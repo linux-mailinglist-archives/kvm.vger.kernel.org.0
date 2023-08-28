@@ -2,85 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88E9778A85F
-	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 10:58:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 845AE78A880
+	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 11:09:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbjH1I5o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Aug 2023 04:57:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
+        id S229669AbjH1JJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 05:09:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbjH1I5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 04:57:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205D4BF
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 01:57:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B0D7263241
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 08:57:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E064FC433C8;
-        Mon, 28 Aug 2023 08:57:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693213042;
-        bh=oq7lotxiOG6rp/fU9NGgOcEsPBS3rd1oTL/ij/e1qnM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=BfGnjVeKoLWZ7sFj+HJSKAir3gL46tRoz7ilIV4r/mOpR6bXduBVck7yk1/KkdARa
-         pVBGl29NWv7B122P7uaOBiCD3ddSsyB2/H3qmsxhXMmg7bdwO8pyER95++NnSiux1a
-         7QDNydm//98VNz1Rl50Iab+y2z8EogO9Jpz9qFxz5xahexVbUrD1tOdJJSy+mWJRgB
-         q548VLyG0L9T4FjyUXEPm3g/ek39TbPy2Hiz2iaox3DD9AqTJFVXbhzCVAME1ayZ7Q
-         JrU7IQ2gV5qJESnW2lKG6zbjl6wsZLucKeewLzGKLXGC3tNEAEAgjwtWWCYOxeEs6J
-         /83s2ewaECk3g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qaY3i-008fYE-RE;
-        Mon, 28 Aug 2023 09:57:19 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexander Stein <alexander.stein@ew.tq-group.com>,
-        Anup Patel <anup@brainfault.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        David Matlack <dmatlack@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Fuad Tabba <tabba@google.com>, Gavin Shan <gshan@redhat.com>,
-        Huang Shijie <shijie@os.amperecomputing.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Kalesh Singh <kaleshsingh@google.com>,
-        Leo Yan <leo.yan@linaro.org>, Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Reiji Watanabe <reijiw@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Will Deacon <will@kernel.org>,
-        Yue Haibing <yuehaibing@huawei.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Zenghui Yu <zenghui.yu@linux.dev>,
-        James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 updates for Linux v6.6
-Date:   Mon, 28 Aug 2023 09:57:11 +0100
-Message-Id: <20230828085711.4000711-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S229626AbjH1JIs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 05:08:48 -0400
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2150.outbound.protection.outlook.com [40.92.62.150])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04D8EC;
+        Mon, 28 Aug 2023 02:08:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aZO+OxFzU1wzRX89kt/Gf6TOy0f/B3O/KZEXu3GskZot/sPg0xcewP5MUN9yPA7XOxfVu9aLioDJcJSLP2vCV5v/s5rH6QrV/fijsHR/gOBYebhpIKR2JMD3xsfrG4klF9jNFFf5YaWYmoHsr4e5GgxQB+N1psnz47ZdmL5VEji6RudTNpsLJvx/Hl8I3wW6EeTO1OeiNaOO+Z8jEpzQt3hbMibmS8WY6AhG7ep88XlN8svDUg9mLJzXp7jGvIyHupt4kCJ5a59ipYnb1HoDO8qsNgA1FMUQ4dEYrAgsL51cVD58xYuGGaqK+MUzGkCx+iiRyqW46UdTfvHu1jAuIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jKhhb45qakiRY3VC6LQnRVKOQiyKkazHDrWcOJmRd9I=;
+ b=V1JKlTjE1khZL1AwCQvYME/NM4nxoxEnq5VKK0bUpFxX7gR9WCt0W6i7aQa50PmXPUMsaT9+2z8Ug2/62cdmtbfju75B4DeGHXY0YUQlo/CPTuf51AqWVEt0eTOuwxaRLnZWG9/u3YmcNtYYq0VYtkoyLZr4dP8oVOauv1sI0bH17sg/flsypf2gEtJR287B146BbvmYHRkdDt6RHzSuw7OmoFBYe6Eo76vPV7pHIEoCNQlH18SccKQ7LyAH8Xuv+abeZrhplwwxgSOR7egR9l5ETtwwLM7ptDzR0+H5gxnyDzsWgvBfV9Im5emgVC6J2BiaL01d7/v3Lmkw+EnONg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jKhhb45qakiRY3VC6LQnRVKOQiyKkazHDrWcOJmRd9I=;
+ b=mPUmLopPSt31dzEC/514O2pOe/VkoG1qKqcYHOrCJEVN2JuUCrZvVq0R3iJVV0k7rvqFea21xKh0/k/9tIhgJhiqbgArjhLHjt6wTULkhOhp/lLUPX8pbUGCby03GADia9CCuvc2EKmbU9cVgBiDAKQ3BGfFAwy4n7AI2g4ix9JXf88D3y0EP6sM///La7qOcNqFBOSdtj+QJzheMwXsYqse4F5dDUEHx1EiteGuzjc2S7hHwmUtT6oCj1TPntdxWcsaSBxEOfIETdF1u66X8hfN6rMt1cn8X7IJXQkzRNa9x8OFAgm7VoZzcU1jPjDIm7UmeDF6jGWKkhHAIZVneQ==
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
+ MEYP282MB2584.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:11e::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.34; Mon, 28 Aug 2023 09:08:41 +0000
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::62ca:cc8a:e3db:1f2c]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::62ca:cc8a:e3db:1f2c%7]) with mapi id 15.20.6699.034; Mon, 28 Aug 2023
+ 09:08:41 +0000
+From:   Tianyi Liu <i.pear@outlook.com>
+To:     seanjc@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, Tianyi Liu <i.pear@outlook.com>
+Subject: [PATCH] KVM: VMX: Fix NMI event loss
+Date:   Mon, 28 Aug 2023 17:07:59 +0800
+Message-ID: <SY4P282MB10841E53BAF421675FCE991D9DE0A@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.41.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexander.stein@ew.tq-group.com, anup@brainfault.org, catalin.marinas@arm.com, dmatlack@google.com, eric.auger@redhat.com, tabba@google.com, gshan@redhat.com, shijie@os.amperecomputing.com, jingzhangos@google.com, kaleshsingh@google.com, leo.yan@linaro.org, broonie@kernel.org, mark.rutland@arm.com, miguel.luis@oracle.com, oliver.upton@linux.dev, philmd@linaro.org, rananta@google.com, rdunlap@infradead.org, reijiw@google.com, seanjc@google.com, shahuang@redhat.com, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuehaibing@huawei.com, yuzenghui@huawei.com, zenghui.yu@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain
+X-TMN:  [cWc8n+iUqzHmtkk4okZcHOwed3ktIshq3V+VAoI/AVrRqEWuiGNGGg==]
+X-ClientProxiedBy: SI2P153CA0033.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::21) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20230828090759.1867-1-i.pear@outlook.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|MEYP282MB2584:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64350467-0185-4828-2beb-08dba7a65f7f
+X-MS-Exchange-SLBlob-MailProps: ymJijV9pwJlrrluThJ+JdRbaZEbpimv0jkv0dvpP/hgujflfnrzU3GALhsh6H3Jb71GFzUX2nPyHWiLNTEVSUDbHsMBNaj2PuhIG4YMPPel5X4zNs9YyYKf09iFMrUAsStqrzrKoJoeKrbSzX+NjXs/jOx+rqvMxgm18cIjoRMhU8qfcmP3ulesS7aDjNrrU5g5Y5jDNeNMLSBnQOD7VHOjzlRDzO7fhpzuoZm7/No2T2++TRaKx9tm8PsvtD6T2sS2DWTSw/0wmC7VCSZ70XbxKkzVCCaf916GRemllfEtkds5k4p9Guk9B04hNzdxd8t+PqsHZ2SKpDwKP0dqzOdY6o4wFUaQ6a4DBb9DctjCWf6V8HlPmSSMYuODHUiAyQdZVUVSGH81/cj4+Fjks4WyWISV92w4/R+3/4VVSqX0dio9UxXC+UyvZjAzVMBTeBOEtkHkFF2lbqIx9PsCTZiKzmTc/ZIVnaIJUZyru4JQ+yNxQKTEKW7ENboa8F86wIEDMqUFmHpsYTf0USDq9cohd2ql254e1zNMCZ+Vm2oMsaeH7vi4s+fPPFrPvwhJ1R9HtE7XCRyTsvl+yXwrIzy6rxTGnxucIM9GIJHSIKXg2Ganvkg5GGkqkNhvGU8uHfZrTTGhY1Xcu2m6IbiycY79HJWyXrx986IgIjXQAmXuhi8wst6y4PAqEEZ3jyt/MKaeMm1facYLkqz/94A8XAtCeqy7HQ+4YDq3Y5US+VMtQIHAtyRtDfQCgUkLS1HjD3tzWnDUAIHZaQpFjWkYBIJazRQ1SmGRkIldl7RrJ/2hIdc4mJDazVHhSv1Gwy8nE
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EVkn/elQomZNZzcsriNeXRB4c9gxlh3TZUsSP/lLezPHWJ4tJZ4W6TbDEJwGSOOy7XOXrJmE+oyUN2olz+zSL8STpr8UqTMADC4pCC8KeUJCiU+bKCYv4tZXmKVLyF4X4gr8i/uG6UpRjrUscTK8yGUIgYgRGiZMIHFolBfiaRBTtaXmKmEW40TU5KBK03CueZ9VqvNXeBgmmuRtVIgUbBUAbxVQ7v193h4ITKZY5z3IHVyv7UM5ovJ8LYBvCaTg9UtLUV+uPYIrvJJZjrNh998IIVMp/0WcYAf2Ltx/onre9+SHNosEP98fchGtcFsldM1xGMNUSDDB8ceZfRL4X32dvFSqmYFnbyUVLebVJs5V9GjYjohmyYTL1xg9/mxflRUEJWrItvaojuh5moZODclBuo5NkTIkCHWSvQh4LzodswbF5aGTghgb+pOYfgCj+evMsoXEr4l1r8yE4PQ4p9J6Hm4hOpsaZ9GaBA82BpBi7LKc66/rbSTDrNWVuEZ+SpJ0IQG4IGoyI9rH/ghXeCj+CnONop2N1xG6deUDKlhBJNE6VUpAdiB/jgBeG06YAHnmDZ24K1rw+asZQZYv0d/mPFMzBNZnWyI3piXCU0U=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KjkwK9RVp5VdZrx2hdTgn42UmhtmDtMZrsAjkLh9RXDkSz4ch6axkKgVYkS8?=
+ =?us-ascii?Q?m7DWpmcNqn9DE2rFJrFdQee1F/CMmatbK3884CGz53rCaBlIKDzRZdqEW92G?=
+ =?us-ascii?Q?N264FwC0wxKi4bS5wOtv4M1KgPT4Fy21x+PpNX8t39apUku92OyDraxF5Q1T?=
+ =?us-ascii?Q?SzvbMQbzegIH0M+4ogZDjazn6pZNYdI6pR7l8GTkjXx8g/YGmYv9yP2e37v0?=
+ =?us-ascii?Q?Nx+IeDdmhS0bgQUejO4nckh5PYQnSYWof/8FIaShMYRF0/XxCTECkI9sMGr9?=
+ =?us-ascii?Q?QlJS+CYr/dWr3ZM9I5AOA/XtbJNQ8/wUueQkWZRm2Hey6AUf3wuw5maTFqGr?=
+ =?us-ascii?Q?F3bGTGkoOW+jvDPj6VVzCKrqcAaWVvD06tAKR04v0Q4u2df3ZTYtIYh9IDrs?=
+ =?us-ascii?Q?+vCuDjSXptdGDmOWlRZvqJZ+KV9xbnVjRAYdCGZOXjPpor951wlP4pOezzHI?=
+ =?us-ascii?Q?Hj62+4bFjvyZmT1VRNph43eO9/jNwkLZxFIFqbbXy+E6goUb1U3hPjKRC+H7?=
+ =?us-ascii?Q?lL9lraIK5R4g8KElJ/RmN2by2dCNroPEa+cSy8QVZJ8XcOlykuIDJh3QzY20?=
+ =?us-ascii?Q?7j9nfR7JVsS7g+4kLP+e/74bJn81lXbZhm92rgnW49cyuzrdHrxXXj/qzffb?=
+ =?us-ascii?Q?07RiVJJpuOlvP9+XiWj/ptiucNDtop2nm91tudK/qJ/sx+0yxBcV7p+fq4C3?=
+ =?us-ascii?Q?hsn9cH1X+Wln0y4p4dSLC3iiRTYYUfjOoPYqbkMFcYbwCcSG6pjljdmH1So+?=
+ =?us-ascii?Q?DcH5mqK2/M6Xy9MGDZdUA7T/lGyzhswm3Ds5nSOuYgPI22NCZEX27+7YN7+S?=
+ =?us-ascii?Q?yAMYamXGPW/7EjntEmdZyBU3tePjfH0cQqCM7Yex2EY08I65Ghx6k/BXB5ZO?=
+ =?us-ascii?Q?xIjXOtoTgut80PKi/zJjm++/UO4u0oXxzVYbGXgvx/gnJPjWAo0KicBRUTRm?=
+ =?us-ascii?Q?fZZgAXMMvzOit7rqXyVzeRKJi/Xdw9BTHO4FUPqy/a+YAKw0FH/JHkFIaRQP?=
+ =?us-ascii?Q?lFxvX3TY/oe8D7W0x6vHmc1nUPTlp9F46xnOJk8ccWyGw/bSY81+XLlLQNN1?=
+ =?us-ascii?Q?Wnds3DwJBuN7Ah0+R0kfF3Pu6svMzFzqoeani7xI8DwSQDBHFeAd+TG8HD7n?=
+ =?us-ascii?Q?cRA8xtCQprwjbOzEf6IDq1huFlNnVdK6YknIlNpha01A5LnO5b3uv+sbfc2u?=
+ =?us-ascii?Q?dHP8G42mxrnWG9JGwU7f0oAuT8lM3rHj43iPVTjFRimK9KwLRbyz32B6xHXk?=
+ =?us-ascii?Q?SyM6qiMnNxVTVEneUq1t?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64350467-0185-4828-2beb-08dba7a65f7f
+X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2023 09:08:41.4372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYP282MB2584
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,192 +102,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Hi, Sean:
 
-Here's the set of KVM/arm64 updates for 6.6. The highlight is the
-support for range-based TLB invalidation, something that should help
-cloud-type workloads, which are basically limited to moving the VMs
-around rather than running guest code... ;-)
+I have found that in the latest version of the kernel, some PMU events are
+being lost. I used bisect and found out the breaking commit [1], which
+moved the handling of NMI events from `handle_exception_irqoff` to
+`vmx_vcpu_enter_exit`.
 
-We also have a pretty large nested virtualisation update, with the
-description of a zillion trap bits. The rest is the usual mix of
-cleanups, bug fixes, and minor improvements (details in the tag
-below).
+If I revert this part as done in this patch, it works correctly. However,
+I'm not really familiar with KVM, and I'm not sure about the intent behind
+the original patch [1]. Could you please take a look on this? Thanks a lot.
 
-Please pull,
+My use case is to sample the IP of guest OS using `perf kvm`:
+`perf kvm --guest record -a -g -e instructions -F 10000 -- sleep 1`
 
-	M.
+If it works correctly, it will record about 10000 samples (as `-F 10000`)
+and it will say:
+`[ perf record: Captured and wrote 0.9 MB perf.data.guest (9729 samples) ]`
+And if not, it will only record ~100 samples, sometimes no sample at all.
 
-The following changes since commit 6eaae198076080886b9e7d57f4ae06fa782f90ef:
+If it's useful for your debug, The callchain of `vmx_vcpu_enter_exit` is:
+vmx_vcpu_enter_exit
+vmx_vcpu_run
+kvm_x86_vcpu_run
+vcpu_enter_guest
 
-  Linux 6.5-rc3 (2023-07-23 15:24:10 -0700)
+While the callchain of `handle_exception_irqoff` is:
+handle_exception_irqoff
+vmx_handle_exit_irqoff
+kvm_x86_handle_exit_irqoff
+vcpu_enter_guest
 
-are available in the Git repository at:
+[1] https://lore.kernel.org/all/20221213060912.654668-8-seanjc@google.com/
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.6
+Signed-off-by: Tianyi Liu <i.pear@outlook.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-for you to fetch changes up to 1f66f1246bfa08aaf13db897736de49cbeaf72a1:
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index df461f387e20..3a0b13867a6b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6955,6 +6955,12 @@ static void handle_exception_irqoff(struct vcpu_vmx *vmx)
+ 	/* Handle machine checks before interrupts are enabled */
+ 	else if (is_machine_check(intr_info))
+ 		kvm_machine_check();
++	/* We need to handle NMIs before interrupts are enabled */
++	else if (is_nmi(intr_info)) {
++		kvm_before_interrupt(&vmx->vcpu, KVM_HANDLING_NMI);
++		vmx_do_nmi_irqoff();
++		kvm_after_interrupt(&vmx->vcpu);
++	}
+ }
+ 
+ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+@@ -7251,13 +7257,6 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ 	else
+ 		vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
+ 
+-	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
+-	    is_nmi(vmx_get_intr_info(vcpu))) {
+-		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+-		vmx_do_nmi_irqoff();
+-		kvm_after_interrupt(vcpu);
+-	}
+-
+ 	guest_state_exit_irqoff();
+ }
+ 
+-- 
+2.41.0
 
-  Merge branch kvm-arm64/6.6/misc into kvmarm-master/next (2023-08-28 09:30:32 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for Linux 6.6
-
-- Add support for TLB range invalidation of Stage-2 page tables,
-  avoiding unnecessary invalidations. Systems that do not implement
-  range invalidation still rely on a full invalidation when dealing
-  with large ranges.
-
-- Add infrastructure for forwarding traps taken from a L2 guest to
-  the L1 guest, with L0 acting as the dispatcher, another baby step
-  towards the full nested support.
-
-- Simplify the way we deal with the (long deprecated) 'CPU target',
-  resulting in a much needed cleanup.
-
-- Fix another set of PMU bugs, both on the guest and host sides,
-  as we seem to never have any shortage of those...
-
-- Relax the alignment requirements of EL2 VA allocations for
-  non-stack allocations, as we were otherwise wasting a lot of that
-  precious VA space.
-
-- The usual set of non-functional cleanups, although I note the lack
-  of spelling fixes...
-
-----------------------------------------------------------------
-David Matlack (3):
-      KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
-      KVM: Allow range-based TLB invalidation from common code
-      KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
-
-Fuad Tabba (1):
-      KVM: arm64: Remove redundant kvm_set_pfn_accessed() from user_mem_abort()
-
-Marc Zyngier (35):
-      Merge branch kvm-arm64/6.6/generic-vcpu into kvmarm-master/next
-      arm64: Add missing VA CMO encodings
-      arm64: Add missing ERX*_EL1 encodings
-      arm64: Add missing DC ZVA/GVA/GZVA encodings
-      arm64: Add TLBI operation encodings
-      arm64: Add AT operation encodings
-      arm64: Add debug registers affected by HDFGxTR_EL2
-      arm64: Add missing BRB/CFP/DVP/CPP instructions
-      arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-      KVM: arm64: Correctly handle ACCDATA_EL1 traps
-      KVM: arm64: Add missing HCR_EL2 trap bits
-      KVM: arm64: nv: Add FGT registers
-      KVM: arm64: Restructure FGT register switching
-      KVM: arm64: nv: Add trap forwarding infrastructure
-      KVM: arm64: nv: Add trap forwarding for HCR_EL2
-      KVM: arm64: nv: Expose FEAT_EVT to nested guests
-      KVM: arm64: nv: Add trap forwarding for MDCR_EL2
-      KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
-      KVM: arm64: nv: Add fine grained trap forwarding infrastructure
-      KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
-      KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
-      KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
-      KVM: arm64: nv: Add SVC trap forwarding
-      KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
-      KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
-      KVM: arm64: nv: Expose FGT to nested guests
-      KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
-      KVM: arm64: nv: Add support for HCRX_EL2
-      KVM: arm64: pmu: Resync EL0 state on counter rotation
-      KVM: arm64: pmu: Guard PMU emulation definitions with CONFIG_KVM
-      KVM: arm64: nv: Add trap description for SPSR_EL2 and ELR_EL2
-      Merge branch kvm-arm64/nv-trap-forwarding into kvmarm-master/next
-      Merge branch kvm-arm64/tlbi-range into kvmarm-master/next
-      Merge branch kvm-arm64/6.6/pmu-fixes into kvmarm-master/next
-      Merge branch kvm-arm64/6.6/misc into kvmarm-master/next
-
-Mark Brown (1):
-      arm64: Add feature detection for fine grained traps
-
-Oliver Upton (4):
-      KVM: arm64: Delete pointless switch statement in kvm_reset_vcpu()
-      KVM: arm64: Remove pointless check for changed init target
-      KVM: arm64: Replace vCPU target with a configuration flag
-      KVM: arm64: Always return generic v8 as the preferred target
-
-Raghavendra Rao Ananta (11):
-      KVM: Declare kvm_arch_flush_remote_tlbs() globally
-      KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-      KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-      arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
-      arm64: tlb: Implement __flush_s2_tlb_range_op()
-      KVM: arm64: Implement __kvm_tlb_flush_vmid_range()
-      KVM: arm64: Define kvm_tlb_flush_vmid_range()
-      KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-      KVM: arm64: Flush only the memslot after write-protect
-      KVM: arm64: Invalidate the table entries upon a range
-      KVM: arm64: Use TLBI range-based instructions for unmap
-
-Randy Dunlap (1):
-      KVM: arm64: nv: Select XARRAY_MULTI to fix build error
-
-Reiji Watanabe (4):
-      KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
-      KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
-      KVM: arm64: PMU: Don't advertise the STALL_SLOT event
-      KVM: arm64: PMU: Don't advertise STALL_SLOT_{FRONTEND,BACKEND}
-
-Shaoqin Huang (1):
-      KVM: arm64: Use the known cpu id instead of smp_processor_id()
-
-Vincent Donnefort (1):
-      KVM: arm64: Remove size-order align in the nVHE hyp private VA range
-
-Yue Haibing (1):
-      KVM: arm64: Remove unused declarations
-
-Zenghui Yu (1):
-      KVM: arm64: Drop HCR_VIRT_EXCP_MASK
-
- arch/arm/include/asm/arm_pmuv3.h        |    2 +
- arch/arm64/include/asm/kvm_arm.h        |   51 +-
- arch/arm64/include/asm/kvm_asm.h        |    3 +
- arch/arm64/include/asm/kvm_host.h       |   24 +-
- arch/arm64/include/asm/kvm_mmu.h        |    1 +
- arch/arm64/include/asm/kvm_nested.h     |    2 +
- arch/arm64/include/asm/kvm_pgtable.h    |   10 +
- arch/arm64/include/asm/sysreg.h         |  268 ++++-
- arch/arm64/include/asm/tlbflush.h       |  124 ++-
- arch/arm64/kernel/cpufeature.c          |    7 +
- arch/arm64/kvm/Kconfig                  |    2 +-
- arch/arm64/kvm/arm.c                    |   65 +-
- arch/arm64/kvm/emulate-nested.c         | 1852 +++++++++++++++++++++++++++++++
- arch/arm64/kvm/guest.c                  |   15 -
- arch/arm64/kvm/handle_exit.c            |   29 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  127 ++-
- arch/arm64/kvm/hyp/include/nvhe/mm.h    |    1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |   11 +
- arch/arm64/kvm/hyp/nvhe/mm.c            |   83 +-
- arch/arm64/kvm/hyp/nvhe/setup.c         |   27 +-
- arch/arm64/kvm/hyp/nvhe/switch.c        |    2 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c           |   30 +
- arch/arm64/kvm/hyp/pgtable.c            |   63 +-
- arch/arm64/kvm/hyp/vhe/tlb.c            |   28 +
- arch/arm64/kvm/mmu.c                    |  102 +-
- arch/arm64/kvm/nested.c                 |   11 +-
- arch/arm64/kvm/pmu-emul.c               |   37 +-
- arch/arm64/kvm/pmu.c                    |   18 +
- arch/arm64/kvm/reset.c                  |   25 +-
- arch/arm64/kvm/sys_regs.c               |   15 +
- arch/arm64/kvm/trace_arm.h              |   26 +
- arch/arm64/kvm/vgic/vgic.h              |    2 -
- arch/arm64/tools/cpucaps                |    1 +
- arch/arm64/tools/sysreg                 |  129 +++
- arch/mips/include/asm/kvm_host.h        |    3 +-
- arch/mips/kvm/mips.c                    |   12 +-
- arch/riscv/kvm/mmu.c                    |    6 -
- arch/x86/include/asm/kvm_host.h         |    6 +-
- arch/x86/kvm/mmu/mmu.c                  |   28 +-
- arch/x86/kvm/mmu/mmu_internal.h         |    3 -
- arch/x86/kvm/x86.c                      |    2 +-
- drivers/perf/arm_pmuv3.c                |    2 +
- include/kvm/arm_pmu.h                   |    4 +-
- include/linux/kvm_host.h                |   24 +-
- virt/kvm/Kconfig                        |    3 -
- virt/kvm/kvm_main.c                     |   35 +-
- 46 files changed, 2993 insertions(+), 328 deletions(-)
