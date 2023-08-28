@@ -2,80 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 730BD78A3A1
-	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 02:06:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ADDE78A4E1
+	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 06:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjH1AGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Aug 2023 20:06:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51120 "EHLO
+        id S229621AbjH1EGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 00:06:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbjH1AGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Aug 2023 20:06:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC239FE
-        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 17:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693181118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ibbxsoxCKoBvkUXcOjeA5GRQGxS837QbGPrgrI0q1/A=;
-        b=g/8Tpsl5o3GeWffUmOeKIZ8pvO14MIcMGkyukXsjj7u3cEXpfn5M0A2rzwORet0Mt/Fndf
-        DTtuNOUWBdE4v+RkdqgutNnZ3lb2ueN5qThvfqXgHz7bIWYALwRlTgYpGdTawZwj4GXSEr
-        YUYnEFXyIm54sRMiTClHPpOY0WaeAhw=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-GF-H1xhmMFSUYdLJ-1TqVA-1; Sun, 27 Aug 2023 20:05:17 -0400
-X-MC-Unique: GF-H1xhmMFSUYdLJ-1TqVA-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-d74b711ec0dso3292879276.0
-        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 17:05:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693181116; x=1693785916;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ibbxsoxCKoBvkUXcOjeA5GRQGxS837QbGPrgrI0q1/A=;
-        b=Zj3guAYKrdcvSx+9FmVovxX+pkhuUmobA2KEAO2TaW9+rS+zKQ6sm10XRmreAjmqQ7
-         6YHnMyZczWDMPy4p3wzjjNQqpE7arSxYkl/fviQ9wRyVuNNVJGglwVXqmwHObTFnB5pk
-         SgevhFlZ1689HVMczUqcZ4FntyNFZiDVO2QqFOn2Byjm/Ikof8Uu6xKebylMoOZpkGsL
-         fiYaM1cQZtYkRbV6/4nCR/dXuTBhZOAPn++2BWhYZ09Fyy4zbKlkj8JbdqpO2kbyHA7S
-         1YEK+rj54sQIXXX2JB9s6XjYjkVWR8ncAfu/hYH+2xajeJ1o0uR6eTLathdeBmV5fRZU
-         K18g==
-X-Gm-Message-State: AOJu0Yxzx0JxEuHPNgowSgpWIyVnJNU16NKtMsU1ZSs9tJy8juJgNp7A
-        m9HhCizQtY2SX7cPRHxCaueb67U1dalpkDONRYXTO/LUEvM4/K1jEVSrrwt0TLIQprpDH7Tp5CF
-        0Fmcs7K2THhNA
-X-Received: by 2002:a5b:c4d:0:b0:c6c:e4f4:2fb1 with SMTP id d13-20020a5b0c4d000000b00c6ce4f42fb1mr23159082ybr.3.1693181116680;
-        Sun, 27 Aug 2023 17:05:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzTGnH/D9yks8HrxCxd1C2qlL/9q/iUYvVS74r5N4bfJiUroHlQVt3omDGJuT4KA1Dop6X2Q==
-X-Received: by 2002:a5b:c4d:0:b0:c6c:e4f4:2fb1 with SMTP id d13-20020a5b0c4d000000b00c6ce4f42fb1mr23159074ybr.3.1693181116446;
-        Sun, 27 Aug 2023 17:05:16 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id g10-20020a63b14a000000b00566095dac12sm5920524pgp.19.2023.08.27.17.05.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Aug 2023 17:05:15 -0700 (PDT)
-Message-ID: <4bd99ea8-46de-f66f-8e9e-aa981b26dc43@redhat.com>
-Date:   Mon, 28 Aug 2023 10:05:10 +1000
+        with ESMTP id S229519AbjH1EG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 00:06:27 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396CA107;
+        Sun, 27 Aug 2023 21:06:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693195585; x=1724731585;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OULJKEe473kdhF1m2dfcAYsUMb0z7uoejfE3vAVjmts=;
+  b=m7/vnLumHbtcJjgWMXzLBmHCTyE7RytBiQAP/Lo5UFgaWk0yEPeUtIhu
+   m1GChwtPWS93BTDS1l0CM4vPKxM5b6/R6IBwrMFgXk3Xkw7iaujCymzPq
+   0P7m5sWvMPoATNXQP60wReWv6gN0yCeRE6vq3dvfobN0gFogJiFyPm/b0
+   WxhnjFLAhDb9QLoGaEiUbwOQsHCuG/9ho97/HbBsfKpYEMZbWsfh0SiDi
+   BZdOETqMCpuavlk4lOcoWy1WvdJX5+e4cX5PQqGAqTaXbTgXF4+e3E1lH
+   IYutbZbvtY9cLj2NDh518yw+j9NIYBR2FsdqQfFvuaHNbNPPvLSG6xnCC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="405996981"
+X-IronPort-AV: E=Sophos;i="6.02,206,1688454000"; 
+   d="scan'208";a="405996981"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2023 21:06:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="803554538"
+X-IronPort-AV: E=Sophos;i="6.02,206,1688454000"; 
+   d="scan'208";a="803554538"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.52]) ([10.238.10.52])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2023 21:06:22 -0700
+Message-ID: <7463d8dd-5290-59c0-73bc-68053d6a320a@linux.intel.com>
+Date:   Mon, 28 Aug 2023 12:06:20 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2] arm/kvm: Enable support for
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Content-Language: en-US
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     peter.maydell@linaro.org, ricarkol@google.com, kvm@vger.kernel.org,
-        jonathan.cameron@huawei.com, linuxarm@huawei.com
-References: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
-From:   Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v10 1/9] KVM: x86/mmu: Use GENMASK_ULL() to define
+ __PT_BASE_ADDR_MASK
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        David.Laight@aculab.com, robert.hu@linux.intel.com,
+        guang.zeng@intel.com
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+ <20230719144131.29052-2-binbin.wu@linux.intel.com>
+ <ZN0454peMb3z/0Bg@google.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZN0454peMb3z/0Bg@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -83,62 +68,75 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi Shameer,
 
-On 8/15/23 19:27, Shameer Kolothum wrote:
-> Now that we have Eager Page Split support added for ARM in the kernel,
-> enable it in Qemu. This adds,
->   -eager-split-size to -accel sub-options to set the eager page split chunk size.
->   -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
-> 
-> The chunk size specifies how many pages to break at a time, using a
-> single allocation. Bigger the chunk size, more pages need to be
-> allocated ahead of time.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
-> RFC v1: https://lore.kernel.org/qemu-devel/20230725150002.621-1-shameerali.kolothum.thodi@huawei.com/
->    -Updated qemu-options.hx with description
->    -Addressed review comments from Peter and Gavin(Thanks).
-> ---
->   include/sysemu/kvm_int.h |  1 +
->   qemu-options.hx          | 14 +++++++++
->   target/arm/kvm.c         | 62 ++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 77 insertions(+)
-> 
+On 8/17/2023 5:00 AM, Sean Christopherson wrote:
+> On Wed, Jul 19, 2023, Binbin Wu wrote:
+>> Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
+> Using GENMASK_ULL() is an opportunistic cleanup, it is not the main purpose for
+> this patch.  The main purpose is to extract the maximum theoretical mask for guest
+> MAXPHYADDR so that it can be used to strip bits from CR3.
+>
+> And rather than bury the actual use in "KVM: x86: Virtualize CR3.LAM_{U48,U57}",
+> I think it makes sense to do the masking in this patch.  That change only becomes
+> _necessary_ when LAM comes along, but it's completely valid without LAM.
+>
+> That will also provide a place to explain why we decided to unconditionally mask
+> the pgd (it's harmless for 32-bit guests, querying 64-bit mode would be more
+> expensive, and for EPT the mask isn't tied to guest mode).
+OK.
 
-[...]
+> And it should also
+> explain that using PT_BASE_ADDR_MASK would actually be wrong (PAE has 64-bit
+> elements _except_ for CR3).
+Hi Sean, I am not sure if I understand it correctly.
+Do you mean when KVM shadows the page table of guest using 32-bit paging 
+or PAE paging,
+guest CR3 is or can be 32 bits for 32-bit paging or PAE paging, so that 
+apply the mask to a 32-bit
+value CR3 "would actually be wrong" ?
 
->   
-> +static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
-> +                                          const char *name, void *opaque,
-> +                                          Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    uint64_t value = s->kvm_eager_split_size;
-> +
-> +    visit_type_size(v, name, &value, errp);
-> +}
-> +
-> +static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
-> +                                          const char *name, void *opaque,
-> +                                          Error **errp)
-> +{
-> +    KVMState *s = KVM_STATE(obj);
-> +    uint64_t value;
-> +
-> +    if (s->fd != -1) {
-> +        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
-> +        return;
-> +    }
-> +
 
-Errors spotted by './scripts/checkpatch.pl', as below:
-
-ERROR: line over 90 characters
-#139: FILE: target/arm/kvm.c:1112:
-+        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
-
-Thanks,
-Gavin
+>
+> E.g. end up with a shortlog for this patch along the lines of:
+>
+>    KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
+>
+> and write the changelog accordingly.
+>
+>> No functional change intended.
+>>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> ---
+>>   arch/x86/kvm/mmu/mmu_internal.h | 1 +
+>>   arch/x86/kvm/mmu/paging_tmpl.h  | 2 +-
+>>   2 files changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+>> index d39af5639ce9..7d2105432d66 100644
+>> --- a/arch/x86/kvm/mmu/mmu_internal.h
+>> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+>> @@ -21,6 +21,7 @@ extern bool dbg;
+>>   #endif
+>>   
+>>   /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
+>> +#define __PT_BASE_ADDR_MASK GENMASK_ULL(51, 12)
+>>   #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
+>>   	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
+>>   #define __PT_INDEX(address, level, bits_per_level) \
+>> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+>> index 0662e0278e70..00c8193f5991 100644
+>> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+>> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+>> @@ -62,7 +62,7 @@
+>>   #endif
+>>   
+>>   /* Common logic, but per-type values.  These also need to be undefined. */
+>> -#define PT_BASE_ADDR_MASK	((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
+>> +#define PT_BASE_ADDR_MASK	((pt_element_t)__PT_BASE_ADDR_MASK)
+>>   #define PT_LVL_ADDR_MASK(lvl)	__PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+>>   #define PT_LVL_OFFSET_MASK(lvl)	__PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+>>   #define PT_INDEX(addr, lvl)	__PT_INDEX(addr, lvl, PT_LEVEL_BITS)
+>> -- 
+>> 2.25.1
+>>
 
