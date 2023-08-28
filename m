@@ -2,96 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11CED78B45D
-	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 17:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C75E878B474
+	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 17:32:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230501AbjH1PYE convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 28 Aug 2023 11:24:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54920 "EHLO
+        id S229535AbjH1Pbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 11:31:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjH1PXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 11:23:32 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68CCE0;
-        Mon, 28 Aug 2023 08:23:30 -0700 (PDT)
-Received: from hamburger.collabora.co.uk (hamburger.collabora.co.uk [IPv6:2a01:4f8:1c1c:f269::1])
-        by madras.collabora.co.uk (Postfix) with ESMTP id A774A660716E;
-        Mon, 28 Aug 2023 16:23:26 +0100 (BST)
-From:   "Muhammad Usama Anjum" <usama.anjum@collabora.com>
-In-Reply-To: <ZOy5L4WCiy1hsiu0@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Forward: 127.0.0.1
-Date:   Mon, 28 Aug 2023 16:23:26 +0100
-Cc:     "syzbot" <syzbot+412c9ae97b4338c5187e@syzkaller.appspotmail.com>,
-        syzkaller-lts-bugs@googlegroups.com,
-        "syzbot" <syzbot+b000b7d21f93fc69de32@syzkaller.appspotmail.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        "Wanpeng Li" <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>,
-        =?utf-8?q?H=2E_Peter_Anvin?= <hpa@zytor.com>,
-        "Jarkko Sakkinen" <jarkko@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-sgx@vger.kernel.org
-To:     "Sean Christopherson" <seanjc@google.com>
+        with ESMTP id S230047AbjH1Pbg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 11:31:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5914A8
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 08:31:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 41827614B9
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:31:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9725AC433C8;
+        Mon, 28 Aug 2023 15:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693236691;
+        bh=WbdMRQdkcx1ONaBVtblf9wKZeJC6ZyaT1n0rlYDKwbo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=d6zhSu0yHVrrHilCP+SGHNNSABzOQsBLTkGx1gbNX/eCQf+UNZ2AFx8GkJpsW0YVz
+         wEjSLPR8WCcHdYFsEIF86qmOhpKSOrLj64i1YQm2tDZ52N/jRTQJF6LrI82axrwBPH
+         9N4ZH6O4k2PKCygcWPzUiFswaL9D5I5oAE8h1setsFLZrYbP7C3SlNUg4Te/+17SOl
+         XXLAeQp0cIzULDLikZUTxlLZveACDOb/eIZQNIw0hbtbB3NV4R5+y65hMA9B93D2Ud
+         O5SHmoi+U7UxB4/4pBaFO6ZlOBvj9nKj5SPOE4IVS7kOVAQpFOFaJf/46lY66KUOhw
+         PT4lYiSvUdnUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qaeDB-008lkQ-1B;
+        Mon, 28 Aug 2023 16:31:29 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: [PATCH] KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private_va_range()
+Date:   Mon, 28 Aug 2023 16:31:21 +0100
+Message-Id: <20230828153121.4179627-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Message-ID: <6ba2-64ecbc00-5-39397d40@6469447>
-Subject: =?utf-8?q?Re=3A?==?utf-8?q?_[v5=2E15]?= WARNING in 
- =?utf-8?q?kvm=5Farch=5Fvcpu=5Fioctl=5Frun?=
-User-Agent: SOGoMail 5.8.4
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, vdonnefort@google.com, m.szyprowski@samsung.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Monday, August 28, 2023 08:11 PM PKT, Sean Christopherson <seanjc@google.com> wrote:
+Marek reports that his RPi4 spits out a warning at boot time,
+right at the point where the GICv2 virtual CPU interface gets
+mapped.
 
-> On Mon, Aug 28, 2023, Muhammad Usama Anjum wrote:
-> > On 5/5/23 1:28 PM, syzbot wrote:
-> > > syzbot has found a reproducer for the following issue on:
-> > > 
-> > > HEAD commit: 8a7f2a5c5aa1 Linux 5.15.110
-> > This same warning has also been found on  6.1.21.
-> > 
-> > > git tree: linux-5.15.y
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=15f12318280000
-> > > kernel config: https://syzkaller.appspot.com/x/.config?x=ba8d5c9d6c5289f
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=412c9ae97b4338c5187e
-> > > compiler: Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > syz repro: https://syzkaller.appspot.com/x/repro.syz?x=10e13c84280000
-> > > C reproducer: https://syzkaller.appspot.com/x/repro.c?x=149d9470280000
-> > I've tried all the C and syz reproducers. I've also tried syz-crash which
-> > launched multiple instances of VMs and ran syz reproducer. But the issue
-> > didn't get reproduced.
-> > 
-> > I don't have kvm skills. Can someone have a look at the the warning
-> > (probably by static analysis)?
-> > 
-> > > 
-> > > Downloadable assets:
-> > > disk image: https://storage.googleapis.com/syzbot-assets/fc04f54c047f/disk-8a7f2a5c.raw.xz
-> > > vmlinux: https://storage.googleapis.com/syzbot-assets/6b4ba4cb1191/vmlinux-8a7f2a5c.xz
-> > > kernel image: https://storage.googleapis.com/syzbot-assets/d927dc3f9670/bzImage-8a7f2a5c.xz
-> > > 
-> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > Reported-by: syzbot+412c9ae97b4338c5187e@syzkaller.appspotmail.com
-> > > 
-> > > ------------[ cut here ]------------
-> > > WARNING: CPU: 0 PID: 3502 at arch/x86/kvm/x86.c:10310 kvm_arch_vcpu_ioctl_run+0x1d63/0x1f80
-> 
-> "Fixed" by https://lore.kernel.org/all/20230808232057.2498287-1-seanjc@google.com,
-> in quotes because sadly the fix was to simply delete the sanity check :-(
+Upon investigation, it seems that we never return the allocated
+VA and use whatever was on the stack at this point. Yes, this
+is good stuff, and Marek was pretty lucky that he ended-up with
+a VA that intersected with something that was already mapped.
 
-Thank you so much Sean. Thank you so much Sean. Syzbot has been finding the issue in LTS kernels. I'm not sure if we should backport a patch which is just removing a false warning. 
+On my setup, this random value is plausible enough for the mapping
+to take place. Who knows what happens...
 
-#syz fix: KVM: x86: Remove WARN sanity check on hypervisor timer vs. UNINITIALIZED vCPU
+Cc: Vincent Donnefort <vdonnefort@google.com>
+Fixes: f156a7d13fc3 ("KVM: arm64: Remove size-order align in the nVHE hyp private VA range")
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/79b0ad6e-0c2a-f777-d504-e40e8123d81d@samsung.com
+---
+ arch/arm64/kvm/mmu.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 11c1d786c506..50be51cc40cc 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -652,6 +652,9 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+ 
+ 	mutex_unlock(&kvm_hyp_pgd_mutex);
+ 
++	if (!ret)
++		*haddr = base;
++
+ 	return ret;
+ }
+ 
+-- 
+2.34.1
 
