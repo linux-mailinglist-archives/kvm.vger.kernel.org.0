@@ -2,86 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A89F378BB20
-	for <lists+kvm@lfdr.de>; Tue, 29 Aug 2023 00:45:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BD7C78BB3E
+	for <lists+kvm@lfdr.de>; Tue, 29 Aug 2023 00:57:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234215AbjH1Woz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Aug 2023 18:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37042 "EHLO
+        id S234282AbjH1W4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 18:56:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234214AbjH1Woh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 18:44:37 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3B7115
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:44:34 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-31c5cac3ae2so3063212f8f.3
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:44:34 -0700 (PDT)
+        with ESMTP id S234271AbjH1W4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 18:56:17 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E13011A
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:56:14 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5702003a908so806494a12.3
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693262673; x=1693867473;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OyyxGce5gmUfNa1tP64bKObZmxdcrbkh1N254wyjdj8=;
-        b=k7WAhWeyRVjmbKXoFTMQVOt3rYKxukLD2PzsgVqfbQwXcrICdz3vwOQY6DI0J4dkB2
-         C+dQUzNsTOGEJz0YMG+EF0hHw5FZ+U2YHLM98scz5D25xg5iVnE2OspOUk+NE7Pb9V66
-         hLwOHjJ76uw6uEDCWrLn3i7MX2bVKryBySPdupmDM5W2qXb+UkKglyC4zvo1R2sZ5hG5
-         1zi8jq6nsVTHAEZUUopx15qV+Y39S29UmCmlf+mLv7Dsl/bMkxf3k8SJ2wsV8rKsxh20
-         F+0CqkPX4svCnHSKGaOHc4/TzIE3hordRSyYzsrCPwGb6sdcIxN2/hmFFFay9Gc0n7h/
-         pf9g==
+        d=google.com; s=20221208; t=1693263374; x=1693868174;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=45FPDFU2bi5QNrTegRTZSI4D/kTsLJ5aPvVquLb6Kb4=;
+        b=pLOLnQlAccDWO/O5kVLkKwA9wRVSEEkjq7uLC+mlmD7Vfw3vEYXCkgTxxXccxGMWgZ
+         wRGNqorlmNPayZTm3R+GqSyo7GngRdVoeiMDanQ2qTLDbFHAwVr7soK6dbWp8LVur1IJ
+         7Dj7NDy10jedqv9lpI8G9Si/rF4w8XfNDjmoH8zHrZK+nE/CztRtHvsfpP2cZBuR/WSb
+         r1GFzm2yEAVnnjHec8JxS7mw13lbH162cn2tJ8OGbc1nr9IEbWJ5p7u+QgsCm1qR34DM
+         OtkAkqUjCP9VneeTOmcCYfI7wZJzfHg/Vici91Fsjq4cCd2IzQiQr/mxwrVo3egZBd6/
+         M4pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693262673; x=1693867473;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1693263374; x=1693868174;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OyyxGce5gmUfNa1tP64bKObZmxdcrbkh1N254wyjdj8=;
-        b=bdWgAILG29IviwFF5UblEQVewi33Lb4DLblaYxywwlLxei8UkDnFL/YshVdlKPAVTk
-         eDuw3lLsNqtBM4p/8p+SygqoA+fCidF6y4OLMoSJ38EYmR8ByDHnP97gwRIUzR6LTRC2
-         q5g2Qmga+gBx28bYOzGTuUYDSGPy0D/mgxA9bSaVBLYcwWiPhTX+IHKamBkPZC617Uhl
-         kvT63cJqAQXFR70s8cjb/r4zPM0w5CdSAv4eDoufjtIHeAMrtc0mCCuWS8mf5NZOQg38
-         hc1Qf5aBtJcFRAcfBDRi4Ru0s3r40f9SQsB2Rsaj6euwiRCaBzboMpX8axGBEG5Ks28j
-         t9YA==
-X-Gm-Message-State: AOJu0Yz5zaPbkAtDP+9jI80XNVPy2c9L/3YaXi4O20/YIaTbkp1d00RR
-        ZZGSb8qyUj6H2EARBYALujfFUw==
-X-Google-Smtp-Source: AGHT+IHfaSlIx9csx3MxeEpezV95gAFOz7PpYvKzI16bZvPWrAZsdeY5OaE3KOe303ksrNGWCZvLAg==
-X-Received: by 2002:a5d:42c7:0:b0:31a:d31:dbf9 with SMTP id t7-20020a5d42c7000000b0031a0d31dbf9mr19067876wrr.49.1693262673038;
-        Mon, 28 Aug 2023 15:44:33 -0700 (PDT)
-Received: from [192.168.69.115] ([176.164.201.64])
-        by smtp.gmail.com with ESMTPSA id f12-20020adff44c000000b00319779ee691sm11852050wrp.28.2023.08.28.15.44.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 15:44:32 -0700 (PDT)
-Message-ID: <f7a42ba7-613b-bc85-35d4-83c5f08c0964@linaro.org>
-Date:   Tue, 29 Aug 2023 00:44:29 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v2 16/16] virtio-mem: Mark memslot alias memory regions
- unmergeable
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        kvm@vger.kernel.org
-References: <20230825132149.366064-1-david@redhat.com>
- <20230825132149.366064-17-david@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230825132149.366064-17-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        bh=45FPDFU2bi5QNrTegRTZSI4D/kTsLJ5aPvVquLb6Kb4=;
+        b=aqMPm+pcsIRPBMYOxwIk7nuTKJo8/4NogtDLeb4p78IdN3rR7IlhcUOzBP/EpJX6JQ
+         RP4tmcTng0KxYyHu5TLZZXvsdYdaIF0pCOpNjJOfTjFxxpdXAt1edxUqOA5eyWuZi/Lk
+         aNhEiWKjabJtUy8T5dY1+V5Hm50z9DYWQPsX7shzECrAWOWp/pQGiZwhsMb9LHkKSJ6Q
+         M6wctmOPPxN+++e8B/xw0WZDWSckeE7dGlFr0H7CNBt+0T1c1lTfF7EvCClfxJxp0HTI
+         jwpJe7Wj/5wcr0/TldZUJgsHKyq6+Gx4BhjpbgwQ8EM0JdBNBKtc7vEUuvd8hvVNIoQw
+         JoGA==
+X-Gm-Message-State: AOJu0YwNcNJvhwEvQPp4yc0kmMqEHwpCwdRhzatHTZmQTuR7eEdUjAvH
+        4AmdMeglaC6r70wv3aorVWJa1vETMwDv6Lmx0Q==
+X-Google-Smtp-Source: AGHT+IHiRfp4dtsSrmAF/uBzjUu2XQ3xTysjq4Ohm5oUAXB2N+6Zi644lMyKLSW9uEB1MtUrJ1+LGs2ibik7KIYLPQ==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a63:8f09:0:b0:566:2d6:f71b with SMTP
+ id n9-20020a638f09000000b0056602d6f71bmr5097167pgd.12.1693263374002; Mon, 28
+ Aug 2023 15:56:14 -0700 (PDT)
+Date:   Mon, 28 Aug 2023 22:56:12 +0000
+In-Reply-To: <ZOO782YGRY0YMuPu@google.com> (message from Sean Christopherson
+ on Mon, 21 Aug 2023 12:33:07 -0700)
+Mime-Version: 1.0
+Message-ID: <diqzttsiu67n.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        david@redhat.com, qperret@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,21 +82,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/8/23 15:21, David Hildenbrand wrote:
-> Let's mark the memslot alias memory regions as unmergable, such that
-> flatview and vhost won't merge adjacent memory region aliases and we can
-> atomically map/unmap individual aliases without affecting adjacent
-> alias memory regions.
-> 
-> This handles vhost and vfio in multiple-memslot mode correctly (which do
-> not support atomic memslot updates) and avoids the temporary removal of
-> large memslots, which can be an expensive operation. For example, vfio
-> might have to unpin + repin a lot of memory, which is undesired.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->   hw/virtio/virtio-mem.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+Sean Christopherson <seanjc@google.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> On Mon, Aug 21, 2023, Ackerley Tng wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>>
+>> > On Tue, Aug 15, 2023, Ackerley Tng wrote:
+>> >> Sean Christopherson <seanjc@google.com> writes:
+>> >> > Nullifying the KVM pointer isn't sufficient, because without additional actions
+>> >> > userspace could extract data from a VM by deleting its memslots and then binding
+>> >> > the guest_memfd to an attacker controlled VM.  Or more likely with TDX and SNP,
+>> >> > induce badness by coercing KVM into mapping memory into a guest with the wrong
+>> >> > ASID/HKID.
+>> >> >
+>> >> > I can think of three ways to handle that:
+>> >> >
+>> >> >   (a) prevent a different VM from *ever* binding to the gmem instance
+>> >> >   (b) free/zero physical pages when unbinding
+>> >> >   (c) free/zero when binding to a different VM
+>> >> >
+>> >> > Option (a) is easy, but that pretty much defeats the purpose of decopuling
+>> >> > guest_memfd from a VM.
+>> >> >
+>> >> > Option (b) isn't hard to implement, but it screws up the lifecycle of the memory,
+>> >> > e.g. would require memory when a memslot is deleted.  That isn't necessarily a
+>> >> > deal-breaker, but it runs counter to how KVM memlots currently operate.  Memslots
+>> >> > are basically just weird page tables, e.g. deleting a memslot doesn't have any
+>> >> > impact on the underlying data in memory.  TDX throws a wrench in this as removing
+>> >> > a page from the Secure EPT is effectively destructive to the data (can't be mapped
+>> >> > back in to the VM without zeroing the data), but IMO that's an oddity with TDX and
+>> >> > not necessarily something we want to carry over to other VM types.
+>> >> >
+>> >> > There would also be performance implications (probably a non-issue in practice),
+>> >> > and weirdness if/when we get to sharing, linking and/or mmap()ing gmem.  E.g. what
+>> >> > should happen if the last memslot (binding) is deleted, but there outstanding userspace
+>> >> > mappings?
+>> >> >
+>> >> > Option (c) is better from a lifecycle perspective, but it adds its own flavor of
+>> >> > complexity, e.g. the performant way to reclaim TDX memory requires the TDMR
+>> >> > (effectively the VM pointer), and so a deferred relcaim doesn't really work for
+>> >> > TDX.  And I'm pretty sure it *can't* work for SNP, because RMP entries must not
+>> >> > outlive the VM; KVM can't reuse an ASID if there are pages assigned to that ASID
+>> >> > in the RMP, i.e. until all memory belonging to the VM has been fully freed.
+>
+> ...
+>
+>> I agree with you that nulling the KVM pointer is insufficient to keep
+>> host userspace out of the TCB. Among the three options (a) preventing a
+>> different VM (HKID/ASID) from binding to the gmem instance, or zeroing
+>> the memory either (b) on unbinding, or (c) on binding to another VM
+>> (HKID/ASID),
+>>
+>> (a) sounds like adding a check issued to TDX/SNP upon binding and this
+>>     check would just return OK for software-protected VMs (line of sight
+>>     to removing host userspace from TCB).
+>>
+>> Or, we could go further for software-protected VMs and add tracking in
+>> the inode to prevent the same inode from being bound to different
+>> "HKID/ASID"s, perhaps like this:
+>>
+>> + On first binding, store the KVM pointer in the inode - not file (but
+>>   not hold a refcount)
+>> + On rebinding, check that the KVM matches the pointer in the inode
+>> + On intra-host migration, update the KVM pointer in the inode to allow
+>>   binding to the new struct kvm
+>>
+>> I think you meant associating the file with a struct kvm at creation
+>> time as an implementation for (a), but technically since the inode is
+>> the representation of memory, tracking of struct kvm should be with the
+>> inode instead of the file.
+>>
+>> (b) You're right that this messes up the lifecycle of the memory and
+>>     wouldn't work with intra-host migration.
+>>
+>> (c) sounds like doing the clearing on a check similar to that of (a)
+>
+> Sort of, though it's much nastier, because it requires the "old" KVM instance to
+> be alive enough to support various operations.  I.e. we'd have to make stronger
+> guarantees about exactly when the handoff/transition could happen.
+>
 
+Good point!
+
+>> If we track struct kvm with the inode, then I think (a), (b) and (c) can
+>> be independent of the refcounting method. What do you think?
+>
+> No go.  Because again, the inode (physical memory) is coupled to the virtual machine
+> as a thing, not to a "struct kvm".  Or more concretely, the inode is coupled to an
+> ASID or an HKID, and there can be multiple "struct kvm" objects associated with a
+> single ASID.  And at some point in the future, I suspect we'll have multiple KVM
+> objects per HKID too.
+>
+> The current SEV use case is for the migration helper, where two KVM objects share
+> a single ASID (the "real" VM and the helper).  I suspect TDX will end up with
+> similar behavior where helper "VMs" can use the HKID of the "real" VM.  For KVM,
+> that means multiple struct kvm objects being associated with a single HKID.
+>
+> To prevent use-after-free, KVM "just" needs to ensure the helper instances can't
+> outlive the real instance, i.e. can't use the HKID/ASID after the owning virtual
+> machine has been destroyed.
+>
+> To put it differently, "struct kvm" is a KVM software construct that _usually_,
+> but not always, is associated 1:1 with a virtual machine.
+>
+> And FWIW, stashing the pointer without holding a reference would not be a complete
+> solution, because it couldn't guard against KVM reusing a pointer.  E.g. if a
+> struct kvm was unbound and then freed, KVM could reuse the same memory for a new
+> struct kvm, with a different ASID/HKID, and get a false negative on the rebinding
+> check.
+
+I agree that inode (physical memory) is coupled to the virtual machine
+as a more generic concept.
+
+I was hoping that in the absence of CC hardware providing a HKID/ASID,
+the struct kvm pointer could act as a representation of the "virtual
+machine". You're definitely right that KVM could reuse a pointer and so
+that idea doesn't stand.
+
+I thought about generating UUIDs to represent "virtual machines" in the
+absence of CC hardware, and this UUID could be transferred during
+intra-host migration, but this still doesn't take host userspace out of
+the TCB. A malicious host VMM could just use the migration ioctl to copy
+the UUID to a malicious dumper VM, which would then pass checks with a
+gmem file linked to the malicious dumper VM. This is fine for HKID/ASIDs
+because the memory is encrypted; with UUIDs there's no memory
+encryption.
+
+Circling back to the original topic, was associating the file with
+struct kvm at gmem file creation time meant to constrain the use of the
+gmem file to one struct kvm, or one virtual machine, or something else?
+
+Follow up questions:
+
+1. Since the physical memory's representation is the inode and should be
+   coupled to the virtual machine (as a concept, not struct kvm), should
+   the binding/coupling be with the file, or the inode?
+
+2. Should struct kvm still be bound to the file/inode at gmem file
+   creation time, since
+
+   + struct kvm isn't a good representation of a "virtual machine"
+   + we currently don't have anything that really represents a "virtual
+     machine" without hardware support
+
+
+I'd also like to bring up another userspace use case that Google has:
+re-use of gmem files for rebooting guests when the KVM instance is
+destroyed and rebuilt.
+
+When rebooting a VM there are some steps relating to gmem that are
+performance-sensitive:
+
+a.      Zeroing pages from the old VM when we close a gmem file/inode
+b. Deallocating pages from the old VM when we close a gmem file/inode
+c.   Allocating pages for the new VM from the new gmem file/inode
+d.      Zeroing pages on page allocation
+
+We want to reuse the gmem file to save re-allocating pages (b. and c.),
+and one of the two page zeroing allocations (a. or d.).
+
+Binding the gmem file to a struct kvm on creation time means the gmem
+file can't be reused with another VM on reboot. Also, host userspace is
+forced to close the gmem file to allow the old VM to be freed.
+
+For other places where files pin KVM, like the stats fd pinning vCPUs, I
+guess that matters less since there isn't much of a penalty to close and
+re-open the stats fd.
