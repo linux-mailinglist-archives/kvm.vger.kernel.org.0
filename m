@@ -2,75 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 940CE78BAF5
-	for <lists+kvm@lfdr.de>; Tue, 29 Aug 2023 00:17:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F69578BAFD
+	for <lists+kvm@lfdr.de>; Tue, 29 Aug 2023 00:27:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233446AbjH1WRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Aug 2023 18:17:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36404 "EHLO
+        id S233900AbjH1W0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 18:26:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234280AbjH1WQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 18:16:57 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A97C1BF
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:16:50 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fef56f7222so36084595e9.2
-        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:16:50 -0700 (PDT)
+        with ESMTP id S233845AbjH1W0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 18:26:32 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D164A13D
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:26:29 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31c5c06e8bbso3074386f8f.1
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:26:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693261008; x=1693865808;
+        d=linaro.org; s=google; t=1693261588; x=1693866388;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ytFP9O6tB4A/pEi2JNvwk+BEX0m6ppsIdLn/qA6xonU=;
-        b=QZnS9rkd5daxIL2BGO1ZoS4Mn4sA5iXxJD2tOusgIbak4rs+X4thSw5FGS8A4nglSm
-         AdHE9vZKzVRDjy+e1woDTsL3gGck7sZeMCbMnUaOILCNdhCYcMzyO8cVEedLmxKdJisV
-         K8fi2thO0IAfTJStwoIOyIYKBOr87L8bWbmQ43zJ5tPlhQCnZGK8sHN2Le/0XfF9fcx/
-         Xqh3kZ2vtFTsgW7t0K1cVA5o4bcrNHYLaRvdGWTjr2o9glCM3MU8qU1brShYCC79B3xr
-         FVQbFJwIfcHq1wFeaVROQyulJ4lZr8R8c8uI48AinFpvnho5hrW9cScvv/Hpdnaixe35
-         x1IQ==
+        bh=Vm3H7pOzxT2KI8I1yN1qSPG4IC7rpw+x2qqgA34opZs=;
+        b=G+mZ51a2OfT+8KzAhZhaLQMM8BmY4DgvEv0jFJ0OsQ9wHOFfV4OqVd2EvM3+7MRXiD
+         q39UzNF00uRveaJ1JYw8pzTGrPclyRMaMSuVGaMpZohfW2v5T6zOQu45Grs8iIyJc1KL
+         xEn9w+8832iL8pSfYwRaoZvsIo1GMSHeua5BBfgnjlXSQ7FNHemhX00V70CMT4dPAgf7
+         QTK1rHTPGr+OmD0MpGhdAHYNQ2Uzfjh0RW0WNOUTMB0wyC/GVAw7eEXWZLvaoTXRgmMN
+         Gcv9+ewGrmGA9dpGsQHblwvnrOSDtx/MUu4k/UXb4D/lthRY9YXRO6W0kJWstQ5iavHq
+         zvLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693261008; x=1693865808;
+        d=1e100.net; s=20221208; t=1693261588; x=1693866388;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ytFP9O6tB4A/pEi2JNvwk+BEX0m6ppsIdLn/qA6xonU=;
-        b=Si7eI3cCw7PLqtuOdYDENAta4ixK4QK4XozRKZTQXLj+N0b1RkNKbJUgVThoBKlLbr
-         Qqt6tVb9ASRaKF2S/tTKrjfAgthLpS2i7IXybo4b5lKG9biBrKZg16ArQ3PdYDSMoeDa
-         GsIaKgvLkZGb+7cUcGLGuuSSbXh392esiWNuh06EKSIrZgWAkRpjx4Up9Ohu8WKhftaq
-         qlGzMfVUfVgQFbXYLUwne2vugfA/Fb3/7MnptRSjQ4Sokr7HdOJwWoc8Nex1dDTMJx27
-         9vKaPJfsjsEx4aCAXBKwM8IsGIzUKD12afcVc3sQbASUACbr0TRKp8dGyDafiQZj+3vl
-         K/3Q==
-X-Gm-Message-State: AOJu0YxFpqs9+3pfPrciPDgtZ+js4ADZ63XQ+t13sfj21pXxHKNV4CYj
-        n78FTPTsDj2hWsqb+SxHWtnAcg==
-X-Google-Smtp-Source: AGHT+IGQjeESzT9Pv+KglhVLGQprC12AmiRPu+V0NlK1m4SsbC41PQCF6ev9khMIyUzI4TxrqBxZEQ==
-X-Received: by 2002:a1c:7210:0:b0:400:2dc5:1fed with SMTP id n16-20020a1c7210000000b004002dc51fedmr12104210wmc.33.1693261008619;
-        Mon, 28 Aug 2023 15:16:48 -0700 (PDT)
+        bh=Vm3H7pOzxT2KI8I1yN1qSPG4IC7rpw+x2qqgA34opZs=;
+        b=BNPruzucH4nyDhALPhm3ThFrtuYO4PD0zmMxTiLt7U5OclzJvD9hX+fze62Zk8WRWZ
+         cpXGcI7nBI+ekR2fhs7Xg5C9BEiuqIsRaCk3mckkckKhMpQfIrdAezELtf8M6UKhY14S
+         PAnKA0xUUow3+Pf8R+ZrIH1/l++/POr6f3m6KFTIubMyfmj0/5gOmPqq7GIJRH9Kea2F
+         PPbUFkSVXZYIzz713ecEKibfLN4x5kOBVs0aBxgUYizAzmmE/6MxcBmD/xCHFmxVqh8W
+         +cZpfeGxoO2bYAL87EegWUFZUAFoYEn5hiuL/E3zGme/uBr+rFIMhInaINj62CZ6FXQG
+         kxSQ==
+X-Gm-Message-State: AOJu0YwlJUvWntB3L9mbdNIMjzECfjTSIvq4GQH8f8G86cl6jrln9cdn
+        APN4bJQnjlO/Qv+ku8BYJ1OzCg==
+X-Google-Smtp-Source: AGHT+IGW96sElphoRlaUhLax7rumoMSOAyhXHhDvuV+/Bwm/TC9lSuts3C2izGbKnjYLSfHST4MftQ==
+X-Received: by 2002:a5d:45c4:0:b0:31a:d90d:8d9f with SMTP id b4-20020a5d45c4000000b0031ad90d8d9fmr16903636wrs.25.1693261588338;
+        Mon, 28 Aug 2023 15:26:28 -0700 (PDT)
 Received: from [192.168.69.115] ([176.164.201.64])
-        by smtp.gmail.com with ESMTPSA id l5-20020a1ced05000000b003fc01495383sm15177318wmh.6.2023.08.28.15.16.46
+        by smtp.gmail.com with ESMTPSA id y3-20020adfe6c3000000b0031c5ce91ad6sm11749584wrm.97.2023.08.28.15.26.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Aug 2023 15:16:48 -0700 (PDT)
-Message-ID: <9279ccbf-f1db-17c5-a129-4a91a9703cdd@linaro.org>
-Date:   Tue, 29 Aug 2023 00:16:45 +0200
+        Mon, 28 Aug 2023 15:26:27 -0700 (PDT)
+Message-ID: <1d68ca74-ce92-ca5f-2c8b-e4567265e2fc@linaro.org>
+Date:   Tue, 29 Aug 2023 00:26:24 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH] KVM: arm64: Properly return allocated EL2 VA from
- hyp_alloc_private_va_range()
+Subject: Re: [PATCH v2 04/16] kvm: Return number of free memslots
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-References: <20230828153121.4179627-1-maz@kernel.org>
- <e311ac4b-48e6-ea8f-3157-6f78bc5b9ad9@linaro.org>
- <875y4zozo6.wl-maz@kernel.org>
+To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Michal Privoznik <mprivozn@redhat.com>,
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        kvm@vger.kernel.org
+References: <20230825132149.366064-1-david@redhat.com>
+ <20230825132149.366064-5-david@redhat.com>
 From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <875y4zozo6.wl-maz@kernel.org>
+In-Reply-To: <20230825132149.366064-5-david@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -83,43 +88,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/8/23 19:16, Marc Zyngier wrote:
-> Hi Philippe,
+On 25/8/23 15:21, David Hildenbrand wrote:
+> Let's return the number of free slots instead of only checking if there
+> is a free slot. While at it, check all address spaces, which will also
+> consider SMM under x86 correctly.
 > 
-> On Mon, 28 Aug 2023 18:00:54 +0100,
-> Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
->>
->> Hi Marc,
->>
->> On 28/8/23 17:31, Marc Zyngier wrote:
->>> Marek reports that his RPi4 spits out a warning at boot time,
->>> right at the point where the GICv2 virtual CPU interface gets
->>> mapped.
->>>
->>> Upon investigation, it seems that we never return the allocated
->>> VA and use whatever was on the stack at this point. Yes, this
->>> is good stuff, and Marek was pretty lucky that he ended-up with
->>> a VA that intersected with something that was already mapped.
->>>
->>> On my setup, this random value is plausible enough for the mapping
->>> to take place. Who knows what happens...
->>>
->>> Cc: Vincent Donnefort <vdonnefort@google.com>
->>> Fixes: f156a7d13fc3 ("KVM: arm64: Remove size-order align in the nVHE hyp private VA range")
->>
->> I don't see your kvmarm-6.6 merged by Paolo, is it too late to squash
->> and send a new PR?
+> Make the stub return UINT_MAX, such that we can call the function
+> unconditionally.
 > 
-> In general, I keep the commits that are in -next stable (no squashing,
-> no rebasing), and only the merge commits that drag these commits onto
-> -next are throw-away (this allows me to rebuild the whole branch
-> without changing any of the commit SHAs).
+> This is a preparation for memory devices that consume multiple memslots.
 > 
-> So no, I won't send a new PR right now. However, I'll stick the patch
-> in -next and will aim to send Paolo another PR later this week or
-> early next week.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   accel/kvm/kvm-all.c      | 33 ++++++++++++++++++++-------------
+>   accel/stubs/kvm-stub.c   |  4 ++--
+>   hw/mem/memory-device.c   |  2 +-
+>   include/sysemu/kvm.h     |  2 +-
+>   include/sysemu/kvm_int.h |  1 +
+>   5 files changed, 25 insertions(+), 17 deletions(-)
 
-Ah, I didn't know. Thanks for explaining :)
 
-Phil.
+> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+> index 235dc661bc..f39997d86e 100644
+> --- a/accel/stubs/kvm-stub.c
+> +++ b/accel/stubs/kvm-stub.c
+> @@ -109,9 +109,9 @@ int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
+>       return -ENOSYS;
+>   }
+>   
+> -bool kvm_has_free_slot(MachineState *ms)
+> +unsigned int kvm_get_free_memslots(void)
+>   {
+> -    return false;
+> +    return UINT_MAX;
+
+Isn't it clearer returning 0 here and keeping kvm_enabled() below?
+
+>   }
+>   
+>   void kvm_init_cpu_signals(CPUState *cpu)
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 667d56bd29..7c24685796 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -59,7 +59,7 @@ static void memory_device_check_addable(MachineState *ms, MemoryRegion *mr,
+>       const uint64_t size = memory_region_size(mr);
+>   
+>       /* we will need a new memory slot for kvm and vhost */
+> -    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
+> +    if (!kvm_get_free_memslots()) {
+
+(here)
+
+>           error_setg(errp, "hypervisor has no free memory slots left");
+>           return;
+>       }
+
+
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index 511b42bde5..8b09e78b12 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -40,6 +40,7 @@ typedef struct KVMMemoryUpdate {
+>   typedef struct KVMMemoryListener {
+>       MemoryListener listener;
+>       KVMSlot *slots;
+> +    int nr_used_slots;
+
+Preferably using 'unsigned' here:
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+
 
