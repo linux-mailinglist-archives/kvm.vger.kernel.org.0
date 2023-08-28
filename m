@@ -2,99 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 845AE78A880
-	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 11:09:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 525BB78AC6A
+	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 12:40:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbjH1JJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Aug 2023 05:09:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45930 "EHLO
+        id S231664AbjH1Kj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 06:39:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjH1JIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 05:08:48 -0400
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2150.outbound.protection.outlook.com [40.92.62.150])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04D8EC;
-        Mon, 28 Aug 2023 02:08:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aZO+OxFzU1wzRX89kt/Gf6TOy0f/B3O/KZEXu3GskZot/sPg0xcewP5MUN9yPA7XOxfVu9aLioDJcJSLP2vCV5v/s5rH6QrV/fijsHR/gOBYebhpIKR2JMD3xsfrG4klF9jNFFf5YaWYmoHsr4e5GgxQB+N1psnz47ZdmL5VEji6RudTNpsLJvx/Hl8I3wW6EeTO1OeiNaOO+Z8jEpzQt3hbMibmS8WY6AhG7ep88XlN8svDUg9mLJzXp7jGvIyHupt4kCJ5a59ipYnb1HoDO8qsNgA1FMUQ4dEYrAgsL51cVD58xYuGGaqK+MUzGkCx+iiRyqW46UdTfvHu1jAuIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jKhhb45qakiRY3VC6LQnRVKOQiyKkazHDrWcOJmRd9I=;
- b=V1JKlTjE1khZL1AwCQvYME/NM4nxoxEnq5VKK0bUpFxX7gR9WCt0W6i7aQa50PmXPUMsaT9+2z8Ug2/62cdmtbfju75B4DeGHXY0YUQlo/CPTuf51AqWVEt0eTOuwxaRLnZWG9/u3YmcNtYYq0VYtkoyLZr4dP8oVOauv1sI0bH17sg/flsypf2gEtJR287B146BbvmYHRkdDt6RHzSuw7OmoFBYe6Eo76vPV7pHIEoCNQlH18SccKQ7LyAH8Xuv+abeZrhplwwxgSOR7egR9l5ETtwwLM7ptDzR0+H5gxnyDzsWgvBfV9Im5emgVC6J2BiaL01d7/v3Lmkw+EnONg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jKhhb45qakiRY3VC6LQnRVKOQiyKkazHDrWcOJmRd9I=;
- b=mPUmLopPSt31dzEC/514O2pOe/VkoG1qKqcYHOrCJEVN2JuUCrZvVq0R3iJVV0k7rvqFea21xKh0/k/9tIhgJhiqbgArjhLHjt6wTULkhOhp/lLUPX8pbUGCby03GADia9CCuvc2EKmbU9cVgBiDAKQ3BGfFAwy4n7AI2g4ix9JXf88D3y0EP6sM///La7qOcNqFBOSdtj+QJzheMwXsYqse4F5dDUEHx1EiteGuzjc2S7hHwmUtT6oCj1TPntdxWcsaSBxEOfIETdF1u66X8hfN6rMt1cn8X7IJXQkzRNa9x8OFAgm7VoZzcU1jPjDIm7UmeDF6jGWKkhHAIZVneQ==
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- MEYP282MB2584.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:11e::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.34; Mon, 28 Aug 2023 09:08:41 +0000
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::62ca:cc8a:e3db:1f2c]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::62ca:cc8a:e3db:1f2c%7]) with mapi id 15.20.6699.034; Mon, 28 Aug 2023
- 09:08:41 +0000
-From:   Tianyi Liu <i.pear@outlook.com>
-To:     seanjc@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH] KVM: VMX: Fix NMI event loss
-Date:   Mon, 28 Aug 2023 17:07:59 +0800
-Message-ID: <SY4P282MB10841E53BAF421675FCE991D9DE0A@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.41.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [cWc8n+iUqzHmtkk4okZcHOwed3ktIshq3V+VAoI/AVrRqEWuiGNGGg==]
-X-ClientProxiedBy: SI2P153CA0033.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::21) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20230828090759.1867-1-i.pear@outlook.com>
+        with ESMTP id S231680AbjH1Kjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 06:39:31 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F82393;
+        Mon, 28 Aug 2023 03:39:28 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37S9c9iB018834;
+        Mon, 28 Aug 2023 10:39:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2Trs+Gigq2wmY4pNmTj0HY0wQXTsqXgcJq1rLw9sNtM=;
+ b=Db8YhJD+0ok7oolbDjTVl/gPKCUI3549pEKM3TKQacefINqtkuM5pgKWqbgwo6Dn6Z+P
+ hyrwtSLMTw+Ghi955JfDouz46CUSn3pd8ONiilDCYCMQQA5cwyjITuJGLJdp55sLxrGv
+ Wc1bxGQ5Tcn9ug2Ry6KBW0eCUBVJ0ZMdqdRn9xepJTlIFQx4DV4uasSopvH5qt1y0FQh
+ RzqnDs7u02vrPMbewNpgABuih1w1L2o+3w/cuV+kTn6HyUaDhz8IRPpo/4vaYRVLIj7K
+ 5Yd7/AwPy5p0+vw0b7liviMcU5Eg1gz0VOE7gjG11tNhnrzfJZvQnxxBupo0CNkRKJYM ug== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sr87gtaj8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Aug 2023 10:39:27 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37S8xSCE019171;
+        Mon, 28 Aug 2023 10:39:26 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sqxe19cmg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 28 Aug 2023 10:39:26 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37SAdNqY61735394
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Aug 2023 10:39:23 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1C63A2006A;
+        Mon, 28 Aug 2023 10:39:19 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 59D222004B;
+        Mon, 28 Aug 2023 10:39:18 +0000 (GMT)
+Received: from [9.179.5.186] (unknown [9.179.5.186])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Aug 2023 10:39:18 +0000 (GMT)
+Message-ID: <fa4e2086-8d7c-84dc-8c35-5d9ea1bfda3c@linux.ibm.com>
+Date:   Mon, 28 Aug 2023 12:39:18 +0200
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|MEYP282MB2584:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64350467-0185-4828-2beb-08dba7a65f7f
-X-MS-Exchange-SLBlob-MailProps: ymJijV9pwJlrrluThJ+JdRbaZEbpimv0jkv0dvpP/hgujflfnrzU3GALhsh6H3Jb71GFzUX2nPyHWiLNTEVSUDbHsMBNaj2PuhIG4YMPPel5X4zNs9YyYKf09iFMrUAsStqrzrKoJoeKrbSzX+NjXs/jOx+rqvMxgm18cIjoRMhU8qfcmP3ulesS7aDjNrrU5g5Y5jDNeNMLSBnQOD7VHOjzlRDzO7fhpzuoZm7/No2T2++TRaKx9tm8PsvtD6T2sS2DWTSw/0wmC7VCSZ70XbxKkzVCCaf916GRemllfEtkds5k4p9Guk9B04hNzdxd8t+PqsHZ2SKpDwKP0dqzOdY6o4wFUaQ6a4DBb9DctjCWf6V8HlPmSSMYuODHUiAyQdZVUVSGH81/cj4+Fjks4WyWISV92w4/R+3/4VVSqX0dio9UxXC+UyvZjAzVMBTeBOEtkHkFF2lbqIx9PsCTZiKzmTc/ZIVnaIJUZyru4JQ+yNxQKTEKW7ENboa8F86wIEDMqUFmHpsYTf0USDq9cohd2ql254e1zNMCZ+Vm2oMsaeH7vi4s+fPPFrPvwhJ1R9HtE7XCRyTsvl+yXwrIzy6rxTGnxucIM9GIJHSIKXg2Ganvkg5GGkqkNhvGU8uHfZrTTGhY1Xcu2m6IbiycY79HJWyXrx986IgIjXQAmXuhi8wst6y4PAqEEZ3jyt/MKaeMm1facYLkqz/94A8XAtCeqy7HQ+4YDq3Y5US+VMtQIHAtyRtDfQCgUkLS1HjD3tzWnDUAIHZaQpFjWkYBIJazRQ1SmGRkIldl7RrJ/2hIdc4mJDazVHhSv1Gwy8nE
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EVkn/elQomZNZzcsriNeXRB4c9gxlh3TZUsSP/lLezPHWJ4tJZ4W6TbDEJwGSOOy7XOXrJmE+oyUN2olz+zSL8STpr8UqTMADC4pCC8KeUJCiU+bKCYv4tZXmKVLyF4X4gr8i/uG6UpRjrUscTK8yGUIgYgRGiZMIHFolBfiaRBTtaXmKmEW40TU5KBK03CueZ9VqvNXeBgmmuRtVIgUbBUAbxVQ7v193h4ITKZY5z3IHVyv7UM5ovJ8LYBvCaTg9UtLUV+uPYIrvJJZjrNh998IIVMp/0WcYAf2Ltx/onre9+SHNosEP98fchGtcFsldM1xGMNUSDDB8ceZfRL4X32dvFSqmYFnbyUVLebVJs5V9GjYjohmyYTL1xg9/mxflRUEJWrItvaojuh5moZODclBuo5NkTIkCHWSvQh4LzodswbF5aGTghgb+pOYfgCj+evMsoXEr4l1r8yE4PQ4p9J6Hm4hOpsaZ9GaBA82BpBi7LKc66/rbSTDrNWVuEZ+SpJ0IQG4IGoyI9rH/ghXeCj+CnONop2N1xG6deUDKlhBJNE6VUpAdiB/jgBeG06YAHnmDZ24K1rw+asZQZYv0d/mPFMzBNZnWyI3piXCU0U=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KjkwK9RVp5VdZrx2hdTgn42UmhtmDtMZrsAjkLh9RXDkSz4ch6axkKgVYkS8?=
- =?us-ascii?Q?m7DWpmcNqn9DE2rFJrFdQee1F/CMmatbK3884CGz53rCaBlIKDzRZdqEW92G?=
- =?us-ascii?Q?N264FwC0wxKi4bS5wOtv4M1KgPT4Fy21x+PpNX8t39apUku92OyDraxF5Q1T?=
- =?us-ascii?Q?SzvbMQbzegIH0M+4ogZDjazn6pZNYdI6pR7l8GTkjXx8g/YGmYv9yP2e37v0?=
- =?us-ascii?Q?Nx+IeDdmhS0bgQUejO4nckh5PYQnSYWof/8FIaShMYRF0/XxCTECkI9sMGr9?=
- =?us-ascii?Q?QlJS+CYr/dWr3ZM9I5AOA/XtbJNQ8/wUueQkWZRm2Hey6AUf3wuw5maTFqGr?=
- =?us-ascii?Q?F3bGTGkoOW+jvDPj6VVzCKrqcAaWVvD06tAKR04v0Q4u2df3ZTYtIYh9IDrs?=
- =?us-ascii?Q?+vCuDjSXptdGDmOWlRZvqJZ+KV9xbnVjRAYdCGZOXjPpor951wlP4pOezzHI?=
- =?us-ascii?Q?Hj62+4bFjvyZmT1VRNph43eO9/jNwkLZxFIFqbbXy+E6goUb1U3hPjKRC+H7?=
- =?us-ascii?Q?lL9lraIK5R4g8KElJ/RmN2by2dCNroPEa+cSy8QVZJ8XcOlykuIDJh3QzY20?=
- =?us-ascii?Q?7j9nfR7JVsS7g+4kLP+e/74bJn81lXbZhm92rgnW49cyuzrdHrxXXj/qzffb?=
- =?us-ascii?Q?07RiVJJpuOlvP9+XiWj/ptiucNDtop2nm91tudK/qJ/sx+0yxBcV7p+fq4C3?=
- =?us-ascii?Q?hsn9cH1X+Wln0y4p4dSLC3iiRTYYUfjOoPYqbkMFcYbwCcSG6pjljdmH1So+?=
- =?us-ascii?Q?DcH5mqK2/M6Xy9MGDZdUA7T/lGyzhswm3Ds5nSOuYgPI22NCZEX27+7YN7+S?=
- =?us-ascii?Q?yAMYamXGPW/7EjntEmdZyBU3tePjfH0cQqCM7Yex2EY08I65Ghx6k/BXB5ZO?=
- =?us-ascii?Q?xIjXOtoTgut80PKi/zJjm++/UO4u0oXxzVYbGXgvx/gnJPjWAo0KicBRUTRm?=
- =?us-ascii?Q?fZZgAXMMvzOit7rqXyVzeRKJi/Xdw9BTHO4FUPqy/a+YAKw0FH/JHkFIaRQP?=
- =?us-ascii?Q?lFxvX3TY/oe8D7W0x6vHmc1nUPTlp9F46xnOJk8ccWyGw/bSY81+XLlLQNN1?=
- =?us-ascii?Q?Wnds3DwJBuN7Ah0+R0kfF3Pu6svMzFzqoeani7xI8DwSQDBHFeAd+TG8HD7n?=
- =?us-ascii?Q?cRA8xtCQprwjbOzEf6IDq1huFlNnVdK6YknIlNpha01A5LnO5b3uv+sbfc2u?=
- =?us-ascii?Q?dHP8G42mxrnWG9JGwU7f0oAuT8lM3rHj43iPVTjFRimK9KwLRbyz32B6xHXk?=
- =?us-ascii?Q?SyM6qiMnNxVTVEneUq1t?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64350467-0185-4828-2beb-08dba7a65f7f
-X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2023 09:08:41.4372
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYP282MB2584
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v2] KVM: s390: fix gisa destroy operation might lead to
+ cpu stalls
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20230824130932.3573866-1-mimu@linux.ibm.com>
+ <f20a40b8-2d7d-2fc5-33eb-ec0273e09308@linux.ibm.com>
+ <a0f4dc8d-a649-3737-df46-c6ce3c1a26dd@linux.ibm.com>
+ <0ddf808c-e929-c975-1b39-5ebc1f2fab62@linux.ibm.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+In-Reply-To: <0ddf808c-e929-c975-1b39-5ebc1f2fab62@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: r3dWZCcuNDDuSN7FBGYhEVMb85IOYig5
+X-Proofpoint-GUID: r3dWZCcuNDDuSN7FBGYhEVMb85IOYig5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-28_07,2023-08-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 impostorscore=0 suspectscore=0
+ adultscore=0 mlxscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2308280095
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,75 +95,183 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Sean:
 
-I have found that in the latest version of the kernel, some PMU events are
-being lost. I used bisect and found out the breaking commit [1], which
-moved the handling of NMI events from `handle_exception_irqoff` to
-`vmx_vcpu_enter_exit`.
 
-If I revert this part as done in this patch, it works correctly. However,
-I'm not really familiar with KVM, and I'm not sure about the intent behind
-the original patch [1]. Could you please take a look on this? Thanks a lot.
+On 25.08.23 04:56, Matthew Rosato wrote:
+> On 8/24/23 4:36 PM, Michael Mueller wrote:
+>>
+>>
+>> On 24.08.23 21:17, Matthew Rosato wrote:
+>>> On 8/24/23 9:09 AM, Michael Mueller wrote:
+>>>> A GISA cannot be destroyed as long it is linked in the GIB alert list
+>>>> as this would breake the alert list. Just waiting for its removal from
+>>>
+>>> Hi Michael,
+>>>
+>>> Nit: s/breake/break/
+>>>
+>>>> the list triggered by another vm is not sufficient as it might be the
+>>>> only vm. The below shown cpu stall situation might occur when GIB alerts
+>>>> are delayed and is fixed by calling process_gib_alert_list() instead of
+>>>> waiting.
+>>>>
+>>>> At this time the vcpus of the vm are already destroyed and thus
+>>>> no vcpu can be kicked to enter the SIE again if for some reason an
+>>>> interrupt is pending for that vm.
+>>>>
+>>>> Additianally the IAM restore value ist set to 0x00 if that was not the
+>>>
+>>> Nits: s/Additianally/Additionally/  as well as s/ist/is/
+>>>
+>>
+>> Thanks a lot, Matt. I will address of course all these typos ;)
+>>
+>>>> case. That would be a bug introduced by incomplete device de-registration,
+>>>> i.e. missing kvm_s390_gisc_unregister() call.
+>>> If this implies a bug, maybe it should be a WARN_ON instead of a KVM_EVENT?  Because if we missed a call to kvm_s390_gisc_unregister() then we're also leaking refcounts (one for each gisc that we didn't unregister).
+>>
+>> I was thinking of a WARN_ON() as well and will most probaly add it because it is much better visible.
+>>
+>>>
+>>>>
+>>>> Setting this value guarantees that late interrupts don't bring the GISA
+>>>> back into the alert list.
+>>>
+>>> Just to make sure I understand -- The idea is that once you set the alert mask to 0x00 then it should be impossible for millicode to deliver further alerts associated with this gisa right?  Thus making it OK to do one last process_gib_alert_list() after that point in time.
+>>>
+>>> But I guess my question is: will millicode actually see this gi->alert.mask change soon enough to prevent further alerts?  Don't you need to also cmpxchg the mask update into the contents of kvm_s390_gisa (via gisa_set_iam?)
+>>
+>> It is not the IAM directly that I set to 0x00 but gi->alert.mask. It is used the restore the IAM in the gisa by means of gisa_get_ipm_or_restore_iam() under cmpxchg() conditions which is called by process_gib_alert_list() and the hr_timer function gisa_vcpu_kicker() that it triggers. When the gisa is in the alert list, the IAM is always 0x00. It's set by millicode. I just need to ensure that it is not changed to anything else.
+> 
+> Besides zeroing it while on the alert list and restoring the IAM to re-enable millicode alerts, we also change the IAM to enable a gisc (kvm_s390_gisc_register) and disable a gisc (kvm_s390_gisc_register) for alerts via a call to gisa_set_iam().  AFAIU the IAM is telling millicode what giscs host alerts should happen for, and the point of the gisa_set_iam() call during gisc_unregister is to tell millicode to stop alerts from being delivered for that gisc at that point.
 
-My use case is to sample the IP of guest OS using `perf kvm`:
-`perf kvm --guest record -a -g -e instructions -F 10000 -- sleep 1`
+Yes, the kvm_s390_gisc_register() function manages the alert.mask to be 
+restored into the IAM when a gisa is processed in the alert list as well 
+as the IAM when a first/additinal guest ISC has to be handled, that's 
+the case for a first/second AP or PCI adapter. In case it's the very 
+first GISC, eg. AP_ISC, the gisa cannot be in the alert list, whence 
+gisa_set_iam() will be successful. When a second AP_ISC is registered 
+the alert.mask is not changed and thus gisa_set_iam() is NOT called. If 
+a different guest ISC is registered, e.g. PCI_ISC, the alert.mask is 
+updated and the gisa_set_iam() tries to set the new IAM. In case the 
+gisa is in the alert list the gisa_set_iam() call returns -EBUSY but we 
+don't need to care because the correct IAM will be restored during the 
+processsing of the alert list. I the gisa is not in the alert list the 
+call will be successful and the new IAM is set.
 
-If it works correctly, it will record about 10000 samples (as `-F 10000`)
-and it will say:
-`[ perf record: Captured and wrote 0.9 MB perf.data.guest (9729 samples) ]`
-And if not, it will only record ~100 samples, sometimes no sample at all.
+The situation for kvm_s390_gisc_unregister() will be similar, let's walk 
+through it. The gisa_set_iam() nees to be called always when the last of 
+a specific guest ISCs is deregistered and also the alert.mask is 
+changed. The condition is that ref_count[gisc] is decrease by 1 and 
+becomes 0. Then the respective bit is cleared in the alert.mask and 
+gisa_set_iam() tries to update the IAM. In case the gisa is in the alert 
+list the IAM will be restored with the current alert.mask which has the 
+bit already cleared. In case the gisa is not in the alert list the IAM 
+will be set immediately.
 
-If it's useful for your debug, The callchain of `vmx_vcpu_enter_exit` is:
-vmx_vcpu_enter_exit
-vmx_vcpu_run
-kvm_x86_vcpu_run
-vcpu_enter_guest
+> 
+> Now for this patch, my understanding is that you are basically cleaning up after a driver that did not handle their gisc refcounts properly, right?  Otherwise by the time you reach gisa_destroy the alert.mask would already be 0x00.  Then in that case, wouldn't you want to force the unregistration of any gisc still in the IAM at gisa_destroy time -- meaning shouldn't we do the equivalent gisa_set_iam that would have previously been done during gisc_unregister, had it been called properly?
 
-While the callchain of `handle_exception_irqoff` is:
-handle_exception_irqoff
-vmx_handle_exit_irqoff
-kvm_x86_handle_exit_irqoff
-vcpu_enter_guest
+The problem with the patch that I currently see is that it tries to 
+solve two different bug scenaries that I have not sketched properly.
 
-[1] https://lore.kernel.org/all/20221213060912.654668-8-seanjc@google.com/
+Yes, I want to do a cleanup a) for the situation that the alert.mask is 
+NOT 0x00 during gisa destruction which is caused by a missing 
+kvm_s390_gisc_unregister() and that's a bug.
 
-Signed-off-by: Tianyi Liu <i.pear@outlook.com>
----
- arch/x86/kvm/vmx/vmx.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+And b) for the situation that a gisa is still in the alert list during 
+gisa destruction. That happend due to a bug in this case as well. The 
+patch from Benjamin in devel 88a096a7a460 accidently switched off the 
+GAL interrupt processing in the host. Thus the 
+kvm_s390_gisc_unregister() was called by the AP driver but the alert was 
+not processed (and never could have processed). My code then ran into 
+that endless loop which is a bug as well:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index df461f387e20..3a0b13867a6b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6955,6 +6955,12 @@ static void handle_exception_irqoff(struct vcpu_vmx *vmx)
- 	/* Handle machine checks before interrupts are enabled */
- 	else if (is_machine_check(intr_info))
- 		kvm_machine_check();
-+	/* We need to handle NMIs before interrupts are enabled */
-+	else if (is_nmi(intr_info)) {
-+		kvm_before_interrupt(&vmx->vcpu, KVM_HANDLING_NMI);
-+		vmx_do_nmi_irqoff();
-+		kvm_after_interrupt(&vmx->vcpu);
-+	}
- }
- 
- static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
-@@ -7251,13 +7257,6 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	else
- 		vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
- 
--	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
--	    is_nmi(vmx_get_intr_info(vcpu))) {
--		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
--		vmx_do_nmi_irqoff();
--		kvm_after_interrupt(vcpu);
--	}
--
- 	guest_state_exit_irqoff();
- }
- 
--- 
-2.41.0
+  while (gisa_in_alert_list(gi->origin))
+    relax_cpu()
 
+> 
+> For example, rather than just setting gi->alert.mask = 0x00 in kvm_s390_gisa_destroy(), what if you instead did:
+> 1) issue the warning that gi->alert.mask was nonzero upon entry to gisa_destroy
+> 2) perform the equivalent of calling kvm_s390_gisc_unregister() for every bit that is still on in the gi->alert.mask, performing the same actions as though the refcount were reaching 0 for each gisc (remove the bit from the alert mask, call gisa_set_iam).
+> 3) Finally, process the alert list one more time if gisa_in_alert_list(gi->origin).  At this point, since we already set IAM to 0x00, millicode would have no further reason to deliver more alerts, so doing one last check should be safe.
+
+yes, that should work
+
+> 
+> That would be the same chain of events (minus the warning) that would occur if a driver actually called kvm_s390_gisc_unregister() the correct number of times.  Of course you could also just collapse step #2 -- doing that gets us _very_ close to this patch; you could just set gi->alert.mask directly to 0x00 like you do here but then you would also need a gisa_set_iam call to tell millicode to stop sending alerts for all of the giscs you just removed from the alert.mask.  In either approach, the -EBUSY return from gisa_set_iam would be an issue that needs to be handled.
+
+The -EBUSY does not need a special treatment in this case because it 
+means the gisa is in the alert list and no additional alerts for the 
+same gisa are triggert by the millicode. Also not for other guest ISC 
+bits. The IAM is cleared to 0x00 by millicode as well.
+
+Either the gisa is not in the alert list, then the IAM was set to 0x00 
+already by the previous gisa_set_iam() an cannot be brought back to the 
+alert list by millicode or I call process_gib_alert_list() once when the 
+gisa is in the alert list, then the IAM is 0x00 (set by millicaode) and 
+will be restored to 0x00 by gisa_vcpu_kicker()/gisa_get_ipm_or_restore_iam()
+
+I don't want to run process_gib_alert_list() unconditionally because it 
+would touch other guest also even if not required.
+
+I will send a v3 today.
+
+Thanks a lot!
+
+> 
+> Overall I guess until the IAM visible to millicode is set to 0x00 I'm not sure I understand what would prevent millicode from delivering another alert to any gisc still enabled in the IAM.  You say above it will be cmpxchg()'d during process_gib_alert_list() via gisa_get_ipm_or_restore_iam() but if we first check gisa_in_alert_list(gi->origin) with this new patch and the gisa is not yet in the alert list then we would skip the call to process_gib_alert_list() and instead just cancel the timer -- I could very well be misunderstanding something, but my concern is that you are shrinking but not eliminating the window here.  Let me try an example -- With this patch, isn't the following chain of events still possible:
+> 
+> 1) enter kvm_s390_gisa_destroy.  Let's say gi->alert.mask = 0x80.
+> 2) set gi->alert.mask = 0x00
+> 3) check if(gisa_in_alert_list(gi->origin)) -- it returns false
+> 4) Since the IAM still had a bit on at this point, millicode now delivers an alert for the gisc associated with bit 0x80 and sets IAM to 0x00 to indicate the gisa in the alert list
+> 5) call hrtimer_cancel (since we already checked gisa_in_alert_list, we don't notice that last alert delivered)
+> 6) set gi->origin = NULL, return from kvm_s390_gisa_destroy
+> 
+> Assuming that series of events is possible, wouldn't a solution be to replace step #3 above with something along the lines of this (untested diff on top of this patch):
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 06890a58d001..ab99c9ec1282 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -3220,6 +3220,10 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
+>                  KVM_EVENT(3, "vm 0x%pK has unexpected restore iam 0x%02x",
+>                            kvm, gi->alert.mask);
+>                  gi->alert.mask = 0x00;
+> +               while (gisa_set_iam(gi->origin, gi->alert.mask)) {
+> +                       KVM_EVENT(3, "vm 0x%pK alert while clearing iam", kvm);
+> +                       process_gib_alert_list();
+> +               }
+>          }
+>          if (gisa_in_alert_list(gi->origin)) {
+>                  KVM_EVENT(3, "vm 0x%pK gisa in alert list during destroy", kvm);
+> 
+>>
+>> in order to ensure an alert can't still be delivered some time after you check gisa_in_alert_list(gi->origin)?  That matches up with what is done per-gisc in kvm_s390_gisc_unregister() today.
+>>
+>> right
+>>
+>>>
+>>> ...  That said, now that I'm looking closer at kvm_s390_gisc_unregister() and gisa_set_iam():  it seems strange that nobody checks the return code from gisa_set_iam today.  AFAICT, even if the device driver(s) call kvm_s390_gisc_unregister correctly for all associated gisc, if gisa_set_iam manages to return -EBUSY because the gisa is already in the alert list then wouldn't the gisc refcounts be decremented but the relevant alert bit left enabled for that gisc until the next time we call gisa_set_iam or gisa_get_ipm_or_restore_iam?
+>>
+>> you are right, that should retried in kvm_s390_gisc_register() and kvm_s390_gisc_unregister() until the rc is 0 but that would lead to a CPU stall as well under the condition where GAL interrupts are not delivered in the host.
+>>
+>>>
+>>> Similar strangeness for kvm_s390_gisc_register() - AFAICT if gisa_set_iam returns -EBUSY then we would increment the gisc refcounts but never actually enable the alert bit for that gisc until the next time we call gisa_set_iam or gisa_get_ipm_or_restore_iam.
+>>
+>> I have to think and play around with process_gib_alert_list() being called as well in these situations.
+>>
+>> BTW the pci and the vfip_ap device drivers currently also ignore the return codes of kvm_s390_gisc_unregister().
+>>
+> 
+> Hmm, good point.  You're right, we should probably do something there.  I think the 3 reasons kvm_s390_gisc_unregister() could give a nonzero RC today would all be strange, likely implementation bugs...
+> 
+> -ENODEV we also would have never been able to register, or something odd happened to gisa after registration
+> -ERANGE we also would have never been able to register, or the gisc got clobbered sometime after registration
+> -EINVAL either we never registered, unregistered too many times or gisa was destroyed on us somehow
+> 
+> I think for these cases the best pci/ap can do would be to WARN_ON(_ONCE) and then proceed just assuming that the gisc was unregistered or never properly registered.
+> 
+> Thanks,
+> Matt
