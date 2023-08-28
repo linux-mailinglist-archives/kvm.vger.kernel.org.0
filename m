@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E53A78B9DF
-	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 23:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 940CE78BAF5
+	for <lists+kvm@lfdr.de>; Tue, 29 Aug 2023 00:17:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233158AbjH1VBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Aug 2023 17:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54162 "EHLO
+        id S233446AbjH1WRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Aug 2023 18:17:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233075AbjH1VAl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Aug 2023 17:00:41 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 103A712D;
-        Mon, 28 Aug 2023 14:00:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693256438; x=1724792438;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=D7H8iRQg3oYPla8ASkYh40XrCVvCBejBs3ZgYFWYd5Q=;
-  b=FQAngCInUwHLQ4kYIM+Fzl58jJckMDyiuo2l6jypZ2/gy/12QuPHAJZW
-   Z6u/0R3Cq8Mk5czAJH6qjWoJL5sYB0tlyXGj8ILnbPHeo9nU75P4PjaCO
-   cVS2eOPIJxL+Uqpr9TY/6Oj2BSnnfWXGPxKTgdmEya8nBvRAkEzOBNBIU
-   8NOUQHeYrpHVfuMfUVutAwzki1tthVSO6tkvnQj5/Y+Ac3ly/eR+FeeZx
-   X+d+jUXI5RWT1jNiDxaTjI/U7c3koI2aURrfV43rAJtwEMFckSk2M3na/
-   07O0C2yqd2PfP1gxB7Gq0rI+7wjzRhjISIQTeWvieP2wooWPA9Vz19XMv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="372615823"
-X-IronPort-AV: E=Sophos;i="6.02,208,1688454000"; 
-   d="scan'208";a="372615823"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2023 14:00:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="715266445"
-X-IronPort-AV: E=Sophos;i="6.02,208,1688454000"; 
-   d="scan'208";a="715266445"
-Received: from drpresto-mobl.amr.corp.intel.com (HELO [10.212.171.191]) ([10.212.171.191])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2023 14:00:36 -0700
-Message-ID: <2597a87b-1248-b8ce-ce60-94074bc67ea4@intel.com>
-Date:   Mon, 28 Aug 2023 14:00:35 -0700
+        with ESMTP id S234280AbjH1WQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Aug 2023 18:16:57 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A97C1BF
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:16:50 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fef56f7222so36084595e9.2
+        for <kvm@vger.kernel.org>; Mon, 28 Aug 2023 15:16:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693261008; x=1693865808;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ytFP9O6tB4A/pEi2JNvwk+BEX0m6ppsIdLn/qA6xonU=;
+        b=QZnS9rkd5daxIL2BGO1ZoS4Mn4sA5iXxJD2tOusgIbak4rs+X4thSw5FGS8A4nglSm
+         AdHE9vZKzVRDjy+e1woDTsL3gGck7sZeMCbMnUaOILCNdhCYcMzyO8cVEedLmxKdJisV
+         K8fi2thO0IAfTJStwoIOyIYKBOr87L8bWbmQ43zJ5tPlhQCnZGK8sHN2Le/0XfF9fcx/
+         Xqh3kZ2vtFTsgW7t0K1cVA5o4bcrNHYLaRvdGWTjr2o9glCM3MU8qU1brShYCC79B3xr
+         FVQbFJwIfcHq1wFeaVROQyulJ4lZr8R8c8uI48AinFpvnho5hrW9cScvv/Hpdnaixe35
+         x1IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693261008; x=1693865808;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ytFP9O6tB4A/pEi2JNvwk+BEX0m6ppsIdLn/qA6xonU=;
+        b=Si7eI3cCw7PLqtuOdYDENAta4ixK4QK4XozRKZTQXLj+N0b1RkNKbJUgVThoBKlLbr
+         Qqt6tVb9ASRaKF2S/tTKrjfAgthLpS2i7IXybo4b5lKG9biBrKZg16ArQ3PdYDSMoeDa
+         GsIaKgvLkZGb+7cUcGLGuuSSbXh392esiWNuh06EKSIrZgWAkRpjx4Up9Ohu8WKhftaq
+         qlGzMfVUfVgQFbXYLUwne2vugfA/Fb3/7MnptRSjQ4Sokr7HdOJwWoc8Nex1dDTMJx27
+         9vKaPJfsjsEx4aCAXBKwM8IsGIzUKD12afcVc3sQbASUACbr0TRKp8dGyDafiQZj+3vl
+         K/3Q==
+X-Gm-Message-State: AOJu0YxFpqs9+3pfPrciPDgtZ+js4ADZ63XQ+t13sfj21pXxHKNV4CYj
+        n78FTPTsDj2hWsqb+SxHWtnAcg==
+X-Google-Smtp-Source: AGHT+IGQjeESzT9Pv+KglhVLGQprC12AmiRPu+V0NlK1m4SsbC41PQCF6ev9khMIyUzI4TxrqBxZEQ==
+X-Received: by 2002:a1c:7210:0:b0:400:2dc5:1fed with SMTP id n16-20020a1c7210000000b004002dc51fedmr12104210wmc.33.1693261008619;
+        Mon, 28 Aug 2023 15:16:48 -0700 (PDT)
+Received: from [192.168.69.115] ([176.164.201.64])
+        by smtp.gmail.com with ESMTPSA id l5-20020a1ced05000000b003fc01495383sm15177318wmh.6.2023.08.28.15.16.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Aug 2023 15:16:48 -0700 (PDT)
+Message-ID: <9279ccbf-f1db-17c5-a129-4a91a9703cdd@linaro.org>
+Date:   Tue, 29 Aug 2023 00:16:45 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v5 09/19] KVM:x86: Make guest supervisor states as
- non-XSAVE managed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH] KVM: arm64: Properly return allocated EL2 VA from
+ hyp_alloc_private_va_range()
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Yang, Weijiang" <weijiang.yang@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>, peterz@infradead.org,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Chao Gao <chao.gao@intel.com>, john.allen@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rick.p.edgecombe@intel.com, binbin.wu@linux.intel.com
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-10-weijiang.yang@intel.com>
- <ZMuMN/8Qa1sjJR/n@chao-email>
- <bfc0b3cb-c17a-0ad6-6378-0c4e38f23024@intel.com>
- <ZM1jV3UPL0AMpVDI@google.com>
- <806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com>
- <c871cc44-b6a0-06e3-493b-33ddf4fa6e05@intel.com>
- <8396a9f6-fbc4-1e62-b6a9-3df568fd15a2@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <8396a9f6-fbc4-1e62-b6a9-3df568fd15a2@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+References: <20230828153121.4179627-1-maz@kernel.org>
+ <e311ac4b-48e6-ea8f-3157-6f78bc5b9ad9@linaro.org>
+ <875y4zozo6.wl-maz@kernel.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <875y4zozo6.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,50 +83,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/10/23 08:15, Paolo Bonzini wrote:
-> On 8/10/23 16:29, Dave Hansen wrote:
->> What actual OSes need this support?
+On 28/8/23 19:16, Marc Zyngier wrote:
+> Hi Philippe,
 > 
-> I think Xen could use it when running nested.  But KVM cannot expose
-> support for CET in CPUID, and at the same time fake support for
-> MSR_IA32_PL{0,1,2}_SSP (e.g. inject a #GP if it's ever written to a
-> nonzero value).
+> On Mon, 28 Aug 2023 18:00:54 +0100,
+> Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 28/8/23 17:31, Marc Zyngier wrote:
+>>> Marek reports that his RPi4 spits out a warning at boot time,
+>>> right at the point where the GICv2 virtual CPU interface gets
+>>> mapped.
+>>>
+>>> Upon investigation, it seems that we never return the allocated
+>>> VA and use whatever was on the stack at this point. Yes, this
+>>> is good stuff, and Marek was pretty lucky that he ended-up with
+>>> a VA that intersected with something that was already mapped.
+>>>
+>>> On my setup, this random value is plausible enough for the mapping
+>>> to take place. Who knows what happens...
+>>>
+>>> Cc: Vincent Donnefort <vdonnefort@google.com>
+>>> Fixes: f156a7d13fc3 ("KVM: arm64: Remove size-order align in the nVHE hyp private VA range")
+>>
+>> I don't see your kvmarm-6.6 merged by Paolo, is it too late to squash
+>> and send a new PR?
 > 
-> I suppose we could invent our own paravirtualized CPUID bit for
-> "supervisor IBT works but supervisor SHSTK doesn't".  Linux could check
-> that but I don't think it's a good idea.
+> In general, I keep the commits that are in -next stable (no squashing,
+> no rebasing), and only the merge commits that drag these commits onto
+> -next are throw-away (this allows me to rebuild the whole branch
+> without changing any of the commit SHAs).
 > 
-> So... do, or do not.  There is no try. :)
+> So no, I won't send a new PR right now. However, I'll stick the patch
+> in -next and will aim to send Paolo another PR later this week or
+> early next week.
 
-Ahh, that makes sense.  This is needed for implementing the
-*architecture*, not because some OS actually wants to _do_ it.
+Ah, I didn't know. Thanks for explaining :)
 
-...
->> In a perfect world, we'd just allocate space for CET_S in the KVM
->> fpstates.  The core kernel fpstates would have
->> XSTATE_BV[13]==XCOMP_BV[13]==0.  An XRSTOR of the core kernel fpstates
->> would just set CET_S to its init state.
-> 
-> Yep.  I don't think it's a lot of work to implement.  The basic idea as
-> you point out below is something like
-> 
-> #define XFEATURE_MASK_USER_DYNAMIC XFEATURE_MASK_XTILE_DATA
-> #define XFEATURE_MASK_USER_OPTIONAL \
->     (XFEATURE_MASK_DYNAMIC | XFEATURE_MASK_CET_KERNEL)
-> 
-> where XFEATURE_MASK_USER_DYNAMIC is used for xfd-related tasks
-> (including the ARCH_GET_XCOMP_SUPP arch_prctl) but everything else uses
-> XFEATURE_MASK_USER_OPTIONAL.
-> 
-> KVM would enable the feature by hand when allocating the guest fpstate.
-> Disabled features would be cleared from EDX:EAX when calling
-> XSAVE/XSAVEC/XSAVES.
+Phil.
 
-OK, so let's _try_ this perfect-world solution.  KVM fpstates get
-fpstate->xfeatures[13] set, but no normal task fpstates have that bit
-set.  Most of the infrastructure should be there to handle this without
-much fuss because it _should_ be looking at generic things like
-fpstate->size and fpstate->features.
-
-But who knows what trouble this will turn up.  It could get nasty and
-not worth it, but we should at least try it.
