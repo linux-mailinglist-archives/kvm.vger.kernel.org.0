@@ -2,205 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 208C278A12A
-	for <lists+kvm@lfdr.de>; Sun, 27 Aug 2023 21:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA75C78A39E
+	for <lists+kvm@lfdr.de>; Mon, 28 Aug 2023 02:04:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbjH0Tc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Aug 2023 15:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43064 "EHLO
+        id S229720AbjH1AD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Aug 2023 20:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbjH0TcP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Aug 2023 15:32:15 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FFDA8E
-        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 12:32:13 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-5009d4a4897so3832324e87.0
-        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 12:32:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693164731; x=1693769531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
-        b=J2OSsLR1nwmfWDm2tmxvo5xPT7PeLWCNEEYKdEyt7NLpZhzFXgjC/0TWbzJLkdd+dA
-         kaHq0nRhKhExyscn2m2XDPBrh5I/GSMo+Tmq50grhNkDsQ2xzZAig7R/nqzDSulxtQoe
-         5swtcoEHEnClRf2SmAotbK35z9drsUaxnLWs0UXNXBWVsfGGWAP0MtDZUuyze4bk15NF
-         tpMfIVy7/3/4D93Wunqdr/lQWtPrVp/f5kZ31/1SAvLh8BFRR7Ha6ZAUYWhoVjcYf1Vg
-         TYfyhdnPIiU1o/jveuIfQ/NLtNuqEbEwzHJT5wKDMRnTd3FUHmUst+tGhpXmykJ40we4
-         iO3Q==
+        with ESMTP id S229471AbjH1ADY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Aug 2023 20:03:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D78F5
+        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 17:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693180955;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xpHPOqpS/BopQCNTxUES7lap/T1aoNZFxwlnvj3+xR8=;
+        b=MB0ihnshJehpAPs2kqDRV3BxVWBqsKi63iLi6AhjjNZSyAMWc3nrd2TMJ6vikplSuOdjuI
+        saUESilY6wlj2PN5QpkTt5aKWmsOclr6GVD9vssC32VBx1d+jYrD0OtfDiWBSTGq4k3m/8
+        g2V/1NlIH/wW69VQc7h5F1+VYmPRc30=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-yAXaYQXYN6SoN2FTIlyCaw-1; Sun, 27 Aug 2023 20:02:31 -0400
+X-MC-Unique: yAXaYQXYN6SoN2FTIlyCaw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7911973a90eso188970239f.3
+        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 17:02:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693164731; x=1693769531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
-        b=EcckfX6mLIBfYahLH30t8mVXwZBBeArL+9YQMlRFBFX+Jx/MxLksezCuCEb2qLveUa
-         IE9ykpcujYn38boq0bxW4WKnnqcB0QrHFrXHCHTu2adohk0Jv3ILHf5qpfzjlmFO3Mxt
-         w/lkFW7TIxDJP4Qb5SoOy4+aCjwHLix7eSS/KVRE4d2sxa1+3RAG/UhkXEw1cJTDrAVM
-         5DPN/zQsEWd1dJhUgm8HzguAkBODDFNgUr6tcvvvZix4tkLB4YGRA3/K1wY+XLe74ISq
-         Ib0+aDqqjEsQK1pvKGf3jubhfPCkiu/QiqwN9nn+uVFToCyMa5L2yfAzLFd/SoZUpsPB
-         ZFzA==
-X-Gm-Message-State: AOJu0Ywr5+g+XrIMCWAvk5nfzGZCw1zcAOtIQuh4GHE4n1gXK3u8vymC
-        alQkBxGtsw6ftGRbVux9/UhBpPe947paI1SzB3/UgA==
-X-Google-Smtp-Source: AGHT+IEk8IVz7X20eoWgRs8RfBcId72R1Gk0/oK298rH6tojKEkA0RmVaOhWFz7sv42H1xdb6aTjSM76rQJI1s/ODrs=
-X-Received: by 2002:ac2:5e35:0:b0:500:94c3:8e3b with SMTP id
- o21-20020ac25e35000000b0050094c38e3bmr9043804lfg.57.1693164731128; Sun, 27
- Aug 2023 12:32:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693180951; x=1693785751;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpHPOqpS/BopQCNTxUES7lap/T1aoNZFxwlnvj3+xR8=;
+        b=eFkPSitxGMRJ6DELaJjjBnnjpMtQxVjO15l2LlbPPa5eXaxRdwxckANHrxSKGqWiT9
+         OuQ3BEnilx2334lJkC55uplZppThsTeErQoA6rDEZ2e6lm0kebtQ2IGtAluXnv0yHpzv
+         0ymuUONbrRoDRUGiCHQ4yofwwGdTYGv+msfD5C/k6XFtRUv4+ykf4WBLpYK5NKgaRHBj
+         E4gNxdbPP055IZ9SFR6BevZJ2CZQ1w4vj0f3ygufJKhvY4Rr2vU8yzAvj9RRFPoZVGbF
+         Pfts9zsGdVYyjEM0X7LGKk6cOOc5qMijALZrjQSbsHXZgyttlFuurZNAiua2hOkN6sED
+         a6sA==
+X-Gm-Message-State: AOJu0YyM6Ec9am1ObyiBecPgHBKSqZPC3k3IaC+jEa8m/MPhtFgg/2Nd
+        f8cDz1nQexev5QXbh1GZAA1g6+lYKl3SbnTwLKXywFTgXtJvKJfvYnyJHFEAwcnj74xic6ui/NL
+        a5KUHkWs4ZuFr
+X-Received: by 2002:a6b:d201:0:b0:792:6963:df3b with SMTP id q1-20020a6bd201000000b007926963df3bmr12962642iob.14.1693180951156;
+        Sun, 27 Aug 2023 17:02:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCcVC2Fb5o3H5Bt8yOb6xoFh2KkZ7sDO2Q1xXCoRXBwCaTF7tedNS897rzyeU1YCMzznZsbQ==
+X-Received: by 2002:a6b:d201:0:b0:792:6963:df3b with SMTP id q1-20020a6bd201000000b007926963df3bmr12962610iob.14.1693180950704;
+        Sun, 27 Aug 2023 17:02:30 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id y19-20020aa78553000000b00682af93093dsm5339822pfn.45.2023.08.27.17.02.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 27 Aug 2023 17:02:30 -0700 (PDT)
+Message-ID: <9fc460ef-bb6b-8b67-d52a-f2d5aea887f1@redhat.com>
+Date:   Mon, 28 Aug 2023 10:02:24 +1000
 MIME-Version: 1.0
-References: <20230821212243.491660-1-jingzhangos@google.com>
- <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
- <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com> <86a5uef55n.wl-maz@kernel.org>
-In-Reply-To: <86a5uef55n.wl-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Sun, 27 Aug 2023 12:31:59 -0700
-Message-ID: <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
-Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Content-Language: en-US
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc:     peter.maydell@linaro.org, ricarkol@google.com, kvm@vger.kernel.org,
+        jonathan.cameron@huawei.com, linuxarm@huawei.com
+References: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
+From:   Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Shameer,
 
-On Sat, Aug 26, 2023 at 3:51=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Tue, 22 Aug 2023 19:35:12 +0100,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
-wrote:
-> > >
-> > > On Mon, 21 Aug 2023 22:22:37 +0100,
-> > > Jing Zhang <jingzhangos@google.com> wrote:
-> > > >
-> > > > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-> > > > from userspace with this change.
-> > > > RES0 fields and those fields hidden by KVM are not writable.
-> > > >
-> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/sys_regs.c | 6 ++++--
-> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > > index afade7186675..20fc38bad4e8 100644
-> > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu=
-,
-> > > >       return true;
-> > > >  }
-> > > >
-> > > > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 2=
-4) | GENMASK(19, 16))
-> > > > +
-> > > >  /*
-> > > >   * Architected system registers.
-> > > >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> > > > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_desc=
-s[] =3D {
-> > > >         .set_user =3D set_id_dfr0_el1,
-> > > >         .visibility =3D aa32_id_visibility,
-> > > >         .reset =3D read_sanitised_id_dfr0_el1,
-> > > > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
-> > > > +       .val =3D GENMASK(31, 0), },
-> > >
-> > > Can you *please* look at the register and realise that we *don't*
-> > > support writing to the whole of the low 32 bits? What does it mean to
-> > > allow selecting the M-profile debug? Or the memory-mapped trace?
-> > >
-> > > You are advertising a lot of crap to userspace, and that's definitely
-> > > not on.
-> > >
-> > > >       ID_HIDDEN(ID_AFR0_EL1),
-> > > >       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> > > >       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> > > > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_desc=
-s[] =3D {
-> > > >         .get_user =3D get_id_reg,
-> > > >         .set_user =3D set_id_aa64dfr0_el1,
-> > > >         .reset =3D read_sanitised_id_aa64dfr0_el1,
-> > > > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
-> > > > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RE=
-S0_MASK), },
-> > >
-> > > And it is the same thing here. Where is the handling code to deal wit=
-h
-> > > variable breakpoint numbers? Oh wait, there is none. Really, the only
-> > > thing we support writing to are the PMU and Debug versions. And
-> > > nothing else.
-> > >
-> > > What does it mean for userspace? Either the write will be denied
-> > > despite being advertised a writable field (remember the first patch o=
-f
-> > > the series???), or we'll blindly accept the write and further ignore
-> > > the requested values. Do you really think any of this is acceptable?
-> > >
-> > > This is the *9th* version of this series, and we're still battling
-> > > over some extremely basic userspace issues... I don't think we can
-> > > merge this series as is stands.
-> >
-> > I removed sanity checks across multiple fields after the discussion
-> > here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
-> > I might have misunderstood the discussion. I thought we'd let VMM do
-> > more complete sanity checks.
->
-> The problem is that you don't even have a statement about how this is
-> supposed to be handled. What are the rules? How can the VMM author
-> *know*?
->
-> That's my real issue with this series: at no point do we state when an
-> ID register can be written, what are the rules that must be followed,
-> where is the split in responsibility between KVM and the VMM, and what
-> is the expected behaviour when the VMM exposes something that is
-> completely outlandish to the guest (such as the M-profile debug).
->
-> Do you see the issue? We can always fix the code. But once we've
-> exposed that to userspace, there is no going back. And I really want
-> everybody's buy-in on that front, including the VMM people.
+On 8/15/23 19:27, Shameer Kolothum wrote:
+> Now that we have Eager Page Split support added for ARM in the kernel,
+> enable it in Qemu. This adds,
+>   -eager-split-size to -accel sub-options to set the eager page split chunk size.
+>   -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
+> 
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+> RFC v1: https://lore.kernel.org/qemu-devel/20230725150002.621-1-shameerali.kolothum.thodi@huawei.com/
+>    -Updated qemu-options.hx with description
+>    -Addressed review comments from Peter and Gavin(Thanks).
+> ---
+>   include/sysemu/kvm_int.h |  1 +
+>   qemu-options.hx          | 14 +++++++++
+>   target/arm/kvm.c         | 62 ++++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 77 insertions(+)
+> 
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index 511b42bde5..03a1660d40 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -116,6 +116,7 @@ struct KVMState
+>       uint64_t kvm_dirty_ring_bytes;  /* Size of the per-vcpu dirty ring */
+>       uint32_t kvm_dirty_ring_size;   /* Number of dirty GFNs per ring */
+>       bool kvm_dirty_ring_with_bitmap;
+> +    uint64_t kvm_eager_split_size; /* Eager Page Splitting chunk size */
 
-Understood.
-Looks like it would be less complicated to have KVM do all the sanity
-checks to determine if a feature field is configured correctly.
-The determination can be done by following rules:
-1. Architecture constraints from ARM ARM.
-2. KVM constraints. (Those features not exposed by KVM should be read-only)
-3. VCPU features. (The write mask needs to be determined on-the-fly)
+One more space is needed before the comments, to have same alignment as
+we had. Besides, it needs to be initialized to zero in kvm-all.c::kvm_accel_instance_init()
+as we're doing for @kvm_dirty_ring_size.
+
+>       struct KVMDirtyRingReaper reaper;
+>       NotifyVmexitOption notify_vmexit;
+>       uint32_t notify_window;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 29b98c3d4c..6ef7b89013 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -186,6 +186,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>       "                split-wx=on|off (enable TCG split w^x mapping)\n"
+>       "                tb-size=n (TCG translation block cache size)\n"
+>       "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+> +    "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+>       "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+>       "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+>   SRST
+> @@ -244,6 +245,19 @@ SRST
+>           is disabled (dirty-ring-size=0).  When enabled, KVM will instead
+>           record dirty pages in a bitmap.
+>   
+> +    ``eager-split-size=n``
+> +        KVM implements dirty page logging at the PAGE_SIZE granularity and
+> +        enabling dirty-logging on a huge-page requires breaking it into
+> +        PAGE_SIZE pages in the first place. KVM on ARM does this splitting
+> +        lazily by default. There are performance benefits in doing huge-page
+> +        split eagerly, especially in situations where TLBI costs associated
+> +        with break-before-make sequences are considerable and also if guest
+> +        workloads are read intensive. The size here specifies how many pages
+> +        to break at a time and needs to be a valid block page size(eg: 4KB |
+> +        2M | 1G when PAGE_SIZE is 4K). Be wary of specifying a higher size as
+> +        it will have an impact on the memory. By default, this feature is
+> +        disabled (eager-split-size=0).
+> +
+
+Since 64KB base page size is another popular option, it's worthy to mention the
+supported block sizes for 64KB base page size. I'm not sure about 16KB though.
+For this, the comments can be improved as below if you agree. With the improvement,
+users needn't look into the code to figure out the valid block sizes.
+
+The size here specifies how many pages to be split at a time and needs to be a valid
+block size, which is 1GB/2MB/4KB, 32MB/16KB and 512MB/64KB for 4KB/16KB/64KB PAGE_SIZE
+respectively.
+
+>       ``notify-vmexit=run|internal-error|disable,notify-window=n``
+>           Enables or disables notify VM exit support on x86 host and specify
+>           the corresponding notify window to trigger the VM exit if enabled.
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index b4c7654f49..6ceba673d9 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -30,6 +30,7 @@
+>   #include "exec/address-spaces.h"
+>   #include "hw/boards.h"
+>   #include "hw/irq.h"
+> +#include "qapi/visitor.h"
+>   #include "qemu/log.h"
+>   
+>   const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> @@ -247,6 +248,11 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
+>       return ret > 0 ? ret : 40;
+>   }
+>   
+> +static bool kvm_arm_eager_split_size_valid(uint64_t req_size, uint32_t sizes)
+> +{
+> +    return req_size & sizes;
+> +}
+> +
+
+It's worthy to be a inline function.
+
+>   int kvm_arch_init(MachineState *ms, KVMState *s)
+>   {
+>       int ret = 0;
+> @@ -280,6 +286,22 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>           }
+>       }
+>   
+> +    if (s->kvm_eager_split_size) {
+> +        uint32_t sizes;
+> +
+> +        sizes = kvm_vm_check_extension(s, KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES);
+> +        if (!sizes) {
+> +            s->kvm_eager_split_size = 0;
+> +            warn_report("Eager Page Split support not available");
+> +        } else if (!kvm_arm_eager_split_size_valid(s->kvm_eager_split_size,
+> +                                                   sizes)) {
+> +            error_report("Eager Page Split requested chunk size not valid");
+> +        } else if (kvm_vm_enable_cap(s, KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE, 0,
+> +                                     s->kvm_eager_split_size)) {
+> +            error_report("Failed to set Eager Page Split chunk size");
+
+Lets print the errno here. It's indicative to tell what happens inside the host
+kernel and why it's failing to enable the feature.
+
+		error_report("Enabling of Eager Page Split failed: %s.", strerror(-ret));
+
+> +        }
+> +    }
+> +
+>       kvm_arm_init_debug(s);
+>   
+>       return ret;
+> @@ -1062,6 +1084,46 @@ bool kvm_arch_cpu_check_are_resettable(void)
+>       return true;
+>   }
+>   
+> +static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +    uint64_t value = s->kvm_eager_split_size;
+> +
+> +    visit_type_size(v, name, &value, errp);
+> +}
+> +
+> +static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +    uint64_t value;
+> +
+> +    if (s->fd != -1) {
+> +        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+> +        return;
+> +    }
+> +
+
+Lets be more obvious here?
+
+	error_setg(errp, "Unable to set early-split-size after KVM has been initialized");
+
+> +    if (!visit_type_size(v, name, &value, errp)) {
+> +        return;
+> +    }
+> +
+> +    if (is_power_of_2(value)) {
+> +        error_setg(errp, "early-split-size must be a power of two.");
+> +        return;
+> +    }
+> +
+
+This condition looks wrong to me. 'value = 0' is accepted to disable the early
+page splitting. Besides, we actually need to warn on !is_power_of_2(value)
+
+	if (value && !is_power_of_2(value)) {
+             error_setg(errp, "early-split-size must be a power of two.");
+             return;
+         }
+
+> +    s->kvm_eager_split_size = value;
+> +}
+> +
+>   void kvm_arch_accel_class_init(ObjectClass *oc)
+>   {
+> +    object_class_property_add(oc, "eager-split-size", "size",
+> +                              kvm_arch_get_eager_split_size,
+> +                              kvm_arch_set_eager_split_size, NULL, NULL);
+> +
+> +    object_class_property_set_description(oc, "eager-split-size",
+> +        "Configure Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+
+"Configure" needs to be dropped since the property has both read/write permission.
+
+>   }
 
 Thanks,
-Jing
+Gavin
 
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
