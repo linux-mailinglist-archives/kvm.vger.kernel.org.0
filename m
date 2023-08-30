@@ -2,185 +2,682 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE92378D90E
-	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6E9778D962
+	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:33:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235398AbjH3ScL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Aug 2023 14:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
+        id S236947AbjH3SdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Aug 2023 14:33:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244654AbjH3NkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Aug 2023 09:40:24 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBB71B0;
-        Wed, 30 Aug 2023 06:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693402822; x=1724938822;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=mGUvoLw8hw2TWDxXd0tp7T6XOlpg2G3FqdXCCbW83WE=;
-  b=NrfY4Yfr64aLjQBwOz6ogKJNT8o98W575pNcGnG5YlLpCyQnUBinQuvC
-   h+BLb2RWOks+JAPcnMnHE27L2+Uz5qWHcx4p+4S/ns7zUcwqtzCFw0xTM
-   b/UlV427NgPkOPDglY7f7VzKR8Qqc02JaRs5uwei8YgAcr+VsHWkpwLHi
-   dSnWiR62mxbygKAqVSguotT1xJr3jnWN2NI/BwOYPkKEZWLLx504/mjSC
-   mSHfab59hFe0SpL1tDaO/u1aGygkvtasI7B3QT2Pu1xgfHZRNaQ5vUTDA
-   jZfb6wkMvwfX1uK5ia6MTbb8s9QbK8rXU/F+RgGCMNfdW3lf5diW75mAn
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="374556041"
-X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
-   d="scan'208";a="374556041"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 06:40:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="732634790"
-X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
-   d="scan'208";a="732634790"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga007.jf.intel.com with ESMTP; 30 Aug 2023 06:40:21 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 30 Aug 2023 06:40:20 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=koC0TQ56D7KHMAu/xMmKyIDhAjvBzD+1IjLTFAtItIjhsNKgr59Se9+ln1ipvqTNkgQBbjmLW+n+ES00G84mqYAoWArurCmmblTSeUeZf/EdU59InqxJl23wCK+ui0eSUbCcvhyWD2UvgY9jj2wA2q6vUvmGiMHxhr5ujfDMAG9b43lPKJ+gk9HQHNJIQjRVsSUEscyGry219UEy3Exw4NBOXuOtwKFTOajtv9pU5OgbURabVzQlZX/PswITKmd0QK4asnrJVLPfFiB34qWF2YqsId8rjH24C4lFDt+OgtFgZgSmVBH/ttxuI3Ov/ERLx10uDjk2DsT/UYBEofnY3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2vrutIHB8GJljhEyHIHyE0nB4zB+ASrA7HHF1K2205w=;
- b=ANW44ds/FGzoVDZXUtvFFUF4gDNV3LwQaapBrEEgByzKjXYZ4jVhQsuLTXbDU6fDrjNWHmMpmKZf7qIArXRVLdQ58aKrfqSeblQYq8EJb//BA483Lwj7wf4WuzoxfJqISvxtcSxvJO7Kt9CqeysY9aFfiFBGP1AdHKVOBvYcSq7toUiT+ag9kW7zshnNZhUeuYiDIWAXCDRqnNrYxD+94MtzjhrRng5vjs9dHYwd3OkmBE6oNIya9nyyZXUfB1H3AkSR6pnM8S1QW5NfMwVkfGk/hECjgmsqlpr5ZAqL2L9KbOCwnf36tL22yzjvhlW/m4PrkOtue6KnjbkYJphx1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6239.namprd11.prod.outlook.com (2603:10b6:8:a7::20) by
- MN2PR11MB4679.namprd11.prod.outlook.com (2603:10b6:208:26b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.18; Wed, 30 Aug
- 2023 13:40:18 +0000
-Received: from DM4PR11MB6239.namprd11.prod.outlook.com
- ([fe80::8a29:8895:64:8fd7]) by DM4PR11MB6239.namprd11.prod.outlook.com
- ([fe80::8a29:8895:64:8fd7%5]) with mapi id 15.20.6745.015; Wed, 30 Aug 2023
- 13:40:18 +0000
-Date:   Wed, 30 Aug 2023 15:40:10 +0200
-From:   Maciej =?utf-8?Q?Wiecz=C3=B3r-Retman?= 
-        <maciej.wieczor-retman@intel.com>
-To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 6/6] selftests/kvm: Replace attribute with macro
-Message-ID: <fw6nuuhzmkp36bumrn6xuy7etxslr2iybazigaoo57iy22x2k7@nord6jkch73n>
-References: <cover.1693216959.git.maciej.wieczor-retman@intel.com>
- <82ed62dd7070203701b4ca326e62862404dd5f72.1693216959.git.maciej.wieczor-retman@intel.com>
- <fc618e8c-f8b-c339-9aa6-1d2c2865b42e@linux.intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fc618e8c-f8b-c339-9aa6-1d2c2865b42e@linux.intel.com>
-X-ClientProxiedBy: BE1P281CA0182.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8d::15) To DM4PR11MB6239.namprd11.prod.outlook.com
- (2603:10b6:8:a7::20)
+        with ESMTP id S244750AbjH3Nup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Aug 2023 09:50:45 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6290AE8;
+        Wed, 30 Aug 2023 06:50:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=G+NBGqErePcqbPIdJvl+cEToNqotUXWurXZ+KaqDw3U=; b=grI+KZSR0evzxVcsPTGsnl1pUv
+        nTEkDCm4R2caFUA5hkpReLZJ1qLXaEy95sE2EDuSym8N6N+PSMq1br+0kEK+a65RSv+8U5wM2HkZ1
+        hcygkXnvDlsrEGUwi+VyjFBL+wtg00JYCElOuNWSNHvvJvx7gtBeJGmqjTbeTxX4bUw8N+aNIJa3c
+        l5kOFMijYvnq8GLpSIFqo81KgGvy5FkKBXaUIUzXzco0MtVAIA5iZSXTZMzkDl/JgBwBq7SFfCIHN
+        B5wWFlLs1I/JKgTI23iQ++hjDazGF60YNHQEj7DcWnRI6LIhHVrk4UonqKZZCKlxoj7wdDPLCOctw
+        fPPnOHlg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qbLaa-00DcUf-1a;
+        Wed, 30 Aug 2023 13:50:32 +0000
+Date:   Wed, 30 Aug 2023 06:50:32 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     ankita@nvidia.com
+Cc:     jgg@nvidia.com, alex.williamson@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+        apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Airlie <airlied@redhat.com>,
+        dri-devel@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>
+Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Message-ID: <ZO9JKKurjv4PsmXh@infradead.org>
+References: <20230822202303.19661-1-ankita@nvidia.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6239:EE_|MN2PR11MB4679:EE_
-X-MS-Office365-Filtering-Correlation-Id: 92640114-b954-4694-f486-08dba95ea5b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aj5oto1aWzZ8J90ILzyx8L64VfRCFvGDVbAaYgMvnj7BxRiIyiC+jUC0vVjY5eX1XB9+DsEtoHM/YDMXU9zo2HiQ83+HJQ4KJKOR6xx9eNu1ggu47oY8NRYiRVSHLnEclUVxbYkyqucFsBEUzVCzK6iYTfcYg4XPwFnWc9pBUMDgThQRpixgDjDGkDUkUsjpUJBXsUmCgSA4fXVMTB9h2hjgzctEFUEAE2cXzMLBQCCY1ulOvlL1wp+LOi/8SGd422+0+PABCMz2HtTVVdNzfZBmuec8XHYJCLL4tt+FTTSWMOEQits8avsr+mCe7/6T8XiLFn4vJ/JP4INQ4dDybV+zoG2reMaEwbyVdw1BNASYCtTjP9mzM0x4134iliGUDZBVrpkbulLxZ5a4EpMzDPiPI97A+9Ya2Car/aOyVQ/TarFNvuZHO5KxsHEpDMsxDtH7ZIkTfsN4WdXjGI/tCB714weK5GI9HeCGb42zpyyfHG7jzK1U88LnG9m3JoOUv/YqFtao2FCCheocZK2QnWyCgvO078HsHK4nsXuDvrv6G9R2eRPhkJ8OL0S99COU
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6239.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(136003)(376002)(366004)(39860400002)(1800799009)(186009)(451199024)(8936002)(6666004)(53546011)(478600001)(6506007)(66556008)(66946007)(66476007)(54906003)(6486002)(6916009)(316002)(38100700002)(41300700001)(82960400001)(9686003)(6512007)(8676002)(5660300002)(83380400001)(2906002)(33716001)(4744005)(86362001)(26005)(66574015)(4326008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?fOXWyvaiWWb6QtLJtRJZw+gEZ/NDkz8ZSlQJoBFIQuAk3LsjsJaCb07VYB?=
- =?iso-8859-1?Q?Z5QdW4aq3cj9LrERDnH8o/LL/KgxC06gNyJlV5pWWcISClV3UZh8Y4zCvg?=
- =?iso-8859-1?Q?ioWlldd/6EepFWlxMgzU9LJfEUqzknajS/cDITNI/tULqI2CwZkT5SFMY3?=
- =?iso-8859-1?Q?UoPbi0uoC2469gUpKINhzF/Kmyh5Y6ktBQH/Ep+SV2veZZAzaun6VsDWBS?=
- =?iso-8859-1?Q?3MQFQF85Oeu1+w1Qx8tphOuPMTIEesyOHyjhiIhYPUZfz19CwjjK6JMQDI?=
- =?iso-8859-1?Q?E02ZOx8A6cjFUhHPrg8JR3DTSEvuGUVDzIwOU5c2HkpkJ5YCZQ63Mxd2w5?=
- =?iso-8859-1?Q?DjmEmfaHmBh9FRPUqNCvsH7tj0/e35gaXySwdve5P8ENrJX6kWyUluzD/Q?=
- =?iso-8859-1?Q?sqYW+ztOYzPBILogZZNtF/jvoBYN7C+x8GlsmJ/qk8nFgW7Ph7BNdq+9+f?=
- =?iso-8859-1?Q?aYGWdttckUu0+3XEVV60IMPFPF97kvgBz+8BCZ/TixnNMYK05lj0noXpVZ?=
- =?iso-8859-1?Q?vh36iQge/B17feosb8Omfm7lSNmq//n46bp5yYsEikxHov6CEtJAldSpIk?=
- =?iso-8859-1?Q?1cYP3wg7dBBJqj3nETkjoyUHKfEyPU1ilcrcT7gQBpt58dHccstA7drGAd?=
- =?iso-8859-1?Q?fGLTnTSntcYcBmGh5/C4rp4o7vnxnohi4+uG9UMkEGHGiYxd/J+anby3t9?=
- =?iso-8859-1?Q?i5HJyK4VHnOcL7ZCyeS+xdqbIGffEqvW7McA9gvbCl9SjgEjDhtyfz5kF9?=
- =?iso-8859-1?Q?ZfgGt0Mma9eLk74sJjFUgCvG6zsQh86VdQVqe+XiyvipcqenZ0s0gi14j+?=
- =?iso-8859-1?Q?Lu22X+iP41G/XahOYgkq1XUEXwHg413AR1QQPKgS6L9dg9QUa9xtapfRPb?=
- =?iso-8859-1?Q?/tLlx9vtOOQR1twpf+aZxJSLnhs3F3j2aIrjKJjMxQMpjU1lsSlZ584P0v?=
- =?iso-8859-1?Q?XCtUt05zGKHr28KTu3S5RgzLMVmzs9CtQ4e6KAsgXw16jDt+5SRFkBE1fX?=
- =?iso-8859-1?Q?Hq9Zfm4OB5S7HOrJLNA0NUBQDeLMGJ/Ks+esTV1D5KCRB9sfxKNuzvwDno?=
- =?iso-8859-1?Q?aeAQQgN1Evw9V/5eYf2AMCT9xzkBU0eAop9dUugt5gvNKSMEGWws0hE1qf?=
- =?iso-8859-1?Q?kpLmgOh8zcT1ZnXol+B5KEfSMA3QU8k/dDMQ+y73tII22igSFReShxIi2k?=
- =?iso-8859-1?Q?+WiP+iLrD1IbxgtP1KhoYyhfhwspBHnP347NOebwEIQ++3v8VyeHGdMdDb?=
- =?iso-8859-1?Q?NF7pmIQ1mNkqlVrMuyH9o6ivhr8/IN7DOmvbcBJvSeXXf/b+OdolmNk5hL?=
- =?iso-8859-1?Q?jbvhuuX3pELhGBXGnNuHsCKMplr+jy04M25b9aPy2V6uZWV/Yo5Rdnm445?=
- =?iso-8859-1?Q?c3RvvZbPOvKbD8xDeDDWLG6w7PjzEiglrwKlCOwtHNC2S6/kvTNow0Qj4l?=
- =?iso-8859-1?Q?W4DN8C7ftDblzrwZCLc1XFwM9TmV6YWgVV6l87VyABRphE2giOPajsoKjj?=
- =?iso-8859-1?Q?9wCtfcI53oGm3VcB/GtPjtr5ba+CRuxpG1bBteyOCdJhfMIaihmXiUckdz?=
- =?iso-8859-1?Q?OSmiheww5ePW4xUW+3uBzBGnyUrl0MbxxxKAGs3Uj/VRMpfFq+7nyqUw2g?=
- =?iso-8859-1?Q?uQFJUcfwysb85cq5k4VVXv+GY35tM4unmOxyGB+pP6XA3QfEIAc81+L8OR?=
- =?iso-8859-1?Q?PTG0tkvw19QbkXmlVLU=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92640114-b954-4694-f486-08dba95ea5b9
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6239.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 13:40:18.0164
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qBGWtS8rZZg2O573dtxzRsXF8bA1YURe6EnDAGF8UFd3OzuMV8DomeUB/G/XBu81fteqPMVnAGOUoQDDRCJ1pGRj3meb0ITfIYNsZFWZmL8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4679
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230822202303.19661-1-ankita@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-08-30 at 15:22:57 +0300, Ilpo Järvinen wrote:
->On Mon, 28 Aug 2023, Wieczor-Retman, Maciej wrote:
->
->> The __printf() macro is used in many tools in the linux kernel to
->> validate the format specifiers in functions that use printf. Some
->> selftests use it without putting it in a macro definition and some tests
->> import the kselftests.h header.
->
->"Some" and yet this only converts one? Please be more precise in the 
->wording.
+I know I'm chiming in a bit late, but what ultimate user space is going
+to use this?  We should not add anything to the kernel that can't
+be used without fully open user space.
 
-Okay, I'll mention them by subsystem.
+vfio has traditionally been a bit special as it "just" passes devices
+through, so any user space could just be a user space driver for a
+random device on $FOO bus, including an actual Linux driver in a VM,
+but this driver has very specific semantics for a very specific piece
+of hardware, so it really needs to be treated like a generic GPU driver
+or accelerator driver.
 
->> Use __printf() attribute instead of the full attribute since the macro
->> is inside kselftests.h and the header is already imported.
->
->IMO, this would be enough:
->
->Use __printf() from kselftests.h instead of the full attribute.
-
-Fair enough, I'll change the paragraph to that.
-
->Was there a reason why you didn't convert mm/pkey-helpers.h one?
-
-Sorry, must have just missed it somehow. Thank you for pointing it out.
-
--- 
-Kind regards
-Maciej Wieczór-Retman
+On Tue, Aug 22, 2023 at 01:23:03PM -0700, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+> for the on-chip GPU that is the logical OS representation of the
+> internal proprietary cache coherent interconnect.
+> 
+> This representation has a number of limitations compared to a real PCI
+> device, in particular, it does not model the coherent GPU memory
+> aperture as a PCI config space BAR, and PCI doesn't know anything
+> about cacheable memory types.
+> 
+> Provide a VFIO PCI variant driver that adapts the unique PCI
+> representation into a more standard PCI representation facing
+> userspace. The GPU memory aperture is obtained from ACPI using
+> device_property_read_u64(), according to the FW specification,
+> and exported to userspace as a separate VFIO_REGION. Since the device
+> implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
+> to the next available PCI BAR (BAR2). Qemu will then naturally generate a
+> PCI device in the VM with two 64-bit BARs (where the cacheable aperture
+> reported in BAR2).
+> 
+> Since this memory region is actually cache coherent with the CPU, the
+> VFIO variant driver will mmap it into VMA using a cacheable mapping. The
+> mapping is done using remap_pfn_range().
+> 
+> PCI BAR are aligned to the power-of-2, but the actual memory on the
+> device may not. A read or write access to the physical address from the
+> last device PFN up to the next power-of-2 aligned physical address
+> results in reading ~1 and dropped writes.
+> 
+> This goes along with a qemu series to provides the necessary
+> implementation of the Grace Hopper Superchip firmware specification so
+> that the guest operating system can see the correct ACPI modeling for
+> the coherent GPU device. Verified with the CUDA workload in the VM.
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg967557.html
+> 
+> This patch is split from a patch series being pursued separately:
+> https://lore.kernel.org/lkml/20230405180134.16932-1-ankita@nvidia.com/
+> 
+> Applied and tested over next-20230821.
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+> 
+> Link for v6: https://lore.kernel.org/all/20230801130714.8221-1-ankita@nvidia.com/
+> 
+> v6 -> v7
+> - Handled out-of-bound and overflow conditions at various places to validate
+>   input offset and length.
+> - Added code to return EINVAL for offset beyond region size.
+> - Memremap the device memory region and cached in the nvdev object until
+>   the device is closed
+> 
+> v5 -> v6
+> - Added the code to handle BAR2 read/write using memremap to the device
+>   memory.
+> 
+> v4 -> v5
+> - Changed the module name from nvgpu-vfio-pci to nvgrace-gpu-vfio-pci.
+> - Fixed memory leak and added suggested boundary checks on device memory
+>   mapping.
+> - Added code to read all Fs and ignored write on region outside of the
+>   physical memory.
+> - Other miscellaneous cleanup suggestions.
+> 
+> v3 -> v4
+> - Mapping the available device memory using sparse mmap. The region outside
+>   the device memory is handled by read/write ops.
+> - Removed the fault handler added in v3.
+> 
+> v2 -> v3
+> - Added fault handler to map the region outside the physical GPU memory
+>   up to the next power-of-2 to a dummy PFN.
+> - Changed to select instead of "depends on" VFIO_PCI_CORE for all the
+>   vfio-pci variant driver.
+> - Code cleanup based on feedback comments.
+> - Code implemented and tested against v6.4-rc4.
+> 
+> v1 -> v2
+> - Updated the wording of reference to BAR offset and replaced with
+>   index.
+> - The GPU memory is exposed at the fixed BAR2_REGION_INDEX.
+> - Code cleanup based on feedback comments.
+> 
+>  MAINTAINERS                           |   6 +
+>  drivers/vfio/pci/Kconfig              |   2 +
+>  drivers/vfio/pci/Makefile             |   2 +
+>  drivers/vfio/pci/nvgrace-gpu/Kconfig  |  10 +
+>  drivers/vfio/pci/nvgrace-gpu/Makefile |   3 +
+>  drivers/vfio/pci/nvgrace-gpu/main.c   | 444 ++++++++++++++++++++++++++
+>  6 files changed, 467 insertions(+)
+>  create mode 100644 drivers/vfio/pci/nvgrace-gpu/Kconfig
+>  create mode 100644 drivers/vfio/pci/nvgrace-gpu/Makefile
+>  create mode 100644 drivers/vfio/pci/nvgrace-gpu/main.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d590ce31aa72..3398dba35b48 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22347,6 +22347,12 @@ L:	kvm@vger.kernel.org
+>  S:	Maintained
+>  F:	drivers/vfio/platform/
+>  
+> +VFIO NVIDIA GRACE GPU DRIVER
+> +M:	Ankit Agrawal <ankita@nvidia.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/vfio/pci/nvgrace-gpu/
+> +
+>  VGA_SWITCHEROO
+>  R:	Lukas Wunner <lukas@wunner.de>
+>  S:	Maintained
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 86bb7835cf3c..0dbdacb929ad 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -63,4 +63,6 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+>  
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
+>  
+> +source "drivers/vfio/pci/nvgrace-gpu/Kconfig"
+> +
+>  endmenu
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 24c524224da5..733f684f320a 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -11,3 +11,5 @@ obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+>  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>  
+>  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+> +
+> +obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) += nvgrace-gpu/
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/Kconfig b/drivers/vfio/pci/nvgrace-gpu/Kconfig
+> new file mode 100644
+> index 000000000000..b46f2d97a1d6
+> --- /dev/null
+> +++ b/drivers/vfio/pci/nvgrace-gpu/Kconfig
+> @@ -0,0 +1,10 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +config NVGRACE_GPU_VFIO_PCI
+> +	tristate "VFIO support for the GPU in the NVIDIA Grace Hopper Superchip"
+> +	depends on ARM64 || (COMPILE_TEST && 64BIT)
+> +	select VFIO_PCI_CORE
+> +	help
+> +	  VFIO support for the GPU in the NVIDIA Grace Hopper Superchip is
+> +	  required to assign the GPU device to a VM using KVM/qemu/etc.
+> +
+> +	  If you don't know what to do here, say N.
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/Makefile b/drivers/vfio/pci/nvgrace-gpu/Makefile
+> new file mode 100644
+> index 000000000000..3ca8c187897a
+> --- /dev/null
+> +++ b/drivers/vfio/pci/nvgrace-gpu/Makefile
+> @@ -0,0 +1,3 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) += nvgrace-gpu-vfio-pci.o
+> +nvgrace-gpu-vfio-pci-y := main.o
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> new file mode 100644
+> index 000000000000..161a6b19e31c
+> --- /dev/null
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -0,0 +1,444 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+> + */
+> +
+> +#include <linux/pci.h>
+> +#include <linux/vfio_pci_core.h>
+> +#include <linux/vfio.h>
+> +
+> +struct nvgrace_gpu_vfio_pci_core_device {
+> +	struct vfio_pci_core_device core_device;
+> +	u64 hpa;
+> +	u64 mem_length;
+> +	void *opregion;
+> +};
+> +
+> +static int nvgrace_gpu_vfio_pci_open_device(struct vfio_device *core_vdev)
+> +{
+> +	struct vfio_pci_core_device *vdev =
+> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> +	int ret;
+> +
+> +	ret = vfio_pci_core_enable(vdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vfio_pci_core_finish_enable(vdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static void nvgrace_gpu_vfio_pci_close_device(struct vfio_device *core_vdev)
+> +{
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +
+> +	if (nvdev->opregion) {
+> +		memunmap(nvdev->opregion);
+> +		nvdev->opregion = NULL;
+> +	}
+> +
+> +	vfio_pci_core_close_device(core_vdev);
+> +}
+> +
+> +static int nvgrace_gpu_vfio_pci_mmap(struct vfio_device *core_vdev,
+> +				      struct vm_area_struct *vma)
+> +{
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +
+> +	unsigned long start_pfn;
+> +	unsigned int index;
+> +	u64 req_len, pgoff, end;
+> +	int ret = 0;
+> +
+> +	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> +	if (index != VFIO_PCI_BAR2_REGION_INDEX)
+> +		return vfio_pci_core_mmap(core_vdev, vma);
+> +
+> +	/*
+> +	 * Request to mmap the BAR. Map to the CPU accessible memory on the
+> +	 * GPU using the memory information gathered from the system ACPI
+> +	 * tables.
+> +	 */
+> +	pgoff = vma->vm_pgoff &
+> +		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> +
+> +	if (check_sub_overflow(vma->vm_end, vma->vm_start, &req_len) ||
+> +		check_add_overflow(PHYS_PFN(nvdev->hpa), pgoff, &start_pfn) ||
+> +		check_add_overflow(PFN_PHYS(pgoff), req_len, &end))
+> +		return -EOVERFLOW;
+> +
+> +	if (end > nvdev->mem_length)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Perform a PFN map to the memory. The device BAR is backed by the
+> +	 * GPU memory now. Check that the mapping does not overflow out of
+> +	 * the GPU memory size.
+> +	 *
+> +	 * The available GPU memory size may not be power-of-2 aligned. Given
+> +	 * that the memory is exposed as a BAR, the mapping request is of the
+> +	 * power-of-2 aligned size. Map only up to the size of the GPU memory.
+> +	 * If the memory access is beyond the actual GPU memory size, it will
+> +	 * be handled by the vfio_device_ops read/write.
+> +	 *
+> +	 * During device reset, the GPU is safely disconnected to the CPU
+> +	 * and access to the BAR will be immediately returned preventing
+> +	 * machine check.
+> +	 */
+> +	ret = remap_pfn_range(vma, vma->vm_start, start_pfn,
+> +			      req_len, vma->vm_page_prot);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vma->vm_pgoff = start_pfn;
+> +
+> +	return 0;
+> +}
+> +
+> +static long nvgrace_gpu_vfio_pci_ioctl(struct vfio_device *core_vdev,
+> +					unsigned int cmd, unsigned long arg)
+> +{
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +
+> +	unsigned long minsz = offsetofend(struct vfio_region_info, offset);
+> +	struct vfio_region_info info;
+> +
+> +	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+> +		if (copy_from_user(&info, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (info.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +			/*
+> +			 * Request to determine the BAR region information. Send the
+> +			 * GPU memory information.
+> +			 */
+> +			uint32_t size;
+> +			struct vfio_region_info_cap_sparse_mmap *sparse;
+> +			struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
+> +
+> +			size = struct_size(sparse, areas, 1);
+> +
+> +			/*
+> +			 * Setup for sparse mapping for the device memory. Only the
+> +			 * available device memory on the hardware is shown as a
+> +			 * mappable region.
+> +			 */
+> +			sparse = kzalloc(size, GFP_KERNEL);
+> +			if (!sparse)
+> +				return -ENOMEM;
+> +
+> +			sparse->nr_areas = 1;
+> +			sparse->areas[0].offset = 0;
+> +			sparse->areas[0].size = nvdev->mem_length;
+> +			sparse->header.id = VFIO_REGION_INFO_CAP_SPARSE_MMAP;
+> +			sparse->header.version = 1;
+> +
+> +			if (vfio_info_add_capability(&caps, &sparse->header, size)) {
+> +				kfree(sparse);
+> +				return -EINVAL;
+> +			}
+> +
+> +			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> +			/*
+> +			 * The available GPU memory size may not be power-of-2 aligned.
+> +			 * Given that the memory is exposed as a BAR and may not be
+> +			 * aligned, roundup to the next power-of-2.
+> +			 */
+> +			info.size = roundup_pow_of_two(nvdev->mem_length);
+> +			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> +				VFIO_REGION_INFO_FLAG_WRITE |
+> +				VFIO_REGION_INFO_FLAG_MMAP;
+> +
+> +			if (caps.size) {
+> +				info.flags |= VFIO_REGION_INFO_FLAG_CAPS;
+> +				if (info.argsz < sizeof(info) + caps.size) {
+> +					info.argsz = sizeof(info) + caps.size;
+> +					info.cap_offset = 0;
+> +				} else {
+> +					vfio_info_cap_shift(&caps, sizeof(info));
+> +					if (copy_to_user((void __user *)arg +
+> +									sizeof(info), caps.buf,
+> +									caps.size)) {
+> +						kfree(caps.buf);
+> +						kfree(sparse);
+> +						return -EFAULT;
+> +					}
+> +					info.cap_offset = sizeof(info);
+> +				}
+> +				kfree(caps.buf);
+> +			}
+> +
+> +			kfree(sparse);
+> +			return copy_to_user((void __user *)arg, &info, minsz) ?
+> +				       -EFAULT : 0;
+> +		}
+> +	}
+> +
+> +	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> +}
+> +
+> +/*
+> + * Read count bytes from the device memory at an offset. The actual device
+> + * memory size (available) may not be a power-of-2. So the driver fakes
+> + * the size to a power-of-2 (reported) when exposing to a user space driver.
+> + *
+> + * Read request beyond the actual device size is filled with ~1, while
+> + * those beyond the actual reported size is skipped.
+> + *
+> + * A read from a reported+ offset is considered error conditions and
+> + * returned with an -EINVAL. Overflow conditions are also handled.
+> + */
+> +ssize_t nvgrace_gpu_read_mem(void __user *buf, size_t count, loff_t *ppos,
+> +			      const void *addr, size_t available, size_t reported)
+> +{
+> +	u64 offset = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	u64 end;
+> +	size_t read_count, i;
+> +	u8 val = 0xFF;
+> +
+> +	if (offset >= reported)
+> +		return -EINVAL;
+> +
+> +	if (check_add_overflow(offset, count, &end))
+> +		return -EOVERFLOW;
+> +
+> +	/* Clip short the read request beyond reported BAR size */
+> +	if (end >= reported)
+> +		count = reported - offset;
+> +
+> +	/*
+> +	 * Determine how many bytes to be actually read from the device memory.
+> +	 * Do not read from the offset beyond available size.
+> +	 */
+> +	if (offset >= available)
+> +		read_count = 0;
+> +	else
+> +		read_count = min(count, available - (size_t)offset);
+> +
+> +	/*
+> +	 * Handle read on the BAR2 region. Map to the target device memory
+> +	 * physical address and copy to the request read buffer.
+> +	 */
+> +	if (copy_to_user(buf, (u8 *)addr + offset, read_count))
+> +		return -EFAULT;
+> +
+> +	/*
+> +	 * Only the device memory present on the hardware is mapped, which may
+> +	 * not be power-of-2 aligned. A read to the BAR2 region implies an
+> +	 * access outside the available device memory on the hardware. Fill
+> +	 * such read request with ~1.
+> +	 */
+> +	for (i = 0; i < count - read_count; i++)
+> +		if (copy_to_user(buf + read_count + i, &val, 1))
+> +			return -EFAULT;
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t nvgrace_gpu_vfio_pci_read(struct vfio_device *core_vdev,
+> +					  char __user *buf, size_t count, loff_t *ppos)
+> +{
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +
+> +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +		if (!nvdev->opregion) {
+> +			nvdev->opregion = memremap(nvdev->hpa, nvdev->mem_length, MEMREMAP_WB);
+> +			if (!nvdev->opregion)
+> +				return -ENOMEM;
+> +		}
+> +
+> +		return nvgrace_gpu_read_mem(buf, count, ppos, nvdev->opregion,
+> +				nvdev->mem_length, roundup_pow_of_two(nvdev->mem_length));
+> +	}
+> +
+> +	return vfio_pci_core_read(core_vdev, buf, count, ppos);
+> +}
+> +
+> +/*
+> + * Write count bytes to the device memory at a given offset. The actual device
+> + * memory size (available) may not be a power-of-2. So the driver fakes the
+> + * size to a power-of-2 (reported) when exposing to a user space driver.
+> + *
+> + * Write request beyond the actual device size are dropped, while those
+> + * beyond the actual reported size are skipped entirely.
+> + *
+> + * A write to a reported+ offset is considered error conditions and
+> + * returned with an -EINVAL. Overflow conditions are also handled.
+> + */
+> +ssize_t nvgrace_gpu_write_mem(const void *addr, size_t count, loff_t *ppos,
+> +			       const void __user *buf, size_t available, size_t reported)
+> +{
+> +	u64 offset = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	u64 end;
+> +	size_t write_count;
+> +
+> +	if (offset >= reported)
+> +		return -EINVAL;
+> +
+> +	if (check_add_overflow(offset, count, &end))
+> +		return -EOVERFLOW;
+> +
+> +	/* Clip short the read request beyond reported BAR size */
+> +	if (end >= reported)
+> +		count = reported - offset;
+> +
+> +	/*
+> +	 * Determine how many bytes to be actually written to the device memory.
+> +	 * Do not write to the offset beyond available size.
+> +	 */
+> +	if (offset >= available)
+> +		write_count = 0;
+> +	else
+> +		write_count = min(count, available - (size_t)offset);
+> +
+> +	/*
+> +	 * Only the device memory present on the hardware is mapped, which may
+> +	 * not be power-of-2 aligned. A write to the BAR2 region implies an
+> +	 * access outside the available device memory on the hardware. Drop
+> +	 * those write requests.
+> +	 */
+> +	if (copy_from_user((u8 *)addr + offset, buf, write_count))
+> +		return -EFAULT;
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t nvgrace_gpu_vfio_pci_write(struct vfio_device *core_vdev,
+> +					   const char __user *buf, size_t count, loff_t *ppos)
+> +{
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +
+> +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +		if (!nvdev->opregion) {
+> +			nvdev->opregion = memremap(nvdev->hpa, nvdev->mem_length, MEMREMAP_WB);
+> +			if (!nvdev->opregion)
+> +				return -ENOMEM;
+> +		}
+> +
+> +		return nvgrace_gpu_write_mem(nvdev->opregion, count, ppos, buf,
+> +				nvdev->mem_length, roundup_pow_of_two(nvdev->mem_length));
+> +	}
+> +
+> +	return vfio_pci_core_write(core_vdev, buf, count, ppos);
+> +}
+> +
+> +static const struct vfio_device_ops nvgrace_gpu_vfio_pci_ops = {
+> +	.name = "nvgrace-gpu-vfio-pci",
+> +	.init = vfio_pci_core_init_dev,
+> +	.release = vfio_pci_core_release_dev,
+> +	.open_device = nvgrace_gpu_vfio_pci_open_device,
+> +	.close_device = nvgrace_gpu_vfio_pci_close_device,
+> +	.ioctl = nvgrace_gpu_vfio_pci_ioctl,
+> +	.read = nvgrace_gpu_vfio_pci_read,
+> +	.write = nvgrace_gpu_vfio_pci_write,
+> +	.mmap = nvgrace_gpu_vfio_pci_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +	.bind_iommufd = vfio_iommufd_physical_bind,
+> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
+> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+> +};
+> +
+> +static struct
+> +nvgrace_gpu_vfio_pci_core_device *nvgrace_gpu_drvdata(struct pci_dev *pdev)
+> +{
+> +	struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
+> +
+> +	return container_of(core_device, struct nvgrace_gpu_vfio_pci_core_device,
+> +			    core_device);
+> +}
+> +
+> +static int
+> +nvgrace_gpu_vfio_pci_fetch_memory_property(struct pci_dev *pdev,
+> +					    struct nvgrace_gpu_vfio_pci_core_device *nvdev)
+> +{
+> +	int ret;
+> +
+> +	/*
+> +	 * The memory information is present in the system ACPI tables as DSD
+> +	 * properties nvidia,gpu-mem-base-pa and nvidia,gpu-mem-size.
+> +	 */
+> +	ret = device_property_read_u64(&pdev->dev, "nvidia,gpu-mem-base-pa",
+> +				       &(nvdev->hpa));
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = device_property_read_u64(&pdev->dev, "nvidia,gpu-mem-size",
+> +				       &(nvdev->mem_length));
+> +	return ret;
+> +}
+> +
+> +static int nvgrace_gpu_vfio_pci_probe(struct pci_dev *pdev,
+> +				       const struct pci_device_id *id)
+> +{
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev;
+> +	int ret;
+> +
+> +	nvdev = vfio_alloc_device(nvgrace_gpu_vfio_pci_core_device, core_device.vdev,
+> +				  &pdev->dev, &nvgrace_gpu_vfio_pci_ops);
+> +	if (IS_ERR(nvdev))
+> +		return PTR_ERR(nvdev);
+> +
+> +	dev_set_drvdata(&pdev->dev, nvdev);
+> +
+> +	ret = nvgrace_gpu_vfio_pci_fetch_memory_property(pdev, nvdev);
+> +	if (ret)
+> +		goto out_put_vdev;
+> +
+> +	ret = vfio_pci_core_register_device(&nvdev->core_device);
+> +	if (ret)
+> +		goto out_put_vdev;
+> +
+> +	return ret;
+> +
+> +out_put_vdev:
+> +	vfio_put_device(&nvdev->core_device.vdev);
+> +	return ret;
+> +}
+> +
+> +static void nvgrace_gpu_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = nvgrace_gpu_drvdata(pdev);
+> +	struct vfio_pci_core_device *vdev = &nvdev->core_device;
+> +
+> +	vfio_pci_core_unregister_device(vdev);
+> +	vfio_put_device(&vdev->vdev);
+> +}
+> +
+> +static const struct pci_device_id nvgrace_gpu_vfio_pci_table[] = {
+> +	/* GH200 120GB */
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2342) },
+> +	/* GH200 480GB */
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_NVIDIA, 0x2345) },
+> +	{}
+> +};
+> +
+> +MODULE_DEVICE_TABLE(pci, nvgrace_gpu_vfio_pci_table);
+> +
+> +static struct pci_driver nvgrace_gpu_vfio_pci_driver = {
+> +	.name = KBUILD_MODNAME,
+> +	.id_table = nvgrace_gpu_vfio_pci_table,
+> +	.probe = nvgrace_gpu_vfio_pci_probe,
+> +	.remove = nvgrace_gpu_vfio_pci_remove,
+> +	.err_handler = &vfio_pci_core_err_handlers,
+> +	.driver_managed_dma = true,
+> +};
+> +
+> +module_pci_driver(nvgrace_gpu_vfio_pci_driver);
+> +
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR("Ankit Agrawal <ankita@nvidia.com>");
+> +MODULE_AUTHOR("Aniket Agashe <aniketa@nvidia.com>");
+> +MODULE_DESCRIPTION(
+> +	"VFIO NVGRACE GPU PF - User Level driver for NVIDIA devices with CPU coherently accessible device memory");
+> -- 
+> 2.17.1
+> 
+---end quoted text---
