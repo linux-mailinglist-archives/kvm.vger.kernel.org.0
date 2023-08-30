@@ -2,57 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8163F78D991
-	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7469D78D941
+	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:33:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237192AbjH3Sda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Aug 2023 14:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
+        id S229651AbjH3ScG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Aug 2023 14:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243684AbjH3L3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Aug 2023 07:29:16 -0400
+        with ESMTP id S243823AbjH3Lss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Aug 2023 07:48:48 -0400
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6809F132
-        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 04:29:13 -0700 (PDT)
-Received: from lhrpeml100003.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RbMQX0fL9z67FR3;
-        Wed, 30 Aug 2023 19:24:52 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1F21B0
+        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 04:48:43 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RbMwp3w51z6HJcB;
+        Wed, 30 Aug 2023 19:47:38 +0800 (CST)
+Received: from A2006125610.china.huawei.com (10.202.227.178) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 30 Aug 2023 12:29:11 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Wed, 30 Aug 2023 12:29:11 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Gavin Shan <gshan@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-CC:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "ricarkol@google.com" <ricarkol@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: RE: [PATCH v2] arm/kvm: Enable support for
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Thread-Topic: [PATCH v2] arm/kvm: Enable support for
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Thread-Index: AQHZz1rBh96g1+Cwu0Gwaz2o/+lpEK/+1l8AgAP05VA=
-Date:   Wed, 30 Aug 2023 11:29:11 +0000
-Message-ID: <2586f98a0999408aa3a88495dd72489c@huawei.com>
-References: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
- <9fc460ef-bb6b-8b67-d52a-f2d5aea887f1@redhat.com>
-In-Reply-To: <9fc460ef-bb6b-8b67-d52a-f2d5aea887f1@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2507.31; Wed, 30 Aug 2023 12:48:36 +0100
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+CC:     <peter.maydell@linaro.org>, <gshan@redhat.com>,
+        <ricarkol@google.com>, <jonathan.cameron@huawei.com>,
+        <kvm@vger.kernel.org>, <linuxarm@huawei.com>
+Subject: [PATCH v3] arm/kvm: Enable support for KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Date:   Wed, 30 Aug 2023 12:48:18 +0100
+Message-ID: <20230830114818.641-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.178]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+X-Spam-Status: No, score=-1.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -61,171 +45,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBHYXZpbiBTaGFuIFttYWlsdG86
-Z3NoYW5AcmVkaGF0LmNvbV0NCj4gU2VudDogMjggQXVndXN0IDIwMjMgMDE6MDINCj4gVG86IFNo
-YW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2Vp
-LmNvbT47DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS1hcm1Abm9uZ251Lm9yZw0KPiBD
-YzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyByaWNhcmtvbEBnb29nbGUuY29tOyBrdm1Admdl
-ci5rZXJuZWwub3JnOw0KPiBKb25hdGhhbiBDYW1lcm9uIDxqb25hdGhhbi5jYW1lcm9uQGh1YXdl
-aS5jb20+OyBMaW51eGFybQ0KPiA8bGludXhhcm1AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCB2Ml0gYXJtL2t2bTogRW5hYmxlIHN1cHBvcnQgZm9yDQo+IEtWTV9DQVBfQVJNX0VB
-R0VSX1NQTElUX0NIVU5LX1NJWkUNCj4gDQo+IEhpIFNoYW1lZXIsDQoNCkhpIEdhdmluLA0KDQpB
-Z3JlZSB3aXRoIGFsbCB0aGUgY29tbWVudHMuIFdpbGwgc2VuZCBvdXQgYSB2MyBzb29uLg0KDQpU
-aGFua3MsDQpTaGFtZWVyDQogDQo+IE9uIDgvMTUvMjMgMTk6MjcsIFNoYW1lZXIgS29sb3RodW0g
-d3JvdGU6DQo+ID4gTm93IHRoYXQgd2UgaGF2ZSBFYWdlciBQYWdlIFNwbGl0IHN1cHBvcnQgYWRk
-ZWQgZm9yIEFSTSBpbiB0aGUga2VybmVsLA0KPiA+IGVuYWJsZSBpdCBpbiBRZW11LiBUaGlzIGFk
-ZHMsDQo+ID4gICAtZWFnZXItc3BsaXQtc2l6ZSB0byAtYWNjZWwgc3ViLW9wdGlvbnMgdG8gc2V0
-IHRoZSBlYWdlciBwYWdlIHNwbGl0IGNodW5rDQo+IHNpemUuDQo+ID4gICAtZW5hYmxlIEtWTV9D
-QVBfQVJNX0VBR0VSX1NQTElUX0NIVU5LX1NJWkUuDQo+ID4NCj4gPiBUaGUgY2h1bmsgc2l6ZSBz
-cGVjaWZpZXMgaG93IG1hbnkgcGFnZXMgdG8gYnJlYWsgYXQgYSB0aW1lLCB1c2luZyBhDQo+ID4g
-c2luZ2xlIGFsbG9jYXRpb24uIEJpZ2dlciB0aGUgY2h1bmsgc2l6ZSwgbW9yZSBwYWdlcyBuZWVk
-IHRvIGJlDQo+ID4gYWxsb2NhdGVkIGFoZWFkIG9mIHRpbWUuDQo+ID4NCj4gPiBTaWduZWQtb2Zm
-LWJ5OiBTaGFtZWVyIEtvbG90aHVtDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdl
-aS5jb20+DQo+ID4gLS0tDQo+ID4gUkZDIHYxOg0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9x
-ZW11LWRldmVsLzIwMjMwNzI1MTUwMDAyLjYyMS0xLXNoYW1lZXJhbGkua29sbw0KPiB0aHVtLnRo
-b2RpQGh1YXdlaS5jb20vDQo+ID4gICAgLVVwZGF0ZWQgcWVtdS1vcHRpb25zLmh4IHdpdGggZGVz
-Y3JpcHRpb24NCj4gPiAgICAtQWRkcmVzc2VkIHJldmlldyBjb21tZW50cyBmcm9tIFBldGVyIGFu
-ZCBHYXZpbihUaGFua3MpLg0KPiA+IC0tLQ0KPiA+ICAgaW5jbHVkZS9zeXNlbXUva3ZtX2ludC5o
-IHwgIDEgKw0KPiA+ICAgcWVtdS1vcHRpb25zLmh4ICAgICAgICAgIHwgMTQgKysrKysrKysrDQo+
-ID4gICB0YXJnZXQvYXJtL2t2bS5jICAgICAgICAgfCA2Mg0KPiArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrDQo+ID4gICAzIGZpbGVzIGNoYW5nZWQsIDc3IGluc2VydGlv
-bnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3N5c2VtdS9rdm1faW50LmggYi9p
-bmNsdWRlL3N5c2VtdS9rdm1faW50LmggaW5kZXgNCj4gPiA1MTFiNDJiZGU1Li4wM2ExNjYwZDQw
-IDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvc3lzZW11L2t2bV9pbnQuaA0KPiA+ICsrKyBiL2lu
-Y2x1ZGUvc3lzZW11L2t2bV9pbnQuaA0KPiA+IEBAIC0xMTYsNiArMTE2LDcgQEAgc3RydWN0IEtW
-TVN0YXRlDQo+ID4gICAgICAgdWludDY0X3Qga3ZtX2RpcnR5X3JpbmdfYnl0ZXM7ICAvKiBTaXpl
-IG9mIHRoZSBwZXItdmNwdSBkaXJ0eSByaW5nDQo+ICovDQo+ID4gICAgICAgdWludDMyX3Qga3Zt
-X2RpcnR5X3Jpbmdfc2l6ZTsgICAvKiBOdW1iZXIgb2YgZGlydHkgR0ZOcyBwZXIgcmluZw0KPiAq
-Lw0KPiA+ICAgICAgIGJvb2wga3ZtX2RpcnR5X3Jpbmdfd2l0aF9iaXRtYXA7DQo+ID4gKyAgICB1
-aW50NjRfdCBrdm1fZWFnZXJfc3BsaXRfc2l6ZTsgLyogRWFnZXIgUGFnZSBTcGxpdHRpbmcgY2h1
-bmsgc2l6ZQ0KPiA+ICsgKi8NCj4gDQo+IE9uZSBtb3JlIHNwYWNlIGlzIG5lZWRlZCBiZWZvcmUg
-dGhlIGNvbW1lbnRzLCB0byBoYXZlIHNhbWUgYWxpZ25tZW50IGFzDQo+IHdlIGhhZC4gQmVzaWRl
-cywgaXQgbmVlZHMgdG8gYmUgaW5pdGlhbGl6ZWQgdG8gemVybyBpbg0KPiBrdm0tYWxsLmM6Omt2
-bV9hY2NlbF9pbnN0YW5jZV9pbml0KCkNCj4gYXMgd2UncmUgZG9pbmcgZm9yIEBrdm1fZGlydHlf
-cmluZ19zaXplLg0KPiANCj4gPiAgICAgICBzdHJ1Y3QgS1ZNRGlydHlSaW5nUmVhcGVyIHJlYXBl
-cjsNCj4gPiAgICAgICBOb3RpZnlWbWV4aXRPcHRpb24gbm90aWZ5X3ZtZXhpdDsNCj4gPiAgICAg
-ICB1aW50MzJfdCBub3RpZnlfd2luZG93Ow0KPiA+IGRpZmYgLS1naXQgYS9xZW11LW9wdGlvbnMu
-aHggYi9xZW11LW9wdGlvbnMuaHggaW5kZXgNCj4gPiAyOWI5OGMzZDRjLi42ZWY3Yjg5MDEzIDEw
-MDY0NA0KPiA+IC0tLSBhL3FlbXUtb3B0aW9ucy5oeA0KPiA+ICsrKyBiL3FlbXUtb3B0aW9ucy5o
-eA0KPiA+IEBAIC0xODYsNiArMTg2LDcgQEAgREVGKCJhY2NlbCIsIEhBU19BUkcsIFFFTVVfT1BU
-SU9OX2FjY2VsLA0KPiA+ICAgICAgICIgICAgICAgICAgICAgICAgc3BsaXQtd3g9b258b2ZmIChl
-bmFibGUgVENHIHNwbGl0IHdeeA0KPiBtYXBwaW5nKVxuIg0KPiA+ICAgICAgICIgICAgICAgICAg
-ICAgICAgdGItc2l6ZT1uIChUQ0cgdHJhbnNsYXRpb24gYmxvY2sgY2FjaGUgc2l6ZSlcbiINCj4g
-PiAgICAgICAiICAgICAgICAgICAgICAgIGRpcnR5LXJpbmctc2l6ZT1uIChLVk0gZGlydHkgcmlu
-ZyBHRk4gY291bnQsDQo+IGRlZmF1bHQgMClcbiINCj4gPiArICAgICIgICAgICAgICAgICAgICAg
-ZWFnZXItc3BsaXQtc2l6ZT1uIChLVk0gRWFnZXIgUGFnZSBTcGxpdCBjaHVuaw0KPiBzaXplLCBk
-ZWZhdWx0IDAsIGRpc2FibGVkLiBBUk0gb25seSlcbiINCj4gPiAgICAgICAiDQo+IG5vdGlmeS12
-bWV4aXQ9cnVufGludGVybmFsLWVycm9yfGRpc2FibGUsbm90aWZ5LXdpbmRvdz1uIChlbmFibGUg
-bm90aWZ5IFZNDQo+IGV4aXQgYW5kIHNldCBub3RpZnkgd2luZG93LCB4ODYgb25seSlcbiINCj4g
-PiAgICAgICAiICAgICAgICAgICAgICAgIHRocmVhZD1zaW5nbGV8bXVsdGkgKGVuYWJsZSBtdWx0
-aS10aHJlYWRlZA0KPiBUQ0cpXG4iLCBRRU1VX0FSQ0hfQUxMKQ0KPiA+ICAgU1JTVA0KPiA+IEBA
-IC0yNDQsNiArMjQ1LDE5IEBAIFNSU1QNCj4gPiAgICAgICAgICAgaXMgZGlzYWJsZWQgKGRpcnR5
-LXJpbmctc2l6ZT0wKS4gIFdoZW4gZW5hYmxlZCwgS1ZNIHdpbGwNCj4gaW5zdGVhZA0KPiA+ICAg
-ICAgICAgICByZWNvcmQgZGlydHkgcGFnZXMgaW4gYSBiaXRtYXAuDQo+ID4NCj4gPiArICAgIGBg
-ZWFnZXItc3BsaXQtc2l6ZT1uYGANCj4gPiArICAgICAgICBLVk0gaW1wbGVtZW50cyBkaXJ0eSBw
-YWdlIGxvZ2dpbmcgYXQgdGhlIFBBR0VfU0laRSBncmFudWxhcml0eQ0KPiBhbmQNCj4gPiArICAg
-ICAgICBlbmFibGluZyBkaXJ0eS1sb2dnaW5nIG9uIGEgaHVnZS1wYWdlIHJlcXVpcmVzIGJyZWFr
-aW5nIGl0IGludG8NCj4gPiArICAgICAgICBQQUdFX1NJWkUgcGFnZXMgaW4gdGhlIGZpcnN0IHBs
-YWNlLiBLVk0gb24gQVJNIGRvZXMgdGhpcw0KPiBzcGxpdHRpbmcNCj4gPiArICAgICAgICBsYXpp
-bHkgYnkgZGVmYXVsdC4gVGhlcmUgYXJlIHBlcmZvcm1hbmNlIGJlbmVmaXRzIGluIGRvaW5nDQo+
-IGh1Z2UtcGFnZQ0KPiA+ICsgICAgICAgIHNwbGl0IGVhZ2VybHksIGVzcGVjaWFsbHkgaW4gc2l0
-dWF0aW9ucyB3aGVyZSBUTEJJIGNvc3RzIGFzc29jaWF0ZWQNCj4gPiArICAgICAgICB3aXRoIGJy
-ZWFrLWJlZm9yZS1tYWtlIHNlcXVlbmNlcyBhcmUgY29uc2lkZXJhYmxlIGFuZCBhbHNvIGlmDQo+
-IGd1ZXN0DQo+ID4gKyAgICAgICAgd29ya2xvYWRzIGFyZSByZWFkIGludGVuc2l2ZS4gVGhlIHNp
-emUgaGVyZSBzcGVjaWZpZXMgaG93IG1hbnkNCj4gcGFnZXMNCj4gPiArICAgICAgICB0byBicmVh
-ayBhdCBhIHRpbWUgYW5kIG5lZWRzIHRvIGJlIGEgdmFsaWQgYmxvY2sgcGFnZSBzaXplKGVnOg0K
-PiA0S0IgfA0KPiA+ICsgICAgICAgIDJNIHwgMUcgd2hlbiBQQUdFX1NJWkUgaXMgNEspLiBCZSB3
-YXJ5IG9mIHNwZWNpZnlpbmcgYSBoaWdoZXINCj4gc2l6ZSBhcw0KPiA+ICsgICAgICAgIGl0IHdp
-bGwgaGF2ZSBhbiBpbXBhY3Qgb24gdGhlIG1lbW9yeS4gQnkgZGVmYXVsdCwgdGhpcyBmZWF0dXJl
-IGlzDQo+ID4gKyAgICAgICAgZGlzYWJsZWQgKGVhZ2VyLXNwbGl0LXNpemU9MCkuDQo+ID4gKw0K
-PiANCj4gU2luY2UgNjRLQiBiYXNlIHBhZ2Ugc2l6ZSBpcyBhbm90aGVyIHBvcHVsYXIgb3B0aW9u
-LCBpdCdzIHdvcnRoeSB0byBtZW50aW9uDQo+IHRoZSBzdXBwb3J0ZWQgYmxvY2sgc2l6ZXMgZm9y
-IDY0S0IgYmFzZSBwYWdlIHNpemUuIEknbSBub3Qgc3VyZSBhYm91dCAxNktCDQo+IHRob3VnaC4N
-Cj4gRm9yIHRoaXMsIHRoZSBjb21tZW50cyBjYW4gYmUgaW1wcm92ZWQgYXMgYmVsb3cgaWYgeW91
-IGFncmVlLiBXaXRoIHRoZQ0KPiBpbXByb3ZlbWVudCwgdXNlcnMgbmVlZG4ndCBsb29rIGludG8g
-dGhlIGNvZGUgdG8gZmlndXJlIG91dCB0aGUgdmFsaWQgYmxvY2sNCj4gc2l6ZXMuDQo+IA0KPiBU
-aGUgc2l6ZSBoZXJlIHNwZWNpZmllcyBob3cgbWFueSBwYWdlcyB0byBiZSBzcGxpdCBhdCBhIHRp
-bWUgYW5kIG5lZWRzIHRvIGJlDQo+IGEgdmFsaWQgYmxvY2sgc2l6ZSwgd2hpY2ggaXMgMUdCLzJN
-Qi80S0IsIDMyTUIvMTZLQiBhbmQgNTEyTUIvNjRLQiBmb3INCj4gNEtCLzE2S0IvNjRLQiBQQUdF
-X1NJWkUgcmVzcGVjdGl2ZWx5Lg0KPiANCj4gPiAgICAgICBgYG5vdGlmeS12bWV4aXQ9cnVufGlu
-dGVybmFsLWVycm9yfGRpc2FibGUsbm90aWZ5LXdpbmRvdz1uYGANCj4gPiAgICAgICAgICAgRW5h
-YmxlcyBvciBkaXNhYmxlcyBub3RpZnkgVk0gZXhpdCBzdXBwb3J0IG9uIHg4NiBob3N0IGFuZA0K
-PiBzcGVjaWZ5DQo+ID4gICAgICAgICAgIHRoZSBjb3JyZXNwb25kaW5nIG5vdGlmeSB3aW5kb3cg
-dG8gdHJpZ2dlciB0aGUgVk0gZXhpdCBpZg0KPiBlbmFibGVkLg0KPiA+IGRpZmYgLS1naXQgYS90
-YXJnZXQvYXJtL2t2bS5jIGIvdGFyZ2V0L2FybS9rdm0uYyBpbmRleA0KPiA+IGI0Yzc2NTRmNDku
-LjZjZWJhNjczZDkgMTAwNjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2FybS9rdm0uYw0KPiA+ICsrKyBi
-L3RhcmdldC9hcm0va3ZtLmMNCj4gPiBAQCAtMzAsNiArMzAsNyBAQA0KPiA+ICAgI2luY2x1ZGUg
-ImV4ZWMvYWRkcmVzcy1zcGFjZXMuaCINCj4gPiAgICNpbmNsdWRlICJody9ib2FyZHMuaCINCj4g
-PiAgICNpbmNsdWRlICJody9pcnEuaCINCj4gPiArI2luY2x1ZGUgInFhcGkvdmlzaXRvci5oIg0K
-PiA+ICAgI2luY2x1ZGUgInFlbXUvbG9nLmgiDQo+ID4NCj4gPiAgIGNvbnN0IEtWTUNhcGFiaWxp
-dHlJbmZvIGt2bV9hcmNoX3JlcXVpcmVkX2NhcGFiaWxpdGllc1tdID0geyBAQA0KPiA+IC0yNDcs
-NiArMjQ4LDExIEBAIGludCBrdm1fYXJtX2dldF9tYXhfdm1faXBhX3NpemUoTWFjaGluZVN0YXRl
-DQo+ICptcywgYm9vbCAqZml4ZWRfaXBhKQ0KPiA+ICAgICAgIHJldHVybiByZXQgPiAwID8gcmV0
-IDogNDA7DQo+ID4gICB9DQo+ID4NCj4gPiArc3RhdGljIGJvb2wga3ZtX2FybV9lYWdlcl9zcGxp
-dF9zaXplX3ZhbGlkKHVpbnQ2NF90IHJlcV9zaXplLA0KPiA+ICt1aW50MzJfdCBzaXplcykgew0K
-PiA+ICsgICAgcmV0dXJuIHJlcV9zaXplICYgc2l6ZXM7DQo+ID4gK30NCj4gPiArDQo+IA0KPiBJ
-dCdzIHdvcnRoeSB0byBiZSBhIGlubGluZSBmdW5jdGlvbi4NCj4gDQo+ID4gICBpbnQga3ZtX2Fy
-Y2hfaW5pdChNYWNoaW5lU3RhdGUgKm1zLCBLVk1TdGF0ZSAqcykNCj4gPiAgIHsNCj4gPiAgICAg
-ICBpbnQgcmV0ID0gMDsNCj4gPiBAQCAtMjgwLDYgKzI4NiwyMiBAQCBpbnQga3ZtX2FyY2hfaW5p
-dChNYWNoaW5lU3RhdGUgKm1zLCBLVk1TdGF0ZQ0KPiAqcykNCj4gPiAgICAgICAgICAgfQ0KPiA+
-ICAgICAgIH0NCj4gPg0KPiA+ICsgICAgaWYgKHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplKSB7DQo+
-ID4gKyAgICAgICAgdWludDMyX3Qgc2l6ZXM7DQo+ID4gKw0KPiA+ICsgICAgICAgIHNpemVzID0g
-a3ZtX3ZtX2NoZWNrX2V4dGVuc2lvbihzLA0KPiBLVk1fQ0FQX0FSTV9TVVBQT1JURURfQkxPQ0tf
-U0laRVMpOw0KPiA+ICsgICAgICAgIGlmICghc2l6ZXMpIHsNCj4gPiArICAgICAgICAgICAgcy0+
-a3ZtX2VhZ2VyX3NwbGl0X3NpemUgPSAwOw0KPiA+ICsgICAgICAgICAgICB3YXJuX3JlcG9ydCgi
-RWFnZXIgUGFnZSBTcGxpdCBzdXBwb3J0IG5vdCBhdmFpbGFibGUiKTsNCj4gPiArICAgICAgICB9
-IGVsc2UgaWYNCj4gKCFrdm1fYXJtX2VhZ2VyX3NwbGl0X3NpemVfdmFsaWQocy0+a3ZtX2VhZ2Vy
-X3NwbGl0X3NpemUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHNpemVzKSkgew0KPiA+ICsgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkVh
-Z2VyIFBhZ2UgU3BsaXQgcmVxdWVzdGVkIGNodW5rIHNpemUgbm90DQo+IHZhbGlkIik7DQo+ID4g
-KyAgICAgICAgfSBlbHNlIGlmIChrdm1fdm1fZW5hYmxlX2NhcChzLA0KPiBLVk1fQ0FQX0FSTV9F
-QUdFUl9TUExJVF9DSFVOS19TSVpFLCAwLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgcy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemUpKSB7DQo+ID4gKyAgICAgICAgICAg
-IGVycm9yX3JlcG9ydCgiRmFpbGVkIHRvIHNldCBFYWdlciBQYWdlIFNwbGl0IGNodW5rDQo+ID4g
-KyBzaXplIik7DQo+IA0KPiBMZXRzIHByaW50IHRoZSBlcnJubyBoZXJlLiBJdCdzIGluZGljYXRp
-dmUgdG8gdGVsbCB3aGF0IGhhcHBlbnMgaW5zaWRlIHRoZSBob3N0DQo+IGtlcm5lbCBhbmQgd2h5
-IGl0J3MgZmFpbGluZyB0byBlbmFibGUgdGhlIGZlYXR1cmUuDQo+IA0KPiAJCWVycm9yX3JlcG9y
-dCgiRW5hYmxpbmcgb2YgRWFnZXIgUGFnZSBTcGxpdCBmYWlsZWQ6ICVzLiIsDQo+IHN0cmVycm9y
-KC1yZXQpKTsNCj4gDQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAg
-ICBrdm1fYXJtX2luaXRfZGVidWcocyk7DQo+ID4NCj4gPiAgICAgICByZXR1cm4gcmV0Ow0KPiA+
-IEBAIC0xMDYyLDYgKzEwODQsNDYgQEAgYm9vbA0KPiBrdm1fYXJjaF9jcHVfY2hlY2tfYXJlX3Jl
-c2V0dGFibGUodm9pZCkNCj4gPiAgICAgICByZXR1cm4gdHJ1ZTsNCj4gPiAgIH0NCj4gPg0KPiA+
-ICtzdGF0aWMgdm9pZCBrdm1fYXJjaF9nZXRfZWFnZXJfc3BsaXRfc2l6ZShPYmplY3QgKm9iaiwg
-VmlzaXRvciAqdiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgY29uc3QgY2hhciAqbmFtZSwgdm9pZA0KPiAqb3BhcXVlLA0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApIHsNCj4gPiArICAgIEtW
-TVN0YXRlICpzID0gS1ZNX1NUQVRFKG9iaik7DQo+ID4gKyAgICB1aW50NjRfdCB2YWx1ZSA9IHMt
-Pmt2bV9lYWdlcl9zcGxpdF9zaXplOw0KPiA+ICsNCj4gPiArICAgIHZpc2l0X3R5cGVfc2l6ZSh2
-LCBuYW1lLCAmdmFsdWUsIGVycnApOyB9DQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCBrdm1fYXJj
-aF9zZXRfZWFnZXJfc3BsaXRfc2l6ZShPYmplY3QgKm9iaiwgVmlzaXRvciAqdiwNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqbmFtZSwg
-dm9pZA0KPiAqb3BhcXVlLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBFcnJvciAqKmVycnApIHsNCj4gPiArICAgIEtWTVN0YXRlICpzID0gS1ZNX1NUQVRF
-KG9iaik7DQo+ID4gKyAgICB1aW50NjRfdCB2YWx1ZTsNCj4gPiArDQo+ID4gKyAgICBpZiAocy0+
-ZmQgIT0gLTEpIHsNCj4gPiArICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3Qgc2V0IHBy
-b3BlcnRpZXMgYWZ0ZXIgdGhlIGFjY2VsZXJhdG9yIGhhcw0KPiBiZWVuIGluaXRpYWxpemVkIik7
-DQo+ID4gKyAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gDQo+IExldHMgYmUg
-bW9yZSBvYnZpb3VzIGhlcmU/DQo+IA0KPiAJZXJyb3Jfc2V0ZyhlcnJwLCAiVW5hYmxlIHRvIHNl
-dCBlYXJseS1zcGxpdC1zaXplIGFmdGVyIEtWTSBoYXMgYmVlbg0KPiBpbml0aWFsaXplZCIpOw0K
-PiANCj4gPiArICAgIGlmICghdmlzaXRfdHlwZV9zaXplKHYsIG5hbWUsICZ2YWx1ZSwgZXJycCkp
-IHsNCj4gPiArICAgICAgICByZXR1cm47DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgaWYg
-KGlzX3Bvd2VyX29mXzIodmFsdWUpKSB7DQo+ID4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAi
-ZWFybHktc3BsaXQtc2l6ZSBtdXN0IGJlIGEgcG93ZXIgb2YgdHdvLiIpOw0KPiA+ICsgICAgICAg
-IHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+IA0KPiBUaGlzIGNvbmRpdGlvbiBsb29rcyB3
-cm9uZyB0byBtZS4gJ3ZhbHVlID0gMCcgaXMgYWNjZXB0ZWQgdG8gZGlzYWJsZSB0aGUgZWFybHkN
-Cj4gcGFnZSBzcGxpdHRpbmcuIEJlc2lkZXMsIHdlIGFjdHVhbGx5IG5lZWQgdG8gd2FybiBvbiAh
-aXNfcG93ZXJfb2ZfMih2YWx1ZSkNCj4gDQo+IAlpZiAodmFsdWUgJiYgIWlzX3Bvd2VyX29mXzIo
-dmFsdWUpKSB7DQo+ICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJlYXJseS1zcGxpdC1z
-aXplIG11c3QgYmUgYSBwb3dlciBvZiB0d28uIik7DQo+ICAgICAgICAgICAgICByZXR1cm47DQo+
-ICAgICAgICAgIH0NCj4gDQo+ID4gKyAgICBzLT5rdm1fZWFnZXJfc3BsaXRfc2l6ZSA9IHZhbHVl
-Ow0KPiA+ICt9DQo+ID4gKw0KPiA+ICAgdm9pZCBrdm1fYXJjaF9hY2NlbF9jbGFzc19pbml0KE9i
-amVjdENsYXNzICpvYykNCj4gPiAgIHsNCj4gPiArICAgIG9iamVjdF9jbGFzc19wcm9wZXJ0eV9h
-ZGQob2MsICJlYWdlci1zcGxpdC1zaXplIiwgInNpemUiLA0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBrdm1fYXJjaF9nZXRfZWFnZXJfc3BsaXRfc2l6ZSwNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAga3ZtX2FyY2hfc2V0X2VhZ2VyX3NwbGl0X3NpemUsIE5V
-TEwsDQo+ID4gKyBOVUxMKTsNCj4gPiArDQo+ID4gKyAgICBvYmplY3RfY2xhc3NfcHJvcGVydHlf
-c2V0X2Rlc2NyaXB0aW9uKG9jLCAiZWFnZXItc3BsaXQtc2l6ZSIsDQo+ID4gKyAgICAgICAgIkNv
-bmZpZ3VyZSBFYWdlciBQYWdlIFNwbGl0IGNodW5rIHNpemUgZm9yIGh1Z2VwYWdlcy4NCj4gPiAr
-IChkZWZhdWx0OiAwLCBkaXNhYmxlZCkiKTsNCj4gDQo+ICJDb25maWd1cmUiIG5lZWRzIHRvIGJl
-IGRyb3BwZWQgc2luY2UgdGhlIHByb3BlcnR5IGhhcyBib3RoIHJlYWQvd3JpdGUNCj4gcGVybWlz
-c2lvbi4NCj4gDQo+ID4gICB9DQo+IA0KPiBUaGFua3MsDQo+IEdhdmluDQoNCg==
+Now that we have Eager Page Split support added for ARM in the kernel,
+enable it in Qemu. This adds,
+ -eager-split-size to -accel sub-options to set the eager page split chunk size.
+ -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
+
+The chunk size specifies how many pages to break at a time, using a
+single allocation. Bigger the chunk size, more pages need to be
+allocated ahead of time.
+
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+v2: https://lore.kernel.org/qemu-devel/20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com/
+   -Addressed comments from Gavin(Thanks).
+RFC v1: https://lore.kernel.org/qemu-devel/20230725150002.621-1-shameerali.kolothum.thodi@huawei.com/
+  -Updated qemu-options.hx with description
+  -Addressed review comments from Peter and Gavin(Thanks).
+---
+ accel/kvm/kvm-all.c      |  1 +
+ include/sysemu/kvm_int.h |  1 +
+ qemu-options.hx          | 15 +++++++++
+ target/arm/kvm.c         | 68 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 85 insertions(+)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 2ba7521695..ff1578bb32 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -3763,6 +3763,7 @@ static void kvm_accel_instance_init(Object *obj)
+     /* KVM dirty ring is by default off */
+     s->kvm_dirty_ring_size = 0;
+     s->kvm_dirty_ring_with_bitmap = false;
++    s->kvm_eager_split_size = 0;
+     s->notify_vmexit = NOTIFY_VMEXIT_OPTION_RUN;
+     s->notify_window = 0;
+     s->xen_version = 0;
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 511b42bde5..a5b9122cb8 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -116,6 +116,7 @@ struct KVMState
+     uint64_t kvm_dirty_ring_bytes;  /* Size of the per-vcpu dirty ring */
+     uint32_t kvm_dirty_ring_size;   /* Number of dirty GFNs per ring */
+     bool kvm_dirty_ring_with_bitmap;
++    uint64_t kvm_eager_split_size;  /* Eager Page Splitting chunk size */
+     struct KVMDirtyRingReaper reaper;
+     NotifyVmexitOption notify_vmexit;
+     uint32_t notify_window;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 29b98c3d4c..2e70704ee8 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -186,6 +186,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "                split-wx=on|off (enable TCG split w^x mapping)\n"
+     "                tb-size=n (TCG translation block cache size)\n"
+     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
++    "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ SRST
+@@ -244,6 +245,20 @@ SRST
+         is disabled (dirty-ring-size=0).  When enabled, KVM will instead
+         record dirty pages in a bitmap.
+ 
++    ``eager-split-size=n``
++        KVM implements dirty page logging at the PAGE_SIZE granularity and
++        enabling dirty-logging on a huge-page requires breaking it into
++        PAGE_SIZE pages in the first place. KVM on ARM does this splitting
++        lazily by default. There are performance benefits in doing huge-page
++        split eagerly, especially in situations where TLBI costs associated
++        with break-before-make sequences are considerable and also if guest
++        workloads are read intensive. The size here specifies how many pages
++        to break at a time and needs to be a valid block size which is
++        1GB/2MB/4KB, 32MB/16KB and 512MB/64KB for 4KB/16KB/64KB PAGE_SIZE
++        respectively. Be wary of specifying a higher size as it will have an
++        impact on the memory. By default, this feature is disabled
++        (eager-split-size=0).
++
+     ``notify-vmexit=run|internal-error|disable,notify-window=n``
+         Enables or disables notify VM exit support on x86 host and specify
+         the corresponding notify window to trigger the VM exit if enabled.
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 23aeb09949..28d81ca790 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -30,6 +30,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/boards.h"
+ #include "hw/irq.h"
++#include "qapi/visitor.h"
+ #include "qemu/log.h"
+ 
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+@@ -247,6 +248,12 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
+     return ret > 0 ? ret : 40;
+ }
+ 
++static inline bool kvm_arm_eager_split_size_valid(uint64_t req_size,
++                                                  uint32_t sizes)
++{
++    return req_size & sizes;
++}
++
+ int kvm_arch_get_default_type(MachineState *ms)
+ {
+     bool fixed_ipa;
+@@ -287,6 +294,27 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
++    if (s->kvm_eager_split_size) {
++        uint32_t sizes;
++
++        sizes = kvm_vm_check_extension(s, KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES);
++        if (!sizes) {
++            s->kvm_eager_split_size = 0;
++            warn_report("Eager Page Split support not available");
++        } else if (!kvm_arm_eager_split_size_valid(s->kvm_eager_split_size,
++                                                   sizes)) {
++            error_report("Eager Page Split requested chunk size not valid");
++            ret = -EINVAL;
++        } else {
++            ret = kvm_vm_enable_cap(s, KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE, 0,
++                                    s->kvm_eager_split_size);
++            if (ret < 0) {
++                error_report("Enabling of Eager Page Split failed: %s",
++                             strerror(-ret));
++            }
++        }
++    }
++
+     kvm_arm_init_debug(s);
+ 
+     return ret;
+@@ -1069,6 +1097,46 @@ bool kvm_arch_cpu_check_are_resettable(void)
+     return true;
+ }
+ 
++static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    uint64_t value = s->kvm_eager_split_size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    uint64_t value;
++
++    if (s->fd != -1) {
++        error_setg(errp, "Unable to set early-split-size after KVM has been initialized");
++        return;
++    }
++
++    if (!visit_type_size(v, name, &value, errp)) {
++        return;
++    }
++
++    if (value && !is_power_of_2(value)) {
++        error_setg(errp, "early-split-size must be a power of two");
++        return;
++    }
++
++    s->kvm_eager_split_size = value;
++}
++
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
++    object_class_property_add(oc, "eager-split-size", "size",
++                              kvm_arch_get_eager_split_size,
++                              kvm_arch_set_eager_split_size, NULL, NULL);
++
++    object_class_property_set_description(oc, "eager-split-size",
++        "Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+ }
+-- 
+2.34.1
+
