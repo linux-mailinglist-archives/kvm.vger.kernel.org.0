@@ -2,184 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0196878D978
-	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:33:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C08A378D917
+	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:32:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235277AbjH3SdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Aug 2023 14:33:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54012 "EHLO
+        id S232653AbjH3ScU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Aug 2023 14:32:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343761AbjH3Qo5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Aug 2023 12:44:57 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D3E1A1
-        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 09:44:53 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fc7afa4beso81751557b3.2
-        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 09:44:53 -0700 (PDT)
+        with ESMTP id S1343779AbjH3QzF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Aug 2023 12:55:05 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2FBD19A
+        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 09:55:02 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bc83a96067so36606195ad.0
+        for <kvm@vger.kernel.org>; Wed, 30 Aug 2023 09:55:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693413893; x=1694018693; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+        d=gmail.com; s=20221208; t=1693414502; x=1694019302; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Q7U5WETyc0Qx792+SyKBjLV43d3DHT0ObMpMrFVoeXw=;
-        b=Vrqu6jdVSxGa28aE1migk5YVHh9PHn+K3BQigSsynTqZy+1FdBGBQl1nQH4In9WVRs
-         KF+yQOaHMyhG/7vylvJ5xFxpXhxbdaWq++yLYUP/fN2VQ82tBRyWoQyVgRPj/MMHCpZe
-         jO+0V9PUab495XMFnTawLOr1RRUfzotX6k9V6ER1+dm9TYtelUtxG92oglhZ+G48OHTA
-         bw77cd5ga08rV8S2iervR+8tUMuXpINKvMhop7uskl+N/C/qylZpwCA4vMTQyd1AjsSG
-         0geLp1xw/hWTZsN/r98ZAoO7y0K3ubKpSdpRpvOm2LmVQAtpWFwGs0HAi3r6ak9bzn/q
-         y+rw==
+        bh=K0kNasBWHXDxag6PfFG1PPRe3KwHHljqTxvWTjzCMWw=;
+        b=S4BI71I/Zvm3XvJX1+jBSExkYJmPOARu2UROjfbKTHdGGY26Cqkm/YXrsVSK5jvpr+
+         eVq9zCmSnf4nFbq8vjlwXGjqsvWjurXqxEYzeS/XY/Ulv3PUbZ5ll4TJOH+U8iY4KRnI
+         WCRR6UJAx2cV/4fA/puNGVh4YnDsHlx7loVonv0fkTfp0aKjrqLXBxW+xy91eiUjeqfr
+         KSNotIjtdubXrk1OgA1MZUTrVQz1yASVJMaEB4otk3sSBlizP6lZUW6fJYxpUAQtXSQP
+         kJ25zLFFq5I+rNCY+WwKEuzM6q5nmJfSBZojFRM/C33mTs5CeUUA7Nq63+SY9TvNeRBt
+         Hoxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693413893; x=1694018693;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20221208; t=1693414502; x=1694019302;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q7U5WETyc0Qx792+SyKBjLV43d3DHT0ObMpMrFVoeXw=;
-        b=Xabl5s+XpnZozIlfePbD+R29f4WnE/Cb6JZc19jMV+dVH68lR/koA7pH9m9jGbToQL
-         AZxcybqydaQHr+naHUAolPdupyXa6HpfmUHK+3fSpH/OUBPRLLmIR2RN5tzLE0MuK44l
-         o1wbjw7TlQRrmbTzHjNGvJD+DDfGoRxnGQSupjDR4XS/y+GvEJD2vmZJb4k5OZFUNYXC
-         lGF95AA7CCb9il34M+KJJyXWwEmEiJVAfYR0vSRSneYKR0RYcbNgRkJJbMgl553/Y+85
-         R4sirnZnjGqs+/MVzt1Zajjpi71zg3CJ9le6Vj8pFrtOAs9yrIBM0naa+J4T7n+rkkVy
-         7gHQ==
-X-Gm-Message-State: AOJu0YzrYW7C8FAMwcHhLSQA4AfaKROCN4HwRuOCkRg8tdd2/P/YpeDH
-        hEcs9iJ3gBtm76OI6cb3m47Gannlqi4Aqcy7mw==
-X-Google-Smtp-Source: AGHT+IHtp9pD/5ci3MqPyr+0sXpcwrOb70482adH4y9FFBhT1onMN4Y2Yo7VfYMaFeFIQUgnoauWykiqo7sAzbNhxQ==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a81:eb0b:0:b0:57a:793:7fb0 with SMTP
- id n11-20020a81eb0b000000b0057a07937fb0mr78438ywm.3.1693413893177; Wed, 30
- Aug 2023 09:44:53 -0700 (PDT)
-Date:   Wed, 30 Aug 2023 16:44:51 +0000
-In-Reply-To: <30ffe039-c9e2-b996-500d-5e11bf6ea789@linux.intel.com> (message
- from Binbin Wu on Wed, 30 Aug 2023 23:12:19 +0800)
-Mime-Version: 1.0
-Message-ID: <diqz5y4wfpj0.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        oliver.upton@linux.dev, chenhuacai@kernel.org, mpe@ellerman.id.au,
-        anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, willy@infradead.org,
-        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, chao.p.peng@linux.intel.com, tabba@google.com,
-        jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
-        david@redhat.com, qperret@google.com, michael.roth@amd.com,
-        wei.w.wang@intel.com, liam.merwick@oracle.com,
-        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        bh=K0kNasBWHXDxag6PfFG1PPRe3KwHHljqTxvWTjzCMWw=;
+        b=cMVFhM9I37kprF6H/PJCCyjEdm1K/e4MEgYkvT07ouxChnhVEqShr68j2xhOHPVBqk
+         TVHl73X1HpyvtYWK9RfuaxJihoMnUaWY4A2fyLGBiDBpgC3hm7MwV+aKJx82wORiKJbf
+         g0dFLh9DgXfy5cJHV+aGo+7P1i+Ld26io0zbhZmOmenv1zSoPWmxcc+P3pHoDbvYW8x3
+         +RRokbnN2ZVKX9+wnuxuKRGe799ofBQFtM9yOEsIok00ljhIcvuL7KGVNUXB3fiPoYtp
+         NrjyATdiBCMxDoH7CU0kfIF3KYZJ6DcPAj4+vwpGYyorc8aVIrR+rGX1Dj7knO/N4wgY
+         E8Pg==
+X-Gm-Message-State: AOJu0YzRl7Fef03ocekkpjTmZWxxcdu2Fc2JfWCmrWBV9kWwMGfd/PcR
+        2mgPuJIdT7lPLy8peEJABB8=
+X-Google-Smtp-Source: AGHT+IEY7YnkM6ikGI3bE4Jy6dgMQCVAbQv/5XNLLtG2muVIw6W6RFGP1GjEFkMCrNNM1OIieqmO9Q==
+X-Received: by 2002:a17:902:e80f:b0:1c1:fbec:bc1c with SMTP id u15-20020a170902e80f00b001c1fbecbc1cmr3160197plg.42.1693414502173;
+        Wed, 30 Aug 2023 09:55:02 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id v11-20020a170902d68b00b001bba1475c92sm11237866ply.113.2023.08.30.09.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 09:55:01 -0700 (PDT)
+Date:   Wed, 30 Aug 2023 09:54:54 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v2 13/58] kvm: Introduce kvm_arch_pre_create_vcpu()
+Message-ID: <20230830165454.GB3638268@ls.amr.corp.intel.com>
+References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
+ <20230818095041.1973309-14-xiaoyao.li@intel.com>
+ <5bfefa59-6e1e-dcfd-a2a6-e49a0b71fded@linaro.org>
+ <6ea095cd-db21-c95a-b518-2d97b6098281@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6ea095cd-db21-c95a-b518-2d97b6098281@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Binbin Wu <binbin.wu@linux.intel.com> writes:
+On Wed, Aug 30, 2023 at 09:45:58AM +0800,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
->> <snip>
->>
->> +static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
->> +{
->> +	struct address_space *mapping = inode->i_mapping;
->> +	pgoff_t start, index, end;
->> +	int r;
->> +
->> +	/* Dedicated guest is immutable by default. */
->> +	if (offset + len > i_size_read(inode))
->> +		return -EINVAL;
->> +
->> +	filemap_invalidate_lock_shared(mapping);
->> +
->> +	start = offset >> PAGE_SHIFT;
->> +	end = (offset + len) >> PAGE_SHIFT;
->> +
->> +	r = 0;
->> +	for (index = start; index < end; ) {
->> +		struct folio *folio;
->> +
->> +		if (signal_pending(current)) {
->> +			r = -EINTR;
->> +			break;
->> +		}
->> +
->> +		folio = kvm_gmem_get_folio(inode, index);
->> +		if (!folio) {
->> +			r = -ENOMEM;
->> +			break;
->> +		}
->> +
->> +		index = folio_next_index(folio);
->> +
->> +		folio_unlock(folio);
->> +		folio_put(folio);
-> May be a dumb question, why we get the folio and then put it immediately?
-> Will it make the folio be released back to the page allocator?
->
+> On 8/29/2023 10:40 PM, Philippe Mathieu-Daudé wrote:
+> > On 18/8/23 11:49, Xiaoyao Li wrote:
+> > > Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
+> > > work prior to create any vcpu. This is for i386 TDX because it needs
+> > > call TDX_INIT_VM before creating any vcpu.
+> > > 
+> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > > Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> > > ---
+> > >   accel/kvm/kvm-all.c  | 12 ++++++++++++
+> > >   include/sysemu/kvm.h |  1 +
+> > >   2 files changed, 13 insertions(+)
+> > > 
+> > > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > > index c9f3aab5e587..5071af917ae0 100644
+> > > --- a/accel/kvm/kvm-all.c
+> > > +++ b/accel/kvm/kvm-all.c
+> > > @@ -422,6 +422,11 @@ static int kvm_get_vcpu(KVMState *s, unsigned
+> > > long vcpu_id)
+> > >       return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
+> > >   }
+> > > +int __attribute__ ((weak)) kvm_arch_pre_create_vcpu(CPUState *cpu)
+> > > +{
+> > > +    return 0;
+> > > +}
+> > 
+> > kvm_arch_init_vcpu() is implemented for each arch. Why not use the
+> > same approach here?
+> 
+> Because only x86 needs it currently, for TDX. Other arches don't require an
+> implementation.
+> 
+> If don't provide the _weak_ function, it needs to implement the empty
+> function (justing return 0) in all the other arches just as the placeholder.
+> If QEMU community prefers this approach, I can change to it in next version.
 
-I was wondering this too, but it is correct.
-
-In filemap_grab_folio(), the refcount is incremented in three places:
-
-+ When the folio is created in filemap_alloc_folio(), it is given a
-  refcount of 1 in
-
-    filemap_alloc_folio() -> folio_alloc() -> __folio_alloc_node() ->
-    __folio_alloc() -> __alloc_pages() -> get_page_from_freelist() ->
-    prep_new_page() -> post_alloc_hook() -> set_page_refcounted()
-
-+ Then, in filemap_add_folio(), the refcount is incremented twice:
-
-    + The first is from the filemap (1 refcount per page if this is a
-      hugepage):
-
-        filemap_add_folio() -> __filemap_add_folio() -> folio_ref_add()
-
-    + The second is a refcount from the lru list
-
-        filemap_add_folio() -> folio_add_lru() -> folio_get() ->
-        folio_ref_inc()
-
-In the other path, if the folio exists in the page cache (filemap), the
-refcount is also incremented through
-
-    filemap_grab_folio() -> __filemap_get_folio() -> filemap_get_entry()
-    -> folio_try_get_rcu()
-
-I believe all the branches in kvm_gmem_get_folio() are taking a refcount
-on the folio while the kernel does some work on the folio like clearing
-the folio in clear_highpage() or getting the next index, and then when
-done, the kernel does folio_put().
-
-This pattern is also used in shmem and hugetlb. :)
-
-I'm not sure whose refcount the folio_put() in kvm_gmem_allocate() is
-dropping though:
-
-+ The refcount for the filemap depends on whether this is a hugepage or
-  not, but folio_put() strictly drops a refcount of 1.
-+ The refcount for the lru list is just 1, but doesn't the page still
-  remain in the lru list?
-
->> +
->> +		/* 64-bit only, wrapping the index should be impossible. */
->> +		if (WARN_ON_ONCE(!index))
->> +			break;
->> +
->> +		cond_resched();
->> +	}
->> +
->> +	filemap_invalidate_unlock_shared(mapping);
->> +
->> +	return r;
->> +}
->> +
->>
->> <snip>
+Alternative is to move the hook to x86 specific function, not common kvm
+function. With my quick grepping, x86_cpus_init() or x86_cpu_realizefn().
+-- 
+Isaku Yamahata <isaku.yamahata@linux.intel.com>
