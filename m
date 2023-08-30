@@ -2,48 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E279178D1CF
-	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 03:46:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4D7378D1DA
+	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 03:54:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241617AbjH3BqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Aug 2023 21:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41260 "EHLO
+        id S241645AbjH3Bxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Aug 2023 21:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241616AbjH3BqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Aug 2023 21:46:12 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE8C0CC5
-        for <kvm@vger.kernel.org>; Tue, 29 Aug 2023 18:46:07 -0700 (PDT)
+        with ESMTP id S238208AbjH3Bxh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Aug 2023 21:53:37 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 185A6FC
+        for <kvm@vger.kernel.org>; Tue, 29 Aug 2023 18:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693359967; x=1724895967;
+  t=1693360415; x=1724896415;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=p4Wy6jh1XftvGcwrqSfMaq2NtDuPyWExhKlq09mPg7E=;
-  b=CkPv/9VW9zN9WfHpkT4NE3EZRaCpP5Sf/wBOPXjwrMtZi+zeMLgm0rqT
-   OWgV/8s8q2bl1MaviGnCJpMrkU7sV4pZie6yhXUv80/YSBnqh5dU18J+8
-   IzmddLO/2SeYaysjm5CzWgET87B9nZovFro4ZiQ6lrBk8R8BmB4bQparD
-   uTWXx9nj2hhfMvFre3LXwJyI2Ay7FQhvHpb1n/w6Y6kP8A6yehMmVh/a/
-   GOcEjuqDIoFlynQJ/Y03B37ozc5iarh36eQBlpR8Mpj9xLF3CAEjo12lu
-   hENl5HZqHIrIsg63MjhJgeot0glCJqrNsu83q078rk+WpqmbgENcfr/vF
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="365727194"
+  bh=n7+5Tnf4oVHN1YfjOKumtJWeaf4nATSJ6NM8TmlHHaU=;
+  b=GOErI5kMhTxeyfFAblYmLUeJ9Sp06durowjonmJllfd8pqNONkNP4QYK
+   R1u6wXKwDwXiD1azu7KcLtIzUbiKDAze5mj9dJ3GIEUyFjZv9Czb+BKx1
+   u0ebrJS2ivciq4w8jmMQTtwlyAHvP+issArjGOa4ltAcd/OFXrw65qmaO
+   +XTwS+s/st88UIV0ZTMG1EA7Gf3D2dgkIFNAGBypew/5/wwZ8WVmiuQjF
+   h38j3UKgRUqdgT17P8mJvGfBGkceVgaN5muZJ5Kcu3Zn3rEAgIcJcEN4l
+   lGBaxhIPlfoY3phSK4Rd7IPr2V3fJp/GaiJGWvvMIKeTZZGwrKofjo4Se
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="360526154"
 X-IronPort-AV: E=Sophos;i="6.02,212,1688454000"; 
-   d="scan'208";a="365727194"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 18:46:07 -0700
+   d="scan'208";a="360526154"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 18:53:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="862443162"
+X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="773937101"
 X-IronPort-AV: E=Sophos;i="6.02,212,1688454000"; 
-   d="scan'208";a="862443162"
+   d="scan'208";a="773937101"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.16.81]) ([10.93.16.81])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 18:46:01 -0700
-Message-ID: <6ea095cd-db21-c95a-b518-2d97b6098281@intel.com>
-Date:   Wed, 30 Aug 2023 09:45:58 +0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 18:53:29 -0700
+Message-ID: <c70bee27-7277-3c9d-19fe-fe4a3a1e29b0@intel.com>
+Date:   Wed, 30 Aug 2023 09:53:26 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Firefox/102.0 Thunderbird/102.14.0
-Subject: Re: [PATCH v2 13/58] kvm: Introduce kvm_arch_pre_create_vcpu()
+Subject: Re: [PATCH v2 36/58] memory: Introduce memory_region_init_ram_gmem()
+Content-Language: en-US
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -64,17 +65,15 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-14-xiaoyao.li@intel.com>
- <5bfefa59-6e1e-dcfd-a2a6-e49a0b71fded@linaro.org>
-Content-Language: en-US
+ <20230818095041.1973309-37-xiaoyao.li@intel.com>
+ <68526bca-6054-510e-09fe-f73bf610b005@linaro.org>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <5bfefa59-6e1e-dcfd-a2a6-e49a0b71fded@linaro.org>
+In-Reply-To: <68526bca-6054-510e-09fe-f73bf610b005@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        HK_RANDOM_FROM,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,68 +81,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/29/2023 10:40 PM, Philippe Mathieu-Daudé wrote:
-> On 18/8/23 11:49, Xiaoyao Li wrote:
->> Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
->> work prior to create any vcpu. This is for i386 TDX because it needs
->> call TDX_INIT_VM before creating any vcpu.
+On 8/29/2023 10:33 PM, Philippe Mathieu-Daudé wrote:
+> On 18/8/23 11:50, Xiaoyao Li wrote:
+>> Introduce memory_region_init_ram_gmem() to allocate private gmem on the
+>> MemoryRegion initialization. It's for the usercase of TDVF, which must
+>> be private on TDX case.
 >>
 >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 >> ---
->>   accel/kvm/kvm-all.c  | 12 ++++++++++++
->>   include/sysemu/kvm.h |  1 +
->>   2 files changed, 13 insertions(+)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index c9f3aab5e587..5071af917ae0 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -422,6 +422,11 @@ static int kvm_get_vcpu(KVMState *s, unsigned 
->> long vcpu_id)
->>       return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
->>   }
->> +int __attribute__ ((weak)) kvm_arch_pre_create_vcpu(CPUState *cpu)
->> +{
->> +    return 0;
->> +}
+>>   include/exec/memory.h |  6 +++++
+>>   softmmu/memory.c      | 52 +++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 58 insertions(+)
 > 
-> kvm_arch_init_vcpu() is implemented for each arch. Why not use the
-> same approach here?
+> 
+>> diff --git a/softmmu/memory.c b/softmmu/memory.c
+>> index af6aa3c1e3c9..ded44dcef1aa 100644
+>> --- a/softmmu/memory.c
+>> +++ b/softmmu/memory.c
+>> @@ -25,6 +25,7 @@
+>>   #include "qom/object.h"
+>>   #include "trace.h"
+>> +#include <linux/kvm.h>
+> 
+> Unlikely to build on non-Linux hosts.
 
-Because only x86 needs it currently, for TDX. Other arches don't require 
-an implementation.
+Thanks for catching it!
 
-If don't provide the _weak_ function, it needs to implement the empty 
-function (justing return 0) in all the other arches just as the 
-placeholder. If QEMU community prefers this approach, I can change to it 
-in next version.
+Will warp it with CONFIG_KVM.
 
->>   int kvm_init_vcpu(CPUState *cpu, Error **errp)
->>   {
->>       KVMState *s = kvm_state;
->> @@ -430,6 +435,13 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->>       trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
->> +    ret = kvm_arch_pre_create_vcpu(cpu);
->> +    if (ret < 0) {
->> +        error_setg_errno(errp, -ret, "%s: kvm_arch_pre_create_vcpu() 
->> failed",
->> +                        __func__);
->> +        goto err;
->> +    }
->> +
->>       ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
->>       if (ret < 0) {
->>           error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu 
->> failed (%lu)",
->> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->> index 49c896d8a512..d89ec87072d7 100644
->> --- a/include/sysemu/kvm.h
->> +++ b/include/sysemu/kvm.h
->> @@ -371,6 +371,7 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
->>   int kvm_arch_init(MachineState *ms, KVMState *s);
->> +int kvm_arch_pre_create_vcpu(CPUState *cpu);
->>   int kvm_arch_init_vcpu(CPUState *cpu);
->>   int kvm_arch_destroy_vcpu(CPUState *cpu);
+Anyway, it's the main open of how to integrating KVM gmem into QEMU's 
+memory system, in QMEU gmem series[*]. I'm still working on it.
+
+[*] 
+https://lore.kernel.org/qemu-devel/20230731162201.271114-1-xiaoyao.li@intel.com/
+
+>>   #include "exec/memory-internal.h"
+>>   #include "exec/ram_addr.h"
+>>   #include "sysemu/kvm.h"
 > 
 
