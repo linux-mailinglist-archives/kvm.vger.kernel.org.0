@@ -2,90 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57BCF78D98B
-	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE92378D90E
+	for <lists+kvm@lfdr.de>; Wed, 30 Aug 2023 20:32:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235097AbjH3SdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Aug 2023 14:33:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
+        id S235398AbjH3ScL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Aug 2023 14:32:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244482AbjH3NNq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Aug 2023 09:13:46 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE39137;
-        Wed, 30 Aug 2023 06:13:43 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37UDC9PF008572;
-        Wed, 30 Aug 2023 13:13:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jfxLaVOy+fNB1HcttHQEu2bQRFMwZpE3egIGBh/IeY0=;
- b=EcKMtzznrAuFGdX7RHHKISli3ApnTLx6H75EA3lZnKahhIUbhDd2BEJg6p1rdx6YgejU
- IHSNuZxYN3TKVMEehlB8a1nYrjNa9Yu2ZY3noMDHx1Xp9es0JbeMtndW1oNL91RaOys3
- wDbDV5krVEIMRdBIzfhmEKi4GUTeAMgOrjkY4wmP+50GP8Td9OywfEH3qhqiUR7+RXrl
- +0CvoZ/nsLD104Of6H6gJESsUel9Cr5vXoDShmchNhrYJrqGBksP9Jiht6CC6MMtE89Q
- acYFcgSpNH+iIJDeryptalO1rLMLOwC0vPf0s5YqHijHl5LVgwwDKTBcxpUNqNK00Y1a RA== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3st6em81dq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Aug 2023 13:13:43 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37UCGpsA019174;
-        Wed, 30 Aug 2023 13:13:42 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sqxe1ugbf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 30 Aug 2023 13:13:42 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37UDDft231982246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Aug 2023 13:13:41 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5DB258056;
-        Wed, 30 Aug 2023 13:13:40 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34D7258052;
-        Wed, 30 Aug 2023 13:13:40 +0000 (GMT)
-Received: from [9.61.14.194] (unknown [9.61.14.194])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 30 Aug 2023 13:13:40 +0000 (GMT)
-Message-ID: <c3825795-ce38-4992-39d3-85341279e913@linux.ibm.com>
-Date:   Wed, 30 Aug 2023 09:13:39 -0400
+        with ESMTP id S244654AbjH3NkY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Aug 2023 09:40:24 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DBB71B0;
+        Wed, 30 Aug 2023 06:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693402822; x=1724938822;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=mGUvoLw8hw2TWDxXd0tp7T6XOlpg2G3FqdXCCbW83WE=;
+  b=NrfY4Yfr64aLjQBwOz6ogKJNT8o98W575pNcGnG5YlLpCyQnUBinQuvC
+   h+BLb2RWOks+JAPcnMnHE27L2+Uz5qWHcx4p+4S/ns7zUcwqtzCFw0xTM
+   b/UlV427NgPkOPDglY7f7VzKR8Qqc02JaRs5uwei8YgAcr+VsHWkpwLHi
+   dSnWiR62mxbygKAqVSguotT1xJr3jnWN2NI/BwOYPkKEZWLLx504/mjSC
+   mSHfab59hFe0SpL1tDaO/u1aGygkvtasI7B3QT2Pu1xgfHZRNaQ5vUTDA
+   jZfb6wkMvwfX1uK5ia6MTbb8s9QbK8rXU/F+RgGCMNfdW3lf5diW75mAn
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="374556041"
+X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
+   d="scan'208";a="374556041"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 06:40:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="732634790"
+X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
+   d="scan'208";a="732634790"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga007.jf.intel.com with ESMTP; 30 Aug 2023 06:40:21 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 30 Aug 2023 06:40:20 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 30 Aug 2023 06:40:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=koC0TQ56D7KHMAu/xMmKyIDhAjvBzD+1IjLTFAtItIjhsNKgr59Se9+ln1ipvqTNkgQBbjmLW+n+ES00G84mqYAoWArurCmmblTSeUeZf/EdU59InqxJl23wCK+ui0eSUbCcvhyWD2UvgY9jj2wA2q6vUvmGiMHxhr5ujfDMAG9b43lPKJ+gk9HQHNJIQjRVsSUEscyGry219UEy3Exw4NBOXuOtwKFTOajtv9pU5OgbURabVzQlZX/PswITKmd0QK4asnrJVLPfFiB34qWF2YqsId8rjH24C4lFDt+OgtFgZgSmVBH/ttxuI3Ov/ERLx10uDjk2DsT/UYBEofnY3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2vrutIHB8GJljhEyHIHyE0nB4zB+ASrA7HHF1K2205w=;
+ b=ANW44ds/FGzoVDZXUtvFFUF4gDNV3LwQaapBrEEgByzKjXYZ4jVhQsuLTXbDU6fDrjNWHmMpmKZf7qIArXRVLdQ58aKrfqSeblQYq8EJb//BA483Lwj7wf4WuzoxfJqISvxtcSxvJO7Kt9CqeysY9aFfiFBGP1AdHKVOBvYcSq7toUiT+ag9kW7zshnNZhUeuYiDIWAXCDRqnNrYxD+94MtzjhrRng5vjs9dHYwd3OkmBE6oNIya9nyyZXUfB1H3AkSR6pnM8S1QW5NfMwVkfGk/hECjgmsqlpr5ZAqL2L9KbOCwnf36tL22yzjvhlW/m4PrkOtue6KnjbkYJphx1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6239.namprd11.prod.outlook.com (2603:10b6:8:a7::20) by
+ MN2PR11MB4679.namprd11.prod.outlook.com (2603:10b6:208:26b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.18; Wed, 30 Aug
+ 2023 13:40:18 +0000
+Received: from DM4PR11MB6239.namprd11.prod.outlook.com
+ ([fe80::8a29:8895:64:8fd7]) by DM4PR11MB6239.namprd11.prod.outlook.com
+ ([fe80::8a29:8895:64:8fd7%5]) with mapi id 15.20.6745.015; Wed, 30 Aug 2023
+ 13:40:18 +0000
+Date:   Wed, 30 Aug 2023 15:40:10 +0200
+From:   Maciej =?utf-8?Q?Wiecz=C3=B3r-Retman?= 
+        <maciej.wieczor-retman@intel.com>
+To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 6/6] selftests/kvm: Replace attribute with macro
+Message-ID: <fw6nuuhzmkp36bumrn6xuy7etxslr2iybazigaoo57iy22x2k7@nord6jkch73n>
+References: <cover.1693216959.git.maciej.wieczor-retman@intel.com>
+ <82ed62dd7070203701b4ca326e62862404dd5f72.1693216959.git.maciej.wieczor-retman@intel.com>
+ <fc618e8c-f8b-c339-9aa6-1d2c2865b42e@linux.intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fc618e8c-f8b-c339-9aa6-1d2c2865b42e@linux.intel.com>
+X-ClientProxiedBy: BE1P281CA0182.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:8d::15) To DM4PR11MB6239.namprd11.prod.outlook.com
+ (2603:10b6:8:a7::20)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3] KVM: s390: fix gisa destroy operation might lead to
- cpu stalls
-Content-Language: en-US
-To:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-References: <20230828151519.2187418-1-mimu@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230828151519.2187418-1-mimu@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hlpRfQovwIc_XRQmP8ikIIMVykQLhfYe
-X-Proofpoint-ORIG-GUID: hlpRfQovwIc_XRQmP8ikIIMVykQLhfYe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-29_16,2023-08-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 malwarescore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308300121
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6239:EE_|MN2PR11MB4679:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92640114-b954-4694-f486-08dba95ea5b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aj5oto1aWzZ8J90ILzyx8L64VfRCFvGDVbAaYgMvnj7BxRiIyiC+jUC0vVjY5eX1XB9+DsEtoHM/YDMXU9zo2HiQ83+HJQ4KJKOR6xx9eNu1ggu47oY8NRYiRVSHLnEclUVxbYkyqucFsBEUzVCzK6iYTfcYg4XPwFnWc9pBUMDgThQRpixgDjDGkDUkUsjpUJBXsUmCgSA4fXVMTB9h2hjgzctEFUEAE2cXzMLBQCCY1ulOvlL1wp+LOi/8SGd422+0+PABCMz2HtTVVdNzfZBmuec8XHYJCLL4tt+FTTSWMOEQits8avsr+mCe7/6T8XiLFn4vJ/JP4INQ4dDybV+zoG2reMaEwbyVdw1BNASYCtTjP9mzM0x4134iliGUDZBVrpkbulLxZ5a4EpMzDPiPI97A+9Ya2Car/aOyVQ/TarFNvuZHO5KxsHEpDMsxDtH7ZIkTfsN4WdXjGI/tCB714weK5GI9HeCGb42zpyyfHG7jzK1U88LnG9m3JoOUv/YqFtao2FCCheocZK2QnWyCgvO078HsHK4nsXuDvrv6G9R2eRPhkJ8OL0S99COU
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6239.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(136003)(376002)(366004)(39860400002)(1800799009)(186009)(451199024)(8936002)(6666004)(53546011)(478600001)(6506007)(66556008)(66946007)(66476007)(54906003)(6486002)(6916009)(316002)(38100700002)(41300700001)(82960400001)(9686003)(6512007)(8676002)(5660300002)(83380400001)(2906002)(33716001)(4744005)(86362001)(26005)(66574015)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?fOXWyvaiWWb6QtLJtRJZw+gEZ/NDkz8ZSlQJoBFIQuAk3LsjsJaCb07VYB?=
+ =?iso-8859-1?Q?Z5QdW4aq3cj9LrERDnH8o/LL/KgxC06gNyJlV5pWWcISClV3UZh8Y4zCvg?=
+ =?iso-8859-1?Q?ioWlldd/6EepFWlxMgzU9LJfEUqzknajS/cDITNI/tULqI2CwZkT5SFMY3?=
+ =?iso-8859-1?Q?UoPbi0uoC2469gUpKINhzF/Kmyh5Y6ktBQH/Ep+SV2veZZAzaun6VsDWBS?=
+ =?iso-8859-1?Q?3MQFQF85Oeu1+w1Qx8tphOuPMTIEesyOHyjhiIhYPUZfz19CwjjK6JMQDI?=
+ =?iso-8859-1?Q?E02ZOx8A6cjFUhHPrg8JR3DTSEvuGUVDzIwOU5c2HkpkJ5YCZQ63Mxd2w5?=
+ =?iso-8859-1?Q?DjmEmfaHmBh9FRPUqNCvsH7tj0/e35gaXySwdve5P8ENrJX6kWyUluzD/Q?=
+ =?iso-8859-1?Q?sqYW+ztOYzPBILogZZNtF/jvoBYN7C+x8GlsmJ/qk8nFgW7Ph7BNdq+9+f?=
+ =?iso-8859-1?Q?aYGWdttckUu0+3XEVV60IMPFPF97kvgBz+8BCZ/TixnNMYK05lj0noXpVZ?=
+ =?iso-8859-1?Q?vh36iQge/B17feosb8Omfm7lSNmq//n46bp5yYsEikxHov6CEtJAldSpIk?=
+ =?iso-8859-1?Q?1cYP3wg7dBBJqj3nETkjoyUHKfEyPU1ilcrcT7gQBpt58dHccstA7drGAd?=
+ =?iso-8859-1?Q?fGLTnTSntcYcBmGh5/C4rp4o7vnxnohi4+uG9UMkEGHGiYxd/J+anby3t9?=
+ =?iso-8859-1?Q?i5HJyK4VHnOcL7ZCyeS+xdqbIGffEqvW7McA9gvbCl9SjgEjDhtyfz5kF9?=
+ =?iso-8859-1?Q?ZfgGt0Mma9eLk74sJjFUgCvG6zsQh86VdQVqe+XiyvipcqenZ0s0gi14j+?=
+ =?iso-8859-1?Q?Lu22X+iP41G/XahOYgkq1XUEXwHg413AR1QQPKgS6L9dg9QUa9xtapfRPb?=
+ =?iso-8859-1?Q?/tLlx9vtOOQR1twpf+aZxJSLnhs3F3j2aIrjKJjMxQMpjU1lsSlZ584P0v?=
+ =?iso-8859-1?Q?XCtUt05zGKHr28KTu3S5RgzLMVmzs9CtQ4e6KAsgXw16jDt+5SRFkBE1fX?=
+ =?iso-8859-1?Q?Hq9Zfm4OB5S7HOrJLNA0NUBQDeLMGJ/Ks+esTV1D5KCRB9sfxKNuzvwDno?=
+ =?iso-8859-1?Q?aeAQQgN1Evw9V/5eYf2AMCT9xzkBU0eAop9dUugt5gvNKSMEGWws0hE1qf?=
+ =?iso-8859-1?Q?kpLmgOh8zcT1ZnXol+B5KEfSMA3QU8k/dDMQ+y73tII22igSFReShxIi2k?=
+ =?iso-8859-1?Q?+WiP+iLrD1IbxgtP1KhoYyhfhwspBHnP347NOebwEIQ++3v8VyeHGdMdDb?=
+ =?iso-8859-1?Q?NF7pmIQ1mNkqlVrMuyH9o6ivhr8/IN7DOmvbcBJvSeXXf/b+OdolmNk5hL?=
+ =?iso-8859-1?Q?jbvhuuX3pELhGBXGnNuHsCKMplr+jy04M25b9aPy2V6uZWV/Yo5Rdnm445?=
+ =?iso-8859-1?Q?c3RvvZbPOvKbD8xDeDDWLG6w7PjzEiglrwKlCOwtHNC2S6/kvTNow0Qj4l?=
+ =?iso-8859-1?Q?W4DN8C7ftDblzrwZCLc1XFwM9TmV6YWgVV6l87VyABRphE2giOPajsoKjj?=
+ =?iso-8859-1?Q?9wCtfcI53oGm3VcB/GtPjtr5ba+CRuxpG1bBteyOCdJhfMIaihmXiUckdz?=
+ =?iso-8859-1?Q?OSmiheww5ePW4xUW+3uBzBGnyUrl0MbxxxKAGs3Uj/VRMpfFq+7nyqUw2g?=
+ =?iso-8859-1?Q?uQFJUcfwysb85cq5k4VVXv+GY35tM4unmOxyGB+pP6XA3QfEIAc81+L8OR?=
+ =?iso-8859-1?Q?PTG0tkvw19QbkXmlVLU=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92640114-b954-4694-f486-08dba95ea5b9
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6239.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 13:40:18.0164
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qBGWtS8rZZg2O573dtxzRsXF8bA1YURe6EnDAGF8UFd3OzuMV8DomeUB/G/XBu81fteqPMVnAGOUoQDDRCJ1pGRj3meb0ITfIYNsZFWZmL8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4679
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,100 +155,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/28/23 11:15 AM, Michael Mueller wrote:
-> A GISA cannot be destroyed as long it is linked in the GIB alert list
-> as this would break the alert list. Just waiting for its removal from
-> the list triggered by another vm is not sufficient as it might be the
-> only vm. The below shown cpu stall situation might occur when GIB alerts
-> are delayed and is fixed by calling process_gib_alert_list() instead of
-> waiting.
-> 
-> At this time the vcpus of the vm are already destroyed and thus
-> no vcpu can be kicked to enter the SIE again if for some reason an
-> interrupt is pending for that vm.
-> 
-> Additionally the IAM restore value is set to 0x00. That would be a bug
-> introduced by incomplete device de-registration, i.e. missing
-> kvm_s390_gisc_unregister() call.
-> 
-> Setting this value and the IAM in the GISA to 0x00 guarantees that late
-> interrupts don't bring the GISA back into the alert list.
-> 
-> CPU stall caused by kvm_s390_gisa_destroy():
-> 
->  [ 4915.311372] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 14-.... } 24533 jiffies s: 5269 root: 0x1/.
->  [ 4915.311390] rcu: blocking rcu_node structures (internal RCU debug): l=1:0-15:0x4000/.
->  [ 4915.311394] Task dump for CPU 14:
->  [ 4915.311395] task:qemu-system-s39 state:R  running task     stack:0     pid:217198 ppid:1      flags:0x00000045
->  [ 4915.311399] Call Trace:
->  [ 4915.311401]  [<0000038003a33a10>] 0x38003a33a10
->  [ 4933.861321] rcu: INFO: rcu_sched self-detected stall on CPU
->  [ 4933.861332] rcu: 	14-....: (42008 ticks this GP) idle=53f4/1/0x4000000000000000 softirq=61530/61530 fqs=14031
->  [ 4933.861353] rcu: 	(t=42008 jiffies g=238109 q=100360 ncpus=18)
->  [ 4933.861357] CPU: 14 PID: 217198 Comm: qemu-system-s39 Not tainted 6.5.0-20230816.rc6.git26.a9d17c5d8813.300.fc38.s390x #1
->  [ 4933.861360] Hardware name: IBM 8561 T01 703 (LPAR)
->  [ 4933.861361] Krnl PSW : 0704e00180000000 000003ff804bfc66 (kvm_s390_gisa_destroy+0x3e/0xe0 [kvm])
->  [ 4933.861414]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
->  [ 4933.861416] Krnl GPRS: 0000000000000000 00000372000000fc 00000002134f8000 000000000d5f5900
->  [ 4933.861419]            00000002f5ea1d18 00000002f5ea1d18 0000000000000000 0000000000000000
->  [ 4933.861420]            00000002134fa890 00000002134f8958 000000000d5f5900 00000002134f8000
->  [ 4933.861422]            000003ffa06acf98 000003ffa06858b0 0000038003a33c20 0000038003a33bc8
->  [ 4933.861430] Krnl Code: 000003ff804bfc58: ec66002b007e	cij	%r6,0,6,000003ff804bfcae
->                            000003ff804bfc5e: b904003a		lgr	%r3,%r10
->                           #000003ff804bfc62: a7f40005		brc	15,000003ff804bfc6c
->                           >000003ff804bfc66: e330b7300204	lg	%r3,10032(%r11)
->                            000003ff804bfc6c: 58003000		l	%r0,0(%r3)
->                            000003ff804bfc70: ec03fffb6076	crj	%r0,%r3,6,000003ff804bfc66
->                            000003ff804bfc76: e320b7600271	lay	%r2,10080(%r11)
->                            000003ff804bfc7c: c0e5fffea339	brasl	%r14,000003ff804942ee
->  [ 4933.861444] Call Trace:
->  [ 4933.861445]  [<000003ff804bfc66>] kvm_s390_gisa_destroy+0x3e/0xe0 [kvm]
->  [ 4933.861460] ([<00000002623523de>] free_unref_page+0xee/0x148)
->  [ 4933.861507]  [<000003ff804aea98>] kvm_arch_destroy_vm+0x50/0x120 [kvm]
->  [ 4933.861521]  [<000003ff8049d374>] kvm_destroy_vm+0x174/0x288 [kvm]
->  [ 4933.861532]  [<000003ff8049d4fe>] kvm_vm_release+0x36/0x48 [kvm]
->  [ 4933.861542]  [<00000002623cd04a>] __fput+0xea/0x2a8
->  [ 4933.861547]  [<00000002620d5bf8>] task_work_run+0x88/0xf0
->  [ 4933.861551]  [<00000002620b0aa6>] do_exit+0x2c6/0x528
->  [ 4933.861556]  [<00000002620b0f00>] do_group_exit+0x40/0xb8
->  [ 4933.861557]  [<00000002620b0fa6>] __s390x_sys_exit_group+0x2e/0x30
->  [ 4933.861559]  [<0000000262d481f4>] __do_syscall+0x1d4/0x200
->  [ 4933.861563]  [<0000000262d59028>] system_call+0x70/0x98
->  [ 4933.861565] Last Breaking-Event-Address:
->  [ 4933.861566]  [<0000038003a33b60>] 0x38003a33b60
-> 
-> Fixes: 9f30f6216378 ("KVM: s390: add gib_alert_irq_handler()")
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> ---
->  arch/s390/kvm/interrupt.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 85e39f472bb4..75e200bd1030 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -3216,11 +3216,12 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
->  
->  	if (!gi->origin)
->  		return;
-> -	if (gi->alert.mask)
-> -		KVM_EVENT(3, "vm 0x%pK has unexpected iam 0x%02x",
-> -			  kvm, gi->alert.mask);
-> -	while (gisa_in_alert_list(gi->origin))
-> -		cpu_relax();
-> +	WARN(gi->alert.mask != 0x00,
-> +	     "unexpected non zero alert.mask 0x%02x",
-> +	     gi->alert.mask);
-> +	gi->alert.mask = 0x00;
-> +	if (gisa_set_iam(gi->origin, gi->alert.mask))
-> +		process_gib_alert_list();
->  	hrtimer_cancel(&gi->timer);
+On 2023-08-30 at 15:22:57 +0300, Ilpo Järvinen wrote:
+>On Mon, 28 Aug 2023, Wieczor-Retman, Maciej wrote:
+>
+>> The __printf() macro is used in many tools in the linux kernel to
+>> validate the format specifiers in functions that use printf. Some
+>> selftests use it without putting it in a macro definition and some tests
+>> import the kselftests.h header.
+>
+>"Some" and yet this only converts one? Please be more precise in the 
+>wording.
 
-Thanks for the prior explanations.  This looks pretty good to me now, I think the subtlety that I was missing is that we are kicking off the callback (gisa_vcpu_kicker) via hrtimer_start with an immediate expiry (0) and relying on the fact that this hrtimer_cancel here will wait until that callback has finished.  AFAIU that means that now we will either set the IAM immediately here via gisa_set_iam or via the callback after handling the alert; in both cases this will prevent further alerts and we won't clear gi->origin until after that point.
+Okay, I'll mention them by subsystem.
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> Use __printf() attribute instead of the full attribute since the macro
+>> is inside kselftests.h and the header is already imported.
+>
+>IMO, this would be enough:
+>
+>Use __printf() from kselftests.h instead of the full attribute.
 
+Fair enough, I'll change the paragraph to that.
 
->  	gi->origin = NULL;
->  	VM_EVENT(kvm, 3, "gisa 0x%pK destroyed", gisa);
+>Was there a reason why you didn't convert mm/pkey-helpers.h one?
 
+Sorry, must have just missed it somehow. Thank you for pointing it out.
+
+-- 
+Kind regards
+Maciej Wieczór-Retman
