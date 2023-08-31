@@ -2,143 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0CE878F3E7
-	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 22:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E3C078F46A
+	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 23:18:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347346AbjHaUYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 16:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42196 "EHLO
+        id S1347509AbjHaVSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 17:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234431AbjHaUYu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 16:24:50 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA797E70
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 13:24:45 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-570096f51acso1162173a12.0
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 13:24:45 -0700 (PDT)
+        with ESMTP id S1346710AbjHaVSX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 17:18:23 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE786107
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 14:18:20 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58d428d4956so15444437b3.0
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 14:18:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693513485; x=1694118285; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1693516700; x=1694121500; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hLtP0B7QCbV/ETdNMxsWIMxjZHiPOti8qoiN6z1b1eo=;
-        b=VHMxxokSRzqyBhlSZ7UhoftOI9uuXb7aOG1Bn3meu5bIiiKNslQDLUxyDsYjJamK3x
-         MYsudD2am3x8WHq85yB6FM9M+YLNFdaEPR95L77HUnhz1o4hGtUvAaErREBJotdsMPSB
-         RqywTzah69CU40v0wyuNsvoO3pMW9b+vQ05jcMaStUBDIo14Geqi9zSG3aWxgJbbmeE4
-         yq5mB00X027GgrtWdG2QLkgrivKzJ41PiC3y136EsSLCiAWXBIkhIGAIXD4B9ycVHq+H
-         vlHiv8oTNFt7yTM4/rT+4p07ptGn24wNXvyMUjum3jGW1YrijeMdsvUszXUgGxovjAes
-         EVsA==
+        bh=YO6r55IA8eElX5w/+X8zOZmT73jh5i8DqE52ZxJWYQc=;
+        b=hguwOPHMZfKtisF5e+gBBaqL6WbtLkRcf2jMAyVAdY8HAcwb2w2zJkAdSOOvRbGjbA
+         kMN271Y/Bg4nTxMzuRKRdwO59El6BiwSpOaVXhtVFIxsnRq2o1EgiIdlOaJLHcZ5/+k4
+         zT03hvFqNg6A7blr+MN/SPn9RJlLr8QOOqafiHMsKOX0syTih8CdWTr3oPvqKIei53ld
+         Q6ih0C81J1DF+qKiSGaGw+1VVQ6FTYGqDTSS71pLg0Pq5ZiecLtMJxfhnXr2oGa4E8xg
+         +rmK7ofH6iqpL1cxdWvRzjKKFpe+8ki74vJ5zd1hHmtD4w9iLyUWpXVY7Or3rttxT4oA
+         gIMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693513485; x=1694118285;
+        d=1e100.net; s=20221208; t=1693516700; x=1694121500;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=hLtP0B7QCbV/ETdNMxsWIMxjZHiPOti8qoiN6z1b1eo=;
-        b=Zyo3iAb5EGgO/326fOkiCvWOCbe8w/kC6Q5raUoxkIEhtF0cTx5d05e4NEF7RM1vg8
-         pTpaD9TKt15Z8JXDEWLrYL23+zVsWk/8qLdTIR5zh1sR9tK2st6YRz+1C+dW7gXf8Utx
-         YpecC6FWL2o+uk5HlTq/YwdluX10e4UFCV4m5yIUUbMhHy/1ePioE+XzI0XyQ35DQ5Lk
-         5ECXqmbMIq5EwmMFDVTerrEsD7aWoPQwOmrTO/qhViwKgfZEFRh4cdtJMZX/XA7MNRXQ
-         afhjZ5N67dTJRixMhRKLNC/3oqVF/j+KJ7I3ScMkbnabMi8lmyxO+hnDa9NtirGIrZBq
-         R7lg==
-X-Gm-Message-State: AOJu0YxLQYgf5aLy93WGFABXatrVmOuDt0iK/XmMrzX5VIZRuAqz+myY
-        8W/4KZ+zKaAWbkdey2y+H9dz1bI28Ho=
-X-Google-Smtp-Source: AGHT+IEIR7uyyBtFUvM+BS8m3vckRckLqxPkMKgsib26tB7v3QMYK/vMPUnX7d2k+P2sC+84IAeEcYo9RDM=
+        bh=YO6r55IA8eElX5w/+X8zOZmT73jh5i8DqE52ZxJWYQc=;
+        b=as/0T2HU2UooVJMD7NuxEROC+LMX0iCu2PEJ+Q+Z81rFC93dcLrNlDRQaAdJoaRS0g
+         xWKiU/lmWUAfiMaxhZUx9+4XOD8OvHNIXgyTME2tkF5R03QVErCBwQAwhdFzkFiZfoY3
+         hLJWCfiXYKNH9jpVNiiYaCEPnZg2f4S0Hh6W8YxzBVyMe7rwapijXKentT4gi5YqVpyx
+         Xg4EP0ftXxbDyKckfHd1tsym2DkKnN4gjossemajB2IGgeYSIJaQm6BGIzPTDMTcoR99
+         pPtxpOGlacWcaH5aCLbgrjrRJ+WKa/Orl8WjQ3b7zcHmPiZ6mcW5YJceQPPMoHs8Yk8G
+         uslQ==
+X-Gm-Message-State: AOJu0YwCoSSULnXpqy/HqgKw9qamwzAQYX4GdKoGChdY8GN6l6eTJNPC
+        DZewiCEONJR5YsPYFcRmWOoINueVugc=
+X-Google-Smtp-Source: AGHT+IEZwzQUuTI7C6FFX7BSq8V52BjhaRfu7MbpFPM/CoSsWVx5jFl7L8T8aMfs6TbWHc+jUHpp1k/u52U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6046:0:b0:565:e585:cb56 with SMTP id
- a6-20020a656046000000b00565e585cb56mr161663pgp.2.1693513485291; Thu, 31 Aug
- 2023 13:24:45 -0700 (PDT)
-Date:   Thu, 31 Aug 2023 13:24:43 -0700
-In-Reply-To: <873ccab4-1470-3ff0-2e59-01d1110809be@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:721:b0:586:5d03:67c8 with SMTP id
+ bt1-20020a05690c072100b005865d0367c8mr16211ywb.3.1693516700041; Thu, 31 Aug
+ 2023 14:18:20 -0700 (PDT)
+Date:   Thu, 31 Aug 2023 14:18:18 -0700
+In-Reply-To: <CAD=HUj6XYKGgRLb2VWBnYEEH9YQUMROBf2YBXaTOvWZS5ejhmg@mail.gmail.com>
 Mime-Version: 1.0
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
- <ZN1M5RvuARP1YMfp@google.com> <6e990b88-1e28-9563-2c2f-0d5d52f9c7ca@linux.intel.com>
- <e4aa03cb-0f80-bd5f-f69e-39b636476f00@linux.intel.com> <ZN93wp9lgmuJqYIA@google.com>
- <873ccab4-1470-3ff0-2e59-01d1110809be@intel.com>
-Message-ID: <ZPD3C/AFnvs9S6vs@google.com>
-Subject: Re: [PATCH v10 0/9] Linear Address Masking (LAM) KVM Enabling
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
+ <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com> <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
+ <ZOd0IMeKSkBwGIer@google.com> <CAD=HUj6XYKGgRLb2VWBnYEEH9YQUMROBf2YBXaTOvWZS5ejhmg@mail.gmail.com>
+Message-ID: <ZPEDmnloiOs/HNr+@google.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
 From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Binbin Wu <binbin.wu@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 25, 2023, Zeng Guang wrote:
+On Fri, Aug 25, 2023, David Stevens wrote:
+> On Fri, Aug 25, 2023 at 12:15=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Thu, Aug 24, 2023, David Stevens wrote:
+> > > On Wed, Jul 5, 2023 at 7:25=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.int=
+el.com> wrote:
+> > > >
+> > > > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > > > @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kv=
+m_vcpu *vcpu,
+> > > > >
+> > > > >  out_unlock:
+> > > > >       read_unlock(&vcpu->kvm->mmu_lock);
+> > > > > -     kvm_release_pfn_clean(fault->pfn);
+> > > >
+> > > > Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped=
+ gfns.
+> > > > What if guest uses a non-referenced page(e.g., as a vmcs12)? Althou=
+gh I
+> > > > believe this is not gonna happen in real world...
+> > >
+> > > kvm_vcpu_map still uses gfn_to_pfn, which eventually passes FOLL_GET
+> > > to __kvm_follow_pfn. So if a guest tries to use a non-refcounted page
+> > > like that, then kvm_vcpu_map will fail and the guest will probably
+> > > crash. It won't trigger any bugs in the host, though.
+> > >
+> > > It is unfortunate that the guest will be able to use certain types of
+> > > memory for some purposes but not for others. However, while it is
+> > > theoretically fixable, it's an unreasonable amount of work for
+> > > something that, as you say, nobody really cares about in practice [1]=
+.
+> > >
+> > > [1] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
+> >
+> > There are use cases that care, which is why I suggested allow_unsafe_km=
+ap.
+> > Specifically, AWS manages their pool of guest memory in userspace and m=
+aps it all
+> > via /dev/mem.  Without that module param to let userspace opt-in, this =
+series will
+> > break such setups.  It still arguably is a breaking change since it req=
+uires
+> > userspace to opt-in, but allowing such behavior by default is simply no=
+t a viable
+> > option, and I don't have much sympathy since so much of this mess has i=
+ts origins
+> > in commit e45adf665a53 ("KVM: Introduce a new guest mapping API").
+> >
+> > The use cases that no one cares about (AFAIK) is allowing _untrusted_ u=
+serspace
+> > to back guest RAM with arbitrary memory.  In other words, I want KVM to=
+ allow
+> > (by default) mapping device memory into the guest for things like vGPUs=
+, without
+> > having to do the massive and invasive overhaul needed to safely allow b=
+acking guest
+> > RAM with completely arbitrary memory.
 >=20
-> On 8/18/2023 9:53 PM, Sean Christopherson wrote:
-> > On Fri, Aug 18, 2023, Binbin Wu wrote:
-> > > On 8/17/2023 5:17 PM, Binbin Wu wrote:
-> > > > On 8/17/2023 6:25 AM, Sean Christopherson wrote:
-> > > > > On Wed, Jul 19, 2023, Binbin Wu wrote:
-> > > > > For the next version, can you (or Zeng) send a single series for =
-LAM
-> > > > > and LASS?  They're both pretty much ready to go, i.e. I don't exp=
-ect
-> > > > > one to hold up the other at this point, and posting a single seri=
-es
-> > > > > will reduce the probability of me screwing up a conflict resoluti=
-on
-> > > > > or missing a dependency when applying.
-> > > > >=20
-> > > Hi Sean,
-> > > Do you still prefer a single series for LAM and LASS=C2=A0 for the ne=
-xt version
-> > > when we don't need to rush for v6.6?
-> > Yes, if it's not too much trouble on your end.  Since the two have over=
-lapping
-> > prep work and concepts, and both series are in good shape, my strong pr=
-eference
-> > is to grab them at the same time.  I would much rather apply what you'v=
-e tested
-> > and reduce the probability of messing up any conflicts.
-> >=20
-> >=20
-> >=20
-> Hi Sean,
-> One more concern, KVM LASS patch has an extra dependency on kernel LASS
-> series in which enumerates lass feature bit (X86_FEATURE_LASS/X86_CR4_LAS=
-S).
-> So far kernel lass patch is still under review, as alternative we may ext=
-ract
-> relevant patch part along with kvm lass patch set for a single series in =
-case
-> kernel lass cannot be merged before v6.7.  Do you think it OK in that way=
-?
+> Do you specifically want the allow_unsafe_kmap breaking change? v7 of
+> this series should have supported everything that is currently
+> supported by KVM, but you're right that the v8 version of
+> hva_to_pfn_remapped doesn't support mapping
+> !kvm_pfn_to_refcounted_page() pages. That could be supported
+> explicitly with allow_unsafe_kmap as you suggested,
 
-Hmm, since getting LASS support in KVM isn't urgent, I think it makes sense=
- to
-wait for kernel support, no reason to complicate things.
-
-To avoid delaying LAM, just put all the LAM patches first, it's trivally ea=
-sy for
-me to grab a partial series.
-
-Speaking of kernel support, one thing we should explicit discuss is whether=
- or
-not KVM should require kernel support for LASS, i.e. if KVM should support =
-LASS
-if it's present in hardware, even if it's not enabled in the host.
-
-Looking at the kernel patches, LASS will be disabled if vsyscall is in emul=
-ate
-mode.  Ah, digging deeper, that's an incredibly esoteric and deprecated mod=
-e.
-bf00745e7791 ("x86/vsyscall: Remove CONFIG_LEGACY_VSYSCALL_EMULATE").
-
-So scratch that, let's again keep things simple.  Might be worth a call out=
- in
-the changelog that adds F(LASS), though.
+I think it needs to be explicit, i.e. needs the admin to opt-in to the unsa=
+fe
+behavior.
