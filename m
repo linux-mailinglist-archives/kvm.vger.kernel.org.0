@@ -2,74 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2787778F294
-	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 20:29:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B28D78F2FD
+	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 21:01:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345044AbjHaS32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 14:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41960 "EHLO
+        id S241453AbjHaTBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 15:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbjHaS31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 14:29:27 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C020EE43
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:29:24 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bf707f526bso12759065ad.1
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:29:24 -0700 (PDT)
+        with ESMTP id S236263AbjHaTBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 15:01:17 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611E8E64
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:01:14 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c9d29588aso15535907b3.0
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:01:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693506564; x=1694111364; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAQ/pFsVHD1Aoomibgpxf2ZqL3aYZZ65V96hB69Tw9c=;
-        b=fDxwxv2JRt9tSD2mwNu82F5veh8qKIzH4kHxxD85d62MrAMfuY0NGzRcJdp34SuaYW
-         AFVJb7Hh/tHW8uzyes3YJyhOrC6JoiJc4jfvhMs050Eg4c79zIuVsbzY1LPk/mGn8xE4
-         fggDMeALBIyCfly1WqwUm4vPj5ZFWm7faLOvsoiLtts05kcbSjMOOUmT6tOrDuI/jcCJ
-         RZVfaNiqtEEeP38++akgIW7aWX9alVIeA0XcccNASlczwRwRfIA+4xrkL9yqMLOovtt3
-         HtgB5cuyrmANwPBqCLzB5cpfwjdifPHGOtgMFRVA3EZTDgnb12m/Bh9MTQfvMAkjdYzi
-         okHA==
+        d=google.com; s=20221208; t=1693508473; x=1694113273; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w6Yyv6ujwYagqpF1MJSJZ41XD5zmN9Sx2XGwawvqoDw=;
+        b=iJeZlol6pcGftJ258RQQGOomkR47eYg5nDMqFvI+bTce6J2mBjA0VCK5w/RNRP/QJN
+         /0bB9g5g6uPIvZIkvDwwk+K/m+DSaNa+AQRH9B0CT5soCYKedO/ZHe+Y0CjejK72CC0l
+         NdJrkGdWIzSCagAZnPwefHtHetDZH1ZYVDaMoyeNWkG7iIHf6AbOZVYDgOC+hmZ+WuPz
+         LmqhaEk5BZ74pODgWkFp4DquzCGrTuMXIqfkg+KzCQWeaoJi2jGHBQSiOZpS29c6rT6N
+         9q689fxZDcUiibHCJYjE1JMGvL4R7gAKNywGTeBPHksb2VESKPczgWmGLmLt0a1UnDTj
+         dgeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693506564; x=1694111364;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAQ/pFsVHD1Aoomibgpxf2ZqL3aYZZ65V96hB69Tw9c=;
-        b=AokSuplfq12WKgK0wG1rLm3ywOTCgp0SBws1DgEwGmnDAK3/4FhTVFNkCyQgre+ZKU
-         s69wuzKcDUnWJgqy8jt22YQnh09qqfVdVfT7k6eEEcnNy4SFZDxgAbvlO/mBNjxEPIkW
-         tqO+g7l/sGOZemh7zW2bm1hSPW29y4QbX45O3WDHk3GoRi7YaVNJM4gp9qHJi5WdgrlP
-         +t8N5L2mt1zoDR9ZE25OQwBXFGX0xroHbtGpIfjwnXrP1uO70yD0OtdW3qvpjQJslUqL
-         5QiLOtdU/9z00i2SM0VccnsKk7GB4puOEMXjvwliOULAciJVnrE7wHar6Cd1TQI25FCf
-         S3tw==
-X-Gm-Message-State: AOJu0YyoQJ+jMv2GYhFHYQHB9z93cGD9kqJEv+anXQ6iWT07TYiHg4vH
-        f1JxsmEmuSuHQVrSppaPkwHb3QTsI9w=
-X-Google-Smtp-Source: AGHT+IFL1xqBeQ6sRUjnp1DduAFvrSYTtqUwn+ivj8j9EbmZT0+UmpZ+UIr8YgioG1n3CHlx12vtk7JlsdI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e74f:b0:1bf:cc5:7b53 with SMTP id
- p15-20020a170902e74f00b001bf0cc57b53mr154232plf.1.1693506564284; Thu, 31 Aug
- 2023 11:29:24 -0700 (PDT)
-Date:   Thu, 31 Aug 2023 11:29:22 -0700
-In-Reply-To: <20230829091233.GA72470@chaop.bj.intel.com>
+        d=1e100.net; s=20221208; t=1693508473; x=1694113273;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w6Yyv6ujwYagqpF1MJSJZ41XD5zmN9Sx2XGwawvqoDw=;
+        b=PsbtkYS/csgCIWLxmlBBqZex/mjNSeHQe04y5evBuIIIVbvHx4uJoRHHQFyswHGXBz
+         dYSJ6b/G2shGtltllcl5VhnILj3aoGqLj01J2dHdQtPXm7l5ilBXnnILJBTg0gUR0gHS
+         nbD5sZDnmEh32UlFfYRc8ucsKJtxP79hSL+ovHwmNNE0nMlepv9DQwXcE8i5F/yh/jqa
+         9jB7ZdGZxoXhZ88XQowmRmwvVWtlrYw52PovusylUziLyep16M8BoJ6Z8MOzcZyEU2Pa
+         Bq6U3AufWQQFV9nOpUMebl6PDZfyUa0df0a9Cm1Ha/dMvhDwptFrYD+9o7siDCMG24iE
+         2/jw==
+X-Gm-Message-State: AOJu0YwYMfTAXQv/aZkqxba/YyovytpTqBqi8UY6fUqSeb6xC0zcLMhZ
+        ePY5D7mCq2jFpiNZE46Km64GOHi2TSbQQkWH5Q==
+X-Google-Smtp-Source: AGHT+IFrm46z1+VKEBXajhS2fuBCkEVRUtADiWBUaJPEsNV5LP51XsSIh3ik+2gqnsiJ8Ue1OyrqzsGWmZectdqWXA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:11c9:b0:d20:7752:e384 with
+ SMTP id n9-20020a05690211c900b00d207752e384mr16197ybu.3.1693508473694; Thu,
+ 31 Aug 2023 12:01:13 -0700 (PDT)
+Date:   Thu, 31 Aug 2023 19:00:52 +0000
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <ZOjpIL0SFH+E3Dj4@google.com>
- <20230829091233.GA72470@chaop.bj.intel.com>
-Message-ID: <ZPDcAuHcoRfU+yRX@google.com>
-Subject: Re: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, Fuad Tabba <tabba@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jorg Rodel <jroedel@suse.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230831190052.129045-1-coltonlewis@google.com>
+Subject: [PATCH] arm64: Restore trapless ptimer access
+From:   Colton Lewis <coltonlewis@google.com>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        qemu-trivial@nongnu.org, Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -80,31 +67,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 29, 2023, Chao Peng wrote:
-> On Fri, Aug 25, 2023 at 10:47:12AM -0700, Sean Christopherson wrote:
-> > 
-> > 
-> > Filemap vs. xarray
-> > ------------------
-> > This is the main item that needs attention.  I don't want to merge guest_memfd()
-> > without doing this comparison, as not using filemap means we don't need AS_UNMOVABLE.
-> > Arguably we could merge a filemap implementation without AS_UNMOVABLE and just eat
-> > the suboptimal behavior, but not waiting a little while longer to do everything we
-> > can to get this right the first time seems ridiculous after we've been working on
-> > this for literally years.
-> > 
-> > Paolo was going to work on an axarray implementation, but AFAIK he hasn't done
-> > anything yet.  We (Google) don't have anyone available to work on an xarray
-> > implementation for several weeks (at best), so if anyone has the bandwidth and
-> > desire to take stab at an xarray implementation, please speak up.
-> 
-> I can do some experiments in the following weeks on the xarray
-> direction. I'm not quite confident I understood all what Paolo
-> originally wanted to do, so questions may have.
+Due to recent KVM changes, QEMU is setting a ptimer offset resulting
+in unintended trap and emulate access and a consequent performance
+hit. Filter out the PTIMER_CNT register to restore trapless ptimer
+access.
 
-FYI, I jumped the gun, sounds like Paolo got far enough along to form a strong
-opinion[*].
+Quoting Andrew Jones:
 
-Thanks for volunteering though, much appreciated!
+Simply reading the CNT register and writing back the same value is
+enough to set an offset, since the timer will have certainly moved
+past whatever value was read by the time it's written.  QEMU
+frequently saves and restores all registers in the get-reg-list array,
+unless they've been explicitly filtered out (with Linux commit
+680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
+restore trapless ptimer accesses, we need a QEMU patch to filter out
+the register.
 
-[*] https://lore.kernel.org/all/CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com
+See
+https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
+for additional context.
+
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ target/arm/kvm64.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 4d904a1d11..2dd46e0a99 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
+  */
+ static const CPRegStateLevel non_runtime_cpregs[] = {
+     { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
++    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+ };
+ 
+ int kvm_arm_cpreg_level(uint64_t regidx)
+-- 
+2.42.0.283.g2d96d420d3-goog
+
