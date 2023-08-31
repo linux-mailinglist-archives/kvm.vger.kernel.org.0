@@ -2,61 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B28D78F2FD
-	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 21:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4332178F347
+	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 21:26:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241453AbjHaTBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 15:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53338 "EHLO
+        id S1345889AbjHaT0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 15:26:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236263AbjHaTBR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 15:01:17 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611E8E64
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:01:14 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c9d29588aso15535907b3.0
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:01:14 -0700 (PDT)
+        with ESMTP id S238613AbjHaT03 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 15:26:29 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16EA9E65
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:26:27 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7454a43541so1057148276.1
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 12:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693508473; x=1694113273; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=w6Yyv6ujwYagqpF1MJSJZ41XD5zmN9Sx2XGwawvqoDw=;
-        b=iJeZlol6pcGftJ258RQQGOomkR47eYg5nDMqFvI+bTce6J2mBjA0VCK5w/RNRP/QJN
-         /0bB9g5g6uPIvZIkvDwwk+K/m+DSaNa+AQRH9B0CT5soCYKedO/ZHe+Y0CjejK72CC0l
-         NdJrkGdWIzSCagAZnPwefHtHetDZH1ZYVDaMoyeNWkG7iIHf6AbOZVYDgOC+hmZ+WuPz
-         LmqhaEk5BZ74pODgWkFp4DquzCGrTuMXIqfkg+KzCQWeaoJi2jGHBQSiOZpS29c6rT6N
-         9q689fxZDcUiibHCJYjE1JMGvL4R7gAKNywGTeBPHksb2VESKPczgWmGLmLt0a1UnDTj
-         dgeg==
+        d=google.com; s=20221208; t=1693509986; x=1694114786; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g6Tf3ZAjz5BRxqYmSOmi3DFQDfVDfYaSY76D6qeC9yM=;
+        b=prWdRNlrHbuDnVYQvJbbzFEynY/Jr5XkGcV6GHNmAWPMTH68ynv7sHKD7PeFWsTP4J
+         x5bZWo1U9WS7zyLobPpxw8+ic4zaTvy1qyidIrheJLVm05HhTcJoRmrE/iS73OUMt9M4
+         XnV1zrtIybohnvWfvPxsTvtABHb3XIWVHH/y96d07t1LZDz9u1qEY1dtC4FQBZ+DaaO+
+         RZczjM3/a0OCqdyQKBhTgyep0YcqJLC4c8NtK26O1USe2WKCAEr1Tw7d+GOG362Lbgiv
+         /ZLXmqixBJDBHZcERoE6Wdl9BTKCktEjGNMH2sjPAUUrKz6wfhAm8HPSIcp7MPaZyen5
+         L5zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693508473; x=1694113273;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w6Yyv6ujwYagqpF1MJSJZ41XD5zmN9Sx2XGwawvqoDw=;
-        b=PsbtkYS/csgCIWLxmlBBqZex/mjNSeHQe04y5evBuIIIVbvHx4uJoRHHQFyswHGXBz
-         dYSJ6b/G2shGtltllcl5VhnILj3aoGqLj01J2dHdQtPXm7l5ilBXnnILJBTg0gUR0gHS
-         nbD5sZDnmEh32UlFfYRc8ucsKJtxP79hSL+ovHwmNNE0nMlepv9DQwXcE8i5F/yh/jqa
-         9jB7ZdGZxoXhZ88XQowmRmwvVWtlrYw52PovusylUziLyep16M8BoJ6Z8MOzcZyEU2Pa
-         Bq6U3AufWQQFV9nOpUMebl6PDZfyUa0df0a9Cm1Ha/dMvhDwptFrYD+9o7siDCMG24iE
-         2/jw==
-X-Gm-Message-State: AOJu0YwYMfTAXQv/aZkqxba/YyovytpTqBqi8UY6fUqSeb6xC0zcLMhZ
-        ePY5D7mCq2jFpiNZE46Km64GOHi2TSbQQkWH5Q==
-X-Google-Smtp-Source: AGHT+IFrm46z1+VKEBXajhS2fuBCkEVRUtADiWBUaJPEsNV5LP51XsSIh3ik+2gqnsiJ8Ue1OyrqzsGWmZectdqWXA==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:11c9:b0:d20:7752:e384 with
- SMTP id n9-20020a05690211c900b00d207752e384mr16197ybu.3.1693508473694; Thu,
- 31 Aug 2023 12:01:13 -0700 (PDT)
-Date:   Thu, 31 Aug 2023 19:00:52 +0000
+        d=1e100.net; s=20221208; t=1693509986; x=1694114786;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g6Tf3ZAjz5BRxqYmSOmi3DFQDfVDfYaSY76D6qeC9yM=;
+        b=bomXLVV//65A+Ah8tFpu0+eO0nZY6NdI1T6lqzGAPmHbfAW53Km5mCqMAhPGwXZjEK
+         gdtRvE/6gj5TCcfAupoOEh67e+jc2zQS6udrs+gghuP2nl5Wi8553Jj9Jrz+5N0Qr2gZ
+         e6/Jg2IDULRvnPYAREfO8+ZyE133UUphMHCToyx/hzjaGGsoe1Kc5BdXHmucR//XrGhH
+         TIBdujc+bXtCP3AF8WDikN1Uy0VMrfPSwEGbGNSqJIRYNfL3xkmTwejDcyKNl3IdFPDO
+         JEO3B4R+ih+4rP7gl+Fuv2WNHJlfs2+B0ISZ2PeK8vPZNHD54MuMkT3B03ljF6QLHvEX
+         jXpg==
+X-Gm-Message-State: AOJu0YzZjxYv/tJH47oS0gwxUIF04bxtcdDmK5Yujs0Ssla07uS3J3ya
+        rZGeB8iWEcKUjlagHj/Se4b8AswFKL4=
+X-Google-Smtp-Source: AGHT+IH8M0VYP2jot5+095k6ObFx+ZWf24y1Sxn22pYWebzpMsn5f2iAMF3TVhv2FinHGqonFYaHnN5B71s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:bb12:0:b0:d7a:6a4c:b657 with SMTP id
+ z18-20020a25bb12000000b00d7a6a4cb657mr22072ybg.0.1693509986347; Thu, 31 Aug
+ 2023 12:26:26 -0700 (PDT)
+Date:   Thu, 31 Aug 2023 12:26:24 -0700
+In-Reply-To: <7463d8dd-5290-59c0-73bc-68053d6a320a@linux.intel.com>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230831190052.129045-1-coltonlewis@google.com>
-Subject: [PATCH] arm64: Restore trapless ptimer access
-From:   Colton Lewis <coltonlewis@google.com>
-To:     qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
-        qemu-trivial@nongnu.org, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+ <20230719144131.29052-2-binbin.wu@linux.intel.com> <ZN0454peMb3z/0Bg@google.com>
+ <7463d8dd-5290-59c0-73bc-68053d6a320a@linux.intel.com>
+Message-ID: <ZPDpYGzt0GdDQxEQ@google.com>
+Subject: Re: [PATCH v10 1/9] KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        David.Laight@aculab.com, robert.hu@linux.intel.com,
+        guang.zeng@intel.com
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -67,43 +70,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to recent KVM changes, QEMU is setting a ptimer offset resulting
-in unintended trap and emulate access and a consequent performance
-hit. Filter out the PTIMER_CNT register to restore trapless ptimer
-access.
+On Mon, Aug 28, 2023, Binbin Wu wrote:
+> 
+> 
+> On 8/17/2023 5:00 AM, Sean Christopherson wrote:
+> > On Wed, Jul 19, 2023, Binbin Wu wrote:
+> > > Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
+> > Using GENMASK_ULL() is an opportunistic cleanup, it is not the main purpose for
+> > this patch.  The main purpose is to extract the maximum theoretical mask for guest
+> > MAXPHYADDR so that it can be used to strip bits from CR3.
+> > 
+> > And rather than bury the actual use in "KVM: x86: Virtualize CR3.LAM_{U48,U57}",
+> > I think it makes sense to do the masking in this patch.  That change only becomes
+> > _necessary_ when LAM comes along, but it's completely valid without LAM.
+> > 
+> > That will also provide a place to explain why we decided to unconditionally mask
+> > the pgd (it's harmless for 32-bit guests, querying 64-bit mode would be more
+> > expensive, and for EPT the mask isn't tied to guest mode).
+> OK.
+> 
+> > And it should also
+> > explain that using PT_BASE_ADDR_MASK would actually be wrong (PAE has 64-bit
+> > elements _except_ for CR3).
+> Hi Sean, I am not sure if I understand it correctly.  Do you mean when KVM
+> shadows the page table of guest using 32-bit paging or PAE paging, guest CR3
+> is or can be 32 bits for 32-bit paging or PAE paging, so that apply the mask
+> to a 32-bit value CR3 "would actually be wrong" ?
 
-Quoting Andrew Jones:
-
-Simply reading the CNT register and writing back the same value is
-enough to set an offset, since the timer will have certainly moved
-past whatever value was read by the time it's written.  QEMU
-frequently saves and restores all registers in the get-reg-list array,
-unless they've been explicitly filtered out (with Linux commit
-680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
-restore trapless ptimer accesses, we need a QEMU patch to filter out
-the register.
-
-See
-https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
-for additional context.
-
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- target/arm/kvm64.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 4d904a1d11..2dd46e0a99 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
-  */
- static const CPRegStateLevel non_runtime_cpregs[] = {
-     { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
-+    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
- };
- 
- int kvm_arm_cpreg_level(uint64_t regidx)
--- 
-2.42.0.283.g2d96d420d3-goog
-
+It would be technically wrong for PAE paging, as the PTEs themselves are 64 bits,
+i.e. PT_BASE_ADDR_MASK would be 51:12, but CR3 is still only 32 bits.  Wouldn't
+matter in practice, but I think it's worth calling out that going out of our way
+to use PT_BASE_ADDR_MASK wouldn't actually "fix" anything.
