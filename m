@@ -2,99 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B53578F279
-	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 20:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F90E78F28C
+	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 20:27:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345932AbjHaSWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 14:22:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48924 "EHLO
+        id S1347007AbjHaS1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 14:27:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346889AbjHaSWh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 14:22:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBDF6E61
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693506115;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kDd6agFPPBZ563tT5sO0tAnh1fA6v2usb5U/Ua+TJqU=;
-        b=MLzT2lKF9dlG5mDqUs+P+QmurC7IL94GzPxuU1JJUuHN1JL9831HSOBEGitXfNSDy7MbBE
-        nHxVCFdOEbyPXp7WgOOpwwlheP1YyHogWU5Rchvmr3PoR1Ahu4qgCfAM5NsMX7juhuCPJb
-        zrVKJeYc6rVhhcgIwyG71s8Zf8xG71w=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-uKZIOWviOqe6p4JiR8l0UA-1; Thu, 31 Aug 2023 14:21:53 -0400
-X-MC-Unique: uKZIOWviOqe6p4JiR8l0UA-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-34de9c47d75so7331335ab.3
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:21:53 -0700 (PDT)
+        with ESMTP id S230427AbjHaS1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 14:27:06 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040A0E64
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:27:03 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56f924de34fso1166183a12.2
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 11:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693506423; x=1694111223; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BL29J1RzTtLIRB8EYDyGe+vo37rP6HDohP3M6dAx+U=;
+        b=B/yNBGZdEvJwbmlj8/1+4UyO5O/ON0FW5I2gLe3wDh4122D7oTI9DEvcv4xd+8usvw
+         dDu4J7kD/lBmKCcK5DtPJ68276AknazyaquPGN7ZAP8YRL+fSyVocQArGv8/HSA4daKo
+         e5T+MxHnWPDkjtaq0KtHSDLzWzYowUKGEUX2WbS60LAuyzzKgF8n5MaaOIHvIXHGvwh0
+         B9JkliSm8LCroeYduq+LWqQugsKV75TLsLENFIt7pXEyS4Ms+vwxNkpXWruxghcFLbQx
+         k0UqNYmFCbW1sl9YSUIVdebkV0YIqMk9Ir0WJqiYBweOfRjk1cdMUMKbdgx9NkC0bUkU
+         w4+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693506113; x=1694110913;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kDd6agFPPBZ563tT5sO0tAnh1fA6v2usb5U/Ua+TJqU=;
-        b=N/9qAoC781bCwE0ev+bFL5eH4a274yua0JkojaMpZ1UKCFc5nvLUr/qdr3UQdnP6G7
-         0RPfn16wc1PR9OKuyc+sy/y6XokHLNwfXfGg6H85xhKESA+1slmgFjnnQvaHt+RBIUHB
-         qBmoI3rSrhBYKa6it44zsuw45xldiLb7JQ+ELzwyE+ZKOmwcmIy8Z/v30bA9sEFA0SKz
-         K6DNKFum3vZwjeGxqrYMLlmZ4aytc3OieakLDtLt1Fbl1isMnJtIFEgL/4alOAQjF/Co
-         T6F/muzzgUMH6IT+3KxukB55pgPB2sv1ckpCHiQAITXQHUI167fm6fMjHJeWEP8Icr0H
-         4Shg==
-X-Gm-Message-State: AOJu0Yyn/yga27V4Mr/Pev21U6rsN93laGf2tRWD6zklzMd4/QnIqsrW
-        kAGk8h7mYcv4Od7cdKS7uFjTokYa9QUh0ELedsd9Z5pkMF9bAYUt/CSigihB4su6h1acfJ0zp6M
-        CIkAb6PmjNpym
-X-Received: by 2002:a05:6e02:eec:b0:34c:e16d:6796 with SMTP id j12-20020a056e020eec00b0034ce16d6796mr329533ilk.16.1693506112878;
-        Thu, 31 Aug 2023 11:21:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE8vns95higbpw7EtaVkzMpHzdrkGJ9Y2vvSqykV851tdz6ITxD49qYcHcmB/e7+Q3TZCiTtw==
-X-Received: by 2002:a05:6e02:eec:b0:34c:e16d:6796 with SMTP id j12-20020a056e020eec00b0034ce16d6796mr329518ilk.16.1693506112687;
-        Thu, 31 Aug 2023 11:21:52 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id w18-20020a92c892000000b00345da2c4776sm557598ilo.81.2023.08.31.11.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 11:21:51 -0700 (PDT)
-Date:   Thu, 31 Aug 2023 12:21:50 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Ankit Agrawal <ankita@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-        Vikram Sethi <vsethi@nvidia.com>,
-        Andy Currid <acurrid@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <danw@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Airlie <airlied@redhat.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20230831122150.2b97511b.alex.williamson@redhat.com>
-In-Reply-To: <ZPCd2sHXrAZHjsHg@infradead.org>
-References: <20230822202303.19661-1-ankita@nvidia.com>
-        <ZO9JKKurjv4PsmXh@infradead.org>
-        <ZO9imcoN5l28GE9+@nvidia.com>
-        <ZPCG9/P0fm88E2Zi@infradead.org>
-        <BY5PR12MB37631B2F41DB62CBDD7B1F69B0E5A@BY5PR12MB3763.namprd12.prod.outlook.com>
-        <ZPCd2sHXrAZHjsHg@infradead.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        d=1e100.net; s=20221208; t=1693506423; x=1694111223;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BL29J1RzTtLIRB8EYDyGe+vo37rP6HDohP3M6dAx+U=;
+        b=aRmHWxGBGUX1GC6qCTH/7mdaEfdr1AFkwcNOOCcxa37aid+vKesVDwsuvcsC+c4Dug
+         UjELKSroRLMGEven7pmXyhVR6uwh2txELRLYl/f79B44JWX0+/bEfq4pUzFx8t33Ub2Q
+         zQTJc4wheEZ2GGobXTCIO59dd0/qwsGxJXY5KAdrcwx2ERj8XrMfPFWJbwTfXtjUYAlb
+         GC8dBwcK5TCDO27lig/nCA6P4Z6e73gev8ys0urrWMow25WXRAOsbw8/Gy4RQO6tMufu
+         7SuYTbHeDxO7i12dyBdTc9gDVqs8BHRqQs0h71tDpcMsrRR28dJi7CiNz57Dkciy0BNK
+         JiAw==
+X-Gm-Message-State: AOJu0YzuLycxRI0p1lq9bHGsNaVOyT5Ely6rbIEUk51AuaDJEP7ndFyW
+        3NlWo8grTWTY8qBZwtqi9H4jEHJgzyI=
+X-Google-Smtp-Source: AGHT+IGy8aNlBIT34IBTO5UeG7P11LE8KsEbP0ykxoFscuLHnZ697p9o+nlvmi+P3IJduZDTQXpkgbeEDsg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2309:b0:1c0:ac09:4032 with SMTP id
+ d9-20020a170903230900b001c0ac094032mr122962plh.9.1693506423541; Thu, 31 Aug
+ 2023 11:27:03 -0700 (PDT)
+Date:   Thu, 31 Aug 2023 11:27:01 -0700
+In-Reply-To: <CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230830000633.3158416-1-seanjc@google.com> <20230830000633.3158416-3-seanjc@google.com>
+ <CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com>
+Message-ID: <ZPDbdTIUXAnvL7SM@google.com>
+Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.6
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,42 +66,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 31 Aug 2023 07:04:10 -0700
-Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Aug 31, 2023, Paolo Bonzini wrote:
+> This is definitely stuff that I wish I took a look for earlier (and
+> this is also why I prefer small bits over the development period, as
+> it keeps me honest),
 
-> On Thu, Aug 31, 2023 at 01:51:11PM +0000, Ankit Agrawal wrote:
-> > Hi Christoph,
-> >   
-> > >Whats the actual consumer running in a qemu VM here?  
-> > The primary use case in the VM is to run the open source Nvidia
-> > driver (https://github.com/NVIDIA/open-gpu-kernel-modules)
-> > and workloads.  
-> 
-> So this infrastructure to run things in a VM that we don't even support
-> in mainline?  I think we need nouveau support for this hardware in the
-> drm driver first, before adding magic vfio support.
+I'll work on making this happen.  I think the biggest thing on my end is to make
+it easier to track/merge arbitrary topic branches, e.g. so that I can put big
+series into their own branches with minimal risk of forgetting to merge them into
+kvm-x86/next.
 
-There's really never a guarantee that the thing we're exposing via the
-vfio uAPI has mainline drivers, for example we don't consult the
-nouveau device table before we expose an NVIDIA GPU to a Windows guest
-running proprietary device drivers.
+> I'll take a look but I've pulled it anyway.
 
-We've also never previously made a requirement that any new code in
-vfio must directly contribute to supporting a mainline driver, in fact
-I think you'll find examples where we do have such code.
+FWIW, I despise the "goverened features" name, though I like the guest_can_use()
+name.
 
-This driver is proposing to expose a coherent memory region associated
-with the device, composed as a PCI BAR, largely to bring it into the
-vfio device model.  Access to that memory region is still pass-through.
-This is essentially behavior that we also enable though mdev drivers
-like kvmgt (modulo the coherent aspect).
+> BTW, not using filemap turned out to be much bigger, and to some
+> extent uglier, than I expected. I'll send a message to the private mem
+> thread, but I think we should not pursue that for now and do it in a
+> separate patch series (if at all) so that it's clearer what filemap_*
+> code is being replaced by custom code.
 
-I assume the above driver understands how to access and make use of
-this coherent memory whether running bare-metal or virtualized, so
-potentially we have some understanding of how it's used by the driver,
-which can't be said for all devices used with vfio.  I'm therefore not
-sure how we can suddenly decide to impose a mainline driver requirement
-for exposing a device to userspace.  Thanks,
-
-Alex
-
+Bummer, I was hoping we could avoid having to touch mm/ code.
