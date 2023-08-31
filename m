@@ -2,199 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EF5C78E92E
-	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 11:18:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35F9B78E95D
+	for <lists+kvm@lfdr.de>; Thu, 31 Aug 2023 11:27:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242592AbjHaJSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 05:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35912 "EHLO
+        id S231459AbjHaJ15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 05:27:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230227AbjHaJSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 05:18:44 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 384EACF4;
-        Thu, 31 Aug 2023 02:18:41 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37V96GIH017856;
-        Thu, 31 Aug 2023 09:18:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=SYjbY0tEWfElEbTqgRB4OPWERFBazTwIpVtJ9bms8Po=;
- b=HlEpqGBJJUvpi84o/Ia7wIn3xWtKtG11LOtXCZrD+sFEtOk+zV+1nWpfCNg9noWmquTl
- dLkeghuZ5QvCmlgwgSgGOu8tuu1iqRt8ACuSYQwl8nPEy3CDmvhOuaWLQmQGsIYXWmui
- PDlWT8OU50SIgMvhmfuT6UkZ3b1pH65cXmoAfchvicONDCCdiJboam3FcLe0p6UYd6NM
- bBx+g5A8xGwZ/v+1a0qZTGKHCNAR8RyZkY2GV+HeXe8KTXfdf+XYt5pmXzwSssY8Aupq
- 535DWQReKzR4xqZGF3ya1jiCsCEQHEG29MAn1GIIc+YzAqgYx4lrtFkBSrV/Rm053L9t qg== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3std7xdhha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Aug 2023 09:18:40 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37V9B9hv009967;
-        Thu, 31 Aug 2023 09:18:39 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sqw7ku1vx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Aug 2023 09:18:39 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37V9IaWU14746142
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Aug 2023 09:18:36 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3EA7420043;
-        Thu, 31 Aug 2023 09:18:36 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E8D820040;
-        Thu, 31 Aug 2023 09:18:35 +0000 (GMT)
-Received: from [9.179.10.222] (unknown [9.179.10.222])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 31 Aug 2023 09:18:35 +0000 (GMT)
-Message-ID: <f4325517-c9ad-4ac2-42a4-6c63d95a0a6f@linux.ibm.com>
-Date:   Thu, 31 Aug 2023 11:18:35 +0200
+        with ESMTP id S230021AbjHaJ14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 05:27:56 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DBD194;
+        Thu, 31 Aug 2023 02:27:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693474073; x=1725010073;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=RdDc48cBbQRqzQzMzPcG7WW8BdV8myxLOLz2N8nkdHM=;
+  b=Dxvmf95uxEeifBTfN4uuSc/IxhsvEKl+YUA/Oree7WV+cge5Y/mjJfko
+   zVAxWwZ7onfSU8aLnHNZ1Pg3l1bVKpkNNOh0Up2kXM6HeUo9Q4RC5+vZH
+   2uXm/ZQqoiBUR1OPWYmbKQxM7vo5eT8y2FfAHtRw3ZmsxcSZ6eVeDs7D5
+   lnaiTjQkzvcxr/rQCmYqbNFhvt5FJ/nd+bRksKK+nCF0CfZAlkBAm4HsV
+   RoFl24V/hstxFLPYQClcnxYpQ6krFfBPzBapWtLLBVB35H8wqAVjXsPmk
+   DrN2fDmONSApoQSmL9NM4UWW66/w6XqgMlRIpK152+wplQFOTm/ybLbCl
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="379625933"
+X-IronPort-AV: E=Sophos;i="6.02,216,1688454000"; 
+   d="scan'208";a="379625933"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 02:27:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="739431210"
+X-IronPort-AV: E=Sophos;i="6.02,216,1688454000"; 
+   d="scan'208";a="739431210"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.210.87]) ([10.254.210.87])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 02:27:49 -0700
+Message-ID: <67aa00ae-01e6-0dd8-499f-279cb6df3ddd@linux.intel.com>
+Date:   Thu, 31 Aug 2023 17:27:47 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v3] KVM: s390: fix gisa destroy operation might lead to
- cpu stalls
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-References: <20230828151519.2187418-1-mimu@linux.ibm.com>
- <c3825795-ce38-4992-39d3-85341279e913@linux.ibm.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-In-Reply-To: <c3825795-ce38-4992-39d3-85341279e913@linux.ibm.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 09/10] iommu: Make iommu_queue_iopf() more generic
+Content-Language: en-US
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <20230825023026.132919-1-baolu.lu@linux.intel.com>
+ <20230825023026.132919-10-baolu.lu@linux.intel.com>
+ <BN9PR11MB52762A33BC9F41AB424915688CE3A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <cbfbe969-1a92-52bf-f00c-3fb89feefd66@linux.intel.com>
+ <BN9PR11MB52768891BC89107AD291E45C8CE6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB52768891BC89107AD291E45C8CE6A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tqXI88mYW3dhz9U3hdRYDDvbGVxVv4Td
-X-Proofpoint-ORIG-GUID: tqXI88mYW3dhz9U3hdRYDDvbGVxVv4Td
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-31_07,2023-08-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501
- spamscore=0 mlxlogscore=870 malwarescore=0 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2308310081
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 30.08.23 15:13, Matthew Rosato wrote:
-> On 8/28/23 11:15 AM, Michael Mueller wrote:
->> A GISA cannot be destroyed as long it is linked in the GIB alert list
->> as this would break the alert list. Just waiting for its removal from
->> the list triggered by another vm is not sufficient as it might be the
->> only vm. The below shown cpu stall situation might occur when GIB alerts
->> are delayed and is fixed by calling process_gib_alert_list() instead of
->> waiting.
+On 2023/8/30 15:43, Tian, Kevin wrote:
+>> From: Baolu Lu <baolu.lu@linux.intel.com>
+>> Sent: Saturday, August 26, 2023 4:01 PM
 >>
->> At this time the vcpus of the vm are already destroyed and thus
->> no vcpu can be kicked to enter the SIE again if for some reason an
->> interrupt is pending for that vm.
+>> On 8/25/23 4:17 PM, Tian, Kevin wrote:
+>>>> +
+>>>>    /**
+>>>>     * iopf_queue_flush_dev - Ensure that all queued faults have been
+>>>> processed
+>>>>     * @dev: the endpoint whose faults need to be flushed.
+>>> Presumably we also need a flush callback per domain given now
+>>> the use of workqueue is optional then flush_workqueue() might
+>>> not be sufficient.
+>>>
 >>
->> Additionally the IAM restore value is set to 0x00. That would be a bug
->> introduced by incomplete device de-registration, i.e. missing
->> kvm_s390_gisc_unregister() call.
+>> The iopf_queue_flush_dev() function flushes all pending faults from the
+>> IOMMU queue for a specific device. It has no means to flush fault queues
+>> out of iommu core.
 >>
->> Setting this value and the IAM in the GISA to 0x00 guarantees that late
->> interrupts don't bring the GISA back into the alert list.
+>> The iopf_queue_flush_dev() function is typically called when a domain is
+>> detaching from a PASID. Hence it's necessary to flush the pending faults
+>> from top to bottom. For example, iommufd should flush pending faults in
+>> its fault queues after detaching the domain from the pasid.
 >>
->> CPU stall caused by kvm_s390_gisa_destroy():
->>
->>   [ 4915.311372] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 14-.... } 24533 jiffies s: 5269 root: 0x1/.
->>   [ 4915.311390] rcu: blocking rcu_node structures (internal RCU debug): l=1:0-15:0x4000/.
->>   [ 4915.311394] Task dump for CPU 14:
->>   [ 4915.311395] task:qemu-system-s39 state:R  running task     stack:0     pid:217198 ppid:1      flags:0x00000045
->>   [ 4915.311399] Call Trace:
->>   [ 4915.311401]  [<0000038003a33a10>] 0x38003a33a10
->>   [ 4933.861321] rcu: INFO: rcu_sched self-detected stall on CPU
->>   [ 4933.861332] rcu: 	14-....: (42008 ticks this GP) idle=53f4/1/0x4000000000000000 softirq=61530/61530 fqs=14031
->>   [ 4933.861353] rcu: 	(t=42008 jiffies g=238109 q=100360 ncpus=18)
->>   [ 4933.861357] CPU: 14 PID: 217198 Comm: qemu-system-s39 Not tainted 6.5.0-20230816.rc6.git26.a9d17c5d8813.300.fc38.s390x #1
->>   [ 4933.861360] Hardware name: IBM 8561 T01 703 (LPAR)
->>   [ 4933.861361] Krnl PSW : 0704e00180000000 000003ff804bfc66 (kvm_s390_gisa_destroy+0x3e/0xe0 [kvm])
->>   [ 4933.861414]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
->>   [ 4933.861416] Krnl GPRS: 0000000000000000 00000372000000fc 00000002134f8000 000000000d5f5900
->>   [ 4933.861419]            00000002f5ea1d18 00000002f5ea1d18 0000000000000000 0000000000000000
->>   [ 4933.861420]            00000002134fa890 00000002134f8958 000000000d5f5900 00000002134f8000
->>   [ 4933.861422]            000003ffa06acf98 000003ffa06858b0 0000038003a33c20 0000038003a33bc8
->>   [ 4933.861430] Krnl Code: 000003ff804bfc58: ec66002b007e	cij	%r6,0,6,000003ff804bfcae
->>                             000003ff804bfc5e: b904003a		lgr	%r3,%r10
->>                            #000003ff804bfc62: a7f40005		brc	15,000003ff804bfc6c
->>                            >000003ff804bfc66: e330b7300204	lg	%r3,10032(%r11)
->>                             000003ff804bfc6c: 58003000		l	%r0,0(%r3)
->>                             000003ff804bfc70: ec03fffb6076	crj	%r0,%r3,6,000003ff804bfc66
->>                             000003ff804bfc76: e320b7600271	lay	%r2,10080(%r11)
->>                             000003ff804bfc7c: c0e5fffea339	brasl	%r14,000003ff804942ee
->>   [ 4933.861444] Call Trace:
->>   [ 4933.861445]  [<000003ff804bfc66>] kvm_s390_gisa_destroy+0x3e/0xe0 [kvm]
->>   [ 4933.861460] ([<00000002623523de>] free_unref_page+0xee/0x148)
->>   [ 4933.861507]  [<000003ff804aea98>] kvm_arch_destroy_vm+0x50/0x120 [kvm]
->>   [ 4933.861521]  [<000003ff8049d374>] kvm_destroy_vm+0x174/0x288 [kvm]
->>   [ 4933.861532]  [<000003ff8049d4fe>] kvm_vm_release+0x36/0x48 [kvm]
->>   [ 4933.861542]  [<00000002623cd04a>] __fput+0xea/0x2a8
->>   [ 4933.861547]  [<00000002620d5bf8>] task_work_run+0x88/0xf0
->>   [ 4933.861551]  [<00000002620b0aa6>] do_exit+0x2c6/0x528
->>   [ 4933.861556]  [<00000002620b0f00>] do_group_exit+0x40/0xb8
->>   [ 4933.861557]  [<00000002620b0fa6>] __s390x_sys_exit_group+0x2e/0x30
->>   [ 4933.861559]  [<0000000262d481f4>] __do_syscall+0x1d4/0x200
->>   [ 4933.861563]  [<0000000262d59028>] system_call+0x70/0x98
->>   [ 4933.861565] Last Breaking-Event-Address:
->>   [ 4933.861566]  [<0000038003a33b60>] 0x38003a33b60
->>
->> Fixes: 9f30f6216378 ("KVM: s390: add gib_alert_irq_handler()")
->> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
->> ---
->>   arch/s390/kvm/interrupt.c | 11 ++++++-----
->>   1 file changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
->> index 85e39f472bb4..75e200bd1030 100644
->> --- a/arch/s390/kvm/interrupt.c
->> +++ b/arch/s390/kvm/interrupt.c
->> @@ -3216,11 +3216,12 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
->>   
->>   	if (!gi->origin)
->>   		return;
->> -	if (gi->alert.mask)
->> -		KVM_EVENT(3, "vm 0x%pK has unexpected iam 0x%02x",
->> -			  kvm, gi->alert.mask);
->> -	while (gisa_in_alert_list(gi->origin))
->> -		cpu_relax();
->> +	WARN(gi->alert.mask != 0x00,
->> +	     "unexpected non zero alert.mask 0x%02x",
->> +	     gi->alert.mask);
->> +	gi->alert.mask = 0x00;
->> +	if (gisa_set_iam(gi->origin, gi->alert.mask))
->> +		process_gib_alert_list();
->>   	hrtimer_cancel(&gi->timer);
 > 
-> Thanks for the prior explanations.  This looks pretty good to me now, I think the subtlety that I was missing is that we are kicking off the callback (gisa_vcpu_kicker) via hrtimer_start with an immediate expiry (0) and relying on the fact that this hrtimer_cancel here will wait until that callback has finished.  AFAIU that means that now we will either set the IAM immediately here via gisa_set_iam or via the callback after handling the alert; in both cases this will prevent further alerts and we won't clear gi->origin until after that point.
+> Is there an ordering problem? The last step of intel_svm_drain_prq()
+> in the detaching path issues a set of descriptors to drain page requests
+> and responses in hardware. It cannot complete if not all software queues
+> are drained and it's counter-intuitive to drain a software queue after
+> the hardware draining has already been completed.
 > 
-> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
+> btw just flushing requests is probably insufficient in iommufd case since
+> the responses are received asynchronously. It requires an interface to
+> drain both requests and responses (presumably with timeouts in case
+> of a malicious guest which never responds) in the detach path.
 
-Thanks Matt!
+You are right. Good catch.
 
-Janosch will pick the patch taday.
+To put it simply, iopf_queue_flush_dev() is insufficient to support the
+case of forwarding iopf's over iommufd. Do I understand it right?
+
+Perhaps we should drain the partial list and the response pending list?
+With these two lists drained, no more iopf's for the specific pasid will
+be forwarded up, and page response from upper layer will be dropped.
 
 > 
->>   	gi->origin = NULL;
->>   	VM_EVENT(kvm, 3, "gisa 0x%pK destroyed", gisa);
+> it's not a problem for sva as responses are synchrounsly delivered after
+> handling mm fault. So fine to not touch it in this series but certainly
+> this area needs more work when moving to support iommufd. 😊
+
+Yes, SVA is not affected. The flush_workqueue() is enough for it. As a
+preparation series, I hope we can solve this in it. :-)
+
 > 
+> btw why is iopf_queue_flush_dev() called only in intel-iommu driver?
+> Isn't it a common requirement for all sva-capable drivers?
+
+Jean answered this.
+
+Best regards,
+baolu
