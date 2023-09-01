@@ -2,135 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7E7578F9F8
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 10:26:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B0178FA80
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 11:11:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345079AbjIAI05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 04:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47948 "EHLO
+        id S1348730AbjIAJLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 05:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233069AbjIAI04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 04:26:56 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1CE10E4
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 01:26:53 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 2CF381F459;
-        Fri,  1 Sep 2023 08:26:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1693556812; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S1345239AbjIAJLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 05:11:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8705891
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 02:10:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693559435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uSnEqUK6TOkRVGZMvsXsDI6e3D+2EA7xs6OLjZY2jbY=;
-        b=FddY0uS22GqVt0E0xIiRWWLQy4FGtZEthdBODABUMZ9ERpRWC92W3UIiaiunO2pP2GXHEq
-        kh9Reb8eeDoXtW6cAHc8w1I/mli/JuJqL6zbtTDDzQnSl/CKbZwoCOokZ3FjG7sqT4bq82
-        36wXEut2sxtEzcdfTHFzPyD8dMpjDX4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1693556812;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uSnEqUK6TOkRVGZMvsXsDI6e3D+2EA7xs6OLjZY2jbY=;
-        b=BBBZsqGGiRvj9wiMIaHtmdlzEgo9SMgsqIDMd5tvBHArkAEHNyJhKcJujiyBvbHjoDb83X
-        pbKQp53ecLp1akDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DDEE01358B;
-        Fri,  1 Sep 2023 08:26:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id CvhgNUug8WT8HgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:26:51 +0000
-Message-ID: <030ede02-074d-98f5-ca71-5540f5b1fbb6@suse.cz>
-Date:   Fri, 1 Sep 2023 10:26:51 +0200
+        bh=Npb7HHjeN5fjX+Qj/C+KTeBsU8vb8i0pb6C74by2qvY=;
+        b=cySqZf5nnonqme4qf4e5ulyZaIuRsRkaeFAAQMaPKAHG5NljKi0ROdjVVjuVmflVHneJHT
+        Cc7PW6sKfr0Rx6RKogqOWwhKgfhPcwwmjQ/cKCQvtBRFXJgkjM+VpMJUm9JV4uGR5WyN3r
+        KQX0aestDIH+kdV054H8i9GHH0CqAgo=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-258-Tj6ysTc1O6-xu3CCFeDW6Q-1; Fri, 01 Sep 2023 05:10:32 -0400
+X-MC-Unique: Tj6ysTc1O6-xu3CCFeDW6Q-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-44e84042d04so736832137.3
+        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 02:10:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693559431; x=1694164231;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Npb7HHjeN5fjX+Qj/C+KTeBsU8vb8i0pb6C74by2qvY=;
+        b=gFch24ZtEf2NerIBs1hwGKzujEueCgSTheypZpZtF6NNwKc0OG9K444LLn0N0j0AiS
+         q0l7tfmAKUrd9KBaLzh71R9CiRN1d4/JWE0LENg3GkRERtpR0rGiUv/nsM4TQBKh9PQ9
+         ON/vOzDiMql+PSZnMxQ0ZFLj9Tb+jrnJMBTdTLAn2kGbj9GatClC0jFpxiOjfXY2DGkN
+         /5ZZ0KAJDYe/QwzH2drR0uNIXAwnAX4OOaWeu19jtAYOv/djgeoPqf9/QX1qbTa8/UG4
+         ZUfoRpVVlCbaxNrazgG/a12/Fe5NLeH+1IkkTPDarbjXi7LMvUF+hQ955g0C3fGfesYu
+         uXGg==
+X-Gm-Message-State: AOJu0Yz3LY95fXSi/uqOPO2CP3KgqHumnq8Rb5hZE/uCTEK4I4HXeX9y
+        LW84yuHDa1tRzPGOGBoOMuVcMTs1EWyl2oetG5Xytn+crfdrA8H/S73gxN+MimhAo5ZPF0mq/qy
+        kARhVZDPfgGwocyZ1bNl7nPuEP4+W
+X-Received: by 2002:a05:6102:89:b0:44d:41bc:705f with SMTP id t9-20020a056102008900b0044d41bc705fmr2414536vsp.16.1693559431489;
+        Fri, 01 Sep 2023 02:10:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFMjkxY54wxRMW3sIgi7Vp5N8QNLOqk6yIG1MtN5b5s07wY8abS7UBuZHmvRpd1eD0Dh7Qzo4ITN1QjU7QKM6M=
+X-Received: by 2002:a05:6102:89:b0:44d:41bc:705f with SMTP id
+ t9-20020a056102008900b0044d41bc705fmr2414505vsp.16.1693559431201; Fri, 01 Sep
+ 2023 02:10:31 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
+References: <20230718234512.1690985-1-seanjc@google.com> <ZOjpIL0SFH+E3Dj4@google.com>
+ <20230829091233.GA72470@chaop.bj.intel.com> <ZPDcAuHcoRfU+yRX@google.com> <20230901011711.GA673287@chaop.bj.intel.com>
+In-Reply-To: <20230901011711.GA673287@chaop.bj.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 1 Sep 2023 11:10:18 +0200
+Message-ID: <CABgObfZiS+e7oDbwuC1Uycsz8Mjsu-FSfSmu=3R0M71vUhpq_Q@mail.gmail.com>
 Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Fuad Tabba <tabba@google.com>,
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Fuad Tabba <tabba@google.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Ackerley Tng <ackerleytng@google.com>,
         Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
         Quentin Perret <qperret@google.com>,
         Michael Roth <michael.roth@amd.com>,
         Wang <wei.w.wang@intel.com>,
         Liam Merwick <liam.merwick@oracle.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Jorg Rodel <jroedel@suse.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <ZOjpIL0SFH+E3Dj4@google.com> <20230829091233.GA72470@chaop.bj.intel.com>
- <ZPDcAuHcoRfU+yRX@google.com> <20230901011711.GA673287@chaop.bj.intel.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20230901011711.GA673287@chaop.bj.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/1/23 03:17, Chao Peng wrote:
-> On Thu, Aug 31, 2023 at 11:29:22AM -0700, Sean Christopherson wrote:
->> On Tue, Aug 29, 2023, Chao Peng wrote:
->> > On Fri, Aug 25, 2023 at 10:47:12AM -0700, Sean Christopherson wrote:
->> > > 
->> > > 
->> > > Filemap vs. xarray
->> > > ------------------
->> > > This is the main item that needs attention.  I don't want to merge guest_memfd()
->> > > without doing this comparison, as not using filemap means we don't need AS_UNMOVABLE.
->> > > Arguably we could merge a filemap implementation without AS_UNMOVABLE and just eat
->> > > the suboptimal behavior, but not waiting a little while longer to do everything we
->> > > can to get this right the first time seems ridiculous after we've been working on
->> > > this for literally years.
->> > > 
->> > > Paolo was going to work on an axarray implementation, but AFAIK he hasn't done
->> > > anything yet.  We (Google) don't have anyone available to work on an xarray
->> > > implementation for several weeks (at best), so if anyone has the bandwidth and
->> > > desire to take stab at an xarray implementation, please speak up.
->> > 
->> > I can do some experiments in the following weeks on the xarray
->> > direction. I'm not quite confident I understood all what Paolo
->> > originally wanted to do, so questions may have.
->> 
->> FYI, I jumped the gun, sounds like Paolo got far enough along to form a strong
->> opinion[*].
-> 
+On Fri, Sep 1, 2023 at 3:28=E2=80=AFAM Chao Peng <chao.p.peng@linux.intel.c=
+om> wrote:
+> > FYI, I jumped the gun, sounds like Paolo got far enough along to form a=
+ strong
+> > opinion[*].
+
+Yeah, I still have some crashes here and there :) so I didn't post
+anything, but here are some note from the experiment.
+
+The only benefit is that gmem does not need the splitting logic of
+__filemap_add_folio, because (I think) there shouldn't be conflicts
+with existing entries. Otherwise it's just a bunch of duplicate code
+with mm/filemap.c, about 150 lines of code.
+
+One question is whether to use our own xarray (e.g. in the private
+inode data) or use i_pages, and likewise for the invalidation lock.
+In my patches I did the former for the sake of safety; I skimmed
+filemap.c enough to think it would work to use i_pages, but I wasn't
+very convinced of which idea is better.
+
+Initially I was most nervous about memory failure, because of the path
+identify_page_state -> page_action -> me_pagecache_{clean,dirty} ->
+truncate_error_page -> filemap_release_folio. In the end
+filemap_release_folio is doing nothing that is filemap-dependent, in
+particular it doesn't do anything on the i_pages and the filemap
+locks. So a plan could be to just identify filemap functions that
+don't use i_pages, and rename them, for example filemap_release_folio
+could become folio_release_from_mapping.
+
+Crashes aside, I actually don't have any objection to *not* using the
+filemap long term, but right now I don't really see a reason to do it.
+We don't know if hugetlbfs support will be easier or harder with the
+filemap for example, and given Vlastimil's reply I think the main
+objection to using the filemap is gone. If we switch, we should invest
+the time in making the filemap and mapping APIs a bit more separate.
+
+Paolo
+
 > Yeah, I see that, that is a good news actually, then we can go ahead with
 > the current filemap one. I personally think these mm touchpoints are not
-> a big deal when compared to previous versions, most part we are just using
+> a big deal when compared to previous versions, most part we are just usin=
+g
 > the APIs.
-
-I also agree with the outcome, I think staying will filemap will be more
-future proof e.g. if migration and swapout becomes possible in the future. I
-don't think having to touch some mm/ code is that much of a problem.
-Hopefully the AS_UNMOVABLE issue will be sufficiently addressed by this:
-https://lore.kernel.org/all/20230901082025.20548-2-vbabka@suse.cz/
-
->> 
->> Thanks for volunteering though, much appreciated!
-> 
+>
+> >
+> > Thanks for volunteering though, much appreciated!
+>
 > NP, any collaboration is to make this lasting years series merge earlier.
-> 
+>
 > Chao
->> 
->> [*] https://lore.kernel.org/all/CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com
+> >
+> > [*] https://lore.kernel.org/all/CABgObfay4FKV=3DfoWLZzAWaC2kVHRnF1ib+6N=
+C058QVZVFhGeyA@mail.gmail.com
+>
 
