@@ -2,164 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA91278F9F2
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 10:23:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7E7578F9F8
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 10:26:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344954AbjIAIXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 04:23:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S1345079AbjIAI05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 04:26:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236869AbjIAIXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 04:23:32 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C86D193;
-        Fri,  1 Sep 2023 01:23:26 -0700 (PDT)
+        with ESMTP id S233069AbjIAI04 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 04:26:56 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1CE10E4
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 01:26:53 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id CBCAF1F45E;
-        Fri,  1 Sep 2023 08:23:24 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 2CF381F459;
+        Fri,  1 Sep 2023 08:26:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1693556604; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1693556812; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lM2jFMiCbU/7Z0Wt66YsVsUtlY4aIj0FUbivaBixA/c=;
-        b=zT4zGINVx2k3wPqz3jcmE9bmJBpBcsDBUwenKzhLerIp+oH2aCkG4+EXh39zRNryjQv5Db
-        syu8c53NOsHAVW9SIMV7rmXaawFxBmlGIS7oN+eGtRpy7NQAkXpdI57c9wkvRp8eiDiXja
-        uA4epJ/r7clJCygmuQc278PsV8l56iM=
+        bh=uSnEqUK6TOkRVGZMvsXsDI6e3D+2EA7xs6OLjZY2jbY=;
+        b=FddY0uS22GqVt0E0xIiRWWLQy4FGtZEthdBODABUMZ9ERpRWC92W3UIiaiunO2pP2GXHEq
+        kh9Reb8eeDoXtW6cAHc8w1I/mli/JuJqL6zbtTDDzQnSl/CKbZwoCOokZ3FjG7sqT4bq82
+        36wXEut2sxtEzcdfTHFzPyD8dMpjDX4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1693556604;
+        s=susede2_ed25519; t=1693556812;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lM2jFMiCbU/7Z0Wt66YsVsUtlY4aIj0FUbivaBixA/c=;
-        b=ZsrMXAmASwR20bAW12DsiBEXD871qEuKP0anx4duKH2O41WOTWfcG8WLKUJiaYTSgmrfs1
-        lQlapOLm5eLYniDg==
+        bh=uSnEqUK6TOkRVGZMvsXsDI6e3D+2EA7xs6OLjZY2jbY=;
+        b=BBBZsqGGiRvj9wiMIaHtmdlzEgo9SMgsqIDMd5tvBHArkAEHNyJhKcJujiyBvbHjoDb83X
+        pbKQp53ecLp1akDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3A66A1358B;
-        Fri,  1 Sep 2023 08:23:24 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DDEE01358B;
+        Fri,  1 Sep 2023 08:26:51 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id BOk4DXyf8WREHQAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:23:24 +0000
-Message-ID: <2d9312bf-a5ad-0427-c197-fef6ea5cfe0a@suse.cz>
-Date:   Fri, 1 Sep 2023 10:23:23 +0200
+        id CvhgNUug8WT8HgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:26:51 +0000
+Message-ID: <030ede02-074d-98f5-ca71-5540f5b1fbb6@suse.cz>
+Date:   Fri, 1 Sep 2023 10:26:51 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
- completely unmovable
-To:     Matthew Wilcox <willy@infradead.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
+Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Fuad Tabba <tabba@google.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Ackerley Tng <ackerleytng@google.com>,
         Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
         Quentin Perret <qperret@google.com>,
         Michael Roth <michael.roth@amd.com>,
         Wang <wei.w.wang@intel.com>,
         Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jorg Rodel <jroedel@suse.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-11-seanjc@google.com>
- <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
- <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
-Content-Language: en-US
+ <ZOjpIL0SFH+E3Dj4@google.com> <20230829091233.GA72470@chaop.bj.intel.com>
+ <ZPDcAuHcoRfU+yRX@google.com> <20230901011711.GA673287@chaop.bj.intel.com>
 From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+In-Reply-To: <20230901011711.GA673287@chaop.bj.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_SOFTFAIL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/25/23 14:51, Matthew Wilcox wrote:
-> On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
->> On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
->> > diff --git a/mm/compaction.c b/mm/compaction.c
->> > index dbc9f86b1934..a3d2b132df52 100644
->> > --- a/mm/compaction.c
->> > +++ b/mm/compaction.c
->> > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
->> >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
->> >  			goto isolate_fail_put;
->> >  
->> > +		/* The mapping truly isn't movable. */
->> > +		if (mapping && mapping_unmovable(mapping))
->> > +			goto isolate_fail_put;
->> > +
+On 9/1/23 03:17, Chao Peng wrote:
+> On Thu, Aug 31, 2023 at 11:29:22AM -0700, Sean Christopherson wrote:
+>> On Tue, Aug 29, 2023, Chao Peng wrote:
+>> > On Fri, Aug 25, 2023 at 10:47:12AM -0700, Sean Christopherson wrote:
+>> > > 
+>> > > 
+>> > > Filemap vs. xarray
+>> > > ------------------
+>> > > This is the main item that needs attention.  I don't want to merge guest_memfd()
+>> > > without doing this comparison, as not using filemap means we don't need AS_UNMOVABLE.
+>> > > Arguably we could merge a filemap implementation without AS_UNMOVABLE and just eat
+>> > > the suboptimal behavior, but not waiting a little while longer to do everything we
+>> > > can to get this right the first time seems ridiculous after we've been working on
+>> > > this for literally years.
+>> > > 
+>> > > Paolo was going to work on an axarray implementation, but AFAIK he hasn't done
+>> > > anything yet.  We (Google) don't have anyone available to work on an xarray
+>> > > implementation for several weeks (at best), so if anyone has the bandwidth and
+>> > > desire to take stab at an xarray implementation, please speak up.
+>> > 
+>> > I can do some experiments in the following weeks on the xarray
+>> > direction. I'm not quite confident I understood all what Paolo
+>> > originally wanted to do, so questions may have.
 >> 
->> I doubt that it is safe to dereference mapping here. I believe the folio
->> can be truncated from under us and the mapping freed with the inode.
->> 
->> The folio has to be locked to dereference mapping safely (given that the
->> mapping is still tied to the folio).
+>> FYI, I jumped the gun, sounds like Paolo got far enough along to form a strong
+>> opinion[*].
 > 
-> There's even a comment to that effect later on in the function:
-> 
->                         /*
->                          * Only pages without mappings or that have a
->                          * ->migrate_folio callback are possible to migrate
->                          * without blocking. However, we can be racing with
->                          * truncation so it's necessary to lock the page
->                          * to stabilise the mapping as truncation holds
->                          * the page lock until after the page is removed
->                          * from the page cache.
->                          */
-> 
-> (that could be reworded to make it clear how dangerous dereferencing
-> ->mapping is without the lock ... and it does need to be changed to say
-> "folio lock" instead of "page lock", so ...)
-> 
-> How does this look?
-> 
->                         /*
->                          * Only folios without mappings or that have
->                          * a ->migrate_folio callback are possible to
->                          * migrate without blocking. However, we can
->                          * be racing with truncation, which can free
->                          * the mapping.  Truncation holds the folio lock
->                          * until after the folio is removed from the page
->                          * cache so holding it ourselves is sufficient.
->                          */
+> Yeah, I see that, that is a good news actually, then we can go ahead with
+> the current filemap one. I personally think these mm touchpoints are not
+> a big deal when compared to previous versions, most part we are just using
+> the APIs.
 
-Incorporated to my attempt at a fix (posted separately per the requested
-process):
-
+I also agree with the outcome, I think staying will filemap will be more
+future proof e.g. if migration and swapout becomes possible in the future. I
+don't think having to touch some mm/ code is that much of a problem.
+Hopefully the AS_UNMOVABLE issue will be sufficiently addressed by this:
 https://lore.kernel.org/all/20230901082025.20548-2-vbabka@suse.cz/
+
+>> 
+>> Thanks for volunteering though, much appreciated!
+> 
+> NP, any collaboration is to make this lasting years series merge earlier.
+> 
+> Chao
+>> 
+>> [*] https://lore.kernel.org/all/CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com
+
