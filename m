@@ -2,99 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E77E97903D6
-	for <lists+kvm@lfdr.de>; Sat,  2 Sep 2023 00:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD1627903DF
+	for <lists+kvm@lfdr.de>; Sat,  2 Sep 2023 00:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351133AbjIAWzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 18:55:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
+        id S236666AbjIAWzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 18:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244369AbjIAWzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 18:55:04 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124B81730;
-        Fri,  1 Sep 2023 14:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693602368; x=1725138368;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XHxocslFLQU8xD6gE26XwrfQlSg9WQxfvtoRwUmoXd4=;
-  b=fs73fJm9bRJyKBZKwbD5mEgyXK9s/AowGNS+H0gXHA0EQQMa1nzj0JyO
-   4ivvodVmSEvCTmNx1xrrPG92m1n7/EkRzmofX9AcXraGnN9/xc4Xh6ZG3
-   r17c6FwtwVCMhafLGgi3Sd3anIHvouYoJWsbVtWB5atZgqa0tZ4kh6j80
-   EFKQ+sRpiruArmeWkbRk9jIoYa/6oLBssZoPneaIcO7Ca9aqEuR30pD4j
-   bKFwnbrDOw1uWI+bsld1+fUELpibsdIlhMv8O6msge/MjCVUs3juuNPv0
-   Bu48qxjBE2vnB0/wR3uxxdkcZAipPR81Pe31J6LaK0FJtf82Ckk21l7eo
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="379031042"
-X-IronPort-AV: E=Sophos;i="6.02,220,1688454000"; 
-   d="scan'208";a="379031042"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 14:06:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="1070871974"
-X-IronPort-AV: E=Sophos;i="6.02,220,1688454000"; 
-   d="scan'208";a="1070871974"
-Received: from jroorda-mobl4.ger.corp.intel.com (HELO box.shutemov.name) ([10.252.32.118])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 14:05:58 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 94702104994; Sat,  2 Sep 2023 00:05:55 +0300 (+03)
-Date:   Sat, 2 Sep 2023 00:05:55 +0300
-From:   kirill.shutemov@linux.intel.com
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     seanjc@google.com, ackerleytng@google.com,
-        akpm@linux-foundation.org, anup@brainfault.org,
-        aou@eecs.berkeley.edu, chao.p.peng@linux.intel.com,
-        chenhuacai@kernel.org, david@redhat.com, isaku.yamahata@gmail.com,
-        jarkko@kernel.org, jmorris@namei.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, liam.merwick@oracle.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-riscv@lists.infradead.org,
-        linux-security-module@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name,
-        maz@kernel.org, michael.roth@amd.com, mpe@ellerman.id.au,
-        oliver.upton@linux.dev, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, paul@paul-moore.com, pbonzini@redhat.com,
-        qperret@google.com, serge@hallyn.com, tabba@google.com,
-        vannapurve@google.com, wei.w.wang@intel.com, willy@infradead.org,
-        yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH gmem FIXUP] mm, compaction: make testing
- mapping_unmovable() safe
-Message-ID: <20230901210555.j5d5a4azmkxzlnn2@box.shutemov.name>
-References: <20230901082025.20548-2-vbabka@suse.cz>
+        with ESMTP id S237598AbjIAWzu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 18:55:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914C21733
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 14:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693602437;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tv/HA+P8uMR5coJUPcxetvErjhQYiAoKoxyPS6dOGNw=;
+        b=T1jsm1JoLOe/el9X26Zh6d6fi6UyeifEF9teO6Rfp/vgEB3BPoeSkeKMBjr/kjggk/Rh+a
+        NyOK278SAf+DuKfU6Idh1EbMPi/dmyiFaGBad1HZo85QYdKS6+A7yzHF+C0Rfcq+9eiph5
+        idmhavG0tS09vRwq5HMNepk3fxa9aKQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-373-XNEzIru_PZ6a22rWBEwFrA-1; Fri, 01 Sep 2023 17:07:16 -0400
+X-MC-Unique: XNEzIru_PZ6a22rWBEwFrA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so15308255e9.3
+        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 14:07:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693602435; x=1694207235;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tv/HA+P8uMR5coJUPcxetvErjhQYiAoKoxyPS6dOGNw=;
+        b=IiSqbtm9RfxCdQBdEHVrRI2gG0WcbuAj9GHeEEe5CdrRzCNmGKKy/LTsX611IzMewX
+         FwfCEXecmwT1+w5LK0c1CF1h06OQRw1zwH3YYrC3dgXEqIcKewCbZTmPqGAYU9GPUoL7
+         b5L5wJ80wdN19dqZFKi46YX22NGp47CuJmuPtvWHlxiq3GSzcmeQMTT+JeQ7F1NRVmT9
+         Nm2LkCqLNQj6MXsBRU29ACzsk8wMisosgl0Amyyyxoj9u5YB4hqn16PZTiQKqX4bGveY
+         tToWwSAGCuNAHzGIcsiP88RmAkQ/CM8SdvF6YEgGX+vbsEzYnuKmYKsl4v+lnqVm2xc/
+         JSUg==
+X-Gm-Message-State: AOJu0YzeFos/XyiSiJpLcsPBKY8s3QTrVLzDtTTsjh6eiwZ4V2sGsFDI
+        XopGw2mOXw504GC1894OnRIEqcZIfA4U0061nVr2woPnazg8fTS5VzDBEQrgTVcF2HnjBrFn3jx
+        8yRfyvv/MCzVu
+X-Received: by 2002:a05:600c:2945:b0:3fe:89be:cd3 with SMTP id n5-20020a05600c294500b003fe89be0cd3mr2737392wmd.22.1693602435117;
+        Fri, 01 Sep 2023 14:07:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1umVJ3kyzWx1aR5zAxechiQtUD6n1Z300wpjAW1KsAc9X8uX0X7I5CKi/7v4HrUsq70DwLA==
+X-Received: by 2002:a05:600c:2945:b0:3fe:89be:cd3 with SMTP id n5-20020a05600c294500b003fe89be0cd3mr2737383wmd.22.1693602434797;
+        Fri, 01 Sep 2023 14:07:14 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id p22-20020a1c7416000000b003fe23b10fdfsm9112249wmc.36.2023.09.01.14.07.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Sep 2023 14:07:13 -0700 (PDT)
+Message-ID: <5e33618d-1c06-b42a-0755-bf8661895e9b@redhat.com>
+Date:   Fri, 1 Sep 2023 23:07:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230901082025.20548-2-vbabka@suse.cz>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [GIT PULL] KVM: x86: MMU changes for 6.6
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+References: <20230830000633.3158416-1-seanjc@google.com>
+ <20230830000633.3158416-4-seanjc@google.com> <ZPDNielH+HOYV89u@google.com>
+ <CABgObfZoJjz1-CMGCQqNjA8i_DivgevEhw+EqfbD463JAMe_bA@mail.gmail.com>
+ <ZPIwtfkVAyFWy41I@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <ZPIwtfkVAyFWy41I@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 01, 2023 at 10:20:26AM +0200, Vlastimil Babka wrote:
-> As Kirill pointed out, mapping can be removed under us due to
-> truncation. Test it under folio lock as already done for the async
-> compaction / dirty folio case. To prevent locking every folio with
-> mapping to do the test, do it only for unevictable folios, as we can
-> expect the unmovable mapping folios are also unevictable - it is the
-> case for guest memfd folios.
+On 9/1/23 20:43, Sean Christopherson wrote:
+>> Ok, I'll apply these by hand.
+> In case you haven't taken care of this already, here's an "official" tested fix.
 > 
-> Also incorporate comment update suggested by Matthew.
-> 
-> Fixes: 3424873596ce ("mm: Add AS_UNMOVABLE to mark mapping as completely unmovable")
-> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+> Like, if you can give your SoB, I'd rather give you full author credit and sub
+> me out entirely.
 
-Superficially looks good to me. But I don't really understand this
-code path to Ack.
+I prefer to squash and possibly face Linus's wrath. :)
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Paolo
+
