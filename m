@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 764C77903C1
-	for <lists+kvm@lfdr.de>; Sat,  2 Sep 2023 00:50:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D81657903C2
+	for <lists+kvm@lfdr.de>; Sat,  2 Sep 2023 00:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351083AbjIAWuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 18:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
+        id S1351094AbjIAWua (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 18:50:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351086AbjIAWuY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 18:50:24 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050B1E5B
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 15:50:16 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59222a14ee1so30237827b3.1
-        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 15:50:16 -0700 (PDT)
+        with ESMTP id S238767AbjIAWu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 18:50:26 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71C9E56
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 15:50:18 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-591138c0978so28502057b3.1
+        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 15:50:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693608616; x=1694213416; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1693608618; x=1694213418; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=mi8kN2V/PmfjoqL/WNq2YxxWTqvv0j5fmwWTlPyDpS4=;
-        b=Q++cdHUWlKx3WxIfrmzcg8/Z4aB5Rvp0I2pQQ0dhYeK7Lzbi2pVdh/M3ro6nTeMIPv
-         A7HVjvMm2iYuohBxsD37etdgl7es8RXSCT1P7NIH1BK0vjiZL5s6AaA4HgDPpzwrrszl
-         TB8JOJMLjqzayMWDjxMH7zmHMaKzmL7FvxLUjaiey8QuI2UhzapZbzQN5lMVtN1i61J4
-         gcNRFu4Ps1kxV09OIvemiRX7fZdQxZBCSlg2DHMfcuC5WZO/nk3eWaMLRqVgw2fXLqjF
-         4c2kzTAQ/ZmjqCXCPEFA3KryqC85Pf4+lCzGa0/61HUCPT9Ura5jWM7TaCrxHsU/AYcK
-         Qjrw==
+        bh=o4uMkW6+u2fqOnORIlbAm4eByiwjzu00DIRnYZ+D4Ek=;
+        b=rH6zwK7E+ajlARZ9usyaFLo80FSVg25GTylh2or5jtTvlUPDLMjuDZ5/9IN9KQZJCV
+         kqBDkv0BOUAoo74TCJjGSrAWMSWgv6VGecifvN3xox39lh2+ZcBW4iSOhGLkZEzE0AoP
+         +xZxO+tecTP5wKxHaP6Uy9or0kNhhmhJvvXND4HoSFHERRzp7bZxuBSYryDYApd0xI44
+         YDy28zcX3aA9lkyWjmWN0uQeJ54r1CguwQpDDgODmeNfh8mrOO08LM8QY1flmoyXWSJP
+         gBK9UAdzGO0rJg6hzpidLEkbkmeLEe3b/Tgx7QBcy98pQD3gJ3TCCmkfLqK3kF1qkghJ
+         MEkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693608616; x=1694213416;
+        d=1e100.net; s=20221208; t=1693608618; x=1694213418;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mi8kN2V/PmfjoqL/WNq2YxxWTqvv0j5fmwWTlPyDpS4=;
-        b=RGiAoeNqFzxQxDummdkQgJTKCTXFGjkr2csGv0mvlHMfIEfDSRmvYUf31si/JGl+iQ
-         9d0ivabfESOkZN0hskMcoBvNEz8F48dnQ/23+YvrwfQJcZKKOqLqrdg0rrbV55lXFSON
-         VO3J4XpRGDIk2QDn6YKG5+IT08FHTjA8Qgs10xu9SSBGW5YN6evcVxugGtGNDkkD0sQc
-         N7iEzXi8hAQtpipkjDHizbfGn7XPV1h7UgGVPu9AypMpitNd3DbhaZq1hUb2GKX7Tlmu
-         CcDTwjmuC2b/hRGYfEQnIiS/HGxb9QFHw02WxDvzmfwl9IZABVjWiDmYHSMnq+SJREaY
-         onlA==
-X-Gm-Message-State: AOJu0YwiS5z/v5OTK9oSo/ffe6xJvgevpsZE5FcBKGISIGic6CSFzRXj
-        4TPVkn/6e/7g8RReC8ml4EYQ1AzCrVo=
-X-Google-Smtp-Source: AGHT+IFqxVFI4CzFmZzzVuZO+71Vw0bTY1wEJTOyQedgjLupxVJ/LI0XsQYAPIT5VO5itRSzxhz2BPVWs7Q=
+        bh=o4uMkW6+u2fqOnORIlbAm4eByiwjzu00DIRnYZ+D4Ek=;
+        b=cOZJ+ZaeGOyqx6vFsuIeOk7Giq/dCq4gJbyG1BnRYlM0KSaAXihD1dOTzsy1TWLv/+
+         N5bFdxEFd+Ufy1t4NWtASkyNDqjukOAole4NQWajh0wkeYUyOQWO5sSAADbVxWmORMjD
+         GirX45Jh6MUKVoSbSdTQYW+VPmrZIW8xMGpAiESugS+6lXgrZWhH7jSGOktZvfaxgrb8
+         AwVFfKShP8jivgataJyIjDsg8xVpRz3boS1FjpP/2llWVilj+WfSUUv9DoBhEBWaevvw
+         1kuCn3YK+loHq5d/LeWzBIuwI6n8iLDJ5nDOH9vwP734L2MnC+96KDzlQ+yEHukY4Bma
+         38wQ==
+X-Gm-Message-State: AOJu0Yx9I1onOtPqHlGDhJz38Ko5Xsc32r+Hcr9aEMR5pfzygNJG3hid
+        UcoP2oRMWtVmRL4VLQvbp4iNv6gPET8=
+X-Google-Smtp-Source: AGHT+IE0z4XE+GZyUgUr4YFsCW8qZIBo/khtB8qpZXKB9+1nw0z7JvhTIGpNhyZPvcL2sqTtI9YcX/wPrHg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c103:0:b0:589:9ebc:4bfc with SMTP id
- f3-20020a81c103000000b005899ebc4bfcmr109361ywi.9.1693608616193; Fri, 01 Sep
- 2023 15:50:16 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:ad16:0:b0:58f:b749:a50b with SMTP id
+ l22-20020a81ad16000000b0058fb749a50bmr101834ywh.4.1693608618089; Fri, 01 Sep
+ 2023 15:50:18 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  1 Sep 2023 15:50:00 -0700
+Date:   Fri,  1 Sep 2023 15:50:01 -0700
 In-Reply-To: <20230901225004.3604702-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230901225004.3604702-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230901225004.3604702-5-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 4/7] nVMX: Rename vmlaunch_succeeds() to vmlaunch()
+Message-ID: <20230901225004.3604702-6-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 5/7] nVMX: Shuffle test_host_addr_size() tests
+ to "restore" CR4 and RIP
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -68,64 +69,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename vmlaunch_succeeds() to just vmlaunch(), the "succeeds" postfix is
-misleading for any test that expects VMLAUNCH to _fail_ as it gives the
-false impression that the helper expects VMLAUNCH to succeed.
+Re-order the testcases in test_host_addr_size() to guarantee that the host
+CR4 and RIP values are either written or restored before each testcase.
+If a test fails unexpectedly, running with a test value from a previous
+testcase may cause all subsequent tests to also fail, e.g. if the CR4
+PCIDE test fails, all of the RIP tests will fail because of the bad CR4.
+
+This also "fixes" the noncanonical RIP testcase, as running with the bad
+CR4 setup by the !PAE testcase would mask a missed noncanonical check.
+
+[sean: Surprise! The bad CR4 is indeed masking a bug.  I'm leaving it for
+ now and intentionally creating a failing testcase for a commit or two to
+ highlight the importance of cleaning up after testcases, and isolating
+ what is actually being tested.]
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx_tests.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ x86/vmx_tests.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 03da5307..376d0a53 100644
+index 376d0a53..1a340242 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -3290,7 +3290,7 @@ static void invvpid_test(void)
-  * VMLAUNCH fails early and execution falls through to the next
-  * instruction.
-  */
--static bool vmlaunch_succeeds(void)
-+static bool vmlaunch(void)
- {
- 	u32 exit_reason;
+@@ -7634,6 +7634,12 @@ static void test_host_addr_size(void)
+ 		report_prefix_pop();
+ 	}
  
-@@ -3320,7 +3320,7 @@ success:
-  */
- static void test_vmx_vmlaunch(u32 xerror)
- {
--	bool success = vmlaunch_succeeds();
-+	bool success = vmlaunch();
- 	u32 vmx_inst_err;
++	vmcs_write(HOST_CR4, cr4_saved  & ~X86_CR4_PAE);
++	report_prefix_pushf("\"CR4.PAE\" unset");
++	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
++	vmcs_write(HOST_CR4, cr4_saved);
++	report_prefix_pop();
++
+ 	for (i = 32; i <= 63; i = i + 4) {
+ 		tmp = rip_saved | 1ull << i;
+ 		vmcs_write(HOST_RIP, tmp);
+@@ -7642,12 +7648,6 @@ static void test_host_addr_size(void)
+ 		report_prefix_pop();
+ 	}
  
- 	report(success == !xerror, "vmlaunch %s",
-@@ -3339,7 +3339,7 @@ static void test_vmx_vmlaunch(u32 xerror)
-  */
- static void test_vmx_vmlaunch2(u32 xerror1, u32 xerror2)
- {
--	bool success = vmlaunch_succeeds();
-+	bool success = vmlaunch();
- 	u32 vmx_inst_err;
+-	vmcs_write(HOST_CR4, cr4_saved  & ~X86_CR4_PAE);
+-	report_prefix_pushf("\"CR4.PAE\" unset");
+-	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+-	vmcs_write(HOST_CR4, cr4_saved);
+-	report_prefix_pop();
+-
+ 	vmcs_write(HOST_RIP, NONCANONICAL);
+ 	report_prefix_pushf("HOST_RIP %llx", NONCANONICAL);
+ 	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+@@ -7657,7 +7657,17 @@ static void test_host_addr_size(void)
+ 	vmcs_write(HOST_RIP, rip_saved);
+ 	vmcs_write(HOST_CR4, cr4_saved);
  
- 	if (!xerror1 == !xerror2)
-@@ -3487,7 +3487,7 @@ static void test_secondary_processor_based_ctls(void)
- 	 */
- 	vmcs_write(CPU_EXEC_CTRL0, primary & ~CPU_SECONDARY);
- 	vmcs_write(CPU_EXEC_CTRL1, ~0);
--	report(vmlaunch_succeeds(),
-+	report(vmlaunch(),
- 	       "Secondary processor-based controls ignored");
- 	vmcs_write(CPU_EXEC_CTRL1, secondary);
- 	vmcs_write(CPU_EXEC_CTRL0, primary);
-@@ -7320,7 +7320,7 @@ static void test_pgc_vmlaunch(u32 xerror, u32 xreason, bool xfail, bool host)
- 	struct vmx_state_area_test_data *data = &vmx_state_area_test_data;
- 
- 	if (host) {
--		success = vmlaunch_succeeds();
-+		success = vmlaunch();
- 		obs = rdmsr(data->msr);
- 		if (!success) {
- 			inst_err = vmcs_read(VMX_INST_ERROR);
+-	/* Restore host's active RIP and CR4 values. */
++	/*
++	 * Restore host's active CR4 and RIP values by triggering a VM-Exit.
++	 * The original CR4 and RIP values in the VMCS are restored between
++	 * testcases as needed, but don't guarantee a VM-Exit and so the active
++	 * CR4 and RIP may still hold a test value.  Running with the test CR4
++	 * and RIP values at some point is unavoidable, and the active values
++	 * are unlikely to affect VM-Enter, so the above doen't force a VM-Exit
++	 * between testcases.  Note, if VM-Enter is surrounded by CALL+RET then
++	 * the active RIP will already be restored, but that's also not
++	 * guaranteed, and CR4 needs to be restored regardless.
++	 */
+ 	report_prefix_pushf("restore host state");
+ 	test_vmx_vmlaunch(0);
+ 	report_prefix_pop();
 -- 
 2.42.0.283.g2d96d420d3-goog
 
