@@ -2,171 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A872C78F674
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 02:44:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1B8D78F6B2
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 03:29:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347961AbjIAAoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 20:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44114 "EHLO
+        id S1348054AbjIAB3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 21:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231699AbjIAAoW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 20:44:22 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2077.outbound.protection.outlook.com [40.107.100.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF764E55;
-        Thu, 31 Aug 2023 17:44:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zqh3zLnry/CcF3Hllt3SMqRDyQBpsbKXK5kM2aH6zwPv4snBzC6P9QzoVDdjPLO94jJBaPLlQx3ueE59N3xxonSMDvyrasrl6+TLqesARJMS7uvyKBGHszfz4Pum1nM8dcJ0/FWoG7hClXfz+TaCt9BwZS7V9v9sIVPK0ZCY1UTMbU9/1J5cofqcMxsyJIJO9mIPlZdu1ppfNvZYwh9KCYKhBtNGaKdpNSIHQblDYsHqCwwHwAywaw9FjbwInEprZtnMicn6d14ZGqPPisZSnUjI7DsvHO1z+9xHVDKVJukfahg1BkdC/tpXEmn0bbySTdgAQkdoS7h9uxiu1lSO8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q26UUkOUc1hFrwUTWomiHGn0+MmPQ2ySsxAnbfkeDHY=;
- b=mYBNim/KfPVf2K5aTOa9JUeoeA4RPZEfJeX79MRZiW1P8vUQ2aJEpRteD2Te32fyMmM54HRb4N9etq/rdOFDXELoKTo6pEQEyGwDtn7rJFfN6xsgurEh5exDd9i86S0rGQvkLA+lZtE37VMPiyAasEZnRUY8ZkbD99Yj4pFQJixc9M0sapTNFitBWznsQTsJMPA0WLHQNlYid3zdtrdWL4ZlTAOZVr/zjZgGQFFcl0hjciwtlrwF2QrEUb197cTIp3h1BOQE8MJ5maRXEO1TWaFGPI/jBOvRMwgITags+IhWhA3mZlF2NXkMLk8EGZnN5Gpw7eE/v5Ba+lbY1C5zhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q26UUkOUc1hFrwUTWomiHGn0+MmPQ2ySsxAnbfkeDHY=;
- b=GVZ2ka65tKu3aWCrWeBKuqOyqoxN78LQqsIKDWd0LaCJA/LHALcjNkHbep8anUEfye/zykysepJerVKnPmDS0lCdbkwrWhlP4Q8HVEKEGsj0TWlFK3HhuJkVtr4HUREzRhUXy2m+wjSTvLULzo5Zw2J21464Dc2SIc8ApGgqO329G2eU23uURzohCaiJOt8H74a0HKhowMHpoaV3IDnwWYsCAUtFPn5GWeAO4fqkFicLWQkPe48gwUnOFIfwdTSJrr/naVFiV03mjdlj2yQ22aeO96FD/muTlWs7p00g0GuY29ND/GvmJH7paqqwrOJ4xNkr2cz9HT8/CYu6Qy7zbw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5999.namprd12.prod.outlook.com (2603:10b6:510:1db::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Fri, 1 Sep
- 2023 00:44:16 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6745.020; Fri, 1 Sep 2023
- 00:44:16 +0000
-Date:   Thu, 31 Aug 2023 21:44:13 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Ankit Agrawal <ankita@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-        Vikram Sethi <vsethi@nvidia.com>,
-        Andy Currid <acurrid@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <danw@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Airlie <airlied@redhat.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        Daniel Vetter <daniel@ffwll.ch>
-Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Message-ID: <ZPEz3fy78wFvRuCB@nvidia.com>
-References: <20230822202303.19661-1-ankita@nvidia.com>
- <ZO9JKKurjv4PsmXh@infradead.org>
- <ZO9imcoN5l28GE9+@nvidia.com>
- <ZPCG9/P0fm88E2Zi@infradead.org>
- <BY5PR12MB37631B2F41DB62CBDD7B1F69B0E5A@BY5PR12MB3763.namprd12.prod.outlook.com>
- <ZPCd2sHXrAZHjsHg@infradead.org>
- <20230831122150.2b97511b.alex.williamson@redhat.com>
+        with ESMTP id S1348044AbjIAB3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 21:29:07 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F8C2E70
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 18:28:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693531726; x=1725067726;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=jcNJ3QYMrTqoK9L+yVuOb08DWygtNbDciY8Xr0vyAjs=;
+  b=XCpauqdHj623g6K17aGsoa4HIKz5srC/M6GqfB6ZZN2v3VPApIwOMx9A
+   PrRKxFM2aLShCcj3Vk8q4Hqy+mr+ovyhBIlyjYk9n3KqJZwlpRdCD0pV0
+   wDTPOAApq5/HsUJV5rnhWW1RBJ7tzCUOWjhg5TuCoeys31vL5eOdi9Q3K
+   TEdE3j1Ox8C58X5mDz56wk3TmCgqk8pN3etersemRPxgNW2eBQbYGn/CT
+   DtjOpRXQ5+b0zZrWQX02nHaFkrf6Onhf7QPG/q1Yw/diyFrawq/zCnzms
+   JP364xLmj7HBoz6LrvXrvuP5Jv8mtkiEqZZmT2ji7xAuvL1PJ0vIafqx+
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="376045535"
+X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
+   d="scan'208";a="376045535"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 18:28:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="805244416"
+X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
+   d="scan'208";a="805244416"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.80])
+  by fmsmga008.fm.intel.com with ESMTP; 31 Aug 2023 18:28:41 -0700
+Date:   Fri, 1 Sep 2023 09:17:11 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Fuad Tabba <tabba@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jorg Rodel <jroedel@suse.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
+Message-ID: <20230901011711.GA673287@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <ZOjpIL0SFH+E3Dj4@google.com>
+ <20230829091233.GA72470@chaop.bj.intel.com>
+ <ZPDcAuHcoRfU+yRX@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230831122150.2b97511b.alex.williamson@redhat.com>
-X-ClientProxiedBy: SJ0PR05CA0153.namprd05.prod.outlook.com
- (2603:10b6:a03:339::8) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5999:EE_
-X-MS-Office365-Filtering-Correlation-Id: 68863643-61a0-4ad5-b8fd-08dbaa849196
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Xl7lOBvymrA7zOiFQdl1hwxWGbLmt9iXDzwF15C2OzWS2uYq8xpo+EvTDugWgHbQCy4jFYUcrzklZEpKhRlRKLUjadHQatDH1UtGKtNe3GoDZ68wFHLSyIatLAecZLjVG4gfm+dvtN+73cddgh/cNh1v5HC61QDCSPltTEGcuhJ8STL8pBUicfDE4JIKukQ7i4zLOiczutzlavrtjRKy3xJcAv97dTHlkZ20fbAhFeBntP5kz/r7z51fPjsh03wl1gprIXuV2WGmntyHKwmczF10D9GKqDxz0VBzNrme2FkrV2JopXFTEkyoqxX7AI9QfVTWJKY6n3/QOrqls6D9rHeN5gPNLxa5DbV9+OQEUgIxSd7RYFfVkdZuPhDc8jtQFC4YDhcBZFemZDz3RhMz6OotNsRfpbHb0XOrfnh2pYFSlIRmJQ40dNcHkfKEN1v4LGLpirqkE04Czj/S64qIF/EJS0fpJkTVEdf3RlmlqWQ35pqgTP5iqXNamJQCSr1jqAxdDgcp9HLhKl8JMcacehf+RiKkgozA6/Xsgm1Cn31ZOBMFw1ps/fATsl/KFAQC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(136003)(346002)(39860400002)(186009)(451199024)(1800799009)(6666004)(6506007)(6486002)(6512007)(478600001)(83380400001)(2906002)(2616005)(26005)(41300700001)(7416002)(54906003)(316002)(66476007)(6916009)(8676002)(66946007)(5660300002)(8936002)(4326008)(66556008)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zTVBfVtnvm3sm/mmbM0kJE3WQkTrDoDQX0nQONBBU2VY6Lguniclh8i2HEUh?=
- =?us-ascii?Q?T05V9j5uuS8AnjuUmKoQgA8c+C7n9gOOEz0VTbOwQLUn8CHlCvaHJw+oypgK?=
- =?us-ascii?Q?YESLMVUCfeL1jVukNgCHKSihtk38VXPwb/34pc5j0uV5b9DYrSS2YFiHpSr2?=
- =?us-ascii?Q?BPICwuC9M6UC7mJjLIxvLtl2NjQg0ID500G+Z2GKHuLbNKoYOaQm4iBIDJR+?=
- =?us-ascii?Q?5519Vr9/me6REdS+C4jQqRGO1zTjHX42kVIgq8KBTNjQD25cqHqbfq06pmCm?=
- =?us-ascii?Q?GCN1iz0oyib0a5iYCLi6o11T3W/xtmdaTkOV1uToLCiRyua2AGP2oH3mfsMG?=
- =?us-ascii?Q?9JBZ8xWkR1xhB9H3H/ZNyi1/jyaOgf4Bf+zqtm/7ZqYHTUNsojvtb/MJsUzq?=
- =?us-ascii?Q?rJxLk2nouTYxEhdfKETUOP4jrtngPUwbTfvtCR8LbZmCmYjHRW26HlRzeFcN?=
- =?us-ascii?Q?5tkezb5MzRPA7bRutgk1fvJ+weYgBJbHP8pOUqRuPEuq60uWkTM/OW4awGpM?=
- =?us-ascii?Q?z238393W01K6QgfULp5OHyLBP8GrTT/MrIK+PjExFSZ8wMQBOlVPiXOQiKbV?=
- =?us-ascii?Q?Y1AYUoOta+sM2uWs9G6LcGHz7CiRAZwozqsmGhojQXiCS5nIfV5lA00Ey9uA?=
- =?us-ascii?Q?SgpptftjfODMZQweKtNJXe/QVJpT9V/P/kUvv+9ltc9xtLtY6TYEk0GqcoIN?=
- =?us-ascii?Q?BdFE89ABbgCKiV5sqfN7zMs/SACcOmVmq1xAUfu+ScexIb6a19JXgNHA+obM?=
- =?us-ascii?Q?nHPOInVbiZywozbBCEH+q9pEd4qrVYFGnJwJUekFjQy2thr0bcCJmfQdmKPc?=
- =?us-ascii?Q?E8/ZHbNyzPw/q7yZbOdb7h+lzH12LXCGqxsN7RViRXqlH+PwS+niAm0Pq1jA?=
- =?us-ascii?Q?OkCVi62c5he7bFksLTTulvbz17ujsXzYHBUeoEMLyNVH8xn/EA6kqvd15VHs?=
- =?us-ascii?Q?g4laFag3pnO5qRRsRlfQHzBHaCS4fqvQp/qvwaS6H/z0WY89MMHEkQa7Bq/4?=
- =?us-ascii?Q?wyZTCJOmB+F35BTGFlaHJ/ZZQgfeKbN5GWIrR6wZr3nZFuDk3TJihqLuD6/0?=
- =?us-ascii?Q?uxJ15to7voVbecQBRNG9yt8xduzxqBcIThY7d2WgX9Ob7sqFZxEOIJnbzSfu?=
- =?us-ascii?Q?dGzIcO9Q9z9JLaESkBHIlG0pYmR4Rn7gtHVCfr/zzj4wifCv4P5wssfpSKJq?=
- =?us-ascii?Q?H3PWC4taGQOxXLB+PBCgnFxyB/TnWNUlWCrA3c7fc2ZXBhGgu+VFvF1+Ed+x?=
- =?us-ascii?Q?8oksCMYIunWTvomBR8Kh0L75N/hHg4vnLMK+F/995+EnhMF0Qne4dVsT1uDr?=
- =?us-ascii?Q?UAo9waDXUWgN8mjs4qD1aZ7dQ+URN4GDcUBXX6zVmAUKncGPbCFYNY5zjPSj?=
- =?us-ascii?Q?Haf4wupxdtpn72iPnV37FqHue8VQZzOkPIt4IhzqXHwFENokYUU0vCisQccw?=
- =?us-ascii?Q?qTVvQw7XvblnXCtvOCFlFvGFh31A0JSKgyfCTOo2qQbpgQLAeLGoDW4L3foa?=
- =?us-ascii?Q?bFNaCY2E0xk28Vu24Ua+YX7pFayQ6FQ8TUDCwxX1smTUAPuy2X28Nw2/1Mv7?=
- =?us-ascii?Q?EK0Ho+3WJODh/i2spQQcvIV1w5x3HCa3XFIamwz9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68863643-61a0-4ad5-b8fd-08dbaa849196
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2023 00:44:16.0566
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7HcfgIO/eMibIuFNca1onhMowP588SETQXtElmkCSEAfNmjg9zNGCKON/G5yjO6V
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5999
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <ZPDcAuHcoRfU+yRX@google.com>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 31, 2023 at 12:21:50PM -0600, Alex Williamson wrote:
+On Thu, Aug 31, 2023 at 11:29:22AM -0700, Sean Christopherson wrote:
+> On Tue, Aug 29, 2023, Chao Peng wrote:
+> > On Fri, Aug 25, 2023 at 10:47:12AM -0700, Sean Christopherson wrote:
+> > > 
+> > > 
+> > > Filemap vs. xarray
+> > > ------------------
+> > > This is the main item that needs attention.  I don't want to merge guest_memfd()
+> > > without doing this comparison, as not using filemap means we don't need AS_UNMOVABLE.
+> > > Arguably we could merge a filemap implementation without AS_UNMOVABLE and just eat
+> > > the suboptimal behavior, but not waiting a little while longer to do everything we
+> > > can to get this right the first time seems ridiculous after we've been working on
+> > > this for literally years.
+> > > 
+> > > Paolo was going to work on an axarray implementation, but AFAIK he hasn't done
+> > > anything yet.  We (Google) don't have anyone available to work on an xarray
+> > > implementation for several weeks (at best), so if anyone has the bandwidth and
+> > > desire to take stab at an xarray implementation, please speak up.
+> > 
+> > I can do some experiments in the following weeks on the xarray
+> > direction. I'm not quite confident I understood all what Paolo
+> > originally wanted to do, so questions may have.
+> 
+> FYI, I jumped the gun, sounds like Paolo got far enough along to form a strong
+> opinion[*].
 
-> I assume the above driver understands how to access and make use of
-> this coherent memory whether running bare-metal or virtualized, so
-> potentially we have some understanding of how it's used by the driver,
-> which can't be said for all devices used with vfio.  I'm therefore not
-> sure how we can suddenly decide to impose a mainline driver requirement
-> for exposing a device to userspace.  Thanks,
+Yeah, I see that, that is a good news actually, then we can go ahead with
+the current filemap one. I personally think these mm touchpoints are not
+a big deal when compared to previous versions, most part we are just using
+the APIs.
 
-Yeah, I was comfortable with removing the old powernv VFIO stuff based
-on the combined logic that the platform was dead, powernv has weird
-arch entanglements and there was no open source driver anyhow so
-maintaining the mess past the vendor lifetime was looking bad. This
-has none of those issues.
+> 
+> Thanks for volunteering though, much appreciated!
 
-I think the threshold here should be the maintainability of the kernel
-and its associated open ecosystem. An open source qemu, and a open
-source VM kernel driver is a pretty good situation to sustain this
-driver. In particular if Alex&co think the qemu side should not
-advance then this should not be merged.
+NP, any collaboration is to make this lasting years series merge earlier.
 
-For comparison, I'm much more unhappy about VFIO_UPDATE_VADDR from a
-maintainability perspective than I am about this. There was a half
-hearted effort to get the userspace side in qemu and now we are now
-stuck with an ugly kernel side mess with no open source userspace so
-we can't even test. :\ Considering the vigorous objections when I
-tried to remove it I assume a cloud operator is running it with a
-proprietary userspace.
-
-Certainly I would strongly support removing kernel side parts if the
-qemu side doesn't get merged within a year or something like that.
-
-Jason
+Chao
+> 
+> [*] https://lore.kernel.org/all/CABgObfay4FKV=foWLZzAWaC2kVHRnF1ib+6NC058QVZVFhGeyA@mail.gmail.com
