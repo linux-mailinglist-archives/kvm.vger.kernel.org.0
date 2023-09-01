@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9963778F977
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 10:03:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8323C78F9E0
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 10:20:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243379AbjIAIDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 04:03:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34156 "EHLO
+        id S244010AbjIAIUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 04:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233314AbjIAIDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 04:03:46 -0400
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65C2C10D7
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 01:03:43 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id a640c23a62f3a-99df431d4bfso199827766b.1
-        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 01:03:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693555422; x=1694160222; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0PJF2sdOqWMTdhnOy+ah6h0lRpj4+pB07jQ8lCelNXs=;
-        b=EEzVjQ5pDzbfnOA8AgoBNam9i9FNWjRed/3Z5oVZR+FYe0fzje+qJGSprCler35Oa5
-         zkbNeG2ZbsAUcjwoYqk8f974em0ILaFoqk8TT2/avkCisdY+fKD0yM+AS19HV7i6+ouz
-         sCdWnLwYUMvhusYd29ZMczAxCAzh7KApDstCSHeOWPQvWjAcgn8ARyacvLGJh22UrUS8
-         T9C+ZadgRzg8C/YGyYxeAI0bdS9QlgoNcWJfE1WjPIhAkczh2IloYGmWEY5sL0zAVCuy
-         IkEqSLJJnHNLJQccCF/K8Jjqage3hDjCzZzVGCAVQ2QEq0looiDuszG9FoPq6tiFaVIK
-         9Jew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693555422; x=1694160222;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0PJF2sdOqWMTdhnOy+ah6h0lRpj4+pB07jQ8lCelNXs=;
-        b=WjCnn6M59wzpjo9jUhXkqaj+WOjzC2h7ugHuYfZdeenN44ipInySPFgoSQqKRe4Uj+
-         pkjutFz/jIdNPjUe0Mggu7cekqxZfeqPT7A5yJZrFgJSUIyu6v9GNpzhaNEvFknVDov4
-         AZlUoSfMzWM00OQwiBjK/yLHVtOotiYIzU2vmmPRO+Ls3/O2BSvl48Hg0k+ovDxxYNOc
-         M6EOBuSlL/ge+3nv5R196ljhd0fwiTiEgjWSYGNTwWMYwQakVt+m+GGIHipltuRUEilR
-         oRW+YP2xnx2GiUkoiLUhU6PK8MmgxE6xTum2KbX6Cc5e01jYe4BsNrKn8CSjLQxvIV0E
-         f8pQ==
-X-Gm-Message-State: AOJu0YzqvVgPFyU8syN0fIw8aSgb2du4RAew0CPU+Py7LIgAqSb637ZL
-        X5MfoMVIUNGdvyg5lNWwY1uQ4w==
-X-Google-Smtp-Source: AGHT+IGymkOKommHWfDqJ3IlTz+5W9APgk0soidXVbcbnmRwhMH15DRV2R3BelGzHFNdLEB4Ag12Pw==
-X-Received: by 2002:a17:906:1cf:b0:9a5:a068:5548 with SMTP id 15-20020a17090601cf00b009a5a0685548mr1082864ejj.75.1693555421945;
-        Fri, 01 Sep 2023 01:03:41 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id t1-20020a170906268100b00993150e5325sm1685356ejc.60.2023.09.01.01.03.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Sep 2023 01:03:41 -0700 (PDT)
-Date:   Fri, 1 Sep 2023 10:03:40 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <anup@brainfault.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.6
-Message-ID: <20230901-a316e896c1355315c18dbe41@orel>
-References: <CAAhSdy2XiFD1QC+v_UZ5G0TAhmT8uH48=UQdu6=bL=EPWy+2Kg@mail.gmail.com>
- <CABgObfbHSkoavDYqKhhotn0cOFr+x2QRYD4NN9v_55tK4nxQoQ@mail.gmail.com>
+        with ESMTP id S241886AbjIAIUf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 04:20:35 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B3610DE;
+        Fri,  1 Sep 2023 01:20:32 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B16B32185C;
+        Fri,  1 Sep 2023 08:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1693556430; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=0WI96qvBSKjcD8skIYDzJyfhIXrX2VNlBg1bDAXSO7w=;
+        b=r4AvfguvEQvHBhS4L8lDsEaveieeJTkNCYi5f+9IRURkHs9QHXGXU55bgZKYP/UIN96eLm
+        Su7gVEZFmwF5EXNaNlCErp7Hgj8GQqdQewKT6RBq+dcvYVgxoLUZe9WovHMiX8iQwt+NsA
+        NGR32KTwfyM1j9J07mti1C+WlqZc3DM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1693556430;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=0WI96qvBSKjcD8skIYDzJyfhIXrX2VNlBg1bDAXSO7w=;
+        b=LDBeIJn7DjHmpeWPe/JUiDen1A1u3hmJEXiXvjRyh5pbOBnd20g14NvrGZHMhmcFppSIaI
+        jb3axaR9hQtT2aCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 27C7D1358B;
+        Fri,  1 Sep 2023 08:20:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id M/8FCc6e8WSYGwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 01 Sep 2023 08:20:30 +0000
+From:   Vlastimil Babka <vbabka@suse.cz>
+To:     seanjc@google.com
+Cc:     ackerleytng@google.com, akpm@linux-foundation.org,
+        anup@brainfault.org, aou@eecs.berkeley.edu,
+        chao.p.peng@linux.intel.com, chenhuacai@kernel.org,
+        david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org,
+        jmorris@namei.org, kirill.shutemov@linux.intel.com,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, liam.merwick@oracle.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-riscv@lists.infradead.org,
+        linux-security-module@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name,
+        maz@kernel.org, michael.roth@amd.com, mpe@ellerman.id.au,
+        oliver.upton@linux.dev, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, paul@paul-moore.com, pbonzini@redhat.com,
+        qperret@google.com, serge@hallyn.com, tabba@google.com,
+        vannapurve@google.com, vbabka@suse.cz, wei.w.wang@intel.com,
+        willy@infradead.org, yu.c.zhang@linux.intel.com
+Subject: [PATCH gmem FIXUP] mm, compaction: make testing mapping_unmovable() safe
+Date:   Fri,  1 Sep 2023 10:20:26 +0200
+Message-ID: <20230901082025.20548-2-vbabka@suse.cz>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfbHSkoavDYqKhhotn0cOFr+x2QRYD4NN9v_55tK4nxQoQ@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -79,65 +80,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 31, 2023 at 07:28:41PM +0200, Paolo Bonzini wrote:
-> On Wed, Aug 23, 2023 at 7:25 PM Anup Patel <anup@brainfault.org> wrote:
-> >
-> > Hi Paolo,
-> >
-> > We have the following KVM RISC-V changes for 6.6:
-> > 1) Zba, Zbs, Zicntr, Zicsr, Zifencei, and Zihpm support for Guest/VM
-> > 2) Added ONE_REG interface for SATP mode
-> > 3) Added ONE_REG interface to enable/disable multiple ISA extensions
-> > 4) Improved error codes returned by ONE_REG interfaces
-> > 5) Added KVM_GET_REG_LIST ioctl() implementation for KVM RISC-V
-> > 6) Added get-reg-list selftest for KVM RISC-V
-> >
-> > Please pull.
-> >
-> > Regards,
-> > Anup
-> >
-> > The following changes since commit 52a93d39b17dc7eb98b6aa3edb93943248e03b2f:
-> >
-> >   Linux 6.5-rc5 (2023-08-06 15:07:51 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.6-1
-> >
-> > for you to fetch changes up to 477069398ed6e0498ee243e799cb6c68baf6ccb8:
-> >
-> >   KVM: riscv: selftests: Add get-reg-list test (2023-08-09 12:15:27 +0530)
-> >
-> > ----------------------------------------------------------------
-> > KVM/riscv changes for 6.6
-> >
-> > - Zba, Zbs, Zicntr, Zicsr, Zifencei, and Zihpm support for Guest/VM
-> > - Added ONE_REG interface for SATP mode
-> > - Added ONE_REG interface to enable/disable multiple ISA extensions
-> > - Improved error codes returned by ONE_REG interfaces
-> > - Added KVM_GET_REG_LIST ioctl() implementation for KVM RISC-V
-> > - Added get-reg-list selftest for KVM RISC-V
-> >
-> > ----------------------------------------------------------------
-> > Andrew Jones (9):
-> >       RISC-V: KVM: Improve vector save/restore errors
-> >       RISC-V: KVM: Improve vector save/restore functions
-> >       KVM: arm64: selftests: Replace str_with_index with strdup_printf
-> >       KVM: arm64: selftests: Drop SVE cap check in print_reg
-> >       KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
-> >       KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
-> >       KVM: arm64: selftests: Delete core_reg_fixup
-> >       KVM: arm64: selftests: Split get-reg-list test code
-> >       KVM: arm64: selftests: Finish generalizing get-reg-list
-> 
-> Pulled, thanks, but I'll give a closer look to these patches after
-> kicking the long-running tests. It would have been nicer to get an
-> Acked-by from either me or Marc or Oliver, but no huge deal.
+As Kirill pointed out, mapping can be removed under us due to
+truncation. Test it under folio lock as already done for the async
+compaction / dirty folio case. To prevent locking every folio with
+mapping to do the test, do it only for unevictable folios, as we can
+expect the unmovable mapping folios are also unevictable - it is the
+case for guest memfd folios.
 
-FWIW, we got a "seems fine" from Marc [1].
+Also incorporate comment update suggested by Matthew.
 
-https://lore.kernel.org/all/87y1ilpz3m.wl-maz@kernel.org/
+Fixes: 3424873596ce ("mm: Add AS_UNMOVABLE to mark mapping as completely unmovable")
+Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+---
+Feel free to squash into 3424873596ce.
 
-Thanks,
-drew
+ mm/compaction.c | 49 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
+
+diff --git a/mm/compaction.c b/mm/compaction.c
+index a3d2b132df52..e0e439b105b5 100644
+--- a/mm/compaction.c
++++ b/mm/compaction.c
+@@ -862,6 +862,7 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 
+ 	/* Time to isolate some pages for migration */
+ 	for (; low_pfn < end_pfn; low_pfn++) {
++		bool is_dirty, is_unevictable;
+ 
+ 		if (skip_on_failure && low_pfn >= next_skip_pfn) {
+ 			/*
+@@ -1047,10 +1048,6 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
+ 			goto isolate_fail_put;
+ 
+-		/* The mapping truly isn't movable. */
+-		if (mapping && mapping_unmovable(mapping))
+-			goto isolate_fail_put;
+-
+ 		/*
+ 		 * Only allow to migrate anonymous pages in GFP_NOFS context
+ 		 * because those do not depend on fs locks.
+@@ -1062,8 +1059,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if (!folio_test_lru(folio))
+ 			goto isolate_fail_put;
+ 
++		is_unevictable = folio_test_unevictable(folio);
++
+ 		/* Compaction might skip unevictable pages but CMA takes them */
+-		if (!(mode & ISOLATE_UNEVICTABLE) && folio_test_unevictable(folio))
++		if (!(mode & ISOLATE_UNEVICTABLE) && is_unevictable)
+ 			goto isolate_fail_put;
+ 
+ 		/*
+@@ -1075,26 +1074,42 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+ 		if ((mode & ISOLATE_ASYNC_MIGRATE) && folio_test_writeback(folio))
+ 			goto isolate_fail_put;
+ 
+-		if ((mode & ISOLATE_ASYNC_MIGRATE) && folio_test_dirty(folio)) {
+-			bool migrate_dirty;
++		is_dirty = folio_test_dirty(folio);
++
++		if (((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty)
++		    || (mapping && is_unevictable)) {
++			bool migrate_dirty = true;
++			bool is_unmovable;
+ 
+ 			/*
+-			 * Only pages without mappings or that have a
+-			 * ->migrate_folio callback are possible to migrate
+-			 * without blocking. However, we can be racing with
+-			 * truncation so it's necessary to lock the page
+-			 * to stabilise the mapping as truncation holds
+-			 * the page lock until after the page is removed
+-			 * from the page cache.
++			 * Only folios without mappings or that have
++			 * a ->migrate_folio callback are possible to migrate
++			 * without blocking.
++			 *
++			 * Folios from unmovable mappings are not migratable.
++			 *
++			 * However, we can be racing with truncation, which can
++			 * free the mapping that we need to check. Truncation
++			 * holds the folio lock until after the folio is removed
++			 * from the page so holding it ourselves is sufficient.
++			 *
++			 * To avoid this folio locking to inspect every folio
++			 * with mapping for being unmovable, we assume every
++			 * such folio is also unevictable, which is a cheaper
++			 * test. If our assumption goes wrong, it's not a bug,
++			 * just potentially wasted cycles.
+ 			 */
+ 			if (!folio_trylock(folio))
+ 				goto isolate_fail_put;
+ 
+ 			mapping = folio_mapping(folio);
+-			migrate_dirty = !mapping ||
+-					mapping->a_ops->migrate_folio;
++			if ((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty) {
++				migrate_dirty = !mapping ||
++						mapping->a_ops->migrate_folio;
++			}
++			is_unmovable = mapping && mapping_unmovable(mapping);
+ 			folio_unlock(folio);
+-			if (!migrate_dirty)
++			if (!migrate_dirty || is_unmovable)
+ 				goto isolate_fail_put;
+ 		}
+ 
+-- 
+2.41.0
+
