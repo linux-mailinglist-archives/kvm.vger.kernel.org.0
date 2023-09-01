@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1848F78F91F
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 09:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9125478F920
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 09:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238793AbjIAHaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 03:30:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45446 "EHLO
+        id S1348505AbjIAHaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 03:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348500AbjIAHaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 03:30:10 -0400
+        with ESMTP id S1348499AbjIAHaU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 03:30:20 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCAC1724
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 00:29:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA1E10D4
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 00:29:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693553385; x=1725089385;
+  t=1693553394; x=1725089394;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YPa75IoSHXcqVnGyb8+Uwwta16Yye+wwmIWExyWjphA=;
-  b=KqDildXGMMtqD7pr1dde4l7zUhc2lxtI7t6CCSpuxBSxMDvgIXzTVNSX
-   ls5QnpXJqyTuo/8Ly8lxdUDv+Fbb16Xj86Ek+EfLCsAMAqiN/HkxGSl+L
-   jkYVuBOrpVbVyebGIOy7UAWiRZ/bhtCvvCJ/RDtuyP6VxyZdISCU5hIDH
-   Ii9/pIbpqqAjOasVY+uDDhRXSmj7+zzZC5PvqOAStEImKbPcrnaoAiocm
-   U8hf9vvkb8WuHHbgjV+rLAAKih3DorE6zq5ZPji8DjQniQzpHO54qCRR3
-   Uxt8Uq3Myg94kdVkXF5xVaF8qgdwKI6ev3P9AiWrJx9nmFagHNbIcyr94
+  bh=ZlJm63XsJYbPCtU6pjKTIlK5jdBIk4qSUq5NaaZ/EzQ=;
+  b=AeVnL9IJBd9NyUJcQ2e15s7gxDaCYqNmBX9tX/ErEPGEltY8o+/i0dqA
+   +xXndFgQKdt/hqz+WuhRvf7MzrIclaLLG0p4UbIzQBnbTkKx3DRvnOWHG
+   bYo3A5GpWzCbnj0XE+knGkzyXFZMLbSmzADyhpRLqqeFOWnyXrEDJ8oYw
+   gEo190E5ZOl96XRXg8rFhxb3tnuuWTOXp1QWT5IXHJBa8lHIi1Ea6OLpL
+   RiC7SGJFl389hZ9eWcht/78L1QFWgIT3HKR1oQhldrkJgHgpkQKyJgnpx
+   ii6VxMSp2Xp5n5rLk8IIvxAEEm9shjTDTSauFzFkqli87zEYNe1XuUwm5
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="373550369"
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="373550376"
 X-IronPort-AV: E=Sophos;i="6.02,219,1688454000"; 
-   d="scan'208";a="373550369"
+   d="scan'208";a="373550376"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:45 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="716671365"
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="716671394"
 X-IronPort-AV: E=Sophos;i="6.02,219,1688454000"; 
-   d="scan'208";a="716671365"
+   d="scan'208";a="716671394"
 Received: from wangdere-mobl2.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.255.29.239])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:42 -0700
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:46 -0700
 From:   Xiong Zhang <xiong.y.zhang@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     seanjc@google.com, like.xu.linux@gmail.com, zhiyuan.lv@intel.com,
         zhenyu.z.wang@intel.com, kan.liang@intel.com,
         dapeng1.mi@linux.intel.com, Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: [PATCH 8/9] KVM: x86/pmu: Upgrade pmu version to 5 on intel processor
-Date:   Fri,  1 Sep 2023 15:28:08 +0800
-Message-Id: <20230901072809.640175-9-xiong.y.zhang@intel.com>
+Subject: [PATCH 9/9] KVM: selftests: Add fixed counters enumeration test case
+Date:   Fri,  1 Sep 2023 15:28:09 +0800
+Message-Id: <20230901072809.640175-10-xiong.y.zhang@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230901072809.640175-1-xiong.y.zhang@intel.com>
 References: <20230901072809.640175-1-xiong.y.zhang@intel.com>
@@ -60,45 +60,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Modern intel processors have supported Architectural Performance
-Monitoring Version 5, this commit upgrade Intel vcpu's vPMU
-version from 2 to 5.
+vPMU v5 adds fixed counter enumeration, which allows user space to
+specify which fixed counters are supported through emulated
+CPUID.0Ah.ECX.
 
-Go through PMU features from version 3 to 5, the following
-features are not supported:
-1. AnyThread counting: it is added in v3, and deprecated in v5.
-2. Streamed Freeze_PerfMon_On_PMI in v4, since legacy Freeze_PerMon_ON_PMI
-isn't supported, the new one won't be supported neither.
-3. IA32_PERF_GLOBAL_STATUS.ASCI[bit 60]: Related to SGX, and will be
-emulated by SGX developer later.
-4. Domain Separation in v5. When INV flag in IA32_PERFEVTSELx is used, a
-counter stops counting when logical processor exits the C0 ACPI C-state.
-First guest INV flag isn't supported, second guest ACPI C-state is vague.
-
-When a guest enable unsupported features through WRMSR, KVM will inject
-a #GP into the guest.
+This commit adds a test case which specify the max fixed counter
+supported only, so guest can access the max fixed counter only, #GP
+exception will be happen once guest access other fixed counters.
 
 Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
 ---
- arch/x86/kvm/pmu.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 84 +++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 4bab4819ea6c..8e6bc9b1a747 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -215,7 +215,10 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
- 		return;
- 	}
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index ebbcb0a3f743..e37dc39164fe 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -18,6 +18,8 @@
+ #include "kvm_util.h"
+ #include "vmx.h"
  
--	kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
-+	if (is_intel)
-+		kvm_pmu_cap.version = min(kvm_pmu_cap.version, 5);
-+	else
-+		kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
- 	kvm_pmu_cap.num_counters_gp = min(kvm_pmu_cap.num_counters_gp,
- 					  pmu_ops->MAX_NR_GP_COUNTERS);
- 	kvm_pmu_cap.num_counters_fixed = min(kvm_pmu_cap.num_counters_fixed,
++uint8_t fixed_counter_num;
++
+ union perf_capabilities {
+ 	struct {
+ 		u64	lbr_format:6;
+@@ -233,6 +235,86 @@ static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
+ 	kvm_vm_free(vm);
+ }
+ 
++static void guest_v5_code(void)
++{
++	uint8_t  vector, i;
++	uint64_t val;
++
++	for (i = 0; i < fixed_counter_num; i++) {
++		vector = rdmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, &val);
++
++		/*
++		 * Only the max fixed counter is supported, #GP will be generated
++		 * when guest access other fixed counters.
++		 */
++		if (i == fixed_counter_num - 1)
++			__GUEST_ASSERT(vector != GP_VECTOR,
++				       "Max Fixed counter is accessible, but get #GP");
++		else
++			__GUEST_ASSERT(vector == GP_VECTOR,
++				       "Fixed counter isn't accessible, but access is ok");
++	}
++
++	GUEST_DONE();
++}
++
++#define PMU_NR_FIXED_COUNTERS_MASK  0x1f
++
++static void test_fixed_counter_enumeration(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int r;
++	struct kvm_cpuid_entry2 *ent;
++	struct ucall uc;
++	uint32_t fixed_counter_bit_mask;
++
++	if (kvm_cpu_property(X86_PROPERTY_PMU_VERSION) != 5)
++		return;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_v5_code);
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	ent = vcpu_get_cpuid_entry(vcpu, 0xa);
++	fixed_counter_num = ent->edx & PMU_NR_FIXED_COUNTERS_MASK;
++	TEST_ASSERT(fixed_counter_num > 0, "fixed counter isn't supported");
++	fixed_counter_bit_mask = (1ul << fixed_counter_num) - 1;
++	TEST_ASSERT(ent->ecx == fixed_counter_bit_mask,
++		    "cpuid.0xa.ecx != %x", fixed_counter_bit_mask);
++
++	/* Fixed counter 0 isn't in ecx, but in edx, set_cpuid should be error. */
++	ent->ecx &= ~0x1;
++	r = __vcpu_set_cpuid(vcpu);
++	TEST_ASSERT(r, "Setting in-consistency cpuid.0xa.ecx and edx success");
++
++	if (fixed_counter_num == 1) {
++		kvm_vm_free(vm);
++		return;
++	}
++
++	/* Support the max Fixed Counter only */
++	ent->ecx = 1UL << (fixed_counter_num - 1);
++	ent->edx &= ~(u32)PMU_NR_FIXED_COUNTERS_MASK;
++
++	r = __vcpu_set_cpuid(vcpu);
++	TEST_ASSERT(!r, "Setting modified cpuid.0xa.ecx and edx failed");
++
++	vcpu_run(vcpu);
++
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++		break;
++	case UCALL_DONE:
++		break;
++	default:
++		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
++	}
++
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	union perf_capabilities host_cap;
+@@ -253,4 +335,6 @@ int main(int argc, char *argv[])
+ 	test_immutable_perf_capabilities(host_cap);
+ 	test_guest_wrmsr_perf_capabilities(host_cap);
+ 	test_lbr_perf_capabilities(host_cap);
++
++	test_fixed_counter_enumeration();
+ }
 -- 
 2.34.1
 
