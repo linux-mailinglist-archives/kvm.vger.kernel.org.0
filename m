@@ -2,184 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9125478F920
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 09:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D529F78F92B
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 09:35:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348505AbjIAHaU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 03:30:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
+        id S238181AbjIAHfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 03:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348499AbjIAHaU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 03:30:20 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA1E10D4
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 00:29:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693553394; x=1725089394;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ZlJm63XsJYbPCtU6pjKTIlK5jdBIk4qSUq5NaaZ/EzQ=;
-  b=AeVnL9IJBd9NyUJcQ2e15s7gxDaCYqNmBX9tX/ErEPGEltY8o+/i0dqA
-   +xXndFgQKdt/hqz+WuhRvf7MzrIclaLLG0p4UbIzQBnbTkKx3DRvnOWHG
-   bYo3A5GpWzCbnj0XE+knGkzyXFZMLbSmzADyhpRLqqeFOWnyXrEDJ8oYw
-   gEo190E5ZOl96XRXg8rFhxb3tnuuWTOXp1QWT5IXHJBa8lHIi1Ea6OLpL
-   RiC7SGJFl389hZ9eWcht/78L1QFWgIT3HKR1oQhldrkJgHgpkQKyJgnpx
-   ii6VxMSp2Xp5n5rLk8IIvxAEEm9shjTDTSauFzFkqli87zEYNe1XuUwm5
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="373550376"
-X-IronPort-AV: E=Sophos;i="6.02,219,1688454000"; 
-   d="scan'208";a="373550376"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="716671394"
-X-IronPort-AV: E=Sophos;i="6.02,219,1688454000"; 
-   d="scan'208";a="716671394"
-Received: from wangdere-mobl2.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.255.29.239])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2023 00:29:46 -0700
-From:   Xiong Zhang <xiong.y.zhang@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, like.xu.linux@gmail.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com,
-        dapeng1.mi@linux.intel.com, Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: [PATCH 9/9] KVM: selftests: Add fixed counters enumeration test case
-Date:   Fri,  1 Sep 2023 15:28:09 +0800
-Message-Id: <20230901072809.640175-10-xiong.y.zhang@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230901072809.640175-1-xiong.y.zhang@intel.com>
-References: <20230901072809.640175-1-xiong.y.zhang@intel.com>
+        with ESMTP id S234471AbjIAHfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 03:35:53 -0400
+Received: from out-235.mta0.migadu.com (out-235.mta0.migadu.com [91.218.175.235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F7310D2
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 00:35:50 -0700 (PDT)
+Date:   Fri, 1 Sep 2023 09:35:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1693553749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uSTkpiBeyJOSrDyBqH5u+QE0xVO5xgn5RZNE7JKVcac=;
+        b=YunA2qSYy4vcIkBJ5DQbT7RYLD/OWgVFsES3gy7S0S3TpjGK/GdAZrCZgktwl4SABbAmV4
+        v8IwiGnGXpVDM/6UsvuPyoH+He74lAdYDdEYiIWvqsGO/7CEIAE9D5BfBWG1uCUjeyVAco
+        dRtzNx/jHIO+Bak/lzkbHN1MJvP+T0A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        kvm@vger.kernel.org, qemu-trivial@nongnu.org
+Subject: Re: [PATCH] arm64: Restore trapless ptimer access
+Message-ID: <20230901-16232ff17690fc32a0feb5df@orel>
+References: <20230831190052.129045-1-coltonlewis@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230831190052.129045-1-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vPMU v5 adds fixed counter enumeration, which allows user space to
-specify which fixed counters are supported through emulated
-CPUID.0Ah.ECX.
+On Thu, Aug 31, 2023 at 07:00:52PM +0000, Colton Lewis wrote:
+> Due to recent KVM changes, QEMU is setting a ptimer offset resulting
+> in unintended trap and emulate access and a consequent performance
+> hit. Filter out the PTIMER_CNT register to restore trapless ptimer
+> access.
+> 
+> Quoting Andrew Jones:
+> 
+> Simply reading the CNT register and writing back the same value is
+> enough to set an offset, since the timer will have certainly moved
+> past whatever value was read by the time it's written.  QEMU
+> frequently saves and restores all registers in the get-reg-list array,
+> unless they've been explicitly filtered out (with Linux commit
+> 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
+> restore trapless ptimer accesses, we need a QEMU patch to filter out
+> the register.
+> 
+> See
+> https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
 
-This commit adds a test case which specify the max fixed counter
-supported only, so guest can access the max fixed counter only, #GP
-exception will be happen once guest access other fixed counters.
+The link can be shorter with
 
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
----
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 84 +++++++++++++++++++
- 1 file changed, 84 insertions(+)
+https://lore.kernel.org/all/20230823200408.1214332-1-coltonlewis@google.com/
 
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-index ebbcb0a3f743..e37dc39164fe 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-@@ -18,6 +18,8 @@
- #include "kvm_util.h"
- #include "vmx.h"
- 
-+uint8_t fixed_counter_num;
-+
- union perf_capabilities {
- 	struct {
- 		u64	lbr_format:6;
-@@ -233,6 +235,86 @@ static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
- 	kvm_vm_free(vm);
- }
- 
-+static void guest_v5_code(void)
-+{
-+	uint8_t  vector, i;
-+	uint64_t val;
-+
-+	for (i = 0; i < fixed_counter_num; i++) {
-+		vector = rdmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, &val);
-+
-+		/*
-+		 * Only the max fixed counter is supported, #GP will be generated
-+		 * when guest access other fixed counters.
-+		 */
-+		if (i == fixed_counter_num - 1)
-+			__GUEST_ASSERT(vector != GP_VECTOR,
-+				       "Max Fixed counter is accessible, but get #GP");
-+		else
-+			__GUEST_ASSERT(vector == GP_VECTOR,
-+				       "Fixed counter isn't accessible, but access is ok");
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+#define PMU_NR_FIXED_COUNTERS_MASK  0x1f
-+
-+static void test_fixed_counter_enumeration(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int r;
-+	struct kvm_cpuid_entry2 *ent;
-+	struct ucall uc;
-+	uint32_t fixed_counter_bit_mask;
-+
-+	if (kvm_cpu_property(X86_PROPERTY_PMU_VERSION) != 5)
-+		return;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_v5_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	ent = vcpu_get_cpuid_entry(vcpu, 0xa);
-+	fixed_counter_num = ent->edx & PMU_NR_FIXED_COUNTERS_MASK;
-+	TEST_ASSERT(fixed_counter_num > 0, "fixed counter isn't supported");
-+	fixed_counter_bit_mask = (1ul << fixed_counter_num) - 1;
-+	TEST_ASSERT(ent->ecx == fixed_counter_bit_mask,
-+		    "cpuid.0xa.ecx != %x", fixed_counter_bit_mask);
-+
-+	/* Fixed counter 0 isn't in ecx, but in edx, set_cpuid should be error. */
-+	ent->ecx &= ~0x1;
-+	r = __vcpu_set_cpuid(vcpu);
-+	TEST_ASSERT(r, "Setting in-consistency cpuid.0xa.ecx and edx success");
-+
-+	if (fixed_counter_num == 1) {
-+		kvm_vm_free(vm);
-+		return;
-+	}
-+
-+	/* Support the max Fixed Counter only */
-+	ent->ecx = 1UL << (fixed_counter_num - 1);
-+	ent->edx &= ~(u32)PMU_NR_FIXED_COUNTERS_MASK;
-+
-+	r = __vcpu_set_cpuid(vcpu);
-+	TEST_ASSERT(!r, "Setting modified cpuid.0xa.ecx and edx failed");
-+
-+	vcpu_run(vcpu);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	union perf_capabilities host_cap;
-@@ -253,4 +335,6 @@ int main(int argc, char *argv[])
- 	test_immutable_perf_capabilities(host_cap);
- 	test_guest_wrmsr_perf_capabilities(host_cap);
- 	test_lbr_perf_capabilities(host_cap);
-+
-+	test_fixed_counter_enumeration();
- }
--- 
-2.34.1
+> for additional context.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
+Thanks for the testing and posting, Colton. Please add your s-o-b and a
+Tested-by tag as well.
+
+Thanks,
+drew
+
+> ---
+>  target/arm/kvm64.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 4d904a1d11..2dd46e0a99 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
+>   */
+>  static const CPRegStateLevel non_runtime_cpregs[] = {
+>      { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+>  };
+>  
+>  int kvm_arm_cpreg_level(uint64_t regidx)
+> -- 
+> 2.42.0.283.g2d96d420d3-goog
+> 
