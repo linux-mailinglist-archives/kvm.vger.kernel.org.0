@@ -2,117 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72F7B78F545
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 00:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED4A578F669
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 02:36:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347660AbjHaWHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Aug 2023 18:07:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40752 "EHLO
+        id S1347947AbjIAAgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Aug 2023 20:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235211AbjHaWHX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Aug 2023 18:07:23 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB68B8
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 15:07:20 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fb9323a27so16477077b3.1
-        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 15:07:20 -0700 (PDT)
+        with ESMTP id S233963AbjIAAgf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Aug 2023 20:36:35 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBBA4E4F
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 17:36:32 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-26d49cf1811so981314a91.0
+        for <kvm@vger.kernel.org>; Thu, 31 Aug 2023 17:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693519640; x=1694124440; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qgnjEF4yFasLmpmpPrDGfWRlTkHCJIfRLIREm8beBzY=;
-        b=t7Io5IhL9RSuMhtkctSkxHUvO49KKR8JyuvpkVwzmIs8/jD6gi4VZiGJfH6LcsSE9q
-         V8I/TuC5PRNTUNqw22BsFHNgxv/AXhZMhWHLs9Gc4vAQPYKKcCxrdyewkseilVP7NuWQ
-         dAd2VIANco0vjDM3D/CtFfpWQRG7mxCZUP81ZONaddE/pUc2s9eEl3CvCF7cO6ynMWYY
-         Cv5Myn7vOTKa9JKc/7WhmGc9g8rnQG3rPTFWgTDNuqDBLqp8AA3x/FqH2yr1WhauiiMd
-         UqH6j6pKm64HQcqijTt4iUSJAjitO01RtBK28emi0fm9mD93QRbnrcM/9WJhlJPaQxlZ
-         mmPw==
+        d=linaro.org; s=google; t=1693528592; x=1694133392; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jG6ZCPZiU9m+IO+qPr5q8Xh7kOdEhSQ//hb0yLOiMcg=;
+        b=VJpySOPx6Ltn/eD2BxazXCV6oaXOR1o1vBlbqLAQi8O/glxvM8lnPXyuHchEEJIqpt
+         c/ULbZBFAgTV9ZhoWf7mMqFT6MgNLTSUpmtSiw0YowtRNnaLBIioFIyiXIL8fzF2ULC3
+         dDqNu4I1EHJH78OhVheQzYoDaL59q5eT0aZ6ug8nAzb5YWs73HFtiqMNF7/NBiUlIoNz
+         wBPDt0FvC0qZQfJT1W9ztXMdAN7rboJyYTKfWg+ARzVgaIXfCPEuN4cWSuNANGK3ID+A
+         qvW5Kdk7M/LXB2D4weY0SUkecO07eCTjfAb9BxAq7iYz5VICwnA4gjcIBY+dPkGNmU+/
+         HEcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693519640; x=1694124440;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qgnjEF4yFasLmpmpPrDGfWRlTkHCJIfRLIREm8beBzY=;
-        b=VSq5gJWQnaH56JYKVHpCymAdfwptsYq0QyiiTGQpavuatQTDHZQvcEBXEW/zpzoYCf
-         lTnWvPnlLaXFzy+a820C5IYaz4gWzdffD9s9o6WfbNBuoHhlickdYbOY1jOe3wrfuO8i
-         /cjMmPOqdB8qDOR2bISl98Wwcd4C3NPWJLVAbZSi435m4KL7tEuBIPZbqia68Xt9Nxa/
-         Ekt21oPCwIHNA4sMbBsPzEyR7P49I+aCs1eBgf28acZjRf8ElsmYPP+59MbMHsveAY6/
-         fE1+QjxmxMSmvc7MDsNQ8Ju/26SQMQrTTmGZquvkr3bRSeGem+n9E84c1dnWD7YGOj6X
-         2iSg==
-X-Gm-Message-State: AOJu0YwFSglruws3x5GVCj3WoXg+73R3F7kqbloWaG1jZUahCeumu1LO
-        QUNg+yvEtqolq1Z7qiFfY0I1+9f8DRM=
-X-Google-Smtp-Source: AGHT+IH7jvi73S8Hy8V1cTNRJcs7gjaW7hdTTxoQCUGUr4SIru6AT2AYKzQ67n76Lv+PuuOp0QD90g+s5Og=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7343:0:b0:d77:df8a:389a with SMTP id
- o64-20020a257343000000b00d77df8a389amr23375ybc.3.1693519640007; Thu, 31 Aug
- 2023 15:07:20 -0700 (PDT)
-Date:   Thu, 31 Aug 2023 15:07:16 -0700
-In-Reply-To: <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
-Mime-Version: 1.0
-References: <ZO2RlYCDl8kmNHnN@torres.zugschlus.de> <ZO2piz5n1MiKR-3-@debian.me>
- <ZO3sA2GuDbEuQoyj@torres.zugschlus.de> <ZO4GeazfcA09SfKw@google.com>
- <ZO4JCfnzRRL1RIZt@torres.zugschlus.de> <ZO4RzCr/Ugwi70bZ@google.com>
- <ZO4YJlhHYjM7MsK4@torres.zugschlus.de> <ZO4nbzkd4tovKpxx@google.com> <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
-Message-ID: <ZPEPFJ8QvubbD3H9@google.com>
-Subject: Re: Linux 6.5 speed regression, boot VERY slow with anything systemd related
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Haber <mh+linux-kernel@zugschlus.de>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, linux-kernel@vger.kernel.org,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tony Lindgren <tony@atomide.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1693528592; x=1694133392;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jG6ZCPZiU9m+IO+qPr5q8Xh7kOdEhSQ//hb0yLOiMcg=;
+        b=Zg9dPS88WTEmo18tUJETTk0qSegyJmPSqfuIn13anuM+KKpD2xhnReXlbz+aGQeEX7
+         Ls0rXPTAaLb+ZqyWbqzbnhik2H2Pi88IPqNe8aPLo40T4lZ+G7nQb9OraXWDhbm5LKIt
+         inIsTLkyO80aUhl2EnwBZSdB4/diUMLNd0362fCfSdTz04z/WsrOHF4aYTJ99+lze2Pb
+         lRHfpwITz0gDRrCwyZZWc1fBUrdEm0Pi5juQUm36FFq0qv2xc28sai5NmheQmbJVHW0E
+         zSAIZAO7oBgFR7YFEacbYrrUqnkI2bdjq1W5y+g6vBf7PR55Lka9jNZP9qvjhZ3TBiAf
+         zxgw==
+X-Gm-Message-State: AOJu0YyxXDcNtXbDqgAWUqdiS8+gyzdk2qx7zzCoAYv0Tp2lLSLB5LGn
+        lA/NTyMWFcCPgqnr38Bsm/gCE84MkoinUILGCvg=
+X-Google-Smtp-Source: AGHT+IGks/9QnTWTqH9/IwKnrpQme5JKpmjQJnyjOajqJkxRfMivGUwaU6cXgMWhc2k8VbSIx7Xr6A==
+X-Received: by 2002:a17:90a:c688:b0:269:3771:7342 with SMTP id n8-20020a17090ac68800b0026937717342mr911835pjt.18.1693528592332;
+        Thu, 31 Aug 2023 17:36:32 -0700 (PDT)
+Received: from [192.168.0.4] ([71.212.131.115])
+        by smtp.gmail.com with ESMTPSA id 12-20020a170902c20c00b001b8b1f6619asm1790758pll.75.2023.08.31.17.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Aug 2023 17:36:31 -0700 (PDT)
+Message-ID: <4129dd8d-a626-d138-47fb-0cbb8f6ad4f4@linaro.org>
+Date:   Thu, 31 Aug 2023 17:36:30 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] arm64: Restore trapless ptimer access
+Content-Language: en-US
+To:     Colton Lewis <coltonlewis@google.com>, qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        qemu-trivial@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
+References: <20230831190052.129045-1-coltonlewis@google.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20230831190052.129045-1-coltonlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 29, 2023, Marc Haber wrote:
-> Hi,
->=20
-> On Tue, Aug 29, 2023 at 10:14:23AM -0700, Sean Christopherson wrote:
-> > On Tue, Aug 29, 2023, Marc Haber wrote:
-> > > Both come from virt-manager, so if the XML helps more, I'll happy to
-> > > post that as well.
-> >=20
-> > Those command lines are quite different, e.g. the Intel one has two
-> > serial ports versus one for the AMD VM.
->=20
-> Indeed? I virt-manager, I don't see a second serial port. In either case,
-> only the one showing up in the VM as ttyS0 is being used. But thanks for
-> making me look, I discovered that the machine on the Intel host still
-> used emulated SCSI instead of VirtIO f=C3=BCr the main disk. I changed th=
-at.
->=20
-> >Unless Tony jumps in with an
-> > idea, I would try massaging either the good or bad VM's QEMU
-> > invocation, e.g. see if you can get the AMD VM to "pass" by pulling in
-> > stuff from the Intel VM, or get the Intel VM to fail by making its
-> > command line look more like the AMD VM.
->=20
-> In Virt-Manager, both machines don't look THAT different tbh. I verified
-> the XML and the differences are not big at all.
->=20
-> Do you want me to try different vCPU types? Currently the VM is set to
-> "Opteron_G3", would you recommend a different vCPU for the host having a
-> "AMD GX-412TC SOC" host CPU?
+On 8/31/23 12:00, Colton Lewis wrote:
+> Due to recent KVM changes, QEMU is setting a ptimer offset resulting
+> in unintended trap and emulate access and a consequent performance
+> hit. Filter out the PTIMER_CNT register to restore trapless ptimer
+> access.
+> 
+> Quoting Andrew Jones:
+> 
+> Simply reading the CNT register and writing back the same value is
+> enough to set an offset, since the timer will have certainly moved
+> past whatever value was read by the time it's written.  QEMU
+> frequently saves and restores all registers in the get-reg-list array,
+> unless they've been explicitly filtered out (with Linux commit
+> 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
+> restore trapless ptimer accesses, we need a QEMU patch to filter out
+> the register.
+> 
+> See
+> https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
+> for additional context.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
-I would be surprised if using a different vCPU type fixed anything, but it'=
-s not
-impossible that it could help.  In general, unless someone from the serial =
-driver
-side spots an issue, fixing whatever the bug is will likely require a repro=
-ducer,
-which in turn likely means narrowing down what exactly is unique about your=
- AMD
-setup.  In other words, if you have cycles to spare, anything you can do to=
- help
-isolate the problem would be appreciated.
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+
+r~
+
+> ---
+>   target/arm/kvm64.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 4d904a1d11..2dd46e0a99 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
+>    */
+>   static const CPRegStateLevel non_runtime_cpregs[] = {
+>       { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+>   };
+>   
+>   int kvm_arm_cpreg_level(uint64_t regidx)
+
