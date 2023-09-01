@@ -2,103 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F468790249
-	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 20:57:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8169790272
+	for <lists+kvm@lfdr.de>; Fri,  1 Sep 2023 21:23:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349050AbjIAS5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Sep 2023 14:57:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54054 "EHLO
+        id S243373AbjIATX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Sep 2023 15:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345183AbjIAS5U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Sep 2023 14:57:20 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB0EE56
-        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 11:57:16 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b88decb2a9so3204805ad.0
-        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 11:57:16 -0700 (PDT)
+        with ESMTP id S229750AbjIATX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Sep 2023 15:23:27 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 776FF10DF
+        for <kvm@vger.kernel.org>; Fri,  1 Sep 2023 12:23:24 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34b4b2608e3so7987875ab.3
+        for <kvm@vger.kernel.org>; Fri, 01 Sep 2023 12:23:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693594636; x=1694199436; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UTtQ2n9VcqGq8vgh9w64aDfJyyICRpGgD1PyNdDzmPc=;
-        b=tV+tCDtFjP19VpIMqqU8wR91VFBObR5+7LYbPD2aACjy5p2OC2Hw/7Axlc2eha5VHr
-         rpD/38AccAIPzooW9uJZ0eGn3W0FBjKfyjPXrmsw2vaoIoirakb1plgPPrnOvdF7TjiV
-         5xRGLVanG0Vk6dn0FHTLgyWJHxz81diaXkHNl6xHQjGU3PjgnFuyTT1F+sTFek++6/Tw
-         BZxnCsk3TcV8aiyjYe0TC0C46ZZX9weEqqJQcgCAOybVbH2bZ6tbIdhHd92pRY4209AJ
-         1kBaagEQGAnEoFnuBSnqZZZBDuIAEEvD40mhKVo1ggww47fKrZAi3IWhWqrj84gF1iWJ
-         ZIAw==
+        d=google.com; s=20221208; t=1693596204; x=1694201004; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jk8eU1YUzlGph2kkfy1NgH1ax2sGgPgvKzoaDKemgb4=;
+        b=Ot+3td20zRC5TQ5TGtiiXj8uJP35Gw26KIKOyw0DOG28VudLa7bkvPiOS6M1fzBP4y
+         rbP+G3IOjE6U+uG/ILpLLh83pnvAdgcbBqGhAV7yd8QZLA10pR9761rOxnysP8CkC2do
+         eji+iWIYYJzmwNPHGYglyKX2LJVSq482Lrlc+QUWJbEf2gShKnDdr2yFWiN/9DTEp0E3
+         gw5moI419cugO/TF42WHrBB6LHjOSRQo8J+Xc6ysqmNid7eFaWwg6NXqstv7xw1NRbmR
+         wvqNoJYGKofBERXWzRqlgCSzV9trKvezzWqin4zR2KLNwIeXNYowPs33Dzr7pNhGPCwk
+         arIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693594636; x=1694199436;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UTtQ2n9VcqGq8vgh9w64aDfJyyICRpGgD1PyNdDzmPc=;
-        b=jaOn1XFz+RaeZo4qoOYV2pqBBMMHAQOZv09ysAWvxs/Yxgvjo+oq/DuKKb07cME7EJ
-         AJTVGpMPJqSbuczswZZSvrE8rjvZhpFuyR6/Su+PhaO7xdLS8zOwt76kLo2ncwO4CQWv
-         ZWs74lofV7jJvOBOmU/Ol46L+3b0yopJfpqXLD9zcT+a5PkRC5upor36deXG1+ea1jNX
-         1+eT70B4Ln1czVMxvomRfSct/bfv2AvseG36ZehiDX2VySB1teqFkTMmoE+eHuBrJue6
-         BuNf8k6OXXD0UqifkCWnZ9ButstKKM+SD1wGzY1zl8bX6kQhYoQZ+SZnweYyG3xhDOYq
-         uHLQ==
-X-Gm-Message-State: AOJu0YxKU2qbZAc1Bgbu3Tvju48TqAsFjy0ankD88jHKA97CxaBJ5VGX
-        vyhaEQboRQZ3E80uXiSwQAyWBgxkUONLrrqobHcZVK0IUWuABvURGuiijMByVso9dZStGbWgwHQ
-        sW0DxpGCnnEr70kAd3O1DxAFnC+qPGZ3KvW2U8FTauZqnsz92bz34s/QU4a8qQP4=
-X-Google-Smtp-Source: AGHT+IFUFV5okVGqEGNyhdxRjhAZ9iywAihYO9xACtTXPYC0YkPvISZqyZAMxXSFmqpgqMSPLw8oyGUgWzZfRA==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a17:902:ce91:b0:1bb:ad19:6b77 with SMTP
- id f17-20020a170902ce9100b001bbad196b77mr1115240plg.2.1693594635978; Fri, 01
- Sep 2023 11:57:15 -0700 (PDT)
-Date:   Fri,  1 Sep 2023 11:56:46 -0700
-In-Reply-To: <20230901185646.2823254-1-jmattson@google.com>
-Mime-Version: 1.0
-References: <20230901185646.2823254-1-jmattson@google.com>
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230901185646.2823254-2-jmattson@google.com>
-Subject: [PATCH 2/2] KVM: x86: Mask LVTPC when handling a PMI
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Like Xu <likexu@tencent.com>, Mingwei Zhang <mizhang@google.com>,
-        Roman Kagan <rkagan@amazon.de>,
-        Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1693596204; x=1694201004;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jk8eU1YUzlGph2kkfy1NgH1ax2sGgPgvKzoaDKemgb4=;
+        b=flbBk2+FAYdU3CKJuiV14pT0ESHycjT61boFj/5YNnPqWGPuHVmz9Rp/JVSzxNBYIy
+         kfHifFS1WP6KoPpXff0qWmH/SoUGTaxSCruoMbsaopvRMBb3JUTBMwxImoLK/Ppomzi5
+         zFO4DDphV27TcjkOzlREkudnSkpfm6lHstJODYJwGCeVC4LlT+Oq04qbv5/WW9L5bWqN
+         zOVbqul4QB48vnBF3Hgo/KRWlHkzNffbFGO9mvFCqMePbV5C7TnGjAlN+HCaJsSm2k1B
+         +EqRAopyvvNhDx4NYJZ2XyWr9SI2zBdSqCFHTS+BXyunY/EOjiBg22ia/EzzHTRiNsue
+         /r7g==
+X-Gm-Message-State: AOJu0Yxt3soGNOwmNjA07V/rt6Yso6HgjQ8fDUBSmPe4d4MlrXe3g4yK
+        fYLKrCTYS1E7RgF3BhBb5bdTXw==
+X-Google-Smtp-Source: AGHT+IHARIbykt4ZHFf2A2z7AfZBgjkaI7ulhwMgGHyetk3eR9KVbd5UJppbxfa1hzIpHvaB8/atjw==
+X-Received: by 2002:a92:d284:0:b0:349:3c0:395d with SMTP id p4-20020a92d284000000b0034903c0395dmr3617488ilp.1.1693596203704;
+        Fri, 01 Sep 2023 12:23:23 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id v12-20020a92d24c000000b00345d6e8ded4sm1252896ilg.25.2023.09.01.12.23.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Sep 2023 12:23:23 -0700 (PDT)
+Date:   Fri, 1 Sep 2023 19:23:20 +0000
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+        kvm@vger.kernel.org, qemu-trivial@nongnu.org
+Subject: Re: [PATCH] arm64: Restore trapless ptimer access
+Message-ID: <ZPI6KNqGGTxxHhCh@google.com>
+References: <20230831190052.129045-1-coltonlewis@google.com>
+ <20230901-16232ff17690fc32a0feb5df@orel>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230901-16232ff17690fc32a0feb5df@orel>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Per the SDM, "When the local APIC handles a performance-monitoring
-counters interrupt, it automatically sets the mask flag in the LVT
-performance counter register."
+On Fri, Sep 01, 2023 at 09:35:47AM +0200, Andrew Jones wrote:
+> On Thu, Aug 31, 2023 at 07:00:52PM +0000, Colton Lewis wrote:
+> > Due to recent KVM changes, QEMU is setting a ptimer offset resulting
+> > in unintended trap and emulate access and a consequent performance
+> > hit. Filter out the PTIMER_CNT register to restore trapless ptimer
+> > access.
+> >
+> > Quoting Andrew Jones:
+> >
+> > Simply reading the CNT register and writing back the same value is
+> > enough to set an offset, since the timer will have certainly moved
+> > past whatever value was read by the time it's written.  QEMU
+> > frequently saves and restores all registers in the get-reg-list array,
+> > unless they've been explicitly filtered out (with Linux commit
+> > 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
+> > restore trapless ptimer accesses, we need a QEMU patch to filter out
+> > the register.
+> >
+> > See
+> > https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
+>
+> The link can be shorter with
+>
+> https://lore.kernel.org/all/20230823200408.1214332-1-coltonlewis@google.com/
 
-Add this behavior to KVM's local APIC emulation, to reduce the
-incidence of "dazed and confused" spurious NMI warnings in Linux
-guests (at least, those that use a PMI handler with "late_ack").
+I will keep that in mind next time.
 
-Fixes: 23930f9521c9 ("KVM: x86: Enable NMI Watchdog via in-kernel PIT source")
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/lapic.c | 2 ++
- 1 file changed, 2 insertions(+)
+> > for additional context.
+> >
+> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+>
+> Thanks for the testing and posting, Colton. Please add your s-o-b and a
+> Tested-by tag as well.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a983a16163b1..1a79ec54ae1e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2743,6 +2743,8 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
- 		vector = reg & APIC_VECTOR_MASK;
- 		mode = reg & APIC_MODE_MASK;
- 		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
-+		if (lvt_type == APIC_LVTPC)
-+			kvm_lapic_set_reg(apic, lvt_type, reg | APIC_LVT_MASKED);
- 		return __apic_accept_irq(apic, mode, vector, 1, trig_mode,
- 					NULL);
- 	}
--- 
-2.42.0.283.g2d96d420d3-goog
+Assuming it is sufficient to add here instead of reposting the whole patch:
 
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+Tested-by: Colton Lewis <coltonlewis@google.com>
+
+> > ---
+> >  target/arm/kvm64.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> > index 4d904a1d11..2dd46e0a99 100644
+> > --- a/target/arm/kvm64.c
+> > +++ b/target/arm/kvm64.c
+> > @@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
+> >   */
+> >  static const CPRegStateLevel non_runtime_cpregs[] = {
+> >      { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+> > +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+> >  };
+> >
+> >  int kvm_arm_cpreg_level(uint64_t regidx)
+> > --
+> > 2.42.0.283.g2d96d420d3-goog
+> >
