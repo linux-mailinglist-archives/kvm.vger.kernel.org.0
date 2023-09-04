@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65C8A791750
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EBBA791752
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:44:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352854AbjIDMn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:43:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
+        id S1352868AbjIDMoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:44:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350864AbjIDMn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:43:58 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD78CD4
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:52 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-52e297c7c39so1270571a12.2
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:52 -0700 (PDT)
+        with ESMTP id S239379AbjIDMoE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:44:04 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7E8CCC
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:58 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2bd6611873aso20724951fa.1
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693831431; x=1694436231; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1693831437; x=1694436237; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SdbPeRb3rqucMV4G8DmJatCRkQTtO6zKzLYWXw0g6yM=;
-        b=NKVUbO/Qvv7VF4HCE9AkPGvIpqppN1Lb7pn6sLpr2I7a+BXSA9m/XgqdhlHYW47jSP
-         2/RAYazx1fnIjcW9raSDp/zcTtn3qmle3E3k4IWOUMfeEWZTpB7l0P6Cq1J4RMQMrKoH
-         OZ5dyyBRDQNDDpg/js82OTR7XvvMk50wt4IqBrDbyPXz8KxxwL7SiWUjjQTx1z5dJRcq
-         6A8h389evNHpbTqctpCTnhz9AWSpygo7Fx+EmEYp2LyQD11jlTzvqsHCAtkC9HeZRsnW
-         R0pkpdaopmOw+EZz/hY23gQ4PzYDjkiW28e4/o9GVr3l9BwCZJLx7o7TjImGFti6kTCJ
-         Vs1g==
+        bh=J86j5mSNtE6sux8EpFhfC+5G/8PZx0ftCeNpTFb29eU=;
+        b=SA4Ljt8izFTEjOIyGfH3mYL4G0sv5r9YmpB2UHQpi77HaGm06BUPhZjt6UVls0K/5e
+         +q/pX8JHMtCBS2z6Q1B8hIL0Cln9etUQW38YokmiwE+Id20qwRthk2SjqrAlgeSG7LLJ
+         qTWOjzLt/21x1oocOdJ+CZS9Wciafl30IuU8rdPbnBF82HpJutWk/6ye/x0vYVAZYHZc
+         UCf84DohWnbBnASYheTZLRZqkiNNAp53qCgLySVJ/sXhUSbKfq9Sj4+hy2bHeOo5gXhq
+         w8ixz9mbCkwPZ258Lk5NG/HEnwv6d9CwAlNi7J05E/CKg9GI8lkDdmxeqvbEzxPUUGCi
+         O9fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693831431; x=1694436231;
+        d=1e100.net; s=20221208; t=1693831437; x=1694436237;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SdbPeRb3rqucMV4G8DmJatCRkQTtO6zKzLYWXw0g6yM=;
-        b=bBuUsyWJFpMUOrGbXJphZr/dUvjgSrWia34tS8aqYdSM5j9A+bbFQPHqldl3KTBH3O
-         uNZupYtkdWrPy8M2PgS0mk6I0zoH3uAJP5+GXwq0T4qU+Rx9FsVCTg5icz2sDaUYBSed
-         iV12iTjSvyHHxk0cnVG4a8efw0m+BU89cmZHSfa/S5jP7Op+Bl2KNI48FG6sYbzdAsZ3
-         AaQpbtQrIBxQdSAQzNzjzr9PLBExK2x20vRdGx2eoqrwzar1caA3vA+KyBTE6s0Yu2Td
-         CkCXHcAVnvfrsmNilQ3qZQ6rDaFbvLWbibO3PnrXJZEP7g6Urkn8z2aD06I1iPGr50xi
-         LaUA==
-X-Gm-Message-State: AOJu0YyuLdN/nqTRlK1SxYr85lXo0z8Qr1uSyaeKC7tC5XErUo2qZ5VO
-        wn1SR1fk8ZrDMe3ijVJxrHn7rg==
-X-Google-Smtp-Source: AGHT+IEsBFqUtTTs6WqvZHff9CgEl9Cr75zp000xY/akplngwM5ibOARO4pqK/3xRP1h2a6+OrAUVw==
-X-Received: by 2002:a17:906:cc5b:b0:99d:fd65:dbb2 with SMTP id mm27-20020a170906cc5b00b0099dfd65dbb2mr7528978ejb.33.1693831431480;
-        Mon, 04 Sep 2023 05:43:51 -0700 (PDT)
+        bh=J86j5mSNtE6sux8EpFhfC+5G/8PZx0ftCeNpTFb29eU=;
+        b=TEnW0LwvaMOHaP7A6BoIOy92IsIGTtPErAs7ee9VtYAvShqCTnYr0aTxpqDsgqYp+/
+         joSJVUS9GsWOacCH5fn9QprsFUnv4uoNlmKAQqtgqJrJZqCXtiwLJAW+AeKNKKTkAG2F
+         89DjKgWtKvi6fYWE9hwEyDMAQdwilsUyDYasIZVaT2hGQbirmGgmcJucho10h6kHkWZC
+         ZwsyQ4o09IAam+PhRTaCxvcfFxXRGsuugJLUOwPufOY1rp3PADOAg3PsdAFckly4t5pN
+         AkJ4T8ARPBOv6jkS8dtkcnLr3gqeBdUEtuCkjR0A/6udKyATW++NZBqSWj2+lc9uY9s2
+         Hj+g==
+X-Gm-Message-State: AOJu0Yw0tyJxIRvgC0DjJIhpNKfb7leTBRh6o08kbefUdRpnciaFuJWk
+        8f99ohQ6EjxgzXEJvO3FPbjUrQ==
+X-Google-Smtp-Source: AGHT+IHTKfewe5UyKQ+3sAtZlufz27CBCCuRSsD4I35Lg5dnHNAx7JD/gpJfXGmmCvEgfuCO6tDe+g==
+X-Received: by 2002:a19:ca4e:0:b0:4fb:9050:1d92 with SMTP id h14-20020a19ca4e000000b004fb90501d92mr5895100lfj.51.1693831437006;
+        Mon, 04 Sep 2023 05:43:57 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.209.227])
-        by smtp.gmail.com with ESMTPSA id y8-20020a170906914800b00992f2befcbcsm6120980ejw.180.2023.09.04.05.43.50
+        by smtp.gmail.com with ESMTPSA id qc8-20020a170906d8a800b009944e955e19sm6102288ejb.30.2023.09.04.05.43.55
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 04 Sep 2023 05:43:51 -0700 (PDT)
+        Mon, 04 Sep 2023 05:43:56 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
@@ -56,9 +56,9 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 04/13] target/i386/helper: Restrict KVM declarations to system emulation
-Date:   Mon,  4 Sep 2023 14:43:15 +0200
-Message-ID: <20230904124325.79040-5-philmd@linaro.org>
+Subject: [PATCH 05/13] target/i386/cpu-sysemu: Inline kvm_apic_in_kernel()
+Date:   Mon,  4 Sep 2023 14:43:16 +0200
+Message-ID: <20230904124325.79040-6-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230904124325.79040-1-philmd@linaro.org>
 References: <20230904124325.79040-1-philmd@linaro.org>
@@ -74,29 +74,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-User emulation doesn't need any KVM declarations.
+In order to have cpu-sysemu.c become accelerator-agnostic,
+inline kvm_apic_in_kernel() -- which is a simple wrapper
+to kvm_irqchip_in_kernel() -- and use the generic "sysemu/kvm.h"
+header.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/i386/helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/kvm/kvm_i386.h | 2 --
+ target/i386/cpu-sysemu.c   | 4 ++--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 89aa696c6d..2070dd0dda 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -22,10 +22,10 @@
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index e24753abfe..470627b750 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -13,8 +13,6 @@
+ 
+ #include "sysemu/kvm.h"
+ 
+-#define kvm_apic_in_kernel() (kvm_irqchip_in_kernel())
+-
+ #ifdef CONFIG_KVM
+ 
+ #define kvm_pit_in_kernel() \
+diff --git a/target/i386/cpu-sysemu.c b/target/i386/cpu-sysemu.c
+index 28115edf44..2375e48178 100644
+--- a/target/i386/cpu-sysemu.c
++++ b/target/i386/cpu-sysemu.c
+@@ -19,9 +19,9 @@
+ 
+ #include "qemu/osdep.h"
  #include "cpu.h"
- #include "exec/exec-all.h"
- #include "sysemu/runstate.h"
++#include "sysemu/kvm.h"
+ #include "sysemu/xen.h"
+ #include "sysemu/whpx.h"
 -#include "kvm/kvm_i386.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/hw_accel.h"
- #include "monitor/monitor.h"
-+#include "kvm/kvm_i386.h"
- #endif
- #include "qemu/log.h"
- #ifdef CONFIG_TCG
+ #include "qapi/error.h"
+ #include "qapi/qapi-visit-run-state.h"
+ #include "qapi/qmp/qdict.h"
+@@ -253,7 +253,7 @@ APICCommonClass *apic_get_class(Error **errp)
+ 
+     /* TODO: in-kernel irqchip for hvf */
+     if (kvm_enabled()) {
+-        if (!kvm_apic_in_kernel()) {
++        if (!kvm_irqchip_in_kernel()) {
+             error_setg(errp, "KVM does not support userspace APIC");
+             return NULL;
+         }
 -- 
 2.41.0
 
