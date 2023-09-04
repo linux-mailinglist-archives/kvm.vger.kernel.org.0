@@ -2,169 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2C637916D3
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:05:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C18C879174B
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351265AbjIDMFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:05:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47906 "EHLO
+        id S237317AbjIDMnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:43:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232660AbjIDMFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:05:45 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E371B8
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:05:42 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 48BAA1F38C;
-        Mon,  4 Sep 2023 12:05:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1693829140; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FGJUU8gdlJybZdYkpSEXd58MdQ8uDH1Q2xZeNXeFrGo=;
-        b=W1jxotF1ycwULr6IPPx8xQfaa2/LCFY9dGRXxPPjGCkIuJ9Gjz6vx4pv0PFE//66SnZ8dh
-        VZ8enF96RAfvbMEmpKgH7aPUyteZS8eN0yyFMEi08sLSIeV0pT2AAnwS9BMnVt8bGT90bh
-        t1773TgL/L6rr9hdjAR/PhdbgNc2990=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1693829140;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FGJUU8gdlJybZdYkpSEXd58MdQ8uDH1Q2xZeNXeFrGo=;
-        b=w9qH7ap3igwA8BgpKla8tS277AQ8hFQro2OtYZMHYM7SKYFIVJTMeBDA8Wb8hqrdimzd1p
-        0a2LhsMWRCKtQWDg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EF88613425;
-        Mon,  4 Sep 2023 12:05:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kbHGOBPI9WTqXAAAMHmgww
-        (envelope-from <cfontana@suse.de>); Mon, 04 Sep 2023 12:05:39 +0000
-Message-ID: <b05c5619-4f88-0aae-9162-ea90188d5b9c@suse.de>
-Date:   Mon, 4 Sep 2023 14:05:39 +0200
+        with ESMTP id S230353AbjIDMnc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:43:32 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A0FC0
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:29 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9a645e54806so166600066b.0
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693831408; x=1694436208; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KgdDAI5WJeQpNJ7fVmtYD+dCjS5FrBlY0naTS3cJ2cY=;
+        b=filfKy5XWRtqSxvFwtnm9D2DvQT9L/IO0I3kGV//EFyDQrHAhOQWvrh4SpOcteRwYn
+         7wfo/5oM/QABvH1rHt0sY49LcLhCrQoZhmjA707gbNLo/mxxsCrB3neWqhF3reDBJ/+o
+         cxm6wQB8DZf8jFRsMtsszljg9wAnUekUWkwRkdXpXsx1f3qEg5/7ttfqymRZpq1Dtx1i
+         69CRbMRX5LMzYY4DdFcc0D887hf9Dk6V8hf1bUx/0GHSvinnYTB5qytT7ytwzvMv3/Dq
+         KtFZJHfG2OErRnVa07VfvQ2oXWeiKs1LvaIIWDDwykRG2a74zBKq0gdczzdld0nD6emR
+         7PhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693831408; x=1694436208;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KgdDAI5WJeQpNJ7fVmtYD+dCjS5FrBlY0naTS3cJ2cY=;
+        b=Si35lCocgbBbmCPur/BCLZJWSNh8ShBD3ptio+JJ8WB+RXguw0BcFRqbJVf4utxxNi
+         bMiPfR6zwcVSNdsUIyRt80c7OzOAJVZ4k4TiBeaw0GUzhwRyx9/o0pRHqWPMEGhbAdJq
+         3nTSxc1dxCtAqVGbUpXmNaBvNkKdffSrPHUihSCnuldBnsa5aQTwBXXuGA8OaHEs1fu1
+         XoDCkGBOKBQA1CrCwU0RIIDVWtST1p4MXUTkHPg02MyJr8DeR7wEWWfinFQ7mjd88Luj
+         kkCkba6JsAaiZMBqUlKx90kEuceN81YRHJR4Taok5AsKCviVFkS4Q+b2WYmwW0n0E7np
+         B8yw==
+X-Gm-Message-State: AOJu0YzcvcJYQQXfAmvov/hHvKX9ISPrBHAh4O/1A3ajU+6x9R90aArm
+        V1yzyW6QhX8QWwYoEyBdpv6gXw==
+X-Google-Smtp-Source: AGHT+IFhdp2S6dmdQU4L+6xLxXs/ra3AOIWeAuonsSZVIyQsXIqOo0I4pZ2Cuh3QLrH5FtcNOMpNIw==
+X-Received: by 2002:a17:906:2d1:b0:99e:5d8:a6f9 with SMTP id 17-20020a17090602d100b0099e05d8a6f9mr6609163ejk.66.1693831407692;
+        Mon, 04 Sep 2023 05:43:27 -0700 (PDT)
+Received: from m1x-phil.lan ([176.187.209.227])
+        by smtp.gmail.com with ESMTPSA id um16-20020a170906cf9000b00992d70f8078sm6099214ejb.106.2023.09.04.05.43.26
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 04 Sep 2023 05:43:27 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH 00/13] target/i386: Cleanups around KVM declarations
+Date:   Mon,  4 Sep 2023 14:43:11 +0200
+Message-ID: <20230904124325.79040-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH] arm64: Restore trapless ptimer access
-Content-Language: en-US
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Colton Lewis <coltonlewis@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>, qemu-devel@nongnu.org,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-        kvm@vger.kernel.org, qemu-trivial@nongnu.org,
-        Marc Zyngier <maz@kernel.org>
-References: <20230831190052.129045-1-coltonlewis@google.com>
- <20230901-16232ff17690fc32a0feb5df@orel> <ZPI6KNqGGTxxHhCh@google.com>
- <cfee780b-27ab-8a49-9d42-72fd2a425a17@suse.de>
- <20230904-2587500eb2b77ed6c92143e2@orel>
-From:   Claudio Fontana <cfontana@suse.de>
-In-Reply-To: <20230904-2587500eb2b77ed6c92143e2@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/4/23 13:07, Andrew Jones wrote:
-> On Mon, Sep 04, 2023 at 10:18:05AM +0200, Claudio Fontana wrote:
->> Hi,
->>
->> I think this discussion from ~2015 could potentially be be historically relevant for context,
->> at the time we had the problem with CNTVOFF IIRC so KVM_REG_ARM_TIMER_CNT being read and rewritten causing time warps in the guest:
->>
->> https://patchwork.kernel.org/project/linux-arm-kernel/patch/1435157697-28579-1-git-send-email-marc.zyngier@arm.com/
->>
->> I could not remember or find if/where the problem was fixed in the end in QEMU,
-> 
-> It's most likely commit 4b7a6bf402bd ("target-arm: kvm: Differentiate
-> registers based on write-back levels")
+Hi,
 
-Indeed, thanks!
+Mostly trivial cleanups.
 
-C
+We want to have QEMU core code accel-agnostic.
+(In particular, removing the KVM specific fields
+from CPUState).
 
-> Thanks,
-> drew
-> 
->>
->> Ciao,
->>
->> Claudio
->>
->> On 9/1/23 21:23, Colton Lewis wrote:
->>> On Fri, Sep 01, 2023 at 09:35:47AM +0200, Andrew Jones wrote:
->>>> On Thu, Aug 31, 2023 at 07:00:52PM +0000, Colton Lewis wrote:
->>>>> Due to recent KVM changes, QEMU is setting a ptimer offset resulting
->>>>> in unintended trap and emulate access and a consequent performance
->>>>> hit. Filter out the PTIMER_CNT register to restore trapless ptimer
->>>>> access.
->>>>>
->>>>> Quoting Andrew Jones:
->>>>>
->>>>> Simply reading the CNT register and writing back the same value is
->>>>> enough to set an offset, since the timer will have certainly moved
->>>>> past whatever value was read by the time it's written.  QEMU
->>>>> frequently saves and restores all registers in the get-reg-list array,
->>>>> unless they've been explicitly filtered out (with Linux commit
->>>>> 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array). So, to
->>>>> restore trapless ptimer accesses, we need a QEMU patch to filter out
->>>>> the register.
->>>>>
->>>>> See
->>>>> https://lore.kernel.org/kvmarm/gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com/T/#m0770023762a821db2a3f0dd0a7dc6aa54e0d0da9
->>>>
->>>> The link can be shorter with
->>>>
->>>> https://lore.kernel.org/all/20230823200408.1214332-1-coltonlewis@google.com/
->>>
->>> I will keep that in mind next time.
->>>
->>>>> for additional context.
->>>>>
->>>>> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
->>>>
->>>> Thanks for the testing and posting, Colton. Please add your s-o-b and a
->>>> Tested-by tag as well.
->>>
->>> Assuming it is sufficient to add here instead of reposting the whole patch:
->>>
->>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->>> Tested-by: Colton Lewis <coltonlewis@google.com>
->>>
->>>>> ---
->>>>>  target/arm/kvm64.c | 1 +
->>>>>  1 file changed, 1 insertion(+)
->>>>>
->>>>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->>>>> index 4d904a1d11..2dd46e0a99 100644
->>>>> --- a/target/arm/kvm64.c
->>>>> +++ b/target/arm/kvm64.c
->>>>> @@ -672,6 +672,7 @@ typedef struct CPRegStateLevel {
->>>>>   */
->>>>>  static const CPRegStateLevel non_runtime_cpregs[] = {
->>>>>      { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
->>>>> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
->>>>>  };
->>>>>
->>>>>  int kvm_arm_cpreg_level(uint64_t regidx)
->>>>> --
->>>>> 2.42.0.283.g2d96d420d3-goog
->>>>>
->>>
->>
+This serie contains the x86 specific patches
+before starting with the generic KVM code.
+
+FWIW, I couldn't test the 'HVF only' configuration
+since I don't have access to such host.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (13):
+  hw/i386/pc: Include missing 'sysemu/tcg.h' header
+  hw/i386/pc: Include missing 'cpu.h' header
+  hw/i386/fw_cfg: Include missing 'cpu.h' header
+  target/i386/helper: Restrict KVM declarations to system emulation
+  target/i386/cpu-sysemu: Inline kvm_apic_in_kernel()
+  target/i386: Remove unused KVM stubs
+  target/i386: Allow elision of kvm_enable_x2apic()
+  target/i386: Allow elision of kvm_hv_vpindex_settable()
+  target/i386: Restrict declarations specific to CONFIG_KVM
+  sysemu/kvm: Restrict kvm_arch_get_supported_cpuid/msr() to x86 targets
+  sysemu/kvm: Restrict kvm_get_apic_state() to x86 targets
+  sysemu/kvm: Restrict kvm_has_pit_state2() to x86 targets
+  sysemu/kvm: Restrict kvm_pc_setup_irq_routing() to x86 targets
+
+ include/sysemu/kvm.h        | 10 --------
+ target/i386/kvm/kvm_i386.h  | 36 ++++++++++++++++----------
+ hw/i386/fw_cfg.c            |  1 +
+ hw/i386/intel_iommu.c       |  2 +-
+ hw/i386/kvm/i8254.c         |  1 +
+ hw/i386/kvm/ioapic.c        |  1 +
+ hw/i386/pc_piix.c           |  1 +
+ hw/i386/pc_q35.c            |  2 ++
+ hw/i386/x86.c               |  4 +--
+ target/i386/cpu-sysemu.c    |  4 +--
+ target/i386/helper.c        |  2 +-
+ target/i386/kvm/kvm-stub.c  | 51 -------------------------------------
+ target/i386/kvm/kvm.c       |  4 +--
+ target/i386/kvm/meson.build |  2 --
+ 14 files changed, 37 insertions(+), 84 deletions(-)
+ delete mode 100644 target/i386/kvm/kvm-stub.c
+
+-- 
+2.41.0
 
