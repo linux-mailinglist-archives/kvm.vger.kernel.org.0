@@ -2,145 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E6717913F8
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 10:53:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB193791444
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 11:05:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349741AbjIDIx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 04:53:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59596 "EHLO
+        id S1345315AbjIDJFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 05:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbjIDIx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 04:53:26 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E3C12A;
-        Mon,  4 Sep 2023 01:53:22 -0700 (PDT)
+        with ESMTP id S229716AbjIDJFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 05:05:32 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75705138;
+        Mon,  4 Sep 2023 02:05:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693817602; x=1725353602;
+  t=1693818329; x=1725354329;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=T1UdlfRyh6zocWKFdE++UtyujSOIwGUBVG8JX+rjvjs=;
-  b=NykUCjs+Ke/xadh1cTFSNZ6CIH87u3DYvo2V7MXT2Ta4r8g2axzJR9V4
-   jyVdrUMBOfCdzImybSweUJneIRcrBdnrXGUM4h672mju1zif0oGyJF6Sf
-   iiKRi/eWkKX+7VGJbuc5rUWT+7TNQhInHh+a6qVLJv4F+Vkw9deVvn8Dg
-   Db73WMhxXoUDWDuPNOAGMcq2PiERAIjR0FmeisAp+0/wrcHmSLTG3i+/c
-   43OZ5no8maMD5J61SO0IIAuQTnR+Tq/eocRIj/9Slft1Qt49Q0tp42yh2
-   qPfhtiQoUztAZsfykaAJ07CPBCxWZNEIcHkDA3U9WCaK7tw/caO+vigPc
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="379267880"
+  bh=7AgDW9SBVcSWx1ZNYJThzWO98dtz/uX7yz0N2iw5P9Y=;
+  b=CBrglLLm7UucbNyItfO2V9TsV1IAoZJi1car7bQW5Aq/XfP7P2UY4zju
+   ogPVP0DeGLebS3KyqUVzF50ZYdZkbcLe4qHFB9/YcdyW5bGnsSWfBYUIu
+   f1dD7zbalHOHDiPQNaMSgVRV/AdBD3rhBWly2a+1vGIVlXYQUTsU8c7SG
+   fbCry1qGGAsat+WX1OyDnAOYRoTVdjX/hlMSq0c49T2/ENlsfg869Q2wy
+   cxTyGnJ+0kQvKfKUTxDoXQ0ZU9DVQA6yMrjAoRiV1voNsnJ0F7OZJZE+z
+   VRMVeOHtfL019MFAstFG4sddBSey3sRnjD6rJxzp3e1NTZ+JSEpw8ACfE
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="440521110"
 X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="379267880"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 01:52:14 -0700
+   d="scan'208";a="440521110"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 02:05:29 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="743865898"
+X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="690520287"
 X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="743865898"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2023 01:52:14 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+   d="scan'208";a="690520287"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2023 02:05:28 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 4 Sep 2023 01:52:14 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ 15.1.2507.27; Mon, 4 Sep 2023 02:05:28 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 4 Sep 2023 01:52:14 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Mon, 4 Sep 2023 02:05:28 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 4 Sep 2023 01:52:13 -0700
+ 15.1.2507.27; Mon, 4 Sep 2023 02:05:27 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PRnPeSigbHSqksggMIpUNZwVAgAw8VdQdxhvjXq9FAW2xZpKbpMMHpGVoXV0NDZyOhbJlV7hAYjHJdnU8ujV9Co3WyBVoMNpDdyZwNw3Dr3D15sdbGHR8LErg57isG5BYadJO2MDRTgCUnNTZQjrNiDWdmo0VRS1GTPPlKW3bXAiwJGgrBzgV5Od5h0gYWoMwA/5JzAf+XPO/58wdCoqcExkUEtNt4s8JGo0VPzF6J2U/8LKdLARGQaGA65ZHk/kax7kbIgfS9stbL8vogtPPUyR2fCW1IWdusYKOxGWW0p4K4h5vDDS0pCWV5LmFeuPNBFuLfYtpf4LUowNefGPtA==
+ b=YdVb7wOwBdkEtZz1O0e3pFU/fJuqvrKblwBqQ17xEDIlH+BwnBtuW0NE8N+QPtE/OEnco2lrrbvmjWLNsPv8WIiJOoOVMPffAkgXpbxqNLJaeY22e/VjGzDEpxhQFPAVDm89x+TWclb+tUI3i9ZmdChwP//P/QN4xepQ/ePKGiQsY2ksvJexgZBi9F6GsVYtG0N6iPpPFqMcI4fm1ksQGbofBbVWbXA+/24+SU7eGyXAimVfBEHeAptlXdyCN2WDP5SUY7AAvJOBA8ZB9zqroXWqGs+MWh9Rs9kgM5XEPP7VeeiBWalGHVn31K/tCEjF7KOvrEl07LBIKJHjiMD/9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K+V0kKSGyIPUHkJ8F84Fe02/O9v+GLlnLMjI7OwLTZ8=;
- b=ceD1N1DlX3gXRRUk1oyq1Wqu9C5aR4HiEtD1EpJhSJuTRvAZfFqwOnd6YS1nOV2DYNs1RDW1C+3Q9Tr4MAd52Ij9bwksAIkdRBJc7p13BbBiqrNqV69tA3vUToxhGtdUztNuo42ntIArEqYiqF1mQk0y+Fab7cZszMvhUOdTkq+Maq0yDjaVFtCZz6Y2nPwBXHEaiR/af3i1rYkZCbK5MvfSza9a6hcQSaE5T5K89MwANxxRlUt7GQaXkakh/enwLWio02rbuxDq6XvnzEIWVW2UWgx+ggh43j0UieCAZIcNij/CTMpnlcHzHHDvTt6RW5ahzIN1zxiOPtVZDU7wCg==
+ bh=gyZpQs1rz0PM98q6vXojJTSKNBXfaREmwMORfvLuHe0=;
+ b=XQOJspPxAg+bMVpvDIFnrZFiWgaNc0t/VzBiEZpo86cweNHWlSC2C+0kavmFU+3d8oBgIjeNVCIRyevIwRS+uIlycK0bHALM6okWYtQaslygkPrNeV19IW1CXUJlnwcNDmqRxXY5tDKdgIdwx88RiBmda0G8pNgmBrB2YCWSEH1fPtYDjwnOlQjkv5wo1e9Xk4rp3reEQv4fFwpepgzFaQHVFSwA02gatA2mwnbXiUpnOOTJmmzFQweXghgKRoPeV9YApRM9QVNZmdoPlRGYE3BYN9AtVdOqxKiYWEJEpJyWpxaeyDzYW7ep+JcHzWlDJy9GBlqPs49tJmf2Kqy96Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MW3PR11MB4697.namprd11.prod.outlook.com (2603:10b6:303:2c::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6745.32; Mon, 4 Sep 2023 08:52:10 +0000
+ CH3PR11MB8341.namprd11.prod.outlook.com (2603:10b6:610:178::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.32; Mon, 4 Sep
+ 2023 09:05:25 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::5e79:2d52:51e:f602]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::5e79:2d52:51e:f602%6]) with mapi id 15.20.6745.030; Mon, 4 Sep 2023
- 08:52:10 +0000
-Date:   Mon, 4 Sep 2023 16:24:30 +0800
+ 09:05:25 +0000
+Date:   Mon, 4 Sep 2023 16:37:48 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <pbonzini@redhat.com>, <chao.gao@intel.com>, <kai.huang@intel.com>,
         <robert.hoo.linux@gmail.com>, <yuan.yao@linux.intel.com>
-Subject: Re: [PATCH v4 09/12] KVM: x86/mmu: serialize vCPUs to zap gfn when
- guest MTRRs are honored
-Message-ID: <ZPWUPnzkqs6AnhMy@yzhao56-desk.sh.intel.com>
+Subject: Re: [PATCH v4 10/12] KVM: x86/mmu: fine-grained gfn zap when guest
+ MTRRs are honored
+Message-ID: <ZPWXXLVlCpccVLvY@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20230714064656.20147-1-yan.y.zhao@intel.com>
- <20230714065454.20688-1-yan.y.zhao@intel.com>
- <ZOkvbzR0Sft1lnD1@google.com>
+ <20230714065530.20748-1-yan.y.zhao@intel.com>
+ <ZOk1n3ssdU7bXalP@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZOkvbzR0Sft1lnD1@google.com>
-X-ClientProxiedBy: KU1PR03CA0019.apcprd03.prod.outlook.com
- (2603:1096:802:18::31) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <ZOk1n3ssdU7bXalP@google.com>
+X-ClientProxiedBy: KL1PR02CA0014.apcprd02.prod.outlook.com
+ (2603:1096:820:c::19) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW3PR11MB4697:EE_
-X-MS-Office365-Filtering-Correlation-Id: e729e895-3287-498f-aa76-08dbad2439e8
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CH3PR11MB8341:EE_
+X-MS-Office365-Filtering-Correlation-Id: b98157a1-dd9d-4aa3-32b3-08dbad261369
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PnAthYVTvwQ9YweLxEFSJgaPRz8pJvIylfsVnfgX7xWAOAynWPmFHK13pVoK6f9pO1kT6unLjPbGuEZax83NndrMQXnDyo/H01DnGLaYvmvbfeUaLboGRJ4ENzrmqVvCCwAVd7Q8qrCvmSiyK1H4Y2rg4F+n3Gq0qbppTCbtVovDpgdWAek6BPY9RGBmvlCRR1I3ExBokn2Od+EI1Y0ttgAfMqMbScx/lc2vA1c4DgQ5DnyX+NdjNg7tyW5J4JeJy7z7f68tBzm/1VStV4yh5IYXSGYuv0lIje3jerPWQxTua81HeGDV2rRh6nJQrXqTHIBPo3fvZXB63bys6l6WcdPWaGcDfwAgR+4wLiW67U9aAmjDgLuDwMWZA32JZUlXjmHT0kWwz1rUuOfVgf/lP6ptjGynKgvieN5XTYUIYaF2eWP3iJpdNJeL01cb+mLTfvt85OXM5W/k48vK6F0B5hC0PwjrHc7dDpL1U/ycj2WAXqGJDbVyhRHCEJsNXmHwJg+jG9GG3EYOAwQL1ymCYenNSXH3eDk2PXEYRxsXY0NmcNp4Ychn1ep78Zt9HqYO
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(366004)(39860400002)(136003)(346002)(186009)(1800799009)(451199024)(6506007)(26005)(6486002)(6512007)(66899024)(38100700002)(86362001)(82960400001)(83380400001)(3450700001)(8936002)(41300700001)(316002)(4326008)(66476007)(6916009)(66556008)(5660300002)(66946007)(8676002)(2906002)(6666004)(478600001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: qbCQqx4giBfnxH9zRqKQpIS+L3t+Qvy+pbwVunqWTm+7+DtF6WmvnBk3rrAwwe4YojYN4yXGStZDl5sSCY97WgT/adBFjniJfVxigKMEocAes0YTd+FK3H2XPpzza4IF5gRUBnaUKNB4xa4mcPqqwuJ5XbbsRVb3H3TKaxQKbpulMqiFFm6ipz1yH/8g5dyITJEVro1u/JAMdacELfdCMXpZ359KJfk/LIl/UWHWy5HRgpjEa5MtAMlyfB0RzPQQHyeIpqGQFdeA8cqDpIN90osvmkYqXJOKLqwxY0it/qWjadOsE/GegAHmgGpPjquxz9rzSiCnck6gu5tI7IJXDUj2qRS0qb0oFsqmS2XDneImMwG28PBt/BRQ3TlG8sPM9AubrMk5pTUIQTrh2qBuR7ePR/vMyClsrvz0y8xMFvv/RYbhcuZ1zt0EdXOc0PKQrzr5fg/ntnGjU3ltBoCrUSrwcy4NG+Pzu1vIr+saPcjuci38gQ3HGsEJKvpWTCyyltdzYdbonkfSFLBSWL2hRv25zx1UFUGMpvS4/NZF/BZbNtQU0abFfDx/ey31Mp0u
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(396003)(136003)(376002)(366004)(186009)(1800799009)(451199024)(41300700001)(478600001)(38100700002)(6666004)(82960400001)(86362001)(83380400001)(26005)(6512007)(6486002)(6506007)(3450700001)(66946007)(2906002)(316002)(6916009)(66476007)(66556008)(8936002)(5660300002)(8676002)(4326008);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PEOBUQ0GG6T3ZcXJJ65oNzQhcC5j6hDwSoYo3II1ph0AATmctLLUHnvhkTeN?=
- =?us-ascii?Q?c2MCRiJKWvLKrnFfljPgFmwe7He29LSVMnW3Sud9SVV8wueHrnhDpYyMU0EE?=
- =?us-ascii?Q?pePfJFDQxOFwz2KwTsTrrHIrAqhW5KEn6Xj0GRb3ofzxaZ5ctA9z5vtf6KB7?=
- =?us-ascii?Q?9MmpS88cqWh3+ntNbf9ogEa6Fk8zDYJYLpWBnIhXAK2xBDuscqm/VWJK+Sbm?=
- =?us-ascii?Q?MIaFlTLyp1XTJVt+bqcVBcSfr44kDqoADo29Q7PX3qD8DL+AqhJ0s3bKbp3k?=
- =?us-ascii?Q?ZFQGJvM4Hs4hTCwfLHCxOBroEXQsKq5Ozcb1rrLe1HlpwL0MB7dv9PiXpwT9?=
- =?us-ascii?Q?mjwgkk4Medx/coCX1f/KWpWiQBqtI5uscxTrzIieh7SJM/tLS/LCzNpRBWFB?=
- =?us-ascii?Q?1kPPCLa+S5PxIeRv7as/ionVdTalZ8RHjxdJ+oayCnrQcdIGW9OKb6EeImR1?=
- =?us-ascii?Q?vB8ULfNn7Qs7G6yh07zv3hE85UDERk4QCcwjzq9XsBaZKxL+tT601UsBW8cu?=
- =?us-ascii?Q?VPYaCHpOEjVEIo5cRIIg3Y68oenobMqAwo3Z42/9VynW6xT76DSoKVX7x18y?=
- =?us-ascii?Q?26YtF1GeAQOebLR+NR4BnA8WhfoVx5Wzz1wjS8pujXrXJ5JQfiA81x0Aq5hB?=
- =?us-ascii?Q?3w6OaUTyzrmWfxFXjn9p1FCxnNkIhPUrwgkAyyqH398LuRmPn/UfyT52uE6Z?=
- =?us-ascii?Q?gN/eW0HLaK9dtd/C8Zd0JY+dmvGioSfMkJGHY00hdlc+cRgvjgZh2dKTl7Kb?=
- =?us-ascii?Q?q5DCxOddYEZxlOsd4olxvgwJ6nHm1O1irjvVWToEVw/qD4frpwkTQ9C5azVz?=
- =?us-ascii?Q?fyaGZteBKFUUcuvSEdLoODYkC9JKRl+ifzh5s9HMBDWG1rZk1s6Zll30sadR?=
- =?us-ascii?Q?VpJ1nbWfxg3uVkQ/rTuet7pQOydHv7y58ttKjcJqIt5Q11dnrQ/xte+9W7Et?=
- =?us-ascii?Q?dtx+zryW0Ka3AeH4vshDcHYdug8O0xNfZ+lv7W4/YmwQxPuzSmt73R2DLVAe?=
- =?us-ascii?Q?QhfTpEJfokde8Zi6ffPX3ZQ7vabkOr8Y2VBhiSM7q+03uDOK6cbSYRvuSvaz?=
- =?us-ascii?Q?ofoSVDBQWHdA4QK6Ab8N69ur1UKk9oavJ+O8IrR2sc8vhrYE8xczkLOQ3dlP?=
- =?us-ascii?Q?w1gM1swznexhzjB4R783pNjAzNy+pdjOMubG2398engME+xCtkrBk0wkhIz6?=
- =?us-ascii?Q?zxseFx0Q7VIOpFApGNwwFO3fSk0Pp/2GzHhyO42/su+PiqDDo6lwyfYmse0R?=
- =?us-ascii?Q?lVQtZswHwPEuA8OFwm3AvPcOJ/1mtuEKOubP8Wj+FsaW81gwHlpPeL+nYpGL?=
- =?us-ascii?Q?h4o7CBiahvwLrKem4SF9L/+3tfgiE0T7ocAue7Ji6OJVDLC0kBN893Y62uj+?=
- =?us-ascii?Q?GltylBgcvQFrQ0xo8ZzTv3LuNqNAdJ1hXMXDMeKdub/j+D+88EYIjeAB9siJ?=
- =?us-ascii?Q?MG5KcsUUon/tKQgq2R2Xv8UzmDmYsDfwIJA+pe7MzSrdItwpwCkJsEEuM9FX?=
- =?us-ascii?Q?EiaKwTXGn3l8xHMoUJoyoqIhvRi5i14a87in/sT4oz0Ll/560L9u8owC+/Gx?=
- =?us-ascii?Q?0ghH6CNorZOLRblSg/byaQ+BcI2lQRf/ZbAGqdon?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e729e895-3287-498f-aa76-08dbad2439e8
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Nqzd+1c2FlKEX5QXyfE+N5RTt94y0Oeq88y0G7LjrQAFcoJ3oD5Oyniu0enm?=
+ =?us-ascii?Q?KifqCtKFlLUi0Jl7WgtsWrdRhDiV0gjf0UVBGNX7xOMM1B/X4DlBAX0KpYio?=
+ =?us-ascii?Q?E0/seKn2L4e0Mqw+BWG98jOLRSQg9NCX6CEIvdEw5qzu9GcQ4wd4rL3jxDr/?=
+ =?us-ascii?Q?Jg2w60FkhBxYpWb2p2aU0MyjvJmva6lquhDewffN1YhHT++Mc7DOHrxAKnE4?=
+ =?us-ascii?Q?/06D4SVLBh6/iirRaTWGHV4beZUXlBluo5cO1l6PSbtlOpsqYEHdRRgYmuLC?=
+ =?us-ascii?Q?Q9h+e+n5cRNwHQYIuybc8Z3RUEPGzqGlHxgG+9Xf4dBz9aknuB2ceJ4LR0HT?=
+ =?us-ascii?Q?+1eNf0Hn39E5brRX90HBLkG8l6sXrEtAixGGZlo6wiFm+HNG20HVDYwjisoy?=
+ =?us-ascii?Q?I6Rgp8lx7Wo0oMaklV5RTlOEfsqd+coT8z5soPjnafGPpqP66ySY4VMfuTCd?=
+ =?us-ascii?Q?3guWj2RfWpQnp4AAQKgdHc0ppKOlUPjP2qRieRVvm+Pi52R9B2UldB97KwSH?=
+ =?us-ascii?Q?ZJIz0aDc+5Lb04Tl9XEf8tQxKqCUSyvzP8pG9VpqbHqI0keeZxVaoYLmZv8y?=
+ =?us-ascii?Q?3SS5n7pgezPZ0EMO8FiwM42pLHHyKWmvy1QIRwitxjl8zUHdtqdWjbp3dV+D?=
+ =?us-ascii?Q?JDCvggCGesZodOdLgw5Scu1ixjLxiePFayiEeeGUP2E3f6okBey+pdxrD7ZC?=
+ =?us-ascii?Q?B1XS4IT9fMz4XHRTzsqTWPRYHEmg5oks2Snl1r4fg1IaXKD1KyvEBj3D+jh0?=
+ =?us-ascii?Q?rUrbqswpl1wtGZyB72sbQLjgjFgawNS86UldvvCiIdC7eXxfQdFvHTjsaLex?=
+ =?us-ascii?Q?k+b10c0gYHqMExu505ZfppM1lA0oJtbJC+COQM/6NXZmM2+m/7R3Hkr3ogEY?=
+ =?us-ascii?Q?zh043VhyizPCQOh/FeP6hYBMIjcR80kURoR+FovZ+QSEcarcCoVN1tW5NTWe?=
+ =?us-ascii?Q?eAN6i8OaRJeJyZwDeQAp5PI8/9LbyKCSjIZxfF2r2PS9zrRrNMEP7RdGf3lm?=
+ =?us-ascii?Q?P8C9YmdVAU3wB4yga8ORFIl5pBbA5UvMSAMVDX/cjLSVjFVVhp80z74KtSDS?=
+ =?us-ascii?Q?tk0+bpQGDtWzrrXWt4FG9I7pZ2iXEXk09El9hD4D/9Kxx5KFIc6mpp2WAK3L?=
+ =?us-ascii?Q?3QqGKKlwsUxV5eOxALonebndesll1DCrBC+3Cxe1cBiGVR0sFbzVhSZ0I/0x?=
+ =?us-ascii?Q?lydoeLq9RAEHVSirVGC0UaZh7cz+QEgO9fsRX9dvBUxsA4ZvdpqX0FzWOzru?=
+ =?us-ascii?Q?qolMqxBazzrA3w9rtez1y3pk3Ku7pjIkhsdqZmFMhAzWtKN3Ny/GHAB5FQ8o?=
+ =?us-ascii?Q?5eX81tbfD6a2zMbbU+VU/9wBYnpgr0G+5yqZ66fLClb/dwHQkMIFUpQFEjGv?=
+ =?us-ascii?Q?H6o6B5wNp1li2s2Wf+VtVz2mit2BjVnFC8oi0/HP73vOqPAKXXHXQGupJH65?=
+ =?us-ascii?Q?41CaD6GitHZ/jH7u3WUOi7VS4KJ4+fYqeytFehdBH0XLh4gs1iwWqlVfX7jI?=
+ =?us-ascii?Q?IipXqqCugQyjT6L9xTDbHYUMHREJ3nhTRg4GDBvwWbiMOH7z6GEvqMJVZ5VA?=
+ =?us-ascii?Q?saJJTCS2a2LDqDJSn+Qp/9GstUjfZL39S5R6uUiV?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b98157a1-dd9d-4aa3-32b3-08dbad261369
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 08:52:10.7209
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 09:05:25.0841
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d920ia+sMM60gUfwZFxy6QxvFtLaaHb011xK681nM5iMJQTmC6tdM+vC9vT9OV1j9BmAAWaCWHIiXN6a+Q4JNQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4697
+X-MS-Exchange-CrossTenant-UserPrincipalName: xGFFAiDTOHYd1oIOPBfgSWC/wZs+atWLvj0JDntiVO3gGHWh4a6viMbqZrpNyJX65zH5IJxjYT8kabfsMSD/zA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8341
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -148,240 +148,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 03:47:11PM -0700, Sean Christopherson wrote:
+On Fri, Aug 25, 2023 at 04:13:35PM -0700, Sean Christopherson wrote:
 > On Fri, Jul 14, 2023, Yan Zhao wrote:
-> > +/*
-> > + * Add @range into kvm->arch.mtrr_zap_list and sort the list in
-> > + * "length" ascending + "start" descending order, so that
-> > + * ranges consuming more zap cycles can be dequeued later and their
-> > + * chances of being found duplicated are increased.
-> 
-> Wrap comments as close to 80 chars as possible.
-Got it!
-I thought it's easy to interpret if a group of words are in one line :)
-
-
-> > + */
-> > +static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
-> > +{
-> > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
-> > +	u64 len = range->end - range->start;
-> > +	struct mtrr_zap_range *cur, *n;
-> > +	bool added = false;
+> >  void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu)
+> >  {
+> > -	return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
+> > +	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
+> > +	bool mtrr_enabled = mtrr_is_enabled(mtrr_state);
+> > +	u8 default_mtrr_type;
+> > +	bool cd_ipat;
+> > +	u8 cd_type;
 > > +
-> > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> > +	kvm_honors_guest_mtrrs_get_cd_memtype(vcpu, &cd_type, &cd_ipat);
 > > +
-> > +	if (list_empty(head)) {
-> > +		list_add(&range->node, head);
-> > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +		return;
-> 
-> Make this
-> 
-> 		goto out;
-> 
-> or
-> 		goto out_unlock;
-> 
-> and then do the same instead of the break; in the loop.  Then "added" goes away
-> and there's a single unlock.
->
-Ok.
-
-> > +	}
+> > +	default_mtrr_type = mtrr_enabled ? mtrr_default_type(mtrr_state) :
+> > +			    mtrr_disabled_type(vcpu);
 > > +
-> > +	list_for_each_entry_safe(cur, n, head, node) {
+> > +	if (cd_type != default_mtrr_type || cd_ipat)
+> > +		return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
 > 
-> This shouldn't need to use the _safe() variant, it's not deleting anything.
-Right. Will remove it.
-_safe() version was a legacy of my initial test versions that items were merged
-and deleted and I later found they don't have any performance benefit.
-
-> > +		u64 cur_len = cur->end - cur->start;
-> > +
-> > +		if (len < cur_len)
-> > +			break;
-> > +
-> > +		if (len > cur_len)
-> > +			continue;
-> > +
-> > +		if (range->start > cur->start)
-> > +			break;
-> > +
-> > +		if (range->start < cur->start)
-> > +			continue;
+> Why does this use use the MTRR version but the failure path does not?  Ah, because
+> trying to allocate in the failure path will likely fail to allocate memory.  With
+> a statically sized array, we can just special case the 0 => -1 case.  Actually,
+> we can do that regardless, it just doesn't need a dedicated flag if we use an
+> array.
 > 
-> Looking at kvm_zap_mtrr_zap_list(), wouldn't we be better off sorting by start,
-> and then batching in kvm_zap_mtrr_zap_list()?  And maybe make the batching "fuzzy"
-> for fixed MTRRs?  I.e. if KVM is zapping any fixed MTRRs, zap all fixed MTRR ranges
-> even if there's a gap.
-Yes, this "fuzzy" is done in the next patch.
-In prepare_zaplist_fixed_mtrr_of_non_type(),
-	range->start = gpa_to_gfn(fixed_seg_table[0].start);
-	range->end = gpa_to_gfn(fixed_seg_table[seg_end].end);
-range start is set to start of first fixed range, and end to the end of
-last fixed range.
+> Using the MTRR version on failure (array is full) means that other vCPUs can see
+> that everything is being zapped and go straight to waitin.
+Yes, will convert to the way of using statially sized array in next version.
 
 > 
 > > +
-> > +		/* equal len & start, no need to add */
-> > +		added = true;
-> > +		kfree(range);
+> > +	/*
+> > +	 * If mtrr is not enabled, it will go to zap all above if the default
 > 
+> Pronouns again.  Maybe this?
 > 
-> Hmm, the memory allocations are a bit of complexity that'd I'd prefer to avoid.
-> At a minimum, I think kvm_add_mtrr_zap_list() should do the allocation.  That'll
-> dedup a decount amount of code.
-> 
-> At the risk of rehashing the old memslots implementation, I think we should simply
-> have a statically sized array in struct kvm to hold "range to zap".  E.g. use 16
-> entries, bin all fixed MTRRs into a single range, and if the remaining 15 fill up,
-> purge and fall back to a full zap.
-> 
-> 128 bytes per VM is totally acceptable, especially since we're burning waaay
-> more than that to deal with per-vCPU MTRRs.  And a well-behaved guest should have
-> identical MTRRs across all vCPUs, or maybe at worst one config for the BSP and
-> one for APs.
+> 	/*
+> 	 * The default MTRR type has already been checked above, if MTRRs are
+> 	 * disabled there are no other MTRR types to consider.
+> 	 */
+Yes, better :)
 
-Ok, will do it in the next version.
-
+> > +	 * type does not equal to cd_type;
+> > +	 * Or it has no need to zap if the default type equals to cd_type.
+> > +	 */
+> > +	if (mtrr_enabled) {
 > 
-> > +		break;
-> > +	}
-> > +
-> > +	if (!added)
-> > +		list_add_tail(&range->node, &cur->node);
-> > +
-> > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +}
-> > +
-> > +static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
-> > +{
-> > +	struct list_head *head = &kvm->arch.mtrr_zap_list;
-> > +	struct mtrr_zap_range *cur = NULL;
-> > +
-> > +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
-> > +
-> > +	while (!list_empty(head)) {
-> > +		u64 start, end;
-> > +
-> > +		cur = list_first_entry(head, typeof(*cur), node);
-> > +		start = cur->start;
-> > +		end = cur->end;
-> > +		list_del(&cur->node);
-> > +		kfree(cur);
+> To save some indentation:
 > 
-> Hmm, the memory allocations are a bit of complexity that'd I'd prefer to avoid.
-yes.
-
-> 
-> > +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +
-> > +		kvm_zap_gfn_range(kvm, start, end);
-> > +
-> > +		spin_lock(&kvm->arch.mtrr_zap_list_lock);
-> > +	}
-> > +
-> > +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-> > +}
-> > +
-> > +static void kvm_zap_or_wait_mtrr_zap_list(struct kvm *kvm)
-> > +{
-> > +	if (atomic_cmpxchg_acquire(&kvm->arch.mtrr_zapping, 0, 1) == 0) {
-> > +		kvm_zap_mtrr_zap_list(kvm);
-> > +		atomic_set_release(&kvm->arch.mtrr_zapping, 0);
-> > +		return;
-> > +	}
-> > +
-> > +	while (atomic_read(&kvm->arch.mtrr_zapping))
-> > +		cpu_relax();
-> > +}
-> > +
-> > +static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
-> > +				   gfn_t gfn_start, gfn_t gfn_end)
-> > +{
-> > +	struct mtrr_zap_range *range;
-> > +
-> > +	range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
-> > +	if (!range)
-> > +		goto fail;
-> > +
-> > +	range->start = gfn_start;
-> > +	range->end = gfn_end;
-> > +
-> > +	kvm_add_mtrr_zap_list(vcpu->kvm, range);
-> > +
-> > +	kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
-> > +	return;
-> > +
-> > +fail:
-> > +	kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end);
-> > +}
-> > +
-> > +void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu)
-> 
-> Rather than provide a one-liner, add something like
-> 
->   void kvm_mtrr_cr0_cd_changed(struct kvm_vcpu *vcpu)
->   {
-> 	if (!kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
+> 	if (!mtrr_enabled)
 > 		return;
 > 
-> 	return kvm_zap_gfn_range(vcpu, 0, -1ull);
->   }
-> 
-> that avoids the comically long function name, and keeps the MTRR logic more
-> contained in the MTRR code.
-Yes, it's better!
-Thanks for you guiding :)
+Got it! 
 
-> 
-> > +{
-> > +	return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
-> 
-> Meh, just zap 0 => ~0ull.  That 51:0 happens to be the theoretical max gfn on
-> x86 is coincidence (AFAIK).  And if the guest.MAXPHYADDR < 52, shifting ~0ull
-> still doesn't yield a "legal" gfn.
-Yes. I think I just wanted to make npage to be less in kvm_zap_gfn_range().
-
-kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end - gfn_start);
-
-> 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 32cc8bfaa5f1..bb79154cf465 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -943,7 +943,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
-> >  
-> >  	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
-> >  	    kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
-> > -		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
-> > +		kvm_honors_guest_mtrrs_zap_on_cd_toggle(vcpu);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_post_set_cr0);
-> >  
-> > @@ -12310,6 +12310,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >  	kvm->arch.guest_can_read_msr_platform_info = true;
-> >  	kvm->arch.enable_pmu = enable_pmu;
-> >  
-> > +	spin_lock_init(&kvm->arch.mtrr_zap_list_lock);
-> > +	INIT_LIST_HEAD(&kvm->arch.mtrr_zap_list);
+> > +		if (prepare_zaplist_fixed_mtrr_of_non_type(vcpu, default_mtrr_type))
+> > +			goto fail;
 > > +
-> >  #if IS_ENABLED(CONFIG_HYPERV)
-> >  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
-> >  	kvm->arch.hv_root_tdp = INVALID_PAGE;
-> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > index e7733dc4dccc..56d8755b2560 100644
-> > --- a/arch/x86/kvm/x86.h
-> > +++ b/arch/x86/kvm/x86.h
-> > @@ -315,6 +315,7 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
-> >  					  int page_num);
-> >  void kvm_honors_guest_mtrrs_get_cd_memtype(struct kvm_vcpu *vcpu,
-> >  					   u8 *type, bool *ipat);
-> > +void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu);
-> >  bool kvm_vector_hashing_enabled(void);
-> >  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
-> >  int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+> > +		if (prepare_zaplist_var_mtrr_of_non_type(vcpu, default_mtrr_type))
+> > +			goto fail;
+> > +
+> > +		kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
+> > +	}
+> > +	return;
+> > +fail:
+> > +	kvm_clear_mtrr_zap_list(vcpu->kvm);
+> > +	/* resort to zapping all on failure*/
+> > +	kvm_zap_gfn_range(vcpu->kvm, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
+> > +	return;
+> >  }
 > > -- 
 > > 2.17.1
 > > 
