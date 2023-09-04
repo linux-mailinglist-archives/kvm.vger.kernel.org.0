@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EF03791911
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 15:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD88679191C
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 15:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345048AbjIDNqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 09:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37294 "EHLO
+        id S1351322AbjIDNsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 09:48:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244007AbjIDNqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 09:46:17 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865FD9E
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 06:46:14 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9a1de3417acso509292966b.0
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 06:46:14 -0700 (PDT)
+        with ESMTP id S242536AbjIDNsa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 09:48:30 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B651713
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 06:48:23 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9a5be3166a2so204140166b.1
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 06:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693835173; x=1694439973; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1693835302; x=1694440102; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MvFpohTVYIZg5zZrtXqASIgY84rg/Ko8jDcHzB0T9Sk=;
-        b=AGWgoqtOgAoGQ9YM2Q8tVG78Z0ckLz16CVxzS5E+VvbkH5aA4dGWTfytqMvSL6/Q5S
-         HGELQoRTgrfYrAJ4fQTF7Azzp2SLGWV+NyXDQV2STuEYJ7CIpknDZiskukv/IiPzufsD
-         1uKzAIc/J8674rZdIhyv2YWD6FkexdKXgQ/PPO6P5efqlmzuhoyjcLtZ0ebz0aK0vuHY
-         +rVBqjZwlYmK14s46dxuFEQH+iDtqkL0Y4yAzT2fVHNqxHpsQqWtxCuJaF1FUugdtB6U
-         yWQVb14ItOs62DOuTPIstV7WmyzuiqJoIhDgizy6tYoAzQs+9Va83LRSYNxNH8pM/U2B
-         MTWw==
+        bh=h3fvlfFXn3XSbLUjhzD0K7O7WyFDtRiY642hHRw1Uek=;
+        b=XVJ61loohnlCQppZrhwndbL54iwlD/8QOhM6wmWdcBvTspmbye0CLST7U7jAScrOMc
+         7ihwNbvTWteWCXJB/6aT9yaZZiGrcFZ3PhVtd/xw62S6Q1nZoC2nXzqsFXArw1l489wR
+         B/+YDR/53KDwYxyIebSnFmvvukpK/8hbm+OVBMWZSgEj89jU9jbIXWmsGWpdg/WrdrP3
+         yC5FjnLos2TWnpFpPX4MiC1kJfbxU4D1H0hKVufQqa+aCV4h5OllYme5DCQnx7Lwoe/r
+         0knHcaD0zfZQGSPeHw7PrUMJIusBy/vkYtjjz1cxGWc/RgxqTs4ab/at/Kay8GicCFFf
+         AdZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693835173; x=1694439973;
+        d=1e100.net; s=20221208; t=1693835302; x=1694440102;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MvFpohTVYIZg5zZrtXqASIgY84rg/Ko8jDcHzB0T9Sk=;
-        b=VDnUTdkNJ4qoXLpnvqSXj8rWGOnEJtrhPfX69LIWSfBcTETf+NkbGhZdSk2CCIbplu
-         8Ro/ol0FiulyFs0wIfoCSMDrQ3bugmH+pyKfCMfhuI1BMizZeAant5nmTdf3lRKXShFL
-         eQbAvo4UnYxx/xj/HUDiRuHuxvYiq0JWxOuxLDxtnY8aP7kQ/q+43Hp+nAR+jVkryWOF
-         mYQoMplLCJQ3f4F6a6Yjb7tdgSAtbiaFSej44pWQfoqCuLflS4VzRFEzHVv7wBgsRbCE
-         BtNCF5M3N4eb3qNIxwCwvvhBXUusySNSIEfdMJ6Bo0NTfiiC43xzlWyiCvEw6g+oD+A/
-         UJ2g==
-X-Gm-Message-State: AOJu0YymGfqHZodQBi8KluEE4n3t5o8kbXmSQAO6kw/W6BJ00FPfgTj4
-        B/SM+cKdcEBDiwPeoh3Gt5WIRQ==
-X-Google-Smtp-Source: AGHT+IEdZjuBxG+ZQHNKrQOJiw6f0psWqsTfKbwqOJ2nIP8Um69rD+e7ovBSZFqMEfeYtMk2y26GEQ==
-X-Received: by 2002:a17:906:51c5:b0:99c:5056:4e31 with SMTP id v5-20020a17090651c500b0099c50564e31mr10901921ejk.15.1693835172485;
-        Mon, 04 Sep 2023 06:46:12 -0700 (PDT)
+        bh=h3fvlfFXn3XSbLUjhzD0K7O7WyFDtRiY642hHRw1Uek=;
+        b=l97/P/iZIpghyZyISSHHmEtrd5RCSgXxFIB5NRvcL2vUOJMGFuQXawm2o/7CFFcr3a
+         HsBj2g2aTT7/EHHsve2PTk7tzPfqyx8oavIMc0kmnvtdgHfQ/HDyl06oGo3TO9NvWIPG
+         crc4gMP293BuJpEuBQbS71FkDOvUmz5YRXhQbuEuXyWgGUv551uw35qIq5X7EzuWPGY+
+         okm+UQmlJ2gSjncHSLWkGsJ32S49JPr0aM5qpNqhwZd2l2dMfQccOneIutLZxoy00E/V
+         hor8YAhA0uswUjapf81XhbZDBws/5f9AN2iHpnbuBvcsMAbNWRmSFMWKwCsLrMPymPdk
+         uBbw==
+X-Gm-Message-State: AOJu0Yw1g2vHYC4Y3m6djVERrg84t5UtHanfOsp28TwUx7BQTXzhPywh
+        8maxgDBcMj9mWUk3cBWaV8ClMA==
+X-Google-Smtp-Source: AGHT+IEdmuQ6wKTsIKPR4BXTBtwQWbUG0Viumxey9/oZVxntWMhJSLmNtJQgpZUnWcUIixf4ahyhVQ==
+X-Received: by 2002:a17:907:2e19:b0:9a1:ce57:8e47 with SMTP id ig25-20020a1709072e1900b009a1ce578e47mr7114400ejc.68.1693835302263;
+        Mon, 04 Sep 2023 06:48:22 -0700 (PDT)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id l18-20020a1709066b9200b009930308425csm6163942ejr.31.2023.09.04.06.46.11
+        by smtp.gmail.com with ESMTPSA id h26-20020a1709062dda00b009a1fef32ce6sm6233554eji.177.2023.09.04.06.48.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 06:46:12 -0700 (PDT)
-Date:   Mon, 4 Sep 2023 15:46:11 +0200
+        Mon, 04 Sep 2023 06:48:21 -0700 (PDT)
+Date:   Mon, 4 Sep 2023 15:48:21 +0200
 From:   Andrew Jones <ajones@ventanamicro.com>
 To:     Haibo Xu <haibo1.xu@intel.com>
 Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
@@ -62,61 +62,58 @@ Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Anup Patel <anup@brainfault.org>,
         Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, wchen <waylingii@gmail.com>,
+        Guo Ren <guoren@kernel.org>,
         Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
         Greentime Hu <greentime.hu@sifive.com>,
         Sean Christopherson <seanjc@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Aaron Lewis <aaronlewis@google.com>,
         David Matlack <dmatlack@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
         Mingwei Zhang <mizhang@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Lei Wang <lei4.wang@intel.com>,
         Vipin Sharma <vipinsh@google.com>,
+        Like Xu <likexu@tencent.com>, Peter Gonda <pgonda@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
-        Peter Gonda <pgonda@google.com>,
-        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
         Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
         David Woodhouse <dwmw@amazon.co.uk>,
         Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
         linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 5/8] KVM: riscv: selftests: Add exception handling
- support
-Message-ID: <20230904-c4d2ea8fcfdea6e6722332b2@orel>
+Subject: Re: [PATCH v2 6/8] KVM: riscv: selftests: Add guest helper to get
+ vcpu id
+Message-ID: <20230904-db7e8ba933a271ef6aafa4b3@orel>
 References: <cover.1693659382.git.haibo1.xu@intel.com>
- <ff41e98a062e0fbb5c2d8dc26d9e4e02c4ce3ea8.1693659382.git.haibo1.xu@intel.com>
+ <23d13f60b5a2fd31b87ae78458507f46442fac3a.1693659382.git.haibo1.xu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ff41e98a062e0fbb5c2d8dc26d9e4e02c4ce3ea8.1693659382.git.haibo1.xu@intel.com>
+In-Reply-To: <23d13f60b5a2fd31b87ae78458507f46442fac3a.1693659382.git.haibo1.xu@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 02, 2023 at 08:59:27PM +0800, Haibo Xu wrote:
-> Add the infrastructure for guest exception handling in riscv selftests.
-> Customized handlers can be enabled by vm_install_exception_handler(vector)
-> or vm_install_interrupt_handler().
-> 
-> The code is inspired from that of x86/arm64.
+On Sat, Sep 02, 2023 at 08:59:28PM +0800, Haibo Xu wrote:
+> Add guest_get_vcpuid() helper to simplify accessing to per-cpu
+> private data. The sscratch CSR was used to store the vcpu id.
 > 
 > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/include/riscv/processor.h   |  43 ++++++++
->  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++++++++++++++++
->  .../selftests/kvm/lib/riscv/processor.c       |  69 ++++++++++++
->  4 files changed, 214 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+>  tools/testing/selftests/kvm/include/aarch64/processor.h | 4 ----
+>  tools/testing/selftests/kvm/include/kvm_util_base.h     | 2 ++
+>  tools/testing/selftests/kvm/lib/riscv/processor.c       | 8 ++++++++
+>  3 files changed, 10 insertions(+), 4 deletions(-)
 >
 
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
