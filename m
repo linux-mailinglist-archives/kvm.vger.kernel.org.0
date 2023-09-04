@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A41B7791540
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 11:56:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 428DB791546
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 11:57:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236158AbjIDJ46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 05:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58200 "EHLO
+        id S237573AbjIDJ5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 05:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233977AbjIDJ45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 05:56:57 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2069.outbound.protection.outlook.com [40.107.100.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8761AC;
-        Mon,  4 Sep 2023 02:56:31 -0700 (PDT)
+        with ESMTP id S234485AbjIDJ5c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 05:57:32 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2073.outbound.protection.outlook.com [40.107.92.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54FDCD8;
+        Mon,  4 Sep 2023 02:57:10 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XkezT17YpCE9XH/tCrXUuL71bKMs2b9RBFupbWLsstUtQeETIhtRhWor6yeWr+Be9nSVhXKpA0hz3+YgvZKVE8G2Bg7rCp9OMCIaNpY8zZxP/MOnKx3/YE6vfr6Rd+NY/0H/iwMEVLQ32M1u2LKQT+Hvdt/dY/IB0+04VbL2VUncyNsgIo3eSsDS0+Tl4j6en7BKYO19WxaQShk+yI85vGDE4DtLz3y8A9t5o4tuqb4PA2MCH6ZOjwckljz+8SCs1/n63iH1/pAIJS6yltNFcFXnYSxW6sgeMimDS7qfR6BWHb6FMuwhNlwBXfP51UUQMeHiHHejB5g9HjBLq03cpg==
+ b=VajvsAwxc5Lfvudq3tCT4xFhrFFdOU9d4J4EL0xu3zcPjoWQAk3M2TssvJX2dPBJupDt0Ts+dKldrFlBsmAFIYdSY+JN42yglZkGzO92TdBOxH25yTodEuTUC0HwHKITnTIG+2dRulqZ369S9ZqT3rXxWa9mMTMdjwrjsM5a6O5rPDGW8BCgw/YpntgNTSMJOPIPq+emYMxRQjiMR2cSc5lyU8HsoNrZgjbLn4eLWNPUpXnwJeDd7xuQobA2572vQmZN77dpymBTtGRAX1vnirdAQFuDAAXnejbgt71Uz1n0kFVPQKNOoVIlwNiE/UEj6ep8fyB9Pw4bEInpXFvsVg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=glVnzG9XCJ+4K13xqccDVQSz9aoSLG442usEAi1R78Q=;
- b=SXyPhr0cwP0vZpbdPH6rPNYjoi/XWcq9rn2+3CHsE/xR0iV2DDJv4Ich4nylHNTH6i1hacw1yyNUvO2VOWMvQL0d4w5EmilEnDO/g3PQ0GUvWvr2yLNsbF8hHfq7BRfSqgDzmyMDEBKBb6u5Pvj1UpUSCiWSD48/OUCV0Euww4/jTh+JVFGSIS0KSnW9K3/n2rQi6OkKQZJzOJu9WpUvlI7PZ7QvGQ3y0UiiUOJumEpXXi736WruCULk8TjC5QBZbIAM4rD5BEgoqEvdMpR3HAzoJtve4U95GXjQzcE277SHe5814l5LMjhlkzBvDQgIic7EXU1DmRdjwH/1BLZCPA==
+ bh=c6akqhtljF1NHy+0XwWvGpX8Rj+0MYE+H/Pi62+ChTw=;
+ b=U0UxAnmHBZk9ebtW7KRb9IsynI5khmxHFDTzex4PGh+61g6B0iI9Li9FnErCrnltHF4ORUZGypKLBRkLub1mvVOoJQaA4bO/a9gghQT6F3dttOOvPvH/CgQPUw2mzgKvOwdMQDpNptCY8NGxqTB+OzNP2nKy8HnNpqroKWzXNLPlDjZLxl8lFeWaYvYbqIXu5gXwZoMCyUNNVy7X9wdvPQscPZ3oYE4u9Y4/kf5L9i09ohLq/1wXlzDwTvg0JAIiy6ilHaNGx5j2KdSql+tA2c934Hyozt/0dYSdLYMPpJINipze5F1M4yNRBSttmDjKP4wqdoY9gcjpbSuIuAkqpw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=glVnzG9XCJ+4K13xqccDVQSz9aoSLG442usEAi1R78Q=;
- b=XRrcccsl102Jg27mXlpo8ovcKo7wpffg6I7DxRFSMSq9Q5FeJPwT5weF26xAYjZvLNYtKuIzfEUkfCN1khbHbRZZICd+hcn3zAcG++lS1YNmHDf4/UIyEwvSFMyL5NaB5K2ivnF33i8wrmOvYXLxo8UvLttdN0rTtWoEHU4KyBM=
-Received: from DM6PR07CA0089.namprd07.prod.outlook.com (2603:10b6:5:337::22)
- by CY8PR12MB8364.namprd12.prod.outlook.com (2603:10b6:930:7f::7) with
+ bh=c6akqhtljF1NHy+0XwWvGpX8Rj+0MYE+H/Pi62+ChTw=;
+ b=YDuyLiY/c4cVshEsQqzmWJAxt+mkAiF9cqHnz0uHeUPfqjpRwx+KKPtEEaZ1YoB5DMPS8wXY3Quap9x69R0sB6kxhQYMTkhK2IhfvCn7UcaG4V65RM/cu6VtByzBzjKLOXCoaTGRwedj5PldWM8sDM1Gj6+i+P+xEpLrAWj3NT4=
+Received: from CH2PR03CA0010.namprd03.prod.outlook.com (2603:10b6:610:59::20)
+ by SJ0PR12MB7459.namprd12.prod.outlook.com (2603:10b6:a03:48d::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.30; Mon, 4 Sep
- 2023 09:55:41 +0000
-Received: from DS2PEPF0000343E.namprd02.prod.outlook.com
- (2603:10b6:5:337:cafe::58) by DM6PR07CA0089.outlook.office365.com
- (2603:10b6:5:337::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33 via Frontend
- Transport; Mon, 4 Sep 2023 09:55:41 +0000
+ 2023 09:57:07 +0000
+Received: from DS2PEPF0000343B.namprd02.prod.outlook.com
+ (2603:10b6:610:59:cafe::ae) by CH2PR03CA0010.outlook.office365.com
+ (2603:10b6:610:59::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.32 via Frontend
+ Transport; Mon, 4 Sep 2023 09:57:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS2PEPF0000343E.mail.protection.outlook.com (10.167.18.41) with Microsoft
+ DS2PEPF0000343B.mail.protection.outlook.com (10.167.18.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6768.25 via Frontend Transport; Mon, 4 Sep 2023 09:55:40 +0000
+ 15.20.6768.25 via Frontend Transport; Mon, 4 Sep 2023 09:57:07 +0000
 Received: from brahmaputra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 4 Sep
- 2023 04:54:49 -0500
+ 2023 04:55:40 -0500
 From:   Manali Shukla <manali.shukla@amd.com>
 To:     <kvm@vger.kernel.org>, <seanjc@google.com>
 CC:     <linux-doc@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
@@ -60,9 +60,9 @@ CC:     <linux-doc@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
         <bp@alien8.de>, <santosh.shukla@amd.com>, <ravi.bangoria@amd.com>,
         <thomas.lendacky@amd.com>, <nikunj@amd.com>,
         <manali.shukla@amd.com>
-Subject: [PATCH 08/13] perf/x86/amd: Add framework to save/restore host IBS state
-Date:   Mon, 4 Sep 2023 09:53:42 +0000
-Message-ID: <20230904095347.14994-9-manali.shukla@amd.com>
+Subject: [PATCH 09/13] KVM: SVM: add support for IBS virtualization for non SEV-ES guests
+Date:   Mon, 4 Sep 2023 09:53:43 +0000
+Message-ID: <20230904095347.14994-10-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230904095347.14994-1-manali.shukla@amd.com>
 References: <20230904095347.14994-1-manali.shukla@amd.com>
@@ -74,23 +74,23 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF0000343E:EE_|CY8PR12MB8364:EE_
-X-MS-Office365-Filtering-Correlation-Id: 343c5311-4d66-4868-9544-08dbad2d1928
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343B:EE_|SJ0PR12MB7459:EE_
+X-MS-Office365-Filtering-Correlation-Id: 433bc5f8-1cf0-448b-8687-08dbad2d4c9b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gQ+VWFPFXdOeWYcdsY6P8uwkO8ZIJVIoQZtEqE/2W1WCl+TO22xYD/CYXZl751Nn5kpndw5vZf/HK7nzsuqEfW4Y0tsoPc3VI4VbSsidKIsa/TTjUQm4d8G1TYqIcy1VB+pcvqYirf1dGDy9Ma+9rDCjvjI2puCsR3skm1YYgkW/ihZz1ig5Ifpv8yHR/fEy4muwFxL7MS59DNYwXGwmncLDhKz/BBk+xxpa85VXGIC5hjlPWIZ3YA/qaPvFmZ+aWxN8IvDaQNoHuotUO/QiiPXtGLRDjyijcbqJJOcewijeFES8OeQFljoF1AqBDcA0nYYC01jZVoxz0KtXc2SOtp7VgKR8ppbqprw3lnd8eJEfckjSUZO12Kr6cqD2ixGZoDwGvkTB0K8JAVh5Ldq6WbI2ruBqeuzRCe2XBzaa0zQg2dxQyJVgdtDl+M5gpVhbYJINMj1WxiMQ43eApPtmDLJwnJy328sCWRKDRlHULAV8xstbOCQ23ZL5Wg+eimgXB88BS3at871nYr+PBr02vI7ImUZZ8NNOO2i1+LWGX0lgGoq6TRTghHiiDoGSfgKHkw+uU0uUGygCMKnsuQCyV43W3qbnMrgATBgEG+E4AWCv3Xlc8g0C/d7ZjqdP/CsjvoDznmdsw0fkp2CXDrWX7xUaxOPgf+tBm522+kvi46CdnBDlbbSLvOVVPiLeq2EVmcBwZ2r0sEANe0kgC+RKyXE+YjF+vk8Kvy9nNWDpuHts3ywmaLx1BzWB8JGfQfnZnSH0xqUuCT1PiGzo2PH4NA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199024)(1800799009)(186009)(82310400011)(40470700004)(36840700001)(46966006)(316002)(110136005)(36756003)(54906003)(2906002)(86362001)(70206006)(70586007)(40480700001)(8936002)(5660300002)(44832011)(4326008)(8676002)(41300700001)(40460700003)(36860700001)(426003)(2616005)(83380400001)(336012)(1076003)(26005)(16526019)(47076005)(966005)(478600001)(81166007)(356005)(82740400003)(7696005)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: UXrD4SCMBCh+ob3lgwVyrqok/6cNSecOZYVMfq9XoSdW68EZWFXkuoY1U8SuISMX9faEjC68REiWqGJHLz13wqJt+6O7vXHvrMBh+Ad/CQ5IZs9wiIyrZnNkTmxS4RDQut5DAZV4/kzBrILbv+igxyVp5Io5G2v8RCACdkV3AoxnxIaTgDM4aOkaT6PzV2j+IIafVuZnN1DXox65+nLtvjWlK81WK0YAjEeCdZQG4KdwPy4MDBZAIIZZCBRYnqmnuZ8QuoX0QoMVygzC8azjG699e82nL7TNDgRYjLB5F4B6/18MzIX+ZGLAkNSewWRPqLBaFVeTiT0IlB3AQ/H343jvQCsaT0/czpBEv97yIH3lmfxcv9LfI1jljkQRkUF948dAKyv5/uPvSPErbEdgr5/o/LZhp6rOC1TfVuLau004Kk6wSk229Rt3QyPeEfg2E+NLAwrEK27k3liNNiTKNg65zcAOHF24R5OXZPIZNsMEAYfjwROETF1iDPRk7V7qjpjmHvs+JCBU1sFBViMwlwyJby8zZLKlaZsPUzkn5hU3FZpvLzPFeRPTtn6ps+mLSHe3ULdZ73UUs4uZ1Dg9vZwLApigtuyPmgEHdkup+hCmqMHh0h2kE4rN6CzW55wU0GxM6A1U6vXoOYzEofxDebq79XNhCVYVJogpUc7RZCByvDmOqBw15XvsNuP4NrKOVshZMvRSVEWm/bcXswQ69klU+hLkclphnOXpmBDEyDVtXYqmDCmKCrAINBMNYlkd
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(346002)(39860400002)(451199024)(186009)(1800799009)(82310400011)(36840700001)(40470700004)(46966006)(26005)(44832011)(426003)(336012)(16526019)(40480700001)(8936002)(8676002)(4326008)(36860700001)(47076005)(83380400001)(5660300002)(2616005)(1076003)(54906003)(7696005)(40460700003)(41300700001)(110136005)(478600001)(70206006)(70586007)(86362001)(316002)(356005)(36756003)(2906002)(966005)(81166007)(82740400003)(30864003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 09:55:40.9499
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 09:57:07.2670
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 343c5311-4d66-4868-9544-08dbad2d1928
+X-MS-Exchange-CrossTenant-Network-Message-Id: 433bc5f8-1cf0-448b-8687-08dbad2d4c9b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS2PEPF0000343E.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS2PEPF0000343B.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8364
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7459
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -101,264 +101,330 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since IBS registers falls under swap type C [1], only the guest state
-is saved and restored automatically by the hardware. Host state needs
-to be saved and restored manually by the hypervisor. Note that, saving
-and restoring of host IBS state happens only when IBS is active on
-host to avoid unnecessary rdmsrs/wrmsrs.
+From: Santosh Shukla <santosh.shukla@amd.com>
 
-Also, hypervisor needs to disable host IBS before VMRUN and re-enable
-it after VMEXIT [2]. However, disabling and enabling of IBS leads to
-subtle races between software and hardware since IBS_*_CTL registers
-contain both control and result bits in the same MSR.
+IBS virtualization (VIBS) [1] feature allows the guest to collect IBS
+samples without exiting the guest.
 
-Consider the following scenario, hypervisor reads IBS control MSR and
-finds enable=1 (control bit) and valid=0 (result bit). While kernel is
-clearing enable bit in its local copy, IBS hardware sets valid bit to
-1 in the MSR. Software, who is unaware of the change done by IBS
-hardware, overwrites IBS MSR with enable=0 and valid=0. Note that,
-this situation occurs while NMIs are disabled. So CPU will receive IBS
-NMI only after STGI. However, the IBS driver won't handle NMI because
-of the valid bit being 0. Since the real source of NMI was IBS, nobody
-else will also handle it which will result in the unknown NMIs.
+There are 2 parts to this feature
+- Virtualizing the IBS register state.
+- Ensuring the IBS interrupt is handled in the guest without exiting
+  to the hypervisor.
 
-Handle the above mentioned race by keeping track of different actions
-performed by KVM on IBS:
+IBS virtualization requires the use of AVIC or NMI virtualization for
+delivery of a virtualized interrupt from IBS hardware in the guest.
+Without the virtualized interrupt delivery, the IBS interrupt
+occurring in the guest will not be delivered to either the guest or
+the hypervisor.  When AVIC is enabled, IBS LVT entry (Extended
+Interrupt 0 LVT) message type should be programmed to INTR or NMI.
 
-  WINDOW_START: After CLGI and before VMRUN. KVM informs IBS driver
-                about its intention to enable IBS for the guest. Thus
-		IBS should be disabled on host and IBS host register
-		state should be saved.
-  WINDOW_STOPPING: After VMEXIT and before STGI. KVM informs IBS driver
-                that it's done using IBS inside the guest and thus host
-		IBS state should be restored followed by re-enabling
-		IBS for host.
-  WINDOW_STOPPED: After STGI. CPU will receive any pending NMI if it
-                was raised between CLGI and STGI. NMI will be marked
-		as handled by IBS driver if WINDOW_STOPPED action is
-                _not performed, valid bit is _not_ set and a valid
-                IBS event exists. However, IBS sample won't be generated.
+So, when the sampled interval for the data collection for IBS fetch/op
+block is over, VIBS hardware is going to generate a Virtual NMI, but
+the source of Virtual NMI is different in both AVIC enabled/disabled
+case.
+1) when AVIC is enabled, Virtual NMI is generated via AVIC using
+   extended LVT (EXTLVT).
+2) When AVIC is disabled, Virtual NMI is directly generated from
+   hardware.
+
+Since IBS registers falls under swap type C [2], only the guest state is
+saved and restored automatically by the hardware. Host state needs to be
+saved and restored manually by the hypervisor. Note that, saving and
+restoring of host IBS state happens only when IBS is active on host.  to
+avoid unnecessary rdmsrs/wrmsrs. Hypervisor needs to disable host IBS
+before VMRUN and re-enable it after VMEXIT [1].
+
+The IBS virtualization feature for non SEV-ES guests is not enabled in
+this patch. Later patches enable VIBS for non SEV-ES guests.
 
 [1]: https://bugzilla.kernel.org/attachment.cgi?id=304653
-     AMD64 Architecture Programmer’s Manual, Vol 2, Appendix B Layout
-     of VMCB, Table B-3 Swap Types.
-
-[2]: https://bugzilla.kernel.org/attachment.cgi?id=304653
      AMD64 Architecture Programmer’s Manual, Vol 2, Section 15.38
      Instruction-Based Sampling Virtualization.
 
+[2]: https://bugzilla.kernel.org/attachment.cgi?id=304653
+     AMD64 Architecture Programmer’s Manual, Vol 2, Appendix B Layout
+     of VMCB, Table B-3 Swap Types.
+
+Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+Co-developed-by: Manali Shukla <manali.shukla@amd.com>
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- arch/x86/events/amd/Makefile      |   2 +-
- arch/x86/events/amd/ibs.c         |  23 +++++++
- arch/x86/events/amd/vibs.c        | 101 ++++++++++++++++++++++++++++++
- arch/x86/include/asm/perf_event.h |  27 ++++++++
- 4 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/events/amd/vibs.c
+ arch/x86/kvm/svm/svm.c | 172 ++++++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.h |   4 +-
+ 2 files changed, 173 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/events/amd/Makefile b/arch/x86/events/amd/Makefile
-index 527d947eb76b..13c2980db9a7 100644
---- a/arch/x86/events/amd/Makefile
-+++ b/arch/x86/events/amd/Makefile
-@@ -2,7 +2,7 @@
- obj-$(CONFIG_CPU_SUP_AMD)		+= core.o lbr.o
- obj-$(CONFIG_PERF_EVENTS_AMD_BRS)	+= brs.o
- obj-$(CONFIG_PERF_EVENTS_AMD_POWER)	+= power.o
--obj-$(CONFIG_X86_LOCAL_APIC)		+= ibs.o
-+obj-$(CONFIG_X86_LOCAL_APIC)		+= ibs.o vibs.o
- obj-$(CONFIG_PERF_EVENTS_AMD_UNCORE)	+= amd-uncore.o
- amd-uncore-objs				:= uncore.o
- ifdef CONFIG_AMD_IOMMU
-diff --git a/arch/x86/events/amd/ibs.c b/arch/x86/events/amd/ibs.c
-index 6911c5399d02..359464f2910d 100644
---- a/arch/x86/events/amd/ibs.c
-+++ b/arch/x86/events/amd/ibs.c
-@@ -1039,6 +1039,16 @@ static int perf_ibs_handle_irq(struct perf_ibs *perf_ibs, struct pt_regs *iregs)
- 		 */
- 		if (test_and_clear_bit(IBS_STOPPED, pcpu->state))
- 			return 1;
-+		/*
-+		 * Catch NMIs generated in an active IBS window: Incoming NMIs
-+		 * from an active IBS window might have the VALID bit cleared
-+		 * when it is supposed to be set due to a race. The reason for
-+		 * the race is ENABLE and VALID bits for MSR_AMD64_IBSFETCHCTL
-+		 * and MSR_AMD64_IBSOPCTL being in their same respective MSRs.
-+		 * Ignore all such NMIs and treat them as handled.
-+		 */
-+		if (amd_vibs_ignore_nmi())
-+			return 1;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 20fe83eb32ee..6f566ed93f4c 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -139,6 +139,22 @@ static const struct svm_direct_access_msrs {
+ 	{ .index = X2APIC_MSR(APIC_TMICT),		.always = false },
+ 	{ .index = X2APIC_MSR(APIC_TMCCT),		.always = false },
+ 	{ .index = X2APIC_MSR(APIC_TDCR),		.always = false },
++	{ .index = MSR_AMD64_IBSFETCHCTL,		.always = false },
++	{ .index = MSR_AMD64_IBSFETCHLINAD,		.always = false },
++	{ .index = MSR_AMD64_IBSOPCTL,			.always = false },
++	{ .index = MSR_AMD64_IBSOPRIP,			.always = false },
++	{ .index = MSR_AMD64_IBSOPDATA,			.always = false },
++	{ .index = MSR_AMD64_IBSOPDATA2,		.always = false },
++	{ .index = MSR_AMD64_IBSOPDATA3,		.always = false },
++	{ .index = MSR_AMD64_IBSDCLINAD,		.always = false },
++	{ .index = MSR_AMD64_IBSBRTARGET,		.always = false },
++	{ .index = MSR_AMD64_ICIBSEXTDCTL,		.always = false },
++	{ .index = X2APIC_MSR(APIC_EFEAT),		.always = false },
++	{ .index = X2APIC_MSR(APIC_ECTRL),		.always = false },
++	{ .index = X2APIC_MSR(APIC_EILVTn(0)),		.always = false },
++	{ .index = X2APIC_MSR(APIC_EILVTn(1)),		.always = false },
++	{ .index = X2APIC_MSR(APIC_EILVTn(2)),		.always = false },
++	{ .index = X2APIC_MSR(APIC_EILVTn(3)),		.always = false },
+ 	{ .index = MSR_INVALID,				.always = false },
+ };
  
- 		return 0;
+@@ -217,6 +233,10 @@ module_param(vgif, int, 0444);
+ static int lbrv = true;
+ module_param(lbrv, int, 0444);
+ 
++/* enable/disable IBS virtualization */
++static int vibs;
++module_param(vibs, int, 0444);
++
+ static int tsc_scaling = true;
+ module_param(tsc_scaling, int, 0444);
+ 
+@@ -1050,6 +1070,20 @@ void disable_nmi_singlestep(struct vcpu_svm *svm)
  	}
-@@ -1542,3 +1552,16 @@ static __init int amd_ibs_init(void)
+ }
  
- /* Since we need the pci subsystem to init ibs we can't do this earlier: */
- device_initcall(amd_ibs_init);
-+
-+static inline bool get_ibs_state(struct perf_ibs *perf_ibs)
++void svm_ibs_msr_interception(struct vcpu_svm *svm, bool intercept)
 +{
-+	struct cpu_perf_ibs *pcpu = this_cpu_ptr(perf_ibs->pcpu);
-+
-+	return test_bit(IBS_STARTED, pcpu->state);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSFETCHCTL, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSFETCHLINAD, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSOPCTL, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSOPRIP, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSOPDATA, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSOPDATA2, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSOPDATA3, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSDCLINAD, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_IBSBRTARGET, !intercept, !intercept);
++	set_msr_interception(&svm->vcpu, svm->msrpm, MSR_AMD64_ICIBSEXTDCTL, !intercept, !intercept);
 +}
 +
-+bool is_amd_ibs_started(void)
-+{
-+	return get_ibs_state(&perf_ibs_fetch) || get_ibs_state(&perf_ibs_op);
-+}
-+EXPORT_SYMBOL_GPL(is_amd_ibs_started);
-diff --git a/arch/x86/events/amd/vibs.c b/arch/x86/events/amd/vibs.c
-new file mode 100644
-index 000000000000..273a60f1cb7f
---- /dev/null
-+++ b/arch/x86/events/amd/vibs.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  Virtualized Performance events - AMD VIBS
-+ *
-+ *  Copyright (C) 2023 Advanced Micro Devices, Inc., Manali Shukla
-+ *
-+ *  For licencing details see kernel-base/COPYING
-+ */
+ static void grow_ple_window(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -1207,6 +1241,29 @@ static inline void init_vmcb_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		/* No need to intercept these MSRs */
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 1, 1);
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 1, 1);
 +
-+#include <linux/perf_event.h>
-+
-+DEFINE_PER_CPU(bool, vibs_window_active);
-+
-+static bool amd_disable_ibs_fetch(u64 *ibs_fetch_ctl)
-+{
-+	*ibs_fetch_ctl = __rdmsr(MSR_AMD64_IBSFETCHCTL);
-+	if (!(*ibs_fetch_ctl & IBS_FETCH_ENABLE))
-+		return false;
-+
-+	native_wrmsrl(MSR_AMD64_IBSFETCHCTL, *ibs_fetch_ctl & ~IBS_FETCH_ENABLE);
-+
-+	return true;
-+}
-+
-+static u64 amd_disable_ibs_op(u64 *ibs_op_ctl)
-+{
-+	*ibs_op_ctl = __rdmsr(MSR_AMD64_IBSOPCTL);
-+	if (!(*ibs_op_ctl & IBS_OP_ENABLE))
-+		return false;
-+
-+	native_wrmsrl(MSR_AMD64_IBSOPCTL, *ibs_op_ctl & ~IBS_OP_ENABLE);
-+
-+	return true;
-+}
-+
-+static void amd_restore_ibs_fetch(u64 ibs_fetch_ctl)
-+{
-+	native_wrmsrl(MSR_AMD64_IBSFETCHCTL, ibs_fetch_ctl);
-+}
-+
-+static void amd_restore_ibs_op(u64 ibs_op_ctl)
-+{
-+	native_wrmsrl(MSR_AMD64_IBSOPCTL, ibs_op_ctl);
-+}
-+
-+bool amd_vibs_ignore_nmi(void)
-+{
-+	return __this_cpu_read(vibs_window_active);
-+}
-+EXPORT_SYMBOL_GPL(amd_vibs_ignore_nmi);
-+
-+bool amd_vibs_window(enum amd_vibs_window_state state, u64 *f_ctl,
-+		     u64 *o_ctl)
-+{
-+	bool f_active, o_active;
-+
-+	switch (state) {
-+	case WINDOW_START:
-+		if (!f_ctl || !o_ctl)
-+			return false;
-+
-+		if (!is_amd_ibs_started())
-+			return false;
-+
-+		f_active = amd_disable_ibs_fetch(f_ctl);
-+		o_active = amd_disable_ibs_op(o_ctl);
-+		__this_cpu_write(vibs_window_active, (f_active || o_active));
-+		break;
-+
-+	case WINDOW_STOPPING:
-+		if (!f_ctl || !o_ctl)
-+			return false;
-+
-+		if (__this_cpu_read(vibs_window_active))
-+			return false;
-+
-+		if (*f_ctl & IBS_FETCH_ENABLE)
-+			amd_restore_ibs_fetch(*f_ctl);
-+		if (*o_ctl & IBS_OP_ENABLE)
-+			amd_restore_ibs_op(*o_ctl);
-+
-+		break;
-+
-+	case WINDOW_STOPPED:
 +		/*
-+		 * This state is executed right after STGI (which is executed
-+		 * after VMEXIT).  By this time, host IBS states are already
-+		 * restored in WINDOW_STOPPING state, so f_ctl and o_ctl will
-+		 * be passed as NULL for this state.
++		 * If hardware supports VIBS then no need to intercept IBS MSRS
++		 * when VIBS is enabled in guest.
 +		 */
-+		if (__this_cpu_read(vibs_window_active))
-+			__this_cpu_write(vibs_window_active, false);
++		if (vibs) {
++			if (guest_cpuid_has(&svm->vcpu, X86_FEATURE_IBS)) {
++				svm_ibs_msr_interception(svm, false);
++				svm->ibs_enabled = true;
++
++				/*
++				 * In order to enable VIBS, AVIC/VNMI must be enabled to handle the
++				 * interrupt generated by IBS driver. When AVIC is enabled, once
++				 * data collection for IBS fetch/op block for sampled interval
++				 * provided is done, hardware signals VNMI which is generated via
++				 * AVIC which uses extended LVT registers. That is why extended LVT
++				 * registers are initialized at guest startup.
++				 */
++				kvm_apic_init_eilvt_regs(vcpu);
++			} else {
++				svm->ibs_enabled = false;
++			}
++		}
+ 	}
+ }
+ 
+@@ -2888,6 +2945,11 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_AMD64_DE_CFG:
+ 		msr_info->data = svm->msr_decfg;
+ 		break;
++
++	case MSR_AMD64_IBSCTL:
++		rdmsrl(MSR_AMD64_IBSCTL, msr_info->data);
 +		break;
 +
-+	default:
-+		return false;
-+	}
-+
-+	return __this_cpu_read(vibs_window_active);
-+}
-+EXPORT_SYMBOL_GPL(amd_vibs_window);
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 85a9fd5a3ec3..b87c235e0e1e 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -486,6 +486,12 @@ struct pebs_xmm {
- #define IBS_OP_MAX_CNT_EXT_MASK	(0x7FULL<<20)	/* separate upper 7 bits */
- #define IBS_RIP_INVALID		(1ULL<<38)
+ 	default:
+ 		return kvm_get_msr_common(vcpu, msr_info);
+ 	}
+@@ -4038,19 +4100,111 @@ static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
+ 	return EXIT_FASTPATH_NONE;
+ }
  
-+enum amd_vibs_window_state {
-+	WINDOW_START = 0,
-+	WINDOW_STOPPING,
-+	WINDOW_STOPPED,
++/*
++ * Since the IBS state is swap type C, the hypervisor is responsible for saving
++ * its own IBS state before VMRUN.
++ */
++static void svm_save_host_ibs_msrs(struct vmcb_save_area *hostsa)
++{
++	rdmsrl(MSR_AMD64_IBSFETCHLINAD, hostsa->ibs_fetch_linear_addr);
++	rdmsrl(MSR_AMD64_IBSOPRIP, hostsa->ibs_op_rip);
++	rdmsrl(MSR_AMD64_IBSOPDATA, hostsa->ibs_op_data);
++	rdmsrl(MSR_AMD64_IBSOPDATA2, hostsa->ibs_op_data2);
++	rdmsrl(MSR_AMD64_IBSOPDATA3, hostsa->ibs_op_data3);
++	rdmsrl(MSR_AMD64_IBSDCLINAD, hostsa->ibs_dc_linear_addr);
++	rdmsrl(MSR_AMD64_IBSBRTARGET, hostsa->ibs_br_target);
++	rdmsrl(MSR_AMD64_ICIBSEXTDCTL, hostsa->ibs_fetch_extd_ctl);
++}
++
++/*
++ * Since the IBS state is swap type C, the hypervisor is responsible for
++ * restoring its own IBS state after VMEXIT.
++ */
++static void svm_restore_host_ibs_msrs(struct vmcb_save_area *hostsa)
++{
++	wrmsrl(MSR_AMD64_IBSFETCHLINAD, hostsa->ibs_fetch_linear_addr);
++	wrmsrl(MSR_AMD64_IBSOPRIP, hostsa->ibs_op_rip);
++	wrmsrl(MSR_AMD64_IBSOPDATA, hostsa->ibs_op_data);
++	wrmsrl(MSR_AMD64_IBSOPDATA2, hostsa->ibs_op_data2);
++	wrmsrl(MSR_AMD64_IBSOPDATA3, hostsa->ibs_op_data3);
++	wrmsrl(MSR_AMD64_IBSDCLINAD, hostsa->ibs_dc_linear_addr);
++	wrmsrl(MSR_AMD64_IBSBRTARGET, hostsa->ibs_br_target);
++	wrmsrl(MSR_AMD64_ICIBSEXTDCTL, hostsa->ibs_fetch_extd_ctl);
++}
++
++/*
++ * Host states are categorized into three swap types based on how it is
++ * handled by hardware during a switch.
++ * Below enum represent host states which are categorized as Swap type C
++ *
++ * C: VMRUN:  Host state _NOT_ saved in host save area
++ *    VMEXIT: Host state initializard to default values.
++ *
++ * Swap type C state is not loaded by VMEXIT and is not saved by VMRUN.
++ * It needs to be saved/restored manually.
++ */
++enum {
++	SWAP_TYPE_C_IBS = 0,
++	SWAP_TYPE_C_MAX
 +};
 +
- #ifdef CONFIG_X86_LOCAL_APIC
- extern u32 get_ibs_caps(void);
- extern int forward_event_to_ibs(struct perf_event *event);
-@@ -584,6 +590,27 @@ static inline void intel_pt_handle_vmx(int on)
- }
- #endif
- 
-+#if defined(CONFIG_X86_LOCAL_APIC) && defined(CONFIG_CPU_SUP_AMD)
-+extern bool amd_vibs_window(enum amd_vibs_window_state state, u64 *vibs_fetch_ctl,
-+			    u64 *vibs_op_ctl);
-+extern bool is_amd_ibs_started(void);
-+extern bool amd_vibs_ignore_nmi(void);
-+#else
-+static inline bool amd_vibs_window(enum amd_vibs_window_state state, u64 *vibs_fetch_ctl,
-+				  u64 *vibs_op_ctl)
++/*
++ * Since IBS state is swap type C, hypervisor needs to disable IBS, then save
++ * IBS MSRs before VMRUN and re-enable it, then restore IBS MSRs after VMEXIT.
++ * This order is important, if not followed, software ends up reading inaccurate
++ * IBS registers.
++ */
++static noinstr u32 svm_save_swap_type_c(struct kvm_vcpu *vcpu)
 +{
-+	return false;
-+}
-+static inline bool is_amd_ibs_started(void)
-+{
-+	return false;
-+}
-+static inline bool amd_vibs_ignore_nmi(void)
-+{
-+	return false;
-+}
-+#endif
++	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
++	struct vmcb_save_area *hostsa;
++	u32 restore_mask = 0;
 +
- #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_AMD)
-  extern void amd_pmu_enable_virt(void);
-  extern void amd_pmu_disable_virt(void);
++	hostsa = (struct vmcb_save_area *)(page_address(sd->save_area) + 0x400);
++
++	if (to_svm(vcpu)->ibs_enabled) {
++		bool en = amd_vibs_window(WINDOW_START, &hostsa->ibs_fetch_ctl, &hostsa->ibs_op_ctl);
++
++		if (en) {
++			svm_save_host_ibs_msrs(hostsa);
++			restore_mask |= 1 << SWAP_TYPE_C_IBS;
++		}
++	}
++	return restore_mask;
++}
++
++static noinstr void svm_restore_swap_type_c(struct kvm_vcpu *vcpu, u32 restore_mask)
++{
++	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
++	struct vmcb_save_area *hostsa;
++
++	hostsa = (struct vmcb_save_area *)(page_address(sd->save_area) + 0x400);
++
++	if (restore_mask & (1 << SWAP_TYPE_C_IBS)) {
++		svm_restore_host_ibs_msrs(hostsa);
++		amd_vibs_window(WINDOW_STOPPING, &hostsa->ibs_fetch_ctl, &hostsa->ibs_op_ctl);
++	}
++}
++
+ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_intercepted)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	u32 restore_mask;
+ 
+ 	guest_state_enter_irqoff();
+ 
+ 	amd_clear_divider();
+ 
+-	if (sev_es_guest(vcpu->kvm))
++	if (sev_es_guest(vcpu->kvm)) {
+ 		__svm_sev_es_vcpu_run(svm, spec_ctrl_intercepted);
+-	else
++	} else {
++		restore_mask = svm_save_swap_type_c(vcpu);
+ 		__svm_vcpu_run(svm, spec_ctrl_intercepted);
+ 
++		if (restore_mask)
++			svm_restore_swap_type_c(vcpu, restore_mask);
++	}
++
+ 	guest_state_exit_irqoff();
+ }
+ 
+@@ -4137,6 +4291,13 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	/* Any pending NMI will happen here */
+ 
++	/*
++	 * Disable the IBS window since any pending IBS NMIs will have been
++	 * handled.
++	 */
++	if (svm->ibs_enabled)
++		amd_vibs_window(WINDOW_STOPPED, NULL, NULL);
++
+ 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+ 		kvm_after_interrupt(vcpu);
+ 
+@@ -5225,6 +5386,13 @@ static __init int svm_hardware_setup(void)
+ 			pr_info("LBR virtualization supported\n");
+ 	}
+ 
++	if (vibs) {
++		if ((vnmi || avic) && boot_cpu_has(X86_FEATURE_VIBS))
++			pr_info("IBS virtualization supported\n");
++		else
++			vibs = false;
++	}
++
+ 	if (!enable_pmu)
+ 		pr_info("PMU virtualization is disabled\n");
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index c7eb82a78127..c2a02629a1d1 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -30,7 +30,7 @@
+ #define	IOPM_SIZE PAGE_SIZE * 3
+ #define	MSRPM_SIZE PAGE_SIZE * 2
+ 
+-#define MAX_DIRECT_ACCESS_MSRS	46
++#define MAX_DIRECT_ACCESS_MSRS	62
+ #define MSRPM_OFFSETS	32
+ extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+ extern bool npt_enabled;
+@@ -260,6 +260,7 @@ struct vcpu_svm {
+ 	unsigned long soft_int_old_rip;
+ 	unsigned long soft_int_next_rip;
+ 	bool soft_int_injected;
++	bool ibs_enabled;
+ 
+ 	u32 ldr_reg;
+ 	u32 dfr_reg;
+@@ -732,6 +733,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
++void svm_ibs_msr_interception(struct vcpu_svm *svm, bool intercept);
+ 
+ /* vmenter.S */
+ 
 -- 
 2.34.1
 
