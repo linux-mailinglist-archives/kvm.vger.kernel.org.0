@@ -2,89 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A9BA79153B
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 11:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5918379154C
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 11:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352712AbjIDJz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 05:55:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37848 "EHLO
+        id S235465AbjIDJ5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 05:57:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235214AbjIDJzW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 05:55:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3DCCC7
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 02:54:18 -0700 (PDT)
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-qRomlt3BP9a06-KTMDWZeQ-1; Mon, 04 Sep 2023 05:54:16 -0400
-X-MC-Unique: qRomlt3BP9a06-KTMDWZeQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-401db0c9d3eso8600405e9.3
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 02:54:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693821255; x=1694426055;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uTvB95KyzDb1YHMdthNLhzgghnoayFFEqz5D/WvthFE=;
-        b=DxqZX9Whu595oytmPjj1paNHOnvCRXmgDh+j8PasXt9StNR6A74PkEnTergeYAylnk
-         Liilpte9RfbZz/CmC+PKmza4EJcXM8seVGulmEk4TPI+QgZeLjNqpS8RpHwXnEii0/Ek
-         29xikVtpvVZh4raRGclTQx+9wnm1pi2FejYAhn/66fMvAqIokUnyxoD2kmpKjXe9HwCV
-         DzoMNqaMhkgFMnCxXcrEBgzLinVFX0phDzPZBeHU3sXH5E9KKz/P35ADEVNX03PhP0PL
-         4iW87z0brtQUSp+qg0lHjgl6+WIQTpZnSZ+OGTRTXN3CEKzvIB6XlN2D/MO3MMheiHrD
-         pOQw==
-X-Gm-Message-State: AOJu0YySyiYKkPNAqa4WfncOq0NrqJrw/zcOHLXc46UC+zdbZF43ZmBB
-        GkCy2RKk5KyjXtkx6y7L6KqHHJs9aj7xn1f7Gs+KZH31B/H6t/XVoELnfuRpnxfp/Cs2FIgTNf0
-        VdN35/DBviSmJ
-X-Received: by 2002:a05:600c:446:b0:401:c52c:5ed9 with SMTP id s6-20020a05600c044600b00401c52c5ed9mr7189480wmb.32.1693821255443;
-        Mon, 04 Sep 2023 02:54:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFI10YPPteFQXl1Pb89NCBFyOvAvoSR+teTCFaysuJFUUiOp7xeh0z9/8Eei9B2E8yp9v3jyQ==
-X-Received: by 2002:a05:600c:446:b0:401:c52c:5ed9 with SMTP id s6-20020a05600c044600b00401c52c5ed9mr7189466wmb.32.1693821255096;
-        Mon, 04 Sep 2023 02:54:15 -0700 (PDT)
-Received: from [10.33.192.199] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id m18-20020a7bce12000000b00401dc20a070sm16566936wmc.43.2023.09.04.02.54.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Sep 2023 02:54:14 -0700 (PDT)
-Message-ID: <74a7684b-0c11-37b3-4313-9241a3f975cc@redhat.com>
-Date:   Mon, 4 Sep 2023 11:54:13 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [kvm-unit-tests PATCH v6 2/8] s390x: add function to set DAT mode
- for all interrupts
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230904082318.1465055-1-nrb@linux.ibm.com>
- <20230904082318.1465055-3-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230904082318.1465055-3-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S243886AbjIDJ5o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 05:57:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 741C5E3;
+        Mon,  4 Sep 2023 02:57:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B720BB80DE3;
+        Mon,  4 Sep 2023 09:57:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F895C433C8;
+        Mon,  4 Sep 2023 09:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693821448;
+        bh=KCgrMSpReKkomAvjrgAyI+M74AruhN3j2aeC3Jx7Y+g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MpQRi+AyB0glohPHvUIs5L0PJBy56ywLS/W3DOBlGZczOTro6uLRuZXW19unGTcYD
+         Tp4cFFCkpNKYDGLzLltFyVr2zlrSidWZKX6Jqo5OA9+0G9uNbKE8HTBm7V4QF+XZAZ
+         FsQmWEAin7RKf/Se/pjD6v3Dj17PeDCTchxVwQaYjPJE6j4y+W+K1oM8xFi6VZQjT9
+         Qg4mHRo6TW7ULwrjc7A5lLZ+H3Q2BIdodMI++Tv30dspoBcLn03g9iKl+gQsYoPU2p
+         Iju5S1r3VUsVfsYFQY/8rv22rkS4a4ekB77raDYFciJl30Rh3Ca2KZOEHJ1umIhBvF
+         w+VvKYzOmRa4Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qd6Kj-00ANAe-VB;
+        Mon, 04 Sep 2023 10:57:26 +0100
+Date:   Mon, 04 Sep 2023 10:57:24 +0100
+Message-ID: <86o7iidzwb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Xu Zhao <zhaoxu.35@bytedance.com>
+Cc:     oliver.upton@linux.dev, james.morse@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v2] KVM: arm/arm64: optimize vSGI injection performance
+In-Reply-To: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
+References: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zhaoxu.35@bytedance.com, oliver.upton@linux.dev, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/09/2023 10.22, Nico Boehr wrote:
-> When toggling DAT or switch address space modes, it is likely that
-> interrupts should be handled in the same DAT or address space mode.
+On Fri, 25 Aug 2023 02:58:11 +0100,
+Xu Zhao <zhaoxu.35@bytedance.com> wrote:
 > 
-> Add a function which toggles DAT and address space mode for all
-> interruptions, except restart interrupts.
+> In a VM with more than 16 vCPUs (with multiple aff0 groups), if the target 
+> vCPU of a vSGI exceeds 16th vCPU, kvm needs to iterate from vCPU0 until 
+> the target vCPU is found. However, affinity routing information is provided 
+> by the ICC_SGI* register, which allows kvm to bypass other aff0 groups, 
+> iterating only on the aff0 group that the target vCPU located. It reduces 
+> the maximum iteration times from the total number of vCPUs to 16, or even 
+> 8 times.
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> This patch aims to optimize the vSGI injecting performance of injecting 
+> target exceeds 16th vCPU in vm with more than 16 vCPUs.
+
+The problem is that you optimise it for the default case, and break it
+for *everything* else.
+
+[...]
+
+> The performance of VM witch 32 cores improvement can be observed. When
+> injecting SGI into the first vCPU of the first aff0 group, the performance 
+> remains the same as before (because the number of iteration is also 1), 
+> but there is an improvement in performance when injecting interrupts into 
+> the last vCPU. When injecting vSGI into the first and last vCPU of the 
+> second aff0 group, the performance improvement is significant because 
+> compared to the original algorithm, it skipped iterates the first aff0 
+> group.
+> 
+> BTW, performance improvement can also be observed by microbench in 
+> kvm-unit-test with little modification :add 32 cores initialization, 
+> then change IPI target CPU in function ipi_exec.
+> 
+> The more vcpu a VM has, the greater the performance improvement of injecting 
+> vSGI into the vCPU in the last aff0 group.
+> 
+> Signed-off-by: Xu Zhao <zhaoxu.35@bytedance.com>
 > ---
->   lib/s390x/asm/arch_def.h  | 10 ++++++----
->   lib/s390x/asm/interrupt.h |  2 ++
->   lib/s390x/interrupt.c     | 35 +++++++++++++++++++++++++++++++++++
->   lib/s390x/mmu.c           |  5 +++--
->   4 files changed, 46 insertions(+), 6 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 152 ++++++++++++++---------------
+>  include/linux/kvm_host.h           |   5 +
+>  2 files changed, 78 insertions(+), 79 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index 188d2187eede..af8f2d6b18c3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -1013,44 +1013,64 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  
+>  	return 0;
+>  }
+> +
+>  /*
+> - * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
+> - * generation register ICC_SGI1R_EL1) with a given VCPU.
+> - * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
+> - * return -1.
+> + * Get affinity routing index from ICC_SGI_* register
+> + * format:
+> + *     aff3       aff2       aff1	aff0
+> + * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits -|
+>   */
+> -static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
+> +static unsigned long sgi_to_affinity(unsigned long reg)
+>  {
+> -	unsigned long affinity;
+> -	int level0;
+> +	u64 aff;
+>  
+> -	/*
+> -	 * Split the current VCPU's MPIDR into affinity level 0 and the
+> -	 * rest as this is what we have to compare against.
+> -	 */
+> -	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
+> -	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
+> -	affinity &= ~MPIDR_LEVEL_MASK;
+> +	/* aff3 - aff1 */
+> +	aff = (((reg) & ICC_SGI1R_AFFINITY_3_MASK) >> ICC_SGI1R_AFFINITY_3_SHIFT) << 16 |
+> +		(((reg) & ICC_SGI1R_AFFINITY_2_MASK) >> ICC_SGI1R_AFFINITY_2_SHIFT) << 8 |
+> +		(((reg) & ICC_SGI1R_AFFINITY_1_MASK) >> ICC_SGI1R_AFFINITY_1_SHIFT);
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Here, you assume that you can directly map a vcpu index to an
+affinity. It would be awesome if that was the case. However, this is
+only valid at reset time, and userspace is perfectly allowed to change
+this mapping by writing to the vcpu's MPIDR_EL1.
 
+So this won't work at all if userspace wants to set its own specific
+CPU numbering.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
