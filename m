@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F345791754
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:44:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE1F9791756
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbjIDMoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38610 "EHLO
+        id S236147AbjIDMoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238975AbjIDMoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:44:09 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A03ACDD
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:44:05 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-52bcb8b199aso1854425a12.3
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:44:05 -0700 (PDT)
+        with ESMTP id S1352874AbjIDMoV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:44:21 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C20CFB
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:44:11 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9a5be3166a2so195183266b.1
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:44:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693831443; x=1694436243; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1693831449; x=1694436249; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uvgb1mY0EmO5+OIh91wyTfD/dyJ0WPXCogU6akizjwQ=;
-        b=jlYMZFIkEus2toBx/LbjpMCmPsNi/F149iw0lpWJUPwmXfd/ZTG4pnpLrAcB/vcBPM
-         iIoaIX3Br0LvtiSnR7KJm+1t2ky5TTz/vJox1pPzInq6fJUwb4CKVdlNkTEaAfZGt9KD
-         dNrybxG9qGhWYrO0F1raRtyFo8g6VWm/6RSlp5cE/lEOVhr+f9ILvveCqEBk/dqz+Nbc
-         fHOK49QBmIFVoumyb/nVgI8Zjso2rsEx0XAotPhpAEajJ3ctxxNk/HqMEiWgEwnKto3E
-         cSq7QMSMYSVzS+2Jnw9hxecNkJLH3TPMPg49lBVq2wRKAmpbNgsxw/yh6C6gO5IGIxLU
-         SU9w==
+        bh=y1KRPJbXgs1nETBjJNmlr2PmeFCKIGRCFU9IErPdUTo=;
+        b=v8OPqbdBSClRZU6+mP2XH7bhTZcQ9L3fiG2Ocq8VG6M7GM28+Y3fu7uZlazrXzoQ94
+         yNyJwDVoEUUKqre7zA1AO9CRq02WzTyHIPL0/02LvKMwRogQNWmZwM28n4ApitKZEq42
+         lLLhB/ydth8DSSu943RijAeczFCr1MU09Re+qJ+jp/SeBQoz/DL9Vu4uyK0PbI7zaPSC
+         gOq24HE3CWR3YogWZhxUTSPSg13zwjONM2tVNEl6+AYXnKG1CSAD8mYrshepeNQlqKG5
+         1HVvrQyLmBP1uKIy+nXstccy+jQiSYnciopHX1SUZmdmI2bzaAVNru/GWUurKviZ+9X4
+         2VWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693831443; x=1694436243;
+        d=1e100.net; s=20221208; t=1693831449; x=1694436249;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uvgb1mY0EmO5+OIh91wyTfD/dyJ0WPXCogU6akizjwQ=;
-        b=QUA/g6jS2pw8xMAJhg7iUp0SzocPoQSHXdcbKku2Jwo+V0Snr1FRQxcOMn4j9nZAmh
-         aY8aOHlIhcousnjUl7sDbb+7I290e2fJKeNOpZJtsTMtm06rP5I+J/j67fkNoOwxsUOm
-         0Drn6BJU0QUDGeo0Xg3/D5yRt582IlPAwJ5XfvgmwJV5Mvv485uCdtzmhaQdNCrCiSqS
-         rH1EESPVhAQarB+/AyIbpnus4TdKz5+iJ3FgY0mTy2GQjwTJsvL6wh4Gw8ap6hCbpr4K
-         Gk77wyyrGjtb5BB7LCWIertp4446utGPRbyNifnLVwhilkceITx1G4A8fRW3Y7j8fJc1
-         JWKQ==
-X-Gm-Message-State: AOJu0YwEtXIa99psGODHu0lTWADhz6G6v7hzuVsnD0ssC037S8LegjyU
-        UlS5QDNlGM7VwtYlJnJVXIpptw==
-X-Google-Smtp-Source: AGHT+IEKCW36+yHgpY2ZBNqNwkC4Vzs3gfJURNdlqSjhdC3qvST4PZ0o00mxq38nx3QQCXyG1+Hd8Q==
-X-Received: by 2002:aa7:d699:0:b0:525:6588:b624 with SMTP id d25-20020aa7d699000000b005256588b624mr6061172edr.37.1693831443293;
-        Mon, 04 Sep 2023 05:44:03 -0700 (PDT)
+        bh=y1KRPJbXgs1nETBjJNmlr2PmeFCKIGRCFU9IErPdUTo=;
+        b=Y7HCoAXxZ/51McEkef49KRNe2o90UUWgifJAlb5a0dBUsBndr0TQM9zDivUknNHFbK
+         wbcyBraoV8DifVsgoFuSWUKWS517dwHRMZo6Bv0p+jmZ+Y8xEDx6+rQffNijVcAnvF8B
+         94Vi+2F6mGkIo33Dk4Lnl/r/1wpC6msbLWnBMMYASYyvUzV6syJ2FhV2B+iJsZGZ310D
+         mpsAQNDs/jKQzn/WjZCbN9SAJb/bR4Rmij72bxcSCDH5iakcel0ZGzKdLoRJrFIVTdwi
+         Fgnri8h1yLjQL1DmzAjri3Ps0cAuBGbz+1H+L3Ngdd2++SGuUEK+E6hE7IQnszes4aWf
+         bYuQ==
+X-Gm-Message-State: AOJu0YxPc3ECTbAIWCkfksoHtzmdgS+DwQ2sxXcyKBCn0jtZCnv/X+vR
+        6Qr0+SIacYMxDxKXK9D9PUhEWA==
+X-Google-Smtp-Source: AGHT+IEWg2VEI4Vi7IulTZgNKdrHE2WZNrX8LJFTMhv1AYpEjEk8Q1zYIfhClVUZKE72XnRCdYjEhg==
+X-Received: by 2002:a17:907:2c75:b0:9a1:d29c:6aa9 with SMTP id ib21-20020a1709072c7500b009a1d29c6aa9mr5782355ejc.11.1693831449576;
+        Mon, 04 Sep 2023 05:44:09 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.209.227])
-        by smtp.gmail.com with ESMTPSA id b22-20020aa7d496000000b0051dd19d6d6esm5820773edr.73.2023.09.04.05.44.01
+        by smtp.gmail.com with ESMTPSA id lt14-20020a170906fa8e00b00977eec7b7e8sm6153822ejb.68.2023.09.04.05.44.08
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 04 Sep 2023 05:44:02 -0700 (PDT)
+        Mon, 04 Sep 2023 05:44:09 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
@@ -56,10 +56,13 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH 06/13] target/i386: Remove unused KVM stubs
-Date:   Mon,  4 Sep 2023 14:43:17 +0200
-Message-ID: <20230904124325.79040-7-philmd@linaro.org>
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Subject: [PATCH 07/13] target/i386: Allow elision of kvm_enable_x2apic()
+Date:   Mon,  4 Sep 2023 14:43:18 +0200
+Message-ID: <20230904124325.79040-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230904124325.79040-1-philmd@linaro.org>
 References: <20230904124325.79040-1-philmd@linaro.org>
@@ -75,71 +78,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All these functions:
+Call kvm_enabled() before kvm_enable_x2apic() to
+let the compiler elide its call.
 
- - kvm_arch_get_supported_cpuid()
- - kvm_has_smm(()
- - kvm_hyperv_expand_features()
- - kvm_set_max_apic_id()
-
-are called after checking for kvm_enabled(), which is
-false when KVM is not built. Since the compiler elides
-these functions, their stubs are not used and can be
-removed.
-
-Inspired-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Suggested-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/i386/kvm/kvm-stub.c | 26 --------------------------
- 1 file changed, 26 deletions(-)
+ hw/i386/intel_iommu.c      | 2 +-
+ hw/i386/x86.c              | 2 +-
+ target/i386/kvm/kvm-stub.c | 7 -------
+ 3 files changed, 2 insertions(+), 9 deletions(-)
 
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3ca71df369..c9961ef752 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -4053,7 +4053,7 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+             error_setg(errp, "eim=on requires accel=kvm,kernel-irqchip=split");
+             return false;
+         }
+-        if (!kvm_enable_x2apic()) {
++        if (kvm_enabled() && !kvm_enable_x2apic()) {
+             error_setg(errp, "eim=on requires support on the KVM side"
+                              "(X2APIC_API, first shipped in v4.7)");
+             return false;
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index a88a126123..d2920af792 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -136,7 +136,7 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+      * With KVM's in-kernel lapic: only if X2APIC API is enabled.
+      */
+     if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
+-        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
++        kvm_enabled() && (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
+         error_report("current -smp configuration requires kernel "
+                      "irqchip and X2APIC API support.");
+         exit(EXIT_FAILURE);
 diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
-index e052f1c7b0..f985d9a1d3 100644
+index f985d9a1d3..62cccebee4 100644
 --- a/target/i386/kvm/kvm-stub.c
 +++ b/target/i386/kvm/kvm-stub.c
-@@ -10,42 +10,16 @@
-  *
-  */
+@@ -12,13 +12,6 @@
  #include "qemu/osdep.h"
--#include "cpu.h"
  #include "kvm_i386.h"
  
- #ifndef __OPTIMIZE__
--bool kvm_has_smm(void)
+-#ifndef __OPTIMIZE__
+-bool kvm_enable_x2apic(void)
 -{
--    return 1;
+-    return false;
 -}
+-#endif
 -
- bool kvm_enable_x2apic(void)
- {
-     return false;
- }
--
--/* This function is only called inside conditionals which we
-- * rely on the compiler to optimize out when CONFIG_KVM is not
-- * defined.
-- */
--uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
--                                      uint32_t index, int reg)
--{
--    abort();
--}
- #endif
- 
  bool kvm_hv_vpindex_settable(void)
  {
      return false;
- }
--
--bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
--{
--    abort();
--}
--
--void kvm_set_max_apic_id(uint32_t max_apic_id)
--{
--    return;
--}
 -- 
 2.41.0
 
