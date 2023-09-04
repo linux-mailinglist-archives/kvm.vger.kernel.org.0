@@ -2,145 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D99437910AE
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 07:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9407379118C
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 08:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351859AbjIDFFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 01:05:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43422 "EHLO
+        id S243007AbjIDGlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 02:41:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242273AbjIDFFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 01:05:25 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D05AFC5
-        for <kvm@vger.kernel.org>; Sun,  3 Sep 2023 22:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693803921; x=1725339921;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tI9k2EMY2feJ2LVHM6pGvYt/+Gf2/l3SonByZWvwW5o=;
-  b=Q817Q6uIB596N/L3HPYSQmC1Qn0rzAl+2dnF2WyZO6TyyaeBRuj8YRNz
-   Du3kxxhzAzEs2Hm5cdSD0rg6WgrlO9DrhBIVG+tvXRVqoNWRJeHAHV/pA
-   6+mP2rNeFI9NtbhnOmKL0AtiWjrgO3U5p/v4q18pCtN+E8TkPmMP8qr0e
-   y6N5pcrgXcZ8yiZeLu1J6/OqCZFfwp7H/SV4XApXOQXbpaUjJJ07SeiRW
-   tZGgUSynUNGlOmncsqUIPSELAA3z8dFqv2oFYJl0OQpOBnY+s3dEKSYSH
-   W9ZCsBiuJrR5csqMUDWseqipAxI3xthdbMWXhJZchnzQbeuLjx8v/Yw5S
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="379230468"
-X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="379230468"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2023 22:05:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="830769558"
-X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="830769558"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2023 22:05:19 -0700
-Date:   Mon, 4 Sep 2023 13:02:40 +0800
-From:   Tao Su <tao1.su@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
-        guang.zeng@intel.com, yi1.lai@intel.com
-Subject: Re: [PATCH 2/2] KVM: x86: Clear X2APIC_ICR_UNUSED_12 after
- APIC-write VM-exit
-Message-ID: <ZPVk8DgxqGJhwxrE@linux.bj.intel.com>
-References: <20230904013555.725413-1-tao1.su@linux.intel.com>
- <20230904013555.725413-3-tao1.su@linux.intel.com>
+        with ESMTP id S1347117AbjIDGlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 02:41:05 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3FA106;
+        Sun,  3 Sep 2023 23:41:00 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3846cGQU028469;
+        Mon, 4 Sep 2023 06:40:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ in-reply-to : references : cc : to : subject : from : message-id : date :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=FfVRcwlRJcoMS36uxppnXHoRJjYjGRzxm90M5y9htoQ=;
+ b=NefFCvDop1hOjIlk8xUn8yZDnaXdwHE9TZcnumvBhB7NC2E5w8LgyIedkVjyGppOFCP+
+ BV6XB78rhIpm8hD9phTXi51JsKCU1IayZLW6Bja0EXHz5QWSOYCDtNJSmiBiXK/FxnrH
+ AZgZvJbehVB4GLqUxbEWw7uDYeDORd88cnyE5Ry/BM37l7LmzVeZho1MqrlzIi0LaVqr
+ Q44kCGDB/vUL0cFtCzdmEqjlmCMh5NYhSHXopFeeOl//lFhv5a1hwNoRhr3UHIe5Uvx5
+ 1eOcp8EjsPLqfX7sE/0fcvZODG+ZCnTjfhPNIbI363FvG++jEHf3mnj2MzjSFOQw4ub9 kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sw87nabq5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Sep 2023 06:40:58 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3846cire029737;
+        Mon, 4 Sep 2023 06:40:58 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sw87nabpn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Sep 2023 06:40:58 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3844Ppmn021459;
+        Mon, 4 Sep 2023 06:40:57 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3svfry0mh4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Sep 2023 06:40:56 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3846erbN20579056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 4 Sep 2023 06:40:53 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7EBC120043;
+        Mon,  4 Sep 2023 06:40:53 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48D4320040;
+        Mon,  4 Sep 2023 06:40:53 +0000 (GMT)
+Received: from t14-nrb (unknown [9.179.12.249])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  4 Sep 2023 06:40:53 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <981405ed-060f-de0b-8125-29099ba8791a@redhat.com>
+References: <20230809091717.1549-1-nrb@linux.ibm.com> <981405ed-060f-de0b-8125-29099ba8791a@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: explicitly mark stack as not executable
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169380965283.97137.623872032086698797@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Mon, 04 Sep 2023 08:40:52 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kOnGeAwRR8z-kP7euWzERHmAlyvNVzfQ
+X-Proofpoint-ORIG-GUID: UM3Rc0pqDTTlEYYccLKJiVXuh5HGUdjQ
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230904013555.725413-3-tao1.su@linux.intel.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-04_03,2023-08-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
+ suspectscore=0 bulkscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ phishscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309040058
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 04, 2023 at 09:35:55AM +0800, Tao Su wrote:
-> When IPI virtualization is enabled, a WARN is triggered if bit12 of ICR
-> MSR is set after APIC-write VM-exit. The reason is kvm_apic_send_ipi()
-> thinks the APIC_ICR_BUSY bit should be cleared because KVM has no delay,
-> but kvm_apic_write_nodecode() doesn't clear the APIC_ICR_BUSY bit.
-> 
-> Since bit12 of ICR is no longer BUSY bit but UNUSED bit in x2APIC mode,
-> and SDM has no detail about how hardware will handle the UNUSED bit12
-> set, we tested on Intel CPU (SRF/GNR) with IPI virtualization and found
-> the UNUSED bit12 was also cleared by hardware without #GP. Therefore,
-> the clearing of bit12 should be still kept being consistent with the
-> hardware behavior.
-> 
-> Fixes: 5413bcba7ed5 ("KVM: x86: Add support for vICR APIC-write VM-Exits in x2APIC mode")
-> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> Tested-by: Yi Lai <yi1.lai@intel.com>
-> ---
->  arch/x86/kvm/lapic.c | 27 ++++++++++++++++++++-------
->  1 file changed, 20 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index a983a16163b1..09a376aeb4a0 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1482,8 +1482,17 @@ void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high)
->  {
->  	struct kvm_lapic_irq irq;
->  
-> -	/* KVM has no delay and should always clear the BUSY/PENDING flag. */
-> -	WARN_ON_ONCE(icr_low & APIC_ICR_BUSY);
-> +	/*
-> +	 * In non-x2apic mode, KVM has no delay and should always clear the
-> +	 * BUSY/PENDING flag. In x2apic mode, KVM should clear the unused bit12
-> +	 * of ICR since hardware will also clear this bit. Although
-> +	 * APIC_ICR_BUSY and X2APIC_ICR_UNUSED_12 are same, they mean different
-> +	 * things in different modes.
-> +	 */
-> +	if (!apic_x2apic_mode(apic))
-> +		WARN_ON_ONCE(icr_low & APIC_ICR_BUSY);
-> +	else
-> +		WARN_ON_ONCE(icr_low & X2APIC_ICR_UNUSED_12);
->  
->  	irq.vector = icr_low & APIC_VECTOR_MASK;
->  	irq.delivery_mode = icr_low & APIC_MODE_MASK;
-> @@ -2429,13 +2438,12 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
->  	 * ICR is a single 64-bit register when x2APIC is enabled.  For legacy
->  	 * xAPIC, ICR writes need to go down the common (slightly slower) path
->  	 * to get the upper half from ICR2.
-> +	 *
-> +	 * TODO: optimize to just emulate side effect w/o one more write
->  	 */
->  	if (apic_x2apic_mode(apic) && offset == APIC_ICR) {
-> -		val = kvm_lapic_get_reg64(apic, APIC_ICR);
+Quoting Thomas Huth (2023-08-13 11:50:00)
+> On 09/08/2023 11.17, Nico Boehr wrote:
+> > With somewhat recent GCC versions, we get this warning on s390x:
+> >=20
+> >    /usr/bin/ld: warning: s390x/cpu.o: missing .note.GNU-stack section i=
+mplies executable stack
+> >    /usr/bin/ld: NOTE: This behaviour is deprecated and will be removed =
+in a future version of the linker
+> >=20
+> > We don't really care whether stack is executable or not since we set it
+> > up ourselves and we're running DAT off mostly anyways.
+> >=20
+> > Silence the warning by explicitly marking the stack as not executable.
+> >=20
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > ---
+> >   s390x/Makefile | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/s390x/Makefile b/s390x/Makefile
+> > index 706be7920406..afa47ccbeb93 100644
+> > --- a/s390x/Makefile
+> > +++ b/s390x/Makefile
+> > @@ -79,7 +79,7 @@ CFLAGS +=3D -O2
+> >   CFLAGS +=3D -march=3DzEC12
+> >   CFLAGS +=3D -mbackchain
+> >   CFLAGS +=3D -fno-delete-null-pointer-checks
+> > -LDFLAGS +=3D -nostdlib -Wl,--build-id=3Dnone
+> > +LDFLAGS +=3D -nostdlib -Wl,--build-id=3Dnone -z noexecstack
+>=20
+> I already did a similar patch some weeks ago:
+>=20
+>   https://lore.kernel.org/kvm/20230623125416.481755-1-thuth@redhat.com/
+>=20
+> ... we need it for x86, too, so I guess I should go ahead and commit it -=
+=20
+> and ask Sean to respin his conflicting series.
 
-Sorry for the mistake, I notice this line is removed accidentally, I will add it back in the
-next version.
-
-> -		kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
-> -		trace_kvm_apic_write(APIC_ICR, val);
-> +		kvm_x2apic_icr_write(apic, val);
->  	} else {
-> -		/* TODO: optimize to just emulate side effect w/o one more write */
->  		val = kvm_lapic_get_reg(apic, offset);
->  		kvm_lapic_reg_write(apic, offset, (u32)val);
->  	}
-> @@ -3122,7 +3130,12 @@ int kvm_lapic_set_vapic_addr(struct kvm_vcpu *vcpu, gpa_t vapic_addr)
->  
->  int kvm_x2apic_icr_write(struct kvm_lapic *apic, u64 data)
->  {
-> -	data &= ~APIC_ICR_BUSY;
-> +	/*
-> +	 * The Delivery Status Bit(bit 12) is removed in x2apic mode, but this
-> +	 * bit is also cleared by hardware, so keep consistent with hardware
-> +	 * behavior to clear this bit.
-> +	 */
-> +	data &= ~X2APIC_ICR_UNUSED_12;
->  
->  	kvm_apic_send_ipi(apic, (u32)data, (u32)(data >> 32));
->  	kvm_lapic_set_reg64(apic, APIC_ICR, data);
-> -- 
-> 2.34.1
-> 
+Thanks!
