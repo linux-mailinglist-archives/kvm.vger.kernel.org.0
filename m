@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4173E791806
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 15:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C379B79182A
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 15:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235260AbjIDN0v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 09:26:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50992 "EHLO
+        id S1346703AbjIDNbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 09:31:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231185AbjIDN0v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 09:26:51 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D789CCE
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 06:26:44 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-52e297c7c39so1329950a12.2
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 06:26:44 -0700 (PDT)
+        with ESMTP id S234778AbjIDNbj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 09:31:39 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28667CDB
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 06:31:36 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9a5dff9d2d9so221124266b.3
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 06:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693834003; x=1694438803; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1693834294; x=1694439094; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/uL2B+XqPFUs3X1qoEJuP1SxRFKqVUX3leZ/vaoEUcA=;
-        b=aiTrpEn/hhG7AJydLun6Cs2uzWNfhpFECX2ZZWUubsQipyd89eZR+kRR3iGm22Qmxm
-         0rfRTgjPOCGpeebTtXH8VKUs4VBAzy8f/daWWsvoNVvA+f1C540Y+9/mOvjPMSJmorI4
-         aKjQZnxNiQ9Jvrtj+MLjngXYRqHxcPuChM75zJX2ruE7m9bxWx6s2SpHnkaA/UI//CUp
-         3c3Y61pe0NlsjSu7miqrroGPSsvwT4w/Qf4Ne/QOJ1YP2oEOUD56Vy/QXxDA/PYlKHLp
-         HokpMbhgoak7/XDhJEGUJ1ptAtEnryVyb8KXzIHWYTpoqsXBdRyMSzsczT/hDNvc1ZUG
-         CJeg==
+        bh=hCYvspyPAR7BQTyfNQLsPOWKxV3J1BTko++dNnBZlmc=;
+        b=Vd/e66qjkvvZX17kbWh+Z7IXMqery1Fs3O8dyfR9G04aEBoSp0WL97mlr0/lq6RXSU
+         owc7mAd3DUU8MGX4LzSfEl30gVSo8CFLjYUMaeoOIS8LmRL37kjWAWwdvySJR+H+KAvM
+         02OQelRS5N4ox4HNLfzDKefCUGa2wHR0pjmDzR4NACNgCwD9ncSuMzGNLj5RNiJa+9a6
+         wbIOBa8nfAWjBCztIgTzpW1Q0o0+V/X8f1DRUnm6UsjGcxkUjiVzpBQS+fB9wyV4wbd6
+         DfF1XgVEmTyOPhf5+3D+gj7tJZtSdgMXpWvH9rmAUJfr1QHNxLYCSpuunlJpd1gMWaLe
+         x3aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693834003; x=1694438803;
+        d=1e100.net; s=20221208; t=1693834294; x=1694439094;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/uL2B+XqPFUs3X1qoEJuP1SxRFKqVUX3leZ/vaoEUcA=;
-        b=gmuzlgL8VWPBFe5T7BBDZEn1d49TIPA85XCQ5wPbUhHLUhIE6/3JECS4TUTSRgbyg8
-         U/WOCH3R1cmBzVnTmo8k7nMv//sG3hzNBlC6+Axht8olDKeJwYb9ePbLtv236ciOZKmg
-         XNwtyZoQaVI1mpJoHx+rZ/nQpLIMpxjSXjrNoBpkriC0odlhdER1kR4+0nj9gWwUHQ1I
-         NqwavvOJ6gzDIXhuRsJ4rsMZDQXVmO8NEu8JCk8Xk7WwdhS3uo9aPdFIVIaMKbxp8B/d
-         j1mW+L7h13lQXBZd5evqhrM9YCfI/Qwxl/jsyqDz7kUoB5AYGKgvpazjEKx14oS7wWQB
-         qE1w==
-X-Gm-Message-State: AOJu0Yxs+gOCpgOwKAnaQRyagiSlKLLgb9mCA0qtd7BO5IXjFi/F2bnr
-        BYb0v9oSKkGs5E6ZcxaV657j9Q==
-X-Google-Smtp-Source: AGHT+IGOFIwY6Wm7dsAMFZC9Eb7yEm5sipTomJmGwCL0leiifhPgy+OojWu1/AqpYEmyOm13m0TRlA==
-X-Received: by 2002:a05:6402:17d7:b0:52c:84c4:a0bf with SMTP id s23-20020a05640217d700b0052c84c4a0bfmr4777586edy.30.1693834002867;
-        Mon, 04 Sep 2023 06:26:42 -0700 (PDT)
+        bh=hCYvspyPAR7BQTyfNQLsPOWKxV3J1BTko++dNnBZlmc=;
+        b=UFqQkyiH/160qpUbDlVLpG//LSyDO+jevzle1Dc6xPyXkN+1E30NjDzOeS8NDvEL1v
+         yizxTzbeMJcjcnlE3jgfZ1njk2+syf3paRHiw4GOx5n59z+65zPkYhGHMoq6WLKrAZTf
+         euZK6Mnz/UGw4iSKP30iseRlxwMZGjidQNVJpc9ITRq/igo3FCoLdJEDnl0kU1eaaQLo
+         RuUDSQBnEzRljNdKL360Zv9xBDp1fjhlc1JT1d0/t+7ZoxCpMt2OC1c/Xqqx1wq27tTG
+         SxcFldZUBouKvPBEMZZySlg1n4Avc1cB8xl6CEpq7H6E7jeMWl/UAClfawXel1jJfkJm
+         INIw==
+X-Gm-Message-State: AOJu0YyrZA9eVl4pdtslNQSeVi8o8hjP4+Q94Y59Xkq37eKjeScW6t0k
+        Yjm9AtqA4jjszjNYYM/TV/fMbQ==
+X-Google-Smtp-Source: AGHT+IGtFqpzjt6uSaukx7aodEb/54kI1XEGaEwgvvmfQYwT0ivCYh8vhE7uW3lVgPNl4aIYuhjmcA==
+X-Received: by 2002:a17:907:7808:b0:9a5:d095:a8e1 with SMTP id la8-20020a170907780800b009a5d095a8e1mr6644948ejc.11.1693834294609;
+        Mon, 04 Sep 2023 06:31:34 -0700 (PDT)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id n18-20020a056402515200b0052a3aa50d72sm5855572edd.40.2023.09.04.06.26.42
+        by smtp.gmail.com with ESMTPSA id m21-20020a1709060d9500b0099bc2d1429csm6167078eji.72.2023.09.04.06.31.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 06:26:42 -0700 (PDT)
-Date:   Mon, 4 Sep 2023 15:26:41 +0200
+        Mon, 04 Sep 2023 06:31:34 -0700 (PDT)
+Date:   Mon, 4 Sep 2023 15:31:33 +0200
 From:   Andrew Jones <ajones@ventanamicro.com>
 To:     Haibo Xu <haibo1.xu@intel.com>
 Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
@@ -64,39 +64,39 @@ Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
         Atish Patra <atishp@atishpatra.org>,
         Guo Ren <guoren@kernel.org>,
         Conor Dooley <conor.dooley@microchip.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
         wchen <waylingii@gmail.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
         Sean Christopherson <seanjc@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Aaron Lewis <aaronlewis@google.com>,
         David Matlack <dmatlack@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ackerley Tng <ackerleytng@google.com>,
         Mingwei Zhang <mizhang@google.com>,
-        Lei Wang <lei4.wang@intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
-        Peter Gonda <pgonda@google.com>,
+        Peter Gonda <pgonda@google.com>, Like Xu <likexu@tencent.com>,
         Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
+        Thomas Huth <thuth@redhat.com>,
         David Woodhouse <dwmw@amazon.co.uk>,
-        Michal Luczaj <mhal@rbox.co>,
-        zhang songyi <zhang.songyi@zte.com.cn>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 3/8] tools: riscv: Add header file csr.h
-Message-ID: <20230904-79306f36fc9cbe222eb0ef8f@orel>
+Subject: Re: [PATCH v2 4/8] KVM: riscv: selftests: Switch to use macro from
+ csr.h
+Message-ID: <20230904-d35320b23119ee97737e8a74@orel>
 References: <cover.1693659382.git.haibo1.xu@intel.com>
- <8173daae52720dbdabbd88a5d412f653e6706de1.1693659382.git.haibo1.xu@intel.com>
+ <ee4e518cbed9ff4210b74a22c5af21c410fab85d.1693659382.git.haibo1.xu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8173daae52720dbdabbd88a5d412f653e6706de1.1693659382.git.haibo1.xu@intel.com>
+In-Reply-To: <ee4e518cbed9ff4210b74a22c5af21c410fab85d.1693659382.git.haibo1.xu@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -105,15 +105,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 02, 2023 at 08:59:25PM +0800, Haibo Xu wrote:
-> Borrow the csr definitions and operations from kernel's
-> arch/riscv/include/asm/csr.h to tools/ for riscv.
-> 
+On Sat, Sep 02, 2023 at 08:59:26PM +0800, Haibo Xu wrote:
 > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 > ---
->  tools/arch/riscv/include/asm/csr.h | 521 +++++++++++++++++++++++++++++
->  1 file changed, 521 insertions(+)
->  create mode 100644 tools/arch/riscv/include/asm/csr.h
+>  tools/testing/selftests/kvm/include/riscv/processor.h | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+> index 5b62a3d2aa9b..6810c887fadc 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -8,6 +8,7 @@
+>  #define SELFTEST_KVM_PROCESSOR_H
+>  
+>  #include "kvm_util.h"
+> +#include <asm/csr.h>
+>  #include <linux/stringify.h>
+>  
+>  static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+> @@ -95,12 +96,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+>  #define PGTBL_PAGE_SIZE				PGTBL_L0_BLOCK_SIZE
+>  #define PGTBL_PAGE_SIZE_SHIFT			PGTBL_L0_BLOCK_SHIFT
+>  
+> -#define SATP_PPN				_AC(0x00000FFFFFFFFFFF, UL)
+>  #define SATP_MODE_39				_AC(0x8000000000000000, UL)
+>  #define SATP_MODE_48				_AC(0x9000000000000000, UL)
+
+SATP_MODE_39/48 are also in csr.h
+
+> -#define SATP_ASID_BITS				16
+> -#define SATP_ASID_SHIFT				44
+> -#define SATP_ASID_MASK				_AC(0xFFFF, UL)
+>  
+>  #define SBI_EXT_EXPERIMENTAL_START		0x08000000
+>  #define SBI_EXT_EXPERIMENTAL_END		0x08FFFFFF
+> -- 
+> 2.34.1
 >
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Thanks,
+drew
