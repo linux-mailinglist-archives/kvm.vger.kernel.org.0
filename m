@@ -2,119 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09FCC79175C
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:44:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6DF679174E
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352924AbjIDMoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:44:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43464 "EHLO
+        id S1352847AbjIDMnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352920AbjIDMof (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:44:35 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86151CCC;
-        Mon,  4 Sep 2023 05:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693831467; x=1725367467;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7OC8ieWLUaMKSqNXbWK6Ilf12UrX6NTH6dUWJKnSfd8=;
-  b=RepF1Ou/L+jXxWYBuLl8nxm5Zv+juInH45iYr3aNwQJOHx7fz+kH5Zin
-   f4l0XvLBt/pI3lQlLmWp9rZXc7s/LnOxu/9TiFJwYcaijcjTscEy44zTo
-   nV0kB17b81stlRqWNNeL3aLtAQC4xw1UMA/txGEMhR88VF5I8lvQYFS4/
-   sQ2h+fpIA38V66XBfMse4/aoNp2bAvwZB8i8LOnZRwUY439W2Rw6qEEzg
-   D2vtomriH9xpo4NVz4Xs4ALTYHogMHnMelKqxkTNENuYfH1VT5MTU27oX
-   UIRiVBNDS9OWB6aSsy0ZTNp4kGb/kiCH+b7QxwXBq8SkQN2+v09Z2yUTO
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="462958523"
-X-IronPort-AV: E=Sophos;i="6.02,226,1688454000"; 
-   d="scan'208";a="462958523"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 05:44:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="810888530"
-X-IronPort-AV: E=Sophos;i="6.02,226,1688454000"; 
-   d="scan'208";a="810888530"
-Received: from mfederki-mobl1.ger.corp.intel.com (HELO wieczorr-mobl1.intel.com) ([10.213.15.69])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 05:44:22 -0700
-From:   Wieczor-Retman Maciej <maciej.wieczor-retman@intel.com>
-To:     akpm@linux-foundation.org, christian@kellner.me,
-        fenghua.yu@intel.com, keescook@chromium.org,
-        ndesaulniers@google.com, coltonlewis@google.com,
-        dmatlack@google.com, vipinsh@google.com, seanjc@google.com,
-        brauner@kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        hannes@cmpxchg.org, nphamcs@gmail.com, reinette.chatre@intel.com
-Cc:     ilpo.jarvinen@linux.intel.com, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH v2 0/8] Add printf attribute to kselftest functions
+        with ESMTP id S1350864AbjIDMnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:43:53 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6A2CDD
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:47 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99bcfe28909so205850166b.3
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693831426; x=1694436226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EAX70gb1DRp0U5HpIrsPRfVqNXXnjE75o2367gc+/Ss=;
+        b=WZaxS/0OLLL9irzltuc0NlABLYaNHFpRDlv4HHODyIt+4XlO+Ckldldhp4siGJGON8
+         LTayCQ1PlaXfsleHEyGx9l63zqSzhXgyA2WcZIA1CJhglih1YmbUTpP7GCE/NBe+p5i5
+         IFEVetKPw8YuDRJhOXS+mom9wPWqpuos5n06xvjAX6g4ekvcMwHw70NOhMnLno6Ue7Tm
+         vkxcx7HC3QLgpFsGIZ5zSECTir/Kus3HKHU4GOPiRceHVu9cRZ2GyLkKzQ38l4oYLdrP
+         oARe6AoWf0lH4fvAcu1JN+YjkxopnIydS+OZ/qESn6mXTkRTETozRvNIq/mQ1Bg+1IkL
+         7W5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693831426; x=1694436226;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EAX70gb1DRp0U5HpIrsPRfVqNXXnjE75o2367gc+/Ss=;
+        b=dYsuNcdeqReggtilkg5L1FOYzXJcjVLyh/XkoZgHo/ff7X7GbeLRBB9KBXb5zEofOu
+         WBgAUM11EaIORRsZCi5ZrecZMp54dT0MTJpLExIq+0mwYBrfcWMjbrpQkRSzSFjvsZGy
+         fAPy7rm06hFf+l+hBh/tckh8XvAzfqTfncW3Mq/YSj66h5V03yZuHuoB3hNTt7rtRGSq
+         8WbUYjiDOgTr3z16sOcZgrHISN98+1ZCCAQqy4nZAMLQ0NWsrYyLDU64RdglXkofYHxC
+         xMuHQsidvdCZh1tla0TDBGlalCQwlppjdi8dI9t9++uTULCU/1vUn1u1C/oe0qWgp7Ge
+         TR4Q==
+X-Gm-Message-State: AOJu0Yxns8zdxgcT41zVljeTTIxg2RbD5G0PVjzsRXrdyAvFSOdMURpK
+        QwMdPeNYeIBl8qal9fonUPZsAQ==
+X-Google-Smtp-Source: AGHT+IFkSqJnsshKBauxCddr+GUPT4A6KXmj88c6crUPHo9OljUs8uCyfcujmDG6A70sYs/Xauvxnw==
+X-Received: by 2002:a17:906:30c1:b0:993:d5bd:a757 with SMTP id b1-20020a17090630c100b00993d5bda757mr7133775ejb.19.1693831425876;
+        Mon, 04 Sep 2023 05:43:45 -0700 (PDT)
+Received: from m1x-phil.lan ([176.187.209.227])
+        by smtp.gmail.com with ESMTPSA id pv9-20020a170907208900b00993470682e5sm6063351ejb.32.2023.09.04.05.43.44
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 04 Sep 2023 05:43:45 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>
+Subject: [PATCH 03/13] hw/i386/fw_cfg: Include missing 'cpu.h' header
 Date:   Mon,  4 Sep 2023 14:43:14 +0200
-Message-ID: <cover.1693829810.git.maciej.wieczor-retman@intel.com>
-X-Mailer: git-send-email 2.42.0
+Message-ID: <20230904124325.79040-4-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230904124325.79040-1-philmd@linaro.org>
+References: <20230904124325.79040-1-philmd@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kselftest.h declares many variadic functions that can print some
-formatted message while also executing selftest logic. These
-declarations don't have any compiler mechanism to verify if passed
-arguments are valid in comparison with format specifiers used in
-printf() calls.
+fw_cfg_build_feature_control() uses CPUID_EXT_VMX which is
+defined in "target/i386/cpu.h".
 
-Attribute addition can make debugging easier, the code more consistent
-and prevent mismatched or missing variables.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ hw/i386/fw_cfg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Add a __printf() macro that validates types of variables passed to the
-format string. The macro is similarly used in other tools in the kernel.
-
-Add __printf() attributes to function definitions inside kselftest.h that
-use printing.
-
-Adding the __printf() macro exposes some mismatches in format strings
-across different selftests.
-
-Fix the mismatched format specifiers in multiple tests.
-
-Changelog v2:
-- Add review and fixes tags to patches.
-- Add two patches with mismatch fixes.
-- Fix missed attribute in selftests/kvm. (Andrew)
-- Fix previously missed issues in selftests/mm (Ilpo)
-
-Wieczor-Retman Maciej (8):
-  selftests: Add printf attribute to ksefltest prints
-  selftests/cachestat: Fix print_cachestat format
-  selftests/openat2: Fix wrong format specifier
-  selftests/pidfd: Fix ksft print formats
-  selftests/sigaltstack: Fix wrong format specifier
-  selftests/kvm: Replace attribute with macro
-  selftests/mm: Substitute attribute with a macro
-  selftests/resctrl: Fix wrong format specifier
-
- .../selftests/cachestat/test_cachestat.c       |  2 +-
- tools/testing/selftests/kselftest.h            | 18 ++++++++++--------
- .../testing/selftests/kvm/include/test_util.h  |  8 ++++----
- tools/testing/selftests/mm/mremap_test.c       |  2 +-
- tools/testing/selftests/mm/pkey-helpers.h      |  2 +-
- tools/testing/selftests/openat2/openat2_test.c |  2 +-
- .../selftests/pidfd/pidfd_fdinfo_test.c        |  2 +-
- tools/testing/selftests/pidfd/pidfd_test.c     | 12 ++++++------
- tools/testing/selftests/resctrl/cache.c        |  2 +-
- tools/testing/selftests/sigaltstack/sas.c      |  2 +-
- 10 files changed, 27 insertions(+), 25 deletions(-)
-
-
-base-commit: 9b1db732866bee060b9bca9493e5ebf5e8874c48
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index 72a42f3c66..7362daa45a 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -24,6 +24,7 @@
+ #include "kvm/kvm_i386.h"
+ #include "qapi/error.h"
+ #include CONFIG_DEVICES
++#include "target/i386/cpu.h"
+ 
+ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ 
 -- 
-2.42.0
+2.41.0
 
