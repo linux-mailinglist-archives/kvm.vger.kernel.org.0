@@ -2,65 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C18C879174B
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BF6979174C
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237317AbjIDMnd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:43:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60826 "EHLO
+        id S1349705AbjIDMnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230353AbjIDMnc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:43:32 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A0FC0
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:29 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9a645e54806so166600066b.0
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:29 -0700 (PDT)
+        with ESMTP id S230353AbjIDMnj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:43:39 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5598B103
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:35 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2bce552508fso20991531fa.1
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693831408; x=1694436208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KgdDAI5WJeQpNJ7fVmtYD+dCjS5FrBlY0naTS3cJ2cY=;
-        b=filfKy5XWRtqSxvFwtnm9D2DvQT9L/IO0I3kGV//EFyDQrHAhOQWvrh4SpOcteRwYn
-         7wfo/5oM/QABvH1rHt0sY49LcLhCrQoZhmjA707gbNLo/mxxsCrB3neWqhF3reDBJ/+o
-         cxm6wQB8DZf8jFRsMtsszljg9wAnUekUWkwRkdXpXsx1f3qEg5/7ttfqymRZpq1Dtx1i
-         69CRbMRX5LMzYY4DdFcc0D887hf9Dk6V8hf1bUx/0GHSvinnYTB5qytT7ytwzvMv3/Dq
-         KtFZJHfG2OErRnVa07VfvQ2oXWeiKs1LvaIIWDDwykRG2a74zBKq0gdczzdld0nD6emR
-         7PhA==
+        d=linaro.org; s=google; t=1693831413; x=1694436213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aJCm9ielSGbSry5cbeI+YJvG0psfGNIv8B+tATNPjpc=;
+        b=nj1OQgtkeNKYr6/QUD5koOwS/jZxJ8I/vxqgE/lq1IF2tlLEgLaGTKNIlt06i3S/YN
+         jaAQ55qJIOI84EG0u1/dgZgc7ED+DUSP2WSUHHBIx2omckZcda6Kry94/ZI8akKlNcgJ
+         rPg/3gGJsKRRxVckLPehLOiIvHUdCDxOq5udvw9iJ9QuozOztZll4nGQudfUMP78paW9
+         Y1Z5v4klZenzzbUvIEjJC3ta5DfbRRqW50t/t2o+6nOyjrdulwdUDYYZKDEvAYJqyQng
+         w2pkYmMRHuTu4XPz1+Ex1P01Lp6BFG63l+yGWAMlgVTWQ/jzgmbKhzZ8of2vGmQHsu80
+         hCQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693831408; x=1694436208;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KgdDAI5WJeQpNJ7fVmtYD+dCjS5FrBlY0naTS3cJ2cY=;
-        b=Si35lCocgbBbmCPur/BCLZJWSNh8ShBD3ptio+JJ8WB+RXguw0BcFRqbJVf4utxxNi
-         bMiPfR6zwcVSNdsUIyRt80c7OzOAJVZ4k4TiBeaw0GUzhwRyx9/o0pRHqWPMEGhbAdJq
-         3nTSxc1dxCtAqVGbUpXmNaBvNkKdffSrPHUihSCnuldBnsa5aQTwBXXuGA8OaHEs1fu1
-         XoDCkGBOKBQA1CrCwU0RIIDVWtST1p4MXUTkHPg02MyJr8DeR7wEWWfinFQ7mjd88Luj
-         kkCkba6JsAaiZMBqUlKx90kEuceN81YRHJR4Taok5AsKCviVFkS4Q+b2WYmwW0n0E7np
-         B8yw==
-X-Gm-Message-State: AOJu0YzcvcJYQQXfAmvov/hHvKX9ISPrBHAh4O/1A3ajU+6x9R90aArm
-        V1yzyW6QhX8QWwYoEyBdpv6gXw==
-X-Google-Smtp-Source: AGHT+IFhdp2S6dmdQU4L+6xLxXs/ra3AOIWeAuonsSZVIyQsXIqOo0I4pZ2Cuh3QLrH5FtcNOMpNIw==
-X-Received: by 2002:a17:906:2d1:b0:99e:5d8:a6f9 with SMTP id 17-20020a17090602d100b0099e05d8a6f9mr6609163ejk.66.1693831407692;
-        Mon, 04 Sep 2023 05:43:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693831413; x=1694436213;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aJCm9ielSGbSry5cbeI+YJvG0psfGNIv8B+tATNPjpc=;
+        b=e3YF/VxRAfr6VneKEe9Ec8xrvdkR0EHCIeA9XezoHW4i6NxW7+kAfeC9pzgEAUjRre
+         ngJUM/E+sSeDWfU5OZCWHHmVBuWJWbXxe0QvYHmQHdb/FFnjz4mbqpNqLGoDxgCLWgwO
+         NZg8s8ObPEwqoGqp1b35y7R5AQLlI8Yd56WkEMX9dfYlUIE5SRef4hEPOx3K/cVf3RZl
+         1mxo24xCkD8vHfc4RtfetAyOqvmIQXsNLfpK2+LxGPWNuReGu1ni29GJeWKB5EvQ4aZO
+         AOyq9ic/IzCzpV/D11x8btyHQHT1zECuoVVIVxPOfclawqcmZuBcLoa3lSQQPL3BPkMb
+         f6CA==
+X-Gm-Message-State: AOJu0YzvNomuTLNKhM9ZLrcNSiqshWwT0MWebuiRFMt74ai0eZGDtz6b
+        gCdJy1BdV8/2PC544xbWRdORWA==
+X-Google-Smtp-Source: AGHT+IF1LC+yWQ0PhXvd9yzZgLb7+mH1K3LMUlqzrxxaMQCoDCfGxeabIkm0GVrCgphK+2vgyIMWHQ==
+X-Received: by 2002:a2e:9a8e:0:b0:2bc:b0ae:a9e5 with SMTP id p14-20020a2e9a8e000000b002bcb0aea9e5mr7458665lji.42.1693831413634;
+        Mon, 04 Sep 2023 05:43:33 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.209.227])
-        by smtp.gmail.com with ESMTPSA id um16-20020a170906cf9000b00992d70f8078sm6099214ejb.106.2023.09.04.05.43.26
+        by smtp.gmail.com with ESMTPSA id f3-20020a170906824300b009786c8249d6sm6163671ejx.175.2023.09.04.05.43.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 04 Sep 2023 05:43:27 -0700 (PDT)
+        Mon, 04 Sep 2023 05:43:33 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 00/13] target/i386: Cleanups around KVM declarations
-Date:   Mon,  4 Sep 2023 14:43:11 +0200
-Message-ID: <20230904124325.79040-1-philmd@linaro.org>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>
+Subject: [PATCH 01/13] hw/i386/pc: Include missing 'sysemu/tcg.h' header
+Date:   Mon,  4 Sep 2023 14:43:12 +0200
+Message-ID: <20230904124325.79040-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230904124325.79040-1-philmd@linaro.org>
+References: <20230904124325.79040-1-philmd@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -71,56 +76,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Since commit 6f529b7534 ("target/i386: move FERR handling
+to target/i386") pc_q35_init() calls tcg_enabled() which
+is declared in "sysemu/tcg.h".
 
-Mostly trivial cleanups.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ hw/i386/pc_q35.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-We want to have QEMU core code accel-agnostic.
-(In particular, removing the KVM specific fields
-from CPUState).
-
-This serie contains the x86 specific patches
-before starting with the generic KVM code.
-
-FWIW, I couldn't test the 'HVF only' configuration
-since I don't have access to such host.
-
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (13):
-  hw/i386/pc: Include missing 'sysemu/tcg.h' header
-  hw/i386/pc: Include missing 'cpu.h' header
-  hw/i386/fw_cfg: Include missing 'cpu.h' header
-  target/i386/helper: Restrict KVM declarations to system emulation
-  target/i386/cpu-sysemu: Inline kvm_apic_in_kernel()
-  target/i386: Remove unused KVM stubs
-  target/i386: Allow elision of kvm_enable_x2apic()
-  target/i386: Allow elision of kvm_hv_vpindex_settable()
-  target/i386: Restrict declarations specific to CONFIG_KVM
-  sysemu/kvm: Restrict kvm_arch_get_supported_cpuid/msr() to x86 targets
-  sysemu/kvm: Restrict kvm_get_apic_state() to x86 targets
-  sysemu/kvm: Restrict kvm_has_pit_state2() to x86 targets
-  sysemu/kvm: Restrict kvm_pc_setup_irq_routing() to x86 targets
-
- include/sysemu/kvm.h        | 10 --------
- target/i386/kvm/kvm_i386.h  | 36 ++++++++++++++++----------
- hw/i386/fw_cfg.c            |  1 +
- hw/i386/intel_iommu.c       |  2 +-
- hw/i386/kvm/i8254.c         |  1 +
- hw/i386/kvm/ioapic.c        |  1 +
- hw/i386/pc_piix.c           |  1 +
- hw/i386/pc_q35.c            |  2 ++
- hw/i386/x86.c               |  4 +--
- target/i386/cpu-sysemu.c    |  4 +--
- target/i386/helper.c        |  2 +-
- target/i386/kvm/kvm-stub.c  | 51 -------------------------------------
- target/i386/kvm/kvm.c       |  4 +--
- target/i386/kvm/meson.build |  2 --
- 14 files changed, 37 insertions(+), 84 deletions(-)
- delete mode 100644 target/i386/kvm/kvm-stub.c
-
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 37c4814bed..43413dd1ac 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -34,6 +34,7 @@
+ #include "hw/loader.h"
+ #include "hw/i2c/smbus_eeprom.h"
+ #include "hw/rtc/mc146818rtc.h"
++#include "sysemu/tcg.h"
+ #include "sysemu/kvm.h"
+ #include "hw/kvm/clock.h"
+ #include "hw/pci-host/q35.h"
 -- 
 2.41.0
 
