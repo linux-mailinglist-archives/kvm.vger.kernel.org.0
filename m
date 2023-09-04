@@ -2,65 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6DF679174E
-	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65C8A791750
+	for <lists+kvm@lfdr.de>; Mon,  4 Sep 2023 14:43:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352847AbjIDMnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Sep 2023 08:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40638 "EHLO
+        id S1352854AbjIDMn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Sep 2023 08:43:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350864AbjIDMnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 08:43:53 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6A2CDD
-        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:47 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99bcfe28909so205850166b.3
-        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:47 -0700 (PDT)
+        with ESMTP id S1350864AbjIDMn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 08:43:58 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECD78CD4
+        for <kvm@vger.kernel.org>; Mon,  4 Sep 2023 05:43:52 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-52e297c7c39so1270571a12.2
+        for <kvm@vger.kernel.org>; Mon, 04 Sep 2023 05:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693831426; x=1694436226; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1693831431; x=1694436231; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EAX70gb1DRp0U5HpIrsPRfVqNXXnjE75o2367gc+/Ss=;
-        b=WZaxS/0OLLL9irzltuc0NlABLYaNHFpRDlv4HHODyIt+4XlO+Ckldldhp4siGJGON8
-         LTayCQ1PlaXfsleHEyGx9l63zqSzhXgyA2WcZIA1CJhglih1YmbUTpP7GCE/NBe+p5i5
-         IFEVetKPw8YuDRJhOXS+mom9wPWqpuos5n06xvjAX6g4ekvcMwHw70NOhMnLno6Ue7Tm
-         vkxcx7HC3QLgpFsGIZ5zSECTir/Kus3HKHU4GOPiRceHVu9cRZ2GyLkKzQ38l4oYLdrP
-         oARe6AoWf0lH4fvAcu1JN+YjkxopnIydS+OZ/qESn6mXTkRTETozRvNIq/mQ1Bg+1IkL
-         7W5Q==
+        bh=SdbPeRb3rqucMV4G8DmJatCRkQTtO6zKzLYWXw0g6yM=;
+        b=NKVUbO/Qvv7VF4HCE9AkPGvIpqppN1Lb7pn6sLpr2I7a+BXSA9m/XgqdhlHYW47jSP
+         2/RAYazx1fnIjcW9raSDp/zcTtn3qmle3E3k4IWOUMfeEWZTpB7l0P6Cq1J4RMQMrKoH
+         OZ5dyyBRDQNDDpg/js82OTR7XvvMk50wt4IqBrDbyPXz8KxxwL7SiWUjjQTx1z5dJRcq
+         6A8h389evNHpbTqctpCTnhz9AWSpygo7Fx+EmEYp2LyQD11jlTzvqsHCAtkC9HeZRsnW
+         R0pkpdaopmOw+EZz/hY23gQ4PzYDjkiW28e4/o9GVr3l9BwCZJLx7o7TjImGFti6kTCJ
+         Vs1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693831426; x=1694436226;
+        d=1e100.net; s=20221208; t=1693831431; x=1694436231;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EAX70gb1DRp0U5HpIrsPRfVqNXXnjE75o2367gc+/Ss=;
-        b=dYsuNcdeqReggtilkg5L1FOYzXJcjVLyh/XkoZgHo/ff7X7GbeLRBB9KBXb5zEofOu
-         WBgAUM11EaIORRsZCi5ZrecZMp54dT0MTJpLExIq+0mwYBrfcWMjbrpQkRSzSFjvsZGy
-         fAPy7rm06hFf+l+hBh/tckh8XvAzfqTfncW3Mq/YSj66h5V03yZuHuoB3hNTt7rtRGSq
-         8WbUYjiDOgTr3z16sOcZgrHISN98+1ZCCAQqy4nZAMLQ0NWsrYyLDU64RdglXkofYHxC
-         xMuHQsidvdCZh1tla0TDBGlalCQwlppjdi8dI9t9++uTULCU/1vUn1u1C/oe0qWgp7Ge
-         TR4Q==
-X-Gm-Message-State: AOJu0Yxns8zdxgcT41zVljeTTIxg2RbD5G0PVjzsRXrdyAvFSOdMURpK
-        QwMdPeNYeIBl8qal9fonUPZsAQ==
-X-Google-Smtp-Source: AGHT+IFkSqJnsshKBauxCddr+GUPT4A6KXmj88c6crUPHo9OljUs8uCyfcujmDG6A70sYs/Xauvxnw==
-X-Received: by 2002:a17:906:30c1:b0:993:d5bd:a757 with SMTP id b1-20020a17090630c100b00993d5bda757mr7133775ejb.19.1693831425876;
-        Mon, 04 Sep 2023 05:43:45 -0700 (PDT)
+        bh=SdbPeRb3rqucMV4G8DmJatCRkQTtO6zKzLYWXw0g6yM=;
+        b=bBuUsyWJFpMUOrGbXJphZr/dUvjgSrWia34tS8aqYdSM5j9A+bbFQPHqldl3KTBH3O
+         uNZupYtkdWrPy8M2PgS0mk6I0zoH3uAJP5+GXwq0T4qU+Rx9FsVCTg5icz2sDaUYBSed
+         iV12iTjSvyHHxk0cnVG4a8efw0m+BU89cmZHSfa/S5jP7Op+Bl2KNI48FG6sYbzdAsZ3
+         AaQpbtQrIBxQdSAQzNzjzr9PLBExK2x20vRdGx2eoqrwzar1caA3vA+KyBTE6s0Yu2Td
+         CkCXHcAVnvfrsmNilQ3qZQ6rDaFbvLWbibO3PnrXJZEP7g6Urkn8z2aD06I1iPGr50xi
+         LaUA==
+X-Gm-Message-State: AOJu0YyuLdN/nqTRlK1SxYr85lXo0z8Qr1uSyaeKC7tC5XErUo2qZ5VO
+        wn1SR1fk8ZrDMe3ijVJxrHn7rg==
+X-Google-Smtp-Source: AGHT+IEsBFqUtTTs6WqvZHff9CgEl9Cr75zp000xY/akplngwM5ibOARO4pqK/3xRP1h2a6+OrAUVw==
+X-Received: by 2002:a17:906:cc5b:b0:99d:fd65:dbb2 with SMTP id mm27-20020a170906cc5b00b0099dfd65dbb2mr7528978ejb.33.1693831431480;
+        Mon, 04 Sep 2023 05:43:51 -0700 (PDT)
 Received: from m1x-phil.lan ([176.187.209.227])
-        by smtp.gmail.com with ESMTPSA id pv9-20020a170907208900b00993470682e5sm6063351ejb.32.2023.09.04.05.43.44
+        by smtp.gmail.com with ESMTPSA id y8-20020a170906914800b00992f2befcbcsm6120980ejw.180.2023.09.04.05.43.50
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 04 Sep 2023 05:43:45 -0700 (PDT)
+        Mon, 04 Sep 2023 05:43:51 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>
-Subject: [PATCH 03/13] hw/i386/fw_cfg: Include missing 'cpu.h' header
-Date:   Mon,  4 Sep 2023 14:43:14 +0200
-Message-ID: <20230904124325.79040-4-philmd@linaro.org>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH 04/13] target/i386/helper: Restrict KVM declarations to system emulation
+Date:   Mon,  4 Sep 2023 14:43:15 +0200
+Message-ID: <20230904124325.79040-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230904124325.79040-1-philmd@linaro.org>
 References: <20230904124325.79040-1-philmd@linaro.org>
@@ -76,26 +74,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-fw_cfg_build_feature_control() uses CPUID_EXT_VMX which is
-defined in "target/i386/cpu.h".
+User emulation doesn't need any KVM declarations.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/i386/fw_cfg.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/i386/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index 72a42f3c66..7362daa45a 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -24,6 +24,7 @@
- #include "kvm/kvm_i386.h"
- #include "qapi/error.h"
- #include CONFIG_DEVICES
-+#include "target/i386/cpu.h"
- 
- struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
- 
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 89aa696c6d..2070dd0dda 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -22,10 +22,10 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "sysemu/runstate.h"
+-#include "kvm/kvm_i386.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/hw_accel.h"
+ #include "monitor/monitor.h"
++#include "kvm/kvm_i386.h"
+ #endif
+ #include "qemu/log.h"
+ #ifdef CONFIG_TCG
 -- 
 2.41.0
 
