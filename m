@@ -2,143 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B56D792803
-	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AD41792580
+	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:23:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237478AbjIEQEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 12:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37856 "EHLO
+        id S237646AbjIEQEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 12:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243976AbjIEBHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Sep 2023 21:07:25 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A731B8;
-        Mon,  4 Sep 2023 18:07:22 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-307d20548adso1688779f8f.0;
-        Mon, 04 Sep 2023 18:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693876041; x=1694480841; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z+16TEVlvXNl9SnUfTt8eBduwj6W82MKg2E06SgE0R0=;
-        b=AHHiN5ITyg3MXDlKNBNn4LtDszVNOGGaCTYk+xHI03Sx6d9gNw/xO0HQ69UfG8xilV
-         CI5mgXJh0oyKWkqxkevFNCaXpFKZVpelN394p6k+xHW/dyhoAPGksndK4c2uxEWxA0Df
-         hSc582j83XvPrgPTqjj3l0m5GpHwkJtEAYZWLCIHCftO2Qlu1JVDN+0Oymai6LDFyP3u
-         QAtEiVTipuMwW/QfYKeRCDjdq2Uq6jTALnFhYfS7tT91eCTvNScPE7md8xe8iU0ysjct
-         bKTz+JIQ8xRO/ESwyCFsR7wZ+1iTS8nJbtLMHsANIp1OF0aM9+jbtnpTIbRawT4PlkfS
-         +qfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693876041; x=1694480841;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z+16TEVlvXNl9SnUfTt8eBduwj6W82MKg2E06SgE0R0=;
-        b=IIs30utBr1/IgfoZB6rTqVceSWxn+qHztJStL1YdxDPbIhoFYzzXoPcX/sm6PTBugY
-         b+v5iJny0VPvNJV6Ws1C7RqN/7vrjxCV08BFrrj4U/8mSPMB5Tw7frJVnx5nVbqBksM8
-         9OE3I4RvEv4+KqzPeOu7X9naeRBqnW7r9VXlxBjqnuaCB18gdI16olBdZ2PtEa3swN8b
-         lsD4jMljaLzn8uHT7pVIwOfYjm9jKlUV2eumc7C2UlratYc0srUucP/LxC1VvP8Jd+GV
-         YYO0dT6fmgiMrCnq5xZZUo59tgIvmas0KX+hHpIFBSZaEmOv82JjJylU1iU8Wg9Y86Pi
-         35mw==
-X-Gm-Message-State: AOJu0YyG8tYawKghN8eCUHTgpvCXlOQ+oUSYoe2fHK8anfNazOigwzkh
-        6XKUVpJdTcc8pND0fcUWcQ+61Tb/dG3lsA85W4Y=
-X-Google-Smtp-Source: AGHT+IECKEvy4ioFjDYfBrbouO8QNOerugEHbXrl2j/pbKhV9wRY+NKO3rLtbVBkaMj079zoHTIhXik4kI/AcIVQBpo=
-X-Received: by 2002:a5d:5482:0:b0:31a:d5fa:d710 with SMTP id
- h2-20020a5d5482000000b0031ad5fad710mr9474704wrv.2.1693876040560; Mon, 04 Sep
- 2023 18:07:20 -0700 (PDT)
+        with ESMTP id S1343619AbjIECku (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Sep 2023 22:40:50 -0400
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83883CC6;
+        Mon,  4 Sep 2023 19:40:42 -0700 (PDT)
+X-UUID: 7279bac059b34fff8ac20e4f995e63f3-20230905
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.31,REQID:c87f21bf-e03a-41f3-8422-8d9d6c6a6197,IP:15,
+        URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+        ON:release,TS:0
+X-CID-INFO: VERSION:1.1.31,REQID:c87f21bf-e03a-41f3-8422-8d9d6c6a6197,IP:15,UR
+        L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:0
+X-CID-META: VersionHash:0ad78a4,CLOUDID:ca901d20-33fd-4aaa-bb43-d3fd68d9d5ae,B
+        ulkID:2309051040336BBU5ZH6,BulkQuantity:0,Recheck:0,SF:24|17|19|44|102,TC:
+        nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OS
+        I:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 7279bac059b34fff8ac20e4f995e63f3-20230905
+X-User: oushixiong@kylinos.cn
+Received: from localhost.localdomain [(111.48.58.12)] by mailgw
+        (envelope-from <oushixiong@kylinos.cn>)
+        (Generic MTA)
+        with ESMTP id 1120735331; Tue, 05 Sep 2023 10:40:31 +0800
+From:   oushixiong <oushixiong@kylinos.cn>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shixiong Ou <oushixiong@kylinos.cn>
+Subject: [PATCH] vfio/pds: Limit Calling dev_dbg function to CONFIG_PCI_ATS
+Date:   Tue,  5 Sep 2023 10:40:28 +0800
+Message-Id: <20230905024028.940377-1-oushixiong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   Hao Peng <flyingpenghao@gmail.com>
-Date:   Tue, 5 Sep 2023 09:07:09 +0800
-Message-ID: <CAPm50aKwbZGeXPK5uig18Br8CF1hOS71CE2j_dLX+ub7oJdpGg@mail.gmail.com>
-Subject: [PATCH RESEND] KVM: X86: Reduce size of kvm_vcpu_arch structure when CONFIG_KVM_XEN=n
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peng Hao <flyingpeng@tencent.com>
+From: Shixiong Ou <oushixiong@kylinos.cn>
 
-When CONFIG_KVM_XEN=n, the size of kvm_vcpu_arch can be reduced
-from 5100+ to 4400+ by adding macro control.
+If CONFIG_PCI_ATS isn't set, then pdev->physfn is not defined.
+So it causes a compilation issue:
 
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+../drivers/vfio/pci/pds/vfio_dev.c:165:30: error: ‘struct pci_dev’ has no member named ‘physfn’; did you mean ‘is_physfn’?
+  165 |   __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
+      |                              ^~~~~~
+
+Signed-off-by: Shixiong Ou <oushixiong@kylinos.cn>
 ---
- arch/x86/include/asm/kvm_host.h | 5 ++++-
- arch/x86/kvm/cpuid.c            | 2 ++
- arch/x86/kvm/x86.c              | 2 ++
- 3 files changed, 8 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/pds/vfio_dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1a4def36d5bb..9320019708f9 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -680,6 +680,7 @@ struct kvm_hypervisor_cpuid {
-        u32 limit;
- };
-
-+#ifdef CONFIG_KVM_XEN
-/* Xen HVM per vcpu emulation context */
- struct kvm_vcpu_xen {
-        u64 hypercall_rip;
-@@ -702,6 +703,7 @@ struct kvm_vcpu_xen {
-        struct timer_list poll_timer;
-        struct kvm_hypervisor_cpuid cpuid;
- };
+diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+index b46174f5eb09..18b4a6a5bc16 100644
+--- a/drivers/vfio/pci/pds/vfio_dev.c
++++ b/drivers/vfio/pci/pds/vfio_dev.c
+@@ -160,10 +160,13 @@ static int pds_vfio_init_device(struct vfio_device *vdev)
+ 	vdev->log_ops = &pds_vfio_log_ops;
+ 
+ 	pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
++
++#ifdef CONFIG_PCI_ATS
+ 	dev_dbg(&pdev->dev,
+ 		"%s: PF %#04x VF %#04x vf_id %d domain %d pds_vfio %p\n",
+ 		__func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
+ 		pci_domain_nr(pdev->bus), pds_vfio);
 +#endif
-
- struct kvm_queued_exception {
-        bool pending;
-@@ -930,8 +932,9 @@ struct kvm_vcpu_arch {
-
-        bool hyperv_enabled;
-        struct kvm_vcpu_hv *hyperv;
-+#ifdef CONFIG_KVM_XEN
-        struct kvm_vcpu_xen xen;
--
-+#endif
-        cpumask_var_t wbinvd_dirty_mask;
-
-        unsigned long last_retry_eip;
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0544e30b4946..48f5308c4556 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -456,7 +456,9 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu,
-struct kvm_cpuid_entry2 *e2,
-        vcpu->arch.cpuid_nent = nent;
-
-        vcpu->arch.kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
-+#ifdef CONFIG_KVM_XEN
-        vcpu->arch.xen.cpuid = kvm_get_hypervisor_cpuid(vcpu, XEN_SIGNATURE);
-+#endif
-        kvm_vcpu_after_set_cpuid(vcpu);
-
-        return 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..4fd08a5e0e98 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3232,11 +3232,13 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
-
-        if (vcpu->pv_time.active)
-                kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0);
-+#ifdef CONFIG_KVM_XEN
-        if (vcpu->xen.vcpu_info_cache.active)
-                kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
-                                        offsetof(struct
-compat_vcpu_info, time));
-        if (vcpu->xen.vcpu_time_info_cache.active)
-                kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
-+#endif
-        kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
-        return 0;
+ 
+ 	return 0;
  }
---
-2.31.1
+-- 
+2.25.1
+
