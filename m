@@ -2,190 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E527792625
-	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:26:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9B2779286D
+	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:43:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237745AbjIEQEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 12:04:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
+        id S236734AbjIEQDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 12:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354293AbjIEKgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Sep 2023 06:36:24 -0400
-Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B04B81AE
-        for <kvm@vger.kernel.org>; Tue,  5 Sep 2023 03:36:19 -0700 (PDT)
-Received: by mail-ej1-x641.google.com with SMTP id a640c23a62f3a-9a6190af24aso357587466b.0
-        for <kvm@vger.kernel.org>; Tue, 05 Sep 2023 03:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693910178; x=1694514978; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nfqw6iJ4ruL8BEmtuLRWIN/7uvJd+Y/QPLQc2ETsH8Q=;
-        b=XV9PLVD3fdr42GJfQOoeFU5sVtu/bfHdL1XWsFUlf2FdWbfasCwXtTnX+44W1A5T3P
-         d3bTRGKEWOHTji+OxuC9IpAxwEGU2WK2afbvTpevUhDt7PM6efa++JBSlgr7bVAjP2Oo
-         liQMt58vI8tiyOap++lHpgb1NzDsl2wdJHEpWdAIDB3OxWvJqnPl27m4HNbN7sYJJ2oo
-         AUlPH9N7m2bFib6dY/qx3uNaXxZe15YkMVmZGqJrlBsmyG94YGr8jYzHeXsKFnoeAMdh
-         2Kb+N8AY3V5Da/ALXQ8eTex3bhCEQALMYowlIhJBwtLVFpDBwvo0Ig2PhgB+S58ojtsO
-         Ev0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693910178; x=1694514978;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nfqw6iJ4ruL8BEmtuLRWIN/7uvJd+Y/QPLQc2ETsH8Q=;
-        b=BURGwNAC+4NeNSHeFpvbporS+oqhdg4vSdKTaecXi/GPZkedgTh9kcRYHLXTexzYT0
-         bYd+cdh8rKkR3WS4TDSnxa+cDKz1nVWZm/5aQerU8lWEsHdMvApio5vzl1oB6ImQ+kTK
-         7l+gs5zQldDObfpp3OuAdK7WfsDbdGNRcV1mYICjozPjhWLdCc3uWnl8hKm7G3Cmijoe
-         0pUpRmB0XBWwldtvxDE2Z6AJqekaDnZG58VsV9Md8wewNOL6xF6XRUcKymUP48Sr4cZr
-         s5tzXDnOmo+PQAD/vh/sHlb+osdA8Pk316fjWjkq9W4ox23DGcQ7zR47mTEXE4//BXCz
-         re8g==
-X-Gm-Message-State: AOJu0YwsL4rE71ww1sPbA4HErucQvO0he3S3SuNRMRa3tytJoDbNNGxF
-        rCKoCnOrF22Sy0R0vKNI1uYkMw==
-X-Google-Smtp-Source: AGHT+IHkRyEbp0w5QIZbj1GlQvlGuscWTdMpQO8f95QsDXvDTy2lmlAWjOWJLe7UTlpwG3PDaD3ODQ==
-X-Received: by 2002:a17:906:10db:b0:9a1:e395:2d10 with SMTP id v27-20020a17090610db00b009a1e3952d10mr9165785ejv.75.1693910178039;
-        Tue, 05 Sep 2023 03:36:18 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170906a40d00b0099bc0daf3d7sm7484299ejz.182.2023.09.05.03.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 03:36:17 -0700 (PDT)
-Date:   Tue, 5 Sep 2023 12:36:16 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, wchen <waylingii@gmail.com>,
-        Greentime Hu <greentime.hu@sifive.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Lei Wang <lei4.wang@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Peter Gonda <pgonda@google.com>,
-        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 0/8] RISCV: Add kvm Sstc timer selftest
-Message-ID: <20230905-eb7998dbd945ed9dd12659ea@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
+        with ESMTP id S1354532AbjIEMWX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Sep 2023 08:22:23 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466D21A8;
+        Tue,  5 Sep 2023 05:22:20 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 385CC1T1006030;
+        Tue, 5 Sep 2023 12:22:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3UwuvDN+eoewhTwVqzsSpnC1hdkuSFLvc+SkpbZsX9A=;
+ b=eakCT4+KJE0QMcdkcs5LbZVZpj0SxSvU/jdZIvMlhpknI6gCbzJivJlXa1/Bm43Pu2Rk
+ Ms/MkBb0O1QkDTDFSJK4T4RL//OVIQwi4tbaCDt5deI6NhB+298WzVO7JjvicJ08Gs1J
+ Xn+kyTIIqYe+KVlL+1axSJY7QUnUW7Ir5su0iEobCprVjebCDsrr8maAqWu3eXy3SKgJ
+ O1FgODDW3MX76kpxUQmgx8aJXWBICT7TbHoEPi8/Z8B9g8OoeQ45NczhuBcS3ebvJh9B
+ r6tC7XDmsvzB9IvL53oLz030llbmHZklxF/pFFSkiDGeoPHtjauFR0IGJqFSTbguUIRz zw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sx44eg8hy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Sep 2023 12:22:19 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 385CDLWT011805;
+        Tue, 5 Sep 2023 12:22:19 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sx44eg8hh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Sep 2023 12:22:19 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 385BU3QZ001615;
+        Tue, 5 Sep 2023 12:22:18 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3svfcsjtdw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Sep 2023 12:22:18 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 385CMFPG52298156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Sep 2023 12:22:15 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 831E72004B;
+        Tue,  5 Sep 2023 12:22:15 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38F1E20043;
+        Tue,  5 Sep 2023 12:22:15 +0000 (GMT)
+Received: from [9.171.57.58] (unknown [9.171.57.58])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Sep 2023 12:22:15 +0000 (GMT)
+Message-ID: <7e20d088-546a-65c1-1438-c9a9cf0c3810@linux.ibm.com>
+Date:   Tue, 5 Sep 2023 14:22:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1693659382.git.haibo1.xu@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [kvm-unit-tests PATCH v6 1/8] lib: s390x: introduce bitfield for
+ PSW mask
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230904082318.1465055-1-nrb@linux.ibm.com>
+ <20230904082318.1465055-2-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230904082318.1465055-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xIhoq4W2Hr6XBLX37b3E7o36nJnZydbt
+X-Proofpoint-ORIG-GUID: 9G5yAIsXXXOL0NuPE2qbWrEPNgjcxdmO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-05_10,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ phishscore=0 mlxscore=0 adultscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxlogscore=758
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309050107
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Haibo,
-
-Some of your patch summaries say 'selftest' instead of 'selftests'. Please
-correct those for the next version.
-
-Thanks,
-drew
-
-On Sat, Sep 02, 2023 at 08:59:22PM +0800, Haibo Xu wrote:
-> The RISC-V arch_timer selftest is used to validate Sstc timer
-> functionality in a guest, which sets up periodic timer interrupts
-> and check the basic interrupt status upon its receipt.
+On 9/4/23 10:22, Nico Boehr wrote:
+> Changing the PSW mask is currently little clumsy, since there is only the
+> PSW_MASK_* defines. This makes it hard to change e.g. only the address
+> space in the current PSW without a lot of bit fiddling.
 > 
-> This KVM selftest was ported from aarch64 arch_timer and tested
-> with Linux v6.5-rc5 on a Qemu riscv64 virt machine.
+> Introduce a bitfield for the PSW mask. This makes this kind of
+> modifications much simpler and easier to read.
 > 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
-> Changed since v1:
->   * Rebase to kvm-riscv/riscv_kvm_next
->   * Cherry-pick Sean's kselftest guest printf patch set
->     https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com/
->   * Copy the entire csr.h verbatim
->   * Unified the function names for exception vector table setup
->     void vm_init_vector_tables(struct kvm_vm *vm);
->     void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
->   * Format the handler.S asm file per Andrew's comments
->   * Consolidate the timer test code for arm64 and riscv
->     based on Andrew's and Sean's suggestion
+>   lib/s390x/asm/arch_def.h | 26 +++++++++++++++++++++++++-
+>   s390x/selftest.c         | 34 ++++++++++++++++++++++++++++++++++
+>   2 files changed, 59 insertions(+), 1 deletion(-)
 > 
-> Haibo Xu (8):
->   KVM: selftests: Unify the codes for guest exception handling
->   KVM: arm64: selftest: Split arch_timer test code
->   tools: riscv: Add header file csr.h
->   KVM: riscv: selftests: Switch to use macro from csr.h
->   KVM: riscv: selftests: Add exception handling support
->   KVM: riscv: selftests: Add guest helper to get vcpu id
->   KVM: riscv: selftest: Change vcpu_has_ext to a common function
->   KVM: riscv: selftests: Add sstc timer test
-> 
->  tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
->  tools/testing/selftests/kvm/Makefile          |  11 +-
->  .../selftests/kvm/aarch64/arch_timer.c        | 292 +---------
->  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
->  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
->  .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
->  tools/testing/selftests/kvm/arch_timer.c      | 261 +++++++++
->  .../selftests/kvm/include/aarch64/processor.h |  12 +-
->  .../selftests/kvm/include/kvm_util_base.h     |   9 +
->  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
->  .../selftests/kvm/include/riscv/processor.h   |  60 +-
->  .../selftests/kvm/include/timer_test.h        |  58 ++
->  .../selftests/kvm/include/x86_64/processor.h  |   5 -
->  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
->  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
->  .../selftests/kvm/lib/riscv/processor.c       |  86 +++
->  .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
->  .../testing/selftests/kvm/riscv/arch_timer.c  | 130 +++++
->  .../selftests/kvm/riscv/get-reg-list.c        |  14 -
->  tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
->  .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
->  .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
->  .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
->  .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
->  .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
->  .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
->  .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
->  .../smaller_maxphyaddr_emulation_test.c       |   4 +-
->  .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
->  .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
->  .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
->  .../kvm/x86_64/ucna_injection_test.c          |   8 +-
->  .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
->  .../vmx_exception_with_invalid_guest_state.c  |   4 +-
->  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
->  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
->  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
->  .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
->  38 files changed, 1376 insertions(+), 376 deletions(-)
->  create mode 100644 tools/arch/riscv/include/asm/csr.h
->  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
->  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
->  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
->  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
->  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
-> 
-> -- 
-> 2.34.1
-> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index bb26e008cc68..5a712f97f129 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -37,12 +37,36 @@ struct stack_frame_int {
+>   };
+>   
+>   struct psw {
+> -	uint64_t	mask;
+> +	union {
+> +		uint64_t	mask;
+> +		struct {
+> +			uint64_t reserved00:1;
+> +			uint64_t per:1;
+> +			uint64_t reserved02:3;
+> +			uint64_t dat:1;
+> +			uint64_t io:1;
+> +			uint64_t ext:1;
+> +			uint64_t key:4;
+> +			uint64_t reserved12:1;
+> +			uint64_t mchk:1;
+> +			uint64_t wait:1;
+> +			uint64_t pstate:1;
+> +			uint64_t as:2;
+> +			uint64_t cc:2;
+> +			uint64_t prg_mask:4;
+> +			uint64_t reserved24:7;
+> +			uint64_t ea:1;
+> +			uint64_t ba:1;
+> +			uint64_t reserved33:31;
+> +		};
+> +	};
+>   	uint64_t	addr;
+>   };
+> +_Static_assert(sizeof(struct psw) == 16, "PSW size");
+>   
+>   #define PSW(m, a) ((struct psw){ .mask = (m), .addr = (uint64_t)(a) })
+>   
+> +
+
+We can fix this up when picking.
+
+Other than that:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
