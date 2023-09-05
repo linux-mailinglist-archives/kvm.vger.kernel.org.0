@@ -2,74 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D534479270A
-	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:34:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34A58792770
+	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:36:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236963AbjIEQDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 12:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43188 "EHLO
+        id S236670AbjIEQDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 12:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351652AbjIEFYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Sep 2023 01:24:38 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0549E8;
-        Mon,  4 Sep 2023 22:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693891474; x=1725427474;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7yRpurzzwCMrF3BW5n2uSjqy7aK/uDwBCGx05tS4LrI=;
-  b=flAiemb0Mp8d2UGF4GIVSydyXVFX0Mq/d0VGuYoZHojAHFlVCskY76un
-   R9RshMz+GYe/A5ezb6VuR5wGBhJmQTIOYBlx45XwcTOU2H/hcMXe30/u9
-   XfmOXO4K7qcX21pmP+w7XrGL/o+XPYcEHGnxOvl+jxU/dPkVUY6oJZH7o
-   cagn0XF03uxF3c/M3Gehw6UQfX+9wlsGzCQjqWeKJHsGUEFeQK/S1kRts
-   sUHC3YlxevchlSwB6XKP7DbHPfCgCGDSLUzN42zHtfom9rRSISfVX7FzW
-   VCY1dH0gqAG9R6oZfNAIBWG0rrJkHwLHKATioC1OrIfRih9oCsbpP+Rl9
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="366935207"
-X-IronPort-AV: E=Sophos;i="6.02,228,1688454000"; 
-   d="scan'208";a="366935207"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 22:24:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="734505788"
-X-IronPort-AV: E=Sophos;i="6.02,228,1688454000"; 
-   d="scan'208";a="734505788"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.214.54]) ([10.254.214.54])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 22:24:29 -0700
-Message-ID: <c9228377-0a5c-adf8-d0ef-9a791226603d@linux.intel.com>
-Date:   Tue, 5 Sep 2023 13:24:26 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        with ESMTP id S1353648AbjIEHCq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Sep 2023 03:02:46 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F9481B4
+        for <kvm@vger.kernel.org>; Tue,  5 Sep 2023 00:02:42 -0700 (PDT)
+Received: from lhrpeml500003.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RfxD35LwJz6J861;
+        Tue,  5 Sep 2023 14:58:11 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 5 Sep 2023 08:02:38 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
+ Tue, 5 Sep 2023 08:02:38 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Gavin Shan <gshan@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+CC:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "ricarkol@google.com" <ricarkol@google.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 09/10] iommu: Make iommu_queue_iopf() more generic
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [PATCH v3] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Topic: [PATCH v3] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Index: AQHZ2zftn8hFaZvXaUy/o6Gq1UEyNLADkdcAgAhEzQA=
+Date:   Tue, 5 Sep 2023 07:02:38 +0000
+Message-ID: <f1ff2e8da36045dcbd965552db1d22e7@huawei.com>
+References: <20230830114818.641-1-shameerali.kolothum.thodi@huawei.com>
+ <f3abdbd6-337f-d175-07ab-ac1975d98dfc@redhat.com>
+In-Reply-To: <f3abdbd6-337f-d175-07ab-ac1975d98dfc@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>
-References: <20230825023026.132919-1-baolu.lu@linux.intel.com>
- <20230825023026.132919-10-baolu.lu@linux.intel.com>
- <BN9PR11MB52762A33BC9F41AB424915688CE3A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <cfd9e0b8-167e-a79b-9ef1-b3bfa38c9199@linux.intel.com>
- <BN9PR11MB5276926066CC3A8FCCFD3DB08CE6A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ed11a5c4-7256-e6ea-e94e-0dfceba6ddbf@linux.intel.com>
- <BN9PR11MB5276622C8271402487FA44708CE4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB5276622C8271402487FA44708CE4A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,358 +61,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/9/1 10:50, Tian, Kevin wrote:
->> From: Baolu Lu <baolu.lu@linux.intel.com>
->> Sent: Thursday, August 31, 2023 7:25 PM
->>
->> On 2023/8/30 15:55, Tian, Kevin wrote:
->>>> From: Baolu Lu <baolu.lu@linux.intel.com>
->>>> Sent: Saturday, August 26, 2023 4:04 PM
->>>>
->>>> On 8/25/23 4:17 PM, Tian, Kevin wrote:
->>>>>> +static void assert_no_pending_iopf(struct device *dev, ioasid_t pasid)
->>>>>> +{
->>>>>> +	struct iommu_fault_param *iopf_param = dev->iommu-
->>>>>>> fault_param;
->>>>>> +	struct iopf_fault *iopf;
->>>>>> +
->>>>>> +	if (!iopf_param)
->>>>>> +		return;
->>>>>> +
->>>>>> +	mutex_lock(&iopf_param->lock);
->>>>>> +	list_for_each_entry(iopf, &iopf_param->partial, list) {
->>>>>> +		if (WARN_ON(iopf->fault.prm.pasid == pasid))
->>>>>> +			break;
->>>>>> +	}
->>>>> partial list is protected by dev_iommu lock.
->>>>>
->>>>
->>>> Ah, do you mind elaborating a bit more? In my mind, partial list is
->>>> protected by dev_iommu->fault_param->lock.
->>>>
->>>
->>> well, it's not how the code is currently written. iommu_queue_iopf()
->>> doesn't hold dev_iommu->fault_param->lock to update the partial
->>> list.
->>>
->>> while at it looks there is also a mislocking in iopf_queue_discard_partial()
->>> which only acquires queue->lock.
->>>
->>> So we have three places touching the partial list all with different locks:
->>>
->>> - iommu_queue_iopf() relies on dev_iommu->lock
->>> - iopf_queue_discard_partial() relies on queue->lock
->>> - this new assert function uses dev_iommu->fault_param->lock
->>
->> Yeah, I see your point now. Thanks for the explanation.
->>
->> So, my understanding is that dev_iommu->lock protects the whole
->> pointer of dev_iommu->fault_param, while dev_iommu->fault_param->lock
->> protects the lists inside it.
->>
-> 
-> yes. let's use fault_param->lock consistently for those lists in all paths.
-
-Hi Kevin,
-
-I am trying to address this issue in below patch. Does it looks sane to
-you?
-
-iommu: Consolidate per-device fault data management
-
-The per-device fault data is a data structure that is used to store
-information about faults that occur on a device. This data is allocated
-when IOPF is enabled on the device and freed when IOPF is disabled. The
-data is used in the paths of iopf reporting, handling, responding, and
-draining.
-
-The fault data is protected by two locks:
-
-- dev->iommu->lock: This lock is used to protect the allocation and
-   freeing of the fault data.
-- dev->iommu->fault_parameter->lock: This lock is used to protect the
-   fault data itself.
-
-Improve the iopf code to enforce this lock mechanism and add a reference
-counter in the fault data to avoid use-after-free issue.
-
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
----
-  include/linux/iommu.h      |   3 +
-  drivers/iommu/io-pgfault.c | 122 +++++++++++++++++++++++--------------
-  2 files changed, 79 insertions(+), 46 deletions(-)
-
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 1697ac168f05..77ad33ffe3ac 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -480,6 +480,8 @@ struct iommu_device {
-  /**
-   * struct iommu_fault_param - per-device IOMMU fault data
-   * @lock: protect pending faults list
-+ * @users: user counter to manage the lifetime of the data, this field
-+ *         is protected by dev->iommu->lock.
-   * @dev: the device that owns this param
-   * @queue: IOPF queue
-   * @queue_list: index into queue->devices
-@@ -489,6 +491,7 @@ struct iommu_device {
-   */
-  struct iommu_fault_param {
-  	struct mutex lock;
-+	int users;
-
-  	struct device *dev;
-  	struct iopf_queue *queue;
-diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index 7e5c6798ce24..3e6845bc5902 100644
---- a/drivers/iommu/io-pgfault.c
-+++ b/drivers/iommu/io-pgfault.c
-@@ -26,6 +26,49 @@ void iopf_free_group(struct iopf_group *group)
-  }
-  EXPORT_SYMBOL_GPL(iopf_free_group);
-
-+/*
-+ * Return the fault parameter of a device if it exists. Otherwise, 
-return NULL.
-+ * On a successful return, the caller takes a reference of this 
-parameter and
-+ * should put it after use by calling iopf_put_dev_fault_param().
-+ */
-+static struct iommu_fault_param *iopf_get_dev_fault_param(struct device 
-*dev)
-+{
-+	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *fault_param;
-+
-+	if (!param)
-+		return NULL;
-+
-+	mutex_lock(&param->lock);
-+	fault_param = param->fault_param;
-+	if (fault_param)
-+		fault_param->users++;
-+	mutex_unlock(&param->lock);
-+
-+	return fault_param;
-+}
-+
-+/* Caller must hold a reference of the fault parameter. */
-+static void iopf_put_dev_fault_param(struct iommu_fault_param *fault_param)
-+{
-+	struct device *dev = fault_param->dev;
-+	struct dev_iommu *param = dev->iommu;
-+
-+	mutex_lock(&param->lock);
-+	if (WARN_ON(fault_param->users <= 0 ||
-+		    fault_param != param->fault_param)) {
-+		mutex_unlock(&param->lock);
-+		return;
-+	}
-+
-+	if (--fault_param->users == 0) {
-+		param->fault_param = NULL;
-+		kfree(fault_param);
-+		put_device(dev);
-+	}
-+	mutex_unlock(&param->lock);
-+}
-+
-  /**
-   * iommu_handle_iopf - IO Page Fault handler
-   * @fault: fault event
-@@ -72,23 +115,14 @@ static int iommu_handle_iopf(struct iommu_fault 
-*fault, struct device *dev)
-  	struct iopf_group *group;
-  	struct iommu_domain *domain;
-  	struct iopf_fault *iopf, *next;
--	struct iommu_fault_param *iopf_param;
--	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *iopf_param = dev->iommu->fault_param;
-
--	lockdep_assert_held(&param->lock);
-+	lockdep_assert_held(&iopf_param->lock);
-
-  	if (fault->type != IOMMU_FAULT_PAGE_REQ)
-  		/* Not a recoverable page fault */
-  		return -EOPNOTSUPP;
-
--	/*
--	 * As long as we're holding param->lock, the queue can't be unlinked
--	 * from the device and therefore cannot disappear.
--	 */
--	iopf_param = param->fault_param;
--	if (!iopf_param)
--		return -ENODEV;
--
-  	if (!(fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-  		iopf = kzalloc(sizeof(*iopf), GFP_KERNEL);
-  		if (!iopf)
-@@ -167,18 +201,15 @@ static int iommu_handle_iopf(struct iommu_fault 
-*fault, struct device *dev)
-   */
-  int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
-  {
--	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *fault_param;
-  	struct iopf_fault *evt_pending = NULL;
--	struct iommu_fault_param *fparam;
-  	int ret = 0;
-
--	if (!param || !evt)
-+	fault_param = iopf_get_dev_fault_param(dev);
-+	if (!fault_param)
-  		return -EINVAL;
-
--	/* we only report device fault if there is a handler registered */
--	mutex_lock(&param->lock);
--	fparam = param->fault_param;
--
-+	mutex_lock(&fault_param->lock);
-  	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
-  	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-  		evt_pending = kmemdup(evt, sizeof(struct iopf_fault),
-@@ -187,20 +218,18 @@ int iommu_report_device_fault(struct device *dev, 
-struct iopf_fault *evt)
-  			ret = -ENOMEM;
-  			goto done_unlock;
-  		}
--		mutex_lock(&fparam->lock);
--		list_add_tail(&evt_pending->list, &fparam->faults);
--		mutex_unlock(&fparam->lock);
-+		list_add_tail(&evt_pending->list, &fault_param->faults);
-  	}
-
-  	ret = iommu_handle_iopf(&evt->fault, dev);
-  	if (ret && evt_pending) {
--		mutex_lock(&fparam->lock);
-  		list_del(&evt_pending->list);
--		mutex_unlock(&fparam->lock);
-  		kfree(evt_pending);
-  	}
-  done_unlock:
--	mutex_unlock(&param->lock);
-+	mutex_unlock(&fault_param->lock);
-+	iopf_put_dev_fault_param(fault_param);
-+
-  	return ret;
-  }
-  EXPORT_SYMBOL_GPL(iommu_report_device_fault);
-@@ -212,19 +241,20 @@ int iommu_page_response(struct device *dev,
-  	int ret = -EINVAL;
-  	struct iopf_fault *evt;
-  	struct iommu_fault_page_request *prm;
--	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *fault_param;
-  	const struct iommu_ops *ops = dev_iommu_ops(dev);
-  	bool has_pasid = msg->flags & IOMMU_PAGE_RESP_PASID_VALID;
-
-  	if (!ops->page_response)
-  		return -ENODEV;
-
--	if (!param || !param->fault_param)
--		return -EINVAL;
-+	fault_param = iopf_get_dev_fault_param(dev);
-+	if (!fault_param)
-+		return -ENODEV;
-
-  	/* Only send response if there is a fault report pending */
--	mutex_lock(&param->fault_param->lock);
--	if (list_empty(&param->fault_param->faults)) {
-+	mutex_lock(&fault_param->lock);
-+	if (list_empty(&fault_param->faults)) {
-  		dev_warn_ratelimited(dev, "no pending PRQ, drop response\n");
-  		goto done_unlock;
-  	}
-@@ -232,7 +262,7 @@ int iommu_page_response(struct device *dev,
-  	 * Check if we have a matching page request pending to respond,
-  	 * otherwise return -EINVAL
-  	 */
--	list_for_each_entry(evt, &param->fault_param->faults, list) {
-+	list_for_each_entry(evt, &fault_param->faults, list) {
-  		prm = &evt->fault.prm;
-  		if (prm->grpid != msg->grpid)
-  			continue;
-@@ -260,7 +290,9 @@ int iommu_page_response(struct device *dev,
-  	}
-
-  done_unlock:
--	mutex_unlock(&param->fault_param->lock);
-+	mutex_unlock(&fault_param->lock);
-+	iopf_put_dev_fault_param(fault_param);
-+
-  	return ret;
-  }
-  EXPORT_SYMBOL_GPL(iommu_page_response);
-@@ -279,22 +311,15 @@ EXPORT_SYMBOL_GPL(iommu_page_response);
-   */
-  int iopf_queue_flush_dev(struct device *dev)
-  {
--	int ret = 0;
--	struct iommu_fault_param *iopf_param;
--	struct dev_iommu *param = dev->iommu;
-+	struct iommu_fault_param *iopf_param = iopf_get_dev_fault_param(dev);
-
--	if (!param)
-+	if (!iopf_param)
-  		return -ENODEV;
-
--	mutex_lock(&param->lock);
--	iopf_param = param->fault_param;
--	if (iopf_param)
--		flush_workqueue(iopf_param->queue->wq);
--	else
--		ret = -ENODEV;
--	mutex_unlock(&param->lock);
-+	flush_workqueue(iopf_param->queue->wq);
-+	iopf_put_dev_fault_param(iopf_param);
-
--	return ret;
-+	return 0;
-  }
-  EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
-
-@@ -318,11 +343,13 @@ int iopf_queue_discard_partial(struct iopf_queue 
-*queue)
-
-  	mutex_lock(&queue->lock);
-  	list_for_each_entry(iopf_param, &queue->devices, queue_list) {
-+		mutex_lock(&iopf_param->lock);
-  		list_for_each_entry_safe(iopf, next, &iopf_param->partial,
-  					 list) {
-  			list_del(&iopf->list);
-  			kfree(iopf);
-  		}
-+		mutex_unlock(&iopf_param->lock);
-  	}
-  	mutex_unlock(&queue->lock);
-  	return 0;
-@@ -361,6 +388,7 @@ int iopf_queue_add_device(struct iopf_queue *queue, 
-struct device *dev)
-  	INIT_LIST_HEAD(&fault_param->faults);
-  	INIT_LIST_HEAD(&fault_param->partial);
-  	fault_param->dev = dev;
-+	fault_param->users = 1;
-  	list_add(&fault_param->queue_list, &queue->devices);
-  	fault_param->queue = queue;
-
-@@ -413,9 +441,11 @@ int iopf_queue_remove_device(struct iopf_queue 
-*queue, struct device *dev)
-  	list_for_each_entry_safe(iopf, next, &fault_param->partial, list)
-  		kfree(iopf);
-
--	param->fault_param = NULL;
--	kfree(fault_param);
--	put_device(dev);
-+	if (--fault_param->users == 0) {
-+		param->fault_param = NULL;
-+		kfree(fault_param);
-+		put_device(dev);
-+	}
-  unlock:
-  	mutex_unlock(&param->lock);
-  	mutex_unlock(&queue->lock);
--- 
-2.34.1
-
-Best regards,
-baolu
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogR2F2aW4gU2hhbiBbbWFp
+bHRvOmdzaGFuQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDMxIEF1Z3VzdCAyMDIzIDAyOjQzDQo+IFRv
+OiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1
+YXdlaS5jb20+Ow0KPiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtYXJtQG5vbmdudS5vcmcN
+Cj4gQ2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgcmljYXJrb2xAZ29vZ2xlLmNvbTsgSm9u
+YXRoYW4gQ2FtZXJvbg0KPiA8am9uYXRoYW4uY2FtZXJvbkBodWF3ZWkuY29tPjsga3ZtQHZnZXIu
+a2VybmVsLm9yZzsgTGludXhhcm0NCj4gPGxpbnV4YXJtQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6
+IFJlOiBbUEFUQ0ggdjNdIGFybS9rdm06IEVuYWJsZSBzdXBwb3J0IGZvcg0KPiBLVk1fQ0FQX0FS
+TV9FQUdFUl9TUExJVF9DSFVOS19TSVpFDQo+IA0KPiBIaSBTaGFtZWVyLA0KPiANCj4gT24gOC8z
+MC8yMyAyMTo0OCwgU2hhbWVlciBLb2xvdGh1bSB3cm90ZToNCj4gPiBOb3cgdGhhdCB3ZSBoYXZl
+IEVhZ2VyIFBhZ2UgU3BsaXQgc3VwcG9ydCBhZGRlZCBmb3IgQVJNIGluIHRoZSBrZXJuZWwsDQo+
+ID4gZW5hYmxlIGl0IGluIFFlbXUuIFRoaXMgYWRkcywNCj4gPiAgIC1lYWdlci1zcGxpdC1zaXpl
+IHRvIC1hY2NlbCBzdWItb3B0aW9ucyB0byBzZXQgdGhlIGVhZ2VyIHBhZ2Ugc3BsaXQgY2h1bmsN
+Cj4gc2l6ZS4NCj4gPiAgIC1lbmFibGUgS1ZNX0NBUF9BUk1fRUFHRVJfU1BMSVRfQ0hVTktfU0la
+RS4NCj4gPg0KPiA+IFRoZSBjaHVuayBzaXplIHNwZWNpZmllcyBob3cgbWFueSBwYWdlcyB0byBi
+cmVhayBhdCBhIHRpbWUsIHVzaW5nIGENCj4gPiBzaW5nbGUgYWxsb2NhdGlvbi4gQmlnZ2VyIHRo
+ZSBjaHVuayBzaXplLCBtb3JlIHBhZ2VzIG5lZWQgdG8gYmUNCj4gPiBhbGxvY2F0ZWQgYWhlYWQg
+b2YgdGltZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFNoYW1lZXIgS29sb3RodW0NCj4gPHNo
+YW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiB2MjoNCj4g
+aHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvcWVtdS1kZXZlbC8yMDIzMDgxNTA5MjcwOS4xMjkwLTEt
+c2hhbWVlcmFsaS5rb2wNCj4gb3RodW0udGhvZGlAaHVhd2VpLmNvbS8NCj4gPiAgICAgLUFkZHJl
+c3NlZCBjb21tZW50cyBmcm9tIEdhdmluKFRoYW5rcykuDQo+ID4gUkZDIHYxOg0KPiBodHRwczov
+L2xvcmUua2VybmVsLm9yZy9xZW11LWRldmVsLzIwMjMwNzI1MTUwMDAyLjYyMS0xLXNoYW1lZXJh
+bGkua29sbw0KPiB0aHVtLnRob2RpQGh1YXdlaS5jb20vDQo+ID4gICAgLVVwZGF0ZWQgcWVtdS1v
+cHRpb25zLmh4IHdpdGggZGVzY3JpcHRpb24NCj4gPiAgICAtQWRkcmVzc2VkIHJldmlldyBjb21t
+ZW50cyBmcm9tIFBldGVyIGFuZCBHYXZpbihUaGFua3MpLg0KPiA+IC0tLQ0KPiA+ICAgYWNjZWwv
+a3ZtL2t2bS1hbGwuYyAgICAgIHwgIDEgKw0KPiA+ICAgaW5jbHVkZS9zeXNlbXUva3ZtX2ludC5o
+IHwgIDEgKw0KPiA+ICAgcWVtdS1vcHRpb25zLmh4ICAgICAgICAgIHwgMTUgKysrKysrKysrDQo+
+ID4gICB0YXJnZXQvYXJtL2t2bS5jICAgICAgICAgfCA2OA0KPiArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrDQo+ID4gICA0IGZpbGVzIGNoYW5nZWQsIDg1IGluc2VydGlv
+bnMoKykNCj4gPg0KPiANCj4gT25lIG1vcmUgcXVlc3Rpb24gYmVsb3cuIFBsZWFzZSBjaGVjayBp
+ZiBpdCdzIHdvcnRoeSB0byBiZSBhZGRyZXNzZWQgaW4gdjQsDQo+IG5lZWRlZA0KPiB0byByZXNv
+bHZlZCBvdGhlciBjb21tZW50cy4gT3RoZXJ3aXNlLCBpdCBsb29rcyBmaW5lIHRvIG1lLg0KPiAN
+Cj4gUmV2aWV3ZWQtYnk6IEdhdmluIFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+DQoNClRoYW5rcy4g
+SSB3aWxsIHNlbmQgb3V0IGEgdjQgd2l0aCB0aGUgYWJvdmUgdGFnIGFuZCB0aGUgYmVsb3cgc3Vn
+Z2VzdGlvbiB0byANCmdldCByaWQgb2YgdGhlIGt2bV9hcm1fZWFnZXJfc3BsaXRfc2l6ZV92YWxp
+ZCgpLg0KDQpTaGFtZWVyLg0KDQo+IA0KPiA+IGRpZmYgLS1naXQgYS9hY2NlbC9rdm0va3ZtLWFs
+bC5jIGIvYWNjZWwva3ZtL2t2bS1hbGwuYw0KPiA+IGluZGV4IDJiYTc1MjE2OTUuLmZmMTU3OGJi
+MzIgMTAwNjQ0DQo+ID4gLS0tIGEvYWNjZWwva3ZtL2t2bS1hbGwuYw0KPiA+ICsrKyBiL2FjY2Vs
+L2t2bS9rdm0tYWxsLmMNCj4gPiBAQCAtMzc2Myw2ICszNzYzLDcgQEAgc3RhdGljIHZvaWQga3Zt
+X2FjY2VsX2luc3RhbmNlX2luaXQoT2JqZWN0ICpvYmopDQo+ID4gICAgICAgLyogS1ZNIGRpcnR5
+IHJpbmcgaXMgYnkgZGVmYXVsdCBvZmYgKi8NCj4gPiAgICAgICBzLT5rdm1fZGlydHlfcmluZ19z
+aXplID0gMDsNCj4gPiAgICAgICBzLT5rdm1fZGlydHlfcmluZ193aXRoX2JpdG1hcCA9IGZhbHNl
+Ow0KPiA+ICsgICAgcy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemUgPSAwOw0KPiA+ICAgICAgIHMtPm5v
+dGlmeV92bWV4aXQgPSBOT1RJRllfVk1FWElUX09QVElPTl9SVU47DQo+ID4gICAgICAgcy0+bm90
+aWZ5X3dpbmRvdyA9IDA7DQo+ID4gICAgICAgcy0+eGVuX3ZlcnNpb24gPSAwOw0KPiA+IGRpZmYg
+LS1naXQgYS9pbmNsdWRlL3N5c2VtdS9rdm1faW50LmggYi9pbmNsdWRlL3N5c2VtdS9rdm1faW50
+LmgNCj4gPiBpbmRleCA1MTFiNDJiZGU1Li5hNWI5MTIyY2I4IDEwMDY0NA0KPiA+IC0tLSBhL2lu
+Y2x1ZGUvc3lzZW11L2t2bV9pbnQuaA0KPiA+ICsrKyBiL2luY2x1ZGUvc3lzZW11L2t2bV9pbnQu
+aA0KPiA+IEBAIC0xMTYsNiArMTE2LDcgQEAgc3RydWN0IEtWTVN0YXRlDQo+ID4gICAgICAgdWlu
+dDY0X3Qga3ZtX2RpcnR5X3JpbmdfYnl0ZXM7ICAvKiBTaXplIG9mIHRoZSBwZXItdmNwdSBkaXJ0
+eSByaW5nDQo+ICovDQo+ID4gICAgICAgdWludDMyX3Qga3ZtX2RpcnR5X3Jpbmdfc2l6ZTsgICAv
+KiBOdW1iZXIgb2YgZGlydHkgR0ZOcyBwZXIgcmluZw0KPiAqLw0KPiA+ICAgICAgIGJvb2wga3Zt
+X2RpcnR5X3Jpbmdfd2l0aF9iaXRtYXA7DQo+ID4gKyAgICB1aW50NjRfdCBrdm1fZWFnZXJfc3Bs
+aXRfc2l6ZTsgIC8qIEVhZ2VyIFBhZ2UgU3BsaXR0aW5nIGNodW5rIHNpemUgKi8NCj4gPiAgICAg
+ICBzdHJ1Y3QgS1ZNRGlydHlSaW5nUmVhcGVyIHJlYXBlcjsNCj4gPiAgICAgICBOb3RpZnlWbWV4
+aXRPcHRpb24gbm90aWZ5X3ZtZXhpdDsNCj4gPiAgICAgICB1aW50MzJfdCBub3RpZnlfd2luZG93
+Ow0KPiA+IGRpZmYgLS1naXQgYS9xZW11LW9wdGlvbnMuaHggYi9xZW11LW9wdGlvbnMuaHgNCj4g
+PiBpbmRleCAyOWI5OGMzZDRjLi4yZTcwNzA0ZWU4IDEwMDY0NA0KPiA+IC0tLSBhL3FlbXUtb3B0
+aW9ucy5oeA0KPiA+ICsrKyBiL3FlbXUtb3B0aW9ucy5oeA0KPiA+IEBAIC0xODYsNiArMTg2LDcg
+QEAgREVGKCJhY2NlbCIsIEhBU19BUkcsIFFFTVVfT1BUSU9OX2FjY2VsLA0KPiA+ICAgICAgICIg
+ICAgICAgICAgICAgICAgc3BsaXQtd3g9b258b2ZmIChlbmFibGUgVENHIHNwbGl0IHdeeA0KPiBt
+YXBwaW5nKVxuIg0KPiA+ICAgICAgICIgICAgICAgICAgICAgICAgdGItc2l6ZT1uIChUQ0cgdHJh
+bnNsYXRpb24gYmxvY2sgY2FjaGUgc2l6ZSlcbiINCj4gPiAgICAgICAiICAgICAgICAgICAgICAg
+IGRpcnR5LXJpbmctc2l6ZT1uIChLVk0gZGlydHkgcmluZyBHRk4gY291bnQsDQo+IGRlZmF1bHQg
+MClcbiINCj4gPiArICAgICIgICAgICAgICAgICAgICAgZWFnZXItc3BsaXQtc2l6ZT1uIChLVk0g
+RWFnZXIgUGFnZSBTcGxpdCBjaHVuaw0KPiBzaXplLCBkZWZhdWx0IDAsIGRpc2FibGVkLiBBUk0g
+b25seSlcbiINCj4gPiAgICAgICAiDQo+IG5vdGlmeS12bWV4aXQ9cnVufGludGVybmFsLWVycm9y
+fGRpc2FibGUsbm90aWZ5LXdpbmRvdz1uIChlbmFibGUgbm90aWZ5IFZNDQo+IGV4aXQgYW5kIHNl
+dCBub3RpZnkgd2luZG93LCB4ODYgb25seSlcbiINCj4gPiAgICAgICAiICAgICAgICAgICAgICAg
+IHRocmVhZD1zaW5nbGV8bXVsdGkgKGVuYWJsZSBtdWx0aS10aHJlYWRlZA0KPiBUQ0cpXG4iLCBR
+RU1VX0FSQ0hfQUxMKQ0KPiA+ICAgU1JTVA0KPiA+IEBAIC0yNDQsNiArMjQ1LDIwIEBAIFNSU1QN
+Cj4gPiAgICAgICAgICAgaXMgZGlzYWJsZWQgKGRpcnR5LXJpbmctc2l6ZT0wKS4gIFdoZW4gZW5h
+YmxlZCwgS1ZNIHdpbGwNCj4gaW5zdGVhZA0KPiA+ICAgICAgICAgICByZWNvcmQgZGlydHkgcGFn
+ZXMgaW4gYSBiaXRtYXAuDQo+ID4NCj4gPiArICAgIGBgZWFnZXItc3BsaXQtc2l6ZT1uYGANCj4g
+PiArICAgICAgICBLVk0gaW1wbGVtZW50cyBkaXJ0eSBwYWdlIGxvZ2dpbmcgYXQgdGhlIFBBR0Vf
+U0laRSBncmFudWxhcml0eQ0KPiBhbmQNCj4gPiArICAgICAgICBlbmFibGluZyBkaXJ0eS1sb2dn
+aW5nIG9uIGEgaHVnZS1wYWdlIHJlcXVpcmVzIGJyZWFraW5nIGl0IGludG8NCj4gPiArICAgICAg
+ICBQQUdFX1NJWkUgcGFnZXMgaW4gdGhlIGZpcnN0IHBsYWNlLiBLVk0gb24gQVJNIGRvZXMgdGhp
+cw0KPiBzcGxpdHRpbmcNCj4gPiArICAgICAgICBsYXppbHkgYnkgZGVmYXVsdC4gVGhlcmUgYXJl
+IHBlcmZvcm1hbmNlIGJlbmVmaXRzIGluIGRvaW5nDQo+IGh1Z2UtcGFnZQ0KPiA+ICsgICAgICAg
+IHNwbGl0IGVhZ2VybHksIGVzcGVjaWFsbHkgaW4gc2l0dWF0aW9ucyB3aGVyZSBUTEJJIGNvc3Rz
+IGFzc29jaWF0ZWQNCj4gPiArICAgICAgICB3aXRoIGJyZWFrLWJlZm9yZS1tYWtlIHNlcXVlbmNl
+cyBhcmUgY29uc2lkZXJhYmxlIGFuZCBhbHNvIGlmDQo+IGd1ZXN0DQo+ID4gKyAgICAgICAgd29y
+a2xvYWRzIGFyZSByZWFkIGludGVuc2l2ZS4gVGhlIHNpemUgaGVyZSBzcGVjaWZpZXMgaG93IG1h
+bnkNCj4gcGFnZXMNCj4gPiArICAgICAgICB0byBicmVhayBhdCBhIHRpbWUgYW5kIG5lZWRzIHRv
+IGJlIGEgdmFsaWQgYmxvY2sgc2l6ZSB3aGljaCBpcw0KPiA+ICsgICAgICAgIDFHQi8yTUIvNEtC
+LCAzMk1CLzE2S0IgYW5kIDUxMk1CLzY0S0IgZm9yDQo+IDRLQi8xNktCLzY0S0IgUEFHRV9TSVpF
+DQo+ID4gKyAgICAgICAgcmVzcGVjdGl2ZWx5LiBCZSB3YXJ5IG9mIHNwZWNpZnlpbmcgYSBoaWdo
+ZXIgc2l6ZSBhcyBpdCB3aWxsIGhhdmUgYW4NCj4gPiArICAgICAgICBpbXBhY3Qgb24gdGhlIG1l
+bW9yeS4gQnkgZGVmYXVsdCwgdGhpcyBmZWF0dXJlIGlzIGRpc2FibGVkDQo+ID4gKyAgICAgICAg
+KGVhZ2VyLXNwbGl0LXNpemU9MCkuDQo+ID4gKw0KPiA+ICAgICAgIGBgbm90aWZ5LXZtZXhpdD1y
+dW58aW50ZXJuYWwtZXJyb3J8ZGlzYWJsZSxub3RpZnktd2luZG93PW5gYA0KPiA+ICAgICAgICAg
+ICBFbmFibGVzIG9yIGRpc2FibGVzIG5vdGlmeSBWTSBleGl0IHN1cHBvcnQgb24geDg2IGhvc3Qg
+YW5kDQo+IHNwZWNpZnkNCj4gPiAgICAgICAgICAgdGhlIGNvcnJlc3BvbmRpbmcgbm90aWZ5IHdp
+bmRvdyB0byB0cmlnZ2VyIHRoZSBWTSBleGl0IGlmDQo+IGVuYWJsZWQuDQo+ID4gZGlmZiAtLWdp
+dCBhL3RhcmdldC9hcm0va3ZtLmMgYi90YXJnZXQvYXJtL2t2bS5jDQo+ID4gaW5kZXggMjNhZWIw
+OTk0OS4uMjhkODFjYTc5MCAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvYXJtL2t2bS5jDQo+ID4g
+KysrIGIvdGFyZ2V0L2FybS9rdm0uYw0KPiA+IEBAIC0zMCw2ICszMCw3IEBADQo+ID4gICAjaW5j
+bHVkZSAiZXhlYy9hZGRyZXNzLXNwYWNlcy5oIg0KPiA+ICAgI2luY2x1ZGUgImh3L2JvYXJkcy5o
+Ig0KPiA+ICAgI2luY2x1ZGUgImh3L2lycS5oIg0KPiA+ICsjaW5jbHVkZSAicWFwaS92aXNpdG9y
+LmgiDQo+ID4gICAjaW5jbHVkZSAicWVtdS9sb2cuaCINCj4gPg0KPiA+ICAgY29uc3QgS1ZNQ2Fw
+YWJpbGl0eUluZm8ga3ZtX2FyY2hfcmVxdWlyZWRfY2FwYWJpbGl0aWVzW10gPSB7DQo+ID4gQEAg
+LTI0Nyw2ICsyNDgsMTIgQEAgaW50DQo+IGt2bV9hcm1fZ2V0X21heF92bV9pcGFfc2l6ZShNYWNo
+aW5lU3RhdGUgKm1zLCBib29sICpmaXhlZF9pcGEpDQo+ID4gICAgICAgcmV0dXJuIHJldCA+IDAg
+PyByZXQgOiA0MDsNCj4gPiAgIH0NCj4gPg0KPiA+ICtzdGF0aWMgaW5saW5lIGJvb2wga3ZtX2Fy
+bV9lYWdlcl9zcGxpdF9zaXplX3ZhbGlkKHVpbnQ2NF90IHJlcV9zaXplLA0KPiA+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IHNpemVz
+KQ0KPiA+ICt7DQo+ID4gKyAgICByZXR1cm4gcmVxX3NpemUgJiBzaXplczsNCj4gPiArfQ0KPiA+
+ICsNCj4gPiAgIGludCBrdm1fYXJjaF9nZXRfZGVmYXVsdF90eXBlKE1hY2hpbmVTdGF0ZSAqbXMp
+DQo+ID4gICB7DQo+ID4gICAgICAgYm9vbCBmaXhlZF9pcGE7DQo+ID4gQEAgLTI4Nyw2ICsyOTQs
+MjcgQEAgaW50IGt2bV9hcmNoX2luaXQoTWFjaGluZVN0YXRlICptcywgS1ZNU3RhdGUNCj4gKnMp
+DQo+ID4gICAgICAgICAgIH0NCj4gPiAgICAgICB9DQo+ID4NCj4gPiArICAgIGlmIChzLT5rdm1f
+ZWFnZXJfc3BsaXRfc2l6ZSkgew0KPiA+ICsgICAgICAgIHVpbnQzMl90IHNpemVzOw0KPiA+ICsN
+Cj4gPiArICAgICAgICBzaXplcyA9IGt2bV92bV9jaGVja19leHRlbnNpb24ocywNCj4gS1ZNX0NB
+UF9BUk1fU1VQUE9SVEVEX0JMT0NLX1NJWkVTKTsNCj4gPiArICAgICAgICBpZiAoIXNpemVzKSB7
+DQo+ID4gKyAgICAgICAgICAgIHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplID0gMDsNCj4gPiArICAg
+ICAgICAgICAgd2Fybl9yZXBvcnQoIkVhZ2VyIFBhZ2UgU3BsaXQgc3VwcG9ydCBub3QgYXZhaWxh
+YmxlIik7DQo+ID4gKyAgICAgICAgfSBlbHNlIGlmDQo+ICgha3ZtX2FybV9lYWdlcl9zcGxpdF9z
+aXplX3ZhbGlkKHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplLA0KPiA+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplcykpIHsNCj4gPiArICAgICAg
+ICAgICAgZXJyb3JfcmVwb3J0KCJFYWdlciBQYWdlIFNwbGl0IHJlcXVlc3RlZCBjaHVuayBzaXpl
+IG5vdA0KPiB2YWxpZCIpOw0KPiA+ICsgICAgICAgICAgICByZXQgPSAtRUlOVkFMOw0KPiA+ICsg
+ICAgICAgIH0gZWxzZSB7DQo+ID4gKyAgICAgICAgICAgIHJldCA9IGt2bV92bV9lbmFibGVfY2Fw
+KHMsDQo+IEtWTV9DQVBfQVJNX0VBR0VSX1NQTElUX0NIVU5LX1NJWkUsIDAsDQo+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplKTsN
+Cj4gPiArICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gPiArICAgICAgICAgICAgICAgIGVy
+cm9yX3JlcG9ydCgiRW5hYmxpbmcgb2YgRWFnZXIgUGFnZSBTcGxpdCBmYWlsZWQ6ICVzIiwNCj4g
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJlcnJvcigtcmV0KSk7DQo+ID4gKyAg
+ICAgICAgICAgIH0NCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICAgICAg
+IGt2bV9hcm1faW5pdF9kZWJ1ZyhzKTsNCj4gPg0KPiA+ICAgICAgIHJldHVybiByZXQ7DQo+IA0K
+PiBUaGUgZnVuY3Rpb24ga3ZtX2FybV9lYWdlcl9zcGxpdF9zaXplX3ZhbGlkKCkgd2FzIHN1Z2dl
+c3RlZCBieSBQZXRlciBpZiBJJ20NCj4gY29ycmVjdC4NCj4gSG93ZXZlciwgaXQgc2VlbXMgd2Ug
+bmVlZG4ndCBpdCBhbnkgbW9yZSBzaW5jZSBpdCdzIGNhbGxlZCBmb3Igb25jZS4gV2h5IG5vdA0K
+PiBzaW1wbHkgdG8NCj4gaGF2ZSBzb21ldGhpbmcgbGlrZSBiZWxvdz8gVGhlIGRldGFpbGVkIGVy
+cm9yIG1lc3NhZ2UgY2FuIGhlbHAgdG8gZXhwbGFpbg0KPiB3aHkgd2UNCj4gbmVlZCB0aGUgY29u
+ZGl0aW9uIG9mIChzLT5rdm1fZWFnZXJfc3BsaXRfc2l6ZSAmIHNpemVzKSBoZXJlLg0KPiANCj4g
+ICAgICB9IGVsc2UgaWYgKHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplICYgc2l6ZXMpIHsNCj4gICAg
+ICAgICAgZXJyb3JfcmVwb3J0KCJVbnN1cHBvcnRlZCBFYWdlciBQYWdlIFNwbGl0IGNodW5rIHNp
+emUgMHglbHggYnkNCj4gMHgleCIsDQo+ICAgICAgICAgICAgICAgICAgICAgICBzLT5rdm1fZWFn
+ZXJfc3BsaXRfc2l6ZSwgc2l6ZXMpOw0KPiAgICAgICAgICByZXQgPSAtRUlOVkFMOw0KPiAgICAg
+IH0NCj4gDQo+ID4gQEAgLTEwNjksNiArMTA5Nyw0NiBAQCBib29sDQo+IGt2bV9hcmNoX2NwdV9j
+aGVja19hcmVfcmVzZXR0YWJsZSh2b2lkKQ0KPiA+ICAgICAgIHJldHVybiB0cnVlOw0KPiA+ICAg
+fQ0KPiA+DQo+ID4gK3N0YXRpYyB2b2lkIGt2bV9hcmNoX2dldF9lYWdlcl9zcGxpdF9zaXplKE9i
+amVjdCAqb2JqLCBWaXNpdG9yICp2LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBjb25zdCBjaGFyICpuYW1lLCB2b2lkDQo+ICpvcGFxdWUsDQo+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4g
+PiArew0KPiA+ICsgICAgS1ZNU3RhdGUgKnMgPSBLVk1fU1RBVEUob2JqKTsNCj4gPiArICAgIHVp
+bnQ2NF90IHZhbHVlID0gcy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemU7DQo+ID4gKw0KPiA+ICsgICAg
+dmlzaXRfdHlwZV9zaXplKHYsIG5hbWUsICZ2YWx1ZSwgZXJycCk7DQo+ID4gK30NCj4gPiArDQo+
+ID4gK3N0YXRpYyB2b2lkIGt2bV9hcmNoX3NldF9lYWdlcl9zcGxpdF9zaXplKE9iamVjdCAqb2Jq
+LCBWaXNpdG9yICp2LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBjb25zdCBjaGFyICpuYW1lLCB2b2lkDQo+ICpvcGFxdWUsDQo+ID4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gPiArew0KPiA+
+ICsgICAgS1ZNU3RhdGUgKnMgPSBLVk1fU1RBVEUob2JqKTsNCj4gPiArICAgIHVpbnQ2NF90IHZh
+bHVlOw0KPiA+ICsNCj4gPiArICAgIGlmIChzLT5mZCAhPSAtMSkgew0KPiA+ICsgICAgICAgIGVy
+cm9yX3NldGcoZXJycCwgIlVuYWJsZSB0byBzZXQgZWFybHktc3BsaXQtc2l6ZSBhZnRlciBLVk0g
+aGFzDQo+IGJlZW4gaW5pdGlhbGl6ZWQiKTsNCj4gPiArICAgICAgICByZXR1cm47DQo+ID4gKyAg
+ICB9DQo+ID4gKw0KPiA+ICsgICAgaWYgKCF2aXNpdF90eXBlX3NpemUodiwgbmFtZSwgJnZhbHVl
+LCBlcnJwKSkgew0KPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4g
+KyAgICBpZiAodmFsdWUgJiYgIWlzX3Bvd2VyX29mXzIodmFsdWUpKSB7DQo+ID4gKyAgICAgICAg
+ZXJyb3Jfc2V0ZyhlcnJwLCAiZWFybHktc3BsaXQtc2l6ZSBtdXN0IGJlIGEgcG93ZXIgb2YgdHdv
+Iik7DQo+ID4gKyAgICAgICAgcmV0dXJuOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIHMt
+Pmt2bV9lYWdlcl9zcGxpdF9zaXplID0gdmFsdWU7DQo+ID4gK30NCj4gPiArDQo+ID4gICB2b2lk
+IGt2bV9hcmNoX2FjY2VsX2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKm9jKQ0KPiA+ICAgew0KPiA+
+ICsgICAgb2JqZWN0X2NsYXNzX3Byb3BlcnR5X2FkZChvYywgImVhZ2VyLXNwbGl0LXNpemUiLCAi
+c2l6ZSIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9hcmNoX2dldF9l
+YWdlcl9zcGxpdF9zaXplLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBrdm1f
+YXJjaF9zZXRfZWFnZXJfc3BsaXRfc2l6ZSwgTlVMTCwNCj4gTlVMTCk7DQo+ID4gKw0KPiA+ICsg
+ICAgb2JqZWN0X2NsYXNzX3Byb3BlcnR5X3NldF9kZXNjcmlwdGlvbihvYywgImVhZ2VyLXNwbGl0
+LXNpemUiLA0KPiA+ICsgICAgICAgICJFYWdlciBQYWdlIFNwbGl0IGNodW5rIHNpemUgZm9yIGh1
+Z2VwYWdlcy4gKGRlZmF1bHQ6IDAsDQo+IGRpc2FibGVkKSIpOw0KPiA+ICAgfQ0KPiANCj4gVGhh
+bmtzLA0KPiBHYXZpbg0KDQo=
