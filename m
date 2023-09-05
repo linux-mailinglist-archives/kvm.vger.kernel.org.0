@@ -2,234 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8898C7926A4
-	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13A02792764
+	for <lists+kvm@lfdr.de>; Tue,  5 Sep 2023 18:36:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237905AbjIEQFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 12:05:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52056 "EHLO
+        id S237542AbjIEQEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 12:04:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348231AbjIEEhN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Sep 2023 00:37:13 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225ED1B6;
-        Mon,  4 Sep 2023 21:37:08 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 651E7120003;
-        Tue,  5 Sep 2023 07:37:05 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 651E7120003
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1693888625;
-        bh=HoIC/Rt7SCCOTU5bzlF4Kw/h0G5mggsepxhm/KWPIrg=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=hIJ7B0NsW7yAaf58/o8XZuTZxIYaC/3XsjNmNqKM187fL/S+F2TdfTM/h9P82y2Uw
-         krF6hyzSxYEaeqbHR8r3haXXXCYVlBEq7prtyRelRQCFHWcn1aImP5140T/3X9K1hx
-         Z9lyXRTOT+J9mJqx4+UjMSMkBYxORLXGrqTzYSOjrlDo3xgBgT30cAmZjpeV51UeKE
-         KjbxFmX/1EUC6f21eErA0clUB5+6bQpUVA1/qMlHIBbV2QIueD65HHSIokHNk8e+Fy
-         yPfRRRAxPJrs3ljcA17u2Jx3QQDjJ+ZXU6yuuZfsG9FYyDWKh/sY+8zvY3gVzS2Wcu
-         xDLyytGWQw3iw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue,  5 Sep 2023 07:37:03 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 5 Sep 2023 07:36:59 +0300
-Message-ID: <c3b34d3c-29ea-5a0f-24d3-483836faa7ba@salutedevices.com>
-Date:   Tue, 5 Sep 2023 07:30:38 +0300
+        with ESMTP id S1351410AbjIEFUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Sep 2023 01:20:00 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D834CCB;
+        Mon,  4 Sep 2023 22:19:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693891195; x=1725427195;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bvHQeHLkknHZ/9vJp80UHxLBNoyfMy8CBO1mOy/WJps=;
+  b=GSoZYj/Fwvqg2CwiTPhv0jDJo1sOUmvKzJVFok1Zhr2ug/Z1eY56iPob
+   hemftubSHI3RQzNkQDJivrzZ2r8UR7CVupy5VubFm43459420XddLtHZF
+   t70nrU6YB5ZaepWVsFJmmDij2Rc7TlN9zHmd2mXDbMLB1hX3lGObMi+b9
+   dsQc+Oy1/4uzVft/S3O70qaNRhJDrhseZXSlUFWf5e0YWX9qd/OHpOhV5
+   29H23kCqM8enAOaXUOjWR714RNfsJI5BeYumWMh6pvz1p1UybxsbBsSU0
+   ulRif4fNa2xszsIvPlhHD3cUJiu/rWe0LNZQK7JqO5ivlUm66J50I6BNb
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="407693819"
+X-IronPort-AV: E=Sophos;i="6.02,228,1688454000"; 
+   d="scan'208";a="407693819"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 22:19:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="740983062"
+X-IronPort-AV: E=Sophos;i="6.02,228,1688454000"; 
+   d="scan'208";a="740983062"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.214.54]) ([10.254.214.54])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 22:19:50 -0700
+Message-ID: <068e3e43-a5c9-596b-3d39-782b7893dbcc@linux.intel.com>
+Date:   Tue, 5 Sep 2023 13:19:48 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v7 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 09/10] iommu: Make iommu_queue_iopf() more generic
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <20230825023026.132919-1-baolu.lu@linux.intel.com>
+ <20230825023026.132919-10-baolu.lu@linux.intel.com>
+ <BN9PR11MB52762A33BC9F41AB424915688CE3A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <cbfbe969-1a92-52bf-f00c-3fb89feefd66@linux.intel.com>
+ <BN9PR11MB52768891BC89107AD291E45C8CE6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <67aa00ae-01e6-0dd8-499f-279cb6df3ddd@linux.intel.com>
+ <BN9PR11MB527610423B186F1C5E734A4B8CE4A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230827085436.941183-1-avkrasnov@salutedevices.com>
- <20230827085436.941183-5-avkrasnov@salutedevices.com>
- <p2u2irlju6yuy54w4tqstaijhpnbmqxwavsdumsmyskrjguwux@kmd7cbavhjbh>
- <0ab443b5-73a5-f092-44a3-52e26244c9a8@salutedevices.com>
- <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
-From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
-Content-Type: text/plain; charset="UTF-8"
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB527610423B186F1C5E734A4B8CE4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179642 [Sep 04 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 529 529 a773548e495283fecef97c3e587259fde2135fef, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/05 03:12:00 #21800815
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04.09.2023 11:21, Stefano Garzarella wrote:
-> On Sun, Sep 03, 2023 at 11:13:23AM +0300, Arseniy Krasnov wrote:
+On 2023/9/1 10:49, Tian, Kevin wrote:
+>> From: Baolu Lu<baolu.lu@linux.intel.com>
+>> Sent: Thursday, August 31, 2023 5:28 PM
 >>
->>
->> On 01.09.2023 15:30, Stefano Garzarella wrote:
->>> On Sun, Aug 27, 2023 at 11:54:36AM +0300, Arseniy Krasnov wrote:
->>>> This adds handling of MSG_ZEROCOPY flag on transmission path: if this
->>>> flag is set and zerocopy transmission is possible (enabled in socket
->>>> options and transport allows zerocopy), then non-linear skb will be
->>>> created and filled with the pages of user's buffer. Pages of user's
->>>> buffer are locked in memory by 'get_user_pages()'. Second thing that
->>>> this patch does is replace type of skb owning: instead of calling
->>>> 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
->>>> change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
->>>> of socket, so to decrease this field correctly proper skb destructor is
->>>> needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
+>> On 2023/8/30 15:43, Tian, Kevin wrote:
+>>>> From: Baolu Lu<baolu.lu@linux.intel.com>
+>>>> Sent: Saturday, August 26, 2023 4:01 PM
 >>>>
->>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> 
-> [...]
-> 
+>>>> On 8/25/23 4:17 PM, Tian, Kevin wrote:
+>>>>>> +
+>>>>>>     /**
+>>>>>>      * iopf_queue_flush_dev - Ensure that all queued faults have been
+>>>>>> processed
+>>>>>>      * @dev: the endpoint whose faults need to be flushed.
+>>>>> Presumably we also need a flush callback per domain given now
+>>>>> the use of workqueue is optional then flush_workqueue() might
+>>>>> not be sufficient.
+>>>>>
+>>>> The iopf_queue_flush_dev() function flushes all pending faults from the
+>>>> IOMMU queue for a specific device. It has no means to flush fault queues
+>>>> out of iommu core.
 >>>>
->>>> -/* Returns a new packet on success, otherwise returns NULL.
->>>> - *
->>>> - * If NULL is returned, errp is set to a negative errno.
->>>> - */
->>>> -static struct sk_buff *
->>>> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->>>> -               size_t len,
->>>> -               u32 src_cid,
->>>> -               u32 src_port,
->>>> -               u32 dst_cid,
->>>> -               u32 dst_port)
->>>> -{
->>>> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->>>> -    struct virtio_vsock_hdr *hdr;
->>>> -    struct sk_buff *skb;
->>>> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
->>>> +                       size_t max_to_send)
->>>                                               ^
->>> I'd call it `pkt_len`, `max_to_send` is confusing IMHO. I didn't
->>> initially if it was the number of buffers or bytes.
->>>
->>>> +{
->>>> +    const struct virtio_transport *t_ops;
->>>> +    struct iov_iter *iov_iter;
->>>> +
->>>> +    if (!info->msg)
->>>> +        return false;
->>>> +
->>>> +    iov_iter = &info->msg->msg_iter;
->>>> +
->>>> +    if (iov_iter->iov_offset)
->>>> +        return false;
->>>> +
->>>> +    /* We can't send whole iov. */
->>>> +    if (iov_iter->count > max_to_send)
->>>> +        return false;
->>>> +
->>>> +    /* Check that transport can send data in zerocopy mode. */
->>>> +    t_ops = virtio_transport_get_ops(info->vsk);
->>>> +
->>>> +    if (t_ops->can_msgzerocopy) {
->>>
->>> So if `can_msgzerocopy` is not implemented, we always return true after
->>> this point. Should we mention it in the .can_msgzerocopy documentation?
-
-
-^^^
-
-Sorry, ops again. Just checked this code during comments fixing. It is correct
-to "return true;" Idea is:
-
-if (generic conditions for MSG_ZEROCOPY == false)
-    return false;// can't zerocopy
-
-if (t_ops->can_msgzerocopy) //transport needs extra check
-    return t_ops->can_msgzerocopy();
-
-return true;//transport doesn't require extra check and generic conditions above are OK -> can zerocopy
-
-But anyway:
-
-1) I'll add comment in 'struct virtio_transport' for '.can_msgzerocopy' that this callback is
-   not mandatory - just additional transport specific check.
-
-2) Add test for fallback to copy.
-
-Thanks, Arseniy
-
->>
->> Ops, this is my mistake, I must return 'false' in this case. Seems I didn't
->> catch this problem with my tests, because there was no test case where
->> zerocopy will fallback to copy!
->>
->> I'll fix it and add new test!
-> 
-> yep, I agree!
-> 
->>
->>>
->>> Can we also mention in the commit description why this is need only for
->>> virtio_tranport and not for vhost and loopback?
->>>
->>>> +        int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
->>>> +        int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
->>>> +
->>>> +        return t_ops->can_msgzerocopy(pages_to_send);
->>>> +    }
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
-> 
-> [...]
-> 
->>>> @@ -270,6 +395,17 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>>>             break;
->>>>         }
+>>>> The iopf_queue_flush_dev() function is typically called when a domain is
+>>>> detaching from a PASID. Hence it's necessary to flush the pending faults
+>>>> from top to bottom. For example, iommufd should flush pending faults in
+>>>> its fault queues after detaching the domain from the pasid.
 >>>>
->>>> +        /* This is last skb to send this portion of data. */
+>>> Is there an ordering problem? The last step of intel_svm_drain_prq()
+>>> in the detaching path issues a set of descriptors to drain page requests
+>>> and responses in hardware. It cannot complete if not all software queues
+>>> are drained and it's counter-intuitive to drain a software queue after
+>>> the hardware draining has already been completed.
 >>>
->>> Sorry I didn't get it :-(
->>>
->>> Can you elaborate this a bit more?
+>>> btw just flushing requests is probably insufficient in iommufd case since
+>>> the responses are received asynchronously. It requires an interface to
+>>> drain both requests and responses (presumably with timeouts in case
+>>> of a malicious guest which never responds) in the detach path.
+>> You are right. Good catch.
 >>
->> I mean that we iterate over user's buffer here, allocating skb on each
->> iteration. And for last skb for this buffer we initialize completion
->> for user (we need to allocate one completion for one syscall).
-> 
-> Okay, so maybe we should explain better also in the code comment.
->>
->> Thanks for review, I'll fix all other comments and resend patchset when
->> 'net-next' will be opened again.
-> 
-> Cool, thanks!
-> Stefano
-> 
+>> To put it simply, iopf_queue_flush_dev() is insufficient to support the
+>> case of forwarding iopf's over iommufd. Do I understand it right?
+> yes
+
+I added below patch to address the iopf_queue_flush_dev() issue. What do
+you think of this？
+
+iommu: Improve iopf_queue_flush_dev()
+
+The iopf_queue_flush_dev() is called by the iommu driver before releasing
+a PASID. It ensures that all pending faults for this PASID have been
+handled or cancelled, and won't hit the address space that reuses this
+PASID. The driver must make sure that no new fault is added to the queue.
+
+The SMMUv3 driver doesn't use it because it only implements the
+Arm-specific stall fault model where DMA transactions are held in the SMMU
+while waiting for the OS to handle iopf's. Since a device driver must
+complete all DMA transactions before detaching domain, there are no
+pending iopf's with the stall model. PRI support requires adding a call to
+iopf_queue_flush_dev() after flushing the hardware page fault queue.
+
+The current implementation of iopf_queue_flush_dev() is a simplified
+version. It is only suitable for SVA case in which the processing of iopf
+is implemented in the inner loop of the iommu subsystem.
+
+Improve this interface to make it also work for handling iopf out of the
+iommu core.
+
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+  include/linux/iommu.h      |  4 ++--
+  drivers/iommu/intel/svm.c  |  2 +-
+  drivers/iommu/io-pgfault.c | 40 ++++++++++++++++++++++++++++++++++++--
+  3 files changed, 41 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 77ad33ffe3ac..465e23e945d0 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -1275,7 +1275,7 @@ iommu_sva_domain_alloc(struct device *dev, struct 
+mm_struct *mm)
+  #ifdef CONFIG_IOMMU_IOPF
+  int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev);
+  int iopf_queue_remove_device(struct iopf_queue *queue, struct device 
+*dev);
+-int iopf_queue_flush_dev(struct device *dev);
++int iopf_queue_flush_dev(struct device *dev, ioasid_t pasid);
+  struct iopf_queue *iopf_queue_alloc(const char *name);
+  void iopf_queue_free(struct iopf_queue *queue);
+  int iopf_queue_discard_partial(struct iopf_queue *queue);
+@@ -1295,7 +1295,7 @@ iopf_queue_remove_device(struct iopf_queue *queue, 
+struct device *dev)
+  	return -ENODEV;
+  }
+
+-static inline int iopf_queue_flush_dev(struct device *dev)
++static inline int iopf_queue_flush_dev(struct device *dev, ioasid_t pasid)
+  {
+  	return -ENODEV;
+  }
+diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
+index 780c5bd73ec2..4c3f4533e337 100644
+--- a/drivers/iommu/intel/svm.c
++++ b/drivers/iommu/intel/svm.c
+@@ -495,7 +495,7 @@ void intel_drain_pasid_prq(struct device *dev, u32 
+pasid)
+  		goto prq_retry;
+  	}
+
+-	iopf_queue_flush_dev(dev);
++	iopf_queue_flush_dev(dev, pasid);
+
+  	/*
+  	 * Perform steps described in VT-d spec CH7.10 to drain page
+diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+index 3e6845bc5902..84728fb89ac7 100644
+--- a/drivers/iommu/io-pgfault.c
++++ b/drivers/iommu/io-pgfault.c
+@@ -309,17 +309,53 @@ EXPORT_SYMBOL_GPL(iommu_page_response);
+   *
+   * Return: 0 on success and <0 on error.
+   */
+-int iopf_queue_flush_dev(struct device *dev)
++int iopf_queue_flush_dev(struct device *dev, ioasid_t pasid)
+  {
+  	struct iommu_fault_param *iopf_param = iopf_get_dev_fault_param(dev);
++	const struct iommu_ops *ops = dev_iommu_ops(dev);
++	struct iommu_page_response resp;
++	struct iopf_fault *iopf, *next;
++	int ret = 0;
+
+  	if (!iopf_param)
+  		return -ENODEV;
+
+  	flush_workqueue(iopf_param->queue->wq);
++
++	mutex_lock(&iopf_param->lock);
++	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
++		if (!(iopf->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID) ||
++		    iopf->fault.prm.pasid != pasid)
++			break;
++
++		list_del(&iopf->list);
++		kfree(iopf);
++	}
++
++	list_for_each_entry_safe(iopf, next, &iopf_param->faults, list) {
++		if (!(iopf->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID) ||
++		    iopf->fault.prm.pasid != pasid)
++			continue;
++
++		memset(&resp, 0, sizeof(struct iommu_page_response));
++		resp.pasid = iopf->fault.prm.pasid;
++		resp.grpid = iopf->fault.prm.grpid;
++		resp.code = IOMMU_PAGE_RESP_INVALID;
++
++		if (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID)
++			resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
++
++		ret = ops->page_response(dev, iopf, &resp);
++		if (ret)
++			break;
++
++		list_del(&iopf->list);
++		kfree(iopf);
++	}
++	mutex_unlock(&iopf_param->lock);
+  	iopf_put_dev_fault_param(iopf_param);
+
+-	return 0;
++	return ret;
+  }
+  EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
+
+Best regards,
+baolu
