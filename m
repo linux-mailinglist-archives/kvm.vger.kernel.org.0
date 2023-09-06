@@ -2,121 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 570B179444B
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 22:11:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5937479445F
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 22:19:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244258AbjIFULs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 16:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34514 "EHLO
+        id S237720AbjIFUTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 16:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231558AbjIFULq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 16:11:46 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76CCE198E
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 13:11:42 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7ba833ef2aso290373276.0
-        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 13:11:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694031101; x=1694635901; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=peODubx65uqMrjkWQ//78jxQ/SfLOSDFlEmlVraSU1s=;
-        b=oMsKFAzjqYxda23YRciiU/mrunUU5yBTgyJ3VM24LhBDNZaQiGt7H+L9l5FaUfyLTK
-         a1SW5hpwO4Y03/6Qv5QtKzg1syo6YgQF5TBIkXNaAJNFAXFGxbqj6UXfaRb2rMDiMWxv
-         DseSWxmCdHPUyEMWuB3XmQMM4jeXPDEuyRfDicb+G+IxPeYCW2ZIXHBDpn7CaGs5KY3F
-         bobY5+zYc84aUpTNVkQu585vN/ujKM4KwAi7UIqfLXlE6wKxQocrBIwpu0EWxa8Loq7d
-         tMVhh+CK9rkcHQwZKXm81wiAMDIyjjiKhPaD2grJ3IvHN7dOU63RDnUgCZx5c/mINXMn
-         dgrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694031101; x=1694635901;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=peODubx65uqMrjkWQ//78jxQ/SfLOSDFlEmlVraSU1s=;
-        b=G87RTCl7h2qkQoVDegGNmSB6U9nFUnr2LO1pm8HDEieywQpGvHM2ulFm3JwC0bNH/b
-         PuX3uFMD3QZfUieRuJBH0RocuzojvLZazGraGcL+1BqQE9h0c95P3Qe21G+os4maY09G
-         03Ens7CM+deK5wTSw/4KcwuF14geANkJk/2Kyk7sVnZfuoSEYRsu/CMfPp/JEZP3NPKf
-         4UxgeBA3YqnWaXlv1jKRSYIsdOTAfDc1i05oqwncvO1TIAcDzv3yCoiEdlAaDmLgXuDh
-         iQFP1bb/CFgeztMR4FYeXl7ZK7TfoBJlHvSrWTMteO/wi5i+43/1tCrRQXAjjllkKwIU
-         1KQg==
-X-Gm-Message-State: AOJu0YzkiuCQhPAFq5Ko8qaj3Dn6H4VyM0+NAB/rY4Gh4VkfD9ixPovI
-        C9f6cvzrTv+I3aYRGkb9AzvHIOfMMb4=
-X-Google-Smtp-Source: AGHT+IHmjE1nbBVkGoMBFKQzpb3eElrhE6wjuj15n/74+GzAvNY7DEWoz7hxMLzs2bUnBR0Ne6hV8GK53i4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8b0a:0:b0:d78:1cbd:fe37 with SMTP id
- i10-20020a258b0a000000b00d781cbdfe37mr399580ybl.2.1694031101774; Wed, 06 Sep
- 2023 13:11:41 -0700 (PDT)
-Date:   Wed, 6 Sep 2023 13:11:40 -0700
-In-Reply-To: <68a44c6d-21c9-30c2-b0cf-66f02f9d2f4e@amd.com>
-Mime-Version: 1.0
-References: <20230906151449.18312-1-pgonda@google.com> <68a44c6d-21c9-30c2-b0cf-66f02f9d2f4e@amd.com>
-Message-ID: <ZPjc/PoBLPNNLukt@google.com>
-Subject: Re: [PATCH V2] KVM: SEV: Update SEV-ES shutdown intercepts with more metadata
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S233587AbjIFUTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 16:19:09 -0400
+Received: from torres.zugschlus.de (torres.zugschlus.de [IPv6:2a01:238:42bc:a101::2:100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE7919A3;
+        Wed,  6 Sep 2023 13:19:02 -0700 (PDT)
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+        (envelope-from <mh+linux-kernel@zugschlus.de>)
+        id 1qdyzG-006ZTz-1m;
+        Wed, 06 Sep 2023 22:18:54 +0200
+Date:   Wed, 6 Sep 2023 22:18:54 +0200
+From:   Marc Haber <mh+linux-kernel@zugschlus.de>
+To:     Tony Lindgren <tony@atomide.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux KVM <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Linux 6.5 speed regression, boot VERY slow with anything systemd
+ related
+Message-ID: <ZPjernao1DVQouhb@torres.zugschlus.de>
+References: <ZO4GeazfcA09SfKw@google.com>
+ <ZO4JCfnzRRL1RIZt@torres.zugschlus.de>
+ <ZO4RzCr/Ugwi70bZ@google.com>
+ <ZO4YJlhHYjM7MsK4@torres.zugschlus.de>
+ <ZO4nbzkd4tovKpxx@google.com>
+ <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
+ <ZPEPFJ8QvubbD3H9@google.com>
+ <20230901122431.GU11676@atomide.com>
+ <ZPiPkSY6NRzfWV5Z@torres.zugschlus.de>
+ <20230906152616.GE11676@atomide.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230906152616.GE11676@atomide.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 06, 2023, Tom Lendacky wrote:
-> On 9/6/23 10:14, Peter Gonda wrote:
-> > Currently if an SEV-ES VM shuts down userspace sees KVM_RUN struct with
+On Wed, Sep 06, 2023 at 06:26:16PM +0300, Tony Lindgren wrote:
+> * Marc Haber <mh+linux-kernel@zugschlus.de> [230906 14:41]:
+> > With my tools I have found out that it really seems to be related to the
+> > CPU of the host. I have changed my VM definition to "copy host CPU
+> > configuration to VM" in libvirt and have moved this very VM (image and
+> > settings) to hosts with a "Ryzen 5 Pro 4650G" and to an "Intel Xeon
+> > E3-1246" where they work flawlessly, while on both APUs I have available
+> > ("AMD G-T40E" and "AMD GX-412TC SOC") the regression in 6.5 shows. And
+> > if I boot other VMs on the APUs with 6.5 the issue comes up. It is a
+> > clear regression since going back to 4.6's serial code solves the issue
+> > on the APUs.
 > 
-> s/down userspace/down, userspace/
+> Not sure why the CPU matters here..
 
-Heh, yeah, I read that the same way you did.
+Neither am I.
 
-> > only the INVALID_ARGUMENT. This is a very limited amount of information
-> > to debug the situation. Instead KVM can return a
-> > KVM_EXIT_SHUTDOWN to alert userspace the VM is shutting down and
-> > is not usable any further.
-> > 
-> > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: Joerg Roedel <joro@8bytes.org>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: x86@kernel.org
-> > Cc: kvm@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > 
-> > ---
-> >   arch/x86/kvm/svm/svm.c | 8 +++++---
-> >   1 file changed, 5 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 956726d867aa..cecf6a528c9b 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -2131,12 +2131,14 @@ static int shutdown_interception(struct kvm_vcpu *vcpu)
-> >   	 * The VM save area has already been encrypted so it
-> >   	 * cannot be reinitialized - just terminate.
-> >   	 */
-> > -	if (sev_es_guest(vcpu->kvm))
-> > -		return -EINVAL;
-> > +	if (sev_es_guest(vcpu->kvm)) {
-> > +		kvm_run->exit_reason = KVM_EXIT_SHUTDOWN;
-> > +		return 0;
-> > +	}
+> One thing to check is if you have these in your .config:
 > 
-> Just a nit... feel free to ignore, but, since KVM_EXIT_SHUTDOWN is also set
-> at the end of the function and I don't think kvm_vcpu_reset() clears the
-> value from kvm_run, you could just set kvm_run->exit_reason on entry and
-> just return 0 early for an SEV-ES guest.
+> CONFIG_SERIAL_CORE=y
+> CONFIG_SERIAL_CORE_CONSOLE=y
 
-kvm_run is writable by userspace though, so KVM can't rely on kvm_run->exit_reason
-for correctness.
+That's affirmative. Otherwise, I think that serial console wouldn't work
+at all, but I get early kernel messages just fine and even at normal
+speed.
 
-And IIUC, the VMSA is also toast, i.e. doing anything other than marking the VM
-dead is futile, no?
+> Or do you maybe have CONFIG_SERIAL_CORE=m as loadable module?
+
+Negative.
+
+Greetings
+Marc
+
+-- 
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
