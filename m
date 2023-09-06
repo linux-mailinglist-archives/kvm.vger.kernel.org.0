@@ -2,102 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0FFE7937C0
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 11:09:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F24C7937E3
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 11:17:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234922AbjIFJJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 05:09:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
+        id S235960AbjIFJRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 05:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232338AbjIFJJl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 05:09:41 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1118295;
-        Wed,  6 Sep 2023 02:09:34 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2bcfd3220d3so51339911fa.2;
-        Wed, 06 Sep 2023 02:09:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693991372; x=1694596172; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rFAc0ENvdawtNpNN8VvAfyOPRtP79Ec15LEe0csz82o=;
-        b=ekjwbsRoQGS07jcauO+GiayVfrN+ZXo9M71YQjdKsxcWhhDA2+tJWj8VrMeAraeXKR
-         txL4D/YfUfWESqwID7Gf84jFni67EUid7PbCxj+9oxG/OkrY/obKHKD/wUkWml8wEkak
-         lYf0zQ2qmEok0j4tRz8G0VO7ZJbpIVxYs9yOdoNtmOcarEJ6pdy29bBYxIomxjF7RDN9
-         a1QlMpktbf7+mGb3N3i68EjLrBQKomc2pGr3tBNmPZCrHd5PWDwkjjpeKoz924KjeOy9
-         ilDY7Et3S/rfKW0DkqZ1Nfw815lYzOblnwF/8PP3zFE6cg2ieRx0+rHUXfJCF6XNRyh+
-         oB9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693991372; x=1694596172;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rFAc0ENvdawtNpNN8VvAfyOPRtP79Ec15LEe0csz82o=;
-        b=cYMMsbxLn0ojz8tOJ69QSoYilFW8A5fIXai+iRmgyEtN24u0Ibm95WoOxHAKegdgpq
-         XTv4vtI2MOhnIECObV74NaOuprxjHK/Kg0ZL9h2RaIQnq5tA/gEM9R61cHL+XN9t86xB
-         uGa6XIx4z7eSMkbXe6Rd0QYXWG0crWP4djrXnoOzP4mKE/gF49YdT1S7xT53Sy3X0lsz
-         1YP1ZeJy3WnGfpHmNKdM3QRc3PKvlXYur31xNm3GDh2SsiT/zzCFM7hDqdxL+AAYt1/r
-         wkiEAtXSrPPULPROVlUAUXiYarwH/JhNYvLY8Y6lP6tuhB6wsokPT0vCQLRgJR78LweZ
-         c8Gw==
-X-Gm-Message-State: AOJu0YxBpctY+/ylyY4K7VKsHNkMvThffKCObevkCNoQqiKuYtVwi6vk
-        nBBS0P56IrhNeSe5ZRX/HYD+/SGyKP1IdYMnB44=
-X-Google-Smtp-Source: AGHT+IGaZt6wsaWTbeCCw1/OFTccreQdD11HazSIZhfbhlO6zQVsNMMI+83UdqvCNrcOOuteAKYC2L4cc72BzWIWZ78=
-X-Received: by 2002:a2e:9859:0:b0:2bd:1fee:aacf with SMTP id
- e25-20020a2e9859000000b002bd1feeaacfmr1890357ljj.24.1693991372034; Wed, 06
- Sep 2023 02:09:32 -0700 (PDT)
+        with ESMTP id S236410AbjIFJRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 05:17:47 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D72CE2
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 02:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693991863; x=1725527863;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8N9n63Faforl26vhAR0bnPTWwSXjdT3F373uFhh2Dok=;
+  b=g7Ih5qwdRxKGBgjcyAlhmtef0y5sJiT49Up9HFa5fMtFeF/PeqyewhDs
+   nxdWt5b3CM3gPxLtFZ+8+Y/Jhb15BSDCIpZ7ta5wxpDvBDFF1TPdZ1vCG
+   E7iZ9dnoC67TBOlkPvgWrrskUc/UpE8j7o7Q2B6DQGO3Irnll3F0GFTtC
+   OkyxcBgaYmSeIklcvbwHeRmAzfQKo1NNcVWAIciZEP/BeyYInfGyykNf/
+   6FgAbTcQSzSnFG5dKT7VbHgpi5l4fzoGNC1Cc5mdG55iiIbNdYPMzTEWw
+   n8dSifxHBykO0NvjUPJ1iaiPcO1VGV/WQeE+/V+euTJEnt/RMIdLJbuI8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="375916982"
+X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
+   d="scan'208";a="375916982"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:17:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="988161058"
+X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
+   d="scan'208";a="988161058"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:17:40 -0700
+Message-ID: <8b964afb-4b8e-b8fb-542c-c76487340705@linux.intel.com>
+Date:   Wed, 6 Sep 2023 17:17:37 +0800
 MIME-Version: 1.0
-References: <cover.1693659382.git.haibo1.xu@intel.com> <8173daae52720dbdabbd88a5d412f653e6706de1.1693659382.git.haibo1.xu@intel.com>
- <20230904-06f09083d5190fd50e53b1ea@orel> <CAJve8on7Yi7cDuXOVznuRdTvfUhig2hZy8g72nvnHkM7omoVAw@mail.gmail.com>
- <20230906-c35fdc0e07d2cc0f9cb93203@orel>
-In-Reply-To: <20230906-c35fdc0e07d2cc0f9cb93203@orel>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Wed, 6 Sep 2023 17:09:20 +0800
-Message-ID: <CAJve8ok-Z6VCziFj5t0=BoouZ-VLyGaqEng-dYGTFnP-CR36kw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] tools: riscv: Add header file csr.h
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        wchen <waylingii@gmail.com>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Lei Wang <lei4.wang@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Peter Gonda <pgonda@google.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Michal Luczaj <mhal@rbox.co>,
-        zhang songyi <zhang.songyi@zte.com.cn>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Like Xu <likexu@tencent.com>, Mingwei Zhang <mizhang@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+References: <20230901185646.2823254-1-jmattson@google.com>
+From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20230901185646.2823254-1-jmattson@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -105,112 +67,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 6, 2023 at 3:13=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
-m> wrote:
->
-> On Wed, Sep 06, 2023 at 02:35:42PM +0800, Haibo Xu wrote:
-> > On Mon, Sep 4, 2023 at 9:33=E2=80=AFPM Andrew Jones <ajones@ventanamicr=
-o.com> wrote:
-> > >
-> > > On Sat, Sep 02, 2023 at 08:59:25PM +0800, Haibo Xu wrote:
-> > > > Borrow the csr definitions and operations from kernel's
-> > > > arch/riscv/include/asm/csr.h to tools/ for riscv.
-> > > >
-> > > > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > > > ---
-> > > >  tools/arch/riscv/include/asm/csr.h | 521 +++++++++++++++++++++++++=
-++++
-> > > >  1 file changed, 521 insertions(+)
-> > > >  create mode 100644 tools/arch/riscv/include/asm/csr.h
-> > > >
-> > > > diff --git a/tools/arch/riscv/include/asm/csr.h b/tools/arch/riscv/=
-include/asm/csr.h
-> > > > new file mode 100644
-> > > > index 000000000000..4e86c82aacbd
-> > > > --- /dev/null
-> > > > +++ b/tools/arch/riscv/include/asm/csr.h
-> > > > @@ -0,0 +1,521 @@
-> > > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > > +/*
-> > > > + * Copyright (C) 2015 Regents of the University of California
-> > > > + */
-> > > > +
-> > > > +#ifndef _ASM_RISCV_CSR_H
-> > > > +#define _ASM_RISCV_CSR_H
-> > > > +
-> > > > +#include <linux/bits.h>
-> > > > +
-> > > > +/* Status register flags */
-> > > > +#define SR_SIE               _AC(0x00000002, UL) /* Supervisor Int=
-errupt Enable */
-> > > > +#define SR_MIE               _AC(0x00000008, UL) /* Machine Interr=
-upt Enable */
-> > > > +#define SR_SPIE              _AC(0x00000020, UL) /* Previous Super=
-visor IE */
-> > > > +#define SR_MPIE              _AC(0x00000080, UL) /* Previous Machi=
-ne IE */
-> > > > +#define SR_SPP               _AC(0x00000100, UL) /* Previously Sup=
-ervisor */
-> > > > +#define SR_MPP               _AC(0x00001800, UL) /* Previously Mac=
-hine */
-> > > > +#define SR_SUM               _AC(0x00040000, UL) /* Supervisor Use=
-r Memory Access */
-> > > > +
-> > > > +#define SR_FS                _AC(0x00006000, UL) /* Floating-point=
- Status */
-> > > > +#define SR_FS_OFF    _AC(0x00000000, UL)
-> > > > +#define SR_FS_INITIAL        _AC(0x00002000, UL)
-> > > > +#define SR_FS_CLEAN  _AC(0x00004000, UL)
-> > > > +#define SR_FS_DIRTY  _AC(0x00006000, UL)
-> > > > +
-> > > > +#define SR_VS                _AC(0x00000600, UL) /* Vector Status =
-*/
-> > > > +#define SR_VS_OFF    _AC(0x00000000, UL)
-> > > > +#define SR_VS_INITIAL        _AC(0x00000200, UL)
-> > > > +#define SR_VS_CLEAN  _AC(0x00000400, UL)
-> > > > +#define SR_VS_DIRTY  _AC(0x00000600, UL)
-> > > > +
-> > > > +#define SR_XS                _AC(0x00018000, UL) /* Extension Stat=
-us */
-> > > > +#define SR_XS_OFF    _AC(0x00000000, UL)
-> > > > +#define SR_XS_INITIAL        _AC(0x00008000, UL)
-> > > > +#define SR_XS_CLEAN  _AC(0x00010000, UL)
-> > > > +#define SR_XS_DIRTY  _AC(0x00018000, UL)
-> > > > +
-> > > > +#define SR_FS_VS     (SR_FS | SR_VS) /* Vector and Floating-Point =
-Unit */
-> > > > +
-> > > > +#ifndef CONFIG_64BIT
-> > >
-> > > How do we ensure CONFIG_64BIT is set?
-> > >
-> >
-> > Currently, no explicit checking for this.
-> > Shall we add a gatekeeper in this file to ensure it is set?
->
-> Not in this file, since this file is shared by all the tools and...
->
-> >
-> > #ifndef CONFIG_64BIT
-> > #error "CONFIG_64BIT was not set"
-> > #endif
->
-> ...we'll surely hit this error right now since nothing is setting
-> CONFIG_64BIT when compiling KVM selftests.
->
-> We need to define CONFIG_64BIT in the build somewhere prior to any
-> headers which depend on it being included. Maybe we can simply
-> add -DCONFIG_64BIT to CFLAGS, since all KVM selftests supported
-> architectures are 64-bit.
->
+On 9/2/2023 2:56 AM, Jim Mattson wrote:
+> When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
+> VM-exit that also invokes __kvm_perf_overflow() as a result of
+> instruction emulation, kvm_pmu_deliver_pmi() will be called twice
+> before the next VM-entry.
 
-Make sense! Another option can be just add "#define CONFIG_64BIT" at
-the begin of csr.h
 
-> (Please trim emails, as I've been doing, when discussing specific parts.)
+Do we have a way to reproduce this spurious NMI error constantly?
+
+
 >
-
-Sure, thanks for the suggestions!
-
-> Thanks,
-> drew
+> That shouldn't be a problem. The local APIC is supposed to
+> automatically set the mask flag in LVTPC when it handles a PMI, so the
+> second PMI should be inhibited. However, KVM's local APIC emulation
+> fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
+> are delivered via the local APIC. In the common case, where LVTPC is
+> configured to deliver an NMI, the first NMI is vectored through the
+> guest IDT, and the second one is held pending. When the NMI handler
+> returns, the second NMI is vectored through the IDT. For Linux guests,
+> this results in the "dazed and confused" spurious NMI message.
+>
+> Though the obvious fix is to set the mask flag in LVTPC when handling
+> a PMI, KVM's logic around synthesizing a PMI is unnecessarily
+> convoluted.
+>
+> Remove the irq_work callback for synthesizing a PMI, and all of the
+> logic for invoking it. Instead, to prevent a vcpu from leaving C0 with
+> a PMI pending, add a check for KVM_REQ_PMI to kvm_vcpu_has_events().
+>
+> Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 -
+>   arch/x86/kvm/pmu.c              | 27 +--------------------------
+>   arch/x86/kvm/x86.c              |  3 +++
+>   3 files changed, 4 insertions(+), 27 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3bc146dfd38d..f6b9e3ae08bf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -528,7 +528,6 @@ struct kvm_pmu {
+>   	u64 raw_event_mask;
+>   	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
+>   	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
+> -	struct irq_work irq_work;
+>   
+>   	/*
+>   	 * Overlay the bitmap with a 64-bit atomic so that all bits can be
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index bf653df86112..0c117cd24077 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -93,14 +93,6 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
+>   #undef __KVM_X86_PMU_OP
+>   }
+>   
+> -static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
+> -{
+> -	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+> -	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+> -
+> -	kvm_pmu_deliver_pmi(vcpu);
+> -}
+> -
+>   static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+>   {
+>   	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> @@ -124,20 +116,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+>   		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+>   	}
+>   
+> -	if (!pmc->intr || skip_pmi)
+> -		return;
+> -
+> -	/*
+> -	 * Inject PMI. If vcpu was in a guest mode during NMI PMI
+> -	 * can be ejected on a guest mode re-entry. Otherwise we can't
+> -	 * be sure that vcpu wasn't executing hlt instruction at the
+> -	 * time of vmexit and is not going to re-enter guest mode until
+> -	 * woken up. So we should wake it, but this is impossible from
+> -	 * NMI context. Do it from irq work instead.
+> -	 */
+> -	if (in_pmi && !kvm_handling_nmi_from_guest(pmc->vcpu))
+> -		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
+> -	else
+> +	if (pmc->intr && !skip_pmi)
+>   		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
+>   }
+>   
+> @@ -677,9 +656,6 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+>   {
+> -	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> -
+> -	irq_work_sync(&pmu->irq_work);
+>   	static_call(kvm_x86_pmu_reset)(vcpu);
+>   }
+>   
+> @@ -689,7 +665,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>   
+>   	memset(pmu, 0, sizeof(*pmu));
+>   	static_call(kvm_x86_pmu_init)(vcpu);
+> -	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
+>   	pmu->event_count = 0;
+>   	pmu->need_cleanup = false;
+>   	kvm_pmu_refresh(vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c381770bcbf1..0732c09fbd2d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12841,6 +12841,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>   		return true;
+>   #endif
+>   
+> +	if (kvm_test_request(KVM_REQ_PMI, vcpu))
+> +		return true;
+> +
+>   	if (kvm_arch_interrupt_allowed(vcpu) &&
+>   	    (kvm_cpu_has_interrupt(vcpu) ||
+>   	    kvm_guest_apic_has_interrupt(vcpu)))
