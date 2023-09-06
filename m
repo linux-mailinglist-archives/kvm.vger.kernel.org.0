@@ -2,181 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ECD6793320
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 03:02:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 913F4793359
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 03:24:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237164AbjIFBCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 21:02:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
+        id S240410AbjIFBYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 21:24:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbjIFBCy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Sep 2023 21:02:54 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5161A3;
-        Tue,  5 Sep 2023 18:02:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zk3VZVhKVyjfN9eqRbK3jyV+UwZY2WeAlYvHPyJeKxJisPF14vsxLm4GuOMH5bTdFSzomLw3tPLJ/hoDcxJj3P0SgcQjSnkVKK9JhqNqwK5z87zjBI4DDjMezOZzWOQaPFQobRNJV9c2bsz5s5+bw5xZyj/7HFhjlZS4ZRBLlYPkmrmCpqO2ME8NO4Ztpb1pN+UYxm29VtZc0HtHiW9EujDLc2gCtYnDLgQBrMvssn4iZp9lRBVif3LpBX1h5SfOLhMqfbw+EecWFpGb5AEBfhWhE3RpYO2O9qxcdYrgox9oBPx91WbixjNBQSozWburQwQ3YDQ8XC4q+zngeBkLUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+kIpEQM3YHYY0mSzn7nZjQV73WkDD6JAd/Jx3b/2VLo=;
- b=nm5dVOPprtowz65LpyxZ455MX2E11+IyZWiGpSqdkIvaT+yA1iPIDEelW9h+KRmUGetPCwKBMYhKo0zCNpag/zax7BrMbd5ZCq9Ji4REXuRmua/aTdeRlNSLq6Kb/OMpXkKAMe3S2QTOwYdgNWBIkfBHdlm4wXMDAB6GoHR7/DyKyciIjsNuLGuBVifH4ZRklJULtn6HDaA5hMslDiuGQ3bNFFkq2B4+e1wa9bJ2FZV7NorG797/O0ixqzEVDVolFSo+l/JNslMDQ8LBjQsMUSHnhtAe7bgTqlloWbIo/CYEKug4O61q4SYy7FmVfYAlBS6KUr4pfdgs9JI3gO6syg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+kIpEQM3YHYY0mSzn7nZjQV73WkDD6JAd/Jx3b/2VLo=;
- b=3OsGnkdVozyk1hh5A8rJnv4c+rMpA7cxEWQbvTca5FeHDDK8EZMM1shx4G5y23DzrYluZSywAyNoEQpSPJlLaVwTwIk6kxsc8HqmkSFHsWuBsKcowG5J2phJXuIaQddV41PFevvu331tBxo7SUfdAIQzW17fL7+o3G8TZ6bGym8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by MN0PR12MB5931.namprd12.prod.outlook.com (2603:10b6:208:37e::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33; Wed, 6 Sep
- 2023 01:02:48 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
- 01:02:47 +0000
-Message-ID: <f17a483b-3a75-9268-392b-69340d9121b8@amd.com>
-Date:   Tue, 5 Sep 2023 18:02:45 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH] vfio/pds: Limit Calling dev_dbg function to
- CONFIG_PCI_ATS
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        oushixiong <oushixiong@kylinos.cn>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230905024028.940377-1-oushixiong@kylinos.cn>
- <20230905083119.27cf3c03.alex.williamson@redhat.com>
-From:   Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20230905083119.27cf3c03.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PH7PR17CA0001.namprd17.prod.outlook.com
- (2603:10b6:510:324::25) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+        with ESMTP id S237379AbjIFBYP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Sep 2023 21:24:15 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B8FCC2;
+        Tue,  5 Sep 2023 18:24:09 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso48218771fa.2;
+        Tue, 05 Sep 2023 18:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693963448; x=1694568248; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
+        b=lLSRaxCep2dvaFMqkRQ6cmjICAimp5HR5WTK+xXkoqIoWVT4aCpmq42y97muDf0jMd
+         j5fKxuPL/oDmUzb6FMt6fJyQuj5boina86p93/FJJP2mrqzsYvywLIs+zg8tBsdvQAvm
+         uBdonLjmdZmXYeYdh2gukhy9SgEoPY30WMHQnIcm4nTXLfJhi2e+by1q2lIfLjJdFttu
+         Po0Olrbq99KD+w4HKz/TCe66TmEejeOO+4Ppl/JHGR304p/AfOjFNNzVuvy2Ys/OdKlw
+         KXD8vECF9otwTyhGjogb0LzdJmjl7rywIyEEXtryzjTTf6hAE9XruYhih4ryZUowldyh
+         v/mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693963448; x=1694568248;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1xfJSGXD8vBLM08q729zBD/9glpH/PWMQ0GciStqljw=;
+        b=JXrqierl7+R84nkungWjbv6g6tBFozZBOzaDHZNOzpVR7B0aFabgZFBX4XML4eeyyO
+         gKhkIlLOagw8MvxyYh7+0anaJ5fwclWbFATilqWFn/N2G2XVcOMPK9f9YH2w7tuSDzkS
+         iGDXC3nKb4q3qLw+cOod6klpg6Ax2VjuWQW9swrtpv/spk5Ra1fbBuzR3GW25c5NacMb
+         50QQ6iFlMMPYokzYJo174GUFM3nV4SQD51LqJGz9v7+Ln5suuIcdXHkCOlqMdnQ13W3Y
+         ZuufFK/QLGTKEHTdUegpWwZH0D2rg/WYivDYJL71QMlhHvaVhVls+XrMQL8tqSMWdMZg
+         pBUA==
+X-Gm-Message-State: AOJu0YxZtZNLy8xcksMM3N+s0HbD92Ag11EUSzbK+nNyZZDNj3cdRztl
+        9HzEXVXrhJZQ6y3EsKhIwZRMAWGgMgOh0cEAOjg=
+X-Google-Smtp-Source: AGHT+IEZAtSdfv2O9kOnOodcd6ZENRRHvHNIg7rIlF/apuuxioXnbEufFM1mW11nwPy+FUp/gWhTnrfWfFZLNg5iXcI=
+X-Received: by 2002:a2e:7204:0:b0:2bc:fb79:d165 with SMTP id
+ n4-20020a2e7204000000b002bcfb79d165mr1109276ljc.39.1693963447866; Tue, 05 Sep
+ 2023 18:24:07 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MN0PR12MB5931:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8446fd1-4467-4d46-7f77-08dbae74fc68
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IzcBzHJEVxs+Wi0FN+Jh2oDJWUIc2ckPggpWfvcRwzZhjkwLBDb4rDzFFuaDnvExBP7rLeMutLs3d0xshfIRMh6zyHbRfxocrrlUYOJ7WR2VWKqKz7tFdvvdP6P/aogTucVuNigEqAKjS4gwhJKym7pkXVIL/7SwCZcpyz6rDGn/Gp88DXtfIDowU0wQ0UGbIZO8IyAKcIs48yBlVeCP43YOrExe6FpS6OMTDRO3q2d0FTZPkirkVXFFgFpafI7l/Iu8SLaQ6mqu3Fl7atXbpu/V52M4VAGVAx5hTvjXqEOw2QP2+M3igUyzXTFZWkA68mD7XqDYXIktFaTsPkAlriZ2g4GWqlQGL2K5ut2cjh34u8zxoqvbXDoS7YUxy+GhawIOFe9y9ko9i21k6oQn+MSsfM91dVDhJRVXMEFi/7/asriCOPYUdpUPzc24jKIeJQaZVIXctx1GTXt/r+QlaMpm65gvMa6qKgA49ZqpPz40WQ1nXQ0crdUz3hZe6RzJ7CkPvHMYxh7jyXosuzbSwt/S96rfZNzfKLTBqiZlFRw+OhqlAN9Oru9ZvoGQ0XZUO2yx351ZgJddIjdyelC8etT6JYOKZXavhv6wVh0bPq4DlcgLKvDicoin36zKj8f5URTZCub3GMAsuaFNrxGCXQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(39860400002)(346002)(376002)(451199024)(1800799009)(186009)(31686004)(5660300002)(8936002)(110136005)(66476007)(36756003)(54906003)(66556008)(316002)(66946007)(2906002)(4326008)(8676002)(41300700001)(6486002)(6506007)(26005)(6512007)(53546011)(38100700002)(478600001)(83380400001)(2616005)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QnUyaUlJaUdWdzdlZnhteTFra29QNFd1MERZQzBQTEdnaTFJemI2ZGowcjg0?=
- =?utf-8?B?QlhVNUd0MTdCemk1N0J0TUFUb1RZVWdHUzA1Ris2SnRXZ1krZnFWL0lPcVBJ?=
- =?utf-8?B?aTlFVGdiTmdnRWRmUGNKVXpiTy80Q3EvemxpNmdHcVA5TUltaEFVZ2pFcXVi?=
- =?utf-8?B?QkdrV3F6b1ROZ0ZhME1LK0VGRkdWRE9NMXpJQlhtaWVXTW5ZQWRCUTVma0NZ?=
- =?utf-8?B?alVtR2hkQWc1OTNKVWJBNUZmT0x5TmJLY005MkRBMnQzSWh5dTZaaEUrQjVj?=
- =?utf-8?B?dndlY0UyazlHTGxVNi91Wm5qZ0JKVElNVk9oWFRFcHA0ZFV1djVvcVUrM2Nv?=
- =?utf-8?B?eTYzZkZoSU9ObllvRm1EZXV3MHVCOUVlQ0lOUC9ycGtTYUFDTWNVVEhJTE9Y?=
- =?utf-8?B?UlN0eEpyRG00K090MnhxaVBZYzYzUFNUTVJWOGEzUG9kS1pySmRmUEJmU1dv?=
- =?utf-8?B?dElqWXpzOHVkMjFnYWVkZDJjRFcrdG9RQm5zNzZPVUFlMWZxRG9neEZxc2c2?=
- =?utf-8?B?eFB1OGk2c21JcUlTUEp4VmRaZ0FRdWM2NlpmTnZTZEpZMXdHL1RVUEMzRmxi?=
- =?utf-8?B?aU1zY1pLV1FqcW9LVmZWZ3dYbG5qNHlhRUNGcmtVeEZmQXFaRFFSSngxNit1?=
- =?utf-8?B?MjVSL3llYzYwQnVLUUlwbERrRzRwY2Q0L1FPaXVqeXJQWlN4N2FsUmNnSjhM?=
- =?utf-8?B?NCtFSEdpK3VlUHVPU2ExYlVGTlF1NllxVHpOSDlWNUpGeTFPTks3TlJ0QVkw?=
- =?utf-8?B?MUJqSnI0bXFGVG9mYnZubzNPN0dDMzVPak50d1hEeENqV0pONTlpRnlQQ0p2?=
- =?utf-8?B?MUVKZlhJbXdWZE0rekMzcDVKKzdmNDJWdGJoMmNzSktSS1dUQVVMdXIxTVlI?=
- =?utf-8?B?UnlPOTE0OU9oSDN6QXdkT2xwRE8rRnUvZnArZmlSRm1lSllrK1d2bTBmeCtq?=
- =?utf-8?B?VnFSUHZvaXVIUHVDc2dLZTdlWWV4eTFEN2QvT2VoMmVDTXFkOGpsNG5yM2ZZ?=
- =?utf-8?B?aHYxTC9ZbWp4QXNRZ3VON2Jabld0R1ovdHd2MlpVdXFkUFlCN1NQQlBSUEda?=
- =?utf-8?B?RzlTNG4weGxDMnQ2emU5QXJYSFJaN0pvN3hFT1c5bkZmcURHRXU2M01KMmlW?=
- =?utf-8?B?eVB1enFhSWhQN0pucjh0YmxRanpZTHV3MlVLTkNteHNHbnJQZUpyV3B2aXlB?=
- =?utf-8?B?aWFoMGh1cEpheng4eVN2VnIvU1pFTEVJeVk1NmRwMG1SOUh6Z3g5VkhLb1pV?=
- =?utf-8?B?S3BSVzFucDVKWDJHZStxQmVKL0g2bWc3RkEwa1NwTHZoOVlhUm9HQ1dZcmw5?=
- =?utf-8?B?N2ExNmw4aWkxT29DNFdZZC9VRkNCem92blFCeG1wc1RibFJVV2UxQ1A5eXVl?=
- =?utf-8?B?QjhHTElMNDFjemVHWk9XMk4rYS9keEE2Y3F1cm40SDR4Vjg1c0NlL0xpNm9M?=
- =?utf-8?B?SU5MNDNLdkNIYTMxQlJXWXZoNmRTR1Fzc3ZFRW5sNjlaR3lLWDRhaUtsQzU2?=
- =?utf-8?B?dUtXdXg1VnJTNmdiNitxSFQ3UTVBamRHSjlUczVGam91NW5LT3Yvb2FldEUy?=
- =?utf-8?B?RnNqenhucCtHZTVUbVYyNGRlU2pVMGVKaTlyOTVMbEltclRWeU1JRWVTakJU?=
- =?utf-8?B?VWlQQmlKMm1VbnlxZGRDS3M4MWROaitJSEVsbFRjWmFiUk9pK2kxZmdFN21S?=
- =?utf-8?B?Rk9tQ0ZqVlVqU2Z6MysyckhlMGpHRVoxeks1QVdJSVdMeEUwRlVMNHNqYmt5?=
- =?utf-8?B?WDE0a0tLTmVtNXhnQmhwVzlIaTRDSFBLWWJVWHJoTUIvbk5Jd2NhdlFNN2Rz?=
- =?utf-8?B?TDd2UWJpTE5vRWx4cEE2LzJvZmtzKzd1VmVYRTduMHFTN1NNM09HMUFjQzly?=
- =?utf-8?B?K25iLzlBM0RhdnFYQisyaUJZTEEvOW5KSms4blhIeVB2ZjlQbENLZzl1RHpF?=
- =?utf-8?B?eXlTWG1GYXh5SnAwMURzUEc1WGFuVi9SdUhOUkVMVDZlenhkdFloZzlPMkxy?=
- =?utf-8?B?SEtGNzNhQ2loUVhsRFE5RTlEUERCY1JmRHZYbHdNKzc4blhhcEEvd0ZQQzhv?=
- =?utf-8?B?cXJER0R4d0tzWGhkL1V6ZFJuVWJyWTBvNEZSb2UzVWNrc2NiV2JCQVdYZVZt?=
- =?utf-8?Q?fbso1e9t6kiEdaZir6b8lBIkN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8446fd1-4467-4d46-7f77-08dbae74fc68
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 01:02:47.8636
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qspnLiYV6PvRbSSOrOWEcQ+ao22ocA4bIT0SvT1mhFqtK3ZpxyXnSkPIyedQYbtuTFtDbISGBWlP7QD5PZ0nRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5931
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1693659382.git.haibo1.xu@intel.com> <20230905-eb7998dbd945ed9dd12659ea@orel>
+In-Reply-To: <20230905-eb7998dbd945ed9dd12659ea@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Wed, 6 Sep 2023 09:23:56 +0800
+Message-ID: <CAJve8o=Oz9m_t3tZOFgxo41Ss+dz-kLHU5Y44ov=JjZs3Jyaew@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] RISCV: Add kvm Sstc timer selftest
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, wchen <waylingii@gmail.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Lei Wang <lei4.wang@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Peter Gonda <pgonda@google.com>,
+        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/5/2023 7:31 AM, Alex Williamson wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> On Tue,  5 Sep 2023 10:40:28 +0800
-> oushixiong <oushixiong@kylinos.cn> wrote:
-> 
->> From: Shixiong Ou <oushixiong@kylinos.cn>
->>
->> If CONFIG_PCI_ATS isn't set, then pdev->physfn is not defined.
->> So it causes a compilation issue:
->>
->> ../drivers/vfio/pci/pds/vfio_dev.c:165:30: error: ‘struct pci_dev’ has no member named ‘physfn’; did you mean ‘is_physfn’?
->>    165 |   __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
->>        |                              ^~~~~~
->>
->> Signed-off-by: Shixiong Ou <oushixiong@kylinos.cn>
->> ---
->>   drivers/vfio/pci/pds/vfio_dev.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
->> index b46174f5eb09..18b4a6a5bc16 100644
->> --- a/drivers/vfio/pci/pds/vfio_dev.c
->> +++ b/drivers/vfio/pci/pds/vfio_dev.c
->> @@ -160,10 +160,13 @@ static int pds_vfio_init_device(struct vfio_device *vdev)
->>        vdev->log_ops = &pds_vfio_log_ops;
->>
->>        pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
->> +
->> +#ifdef CONFIG_PCI_ATS
->>        dev_dbg(&pdev->dev,
->>                "%s: PF %#04x VF %#04x vf_id %d domain %d pds_vfio %p\n",
->>                __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
->>                pci_domain_nr(pdev->bus), pds_vfio);
->> +#endif
->>
->>        return 0;
->>   }
-> 
-> AIUI, this whole driver is dependent on SR-IOV functionality, so perhaps
-> this should be gated at Kconfig?  Thanks,
-> 
-> Alex
+On Tue, Sep 5, 2023 at 6:36=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> Hi Haibo,
+>
+> Some of your patch summaries say 'selftest' instead of 'selftests'. Pleas=
+e
+> correct those for the next version.
+>
 
-It seems like depending on SR-IOV functionality makes more sense.
+Sure, thanks for pointing that out!
 
-Thanks,
-
-Brett
-> 
+> Thanks,
+> drew
+>
+> On Sat, Sep 02, 2023 at 08:59:22PM +0800, Haibo Xu wrote:
+> > The RISC-V arch_timer selftest is used to validate Sstc timer
+> > functionality in a guest, which sets up periodic timer interrupts
+> > and check the basic interrupt status upon its receipt.
+> >
+> > This KVM selftest was ported from aarch64 arch_timer and tested
+> > with Linux v6.5-rc5 on a Qemu riscv64 virt machine.
+> >
+> > ---
+> > Changed since v1:
+> >   * Rebase to kvm-riscv/riscv_kvm_next
+> >   * Cherry-pick Sean's kselftest guest printf patch set
+> >     https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.=
+com/
+> >   * Copy the entire csr.h verbatim
+> >   * Unified the function names for exception vector table setup
+> >     void vm_init_vector_tables(struct kvm_vm *vm);
+> >     void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+> >   * Format the handler.S asm file per Andrew's comments
+> >   * Consolidate the timer test code for arm64 and riscv
+> >     based on Andrew's and Sean's suggestion
+> >
+> > Haibo Xu (8):
+> >   KVM: selftests: Unify the codes for guest exception handling
+> >   KVM: arm64: selftest: Split arch_timer test code
+> >   tools: riscv: Add header file csr.h
+> >   KVM: riscv: selftests: Switch to use macro from csr.h
+> >   KVM: riscv: selftests: Add exception handling support
+> >   KVM: riscv: selftests: Add guest helper to get vcpu id
+> >   KVM: riscv: selftest: Change vcpu_has_ext to a common function
+> >   KVM: riscv: selftests: Add sstc timer test
+> >
+> >  tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+> >  tools/testing/selftests/kvm/Makefile          |  11 +-
+> >  .../selftests/kvm/aarch64/arch_timer.c        | 292 +---------
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+> >  .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+> >  .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
+> >  tools/testing/selftests/kvm/arch_timer.c      | 261 +++++++++
+> >  .../selftests/kvm/include/aarch64/processor.h |  12 +-
+> >  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+> >  .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
+> >  .../selftests/kvm/include/riscv/processor.h   |  60 +-
+> >  .../selftests/kvm/include/timer_test.h        |  58 ++
+> >  .../selftests/kvm/include/x86_64/processor.h  |   5 -
+> >  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+> >  .../selftests/kvm/lib/riscv/processor.c       |  86 +++
+> >  .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
+> >  .../testing/selftests/kvm/riscv/arch_timer.c  | 130 +++++
+> >  .../selftests/kvm/riscv/get-reg-list.c        |  14 -
+> >  tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
+> >  .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
+> >  .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
+> >  .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+> >  .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
+> >  .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
+> >  .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
+> >  .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
+> >  .../smaller_maxphyaddr_emulation_test.c       |   4 +-
+> >  .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
+> >  .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
+> >  .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
+> >  .../kvm/x86_64/ucna_injection_test.c          |   8 +-
+> >  .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
+> >  .../vmx_exception_with_invalid_guest_state.c  |   4 +-
+> >  .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
+> >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+> >  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
+> >  .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+> >  38 files changed, 1376 insertions(+), 376 deletions(-)
+> >  create mode 100644 tools/arch/riscv/include/asm/csr.h
+> >  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+> >  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_time=
+r.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+> >  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+> >
+> > --
+> > 2.34.1
+> >
