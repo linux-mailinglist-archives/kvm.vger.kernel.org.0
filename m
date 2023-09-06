@@ -2,136 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE1EA794600
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 00:11:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368CE794616
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 00:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244996AbjIFWLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 18:11:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37662 "EHLO
+        id S245027AbjIFWSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 18:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244990AbjIFWLR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 18:11:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6BE019B5
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 15:10:27 -0700 (PDT)
+        with ESMTP id S245008AbjIFWSR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 18:18:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EC619BC
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 15:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694038226;
+        s=mimecast20190719; t=1694038646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2sW5n0U9nqfDRjI4qbYKErrgizSRaxysFjpyGkvRHBg=;
-        b=M8S+VDizZhMczTvy4qOkwu69RCSXAMJRrwDE5/YOrFqU30ohqzZo+SPQkmLGYY3OBo3uHN
-        buZcE8sq/h5mZMgwCvjLZfQO1iqx8zXwdWeMSu2mn3OscEwpMuA0NYhtGMVUZn93BFklsZ
-        WpRd0tLErVO6WrvHELpI9wSjm4gVRq8=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=H/UCYibyps03BeaD/1Nk79xBgk22JsdCefm9WuOhC/s=;
+        b=KNCauIIUnNwa+z224tk87//DJgdyA4c5MR2SACxsO5ka2M5enI4tSZ6qB3yG3eNATPU5wN
+        4H7b+xxZ5iLnIN3CzkQdzETeySYBiMia2RJQjM+ID3cIoZk94vuFBrkCS7q8HohS8MdvxR
+        nenf+1ghQ4VOvpSN8TVl8WtahsoIJYo=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-451-O8c-VdspNBKCKO0tnO1uYA-1; Wed, 06 Sep 2023 18:10:25 -0400
-X-MC-Unique: O8c-VdspNBKCKO0tnO1uYA-1
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-7a4f58bd3d4so96116241.2
-        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 15:10:25 -0700 (PDT)
+ us-mta-258-R-k1SvnAMziaX0rW62s_8Q-1; Wed, 06 Sep 2023 18:17:25 -0400
+X-MC-Unique: R-k1SvnAMziaX0rW62s_8Q-1
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-44d52144f65so118589137.1
+        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 15:17:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694038225; x=1694643025;
+        d=1e100.net; s=20221208; t=1694038644; x=1694643444;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2sW5n0U9nqfDRjI4qbYKErrgizSRaxysFjpyGkvRHBg=;
-        b=fZFb5s6TnCQaUGPz6X5+dWGYxCqcKjdW9HWtIDhtQuFpM2RFhviy7Mru9ReNlNHcCM
-         eNOQxRjcKKnx5d9wsFNB2mkQXiSxcPmdkDnuR6OyMnqhj5Ea8DPFMbE9qRCXH3fH5/sg
-         f/Xe2Q3JZKvtVfkz2qhuUpR2wQxtc6Fe0Zk8GQogKGJGpagatlVI8Vm/SBBGLsWQ2+He
-         pP6Jyix+a6meE2KXTlOQgAOX/p3WhyXSmkkhoofIp7n6/yd/rx9PIKr6rNKHzrC6MpZF
-         /4m1fuWbmPeiecOC6OsJxGo4AgSaOatsgwlLcsUWVJA1Q4oAF4Xrholvt8OuwUOAfd7l
-         67cA==
-X-Gm-Message-State: AOJu0YzK4HsvfFCqi53v9X4m50JR75jY/NMIZEf7Gcu8EdbHsFjvii06
-        +QkozZ8cFt+CdKvouQDopM8TM4TcWMcYPZbdygTvHnv39LWi8wqfppB9cuFOfFG1PbsWdVZ0Si+
-        vpRLkeLfqBkxP6TgU4G81dVfXKfDU
-X-Received: by 2002:a67:ee4d:0:b0:444:17aa:df60 with SMTP id g13-20020a67ee4d000000b0044417aadf60mr4110671vsp.13.1694038225084;
-        Wed, 06 Sep 2023 15:10:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHp5n1WB8R1og/NcZaTM8SckALAeHpMUrTVBDu8TXyXcr3qI/pIRPsrfv30I89brgsoG52emGtevyCvY1jn784=
-X-Received: by 2002:a67:ee4d:0:b0:444:17aa:df60 with SMTP id
- g13-20020a67ee4d000000b0044417aadf60mr4110646vsp.13.1694038224758; Wed, 06
- Sep 2023 15:10:24 -0700 (PDT)
+        bh=H/UCYibyps03BeaD/1Nk79xBgk22JsdCefm9WuOhC/s=;
+        b=lW+p5t0yVLtVeuEo1WjorNjCtIb46xhn9Fh9KADdSoQ4ANkBPnOv3m0veyr/pY/TPO
+         18nlKlZDAN9yvIp5gx4e1qwiHeVt7eSmHpvRQwXN24WWrdeZnoGehzZ2HRb2bBdSgzCg
+         gZOZVXsv0qu6DRDBb+jVRbIwduacFFc3OYE6kzhhTRyFCawT+vpzsZkz2x1qb99Xocom
+         q7jisYW2COcEk7F0aXCZZgJvRullbhrtUpbklJgjp3uzlZ06KhXXYdcCXna+NEndiwVn
+         n2+WYAJZ580f51ABWUzQZl8hm1nCJQomiYvodEf08BtLbmuhnf9IDmCYLQ1oVsWdW36v
+         YCqA==
+X-Gm-Message-State: AOJu0YzIC8QUn2aKaoEbjK/xfj9vL5NQH/HZk8Kl3GuKx4zpdFti5zTz
+        eDeVjAXS6Tl7B1OJLZWspDn7NX9zvQY2E+rZqKsF84pdM8vRyizcFCgtF7HUJPd08zlZ88CT7TH
+        Apxhn0gPdJeBWQDohsomOqs/Uaj2E
+X-Received: by 2002:a67:f887:0:b0:44d:e70d:8a4b with SMTP id h7-20020a67f887000000b0044de70d8a4bmr4566485vso.8.1694038644369;
+        Wed, 06 Sep 2023 15:17:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG9bTrQsgAOigUVQNMSsTnCiw0gqhTSfkFbFpj/VTRj0g7Zbje3/rR2Wvm0S7hHF5lw776crY2rRCp8ybteIqY=
+X-Received: by 2002:a67:f887:0:b0:44d:e70d:8a4b with SMTP id
+ h7-20020a67f887000000b0044de70d8a4bmr4566473vso.8.1694038644156; Wed, 06 Sep
+ 2023 15:17:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-14-seanjc@google.com>
- <84a908ae-04c7-51c7-c9a8-119e1933a189@redhat.com> <ZLq8ylTsFQ1s4BAZ@google.com>
-In-Reply-To: <ZLq8ylTsFQ1s4BAZ@google.com>
+References: <20230808085056.14644-1-yan.y.zhao@intel.com> <ZN0S28lkbo6+D7aF@google.com>
+ <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com> <ZN5elYQ5szQndN8n@google.com>
+ <ZN9FQf343+kt1YsX@yzhao56-desk.sh.intel.com> <ZPWBM5DDC6MKINUe@yzhao56-desk.sh.intel.com>
+ <ZPeND9WFHR2Xx8BM@google.com>
+In-Reply-To: <ZPeND9WFHR2Xx8BM@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 7 Sep 2023 00:10:13 +0200
-Message-ID: <CABgObfYLuRx5oAfOKM1fNuyRw5BNhe127sbRYhmpoT9MsjMYQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v11 13/29] KVM: Add transparent hugepage support for
- dedicated guest memory
+Date:   Thu, 7 Sep 2023 00:17:12 +0200
+Message-ID: <CABgObfZ7MRShYm79NsH2=WwvTAcaoz5jUSBxPb57KEhotcr_oA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: x86/mmu: .change_pte() optimization in TDP MMU
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 7:13=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Tue, Sep 5, 2023 at 10:18=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
-> On Fri, Jul 21, 2023, Paolo Bonzini wrote:
-> > On 7/19/23 01:44, Sean Christopherson wrote:
-> > > @@ -413,6 +454,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_c=
-reate_guest_memfd *args)
-> > >     u64 flags =3D args->flags;
-> > >     u64 valid_flags =3D 0;
-> > > +   if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> > > +           valid_flags |=3D KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
-> > > +
-> >
-> > I think it should be always allowed.  The outcome would just be "never =
-have
-> > a hugepage" if thp is not enabled in the kernel.
+> Ooh, actually, maybe we could do
 >
-> I don't have a strong preference.  My thinking was that userspace would p=
-robably
-> rather have an explicit error, as opposed to silently running with a misc=
-onfigured
-> setup.
+>         static bool <name_tbd> =3D !IS_ENABLED(CONFIG_KSM);
+>
+> and then cross our fingers that that doesn't regress some other funky set=
+ups.
 
-Considering that is how madvise(MADV_HUGEPAGE) behaves, your patch is
-good. I disagree but consistency is better.
+It probably breaks gvisor-like setups that use MAP_PRIVATE mmap for
+memslots? It would instantly break CoW even if memory is never
+written.
 
 Paolo
 
