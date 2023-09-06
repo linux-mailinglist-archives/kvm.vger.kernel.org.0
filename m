@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B3EE794136
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 18:09:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4137779414D
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 18:19:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241329AbjIFQJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 12:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56230 "EHLO
+        id S242796AbjIFQTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 12:19:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242751AbjIFQJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 12:09:49 -0400
-X-Greylist: delayed 565 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Sep 2023 09:09:19 PDT
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 710D91998
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 09:09:19 -0700 (PDT)
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E9E6742937;
-        Wed,  6 Sep 2023 17:59:52 +0200 (CEST)
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 06 Sep 2023 17:59:51 +0200
-From:   "Stefan Sterz" <s.sterz@proxmox.com>
-To:     "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Krish Sadhukhan" <krish.sadhukhan@oracle.com>,
-        <kvm@vger.kernel.org>
-Cc:     <jmattson@google.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <joro@8bytes.org>
-Subject: Re: [PATCH 2/5] nSVM: Check for optional commands and reserved
- encodings of TLB_CONTROL in nested VMCB
-Message-ID: <b9915c9c-4cf6-051a-2d91-44cc6380f455@proxmox.com>
+        with ESMTP id S230349AbjIFQTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 12:19:03 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4552F198B;
+        Wed,  6 Sep 2023 09:18:59 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 852D8106F;
+        Wed,  6 Sep 2023 09:19:36 -0700 (PDT)
+Received: from [10.57.5.192] (unknown [10.57.5.192])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 512F63F67D;
+        Wed,  6 Sep 2023 09:18:57 -0700 (PDT)
+Message-ID: <5d81a9cd-f96d-bcdb-7878-74c2ead26cfb@arm.com>
+Date:   Wed, 6 Sep 2023 17:18:51 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
-References: <20210920235134.101970-1-krish.sadhukhan@oracle.com>
- <20210920235134.101970-3-krish.sadhukhan@oracle.com>
- <f7c2d5f5-3560-8666-90be-3605220cb93c@redhat.com>
-Content-Language: en-US
-X-Mozilla-Draft-Info: internal/draft; vcard=0; receipt=0; DSN=0; uuencode=0;
- attachmentreminder=0; deliveryformat=0
-X-Identity-Key: id1
-Fcc:    imap://s.sterz%40proxmox.com@webmail.proxmox.com/Sent
-In-Reply-To: <f7c2d5f5-3560-8666-90be-3605220cb93c@redhat.com>
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/2] KVM: x86/mmu: .change_pte() optimization in TDP MMU
+Content-Language: en-GB
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        Christoph Hellwig <hch@lst.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <20230808085056.14644-1-yan.y.zhao@intel.com>
+ <ZN0S28lkbo6+D7aF@google.com> <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com>
+ <ZN5elYQ5szQndN8n@google.com> <ZN9FQf343+kt1YsX@yzhao56-desk.sh.intel.com>
+ <ZPWBM5DDC6MKINUe@yzhao56-desk.sh.intel.com> <ZPd6Y9KJ0FfbCa0Q@google.com>
+ <5ff1591c-d41c-331f-84a6-ac690c48ff5d@arm.com> <ZPiQQ0OANuaOYdIS@google.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <ZPiQQ0OANuaOYdIS@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -51,59 +51,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.09.21 18:55, Paolo Bonzini wrote:
-> On 21/09/21 01:51, Krish Sadhukhan wrote:
->> According to section "TLB Flush" in APM vol 2,
+On 2023-09-06 15:44, Sean Christopherson wrote:
+> On Wed, Sep 06, 2023, Robin Murphy wrote:
+>> On 2023-09-05 19:59, Sean Christopherson wrote:
+>>> And if the driver *doesn't* initialize the data, then the copy is at best pointless,
+>>> and possibly even worse than leaking stale swiotlb data.
 >>
->>      "Support for TLB_CONTROL commands other than the first two, is
->>       optional and is indicated by CPUID Fn8000_000A_EDX[FlushByAsid].
+>> Other than the overhead, done right it can't be any worse than if SWIOTLB
+>> were not involved at all.
+> 
+> Yep.
+> 
+>>> Looking at commit ddbd89deb7d3 ("swiotlb: fix info leak with DMA_FROM_DEVICE"),
+>>> IIUC the data leak was observed with a synthetic test "driver" that was developed
+>>> to verify a real data leak fixed by commit a45b599ad808 ("scsi: sg: allocate with
+>>> __GFP_ZERO in sg_build_indirect()").  Which basically proves my point: copying
+>>> from the source only adds value absent a bug in the owning driver.
 >>
->>       All encodings of TLB_CONTROL not defined in the APM are reserved."
+>> Huh? IIUC the bug there was that the SCSI layer failed to sanitise
+>> partially-written buffers. That bug was fixed, and the scrutiny therein
+>> happened to reveal that SWIOTLB *also* had a lower-level problem with
+>> partial writes, in that it was corrupting DMA-mapped memory which was not
+>> updated by the device. Partial DMA writes are not in themselves indicative
+>> of a bug, they may well be a valid and expected behaviour.
+> 
+> The problem is that the comment only talks about leaking data to userspace, and
+> doesn't say anything about data corruption or the "swiotlb needs to match hardware"
+> justification that Linus pointed out.  I buy both of those arguments for copying
+> data from the original page, but the "may prevent leaking swiotlb content" is IMO
+> completely nonsensical, because if preventing leakage is the only goal, then
+> explicitly initializing the memory is better in every way.
+> 
+> If no one objects, I'll put together a patch to rewrite the comment in terms of
+> mimicking hardware and not corrupting the caller's data.
+
+Sounds good to me. I guess the trouble is that as soon as a CVE is 
+involved it can then get hard to look past it, or want to risk appearing 
+to downplay it :)
+
+>>> IMO, rather than copying from the original memory, swiotlb_tbl_map_single() should
+>>> simply zero the original page(s) when establishing the mapping.  That would harden
+>>> all usage of swiotlb and avoid the read-before-write behavior that is problematic
+>>> for KVM.
 >>
->> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> ---
->>   arch/x86/kvm/svm/nested.c | 19 +++++++++++++++++++
->>   1 file changed, 19 insertions(+)
+>> Depends on one's exact definition of "harden"... Corrupting memory with
+>> zeros is less bad than corrupting memory with someone else's data if you
+>> look at it from an information security point of view, but from a
+>> not-corrupting-memory point of view it's definitely still corrupting memory
+>> :/
 >>
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 5e13357da21e..028cc2a1f028 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -235,6 +235,22 @@ static bool nested_svm_check_bitmap_pa(struct
->> kvm_vcpu *vcpu, u64 pa, u32 size)
->>           kvm_vcpu_is_legal_gpa(vcpu, addr + size - 1);
->>   }
->>   +static bool nested_svm_check_tlb_ctl(struct kvm_vcpu *vcpu
-, u8
->> tlb_ctl)
->> +{
->> +    switch(tlb_ctl) {
->> +        case TLB_CONTROL_DO_NOTHING:
->> +        case TLB_CONTROL_FLUSH_ALL_ASID:
->> +            return true;
->> +        case TLB_CONTROL_FLUSH_ASID:
->> +        case TLB_CONTROL_FLUSH_ASID_LOCAL:
->> +            if (guest_cpuid_has(vcpu, X86_FEATURE_FLUSHBYASID))
->> +                return true;
->> +            fallthrough;
->
-> Since nested FLUSHBYASID is not supported yet, this second set of case
-> labels can go away.
->
-> Queued with that change, thanks.
->
-> Paolo
->
+>> Taking a step back, is there not an argument that if people care about
+>> general KVM performance then they should maybe stop emulating obsolete PC
+>> hardware from 30 years ago, and at least emulate obsolete PC hardware from
+>> 20 years ago that supports 64-bit DMA?
+> 
+> Heh, I don't think there's an argument per se, people most definitely shouldn't
+> be emulating old hardware if they care about performance.  I already told Yan as
+> much.
+> 
+>> Even non-virtualised, SWIOTLB is pretty horrible for I/O performance by its
+>> very nature - avoiding it if at all possible should always be preferred.
+> 
+> Yeah.  The main reason I didn't just sweep this under the rug is the confidential
+> VM use case, where SWIOTLB is used to bounce data from guest private memory into
+> shread buffers.  There's also a good argument that anyone that cares about I/O
+> performance in confidential VMs should put in the effort to enlighten their device
+> drivers to use shared memory directly, but practically speaking that's easier said
+> than done.
 
-Are there any plans to support FLUSHBYASID in the future? It seems
-VMWare Workstation and ESXi require this feature to run on top of KVM
-[1]. This means that after the introduction of this check these VMs fail
-to boot and report missing features. Hence, upgrading to a newer kernel
-version is not an option for some users.
+Indeed a bunch of work has gone into SWIOTLB recently trying to make it 
+a bit more efficient for such cases where it can't be avoided, so it is 
+definitely still interesting to learn about impacts at other levels like 
+this. Maybe there's a bit of a get-out for confidential VMs though, 
+since presumably there's not much point COW-ing encrypted private 
+memory, so perhaps KVM might end up wanting to optimise that out and 
+thus happen to end up less sensitive to unavoidable SWIOTLB behaviour 
+anyway?
 
-Sorry if I misunderstood something or if 
-this is not the right place to
-ask.
-
-[1]: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2008583
-
+Cheers,
+Robin.
