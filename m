@@ -2,131 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4137779414D
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 18:19:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 976727941AB
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 18:46:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242796AbjIFQTE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 12:19:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
+        id S239760AbjIFQqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 12:46:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbjIFQTD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 12:19:03 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4552F198B;
-        Wed,  6 Sep 2023 09:18:59 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 852D8106F;
-        Wed,  6 Sep 2023 09:19:36 -0700 (PDT)
-Received: from [10.57.5.192] (unknown [10.57.5.192])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 512F63F67D;
-        Wed,  6 Sep 2023 09:18:57 -0700 (PDT)
-Message-ID: <5d81a9cd-f96d-bcdb-7878-74c2ead26cfb@arm.com>
-Date:   Wed, 6 Sep 2023 17:18:51 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
+        with ESMTP id S238771AbjIFQqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 12:46:46 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A546D19A8
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 09:46:37 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7ba519f46bso3312936276.3
+        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 09:46:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1694018797; x=1694623597; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kEa2f2r5+8Ye+Y3Rea4IpiSzc5RRjFLgk939Csd8Y4M=;
+        b=Yg24c9SNOTTkFvibF8PFkt7lW4a8rdTwsJwHSCCSBU0Uk/wah0KNuFyiURaL0BZncs
+         r9Umtta4njNB5/A/CUTZitx7/s3hScOxiTavoSJgvifhsQd2X8766hmPidYmqcZ24Uei
+         ahS7a4CFvwyTix78Vr8SYPVjy3jmlKRJPoNCerMP0rhepbWtT4hyN29tbHN6hSOAMfs3
+         PvZvMH/409+1SXWrjMWYDK3rkj6UpT3v/qINVB9Mpe55I9uPXTJnxxyeGgjC9ZBKwl0i
+         KSq3CYSEOW9SQFQ6u9M3PvbzwN032MR8YR8lxBKq92m4I8IUqU00ev6clfeSAgl5bCxo
+         SlHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694018797; x=1694623597;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kEa2f2r5+8Ye+Y3Rea4IpiSzc5RRjFLgk939Csd8Y4M=;
+        b=YqUnMlU5gbFckbSr2KnxMqH0FVKkCLYZSBYE2hz043/dv5sFS0rROU11d5MlkmoYUo
+         j8H/+8A5mWdSp7h7yboUjWOIQzbjYueWXPNQEXgd8FuuJzlmR6SjgfzdOkAwU3hrdTv+
+         rMVB5w15Rm8BFpUiE0I4Xq6vRvHY6yLaZzqrbg+PagdG/d7Mr94LOATYjia2OnwsuWX3
+         cbNKfLNa4Cv5VjFRh5aFuYLPBkhNgDRVvtTpOHX5CFTk0dDHcxR02A2v5RSPnZKDq4/u
+         3qiLXFZ7b10WdDtJnzb7GwwMh6kabVy48bHVfnLojvFensTIiX7LNoaBKCepKwyJpmvP
+         UOuQ==
+X-Gm-Message-State: AOJu0YwYn1EQ9X7Fk38NqH/sgiVrmhSVX/Xfcu5cClV0NpR/sYj4c6+d
+        7n0Wybh4vqvTejlp8IaQfeW2WNRA+rE=
+X-Google-Smtp-Source: AGHT+IEZlBFSJ9GJjDT/u5X8GlcTwrb4NN4jBAxF5f8C8zTwvYzgAueDPpLQsRb43imu0XVwrhKVQbKCp+k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1804:b0:d7a:c85c:725b with SMTP id
+ cf4-20020a056902180400b00d7ac85c725bmr375293ybb.7.1694018796920; Wed, 06 Sep
+ 2023 09:46:36 -0700 (PDT)
+Date:   Wed, 6 Sep 2023 09:46:35 -0700
+In-Reply-To: <5d81a9cd-f96d-bcdb-7878-74c2ead26cfb@arm.com>
+Mime-Version: 1.0
+References: <20230808085056.14644-1-yan.y.zhao@intel.com> <ZN0S28lkbo6+D7aF@google.com>
+ <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com> <ZN5elYQ5szQndN8n@google.com>
+ <ZN9FQf343+kt1YsX@yzhao56-desk.sh.intel.com> <ZPWBM5DDC6MKINUe@yzhao56-desk.sh.intel.com>
+ <ZPd6Y9KJ0FfbCa0Q@google.com> <5ff1591c-d41c-331f-84a6-ac690c48ff5d@arm.com>
+ <ZPiQQ0OANuaOYdIS@google.com> <5d81a9cd-f96d-bcdb-7878-74c2ead26cfb@arm.com>
+Message-ID: <ZPis61o4lkjr0mMU@google.com>
 Subject: Re: [PATCH 0/2] KVM: x86/mmu: .change_pte() optimization in TDP MMU
-Content-Language: en-GB
-To:     Sean Christopherson <seanjc@google.com>
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robin Murphy <robin.murphy@arm.com>
 Cc:     Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, pbonzini@redhat.com,
         Christoph Hellwig <hch@lst.de>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         Linus Torvalds <torvalds@linux-foundation.org>
-References: <20230808085056.14644-1-yan.y.zhao@intel.com>
- <ZN0S28lkbo6+D7aF@google.com> <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com>
- <ZN5elYQ5szQndN8n@google.com> <ZN9FQf343+kt1YsX@yzhao56-desk.sh.intel.com>
- <ZPWBM5DDC6MKINUe@yzhao56-desk.sh.intel.com> <ZPd6Y9KJ0FfbCa0Q@google.com>
- <5ff1591c-d41c-331f-84a6-ac690c48ff5d@arm.com> <ZPiQQ0OANuaOYdIS@google.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <ZPiQQ0OANuaOYdIS@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-09-06 15:44, Sean Christopherson wrote:
-> On Wed, Sep 06, 2023, Robin Murphy wrote:
->> On 2023-09-05 19:59, Sean Christopherson wrote:
->>> And if the driver *doesn't* initialize the data, then the copy is at best pointless,
->>> and possibly even worse than leaking stale swiotlb data.
->>
->> Other than the overhead, done right it can't be any worse than if SWIOTLB
->> were not involved at all.
+On Wed, Sep 06, 2023, Robin Murphy wrote:
+> On 2023-09-06 15:44, Sean Christopherson wrote:
+> > On Wed, Sep 06, 2023, Robin Murphy wrote:
+> > > Even non-virtualised, SWIOTLB is pretty horrible for I/O performance by its
+> > > very nature - avoiding it if at all possible should always be preferred.
+> > 
+> > Yeah.  The main reason I didn't just sweep this under the rug is the confidential
+> > VM use case, where SWIOTLB is used to bounce data from guest private memory into
+> > shread buffers.  There's also a good argument that anyone that cares about I/O
+> > performance in confidential VMs should put in the effort to enlighten their device
+> > drivers to use shared memory directly, but practically speaking that's easier said
+> > than done.
 > 
-> Yep.
-> 
->>> Looking at commit ddbd89deb7d3 ("swiotlb: fix info leak with DMA_FROM_DEVICE"),
->>> IIUC the data leak was observed with a synthetic test "driver" that was developed
->>> to verify a real data leak fixed by commit a45b599ad808 ("scsi: sg: allocate with
->>> __GFP_ZERO in sg_build_indirect()").  Which basically proves my point: copying
->>> from the source only adds value absent a bug in the owning driver.
->>
->> Huh? IIUC the bug there was that the SCSI layer failed to sanitise
->> partially-written buffers. That bug was fixed, and the scrutiny therein
->> happened to reveal that SWIOTLB *also* had a lower-level problem with
->> partial writes, in that it was corrupting DMA-mapped memory which was not
->> updated by the device. Partial DMA writes are not in themselves indicative
->> of a bug, they may well be a valid and expected behaviour.
-> 
-> The problem is that the comment only talks about leaking data to userspace, and
-> doesn't say anything about data corruption or the "swiotlb needs to match hardware"
-> justification that Linus pointed out.  I buy both of those arguments for copying
-> data from the original page, but the "may prevent leaking swiotlb content" is IMO
-> completely nonsensical, because if preventing leakage is the only goal, then
-> explicitly initializing the memory is better in every way.
-> 
-> If no one objects, I'll put together a patch to rewrite the comment in terms of
-> mimicking hardware and not corrupting the caller's data.
+> Indeed a bunch of work has gone into SWIOTLB recently trying to make it a
+> bit more efficient for such cases where it can't be avoided, so it is
+> definitely still interesting to learn about impacts at other levels like
+> this. Maybe there's a bit of a get-out for confidential VMs though, since
+> presumably there's not much point COW-ing encrypted private memory, so
+> perhaps KVM might end up wanting to optimise that out and thus happen to end
+> up less sensitive to unavoidable SWIOTLB behaviour anyway?
 
-Sounds good to me. I guess the trouble is that as soon as a CVE is 
-involved it can then get hard to look past it, or want to risk appearing 
-to downplay it :)
+CoW should be a non-issue for confidential VMs, at least on x86.  SEV and SEV-ES
+are effectively forced to pin memory as writable before it can be mapped into the
+guest.  TDX and SNP and will have a different implementation, but similar behavior.
 
->>> IMO, rather than copying from the original memory, swiotlb_tbl_map_single() should
->>> simply zero the original page(s) when establishing the mapping.  That would harden
->>> all usage of swiotlb and avoid the read-before-write behavior that is problematic
->>> for KVM.
->>
->> Depends on one's exact definition of "harden"... Corrupting memory with
->> zeros is less bad than corrupting memory with someone else's data if you
->> look at it from an information security point of view, but from a
->> not-corrupting-memory point of view it's definitely still corrupting memory
->> :/
->>
->> Taking a step back, is there not an argument that if people care about
->> general KVM performance then they should maybe stop emulating obsolete PC
->> hardware from 30 years ago, and at least emulate obsolete PC hardware from
->> 20 years ago that supports 64-bit DMA?
-> 
-> Heh, I don't think there's an argument per se, people most definitely shouldn't
-> be emulating old hardware if they care about performance.  I already told Yan as
-> much.
-> 
->> Even non-virtualised, SWIOTLB is pretty horrible for I/O performance by its
->> very nature - avoiding it if at all possible should always be preferred.
-> 
-> Yeah.  The main reason I didn't just sweep this under the rug is the confidential
-> VM use case, where SWIOTLB is used to bounce data from guest private memory into
-> shread buffers.  There's also a good argument that anyone that cares about I/O
-> performance in confidential VMs should put in the effort to enlighten their device
-> drivers to use shared memory directly, but practically speaking that's easier said
-> than done.
-
-Indeed a bunch of work has gone into SWIOTLB recently trying to make it 
-a bit more efficient for such cases where it can't be avoided, so it is 
-definitely still interesting to learn about impacts at other levels like 
-this. Maybe there's a bit of a get-out for confidential VMs though, 
-since presumably there's not much point COW-ing encrypted private 
-memory, so perhaps KVM might end up wanting to optimise that out and 
-thus happen to end up less sensitive to unavoidable SWIOTLB behaviour 
-anyway?
-
-Cheers,
-Robin.
+Confidential VMs would benefit purely by either eliminating or reducing the cost
+of "initializing" memory, i.e. by eliminating the memcpy() or replacing it with a
+memset().  I most definitely don't care enough about confidential VM I/O performance
+to try and micro-optimize that behavior, their existence was simply what made me
+look more closely instead of just telling Yan to stop using IDE :-)
