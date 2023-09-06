@@ -2,144 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 633D87938B1
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 11:44:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B11D7938C4
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 11:47:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232279AbjIFJov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 05:44:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39364 "EHLO
+        id S234986AbjIFJrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 05:47:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234398AbjIFJou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 05:44:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C61E11990
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 02:44:19 -0700 (PDT)
+        with ESMTP id S236661AbjIFJrm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 05:47:42 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE081717
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 02:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693993459; x=1725529459;
+  t=1693993655; x=1725529655;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mkpCc6+QjXKML4/zwcgUT94O8KNWCx72unD1h2d8Zz0=;
-  b=M9Lu+kplkrl9lDomFc08zAW2UdcSuC2mM91g6urJ1LMMfODeUxBrcauA
-   jJ0TBte23r4wibFYT3/Qz+/P2Ke3Fj12Phgj/m8tdZa1TxIc+CTlBEGKs
-   vds3I7ttSRvS2EAKD5oV7++ddwGfmnpwbOVZKCf/7NWphfrQ1tXjsIC5s
-   JOxUbuxOl3iATEyVZIliLE2zh18pCJ0xNkon1QEKkRme3B2nWh03nbeHT
-   1n7fiRu8E3iyAeAxwv2AV/aG17LrrtXiw1OQY5M7YTYgIVkcficZ9JcI7
-   uuvNjc4U7HB5Ehow7hsC6IYik49xWqRx8OIZQS/x9ZAhVbPsJp1z17Bo4
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="362045734"
+  bh=PlIj76q9h4GbohlRkiQnz8cc2knHnXUJBaDMsTLT5hY=;
+  b=Ym5S5nOS847lV6ZS0pQ41cfwNYZA6p0oH1nrd31idRiNt3R+aPiP6nbO
+   8XwoXP++D8wcSTVCbm8waqp/85rxlqt9aCg4IZyoHUoaGv/jYs8WcVktk
+   IIReEpcqebVW37/xPBj6AMHOQfgAw6fXU+IBZ9RzmnokeOh1dbRewb3sm
+   CcN779mX0E3O+u0P5tYalIMsYlmMTzOjmL9kJ9fRk8ISqniECyVrxQGg/
+   /uwP2pxwFkKH8m6I0IuDlNKO8nivvJmt6VpDO3OjdXtGfKsNU+8BcJpf+
+   oC4BzHunHPG9+LeynrdC9pqSBxft1grrzuO28g/6hQ5xerWYnmpbDkDTf
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="379733333"
 X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="362045734"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:44:14 -0700
+   d="scan'208";a="379733333"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:47:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="1072319637"
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="915205424"
 X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="1072319637"
+   d="scan'208";a="915205424"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:44:12 -0700
-Message-ID: <276c9031-8d1e-f86b-b5d4-bb9af47e7b88@linux.intel.com>
-Date:   Wed, 6 Sep 2023 17:44:10 +0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 02:47:31 -0700
+Message-ID: <13788236-1fdc-ff6b-c762-f07ba0dc027f@linux.intel.com>
+Date:   Wed, 6 Sep 2023 17:47:29 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
-Subject: Re: [PATCH 5/9] KVM: x86/pmu: Check CPUID.0AH.ECX consistency
+Subject: Re: [PATCH 1/9] KVM: x86/PMU: Don't release vLBR caused by PMI
 Content-Language: en-US
 To:     Xiong Zhang <xiong.y.zhang@intel.com>, kvm@vger.kernel.org
 Cc:     seanjc@google.com, like.xu.linux@gmail.com, zhiyuan.lv@intel.com,
         zhenyu.z.wang@intel.com, kan.liang@intel.com
 References: <20230901072809.640175-1-xiong.y.zhang@intel.com>
- <20230901072809.640175-6-xiong.y.zhang@intel.com>
+ <20230901072809.640175-2-xiong.y.zhang@intel.com>
 From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20230901072809.640175-6-xiong.y.zhang@intel.com>
+In-Reply-To: <20230901072809.640175-2-xiong.y.zhang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+
 On 9/1/2023 3:28 PM, Xiong Zhang wrote:
-> With Arch PMU V5, register CPUID.0AH.ECX indicates Fixed Counter
-> enumeration. It is a bit mask which enumerates the supported Fixed
-> counters.
-> FxCtrl[i]_is_supported := ECX[i] || (EDX[4:0] > i)
-> where EDX[4:0] is Number of continuous fixed-function performance
-> counters starting from 0 (if version ID > 1).
+> vLBR event will be released at vcpu sched-in time if LBR_EN bit is not
+> set in GUEST_IA32_DEBUGCTL VMCS field, this bit is cleared in two cases:
+> 1. guest disable LBR through WRMSR
+> 2. KVM disable LBR at PMI injection to emulate guest FREEZE_LBR_ON_PMI.
 >
-> Here ECX and EDX[4:0] should satisfy the following consistency:
-> 1. if 1 < pmu_version < 5, ECX == 0;
-> 2. if pmu_version == 5 && edx[4:0] == 0, ECX[bit 0] == 0
-> 3. if pmu_version == 5 && edx[4:0] > 0,
->     ecx & ((1 << edx[4:0]) - 1) == (1 << edx[4:0]) -1
+> The first case is guest LBR won't be used anymore and vLBR event can be
+> released, but guest LBR is still be used in the second case, vLBR event
+> can not be released.
 >
-> Otherwise it is mess to decide whether a fixed counter is supported
-> or not. i.e. pmu_version = 5, edx[4:0] = 3, ecx = 0x10, it is hard
-> to decide whether fixed counters 0 ~ 2 are supported or not.
+> Considering this serial:
+> 1. vPMC overflow, KVM injects vPMI and clears guest LBR_EN
+> 2. guest handles PMI, and reads LBR records.
+> 3. vCPU is sched-out, later sched-in, vLBR event is released.
+> 4. Guest continue reading LBR records, KVM creates vLBR event again,
+> the vLBR event is the only LBR user on host now, host PMU driver will
+> reset HW LBR facility at vLBR creataion.
+> 5. Guest gets the remain LBR records with reset state.
+> This is conflict with FREEZE_LBR_ON_PMI meaning, so vLBR event can
+> not be release on PMI.
 >
-> User can call SET_CPUID2 ioctl to set guest CPUID.0AH, this commit
-> adds a check to guarantee ecx and edx consistency specified by user.
->
-> Once user specifies an un-consistency value, KVM can return an
-> error to user and drop user setting, or correct the un-consistency
-> data and accept the corrected data, this commit chooses to
-> return an error to user.
+> This commit adds a freeze_on_pmi flag, this flag is set at pmi
+> injection and is cleared when guest operates guest DEBUGCTL_MSR. If
+> this flag is true, vLBR event will not be released.
 >
 > Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
 > ---
->   arch/x86/kvm/cpuid.c | 27 +++++++++++++++++++++++++++
->   1 file changed, 27 insertions(+)
+>   arch/x86/kvm/vmx/pmu_intel.c |  5 ++++-
+>   arch/x86/kvm/vmx/vmx.c       | 12 +++++++++---
+>   arch/x86/kvm/vmx/vmx.h       |  3 +++
+>   3 files changed, 16 insertions(+), 4 deletions(-)
 >
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index e961e9a05847..95dc5e8847e0 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -150,6 +150,33 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
->   			return -EINVAL;
->   	}
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index f2efa0bf7ae8..3a36a91638c6 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -628,6 +628,7 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+>   	lbr_desc->records.nr = 0;
+>   	lbr_desc->event = NULL;
+>   	lbr_desc->msr_passthrough = false;
+> +	lbr_desc->freeze_on_pmi = false;
+>   }
 >   
-> +	best = cpuid_entry2_find(entries, nent, 0xa,
-> +				 KVM_CPUID_INDEX_NOT_SIGNIFICANT);
-> +	if (best && vcpu->kvm->arch.enable_pmu) {
-> +		union cpuid10_eax eax;
-> +		union cpuid10_edx   edx;
-
-
-Remove the redundant space before edx.
-
-
+>   static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+> @@ -670,6 +671,7 @@ static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>   	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+>   		data &= ~DEBUGCTLMSR_LBR;
+>   		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +		vcpu_to_lbr_desc(vcpu)->freeze_on_pmi = true;
+>   	}
+>   }
+>   
+> @@ -761,7 +763,8 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>   
+>   static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>   {
+> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR) &&
+> +	    !vcpu_to_lbr_desc(vcpu)->freeze_on_pmi)
+>   		intel_pmu_release_guest_lbr_event(vcpu);
+>   }
+>   
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e6849f780dba..199d0da1dbee 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2223,9 +2223,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+>   
+>   		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> -		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+> -		    (data & DEBUGCTLMSR_LBR))
+> -			intel_pmu_create_guest_lbr_event(vcpu);
 > +
-> +		eax.full = best->eax;
-> +		edx.full = best->edx;
+> +		if (intel_pmu_lbr_is_enabled(vcpu)) {
+> +			struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
 > +
-
-We may add SDM quotes as comments here. That makes reader to understand 
-the logic easily.
-
-
-> +		if (eax.split.version_id > 1 &&
-> +		    eax.split.version_id < 5 &&
-> +		    best->ecx != 0) {
-> +			return -EINVAL;
-> +		} else if (eax.split.version_id >= 5) {
-> +			int fixed_count = edx.split.num_counters_fixed;
-> +
-> +			if (fixed_count == 0 && (best->ecx & 0x1)) {
-> +				return -EINVAL;
-> +			} else if (fixed_count > 0) {
-> +				int low_fixed_mask = (1 << fixed_count) - 1;
-> +
-> +				if ((best->ecx & low_fixed_mask) != low_fixed_mask)
-> +					return -EINVAL;
-> +			}
+> +			lbr_desc->freeze_on_pmi = false;
+> +			if (!lbr_desc->event && (data & DEBUGCTLMSR_LBR))
+> +				intel_pmu_create_guest_lbr_event(vcpu);
 > +		}
-> +	}
 > +
->   	/*
->   	 * Exposing dynamic xfeatures to the guest requires additional
->   	 * enabling in the FPU, e.g. to expand the guest XSAVE state size.
+>   		return 0;
+>   	}
+>   	case MSR_IA32_BNDCFGS:
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index c2130d2c8e24..9729ccfa75ae 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -107,6 +107,9 @@ struct lbr_desc {
+>   
+>   	/* True if LBRs are marked as not intercepted in the MSR bitmap */
+>   	bool msr_passthrough;
+> +
+> +	/* True if LBR is frozen on PMI */
+> +	bool freeze_on_pmi;
+>   };
+>   
+>   /*
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
