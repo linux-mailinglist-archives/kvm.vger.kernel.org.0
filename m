@@ -2,152 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB055793665
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 09:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1E37793694
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 09:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233700AbjIFHiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 03:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38480 "EHLO
+        id S233218AbjIFHvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 03:51:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233755AbjIFHiY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 03:38:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0502FCC
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 00:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1693985853;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u+G7SCEl+RQAMOAXPLnGsTEkk0k/teSfrbOvDIMaHxM=;
-        b=BI2nLzildci29SgYpdlqUGYHNjIer3zaeQmbcpQgoE9zovWceVmS0VgCsck0zS0SIkzGAg
-        Hjr1MYazP1i6ytRQ9tvbNTxkR3lb7mWT3WLMyJl8hDVJMoHYlOxRC8hBZNchmkYXDKZkXw
-        ydm6gxB2rW5v99ukTbTSGggVpn0gYpk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-x7o9iqtLPoqnBUG-PZ4jag-1; Wed, 06 Sep 2023 03:37:32 -0400
-X-MC-Unique: x7o9iqtLPoqnBUG-PZ4jag-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31f46ccee0fso245435f8f.1
-        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 00:37:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693985850; x=1694590650;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u+G7SCEl+RQAMOAXPLnGsTEkk0k/teSfrbOvDIMaHxM=;
-        b=BnKC8+N+nf+zkdCp1STCvBBxLXWjpO8iKWWfaWT7qSCF4E2RfbY2ST68MbFzKOH3WR
-         B3QEKrvR4I8e2ximNx0OuhwfycSOl+xUnHWTXXz3g3jMT6yZGI7FnSLzwIHnll9llZjL
-         O2Fkf4v373G+rECAXyV1Rdxi4GOsJw3qN+DqKOzC4jdBDl8Da+c5fwBQx8NQO9JoCw1Q
-         tc0e0y0xOkAuv74Y9gC4kwEwXEg4MxY7m780CokX5FIhi6vi/bKIBX3wEMtmz4q5l3gE
-         nG5y3h4A9JD3l3nFkoEaqgU/SdWsxdSheZsyFECVfT/QOo4eK6OZeEidqxUxfW2ni1Oh
-         5ChQ==
-X-Gm-Message-State: AOJu0YxLak6I51aiM0NrvPRTr3dRbCwCqzgn3PHtJ497Eh9crn06Cggh
-        NzGFNXp+aXHFGWpej580KSGqdCoaEVuDtgRRiGJZmXqFBMB3nFL3IExh3hZq399cWGagjobJd38
-        u+vHurNX8v3wp
-X-Received: by 2002:a05:6000:3c5:b0:31f:651f:f84d with SMTP id b5-20020a05600003c500b0031f651ff84dmr696717wrg.12.1693985850719;
-        Wed, 06 Sep 2023 00:37:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1DSLXnwgNrv0EcncvQZhdHSbHRQqVhH+cXARLZ7z4S+sxICbZle9GKSg+Vg9thxtE+EUG8g==
-X-Received: by 2002:a05:6000:3c5:b0:31f:651f:f84d with SMTP id b5-20020a05600003c500b0031f651ff84dmr696701wrg.12.1693985850322;
-        Wed, 06 Sep 2023 00:37:30 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70c:6c00:92a4:6f8:ff7e:6853? (p200300cbc70c6c0092a406f8ff7e6853.dip0.t-ipconnect.de. [2003:cb:c70c:6c00:92a4:6f8:ff7e:6853])
-        by smtp.gmail.com with ESMTPSA id m3-20020a5d56c3000000b0031762e89f94sm19274463wrw.117.2023.09.06.00.37.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Sep 2023 00:37:29 -0700 (PDT)
-Message-ID: <411a4c35-4f65-c166-0eb0-994b8e39f9c6@redhat.com>
-Date:   Wed, 6 Sep 2023 09:37:28 +0200
+        with ESMTP id S230137AbjIFHvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 03:51:09 -0400
+Received: from mail.venturelinkbiz.com (mail.venturelinkbiz.com [51.195.119.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9901EC9
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 00:51:02 -0700 (PDT)
+Received: by mail.venturelinkbiz.com (Postfix, from userid 1002)
+        id 96BC746315; Wed,  6 Sep 2023 07:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=venturelinkbiz.com;
+        s=mail; t=1693986660;
+        bh=JBV4b8UUo1MSngn/QBoedt1Dv52bT8rWeq4R22MtJMs=;
+        h=Date:From:To:Subject:From;
+        b=H6xmDIEcVxsLG4tSerxoeb/awcLfgPEUycFmbWLxh1vX+nmjnEohEmBN+mvo+QPzv
+         sTQ7afF/YaA9aHCM6IfQf2J2r5cXTh2lXWiqmby/G8PehasRsdxjoouUZA5bybDCPF
+         r8oJzZlRIjIBxht+IPABjRTJvNT6yElKltqxuZdW0Bp4s2ay+y/tovrOd/nqFuceoK
+         efcdcd/xVdfqsBrrRL99eX1uWpdhujaQAgdXtkB/nm20fs6H35y+MAU7PCZvudjMxr
+         L3ktyxff1yBg3KBNdhFSH5/OWLLsDqpf60sbr4F3YkExaMcGPNw8tbrLHzaYOxpeP7
+         XrsUDjbvC8fzQ==
+Received: by mail.venturelinkbiz.com for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 07:50:43 GMT
+Message-ID: <20230906064500-0.1.28.604s.0.uyjnco17gm@venturelinkbiz.com>
+Date:   Wed,  6 Sep 2023 07:50:43 GMT
+From:   "Michal Rmoutil" <michal.rmoutil@venturelinkbiz.com>
+To:     <kvm@vger.kernel.org>
+Subject: =?UTF-8?Q?Efektivn=C3=AD_sledov=C3=A1n=C3=AD_a_optimalizace_v=C3=BDroby_pro_va=C5=A1i_spole=C4=8Dnost?=
+X-Mailer: mail.venturelinkbiz.com
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 0/2] KVM: s390: add counters for vsie performance
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230904130140.22006-1-nrb@linux.ibm.com>
- <a41f6fc29032d345b3c2f24e19f32282dd627e5c.camel@linux.ibm.com>
- <169390280362.97137.14761686200997364254@t14-nrb>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <169390280362.97137.14761686200997364254@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H2,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS,URIBL_CSS_A,
+        URIBL_DBL_SPAM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ***
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.09.23 10:33, Nico Boehr wrote:
-> Quoting Niklas Schnelle (2023-09-05 09:53:40)
->> On Mon, 2023-09-04 at 15:01 +0200, Nico Boehr wrote:
->>> v3:
->>> ---
->>> * rename te -> entry (David)
->>> * add counters for gmap reuse and gmap create (David)
->>>
->>> v2:
->>> ---
->>> * also count shadowing of pages (Janosch)
->>> * fix naming of counters (Janosch)
->>> * mention shadowing of multiple levels is counted in each level (Claudio)
->>> * fix inaccuate commit description regarding gmap notifier (Claudio)
->>>
->>> When running a guest-3 via VSIE, guest-1 needs to shadow the page table
->>> structures of guest-2.
->>>
->>> To reflect changes of the guest-2 in the _shadowed_ page table structures,
->>> the _shadowing_ sturctures sometimes need to be rebuilt. Since this is a
->>> costly operation, it should be avoided whenever possible.
->>>
->>> This series adds kvm stat counters to count the number of shadow gmaps
->>> created and a tracepoint whenever something is unshadowed. This is a first
->>> step to try and improve VSIE performance.
->>>
->>> Please note that "KVM: s390: add tracepoint in gmap notifier" has some
->>> checkpatch --strict findings. I did not fix these since the tracepoint
->>> definition would then look completely different from all the other
->>> tracepoints in arch/s390/kvm/trace-s390.h. If you want me to fix that,
->>> please let me know.
->>>
->>> While developing this, a question regarding the stat counters came up:
->>> there's usually no locking involved when the stat counters are incremented.
->>> On s390, GCC accidentally seems to do the right thing(TM) most of the time
->>> by generating a agsi instruction (which should be atomic given proper
->>> alignment). However, it's not guaranteed, so would we rather want to go
->>> with an atomic for the stat counters to avoid losing events? Or do we just
->>> accept the fact that we might loose events sometimes? Is there anything
->>> that speaks against having an atomic in kvm_stat?
->>>
->>
->> FWIW the PCI counters (/sys/kernel/debug/pci/<dev>/statistics) use
->> atomic64_add(). Also, s390's memory model is strong enough that these
->> are actually just normal loads/stores/adds (see
->> arch/s390/include/asm/atomic_ops.h) with the generic atomic64_xx()
->> adding debug instrumentation.
-> 
-> In KVM I am mostly concerned about the compiler since we just do counter++
-> - right now this always seems to result in an agsi instruction, but that's
-> of course not guaranteed.
+Dobr=C3=A9 r=C3=A1no,
 
-Right, the compiler can do what it wants with that. The question is if 
-we care about a slight imprecision, though.
+m=C3=A1te mo=C5=BEnost sledovat stav ka=C5=BEd=C3=A9ho stroje a v=C3=BDro=
+bn=C3=ADho procesu z kancel=C3=A1=C5=99e, konferen=C4=8Dn=C3=AD m=C3=ADst=
+nosti nebo dokonce z domova =C4=8Di na cest=C3=A1ch =E2=80=93 na va=C5=A1=
+em telefonu?
 
-Probably not worth the trouble for something that never happens and is 
-only used for debugging purposes.
+Poskytujeme rychle implementovateln=C3=BD a snadno pou=C5=BEiteln=C3=BD n=
+=C3=A1stroj, kter=C3=BD zachyt=C3=AD i n=C4=9Bkolikasekundov=C3=BD mikrop=
+rostoj a okam=C5=BEit=C4=9B p=C5=99epo=C4=8D=C3=ADt=C3=A1 vyu=C5=BEit=C3=AD=
+ stroje v kontextu dan=C3=A9 v=C3=BDrobn=C3=AD zak=C3=A1zky.
 
-Using atomics would be cleaner, though.
+Kdykoli vid=C3=ADte stav objedn=C3=A1vky a jste informov=C3=A1ni o p=C5=99=
+=C3=ADpadn=C3=A9m sn=C3=AD=C5=BEen=C3=AD efektivity. Syst=C3=A9m s=C3=A1m=
+ analyzuje data a p=C5=99ipravuje cenn=C3=A9 reporty, co=C5=BE oper=C3=A1=
+tor=C5=AFm umo=C5=BE=C5=88uje soust=C5=99edit se na v=C3=BDrobn=C3=AD c=C3=
+=ADl.
 
--- 
-Cheers,
+C=C3=ADl je jednoduch=C3=BD: jeden pohled =E2=80=93 cel=C3=A1 tov=C3=A1rn=
+a. =C4=8Cek=C3=A1m na odpov=C4=9B=C4=8F, jestli vid=C3=ADte mo=C5=BEnost =
+vyu=C5=BEit=C3=AD takov=C3=A9ho n=C3=A1stroje ve va=C5=A1=C3=AD firm=C4=9B=
+=2E
 
-David / dhildenb
 
+Pozdravy
+Michal Rmoutil
