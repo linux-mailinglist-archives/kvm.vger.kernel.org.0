@@ -2,148 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB25E793F0F
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 16:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2F25793F1B
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 16:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241745AbjIFOi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 10:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49210 "EHLO
+        id S241809AbjIFOlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 10:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230408AbjIFOiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 10:38:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65CC8F
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 07:37:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694011059;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lg2fMO06PnQXvtf+z6WSmsHkPqrM9ZYU8QTTgt0YWXQ=;
-        b=ERKRAldWV71Crxd7M/NHhpJUzk0VS8YnWPA76b/rO9+FyNw9zk1ohVsD8cIPt/yU5H/lXt
-        RBIA1KaKNQ0x2vM9nNEGR0IW8RHJKfKdgI+YL3AcXNq0E9XtUTrgVFnyZIU8ExSbB3TpBC
-        xaTmVExdPRWkwLjsVhTCwcA/FVrp2H0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-JsMCZvvBP1mNqcCruV_DCA-1; Wed, 06 Sep 2023 10:37:37 -0400
-X-MC-Unique: JsMCZvvBP1mNqcCruV_DCA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-31f49c34d1fso1695008f8f.0
-        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 07:37:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694011056; x=1694615856;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lg2fMO06PnQXvtf+z6WSmsHkPqrM9ZYU8QTTgt0YWXQ=;
-        b=Kb7Gde1dJN2QAS4h+h6H6ZWFVYetl4ZY1pI9ZnQaEA1R6PMS9FfF4dJYt4S2QppOEI
-         +xbqbxjmfB1JwDvjWWdVDKt4A54raJt9Zcwz3+ZvZiDDnUCyx3vownk+6uPP+MOSyTTy
-         YCP54ztG21RyNkcKpJ9M9V4A4gNVH/beVH5aDRGVYfAmgOLbqtnBB/V7i2o2KVKqZpcq
-         aKxGRyIeydsSDmcHWjfWUcQtyhMje0ec7MqNt0a7n7od5cxG4Fa02MdWyiuihh9/yA7H
-         1kHZjieqcW8OmM6jJ8xTwmFo6BL+dH1ceJ3UGWqhSxC3GOM4kgwcblUa5BsJf9J4S1Qv
-         XlgQ==
-X-Gm-Message-State: AOJu0Ywv3W9PIzsYFlzOA0OR1IiwQQyLOLOaySZMXs5dfJ/7gqRj8pBF
-        oyJAmBWwsDltGpgFTQbbaTnVrX6+o4yHVh1FZkeHicWWKA5uahFsbnFU/A0h9I/K+SbMgjyfFpj
-        vo3iBRNA42b56
-X-Received: by 2002:adf:dc8c:0:b0:317:5351:e428 with SMTP id r12-20020adfdc8c000000b003175351e428mr2259902wrj.4.1694011056323;
-        Wed, 06 Sep 2023 07:37:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6FP2trIpa9SyMRqQVDHpkv6KR2bWRmBHizszpCaWuoC2c7TXCDXjhpfQSjz/N58+wSW/0iw==
-X-Received: by 2002:adf:dc8c:0:b0:317:5351:e428 with SMTP id r12-20020adfdc8c000000b003175351e428mr2259886wrj.4.1694011055968;
-        Wed, 06 Sep 2023 07:37:35 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70c:6c00:92a4:6f8:ff7e:6853? (p200300cbc70c6c0092a406f8ff7e6853.dip0.t-ipconnect.de. [2003:cb:c70c:6c00:92a4:6f8:ff7e:6853])
-        by smtp.gmail.com with ESMTPSA id j17-20020a5d5651000000b003197efd1e7bsm20671464wrw.114.2023.09.06.07.37.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Sep 2023 07:37:35 -0700 (PDT)
-Message-ID: <de45c2d4-13b6-d022-e32a-ea5296e04b1d@redhat.com>
-Date:   Wed, 6 Sep 2023 16:37:34 +0200
+        with ESMTP id S241785AbjIFOll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 10:41:41 -0400
+Received: from torres.zugschlus.de (torres.zugschlus.de [IPv6:2a01:238:42bc:a101::2:100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26553172C;
+        Wed,  6 Sep 2023 07:41:36 -0700 (PDT)
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+        (envelope-from <mh+linux-kernel@zugschlus.de>)
+        id 1qdtib-006SiW-2q;
+        Wed, 06 Sep 2023 16:41:21 +0200
+Date:   Wed, 6 Sep 2023 16:41:21 +0200
+From:   Marc Haber <mh+linux-kernel@zugschlus.de>
+To:     Tony Lindgren <tony@atomide.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-kernel@vger.kernel.org,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux KVM <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Linux 6.5 speed regression, boot VERY slow with anything systemd
+ related
+Message-ID: <ZPiPkSY6NRzfWV5Z@torres.zugschlus.de>
+References: <ZO2piz5n1MiKR-3-@debian.me>
+ <ZO3sA2GuDbEuQoyj@torres.zugschlus.de>
+ <ZO4GeazfcA09SfKw@google.com>
+ <ZO4JCfnzRRL1RIZt@torres.zugschlus.de>
+ <ZO4RzCr/Ugwi70bZ@google.com>
+ <ZO4YJlhHYjM7MsK4@torres.zugschlus.de>
+ <ZO4nbzkd4tovKpxx@google.com>
+ <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
+ <ZPEPFJ8QvubbD3H9@google.com>
+ <20230901122431.GU11676@atomide.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 04/16] kvm: Return number of free memslots
-Content-Language: en-US
-From:   David Hildenbrand <david@redhat.com>
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        kvm@vger.kernel.org
-References: <20230825132149.366064-1-david@redhat.com>
- <20230825132149.366064-5-david@redhat.com>
- <1d68ca74-ce92-ca5f-2c8b-e4567265e2fc@linaro.org>
- <ee1bbc2b-3180-ab79-4f0d-6159577b2164@redhat.com>
-Organization: Red Hat
-In-Reply-To: <ee1bbc2b-3180-ab79-4f0d-6159577b2164@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230901122431.GU11676@atomide.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.09.23 16:14, David Hildenbrand wrote:
-> On 29.08.23 00:26, Philippe Mathieu-Daudé wrote:
->> On 25/8/23 15:21, David Hildenbrand wrote:
->>> Let's return the number of free slots instead of only checking if there
->>> is a free slot. While at it, check all address spaces, which will also
->>> consider SMM under x86 correctly.
->>>
->>> Make the stub return UINT_MAX, such that we can call the function
->>> unconditionally.
->>>
->>> This is a preparation for memory devices that consume multiple memslots.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>     accel/kvm/kvm-all.c      | 33 ++++++++++++++++++++-------------
->>>     accel/stubs/kvm-stub.c   |  4 ++--
->>>     hw/mem/memory-device.c   |  2 +-
->>>     include/sysemu/kvm.h     |  2 +-
->>>     include/sysemu/kvm_int.h |  1 +
->>>     5 files changed, 25 insertions(+), 17 deletions(-)
->>
->>
->>> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
->>> index 235dc661bc..f39997d86e 100644
->>> --- a/accel/stubs/kvm-stub.c
->>> +++ b/accel/stubs/kvm-stub.c
->>> @@ -109,9 +109,9 @@ int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
->>>         return -ENOSYS;
->>>     }
->>>     
->>> -bool kvm_has_free_slot(MachineState *ms)
->>> +unsigned int kvm_get_free_memslots(void)
->>>     {
->>> -    return false;
->>> +    return UINT_MAX;
->>
->> Isn't it clearer returning 0 here and keeping kvm_enabled() below?
-> 
-> I tried doing it similarly to vhost_has_free_slot().
-> 
+On Fri, Sep 01, 2023 at 03:24:31PM +0300, Tony Lindgren wrote:
+> Yes two somewhat minimal qemu command lines for working and failing test
+> case sure would help to debug this.
 
-I'll leave the kvm_enabled() check in place, looks cleaner.
+I have spent some time with that but have failed yet. I would appreciate
+help about which qemu option I'd need to get a serial console configured
+AND to get access to this serial console, alternatively get access to a
+VNC console.
+
+I have the following qemu start script so far (command line pulled from
+libvirt log and simplified):
+export LC_ALL=C
+export QEMU_AUDIO_DRV=spice
+
+/usr/bin/qemu-system-x86_64 \
+-name guest=lasso2,debug-threads=on \
+-S \
+-machine pc-i440fx-2.1,accel=kvm,usb=off,dump-guest-core=off \
+-m 768 \
+-realtime mlock=off \
+-smp 1,sockets=1,cores=1,threads=1 \
+-uuid 7954f7a6-9418-4ab5-9571-97ccbea263ec \
+-no-user-config \
+-rtc base=utc,driftfix=slew \
+-global kvm-pit.lost_tick_policy=delay \
+-no-hpet \
+-no-shutdown \
+-nodefaults \
+-global PIIX4_PM.disable_s3=1 \
+-global PIIX4_PM.disable_s4=1 \
+-boot strict=on \
+-device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
+-device ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pci.0,multifunction=on,addr=0x5 \
+-device ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pci.0,addr=0x5.0x1 \
+-device ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pci.0,addr=0x5.0x2 \
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
+-drive file=/dev/prom/lasso2,format=raw,if=none,id=drive-virtio-disk0,cache=none,discard=unmap,aio=native \
+-device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on \
+-chardev pty,id=charserial0 \
+-device isa-serial,chardev=charserial0,id=serial0 \
+-device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x8 \
+-msg timestamp=on \
+-device qxl-vga,id=video0,ram_size=67108864,vram_size=67108864,vram64_size_mb=0,vgamem_mb=16,max_outputs=1,bus=pci.0,addr=0x2 \
+-vnc :1
+
+The quoted qemu command line will listen on port 5901, but trying to
+connect with tightvncviewer or vinagre yields an immediate RST. 
+
+If I cannot see the host boot, I cannot debug, and if I cannot type into
+grub, I cannot find out whether removing the serial console from the
+kernel command line fixes the issue. I have removed the network
+interface to simplify things, so I need a working console.
+
+With my tools I have found out that it really seems to be related to the
+CPU of the host. I have changed my VM definition to "copy host CPU
+configuration to VM" in libvirt and have moved this very VM (image and
+settings) to hosts with a "Ryzen 5 Pro 4650G" and to an "Intel Xeon
+E3-1246" where they work flawlessly, while on both APUs I have available
+("AMD G-T40E" and "AMD GX-412TC SOC") the regression in 6.5 shows. And
+if I boot other VMs on the APUs with 6.5 the issue comes up. It is a
+clear regression since going back to 4.6's serial code solves the issue
+on the APUs.
+
+Greetings
+Marc
+
 
 -- 
-Cheers,
-
-David / dhildenb
-
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
