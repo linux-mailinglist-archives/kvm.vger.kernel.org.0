@@ -2,134 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33140793516
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 08:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CE4B79353A
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 08:25:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241166AbjIFGEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 02:04:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33308 "EHLO
+        id S233132AbjIFGZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 02:25:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbjIFGEM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 02:04:12 -0400
-Received: from out-221.mta1.migadu.com (out-221.mta1.migadu.com [IPv6:2001:41d0:203:375::dd])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A32CFD
-        for <kvm@vger.kernel.org>; Tue,  5 Sep 2023 23:04:06 -0700 (PDT)
-Date:   Wed, 6 Sep 2023 06:03:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1693980244;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sz1dEz51amxgl8u4MbjhfSRIzo+wFIPdJiGVXiPN2oc=;
-        b=EJ5wecrMHeWERHJYByFrVHm6ApeXu0QDMUV8Vyw/HszWIrBM7WApWu25d5lv5Pf8Faj24E
-        ClTt/toFuAW9prJz9vlPUmsu4JEsdV9RXKcExO3d2fQJgx/uvTAArm9d/KqmCAeyppT2BK
-        ahN0cWfPM/4lxez1Pd3dBNCogpd97fU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-Message-ID: <ZPgWT6SfUHqPOjpg@linux.dev>
-References: <20230821212243.491660-1-jingzhangos@google.com>
- <20230821212243.491660-6-jingzhangos@google.com>
- <878ra3pndw.wl-maz@kernel.org>
- <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
- <86a5uef55n.wl-maz@kernel.org>
- <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
- <CAAdAUtj386UcK+BBJDf+_00yYd1cbiQigSdAbssaJBmb+v32ng@mail.gmail.com>
+        with ESMTP id S229614AbjIFGZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 02:25:07 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A449B;
+        Tue,  5 Sep 2023 23:25:03 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-4018af1038cso31534385e9.0;
+        Tue, 05 Sep 2023 23:25:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693981502; x=1694586302; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DSDz3ym8Sv1A+SBkcuToJiss6n9XN70R7Q8nsUTLerA=;
+        b=dcJtPzkjqBnf/Zx40d5vY+I7TwlztXZAzSyiVTHKEUOpjZ4QxTHp5OrxeC0dBq3sRR
+         nuY18PBWvB3qFNxc5lgv9OxKk3nc26l37pyjxUFy65K3OTfhxQ+Akki0vWVoHO3pY0Nj
+         QD/2hkaLdib3SWneVXpp+4CKZezBZ4mnkZmsuwUwIpz9RatAn66CqmiwPxgqU+Qtoska
+         0vcIvbKtJf1zxeSwLLSDwPs+9Lyb+L/J4XfRaUo6vjrtUT+4dsH0oefe7ILDTN3tZO0P
+         Bs5q2F7zQavDm5wCAbTrjZG1UJAuzP7XnFvlmtM6NaIUAvOPMNB+Rz9PNd6xU9AX73LO
+         RACw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693981502; x=1694586302;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DSDz3ym8Sv1A+SBkcuToJiss6n9XN70R7Q8nsUTLerA=;
+        b=Wn7j9tANaA8uKYTSDk7NhYyBt00SbY003PGhpla/zGBGw0Zq1T84twCJqhZ5IrhCYv
+         8rAX1CBxY8wkqOY1pycdniJ4O+SCDNF7AvIl/LAJlwt8rcpU+w73zwcUMqw7xP8BeOU1
+         0k/DPGNKWaUy+vAncjsKuDz5iUkKSDiq/zc53Fw/QwWHRC1ck7IO8z9J/a60jvDG1E14
+         8RASW1b4ClnTEOUhvSco1lBKYfr0Me2XuFjhozBX0KgM1vkSHTccX+InH9Wo944RcCQe
+         kV1s1RvAyNFYnbnbyt6mC7LBRd/SB/I8YAA1CY+wO6Ge+esVB6J1fHuYhZlMtx+EQ2pc
+         Z/5g==
+X-Gm-Message-State: AOJu0Ywp0rEo0ESkWQNvoDe/5WJW04x9W2Ya+BcT7IAL8yS7El3NTsKW
+        P3Bh3rVBi1ZpsH9iDzuIzIkTLxHo+pCUpFbhXVCOKMGLEKQ=
+X-Google-Smtp-Source: AGHT+IHTxHuiiPVHl4imd9Zri02xIEIsDW74V9lLYJBzR4D6e5rD4QFkx/eiTJPoW5kqtW+CvnHUc1n9l7/sWb7H//M=
+X-Received: by 2002:a05:600c:c3:b0:3fb:e2af:49f6 with SMTP id
+ u3-20020a05600c00c300b003fbe2af49f6mr1249933wmm.39.1693981502070; Tue, 05 Sep
+ 2023 23:25:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAdAUtj386UcK+BBJDf+_00yYd1cbiQigSdAbssaJBmb+v32ng@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+From:   Hao Peng <flyingpenghao@gmail.com>
+Date:   Wed, 6 Sep 2023 14:24:50 +0800
+Message-ID: <CAPm50aLd5ZbAqd8O03fEm6UhHB_svfFLA19zBfgpDEQsQUhoGw@mail.gmail.com>
+Subject: [PATCH] KVM: X86: Reduce calls to vcpu_load
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 05, 2023 at 07:13:35PM -0700, Jing Zhang wrote:
+From: Peng Hao <flyingpeng@tencent.com>
 
-[...]
+The call of vcpu_load/put takes about 1-2us. Each
+kvm_arch_vcpu_create will call vcpu_load/put
+to initialize some fields of vmcs, which can be
+delayed until the call of vcpu_ioctl to process
+this part of the vmcs field, which can reduce calls
+to vcpu_load.
 
-> > > > I removed sanity checks across multiple fields after the discussion
-> > > > here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
-> > > > I might have misunderstood the discussion. I thought we'd let VMM do
-> > > > more complete sanity checks.
-> > >
-> > > The problem is that you don't even have a statement about how this is
-> > > supposed to be handled. What are the rules? How can the VMM author
-> > > *know*?
-> > >
-> > > That's my real issue with this series: at no point do we state when an
-> > > ID register can be written, what are the rules that must be followed,
-> > > where is the split in responsibility between KVM and the VMM, and what
-> > > is the expected behaviour when the VMM exposes something that is
-> > > completely outlandish to the guest (such as the M-profile debug).
-> > >
-> > > Do you see the issue? We can always fix the code. But once we've
-> > > exposed that to userspace, there is no going back. And I really want
-> > > everybody's buy-in on that front, including the VMM people.
-> >
-> > Understood.
-> > Looks like it would be less complicated to have KVM do all the sanity
-> > checks to determine if a feature field is configured correctly.
-> > The determination can be done by following rules:
-> > 1. Architecture constraints from ARM ARM.
-> > 2. KVM constraints. (Those features not exposed by KVM should be read-only)
-> > 3. VCPU features. (The write mask needs to be determined on-the-fly)
-> 
-> Does this sound good to you to have all sanity checks in KVM?
+Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 21 ++++++++++++++++-----
+ 2 files changed, 17 insertions(+), 5 deletions(-)
 
-I would rather we not implement exhaustive checks in KVM, because we
-*will* get them wrong. I don't believe Marc is asking for exhaustive
-sanity checks in KVM either, just that we prevent userspace from
-selecting features we will _never_ emulate (like the MProfDbg example).
-You need very clear documentation for the usage pattern and what the
-VMM's responsibilities are (like obeying the ARM ARM).
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 9320019708f9..2f2dcd283788 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -984,6 +984,7 @@ struct kvm_vcpu_arch {
+        /* Flush the L1 Data cache for L1TF mitigation on VMENTER */
+        bool l1tf_flush_l1d;
 
-While we're here, I'll subject the both of you to one of the ongoing
-thoughts I've had with the whole configurable CPU model UAPI. Ideally
-we should get to the point where all emulation and trap configuration is
-solely determined from the ID register values of the VM.
++       bool initialized;
+        /* Host CPU on which VM-entry was most recently attempted */
+        int last_vmentry_cpu;
 
-I'm a bit worried that this mixes poorly with userspace system register
-accesses, though. As implemented, nothing stops userspce from
-interleaving ID register writes with other system registers that might
-be conditional on a particular CPU feature. For example, disabling the
-PMU via DFR0 and then writing to the PMCs. Sure, this could be hacked
-around by making PMCs visible to userspace only when the ID register
-hides the feature, but we may be painting ourselves in a corner w.r.t.
-the addition of new features.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4fd08a5e0e98..a3671a54e850 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -317,7 +317,20 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
+ u64 __read_mostly host_xcr0;
 
-One way out would be to make the ID registers immutable after
-the first system register write outside of the ID register range.
-Changes under the hood wouldn't be too terrible; AFAICT it involves
-hoisting error checking into kvm_vcpu_init_check_features() and
-deferring kvm_vcpu_reset() to the point the ID regs are immutable.
+ static struct kmem_cache *x86_emulator_cache;
++static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz);
 
-I somewhat like the clear order of operations, and it _shouldn't_ break
-existing VMMs since they just save/restore the KVM values verbatim. Of
-course, this requires some very clear documentation for VMMs that want
-to adopt the new UAPI.
++static inline bool kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
++{
++       return vcpu->arch.initialized;
++}
++
++static void kvm_vcpu_initial_reset(struct kvm_vcpu *vcpu)
++{
++       kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
++       kvm_vcpu_reset(vcpu, false);
++       kvm_init_mmu(vcpu);
++       vcpu->arch.initialized = true;
++}
+ /*
+  * When called, it means the previous get/set msr reached an invalid msr.
+  * Return true if we want to ignore/silent this failed msr access.
+@@ -5647,6 +5660,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
 
--- 
-Thanks,
-Oliver
+        vcpu_load(vcpu);
+
++       if (!kvm_vcpu_initialized(vcpu))
++               kvm_vcpu_initial_reset(vcpu);
++
+        u.buffer = NULL;
+        switch (ioctl) {
+        case KVM_GET_LAPIC: {
+@@ -11930,11 +11946,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+        vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+        kvm_xen_init_vcpu(vcpu);
+        kvm_vcpu_mtrr_init(vcpu);
+-       vcpu_load(vcpu);
+-       kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
+-       kvm_vcpu_reset(vcpu, false);
+-       kvm_init_mmu(vcpu);
+-       vcpu_put(vcpu);
+        return 0;
+
+ free_guest_fpu:
+--
+2.31.1
