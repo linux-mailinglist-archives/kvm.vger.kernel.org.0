@@ -2,149 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74A92793573
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 08:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779A3793578
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 08:41:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241831AbjIFGlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 02:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
+        id S241952AbjIFGlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 02:41:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235180AbjIFGlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 02:41:13 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A32CFC;
-        Tue,  5 Sep 2023 23:41:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693982464; x=1725518464;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RsYbEoQMorIDKJhNn8tK8oAOQZCO4LcPFT+r0555VJo=;
-  b=mACK08PcQZ6QFb8DTYnjGCTiegS0UssxdBC6Z5gOIZ28NLj62CCCzMC7
-   hiyZPcTgXFzvInKJ/tGdGqfEckpShzcjktnOFdx5wXFqKQZYrDjoj5om3
-   iBmYWPW/aMxWSrcFMSJzGe4tMqbaMpvord20TYij1Nxzyg+y1G9xc4zgp
-   cA/lISdYgmSi3zOKapi747+IsbybdBho5yWB0oPm6oHehdzw05OnaYbBi
-   +KsBZcUZt9cO3lZwdOP6eji9usPeUIhgWhFipb/FQoguwVGpGJBaInIhZ
-   8cFHPOmfBOfKhupTPULrETn6RyyTIs/bDcL3bMN/zVKsy21FFALrrNEyH
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="375890324"
-X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="375890324"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 23:41:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="691192510"
-X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="691192510"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.11.250]) ([10.93.11.250])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 23:41:02 -0700
-Message-ID: <10bdaf6d-1c5c-6502-c340-db3f84bf74a1@intel.com>
-Date:   Wed, 6 Sep 2023 14:40:59 +0800
+        with ESMTP id S241926AbjIFGlv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 02:41:51 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C310BCFD
+        for <kvm@vger.kernel.org>; Tue,  5 Sep 2023 23:41:34 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-31c3df710bdso2584691f8f.1
+        for <kvm@vger.kernel.org>; Tue, 05 Sep 2023 23:41:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1693982493; x=1694587293; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CDrXgceSRA6nWxSqvxXedEAqqqoYTPyIJVyrWo9VKf8=;
+        b=Lu+UYlga9SneyBsf/voQWHNOp476n6uzhXTP1EYiM5sCPq620kG69QXpZRE98j5Wrm
+         TN8fM/ocUylv4qjKC9AdZhBJkAT/pcL5TtlZb7liB5Np1mQaMUygeFCz3S0oq/rPjy/3
+         e5z6I6YrQEc06svLucP5y8i26FHIKUm0n+Xtwdq8715DB7Vp8AlJLRiBCLU3K71kFvno
+         B5Q63+AqILSNim4lIHxEiqbtImtlB/FNdSB7m9hRU/DS01sDZgJxgthVBuuFKrNPPyTs
+         g4TQCifUnlErVh5xWmKsdyHlhmEnRTu6Q+QDxxWGg/RfJkmV7QmGqgFMStQJAllAIZs5
+         IC/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693982493; x=1694587293;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CDrXgceSRA6nWxSqvxXedEAqqqoYTPyIJVyrWo9VKf8=;
+        b=Wr7xcy73w0pwlCNxmaFVf6cIMUJOEAgd5xzHNLRYD1owLIbaRXyqeos9UDo+5tOTXP
+         WFgDBqAf6Ug+9eCbq7uq/Kj9FrqRM+OnXaSknq+5or6Jwy0byfeJxXsTssQuA+IgTTav
+         ahtwYI38OD9X70ZcxmFQiJQAZisJbkOF//E8I5SljmhwVsNou/4vOwrlmmLaFLhMKaC2
+         yxlz+0w8Djr+wKpArQhkwswr6YbHGJRuWivTrhO5eG9sRC3GM4luA8EKdV+G8BDy12Sc
+         UuTD7lDnEVnS2+yN+lhD2vxIvfSmqSePQmGF9haDynoR23DfBWyXkV0eTY9MwCNrff5q
+         pg3g==
+X-Gm-Message-State: AOJu0YwODDlGeYNUIa4djOkv1aAf6ICvf3iZ1S45P64jqGsvpCcl70Kw
+        1PNPQ5u2y37iINXh0s9bg1Pm8Q==
+X-Google-Smtp-Source: AGHT+IGX0i5tAkcMDPeTKOwlfoH2ZHWjyq3skD2KqOfwczWV54QzQ/+ExzzCATYleUpKxouAAc9edA==
+X-Received: by 2002:a5d:6b49:0:b0:31a:ed75:75d6 with SMTP id x9-20020a5d6b49000000b0031aed7575d6mr1639449wrw.15.1693982493183;
+        Tue, 05 Sep 2023 23:41:33 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id m14-20020a056000174e00b0031f3b04e7cdsm11905338wrf.109.2023.09.05.23.41.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 23:41:32 -0700 (PDT)
+Date:   Wed, 6 Sep 2023 08:41:31 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <xiaobo55x@gmail.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Lei Wang <lei4.wang@intel.com>, Like Xu <likexu@tencent.com>,
+        Peter Gonda <pgonda@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 2/8] KVM: arm64: selftest: Split arch_timer test code
+Message-ID: <20230906-6996fca9840e6de7b75692ec@orel>
+References: <cover.1693659382.git.haibo1.xu@intel.com>
+ <c87337cfd7fb135e2efed589360a78c26a402eac.1693659382.git.haibo1.xu@intel.com>
+ <20230904-11e853ffe3d8e9cf9ec6079d@orel>
+ <CAJve8onwjBQcbVy75qyOF3A51-T0WyBkmeCV_wOZvzaPcrBVFg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.0
-Subject: Re: [PATCH] KVM: X86: Reduce calls to vcpu_load
-To:     Hao Peng <flyingpenghao@gmail.com>, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org
-References: <CAPm50aLd5ZbAqd8O03fEm6UhHB_svfFLA19zBfgpDEQsQUhoGw@mail.gmail.com>
-Content-Language: en-US
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CAPm50aLd5ZbAqd8O03fEm6UhHB_svfFLA19zBfgpDEQsQUhoGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJve8onwjBQcbVy75qyOF3A51-T0WyBkmeCV_wOZvzaPcrBVFg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/6/2023 2:24 PM, Hao Peng wrote:
-> From: Peng Hao <flyingpeng@tencent.com>
+On Wed, Sep 06, 2023 at 10:14:52AM +0800, Haibo Xu wrote:
+> On Mon, Sep 4, 2023 at 9:24 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+> >
+> > On Sat, Sep 02, 2023 at 08:59:24PM +0800, Haibo Xu wrote:
+...
+> > > +
+> > > +#include "kvm_util.h"
+> > > +
+> > > +#define NR_VCPUS_DEF            4
+> > > +#define NR_TEST_ITERS_DEF       5
+> > > +#define TIMER_TEST_PERIOD_MS_DEF    10
+> > > +#define TIMER_TEST_ERR_MARGIN_US    100
+> > > +#define TIMER_TEST_MIGRATION_FREQ_MS    2
+> > > +
+> > > +#define msecs_to_usecs(msec)    ((msec) * 1000LL)
+> >
+> > I'd move the above to include/test_util.h
+> >
 > 
-> The call of vcpu_load/put takes about 1-2us. Each
-> kvm_arch_vcpu_create will call vcpu_load/put
-> to initialize some fields of vmcs, which can be
-> delayed until the call of vcpu_ioctl to process
-> this part of the vmcs field, which can reduce calls
-> to vcpu_load.
+> Yes, msecs_to_usecs() macro should be a common API for all the tests.
+> 
+> > > +
+> > > +#define GICD_BASE_GPA    0x8000000ULL
+> > > +#define GICR_BASE_GPA    0x80A0000ULL
+> >
+> > These defines belong in aarch64/arch_timer.c
+> >
+> 
+> These 2 defines were also defined in other test cases, shall we move them
+> to an aarch64 specific header file? Maybe
+> tools/testing/selftests/kvm/include/aarch64/gic.h?
 
-what if no vcpu ioctl is called after vcpu creation?
+Even though currently all the aarch64 tests that use the gic are using
+these defines for the base addresses, each test is free to choose whatever
+base addresses it likes. I'd just move them back to aarch64/arch_timer.c
+for now. Consolidating them into shared, default base addresses, if done
+at all, is work for another series.
 
-And will the first (it was second before this patch) vcpu_load() becomes 
-longer? have you measured it?
-
-I don't think it worth the optimization unless a strong reason.
-
-> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  1 +
->   arch/x86/kvm/x86.c              | 21 ++++++++++++++++-----
->   2 files changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 9320019708f9..2f2dcd283788 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -984,6 +984,7 @@ struct kvm_vcpu_arch {
->          /* Flush the L1 Data cache for L1TF mitigation on VMENTER */
->          bool l1tf_flush_l1d;
-> 
-> +       bool initialized;
->          /* Host CPU on which VM-entry was most recently attempted */
->          int last_vmentry_cpu;
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4fd08a5e0e98..a3671a54e850 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -317,7 +317,20 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
->   u64 __read_mostly host_xcr0;
-> 
->   static struct kmem_cache *x86_emulator_cache;
-> +static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz);
-> 
-> +static inline bool kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-> +{
-> +       return vcpu->arch.initialized;
-> +}
-> +
-> +static void kvm_vcpu_initial_reset(struct kvm_vcpu *vcpu)
-> +{
-> +       kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
-> +       kvm_vcpu_reset(vcpu, false);
-> +       kvm_init_mmu(vcpu);
-> +       vcpu->arch.initialized = true;
-> +}
->   /*
->    * When called, it means the previous get/set msr reached an invalid msr.
->    * Return true if we want to ignore/silent this failed msr access.
-> @@ -5647,6 +5660,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> 
->          vcpu_load(vcpu);
-> 
-> +       if (!kvm_vcpu_initialized(vcpu))
-> +               kvm_vcpu_initial_reset(vcpu);
-> +
->          u.buffer = NULL;
->          switch (ioctl) {
->          case KVM_GET_LAPIC: {
-> @@ -11930,11 +11946,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->          vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
->          kvm_xen_init_vcpu(vcpu);
->          kvm_vcpu_mtrr_init(vcpu);
-> -       vcpu_load(vcpu);
-> -       kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
-> -       kvm_vcpu_reset(vcpu, false);
-> -       kvm_init_mmu(vcpu);
-> -       vcpu_put(vcpu);
->          return 0;
-> 
->   free_guest_fpu:
-> --
-> 2.31.1
-
+Thanks,
+drew
