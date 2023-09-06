@@ -2,245 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35E03793345
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 03:18:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ECD6793320
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 03:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236791AbjIFBSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Sep 2023 21:18:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
+        id S237164AbjIFBCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Sep 2023 21:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233249AbjIFBSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Sep 2023 21:18:16 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538D01AB;
-        Tue,  5 Sep 2023 18:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693963089; x=1725499089;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=UxXBSt2yvKyUjNb49TVlzh+fwWGir7bcKlWlTurdCS8=;
-  b=R0Chf5M0ibWgvc1n5eIHL+idtG15byBskXkBZcPtdKGPw4HodQ1nMgND
-   0y25NAHzjjGTvxIUCJwftpwd8tiMUkw4Q8DOZ2jggh12AOCrvRPBl0iZs
-   NvKfrqNGWwvcwZe8HG4tasOQpUHw+rd7AW5LdhrYjKckJFg1DdcsPx9KZ
-   VS+C1xoY464Se+Jp1Gwvn6YQD/RU9VHqnqgye4afcKSDz6YLTR50p22KS
-   ovYP3V01QvJ8oKZ3Hy16GLoCgFZDq7ivGDG0ow7+Orgp2NE9Pd+R9aP9d
-   bUecyJb8rjxOCorIoBtIAxeBLGDjqjDSMrXtsANc5Wr9c6lSYy5pHlT6G
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="367158131"
-X-IronPort-AV: E=Sophos;i="6.02,230,1688454000"; 
-   d="scan'208";a="367158131"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 18:18:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="741323783"
-X-IronPort-AV: E=Sophos;i="6.02,230,1688454000"; 
-   d="scan'208";a="741323783"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Sep 2023 18:18:08 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 5 Sep 2023 18:18:08 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 5 Sep 2023 18:18:08 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 5 Sep 2023 18:18:08 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 5 Sep 2023 18:18:07 -0700
+        with ESMTP id S230062AbjIFBCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Sep 2023 21:02:54 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5161A3;
+        Tue,  5 Sep 2023 18:02:51 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HqsfGSW061npU5vt5RDQ0OH7MDqk5v+CeCY/Ht83ZQxngZvD6xsaYYf5Z4s4EAZPKHjorf4JyUe43Vh/OjIPOsWjdVTo42aHdNnS0SSEFnxYEW3UHodJmRicrKmBT+NYonxl/rcrCXQ+HCYhPUILOQTTwk4t0jFFJHk3ANnBRcgAX9hb6Lh1wm7V5Zalg/y99Di7Kbi4rpm6rn/RsVS2wUERed/NJLt1i9OEruT2dLboygemilTOpoOW7Os23dxkAoVhLdoWHHk9MCQnKCS9FDFCliV4n2EQddBSqZqwa/G3Fm4bLMqQqwRApe+tOxHQzmO615glo77tHjDlw9eKgQ==
+ b=Zk3VZVhKVyjfN9eqRbK3jyV+UwZY2WeAlYvHPyJeKxJisPF14vsxLm4GuOMH5bTdFSzomLw3tPLJ/hoDcxJj3P0SgcQjSnkVKK9JhqNqwK5z87zjBI4DDjMezOZzWOQaPFQobRNJV9c2bsz5s5+bw5xZyj/7HFhjlZS4ZRBLlYPkmrmCpqO2ME8NO4Ztpb1pN+UYxm29VtZc0HtHiW9EujDLc2gCtYnDLgQBrMvssn4iZp9lRBVif3LpBX1h5SfOLhMqfbw+EecWFpGb5AEBfhWhE3RpYO2O9qxcdYrgox9oBPx91WbixjNBQSozWburQwQ3YDQ8XC4q+zngeBkLUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LBHmA36JBGTOIYCuheuthQvXMZ999WCl5WQfQrnAAs0=;
- b=nHKxwBpdoQ00G/FizXMjJcBqMc7xRwoO3GawxBi7jEieWu+sJK0zUccMTKA2kz53CK/jOvQGszHtdQLJDPV6I1EXry1/r0+5CFhH8ZB1ajhAu5TjNDcFCjxKrx2GijWTb8s+VC9uuxtoIgGzt30c7pFQfYn283mjkz/qnVZFNpeLT3x2cHr+FwNdVW3udgXd0EHkXck2TEzd/bhFLZ1x4ignO9xhsd/GBhLT1ghbmmLJoBkj50FRUZKcmRTFvJCTNJV0r2xPIdp9PcjlzNuy1rH95s3lbHIyjxr8OzB23N5vR600V2LaRDHzBjFtgNP29Fgz2wnqp4aFenUbikf+Gw==
+ bh=+kIpEQM3YHYY0mSzn7nZjQV73WkDD6JAd/Jx3b/2VLo=;
+ b=nm5dVOPprtowz65LpyxZ455MX2E11+IyZWiGpSqdkIvaT+yA1iPIDEelW9h+KRmUGetPCwKBMYhKo0zCNpag/zax7BrMbd5ZCq9Ji4REXuRmua/aTdeRlNSLq6Kb/OMpXkKAMe3S2QTOwYdgNWBIkfBHdlm4wXMDAB6GoHR7/DyKyciIjsNuLGuBVifH4ZRklJULtn6HDaA5hMslDiuGQ3bNFFkq2B4+e1wa9bJ2FZV7NorG797/O0ixqzEVDVolFSo+l/JNslMDQ8LBjQsMUSHnhtAe7bgTqlloWbIo/CYEKug4O61q4SYy7FmVfYAlBS6KUr4pfdgs9JI3gO6syg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+kIpEQM3YHYY0mSzn7nZjQV73WkDD6JAd/Jx3b/2VLo=;
+ b=3OsGnkdVozyk1hh5A8rJnv4c+rMpA7cxEWQbvTca5FeHDDK8EZMM1shx4G5y23DzrYluZSywAyNoEQpSPJlLaVwTwIk6kxsc8HqmkSFHsWuBsKcowG5J2phJXuIaQddV41PFevvu331tBxo7SUfdAIQzW17fL7+o3G8TZ6bGym8=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- BY1PR11MB8080.namprd11.prod.outlook.com (2603:10b6:a03:528::22) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MN0PR12MB5931.namprd12.prod.outlook.com (2603:10b6:208:37e::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33; Wed, 6 Sep
- 2023 01:18:04 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602%6]) with mapi id 15.20.6745.030; Wed, 6 Sep 2023
- 01:18:04 +0000
-Date:   Wed, 6 Sep 2023 08:50:26 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <chao.gao@intel.com>, <kai.huang@intel.com>,
-        <robert.hoo.linux@gmail.com>, <yuan.yao@linux.intel.com>
-Subject: Re: [PATCH v4 12/12] KVM: x86/mmu: convert kvm_zap_gfn_range() to
- use shared mmu_lock in TDP MMU
-Message-ID: <ZPfM0kr+/sx2cae5@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20230714064656.20147-1-yan.y.zhao@intel.com>
- <20230714065631.20869-1-yan.y.zhao@intel.com>
- <ZOkeZi/Xx+1inver@google.com>
- <ZPWHtUh9SZDc4EoN@yzhao56-desk.sh.intel.com>
- <ZPesX2xp6rGZsxlE@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZPesX2xp6rGZsxlE@google.com>
-X-ClientProxiedBy: KL1P15301CA0036.APCP153.PROD.OUTLOOK.COM
- (2603:1096:820:6::24) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ 2023 01:02:48 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
+ 01:02:47 +0000
+Message-ID: <f17a483b-3a75-9268-392b-69340d9121b8@amd.com>
+Date:   Tue, 5 Sep 2023 18:02:45 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH] vfio/pds: Limit Calling dev_dbg function to
+ CONFIG_PCI_ATS
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        oushixiong <oushixiong@kylinos.cn>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230905024028.940377-1-oushixiong@kylinos.cn>
+ <20230905083119.27cf3c03.alex.williamson@redhat.com>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230905083119.27cf3c03.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH7PR17CA0001.namprd17.prod.outlook.com
+ (2603:10b6:510:324::25) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|BY1PR11MB8080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 515e1635-4dc4-49c4-eace-08dbae771e4f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MN0PR12MB5931:EE_
+X-MS-Office365-Filtering-Correlation-Id: c8446fd1-4467-4d46-7f77-08dbae74fc68
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aPBOvU7XKQ+mGzY/67SLAKIVOrM/WyvoS7SCEqsRHywXZ5Ap4PyJOrOKj9jgQ23hEs8oFY+6TSK/18sQlvfOQeDOc8h59NSvvM9o6AgdawBcrFxI6lLnSZfCtJHWs7VOJWuLOdaV1N4HA2DbckWtZFCUYyuWr/RUxJyaFDFdFBtI1rfshq7LfSgXUWk1jSYFSAV1Y5G1JfF9TTG9aEuDU/3u9miBhvOh8iJvzQtJpArjV1W3VcykYCdruqTHyoIuei7zGtVZqkjaBZbWAps28WZHmAKA2T0/2gLuu9YonimJmVrkqNaU2P1zdcSKB1/g5Tti8IZkS00Hh0U9rnlAD6CzIwz8q1FR15pajnPehRZYtq12MB3UfP2DICG4q22WtmWbTi2eKpdxulMb7MP3Z4KdFWui8PYi+Lj5mh9WfdJAYAuIjMyfRs8KyDXVGSqxCmKdqpxfG6cWSA0REyNnBCKGYc8g+FLKwAlWZtpzuzxrvocbSlP/otscl0ihBiPuadNPNLUstYrlHMDbeA1xo4hEMb5koL9Q7e6lmpp4l0QA6FI4dFp4R0OJRXsXvdht
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(39860400002)(346002)(376002)(1800799009)(451199024)(186009)(2906002)(66476007)(8676002)(4326008)(8936002)(3450700001)(6916009)(41300700001)(5660300002)(316002)(6506007)(66946007)(66556008)(86362001)(82960400001)(6666004)(478600001)(6512007)(6486002)(26005)(38100700002)(83380400001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: IzcBzHJEVxs+Wi0FN+Jh2oDJWUIc2ckPggpWfvcRwzZhjkwLBDb4rDzFFuaDnvExBP7rLeMutLs3d0xshfIRMh6zyHbRfxocrrlUYOJ7WR2VWKqKz7tFdvvdP6P/aogTucVuNigEqAKjS4gwhJKym7pkXVIL/7SwCZcpyz6rDGn/Gp88DXtfIDowU0wQ0UGbIZO8IyAKcIs48yBlVeCP43YOrExe6FpS6OMTDRO3q2d0FTZPkirkVXFFgFpafI7l/Iu8SLaQ6mqu3Fl7atXbpu/V52M4VAGVAx5hTvjXqEOw2QP2+M3igUyzXTFZWkA68mD7XqDYXIktFaTsPkAlriZ2g4GWqlQGL2K5ut2cjh34u8zxoqvbXDoS7YUxy+GhawIOFe9y9ko9i21k6oQn+MSsfM91dVDhJRVXMEFi/7/asriCOPYUdpUPzc24jKIeJQaZVIXctx1GTXt/r+QlaMpm65gvMa6qKgA49ZqpPz40WQ1nXQ0crdUz3hZe6RzJ7CkPvHMYxh7jyXosuzbSwt/S96rfZNzfKLTBqiZlFRw+OhqlAN9Oru9ZvoGQ0XZUO2yx351ZgJddIjdyelC8etT6JYOKZXavhv6wVh0bPq4DlcgLKvDicoin36zKj8f5URTZCub3GMAsuaFNrxGCXQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(39860400002)(346002)(376002)(451199024)(1800799009)(186009)(31686004)(5660300002)(8936002)(110136005)(66476007)(36756003)(54906003)(66556008)(316002)(66946007)(2906002)(4326008)(8676002)(41300700001)(6486002)(6506007)(26005)(6512007)(53546011)(38100700002)(478600001)(83380400001)(2616005)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Waknth3LEOPELQLljX+VbgRt+es/djZKkiINeHQvBDbuBe7x1St1qDl1ZT/7?=
- =?us-ascii?Q?gBXPFwYxXWmOX/YfhE7s71dyvFMFCI3vMvJBNew7u0yiwqygtGE+Hi25iBSY?=
- =?us-ascii?Q?TXxKBIQ8n0F7adU7jn4BF8VID22uQ7qogHQAaK3s9+kIs8KvNd0yJn2Ya89J?=
- =?us-ascii?Q?0PKfYfsuEBGApJ+pyUx0FPNuAX5/YF9hIr/Ddaj9vEkHA3Eup2bdBckawywq?=
- =?us-ascii?Q?H3Je6EgS+uaJNuU00TUS1/q9A4YDp1/Qm7MNwwOWkWkmUIeylUPMkFYjNLoK?=
- =?us-ascii?Q?ci47uP0jiNdfUc8triHu8Kipizyrbx6E4TUgLnwcy/UNcwFPZB4PSxf1UxvX?=
- =?us-ascii?Q?6EHiW+M6PiOfnGg6m8vUO1CfO6hNr0hMvXyIGzz+rFJ+Ic2CMB1Suabf4rSZ?=
- =?us-ascii?Q?YCgLSP66WSGnAHKlJqWKmtUUL66/25hXFCDPHftYAUpREXkoiE/kA1/7czqo?=
- =?us-ascii?Q?uQTfu44sjX+pn5din6IXGOgSQhMIa7u5slp+GXGm5HgXT7njKjI20x7uGYne?=
- =?us-ascii?Q?SJ5jHE+bYxFn+FRY/s8mUzv3nnPcsx1kdaqqDkEtIWfrnXYjrPExHriYt8Qf?=
- =?us-ascii?Q?N7xzBtzr9D9sQJj+T+vXceTI4x5HtsLoS/AkTsx/zynoZ8f9rMypfg7WjVNI?=
- =?us-ascii?Q?k/ccWb0+AIoYxIgc1tAbpN5coz66QDVuhuCE4VycmRbPsSayU/DlLcSTEC0X?=
- =?us-ascii?Q?S+OyKNfBuQaQBx+HlKcjT01kAdzOJbw9XzTg1raH0OR7hW7QPkARnGp3cWRr?=
- =?us-ascii?Q?8aefY/8SIcbQJtlubg0CNnXmftK0k53WaeenoaQh5kF8UhNkmc3ZPp5lHNI4?=
- =?us-ascii?Q?hBTSSQ1OM/g4MN9aokPZtV8hoA/HsJGvDAafDWnscOO3LTH6D5oBf6VRJ3b9?=
- =?us-ascii?Q?BaU63v0k79AD9U9TtV30i9y0xS0XLK/Ut3+jIDeH1go4cYMuE+juWVp+wIs9?=
- =?us-ascii?Q?HwKiRfDvCJx3+oLZlGb74uKzMcmSzXAP+yeQR35wRPIBC88uY57rh6C3VQ9b?=
- =?us-ascii?Q?ee2M2W65YdBPc+UVIbYzNw2aiDGJDR5aDN3ViU9XWGeS6gMM8r6PIkrbBVpm?=
- =?us-ascii?Q?HZjbPPKcLtDjwnAAEIY3iz7WbvvnB3lM/tlbZQLLt6Dx5vP0pQ+6MfFsyRy8?=
- =?us-ascii?Q?CTIEhhZvoiHpx97H2QqUdMChE3a27ixi9soMRgGMAsiKzJrWGyrBh2er4MWp?=
- =?us-ascii?Q?N2YbxkfW+F/e3W9wDvHNTluefvrW6mlZ2HaS1qzkpim3r/LPeklci9Fp6RyA?=
- =?us-ascii?Q?sRaOyUb0l1kSdMoYlld/IXl4SBOsDJES2xf5DQzTSzc7kcrm3mbgTt+4OAVK?=
- =?us-ascii?Q?H5ktu7So6VVNY9D3ECu79IVwQ080yw1EaUNJEV0lfQtoAbbnKURKq5InwX6L?=
- =?us-ascii?Q?opr2mAXsQWLnupTPG523wX4vcP/pxNseehAG4CNOwFigYu/OoXskQdxPGL8f?=
- =?us-ascii?Q?/LFGhl2ZeIHsqwdRDya0kKVSGnDfRykBkGE7wjfk7pQGpsukmdW9eIjjTMWS?=
- =?us-ascii?Q?Z9FTIN3WDNUlWjnGu3reZr2pKnF2a34lEp3Q35sZ7/XAALT7tK3co2zKVINC?=
- =?us-ascii?Q?fAFZnePoeh3S5JM6BVyFV3Cg5RCFUi8CB0RelufK?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 515e1635-4dc4-49c4-eace-08dbae771e4f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QnUyaUlJaUdWdzdlZnhteTFra29QNFd1MERZQzBQTEdnaTFJemI2ZGowcjg0?=
+ =?utf-8?B?QlhVNUd0MTdCemk1N0J0TUFUb1RZVWdHUzA1Ris2SnRXZ1krZnFWL0lPcVBJ?=
+ =?utf-8?B?aTlFVGdiTmdnRWRmUGNKVXpiTy80Q3EvemxpNmdHcVA5TUltaEFVZ2pFcXVi?=
+ =?utf-8?B?QkdrV3F6b1ROZ0ZhME1LK0VGRkdWRE9NMXpJQlhtaWVXTW5ZQWRCUTVma0NZ?=
+ =?utf-8?B?alVtR2hkQWc1OTNKVWJBNUZmT0x5TmJLY005MkRBMnQzSWh5dTZaaEUrQjVj?=
+ =?utf-8?B?dndlY0UyazlHTGxVNi91Wm5qZ0JKVElNVk9oWFRFcHA0ZFV1djVvcVUrM2Nv?=
+ =?utf-8?B?eTYzZkZoSU9ObllvRm1EZXV3MHVCOUVlQ0lOUC9ycGtTYUFDTWNVVEhJTE9Y?=
+ =?utf-8?B?UlN0eEpyRG00K090MnhxaVBZYzYzUFNUTVJWOGEzUG9kS1pySmRmUEJmU1dv?=
+ =?utf-8?B?dElqWXpzOHVkMjFnYWVkZDJjRFcrdG9RQm5zNzZPVUFlMWZxRG9neEZxc2c2?=
+ =?utf-8?B?eFB1OGk2c21JcUlTUEp4VmRaZ0FRdWM2NlpmTnZTZEpZMXdHL1RVUEMzRmxi?=
+ =?utf-8?B?aU1zY1pLV1FqcW9LVmZWZ3dYbG5qNHlhRUNGcmtVeEZmQXFaRFFSSngxNit1?=
+ =?utf-8?B?MjVSL3llYzYwQnVLUUlwbERrRzRwY2Q0L1FPaXVqeXJQWlN4N2FsUmNnSjhM?=
+ =?utf-8?B?NCtFSEdpK3VlUHVPU2ExYlVGTlF1NllxVHpOSDlWNUpGeTFPTks3TlJ0QVkw?=
+ =?utf-8?B?MUJqSnI0bXFGVG9mYnZubzNPN0dDMzVPak50d1hEeENqV0pONTlpRnlQQ0p2?=
+ =?utf-8?B?MUVKZlhJbXdWZE0rekMzcDVKKzdmNDJWdGJoMmNzSktSS1dUQVVMdXIxTVlI?=
+ =?utf-8?B?UnlPOTE0OU9oSDN6QXdkT2xwRE8rRnUvZnArZmlSRm1lSllrK1d2bTBmeCtq?=
+ =?utf-8?B?VnFSUHZvaXVIUHVDc2dLZTdlWWV4eTFEN2QvT2VoMmVDTXFkOGpsNG5yM2ZZ?=
+ =?utf-8?B?aHYxTC9ZbWp4QXNRZ3VON2Jabld0R1ovdHd2MlpVdXFkUFlCN1NQQlBSUEda?=
+ =?utf-8?B?RzlTNG4weGxDMnQ2emU5QXJYSFJaN0pvN3hFT1c5bkZmcURHRXU2M01KMmlW?=
+ =?utf-8?B?eVB1enFhSWhQN0pucjh0YmxRanpZTHV3MlVLTkNteHNHbnJQZUpyV3B2aXlB?=
+ =?utf-8?B?aWFoMGh1cEpheng4eVN2VnIvU1pFTEVJeVk1NmRwMG1SOUh6Z3g5VkhLb1pV?=
+ =?utf-8?B?S3BSVzFucDVKWDJHZStxQmVKL0g2bWc3RkEwa1NwTHZoOVlhUm9HQ1dZcmw5?=
+ =?utf-8?B?N2ExNmw4aWkxT29DNFdZZC9VRkNCem92blFCeG1wc1RibFJVV2UxQ1A5eXVl?=
+ =?utf-8?B?QjhHTElMNDFjemVHWk9XMk4rYS9keEE2Y3F1cm40SDR4Vjg1c0NlL0xpNm9M?=
+ =?utf-8?B?SU5MNDNLdkNIYTMxQlJXWXZoNmRTR1Fzc3ZFRW5sNjlaR3lLWDRhaUtsQzU2?=
+ =?utf-8?B?dUtXdXg1VnJTNmdiNitxSFQ3UTVBamRHSjlUczVGam91NW5LT3Yvb2FldEUy?=
+ =?utf-8?B?RnNqenhucCtHZTVUbVYyNGRlU2pVMGVKaTlyOTVMbEltclRWeU1JRWVTakJU?=
+ =?utf-8?B?VWlQQmlKMm1VbnlxZGRDS3M4MWROaitJSEVsbFRjWmFiUk9pK2kxZmdFN21S?=
+ =?utf-8?B?Rk9tQ0ZqVlVqU2Z6MysyckhlMGpHRVoxeks1QVdJSVdMeEUwRlVMNHNqYmt5?=
+ =?utf-8?B?WDE0a0tLTmVtNXhnQmhwVzlIaTRDSFBLWWJVWHJoTUIvbk5Jd2NhdlFNN2Rz?=
+ =?utf-8?B?TDd2UWJpTE5vRWx4cEE2LzJvZmtzKzd1VmVYRTduMHFTN1NNM09HMUFjQzly?=
+ =?utf-8?B?K25iLzlBM0RhdnFYQisyaUJZTEEvOW5KSms4blhIeVB2ZjlQbENLZzl1RHpF?=
+ =?utf-8?B?eXlTWG1GYXh5SnAwMURzUEc1WGFuVi9SdUhOUkVMVDZlenhkdFloZzlPMkxy?=
+ =?utf-8?B?SEtGNzNhQ2loUVhsRFE5RTlEUERCY1JmRHZYbHdNKzc4blhhcEEvd0ZQQzhv?=
+ =?utf-8?B?cXJER0R4d0tzWGhkL1V6ZFJuVWJyWTBvNEZSb2UzVWNrc2NiV2JCQVdYZVZt?=
+ =?utf-8?Q?fbso1e9t6kiEdaZir6b8lBIkN?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c8446fd1-4467-4d46-7f77-08dbae74fc68
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 01:18:04.3636
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 01:02:47.8636
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HnIPql0NkTTRAq9WCuWrGKuESh3ePp2xZ/L/EBOXv0xRDybwmWBVt/pekc3txPh9ORlTLX5EFwlKDdlYgPVnLw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8080
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: qspnLiYV6PvRbSSOrOWEcQ+ao22ocA4bIT0SvT1mhFqtK3ZpxyXnSkPIyedQYbtuTFtDbISGBWlP7QD5PZ0nRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5931
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 05, 2023 at 03:31:59PM -0700, Sean Christopherson wrote:
-> On Mon, Sep 04, 2023, Yan Zhao wrote:
-> > On Fri, Aug 25, 2023 at 02:34:30PM -0700, Sean Christopherson wrote:
-> > > On Fri, Jul 14, 2023, Yan Zhao wrote:
-> > > > Convert kvm_zap_gfn_range() from holding mmu_lock for write to holding for
-> > > > read in TDP MMU and allow zapping of non-leaf SPTEs of level <= 1G.
-> > > > TLB flushes are executed/requested within tdp_mmu_zap_spte_atomic() guarded
-> > > > by RCU lock.
-> > > > 
-> > > > GFN zap can be super slow if mmu_lock is held for write when there are
-> > > > contentions. In worst cases, huge cpu cycles are spent on yielding GFN by
-> > > > GFN, i.e. the loop of "check and flush tlb -> drop rcu lock ->
-> > > > drop mmu_lock -> cpu_relax() -> take mmu_lock -> take rcu lock" are entered
-> > > > for every GFN.
-> > > > Contentions can either from concurrent zaps holding mmu_lock for write or
-> > > > from tdp_mmu_map() holding mmu_lock for read.
-> > > 
-> > > The lock contention should go away with a pre-check[*], correct?  That's a more
-> > Yes, I think so, though I don't have time to verify it yet.
-> > 
-> > > complete solution too, in that it also avoids lock contention for the shadow MMU,
-> > > which presumably suffers the same problem (I don't see anything that would prevent
-> > > it from yielding).
-> > > 
-> > > If we do want to zap with mmu_lock held for read, I think we should convert
-> > > kvm_tdp_mmu_zap_leafs() and all its callers to run under read, because unless I'm
-> > > missing something, the rules are the same regardless of _why_ KVM is zapping, e.g.
-> > > the zap needs to be protected by mmu_invalidate_in_progress, which ensures no other
-> > > tasks will race to install SPTEs that are supposed to be zapped.
-> > Yes. I did't do that to the unmap path was only because I don't want to make a
-> > big code change.
-> > The write lock in kvm_unmap_gfn_range() path is taken in arch-agnostic code,
-> > which is not easy to change, right?
+On 9/5/2023 7:31 AM, Alex Williamson wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Yeah.  The lock itself isn't bad, especially if we can convert all mmu_nofitier
-> hooks, e.g. we already have KVM_MMU_LOCK(), adding a variant for mmu_notifiers
-> would be quite easy.
->
-> The bigger problem would be kvm_mmu_invalidate_{begin,end}() and getting the
-> memory ordering right, especially if there are multiple mmu_notifier events in
-> flight.
 > 
-> But I was actually thinking of a cheesier approach: drop and reacquire mmu_lock
-> when zapping, e.g. without the necessary changes in tdp_mmu_zap_leafs():
+> On Tue,  5 Sep 2023 10:40:28 +0800
+> oushixiong <oushixiong@kylinos.cn> wrote:
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 735c976913c2..c89a2511789b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -882,9 +882,15 @@ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
->  {
->         struct kvm_mmu_page *root;
->  
-> +       write_unlock(&kvm->mmu_lock);
-> +       read_lock(&kvm->mmu_lock);
-> +
->         for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
->                 flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, flush);
->  
-> +       read_unlock(&kvm->mmu_lock);
-> +       write_lock(&kvm->mmu_lock);
-> +
->         return flush;
->  }
+>> From: Shixiong Ou <oushixiong@kylinos.cn>
+>>
+>> If CONFIG_PCI_ATS isn't set, then pdev->physfn is not defined.
+>> So it causes a compilation issue:
+>>
+>> ../drivers/vfio/pci/pds/vfio_dev.c:165:30: error: ‘struct pci_dev’ has no member named ‘physfn’; did you mean ‘is_physfn’?
+>>    165 |   __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
+>>        |                              ^~~~~~
+>>
+>> Signed-off-by: Shixiong Ou <oushixiong@kylinos.cn>
+>> ---
+>>   drivers/vfio/pci/pds/vfio_dev.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+>> index b46174f5eb09..18b4a6a5bc16 100644
+>> --- a/drivers/vfio/pci/pds/vfio_dev.c
+>> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+>> @@ -160,10 +160,13 @@ static int pds_vfio_init_device(struct vfio_device *vdev)
+>>        vdev->log_ops = &pds_vfio_log_ops;
+>>
+>>        pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
+>> +
+>> +#ifdef CONFIG_PCI_ATS
+>>        dev_dbg(&pdev->dev,
+>>                "%s: PF %#04x VF %#04x vf_id %d domain %d pds_vfio %p\n",
+>>                __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
+>>                pci_domain_nr(pdev->bus), pds_vfio);
+>> +#endif
+>>
+>>        return 0;
+>>   }
 > 
-> vCPUs would still get blocked, but for a smaller duration, and the lock contention
-> between vCPUs and the zapping task would mostly go away.
->
-Yes, I actually did similar thing locally, i.e. releasing write lock and taking
-read lock before zapping.
-But yes, I also think it's cheesier as the caller of the write lock knows nothing
-about its write lock was replaced with read lock.
+> AIUI, this whole driver is dependent on SR-IOV functionality, so perhaps
+> this should be gated at Kconfig?  Thanks,
+> 
+> Alex
 
+It seems like depending on SR-IOV functionality makes more sense.
 
-> > > If you post a version of this patch that converts kvm_tdp_mmu_zap_leafs(), please
-> > > post it as a standalone patch.  At a glance it doesn't have any dependencies on the
-> > > MTRR changes, and I don't want this type of changed buried at the end of a series
-> > > that is for a fairly niche setup.  This needs a lot of scrutiny to make sure zapping
-> > > under read really is safe
-> > Given the pre-check patch should work, do you think it's still worthwhile to do
-> > this convertion?
+Thanks,
+
+Brett
 > 
-> I do think it would be a net positive, though I don't know that it's worth your
-> time without a concrete use cases.  My gut instinct could be wrong, so I wouldn't
-> want to take on the risk of running with mmu_lock held for read without hard
-> performance numbers to justify the change.
-Ok, I see. May try conversion later if I found out the performance justification.
-
-Thanks!
