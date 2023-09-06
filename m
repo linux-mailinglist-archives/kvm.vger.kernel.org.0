@@ -2,107 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC41E793600
-	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 09:13:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35EA0793660
+	for <lists+kvm@lfdr.de>; Wed,  6 Sep 2023 09:36:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231538AbjIFHNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Sep 2023 03:13:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51766 "EHLO
+        id S233655AbjIFHg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Sep 2023 03:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231420AbjIFHNq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Sep 2023 03:13:46 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55693E60
-        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 00:13:36 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2bb9a063f26so52681181fa.2
-        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 00:13:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1693984414; x=1694589214; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aTsez1MtzhhlmQ/mCF+KXbnv+lrjtNHxtrQ8tWacSro=;
-        b=XgR5KbP8Z9ANBsYHz0mmqisWhDFYtmyh2NRc0lXzhXWmuH5kplq6j+GO1JewPY+uLq
-         2gTaqMt1rBCIM3Wx0dTOhmchlxY4kb4wlfdZyfEOl92FX3DYtUSceJa6ckO+6kE+XjxH
-         vhMcLu0aGqrlhPfpvYJSMjU/3wz1ZdjovcLkCx7xyt3sYWB2rXqP5eAOqlzKxEBG/8IQ
-         NByG3jAHpT/c6rQEN+oZ8SVLgrBlpkO+ir0GVweWfwwjP/giFDb9mNvBj0tbGEV0ck0M
-         wnq5fpD6n63xHBaauUiHCgqATzjEOyVz68IOucj2YGwjphLUBmjRr1+dMmNjhn77todl
-         F7gw==
+        with ESMTP id S229583AbjIFHg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Sep 2023 03:36:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A9D7E43
+        for <kvm@vger.kernel.org>; Wed,  6 Sep 2023 00:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1693985733;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S9525qsdmaz1EKzskd2zaTN3MO2SfATilPf4OtTizIo=;
+        b=J1f29eiHS3oxY2rNshLS0eRORWO+NLxFrUGCXN66XJr21rP+yNT00B61OiAR74dEIT83Fu
+        664rjko/oIlQTo2cdsozOB6gIShL9ZOoVlPqsJSt9x/0zwgFzg8IeljkCjfKUnLSezgDHv
+        TsR2fOHTrH2/BCcctcKbqAcP1cTwdWw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-aHT6RwjGNTaLcnYVLTaLVg-1; Wed, 06 Sep 2023 03:35:31 -0400
+X-MC-Unique: aHT6RwjGNTaLcnYVLTaLVg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-401db25510fso20382245e9.1
+        for <kvm@vger.kernel.org>; Wed, 06 Sep 2023 00:35:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693984414; x=1694589214;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aTsez1MtzhhlmQ/mCF+KXbnv+lrjtNHxtrQ8tWacSro=;
-        b=aNmUPZjSAzFd9VOTiWlRmAuHQEzgHnWWt4pD4d+RL+OEKUHSZFk6F8ElqOrTzivOIC
-         uC34ERjRiksu8Gwo1NdjHC4ivyfED+HW8aitwye2smZfviqC2vhdoboRbejavDSn7uBQ
-         NjypANv1YHUQ4e+OAGxw0dSDJIe2HiwMbmfqdXW9lpSrPsoDvJo9AKvZo76pvLWq+ksg
-         QrC5h+pTIDny4nFElLzvhlY/dhyKWPQ6fusesZws/1ecOQ2nzhsmptVJdM+lu8wYbjh0
-         j1NRnPtoAIisRbpcQ0ZDSMJutf+AXmFnMlfpTWefddcukPJKAvilvqIEhYC6lBHrvRU5
-         fEKA==
-X-Gm-Message-State: AOJu0YyOkXc4cjc//v+dGo5mfMyWtAWS9FglPzTMfp/aDKjdBOJldWyB
-        Cyz/a8FBc84eMfhs7s6xIrfwrA==
-X-Google-Smtp-Source: AGHT+IFUfuCxBleSioCsaDTw5kdKiT/iGJ6erAaiBayaHgVuc5Zh2EjkSrt7wvrXGoCM5I5C4sZAoA==
-X-Received: by 2002:a2e:9254:0:b0:2b9:55c9:c228 with SMTP id v20-20020a2e9254000000b002b955c9c228mr1549101ljg.27.1693984413992;
-        Wed, 06 Sep 2023 00:13:33 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id e2-20020a05600c218200b003fef5402d2dsm22237218wme.8.2023.09.06.00.13.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Sep 2023 00:13:33 -0700 (PDT)
-Date:   Wed, 6 Sep 2023 09:13:32 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <xiaobo55x@gmail.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        wchen <waylingii@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Lei Wang <lei4.wang@intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Peter Gonda <pgonda@google.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Michal Luczaj <mhal@rbox.co>,
-        zhang songyi <zhang.songyi@zte.com.cn>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 3/8] tools: riscv: Add header file csr.h
-Message-ID: <20230906-c35fdc0e07d2cc0f9cb93203@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
- <8173daae52720dbdabbd88a5d412f653e6706de1.1693659382.git.haibo1.xu@intel.com>
- <20230904-06f09083d5190fd50e53b1ea@orel>
- <CAJve8on7Yi7cDuXOVznuRdTvfUhig2hZy8g72nvnHkM7omoVAw@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1693985731; x=1694590531;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S9525qsdmaz1EKzskd2zaTN3MO2SfATilPf4OtTizIo=;
+        b=l2VjCOg5wJ32HqX/SKeDz5Xlc8QqBG/TxOqeLDgZhJaCpz//r5NhLktylsEUxdCXih
+         EASwTeyrY8OKpLZaX03ZXMaT9YtpcLPaQgy+iJCIMJO3EGET0wbL+/lOUY9FTzXJc3b5
+         S+IO+3QkJ70kLjW7ckJ8lMQ6eL8HRlaF+SKlXtUHSz4AHhl3qyGCSRlanO15ubuYUkBh
+         w76FSdt01A8Has0mg0Y0NQHAo0MfK6I8jfBXK/BbcgA2WNrDJTDo4chARisvZOBlV8q0
+         aoUSjpxXNwKFO3rtzLfpFLmz1mNKv6j79emohdhO+H3hsJFYr7HBwsGIwwlZOQgpKfRm
+         XS3A==
+X-Gm-Message-State: AOJu0YyrH/YJ16VCN2zo7sTKzz7TgOdCkJymgEpt0WJjKRrDHlPLoYR9
+        AqRphFGO2mgx1FwAyKPsoTdrV6mhhc7mLhwHAb86CRFCr8eO+esxARJv1wveRc9ZZie/+FoIN/F
+        6mbOczQY0pud+
+X-Received: by 2002:a7b:cbcf:0:b0:400:8d91:ffe9 with SMTP id n15-20020a7bcbcf000000b004008d91ffe9mr1421843wmi.26.1693985730802;
+        Wed, 06 Sep 2023 00:35:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFMcPWL3aQHtiz5UoTH7jq3Jrne3uoeX28Xa/4VjaBF88KLbGYAciW2ubPscjXi/ru9eOQwew==
+X-Received: by 2002:a7b:cbcf:0:b0:400:8d91:ffe9 with SMTP id n15-20020a7bcbcf000000b004008d91ffe9mr1421830wmi.26.1693985730459;
+        Wed, 06 Sep 2023 00:35:30 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70c:6c00:92a4:6f8:ff7e:6853? (p200300cbc70c6c0092a406f8ff7e6853.dip0.t-ipconnect.de. [2003:cb:c70c:6c00:92a4:6f8:ff7e:6853])
+        by smtp.gmail.com with ESMTPSA id 25-20020a05600c22d900b003fe2b6d64c8sm22213047wmg.21.2023.09.06.00.35.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Sep 2023 00:35:29 -0700 (PDT)
+Message-ID: <73d4900e-52e6-8fce-ff91-8243dcd4d6da@redhat.com>
+Date:   Wed, 6 Sep 2023 09:35:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8on7Yi7cDuXOVznuRdTvfUhig2hZy8g72nvnHkM7omoVAw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 1/2] KVM: s390: add stat counter for shadow gmap events
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230904130140.22006-1-nrb@linux.ibm.com>
+ <20230904130140.22006-2-nrb@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230904130140.22006-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -110,88 +84,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 06, 2023 at 02:35:42PM +0800, Haibo Xu wrote:
-> On Mon, Sep 4, 2023 at 9:33 PM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Sat, Sep 02, 2023 at 08:59:25PM +0800, Haibo Xu wrote:
-> > > Borrow the csr definitions and operations from kernel's
-> > > arch/riscv/include/asm/csr.h to tools/ for riscv.
-> > >
-> > > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > > ---
-> > >  tools/arch/riscv/include/asm/csr.h | 521 +++++++++++++++++++++++++++++
-> > >  1 file changed, 521 insertions(+)
-> > >  create mode 100644 tools/arch/riscv/include/asm/csr.h
-> > >
-> > > diff --git a/tools/arch/riscv/include/asm/csr.h b/tools/arch/riscv/include/asm/csr.h
-> > > new file mode 100644
-> > > index 000000000000..4e86c82aacbd
-> > > --- /dev/null
-> > > +++ b/tools/arch/riscv/include/asm/csr.h
-> > > @@ -0,0 +1,521 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +/*
-> > > + * Copyright (C) 2015 Regents of the University of California
-> > > + */
-> > > +
-> > > +#ifndef _ASM_RISCV_CSR_H
-> > > +#define _ASM_RISCV_CSR_H
-> > > +
-> > > +#include <linux/bits.h>
-> > > +
-> > > +/* Status register flags */
-> > > +#define SR_SIE               _AC(0x00000002, UL) /* Supervisor Interrupt Enable */
-> > > +#define SR_MIE               _AC(0x00000008, UL) /* Machine Interrupt Enable */
-> > > +#define SR_SPIE              _AC(0x00000020, UL) /* Previous Supervisor IE */
-> > > +#define SR_MPIE              _AC(0x00000080, UL) /* Previous Machine IE */
-> > > +#define SR_SPP               _AC(0x00000100, UL) /* Previously Supervisor */
-> > > +#define SR_MPP               _AC(0x00001800, UL) /* Previously Machine */
-> > > +#define SR_SUM               _AC(0x00040000, UL) /* Supervisor User Memory Access */
-> > > +
-> > > +#define SR_FS                _AC(0x00006000, UL) /* Floating-point Status */
-> > > +#define SR_FS_OFF    _AC(0x00000000, UL)
-> > > +#define SR_FS_INITIAL        _AC(0x00002000, UL)
-> > > +#define SR_FS_CLEAN  _AC(0x00004000, UL)
-> > > +#define SR_FS_DIRTY  _AC(0x00006000, UL)
-> > > +
-> > > +#define SR_VS                _AC(0x00000600, UL) /* Vector Status */
-> > > +#define SR_VS_OFF    _AC(0x00000000, UL)
-> > > +#define SR_VS_INITIAL        _AC(0x00000200, UL)
-> > > +#define SR_VS_CLEAN  _AC(0x00000400, UL)
-> > > +#define SR_VS_DIRTY  _AC(0x00000600, UL)
-> > > +
-> > > +#define SR_XS                _AC(0x00018000, UL) /* Extension Status */
-> > > +#define SR_XS_OFF    _AC(0x00000000, UL)
-> > > +#define SR_XS_INITIAL        _AC(0x00008000, UL)
-> > > +#define SR_XS_CLEAN  _AC(0x00010000, UL)
-> > > +#define SR_XS_DIRTY  _AC(0x00018000, UL)
-> > > +
-> > > +#define SR_FS_VS     (SR_FS | SR_VS) /* Vector and Floating-Point Unit */
-> > > +
-> > > +#ifndef CONFIG_64BIT
-> >
-> > How do we ensure CONFIG_64BIT is set?
-> >
+On 04.09.23 15:01, Nico Boehr wrote:
+> The shadow gmap tracks memory of nested guests (guest-3). In certain
+> scenarios, the shadow gmap needs to be rebuilt, which is a costly operation
+> since it involves a SIE exit into guest-1 for every entry in the respective
+> shadow level.
 > 
-> Currently, no explicit checking for this.
-> Shall we add a gatekeeper in this file to ensure it is set?
-
-Not in this file, since this file is shared by all the tools and...
-
+> Add kvm stat counters when new shadow structures are created at various
+> levels. Also add a counter gmap_shadow_create when a completely fresh
+> shadow gmap is created as well as a counter gmap_shadow_reuse when an
+> existing gmap is being reused.
 > 
-> #ifndef CONFIG_64BIT
-> #error "CONFIG_64BIT was not set"
-> #endif
+> Note that when several levels are shadowed at once, counters on all
+> affected levels will be increased.
+> 
+> Also note that not all page table levels need to be present and a ASCE
+> can directly point to e.g. a segment table. In this case, a new segment
+> table will always be equivalent to a new shadow gmap and hence will be
+> counted as gmap_shadow_create and not as gmap_shadow_segment.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-...we'll surely hit this error right now since nothing is setting
-CONFIG_64BIT when compiling KVM selftests.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-We need to define CONFIG_64BIT in the build somewhere prior to any
-headers which depend on it being included. Maybe we can simply
-add -DCONFIG_64BIT to CFLAGS, since all KVM selftests supported
-architectures are 64-bit.
+-- 
+Cheers,
 
-(Please trim emails, as I've been doing, when discussing specific parts.)
+David / dhildenb
 
-Thanks,
-drew
