@@ -2,179 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2354A7976B0
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:14:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1DA67976BA
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbjIGQOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 12:14:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46930 "EHLO
+        id S237163AbjIGQP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 12:15:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237768AbjIGQOE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 12:14:04 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on20618.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::618])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19EB2D52;
-        Thu,  7 Sep 2023 08:51:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UZWkS2ZbZZVadP9Kd/ek3VNNpj3r3RXGflvWFVExbIqRXsQr9Vzf67GD1rhnv5c0MULbKYv3gVM/zNMzSm51PVRDKmI3KDvEu6hGTBHx7+mtUN+iuX7CnUjZNCFkECRyaIIsz1qglodLDrq4poM7RHsmLjAiIouNmMvAEtJlJqK4cLrURfG5eXe6hDoEaqgV14X/WO3JDbagdhkQbrPI+9WMHHK9GoBXXqjG6GQfHiisQ5HBNa5qvP8Nqg6RhZHH2oYSMQ81F6Slyh1NMInfkRjEbuhYzYsQTNe8xyNdnGNNa3nYh+VQpPXYhDm4MjhNnzCW4yfno1/yJAYapXAJgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AYWjHRkwlu/BFY3LNZPdrNtx8ypbk4Yila7LEHB7WTs=;
- b=FqVMXwjiAQjnIbK0RAz59qwGas9Ob2kmd9iqGVvUhHNoqnvKuWPIjHGsv5kNaUl52zo5aKHr4Iob1nxd138yMicscbp8oFIULR2b3qhPjjLteUOa74TkkquyrmbSMHN8I/CbCkCKLqlF1qCB7ixJMCJ4GDZd/gRJXY45RqrdFrv/VLr6poAAMFN/00RjzY/gmyGG/qg3fTpn239bxKB89ddOvi/6PkY0HnIqWEDWcvLXWkcCL0iNra1sFqGLZQH2GhhLRD4LfJUyLTS9XsJsbL3OYC3WnJTR5zEDzZ1Z7BRKg7ZA0DW2VpzE0ToM2qOtI58x4ixLIyqoqZlrVsf89A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AYWjHRkwlu/BFY3LNZPdrNtx8ypbk4Yila7LEHB7WTs=;
- b=civKQIBueI/m4FTJca1a70N/wcGHsnCvOm9kGORWFMRb9aEDmLT5Pv5W4i0oJdu+pUTXlJt6k6i1pnWpmqBUBTRCXgNTZmbHsqToDSFN4N9uVsKUE5nZsKEoxnkXw3L1i9/pMu4NHFLZ6jBOJOWaWM+dN3HPy1yHAAo5lckd+UY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- DM6PR12MB4265.namprd12.prod.outlook.com (2603:10b6:5:211::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6768.30; Thu, 7 Sep 2023 15:50:06 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::6f26:6cea:cd82:df23]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::6f26:6cea:cd82:df23%3]) with mapi id 15.20.6745.034; Thu, 7 Sep 2023
- 15:50:06 +0000
-Message-ID: <188f7a79-ad47-eddd-a185-174e0970ad22@amd.com>
-Date:   Thu, 7 Sep 2023 21:19:51 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH 00/13] Implement support for IBS virtualization
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, linux-doc@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, bp@alien8.de, santosh.shukla@amd.com,
-        ravi.bangoria@amd.com, thomas.lendacky@amd.com, nikunj@amd.com
-References: <20230904095347.14994-1-manali.shukla@amd.com>
- <20230905154744.GB28379@noisy.programming.kicks-ass.net>
- <012c9897-51d7-87d3-e0e5-3856fa9644e5@amd.com>
- <20230906195619.GD28278@noisy.programming.kicks-ass.net>
-From:   Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <20230906195619.GD28278@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0157.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:c8::19) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+        with ESMTP id S236486AbjIGQPE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 12:15:04 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA3349E9
+        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 09:11:50 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6c0828c3c2dso786280a34.1
+        for <kvm@vger.kernel.org>; Thu, 07 Sep 2023 09:11:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1694103022; x=1694707822; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SgLgd1SPc6YB6mb40hQjfa5ZZlpVScz+27QCEpD3rcU=;
+        b=PvqWNVZ72aqJKocMPOHuyuwt4A24MkVtvk28ry9JUqvOXCRVp9iJPLlZhqtBcL2U5+
+         m9nkYcyhJAB8Yb6fYnVpf6HzOzh2UHa6emd6G2JaBA+qJ6+omTdfcoQqnAWS74A22W+g
+         QlW/A0LBbQZWXrcBEc1fiyT2PrKDQ97iQIPk5l97yZQgGqn/YVgMBH/6w2bfn6S6y+Gi
+         XABVnMtijGnMIUCLBpzS641pXSCfVe9fNBVAmhdSOn/D9O+npQFLHqOG2Pj3cT65vhbW
+         Or838FCQqZTHjYKUMAlq8n+c7QhwMTD5K3NAshC1j3/dtFoBe807O7Z6hc9bbPBHtmp0
+         +iBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694103022; x=1694707822;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SgLgd1SPc6YB6mb40hQjfa5ZZlpVScz+27QCEpD3rcU=;
+        b=eiSbC9GLOGUVAHCB4QgeG9doc56yL+Kc2IgBonsqbLVN1Z2ruq9xPZRCQ/neFceZo0
+         Sr0UHqWCmDiZ3g/SbVvZtMKEAz5/dQCNq+vc7Dvg5MAkYe3kcL8kGok1SJkGF4mkbCLY
+         Urk4C3A+H3J1mN81PYUgmiOwSQEh8gsMlMz4GhmpDgv+gjJ/TPd2o45mDund1hx5Jo3R
+         kI0C1vIyuAvtW5niXOpi7nCTV14I7u7Bu9jNfD9XWHipuOM5sTPbsL6ZIU/72KYx2R9t
+         ax11ZblGcwkQ1G4t+2qczzr7KlWaEUHRQenzC+hUmIPfUlBfVHvmFvhwyDlcB+MbvpQb
+         VqbQ==
+X-Gm-Message-State: AOJu0YzZTX0wU/KMBKzwoaCj+Pi58/SOhykjnMFRNL1/zenMGbK/qi1X
+        yccWvGq5gygyxo8Aigv3fzGwRw==
+X-Google-Smtp-Source: AGHT+IERsBNl+Au3IHrRw2kUYGqmyQ32p3bRKRylRe/SD4Zg8jGBdBHeqpIHcghYXGcvloCt2IKYGg==
+X-Received: by 2002:a05:6358:52c8:b0:134:e964:134c with SMTP id z8-20020a05635852c800b00134e964134cmr8509262rwz.11.1694103022523;
+        Thu, 07 Sep 2023 09:10:22 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-134-41-202-196.dhcp-dynamic.fibreop.ns.bellaliant.net. [134.41.202.196])
+        by smtp.gmail.com with ESMTPSA id m17-20020a0cdb91000000b006418c076f59sm6395881qvk.100.2023.09.07.09.10.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Sep 2023 09:10:21 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qeHaG-00170I-NH;
+        Thu, 07 Sep 2023 13:10:20 -0300
+Date:   Thu, 7 Sep 2023 13:10:20 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Kim Phillips <kim.phillips@amd.com>, joro@8bytes.org,
+        iommu@lists.linux.dev, Michael Roth <michael.roth@amd.com>,
+        "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        linux-coco@lists.linux.dev
+Subject: Re: [PATCH] iommu/amd: remove amd_iommu_snp_enable
+Message-ID: <ZPn17E94bVUKIs+U@ziepe.ca>
+References: <20230831123107.280998-1-hch@lst.de>
+ <d33f6abe-5de1-fdba-6a69-51bcbf568c81@amd.com>
+ <20230901055020.GA31908@lst.de>
+ <ZPiAUx9Qysw0AKNq@ziepe.ca>
+ <d230d9f5-53bd-8ea1-d4c7-717b0e8be9b9@amd.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|DM6PR12MB4265:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94ef0fc6-113c-4061-582b-08dbafba1b42
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +jPFkNNK0gtIxTzDU6amgB8mx6euHRBeirxzzwfSmmtf72FzJcvTz48fXkDiFCrXoKJgFs3+ceUoxQnBrI6KCDUQ3dIkANiRfUEmxNNLxGYG4BsGtws9ZieoAn0A7M90DDKk+jGzDK+SeObeJ+8gpha8PgMR0090PCO8eaFNGrzuTFAh50zb2oNiY6pSQMoxG4e40aVmXWZJrKAYXuUQmyU9R27FwxV88hWVJ34tUmewtdasY2S2jsbXDoAdNDT3hkqhAodFTwEGCiGU28c7AP5eGcshszudP+lGpgCgiNca7CY0M1jtA93hBGY9e0f5uYO4CLjnnRWE+qgK/FOOIu/iSBYs81mIN4kO8tO2En5Rxxargnng+MPgFpCt88xCVUpAfni9wQIikmIdFWBMDSr+pU19XPFdVeEqY4XcDS4R6VgT6C1LBezhCgd2qV90B64uvvTb6A/dQvFYB0jfSJcZWRtWf4pqN3YYCEot8rsGoUXVRZ+H0GrY+Ia1f4hQWWj+JtbJjOnig4QNWBK3mVuALH+uyjbPUrKB22h2x8R8bIUKBYiBhxgSVp2FcV+vscEFUzv03CD07SWeG3445BC8bneNdw7ELK7AsnG+XaD9LUBNsUGkbVReri28YmwgHBMQU75n8fLK0shdTWWvpw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(366004)(376002)(136003)(39860400002)(186009)(1800799009)(451199024)(4326008)(5660300002)(8936002)(8676002)(41300700001)(66556008)(66476007)(66946007)(44832011)(31686004)(316002)(6916009)(2906002)(38100700002)(83380400001)(6512007)(53546011)(2616005)(26005)(86362001)(31696002)(36756003)(478600001)(6506007)(6486002)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VzdDb1QvZ0RjTnNKUUF0VG45VTIrWlNVVUlRRThTR3M5OW9NbzE4Uyt3QXVL?=
- =?utf-8?B?dUk2VzMxZFh3Q0ZRbE9rSTU5SGlTK2s3eGRtN0dGWEk1MVNhS1oyY3NWR29X?=
- =?utf-8?B?NkpNejBndksxWWUvNHBMUkxrYmZmRzMyZ0MvYmlHOWN4UFdKa2p0aWVVMGcx?=
- =?utf-8?B?SUt0bDBteThMTWt5M3hxVU8zTTBxbThGRURPS1U1VjEvZE0zb2lqOTZRa0pG?=
- =?utf-8?B?bzVVSTc3TjRkU09ReXJtaGRTaHdadTFVOVcwWkJpcXJHazVjaVZ5QlQ5S3Qr?=
- =?utf-8?B?QU9pNHUxamxxZEg0WmpVLzJ3ekNNVUpKVkZMbXBodlV0QWVxaE9KbmxDM0ZI?=
- =?utf-8?B?anY4OExSLzFZLytxQjRMRTYyeURBck5zYy9kbU5tUUJxZWJNdk5rbWNoR0Nh?=
- =?utf-8?B?VTVUVDZwcWpNcnY2YU9wS3ZyYlExRDNLVVVLbFY1ejZadzFEMW9HT3Bqa3Vy?=
- =?utf-8?B?c0d2Q09zVnZJRzFldFZnV3QrbnphMXpUYzhueGdROWRTZ1h0QW5Hc2duM3dI?=
- =?utf-8?B?OTA4U2VCSS9zMjRNRUpIa1lpWkkwdFo4eEE3amxpMCtlNzNLRndQdGNoMjUw?=
- =?utf-8?B?Q1U4dDIwdUtkOTcrb0hWRm81Y0E3VTRabUJCOStkdHUxT29kQmJDOFFTTmFk?=
- =?utf-8?B?QkMwN1pHL1duOWZ6dHZXQjB4UytiS3NuUzNjRVRMMjM2eGNUNU1hVnI0a25S?=
- =?utf-8?B?OXZMOUM2MjEvWVFrTm5RS1hweXdLTU1rMDFLcjlyZTMvS0I3WEhkbDZJQVRB?=
- =?utf-8?B?RU9uQ09lNGVPRm1Ndy9yQkNacTBwR2l1VXArb2dJcktZazV0cUZTdjZ0cWtv?=
- =?utf-8?B?YWM1ZjRxVEZNejhYbmFrZnQrc3I0VGhXK3RNRkF0YXZRQkJ3VkdycC90VCt5?=
- =?utf-8?B?azN5UTVsOGQ0d0xpaVdFMVM1YjNaQTdUZ0xJOFluOFhXaXo3OHNrWncvUnp2?=
- =?utf-8?B?aDF5V2FaaFhPTkdnOVVXL2NGek5pMUNtcHh2TkFiQWhKMnl4cGtZTCsvamp3?=
- =?utf-8?B?QXlzeWNwYURXZ3NWZUY4WGlKbTk0RkxTQ2lNa3FITWtMeE15Tm9CWU5TdC95?=
- =?utf-8?B?WXk5MDg1eE9hY2JKSGxnZ1JzZDM5L2pacUZRZmtqV21IaHFKRWF1dlhFekFs?=
- =?utf-8?B?RDV3Q3g3a1hrNDRDQ1VNT001dU5Wd05iTnhhZlVQaHBRRjR0N2xqcWJUTmE4?=
- =?utf-8?B?M29xU0s1bVBuN2FjaUpnY3NsaGR0L0RyZUJJQTVqWG1wM2RBRXEyanhIdXNl?=
- =?utf-8?B?ckF0S25OakpCTnNsMUtTVGlHeFVSQzN2WWIzQmhhR3N4TEVNaEtaS2VEWFph?=
- =?utf-8?B?aWN1NmpMTVh1UG56dm5CWkN3NGtMZnhvWm12aVR5SmJwQW1sTFBRL1E5Nmtm?=
- =?utf-8?B?emJhK1Q5MXVxSitQbWU0RmhqWGU4STNlS2N5MmRQN3FxNVVCUzN1OXlOK1Vs?=
- =?utf-8?B?VjE4R01HYmxtS3hjcjhGcWNxbVJicnExZzk4bEp3UEZ0N1Ewa1RpTitobmVN?=
- =?utf-8?B?RUdWMFZDL2JWMEVYSjRWUXdqUE5XSUdDVy9iVDVEN3E0NkloRDJUOUxwRXVj?=
- =?utf-8?B?UVVSaVk0d3NTaW0xZFRhQlRUSVVOK3ZaK0xSdlR1THZIN3FsZysvaEN2b2xZ?=
- =?utf-8?B?bVByS3BCWlBsa3ZhUjBXSWtCN2tFYllKeitvL3lzT3lTd21KVkpva1hSSlcr?=
- =?utf-8?B?MmJuWExQQ29ldXlLU1ptay90WVNzY2FLTXJuU0ZxazV5TzMyUVRCZkwvaEx0?=
- =?utf-8?B?d21DT1ZEeHhzZWNxU2pNNXNkRnZiY2MrYjBkd0tpamFnQ1IvRkZCbVZiM1l5?=
- =?utf-8?B?N1c4MXlnSTJVcTd1Wi9Jc2huNUJKTmp5YzROS3lTeGxZZTVaZGZqUnA2cTBm?=
- =?utf-8?B?M0d1SHFUekpOdUdLVE1MWjNEMXcyVmEvVTJYcmpBdFpzWGZPMVQwZ2g0ZXFR?=
- =?utf-8?B?VHdZWG5hRVFuckdUZlh4NHlteGh5OUVybnhyaUtuQkJOTGRnWE00bzdnMDFm?=
- =?utf-8?B?NzlFZkc2ek9Md3BVazRua0Y5aU1qSXIwTG1iTm9PaFIvbTBnV2p2V1Z0aUxr?=
- =?utf-8?B?ZzIwTUExdVg3YWNZQTh4U2tmZnc2T3hCUndiVUszRzEzY2ZDczN3TUNFNlF2?=
- =?utf-8?Q?7PAKhSUIheEBPGI4AAaUNTsgn?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94ef0fc6-113c-4061-582b-08dbafba1b42
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 15:50:06.3673
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RQEc7v8rco+30TUwdpO0LwCXXoBchN6rioMn/mOXkzsyxwABVoPJIfymL08txBg6C+JNzpKgOKbi82+OJ437Vw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4265
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d230d9f5-53bd-8ea1-d4c7-717b0e8be9b9@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+On Thu, Sep 07, 2023 at 04:55:52PM +0700, Suthikulpanit, Suravee wrote:
 
-On 9/7/2023 1:26 AM, Peter Zijlstra wrote:
-> On Wed, Sep 06, 2023 at 09:08:25PM +0530, Manali Shukla wrote:
->> Hi Peter,
->>
->> Thank you for looking into this.
->>
->> On 9/5/2023 9:17 PM, Peter Zijlstra wrote:
->>> On Mon, Sep 04, 2023 at 09:53:34AM +0000, Manali Shukla wrote:
->>>
->>>> Note that, since IBS registers are swap type C [2], the hypervisor is
->>>> responsible for saving and restoring of IBS host state. Hypervisor
->>>> does so only when IBS is active on the host to avoid unnecessary
->>>> rdmsrs/wrmsrs. Hypervisor needs to disable host IBS before saving the
->>>> state and enter the guest. After a guest exit, the hypervisor needs to
->>>> restore host IBS state and re-enable IBS.
->>>
->>> Why do you think it is OK for a guest to disable the host IBS when
->>> entering a guest? Perhaps the host was wanting to profile the guest.
->>>
->>
->> 1. Since IBS registers are of swap type C [1], only guest state is saved
->> and restored by the hardware. Host state needs to be saved and restored by
->> hypervisor. In order to save IBS registers correctly, IBS needs to be
->> disabled before saving the IBS registers.
->>
->> 2. As per APM [2],
->> "When a VMRUN is executed to an SEV-ES guest with IBS virtualization enabled, the
->> IbsFetchCtl[IbsFetchEn] and IbsOpCtl[IbsOpEn] MSR bits must be 0. If either of 
->> these bits are not 0, the VMRUN will fail with a VMEXIT_INVALID error code."
->> This is enforced by hardware on SEV-ES guests when VIBS is enabled on SEV-ES
->> guests.
+> > I've said this many times lately. There are other things in this
+> > driver that have no upstream justification too, like nesting
+> > "support".
 > 
-> I'm not sure I'm fluent in virt speak (in fact, I'm sure I'm not). Is
-> the above saying that a host can never IBS profile a guest?
+> Jason, there is no need to keep repeating and polluting this thread. I am
+> happy to discuss and clarify any points of your concern on the "nesting
+> support" in a separate discussion thread :)
 
-Host can profile a guest with IBS if VIBS is disabled for the guest. This is
-the default behavior. Host can not profile guest if VIBS is enabled for guest.
+It is not polluting this thread. We are, again, asking AMD to follow
+the rules please.
 
-> 
-> Does the current IBS thing assert perf_event_attr::exclude_guest is set?
+None of the other threads about the nesting has resulted in acceptance
+that code needs to be removed as well. Go respond in one of those if
+you have something to add.
 
-Unlike AMD core pmu, IBS doesn't have Host/Guest filtering capability, thus
-perf_event_open() fails if exclude_guest is set for an IBS event.
-
-> 
-> I can't quickly find anything :-(
-
-Thank you,
-Manali
-
+Jason
