@@ -2,109 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCF33797CC0
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 21:31:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76DF6797B65
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 20:16:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237376AbjIGTba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 15:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
+        id S233900AbjIGSQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 14:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243518AbjIGRWz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 13:22:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D91135
-        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 10:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694107209;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T19fvwwZwYYxN0N2ir2GwX4u4CAMB7SDLx2HtMxv4lk=;
-        b=a7nsgWt/6no8YN6pgosTNA+KnPOCojA72QyJrms3YvLEgNjyegKCh0XFzfIUb7YI8al4W1
-        fTMKhk9aNsnJ5nHKBiMcyr+j2JeoJYO15qj8AnGsNUjhJdG8zrW33sa94liy5DrpfZuyD2
-        5iuX7yw0uc9dalEa9APhyAmHAJkf8ZA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-167-Biq_1bLnNVinpIASYQw43A-1; Thu, 07 Sep 2023 06:55:06 -0400
-X-MC-Unique: Biq_1bLnNVinpIASYQw43A-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-314256aedcbso545823f8f.0
-        for <kvm@vger.kernel.org>; Thu, 07 Sep 2023 03:55:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694084105; x=1694688905;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T19fvwwZwYYxN0N2ir2GwX4u4CAMB7SDLx2HtMxv4lk=;
-        b=B+nzT5+WE/gA5jSWDMNb353DkBOzQ0V6TDvJl42mV3nTZu35W6+GCYhukoStLRuRRw
-         WC0l3WlnNbg56HOcK6IEVxreOQ3TJjv8C09djo8TOPKikGdgKYE+HEZNaSgv2ZEyorXR
-         +QcYXN/u71CmPkgvaODNGb8Umc3kTj6r86IqkFqxE7U6AVCl/loYtWLeICvwyWn8hzxT
-         OQdv+M2TbIx/vQRQGg6JMrUOA8XNL/LrnBe/9YuCjxK3aso4sw3K1g+qbC6vJOT6UHSL
-         I3xm1s2nL3MSLqWjSqRFgdwip3HG8XThVhZMBPt16c3Tyjhldnj+S9M8YTIHd9W41XQd
-         Y2vg==
-X-Gm-Message-State: AOJu0YyZdUGhuIoSI5vlZyoFmcFGGz3u1rSIOu+9Ba7ii4kwfa6nSzRW
-        /WZVVAR883ZPggSRbLplO5tmPg00z9gQjhdBAa6JuehmEYlpqRuYd2lEeqrjlHeBmnUlZiVGNue
-        mC9QIsQbVul9O
-X-Received: by 2002:a7b:c8ca:0:b0:3fc:21:2c43 with SMTP id f10-20020a7bc8ca000000b003fc00212c43mr4445662wml.13.1694084105368;
-        Thu, 07 Sep 2023 03:55:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEqFWYOgdb5RcycadIErqmAG5PL6+JJULN0r3CFf2H3pMoBcI8MCKupsm+TZ8wkJ5cFFMPe/Q==
-X-Received: by 2002:a7b:c8ca:0:b0:3fc:21:2c43 with SMTP id f10-20020a7bc8ca000000b003fc00212c43mr4445653wml.13.1694084105063;
-        Thu, 07 Sep 2023 03:55:05 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312::1fc? ([2001:b07:6468:f312::1fc])
-        by smtp.googlemail.com with ESMTPSA id k20-20020a7bc414000000b003fd2e898aa3sm1433469wmi.0.2023.09.07.03.55.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Sep 2023 03:55:04 -0700 (PDT)
-Message-ID: <0634f55b-e319-ba29-0746-eea826cc7f94@redhat.com>
-Date:   Thu, 7 Sep 2023 12:55:03 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Jari Ruusu <jariruusu@protonmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <NOTSPohUo5EZSaOrRTX88K-vU9QJqeV2Vqti75bEwTpckXBiudKyWw97EDAbgp9ODnk8-lCVBVNCYdd7YygWY5S2n-Yoz_BiJ13DeNLEItI=@protonmail.com>
- <ZPeBE5aZqLwdnspl@google.com>
- <DSxaeYtslZW13dZU36PVY2RooaqU99qcXgPSYkyw6F5t8LSJk8MkAn1shTVrb-cAFRaKEVr5VDrWD6JRmSTlpDbGrHBiM-8zHwIiH90nNHI=@protonmail.com>
- <ZPeV1GWQWeH48a2G@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm ignores ignore_msrs=1 VETO for some MSRs
-In-Reply-To: <ZPeV1GWQWeH48a2G@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231687AbjIGSQS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 14:16:18 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D039A1FCF
+        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 11:15:56 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5449BC433C8;
+        Thu,  7 Sep 2023 18:15:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694110533;
+        bh=5szpdA83l9R1ikFYVyG1shRGZ7+F4onPaR5XCxJ8/Tc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VCSZbDLz4YecrxSQkSQG7ueSL/fV36qFTMzY/NjxaHFGH+HHJIYEZK11CHQnAPzfX
+         a+57O4h8ogot7mSjABe98hHAzcEjNcsGHO/3L6r8CEfIlKHTlPQ7KIm6eIF+hWW/1v
+         9cTFSB0Pu+8YM7fePGv5ni8QeZsuidRDawWn75nHpiVgMFXA8/nP62T7NI+l1gK4DH
+         YBXT+/5Fh7xaS72TiwCcYxl2/k0ZPdg7j1iC5cGWoqVa7q+RbYbrfuzW5Tq49NaId0
+         ShX+dhcs5e+cYvKzoi7NdYJN/4cE3+m6Euty1v6dnuvdlvboFuJjaJFrrX47PyFjin
+         cWgSfzwf0Q0UQ==
+Received: from [82.132.186.150] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qeJXO-00BAmG-Lk;
+        Thu, 07 Sep 2023 19:15:30 +0100
+Date:   Thu, 07 Sep 2023 19:15:38 +0100
+Message-ID: <8734zpq27p.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Joey Gouly <joey.gouly@arm.com>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Xu Zhao <zhaoxu.35@bytedance.com>
+Subject: Re: [PATCH 2/5] KVM: arm64: Build MPIDR to vcpu index cache at runtime
+In-Reply-To: <20230907152918.GB69899@e124191.cambridge.arm.com>
+References: <20230907100931.1186690-1-maz@kernel.org>
+        <20230907100931.1186690-3-maz@kernel.org>
+        <20230907152918.GB69899@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.186.150
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, zhaoxu.35@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/5/23 22:55, Sean Christopherson wrote:
-> On Tue, Sep 05, 2023, Jari Ruusu wrote:
->> On Tuesday, September 5th, 2023 at 22:27, Sean Christopherson <seanjc@google.com> wrote:
->>> As for working around this in your setup, assuming you don't actually need a
->>> virtual PMU in the guest, the simplest workaround would be to turn off vPMU
->>> support in KVM, i.e. boot with kvm.enable_pmu=0. That should cause QEMU to not
->>> advertise a PMU to the guest.
->>
->> Newer host kernels seem to have kvm.enable_pmu parameter,
->> but linux-5.10.y kernels do not have that.
+On Thu, 07 Sep 2023 16:29:18 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Gah, try kvm.pmu.
+> On Thu, Sep 07, 2023 at 11:09:28AM +0100, Marc Zyngier wrote:
+
+[...]
+
+> > @@ -578,6 +579,57 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> >  	return vcpu_get_flag(vcpu, VCPU_INITIALIZED);
+> >  }
+> >  
+> > +static void kvm_init_mpidr_data(struct kvm *kvm)
+> > +{
+> > +	struct kvm_mpidr_data *data = NULL;
+> > +	unsigned long c, mask, nr_entries;
+> > +	u64 aff_set = 0, aff_clr = ~0UL;
+> > +	struct kvm_vcpu *vcpu;
+> > +
+> > +	mutex_lock(&kvm->arch.config_lock);
+> > +
+> > +	if (kvm->arch.mpidr_data || atomic_read(&kvm->online_vcpus) == 1)
+> > +		goto out;
+> > +
+> > +	kvm_for_each_vcpu(c, vcpu, kvm) {
+> > +		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
+> > +		aff_set |= aff;
+> > +		aff_clr &= aff;
+> > +	}
+> > +
+> > +	/*
+> > +	 * A significant bit can be either 0 or 1, and will only appear in
+> > +	 * aff_set. Use aff_clr to weed out the useless stuff.
+> > +	 */
+> > +	mask = aff_set ^ aff_clr;
+> > +	nr_entries = BIT_ULL(hweight_long(mask));
+> > +
+> > +	/*
+> > +	 * Don't let userspace fool us. If we need more than a single page
+> > +	 * to describe the compressed MPIDR array, just fall back to the
+> > +	 * iterative method. Single vcpu VMs do not need this either.
+> > +	 */
+> > +	if (struct_size(data, cmpidr_to_idx, nr_entries) <= PAGE_SIZE)
+> > +		data = kzalloc(struct_size(data, cmpidr_to_idx, nr_entries),
+> > +			       GFP_KERNEL_ACCOUNT);
+> > +
+> > +	if (!data)
+> > +		goto out;
 > 
-> Commit 4732f2444acd ("KVM: x86: Making the module parameter of vPMU more common")
-> renamed the variable to avoid collisions, but it unnecessarily changed the name
-> exposed to userspace too.  My gut reaction is to revert the param name back to
-> "pmu".
-> 
-> Paolo, any idea if reverting "enable_pmu" back to "pmu" would be worth the churn?
+> Probably not a big deal, but if the data doesn't fit, every vCPU will run this
+> function up until this point (if the data fits or there's only 1 vCPU we bail
+> out earlier)
 
-Hmm, 5.17 is almost a couple years old so I'm debating it...  Probably 
-not, but I wouldn't complain either way.
+Yeah, I thought about that when writing this code, and applied the
+following reasoning:
 
-Paolo
+- this code is only run once per vcpu
 
+- being able to remember that we cannot allocate the hash table
+  requires at least an extra flag or a special value for the pointer
+
+- this sequence is pretty quick (one read/or/and * nr_vcpu^2), and
+  even if you have 512 vcpus, it isn't *that* much stuff given that it
+  is spread across vcpus
+
+Now, if someone can actually measure a significant boot-time speed-up,
+I'll happily add that flag.
+
+[...]
+
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
