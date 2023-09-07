@@ -2,163 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BF9779781C
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:41:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E770C7976B9
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:15:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231673AbjIGQmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 12:42:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54656 "EHLO
+        id S238669AbjIGQPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 12:15:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242526AbjIGQlr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 12:41:47 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C8DB32F
-        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 08:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694101639; x=1725637639;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+XxI/zfHIFSOE3LTQ4Z/bBIZd8YSiPCzhAZUyvnviJ0=;
-  b=jUoFLZBNbjcjmpPyIDtEmydGouaML56N0P8uPNQDJQiz+0WR4SugWn1W
-   OF7/qqwbgoVK0Yp2DPC7iIjLzR1hru4MHDGpC6+XPNVYY7IR0bdyFsDFq
-   YPfkDaQ3e8sGp0VgtznpK2no9NotNeh9z1jZBXqPAiGxiNpWNe4opNKkC
-   qWoQYg5X6WoXoQ+iNt/5KfvB7aS5/YBJHeysHZfbwpcMxNsEF5ULt7ezx
-   zJ+pSl5bvQyofNapuf2DQqubrTwdFNzkoCDTVS6bmLaCitK7yZPFNIa7m
-   JojRgzzGrL2OBc9u165GVPwvs+dXW7BQfow+YlHtRY+6XFcCQ9h/VnbLm
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="376222550"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="376222550"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2023 02:59:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="691723566"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="691723566"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2023 02:59:11 -0700
-Date:   Thu, 7 Sep 2023 17:56:31 +0800
-From:   Tao Su <tao1.su@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
-        guang.zeng@intel.com, yi1.lai@intel.com
-Subject: Re: [PATCH 2/2] KVM: x86: Clear X2APIC_ICR_UNUSED_12 after
- APIC-write VM-exit
-Message-ID: <ZPmeKHNJQpgoIZmW@linux.bj.intel.com>
-References: <20230904013555.725413-1-tao1.su@linux.intel.com>
- <20230904013555.725413-3-tao1.su@linux.intel.com>
- <ZPezyAyVbdZSqhzk@google.com>
- <ZPgJDacP1LeO084Z@linux.bj.intel.com>
- <ZPj6iF0Q7iynn62p@google.com>
+        with ESMTP id S238593AbjIGQOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 12:14:52 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26F646B0
+        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 09:11:32 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13783C43142;
+        Thu,  7 Sep 2023 10:09:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694081396;
+        bh=TzyJtdWsmYBUToQcQ3+2crtixqGb2HnF6L3+Xtxg3ZE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Ruaez+JQVMgoAwlHuyAZOyhbC/bbmuwwu/IAD9ATO62Y4fFnt6VuXNmKqjVjVJMPR
+         Dx3i9j2zUX1QEUyQd9Q/YzX5C3At86wNS9/QEhFLZJSylUWqTIfw8dMGvnM+Om+d6c
+         6Uf33tiFmj1uMfgpwQkg9LwYI5w1CQH7JyVJGGVJJYzAtjuO/2ARn7uBtF6Tn+g5TN
+         FAkxNavqwKJia5Dxzgd/68aAglOf3q5id86jNsHm6dObWah/RFAoYwPCkdyU9sjDmL
+         HdksoKTGJB2iLUku3KnLRICyoGKJxJg9rqx0OOv8WNZjwXBXSUPKhsLR0WhJSTrfF4
+         HP37rj7XWSthQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qeBxR-00B37Y-BN;
+        Thu, 07 Sep 2023 11:09:53 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Xu Zhao <zhaoxu.35@bytedance.com>
+Subject: [PATCH 0/5] KVM: arm64: Accelerate lookup of vcpus by MPIDR values
+Date:   Thu,  7 Sep 2023 11:09:26 +0100
+Message-Id: <20230907100931.1186690-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZPj6iF0Q7iynn62p@google.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, zhaoxu.35@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 06, 2023 at 03:17:44PM -0700, Sean Christopherson wrote:
-> On Wed, Sep 06, 2023, Tao Su wrote:
-> > On Tue, Sep 05, 2023 at 04:03:36PM -0700, Sean Christopherson wrote:
-> > > +Suravee
-> > > 
-> > > On Mon, Sep 04, 2023, Tao Su wrote:
-> > > > When IPI virtualization is enabled, a WARN is triggered if bit12 of ICR
-> > > > MSR is set after APIC-write VM-exit. The reason is kvm_apic_send_ipi()
-> > > > thinks the APIC_ICR_BUSY bit should be cleared because KVM has no delay,
-> > > > but kvm_apic_write_nodecode() doesn't clear the APIC_ICR_BUSY bit.
-> > > > 
-> > > > Since bit12 of ICR is no longer BUSY bit but UNUSED bit in x2APIC mode,
-> > > > and SDM has no detail about how hardware will handle the UNUSED bit12
-> > > > set, we tested on Intel CPU (SRF/GNR) with IPI virtualization and found
-> > > > the UNUSED bit12 was also cleared by hardware without #GP. Therefore,
-> > > > the clearing of bit12 should be still kept being consistent with the
-> > > > hardware behavior.
-> > > 
-> > > I'm confused.  If hardware clears the bit, then why is it set in the vAPIC page
-> > > after a trap-like APIC-write VM-Exit?  In other words, how is this not a ucode
-> > > or hardware bug?
-> > 
-> > Sorry, I didn't describe it clearly.
-> > 
-> > On bare-metal, bit12 of ICR MSR will be cleared after setting this bit.
-> > 
-> > If bit12 is set in guest, the bit is not cleared in the vAPIC page after APIC-write
-> > VM-Exit. So whether to clear bit12 in vAPIC page needs to be considered.
-> 
-> I got that, the behavior just seems odd to me.  And I'm grumpy that Intel punted
-> the problem to software.  But the SDM specifically calls out that this is the
-> correct behavior :-/
-> 
-> Specifically, in the context of IPI virtualization:
-> 
->   If ECX contains 830H, a general-protection fault occurs if any of bits 31:20,
->   17:16, or 13 of EAX is non-zero.
-> 
-> and
-> 
->   If ECX contains 830H, the processor then checks the value of VICR to determine
->   whether the following are all true:
-> 
->   Bits 19:18 (destination shorthand) are 00B (no shorthand).
->   Bit 15 (trigger mode) is 0 (edge).
->   Bit 12 (unused) is 0.
->   Bit 11 (destination mode) is 0 (physical).
->   Bits 10:8 (delivery mode) are 000B (fixed).
->   
->   If all of the items above are true, the processor performs IPI virtualization
->   using the 8-bit vector in byte 0 of VICR and the 32-bit APIC ID in VICR[63:32]
->   (see Section 30.1.6). Otherwise, the logical processor causes an APIC-write VM
->   exit (see Section 30.4.3.3).  If ECX contains 830H, the processor then checks
->   the value of VICR to determine whether the following are all true:
-> 
-> I.e. the "unused" busy bit must be zero.  The part that makes me grumpy is that
-> hardware does check that other reserved bits are actually zero:
-> 
->   If special processing applies, no general-protection exception is produced due
->   to the fact that the local APIC is in xAPIC mode. However, WRMSR does perform
->   the normal reserved-bit checking:
->    - If ECX contains 808H or 83FH, a general-protection fault occurs if either EDX or EAX[31:8] is non-zero.
->    - If ECX contains 80BH, a general-protection fault occurs if either EDX or EAX is non-zero.
->    - If ECX contains 830H, a general-protection fault occurs if any of bits 31:20, 17:16, or 13 of EAX is non-zero.
-> 
-> Which implies that the hardware *does* enforce all the other reserved bits, but
-> punted bit 12 to the hypervisor :-(
-> 
-> That said, I think we have an "out".  Under the x2APIC section, regarding ICR,
-> the SDM also says:
-> 
->   It remains readable only to aid in debugging; however, software should not
->   assume the value returned by reading the ICR is the last written value.
-> 
-> I.e. KVM basically has free reign to do whatever it wants, so long as it doesn't
-> confuse userspace or break KVM's ABI.  As much as I want to say "do nothing",
-> clearing bit 12 so that it reads back as '0' is the safer approach.  Just please
-> don't add a new #define for, it's far easier to understand what's going on if we
-> just use APIC_ICR_BUSY, especially given that I highly doubt the bit will actually
-> be repurposed for something new.
+Xu Zhao recently reported[1] that sending SGIs on large VMs was slower
+than expected, specially if targeting vcpus that have a high vcpu
+index. They root-caused it to the way we walk the vcpu xarray in the
+search of the correct MPIDR, one vcpu at a time, which is of course
+grossly inefficient.
 
-Thanks for such a detailed analysis. I will submit a patch to clear bit12 since it is
-a safer approach, and also drop the unnecessary alias.
+The solution they proposed was, unfortunately, less than ideal, but I
+was "nerd snipped" into doing something about it.
 
-> 
-> FWIW, I also suspect that hardware isn't clearing the busy bit per se, I suspect
-> that hardware simply reads the bit as zero.
-> 
-> Side topic, unless I'm blind, KVM is missing the reserved bits #GP checks for ICR
-> bits bits 31:20, 17:16, and 13.
+The main idea is to build a small hash table of MPIDR to vcpu
+mappings, using the fact that most of the time, the MPIDR values only
+use a small number of significant bits and that we can easily compute
+a compact index from it. Once we have that, accelerating vcpu lookup
+becomes pretty cheap, and we can in turn make SGIs great again.
 
-Yes, it is needed to check the reserved bits of ICR and inject #GP when IPI virtualization
-disabled (otherwise it is injected by hardware). The related kselftest is also necessary
-to verify the #GP is correctly emulated.
+It must be noted that since the MPIDR values are controlled by
+userspace, it isn't always possible to allocate the hash table
+(userspace could build a 32 vcpu VM and allocate one bit of affinity
+to each of them, making all the bits significant). We thus always have
+an iterative fallback -- if it hurts, don't do that.
+
+Performance wise, this is very significant: using the KUT micro-bench
+test with the following patch (always IPI-ing the last vcpu of the VM)
+and running it with large number of vcpus shows a large improvement
+(from 3832ns to 2593ns for a 64 vcpu VM, a 32% reduction, measured on
+an Ampere Altra). I expect that IPI-happy workloads could benefit from
+this.
 
 Thanks,
-Tao
+
+	M.
+
+[1] https://lore.kernel.org/r/20230825015811.5292-1-zhaoxu.35@bytedance.com
+
+diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+index bfd181dc..f3ac3270 100644
+--- a/arm/micro-bench.c
++++ b/arm/micro-bench.c
+@@ -88,7 +88,7 @@ static bool test_init(void)
+ 
+ 	irq_ready = false;
+ 	gic_enable_defaults();
+-	on_cpu_async(1, gic_secondary_entry, NULL);
++	on_cpu_async(nr_cpus - 1, gic_secondary_entry, NULL);
+ 
+ 	cntfrq = get_cntfrq();
+ 	printf("Timer Frequency %d Hz (Output in microseconds)\n", cntfrq);
+@@ -157,7 +157,7 @@ static void ipi_exec(void)
+ 
+ 	irq_received = false;
+ 
+-	gic_ipi_send_single(1, 1);
++	gic_ipi_send_single(1, nr_cpus - 1);
+ 
+ 	while (!irq_received && tries--)
+ 		cpu_relax();
+
+
+Marc Zyngier (5):
+  KVM: arm64: Simplify kvm_vcpu_get_mpidr_aff()
+  KVM: arm64: Build MPIDR to vcpu index cache at runtime
+  KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is
+    available
+  KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
+  KVM: arm64: vgic-v3: Optimize affinity-based SGI injection
+
+ arch/arm64/include/asm/kvm_emulate.h |   2 +-
+ arch/arm64/include/asm/kvm_host.h    |  28 ++++++
+ arch/arm64/kvm/arm.c                 |  66 +++++++++++++
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c   | 142 ++++++++++-----------------
+ 4 files changed, 148 insertions(+), 90 deletions(-)
+
+-- 
+2.34.1
 
