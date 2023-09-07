@@ -2,103 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B62A79770A
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:20:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 017AE7977F5
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:38:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239680AbjIGQUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 12:20:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54598 "EHLO
+        id S236920AbjIGQiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 12:38:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239790AbjIGQTy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 12:19:54 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E26B186;
-        Thu,  7 Sep 2023 08:46:38 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3878cUaV000863;
-        Thu, 7 Sep 2023 08:50:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : from : cc : to : message-id : date; s=pp1;
- bh=dFCc0qTzdrwocEFsIvYEmIazAX+uga/LQ0XFfx6bZ88=;
- b=oAo/j4yONZbUSveEubI2aOck2s8VuNJaOrGzLLPkZfWcoqqyXJp+gsKBX7uMrQ3u+H5U
- j2v94I6epJWe8amRHfcQA9KfMKIPbZnL0x4PB8wULDZI6iMPzveB/gOLpEjDJfq5lZZN
- lT4NdO8X5BBNuKqYW2JGIRSEVtwjg8mLSgb5G785uioblkJJomxezK/T7dYD2OYH0IEH
- G4e+wB2EUXCxxAy2MTJqs2GCpRvtUEZeGg5/s+R2BJegxgnKm3+nhtm+Q/sy8LujVILK
- Wy7man1Ps2dVqZLATpMGHNDhC8CFWJRv4vcvfZVOeCku0SN11Yr9s2Vp9DtHhDvLNT7H Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3syay10g9y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Sep 2023 08:50:37 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3878cdcP001441;
-        Thu, 7 Sep 2023 08:50:36 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3syay10g9q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Sep 2023 08:50:36 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3878eq1x026756;
-        Thu, 7 Sep 2023 08:50:35 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3svgcnt9d4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Sep 2023 08:50:35 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3878oWqA35651852
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Sep 2023 08:50:32 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F6A220040;
-        Thu,  7 Sep 2023 08:50:32 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 001F52004E;
-        Thu,  7 Sep 2023 08:50:31 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.12.47])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Sep 2023 08:50:31 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S243895AbjIGQiP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 12:38:15 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD93A6190
+        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 09:13:11 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-502934c88b7so1417885e87.2
+        for <kvm@vger.kernel.org>; Thu, 07 Sep 2023 09:13:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694103133; x=1694707933; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XeBbVRtX/aIWzlXHiHUn4OCigEvkTh1dLDX2VajCG9M=;
+        b=I9pYhI4cbi4i2ksJ4Q+hdVFqs0CJYiCiY4NKwlgrr3JdmXoDZ2DQofYkOhvesPnJu3
+         ydYFmWxU3p9GLZ1z/Z+XXB52f4487vT+xrTTMDxa8qvjRlW8aduRE7LNbvzaKzhCT1h7
+         QCCn0jqoS0USuQrqoDOWlzLUz71O5u0pCVOMoY/w/7v8hT7Xom93CqELUTTxTBMRoWgq
+         ZTNevq/krmYz4DfrziO0Vb5UGb1N/aOXFEneFysPJ15WxpbODbsYvMDH5p8wsI9NkXaH
+         LJz7MOf1n8BJeu+fyGkVSJL+FBpiQGr7+zjB/EgtySi1/8y6vqGcfNpjtSTPcGNq6iQl
+         ARWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694103133; x=1694707933;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XeBbVRtX/aIWzlXHiHUn4OCigEvkTh1dLDX2VajCG9M=;
+        b=Asd0ujQEvvJwZklorfaf74h1nqHpUtHUuGmRrnrNVgiC6k01/WuI/lyFXNoj/umagw
+         23IZ3kx5r0b7/Kv9pH9P/usDY39W6vA3rRDH1xAnhjHv63/0XQ3G8DPHuy0DlBn+H9lY
+         RD3KZQITaWOaXs8AFyoSgmKeeqNIzij603PMDs0DFoDO2/BmltjPGpw/q12WPGI8iIum
+         vz9glD8eJeHWLluVKRMb2L5tkQW9Mq7ya2yPg6JC8Kz9MrLJBewwuDxHyFnN92z5vC7a
+         WmPdURdNZ3JU6v/YB+dDran4j/ECu4OoUTNa45YOVLMx5Hjo3a5nkP0A6+krsRuBICSv
+         eV7Q==
+X-Gm-Message-State: AOJu0YwEN34RprBUHkX8CXYA1jVInZBCmLmG1Ed/P4FD355JeGbdSbWu
+        OpBtlguRd1kNQHpRl25hoG2XTsSm7I9RLEtikyI=
+X-Google-Smtp-Source: AGHT+IGEGmreaznUgLT0wco7186DbxtRAxnnEI6albp1jZXrz+2WijzMa2iZXNVK2n5/iINTQ0Yxlw==
+X-Received: by 2002:adf:fd4d:0:b0:316:fb57:26d1 with SMTP id h13-20020adffd4d000000b00316fb5726d1mr4496582wrs.8.1694076710917;
+        Thu, 07 Sep 2023 01:51:50 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id l21-20020a1c7915000000b003fef6881350sm1853914wme.25.2023.09.07.01.51.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Sep 2023 01:51:50 -0700 (PDT)
+Date:   Thu, 7 Sep 2023 10:51:49 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Charlie Jenkins <charlie@rivosinc.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>, jrtc27@jrtc27.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        bpf@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, peterz@infradead.org, jpoimboe@kernel.org,
+        jbaron@akamai.com, rostedt@goodmis.org,
+        Ard Biesheuvel <ardb@kernel.org>, anup@brainfault.org,
+        atishp@atishpatra.org, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+        yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+        sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+        bjorn@kernel.org, luke.r.nels@gmail.com, xi.wang@gmail.com,
+        namcaov@gmail.com
+Subject: Re: [PATCH 00/10] RISC-V: Refactor instructions
+Message-ID: <20230907-304f53e7de4e0386d04f4dcf@orel>
+References: <ZN5OJO/xOWUjLK2w@ghost>
+ <mhng-7d609dde-ad47-42ed-a47b-6206e719020a@palmer-ri-x1c9a>
+ <20230818-63347af7195b7385c146778d@orel>
+ <ZPjKGd7VstwIKDV5@ghost>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <411a4c35-4f65-c166-0eb0-994b8e39f9c6@redhat.com>
-References: <20230904130140.22006-1-nrb@linux.ibm.com> <a41f6fc29032d345b3c2f24e19f32282dd627e5c.camel@linux.ibm.com> <169390280362.97137.14761686200997364254@t14-nrb> <411a4c35-4f65-c166-0eb0-994b8e39f9c6@redhat.com>
-Subject: Re: [PATCH v3 0/2] KVM: s390: add counters for vsie performance
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-To:     David Hildenbrand <david@redhat.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Message-ID: <169407663163.12126.3803431831591387133@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 07 Sep 2023 10:50:31 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BhrJnjoYTD1nFzWJQvZ5BqKEbpcnCZqd
-X-Proofpoint-GUID: cIKtLQdGh3AmXR6UWn-yP6R12VeXYDi0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-06_12,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=437
- lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 spamscore=0
- malwarescore=0 clxscore=1015 priorityscore=1501 suspectscore=0
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309070074
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZPjKGd7VstwIKDV5@ghost>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting David Hildenbrand (2023-09-06 09:37:28)
-[...]
-> Right, the compiler can do what it wants with that. The question is if=20
-> we care about a slight imprecision, though.
->=20
-> Probably not worth the trouble for something that never happens and is=20
-> only used for debugging purposes.
+On Wed, Sep 06, 2023 at 11:51:05AM -0700, Charlie Jenkins wrote:
+> On Fri, Aug 18, 2023 at 09:30:32AM +0200, Andrew Jones wrote:
+> > On Thu, Aug 17, 2023 at 10:52:22AM -0700, Palmer Dabbelt wrote:
+> > > On Thu, 17 Aug 2023 09:43:16 PDT (-0700), Charlie Jenkins wrote:
+> > ...
+> > > > It seems to me that it will be significantly more challenging to use
+> > > > riscv-opcodes than it would for people to just hand create the macros
+> > > > that they need.
+> > > 
+> > > Ya, riscv-opcodes is pretty custy.  We stopped using it elsewhere ages ago.
+> > 
+> > Ah, pity I didn't know the history of it or I wouldn't have suggested it,
+> > wasting Charlie's time (sorry, Charlie!). So everywhere that needs
+> > encodings are manually scraping them from the PDFs? Or maybe we can write
+> > our own parser which converts adoc/wavedrom files[1] to Linux C?
+> > 
+> > [1] https://github.com/riscv/riscv-isa-manual/tree/main/src/images/wavedrom
+> 
+> The problem with the wavedrom files is that there are no standard for
+> how each instruction is identified. The title of of the adoc gives some
+> insight and there is generally a funct3 or specific opcode that is
+> associated with the instruction but it would be kind of messy to write a
+> script to parse that. I think manually constructing the instructions is
+> fine. When somebody wants to add a new instruction they probably will
+> not need to add very many at a time, so it should be only a couple of
+> lines that they will be able to test.
+>
 
-Yep, probably true. Thanks!
+OK, we'll just have to prop our eyelids open with toothpicks to get
+through the review of the initial mass conversion.
+
+Thanks,
+drew
