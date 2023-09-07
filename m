@@ -2,56 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5FDA79768D
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BF267976B6
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:14:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234817AbjIGQNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 12:13:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46848 "EHLO
+        id S238865AbjIGQO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 12:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238413AbjIGQMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 12:12:23 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD768A5EC
-        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 09:09:26 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401c90ed2ecso12794295e9.0
-        for <kvm@vger.kernel.org>; Thu, 07 Sep 2023 09:09:26 -0700 (PDT)
+        with ESMTP id S239217AbjIGQOb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 12:14:31 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0DFD1FE8;
+        Thu,  7 Sep 2023 09:10:57 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-52c88a03f99so1467246a12.2;
+        Thu, 07 Sep 2023 09:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694102887; x=1694707687; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SUKo+1CllhDiFuk8e5kRvChp7TbG5sdYIOTqTfNiyNA=;
-        b=cHLzUuMFjaAqVETUahANCgaHF9+qKTTW/9NpcRh0dgJ8WJMj4xn7P8tx0sDsIxwvgr
-         SMmrrnFrCtG5lVPMspRFL33sgrP65BpxAf0uaVGfqgeEtEmgfdmrFvolIC4/b+fJcgMK
-         8Bponfb6ohYWi1/6lsKyoznFR8BFf3D2MLnLbcMec4gNgNvxcRLj/nVsrGZzMQr2YqMU
-         qFvaucobPqq9d6Y1dNl/pu5nVD8q/l+chjERqBPKIZUVMcsNKGv0+pUrzmpXXnfx71sY
-         mdVQ5V9WvF/Ky0XxK3JO6l8GhQMP5Q1Y08TOFWZZyjm8n6YlUCVSFNkqDG3JMTklE/vn
-         iRdA==
+        d=gmail.com; s=20221208; t=1694102993; x=1694707793; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EBBEzL7qY3uq6+ZqigJzuGuvME9kRMD/negQGQFd1kU=;
+        b=SVZ3HxdXmiXzCR3Sg4YkbUiQK5WHwETv3O3BrTFQ+jw5sKWGBZM6Hag0a7249Uogof
+         wSEz0ad57FX0XyHKFUSS0OsMHVwclj6u2mnqyNBkikj07KP0KPREzy6M5zZYh68eU8yo
+         ONg6MZfg949Er1TgPsYZRWEibT1sQpXGkg5KBcCsVQCs9ocsQyxcwYSWFL1etUPTNDg6
+         E0mUxI4/E0M0t6arTvkEoP2ZH0S3b824Lx6OJVknSr5nrsaXyYBaYdH9dxfltVCszhE6
+         apK4S0ZTozlj/xr+clcCGc9QPg70gERbhJ/eFCRc3mk1pJovU7uzQIS/pjfvn5M8JcPr
+         HL9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694102887; x=1694707687;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SUKo+1CllhDiFuk8e5kRvChp7TbG5sdYIOTqTfNiyNA=;
-        b=VQghNDav21zxL2UbOIR7bq/L/oavLK2tc8UMVYJjL9GQ/H/lS8B+bBCLXl4WXb58EW
-         SRh36wIu2p2zXL5CTgXbDBuczcED6jAPigROCydy3MCz9rIDrD5soBW2TeT+H2nWPgFe
-         lWEK1c/YGmcLPH2UW1jfCCLkVjXcdDfHmLziiaeSzUUsw1iIEajtqStn76HvKLVQVciQ
-         FgMS2AJm05+Uun8DmCNTC9yMiazg8qROJJ8XHhJ9h48zlHU1DVLR0PQq4LLlN7yY92G8
-         zHj5iZYICUj0bX9xAwWzCQHIFTN7UfxIy/zU91SaYBAHQqbEWuJKlikVo3vQqLI5Zb1t
-         1XwQ==
-X-Gm-Message-State: AOJu0YwJoFRB8DthpFj+vYDON2Q+o2yvWHfVlawaKMPn+uJSvgh15aIC
-        36EgmRJqaWH/y42Vu4obE8pYp4j6Y35/uHN8ieQ=
-X-Google-Smtp-Source: AGHT+IFpt5OHjqn8E5AQWQ3lRTTwlRHl603sQrss7nLMvcblN8lMTU9C4YqIhqBmSU5t7umjGBWQQA==
-X-Received: by 2002:a7b:c414:0:b0:3fe:f74c:b4f6 with SMTP id k20-20020a7bc414000000b003fef74cb4f6mr4055831wmi.17.1694077304089;
-        Thu, 07 Sep 2023 02:01:44 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id s13-20020a7bc38d000000b003fe24441e23sm1882132wmj.24.2023.09.07.02.01.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 02:01:43 -0700 (PDT)
-Date:   Thu, 7 Sep 2023 11:01:42 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Haibo Xu <xiaobo55x@gmail.com>
+        d=1e100.net; s=20221208; t=1694102993; x=1694707793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EBBEzL7qY3uq6+ZqigJzuGuvME9kRMD/negQGQFd1kU=;
+        b=kXjMsZ79g/QSnre9deS0wouUz0mQiiUQfDIc97dqKYnPkI2Jf5rnbyRsE7iZQ7FOwJ
+         zBSFF3hKb0PBepgqvxyrTixzf38tQ1cMCoY3jzz/PMFhYMrNuglv2mtCuma+l/epaZy8
+         t9th/jd/aLK4yIV0EZOLbgGu/H946K08IJicBZ0NVTCoUoviWOwTDyCZYEnhM/neJTk9
+         ZtU0sEUdgZc6ZOktQx7knsp32KDeBy3gmGXzIsFZkjmUtht50GQTOQUgryDxOqc439S0
+         +/7t9J9YJxqyspyMlVuM+IszxMAzhtH+2AClPxTPUp8+Wt5cHnQw2O0jc9UARb/AXRDr
+         kGSw==
+X-Gm-Message-State: AOJu0YzkuZaO5kygphD4AF86Si5fHxv7D7nJszdsZ0JNiiN33hN35BWF
+        4yCxKdk3ylOeMLYVziYegSbKFcrXeLcXxkds+Hi0vQFj
+X-Google-Smtp-Source: AGHT+IF10+wenAf/r4lgyEOBY89UZGCOdwUC3J+LpxGhdoe1wYTW/cIeqheprklSo2IBVjz46fa7sLxs5xkSY5w4zLI=
+X-Received: by 2002:a2e:804c:0:b0:2bc:c830:4cbb with SMTP id
+ p12-20020a2e804c000000b002bcc8304cbbmr3729686ljg.45.1694078317171; Thu, 07
+ Sep 2023 02:18:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1693659382.git.haibo1.xu@intel.com> <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
+ <20230904-aa8b0d8d23d391586686038a@orel> <CAJve8ok5cU+h1K+WJ+aDpB+u+PBo8XosUyyVbMGy-xR0XiWFdw@mail.gmail.com>
+ <CAJve8om+dLcG+4trDfG1yx8vhj52RhPZrJoF-emWDX+OPM088A@mail.gmail.com> <20230907-bde62d037a3aaeedfe31f964@orel>
+In-Reply-To: <20230907-bde62d037a3aaeedfe31f964@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Thu, 7 Sep 2023 17:18:25 +0800
+Message-ID: <CAJve8okJOHofRK=0VRG8QPetOgk_WexEui_3UtEKk+4x1iPwMA@mail.gmail.com>
+Subject: Re: [PATCH v2 7/8] KVM: riscv: selftest: Change vcpu_has_ext to a
+ common function
+To:     Andrew Jones <ajones@ventanamicro.com>
 Cc:     Haibo Xu <haibo1.xu@intel.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -81,92 +86,96 @@ Cc:     Haibo Xu <haibo1.xu@intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Like Xu <likexu@tencent.com>, Peter Gonda <pgonda@google.com>,
         Thomas Huth <thuth@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
         David Woodhouse <dwmw@amazon.co.uk>,
         Michal Luczaj <mhal@rbox.co>, Paul Durrant <paul@xen.org>,
         linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
         kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 7/8] KVM: riscv: selftest: Change vcpu_has_ext to a
- common function
-Message-ID: <20230907-bde62d037a3aaeedfe31f964@orel>
-References: <cover.1693659382.git.haibo1.xu@intel.com>
- <b6ef1b031e3a581f481cf19a26623388163444b4.1693659382.git.haibo1.xu@intel.com>
- <20230904-aa8b0d8d23d391586686038a@orel>
- <CAJve8ok5cU+h1K+WJ+aDpB+u+PBo8XosUyyVbMGy-xR0XiWFdw@mail.gmail.com>
- <CAJve8om+dLcG+4trDfG1yx8vhj52RhPZrJoF-emWDX+OPM088A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJve8om+dLcG+4trDfG1yx8vhj52RhPZrJoF-emWDX+OPM088A@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 07, 2023 at 11:57:00AM +0800, Haibo Xu wrote:
-> On Wed, Sep 6, 2023 at 6:10 PM Haibo Xu <xiaobo55x@gmail.com> wrote:
-> >
-> > On Mon, Sep 4, 2023 at 10:04 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+On Thu, Sep 7, 2023 at 5:01=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Thu, Sep 07, 2023 at 11:57:00AM +0800, Haibo Xu wrote:
+> > On Wed, Sep 6, 2023 at 6:10=E2=80=AFPM Haibo Xu <xiaobo55x@gmail.com> w=
+rote:
 > > >
-> > > On Sat, Sep 02, 2023 at 08:59:29PM +0800, Haibo Xu wrote:
-> > > > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > > > index d8ecacd03ecf..c4028bf32e3f 100644
-> > > > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > > > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > > > @@ -44,20 +44,6 @@ bool check_reject_set(int err)
-> > > >       return err == EINVAL;
-> > > >  }
+> > > On Mon, Sep 4, 2023 at 10:04=E2=80=AFPM Andrew Jones <ajones@ventanam=
+icro.com> wrote:
 > > > >
-> > > > -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > > > -{
-> > > > -     int ret;
-> > > > -     unsigned long value;
-> > > > -
-> > > > -     ret = __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> > > > -     if (ret) {
-> > > > -             printf("Failed to get ext %d", ext);
-> > > > -             return false;
-> > > > -     }
-> > > > -
-> > > > -     return !!value;
+> > > > On Sat, Sep 02, 2023 at 08:59:29PM +0800, Haibo Xu wrote:
+> > > > > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/t=
+ools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > > > index d8ecacd03ecf..c4028bf32e3f 100644
+> > > > > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > > > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > > > @@ -44,20 +44,6 @@ bool check_reject_set(int err)
+> > > > >       return err =3D=3D EINVAL;
+> > > > >  }
+> > > > >
+> > > > > -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> > > > > -{
+> > > > > -     int ret;
+> > > > > -     unsigned long value;
+> > > > > -
+> > > > > -     ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value=
+);
+> > > > > -     if (ret) {
+> > > > > -             printf("Failed to get ext %d", ext);
+> > > > > -             return false;
+> > > > > -     }
+> > > > > -
+> > > > > -     return !!value;
+> > > >
+> > > > get-reg-list will now assert on get-reg when an extension isn't pre=
+sent,
+> > > > rather than failing the __TEST_REQUIRE(), which would do a skip ins=
+tead.
+> > > > We need both the return false version and the assert version.
+> > > >
 > > >
-> > > get-reg-list will now assert on get-reg when an extension isn't present,
-> > > rather than failing the __TEST_REQUIRE(), which would do a skip instead.
-> > > We need both the return false version and the assert version.
+> > > Ok, Will keep this one for get-reg-list and add another one for
+> > > arch-timer specific usage.
 > > >
 > >
-> > Ok, Will keep this one for get-reg-list and add another one for
-> > arch-timer specific usage.
+> > Just thought about it again, maybe we only need the "return false"
+> > version for both get-reg-list
+> > and arch-timer tests since if an extension was not available, the test
+> > can be skipped with a message.
 > >
-> 
-> Just thought about it again, maybe we only need the "return false"
-> version for both get-reg-list
-> and arch-timer tests since if an extension was not available, the test
-> can be skipped with a message.
-> 
-> bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> {
->        unsigned long value = 0;
-> 
->        __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> 
->        return !!value;
-> }
+> > bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> > {
+> >        unsigned long value =3D 0;
+> >
+> >        __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> >
+> >        return !!value;
+> > }
+>
+> Yup, I had actually seen that when reviewing a later patch in this series=
+,
+> but I wasn't concerned if we added the assert type anyway, since we
+> frequently end up with the two function types for KVM queries. If we don'=
+t
+> have a need for an assert type yet, then we don't need to introduce it.
+> However, we should introduce the non-assert type as __vcpu_has_ext(),
+> reserving the vcpu_has_ext() name for the assert type, per the kvm
+> selftests naming convention.
+>
 
-Yup, I had actually seen that when reviewing a later patch in this series,
-but I wasn't concerned if we added the assert type anyway, since we
-frequently end up with the two function types for KVM queries. If we don't
-have a need for an assert type yet, then we don't need to introduce it.
-However, we should introduce the non-assert type as __vcpu_has_ext(),
-reserving the vcpu_has_ext() name for the assert type, per the kvm
-selftests naming convention.
+Sure, thanks!
 
-Thanks,
-drew
+> Thanks,
+> drew
