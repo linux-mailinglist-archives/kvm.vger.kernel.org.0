@@ -2,67 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B1F79760E
-	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 18:01:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7610A79753E
+	for <lists+kvm@lfdr.de>; Thu,  7 Sep 2023 17:47:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236486AbjIGQBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 12:01:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45832 "EHLO
+        id S235028AbjIGPrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 11:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239813AbjIGP65 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 11:58:57 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E826B1A4
-        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 08:46:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694101609; x=1725637609;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZpjuLTWxxSZsdrMaGmX1WqcNjY8TGra7vWjCo4KkIcM=;
-  b=JKbzcvyG5U10tQi9JYpW2DoAgE82ywM1IUOE154g/ctY/Vedi+u2ubF5
-   pjN16rSLlFywSKVYcklOC/mgpadfxxRmGGwXr/5s0SvaoSlQfi9nxbH7l
-   /as46keNR/nO6wZGgRXdA1L9S7sOljO+xKFVRu/wxC7BwOKSPOmBxIJaa
-   Dfpk7oLZP9BtKo+wiqvH+kgucNmX7qnHfBP0thGvYwVcd+d8Lx3McSazr
-   IXTPSuQr2YtiuP+blOhMmFPWq8szSkPQ+SCXTsXFxK80HhrA3ZjImpRxM
-   P+FHt0VjCLJN2Ro1T29oOkbCL2gCmbbcR2/WULMl67PdZc7W4nK3MgDNx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="376178334"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="376178334"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 23:30:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="885028879"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="885028879"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 23:29:47 -0700
-Message-ID: <d5323204-a1b8-37c0-0ac2-8728e9098151@linux.intel.com>
-Date:   Thu, 7 Sep 2023 14:29:58 +0800
-MIME-Version: 1.0
+        with ESMTP id S245116AbjIGP3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 11:29:15 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on20611.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::611])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963401BF3
+        for <kvm@vger.kernel.org>; Thu,  7 Sep 2023 08:28:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UertFvhdCLVSyitG/UHesJ8tUp2HWNdmBQFcwI35eG3CBw+gc4IXzsSQfidmSi+G98kgp1WA2rl/qKVD/eU0Q1Ny3itoahX2ovx0F/av943hHv2yP/94SfoMS6kIlegWHT+vq4WLpVsxI7g8sIquTIAt00AsNF7o/igwRsIG9J7LLlmcYM0WuUdjKm2yMVhAStepxyKSOgHoAJ2XSmTm+6XLlpg6NsRjkVwmn0tvOU5usCC6BGHvtrk8Td4IXjcZRRpUKRh25IhtIUACkGR0q/FcsFFYtoan28m9J92kII8IlNr1lYxTo/kO89LnRMfWI70OoN1ZWGgjWk/2YyfprQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HF57vorCQbKt/NWp5/25prdYVR4NUurlk8mCilezb2M=;
+ b=mZvgOuB0/4A2MnkJ5cQLooLKvFbhq60Xnj3h8G0j2ZfOFaKSvmQcQqFPWn++FEll8jT5Ow9YkafEnGMhgrgn7Z/GaiIsfJ8GWT07dCSpUJiPLvCUscrpN04Z22XCDtqtKXJOgs9LnboB6Bdzcpcs/mUMyLwNpY5WKlDRTpraULUy/a+DLqFFXqqd/6+RdPGfcCUQy8HuvKKfpMS4Zz5yhmrwBXSIvbUsVn68iGecOhB7TCUA+be/zo9feBoEPA+NFHgN2fzb4LfN+67VeWFz+qOCemOQkYsQ1ioStF2ZkKghXmLp8rv4+I6xakX48oUMFn2h9U/ap6vKxBbb8BPP8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HF57vorCQbKt/NWp5/25prdYVR4NUurlk8mCilezb2M=;
+ b=Zi7enVXnEO8mYetR6Mz2+QsA2Koc6WMKmC2wjlq42kpxFPaUYbqjiQJTtfuoL6uKbYih8Mj39d+DmMzQH5FdNxAPCd0F13YI+guYtx+MrxdOUNVH9Wwmy0RsW/UXXz3dUhF/Lu+LIr0y/7LOGbvn4+mijnvxdijnw/D4y9hkNcw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ SJ2PR12MB8184.namprd12.prod.outlook.com (2603:10b6:a03:4f2::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
+ 2023 09:56:02 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::12ec:a62b:b286:d309]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::12ec:a62b:b286:d309%7]) with mapi id 15.20.6768.029; Thu, 7 Sep 2023
+ 09:56:01 +0000
+Message-ID: <d230d9f5-53bd-8ea1-d4c7-717b0e8be9b9@amd.com>
+Date:   Thu, 7 Sep 2023 16:55:52 +0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
+ Thunderbird/102.10.1
+Subject: Re: [PATCH] iommu/amd: remove amd_iommu_snp_enable
 Content-Language: en-US
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
-        Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>
-References: <20230901185646.2823254-1-jmattson@google.com>
- <8b964afb-4b8e-b8fb-542c-c76487340705@linux.intel.com>
- <ZPjnExoXOsqlfagD@google.com>
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZPjnExoXOsqlfagD@google.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
+Cc:     Kim Phillips <kim.phillips@amd.com>, joro@8bytes.org,
+        iommu@lists.linux.dev, Michael Roth <michael.roth@amd.com>,
+        "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        linux-coco@lists.linux.dev
+References: <20230831123107.280998-1-hch@lst.de>
+ <d33f6abe-5de1-fdba-6a69-51bcbf568c81@amd.com>
+ <20230901055020.GA31908@lst.de> <ZPiAUx9Qysw0AKNq@ziepe.ca>
+From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
+In-Reply-To: <ZPiAUx9Qysw0AKNq@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR01CA0028.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::21) To DM8PR12MB5445.namprd12.prod.outlook.com
+ (2603:10b6:8:24::7)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|SJ2PR12MB8184:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b3fd39a-2224-42cb-8dd8-08dbaf88a4a6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 09qKP1w8DFWW714Nzvhqwh47DXyotezvFN3z1OkuPs/VVkp/hAoOyj/oPfWyZpSKsp1BBinOKCbLvuB7KdnExFQApjVFckT4xjXuRy8I62RhKEie9r2yGv1sV3PrYtlTuxBBrfJqkB3QWn0x1J63Df9BiBiNfyxWzl+1K3HZ1BO3UY1V8Q9C0pJA39dtjB1N022boagR9OigdRQ49DknU+MzWzeTAhnT+rNe13TALLn5SyoXaVbOPdUr/d+w2hpiX7MrlP+okgl2tIRLPCLXS4kkrTYW7t2MZICP3ltapOfw6qMyc3CICCiJ8O6yjU2gXWc5Oy8Qq2HMy8BbCNQDxr5LoSBcLs4Qb/p/H27t86zGGrfMl+eXm75Y5QEN4Mv7Dcp5VADsM65OnO+x+vItdzRYmnx/9smonMVTT9xghlrsybicZ97kWXY66hAXWvJ9RQHnlux6cTisLRhKnajdJeAWkao7gRDKgaVwaHIpEe8ufpr3LYhkRi/dPOSlt9JQmPusRJ1DqswPQcPu6/oBoWd9mdREUxJEEWeLHjXRdQkfxn7leyr+9PsyN7dKbbx5hl/xJnMaM7g6nkQquLSBcxkXd6eS7x8kFZ/uK0PXjcCfC6n9b75Ce1MwIOktu/LnRflp52Gdw66fnBZe6HOJoA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(366004)(136003)(396003)(376002)(186009)(1800799009)(451199024)(8676002)(6666004)(6486002)(6506007)(53546011)(966005)(478600001)(26005)(2906002)(6512007)(316002)(110136005)(66556008)(41300700001)(66476007)(54906003)(8936002)(66946007)(5660300002)(4326008)(2616005)(36756003)(86362001)(31696002)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MW1qQUlJMUVtbW50alVKQ1FOSjF3Nm83OUlDRWNtSjhqeWFPVjBlYUxoN2pw?=
+ =?utf-8?B?bmwyL2VuY25YZUdKQ04rTHZGbFB3aWZhZndESG55U1k3dXB6N2dvbEt6Z0tz?=
+ =?utf-8?B?UkNiVTBHTnFGcFFCRVJjRFM0R1dodDF0UFcwa3VlcFZ4cmh5a2l1Szl6MGtT?=
+ =?utf-8?B?NFR0UmR0bEl6TWhLcjBOQmNsakpYMzhZaFZzdnRrR3BCMXJWaHRQdWFsdUxT?=
+ =?utf-8?B?YkxEKzdGZEFVOUF0TnJmQWt2YzNLT3RpTC9kaE94YytZOUlhTHBDY1N6Rm5j?=
+ =?utf-8?B?dHhQNm5UcEh5N215cjRPL3lHaE1oeVhUeGtzNVdINUdDdjRaYTkydXdBV2pT?=
+ =?utf-8?B?d01VYisyTURYZGdJTU5SMldqL0NyQTd4ZTl6bVc0YXNXVHRObm1LVm1YYXNN?=
+ =?utf-8?B?a2d4UWVXYzJ1NmxhWlgxRHZXVDJ3dEl5YlFlVnB6VFZJeEN2U2ZVc1E4R1du?=
+ =?utf-8?B?WXB4RWgxT3hHa3UyN1VoR2JrZllKWWZRZTJjZ01MRGplOE4raituZjR4Q0s1?=
+ =?utf-8?B?UmRtRVRkSWJUd2tRdkpNc3E2enRsK2hRM3pEYURrVVpObENsNFBwNG1kaHVS?=
+ =?utf-8?B?Y2xTQkV0TW5VMndRMG9RT1FHMmE3dHRjRnoxQUltaklaM0N4YkxBUG9TUEdY?=
+ =?utf-8?B?aS9tNnpncEtTdFQ0VENUWG41b1p4eHFYbWRBbFR1dXoxNVpzS3BCdGY1U0dK?=
+ =?utf-8?B?bWpHK0p1VWdpWlhhMjkyNG1qcWhyWERpb0RXOVk0NFhsM1B1K0p1S3Y0REVH?=
+ =?utf-8?B?NDBnTFVkRlVKZ2gxTjBaYllsWUtqckNXemdRLzRubEJ1cGdhVXRaYUFKeExX?=
+ =?utf-8?B?MkYvUXpNK3hZbWkzUGo2QUFmQUszYTFEc2FIcW4wcjY3WjNyNy9xSk0vVC85?=
+ =?utf-8?B?K0hJVlhobE5CMkFYWm9sbkNuVlFxYjRuRThHN05GVDcrZys3WjNKTHVHQm5i?=
+ =?utf-8?B?WmlibExBY3BReXY5eTF5VWNFWGFqdFZGTVl4UzF4ZjhyYlBjaDFEZU5KSS9Y?=
+ =?utf-8?B?TEhpYkpUYWY3eHlNdHdJT2RUMndJcEdpcEdneDBVV1o2OHUrRGhLbXlkTjk0?=
+ =?utf-8?B?aVpKMmJ6WHR0bmNCcU5nWXlGcnlCUVZ5RFlCM2NrOVhQTW1oWmttRXk3R3Q4?=
+ =?utf-8?B?Q1BNN0xiWk15TzdhR1ArajJTOUU4ZHJiaC9HU3FYTW1XYm5uRVFHWXZYY2wv?=
+ =?utf-8?B?ZDllbFF2RlVsTkNreHE1R1h5SHFVQytRTENoWXQyVHlNS1o0K2VINnpGRXN3?=
+ =?utf-8?B?eDhPSFVPZUVzcjBDSHJPTS9jdkt5dythekR1UVlRQ3VyM1BaQzVnRkJIVEYy?=
+ =?utf-8?B?aVpJc2Z6bmw0TWhaTVJXMm83M2l3dGRXTUMzaVMwNWZNNFBNRk5Pb3VSQmRo?=
+ =?utf-8?B?TXBWT21kVUNsZDlyQ0xqMVphcXJFVE1jSGlHNlZONWJNNkdVWFNCL2w1QWdW?=
+ =?utf-8?B?ZWZPdXNvV2JBdUt4VHBheXV2QllnVlVMVVRwUFRRNGZUQWIrUXlVSHdUU2o1?=
+ =?utf-8?B?NEU5Q1VUMHN6YmthZ1FJdzhsSnJkNjVqZUlFMUhKa0h4emtlTlV1MXJuYzRL?=
+ =?utf-8?B?MWxZUmNLMmpOUDZNOTBSYXU2Vmw0QnFzblVQdndkSUFHZHo0bSt4U1BiRytH?=
+ =?utf-8?B?elpvOWcvbmJaNHVIZ3dZTHhGdWgydWF0Mm5BQlFzTnU5eksyVW5odXNnTUxD?=
+ =?utf-8?B?UTlEUjdKL0ZvQ0s2c3dtNGNqMGhJMEE0Vkl5VXQydkd6azdhUDRUUE9yb3Va?=
+ =?utf-8?B?UnYrMVNzby92OGRvKzJSZStSME9EdDRncDlyeVJSbFVrL1VmdUZNcU14Unhi?=
+ =?utf-8?B?bG80ZlY5cnIzVTJZYm8rNUtVRkVlbDBPQ3hJY2IwdnhCRzRXQ2JZN1lPWnB4?=
+ =?utf-8?B?THhLVlY3Z2RMSkZGb1pCRysvaGpuc0R6Wi9KOTJYWGhFVXp4M0hTWndrK0o2?=
+ =?utf-8?B?cDE4SXBMZ3ZTY1RBWi8xejJhcnc5bkkvK1A4Q0ZJSzZmWnA4ZWtJZzRIdWFL?=
+ =?utf-8?B?ZzhKalliU1FjM2ttQTBXZ0swUjBReFBnd1BLUUYvbzd3Z0JiZGVpRjI1US8y?=
+ =?utf-8?B?VENYZTdwRER3L2JRaFZGN2RDSU42NndQTkpDZmFvelkwdk92bmZxNzRCV2dJ?=
+ =?utf-8?Q?bm15UHHrTx8pNJCmFRPsLfSN2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b3fd39a-2224-42cb-8dd8-08dbaf88a4a6
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 09:56:01.9049
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9jTGwZVXz6YDLnmUG5MCJCuZjRuc9qU1mDLxbY9l4dq87EOeLeMsqEQnUxUFB6fL8Vwb+5s6MlY4MTSzha6VPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8184
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -70,141 +129,59 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 9/7/2023 4:54 AM, Mingwei Zhang wrote:
-> On Wed, Sep 06, 2023, Mi, Dapeng wrote:
->> On 9/2/2023 2:56 AM, Jim Mattson wrote:
->>> When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
->>> VM-exit that also invokes __kvm_perf_overflow() as a result of
->>> instruction emulation, kvm_pmu_deliver_pmi() will be called twice
->>> before the next VM-entry.
+
+On 9/6/2023 8:36 PM, Jason Gunthorpe wrote:
+> On Fri, Sep 01, 2023 at 07:50:20AM +0200, Christoph Hellwig wrote:
+>> On Thu, Aug 31, 2023 at 01:03:53PM -0500, Kim Phillips wrote:
+>>> +Mike Roth, Ashish
+>>>
+>>> On 8/31/23 7:31 AM, Christoph Hellwig wrote:
+>>>> amd_iommu_snp_enable is unused and has been since it was added in commit
+>>>> fb2accadaa94 ("iommu/amd: Introduce function to check and enable SNP").
+>>>>
+>>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>>> ---
+>>>
+>>> It is used by the forthcoming host SNP support:
+>>>
+>>> https://lore.kernel.org/lkml/20230612042559.375660-8-michael.roth@amd.com/
 >>
->> Do we have a way to reproduce this spurious NMI error constantly?
->>
-> I think I shared with you in another thread. I also shared the event
-> list and command here:
->
-> https://lore.kernel.org/all/ZKCD30QrE5g9XGIh@google.com/
->
-> To observe the spurious NMIs, you can just continously look at the
-> NMIs/PMIs in /proc/interrupts and see if you have huge number within 2
-> minutes when running the above command in a 8-vcpu QEMU VM on Intel SPR
-> machine. Huge here means more than 10K.
->
-> In addition, you may observe the following warning from kernel dmesg:
->
-> [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
-> [3939579.462836] Dazed and confused, but trying to continue
+>> Then resend it with that support, but don't waste resources and everyones
+>> time now.
+> 
+> +1
+> 
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Thanks. I run the perf command which you shared in a VM for 10 minutes 
-on SPR, I indeed see the unknown NMI warning messages, but I didn't see 
-the huge number NMI interrupt burst, instead the NMI number increased 
-averagely and there is no a burst increase.
+Duly noted :)
 
-After applying this patchset, the unknown NMI warning is indeed gone.
+The reason we introduced this change separately from the SNP series was 
+because it is part of a different subsystem, which normally get pulled 
+in separately. Unfortunately the main series takes a long time to get 
+into upstream Linux kernel. So, this code appears as unused, which I can 
+see how it can be confusing to other developers.
 
-Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+FYI: This is just removing a function to enable SNP support in AMD IOMMU 
+driver. The underlying logic to enable the hardware still exist, which 
+is part of the SNP feature enablement of the AMD IOMMU driver.
 
->
->>> That shouldn't be a problem. The local APIC is supposed to
->>> automatically set the mask flag in LVTPC when it handles a PMI, so the
->>> second PMI should be inhibited. However, KVM's local APIC emulation
->>> fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
->>> are delivered via the local APIC. In the common case, where LVTPC is
->>> configured to deliver an NMI, the first NMI is vectored through the
->>> guest IDT, and the second one is held pending. When the NMI handler
->>> returns, the second NMI is vectored through the IDT. For Linux guests,
->>> this results in the "dazed and confused" spurious NMI message.
->>>
->>> Though the obvious fix is to set the mask flag in LVTPC when handling
->>> a PMI, KVM's logic around synthesizing a PMI is unnecessarily
->>> convoluted.
->>>
->>> Remove the irq_work callback for synthesizing a PMI, and all of the
->>> logic for invoking it. Instead, to prevent a vcpu from leaving C0 with
->>> a PMI pending, add a check for KVM_REQ_PMI to kvm_vcpu_has_events().
->>>
->>> Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
->>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>> ---
->>>    arch/x86/include/asm/kvm_host.h |  1 -
->>>    arch/x86/kvm/pmu.c              | 27 +--------------------------
->>>    arch/x86/kvm/x86.c              |  3 +++
->>>    3 files changed, 4 insertions(+), 27 deletions(-)
->>>
->>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->>> index 3bc146dfd38d..f6b9e3ae08bf 100644
->>> --- a/arch/x86/include/asm/kvm_host.h
->>> +++ b/arch/x86/include/asm/kvm_host.h
->>> @@ -528,7 +528,6 @@ struct kvm_pmu {
->>>    	u64 raw_event_mask;
->>>    	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
->>>    	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
->>> -	struct irq_work irq_work;
->>>    	/*
->>>    	 * Overlay the bitmap with a 64-bit atomic so that all bits can be
->>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>> index bf653df86112..0c117cd24077 100644
->>> --- a/arch/x86/kvm/pmu.c
->>> +++ b/arch/x86/kvm/pmu.c
->>> @@ -93,14 +93,6 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
->>>    #undef __KVM_X86_PMU_OP
->>>    }
->>> -static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
->>> -{
->>> -	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
->>> -	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
->>> -
->>> -	kvm_pmu_deliver_pmi(vcpu);
->>> -}
->>> -
->>>    static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
->>>    {
->>>    	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
->>> @@ -124,20 +116,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
->>>    		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
->>>    	}
->>> -	if (!pmc->intr || skip_pmi)
->>> -		return;
->>> -
->>> -	/*
->>> -	 * Inject PMI. If vcpu was in a guest mode during NMI PMI
->>> -	 * can be ejected on a guest mode re-entry. Otherwise we can't
->>> -	 * be sure that vcpu wasn't executing hlt instruction at the
->>> -	 * time of vmexit and is not going to re-enter guest mode until
->>> -	 * woken up. So we should wake it, but this is impossible from
->>> -	 * NMI context. Do it from irq work instead.
->>> -	 */
->>> -	if (in_pmi && !kvm_handling_nmi_from_guest(pmc->vcpu))
->>> -		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
->>> -	else
->>> +	if (pmc->intr && !skip_pmi)
->>>    		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
->>>    }
->>> @@ -677,9 +656,6 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->>>    void kvm_pmu_reset(struct kvm_vcpu *vcpu)
->>>    {
->>> -	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>> -
->>> -	irq_work_sync(&pmu->irq_work);
->>>    	static_call(kvm_x86_pmu_reset)(vcpu);
->>>    }
->>> @@ -689,7 +665,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
->>>    	memset(pmu, 0, sizeof(*pmu));
->>>    	static_call(kvm_x86_pmu_init)(vcpu);
->>> -	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
->>>    	pmu->event_count = 0;
->>>    	pmu->need_cleanup = false;
->>>    	kvm_pmu_refresh(vcpu);
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index c381770bcbf1..0732c09fbd2d 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -12841,6 +12841,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
->>>    		return true;
->>>    #endif
->>> +	if (kvm_test_request(KVM_REQ_PMI, vcpu))
->>> +		return true;
->>> +
->>>    	if (kvm_arch_interrupt_allowed(vcpu) &&
->>>    	    (kvm_cpu_has_interrupt(vcpu) ||
->>>    	    kvm_guest_apic_has_interrupt(vcpu)))
+Reviewed-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+
+> I've said this many times lately. There are other things in this
+> driver that have no upstream justification too, like nesting
+> "support".
+
+Jason, there is no need to keep repeating and polluting this thread. I 
+am happy to discuss and clarify any points of your concern on the 
+"nesting support" in a separate discussion thread :)
+
+> Please organize this SNP support into series that makes sense and are
+> self complete :( I'm not sure a 51 patch series is a productive way to
+> approach this..
+
+We have discussed with Michael Roth (the author of the series "Add AMD 
+Secure Nested Paging (SEV-SNP) Hypervisor Support"​), and he will start 
+including the removed function in the next revision of his series.
+
+Regards,
+Suravee
