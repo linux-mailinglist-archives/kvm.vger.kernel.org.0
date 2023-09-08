@@ -2,75 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67BFC7987E6
-	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 15:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57CE3798821
+	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 15:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233615AbjIHNbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 09:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53110 "EHLO
+        id S241597AbjIHNvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 09:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjIHNbe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Sep 2023 09:31:34 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BC619BC;
-        Fri,  8 Sep 2023 06:31:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TQKWOfY+iS0XtMOemRYfYqcvGehYFsyz+lsbAvmWQBg=; b=IE4IuO3f7ZfICVOmPxBOxmPKMP
-        BVvtm3tlC9Fkm6m023ngfZHnP4SnavAeqGqXpMV0meWCcNPgoI4uOXn0+Un9T1CTUtaLFrDIk6tp2
-        Mf7opQjS3UB2Lm/YwkrPZt320KhUdv+Xu8824dvzDn9ufum8Bj5LvTES6PUFat9PUf9LYgnptHIpP
-        QKcuAp4S/VEPeJj6RzFC7B0o6LTtqTD2VIIpuNNTKCXJFxU/vA1Qf6DShsIbOaWsKlUDlfVGJWqqp
-        3LLjicSUT2MrAMTf09bgkh+N/P20mGxQ93DER4zLqktpngI2UoMCBy0d82hR7DN/2+RtwXoS1GM94
-        0sSG2uXg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qebZr-002YCs-2e;
-        Fri, 08 Sep 2023 13:31:17 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 3FD52300472; Fri,  8 Sep 2023 15:31:15 +0200 (CEST)
-Date:   Fri, 8 Sep 2023 15:31:14 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Manali Shukla <manali.shukla@amd.com>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, linux-doc@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, bp@alien8.de, santosh.shukla@amd.com,
-        ravi.bangoria@amd.com, thomas.lendacky@amd.com, nikunj@amd.com
-Subject: Re: [PATCH 00/13] Implement support for IBS virtualization
-Message-ID: <20230908133114.GK19320@noisy.programming.kicks-ass.net>
-References: <20230904095347.14994-1-manali.shukla@amd.com>
- <20230905154744.GB28379@noisy.programming.kicks-ass.net>
- <012c9897-51d7-87d3-e0e5-3856fa9644e5@amd.com>
- <20230906195619.GD28278@noisy.programming.kicks-ass.net>
- <188f7a79-ad47-eddd-a185-174e0970ad22@amd.com>
+        with ESMTP id S230266AbjIHNvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Sep 2023 09:51:11 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE4A1BC6
+        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 06:51:06 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-52bcb8b199aso2832561a12.3
+        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 06:51:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694181065; x=1694785865; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=J8pjd1/df+s3RtkGAmFa4NAq964Oj2OD0bhtrmrAYJc=;
+        b=bme02ggeJSf2w/VOO9Kd/nvpSXOrlANBhmhJPqqjGcxRQTAK4D0K4bFii/32diQR5s
+         ZJlWPoZxGqC/ZtN84ZJsWxJ3JsHOOmPsP6P2u4t9H7uqB0z0vSNBlFqGlLVBpzY21lgy
+         OCNTy3l/OtC6FLHhBIj+UMggO0RPuMfwz8cdraux0SSx8/ArWQd2SD7bJSem+uEQGfsz
+         GURPIgIZgsR9FmoBu5nU2hwiaNehMdg6JZ6TKxU5Qn4u9TYOMEH09HgO3PWtSVij1n2w
+         0sndReYIqXSBQzmRx8oYWqNv+qQBVEMmlwWnVSDub1jcH6hTflLSKCxlWV/AdHaSMSHn
+         AL5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694181065; x=1694785865;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J8pjd1/df+s3RtkGAmFa4NAq964Oj2OD0bhtrmrAYJc=;
+        b=ogVqsou4fYBqYv+MCK3wAweaENhRN/PwucQsv+h/ZYD25RvALc/Mabx4zWqCSgQ3VR
+         PQJ5FwrxSfRbCuerAljLIAgEUidOyq5uZ5AAmzIPhkBE9xVe6r6l1j6Fp1joqdW6pfnZ
+         dd+eIIrt8TRTODGDHHAJXQM/rmEdjDo+2y6JlsCokBSRyywq7R+GJmj5mJOcdaXB46hm
+         QZi7KGsA0HgJzDses/0jp333g6hsMzqpma8jbQIm4BFsNUqKV8NaxkK3/Omz2scyBSze
+         BXRfbRZaSDPZsWAmWYpbqZt6Q18tTFX8dIYMKv7/f22wnCcIUg7FJ6I87yzY4eq/yJnf
+         70mA==
+X-Gm-Message-State: AOJu0Yw+Gr1iiGZy+crHWjnzDmvyjoiIDcu5CGweCg/oi+bq1PETsuoQ
+        TFA1IuQZOoZRLq6mODZxrvQJhvj5bY9ZjhfRmDHZbA==
+X-Google-Smtp-Source: AGHT+IEQjj9TQ4wV38n8jiVxEkPB4pqx7hwLWUAIz58yT1lE3WfiLYWREcppqs7fooBw09ZICMN/hMQP3yvRSngT8F8=
+X-Received: by 2002:aa7:d90b:0:b0:51b:d567:cfed with SMTP id
+ a11-20020aa7d90b000000b0051bd567cfedmr1955373edr.5.1694181065267; Fri, 08 Sep
+ 2023 06:51:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <188f7a79-ad47-eddd-a185-174e0970ad22@amd.com>
+References: <20230905091246.1931-1-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20230905091246.1931-1-shameerali.kolothum.thodi@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 8 Sep 2023 14:50:54 +0100
+Message-ID: <CAFEAcA-av-LmRw1f=cU4Mb9r-TS5gfmGBeKdcrsxHMtdJ7-bHQ@mail.gmail.com>
+Subject: Re: [PATCH v4] arm/kvm: Enable support for KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, gshan@redhat.com,
+        ricarkol@google.com, jonathan.cameron@huawei.com,
+        kvm@vger.kernel.org, linuxarm@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 07, 2023 at 09:19:51PM +0530, Manali Shukla wrote:
+On Tue, 5 Sept 2023 at 10:13, Shameer Kolothum
+<shameerali.kolothum.thodi@huawei.com> wrote:
+>
+> Now that we have Eager Page Split support added for ARM in the kernel,
+> enable it in Qemu. This adds,
+>  -eager-split-size to -accel sub-options to set the eager page split chunk size.
+>  -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
+>
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
+>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+> Changes:
+> v3: https://lore.kernel.org/qemu-devel/20230830114818.641-1-shameerali.kolothum.thodi@huawei.com/
+>    -Added R-by by Gavin and replaced kvm_arm_eager_split_size_valid()
+>     with a direct check.
+> v2: https://lore.kernel.org/qemu-devel/20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com/
+>    -Addressed commenst from Gavin.
+> RFC v1: https://lore.kernel.org/qemu-devel/20230725150002.621-1-shameerali.kolothum.thodi@huawei.com/
+>   -Updated qemu-options.hx with description
+>   -Addressed review comments from Peter and Gavin(Thanks).
 
-> > I'm not sure I'm fluent in virt speak (in fact, I'm sure I'm not). Is
-> > the above saying that a host can never IBS profile a guest?
-> 
-> Host can profile a guest with IBS if VIBS is disabled for the guest. This is
-> the default behavior. Host can not profile guest if VIBS is enabled for guest.
-> 
-> > 
-> > Does the current IBS thing assert perf_event_attr::exclude_guest is set?
-> 
-> Unlike AMD core pmu, IBS doesn't have Host/Guest filtering capability, thus
-> perf_event_open() fails if exclude_guest is set for an IBS event.
 
-Then you must not allow VIBS if a host cpu-wide IBS counter exists.
 
-Also, VIBS reads like it can be (ab)used as a filter.
+Applied to target-arm.next, thanks.
+
+-- PMM
