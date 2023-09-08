@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C787F79923A
-	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 00:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9740179923C
+	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 00:30:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343901AbjIHWaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 18:30:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48554 "EHLO
+        id S1343913AbjIHWaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 18:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343876AbjIHWaC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Sep 2023 18:30:02 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E098D1FCA
-        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 15:29:57 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7c676651c7so6993928276.1
-        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 15:29:57 -0700 (PDT)
+        with ESMTP id S1343915AbjIHWaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Sep 2023 18:30:03 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061721FE8
+        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 15:29:59 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7e4151d07aso2543385276.2
+        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 15:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694212197; x=1694816997; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1694212198; x=1694816998; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5mp0XJC4R62BtJjjX6cjHP8swHT4GNhM1P2WJh4sej8=;
-        b=VxgLjaZ+EAXLl53SJWWinedfrxXzWs5tCt6a1U3Yn8lBpX9QF2t16i4BypWAEJUhtj
-         A+Q75CwSrBmNghQNauxvaZBtT4VxpaLTxuaCN+d56PkEGg3ahIjX2Ywn3oi8NHzFiETh
-         CKXBsXuq1KeJJydBoDrC644yeQ+wgbYLPuV+BTRUTyY8GtqAEbK0moDdCwucDp/pYFb9
-         QcqV6mdr4JQYdMb2o+A6P+XAyLJ+eAGmEmZxGcGhm193vG/wsvU0kTUIMFPSEcmByCGW
-         ki3meDVpD3khhnKL+fOekV8otLvZyaWYc5wCcGT15684YfMcojceW2EauZ3ockpEQ6Nb
-         8EaA==
+        bh=jB1z42QoJJDiLaHgs90ydsyq4F02cKAC+BVC0dKoEvo=;
+        b=efumdTe08f4NOcfweGgJYHEyMSVtZZgCREm+aQ7qJ9wpAPD6zOE/EzFGunKilm1HQI
+         yUVqvP2wRrgHyz3iA2KOlBERp2RDk1g9HBzLpitvsLlGEvaqY9LWvcQhB3VSvI3dkt2P
+         eS0quoF+/O30tqvlV6PCpNMkK3MEKw6mxhi5p8oGQwSOJjuNh+3NjZ+/Uvwp0eB3YW3U
+         /CSc2KBAq9dEXhuCyAqWMgzVL0eWxbDfzFg9H+Uc2ScU12b0w9BQ7EqyHBj0pqd92fiS
+         Td51hqks67BcoJxB3CG9JcTiobhUffQwyj9iswzpIKF6SVH3QCd7c8zIiZAVafZXYY4u
+         IB7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694212197; x=1694816997;
+        d=1e100.net; s=20230601; t=1694212198; x=1694816998;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5mp0XJC4R62BtJjjX6cjHP8swHT4GNhM1P2WJh4sej8=;
-        b=lRQG/4AyxwNf5KybIt7aAyLrlASyNLum11Jgqz1lMrKwjUxcWiMFyJmSOxK3W0eAZH
-         4sk9m4DjLUFtlOE5aQ6lb0XgCrPVItAm6Nx6lJJrNVg6Rm5xZgNtXzKUb9V1mTPyWiRC
-         Fi57VeAF8O30f3gF8PCvZvJkKvN5oUQ/uPonaaXCKKNVmGP8tF+X7UkXHqXnwmxRDCjn
-         JZsyYjeR4U0+M1tV52d9T6859Bby8ZA5Y/xHYYHfnzvZjRqRHhuxStTbI3n9/PzxTCaP
-         +bive4AiDsVWB1YPJxj865+HLT/QbnZ1+32RZtyABAABuW1JO3lqubiu5EnuAFhiEmq7
-         SsKw==
-X-Gm-Message-State: AOJu0YyEle3VOm1PS/DG++L+UT5VPBa9VyWgXLWVMoYJ/rmLjXaVAeo0
-        GPvgPWH8BhSsk98qxpSVdzQJevWK/Fm5gQ==
-X-Google-Smtp-Source: AGHT+IFC72Q+0iEWcEgGkc+m7VbWdSgk0sXS3HD6u9epEqsTQfW84aC06nmxfOKJ/0XL5ODQBpPtQAmA6G8Tmg==
+        bh=jB1z42QoJJDiLaHgs90ydsyq4F02cKAC+BVC0dKoEvo=;
+        b=FxpEe8CpKplnyEcCwKeUNUAkyjqlB+mWfEFcqvMU/qChnJ0gDIpesX0h74nbKIIPXU
+         rSqSYhRG6YFoHpGGpr4id2kv/HdPbrZxZFAp1yT4VvMjrE7gu6l1BHvhj8CnFig+DfeF
+         CteTOiFcZymFx090LlX/xqoGF+qwBGEATx+rI7sr8yZRZhPwwUS+FdcQ6Ux5yHC2cZ1q
+         09BECQToI3+/3ZreIYFxqUqzdfO/ng3HOh95I5sbMfOYIoVd4e0Czb1AJhrZWaNR1D83
+         me9OJBwrIxpnW7qZhDXSJzveK46ag0R0FcQCdEJj5xvruN9HZiy81SsKWC2YBYQpxw9j
+         Yg4w==
+X-Gm-Message-State: AOJu0YzSSLIPJ2Xw8cUCm1cyA5H5itD2CyKB0YsO5r9Ypyf5gFby3SSE
+        4NCPYLSwYVwhcWHC5KanCHU2Lyfepu+5PA==
+X-Google-Smtp-Source: AGHT+IEBLxxxYVBptOyfP6KR32iQyaj2s2xoKKyou0JBv0ZaSfmRl920VzlS/FX6mB4CaGl6pX8rcmbMlSRqAw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:1024:b0:d7e:c4af:22d2 with SMTP
- id x4-20020a056902102400b00d7ec4af22d2mr225355ybt.4.1694212197218; Fri, 08
- Sep 2023 15:29:57 -0700 (PDT)
-Date:   Fri,  8 Sep 2023 22:28:56 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:d4c9:0:b0:d78:f45:d7bd with SMTP id
+ m192-20020a25d4c9000000b00d780f45d7bdmr83912ybf.4.1694212198302; Fri, 08 Sep
+ 2023 15:29:58 -0700 (PDT)
+Date:   Fri,  8 Sep 2023 22:28:57 +0000
 In-Reply-To: <20230908222905.1321305-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230908222905.1321305-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908222905.1321305-10-amoorthy@google.com>
-Subject: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING without implementation
+Message-ID: <20230908222905.1321305-11-amoorthy@google.com>
+Subject: [PATCH v5 10/17] KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by
+ atomizing __gfn_to_pfn_memslot() calls
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev
@@ -61,177 +62,212 @@ Cc:     pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
         isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add documentation, memslot flags, useful helper functions, and the
-definition of the capability. Implementation is provided in a subsequent
-commit.
+Change the "atomic" parameter of __gfn_to_pfn_memslot() to an enum which
+reflects the possibility of allowig non-atomic accesses (GUP calls)
+being "upgraded" to atomic, and mark locations where such upgrading is
+allowed.
 
-Memory fault exits on absent mappings are particularly useful for
-userfaultfd-based postcopy live migration, where contention within uffd
-can lead to slowness When many vCPUs fault on a single uffd/vma.
-Bypassing the uffd entirely by returning information directly to the
-vCPU via an exit avoids contention and can greatly improves the fault
-rate.
+Concerning gfn_to_pfn_prot(): this function is unused on x86, and the
+only usage on arm64 is from a codepath where upgrading gup calls to
+atomic based on the memslot is undesirable. Therefore, punt on adding
+any plumbing to expose the 'atomicity' parameter.
 
-Suggested-by: James Houghton <jthoughton@google.com>
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- Documentation/virt/kvm/api.rst | 28 +++++++++++++++++++++++++---
- include/linux/kvm_host.h       |  9 +++++++++
- include/uapi/linux/kvm.h       |  2 ++
- tools/include/uapi/linux/kvm.h |  1 +
- virt/kvm/Kconfig               |  3 +++
- virt/kvm/kvm_main.c            |  5 +++++
- 6 files changed, 45 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/mmu.c                   |  4 +--
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  3 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  3 +-
+ arch/x86/kvm/mmu/mmu.c                 |  8 +++---
+ include/linux/kvm_host.h               | 14 +++++++++-
+ virt/kvm/kvm_main.c                    | 38 ++++++++++++++++++++------
+ 6 files changed, 53 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 92fd3faa6bab..c2eaacb6dc63 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
-   /* for kvm_userspace_memory_region::flags */
-   #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-   #define KVM_MEM_READONLY	(1UL << 1)
-+  #define KVM_MEM_USERFAULT_ON_MISSING  (1UL << 2)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8ede6c5edc5f..ac77ae5b5d2b 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1502,8 +1502,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+ 	mmap_read_unlock(current->mm);
  
- This ioctl allows the user to create, modify or delete a guest physical
- memory slot.  Bits 0-15 of "slot" specify the slot id and this value
-@@ -1342,12 +1343,15 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
- be identical.  This allows large pages in the guest to be backed by large
- pages in the host.
+-	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
+-				   write_fault, &writable, NULL);
++	pfn = __gfn_to_pfn_memslot(memslot, gfn, MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE,
++				   false, NULL, write_fault, &writable, NULL);
+ 	if (pfn == KVM_PFN_ERR_HWPOISON) {
+ 		kvm_send_hwpoison_signal(hva, vma_shift);
+ 		return 0;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 7f765d5ad436..ab7caa86aa16 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -612,7 +612,8 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
+ 		write_ok = true;
+ 	} else {
+ 		/* Call KVM generic code to do the slow-path check */
+-		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
++		pfn = __gfn_to_pfn_memslot(memslot, gfn, MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC,
++					   false, NULL,
+ 					   writing, &write_ok, NULL);
+ 		if (is_error_noslot_pfn(pfn))
+ 			return -EFAULT;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 572707858d65..3fa05c8e96b0 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -846,7 +846,8 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 		unsigned long pfn;
  
--The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
--KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-+The flags field supports three flags
-+
-+1.  KVM_MEM_LOG_DIRTY_PAGES: can be set to instruct KVM to keep track of
- writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
--use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-+use it.
-+2.  KVM_MEM_READONLY: can be set, if KVM_CAP_READONLY_MEM capability allows it,
- to make a new slot read-only.  In this case, writes to this memory will be
- posted to userspace as KVM_EXIT_MMIO exits.
-+3.  KVM_MEM_USERFAULT_ON_MISSING: see KVM_CAP_USERFAULT_ON_MISSING for details.
+ 		/* Call KVM generic code to do the slow-path check */
+-		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
++		pfn = __gfn_to_pfn_memslot(memslot, gfn, MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC,
++					   false, NULL,
+ 					   writing, upgrade_p, NULL);
+ 		if (is_error_noslot_pfn(pfn))
+ 			return -EFAULT;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index deae8ac74d9a..43516eb50e06 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4297,8 +4297,8 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	}
  
- When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
- the memory region are automatically reflected into the guest.  For example, an
-@@ -7781,6 +7785,24 @@ Note: Userspaces which attempt to resolve memory faults so that they can retry
- KVM_RUN are encouraged to guard against repeatedly receiving the same
- error/annotated fault.
- 
-+7.35 KVM_CAP_USERFAULT_ON_MISSING
-+---------------------------------
-+
-+:Architectures: None
-+:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-+
-+The presence of this capability indicates that userspace may set the
-+KVM_MEM_USERFAULT_ON_MISSING on memslots (via KVM_SET_USER_MEMORY_REGION). Said
-+flag will cause KVM_RUN to fail (-EFAULT) in response to guest-context memory
-+accesses which would require KVM to page fault on the userspace mapping.
-+
-+The range of guest physical memory causing the fault is advertised to userspace
-+through KVM_CAP_MEMORY_FAULT_INFO. Userspace should determine how best to make
-+the mapping present, take appropriate action, then return to KVM_RUN to retry
-+the access.
-+
-+Attempts to enable this capability directly will fail.
-+
- 8. Other capabilities.
- ======================
- 
+ 	async = false;
+-	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+-					  fault->write, &fault->map_writable,
++	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE,
++					  false, &async, fault->write, &fault->map_writable,
+ 					  &fault->hva);
+ 	if (!async)
+ 		return RET_PF_CONTINUE; /* *pfn has correct page already */
+@@ -4319,8 +4319,8 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	 * to wait for IO.  Note, gup always bails if it is unable to quickly
+ 	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
+ 	 */
+-	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, true, NULL,
+-					  fault->write, &fault->map_writable,
++	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE,
++					  true, NULL, fault->write, &fault->map_writable,
+ 					  &fault->hva);
+ 	return RET_PF_CONTINUE;
+ }
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9206ac944d31..db5c3eae58fe 100644
+index db5c3eae58fe..fdd386e1d3c0 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -2353,4 +2353,13 @@ static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu,
- 	vcpu->run->memory_fault.flags = flags;
- }
+@@ -1188,8 +1188,20 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+ 		      bool *writable);
+ kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn);
+ kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn);
++enum memslot_access_atomicity {
++	/* Force atomic access */
++	MEMSLOT_ACCESS_ATOMIC,
++	/*
++	 * Ask for non-atomic access, but allow upgrading to atomic depending
++	 * on the memslot
++	 */
++	MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE,
++	/* Force non-atomic access */
++	MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC
++};
+ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+-			       bool atomic, bool interruptible, bool *async,
++			       enum memslot_access_atomicity atomicity,
++			       bool interruptible, bool *async,
+ 			       bool write_fault, bool *writable, hva_t *hva);
  
-+/*
-+ * Whether non-atomic accesses to the userspace mapping of the memslot should
-+ * be upgraded when possible.
-+ */
-+static inline bool kvm_is_slot_userfault_on_missing(const struct kvm_memory_slot *slot)
-+{
-+	return slot && slot->flags & KVM_MEM_USERFAULT_ON_MISSING;
-+}
-+
- #endif
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b2e4ac83b5a8..a21921e4ee2a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_USERFAULT_ON_MISSING	(1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -1220,6 +1221,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
- #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
- #define KVM_CAP_MEMORY_FAULT_INFO 230
-+#define KVM_CAP_USERFAULT_ON_MISSING 231
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index d19aa7965392..188be8549070 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -102,6 +102,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_USERFAULT_ON_MISSING (1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 484d0873061c..906878438687 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -92,3 +92,6 @@ config HAVE_KVM_PM_NOTIFIER
- 
- config KVM_GENERIC_HARDWARE_ENABLING
-        bool
-+
-+config HAVE_KVM_USERFAULT_ON_MISSING
-+       bool
+ void kvm_release_pfn_clean(kvm_pfn_t pfn);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a7e6320dd7f0..aa81e41b1488 100644
+index aa81e41b1488..d4f4ccb29e6d 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1553,6 +1553,9 @@ static int check_memory_region_flags(const struct kvm_userspace_memory_region *m
- 	valid_flags |= KVM_MEM_READONLY;
- #endif
+@@ -2735,9 +2735,11 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
+ }
  
-+	if (IS_ENABLED(CONFIG_HAVE_KVM_USERFAULT_ON_MISSING))
-+		valid_flags |= KVM_MEM_USERFAULT_ON_MISSING;
+ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+-			       bool atomic, bool interruptible, bool *async,
++			       enum memslot_access_atomicity atomicity,
++			       bool interruptible, bool *async,
+ 			       bool write_fault, bool *writable, hva_t *hva)
+ {
++	bool atomic;
+ 	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+ 
+ 	if (hva)
+@@ -2759,6 +2761,23 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+ 		writable = NULL;
+ 	}
+ 
++	if (atomicity == MEMSLOT_ACCESS_ATOMIC) {
++		atomic = true;
++	} else if (atomicity == MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE) {
++		atomic = false;
++		if (kvm_is_slot_userfault_on_missing(slot)) {
++			atomic = true;
++			if (async) {
++				*async = false;
++				async = NULL;
++			}
++		}
++	} else if (atomicity == MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC) {
++		atomic = false;
++	} else {
++		BUG();
++	}
 +
- 	if (mem->flags & ~valid_flags)
+ 	return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+ 			  writable);
+ }
+@@ -2767,22 +2786,23 @@ EXPORT_SYMBOL_GPL(__gfn_to_pfn_memslot);
+ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+ 		      bool *writable)
+ {
+-	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, false,
+-				    NULL, write_fault, writable, NULL);
++	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn,
++				    MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC,
++				    false, NULL, write_fault, writable, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+ 
+ kvm_pfn_t gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+-	return __gfn_to_pfn_memslot(slot, gfn, false, false, NULL, true,
+-				    NULL, NULL);
++	return __gfn_to_pfn_memslot(slot, gfn, MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE,
++				    false, NULL, true, NULL, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+ 
+ kvm_pfn_t gfn_to_pfn_memslot_atomic(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+-	return __gfn_to_pfn_memslot(slot, gfn, true, false, NULL, true,
+-				    NULL, NULL);
++	return __gfn_to_pfn_memslot(slot, gfn, MEMSLOT_ACCESS_ATOMIC,
++				    false, NULL, true, NULL, NULL);
+ }
+ EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
+ 
+@@ -2862,7 +2882,9 @@ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map)
+ 	if (!map)
  		return -EINVAL;
  
-@@ -4588,6 +4591,8 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 	case KVM_CAP_BINARY_STATS_FD:
- 	case KVM_CAP_SYSTEM_EVENT_DATA:
- 		return 1;
-+	case KVM_CAP_USERFAULT_ON_MISSING:
-+		return IS_ENABLED(CONFIG_HAVE_KVM_USERFAULT_ON_MISSING);
- 	default:
- 		break;
- 	}
+-	pfn = gfn_to_pfn(vcpu->kvm, gfn);
++	pfn = __gfn_to_pfn_memslot(gfn_to_memslot(vcpu->kvm, gfn), gfn,
++				   MEMSLOT_ACCESS_FORCE_ALLOW_NONATOMIC,
++				   false, NULL, true, NULL, NULL);
+ 	if (is_error_noslot_pfn(pfn))
+ 		return -EINVAL;
+ 
 -- 
 2.42.0.283.g2d96d420d3-goog
 
