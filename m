@@ -2,49 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3BFF79814D
-	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 06:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53E59798334
+	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 09:21:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237732AbjIHElx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 00:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48482 "EHLO
+        id S238198AbjIHHVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 03:21:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237268AbjIHElw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Sep 2023 00:41:52 -0400
-Received: from muru.com (muru.com [72.249.23.125])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D0EC41BD2;
-        Thu,  7 Sep 2023 21:41:48 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by muru.com (Postfix) with ESMTPS id F11068050;
-        Fri,  8 Sep 2023 04:41:47 +0000 (UTC)
-Date:   Fri, 8 Sep 2023 07:41:46 +0300
-From:   Tony Lindgren <tony@atomide.com>
-To:     Marc Haber <mh+linux-kernel@zugschlus.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Linux 6.5 speed regression, boot VERY slow with anything systemd
- related
-Message-ID: <20230908044146.GK11676@atomide.com>
-References: <ZO4RzCr/Ugwi70bZ@google.com>
- <ZO4YJlhHYjM7MsK4@torres.zugschlus.de>
- <ZO4nbzkd4tovKpxx@google.com>
- <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
- <ZPEPFJ8QvubbD3H9@google.com>
- <20230901122431.GU11676@atomide.com>
- <ZPiPkSY6NRzfWV5Z@torres.zugschlus.de>
- <20230906152107.GD11676@atomide.com>
- <ZPmignexOJvJ5J5W@torres.zugschlus.de>
- <20230907105150.GJ11676@atomide.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230907105150.GJ11676@atomide.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        with ESMTP id S230143AbjIHHVy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Sep 2023 03:21:54 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E75111BC8
+        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 00:21:50 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 740C6C433C7;
+        Fri,  8 Sep 2023 07:21:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694157710;
+        bh=hlIhJE37roD5m52PpdY5rfE7FOoKJCNEwPzflmRv0T0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=D/ynPj79vSCSk4N2ObB33HQKPgPKX3Sduc54P1euof5oDbPRKk8WHhYj1fDK2IjMQ
+         ri8scMbD7KqSxkRHIZQQuwTPWsbm0o20tXVXJCR8o919WQBbNQ/byrKF/69b9CjVXf
+         cXLmDElj5YYYO0rl2GifqRc4QhfBSFb3+xgqAeqEC1Z+G7hrk9SPWJl7LOoxxXTKCp
+         CzfhJKDzQeWmgi3yRTLOqR7BzhtebyAIeODyolt1U/4G6JVentY3QCz0GEMk4WBWuy
+         yvsYEMGgjIVHY1C8YXSjMFsS24RlIllUMyUBFauCg6c0tAv6q9F/lZjPOdi3MYtOzl
+         b0VlyIZIqEqGw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qeVoJ-00BILK-RH;
+        Fri, 08 Sep 2023 08:21:47 +0100
+Date:   Fri, 08 Sep 2023 08:21:47 +0100
+Message-ID: <86cyytdt9w.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Joey Gouly <joey.gouly@arm.com>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Xu Zhao <zhaoxu.35@bytedance.com>
+Subject: Re: [PATCH 0/5] KVM: arm64: Accelerate lookup of vcpus by MPIDR values
+In-Reply-To: <20230907202712.GA171716@e124191.cambridge.arm.com>
+References: <20230907100931.1186690-1-maz@kernel.org>
+        <20230907153052.GD69899@e124191.cambridge.arm.com>
+        <871qf9q25c.wl-maz@kernel.org>
+        <20230907202712.GA171716@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, zhaoxu.35@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,26 +67,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Tony Lindgren <tony@atomide.com> [230907 13:51]:
-> So I tried something similar with just kernel and ramdisk:
+On Thu, 07 Sep 2023 21:27:12 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> qemu-system-x86_64 \
-> -m 768 \
-> -machine pc-i440fx-2.1,accel=kvm,usb=off,dump-guest-core=off \
-> -nodefaults \
-> -kernel ~/bzImage \
-> -initrd ~/ramdisk.img \
-> -serial stdio \
-> -append "console=ttyS0 debug"
+> On Thu, Sep 07, 2023 at 07:17:03PM +0100, Marc Zyngier wrote:
+> > On Thu, 07 Sep 2023 16:30:52 +0100,
+> > Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > [...]
+> > 
+> > > Got a roughly similar perf improvement (about 28%).
+> > 
+> > Out of curiosity, on which HW?
 > 
-> It boots just fine for me. Console seems to come up a bit faster if I
-> leave out the machine option. I tried this with qemu 8.0.3 on a m1 laptop
-> running linux in case the machine running the qemu host might make some
-> difference..
+> I used QEMU emulation, but was told after posting this that QEMU is probably
+> not good to be used for perf measurments? Sorry about that. I can retry on Juno
+> tomorrow if that's of any use.
 
-Sorry I noticed that the above example I tried on my x86_64 box, no on m1.
-On m1 accel=kvm needs to be left out. Both cases work fine for me though.
+Indeed, using models for performance measurement is pretty unreliable,
+and will give you a rather different profile from the HW.
 
-Regards,
+Unfortunately, Juno has only a GICv2, which won't see any significant
+gain. You'll need something with a GICv3, as the whole interrupt
+routing (SGI and SPI) is MPIDR based.
 
-Tony
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
