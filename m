@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE550798A9A
-	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 18:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98951798AB0
+	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 18:31:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244998AbjIHQV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 12:21:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
+        id S242100AbjIHQbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 12:31:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233875AbjIHQV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Sep 2023 12:21:28 -0400
+        with ESMTP id S231976AbjIHQbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Sep 2023 12:31:51 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72EA9CFA;
-        Fri,  8 Sep 2023 09:21:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671E91739;
+        Fri,  8 Sep 2023 09:31:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694190083; x=1725726083;
+  t=1694190707; x=1725726707;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=e873u3sibJs0xbxxhRsYnTPnv8uBch+24bj/ve5sdac=;
-  b=ZbN7KW9rlrnvvbueH6+qqzrTIGASq4npZkEgtr/WMqTrnQK+JNzTVTcp
-   hs5TpfcnMI2YpOEbVGZNmCtvXovvaqaqXkdGL+dFffS4k67sd+2pehvni
-   DxJE+NGu7iKULHX4frfCIMMypSLOhHOX3T8rD9LNC9HnQXYb2qBkzjfE+
-   aWoWJL5iVk0hzn+b+cALneOursXl+1v22KW+9w6nehqGrdNuS//t29LQw
-   +zDrricHYi00+KB2XtrKRqjGcVgkjQ8+MKtzNe8ow5eJiw6FvdxLR98jd
-   oe4pC7/8H8jVpI7JIpVeUPcWOyxmcRHCtW0qVUHl5V3oxm3brKs+w7fnT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="441699731"
+  bh=1irE0Oh6SvrG7SeE6HAy9wbfWNk4Gkba/izCnIEjgtw=;
+  b=fvOEEaqblnVpWlzqG6HaHbfjepV2FzvluWI7BTwu6vrKXffStd5JnCNf
+   2Y5i19F0JZ5w1m2/d5md7eBI6Io6uwQPtA20hqmk6MISrlSIuzqiAqGEQ
+   pPNtf9WmTfniCzyGOC6uP8obSzzChwzolrbXAjvaTWJoliLj+g1xYB/dA
+   OKJ5HjwdMi9bkBMayJr3qdcoNaNXyPAAo5RuQJcM712ecPUy7XqXwi65h
+   f0g2Ab733uhRhgC2nq6/uHFLpnYIdFF387OdPvcQ1VdOs7W9BCOxtVlBk
+   ytXALbzdnUTkhg5aVs2WBs58A/DF8hfri1IFr51cAtIn1soF0BU16bpLK
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="441702596"
 X-IronPort-AV: E=Sophos;i="6.02,237,1688454000"; 
-   d="scan'208";a="441699731"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 09:21:22 -0700
+   d="scan'208";a="441702596"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 09:31:46 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="808068882"
+X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="812626925"
 X-IronPort-AV: E=Sophos;i="6.02,237,1688454000"; 
-   d="scan'208";a="808068882"
+   d="scan'208";a="812626925"
 Received: from fgilganx-mobl1.amr.corp.intel.com (HELO [10.209.17.195]) ([10.209.17.195])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 09:21:20 -0700
-Message-ID: <0676101a-e781-81e0-2e0f-7f5e72595e5c@intel.com>
-Date:   Fri, 8 Sep 2023 09:21:19 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 09:31:45 -0700
+Message-ID: <2f30d181-0747-cd7d-be6a-f19dcd1674f6@intel.com>
+Date:   Fri, 8 Sep 2023 09:31:44 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
-Subject: Re: [PATCH v13 05/22] x86/virt/tdx: Handle SEAMCALL no entropy error
- in common code
+Subject: Re: [PATCH v13 06/22] x86/virt/tdx: Add SEAMCALL error printing for
+ module initialization
 Content-Language: en-US
 To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -58,9 +58,9 @@ Cc:     x86@kernel.org, kirill.shutemov@linux.intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
 References: <cover.1692962263.git.kai.huang@intel.com>
- <c945c9a8db98b7a304c404a7ef18aa2f7770ffaf.1692962263.git.kai.huang@intel.com>
+ <3b9ddfb377a944393b2a93f963cd902232a5ee33.1692962263.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <c945c9a8db98b7a304c404a7ef18aa2f7770ffaf.1692962263.git.kai.huang@intel.com>
+In-Reply-To: <3b9ddfb377a944393b2a93f963cd902232a5ee33.1692962263.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -74,84 +74,37 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 8/25/23 05:14, Kai Huang wrote:
-> Some SEAMCALLs use the RDRAND hardware and can fail for the same reasons
-> as RDRAND.  Use the kernel RDRAND retry logic for them.
-> 
-> There are three __seamcall*() variants.  Add a macro to do the SEAMCALL
-> retry in the common code and define a wrapper for each __seamcall*()
-> variant.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
-> 
-> v12 -> v13:
->  - New implementation due to TDCALL assembly series.
-> 
-> ---
->  arch/x86/include/asm/tdx.h | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index a252328734c7..cfae8b31a2e9 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -24,6 +24,11 @@
->  #define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
->  #define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
->  
-> +/*
-> + * TDX module SEAMCALL leaf function error codes
-> + */
-> +#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
-> +
->  #ifndef __ASSEMBLY__
->  
->  /*
-> @@ -82,6 +87,28 @@ u64 __seamcall(u64 fn, struct tdx_module_args *args);
->  u64 __seamcall_ret(u64 fn, struct tdx_module_args *args);
->  u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args);
->  
-> +#include <asm/archrandom.h>
-> +
-> +#define SEAMCALL_NO_ENTROPY_RETRY(__seamcall_func, __fn, __args)	\
-> +({									\
-> +	int ___retry = RDRAND_RETRY_LOOPS;				\
-> +	u64 ___sret;							\
-> +									\
-> +	do {								\
-> +		___sret = __seamcall_func((__fn), (__args));		\
-> +	} while (___sret == TDX_RND_NO_ENTROPY && --___retry);		\
-> +	___sret;							\
+> +#define SEAMCALL_PRERR(__seamcall_func, __fn, __args, __seamcall_err_func)	\
+> +({										\
+> +	u64 ___sret = __SEAMCALL_PRERR(__seamcall_func, __fn, __args,		\
+> +			__seamcall_err_func, pr_err);				\
+> +	int ___ret;								\
+> +										\
+> +	switch (___sret) {							\
+> +	case TDX_SUCCESS:							\
+> +		___ret = 0;							\
+> +		break;								\
+> +	case TDX_SEAMCALL_VMFAILINVALID:					\
+> +		pr_err("SEAMCALL failed: TDX module not loaded.\n");		\
+> +		___ret = -ENODEV;						\
+> +		break;								\
+> +	case TDX_SEAMCALL_GP:							\
+> +		pr_err("SEAMCALL failed: TDX disabled by BIOS.\n");		\
+> +		___ret = -EOPNOTSUPP;						\
+> +		break;								\
+> +	case TDX_SEAMCALL_UD:							\
+> +		pr_err("SEAMCALL failed: CPU not in VMX operation.\n");		\
+> +		___ret = -EACCES;						\
+> +		break;								\
+> +	default:								\
+> +		___ret = -EIO;							\
+> +	}									\
+> +	___ret;									\
 > +})
 
-This is a *LOT* less eye-bleedy if you do it without macros:
+I have no clue where all of this came from or why it is necessary or why
+it has to be macros.  I'm just utterly confused.
 
-
-typedef u64 (*sc_func_t)(u64 fn, struct tdx_module_args *args);
-
-static inline
-u64 sc_retry(sc_func_t func, u64 fn, struct tdx_module_args *args)
-{
-        int retry = RDRAND_RETRY_LOOPS;
-        u64 ret;
-
-        do {
-                ret = func(fn, args);
-        } while (ret == TDX_RND_NO_ENTROPY && --retry);
-
-        return ret;
-}
-
-#define seamcall(_fn, _args)           sc_retry(_seamcall,
-(_fn), (_args))
-#define seamcall_ret(_fn, _args)       sc_retry(_seamcall_ret,
-(_fn), (_args))
-#define seamcall_saved_ret(_fn, _args) sc_retry(_seamcall_saved_ret,
-(_fn), (_args))
-
-The compiler can figure it out and avoid making func() an indirect call
-since it knows the call location at compile time.
-
-You can also do the seamcall() #define as a static inline, but it does
-take up more screen real estate.  Oh, and going a wee bit over 80
-columns is OK for those #defines.
+I was really hoping to be able to run through this set and get it ready
+to be merged.  But it seems to still be seeing a *LOT* of change.
+Should I wait another few weeks for this to settle down again?
