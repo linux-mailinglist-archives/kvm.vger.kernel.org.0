@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D4E7799240
-	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 00:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 255F5799241
+	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 00:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344020AbjIHWaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 18:30:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59956 "EHLO
+        id S238406AbjIHWaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 18:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343820AbjIHWaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233430AbjIHWaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 8 Sep 2023 18:30:16 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98932106
-        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 15:30:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-cf4cb742715so2482161276.2
-        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 15:30:04 -0700 (PDT)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171EC1FE5
+        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 15:30:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7ea08906b3so2645419276.1
+        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 15:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694212203; x=1694817003; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1694212204; x=1694817004; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XNvo3KyCXhe4/JPrBh+FqhkqSizcDNuUzKgVoWMo32M=;
-        b=Z8h9+7UKUCHXZL6Zso+geVwXDg6C+ybBRW9kkeztHg9myQQIf/o+O2gtbeDyclnfuj
-         WFMLwZssTcoLamRHKMNhlwSRLYDGqIwdQUzyGuVaAm3680ro2z5QlzSPD12durXk6dzC
-         26v56QEXqgqTW+toIIPb8DX3ZQJ354+LMCbe4ZSp4ewjMyK3nhFOFmes/E9DuafQtML6
-         FZpTmKdjdAUWFEzoUU869IJjDd64A6Ow07mEyxQWg+qPhcidSarZfJQgNpmcxeMyU5G/
-         XX9rHHGT0xw4yWYCVugtIt+wzkPUGhlhwdZ/CiY5g7C/LAUlzZ2C0jMHCz5AS+xXWIMD
-         Q7OA==
+        bh=QixRm6EQN3Ldt+zlc4ioZ9kbbx4lKzNZFROgor3dASU=;
+        b=Sp9GmU2Z+jlGCtEW+3quQ5MAWa9KJJeRIggJDpZy/LtlVzZ/lJDHGzsIXJpU4+3osD
+         DoVyUVr14y8oBQ/Tn2rQCnRUXMjt1ZKhgPxj45uQ5NG+unJv7HNi6VhT/5zGka/eIxIP
+         NEs3yRm5IWwAXwBuJ1fwg07jYV9jKeFnPVWpwbjNHEGWZwF10IeD4jkdfow54N+MG4s2
+         O1I1QR/doHEHWr8p+JFwL+7Ddw8tYIe66KzhHGYcCcB1/hxsGgzjeN9XiQtea9dGqPxI
+         SLZu0U3C1VTg4clcz2oKoaR12WmJ4pO8kztAppHl5M4vI0cj2ukKze/abMSxyFiQZvyy
+         3Tww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694212203; x=1694817003;
+        d=1e100.net; s=20230601; t=1694212204; x=1694817004;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XNvo3KyCXhe4/JPrBh+FqhkqSizcDNuUzKgVoWMo32M=;
-        b=nW7mlvOanG6ersGPspR8Y9T69Y2GSt1nY4XRJlH6O+wHDytkF5eQ3f/TipCEhNvbwg
-         wkLJTaAj6yagkL2ALGLsZ+uX9ftOa0XgxlQIDrdjzRCsVbl/yjRd+mMYx+DJZxPWzuJn
-         VqawgrihJP72fivwphEGEjieCPmD0LYxByXiG6elBjeBlXlEdL4NS++RPVpN0/2eQqFZ
-         Kjmwg/zcwwM6SKsulC9rO2YsPMsAOzQ0ger//atsf6qKw9ozLQ5UbsbvgTBTzWvXQwqv
-         UuDD0JvxyJwHQRWXnd9kzDGU8ty4DuRjxIESJcwLQhXkJswJzdYEmu2bmDY7aNnXrsE0
-         +EqA==
-X-Gm-Message-State: AOJu0YzXGd2xpdL+hsuvmccoVxcy/bDwjdhd1KF9y37ga+RLQfDI92Mx
-        Qf3vkD34MNky29QlJinvml7wjE2hIyXSzg==
-X-Google-Smtp-Source: AGHT+IHVTKhRKMD4mfkphXrMFXILZjv8PZl6WZRe9vF1bvuSlGumwwco+OrsrNQCiYRM232dhWiDHy6su+dfHw==
+        bh=QixRm6EQN3Ldt+zlc4ioZ9kbbx4lKzNZFROgor3dASU=;
+        b=WNfuzBNCgtdh7xsOxRx2KZ15nOGgWZN3veXZTunJ2DTFieTi6kG1cIY/F7Pyn9wBm/
+         pZ622Cp42wuLUeUuMt7lhYzxxMXV1Wx1vO8tVEhYX+uEvY8D+9xGsZJBo+QO0l4YZEqw
+         RXIsqZI11VPmYBsMERuh9k9JidkkjfSmKCDwVSFMKs05ELEkTHeRhE9SpRlzp8LETEfj
+         Ksxjm/DLYWjsOxhNJEh8FHCWyD+cxcQuejmlVfQY7vZjKaBtw46z4BPkNDHq+1UwkdWl
+         U3NrLp4cioDKJKrlYaD2YcOOyBehkeBOg8hXptQNKwtDHpNI29sq8r6Vicnp0OV9IkDe
+         F1aA==
+X-Gm-Message-State: AOJu0Yw0v/MyGB+3fTapaO1vuz19C/ivoyu7B1nkSW9atpckJSjryDHQ
+        bITgxiuQhVo1BPmnvtptzNamTA7Tf8xGPA==
+X-Google-Smtp-Source: AGHT+IFmPNOfALnuUM1fozgkFU1fF1f31K71XPgaFia/rvjtmt+x1nhW4rKunooNDT/eSmNNy4Y0ISr0L5LgRw==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a25:748f:0:b0:d47:4b58:a19e with SMTP id
- p137-20020a25748f000000b00d474b58a19emr77254ybc.11.1694212202919; Fri, 08 Sep
- 2023 15:30:02 -0700 (PDT)
-Date:   Fri,  8 Sep 2023 22:29:02 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:108f:b0:d78:3c2e:b186 with SMTP
+ id v15-20020a056902108f00b00d783c2eb186mr83779ybu.5.1694212203986; Fri, 08
+ Sep 2023 15:30:03 -0700 (PDT)
+Date:   Fri,  8 Sep 2023 22:29:03 +0000
 In-Reply-To: <20230908222905.1321305-1-amoorthy@google.com>
 Mime-Version: 1.0
 References: <20230908222905.1321305-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908222905.1321305-16-amoorthy@google.com>
-Subject: [PATCH v5 15/17] KVM: selftests: Use EPOLL in userfaultfd_util reader
- threads and signal errors via TEST_ASSERT
+Message-ID: <20230908222905.1321305-17-amoorthy@google.com>
+Subject: [PATCH v5 16/17] KVM: selftests: Add memslot_flags parameter to memstress_create_vm()
 From:   Anish Moorthy <amoorthy@google.com>
 To:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev
@@ -62,173 +61,129 @@ Cc:     pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com,
         isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With multiple reader threads POLLing a single UFFD, the test suffers
-from the thundering herd problem: performance degrades as the number of
-reader threads is increased. Solve this issue [1] by switching the
-the polling mechanism to EPOLL + EPOLLEXCLUSIVE.
-
-Also, change the error-handling convention of uffd_handler_thread_fn.
-Instead of just printing errors and returning early from the polling
-loop, check for them via TEST_ASSERT. "return NULL" is reserved for a
-successful exit from uffd_handler_thread_fn, ie one triggered by a
-write to the exit pipe.
-
-Performance samples generated by the command in [2] are given below.
-
-Num Reader Threads, Paging Rate (POLL), Paging Rate (EPOLL)
-1      249k      185k
-2      201k      235k
-4      186k      155k
-16     150k      217k
-32     89k       198k
-
-[1] Single-vCPU performance does suffer somewhat.
-[2] ./demand_paging_test -u MINOR -s shmem -v 4 -o -r <num readers>
+Memslot flags aren't currently exposed to the tests, and are just always
+set to 0. Add a parameter to allow tests to manually set those flags.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
-Acked-by: James Houghton <jthoughton@google.com>
 ---
- .../selftests/kvm/demand_paging_test.c        |  1 -
- .../selftests/kvm/lib/userfaultfd_util.c      | 74 +++++++++----------
- 2 files changed, 35 insertions(+), 40 deletions(-)
+ tools/testing/selftests/kvm/access_tracking_perf_test.c       | 2 +-
+ tools/testing/selftests/kvm/demand_paging_test.c              | 2 +-
+ tools/testing/selftests/kvm/dirty_log_perf_test.c             | 2 +-
+ tools/testing/selftests/kvm/include/memstress.h               | 2 +-
+ tools/testing/selftests/kvm/lib/memstress.c                   | 4 ++--
+ .../testing/selftests/kvm/memslot_modification_stress_test.c  | 2 +-
+ .../selftests/kvm/x86_64/dirty_log_page_splitting_test.c      | 2 +-
+ 7 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 3c7defd34f56..b51656b408b8 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -306,7 +306,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vm *vm;
+ 	int nr_vcpus = params->nr_vcpus;
+ 
+-	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
++	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1, 0,
+ 				 params->backing_src, !overlap_memory_access);
+ 
+ 	memstress_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
 diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index f7897a951f90..0455347f932a 100644
+index 0455347f932a..61bb2e23bef0 100644
 --- a/tools/testing/selftests/kvm/demand_paging_test.c
 +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -13,7 +13,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <time.h>
--#include <poll.h>
- #include <pthread.h>
- #include <linux/userfaultfd.h>
- #include <sys/syscall.h>
-diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-index 6f220aa4fb08..2a179133645a 100644
---- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-+++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
-@@ -16,6 +16,7 @@
- #include <poll.h>
- #include <pthread.h>
- #include <linux/userfaultfd.h>
-+#include <sys/epoll.h>
- #include <sys/syscall.h>
+@@ -163,7 +163,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	double vcpu_paging_rate;
+ 	uint64_t uffd_region_size;
  
- #include "kvm_util.h"
-@@ -32,60 +33,55 @@ static void *uffd_handler_thread_fn(void *arg)
- 	int64_t pages = 0;
- 	struct timespec start;
- 	struct timespec ts_diff;
-+	int epollfd;
-+	struct epoll_event evt;
-+
-+	epollfd = epoll_create(1);
-+	TEST_ASSERT(epollfd >= 0, "Failed to create epollfd.");
-+
-+	evt.events = EPOLLIN | EPOLLEXCLUSIVE;
-+	evt.data.u32 = 0;
-+	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, uffd, &evt) == 0,
-+		    "Failed to add uffd to epollfd");
-+
-+	evt.events = EPOLLIN;
-+	evt.data.u32 = 1;
-+	TEST_ASSERT(epoll_ctl(epollfd, EPOLL_CTL_ADD, reader_args->pipe, &evt) == 0,
-+		    "Failed to add pipe to epollfd");
+-	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
++	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1, 0,
+ 				 p->src_type, p->partition_vcpu_memory_access);
  
- 	clock_gettime(CLOCK_MONOTONIC, &start);
- 	while (1) {
- 		struct uffd_msg msg;
--		struct pollfd pollfd[2];
--		char tmp_chr;
- 		int r;
+ 	demand_paging_size = get_backing_src_pagesz(p->src_type);
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index d374dbcf9a53..8b1a84a4db3b 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -153,7 +153,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	int i;
  
--		pollfd[0].fd = uffd;
--		pollfd[0].events = POLLIN;
--		pollfd[1].fd = reader_args->pipe;
--		pollfd[1].events = POLLIN;
--
--		r = poll(pollfd, 2, -1);
--		switch (r) {
--		case -1:
--			pr_info("poll err");
--			continue;
--		case 0:
--			continue;
--		case 1:
--			break;
--		default:
--			pr_info("Polling uffd returned %d", r);
--			return NULL;
--		}
-+		r = epoll_wait(epollfd, &evt, 1, -1);
-+		TEST_ASSERT(r == 1,
-+			    "Unexpected number of events (%d) from epoll, errno = %d",
-+			    r, errno);
+ 	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
+-				 p->slots, p->backing_src,
++				 p->slots, 0, p->backing_src,
+ 				 p->partition_vcpu_memory_access);
  
--		if (pollfd[0].revents & POLLERR) {
--			pr_info("uffd revents has POLLERR");
--			return NULL;
--		}
-+		if (evt.data.u32 == 1) {
-+			char tmp_chr;
+ 	pr_info("Random seed: %u\n", p->random_seed);
+diff --git a/tools/testing/selftests/kvm/include/memstress.h b/tools/testing/selftests/kvm/include/memstress.h
+index ce4e603050ea..8be9609d3ca0 100644
+--- a/tools/testing/selftests/kvm/include/memstress.h
++++ b/tools/testing/selftests/kvm/include/memstress.h
+@@ -56,7 +56,7 @@ struct memstress_args {
+ extern struct memstress_args memstress_args;
  
--		if (pollfd[1].revents & POLLIN) {
--			r = read(pollfd[1].fd, &tmp_chr, 1);
-+			TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-+				    "Reader thread received EPOLLERR or EPOLLHUP on pipe.");
-+			r = read(reader_args->pipe, &tmp_chr, 1);
- 			TEST_ASSERT(r == 1,
--				    "Error reading pipefd in UFFD thread\n");
-+				    "Error reading pipefd in uffd reader thread");
- 			break;
- 		}
+ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+-				   uint64_t vcpu_memory_bytes, int slots,
++				   uint64_t vcpu_memory_bytes, int slots, uint32_t slot_flags,
+ 				   enum vm_mem_backing_src_type backing_src,
+ 				   bool partition_vcpu_memory_access);
+ void memstress_destroy_vm(struct kvm_vm *vm);
+diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
+index df457452d146..dc145952d19c 100644
+--- a/tools/testing/selftests/kvm/lib/memstress.c
++++ b/tools/testing/selftests/kvm/lib/memstress.c
+@@ -123,7 +123,7 @@ void memstress_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
+ }
  
--		if (!(pollfd[0].revents & POLLIN))
--			continue;
-+		TEST_ASSERT(!(evt.events & (EPOLLERR | EPOLLHUP)),
-+			    "Reader thread received EPOLLERR or EPOLLHUP on uffd.");
+ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+-				   uint64_t vcpu_memory_bytes, int slots,
++				   uint64_t vcpu_memory_bytes, int slots, uint32_t slot_flags,
+ 				   enum vm_mem_backing_src_type backing_src,
+ 				   bool partition_vcpu_memory_access)
+ {
+@@ -211,7 +211,7 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
  
- 		r = read(uffd, &msg, sizeof(msg));
- 		if (r == -1) {
--			if (errno == EAGAIN)
--				continue;
--			pr_info("Read of uffd got errno %d\n", errno);
--			return NULL;
-+			TEST_ASSERT(errno == EAGAIN,
-+				    "Error reading from UFFD: errno = %d", errno);
-+			continue;
- 		}
- 
--		if (r != sizeof(msg)) {
--			pr_info("Read on uffd returned unexpected size: %d bytes", r);
--			return NULL;
--		}
-+		TEST_ASSERT(r == sizeof(msg),
-+			    "Read on uffd returned unexpected number of bytes (%d)", r);
- 
- 		if (!(msg.event & UFFD_EVENT_PAGEFAULT))
- 			continue;
-@@ -93,8 +89,8 @@ static void *uffd_handler_thread_fn(void *arg)
- 		if (reader_args->delay)
- 			usleep(reader_args->delay);
- 		r = reader_args->handler(reader_args->uffd_mode, uffd, &msg);
--		if (r < 0)
--			return NULL;
-+		TEST_ASSERT(r >= 0,
-+			    "Reader thread handler fn returned negative value %d", r);
- 		pages++;
+ 		vm_userspace_mem_region_add(vm, backing_src, region_start,
+ 					    MEMSTRESS_MEM_SLOT_INDEX + i,
+-					    region_pages, 0);
++					    region_pages, slot_flags);
  	}
  
+ 	/* Do mapping for the demand paging memory slot */
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 9855c41ca811..0b19ec3ecc9c 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -95,7 +95,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct test_params *p = arg;
+ 	struct kvm_vm *vm;
+ 
+-	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
++	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1, 0,
+ 				 VM_MEM_SRC_ANONYMOUS,
+ 				 p->partition_vcpu_memory_access);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+index 634c6bfcd572..a770d7fa469a 100644
+--- a/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
++++ b/tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
+@@ -100,7 +100,7 @@ static void run_test(enum vm_guest_mode mode, void *unused)
+ 	struct kvm_page_stats stats_dirty_logging_disabled;
+ 	struct kvm_page_stats stats_repopulated;
+ 
+-	vm = memstress_create_vm(mode, VCPUS, guest_percpu_mem_size,
++	vm = memstress_create_vm(mode, VCPUS, guest_percpu_mem_size, 0,
+ 				 SLOTS, backing_src, false);
+ 
+ 	guest_num_pages = (VCPUS * guest_percpu_mem_size) >> vm->page_shift;
 -- 
 2.42.0.283.g2d96d420d3-goog
 
