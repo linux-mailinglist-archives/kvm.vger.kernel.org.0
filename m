@@ -2,64 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B0CB79805F
-	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 03:55:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A308279809E
+	for <lists+kvm@lfdr.de>; Fri,  8 Sep 2023 04:36:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240160AbjIHBzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Sep 2023 21:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50622 "EHLO
+        id S241557AbjIHCg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Sep 2023 22:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230436AbjIHBzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Sep 2023 21:55:10 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F0619BD;
-        Thu,  7 Sep 2023 18:55:03 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B561FC433C7;
-        Fri,  8 Sep 2023 01:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694138102;
-        bh=TF7EVziI1jzZrWzcJPKqnNaOcy6SMk9TrwglIc9C564=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qtbeLk5C5zmpm2mbdphvnd29u70TUewb2fv/4JhFY0Uo8r3WJfIPxBxZdeNZBeCzD
-         62SwgkNVcSB9t+queuuqIYtv10K63phpxeVFMUI95zZ2dwmbM1Vp/IGeCu2P5tvT/K
-         REo/elfzcXYNKqvJqEcbRZWziqcQrhX8IuXKEpHe4ht/jYQYy0dkuffvU4HFGBP39y
-         t9l1OZldO+YcJtwdOxJas1Rg26gKAkvs0iI2D5OUCnUxZ/ch5tb+HwWPntXgGmmBkw
-         MMDmSW96B8+GE552EnDLlJ5ei2jHN4vnuMdqqPiHOwWpxH3Z2ChJniWHKA4mqDOR+V
-         wC8WyXXvshjFQ==
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-31ae6bf91a9so1447970f8f.2;
-        Thu, 07 Sep 2023 18:55:02 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz0FaVF/Rc4Eo1I77DCFvOPbESL2zPSoPUNvRSAnPaYRi/fyipw
-        lOLinZe1N0b3Ct4R+2Q8IrrCIx3FscGzMQMN5lU=
-X-Google-Smtp-Source: AGHT+IFavYLOKRsyuxz1o6Mmg1ottHz3UqdjPcdBMdqv21cdcnwg1S4Nj/BBkj1Wxr2eOLt3pcYB6dAAadvqaRLMUP0=
-X-Received: by 2002:adf:f3d2:0:b0:313:e8b6:1699 with SMTP id
- g18-20020adff3d2000000b00313e8b61699mr666328wrp.55.1694138101155; Thu, 07 Sep
- 2023 18:55:01 -0700 (PDT)
+        with ESMTP id S231597AbjIHCg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Sep 2023 22:36:26 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9232F19A6;
+        Thu,  7 Sep 2023 19:36:22 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2bcda0aaf47so32875601fa.1;
+        Thu, 07 Sep 2023 19:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694140581; x=1694745381; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3SloDScCMx4oSLnsTG5Eji59Tx/5anpswbLezsyOC20=;
+        b=IW+D63zaZFzzl8kf+IK0KaHGSv9Nh1OHROaW2n9tGQl+7YI5OYJ99dQwL0zEmM0D5n
+         gLyZOc1zzg0OBb/qQssmahuEVB7D4a9ffccrGWBTkiml4v70keClCOPuuw1JKOXSJHvQ
+         84qJZgDJINlxtsiMMqUSWyTAVhIWjE7mj+6RLvJE2Q3OLUOBdgJi+6CcwfbUg8vvrPpt
+         4ORVno6UM6v05/TgA5tNoKgjI+sC+vY5BK7u7q99/BVhz5VgRNgURFIjs5xVDgeuCTyf
+         Co6EX69PqpdzXnwdO2Nl9FaPxyAFA8EhCUmYyVRR39xa6YOzS2hmFS7hoioy6ujHlqir
+         Iu/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694140581; x=1694745381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3SloDScCMx4oSLnsTG5Eji59Tx/5anpswbLezsyOC20=;
+        b=R2fL09PdhXVsqzWBdeK/EjofBjIc/ein0vClAygfa3vGERy8kv/0uHjtIpyKF79mQe
+         XmtNCGfO7bg7StftT3ZX1nzpDjTWpTmG53ja6WusIwEnD60SKh6Efuyb3QwqbqGYuNlL
+         7CTxDEl5eNcpt5NFrqkuEGBGtQhpKdOmFP5FRhw9q9gWCKDSLcNJGmR0W1lEbWntI5fH
+         lmn5BcW5cf0voilRF3+i7/8DGaJ4bexJvR8IGbCwVXGzvtVEKacDkZq2EdaBncE4+/am
+         vd3ezOTaXTREznsmEBGdcnlQbZReQGkMfIAI4vrMF64lcEKky80ISy6Ou6MNONk7aggC
+         Ejew==
+X-Gm-Message-State: AOJu0YxrS9d/TV4Ab2/VNr5Bx72nglgl9/rrWrsPel5VfdfqJQQ/Nlyn
+        Nk2OGPUyRJJpe246R917Yr7y1jCTOT4KvY6imJ4=
+X-Google-Smtp-Source: AGHT+IGPnaH1hB1XaAWpoSpVu9fE6H6lAvlQx/cBu/gZNMgWAzXLEKoti/amvId+mp2eIUJ6sUeQ6zygE6V1VF/TXK8=
+X-Received: by 2002:a2e:800f:0:b0:2b9:601d:2c0 with SMTP id
+ j15-20020a2e800f000000b002b9601d02c0mr285241ljg.25.1694140580444; Thu, 07 Sep
+ 2023 19:36:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
- <20230831083020.2187109-29-zhaotianrui@loongson.cn> <925522e9-9be6-2545-4c4e-1608eaab523a@xen0n.name>
- <CAAhV-H5WHOysfEutSg1oopx5s8SDnYd8zn8C+TY6mqVbFr22sQ@mail.gmail.com> <61b34ee0-8205-43e0-becf-a4f6c8ff876a@loongson.cn>
-In-Reply-To: <61b34ee0-8205-43e0-becf-a4f6c8ff876a@loongson.cn>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Fri, 8 Sep 2023 09:54:49 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4vhY+Kf2gOB9o0Kp+pv=aEQtr=Uzq6APq1jn2p20ga0w@mail.gmail.com>
-Message-ID: <CAAhV-H4vhY+Kf2gOB9o0Kp+pv=aEQtr=Uzq6APq1jn2p20ga0w@mail.gmail.com>
-Subject: Re: [PATCH v20 28/30] LoongArch: KVM: Enable kvm config and add the makefile
-To:     bibo mao <maobibo@loongson.cn>
-Cc:     WANG Xuerui <kernel@xen0n.name>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+References: <cover.1693659382.git.haibo1.xu@intel.com> <d2b3c53537fef3f0a2d27d8be663a64123d4bc3c.1693659382.git.haibo1.xu@intel.com>
+ <20230904-a69c6a228bf4553cc58bca17@orel> <CAJve8ok03P-t7pTA9mH=5vvkUy4NtxHac_Z_NM88cs55YQZATg@mail.gmail.com>
+ <20230907-5d3da2b6dca23bedb31b33a0@orel> <CAJve8om1VibbkHBuG4B+KbKY2eug42wGk9wiYtCYeF-WDY8EgQ@mail.gmail.com>
+In-Reply-To: <CAJve8om1VibbkHBuG4B+KbKY2eug42wGk9wiYtCYeF-WDY8EgQ@mail.gmail.com>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Fri, 8 Sep 2023 10:36:09 +0800
+Message-ID: <CAJve8o=_09khYSEapJfb2xiqzCLdM6FbR=Q9gAawZ6nhHDUZCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 8/8] KVM: riscv: selftests: Add sstc timer test
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>,
-        kernel test robot <lkp@intel.com>
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        wchen <waylingii@gmail.com>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Peter Gonda <pgonda@google.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Thomas Huth <thuth@redhat.com>, Like Xu <likexu@tencent.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Michal Luczaj <mhal@rbox.co>,
+        zhang songyi <zhang.songyi@zte.com.cn>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,226 +105,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 8, 2023 at 9:49=E2=80=AFAM bibo mao <maobibo@loongson.cn> wrote=
+On Fri, Sep 8, 2023 at 9:19=E2=80=AFAM Haibo Xu <xiaobo55x@gmail.com> wrote=
 :
 >
->
->
-> =E5=9C=A8 2023/9/8 09:40, Huacai Chen =E5=86=99=E9=81=93:
-> > On Fri, Sep 8, 2023 at 4:10=E2=80=AFAM WANG Xuerui <kernel@xen0n.name> =
-wrote:
-> >>
-> >>
-> >> On 8/31/23 16:30, Tianrui Zhao wrote:
-> >>> Enable LoongArch kvm config and add the makefile to support build kvm
-> >>> module.
-> >>>
-> >>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> >>> Reported-by: kernel test robot <lkp@intel.com>
-> >>> Link: https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp=
-@intel.com/
-> >>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> >>> ---
-> >>>   arch/loongarch/Kbuild                      |  1 +
-> >>>   arch/loongarch/Kconfig                     |  3 ++
-> >>>   arch/loongarch/configs/loongson3_defconfig |  2 +
-> >>>   arch/loongarch/kvm/Kconfig                 | 45 +++++++++++++++++++=
-+++
-> >>>   arch/loongarch/kvm/Makefile                | 22 +++++++++++
-> >>>   5 files changed, 73 insertions(+)
-> >>>   create mode 100644 arch/loongarch/kvm/Kconfig
-> >>>   create mode 100644 arch/loongarch/kvm/Makefile
-> >>>
-> >>> diff --git a/arch/loongarch/Kbuild b/arch/loongarch/Kbuild
-> >>> index b01f5cdb27..40be8a1696 100644
-> >>> --- a/arch/loongarch/Kbuild
-> >>> +++ b/arch/loongarch/Kbuild
-> >>> @@ -2,6 +2,7 @@ obj-y +=3D kernel/
-> >>>   obj-y +=3D mm/
-> >>>   obj-y +=3D net/
-> >>>   obj-y +=3D vdso/
-> >>> +obj-y +=3D kvm/
-> >> Do we want to keep the list alphabetically sorted here?
-> > kvm directory can be at last, but I'm afraid that it should be
+> On Fri, Sep 8, 2023 at 3:01=E2=80=AFAM Andrew Jones <ajones@ventanamicro.=
+com> wrote:
 > >
-> > ifdef CONFIG_KVM
-> > obj-y +=3D kvm/
-> > endif
-> Agree, how about this like other architectures.
-> obj-$(CONFIG_KVM) +=3D kvm/
-This is better, I agree and it can be at last because it is in a
-different format from others.
+> > On Thu, Sep 07, 2023 at 12:20:29PM +0800, Haibo Xu wrote:
+> > > On Mon, Sep 4, 2023 at 10:58=E2=80=AFPM Andrew Jones <ajones@ventanam=
+icro.com> wrote:
+> > > >
+> > > > On Sat, Sep 02, 2023 at 08:59:30PM +0800, Haibo Xu wrote:
+> > > > > Add a KVM selftest to validate the Sstc timer functionality.
+> > > > > The test was ported from arm64 arch timer test.
+> > > > >
+> > > > > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > > > > ---
+> > >
+> > > > > diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/too=
+ls/testing/selftests/kvm/riscv/arch_timer.c
+> > > > > new file mode 100644
+> > > > > index 000000000000..c50a33c1e4f9
+> > > > > --- /dev/null
+> > > > > +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> > > > > @@ -0,0 +1,130 @@
+> > > > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > > > +/*
+> > > > > + * arch_timer.c - Tests the riscv64 sstc timer IRQ functionality
+> > > > > + *
+> > > > > + * The test validates the sstc timer IRQs using vstimecmp regist=
+ers.
+> > > > > + * It's ported from the aarch64 arch_timer test.
 
+> > >
+> > > > > +
+> > > > > +static void guest_code(void)
+> > > > > +{
+> > > > > +     uint32_t cpu =3D guest_get_vcpuid();
+> > > > > +     struct test_vcpu_shared_data *shared_data =3D &vcpu_shared_=
+data[cpu];
+> > > > > +
+> > > > > +     local_irq_disable();
+> > > > > +     timer_irq_disable();
+> > > > > +     local_irq_enable();
+> > > >
+> > > > I don't think we need to disable all interrupts when disabling the =
+timer
+> > > > interrupt.
+> > > >
+> > >
+> > > There is no local_irq_disable() protection during the initial debug
+> > > phase, but the test always
+> > > fail with below error messages:
+> > >
+> > > Guest assert failed,  vcpu 0; stage; 0; iter: 0
+> > > =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+> > >   riscv/arch_timer.c:78: config_iter + 1 =3D=3D irq_iter
+> > >   pid=3D585 tid=3D586 errno=3D4 - Interrupted system call
+> > >   (stack trace empty)
+> > >   0x1 !=3D 0x0 (config_iter + 1 !=3D irq_iter)
+> > >
+> > > To be frank, I am not quite sure why the local_irq_disable/enable() m=
+atters.
+> > > One possible reason may be some timer irq was triggered before we set=
+ up the
+> > > timecmp register.
 > >
-> > If such a guard is unnecessary, then I agree to use alphabetical order.
-> Is there any document about "alphabetical order"? I check Kbuild in other
-> directories, it is not sorted by alphabetical order.
-Yes, there is no hard limit, but alphabetical order is better in some
-cases, e.g., avoid duplicate lines.
+> > We should ensure we know the exact, expected state of the vcpu before,
+> > during, and after the test. If a state doesn't match expectations,
+> > then the test should assert and we should go investigate the test code
+> > to see if setup/checking is correct. If it is, then we've found a bug
+> > in KVM that we need to go investigate.
+> >
+> > For Sstc, a pending timer interrupt completely depends on stimecmp, so
+> > we need to watch that closely. Take a look at the attached simple timer
+> > test I pulled together to illustrate how stimecmp, timer interrupt enab=
+le,
+> > and all interrupt enable interact. You may want to use it to help port
+> > the arch_timer.
+> >
+>
+> Thanks for sharing the test codes. Will have an investigation on it.
+>
 
-Huacai
->
-> $ cat  arch/riscv/Kbuild
-> obj-y +=3D kernel/ mm/ net/
-> obj-$(CONFIG_BUILTIN_DTB) +=3D boot/dts/
-> obj-y +=3D errata/
-> obj-$(CONFIG_KVM) +=3D kvm/
-> obj-$(CONFIG_ARCH_HAS_KEXEC_PURGATORY) +=3D purgatory/
-> # for cleaning
-> subdir- +=3D boot
->
-> $ cat arch/arm64/Kbuild
-> obj-y                   +=3D kernel/ mm/ net/
-> obj-$(CONFIG_KVM)       +=3D kvm/
-> obj-$(CONFIG_XEN)       +=3D xen/
-> obj-$(subst m,y,$(CONFIG_HYPERV))       +=3D hyperv/
-> obj-$(CONFIG_CRYPTO)    +=3D crypto/
->
-> # for cleaning
-> subdir- +=3D boot
->
->
-> Regards
-> Bibo Mao
-> >
-> > Huacai
-> >
-> >>>
-> >>>   # for cleaning
-> >>>   subdir- +=3D boot
-> >>> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
-> >>> index ecf282dee5..7f2f7ccc76 100644
-> >>> --- a/arch/loongarch/Kconfig
-> >>> +++ b/arch/loongarch/Kconfig
-> >>> @@ -123,6 +123,7 @@ config LOONGARCH
-> >>>       select HAVE_KPROBES
-> >>>       select HAVE_KPROBES_ON_FTRACE
-> >>>       select HAVE_KRETPROBES
-> >>> +     select HAVE_KVM
-> >>>       select HAVE_MOD_ARCH_SPECIFIC
-> >>>       select HAVE_NMI
-> >>>       select HAVE_PCI
-> >>> @@ -650,3 +651,5 @@ source "kernel/power/Kconfig"
-> >>>   source "drivers/acpi/Kconfig"
-> >>>
-> >>>   endmenu
-> >>> +
-> >>> +source "arch/loongarch/kvm/Kconfig"
-> >>> diff --git a/arch/loongarch/configs/loongson3_defconfig b/arch/loonga=
-rch/configs/loongson3_defconfig
-> >>> index d64849b4cb..7acb4ae7af 100644
-> >>> --- a/arch/loongarch/configs/loongson3_defconfig
-> >>> +++ b/arch/loongarch/configs/loongson3_defconfig
-> >>> @@ -63,6 +63,8 @@ CONFIG_EFI_ZBOOT=3Dy
-> >>>   CONFIG_EFI_GENERIC_STUB_INITRD_CMDLINE_LOADER=3Dy
-> >>>   CONFIG_EFI_CAPSULE_LOADER=3Dm
-> >>>   CONFIG_EFI_TEST=3Dm
-> >>> +CONFIG_VIRTUALIZATION=3Dy
-> >>> +CONFIG_KVM=3Dm
-> >>>   CONFIG_MODULES=3Dy
-> >>>   CONFIG_MODULE_FORCE_LOAD=3Dy
-> >>>   CONFIG_MODULE_UNLOAD=3Dy
-> >>> diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-> >>> new file mode 100644
-> >>> index 0000000000..bf7d6e7cde
-> >>> --- /dev/null
-> >>> +++ b/arch/loongarch/kvm/Kconfig
-> >>> @@ -0,0 +1,45 @@
-> >>> +# SPDX-License-Identifier: GPL-2.0
-> >>> +#
-> >>> +# KVM configuration
-> >>> +#
-> >>> +
-> >>> +source "virt/kvm/Kconfig"
-> >>> +
-> >>> +menuconfig VIRTUALIZATION
-> >>> +     bool "Virtualization"
-> >>> +     help
-> >>> +       Say Y here to get to see options for using your Linux host to=
- run
-> >>> +       other operating systems inside virtual machines (guests).
-> >>> +       This option alone does not add any kernel code.
-> >>> +
-> >>> +       If you say N, all options in this submenu will be skipped and
-> >>> +       disabled.
-> >>> +
-> >>> +if VIRTUALIZATION
-> >>> +
-> >>> +config AS_HAS_LVZ_EXTENSION
-> >>> +     def_bool $(as-instr,hvcl 0)
-> >>> +
-> >>> +config KVM
-> >>> +     tristate "Kernel-based Virtual Machine (KVM) support"
-> >>> +     depends on HAVE_KVM
-> >>> +     depends on AS_HAS_LVZ_EXTENSION
-> >>> +     select MMU_NOTIFIER
-> >>> +     select ANON_INODES
-> >>> +     select PREEMPT_NOTIFIERS
-> >>> +     select KVM_MMIO
-> >>> +     select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> >>> +     select KVM_GENERIC_HARDWARE_ENABLING
-> >>> +     select KVM_XFER_TO_GUEST_WORK
-> >>> +     select HAVE_KVM_DIRTY_RING_ACQ_REL
-> >>> +     select HAVE_KVM_VCPU_ASYNC_IOCTL
-> >>> +     select HAVE_KVM_EVENTFD
-> >>> +     select SRCU
-> >> Make the list of selects also alphabetically sorted?
-> >>> +     help
-> >>> +       Support hosting virtualized guest machines using hardware
-> >>> +       virtualization extensions. You will need a fairly processor
-> >>> +       equipped with virtualization extensions.
-> >>
-> >> The word "fairly" seems extraneous here, and can be simply dropped.
-> >>
-> >> (I suppose you forgot to delete it after tweaking the original sentenc=
-e,
-> >> that came from arch/x86/kvm: "You will need a fairly recent processor
-> >> ..." -- all LoongArch processors are recent!)
-> >>
-> >>> +
-> >>> +       If unsure, say N.
-> >>> +
-> >>> +endif # VIRTUALIZATION
-> >>> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefil=
-e
-> >>> new file mode 100644
-> >>> index 0000000000..2335e873a6
-> >>> --- /dev/null
-> >>> +++ b/arch/loongarch/kvm/Makefile
-> >>> @@ -0,0 +1,22 @@
-> >>> +# SPDX-License-Identifier: GPL-2.0
-> >>> +#
-> >>> +# Makefile for LOONGARCH KVM support
-> >> "LoongArch" -- you may want to check the entire patch series for such
-> >> ALL-CAPS references to LoongArch in natural language paragraphs, they
-> >> all want to be spelled "LoongArch".
-> >>> +#
-> >>> +
-> >>> +ccflags-y +=3D -I $(srctree)/$(src)
-> >>> +
-> >>> +include $(srctree)/virt/kvm/Makefile.kvm
-> >>> +
-> >>> +obj-$(CONFIG_KVM) +=3D kvm.o
-> >>> +
-> >>> +kvm-y +=3D main.o
-> >>> +kvm-y +=3D vm.o
-> >>> +kvm-y +=3D vmid.o
-> >>> +kvm-y +=3D tlb.o
-> >>> +kvm-y +=3D mmu.o
-> >>> +kvm-y +=3D vcpu.o
-> >>> +kvm-y +=3D exit.o
-> >>> +kvm-y +=3D interrupt.o
-> >>> +kvm-y +=3D timer.o
-> >>> +kvm-y +=3D switch.o
-> >>> +kvm-y +=3D csr_ops.o
-> >> I'd suggest sorting this list too to better avoid editing conflicts in
-> >> the future.
-> >>
-> >> --
-> >> WANG "xen0n" Xuerui
-> >>
-> >> Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
-> >>
-> >>
->
->
+Hi Andrew,
+
+You are right. The local_irq_disable() was not needed here.
+It's my fault that I also removed the local_irq_enable() when trying
+your suggestion.
+
+Thanks for your review and help on this patch set!
+
+Regards,
+Haibo
+
+> > Thanks,
+> > drew
