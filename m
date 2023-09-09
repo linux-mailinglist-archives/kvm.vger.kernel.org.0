@@ -2,92 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B400979930F
-	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 02:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D059C799312
+	for <lists+kvm@lfdr.de>; Sat,  9 Sep 2023 02:16:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345191AbjIIAPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Sep 2023 20:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53808 "EHLO
+        id S1345353AbjIIAPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Sep 2023 20:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235137AbjIIAPr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Sep 2023 20:15:47 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFBB18E
-        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 17:15:43 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7b9eb73dcdso2366250276.0
-        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 17:15:43 -0700 (PDT)
+        with ESMTP id S235137AbjIIAPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Sep 2023 20:15:54 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A51D18E
+        for <kvm@vger.kernel.org>; Fri,  8 Sep 2023 17:15:50 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58e49935630so48652947b3.0
+        for <kvm@vger.kernel.org>; Fri, 08 Sep 2023 17:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694218542; x=1694823342; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1694218549; x=1694823349; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=duTiommV4wRLXU9fXYKi68EXY965Pe9kyNHOVuE7lAE=;
-        b=IsBEP4bomsq2q0ScihmwzzZ/w5M0rIoVM6GYSqLbVVKr2s9O8ccKFdm8mPwqQmgAWt
-         zY2crjfKBS8EkbtWBPTH6yEpDOj9SvGBKLmwK5TWgYfgDUxMN3JMMos+RaIvlzyE2AtR
-         WAZdAlLZS81BqtlBYAax+zZi2jllP9TL8mxRLatYbCUVvJCljpEJC4/5qcJ7jIVYaiGz
-         gQpPTmXHF3j6ZfeH08Xr1K9fecQK3AWeiVdyhA1tgzad/osVZvvTIkPlJDxPDjxd/thb
-         /KFtzhluJV3F8W0/LVvDIQfDPH7ykZT4AUWBjBT1fhu7vYv8xkyXB0LaRl0mpEXTJofk
-         0nig==
+        bh=gaKhly8Aj9nDlRectFKYGw3FxO6EGE4C2aH6vsrGIcs=;
+        b=KKQYboSqcTfMiYuHqb6JaslyaUwLzygQtr54knTg8NFmKZzW9Nk9F02RAnx7QH76ia
+         RSnP7F+UCzWFEgW1vS7n2nD/rmqu97xxXhcj5PwkUBzHhxGFYXhOM0um0yr9FX8DpsCH
+         21bYQnWQAdXtwyqFTHsM9D2GXmjWt7d51G5geMz2N4THsLnsSmGJFJh325W3DOtzhQG+
+         mKmymS6dV9lG4v1aHafJwZMd4+rREJjtGYyKpGi9L+IMoZ3vprp5C3XlcQHUBn1z2+j9
+         MaVh85U/qkraojXJqCxJBnLJIvLcUlXYYdEsb1ph6ov4zAOxrXGLaXGELdxBclajwmko
+         Lk4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694218542; x=1694823342;
+        d=1e100.net; s=20230601; t=1694218549; x=1694823349;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=duTiommV4wRLXU9fXYKi68EXY965Pe9kyNHOVuE7lAE=;
-        b=Rx+pq7Ono3RG4HVpfdAkzrvRxiMILFHsgfirUNzLZ/hSuvoY8LYkbzPN0aQGNNFlYz
-         dGWWr+jaPgWIIO0DSeRiG7KrFjQ6oBwhO6xGfEU3wec93VFPNNJz1sJm1H6/IXVdCUxY
-         uUDdepnx3r7Tzm81looA+tw6v/8eyupWE0w6l7Kte5vBfN774/VV8MbOjgiKBlac14C1
-         urrDXneEsEo/L95w4BuZ3H8BpHxzxQNlH7pbUp0bascnJ5vCQxp0e8f+nTGcWIMvB2Ch
-         44k+8ORvGjDG78glHgkN2UiU9a1fal58kvAdu5RcakF8eqnwXcXSJIaIzbglE8pZXors
-         +TnQ==
-X-Gm-Message-State: AOJu0Yy9bcbQ8p/VB2nGec4UONpWjiHiO5J18bmy7Hwrz0e/BjoryDbZ
-        A9Spdd39eoC6sUPRTItJgGb1B4e88b8=
-X-Google-Smtp-Source: AGHT+IFG9zFrL0+cWVhbTJWR1ZSxntCJRoVGsdC1oHU8sVjjKFd4JL2NtbwkPyCFC8lKPTHXLt7ietThG3s=
+        bh=gaKhly8Aj9nDlRectFKYGw3FxO6EGE4C2aH6vsrGIcs=;
+        b=sz3phC238CMULHxJutRpQMk6A4IQ/1Dni+vn5eWZH4JltjXyGFdR1dKL12lwqJBuE2
+         P3CVZ14ciCFl+Ly8gRXGGOPSRSdAGNPiHujEathYYumKxSl6NIlGELisu1A9H0T0tlle
+         BU8dbfDqzfB4ycwKNvd8PtQzFTeO3fFroxUswG194gG6vaveFe+87jzfwk9L5JGtTrFt
+         R416EAsqCIEpQj4mBirmkxXtkwRuImP43CB762PFpAJ6c8WAOHyfoCKqKb57X52kuWqa
+         mqyAs+hkuarSQcPTSNsc8XeBt9Enhitx5jXSwXx/p/hU+2ekaLV0MDEmkGqfFXpQ807E
+         pheQ==
+X-Gm-Message-State: AOJu0YxUv9m/wVUDyoE3j17dF4glhmwWpAJCvHpOpP8WxS13QKPn470A
+        MEOZtarFbx5y8J3zpU9ZbpSeIe8ckkM=
+X-Google-Smtp-Source: AGHT+IF1C60bg2DJN40Ko3jIsOcOxP0NOjMSP0DFTt+pfC3PQMs+2qr1EtNSX5EQJ2FP9+vXkLa3AHa75+U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ac02:0:b0:d7f:f3e:74ab with SMTP id
- w2-20020a25ac02000000b00d7f0f3e74abmr90874ybi.1.1694218542725; Fri, 08 Sep
- 2023 17:15:42 -0700 (PDT)
-Date:   Fri,  8 Sep 2023 17:15:31 -0700
-In-Reply-To: <20230825001729.1952858-1-ackerleytng@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:9848:0:b0:59b:5a5b:3a91 with SMTP id
+ p69-20020a819848000000b0059b5a5b3a91mr89060ywg.2.1694218549752; Fri, 08 Sep
+ 2023 17:15:49 -0700 (PDT)
+Date:   Fri,  8 Sep 2023 17:15:33 -0700
+In-Reply-To: <20230908074222.28723-2-vbabka@suse.cz>
 Mime-Version: 1.0
-References: <20230825001729.1952858-1-ackerleytng@google.com>
+References: <20230908074222.28723-2-vbabka@suse.cz>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <169421600030.98653.16406301904284107961.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: selftests: Add tests - invalid inputs for KVM_CREATE_GUEST_MEMFD
+Message-ID: <169421599820.98577.9267896589643015779.b4-ty@google.com>
+Subject: Re: [PATCH gmem FIXUP v2] mm, compaction: make testing
+ mapping_unmovable() safe
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Ackerley Tng <ackerleytng@google.com>
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shuah@kernel.org, andrew.jones@linux.dev,
-        ricarkol@google.com, chao.p.peng@linux.intel.com, tabba@google.com,
-        jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        vannapurve@google.com, erdemaktas@google.com,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
-        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        kirill.shutemov@linux.intel.com
+To:     Sean Christopherson <seanjc@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+Cc:     ackerleytng@google.com, akpm@linux-foundation.org,
+        anup@brainfault.org, aou@eecs.berkeley.edu,
+        chao.p.peng@linux.intel.com, chenhuacai@kernel.org,
+        david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org,
+        jmorris@namei.org, kirill.shutemov@linux.intel.com,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, liam.merwick@oracle.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-riscv@lists.infradead.org,
+        linux-security-module@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name,
+        maz@kernel.org, michael.roth@amd.com, mpe@ellerman.id.au,
+        oliver.upton@linux.dev, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, paul@paul-moore.com, pbonzini@redhat.com,
+        qperret@google.com, serge@hallyn.com, tabba@google.com,
+        vannapurve@google.com, wei.w.wang@intel.com, willy@infradead.org,
+        yu.c.zhang@linux.intel.com
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 25 Aug 2023 00:17:29 +0000, Ackerley Tng wrote:
-> Test that invalid inputs for KVM_CREATE_GUEST_MEMFD, such as
-> non-page-aligned page size and invalid flags, are rejected by the
-> KVM_CREATE_GUEST_MEMFD with EINVAL
+On Fri, 08 Sep 2023 09:42:23 +0200, Vlastimil Babka wrote:
+> As Kirill pointed out, mapping can be removed under us due to
+> truncation. Test it under folio lock as already done for the async
+> compaction / dirty folio case. To prevent locking every folio with
+> mapping to do the test, do it only for unevictable folios, as we can
+> expect the unmovable mapping folios are also unevictable. To enforce
+> that expecation, make mapping_set_unmovable() also set AS_UNEVICTABLE.
 > 
-> 
+> [...]
 
 Applied to kvm-x86 guest_memfd, thanks!
 
-[1/1] KVM: selftests: Add tests - invalid inputs for KVM_CREATE_GUEST_MEMFD
-      https://github.com/kvm-x86/linux/commit/a5accd8596fa
+[1/1] mm, compaction: make testing mapping_unmovable() safe
+      https://github.com/kvm-x86/linux/commit/4876a35647b9
 
 --
 https://github.com/kvm-x86/linux/tree/next
