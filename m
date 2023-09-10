@@ -2,144 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D26A799EF8
-	for <lists+kvm@lfdr.de>; Sun, 10 Sep 2023 18:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9228799F4E
+	for <lists+kvm@lfdr.de>; Sun, 10 Sep 2023 20:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234597AbjIJQby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Sep 2023 12:31:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40694 "EHLO
+        id S234005AbjIJSSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Sep 2023 14:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbjIJQbx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Sep 2023 12:31:53 -0400
-X-Greylist: delayed 336 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 10 Sep 2023 09:31:47 PDT
-Received: from out-219.mta0.migadu.com (out-219.mta0.migadu.com [IPv6:2001:41d0:1004:224b::db])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADCC81B5
-        for <kvm@vger.kernel.org>; Sun, 10 Sep 2023 09:31:47 -0700 (PDT)
-Message-ID: <fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1694363170;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rsJTV4TGEiHWsO+KfLl8BIfB/jdFBOkN4/lhq6SgVaw=;
-        b=G2BwvTyKhntpdDrUFaeWo109jjjRls1LKieTt6X/EFdnX5xJd0l02jyMyu8sYL3AgBBg3n
-        nvp/4UVxHkAJwymOdmOn78UbWqJHSNiVwXX4sfv/NUMIBU33RMI1MhHdNj17ZhpTyC/XRI
-        TBc5PobGJfqX7mFoU0ZzfbCayRuwbmY=
-Date:   Mon, 11 Sep 2023 00:25:36 +0800
-MIME-Version: 1.0
-Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
+        with ESMTP id S229503AbjIJSSu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Sep 2023 14:18:50 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37EE318E
+        for <kvm@vger.kernel.org>; Sun, 10 Sep 2023 11:18:45 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26BCC433C8;
+        Sun, 10 Sep 2023 18:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694369924;
+        bh=ASilHGVZgGzH/f+ZMWTcrcQGEIs4+1IIpikMRP0PMLE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nSgkGpXEC1TaKGgH5EDL4geDysjEA5MRO61k1UHKPd/DoAmbuRBqINYW1jGOHezc8
+         I7PxdZvZkwkid7DXa9UvKCC7ybtOxgwngPiKRwvNq1vTCnqHTzpYTxaPqhVtF0bOtn
+         pjGmtojRoHBcYw+8nnzA9+QibjIzPOqHrHDjq9RreEDzb9RIHesBwpWZ//Z30YkAMo
+         WLFwkPi4PHkAcHe8gGd3rVSV5Dt0I1YN2ekQGuvj2SONeO/EBwfrtkE49oWr6pGA7O
+         pJJI/GOa/xnqyt1BLq0rJ3mgj7nR6SJYqP8rnZ+AhmhRg5oKnSXCyh19WtgTQd7jlU
+         jQvtJgZgbquWQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qfP18-00BlHD-3Q;
+        Sun, 10 Sep 2023 19:18:42 +0100
+Date:   Sun, 10 Sep 2023 19:18:37 +0100
+Message-ID: <87ledd51tu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <zenghui.yu@linux.dev>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
+In-Reply-To: <fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
 References: <20230907100931.1186690-1-maz@kernel.org>
- <20230907100931.1186690-5-maz@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20230907100931.1186690-5-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        <20230907100931.1186690-5-maz@kernel.org>
+        <fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, zhaoxu.35@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 2023/9/7 18:09, Marc Zyngier wrote:
-> As we're about to change the way SGIs are sent, start by splitting
-> out some of the basic functionnality: instead of intermingling
-
-functionality
-
-> the broadcast and non-broadcast cases with the actual SGI generation,
-> perform the following cleanups:
+On Sun, 10 Sep 2023 17:25:36 +0100,
+Zenghui Yu <zenghui.yu@linux.dev> wrote:
 > 
-> - move the SGI queuing into its own helper
-> - split the broadcast code from the affinity-driven code
-> - replace the mask/shift combinations with FIELD_GET()
+> Hi Marc,
 > 
-> The result is much more readable, and paves the way for further
-> optimisations.
+> On 2023/9/7 18:09, Marc Zyngier wrote:
+> > As we're about to change the way SGIs are sent, start by splitting
+> > out some of the basic functionnality: instead of intermingling
+> 
+> functionality
+> 
+> > the broadcast and non-broadcast cases with the actual SGI generation,
+> > perform the following cleanups:
+> > 
+> > - move the SGI queuing into its own helper
+> > - split the broadcast code from the affinity-driven code
+> > - replace the mask/shift combinations with FIELD_GET()
+> > 
+> > The result is much more readable, and paves the way for further
+> > optimisations.
+> 
+> Indeed!
+> 
+> > @@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+> >  {
+> >  	struct kvm *kvm = vcpu->kvm;
+> >  	struct kvm_vcpu *c_vcpu;
+> > -	u16 target_cpus;
+> > +	unsigned long target_cpus;
+> >  	u64 mpidr;
+> > -	int sgi;
+> > -	int vcpu_id = vcpu->vcpu_id;
+> > -	bool broadcast;
+> > -	unsigned long c, flags;
+> > -
+> > -	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
+> > -	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
+> > -	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
+> > +	u32 sgi;
+> > +	unsigned long c;
+> > +
+> > +	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
+> > +
+> > +	/* Broadcast */
+> > +	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
+> > +		kvm_for_each_vcpu(c, c_vcpu, kvm) {
+> > +			/* Don't signal the calling VCPU */
+> > +			if (c_vcpu == vcpu)
+> > +				continue;
+> > +
+> > +			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
+> > +		}
+> > +
+> > +		return;
+> > +	}
+> > +
+> >  	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
+> >  	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
+> >  	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
+> > +	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
+> >   	/*
+> >  	 * We iterate over all VCPUs to find the MPIDRs matching the request.
+> > @@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+> >  	 * VCPUs when most of the times we just signal a single VCPU.
+> >  	 */
+> >  	kvm_for_each_vcpu(c, c_vcpu, kvm) {
+> > -		struct vgic_irq *irq;
+> > +		int level0;
+> >   		/* Exit early if we have dealt with all requested CPUs
+> > */
+> > -		if (!broadcast && target_cpus == 0)
+> > +		if (target_cpus == 0)
+> >  			break;
+> > -
+> > -		/* Don't signal the calling VCPU */
+> > -		if (broadcast && c == vcpu_id)
+> 
+> Unrelated to this patch, but it looks that we were comparing the value
+> of *vcpu_idx* and vcpu_id to skip the calling VCPU.
 
-Indeed!
+Huh, well caught. That was definitely a bug that was there for ever,
+and only you spotted it. Guess I should flag it as a stable candidate.
 
-> @@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
->  {
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_vcpu *c_vcpu;
-> -	u16 target_cpus;
-> +	unsigned long target_cpus;
->  	u64 mpidr;
-> -	int sgi;
-> -	int vcpu_id = vcpu->vcpu_id;
-> -	bool broadcast;
-> -	unsigned long c, flags;
-> -
-> -	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
-> -	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
-> -	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
-> +	u32 sgi;
-> +	unsigned long c;
-> +
-> +	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
-> +
-> +	/* Broadcast */
-> +	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
-> +		kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> +			/* Don't signal the calling VCPU */
-> +			if (c_vcpu == vcpu)
-> +				continue;
-> +
-> +			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
-> +		}
-> +
-> +		return;
-> +	}
-> +
->  	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
->  	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
->  	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
-> +	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
->  
->  	/*
->  	 * We iterate over all VCPUs to find the MPIDRs matching the request.
-> @@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
->  	 * VCPUs when most of the times we just signal a single VCPU.
->  	 */
->  	kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> -		struct vgic_irq *irq;
-> +		int level0;
->  
->  		/* Exit early if we have dealt with all requested CPUs */
-> -		if (!broadcast && target_cpus == 0)
-> +		if (target_cpus == 0)
->  			break;
-> -
-> -		/* Don't signal the calling VCPU */
-> -		if (broadcast && c == vcpu_id)
+> Is there a rule in KVM that userspace should invoke KVM_CREATE_VCPU
+> with sequential "vcpu id"s, starting at 0, so that the user-provided
+> vcpu_id always equals to the KVM-internal vcpu_idx for a given VCPU?
 
-Unrelated to this patch, but it looks that we were comparing the value
-of *vcpu_idx* and vcpu_id to skip the calling VCPU. Is there a rule in
-KVM that userspace should invoke KVM_CREATE_VCPU with sequential
-"vcpu id"s, starting at 0, so that the user-provided vcpu_id always
-equals to the KVM-internal vcpu_idx for a given VCPU?
+I don't think there is any such rule. As far as I can tell, any number
+will do as long as it is within the range [0, max_vcpu_id). Of course,
+max_vcpu_id doesn't even exist on arm64. From what I can tell, this is
+just some random number between 0 and 511 for us (GICv2
+notwithstanding).
 
-I asked because it seems that in kvm/arm64 we always use
-kvm_get_vcpu(kvm, i) to obtain the kvm_vcpu pointer, even if *i* is
-sometimes essentially provided by userspace..
+> I asked because it seems that in kvm/arm64 we always use
+> kvm_get_vcpu(kvm, i) to obtain the kvm_vcpu pointer, even if *i* is
+> sometimes essentially provided by userspace..
 
-Besides, the refactor itself looks good to me.
+Huh, this is incredibly dodgy. I had a go at a few occurrences (see
+below), but this is hardly a complete list.
 
-Thanks,
-Zenghui
+> Besides, the refactor itself looks good to me.
+
+Cool, thanks!
+
+	M.
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 6dcdae4d38cb..e32c867e7b48 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 				   timer_ctx->irq.level);
+ 
+ 	if (!userspace_irqchip(vcpu->kvm)) {
+-		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_idx,
+ 					  timer_irq(timer_ctx),
+ 					  timer_ctx->irq.level,
+ 					  timer_ctx);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a3b13281d38a..1f7b074b81df 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -439,9 +439,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
+ 	 */
+-	if (*last_ran != vcpu->vcpu_id) {
++	if (*last_ran != vcpu->vcpu_idx) {
+ 		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
+-		*last_ran = vcpu->vcpu_id;
++		*last_ran = vcpu->vcpu_idx;
+ 	}
+ 
+ 	vcpu->cpu = cpu;
+@@ -1207,7 +1207,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 		if (vcpu_idx >= nrcpus)
+ 			return -EINVAL;
+ 
+-		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
++		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_idx);
+ 		if (!vcpu)
+ 			return -EINVAL;
+ 
+@@ -1222,14 +1222,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 		if (vcpu_idx >= nrcpus)
+ 			return -EINVAL;
+ 
+-		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
++		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_idx);
+ 		if (!vcpu)
+ 			return -EINVAL;
+ 
+ 		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
+ 			return -EINVAL;
+ 
+-		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level, NULL);
++		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_idx, irq_num, level, NULL);
+ 	case KVM_ARM_IRQ_TYPE_SPI:
+ 		if (!irqchip_in_kernel(kvm))
+ 			return -ENXIO;
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 6b066e04dc5d..4448940b6d79 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -348,7 +348,7 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
+ 	pmu->irq_level = overflow;
+ 
+ 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
+-		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_idx,
+ 					      pmu->irq_num, overflow, pmu);
+ 		WARN_ON(ret);
+ 	}
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+index 07aa0437125a..85606a531dc3 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -166,7 +166,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
+ 
+ 	if (vcpu) {
+ 		hdr = "VCPU";
+-		id = vcpu->vcpu_id;
++		id = vcpu->vcpu_idx;
+ 	}
+ 
+ 	seq_printf(s, "\n");
+@@ -212,7 +212,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 		      "     %2d "
+ 		      "\n",
+ 			type, irq->intid,
+-			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
++			(irq->target_vcpu) ? irq->target_vcpu->vcpu_idx : -1,
+ 			pending,
+ 			irq->line_level,
+ 			irq->active,
+@@ -224,7 +224,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 			irq->mpidr,
+ 			irq->source,
+ 			irq->priority,
+-			(irq->vcpu) ? irq->vcpu->vcpu_id : -1);
++			(irq->vcpu) ? irq->vcpu->vcpu_idx : -1);
+ }
+ 
+ static int vgic_debug_show(struct seq_file *s, void *v)
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 212b73a715c1..82b264ad68c4 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -345,7 +345,7 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+ 	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
+ 		return -EINVAL;
+ 
+-	reg_attr->vcpu = kvm_get_vcpu(dev->kvm, cpuid);
++	reg_attr->vcpu = kvm_get_vcpu_by_id(dev->kvm, cpuid);
+ 	reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
+ 
+ 	return 0;
+
+-- 
+Without deviation from the norm, progress is not possible.
