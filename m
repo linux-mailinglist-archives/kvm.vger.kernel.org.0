@@ -2,75 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00F8479BA15
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4405979B6BE
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:05:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234814AbjIKUs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
+        id S235131AbjIKUsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236210AbjIKJ7h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:59:37 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABC2EE67;
-        Mon, 11 Sep 2023 02:59:32 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-68fbd5cd0ceso782915b3a.1;
-        Mon, 11 Sep 2023 02:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694426372; x=1695031172; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2TUtc0pSp329hvP10KKMH6JHebPrZxEBsgiEKJrLWh8=;
-        b=Par9M4bAT71wLoP3LOxI7TzYC+oMYkf8YihsNCeS9hJINIdUkEBUrgkQqOwEvpaSB8
-         PfGeyvn8+P11y2nSIyvOtQhBEMppe8Wj/rIkLJ9s2uKCX6LqWZDK3i0Hnqi460pgYm8s
-         Xbk4OFnSoc4qpu0x53Aw9ma9KojDGer2G+40UoqAg1vcD4U9VHlxblWt1ChTW/bKrTTJ
-         BrktUoEY3Rftiq/kGPfpiEBDdWv/O/0I5Zn2D9Uf9QMypc3zi8cc2gCgKsNV0erxqpHB
-         pKr1HX05LAq9Ac8Cf592BfAYsBLJEnKVbv1kTQfgu89jRwCAP2WcwgzeuH1R8uUEmSiD
-         hREA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694426372; x=1695031172;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2TUtc0pSp329hvP10KKMH6JHebPrZxEBsgiEKJrLWh8=;
-        b=ve0AXAeruaIHcR2z0PcZj9yse+8Mu4RqP7syT4VBR6WNsX7vmREmbQVaUt4MBL2Ag6
-         QGI1j7EXF6+lJ15mg1ZjAyaXUUIUCxoxRY6q60J52aZVpFNVlrVP3ecL53RakIflUyzv
-         VKbfpSIalAxJkBHIUE/htxaxwnN8Su9oUCxJUMw1FkxMb8QNG+VlXEnwp8FQF/IFcZPh
-         lsJ0Csnf84CMvR1ICXWVf5r13AP/jdOsUptBCYfQ5/XBcVxk6GBi9puQBzHpIQUaFqUS
-         UHwHR1bnxlXSN98QA2XwCxnJ93aBIhZgHEMjm6pAol1t79Qdcs6xzOKtSrWfvoRRpoRI
-         T2LA==
-X-Gm-Message-State: AOJu0YyXRjkyt4ADvZKvkzZan5+SzSthODUhgY4FuukzU8JPvxcQy6/y
-        HSrJUaNlB5DYvMX9+qqsPnk=
-X-Google-Smtp-Source: AGHT+IGkzN+hUtDsUPe18WTuHFjC/nSGgLEYgTG+Bkgu03Q3BrHKBDYoPaTD2zr9BUI0Xc0Y4p9o1g==
-X-Received: by 2002:a05:6a20:1390:b0:14c:512c:60d9 with SMTP id hn16-20020a056a20139000b0014c512c60d9mr8341377pzc.27.1694426372083;
-        Mon, 11 Sep 2023 02:59:32 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j13-20020aa78d0d000000b0068bff979c33sm5224230pfe.188.2023.09.11.02.59.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Sep 2023 02:59:31 -0700 (PDT)
-Message-ID: <6c15cbd9-1086-373c-d906-fc1cd0016890@gmail.com>
-Date:   Mon, 11 Sep 2023 17:59:23 +0800
+        with ESMTP id S236245AbjIKKDo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 06:03:44 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24482E6B;
+        Mon, 11 Sep 2023 03:03:37 -0700 (PDT)
+Received: from loongson.cn (unknown [10.40.46.158])
+        by gateway (Coremail) with SMTP id _____8Cxc_D35f5k0ookAA--.6137S3;
+        Mon, 11 Sep 2023 18:03:35 +0800 (CST)
+Received: from [192.168.124.126] (unknown [10.40.46.158])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfSP15f5kCSZ3AA--.39206S3;
+        Mon, 11 Sep 2023 18:03:34 +0800 (CST)
+Subject: Re: [PATCH v20 09/30] LoongArch: KVM: Implement vcpu get, vcpu set
+ registers
+To:     Huacai Chen <chenhuacai@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
+ <20230831083020.2187109-10-zhaotianrui@loongson.cn>
+ <CAAhV-H6=e-Tg1tCdFhN5i2CSQpL-NDLovJdc9A=Sxt=3h-3Z0g@mail.gmail.com>
+From:   zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <5bb1f2fa-c41d-9f0b-7eab-173af09df5a0@loongson.cn>
+Date:   Mon, 11 Sep 2023 18:03:33 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH] KVM: x86: Allow exposure of VMware backdoor Pseudo-PMCs
- when !enable_pmu
+In-Reply-To: <CAAhV-H6=e-Tg1tCdFhN5i2CSQpL-NDLovJdc9A=Sxt=3h-3Z0g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     arbel.moshe@oracle.com, liran.alon@oracle.com,
-        nikita.leshchenko@oracle.com,
-        Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-References: <20230822080312.63514-1-likexu@tencent.com>
- <ZOZteOxJvq9v609G@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZOZteOxJvq9v609G@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+X-CM-TRANSID: AQAAf8DxfSP15f5kCSZ3AA--.39206S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKF43uFyDJF4rAr1DZF48Xwc_yoWfGF13pF
+        WUCan8Xr48tryxCw1Iqr4qgF9Iqr97Kr17ZFy7Kayayr1qyryFyF40krW3CFyrGr18uF1I
+        va4jqF1I9FsYy3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+        6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+        Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+        Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+        CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+        MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
+        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUU
+        U==
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -79,78 +74,332 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi folks,
 
-Please help confirm if VMware backdoor Pseudo-PMCs [*] are still available
-when the KVM module parameter eneble_pmu=0.
-
-	- VMWARE_BACKDOOR_PMC_HOST_TSC;
-	- VMWARE_BACKDOOR_PMC_REAL_TIME;
-	- VMWARE_BACKDOOR_PMC_APPARENT_TIME;
-
-I'd like to say yes, but safely you have the official right to define it. Thanks.
-
-[*] https://www.vmware.com/files/pdf/techpaper/Timekeeping-In-VirtualMachines.pdf
-
-On 24/8/2023 4:35 am, Sean Christopherson wrote:
-> On Tue, Aug 22, 2023, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
+在 2023/9/11 下午5:03, Huacai Chen 写道:
+> Hi, Tianrui,
+>
+> On Thu, Aug 31, 2023 at 4:30 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
+>> Implement LoongArch vcpu get registers and set registers operations, it
+>> is called when user space use the ioctl interface to get or set regs.
 >>
->> Fix kvm_pmu_rdpmc() logic to allow exposure of VMware backdoor Pseudo-PMCs
->> if pmu is globally disabled.
->>
->> In this usage scenario, once vmware_backdoor is enabled, the VMs can fully
->> utilize all of the vmware_backdoor-related resources, not just part of it,
->> i.e., vcpu should always be able to access the VMware backdoor Pseudo-PMCs
->> via RDPMC. Since the enable_pmu is more concerned with the visibility of
->> hardware pmu resources on the host, fix it to decouple the two knobs.
->>
->> The test case vmware_backdoors from KUT is used for validation.
-> 
-> Is there a real world need for this?  Per commit 672ff6cff80c ("KVM: x86: Raise
-> #GP when guest vCPU do not support PMU"), KVM's behavior is intentional.  If there
-> is a real world need, then (a) that justification needs to be provided, (b) this
-> needs a Fixes:, and (c) this probably needs to be tagged for stable.
-> 
->> Cc: Arbel Moshe <arbel.moshe@oracle.com>
->> Cc: Liran Alon <liran.alon@oracle.com>
->> Cc: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> 
-> The expectation is that a Cc: in the changelog means the patch email is Cc'd to
-> that person, i.e. one of the purposes of Cc: here is to record that people who
-> might care about the patch have been made aware of its existence.  stable@ is
-> pretty much the only exception to that rule, as "Cc: stable@vger.kernel.org" is
-> really just a metadata tag for scripts.
-> 
-> FWIW, I believe Liran no longer works for Oracle, no idea about the others.
-> 
->> Signed-off-by: Like Xu <likexu@tencent.com>
+>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 >> ---
->>   arch/x86/kvm/pmu.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>   arch/loongarch/kvm/csr_ops.S |  67 ++++++++++++
+>>   arch/loongarch/kvm/vcpu.c    | 206 +++++++++++++++++++++++++++++++++++
+>>   2 files changed, 273 insertions(+)
+>>   create mode 100644 arch/loongarch/kvm/csr_ops.S
 >>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index edb89b51b383..c896328b2b5a 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -526,12 +526,12 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
->>   	struct kvm_pmc *pmc;
->>   	u64 mask = fast_mode ? ~0u : ~0ull;
->>   
->> -	if (!pmu->version)
->> -		return 1;
->> -
->>   	if (is_vmware_backdoor_pmc(idx))
->>   		return kvm_pmu_rdpmc_vmware(vcpu, idx, data);
->>   
->> +	if (!pmu->version)
->> +		return 1;
+>> diff --git a/arch/loongarch/kvm/csr_ops.S b/arch/loongarch/kvm/csr_ops.S
+>> new file mode 100644
+>> index 0000000000..53e44b23a5
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/csr_ops.S
+>> @@ -0,0 +1,67 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>> + */
 >> +
->>   	pmc = static_call(kvm_x86_pmu_rdpmc_ecx_to_pmc)(vcpu, idx, &mask);
->>   	if (!pmc)
->>   		return 1;
+>> +#include <asm/regdef.h>
+>> +#include <linux/linkage.h>
+>> +       .text
+>> +       .cfi_sections   .debug_frame
+>> +/*
+>> + * we have splited hw gcsr into three parts, so we can
+>> + * calculate the code offset by gcsrid and jump here to
+>> + * run the gcsrwr instruction.
+>> + */
+>> +SYM_FUNC_START(set_hw_gcsr)
+>> +       addi.d      t0,   a0,   0
+>> +       addi.w      t1,   zero, 96
+>> +       bltu        t1,   t0,   1f
+>> +       la.pcrel    t0,   10f
+>> +       alsl.d      t0,   a0,   t0, 3
+>> +       jr          t0
+>> +1:
+>> +       addi.w      t1,   a0,   -128
+>> +       addi.w      t2,   zero, 15
+>> +       bltu        t2,   t1,   2f
+>> +       la.pcrel    t0,   11f
+>> +       alsl.d      t0,   t1,   t0, 3
+>> +       jr          t0
+>> +2:
+>> +       addi.w      t1,   a0,   -384
+>> +       addi.w      t2,   zero, 3
+>> +       bltu        t2,   t1,   3f
+>> +       la.pcrel    t0,   12f
+>> +       alsl.d      t0,   t1,   t0, 3
+>> +       jr          t0
+>> +3:
+>> +       addi.w      a0,   zero, -1
+>> +       jr          ra
+>> +
+>> +/* range from 0x0(KVM_CSR_CRMD) to 0x60(KVM_CSR_LLBCTL) */
+>> +10:
+>> +       csrnum = 0
+>> +       .rept 0x61
+>> +       gcsrwr a1, csrnum
+>> +       jr ra
+>> +       csrnum = csrnum + 1
+>> +       .endr
+>> +
+>> +/* range from 0x80(KVM_CSR_IMPCTL1) to 0x8f(KVM_CSR_TLBRPRMD) */
+>> +11:
+>> +       csrnum = 0x80
+>> +       .rept 0x10
+>> +       gcsrwr a1, csrnum
+>> +       jr ra
+>> +       csrnum = csrnum + 1
+>> +       .endr
+>> +
+>> +/* range from 0x180(KVM_CSR_DMWIN0) to 0x183(KVM_CSR_DMWIN3) */
+>> +12:
+>> +       csrnum = 0x180
+>> +       .rept 0x4
+>> +       gcsrwr a1, csrnum
+>> +       jr ra
+>> +       csrnum = csrnum + 1
+>> +       .endr
+>> +
+>> +SYM_FUNC_END(set_hw_gcsr)
+>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>> index ca4e8d074e..f17422a942 100644
+>> --- a/arch/loongarch/kvm/vcpu.c
+>> +++ b/arch/loongarch/kvm/vcpu.c
+>> @@ -13,6 +13,212 @@
+>>   #define CREATE_TRACE_POINTS
+>>   #include "trace.h"
 >>
->> base-commit: fff2e47e6c3b8050ca26656693caa857e3a8b740
->> -- 
->> 2.41.0
+>> +int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *v)
+>> +{
+>> +       unsigned long val;
+>> +       struct loongarch_csrs *csr = vcpu->arch.csr;
+>> +
+>> +       if (get_gcsr_flag(id) & INVALID_GCSR)
+>> +               return -EINVAL;
+>> +
+>> +       if (id == LOONGARCH_CSR_ESTAT) {
+>> +               /* interrupt status IP0 -- IP7 from GINTC */
+>> +               val = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_GINTC) & 0xff;
+>> +               *v = kvm_read_sw_gcsr(csr, id) | (val << 2);
+>> +               return 0;
+>> +       }
+>> +
+>> +       /*
+>> +        * get software csr state if csrid is valid, since software
+>> +        * csr state is consistent with hardware
+>> +        */
+> After a long time thinking, I found this is wrong. Of course
+> _kvm_setcsr() saves a software copy of the hardware registers, but the
+> hardware status will change. For example, during a VM running, it may
+> change the EUEN register if it uses fpu.
+>
+> So, we should do things like what we do in our internal repo,
+> _kvm_getcsr() should get values from hardware for HW_GCSR registers.
+> And we also need a get_hw_gcsr assembly function.
+>
+>
+> Huacai
+This is a asynchronous vcpu ioctl action, that is to say  this action 
+take place int the vcpu thread after vcpu get out of guest mode, and the 
+guest registers have been saved in software, so we could return software 
+register value when get guest csr.
+
+Thanks
+Tianrui Zhao
+>
+>> +       *v = kvm_read_sw_gcsr(csr, id);
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
+>> +{
+>> +       struct loongarch_csrs *csr = vcpu->arch.csr;
+>> +       int ret = 0, gintc;
+>> +
+>> +       if (get_gcsr_flag(id) & INVALID_GCSR)
+>> +               return -EINVAL;
+>> +
+>> +       if (id == LOONGARCH_CSR_ESTAT) {
+>> +               /* estat IP0~IP7 inject through guestexcept */
+>> +               gintc = (val >> 2) & 0xff;
+>> +               write_csr_gintc(gintc);
+>> +               kvm_set_sw_gcsr(csr, LOONGARCH_CSR_GINTC, gintc);
+>> +
+>> +               gintc = val & ~(0xffUL << 2);
+>> +               write_gcsr_estat(gintc);
+>> +               kvm_set_sw_gcsr(csr, LOONGARCH_CSR_ESTAT, gintc);
+>> +
+>> +               return ret;
+>> +       }
+>> +
+>> +       if (get_gcsr_flag(id) & HW_GCSR) {
+>> +               set_hw_gcsr(id, val);
+>> +               /* write sw gcsr to keep consistent with hardware */
+>> +               kvm_write_sw_gcsr(csr, id, val);
+>> +       } else
+>> +               kvm_write_sw_gcsr(csr, id, val);
+>> +
+>> +       return ret;
+>> +}
+>> +
+>> +static int _kvm_get_one_reg(struct kvm_vcpu *vcpu,
+>> +               const struct kvm_one_reg *reg, s64 *v)
+>> +{
+>> +       int reg_idx, ret = 0;
+>> +
+>> +       if ((reg->id & KVM_REG_LOONGARCH_MASK) == KVM_REG_LOONGARCH_CSR) {
+>> +               reg_idx = KVM_GET_IOC_CSRIDX(reg->id);
+>> +               ret = _kvm_getcsr(vcpu, reg_idx, v);
+>> +       } else if (reg->id == KVM_REG_LOONGARCH_COUNTER)
+>> +               *v = drdtime() + vcpu->kvm->arch.time_offset;
+>> +       else
+>> +               ret = -EINVAL;
+>> +
+>> +       return ret;
+>> +}
+>> +
+>> +static int _kvm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>> +{
+>> +       int ret = -EINVAL;
+>> +       s64 v;
+>> +
+>> +       if ((reg->id & KVM_REG_SIZE_MASK) != KVM_REG_SIZE_U64)
+>> +               return ret;
+>> +
+>> +       if (_kvm_get_one_reg(vcpu, reg, &v))
+>> +               return ret;
+>> +
+>> +       return put_user(v, (u64 __user *)(long)reg->addr);
+>> +}
+>> +
+>> +static int _kvm_set_one_reg(struct kvm_vcpu *vcpu,
+>> +                       const struct kvm_one_reg *reg,
+>> +                       s64 v)
+>> +{
+>> +       int ret = 0;
+>> +       unsigned long flags;
+>> +       u64 val;
+>> +       int reg_idx;
+>> +
+>> +       val = v;
+>> +       if ((reg->id & KVM_REG_LOONGARCH_MASK) == KVM_REG_LOONGARCH_CSR) {
+>> +               reg_idx = KVM_GET_IOC_CSRIDX(reg->id);
+>> +               ret = _kvm_setcsr(vcpu, reg_idx, val);
+>> +       } else if (reg->id == KVM_REG_LOONGARCH_COUNTER) {
+>> +               local_irq_save(flags);
+>> +               /*
+>> +                * gftoffset is relative with board, not vcpu
+>> +                * only set for the first time for smp system
+>> +                */
+>> +               if (vcpu->vcpu_id == 0)
+>> +                       vcpu->kvm->arch.time_offset = (signed long)(v - drdtime());
+>> +               write_csr_gcntc((ulong)vcpu->kvm->arch.time_offset);
+>> +               local_irq_restore(flags);
+>> +       } else if (reg->id == KVM_REG_LOONGARCH_VCPU_RESET) {
+>> +               kvm_reset_timer(vcpu);
+>> +               memset(&vcpu->arch.irq_pending, 0, sizeof(vcpu->arch.irq_pending));
+>> +               memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arch.irq_clear));
+>> +       } else
+>> +               ret = -EINVAL;
+>> +
+>> +       return ret;
+>> +}
+>> +
+>> +static int _kvm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>> +{
+>> +       s64 v;
+>> +       int ret = -EINVAL;
+>> +
+>> +       if ((reg->id & KVM_REG_SIZE_MASK) != KVM_REG_SIZE_U64)
+>> +               return ret;
+>> +
+>> +       if (get_user(v, (u64 __user *)(long)reg->addr))
+>> +               return ret;
+>> +
+>> +       return _kvm_set_one_reg(vcpu, reg, v);
+>> +}
+>> +
+>> +int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+>> +                                 struct kvm_sregs *sregs)
+>> +{
+>> +       return -ENOIOCTLCMD;
+>> +}
+>> +
+>> +int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+>> +                                 struct kvm_sregs *sregs)
+>> +{
+>> +       return -ENOIOCTLCMD;
+>> +}
+>> +
+>> +int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>> +{
+>> +       int i;
+>> +
+>> +       vcpu_load(vcpu);
+>> +
+>> +       for (i = 0; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+>> +               regs->gpr[i] = vcpu->arch.gprs[i];
+>> +
+>> +       regs->pc = vcpu->arch.pc;
+>> +
+>> +       vcpu_put(vcpu);
+>> +       return 0;
+>> +}
+>> +
+>> +int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>> +{
+>> +       int i;
+>> +
+>> +       vcpu_load(vcpu);
+>> +
+>> +       for (i = 1; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+>> +               vcpu->arch.gprs[i] = regs->gpr[i];
+>> +       vcpu->arch.gprs[0] = 0; /* zero is special, and cannot be set. */
+>> +       vcpu->arch.pc = regs->pc;
+>> +
+>> +       vcpu_put(vcpu);
+>> +       return 0;
+>> +}
+>> +
+>> +long kvm_arch_vcpu_ioctl(struct file *filp,
+>> +                        unsigned int ioctl, unsigned long arg)
+>> +{
+>> +       struct kvm_vcpu *vcpu = filp->private_data;
+>> +       void __user *argp = (void __user *)arg;
+>> +       long r;
+>> +
+>> +       vcpu_load(vcpu);
+>> +
+>> +       switch (ioctl) {
+>> +       case KVM_SET_ONE_REG:
+>> +       case KVM_GET_ONE_REG: {
+>> +               struct kvm_one_reg reg;
+>> +
+>> +               r = -EFAULT;
+>> +               if (copy_from_user(&reg, argp, sizeof(reg)))
+>> +                       break;
+>> +               if (ioctl == KVM_SET_ONE_REG)
+>> +                       r = _kvm_set_reg(vcpu, &reg);
+>> +               else
+>> +                       r = _kvm_get_reg(vcpu, &reg);
+>> +               break;
+>> +       }
+>> +       default:
+>> +               r = -ENOIOCTLCMD;
+>> +               break;
+>> +       }
+>> +
+>> +       vcpu_put(vcpu);
+>> +       return r;
+>> +}
+>> +
+>>   int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+>>   {
+>>          return 0;
+>> --
+>> 2.27.0
 >>
+
