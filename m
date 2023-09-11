@@ -2,85 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B86A879B949
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:09:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DA7F79BAB1
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:12:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234659AbjIKUs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:48:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58638 "EHLO
+        id S233181AbjIKUrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:47:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237492AbjIKMxr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 08:53:47 -0400
-Received: from muru.com (muru.com [72.249.23.125])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 80CF6CEB;
-        Mon, 11 Sep 2023 05:53:42 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by muru.com (Postfix) with ESMTPS id E961280A2;
-        Mon, 11 Sep 2023 12:53:41 +0000 (UTC)
-Date:   Mon, 11 Sep 2023 15:53:40 +0300
-From:   Tony Lindgren <tony@atomide.com>
-To:     Marc Haber <mh+linux-kernel@zugschlus.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Linux 6.5 speed regression, boot VERY slow with anything systemd
- related
-Message-ID: <20230911125340.GB5285@atomide.com>
-References: <ZO4YJlhHYjM7MsK4@torres.zugschlus.de>
- <ZO4nbzkd4tovKpxx@google.com>
- <ZO5OeoKA7TbAnrI1@torres.zugschlus.de>
- <ZPEPFJ8QvubbD3H9@google.com>
- <20230901122431.GU11676@atomide.com>
- <ZPiPkSY6NRzfWV5Z@torres.zugschlus.de>
- <20230906152107.GD11676@atomide.com>
- <ZPmignexOJvJ5J5W@torres.zugschlus.de>
- <20230907105150.GJ11676@atomide.com>
- <ZPzQvXUW+dbkLMZ2@torres.zugschlus.de>
+        with ESMTP id S237634AbjIKNEO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 09:04:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E305DE0
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 06:03:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694437407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VSJPoGx10J6x6+0exgf8zlMMy8M925rAu1G76vFf9bs=;
+        b=W8sK2nWMjSCiO9NDgO3b/qA0xfEhiBDbD67UXgUpneGqDIFTmsixHc6Lay4GL1dbKpjG+y
+        bSp4BGlZW1cp4ZZuRXgUbHFfv0LgYuiJNb4vFoSVNlRWweZq76IQepVuJdjg84C2nplNO+
+        RWMR5mfpdnuRXuWhzrld6ub6GQ69jcA=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-1-HRl8HX2aMzS5sXQtod1MAA-1; Mon, 11 Sep 2023 09:03:23 -0400
+X-MC-Unique: HRl8HX2aMzS5sXQtod1MAA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E90643C1DC25;
+        Mon, 11 Sep 2023 13:03:21 +0000 (UTC)
+Received: from [10.22.32.237] (unknown [10.22.32.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 460CC40C6EA8;
+        Mon, 11 Sep 2023 13:03:20 +0000 (UTC)
+Message-ID: <06714da1-d566-766f-7a13-a3c93b5953c4@redhat.com>
+Date:   Mon, 11 Sep 2023 09:03:20 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZPzQvXUW+dbkLMZ2@torres.zugschlus.de>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH V11 04/17] locking/qspinlock: Improve xchg_tail for number
+ of cpus >= 16k
+Content-Language: en-US
+To:     Guo Ren <guoren@kernel.org>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
+        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
+        catalin.marinas@arm.com, conor.dooley@microchip.com,
+        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
+        alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        leobras@redhat.com, linux-arch@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-5-guoren@kernel.org>
+ <f091ead0-99b9-b30a-a295-730ce321ac60@redhat.com>
+ <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Marc Haber <mh+linux-kernel@zugschlus.de> [230909 20:08]:
-> On Thu, Sep 07, 2023 at 01:51:50PM +0300, Tony Lindgren wrote:
-> > Still a minimal reproducable test case is needed.. Or do you have the
-> > dmesg output of the failing boot?
-> 
-> I have both dmesg output of a failing boot (with my kernel) and of a
-> successful boot (with the Debian kernel). Attached.
+On 9/10/23 23:09, Guo Ren wrote:
+> On Mon, Sep 11, 2023 at 10:35 AM Waiman Long <longman@redhat.com> wrote:
+>>
+>> On 9/10/23 04:28, guoren@kernel.org wrote:
+>>> From: Guo Ren <guoren@linux.alibaba.com>
+>>>
+>>> The target of xchg_tail is to write the tail to the lock value, so
+>>> adding prefetchw could help the next cmpxchg step, which may
+>>> decrease the cmpxchg retry loops of xchg_tail. Some processors may
+>>> utilize this feature to give a forward guarantee, e.g., RISC-V
+>>> XuanTie processors would block the snoop channel & irq for several
+>>> cycles when prefetch.w instruction (from Zicbop extension) retired,
+>>> which guarantees the next cmpxchg succeeds.
+>>>
+>>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+>>> Signed-off-by: Guo Ren <guoren@kernel.org>
+>>> ---
+>>>    kernel/locking/qspinlock.c | 5 ++++-
+>>>    1 file changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
+>>> index d3f99060b60f..96b54e2ade86 100644
+>>> --- a/kernel/locking/qspinlock.c
+>>> +++ b/kernel/locking/qspinlock.c
+>>> @@ -223,7 +223,10 @@ static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
+>>>     */
+>>>    static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
+>>>    {
+>>> -     u32 old, new, val = atomic_read(&lock->val);
+>>> +     u32 old, new, val;
+>>> +
+>>> +     prefetchw(&lock->val);
+>>> +     val = atomic_read(&lock->val);
+>>>
+>>>        for (;;) {
+>>>                new = (val & _Q_LOCKED_PENDING_MASK) | tail;
+>> That looks a bit weird. You pre-fetch and then immediately read it. How
+>> much performance gain you get by this change alone?
+>>
+>> Maybe you can define an arch specific primitive that default back to
+>> atomic_read() if not defined.
+> Thx for the reply. This is a generic optimization point I would like
+> to talk about with you.
+>
+> First, prefetchw() makes cacheline an exclusive state and serves for
+> the next cmpxchg loop semantic, which writes the idx_tail part of
+> arch_spin_lock. The atomic_read only makes cacheline in the shared
+> state, which couldn't give any guarantee for the next cmpxchg loop
+> semantic. Micro-architecture could utilize prefetchw() to provide a
+> strong forward progress guarantee for the xchg_tail, e.g., the T-HEAD
+> XuanTie processor would hold the exclusive cacheline state until the
+> next cmpxchg write success.
+>
+> In the end, Let's go back to the principle: the xchg_tail is an atomic
+> swap operation that contains write eventually, so giving a prefetchw()
+> at the beginning is acceptable for all architectures..
+> ••••••••••••
 
-Thanks I don't see anything strange there, serial ports are probed in
-both cases.
+I did realize afterward that prefetchw gets the cacheline in exclusive 
+state. I will suggest you mention that in your commit log as well as 
+adding a comment about its purpose in the code.
 
-> In the last few days I have made some additional experiments. Since 6.5
-> has landed in Debian experimental in the mean time, I tried with the
-> Debian kernel: It works. I then used the Debian .config with my kernel
-> tree and my build environment, it works as well. I tried again with my
-> own .config, doesn't work.
+Thanks,
+Longman
 
-OK
+>> Cheers,
+>> Longman
+>>
+>
 
-> I spent the next days with kind of binary searching the .config
-> differences between mine and Debian's (they're huge), and I now have two
-> configurations that only differ in CONFIG_PREEMPT_VOLUNTARY and
-> CONFIG_PREMPT. The version with CONFIG_PREEMPT_VOLUNTARY seems to work
-> (both attached). Sadly, my "own" .config uses CONFIG_PREEMPT_VOLUNTARY
-> and doesn't work, so the actual problem seems to be a bit more complex
-> still.
-
-OK
-
-Regards,
-
-Tony
