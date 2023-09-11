@@ -2,58 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD02179B8A6
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DD1F79B7D2
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:07:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232806AbjIKUri (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:47:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
+        id S232299AbjIKUr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236725AbjIKLPz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 07:15:55 -0400
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B52CE5
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 04:15:51 -0700 (PDT)
-Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-573449a364fso2826900eaf.1
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 04:15:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694430950; x=1695035750; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kdc5E14LhEXwfEKTYcmcAb8UaBAI6Gd6db9kqJWLZf8=;
-        b=IP62h/c8Lf+PyM3+1sTaznOCuYYzi5VT2BPOZaf+p5VeEOzYCwxEHT65LPBsEfZogY
-         BAkUaCm0CSzwhCXdjQrh5dnbnu/DlKqq22Yn9MwYgk+OK8mTyJRZ94EviPguiBBqzRJf
-         LCvDLiM5Pw3O5j4/YGPNVvHWH7PLXY8kS+Ir2TS4R8IAmNtpz/WaU3sRO1NJjei5v1ww
-         1MsVJV8pbF2BzEJEa4ooFuRStk6JIQQ181W3DadVAl9rdLjo1hjuJedYMfOKkhf7qXJq
-         5VMzSXEGk1FM3pxLEiQ4ZI2sWS9ET0n9dFffM5sxLSP5wKNANRXhVjrXAZb0AJUCVKMA
-         iM3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694430950; x=1695035750;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kdc5E14LhEXwfEKTYcmcAb8UaBAI6Gd6db9kqJWLZf8=;
-        b=rarp/d77dLuu4vpTGfIU0bIqEuA2/SzPhznTUe+qduwku1x9HR0miU6AKVE6DoxCtU
-         Udsoasai0twVgHwKuiOzz1ey/pkR9hArqdB5utfODxbE6ErZ7AARoTmTSN/IouVvxDBj
-         deZAySWNSsoaT6fnqU0KS9aYAyILwYg+tn5+n4STy8vgkJZSD6aPuCjG3PAGYrj0uyAz
-         Vc7uUPOAT1Qzo1ZYCgEmdXFkTqaTtV8rZxQAImNGU9KJnmHt+reUvoWRUK35fGCnptvG
-         WJ5rWKxOOmlEcq1QT7HRj9fve4yIcGHPyBcQzQbPPiAPPiOVYgYJIsm4cyCu0h9Qscj/
-         04kg==
-X-Gm-Message-State: AOJu0YzwVqOUUgg41X8/z2LwwJdZMGFzOr2ivXDRlPc4yYXo05uM+G8C
-        mumFjNpeyTc/gWHmc54YcdM0NJimEVXcQc+0I8Y=
-X-Google-Smtp-Source: AGHT+IG5fn2r+CZXTQswNTv5o7+j06b8HcxylfS5GopnmziRRoq5CFLnhStHdBfjOU0thzFJ80D+0yHOWkBr0RKaP/Y=
-X-Received: by 2002:a4a:3906:0:b0:56d:2229:5f94 with SMTP id
- m6-20020a4a3906000000b0056d22295f94mr9256893ooa.6.1694430950243; Mon, 11 Sep
- 2023 04:15:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230911103832.23596-1-philmd@linaro.org>
-In-Reply-To: <20230911103832.23596-1-philmd@linaro.org>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Mon, 11 Sep 2023 07:15:38 -0400
-Message-ID: <CAJSP0QWDcNhso5nNBMNziLSXZczcrGp=6FgGNOXvYEQ6=Giiug@mail.gmail.com>
-Subject: Re: [PATCH] target/i386: Re-introduce few KVM stubs for Clang debug builds
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+        with ESMTP id S236773AbjIKLXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 07:23:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4AEF8CDD
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 04:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694431350;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FY1xnhXgLb3MKZYXgZ+3L/SjT5+gXejZiBkpCQ3k5I4=;
+        b=QV1mipxeyIfYOZMDhTo1GMXgfeWTG3fxgItn2/EkumQaC1JZrsbpLNxi23HdNp73YSiOEw
+        asBdUNWtQVDlfncH8YfcnMQGtjGbJf5xEzZ1CES5ku3e9IhWzbtPd5e85GRDyjul7kBqyK
+        K33dYC1NfXx9T4cgWgh3Vqg0SwsPWro=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-665-YG_QuyVLMkKPKexjbrwgqg-1; Mon, 11 Sep 2023 07:22:27 -0400
+X-MC-Unique: YG_QuyVLMkKPKexjbrwgqg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 85CA51C068E4;
+        Mon, 11 Sep 2023 11:22:26 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 40AEC10005D2;
+        Mon, 11 Sep 2023 11:22:25 +0000 (UTC)
+Date:   Mon, 11 Sep 2023 12:22:23 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 Cc:     qemu-devel@nongnu.org,
         Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -62,118 +49,79 @@ Cc:     qemu-devel@nongnu.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Subject: Re: [PATCH] target/i386: Re-introduce few KVM stubs for Clang debug
+ builds
+Message-ID: <ZP74b/ByEaVW5bZO@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20230911103832.23596-1-philmd@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230911103832.23596-1-philmd@linaro.org>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 11 Sept 2023 at 06:39, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.o=
-rg> wrote:
->
+On Mon, Sep 11, 2023 at 12:38:32PM +0200, Philippe Mathieu-Daudé wrote:
 > Since commits 3adce820cf..ef1cf6890f, When building on
 > a x86 host configured as:
->
->   $ ./configure --cc=3Dclang \
->     --target-list=3Dx86_64-linux-user,x86_64-softmmu \
+> 
+>   $ ./configure --cc=clang \
+>     --target-list=x86_64-linux-user,x86_64-softmmu \
 >     --enable-debug
->
+> 
 > we get:
->
+> 
 >   [71/71] Linking target qemu-x86_64
 >   FAILED: qemu-x86_64
->   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in fun=
-ction `cpu_x86_cpuid':
->   cpu.c:(.text+0x1374): undefined reference to `kvm_arch_get_supported_cp=
-uid'
->   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in fun=
-ction `x86_cpu_filter_features':
->   cpu.c:(.text+0x81c2): undefined reference to `kvm_arch_get_supported_cp=
-uid'
->   /usr/bin/ld: cpu.c:(.text+0x81da): undefined reference to `kvm_arch_get=
-_supported_cpuid'
->   /usr/bin/ld: cpu.c:(.text+0x81f2): undefined reference to `kvm_arch_get=
-_supported_cpuid'
->   /usr/bin/ld: cpu.c:(.text+0x820a): undefined reference to `kvm_arch_get=
-_supported_cpuid'
->   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o:cpu.c:(=
-.text+0x8225): more undefined references to `kvm_arch_get_supported_cpuid' =
-follow
->   clang: error: linker command failed with exit code 1 (use -v to see inv=
-ocation)
+>   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in function `cpu_x86_cpuid':
+>   cpu.c:(.text+0x1374): undefined reference to `kvm_arch_get_supported_cpuid'
+>   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in function `x86_cpu_filter_features':
+>   cpu.c:(.text+0x81c2): undefined reference to `kvm_arch_get_supported_cpuid'
+>   /usr/bin/ld: cpu.c:(.text+0x81da): undefined reference to `kvm_arch_get_supported_cpuid'
+>   /usr/bin/ld: cpu.c:(.text+0x81f2): undefined reference to `kvm_arch_get_supported_cpuid'
+>   /usr/bin/ld: cpu.c:(.text+0x820a): undefined reference to `kvm_arch_get_supported_cpuid'
+>   /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o:cpu.c:(.text+0x8225): more undefined references to `kvm_arch_get_supported_cpuid' follow
+>   clang: error: linker command failed with exit code 1 (use -v to see invocation)
 >   ninja: build stopped: subcommand failed.
->
-> '--enable-debug' disables optimizations (CFLAGS=3D-O0).
->
+> 
+> '--enable-debug' disables optimizations (CFLAGS=-O0).
+> 
 > While at this (un)optimization level GCC eliminate the
 > following dead code:
->
+> 
 >   if (0 && foo()) {
 >       ...
 >   }
->
+> 
 > Clang does not. Therefore restore a pair of stubs for
 > unoptimized Clang builds.
->
+> 
 > Reported-by: Kevin Wolf <kwolf@redhat.com>
 > Fixes: 3adce820cf ("target/i386: Remove unused KVM stubs")
-> Fixes: ef1cf6890f ("target/i386: Allow elision of kvm_hv_vpindex_settable=
-()")
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Fixes: ef1cf6890f ("target/i386: Allow elision of kvm_hv_vpindex_settable()")
+
+Why not just revert those two commits, since we now learned the rationale
+for them was incorrect ?
+
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
 >  target/i386/kvm/kvm_i386.h | 21 ++++++++++++++++++---
 >  1 file changed, 18 insertions(+), 3 deletions(-)
->
-> diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
-> index 55d4e68c34..0b62ac628f 100644
-> --- a/target/i386/kvm/kvm_i386.h
-> +++ b/target/i386/kvm/kvm_i386.h
-> @@ -32,7 +32,6 @@
->
->  bool kvm_has_smm(void);
->  bool kvm_enable_x2apic(void);
-> -bool kvm_hv_vpindex_settable(void);
->  bool kvm_has_pit_state2(void);
->
->  bool kvm_enable_sgx_provisioning(KVMState *s);
-> @@ -41,8 +40,6 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **er=
-rp);
->  void kvm_arch_reset_vcpu(X86CPU *cs);
->  void kvm_arch_after_reset_vcpu(X86CPU *cpu);
->  void kvm_arch_do_init_vcpu(X86CPU *cs);
-> -uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-> -                                      uint32_t index, int reg);
->  uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)=
-;
->
->  void kvm_set_max_apic_id(uint32_t max_apic_id);
-> @@ -60,6 +57,10 @@ void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
->
->  bool kvm_has_x2apic_api(void);
->  bool kvm_has_waitpkg(void);
-> +bool kvm_hv_vpindex_settable(void);
-> +
-> +uint32_t kvm_arch_get_supported_cpuid(KVMState *env, uint32_t function,
-> +                                      uint32_t index, int reg);
->
->  uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
->  void kvm_update_msi_routes_all(void *private, bool global,
-> @@ -76,6 +77,20 @@ typedef struct kvm_msr_handlers {
->  bool kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
->                      QEMUWRMSRHandler *wrmsr);
->
-> +#elif defined(__clang__) && !defined(__OPTIMIZE__)
 
-Another approach is a static library with a .o file containing the
-stubs so the linker only includes it in the executable if the compiler
-emitted the symbols. That way there is no need for defined(__clang__)
-&& !defined(__OPTIMIZE__) and it will work with other
-compilers/optimization levels. It's more work to set up though.
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
