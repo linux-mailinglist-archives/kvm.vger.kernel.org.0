@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41EDE79A22B
-	for <lists+kvm@lfdr.de>; Mon, 11 Sep 2023 06:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F7D179A2AB
+	for <lists+kvm@lfdr.de>; Mon, 11 Sep 2023 07:00:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbjIKEDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 00:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48774 "EHLO
+        id S233809AbjIKFAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 01:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233655AbjIKEDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 00:03:18 -0400
+        with ESMTP id S229656AbjIKFAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 01:00:17 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562E819C;
-        Sun, 10 Sep 2023 21:03:12 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06A2C433C7;
-        Mon, 11 Sep 2023 04:03:11 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62D0ECCA;
+        Sun, 10 Sep 2023 21:59:58 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1B3C433CD;
+        Mon, 11 Sep 2023 04:59:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694404992;
-        bh=92EpCwDEyHeWViedvJ9pBTItHlypPHOPTESLZtTS2Wk=;
+        s=k20201202; t=1694408398;
+        bh=gCvtehknDUl3QH9SKtUiHlsPsjGZ5E9iz3pDBI9XNPQ=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=QTH03VIp70gv1XO7kDapQVr1MF/gj62q5li0jwVEi5XCUPkieEMXU5K+RsXxYe4GB
-         0XGuRI/pHs+brKnvAecIDIVH5FfacOv6OxKxsIDXxYDRTOdyAG0S+CkYYm4wKzoPkC
-         M9zw7Ft3fomWJsp3dxXpa4yDs44hWGyp0QB3ToPlAqFz4JnZzfNbvB+77A5JLBwlnk
-         ISopdxP+brdgckUPF5rOV2mmp3brcekla1jXiRuzmEBOgzv/O6FY5sZ73DUS5/bUsS
-         XKWH/Ti1vMkWVHk8ia7KiZ2clA4WboeDHYN9n6Lqp3OarV0iTo0DFxBCiAaUsrwGG8
-         XqF2RInSXBEzQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-99bed101b70so493375766b.3;
-        Sun, 10 Sep 2023 21:03:11 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzyfIm9l85uRtDq+0HHYt2blzF4XbnFw9BkdStyX8DChlZQ/5s3
-        ZAX0ynTopxcDy5E2ntQ4wkEnNXPGEpXNSxMHLVM=
-X-Google-Smtp-Source: AGHT+IGIQz9UD2kElek9xWFcunN865uMllVDHT6TdxiyvqwcT8s80reUGfGzxP3VM47hyzrhTlRyGsXOURyPRkZqvME=
-X-Received: by 2002:a17:906:cc45:b0:9a1:debe:6b9b with SMTP id
- mm5-20020a170906cc4500b009a1debe6b9bmr6771517ejb.35.1694404990204; Sun, 10
- Sep 2023 21:03:10 -0700 (PDT)
+        b=ppadIEtmXfym/HDY8Sz8hYSKkqPLBUKsm7ZVOA/O2uf8x0DPUef8pbBABwkn3RYT1
+         95+ilGgKsMRBep7O7A5WJOqPXtmxgonK7P34IRyYZXuHie/zIdHHnOssqMgW28gkJI
+         FZLCGD+0EiGVTdwlBAQ3n9gL+z6n5n7pncglIhKHCOllezRRCexEt3AZq0aXeGUNcB
+         CyJ9Im65c50u9lAioCD133vj9Pw25LaMDFGWGyFEjHlOKS4ToCHh8WvHfa9dZbO74q
+         JJFHiG/Nm6b8Ww+r99kKNlITnlwjqi7uR1Atc1fXKHInNM+UY/iwNJFOYh8wVOK8J2
+         NjYUb6oFGSg6w==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-52a23227567so5101493a12.0;
+        Sun, 10 Sep 2023 21:59:57 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwZvULgKJcyNtk+buGCZDdZjx1StEVoHcFqgQIxjo6gRLmwBxJP
+        CiKYG+dGnLMrwE6hrfpmZkW771xFp6UCY/tQz6s=
+X-Google-Smtp-Source: AGHT+IEH6WwMxSKLtFFXUphU0ngn8X1dAuSlfOIteHCH5lBq1zmzW/RyeKvWID3SVfeLdbpU6FQL+3+D8g+Hd6PjyOU=
+X-Received: by 2002:a17:906:3117:b0:99b:6e54:bd6e with SMTP id
+ 23-20020a170906311700b0099b6e54bd6emr6572749ejx.56.1694408396235; Sun, 10 Sep
+ 2023 21:59:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
-In-Reply-To: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
+References: <20230831083020.2187109-1-zhaotianrui@loongson.cn> <20230831083020.2187109-2-zhaotianrui@loongson.cn>
+In-Reply-To: <20230831083020.2187109-2-zhaotianrui@loongson.cn>
 From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Mon, 11 Sep 2023 12:02:57 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5SQWAGvc2gmH1eapm7DeNvYN9YrRzUFJfUZiV5NFGbNg@mail.gmail.com>
-Message-ID: <CAAhV-H5SQWAGvc2gmH1eapm7DeNvYN9YrRzUFJfUZiV5NFGbNg@mail.gmail.com>
-Subject: Re: [PATCH v20 00/30] Add KVM LoongArch support
+Date:   Mon, 11 Sep 2023 12:59:43 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H64c=yDfTpWcvH3LXceJ+Eox0bboLSoq2w+=_ZuyU9jVw@mail.gmail.com>
+Message-ID: <CAAhV-H64c=yDfTpWcvH3LXceJ+Eox0bboLSoq2w+=_ZuyU9jVw@mail.gmail.com>
+Subject: Re: [PATCH v20 01/30] LoongArch: KVM: Add kvm related header files
 To:     Tianrui Zhao <zhaotianrui@loongson.cn>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,345 +66,454 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi, Tianrui,
 
-I hope this can be the last review and the next version can get upstreamed.=
- :)
-
-
 On Thu, Aug 31, 2023 at 4:30=E2=80=AFPM Tianrui Zhao <zhaotianrui@loongson.=
 cn> wrote:
 >
-> From: zhaotianrui <zhaotianrui@loongson.cn>
+> Add LoongArch KVM related header files, including kvm.h,
+> kvm_host.h, kvm_types.h. All of those are about LoongArch
+> virtualization features and kvm interfaces.
 >
-> This series adds KVM LoongArch support. Loongson 3A5000 supports hardware
-> assisted virtualization. With cpu virtualization, there are separate
-> hw-supported user mode and kernel mode in guest mode. With memory
-> virtualization, there are two-level hw mmu table for guest mode and host
-> mode. Also there is separate hw cpu timer with consant frequency in
-> guest mode, so that vm can migrate between hosts with different freq.
-> Currently, we are able to boot LoongArch Linux Guests.
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/kvm_host.h  | 238 +++++++++++++++++++++++++
+>  arch/loongarch/include/asm/kvm_types.h |  11 ++
+>  arch/loongarch/include/uapi/asm/kvm.h  | 101 +++++++++++
+>  include/uapi/linux/kvm.h               |   9 +
+>  4 files changed, 359 insertions(+)
+>  create mode 100644 arch/loongarch/include/asm/kvm_host.h
+>  create mode 100644 arch/loongarch/include/asm/kvm_types.h
+>  create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
 >
-> Few key aspects of KVM LoongArch added by this series are:
-> 1. Enable kvm hardware function when kvm module is loaded.
-> 2. Implement VM and vcpu related ioctl interface such as vcpu create,
->    vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
->    get general registers one by one.
-> 3. Hardware access about MMU, timer and csr are emulated in kernel.
-> 4. Hardwares such as mmio and iocsr device are emulated in user space
->    such as APIC, IPI, pci devices etc.
->
-> The running environment of LoongArch virt machine:
-> 1. Cross tools to build kernel and uefi:
->    $ wget https://github.com/loongson/build-tools/releases/download/2022.=
-09.06/loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz
-The cross tools should be updated to the latest one, because we need
-binutils 2.41 now.
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> new file mode 100644
+> index 0000000000..9f23ddaaae
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -0,0 +1,238 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef __ASM_LOONGARCH_KVM_HOST_H__
+> +#define __ASM_LOONGARCH_KVM_HOST_H__
+> +
+> +#include <linux/cpumask.h>
+> +#include <linux/mutex.h>
+> +#include <linux/hrtimer.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/types.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_types.h>
+> +#include <linux/threads.h>
+> +#include <linux/spinlock.h>
+> +
+> +#include <asm/inst.h>
+> +#include <asm/loongarch.h>
+> +
+> +/* Loongarch KVM register ids */
+> +#define LOONGARCH_CSR_32(_R, _S)       \
+> +       (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
+> +
+> +#define LOONGARCH_CSR_64(_R, _S)       \
+> +       (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
+> +
+> +#define KVM_IOC_CSRID(id)              LOONGARCH_CSR_64(id, 0)
+> +#define KVM_GET_IOC_CSRIDX(id)         ((id & KVM_CSR_IDX_MASK) >> 3)
+> +
+> +#define KVM_MAX_VCPUS                  256
+> +/* memory slots that does not exposed to userspace */
+> +#define KVM_PRIVATE_MEM_SLOTS          0
+> +
+> +#define KVM_HALT_POLL_NS_DEFAULT       500000
+> +
+> +struct kvm_vm_stat {
+> +       struct kvm_vm_stat_generic generic;
+> +};
+> +
+> +struct kvm_vcpu_stat {
+> +       struct kvm_vcpu_stat_generic generic;
+> +       u64 idle_exits;
+> +       u64 signal_exits;
+> +       u64 int_exits;
+> +       u64 cpucfg_exits;
+> +};
+> +
+> +struct kvm_arch_memory_slot {
+> +};
+> +
+> +struct kvm_context {
+> +       unsigned long vpid_cache;
+> +       struct kvm_vcpu *last_vcpu;
+> +};
+> +
+> +struct kvm_world_switch {
+> +       int (*guest_eentry)(void);
+> +       int (*enter_guest)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +       unsigned long page_order;
+> +};
+> +
+> +struct kvm_arch {
+> +       /* Guest physical mm */
+> +       pgd_t *pgd;
+> +       unsigned long gpa_size;
+> +
+> +       s64 time_offset;
+> +       struct kvm_context __percpu *vmcs;
+> +};
+> +
+> +#define CSR_MAX_NUMS           0x800
+> +
+> +struct loongarch_csrs {
+> +       unsigned long csrs[CSR_MAX_NUMS];
+> +};
+> +
+> +/* Resume Flags */
+> +#define RESUME_HOST            0
+> +#define RESUME_GUEST           1
+> +
+> +enum emulation_result {
+> +       EMULATE_DONE,           /* no further processing */
+> +       EMULATE_DO_MMIO,        /* kvm_run filled with MMIO request */
+> +       EMULATE_FAIL,           /* can't emulate this instruction */
+> +       EMULATE_EXCEPT,         /* A guest exception has been generated *=
+/
+> +       EMULATE_DO_IOCSR,       /* handle IOCSR request */
+> +};
+> +
+> +#define KVM_LARCH_CSR          (0x1 << 1)
+> +#define KVM_LARCH_FPU          (0x1 << 0)
+> +
+> +struct kvm_vcpu_arch {
+> +       /*
+> +        * Switch pointer-to-function type to unsigned long
+> +        * for loading the value into register directly.
+> +        */
+> +       unsigned long host_eentry;
+> +       unsigned long guest_eentry;
+> +
+> +       /* Pointers stored here for easy accessing from assembly code */
+> +       int (*handle_exit)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +
+> +       /* Host registers preserved across guest mode execution */
+> +       unsigned long host_sp;
+> +       unsigned long host_tp;
+> +       unsigned long host_pgd;
+> +
+> +       /* Host CSRs are used when handling exits from guest */
+> +       unsigned long badi;
+> +       unsigned long badv;
+> +       unsigned long host_ecfg;
+> +       unsigned long host_estat;
+> +       unsigned long host_percpu;
+> +
+> +       /* GPRs */
+> +       unsigned long gprs[32];
+> +       unsigned long pc;
+> +
+> +       /* Which auxiliary state is loaded (KVM_LOONGARCH_AUX_*) */
+> +       unsigned int aux_inuse;
+> +       /* FPU state */
+> +       struct loongarch_fpu fpu FPU_ALIGN;
+> +
+> +       /* CSR state */
+> +       struct loongarch_csrs *csr;
+> +
+> +       /* GPR used as IO source/target */
+> +       u32 io_gpr;
+> +
+> +       struct hrtimer swtimer;
+> +       /* KVM register to control count timer */
+> +       u32 count_ctl;
+> +
+> +       /* Bitmask of exceptions that are pending */
+> +       unsigned long irq_pending;
+> +       /* Bitmask of pending exceptions to be cleared */
+> +       unsigned long irq_clear;
+> +
+> +       /* Cache for pages needed inside spinlock regions */
+> +       struct kvm_mmu_memory_cache mmu_page_cache;
+> +
+> +       /* vcpu's vpid */
+> +       u64 vpid;
+> +
+> +       /* Frequency of stable timer in Hz */
+> +       u64 timer_mhz;
+> +       ktime_t expire;
+> +
+> +       u64 core_ext_ioisr[4];
+> +
+> +       /* Last CPU the vCPU state was loaded on */
+> +       int last_sched_cpu;
+> +       /* mp state */
+> +       struct kvm_mp_state mp_state;
+> +};
+> +
+> +static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, in=
+t reg)
+> +{
+> +       return csr->csrs[reg];
+> +}
+> +
+> +static inline void writel_sw_gcsr(struct loongarch_csrs *csr, int reg, u=
+nsigned long val)
+> +{
+> +       csr->csrs[reg] =3D val;
+> +}
+> +
+> +/* Helpers */
+> +static inline bool _kvm_guest_has_fpu(struct kvm_vcpu_arch *arch)
+> +{
+> +       return cpu_has_fpu;
+> +}
+> +
+> +void _kvm_init_fault(void);
+Can we use kvm_guest_has_fpu and kvm_init_fault? Don't prefix with _
+unless you have a special reason. For example, static internal
+functions can be prefixed.
 
->    tar -vxf loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz  -C /opt
->    export PATH=3D/opt/cross-tools/bin:$PATH
->    export LD_LIBRARY_PATH=3D/opt/cross-tools/lib:$LD_LIBRARY_PATH
->    export LD_LIBRARY_PATH=3D/opt/cross-tools/loongarch64-unknown-linux-gn=
-u/lib/:$LD_LIBRARY_PATH
-> 2. This series is based on the linux source code:
->    https://github.com/loongson/linux-loongarch-kvm
-Please update the base to at least v6.6-rc1.
-
->    Build command:
->    git checkout kvm-loongarch
->    make ARCH=3Dloongarch CROSS_COMPILE=3Dloongarch64-unknown-linux-gnu- l=
-oongson3_defconfig
->    make ARCH=3Dloongarch CROSS_COMPILE=3Dloongarch64-unknown-linux-gnu-
-> 3. QEMU hypervisor with LoongArch supported:
->    https://github.com/loongson/qemu
-QEMU base should also be updated.
-
->    Build command:
->    git checkout kvm-loongarch
->    ./configure --target-list=3D"loongarch64-softmmu"  --enable-kvm
->    make
-> 4. Uefi bios of LoongArch virt machine:
->    Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform=
-/Loongson/LoongArchQemuPkg#readme
-> 5. you can also access the binary files we have already build:
->    https://github.com/yangxiaojuan-loongson/qemu-binary
-Update any binaries if needed, too.
-
-I will do a full test after v21 of this series, and I hope this can
-move things forwards.
+> +
+> +/* Debug: dump vcpu state */
+> +int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+> +
+> +/* MMU handling */
+> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long badv, bool =
+write);
+> +void kvm_flush_tlb_all(void);
+> +void _kvm_destroy_mm(struct kvm *kvm);
+The same as before, and maybe you can check other patches for the same issu=
+e.
 
 
 Huacai
 
-> The command to boot loongarch virt machine:
->    $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
->    -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
->    -serial stdio   -monitor telnet:localhost:4495,server,nowait \
->    -append "root=3D/dev/ram rdinit=3D/sbin/init console=3DttyS0,115200" \
->    --nographic
+> +pgd_t *kvm_pgd_alloc(void);
+> +
+> +#define KVM_ARCH_WANT_MMU_NOTIFIER
+> +int kvm_unmap_hva_range(struct kvm *kvm,
+> +                       unsigned long start, unsigned long end, bool bloc=
+kable);
+> +void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+> +int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)=
+;
+> +int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> +
+> +static inline void update_pc(struct kvm_vcpu_arch *arch)
+> +{
+> +       arch->pc +=3D 4;
+> +}
+> +
+> +/**
+> + * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to ifetc=
+h fault.
+> + * @vcpu:      Virtual CPU.
+> + *
+> + * Returns:    Whether the TLBL exception was likely due to an instructi=
+on
+> + *             fetch fault rather than a data load fault.
+> + */
+> +static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
+> +{
+> +       return arch->pc =3D=3D arch->badv;
+> +}
+> +
+> +/* Misc */
+> +static inline void kvm_arch_hardware_unsetup(void) {}
+> +static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> +static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {=
+}
+> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_free_memslot(struct kvm *kvm,
+> +                                  struct kvm_memory_slot *slot) {}
+> +void _kvm_check_vmid(struct kvm_vcpu *vcpu);
+> +enum hrtimer_restart kvm_swtimer_wakeup(struct hrtimer *timer);
+> +int kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa);
+> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+> +                                       const struct kvm_memory_slot *mem=
+slot);
+> +void kvm_init_vmcs(struct kvm *kvm);
+> +void kvm_vector_entry(void);
+> +int  kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu);
+> +extern const unsigned long kvm_vector_size;
+> +extern const unsigned long kvm_enter_guest_size;
+> +extern unsigned long vpid_mask;
+> +extern struct kvm_world_switch *kvm_loongarch_ops;
+> +
+> +#define SW_GCSR                (1 << 0)
+> +#define HW_GCSR                (1 << 1)
+> +#define INVALID_GCSR   (1 << 2)
+> +int get_gcsr_flag(int csr);
+> +extern void set_hw_gcsr(int csr_id, unsigned long val);
+> +#endif /* __ASM_LOONGARCH_KVM_HOST_H__ */
+> diff --git a/arch/loongarch/include/asm/kvm_types.h b/arch/loongarch/incl=
+ude/asm/kvm_types.h
+> new file mode 100644
+> index 0000000000..2fe1d4bdff
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/kvm_types.h
+> @@ -0,0 +1,11 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef _ASM_LOONGARCH_KVM_TYPES_H
+> +#define _ASM_LOONGARCH_KVM_TYPES_H
+> +
+> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE      40
+> +
+> +#endif /* _ASM_LOONGARCH_KVM_TYPES_H */
+> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
+de/uapi/asm/kvm.h
+> new file mode 100644
+> index 0000000000..7ec2f34018
+> --- /dev/null
+> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> @@ -0,0 +1,101 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef __UAPI_ASM_LOONGARCH_KVM_H
+> +#define __UAPI_ASM_LOONGARCH_KVM_H
+> +
+> +#include <linux/types.h>
+> +
+> +/*
+> + * KVM Loongarch specific structures and definitions.
+> + *
+> + * Some parts derived from the x86 version of this file.
+> + */
+> +
+> +#define __KVM_HAVE_READONLY_MEM
+> +
+> +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> +#define KVM_DIRTY_LOG_PAGE_OFFSET      64
+> +
+> +/*
+> + * for KVM_GET_REGS and KVM_SET_REGS
+> + */
+> +struct kvm_regs {
+> +       /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
+> +       __u64 gpr[32];
+> +       __u64 pc;
+> +};
+> +
+> +/*
+> + * for KVM_GET_FPU and KVM_SET_FPU
+> + */
+> +struct kvm_fpu {
+> +       __u32 fcsr;
+> +       __u64 fcc;    /* 8x8 */
+> +       struct kvm_fpureg {
+> +               __u64 val64[4];
+> +       } fpr[32];
+> +};
+> +
+> +/*
+> + * For LoongArch, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access v=
+arious
+> + * registers.  The id field is broken down as follows:
+> + *
+> + *  bits[63..52] - As per linux/kvm.h
+> + *  bits[51..32] - Must be zero.
+> + *  bits[31..16] - Register set.
+> + *
+> + * Register set =3D 0: GP registers from kvm_regs (see definitions below=
+).
+> + *
+> + * Register set =3D 1: CSR registers.
+> + *
+> + * Register set =3D 2: KVM specific registers (see definitions below).
+> + *
+> + * Register set =3D 3: FPU / SIMD registers (see definitions below).
+> + *
+> + * Other sets registers may be added in the future.  Each set would
+> + * have its own identifier in bits[31..16].
+> + */
+> +
+> +#define KVM_REG_LOONGARCH_GPR          (KVM_REG_LOONGARCH | 0x00000ULL)
+> +#define KVM_REG_LOONGARCH_CSR          (KVM_REG_LOONGARCH | 0x10000ULL)
+> +#define KVM_REG_LOONGARCH_KVM          (KVM_REG_LOONGARCH | 0x20000ULL)
+> +#define KVM_REG_LOONGARCH_FPU          (KVM_REG_LOONGARCH | 0x30000ULL)
+> +#define KVM_REG_LOONGARCH_MASK         (KVM_REG_LOONGARCH | 0x30000ULL)
+> +#define KVM_CSR_IDX_MASK               (0x10000 - 1)
+> +
+> +/*
+> + * KVM_REG_LOONGARCH_KVM - KVM specific control registers.
+> + */
+> +
+> +#define KVM_REG_LOONGARCH_COUNTER      (KVM_REG_LOONGARCH_KVM | KVM_REG_=
+SIZE_U64 | 3)
+> +#define KVM_REG_LOONGARCH_VCPU_RESET   (KVM_REG_LOONGARCH_KVM | KVM_REG_=
+SIZE_U64 | 4)
+> +
+> +struct kvm_debug_exit_arch {
+> +};
+> +
+> +/* for KVM_SET_GUEST_DEBUG */
+> +struct kvm_guest_debug_arch {
+> +};
+> +
+> +/* definition of registers in kvm_run */
+> +struct kvm_sync_regs {
+> +};
+> +
+> +/* dummy definition */
+> +struct kvm_sregs {
+> +};
+> +
+> +struct kvm_iocsr_entry {
+> +       __u32 addr;
+> +       __u32 pad;
+> +       __u64 data;
+> +};
+> +
+> +#define KVM_NR_IRQCHIPS                1
+> +#define KVM_IRQCHIP_NUM_PINS   64
+> +#define KVM_MAX_CORES          256
+> +
+> +#endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f089ab2909..1184171224 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_LOONGARCH_IOCSR  38
 >
-> changes for v20:
-> 1. Remove the binary codes of virtualization instructions in
-> insn_def.h and csr_ops.S and directly use the default csrrd,
-> csrwr,csrxchg instructions. And let CONFIG_KVM depends on the
-> AS_HAS_LVZ_EXTENSION, so we should use the binutils that have
-> already supported them to compile the KVM. This can make our
-> LoongArch KVM codes more maintainable and easier.
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -336,6 +337,13 @@ struct kvm_run {
+>                         __u32 len;
+>                         __u8  is_write;
+>                 } mmio;
+> +               /* KVM_EXIT_LOONGARCH_IOCSR */
+> +               struct {
+> +                       __u64 phys_addr;
+> +                       __u8  data[8];
+> +                       __u32 len;
+> +                       __u8  is_write;
+> +               } iocsr_io;
+>                 /* KVM_EXIT_HYPERCALL */
+>                 struct {
+>                         __u64 nr;
+> @@ -1362,6 +1370,7 @@ struct kvm_dirty_tlb {
+>  #define KVM_REG_ARM64          0x6000000000000000ULL
+>  #define KVM_REG_MIPS           0x7000000000000000ULL
+>  #define KVM_REG_RISCV          0x8000000000000000ULL
+> +#define KVM_REG_LOONGARCH      0x9000000000000000ULL
 >
-> changes for v19:
-> 1. Use the common interface xfer_to_guest_mode_handle_work to
-> Check conditions before entering the guest.
-> 2. Add vcpu dirty ring support.
->
-> changes for v18:
-> 1. Code cleanup for vcpu timer: remove unnecessary timer_period_ns,
-> timer_bias, timer_dyn_bias variables in kvm_vcpu_arch and rename
-> the stable_ktime_saved variable to expire.
-> 2. Change the value of KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE to 40.
->
-> changes for v17:
-> 1. Add CONFIG_AS_HAS_LVZ_EXTENSION config option which depends on
-> binutils that support LVZ assemble instruction.
-> 2. Change kvm mmu related functions, such as rename level2_ptw_pgd
-> to kvm_ptw_pgd, replace kvm_flush_range with kvm_ptw_pgd pagewalk
-> framework, replace kvm_arch.gpa_mm with kvm_arch.pgd, set
-> mark_page_dirty/kvm_set_pfn_dirty out of mmu_lock in kvm page fault
-> handling.
-> 3. Replace kvm_loongarch_interrupt with standard kvm_interrupt
-> when injecting IRQ.
-> 4. Replace vcpu_arch.last_exec_cpu with existing vcpu.cpu, remove
-> kvm_arch.online_vcpus and kvm_arch.is_migrating,
-> 5. Remove EXCCODE_TLBNR and EXCCODE_TLBNX in kvm exception table,
-> since NR/NX bit is not set in kvm page fault handling.
->
-> Changes for v16:
-> 1. Free allocated memory of vmcs,kvm_loongarch_ops in kvm module init,
-> exit to avoid memory leak problem.
-> 2. Simplify some assemble codes in switch.S which are necessary to be
-> replaced with pseudo-instructions. And any other instructions do not need
-> to be replaced anymore.
-> 3. Add kvm_{save,restore}_guest_gprs macros to replace these ld.d,st.d
-> guest regs instructions when vcpu world switch.
-> 4. It is more secure to disable irq when flush guest tlb by gpa, so repla=
-ce
-> preempt_disable with loacl_irq_save in kvm_flush_tlb_gpa.
->
-> Changes for v15:
-> 1. Re-order some macros and variables in LoongArch kvm headers, put them
-> together which have the same meaning.
-> 2. Make some function definitions in one line, as it is not needed to spl=
-it
-> them.
-> 3. Re-name some macros such as KVM_REG_LOONGARCH_GPR.
->
-> Changes for v14:
-> 1. Remove the macro CONFIG_KVM_GENERIC_HARDWARE_ENABLING in
-> loongarch/kvm/main.c, as it is not useful.
-> 2. Add select KVM_GENERIC_HARDWARE_ENABLING in loongarch/kvm/Kconfig,
-> as it is used by virt/kvm.
-> 3. Fix the LoongArch KVM source link in MAINTAINERS.
-> 4. Improve LoongArch KVM documentation, such as add comment for
-> LoongArch kvm_regs.
->
-> Changes for v13:
-> 1. Remove patch-28 "Implement probe virtualization when cpu init", as the
-> virtualization information about FPU,PMP,LSX in guest.options,options_dyn
-> is not used and the gcfg reg value can be read in kvm_hardware_enable, so
-> remove the previous cpu_probe_lvz function.
-> 2. Fix vcpu_enable_cap interface, it should return -EINVAL directly, as
-> FPU cap is enable by default, and do not support any other caps now.
-> 3. Simplify the jirl instruction with jr when without return addr,
-> simplify case HW0 ... HW7 statment in interrupt.c
-> 4. Rename host_stack,host_gp in kvm_vcpu_arch to host_sp,host_tp.
-> 5. Remove 'cpu' parameter in _kvm_check_requests, as 'cpu' is not used,
-> and remove 'cpu' parameter in kvm_check_vmid function, as it can get
-> cpu number by itself.
->
-> Changes for v12:
-> 1. Improve the gcsr write/read/xchg interface to avoid the previous
-> instruction statment like parse_r and make the code easy understanding,
-> they are implemented in asm/insn-def.h and the instructions consistent
-> of "opcode" "rj" "rd" "simm14" arguments.
-> 2. Fix the maintainers list of LoongArch KVM.
->
-> Changes for v11:
-> 1. Add maintainers for LoongArch KVM.
->
-> Changes for v10:
-> 1. Fix grammatical problems in LoongArch documentation.
-> 2. It is not necessary to save or restore the LOONGARCH_CSR_PGD when
-> vcpu put and vcpu load, so we remove it.
->
-> Changes for v9:
-> 1. Apply the new defined interrupt number macros in loongarch.h to kvm,
-> such as INT_SWI0, INT_HWI0, INT_TI, INT_IPI, etc. And remove the
-> previous unused macros.
-> 2. Remove unused variables in kvm_vcpu_arch, and reorder the variables
-> to make them more standard.
->
-> Changes for v8:
-> 1. Adjust the cpu_data.guest.options structure, add the ases flag into
-> it, and remove the previous guest.ases. We do this to keep consistent
-> with host cpu_data.options structure.
-> 2. Remove the "#include <asm/kvm_host.h>" in some files which also
-> include the "<linux/kvm_host.h>". As linux/kvm_host.h already include
-> the asm/kvm_host.h.
-> 3. Fix some unstandard spelling and grammar errors in comments, and
-> improve a little code format to make it easier and standard.
->
-> Changes for v7:
-> 1. Fix the kvm_save/restore_hw_gcsr compiling warnings reported by
-> kernel test robot. The report link is:
-> https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com=
-/
-> 2. Fix loongarch kvm trace related compiling problems.
->
-> Changes for v6:
-> 1. Fix the Documentation/virt/kvm/api.rst compile warning about
-> loongarch parts.
->
-> Changes for v5:
-> 1. Implement get/set mp_state ioctl interface, and only the
-> KVM_MP_STATE_RUNNABLE state is supported now, and other states
-> will be completed in the future. The state is also used when vcpu
-> run idle instruction, if vcpu state is changed to RUNNABLE, the
-> vcpu will have the possibility to be woken up.
-> 2. Supplement kvm document about loongarch-specific part, such as add
-> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
-> etc.
-> 3. Improve the kvm_switch_to_guest function in switch.S, remove the
-> previous tmp,tmp1 arguments and replace it with t0,t1 reg.
->
-> Changes for v4:
-> 1. Add a csr_need_update flag in _vcpu_put, as most csr registers keep
-> unchanged during process context switch, so we need not to update it
-> every time. We can do this only if the soft csr is different form hardwar=
-e.
-> That is to say all of csrs should update after vcpu enter guest, as for
-> set_csr_ioctl, we have written soft csr to keep consistent with hardware.
-> 2. Improve get/set_csr_ioctl interface, we set SW or HW or INVALID flag
-> for all csrs according to it's features when kvm init. In get/set_csr_ioc=
-tl,
-> if csr is HW, we use gcsrrd/ gcsrwr instruction to access it, else if csr=
- is
-> SW, we use software to emulate it, and others return false.
-> 3. Add set_hw_gcsr function in csr_ops.S, and it is used in set_csr_ioctl=
-.
-> We have splited hw gcsr into three parts, so we can calculate the code of=
-fset
-> by gcsrid and jump here to run the gcsrwr instruction. We use this functi=
-on to
-> make the code easier and avoid to use the previous SET_HW_GCSR(XXX) inter=
-face.
-> 4. Improve kvm mmu functions, such as flush page table and make clean pag=
-e table
-> interface.
->
-> Changes for v3:
-> 1. Remove the vpid array list in kvm_vcpu_arch and use a vpid variable he=
-re,
-> because a vpid will never be recycled if a vCPU migrates from physical CP=
-U A
-> to B and back to A.
-> 2. Make some constant variables in kvm_context to global such as vpid_mas=
-k,
-> guest_eentry, enter_guest, etc.
-> 3. Add some new tracepoints, such as kvm_trace_idle, kvm_trace_cache,
-> kvm_trace_gspr, etc.
-> 4. There are some duplicate codes in kvm_handle_exit and kvm_vcpu_run,
-> so we move it to a new function kvm_pre_enter_guest.
-> 5. Change the RESUME_HOST, RESUME_GUEST value, return 1 for resume guest
-> and "<=3D 0" for resume host.
-> 6. Fcsr and fpu registers are saved/restored together.
->
-> Changes for v2:
-> 1. Seprate the original patch-01 and patch-03 into small patches, and the
-> patches mainly contain kvm module init, module exit, vcpu create, vcpu ru=
-n,
-> etc.
-> 2. Remove the original KVM_{GET,SET}_CSRS ioctl in the kvm uapi header,
-> and we use the common KVM_{GET,SET}_ONE_REG to access register.
-> 3. Use BIT(x) to replace the "1 << n_bits" statement.
->
-> Tianrui Zhao (30):
->   LoongArch: KVM: Add kvm related header files
->   LoongArch: KVM: Implement kvm module related interface
->   LoongArch: KVM: Implement kvm hardware enable, disable interface
->   LoongArch: KVM: Implement VM related functions
->   LoongArch: KVM: Add vcpu related header files
->   LoongArch: KVM: Implement vcpu create and destroy interface
->   LoongArch: KVM: Implement vcpu run interface
->   LoongArch: KVM: Implement vcpu handle exit interface
->   LoongArch: KVM: Implement vcpu get, vcpu set registers
->   LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl interface
->   LoongArch: KVM: Implement fpu related operations for vcpu
->   LoongArch: KVM: Implement vcpu interrupt operations
->   LoongArch: KVM: Implement misc vcpu related interfaces
->   LoongArch: KVM: Implement vcpu load and vcpu put operations
->   LoongArch: KVM: Implement vcpu status description
->   LoongArch: KVM: Implement update VM id function
->   LoongArch: KVM: Implement virtual machine tlb operations
->   LoongArch: KVM: Implement vcpu timer operations
->   LoongArch: KVM: Implement kvm mmu operations
->   LoongArch: KVM: Implement handle csr excption
->   LoongArch: KVM: Implement handle iocsr exception
->   LoongArch: KVM: Implement handle idle exception
->   LoongArch: KVM: Implement handle gspr exception
->   LoongArch: KVM: Implement handle mmio exception
->   LoongArch: KVM: Implement handle fpu exception
->   LoongArch: KVM: Implement kvm exception vector
->   LoongArch: KVM: Implement vcpu world switch
->   LoongArch: KVM: Enable kvm config and add the makefile
->   LoongArch: KVM: Supplement kvm document about LoongArch-specific part
->   LoongArch: KVM: Add maintainers for LoongArch KVM
->
->  Documentation/virt/kvm/api.rst             |  70 +-
->  MAINTAINERS                                |  12 +
->  arch/loongarch/Kbuild                      |   1 +
->  arch/loongarch/Kconfig                     |   3 +
->  arch/loongarch/configs/loongson3_defconfig |   2 +
->  arch/loongarch/include/asm/inst.h          |  16 +
->  arch/loongarch/include/asm/kvm_csr.h       | 222 +++++
->  arch/loongarch/include/asm/kvm_host.h      | 238 ++++++
->  arch/loongarch/include/asm/kvm_types.h     |  11 +
->  arch/loongarch/include/asm/kvm_vcpu.h      |  95 +++
->  arch/loongarch/include/asm/loongarch.h     |  19 +-
->  arch/loongarch/include/uapi/asm/kvm.h      | 101 +++
->  arch/loongarch/kernel/asm-offsets.c        |  32 +
->  arch/loongarch/kvm/Kconfig                 |  45 ++
->  arch/loongarch/kvm/Makefile                |  22 +
->  arch/loongarch/kvm/csr_ops.S               |  67 ++
->  arch/loongarch/kvm/exit.c                  | 702 ++++++++++++++++
->  arch/loongarch/kvm/interrupt.c             | 113 +++
->  arch/loongarch/kvm/main.c                  | 361 +++++++++
->  arch/loongarch/kvm/mmu.c                   | 678 ++++++++++++++++
->  arch/loongarch/kvm/switch.S                | 255 ++++++
->  arch/loongarch/kvm/timer.c                 | 200 +++++
->  arch/loongarch/kvm/tlb.c                   |  34 +
->  arch/loongarch/kvm/trace.h                 | 168 ++++
->  arch/loongarch/kvm/vcpu.c                  | 898 +++++++++++++++++++++
->  arch/loongarch/kvm/vm.c                    |  76 ++
->  arch/loongarch/kvm/vmid.c                  |  66 ++
->  include/uapi/linux/kvm.h                   |   9 +
->  28 files changed, 4502 insertions(+), 14 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->  create mode 100644 arch/loongarch/include/asm/kvm_host.h
->  create mode 100644 arch/loongarch/include/asm/kvm_types.h
->  create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->  create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->  create mode 100644 arch/loongarch/kvm/Kconfig
->  create mode 100644 arch/loongarch/kvm/Makefile
->  create mode 100644 arch/loongarch/kvm/csr_ops.S
->  create mode 100644 arch/loongarch/kvm/exit.c
->  create mode 100644 arch/loongarch/kvm/interrupt.c
->  create mode 100644 arch/loongarch/kvm/main.c
->  create mode 100644 arch/loongarch/kvm/mmu.c
->  create mode 100644 arch/loongarch/kvm/switch.S
->  create mode 100644 arch/loongarch/kvm/timer.c
->  create mode 100644 arch/loongarch/kvm/tlb.c
->  create mode 100644 arch/loongarch/kvm/trace.h
->  create mode 100644 arch/loongarch/kvm/vcpu.c
->  create mode 100644 arch/loongarch/kvm/vm.c
->  create mode 100644 arch/loongarch/kvm/vmid.c
->
+>  #define KVM_REG_SIZE_SHIFT     52
+>  #define KVM_REG_SIZE_MASK      0x00f0000000000000ULL
 > --
 > 2.27.0
 >
