@@ -2,61 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F7D179A2AB
-	for <lists+kvm@lfdr.de>; Mon, 11 Sep 2023 07:00:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39C7679A34A
+	for <lists+kvm@lfdr.de>; Mon, 11 Sep 2023 08:07:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233809AbjIKFAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 01:00:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51882 "EHLO
+        id S232815AbjIKGHH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 02:07:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbjIKFAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 01:00:17 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62D0ECCA;
-        Sun, 10 Sep 2023 21:59:58 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1B3C433CD;
-        Mon, 11 Sep 2023 04:59:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694408398;
-        bh=gCvtehknDUl3QH9SKtUiHlsPsjGZ5E9iz3pDBI9XNPQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ppadIEtmXfym/HDY8Sz8hYSKkqPLBUKsm7ZVOA/O2uf8x0DPUef8pbBABwkn3RYT1
-         95+ilGgKsMRBep7O7A5WJOqPXtmxgonK7P34IRyYZXuHie/zIdHHnOssqMgW28gkJI
-         FZLCGD+0EiGVTdwlBAQ3n9gL+z6n5n7pncglIhKHCOllezRRCexEt3AZq0aXeGUNcB
-         CyJ9Im65c50u9lAioCD133vj9Pw25LaMDFGWGyFEjHlOKS4ToCHh8WvHfa9dZbO74q
-         JJFHiG/Nm6b8Ww+r99kKNlITnlwjqi7uR1Atc1fXKHInNM+UY/iwNJFOYh8wVOK8J2
-         NjYUb6oFGSg6w==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-52a23227567so5101493a12.0;
-        Sun, 10 Sep 2023 21:59:57 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwZvULgKJcyNtk+buGCZDdZjx1StEVoHcFqgQIxjo6gRLmwBxJP
-        CiKYG+dGnLMrwE6hrfpmZkW771xFp6UCY/tQz6s=
-X-Google-Smtp-Source: AGHT+IEH6WwMxSKLtFFXUphU0ngn8X1dAuSlfOIteHCH5lBq1zmzW/RyeKvWID3SVfeLdbpU6FQL+3+D8g+Hd6PjyOU=
-X-Received: by 2002:a17:906:3117:b0:99b:6e54:bd6e with SMTP id
- 23-20020a170906311700b0099b6e54bd6emr6572749ejx.56.1694408396235; Sun, 10 Sep
- 2023 21:59:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230831083020.2187109-1-zhaotianrui@loongson.cn> <20230831083020.2187109-2-zhaotianrui@loongson.cn>
-In-Reply-To: <20230831083020.2187109-2-zhaotianrui@loongson.cn>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Mon, 11 Sep 2023 12:59:43 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H64c=yDfTpWcvH3LXceJ+Eox0bboLSoq2w+=_ZuyU9jVw@mail.gmail.com>
-Message-ID: <CAAhV-H64c=yDfTpWcvH3LXceJ+Eox0bboLSoq2w+=_ZuyU9jVw@mail.gmail.com>
-Subject: Re: [PATCH v20 01/30] LoongArch: KVM: Add kvm related header files
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S230242AbjIKGHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 02:07:05 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF5B109;
+        Sun, 10 Sep 2023 23:06:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694412399; x=1725948399;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CGutJeudvye2h6yhfYkWn7qfQnkIYSgdxbJwl/EFxK0=;
+  b=D5ECFH2rQurINm98UfHIxN1re+PAGoo3BIcBgDpVqn0nle0FnkFg07C5
+   wmPWA8RJ8Gn7G5Z0brvWRIowQv+h475blkgr8j7/2U3+YvGhyP9YdAjFb
+   LVKl4vK44iAOySzKY2K7A0jVLfAWb5MAqtx+2VnFQ9WPfCVlOd02Ncgli
+   +TQ887w83DWFtKuZ1Lth4l3mTK52mV67jGR5aPEybBQ6zme5cPe4a5OEa
+   JMiQC+RXeE3muqQ8VCZJ+bF+HBJxCROF0bp/qSYk9c//3J8o0n7J0DjBd
+   02jaitYCYboneEz95odN8bvMWvWk3/OAuDREfDCsnmM/JiCmjHLjs93RI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="444419867"
+X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
+   d="scan'208";a="444419867"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2023 23:06:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="989966398"
+X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
+   d="scan'208";a="989966398"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Sep 2023 23:06:38 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Sun, 10 Sep 2023 23:06:38 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Sun, 10 Sep 2023 23:06:38 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Sun, 10 Sep 2023 23:06:38 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Sun, 10 Sep 2023 23:06:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ApL/YiXjRh3sOolZ8jgzZluYZWLE4JXqqVXw0vwlrjEoBWRwxxPs7KibRR+CjxgWT0YGEalZzQLpVV2mw6m/erHO1vs/V7MTTYbmUwcB01Fyj/bKW9bRYRMqZFHdKMtzLKXGWt1JuiD4ykJO+I7H/wXbmAo9Xv2nSprbLUcZ7L3H6vWSsggkNlrW9e8g5/bDyrW/nkK2SOujL/uTNPoogwywpMqZwTfRS6rPGSC6zS/+iub2iJNeFkzk5OTHW8tE8gP2O/3y5ItTvh/dsrGywocCg4miPXDvWnzpTG5OEr8yjfM6/BZ8JL0VE5VTaA9HIF2F9b+YGaJ72sivTxUZpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CGutJeudvye2h6yhfYkWn7qfQnkIYSgdxbJwl/EFxK0=;
+ b=nLTWjEmsKj1BgafHj/nCTOufk3fNOrEoeVcn1uvzYaTS1Jh/lMq/aoAT6YGuBRHRYd/RQIk2YnO/A3CkpRsfkteKvJ6gANj2WxazfcxqLx/E6nV6WfpLQlPee2WhIbQnuOIQuxYsPPYb2A63chzVPzH0YkkrZKXhblN5FfMySRm0NxRAHRG1lS9PBh47o/NtdT0+jTX5coYMhhBCUn3/c9TP/QERAtoNA31zoSap5qE3mfu79zR9LKW9NvRQctTz+6e7NDfU3Zy2xE0H3aLicUJmKxdSHO6DZjEgeIO6DZf5wjJ1ivOY5AyyKD8/jnYUxpXBbJJCAsVIE+ZOAbREFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DS7PR11MB5989.namprd11.prod.outlook.com (2603:10b6:8:70::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.32; Mon, 11 Sep
+ 2023 06:06:35 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::ddda:2559:a7a6:8323]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::ddda:2559:a7a6:8323%7]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
+ 06:06:35 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     David Laight <David.Laight@ACULAB.COM>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: RE: [PATCH v2 1/3] vfio: trivially use __aligned_u64 for ioctl
+ structs
+Thread-Topic: [PATCH v2 1/3] vfio: trivially use __aligned_u64 for ioctl
+ structs
+Thread-Index: AQHZ2qa2zQRqbVx76kGQl1BPbC1bWrAVNtLA
+Date:   Mon, 11 Sep 2023 06:06:35 +0000
+Message-ID: <BN9PR11MB52766EB0B99F292DED0C10588CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230829182720.331083-1-stefanha@redhat.com>
+ <20230829182720.331083-2-stefanha@redhat.com>
+In-Reply-To: <20230829182720.331083-2-stefanha@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DS7PR11MB5989:EE_
+x-ms-office365-filtering-correlation-id: 632b1468-4d88-4102-4dc2-08dbb28d4123
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9jw21XeZjVcxEWX/LhcH2kzam1rbQJMGdUsltzg0cFmRfpM84v7leaNvEo4RWOAmd6Fxs3rwFD8Z6IrER51ux/MtjJl1NgUPupIZh4FZl114lWVlMbtLdrC1YCLq+kVjPZV0FeVDP15GwjYKhUhW7/qlT3Qju8LxZFHF4kQuVTQMvBT/qsCSXTlzye6GI9mhVGsMDye38RtUfSwgnKtOBTE1wAqoD9+iDByvcDVsxuLCSUG0N6M8X3ucX3V/pR5FaNb9KgA2GGvvtwzWlJywgzdQDQLD3hon1Jz2hDrooMESm8MH+KqwXyaovtqmyA6C9S5spM8m1mzJEiXphZ4rW5pJFoHNGP2YmARUxpvKi+5gKostVBCa12ezLgcusXrwIpij9p77FJUQ9ifHGeNGOJ8/qtJLXjc3nlkIRwXXVhU9eHJpuQLCoO+W52AoqizaW5ZLiDcoDW/uhZxThMTQZ8N+TCZh30Pk6wqnWzqyzzgCJjVLWlJcj5U3xgGBmZ3Moxx5rEOFVpDYMpM3HVri2cOySzBcpbDChGgWYJNuP9GY+E6KaSh+eObnnovX6OVvL79IzC5x+v9XAVnMLh1A9dnorGMEuAvoeytGEonliGWGeUUanlPPl3xIU430OMs+
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(376002)(346002)(39860400002)(451199024)(1800799009)(186009)(66476007)(4744005)(55016003)(86362001)(66899024)(2906002)(8936002)(316002)(41300700001)(8676002)(52536014)(5660300002)(4326008)(33656002)(26005)(71200400001)(478600001)(122000001)(83380400001)(7696005)(6506007)(9686003)(38100700002)(38070700005)(82960400001)(110136005)(66946007)(76116006)(64756008)(66556008)(66446008)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OzIfnsZ/Ivb+A+ps21JIVv7Cxp3N6+yfkdIFTH0iJkkwiwrZa8m4diGYYrpx?=
+ =?us-ascii?Q?+lNmv+/6jy3YfODaoTaZTiyLifcJTS/tGv1WYjHvKKYRfC5h1PH49N/kqJGt?=
+ =?us-ascii?Q?V+rfTd2JO6QFUcRBzh/gWlIEaz3CHozZ7nPYO++fDmTdTajAZ5fp0bwElOTy?=
+ =?us-ascii?Q?x84G3lyC4C47Xoq89RgLYG1zAtpTAVDpE1IdNEOjmMl0ZWy+wcgeO8SazAK9?=
+ =?us-ascii?Q?kFlHrqAs0dzV5RcmXnO7swxP5DnKJWH+COUr57HZv0ODyufImE94zvJoGgaS?=
+ =?us-ascii?Q?FnrRSkKVvTCW3KtN5ONa4WRcMUtyO6twPPKTZgl/mNWvCZnxjnwJY7i+xBSc?=
+ =?us-ascii?Q?Inh6+z5naT1EjHNHReSftP0nar6ksz9PX8ZtG+55W2hEg/lgiPaSEnT0abSZ?=
+ =?us-ascii?Q?c8FKY0Gzlvg7Or1Yy2pht5Uxp/e8++OspQD7C6crOmrmdwCRpQnOhSW/KVXC?=
+ =?us-ascii?Q?mbVZT+D6JHPAEZLMO4c3hRcTMDBsM7bj/P194bjW5siTlxY0aYOJc4O3Wpg0?=
+ =?us-ascii?Q?+zkrgIo23tjOSBqzSQuQKwLYKJobkRDpqqMX0i/F8CMCHd4z3IxH5Zn3eTBg?=
+ =?us-ascii?Q?CmCIFUZTBNx6UzvR5jbLZrMe4lBR/AySfM03ITs8pekCBGeINcLzLS3nzg5g?=
+ =?us-ascii?Q?gVMKlnTRRxBymW1l6DWK+Jao+QHbeeukag6XvVOwo0dgcayCHj+ICo60y0EQ?=
+ =?us-ascii?Q?wc6ZyZ+4HuloXHBvy6776VOXBI7p4JypTyikDWsA1SFkERIWqV/2LQrq1uBT?=
+ =?us-ascii?Q?FB/QMdBFfXLULA8cQKmDGpGHB0XIVWXZ8I5Tj534NOM5E8rbYb8Fso88qps9?=
+ =?us-ascii?Q?lAGsM3+T/5M1gRosHo0lnrJCBTzhsGLjW+TrKrzOmLR+Igx2WY8ma3rNyh5f?=
+ =?us-ascii?Q?IbRPtnsKALmGYlnsvRBKE4KV4wvGeq1i44pqhinrua97htLSuWT0BvlcYreS?=
+ =?us-ascii?Q?dVqAKMx1MWoxZnoB9hSj3ia0zlwPQaPkLkdB5wuRFpjy1CTYhAhtbCBLkptK?=
+ =?us-ascii?Q?66TS1pzxaOz6D/SExU0DYleyDXr+xVbQOoM17CsqHRKwBwrqsb5dsvPUgEHS?=
+ =?us-ascii?Q?bGO+JTdGVJ2huWa5zZZHgPgvQJrT0TpCE705/z8nD0J1vgzGTmQBdU5Z5HH5?=
+ =?us-ascii?Q?i5MDH93szwUNd8l6cJHKeXvWS0Ik3l0K5nVaBcROrCNfxRBm4573ma/OuqJc?=
+ =?us-ascii?Q?FpWMmYOgwp9ANBpX7Zpy7JFU5OUtTVNgdMTGvKveLB23B/Q1CQlyZoOyEn7f?=
+ =?us-ascii?Q?R8wFWmGyDd738kwcXWrlHxX2eDNfOkv96VJyfj0wY/g2Y26+gcAVy+i+A3Gv?=
+ =?us-ascii?Q?qmN9w5oWIMrjcKelXqug/1KtsGyGtYBBy6gnRAkgLa8GYylzlSXPoeQ2kYxs?=
+ =?us-ascii?Q?bsPMglSE5m1EnOb13hjowFsLV7x0JLJV+snI/ZyySDdeSROvYEVDTw3RhIlp?=
+ =?us-ascii?Q?7QBALJ3WLkCuwC0OW2NzG7mm4P8M4/h+YSGK8NekUbHTQ5jKf5L5pm0ueuoY?=
+ =?us-ascii?Q?4HcXOxFyzCEOv8cGRhM1YQ0940YgF105UgaaXhujuDqGc+PRqZmmW24tKLYD?=
+ =?us-ascii?Q?KrhIKS/MPY/st9/zp3E0EjKdncJX6mvEvzF8GxYM?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 632b1468-4d88-4102-4dc2-08dbb28d4123
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2023 06:06:35.5851
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KGYxDKYV33/FVTVsoIMz4CvnD+MARqQM9xmGaJAUbTTt6XiGSURI7pj0f/lqOs16aDFJ06ntrZ/t3Yh94aRCwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB5989
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,456 +157,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Tianrui,
+> From: Stefan Hajnoczi <stefanha@redhat.com>
+> Sent: Wednesday, August 30, 2023 2:27 AM
+>=20
+> u64 alignment behaves differently depending on the architecture and so
+> <uapi/linux/types.h> offers __aligned_u64 to achieve consistent behavior
+> in kernel<->userspace ABIs.
+>=20
+> There are structs in <uapi/linux/vfio.h> that can trivially be updated
+> to __aligned_u64 because the struct sizes are multiples of 8 bytes.
+> There is no change in memory layout on any CPU architecture and
+> therefore this change is safe.
+>=20
+> The commits that follow this one handle the trickier cases where
+> explanation about ABI breakage is necessary.
+>=20
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, Aug 31, 2023 at 4:30=E2=80=AFPM Tianrui Zhao <zhaotianrui@loongson.=
-cn> wrote:
->
-> Add LoongArch KVM related header files, including kvm.h,
-> kvm_host.h, kvm_types.h. All of those are about LoongArch
-> virtualization features and kvm interfaces.
->
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->  arch/loongarch/include/asm/kvm_host.h  | 238 +++++++++++++++++++++++++
->  arch/loongarch/include/asm/kvm_types.h |  11 ++
->  arch/loongarch/include/uapi/asm/kvm.h  | 101 +++++++++++
->  include/uapi/linux/kvm.h               |   9 +
->  4 files changed, 359 insertions(+)
->  create mode 100644 arch/loongarch/include/asm/kvm_host.h
->  create mode 100644 arch/loongarch/include/asm/kvm_types.h
->  create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
-de/asm/kvm_host.h
-> new file mode 100644
-> index 0000000000..9f23ddaaae
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -0,0 +1,238 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_LOONGARCH_KVM_HOST_H__
-> +#define __ASM_LOONGARCH_KVM_HOST_H__
-> +
-> +#include <linux/cpumask.h>
-> +#include <linux/mutex.h>
-> +#include <linux/hrtimer.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/types.h>
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_types.h>
-> +#include <linux/threads.h>
-> +#include <linux/spinlock.h>
-> +
-> +#include <asm/inst.h>
-> +#include <asm/loongarch.h>
-> +
-> +/* Loongarch KVM register ids */
-> +#define LOONGARCH_CSR_32(_R, _S)       \
-> +       (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-> +
-> +#define LOONGARCH_CSR_64(_R, _S)       \
-> +       (KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | (8 * (_R) + (_S)))
-> +
-> +#define KVM_IOC_CSRID(id)              LOONGARCH_CSR_64(id, 0)
-> +#define KVM_GET_IOC_CSRIDX(id)         ((id & KVM_CSR_IDX_MASK) >> 3)
-> +
-> +#define KVM_MAX_VCPUS                  256
-> +/* memory slots that does not exposed to userspace */
-> +#define KVM_PRIVATE_MEM_SLOTS          0
-> +
-> +#define KVM_HALT_POLL_NS_DEFAULT       500000
-> +
-> +struct kvm_vm_stat {
-> +       struct kvm_vm_stat_generic generic;
-> +};
-> +
-> +struct kvm_vcpu_stat {
-> +       struct kvm_vcpu_stat_generic generic;
-> +       u64 idle_exits;
-> +       u64 signal_exits;
-> +       u64 int_exits;
-> +       u64 cpucfg_exits;
-> +};
-> +
-> +struct kvm_arch_memory_slot {
-> +};
-> +
-> +struct kvm_context {
-> +       unsigned long vpid_cache;
-> +       struct kvm_vcpu *last_vcpu;
-> +};
-> +
-> +struct kvm_world_switch {
-> +       int (*guest_eentry)(void);
-> +       int (*enter_guest)(struct kvm_run *run, struct kvm_vcpu *vcpu);
-> +       unsigned long page_order;
-> +};
-> +
-> +struct kvm_arch {
-> +       /* Guest physical mm */
-> +       pgd_t *pgd;
-> +       unsigned long gpa_size;
-> +
-> +       s64 time_offset;
-> +       struct kvm_context __percpu *vmcs;
-> +};
-> +
-> +#define CSR_MAX_NUMS           0x800
-> +
-> +struct loongarch_csrs {
-> +       unsigned long csrs[CSR_MAX_NUMS];
-> +};
-> +
-> +/* Resume Flags */
-> +#define RESUME_HOST            0
-> +#define RESUME_GUEST           1
-> +
-> +enum emulation_result {
-> +       EMULATE_DONE,           /* no further processing */
-> +       EMULATE_DO_MMIO,        /* kvm_run filled with MMIO request */
-> +       EMULATE_FAIL,           /* can't emulate this instruction */
-> +       EMULATE_EXCEPT,         /* A guest exception has been generated *=
-/
-> +       EMULATE_DO_IOCSR,       /* handle IOCSR request */
-> +};
-> +
-> +#define KVM_LARCH_CSR          (0x1 << 1)
-> +#define KVM_LARCH_FPU          (0x1 << 0)
-> +
-> +struct kvm_vcpu_arch {
-> +       /*
-> +        * Switch pointer-to-function type to unsigned long
-> +        * for loading the value into register directly.
-> +        */
-> +       unsigned long host_eentry;
-> +       unsigned long guest_eentry;
-> +
-> +       /* Pointers stored here for easy accessing from assembly code */
-> +       int (*handle_exit)(struct kvm_run *run, struct kvm_vcpu *vcpu);
-> +
-> +       /* Host registers preserved across guest mode execution */
-> +       unsigned long host_sp;
-> +       unsigned long host_tp;
-> +       unsigned long host_pgd;
-> +
-> +       /* Host CSRs are used when handling exits from guest */
-> +       unsigned long badi;
-> +       unsigned long badv;
-> +       unsigned long host_ecfg;
-> +       unsigned long host_estat;
-> +       unsigned long host_percpu;
-> +
-> +       /* GPRs */
-> +       unsigned long gprs[32];
-> +       unsigned long pc;
-> +
-> +       /* Which auxiliary state is loaded (KVM_LOONGARCH_AUX_*) */
-> +       unsigned int aux_inuse;
-> +       /* FPU state */
-> +       struct loongarch_fpu fpu FPU_ALIGN;
-> +
-> +       /* CSR state */
-> +       struct loongarch_csrs *csr;
-> +
-> +       /* GPR used as IO source/target */
-> +       u32 io_gpr;
-> +
-> +       struct hrtimer swtimer;
-> +       /* KVM register to control count timer */
-> +       u32 count_ctl;
-> +
-> +       /* Bitmask of exceptions that are pending */
-> +       unsigned long irq_pending;
-> +       /* Bitmask of pending exceptions to be cleared */
-> +       unsigned long irq_clear;
-> +
-> +       /* Cache for pages needed inside spinlock regions */
-> +       struct kvm_mmu_memory_cache mmu_page_cache;
-> +
-> +       /* vcpu's vpid */
-> +       u64 vpid;
-> +
-> +       /* Frequency of stable timer in Hz */
-> +       u64 timer_mhz;
-> +       ktime_t expire;
-> +
-> +       u64 core_ext_ioisr[4];
-> +
-> +       /* Last CPU the vCPU state was loaded on */
-> +       int last_sched_cpu;
-> +       /* mp state */
-> +       struct kvm_mp_state mp_state;
-> +};
-> +
-> +static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, in=
-t reg)
-> +{
-> +       return csr->csrs[reg];
-> +}
-> +
-> +static inline void writel_sw_gcsr(struct loongarch_csrs *csr, int reg, u=
-nsigned long val)
-> +{
-> +       csr->csrs[reg] =3D val;
-> +}
-> +
-> +/* Helpers */
-> +static inline bool _kvm_guest_has_fpu(struct kvm_vcpu_arch *arch)
-> +{
-> +       return cpu_has_fpu;
-> +}
-> +
-> +void _kvm_init_fault(void);
-Can we use kvm_guest_has_fpu and kvm_init_fault? Don't prefix with _
-unless you have a special reason. For example, static internal
-functions can be prefixed.
-
-> +
-> +/* Debug: dump vcpu state */
-> +int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
-> +
-> +/* MMU handling */
-> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long badv, bool =
-write);
-> +void kvm_flush_tlb_all(void);
-> +void _kvm_destroy_mm(struct kvm *kvm);
-The same as before, and maybe you can check other patches for the same issu=
-e.
-
-
-Huacai
-
-> +pgd_t *kvm_pgd_alloc(void);
-> +
-> +#define KVM_ARCH_WANT_MMU_NOTIFIER
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +                       unsigned long start, unsigned long end, bool bloc=
-kable);
-> +void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> +int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)=
-;
-> +int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> +
-> +static inline void update_pc(struct kvm_vcpu_arch *arch)
-> +{
-> +       arch->pc +=3D 4;
-> +}
-> +
-> +/**
-> + * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to ifetc=
-h fault.
-> + * @vcpu:      Virtual CPU.
-> + *
-> + * Returns:    Whether the TLBL exception was likely due to an instructi=
-on
-> + *             fetch fault rather than a data load fault.
-> + */
-> +static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
-> +{
-> +       return arch->pc =3D=3D arch->badv;
-> +}
-> +
-> +/* Misc */
-> +static inline void kvm_arch_hardware_unsetup(void) {}
-> +static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> +static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {=
-}
-> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_arch_free_memslot(struct kvm *kvm,
-> +                                  struct kvm_memory_slot *slot) {}
-> +void _kvm_check_vmid(struct kvm_vcpu *vcpu);
-> +enum hrtimer_restart kvm_swtimer_wakeup(struct hrtimer *timer);
-> +int kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa);
-> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-> +                                       const struct kvm_memory_slot *mem=
-slot);
-> +void kvm_init_vmcs(struct kvm *kvm);
-> +void kvm_vector_entry(void);
-> +int  kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu);
-> +extern const unsigned long kvm_vector_size;
-> +extern const unsigned long kvm_enter_guest_size;
-> +extern unsigned long vpid_mask;
-> +extern struct kvm_world_switch *kvm_loongarch_ops;
-> +
-> +#define SW_GCSR                (1 << 0)
-> +#define HW_GCSR                (1 << 1)
-> +#define INVALID_GCSR   (1 << 2)
-> +int get_gcsr_flag(int csr);
-> +extern void set_hw_gcsr(int csr_id, unsigned long val);
-> +#endif /* __ASM_LOONGARCH_KVM_HOST_H__ */
-> diff --git a/arch/loongarch/include/asm/kvm_types.h b/arch/loongarch/incl=
-ude/asm/kvm_types.h
-> new file mode 100644
-> index 0000000000..2fe1d4bdff
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_types.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef _ASM_LOONGARCH_KVM_TYPES_H
-> +#define _ASM_LOONGARCH_KVM_TYPES_H
-> +
-> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE      40
-> +
-> +#endif /* _ASM_LOONGARCH_KVM_TYPES_H */
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
-de/uapi/asm/kvm.h
-> new file mode 100644
-> index 0000000000..7ec2f34018
-> --- /dev/null
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -0,0 +1,101 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __UAPI_ASM_LOONGARCH_KVM_H
-> +#define __UAPI_ASM_LOONGARCH_KVM_H
-> +
-> +#include <linux/types.h>
-> +
-> +/*
-> + * KVM Loongarch specific structures and definitions.
-> + *
-> + * Some parts derived from the x86 version of this file.
-> + */
-> +
-> +#define __KVM_HAVE_READONLY_MEM
-> +
-> +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> +#define KVM_DIRTY_LOG_PAGE_OFFSET      64
-> +
-> +/*
-> + * for KVM_GET_REGS and KVM_SET_REGS
-> + */
-> +struct kvm_regs {
-> +       /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
-> +       __u64 gpr[32];
-> +       __u64 pc;
-> +};
-> +
-> +/*
-> + * for KVM_GET_FPU and KVM_SET_FPU
-> + */
-> +struct kvm_fpu {
-> +       __u32 fcsr;
-> +       __u64 fcc;    /* 8x8 */
-> +       struct kvm_fpureg {
-> +               __u64 val64[4];
-> +       } fpr[32];
-> +};
-> +
-> +/*
-> + * For LoongArch, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access v=
-arious
-> + * registers.  The id field is broken down as follows:
-> + *
-> + *  bits[63..52] - As per linux/kvm.h
-> + *  bits[51..32] - Must be zero.
-> + *  bits[31..16] - Register set.
-> + *
-> + * Register set =3D 0: GP registers from kvm_regs (see definitions below=
-).
-> + *
-> + * Register set =3D 1: CSR registers.
-> + *
-> + * Register set =3D 2: KVM specific registers (see definitions below).
-> + *
-> + * Register set =3D 3: FPU / SIMD registers (see definitions below).
-> + *
-> + * Other sets registers may be added in the future.  Each set would
-> + * have its own identifier in bits[31..16].
-> + */
-> +
-> +#define KVM_REG_LOONGARCH_GPR          (KVM_REG_LOONGARCH | 0x00000ULL)
-> +#define KVM_REG_LOONGARCH_CSR          (KVM_REG_LOONGARCH | 0x10000ULL)
-> +#define KVM_REG_LOONGARCH_KVM          (KVM_REG_LOONGARCH | 0x20000ULL)
-> +#define KVM_REG_LOONGARCH_FPU          (KVM_REG_LOONGARCH | 0x30000ULL)
-> +#define KVM_REG_LOONGARCH_MASK         (KVM_REG_LOONGARCH | 0x30000ULL)
-> +#define KVM_CSR_IDX_MASK               (0x10000 - 1)
-> +
-> +/*
-> + * KVM_REG_LOONGARCH_KVM - KVM specific control registers.
-> + */
-> +
-> +#define KVM_REG_LOONGARCH_COUNTER      (KVM_REG_LOONGARCH_KVM | KVM_REG_=
-SIZE_U64 | 3)
-> +#define KVM_REG_LOONGARCH_VCPU_RESET   (KVM_REG_LOONGARCH_KVM | KVM_REG_=
-SIZE_U64 | 4)
-> +
-> +struct kvm_debug_exit_arch {
-> +};
-> +
-> +/* for KVM_SET_GUEST_DEBUG */
-> +struct kvm_guest_debug_arch {
-> +};
-> +
-> +/* definition of registers in kvm_run */
-> +struct kvm_sync_regs {
-> +};
-> +
-> +/* dummy definition */
-> +struct kvm_sregs {
-> +};
-> +
-> +struct kvm_iocsr_entry {
-> +       __u32 addr;
-> +       __u32 pad;
-> +       __u64 data;
-> +};
-> +
-> +#define KVM_NR_IRQCHIPS                1
-> +#define KVM_IRQCHIP_NUM_PINS   64
-> +#define KVM_MAX_CORES          256
-> +
-> +#endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f089ab2909..1184171224 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
->  #define KVM_EXIT_RISCV_SBI        35
->  #define KVM_EXIT_RISCV_CSR        36
->  #define KVM_EXIT_NOTIFY           37
-> +#define KVM_EXIT_LOONGARCH_IOCSR  38
->
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
-> @@ -336,6 +337,13 @@ struct kvm_run {
->                         __u32 len;
->                         __u8  is_write;
->                 } mmio;
-> +               /* KVM_EXIT_LOONGARCH_IOCSR */
-> +               struct {
-> +                       __u64 phys_addr;
-> +                       __u8  data[8];
-> +                       __u32 len;
-> +                       __u8  is_write;
-> +               } iocsr_io;
->                 /* KVM_EXIT_HYPERCALL */
->                 struct {
->                         __u64 nr;
-> @@ -1362,6 +1370,7 @@ struct kvm_dirty_tlb {
->  #define KVM_REG_ARM64          0x6000000000000000ULL
->  #define KVM_REG_MIPS           0x7000000000000000ULL
->  #define KVM_REG_RISCV          0x8000000000000000ULL
-> +#define KVM_REG_LOONGARCH      0x9000000000000000ULL
->
->  #define KVM_REG_SIZE_SHIFT     52
->  #define KVM_REG_SIZE_MASK      0x00f0000000000000ULL
-> --
-> 2.27.0
->
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
