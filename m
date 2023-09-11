@@ -2,87 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25BB279B748
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E621179BB02
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:12:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236837AbjIKUuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37166 "EHLO
+        id S230371AbjIKUrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244123AbjIKTGY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 15:06:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9F0B1B6
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 12:05:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694459131;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yukk2f6oqMsdHKjhoJE1WmcLNdeEJDKH4QDEs4EiGPg=;
-        b=RukaH4huovX9rJuSekdg9NGrBo+B9J1vA3GQdCY4NSnwR3QZaiIF+RIKot/ccaAoPnWH+C
-        4sHdVB8BgWSgLvk77K+j7pRNpPNjJ9WLaeXbpWyxj8VTtYjvCTGdZ+eTqKhA8hZ4F5UIeG
-        qcwTxwxgKDMThm8TTVgPX3EmfxHPbJE=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-338-dp65qhMjMSq0L-sjQH7wJQ-1; Mon, 11 Sep 2023 15:05:30 -0400
-X-MC-Unique: dp65qhMjMSq0L-sjQH7wJQ-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6c0f3675070so799063a34.1
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 12:05:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694459130; x=1695063930;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yukk2f6oqMsdHKjhoJE1WmcLNdeEJDKH4QDEs4EiGPg=;
-        b=duyB5eaEviVhHJzgXNni/4Ms9UrCi+tH5M6u+FM74IVuiHxD4HXwgFhruxxv85XvVh
-         IL5k8HDnQtWhMEIHQlbvTSa59sfNVTbpBqMgWKmm6gIUfqYmnD8ia1q5SBGzuC5mFKPr
-         Xqld5UJFSqtIirTTab5qTDgl+55Av8VyHDz10dD8cwUkxuJtzBE0UMbddKzvBZ6T8xfR
-         mqxq+itS42fofgKX/idNc3bPT8ncjveUU8QYmVRg2u37ljDcPWklh1d2MhgMBNVYq798
-         QBTgElDrn82rrfwd2Is8UrDmGoYquTOr5B7IqZZ7gPdXwMxCcUtysTDo6flBKehsfvDd
-         O+qw==
-X-Gm-Message-State: AOJu0YxMVRoIBHPBo7mkkbUd4FVPYGIZNtk5YOmpyQ0vTfsegPWhAKXA
-        vw13GX7ZShoyQ8hLJEFbBYZIs130DyfrqFUR3xfhVIwasYDYDV0nQ73SKvcCnbqRezVilSqXLQf
-        bKOYQOqxkk3Wh
-X-Received: by 2002:a9d:4e90:0:b0:6c0:abdd:a875 with SMTP id v16-20020a9d4e90000000b006c0abdda875mr11713391otk.18.1694459129879;
-        Mon, 11 Sep 2023 12:05:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGStsqh389BzmE57cp5mD7HYmxQywTAlI0LrMmQ6OTXG7DZOO3hPQDzK0WcE6xAB/YEW7bphA==
-X-Received: by 2002:a9d:4e90:0:b0:6c0:abdd:a875 with SMTP id v16-20020a9d4e90000000b006c0abdda875mr11713377otk.18.1694459129611;
-        Mon, 11 Sep 2023 12:05:29 -0700 (PDT)
-Received: from ?IPv6:2804:1b3:a803:c91:da45:7fbc:86c3:920a? ([2804:1b3:a803:c91:da45:7fbc:86c3:920a])
-        by smtp.gmail.com with ESMTPSA id l17-20020a05683016d100b006b95392cf09sm3318989otr.33.2023.09.11.12.05.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 12:05:28 -0700 (PDT)
-Message-ID: <5c082cb1fd306cb75abbcaa80229d791260f8756.camel@redhat.com>
-Subject: Re: [PATCH V11 01/17] asm-generic: ticket-lock: Reuse
- arch_spinlock_t of qspinlock
-From:   Leonardo =?ISO-8859-1?Q?Br=E1s?= <leobras@redhat.com>
-To:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn
-Cc:     linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Date:   Mon, 11 Sep 2023 16:05:20 -0300
-In-Reply-To: <20230910082911.3378782-2-guoren@kernel.org>
-References: <20230910082911.3378782-1-guoren@kernel.org>
-         <20230910082911.3378782-2-guoren@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
+        with ESMTP id S244413AbjIKU1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 16:27:32 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816011AB;
+        Mon, 11 Sep 2023 13:27:25 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id F238C100008;
+        Mon, 11 Sep 2023 23:27:21 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru F238C100008
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+        s=mail; t=1694464041;
+        bh=SHyvaS7qBOiIPWjV3UCTjmC069NWQH/OhcxthAchlvc=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=oxs9C1AKRMhjpTfJKktmMnkwRtd8xO1fRPlE8kKUe4FPI6gT1G3I8VepJ0R/S3gJW
+         14Z4EyYMfG5f9Hx2i2DeuTF0ruL3QoVwD+FTBsqt4uaVzZqTibTBgjt9nGV107Rtjm
+         mEmGgs5alSW8LfA8Bbd8Neu4vPmjAa2EH/qy9LfZ2+gms/w+wfhKsEqAGdyKs+vpJb
+         +Yx0xy5dFjrwfbqZOEOpRgCS7sEwyUYgiH3mhPD7LLLg7ZY6BFneYC14O2b/X831nn
+         CNuVwtR/JcvnvSnWP8rArP2KMMn8cseXlJNICT6q4/biowhPTQYWcQk7BKSTrVWU90
+         /sAGP6NpByGFg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Mon, 11 Sep 2023 23:27:21 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 11 Sep 2023 23:27:21 +0300
+From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v2 0/2] vsock: handle writes to shutdowned socket
+Date:   Mon, 11 Sep 2023 23:20:25 +0300
+Message-ID: <20230911202027.1928574-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179791 [Sep 11 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;git.kernel.org:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/11 13:14:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/11 15:43:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/11 15:53:00 #21884588
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,167 +86,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2023-09-10 at 04:28 -0400, guoren@kernel.org wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
->=20
-> The arch_spinlock_t of qspinlock has contained the atomic_t val, which
-> satisfies the ticket-lock requirement. Thus, unify the arch_spinlock_t
-> into qspinlock_types.h. This is the preparation for the next combo
-> spinlock.
->=20
-> Signed-off-by: Guo Ren <guoren@kernel.org>
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> ---
->  include/asm-generic/spinlock.h       | 14 +++++++-------
->  include/asm-generic/spinlock_types.h | 12 ++----------
->  2 files changed, 9 insertions(+), 17 deletions(-)
->=20
-> diff --git a/include/asm-generic/spinlock.h b/include/asm-generic/spinloc=
-k.h
-> index 90803a826ba0..4773334ee638 100644
-> --- a/include/asm-generic/spinlock.h
-> +++ b/include/asm-generic/spinlock.h
-> @@ -32,7 +32,7 @@
-> =20
->  static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
->  {
-> -	u32 val =3D atomic_fetch_add(1<<16, lock);
-> +	u32 val =3D atomic_fetch_add(1<<16, &lock->val);
->  	u16 ticket =3D val >> 16;
-> =20
->  	if (ticket =3D=3D (u16)val)
-> @@ -46,31 +46,31 @@ static __always_inline void arch_spin_lock(arch_spinl=
-ock_t *lock)
->  	 * have no outstanding writes due to the atomic_fetch_add() the extra
->  	 * orderings are free.
->  	 */
-> -	atomic_cond_read_acquire(lock, ticket =3D=3D (u16)VAL);
-> +	atomic_cond_read_acquire(&lock->val, ticket =3D=3D (u16)VAL);
->  	smp_mb();
->  }
-> =20
->  static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
->  {
-> -	u32 old =3D atomic_read(lock);
-> +	u32 old =3D atomic_read(&lock->val);
-> =20
->  	if ((old >> 16) !=3D (old & 0xffff))
->  		return false;
-> =20
-> -	return atomic_try_cmpxchg(lock, &old, old + (1<<16)); /* SC, for RCsc *=
-/
-> +	return atomic_try_cmpxchg(&lock->val, &old, old + (1<<16)); /* SC, for =
-RCsc */
->  }
-> =20
->  static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
->  {
->  	u16 *ptr =3D (u16 *)lock + IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
-> -	u32 val =3D atomic_read(lock);
-> +	u32 val =3D atomic_read(&lock->val);
-> =20
->  	smp_store_release(ptr, (u16)val + 1);
->  }
-> =20
->  static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock=
-)
->  {
-> -	u32 val =3D lock.counter;
-> +	u32 val =3D lock.val.counter;
-> =20
->  	return ((val >> 16) =3D=3D (val & 0xffff));
->  }
+Hello,
 
-This one seems to be different in torvalds/master, but I suppose it's becau=
-se of
-the requirement patches I have not merged.
+this small patchset adds POSIX compliant behaviour on writes to the
+socket which was shutdowned with 'shutdown()' (both sides - local with
+SHUT_WR flag, peer - with SHUT_RD flag). According POSIX we must send
+SIGPIPE in such cases (but SIGPIPE is not send when MSG_NOSIGNAL is set).
 
-> @@ -84,7 +84,7 @@ static __always_inline int arch_spin_is_locked(arch_spi=
-nlock_t *lock)
-> =20
->  static __always_inline int arch_spin_is_contended(arch_spinlock_t *lock)
->  {
-> -	u32 val =3D atomic_read(lock);
-> +	u32 val =3D atomic_read(&lock->val);
-> =20
->  	return (s16)((val >> 16) - (val & 0xffff)) > 1;
->  }
-> diff --git a/include/asm-generic/spinlock_types.h b/include/asm-generic/s=
-pinlock_types.h
-> index 8962bb730945..f534aa5de394 100644
-> --- a/include/asm-generic/spinlock_types.h
-> +++ b/include/asm-generic/spinlock_types.h
-> @@ -3,15 +3,7 @@
->  #ifndef __ASM_GENERIC_SPINLOCK_TYPES_H
->  #define __ASM_GENERIC_SPINLOCK_TYPES_H
-> =20
-> -#include <linux/types.h>
-> -typedef atomic_t arch_spinlock_t;
-> -
-> -/*
-> - * qrwlock_types depends on arch_spinlock_t, so we must typedef that bef=
-ore the
-> - * include.
-> - */
-> -#include <asm/qrwlock_types.h>
-> -
-> -#define __ARCH_SPIN_LOCK_UNLOCKED	ATOMIC_INIT(0)
-> +#include <asm-generic/qspinlock_types.h>
-> +#include <asm-generic/qrwlock_types.h>
-> =20
->  #endif /* __ASM_GENERIC_SPINLOCK_TYPES_H */
+First patch is implemented in the same way as net/ipv4/tcp.c:tcp_sendmsg_locked().
+It uses 'sk_stream_error()' function which handles EPIPE error. Another
+way is to use code from net/unix/af_unix.c:unix_stream_sendmsg() where
+same logic from 'sk_stream_error()' is implemented "from scratch", but
+it doesn't check 'sk_err' field. I think error from this field has more
+priority to be returned from syscall. So I guess it is better to reuse
+currently implemented 'sk_stream_error()' function.
 
-FWIW, LGTM:
+Test is also added.
 
-Reviewed-by: Leonardo Bras <leobras@redhat.com>
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=73be7fb14e83d24383f840a22f24d3ed222ca319
 
+Link to v1:
+https://lore.kernel.org/netdev/20230801141727.481156-1-AVKrasnov@sberdevices.ru/
+Link to v2 (RFC):
+https://lore.kernel.org/netdev/20230826175900.3693844-1-avkrasnov@salutedevices.com/
 
-Just a suggestion: In this patch I could see a lot of usage changes to
-arch_spinlock_t, and only at the end I could see the actual change in the .=
-h
-file.
+Changelog:
+v1 -> v2:
+ * 0001 stills the same - SIGPIPE is sent only for SOCK_STREAM as discussed in v1
+   with Stefano Garzarella <sgarzare@redhat.com>.
+ * 0002 - use 'sig_atomic_t' instead of 'bool' for flag variables updated from
+   signal handler.
 
-In cases like this, it looks nicer to see the .h file first.
+Arseniy Krasnov (2):
+  vsock: send SIGPIPE on write to shutdowned socket
+  test/vsock: shutdowned socket test
 
-I recently found out about this git diff.orderFile option, which helps to
-achieve exactly this.
+ net/vmw_vsock/af_vsock.c         |   3 +
+ tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
+ 2 files changed, 141 insertions(+)
 
-I use the following git.orderfile, adapted from qemu:
-
-###########################################################################=
-#
-#
-# order file for git, to produce patches which are easier to review
-# by diffing the important stuff like interface changes first.
-#
-# one-off usage:
-#   git diff -O scripts/git.orderfile ...
-#
-# add to git config:
-#   git config diff.orderFile scripts/git.orderfile
-#
-
-MAINTAINERS
-
-# Documentation
-Documentation/*
-*.rst
-*.rst.inc
-
-# build system
-Kbuild
-Makefile*
-*.mak
-
-# semantic patches
-*.cocci
-
-# headers
-*.h
-*.h.inc
-
-# code
-*.c
-*.c.inc
-
+-- 
+2.25.1
 
