@@ -2,396 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29E4D79BEDB
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:18:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA5C979C03F
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:20:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231434AbjIKUrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35476 "EHLO
+        id S232662AbjIKUrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235613AbjIKJEP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:04:15 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3AD6CCC;
-        Mon, 11 Sep 2023 02:04:09 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74176C433A9;
-        Mon, 11 Sep 2023 09:04:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694423049;
-        bh=jIlDzAd6Y2zBAGfpR03z1y19Cd9znjvuc3WHMy7zY14=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=eMGkZVirD9iGvSzLNzAXs8MCuYuSmx0zLTBWTX+BpxgGThWCiU9jGZaj5Cq9KH7ay
-         J3Aq9z3Fsqx1ZiNftAysBYWPXnX1abnde99poAbtsKiWCoq/qnxTDwEEWwclnrcKUn
-         3IeQeHZ3uMWSUfQszJEOA86GgL/2WkICTqXbik+HXKtUrB32G19Yj5g4+mLy95S2fA
-         M8nLAW+x0Ga2r12/cWrmMnTtSALVuSS4RPydNDc5GqfOH84r+51quNKODqllzfRDic
-         ryMH/iZ/UsPTPcOcUr9vUQEUev3r8wrJFA3zqDCdiLM+W+/0Jo3rUpn3+HM32PylJj
-         sRB8d48fCznjA==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-99de884ad25so547697366b.3;
-        Mon, 11 Sep 2023 02:04:09 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yztu/UgRwpiIkh4PEZpju6a+itoTTWTQtC66OIHNBQnvcF0dEDe
-        TkZE2guQUvB6iwqSrOc5BSYR85KL3yY7ORVutdg=
-X-Google-Smtp-Source: AGHT+IG6dIYXo1HaOT8AKRYe8T8M6JXkVELonmamgzNT9xOIY7/Ij+WADwdmCJ8XXlgiqH+XyoXu6KdqoM/9Q6M7JJ0=
-X-Received: by 2002:a17:906:73c8:b0:9a5:cab0:b061 with SMTP id
- n8-20020a17090673c800b009a5cab0b061mr8174722ejl.51.1694423047815; Mon, 11 Sep
- 2023 02:04:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230831083020.2187109-1-zhaotianrui@loongson.cn> <20230831083020.2187109-10-zhaotianrui@loongson.cn>
-In-Reply-To: <20230831083020.2187109-10-zhaotianrui@loongson.cn>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Mon, 11 Sep 2023 17:03:54 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6=e-Tg1tCdFhN5i2CSQpL-NDLovJdc9A=Sxt=3h-3Z0g@mail.gmail.com>
-Message-ID: <CAAhV-H6=e-Tg1tCdFhN5i2CSQpL-NDLovJdc9A=Sxt=3h-3Z0g@mail.gmail.com>
-Subject: Re: [PATCH v20 09/30] LoongArch: KVM: Implement vcpu get, vcpu set registers
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S235676AbjIKJTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 05:19:41 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2055.outbound.protection.outlook.com [40.107.243.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D2ECD3;
+        Mon, 11 Sep 2023 02:19:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FjULUbcdB1f5WVdtQqfmTqrCLkqe9ZjZx17mDjdcj8Xbm/7U1BGoF+WRWEPD0Hy9MEipSSim7nLSl/hpfxWWse7sEsgLYoaoVdt/UK7Vic5GmfcHqGKW5Hc23Le3t1MMrv5vkqHRo4IGiE30Ofxq13LchONr0+m4D55p5/C8ZZhpxgUExyQavN/0Xmzns7NAms1n35zDkWKFZ2Rf9IFyf0qOYla/ZYDbJ/DkuOOa+7My9eOo92K8hb6iarKTxwSG0PUFbAHbQDvMMIOC3oqRhLSxsURaa3/m5HMTsvad+PylNjUQpi6fRRcpSN4Dx3eypLBJmHG0pdqFI/c3l6Wtjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SBryHqzH+NZNx0VM3cFWVB0q8UQ62c+zlr8T9OLVyZk=;
+ b=k1++d1aQ/xxGQ9GN8WCeVnNZTC0O6pa8Jn8q4uE+1le765jGjC4YYNExoFNqB604gFJeGklJT5dfJGRLAjwLfkXt2qhgMx/JRX9gguSjolop9N+Pw1qMH3rqkpsM7Xft8ft1rwQL1tXsZqVHbmKAUH6wDEq0OD0sATQYQdLeDYoCo1hWcbiqZFh3fqhwd/OoNpSjt6vfGElJHDqfo+HpzPeN4WcSkFjDuBIkflUnA2lYsJAImJy7Zb0remIImcbNS3WpT+lXmWmbMQJtdTFcX/Cel0z786h0BK47QyNNqbxf0gdRS0gUJogoD+jBmlSkWNRYrZJl+n4OLuG7tlnapg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SBryHqzH+NZNx0VM3cFWVB0q8UQ62c+zlr8T9OLVyZk=;
+ b=V5X4piyOP6mvK/wlnw+/j9LG38kz03UL8rf6P58F+Ke84FgUalnFjQTLdmTso9nOQvJv4+qcQcEP8waGp4M8lwtm+VCpvCCYIw7SLe8nOLW/wN1oDU1vgavKGeEFZnqLx4/wC3JxEweLKRc3ZXxJWGxhtNkoX1hsUQ33MgGT+TUI/REfxVX1m7VPVKwuDg13ULybwkkYmRqK9+oRoGS6sk1VWkM26lghVQBY49ldA2FejGAFqs8wGJPuFDpecYYlV61wxVhBrRVpihnaluDXvM6WXMiF2gjeKs021x5KsU2F1bklTi+bwKprRVyLfM8srXi1qqSXN9bRDGjezD+jHw==
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com (2603:10b6:a03:1a8::24)
+ by DS7PR12MB6095.namprd12.prod.outlook.com (2603:10b6:8:9c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Mon, 11 Sep
+ 2023 09:19:31 +0000
+Received: from BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::9e7a:4853:fa35:a060]) by BY5PR12MB3763.namprd12.prod.outlook.com
+ ([fe80::9e7a:4853:fa35:a060%2]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
+ 09:19:30 +0000
+From:   Ankit Agrawal <ankita@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+        Vikram Sethi <vsethi@nvidia.com>,
+        Andy Currid <acurrid@nvidia.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dan Williams <danw@nvidia.com>,
+        "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v8 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Thread-Topic: [PATCH v8 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Thread-Index: AQHZ11GEd4uKBig/Bk6gFqMLb5fS47AP2/IAgABN7YCAADqIAIAAUAcAgAA5YoCABGIpgIAAEEZXgAAD0gCAAAnLIA==
+Date:   Mon, 11 Sep 2023 09:19:30 +0000
+Message-ID: <BY5PR12MB376342616237C2F216461FF8B0F2A@BY5PR12MB3763.namprd12.prod.outlook.com>
+References: <20230825124138.9088-1-ankita@nvidia.com>
+ <20230907135546.70239f1b.alex.williamson@redhat.com>
+ <ZPpsIU3vAcfFh2e6@nvidia.com>
+ <20230907220410.31c6c2ab.alex.williamson@redhat.com>
+ <ZPrgXAfJvlDLsWqb@infradead.org> <ZPsQf9pGrSnbFI8p@nvidia.com>
+ <BN9PR11MB5276E36C876042AADD707AD08CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <BY5PR12MB3763D6DA3374A84109D0B2E7B0F2A@BY5PR12MB3763.namprd12.prod.outlook.com>
+ <BN9PR11MB5276CC0D0E21F8A1C335A3828CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB5276CC0D0E21F8A1C335A3828CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR12MB3763:EE_|DS7PR12MB6095:EE_
+x-ms-office365-filtering-correlation-id: 898bee01-6e21-4df8-ca67-08dbb2a83456
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CR/ziWJ4Ucm5sT8jdMSWCQJeTOVa3y5iWZJ2lkYkq23ikfmja6R6GAHQlnl5Jk+6bZNyWaBy6rdG77y4Nw5teu61mm/fmQXn/gp6mGliwI9k93DpN3WlKy8sjp3koaUBjKbbhPYccuNqbvAJyUGO42nQCAJDI+0Wu2rIT2aAXIIoIwN4CnQEpBbY3PQN7TOrM7mLO/hF5avAzSGpGEXH6Nb5gWZS/o/clCv9Wk9C8MNOqtT9YL0cXRwHvfkrnIJtZfmWaqqvhls6OMfo9UGZYvyrsfF1I6+Ou07rttOo97u8u/jawOMzIzTT8XPZfDOpEWtamuai123eiV9hZJ+/rcUW7MTp6VssGMuSlotNEZT21nKRdT3sjXuLuoK/fPi6ENOK8Ip4c6aeKEX6A7qKhYO+YUUE434Kt9pm/1+/gEd40hWNcNTZKMibGHil/p3yD6rLx8vV8CPZCpyfejDwY+070+FcNhqgTJSyUoc61EO98pMHHGAlqaA5gZyz3NfEykW88mc5TpMkG4WTN2RqkpOuZ5HH6BRA3Wh8NnxidVaiwu7u9ZRsSW8LCAG3hfwBXK0OO4nykbQruSzrurQ2Un1gB4tUKj1vq7e4fB5ygzqipEgFup2CclP4XKzmWPSa942YTrCB/4WVLlBA+dXAtaN6IcdfFThXw/m6FaPIOX0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(39860400002)(346002)(396003)(451199024)(1800799009)(186009)(4326008)(26005)(8676002)(8936002)(55016003)(52536014)(5660300002)(83380400001)(9686003)(41300700001)(7696005)(6506007)(71200400001)(91956017)(66476007)(66556008)(54906003)(110136005)(64756008)(66946007)(38100700002)(66446008)(38070700005)(76116006)(316002)(478600001)(86362001)(33656002)(122000001)(2906002)(4744005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?0kNnADPTvcSJ7Ts+GKvb2g0KounGCHT8gj0HwsmMAe79yaKTq8xB67o7/0?=
+ =?iso-8859-1?Q?6zB1eCnjSvPtSaizXyZAzROldAFXZua8/0Ig+IVrgzlBqVWtI5Wzd2ZxXi?=
+ =?iso-8859-1?Q?7tJYMceRCQurWXvvXqs3ELhyX6DsIvq6qTvrMkFqRcBjRfcraV3kMXAXMM?=
+ =?iso-8859-1?Q?d99Ck+YA1fHTd+ikjfGYTa+7tiqQwYmOaRogG57B/2pD55JjIUep2Ae8nf?=
+ =?iso-8859-1?Q?WzyHSykdrjXYr2v74AjS9CLRqfZToBqNRwVDeOxP3SEn/m3hdMQwJByTUz?=
+ =?iso-8859-1?Q?+Vesvh7gcsiCsSFytzkJOj4kjcoLJQAhTN3BNPaP16t7fM2iIVdZhWKXZ6?=
+ =?iso-8859-1?Q?xQkx/qvQiRF45Ix/SpeHHF8qyHCmcKRLMRqc4ba0dTBzXa5ywokClSy6d3?=
+ =?iso-8859-1?Q?oKGh0D2qWIYhTx9ns2cpT6lLuOxbrbKM/Od8KehNGL6gSR/UTblvEF3GaL?=
+ =?iso-8859-1?Q?thQvloVqRQ5nsmtxW4Map4xvv8j4LvOJ+2oYNozuikJkM/e5Io/2IWPJ/f?=
+ =?iso-8859-1?Q?c5hhQuutj6gts6Tikm3y2UcH+zAAkR3brFzvFyX/L2f49kLeGi4YcrqHoa?=
+ =?iso-8859-1?Q?6Z243hCA6+YfaHZTFTNOtzYh/1GPnGsygH5Hxbkf/88l7W6WOtBqLihszq?=
+ =?iso-8859-1?Q?Wqvm8Xx+eg7gHvBUhYnD3sV9mbC+EqhjlnAas7eYRmfPEXtcxLzgoKAi5J?=
+ =?iso-8859-1?Q?d+A7hSyOsZTpfE+Gq+7SMwaKanQVDIa/r6UjRi0hUx3jFSB0JWdv7xExHG?=
+ =?iso-8859-1?Q?7lEZp8KNrbjVFX5/1Pu7ddEvmzl3dJq8RTtyCRqlegfDGU8o66zgCvT0jb?=
+ =?iso-8859-1?Q?NVSjib23+UbiGcCqZQTnnbTvnxqf6ESH3ebxhfcAzKoLsQ+SoNuFCsHxGt?=
+ =?iso-8859-1?Q?sex8SuCeHTBQoUZfOkkjdcR33ps5kzFtvHfp3gUFr1zJ4O4UEFTg54Dpvl?=
+ =?iso-8859-1?Q?rnobs6+si39La4ChVX956TdLwTwPQDTOxjlSm+wWVguV9/J0nkOqRUEmGG?=
+ =?iso-8859-1?Q?tddZbViBshDqVz052rE4CSrNJqYbDqxb3DWquphf6mj2GmUvuOXbqapnvg?=
+ =?iso-8859-1?Q?EbdYkDsnWF/FzEnSgItVeQPji3kLDLnj5OK7NRokWePpDktU1EmttYovYQ?=
+ =?iso-8859-1?Q?T6AbTzQKqvsFfnaLf+ButkjoOont5PYouLhiamBrFmkv93aSeOfrwR39E7?=
+ =?iso-8859-1?Q?8alnxlwCYxCwZUMsbpTPJXT0ZUNhNgFjsSsxCGXiL9MTLKhOhJxpaWuO5U?=
+ =?iso-8859-1?Q?uiAjD9wudQ7e6lI39vlASr5io4ExI1PCJKR8u7IuPR6rbxdiELYba2IUpe?=
+ =?iso-8859-1?Q?vRIGvuVE2sicMlViFkp54ze5JnIHrIb24N+2DhySVbeAoFAp2GziTMAlaM?=
+ =?iso-8859-1?Q?EINH9RZf2OEa1kpYi6PQQs7b5fjPPAaeAwGafzHRgAHtFqatduU2+/vwJu?=
+ =?iso-8859-1?Q?yfFTHoVLnSwZqAFIapZ9swSiVUxcY/ow+P9YSeroW76fMhp2+fwN3JYFqU?=
+ =?iso-8859-1?Q?zcCfZTE0l8QF7uwOeAGaKYH4OISvDRF06T4Fde/eYf/C6bklq2KtsV7Ryd?=
+ =?iso-8859-1?Q?eNoUUrbKi2PyUrDTtA1h/xv5vHYnVk9gum83YCUFzyUn7quyo1+++tFuvW?=
+ =?iso-8859-1?Q?cBzI0o0/BdqBM=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 898bee01-6e21-4df8-ca67-08dbb2a83456
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2023 09:19:30.5253
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3ip41/CXHcxV9bhmmHjX7AlVhF9Od3LGAvnLEXTB2p7HEuHNcAOL4x5S8k98SXdXTAtl7szqtsuA93JYT9ig+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6095
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Tianrui,
-
-On Thu, Aug 31, 2023 at 4:30=E2=80=AFPM Tianrui Zhao <zhaotianrui@loongson.=
-cn> wrote:
->
-> Implement LoongArch vcpu get registers and set registers operations, it
-> is called when user space use the ioctl interface to get or set regs.
->
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> ---
->  arch/loongarch/kvm/csr_ops.S |  67 ++++++++++++
->  arch/loongarch/kvm/vcpu.c    | 206 +++++++++++++++++++++++++++++++++++
->  2 files changed, 273 insertions(+)
->  create mode 100644 arch/loongarch/kvm/csr_ops.S
->
-> diff --git a/arch/loongarch/kvm/csr_ops.S b/arch/loongarch/kvm/csr_ops.S
-> new file mode 100644
-> index 0000000000..53e44b23a5
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/csr_ops.S
-> @@ -0,0 +1,67 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#include <asm/regdef.h>
-> +#include <linux/linkage.h>
-> +       .text
-> +       .cfi_sections   .debug_frame
-> +/*
-> + * we have splited hw gcsr into three parts, so we can
-> + * calculate the code offset by gcsrid and jump here to
-> + * run the gcsrwr instruction.
-> + */
-> +SYM_FUNC_START(set_hw_gcsr)
-> +       addi.d      t0,   a0,   0
-> +       addi.w      t1,   zero, 96
-> +       bltu        t1,   t0,   1f
-> +       la.pcrel    t0,   10f
-> +       alsl.d      t0,   a0,   t0, 3
-> +       jr          t0
-> +1:
-> +       addi.w      t1,   a0,   -128
-> +       addi.w      t2,   zero, 15
-> +       bltu        t2,   t1,   2f
-> +       la.pcrel    t0,   11f
-> +       alsl.d      t0,   t1,   t0, 3
-> +       jr          t0
-> +2:
-> +       addi.w      t1,   a0,   -384
-> +       addi.w      t2,   zero, 3
-> +       bltu        t2,   t1,   3f
-> +       la.pcrel    t0,   12f
-> +       alsl.d      t0,   t1,   t0, 3
-> +       jr          t0
-> +3:
-> +       addi.w      a0,   zero, -1
-> +       jr          ra
-> +
-> +/* range from 0x0(KVM_CSR_CRMD) to 0x60(KVM_CSR_LLBCTL) */
-> +10:
-> +       csrnum =3D 0
-> +       .rept 0x61
-> +       gcsrwr a1, csrnum
-> +       jr ra
-> +       csrnum =3D csrnum + 1
-> +       .endr
-> +
-> +/* range from 0x80(KVM_CSR_IMPCTL1) to 0x8f(KVM_CSR_TLBRPRMD) */
-> +11:
-> +       csrnum =3D 0x80
-> +       .rept 0x10
-> +       gcsrwr a1, csrnum
-> +       jr ra
-> +       csrnum =3D csrnum + 1
-> +       .endr
-> +
-> +/* range from 0x180(KVM_CSR_DMWIN0) to 0x183(KVM_CSR_DMWIN3) */
-> +12:
-> +       csrnum =3D 0x180
-> +       .rept 0x4
-> +       gcsrwr a1, csrnum
-> +       jr ra
-> +       csrnum =3D csrnum + 1
-> +       .endr
-> +
-> +SYM_FUNC_END(set_hw_gcsr)
-> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> index ca4e8d074e..f17422a942 100644
-> --- a/arch/loongarch/kvm/vcpu.c
-> +++ b/arch/loongarch/kvm/vcpu.c
-> @@ -13,6 +13,212 @@
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
->
-> +int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *v)
-> +{
-> +       unsigned long val;
-> +       struct loongarch_csrs *csr =3D vcpu->arch.csr;
-> +
-> +       if (get_gcsr_flag(id) & INVALID_GCSR)
-> +               return -EINVAL;
-> +
-> +       if (id =3D=3D LOONGARCH_CSR_ESTAT) {
-> +               /* interrupt status IP0 -- IP7 from GINTC */
-> +               val =3D kvm_read_sw_gcsr(csr, LOONGARCH_CSR_GINTC) & 0xff=
-;
-> +               *v =3D kvm_read_sw_gcsr(csr, id) | (val << 2);
-> +               return 0;
-> +       }
-> +
-> +       /*
-> +        * get software csr state if csrid is valid, since software
-> +        * csr state is consistent with hardware
-> +        */
-After a long time thinking, I found this is wrong. Of course
-_kvm_setcsr() saves a software copy of the hardware registers, but the
-hardware status will change. For example, during a VM running, it may
-change the EUEN register if it uses fpu.
-
-So, we should do things like what we do in our internal repo,
-_kvm_getcsr() should get values from hardware for HW_GCSR registers.
-And we also need a get_hw_gcsr assembly function.
-
-
-Huacai
-
-> +       *v =3D kvm_read_sw_gcsr(csr, id);
-> +
-> +       return 0;
-> +}
-> +
-> +int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
-> +{
-> +       struct loongarch_csrs *csr =3D vcpu->arch.csr;
-> +       int ret =3D 0, gintc;
-> +
-> +       if (get_gcsr_flag(id) & INVALID_GCSR)
-> +               return -EINVAL;
-> +
-> +       if (id =3D=3D LOONGARCH_CSR_ESTAT) {
-> +               /* estat IP0~IP7 inject through guestexcept */
-> +               gintc =3D (val >> 2) & 0xff;
-> +               write_csr_gintc(gintc);
-> +               kvm_set_sw_gcsr(csr, LOONGARCH_CSR_GINTC, gintc);
-> +
-> +               gintc =3D val & ~(0xffUL << 2);
-> +               write_gcsr_estat(gintc);
-> +               kvm_set_sw_gcsr(csr, LOONGARCH_CSR_ESTAT, gintc);
-> +
-> +               return ret;
-> +       }
-> +
-> +       if (get_gcsr_flag(id) & HW_GCSR) {
-> +               set_hw_gcsr(id, val);
-> +               /* write sw gcsr to keep consistent with hardware */
-> +               kvm_write_sw_gcsr(csr, id, val);
-> +       } else
-> +               kvm_write_sw_gcsr(csr, id, val);
-> +
-> +       return ret;
-> +}
-> +
-> +static int _kvm_get_one_reg(struct kvm_vcpu *vcpu,
-> +               const struct kvm_one_reg *reg, s64 *v)
-> +{
-> +       int reg_idx, ret =3D 0;
-> +
-> +       if ((reg->id & KVM_REG_LOONGARCH_MASK) =3D=3D KVM_REG_LOONGARCH_C=
-SR) {
-> +               reg_idx =3D KVM_GET_IOC_CSRIDX(reg->id);
-> +               ret =3D _kvm_getcsr(vcpu, reg_idx, v);
-> +       } else if (reg->id =3D=3D KVM_REG_LOONGARCH_COUNTER)
-> +               *v =3D drdtime() + vcpu->kvm->arch.time_offset;
-> +       else
-> +               ret =3D -EINVAL;
-> +
-> +       return ret;
-> +}
-> +
-> +static int _kvm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg =
-*reg)
-> +{
-> +       int ret =3D -EINVAL;
-> +       s64 v;
-> +
-> +       if ((reg->id & KVM_REG_SIZE_MASK) !=3D KVM_REG_SIZE_U64)
-> +               return ret;
-> +
-> +       if (_kvm_get_one_reg(vcpu, reg, &v))
-> +               return ret;
-> +
-> +       return put_user(v, (u64 __user *)(long)reg->addr);
-> +}
-> +
-> +static int _kvm_set_one_reg(struct kvm_vcpu *vcpu,
-> +                       const struct kvm_one_reg *reg,
-> +                       s64 v)
-> +{
-> +       int ret =3D 0;
-> +       unsigned long flags;
-> +       u64 val;
-> +       int reg_idx;
-> +
-> +       val =3D v;
-> +       if ((reg->id & KVM_REG_LOONGARCH_MASK) =3D=3D KVM_REG_LOONGARCH_C=
-SR) {
-> +               reg_idx =3D KVM_GET_IOC_CSRIDX(reg->id);
-> +               ret =3D _kvm_setcsr(vcpu, reg_idx, val);
-> +       } else if (reg->id =3D=3D KVM_REG_LOONGARCH_COUNTER) {
-> +               local_irq_save(flags);
-> +               /*
-> +                * gftoffset is relative with board, not vcpu
-> +                * only set for the first time for smp system
-> +                */
-> +               if (vcpu->vcpu_id =3D=3D 0)
-> +                       vcpu->kvm->arch.time_offset =3D (signed long)(v -=
- drdtime());
-> +               write_csr_gcntc((ulong)vcpu->kvm->arch.time_offset);
-> +               local_irq_restore(flags);
-> +       } else if (reg->id =3D=3D KVM_REG_LOONGARCH_VCPU_RESET) {
-> +               kvm_reset_timer(vcpu);
-> +               memset(&vcpu->arch.irq_pending, 0, sizeof(vcpu->arch.irq_=
-pending));
-> +               memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arch.irq_cl=
-ear));
-> +       } else
-> +               ret =3D -EINVAL;
-> +
-> +       return ret;
-> +}
-> +
-> +static int _kvm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg =
-*reg)
-> +{
-> +       s64 v;
-> +       int ret =3D -EINVAL;
-> +
-> +       if ((reg->id & KVM_REG_SIZE_MASK) !=3D KVM_REG_SIZE_U64)
-> +               return ret;
-> +
-> +       if (get_user(v, (u64 __user *)(long)reg->addr))
-> +               return ret;
-> +
-> +       return _kvm_set_one_reg(vcpu, reg, v);
-> +}
-> +
-> +int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
-> +                                 struct kvm_sregs *sregs)
-> +{
-> +       return -ENOIOCTLCMD;
-> +}
-> +
-> +int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
-> +                                 struct kvm_sregs *sregs)
-> +{
-> +       return -ENOIOCTLCMD;
-> +}
-> +
-> +int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs =
-*regs)
-> +{
-> +       int i;
-> +
-> +       vcpu_load(vcpu);
-> +
-> +       for (i =3D 0; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
-> +               regs->gpr[i] =3D vcpu->arch.gprs[i];
-> +
-> +       regs->pc =3D vcpu->arch.pc;
-> +
-> +       vcpu_put(vcpu);
-> +       return 0;
-> +}
-> +
-> +int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs =
-*regs)
-> +{
-> +       int i;
-> +
-> +       vcpu_load(vcpu);
-> +
-> +       for (i =3D 1; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
-> +               vcpu->arch.gprs[i] =3D regs->gpr[i];
-> +       vcpu->arch.gprs[0] =3D 0; /* zero is special, and cannot be set. =
-*/
-> +       vcpu->arch.pc =3D regs->pc;
-> +
-> +       vcpu_put(vcpu);
-> +       return 0;
-> +}
-> +
-> +long kvm_arch_vcpu_ioctl(struct file *filp,
-> +                        unsigned int ioctl, unsigned long arg)
-> +{
-> +       struct kvm_vcpu *vcpu =3D filp->private_data;
-> +       void __user *argp =3D (void __user *)arg;
-> +       long r;
-> +
-> +       vcpu_load(vcpu);
-> +
-> +       switch (ioctl) {
-> +       case KVM_SET_ONE_REG:
-> +       case KVM_GET_ONE_REG: {
-> +               struct kvm_one_reg reg;
-> +
-> +               r =3D -EFAULT;
-> +               if (copy_from_user(&reg, argp, sizeof(reg)))
-> +                       break;
-> +               if (ioctl =3D=3D KVM_SET_ONE_REG)
-> +                       r =3D _kvm_set_reg(vcpu, &reg);
-> +               else
-> +                       r =3D _kvm_get_reg(vcpu, &reg);
-> +               break;
-> +       }
-> +       default:
-> +               r =3D -ENOIOCTLCMD;
-> +               break;
-> +       }
-> +
-> +       vcpu_put(vcpu);
-> +       return r;
-> +}
-> +
->  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->  {
->         return 0;
-> --
-> 2.27.0
->
+>> > Does it mean that this requires maintaining a new guest driver=0A=
+>> > different from the existing one on bare metal?=0A=
+>>=0A=
+>> No, the VM would use the same Nvidia open source driver that is used by =
+the=0A=
+>> bare metal. (https://github.com/NVIDIA/open-gpu-kernel-modules).=0A=
+>=0A=
+> because this driver already supports two ways of accessing the aperture:=
+=0A=
+> one via the firmware table, the other using this fake BAR2?=0A=
+=0A=
+Yes, exactly. The driver supports both ways. An absence of ACPI DSD device=
+=0A=
+property describing the device memory (that happens for the virtualization =
+case)=0A=
+when Qemu does not expose them via VM ACPI) provides an indication to the=
+=0A=
+driver that it needs to use the fake BAR (and determine the memory properti=
+es=0A=
+from it); use the memory region otherwise.=0A=
