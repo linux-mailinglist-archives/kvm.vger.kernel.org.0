@@ -2,127 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E92DB79B9A6
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:10:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 141B079BEC8
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:18:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234593AbjIKUsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:48:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48052 "EHLO
+        id S235250AbjIKUtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:49:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239599AbjIKOYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 10:24:20 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46849CF0
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 07:24:15 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-991c786369cso598879466b.1
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 07:24:15 -0700 (PDT)
+        with ESMTP id S239740AbjIKO1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 10:27:39 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439DECF0
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 07:27:34 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9a65f9147ccso572824866b.1
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 07:27:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694442253; x=1695047053; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=77wmyEqNTeDGUTOmfGVt3GM6ImVu59aR1ZuCl07cYtc=;
-        b=X6pTQDR2DZBZ/WzdandnIT2QQcc+5eddz1nCgLRDSeMyEDihG9ynBbesczURf7uOHi
-         aCE9THHpHtmQE2pYCU8S2rB6eMjWCq+ZUxviZHtzByUQGooAMdlEHFPKltZxbehwVpCa
-         rXN/RNQuoh8SSQqpsc98T/h8sfTPyPBRvU9PyFwW2pJmvp7KkniVoxW5+qnDT8XI2w23
-         AApcGz3w0gvSPy5JmUv/Z4nw6DlnML5BKwqEjqHWE1/AX7i22v0K6TyAlZ0CdnspHQGE
-         T9BTI7Tl2EEJMsTVOWqQadK5AIMudstjLvhvX76E1cloobObuv8GmEPW7Uibc+b7gR2z
-         jkSA==
+        d=linaro.org; s=google; t=1694442452; x=1695047252; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2u6ntARkJIvNRR76qoe5f9qgwmF82Gn0r5UusWtZxI=;
+        b=HXP+MMGSnBMYgaqz7ZCSpVLw9eKTGAqrhKQ0kcn2HmYxlc0e+vzGh2DR5YTBhql24/
+         Pkw5DkrR1HLKoo572zn6SWlgpBEpu/EUjfPnxH6u+tLYI7pifcfRjQIBWSLHxUQIVExy
+         cq8y8xP0gYTIA9SUe8FCalqsrv2cfk3x8bm7GRMqVw56V4RznCiw9E5Brnd6b8dKxcTA
+         xu/CHKuo5IQLpDOY18RpX9ao+xcpwEjzAS959Tx423rrfNY/BYe+ggONyvAzHFNR/HSx
+         W0rrkx7c5C85LJnCiKawppsgh5gWLW9sFhC+E0z7sIPgsNvBlzbVCwxn4f7kjeBMDM/P
+         NNtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694442253; x=1695047053;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=77wmyEqNTeDGUTOmfGVt3GM6ImVu59aR1ZuCl07cYtc=;
-        b=oFU6o27JPr8dxfuO9rIfUvus2oifLSkzuDwbF5J5zNihq9M3QopijpZ6wqUq4moPsv
-         0MdskPnnf+HzuruCZYSo7euhSiZpmiamFaB48KoJqmkoBdat4g9Y/y4gYjpTihY0GC2M
-         rZv+yq8XJiq0Eo1h+iWqGaz9xV+wv9FsOymXXM4ZYfqLXZeO2dwNoKG5BMqNBxC/6fjx
-         P1FpQ4El+UtCdQ9RTx/NJxt/tQYx0M64b++bM/aE7UNLW/dTBcKWCvoeNFstVOfovLLW
-         zU669LKFsOHOxnKOtuDkOd/FT9pr/Mf7pSA8snddNiPeNI6MQoUnoT91WNMmXUCrbi3t
-         WLSg==
-X-Gm-Message-State: AOJu0Yw41+yO2IfNOKP0i0jE5/AO4VFhVc5fDr8N5lEgAPIEvS51GtUV
-        0h8Ea2z0q5ADNmlbqpXAMRLAHw==
-X-Google-Smtp-Source: AGHT+IFwixzQiIoWbOPCD8vfySFcjlXiXCkI/jtnoIPnq/qrqyThN++agwziFT7GEG0gJrAhK+agng==
-X-Received: by 2002:a17:906:5a70:b0:9a1:c370:1aef with SMTP id my48-20020a1709065a7000b009a1c3701aefmr8580666ejc.55.1694442253697;
-        Mon, 11 Sep 2023 07:24:13 -0700 (PDT)
-Received: from localhost (h3220.n1.ips.mtn.co.ug. [41.210.178.32])
-        by smtp.gmail.com with ESMTPSA id kj27-20020a170907765b00b009a5f7fb51dcsm5415145ejc.42.2023.09.11.07.24.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 07:24:13 -0700 (PDT)
-Date:   Mon, 11 Sep 2023 17:24:09 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     brett.creeley@amd.com
-Cc:     kvm@vger.kernel.org
-Subject: [bug report] vfio/pds: Add VFIO live migration support
-Message-ID: <1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain>
+        d=1e100.net; s=20230601; t=1694442452; x=1695047252;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y2u6ntARkJIvNRR76qoe5f9qgwmF82Gn0r5UusWtZxI=;
+        b=B1UquZZVz58hd8qErXeAS0uZP6+1dwxuBwet3VUZ6oESpfNapMurK1KP4fMzlSvzV9
+         Rd3NJBP9svW4ErqsI3Z75MmxXAaldZkrovIllNiq0OFES9w1meiLk/AbrKtkU3iZ3i+u
+         ZhQudb+c9Zjl0cR7g2A94PBf1tt9JJRTvdaUmvZaeY+af9bsybbUFzM3RvENBL3JDi/v
+         zOuhiO4vShD1Hm0TfxG1eOTSuaYvmDqTIz8C88FTWURIejZbeGQcOyYxJztFW0ElGJwo
+         OMaDTQIsMos9RlXIV/bCmKVRg+UDPgHLm+93wIjTgxbYPaoSLaiDYF5y0sq2jTJ77DO4
+         WUjg==
+X-Gm-Message-State: AOJu0Yxhl2FPMj6TAQtNfrP08DsTAr1w/rBPlJ4anHnIFNesrB7MfEq8
+        pIwwF/Ezje/T0+tY2dqp7jpk/w==
+X-Google-Smtp-Source: AGHT+IE6EaLC3OIVPcB4+Vjhcm6RbMF4kh3NqMBKkSHliE2tkXbVcgIzIe+A4mYSR40xCMeyuua83Q==
+X-Received: by 2002:a17:906:cc12:b0:9a1:e293:9882 with SMTP id ml18-20020a170906cc1200b009a1e2939882mr8487409ejb.63.1694442452656;
+        Mon, 11 Sep 2023 07:27:32 -0700 (PDT)
+Received: from m1x-phil.lan (tfy62-h01-176-171-221-76.dsl.sta.abo.bbox.fr. [176.171.221.76])
+        by smtp.gmail.com with ESMTPSA id lx24-20020a170906af1800b0099cb349d570sm5430139ejb.185.2023.09.11.07.27.30
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 11 Sep 2023 07:27:32 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH v3] target/i386: Restrict system-specific features from user emulation
+Date:   Mon, 11 Sep 2023 16:27:29 +0200
+Message-ID: <20230911142729.25548-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-        version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Brett Creeley,
+Since commits 3adce820cf ("target/i386: Remove unused KVM
+stubs") and ef1cf6890f ("target/i386: Allow elision of
+kvm_hv_vpindex_settable()"), when building on a x86 host
+configured as:
 
-The patch bb500dbe2ac6: "vfio/pds: Add VFIO live migration support"
-from Aug 7, 2023 (linux-next), leads to the following Smatch static
-checker warning:
+  $ ./configure --cc=clang \
+    --target-list=x86_64-linux-user,x86_64-softmmu \
+    --enable-debug
 
-	drivers/vfio/pci/pds/lm.c:117 pds_vfio_put_save_file()
-	warn: sleeping in atomic context
+we get:
 
-The call tree is:
+  [71/71] Linking target qemu-x86_64
+  FAILED: qemu-x86_64
+  /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in function `cpu_x86_cpuid':
+  cpu.c:(.text+0x1374): undefined reference to `kvm_arch_get_supported_cpuid'
+  /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o: in function `x86_cpu_filter_features':
+  cpu.c:(.text+0x81c2): undefined reference to `kvm_arch_get_supported_cpuid'
+  /usr/bin/ld: cpu.c:(.text+0x81da): undefined reference to `kvm_arch_get_supported_cpuid'
+  /usr/bin/ld: cpu.c:(.text+0x81f2): undefined reference to `kvm_arch_get_supported_cpuid'
+  /usr/bin/ld: cpu.c:(.text+0x820a): undefined reference to `kvm_arch_get_supported_cpuid'
+  /usr/bin/ld: libqemu-x86_64-linux-user.fa.p/target_i386_cpu.c.o:cpu.c:(.text+0x8225): more undefined references to `kvm_arch_get_supported_cpuid' follow
+  clang: error: linker command failed with exit code 1 (use -v to see invocation)
+  ninja: build stopped: subcommand failed.
 
-pds_vfio_state_mutex_unlock() <- disables preempt
--> pds_vfio_put_save_file() <- sleeps
+libqemu-x86_64-linux-user.fa is user emulation specific, so
+having system emulation code called there is dubious.
 
-drivers/vfio/pci/pds/vfio_dev.c
-    29  void pds_vfio_state_mutex_unlock(struct pds_vfio_pci_device *pds_vfio)
-    30  {
-    31  again:
-    32          spin_lock(&pds_vfio->reset_lock);
-                ^^^^^^^^^
-Preempt disabled
+'--enable-debug' disables optimizations (CFLAGS=-O0).
 
-    33          if (pds_vfio->deferred_reset) {
-    34                  pds_vfio->deferred_reset = false;
-    35                  if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
-    36                          pds_vfio_put_restore_file(pds_vfio);
-    37                          pds_vfio_put_save_file(pds_vfio);
-                                ^^^^^^^^^^^^^^^^^^^^^^
+While at this (un)optimization level GCC eliminate the
+following dead code (CPP output of mentioned build):
 
-    38                          pds_vfio_dirty_disable(pds_vfio, false);
-    39                  }
-    40                  pds_vfio->state = pds_vfio->deferred_reset_state;
-    41                  pds_vfio->deferred_reset_state = VFIO_DEVICE_STATE_RUNNING;
-    42                  spin_unlock(&pds_vfio->reset_lock);
-    43                  goto again;
-    44          }
-    45          mutex_unlock(&pds_vfio->state_mutex);
-    46          spin_unlock(&pds_vfio->reset_lock);
+ static void x86_cpu_get_supported_cpuid(uint32_t func, uint32_t index,
+                                         uint32_t *eax, uint32_t *ebx,
+                                         uint32_t *ecx, uint32_t *edx)
+ {
+     if ((0)) {
+         *eax = kvm_arch_get_supported_cpuid(kvm_state, func, index, R_EAX);
+         *ebx = kvm_arch_get_supported_cpuid(kvm_state, func, index, R_EBX);
+         *ecx = kvm_arch_get_supported_cpuid(kvm_state, func, index, R_ECX);
+         *edx = kvm_arch_get_supported_cpuid(kvm_state, func, index, R_EDX);
+     } else if (0) {
+         *eax = 0;
+         *ebx = 0;
+         *ecx = 0;
+         *edx = 0;
+     } else {
+         *eax = 0;
+         *ebx = 0;
+         *ecx = 0;
+         *edx = 0;
+     }
+ }
 
-Unrelated but it really makes me itch that we drop the mutex before the
-spinlock.
+Clang does not.
 
-    47  }
+Instead of trying to deal with compiler specific checks around
+__OPTIMIZE__ (see commit 2140cfa51d "i386: Fix build by providing
+stub kvm_arch_get_supported_cpuid()"), simply restrict code
+belonging to system emulation, easing user emulation linking.
 
-drivers/vfio/pci/pds/lm.c
-    112 void pds_vfio_put_save_file(struct pds_vfio_pci_device *pds_vfio)
-    113 {
-    114         if (!pds_vfio->save_file)
-    115                 return;
-    116 
---> 117         pds_vfio_put_lm_file(pds_vfio->save_file);
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Calls mutex_lock().
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ target/i386/cpu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-    118         pds_vfio->save_file = NULL;
-    119 }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 24ee67b42d..83914d5d1b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6163,6 +6163,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             }
+             *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
+ 
++#ifndef CONFIG_USER_ONLY
+             /*
+              * SGX cannot be emulated in software.  If hardware does not
+              * support enabling SGX and/or SGX flexible launch control,
+@@ -6181,6 +6182,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                     CPUID_7_0_ECX_SGX_LC))) {
+                 *ecx &= ~CPUID_7_0_ECX_SGX_LC;
+             }
++#endif
+         } else if (count == 1) {
+             *eax = env->features[FEAT_7_1_EAX];
+             *edx = env->features[FEAT_7_1_EDX];
+@@ -7152,6 +7154,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+         mark_unavailable_features(cpu, w, unavailable_features, prefix);
+     }
+ 
++#ifndef CONFIG_USER_ONLY
+     if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+         kvm_enabled()) {
+         KVMState *s = CPU(cpu)->kvm_state;
+@@ -7179,6 +7182,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+             mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
+         }
+     }
++#endif
+ }
+ 
+ static void x86_cpu_hyperv_realize(X86CPU *cpu)
+-- 
+2.41.0
 
-regards,
-dan carpenter
