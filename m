@@ -2,438 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87D2179B900
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:09:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 478DC79BC25
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:14:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231126AbjIKUrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48916 "EHLO
+        id S235156AbjIKUst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236828AbjIKLck (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 07:32:40 -0400
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2058.outbound.protection.outlook.com [40.107.21.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A13CCDD;
-        Mon, 11 Sep 2023 04:32:34 -0700 (PDT)
+        with ESMTP id S236928AbjIKLmP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 07:42:15 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE47CDD;
+        Mon, 11 Sep 2023 04:42:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694432530; x=1725968530;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=1hksIPFcfvsurVCZOQDe9vqmt8yCAnOcf1QowBDXogo=;
+  b=RbNVaQecXtoSE9rJuPgAc01PAxQkh08awdSb5Td2xV8rrf6M6CdZzI86
+   YTZvMnvMNgFa476uupQP3YZVxXxOfkFFzfALrORrQCXCG7hWgBsbxGTIi
+   y9jOVnlRIPNI3iOShssmFHAUHVkj9gvjpwuVlO54RD1CfVyku6MP2IhEe
+   +vbHz7TSIizzHOY5fzcoa5A44Ko39Fr/tCq7RauUEoEHLympw3A0uWbdx
+   Pf59qbqGx/lvjL3gxhDQ4iekVoyINQu6BkV1Rc6/X1+Iqt5D5D6Vn9BAj
+   nKrmTzBbEeP0ZAcDP9BY0N4xHjV5doG2N5FaQS4RD/kr2a2IKifTJ6MmA
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="358362651"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="358362651"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 04:41:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="1074110092"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="1074110092"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Sep 2023 04:41:41 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 11 Sep 2023 04:41:41 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 11 Sep 2023 04:41:40 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 11 Sep 2023 04:41:40 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 11 Sep 2023 04:41:40 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E/OVdAJn6ul0yrfL07Iea0SAj7U9e1nQkaSZuK+9QKnAaKY7s4qx4Mewf27K7d8ehHpBLZKRIfkm1Iw/Gy7Js6SU+e3aBkqCrXx/QCHMZuRsHDRM1qnG34zzelAd+KOUwgiq3ub1e+Scxq9gdVaHO6DIAWbFS8wqGpwhuyHsnsMM7RR22Uh6ZB/0i4ag07n488BYAv8/qB479e4ocfD4GUbsrRY/GXA75Fz2BpkiHLNMNXiWxgHglam7sza+kkd8BsiQkCTjgHPc/YyN7+fivah7SDFJD7ji7Z0PnD9aJ5a8v5etu22G86oJqAGCq0vE1uf/8yYt8Y9SdYgoRA2RhA==
+ b=Nlcj2NAH1ot4ik//gjBiooAnhAvAkXstfy7shppYdIR1Yvm+3Cw/3JSn+2x7zorxOa21mtkyc4LGH/WgJKiiV9x4TOS43wG6WLgPmXYFMK3HYULOM2bEmYKxU9hiMnH9TV5hJwf9BXPB1A/Jqnh+z+yOZ8CTx5j86b6HUwxIRP/golyx4ehNgg7zuewPnTw0/4WhA93NUMbnKNT5PSJTK48pzZK6GMEV6w4+EVy5WF+/1CCg16a9hm5XA9staf+9VgFyzY0tyqDJ1O1i0ZeiS5yo5nu8+H8ytyGxK8wInAOfOI0jF1gjT57eT/jwyJh9qRnlgzzpcPxsKlBhxF/rXw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fqOEy0Xz4n8Ztk7m1y7SvsIaZZytIpYglD8s7kOtgDk=;
- b=RA6lTKwrhyPBAqeeSnC5P+S/a4Rm6769qYFix/60d5NWCDkgga3OR+G1FIBsyRI/Dayb2LqhEu3vmd9Gqqal1FgUmF4MOugHsCH96K5RtcJHv8qRsSpvFB2yiO8nBMORNE4NFBUSC/fRrW3ru3t/XyAxqIS+YRDApRqW36ApOBd3Mm/iFFEhBdL3RCqP6PHTBPwP+oesJs3KkXv0GcJs6t/NcYxubsOFUZ/ZXlrJkosJg9bC4V3YePmmX4S0YU/81frSDpjelgrIFOXGgyldCKjEh1ww7kJXvHoAJGMymOTcAKL4gPVokX3XW3phAkQMKzufc4AXkXGRPG60fxgWaw==
+ bh=1hksIPFcfvsurVCZOQDe9vqmt8yCAnOcf1QowBDXogo=;
+ b=oXMJaMya7VShBntoAbYZfP/irxSMZioLUaL4BrStSLJBPkcr7eGRzLow8kQizo/LlOal2nB1uQF3oFtZvfnV9umUp+Ib5ISSAOqqNMJKn+/QZDMDwmIR3xYGViDB16OpQxgHWmkkvq+u6gU8scOZE0wZpyXQ22DbBYfz0dzBfEvU5B9lrv2P/n41FWTTvG8uKMdS7qF8dgeLz+EjVkNqdE4rvMyDrOjVACGUhEMMGy8P2gsnE9VDPW7s/bMZHFzEDEtMzJiKxWIAiohBFHO2GCyRfCNt1eoEt0VUVVX1lcAKaoI1IKcXz6cqAZoPtekArZizrW/BEkh/sdYDbJ2biw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fqOEy0Xz4n8Ztk7m1y7SvsIaZZytIpYglD8s7kOtgDk=;
- b=yelB0LYnoVAUp0xvDunPC/WbnvuZ3NiffHOoYExbcIy9qaqw4fDljpaVMer+ecZmN6b1nIAzR9+OfDwsDpLiCQ/pY0fpGadhkw47Rr/DU4gqcZsIx12qypz6vKrjdYf7FrhdZjuw8yggNgYLQ+1GcxMCbOuepvOh6OGDWkHA80JIFXfGQApUTtJ7kEDq+WKtG0ZXmf2KBeH41HRnEV/IWAut8qdO5zKGktls0v8X6/SppFxCZSd0C4oA0RkRvXLMmTa5ZDIT3Fb+Xv4iIKdPYImvLPhhAzDD7iHgEoKkdTCzTgrWM9vPNDjeMvFH/mLp3SqUJjM6Znp+V4pXq/rSlQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
- by AS8PR04MB9096.eurprd04.prod.outlook.com (2603:10a6:20b:447::10) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SA0PR11MB4687.namprd11.prod.outlook.com (2603:10b6:806:96::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.34; Mon, 11 Sep
- 2023 11:32:29 +0000
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::274c:c30b:ac8c:2361]) by PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::274c:c30b:ac8c:2361%2]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
- 11:32:29 +0000
-Message-ID: <528511e9-c205-f248-9a64-9066281004ba@suse.com>
-Date:   Mon, 11 Sep 2023 14:32:25 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
+ 2023 11:41:37 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::980d:80cc:c006:e739]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::980d:80cc:c006:e739%4]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
+ 11:41:37 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v13 05/22] x86/virt/tdx: Handle SEAMCALL no entropy error
+ in common code
+Thread-Topic: [PATCH v13 05/22] x86/virt/tdx: Handle SEAMCALL no entropy error
+ in common code
+Thread-Index: AQHZ101FhnZRwPhg0EWj68AddtBoNbARMmSAgARo14A=
+Date:   Mon, 11 Sep 2023 11:41:37 +0000
+Message-ID: <14e8f19b93f3e0eb381061320b47a8c4a048c9cd.camel@intel.com>
 References: <cover.1692962263.git.kai.huang@intel.com>
- <840351e17ca17b833733ed9e623e7a51d8340c2d.1692962263.git.kai.huang@intel.com>
+         <c945c9a8db98b7a304c404a7ef18aa2f7770ffaf.1692962263.git.kai.huang@intel.com>
+         <0676101a-e781-81e0-2e0f-7f5e72595e5c@intel.com>
+In-Reply-To: <0676101a-e781-81e0-2e0f-7f5e72595e5c@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-From:   Nikolay Borisov <nik.borisov@suse.com>
-Subject: Re: [PATCH v13 22/22] Documentation/x86: Add documentation for TDX
- host support
-In-Reply-To: <840351e17ca17b833733ed9e623e7a51d8340c2d.1692962263.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR3P281CA0023.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1c::7) To PA4PR04MB7790.eurprd04.prod.outlook.com
- (2603:10a6:102:cc::8)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SA0PR11MB4687:EE_
+x-ms-office365-filtering-correlation-id: b23bd876-c06c-4349-c3a7-08dbb2bc0eb3
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5rFYXZ2unnhh638Mp1nOK54qaB9nFXO4hrvXzTzaUFI8XqcvxmtauoWsWFu22/ZJXRvYXMSlqNRGlT7XkgM94rA/jByfCwPd0IBYlhmApiDKnZIrv+7qdoYAu2iqqA35sswbF3kcu9VPCdjuZVZLO49jW8VNQB56hbpEu5ljAqt5heebMq+djE9GINM8PHox3diQz+b8YqzwNzMQcS/fQQQAN6XaUS6nnX8ty49EkffW8VhI9Tp9ka7ipmJHUu7nHSZH9btjdRN+nklF8PDJqvxVhxNovkklNqEfXNz3D1jbZPtCRIj4LTUAIoP8oXNf0hEuyaj3ygenhcOFKFZQbkFNWe0Zjhth9kTf03WGoQCuMa0nHxo3yiOLO5pnv+0UiAT2fGkG5Brkm5OsfjkeSOfM1Rb5HhrZqTtXjOqTp/4Oy29gidW+KXIGhcec9uj+1bB/V7sD/2mOZAuJWKvojrG+OPHy1oe6XbW1Z5cjbfTs9b94roRETp2b6hYfyPjMrNKfYkYOJ3VG+8mWBTSJXDwt1kQDEGBPtSgAffMw8fHYzs6e7OgSsj3hqGW9o2HO3kV6OKq4SmPo1g9CdAOEK81GckTUZvpT9zVDJ35wyMPm3K7X3Zb0M842KkXDwdre
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(39860400002)(366004)(396003)(186009)(451199024)(1800799009)(6506007)(53546011)(6486002)(6512007)(71200400001)(83380400001)(122000001)(86362001)(82960400001)(38100700002)(38070700005)(36756003)(2616005)(26005)(316002)(7416002)(41300700001)(8936002)(4326008)(2906002)(76116006)(8676002)(66556008)(66946007)(54906003)(66446008)(64756008)(66476007)(91956017)(110136005)(478600001)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?d2VFanh2TXhTQWxaSzVwakI0ZHloMWtQWFNmQkJtTFRFVVMyRmV0TUZjb0tW?=
+ =?utf-8?B?MmVuMnd0S3kvbzBRd2NyS2kxQ1J4Nk4xN01HMksrR1lHdi92Vm1IWUtOQlhE?=
+ =?utf-8?B?dTVxVlIzUC8xSlhmV0NqR3ozVTBnRWVlSVJ4VUtDaFV3bjc3eGVZcWJTR2M4?=
+ =?utf-8?B?dkdSdXVydDU3SEVqZ1JyU0VaSHhVWkNnZ2kydk5qNnJudmRLVTl1MzZxVHp5?=
+ =?utf-8?B?b2xlb3d4VTNuQ1ZLRW1LVjRFZVp5RklpVzBnV0g3ditDazRZSmlxRmM0c1V3?=
+ =?utf-8?B?MmFqZ3ZlN1E1Ulovc1JpYjRwWEkwNlFHS0k0VG9sTk5QbFBOTTZ5UlRSc0tJ?=
+ =?utf-8?B?aGxqazMzM016b1VSblVIQy9PcFVyQ3NXZHRINmY5aFJvdXlJemtkYjhwS05p?=
+ =?utf-8?B?QmZtQzQ2TjBoWUI3L0pVSTZLVWJuaFlwTzVIczhDNll1aVYzQ1I4d3RMRXRW?=
+ =?utf-8?B?ZVRtc09RMWxVaTd2OERCTXpKYlkwYnF6aDlESkpyOGt6NDRVYVk2TCtiaEt2?=
+ =?utf-8?B?Y01mR0ErNk1LdFhMeUpNV2lDM0o3L2JYbEpmYmNXQWJxenRZNFlOVkxFK21T?=
+ =?utf-8?B?RjlyM3dqZ1JBVXFDNmFSdDFJallidHhpRlNhUTZiTEZra1pEUGZJdzVJOGMz?=
+ =?utf-8?B?OWd5b2NwRUlITUNYWDZiZzk3UHlHVUlGNitmSU9tajVUUGFhOUtGL3lFZTR5?=
+ =?utf-8?B?cTFnd3pFYzBNb2tPank2NDlDZzRCMDRtR3pOblk2a1k0VjRCTUtKU3h4VUQw?=
+ =?utf-8?B?bHJQMzJxbXZLdng2N2xvamliRmhlVmlRK2hMWUxjQ1YvbjlBT2REc0I4RzVu?=
+ =?utf-8?B?ekREMUJzUkUySjJVeTZKZCtEK1htRitDU2V4Nzg4aFJTMGpHdnFpdUNpWHpF?=
+ =?utf-8?B?WE5LWVUxSW90djBtWCtSUzFDMU5iUGdRS2JJT1JoTDFDVHpueVdFdG1yYmx2?=
+ =?utf-8?B?MTQrOFJUNTVFR3pVcVpSaTVhenJoY29uQXF0aWpwZkpkRjVoWktYUU9vU3Zj?=
+ =?utf-8?B?a2g2NW5tNFlHbkUxZWxLU3ptcHBybjFYK2d0Vm5BS1NJdGFLQXRaTWxMbGNq?=
+ =?utf-8?B?WFFyN0RSbE1MdlBVamVBeDZ6b3pHZmpBZWVHU3VEaUd4eUNVNWxpVjhoeGZ4?=
+ =?utf-8?B?bVNpU1JBZC9FS2hra2ovNndzU2ZHc29id2oyZWNtbFpPRkRxUGlFVE1lN1Zv?=
+ =?utf-8?B?eUdteUZZaHoxcno4bHZlVTBaVFhwbXQrajRsVHNOUk00M2grUFBaWnpqS2RS?=
+ =?utf-8?B?aTcxMDRHdkZUVFkwdHBUQThrWldsd0lxMWdRWkt5Uis4ejRxZTl1cmtuYkZH?=
+ =?utf-8?B?TVh1dmJXeFZYa1RHQ28rNjlOMWUxb1B4OGdUc3VVQ1ptdVJJWWcyL2VjQW9S?=
+ =?utf-8?B?QTA4T1JYSE5RM01qZFNTeXdWNkxOUkZkODN0RzZXaExNMmZDVUh3KzJrR2ZM?=
+ =?utf-8?B?Qm4xMlhoTU03U3F3ellLM01kZFBndkl0dk9rckUzbXFJa2xwcWNSdEozcGFZ?=
+ =?utf-8?B?MXE3VGhYNjl0QURjSndSWlROTExIK2hlcWtFTGY2MEpnOUF6aUVQT2NrLzhT?=
+ =?utf-8?B?SXByYjhWNW9JUW5yWjhqWVR2N1kwdEtGM0NCdW9xbDZCUzlpb0pueXlvV1JX?=
+ =?utf-8?B?eW9rS0tlSHJueUpMb2xHMittUGlRc09veFJrVzJ6NjZOU2xjSjVBMVg1cUo1?=
+ =?utf-8?B?aDlYbWpSZTA5OXJlRzdrL3g4a1llc2cwRVV5TmpSY0JuVUs0OW1PeGZUY3Rm?=
+ =?utf-8?B?eWdOb1lNR0Q4RWZqY0RNV2d3Sml4eVZpWlBHdHRjMVN1dmQ3TUlzdnVxbmdJ?=
+ =?utf-8?B?TWFRMDVUR1AzbVVoS1VXV0E5UitMNFlab1lXZDVXSEdIblRYT3BCUEF4RUVv?=
+ =?utf-8?B?MU5wQk1HaE5lMnJKU0xjSk5OdU9KMkkySkJMOVNtbTBRclJob015UEVTOUpy?=
+ =?utf-8?B?djQxRkNKVkZFcml6VVc5d1FESlRnczhmSHVneWpyWWV2OWUrbkpqNW9DT0I5?=
+ =?utf-8?B?ZXNCbkxtWlcyV3p6ZnV4ZVh6YnNVNWpULzhXSnZnTTFDYjZ2N3hkT0lpdFFY?=
+ =?utf-8?B?WmdjMTA0Ymx0NE8wY2xGalJxNytSMVQyOWxWcTZIY3I2VmwzSjQyd3oveFlK?=
+ =?utf-8?Q?aPuX3ieMK+Iz4URyILlzjxWb0?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EA76BF1C8B5FF34FBDBB8CA150B35B32@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AS8PR04MB9096:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5f45da3-a86e-4376-8782-08dbb2bac806
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tsnxiPsMiD0RNvgVHTtz6OlBHZrEqOLUrOCTl7owhxofrXBEOH5c78B5jDFX8SAL1wcfP56UyJUmvVbdhehcdB6hZ12kK3LVkLNV1BR2LNLcGfnuGOczubtEyW0b0h8vKNAHGv1ceQ8AZEt8cI5oaJmZJkwEQzTd9ZKnrAWeDPywZX9PfQvpeeNMefsX666/Q67s/jq+NU887BJHT7Vi3Rcr94oZDdvVvyM/dAupwn1Zbg+e5CizlcOauBRHRk7WaptCWZ3ajNFpHkNUiB6Rc73Joji9xNKVUqM3AQVtSiGm9dj5gh/tkCYCvvPCaWVlHvSeew1B7bmT3VcKq/3qzD4vbhee2/PJjfEE3PYXBsszBhbz00Zy/UsU1EwucfkwPZDvykiTdUzwu6SZXpDFhGQzyfE1ah8Xf/n7qLr9G8iSIhBKAF2XfZ9D/OZeZJCZ1Buk2zTJoyGaX4XchE72V0e60UfDOyZJQxQkQQggP6ufT4nXZTF3t+szu1dPtEPUD72Te4y56qozSnB2iR50UtprtMqP5MwPa+ryMn7KRe3pHx9t7TyKJv5Ey0yzasTHJizb7z7RBvbQiVwqG0S0lPQ/txeYW0gfFlXjTBR6ALCb6zaAqfScdv/YmQyBx9ktxP6v3sy7UxSqZn20kgUigw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(136003)(376002)(346002)(451199024)(186009)(1800799009)(2906002)(26005)(7416002)(41300700001)(316002)(66476007)(66556008)(66946007)(30864003)(478600001)(5660300002)(4326008)(8676002)(8936002)(31686004)(6666004)(6486002)(6506007)(6512007)(36756003)(2616005)(83380400001)(38100700002)(31696002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VDdtMXM3dncrWmJDNXlkblYzRGxIZ01tV2N2azRmSWV4N3hKRlAwTGdXak5q?=
- =?utf-8?B?eEhULzd3a2lNeStPeFJqNy9qWWhDZ1VubzZoWHdodHFrNjdld1kzSjFCblM2?=
- =?utf-8?B?aWYwSTBLMVo1aGhpekl4ZFVWSWY0MitodlZqTy9Od2dTOXpoTSt1cHIvQUJS?=
- =?utf-8?B?YnBRVkp6dHR1TzZNd3I5aFY4VXJqc05INTB2R0R0bTRQUTlnUURIK0REM3BD?=
- =?utf-8?B?NUZ4VC9mZWlKbnk4UzdtVExFR3loem80SGM3ZktmU3A2UE5BM0NkbUI2b0dp?=
- =?utf-8?B?ZmF5SktVQWxCcFdXd3FEOVJ0MXNGNzVDalBWWVBOeFgwVHFJK0h0NmlXcGdz?=
- =?utf-8?B?WW12NEpsc0tkTXYrTzBXdXB2YzFlTHdnNEhkWEw4N0pxVlNZYTZNV0VHcW9H?=
- =?utf-8?B?UGlZT0lKdDAwT2xOZk9zRGNsSkFvbEpwRExVMDUrRkVNV3hPT0VYSzBNUlV3?=
- =?utf-8?B?bWlYVUtHV21GaWFWMWp1NEZjQjVJcWtKWnY0dDhtNjRBZ1NyYzlsUkt2eDNv?=
- =?utf-8?B?L0YvMVJtT05HUGlNb1o2ZFVZSGVrWVAyeG1TLzM3OHd6WFgrVWhQTVh4NER3?=
- =?utf-8?B?bE41RHpnUTNid3Fvb3FOU1R1Y0w2dTFsR0VITlJxNVZQc0V6bUkvcVd1MlRh?=
- =?utf-8?B?KzNzbS85NG10bjJnZUx4bDVpbG40WEYxZHFVTEpyb2tUT2xMaUxVZ1pOd3Bw?=
- =?utf-8?B?WW5wN0ZTQU5mT1VPVXdoS0o2Um5CVzloWE5ZdWg0V3hsWTBVK3VVZ0J1N1Uz?=
- =?utf-8?B?Um8vamhvL09WVUtRMWNFcWU0R1dPMUxCL2Iyc0xuOFpaNWxhNTZUN1ZzaVFr?=
- =?utf-8?B?OXJLeTJJelFiZnBUL3RGUW05YlM0dDA0OER2NEQ0NnlzZTlCcnlXZkZINlV3?=
- =?utf-8?B?bzMvbDJtSXVIL0NpSExKd2lFbjc1QzB2M3M1OWFNbFBJTERUNWxPZTYxbXAz?=
- =?utf-8?B?R1NyOExMay9SaDRrQjJhVjEvaDdjeC9CTUkvUlNPSmVXWWcyQ0NnOW5vNWpB?=
- =?utf-8?B?a2FERFp6KzhEdWl3Vkg4QjE2MFBLZVVWcnFYNEtyUDlrSjZSSDJvd2ZrSUll?=
- =?utf-8?B?WlFTYTMzMU1sVm8yaFVHUHliRE1WTnlQSHhWY3VCQ1o5bTNOWlZaMllBT0Vn?=
- =?utf-8?B?SElqaEFkTnJMYVZ0Z1JwNG54WHhTSlBkUVc3TkYwZkdjYWlOaUZ3M05ybXFw?=
- =?utf-8?B?Uk44Q2cwWjQ0UVZndXNFOTZkenBpSVltRVVUQlNpRnhyZ3JnU3BMelByWkNI?=
- =?utf-8?B?Tm5rMlVEd2pQdm1HV1lUU1R2Rm9yUGNpVFE1Z21MeVNLWER1Y1grUC9sN3VR?=
- =?utf-8?B?blZuS3RiWndHZUZxa2YrbmNFeGZNVFdUZ25XNzJTU21PRGl4UXRmbVV1Wi8v?=
- =?utf-8?B?TGZxWW8raHJCTzl5dWRHTkl6cGJTa0RrcUVJUjlxbkJOZFBGakhkL3k5QXZD?=
- =?utf-8?B?RmZucERxMzZLRHVYWE12K1NRVXl1WlY2STIxTThpa0dJRkR1bTJON3RPQWFC?=
- =?utf-8?B?MHlyc1UzcDlTVE03Q2ZaMnRqanFyU05vKzRieDNMaXVvclB1UG51Tjh3T0hn?=
- =?utf-8?B?ZW02VDBVSldRV3A1Q2dVOHhoUEhHTmRmc2pqNDg2RWhFTEFaZUlxd3Q1ejNp?=
- =?utf-8?B?MGFMekFMMGpaNHYySmtOb1BIb3MzU25aM3VOTWF6ZFlhTE55b0d1cXdMM0JH?=
- =?utf-8?B?WnlaS3cvSFkxWjVsQnZyMm9HV0pEdldGZkl3cy9najRVbXFmaS9VWUQ4Zm5K?=
- =?utf-8?B?NVBQTmh0Tkc0VERwMmI0TndDelMzeUplK1B0S0VOMUdTYXduS1YvcmVtZnhT?=
- =?utf-8?B?NkdydXFhTnpSeWFPc3l5YUJPMS9EK2hHanNOQ0doSDM3cFdNVDRMN29VSTcw?=
- =?utf-8?B?WlcwQUJWaFZCdUkyUE1lQVI1Tm0ydWxBcldiNGRDK2ExNHpURkQ5Z204RDZN?=
- =?utf-8?B?azNmcE5VKzFYVkx3aEpzcjZIOWRxWnF0SGg3Nzd6eitpbGQzUmUzRVZxTjMx?=
- =?utf-8?B?bDZENVJ0YnpLTm1ja09hbGhFenZFaGl1M0J6RXFjV2lWTStFdGpubXhUOW1s?=
- =?utf-8?B?Z0t1MDkwcE05dlFaODVlOGF4Qm5HRG5Yc01UNGhHc3ZzWVdCTHVUMU9PblpB?=
- =?utf-8?Q?u5slMOkIqMlESp/oLFDsr7pwR?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5f45da3-a86e-4376-8782-08dbb2bac806
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 11:32:29.4141
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b23bd876-c06c-4349-c3a7-08dbb2bc0eb3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2023 11:41:37.2928
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FbZFS84XHWbUxsYlrE3k/0vsB2JCAdatTcksU9yJrIr5CDQsoXEdK9V9qcFw7fg/Mslh400zwD5LnN8/vhgL0A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9096
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zFm6NfjiJUoqg2oSEKW3b+BIsUAZd8SJIfhlXE3P7HswE291IoPeQiYNwSGr6pRTdN1eM1ZtUTpHvwO76s3A6w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4687
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 25.08.23 г. 15:14 ч., Kai Huang wrote:
-> Add documentation for TDX host kernel support.  There is already one
-> file Documentation/x86/tdx.rst containing documentation for TDX guest
-> internals.  Also reuse it for TDX host kernel support.
-> 
-> Introduce a new level menu "TDX Guest Support" and move existing
-> materials under it, and add a new menu for TDX host kernel support.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->   Documentation/arch/x86/tdx.rst | 184 +++++++++++++++++++++++++++++++--
->   1 file changed, 173 insertions(+), 11 deletions(-)
-> 
-> diff --git a/Documentation/arch/x86/tdx.rst b/Documentation/arch/x86/tdx.rst
-> index dc8d9fd2c3f7..ae83ad8bd17c 100644
-> --- a/Documentation/arch/x86/tdx.rst
-> +++ b/Documentation/arch/x86/tdx.rst
-> @@ -10,6 +10,168 @@ encrypting the guest memory. In TDX, a special module running in a special
->   mode sits between the host and the guest and manages the guest/host
->   separation.
->   
-> +TDX Host Kernel Support
-> +=======================
-> +
-> +TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM) and
-> +a new isolated range pointed by the SEAM Ranger Register (SEAMRR).  A
-> +CPU-attested software module called 'the TDX module' runs inside the new
-> +isolated range to provide the functionalities to manage and run protected
-> +VMs.
-> +
-> +TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
-> +provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
-> +as TDX private KeyIDs, which are only accessible within the SEAM mode.
-> +BIOS is responsible for partitioning legacy MKTME KeyIDs and TDX KeyIDs.
-> +
-> +Before the TDX module can be used to create and run protected VMs, it
-> +must be loaded into the isolated range and properly initialized.  The TDX
-> +architecture doesn't require the BIOS to load the TDX module, but the
-> +kernel assumes it is loaded by the BIOS.
-> +
-> +TDX boot-time detection
-> +-----------------------
-> +
-> +The kernel detects TDX by detecting TDX private KeyIDs during kernel
-> +boot.  Below dmesg shows when TDX is enabled by BIOS::
-> +
-> +  [..] tdx: BIOS enabled: private KeyID range: [16, 64).
-> +
-> +TDX module initialization
-> +---------------------------------------
-> +
-> +The kernel talks to the TDX module via the new SEAMCALL instruction.  The
-> +TDX module implements SEAMCALL leaf functions to allow the kernel to
-> +initialize it.
-> +
-> +If the TDX module isn't loaded, the SEAMCALL instruction fails with a
-> +special error.  In this case the kernel fails the module initialization
-> +and reports the module isn't loaded::
-> +
-> +  [..] tdx: SEAMCALL failed: TDX Module not loaded.
-> +
-> +Initializing the TDX module consumes roughly ~1/256th system RAM size to
-> +use it as 'metadata' for the TDX memory.  It also takes additional CPU
-> +time to initialize those metadata along with the TDX module itself.  Both
-> +are not trivial.  The kernel initializes the TDX module at runtime on
-> +demand.
-> +
-> +Besides initializing the TDX module, a per-cpu initialization SEAMCALL
-> +must be done on one cpu before any other SEAMCALLs can be made on that
-> +cpu.
-> +
-> +The kernel provides two functions, tdx_enable() and tdx_cpu_enable() to
-> +allow the user of TDX to enable the TDX module and enable TDX on local
-> +cpu.
-> +
-> +Making SEAMCALL requires the CPU already being in VMX operation (VMXON
-> +has been done).  For now both tdx_enable() and tdx_cpu_enable() don't
-> +handle VMXON internally, but depends on the caller to guarantee that.
-Isn't this an implementation detail. It's fine mentioning that TDX 
-requires VMX being enabled but whether it's being handled by current 
-code or not is an implementation details. I think this is better left as 
-a comment in the code rather than in the doc, it will likely quickly go 
-stale.
-
-> +
-> +To enable TDX, the caller of TDX should: 1) hold read lock of CPU hotplug
-
-nit: Hold CPU hotplug lock in read mode. And again, this is more of an 
-implementation details, the important bit is that cpu hotplug must be 
-blocked while enabling is in progress, no?
-
-> +lock; 2) do VMXON and tdx_enable_cpu() on all online cpus successfully;
-> +3) call tdx_enable().  For example::
-> +
-> +        cpus_read_lock();
-> +        on_each_cpu(vmxon_and_tdx_cpu_enable());
-> +        ret = tdx_enable();
-> +        cpus_read_unlock();
-> +        if (ret)
-> +                goto no_tdx;
-> +        // TDX is ready to use
-> +
-> +And the caller of TDX must guarantee the tdx_cpu_enable() has been
-> +successfully done on any cpu before it wants to run any other SEAMCALL.
-> +A typical usage is do both VMXON and tdx_cpu_enable() in CPU hotplug
-> +online callback, and refuse to online if tdx_cpu_enable() fails.
-> +
-> +User can consult dmesg to see whether the TDX module has been initialized.
-> +
-> +If the TDX module is initialized successfully, dmesg shows something
-> +like below::
-> +
-> +  [..] tdx: TDX module: attributes 0x0, vendor_id 0x8086, major_version 1, minor_version 0, build_date 20211209, build_num 160
-> +  [..] tdx: 262668 KBs allocated for PAMT.
-> +  [..] tdx: module initialized.
-> +
-> +If the TDX module failed to initialize, dmesg also shows it failed to
-> +initialize::
-> +
-> +  [..] tdx: module initialization failed ...
-
-nit: You give specific strings which tdx is going to use, of course 
-those can change and will go stale here. Instead, perhaps just 
-mentioning that the dmesg is going to be contains a message signifying 
-error or success.
-> +
-> +TDX Interaction to Other Kernel Components
-> +------------------------------------------
-> +
-> +TDX Memory Policy
-> +~~~~~~~~~~~~~~~~~
-> +
-> +TDX reports a list of "Convertible Memory Region" (CMR) to tell the
-> +kernel which memory is TDX compatible.  The kernel needs to build a list
-> +of memory regions (out of CMRs) as "TDX-usable" memory and pass those
-> +regions to the TDX module.  Once this is done, those "TDX-usable" memory
-> +regions are fixed during module's lifetime.
-> +
-> +To keep things simple, currently the kernel simply guarantees all pages
-> +in the page allocator are TDX memory.  Specifically, the kernel uses all
-> +system memory in the core-mm at the time of initializing the TDX module
-> +as TDX memory, and in the meantime, refuses to online any non-TDX-memory
-> +in the memory hotplug.
-> +
-> +This can be enhanced in the future, i.e. by allowing adding non-TDX
-> +memory to a separate NUMA node.  In this case, the "TDX-capable" nodes
-> +and the "non-TDX-capable" nodes can co-exist, but the kernel/userspace
-> +needs to guarantee memory pages for TDX guests are always allocated from
-> +the "TDX-capable" nodes.
-> +
-> +Physical Memory Hotplug
-> +~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +Note TDX assumes convertible memory is always physically present during
-> +machine's runtime.  A non-buggy BIOS should never support hot-removal of
-> +any convertible memory.  This implementation doesn't handle ACPI memory
-> +removal but depends on the BIOS to behave correctly.
-> +
-> +CPU Hotplug
-> +~~~~~~~~~~~
-> +
-> +TDX module requires the per-cpu initialization SEAMCALL (TDH.SYS.LP.INIT)
-> +must be done on one cpu before any other SEAMCALLs can be made on that
-> +cpu, including those involved during the module initialization.
-> +
-> +The kernel provides tdx_cpu_enable() to let the user of TDX to do it when
-> +the user wants to use a new cpu for TDX task.
-> +
-> +TDX doesn't support physical (ACPI) CPU hotplug.  During machine boot,
-> +TDX verifies all boot-time present logical CPUs are TDX compatible before
-> +enabling TDX.  A non-buggy BIOS should never support hot-add/removal of
-> +physical CPU.  Currently the kernel doesn't handle physical CPU hotplug,
-> +but depends on the BIOS to behave correctly.
-> +
-> +Note TDX works with CPU logical online/offline, thus the kernel still
-> +allows to offline logical CPU and online it again.
-> +
-> +Kexec()
-> +~~~~~~~
-> +
-> +There are two problems in terms of using kexec() to boot to a new kernel
-> +when the old kernel has enabled TDX: 1) Part of the memory pages are
-> +still TDX private pages; 2) There might be dirty cachelines associated
-> +with TDX private pages.
-> +
-> +The first problem doesn't matter.  KeyID 0 doesn't have integrity check.
-> +Even the new kernel wants use any non-zero KeyID, it needs to convert
-> +the memory to that KeyID and such conversion would work from any KeyID.
-> +
-> +However the old kernel needs to guarantee there's no dirty cacheline
-> +left behind before booting to the new kernel to avoid silent corruption
-> +from later cacheline writeback (Intel hardware doesn't guarantee cache
-> +coherency across different KeyIDs).
-> +
-> +Similar to AMD SME, the kernel just uses wbinvd() to flush cache before
-> +booting to the new kernel.
-> +
-> +TDX Guest Support
-> +=================
->   Since the host cannot directly access guest registers or memory, much
->   normal functionality of a hypervisor must be moved into the guest. This is
->   implemented using a Virtualization Exception (#VE) that is handled by the
-> @@ -20,7 +182,7 @@ TDX includes new hypercall-like mechanisms for communicating from the
->   guest to the hypervisor or the TDX module.
->   
->   New TDX Exceptions
-> -==================
-> +------------------
->   
->   TDX guests behave differently from bare-metal and traditional VMX guests.
->   In TDX guests, otherwise normal instructions or memory accesses can cause
-> @@ -30,7 +192,7 @@ Instructions marked with an '*' conditionally cause exceptions.  The
->   details for these instructions are discussed below.
->   
->   Instruction-based #VE
-> ----------------------
-> +~~~~~~~~~~~~~~~~~~~~~
->   
->   - Port I/O (INS, OUTS, IN, OUT)
->   - HLT
-> @@ -41,7 +203,7 @@ Instruction-based #VE
->   - CPUID*
->   
->   Instruction-based #GP
-> ----------------------
-> +~~~~~~~~~~~~~~~~~~~~~
->   
->   - All VMX instructions: INVEPT, INVVPID, VMCLEAR, VMFUNC, VMLAUNCH,
->     VMPTRLD, VMPTRST, VMREAD, VMRESUME, VMWRITE, VMXOFF, VMXON
-> @@ -52,7 +214,7 @@ Instruction-based #GP
->   - RDMSR*,WRMSR*
->   
->   RDMSR/WRMSR Behavior
-> ---------------------
-> +~~~~~~~~~~~~~~~~~~~~
->   
->   MSR access behavior falls into three categories:
->   
-> @@ -73,7 +235,7 @@ trapping and handling in the TDX module.  Other than possibly being slow,
->   these MSRs appear to function just as they would on bare metal.
->   
->   CPUID Behavior
-> ---------------
-> +~~~~~~~~~~~~~~
->   
->   For some CPUID leaves and sub-leaves, the virtualized bit fields of CPUID
->   return values (in guest EAX/EBX/ECX/EDX) are configurable by the
-> @@ -93,7 +255,7 @@ not know how to handle. The guest kernel may ask the hypervisor for the
->   value with a hypercall.
->   
->   #VE on Memory Accesses
-> -======================
-> +----------------------
->   
->   There are essentially two classes of TDX memory: private and shared.
->   Private memory receives full TDX protections.  Its content is protected
-> @@ -107,7 +269,7 @@ entries.  This helps ensure that a guest does not place sensitive
->   information in shared memory, exposing it to the untrusted hypervisor.
->   
->   #VE on Shared Memory
-> ---------------------
-> +~~~~~~~~~~~~~~~~~~~~
->   
->   Access to shared mappings can cause a #VE.  The hypervisor ultimately
->   controls whether a shared memory access causes a #VE, so the guest must be
-> @@ -127,7 +289,7 @@ be careful not to access device MMIO regions unless it is also prepared to
->   handle a #VE.
->   
->   #VE on Private Pages
-> ---------------------
-> +~~~~~~~~~~~~~~~~~~~~
->   
->   An access to private mappings can also cause a #VE.  Since all kernel
->   memory is also private memory, the kernel might theoretically need to
-> @@ -145,7 +307,7 @@ The hypervisor is permitted to unilaterally move accepted pages to a
->   to handle the exception.
->   
->   Linux #VE handler
-> -=================
-> +-----------------
->   
->   Just like page faults or #GP's, #VE exceptions can be either handled or be
->   fatal.  Typically, an unhandled userspace #VE results in a SIGSEGV.
-> @@ -167,7 +329,7 @@ While the block is in place, any #VE is elevated to a double fault (#DF)
->   which is not recoverable.
->   
->   MMIO handling
-> -=============
-> +-------------
->   
->   In non-TDX VMs, MMIO is usually implemented by giving a guest access to a
->   mapping which will cause a VMEXIT on access, and then the hypervisor
-> @@ -189,7 +351,7 @@ MMIO access via other means (like structure overlays) may result in an
->   oops.
->   
->   Shared Memory Conversions
-> -=========================
-> +-------------------------
->   
->   All TDX guest memory starts out as private at boot.  This memory can not
->   be accessed by the hypervisor.  However, some kernel users like device
+T24gRnJpLCAyMDIzLTA5LTA4IGF0IDA5OjIxIC0wNzAwLCBEYXZlIEhhbnNlbiB3cm90ZToNCj4g
+T24gOC8yNS8yMyAwNToxNCwgS2FpIEh1YW5nIHdyb3RlOg0KPiA+IFNvbWUgU0VBTUNBTExzIHVz
+ZSB0aGUgUkRSQU5EIGhhcmR3YXJlIGFuZCBjYW4gZmFpbCBmb3IgdGhlIHNhbWUgcmVhc29ucw0K
+PiA+IGFzIFJEUkFORC4gIFVzZSB0aGUga2VybmVsIFJEUkFORCByZXRyeSBsb2dpYyBmb3IgdGhl
+bS4NCj4gPiANCj4gPiBUaGVyZSBhcmUgdGhyZWUgX19zZWFtY2FsbCooKSB2YXJpYW50cy4gIEFk
+ZCBhIG1hY3JvIHRvIGRvIHRoZSBTRUFNQ0FMTA0KPiA+IHJldHJ5IGluIHRoZSBjb21tb24gY29k
+ZSBhbmQgZGVmaW5lIGEgd3JhcHBlciBmb3IgZWFjaCBfX3NlYW1jYWxsKigpDQo+ID4gdmFyaWFu
+dC4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBLYWkgSHVhbmcgPGthaS5odWFuZ0BpbnRlbC5j
+b20+DQo+ID4gLS0tDQo+ID4gDQo+ID4gdjEyIC0+IHYxMzoNCj4gPiAgLSBOZXcgaW1wbGVtZW50
+YXRpb24gZHVlIHRvIFREQ0FMTCBhc3NlbWJseSBzZXJpZXMuDQo+ID4gDQo+ID4gLS0tDQo+ID4g
+IGFyY2gveDg2L2luY2x1ZGUvYXNtL3RkeC5oIHwgMjcgKysrKysrKysrKysrKysrKysrKysrKysr
+KysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyNyBpbnNlcnRpb25zKCspDQo+ID4gDQo+ID4gZGlm
+ZiAtLWdpdCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL3RkeC5oIGIvYXJjaC94ODYvaW5jbHVkZS9h
+c20vdGR4LmgNCj4gPiBpbmRleCBhMjUyMzI4NzM0YzcuLmNmYWU4YjMxYTJlOSAxMDA2NDQNCj4g
+PiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS90ZHguaA0KPiA+ICsrKyBiL2FyY2gveDg2L2lu
+Y2x1ZGUvYXNtL3RkeC5oDQo+ID4gQEAgLTI0LDYgKzI0LDExIEBADQo+ID4gICNkZWZpbmUgVERY
+X1NFQU1DQUxMX0dQCQkJKFREWF9TV19FUlJPUiB8IFg4Nl9UUkFQX0dQKQ0KPiA+ICAjZGVmaW5l
+IFREWF9TRUFNQ0FMTF9VRAkJCShURFhfU1dfRVJST1IgfCBYODZfVFJBUF9VRCkNCj4gPiAgDQo+
+ID4gKy8qDQo+ID4gKyAqIFREWCBtb2R1bGUgU0VBTUNBTEwgbGVhZiBmdW5jdGlvbiBlcnJvciBj
+b2Rlcw0KPiA+ICsgKi8NCj4gPiArI2RlZmluZSBURFhfUk5EX05PX0VOVFJPUFkJMHg4MDAwMDIw
+MzAwMDAwMDAwVUxMDQo+ID4gKw0KPiA+ICAjaWZuZGVmIF9fQVNTRU1CTFlfXw0KPiA+ICANCj4g
+PiAgLyoNCj4gPiBAQCAtODIsNiArODcsMjggQEAgdTY0IF9fc2VhbWNhbGwodTY0IGZuLCBzdHJ1
+Y3QgdGR4X21vZHVsZV9hcmdzICphcmdzKTsNCj4gPiAgdTY0IF9fc2VhbWNhbGxfcmV0KHU2NCBm
+biwgc3RydWN0IHRkeF9tb2R1bGVfYXJncyAqYXJncyk7DQo+ID4gIHU2NCBfX3NlYW1jYWxsX3Nh
+dmVkX3JldCh1NjQgZm4sIHN0cnVjdCB0ZHhfbW9kdWxlX2FyZ3MgKmFyZ3MpOw0KPiA+ICANCj4g
+PiArI2luY2x1ZGUgPGFzbS9hcmNocmFuZG9tLmg+DQo+ID4gKw0KPiA+ICsjZGVmaW5lIFNFQU1D
+QUxMX05PX0VOVFJPUFlfUkVUUlkoX19zZWFtY2FsbF9mdW5jLCBfX2ZuLCBfX2FyZ3MpCVwNCj4g
+PiArKHsJCQkJCQkJCQlcDQo+ID4gKwlpbnQgX19fcmV0cnkgPSBSRFJBTkRfUkVUUllfTE9PUFM7
+CQkJCVwNCj4gPiArCXU2NCBfX19zcmV0OwkJCQkJCQlcDQo+ID4gKwkJCQkJCQkJCVwNCj4gPiAr
+CWRvIHsJCQkJCQkJCVwNCj4gPiArCQlfX19zcmV0ID0gX19zZWFtY2FsbF9mdW5jKChfX2ZuKSwg
+KF9fYXJncykpOwkJXA0KPiA+ICsJfSB3aGlsZSAoX19fc3JldCA9PSBURFhfUk5EX05PX0VOVFJP
+UFkgJiYgLS1fX19yZXRyeSk7CQlcDQo+ID4gKwlfX19zcmV0OwkJCQkJCQlcDQo+ID4gK30pDQo+
+IA0KPiBUaGlzIGlzIGEgKkxPVCogbGVzcyBleWUtYmxlZWR5IGlmIHlvdSBkbyBpdCB3aXRob3V0
+IG1hY3JvczoNCj4gDQo+IA0KPiB0eXBlZGVmIHU2NCAoKnNjX2Z1bmNfdCkodTY0IGZuLCBzdHJ1
+Y3QgdGR4X21vZHVsZV9hcmdzICphcmdzKTsNCj4gDQo+IHN0YXRpYyBpbmxpbmUNCj4gdTY0IHNj
+X3JldHJ5KHNjX2Z1bmNfdCBmdW5jLCB1NjQgZm4sIHN0cnVjdCB0ZHhfbW9kdWxlX2FyZ3MgKmFy
+Z3MpDQo+IHsNCj4gICAgICAgICBpbnQgcmV0cnkgPSBSRFJBTkRfUkVUUllfTE9PUFM7DQo+ICAg
+ICAgICAgdTY0IHJldDsNCj4gDQo+ICAgICAgICAgZG8gew0KPiAgICAgICAgICAgICAgICAgcmV0
+ID0gZnVuYyhmbiwgYXJncyk7DQo+ICAgICAgICAgfSB3aGlsZSAocmV0ID09IFREWF9STkRfTk9f
+RU5UUk9QWSAmJiAtLXJldHJ5KTsNCj4gDQo+ICAgICAgICAgcmV0dXJuIHJldDsNCj4gfQ0KPiAN
+Cj4gI2RlZmluZSBzZWFtY2FsbChfZm4sIF9hcmdzKSAgICAgICAgICAgc2NfcmV0cnkoX3NlYW1j
+YWxsLA0KPiAoX2ZuKSwgKF9hcmdzKSkNCj4gI2RlZmluZSBzZWFtY2FsbF9yZXQoX2ZuLCBfYXJn
+cykgICAgICAgc2NfcmV0cnkoX3NlYW1jYWxsX3JldCwNCj4gKF9mbiksIChfYXJncykpDQo+ICNk
+ZWZpbmUgc2VhbWNhbGxfc2F2ZWRfcmV0KF9mbiwgX2FyZ3MpIHNjX3JldHJ5KF9zZWFtY2FsbF9z
+YXZlZF9yZXQsDQo+IChfZm4pLCAoX2FyZ3MpKQ0KPiANCj4gVGhlIGNvbXBpbGVyIGNhbiBmaWd1
+cmUgaXQgb3V0IGFuZCBhdm9pZCBtYWtpbmcgZnVuYygpIGFuIGluZGlyZWN0IGNhbGwNCj4gc2lu
+Y2UgaXQga25vd3MgdGhlIGNhbGwgbG9jYXRpb24gYXQgY29tcGlsZSB0aW1lLg0KDQpJbmRpcmVj
+dCBjYWxsIHdhcyBhIGNvbmNlcm4gd2hlbiBJIHdhcyBpbXBsZW1lbnRpbmcgdGhvc2UuICBJIGRp
+ZG4ndCBrbm93IGZvciANCnN1cmUgdGhhdCB0aGUgY29tcGlsZXIgY2FuIGF2b2lkIGl0LiAgSSds
+bCBjaGFuZ2UgdG8gdXNlIGFib3ZlLiAgVGhhbmtzIQ0KDQo+IA0KPiBZb3UgY2FuIGFsc28gZG8g
+dGhlIHNlYW1jYWxsKCkgI2RlZmluZSBhcyBhIHN0YXRpYyBpbmxpbmUsIGJ1dCBpdCBkb2VzDQo+
+IHRha2UgdXAgbW9yZSBzY3JlZW4gcmVhbCBlc3RhdGUuICBPaCwgYW5kIGdvaW5nIGEgd2VlIGJp
+dCBvdmVyIDgwDQo+IGNvbHVtbnMgaXMgT0sgZm9yIHRob3NlICNkZWZpbmVzLg0KDQpZZXMgSSB2
+ZXJpZmllZCB0aGUgY2hlY2twYXRjaC5wbCB3b3VsZG4ndCBjb21wbGFpbiBpZiB0aGUgI2RlZmlu
+ZSBleGNlZWRlZCA4MA0KY2hhcmFjdGVycyBpbiBvbmUgbGluZS4gIEknbGwgdXNlICNkZWZpbmUu
+ICBUaGFua3MhDQo=
