@@ -2,143 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3B0479B358
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 825C279ADC4
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:40:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235358AbjIKUtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:49:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52544 "EHLO
+        id S235830AbjIKUtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:49:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236959AbjIKLox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 07:44:53 -0400
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5AF8CDD;
-        Mon, 11 Sep 2023 04:44:49 -0700 (PDT)
-Received: by mail-pj1-x1043.google.com with SMTP id 98e67ed59e1d1-26f3975ddd4so3375886a91.1;
-        Mon, 11 Sep 2023 04:44:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694432689; x=1695037489; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XS4l8NjypD0OWjSmUSnK/9QZ38cmUYdqmRK9Wl6+lME=;
-        b=g4mI7GMqGPcjyt9bL2hFhwZ5I0FxVmC9Z//XgV1dwjW/DqufL3KaH049HPxrSh2U/a
-         RMiwUeQRyrEio9CoUTwcRnPZthh2SbXFzkI/5lD6LXCFpas2q/DZRkp/kOHvnlwLL53N
-         F+LA0/KRXN6wVWGdfX7wn3zE0BZ6wF89Pqji2hATBlv9Sdhm4NI0stak9ZwkpGykl96r
-         2QN0l4lvrWyTMpo2rosn4xqcomh1PhISUCPPgAhOBSuUCngGPmFkgbLIfX2MImIcUXZB
-         puOvR1XiX7bPbK9YNkHToXQajWj/DR4jL8Q2vVMWKj/lXkLWV40yHJ2FAsaLVjezglz/
-         65RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694432689; x=1695037489;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XS4l8NjypD0OWjSmUSnK/9QZ38cmUYdqmRK9Wl6+lME=;
-        b=xUeRof2/o2TUvqFyBZMyYWwtP9pcYhYdXcVNpucJ7TJDIs+g8iE2I4Q6YgyXcepO04
-         LM3RcdZeiCX916iobWVZyb57/ir6ZqYYDFufeMFp6isAZGvHbi/DmVLJJL9EEOlxzRil
-         QyO/kgUy+0m7rcrTXOYk9qeSV9WQd3iqHxT93/zwA76tWjkMXoTXx7RXr/rLOFhriBNC
-         La2ncPptAHHgugo0nmb4EL9a/fsq18rP/ZwAWYlRcADKFj+Xbltmf8yH+WzyA+iqA6ju
-         j/J/Vbf0CFZKNhb+qBFdVyHiAtFiyygqKAlNfKlXdStd9BC0kuijPCwlziLaNWlmgauM
-         WHPQ==
-X-Gm-Message-State: AOJu0YyXbkvhFB4b5LxXCMy7VBfRVoNtsTltDPYOq1ZF+MsjaTc2jL7l
-        tmrzkPTbgOEjz2dQMOHv/Vo8yCb/Oa6IRb2H
-X-Google-Smtp-Source: AGHT+IEm5WNIXk0lYZ5DBRk4aFK9xALQuUJIbtn8h0hpFzKcdBtiBcy63vgdALyHL4Iun1GKjH9LGg==
-X-Received: by 2002:a17:90a:289:b0:262:fc8a:ed1 with SMTP id w9-20020a17090a028900b00262fc8a0ed1mr8879745pja.44.1694432689300;
-        Mon, 11 Sep 2023 04:44:49 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id b9-20020a17090a10c900b00273f65fa424sm3855390pje.8.2023.09.11.04.44.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 04:44:48 -0700 (PDT)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 7/9] KVM: selftests: Test consistency of CPUID with num of fixed counters
-Date:   Mon, 11 Sep 2023 19:43:45 +0800
-Message-Id: <20230911114347.85882-8-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230911114347.85882-1-cloudliang@tencent.com>
-References: <20230911114347.85882-1-cloudliang@tencent.com>
+        with ESMTP id S237385AbjIKMqh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 08:46:37 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782E210E;
+        Mon, 11 Sep 2023 05:46:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694436392; x=1725972392;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=XG3f/Go4Kskr9FPWHx1DIAciSaD0sIA1smH1YceAZ4E=;
+  b=DXPDcL18Jf2M4EiM+0W6mNcnIKPagObXVag/Kzj17D//Vtik1vqRgai/
+   7u/CEJaLgwlLx+OkJS1YFFLDbW8O/X2QZMjznQk1NFfpDbQ1DrqxfmJDB
+   IDGgkaJiXaeLyEfUg94KopkNzqXCtg7dOmb/Wq9/VvVCyuXl3NizWImEx
+   5DQ2tNA10Ln7+QMo5QttRWK+HN9k3KPUg1ri6tfmc/RrM75aPG+d9WVJy
+   lGF0xSoRWROWExpm65KPof2041bJ5aTCw/WXUQ2Vk87aORj8YuT4G8pnn
+   m0SjQec5y0dFl+XRiq2ywZ8Lw9zvplM1EJ9FkWAtBgbwLYLVST/RHWMuY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="409038057"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="409038057"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 05:46:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="808815482"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="808815482"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.28.234]) ([10.255.28.234])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 05:46:28 -0700
+Message-ID: <eca39154-bc45-3c7d-88a9-b377f4d248f9@linux.intel.com>
+Date:   Mon, 11 Sep 2023 20:46:26 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 09/10] iommu: Make iommu_queue_iopf() more generic
+Content-Language: en-US
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <20230825023026.132919-1-baolu.lu@linux.intel.com>
+ <20230825023026.132919-10-baolu.lu@linux.intel.com>
+ <BN9PR11MB52762A33BC9F41AB424915688CE3A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <cfd9e0b8-167e-a79b-9ef1-b3bfa38c9199@linux.intel.com>
+ <BN9PR11MB5276926066CC3A8FCCFD3DB08CE6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ed11a5c4-7256-e6ea-e94e-0dfceba6ddbf@linux.intel.com>
+ <BN9PR11MB5276622C8271402487FA44708CE4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <c9228377-0a5c-adf8-d0ef-9a791226603d@linux.intel.com>
+ <BN9PR11MB52764790D53DF8AB4ED417098CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB52764790D53DF8AB4ED417098CF2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
+On 2023/9/11 14:57, Tian, Kevin wrote:
+>> From: Baolu Lu <baolu.lu@linux.intel.com>
+>> Sent: Tuesday, September 5, 2023 1:24 PM
+>>
+>> Hi Kevin,
+>>
+>> I am trying to address this issue in below patch. Does it looks sane to
+>> you?
+>>
+>> iommu: Consolidate per-device fault data management
+>>
+>> The per-device fault data is a data structure that is used to store
+>> information about faults that occur on a device. This data is allocated
+>> when IOPF is enabled on the device and freed when IOPF is disabled. The
+>> data is used in the paths of iopf reporting, handling, responding, and
+>> draining.
+>>
+>> The fault data is protected by two locks:
+>>
+>> - dev->iommu->lock: This lock is used to protect the allocation and
+>>     freeing of the fault data.
+>> - dev->iommu->fault_parameter->lock: This lock is used to protect the
+>>     fault data itself.
+>>
+>> Improve the iopf code to enforce this lock mechanism and add a reference
+>> counter in the fault data to avoid use-after-free issue.
+>>
+> 
+> Can you elaborate the use-after-free issue and why a new user count
+> is required?
 
-Add test to check if non-existent counters can be accessed in guest after
-determining the number of Intel generic performance counters by CPUID.
-Per SDM, fixed-function performance counter 'i' is supported if ECX[i] ||
-(EDX[4:0] > i). KVM doesn't emulate more counters than it can support.
+I was concerned that when iommufd uses iopf, page fault report/response
+may occur simultaneously with enable/disable PRI.
 
-Co-developed-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 28 +++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Currently, this is not an issue as the enable/disable PRI is in its own
+path. In the future, we may discard this interface and enable PRI when
+attaching the first PRI-capable domain, and disable it when detaching
+the last PRI-capable domain.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index e636323e202c..df76f0f2bfd0 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -251,8 +251,32 @@ static void test_oob_gp_counter(uint8_t eax_gp_num, uint64_t perf_cap)
- 	kvm_vm_free(vm);
- }
- 
-+static void guest_rd_wr_fixed_counter(void)
-+{
-+	uint8_t nr_fixed_counters = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-+
-+	__guest_wrmsr_rdmsr(MSR_CORE_PERF_FIXED_CTR0, nr_fixed_counters, true);
-+}
-+
-+static void test_oob_fixed_ctr(uint8_t edx_fixed_num)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_rd_wr_fixed_counter);
-+
-+	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_FIXED_COUNTERS_BITMASK, 0);
-+	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_NR_FIXED_COUNTERS,
-+				edx_fixed_num);
-+
-+	run_vcpu(vcpu);
-+
-+	kvm_vm_free(vm);
-+}
-+
- static void test_intel_counters_num(void)
- {
-+	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
- 	uint8_t nr_gp_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
- 	unsigned int i;
- 
-@@ -271,6 +295,10 @@ static void test_intel_counters_num(void)
- 		/* KVM doesn't emulate more counters than it can support. */
- 		test_oob_gp_counter(nr_gp_counters + 1, perf_caps[i]);
- 	}
-+
-+	test_oob_fixed_ctr(0);
-+	test_oob_fixed_ctr(nr_fixed_counters);
-+	test_oob_fixed_ctr(nr_fixed_counters + 1);
- }
- 
- int main(int argc, char *argv[])
--- 
-2.39.3
+> 
+> btw a Fix tag is required given this mislocking issue has been there for
+> quite some time...
 
+I don't see any real issue fixed by this change. It's only a lock
+refactoring after the code refactoring and preparing it for iommufd use.
+Perhaps I missed anything?
+
+Best regards,
+baolu
