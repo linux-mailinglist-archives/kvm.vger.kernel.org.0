@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8FCA79AD03
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:38:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C877179AF9A
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:47:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235204AbjIKUs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42042 "EHLO
+        id S235913AbjIKUte (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:49:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235814AbjIKJkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:40:01 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2079.outbound.protection.outlook.com [40.107.93.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4190910C
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 02:39:56 -0700 (PDT)
+        with ESMTP id S235818AbjIKJkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 05:40:04 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2074.outbound.protection.outlook.com [40.107.101.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9AC102
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 02:40:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fnEBe7VrS5Znqb73skArMSONRa7L1UFRsTo21ClnvwSB1OGfFLBcsS4sC3gnAPcz5btf54KCzu5Fme6EUD7k7PI4MLiKBEtGVbIrckR2gqbMJWI/6J+TA+RIH6qOq/EOhovbvRRAtnnox1KcrzeFMFffSrogJyjTTd5wZMNvCbBjgzbG9HSQ1z96XQsbykwUiP8YGPFDpcEUxY+XG91VzOs44T9VkZhrjon7ZhU60tW7fuTcLq8aXriSdfgk4I3l4CIDHBPV5bJUvaDP0UWUtpgbk9C3BOyg2KYsoqddL/3RK5cXA3Uw5oW/JW6z8NL087xwT3E8Iwq+lieBMmZI7A==
+ b=H3PfkrHE5yZNlGUFupmGRkjWxkQIhdF73ZrJVG7XYhLq/jcZokVfdldFsI4ZvMrl3F/ENwDcgguj5vNqaTA/GMSKozNyGSZ0RjvAWExLJvZfDFqN0x739eh818JBKSuptbPQ3VpDqNq/veqPoebYYLBh1jmRHQ9Hak4omTFjRscbrEeDc7EUWYMr+4yqfgJ4VIJvu5Dw8wHk+auOS4Nxz/u8KBexiis5lTs7ctjju2qtzRxMPVAdwG/UFD+aMnFk7hB/HSs8MNbdg67u1isy1a9Oj0CmkEKs0IU4sZUXmCNzsVXfWc2MWGPy26nE7K4AccSJRO69ewJlo1THoIvdLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vE8LausPLFh5fMMZ8j0TsraGGqpk45wHR1R8uT/+T8Y=;
- b=oSHMeVMjTE9Jusns7jnvJ47NsBq3vWKWmHv1U7EysSo6NrG6RsInBcCSkCrB9RUXtfkzHDRGUn3hJ1q9168s2uaEILph7BtcZpOTfJFUevB34ToM0pdJpw3zPhzdwR4yKupqQaVY2q2dh7BI/zjz9bTaRUHrCApiPBj/ejFFVu8B24CETVNtbKmD8pRpBVPtz8WjaRgQpwBmeBKOjOvVs9EuVpWoquO9hLvJAYwtEUzypQ/tMsYfDvVl1bgOFe4YsFeN9fc2/90oeW0jeLFvbyLY7yJUCivTu8dRipZRw0/XsGUxjoYW/iwJIThHrDEDHg2IInsZP1U7+6OB97YRTQ==
+ bh=Or5AbvCH7sJ24Bq2MKMAvnM7iApt0EvyiarRXA/H41k=;
+ b=gFa76YT3bUQ7KExEHSt/5sdGg2Ak8Ao+YNOlgWDYiUhFWShu72tP1xfiUYn0lkjk7h7+H5+Xba4YkxVL7D1fV0xWxDhdBRK5qJVHjhByk79HIGOeOHzIULpNrTvn8fqiBBQ0g1tYpKfpSuduONf+3qK8FOayvmzsn7VDjpwraKNIwmvCokdaj47QSU3gj2OGZcWirLKMZaWRO1cu6EvkzggFFx0Pz6Df53OylLT/KdxR/T0zjMJPDmh+TtmgUEEDtFygVhGJ/IcyiQHBzvxYZfa8rJBMm/WOMt3GOFRpzdo9fTVcO5rjoxt6hb79vQn89l4eIt45lnsyNyPbxfjrqA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -28,18 +28,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vE8LausPLFh5fMMZ8j0TsraGGqpk45wHR1R8uT/+T8Y=;
- b=aGsSb+dYIvYVRMzynp7ejqy33yZhrexWcMyhH57WomJcKV5Sj+X8+0xgaj7swV7SKyo0SK4sfSoCxw8HBvLZ+rJqVWPZaL5x9ND7X0YqlFqCgy/Y+FSgDkyrQKr41kUMESTXd9B/EOKMp5262biV+y2f1S/ll5oVZsFRV9hPVSiq3mzcrmJFKbyOM0oEVpE6II7HpqjwWMDhgblg9FWY50ABl1xA3oEg63FAJ5gwqAw09aeWWNoNZEfdRhfthpVszN+5WBbbOwtUJV62mNEY+DnPAkYJa0dkaVbAZyHnP9lGrgeFjxspGRx0LoXRfv+pGMbswBa7vnU48JBmTWyrQg==
-Received: from MN2PR11CA0027.namprd11.prod.outlook.com (2603:10b6:208:23b::32)
- by PH7PR12MB9222.namprd12.prod.outlook.com (2603:10b6:510:2ef::8) with
+ bh=Or5AbvCH7sJ24Bq2MKMAvnM7iApt0EvyiarRXA/H41k=;
+ b=CH+yFjGWNEwykAFl/QsTxjaO8SrvZjZi72N0Ruk+9PIGVoq6q0ph44L76RDXSEo99z0ryyq+FNoipL+qcxZXEYrw8Nu9XzkopdEAUfhQXKvUizytgyqlrsj6jAZShoDOK0HPF6d0PWZXSmoCWEJ+52EVeC9TH3Yq9b/zn9qroa9KFII/b80gA9hM0uISQbRD+HQNTTI/hjyZsL1nDlYNkrvFg6ME9QkBS9tfzyHdo4iSluW3rcQBDCuFVCtjCScXiaUd7lMxPXY+Uv2sZlczLXs1swt1P+PTltxrWQOAUuGX00XlQSQQsl53tiXyHtL3FcWJYRIRBAzSFwRBmEV9tQ==
+Received: from MN2PR02CA0021.namprd02.prod.outlook.com (2603:10b6:208:fc::34)
+ by MW3PR12MB4505.namprd12.prod.outlook.com (2603:10b6:303:5a::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Mon, 11 Sep
- 2023 09:39:54 +0000
-Received: from BL6PEPF0001AB58.namprd02.prod.outlook.com
- (2603:10b6:208:23b:cafe::81) by MN2PR11CA0027.outlook.office365.com
- (2603:10b6:208:23b::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
+ 2023 09:39:58 +0000
+Received: from BL6PEPF0001AB59.namprd02.prod.outlook.com
+ (2603:10b6:208:fc:cafe::3e) by MN2PR02CA0021.outlook.office365.com
+ (2603:10b6:208:fc::34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35 via Frontend
- Transport; Mon, 11 Sep 2023 09:39:54 +0000
+ Transport; Mon, 11 Sep 2023 09:39:57 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -47,52 +47,54 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF0001AB58.mail.protection.outlook.com (10.167.241.10) with Microsoft
+ BL6PEPF0001AB59.mail.protection.outlook.com (10.167.241.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6792.16 via Frontend Transport; Mon, 11 Sep 2023 09:39:53 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ 15.20.6792.17 via Frontend Transport; Mon, 11 Sep 2023 09:39:57 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 11 Sep 2023
- 02:39:42 -0700
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ 02:39:47 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 11 Sep
- 2023 02:39:42 -0700
+ 2023 02:39:47 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
  with Microsoft SMTP Server id 15.2.986.37 via Frontend Transport; Mon, 11 Sep
- 2023 02:39:40 -0700
+ 2023 02:39:45 -0700
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
         <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
         <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH vfio 0/9] Add chunk mode support for mlx5 driver
-Date:   Mon, 11 Sep 2023 12:38:47 +0300
-Message-ID: <20230911093856.81910-1-yishaih@nvidia.com>
+Subject: [PATCH vfio 2/9] vfio/mlx5: Wake up the reader post of disabling the SAVING migration file
+Date:   Mon, 11 Sep 2023 12:38:49 +0300
+Message-ID: <20230911093856.81910-3-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20230911093856.81910-1-yishaih@nvidia.com>
+References: <20230911093856.81910-1-yishaih@nvidia.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB58:EE_|PH7PR12MB9222:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6caacd2-27c0-415d-02e9-08dbb2ab0db0
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB59:EE_|MW3PR12MB4505:EE_
+X-MS-Office365-Filtering-Correlation-Id: d06f14b6-27ad-4faa-e5c0-08dbb2ab0fcd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UMjRH8pD3jU0vPKw2nA67tBozKdrobDP7D+1QtcPbx085AUreqLDvWtzPaZoqS0VIAP6daa47fWfQ0T6SWFD0FhxpGVfd/Dzvxoy0ozH9FCrVDVBamnPElTIhKnAte6lnZasorIoqoATxTF2/lcu/9SxM/pao4mgabQKRDfWmPl2WriaekM/kF7p9MU60lJbHYQbRtbaGvmJyP+B2M052VEWa/XbHWlLpDmlmsIHHdYc9dBe4+ux5k6DvXO8e4uGLRBE4eXSIdB0XSt9dGBK7yFYnNeKVyOA+vki4ORLCbWCN6JFR5/VXwia/7v5KSYK2EHyVPVs0NNze8YgydD8xLy6UTzs7XD4KORCMVRMfc2LMIEHdjA7OtSqsttxUZPbR8HPOHedtd8nOvtN4KY8raPOFnpFTQJh1w8Jbex8as+HPEpoA4c9IU9CRIjbIxwmYy+VpM4puHsKnkwc1VHO3AZJxpDvbrwlCimthhhP5OrDb6YaMkDYqGs8Ym+mGdDec/JSVncL2VTxGRqTaDtSt1YTGEkkc8lDqQI2nCVIsWnj9CI6/XJFO74EuuyBYdYmSThuKN6iqHGKG9kznID5F845Ng6bs8KocTPp1/4K1Dkyybs+2bu7QlCzSqGhQwoRZ4Vo00KEgKujc3zGu0m9I8R/6jqHH0CEySvWuWWekMqeWXX9JMrj3I7SEJFsrkzcw8XSyKrFEd4HsVib5vkCBh6cvdKpyOsNTYDA1ml2cdkJJVTK1mjmkq7wArVG5Ndv
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(376002)(346002)(136003)(82310400011)(451199024)(186009)(1800799009)(36840700001)(40470700004)(46966006)(7696005)(83380400001)(426003)(2616005)(26005)(478600001)(336012)(110136005)(2906002)(316002)(41300700001)(6636002)(54906003)(107886003)(70586007)(8676002)(70206006)(8936002)(5660300002)(1076003)(40460700003)(82740400003)(40480700001)(47076005)(36756003)(86362001)(36860700001)(4326008)(7636003)(356005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Stm0W7yNZ17d+KchCwSyrs6s3J6InPYS1YYD0SshSih72uGbVmlc4bZvFs7MiW2vDqjep/Ju5MBUQPOrG7wBV7HvuNeYI0ptyLRd1bzkE3DCu7iPx2cPjOkw7REn/yDpIj6g8d4n3yzwmhcRdHGWuvF16MJrO5T/uyMgwI+721rfo1Xly4FAmrEb9NStmeQnJovg4A6ScNO2+duaSvav/m3syCLPldGy290QZVbt8ulYiu+THK2QYDFZ9dzC+AwZzH++lD2/hN1A6srfuNAmza+tsJlus84dfYZKRoJK+ChFcHcDAQaAKvgL0D0gxEbmw/f0XuYoW+Vt6iea1jt8LsM41FDnyIt1cqPk1mwsHYrSHIYYq36+9b5lZPtVoljZWzZlFUIV0oBaa/nlBVcZxdIyyBC3IK9a7gRt6/6Eqr3zYzr/RDSUmoYHpjSKK5JbjITVgOAbgJEdUgl3KXp6mvJz9lj9hXGWU07Y15gZtiAXQsRieWMIOY0N3aH7ts8re+nXTxFCi22L89SYPYBseeEe5n1FO6yvbUGNfUt01WDs0IWDZgqmWUfdrZxFFByyLb2X0AQ+F3R7MbPdE4DsKwIytslFP4zbP9RL3clIiF+u3IXmSVBRdt43W9P7B5TBSDISexP/lEkPB8nvYe3sfv9bgIxUc0B4ggIc5D2jstT+qmShEp5xDiSqcXAZUuiaLBEtFowmHLmeiKTEueP/wnHsnPkBuIzE4yiX3lgB138=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(39860400002)(396003)(346002)(186009)(451199024)(82310400011)(1800799009)(40470700004)(36840700001)(46966006)(5660300002)(4326008)(70206006)(41300700001)(8676002)(8936002)(316002)(6636002)(54906003)(110136005)(70586007)(40460700003)(47076005)(478600001)(36756003)(40480700001)(7696005)(2616005)(107886003)(2906002)(86362001)(1076003)(336012)(426003)(26005)(82740400003)(356005)(7636003)(36860700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 09:39:53.9972
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 09:39:57.5329
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6caacd2-27c0-415d-02e9-08dbb2ab0db0
+X-MS-Exchange-CrossTenant-Network-Message-Id: d06f14b6-27ad-4faa-e5c0-08dbb2ab0fcd
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BL6PEPF0001AB58.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BL6PEPF0001AB59.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9222
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4505
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -103,65 +105,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds 'chunk mode' support for mlx5 driver upon the migration
-flow.
+Post of disabling the SAVING migration file, which includes setting the
+file state to be MLX5_MIGF_STATE_ERROR, call to wake_up_interruptible()
+on its poll_wait member.
 
-Before this series, we were limited to 4GB state size, as of the 4 bytes
-max value based on the device specification for the query/save/load
-commands.
+This lets any potential reader which is waiting already for data as part
+of mlx5vf_save_read() to wake up, recognize the error state and return
+with an error.
 
-Once the device supports 'chunk mode' the driver can support state size
-which is larger than 4GB.
+Post of that we don't need to rely on any other condition to wake up
+the reader as of the returning of the SAVE command that was previously
+executed, etc.
 
-In that case, the device has the capability to split a single image to
-multiple chunks as long as the software provides a buffer in the minimum
-size reported by the device.
+In addition, this change will simplify error flows (e.g health recovery)
+once we'll move to chunk mode and multiple SAVE commands may run in the
+STOP_COPY phase as we won't need to rely any more on a SAVE command to
+wake-up a potential waiting reader.
 
-The driver should query for the minimum buffer size required using
-QUERY_VHCA_MIGRATION_STATE command with the 'chunk' bit set in its
-input, in that case, the output will include both the minimum buffer
-size and also the remaining total size to be reported/used where it will
-be applicable.
+Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+---
+ drivers/vfio/pci/mlx5/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Upon chunk mode, there may be multiple images that will be read from the
-device upon STOP_COPY. The driver will read ahead from the firmware the
-full state in small/optimized chunks while letting QEMU/user space read
-in parallel the available data.
-
-The chunk buffer size is picked up based on the minimum size that
-firmware requires, the total full size and some max value in the driver
-code which was set to 8MB to achieve some optimized downtime in the
-general case.
-
-With that series in place, we could migrate successfully a device state
-with a larger size than 4GB, while even improving the downtime in some
-scenarios.
-
-Note:
-As the first patch should go to net/mlx5 we may need to send it as a
-pull request format to VFIO to avoid conflicts before acceptance.
-
-Yishai
-
-Yishai Hadas (9):
-  net/mlx5: Introduce ifc bits for migration in a chunk mode
-  vfio/mlx5: Wake up the reader post of disabling the SAVING migration
-    file
-  vfio/mlx5: Refactor the SAVE callback to activate a work only upon an
-    error
-  vfio/mlx5: Enable querying state size which is > 4GB
-  vfio/mlx5: Rename some stuff to match chunk mode
-  vfio/mlx5: Pre-allocate chunks for the STOP_COPY phase
-  vfio/mlx5: Add support for SAVING in chunk mode
-  vfio/mlx5: Add support for READING in chunk mode
-  vfio/mlx5: Activate the chunk mode functionality
-
- drivers/vfio/pci/mlx5/cmd.c   | 103 +++++++++----
- drivers/vfio/pci/mlx5/cmd.h   |  28 +++-
- drivers/vfio/pci/mlx5/main.c  | 283 +++++++++++++++++++++++++---------
- include/linux/mlx5/mlx5_ifc.h |  15 +-
- 4 files changed, 322 insertions(+), 107 deletions(-)
-
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index 42ec574a8622..2556d5455692 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -1019,6 +1019,7 @@ void mlx5vf_disable_fds(struct mlx5vf_pci_core_device *mvdev)
+ 		mlx5_cmd_cleanup_async_ctx(&mvdev->saving_migf->async_ctx);
+ 		cancel_work_sync(&mvdev->saving_migf->async_data.work);
+ 		mlx5vf_disable_fd(mvdev->saving_migf);
++		wake_up_interruptible(&mvdev->saving_migf->poll_wait);
+ 		mlx5fv_cmd_clean_migf_resources(mvdev->saving_migf);
+ 		fput(mvdev->saving_migf->filp);
+ 		mvdev->saving_migf = NULL;
 -- 
 2.18.1
 
