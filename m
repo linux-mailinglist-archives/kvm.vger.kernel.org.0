@@ -2,133 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B54979AE40
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76B1D79AF1E
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:46:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233676AbjIKUr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47788 "EHLO
+        id S229783AbjIKUsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:48:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243851AbjIKSBd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 14:01:33 -0400
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49F2E5
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:01:27 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-655de2a5121so13445576d6.1
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:01:27 -0700 (PDT)
+        with ESMTP id S243920AbjIKSUV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 14:20:21 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADACE110
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:20:16 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so4599962276.2
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694455287; x=1695060087; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xjDfbVG7Z0f4VRf2UrtEhKHET6lYtFmHzIWX+qMQT4w=;
-        b=joDU89foLETwducOUmy0Czh5myFh4v87rXJbSXxJOGWGn2LYz6ElQbl8QUdLNd0w9T
-         6I0si2CqmLqbPBA1SZvuO4B8wvqEXLuqQ8g9alrobLLFcpRvZX/OGrxPRAd4BNknwWKV
-         e6g4j4c1wLwJbvKyUWorDRaog+ztkhb/WoKDkrkjmIh9BQNzcjpbwLNMCE52g6FBBCnh
-         McFYB4yAJRpqwmB7TsH8hpGP+k8BcMpgUk9UOITXMVeQ2lr7IT/Pb8ihFHBHjm5kgWvc
-         QzznxuPUhrc8DkgVP4mepP5AudBFBJND9CdP/P0S2h10Pmmd0GIzOPfQQh9PPCujSqH0
-         lwYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694455287; x=1695060087;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20221208; t=1694456416; x=1695061216; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xjDfbVG7Z0f4VRf2UrtEhKHET6lYtFmHzIWX+qMQT4w=;
-        b=oWpV3WQQ7m0BBo9cAY5/Fm9zLhTPfIxZHFaArSEs9DwTD3BRa544RpIc8yMwakjB+T
-         2kpHZPfsDrMBT/Mw/V/EDiH81DmxgF6afQzdMyixVhs/x13AzSDZv/vlWZVXNlAhq4uA
-         utm4wSvHaHyMD10gN0ltM12YtoSjbAQXoVaqh0GXWjnM+lXeTQXRal3x77QC91F636kQ
-         tZtZkaYSU/CK92Ajlej3fJePcLLaOCgHz3I/BOkJajDYIsd6AqMeL9WACNhzkSpgUByr
-         pfCWqvfBF4A+UQebcSSm3LhqYM2lfR5sF64GG5lThlpk28IL90GwGftTGmQJm+CinpBI
-         634g==
-X-Gm-Message-State: AOJu0Yyi5F4aHws9i4jzlXCU/1VrYBaLkq+iy+0iaKRhAJ3iIJ5aOx8k
-        SII/ChG+orVQT2g82vphWXmCSzYR3rOxjM23BLoLrg==
-X-Google-Smtp-Source: AGHT+IFlV+rbxVmLpOVjETaXMQmsUmYNkJcDNdsKKjIGa+QzT0JjiVzwUSu5k2nyYtxJ0IWGyOzO5f20FKr+R7mrBaA=
-X-Received: by 2002:a0c:ea4e:0:b0:64f:3699:90cd with SMTP id
- u14-20020a0cea4e000000b0064f369990cdmr9751242qvp.42.1694455286702; Mon, 11
- Sep 2023 11:01:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230911061147.409152-1-mizhang@google.com> <ZP8r2CDsv3JkGYzX@google.com>
-In-Reply-To: <ZP8r2CDsv3JkGYzX@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 11 Sep 2023 11:00:50 -0700
-Message-ID: <CAL715WKyS4sTH3yEOX2OyV+fxMLMOAV6tX-A7fvEAKEUGj8uxw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: vPMU: Use atomic bit operations for global_status
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>, Like Xu <likexu@tencent.com>
+        bh=OO6hJ0ABYHN8zgIR4FZOYgzIVAhANS0xV5LilSo/dHk=;
+        b=ersXw9r9uoiv5mvyyEKcAe+M6JGdytgwJhzWem6aMdKeCQjxmbXe6qhJj0Q2EBA0CV
+         KypGv+76Y5536aPQlosoYMt6c7XH4USLHmWDmFJtW0BOgMpYtFtFFd3O9M4PQ4YPofoN
+         Zq0YHn7g/bgTatJGbh+Cchct4sjvEQ63aXleSw8TBGslgvlgtqRsLl2mNvsWoI7xXWNm
+         WAkcpNbq7jVf576nR6qBpyGxrgkofBtzRjVfQWqUlP73p0GOX9byq4PXIa+cM0X2L4Yz
+         yjg8RowXfLCwcC6LmKWOsvkzov6HvIkMLzekClatli4SRUJ50gpjklsC47VIw/sKV6AN
+         Ff5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694456416; x=1695061216;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OO6hJ0ABYHN8zgIR4FZOYgzIVAhANS0xV5LilSo/dHk=;
+        b=aQsR50+XQxm7Qo7OQXEK6RcXC+qfOiJjGpHzVpPBVmCPAeSKwWA9NFuz4sBoJYbYBT
+         T5KqbBpRNTNK0JjiWQW+tci0xuFIfdRifMiXFYqoyG1bEE/DcHR4sVxG7ludoRCVRdZm
+         KHX0PruOLkYX9r9p01/smHZNb7fRcz3lwjiLMGFOmJE5fA1Q+A2sx+2KSmrmIOiZXZpB
+         DBm/YX2dTpGfLde7BDuaiIp7sBStEgzsiMiLw9H99RTOpZ/GyvXeMZaYq8eLGzM2Ir1Z
+         //LgQTDbv3B5Dy44taZN3OIGkKpM4afydUi2nxK76+uPNRY4pu+FFziZbJpEzALiGt/t
+         ealQ==
+X-Gm-Message-State: AOJu0Yza2vB7cREzNaQNwZNi51vKIFEvZqMc/UJIbaiTlBShaEZX9IP2
+        xoHv059tsI9ZyXLPKUrntYN4ABErnMw=
+X-Google-Smtp-Source: AGHT+IFiZFhsjOA5AHhA0tEr+/3w8LcO/rFF+A/QTjr/VDrVtAR0GVfuegGZQphHd/lb0wkGbxbobF8uh58=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1682:b0:d73:bcb7:7282 with SMTP id
+ bx2-20020a056902168200b00d73bcb77282mr255582ybb.8.1694456415922; Mon, 11 Sep
+ 2023 11:20:15 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 11 Sep 2023 11:20:10 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230911182013.333559-1-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 0/3] nVMX: Test for EP4TA pointing at MMIO
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 8:01=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Sep 11, 2023, Mingwei Zhang wrote:
-> > Use atomic bit operations for pmu->global_status because it may suffer =
-from
-> > race conditions between emulated overflow in KVM vPMU and PEBS overflow=
- in
-> > host PMI handler.
->
-> Only if the host PMI occurs on a different pCPU, and if that can happen d=
-on't we
-> have a much larger problem?
+Finally posting the testcase for the fix to back !visible roots with a dummy
+root[*].  The testcase is very simple: point EP4TA at MMIO (TPM base), do
+VM-Enter, and expect the VM to not die.
 
-Why on different pCPU?  For vPMU, I think there is always contention
-between the vCPU thread and the host PMI handler running on the same
-pCPU, no?
+[*] https://lore.kernel.org/all/20230729005200.1057358-6-seanjc@google.com
 
-So, in that case, anything that __kvm_perf_overflow(..., in_pmi=3Dtrue)
-touches on struct kvm_pmu will potentially race with the functions
-like reprogram_counter() -> __kvm_perf_overflow(..., in_pmi=3Dfalse).
+Sean Christopherson (3):
+  nVMX: Use helpers to check for WB memtype and 4-level EPT support
+  nVMX: Use setup_dummy_ept() to configure EPT for test_ept_eptp() test
+  nVMX: Add a testcase for running L2 with EP4TA that points at MMIO
 
--Mingwei
->
-> > Fixes: f331601c65ad ("KVM: x86/pmu: Don't generate PEBS records for emu=
-lated instructions")
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/pmu.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > index edb89b51b383..00b48f25afdb 100644
-> > --- a/arch/x86/kvm/pmu.c
-> > +++ b/arch/x86/kvm/pmu.c
-> > @@ -117,11 +117,11 @@ static inline void __kvm_perf_overflow(struct kvm=
-_pmc *pmc, bool in_pmi)
-> >                       skip_pmi =3D true;
-> >               } else {
-> >                       /* Indicate PEBS overflow PMI to guest. */
-> > -                     skip_pmi =3D __test_and_set_bit(GLOBAL_STATUS_BUF=
-FER_OVF_BIT,
-> > -                                                   (unsigned long *)&p=
-mu->global_status);
-> > +                     skip_pmi =3D test_and_set_bit(GLOBAL_STATUS_BUFFE=
-R_OVF_BIT,
-> > +                                                 (unsigned long *)&pmu=
-->global_status);
-> >               }
-> >       } else {
-> > -             __set_bit(pmc->idx, (unsigned long *)&pmu->global_status)=
-;
-> > +             set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-> >       }
-> >
-> >       if (!pmc->intr || skip_pmi)
-> >
-> > base-commit: e2013f46ee2e721567783557c301e5c91d0b74ff
-> > --
-> > 2.42.0.283.g2d96d420d3-goog
-> >
+ x86/vmx_tests.c | 31 ++++++++++++++-----------------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
+
+
+base-commit: d4fba74a42d222d2cfdde65351fac3531a1d6f5c
+-- 
+2.42.0.283.g2d96d420d3-goog
+
