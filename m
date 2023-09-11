@@ -2,65 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 603B479B7A7
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750E079BDD8
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234439AbjIKUuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34976 "EHLO
+        id S235177AbjIKUs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241092AbjIKPBv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 11:01:51 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637F6E40
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 08:01:46 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fb8933e18so47905877b3.3
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 08:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694444505; x=1695049305; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0h492hhBpi4c7QjU/Eg4y9r9cK5ab5e3uk7UqAdbaQ=;
-        b=Pr8mt8rkLiApjr2WrJ6nHLqYYW68/+aAH9BAVW69JalJsNr5mqyqVJdDnmbXH69CRj
-         pzOAXCCmgcSRn+hE3qCSq5xZcnhWqAFiJjxdU0YYBblqO48BnSEeRnhCiVEjXIjwtoUF
-         K7sGeU7d/qm4WPZ3nFtjqhcrw9aL53pUWZRK2OOphWXPKBWnBTXPdK1NErt15qSN/mQx
-         CG1ZflvNRt7MajJi2Ga7aaaPnXYvTDJA3suETB/+JPJC8eAw98ZxGrFsfU8RKrqPyiQ+
-         yqz5oL3RANHdCY/++y931JrR8VvVaWKyjAOA/JbMd/4no95cA5N2BChMvd8uTadp/vE1
-         DISA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694444505; x=1695049305;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0h492hhBpi4c7QjU/Eg4y9r9cK5ab5e3uk7UqAdbaQ=;
-        b=MkLFtgjuzRAjPWgspnrHzrOgXDQoq2L9z69bEt2bEPCwtqM8PErUJQqFOA4OMNoWwp
-         flrPzJqFe7PKIibZ97ixuYU7XO9xS4Vv3FmJKeMju1OlKwJZV0gUOXDtJzcS13+F5IoQ
-         kV5GnIxhclB1IBGpGM39zfFiLNDlFNDHGW4QYJ2tTBA57klfkc+d0G0K4IAQOrTcv12j
-         xyH573TFuMwAL1uHvQI1vqITg5+MZ4V0D4r9W1ggWwdMYONay3cd1bFIAvklELCabD0g
-         d0xuwaoLVJmWxgxF1Gkgm+Sxab4rLCWr932uNSo2lSlIJlTFvcOhyjmVidRplt+7+UXE
-         GRKA==
-X-Gm-Message-State: AOJu0YyUZjAe8LfeuPBSbJxUVoY5+ieEbje2AVXQd6sG8WmIdDUGlBbk
-        ZglVsBrTx7anHfbmI0kq5Y78oDlgRRc=
-X-Google-Smtp-Source: AGHT+IHFy6Z2B6TX5cvZ3QqsmLTdgDZNZyoDuthM3YMwP4/tCuZIqq0zhX3hLRzEEghmYVjFBeHBbfVKodU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:168e:b0:d7f:2cb6:7d8c with SMTP id
- bx14-20020a056902168e00b00d7f2cb67d8cmr223777ybb.13.1694444505636; Mon, 11
- Sep 2023 08:01:45 -0700 (PDT)
-Date:   Mon, 11 Sep 2023 08:01:44 -0700
-In-Reply-To: <20230911061147.409152-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230911061147.409152-1-mizhang@google.com>
-Message-ID: <ZP8r2CDsv3JkGYzX@google.com>
-Subject: Re: [PATCH] KVM: vPMU: Use atomic bit operations for global_status
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>, Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        with ESMTP id S242682AbjIKQGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 12:06:37 -0400
+X-Greylist: delayed 433 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 11 Sep 2023 09:06:31 PDT
+Received: from out-213.mta1.migadu.com (out-213.mta1.migadu.com [IPv6:2001:41d0:203:375::d5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789141B6
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 09:06:31 -0700 (PDT)
+Message-ID: <963a899d-d25a-368f-1465-851787c25959@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1694447954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UWGx8nOe8UMiBtiPfiV0PpeEd8UXtwFSIc0awgSTnuM=;
+        b=PTq8pYHKGyxAQ1Loh2IKxBsBNTnU1jI78EQH7m5D4j7ZaoK3folTH6rtJGyjpE2fcB7SyH
+        fkkyU6heVJkLwN5BD2gA48F0Kv9OJihdLzz4iFxMsbKc2TGg4O4wOuyrfj81awE85s4tlz
+        xyXERjf+ougQ5lZK4ULixkULhYKsUAE=
+Date:   Mon, 11 Sep 2023 23:57:39 +0800
+MIME-Version: 1.0
+Subject: Re: [PATCH 4/5] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Xu Zhao <zhaoxu.35@bytedance.com>
+References: <20230907100931.1186690-1-maz@kernel.org>
+ <20230907100931.1186690-5-maz@kernel.org>
+ <fd96f034-b7ca-c1bd-a94e-06f8e84e52a7@linux.dev>
+ <87ledd51tu.wl-maz@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <87ledd51tu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,41 +56,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023, Mingwei Zhang wrote:
-> Use atomic bit operations for pmu->global_status because it may suffer from
-> race conditions between emulated overflow in KVM vPMU and PEBS overflow in
-> host PMI handler.
+On 2023/9/11 02:18, Marc Zyngier wrote:
+> On Sun, 10 Sep 2023 17:25:36 +0100,
+> Zenghui Yu <zenghui.yu@linux.dev> wrote:
+>>
+>> Hi Marc,
+>>
+>> I asked because it seems that in kvm/arm64 we always use
+>> kvm_get_vcpu(kvm, i) to obtain the kvm_vcpu pointer, even if *i* is
+>> sometimes essentially provided by userspace..
+> 
+> Huh, this is incredibly dodgy. I had a go at a few occurrences (see
+> below), but this is hardly a complete list.
 
-Only if the host PMI occurs on a different pCPU, and if that can happen don't we
-have a much larger problem?
+Another case is all kvm_get_vcpu(kvm, target_addr) in the vgic-its
+emulation code. As we expose GITS_TYPER.PTA=0 to guest, which indicates
+that the target address corresponds to the PE number specified by
+GICR_TYPER.Processor_Number, which is now encoded as vcpu->vcpu_id.
 
-> Fixes: f331601c65ad ("KVM: x86/pmu: Don't generate PEBS records for emulated instructions")
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/pmu.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index edb89b51b383..00b48f25afdb 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -117,11 +117,11 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
->  			skip_pmi = true;
->  		} else {
->  			/* Indicate PEBS overflow PMI to guest. */
-> -			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-> -						      (unsigned long *)&pmu->global_status);
-> +			skip_pmi = test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-> +						    (unsigned long *)&pmu->global_status);
->  		}
->  	} else {
-> -		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-> +		set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
->  	}
->  
->  	if (!pmc->intr || skip_pmi)
-> 
-> base-commit: e2013f46ee2e721567783557c301e5c91d0b74ff
-> -- 
-> 2.42.0.283.g2d96d420d3-goog
-> 
+Thanks,
+Zenghui
