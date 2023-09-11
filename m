@@ -2,120 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26D7379AF55
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:47:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B54979AE40
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 01:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236004AbjIKUto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:49:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40306 "EHLO
+        id S233676AbjIKUr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:47:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242441AbjIKPfH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 11:35:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4F195FA
-        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 08:34:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694446457;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H0hlG5FAGp8RmPoZ3E3s3/+3No0cdG4KvSkd6VNEwic=;
-        b=IHhM6Qem/3nEfzc4yLTanbBi3Jb08wowb/QR1r7En9iZNL/lfzuslNyQR+vns4tG5kX/6z
-        i1m4laUtBpIVvdC3iQ3rflOnxXBKmQu2X69sV74cKTe4cpVJRX8abOrIP2SeC+hqnm00Eu
-        7ZYGfonNtfd3vm8n8tLjxkoNipYSZ2s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-7swe91uhPdmELgDadpzMYA-1; Mon, 11 Sep 2023 11:34:13 -0400
-X-MC-Unique: 7swe91uhPdmELgDadpzMYA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D615183689B;
-        Mon, 11 Sep 2023 15:34:11 +0000 (UTC)
-Received: from [10.22.32.237] (unknown [10.22.32.237])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D391140C6EBF;
-        Mon, 11 Sep 2023 15:34:09 +0000 (UTC)
-Message-ID: <5ba0b8f3-f8f5-3a25-e9b7-f29a1abe654a@redhat.com>
-Date:   Mon, 11 Sep 2023 11:34:09 -0400
+        with ESMTP id S243851AbjIKSBd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 14:01:33 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49F2E5
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:01:27 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-655de2a5121so13445576d6.1
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 11:01:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1694455287; x=1695060087; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjDfbVG7Z0f4VRf2UrtEhKHET6lYtFmHzIWX+qMQT4w=;
+        b=joDU89foLETwducOUmy0Czh5myFh4v87rXJbSXxJOGWGn2LYz6ElQbl8QUdLNd0w9T
+         6I0si2CqmLqbPBA1SZvuO4B8wvqEXLuqQ8g9alrobLLFcpRvZX/OGrxPRAd4BNknwWKV
+         e6g4j4c1wLwJbvKyUWorDRaog+ztkhb/WoKDkrkjmIh9BQNzcjpbwLNMCE52g6FBBCnh
+         McFYB4yAJRpqwmB7TsH8hpGP+k8BcMpgUk9UOITXMVeQ2lr7IT/Pb8ihFHBHjm5kgWvc
+         QzznxuPUhrc8DkgVP4mepP5AudBFBJND9CdP/P0S2h10Pmmd0GIzOPfQQh9PPCujSqH0
+         lwYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694455287; x=1695060087;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xjDfbVG7Z0f4VRf2UrtEhKHET6lYtFmHzIWX+qMQT4w=;
+        b=oWpV3WQQ7m0BBo9cAY5/Fm9zLhTPfIxZHFaArSEs9DwTD3BRa544RpIc8yMwakjB+T
+         2kpHZPfsDrMBT/Mw/V/EDiH81DmxgF6afQzdMyixVhs/x13AzSDZv/vlWZVXNlAhq4uA
+         utm4wSvHaHyMD10gN0ltM12YtoSjbAQXoVaqh0GXWjnM+lXeTQXRal3x77QC91F636kQ
+         tZtZkaYSU/CK92Ajlej3fJePcLLaOCgHz3I/BOkJajDYIsd6AqMeL9WACNhzkSpgUByr
+         pfCWqvfBF4A+UQebcSSm3LhqYM2lfR5sF64GG5lThlpk28IL90GwGftTGmQJm+CinpBI
+         634g==
+X-Gm-Message-State: AOJu0Yyi5F4aHws9i4jzlXCU/1VrYBaLkq+iy+0iaKRhAJ3iIJ5aOx8k
+        SII/ChG+orVQT2g82vphWXmCSzYR3rOxjM23BLoLrg==
+X-Google-Smtp-Source: AGHT+IFlV+rbxVmLpOVjETaXMQmsUmYNkJcDNdsKKjIGa+QzT0JjiVzwUSu5k2nyYtxJ0IWGyOzO5f20FKr+R7mrBaA=
+X-Received: by 2002:a0c:ea4e:0:b0:64f:3699:90cd with SMTP id
+ u14-20020a0cea4e000000b0064f369990cdmr9751242qvp.42.1694455286702; Mon, 11
+ Sep 2023 11:01:26 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH V11 07/17] riscv: qspinlock: Introduce qspinlock param for
- command line
-Content-Language: en-US
-To:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
-        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, conor.dooley@microchip.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        leobras@redhat.com
-Cc:     linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-8-guoren@kernel.org>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <20230910082911.3378782-8-guoren@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230911061147.409152-1-mizhang@google.com> <ZP8r2CDsv3JkGYzX@google.com>
+In-Reply-To: <ZP8r2CDsv3JkGYzX@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 11 Sep 2023 11:00:50 -0700
+Message-ID: <CAL715WKyS4sTH3yEOX2OyV+fxMLMOAV6tX-A7fvEAKEUGj8uxw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: vPMU: Use atomic bit operations for global_status
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>, Like Xu <likexu@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/10/23 04:29, guoren@kernel.org wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
+On Mon, Sep 11, 2023 at 8:01=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> Allow cmdline to force the kernel to use queued_spinlock when
-> CONFIG_RISCV_COMBO_SPINLOCKS=y.
+> On Mon, Sep 11, 2023, Mingwei Zhang wrote:
+> > Use atomic bit operations for pmu->global_status because it may suffer =
+from
+> > race conditions between emulated overflow in KVM vPMU and PEBS overflow=
+ in
+> > host PMI handler.
 >
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@kernel.org>
-> ---
->   Documentation/admin-guide/kernel-parameters.txt |  2 ++
->   arch/riscv/kernel/setup.c                       | 16 +++++++++++++++-
->   2 files changed, 17 insertions(+), 1 deletion(-)
+> Only if the host PMI occurs on a different pCPU, and if that can happen d=
+on't we
+> have a much larger problem?
+
+Why on different pCPU?  For vPMU, I think there is always contention
+between the vCPU thread and the host PMI handler running on the same
+pCPU, no?
+
+So, in that case, anything that __kvm_perf_overflow(..., in_pmi=3Dtrue)
+touches on struct kvm_pmu will potentially race with the functions
+like reprogram_counter() -> __kvm_perf_overflow(..., in_pmi=3Dfalse).
+
+-Mingwei
 >
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 7dfb540c4f6c..61cacb8dfd0e 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -4693,6 +4693,8 @@
->   			[KNL] Number of legacy pty's. Overwrites compiled-in
->   			default number.
->   
-> +	qspinlock	[RISCV] Force to use qspinlock or auto-detect spinlock.
-> +
->   	qspinlock.numa_spinlock_threshold_ns=	[NUMA, PV_OPS]
->   			Set the time threshold in nanoseconds for the
->   			number of intra-node lock hand-offs before the
-> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> index a447cf360a18..0f084f037651 100644
-> --- a/arch/riscv/kernel/setup.c
-> +++ b/arch/riscv/kernel/setup.c
-> @@ -270,6 +270,15 @@ static void __init parse_dtb(void)
->   }
->   
->   #ifdef CONFIG_RISCV_COMBO_SPINLOCKS
-> +bool enable_qspinlock_key = false;
-
-You can use __ro_after_init qualifier for enable_qspinlock_key. BTW, 
-this is not a static key, just a simple flag. So what is the point of 
-the _key suffix?
-
-Cheers,
-Longman
-
+> > Fixes: f331601c65ad ("KVM: x86/pmu: Don't generate PEBS records for emu=
+lated instructions")
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  arch/x86/kvm/pmu.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > index edb89b51b383..00b48f25afdb 100644
+> > --- a/arch/x86/kvm/pmu.c
+> > +++ b/arch/x86/kvm/pmu.c
+> > @@ -117,11 +117,11 @@ static inline void __kvm_perf_overflow(struct kvm=
+_pmc *pmc, bool in_pmi)
+> >                       skip_pmi =3D true;
+> >               } else {
+> >                       /* Indicate PEBS overflow PMI to guest. */
+> > -                     skip_pmi =3D __test_and_set_bit(GLOBAL_STATUS_BUF=
+FER_OVF_BIT,
+> > -                                                   (unsigned long *)&p=
+mu->global_status);
+> > +                     skip_pmi =3D test_and_set_bit(GLOBAL_STATUS_BUFFE=
+R_OVF_BIT,
+> > +                                                 (unsigned long *)&pmu=
+->global_status);
+> >               }
+> >       } else {
+> > -             __set_bit(pmc->idx, (unsigned long *)&pmu->global_status)=
+;
+> > +             set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+> >       }
+> >
+> >       if (!pmc->intr || skip_pmi)
+> >
+> > base-commit: e2013f46ee2e721567783557c301e5c91d0b74ff
+> > --
+> > 2.42.0.283.g2d96d420d3-goog
+> >
