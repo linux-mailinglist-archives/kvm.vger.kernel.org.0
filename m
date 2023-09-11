@@ -2,407 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70CD079BF3A
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B0AA79BDEB
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 02:16:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234087AbjIKUsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 16:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47992 "EHLO
+        id S230461AbjIKUuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 16:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235774AbjIKJfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:35:25 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 11DB310C;
-        Mon, 11 Sep 2023 02:35:18 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8CxRuhU3_5k74IkAA--.18106S3;
-        Mon, 11 Sep 2023 17:35:16 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxF81R3_5kzBp3AA--.18119S3;
-        Mon, 11 Sep 2023 17:35:13 +0800 (CST)
-Subject: Re: [PATCH v20 00/30] Add KVM LoongArch support
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
- <CAAhV-H5SQWAGvc2gmH1eapm7DeNvYN9YrRzUFJfUZiV5NFGbNg@mail.gmail.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <e32df893-84d3-0bc7-687f-f60edda15ea2@loongson.cn>
-Date:   Mon, 11 Sep 2023 17:34:40 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S235817AbjIKJkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 05:40:04 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA1A0EE
+        for <kvm@vger.kernel.org>; Mon, 11 Sep 2023 02:39:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iByYBnnBydzeecGLpvAQZIXqw5kdUaan/liVwdVAGBssvuQSktRMaqeABOVw+LwBfhKUro3KJHrAzo4nHXnBWoVnFLFfj8T7x1HrEAUdAu360rgBjO1Gn1dMgXGTNuWoU/X/Xl8Gz3oB9PMFAyIQ7LuKq+5PLwHGN6ouk/CCNsnKhC14kdkHNB3YOTwY2JncuuwYPk/COd4SbUCEzCbf0kQHiEmKPvvZSb1EEWO5FhP+JVe7ZbLt6BT7czN3TEYUbgGDgA1JDTRE+fMjW6s116KjHQtfmG5kPuirpfXZPhIjhyh+n2jZlJWoZFRBsWJCswjWyub8as5JtI3YSgWkSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sQVQ+bCXXCtXoD2Ad+Bb3eAnuZYGGwwVcldZOvmPK68=;
+ b=EUAj9x70Oj4RFixgZQPdazvXrCu1ysefL3pdyNL3CbZi2RXYpiYN2WQnoBN/d6pEQhFy6qV8HYD5us6P1Y0aUemloartxbrTDMZ0X74deq2JE5jjK+bkYJJO1RSOog6Ag/f7lRxH6O4e7AQBCJLMAMaPvqir5uaOs5xjgITeVowm9foBvHqrqSzHXllQeY4xrkd5T+z+gU/OpDdRg2fh8pRAUTSy86tjvFg46wwdnKBzxpzDm3jpnB13Wgw9ddckpmrpPipm3HSnuB1WpyhDjBQEU5X7X0nW9LnTKJdCoTvDg1do38A1Nr5/axO5JCEZobpjrZ1mJJNP3dU0rJjmoQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQVQ+bCXXCtXoD2Ad+Bb3eAnuZYGGwwVcldZOvmPK68=;
+ b=LSUFpb45TbFuEeYH2okOZpUXQTvLxqUhqikrv8kZvsy3iU4AOsAWRF+D09vuXbeghiGPNsLZpUZ4CJASM2o0NBkPMNrV/yPy1hS5fZDnLv+OfJxL7wsYqnmxafJvKjxb3HwK8Iuoiz4O48fENKWce2/bROs9S2dgpvHexHS2LtXVu0CdAJ2iHsZaN4VJXl5Qz2GQNgm4h0piLDsXvwVPu/cixdQpAWFPlWbh2tRjZeq6grsEwRJjBprjLhlBotQhJEuT2Bzd00B6YTQ9rVpJmgrbkgE5afMoT0MVj75/XuvzzxqRCMuoTERvWUk7UsgeavXNcNRAqgfMXSZYy1bhFg==
+Received: from CY5PR15CA0256.namprd15.prod.outlook.com (2603:10b6:930:66::27)
+ by SN7PR12MB7449.namprd12.prod.outlook.com (2603:10b6:806:299::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.30; Mon, 11 Sep
+ 2023 09:39:56 +0000
+Received: from CY4PEPF0000FCC5.namprd03.prod.outlook.com
+ (2603:10b6:930:66:cafe::30) by CY5PR15CA0256.outlook.office365.com
+ (2603:10b6:930:66::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.41 via Frontend
+ Transport; Mon, 11 Sep 2023 09:39:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000FCC5.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6792.17 via Frontend Transport; Mon, 11 Sep 2023 09:39:56 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 11 Sep 2023
+ 02:39:45 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 11 Sep
+ 2023 02:39:44 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.986.37 via Frontend Transport; Mon, 11 Sep
+ 2023 02:39:42 -0700
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <yishaih@nvidia.com>, <maorg@nvidia.com>
+Subject: [PATCH vfio 1/9] net/mlx5: Introduce ifc bits for migration in a chunk mode
+Date:   Mon, 11 Sep 2023 12:38:48 +0300
+Message-ID: <20230911093856.81910-2-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20230911093856.81910-1-yishaih@nvidia.com>
+References: <20230911093856.81910-1-yishaih@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5SQWAGvc2gmH1eapm7DeNvYN9YrRzUFJfUZiV5NFGbNg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: AQAAf8CxF81R3_5kzBp3AA--.18119S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3KF47Ar4kZFWDWrykKF17Jwc_yoW8WF1fto
-        WfAFW2qw40gr18Cryqv3sFkFWUXa4xCr4rZ347uas8XF4rJ345Ka4rKw4YyayayFn5Wr17
-        C34UWw4qvrZrtFn3l-sFpf9Il3svdjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf
-        9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-        UjIYCTnIWjp_UUUO17kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-        8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-        Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AK
-        xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
-        6r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-        1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUU
-        U==
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC5:EE_|SN7PR12MB7449:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32d3839c-a229-4451-24d1-08dbb2ab0f2a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sV+VXZNsUisAqgpMEu2G+NyNtsKlBVpHMXotfjrHnez86tRWdJtWe9MERYwhnXkqvkH25+Rz1FohJsVaIlGalflk8Q2TrD7n3V94eatFXfsSQukIVIPsRSjcnHiurNZ8R999bw+JIKN1sWp2tFdQnJHTeH8lyoOo7SEx8wOg2XWckTpDI94OJS5AloidJdE3dvGJSmqMsRMj/iEZlJuRxe+EebQ898viaSXIvgcCaI31GV4WN+s64buMywbhN9AJK/p3tlDLj7lY24U/tLwas9euNbQSZ8agxs/ZQ2S9I0yaW2oBHawwe/p2igKDF35tWQezenCQdxLOjeyv7nTQ+9fj96vxUfajavVCdORDLBN0XUrnbAuDXM/LM9rgIrWsyN6Tbgc0Ww1VaadoZjEOzmePSaYBlXsG/bwdalfabGJjAP2fjW0hVR6V8vrArKex2fqM/zlY8w8eVc44k8FSiyiN0f2jUsH2n5ptq3K9gKIqFu2O2ji5nv3OkoKk9yIC7lk4mpWg9EggW2ztlhGHXjKbOn+rDZ+YYX+/heDPmez78TeE9tNWGY243x5v/b04/jD2haCrl27OdwbNqCemxenmklQpe7sKKTXdHAWDyHkSJ6Oq2i3yyUM0EUdkqFBOQcVT1Cov2kisZqzahFYFPugBR2LCtmUiZMd/YeRngt+HRVCPtiRXwN8HmXoKYcpO/QALb1yLD6zL16J0wCJ5s27AmS78dP1joPJ2HhBM0BpARe5bWmlb/7v1z6iHKBqT
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(136003)(376002)(82310400011)(451199024)(1800799009)(186009)(40470700004)(36840700001)(46966006)(83380400001)(110136005)(2906002)(426003)(1076003)(336012)(107886003)(2616005)(26005)(478600001)(70586007)(316002)(70206006)(54906003)(8676002)(7696005)(8936002)(5660300002)(36756003)(86362001)(40460700003)(356005)(47076005)(7636003)(82740400003)(41300700001)(36860700001)(40480700001)(6636002)(4326008);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 09:39:56.5066
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32d3839c-a229-4451-24d1-08dbb2ab0f2a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000FCC5.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7449
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Introduce ifc related stuff to enable migration in a chunk mode.
 
-在 2023/9/11 下午12:02, Huacai Chen 写道:
-> Hi, Tianrui,
->
-> I hope this can be the last review and the next version can get upstreamed. :)
-Thanks, I am very grateful for your carefully reviewing and giving us a 
-lot of useful advice to make the LoongArch KVM codes better.
->
->
-> On Thu, Aug 31, 2023 at 4:30 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->> From: zhaotianrui <zhaotianrui@loongson.cn>
->>
->> This series adds KVM LoongArch support. Loongson 3A5000 supports hardware
->> assisted virtualization. With cpu virtualization, there are separate
->> hw-supported user mode and kernel mode in guest mode. With memory
->> virtualization, there are two-level hw mmu table for guest mode and host
->> mode. Also there is separate hw cpu timer with consant frequency in
->> guest mode, so that vm can migrate between hosts with different freq.
->> Currently, we are able to boot LoongArch Linux Guests.
->>
->> Few key aspects of KVM LoongArch added by this series are:
->> 1. Enable kvm hardware function when kvm module is loaded.
->> 2. Implement VM and vcpu related ioctl interface such as vcpu create,
->>     vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
->>     get general registers one by one.
->> 3. Hardware access about MMU, timer and csr are emulated in kernel.
->> 4. Hardwares such as mmio and iocsr device are emulated in user space
->>     such as APIC, IPI, pci devices etc.
->>
->> The running environment of LoongArch virt machine:
->> 1. Cross tools to build kernel and uefi:
->>     $ wget https://github.com/loongson/build-tools/releases/download/2022.09.06/loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz
-> The cross tools should be updated to the latest one, because we need
-> binutils 2.41 now.
-Thanks, I will update the binutils to latest version.
->
->>     tar -vxf loongarch64-clfs-6.3-cross-tools-gcc-glibc.tar.xz  -C /opt
->>     export PATH=/opt/cross-tools/bin:$PATH
->>     export LD_LIBRARY_PATH=/opt/cross-tools/lib:$LD_LIBRARY_PATH
->>     export LD_LIBRARY_PATH=/opt/cross-tools/loongarch64-unknown-linux-gnu/lib/:$LD_LIBRARY_PATH
->> 2. This series is based on the linux source code:
->>     https://github.com/loongson/linux-loongarch-kvm
-> Please update the base to at least v6.6-rc1.
-Thanks, I will update the linux kernel to least version.
->
->>     Build command:
->>     git checkout kvm-loongarch
->>     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
->>     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
->> 3. QEMU hypervisor with LoongArch supported:
->>     https://github.com/loongson/qemu
-> QEMU base should also be updated.
-Thanks, I will update QEMU to latest version.
->
->>     Build command:
->>     git checkout kvm-loongarch
->>     ./configure --target-list="loongarch64-softmmu"  --enable-kvm
->>     make
->> 4. Uefi bios of LoongArch virt machine:
->>     Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
->> 5. you can also access the binary files we have already build:
->>     https://github.com/yangxiaojuan-loongson/qemu-binary
-> Update any binaries if needed, too.
-Thanks, I will update all the binary files used by KVM to latest.
+Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+---
+ include/linux/mlx5/mlx5_ifc.h | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-Thanks
-Tianrui Zhao
->
-> I will do a full test after v21 of this series, and I hope this can
-> move things forwards.
->
->
-> Huacai
->
->> The command to boot loongarch virt machine:
->>     $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
->>     -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
->>     -serial stdio   -monitor telnet:localhost:4495,server,nowait \
->>     -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
->>     --nographic
->>
->> changes for v20:
->> 1. Remove the binary codes of virtualization instructions in
->> insn_def.h and csr_ops.S and directly use the default csrrd,
->> csrwr,csrxchg instructions. And let CONFIG_KVM depends on the
->> AS_HAS_LVZ_EXTENSION, so we should use the binutils that have
->> already supported them to compile the KVM. This can make our
->> LoongArch KVM codes more maintainable and easier.
->>
->> changes for v19:
->> 1. Use the common interface xfer_to_guest_mode_handle_work to
->> Check conditions before entering the guest.
->> 2. Add vcpu dirty ring support.
->>
->> changes for v18:
->> 1. Code cleanup for vcpu timer: remove unnecessary timer_period_ns,
->> timer_bias, timer_dyn_bias variables in kvm_vcpu_arch and rename
->> the stable_ktime_saved variable to expire.
->> 2. Change the value of KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE to 40.
->>
->> changes for v17:
->> 1. Add CONFIG_AS_HAS_LVZ_EXTENSION config option which depends on
->> binutils that support LVZ assemble instruction.
->> 2. Change kvm mmu related functions, such as rename level2_ptw_pgd
->> to kvm_ptw_pgd, replace kvm_flush_range with kvm_ptw_pgd pagewalk
->> framework, replace kvm_arch.gpa_mm with kvm_arch.pgd, set
->> mark_page_dirty/kvm_set_pfn_dirty out of mmu_lock in kvm page fault
->> handling.
->> 3. Replace kvm_loongarch_interrupt with standard kvm_interrupt
->> when injecting IRQ.
->> 4. Replace vcpu_arch.last_exec_cpu with existing vcpu.cpu, remove
->> kvm_arch.online_vcpus and kvm_arch.is_migrating,
->> 5. Remove EXCCODE_TLBNR and EXCCODE_TLBNX in kvm exception table,
->> since NR/NX bit is not set in kvm page fault handling.
->>
->> Changes for v16:
->> 1. Free allocated memory of vmcs,kvm_loongarch_ops in kvm module init,
->> exit to avoid memory leak problem.
->> 2. Simplify some assemble codes in switch.S which are necessary to be
->> replaced with pseudo-instructions. And any other instructions do not need
->> to be replaced anymore.
->> 3. Add kvm_{save,restore}_guest_gprs macros to replace these ld.d,st.d
->> guest regs instructions when vcpu world switch.
->> 4. It is more secure to disable irq when flush guest tlb by gpa, so replace
->> preempt_disable with loacl_irq_save in kvm_flush_tlb_gpa.
->>
->> Changes for v15:
->> 1. Re-order some macros and variables in LoongArch kvm headers, put them
->> together which have the same meaning.
->> 2. Make some function definitions in one line, as it is not needed to split
->> them.
->> 3. Re-name some macros such as KVM_REG_LOONGARCH_GPR.
->>
->> Changes for v14:
->> 1. Remove the macro CONFIG_KVM_GENERIC_HARDWARE_ENABLING in
->> loongarch/kvm/main.c, as it is not useful.
->> 2. Add select KVM_GENERIC_HARDWARE_ENABLING in loongarch/kvm/Kconfig,
->> as it is used by virt/kvm.
->> 3. Fix the LoongArch KVM source link in MAINTAINERS.
->> 4. Improve LoongArch KVM documentation, such as add comment for
->> LoongArch kvm_regs.
->>
->> Changes for v13:
->> 1. Remove patch-28 "Implement probe virtualization when cpu init", as the
->> virtualization information about FPU,PMP,LSX in guest.options,options_dyn
->> is not used and the gcfg reg value can be read in kvm_hardware_enable, so
->> remove the previous cpu_probe_lvz function.
->> 2. Fix vcpu_enable_cap interface, it should return -EINVAL directly, as
->> FPU cap is enable by default, and do not support any other caps now.
->> 3. Simplify the jirl instruction with jr when without return addr,
->> simplify case HW0 ... HW7 statment in interrupt.c
->> 4. Rename host_stack,host_gp in kvm_vcpu_arch to host_sp,host_tp.
->> 5. Remove 'cpu' parameter in _kvm_check_requests, as 'cpu' is not used,
->> and remove 'cpu' parameter in kvm_check_vmid function, as it can get
->> cpu number by itself.
->>
->> Changes for v12:
->> 1. Improve the gcsr write/read/xchg interface to avoid the previous
->> instruction statment like parse_r and make the code easy understanding,
->> they are implemented in asm/insn-def.h and the instructions consistent
->> of "opcode" "rj" "rd" "simm14" arguments.
->> 2. Fix the maintainers list of LoongArch KVM.
->>
->> Changes for v11:
->> 1. Add maintainers for LoongArch KVM.
->>
->> Changes for v10:
->> 1. Fix grammatical problems in LoongArch documentation.
->> 2. It is not necessary to save or restore the LOONGARCH_CSR_PGD when
->> vcpu put and vcpu load, so we remove it.
->>
->> Changes for v9:
->> 1. Apply the new defined interrupt number macros in loongarch.h to kvm,
->> such as INT_SWI0, INT_HWI0, INT_TI, INT_IPI, etc. And remove the
->> previous unused macros.
->> 2. Remove unused variables in kvm_vcpu_arch, and reorder the variables
->> to make them more standard.
->>
->> Changes for v8:
->> 1. Adjust the cpu_data.guest.options structure, add the ases flag into
->> it, and remove the previous guest.ases. We do this to keep consistent
->> with host cpu_data.options structure.
->> 2. Remove the "#include <asm/kvm_host.h>" in some files which also
->> include the "<linux/kvm_host.h>". As linux/kvm_host.h already include
->> the asm/kvm_host.h.
->> 3. Fix some unstandard spelling and grammar errors in comments, and
->> improve a little code format to make it easier and standard.
->>
->> Changes for v7:
->> 1. Fix the kvm_save/restore_hw_gcsr compiling warnings reported by
->> kernel test robot. The report link is:
->> https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com/
->> 2. Fix loongarch kvm trace related compiling problems.
->>
->> Changes for v6:
->> 1. Fix the Documentation/virt/kvm/api.rst compile warning about
->> loongarch parts.
->>
->> Changes for v5:
->> 1. Implement get/set mp_state ioctl interface, and only the
->> KVM_MP_STATE_RUNNABLE state is supported now, and other states
->> will be completed in the future. The state is also used when vcpu
->> run idle instruction, if vcpu state is changed to RUNNABLE, the
->> vcpu will have the possibility to be woken up.
->> 2. Supplement kvm document about loongarch-specific part, such as add
->> api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
->> etc.
->> 3. Improve the kvm_switch_to_guest function in switch.S, remove the
->> previous tmp,tmp1 arguments and replace it with t0,t1 reg.
->>
->> Changes for v4:
->> 1. Add a csr_need_update flag in _vcpu_put, as most csr registers keep
->> unchanged during process context switch, so we need not to update it
->> every time. We can do this only if the soft csr is different form hardware.
->> That is to say all of csrs should update after vcpu enter guest, as for
->> set_csr_ioctl, we have written soft csr to keep consistent with hardware.
->> 2. Improve get/set_csr_ioctl interface, we set SW or HW or INVALID flag
->> for all csrs according to it's features when kvm init. In get/set_csr_ioctl,
->> if csr is HW, we use gcsrrd/ gcsrwr instruction to access it, else if csr is
->> SW, we use software to emulate it, and others return false.
->> 3. Add set_hw_gcsr function in csr_ops.S, and it is used in set_csr_ioctl.
->> We have splited hw gcsr into three parts, so we can calculate the code offset
->> by gcsrid and jump here to run the gcsrwr instruction. We use this function to
->> make the code easier and avoid to use the previous SET_HW_GCSR(XXX) interface.
->> 4. Improve kvm mmu functions, such as flush page table and make clean page table
->> interface.
->>
->> Changes for v3:
->> 1. Remove the vpid array list in kvm_vcpu_arch and use a vpid variable here,
->> because a vpid will never be recycled if a vCPU migrates from physical CPU A
->> to B and back to A.
->> 2. Make some constant variables in kvm_context to global such as vpid_mask,
->> guest_eentry, enter_guest, etc.
->> 3. Add some new tracepoints, such as kvm_trace_idle, kvm_trace_cache,
->> kvm_trace_gspr, etc.
->> 4. There are some duplicate codes in kvm_handle_exit and kvm_vcpu_run,
->> so we move it to a new function kvm_pre_enter_guest.
->> 5. Change the RESUME_HOST, RESUME_GUEST value, return 1 for resume guest
->> and "<= 0" for resume host.
->> 6. Fcsr and fpu registers are saved/restored together.
->>
->> Changes for v2:
->> 1. Seprate the original patch-01 and patch-03 into small patches, and the
->> patches mainly contain kvm module init, module exit, vcpu create, vcpu run,
->> etc.
->> 2. Remove the original KVM_{GET,SET}_CSRS ioctl in the kvm uapi header,
->> and we use the common KVM_{GET,SET}_ONE_REG to access register.
->> 3. Use BIT(x) to replace the "1 << n_bits" statement.
->>
->> Tianrui Zhao (30):
->>    LoongArch: KVM: Add kvm related header files
->>    LoongArch: KVM: Implement kvm module related interface
->>    LoongArch: KVM: Implement kvm hardware enable, disable interface
->>    LoongArch: KVM: Implement VM related functions
->>    LoongArch: KVM: Add vcpu related header files
->>    LoongArch: KVM: Implement vcpu create and destroy interface
->>    LoongArch: KVM: Implement vcpu run interface
->>    LoongArch: KVM: Implement vcpu handle exit interface
->>    LoongArch: KVM: Implement vcpu get, vcpu set registers
->>    LoongArch: KVM: Implement vcpu ENABLE_CAP ioctl interface
->>    LoongArch: KVM: Implement fpu related operations for vcpu
->>    LoongArch: KVM: Implement vcpu interrupt operations
->>    LoongArch: KVM: Implement misc vcpu related interfaces
->>    LoongArch: KVM: Implement vcpu load and vcpu put operations
->>    LoongArch: KVM: Implement vcpu status description
->>    LoongArch: KVM: Implement update VM id function
->>    LoongArch: KVM: Implement virtual machine tlb operations
->>    LoongArch: KVM: Implement vcpu timer operations
->>    LoongArch: KVM: Implement kvm mmu operations
->>    LoongArch: KVM: Implement handle csr excption
->>    LoongArch: KVM: Implement handle iocsr exception
->>    LoongArch: KVM: Implement handle idle exception
->>    LoongArch: KVM: Implement handle gspr exception
->>    LoongArch: KVM: Implement handle mmio exception
->>    LoongArch: KVM: Implement handle fpu exception
->>    LoongArch: KVM: Implement kvm exception vector
->>    LoongArch: KVM: Implement vcpu world switch
->>    LoongArch: KVM: Enable kvm config and add the makefile
->>    LoongArch: KVM: Supplement kvm document about LoongArch-specific part
->>    LoongArch: KVM: Add maintainers for LoongArch KVM
->>
->>   Documentation/virt/kvm/api.rst             |  70 +-
->>   MAINTAINERS                                |  12 +
->>   arch/loongarch/Kbuild                      |   1 +
->>   arch/loongarch/Kconfig                     |   3 +
->>   arch/loongarch/configs/loongson3_defconfig |   2 +
->>   arch/loongarch/include/asm/inst.h          |  16 +
->>   arch/loongarch/include/asm/kvm_csr.h       | 222 +++++
->>   arch/loongarch/include/asm/kvm_host.h      | 238 ++++++
->>   arch/loongarch/include/asm/kvm_types.h     |  11 +
->>   arch/loongarch/include/asm/kvm_vcpu.h      |  95 +++
->>   arch/loongarch/include/asm/loongarch.h     |  19 +-
->>   arch/loongarch/include/uapi/asm/kvm.h      | 101 +++
->>   arch/loongarch/kernel/asm-offsets.c        |  32 +
->>   arch/loongarch/kvm/Kconfig                 |  45 ++
->>   arch/loongarch/kvm/Makefile                |  22 +
->>   arch/loongarch/kvm/csr_ops.S               |  67 ++
->>   arch/loongarch/kvm/exit.c                  | 702 ++++++++++++++++
->>   arch/loongarch/kvm/interrupt.c             | 113 +++
->>   arch/loongarch/kvm/main.c                  | 361 +++++++++
->>   arch/loongarch/kvm/mmu.c                   | 678 ++++++++++++++++
->>   arch/loongarch/kvm/switch.S                | 255 ++++++
->>   arch/loongarch/kvm/timer.c                 | 200 +++++
->>   arch/loongarch/kvm/tlb.c                   |  34 +
->>   arch/loongarch/kvm/trace.h                 | 168 ++++
->>   arch/loongarch/kvm/vcpu.c                  | 898 +++++++++++++++++++++
->>   arch/loongarch/kvm/vm.c                    |  76 ++
->>   arch/loongarch/kvm/vmid.c                  |  66 ++
->>   include/uapi/linux/kvm.h                   |   9 +
->>   28 files changed, 4502 insertions(+), 14 deletions(-)
->>   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->>   create mode 100644 arch/loongarch/include/asm/kvm_host.h
->>   create mode 100644 arch/loongarch/include/asm/kvm_types.h
->>   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->>   create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
->>   create mode 100644 arch/loongarch/kvm/Kconfig
->>   create mode 100644 arch/loongarch/kvm/Makefile
->>   create mode 100644 arch/loongarch/kvm/csr_ops.S
->>   create mode 100644 arch/loongarch/kvm/exit.c
->>   create mode 100644 arch/loongarch/kvm/interrupt.c
->>   create mode 100644 arch/loongarch/kvm/main.c
->>   create mode 100644 arch/loongarch/kvm/mmu.c
->>   create mode 100644 arch/loongarch/kvm/switch.S
->>   create mode 100644 arch/loongarch/kvm/timer.c
->>   create mode 100644 arch/loongarch/kvm/tlb.c
->>   create mode 100644 arch/loongarch/kvm/trace.h
->>   create mode 100644 arch/loongarch/kvm/vcpu.c
->>   create mode 100644 arch/loongarch/kvm/vm.c
->>   create mode 100644 arch/loongarch/kvm/vmid.c
->>
->> --
->> 2.27.0
->>
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index fc3db401f8a2..3265bfcb3156 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -1948,7 +1948,9 @@ struct mlx5_ifc_cmd_hca_cap_2_bits {
+ 	u8	   reserved_at_c0[0x8];
+ 	u8	   migration_multi_load[0x1];
+ 	u8	   migration_tracking_state[0x1];
+-	u8	   reserved_at_ca[0x16];
++	u8	   reserved_at_ca[0x6];
++	u8	   migration_in_chunks[0x1];
++	u8	   reserved_at_d1[0xf];
+ 
+ 	u8	   reserved_at_e0[0xc0];
+ 
+@@ -12392,7 +12394,8 @@ struct mlx5_ifc_query_vhca_migration_state_in_bits {
+ 	u8         op_mod[0x10];
+ 
+ 	u8         incremental[0x1];
+-	u8         reserved_at_41[0xf];
++	u8         chunk[0x1];
++	u8         reserved_at_42[0xe];
+ 	u8         vhca_id[0x10];
+ 
+ 	u8         reserved_at_60[0x20];
+@@ -12408,7 +12411,11 @@ struct mlx5_ifc_query_vhca_migration_state_out_bits {
+ 
+ 	u8         required_umem_size[0x20];
+ 
+-	u8         reserved_at_a0[0x160];
++	u8         reserved_at_a0[0x20];
++
++	u8         remaining_total_size[0x40];
++
++	u8         reserved_at_100[0x100];
+ };
+ 
+ struct mlx5_ifc_save_vhca_state_in_bits {
+@@ -12440,7 +12447,7 @@ struct mlx5_ifc_save_vhca_state_out_bits {
+ 
+ 	u8         actual_image_size[0x20];
+ 
+-	u8         reserved_at_60[0x20];
++	u8         next_required_umem_size[0x20];
+ };
+ 
+ struct mlx5_ifc_load_vhca_state_in_bits {
+-- 
+2.18.1
 
