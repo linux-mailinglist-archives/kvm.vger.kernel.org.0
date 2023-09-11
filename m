@@ -2,146 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F6EE799F8A
-	for <lists+kvm@lfdr.de>; Sun, 10 Sep 2023 21:45:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0107779A128
+	for <lists+kvm@lfdr.de>; Mon, 11 Sep 2023 04:16:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233073AbjIJTp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Sep 2023 15:45:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S229522AbjIKCQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Sep 2023 22:16:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbjIJTp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Sep 2023 15:45:57 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D2412C;
-        Sun, 10 Sep 2023 12:45:53 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA571C433C8;
-        Sun, 10 Sep 2023 19:45:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694375152;
-        bh=y3LT/R5kddG6jRISOgX3O0b1AfwlsqmAKG5NrInJc5M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=m4LRUq+GNjS1nxT6CjBfu+Kauv5mxEdU5FGaIxmYPwyn9l674yDbMBakGr//9qPCW
-         HDsmv6ZgT92MGhi5kjsP8Q/gZldYSFC3PD6kji9VI1DLjbB7oSSZcAfOGqc3os7R5m
-         NJuo/islUaX6qqopQMbVNySFN5OwLvDypjthia3kvDAg0//QiwDOaxxJCTh5ujbI+r
-         r3RLRC7Etrmzh7hWVpAS/dNI9hKoAMjpwAQ0xSAm+rqCeFLXHZu6vhPLQBydVbQq12
-         lmXgiiQXbjop+sPE6i0CE7xlE8U8iSP9cZXPcLsbmEBipgj1nnB5RSkO99H0wpVDUR
-         +6F+d2sx4tqHw==
-Date:   Sun, 10 Sep 2023 20:45:44 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Guo Ren <guoren@kernel.org>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        leobras@redhat.com, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 00/17] riscv: Add Native/Paravirt qspinlock support
-Message-ID: <20230910-facsimile-answering-60d1452b8c10@spud>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910-esteemed-exodus-706aaae940b1@spud>
- <CAJF2gTRQd_dNuZHNwfg3SwD0XERaYXYUdFUFQiarym40kpxFRQ@mail.gmail.com>
- <20230910-baggage-accent-ec5331b58c8e@spud>
- <CAJF2gTS8Vh5XdMUcgLA_GJzW6Nm3JKHxuMN9jYSNe_YCEjgCXA@mail.gmail.com>
+        with ESMTP id S232520AbjIKCQw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Sep 2023 22:16:52 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2391A5
+        for <kvm@vger.kernel.org>; Sun, 10 Sep 2023 19:16:47 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c0c6d4d650so32470005ad.0
+        for <kvm@vger.kernel.org>; Sun, 10 Sep 2023 19:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1694398607; x=1695003407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vqoA9GhDYxmGiRCW6kUKLzalkSujRXWk0xXWsVaqSl0=;
+        b=RT5yWhx3n44RuOqc/LXzstJ4VO9cuodC5ir2Oq1VpbOTsEUrC4UEclMtWwfpltZbc+
+         rfFuUshjQ9ZFZCH9+tvcN0sQGoyjf4F2jgYrlpsakKLxRn3fhbCGPDdZtYVMSnYGxnn7
+         YCIbZYwQ5eDNQoluaL9B6Ha09pWxcrYH1/Arc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694398607; x=1695003407;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vqoA9GhDYxmGiRCW6kUKLzalkSujRXWk0xXWsVaqSl0=;
+        b=IliTyOLTCgMX6C1a+3flYXc5Rw+/LaUvz4AMi+A/IvZn+E1GC8xltOM9sMQcb0RO9o
+         q3v6hdINT02H7KfrCDwphLPFF02NK0kcUaIWF8qEe//7VvkkXhBo6gJolo81PBvc5PRD
+         czcc1BScoPKRWovfdAO7WNeiJxRizlYD4nn6Me7wYVUbBN+zleUhpQnH48xwjvYMUNG+
+         vk4uCYvPthQrToMdXkkeMmpzN413i+mBaKcxwWdAZb4uZYwHm5nvleHkaQtEAA4qRsNQ
+         wrNT0X/R0HuUt6nv8/Fl+PPp8wKKB8MzyBUZFKlg6731BWnrCTv5FquydC8rU2VvH/Of
+         wwXA==
+X-Gm-Message-State: AOJu0YzJYBp00vb1t8HoueV460YSfLjWM936NQpGd8cLxskTxshRXPwW
+        8sfLiQd6yrUtSyp/cDTrkYkOI3aqpgzbuTCq2R8=
+X-Google-Smtp-Source: AGHT+IHwrp4u7peThbJCv3jlphOZQ/t5wNetdYpbttfEVToV24awEthc+P0HA+ZZ6XmS9NnPtx+BLg==
+X-Received: by 2002:a17:902:ed53:b0:1bf:64c9:a67c with SMTP id y19-20020a170902ed5300b001bf64c9a67cmr8538505plb.22.1694398607060;
+        Sun, 10 Sep 2023 19:16:47 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:282a:59c8:cc3a:2d6])
+        by smtp.gmail.com with UTF8SMTPSA id g2-20020a1709026b4200b001b8a00d4f7asm5171961plt.9.2023.09.10.19.16.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Sep 2023 19:16:46 -0700 (PDT)
+From:   David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Stevens <stevensd@chromium.org>
+Subject: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
+Date:   Mon, 11 Sep 2023 11:16:30 +0900
+Message-ID: <20230911021637.1941096-1-stevensd@google.com>
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FcTODDigvcxHiRXq"
-Content-Disposition: inline
-In-Reply-To: <CAJF2gTS8Vh5XdMUcgLA_GJzW6Nm3JKHxuMN9jYSNe_YCEjgCXA@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: David Stevens <stevensd@chromium.org>
 
---FcTODDigvcxHiRXq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch series adds support for mapping VM_IO and VM_PFNMAP memory
+that is backed by struct pages that aren't currently being refcounted
+(e.g. tail pages of non-compound higher order allocations) into the
+guest.
 
-On Sun, Sep 10, 2023 at 05:49:13PM +0800, Guo Ren wrote:
-> On Sun, Sep 10, 2023 at 5:32=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
-rote:
-> >
-> > On Sun, Sep 10, 2023 at 05:16:46PM +0800, Guo Ren wrote:
-> > > On Sun, Sep 10, 2023 at 4:58=E2=80=AFPM Conor Dooley <conor@kernel.or=
-g> wrote:
-> > > >
-> > > > On Sun, Sep 10, 2023 at 04:28:54AM -0400, guoren@kernel.org wrote:
-> > > >
-> > > > > Changlog:
-> > > > > V11:
-> > > > >  - Based on Leonardo Bras's cmpxchg_small patches v5.
-> > > > >  - Based on Guo Ren's Optimize arch_spin_value_unlocked patch v3.
-> > > > >  - Remove abusing alternative framework and use jump_label instea=
-d.
-> > > >
-> > > > btw, I didn't say that using alternatives was the problem, it was
-> > > > abusing the errata framework to perform feature detection that I had
-> > > > a problem with. That's not changed in v11.
-> > > I've removed errata feature detection. The only related patches are:
-> > >  - riscv: qspinlock: errata: Add ERRATA_THEAD_WRITE_ONCE fixup
-> > >  - riscv: qspinlock: errata: Enable qspinlock for T-HEAD processors
-> > >
-> > > Which one is your concern? Could you reply on the exact patch thread?=
- Thx.
-> >
-> > riscv: qspinlock: errata: Enable qspinlock for T-HEAD processors
-> >
-> > Please go back and re-read the comments I left on v11 about using the
-> > errata code for feature detection.
-> >
-> > > > A stronger forward progress guarantee is not an erratum, AFAICT.
-> >
-> > > Sorry, there is no erratum of "stronger forward progress guarantee" i=
-n the V11.
-> >
-> > "riscv: qspinlock: errata: Enable qspinlock for T-HEAD processors" still
-> > uses the errata framework to detect the presence of the stronger forward
-> > progress guarantee in v11.
-> Oh, thx for pointing it out. I could replace it with this:
->=20
-> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> index 88690751f2ee..4be92766d3e3 100644
-> --- a/arch/riscv/kernel/setup.c
-> +++ b/arch/riscv/kernel/setup.c
-> @@ -310,7 +310,8 @@ static void __init riscv_spinlock_init(void)
->  {
->  #ifdef CONFIG_RISCV_COMBO_SPINLOCKS
->         if (!enable_qspinlock_key &&
-> -           (sbi_get_firmware_id() !=3D SBI_EXT_BASE_IMPL_ID_KVM)) {
-> +           (sbi_get_firmware_id() !=3D SBI_EXT_BASE_IMPL_ID_KVM) &&
-> +           (sbi_get_mvendorid() !=3D THEAD_VENDOR_ID)) {
->                 static_branch_disable(&combo_qspinlock_key);
->                 pr_info("Ticket spinlock: enabled\n");
->         } else {
+Our use case is virtio-gpu blob resources [1], which directly map host
+graphics buffers into the guest as "vram" for the virtio-gpu device.
+This feature currently does not work on systems using the amdgpu driver,
+as that driver allocates non-compound higher order pages via
+ttm_pool_alloc_page.
 
-As I said on v11, I am opposed to feature probing using mvendorid & Co,
-partially due to the exact sort of check here to see if the kernel is
-running as a KVM guest. IMO, whether a platform has this stronger
-guarantee needs to be communicated by firmware, using ACPI or DT.
-I made some comments on v11, referring similar discussion about the
-thead vector stuff. Please go take a look at that.
+First, this series replaces the __gfn_to_pfn_memslot API with a more
+extensible __kvm_faultin_pfn API. The updated API rearranges
+__gfn_to_pfn_memslot's args into a struct and where possible packs the
+bool arguments into a FOLL_ flags argument. The refactoring changes do
+not change any behavior.
 
---FcTODDigvcxHiRXq
-Content-Type: application/pgp-signature; name="signature.asc"
+From there, this series extends the __kvm_faultin_pfn API so that
+non-refconuted pages can be safely handled. This invloves adding an
+input parameter to indicate whether the caller can safely use
+non-refcounted pfns and an output parameter to tell the caller whether
+or not the returned page is refcounted. This change includes a breaking
+change, by disallowing non-refcounted pfn mappings by default, as such
+mappings are unsafe. To allow such systems to continue to function, an
+opt-in module parameter is added to allow the unsafe behavior.
 
------BEGIN PGP SIGNATURE-----
+This series only adds support for non-refcounted pages to x86. Other
+MMUs can likely be updated without too much difficulty, but it is not
+needed at this point. Updating other parts of KVM (e.g. pfncache) is not
+straightforward [2].
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZP4c6AAKCRB4tDGHoIJi
-0ufzAQDyDyGN2Md5XT9ACjrp5SGyIPvMbchiOqhgvTVmc7yOaQEAxRbNy/jXdJGm
-2/gUe8tsoFaT3nlOeKvjVkQDjoH62gk=
-=jMZv
------END PGP SIGNATURE-----
+[1]
+https://patchwork.kernel.org/project/dri-devel/cover/20200814024000.2485-1-gurchetansingh@chromium.org/
+[2] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
 
---FcTODDigvcxHiRXq--
+v8 -> v9:
+ - Make paying attention to is_refcounted_page mandatory. This means
+   that FOLL_GET is no longer necessary. For compatibility with
+   un-migrated callers, add a temporary parameter to sidestep
+   ref-counting issues.
+ - Add allow_unsafe_mappings, which is a breaking change.
+ - Migrate kvm_vcpu_map and other callsites used by x86 to the new API.
+ - Drop arm and ppc changes.
+v7 -> v8:
+ - Set access bits before releasing mmu_lock.
+ - Pass FOLL_GET on 32-bit x86 or !tdp_enabled.
+ - Refactor FOLL_GET handling, add kvm_follow_refcounted_pfn helper.
+ - Set refcounted bit on >4k pages.
+ - Add comments and apply formatting suggestions.
+ - rebase on kvm next branch.
+v6 -> v7:
+ - Replace __gfn_to_pfn_memslot with a more flexible __kvm_faultin_pfn,
+   and extend that API to support non-refcounted pages (complete
+   rewrite).
+
+David Stevens (5):
+  KVM: mmu: Introduce __kvm_follow_pfn function
+  KVM: mmu: Improve handling of non-refcounted pfns
+  KVM: Migrate kvm_vcpu_map to __kvm_follow_pfn
+  KVM: x86: Migrate to __kvm_follow_pfn
+  KVM: x86/mmu: Handle non-refcounted pages
+
+Sean Christopherson (1):
+  KVM: Assert that a page's refcount is elevated when marking
+    accessed/dirty
+
+ arch/x86/kvm/mmu/mmu.c          |  93 +++++++---
+ arch/x86/kvm/mmu/mmu_internal.h |   1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  |   8 +-
+ arch/x86/kvm/mmu/spte.c         |   4 +-
+ arch/x86/kvm/mmu/spte.h         |  12 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  22 ++-
+ arch/x86/kvm/x86.c              |  12 +-
+ include/linux/kvm_host.h        |  42 ++++-
+ virt/kvm/kvm_main.c             | 294 +++++++++++++++++++-------------
+ virt/kvm/kvm_mm.h               |   3 +-
+ virt/kvm/pfncache.c             |  11 +-
+ 11 files changed, 339 insertions(+), 163 deletions(-)
+
+-- 
+2.42.0.283.g2d96d420d3-goog
+
