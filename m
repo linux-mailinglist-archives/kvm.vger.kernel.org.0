@@ -2,107 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C60579D6AC
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 18:44:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFEB479D6E2
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 18:53:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236801AbjILQo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 12:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40364 "EHLO
+        id S237132AbjILQxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 12:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234829AbjILQo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 12:44:56 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14A910DF
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:44:51 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3ff7d73a6feso62074005e9.1
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:44:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694537090; x=1695141890; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xYzn/3kOKpXxvHMz10ApcHvQSJG8FaIxGybsqApJRpA=;
-        b=TUMThmfUX2UewFRi76kP0O9oPDHUjvwk4RnZ8MuPQa+QaFvbCAFOwJr5uyKJGcAd9l
-         pAzWtH6M05OXc5+/oGKHxbQOI3lFAGN6KWRVF+PMy74Ov71EPpd8DB7ZWMUC6ojgSG7X
-         IDyBBnb+FnoLekydtY6pj5Ni6QmXQJyXTzqNrfjk0DSPCBYiX1utq9YiHQaL5KTE0Psz
-         YGgCemGDJUopqfaesoqdzG/rrllPOncgyuG101jt7Oa3aSVG8pQTwf3ddgHveQ9BGKiU
-         AeVG38z2y6AnAFn/IsYW/Mta6gHcjcNDP53AshSe6N1Pd2qNJnld8+0ZMkp11xMif3ll
-         VQog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694537090; x=1695141890;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYzn/3kOKpXxvHMz10ApcHvQSJG8FaIxGybsqApJRpA=;
-        b=Zx9EH34MYmsB2Z0p7MHnWqkSGTiTQ2ufeGO5u8loW82bim/UzZueJcvrACnNrUB2CN
-         hCn7HayvSe0J/7Hun1XPbqgpTyAzaVMk4Dljm+JeLq8iYlcjcZICvlItgN6qVBNolNlp
-         7mf7vRYidJMMQjuQbhBgQiY5OmTn1gNpXK8tmY1hL124keticGz3mjBBo88EbcXbwHwt
-         oAkZjJm5OjRvu0PDu1owMgDDqkXqTo6jTVRsvnDO6b0bYq6wwMKsYlQWH11Zf4SeHvMF
-         pj6ojO0W4XJXyFLmBhpwoOFdNq08Feh0PnXWHtbZ29S4lNJ8BkdEZUU/4RRva1Q3mICZ
-         sHow==
-X-Gm-Message-State: AOJu0Yyfjn7gcDVEh4kLmLDXWQm8+wMvDHWJf1DqwHsEhljVS2qjfFfP
-        Bw5cnIBjDFj52+OsUuqGtLLp9A==
-X-Google-Smtp-Source: AGHT+IH5vub4rBT/vbvswzxQwp1f1tgh1SGV+s0iqZ7V+FINUgCe/yHe8M0v8fp7xIKASp2eOFPd5g==
-X-Received: by 2002:a7b:c4cb:0:b0:3fd:30cb:18bd with SMTP id g11-20020a7bc4cb000000b003fd30cb18bdmr12420154wmk.15.1694537090421;
-        Tue, 12 Sep 2023 09:44:50 -0700 (PDT)
-Received: from [192.168.69.115] (cou50-h01-176-172-50-150.dsl.sta.abo.bbox.fr. [176.172.50.150])
-        by smtp.gmail.com with ESMTPSA id l12-20020a1ced0c000000b003fe24441e23sm13498474wmh.24.2023.09.12.09.44.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 09:44:50 -0700 (PDT)
-Message-ID: <111b9277-59b6-7252-6ddd-13edff9b2505@linaro.org>
-Date:   Tue, 12 Sep 2023 18:44:48 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH v4 0/3] target/i386: Restrict system-specific features
- from user emulation
+        with ESMTP id S237115AbjILQxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 12:53:48 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2086.outbound.protection.outlook.com [40.107.96.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17D3115;
+        Tue, 12 Sep 2023 09:53:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jrTjc1FFq6Ikzsqkzchjdeyp/7ynBba7KFU2p1KbYMGWpHUMkfSKMn7yqNUfmx6l+V5yRbhu3O5XC3klVsac86IWCjcLeKVatIRdQxRl/Xcy0YBmi4j/k3oKACprRaOF3vYGkR7KHf1giEsSDxeNb7T/IWWId3ExhlDJ2ET8pf7GlhAAtvuMCkBEMKLLyg/HkYoPl1dpIC+IS/JkEcLHa9Da5t6svp1BFW9z76ijn2+eiJtDnhW8T+Tulc0r8mysLJMDGhzaQi0Nwhq4mhlUxJwjnvB4bqrqjASpjq39GetjbQLyl/W0eO5UBe+Rf3gYGMV30/kqdAI778DBOlGMDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YwY7U95yNI3tulsoI5UVXmH/FgeVYiGGzFerU/YjC4g=;
+ b=QJ9GShwb1EcojaM4O9P64JAJXGuty3v1h++VkMABs8hPaLvUFUisFE+K1fB1II2izI+pNs87s4Lc4OMAxNrNtWk5nsMrpC4dfjLi0FZ58IJRufCEnBVRTOdZzN+aL7HzNld6BSRQDlk1eVxh8EmALFNSLCAZ/qaPwRLAYW2d1567XnqxtvSpJNHWjVfJdaKKb7jCVP2GFbrDvelkIHriMapnmHIMYZCkItZpCSg+A2HQZyjJtiwepWaJD5mqvO+JcijmrfI7cXscDv2Da1uispPEObauBt0sWbjJWWi85M+i0BMZivjOUJSH+Prt9e7/q6Nk1/lDeiueFn+AHrCXsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YwY7U95yNI3tulsoI5UVXmH/FgeVYiGGzFerU/YjC4g=;
+ b=tlWq8SDYPy/WBVJpYQ/myhBdrF23uC+i1JeAd1JA+7YsYiUYqspMN0IUU783zX4V4U0X24NSN7jou1GvryCsB4gmYQapdOXJ8ZhdsC6dVBizdIhp7+0Gm3eSFCH1je66XdWVqIx0j3YHrAkiHV4lSUziO4/BHQeAlSL1QjWTymk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DM4PR12MB6208.namprd12.prod.outlook.com (2603:10b6:8:a5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Tue, 12 Sep
+ 2023 16:53:42 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6768.029; Tue, 12 Sep 2023
+ 16:53:42 +0000
+Message-ID: <56e5da1b-bed2-f935-d8c4-9c3013897621@amd.com>
+Date:   Tue, 12 Sep 2023 09:53:39 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH] KVM: x86: Fix lapic timer interrupt lost after loading a
+ snapshot.
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Michael Tokarev <mjt@tls.msk.ru>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20230911211317.28773-1-philmd@linaro.org>
- <fabf2451-e8ad-8171-b583-16b238c578e7@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <fabf2451-e8ad-8171-b583-16b238c578e7@redhat.com>
+To:     Haitao Shan <hshan@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20230912161518.199484-1-hshan@google.com>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230912161518.199484-1-hshan@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0254.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::19) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DM4PR12MB6208:EE_
+X-MS-Office365-Filtering-Correlation-Id: ba4b1977-1aee-4f8d-d1cf-08dbb3b0d1f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +BkqGisqdb0RfKjv9VXtksd+ArvxJKDvzBtZ0n399axpjbPXlP53fBmks9U3fdW70jUegc11kS6SaRCsiKB2NrEV2joNG5ib7Kh4AmJ3/AAV1uF0Ca1Hcm+PLZyseSnErNFjyefTpYt3ElkjBzUr213zyOpAdjOQhTEedQgfM/i29gVK5zK06nWhy+bVrDsIasaxkpSKEiUFqkVkXMROcuctueU8yiUEiUw8f5eitUH80pJUkwvghf71ubW4l6/0brGEAvNIAxK3/lBhptet+CNsCpZjjaaeuq2DCLS9dISf8Z7+1spkUouSMKMPvCQ4uLj4pltmcZenWQrOHITgko8F2fywtiWs52PR03XBm3waOpKdOKehEP5MZfaTDQDNpKqEAmhnBMnGX/av95RtDSVGHMBHUZiRMei4vVlyle/eVZUX6LoLjTEIyKCzGLN3onpEn/J/GhWnZ1D305xIjqtvQ1VWiBJb9ypNWQrcWg5sxDQB4WnDz/mAC14IHu0olt3ADq6nD/5L8Zk+4SU++Ct67AU1lcvClYplSkHhckwM4oBBQArUBYAlNfQeDuQdwf3aWbRg3RqFfJgvr8f4Xf6etxsaJkoYVcGMxNHpzKvmVMX3v+JgHI5ESL75o9Ox2b7uBXdYWjlySmGRCX44Ag==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(346002)(136003)(39860400002)(1800799009)(451199024)(186009)(6666004)(26005)(478600001)(6486002)(2616005)(31686004)(110136005)(83380400001)(38100700002)(66556008)(54906003)(66476007)(6506007)(53546011)(66946007)(6512007)(7416002)(316002)(8936002)(8676002)(41300700001)(2906002)(31696002)(4326008)(5660300002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WlJreU9tdm5PaUp6M2xaRXlER3h1TzJmM1N5U09CdHZOZW9GZ1J0bmRBaE1q?=
+ =?utf-8?B?ZnRjZmk5Q1NNZnNoaU9QRnpNTmJyLzdJR1N1TUdJbzJpdzFZNGMwbTRDTzRL?=
+ =?utf-8?B?VVdJK2hGZTZFWDNzQTB2d3o4WUxJNjNDVzViVnNQdFgrYVI5TW1DOTJsWGk2?=
+ =?utf-8?B?aWVGVlNQVkJrWWVCZG1yR0VBMGYzeWdwZTFUZVVyT2hreXdHc3RKZHJFME9F?=
+ =?utf-8?B?V2xlamFkUzZwWmdNeUZRS1Ayai91djk1di9DazN5WlNiaStHNitlaXFmYi9G?=
+ =?utf-8?B?S1FHbUJZQkdMcnhjNE9obzhXKzJoOEZjZWVKT2t6eGNaSGdOS2lhV1Z0c1l3?=
+ =?utf-8?B?RHl6QXZtNVFYY1hNdCtDb0NwNHN0b2NSVGR5emNSNHpnRllZeVhkQVY3dGR6?=
+ =?utf-8?B?QTVYbnBMZWRsdjJUbjZmbjNrdlVmNVIydnN4YTJncm01eXhvdzU4RHVmeDhU?=
+ =?utf-8?B?VWpPbUxENmVSZE9FbzBEZG13SEhiK2kzSWl6VEROaWx4UXJSMmZNT1A3a3FI?=
+ =?utf-8?B?NnBXMXkvc0F3TDJDTnRPdGQrcmU4bTBQWTNtNmx1eVlGd0daT2E2NTRRM25V?=
+ =?utf-8?B?L0NSMGZESFpzM3dQYmRKZTBkRm5hTDFoZnhoc01GcmVhRGk1Wk1iV2pidEg4?=
+ =?utf-8?B?RVVRcFJWamlZY2Fxcm1xcTJXZ2V1TnRiQ2lSMUxXcWhkOHlzSWJmRk5IcVdC?=
+ =?utf-8?B?YnNRSVlKYjgzTkxJd0RSWkJndDFTT09HeGhNMFJwYXgwSklEMEV6Z3VjejA3?=
+ =?utf-8?B?ZVBTN05qRmxGWXY1T2JLcFV5UXB3azlLYWNkUjE4ckpxdXdPQjVKd2JMWGFo?=
+ =?utf-8?B?QzlweTUyNUxkL1VseUNjQnZpOUY0N1ZnMnF6cjdJR0NjNEtKbTYrWU5aN1Ux?=
+ =?utf-8?B?dG9DekdWOGh5cjhtbUU2d0FEOEl3S2Q3dmpCanNpb0VPcWZkTnlxNlMrMXNT?=
+ =?utf-8?B?UWJDZ2hjUVA5ZW5Hais2OEYzd1dyRlRhWG8vTnd0czVXRUVNNEdXUW1BMDlW?=
+ =?utf-8?B?Sy9UVGFsOUY3TWVkdy9BMzZnWndhaTFYTjA2N0FRL3lFTmQ1TnlpVlNOZW1F?=
+ =?utf-8?B?VXhFVFRyMWt2Z2o4T0Jac3kydzI4aUV3U0tzSDBXWkVzQTJzeDNJREtRMkxq?=
+ =?utf-8?B?UFBrdUxvU2xFWHNsNHRLR3FqSUpGR1g4VTl6R2pxd3krTFFWUHYzWmhNWCsw?=
+ =?utf-8?B?OFh1VndMbnRHRVdZVDBIZ1ZCSDBpTFBZbXhkd0g5QWhqTU1yS3Z2cldKYVR4?=
+ =?utf-8?B?NU80NFJxRVo4YnpWdFVXckhONWEzT3dMVE8vNVhMWGRrb1VEakw5V1hxNTIz?=
+ =?utf-8?B?Vjd2NnE4UlhRL0xDUzkwbFg1QlpVdlY2Z2k4TU1VQUkwaDZOaHB6NnlTKzNt?=
+ =?utf-8?B?aGZCNVhyMUIxUHZBVGYwTkRNVVhyR2p5OFViMjJraUM1RVlpUjhKc25YRkpZ?=
+ =?utf-8?B?Uk1UNlhreWJGWDFhRHFrRUdrdlhKRzBFY2JqWmdqeGlDWXZ6cmtQU3AvSEVX?=
+ =?utf-8?B?YzhpM2U4WVRwb2pjOFFEbUZycmZPTWc5ak5YcXZnMVBRaFpzTW00ZUw1RGs3?=
+ =?utf-8?B?U2lkK3VVelpFQXdBQk50dmlJREF0K1hncnNsRnR1bHhHUTc3TWVOK2xEOUhw?=
+ =?utf-8?B?VkZsWmplb1FWN3VQSzZjUCt2OXlqNWEyb285YjcycS95MTQxbDdxN3lpemJ0?=
+ =?utf-8?B?cklJZmxQd1dXbUwxRFVxd0pyQ3RIS0w4QnpjNnpBRm16NzA3T0R6REdZTXAx?=
+ =?utf-8?B?c3doNW9CRkxSTDY4SkQvTjJHeDROS1Rqc0xYVmJpdlZzZFR6V2NLYlRRT2x6?=
+ =?utf-8?B?K3ltZnZMMTVWOFUxQUxDRzYraDZzd2hnN1FIM21GTjhlSithREZSL24rMndI?=
+ =?utf-8?B?U3F3NVZjNXJ1TGtmNTlraGl3OTljWDVmcTJPaHF1STY3VGFYc25DTTFpczlh?=
+ =?utf-8?B?em1ucVcvN2YrRXk4NWxCU1VlNkdYUS9uY2d3NEh5MS84bXNKcXNiNzd3TWtU?=
+ =?utf-8?B?N1hLSGNZUE5yQlVHeEk4MTErT2dtdkgvbjh3MFRtKzFrbHFHZ09WMjRqaE8y?=
+ =?utf-8?B?aThFSWJsNUhyOWpLQ0srZjU0TEFJeGYrc015U1hraHg0djJyT1VBa0c1Y1c1?=
+ =?utf-8?Q?X8RfXQYVdnmIfKNUN5/QmY4bO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ba4b1977-1aee-4f8d-d1cf-08dbb3b0d1f9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 16:53:42.2627
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: w7q0V9e7OrrD+XV1ACbYhiU7RwK3OsVqtEhenLS+IVfVrWTGwJENqrVjFg6+muwzgijHqUoQTz6T3oT+rTjtVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6208
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/9/23 16:07, Paolo Bonzini wrote:
-> On 9/11/23 23:13, Philippe Mathieu-Daudé wrote:
->> Too many system-specific code (and in particular KVM related)
->> is pulled in user-only build. This led to adding unjustified
->> stubs as kludge to unagressive linker non-optimizations.
->>
->> This series restrict x86 system-specific features to sysemu,
->> so we don't require any stub, and remove all x86 KVM declarations
->> from user emulation code (to trigger compile failure instead of
->> link one).
->>
->> Philippe Mathieu-Daudé (3):
->>    target/i386: Check kvm_hyperv_expand_features() return value
->>    RFC target/i386: Restrict system-specific features from user emulation
->>    target/i386: Prohibit target specific KVM prototypes on user emulation
+On 9/12/2023 9:15 AM, Haitao Shan wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> At least, patch 2 should be changed so that the #ifdef'ery is done at a 
-> higher level.
+> 
+> This issue exists in kernel version 6.3-rc1 or above. The issue is
+> introduced by the commit 8e6ed96cdd50 ("KVM: x86: fire timer when it is
+> migrated and expired, and in oneshot mode"). The issue occurs on Intel
+> platform which APIC virtualization and posted interrupt processing.
+> 
+> The issue is first discovered when running the Android Emulator which
+> is based on QEMU 2.12. I can reproduce the issue with QEMU 8.0.4 in
+> Debian 12.
+> 
+> With the above commit, the timer gets fired immediately inside the
+> KVM_SET_LAPIC call when loading the snapshot. On such Intel platforms,
+> this eventually leads to setting the corresponding PIR bit. However,
+> the whole PIR bits get cleared later in the same KVM_SET_LAPIC call.
+> Missing lapic timer interrupt freeze the guest kernel.
+> 
 
-I can try to improve it with your comments, but I have no idea of
-x86 CPU features.
+Should there be a "Fixes" tag here with the problematic commit?
 
-> However, the dependency of user-mode emulation on KVM is really an 
-> implementation detail of QEMU.  It's very much baked into linux-user and 
-> hard to remove, but I'm not sure it's a good idea to add more #ifdef 
-> CONFIG_USER_ONLY around KVM code.
+Thanks,
 
-Do you rather v3 then?
+Brett
 
-https://lore.kernel.org/qemu-devel/20230911142729.25548-1-philmd@linaro.org/
-
+> Signed-off-by: Haitao Shan <hshan@google.com>
+> ---
+>   arch/x86/kvm/lapic.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index a983a16163b1..6f73406b875a 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2977,14 +2977,14 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>          apic_update_lvtt(apic);
+>          apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>          update_divide_count(apic);
+> -       __start_apic_timer(apic, APIC_TMCCT);
+> -       kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
+>          kvm_apic_update_apicv(vcpu);
+>          if (apic->apicv_active) {
+>                  static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
+>                  static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
+>                  static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
+>          }
+> +       __start_apic_timer(apic, APIC_TMCCT);
+> +       kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
+>          kvm_make_request(KVM_REQ_EVENT, vcpu);
+>          if (ioapic_in_kernel(vcpu->kvm))
+>                  kvm_rtc_eoi_tracking_restore_one(vcpu);
+> --
+> 2.42.0.283.g2d96d420d3-goog
+> 
