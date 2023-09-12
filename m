@@ -2,172 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC8A79C42E
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 05:32:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D73AA79C46B
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 05:52:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236307AbjILDca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 23:32:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37678 "EHLO
+        id S238018AbjILDw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 23:52:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237591AbjILDcM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 23:32:12 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD662272D;
-        Mon, 11 Sep 2023 20:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694489467; x=1726025467;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=BibANY+3WW38vcaZxChx5aPMBzh0hAAlOhy5HblVAXw=;
-  b=etBsWO0VK7Zl54GeVmonGxf1mEAh6wQpKZPN5ISMa+EdEAwSsWheCx/E
-   L48wl9XvNw4iH7s7xwcGJB704urjDxSWqMvxO7NgJFLGPNkHvHtkd/1EL
-   tp0migsQo3XeZD63YvcKjqWT+jLmOEZ4ez8OrJzmjgzLlqH/xn6D6pQEo
-   fQglBnAa0prA+3NmNeAfPIEUes08i2/R68FHL6ym4bO4abuD+t3XBUBH6
-   l5pVaq4oN77DL/83gZ/9Hv6nit66btFAfavHzin0jfn9750+HjzxVBf/K
-   7HESvTBbVZCkvVljHMv7UQTNcTziqNt+GsOC3XQR5uHqHeJxL9SVit7na
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="357702040"
-X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
-   d="scan'208";a="357702040"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 20:31:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="736981567"
-X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
-   d="scan'208";a="736981567"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Sep 2023 20:31:06 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 11 Sep 2023 20:31:06 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 11 Sep 2023 20:31:05 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Mon, 11 Sep 2023 20:31:05 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Mon, 11 Sep 2023 20:31:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M7/ONRVa2uCnwmsoC7rrbQrog2mlU0Z0e/IiJZezqDYJ+ZlCuk2zv6/MJmGiCcZf3Lwg2fI5Ba5HNpwWzz2aDqXtmHnVQorKbrJmwavDWUjY5WC2HbTkZo5IWDaV/cu+jkR2MUnDYpAm9nWPkGKj8/2BZ1+JDCJt3c7Dcety7UlMwlhlGEiqF4Pgd39ZgZGLvamOAtB11X9Ojpo3ZG28rHlh9xzvDFIMqdnf5XKUieMQhEFkcbuKYH8OxCP68Hvys5VqPMuiH4C2xH/1/jXiJhkeNTBLFVN+aeAUXOeDmHYtoqYFNURHozTyrcfbBZi0WoKZtSHVY+Y58ZKj/yr8bQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vIuowMT3Iz7ml7ttuPFwgpJTiXyoSWJBdDkoV4iktE4=;
- b=Mbo8BJ9Axc2EUQSfQAXs+fDm7OHjJTgj+tj/tjkAuCtzT5rsL9RwZyxCBKkQfWPfK7P0qzmx/32qBMQ2Ypk0lumTxIx4GOgjDZ+j2XhjrN4KQJ4rqQV6dZ+Iqw5PYjcM+38uBBIPRaaYhjen0wMcyXS5hR8K74f1TcF3lZqcofZKPmWC/6nY2qVovKDBoFluhwsgmQebND2S6u6da6+aj2PAnjJPOCn4iJWAol7coPXJQgSETDsBp9nbsORLRdpq+p1+NCKZS4CE4NXtqE/lWgQpJzPnjrO55q+NbSCP/kwxVg3cVdzE8JWU5DNz6iErb0zWtaC3oZ7XYQ//9h691g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by BL1PR11MB5541.namprd11.prod.outlook.com (2603:10b6:208:31f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Tue, 12 Sep
- 2023 03:31:02 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5d9f:7e54:4218:159f]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::5d9f:7e54:4218:159f%7]) with mapi id 15.20.6768.029; Tue, 12 Sep 2023
- 03:31:02 +0000
-Date:   Tue, 12 Sep 2023 11:30:50 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Manali Shukla <manali.shukla@amd.com>
-CC:     <kvm@vger.kernel.org>, <seanjc@google.com>,
-        <linux-doc@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
-        <x86@kernel.org>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <bp@alien8.de>, <santosh.shukla@amd.com>, <ravi.bangoria@amd.com>,
-        <thomas.lendacky@amd.com>, <nikunj@amd.com>
-Subject: Re: [PATCH 12/13] KVM: SVM: Enable IBS virtualization on non SEV-ES
- and SEV-ES guests
-Message-ID: <ZP/bavxZsg7Kbv7+@chao-email>
-References: <20230904095347.14994-1-manali.shukla@amd.com>
- <20230904095347.14994-13-manali.shukla@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230904095347.14994-13-manali.shukla@amd.com>
-X-ClientProxiedBy: SI1PR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::9) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S237771AbjILDwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 23:52:17 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880B6AF;
+        Mon, 11 Sep 2023 20:52:13 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A10CC433C9;
+        Tue, 12 Sep 2023 03:52:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694490733;
+        bh=WqtyR6TyE2OiwN9Ksz+X7wHBgrKGw+Y7ijGlSzfZmqw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=H+83pHrfPKWcgEp4xNyLlDqq2G+A7bJcjbqLZcTgEPHze/tRozW+wdUIzLWlQK+fl
+         9lGaj325gIxmAvSRrOIiGs8lCzsgqSW5zjvEu5a1HfbUoIXJAtJP+Yndo0/HM2RIFQ
+         9sLIfuhIMGRGsLEjxXVS+Hdh1JHFUKkR2wzpOlRSL2JwSRGv5A8QsvZJfdKCdUapXG
+         ALV8zCO1wmsV4JNHYm+2yqpcT4H5/fLzGy8LKX7RTo64hqsWdtXXQZB2xnneyOFZFN
+         qOHM2P4Gpn8Q9euuw+W37cPATd7d5eeli2lNbwyziLYL0mBAlblVGJtk6wSTfxAxo7
+         Gi7k3tEw+wksA==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2bceca8a41aso82494191fa.0;
+        Mon, 11 Sep 2023 20:52:13 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yx4wHgcQQjbRoY4o1baAWl033QhGmDCksLf82DugLuFuFdTtaad
+        y9YuxJPd7hZW6hbxdceUt5XGZDrg0+ndEedxV/c=
+X-Google-Smtp-Source: AGHT+IFTeWfLmYlpWNn+ra8nqvwqS5UVyI2/EdimCPz3OodsUCMrXm5acnaN1t3VEu17oBXGrc+tsWOOlAASLGgO9bM=
+X-Received: by 2002:a2e:9bcf:0:b0:2bc:b6b0:1c4d with SMTP id
+ w15-20020a2e9bcf000000b002bcb6b01c4dmr9287945ljj.10.1694490731299; Mon, 11
+ Sep 2023 20:52:11 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|BL1PR11MB5541:EE_
-X-MS-Office365-Filtering-Correlation-Id: 808eddf9-1b28-48a7-6756-08dbb340b05a
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kaf3IFqlKI39Dnp2H1TXMRdcMXJj4FbInLFuV+Okv1zzzJ2G8r+J1KLo92CyT30mMuFCjm9W4JT+4wLzDB1mZQ1WkOfaZWGByqLO7oZizWXnkxNoka6DQ46G5q/Hz4PcDQ3WkV0OMNvehgv3ES0iHvv90XSDhrL2E5IaBvoBsIhJTbOoGtTUzR23OEYPkSDVntJ/AyxhNS1UXvfLzzPZhKu8mZtVXzYF4K/LsVc5aV8wQJUCP9J3/gdMp4CBjQT5M12egMawwNYPc0Ndsjz6K1J922A8VS0uWf1fpNwuxfgSdgQqYG4qXZ59VYqsiyKrfCGP3TAghbPh8ZIqJXHUW2YqiURKmrN5bMeW11cARlJasZpttDoOfOrh5Joycpar7xYTulyGyrnP5+5cxomIE4fA0kNAwWsX4OwZoBC0DlO9Z3zTfZ5EM6ZtMZwu/AL0LkkOjDW7/T9AS1yAWGuHsNzyEbb8EdnTkvux8t4aZaQVeATD1VD676RD8b27Qd36d3UNYArSsOKXNUmG2l9mXiYFFOz8gQgIgfApJZ6Qv949r6irGSZXeojc2/1yccNR
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(136003)(376002)(366004)(346002)(186009)(451199024)(1800799009)(41300700001)(6916009)(316002)(7416002)(26005)(44832011)(8676002)(66946007)(66556008)(4326008)(2906002)(8936002)(66476007)(5660300002)(478600001)(4744005)(6666004)(6486002)(6506007)(9686003)(6512007)(83380400001)(33716001)(38100700002)(82960400001)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LfOhkzmjFB7mAYHh4uo4wFc5f8npwh9L3JDCf1aE8FyWogzVJzYQzMGAzZrx?=
- =?us-ascii?Q?OUJUEwrt06RBPvtkrLVJUmKo3O091SL7ufYZNmqXQpeRfsW5dultY+iRbkM1?=
- =?us-ascii?Q?ke/R7gEo6BSIXppKEQtLNG/YnjSIe2By343JD6RU670zD1Cbn9FsZw1OLxHX?=
- =?us-ascii?Q?gmF3tk4TIX4m0qgta+dHtcp4enfThz2LRGQq1YkdFCSV4iL6sHBOzlUdJOVp?=
- =?us-ascii?Q?aCzq5d6++DXLxwkPy4p3B8FfSFBh9jMCztI0QQWBjVyYw9IPoevfRqclVeYf?=
- =?us-ascii?Q?xi/EijxYZT2TPNq/NyS34+OYiZhJ59LuJsaE6P7ZvokWBNk/tfO+p2k+gCyW?=
- =?us-ascii?Q?AZMH/j+DyNuIZiMRPGx2OBd8AgxM+EYUxxNVqUE/AyG2L+iXAeKHr+Vw0tIJ?=
- =?us-ascii?Q?wG2yaxMXpvFHa/OCYZwI1eZ03UJ+veMJPBkfqzAhH13OqBoRvNJLVBr90p4n?=
- =?us-ascii?Q?7uMOTB0Obt5ik8H5fxGLRgTcSIH3wYxGY5O2i4KRX7STWK4LjgCLDbLR6F3y?=
- =?us-ascii?Q?Yd4eMz9t/9qqNgjMtHh59HyUhD6LJyhAUyNUQVwAkF5FhWsC/n1spMwL1BVe?=
- =?us-ascii?Q?XTvU3D+Yp3Kdd3fl/uuHj9Fe32ujhn60VJcPXjPF6t2YYpyCein51adeO9cn?=
- =?us-ascii?Q?HIqUYMbOhYpnm7YPxgRKC+D6nvyUU+AW+0QKBJy/x3C+KfGprXNW497lKtwg?=
- =?us-ascii?Q?IxVNjulmzRZm5xxRQDNcz9/WJwmZPAkZkKBIXVUc3lCbGKzCXz2UWnKK930S?=
- =?us-ascii?Q?ArSPxivsGPrMltIDm+kA2eKHUa2k8OjuxIWhDgY85P8gdvlxe3DdI154vQIS?=
- =?us-ascii?Q?CNW8u2pTVefjhTS6Bb8vHMQCDhcOmxVpW3vVUhq9wIAN5YcSGHCeF+QPLduC?=
- =?us-ascii?Q?kqc++UrAEn9S52M/z/NHaSTdthZGH3Otf/GLcTB5poVKixpDjftJyTU5KjEg?=
- =?us-ascii?Q?AMDGDWsUgnMyTfXWPT6SXFoat1i+UoCzsEkMs1JB6W3xbfh/dhMBl3qz3Dew?=
- =?us-ascii?Q?4FYI2c+sr/lwK31OF0Yooekf/qb/ZJUVoflr4afZDzroEzUN0fXAxp4PvHqp?=
- =?us-ascii?Q?1mct3KpGVfJhHm1qOZilYKM2YM8I8NZxoSE4cqAX14PyXh0O3bdYCN7XUH0N?=
- =?us-ascii?Q?3Gz2DmjfdfmBUAlBcS18KMrNvxsfjgPNiPXNiu/NTXsMhGipK+q2DsB8GsdM?=
- =?us-ascii?Q?Bk+hON3UlxJUvqtl0b7A8kpOvr62Xdoi6b5upR1TrdrEGud4OUWLpH1XE1ve?=
- =?us-ascii?Q?NTmExoX5Rky5zZ7Qj+b2vGRg6kcb3M8YAjRwPJFnAx/1eu7bGyRrN6IvXo6/?=
- =?us-ascii?Q?6Ed9N2BCUzU+5nCnAwGTUS6AehwdekpPkHm06JwIzYGaaFCp/t9QHDGQQmSi?=
- =?us-ascii?Q?phCXRW5w7ufIHYmgCFpJCJLY4HAc4tkJpLzPh+19gGbxyosmaFpj+5p/P/yy?=
- =?us-ascii?Q?YjlPcqmlIJhdE5EjgzGbEXZlzNkcjfFeKsLh8vOtIgeYpOtSoflEk6Qgkhjd?=
- =?us-ascii?Q?3LlIaCCKuoN9VSa12F3UzJUwNVDGWWoBw9HMflILqpZ0ELPZULS3DrxRK8zf?=
- =?us-ascii?Q?Z/dZyOnBpc8YKx6BUbjnIIA3NpfX2pgFvKiTrB+X?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 808eddf9-1b28-48a7-6756-08dbb340b05a
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 03:31:02.2538
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HQV3xkE1LKWeO3mgoTKzdXyKdQG8tDMixtC7mRlJe2U2jatzqSg2a6MXwdkUkJMznTbd1l1x+Y7q8x8rDyCi3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5541
-X-OriginatorOrg: intel.com
+References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
+ <20230831083020.2187109-17-zhaotianrui@loongson.cn> <CAAhV-H497R=B3KaO8Z5ig2Nwst10dm63eiPnDpfNbFCxG4uVKg@mail.gmail.com>
+ <7379be58-30a5-1f0f-2e13-ca51b7cff096@loongson.cn>
+In-Reply-To: <7379be58-30a5-1f0f-2e13-ca51b7cff096@loongson.cn>
+From:   Huacai Chen <chenhuacai@kernel.org>
+Date:   Tue, 12 Sep 2023 11:51:58 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H51vjwuUgS-GEkMbDs+JAdmT0i3vd13RwuvYju=GwELFw@mail.gmail.com>
+Message-ID: <CAAhV-H51vjwuUgS-GEkMbDs+JAdmT0i3vd13RwuvYju=GwELFw@mail.gmail.com>
+Subject: Re: [PATCH v20 16/30] LoongArch: KVM: Implement update VM id function
+To:     bibo mao <maobibo@loongson.cn>
+Cc:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Xi Ruoyao <xry111@xry111.site>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->+static void svm_ibs_set_cpu_caps(void)
->+{
->+	kvm_cpu_cap_set(X86_FEATURE_IBS);
->+	kvm_cpu_cap_set(X86_FEATURE_EXTLVT);
->+	kvm_cpu_cap_set(X86_FEATURE_EXTAPIC);
+On Mon, Sep 11, 2023 at 6:23=E2=80=AFPM bibo mao <maobibo@loongson.cn> wrot=
+e:
+>
+>
+>
+> =E5=9C=A8 2023/9/11 18:00, Huacai Chen =E5=86=99=E9=81=93:
+> > Hi, Tianrui,
+> >
+> > On Thu, Aug 31, 2023 at 4:30=E2=80=AFPM Tianrui Zhao <zhaotianrui@loong=
+son.cn> wrote:
+> >>
+> >> Implement kvm check vmid and update vmid, the vmid should be checked b=
+efore
+> >> vcpu enter guest.
+> >>
+> >> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> >> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+> >> ---
+> >>  arch/loongarch/kvm/vmid.c | 66 ++++++++++++++++++++++++++++++++++++++=
++
+> >>  1 file changed, 66 insertions(+)
+> >>  create mode 100644 arch/loongarch/kvm/vmid.c
+> >>
+> >> diff --git a/arch/loongarch/kvm/vmid.c b/arch/loongarch/kvm/vmid.c
+> >> new file mode 100644
+> >> index 0000000000..fc25ddc3b7
+> >> --- /dev/null
+> >> +++ b/arch/loongarch/kvm/vmid.c
+> >> @@ -0,0 +1,66 @@
+> >> +// SPDX-License-Identifier: GPL-2.0
+> >> +/*
+> >> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+> >> + */
+> >> +
+> >> +#include <linux/kvm_host.h>
+> >> +#include "trace.h"
+> >> +
+> >> +static void _kvm_update_vpid(struct kvm_vcpu *vcpu, int cpu)
+> >> +{
+> >> +       struct kvm_context *context;
+> >> +       unsigned long vpid;
+> >> +
+> >> +       context =3D per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
+> >> +       vpid =3D context->vpid_cache + 1;
+> >> +       if (!(vpid & vpid_mask)) {
+> >> +               /* finish round of 64 bit loop */
+> >> +               if (unlikely(!vpid))
+> >> +                       vpid =3D vpid_mask + 1;
+> >> +
+> >> +               /* vpid 0 reserved for root */
+> >> +               ++vpid;
+> >> +
+> >> +               /* start new vpid cycle */
+> >> +               kvm_flush_tlb_all();
+> >> +       }
+> >> +
+> >> +       context->vpid_cache =3D vpid;
+> >> +       vcpu->arch.vpid =3D vpid;
+> >> +}
+> >> +
+> >> +void _kvm_check_vmid(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +       struct kvm_context *context;
+> >> +       bool migrated;
+> >> +       unsigned long ver, old, vpid;
+> >> +       int cpu;
+> >> +
+> >> +       cpu =3D smp_processor_id();
+> >> +       /*
+> >> +        * Are we entering guest context on a different CPU to last ti=
+me?
+> >> +        * If so, the vCPU's guest TLB state on this CPU may be stale.
+> >> +        */
+> >> +       context =3D per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
+> >> +       migrated =3D (vcpu->cpu !=3D cpu);
+> >> +
+> >> +       /*
+> >> +        * Check if our vpid is of an older version
+> >> +        *
+> >> +        * We also discard the stored vpid if we've executed on
+> >> +        * another CPU, as the guest mappings may have changed without
+> >> +        * hypervisor knowledge.
+> >> +        */
+> >> +       ver =3D vcpu->arch.vpid & ~vpid_mask;
+> >> +       old =3D context->vpid_cache  & ~vpid_mask;
+> >> +       if (migrated || (ver !=3D old)) {
+> >> +               _kvm_update_vpid(vcpu, cpu);
+> >> +               trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
+> >> +               vcpu->cpu =3D cpu;
+> >> +       }
+> >> +
+> >> +       /* Restore GSTAT(0x50).vpid */
+> >> +       vpid =3D (vcpu->arch.vpid & vpid_mask)
+> >> +               << CSR_GSTAT_GID_SHIFT;
+> >> +       change_csr_gstat(vpid_mask << CSR_GSTAT_GID_SHIFT, vpid);
+> >> +}
+> > I believe that vpid and vmid are both GID in the gstat register, so
+> > please unify their names. And I think vpid is better than vmid.
+>
+> For processor 3A5000 vpid is the same with vmid, with next generation pro=
+cessor
+> like 3A6000, it is seperated. vpid is for vcpu specific and represents
+> translation from gva to gpa; vmid is the whole vm and represents translat=
+ion
+> from gpa to hpa, all vcpus shares the same vmid, so that tlb indexed with=
+ vpid
+> will be still in effective when flushing shadow tlbs indexed with vmid.
+>
+> Only that VM patch for 3A6000 is not submitted now, generation method for
+> vpid and vmid will be much different. It is prepared for future processor
+> update :)
+If so, then I think there should be a 'vmid' in kvm_arch and a 'vpid'
+in kvm_vcpu_arch?
+This patch only handles kvm_vcpu_arch so I think all should be vpid here.
 
-EXTLVT is a misnomer to me. It indicates the AVIC change about handling guest's
-accesses to externed LVTs rather than the presence of extended LVTs (that's what
-EXTAPIC is for).
+And again, this code can be just put in main.c.
 
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_AVAIL);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_FETCHSAM);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_OPSAM);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_RDWROPCNT);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_OPCNT);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_BRNTRGT);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_OPCNTEXT);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_RIPINVALIDCHK);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_OPBRNFUSE);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_FETCHCTLEXTD);
->+	kvm_cpu_cap_set(X86_FEATURE_IBS_ZEN4_EXT);
+Huacai
 
-any reason for not using kvm_cpu_cap_check_and_set(), which takes
-hardware capabilities into account?
+>
+> Regards
+> Bibo Mao
+>
+> >
+> > Moreover, no need to create a vmid.c file, just putting them in main.c =
+is OK.
+> >
+> > Huacai
+> >
+> >> --
+> >> 2.27.0
+> >>
+>
