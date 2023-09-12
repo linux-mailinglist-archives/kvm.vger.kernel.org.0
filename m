@@ -2,112 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7878A79CF0A
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 12:59:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7BDD79CFB3
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 13:19:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbjILK71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 06:59:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
+        id S234444AbjILLT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 07:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234182AbjILK6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 06:58:47 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316BF118;
-        Tue, 12 Sep 2023 03:58:38 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC31BC433B6;
-        Tue, 12 Sep 2023 10:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694516317;
-        bh=bMazgWjiUns7bxIOW7iDcJXKsG8+oY7C1L0a2QPDtNQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=N5amLBUeuaQQfQrkRGbMQPohZMxyrm/E+1U8aGzLmQkBBe1SjxaKm3mBIDG1j3MB7
-         mEelEBPOX/CgAHNU5OpXYjmkc9An28zQLE48MZaqrAk2d1j2J6LiO4u10zUyVtPwxI
-         0dD7Os9rGlNUQy5YIVpQnMAFAXwIEfKHXjBzrypBIE/g+a4kKPKv2jy3wWCHQcfED4
-         +soa92eXj4Bwepl+2a0I2nUKXZIa/VuBhP0LjZ1cT4PMwY+lVBfLdL/YoYKX+I07iT
-         TzenYk+RO9bhdZaKU2TuaZjIPxWPmKt/+hiSYduBOx7DeXFqVWzBVWLz79ChMaiSsn
-         YgpE96OaS9lrg==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-52a5c0d949eso6913759a12.0;
-        Tue, 12 Sep 2023 03:58:37 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxJb1/SHXe2i1qXhrcvdJYqe9/txwPJ/iftQ0KF5SmlAs/z37Za
-        h0+DnKY7z9Nu1Tsp00ouMI8VGlBIzsDU2l7wEL4=
-X-Google-Smtp-Source: AGHT+IFlJTroWUzDrpNmu1jFhrEOedb4AZCufJm4Yw5gh0F+6q7MG2VcUbiSngUFjwNHEEx8rscVSAFajHlgNpUUEAg=
-X-Received: by 2002:a17:906:2d1:b0:9ad:7d5b:ba68 with SMTP id
- 17-20020a17090602d100b009ad7d5bba68mr1879773ejk.32.1694516316048; Tue, 12 Sep
- 2023 03:58:36 -0700 (PDT)
+        with ESMTP id S233867AbjILLTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 07:19:23 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B6D7B3
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:19:19 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6bf01bcb1aeso3892478a34.3
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:19:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694517558; x=1695122358; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Y3V9U3MiwZNBieDOndWGj7Opd222WISjT8X2wjlyTs=;
+        b=PFCaW7tpfU2roDc49GT09OvKraEzyXl2b3IpFr2hutkhpKC1X+/0gP0I6xS4wSp5OK
+         BUlwSW6T2/SyTcOmfo6LlyGRmcsvskmnx0onJbuRZevrL/ZU8GoQGLhmeW9FwR0j0Bnl
+         ZNivKheUAZ/9kZbHs9Os9vCDvTzJ9tYoTmE5Uhun1E/JYqQM8o3BRRov08bD/ExYDChp
+         sxMHSYD1RVSD/GvJdfRwK0nrZfhKWuSBuUvfzVBf5CU5oXxjgccd5JoCUzMffmTsDNI/
+         X48GNMJVUKzLk3UTszpqEUhg9R7a3I4dPqR5bktgwkFE/gri0KMT2L8QB87enwsDZJQp
+         rfyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694517558; x=1695122358;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Y3V9U3MiwZNBieDOndWGj7Opd222WISjT8X2wjlyTs=;
+        b=IH8kMNrRBRfZRPB35bOJvr+R00fQu8PQQa8knZ/Xs6qZcH0ep+cYXJxNpuhhtXrcdN
+         F1aYcCNi6liWa4pcsFmnftQ2wRqPZdLAl0OYlvDKsdWb/JDPKpp/48vl4KEocYiclLs8
+         gdgLpeataZhF3v2ANS1KI9MHtw/pcbzovb8lZFnknudazrt+l0qtxWY5pr0+m8VQ6e+q
+         Dqdk2YmtqWX6qlCZ5kPlHbVTHIndClr5ozSmhDDCAGx1C65Myp/zSahlmgaBdFx37KIe
+         lREeb/sSD7MgEiouwY5j7RCfhr/4+OqXzoK34fx/Et1/Ntrm+DbznBZwZxEmrxwVmV6H
+         D7GA==
+X-Gm-Message-State: AOJu0Yx14nCmWa5zhjLz4SIkwOgT/y2aE6jX6rRsMIEFOe2RwzRDjtP+
+        CGatJDE1rusXSSBsfy9FjAc=
+X-Google-Smtp-Source: AGHT+IEltiddWzg+7ZcDOYwtOlCn2GVUrJ4r8pn0UMIR3d24/je7mFP/zTvfdlHty7VCC/LwkQEJNw==
+X-Received: by 2002:a9d:6f15:0:b0:6b8:6785:ed0b with SMTP id n21-20020a9d6f15000000b006b86785ed0bmr14110292otq.30.1694517558282;
+        Tue, 12 Sep 2023 04:19:18 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id v11-20020aa7808b000000b006884549adc8sm7118935pff.29.2023.09.12.04.19.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Sep 2023 04:19:17 -0700 (PDT)
+Message-ID: <e0dea9df-501e-acd2-a81b-b5126ddc7be0@gmail.com>
+Date:   Tue, 12 Sep 2023 19:19:09 +0800
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910-esteemed-exodus-706aaae940b1@spud>
- <CAJF2gTRQd_dNuZHNwfg3SwD0XERaYXYUdFUFQiarym40kpxFRQ@mail.gmail.com>
- <20230910-baggage-accent-ec5331b58c8e@spud> <CAJF2gTS8Vh5XdMUcgLA_GJzW6Nm3JKHxuMN9jYSNe_YCEjgCXA@mail.gmail.com>
- <20230910-facsimile-answering-60d1452b8c10@spud> <CAJF2gTSP1rxVhuwOKyWiE2vFFijJFc2aKRU2=0rTK9nDc8AbsQ@mail.gmail.com>
- <20230911-nimbly-outcome-496efae7adc6@wendy> <CAJF2gTTSDtnc7WRAZ0eLjiwZHZFbOcPZaQ_c8LiLcctBNsKCaA@mail.gmail.com>
- <20230912-snitch-astronaut-41e1b694d24f@wendy>
-In-Reply-To: <20230912-snitch-astronaut-41e1b694d24f@wendy>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Tue, 12 Sep 2023 18:58:22 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTQXhjvP3WRDKOJ67Bv+KSB-Dh2LAuSsf0kv12HJCmSL7Q@mail.gmail.com>
-Message-ID: <CAJF2gTQXhjvP3WRDKOJ67Bv+KSB-Dh2LAuSsf0kv12HJCmSL7Q@mail.gmail.com>
-Subject: Re: [PATCH V11 00/17] riscv: Add Native/Paravirt qspinlock support
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Conor Dooley <conor@kernel.org>, paul.walmsley@sifive.com,
-        anup@brainfault.org, peterz@infradead.org, mingo@redhat.com,
-        will@kernel.org, palmer@rivosinc.com, longman@redhat.com,
-        boqun.feng@gmail.com, tglx@linutronix.de, paulmck@kernel.org,
-        rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        leobras@redhat.com, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH 8/9] KVM: x86/pmu: Upgrade pmu version to 5 on intel
+ processor
+Content-Language: en-US
+To:     Xiong Zhang <xiong.y.zhang@intel.com>
+Cc:     seanjc@google.com, zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com,
+        kan.liang@intel.com, dapeng1.mi@linux.intel.com,
+        kvm@vger.kernel.org
+References: <20230901072809.640175-1-xiong.y.zhang@intel.com>
+ <20230901072809.640175-9-xiong.y.zhang@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230901072809.640175-9-xiong.y.zhang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 12, 2023 at 4:08=E2=80=AFPM Conor Dooley <conor.dooley@microchi=
-p.com> wrote:
->
-> On Tue, Sep 12, 2023 at 09:33:57AM +0800, Guo Ren wrote:
-> > On Mon, Sep 11, 2023 at 8:53=E2=80=AFPM Conor Dooley <conor.dooley@micr=
-ochip.com> wrote:
->
-> > > I added the new "riscv,isa-extensions" property in part to make
-> > > communicating vendor extensions like this easier. Please try to use
-> > > that. "qspinlock" is software configuration though, the vendor extens=
-ion
-> > > should focus on the guarantee of strong forward progress, since that =
-is
-> > > the non-standard aspect of your IP.
-> >
-> > The qspinlock contains three paths:
-> >  - Native qspinlock, this is your strong forward progress.
-> >  - virt_spin_lock, for KVM guest when paravirt qspinlock disabled.
-> >    https://lore.kernel.org/linux-riscv/20230910082911.3378782-9-guoren@=
-kernel.org/
-> >  - paravirt qspinlock, for KVM guest
-> >
-> > So, we need a software configuration here, "riscv,isa-extensions" is
-> > all about vendor extension.
->
-> Ah right, yes it would only be able to be used to determine whether or
-> not the platform is capable of supporting these spinlocks, not whether or
-> not the kernel is a guest. I think I misinterpreted that snippet you post=
-ed,
-> thinking you were trying to disable your new spinlock for KVM, sorry.
-> On that note though, what about other sorts of guests? Will non-KVM
-> guests not also want to use this virt spinlock?
-I only put KVM guests here, and I can't answer other hypervisor that
-is another topic.
-
->
-> Thanks,
-> Conor.
 
 
+On 1/9/2023 3:28 pm, Xiong Zhang wrote:
+> Modern intel processors have supported Architectural Performance
+> Monitoring Version 5, this commit upgrade Intel vcpu's vPMU
+> version from 2 to 5.
+> 
+> Go through PMU features from version 3 to 5, the following
+> features are not supported:
+> 1. AnyThread counting: it is added in v3, and deprecated in v5.
+> 2. Streamed Freeze_PerfMon_On_PMI in v4, since legacy Freeze_PerMon_ON_PMI
+> isn't supported, the new one won't be supported neither.
+> 3. IA32_PERF_GLOBAL_STATUS.ASCI[bit 60]: Related to SGX, and will be
+> emulated by SGX developer later.
+> 4. Domain Separation in v5. When INV flag in IA32_PERFEVTSELx is used, a
+> counter stops counting when logical processor exits the C0 ACPI C-state.
+> First guest INV flag isn't supported, second guest ACPI C-state is vague.
+> 
+> When a guest enable unsupported features through WRMSR, KVM will inject
+> a #GP into the guest.
+> 
+> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+> ---
+>   arch/x86/kvm/pmu.h | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 4bab4819ea6c..8e6bc9b1a747 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -215,7 +215,10 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+>   		return;
+>   	}
+>   
+> -	kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
 
---=20
-Best Regards
- Guo Ren
+For AMD as of now, the kvm_pmu_cap.version will not exceed 2.
+Thus there's no need to differentiate between Intel and AMD.
+
+> +	if (is_intel)
+> +		kvm_pmu_cap.version = min(kvm_pmu_cap.version, 5);
+> +	else
+> +		kvm_pmu_cap.version = min(kvm_pmu_cap.version, 2);
+>   	kvm_pmu_cap.num_counters_gp = min(kvm_pmu_cap.num_counters_gp,
+>   					  pmu_ops->MAX_NR_GP_COUNTERS);
+>   	kvm_pmu_cap.num_counters_fixed = min(kvm_pmu_cap.num_counters_fixed,
