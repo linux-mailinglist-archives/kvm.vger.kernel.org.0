@@ -2,100 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14E3079D1BD
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 15:04:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6FC279D1DC
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 15:14:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235752AbjILNEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 09:04:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41076 "EHLO
+        id S235409AbjILNOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 09:14:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235561AbjILNDu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 09:03:50 -0400
-Received: from isrv.corpit.ru (isrv.corpit.ru [86.62.121.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1147A1BF6
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 06:03:03 -0700 (PDT)
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
-        by isrv.corpit.ru (Postfix) with ESMTP id BD93721218;
-        Tue, 12 Sep 2023 16:03:05 +0300 (MSK)
-Received: from [192.168.177.130] (mjt.wg.tls.msk.ru [192.168.177.130])
-        by tsrv.corpit.ru (Postfix) with ESMTP id 8303327867;
-        Tue, 12 Sep 2023 16:03:01 +0300 (MSK)
-Message-ID: <90ab0eef-1ac7-36df-dcba-67d1f772b1a5@tls.msk.ru>
-Date:   Tue, 12 Sep 2023 16:03:01 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH 2/4] target/ppc: Restrict KVM objects to system emulation
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        qemu-ppc@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Greg Kurz <groug@kaod.org>
-References: <20230912113027.63941-1-philmd@linaro.org>
- <20230912113027.63941-3-philmd@linaro.org>
-From:   Michael Tokarev <mjt@tls.msk.ru>
-In-Reply-To: <20230912113027.63941-3-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S235522AbjILNOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 09:14:05 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D361996;
+        Tue, 12 Sep 2023 06:06:12 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 196E1C433C8;
+        Tue, 12 Sep 2023 13:06:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694523972;
+        bh=PBatigLooCafkXd5Xk10QKKr4lnQGUF685h7vHWrU54=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=tJ5sy9g9yhlRyrigQHP7XUtlSnxcLPWilG+U71PTzBFN0NBmLLM6SW0liYkLAjPuV
+         z+jBkOGydGu9kAP+RG9SUXkQ4wW7Zcf+zuF+3yA4ZCAzlpRqf1lTE6zVqL1vpyFqJL
+         YbeJhD9wM5bR5K5zVV1iGozYmeCVA9N/XqkFlH4A84DxoYrxXdss/qjmGW/TnUv0/B
+         yLP9dtdQRGDZjpRqzgdtZiW8NP2xDbxMdDO0YtgDrwfyBCARsEisHFZFDrbPHsW1A5
+         dYUZzbXlKkOy37mrztMblKeGw1fjDYJpyK1x5QT6Jm+WmCQu5PxirujdZWUv9+0Bx1
+         HgOkJJQ9dUZGQ==
+Received: from [104.132.96.100] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qg35l-00CGuA-5R;
+        Tue, 12 Sep 2023 14:06:09 +0100
+Date:   Tue, 12 Sep 2023 14:06:03 +0100
+Message-ID: <87h6nz4k3o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     zhaoxu <zhaoxu.35@bytedance.com>
+Cc:     oliver.upton@linux.dev, james.morse@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        zhouyibo@bytedance.com, zhouliang.001@bytedance.com
+Subject: Re: [RFC v2] KVM: arm/arm64: optimize vSGI injection performance
+In-Reply-To: <28610076-6ac7-4004-8479-e0005ff96c63@bytedance.com>
+References: <20230825015811.5292-1-zhaoxu.35@bytedance.com>
+        <86o7iidzwb.wl-maz@kernel.org>
+        <28610076-6ac7-4004-8479-e0005ff96c63@bytedance.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.96.100
+X-SA-Exim-Rcpt-To: zhaoxu.35@bytedance.com, oliver.upton@linux.dev, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, zhouyibo@bytedance.com, zhouliang.001@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-12.09.2023 14:30, Philippe Mathieu-Daudé:
-> kvm-stub.c only defines kvm_openpic_connect_vcpu(),
-> which is clearly not used by user emulation.
-
-Yes, kvm-stub only defines this function.  But you also move kvm.c
-from ppc_ss to ppc_system_ss, and the commit message does not say
-a word about this.  Hopefully there's no usage of symbols in kvm.c
-in other configurations (or else it wont link).
-
-I think commit message might be just a bit more verbose.  Right now
-it is misleading/confusing, which is worse than no commit message
-at all :)
-
-For the changes,
-
-Reviewed-by: Michael Tokarev <mjt@tls.msk.ru>
-
-I even tried to build some targets (ppc user and system on x86)
-with this change, but I can't say I verified every configuration.
-
-/mjt
-
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-
-
-> ---
->   target/ppc/meson.build | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, 12 Sep 2023 05:13:19 +0100,
+zhaoxu <zhaoxu.35@bytedance.com> wrote:
 > 
-> diff --git a/target/ppc/meson.build b/target/ppc/meson.build
-> index 4c2635039e..bf1c9319fa 100644
-> --- a/target/ppc/meson.build
-> +++ b/target/ppc/meson.build
-> @@ -30,7 +30,6 @@ gen = [
->   ]
->   ppc_ss.add(when: 'CONFIG_TCG', if_true: gen)
->   
-> -ppc_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'), if_false: files('kvm-stub.c'))
->   ppc_ss.add(when: 'CONFIG_USER_ONLY', if_true: files('user_only_helper.c'))
->   
->   ppc_system_ss = ss.source_set()
-> @@ -46,6 +45,7 @@ ppc_system_ss.add(when: 'CONFIG_TCG', if_true: files(
->   ), if_false: files(
->     'tcg-stub.c',
->   ))
-> +ppc_system_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'), if_false: files('kvm-stub.c'))
->   
->   ppc_system_ss.add(when: 'TARGET_PPC64', if_true: files(
->     'compat.c',
+> 
+> 
+> On 2023/9/4 17:57, Marc Zyngier wrote:
+> > On Fri, 25 Aug 2023 02:58:11 +0100,
+> > Xu Zhao <zhaoxu.35@bytedance.com> wrote:
+> [...]
+> >> -	unsigned long affinity;
+> >> -	int level0;
+> >> +	u64 aff;
+> >>   -	/*
+> >> -	 * Split the current VCPU's MPIDR into affinity level 0 and the
+> >> -	 * rest as this is what we have to compare against.
+> >> -	 */
+> >> -	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
+> >> -	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
+> >> -	affinity &= ~MPIDR_LEVEL_MASK;
+> >> +	/* aff3 - aff1 */
+> >> +	aff = (((reg) & ICC_SGI1R_AFFINITY_3_MASK) >> ICC_SGI1R_AFFINITY_3_SHIFT) << 16 |
+> >> +		(((reg) & ICC_SGI1R_AFFINITY_2_MASK) >> ICC_SGI1R_AFFINITY_2_SHIFT) << 8 |
+> >> +		(((reg) & ICC_SGI1R_AFFINITY_1_MASK) >> ICC_SGI1R_AFFINITY_1_SHIFT);
+> > 
+> > Here, you assume that you can directly map a vcpu index to an
+> > affinity. It would be awesome if that was the case. However, this is
+> > only valid at reset time, and userspace is perfectly allowed to change
+> > this mapping by writing to the vcpu's MPIDR_EL1.
+> > 
+> > So this won't work at all if userspace wants to set its own specific
+> > CPU numbering.
+> > 
+> > 	M.
+> > 
+> Hi Marc,
+> 
+> Yes, i don't think too much about userspace can change MPIDR value, I
+> checked the source code of qemu, qemu create vcpu sequentially, so in
+> this case, vcpu_id is equivalent to vcpu_idx which means vcpu_id
+> represents the position in vcpu array.
 
+The problem is that this is only a convention, and userspace is
+totally free to use vcpu_id in a different way. Note that we have
+other bugs in the KVM code that treat them interchangeably, but I'm
+trying to fix that.
+
+> These days, I'm still thinking about whether it is because of the
+> content related to future vcpu hot-plug feature that vcpu_id can be
+> modified, but now it seems that's not entirely the case.
+
+There are 3 levels of identification:
+
+- vcpu_idx, which is an internal KVM index that userspace is not
+  suppose to rely on (or know)
+
+- vcpu_id, which is provided by userspace as a CPU number, and from
+  which we derive the default MPIDR_EL1 value. This is used all over
+  the code to identify a CPU from userspace.
+
+- MPIDR_EL1, which is how the architecture identifies a CPU.
+
+For CPU hotplug, I expect usespace to set vcpu_id and MPIDR_EL1 as it
+sees fit, knowing that the vpcu must have been allocated upfront (and
+vcpu_idx set).
+
+> I have read your latest patch and have been deeply inspired, and
+> Thanks for agreeing with this issue.
+
+No worries. I'd appreciate you testing it and reporting whether this
+matches the results you are observing with your own patch.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
