@@ -2,218 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D063279D87F
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 20:16:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C190F79D89B
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 20:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237173AbjILSQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 14:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36280 "EHLO
+        id S237381AbjILSYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 14:24:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237373AbjILSQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 14:16:20 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F140F10D8
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:16:15 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-52a49a42353so7681579a12.2
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:16:15 -0700 (PDT)
+        with ESMTP id S237352AbjILSYK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 14:24:10 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16B710E9
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68fc9e0e22eso1889895b3a.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694542574; x=1695147374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7G6zArsYHzwZkBqmBK6VoaHYjsTRL2QKwDCRc1siAf0=;
-        b=qGfFzfZiaxKERCfxJp4hDVoU/PYn+A5fwIgpXbymHbzEP8gHG3VJs7Rc7ayn/3CGIh
-         Djog/vSFDb8Qmnkl1bZzo92XrJV7cgX+Qjz1Dp/5X720B9swbtP4vsBWU9U/PUCbRT9S
-         HPjoeyIxmnl5NIg8dUMl78IIdHbYmUmA5Gg+Y9J1S0ucB0eisxRDK6hqnlHTnII+ND1Y
-         BjIq4aRy97FgJYdG9Qhp8Vl/hFsG/YmLT0FJhwCDfFN/jg3sOpGe8z7BWxvGGQOU95lY
-         nc2FrL3Jy5crNaTRVilDdUnZyG6Gmcs30SEgkpD+6gsDcLki+tXk4A1wCe9nDvg3xUn7
-         rGcQ==
+        d=google.com; s=20230601; t=1694543046; x=1695147846; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y8/1D1hlKrwxGhPYu7s8FW0yjX/NvlYAKUyveN+rZHg=;
+        b=RoDfTMpdGYQOL3qxsM/UQYJdoVepEmmHsBXKTD8a12xDCSBeBz0M0t8fZlfFUm3Kdv
+         87RxsOHwjEmPO0JUqLr3/wfdXi73kVHbmoqDQ7ZCwg1WRfUqlitl63X3ZgCTwo9Xh9U8
+         MVRh3AdeOk7O4mqiwzXX3dDQHYsgVkGz+ExyA6aDNgy4X0a3yEW1lSamfCWt4vXbkq1g
+         m1tgZafo/dsa5rtlUjNjUAxHvd9T6Ivs9hLQLX6PLs+l7rCOsEegWhyEz8vyjL5397UE
+         eIcs6R9SbM5lmj4HjgFHhTscHIrsHOVvxv7j1BRvPr7YjldRj/ZYKpnXa4tXL9WhYQqv
+         yiuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694542574; x=1695147374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7G6zArsYHzwZkBqmBK6VoaHYjsTRL2QKwDCRc1siAf0=;
-        b=sBzvomm3PgOJgYKxyabS1TiHsDU9tfGFySDPp0YawzcV9kHUKGVFGq5LyRj1p/MtbE
-         dT7/+em/0aSdsbE7H20UlCm22qwwGjqEYutANs6XOiVhDE8ldh7G1y8CxBF/1w5OlIHh
-         U/KcxrPTCahPIox6cFc2ajPqByp9xneRfSoSTxlN6ppOB/CGvuB7vq8IDQEm3s7fnhOw
-         GXHUPdQJhB6+oqmTLIBR5AxzYgVDuyuDvXTTigT4XWXBC3YVKJzjxoiBnZaN4JjSruGW
-         XuOBbyCCop2wjXymBdnrtt+iXLOzxrgy2kE1NQN9wvVSGtAhjb4eqk8uhc+obyx23Nnw
-         iLPg==
-X-Gm-Message-State: AOJu0Ywnnx9ktgSbjesCDKkqnhbucr9Scx8gOlhcw7e+P/OPfeUX2jIO
-        dT0EtEcZ+PE4UE/h9flLZKfbPhPLMwT/90/SquDEtw==
-X-Google-Smtp-Source: AGHT+IFqq23f40V3D1ln2gU0d96bO0U35CPT0AKCN0YsmzMEFl7m8OF2w1scczWLTCpJ0oJ5Sfrod2OzJoeEKqcJLcY=
-X-Received: by 2002:a17:906:844a:b0:9a1:e8c0:7e2e with SMTP id
- e10-20020a170906844a00b009a1e8c07e2emr72791ejy.14.1694542574160; Tue, 12 Sep
- 2023 11:16:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230912161518.199484-1-hshan@google.com> <ZQCayNY+8PYvfc40@google.com>
-In-Reply-To: <ZQCayNY+8PYvfc40@google.com>
-From:   Haitao Shan <hshan@google.com>
-Date:   Tue, 12 Sep 2023 11:16:02 -0700
-Message-ID: <CAGD3tSwnXFhnyw4JX_7-UgZpHpPg1Yj_JqsO_Tano1XgmcCvbQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
+        d=1e100.net; s=20230601; t=1694543046; x=1695147846;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y8/1D1hlKrwxGhPYu7s8FW0yjX/NvlYAKUyveN+rZHg=;
+        b=WKA5bCdkpsZpC4aknL+jJ+HqALBtMRM6U8OXsCooB/0Hh5sUFW7bP3r06eSxBGC8au
+         CSUfoZfE/dpQslxfFjMpnJ3L7r3dMK4CfLaPXMx5d3ec9XefdHjRp9PDza+hvBiXN6oR
+         yInrRn716tJofyOSbbH+wH9nh5Mg2WaVGEBNz0d2xEJfhpHlnMDG29zyTgWKazFVtdEM
+         PXftpu4COca6DpKBwbA+PrnmA3e3aumRahHYsD27fDflogoYP/b5NfOaijfS9oBFh+qD
+         h+vX8SL33xHHgfo+ccGriNK9cPQH5MEyRUPEXQZQEMkXoLxYUVv8mnSs8owAwWdMv6us
+         tnHQ==
+X-Gm-Message-State: AOJu0Yz+Wo0n+gP5mKnJ8uAbTpj0wkZlgNrDUm2cWPmhLIri9VY42MyA
+        Kya8dfKEEEihn98/hbrtAzXv2Q==
+X-Google-Smtp-Source: AGHT+IG9chD/RkZ8OOUzGsLf726oa5VFCPJ0BaZ+qbex436wuU+iD6QMGqbR6s+8Yxvxt+tedk1NWA==
+X-Received: by 2002:a05:6a21:47cb:b0:153:6e99:edbb with SMTP id as11-20020a056a2147cb00b001536e99edbbmr225106pzc.31.1694543046299;
+        Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id bt10-20020a056a00438a00b006875df4773fsm3989174pfb.163.2023.09.12.11.24.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 11:24:05 -0700 (PDT)
+Date:   Tue, 12 Sep 2023 18:24:01 +0000
+From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kai Huang <kai.huang@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 4/6] KVM: Documentation: Add the missing description
+ for tdp_mmu_root_count into kvm_mmu_page
+Message-ID: <ZQCswf8EWAGy8QZI@google.com>
+References: <20230801002127.534020-1-mizhang@google.com>
+ <20230801002127.534020-5-mizhang@google.com>
+ <ZN1R31uo4FGQfKrQ@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZN1R31uo4FGQfKrQ@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry for sending the reply twice. The former reply got rejected since
-I forgot to turn on the plain text email setting.
-
-On Tue, Sep 12, 2023 at 10:07=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Tue, Sep 12, 2023, Haitao Shan wrote:
-> > This issue exists in kernel version 6.3-rc1 or above. The issue is
-> > introduced by the commit 8e6ed96cdd50 ("KVM: x86: fire timer when it is
-> > migrated and expired, and in oneshot mode"). The issue occurs on Intel
-> > platform which APIC virtualization and posted interrupt processing.
->
-> I think the bug was actually introduced by:
->
->   967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
-Thanks for pointing this out. I know commit 8e6ed96cdd50 is only a
-trigger. But I
-did not go one step further and find out where the bug is coming from.
->
-> Fixing the "deadline <=3D 0" handling just made it much easier to be hit.=
-  E.g. if
-> the deadline was '1' during restore, set_target_expiration() would set ts=
-cdeadline
-> to T1+(1*N), where T1 is the current TSC and N is the multipler to get fr=
-om nanoseconds
-> to cycles.  start_sw_tscdeadline() (or vmx_set_hv_timer()) would then rer=
-ead the
-> TSC (call it T2), see T2 > T1+(1*N), and mark the timer as expired.
->
-> > The issue is first discovered when running the Android Emulator which
-> > is based on QEMU 2.12. I can reproduce the issue with QEMU 8.0.4 in
-> > Debian 12.
->
-> The above is helpful as extra context, but repeating "This issue" and "Th=
-e issue"
-> over and over without ever actually describing what the issue actualy is =
-makes it
-> quite difficult to understand what is actually being fixed.
-Got it. I will rewrite the whole commit message for v2.
->
-> > With the above commit, the timer gets fired immediately inside the
-> > KVM_SET_LAPIC call when loading the snapshot. On such Intel platforms,
-> > this eventually leads to setting the corresponding PIR bit. However,
-> > the whole PIR bits get cleared later in the same KVM_SET_LAPIC call.
-> > Missing lapic timer interrupt freeze the guest kernel.
->
-> Please phrase changelogs as commands and state what is actually being cha=
-nged.
-> Again, the context on what is broken is helpful, but the changelog really=
-, really
-> needs to state what is being changed.
-Will do.
->
-> > Signed-off-by: Haitao Shan <hshan@google.com>
+On Wed, Aug 16, 2023, Sean Christopherson wrote:
+> On Tue, Aug 01, 2023, Mingwei Zhang wrote:
+> > Add the description of tdp_mmu_root_count into kvm_mmu_page description and
+> > combine it with the description of root_count. tdp_mmu_root_count is an
+> > atomic counter used only in TDP MMU. Update the doc.
+> > 
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > Reviewed-by: Kai Huang <kai.huang@intel.com>
 > > ---
-> >  arch/x86/kvm/lapic.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index a983a16163b1..6f73406b875a 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2977,14 +2977,14 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, s=
-truct kvm_lapic_state *s)
-> >       apic_update_lvtt(apic);
-> >       apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0)=
-);
-> >       update_divide_count(apic);
-> > -     __start_apic_timer(apic, APIC_TMCCT);
-> > -     kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
-> >       kvm_apic_update_apicv(vcpu);
-> >       if (apic->apicv_active) {
-> >               static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
-> >               static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_fi=
-nd_highest_irr(apic));
-> >               static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_hig=
-hest_isr(apic));
-> >       }
-> > +     __start_apic_timer(apic, APIC_TMCCT);
-> > +     kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
->
-> I don't think this is the ordering we want.  It currently works, but it s=
-ubtly
-> "relies" on a few things:
->
->   1. That vmx_deliver_posted_interrupt() never "fails" when APICv is enab=
-led,
->      i.e. never puts the interrupt in the IRR instead of the PIR.
->
->   2. The SVM, a.k.a. AVIC, doesn't ever sync from the IRR to a separate "=
-hardware"
->      virtual APIC, because unlike VMX, SVM does set the bit in the IRR.
->
-> I doubt #2 will ever change simply because that's tied to how AVIC works,=
- and #1
-> shouldn't actually break anything since the fallback path in vmx_deliver_=
-interrupt()
-> needs to be self-sufficient, but I don't like that the code syncs from th=
-e IRR and
-> _then_ potentially modifies the IRR.
->
-> I also don't like doing additional APIC state restoration _after_ invokin=
-g the
-> post_state_restore() hook.  Updating APICv in the middle of the restore f=
-low is
-> going to be brittle and difficult to maintain, e.g. it won't be obvious w=
-hat
-> needs to go before and what needs to go after.
->
-> IMO, vmx_apicv_post_state_restore() is blatantly broken.  It is most defi=
-nitely
-> not doing "post state restore" stuff, it's simply purging state, i.e. bel=
-ongs in
-> a "pre state restore" hook.
->
-> So rather than shuffle around the timer code, I think we should instead a=
-dd yet
-> another kvm_x86_ops hook, e.g. apicv_pre_state_restore(), and have initia=
-lize
-> the PI descriptor there.
->
-> Aha!  And I think the new apicv_pre_state_restore() needs to be invoked e=
-ven if
-> APICv is not active, because I don't see anything that purges the PIR whe=
-n APICv
-> is enabled.  VMX's APICv doesn't have many inhibits that can go away, and=
- I
-> highly doubt userspace will restore into a vCPU with pending posted inter=
-rupts,
-> so in practice this is _extremely_ unlikely to be problematic.  But it's =
-still
-> wrong.
-Thanks for sharing what you would like to fix the bug. I will write a
-v2 for that.
-Actually, I am sorry that I forgot to add RFC to the title, as I
-personally did not think
-the proposed fix looks clean. I am surprised that
-apic_post_state_restore actually
-clears the whole PIR which looks like "resetting" instead of
-"restoring". However,
-I am not sure whether this is the exact intended behavior and code sequence=
-. If
-it is intended, __restart_apic_timer should defer its interrupt
-delivery action after
-apic_post_state_restore (something like raising a request for updating PIR =
-when
-vcpu_enter_guest).
+> >  Documentation/virt/kvm/x86/mmu.rst | 12 ++++++++----
+> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
+> > index 17d90974204e..40daf8beb9b1 100644
+> > --- a/Documentation/virt/kvm/x86/mmu.rst
+> > +++ b/Documentation/virt/kvm/x86/mmu.rst
+> > @@ -229,10 +229,14 @@ Shadow pages contain the following information:
+> >      can be calculated from the gfn field when used.  In addition, when
+> >      role.direct is set, KVM does not track access permission for each of the
+> >      gfn. See role.direct and gfn.
+> > -  root_count:
+> > -    A counter keeping track of how many hardware registers (guest cr3 or
+> > -    pdptrs) are now pointing at the page.  While this counter is nonzero, the
+> > -    page cannot be destroyed.  See role.invalid.
+> > +  root_count / tdp_mmu_root_count:
+> > +     root_count is a reference counter for root shadow pages in Shadow MMU.
+> > +     vCPUs elevate the refcount when getting a shadow page that will be used as
+> > +     a root page, i.e. page that will be loaded into hardware directly (CR3,
+> > +     PDPTRs, nCR3 EPTP). Root pages cannot be destroyed while their refcount is
+> > +     non-zero. See role.invalid. tdp_mmu_root_count is similar but exclusively
+> > +     used in TDP MMU as an atomic refcount. When the value is non-zero, it
+> > +     allows vCPUs acquire references while holding mmu_lock for read.
+> 
+> That last sentence is wrong.  *vCPUs* can't acquire references while holding
+> mmu_lock for read.  And actually, they don't ever put references while holding
+> for read either.  vCPUs *must* hold mmu_lock for write to obtain a new root,
+> Not putting references while holding mmu_lock for read is mostly an implementation
+> quirk.
+> 
+> Maybe replace it with this?
+> 
+>     tdp_mmu_root_count is similar but exclusively used in the TDP MMU as an
+>     atomic refcount (select TDP MMU flows walk all roots while holding mmu_lock
+>     for read, e.g. when clearing dirty bits).
 
-I will work on v2 following your suggestion. Thanks!
+hmm, I think all the content within the bracket is details and we should
+not mention them at all. In fact, when I see the implementation, the
+last refcount of tdp_mmu_root_count is treated differently. Those
+details should be instead mentioned in code or comments instead of
+documentation as they may evolve much faster.
 
---=20
-Haitao @Google
+So, I will remove the last sentence.
