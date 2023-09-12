@@ -2,108 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EFFA79D5FA
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 18:15:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C60579D6AC
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 18:44:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236591AbjILQP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 12:15:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50968 "EHLO
+        id S236801AbjILQo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 12:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbjILQP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 12:15:28 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA8410D
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:15:24 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7e81a07ea3so5625061276.2
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:15:24 -0700 (PDT)
+        with ESMTP id S234829AbjILQo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 12:44:56 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14A910DF
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:44:51 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3ff7d73a6feso62074005e9.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 09:44:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694535323; x=1695140123; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=J4cYw5IPScCbBIBQLEMtcScQA2dnbp2DfUfUQiEYgc4=;
-        b=1MmDPyYv2dsBneuZehtOCGmYZDje36EbYCHw+OhxK8zOgJlfUEXpasVS5Kn6xUdeuq
-         FbgZh1qSomPbLnYyymBnxpSAd1/KsiYbWJfIqGeCGmnImWJ8DotgahEN+ci4tbAZmy/N
-         GaT2WOgb8PCYYxKq4UW97QoDtwFUiq/l0MiOyeenlBxVr4TIm+nTIQ3NfATdC2HShSK8
-         nphDHCnaaP32C/1LcNPQ1+1GwJqyOIYHCF5K3AggPLO0b8ve3gGjbRLxFlPLQb/o+TWx
-         H9fQk4kpHizRlZ1oLWuk2WFJSoNqm/+pJDnBTDyq0OJBmCPWi/SyVP8lo0yD09dzlo2D
-         dwVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694535323; x=1695140123;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=linaro.org; s=google; t=1694537090; x=1695141890; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=J4cYw5IPScCbBIBQLEMtcScQA2dnbp2DfUfUQiEYgc4=;
-        b=FXOcttIs6UOEfG7GTzE3Ja1lHRpa3CAtbtbsKCB+UXB48iRPb1Cu3wwggUTgO38pv+
-         9hb7mbKbe2pAo/EWVX8hg1LRqkvyCJrAiH33e2vJjp1m21/L72YV2c0W9Wg3+xSVIN9o
-         uJINQEARC8DE1D4lM/LeLGezw1Y8guH63oGo0huMiVFRL5VE2TFFx32SI54YsgQ5Nqmo
-         kmFIztqKWzAcv+B06Wqb2oybN38BcZk6tAbiOWSLn2zssB96mrUjlXhx80MFRwD6jbE0
-         +O0OSv/dOEUuJCR1ddFWEkCiuqBKFK0WjMt1UiyhbwGeCa0SLUN05SxvmGq+iKDYMh03
-         GTIA==
-X-Gm-Message-State: AOJu0YxGNb6yuXFdRtk/01BXjt9OKy4CFCB75LeVUXfjHMrQ4wIi+RV3
-        oQjU27S8I5wXN9777dDg0fkzLPU6pQ==
-X-Google-Smtp-Source: AGHT+IFhLsWmMTy9DdyhHCb/6TCeOCi858SESAMq3siI8kdI+HJGlgTMxtCITUHnFtdTorokH1eV78N3BA==
-X-Received: from hshan17.roam.corp.google.com ([2620:15c:211:201:2a7f:c6c4:6e3:ac5c])
- (user=hshan job=sendgmr) by 2002:a05:6902:168e:b0:d7f:2cb6:7d8c with SMTP id
- bx14-20020a056902168e00b00d7f2cb67d8cmr298656ybb.13.1694535323376; Tue, 12
- Sep 2023 09:15:23 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 09:15:18 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230912161518.199484-1-hshan@google.com>
-Subject: [PATCH] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
-From:   Haitao Shan <hshan@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Haitao Shan <hshan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        bh=xYzn/3kOKpXxvHMz10ApcHvQSJG8FaIxGybsqApJRpA=;
+        b=TUMThmfUX2UewFRi76kP0O9oPDHUjvwk4RnZ8MuPQa+QaFvbCAFOwJr5uyKJGcAd9l
+         pAzWtH6M05OXc5+/oGKHxbQOI3lFAGN6KWRVF+PMy74Ov71EPpd8DB7ZWMUC6ojgSG7X
+         IDyBBnb+FnoLekydtY6pj5Ni6QmXQJyXTzqNrfjk0DSPCBYiX1utq9YiHQaL5KTE0Psz
+         YGgCemGDJUopqfaesoqdzG/rrllPOncgyuG101jt7Oa3aSVG8pQTwf3ddgHveQ9BGKiU
+         AeVG38z2y6AnAFn/IsYW/Mta6gHcjcNDP53AshSe6N1Pd2qNJnld8+0ZMkp11xMif3ll
+         VQog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694537090; x=1695141890;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xYzn/3kOKpXxvHMz10ApcHvQSJG8FaIxGybsqApJRpA=;
+        b=Zx9EH34MYmsB2Z0p7MHnWqkSGTiTQ2ufeGO5u8loW82bim/UzZueJcvrACnNrUB2CN
+         hCn7HayvSe0J/7Hun1XPbqgpTyAzaVMk4Dljm+JeLq8iYlcjcZICvlItgN6qVBNolNlp
+         7mf7vRYidJMMQjuQbhBgQiY5OmTn1gNpXK8tmY1hL124keticGz3mjBBo88EbcXbwHwt
+         oAkZjJm5OjRvu0PDu1owMgDDqkXqTo6jTVRsvnDO6b0bYq6wwMKsYlQWH11Zf4SeHvMF
+         pj6ojO0W4XJXyFLmBhpwoOFdNq08Feh0PnXWHtbZ29S4lNJ8BkdEZUU/4RRva1Q3mICZ
+         sHow==
+X-Gm-Message-State: AOJu0Yyfjn7gcDVEh4kLmLDXWQm8+wMvDHWJf1DqwHsEhljVS2qjfFfP
+        Bw5cnIBjDFj52+OsUuqGtLLp9A==
+X-Google-Smtp-Source: AGHT+IH5vub4rBT/vbvswzxQwp1f1tgh1SGV+s0iqZ7V+FINUgCe/yHe8M0v8fp7xIKASp2eOFPd5g==
+X-Received: by 2002:a7b:c4cb:0:b0:3fd:30cb:18bd with SMTP id g11-20020a7bc4cb000000b003fd30cb18bdmr12420154wmk.15.1694537090421;
+        Tue, 12 Sep 2023 09:44:50 -0700 (PDT)
+Received: from [192.168.69.115] (cou50-h01-176-172-50-150.dsl.sta.abo.bbox.fr. [176.172.50.150])
+        by smtp.gmail.com with ESMTPSA id l12-20020a1ced0c000000b003fe24441e23sm13498474wmh.24.2023.09.12.09.44.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Sep 2023 09:44:50 -0700 (PDT)
+Message-ID: <111b9277-59b6-7252-6ddd-13edff9b2505@linaro.org>
+Date:   Tue, 12 Sep 2023 18:44:48 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH v4 0/3] target/i386: Restrict system-specific features
+ from user emulation
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20230911211317.28773-1-philmd@linaro.org>
+ <fabf2451-e8ad-8171-b583-16b238c578e7@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <fabf2451-e8ad-8171-b583-16b238c578e7@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This issue exists in kernel version 6.3-rc1 or above. The issue is
-introduced by the commit 8e6ed96cdd50 ("KVM: x86: fire timer when it is
-migrated and expired, and in oneshot mode"). The issue occurs on Intel
-platform which APIC virtualization and posted interrupt processing.
+On 12/9/23 16:07, Paolo Bonzini wrote:
+> On 9/11/23 23:13, Philippe Mathieu-Daudé wrote:
+>> Too many system-specific code (and in particular KVM related)
+>> is pulled in user-only build. This led to adding unjustified
+>> stubs as kludge to unagressive linker non-optimizations.
+>>
+>> This series restrict x86 system-specific features to sysemu,
+>> so we don't require any stub, and remove all x86 KVM declarations
+>> from user emulation code (to trigger compile failure instead of
+>> link one).
+>>
+>> Philippe Mathieu-Daudé (3):
+>>    target/i386: Check kvm_hyperv_expand_features() return value
+>>    RFC target/i386: Restrict system-specific features from user emulation
+>>    target/i386: Prohibit target specific KVM prototypes on user emulation
+> 
+> At least, patch 2 should be changed so that the #ifdef'ery is done at a 
+> higher level.
 
-The issue is first discovered when running the Android Emulator which
-is based on QEMU 2.12. I can reproduce the issue with QEMU 8.0.4 in
-Debian 12.
+I can try to improve it with your comments, but I have no idea of
+x86 CPU features.
 
-With the above commit, the timer gets fired immediately inside the
-KVM_SET_LAPIC call when loading the snapshot. On such Intel platforms,
-this eventually leads to setting the corresponding PIR bit. However,
-the whole PIR bits get cleared later in the same KVM_SET_LAPIC call.
-Missing lapic timer interrupt freeze the guest kernel.
+> However, the dependency of user-mode emulation on KVM is really an 
+> implementation detail of QEMU.  It's very much baked into linux-user and 
+> hard to remove, but I'm not sure it's a good idea to add more #ifdef 
+> CONFIG_USER_ONLY around KVM code.
 
-Signed-off-by: Haitao Shan <hshan@google.com>
----
- arch/x86/kvm/lapic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Do you rather v3 then?
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a983a16163b1..6f73406b875a 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2977,14 +2977,14 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	apic_update_lvtt(apic);
- 	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
- 	update_divide_count(apic);
--	__start_apic_timer(apic, APIC_TMCCT);
--	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
- 	kvm_apic_update_apicv(vcpu);
- 	if (apic->apicv_active) {
- 		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
- 		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
- 		static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
- 	}
-+	__start_apic_timer(apic, APIC_TMCCT);
-+	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
- 	if (ioapic_in_kernel(vcpu->kvm))
- 		kvm_rtc_eoi_tracking_restore_one(vcpu);
--- 
-2.42.0.283.g2d96d420d3-goog
+https://lore.kernel.org/qemu-devel/20230911142729.25548-1-philmd@linaro.org/
 
