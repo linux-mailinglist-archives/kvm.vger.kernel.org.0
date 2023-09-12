@@ -2,100 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71AA879D8F8
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 20:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B47C79DBF6
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 00:39:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237646AbjILSqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 14:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58088 "EHLO
+        id S237772AbjILWj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 18:39:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237642AbjILSqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 14:46:16 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02EB11991
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:46:08 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fb8933e18so64459437b3.3
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694544368; x=1695149168; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=8NSnv/WTj9TePiwJ3e7yhez5Y5Fg6PSmoubFG+0am4I=;
-        b=lpm26PFNLDdB5U8I7PH2zsOgtkh+8n0wJP0UoVJtwGT+9Xu+VjkiJVDdx4zHQPubY/
-         S8cijbfRWnpZ4dxhQtu7bZEsr5tPu7vz4wKAaEXNU25dTmwMf4i4Bfk/5WUapQXcjymE
-         gWlyxfXlsgTZ0rLMBweEaxkezHhe54GKjk+xJX10cnAbRo/DzGoYz9DKYc7FdecAAy4F
-         +NZanwJDCYaHoSGcPIUZ3Tq3awy+/KTrOPQr2Dm6JuMqOuq4EqopP0epCmdTT/gwL/3S
-         U1bICPIiYBRO3KwhC+2Nv0/+tVVWPyjhegLFMhUiFDZBtn1ilkZSfk/7jbSW7wrlWfPt
-         2yHg==
+        with ESMTP id S234813AbjILWj6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 18:39:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8564A10E9
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 15:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694558347;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hw4dz052UmhVfzEQW7+Uflu1VFGZC1UKKB7LwcrU6Xs=;
+        b=P86c/NEmdqlRXNvidILtx+bZU6CFOpQbGv07TuPVpdIL5kQkr+ah8N9o4FOFNnSjIN63eD
+        GtadjLZl/7sSMppMuTSwjY+XYtHxt+Cv2Z+xtT19WGqpqVbV18PQwsXS4qvbpALQSwHQPF
+        R+g71Tuvr/FuWWbp5lVKjZqvTMbZwxE=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581--cHSQAU5NFGqoJ1HJavgIQ-1; Tue, 12 Sep 2023 18:39:06 -0400
+X-MC-Unique: -cHSQAU5NFGqoJ1HJavgIQ-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1bde8160fbdso81581685ad.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 15:39:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694544368; x=1695149168;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8NSnv/WTj9TePiwJ3e7yhez5Y5Fg6PSmoubFG+0am4I=;
-        b=saHq4BcbuibCAXUZqqo8VAMfw3bdns6LpIUcP8v4V3YWZ/uAd8uuFl/6F9DCO9aNlh
-         4UJFKBVae9uNC6nER51q409yBW1D3TR0piVYHE4628m10oaGto0PjSUF/0rSmdjXiIsV
-         HSy5MbxBwqZ1WmlpuWA3BnZwrEI3e6ey4CYcNTWJG2V8JeSj2xcKRqMFShOhoFBEn6hf
-         WmjUQa8foLm7t8HuBTNRt6kQ3LJn/kwyTUt04hP8SCl3e/WZL+MpsB0O/mXbiGepPL9c
-         CeSbu0/HwtZ/l8ZL1RRQgJMVfrsyYUILe7eho/Mv33Fi1cXtxTuk59MH5Vbx2rw8nkYN
-         Nvvw==
-X-Gm-Message-State: AOJu0YyN1Qi9yVknENsVdgxkD6qLEwCUZYzTfTpqpk9G5tfL5yneDYL+
-        mtMBZnieh51KnMlvmOCh5Kfl5KtVq9KB
-X-Google-Smtp-Source: AGHT+IFADHJrwy/aa2LM6dPwu4H3fm1xiVyTj+CcoUMEvy5vi37pxe5Yg8FlnTokO/LcSVDIT1ldwzVEBl20
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a81:400c:0:b0:589:a855:7af with SMTP id
- l12-20020a81400c000000b00589a85507afmr8853ywn.7.1694544367876; Tue, 12 Sep
- 2023 11:46:07 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 12 Sep 2023 18:45:53 +0000
-In-Reply-To: <20230912184553.1887764-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230912184553.1887764-1-mizhang@google.com>
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230912184553.1887764-7-mizhang@google.com>
-Subject: [PATCH v4 6/6] KVM: Documentation: Add the missing description for
- tdp_mmu_page into kvm_mmu_page
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20230601; t=1694558345; x=1695163145;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hw4dz052UmhVfzEQW7+Uflu1VFGZC1UKKB7LwcrU6Xs=;
+        b=OQqfJb1MnVwBLQtUB2R0VfNSULutTcYcwBMF0gJrnBUBxiUJkedGKab73lm4iTU05a
+         qsAl8YRrmvr4emoOLMu9Xf4r7QFGqw9Ek9/5i2OcqNG4f6FPYsv+DhsCWv1iTdgT/KB0
+         Fr/drs68ewj3vQkQtDqq2roUV+legBTAeS51Fi+nxbeuvq5af7CUcCxUQ5CaCuZm/lvg
+         ReXKorjmBx/z5PDot8S2sjxX0ZJCFb+vIf1AybHqX9ZnVPdcNKxufWQzrWrourYIDhUR
+         NWYeVBud2DLAE162jrRX6KdDilkv+qLmO+yLC6QFTKqIFoz8l4tRqiV4P89O0IPQFbQb
+         hrBg==
+X-Gm-Message-State: AOJu0Yx1n29oaesf1Cv+cvwrBapqkHdZi1XzrfcbGgR8zj8jIpLCRr0r
+        Z9rygiDWV55F6Xqon4T2ztqX8FfwxavUth6TfGf4foc3bLbNE3tlzXEMQIofFp2YrmIuiA5Hi9m
+        VmlpGoAu27ViD
+X-Received: by 2002:a17:903:41c4:b0:1c3:3cde:7b44 with SMTP id u4-20020a17090341c400b001c33cde7b44mr1269652ple.12.1694558344881;
+        Tue, 12 Sep 2023 15:39:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHJXfeCtpozu/i9MX/Nb9C9D8rRf3TwAOO4AoonFr0CYCLCqxvZy3HNtrsprY+cWVaejgiLRA==
+X-Received: by 2002:a17:903:41c4:b0:1c3:3cde:7b44 with SMTP id u4-20020a17090341c400b001c33cde7b44mr1269621ple.12.1694558344560;
+        Tue, 12 Sep 2023 15:39:04 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id c10-20020a170902aa4a00b001c0af36dd64sm8964168plr.162.2023.09.12.15.38.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Sep 2023 15:39:03 -0700 (PDT)
+Message-ID: <5a5fb237-c28b-d6b5-0425-8f8f0fe1ac79@redhat.com>
+Date:   Wed, 13 Sep 2023 08:38:51 +1000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug
+Content-Language: en-US
+To:     James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+        loongarch@lists.linux.dev, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        x86@kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Len Brown <lenb@kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <41dd71ab-a6a7-fd93-73ec-64a6b0ca468e@redhat.com>
+ <1ca1fb8f-1dec-74a3-ee44-94609f6aba2c@arm.com>
+From:   Gavin Shan <gshan@redhat.com>
+In-Reply-To: <1ca1fb8f-1dec-74a3-ee44-94609f6aba2c@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the description for tdp_mmu_page into kvm_mmu_page description.
-tdp_mmu_page is a field to differentiate shadow pages from TDP MMU and
-non-TDP MMU.
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/virt/kvm/x86/mmu.rst | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi James,
 
-diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-index 16d5d6a1c174..82c5c6a6da2c 100644
---- a/Documentation/virt/kvm/x86/mmu.rst
-+++ b/Documentation/virt/kvm/x86/mmu.rst
-@@ -282,6 +282,10 @@ Shadow pages contain the following information:
-     since the last time the page table was actually used; if emulation
-     is triggered too frequently on this page, KVM will unmap the page
-     to avoid emulation in the future.
-+  tdp_mmu_page:
-+    Is 1 if the shadow page is a TDP MMU page. This variable is used to
-+    bifurcate the control flows for KVM when walking any data structure that may
-+    contain pages from both TDP MMU and shadow MMU.
- 
- Reverse map
- ===========
--- 
-2.42.0.283.g2d96d420d3-goog
+On 9/13/23 03:01, James Morse wrote:
+> On 29/03/2023 03:35, Gavin Shan wrote:
+>> On 2/3/23 9:50 PM, James Morse wrote:
+> 
+>>> If folk want to play along at home, you'll need a copy of Qemu that supports this.
+>>> https://github.com/salil-mehta/qemu.git
+>>> salil/virt-cpuhp-armv8/rfc-v1-port29092022.psci.present
+>>>
+>>> You'll need to fix the numbers of KVM_CAP_ARM_HVC_TO_USER and KVM_CAP_ARM_PSCI_TO_USER
+>>> to match your host kernel. Replace your '-smp' argument with something like:
+>>> | -smp cpus=1,maxcpus=3,cores=3,threads=1,sockets=1
+>>>
+>>> then feed the following to the Qemu montior;
+>>> | (qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+>>> | (qemu) device_del cpu1
+>>>
+>>>
+>>> This series is based on v6.2-rc3, and can be retrieved from:
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/ virtual_cpu_hotplug/rfc/v1
+> 
+>> I give it a try, but the hot-added CPU needs to be put into online
+>> state manually. I'm not sure if it's expected or not.
+> 
+> This is expected. If you want the CPUs to be brought online automatically, you can add
+> udev rules to do that.
+> 
+
+Yeah, I usually execute the following command to bring the CPU into online state,
+after the vCPU is hot added by QMP command.
+
+(qemu) device_add driver=host-arm-cpu,core-id=1,id=cpu1
+guest# echo 1 > /sys/devices/system/cpu/cpux/online
+
+James, the series was posted a while ago and do you have plan to respin
+and post RFCv2 in near future? :)
+
+Thanks,
+Gavin
 
