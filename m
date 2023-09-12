@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C9F979D330
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 16:06:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA63579D346
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 16:08:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235771AbjILOGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 10:06:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
+        id S235875AbjILOIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 10:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232145AbjILOGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 10:06:11 -0400
+        with ESMTP id S231508AbjILOIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 10:08:30 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD4F310D1
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 07:05:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 664AB10D9
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 07:07:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694527525;
+        s=mimecast20190719; t=1694527660;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Se7hqQXQMKrYV5KqZThGeZ3NRXLMJ2EyFNldKIrj/Kc=;
-        b=czMnKQ7eYl01dWzwcP2iSEJ1LW3ZfU/lu1R6kYkjuleCabDR36YCjWSwSe15B6u5ZTzL4z
-        3MFdGmICSKzWXqhmdS5Q+tUWLAqAxndWmKwGmjmd93Sv3zyp3vSxXUFjU12qWZJ7JVTGWM
-        T+7y8qaO4z0sd7QDfjrgGDtq7AKyl/4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QRN2zNzEIRdt9mVIxmAhTfWZatfHk2JC63APMxesKYw=;
+        b=AKv58k9rYl1tGQatSnVpo0Mr7TiPNBgOe4AITe54nH6/ocVHaGi0rkGkkUcGo1/XfLTkL+
+        nbfEb0oaJHe5JDrxv5KRKpSDTWl/lUzWPqfMTDI6ItpQCykVOjjmb488cIqpNyBZrMzoK7
+        fTSHteacCGDyDUCmbRYMYmprgQrUp4s=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-211-BJFGdIfUMrueTzOk8xafdw-1; Tue, 12 Sep 2023 10:05:23 -0400
-X-MC-Unique: BJFGdIfUMrueTzOk8xafdw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31f79595669so1702902f8f.0
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 07:05:22 -0700 (PDT)
+ us-mta-623-e5VYUccBN3Wuab5TkUeMDw-1; Tue, 12 Sep 2023 10:07:39 -0400
+X-MC-Unique: e5VYUccBN3Wuab5TkUeMDw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-402d1892cecso25138695e9.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 07:07:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694527522; x=1695132322;
+        d=1e100.net; s=20230601; t=1694527658; x=1695132458;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Se7hqQXQMKrYV5KqZThGeZ3NRXLMJ2EyFNldKIrj/Kc=;
-        b=jn5b1xnDedTyutgsMyeBn80nKHXxJNti0z8xaLL8SDLzrrB5C7BZYmW3gwob1FORDd
-         rmoFpkY4OD5OCDAsS+JDCCMUFZMJyfnebc3CBIYwTgXn2+PJMJFArSZzaMFXbWArt0Hy
-         OtSdFbokzzJTmOIeBLksLqEXv6LAZ1XVYYZPTNqMvmPiGeds+MvRKq4XKh+gLK3hF9vw
-         RTSM3WbGHNvZOIL/6Gz9fP2EbOEPlYCWEntf3HV0NcerWx7x+HesVgtJ6s7P8sYlqj7y
-         PoHeZZojNW3rxUBLuGvuq6ebVi1Jkncwo6wcpXMvUWRFCAp3ZLeNkpy8RD0Xig+RzYQJ
-         RFcw==
-X-Gm-Message-State: AOJu0YyCmdceTq+Ihr469ia37OmC5L31wYO7MaV/Q3ddfjJB7XtnJ9En
-        DMcAjnngXoolbYKI/GgibkvBmQ6EkOwSZ56TVBKaSvyx5DojqIf/RqdlfY6rRQYndy6WmyBwBIl
-        G3jyX5LYNTXFi
-X-Received: by 2002:a5d:60cf:0:b0:319:6ed2:a5c4 with SMTP id x15-20020a5d60cf000000b003196ed2a5c4mr1981262wrt.26.1694527521947;
-        Tue, 12 Sep 2023 07:05:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFwvhGWr+8e/BfJGS8trosITGG6jjfK+GccPrMCMaQFMHkG9Oz3yizJcHxtDxGBOSe4tBw8yg==
-X-Received: by 2002:a5d:60cf:0:b0:319:6ed2:a5c4 with SMTP id x15-20020a5d60cf000000b003196ed2a5c4mr1981205wrt.26.1694527520907;
-        Tue, 12 Sep 2023 07:05:20 -0700 (PDT)
+        bh=QRN2zNzEIRdt9mVIxmAhTfWZatfHk2JC63APMxesKYw=;
+        b=lFo8DEBhVfprufUFoo/099K3JZuK/QQ3F3d2L690x67rZoIP0ZUIwRybvRPVu8cVZX
+         iLtZ/g3jseQCQemrVjGNAqZdSIjmJu3wkrOCwqIfFgLmrpDwiByQieKhVoOmFhgN5JPH
+         x5zT5gUyv8vTxq1tVfXjWtuwWm6bWYbHEO7tBZqaZ20VryZLhIvBvbQ9WrtwUwITVguv
+         kOcCUuwrwKV/1oY7uD7P9mVM64pK0fftsP5u54Pip+p0Fg/Qn8aIcVmUlJCzJBYScGgl
+         ewW50iykPTC+fqc0olHawOuo/GHQYRvjFq3e/3DGTWS/OF5cRsM0vS2FMWaPN4LnEkam
+         rZOw==
+X-Gm-Message-State: AOJu0YweFiVyiLZvI3FrqgVyINfBaHZPzkhTCp4Oc98XPQHkOPnuPsU9
+        xMC+6qPTYufhiGmygowefp47YHtcJ2iVc5zCDMmB+anqY2TMzdcMLH5veDwmQ9aUDpp5w8wMETS
+        8xVJZc1zy/1oX
+X-Received: by 2002:a7b:ca47:0:b0:3fb:c075:b308 with SMTP id m7-20020a7bca47000000b003fbc075b308mr2071599wml.12.1694527657840;
+        Tue, 12 Sep 2023 07:07:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF7DFNhJSaXDU85WH3j5/sSakZlESk56Xn91pig/o3p2nP0S9nFEbdN3YcyLiQgbtnDSG6WhQ==
+X-Received: by 2002:a7b:ca47:0:b0:3fb:c075:b308 with SMTP id m7-20020a7bca47000000b003fbc075b308mr2071575wml.12.1694527657499;
+        Tue, 12 Sep 2023 07:07:37 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id v17-20020a5d6791000000b00318147fd2d3sm12934675wru.41.2023.09.12.07.05.19
+        by smtp.googlemail.com with ESMTPSA id y18-20020adfd092000000b003179d5aee67sm13007052wrh.94.2023.09.12.07.07.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 07:05:20 -0700 (PDT)
-Message-ID: <c33130ec-661a-a1ed-c285-eeaa52365358@redhat.com>
-Date:   Tue, 12 Sep 2023 16:05:19 +0200
+        Tue, 12 Sep 2023 07:07:36 -0700 (PDT)
+Message-ID: <fabf2451-e8ad-8171-b583-16b238c578e7@redhat.com>
+Date:   Tue, 12 Sep 2023 16:07:31 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [RFC PATCH v4 2/3] target/i386: Restrict system-specific features
+Subject: Re: [PATCH v4 0/3] target/i386: Restrict system-specific features
  from user emulation
 Content-Language: en-US
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
@@ -71,12 +71,10 @@ Cc:     kvm@vger.kernel.org,
         Michael Tokarev <mjt@tls.msk.ru>,
         Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 References: <20230911211317.28773-1-philmd@linaro.org>
- <20230911211317.28773-3-philmd@linaro.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230911211317.28773-3-philmd@linaro.org>
+In-Reply-To: <20230911211317.28773-1-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -84,91 +82,27 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 9/11/23 23:13, Philippe Mathieu-Daudé wrote:
->   /*
->    * Only for builtin_x86_defs models initialized with x86_register_cpudef_types.
->    */
-> @@ -6163,6 +6195,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->               }
->               *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
->   
-> +#ifndef CONFIG_USER_ONLY
->               /*
->                * SGX cannot be emulated in software.  If hardware does not
->                * support enabling SGX and/or SGX flexible launch control,
-> @@ -6181,6 +6214,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->                       CPUID_7_0_ECX_SGX_LC))) {
->                   *ecx &= ~CPUID_7_0_ECX_SGX_LC;
->               }
-> +#endif
+> Too many system-specific code (and in particular KVM related)
+> is pulled in user-only build. This led to adding unjustified
+> stubs as kludge to unagressive linker non-optimizations.
+> 
+> This series restrict x86 system-specific features to sysemu,
+> so we don't require any stub, and remove all x86 KVM declarations
+> from user emulation code (to trigger compile failure instead of
+> link one).
+> 
+> Philippe Mathieu-Daudé (3):
+>    target/i386: Check kvm_hyperv_expand_features() return value
+>    RFC target/i386: Restrict system-specific features from user emulation
+>    target/i386: Prohibit target specific KVM prototypes on user emulation
 
-This can use a variant of x86_cpu_get_supported_cpuid that returns a 
-single register; or it can be rewritten to use x86_cpu_get_supported_cpuid.
+At least, patch 2 should be changed so that the #ifdef'ery is done at a 
+higher level.
 
-In general, a lot of checks for accel_uses_host_cpuid() are unnecessary, 
-and the code can be modified to not depend on either KVM or HVF.
-
->           } else if (count == 1) {
->               *eax = env->features[FEAT_7_1_EAX];
->               *edx = env->features[FEAT_7_1_EDX];
-> @@ -6876,6 +6910,8 @@ static void mce_init(X86CPU *cpu)
->       }
->   }
->   
-> +#ifndef CONFIG_USER_ONLY
-> +
->   static void x86_cpu_adjust_level(X86CPU *cpu, uint32_t *min, uint32_t value)
->   {
->       if (*min < value) {
-> @@ -6948,6 +6984,8 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
->       env->features[FEAT_XSAVE_XSS_HI] = mask >> 32;
->   }
->   
-> +#endif /* !CONFIG_USER_ONLY */
-
-These functions should all be used in user-mode emulation as well.
-
->   /***** Steps involved on loading and filtering CPUID data
->    *
->    * When initializing and realizing a CPU object, the steps
-> @@ -7040,6 +7078,7 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->           }
->       }
->   
-> +#ifndef CONFIG_USER_ONLY
->       if (!kvm_enabled() || !cpu->expose_kvm) {
->           env->features[FEAT_KVM] = 0;
->       }
-
-This is "!kvm_enabled()" so it should be kept for user-mode emulation.
-
-> @@ -7111,6 +7150,8 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->           return;
->       }
->   
-> +#endif /* !CONFIG_USER_ONLY */
->       /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
->       if (env->cpuid_level_func7 == UINT32_MAX) {
->           env->cpuid_level_func7 = env->cpuid_min_level_func7;
-> @@ -7152,6 +7193,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
->           mark_unavailable_features(cpu, w, unavailable_features, prefix);
->       }
->   
-> +#ifndef CONFIG_USER_ONLY
->       if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
->           kvm_enabled()) {
->           KVMState *s = CPU(cpu)->kvm_state;
-> @@ -7179,6 +7221,7 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
->               mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
->           }
->       }
-> +#endif
-
-This need not be limited to KVM, it can likewise use 
-x86_cpu_get_supported_cpuid.
+However, the dependency of user-mode emulation on KVM is really an 
+implementation detail of QEMU.  It's very much baked into linux-user and 
+hard to remove, but I'm not sure it's a good idea to add more #ifdef 
+CONFIG_USER_ONLY around KVM code.
 
 Paolo
-
->   }
->   
->   static void x86_cpu_hyperv_realize(X86CPU *cpu)
 
