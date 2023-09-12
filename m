@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C190F79D89B
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 20:24:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFE7A79D8CB
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 20:38:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237381AbjILSYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 14:24:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37742 "EHLO
+        id S237450AbjILSiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 14:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237352AbjILSYK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 14:24:10 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16B710E9
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68fc9e0e22eso1889895b3a.1
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
+        with ESMTP id S237381AbjILSiC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 14:38:02 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7687E10F2
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:37:58 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68fc9e0e22eso1902291b3a.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 11:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694543046; x=1695147846; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694543878; x=1695148678; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y8/1D1hlKrwxGhPYu7s8FW0yjX/NvlYAKUyveN+rZHg=;
-        b=RoDfTMpdGYQOL3qxsM/UQYJdoVepEmmHsBXKTD8a12xDCSBeBz0M0t8fZlfFUm3Kdv
-         87RxsOHwjEmPO0JUqLr3/wfdXi73kVHbmoqDQ7ZCwg1WRfUqlitl63X3ZgCTwo9Xh9U8
-         MVRh3AdeOk7O4mqiwzXX3dDQHYsgVkGz+ExyA6aDNgy4X0a3yEW1lSamfCWt4vXbkq1g
-         m1tgZafo/dsa5rtlUjNjUAxHvd9T6Ivs9hLQLX6PLs+l7rCOsEegWhyEz8vyjL5397UE
-         eIcs6R9SbM5lmj4HjgFHhTscHIrsHOVvxv7j1BRvPr7YjldRj/ZYKpnXa4tXL9WhYQqv
-         yiuQ==
+        bh=Wy5n43SLh7KcjSaJVYVzVDg3MnFdzm1gNQS0TTXtUR4=;
+        b=h5puBHtKj0adr1b3YQzUHSxeHSLsQRuriquzsKliOWX1fQR/Bm2/QGldD0I2RxdpLd
+         KbSXhjwfQMdsR8nGYyWoebFBi2dIB5EMVvqwCqbxQ/kOAapAr9NHSm6lfIn8vbxn1fAR
+         m9PtWcR2Wp56WQlA11/jGkW2nmgP5jaT7jCDLIrwXs/aouxEoggernOIn/HemlEiaeK0
+         zzmsPSCMOnjcIkpCoVu2j+mLqNFApTyMaTVWEbnepI1vCxd5cYITayA0Bu5GzrDNi3az
+         76qAyrKA+2n1mDGvJgifoalFzNTc2TReWTUJjqIH5KcE3GWEPD/CS4M9inx2tgM0tbaN
+         X5hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694543046; x=1695147846;
+        d=1e100.net; s=20230601; t=1694543878; x=1695148678;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y8/1D1hlKrwxGhPYu7s8FW0yjX/NvlYAKUyveN+rZHg=;
-        b=WKA5bCdkpsZpC4aknL+jJ+HqALBtMRM6U8OXsCooB/0Hh5sUFW7bP3r06eSxBGC8au
-         CSUfoZfE/dpQslxfFjMpnJ3L7r3dMK4CfLaPXMx5d3ec9XefdHjRp9PDza+hvBiXN6oR
-         yInrRn716tJofyOSbbH+wH9nh5Mg2WaVGEBNz0d2xEJfhpHlnMDG29zyTgWKazFVtdEM
-         PXftpu4COca6DpKBwbA+PrnmA3e3aumRahHYsD27fDflogoYP/b5NfOaijfS9oBFh+qD
-         h+vX8SL33xHHgfo+ccGriNK9cPQH5MEyRUPEXQZQEMkXoLxYUVv8mnSs8owAwWdMv6us
-         tnHQ==
-X-Gm-Message-State: AOJu0Yz+Wo0n+gP5mKnJ8uAbTpj0wkZlgNrDUm2cWPmhLIri9VY42MyA
-        Kya8dfKEEEihn98/hbrtAzXv2Q==
-X-Google-Smtp-Source: AGHT+IG9chD/RkZ8OOUzGsLf726oa5VFCPJ0BaZ+qbex436wuU+iD6QMGqbR6s+8Yxvxt+tedk1NWA==
-X-Received: by 2002:a05:6a21:47cb:b0:153:6e99:edbb with SMTP id as11-20020a056a2147cb00b001536e99edbbmr225106pzc.31.1694543046299;
-        Tue, 12 Sep 2023 11:24:06 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id bt10-20020a056a00438a00b006875df4773fsm3989174pfb.163.2023.09.12.11.24.05
+        bh=Wy5n43SLh7KcjSaJVYVzVDg3MnFdzm1gNQS0TTXtUR4=;
+        b=oOVI/LEIn4uqeQbn6hcbkfF9RC/9FpwRzoaTTAhlTqmV7iGJ6uDfzq+ZcwIjPUSHWi
+         MlLTcOMwecufzpGASBADBLVrNOuYKJI6r/GYp48mN6jhjLII3UQrCX1Tprpw0GL0ebqv
+         QBNF+V+m9SchGk4DLAVZTsEvZ/pi4eD6OyOLWoxqWZAh/mY410xYUnLefB5C0sT+01oG
+         iUH3rHKpnAf20vZLHLm/EQYjrrkXvziPgURGet+DAZcCRC0gxRbAS0NMgveZQo+9imct
+         mBL+t5dBXz6Gm+Gzj6iUz0sMKpZJMSPITA8QzVayM2NjqJF3zErrz+Am1c5/KYAuq7eq
+         Bn1w==
+X-Gm-Message-State: AOJu0Ywbq0ORo1d03YbGREdJdJs4gSKtd6uyfHuRbKT8loUTQEfz+GLt
+        ENiu5zAyTnlIgjhz0cN7rQJtKA==
+X-Google-Smtp-Source: AGHT+IErGHsRSrFJvKHefg2NAmQCNrlFHjl+ciy1JtJ0nTYwIV/1H9rX5PxkYX9lsT1GFBHM0HI/Bg==
+X-Received: by 2002:a05:6a00:847:b0:68f:cb69:8e78 with SMTP id q7-20020a056a00084700b0068fcb698e78mr664621pfk.5.1694543877695;
+        Tue, 12 Sep 2023 11:37:57 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id y24-20020a056a001c9800b0068fb996503esm4624790pfw.100.2023.09.12.11.37.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 11:24:05 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 18:24:01 +0000
+        Tue, 12 Sep 2023 11:37:57 -0700 (PDT)
+Date:   Tue, 12 Sep 2023 18:37:53 +0000
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
@@ -59,69 +59,67 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v3 4/6] KVM: Documentation: Add the missing description
- for tdp_mmu_root_count into kvm_mmu_page
-Message-ID: <ZQCswf8EWAGy8QZI@google.com>
+Subject: Re: [PATCH v3 5/6] KVM: Documentation: Add the missing description
+ for mmu_valid_gen into kvm_mmu_page
+Message-ID: <ZQCwASSh0ssWYH4I@google.com>
 References: <20230801002127.534020-1-mizhang@google.com>
- <20230801002127.534020-5-mizhang@google.com>
- <ZN1R31uo4FGQfKrQ@google.com>
+ <20230801002127.534020-6-mizhang@google.com>
+ <ZN1QYGfFuzlyjECm@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZN1R31uo4FGQfKrQ@google.com>
+In-Reply-To: <ZN1QYGfFuzlyjECm@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Aug 16, 2023, Sean Christopherson wrote:
 > On Tue, Aug 01, 2023, Mingwei Zhang wrote:
-> > Add the description of tdp_mmu_root_count into kvm_mmu_page description and
-> > combine it with the description of root_count. tdp_mmu_root_count is an
-> > atomic counter used only in TDP MMU. Update the doc.
+> > Add the description for mmu_valid_gen into kvm_mmu_page description.
+> > mmu_valid_gen is used in shadow MMU for fast zapping. Update the doc to
+> > reflect that.
 > > 
 > > Signed-off-by: Mingwei Zhang <mizhang@google.com>
 > > Reviewed-by: Kai Huang <kai.huang@intel.com>
 > > ---
-> >  Documentation/virt/kvm/x86/mmu.rst | 12 ++++++++----
-> >  1 file changed, 8 insertions(+), 4 deletions(-)
+> >  Documentation/virt/kvm/x86/mmu.rst | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
 > > 
 > > diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-> > index 17d90974204e..40daf8beb9b1 100644
+> > index 40daf8beb9b1..581e53fa00a2 100644
 > > --- a/Documentation/virt/kvm/x86/mmu.rst
 > > +++ b/Documentation/virt/kvm/x86/mmu.rst
-> > @@ -229,10 +229,14 @@ Shadow pages contain the following information:
-> >      can be calculated from the gfn field when used.  In addition, when
-> >      role.direct is set, KVM does not track access permission for each of the
-> >      gfn. See role.direct and gfn.
-> > -  root_count:
-> > -    A counter keeping track of how many hardware registers (guest cr3 or
-> > -    pdptrs) are now pointing at the page.  While this counter is nonzero, the
-> > -    page cannot be destroyed.  See role.invalid.
-> > +  root_count / tdp_mmu_root_count:
-> > +     root_count is a reference counter for root shadow pages in Shadow MMU.
-> > +     vCPUs elevate the refcount when getting a shadow page that will be used as
-> > +     a root page, i.e. page that will be loaded into hardware directly (CR3,
-> > +     PDPTRs, nCR3 EPTP). Root pages cannot be destroyed while their refcount is
-> > +     non-zero. See role.invalid. tdp_mmu_root_count is similar but exclusively
-> > +     used in TDP MMU as an atomic refcount. When the value is non-zero, it
-> > +     allows vCPUs acquire references while holding mmu_lock for read.
+> > @@ -208,6 +208,16 @@ Shadow pages contain the following information:
+> >      The page is not backed by a guest page table, but its first entry
+> >      points to one.  This is set if NPT uses 5-level page tables (host
+> >      CR4.LA57=1) and is shadowing L1's 4-level NPT (L1 CR4.LA57=1).
+> > +  mmu_valid_gen:
+> > +    The MMU generation of this page, used to fast zap of all MMU pages within a
+> > +    VM without blocking vCPUs.
 > 
-> That last sentence is wrong.  *vCPUs* can't acquire references while holding
-> mmu_lock for read.  And actually, they don't ever put references while holding
-> for read either.  vCPUs *must* hold mmu_lock for write to obtain a new root,
-> Not putting references while holding mmu_lock for read is mostly an implementation
-> quirk.
+> KVM still blocks vCPUs, just for far less time.  How about this?
 > 
-> Maybe replace it with this?
+>      The MMU generation of this page, used to determine whether or not a shadow
+>      page is obsolete, i.e. belongs to a previous MMU generation.  KVM changes
+>      the MMU generation when all shadow pages need to be invalidated, e.g. if a
+>      memslot is deleted, and so effectively marks all shadow pages as obsolete
+>      without having to touch each page.  Marking shadow pages obsolete allows
+>      KVM to zap them in the background, i.e. so that vCPUs can run while the
+>      zap is ongoing (using a root from the new generation).  The MMU generation
+>      is only ever '0' or '1' (slots_lock must be held until all pages from the
+>      previous generation are zapped).
 > 
->     tdp_mmu_root_count is similar but exclusively used in the TDP MMU as an
->     atomic refcount (select TDP MMU flows walk all roots while holding mmu_lock
->     for read, e.g. when clearing dirty bits).
+>      Note, the TDP MMU...
+> 
 
-hmm, I think all the content within the bracket is details and we should
-not mention them at all. In fact, when I see the implementation, the
-last refcount of tdp_mmu_root_count is treated differently. Those
-details should be instead mentioned in code or comments instead of
-documentation as they may evolve much faster.
+Got you. I think instead of elaborating this, I would simply put this
+way: "... without blocking vCPUs for too long". The subsequent description
+basically tells how it works and naturally explains how it does not
+blocks vCPUs for too long.
 
-So, I will remove the last sentence.
+> > Specifically, KVM updates the per-VM valid MMU
+> > +    generation which causes the mismatch of mmu_valid_gen for each mmu page.
+> > +    This makes all existing MMU pages obsolete. Obsolete pages can't be used.
+> > +    Therefore, vCPUs must load a new, valid root before re-entering the guest.
+> > +    The MMU generation is only ever '0' or '1'.  
+
