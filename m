@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3853079D197
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 15:02:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67BC579D18B
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 15:02:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235476AbjILNCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 09:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54740 "EHLO
+        id S235369AbjILNCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 09:02:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235436AbjILNC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 09:02:26 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2453D10E0;
-        Tue, 12 Sep 2023 06:02:18 -0700 (PDT)
+        with ESMTP id S235164AbjILNCP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 09:02:15 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9182210D8;
+        Tue, 12 Sep 2023 06:02:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZKzit3GV868d3L5xHUpyvRKA3XHAHHVEDj6GZgw1vlprvqTO5qEkiWVDDeDLwwazPP7DA6OHOUPLzr0FlK1b+N7sLfWs3nivzp6OOQNO+9PCV6VfqK9dsLAZe9bKlTN7e3BtCShYkY+n+ZmDgR4YC9FctgnCLmUCif7J8/WMI5hmQLpd5NwZYxbYHJsvAGZcPmfSiu7tIiXFV/iEZIDMAW/zccqAeOA8ZiK5joIWWODJmE0m0fS2zHS8wUqTr4KSAJiKjr2cX28Gki4jJF6Dx2S/k4tRiS0zt/pitwv2MzGxrOw1V08u4fxFzpBoiEWi+smACyzihwskZIvfsuLD0g==
+ b=n+4IJFeu0+HtV6OBRpD9wydgZ7AfNMalbPltd6ToOsL3kVLVfBE8jfcBqzLLJC5Hyu9yq2QgsqyjaLEmY+wEKNjJ+ciYflhGlOVqWmoZY9iDH1y+MC7xg2Ag1k1GjXFndNlf9oKSW2qZRkhZrL4tq4h0tB2JgccRGWhH5JaGp6xMfkKWih+m5ag43+rV8lOp+xPkD19TKiXeEFnK7KN/ImWNOOvalMFT7/LV8dfaswgtrwvaZXgLr1kLrBNQmPhuKMhMCgwPP2uOMBKmU+UG+PXCy+g17go/uhMiF7/xzEE2OdrFlQCLJLYMaDb0FBuPXyzLCJ3MnspQyT6+vmrnAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ILKog4btT16IMu9HXAHH95fAm+8LcOyK/4mzDrViAvI=;
- b=FleG3wx/Hqgb86ACdcsr/cljM2/X2HGjcVrO1UupUio6gLiD4lZg0go7/UA3pmHO7VrKqeSaMU2yFkMBrizad72BY6pSdC9wngBuWo7+w4v1OKophAsPkhObp1NoSwaCuDn2x/91usBmMDnBvBic23P9IWqAnTL0/AzLyTvjxlAWuSfsV2JKB7zYESMvGekdPz5khV8bgq/I5Si7hxe8+8GSBrNyp5RKGzJJdjeBYJW/Kq7WLX/uTyGNqQRAgFtKtLox8w7fUVoGUIkUVcmXOh9B1HgfCGH81iI0Vy1N7jGjiCEAirsQI0E+kUKH72d34lh/R32ZHDfG1fri4YFL2w==
+ bh=u64U1vHaUjCMSpg15sklK0flAB7mos1z6H94Kmb4gsM=;
+ b=Ql+TNpsP0SGgRqK0Netrx+uv2B80La0nBGTBTujvhXlU/h/sn+tdjEPeyj8mDK2AUaJ4j8yHBpo/1PwGRWDvbpWe8fRhTKH99ijXlP2ubd02MZD8fM4PRxdUl1jpwZeUc65Z6HgfyTDXOM9Vhvkhx6NNd+S2E8cjEBpEIOsYQoPqlzKSjcrnhaecmtydjpY4RI/TpST8HUAIDUTVDMHH/Yd/LyGjEwSA4QdygsV4z6fJE4PMtVsvfbumD3tX5sjvWs/zJjCnLDs/DEz8pofVuSbYA1nG3z4dA1W/aKCgKHqiSrOaWHg8C1XKZ8Kt60UhPutC5sB43UGy5s6LhQAxYw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ILKog4btT16IMu9HXAHH95fAm+8LcOyK/4mzDrViAvI=;
- b=MhbQ1sNYZxh/ME+pdyMeYEU0h0FZrrgphuNEKNH5Co9ESFoYRvO65HheYucgxgqvmnDbnJya0onJj5qnhujQtp1eOuwdxAKgsiwq7V1ypyrj30BPSW9uorqgj6ZONgzuZfZiti6B8vHFTbOj6fHbu1i6fS/uor9Nvg0E/O0ucqTEyH7xxDL2VnSfvrWz5A+1NlTcvUaqUt1HB0pj7xZpBHMMgvjEz1108yGyW9XdlCDJZeUCjh/XsWcyr0q0j6cJkCwUva1rk+Yce2+zeARt8SQVYJV5IiSs02iFJ0mAoFcsmmtFmWSrp9UN0/HQtYNoqC4XGszEz3NK3msD05EIAQ==
-Received: from SA1P222CA0156.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c3::19)
- by IA1PR12MB8190.namprd12.prod.outlook.com (2603:10b6:208:3f2::7) with
+ bh=u64U1vHaUjCMSpg15sklK0flAB7mos1z6H94Kmb4gsM=;
+ b=jYbVfvy6fjzQ0PMnG6pApEc3S4H046yPOUSBJnS2XSxw0/gCrSNdH75LSFQ+AGVLvCyBEQEDWoS8bSzb0RI7FwcqRY2jG8ATDSaUlku9DxqSIMXP0n9sO97FJIGYGra1ssCHHUh+fOk0GBQRuq8IIDxEoeOZZprfveBxAu/WrUzxMJEod3lWk5S8RmHWNY/06jcD//wi9tdSK9fTqwB7+29aUAUfVHTSVUu7PkNGQOUrz8CNegQMfAMZ0ThczLKZ0BPmSynpUeSZEzXRY1zdH3ewPiOTdrwzDZmawFw+Dz4q3ubhoBHFhHCnF43un/q+bso05MPFpi/OxwxYYPYUTA==
+Received: from DM6PR14CA0060.namprd14.prod.outlook.com (2603:10b6:5:18f::37)
+ by IA0PR12MB8375.namprd12.prod.outlook.com (2603:10b6:208:3dd::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.31; Tue, 12 Sep
- 2023 13:02:14 +0000
-Received: from SA2PEPF000015C8.namprd03.prod.outlook.com
- (2603:10b6:806:3c3:cafe::19) by SA1P222CA0156.outlook.office365.com
- (2603:10b6:806:3c3::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.33; Tue, 12 Sep
+ 2023 13:02:08 +0000
+Received: from CY4PEPF0000E9D9.namprd05.prod.outlook.com
+ (2603:10b6:5:18f:cafe::75) by DM6PR14CA0060.outlook.office365.com
+ (2603:10b6:5:18f::37) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.19 via Frontend
- Transport; Tue, 12 Sep 2023 13:02:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ Transport; Tue, 12 Sep 2023 13:02:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF000015C8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D9.mail.protection.outlook.com (10.167.241.77) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6792.16 via Frontend Transport; Tue, 12 Sep 2023 13:02:14 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6792.17 via Frontend Transport; Tue, 12 Sep 2023 13:02:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 12 Sep 2023
- 06:01:53 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ 06:01:57 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 12 Sep
- 2023 06:01:53 -0700
+ 2023 06:01:56 -0700
 Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
  mail.nvidia.com (10.129.68.10) with Microsoft SMTP Server id 15.2.986.37 via
- Frontend Transport; Tue, 12 Sep 2023 06:01:50 -0700
+ Frontend Transport; Tue, 12 Sep 2023 06:01:54 -0700
 From:   Dragos Tatulea <dtatulea@nvidia.com>
 To:     Jason Wang <jasowang@redhat.com>,
         =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
@@ -72,9 +72,9 @@ To:     Jason Wang <jasowang@redhat.com>,
 CC:     Dragos Tatulea <dtatulea@nvidia.com>,
         Parav Pandit <parav@nvidia.com>,
         Xuan Zhuo <xuanzhuo@linux.alibaba.com>, <kvm@vger.kernel.org>
-Subject: [PATCH 02/16] vhost-vdpa: introduce descriptor group backend feature
-Date:   Tue, 12 Sep 2023 16:01:12 +0300
-Message-ID: <20230912130132.561193-3-dtatulea@nvidia.com>
+Subject: [PATCH 03/16] vhost-vdpa: uAPI to get dedicated descriptor group id
+Date:   Tue, 12 Sep 2023 16:01:13 +0300
+Message-ID: <20230912130132.561193-4-dtatulea@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230912130132.561193-1-dtatulea@nvidia.com>
 References: <20230912130132.561193-1-dtatulea@nvidia.com>
@@ -84,108 +84,80 @@ Content-Transfer-Encoding: 8bit
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015C8:EE_|IA1PR12MB8190:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0339d38-a04f-46dc-5fa9-08dbb3907c63
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D9:EE_|IA0PR12MB8375:EE_
+X-MS-Office365-Filtering-Correlation-Id: 50b5d8a3-2eac-433d-ec69-08dbb39078ad
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: imzE884gY0CmPpGIpp/Shmq1GnEFlr2VfNTl2BRbhlWwJHyVv76oKNPVMJFQbJGjaehIORrmkdxQHOSfLsItp5CYbcT6RO/K5mH7QmavyQyHgOF905UZn6LOzqLMw3hUsk14b+MDxbkWk7udPmWM/u4+l0uZ4/caRRAg9GnEXje1IsrGfIvJoMZXu7zZwmhN9rp2evFeynrHThoA8iy0To1TkndERFqJYsVX9hKGPMcoVYf38D0SLpY2gDeasBvegqpHbHlRBiq8LSYg22szdunbEIBCJ8SSeVq9WpGMxXl8JNdFviW+cA9CC72grFSr5uWFKld5FZAa83pB5tQo6dEjrsaqMiXaw4A67bhTpLL8FShHpy5l/8OqrPo9rWZBUkca/0IyiPJzIwu6k+vUveP4q0ZI4/FGbyQnyGH+O0usAb6hUG9GX+UmIKoMZS3OHT4zHSuZlrRoegEtJQxVusZhc2zuJjHhgTcm6jN+Hkfpwc2Daqzoqk6UCSUoNpRlID1SuDwxvkgnPrWpSlhWx8Ve6QfZsePHwqemcHu77rGscgDnB+4nKH/ZGFjpZTwDB4BrFJ5cSecANpkxDkLWU9ZxE8hfV15q022RibXyEEaDyRms+EQR+IUEK5wuelU/1fYYqeDE6Ye1su/f7wTO0NGPy6uOy1zQO2519gSOyOTJs9EOxdXrJOOpr5+QkBzywt74hN9hyWUDquG2XYeDH/3EjrhvyVZ2HjijGWE50VO0w/USKhBP636kDp2IqqPu
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(396003)(39860400002)(346002)(186009)(451199024)(82310400011)(1800799009)(40470700004)(46966006)(36840700001)(40460700003)(426003)(8676002)(2906002)(36756003)(86362001)(82740400003)(356005)(7636003)(5660300002)(40480700001)(4326008)(26005)(36860700001)(1076003)(8936002)(83380400001)(66574015)(47076005)(316002)(41300700001)(6666004)(336012)(2616005)(70586007)(478600001)(70206006)(110136005)(54906003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: gb1HPxQzCWQJFaPXWWVxmwHwnc4AmW4oAqnvxvE6VxG329Du5We0wTgpQJ9ukAVOnSSJTGR8X3yXXU3rk6tEw9l/euIPXQShy0ehp7MzB1LKhPbIBHNQhrs0S0dYFHpqu5PC3ioYj/0jL8IFyEalWzHz9ikEixWUOPbHwP27qF9gC0lVARBMnKE4tLzeqOmBgc1XzxoQSoEVQhTmHWd4tlI29A1gFXiVlFYN7kqKBt75qkDkZBrLDV+n7tJCfBLzxN4zSxCD+/zcJWt2REvA1PENj0IynqW3GfPTcPbSAtJk6LtTHfLK5oRkjGQXLyea7v4gxf0BRfXKn67divfyDb9Tn1LZzj2+SxeeqTaRo7v79saEEUOHg0YNbGNNEdmR4Zjt8Ro4OP5VeHRpJQMaEsH8Vep77pOsHMx6SAAHCJp2CG4oyhKztijDnSPlTE5LjjDPg7CaMW0xbX6wIopVuE3aWVzRrKVAR7D4CheKmElDbL1OkpwFPzeMvNv8VQNRQf6W81oQWbAqiFQQyf0TL1VCUbKz9nYi91trxBw9sEP8PQV4+SIjnMTHHVlRSeZgrC3PwsnkYiO9P7RjxGeqPwtGk6Zozq2tLzld/HNqUhx09Ls+fVkPSbymy9P25foYb2olqBoxWvy/w+mY5oXRTYcbbRYQQo/vys8wfyF140FsbKoPf4kIKq9+ABFF5PmTp9X2BXHs7ejA9nYJMUyiQklRHuiuhqLy+GfjqchB669eUvrDo1v36FAcmA3Te1Eu
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(39860400002)(346002)(376002)(186009)(451199024)(1800799009)(82310400011)(46966006)(40470700004)(36840700001)(41300700001)(316002)(40480700001)(26005)(336012)(426003)(1076003)(70586007)(8936002)(110136005)(2906002)(70206006)(8676002)(4326008)(54906003)(5660300002)(478600001)(6666004)(40460700003)(36756003)(36860700001)(47076005)(2616005)(83380400001)(86362001)(82740400003)(356005)(7636003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 13:02:14.5200
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 13:02:08.2977
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0339d38-a04f-46dc-5fa9-08dbb3907c63
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50b5d8a3-2eac-433d-ec69-08dbb39078ad
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF000015C8.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D9.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8190
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8375
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Si-Wei Liu <si-wei.liu@oracle.com>
 
-Userspace knows if the device has dedicated descriptor group or not
-by checking this feature bit.
-
-It's only exposed if the vdpa driver backend implements the
-.get_vq_desc_group() operation callback. Userspace trying to negotiate
-this feature when it or the dependent _F_IOTLB_ASID feature hasn't
-been exposed will result in an error.
+With _F_DESC_ASID backend feature, the device can now support the
+VHOST_VDPA_GET_VRING_DESC_GROUP ioctl, and it may expose the descriptor
+table (including avail and used ring) in a different group than the
+buffers it contains. This new uAPI will fetch the group ID of the
+descriptor table.
 
 Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
 Acked-by: Eugenio Pérez <eperezma@redhat.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/vhost/vdpa.c             | 17 +++++++++++++++++
- include/uapi/linux/vhost_types.h |  5 +++++
- 2 files changed, 22 insertions(+)
+ drivers/vhost/vdpa.c       | 10 ++++++++++
+ include/uapi/linux/vhost.h |  8 ++++++++
+ 2 files changed, 18 insertions(+)
 
 diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 78379ffd2336..2f21798a37ee 100644
+index 2f21798a37ee..851535f57b95 100644
 --- a/drivers/vhost/vdpa.c
 +++ b/drivers/vhost/vdpa.c
-@@ -389,6 +389,14 @@ static bool vhost_vdpa_can_resume(const struct vhost_vdpa *v)
- 	return ops->resume;
- }
- 
-+static bool vhost_vdpa_has_desc_group(const struct vhost_vdpa *v)
-+{
-+	struct vdpa_device *vdpa = v->vdpa;
-+	const struct vdpa_config_ops *ops = vdpa->config;
-+
-+	return ops->get_vq_desc_group;
-+}
-+
- static long vhost_vdpa_get_features(struct vhost_vdpa *v, u64 __user *featurep)
- {
- 	struct vdpa_device *vdpa = v->vdpa;
-@@ -690,6 +698,7 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 		if (copy_from_user(&features, featurep, sizeof(features)))
+@@ -613,6 +613,16 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 		else if (copy_to_user(argp, &s, sizeof(s)))
  			return -EFAULT;
- 		if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-+				 BIT_ULL(VHOST_BACKEND_F_DESC_ASID) |
- 				 BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
- 				 BIT_ULL(VHOST_BACKEND_F_RESUME) |
- 				 BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-@@ -700,6 +709,12 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 		if ((features & BIT_ULL(VHOST_BACKEND_F_RESUME)) &&
- 		     !vhost_vdpa_can_resume(v))
- 			return -EOPNOTSUPP;
-+		if ((features & BIT_ULL(VHOST_BACKEND_F_DESC_ASID)) &&
-+		    !(features & BIT_ULL(VHOST_BACKEND_F_IOTLB_ASID)))
-+			return -EINVAL;
-+		if ((features & BIT_ULL(VHOST_BACKEND_F_DESC_ASID)) &&
-+		     !vhost_vdpa_has_desc_group(v))
-+			return -EOPNOTSUPP;
- 		vhost_set_backend_features(&v->vdev, features);
  		return 0;
- 	}
-@@ -753,6 +768,8 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 			features |= BIT_ULL(VHOST_BACKEND_F_SUSPEND);
- 		if (vhost_vdpa_can_resume(v))
- 			features |= BIT_ULL(VHOST_BACKEND_F_RESUME);
-+		if (vhost_vdpa_has_desc_group(v))
-+			features |= BIT_ULL(VHOST_BACKEND_F_DESC_ASID);
- 		features |= vhost_vdpa_get_backend_features(v);
- 		if (copy_to_user(featurep, &features, sizeof(features)))
- 			r = -EFAULT;
-diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
-index 2d827d22cd99..18ad6ae7ab5c 100644
---- a/include/uapi/linux/vhost_types.h
-+++ b/include/uapi/linux/vhost_types.h
-@@ -185,5 +185,10 @@ struct vhost_vdpa_iova_range {
-  * DRIVER_OK
++	case VHOST_VDPA_GET_VRING_DESC_GROUP:
++		if (!vhost_vdpa_has_desc_group(v))
++			return -EOPNOTSUPP;
++		s.index = idx;
++		s.num = ops->get_vq_desc_group(vdpa, idx);
++		if (s.num >= vdpa->ngroups)
++			return -EIO;
++		else if (copy_to_user(argp, &s, sizeof(s)))
++			return -EFAULT;
++		return 0;
+ 	case VHOST_VDPA_SET_GROUP_ASID:
+ 		if (copy_from_user(&s, argp, sizeof(s)))
+ 			return -EFAULT;
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index f5c48b61ab62..649560c685f1 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -219,4 +219,12 @@
   */
- #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
-+/* Device may expose the virtqueue's descriptor area, driver area and
-+ * device area to a different group for ASID binding than where its
-+ * buffers may reside. Requires VHOST_BACKEND_F_IOTLB_ASID.
-+ */
-+#define VHOST_BACKEND_F_DESC_ASID    0x7
+ #define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
  
++/* Get the group for the descriptor table including driver & device areas
++ * of a virtqueue: read index, write group in num.
++ * The virtqueue index is stored in the index field of vhost_vring_state.
++ * The group ID of the descriptor table for this specific virtqueue
++ * is returned via num field of vhost_vring_state.
++ */
++#define VHOST_VDPA_GET_VRING_DESC_GROUP	_IOWR(VHOST_VIRTIO, 0x7F,	\
++					      struct vhost_vring_state)
  #endif
 -- 
 2.41.0
