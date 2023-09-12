@@ -2,212 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18A8079C244
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 04:08:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BE9979C3B7
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 05:08:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236914AbjILCII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 22:08:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56482 "EHLO
+        id S241200AbjILDIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 23:08:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239030AbjILCC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 22:02:58 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F489303AB;
-        Mon, 11 Sep 2023 18:34:11 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97150C116A5;
-        Tue, 12 Sep 2023 01:34:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694482451;
-        bh=hny5DKN7nnmKvKb+KypTMSMKYkZuAQjCXV58rWadSh8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=EnwrZ0pORbyPZa7JmqTgAS0cKxJLWQTUgkwwewaqdq6cj8vZjSFjcBQu/SUyCohiJ
-         JeaI2N8X/TzAYu2qBzfzJKkD48dWBa1Ql9XnNMy4PagVQtswUDUli69UfDY+RD58Te
-         m3MjiDynHMMoJ2oGsklnJgRfnsiNlM7CA66evTxxxBJlE9QwJLvzOmp1FqGeYp56s1
-         L8mPgmGzsgk4NIaRXiRCo0lokkHJEtXRZnZitlusbk0h4Ix/DUc+DOZq47Gf727VHE
-         0fZ6VYAndfIUq8cFuE0YghCE00JHvLqvDD6kwgljJxyaur4xPUKeTRAxAeYUuz0Kx9
-         afOp3YCyAWNgg==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-502153ae36cso8147089e87.3;
-        Mon, 11 Sep 2023 18:34:11 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzNj/U4ZQJESWEuUyy+4pLcP8e19vTEXl6hyaMuA3xfVA3xz1Je
-        9JL8DIfaJrp4SyicfM4tkrX/k1WMZBcl7uZgCqE=
-X-Google-Smtp-Source: AGHT+IEmU61GOGMCu0W//Xu8QTjfIgZ9mUeXY9BPbpPxM4T4RRtRdPOH27C8ssirhpnfS38Xp4cxFKSk0f4MPp6i4kw=
-X-Received: by 2002:a05:6512:252c:b0:4ff:9efd:8a9e with SMTP id
- be44-20020a056512252c00b004ff9efd8a9emr10514533lfb.7.1694482449831; Mon, 11
- Sep 2023 18:34:09 -0700 (PDT)
+        with ESMTP id S235370AbjILDH4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 23:07:56 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051891847BB;
+        Mon, 11 Sep 2023 18:48:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694483284; x=1726019284;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=5cvYCzadl2SnE5hP3+G9QNhDTtdJBA1K1aAXx8q51tA=;
+  b=gh7dZKsAdKngW/pRqGntpIQfv7XO2DVsxSi6YWTp+aHmpzRUkXVi66H6
+   37x7DOsbO3jos1Xy70nT+9SV9BDD1QGAcbRkSrqQ9HG4XFkJQTZ+T4Wag
+   BY9j4x+DJUMHAepcabbax7xTQ19Vd2Ovhbh+fqqUrYfawBTkIY2NhnPv9
+   IfdlDJN2oPu/tgB0NLvAFaf4YC0KWSLKHd0VDV6Oa/NoqecPsSOQePGOQ
+   B76EK9dt3GSHm7zS2hCMGIPvnOQc87EapfZ2jzsQWOF+zaW3gGh9W3Clj
+   aWORcY08d2mS2AkGbb1W66Nu73/BkVEPZ1lU0TplxSGhzLYk73l6Mb/vw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="368507146"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="368507146"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 18:48:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="736956452"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="736956452"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Sep 2023 18:48:03 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 11 Sep 2023 18:48:02 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 11 Sep 2023 18:48:02 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 11 Sep 2023 18:47:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W3RifcXNuLaXr2A+0PwDIZMA9AVYOaX+ujy+i7ccqd702OxMQbDziMahbkjtY9kJlp9PNIriQTfXrKqsbCKQlf/5jBC1bvunZmqoEDoMyEz/JmpD1ewT06CtauKgZCiaK6hHfZylv5EihKVgAD8rm8XqA/titEMMmATYnOKfwFtx6XWTFI/SpNmrt5zQXLbdqyzvTmq3eeYuyWNUJN9/6cV2hMVmrIWOd3b5AO/DtwTe8S8DkDPltjg1JSKuCnQSadt0wtFNonVWHgKeP585OUEEym24t8PE87Am0i/Fd1Vkji0+gSIiewOu+S+sEoffsap+U684BzU2+ZBFRMolDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XlktrlwE2z5jC+9qFQDw/KgPtGkAWk9jnizYQ2434Z4=;
+ b=iNxGXRbw+dtOEzZoQ823XzzOiqacWjBtOnvha1IW1GDlZi4pP4zJL6ALdS1Y7UgRSZstj1Bf73JmYE8xqTws9twypg5MdKY9Gc1tT1hr0+ILFgAtrMekvF+w04ZBwPzd5v761eCfXxHTKrw7gSTpzPavV8bqwzLbQ3VELKQVnG8QPb4tvOWc11dlc2/CFzaAg9hsNslpOF/DtVN2ZsJ4gO88C4BCYoXB6oTynIhjgT11m+89N2tXyC5DE/tRZ8eimk/WTN8DEU7usf0ZvVh+u6IDemDzoPOwx7UF7tcD15CPyqTvMVkz+WwbkYnLLrdwNN4zcBR7M5OVL5EoYLBmeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by MW4PR11MB6885.namprd11.prod.outlook.com (2603:10b6:303:21b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Tue, 12 Sep
+ 2023 01:47:55 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5d9f:7e54:4218:159f]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::5d9f:7e54:4218:159f%7]) with mapi id 15.20.6768.029; Tue, 12 Sep 2023
+ 01:47:55 +0000
+Date:   Tue, 12 Sep 2023 09:47:43 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Manali Shukla <manali.shukla@amd.com>
+CC:     <kvm@vger.kernel.org>, <seanjc@google.com>,
+        <linux-doc@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
+        <x86@kernel.org>, <pbonzini@redhat.com>, <peterz@infradead.org>,
+        <bp@alien8.de>, <santosh.shukla@amd.com>, <ravi.bangoria@amd.com>,
+        <thomas.lendacky@amd.com>, <nikunj@amd.com>
+Subject: Re: [PATCH 01/13] KVM: Add KVM_GET_LAPIC_W_EXTAPIC and
+ KVM_SET_LAPIC_W_EXTAPIC for extapic
+Message-ID: <ZP/DP+JotXLQUsEP@chao-email>
+References: <20230904095347.14994-1-manali.shukla@amd.com>
+ <20230904095347.14994-2-manali.shukla@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230904095347.14994-2-manali.shukla@amd.com>
+X-ClientProxiedBy: SI2PR02CA0022.apcprd02.prod.outlook.com
+ (2603:1096:4:195::23) To PH8PR11MB6780.namprd11.prod.outlook.com
+ (2603:10b6:510:1cb::11)
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910-esteemed-exodus-706aaae940b1@spud>
- <CAJF2gTRQd_dNuZHNwfg3SwD0XERaYXYUdFUFQiarym40kpxFRQ@mail.gmail.com>
- <20230910-baggage-accent-ec5331b58c8e@spud> <CAJF2gTS8Vh5XdMUcgLA_GJzW6Nm3JKHxuMN9jYSNe_YCEjgCXA@mail.gmail.com>
- <20230910-facsimile-answering-60d1452b8c10@spud> <CAJF2gTSP1rxVhuwOKyWiE2vFFijJFc2aKRU2=0rTK9nDc8AbsQ@mail.gmail.com>
- <20230911-nimbly-outcome-496efae7adc6@wendy>
-In-Reply-To: <20230911-nimbly-outcome-496efae7adc6@wendy>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Tue, 12 Sep 2023 09:33:57 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTTSDtnc7WRAZ0eLjiwZHZFbOcPZaQ_c8LiLcctBNsKCaA@mail.gmail.com>
-Message-ID: <CAJF2gTTSDtnc7WRAZ0eLjiwZHZFbOcPZaQ_c8LiLcctBNsKCaA@mail.gmail.com>
-Subject: Re: [PATCH V11 00/17] riscv: Add Native/Paravirt qspinlock support
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Conor Dooley <conor@kernel.org>, paul.walmsley@sifive.com,
-        anup@brainfault.org, peterz@infradead.org, mingo@redhat.com,
-        will@kernel.org, palmer@rivosinc.com, longman@redhat.com,
-        boqun.feng@gmail.com, tglx@linutronix.de, paulmck@kernel.org,
-        rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        leobras@redhat.com, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|MW4PR11MB6885:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7fee3a7-3a1b-4f3b-ad35-08dbb3324896
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nx+Mtvo+wFdQx6wSL9h71eSTaldJq6eYaCTuO0mpgc/4INDp1cjTEmtLpekFdpbuDEZ2PR0yi/+AN+x4XOKRZALXApyKlfEvZ03a3q1X5EnbOER+pn/RJ24rKGtpj/Yi8lKNa9aXgu8IE6jQHgEP1G8tX00zkDt4UWD5VmGVvgYjpBWS8XrPygYSJGjmz1aE4pwX+wRyZxjOWkpikcG8B9CX4ZdHCGzHGU3tr2/Nfqi6IqamTbzPEc0u9HqF8PJTtMSf5wAk4rF0A6tN9Ajh7sOhGmaOibiZzV21o6X9OCC7JHETGzfeG/ssv6igRrqxY+vpk63tenr9Q+WsD9ak4O/WnC9DeHJQxaFICCevTr0EyFEntP4DWDUUWD3dtRkSy4nsZehSI8Jh3flGt6EovjyIpJw2HWu1JvE9bcVkJxeu/Bifida9U4jlaYN5q8/BXFJs7i8jbzR/+DcLzPrOk6mm7wXKTuCP0WXJw8vp0p2BsgCsgsgDtnGvo3dzQrx9jnzryhHHwSKTYQN4dC8x+U7exdkilwoMO9SfnZm9bW8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(346002)(396003)(136003)(39860400002)(366004)(1800799009)(451199024)(186009)(5660300002)(6512007)(6666004)(6486002)(6506007)(86362001)(82960400001)(38100700002)(33716001)(26005)(9686003)(478600001)(83380400001)(66476007)(4326008)(8936002)(66946007)(8676002)(41300700001)(44832011)(7416002)(2906002)(316002)(6916009)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OJbBWZEGLnaEAo1hKB5MHxWImfNKWCYXN2mGMV7rW/qu1jGCQf/fiEcv3tV3?=
+ =?us-ascii?Q?Y0MnPWEtOuuQq6kz2gxxucB7NsBjZU0NEP5YHX887tMrxdS605SBRyyuzy49?=
+ =?us-ascii?Q?Xe0keRcqOomHggQc8TOd5jh46W0FMr2VJ8K8850LJaTBEniLyXnR069Q+V6f?=
+ =?us-ascii?Q?KY0CBpPZ79i37vFF7Fgz2KtKT1D6iYT9khLONru7PiIui9QOjHvO1DBOqMm8?=
+ =?us-ascii?Q?Nbw40Iq+biD9JyuTebDiFUCdTsT204RoHol3lctobvvTRUkHh41zgpqvztBE?=
+ =?us-ascii?Q?3ZA7i4aLBCI8TNi63GoK++ATjyeFuxmmPjBcWWkhWt6rqDzpmCl8k8xAZMrd?=
+ =?us-ascii?Q?zUTahYRAzrKiPUXDk9XUaxaf76eUvx1VQuBQMH7s6s5foPnFXl0I0vJw2kxY?=
+ =?us-ascii?Q?NqVY0ekQf/vpVs088o0uk6sX69zC2m4T/te1BlKXDB2SL0P1HmzJGJ+BlEQW?=
+ =?us-ascii?Q?fRtPuh0wt76v3sbkvFQ3G4LCY24jzuYS0WKxTnIRqvmZ6IanZIWQcow9rfBd?=
+ =?us-ascii?Q?XVPnv8SBuZ6W0TWU11ziHIwBYBhdcvG756D1f7GB1t2wZT5Uy//QrAeCR7W/?=
+ =?us-ascii?Q?MVlFKgqf65Rd7fehUBHWXi/pKwxogsw+1/rsubApSYNXpdtiQEPpMxJLS1Wp?=
+ =?us-ascii?Q?B2AcyIbeNKf3ICS8wghmVPX1X0vPMKOZFdTfXf6nbl8aI/d3pFY2XeSeo/Q+?=
+ =?us-ascii?Q?TzWPRu/oIPOw9gM3THdFzJXLu845Y+ZrFiPE++AQKWovj2YdNyTUKSSI5XP1?=
+ =?us-ascii?Q?zR5cjoMDHFoboDu3fQznIXj+Kj3339aXSS9+FhB6yzQV19FD06aIuCTbg1/2?=
+ =?us-ascii?Q?HqXR8YctFYZSi6Js/l0TShkfz55aKJ1eLux5NnacY/c1mYgdQCfFvuvkOkNe?=
+ =?us-ascii?Q?Ya0rijqhBgZHoJsyulNztompimoceASDxpZhGu0cZckKT3jYJbXMaz0yKjUE?=
+ =?us-ascii?Q?/ApNIovMfCdltE8T1/YiwZb2UdaovUK8RWeIYjGLU5w73NDtu/GDT5WqgDXs?=
+ =?us-ascii?Q?NIGQaQfmwjipR1d2D/9bYBWGOxLuqNHHDQ4HYoyOfg/4sjNvsfPPEQXIBvtR?=
+ =?us-ascii?Q?WItQLPsE1VlubQ4I0/HHrgxRLvLy5U4Eo9zO9areBm9pzbhkpEvhNeElgU1t?=
+ =?us-ascii?Q?7aRIRIjiQRZZMdMuty0mwcyBXHusP1YxPLDAVj1NO64GxmSnx9vjQrQadEQg?=
+ =?us-ascii?Q?6kQt+jMG34aEtjSJ1GQ/54IpmChOydgqIScXrCELsHijq2s0uZHyXoUovX8Q?=
+ =?us-ascii?Q?pCEEpVKEhfcG2lSOJYg98Qk+xC572IwxtjpNm9QmCUu3uKVFK1yVlGFRngdC?=
+ =?us-ascii?Q?eqZK6eKKWoOwawpslKyhSnngOZDrUXPrfZRNm/bApgX3vI25fsE2B+s5Lntt?=
+ =?us-ascii?Q?4yzkliH3HkcnF1UDt8RpDat9EqhxWVctJKTITNnV+Mqzaxmkq9nm4iuWbLby?=
+ =?us-ascii?Q?cYam8StAOOIZbq9DBY1ZskUNeP1pOuyc37pSiFJJ8dh/vs5MfYqnbXAbfzGb?=
+ =?us-ascii?Q?zldssprKR5dOG59v9wJLGPRedpDFdfNQqf+ZywWVwsiaBQB4k+0vIxPoncE1?=
+ =?us-ascii?Q?lV6cR2j5rv8wwN0NNZYZX4fsAKaBQItkwUeKpcrn?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7fee3a7-3a1b-4f3b-ad35-08dbb3324896
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 01:47:55.4092
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nhOViMtszLwG8TttzEugxQi54B2d+6ZN1PWQCtpwBITPZrDaTQh6+t8tlpyL26oNaPWMTeM8jd35hO/npWI6dA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6885
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 8:53=E2=80=AFPM Conor Dooley <conor.dooley@microchi=
-p.com> wrote:
+On Mon, Sep 04, 2023 at 09:53:35AM +0000, Manali Shukla wrote:
+>There are four additional extended LVT registers available in extended
+>APIC register space which can be used for additional interrupt sources
+>like instruction based sampling and many more.
 >
-> On Mon, Sep 11, 2023 at 11:36:27AM +0800, Guo Ren wrote:
-> > On Mon, Sep 11, 2023 at 3:45=E2=80=AFAM Conor Dooley <conor@kernel.org>=
- wrote:
-> > >
-> > > On Sun, Sep 10, 2023 at 05:49:13PM +0800, Guo Ren wrote:
-> > > > On Sun, Sep 10, 2023 at 5:32=E2=80=AFPM Conor Dooley <conor@kernel.=
-org> wrote:
-> > > > >
-> > > > > On Sun, Sep 10, 2023 at 05:16:46PM +0800, Guo Ren wrote:
-> > > > > > On Sun, Sep 10, 2023 at 4:58=E2=80=AFPM Conor Dooley <conor@ker=
-nel.org> wrote:
-> > > > > > >
-> > > > > > > On Sun, Sep 10, 2023 at 04:28:54AM -0400, guoren@kernel.org w=
-rote:
-> > > > > > >
-> > > > > > > > Changlog:
-> > > > > > > > V11:
-> > > > > > > >  - Based on Leonardo Bras's cmpxchg_small patches v5.
-> > > > > > > >  - Based on Guo Ren's Optimize arch_spin_value_unlocked pat=
-ch v3.
-> > > > > > > >  - Remove abusing alternative framework and use jump_label =
-instead.
-> > > > > > >
-> > > > > > > btw, I didn't say that using alternatives was the problem, it=
- was
-> > > > > > > abusing the errata framework to perform feature detection tha=
-t I had
-> > > > > > > a problem with. That's not changed in v11.
-> > > > > > I've removed errata feature detection. The only related patches=
- are:
-> > > > > >  - riscv: qspinlock: errata: Add ERRATA_THEAD_WRITE_ONCE fixup
-> > > > > >  - riscv: qspinlock: errata: Enable qspinlock for T-HEAD proces=
-sors
-> > > > > >
-> > > > > > Which one is your concern? Could you reply on the exact patch t=
-hread? Thx.
-> > > > >
-> > > > > riscv: qspinlock: errata: Enable qspinlock for T-HEAD processors
-> > > > >
-> > > > > Please go back and re-read the comments I left on v11 about using=
- the
-> > > > > errata code for feature detection.
-> > > > >
-> > > > > > > A stronger forward progress guarantee is not an erratum, AFAI=
-CT.
-> > > > >
-> > > > > > Sorry, there is no erratum of "stronger forward progress guaran=
-tee" in the V11.
-> > > > >
-> > > > > "riscv: qspinlock: errata: Enable qspinlock for T-HEAD processors=
-" still
-> > > > > uses the errata framework to detect the presence of the stronger =
-forward
-> > > > > progress guarantee in v11.
-> > > > Oh, thx for pointing it out. I could replace it with this:
-> > > >
-> > > > diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> > > > index 88690751f2ee..4be92766d3e3 100644
-> > > > --- a/arch/riscv/kernel/setup.c
-> > > > +++ b/arch/riscv/kernel/setup.c
-> > > > @@ -310,7 +310,8 @@ static void __init riscv_spinlock_init(void)
-> > > >  {
-> > > >  #ifdef CONFIG_RISCV_COMBO_SPINLOCKS
-> > > >         if (!enable_qspinlock_key &&
-> > > > -           (sbi_get_firmware_id() !=3D SBI_EXT_BASE_IMPL_ID_KVM)) =
-{
-> > > > +           (sbi_get_firmware_id() !=3D SBI_EXT_BASE_IMPL_ID_KVM) &=
-&
-> > > > +           (sbi_get_mvendorid() !=3D THEAD_VENDOR_ID)) {
-> > > >                 static_branch_disable(&combo_qspinlock_key);
-> > > >                 pr_info("Ticket spinlock: enabled\n");
-> > > >         } else {
-> > >
-> > > As I said on v11, I am opposed to feature probing using mvendorid & C=
-o,
-> > > partially due to the exact sort of check here to see if the kernel is
-> > > running as a KVM guest. IMO, whether a platform has this stronger
+>Please refer to AMD programmers's manual Volume 2, Section 16.4.5 for
+>more details on extapic.
+>https://bugzilla.kernel.org/attachment.cgi?id=304653
 >
-> > KVM can't use any fairness lock, so forcing it using a Test-Set lock
-> > or paravirt qspinlock is the right way. KVM is not a vendor platform.
+>Adds two new vcpu-based IOCTLs to save and restore the local APIC
+>registers with extended APIC register space for a single vcpu. It
+>works same as KVM_GET_LAPIC and KVM_SET_LAPIC IOCTLs. The only
+>differece is the size of APIC page which is copied/restored by kernel.
+>In case of KVM_GET_LAPIC_W_EXTAPIC and KVM_SET_LAPIC_W_EXTAPIC IOCTLs,
+>kernel copies/restores the APIC page with extended APIC register space
+>located at APIC offsets 400h-530h.
 >
-> My point is that KVM should be telling the guest what additional features
-> it is capable of using, rather than the kernel making some assumptions
-> based on$vendorid etc that are invalid when the kernel is running as a
-> KVM guest.
-> If the mvendorid etc related assumptions were dropped, the kernel would
-> then default away from your qspinlock & there'd not be a need to
-> special-case KVM AFAICT.
+>KVM_GET_LAPIC_W_EXTAPIC and KVM_SET_LAPIC_W_EXTAPIC IOCTLs are used
+>when extended APIC is enabled in the guest.
 >
-> > > guarantee needs to be communicated by firmware, using ACPI or DT.
-> > > I made some comments on v11, referring similar discussion about the
-> > > thead vector stuff. Please go take a look at that.
-> > I prefer forcing T-HEAD processors using qspinlock, but if all people
-> > thought it must be in the ACPI or DT, I would compromise. Then, I
-> > would delete the qspinlock cmdline param patch and move it into DT.
-> >
-> > By the way, what's the kind of DT format? How about:
+>Document KVM_GET_LAPIC_W_EXTAPIC, KVM_SET_LAPIC_W_EXTAPIC ioctls.
 >
-> I added the new "riscv,isa-extensions" property in part to make
-> communicating vendor extensions like this easier. Please try to use
-> that. "qspinlock" is software configuration though, the vendor extension
-> should focus on the guarantee of strong forward progress, since that is
-> the non-standard aspect of your IP.
-The qspinlock contains three paths:
- - Native qspinlock, this is your strong forward progress.
- - virt_spin_lock, for KVM guest when paravirt qspinlock disabled.
-   https://lore.kernel.org/linux-riscv/20230910082911.3378782-9-guoren@kern=
-el.org/
- - paravirt qspinlock, for KVM guest
+>Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+>---
+> Documentation/virt/kvm/api.rst  | 23 +++++++++++++++++++++++
+> arch/x86/include/uapi/asm/kvm.h |  5 +++++
+> arch/x86/kvm/lapic.c            | 12 +++++++-----
+> arch/x86/kvm/lapic.h            |  6 ++++--
+> arch/x86/kvm/x86.c              | 24 +++++++++++++-----------
+> include/uapi/linux/kvm.h        | 10 ++++++++++
+> 6 files changed, 62 insertions(+), 18 deletions(-)
+>
+>diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>index 73db30cb60fb..7239d4f1ecf3 100644
+>--- a/Documentation/virt/kvm/api.rst
+>+++ b/Documentation/virt/kvm/api.rst
+>@@ -1961,6 +1961,18 @@ error.
+> Reads the Local APIC registers and copies them into the input argument.  The
+> data format and layout are the same as documented in the architecture manual.
+> 
+>+::
+>+
+>+  #define KVM_APIC_EXT_REG_SIZE 0x540
+>+  struct kvm_lapic_state_w_extapic {
+>+        __u8 regs[KVM_APIC_EXT_REG_SIZE];
+>+  };
 
-So, we need a software configuration here, "riscv,isa-extensions" is
-all about vendor extension.
-
->
-> A commandline property may still be desirable, to control the locking
-> method used, since the DT should be a description of the hardware, not
-> for configuring software policy in your operating system.
-Okay, I would keep the cmdline property.
-
->
-> Thanks,
-> Conor.
->
-> >         cpus {
-> >                 #address-cells =3D <1>;
-> >                 #size-cells =3D <0>;
-> > +              qspinlock;
-> >                 cpu0: cpu@0 {
-> >                         compatible =3D "sifive,bullet0", "riscv";
-> >                         device_type =3D "cpu";
-> >                         i-cache-block-size =3D <64>;
-> >                         i-cache-sets =3D <128>;
-> >
-> > --
-> > Best Regards
-> >  Guo Ren
-
-
-
---=20
-Best Regards
- Guo Ren
+The size of this new structure is also hard-coded. Do you think it is better to
+make the new structure extensible so that next time KVM needn't add more uAPIs
+for future local APIC extensions?
