@@ -2,112 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7182B79C1F7
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 03:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5419079C1C5
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 03:40:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234866AbjILBtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Sep 2023 21:49:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
+        id S235959AbjILBk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Sep 2023 21:40:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235405AbjILBs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Sep 2023 21:48:59 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371C8130FB8;
-        Mon, 11 Sep 2023 18:22:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB896C4AF6B;
-        Tue, 12 Sep 2023 01:06:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694480802;
-        bh=l4+CNsWaJdhkXR0vkKkAiHJ2iQogyvfkUk7FzvHK3AU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=rDRIA4d6KAD5REBFXHv8wxLdpkWXtR/ABreMbVOKR1Z842Q1IY2CrC1HXeIj0ZugJ
-         EXDPGPvX9IibEzN74L3a7ldtnF3uqIFhLY7YoHImX5G41brZSb+8Ej/ioxIieDNPE7
-         EOSb67RxTTZtlrcliGrquXC8rYsE5WpXHQev4fbvySjhS/6HhV5WZ/4mm+aJUgLxW3
-         QXsM2P+8thLUgQT6KsFyjlf/KYxk4TUJYoBN4JMhyT9/CdlMi+EYcYEe0apCG2FJGs
-         1kQYlRKXTPINHgKX2v2fYG7Fa+vLY2ZFsBH1NySCgMULXNb6V3rjSA3wobObxXvv4X
-         meLNkytj/8PFw==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-52a5c0d949eso6377282a12.0;
-        Mon, 11 Sep 2023 18:06:42 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yx0a/UHX3JXqFSrobU/M6cB+j/o3+em6OPq0WuKg0ta0BHrQFBR
-        BsYipR0Ew3KC6wklropm7zW8PBZRC2cQDQNJO4s=
-X-Google-Smtp-Source: AGHT+IH4FhF/kTxPNgAVFbni63ODW/AwqSUOKFR7sTv2qzDRT5kLd8ExzVW67eg6HZD7guqGdyMOiuukWtzDSS5Upc0=
-X-Received: by 2002:a17:907:2c67:b0:99d:e617:abeb with SMTP id
- ib7-20020a1709072c6700b0099de617abebmr8061187ejc.23.1694480801055; Mon, 11
- Sep 2023 18:06:41 -0700 (PDT)
+        with ESMTP id S235545AbjILBki (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Sep 2023 21:40:38 -0400
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2F71F3A05;
+        Mon, 11 Sep 2023 18:17:53 -0700 (PDT)
+X-UUID: fd1f1503926f43ed813b6d93c41cccfd-20230912
+X-CID-O-RULE: Release_Ham
+X-CID-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.31,REQID:2163a5a7-a836-4095-9297-32296930c1c8,IP:5,U
+        RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+        ON:release,TS:-15
+X-CID-INFO: VERSION:1.1.31,REQID:2163a5a7-a836-4095-9297-32296930c1c8,IP:5,URL
+        :0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:-15
+X-CID-META: VersionHash:0ad78a4,CLOUDID:e815b8be-14cc-44ca-b657-2d2783296e72,B
+        ulkID:2309111741135Y7Z3OCS,BulkQuantity:2,Recheck:0,SF:24|17|19|44|102,TC:
+        nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,COL:0,OSI
+        :0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-UUID: fd1f1503926f43ed813b6d93c41cccfd-20230912
+X-User: liucong2@kylinos.cn
+Received: from localhost.localdomain [(111.48.58.12)] by mailgw
+        (envelope-from <liucong2@kylinos.cn>)
+        (Generic MTA)
+        with ESMTP id 1067619403; Tue, 12 Sep 2023 09:07:38 +0800
+From:   Cong Liu <liucong2@kylinos.cn>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liucong2@kylinos.cn
+Subject: [PATCH] fix build error in function vfio_combine_iova_ranges
+Date:   Tue, 12 Sep 2023 09:07:36 +0800
+Message-Id: <20230912010736.19481-1-liucong2@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230911124431.5e09f53b.alex.williamson@redhat.com>
+References: <20230911124431.5e09f53b.alex.williamson@redhat.com>
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910082911.3378782-8-guoren@kernel.org>
- <11f2a7a5-5219-a46e-5d16-4bdd400f5d9b@redhat.com>
-In-Reply-To: <11f2a7a5-5219-a46e-5d16-4bdd400f5d9b@redhat.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Tue, 12 Sep 2023 09:06:28 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTTFhcwprGoBvrS7bw1pBUWSPPZxsujjpgheQ4L80wBnXg@mail.gmail.com>
-Message-ID: <CAJF2gTTFhcwprGoBvrS7bw1pBUWSPPZxsujjpgheQ4L80wBnXg@mail.gmail.com>
-Subject: Re: [PATCH V11 07/17] riscv: qspinlock: Introduce qspinlock param for
- command line
-To:     Waiman Long <longman@redhat.com>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
-        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, conor.dooley@microchip.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        leobras@redhat.com, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 11:22=E2=80=AFPM Waiman Long <longman@redhat.com> w=
-rote:
->
-> On 9/10/23 04:29, guoren@kernel.org wrote:
-> > From: Guo Ren <guoren@linux.alibaba.com>
-> >
-> > Allow cmdline to force the kernel to use queued_spinlock when
-> > CONFIG_RISCV_COMBO_SPINLOCKS=3Dy.
-> >
-> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > ---
-> >   Documentation/admin-guide/kernel-parameters.txt |  2 ++
-> >   arch/riscv/kernel/setup.c                       | 16 +++++++++++++++-
-> >   2 files changed, 17 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Document=
-ation/admin-guide/kernel-parameters.txt
-> > index 7dfb540c4f6c..61cacb8dfd0e 100644
-> > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > @@ -4693,6 +4693,8 @@
-> >                       [KNL] Number of legacy pty's. Overwrites compiled=
--in
-> >                       default number.
-> >
-> > +     qspinlock       [RISCV] Force to use qspinlock or auto-detect spi=
-nlock.
-> > +
-> >       qspinlock.numa_spinlock_threshold_ns=3D   [NUMA, PV_OPS]
-> >                       Set the time threshold in nanoseconds for the
-> >                       number of intra-node lock hand-offs before the
->
-> Your patch series is still based on top of numa-aware qspinlock patchset
-> which isn't upstream yet. Please rebase it without that as that will
-> cause merge conflict during upstream merge.
-Okay, thx for pointing it out.
+when compiling with smatch check, the following errors were encountered:
 
->
-> Cheers,
-> Longman
->
+drivers/vfio/vfio_main.c:957 vfio_combine_iova_ranges() error: uninitialized symbol 'last'.
+drivers/vfio/vfio_main.c:978 vfio_combine_iova_ranges() error: potentially dereferencing uninitialized 'comb_end'.
+drivers/vfio/vfio_main.c:978 vfio_combine_iova_ranges() error: potentially dereferencing uninitialized 'comb_start'.
 
+this patch fix these error.
 
---=20
-Best Regards
- Guo Ren
+Signed-off-by: Cong Liu <liucong2@kylinos.cn>
+---
+ drivers/vfio/vfio_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 40732e8ed4c6..68a0a5081161 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -938,12 +938,13 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+ 			      u32 req_nodes)
+ {
+-	struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
++	struct interval_tree_node *prev, *curr;
++	struct interval_tree_node *comb_start = NULL, *comb_end = NULL;
+ 	unsigned long min_gap, curr_gap;
+ 
+ 	/* Special shortcut when a single range is required */
+ 	if (req_nodes == 1) {
+-		unsigned long last;
++		unsigned long last = 0;
+ 
+ 		comb_start = interval_tree_iter_first(root, 0, ULONG_MAX);
+ 		curr = comb_start;
+-- 
+2.34.1
+
+I'm very sorry, I compiled the code on another machine and then copied the wrong patch.
