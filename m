@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C18579C9D5
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 10:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A795179CC21
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 11:42:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232588AbjILI0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 04:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56068 "EHLO
+        id S232683AbjILJmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 05:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231509AbjILI0L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 04:26:11 -0400
+        with ESMTP id S229876AbjILJmo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 05:42:44 -0400
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D7A1BF;
-        Tue, 12 Sep 2023 01:26:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F0FF4116;
+        Tue, 12 Sep 2023 02:42:39 -0700 (PDT)
 Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8BxyeqdIABlUm8lAA--.63548S3;
-        Tue, 12 Sep 2023 16:26:05 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8AxZ+iOMgBl0HglAA--.36908S3;
+        Tue, 12 Sep 2023 17:42:38 +0800 (CST)
 Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxvdybIABl63kAAA--.203S3;
-        Tue, 12 Sep 2023 16:26:04 +0800 (CST)
-Subject: Re: [PATCH v20 05/30] LoongArch: KVM: Add vcpu related header files
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxni+NMgBlWJYAAA--.431S3;
+        Tue, 12 Sep 2023 17:42:37 +0800 (CST)
+Subject: Re: [PATCH v20 19/30] LoongArch: KVM: Implement kvm mmu operations
+To:     WANG Xuerui <kernel@xen0n.name>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
         Mark Brown <broonie@kernel.org>,
@@ -32,23 +32,23 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>
 References: <20230831083020.2187109-1-zhaotianrui@loongson.cn>
- <20230831083020.2187109-6-zhaotianrui@loongson.cn>
- <CAAhV-H6N9KVzHpJMXS5XbHF92qO_UDi_XHjNAt5BF6c3EaEj+A@mail.gmail.com>
+ <20230831083020.2187109-20-zhaotianrui@loongson.cn>
+ <bf7640c4-39e1-ce4b-9e56-bd75adb9c611@xen0n.name>
 From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <e8766483-76c1-a1b0-645a-863d086c3042@loongson.cn>
-Date:   Tue, 12 Sep 2023 16:26:03 +0800
+Message-ID: <d9b78eb6-048a-dd17-4815-8d9635687e5b@loongson.cn>
+Date:   Tue, 12 Sep 2023 17:42:37 +0800
 User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H6N9KVzHpJMXS5XbHF92qO_UDi_XHjNAt5BF6c3EaEj+A@mail.gmail.com>
+In-Reply-To: <bf7640c4-39e1-ce4b-9e56-bd75adb9c611@xen0n.name>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-CM-TRANSID: AQAAf8CxvdybIABl63kAAA--.203S3
+X-CM-TRANSID: AQAAf8Bxni+NMgBlWJYAAA--.431S3
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj9fXoWfuw47XrWrXFWruw45Gr4rZwc_yoW5JFW8Jo
-        W3Ja1fGFn5Jw42yF4qga42qa4DZryFkFs8Zw45CryFv34UJas8Wr47J3yrXr43Xryqg343
-        CFyIgas5ua4Fyws8l-sFpf9Il3svdjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf
+X-Coremail-Antispam: 1Uk129KBj9fXoWfXF4rtry5GF1kXr1ruw1fXwc_yoW5Gry7uo
+        W7Kr1fJr1rJr1jgr1UJr1Utr13ZF1UGrnrtr1UKry7Jr18Aa4UJ3yUJrWjy3yUJr18Gr1x
+        AF1UJry0yFyUAr15l-sFpf9Il3svdjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf
         9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
         UjIYCTnIWjp_UUUO87kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
         8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
@@ -69,608 +69,764 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2023/9/11 下午4:07, Huacai Chen 写道:
-> Hi, Tianrui,
->
-> On Thu, Aug 31, 2023 at 4:30 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->> Add LoongArch vcpu related header files, including vcpu csr
->> information, irq number defines, and some vcpu interfaces.
+在 2023/9/8 上午3:57, WANG Xuerui 写道:
+> On 8/31/23 16:30, Tianrui Zhao wrote:
+>> Implement LoongArch kvm mmu, it is used to switch gpa to hpa when
+>> guest exit because of address translation exception. This patch
+>> implement allocate gpa page table, search gpa from it and flush guest
+>> gpa in the table.
 >>
 >> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 >> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 >> ---
->>   arch/loongarch/include/asm/kvm_csr.h   | 222 +++++++++++++++++++++++++
->>   arch/loongarch/include/asm/kvm_vcpu.h  |  95 +++++++++++
->>   arch/loongarch/include/asm/loongarch.h |  19 ++-
->>   arch/loongarch/kvm/trace.h             | 168 +++++++++++++++++++
->>   4 files changed, 499 insertions(+), 5 deletions(-)
->>   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->>   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->>   create mode 100644 arch/loongarch/kvm/trace.h
+>>   arch/loongarch/kvm/mmu.c | 678 +++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 678 insertions(+)
+>>   create mode 100644 arch/loongarch/kvm/mmu.c
 >>
->> diff --git a/arch/loongarch/include/asm/kvm_csr.h b/arch/loongarch/include/asm/kvm_csr.h
+>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
 >> new file mode 100644
->> index 0000000000..e27dcacd00
+>> index 0000000000..4bb20393f4
 >> --- /dev/null
->> +++ b/arch/loongarch/include/asm/kvm_csr.h
->> @@ -0,0 +1,222 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +++ b/arch/loongarch/kvm/mmu.c
+>> @@ -0,0 +1,678 @@
+>> +// SPDX-License-Identifier: GPL-2.0
 >> +/*
 >> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
 >> + */
 >> +
->> +#ifndef __ASM_LOONGARCH_KVM_CSR_H__
->> +#define __ASM_LOONGARCH_KVM_CSR_H__
->> +#include <asm/loongarch.h>
->> +#include <asm/kvm_vcpu.h>
+>> +#include <linux/highmem.h>
+>> +#include <linux/page-flags.h>
+>> +#include <linux/kvm_host.h>
 >> +#include <linux/uaccess.h>
->> +#include <linux/kvm_host.h>
->> +
->> +/* binutils support virtualization instructions */
->> +#define gcsr_read(csr)                                         \
->> +({                                                             \
->> +       register unsigned long __v;                             \
->> +       __asm__ __volatile__(                                   \
->> +               " gcsrrd %[val], %[reg]\n\t"                    \
->> +               : [val] "=r" (__v)                              \
->> +               : [reg] "i" (csr)                               \
->> +               : "memory");                                    \
->> +       __v;                                                    \
->> +})
->> +
->> +#define gcsr_write(v, csr)                                     \
->> +({                                                             \
->> +       register unsigned long __v = v;                         \
->> +       __asm__ __volatile__ (                                  \
->> +               " gcsrwr %[val], %[reg]\n\t"                    \
->> +               : [val] "+r" (__v)                              \
->> +               : [reg] "i" (csr)                               \
->> +               : "memory");                                    \
->> +})
->> +
->> +#define gcsr_xchg(v, m, csr)                                   \
->> +({                                                             \
->> +       register unsigned long __v = v;                         \
->> +       __asm__ __volatile__(                                   \
->> +               " gcsrxchg %[val], %[mask], %[reg]\n\t"         \
->> +               : [val] "+r" (__v)                              \
->> +               : [mask] "r" (m), [reg] "i" (csr)               \
->> +               : "memory");                                    \
->> +       __v;                                                    \
->> +})
->> +
->> +/* Guest CSRS read and write */
->> +#define read_gcsr_crmd()               gcsr_read(LOONGARCH_CSR_CRMD)
->> +#define write_gcsr_crmd(val)           gcsr_write(val, LOONGARCH_CSR_CRMD)
->> +#define read_gcsr_prmd()               gcsr_read(LOONGARCH_CSR_PRMD)
->> +#define write_gcsr_prmd(val)           gcsr_write(val, LOONGARCH_CSR_PRMD)
->> +#define read_gcsr_euen()               gcsr_read(LOONGARCH_CSR_EUEN)
->> +#define write_gcsr_euen(val)           gcsr_write(val, LOONGARCH_CSR_EUEN)
->> +#define read_gcsr_misc()               gcsr_read(LOONGARCH_CSR_MISC)
->> +#define write_gcsr_misc(val)           gcsr_write(val, LOONGARCH_CSR_MISC)
->> +#define read_gcsr_ecfg()               gcsr_read(LOONGARCH_CSR_ECFG)
->> +#define write_gcsr_ecfg(val)           gcsr_write(val, LOONGARCH_CSR_ECFG)
->> +#define read_gcsr_estat()              gcsr_read(LOONGARCH_CSR_ESTAT)
->> +#define write_gcsr_estat(val)          gcsr_write(val, LOONGARCH_CSR_ESTAT)
->> +#define read_gcsr_era()                        gcsr_read(LOONGARCH_CSR_ERA)
->> +#define write_gcsr_era(val)            gcsr_write(val, LOONGARCH_CSR_ERA)
->> +#define read_gcsr_badv()               gcsr_read(LOONGARCH_CSR_BADV)
->> +#define write_gcsr_badv(val)           gcsr_write(val, LOONGARCH_CSR_BADV)
->> +#define read_gcsr_badi()               gcsr_read(LOONGARCH_CSR_BADI)
->> +#define write_gcsr_badi(val)           gcsr_write(val, LOONGARCH_CSR_BADI)
->> +#define read_gcsr_eentry()             gcsr_read(LOONGARCH_CSR_EENTRY)
->> +#define write_gcsr_eentry(val)         gcsr_write(val, LOONGARCH_CSR_EENTRY)
->> +
->> +#define read_gcsr_tlbidx()             gcsr_read(LOONGARCH_CSR_TLBIDX)
->> +#define write_gcsr_tlbidx(val)         gcsr_write(val, LOONGARCH_CSR_TLBIDX)
->> +#define read_gcsr_tlbhi()              gcsr_read(LOONGARCH_CSR_TLBEHI)
->> +#define write_gcsr_tlbhi(val)          gcsr_write(val, LOONGARCH_CSR_TLBEHI)
->> +#define read_gcsr_tlblo0()             gcsr_read(LOONGARCH_CSR_TLBELO0)
->> +#define write_gcsr_tlblo0(val)         gcsr_write(val, LOONGARCH_CSR_TLBELO0)
->> +#define read_gcsr_tlblo1()             gcsr_read(LOONGARCH_CSR_TLBELO1)
->> +#define write_gcsr_tlblo1(val)         gcsr_write(val, LOONGARCH_CSR_TLBELO1)
->> +
->> +#define read_gcsr_asid()               gcsr_read(LOONGARCH_CSR_ASID)
->> +#define write_gcsr_asid(val)           gcsr_write(val, LOONGARCH_CSR_ASID)
->> +#define read_gcsr_pgdl()               gcsr_read(LOONGARCH_CSR_PGDL)
->> +#define write_gcsr_pgdl(val)           gcsr_write(val, LOONGARCH_CSR_PGDL)
->> +#define read_gcsr_pgdh()               gcsr_read(LOONGARCH_CSR_PGDH)
->> +#define write_gcsr_pgdh(val)           gcsr_write(val, LOONGARCH_CSR_PGDH)
->> +#define write_gcsr_pgd(val)            gcsr_write(val, LOONGARCH_CSR_PGD)
->> +#define read_gcsr_pgd()                        gcsr_read(LOONGARCH_CSR_PGD)
->> +#define read_gcsr_pwctl0()             gcsr_read(LOONGARCH_CSR_PWCTL0)
->> +#define write_gcsr_pwctl0(val)         gcsr_write(val, LOONGARCH_CSR_PWCTL0)
->> +#define read_gcsr_pwctl1()             gcsr_read(LOONGARCH_CSR_PWCTL1)
->> +#define write_gcsr_pwctl1(val)         gcsr_write(val, LOONGARCH_CSR_PWCTL1)
->> +#define read_gcsr_stlbpgsize()         gcsr_read(LOONGARCH_CSR_STLBPGSIZE)
->> +#define write_gcsr_stlbpgsize(val)     gcsr_write(val, LOONGARCH_CSR_STLBPGSIZE)
->> +#define read_gcsr_rvacfg()             gcsr_read(LOONGARCH_CSR_RVACFG)
->> +#define write_gcsr_rvacfg(val)         gcsr_write(val, LOONGARCH_CSR_RVACFG)
->> +
->> +#define read_gcsr_cpuid()              gcsr_read(LOONGARCH_CSR_CPUID)
->> +#define write_gcsr_cpuid(val)          gcsr_write(val, LOONGARCH_CSR_CPUID)
->> +#define read_gcsr_prcfg1()             gcsr_read(LOONGARCH_CSR_PRCFG1)
->> +#define write_gcsr_prcfg1(val)         gcsr_write(val, LOONGARCH_CSR_PRCFG1)
->> +#define read_gcsr_prcfg2()             gcsr_read(LOONGARCH_CSR_PRCFG2)
->> +#define write_gcsr_prcfg2(val)         gcsr_write(val, LOONGARCH_CSR_PRCFG2)
->> +#define read_gcsr_prcfg3()             gcsr_read(LOONGARCH_CSR_PRCFG3)
->> +#define write_gcsr_prcfg3(val)         gcsr_write(val, LOONGARCH_CSR_PRCFG3)
->> +
->> +#define read_gcsr_kscratch0()          gcsr_read(LOONGARCH_CSR_KS0)
->> +#define write_gcsr_kscratch0(val)      gcsr_write(val, LOONGARCH_CSR_KS0)
->> +#define read_gcsr_kscratch1()          gcsr_read(LOONGARCH_CSR_KS1)
->> +#define write_gcsr_kscratch1(val)      gcsr_write(val, LOONGARCH_CSR_KS1)
->> +#define read_gcsr_kscratch2()          gcsr_read(LOONGARCH_CSR_KS2)
->> +#define write_gcsr_kscratch2(val)      gcsr_write(val, LOONGARCH_CSR_KS2)
->> +#define read_gcsr_kscratch3()          gcsr_read(LOONGARCH_CSR_KS3)
->> +#define write_gcsr_kscratch3(val)      gcsr_write(val, LOONGARCH_CSR_KS3)
->> +#define read_gcsr_kscratch4()          gcsr_read(LOONGARCH_CSR_KS4)
->> +#define write_gcsr_kscratch4(val)      gcsr_write(val, LOONGARCH_CSR_KS4)
->> +#define read_gcsr_kscratch5()          gcsr_read(LOONGARCH_CSR_KS5)
->> +#define write_gcsr_kscratch5(val)      gcsr_write(val, LOONGARCH_CSR_KS5)
->> +#define read_gcsr_kscratch6()          gcsr_read(LOONGARCH_CSR_KS6)
->> +#define write_gcsr_kscratch6(val)      gcsr_write(val, LOONGARCH_CSR_KS6)
->> +#define read_gcsr_kscratch7()          gcsr_read(LOONGARCH_CSR_KS7)
->> +#define write_gcsr_kscratch7(val)      gcsr_write(val, LOONGARCH_CSR_KS7)
->> +
->> +#define read_gcsr_timerid()            gcsr_read(LOONGARCH_CSR_TMID)
->> +#define write_gcsr_timerid(val)                gcsr_write(val, LOONGARCH_CSR_TMID)
->> +#define read_gcsr_timercfg()           gcsr_read(LOONGARCH_CSR_TCFG)
->> +#define write_gcsr_timercfg(val)       gcsr_write(val, LOONGARCH_CSR_TCFG)
->> +#define read_gcsr_timertick()          gcsr_read(LOONGARCH_CSR_TVAL)
->> +#define write_gcsr_timertick(val)      gcsr_write(val, LOONGARCH_CSR_TVAL)
->> +#define read_gcsr_timeroffset()                gcsr_read(LOONGARCH_CSR_CNTC)
->> +#define write_gcsr_timeroffset(val)    gcsr_write(val, LOONGARCH_CSR_CNTC)
->> +
->> +#define read_gcsr_llbctl()             gcsr_read(LOONGARCH_CSR_LLBCTL)
->> +#define write_gcsr_llbctl(val)         gcsr_write(val, LOONGARCH_CSR_LLBCTL)
->> +
->> +#define read_gcsr_tlbrentry()          gcsr_read(LOONGARCH_CSR_TLBRENTRY)
->> +#define write_gcsr_tlbrentry(val)      gcsr_write(val, LOONGARCH_CSR_TLBRENTRY)
->> +#define read_gcsr_tlbrbadv()           gcsr_read(LOONGARCH_CSR_TLBRBADV)
->> +#define write_gcsr_tlbrbadv(val)       gcsr_write(val, LOONGARCH_CSR_TLBRBADV)
->> +#define read_gcsr_tlbrera()            gcsr_read(LOONGARCH_CSR_TLBRERA)
->> +#define write_gcsr_tlbrera(val)                gcsr_write(val, LOONGARCH_CSR_TLBRERA)
->> +#define read_gcsr_tlbrsave()           gcsr_read(LOONGARCH_CSR_TLBRSAVE)
->> +#define write_gcsr_tlbrsave(val)       gcsr_write(val, LOONGARCH_CSR_TLBRSAVE)
->> +#define read_gcsr_tlbrelo0()           gcsr_read(LOONGARCH_CSR_TLBRELO0)
->> +#define write_gcsr_tlbrelo0(val)       gcsr_write(val, LOONGARCH_CSR_TLBRELO0)
->> +#define read_gcsr_tlbrelo1()           gcsr_read(LOONGARCH_CSR_TLBRELO1)
->> +#define write_gcsr_tlbrelo1(val)       gcsr_write(val, LOONGARCH_CSR_TLBRELO1)
->> +#define read_gcsr_tlbrehi()            gcsr_read(LOONGARCH_CSR_TLBREHI)
->> +#define write_gcsr_tlbrehi(val)                gcsr_write(val, LOONGARCH_CSR_TLBREHI)
->> +#define read_gcsr_tlbrprmd()           gcsr_read(LOONGARCH_CSR_TLBRPRMD)
->> +#define write_gcsr_tlbrprmd(val)       gcsr_write(val, LOONGARCH_CSR_TLBRPRMD)
->> +
->> +#define read_gcsr_directwin0()         gcsr_read(LOONGARCH_CSR_DMWIN0)
->> +#define write_gcsr_directwin0(val)     gcsr_write(val, LOONGARCH_CSR_DMWIN0)
->> +#define read_gcsr_directwin1()         gcsr_read(LOONGARCH_CSR_DMWIN1)
->> +#define write_gcsr_directwin1(val)     gcsr_write(val, LOONGARCH_CSR_DMWIN1)
->> +#define read_gcsr_directwin2()         gcsr_read(LOONGARCH_CSR_DMWIN2)
->> +#define write_gcsr_directwin2(val)     gcsr_write(val, LOONGARCH_CSR_DMWIN2)
->> +#define read_gcsr_directwin3()         gcsr_read(LOONGARCH_CSR_DMWIN3)
->> +#define write_gcsr_directwin3(val)     gcsr_write(val, LOONGARCH_CSR_DMWIN3)
->> +
->> +/* Guest related CSRs */
->> +#define read_csr_gtlbc()               csr_read64(LOONGARCH_CSR_GTLBC)
->> +#define write_csr_gtlbc(val)           csr_write64(val, LOONGARCH_CSR_GTLBC)
->> +#define read_csr_trgp()                        csr_read64(LOONGARCH_CSR_TRGP)
->> +#define read_csr_gcfg()                        csr_read64(LOONGARCH_CSR_GCFG)
->> +#define write_csr_gcfg(val)            csr_write64(val, LOONGARCH_CSR_GCFG)
->> +#define read_csr_gstat()               csr_read64(LOONGARCH_CSR_GSTAT)
->> +#define write_csr_gstat(val)           csr_write64(val, LOONGARCH_CSR_GSTAT)
->> +#define read_csr_gintc()               csr_read64(LOONGARCH_CSR_GINTC)
->> +#define write_csr_gintc(val)           csr_write64(val, LOONGARCH_CSR_GINTC)
->> +#define read_csr_gcntc()               csr_read64(LOONGARCH_CSR_GCNTC)
->> +#define write_csr_gcntc(val)           csr_write64(val, LOONGARCH_CSR_GCNTC)
->> +
->> +#define __BUILD_GCSR_OP(name)          __BUILD_CSR_COMMON(gcsr_##name)
->> +
->> +__BUILD_GCSR_OP(llbctl)
->> +__BUILD_GCSR_OP(tlbidx)
->> +__BUILD_CSR_OP(gcfg)
->> +__BUILD_CSR_OP(gstat)
->> +__BUILD_CSR_OP(gtlbc)
->> +__BUILD_CSR_OP(gintc)
->> +
->> +#define set_gcsr_estat(val)    \
->> +       gcsr_xchg(val, val, LOONGARCH_CSR_ESTAT)
->> +#define clear_gcsr_estat(val)  \
->> +       gcsr_xchg(~(val), val, LOONGARCH_CSR_ESTAT)
->> +
->> +#define kvm_read_hw_gcsr(id)           gcsr_read(id)
->> +#define kvm_write_hw_gcsr(csr, id, val)        gcsr_write(val, id)
->> +
->> +int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *v);
->> +int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 v);
->> +
->> +int _kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu);
->> +
->> +#define kvm_save_hw_gcsr(csr, gid)     (csr->csrs[gid] = gcsr_read(gid))
->> +#define kvm_restore_hw_gcsr(csr, gid)  (gcsr_write(csr->csrs[gid], gid))
->> +
->> +static __always_inline unsigned long kvm_read_sw_gcsr(struct loongarch_csrs *csr, int gid)
->> +{
->> +       return csr->csrs[gid];
->> +}
->> +
->> +static __always_inline void kvm_write_sw_gcsr(struct loongarch_csrs *csr,
->> +                                             int gid, unsigned long val)
->> +{
->> +       csr->csrs[gid] = val;
->> +}
->> +
->> +static __always_inline void kvm_set_sw_gcsr(struct loongarch_csrs *csr,
->> +                                           int gid, unsigned long val)
->> +{
->> +       csr->csrs[gid] |= val;
->> +}
->> +
->> +static __always_inline void kvm_change_sw_gcsr(struct loongarch_csrs *csr,
->> +                                              int gid, unsigned long mask,
->> +                                              unsigned long val)
->> +{
->> +       unsigned long _mask = mask;
->> +
->> +       csr->csrs[gid] &= ~_mask;
->> +       csr->csrs[gid] |= val & _mask;
->> +}
->> +#endif /* __ASM_LOONGARCH_KVM_CSR_H__ */
->> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
->> new file mode 100644
->> index 0000000000..3d23a656fe
->> --- /dev/null
->> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
->> @@ -0,0 +1,95 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#ifndef __ASM_LOONGARCH_KVM_VCPU_H__
->> +#define __ASM_LOONGARCH_KVM_VCPU_H__
->> +
->> +#include <linux/kvm_host.h>
->> +#include <asm/loongarch.h>
->> +
->> +/* Controlled by 0x5 guest exst */
->> +#define CPU_SIP0                       (_ULCAST_(1))
->> +#define CPU_SIP1                       (_ULCAST_(1) << 1)
->> +#define CPU_PMU                                (_ULCAST_(1) << 10)
->> +#define CPU_TIMER                      (_ULCAST_(1) << 11)
->> +#define CPU_IPI                                (_ULCAST_(1) << 12)
->> +
->> +/* Controlled by 0x52 guest exception VIP
->> + * aligned to exst bit 5~12
->> + */
->> +#define CPU_IP0                                (_ULCAST_(1))
->> +#define CPU_IP1                                (_ULCAST_(1) << 1)
->> +#define CPU_IP2                                (_ULCAST_(1) << 2)
->> +#define CPU_IP3                                (_ULCAST_(1) << 3)
->> +#define CPU_IP4                                (_ULCAST_(1) << 4)
->> +#define CPU_IP5                                (_ULCAST_(1) << 5)
->> +#define CPU_IP6                                (_ULCAST_(1) << 6)
->> +#define CPU_IP7                                (_ULCAST_(1) << 7)
->> +
->> +#define MNSEC_PER_SEC                  (NSEC_PER_SEC >> 20)
->> +
->> +/* KVM_IRQ_LINE irq field index values */
->> +#define KVM_LOONGSON_IRQ_TYPE_SHIFT    24
->> +#define KVM_LOONGSON_IRQ_TYPE_MASK     0xff
->> +#define KVM_LOONGSON_IRQ_VCPU_SHIFT    16
->> +#define KVM_LOONGSON_IRQ_VCPU_MASK     0xff
->> +#define KVM_LOONGSON_IRQ_NUM_SHIFT     0
->> +#define KVM_LOONGSON_IRQ_NUM_MASK      0xffff
->> +
->> +/* Irq_type field */
->> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IP   0
->> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IO   1
->> +#define KVM_LOONGSON_IRQ_TYPE_HT       2
->> +#define KVM_LOONGSON_IRQ_TYPE_MSI      3
->> +#define KVM_LOONGSON_IRQ_TYPE_IOAPIC   4
->> +#define KVM_LOONGSON_IRQ_TYPE_ROUTE    5
->> +
->> +/* Out-of-kernel GIC cpu interrupt injection irq_number field */
->> +#define KVM_LOONGSON_IRQ_CPU_IRQ       0
->> +#define KVM_LOONGSON_IRQ_CPU_FIQ       1
->> +#define KVM_LOONGSON_CPU_IP_NUM                8
->> +
->> +typedef union loongarch_instruction  larch_inst;
->> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
->> +
->> +int  _kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst);
->> +int  _kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst);
->> +int  _kvm_complete_mmio_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> +int  _kvm_complete_iocsr_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> +int  _kvm_emu_idle(struct kvm_vcpu *vcpu);
->> +int  _kvm_handle_pv_hcall(struct kvm_vcpu *vcpu);
->> +int  _kvm_pending_timer(struct kvm_vcpu *vcpu);
->> +int  _kvm_handle_fault(struct kvm_vcpu *vcpu, int fault);
->> +void _kvm_deliver_intr(struct kvm_vcpu *vcpu);
->> +
->> +void kvm_own_fpu(struct kvm_vcpu *vcpu);
->> +void kvm_lose_fpu(struct kvm_vcpu *vcpu);
->> +void kvm_save_fpu(struct loongarch_fpu *fpu);
->> +void kvm_restore_fpu(struct loongarch_fpu *fpu);
->> +void kvm_restore_fcsr(struct loongarch_fpu *fpu);
->> +
->> +void kvm_acquire_timer(struct kvm_vcpu *vcpu);
->> +void kvm_reset_timer(struct kvm_vcpu *vcpu);
->> +void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
->> +void kvm_restore_timer(struct kvm_vcpu *vcpu);
->> +void kvm_save_timer(struct kvm_vcpu *vcpu);
->> +
->> +int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu, struct kvm_interrupt *irq);
->> +/*
->> + * Loongarch KVM guest interrupt handling
->> + */
->> +static inline void _kvm_queue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
->> +{
->> +       set_bit(irq, &vcpu->arch.irq_pending);
->> +       clear_bit(irq, &vcpu->arch.irq_clear);
->> +}
->> +
->> +static inline void _kvm_dequeue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
->> +{
->> +       clear_bit(irq, &vcpu->arch.irq_pending);
->> +       set_bit(irq, &vcpu->arch.irq_clear);
->> +}
->> +
->> +#endif /* __ASM_LOONGARCH_KVM_VCPU_H__ */
->> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
->> index 10748a20a2..b9044c8dfa 100644
->> --- a/arch/loongarch/include/asm/loongarch.h
->> +++ b/arch/loongarch/include/asm/loongarch.h
->> @@ -269,6 +269,7 @@ __asm__(".macro     parse_r var r\n\t"
->>   #define LOONGARCH_CSR_ECFG             0x4     /* Exception config */
->>   #define  CSR_ECFG_VS_SHIFT             16
->>   #define  CSR_ECFG_VS_WIDTH             3
->> +#define  CSR_ECFG_VS_SHIFT_END         (CSR_ECFG_VS_SHIFT + CSR_ECFG_VS_WIDTH - 1)
->>   #define  CSR_ECFG_VS                   (_ULCAST_(0x7) << CSR_ECFG_VS_SHIFT)
->>   #define  CSR_ECFG_IM_SHIFT             0
->>   #define  CSR_ECFG_IM_WIDTH             14
->> @@ -357,13 +358,14 @@ __asm__(".macro   parse_r var r\n\t"
->>   #define  CSR_TLBLO1_V                  (_ULCAST_(0x1) << CSR_TLBLO1_V_SHIFT)
->>
->>   #define LOONGARCH_CSR_GTLBC            0x15    /* Guest TLB control */
->> -#define  CSR_GTLBC_RID_SHIFT           16
->> -#define  CSR_GTLBC_RID_WIDTH           8
->> -#define  CSR_GTLBC_RID                 (_ULCAST_(0xff) << CSR_GTLBC_RID_SHIFT)
->> +#define  CSR_GTLBC_TGID_SHIFT          16
->> +#define  CSR_GTLBC_TGID_WIDTH          8
->> +#define  CSR_GTLBC_TGID_SHIFT_END      (CSR_GTLBC_TGID_SHIFT + CSR_GTLBC_TGID_WIDTH - 1)
->> +#define  CSR_GTLBC_TGID                        (_ULCAST_(0xff) << CSR_GTLBC_TGID_SHIFT)
->>   #define  CSR_GTLBC_TOTI_SHIFT          13
->>   #define  CSR_GTLBC_TOTI                        (_ULCAST_(0x1) << CSR_GTLBC_TOTI_SHIFT)
->> -#define  CSR_GTLBC_USERID_SHIFT                12
->> -#define  CSR_GTLBC_USERID              (_ULCAST_(0x1) << CSR_GTLBC_USERID_SHIFT)
->> +#define  CSR_GTLBC_USETGID_SHIFT       12
->> +#define  CSR_GTLBC_USETGID             (_ULCAST_(0x1) << CSR_GTLBC_USETGID_SHIFT)
->>   #define  CSR_GTLBC_GMTLBSZ_SHIFT       0
->>   #define  CSR_GTLBC_GMTLBSZ_WIDTH       6
->>   #define  CSR_GTLBC_GMTLBSZ             (_ULCAST_(0x3f) << CSR_GTLBC_GMTLBSZ_SHIFT)
->> @@ -518,6 +520,7 @@ __asm__(".macro     parse_r var r\n\t"
->>   #define LOONGARCH_CSR_GSTAT            0x50    /* Guest status */
->>   #define  CSR_GSTAT_GID_SHIFT           16
->>   #define  CSR_GSTAT_GID_WIDTH           8
->> +#define  CSR_GSTAT_GID_SHIFT_END       (CSR_GSTAT_GID_SHIFT + CSR_GSTAT_GID_WIDTH - 1)
->>   #define  CSR_GSTAT_GID                 (_ULCAST_(0xff) << CSR_GSTAT_GID_SHIFT)
->>   #define  CSR_GSTAT_GIDBIT_SHIFT                4
->>   #define  CSR_GSTAT_GIDBIT_WIDTH                6
->> @@ -568,6 +571,12 @@ __asm__(".macro    parse_r var r\n\t"
->>   #define  CSR_GCFG_MATC_GUEST           (_ULCAST_(0x0) << CSR_GCFG_MATC_SHITF)
->>   #define  CSR_GCFG_MATC_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATC_SHITF)
->>   #define  CSR_GCFG_MATC_NEST            (_ULCAST_(0x2) << CSR_GCFG_MATC_SHITF)
->> +#define  CSR_GCFG_MATP_NEST_SHIFT      2
->> +#define  CSR_GCFG_MATP_NEST            (_ULCAST_(0x1) << CSR_GCFG_MATP_NEST_SHIFT)
->> +#define  CSR_GCFG_MATP_ROOT_SHIFT      1
->> +#define  CSR_GCFG_MATP_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATP_ROOT_SHIFT)
->> +#define  CSR_GCFG_MATP_GUEST_SHIFT     0
->> +#define  CSR_GCFG_MATP_GUEST           (_ULCAST_(0x1) << CSR_GCFG_MATP_GUEST_SHIFT)
->>
->>   #define LOONGARCH_CSR_GINTC            0x52    /* Guest interrupt control */
->>   #define  CSR_GINTC_HC_SHIFT            16
->> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
->> new file mode 100644
->> index 0000000000..17b28d94d5
->> --- /dev/null
->> +++ b/arch/loongarch/kvm/trace.h
->> @@ -0,0 +1,168 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->> + */
->> +
->> +#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
->> +#define _TRACE_KVM_H
->> +
->> +#include <linux/tracepoint.h>
->> +#include <asm/kvm_csr.h>
->> +
->> +#undef TRACE_SYSTEM
->> +#define TRACE_SYSTEM   kvm
+>> +#include <asm/mmu_context.h>
+>> +#include <asm/pgalloc.h>
+>> +#include <asm/tlb.h>
 >> +
 >> +/*
->> + * Tracepoints for VM enters
+>> + * KVM_MMU_CACHE_MIN_PAGES is the number of GPA page table 
+>> translation levels
+>> + * for which pages need to be cached.
 >> + */
->> +DECLARE_EVENT_CLASS(kvm_transition,
->> +       TP_PROTO(struct kvm_vcpu *vcpu),
->> +       TP_ARGS(vcpu),
->> +       TP_STRUCT__entry(
->> +               __field(unsigned long, pc)
->> +       ),
+>> +#define KVM_MMU_CACHE_MIN_PAGES (CONFIG_PGTABLE_LEVELS - 1)
 >> +
->> +       TP_fast_assign(
->> +               __entry->pc = vcpu->arch.pc;
->> +       ),
+>> +static inline void kvm_set_pte(pte_t *ptep, pte_t pteval)
+>> +{
+>> +    *ptep = pteval;
+>> +}
 >> +
->> +       TP_printk("PC: 0x%08lx",
->> +                 __entry->pc)
->> +);
+>> +/**
+>> + * kvm_pgd_alloc() - Allocate and initialise a KVM GPA page directory.
+>> + *
+>> + * Allocate a blank KVM GPA page directory (PGD) for representing 
+>> guest physical
+>> + * to host physical page mappings.
+>> + *
+>> + * Returns:    Pointer to new KVM GPA page directory.
+>> + *        NULL on allocation failure.
+>> + */
+>> +pgd_t *kvm_pgd_alloc(void)
+>> +{
+>> +    pgd_t *pgd;
 >> +
->> +DEFINE_EVENT(kvm_transition, kvm_enter,
->> +            TP_PROTO(struct kvm_vcpu *vcpu),
->> +            TP_ARGS(vcpu));
+>> +    pgd = (pgd_t *)__get_free_pages(GFP_KERNEL, 0);
+>> +    if (pgd)
+>> +        pgd_init((void *)pgd);
 >> +
->> +DEFINE_EVENT(kvm_transition, kvm_reenter,
->> +            TP_PROTO(struct kvm_vcpu *vcpu),
->> +            TP_ARGS(vcpu));
+>> +    return pgd;
+>> +}
 >> +
->> +DEFINE_EVENT(kvm_transition, kvm_out,
->> +            TP_PROTO(struct kvm_vcpu *vcpu),
->> +            TP_ARGS(vcpu));
+>> +/*
+>> + * Caller must hold kvm->mm_lock
+>> + *
+>> + * Walk the page tables of kvm to find the PTE corresponding to the
+>> + * address @addr. If page tables don't exist for @addr, they will be 
+>> created
+>> + * from the MMU cache if @cache is not NULL.
+>> + */
+>> +static pte_t *kvm_populate_gpa(struct kvm *kvm,
+>> +                struct kvm_mmu_memory_cache *cache,
+>> +                unsigned long addr)
+>> +{
+>> +    pgd_t *pgd;
+>> +    p4d_t *p4d;
+>> +    pud_t *pud;
+>> +    pmd_t *pmd;
 >> +
->> +/* Further exit reasons */
->> +#define KVM_TRACE_EXIT_IDLE            64
->> +#define KVM_TRACE_EXIT_CACHE           65
->> +#define KVM_TRACE_EXIT_SIGNAL          66
+>> +    pgd = kvm->arch.pgd + pgd_index(addr);
+>> +    p4d = p4d_offset(pgd, addr);
+>> +    if (p4d_none(*p4d)) {
+>> +        if (!cache)
+>> +            return NULL;
 >> +
->> +/* Tracepoints for VM exits */
->> +#define kvm_trace_symbol_exit_types                    \
->> +       { KVM_TRACE_EXIT_IDLE,          "IDLE" },       \
->> +       { KVM_TRACE_EXIT_CACHE,         "CACHE" },      \
->> +       { KVM_TRACE_EXIT_SIGNAL,        "Signal" }
-> Consider to use Idle, Cache which has the same style of Signal?
-The trace point of signal is not used, and I will remove it.
->
-> And why the types here are not the same as those in kvm_vcpu_stat?
-As the idle_exits is the statistics of idle exiting, so it is different 
-from idle trace point.
->
-> struct kvm_vcpu_stat {
->   struct kvm_vcpu_stat_generic generic;
->   u64 idle_exits;
->   u64 signal_exits;
->   u64 int_exits;
->   u64 cpucfg_exits;
-> };
->
+>> +        pud = kvm_mmu_memory_cache_alloc(cache);
+>> +        pud_init(pud);
+>> +        p4d_populate(NULL, p4d, pud);
+>> +    }
 >> +
->> +TRACE_EVENT(kvm_exit_gspr,
->> +           TP_PROTO(struct kvm_vcpu *vcpu, unsigned int inst_word),
->> +           TP_ARGS(vcpu, inst_word),
->> +           TP_STRUCT__entry(
->> +                       __field(unsigned int, inst_word)
->> +           ),
+>> +    pud = pud_offset(p4d, addr);
+>> +    if (pud_none(*pud)) {
+>> +        if (!cache)
+>> +            return NULL;
+>> +        pmd = kvm_mmu_memory_cache_alloc(cache);
+>> +        pmd_init(pmd);
+>> +        pud_populate(NULL, pud, pmd);
+>> +    }
 >> +
->> +           TP_fast_assign(
->> +                       __entry->inst_word = inst_word;
->> +           ),
+>> +    pmd = pmd_offset(pud, addr);
+>> +    if (pmd_none(*pmd)) {
+>> +        pte_t *pte;
 >> +
->> +           TP_printk("inst word: 0x%08x",
->> +                     __entry->inst_word)
->> +);
+>> +        if (!cache)
+>> +            return NULL;
+>> +        pte = kvm_mmu_memory_cache_alloc(cache);
+>> +        clear_page(pte);
+>> +        pmd_populate_kernel(NULL, pmd, pte);
+>> +    }
 >> +
+>> +    return pte_offset_kernel(pmd, addr);
+>> +}
 >> +
->> +DECLARE_EVENT_CLASS(kvm_exit,
->> +           TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
->> +           TP_ARGS(vcpu, reason),
->> +           TP_STRUCT__entry(
->> +                       __field(unsigned long, pc)
->> +                       __field(unsigned int, reason)
->> +           ),
+>> +typedef int (*kvm_pte_ops)(pte_t *pte);
 >> +
->> +           TP_fast_assign(
->> +                       __entry->pc = vcpu->arch.pc;
->> +                       __entry->reason = reason;
->> +           ),
+>> +struct kvm_ptw_ctx {
+>> +    kvm_pte_ops    ops;
+>> +    int        need_flush;
+>> +};
 >> +
->> +           TP_printk("[%s]PC: 0x%08lx",
->> +                     __print_symbolic(__entry->reason,
->> +                                      kvm_trace_symbol_exit_types),
->> +                     __entry->pc)
->> +);
+>> +static int kvm_ptw_pte(pmd_t *pmd, unsigned long addr, unsigned long 
+>> end,
+>> +            struct kvm_ptw_ctx *context)
+>> +{
+>> +    pte_t *pte;
+>> +    unsigned long next, start;
+>> +    int ret;
 >> +
->> +DEFINE_EVENT(kvm_exit, kvm_exit_idle,
->> +            TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
->> +            TP_ARGS(vcpu, reason));
+>> +    ret = 0;
+>> +    start = addr;
+>> +    pte = pte_offset_kernel(pmd, addr);
+>> +    do {
+>> +        next = addr + PAGE_SIZE;
+>> +        if (!pte_present(*pte))
+>> +            continue;
 >> +
->> +DEFINE_EVENT(kvm_exit, kvm_exit_cache,
->> +            TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
->> +            TP_ARGS(vcpu, reason));
+>> +        ret |= context->ops(pte);
+>> +    } while (pte++, addr = next, addr != end);
 >> +
->> +DEFINE_EVENT(kvm_exit, kvm_exit,
-> I'm not sure, but it may be DEFINE_EVENT(kvm_exit, kvm_exit_signal),
-> which is corresponding to the types above?
-The trace point of signal is not used, so there need not the 
-kvm_exit_signal function.
+>> +    if (context->need_flush && (start + PMD_SIZE == end)) {
+>> +        pte = pte_offset_kernel(pmd, 0);
+>> +        pmd_clear(pmd);
+>> +        free_page((unsigned long)pte);
+>> +    }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static int kvm_ptw_pmd(pud_t *pud, unsigned long addr, unsigned long 
+>> end,
+>> +            struct kvm_ptw_ctx *context)
+>> +{
+>> +    pmd_t *pmd;
+>> +    unsigned long next, start;
+>> +    int ret;
+>> +
+>> +    ret = 0;
+>> +    start = addr;
+>> +    pmd = pmd_offset(pud, addr);
+>> +    do {
+>> +        next = pmd_addr_end(addr, end);
+>> +        if (!pmd_present(*pmd))
+>> +            continue;
+>> +
+>> +        ret |= kvm_ptw_pte(pmd, addr, next, context);
+>> +    } while (pmd++, addr = next, addr != end);
+>> +
+>> +#ifndef __PAGETABLE_PMD_FOLDED
+>> +    if (context->need_flush && (start + PUD_SIZE == end)) {
+>> +        pmd = pmd_offset(pud, 0);
+>> +        pud_clear(pud);
+>> +        free_page((unsigned long)pmd);
+>> +    }
+>> +#endif
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static int kvm_ptw_pud(pgd_t *pgd, unsigned long addr, unsigned long 
+>> end,
+>> +            struct kvm_ptw_ctx *context)
+>> +{
+>> +    p4d_t *p4d;
+>> +    pud_t *pud;
+>> +    int ret = 0;
+>> +    unsigned long next;
+>> +#ifndef __PAGETABLE_PUD_FOLDED
+>> +    unsigned long start = addr;
+>> +#endif
+>> +
+>> +    p4d = p4d_offset(pgd, addr);
+>> +    pud = pud_offset(p4d, addr);
+>> +    do {
+>> +        next = pud_addr_end(addr, end);
+>> +        if (!pud_present(*pud))
+>> +            continue;
+>> +
+>> +        ret |= kvm_ptw_pmd(pud, addr, next, context);
+>> +    } while (pud++, addr = next, addr != end);
+>> +
+>> +#ifndef __PAGETABLE_PUD_FOLDED
+>> +    if (context->need_flush && (start + PGDIR_SIZE == end)) {
+>> +        pud = pud_offset(p4d, 0);
+>> +        p4d_clear(p4d);
+>> +        free_page((unsigned long)pud);
+>> +    }
+>> +#endif
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static int kvm_ptw_pgd(pgd_t *pgd, unsigned long addr, unsigned long 
+>> end,
+>> +            struct kvm_ptw_ctx *context)
+>> +{
+>> +    unsigned long next;
+>> +    int ret;
+>> +
+>> +    ret = 0;
+>> +    if (addr > end - 1)
+>> +        return ret;
+>> +    pgd = pgd + pgd_index(addr);
+>> +    do {
+>> +        next = pgd_addr_end(addr, end);
+>> +        if (!pgd_present(*pgd))
+>> +            continue;
+>> +
+>> +        ret |= kvm_ptw_pud(pgd, addr, next, context);
+>> +    }  while (pgd++, addr = next, addr != end);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +/*
+>> + * clear pte entry
+>> + */
+>> +static int kvm_flush_pte(pte_t *pte)
+>> +{
+>> +    kvm_set_pte(pte, __pte(0));
+>> +    return 1;
+>> +}
+>> +
+>> +/**
+>> + * kvm_flush_range() - Flush a range of guest physical addresses.
+>> + * @kvm:    KVM pointer.
+>> + * @start_gfn:    Guest frame number of first page in GPA range to 
+>> flush.
+>> + * @end_gfn:    Guest frame number of last page in GPA range to flush.
+>> + *
+>> + * Flushes a range of GPA mappings from the GPA page tables.
+>> + *
+>> + * The caller must hold the @kvm->mmu_lock spinlock.
+>> + *
+>> + * Returns:    Whether its safe to remove the top level page 
+>> directory because
+>> + *        all lower levels have been removed.
+>> + */
+>> +static bool kvm_flush_range(struct kvm *kvm, gfn_t start_gfn, gfn_t 
+>> end_gfn)
+>> +{
+>> +    struct kvm_ptw_ctx ctx;
+>> +
+>> +    ctx.ops = kvm_flush_pte;
+>> +    ctx.need_flush = 1;
+>> +
+>> +    return kvm_ptw_pgd(kvm->arch.pgd, start_gfn << PAGE_SHIFT,
+>> +                end_gfn << PAGE_SHIFT, &ctx);
+>> +}
+>> +
+>> +/*
+>> + * kvm_mkclean_pte
+>> + * Mark a range of guest physical address space clean (writes fault) 
+>> in the VM's
+>> + * GPA page table to allow dirty page tracking.
+>> + */
+>> +static int kvm_mkclean_pte(pte_t *pte)
+>> +{
+>> +    pte_t val;
+>> +
+>> +    val = *pte;
+>> +    if (pte_dirty(val)) {
+>> +        *pte = pte_mkclean(val);
+>> +        return 1;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +/*
+>> + * kvm_mkclean_gpa_pt() - Make a range of guest physical addresses 
+>> clean.
+>> + * @kvm:    KVM pointer.
+>> + * @start_gfn:    Guest frame number of first page in GPA range to 
+>> flush.
+>> + * @end_gfn:    Guest frame number of last page in GPA range to flush.
+>> + *
+>> + * Make a range of GPA mappings clean so that guest writes will 
+>> fault and
+>> + * trigger dirty page logging.
+>> + *
+>> + * The caller must hold the @kvm->mmu_lock spinlock.
+>> + *
+>> + * Returns:    Whether any GPA mappings were modified, which would 
+>> require
+>> + *        derived mappings (GVA page tables & TLB enties) to be
+>> + *        invalidated.
+>> + */
+>> +static int kvm_mkclean_gpa_pt(struct kvm *kvm, gfn_t start_gfn, 
+>> gfn_t end_gfn)
+>> +{
+>> +    struct kvm_ptw_ctx ctx;
+>> +
+>> +    ctx.ops = kvm_mkclean_pte;
+>> +    ctx.need_flush = 0;
+>> +    return kvm_ptw_pgd(kvm->arch.pgd, start_gfn << PAGE_SHIFT,
+>> +                end_gfn << PAGE_SHIFT, &ctx);
+>> +}
+>> +
+>> +/*
+>> + * kvm_arch_mmu_enable_log_dirty_pt_masked() - write protect dirty 
+>> pages
+>> + * @kvm:    The KVM pointer
+>> + * @slot:    The memory slot associated with mask
+>> + * @gfn_offset:    The gfn offset in memory slot
+>> + * @mask:    The mask of dirty pages at offset 'gfn_offset' in this 
+>> memory
+>> + *        slot to be write protected
+>> + *
+>> + * Walks bits set in mask write protects the associated pte's. 
+>> Caller must
+>> + * acquire @kvm->mmu_lock.
+>> + */
+>> +void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>> +        struct kvm_memory_slot *slot,
+>> +        gfn_t gfn_offset, unsigned long mask)
+>> +{
+>> +    gfn_t base_gfn = slot->base_gfn + gfn_offset;
+>> +    gfn_t start = base_gfn +  __ffs(mask);
+> One extra space after the plus sign?
+Thanks, I will remove the extra space.
+>> +    gfn_t end = base_gfn + __fls(mask) + 1;
+>> +
+>> +    kvm_mkclean_gpa_pt(kvm, start, end);
+>> +}
+>> +
+>> +void kvm_arch_commit_memory_region(struct kvm *kvm,
+>> +                   struct kvm_memory_slot *old,
+>> +                   const struct kvm_memory_slot *new,
+>> +                   enum kvm_mr_change change)
+>> +{
+>> +    int needs_flush;
+>> +
+>> +    /*
+>> +     * If dirty page logging is enabled, write protect all pages in 
+>> the slot
+>> +     * ready for dirty logging.
+>> +     *
+>> +     * There is no need to do this in any of the following cases:
+>> +     * CREATE:    No dirty mappings will already exist.
+>> +     * MOVE/DELETE:    The old mappings will already have been 
+>> cleaned up by
+>> +     *        kvm_arch_flush_shadow_memslot()
+>> +     */
+>> +    if (change == KVM_MR_FLAGS_ONLY &&
+>> +        (!(old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+>> +         new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>> +        spin_lock(&kvm->mmu_lock);
+>> +        /* Write protect GPA page table entries */
+>> +        needs_flush = kvm_mkclean_gpa_pt(kvm, new->base_gfn,
+>> +                    new->base_gfn + new->npages);
+>> +        if (needs_flush)
+>> +            kvm_flush_remote_tlbs(kvm);
+>> +        spin_unlock(&kvm->mmu_lock);
+>> +    }
+>> +}
+>> +
+>> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>> +{
+>> +    /* Flush whole GPA */
+>> +    kvm_flush_range(kvm, 0, kvm->arch.gpa_size >> PAGE_SHIFT);
+>> +    /* Flush vpid for each vCPU individually */
+>> +    kvm_flush_remote_tlbs(kvm);
+>> +}
+>> +
+>> +void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>> +        struct kvm_memory_slot *slot)
+>> +{
+>> +    int ret;
+>> +
+>> +    /*
+>> +     * The slot has been made invalid (ready for moving or 
+>> deletion), so we
+>> +     * need to ensure that it can no longer be accessed by any guest 
+>> vCPUs.
+>> +     */
+>> +    spin_lock(&kvm->mmu_lock);
+>> +    /* Flush slot from GPA */
+>> +    ret = kvm_flush_range(kvm, slot->base_gfn,
+>> +            slot->base_gfn + slot->npages);
+>> +    /* Let implementation do the rest */
+>> +    if (ret)
+>> +        kvm_flush_remote_tlbs(kvm);
+>> +    spin_unlock(&kvm->mmu_lock);
+>> +}
+>> +
+>> +void _kvm_destroy_mm(struct kvm *kvm)
+>> +{
+>> +    /* It should always be safe to remove after flushing the whole 
+>> range */
+>> +    kvm_flush_range(kvm, 0, kvm->arch.gpa_size >> PAGE_SHIFT);
+>> +    pgd_free(NULL, kvm->arch.pgd);
+>> +    kvm->arch.pgd = NULL;
+>> +}
+>> +
+>> +/*
+>> + * Mark a range of guest physical address space old (all accesses 
+>> fault) in the
+>> + * VM's GPA page table to allow detection of commonly used pages.
+>> + */
+>> +static int kvm_mkold_pte(pte_t *pte)
+>> +{
+>> +    pte_t val;
+>> +
+>> +    val = *pte;
+> "pte_t val = *pte" would be enough... You may want to check the entire 
+> patch series for simplifications like this.
+Thanks, I will fix this.
+>> +    if (pte_young(val)) {
+>> +        *pte = pte_mkold(val);
+>> +        return 1;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +    return kvm_flush_range(kvm, range->start, range->end);
+>> +}
+>> +
+>> +bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +    gpa_t gpa = range->start << PAGE_SHIFT;
+>> +    pte_t hva_pte = range->pte;
+> This has become "range->arg.pte" since commit 3e1efe2b67d3 ("KVM: Wrap 
+> kvm_{gfn,hva}_range.pte in a per-action union") which is already 
+> inside linux-next.
+Thanks, I will update it.
+>> +    pte_t *ptep = kvm_populate_gpa(kvm, NULL, gpa);
+>> +    pte_t old_pte;
+>> +
+>> +    if (!ptep)
+>> +        return false;
+>> +
+>> +    /* Mapping may need adjusting depending on memslot flags */
+>> +    old_pte = *ptep;
+>> +    if (range->slot->flags & KVM_MEM_LOG_DIRTY_PAGES && 
+>> !pte_dirty(old_pte))
+>> +        hva_pte = pte_mkclean(hva_pte);
+>> +    else if (range->slot->flags & KVM_MEM_READONLY)
+>> +        hva_pte = pte_wrprotect(hva_pte);
+>> +
+>> +    kvm_set_pte(ptep, hva_pte);
+>> +
+>> +    /* Replacing an absent or old page doesn't need flushes */
+>> +    if (!pte_present(old_pte) || !pte_young(old_pte))
+>> +        return false;
+>> +
+>> +    /* Pages swapped, aged, moved, or cleaned require flushes */
+>> +    return !pte_present(hva_pte) ||
+>> +           !pte_young(hva_pte) ||
+>> +           pte_pfn(old_pte) != pte_pfn(hva_pte) ||
+>> +           (pte_dirty(old_pte) && !pte_dirty(hva_pte));
+>> +}
+>> +
+>> +bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +    struct kvm_ptw_ctx ctx;
+>> +
+>> +    ctx.ops = kvm_mkold_pte;
+>> +    ctx.need_flush = 0;
+>> +    return kvm_ptw_pgd(kvm->arch.pgd, range->start << PAGE_SHIFT,
+>> +                range->end << PAGE_SHIFT, &ctx);
+>> +}
+>> +
+>> +bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>> +{
+>> +    gpa_t gpa = range->start << PAGE_SHIFT;
+>> +    pte_t *ptep = kvm_populate_gpa(kvm, NULL, gpa);
+>> +
+>> +    if (ptep && pte_present(*ptep) && pte_young(*ptep))
+>> +        return true;
+>> +
+>> +    return false;
+>> +}
+>> +
+>> +/**
+>> + * kvm_map_page_fast() - Fast path GPA fault handler.
+>> + * @vcpu:        vCPU pointer.
+>> + * @gpa:        Guest physical address of fault.
+>> + * @write:    Whether the fault was due to a write.
+>> + *
+>> + * Perform fast path GPA fault handling, doing all that can be done 
+>> without
+>> + * calling into KVM. This handles marking old pages young (for idle 
+>> page
+>> + * tracking), and dirtying of clean pages (for dirty page logging).
+>> + *
+>> + * Returns:    0 on success, in which case we can update derived 
+>> mappings and
+>> + *        resume guest execution.
+>> + *        -EFAULT on failure due to absent GPA mapping or write to
+>> + *        read-only page, in which case KVM must be consulted.
+>> + */
+>> +static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa,
+>> +                   bool write)
+>> +{
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    gfn_t gfn = gpa >> PAGE_SHIFT;
+>> +    pte_t *ptep;
+>> +    kvm_pfn_t pfn = 0;
+>> +    bool pfn_valid = false, pfn_dirty = false;
+>> +    int ret = 0;
+>> +
+>> +    spin_lock(&kvm->mmu_lock);
+>> +
+>> +    /* Fast path - just check GPA page table for an existing entry */
+>> +    ptep = kvm_populate_gpa(kvm, NULL, gpa);
+>> +    if (!ptep || !pte_present(*ptep)) {
+>> +        ret = -EFAULT;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* Track access to pages marked old */
+>> +    if (!pte_young(*ptep)) {
+>> +        kvm_set_pte(ptep, pte_mkyoung(*ptep));
+>> +        pfn = pte_pfn(*ptep);
+>> +        pfn_valid = true;
+>> +        /* call kvm_set_pfn_accessed() after unlock */
+>> +    }
+>> +    if (write && !pte_dirty(*ptep)) {
+>> +        if (!pte_write(*ptep)) {
+>> +            ret = -EFAULT;
+>> +            goto out;
+>> +        }
+>> +
+>> +        /* Track dirtying of writeable pages */
+>> +        kvm_set_pte(ptep, pte_mkdirty(*ptep));
+>> +        pfn = pte_pfn(*ptep);
+>> +        pfn_dirty = true;
+>> +    }
+>> +
+>> +out:
+>> +    spin_unlock(&kvm->mmu_lock);
+>> +    if (pfn_valid)
+>> +        kvm_set_pfn_accessed(pfn);
+>> +    if (pfn_dirty) {
+>> +        mark_page_dirty(kvm, gfn);
+>> +        kvm_set_pfn_dirty(pfn);
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>> +/**
+>> + * kvm_map_page() - Map a guest physical page.
+>> + * @vcpu:        vCPU pointer.
+>> + * @gpa:        Guest physical address of fault.
+>> + * @write:    Whether the fault was due to a write.
+>> + *
+>> + * Handle GPA faults by creating a new GPA mapping (or updating an 
+>> existing
+>> + * one).
+>> + *
+>> + * This takes care of marking pages young or dirty (idle/dirty page 
+>> tracking),
+>> + * asking KVM for the corresponding PFN, and creating a mapping in 
+>> the GPA page
+>> + * tables. Derived mappings (GVA page tables and TLBs) must be 
+>> handled by the
+>> + * caller.
+>> + *
+>> + * Returns:    0 on success
+>> + *        -EFAULT if there is no memory region at @gpa or a write was
+>> + *        attempted to a read-only memory region. This is usually 
+>> handled
+>> + *        as an MMIO access.
+>> + */
+>> +static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, 
+>> bool write)
+>> +{
+>> +    bool writeable;
+>> +    int srcu_idx, err = 0, retry_no = 0;
+>> +    unsigned long hva;
+>> +    unsigned long mmu_seq;
+>> +    unsigned long prot_bits;
+>> +    pte_t *ptep, new_pte;
+>> +    kvm_pfn_t pfn;
+>> +    gfn_t gfn = gpa >> PAGE_SHIFT;
+>> +    struct vm_area_struct *vma;
+>> +    struct kvm *kvm = vcpu->kvm;
+>> +    struct kvm_memory_slot *memslot;
+>> +    struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>> +
+>> +    /* Try the fast path to handle old / clean pages */
+>> +    srcu_idx = srcu_read_lock(&kvm->srcu);
+>> +    err = kvm_map_page_fast(vcpu, gpa, write);
+>> +    if (!err)
+>> +        goto out;
+>> +
+>> +    memslot = gfn_to_memslot(kvm, gfn);
+>> +    hva = gfn_to_hva_memslot_prot(memslot, gfn, &writeable);
+>> +    if (kvm_is_error_hva(hva) || (write && !writeable))
+>> +        goto out;
+>> +
+>> +    mmap_read_lock(current->mm);
+>> +    vma = find_vma_intersection(current->mm, hva, hva + 1);
+>> +    if (unlikely(!vma)) {
+>> +        kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+>> +        mmap_read_unlock(current->mm);
+>> +        err = -EFAULT;
+>> +        goto out;
+>> +    }
+>> +    mmap_read_unlock(current->mm);
+>> +
+>> +    /* We need a minimum of cached pages ready for page table 
+>> creation */
+>> +    err = kvm_mmu_topup_memory_cache(memcache, 
+>> KVM_MMU_CACHE_MIN_PAGES);
+>> +    if (err)
+>> +        goto out;
+>> +
+>> +retry:
+>> +    /*
+>> +     * Used to check for invalidations in progress, of the pfn that is
+>> +     * returned by pfn_to_pfn_prot below.
+>> +     */
+>> +    mmu_seq = kvm->mmu_invalidate_seq;
+>> +    /*
+>> +     * Ensure the read of mmu_invalidate_seq isn't reordered with 
+>> PTE reads in
+>> +     * gfn_to_pfn_prot() (which calls get_user_pages()), so that we 
+>> don't
+>> +     * risk the page we get a reference to getting unmapped before 
+>> we have a
+>> +     * chance to grab the mmu_lock without mmu_invalidate_retry() 
+>> noticing.
+>> +     *
+>> +     * This smp_rmb() pairs with the effective smp_wmb() of the 
+>> combination
+>> +     * of the pte_unmap_unlock() after the PTE is zapped, and the
+>> +     * spin_lock() in 
+>> kvm_mmu_invalidate_invalidate_<page|range_end>() before
+>> +     * mmu_invalidate_seq is incremented.
+>> +     */
+>> +    smp_rmb();
+>> +
+>> +    /* Slow path - ask KVM core whether we can access this GPA */
+>> +    pfn = gfn_to_pfn_prot(kvm, gfn, write, &writeable);
+>> +    if (is_error_noslot_pfn(pfn)) {
+>> +        err = -EFAULT;
+>> +        goto out;
+>> +    }
+>> +
+>> +    /* Check if an invalidation has taken place since we got pfn */
+>> +    if (mmu_invalidate_retry(kvm, mmu_seq)) {
+>> +        /*
+> Wrong indentation?
+I will fix this indentation.
 
 Thanks
 Tianrui Zhao
+>> +         * This can happen when mappings are changed asynchronously, 
+>> but
+>> +         * also synchronously if a COW is triggered by
+>> +         * gfn_to_pfn_prot().
+>> +         */
+>> +        kvm_set_pfn_accessed(pfn);
+>> +        kvm_release_pfn_clean(pfn);
+>> +        if (retry_no > 100) {
+>> +            retry_no = 0;
+>> +            schedule();
+>> +        }
+>> +        retry_no++;
+>> +        goto retry;
+>> +    }
+>> +
+>> +    /*
+>> +     * For emulated devices such virtio device, actual cache 
+>> attribute is
+>> +     * determined by physical machine.
+>> +     * For pass through physical device, it should be uncachable
+>> +     */
+>> +    prot_bits = _PAGE_PRESENT | __READABLE;
+>> +    if (vma->vm_flags & (VM_IO | VM_PFNMAP))
+>> +        prot_bits |= _CACHE_SUC;
+>> +    else
+>> +        prot_bits |= _CACHE_CC;
+>> +
+>> +    if (writeable) {
+>> +        prot_bits |= _PAGE_WRITE;
+>> +        if (write)
+>> +            prot_bits |= __WRITEABLE;
+>> +    }
+>> +
+>> +    /* Ensure page tables are allocated */
+>> +    spin_lock(&kvm->mmu_lock);
+>> +    ptep = kvm_populate_gpa(kvm, memcache, gpa);
+>> +    new_pte = pfn_pte(pfn, __pgprot(prot_bits));
+>> +    kvm_set_pte(ptep, new_pte);
+>> +
+>> +    err = 0;
+>> +    spin_unlock(&kvm->mmu_lock);
+>> +
+>> +    if (prot_bits & _PAGE_DIRTY) {
+>> +        mark_page_dirty(kvm, gfn);
+>> +        kvm_set_pfn_dirty(pfn);
+>> +    }
+>> +
+>> +    kvm_set_pfn_accessed(pfn);
+>> +    kvm_release_pfn_clean(pfn);
+>> +out:
+>> +    srcu_read_unlock(&kvm->srcu, srcu_idx);
+>> +    return err;
+>> +}
+>> +
+>> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long gpa, 
+>> bool write)
+>> +{
+>> +    int ret;
+>> +
+>> +    ret = kvm_map_page(vcpu, gpa, write);
+>> +    if (ret)
+>> +        return ret;
+>> +
+>> +    /* Invalidate this entry in the TLB */
+>> +    return kvm_flush_tlb_gpa(vcpu, gpa);
+>> +}
+>> +
+>> +void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot 
+>> *memslot)
+>> +{
+>> +
+>> +}
+>> +
+>> +int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>> +                   const struct kvm_memory_slot *old,
+>> +                   struct kvm_memory_slot *new,
+>> +                   enum kvm_mr_change change)
+>> +{
+>> +    return 0;
+>> +}
+>> +
+>> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+>> +                    const struct kvm_memory_slot *memslot)
+>> +{
+>> +    kvm_flush_remote_tlbs(kvm);
+>> +}
 >
->
-> Huacai
->
->> +            TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
->> +            TP_ARGS(vcpu, reason));
->> +
->> +#define KVM_TRACE_AUX_RESTORE          0
->> +#define KVM_TRACE_AUX_SAVE             1
->> +#define KVM_TRACE_AUX_ENABLE           2
->> +#define KVM_TRACE_AUX_DISABLE          3
->> +#define KVM_TRACE_AUX_DISCARD          4
->> +
->> +#define KVM_TRACE_AUX_FPU              1
->> +
->> +#define kvm_trace_symbol_aux_op                                \
->> +       { KVM_TRACE_AUX_RESTORE,        "restore" },    \
->> +       { KVM_TRACE_AUX_SAVE,           "save" },       \
->> +       { KVM_TRACE_AUX_ENABLE,         "enable" },     \
->> +       { KVM_TRACE_AUX_DISABLE,        "disable" },    \
->> +       { KVM_TRACE_AUX_DISCARD,        "discard" }
->> +
->> +#define kvm_trace_symbol_aux_state                     \
->> +       { KVM_TRACE_AUX_FPU,     "FPU" }
->> +
->> +TRACE_EVENT(kvm_aux,
->> +           TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
->> +                    unsigned int state),
->> +           TP_ARGS(vcpu, op, state),
->> +           TP_STRUCT__entry(
->> +                       __field(unsigned long, pc)
->> +                       __field(u8, op)
->> +                       __field(u8, state)
->> +           ),
->> +
->> +           TP_fast_assign(
->> +                       __entry->pc = vcpu->arch.pc;
->> +                       __entry->op = op;
->> +                       __entry->state = state;
->> +           ),
->> +
->> +           TP_printk("%s %s PC: 0x%08lx",
->> +                     __print_symbolic(__entry->op,
->> +                                      kvm_trace_symbol_aux_op),
->> +                     __print_symbolic(__entry->state,
->> +                                      kvm_trace_symbol_aux_state),
->> +                     __entry->pc)
->> +);
->> +
->> +TRACE_EVENT(kvm_vpid_change,
->> +           TP_PROTO(struct kvm_vcpu *vcpu, unsigned long vpid),
->> +           TP_ARGS(vcpu, vpid),
->> +           TP_STRUCT__entry(
->> +                       __field(unsigned long, vpid)
->> +           ),
->> +
->> +           TP_fast_assign(
->> +                       __entry->vpid = vpid;
->> +           ),
->> +
->> +           TP_printk("vpid: 0x%08lx",
->> +                     __entry->vpid)
->> +);
->> +
->> +#endif /* _TRACE_LOONGARCH64_KVM_H */
->> +
->> +#undef TRACE_INCLUDE_PATH
->> +#define TRACE_INCLUDE_PATH ../../arch/loongarch/kvm
->> +#undef TRACE_INCLUDE_FILE
->> +#define TRACE_INCLUDE_FILE trace
->> +
->> +/* This part must be outside protection */
->> +#include <trace/define_trace.h>
->> --
->> 2.27.0
->>
 
