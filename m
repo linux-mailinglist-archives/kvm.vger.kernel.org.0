@@ -2,107 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E816379CFCE
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 13:25:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C63A979CFEB
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 13:31:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234629AbjILLZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 07:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44986 "EHLO
+        id S234696AbjILLa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 07:30:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234736AbjILLYn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 07:24:43 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F1B1724
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:24:34 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c3bd829b86so14936455ad.0
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:24:34 -0700 (PDT)
+        with ESMTP id S234607AbjILLag (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 07:30:36 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC05D98
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:31 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a63b2793ecso700274966b.2
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694517873; x=1695122673; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BMSVWfDKGB85VIlcU/SXoOrl8HpXYWQvEmj0v+X5nMk=;
-        b=ItYtg9GXIBZcIo62dgNKBA1KmsM/wcbZmZxaO8faSUk3JWRMPxi/4ahbXJiB2+5PgD
-         3Ov6qXATuhWRJZyzji0CvEVCh/DBvmVFSI+VtCGFZ00INWoLCp81d9AQenh8LEkNS/YG
-         Y0fxhNxAP2POBIBVYpToMDCwtezF3x6U6MWQ6JlGaKoSVyo59Q9t1bk8z8PO/k0dou2+
-         PJAoHS61I27YOAlJK4hfgYCPhovD5a2/+vwk81dJiZIIVz6pniRqbBybP2bp05gUFthe
-         h76erj/t+P9bke4NAMoPQ/FFf0pubUfaisUf6tJns2CAHb1lWy3AcaQf698R04RawB9z
-         X7LA==
+        d=linaro.org; s=google; t=1694518230; x=1695123030; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F/EKm1PmSvEC7rs4ZxmxgrW2WM6+iO3cGl9uzitMTBI=;
+        b=fzJPTDNemPpuK51eIPbE10nBGpxgy+zLwCAcN5WUTlWaimQVSDmrVgFg1iThpr+xO5
+         yXO/W8sM4+G6XqS5WyHH0dF2CGzHFYtMIZZZNG1CsuX8836g8Za0o5fPusEWu1LgynLp
+         WIQFT2M4MHhVV6GR1U4WZQMvyAXTd/IDQ8gEyAL3L9PfBux6sc1pqMSUWJSgENA2zESl
+         L3q4QWD+3i8cv9KRLgQHhQsciGPhnx0Efk6kOkgs4g+GlaFTapkHKdPEZvqR+viazpZS
+         3CzionjsXg0UvktNTIH4R/2ntnPgUclr3W4wXtGAzawAKpXqML7m1PE7kn8X9iFRkWq/
+         CsNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694517873; x=1695122673;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMSVWfDKGB85VIlcU/SXoOrl8HpXYWQvEmj0v+X5nMk=;
-        b=Dciw4/mXgXNg/zY4f4z6tKEuXKuSJuQlILwQ7VvvSlcp9W/a8N9rFOjwQZg50EUzDv
-         0wRzHIbH9adKu7OIb+tj6cZLyI7yLrehtDI+2dibBEZfZSp+WzZMvthSdyHl2ilbuSvj
-         zKqpYrfs7/emVGGnM0u0GObwe+IdT1Vav36RgEekT4IulS3L4sm84Ewvs3hetbZaJYxs
-         vO0hI5c4bLSo0ib1yiGs76sa5Dz0UWKGG64RncHklWeKcWO+y4jSLXg6F+4ROgwUy8p7
-         jPrNFrDUqktVBkscQjQ+5PYpYJpb+GGQQ3kkaWYtBDSDX27E+0pPVt0auFLkg0Sqxidf
-         H1Yg==
-X-Gm-Message-State: AOJu0Yy3kj1QTF232KoJoGnnMsBs+Y5pixFWUWW1HOrhTYAxQY6E6PH9
-        rsEwBrmyZOMC1jLhsumxsh0=
-X-Google-Smtp-Source: AGHT+IHRQ+XP2QSWJyOSUQyWow6rQ87ODoPQvoTbSEbYMPJhjNZJP92wrhZ3Sji4NXU5czl93lMMog==
-X-Received: by 2002:a17:90a:9f06:b0:26d:ae3:f6a7 with SMTP id n6-20020a17090a9f0600b0026d0ae3f6a7mr10268903pjp.21.1694517873419;
-        Tue, 12 Sep 2023 04:24:33 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 15-20020a17090a1a0f00b002680b2d2ab6sm9767038pjk.19.2023.09.12.04.24.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 04:24:32 -0700 (PDT)
-Message-ID: <d0cf6ba0-94af-2ffc-b086-b90572e5ce98@gmail.com>
-Date:   Tue, 12 Sep 2023 19:24:25 +0800
+        d=1e100.net; s=20230601; t=1694518230; x=1695123030;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F/EKm1PmSvEC7rs4ZxmxgrW2WM6+iO3cGl9uzitMTBI=;
+        b=V7LzSUk47BlzwlwgpQ2PMzBk9uVddvn8X2hJKmOIwvd2UFVqcfa5PSrAgyYJSpt0qe
+         tWmF71xNyIYLVKgLu/qPAj33bckyu7W3yUpmy1l8oA6eKJViwR0vAlVKe8bjB6dDFSHa
+         dmYLRAjOCl/tMT0IadXEg7pGo3Q2efUqOOBmhJIWH334lXJoSXFI2U8Sqmex7Gp1AtpD
+         X8A9BPea2uUsVtBBIa7v1AFJlMkl71anerQTCp4all6WrD+nZyRfTYI83m+aRLlqE5BV
+         N5zSlPp4fpoRFQFYkagTbLb/8WB7mhcrio8nX8UwRF5vKWH05oyrurc/puZ8986jNEp9
+         tOsg==
+X-Gm-Message-State: AOJu0YyCBCRnBajXNt+R/Ih8Bh9jqt5bsYMUBlgdk17LYLg9bVMRhCN5
+        0ZusVjSHv93M0brycYkEfkiKCA==
+X-Google-Smtp-Source: AGHT+IG8ZGVAtPAxgR7LQWZ2H5QWK9SxUmAMBPgezLz6rY0uT5RF0bLMGBo73IIHaakvdDTgoxb9xw==
+X-Received: by 2002:a17:906:53c4:b0:9a5:c9a8:1816 with SMTP id p4-20020a17090653c400b009a5c9a81816mr10949917ejo.58.1694518230392;
+        Tue, 12 Sep 2023 04:30:30 -0700 (PDT)
+Received: from m1x-phil.lan (cou50-h01-176-172-50-150.dsl.sta.abo.bbox.fr. [176.172.50.150])
+        by smtp.gmail.com with ESMTPSA id kj27-20020a170907765b00b0099b5a71b0bfsm6787085ejc.94.2023.09.12.04.30.28
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 12 Sep 2023 04:30:30 -0700 (PDT)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        qemu-ppc@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        Michael Tokarev <mjt@tls.msk.ru>, Greg Kurz <groug@kaod.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH 0/4] target/ppc: Prohibit target specific KVM prototypes on user emulation
+Date:   Tue, 12 Sep 2023 13:30:22 +0200
+Message-ID: <20230912113027.63941-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH 7/9] KVM: x86/pmu: Add fixed counter enumeration for pmu
- v5
-Content-Language: en-US
-To:     Xiong Zhang <xiong.y.zhang@intel.com>
-Cc:     seanjc@google.com, zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com,
-        kan.liang@intel.com, dapeng1.mi@linux.intel.com,
-        kvm@vger.kernel.org
-References: <20230901072809.640175-1-xiong.y.zhang@intel.com>
- <20230901072809.640175-8-xiong.y.zhang@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230901072809.640175-8-xiong.y.zhang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/9/2023 3:28 pm, Xiong Zhang wrote:
-> With Arch PMU v5, CPUID.0AH.ECX is a bit mask which enumerates the
-> supported Fixed Counters. If bit 'i' is set, it implies that Fixed
-> Counter 'i' is supported.
-> 
-> This commit adds CPUID.0AH.ECX emulation for vPMU version 5, KVM
-> supports Fixed Counter enumeration starting from 0 by default,
-> user can modify it through SET_CPUID2 ioctl.
-> 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
->   arch/x86/kvm/cpuid.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 95dc5e8847e0..2bffed010c9e 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1028,7 +1028,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   
->   		entry->eax = eax.full;
->   		entry->ebx = kvm_pmu_cap.events_mask;
-> -		entry->ecx = 0;
-> +		if (kvm_pmu_cap.version < 5)
-> +			entry->ecx = 0;
-> +		else
-> +			entry->ecx = (1ULL << kvm_pmu_cap.num_counters_fixed) - 1;
+Implement Kevin's suggestion to remove KVM declarations
+for user emulation builds, so if KVM prototype are used
+we directly get a compile failure.
 
-If there are partial fixed counters on the host (e.g. L1 host for L2 VM) that 
-are filtered out,
-L1 KVM should not expose unsupported fixed counters in this way.
+Philippe Mathieu-Daudé (4):
+  sysemu/kvm: Restrict kvmppc_get_radix_page_info() to ppc targets
+  target/ppc: Restrict KVM objects to system emulation
+  hw/ppc/e500: Restrict ppce500_init_mpic_kvm() to KVM
+  target/ppc: Prohibit target specific KVM prototypes on user emulation
 
->   		entry->edx = edx.full;
->   		break;
->   	}
+ include/sysemu/kvm.h   |  1 -
+ target/ppc/kvm_ppc.h   |  6 ++++++
+ hw/ppc/e500.c          |  4 ++++
+ target/ppc/kvm-stub.c  | 19 -------------------
+ target/ppc/kvm.c       |  4 ++--
+ target/ppc/meson.build |  2 +-
+ 6 files changed, 13 insertions(+), 23 deletions(-)
+ delete mode 100644 target/ppc/kvm-stub.c
+
+-- 
+2.41.0
+
