@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C63A979CFEB
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 13:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D34A079CFEA
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 13:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234696AbjILLa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 07:30:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42864 "EHLO
+        id S234567AbjILLav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 07:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234607AbjILLag (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 07:30:36 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC05D98
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:31 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a63b2793ecso700274966b.2
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:31 -0700 (PDT)
+        with ESMTP id S232345AbjILLam (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 07:30:42 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22F510D2
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:38 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bcb89b4767so90374381fa.3
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 04:30:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694518230; x=1695123030; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=F/EKm1PmSvEC7rs4ZxmxgrW2WM6+iO3cGl9uzitMTBI=;
-        b=fzJPTDNemPpuK51eIPbE10nBGpxgy+zLwCAcN5WUTlWaimQVSDmrVgFg1iThpr+xO5
-         yXO/W8sM4+G6XqS5WyHH0dF2CGzHFYtMIZZZNG1CsuX8836g8Za0o5fPusEWu1LgynLp
-         WIQFT2M4MHhVV6GR1U4WZQMvyAXTd/IDQ8gEyAL3L9PfBux6sc1pqMSUWJSgENA2zESl
-         L3q4QWD+3i8cv9KRLgQHhQsciGPhnx0Efk6kOkgs4g+GlaFTapkHKdPEZvqR+viazpZS
-         3CzionjsXg0UvktNTIH4R/2ntnPgUclr3W4wXtGAzawAKpXqML7m1PE7kn8X9iFRkWq/
-         CsNQ==
+        d=linaro.org; s=google; t=1694518236; x=1695123036; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=21QMJ7GGkeglUQqOfSInY5x1p67Ji2fztTn3JUMzTjQ=;
+        b=u1kCPa4UR0KdAj+q5r6ikP/fz6yMtAei4/3/fTBR8/YBlAqZFnVu+GTX1LEBUP6ORb
+         gE7QMy5t3Fgl3HRxCEmvKQzdgy0eLfrtOkiLWH4dINk5SQr3UOWQlAOuKXqRvCkYWEBF
+         IjfFM4r8J/g+gED+/dnZWDVEx0FkfHS7AzxWT6pbGet9SsjYuH5+8Dm5M7gl8Kd82tAO
+         X9Hk2bAKX6g2vk33tUsotFWTUNL24vJiZRxcoKttT+VN/toD23fxMdmiILhdvNVMnttQ
+         Tt2M4HCf2iXfqC0szs9ExcxAw279R4eXW1/h4cevk3WP2jJNi8hAaZYm7asocBW7k8GF
+         zOOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694518230; x=1695123030;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F/EKm1PmSvEC7rs4ZxmxgrW2WM6+iO3cGl9uzitMTBI=;
-        b=V7LzSUk47BlzwlwgpQ2PMzBk9uVddvn8X2hJKmOIwvd2UFVqcfa5PSrAgyYJSpt0qe
-         tWmF71xNyIYLVKgLu/qPAj33bckyu7W3yUpmy1l8oA6eKJViwR0vAlVKe8bjB6dDFSHa
-         dmYLRAjOCl/tMT0IadXEg7pGo3Q2efUqOOBmhJIWH334lXJoSXFI2U8Sqmex7Gp1AtpD
-         X8A9BPea2uUsVtBBIa7v1AFJlMkl71anerQTCp4all6WrD+nZyRfTYI83m+aRLlqE5BV
-         N5zSlPp4fpoRFQFYkagTbLb/8WB7mhcrio8nX8UwRF5vKWH05oyrurc/puZ8986jNEp9
-         tOsg==
-X-Gm-Message-State: AOJu0YyCBCRnBajXNt+R/Ih8Bh9jqt5bsYMUBlgdk17LYLg9bVMRhCN5
-        0ZusVjSHv93M0brycYkEfkiKCA==
-X-Google-Smtp-Source: AGHT+IG8ZGVAtPAxgR7LQWZ2H5QWK9SxUmAMBPgezLz6rY0uT5RF0bLMGBo73IIHaakvdDTgoxb9xw==
-X-Received: by 2002:a17:906:53c4:b0:9a5:c9a8:1816 with SMTP id p4-20020a17090653c400b009a5c9a81816mr10949917ejo.58.1694518230392;
-        Tue, 12 Sep 2023 04:30:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694518236; x=1695123036;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=21QMJ7GGkeglUQqOfSInY5x1p67Ji2fztTn3JUMzTjQ=;
+        b=FQn+Z0ILShQanay2B/mJFR4ZwTX4xrHZkgZd6T8Dvve9wvBQFYmAUMt0q8p7daBb87
+         Rqt8UxO47H1k/ExoZ0DrVrhiq2QPeufGT5y4Z2nAM8IuX25frzHCKgi80ecdePZDezkX
+         LVCoYi1DHmRZwn2jjfX3nLLYFrAO4LDdXsQeFTnn0jsIGtv8uMXL36pFK3JErYaxcD1X
+         oHatKKDEGACW+RK0FQEOcypkZ0YMIT7g7gawRfdN/KqzXSmwSjn1DAQUsI+u3rgZ7fID
+         vPnFb8KXzjA6vb2aRxB7PtdcENMdT1WshQIjJoC+l9Q7tffjGoQa4yAC/MfZyRl8Hrvi
+         K83g==
+X-Gm-Message-State: AOJu0YwwQupjFGIw4mj4QpIdMBJkSO0A/NlZfIf4AWAFuPpzFNxrdF3p
+        LmC4cXtfh2xnvRE47UJ9O09rHz5EWOPEe1S42o8=
+X-Google-Smtp-Source: AGHT+IGrmkxUF4fF6+bNXffo8F8gG9e/Ung4GKdfh9dcnF2dShXSPiBar0HZ/5nMx033pCom6oSwBw==
+X-Received: by 2002:a2e:7c1a:0:b0:2bc:c846:aa17 with SMTP id x26-20020a2e7c1a000000b002bcc846aa17mr10295292ljc.41.1694518236658;
+        Tue, 12 Sep 2023 04:30:36 -0700 (PDT)
 Received: from m1x-phil.lan (cou50-h01-176-172-50-150.dsl.sta.abo.bbox.fr. [176.172.50.150])
-        by smtp.gmail.com with ESMTPSA id kj27-20020a170907765b00b0099b5a71b0bfsm6787085ejc.94.2023.09.12.04.30.28
+        by smtp.gmail.com with ESMTPSA id l26-20020a1709061c5a00b009894b476310sm6628964ejg.163.2023.09.12.04.30.34
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 12 Sep 2023 04:30:30 -0700 (PDT)
+        Tue, 12 Sep 2023 04:30:36 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Nicholas Piggin <npiggin@gmail.com>,
@@ -61,36 +62,78 @@ Cc:     Nicholas Piggin <npiggin@gmail.com>,
         =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
         Michael Tokarev <mjt@tls.msk.ru>, Greg Kurz <groug@kaod.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 0/4] target/ppc: Prohibit target specific KVM prototypes on user emulation
-Date:   Tue, 12 Sep 2023 13:30:22 +0200
-Message-ID: <20230912113027.63941-1-philmd@linaro.org>
+Subject: [PATCH 1/4] sysemu/kvm: Restrict kvmppc_get_radix_page_info() to ppc targets
+Date:   Tue, 12 Sep 2023 13:30:23 +0200
+Message-ID: <20230912113027.63941-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230912113027.63941-1-philmd@linaro.org>
+References: <20230912113027.63941-1-philmd@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement Kevin's suggestion to remove KVM declarations
-for user emulation builds, so if KVM prototype are used
-we directly get a compile failure.
+kvm_get_radix_page_info() is only defined for ppc targets (in
+target/ppc/kvm.c). The declaration is not useful in other targets.
+Rename using the 'kvmppc_' prefix following other declarations
+from target/ppc/kvm_ppc.h.
 
-Philippe Mathieu-Daudé (4):
-  sysemu/kvm: Restrict kvmppc_get_radix_page_info() to ppc targets
-  target/ppc: Restrict KVM objects to system emulation
-  hw/ppc/e500: Restrict ppce500_init_mpic_kvm() to KVM
-  target/ppc: Prohibit target specific KVM prototypes on user emulation
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ include/sysemu/kvm.h | 1 -
+ target/ppc/kvm_ppc.h | 2 ++
+ target/ppc/kvm.c     | 4 ++--
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
- include/sysemu/kvm.h   |  1 -
- target/ppc/kvm_ppc.h   |  6 ++++++
- hw/ppc/e500.c          |  4 ++++
- target/ppc/kvm-stub.c  | 19 -------------------
- target/ppc/kvm.c       |  4 ++--
- target/ppc/meson.build |  2 +-
- 6 files changed, 13 insertions(+), 23 deletions(-)
- delete mode 100644 target/ppc/kvm-stub.c
-
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index ee9025f8e9..3bcd8f45be 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -551,7 +551,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
+  * Returns: 0 on success, or a negative errno on failure.
+  */
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+-struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+ int kvm_get_max_memslots(void);
+ 
+ /* Notify resamplefd for EOI of specific interrupts. */
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 6a4dd9c560..440e93f923 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -89,6 +89,8 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
+ 
+ int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
+ 
++struct ppc_radix_page_info *kvmppc_get_radix_page_info(void);
++
+ #define kvmppc_eieio() \
+     do {                                          \
+         if (kvm_enabled()) {                          \
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 51112bd367..a58708cdfc 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -268,7 +268,7 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
+                      "KVM failed to provide the MMU features it supports");
+ }
+ 
+-struct ppc_radix_page_info *kvm_get_radix_page_info(void)
++struct ppc_radix_page_info *kvmppc_get_radix_page_info(void)
+ {
+     KVMState *s = KVM_STATE(current_accel());
+     struct ppc_radix_page_info *radix_page_info;
+@@ -2372,7 +2372,7 @@ static void kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+     }
+ 
+ #if defined(TARGET_PPC64)
+-    pcc->radix_page_info = kvm_get_radix_page_info();
++    pcc->radix_page_info = kvmppc_get_radix_page_info();
+ 
+     if ((pcc->pvr & 0xffffff00) == CPU_POWERPC_POWER9_DD1) {
+         /*
 -- 
 2.41.0
 
