@@ -2,122 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 895D979D710
-	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 19:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09FFB79D72F
+	for <lists+kvm@lfdr.de>; Tue, 12 Sep 2023 19:07:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231514AbjILRCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 13:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32880 "EHLO
+        id S236662AbjILRHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 13:07:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236687AbjILRCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 13:02:13 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C7A031728;
-        Tue, 12 Sep 2023 10:02:08 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B803CC15;
-        Tue, 12 Sep 2023 10:02:45 -0700 (PDT)
-Received: from [10.1.197.60] (eglon.cambridge.arm.com [10.1.197.60])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 431A73F738;
-        Tue, 12 Sep 2023 10:02:03 -0700 (PDT)
-Message-ID: <3ad03f27-1f2b-a79f-130d-afb9e713fa70@arm.com>
-Date:   Tue, 12 Sep 2023 18:01:43 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [RFC PATCH 30/32] KVM: arm64: Pass PSCI calls to userspace
-Content-Language: en-GB
-To:     Salil Mehta <salil.mehta@huawei.com>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Cc:     Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S236656AbjILRH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 13:07:27 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABDB3E7A
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 10:07:23 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-68fb0b81151so4646055b3a.1
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 10:07:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694538443; x=1695143243; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/3BcICV5TcaAp/tV1Z+AiMSUHHNst5J2lkKv8Z8FT38=;
+        b=KKNi4s5FuRLHsFw73lytoakbGpwTRaZQtiXxRzNZ54teDXsAuemN2EWCJTqZHjtxnK
+         Q1+Qc62g6TzL1K6vkq1SHVRoqz65SntVWvk4neqH8P9e1X5YOeHlNInP2dAF0NpE6F5D
+         T+FLUbe7njwpjkdco4TgT49nsmATFNbzfSgxlKRp3rnbrvwYOxpZG9IfCU470ocYC2/T
+         sWgmw0A86OP1EHfDfY8Qq6Q6yugAlhafp2fRd2mWHJ2w/Jln10Soh23LDVHN29CyW37L
+         uE2ledLUb7VilpYG48fDhoqQ3IVg/csReiezmAeKDKzNvjMfNPthgqOTY/kstzS9CQUs
+         p/2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694538443; x=1695143243;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/3BcICV5TcaAp/tV1Z+AiMSUHHNst5J2lkKv8Z8FT38=;
+        b=uO+B99T4cdsPaCc24nHG5fnF/pWTJr13f9RLwron+0oe49NyPcCql0QRPiIoLkpUIv
+         /Hy8peHImtXoXOLreff6mNttZm7qiJ0Mp/sotKHQfN6QbV8lHVjzDNFcCA1SFeDifuHe
+         Ye/4UbhGTnZOURlISjL0oz4Z1CopX+hO6f7MgYc6MC/5bIDjm2+dOa/RKQMcY1uCcCIb
+         q681PUlpltMGXMGYpQnyKuoueqE5CHJVXyrKj2iSV9W+0sCNiGIf/MtWJCkqfRDf9JSS
+         d7JslwmKsd+AyHZTjnFAJ0SXcHaHqkZxERWSBij1Hek8jY6A9MJIov+G1kIcZdOHl4cL
+         nvuA==
+X-Gm-Message-State: AOJu0YwWo0BAHOkYdBPpLZ3+jKsFhz9w1O4zGipWhsN+mxBSqxqJBjJ8
+        qsCr6fIKxPt5vj1ZPcJIxdnxpOoYb2I=
+X-Google-Smtp-Source: AGHT+IGM3S4koFEdiAG0hKnMNdDHnWEexRx81djDvqAfRBC8MvDyYp+FSUsfdhGQL7QVMW4+/pnRlnKrycw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:188b:b0:68f:cb69:8e76 with SMTP id
+ x11-20020a056a00188b00b0068fcb698e76mr95817pfh.2.1694538443136; Tue, 12 Sep
+ 2023 10:07:23 -0700 (PDT)
+Date:   Tue, 12 Sep 2023 10:07:20 -0700
+In-Reply-To: <20230912161518.199484-1-hshan@google.com>
+Mime-Version: 1.0
+References: <20230912161518.199484-1-hshan@google.com>
+Message-ID: <ZQCayNY+8PYvfc40@google.com>
+Subject: Re: [PATCH] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
+From:   Sean Christopherson <seanjc@google.com>
+To:     Haitao Shan <hshan@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Len Brown <lenb@kernel.org>,
-        Rafael Wysocki <rafael@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Russell King <linux@armlinux.org.uk>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <20230203135043.409192-31-james.morse@arm.com>
- <7e182886f20044d09d5b269cb6224af7@huawei.com>
-From:   James Morse <james.morse@arm.com>
-In-Reply-To: <7e182886f20044d09d5b269cb6224af7@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Salil,
+On Tue, Sep 12, 2023, Haitao Shan wrote:
+> This issue exists in kernel version 6.3-rc1 or above. The issue is
+> introduced by the commit 8e6ed96cdd50 ("KVM: x86: fire timer when it is
+> migrated and expired, and in oneshot mode"). The issue occurs on Intel
+> platform which APIC virtualization and posted interrupt processing.
 
-On 23/05/2023 10:32, Salil Mehta wrote:
->> From: James Morse <james.morse@arm.com>
->> Sent: Friday, February 3, 2023 1:51 PM
->> To: linux-pm@vger.kernel.org; loongarch@lists.linux.dev;
->> kvmarm@lists.linux.dev; kvm@vger.kernel.org; linux-acpi@vger.kernel.org;
->> linux-arch@vger.kernel.org; linux-ia64@vger.kernel.org; linux-
->> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
->> x86@kernel.org
+I think the bug was actually introduced by:
+
+  967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
+
+Fixing the "deadline <= 0" handling just made it much easier to be hit.  E.g. if
+the deadline was '1' during restore, set_target_expiration() would set tscdeadline
+to T1+(1*N), where T1 is the current TSC and N is the multipler to get from nanoseconds
+to cycles.  start_sw_tscdeadline() (or vmx_set_hv_timer()) would then reread the
+TSC (call it T2), see T2 > T1+(1*N), and mark the timer as expired.
+
+> The issue is first discovered when running the Android Emulator which
+> is based on QEMU 2.12. I can reproduce the issue with QEMU 8.0.4 in
+> Debian 12.
+
+The above is helpful as extra context, but repeating "This issue" and "The issue"
+over and over without ever actually describing what the issue actualy is makes it
+quite difficult to understand what is actually being fixed.
+
+> With the above commit, the timer gets fired immediately inside the
+> KVM_SET_LAPIC call when loading the snapshot. On such Intel platforms,
+> this eventually leads to setting the corresponding PIR bit. However,
+> the whole PIR bits get cleared later in the same KVM_SET_LAPIC call.
+> Missing lapic timer interrupt freeze the guest kernel.
+
+Please phrase changelogs as commands and state what is actually being changed.
+Again, the context on what is broken is helpful, but the changelog really, really
+needs to state what is being changed.
+
+> Signed-off-by: Haitao Shan <hshan@google.com>
+> ---
+>  arch/x86/kvm/lapic.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> [...]
-> 
-> 
->>
->> When the KVM_CAP_ARM_PSCI_TO_USER capability is available, userspace can
->> request to handle PSCI calls.
->>
->> This is required for virtual CPU hotplug to allow the VMM to enforce the
->> online/offline policy it has advertised via ACPI. By managing PSCI in
->> user-space, the VMM is able to return PSCI_DENIED when the guest attempts
->> to bring a disabled vCPU online.
->> Without this, the VMM is only able to not-run the vCPU, the kernel will
->> have already returned PSCI_SUCCESS to the guest. This results in
->> timeouts during boot as the OS must wait for the secondary vCPU.
->>
->> SMCCC probe requires PSCI v1.x. If userspace only implements PSCI v0.2,
->> the guest won't query SMCCC support through PSCI and won't use the
->> spectre workarounds. We could hijack PSCI_VERSION and pretend to support
->> v1.0 if userspace does not, then handle all v1.0 calls ourselves
->> (including guessing the PSCI feature set implemented by the guest), but
->> that seems unnecessary. After all the API already allows userspace to
->> force a version lower than v1.0 using the firmware pseudo-registers.
->>
->> The KVM_REG_ARM_PSCI_VERSION pseudo-register currently resets to either
->> v0.1 if userspace doesn't set KVM_ARM_VCPU_PSCI_0_2, or
->> KVM_ARM_PSCI_LATEST (1.0).
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index a983a16163b1..6f73406b875a 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2977,14 +2977,14 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>  	apic_update_lvtt(apic);
+>  	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>  	update_divide_count(apic);
+> -	__start_apic_timer(apic, APIC_TMCCT);
+> -	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
+>  	kvm_apic_update_apicv(vcpu);
+>  	if (apic->apicv_active) {
+>  		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
+>  		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
+>  		static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
+>  	}
+> +	__start_apic_timer(apic, APIC_TMCCT);
+> +	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
 
-> I just saw the latest PSCI standard issue (Mar 2023 E Non-Confidential
-> PSCI 1.2 issue E) and it contains the DENIED return value for the CPU_ON. 
-> 
-> Should we *explicitly* check for PSCI 1.2 support before allowing vCPU
-> Hot plug support? For this we would need KVM changes.
+I don't think this is the ordering we want.  It currently works, but it subtly
+"relies" on a few things:
 
-The VMM should certainly check which version of PSCI it supports, to make sure it doesn't
-return an error code that the spec says that version of PSCI doesn't use.
+  1. That vmx_deliver_posted_interrupt() never "fails" when APICv is enabled,
+     i.e. never puts the interrupt in the IRR instead of the PIR.
 
-Moving the PSCI support to the VMM is a pre-requisite for supporting this mechanism,
-otherwise KVM will allow the CPUs to come online immediately.
+  2. The SVM, a.k.a. AVIC, doesn't ever sync from the IRR to a separate "hardware"
+     virtual APIC, because unlike VMX, SVM does set the bit in the IRR.
 
+I doubt #2 will ever change simply because that's tied to how AVIC works, and #1
+shouldn't actually break anything since the fallback path in vmx_deliver_interrupt()
+needs to be self-sufficient, but I don't like that the code syncs from the IRR and
+_then_ potentially modifies the IRR.
 
-Thanks,
+I also don't like doing additional APIC state restoration _after_ invoking the
+post_state_restore() hook.  Updating APICv in the middle of the restore flow is
+going to be brittle and difficult to maintain, e.g. it won't be obvious what
+needs to go before and what needs to go after.
 
-James
+IMO, vmx_apicv_post_state_restore() is blatantly broken.  It is most definitely
+not doing "post state restore" stuff, it's simply purging state, i.e. belongs in
+a "pre state restore" hook.
+
+So rather than shuffle around the timer code, I think we should instead add yet
+another kvm_x86_ops hook, e.g. apicv_pre_state_restore(), and have initialize
+the PI descriptor there.
+
+Aha!  And I think the new apicv_pre_state_restore() needs to be invoked even if
+APICv is not active, because I don't see anything that purges the PIR when APICv
+is enabled.  VMX's APICv doesn't have many inhibits that can go away, and I
+highly doubt userspace will restore into a vCPU with pending posted interrupts,
+so in practice this is _extremely_ unlikely to be problematic.  But it's still
+wrong.
