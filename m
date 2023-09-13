@@ -2,108 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77AAF79F060
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E21E79F067
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230301AbjIMR2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 13:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
+        id S231351AbjIMRaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 13:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjIMR2F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 13:28:05 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A533A9E
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:28:01 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-501bef6e0d3so41954e87.1
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694626079; x=1695230879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p+DqPIsZFtugl3Ebs9kY786FjdhqhI/ka8Sx6QaBhio=;
-        b=1oAj8c2sFgUTYJ5HDIPliN0DLZTFvsjai8OaW7Ox5Q9xOjP6RGUiy2LqJ9xuSW17aE
-         mJnTPY8paOEgcoRzE97BjINBUyoZEcg8N8XGbj9bRBFAX5XpSGxpyAvBiI7SJQu5Ejuo
-         1K6aHwl54ia52EejBUIxA5vuSUi7eoBT0ZcP2gCOacVG0sHrWPRGXMLQTFkNaSeH0S9N
-         lvx6wJNzEsjy0ACOkPdi0azsLIsUFNSgl0IOjzyGU+O/DpUB8zawiXkuVuKxHIzZR68r
-         z7l02IGLvAQuedIMEudZh4zQ+DohZ6ObkZk00JfzhqzvF1veWOij85S3ZCGbH35xqLNb
-         n2nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694626079; x=1695230879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p+DqPIsZFtugl3Ebs9kY786FjdhqhI/ka8Sx6QaBhio=;
-        b=wO79vqJrvaRe19RXCUUq2xeFfkA9Xr9lHevjSNo4lcj83yOd+9WNxtX4EEgQar6oV0
-         qavFu863U8f7Q0/CCzN84YXoWuwVwPdZ+bzImV/SlWxxb5YM5f4SoQzDUbVdCHsTpl5p
-         a1m9H8DoJHzyc/Mh7B9RrywFPtlJyN3nvk7vUpjTSHthMryDWvpAuW6toKGqI47eQl3e
-         kIHg1CBernetWzc7K3SXhs8EFl1A0g22XXkWnumuiLUbXgjOrc9MMKhjys+IDl4IEC46
-         jhBR6Obh71RngTNVwq154gxDlg6emlo5DAdu8Tq0naW0gix0+5CJQ4wLnxcNTGFWCuvM
-         Ys8A==
-X-Gm-Message-State: AOJu0YzD5hIkg2j4mNoUx7vkpv42FXhUuTNuv7BX2vpdSIRi0pFqMW84
-        TY2HCSpC+dvfJgfbZX20luHFq9PuwSwjJgF922zUHA==
-X-Google-Smtp-Source: AGHT+IG/2Y7iXKR9nHNNQNTdoe9u3xhm8Pd9RnXoAkxXl8ypYqri5so/4BxjbptLDpNYM72GX6LWhvrdQBvyUpVkTBU=
-X-Received: by 2002:a19:6415:0:b0:500:9de4:5968 with SMTP id
- y21-20020a196415000000b005009de45968mr2330866lfb.59.1694626079514; Wed, 13
- Sep 2023 10:27:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230913165645.2319017-1-oliver.upton@linux.dev>
-In-Reply-To: <20230913165645.2319017-1-oliver.upton@linux.dev>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 13 Sep 2023 10:27:46 -0700
-Message-ID: <CAAdAUtgsWwH5gfxnU38m4pEddXAYUtwGE4arSEYDJw9cqPRoLQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Don't use kerneldoc comment for arm64_check_features()
-To:     Oliver Upton <oliver.upton@linux.dev>
+        with ESMTP id S229923AbjIMRaO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 13:30:14 -0400
+Received: from out-223.mta1.migadu.com (out-223.mta1.migadu.com [IPv6:2001:41d0:203:375::df])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A00FDC
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:30:10 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 17:30:03 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1694626209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2jxXuDsdxHjvkm94f22PEQvZk32OEtTjBlaxJsBMLbI=;
+        b=c6QvLNV30cJqCkCX7oLBhgkG42dkPQdepaLwLCGf4Nn1+mCXbT8eTbHs5H6L5w5rjL5rJQ
+        TxE2q8GVA8+z3twT2/ZJ1iM6czH3S4wEm9kNEbu0wfzZ6aaxafm5AYIh4iMRo4oyQMkGAy
+        bNyxYeZyI163al5tNrlTnsuXODecGvk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        zhukeqian1@huawei.com, jonathan.cameron@huawei.com,
+        linuxarm@huawei.com
+Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
+Message-ID: <ZQHxm+L890yTpY91@linux.dev>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+Hi Shameer,
 
-On Wed, Sep 13, 2023 at 9:56=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> A double-asterisk opening mark to the comment (i.e. '/**') indicates a
-> comment block is in the kerneldoc format. There's automation in place to
-> validate that kerneldoc blocks actually adhere to the formatting rules.
->
-> The function comment for arm64_check_features() isn't kerneldoc; use a
-> 'regular' comment to silence automation warnings.
->
-> Link: https://lore.kernel.org/all/202309112251.e25LqfcK-lkp@intel.com/
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e92ec810d449..818a52e257ed 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1228,7 +1228,7 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const s=
-truct arm64_ftr_bits *ftrp,
->         return arm64_ftr_safe_value(&kvm_ftr, new, cur);
->  }
->
-> -/**
-> +/*
+On Fri, Aug 25, 2023 at 10:35:20AM +0100, Shameer Kolothum wrote:
+> Hi,
+> 
+> This is to revive the RFC series[1], which makes use of hardware dirty
+> bit modifier(DBM) feature(FEAT_HAFDBS) for dirty page tracking, sent
+> out by Zhu Keqian sometime back.
+> 
+> One of the main drawbacks in using the hardware DBM feature for dirty
+> page tracking is the additional overhead in scanning the PTEs for dirty
+> pages[2]. Also there are no vCPU page faults when we set the DBM bit,
+> which may result in higher convergence time during guest migration. 
+> 
+> This series tries to reduce these overheads by not setting the
+> DBM for all the writeable pages during migration and instead uses a
+> combined software(current page fault mechanism) and hardware approach
+> (set DBM) for dirty page tracking.
+> 
+> As noted in RFC v1[1],
+> "The core idea is that we do not enable hardware dirty at start (do not
+> add DBM bit). When an arbitrary PT occurs fault, we execute soft tracking
+> for this PT and enable hardware tracking for its *nearby* PTs (e.g. Add
+> DBM bit for nearby 64PTs). Then when sync dirty log, we have known all
+> PTs with hardware dirty enabled, so we do not need to scan all PTs."
 
-Thanks for the fix.
-Jing
+I'm unconvinced of the value of such a change.
 
->   * arm64_check_features() - Check if a feature register value constitute=
-s
->   * a subset of features indicated by the idreg's KVM sanitised limit.
->   *
->
-> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-> --
-> 2.42.0.459.ge4e396fd5e-goog
->
+What you're proposing here is complicated and I fear not easily
+maintainable. Keeping the *two* sources of dirty state seems likely to
+fail (eventually) with some very unfortunate consequences.
+
+The optimization of enabling DBM on neighboring PTEs is presumptive of
+the guest access pattern and could incur unnecessary scans of the
+stage-2 page table w/ a sufficiently sparse guest access pattern.
+
+> Tests with dirty_log_perf_test with anonymous THP pages shows significant
+> improvement in "dirty memory time" as expected but with a hit on
+> "get dirty time" .
+> 
+> ./dirty_log_perf_test -b 512MB -v 96 -i 5 -m 2 -s anonymous_thp
+> 
+> +---------------------------+----------------+------------------+
+> |                           |   6.5-rc5      | 6.5-rc5 + series |
+> |                           |     (s)        |       (s)        |
+> +---------------------------+----------------+------------------+
+> |    dirty memory time      |    4.22        |          0.41    |
+> |    get dirty log time     |    0.00047     |          3.25    |
+> |    clear dirty log time   |    0.48        |          0.98    |
+> +---------------------------------------------------------------+
+
+The vCPU:memory ratio you're testing doesn't seem representative of what
+a typical cloud provider would be configuring, and the dirty log
+collection is going to scale linearly with the size of guest memory.
+
+Slow dirty log collection is going to matter a lot for VM blackout,
+which from experience tends to be the most sensitive period of live
+migration for guest workloads.
+
+At least in our testing, the split GET/CLEAR dirty log ioctls
+dramatically improved the performance of a write-protection based ditry
+tracking scheme, as the false positive rate for dirtied pages is
+significantly reduced. FWIW, this is what we use for doing LM on arm64 as
+opposed to the D-bit implemenation that we use on x86.
+       
+> In order to get some idea on actual live migration performance,
+> I created a VM (96vCPUs, 1GB), ran a redis-benchmark test and
+> while the test was in progress initiated live migration(local).
+> 
+> redis-benchmark -t set -c 900 -n 5000000 --threads 96
+> 
+> Average of 5 runs shows that benchmark finishes ~10% faster with
+> a ~8% increase in "total time" for migration.
+> 
+> +---------------------------+----------------+------------------+
+> |                           |   6.5-rc5      | 6.5-rc5 + series |
+> |                           |     (s)        |    (s)           |
+> +---------------------------+----------------+------------------+
+> | [redis]5000000 requests in|    79.428      |      71.49       |
+> | [info migrate]total time  |    8438        |      9097        |
+> +---------------------------------------------------------------+
+
+Faster pre-copy performance would help the benchmark complete faster,
+but the goal for a live migration should be to minimize the lost
+computation for the entire operation. You'd need to test with a
+continuous workload rather than one with a finite amount of work.
+
+Also, do you know what live migration scheme you're using here?
+
+-- 
+Thanks,
+Oliver
