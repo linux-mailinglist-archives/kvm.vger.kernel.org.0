@@ -2,43 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9025979EA77
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 16:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8B7979EAAD
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 16:13:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241222AbjIMOIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 10:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47412 "EHLO
+        id S241571AbjIMOLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 10:11:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231767AbjIMOIl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 10:08:41 -0400
+        with ESMTP id S241287AbjIMOKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 10:10:23 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407B919B1
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 07:08:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7219115
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 07:09:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=jxt9bxGK7CKorrjungcwO4FK3/65JKMsEjvBJMfHGfE=; b=CJR5y/quBvUtHuNGwcdE58puqO
-        Ica5/nFJpJ7uxsvSP3pYDgjX3w2XJOa5IfRdtET1jAdXsJ8elllUZvVg1xwKOnYR5aBRpm54rO1cQ
-        rCa2iqXV9F+hQc36ik1UtrYs0AInPDX5ig43Zu2EuTZs8AUVcLGIDBiB/NgHyDI0k/s6XN2DhYiEh
-        mVnMH9TnmmGFElJm+mdP7SYvkGdDw0Qg4mpvrwE/OjmRLGn8YZu7UL3WiBpQ11isIvC51MrcNh648
-        NLBCvK+IGR4ugpx78QxdB3vvIJclwrAELHCC5Lij2yZi5pFkI9RE3B0L/FN/LjUelfgA1BRLLJdvH
-        vUwlgHZA==;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=B9YbSReDQZMxU7crd3Ch0dYPxCZmEojAT2G7KeE1NxY=; b=E64lG3aUtH/BfoD5tjaTCVEOmv
+        7C93Mf91NBn3q2gniAjh09Un3ptiErDEUrtF4IwPolWvDGC9iOOpcTxngdLn2+3QFy0fWF24vM0U9
+        Zix4bNty0/ARvbIQc1rznvdV+C9wxLZidbGoDVds1YMLN/o8EVNYal6ZkPfBPwoj9u2THceag1WWf
+        e8/cnImiCi5Kz5TEyWeyweaRpTgxISoRahBwXm2RyPryUT2/8ogZhrPM1kEbQmOJZAFm6gnSzDukI
+        qy8w9LC8avMEaEyiUjp2xxXMIVtXQCnE1lbBFAsX4WGBm/j9UowIsekWXpQ8Sd94Ud36hJ2mGAuRz
+        DwZgh0QQ==;
 Received: from [54.239.6.187] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgQXX-00EGyd-R0; Wed, 13 Sep 2023 14:08:24 +0000
-Message-ID: <13f256ad95de186e3b6bcfcc1f88da5d0ad0cb71.camel@infradead.org>
-Subject: [RFC] KVM: x86: Add KVM_VCPU_TSC_SCALE and fix the documentation on
- TSC migration
+        id 1qgQY1-00EH0y-Ow; Wed, 13 Sep 2023 14:08:53 +0000
+Message-ID: <f2b86e0268bc33bba26fc1466538617791bd3f80.camel@infradead.org>
+Subject: Re: [PATCH v2] KVM: x86: add KVM_VCPU_TSC_VALUE attribute
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org
-Cc:     dff@amazon.com, jmattson@google.com, joro@8bytes.org,
-        oupton@google.com, pbonzini@redhat.com, seanjc@google.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Simon Veith <sveith@amazon.de>
-Date:   Wed, 13 Sep 2023 16:08:22 +0200
+Cc:     dff@amazon.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, oupton@google.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com
+Date:   Wed, 13 Sep 2023 16:08:52 +0200
+In-Reply-To: <723bf800-9666-dfb6-e7cc-653adb0203b4@redhat.com>
+References: <f3a957786a82bdd41fe558c40ec93c3fb9ea2ee2.camel@infradead.org>
+         <20230202165950.483430-1-sveith@amazon.de> <ZBIjImc+xEMhJkQM@google.com>
+         <723bf800-9666-dfb6-e7cc-653adb0203b4@redhat.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-bwLX6QE0uIzu4DGIIUUs"
+        boundary="=-Qs+pMiylBCQXEHmfepzs"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -47,228 +51,43 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-bwLX6QE0uIzu4DGIIUUs
+--=-Qs+pMiylBCQXEHmfepzs
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, 2023-03-24 at 12:22 +0100, Paolo Bonzini wrote:
+> On 3/15/23 20:57, Sean Christopherson wrote:
+> > > In the case of live migration, using the KVM_VCPU_TSC_OFFSET approach=
+ to
+> > > preserve the TSC value and apply a known offset would require
+> > > duplicating the TSC scaling computations in userspace to account for
+> > > frequency differences between source and destination TSCs.
+> > >=20
+> > > Hence, if userspace wants to set the TSC to some known value without
+> > > having to deal with TSC scaling, and while also being resilient again=
+st
+> > > scheduling delays, neither KVM_SET_MSRS nor KVM_VCPU_TSC_VALUE are
+> > > suitable options.
+> >=20
+> > Requiring userspace to handle certain aspects of TSC scaling doesn't se=
+em
+> > particularly onerous, at least not relative to all the other time insan=
+ity.=C2=A0 In
+> > other words, why should KVM take on more complexity and a mostly-redund=
+ant uAPI?
+>=20
+> Yeah, it seems like the problem is that KVM_GET_CLOCK return host=20
+> unscaled TSC units (which was done because the guest TSC frequency is at=
+=20
+> least in theory per-CPU, and KVM_GET_CLOCK is a vm ioctl)?
+>=20
+> Perhaps it's more important (uAPI-wise) for KVM to return the precise
+> guest/host TSC ratio via a vcpu device attribute?
 
-The documentation on TSC migration using KVM_VCPU_TSC_OFFSET is woefully
-inadequate. It ignores TSC scaling, and ignores the fact that the host
-TSC may differ from one host to the next (and in fact because of the way
-the kernel calibrates it, it generally differs from one boot to the next
-even on the same hardware).
+Perhaps. Although that really does suck as a userspace experience. See
+the patch I just sent.
 
-Add KVM_VCPU_TSC_SCALE to extract the actual scale ratio and frac_bits,
-and attempt to document the *awful* process that we're requiring userspace
-to follow to merely preserve the TSC across migration.
-
-I may have thrown up in my mouth a little when writing that documentation.
-It's an awful API. If we do this, we should be ashamed of ourselves.
-(I also haven't tested the documented process yet).
-
-Let's use Simon's KVM_VCPU_TSC_VALUE instead.
-https://lore.kernel.org/all/20230202165950.483430-1-sveith@amazon.de/
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- Documentation/virt/kvm/devices/vcpu.rst | 80 ++++++++++++++++++++-----
- arch/x86/include/uapi/asm/kvm.h         |  6 ++
- arch/x86/kvm/x86.c                      | 15 +++++
- 3 files changed, 86 insertions(+), 15 deletions(-)
-
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/k=
-vm/devices/vcpu.rst
-index 31f14ec4a65b..b6b6e4b98744 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -216,9 +216,11 @@ Returns:
- Specifies the guest's TSC offset relative to the host's TSC. The guest's
- TSC is then derived by the following equation:
-=20
--  guest_tsc =3D host_tsc + KVM_VCPU_TSC_OFFSET
-+  guest_tsc =3D (( host_tsc * tsc_scale_ratio ) >> tsc_scale_bits ) + KVM_=
-VCPU_TSC_OFFSET
-=20
--This attribute is useful to adjust the guest's TSC on live migration,
-+The value of tsc_scale_bits is 48 on Intel and 32 on AMD. You can calculat=
-e
-+tsc_scale_ratio as (... where you might be able to botain tsc_scale_bits f=
-rom debugfs
-+  if you're luckyThis attribute is useful to adjust the guest's TSC on liv=
-e migration,
- so that the TSC counts the time during which the VM was paused. The
- following describes a possible algorithm to use for this purpose.
-=20
-@@ -234,9 +236,19 @@ From the source VMM process:
- 3. Invoke the KVM_GET_TSC_KHZ ioctl to record the frequency of the
-    guest's TSC (freq).
-=20
-+4. Read the KVM_VCPU_TSC_SCALE attribute for each vCPU to obtain the
-+   src_tsc_ratio[i] and src_tsc_frac_bits[i] values.
-+
-+5. For each vCPU[i], calculate the guest TSC value (guest_tsc_src) at time
-+   [guest_src] in guest KVM time. This is calculated by the formula:
-+      guest_tsc_src[i] =3D ((tsc_src * src_tsc_ratio[i]) >> src_tsc_frac_b=
-its[i]) + ofs_src[i]
-+
- From the destination VMM process:
-=20
--4. Invoke the KVM_SET_CLOCK ioctl, providing the source nanoseconds from
-+6. Invoke the KVM_SET_TSC_KHZ ioctl to set the scaled frequency of the
-+   guest's TSC (freq).
-+
-+7. Invoke the KVM_SET_CLOCK ioctl, providing the source nanoseconds from
-    kvmclock (guest_src) and CLOCK_REALTIME (host_src) in their respective
-    fields.  Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-    structure.
-@@ -248,20 +260,58 @@ From the destination VMM process:
-    between the source pausing the VMs and the destination executing
-    steps 4-7.
-=20
--5. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (tsc_dest) and
-+8. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (tsc_dest) and
-    kvmclock nanoseconds (guest_dest).
-=20
--6. Adjust the guest TSC offsets for every vCPU to account for (1) time
--   elapsed since recording state and (2) difference in TSCs between the
--   source and destination machine:
-+9. Read the KVM_VCPU_TSC_SCALE attribute for each vCPU to obtain the
-+   dest_tsc_ratio[i] and dest_tsc_frac_bits[i] values.
-+
-+10. For each vCPU[i], calculate the guest TSC value (guest_src_dest) at ti=
-me
-+    [guest_dest] in guest KVM time, as follows:
-+       guest_tsc_dest[i] =3D guest_tsc_src[i] + (guest_dest - guest_src) /=
- (1000000 * freq)
-+
-+11. For each vcpu[i], calculate what KVM will use internally as the scaled
-+    guest time _before_ offsetting at time [guest_dest]:
-+       raw_guest_tsc_dest[i] =3D (tsc_dest * dest_tsc_ratio[i]) >> dest_ts=
-c_frac_bits[i]
-+
-+12. Calculate the post-scaling guest TSC offsets for every vCPU to account
-+    for the difference between the raw scaled value and the intended value=
-:
-+
-+       ofs_dst[i] =3D guest_tsc_dest[i] - raw_guest_tsc_dest[i]
-+
-+13. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
-+    respective value derived in the previous step.
-+
-+4.2 ATTRIBUTE: KVM_VCPU_TSC_SCALE
-+
-+:Parameters: 64-bit fixed point TSC scale factor
-+
-+Returns:
-+
-+	 =3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+	 -EFAULT Error reading the provided parameter
-+		 address.
-+	 -ENXIO  Attribute not supported
-+	 -EINVAL Invalid request to write the attribute
-+	 =3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+This read-only attribute reports the guest's TSC scaling factor, in the fo=
-rm
-+of a fixed-point number represented by the following structure:
-+
-+    struct kvm_vcpu_tsc_scale {
-+	    __u64	tsc_ratio;
-+	    __u64	tsc_frac_bits;
-+    };
-+
-=20
--   ofs_dst[i] =3D ofs_src[i] -
--     (guest_src - guest_dest) * freq +
--     (tsc_src - tsc_dest)
-+The tsc_frac_bits field indicate the location of the fixed point, such tha=
-t
-+host TSC values are converted to guest TSC using the formula:
-=20
--   ("ofs[i] + tsc - guest * freq" is the guest TSC value corresponding to
--   a time of 0 in kvmclock.  The above formula ensures that it is the
--   same on the destination as it was on the source).
-+    guest_tsc =3D ( ( host_tsc * tsc_ratio ) >> tsc_frac_bits) + offset
-=20
--7. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
--   respective value derived in the previous step.
-+Userspace generally has no need to know this, as it has set the desired
-+guest TSC frequency. But since KVM only offsets the KVM_VCPU_TSC_OFFSET
-+attribute as documented above, and not a KVM_VCPU_TSC_VALUE attribute
-+which would have made life much easier, userspace needs to extract these
-+values so that it can do for itself all the calculations that the kernel
-+could have done more easily.
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
-m.h
-index 1a6a1f987949..a7b1406e7e62 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -558,6 +558,12 @@ struct kvm_pmu_event_filter {
- /* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
- #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TS=
-C) */
- #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
-+#define   KVM_VCPU_TSC_SCALE  1 /* attribute for TSC scaling factor */
-+
-+struct kvm_vcpu_tsc_scale {
-+	__u64 tsc_ratio;
-+	__u64 tsc_frac_bits;
-+};
-=20
- /* x86-specific KVM_EXIT_HYPERCALL flags. */
- #define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a6b9bea62fb8..abc951f7bb95 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5462,6 +5462,7 @@ static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vcp=
-u,
-=20
- 	switch (attr->attr) {
- 	case KVM_VCPU_TSC_OFFSET:
-+	case KVM_VCPU_TSC_SCALE:
- 		r =3D 0;
- 		break;
- 	default:
-@@ -5487,6 +5488,17 @@ static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vc=
-pu,
- 			break;
- 		r =3D 0;
- 		break;
-+	case KVM_VCPU_TSC_SCALE: {
-+		struct kvm_vcpu_tsc_scale scale;
-+
-+		scale.tsc_ratio =3D vcpu->arch.l1_tsc_scaling_ratio;
-+		scale.tsc_frac_bits =3D kvm_caps.tsc_scaling_ratio_frac_bits;
-+		r =3D -EFAULT;
-+		if (copy_to_user(uaddr, &scale, sizeof(scale)))
-+			break;
-+		r =3D 0;
-+		break;
-+	}
- 	default:
- 		r =3D -ENXIO;
- 	}
-@@ -5529,6 +5541,9 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcp=
-u,
- 		r =3D 0;
- 		break;
- 	}
-+	case KVM_VCPU_TSC_SCALE:
-+		r =3D -EINVAL; /* Read only */
-+		break;
- 	default:
- 		r =3D -ENXIO;
- 	}
---=20
-2.34.1
-
-
-
---=-bwLX6QE0uIzu4DGIIUUs
+--=-Qs+pMiylBCQXEHmfepzs
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -360,24 +179,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTEzMTQwODIyWjAvBgkqhkiG9w0BCQQxIgQg32FClFhD
-n3xQL7uNHXpTgKUz/UHD2bDGHrasSYmt93gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTEzMTQwODUyWjAvBgkqhkiG9w0BCQQxIgQgGeHhDfMf
+Yh2K/kEQ3QhIYpgtp4Lrc5bMDSrGN/jo/nwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBNrnqt18qaTsCsQUX6YTgtFo2uB3B16jlt
-U6WESc6Hnjf2ISUc/0asP8f7bWTnvWeoVdOfOm3n80UQWjfUpVLVOiPevlu6Vffm4Wa6tdUUTf6K
-FSnjBCxMl26PpL03obcSitAvBJ/QH2ZaqwPlVoLj6SBtvL8bG/MmLaFMSfpUC0VTESEpBHiCidfP
-3DdRvLXgRWInxDIVCuhBZ4Mo1OP8I6aWeRHd53XobHsC9JdE7m76aSBvEEhNBAGiEVcgiPCNMKf5
-slhjChfketUafn9qif+dbEResoh1253WbPes3DUiXu5qByCWlNscwkSOPRCj0GGyUkSFXMsNhg0Y
-VCtM2BWkiTzeHtjp81M9T+LjSOrMf+aRStQYI6TE+TIi9wPPvD4oWdet3zCRCUwYs5VwxxzFqTdJ
-dXZE3bA9IZKrTS0vr48IrLl40cEjJa/UX4iPUGxo3VMcp4Y8WPnqiopogUQ0Mz/fpvKZX+NO2dAd
-RA3pZ5hw5bv2fanJcpGPpTS64sxjVk/vYa9yMpD7pk9PvJO1Xz2SO4AdkkG+Uxhy38C5TtIloJbc
-/405RBjSWpqTSGDBC3g0Ui0Zs1nSdkPsZ5+6qjCLexahQ8BC+G9q+00S3jApjLCM2hIqMHFJ+Rvh
-U8O6hZh3weRqjtf/FV/4wPdVR2Hu0FEn7iBAhEOI2wAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCB5gYS2vXTXKZE2W+A1CirkF/Kz0CR0f6L
+Qd3xesT9PIAFbNesuGQqMVGQ0nvmmSx1fUrGctmODZcPYv/pre20y7QNb38uMASS5JDiNrAW9qm2
+T37dOkq350a1Qz++fqAWdG1EM7u7hB03OdO55FwLlWiHOw9Uo7szFQwKERv++QjGeCiV55gr/YKN
+8F74yXFS1/CYmplzbVOuLgdcre8eYnJ+Bs7uhPVi2BKeNRHMRrQeUwrceYTKdxM8qBs92NyVB0iP
+UxuQP9xig8j/sKKAw31jXSLxIto2KxKrfGemopujB66eQUQy/2Xv6g+Fp82lwkG290sAqg0WP5Gh
+8yp2Hp6kaCQZnR1SBksPArLIx29JWJTqAaw5pZ80YWA3fLikKmtwfUesK1PrH+WEWGCN9Cx/WJzR
+voy+1u81cpUIzLKPR3/3BYkZvsLp4NSxN+T40HaEfwnyhdck/DnhkaDj0zlGiFs3ZUuJW/qGegAv
+S59/yyb2uKW8fwunFZ8UO0hnrBFEncwiTXDS5CyudmxAMyI0cpaDcVyvi/vxNmmCyVXp4Zy0uzZb
+/le2xf87BvEYhXRhOELgt0DCXtAw/CoYM3WOQjwu8HhlSCMGC8BQXh7lJ2Zg1r5XFQhSh+UWm7nA
+QVAqQ9IraLSsSdrh3ceFSDQ9NOLgdQwEH4xnh29ebgAAAAAAAA==
 
 
---=-bwLX6QE0uIzu4DGIIUUs--
+--=-Qs+pMiylBCQXEHmfepzs--
