@@ -2,156 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A157A79EDF6
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 18:10:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C18E79EE1E
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 18:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbjIMQKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 12:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
+        id S229818AbjIMQQX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 12:16:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjIMQKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 12:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DAFB2CCD
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 09:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694621366;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+vir9XPxQtJjkx9y2t61YbcWIDMErIm3G1G2MRJnWHY=;
-        b=T/6DDR8l2Qg+7AXWbxC+6NYHmATPhFbRgqnC53o9z+Lw5XCN9nmCLGC8a6zZb+pg4fDpEe
-        OUQNbKOIIEDyK9L48r223hk4b7P6JoqHaH8XkPbepdDJpM26fE1OQF5/lf0SmeEmtOAXcD
-        iLVdBP02VE+f2azi9/JQ3QBrJZoiTGM=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-224-ORHzONEDPXC11tieI6sRww-1; Wed, 13 Sep 2023 12:09:24 -0400
-X-MC-Unique: ORHzONEDPXC11tieI6sRww-1
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a741f4790fso8306029b6e.0
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 09:09:24 -0700 (PDT)
+        with ESMTP id S230272AbjIMQQR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 12:16:17 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7EA1B8
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 09:16:13 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-594e5e2e608so79275487b3.2
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 09:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694621773; x=1695226573; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4JiE4DdxUMHfTS70Z4Y1GxX9A0Rg/BgOzVpxxMDofuU=;
+        b=d5lG24biiIxs2IX1D6Eb6aMsY6oZ5Ztz3fYvlSNYYKUXz+ljPtrdPKx1TCuu8Alu0z
+         /OrmlbfOQn2BailNLtXXvuuR5Hkc5+ydkv/wMJl35PktEUnlGuh8CGzMryhvKCrcQuJF
+         O1BUm3tN8b+KC4m1g0du+ZhfPQNaL/K93iAWKbWCJym1Pgmqx3GXwGQhPPb/sUyMJAKy
+         UQmTb4cIj65UZvLGrIKxmvfFlW+x8tU5tdJpxgl14y6piBP3kSHqq0cRcrG36RaJO8fK
+         AmpeqNIWU3XYOyB44D8bt5ioxJjPQtYSHpASnIh+WYXrKRo7b9qqK+K4lC8w/55V14+m
+         z1Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694621363; x=1695226163;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+vir9XPxQtJjkx9y2t61YbcWIDMErIm3G1G2MRJnWHY=;
-        b=bwKtAnpVXm8O/zbmh6avXHXXSbNdR+WcvFv/zbzirMJvvBWOLMMFHyzvU+NIHcOIMQ
-         tW5DZqYFnXWKXbz3VARMcnN9GVmT49U3mVIPqHbgkTLbR36ZHTsH1LvBC1EQbf4p+J9T
-         yzPZ4ORes/S9XJAw84RSixf3FmqfW0iEGDeGH7eIR7YL2g6okMtcGGGuAmx3Gf2pgMIo
-         tYA7yYg9yotmnRH2MviOwU3ROXJGpE30zyt/P/pDkykrzA4gq9qbIaly9LqEL3Me2PYT
-         2C0qPGGnwNho8DjO+kZkvvFY9CkZbeVcA7yS28mmKwwZJrQCdaCJUK2/irDwOd8s3Q7k
-         DFCw==
-X-Gm-Message-State: AOJu0Yz7WSvE6sq/h2NG4DeL173D82R41qeYmXqy4RlVFvfYnFYnvUlC
-        t1iYt2EKDto0SMCELHCpy62PZ/Rq2iQI6r82EIufCCQBALN/Yh+MD97n3YgipM2kO5kV8kNm63k
-        6WL2RHecz1/mmNN+6CjXKnuKk1N35fnceVRtL
-X-Received: by 2002:aca:2102:0:b0:3a7:b5ea:f5e8 with SMTP id 2-20020aca2102000000b003a7b5eaf5e8mr3184298oiz.27.1694621363739;
-        Wed, 13 Sep 2023 09:09:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7xa/Ps8ih1cpYFwfdNgaYAIRO8lM7v3v1vhDYf8Q+UuRA7mbI4UIywieN9ESmOr62otMmXGOb4OjZGxHnWa8=
-X-Received: by 2002:aca:2102:0:b0:3a7:b5ea:f5e8 with SMTP id
- 2-20020aca2102000000b003a7b5eaf5e8mr3184272oiz.27.1694621363522; Wed, 13 Sep
- 2023 09:09:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230912130132.561193-1-dtatulea@nvidia.com> <CAPpAL=w6KeBG5Ur037GNQa=n_fdoUwrFo+ATsFtX9HbWPHZvsg@mail.gmail.com>
-In-Reply-To: <CAPpAL=w6KeBG5Ur037GNQa=n_fdoUwrFo+ATsFtX9HbWPHZvsg@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 13 Sep 2023 18:08:47 +0200
-Message-ID: <CAJaqyWeVjKTPmGWwZ26TgebuzCaN8Z2FmPontHvZauOTQj0brQ@mail.gmail.com>
-Subject: Re: [PATCH 00/16] vdpa: Add support for vq descriptor mappings
-To:     Lei Yang <leiyang@redhat.com>
-Cc:     Dragos Tatulea <dtatulea@nvidia.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Parav Pandit <parav@nvidia.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20230601; t=1694621773; x=1695226573;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4JiE4DdxUMHfTS70Z4Y1GxX9A0Rg/BgOzVpxxMDofuU=;
+        b=Q0G8kLJBSkUwN1f9xNP+VwJRtJ0dy9sqC+PJ+Y69HPq+VsPYCbuWRt/u95dXqfb4kX
+         riacB45ryyI5DiMz9G1AaItcQZ/YNAdwGhETb8nwC7eYxa+JMJOQhuNpSJtWYtpTNxdd
+         /rViLjWyywHccHvBq6xg9m7Lh0HzrtwCIWyZBC+6htobJ/AXqw0jYP5SM0IBZfrxN+iM
+         FkpokeTZlnlkLp2vV1eSgRTBO+euC39Jj+7Ay2ZOlhU66607s/8d55QBrxSFX/XbDMyS
+         GRETVto2Lj3mIHrogA7tDqDgbvpkDva2/nGCWsZBCAA8ttyBidVU3AgsIiJETWmJBFoC
+         x9VA==
+X-Gm-Message-State: AOJu0Yy278eVqU6rk0bqzwdA49k02c9PWbwFOD8peVU9gFH2neAngjKP
+        bZaZn6Lahvl4zUFlBTH4uiItGLCk77I=
+X-Google-Smtp-Source: AGHT+IHPHKf4QXfFQhCv9rVUa7JrPB8sTnwxipNESGJoGValFttp6Gj7lD6PQrORyTMLg/nP1eKBYhCE38I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b71e:0:b0:583:4f82:b9d9 with SMTP id
+ v30-20020a81b71e000000b005834f82b9d9mr84623ywh.5.1694621772950; Wed, 13 Sep
+ 2023 09:16:12 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 09:16:11 -0700
+In-Reply-To: <56cd2f6f42351f2f27a07e5764bab7f689cc0059.1694599703.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+References: <cover.1694599703.git.isaku.yamahata@intel.com> <56cd2f6f42351f2f27a07e5764bab7f689cc0059.1694599703.git.isaku.yamahata@intel.com>
+Message-ID: <ZQHgS13+QBChjYNw@google.com>
+Subject: Re: [RFC PATCH 1/6] KVM: guest_memfd: Add config to show the
+ capability to handle error page
+From:   Sean Christopherson <seanjc@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
+        Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 3:03=E2=80=AFAM Lei Yang <leiyang@redhat.com> wrote=
-:
->
-> Hi Dragos, Eugenio and Si-Wei
->
-> My name is Lei Yang, a software Quality Engineer from Red Hat.  And
-> always paying attention to improving the live migration downtime
-> issues because there are others QE asked about this problem when I
-> share live migration status  recently. Therefore I would like to test
-> it in my environment. Before the testing I want to know if there is an
-> expectation of downtime range based on this series of patches? In
-> addition, QE also can help do a regression test based on this series
-> of patches if there is a requirement.
->
+On Wed, Sep 13, 2023, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Add config, HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR, to indicate kvm arch
+> can handle gmem error page.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  virt/kvm/Kconfig     | 3 +++
+>  virt/kvm/guest_mem.c | 3 +++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 1a48cb530092..624df45baff0 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -112,3 +112,6 @@ config KVM_GENERIC_PRIVATE_MEM
+>         select KVM_GENERIC_MEMORY_ATTRIBUTES
+>         select KVM_PRIVATE_MEM
+>         bool
+> +
+> +config HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR
+> +	bool
+> diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
+> index 85903c32163f..35d8f03e7937 100644
+> --- a/virt/kvm/guest_mem.c
+> +++ b/virt/kvm/guest_mem.c
+> @@ -307,6 +307,9 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
+>  	pgoff_t start, end;
+>  	gfn_t gfn;
+>  
+> +	if (!IS_ENABLED(CONFIG_HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR))
+> +		return MF_IGNORED;
 
-Hi Lei,
-
-Thanks for offering the testing bandwidth!
-
-I think we can only do regression tests here, as the userland part is
-still not sent to qemu.
-
-> Regards and thanks
-> Lei
->
->
-> On Tue, Sep 12, 2023 at 9:04=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.c=
-om> wrote:
-> >
-> > This patch series adds support for vq descriptor table mappings which
-> > are used to improve vdpa live migration downtime. The improvement comes
-> > from using smaller mappings which take less time to create and destroy
-> > in hw.
-> >
-> > The first part adds the vdpa core changes from Si-Wei [0].
-> >
-> > The second part adds support in mlx5_vdpa:
-> > - Refactor the mr code to be able to cleanly add descriptor mappings.
-> > - Add hardware descriptor mr support.
-> > - Properly update iotlb for cvq during ASID switch.
-> >
-> > [0] https://lore.kernel.org/virtualization/1694248959-13369-1-git-send-=
-email-si-wei.liu@oracle.com
-> >
-> > Dragos Tatulea (13):
-> >   vdpa/mlx5: Create helper function for dma mappings
-> >   vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
-> >   vdpa/mlx5: Take cvq iotlb lock during refresh
-> >   vdpa/mlx5: Collapse "dvq" mr add/delete functions
-> >   vdpa/mlx5: Rename mr destroy functions
-> >   vdpa/mlx5: Allow creation/deletion of any given mr struct
-> >   vdpa/mlx5: Move mr mutex out of mr struct
-> >   vdpa/mlx5: Improve mr update flow
-> >   vdpa/mlx5: Introduce mr for vq descriptor
-> >   vdpa/mlx5: Enable hw support for vq descriptor mapping
-> >   vdpa/mlx5: Make iotlb helper functions more generic
-> >   vdpa/mlx5: Update cvq iotlb mapping on ASID change
-> >   Cover letter: vdpa/mlx5: Add support for vq descriptor mappings
-> >
-> > Si-Wei Liu (3):
-> >   vdpa: introduce dedicated descriptor group for virtqueue
-> >   vhost-vdpa: introduce descriptor group backend feature
-> >   vhost-vdpa: uAPI to get dedicated descriptor group id
-> >
-> >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |  31 +++--
-> >  drivers/vdpa/mlx5/core/mr.c        | 191 ++++++++++++++++-------------
-> >  drivers/vdpa/mlx5/core/resources.c |   6 +-
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 100 ++++++++++-----
-> >  drivers/vhost/vdpa.c               |  27 ++++
-> >  include/linux/mlx5/mlx5_ifc.h      |   8 +-
-> >  include/linux/mlx5/mlx5_ifc_vdpa.h |   7 +-
-> >  include/linux/vdpa.h               |  11 ++
-> >  include/uapi/linux/vhost.h         |   8 ++
-> >  include/uapi/linux/vhost_types.h   |   5 +
-> >  10 files changed, 264 insertions(+), 130 deletions(-)
-> >
-> > --
-> > 2.41.0
-> >
->
-
+I don't see the point, KVM can and should always zap SPTEs, i.e. can force the
+geust to re-fault on the affected memory.  At that point kvm_gmem_get_pfn() will
+return -EHWPOISON and architectures that don't support graceful recovery can
+simply terminate the VM.
