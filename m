@@ -2,112 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DE4879E25D
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:41:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79B6679E273
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:44:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238884AbjIMIlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 04:41:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52004 "EHLO
+        id S239014AbjIMIpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 04:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239043AbjIMIlT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 04:41:19 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FE6C3;
-        Wed, 13 Sep 2023 01:41:15 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c0d5b16aacso54638015ad.1;
-        Wed, 13 Sep 2023 01:41:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694594475; x=1695199275; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=intO71UPcUlUAm/9kyhaRH5URaG8fvKJmiHr0gV1cEg=;
-        b=QgilfqQv0ykT5PCjmia2ZIenp4dtlzm7BRa6FGbXqbCeUE7Yu2lmcgLt+ZlLsP7Zz/
-         145ewg/IKIGModd1PXqbkyA/C7GfTAr9Mq8Scg1VUrusuMJ0PddNsTQ6KeDlq+e6GPiN
-         l4od/wbV0auwRwtQRf8rS8Sk4lGPDGy0SxbmtWr6PiAaY6W5JMQilhi4gdq03gbu8rAQ
-         kFc3iVHr3ZX2s2cWnIvmsmOM71mM4osW9Qsey3gackWiIddOi01a2odwP5EmXARQGqdQ
-         NnJugBZbfn8eJasyfeFKs5qWYtQOI4eF7w/Tz6EXbKLHh80h+G9mZkjXvb4dlir/7lZd
-         7mjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694594475; x=1695199275;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=intO71UPcUlUAm/9kyhaRH5URaG8fvKJmiHr0gV1cEg=;
-        b=EEGz3Djo0IlEoV9tZ18spk/KhC2aA1nalmSf1b7AVsCelJV61rGuR4y3pjqMidZWMC
-         K6yessz/Ar/PrE9NfWtb2+u+C75DTScl8bfFdpEUTU56vBsmGmKqdOeAGsHQ1Hyran1t
-         O6HPDt62BDPDz5zrALB+8XMUJqNMj0vAnk9QbZ6oRzfXYd8L9/zi1b4win6c+dCJ8g/n
-         EL/qlr/tvTyXHMsWXHqRVmO/bKoE2JZKCQomKv9ZEm5/BUHNJYXnuPCqDWLKD0xFfZxP
-         +/wVNIrI09obYrPMgI4nsDPkcNtyGnEbI5pjcG0K7DuxKCu8a7FzJOBV9fY/w1TkaOUQ
-         4Beg==
-X-Gm-Message-State: AOJu0YxYD+JQloNRd97GqoSKide/zT+C2B5lU0G74utILIoLEZ6kaHzy
-        GLmRrdP3pu9NJ4MMs9GqW3w=
-X-Google-Smtp-Source: AGHT+IF6txkjxpydQzEAk34oi3gjcODvjk8+YIREYI9SaoutOK+YDOXPeGlSwsm0AaipKYGGNlyhGQ==
-X-Received: by 2002:a17:902:f690:b0:1bd:ea88:7b93 with SMTP id l16-20020a170902f69000b001bdea887b93mr2202057plg.54.1694594475062;
-        Wed, 13 Sep 2023 01:41:15 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id iw21-20020a170903045500b001b39ffff838sm9955773plb.25.2023.09.13.01.41.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 01:41:14 -0700 (PDT)
-Message-ID: <55dc9282-56c1-8574-0ba1-4bbf075f4c3e@gmail.com>
-Date:   Wed, 13 Sep 2023 16:41:07 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
+        with ESMTP id S232464AbjIMIpB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 04:45:01 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F201E73;
+        Wed, 13 Sep 2023 01:44:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SFNPOMfIZDNvCBeD0d21rM+sQmdD3L5zOKmCqkTFEYc=; b=Ofzcygjls33zE+ij7dvH5gqk+p
+        Aelm5idn1g9imNyDugjY6NgVvZ+C56SjcIvicH6qebPPpT+rsZJmMgsefrh2g6T0nAm7Oqfn+FLXf
+        8BEEhjTkxujOwqmtxZtHtBjN9zG+Na6tvTSVkzHZYuYG8cZAqFb0GkqhQy9phAKFwfC2EM7inwq5v
+        88s5XzGN73/ZXrr7OCMkOWsUFCCJlbB5vNUaeHlhYuZW9+WCft5AG8g9nIY/cFFbUU8YaxV3hJ2Gs
+        XDmYRYr57OK3MYob2vEHQJs3MrXwp0niSrDi/7nQDTL1TA9mkJ2/ul2xI1IfsbomUXdF4a2lAevYi
+        fnsS49EQ==;
+Received: from [54.239.6.187] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qgLUT-00Cpul-DU; Wed, 13 Sep 2023 08:44:53 +0000
+Message-ID: <93dc0a7aafab5d92bd4ab9b4c1c0622a088bab04.camel@infradead.org>
 Subject: Re: [PATCH v4] KVM: x86/tsc: Don't sync user changes to TSC with
  KVM-initiated change
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>
+Date:   Wed, 13 Sep 2023 10:44:52 +0200
+In-Reply-To: <55dc9282-56c1-8574-0ba1-4bbf075f4c3e@gmail.com>
 References: <20230801034524.64007-1-likexu@tencent.com>
- <ZNa9QyRmuAjNAonC@google.com>
- <d39a25a85750e99e11f6b8a58dcd0560f5463f97.camel@infradead.org>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <d39a25a85750e99e11f6b8a58dcd0560f5463f97.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+         <ZNa9QyRmuAjNAonC@google.com>
+         <d39a25a85750e99e11f6b8a58dcd0560f5463f97.camel@infradead.org>
+         <55dc9282-56c1-8574-0ba1-4bbf075f4c3e@gmail.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-cC2nMUc9VkPSGf8aKK51"
+User-Agent: Evolution 3.44.4-0ubuntu2 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/9/2023 4:10 pm, David Woodhouse wrote:
-> On Fri, 2023-08-11 at 15:59 -0700, Sean Christopherson wrote:
->> The problem isn't that the sync code doesn't differentiate between kernel and
->> user-initiated writes, because parts of the code *do* differentiate.  I think it's
->> more accurate to say that the problem is that the sync code doesn't differentiate
->> between userspace initializing the TSC and userspace attempting to synchronize the
->> TSC.
-> 
-> I'm not utterly sure that *I* differentiate between userspace
-> "initializing the TSC" and attempting to "synchronize the TSC". What
-> *is* the difference?
 
-I'd be more inclined to Oliver's explanation in this version of the changelog
-that different tsc_offsets are used to calculate guest_tsc value between the vcpu
-is created and when it is first set by usersapce. This extra synchronization is not
-expected for guest based on user's bugzilla report.
+--=-cC2nMUc9VkPSGf8aKK51
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Userspace is merely *setting* the TSC for a given vCPU, regardless of
-> whether other vCPUs even exist.
-> 
-> But we have to work around the fundamental brokenness of the legacy
-> API, whose semantics are most accurately described as "Please set the
-> TSC to precisely <x> because that's what it should have been *some*
-> time around now, if I wasn't preempted very much between when I
-> calculated it and when you see this ioctl".
-> 
-> That's why — for the legacy API only — we have this hack to make the
-> TSCs *actually* in sync if they're close. Because without it, there;s
-> *no* way the VMM can restore a guest with its TSCs actually in sync.
-> 
-> I think the best answer to the bug report that led to this patch is
-> just "Don't use the legacy API then". Use KVM_VCPU_TSC_OFFSET which is
-> defined as "the TSC was <x> at KVM time <y>" and is actually *sane*.
-> 
+On Wed, 2023-09-13 at 16:41 +0800, Like Xu wrote:
+> On 13/9/2023 4:10 pm, David Woodhouse wrote:
+> > On Fri, 2023-08-11 at 15:59 -0700, Sean Christopherson wrote:
+> > > The problem isn't that the sync code doesn't differentiate between ke=
+rnel and
+> > > user-initiated writes, because parts of the code *do* differentiate.=
+=C2=A0 I think it's
+> > > more accurate to say that the problem is that the sync code doesn't d=
+ifferentiate
+> > > between userspace initializing the TSC and userspace attempting to sy=
+nchronize the
+> > > TSC.
+> >=20
+> > I'm not utterly sure that *I* differentiate between userspace
+> > "initializing the TSC" and attempting to "synchronize the TSC". What
+> > *is* the difference?
+>=20
+> I'd be more inclined to Oliver's explanation in this version of the chang=
+elog
+> that different tsc_offsets are used to calculate guest_tsc value between =
+the vcpu
+> is created and when it is first set by usersapce. This extra synchronizat=
+ion is not
+> expected for guest based on user's bugzilla report.
+>=20
 
-Two hands in favor. Using the new KVM_VCPU_TSC_OFFSET API and a little
-fix on the legacy API is not conflict. Thank you for reviewing it.
+Yes, it's about the kernel's default startup values (first vCPU
+starting at TSC 0, others syncing to that on creation), and the fact
+that the *first* userspace write (to any vCPU) should actually be
+honoured even if it *does* happen to be within 1 second of the kernel's
+startup values.
+
+
+> Two hands in favor. Using the new KVM_VCPU_TSC_OFFSET API and a little
+> fix on the legacy API is not conflict. Thank you for reviewing it.
+
+I'm slightly dubious about making *changes* to an established userspace
+ABI, especially when there's already a better way to do it. But I
+suppose this specific change, if you *don't* also take away the ability
+for userspace to explicitly write zero to force a sync (qv), is OK.
+
+--=-cC2nMUc9VkPSGf8aKK51
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTEzMDg0NDUyWjAvBgkqhkiG9w0BCQQxIgQgdiYhbw7m
+1RdipY5/JAggj5ttgk5DnhZ00e5yw7CqAX4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCy+Mv3G9jZerSR/qe5nFzL+5C+JNtq8v7Q
+ebAoNGg370jXLpaD9FQkQTCmmd1M2l7fUV1WkicyQUTeE9nSr2+WitqXchgAIVB1Mi0Lfl8AkOK6
+cHHM9HB5eeq+TttOscX4yz28e1STxd1UhRa1dnoCUP85lj7ANvDvdx4GiDaYN0JV5T0iEV4MCse4
+s8PKcuIOE/lz92dRBdqnZZu+Ulv/GI6P9R1Ufmk5bm5TD9c9oIcpvUbo27wMZO374ziYXOlPUl3h
+shRcuyUp+1Qwrdv3/PKWDIUvG2o+NXb6A2Mpo0d/rIVBEuHgI/KiYqNbKB0BRVV5cb98ttxJS/1z
+KFK2KZ/BxQ0A8dNtj+wDg8Q/eE8Wb0yxNcosOghyRvOF8OQqUCtbMc2udgM1aYBsShwl/ZYcV12w
+SdlYpEyI3udIjSOQz+SWpRPTQsoE6zD6vnqDGvaN4XV4xH6klfdSAnfd2yn8QFm5LhENh1wyeD8h
++tLfMgaAuIAmbMyIxzhbtj3k6XL+Uwv8KdNqd5epyOoZ1xhUG+uzvKkzyDFgzu1Ng0jR1BUlRdbq
+1VBG0qDB9VpN83vHCOZm8NHrJ4Ad0m3yRKDejs7JZPWyiApx0SwL3JW7pzaOnG7Un/RKq2lRncD7
+JMeLznJyHzDFQqKdPJAbpw0DMRyRkGL+Mwho0sLNtwAAAAAAAA==
+
+
+--=-cC2nMUc9VkPSGf8aKK51--
