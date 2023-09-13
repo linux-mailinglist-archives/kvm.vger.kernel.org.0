@@ -2,211 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79B6679E273
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:44:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2F9C79E29A
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239014AbjIMIpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 04:45:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34538 "EHLO
+        id S239102AbjIMIuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 04:50:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232464AbjIMIpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 04:45:01 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F201E73;
-        Wed, 13 Sep 2023 01:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SFNPOMfIZDNvCBeD0d21rM+sQmdD3L5zOKmCqkTFEYc=; b=Ofzcygjls33zE+ij7dvH5gqk+p
-        Aelm5idn1g9imNyDugjY6NgVvZ+C56SjcIvicH6qebPPpT+rsZJmMgsefrh2g6T0nAm7Oqfn+FLXf
-        8BEEhjTkxujOwqmtxZtHtBjN9zG+Na6tvTSVkzHZYuYG8cZAqFb0GkqhQy9phAKFwfC2EM7inwq5v
-        88s5XzGN73/ZXrr7OCMkOWsUFCCJlbB5vNUaeHlhYuZW9+WCft5AG8g9nIY/cFFbUU8YaxV3hJ2Gs
-        XDmYRYr57OK3MYob2vEHQJs3MrXwp0niSrDi/7nQDTL1TA9mkJ2/ul2xI1IfsbomUXdF4a2lAevYi
-        fnsS49EQ==;
-Received: from [54.239.6.187] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgLUT-00Cpul-DU; Wed, 13 Sep 2023 08:44:53 +0000
-Message-ID: <93dc0a7aafab5d92bd4ab9b4c1c0622a088bab04.camel@infradead.org>
-Subject: Re: [PATCH v4] KVM: x86/tsc: Don't sync user changes to TSC with
- KVM-initiated change
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Sep 2023 10:44:52 +0200
-In-Reply-To: <55dc9282-56c1-8574-0ba1-4bbf075f4c3e@gmail.com>
-References: <20230801034524.64007-1-likexu@tencent.com>
-         <ZNa9QyRmuAjNAonC@google.com>
-         <d39a25a85750e99e11f6b8a58dcd0560f5463f97.camel@infradead.org>
-         <55dc9282-56c1-8574-0ba1-4bbf075f4c3e@gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-cC2nMUc9VkPSGf8aKK51"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S239092AbjIMIuv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 04:50:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 160D01997
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:49:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694594998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CEEbRM+L5SAUMWcCbxhNrqKQfIPsl4YV6xdR61UZGBA=;
+        b=JfrhzYw69RA4utN4l8KiP2dZFeW3JT53tPaSYbIPw1AIhIHcYi8g+ixBQ3i0llHEDRAaFu
+        h7pJOvfLHo+hGqkiS+kA7pzsryLSW1f9Pfa56Q76/6cKhrhgv4aY3jefPwd95iD/wrnAE4
+        QBIwpDZ6mtai/Q2bN/kFrYj0pzxkhcE=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-153-VF_8njo7MJ2TxRqq5QUvCg-1; Wed, 13 Sep 2023 04:49:56 -0400
+X-MC-Unique: VF_8njo7MJ2TxRqq5QUvCg-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6b9efedaeebso7337701a34.2
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:49:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694594996; x=1695199796;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CEEbRM+L5SAUMWcCbxhNrqKQfIPsl4YV6xdR61UZGBA=;
+        b=WLyrgToMF+gLwG66Jd9KMUKa4YBrA0GCB6GTxLoXDfxQsYpR7gpNzPjr1crypVIkzR
+         xFL7YuiYSIK3s2YpbYJqrD4XS0tHr+iksnQEdlOHf8AJTkHzkZVbRIfhI4b/CPcYayFn
+         FS90lHs/DHyqpkwcRUczJAFgbx3Rn7yykQMoOACRrapTIjFaoc+4TZr8aPasV/5mqC/8
+         d9TRcQrzdvo1O/77TYYqjHO0rAN7va1K0c6l4FeRdTgsdHx3evqG/lIFN0SUW6FIeHIL
+         3oOlLLl0rV8z1KXvdqwHcRM6AVWeOsbnrNkkvG4yr5vFnoO3a+YKjZQYN1hZpN0OKZH9
+         2FRA==
+X-Gm-Message-State: AOJu0YxApyjn/lqIV4E9PnAH5GQOTsKTZqkxGhu96bSCPRcyd430gw/Z
+        3GcrEnNV1t151eMEE2UvYrHgc5cZij2QL2d7EQMsnfxMb8gLwm22Sm6Lt4+jSt21hlxu0Jmrzwu
+        qkiscUd37JZpI
+X-Received: by 2002:a05:6830:42:b0:6bd:1059:8212 with SMTP id d2-20020a056830004200b006bd10598212mr2442866otp.26.1694594996254;
+        Wed, 13 Sep 2023 01:49:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbL4AK6cS8gntncrHkfFRvxragh1Vk4rkFly+C/wOw+cgMI41aIbdMzJtL31SZ/Ari+MYAwA==
+X-Received: by 2002:a05:6830:42:b0:6bd:1059:8212 with SMTP id d2-20020a056830004200b006bd10598212mr2442845otp.26.1694594996010;
+        Wed, 13 Sep 2023 01:49:56 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
+        by smtp.gmail.com with ESMTPSA id f18-20020a4ada52000000b00578a0824ff6sm1312546oou.20.2023.09.13.01.49.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 01:49:55 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 05:49:45 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <ZQF3qS1KRYAt3coC@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230910082911.3378782-4-guoren@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> Cache-block prefetch instructions are HINTs to the hardware to
+> indicate that software intends to perform a particular type of
+> memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> improve the arch_xchg for qspinlock xchg_tail.
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> ---
+>  arch/riscv/Kconfig                 | 15 +++++++++++++++
+>  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+>  arch/riscv/include/asm/hwcap.h     |  1 +
+>  arch/riscv/include/asm/insn-def.h  |  5 +++++
+>  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+>  arch/riscv/kernel/cpufeature.c     |  1 +
+>  6 files changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index e9ae6fa232c3..2c346fe169c1 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+>  
+>  	   If you don't know what to do here, say Y.
+>  
+> +config RISCV_ISA_ZICBOP
+> +	bool "Zicbop extension support for cache block prefetch"
+> +	depends on MMU
+> +	depends on RISCV_ALTERNATIVE
+> +	default y
+> +	help
+> +	   Adds support to dynamically detect the presence of the ZICBOP
+> +	   extension (Cache Block Prefetch Operations) and enable its
+> +	   usage.
+> +
+> +	   The Zicbop extension can be used to prefetch cache block for
+> +	   read/write/instruction fetch.
+> +
+> +	   If you don't know what to do here, say Y.
+> +
+>  config TOOLCHAIN_HAS_ZIHINTPAUSE
+>  	bool
+>  	default y
+> diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+> index 702725727671..56eff7a9d2d2 100644
+> --- a/arch/riscv/include/asm/cmpxchg.h
+> +++ b/arch/riscv/include/asm/cmpxchg.h
+> @@ -11,6 +11,7 @@
+>  
+>  #include <asm/barrier.h>
+>  #include <asm/fence.h>
+> +#include <asm/processor.h>
+>  
+>  #define __arch_xchg_masked(prepend, append, r, p, n)			\
+>  ({									\
+> @@ -25,6 +26,7 @@
+>  									\
+>  	__asm__ __volatile__ (						\
+>  	       prepend							\
+> +	       PREFETCHW_ASM(%5)					\
+>  	       "0:	lr.w %0, %2\n"					\
+>  	       "	and  %1, %0, %z4\n"				\
+>  	       "	or   %1, %1, %z3\n"				\
+> @@ -32,7 +34,7 @@
+>  	       "	bnez %1, 0b\n"					\
+>  	       append							\
+>  	       : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))	\
+> -	       : "rJ" (__newx), "rJ" (~__mask)				\
+> +	       : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)		\
+>  	       : "memory");						\
+>  									\
+>  	r = (__typeof__(*(p)))((__retx & __mask) >> __s);		\
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index b7b58258f6c7..78b7b8b53778 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -58,6 +58,7 @@
+>  #define RISCV_ISA_EXT_ZICSR		40
+>  #define RISCV_ISA_EXT_ZIFENCEI		41
+>  #define RISCV_ISA_EXT_ZIHPM		42
+> +#define RISCV_ISA_EXT_ZICBOP		43
+>  
+>  #define RISCV_ISA_EXT_MAX		64
+>  
+> diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
+> index 6960beb75f32..dc590d331894 100644
+> --- a/arch/riscv/include/asm/insn-def.h
+> +++ b/arch/riscv/include/asm/insn-def.h
+> @@ -134,6 +134,7 @@
+>  
+>  #define RV_OPCODE_MISC_MEM	RV_OPCODE(15)
+>  #define RV_OPCODE_SYSTEM	RV_OPCODE(115)
+> +#define RV_OPCODE_PREFETCH	RV_OPCODE(19)
+>  
+>  #define HFENCE_VVMA(vaddr, asid)				\
+>  	INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),		\
+> @@ -196,4 +197,8 @@
+>  	INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),		\
+>  	       RS1(base), SIMM12(4))
+>  
+> +#define CBO_prefetchw(base)					\
+> +	INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),		\
+> +	       RD(x0), RS1(base), RS2(x0))
+> +
 
---=-cC2nMUc9VkPSGf8aKK51
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I understand that here you create the instruction via bitfield, following 
+the ISA, and this enables using instructions not available on the 
+toolchain.
 
-On Wed, 2023-09-13 at 16:41 +0800, Like Xu wrote:
-> On 13/9/2023 4:10 pm, David Woodhouse wrote:
-> > On Fri, 2023-08-11 at 15:59 -0700, Sean Christopherson wrote:
-> > > The problem isn't that the sync code doesn't differentiate between ke=
-rnel and
-> > > user-initiated writes, because parts of the code *do* differentiate.=
-=C2=A0 I think it's
-> > > more accurate to say that the problem is that the sync code doesn't d=
-ifferentiate
-> > > between userspace initializing the TSC and userspace attempting to sy=
-nchronize the
-> > > TSC.
-> >=20
-> > I'm not utterly sure that *I* differentiate between userspace
-> > "initializing the TSC" and attempting to "synchronize the TSC". What
-> > *is* the difference?
->=20
-> I'd be more inclined to Oliver's explanation in this version of the chang=
-elog
-> that different tsc_offsets are used to calculate guest_tsc value between =
-the vcpu
-> is created and when it is first set by usersapce. This extra synchronizat=
-ion is not
-> expected for guest based on user's bugzilla report.
->=20
+It took me some time to find the document with this instruction, so please 
+add this to the commit msg:
 
-Yes, it's about the kernel's default startup values (first vCPU
-starting at TSC 0, others syncing to that on creation), and the fact
-that the *first* userspace write (to any vCPU) should actually be
-honoured even if it *does* happen to be within 1 second of the kernel's
-startup values.
+https://github.com/riscv/riscv-CMOs/blob/master/specifications/cmobase-v1.0.pdf
+Page 23.
 
+IIUC, the instruction is "prefetch.w".
 
-> Two hands in favor. Using the new KVM_VCPU_TSC_OFFSET API and a little
-> fix on the legacy API is not conflict. Thank you for reviewing it.
+Maybe I am missing something, but in the document the rs2 field 
+(PREFETCH.W) contains a 0x3, while the above looks to have a 0 instead.
 
-I'm slightly dubious about making *changes* to an established userspace
-ABI, especially when there's already a better way to do it. But I
-suppose this specific change, if you *don't* also take away the ability
-for userspace to explicitly write zero to force a sync (qv), is OK.
+rs2 field = 0x0 would be a prefetch.i (instruction prefetch) instead.
 
---=-cC2nMUc9VkPSGf8aKK51
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTEzMDg0NDUyWjAvBgkqhkiG9w0BCQQxIgQgdiYhbw7m
-1RdipY5/JAggj5ttgk5DnhZ00e5yw7CqAX4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCy+Mv3G9jZerSR/qe5nFzL+5C+JNtq8v7Q
-ebAoNGg370jXLpaD9FQkQTCmmd1M2l7fUV1WkicyQUTeE9nSr2+WitqXchgAIVB1Mi0Lfl8AkOK6
-cHHM9HB5eeq+TttOscX4yz28e1STxd1UhRa1dnoCUP85lj7ANvDvdx4GiDaYN0JV5T0iEV4MCse4
-s8PKcuIOE/lz92dRBdqnZZu+Ulv/GI6P9R1Ufmk5bm5TD9c9oIcpvUbo27wMZO374ziYXOlPUl3h
-shRcuyUp+1Qwrdv3/PKWDIUvG2o+NXb6A2Mpo0d/rIVBEuHgI/KiYqNbKB0BRVV5cb98ttxJS/1z
-KFK2KZ/BxQ0A8dNtj+wDg8Q/eE8Wb0yxNcosOghyRvOF8OQqUCtbMc2udgM1aYBsShwl/ZYcV12w
-SdlYpEyI3udIjSOQz+SWpRPTQsoE6zD6vnqDGvaN4XV4xH6klfdSAnfd2yn8QFm5LhENh1wyeD8h
-+tLfMgaAuIAmbMyIxzhbtj3k6XL+Uwv8KdNqd5epyOoZ1xhUG+uzvKkzyDFgzu1Ng0jR1BUlRdbq
-1VBG0qDB9VpN83vHCOZm8NHrJ4Ad0m3yRKDejs7JZPWyiApx0SwL3JW7pzaOnG7Un/RKq2lRncD7
-JMeLznJyHzDFQqKdPJAbpw0DMRyRkGL+Mwho0sLNtwAAAAAAAA==
+Is the above correct, or am I missing something?
 
 
---=-cC2nMUc9VkPSGf8aKK51--
+Thanks!
+Leo
+
+>  #endif /* __ASM_INSN_DEF_H */
+> diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
+> index de9da852f78d..7ad3a24212e8 100644
+> --- a/arch/riscv/include/asm/processor.h
+> +++ b/arch/riscv/include/asm/processor.h
+> @@ -12,6 +12,8 @@
+>  #include <vdso/processor.h>
+>  
+>  #include <asm/ptrace.h>
+> +#include <asm/insn-def.h>
+> +#include <asm/hwcap.h>
+>  
+>  #ifdef CONFIG_64BIT
+>  #define DEFAULT_MAP_WINDOW	(UL(1) << (MMAP_VA_BITS - 1))
+> @@ -103,6 +105,17 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+>  #define KSTK_EIP(tsk)		(ulong)(task_pt_regs(tsk)->epc)
+>  #define KSTK_ESP(tsk)		(ulong)(task_pt_regs(tsk)->sp)
+>  
+> +#define ARCH_HAS_PREFETCHW
+> +#define PREFETCHW_ASM(base)	ALTERNATIVE(__nops(1), \
+> +					    CBO_prefetchw(base), \
+> +					    0, \
+> +					    RISCV_ISA_EXT_ZICBOP, \
+> +					    CONFIG_RISCV_ISA_ZICBOP)
+> +static inline void prefetchw(const void *ptr)
+> +{
+> +	asm volatile(PREFETCHW_ASM(%0)
+> +		: : "r" (ptr) : "memory");
+> +}
+>  
+>  /* Do necessary setup to start up a newly executed thread. */
+>  extern void start_thread(struct pt_regs *regs,
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> index ef7b4fd9e876..e0b897db0b97 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -159,6 +159,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+>  	__RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
+>  	__RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+>  	__RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
+> +	__RISCV_ISA_EXT_DATA(zicbop, RISCV_ISA_EXT_ZICBOP),
+>  	__RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+>  	__RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+>  	__RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
+> -- 
+> 2.36.1
+> 
+
