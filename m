@@ -2,159 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3224079F08E
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EA6179F0A4
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:51:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbjIMRqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 13:46:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34924 "EHLO
+        id S231559AbjIMRvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 13:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231526AbjIMRqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 13:46:17 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 658E519AD
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:46:13 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d814105dc2cso101020276.2
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:46:13 -0700 (PDT)
+        with ESMTP id S231518AbjIMRvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 13:51:23 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D0319AE
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:51:18 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-400a087b0bfso593325e9.2
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694627172; x=1695231972; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ocbK288Al1DpwUeolIoLVHrflqgxdyru7h8mWey0wo=;
-        b=bRX+fw1+7a8iLbidTBYkBFr230SoMZaQINwo5EkmKFYmLyz9FO0777ON+9CDsoGgrP
-         RaIqSQ2eWPwWpntXBcu+yu6b6IDeZBcDQy76lEtrZOqoVYHIByG2RM18r0FkRlb0CsP1
-         t6uY/IL3he/h3anC+mQ/mBRJcfSJsFqXYbnGzHhnz8T+kFeBxbbqw8iTj/2EpoULBWSi
-         8rnbNQVjIejAYZNqTB4vhu9dmBzMVho3SkfEyZv0DYFIkFn6dxjx806hFB+K9XeNTHJy
-         a0gEN8EwkaivFPpkJcw+0ZzIxaXZM18f4G9XxABHYxy84fFWU7whDgIWALFZwAQfyMl/
-         LOZQ==
+        d=linaro.org; s=google; t=1694627477; x=1695232277; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IL+p0DO0IUZqRFcgqHBd4klJrZRjlDQpNVieZFDn44o=;
+        b=RJMnfZ4MHlhiUVwORpKd89HtWnDSV9uWO8TN/eA2KQ+rrtduw/3OOAbcPzrLPUT/sa
+         DRnhUZxRGv5Lj5mw262AH4UpMjyjz9y8WZTf7KvdBlD5HtW7bZyx2n9YtSA59djxfkZ8
+         B8PqkHpJzgUvQoU3BPJowYKBAytvXuBf75W8MSy432ifEcg+fpO+LT+rApyiIYXozxeW
+         V2qeFW0btFxdtsVsz/uYp+SWNzJCp4YFKK9YJs8WTGB/ViWu65yQKhVceTLDceP4fI4/
+         LyMj9xk/bhD5tiZt3hWoTbz1ZFx0SngwGRSo0GV9/nF9abH1mxXr9UR7UpWQHpkk/EAv
+         qgYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694627172; x=1695231972;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ocbK288Al1DpwUeolIoLVHrflqgxdyru7h8mWey0wo=;
-        b=C0imMusiuELh9Xe2Wjmdd2nhUPjW18PFJ45Eu4xNIwwRGuzHDczN3fEsopUw934rgm
-         xYknl3EG0W1CPvNs94rnWcBp1OQOFGD1L38KNbaQIE7McLFvkDg6U/O9TmiFQ7lwilt3
-         2JIAMVaW6DurWtF53lpFetuiX8If6X6BExFym5G4jsQRb1aHyb1jGyv7+21lzNb1PinG
-         AWGlVHLF2/HhkmmQTwFNb659AbrNZ5U/mNpx6zo7ETfASyuFaoEPuaubAoVNmXg0qY2+
-         M2nlTJXZr8v/CaGbhC/L1BOhN+YZF63M0z4VPeizrISyyWXjue6HP6m/4MrqTHYTrVA3
-         CxEg==
-X-Gm-Message-State: AOJu0YwoP77q8ImRjf183niLlEBKmLr+jwaa45/yS+2e8GNy6c5KcoJE
-        yQ9v+0DLYAL445neN1y0Z9QA10f90YE=
-X-Google-Smtp-Source: AGHT+IEL/dshnjsgmjdfGSman4r0qxwjXyMs+hXHniVftyWUrPYv6azBgo0B81bsYJN3JcUy4Fmp/3PNp8E=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1102:b0:d0b:d8cd:e661 with SMTP id
- o2-20020a056902110200b00d0bd8cde661mr95997ybu.12.1694627172692; Wed, 13 Sep
- 2023 10:46:12 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 10:46:11 -0700
-In-Reply-To: <852b6fa117bf3767a99353d908bc566a5dd9c61a.1694599703.git.isaku.yamahata@intel.com>
-Mime-Version: 1.0
-References: <cover.1694599703.git.isaku.yamahata@intel.com> <852b6fa117bf3767a99353d908bc566a5dd9c61a.1694599703.git.isaku.yamahata@intel.com>
-Message-ID: <ZQH1YzB5YaeCwHii@google.com>
-Subject: Re: [RFC PATCH 4/6] KVM: guest_memfd: Implemnet bmap inode operation
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+        d=1e100.net; s=20230601; t=1694627477; x=1695232277;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IL+p0DO0IUZqRFcgqHBd4klJrZRjlDQpNVieZFDn44o=;
+        b=PNOzb6CvJKksr4brPsm3mge0SjUvQ+A+aGChR6p5SNDtRAqMEkRtvqjnk7SzEo4kAa
+         Txb1uGSLCCni48RWDP8ouUTMIcZekszxpxjU+qXcg/RynLuge8Al+/DePw8Zh8s6x7dg
+         QAQpTIEkFQ6JmRbNPrxaHGVfiZYs5eeQYyJlx2jV938BItaFShDQoT1P59K/IxO5YYAm
+         4j4MW1BZI+Nok9cdQ6C3TpU85h+3HwY4Z2AYiNYsjPO7uTDDFSnxUsx6UzO24a6tKJap
+         0z0nBQaHuolzRwwENCsv1x/p7MnjOFFrzKyIVecqa4xjTERwG5g6Xjh6NZk0PnmSypgW
+         vwAw==
+X-Gm-Message-State: AOJu0Yw+ZJgHLRjbbR0BLH+TxgdbSI7EMJ3uGcN0JOb4qtwfJ9AhvN7r
+        ak6/zBSRyfX6mXyTyjY1kdZoGg==
+X-Google-Smtp-Source: AGHT+IHsDrYYksJsH+fsMamDPEcPXK3kNmBj+8dhjNSjsHFaW/Mu1D4ub/xql4tlOhysvrRnlUQskA==
+X-Received: by 2002:a05:600c:2294:b0:403:149:150b with SMTP id 20-20020a05600c229400b004030149150bmr2514123wmf.16.1694627477264;
+        Wed, 13 Sep 2023 10:51:17 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id 24-20020a05600c021800b003fee53feab5sm2667837wmi.10.2023.09.13.10.51.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 10:51:16 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 20:51:14 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     jgg@ziepe.ca, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        alex.williamson@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shannon.nelson@amd.com
+Subject: Re: [PATCH vfio] pds/vfio: Fix possible sleep while in atomic context
+Message-ID: <8fdf4fe3-dd68-4b60-87f3-2607aaa2279c@kadam.mountain>
+References: <20230913174238.72205-1-brett.creeley@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913174238.72205-1-brett.creeley@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, Sep 13, 2023 at 10:42:38AM -0700, Brett Creeley wrote:
+> The driver could possibly sleep while in atomic context resulting
+> in the following call trace while CONFIG_DEBUG_ATOMIC_SLEEP=y is
+> set:
 > 
-> To inject memory failure, physical address of the page is needed.
-> Implement bmap() method to convert the file offset into physical address.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  virt/kvm/Kconfig     |  4 ++++
->  virt/kvm/guest_mem.c | 28 ++++++++++++++++++++++++++++
->  2 files changed, 32 insertions(+)
-> 
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 624df45baff0..eb008f0e7cc3 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -115,3 +115,7 @@ config KVM_GENERIC_PRIVATE_MEM
->  
->  config HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR
->  	bool
-> +
-> +config KVM_GENERIC_PRIVATE_MEM_BMAP
-> +	depends on KVM_GENERIC_PRIVATE_MEM
-> +	bool
-> diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-> index 3678287d7c9d..90dfdfab1f8c 100644
-> --- a/virt/kvm/guest_mem.c
-> +++ b/virt/kvm/guest_mem.c
-> @@ -355,12 +355,40 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
->  	return MF_DELAYED;
->  }
->  
-> +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_BMAP
-> +static sector_t kvm_gmem_bmap(struct address_space *mapping, sector_t block)
-> +{
-> +	struct folio *folio;
-> +	sector_t pfn = 0;
-> +
-> +	filemap_invalidate_lock_shared(mapping);
-> +
-> +	if (block << PAGE_SHIFT > i_size_read(mapping->host))
-> +		goto out;
-> +
-> +	folio = filemap_get_folio(mapping, block);
-> +	if (IS_ERR_OR_NULL(folio))
-> +		goto out;
-> +
-> +	pfn = folio_pfn(folio) + (block - folio->index);
-> +	folio_put(folio);
-> +
-> +out:
-> +	filemap_invalidate_unlock_shared(mapping);
-> +	return pfn;
+> [  675.116953] BUG: spinlock bad magic on CPU#2, bash/2481
+> [  675.116966]  lock: 0xffff8d6052a88f50, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+> [  675.116978] CPU: 2 PID: 2481 Comm: bash Tainted: G S                 6.6.0-rc1-next-20230911 #1
+> [  675.116986] Hardware name: HPE ProLiant DL360 Gen10/ProLiant DL360 Gen10, BIOS U32 01/23/2021
+> [  675.116991] Call Trace:
+> [  675.116997]  <TASK>
+> [  675.117002]  dump_stack_lvl+0x36/0x50
+> [  675.117014]  do_raw_spin_lock+0x79/0xc0
+> [  675.117032]  pds_vfio_reset+0x1d/0x60 [pds_vfio_pci]
+> [  675.117049]  pci_reset_function+0x4b/0x70
+> [  675.117061]  reset_store+0x5b/0xa0
+> [  675.117074]  kernfs_fop_write_iter+0x137/0x1d0
+> [  675.117087]  vfs_write+0x2de/0x410
+> [  675.117101]  ksys_write+0x5d/0xd0
+> [  675.117111]  do_syscall_64+0x3b/0x90
+> [  675.117122]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  675.117135] RIP: 0033:0x7f9ebbd1fa28
+> [  675.117141] Code: 89 02 48 c7 c0 ff ff ff ff eb b3 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 8d 05 15 4d 2a 00 8b 00 85 c0 75 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 41 54 49 89 d4 55
+> [  675.117148] RSP: 002b:00007ffdff410728 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> [  675.117156] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f9ebbd1fa28
+> [  675.117161] RDX: 0000000000000002 RSI: 000055ffc5fdf7c0 RDI: 0000000000000001
+> [  675.117166] RBP: 000055ffc5fdf7c0 R08: 000000000000000a R09: 00007f9ebbd7fae0
+> [  675.117170] R10: 000000000000000a R11: 0000000000000246 R12: 00007f9ebbfc06e0
+> [  675.117174] R13: 0000000000000002 R14: 00007f9ebbfbb860 R15: 0000000000000002
+> [  675.117180]  </TASK>
 
-IIUC, hijacking bmap() is a gigantic hack to propagate a host pfn to userspace
-without adding a new ioctl() or syscall.  If we want to support target injection,
-I would much, much rather add a KVM ioctl(), e.g. to let userspace inject errors
-for a gfn.  Returning a pfn for something that AFAICT has nothing to do with pfns
-is gross, e.g. the whole "0 is the error code" thing is technically wrong because
-'0' is a perfectly valid pfn.
+This splat doesn't match the sleeping in atomic bug at all.  That
+warning should have said, "BUG: sleeping function called from invalid
+context" and the stack trace would have looked totally different.
 
-My vote is to drop this and not extend the injection information for the initial
-merge, i.e. rely on point testing to verify kvm_gmem_error_page(), and defer adding
-uAPI to let selftests inject errors.
+I don't have a problem with the patch itself, that seems reasonable.  I
+really like that you tested it but you're running into a different
+bug here.  Hopefully, you just pasted the wrong splat but otherwise we
+need to investigate this other "bad magic" bug.
 
-> +
-> +}
-> +#endif
-> +
->  static const struct address_space_operations kvm_gmem_aops = {
->  	.dirty_folio = noop_dirty_folio,
->  #ifdef CONFIG_MIGRATION
->  	.migrate_folio	= kvm_gmem_migrate_folio,
->  #endif
->  	.error_remove_page = kvm_gmem_error_page,
-> +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_BMAP
-> +	.bmap = kvm_gmem_bmap,
-> +#endif
->  };
->  
->  static int  kvm_gmem_getattr(struct mnt_idmap *idmap,
-> -- 
-> 2.25.1
-> 
+regards,
+dan carpenter
+
