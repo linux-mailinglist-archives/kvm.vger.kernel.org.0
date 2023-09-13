@@ -2,156 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30A1C79E8A4
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 15:07:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A192479EA54
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 16:01:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240786AbjIMNHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 09:07:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
+        id S241186AbjIMOBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 10:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240767AbjIMNHc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 09:07:32 -0400
+        with ESMTP id S241120AbjIMOBE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 10:01:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CAE8C19BB
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 06:06:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 295901BC7
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 07:00:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694610406;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1694613615;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1N8nXpfMCNYLFwc5DqM2IQ2ttQ6FxXsVgYdelfbJc5Y=;
-        b=HTnOBm4l1uSQZn6SQy6fN0/mX4g3IAl/jSznAhA4Lz9mfyzFZx90RKQGE3zB1yytu6SS4V
-        QI1Hc98ycixoD3y40znQDxjaXx/7eY7uIJQ1l8KljJf5rBRYs8wPpkE8bS4E9tS3ixlj4D
-        SKpgHe2oBeX4GOSTNkd8eIdo0Pub978=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-659-QRcYUWmXNfChTXcc_wePhw-1; Wed, 13 Sep 2023 09:06:42 -0400
-X-MC-Unique: QRcYUWmXNfChTXcc_wePhw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B7A2101FAA1;
-        Wed, 13 Sep 2023 13:06:41 +0000 (UTC)
-Received: from [10.22.32.174] (unknown [10.22.32.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A80792904;
-        Wed, 13 Sep 2023 13:06:37 +0000 (UTC)
-Message-ID: <0ea8d0e7-6447-3a60-8cf4-d6a4e89fa8be@redhat.com>
-Date:   Wed, 13 Sep 2023 09:06:37 -0400
+        bh=1yK3xgmt1aeFdUkAxw9Y0+ZQFHP2f+qkDkwODsKtQl0=;
+        b=G0tNwfMokOjdXrzN6zpHG+mAfsXOvpsdgNgYHef/zb4fmzhYihcuTSwdz4u7HSvdzSICL5
+        ntA1/0v6GfQ3DKhK2gwzaMv0DpNBsO2qr9SeqbOsth2OlZjNygWyR0t7OjeUqEs65pA3wD
+        jQN1lNMKQFSEWEP9jJwGPSTXQtxMo7s=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-255-P3gXkZLCOIGby33iFzVPyg-1; Wed, 13 Sep 2023 10:00:13 -0400
+X-MC-Unique: P3gXkZLCOIGby33iFzVPyg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76ef205d695so68817585a.0
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 07:00:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694613613; x=1695218413;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1yK3xgmt1aeFdUkAxw9Y0+ZQFHP2f+qkDkwODsKtQl0=;
+        b=jKw1VuvJmGk2i2r3xy735eCfuwBon011aBEazpBMz3LoKGFeI2OdeLGif7a4nEltHT
+         MOG/WKxx+xZrgVQAQJVMz7iLsSjPk85f0mzr9wmw6UCBBewnzulqtKtfyC0Cuts3+NoT
+         PjhgwGrVf/y2p5JaJDUnYv9s7bGpEORgPeIUYFOQON+FDbp6Alug2S+2Rk8wt425497S
+         q0fONyrx4EGRi/7enCOZwUYfEiqBw/U+M15OAXZKsbOGO+xqkBjJrAg7zTR220g4qNl0
+         SVjKKUUwPibV6VrXpuYQVIqflzoj3zrYQATdAvq3TrHwoV4jE8+/da5RlI5/XkoQq+xu
+         1jnA==
+X-Gm-Message-State: AOJu0YxBNu2apEASijL/32lXAeNnuSnyT1BxfGYvj9Vdx7vYgpnZAGMb
+        +u9JMWDsUkv92AEgpM9SL98g2sZLpRheslt40BtV+VfTwNFYtf3s8YW+GbUcgExB2w8Ed8pxrfQ
+        kwWfO9etdja2w
+X-Received: by 2002:a05:620a:44c3:b0:76e:f686:cad8 with SMTP id y3-20020a05620a44c300b0076ef686cad8mr7244555qkp.13.1694613613035;
+        Wed, 13 Sep 2023 07:00:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfk9vTwiioPzhJO0D1j6+0LQmPdk1mn8JxTGfaPUXi0LyXZ0YuCSf940L14zsRR6mW81HaUA==
+X-Received: by 2002:a05:620a:44c3:b0:76e:f686:cad8 with SMTP id y3-20020a05620a44c300b0076ef686cad8mr7244535qkp.13.1694613612753;
+        Wed, 13 Sep 2023 07:00:12 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id u9-20020a0cf1c9000000b00653589babcbsm4456536qvl.87.2023.09.13.07.00.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Sep 2023 07:00:11 -0700 (PDT)
+Message-ID: <bed381a8-7d3d-d596-bc88-6ff8a7a5a33b@redhat.com>
+Date:   Wed, 13 Sep 2023 16:00:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH V11 04/17] locking/qspinlock: Improve xchg_tail for number
- of cpus >= 16k
+ Thunderbird/102.13.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
 Content-Language: en-US
-To:     Guo Ren <guoren@kernel.org>, Leonardo Bras <leobras@redhat.com>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
-        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, conor.dooley@microchip.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-5-guoren@kernel.org>
- <f091ead0-99b9-b30a-a295-730ce321ac60@redhat.com>
- <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
- <06714da1-d566-766f-7a13-a3c93b5953c4@redhat.com>
- <CAJF2gTQ3Q7f+FGorVTR66c6TGWsSeeKVvLF+LH1_m3kSHrm0yA@mail.gmail.com>
- <ZQF49GIZoFceUGYH@redhat.com>
- <CAJF2gTTHdCr-FQVSGUc+LapkJPmDiEYYa_1P6T86uCjRujgnTg@mail.gmail.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <CAJF2gTTHdCr-FQVSGUc+LapkJPmDiEYYa_1P6T86uCjRujgnTg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+To:     eric.auger.pro@gmail.com, elic@nvidia.com, mail@anirudhrb.com,
+        jasowang@redhat.com, mst@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvmarm@lists.linux.dev
+Cc:     stable@vger.kernel.org
+References: <20230824093722.249291-1-eric.auger@redhat.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230824093722.249291-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/13/23 08:52, Guo Ren wrote:
-> On Wed, Sep 13, 2023 at 4:55 PM Leonardo Bras <leobras@redhat.com> wrote:
->> On Tue, Sep 12, 2023 at 09:10:08AM +0800, Guo Ren wrote:
->>> On Mon, Sep 11, 2023 at 9:03 PM Waiman Long <longman@redhat.com> wrote:
->>>> On 9/10/23 23:09, Guo Ren wrote:
->>>>> On Mon, Sep 11, 2023 at 10:35 AM Waiman Long <longman@redhat.com> wrote:
->>>>>> On 9/10/23 04:28, guoren@kernel.org wrote:
->>>>>>> From: Guo Ren <guoren@linux.alibaba.com>
->>>>>>>
->>>>>>> The target of xchg_tail is to write the tail to the lock value, so
->>>>>>> adding prefetchw could help the next cmpxchg step, which may
->>>>>>> decrease the cmpxchg retry loops of xchg_tail. Some processors may
->>>>>>> utilize this feature to give a forward guarantee, e.g., RISC-V
->>>>>>> XuanTie processors would block the snoop channel & irq for several
->>>>>>> cycles when prefetch.w instruction (from Zicbop extension) retired,
->>>>>>> which guarantees the next cmpxchg succeeds.
->>>>>>>
->>>>>>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
->>>>>>> Signed-off-by: Guo Ren <guoren@kernel.org>
->>>>>>> ---
->>>>>>>     kernel/locking/qspinlock.c | 5 ++++-
->>>>>>>     1 file changed, 4 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
->>>>>>> index d3f99060b60f..96b54e2ade86 100644
->>>>>>> --- a/kernel/locking/qspinlock.c
->>>>>>> +++ b/kernel/locking/qspinlock.c
->>>>>>> @@ -223,7 +223,10 @@ static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
->>>>>>>      */
->>>>>>>     static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
->>>>>>>     {
->>>>>>> -     u32 old, new, val = atomic_read(&lock->val);
->>>>>>> +     u32 old, new, val;
->>>>>>> +
->>>>>>> +     prefetchw(&lock->val);
->>>>>>> +     val = atomic_read(&lock->val);
->>>>>>>
->>>>>>>         for (;;) {
->>>>>>>                 new = (val & _Q_LOCKED_PENDING_MASK) | tail;
->>>>>> That looks a bit weird. You pre-fetch and then immediately read it. How
->>>>>> much performance gain you get by this change alone?
->>>>>>
->>>>>> Maybe you can define an arch specific primitive that default back to
->>>>>> atomic_read() if not defined.
->>>>> Thx for the reply. This is a generic optimization point I would like
->>>>> to talk about with you.
->>>>>
->>>>> First, prefetchw() makes cacheline an exclusive state and serves for
->>>>> the next cmpxchg loop semantic, which writes the idx_tail part of
->>>>> arch_spin_lock. The atomic_read only makes cacheline in the shared
->>>>> state, which couldn't give any guarantee for the next cmpxchg loop
->>>>> semantic. Micro-architecture could utilize prefetchw() to provide a
->>>>> strong forward progress guarantee for the xchg_tail, e.g., the T-HEAD
->>>>> XuanTie processor would hold the exclusive cacheline state until the
->>>>> next cmpxchg write success.
->>>>>
->>>>> In the end, Let's go back to the principle: the xchg_tail is an atomic
->>>>> swap operation that contains write eventually, so giving a prefetchw()
->>>>> at the beginning is acceptable for all architectures..
->>>>> ••••••••••••
->>>> I did realize afterward that prefetchw gets the cacheline in exclusive
->>>> state. I will suggest you mention that in your commit log as well as
->>>> adding a comment about its purpose in the code.
->>> Okay, I would do that in v12, thx.
->> I would suggest adding a snippet from the ISA Extenstion doc:
->>
->> "A prefetch.w instruction indicates to hardware that the cache block whose
->> effective address is the sum of the base address specified in rs1 and the
->> sign-extended offset encoded in imm[11:0], where imm[4:0] equals 0b00000,
->> is likely to be accessed by a data write (i.e. store) in the near future."
-> Good point, thx.
+Hi,
 
-qspinlock is generic code. I suppose this is for the RISCV architecture. 
-You can mention that in the commit log as an example, but I prefer more 
-generic comment especially in the code.
+On 8/24/23 11:37, Eric Auger wrote:
+> Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
+> entries") Forbade vhost iotlb msg with null size to prevent entries
+> with size = start = 0 and last = ULONG_MAX to end up in the iotlb.
+>
+> Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
+> only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
+> message types to fix a regression observed with batching hit.
+>
+> Still, the introduction of that check introduced a regression for
+> some users attempting to invalidate the whole ULONG_MAX range by
+> setting the size to 0. This is the case with qemu/smmuv3/vhost
+> integration which does not work anymore. It Looks safe to partially
+> revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
+> with null size. vhost_iotlb_del_range() will compute a correct end
+> iova. Same for vhost_vdpa_iotlb_unmap().
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entries")
+> Cc: stable@vger.kernel.org # v5.17+
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-Cheers,
-Longman
+Gentle ping for this fix? Any other comments besides Jason's A-b?
+
+Best Regards
+
+Eric
+>
+> ---
+> v1 -> v2:
+> - Added Cc stable and Jason's Acked-by
+> ---
+>  drivers/vhost/vhost.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index c71d573f1c94..e0c181ad17e3 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>  		goto done;
+>  	}
+>  
+> -	if ((msg.type == VHOST_IOTLB_UPDATE ||
+> -	     msg.type == VHOST_IOTLB_INVALIDATE) &&
+> -	     msg.size == 0) {
+> +	if (msg.type == VHOST_IOTLB_UPDATE && msg.size == 0) {
+>  		ret = -EINVAL;
+>  		goto done;
+>  	}
 
