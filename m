@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B977079E050
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 08:59:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9337979E051
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 09:00:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238367AbjIMG7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 02:59:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
+        id S238389AbjIMHAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 03:00:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233657AbjIMG7u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 02:59:50 -0400
+        with ESMTP id S233657AbjIMHAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 03:00:13 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493F0173E
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 23:59:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F961738
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 00:00:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694588386; x=1726124386;
+  t=1694588410; x=1726124410;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=C6mQa9xWJ5rj5rAaxGCawIPJlfT6aTwLFeDPxzx9A+k=;
-  b=GfvrHMHpuNPx7PCrJZikuDd9VRhSPZcRUN8lY4VEfZ+UPgsc560eodrp
-   J4zqRnw4mbtqnQ9vegsuFHMMYcSZAoo0d4t8Z1vZXfUdQ14WUlzG0dHQB
-   FbuHYAzyNYM7Gb3sjziONIkwiYDoSl0UYnXAgqP3uInqIUBn8gcw0ypUw
-   nVK/xkeIZiJH5fLkGcHPMfYC7UVXTF2kKk4/GxpBYSeGX3RnSnVgpWd3E
-   g594cI6Ernj1TjRvoIsn87F/yr6kiYWr05YVQF3SJllAw19WaqMKjIFwL
-   tahvOk+EKpNi3TUcsYpo/9FNFWvLe61PmTZKNFGM6YHI1a7XcFQnW3M7i
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="377491110"
+  bh=6ZOTolQaVZtDkdndjG007mer0l08MC5v1of/bXfVgh0=;
+  b=kUmjna+/ZYxvuEIx9hcb7VBlgVnK2xWuUVn2qhy/Z9SRmvoQHWzsa2Ml
+   0Vor+O08X90BhTLZFgou0jqtD9BrD9JDuYp3fRw9n3g+8WbGoAw479YsY
+   1CnzjJGs8Lw+H5LE/mbKrTYzLzAUqdfnYq09ALexcymMCd9sAy0GNykUT
+   HKCwsCvCL5ZiCheAOl+raUjHfnO8Iqabs/BbpOocYwwaSMZK34tvN04tQ
+   9eCzLo4l2dGRwUwbhicFHis0Feh6IpAAtwb03+uFV3vV9unuoEe5Oo12v
+   seGjIdTGvG+wX6BBtn87u3mMZobjvXzyI1ttgf2pyA/0VKj/nRZN+jFHS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="377491296"
 X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
-   d="scan'208";a="377491110"
+   d="scan'208";a="377491296"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 23:59:31 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 00:00:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="747192882"
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="747193142"
 X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
-   d="scan'208";a="747192882"
+   d="scan'208";a="747193142"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.16.87]) ([10.93.16.87])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 23:59:26 -0700
-Message-ID: <fc235a15-53be-033a-1281-ff94ecb8c269@intel.com>
-Date:   Wed, 13 Sep 2023 14:59:23 +0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 00:00:04 -0700
+Message-ID: <a19427f8-3432-0918-0e0e-e972de5aa9df@intel.com>
+Date:   Wed, 13 Sep 2023 15:00:02 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Firefox/102.0 Thunderbird/102.15.0
 Subject: Re: [RFC PATCH 15/19] kvm: handle KVM_EXIT_MEMORY_FAULT
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Content-Language: en-US
+To:     Xu Yilun <yilun.xu@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Hildenbrand <david@redhat.com>,
@@ -59,24 +60,21 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
         Peter Xu <peterx@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
-        Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
  <20230731162201.271114-16-xiaoyao.li@intel.com>
- <20230802222545.GC1807130@ls.amr.corp.intel.com>
-Content-Language: en-US
+ <ZNOqhy1NlGzDA6/F@yilunxu-OptiPlex-7050>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20230802222545.GC1807130@ls.amr.corp.intel.com>
+In-Reply-To: <ZNOqhy1NlGzDA6/F@yilunxu-OptiPlex-7050>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2023 6:25 AM, Isaku Yamahata wrote:
-> On Mon, Jul 31, 2023 at 12:21:57PM -0400,
-> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-> 
+On 8/9/2023 11:02 PM, Xu Yilun wrote:
+> On 2023-07-31 at 12:21:57 -0400, Xiaoyao Li wrote:
 >> From: Chao Peng <chao.p.peng@linux.intel.com>
 >>
 >> Currently only KVM_MEMORY_EXIT_FLAG_PRIVATE in flags is valid when
@@ -123,17 +121,31 @@ On 8/3/2023 6:25 AM, Isaku Yamahata wrote:
 >> +
 >> +        if (ret) {
 >> +            return ret;
+> 
+> Should we unref the memory region before return?
+
+Thanks for catching this!
+
+> Thanks,
+> Yilun
+> 
 >> +        }
 >> +
 >> +        addr = memory_region_get_ram_ptr(section.mr) +
 >> +               section.offset_within_region;
 >> +        rb = qemu_ram_block_from_host(addr, false, &offset);
-> 
-> Here we have already section. section.mr->ram_block.  We don't have to
-> scan the existing RAMBlocks.
-
-But we don't have the @offset, do we?
-
-> Except that, looks good to me.
-> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> +        /*
+>> +         * With KVM_SET_MEMORY_ATTRIBUTES by kvm_set_memory_attributes(),
+>> +         * operation on underlying file descriptor is only for releasing
+>> +         * unnecessary pages.
+>> +         */
+>> +        ram_block_convert_range(rb, offset, size, to_private);
+>> +    } else {
+>> +        warn_report("Convert non guest-memfd backed memory region (0x%"HWADDR_PRIx" ,+ 0x%"HWADDR_PRIx") to %s",
+>> +                    start, size, to_private ? "private" : "shared");
+>> +    }
+>> +
+>> +    memory_region_unref(section.mr);
+>> +    return ret;
+>> +}
 
