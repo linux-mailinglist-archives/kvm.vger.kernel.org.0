@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1650C79E537
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:49:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C12E279E53A
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:49:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233278AbjIMKtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 06:49:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60880 "EHLO
+        id S239758AbjIMKtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 06:49:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239730AbjIMKtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S239733AbjIMKtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 13 Sep 2023 06:49:16 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436491726;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C2219AD;
         Wed, 13 Sep 2023 03:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1694602152; x=1726138152;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GkBig6IwfAcfP2Qu/zXThXAnAkU33oLrNZahoClMAyU=;
-  b=JSvUjgeRlXUPi9D8eYylh5/oBfAem5hmVE0l493FCApHLpgNBjwdDB+z
-   Or3BzyABRBaACARZ/EkdG9c2YYUTSA5RHgY9ZAkF5cjnh62Sa/2BaS+vb
-   HvKP4rphra3vSMfgnfQgoMndaAw6QK4qnpaNiQpVYCKSSuL/VWDlWCB6g
-   WRQ+FEkHTm1e/tB7b76EmkzHVAvyi41x2BnXo0dBNO+V+YTA0L/xiFj/Y
-   kHarpa2Fe+pilSsJT9/0jyxtj6EDSsAHmfeEc++/zXWOlc5OMQHd/o5Ey
-   Hc36T65zJuXm6lbgeoswH1ABnVKSkSyEosb4dkzoZzx0ACgbIsteJn3pR
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="377537881"
+  bh=w56T0yhNaiatkjqh/uT3sOfSvQs6+aSo/JfJQY17ObY=;
+  b=EP/O/eLjvuNw4Uv064A4PCcDZxXG0cU0p6wORSOn9BW0u/11kcZY9kbl
+   QIFx36GGwXQSq6+7B4oBcBtLPv5+RNTINTX+/+w4VwROPr3QV3hubvMPr
+   mNEagD2dt60pmKDhXmOXZZK59B8Okv2jKMw6TnMuieoejL7NxPyxuF38G
+   1n1TN5LDyORle/KSl80c5lw8MTqsYC9toVX2e8lQRZkgbL4yUkuA5fPk8
+   5uDgCalUVpKafz9iMXcvF5SHkfTUHadMdfRxkSqTavmwX+qSca03lPo0a
+   URalsr8/2Gbm2pcpG00Sfl82i9IONrdm3iEQsg6V9d3r4xLrfRnpAHQMN
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="377537889"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="377537881"
+   d="scan'208";a="377537889"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:11 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="809635588"
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="809635592"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="809635588"
+   d="scan'208";a="809635592"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:11 -0700
 From:   isaku.yamahata@intel.com
@@ -57,9 +57,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Xu Yilun <yilun.xu@intel.com>,
         Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
         Fuad Tabba <tabba@google.com>
-Subject: [RFC PATCH 3/6] KVM: guest_memfd, x86: MEMORY_FAULT exit with hw poisoned page
-Date:   Wed, 13 Sep 2023 03:48:52 -0700
-Message-Id: <36f6fae6cd7aaba3b0fc18f10981bbba2c30b979.1694599703.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 4/6] KVM: guest_memfd: Implemnet bmap inode operation
+Date:   Wed, 13 Sep 2023 03:48:53 -0700
+Message-Id: <852b6fa117bf3767a99353d908bc566a5dd9c61a.1694599703.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1694599703.git.isaku.yamahata@intel.com>
 References: <cover.1694599703.git.isaku.yamahata@intel.com>
@@ -71,118 +71,72 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-When resolving kvm page fault and hwpoisoned page is given, KVM exit
-with HWPOISONED flag so that user space VMM, e.g. qemu, handle it.
-
-- Add a new flag POISON to KVM_EXIT_MEMORY_FAULT to indicate the page is
-  poisoned.
-- Make kvm_gmem_get_pfn() return hwpoison state by -EHWPOISON when the
-  folio is hw-poisoned.
-- When page is hw-poisoned on faulting in private gmem, return
-  KVM_EXIT_MEMORY_FAULT with HWPOISONED flag.
+To inject memory failure, physical address of the page is needed.
+Implement bmap() method to convert the file offset into physical address.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 21 +++++++++++++++------
- include/uapi/linux/kvm.h |  3 ++-
- virt/kvm/guest_mem.c     |  4 +++-
- 3 files changed, 20 insertions(+), 8 deletions(-)
+ virt/kvm/Kconfig     |  4 ++++
+ virt/kvm/guest_mem.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 05943ccb55a4..5dc9d1fdadca 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4335,19 +4335,24 @@ static inline u8 kvm_max_level_for_order(int order)
- 	return PG_LEVEL_4K;
- }
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 624df45baff0..eb008f0e7cc3 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -115,3 +115,7 @@ config KVM_GENERIC_PRIVATE_MEM
  
--static int kvm_do_memory_fault_exit(struct kvm_vcpu *vcpu,
--				    struct kvm_page_fault *fault)
-+static int __kvm_do_memory_fault_exit(struct kvm_vcpu *vcpu,
-+				      struct kvm_page_fault *fault, __u64 flags)
- {
- 	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
- 	if (fault->is_private)
--		vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
--	else
--		vcpu->run->memory.flags = 0;
-+		flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-+	vcpu->run->flags = flags;
- 	vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
- 	vcpu->run->memory.size = PAGE_SIZE;
- 	return RET_PF_USER;
- }
- 
-+static int kvm_do_memory_fault_exit(struct kvm_vcpu *vcpu,
-+				    struct kvm_page_fault *fault)
-+{
-+	return __kvm_do_memory_fault_exit(vcpu, fault, 0);
-+}
+ config HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR
+ 	bool
 +
- static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
- 				   struct kvm_page_fault *fault)
- {
-@@ -4358,12 +4363,16 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
- 
- 	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
- 			     &max_order);
--	if (r)
-+	if (r && r != -EHWPOISON)
- 		return r;
- 
- 	fault->max_level = min(kvm_max_level_for_order(max_order),
- 			       fault->max_level);
- 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-+
-+	if (r == -EHWPOISON)
-+		return __kvm_do_memory_fault_exit(vcpu, fault,
-+						  KVM_MEMORY_EXIT_FLAG_HWPOISON);
- 	return RET_PF_CONTINUE;
- }
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index eb900344a054..48329cb44415 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -527,7 +527,8 @@ struct kvm_run {
- 		} notify;
- 		/* KVM_EXIT_MEMORY_FAULT */
- 		struct {
--#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-+#define KVM_MEMORY_EXIT_FLAG_PRIVATE	BIT_ULL(3)
-+#define KVM_MEMORY_EXIT_FLAG_HWPOISON	BIT_ULL(4)
- 			__u64 flags;
- 			__u64 gpa;
- 			__u64 size;
++config KVM_GENERIC_PRIVATE_MEM_BMAP
++	depends on KVM_GENERIC_PRIVATE_MEM
++	bool
 diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index 746e683df589..3678287d7c9d 100644
+index 3678287d7c9d..90dfdfab1f8c 100644
 --- a/virt/kvm/guest_mem.c
 +++ b/virt/kvm/guest_mem.c
-@@ -589,6 +589,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- {
- 	pgoff_t index = gfn - slot->base_gfn + slot->gmem.pgoff;
- 	struct kvm_gmem *gmem;
-+	bool hwpoison = false;
- 	struct folio *folio;
- 	struct page *page;
- 	struct file *file;
-@@ -610,6 +611,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		return -ENOMEM;
- 	}
- 
-+	hwpoison = folio_test_hwpoison(folio);
- 	page = folio_file_page(folio, index);
- 
- 	*pfn = page_to_pfn(page);
-@@ -618,7 +620,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	folio_unlock(folio);
- 	fput(file);
- 
--	return 0;
-+	return hwpoison ? -EHWPOISON : 0;
+@@ -355,12 +355,40 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
+ 	return MF_DELAYED;
  }
- EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
  
++#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_BMAP
++static sector_t kvm_gmem_bmap(struct address_space *mapping, sector_t block)
++{
++	struct folio *folio;
++	sector_t pfn = 0;
++
++	filemap_invalidate_lock_shared(mapping);
++
++	if (block << PAGE_SHIFT > i_size_read(mapping->host))
++		goto out;
++
++	folio = filemap_get_folio(mapping, block);
++	if (IS_ERR_OR_NULL(folio))
++		goto out;
++
++	pfn = folio_pfn(folio) + (block - folio->index);
++	folio_put(folio);
++
++out:
++	filemap_invalidate_unlock_shared(mapping);
++	return pfn;
++
++}
++#endif
++
+ static const struct address_space_operations kvm_gmem_aops = {
+ 	.dirty_folio = noop_dirty_folio,
+ #ifdef CONFIG_MIGRATION
+ 	.migrate_folio	= kvm_gmem_migrate_folio,
+ #endif
+ 	.error_remove_page = kvm_gmem_error_page,
++#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_BMAP
++	.bmap = kvm_gmem_bmap,
++#endif
+ };
+ 
+ static int  kvm_gmem_getattr(struct mnt_idmap *idmap,
 -- 
 2.25.1
 
