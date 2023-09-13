@@ -2,202 +2,333 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0A7A79E1A9
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:11:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 732B079E1C7
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:16:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238839AbjIMILK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 04:11:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42544 "EHLO
+        id S238849AbjIMIQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 04:16:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238782AbjIMILB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 04:11:01 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8B21996;
-        Wed, 13 Sep 2023 01:10:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Q3cSiDztWnesbzMErnOcf8Di/EbSzOWgRoz1O8kWUGA=; b=Vbd+Z/X+jnAQC9F7geEsvNvefl
-        260jgGLZjCYqlChL8F4ibEXkAYnluikyo21FP1K+QSV1/NwMMi+fXBMoMX3gmHKuWfz3SwxsYIQA6
-        d/e8OKQzbOUuvliFJ0umIhzmRuwAgompR3BmpifwfSEa+kLiv4kwQYSMvKPhIoEiOa9K8f36J0Y1y
-        uUg7zpTQoOXC4acOS3NoMFuZw3ZiddqylFa62KRPLcTx3x3vmDsNM1luhNmhq7CjPv/yIiFrFneBB
-        qC26hUDr0CShTjmBmBfQlEvdaax1aAZfqU2gtq6H89WhiiPqc3gDv5PeWAU5lpwt5140OdDGh9J/G
-        kdEIlILQ==;
-Received: from [54.239.6.187] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgKxX-00CfVR-1H; Wed, 13 Sep 2023 08:10:51 +0000
-Message-ID: <d39a25a85750e99e11f6b8a58dcd0560f5463f97.camel@infradead.org>
-Subject: Re: [PATCH v4] KVM: x86/tsc: Don't sync user changes to TSC with
- KVM-initiated change
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 13 Sep 2023 10:10:48 +0200
-In-Reply-To: <ZNa9QyRmuAjNAonC@google.com>
-References: <20230801034524.64007-1-likexu@tencent.com>
-         <ZNa9QyRmuAjNAonC@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-i2GAPbyuCQEoSsXUiu64"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S238825AbjIMIQx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 04:16:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA92CDA
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694592962;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jC7cBaRtwiLtOqIw5mLAFy7L+zLW4t61GX8cvLgSZ6Q=;
+        b=YHfG4FnNQo8zV27yca7XWFH6SPkd97VKHap7P4koFKINiAHwfbOTY2gqKhomYxehOGm2Rn
+        gMGpMhRTI5ypZn7msTuuNUFbZmhaMXIwu/wGf3wL8DBov8uQND47atHfvX26kwN2ubqzfV
+        8yScGrz5OwejSplGcy+BIb4XqPoS6TA=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-507-LF-yPJFMPKSWt_ji8NZWCg-1; Wed, 13 Sep 2023 04:16:01 -0400
+X-MC-Unique: LF-yPJFMPKSWt_ji8NZWCg-1
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5768b77a11bso3888400eaf.0
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:16:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694592961; x=1695197761;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jC7cBaRtwiLtOqIw5mLAFy7L+zLW4t61GX8cvLgSZ6Q=;
+        b=sz3yaGs6p5bPLeVgqrWCsnuK6hUEysPdzOXo+cWhIZOXBSnjrdkbyjsyu1WI06iE7g
+         ALuGOkbhfD9ZaUK+Z5Gm+idJsc8kItN7zKOJCuw1Sqzlm1N/dOMV+AC8Z1XP/IRUmYhl
+         jJ9o4Z1CtMC2svpT1vOI0UBRk27iaFFMb6eoT7KlCkFBXSymb9y5a9WJNbLSoWxA+c2L
+         fY98PfKoMr0HAwiZEReGgaFo3339RGTI4dZV9WuRC0eE0/XPzF5cKeGfd6ytBbhnwrhg
+         NgvBaWGsgJ0UKaeBqE/HbI59Mz50MNgVdjmEIL+kA7rxwzHEyeRKZYSS3wXBBb1qRb7m
+         iDSg==
+X-Gm-Message-State: AOJu0Yw28RPvLZj4aKMCgNk0v2OG1guxOsE0oB/lqt54etOTRnhR7YsK
+        EaoZNJD+zzLCIJ8W97DEJ1zhE+3Hl5G0dQskwt/U1txvaiq07q3wnwpB0hL6ixmAcXKX+8pqQlt
+        JHgqlpB8FEfVf
+X-Received: by 2002:a05:6870:8a29:b0:1bb:ac7:2e34 with SMTP id p41-20020a0568708a2900b001bb0ac72e34mr2086697oaq.40.1694592960755;
+        Wed, 13 Sep 2023 01:16:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFOZaoTn/FO9XWZIjXe4DzC8fn4zXFZUBlh/tx8ipyh0Rk/Pu3d+gYYuWAYZlcTSDNBgzo2Hg==
+X-Received: by 2002:a05:6870:8a29:b0:1bb:ac7:2e34 with SMTP id p41-20020a0568708a2900b001bb0ac72e34mr2086683oaq.40.1694592960455;
+        Wed, 13 Sep 2023 01:16:00 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
+        by smtp.gmail.com with ESMTPSA id e2-20020a056870944200b001d533004669sm6032266oal.32.2023.09.13.01.15.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 01:16:00 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 05:15:51 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 02/17] asm-generic: ticket-lock: Move into
+ ticket_spinlock.h
+Message-ID: <ZQFvt2nW4IwpdDo3@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-3-guoren@kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230910082911.3378782-3-guoren@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Sep 10, 2023 at 04:28:56AM -0400, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> Move ticket-lock definition into an independent file. This is the
+> preparation for the next combo spinlock of riscv.
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> ---
+>  include/asm-generic/spinlock.h        |  87 +---------------------
+>  include/asm-generic/ticket_spinlock.h | 103 ++++++++++++++++++++++++++
+>  2 files changed, 104 insertions(+), 86 deletions(-)
+>  create mode 100644 include/asm-generic/ticket_spinlock.h
+> 
+> diff --git a/include/asm-generic/spinlock.h b/include/asm-generic/spinlock.h
+> index 4773334ee638..970590baf61b 100644
+> --- a/include/asm-generic/spinlock.h
+> +++ b/include/asm-generic/spinlock.h
+> @@ -1,94 +1,9 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  
+> -/*
+> - * 'Generic' ticket-lock implementation.
+> - *
+> - * It relies on atomic_fetch_add() having well defined forward progress
+> - * guarantees under contention. If your architecture cannot provide this, stick
+> - * to a test-and-set lock.
+> - *
+> - * It also relies on atomic_fetch_add() being safe vs smp_store_release() on a
+> - * sub-word of the value. This is generally true for anything LL/SC although
+> - * you'd be hard pressed to find anything useful in architecture specifications
+> - * about this. If your architecture cannot do this you might be better off with
+> - * a test-and-set.
+> - *
+> - * It further assumes atomic_*_release() + atomic_*_acquire() is RCpc and hence
+> - * uses atomic_fetch_add() which is RCsc to create an RCsc hot path, along with
+> - * a full fence after the spin to upgrade the otherwise-RCpc
+> - * atomic_cond_read_acquire().
+> - *
+> - * The implementation uses smp_cond_load_acquire() to spin, so if the
+> - * architecture has WFE like instructions to sleep instead of poll for word
+> - * modifications be sure to implement that (see ARM64 for example).
+> - *
+> - */
+> -
+>  #ifndef __ASM_GENERIC_SPINLOCK_H
+>  #define __ASM_GENERIC_SPINLOCK_H
+>  
+> -#include <linux/atomic.h>
+> -#include <asm-generic/spinlock_types.h>
+> -
+> -static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+> -{
+> -	u32 val = atomic_fetch_add(1<<16, &lock->val);
+> -	u16 ticket = val >> 16;
+> -
+> -	if (ticket == (u16)val)
+> -		return;
+> -
+> -	/*
+> -	 * atomic_cond_read_acquire() is RCpc, but rather than defining a
+> -	 * custom cond_read_rcsc() here we just emit a full fence.  We only
+> -	 * need the prior reads before subsequent writes ordering from
+> -	 * smb_mb(), but as atomic_cond_read_acquire() just emits reads and we
+> -	 * have no outstanding writes due to the atomic_fetch_add() the extra
+> -	 * orderings are free.
+> -	 */
+> -	atomic_cond_read_acquire(&lock->val, ticket == (u16)VAL);
+> -	smp_mb();
+> -}
+> -
+> -static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+> -{
+> -	u32 old = atomic_read(&lock->val);
+> -
+> -	if ((old >> 16) != (old & 0xffff))
+> -		return false;
+> -
+> -	return atomic_try_cmpxchg(&lock->val, &old, old + (1<<16)); /* SC, for RCsc */
+> -}
+> -
+> -static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
+> -{
+> -	u16 *ptr = (u16 *)lock + IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
+> -	u32 val = atomic_read(&lock->val);
+> -
+> -	smp_store_release(ptr, (u16)val + 1);
+> -}
+> -
+> -static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock)
+> -{
+> -	u32 val = lock.val.counter;
+> -
+> -	return ((val >> 16) == (val & 0xffff));
+> -}
+> -
+> -static __always_inline int arch_spin_is_locked(arch_spinlock_t *lock)
+> -{
+> -	arch_spinlock_t val = READ_ONCE(*lock);
+> -
+> -	return !arch_spin_value_unlocked(val);
+> -}
+> -
+> -static __always_inline int arch_spin_is_contended(arch_spinlock_t *lock)
+> -{
+> -	u32 val = atomic_read(&lock->val);
+> -
+> -	return (s16)((val >> 16) - (val & 0xffff)) > 1;
+> -}
+> -
+> +#include <asm-generic/ticket_spinlock.h>
+>  #include <asm/qrwlock.h>
+>  
+>  #endif /* __ASM_GENERIC_SPINLOCK_H */
+> diff --git a/include/asm-generic/ticket_spinlock.h b/include/asm-generic/ticket_spinlock.h
+> new file mode 100644
+> index 000000000000..cfcff22b37b3
+> --- /dev/null
+> +++ b/include/asm-generic/ticket_spinlock.h
+> @@ -0,0 +1,103 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +/*
+> + * 'Generic' ticket-lock implementation.
+> + *
+> + * It relies on atomic_fetch_add() having well defined forward progress
+> + * guarantees under contention. If your architecture cannot provide this, stick
+> + * to a test-and-set lock.
+> + *
+> + * It also relies on atomic_fetch_add() being safe vs smp_store_release() on a
+> + * sub-word of the value. This is generally true for anything LL/SC although
+> + * you'd be hard pressed to find anything useful in architecture specifications
+> + * about this. If your architecture cannot do this you might be better off with
+> + * a test-and-set.
+> + *
+> + * It further assumes atomic_*_release() + atomic_*_acquire() is RCpc and hence
+> + * uses atomic_fetch_add() which is RCsc to create an RCsc hot path, along with
+> + * a full fence after the spin to upgrade the otherwise-RCpc
+> + * atomic_cond_read_acquire().
+> + *
+> + * The implementation uses smp_cond_load_acquire() to spin, so if the
+> + * architecture has WFE like instructions to sleep instead of poll for word
+> + * modifications be sure to implement that (see ARM64 for example).
+> + *
+> + */
+> +
+> +#ifndef __ASM_GENERIC_TICKET_SPINLOCK_H
+> +#define __ASM_GENERIC_TICKET_SPINLOCK_H
+> +
+> +#include <linux/atomic.h>
+> +#include <asm-generic/spinlock_types.h>
+> +
+> +static __always_inline void ticket_spin_lock(arch_spinlock_t *lock)
+> +{
+> +	u32 val = atomic_fetch_add(1<<16, &lock->val);
+> +	u16 ticket = val >> 16;
+> +
+> +	if (ticket == (u16)val)
+> +		return;
+> +
+> +	/*
+> +	 * atomic_cond_read_acquire() is RCpc, but rather than defining a
+> +	 * custom cond_read_rcsc() here we just emit a full fence.  We only
+> +	 * need the prior reads before subsequent writes ordering from
+> +	 * smb_mb(), but as atomic_cond_read_acquire() just emits reads and we
+> +	 * have no outstanding writes due to the atomic_fetch_add() the extra
+> +	 * orderings are free.
+> +	 */
+> +	atomic_cond_read_acquire(&lock->val, ticket == (u16)VAL);
+> +	smp_mb();
+> +}
+> +
+> +static __always_inline bool ticket_spin_trylock(arch_spinlock_t *lock)
+> +{
+> +	u32 old = atomic_read(&lock->val);
+> +
+> +	if ((old >> 16) != (old & 0xffff))
+> +		return false;
+> +
+> +	return atomic_try_cmpxchg(&lock->val, &old, old + (1<<16)); /* SC, for RCsc */
+> +}
+> +
+> +static __always_inline void ticket_spin_unlock(arch_spinlock_t *lock)
+> +{
+> +	u16 *ptr = (u16 *)lock + IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
+> +	u32 val = atomic_read(&lock->val);
+> +
+> +	smp_store_release(ptr, (u16)val + 1);
+> +}
+> +
+> +static __always_inline int ticket_spin_value_unlocked(arch_spinlock_t lock)
+> +{
+> +	u32 val = lock.val.counter;
+> +
+> +	return ((val >> 16) == (val & 0xffff));
+> +}
+> +
+> +static __always_inline int ticket_spin_is_locked(arch_spinlock_t *lock)
+> +{
+> +	arch_spinlock_t val = READ_ONCE(*lock);
+> +
+> +	return !ticket_spin_value_unlocked(val);
+> +}
+> +
+> +static __always_inline int ticket_spin_is_contended(arch_spinlock_t *lock)
+> +{
+> +	u32 val = atomic_read(&lock->val);
+> +
+> +	return (s16)((val >> 16) - (val & 0xffff)) > 1;
+> +}
+> +
+> +/*
+> + * Remapping spinlock architecture specific functions to the corresponding
+> + * ticket spinlock functions.
+> + */
+> +#define arch_spin_is_locked(l)		ticket_spin_is_locked(l)
+> +#define arch_spin_is_contended(l)	ticket_spin_is_contended(l)
+> +#define arch_spin_value_unlocked(l)	ticket_spin_value_unlocked(l)
+> +#define arch_spin_lock(l)		ticket_spin_lock(l)
+> +#define arch_spin_trylock(l)		ticket_spin_trylock(l)
+> +#define arch_spin_unlock(l)		ticket_spin_unlock(l)
+> +
+> +#endif /* __ASM_GENERIC_TICKET_SPINLOCK_H */
 
---=-i2GAPbyuCQEoSsXUiu64
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+IIUC here most of the file was moved, and the above defines are introduced.
 
-On Fri, 2023-08-11 at 15:59 -0700, Sean Christopherson wrote:
-> The problem isn't that the sync code doesn't differentiate between kernel=
- and
-> user-initiated writes, because parts of the code *do* differentiate.=C2=
-=A0 I think it's
-> more accurate to say that the problem is that the sync code doesn't diffe=
-rentiate
-> between userspace initializing the TSC and userspace attempting to synchr=
-onize the
-> TSC.
+I understand this pattern of creating the defines at the end of the file is 
+the same used in "asm-generic/qspinlock.h" but I don't actually think this
+is a good way of doing this.
 
-I'm not utterly sure that *I* differentiate between userspace
-"initializing the TSC" and attempting to "synchronize the TSC". What
-*is* the difference?=20
+Instead of having those defines here (and similarly on 
+"asm-generic/qspinlock.h", I think it would be better to have those defines 
+in the arch-specific header including them, which would allow the arch to 
+include multiple spinlock versions and decide (compile-time, even run-time)
+which version to use. It gives decision power to the arch code.
 
-Userspace is merely *setting* the TSC for a given vCPU, regardless of
-whether other vCPUs even exist.
+(And it would remove the need of undefining them on a later patch)
 
-But we have to work around the fundamental brokenness of the legacy
-API, whose semantics are most accurately described as "Please set the
-TSC to precisely <x> because that's what it should have been *some*
-time around now, if I wasn't preempted very much between when I
-calculated it and when you see this ioctl".
+There are only 3 archs which use this arch-generic qspinlock, so should 
+not be a huge deal to have the defines copied there:
 
-That's why =E2=80=94 for the legacy API only =E2=80=94 we have this hack to=
- make the
-TSCs *actually* in sync if they're close. Because without it, there;s
-*no* way the VMM can restore a guest with its TSCs actually in sync.
+# git grep asm-generic/qspinlock.h
+arch/loongarch/include/asm/qspinlock.h:16:#include <asm-generic/qspinlock.h>
+arch/sparc/include/asm/qspinlock.h:6:#include <asm-generic/qspinlock.h>
+arch/x86/include/asm/qspinlock.h:107:#include <asm-generic/qspinlock.h>
 
-I think the best answer to the bug report that led to this patch is
-just "Don't use the legacy API then". Use KVM_VCPU_TSC_OFFSET which is
-defined as "the TSC was <x> at KVM time <y>" and is actually *sane*.
+Other than that:
+Reviewed-by: Leonardo Bras <leobras@redhat.com>
 
-
---=-i2GAPbyuCQEoSsXUiu64
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTEzMDgxMDQ4WjAvBgkqhkiG9w0BCQQxIgQgkQYyFZ6S
-mKPjLEmClqRevBtT7iiXbz1SRkb0wDHBCmEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBVf3/WnOJckmfHgCvWMmMD6eUz/EtHDaZZ
-WYpf7vJjXabaA6jaz2ND55NrYIw3osOhBE1W3t+xpOb3eX/IqG+Ev+Yd3V7VpsnRH2iT/P5BIJt3
-rlRLpyvE67JzWjt13LH6K53TwuwFATIQmMPkJARU6VMEfLKWTLIo+1H/HSHl68ZhOHGYwLYodtuM
-h9zM+Y8sF0V9lLxPXgPrmnpDf5ZDLZS6SvCPUnaWBWi7s5JZrWqSN8QHZXar81GKpbTj42xNEamE
-vu1FtnGL7+SyPcpGEMOW8QZs+wcHuLS1K6hSEAhxgvtUtIPH1jzEuHj+o60FWVqGs1bxqMvMvgB9
-SLI6NflNveQoVCF3HgoXjJ3EPYmISlbwEHqOY8pil9XWFU8MnC5cV8t4W3Def3EEZ+F1cCyTR0Mx
-+nlimaRhWuUlMyVU1rqLyWucqlFIfOBVwTVdiTP9s82coKBedaqmggYA0Zjz1+Eek446lI0K8X5k
-e4Lf+INU2sHJ0icnuXLXWlECJapUZNHKk/KPgxK1bkdnwLhaUCS3EYAP4FIdPcygnetko4wIpyGh
-VoY3gONEY7xf23GN+aYXbCibvQ3g0fatbqSPLmV0EbCXHqlQkOc5xLcX5US4VHVdlTGIofuPBZdj
-IXZkqzk76YW9iKXMUbsJ5Oo9X4BmRO0k5GNeqGwtdAAAAAAAAA==
-
-
---=-i2GAPbyuCQEoSsXUiu64--
