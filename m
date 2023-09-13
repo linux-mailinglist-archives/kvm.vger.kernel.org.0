@@ -2,138 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 726C779E89B
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 15:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30A1C79E8A4
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 15:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240730AbjIMNHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 09:07:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48962 "EHLO
+        id S240786AbjIMNHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 09:07:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240711AbjIMNHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 09:07:10 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2099019B6;
-        Wed, 13 Sep 2023 06:07:06 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38DCRWOI016469;
-        Wed, 13 Sep 2023 13:07:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=U6m79bn53R80K62WnFpoCyhwSnR4yQVNhqrLWqqZQwk=;
- b=e96pzpA0D/LpdPvP69j0Grf4IDP3ysXoivr94YT+362omeS1wFuGjf/Ygv8J3vMJZJDK
- gq3B5JdYyEeczlYhKJ8RsOevvLti1KP+pC7eLYIhU43sH6iVnmW/PVsUHaD8gOllypV/
- BeBs/few4NGfsG9adVArhNt8Kymb6Pcb9qtem5p37UBRyzxSfyPY8UbmrJWbE7I7kBqp
- qqinfGg9xfR96FMqsT6O3gwtdnfH+/ikzBir9e3QjrnEduv02L94fofnKkns8J8ZOE5Z
- wpc85/02p7U9YuCrk/mjBR2oq1uIoaz6l0qW3bELb+UooHJGpx/fYhM87L/7GkrHfBnr Lw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t3d3qs6cu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Sep 2023 13:07:03 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38DCc9Gh002970;
-        Wed, 13 Sep 2023 13:06:44 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t3d3qs627-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Sep 2023 13:06:44 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38DC14AA024021;
-        Wed, 13 Sep 2023 13:06:30 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t131tbka0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Sep 2023 13:06:30 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38DD6UOf2032354
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Sep 2023 13:06:30 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3925D58059;
-        Wed, 13 Sep 2023 13:06:30 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5B58758058;
-        Wed, 13 Sep 2023 13:06:29 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.101.13])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Sep 2023 13:06:29 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, borntraeger@linux.ibm.com,
-        kwankhede@nvidia.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com,
-        Anthony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH 2/2] s390/vfio-ap: set status response code to 06 on gisc registration failure
-Date:   Wed, 13 Sep 2023 09:06:22 -0400
-Message-ID: <20230913130626.217665-3-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230913130626.217665-1-akrowiak@linux.ibm.com>
-References: <20230913130626.217665-1-akrowiak@linux.ibm.com>
+        with ESMTP id S240767AbjIMNHc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 09:07:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CAE8C19BB
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 06:06:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694610406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1N8nXpfMCNYLFwc5DqM2IQ2ttQ6FxXsVgYdelfbJc5Y=;
+        b=HTnOBm4l1uSQZn6SQy6fN0/mX4g3IAl/jSznAhA4Lz9mfyzFZx90RKQGE3zB1yytu6SS4V
+        QI1Hc98ycixoD3y40znQDxjaXx/7eY7uIJQ1l8KljJf5rBRYs8wPpkE8bS4E9tS3ixlj4D
+        SKpgHe2oBeX4GOSTNkd8eIdo0Pub978=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-659-QRcYUWmXNfChTXcc_wePhw-1; Wed, 13 Sep 2023 09:06:42 -0400
+X-MC-Unique: QRcYUWmXNfChTXcc_wePhw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B7A2101FAA1;
+        Wed, 13 Sep 2023 13:06:41 +0000 (UTC)
+Received: from [10.22.32.174] (unknown [10.22.32.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A80792904;
+        Wed, 13 Sep 2023 13:06:37 +0000 (UTC)
+Message-ID: <0ea8d0e7-6447-3a60-8cf4-d6a4e89fa8be@redhat.com>
+Date:   Wed, 13 Sep 2023 09:06:37 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH V11 04/17] locking/qspinlock: Improve xchg_tail for number
+ of cpus >= 16k
+Content-Language: en-US
+To:     Guo Ren <guoren@kernel.org>, Leonardo Bras <leobras@redhat.com>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
+        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
+        catalin.marinas@arm.com, conor.dooley@microchip.com,
+        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
+        alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-5-guoren@kernel.org>
+ <f091ead0-99b9-b30a-a295-730ce321ac60@redhat.com>
+ <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
+ <06714da1-d566-766f-7a13-a3c93b5953c4@redhat.com>
+ <CAJF2gTQ3Q7f+FGorVTR66c6TGWsSeeKVvLF+LH1_m3kSHrm0yA@mail.gmail.com>
+ <ZQF49GIZoFceUGYH@redhat.com>
+ <CAJF2gTTHdCr-FQVSGUc+LapkJPmDiEYYa_1P6T86uCjRujgnTg@mail.gmail.com>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <CAJF2gTTHdCr-FQVSGUc+LapkJPmDiEYYa_1P6T86uCjRujgnTg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lU2LQRYLG9tuGBlkzrvvtPDdHVoJbi4C
-X-Proofpoint-ORIG-GUID: q5sFbLFVHWMbtwh9T3ABJjGAKtNL1md0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-13_06,2023-09-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 mlxscore=0 suspectscore=0 spamscore=0 adultscore=0
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2308100000 definitions=main-2309130101
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Anthony Krowiak <akrowiak@linux.ibm.com>
+On 9/13/23 08:52, Guo Ren wrote:
+> On Wed, Sep 13, 2023 at 4:55 PM Leonardo Bras <leobras@redhat.com> wrote:
+>> On Tue, Sep 12, 2023 at 09:10:08AM +0800, Guo Ren wrote:
+>>> On Mon, Sep 11, 2023 at 9:03 PM Waiman Long <longman@redhat.com> wrote:
+>>>> On 9/10/23 23:09, Guo Ren wrote:
+>>>>> On Mon, Sep 11, 2023 at 10:35 AM Waiman Long <longman@redhat.com> wrote:
+>>>>>> On 9/10/23 04:28, guoren@kernel.org wrote:
+>>>>>>> From: Guo Ren <guoren@linux.alibaba.com>
+>>>>>>>
+>>>>>>> The target of xchg_tail is to write the tail to the lock value, so
+>>>>>>> adding prefetchw could help the next cmpxchg step, which may
+>>>>>>> decrease the cmpxchg retry loops of xchg_tail. Some processors may
+>>>>>>> utilize this feature to give a forward guarantee, e.g., RISC-V
+>>>>>>> XuanTie processors would block the snoop channel & irq for several
+>>>>>>> cycles when prefetch.w instruction (from Zicbop extension) retired,
+>>>>>>> which guarantees the next cmpxchg succeeds.
+>>>>>>>
+>>>>>>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+>>>>>>> Signed-off-by: Guo Ren <guoren@kernel.org>
+>>>>>>> ---
+>>>>>>>     kernel/locking/qspinlock.c | 5 ++++-
+>>>>>>>     1 file changed, 4 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
+>>>>>>> index d3f99060b60f..96b54e2ade86 100644
+>>>>>>> --- a/kernel/locking/qspinlock.c
+>>>>>>> +++ b/kernel/locking/qspinlock.c
+>>>>>>> @@ -223,7 +223,10 @@ static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
+>>>>>>>      */
+>>>>>>>     static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
+>>>>>>>     {
+>>>>>>> -     u32 old, new, val = atomic_read(&lock->val);
+>>>>>>> +     u32 old, new, val;
+>>>>>>> +
+>>>>>>> +     prefetchw(&lock->val);
+>>>>>>> +     val = atomic_read(&lock->val);
+>>>>>>>
+>>>>>>>         for (;;) {
+>>>>>>>                 new = (val & _Q_LOCKED_PENDING_MASK) | tail;
+>>>>>> That looks a bit weird. You pre-fetch and then immediately read it. How
+>>>>>> much performance gain you get by this change alone?
+>>>>>>
+>>>>>> Maybe you can define an arch specific primitive that default back to
+>>>>>> atomic_read() if not defined.
+>>>>> Thx for the reply. This is a generic optimization point I would like
+>>>>> to talk about with you.
+>>>>>
+>>>>> First, prefetchw() makes cacheline an exclusive state and serves for
+>>>>> the next cmpxchg loop semantic, which writes the idx_tail part of
+>>>>> arch_spin_lock. The atomic_read only makes cacheline in the shared
+>>>>> state, which couldn't give any guarantee for the next cmpxchg loop
+>>>>> semantic. Micro-architecture could utilize prefetchw() to provide a
+>>>>> strong forward progress guarantee for the xchg_tail, e.g., the T-HEAD
+>>>>> XuanTie processor would hold the exclusive cacheline state until the
+>>>>> next cmpxchg write success.
+>>>>>
+>>>>> In the end, Let's go back to the principle: the xchg_tail is an atomic
+>>>>> swap operation that contains write eventually, so giving a prefetchw()
+>>>>> at the beginning is acceptable for all architectures..
+>>>>> ••••••••••••
+>>>> I did realize afterward that prefetchw gets the cacheline in exclusive
+>>>> state. I will suggest you mention that in your commit log as well as
+>>>> adding a comment about its purpose in the code.
+>>> Okay, I would do that in v12, thx.
+>> I would suggest adding a snippet from the ISA Extenstion doc:
+>>
+>> "A prefetch.w instruction indicates to hardware that the cache block whose
+>> effective address is the sum of the base address specified in rs1 and the
+>> sign-extended offset encoded in imm[11:0], where imm[4:0] equals 0b00000,
+>> is likely to be accessed by a data write (i.e. store) in the near future."
+> Good point, thx.
 
-The interception handler for the PQAP(AQIC) command calls the
-kvm_s390_gisc_register function to register the guest ISC with the channel
-subsystem. If that call fails, the status response code 08 - indicating
-Invalid ZONE/GISA designation - is returned to the guest. This response
-code does not make sense because the non-zero return code from the
-kvm_s390_gisc_register function can be due one of two things: Either the
-ISC passed as a parameter by the guest to the PQAP(AQIC) command is greater
-than the maximum ISC value allowed, or the guest is not using a GISA.
+qspinlock is generic code. I suppose this is for the RISCV architecture. 
+You can mention that in the commit log as an example, but I prefer more 
+generic comment especially in the code.
 
-Since this scenario is very unlikely to happen and there is no status
-response code to indicate an invalid ISC value, let's set the
-response code to 06 indicating 'Invalid address of AP-queue notification
-byte'. While this is not entirely accurate, it is better than indicating
-that the ZONE/GISA designation is invalid which is something the guest
-can do nothing about since those values are set by the hypervisor.
-
-Signed-off-by: Anthony Krowiak <akrowiak@linux.ibm.com>
-Suggested-by: Halil Pasic <pasic@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 9cb28978c186..e7e4dbbf5ad3 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -394,7 +394,7 @@ static int ensure_nib_shared(unsigned long addr, struct gmap *gmap)
-  * host ISC to issue the host side PQAP/AQIC
-  *
-  * Response.status may be set to AP_RESPONSE_INVALID_ADDRESS in case the
-- * vfio_pin_pages failed.
-+ * vfio_pin_pages or kvm_s390_gisc_register failed.
-  *
-  * Otherwise return the ap_queue_status returned by the ap_aqic(),
-  * all retry handling will be done by the guest.
-@@ -458,7 +458,7 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
- 				 __func__, nisc, isc, q->apqn);
- 
- 		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
--		status.response_code = AP_RESPONSE_INVALID_GISA;
-+		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
- 		return status;
- 	}
- 
--- 
-2.41.0
+Cheers,
+Longman
 
