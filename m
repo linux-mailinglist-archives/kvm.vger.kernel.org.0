@@ -2,137 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61F3E79F077
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:37:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54C0679F087
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 19:43:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbjIMRhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 13:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37126 "EHLO
+        id S231310AbjIMRnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 13:43:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjIMRha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 13:37:30 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32638A8
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:37:26 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c3a2f46244so251105ad.1
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 10:37:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694626645; x=1695231445; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AecudT7EiX+/N1zd76G2BuWYAX0/KYuLLaU2H3llYQ=;
-        b=U8BIABw/cNPFs1/y98w03BSd9X0/5LBkjSaM7PWjP1lf52AeXYmdsxMMCDIz6hXa9J
-         O64a4RZhv0YQ3BiVTjffp97ynknGRZElnjkGr6EfygfgPyDWFx1QYt71Wcpz1ejZ9Bst
-         zNVW+z5s8s9r8YL1KD23dY8TRleIJOSifu8nXp79vKxwmtKJu6tCxDnhUXAiENhjm5up
-         w4+5eKwXnesDhFknxdmXA8XU2mbH2y/OfYlPYIOWcPR0xeUBUNWwHARPbKracOS+Jfa4
-         htlxgUEOMLmfR0z8nr7z3TDKiWoFdRkT5hOg+puL7WSdEG5PV630yUkK5mLoek/K+tEQ
-         Icfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694626645; x=1695231445;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1AecudT7EiX+/N1zd76G2BuWYAX0/KYuLLaU2H3llYQ=;
-        b=HZvzxO4R9I5iokGKGkQz8IWa38JEVhRME9s3Qr/kMc02eJlOG9ROnFp1973gxHT5OG
-         BhpZFVoDNv9V+E2+tdfujrmR++Wsrl+DI8SKYcZivIiGlgI6vF2UZC64fHC1n9/jGRlB
-         89JZ2gka47WGKBSC+hWeOA2doAlWvA4ai6q5bmaWse0M+hFlOSf2oO4ugzveP1cFOU1r
-         c2xcPXC4pACqmW6Bec3nDkZVxib4ZcyRiD7R/KudnIgt7XPLGKZktfBGMVzemt63ko1S
-         yJjwOv9TVhcU4zCMfWvEkuFzLcKNZoYQuwbOEBwriiJZjQNjeObYryKBxbMjoCQpNfUZ
-         iC7Q==
-X-Gm-Message-State: AOJu0YyKB4ZbIXJWHdmfqHRwvLaicb6KQpMufUfuAOGTFWAIAaeWhikA
-        oAccFYhAE3YRhLHfOOa1nwuWI5KIlSg=
-X-Google-Smtp-Source: AGHT+IHiMeIl2kyTkgSOGsBoH7eXEckogjT+Oxb3QtAWLG1MtxlYB2PHOPs6XjcZ/s4JwKMi4FJkjjeo9Jg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:c28b:b0:26b:2001:54f5 with SMTP id
- f11-20020a17090ac28b00b0026b200154f5mr76310pjt.8.1694626645628; Wed, 13 Sep
- 2023 10:37:25 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 10:37:24 -0700
-In-Reply-To: <36f6fae6cd7aaba3b0fc18f10981bbba2c30b979.1694599703.git.isaku.yamahata@intel.com>
-Mime-Version: 1.0
-References: <cover.1694599703.git.isaku.yamahata@intel.com> <36f6fae6cd7aaba3b0fc18f10981bbba2c30b979.1694599703.git.isaku.yamahata@intel.com>
-Message-ID: <ZQHzVOIsesTTysgf@google.com>
-Subject: Re: [RFC PATCH 3/6] KVM: guest_memfd, x86: MEMORY_FAULT exit with hw
- poisoned page
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
-Content-Type: text/plain; charset="us-ascii"
+        with ESMTP id S229468AbjIMRnC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 13:43:02 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2043.outbound.protection.outlook.com [40.107.102.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BE5A8;
+        Wed, 13 Sep 2023 10:42:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Py8K+w609xhe/93kV6gH7k4d38/pDZZJ6fAOgfyGcv317dXpmlrRXM3T/zNtsGrwHxomVpB+neLtYtsl1EJ1nSDRidam+1edULUDJ6KeoNalrXJdbXP4OE70IhrT4amXIPKQqZCqWrFlh9FmzVszaodclPjO8eDTb1PptD895xkr/cnIncg/CYjHWHSGaNicSbUXyH1HBLh/pmsLTrCdMPuxU4iHR9qhSyaEq0d9QKVmuAquraV1ZKkI1hxsuaEs7CB24c7xbhkiQHihFISkGJw8cDSsI6rK5rre59d+S66OD4SNsvFim1sXoo4CoZxmj5yAE7pNWGPDq08/Ip2JtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4jWgyKQJ4caRRlfYsa9YoXwd0Ul0Y2uRZloM1iQSlmQ=;
+ b=brw1djUICJwfgtpPwiJZAnCRzIrBnDw/f029NEVC66vBO5JUyozwaSAUT3G7EMze0YNnrhNTDDGDiCmUkENXIQzVBbB3Zi8BYXk5zMBZIRzzuP48WyFq9aZ7xurvNmkEa38IkRmXNYznUIuVRu4w2JWZN8R8Y7ZNF0zIQV0jy0NifAbNfYRDaK1ccGMr6kr7H9v5jkatyvynCUz1KCH/hTqt/8w1vb0oifteT1aEEFb6/btJrX1br3e7p2dKgzWZOAtsYZ0XwM+/xJOb3q4t0FbNyGX3SAS407KBVWhPTT2P3AdntOao0bdVOGOEFu8EM2QJb4EDF475s3GxVCFFyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4jWgyKQJ4caRRlfYsa9YoXwd0Ul0Y2uRZloM1iQSlmQ=;
+ b=htiMkrCuxAzwfA2/zPVA8DtOQ7ovC+X05kIgfiWxn8OVnKSSkLDYIlG5IMyq2SvW4dsuhhzw1hMllMneO+hQBYGnRPTUj6U65X+wJz8ZP0CI3Ju8QhiqfspHOBooGA88srDZ1AT5Gpr9DcR4exaie1Niz83VXQ60Quat3CY0jNw=
+Received: from BLAPR05CA0028.namprd05.prod.outlook.com (2603:10b6:208:335::9)
+ by PH8PR12MB6674.namprd12.prod.outlook.com (2603:10b6:510:1c1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.34; Wed, 13 Sep
+ 2023 17:42:55 +0000
+Received: from BL02EPF0001A106.namprd05.prod.outlook.com
+ (2603:10b6:208:335:cafe::75) by BLAPR05CA0028.outlook.office365.com
+ (2603:10b6:208:335::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20 via Frontend
+ Transport; Wed, 13 Sep 2023 17:42:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0001A106.mail.protection.outlook.com (10.167.241.139) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.20 via Frontend Transport; Wed, 13 Sep 2023 17:42:55 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 13 Sep
+ 2023 12:42:51 -0500
+From:   Brett Creeley <brett.creeley@amd.com>
+To:     <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <alex.williamson@redhat.com>, <dan.carpenter@linaro.org>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <brett.creeley@amd.com>, <shannon.nelson@amd.com>
+Subject: [PATCH vfio] pds/vfio: Fix possible sleep while in atomic context
+Date:   Wed, 13 Sep 2023 10:42:38 -0700
+Message-ID: <20230913174238.72205-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A106:EE_|PH8PR12MB6674:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4d3941d-002e-4d1e-4b9c-08dbb480dcaa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4oqFGH88JCPAd/362LtxQyTR+XmYISEnK2W/BJXhHh+pSrYosSNEI/2kw5+Fq5j478aeoZcFzde1T246yIP++oykGgJ5phgYEAjBDQa7LOwJ9K3SVsKa1pXJ8jRgLlKFmc2HOZVOh9yA3fpXnYN0qNWEDuqllcsvHqLuyigXtFxrpc0QrB4LSNVUcE6I2AaW6pqxT+C+yp+fqIHo4on5061dnsqz7rypgfRW0BfOKitSBGxtuZkUSsWzwz8y8mfiVt3AfLyHxVIVws1sXmzzfXZK53JW5Yuow4P8XP8mJGSlwSTsK9q/8kXUKb6G+TYKhsfxYUXpI+5Em76hwi+DyndX2GCk2xWX02widho0CGBv5T8yHWc2lp+EQa2k9pgUirIxhFFzCdIo9fjjt5XL4paGVSXyzdKIir62e47Y07HoHPOrriwC17jO9WC3GOLED9ALTgYVVijoo0YV8anqiEz4W2C5Ibg/yUASvnfY+G/4fmEZEbZaUQ/6cLRkdYIYd83/wZMlPvy2/2NpJWqcWZVIrSwJ1eZXFfyFvDislBEguc4ruf8QTi+KV0ReZKyhgvKpdxtMC/fUfh4ya87rxyQJ0CkRv1KZS03XF0mWXv/9yb8TjHOH9ZGcpk+aG7OfhCpSLvEgcS1oZU+k0CmlBv7z/4VuMv/aIARCYBVFUZNY4rsPAScrVRucQ2VbvZMWsQF1lY16ATBHtnTmR7jjZzK31ToX120fbaOl/dgWYlJ45JseIgnz5nCDZ6RLy4eb1J3VqHUWEJiCtC6JleaUmA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(39860400002)(136003)(376002)(82310400011)(186009)(451199024)(1800799009)(40470700004)(46966006)(36840700001)(41300700001)(110136005)(6666004)(2906002)(478600001)(966005)(83380400001)(5660300002)(426003)(1076003)(70586007)(44832011)(336012)(54906003)(26005)(70206006)(16526019)(8936002)(316002)(8676002)(40460700003)(4326008)(82740400003)(86362001)(36756003)(40480700001)(47076005)(36860700001)(81166007)(2616005)(356005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2023 17:42:55.3549
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4d3941d-002e-4d1e-4b9c-08dbb480dcaa
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0001A106.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6674
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> When resolving kvm page fault and hwpoisoned page is given, KVM exit
-> with HWPOISONED flag so that user space VMM, e.g. qemu, handle it.
-> 
-> - Add a new flag POISON to KVM_EXIT_MEMORY_FAULT to indicate the page is
->   poisoned.
-> - Make kvm_gmem_get_pfn() return hwpoison state by -EHWPOISON when the
->   folio is hw-poisoned.
-> - When page is hw-poisoned on faulting in private gmem, return
->   KVM_EXIT_MEMORY_FAULT with HWPOISONED flag.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
+The driver could possibly sleep while in atomic context resulting
+in the following call trace while CONFIG_DEBUG_ATOMIC_SLEEP=y is
+set:
 
-...
+[  675.116953] BUG: spinlock bad magic on CPU#2, bash/2481
+[  675.116966]  lock: 0xffff8d6052a88f50, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+[  675.116978] CPU: 2 PID: 2481 Comm: bash Tainted: G S                 6.6.0-rc1-next-20230911 #1
+[  675.116986] Hardware name: HPE ProLiant DL360 Gen10/ProLiant DL360 Gen10, BIOS U32 01/23/2021
+[  675.116991] Call Trace:
+[  675.116997]  <TASK>
+[  675.117002]  dump_stack_lvl+0x36/0x50
+[  675.117014]  do_raw_spin_lock+0x79/0xc0
+[  675.117032]  pds_vfio_reset+0x1d/0x60 [pds_vfio_pci]
+[  675.117049]  pci_reset_function+0x4b/0x70
+[  675.117061]  reset_store+0x5b/0xa0
+[  675.117074]  kernfs_fop_write_iter+0x137/0x1d0
+[  675.117087]  vfs_write+0x2de/0x410
+[  675.117101]  ksys_write+0x5d/0xd0
+[  675.117111]  do_syscall_64+0x3b/0x90
+[  675.117122]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+[  675.117135] RIP: 0033:0x7f9ebbd1fa28
+[  675.117141] Code: 89 02 48 c7 c0 ff ff ff ff eb b3 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 8d 05 15 4d 2a 00 8b 00 85 c0 75 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 41 54 49 89 d4 55
+[  675.117148] RSP: 002b:00007ffdff410728 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[  675.117156] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f9ebbd1fa28
+[  675.117161] RDX: 0000000000000002 RSI: 000055ffc5fdf7c0 RDI: 0000000000000001
+[  675.117166] RBP: 000055ffc5fdf7c0 R08: 000000000000000a R09: 00007f9ebbd7fae0
+[  675.117170] R10: 000000000000000a R11: 0000000000000246 R12: 00007f9ebbfc06e0
+[  675.117174] R13: 0000000000000002 R14: 00007f9ebbfbb860 R15: 0000000000000002
+[  675.117180]  </TASK>
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index eb900344a054..48329cb44415 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -527,7 +527,8 @@ struct kvm_run {
->  		} notify;
->  		/* KVM_EXIT_MEMORY_FAULT */
->  		struct {
-> -#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE	BIT_ULL(3)
-> +#define KVM_MEMORY_EXIT_FLAG_HWPOISON	BIT_ULL(4)
 
-Rather than add a flag, I think we should double down on returning -1 + errno
-when exiting with vcpu->run->exit_reason == KVM_EXIT_MEMORY_FAULT, as is being
-proposed in Anish's series for accelerating UFFD-like behavior in KVM[*].
+This can happen if pds_vfio_put_restore_file() and/or
+pds_vfio_put_save_file() grab the mutex_lock(&lm_file->lock)
+while the spin_lock(&pds_vfio->reset_lock) is held, which can
+happen during while calling pds_vfio_state_mutex_unlock().
 
-Then KVM can simply return -EFAULT or -EHWPOISON to communicate why KVM is
-existing at a higher level, and let the kvm_run structure provide the finer
-details about the access itself.  E.g. kvm_faultin_pfn_private() can simply
-propagate the return value from kvm_gmem_get_pfn() without having to identify
-*why* kvm_gmem_get_pfn() failed.
+Fix this by releasing the spin_unlock(&pds_vfio->reset_lock) before
+calling pds_vfio_put_restore_file() and pds_vfio_put_save_file() and
+re-acquiring spin_lock(&pds_vfio->reset_lock) after the previously
+mentioned functions are called to protect setting the subsequent
+state/deferred reset settings.
 
-static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-				   struct kvm_page_fault *fault)
-{
-	int max_order, r;
+The only possible concerns are other threads that may call
+pds_vfio_put_restore_file() and/or pds_vfio_put_save_file(). However,
+those paths are already protected by the state mutex_lock().
 
-	if (!kvm_slot_can_be_private(fault->slot)) {
-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-		return -EFAULT;
-	}
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/kvm/1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain/
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+---
+ drivers/vfio/pci/pds/vfio_dev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-			     &max_order);
-	if (r) {
-		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-		return r;
-	}
+diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+index b46174f5eb09..0807d163f83e 100644
+--- a/drivers/vfio/pci/pds/vfio_dev.c
++++ b/drivers/vfio/pci/pds/vfio_dev.c
+@@ -33,8 +33,10 @@ void pds_vfio_state_mutex_unlock(struct pds_vfio_pci_device *pds_vfio)
+ 	if (pds_vfio->deferred_reset) {
+ 		pds_vfio->deferred_reset = false;
+ 		if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
++			spin_unlock(&pds_vfio->reset_lock);
+ 			pds_vfio_put_restore_file(pds_vfio);
+ 			pds_vfio_put_save_file(pds_vfio);
++			spin_lock(&pds_vfio->reset_lock);
+ 			pds_vfio_dirty_disable(pds_vfio, false);
+ 		}
+ 		pds_vfio->state = pds_vfio->deferred_reset_state;
+-- 
+2.17.1
 
-	...
-}
-
-[*] https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.com
