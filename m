@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8D479E534
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:49:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1253C79E53E
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:49:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238099AbjIMKtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 06:49:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38158 "EHLO
+        id S239768AbjIMKt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 06:49:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233278AbjIMKtL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 06:49:11 -0400
+        with ESMTP id S239745AbjIMKtT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 06:49:19 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049ACCA;
-        Wed, 13 Sep 2023 03:49:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD3219AD;
+        Wed, 13 Sep 2023 03:49:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694602147; x=1726138147;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0ipY0xZJYgdQ7/oanIvGLJbsO2u+4QkUIghXmzX8/8w=;
-  b=Kw3R2kQmyEQ5Zwc0wbCb2Yd7fPT0RznIWyCi2ft42LzDu2alxOYXHlop
-   bQgcDFexSuRY0JgGV8d2JLLnkNzrU6nA4f59ZllQoBnV8aEX8vXxtyI/D
-   ObfoE9849aTywudPQ35dKOHAixQrJG/4cuf0ohCaQ2bbfS1Odaszf222f
-   4kZ3pEpJA/PIbLBppqJt4f901jhsbMg5/q9DZVNT5YPLE1fbmKdzkxUVW
-   faHT0EdHXD96Q0ctNBNTO9SuXe5KTQPz5Q+FCnsCJNAx7y+UyejHUvyKs
-   9uInDqmf3HjpYoRjtTzitIzgP8ABssf8AJMPvi0qHNYNFLt7gFRlKLbAw
+  t=1694602155; x=1726138155;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vea9mvBaSY1mfkjysqPlMz9IcbWDu86rAIRw2ANf9IU=;
+  b=S3B5mHPMRO04ej1QqK8YST3CxjOPhX/PJ+GA7bcc1SPCwSPFj51UwKIW
+   I+0yTwV0jXkxBeSWFc3XIP00+Gz4jFkCq3dPT0a6qgc1hcexTjJwgrAVS
+   8NsgedDGxo89PvAaj4z+WgI7jnB1dDhLMDZlvbE7jRtavRWzgtVQDwE4R
+   pgVK8vCM1mYnQz7R3mXOoB7VWs9gvirXjoPVH+7OjV+Zw/l1Vl3gZE7At
+   6T3xqm/gb6A4Re1Da0zsGv5aHRH1EjpSjVlv2powyT+MFdf91SnsWRfXX
+   WGMTAVZ+7BI4hs4mdYXnLpirT+cYeF2LtzQuCfugs0VOpVJjAY18OToAH
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464994921"
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464994949"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="464994921"
+   d="scan'208";a="464994949"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:07 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:15 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="737451848"
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="737451852"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="737451848"
+   d="scan'208";a="737451852"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:06 -0700
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:49:07 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -57,10 +57,12 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Xu Yilun <yilun.xu@intel.com>,
         Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
         Fuad Tabba <tabba@google.com>
-Subject: [RFC PATCH 0/6] KVM: gmem: Implement error_remove_page
-Date:   Wed, 13 Sep 2023 03:48:49 -0700
-Message-Id: <cover.1694599703.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH 1/6] KVM: guest_memfd: Add config to show the capability to handle error page
+Date:   Wed, 13 Sep 2023 03:48:50 -0700
+Message-Id: <56cd2f6f42351f2f27a07e5764bab7f689cc0059.1694599703.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1694599703.git.isaku.yamahata@intel.com>
+References: <cover.1694599703.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -69,48 +71,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This patch series is to share my progress on the KVM gmem error_remove_page task.
-Although I'm still working on test cases, I don't want to hold the patches
-locally until I finish test cases.
+Add config, HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR, to indicate kvm arch
+can handle gmem error page.
 
-- Update error_remove_page method.  Unmap gfn on poisoned pages.  Pass related
-  arguments.  Unfortunately, the error_remove_page callback is passed struct
-  page.  So the callback can't know about the actual poisoned address and range.
-  The memory poisoning would be based on cache line size, though.
-- Add a new flag to KVM_EXIT_MEMORY_FAULT to indicate the page is poisoned.
-- Add check in faultin_pfn_private.  When the page is poisoned,
-  KVM_EXIT_MEMORY_FAULT(HWPOISON).
-- Only test case for ioctl(FIBMAP).  Test cases are TODO.
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+---
+ virt/kvm/Kconfig     | 3 +++
+ virt/kvm/guest_mem.c | 3 +++
+ 2 files changed, 6 insertions(+)
 
-TODOs
-- Implement test cases to inject HWPOISON or MCE by hwpoison
-  (/sys/kernel/debug/hwpoison/corrupt-pfn) or MCE injection
-  (/sys/kernel/debug/mce-inject).
-- Update qemu to handle KVM_EXIT_MEMORY_FAULT(HWPOISON)
-- Update TDX KVM to handle it and Add test cases for TDX.
-- Try to inject HWPOISON as soon as the poison is detected.
-
-Isaku Yamahata (6):
-  KVM: guest_memfd: Add config to show the capability to handle error
-    page
-  KVM: guestmem_fd: Make error_remove_page callback to unmap guest
-    memory
-  KVM: guest_memfd, x86: MEMORY_FAULT exit with hw poisoned page
-  KVM: guest_memfd: Implemnet bmap inode operation
-  KVM: selftests: Add selftest for guest_memfd() fibmap
-  KVM: X86: Allow KVM gmem hwpoison test cases
-
- arch/x86/kvm/Kconfig                          |  2 +
- arch/x86/kvm/mmu/mmu.c                        | 21 +++--
- include/linux/kvm_host.h                      |  2 +
- include/uapi/linux/kvm.h                      |  3 +-
- .../testing/selftests/kvm/guest_memfd_test.c  | 45 ++++++++++
- virt/kvm/Kconfig                              |  7 ++
- virt/kvm/guest_mem.c                          | 82 +++++++++++++++----
- 7 files changed, 139 insertions(+), 23 deletions(-)
-
-
-base-commit: a5accd8596fa84b9fe00076444b5ef628d2351b9
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 1a48cb530092..624df45baff0 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -112,3 +112,6 @@ config KVM_GENERIC_PRIVATE_MEM
+        select KVM_GENERIC_MEMORY_ATTRIBUTES
+        select KVM_PRIVATE_MEM
+        bool
++
++config HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR
++	bool
+diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
+index 85903c32163f..35d8f03e7937 100644
+--- a/virt/kvm/guest_mem.c
++++ b/virt/kvm/guest_mem.c
+@@ -307,6 +307,9 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
+ 	pgoff_t start, end;
+ 	gfn_t gfn;
+ 
++	if (!IS_ENABLED(CONFIG_HAVE_GENERIC_PRIVATE_MEM_HANDLE_ERROR))
++		return MF_IGNORED;
++
+ 	filemap_invalidate_lock_shared(mapping);
+ 
+ 	start = page->index;
 -- 
 2.25.1
 
