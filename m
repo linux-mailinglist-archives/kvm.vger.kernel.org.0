@@ -2,129 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C5679F14F
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 20:42:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 073E179F170
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 20:54:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231875AbjIMSmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 14:42:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46832 "EHLO
+        id S232036AbjIMSy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 14:54:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbjIMSmo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 14:42:44 -0400
-Received: from out-210.mta1.migadu.com (out-210.mta1.migadu.com [IPv6:2001:41d0:203:375::d2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A440BA3
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 11:42:40 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 18:42:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1694630556;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zbGmeaiAhruCsTYtUBEjHjtu3fwpdJmWOhi1GQR/CuQ=;
-        b=nB+4ixR36xp5mTADmigicU6BIarSlxQlccDXHV1SUJ7P8f6pFGZVg4OF/uIv7pcoe9hdad
-        jBdPUyp1xeot1bSoOjjyBPz8i/wj52zbxAV3IaqQycfdzLdM2EIt0AnekYJXHBLP8UAI7J
-        X8kE56ZheHYdxhuKrin2YEMhf5bFFtg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Salil Mehta <salil.mehta@huawei.com>
-Subject: Re: [PATCH kvmtool v3 00/17] aarch64: Handle PSCI calls in userspace
-Message-ID: <ZQIClyAyD4Y67qng@linux.dev>
-References: <20230802234255.466782-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230802234255.466782-1-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+        with ESMTP id S231980AbjIMSy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 14:54:27 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CECF1989
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 11:54:23 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68fc081cd46so120507b3a.0
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 11:54:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1694631263; x=1695236063; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AeNR7qwQLkJOVuge8P10O3vzgVEpbjfLDo4ctIHKwbU=;
+        b=VdS/pDO4yvsVu/1ahDVz/fvHw92at1jw/ugcmAuDydR4skNEALikzcyS/QQGawmikF
+         lmoenMs3SlGwHBNHJUaG/4v+Brd1jfPVGIAjq4ZctQBbK8F5xnek+enffjSfbh2LzWss
+         hRVRuovwqGqYJN6cagUD1hRXmz0W3ZBCJZ+FIgTCXHXAcBBWZHxDUpUTcKkDhhI1QsIM
+         PZWJjYCFnCarSn7veuCg186TNCiahJlx3v3RZudKgVj7RmbJ9D+p6ta0h2QUjUDzUtwQ
+         M6w7r/lnZFac6BnlVIn3tsrninChcSUpd3lulbC3DJTTFcN1KiSd7PykZiN1WF1UUtrJ
+         IZmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694631263; x=1695236063;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AeNR7qwQLkJOVuge8P10O3vzgVEpbjfLDo4ctIHKwbU=;
+        b=C5F0NFHyIfP4Psm/c0PVQGB+wICVz6z2LJteQuiQgct1F5AcL/zfDdkh8z0d7h5/pl
+         eTygkM1P6spCbMtLXrM6OcKCt07GQpiiwBCVMWMXvmqwg83CB0A8IcP4PDV4jfsTpw9j
+         Zzj7/uqCREiK+r/akWDcpA65jj/Mfxm6An2iCVsiN7pT0i/zUYll62ts6XggnHy83hwd
+         WSStIaFmxMWC6cNWVglGvVww4Z5/68sgCBQgN96Gh0loGIWwYWAlEP+sN00W7Cfg3ZCV
+         yqAXfuSHHxTuqImY23wN5z4Ag2cN9R+ZRRVfoo0OjgvM7hRPCXbbfwvu4MIHJylBlR0O
+         t6rA==
+X-Gm-Message-State: AOJu0Yw6Z/VxpnHW4xeRVc73k5F7s28PIz44jo63BdAAB17v4h4DqR16
+        HTQCRdTXU6DIQLBVzc1WtQf4PA==
+X-Google-Smtp-Source: AGHT+IHWJanL/mhSZzKNrnjgZ9a4L8x4QH7mCct+onuawdEUp8h+RhW5cHMtW3sNV708kZgryFVaZg==
+X-Received: by 2002:a05:6a21:329c:b0:12e:98a3:77b7 with SMTP id yt28-20020a056a21329c00b0012e98a377b7mr3872648pzb.59.1694631262697;
+        Wed, 13 Sep 2023 11:54:22 -0700 (PDT)
+Received: from localhost ([135.180.227.0])
+        by smtp.gmail.com with ESMTPSA id x14-20020a170902ec8e00b001a6d4ea7301sm10765184plg.251.2023.09.13.11.54.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 11:54:21 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 11:54:21 -0700 (PDT)
+X-Google-Original-Date: Wed, 13 Sep 2023 11:54:19 PDT (-0700)
+Subject:     Re: [PATCH V10 07/19] riscv: qspinlock: errata: Introduce ERRATA_THEAD_QSPINLOCK
+In-Reply-To: <ae320af5-6cca-4689-aa66-9d0193713d40@app.fastmail.com>
+CC:     guoren@kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        anup@brainfault.org, peterz@infradead.org, mingo@redhat.com,
+        Will Deacon <will@kernel.org>, longman@redhat.com,
+        boqun.feng@gmail.com, tglx@linutronix.de, paulmck@kernel.org,
+        rostedt@goodmis.org, rdunlap@infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        xiaoguang.xing@sophgo.com, Bjorn Topel <bjorn@rivosinc.com>,
+        alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, guoren@linux.alibaba.com
+From:   Palmer Dabbelt <palmer@rivosinc.com>
+To:     sorear@fastmail.com
+Message-ID: <mhng-ee184bd2-7666-402d-b0df-d484ed6d8236@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Will,
+On Sun, 06 Aug 2023 22:23:34 PDT (-0700), sorear@fastmail.com wrote:
+> On Wed, Aug 2, 2023, at 12:46 PM, guoren@kernel.org wrote:
+>> From: Guo Ren <guoren@linux.alibaba.com>
+>>
+>> According to qspinlock requirements, RISC-V gives out a weak LR/SC
+>> forward progress guarantee which does not satisfy qspinlock. But
+>> many vendors could produce stronger forward guarantee LR/SC to
+>> ensure the xchg_tail could be finished in time on any kind of
+>> hart. T-HEAD is the vendor which implements strong forward
+>> guarantee LR/SC instruction pairs, so enable qspinlock for T-HEAD
+>> with errata help.
+>>
+>> T-HEAD early version of processors has the merge buffer delay
+>> problem, so we need ERRATA_WRITEONCE to support qspinlock.
+>>
+>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+>> Signed-off-by: Guo Ren <guoren@kernel.org>
+>> ---
+>>  arch/riscv/Kconfig.errata              | 13 +++++++++++++
+>>  arch/riscv/errata/thead/errata.c       | 24 ++++++++++++++++++++++++
+>>  arch/riscv/include/asm/errata_list.h   | 20 ++++++++++++++++++++
+>>  arch/riscv/include/asm/vendorid_list.h |  3 ++-
+>>  arch/riscv/kernel/cpufeature.c         |  3 ++-
+>>  5 files changed, 61 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/riscv/Kconfig.errata b/arch/riscv/Kconfig.errata
+>> index 4745a5c57e7c..eb43677b13cc 100644
+>> --- a/arch/riscv/Kconfig.errata
+>> +++ b/arch/riscv/Kconfig.errata
+>> @@ -96,4 +96,17 @@ config ERRATA_THEAD_WRITE_ONCE
+>>
+>>  	  If you don't know what to do here, say "Y".
+>>
+>> +config ERRATA_THEAD_QSPINLOCK
+>> +	bool "Apply T-Head queued spinlock errata"
+>> +	depends on ERRATA_THEAD
+>> +	default y
+>> +	help
+>> +	  The T-HEAD C9xx processors implement strong fwd guarantee LR/SC to
+>> +	  match the xchg_tail requirement of qspinlock.
+>> +
+>> +	  This will apply the QSPINLOCK errata to handle the non-standard
+>> +	  behavior via using qspinlock instead of ticket_lock.
+>> +
+>> +	  If you don't know what to do here, say "Y".
+>
+> If this is to be applied, I would like to see a detailed explanation somewhere,
+> preferably with citations, of:
+>
+> (a) The memory model requirements for qspinlock
+> (b) Why, with arguments, RISC-V does not architecturally meet (a)
+> (c) Why, with arguments, T-HEAD C9xx meets (a)
+> (d) Why at least one other architecture which defines ARCH_USE_QUEUED_SPINLOCKS
+>     meets (a)
 
-Haven't heard anything on v2 or v3 of this series and this has been on
-the list for a while. Any thoughts?
+I agree.
 
-I want to get a VMM using the SMCCC filtering UAPI ahead of CPU hotplug
-on QEMU so we have some test coverage :) There's a knock-on benefit of
-plugging some of the inherent races in system-scoped PSCI calls getting
-out to userspace too.
+Just having a magic fence that makes qspinlocks stop livelocking on some 
+processors is going to lead to a mess -- I'd argue this means those 
+processors just don't provide the forward progress guarantee, but we'd 
+really need something written down about what this new custom 
+instruction aliasing as a fence does.
 
---
-Thanks,
-Oliver
+> As far as I can tell, the RISC-V guarantees concerning constrained LR/SC loops
+> (livelock freedom but no starvation freedom) are exactly the same as those in
+> Armv8 (as of 0487F.c) for equivalent loops, and xchg_tail compiles to a
+> constrained LR/SC loop with guaranteed eventual success (with -O1).  Clearly you
+> disagree; I would like to see your perspective.
 
-On Wed, Aug 02, 2023 at 11:42:38PM +0000, Oliver Upton wrote:
-> v3 of the series to do PSCI calls in userspace, as an example for using
-> the SMCCC filtering API added to KVM in 6.4.
-> 
-> v2 -> v3:
->  - Dropped some of the headers patches since they've already been
->    updated
->  - Redo header imports on top of 6.5-rc1
->  - Actually use the right subject prefix...
-> 
-> v2: https://lore.kernel.org/kvmarm/20230620163353.2688567-1-oliver.upton@linux.dev/
-> 
-> Oliver Upton (17):
->   Import arm-smccc.h from Linux 6.5-rc1
->   aarch64: Copy cputype.h from Linux 6.5-rc1
->   Update psci.h to Linux 6.5-rc1
->   arm: Stash kvm_vcpu_init for later use
->   arm: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
->   aarch64: Expose ARM64_CORE_REG() for general use
->   arm: Generalize execution state specific VM initialization
->   Add helpers to pause the VM from vCPU thread
->   aarch64: Add support for finding vCPU for given MPIDR
->   aarch64: Add skeleton implementation for PSCI
->   aarch64: psci: Implement CPU_SUSPEND
->   aarch64: psci: Implement CPU_OFF
->   aarch64: psci: Implement CPU_ON
->   aarch64: psci: Implement AFFINITY_INFO
->   aarch64: psci: Implement MIGRATE_INFO_TYPE
->   aarch64: psci: Implement SYSTEM_{OFF,RESET}
->   aarch64: smccc: Start sending PSCI to userspace
-> 
->  Makefile                                  |   4 +-
->  arm/aarch32/include/kvm/kvm-arch.h        |   2 +-
->  arm/aarch32/kvm-cpu.c                     |   5 +
->  arm/aarch64/include/asm/cputype.h         | 186 +++++++++++++++++
->  arm/aarch64/include/asm/smccc.h           |  65 ++++++
->  arm/aarch64/include/kvm/kvm-arch.h        |   2 +-
->  arm/aarch64/include/kvm/kvm-config-arch.h |   6 +-
->  arm/aarch64/include/kvm/kvm-cpu-arch.h    |  28 ++-
->  arm/aarch64/kvm-cpu.c                     |  48 +++--
->  arm/aarch64/kvm.c                         |  25 ++-
->  arm/aarch64/psci.c                        | 207 +++++++++++++++++++
->  arm/aarch64/smccc.c                       |  81 ++++++++
->  arm/include/arm-common/kvm-arch.h         |   2 +
->  arm/include/arm-common/kvm-config-arch.h  |   1 +
->  arm/include/arm-common/kvm-cpu-arch.h     |   2 +-
->  arm/kvm-cpu.c                             |  21 +-
->  arm/kvm.c                                 |   2 +-
->  include/kvm/kvm-cpu.h                     |   3 +
->  include/linux/arm-smccc.h                 | 240 ++++++++++++++++++++++
->  include/linux/psci.h                      |  47 +++++
->  kvm-cpu.c                                 |  16 ++
->  21 files changed, 959 insertions(+), 34 deletions(-)
->  create mode 100644 arm/aarch64/include/asm/cputype.h
->  create mode 100644 arm/aarch64/include/asm/smccc.h
->  create mode 100644 arm/aarch64/psci.c
->  create mode 100644 arm/aarch64/smccc.c
->  create mode 100644 include/linux/arm-smccc.h
-> 
-> 
-> base-commit: 106e2ea7756d980454d68631b87d5e25ba4e4881
-> -- 
-> 2.41.0.585.gd2178a4bd4-goog
-> 
+It sounds to me like this processor might be quite broken: if it's 
+permanently holding stores in a buffer we're going to have more issues 
+than just qspinlock, pretty much anything concurrent is going to have 
+issues -- and that's not just in the kernel, there's concurrent 
+userspace code as well.
 
--- 
-Thanks,
-Oliver
+> -s
+>
+>> +
+>>  endmenu # "CPU errata selection"
+>> diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+>> index 881729746d2e..d560dc45c0e7 100644
+>> --- a/arch/riscv/errata/thead/errata.c
+>> +++ b/arch/riscv/errata/thead/errata.c
+>> @@ -86,6 +86,27 @@ static bool errata_probe_write_once(unsigned int stage,
+>>  	return false;
+>>  }
+>>
+>> +static bool errata_probe_qspinlock(unsigned int stage,
+>> +				   unsigned long arch_id, unsigned long impid)
+>> +{
+>> +	if (!IS_ENABLED(CONFIG_ERRATA_THEAD_QSPINLOCK))
+>> +		return false;
+>> +
+>> +	/*
+>> +	 * The queued_spinlock torture would get in livelock without
+>> +	 * ERRATA_THEAD_WRITE_ONCE fixup for the early versions of T-HEAD
+>> +	 * processors.
+>> +	 */
+>> +	if (arch_id == 0 && impid == 0 &&
+>> +	    !IS_ENABLED(CONFIG_ERRATA_THEAD_WRITE_ONCE))
+>> +		return false;
+>> +
+>> +	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+>> +		return true;
+>> +
+>> +	return false;
+>> +}
+>> +
+>>  static u32 thead_errata_probe(unsigned int stage,
+>>  			      unsigned long archid, unsigned long impid)
+>>  {
+>> @@ -103,6 +124,9 @@ static u32 thead_errata_probe(unsigned int stage,
+>>  	if (errata_probe_write_once(stage, archid, impid))
+>>  		cpu_req_errata |= BIT(ERRATA_THEAD_WRITE_ONCE);
+>>
+>> +	if (errata_probe_qspinlock(stage, archid, impid))
+>> +		cpu_req_errata |= BIT(ERRATA_THEAD_QSPINLOCK);
+>> +
+>>  	return cpu_req_errata;
+>>  }
+>>
+>> diff --git a/arch/riscv/include/asm/errata_list.h
+>> b/arch/riscv/include/asm/errata_list.h
+>> index fbb2b8d39321..a696d18d1b0d 100644
+>> --- a/arch/riscv/include/asm/errata_list.h
+>> +++ b/arch/riscv/include/asm/errata_list.h
+>> @@ -141,6 +141,26 @@ asm volatile(ALTERNATIVE(						\
+>>  	: "=r" (__ovl) :						\
+>>  	: "memory")
+>>
+>> +static __always_inline bool
+>> +riscv_has_errata_thead_qspinlock(void)
+>> +{
+>> +	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
+>> +		asm_volatile_goto(
+>> +		ALTERNATIVE(
+>> +		"j	%l[l_no]", "nop",
+>> +		THEAD_VENDOR_ID,
+>> +		ERRATA_THEAD_QSPINLOCK,
+>> +		CONFIG_ERRATA_THEAD_QSPINLOCK)
+>> +		: : : : l_no);
+>> +	} else {
+>> +		goto l_no;
+>> +	}
+>> +
+>> +	return true;
+>> +l_no:
+>> +	return false;
+>> +}
+>> +
+>>  #endif /* __ASSEMBLY__ */
+>>
+>>  #endif
+>> diff --git a/arch/riscv/include/asm/vendorid_list.h
+>> b/arch/riscv/include/asm/vendorid_list.h
+>> index 73078cfe4029..1f1d03877f5f 100644
+>> --- a/arch/riscv/include/asm/vendorid_list.h
+>> +++ b/arch/riscv/include/asm/vendorid_list.h
+>> @@ -19,7 +19,8 @@
+>>  #define	ERRATA_THEAD_CMO 1
+>>  #define	ERRATA_THEAD_PMU 2
+>>  #define	ERRATA_THEAD_WRITE_ONCE 3
+>> -#define	ERRATA_THEAD_NUMBER 4
+>> +#define	ERRATA_THEAD_QSPINLOCK 4
+>> +#define	ERRATA_THEAD_NUMBER 5
+>>  #endif
+>>
+>>  #endif
+>> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+>> index f8dbbe1bbd34..d9694fe40a9a 100644
+>> --- a/arch/riscv/kernel/cpufeature.c
+>> +++ b/arch/riscv/kernel/cpufeature.c
+>> @@ -342,7 +342,8 @@ void __init riscv_fill_hwcap(void)
+>>  		 * spinlock value, the only way is to change from queued_spinlock to
+>>  		 * ticket_spinlock, but can not be vice.
+>>  		 */
+>> -		if (!force_qspinlock) {
+>> +		if (!force_qspinlock &&
+>> +		    !riscv_has_errata_thead_qspinlock()) {
+>>  			set_bit(RISCV_ISA_EXT_XTICKETLOCK, isainfo->isa);
+>>  		}
+>>  #endif
+>> --
+>> 2.36.1
+>>
+>>
+>> _______________________________________________
+>> linux-riscv mailing list
+>> linux-riscv@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-riscv
