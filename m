@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19E4079ED60
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 17:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B949079ED5F
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 17:40:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbjIMPkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 11:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51910 "EHLO
+        id S230023AbjIMPk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 11:40:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbjIMPkE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 11:40:04 -0400
+        with ESMTP id S230021AbjIMPkG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 11:40:06 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56A631BD2;
-        Wed, 13 Sep 2023 08:39:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40AC1998;
+        Wed, 13 Sep 2023 08:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694619598; x=1726155598;
+  t=1694619601; x=1726155601;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0cTlr1mKrGrpxp1CAfvA2cpfcdMbNRRwGEwG+LbmU24=;
-  b=CFwOsHjiNKJO/wzXG/NTkqxsBnqLmMWxEbOKUkA3wGxhmzZWpjht3Rph
-   qItzwOw3eAdemjiCqGGCT3wSBXv+u/081YCgp4AF0yi7E2Rk1hDfwypM/
-   Dl7C3e0h35U39qMkuxrR+ZVKzXPnN30netc6QRffEpsqjVH209t7UFJat
-   yf5L9suJKk8OHhjt9s36BUA813zooZlX3hkFO3gvtCVgQ8pFhYqD6hIVU
-   VqV8MvDSOZm/A/2GFjDWbTDZcTiCtfPsTPzUZWAQcz4wGbVcHHR544vTS
-   VOKG8+aW1pJh6Ic+etn+tPbqiPQ5w+FmE0jeFXbHWuFk95ebYRfmx8ys0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="376030190"
+  bh=67P2iLxdV87t35mWNljMwrzWvImeQnpC9+86T3M9PiA=;
+  b=esNBrkouJ56Rd+D/y9y//ajdluY99st1Rld8HqSj0aehWezBxFQt7BuF
+   w6yaxidEkWImtVTtaff2+kv9sBgHclyK7RbFfwRwypA3WjLHK/gyfD3e4
+   VIU72b3hyxv72mivx8+11KQRuYXWmkSa6a8NPPD16n6wsOvtO4Lj+M4SG
+   E47PDj3jIrAqCSRK8hjqNJwWE+PoXkOcvm5/cCCpekAtV3DQXknUK5MM5
+   Cq8ZcJQtar/lhgZ0o3Uwf9/Yy/0wIO9JVJPcHVzfnlXrDA30jmWZQLe/4
+   VW08ZDMMpVPTFCk5bhbRvfetJVvmmDf6pKEH8SFmA0iRzYm1f35T55uWp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="376030203"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="376030190"
+   d="scan'208";a="376030203"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:58 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:40:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="867852095"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="867852107"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="867852095"
+   d="scan'208";a="867852107"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO binbinwu-mobl.sh.intel.com) ([10.93.2.44])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:55 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:58 -0700
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
         kai.huang@intel.com, David.Laight@ACULAB.COM,
         robert.hu@linux.intel.com, guang.zeng@intel.com,
         binbin.wu@linux.intel.com
-Subject: [PATCH v11 06/16] KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
-Date:   Wed, 13 Sep 2023 20:42:17 +0800
-Message-Id: <20230913124227.12574-7-binbin.wu@linux.intel.com>
+Subject: [PATCH v11 07/16] KVM: x86: Remove kvm_vcpu_is_illegal_gpa()
+Date:   Wed, 13 Sep 2023 20:42:18 +0800
+Message-Id: <20230913124227.12574-8-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230913124227.12574-1-binbin.wu@linux.intel.com>
 References: <20230913124227.12574-1-binbin.wu@linux.intel.com>
@@ -56,101 +56,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add and use kvm_vcpu_is_legal_cr3() to check CR3's legality to provide
-a clear distinction b/t CR3 and GPA checks. So that kvm_vcpu_is_legal_cr3()
-can be adjusted according to new features.
+Remove kvm_vcpu_is_illegal_gpa() and use !kvm_vcpu_is_legal_gpa() instead.
 
 No functional change intended.
 
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
- arch/x86/kvm/cpuid.h      | 5 +++++
- arch/x86/kvm/svm/nested.c | 4 ++--
- arch/x86/kvm/vmx/nested.c | 4 ++--
- arch/x86/kvm/x86.c        | 4 ++--
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ arch/x86/kvm/cpuid.h      | 5 -----
+ arch/x86/kvm/vmx/nested.c | 2 +-
+ arch/x86/kvm/vmx/vmx.c    | 2 +-
+ 3 files changed, 2 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 284fa4704553..ca1fdab31d1e 100644
+index ca1fdab31d1e..31b7def60282 100644
 --- a/arch/x86/kvm/cpuid.h
 +++ b/arch/x86/kvm/cpuid.h
-@@ -278,4 +278,9 @@ static __always_inline bool guest_can_use(struct kvm_vcpu *vcpu,
- 			vcpu->arch.governed_features.enabled);
+@@ -47,11 +47,6 @@ static inline bool kvm_vcpu_is_legal_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+ 	return !(gpa & vcpu->arch.reserved_gpa_bits);
  }
  
-+static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-+{
-+	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index dd496c9e5f91..c63aa6624e7f 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -311,7 +311,7 @@ static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
- 	if ((save->efer & EFER_LME) && (save->cr0 & X86_CR0_PG)) {
- 		if (CC(!(save->cr4 & X86_CR4_PAE)) ||
- 		    CC(!(save->cr0 & X86_CR0_PE)) ||
--		    CC(kvm_vcpu_is_illegal_gpa(vcpu, save->cr3)))
-+		    CC(!kvm_vcpu_is_legal_cr3(vcpu, save->cr3)))
- 			return false;
- 	}
- 
-@@ -520,7 +520,7 @@ static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
- static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 			       bool nested_npt, bool reload_pdptrs)
+-static inline bool kvm_vcpu_is_illegal_gpa(struct kvm_vcpu *vcpu, gpa_t gpa)
+-{
+-	return !kvm_vcpu_is_legal_gpa(vcpu, gpa);
+-}
+-
+ static inline bool kvm_vcpu_is_legal_aligned_gpa(struct kvm_vcpu *vcpu,
+ 						 gpa_t gpa, gpa_t alignment)
  {
--	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3)))
-+	if (CC(!kvm_vcpu_is_legal_cr3(vcpu, cr3)))
- 		return -EINVAL;
- 
- 	if (reload_pdptrs && !nested_npt && is_pae_paging(vcpu) &&
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index c5ec0ef51ff7..db61cf8e3128 100644
+index db61cf8e3128..51622878d6e4 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1085,7 +1085,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 			       bool nested_ept, bool reload_pdptrs,
- 			       enum vm_entry_failure_code *entry_failure_code)
- {
--	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3))) {
-+	if (CC(!kvm_vcpu_is_legal_cr3(vcpu, cr3))) {
- 		*entry_failure_code = ENTRY_FAIL_DEFAULT;
- 		return -EINVAL;
+@@ -2717,7 +2717,7 @@ static bool nested_vmx_check_eptp(struct kvm_vcpu *vcpu, u64 new_eptp)
  	}
-@@ -2912,7 +2912,7 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
  
- 	if (CC(!nested_host_cr0_valid(vcpu, vmcs12->host_cr0)) ||
- 	    CC(!nested_host_cr4_valid(vcpu, vmcs12->host_cr4)) ||
--	    CC(kvm_vcpu_is_illegal_gpa(vcpu, vmcs12->host_cr3)))
-+	    CC(!kvm_vcpu_is_legal_cr3(vcpu, vmcs12->host_cr3)))
- 		return -EINVAL;
+ 	/* Reserved bits should not be set */
+-	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, new_eptp) || ((new_eptp >> 7) & 0x1f)))
++	if (CC(!kvm_vcpu_is_legal_gpa(vcpu, new_eptp) || ((new_eptp >> 7) & 0x1f)))
+ 		return false;
  
- 	if (CC(is_noncanonical_address(vmcs12->host_ia32_sysenter_esp, vcpu)) ||
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..ea48ba87dacf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1284,7 +1284,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
- 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
- 	 * the current vCPU mode is accurate.
+ 	/* AD, if set, should be supported */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 72e3943f3693..6eba8c08eff6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5782,7 +5782,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	 * would also use advanced VM-exit information for EPT violations to
+ 	 * reconstruct the page fault error code.
  	 */
--	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
-+	if (!kvm_vcpu_is_legal_cr3(vcpu, cr3))
- 		return 1;
+-	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
++	if (unlikely(allow_smaller_maxphyaddr && !kvm_vcpu_is_legal_gpa(vcpu, gpa)))
+ 		return kvm_emulate_instruction(vcpu, 0);
  
- 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
-@@ -11468,7 +11468,7 @@ static bool kvm_is_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 		 */
- 		if (!(sregs->cr4 & X86_CR4_PAE) || !(sregs->efer & EFER_LMA))
- 			return false;
--		if (kvm_vcpu_is_illegal_gpa(vcpu, sregs->cr3))
-+		if (!kvm_vcpu_is_legal_cr3(vcpu, sregs->cr3))
- 			return false;
- 	} else {
- 		/*
+ 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
 -- 
 2.25.1
 
