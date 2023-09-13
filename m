@@ -2,186 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A3E979DCEC
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 02:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D30079DD5B
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 03:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233204AbjIMACY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 20:02:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46382 "EHLO
+        id S237992AbjIMBEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 21:04:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbjIMACY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 20:02:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1B31705
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 17:02:20 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d80db590b1cso773943276.0
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 17:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694563339; x=1695168139; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=B8O84M8nqeVG0BSKRDFPvsNkITeT3KIGbDhN0gQ/CcA=;
-        b=z3A/JYrUH6aUjaVFObA3A48277ymlDZMje7jhmuTmvsvav8LEzusi2eid4en/p1I+B
-         1jfla3LGDc2CM6iHWJH0biY+abhCFMApSWvh/Bqu0CxM/ACj3mVF4bRMweS4nvQtU1Mr
-         WoJ4mhvbLuLXsvdz7QTnjSVW04NQLJ1H29p7kzXQQjNFqokdY091MfAfWlZbygkwTex2
-         0eNPyY21/nTU/87Yi6vTwvPNF8b5bMELPbcWsOBtHqhsxJvxIM/6Oej3e9GdNJS624dZ
-         LTyWLkWkSEjWN3VAMtHxgNNVFDlG8kTQXodR2pIgTNuYozEQoc9Fye8a3v8ZMc0zgyou
-         uQcA==
+        with ESMTP id S229553AbjIMBEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 21:04:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A35391706
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 18:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694567035;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5NRCL/xSBSuFgu7em92vBs1igQbTUxJIfZeUuKm3Sk4=;
+        b=WF2Oeh02NiaxnayvoUL9mAQ4d/8+mPIWtliiJuygy20Njh8EKkBzflXGJ+i6xHhMqeCZTi
+        FV/T13IUp27R2SCoIjF6fIj49N5QkyiSEeCGGxPsmTJLDsw1XBj1yIVK3xa/DdKtap3xpD
+        iGL2/4ADtwd/ADmDCCpYwKKGMtp0Py4=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-151-upGOa8YmPdivPEJdHKWchw-1; Tue, 12 Sep 2023 21:03:54 -0400
+X-MC-Unique: upGOa8YmPdivPEJdHKWchw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-52c03bb5327so4126841a12.0
+        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 18:03:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694563339; x=1695168139;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B8O84M8nqeVG0BSKRDFPvsNkITeT3KIGbDhN0gQ/CcA=;
-        b=WRzC9fQyCnwop0+FqgusJKk2uFxHZIbmPoDVJENeUBzu3iyQN8LKOZ+aQrTWimLl8c
-         xfzL0RYjAgeKNQ+KjuqPCoWuxtfxeqtXxfD7fVASeXSvtJq8EAxc+hxagehAuffAj+Bv
-         RilmUfRBO1rcbZ9ZlxQkbHHcQkoklW5gQHViVJyFmNtD6q+AjBaHKinnmEYRlGNVfGjB
-         dJFYI/CDg7rFtGbbNe9AsrXbcEUZS0Pvp03drIdf9GMSKI0C9Cuszo2im7oGMCTA6Lgb
-         XZ98H07LS/bzM6uK3GPzfuApnIpLMNAQQ/ArvJ8N8D0hyHT3OmXrJFdZ7WVYMiaWGSBf
-         fX1Q==
-X-Gm-Message-State: AOJu0Yy5/oJRxZ/IMcg8942ITg6/yEcKkig8CnX4yXQIxnhs9hPYk/Se
-        sm8gJgp+j+zolNSTWG8E9ntUQAdBGg==
-X-Google-Smtp-Source: AGHT+IGBoQiQuWTki2UGlib6khGZDCCRNfaIToyv6J5RX2gRNwbvmdUBIqgi7S5AFfYW/udiKrZd/4LqYA==
-X-Received: from hshan17.roam.corp.google.com ([2620:15c:211:201:2a7f:c6c4:6e3:ac5c])
- (user=hshan job=sendgmr) by 2002:a05:6902:1022:b0:ca3:3341:6315 with SMTP id
- x2-20020a056902102200b00ca333416315mr46020ybt.0.1694563339330; Tue, 12 Sep
- 2023 17:02:19 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 16:55:45 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230913000215.478387-1-hshan@google.com>
-Subject: [PATCH v3] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
-From:   Haitao Shan <hshan@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Haitao Shan <hshan@google.com>
+        d=1e100.net; s=20230601; t=1694567033; x=1695171833;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5NRCL/xSBSuFgu7em92vBs1igQbTUxJIfZeUuKm3Sk4=;
+        b=EChlvDvXu+30B9grw5pR4DzP/byo/a/PVle5cJP0Gshkia0qSUF/wzGrFjtl4DOUqz
+         sShOrxf6vWgTDcZH0DMrRSy37qJjEY7UHReoKZXgMkraIxTagIgfq/UqLE8kKwzowlGF
+         NchllgfeODORTVb5svk2N5zy95M6U+QHGr4PKnN3rItqbWNIdLdfXCxFmlwoN4ywu69+
+         SI/6sc6eXrYmYYW7McL/Lg4UpoAoLdamIyPmD5DO/kM3Qzq5AR87R2bjf0RF3dO201SS
+         Tucmh+ZZ16cB/Kvgh2L7s7vPy5Ojh9utT1Vvi1MzqTlOQMAS6YjBqaLAQ0yF7/oxFmxk
+         JFSA==
+X-Gm-Message-State: AOJu0YzXZWqx1IidQDEUPRp4NrqZwAjU0ZwcIDY7xrtRj6N9zhZxwBOD
+        +ylpjvU4kcZ+oF8ZHch6IGesIE1nj8PQNN/EOn6IDWJmwXyvpt9G+KqzwkNmLyFnQcrhOiCuH5g
+        Mm8Ci5ExWGhySHonmLKr89KPz8lpy
+X-Received: by 2002:aa7:c50b:0:b0:523:cc3d:9121 with SMTP id o11-20020aa7c50b000000b00523cc3d9121mr857282edq.14.1694567032759;
+        Tue, 12 Sep 2023 18:03:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFu64JnfHFzyZtEh4sWY+VJP3IlZTzEnel5Sw1uyDAqbUJK4erdPM+M7Hz8BqtRBiR06pvVlXvXC0tnu7fHLCc=
+X-Received: by 2002:aa7:c50b:0:b0:523:cc3d:9121 with SMTP id
+ o11-20020aa7c50b000000b00523cc3d9121mr857267edq.14.1694567032457; Tue, 12 Sep
+ 2023 18:03:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230912130132.561193-1-dtatulea@nvidia.com>
+In-Reply-To: <20230912130132.561193-1-dtatulea@nvidia.com>
+From:   Lei Yang <leiyang@redhat.com>
+Date:   Wed, 13 Sep 2023 09:03:15 +0800
+Message-ID: <CAPpAL=w6KeBG5Ur037GNQa=n_fdoUwrFo+ATsFtX9HbWPHZvsg@mail.gmail.com>
+Subject: Re: [PATCH 00/16] vdpa: Add support for vq descriptor mappings
+To:     Dragos Tatulea <dtatulea@nvidia.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, Parav Pandit <parav@nvidia.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running android emulator (which is based on QEMU 2.12) on
-certain Intel hosts with kernel version 6.3-rc1 or above, guest
-will freeze after loading a snapshot. This is almost 100%
-reproducible. By default, the android emulator will use snapshot
-to speed up the next launching of the same android guest. So
-this breaks the android emulator badly.
+Hi Dragos, Eugenio and Si-Wei
 
-I tested QEMU 8.0.4 from Debian 12 with an Ubuntu 22.04 guest by
-running command "loadvm" after "savevm". The same issue is
-observed. At the same time, none of our AMD platforms is impacted.
-More experiments show that loading the KVM module with
-"enable_apicv=false" can workaround it.
+My name is Lei Yang, a software Quality Engineer from Red Hat.  And
+always paying attention to improving the live migration downtime
+issues because there are others QE asked about this problem when I
+share live migration status  recently. Therefore I would like to test
+it in my environment. Before the testing I want to know if there is an
+expectation of downtime range based on this series of patches? In
+addition, QE also can help do a regression test based on this series
+of patches if there is a requirement.
 
-The issue started to show up after commit 8e6ed96cdd50 ("KVM: x86:
-fire timer when it is migrated and expired, and in oneshot mode").
-However, as is pointed out by Sean Christopherson, it is introduced
-by commit 967235d32032 ("KVM: vmx: clear pending interrupts on
-KVM_SET_LAPIC"). commit 8e6ed96cdd50 ("KVM: x86: fire timer when
-it is migrated and expired, and in oneshot mode") just makes it
-easier to hit the issue.
+Regards and thanks
+Lei
 
-Having both commits, the oneshot lapic timer gets fired immediately
-inside the KVM_SET_LAPIC call when loading the snapshot. On Intel
-platforms with APIC virtualization and posted interrupt processing,
-this eventually leads to setting the corresponding PIR bit. However,
-the whole PIR bits get cleared later in the same KVM_SET_LAPIC call
-by apicv_post_state_restore. This leads to timer interrupt lost.
 
-The fix is to move vmx_apicv_post_state_restore to the beginning of
-the KVM_SET_LAPIC call and rename to vmx_apicv_pre_state_restore.
-What vmx_apicv_post_state_restore does is actually clearing any
-former apicv state and this behavior is more suitable to carry out
-in the beginning.
-
-Fixes: 967235d32032 ("KVM: vmx: clear pending interrupts on KVM_SET_LAPIC")
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Haitao Shan <hshan@google.com>
----
-v1 ---> v2:
-	Rewrite the fix following Sean's suggestion.
-
-v2 ---> v3:
-	Rename and move apicv_post_state_restore in both
-	kvm_lapic_reset and kvm_apic_set_state
----
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 1 +
- arch/x86/kvm/lapic.c               | 4 ++++
- arch/x86/kvm/vmx/vmx.c             | 4 ++--
- 4 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index e3054e3e46d5..9b419f0de713 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -108,6 +108,7 @@ KVM_X86_OP_OPTIONAL(vcpu_blocking)
- KVM_X86_OP_OPTIONAL(vcpu_unblocking)
- KVM_X86_OP_OPTIONAL(pi_update_irte)
- KVM_X86_OP_OPTIONAL(pi_start_assignment)
-+KVM_X86_OP_OPTIONAL(apicv_pre_state_restore)
- KVM_X86_OP_OPTIONAL(apicv_post_state_restore)
- KVM_X86_OP_OPTIONAL_RET0(dy_apicv_has_pending_interrupt)
- KVM_X86_OP_OPTIONAL(set_hv_timer)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3bc146dfd38d..af33fdc7377f 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1691,6 +1691,7 @@ struct kvm_x86_ops {
- 	int (*pi_update_irte)(struct kvm *kvm, unsigned int host_irq,
- 			      uint32_t guest_irq, bool set);
- 	void (*pi_start_assignment)(struct kvm *kvm);
-+	void (*apicv_pre_state_restore)(struct kvm_vcpu *vcpu);
- 	void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
- 	bool (*dy_apicv_has_pending_interrupt)(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a983a16163b1..c4ae3ce15f4e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2649,6 +2649,8 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	u64 msr_val;
- 	int i;
- 
-+	static_call_cond(kvm_x86_apicv_pre_state_restore)(vcpu);
-+
- 	if (!init_event) {
- 		msr_val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
- 		if (kvm_vcpu_is_reset_bsp(vcpu))
-@@ -2956,6 +2958,8 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	int r;
- 
-+	static_call_cond(kvm_x86_apicv_pre_state_restore)(vcpu);
-+
- 	kvm_lapic_set_base(vcpu, vcpu->arch.apic_base);
- 	/* set SPIV separately to get count of SW disabled APICs right */
- 	apic_set_spiv(apic, *((u32 *)(s->regs + APIC_SPIV)));
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index df461f387e20..4fcf2448762c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6911,7 +6911,7 @@ static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
- 	vmcs_write64(EOI_EXIT_BITMAP3, eoi_exit_bitmap[3]);
- }
- 
--static void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
-+static void vmx_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -8276,7 +8276,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
- 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
- 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
--	.apicv_post_state_restore = vmx_apicv_post_state_restore,
-+	.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
- 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
- 	.hwapic_irr_update = vmx_hwapic_irr_update,
- 	.hwapic_isr_update = vmx_hwapic_isr_update,
--- 
-2.42.0.283.g2d96d420d3-goog
+On Tue, Sep 12, 2023 at 9:04=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> This patch series adds support for vq descriptor table mappings which
+> are used to improve vdpa live migration downtime. The improvement comes
+> from using smaller mappings which take less time to create and destroy
+> in hw.
+>
+> The first part adds the vdpa core changes from Si-Wei [0].
+>
+> The second part adds support in mlx5_vdpa:
+> - Refactor the mr code to be able to cleanly add descriptor mappings.
+> - Add hardware descriptor mr support.
+> - Properly update iotlb for cvq during ASID switch.
+>
+> [0] https://lore.kernel.org/virtualization/1694248959-13369-1-git-send-em=
+ail-si-wei.liu@oracle.com
+>
+> Dragos Tatulea (13):
+>   vdpa/mlx5: Create helper function for dma mappings
+>   vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
+>   vdpa/mlx5: Take cvq iotlb lock during refresh
+>   vdpa/mlx5: Collapse "dvq" mr add/delete functions
+>   vdpa/mlx5: Rename mr destroy functions
+>   vdpa/mlx5: Allow creation/deletion of any given mr struct
+>   vdpa/mlx5: Move mr mutex out of mr struct
+>   vdpa/mlx5: Improve mr update flow
+>   vdpa/mlx5: Introduce mr for vq descriptor
+>   vdpa/mlx5: Enable hw support for vq descriptor mapping
+>   vdpa/mlx5: Make iotlb helper functions more generic
+>   vdpa/mlx5: Update cvq iotlb mapping on ASID change
+>   Cover letter: vdpa/mlx5: Add support for vq descriptor mappings
+>
+> Si-Wei Liu (3):
+>   vdpa: introduce dedicated descriptor group for virtqueue
+>   vhost-vdpa: introduce descriptor group backend feature
+>   vhost-vdpa: uAPI to get dedicated descriptor group id
+>
+>  drivers/vdpa/mlx5/core/mlx5_vdpa.h |  31 +++--
+>  drivers/vdpa/mlx5/core/mr.c        | 191 ++++++++++++++++-------------
+>  drivers/vdpa/mlx5/core/resources.c |   6 +-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 100 ++++++++++-----
+>  drivers/vhost/vdpa.c               |  27 ++++
+>  include/linux/mlx5/mlx5_ifc.h      |   8 +-
+>  include/linux/mlx5/mlx5_ifc_vdpa.h |   7 +-
+>  include/linux/vdpa.h               |  11 ++
+>  include/uapi/linux/vhost.h         |   8 ++
+>  include/uapi/linux/vhost_types.h   |   5 +
+>  10 files changed, 264 insertions(+), 130 deletions(-)
+>
+> --
+> 2.41.0
+>
 
