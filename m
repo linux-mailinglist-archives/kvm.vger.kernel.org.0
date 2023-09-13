@@ -2,104 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E34E79E4ED
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7705479E513
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230000AbjIMKaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 06:30:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
+        id S239721AbjIMKhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 06:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjIMKaK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 06:30:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E3C2419B6
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 03:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694600959;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0bxFVe/E2XvfrFqG8Yrr1bPRLJ8gbzxCcYIWyf9wMMg=;
-        b=SEtO//4XqdqmKw26OrP4dGeP0BtkzRCKMU1sOZYgw0lLSlE6xI4Jncj2P9cdecJnkNg8ao
-        iK3uuFAbgQrlBSiJrrk9htTKdzJE8BU4iu0rqF7CRd8+w+qMDeqo2W5idS3CL4ufPxo27t
-        8EIscCNvwbL0GoyrIV5s1Y/oMj9Yz1E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-49-HxFj8HFcPnSLhc1zFQegRw-1; Wed, 13 Sep 2023 06:29:18 -0400
-X-MC-Unique: HxFj8HFcPnSLhc1zFQegRw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so49867525e9.3
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 03:29:18 -0700 (PDT)
+        with ESMTP id S238013AbjIMKhw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 06:37:52 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B670FD3;
+        Wed, 13 Sep 2023 03:37:48 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1c3887039d4so37475215ad.1;
+        Wed, 13 Sep 2023 03:37:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694601468; x=1695206268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ojXgjXc0jqNFJeHH1Cm2DAbtucHxBYUYh4RahEa6KBs=;
+        b=DaL0s2N+9mV6Rl/u4VhjBUfpAkX4C5tn92B0U/PnJxVmTGi13jW5FbstLXmfbFpN4Q
+         RJL7ckt2ruTY5S46Uo/bWxoN4ADakLWBD9u/FSMfOHGV/QPbIsgMJfmgn/cxApaJS1Bg
+         VQ6tdzgjuWcg9QApIuRYun57HxTjFptMO/knvUcPbwJlKCxIByMoC6NGlQAcKYRsS1iq
+         MnEwoAKYp2Erg3VrtIBLT8BuYwDTJ7RxFRhmYDvTDSW/C6VUuh31hk5T6+wTtsXZH7h9
+         i+R5EzudGTdi8FMsoS9Zfd8xkot5ySpnl2CNXCLCMWnIaUDsG1/H720z0aMM2XduhoBP
+         TOJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694600957; x=1695205757;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0bxFVe/E2XvfrFqG8Yrr1bPRLJ8gbzxCcYIWyf9wMMg=;
-        b=HcTMWFf3pA2uI2i8bS4hWgleXH4nDbBa4oSwTbXAYcdLFoVnNOrjbGR7i///IqM7tM
-         Ymdt1C53AxhTHbO8xeUfJAB5M7kpZr1/Syd0s8CIWVAy8cF1lbhU3RRLEVAiy735FRj8
-         I/moABSzCoKI1eEWH3iWFOd3ubY1S2M+QgPvjyT2Z/1l6+GD4/i3IUNqbvqmXek8ii6H
-         kPPfKsWy5pI6sEk+saDZ1UHOHaFBBE9U/nvs0dI/d0sova74schWEiSmCRKLx6mtfl6F
-         y7fIH7IOEJq5UWcUA3GKANA46EAzgq03DoumvQ8LrmqcgaY03FXHfFBqOQAuh8eJaSLh
-         NbEA==
-X-Gm-Message-State: AOJu0Yxg0ZfVl8bkYbAfGcl/8JSclXQahS3K1nddbiznIffxZlhRGg8X
-        l+5vkDom9o2Kzc2JImsvPCTOobguvELsggownZQQT2nv4eTvy3RTdiSW2cAy4tdq+rbItRusK1k
-        T2M2yjxjDMh4/
-X-Received: by 2002:a1c:7213:0:b0:401:d5bb:9b40 with SMTP id n19-20020a1c7213000000b00401d5bb9b40mr1791338wmc.15.1694600957305;
-        Wed, 13 Sep 2023 03:29:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJQ20OnDZTTPIGLgVTuejcFW7U3fILnen/CmHvty2+jekejpqdkNJ3ZrDotViC4vJgjVrZ9Q==
-X-Received: by 2002:a1c:7213:0:b0:401:d5bb:9b40 with SMTP id n19-20020a1c7213000000b00401d5bb9b40mr1791319wmc.15.1694600956978;
-        Wed, 13 Sep 2023 03:29:16 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id a16-20020a5d4570000000b00317f70240afsm15203183wrc.27.2023.09.13.03.29.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 03:29:16 -0700 (PDT)
-Message-ID: <7b544940-0cf2-652e-732e-934dfac63182@redhat.com>
-Date:   Wed, 13 Sep 2023 12:29:15 +0200
+        d=1e100.net; s=20230601; t=1694601468; x=1695206268;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ojXgjXc0jqNFJeHH1Cm2DAbtucHxBYUYh4RahEa6KBs=;
+        b=E8WiXvsszcVZmgwKa81IjvVXFD3tYRE4V1oMA1bfh1kT81CgX611/fzlWX831rWCp8
+         3fFfAiqvYd9WqAtjyAUMntSc9xaym/wc6/PRFxjIZfAh4YZQGM7QvZElsjZshdgcuPqY
+         yKLTR8IgE6+JIdcfMEB3P5sYRCFz55tkJKZdXxIbWTiaMyx70illKQZOhoWC7YLly95q
+         Q+w0NwNFQeVnkeIAmsJU6ep86ZW9HGM2h2iAk0huFWpjk3f6LZNyua6+vJ7M727ox5jZ
+         b1m3sFhX8UbyzqHKAyvD3bxugeNPOX5XgCJe/dNuMqDw0X63msCdinAB6KY0iHCqLi0S
+         9Zpw==
+X-Gm-Message-State: AOJu0Yx5qPQBHofe9J9l+WWcUUPYdjbHjL8b0jwDeT262Mo7EP7wpqOt
+        cvEEK6s7rxXwIiSOPaaxuH8=
+X-Google-Smtp-Source: AGHT+IHvJ2eBElEtJFWhMKjK3Lz6CRhqGH31S1aPJG0hOing5nNsAWJbgCW7LUwctZ46rF3QIH6DmQ==
+X-Received: by 2002:a17:903:2310:b0:1af:aafb:64c8 with SMTP id d16-20020a170903231000b001afaafb64c8mr2623769plh.21.1694601468097;
+        Wed, 13 Sep 2023 03:37:48 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id b15-20020a170902d50f00b001b8a85489a3sm10090808plg.262.2023.09.13.03.37.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 03:37:47 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v6] KVM: x86/tsc: Don't sync user-written TSC against startup values
+Date:   Wed, 13 Sep 2023 18:37:29 +0800
+Message-ID: <20230913103729.51194-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v5 0/6] target/i386: Restrict system-specific features
- from user emulation
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-        Michael Tokarev <mjt@tls.msk.ru>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <20230913093009.83520-1-philmd@linaro.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230913093009.83520-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/13/23 11:30, Philippe Mathieu-Daudé wrote:
-> Since v4:
-> - Addressed Paolo's suggestions (clearly better)
-> 
-> Too many system-specific code (and in particular KVM related)
-> is pulled in user-only build. This led to adding unjustified
-> stubs as kludge to unagressive linker non-optimizations.
-> 
-> This series restrict x86 system-specific features to sysemu,
-> so we don't require any stub, and remove all x86 KVM declarations
-> from user emulation code (to trigger compile failure instead of
-> link one).
+From: Like Xu <likexu@tencent.com>
 
-I'm still not sure about patch 5, though I'd like to have something like 
-patch 6.  But fortunately patches 1-3 are enough to placate clang, so I 
-have queued them.
+The legacy API for setting the TSC is fundamentally broken, and only
+allows userspace to set a TSC "now", without any way to account for
+time lost to preemption between the calculation of the value, and the
+kernel eventually handling the ioctl.
 
-Thanks Philippe!
+To work around this we have had a hack which, if a TSC is set with a
+value which is within a second's worth of a previous vCPU, assumes that
+userspace actually intended them to be in sync and adjusts the newly-
+written TSC value accordingly.
 
-Paolo
+Thus, when a VMM restores a guest after suspend or migration using the
+legacy API, the TSCs aren't necessarily *right*, but at least they're
+in sync.
 
+This trick falls down when restoring a guest which genuinely has been
+running for less time than the 1 second of imprecision which we allow
+for in the legacy API. On *creation* the first vCPU starts its TSC
+counting from zero, and the subsequent vCPUs synchronize to that. But
+then when the VMM tries to set the intended TSC value, because that's
+within a second of what the last TSC synced to, it just adjusts it to
+match that.
+
+The correct answer is for the VMM not to use the legacy API of course.
+
+But we can pile further hacks onto our existing hackish ABI, and
+declare that the *first* value written by userspace (on any vCPU)
+should not be subject to this 'correction' to make it sync up with
+values that only from the kernel's default vCPU creation.
+
+To that end: Add a flag in kvm->arch.user_set_tsc, protected by
+kvm->arch.tsc_write_lock, to record that a TSC for at least one vCPU in
+this KVM *has* been set by userspace. Make the 1-second slop hack only
+trigger if that flag is already set.
+
+Reported-by: Yong He <alexyonghe@tencent.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Original-by: Oliver Upton <oliver.upton@linux.dev>
+Original-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: David Woodhouse <dwmw2@infradead.org>
+Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+Signed-off-by: Like Xu <likexu@tencent.com>
+Tested-by: Yong He <alexyonghe@tencent.com>
+---
+V5 -> V6 Changelog:
+- Refine commit message and comments to make more sense; (David)
+- Set kvm->arch.user_set_tsc in the kvm_arch_tsc_set_attr(); (David)
+- Continue to allow usersapce to write zero to force a sync; (David)
+V5: https://lore.kernel.org/kvm/20230913072113.78885-1-likexu@tencent.com/
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1a4def36d5bb..427be7ef9702 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1322,6 +1322,7 @@ struct kvm_arch {
+ 	u64 cur_tsc_offset;
+ 	u64 cur_tsc_generation;
+ 	int nr_vcpus_matched_tsc;
++	bool user_set_tsc;
+ 
+ 	u32 default_tsc_khz;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6c9c81e82e65..354169fbc9c4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2735,20 +2735,35 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
+ 			 * kvm_clock stable after CPU hotplug
+ 			 */
+ 			synchronizing = true;
+-		} else {
++		} else if (kvm->arch.user_set_tsc) {
+ 			u64 tsc_exp = kvm->arch.last_tsc_write +
+ 						nsec_to_cycles(vcpu, elapsed);
+ 			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+ 			/*
+-			 * Special case: TSC write with a small delta (1 second)
+-			 * of virtual cycle time against real time is
+-			 * interpreted as an attempt to synchronize the CPU.
++			 * Here lies UAPI baggage: when a user-initiated TSC write has
++			 * a small delta (1 second) of virtual cycle time against the
++			 * previously set vCPU, we assume that they were intended to be
++			 * in sync and the delta was only due to the racy nature of the
++			 * legacy API.
++			 *
++			 * This trick falls down when restoring a guest which genuinely
++			 * has been running for less time than the 1 second of imprecision
++			 * which we allow for in the legacy API. In this case, the first
++			 * value written by userspace (on any vCPU) should not be subject
++			 * to this 'correction' to make it sync up with values that only
++			 * from the kernel's default vCPU creation. Make the 1-second slop
++			 * hack only trigger if the user_set_tsc flag is already set.
++			 *
++			 * The correct answer is for the VMM not to use the legacy API.
+ 			 */
+ 			synchronizing = data < tsc_exp + tsc_hz &&
+ 					data + tsc_hz > tsc_exp;
+ 		}
+ 	}
+ 
++	if (data)
++		kvm->arch.user_set_tsc = true;
++
+ 	/*
+ 	 * For a reliable TSC, we can match TSC offsets, and for an unstable
+ 	 * TSC, we add elapsed time in this computation.  We could let the
+@@ -5536,6 +5551,7 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
+ 		tsc = kvm_scale_tsc(rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
+ 		ns = get_kvmclock_base_ns();
+ 
++		kvm->arch.user_set_tsc = true;
+ 		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
+ 		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
+ 
+
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+-- 
+2.42.0
 
