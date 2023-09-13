@@ -2,144 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D30079DD5B
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 03:04:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FEB279DE03
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 03:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237992AbjIMBEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Sep 2023 21:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
+        id S238126AbjIMBzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Sep 2023 21:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbjIMBEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Sep 2023 21:04:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A35391706
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 18:03:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694567035;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5NRCL/xSBSuFgu7em92vBs1igQbTUxJIfZeUuKm3Sk4=;
-        b=WF2Oeh02NiaxnayvoUL9mAQ4d/8+mPIWtliiJuygy20Njh8EKkBzflXGJ+i6xHhMqeCZTi
-        FV/T13IUp27R2SCoIjF6fIj49N5QkyiSEeCGGxPsmTJLDsw1XBj1yIVK3xa/DdKtap3xpD
-        iGL2/4ADtwd/ADmDCCpYwKKGMtp0Py4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-151-upGOa8YmPdivPEJdHKWchw-1; Tue, 12 Sep 2023 21:03:54 -0400
-X-MC-Unique: upGOa8YmPdivPEJdHKWchw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-52c03bb5327so4126841a12.0
-        for <kvm@vger.kernel.org>; Tue, 12 Sep 2023 18:03:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694567033; x=1695171833;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5NRCL/xSBSuFgu7em92vBs1igQbTUxJIfZeUuKm3Sk4=;
-        b=EChlvDvXu+30B9grw5pR4DzP/byo/a/PVle5cJP0Gshkia0qSUF/wzGrFjtl4DOUqz
-         sShOrxf6vWgTDcZH0DMrRSy37qJjEY7UHReoKZXgMkraIxTagIgfq/UqLE8kKwzowlGF
-         NchllgfeODORTVb5svk2N5zy95M6U+QHGr4PKnN3rItqbWNIdLdfXCxFmlwoN4ywu69+
-         SI/6sc6eXrYmYYW7McL/Lg4UpoAoLdamIyPmD5DO/kM3Qzq5AR87R2bjf0RF3dO201SS
-         Tucmh+ZZ16cB/Kvgh2L7s7vPy5Ojh9utT1Vvi1MzqTlOQMAS6YjBqaLAQ0yF7/oxFmxk
-         JFSA==
-X-Gm-Message-State: AOJu0YzXZWqx1IidQDEUPRp4NrqZwAjU0ZwcIDY7xrtRj6N9zhZxwBOD
-        +ylpjvU4kcZ+oF8ZHch6IGesIE1nj8PQNN/EOn6IDWJmwXyvpt9G+KqzwkNmLyFnQcrhOiCuH5g
-        Mm8Ci5ExWGhySHonmLKr89KPz8lpy
-X-Received: by 2002:aa7:c50b:0:b0:523:cc3d:9121 with SMTP id o11-20020aa7c50b000000b00523cc3d9121mr857282edq.14.1694567032759;
-        Tue, 12 Sep 2023 18:03:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFu64JnfHFzyZtEh4sWY+VJP3IlZTzEnel5Sw1uyDAqbUJK4erdPM+M7Hz8BqtRBiR06pvVlXvXC0tnu7fHLCc=
-X-Received: by 2002:aa7:c50b:0:b0:523:cc3d:9121 with SMTP id
- o11-20020aa7c50b000000b00523cc3d9121mr857267edq.14.1694567032457; Tue, 12 Sep
- 2023 18:03:52 -0700 (PDT)
+        with ESMTP id S230323AbjIMBzu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Sep 2023 21:55:50 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ABDA10EB;
+        Tue, 12 Sep 2023 18:55:47 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E1B2C433D9;
+        Wed, 13 Sep 2023 01:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694570146;
+        bh=2OddQKIH3uYXJT7ExCA6HUaFdELFgK8aV8tLID+9nMA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=eD0PQCfBKvsqVbB7ZvJNoRjXJLBBGZHn7YlSY1d/Tz+qrf4w3SSr4rHMQrwHZomTq
+         /gGngHgQe0yZjZ49G1DqOAiFSCDvaQAw3+Jbovt3FzsC97hDsUmgVouzDdA9qdhNmT
+         K8mB8yEC9C1lWaVjm78l1Vdj84WFdaOwFhvcegWoOdwmTSLOP0+0kNYKKoOnRpMcwL
+         Zg0Dt3s0KZro1KI9dnHd1Uw0K2Q80a5Ig7UDUuRwuMeu9ravHyLun9fMqlp5S4c+y0
+         sPVzgLLUrB0JtdlQNL8M+GAGtjiD3zVCe2dgZARFgoDCAwc4ceSWMHg2400pjtpAeb
+         jqMIYKeY0hFcw==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-501be2d45e0so10633674e87.3;
+        Tue, 12 Sep 2023 18:55:46 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yw1bh1PU/GbvxMYx3w1CgGt6HjH/YoD48410ij48/Q03WgcO5Pu
+        ubEJ5Lghbx5g9id7w8YlSUESiRWzKs51lIs/zYI=
+X-Google-Smtp-Source: AGHT+IGiIM8YEctQvL/CVmwan/hG+6jqbFGBYTrZFX/O9x6gC7L4g0XHDwgTYPZ+T/UmOPyj0gLtC9syNiSq7NGyTW8=
+X-Received: by 2002:ac2:58e8:0:b0:500:bffa:5b86 with SMTP id
+ v8-20020ac258e8000000b00500bffa5b86mr760589lfo.6.1694570144735; Tue, 12 Sep
+ 2023 18:55:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230912130132.561193-1-dtatulea@nvidia.com>
-In-Reply-To: <20230912130132.561193-1-dtatulea@nvidia.com>
-From:   Lei Yang <leiyang@redhat.com>
-Date:   Wed, 13 Sep 2023 09:03:15 +0800
-Message-ID: <CAPpAL=w6KeBG5Ur037GNQa=n_fdoUwrFo+ATsFtX9HbWPHZvsg@mail.gmail.com>
-Subject: Re: [PATCH 00/16] vdpa: Add support for vq descriptor mappings
-To:     Dragos Tatulea <dtatulea@nvidia.com>,
-        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
+References: <20230910082911.3378782-1-guoren@kernel.org> <20230910082911.3378782-2-guoren@kernel.org>
+ <5c082cb1fd306cb75abbcaa80229d791260f8756.camel@redhat.com>
+In-Reply-To: <5c082cb1fd306cb75abbcaa80229d791260f8756.camel@redhat.com>
+From:   Guo Ren <guoren@kernel.org>
+Date:   Wed, 13 Sep 2023 09:55:31 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTSynMnYy+ARhFb0JjbAGjEYrfgsiGa2ZWv4wB3HdheU2A@mail.gmail.com>
+Message-ID: <CAJF2gTSynMnYy+ARhFb0JjbAGjEYrfgsiGa2ZWv4wB3HdheU2A@mail.gmail.com>
+Subject: Re: [PATCH V11 01/17] asm-generic: ticket-lock: Reuse arch_spinlock_t
+ of qspinlock
+To:     =?UTF-8?Q?Leonardo_Br=C3=A1s?= <leobras@redhat.com>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Parav Pandit <parav@nvidia.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dragos, Eugenio and Si-Wei
+On Tue, Sep 12, 2023 at 3:05=E2=80=AFAM Leonardo Br=C3=A1s <leobras@redhat.=
+com> wrote:
+>
+> On Sun, 2023-09-10 at 04:28 -0400, guoren@kernel.org wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> >
+> > The arch_spinlock_t of qspinlock has contained the atomic_t val, which
+> > satisfies the ticket-lock requirement. Thus, unify the arch_spinlock_t
+> > into qspinlock_types.h. This is the preparation for the next combo
+> > spinlock.
+> >
+> > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > ---
+> >  include/asm-generic/spinlock.h       | 14 +++++++-------
+> >  include/asm-generic/spinlock_types.h | 12 ++----------
+> >  2 files changed, 9 insertions(+), 17 deletions(-)
+> >
+> > diff --git a/include/asm-generic/spinlock.h b/include/asm-generic/spinl=
+ock.h
+> > index 90803a826ba0..4773334ee638 100644
+> > --- a/include/asm-generic/spinlock.h
+> > +++ b/include/asm-generic/spinlock.h
+> > @@ -32,7 +32,7 @@
+> >
+> >  static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+> >  {
+> > -     u32 val =3D atomic_fetch_add(1<<16, lock);
+> > +     u32 val =3D atomic_fetch_add(1<<16, &lock->val);
+> >       u16 ticket =3D val >> 16;
+> >
+> >       if (ticket =3D=3D (u16)val)
+> > @@ -46,31 +46,31 @@ static __always_inline void arch_spin_lock(arch_spi=
+nlock_t *lock)
+> >        * have no outstanding writes due to the atomic_fetch_add() the e=
+xtra
+> >        * orderings are free.
+> >        */
+> > -     atomic_cond_read_acquire(lock, ticket =3D=3D (u16)VAL);
+> > +     atomic_cond_read_acquire(&lock->val, ticket =3D=3D (u16)VAL);
+> >       smp_mb();
+> >  }
+> >
+> >  static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+> >  {
+> > -     u32 old =3D atomic_read(lock);
+> > +     u32 old =3D atomic_read(&lock->val);
+> >
+> >       if ((old >> 16) !=3D (old & 0xffff))
+> >               return false;
+> >
+> > -     return atomic_try_cmpxchg(lock, &old, old + (1<<16)); /* SC, for =
+RCsc */
+> > +     return atomic_try_cmpxchg(&lock->val, &old, old + (1<<16)); /* SC=
+, for RCsc */
+> >  }
+> >
+> >  static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
+> >  {
+> >       u16 *ptr =3D (u16 *)lock + IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
+> > -     u32 val =3D atomic_read(lock);
+> > +     u32 val =3D atomic_read(&lock->val);
+> >
+> >       smp_store_release(ptr, (u16)val + 1);
+> >  }
+> >
+> >  static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lo=
+ck)
+> >  {
+> > -     u32 val =3D lock.counter;
+> > +     u32 val =3D lock.val.counter;
+> >
+> >       return ((val >> 16) =3D=3D (val & 0xffff));
+> >  }
+>
+> This one seems to be different in torvalds/master, but I suppose it's bec=
+ause of
+> the requirement patches I have not merged.
+>
+> > @@ -84,7 +84,7 @@ static __always_inline int arch_spin_is_locked(arch_s=
+pinlock_t *lock)
+> >
+> >  static __always_inline int arch_spin_is_contended(arch_spinlock_t *loc=
+k)
+> >  {
+> > -     u32 val =3D atomic_read(lock);
+> > +     u32 val =3D atomic_read(&lock->val);
+> >
+> >       return (s16)((val >> 16) - (val & 0xffff)) > 1;
+> >  }
+> > diff --git a/include/asm-generic/spinlock_types.h b/include/asm-generic=
+/spinlock_types.h
+> > index 8962bb730945..f534aa5de394 100644
+> > --- a/include/asm-generic/spinlock_types.h
+> > +++ b/include/asm-generic/spinlock_types.h
+> > @@ -3,15 +3,7 @@
+> >  #ifndef __ASM_GENERIC_SPINLOCK_TYPES_H
+> >  #define __ASM_GENERIC_SPINLOCK_TYPES_H
+> >
+> > -#include <linux/types.h>
+> > -typedef atomic_t arch_spinlock_t;
+> > -
+> > -/*
+> > - * qrwlock_types depends on arch_spinlock_t, so we must typedef that b=
+efore the
+> > - * include.
+> > - */
+> > -#include <asm/qrwlock_types.h>
+> > -
+> > -#define __ARCH_SPIN_LOCK_UNLOCKED    ATOMIC_INIT(0)
+> > +#include <asm-generic/qspinlock_types.h>
+> > +#include <asm-generic/qrwlock_types.h>
+> >
+> >  #endif /* __ASM_GENERIC_SPINLOCK_TYPES_H */
+>
+> FWIW, LGTM:
+>
+> Reviewed-by: Leonardo Bras <leobras@redhat.com>
+>
+>
+> Just a suggestion: In this patch I could see a lot of usage changes to
+> arch_spinlock_t, and only at the end I could see the actual change in the=
+ .h
+> file.
+ include/asm-generic/spinlock.h       | 14 +++++++-------
+ include/asm-generic/spinlock_types.h | 12 ++----------
 
-My name is Lei Yang, a software Quality Engineer from Red Hat.  And
-always paying attention to improving the live migration downtime
-issues because there are others QE asked about this problem when I
-share live migration status  recently. Therefore I would like to test
-it in my environment. Before the testing I want to know if there is an
-expectation of downtime range based on this series of patches? In
-addition, QE also can help do a regression test based on this series
-of patches if there is a requirement.
+All are .h files. So, how to use git.orderfile?
 
-Regards and thanks
-Lei
-
-
-On Tue, Sep 12, 2023 at 9:04=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
-> wrote:
 >
-> This patch series adds support for vq descriptor table mappings which
-> are used to improve vdpa live migration downtime. The improvement comes
-> from using smaller mappings which take less time to create and destroy
-> in hw.
+> In cases like this, it looks nicer to see the .h file first.
 >
-> The first part adds the vdpa core changes from Si-Wei [0].
+> I recently found out about this git diff.orderFile option, which helps to
+> achieve exactly this.
 >
-> The second part adds support in mlx5_vdpa:
-> - Refactor the mr code to be able to cleanly add descriptor mappings.
-> - Add hardware descriptor mr support.
-> - Properly update iotlb for cvq during ASID switch.
+> I use the following git.orderfile, adapted from qemu:
 >
-> [0] https://lore.kernel.org/virtualization/1694248959-13369-1-git-send-em=
-ail-si-wei.liu@oracle.com
+> #########################################################################=
+###
+> #
+> # order file for git, to produce patches which are easier to review
+> # by diffing the important stuff like interface changes first.
+> #
+> # one-off usage:
+> #   git diff -O scripts/git.orderfile ...
+> #
+> # add to git config:
+> #   git config diff.orderFile scripts/git.orderfile
+> #
 >
-> Dragos Tatulea (13):
->   vdpa/mlx5: Create helper function for dma mappings
->   vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
->   vdpa/mlx5: Take cvq iotlb lock during refresh
->   vdpa/mlx5: Collapse "dvq" mr add/delete functions
->   vdpa/mlx5: Rename mr destroy functions
->   vdpa/mlx5: Allow creation/deletion of any given mr struct
->   vdpa/mlx5: Move mr mutex out of mr struct
->   vdpa/mlx5: Improve mr update flow
->   vdpa/mlx5: Introduce mr for vq descriptor
->   vdpa/mlx5: Enable hw support for vq descriptor mapping
->   vdpa/mlx5: Make iotlb helper functions more generic
->   vdpa/mlx5: Update cvq iotlb mapping on ASID change
->   Cover letter: vdpa/mlx5: Add support for vq descriptor mappings
+> MAINTAINERS
 >
-> Si-Wei Liu (3):
->   vdpa: introduce dedicated descriptor group for virtqueue
->   vhost-vdpa: introduce descriptor group backend feature
->   vhost-vdpa: uAPI to get dedicated descriptor group id
+> # Documentation
+> Documentation/*
+> *.rst
+> *.rst.inc
 >
->  drivers/vdpa/mlx5/core/mlx5_vdpa.h |  31 +++--
->  drivers/vdpa/mlx5/core/mr.c        | 191 ++++++++++++++++-------------
->  drivers/vdpa/mlx5/core/resources.c |   6 +-
->  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 100 ++++++++++-----
->  drivers/vhost/vdpa.c               |  27 ++++
->  include/linux/mlx5/mlx5_ifc.h      |   8 +-
->  include/linux/mlx5/mlx5_ifc_vdpa.h |   7 +-
->  include/linux/vdpa.h               |  11 ++
->  include/uapi/linux/vhost.h         |   8 ++
->  include/uapi/linux/vhost_types.h   |   5 +
->  10 files changed, 264 insertions(+), 130 deletions(-)
+> # build system
+> Kbuild
+> Makefile*
+> *.mak
 >
-> --
-> 2.41.0
+> # semantic patches
+> *.cocci
+>
+> # headers
+> *.h
+> *.h.inc
+>
+> # code
+> *.c
+> *.c.inc
+>
 >
 
+
+--=20
+Best Regards
+ Guo Ren
