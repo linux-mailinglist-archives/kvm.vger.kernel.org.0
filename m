@@ -2,125 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 476BB79E423
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 11:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E34E79E4ED
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 12:30:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236742AbjIMJv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 05:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38598 "EHLO
+        id S230000AbjIMKaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 06:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236400AbjIMJvz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 05:51:55 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDD7199E;
-        Wed, 13 Sep 2023 02:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=XfpygDLDkqB2bwEWEf6mvs152AUbfDN+/5uofqP+Y+4=; b=rJLiFqQX9ZPumgfMZxt3b77mMh
-        kIqTT4KTKSGUgbDG5vzpSb9mupJ1p96HhW+8tiuP28tk1ljHJ1ExjTTLvk6yfh+9DVKeKfj8P73WE
-        pmevE3lxRaFzWYnJHgAcV1r26jsdlVt/iW1gkPakyiaTkM8/L5ajiqbt/cmXyt8KrHVEcgamAxN7l
-        UbqMLNgW7Vf2QroqVaWkLQq0kQcFkurRughS7zVBWj76y+DXYBGE0Xx1MzdajsNsi6i58E5B1BN6Y
-        ThvYdpBJ/n5H21gOylcQB8Swhv47v93TyaQyafKIJ30T+tFdnZ9WnZ5wh1kvIND9peZ326C5Mn/Tf
-        qOd09D8w==;
-Received: from [89.27.170.32] (helo=[127.0.0.1])
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgMXD-00D5yH-3s; Wed, 13 Sep 2023 09:51:47 +0000
-Date:   Wed, 13 Sep 2023 11:51:46 +0200
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Like Xu <like.xu.linux@gmail.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v5=5D_KVM=3A_x86/tsc=3A_Don=27t_sync_T?= =?US-ASCII?Q?SC_on_the_first_write_in_state_restoration?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <38859747-d4f1-b4e2-98c7-bd529cd09976@gmail.com>
-References: <20230913072113.78885-1-likexu@tencent.com> <e506ceb2d837344999c4899525a3490d8c46c95b.camel@infradead.org> <90194cd0-61d8-18b9-980a-b46f903409b4@gmail.com> <461B7217-7AA7-479E-9060-772E243CB03D@infradead.org> <38859747-d4f1-b4e2-98c7-bd529cd09976@gmail.com>
-Message-ID: <6E4A54F1-B8C0-44AD-B2A9-6EDF7059D0EC@infradead.org>
+        with ESMTP id S229468AbjIMKaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 06:30:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E3C2419B6
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 03:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694600959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0bxFVe/E2XvfrFqG8Yrr1bPRLJ8gbzxCcYIWyf9wMMg=;
+        b=SEtO//4XqdqmKw26OrP4dGeP0BtkzRCKMU1sOZYgw0lLSlE6xI4Jncj2P9cdecJnkNg8ao
+        iK3uuFAbgQrlBSiJrrk9htTKdzJE8BU4iu0rqF7CRd8+w+qMDeqo2W5idS3CL4ufPxo27t
+        8EIscCNvwbL0GoyrIV5s1Y/oMj9Yz1E=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-49-HxFj8HFcPnSLhc1zFQegRw-1; Wed, 13 Sep 2023 06:29:18 -0400
+X-MC-Unique: HxFj8HFcPnSLhc1zFQegRw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so49867525e9.3
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 03:29:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694600957; x=1695205757;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0bxFVe/E2XvfrFqG8Yrr1bPRLJ8gbzxCcYIWyf9wMMg=;
+        b=HcTMWFf3pA2uI2i8bS4hWgleXH4nDbBa4oSwTbXAYcdLFoVnNOrjbGR7i///IqM7tM
+         Ymdt1C53AxhTHbO8xeUfJAB5M7kpZr1/Syd0s8CIWVAy8cF1lbhU3RRLEVAiy735FRj8
+         I/moABSzCoKI1eEWH3iWFOd3ubY1S2M+QgPvjyT2Z/1l6+GD4/i3IUNqbvqmXek8ii6H
+         kPPfKsWy5pI6sEk+saDZ1UHOHaFBBE9U/nvs0dI/d0sova74schWEiSmCRKLx6mtfl6F
+         y7fIH7IOEJq5UWcUA3GKANA46EAzgq03DoumvQ8LrmqcgaY03FXHfFBqOQAuh8eJaSLh
+         NbEA==
+X-Gm-Message-State: AOJu0Yxg0ZfVl8bkYbAfGcl/8JSclXQahS3K1nddbiznIffxZlhRGg8X
+        l+5vkDom9o2Kzc2JImsvPCTOobguvELsggownZQQT2nv4eTvy3RTdiSW2cAy4tdq+rbItRusK1k
+        T2M2yjxjDMh4/
+X-Received: by 2002:a1c:7213:0:b0:401:d5bb:9b40 with SMTP id n19-20020a1c7213000000b00401d5bb9b40mr1791338wmc.15.1694600957305;
+        Wed, 13 Sep 2023 03:29:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHJQ20OnDZTTPIGLgVTuejcFW7U3fILnen/CmHvty2+jekejpqdkNJ3ZrDotViC4vJgjVrZ9Q==
+X-Received: by 2002:a1c:7213:0:b0:401:d5bb:9b40 with SMTP id n19-20020a1c7213000000b00401d5bb9b40mr1791319wmc.15.1694600956978;
+        Wed, 13 Sep 2023 03:29:16 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id a16-20020a5d4570000000b00317f70240afsm15203183wrc.27.2023.09.13.03.29.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Sep 2023 03:29:16 -0700 (PDT)
+Message-ID: <7b544940-0cf2-652e-732e-934dfac63182@redhat.com>
+Date:   Wed, 13 Sep 2023 12:29:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v5 0/6] target/i386: Restrict system-specific features
+ from user emulation
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+References: <20230913093009.83520-1-philmd@linaro.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230913093009.83520-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 9/13/23 11:30, Philippe Mathieu-Daudé wrote:
+> Since v4:
+> - Addressed Paolo's suggestions (clearly better)
+> 
+> Too many system-specific code (and in particular KVM related)
+> is pulled in user-only build. This led to adding unjustified
+> stubs as kludge to unagressive linker non-optimizations.
+> 
+> This series restrict x86 system-specific features to sysemu,
+> so we don't require any stub, and remove all x86 KVM declarations
+> from user emulation code (to trigger compile failure instead of
+> link one).
+
+I'm still not sure about patch 5, though I'd like to have something like 
+patch 6.  But fortunately patches 1-3 are enough to placate clang, so I 
+have queued them.
+
+Thanks Philippe!
+
+Paolo
 
 
-On 13 September 2023 11:43:56 CEST, Like Xu <like=2Exu=2Elinux@gmail=2Ecom=
-> wrote:
-
->> Why? Can't we treat an explicit zero write just the same as when the ke=
-rnel does it?
->
->Not sure if it meets your simplified expectations:
-
-Think that looks good, thanks=2E One minor nit=2E=2E=2E
-
-
->diff --git a/arch/x86/kvm/x86=2Ec b/arch/x86/kvm/x86=2Ec
->index 6c9c81e82e65=2E=2E0f05cf90d636 100644
->--- a/arch/x86/kvm/x86=2Ec
->+++ b/arch/x86/kvm/x86=2Ec
->@@ -2735,20 +2735,35 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *=
-vcpu, u64 data)
-> 			 * kvm_clock stable after CPU hotplug
-> 			 */
-> 			synchronizing =3D true;
->-		} else {
->+		} else if (!data || kvm->arch=2Euser_set_tsc) {
-
-If data is zero here, won't the first if() case have been taken, and set s=
-ynchronizing=3Dtrue?
-
-So this is equivalent to "else if (kvm->arch=2Euser_set_tsc)"=2E (Which is=
- fine and what what I intended)=2E
-
-> 			u64 tsc_exp =3D kvm->arch=2Elast_tsc_write +
-> 						nsec_to_cycles(vcpu, elapsed);
-> 			u64 tsc_hz =3D vcpu->arch=2Evirtual_tsc_khz * 1000LL;
-> 			/*
->-			 * Special case: TSC write with a small delta (1 second)
->-			 * of virtual cycle time against real time is
->-			 * interpreted as an attempt to synchronize the CPU=2E
->+			 * Here lies UAPI baggage: when a user-initiated TSC write has
->+			 * a small delta (1 second) of virtual cycle time against the
->+			 * previously set vCPU, we assume that they were intended to be
->+			 * in sync and the delta was only due to the racy nature of the
->+			 * legacy API=2E
->+			 *
->+			 * This trick falls down when restoring a guest which genuinely
->+			 * has been running for less time than the 1 second of imprecision
->+			 * which we allow for in the legacy API=2E In this case, the first
->+			 * value written by userspace (on any vCPU) should not be subject
->+			 * to this 'correction' to make it sync up with values that only
->+			 * from from the kernel's default vCPU creation=2E Make the 1-second
->+			 * slop hack only trigger if flag is already set=2E
->+			 *
->+			 * The correct answer is for the VMM not to use the legacy API=2E
-> 			 */
-> 			synchronizing =3D data < tsc_exp + tsc_hz &&
-> 					data + tsc_hz > tsc_exp;
-> 		}
-> 	}
->
->+	if (data)
->+		kvm->arch=2Euser_set_tsc =3D true;
->+
-> 	/*
-> 	 * For a reliable TSC, we can match TSC offsets, and for an unstable
-> 	 * TSC, we add elapsed time in this computation=2E  We could let the
->@@ -5536,6 +5551,7 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *v=
-cpu,
-> 		tsc =3D kvm_scale_tsc(rdtsc(), vcpu->arch=2El1_tsc_scaling_ratio) + of=
-fset;
-> 		ns =3D get_kvmclock_base_ns();
->
->+		kvm->arch=2Euser_set_tsc =3D true;
-> 		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
-> 		raw_spin_unlock_irqrestore(&kvm->arch=2Etsc_write_lock, flags);
->
->
