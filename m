@@ -2,184 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5482E79E2BD
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 10:56:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37E9879E2DC
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 11:02:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239134AbjIMI4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 04:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44354 "EHLO
+        id S239168AbjIMJCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 05:02:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239173AbjIMI4U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 04:56:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 69AA7196
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:55:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694595328;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7IDrq/ZjwAliy/cuqJYdam/hL0PUOvTA7Mi9bsbloig=;
-        b=caxjCmskNBOux9IjaT14OV9MMmP2Aflw0stDJpoULQk0VwdtHkIu1U+iTRFEDn/l8O/075
-        d0JHoFA+ct41TiVgjXqu7alvBMQSYdVcJaIVCwXtOj3o7k6Q7XIooyEfDEb6VyjkfBCL5m
-        AiUZ+ww55m+Qwseb3M43skeX61AjbCs=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-301-Hd5NLX4PP2uDigHttPNrIw-1; Wed, 13 Sep 2023 04:55:27 -0400
-X-MC-Unique: Hd5NLX4PP2uDigHttPNrIw-1
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3ab7fb11711so4836343b6e.2
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 01:55:27 -0700 (PDT)
+        with ESMTP id S236929AbjIMJCS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 05:02:18 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30521993
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 02:02:14 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3ff7d73a6feso69207325e9.1
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 02:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694595733; x=1695200533; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xe6MqFGK/ptUu+T86YHQkfsfUOxtldvwwlNPM1pFiTI=;
+        b=xOLVZhJdUxzEWfUQsdSVbRzzQ/1D4FAMQAis9S7ZOLJgDmK1XUmUOsoJ2UQeDEkkTB
+         4M+gCUfvMAzwOle2lLHoao+xQUNy4iQ2QgCbtKuJ76WqUMC9lVvPaU6/hv16z8gl60wL
+         EmpULGq5nUQYRznRVWlaKqkBCGW9GUMp6jJpkS7nfMhkUUQJ7ZxCJG8cd+OE117WSvDH
+         FT6w5v6ep7S4/uEJxTK6mdduAHRdYqrDOgYcdH5wYE0x1QVfVRwo2gPxdBCbNW0ccc7x
+         b1Hv1qJiVFapj005pklokwYTsBb8yNyK0vkAbhIU05KEa1Px8MG1RS6BCLBRo2SxOB4S
+         6C+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694595326; x=1695200126;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1694595733; x=1695200533;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7IDrq/ZjwAliy/cuqJYdam/hL0PUOvTA7Mi9bsbloig=;
-        b=v0YCD8KqRcl3bySo3yNZYXxaCyPNlqF8XE3s063hZyc4fZPUg7GuuiqhhPDZHFd9Jj
-         3DEQpmcEOS87j3NXTh6w0R8oKXbanT6gDiiSMj0B1eATh6jUNcO9mG/EWHy69q+NIjPo
-         eKAi3fpHBUgrQWWL9P+mIs9V7gDGKLdukQEkIngB3fMRDrPoYwAkytmA8o/rFwZrevih
-         CCt6BiVjATg+QymMi8umyprARdDqy/tBYvfw4rfOvI++8FZDFhugGkDqhD8yKobk21af
-         FlprbaOAe5FPh/03QF2VHElVRoSjHk5QMwNTOrGIJwHNwqlqmUqXgV7iQW35I8zQviQv
-         on8A==
-X-Gm-Message-State: AOJu0YwVWXKAfvSA6A6B5IRuNJgQJzHCvJsOd1NZEVmnpvxEypbTjRDA
-        w+Irflyk6DfIlXw6zSS5YRehjMYKphl59FjMJ44iqP0Mrbj/fGZHf/Y+rpxsSq1nqcZ8nJ023jP
-        4VA7b3UaxCR+o
-X-Received: by 2002:a05:6808:616:b0:3a8:83df:d5a4 with SMTP id y22-20020a056808061600b003a883dfd5a4mr1851059oih.59.1694595326802;
-        Wed, 13 Sep 2023 01:55:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGKPVssIlImig5nXmhpkcsDQ7KpqCHiahCisjz+0XwI28OTqJEh/HnL6zXhYAXW7+m311Y1Pw==
-X-Received: by 2002:a05:6808:616:b0:3a8:83df:d5a4 with SMTP id y22-20020a056808061600b003a883dfd5a4mr1851051oih.59.1694595326594;
-        Wed, 13 Sep 2023 01:55:26 -0700 (PDT)
-Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id az19-20020a056830459300b006c21f11dcecsm647356otb.49.2023.09.13.01.55.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 01:55:26 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 05:55:16 -0300
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Guo Ren <guoren@kernel.org>
-Cc:     Waiman Long <longman@redhat.com>, paul.walmsley@sifive.com,
-        anup@brainfault.org, peterz@infradead.org, mingo@redhat.com,
-        will@kernel.org, palmer@rivosinc.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 04/17] locking/qspinlock: Improve xchg_tail for
- number of cpus >= 16k
-Message-ID: <ZQF49GIZoFceUGYH@redhat.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-5-guoren@kernel.org>
- <f091ead0-99b9-b30a-a295-730ce321ac60@redhat.com>
- <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
- <06714da1-d566-766f-7a13-a3c93b5953c4@redhat.com>
- <CAJF2gTQ3Q7f+FGorVTR66c6TGWsSeeKVvLF+LH1_m3kSHrm0yA@mail.gmail.com>
+        bh=Xe6MqFGK/ptUu+T86YHQkfsfUOxtldvwwlNPM1pFiTI=;
+        b=aKgWt+k61E43CiypdWrT4+v8sxy6PxYzOQVB7Ous+RXlsk+lhHOmypcB7IWiY+whhJ
+         1RkrWBp8tAUbFjUecVxgdxthsJDD976z+iuXzHDmDFy8ltCTUg7XWf8i2AGbe0fd9bJQ
+         k/tg/q0tPzTa7gpy9lXKZ9gkX/eznRF1WbEj2Vi2+WMq1Va9u+ry9C32dFq+HRfwbqHe
+         Wz0WIHm+Ilolmx40dhzixlnbEnhklnOcEvZybtO15Ex/cWscae2Mjm6CEbvfYbw0wJRB
+         HInJzwtXQkbSvoVdbZE1t4yaAxtQdgGJz9clLsumeAM7RFGcXpgVBQiHthJc6Jk0JmKf
+         1E1w==
+X-Gm-Message-State: AOJu0YyKRDXp7sZqWvSUQMO2Oad5aQSX0Mf5JWOv1gkAmsg0u5AuuTbZ
+        OfF96ti9Iu1wWNQYwdYDPAmrqw==
+X-Google-Smtp-Source: AGHT+IE6yyLIhYgsfFaQXW0eEC/aUhEtR8RrznU/yaYwzA3qd8pvyYQIuLDFOKRx9JhVmh92Z0EAPA==
+X-Received: by 2002:a05:600c:2802:b0:401:6800:703c with SMTP id m2-20020a05600c280200b004016800703cmr1494028wmb.21.1694595733164;
+        Wed, 13 Sep 2023 02:02:13 -0700 (PDT)
+Received: from [192.168.69.115] (176-131-211-241.abo.bbox.fr. [176.131.211.241])
+        by smtp.gmail.com with ESMTPSA id f18-20020a7bcd12000000b00402f7e473b7sm1402592wmj.15.2023.09.13.02.02.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Sep 2023 02:02:12 -0700 (PDT)
+Message-ID: <361eaa5e-67d4-bce0-679b-8faf6cb5ce32@linaro.org>
+Date:   Wed, 13 Sep 2023 11:02:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [RFC PATCH v4 2/3] target/i386: Restrict system-specific features
+ from user emulation
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>
+References: <20230911211317.28773-1-philmd@linaro.org>
+ <20230911211317.28773-3-philmd@linaro.org>
+ <c33130ec-661a-a1ed-c285-eeaa52365358@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <c33130ec-661a-a1ed-c285-eeaa52365358@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJF2gTQ3Q7f+FGorVTR66c6TGWsSeeKVvLF+LH1_m3kSHrm0yA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 12, 2023 at 09:10:08AM +0800, Guo Ren wrote:
-> On Mon, Sep 11, 2023 at 9:03 PM Waiman Long <longman@redhat.com> wrote:
-> >
-> > On 9/10/23 23:09, Guo Ren wrote:
-> > > On Mon, Sep 11, 2023 at 10:35 AM Waiman Long <longman@redhat.com> wrote:
-> > >>
-> > >> On 9/10/23 04:28, guoren@kernel.org wrote:
-> > >>> From: Guo Ren <guoren@linux.alibaba.com>
-> > >>>
-> > >>> The target of xchg_tail is to write the tail to the lock value, so
-> > >>> adding prefetchw could help the next cmpxchg step, which may
-> > >>> decrease the cmpxchg retry loops of xchg_tail. Some processors may
-> > >>> utilize this feature to give a forward guarantee, e.g., RISC-V
-> > >>> XuanTie processors would block the snoop channel & irq for several
-> > >>> cycles when prefetch.w instruction (from Zicbop extension) retired,
-> > >>> which guarantees the next cmpxchg succeeds.
-> > >>>
-> > >>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > >>> Signed-off-by: Guo Ren <guoren@kernel.org>
-> > >>> ---
-> > >>>    kernel/locking/qspinlock.c | 5 ++++-
-> > >>>    1 file changed, 4 insertions(+), 1 deletion(-)
-> > >>>
-> > >>> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-> > >>> index d3f99060b60f..96b54e2ade86 100644
-> > >>> --- a/kernel/locking/qspinlock.c
-> > >>> +++ b/kernel/locking/qspinlock.c
-> > >>> @@ -223,7 +223,10 @@ static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
-> > >>>     */
-> > >>>    static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
-> > >>>    {
-> > >>> -     u32 old, new, val = atomic_read(&lock->val);
-> > >>> +     u32 old, new, val;
-> > >>> +
-> > >>> +     prefetchw(&lock->val);
-> > >>> +     val = atomic_read(&lock->val);
-> > >>>
-> > >>>        for (;;) {
-> > >>>                new = (val & _Q_LOCKED_PENDING_MASK) | tail;
-> > >> That looks a bit weird. You pre-fetch and then immediately read it. How
-> > >> much performance gain you get by this change alone?
-> > >>
-> > >> Maybe you can define an arch specific primitive that default back to
-> > >> atomic_read() if not defined.
-> > > Thx for the reply. This is a generic optimization point I would like
-> > > to talk about with you.
-> > >
-> > > First, prefetchw() makes cacheline an exclusive state and serves for
-> > > the next cmpxchg loop semantic, which writes the idx_tail part of
-> > > arch_spin_lock. The atomic_read only makes cacheline in the shared
-> > > state, which couldn't give any guarantee for the next cmpxchg loop
-> > > semantic. Micro-architecture could utilize prefetchw() to provide a
-> > > strong forward progress guarantee for the xchg_tail, e.g., the T-HEAD
-> > > XuanTie processor would hold the exclusive cacheline state until the
-> > > next cmpxchg write success.
-> > >
-> > > In the end, Let's go back to the principle: the xchg_tail is an atomic
-> > > swap operation that contains write eventually, so giving a prefetchw()
-> > > at the beginning is acceptable for all architectures..
-> > > ••••••••••••
-> >
-> > I did realize afterward that prefetchw gets the cacheline in exclusive
-> > state. I will suggest you mention that in your commit log as well as
-> > adding a comment about its purpose in the code.
-> Okay, I would do that in v12, thx.
-
-I would suggest adding a snippet from the ISA Extenstion doc:
-
-"A prefetch.w instruction indicates to hardware that the cache block whose 
-effective address is the sum of the base address specified in rs1 and the  
-sign-extended offset encoded in imm[11:0], where imm[4:0] equals 0b00000, 
-is likely to be accessed by a data write (i.e. store) in the near future."
-
-Other than that,
-Reviewed-by: Leonardo Bras <leobras@redhat.com>
-
-
+On 12/9/23 16:05, Paolo Bonzini wrote:
+> On 9/11/23 23:13, Philippe Mathieu-Daudé wrote:
+>>   /*
+>>    * Only for builtin_x86_defs models initialized with 
+>> x86_register_cpudef_types.
+>>    */
+>> @@ -6163,6 +6195,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t 
+>> index, uint32_t count,
+>>               }
+>>               *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
+>> +#ifndef CONFIG_USER_ONLY
+>>               /*
+>>                * SGX cannot be emulated in software.  If hardware does 
+>> not
+>>                * support enabling SGX and/or SGX flexible launch control,
+>> @@ -6181,6 +6214,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t 
+>> index, uint32_t count,
+>>                       CPUID_7_0_ECX_SGX_LC))) {
+>>                   *ecx &= ~CPUID_7_0_ECX_SGX_LC;
+>>               }
+>> +#endif
 > 
-> >
-> > Thanks,
-> > Longman
-> >
-> > >> Cheers,
-> > >> Longman
-> > >>
-> > >
-> >
-> 
-> 
-> -- 
-> Best Regards
->  Guo Ren
-> 
+> This can use a variant of x86_cpu_get_supported_cpuid that returns a 
+> single register; or it can be rewritten to use x86_cpu_get_supported_cpuid.
 
+Great suggestion, thanks!
+
+> In general, a lot of checks for accel_uses_host_cpuid() are unnecessary, 
+> and the code can be modified to not depend on either KVM or HVF.
+
+OK.
