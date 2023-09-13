@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC3FE79ED58
-	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 17:40:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FDBA79ED5C
+	for <lists+kvm@lfdr.de>; Wed, 13 Sep 2023 17:40:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbjIMPkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 11:40:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51840 "EHLO
+        id S230033AbjIMPkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 11:40:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbjIMPkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 11:40:00 -0400
+        with ESMTP id S229936AbjIMPkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 11:40:01 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE7A1BDA;
-        Wed, 13 Sep 2023 08:39:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E551BFC;
+        Wed, 13 Sep 2023 08:39:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694619592; x=1726155592;
+  t=1694619595; x=1726155595;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AEWudJDZ+NDRaTIFe/yzf4ZaPBnztbnXXDvtdbIDNGE=;
-  b=WiEoHAyqSsBkDGyse4vvga40pj543fcyySqjTkum63wxwW8bPxBt42yP
-   GPJq0guDfTJ8d7d5qj03uQhHR2HxLnmlqEp58WHzevENSJtx50JU+ZaRG
-   nkV9pNFvgCSAHEVtJts8rx1KVjEGi7gZMfcU5C0Nd4mypkls1fEp1WNR1
-   MI3w3bLxQsNBs+IyED7RKUUks6vNi+8FjRQvjkzsqFZ7ZrL0GeZgkaegS
-   +HpGj7rqdX3rhLY7JyG55HOOLdgf0W7j2dd5+8bjoM6RlVVkWvX2Ukdna
-   Q3yCKkJOxh5W9WaStD62svm2+o6F6Vz3cj2BDm27SnGYBsbqB63CscRoN
+  bh=rYEBqAIo0P765JtuiX1UKxLDu6cAJk+hM7akS4M4yss=;
+  b=a2wrrql0Qyy931qD2s1d3PnwYKRIRJGdc0Ex6doTexFeyHZ9MUjmhmKf
+   olZAW+ad5gxQ0DGMlwiFN/TRkDHE3kT3KwgtpcX9FJBfFlez1UfBSurMF
+   Vi1wbzBlfg2YhjLgE+VCCLMS8yh0Nf/Yuw/4e12MvVrd38SEslQdHBGK1
+   oUPN0+zEiNtcKlJf92AvTcbN7ulnhgKrJ7sPfU5nHp6Srhn8r3wyY/d6t
+   1bk5c/kavXZrRwgzoJspk9E6vhmLx+l6rHCNOpyxGwPuRk3vKGAFmkQZN
+   5ikYABVfZptb8eYoIyodrNn+vj739Qk+rRuIU/43cpp49zihb8o0s2WO4
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="376030160"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="376030175"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="376030160"
+   d="scan'208";a="376030175"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:52 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="867852081"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="867852088"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="867852081"
+   d="scan'208";a="867852088"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO binbinwu-mobl.sh.intel.com) ([10.93.2.44])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:49 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 08:39:52 -0700
 From:   Binbin Wu <binbin.wu@linux.intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
         kai.huang@intel.com, David.Laight@ACULAB.COM,
         robert.hu@linux.intel.com, guang.zeng@intel.com,
         binbin.wu@linux.intel.com
-Subject: [PATCH v11 04/16] KVM: x86: Add X86EMUL_F_INVLPG and pass it in em_invlpg()
-Date:   Wed, 13 Sep 2023 20:42:15 +0800
-Message-Id: <20230913124227.12574-5-binbin.wu@linux.intel.com>
+Subject: [PATCH v11 05/16] KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
+Date:   Wed, 13 Sep 2023 20:42:16 +0800
+Message-Id: <20230913124227.12574-6-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230913124227.12574-1-binbin.wu@linux.intel.com>
 References: <20230913124227.12574-1-binbin.wu@linux.intel.com>
@@ -56,52 +56,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an emulation flag X86EMUL_F_INVLPG, which is used to identify an
-instruction that does TLB invalidation without true memory access.
+Drop non-PA bits when getting GFN for guest's PGD with the maximum theoretical
+mask for guest MAXPHYADDR.
 
-Only invlpg & invlpga implemented in emulator belong to this kind.
-invlpga doesn't need additional information for emulation. Just pass
-the flag to em_invlpg().
+Do it unconditionally because it's harmless for 32-bit guests, querying 64-bit
+mode would be more expensive, and for EPT the mask isn't tied to guest mode.
+Using PT_BASE_ADDR_MASK would be technically wrong (PAE paging has 64-bit
+elements _excpet_ for CR3, which has only 32 valid bits), it wouldn't matter
+in practice though.
 
-Linear Address Masking (LAM) and Linear Address Space Separation (LASS)
-don't apply to addresses that are inputs to TLB invalidation. The flag
-will be consumed to support LAM/LASS virtualization.
+Opportunistically use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
 
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
- arch/x86/kvm/emulate.c     | 4 +++-
- arch/x86/kvm/kvm_emulate.h | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c          | 2 +-
+ arch/x86/kvm/mmu/mmu_internal.h | 1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 274d6e7aa0c1..f54e1a2cafa9 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -3441,8 +3441,10 @@ static int em_invlpg(struct x86_emulate_ctxt *ctxt)
- {
- 	int rc;
- 	ulong linear;
-+	unsigned int max_size;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e1d011c67cc6..f316df038e61 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3774,7 +3774,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	hpa_t root;
  
--	rc = linearize(ctxt, ctxt->src.addr.mem, 1, false, &linear);
-+	rc = __linearize(ctxt, ctxt->src.addr.mem, &max_size, 1, ctxt->mode,
-+			 &linear, X86EMUL_F_INVLPG);
- 	if (rc == X86EMUL_CONTINUE)
- 		ctxt->ops->invlpg(ctxt, linear);
- 	/* Disable writeback. */
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 5f9869018332..70f329a685fe 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -93,6 +93,7 @@ struct x86_instruction_info {
- #define X86EMUL_F_FETCH			BIT(1)
- #define X86EMUL_F_BRANCH		BIT(2)
- #define X86EMUL_F_IMPLICIT		BIT(3)
-+#define X86EMUL_F_INVLPG		BIT(4)
+ 	root_pgd = kvm_mmu_get_guest_pgd(vcpu, mmu);
+-	root_gfn = root_pgd >> PAGE_SHIFT;
++	root_gfn = (root_pgd & __PT_BASE_ADDR_MASK) >> PAGE_SHIFT;
  
- struct x86_emulate_ops {
- 	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+ 	if (!kvm_vcpu_is_visible_gfn(vcpu, root_gfn)) {
+ 		mmu->root.hpa = kvm_mmu_get_dummy_root();
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index b102014e2c60..b5aca7560fd0 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -13,6 +13,7 @@
+ #endif
+ 
+ /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
++#define __PT_BASE_ADDR_MASK GENMASK_ULL(51, 12)
+ #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
+ 	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
+ #define __PT_INDEX(address, level, bits_per_level) \
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index c85255073f67..4d4e98fe4f35 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -62,7 +62,7 @@
+ #endif
+ 
+ /* Common logic, but per-type values.  These also need to be undefined. */
+-#define PT_BASE_ADDR_MASK	((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
++#define PT_BASE_ADDR_MASK	((pt_element_t)__PT_BASE_ADDR_MASK)
+ #define PT_LVL_ADDR_MASK(lvl)	__PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+ #define PT_LVL_OFFSET_MASK(lvl)	__PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+ #define PT_INDEX(addr, lvl)	__PT_INDEX(addr, lvl, PT_LEVEL_BITS)
 -- 
 2.25.1
 
