@@ -2,619 +2,799 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62E807A07A3
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 057CE7A07A8
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240273AbjINOqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 10:46:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
+        id S240313AbjINOrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 10:47:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234000AbjINOqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:46:30 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA291BFE;
-        Thu, 14 Sep 2023 07:46:25 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id CFC72100002;
-        Thu, 14 Sep 2023 17:46:23 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CFC72100002
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1694702783;
-        bh=LPlma2LAeMgyhlh98VrzM6ckVv1GOUdtnoROUWdF3SU=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=in3mRz3xMSBz1JeSCLHA086BH0kEpv8iwdfc80EgXGBJFyXlP6wek/23Cac79uwm4
-         0TLyLt2v1bcdBoZ07uKFXVOSAIl7CKbSmkSrq1vTs1T+Hae7LTl9JIpSc4yxxQeaqk
-         JWuMuTZfDDFs1EwDG6JlY37OX5PnFyZtT1wV1iXngLtAGfyoYm7qE/ycxoSn6bODhT
-         pljTsqB+pp7JaWhNk/Pql5eGtx8NaFSVXrbUzJcCpdap0hRHjwbChPmnYyF1inJFar
-         uP7UpCjdNLjfH/JJgQPm7IL2TcsGUQ/lpy3+IfFmY/q8DqLHoE/RNJyFyOtiafXjb/
-         E9OGK5N+sNTtw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Thu, 14 Sep 2023 17:46:23 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 14 Sep 2023 17:46:23 +0300
-Message-ID: <9513728a-4326-59db-cdc3-8da9c7cf8970@salutedevices.com>
-Date:   Thu, 14 Sep 2023 17:39:42 +0300
+        with ESMTP id S240159AbjINOrK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 10:47:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75B621BFC
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:46:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694702783;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2QvcZvL63W/gB4lIrthqpAgfv9tf/kqXEO64jGCfdpw=;
+        b=M8kiDteQZ2Pr3tIEnnWDr6fS2L+xq7v0XjTJ2w8tmHvOo/lq459PA9dngk1dJvZixlcItV
+        OnBRWwsTspJgCchYw+d+HLOUMFN+ZQyyRIVgHiHRCH0A+Yavo/wge2y6GTx4kWfITBOvIL
+        GSCknglMSeB0FEewEo4W6q3NRrpS+l8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-WtRdralpOkmWIGCgFwO72Q-1; Thu, 14 Sep 2023 10:46:21 -0400
+X-MC-Unique: WtRdralpOkmWIGCgFwO72Q-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4011f56165eso9429615e9.0
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:46:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694702780; x=1695307580;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2QvcZvL63W/gB4lIrthqpAgfv9tf/kqXEO64jGCfdpw=;
+        b=ffHvymHoUZgUwhW/7qTjsAm/NvFOp1QM7+TDD5/c4D9eM8kL1pkttXGS7LcoxD1kpz
+         ob3RBeNVCvgC1ngZby7tDk6ZpczEy/H7t0dURz0bxwKC6gafzRiVF5vpadJW1TgwGklW
+         yIQcP0V0xZQJOz+HH8+LreleK7r7djWnT4oV3QL17rlthmb6zduz0G1EbZCX7iUbQ92c
+         H7a/Nd4XV5hjyn6s+kV20QZXJ9AHkZ2YLy37Chy0K+f0/V1Ip99XuFVTIoMzGw88d6u4
+         u1+UvOKcq3B5NOLLIHej4kL1DS8te2lvhbaJ9C1JVNA2rZx7OSjnr6PklHRzA9/orgK5
+         TABg==
+X-Gm-Message-State: AOJu0YyMFGoFKIlpUDS8Yw1TtwRFtfD6wvVop5PXY9IGLIbY64Qad+5x
+        bLA5p6bJMnv/j2dEYeJcRN61jKcWcOUgNXZ09WKXcv5B/O9UWbD1SRopDrJ9gtjnX1BsE7quBwH
+        XUKGBOraW/NXm
+X-Received: by 2002:adf:f4c4:0:b0:319:6b56:94d9 with SMTP id h4-20020adff4c4000000b003196b5694d9mr1799502wrp.2.1694702780059;
+        Thu, 14 Sep 2023 07:46:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwurh8vxY5ig7Yiq2Av9cHzofzmrerCebMVykhv9I0mv6+IIaUsY2vPsRI4LchH5cctpzJWQ==
+X-Received: by 2002:adf:f4c4:0:b0:319:6b56:94d9 with SMTP id h4-20020adff4c4000000b003196b5694d9mr1799473wrp.2.1694702779434;
+        Thu, 14 Sep 2023 07:46:19 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id k3-20020a056000004300b0031fba0a746bsm1974881wrx.9.2023.09.14.07.46.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Sep 2023 07:46:18 -0700 (PDT)
+Message-ID: <c2fb72a1-2e83-d266-c428-72dcfcd95a75@redhat.com>
+Date:   Thu, 14 Sep 2023 16:46:16 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v8 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+ Thunderbird/102.13.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v1 02/22] Update linux-header to support iommufd cdev and
+ hwpt alloc
 Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
+To:     Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-devel@nongnu.org
+Cc:     alex.williamson@redhat.com, clg@redhat.com, jgg@nvidia.com,
+        nicolinc@nvidia.com, joao.m.martins@oracle.com, peterx@redhat.com,
+        jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+        yi.y.sun@intel.com, chao.p.peng@intel.com,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
- <20230911202234.1932024-5-avkrasnov@salutedevices.com>
- <paronli5omh2byddxcsbew3lrnydq4liifsevp2oomhhy5pxed@q46cdz6qp2in>
-From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <paronli5omh2byddxcsbew3lrnydq4liifsevp2oomhhy5pxed@q46cdz6qp2in>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179869 [Sep 14 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/14 11:07:00 #21890594
-X-KSMG-AntiVirus-Status: Clean, skipped
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+References: <20230830103754.36461-1-zhenzhong.duan@intel.com>
+ <20230830103754.36461-3-zhenzhong.duan@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230830103754.36461-3-zhenzhong.duan@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Zhenzhong,
 
+On 8/30/23 12:37, Zhenzhong Duan wrote:
+> From https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git
+> branch: for_next
+> commit id: eb501c2d96cfce6b42528e8321ea085ec605e790
+I see that in your branch you have now updated against v6.6-rc1. However
+you should run a full ./scripts/update-linux-headers.sh,
+ie. not only importing the changes in linux-headers/linux/iommufd.h as
+it seems to do but also import all changes brought with this linux version.
 
-On 14.09.2023 16:57, Stefano Garzarella wrote:
-> On Mon, Sep 11, 2023 at 11:22:34PM +0300, Arseniy Krasnov wrote:
->> This adds handling of MSG_ZEROCOPY flag on transmission path:
->>
->> 1) If this flag is set and zerocopy transmission is possible (enabled
->>   in socket options and transport allows zerocopy), then non-linear
->>   skb will be created and filled with the pages of user's buffer.
->>   Pages of user's buffer are locked in memory by 'get_user_pages()'.
->> 2) Replaces way of skb owning: instead of 'skb_set_owner_sk_safe()' it
->>   calls 'skb_set_owner_w()'. Reason of this change is that
->>   '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc' of socket, so
->>   to decrease this field correctly, proper skb destructor is needed:
->>   'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
->> 3) Adds new callback to 'struct virtio_transport': 'can_msgzerocopy'.
->>   If this callback is set, then transport needs extra check to be able
->>   to send provided number of buffers in zerocopy mode. Currently, the
->>   only transport that needs this callback set is virtio, because this
->>   transport adds new buffers to the virtio queue and we need to check,
->>   that number of these buffers is less than size of the queue (it is
->>   required by virtio spec). vhost and loopback transports don't need
->>   this check.
->>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->> ---
->> Changelog:
->> v5(big patchset) -> v1:
->>  * Refactorings of 'if' conditions.
->>  * Remove extra blank line.
->>  * Remove 'frag_off' field unneeded init.
->>  * Add function 'virtio_transport_fill_skb()' which fills both linear
->>    and non-linear skb with provided data.
->> v1 -> v2:
->>  * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
->> v2 -> v3:
->>  * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
->>    provided 'iov_iter' with data could be sent in a zerocopy mode.
->>    If this callback is not set in transport - transport allows to send
->>    any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
->>    then zerocopy is allowed. Reason of this callback is that in case of
->>    G2H transmission we insert whole skb to the tx virtio queue and such
->>    skb must fit to the size of the virtio queue to be sent in a single
->>    iteration (may be tx logic in 'virtio_transport.c' could be reworked
->>    as in vhost to support partial send of current skb). This callback
->>    will be enabled only for G2H path. For details pls see comment
->>    'Check that tx queue...' below.
->> v3 -> v4:
->>  * 'msgzerocopy_check_iov' moved from 'struct vsock_transport' to
->>    'struct virtio_transport' as it is virtio specific callback and
->>    never needed in other transports.
->> v4 -> v5:
->>  * 'msgzerocopy_check_iov' renamed to 'can_msgzerocopy' and now it
->>    uses number of buffers to send as input argument. I think there is
->>    no need to pass iov to this callback (at least today, it is used only
->>    by guest side of virtio transport), because the only thing that this
->>    callback does is comparison of number of buffers to be inserted to
->>    the tx queue and size of this queue.
->>  * Remove any checks for type of current 'iov_iter' with payload (is it
->>    'iovec' or 'ubuf'). These checks left from the earlier versions where I
->>    didn't use already implemented kernel API which handles every type of
->>    'iov_iter'.
->> v5 -> v6:
->>  * Refactor 'virtio_transport_fill_skb()'.
->>  * Add 'WARN_ON_ONCE()' and comment on invalid combination of destination
->>    socket and payload in 'virtio_transport_alloc_skb()'.
->> v7 -> v8:
->>  * Move '+1' addition from 'can_msgzerocopy' callback body to the caller.
->>    This addition means packet header.
->>  * In 'virtio_transport_can_zcopy()' rename 'max_to_send' argument to
->>    'pkt_len'.
->>  * Update commit message by adding details about new 'can_msgzerocopy'
->>    callback.
->>  * In 'virtio_transport_init_hdr()' move 'len' argument directly after
->>    'info'.
->>  * Add comment about processing last skb in tx loop.
->>  * Update comment for 'can_msgzerocopy' callback for more details.
->>
->> include/linux/virtio_vsock.h            |   9 +
->> net/vmw_vsock/virtio_transport.c        |  32 +++
->> net/vmw_vsock/virtio_transport_common.c | 256 ++++++++++++++++++------
->> 3 files changed, 239 insertions(+), 58 deletions(-)
->>
->> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->> index a91fbdf233e4..ebb3ce63d64d 100644
->> --- a/include/linux/virtio_vsock.h
->> +++ b/include/linux/virtio_vsock.h
->> @@ -160,6 +160,15 @@ struct virtio_transport {
->>
->>     /* Takes ownership of the packet */
->>     int (*send_pkt)(struct sk_buff *skb);
->> +
->> +    /* Used in MSG_ZEROCOPY mode. Checks, that provided data
->> +     * (number of buffers) could be transmitted with zerocopy
->> +     * mode. If this callback is not implemented for the current
->> +     * transport - this means that this transport doesn't need
->> +     * extra checks and can perform zerocopy transmission by
->> +     * default.
->> +     */
->> +    bool (*can_msgzerocopy)(int bufs_num);
->> };
->>
->> ssize_t
->> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->> index 73d730156349..09ba3128e759 100644
->> --- a/net/vmw_vsock/virtio_transport.c
->> +++ b/net/vmw_vsock/virtio_transport.c
->> @@ -455,6 +455,37 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
->>     queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->> }
->>
->> +static bool virtio_transport_can_msgzerocopy(int bufs_num)
->> +{
->> +    struct virtio_vsock *vsock;
->> +    bool res = false;
->> +
->> +    rcu_read_lock();
->> +
->> +    vsock = rcu_dereference(the_virtio_vsock);
->> +    if (vsock) {
->> +        struct virtqueue *vq = vsock->vqs[VSOCK_VQ_TX];
->> +
->> +        /* Check that tx queue is large enough to keep whole
->> +         * data to send. This is needed, because when there is
->> +         * not enough free space in the queue, current skb to
->> +         * send will be reinserted to the head of tx list of
->> +         * the socket to retry transmission later, so if skb
->> +         * is bigger than whole queue, it will be reinserted
->> +         * again and again, thus blocking other skbs to be sent.
->> +         * Each page of the user provided buffer will be added
->> +         * as a single buffer to the tx virtqueue, so compare
->> +         * number of pages against maximum capacity of the queue.
->> +         */
->> +        if (bufs_num <= vq->num_max)
->> +            res = true;
->> +    }
->> +
->> +    rcu_read_unlock();
->> +
->> +    return res;
->> +}
->> +
->> static bool virtio_transport_seqpacket_allow(u32 remote_cid);
->>
->> static struct virtio_transport virtio_transport = {
->> @@ -504,6 +535,7 @@ static struct virtio_transport virtio_transport = {
->>     },
->>
->>     .send_pkt = virtio_transport_send_pkt,
->> +    .can_msgzerocopy = virtio_transport_can_msgzerocopy,
->> };
->>
->> static bool virtio_transport_seqpacket_allow(u32 remote_cid)
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 3a48e48a99ac..e358f118b07e 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -37,73 +37,110 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
->>     return container_of(t, struct virtio_transport, transport);
->> }
->>
->> -/* Returns a new packet on success, otherwise returns NULL.
->> - *
->> - * If NULL is returned, errp is set to a negative errno.
->> - */
-> 
-> Why we are removing this comment?
+Thanks
 
-I think I can return it like:
-/* Returns a new sk_buff on success, otherwise returns NULL. */
+Eric
+>
+> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+> ---
+> Note this is a placeholder patch.
+>
+>  include/standard-headers/linux/fuse.h |   3 +
+>  linux-headers/linux/iommufd.h         | 444 ++++++++++++++++++++++++++
+>  linux-headers/linux/kvm.h             |  13 +-
+>  linux-headers/linux/vfio.h            | 148 ++++++++-
+>  4 files changed, 604 insertions(+), 4 deletions(-)
+>  create mode 100644 linux-headers/linux/iommufd.h
+>
+> diff --git a/include/standard-headers/linux/fuse.h b/include/standard-headers/linux/fuse.h
+> index 35c131a107..2c8b8de9c2 100644
+> --- a/include/standard-headers/linux/fuse.h
+> +++ b/include/standard-headers/linux/fuse.h
+> @@ -206,6 +206,7 @@
+>   *  - add extension header
+>   *  - add FUSE_EXT_GROUPS
+>   *  - add FUSE_CREATE_SUPP_GROUP
+> + *  - add FUSE_HAS_EXPIRE_ONLY
+>   */
+>  
+>  #ifndef _LINUX_FUSE_H
+> @@ -365,6 +366,7 @@ struct fuse_file_lock {
+>   * FUSE_HAS_INODE_DAX:  use per inode DAX
+>   * FUSE_CREATE_SUPP_GROUP: add supplementary group info to create, mkdir,
+>   *			symlink and mknod (single group that matches parent)
+> + * FUSE_HAS_EXPIRE_ONLY: kernel supports expiry-only entry invalidation
+>   */
+>  #define FUSE_ASYNC_READ		(1 << 0)
+>  #define FUSE_POSIX_LOCKS	(1 << 1)
+> @@ -402,6 +404,7 @@ struct fuse_file_lock {
+>  #define FUSE_SECURITY_CTX	(1ULL << 32)
+>  #define FUSE_HAS_INODE_DAX	(1ULL << 33)
+>  #define FUSE_CREATE_SUPP_GROUP	(1ULL << 34)
+> +#define FUSE_HAS_EXPIRE_ONLY	(1ULL << 35)
+>  
+>  /**
+>   * CUSE INIT request/reply flags
+> diff --git a/linux-headers/linux/iommufd.h b/linux-headers/linux/iommufd.h
+> new file mode 100644
+> index 0000000000..218bf7ac98
+> --- /dev/null
+> +++ b/linux-headers/linux/iommufd.h
+> @@ -0,0 +1,444 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
+> + */
+> +#ifndef _IOMMUFD_H
+> +#define _IOMMUFD_H
+> +
+> +#include <linux/types.h>
+> +#include <linux/ioctl.h>
+> +
+> +#define IOMMUFD_TYPE (';')
+> +
+> +/**
+> + * DOC: General ioctl format
+> + *
+> + * The ioctl interface follows a general format to allow for extensibility. Each
+> + * ioctl is passed in a structure pointer as the argument providing the size of
+> + * the structure in the first u32. The kernel checks that any structure space
+> + * beyond what it understands is 0. This allows userspace to use the backward
+> + * compatible portion while consistently using the newer, larger, structures.
+> + *
+> + * ioctls use a standard meaning for common errnos:
+> + *
+> + *  - ENOTTY: The IOCTL number itself is not supported at all
+> + *  - E2BIG: The IOCTL number is supported, but the provided structure has
+> + *    non-zero in a part the kernel does not understand.
+> + *  - EOPNOTSUPP: The IOCTL number is supported, and the structure is
+> + *    understood, however a known field has a value the kernel does not
+> + *    understand or support.
+> + *  - EINVAL: Everything about the IOCTL was understood, but a field is not
+> + *    correct.
+> + *  - ENOENT: An ID or IOVA provided does not exist.
+> + *  - ENOMEM: Out of memory.
+> + *  - EOVERFLOW: Mathematics overflowed.
+> + *
+> + * As well as additional errnos, within specific ioctls.
+> + */
+> +enum {
+> +	IOMMUFD_CMD_BASE = 0x80,
+> +	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
+> +	IOMMUFD_CMD_IOAS_ALLOC,
+> +	IOMMUFD_CMD_IOAS_ALLOW_IOVAS,
+> +	IOMMUFD_CMD_IOAS_COPY,
+> +	IOMMUFD_CMD_IOAS_IOVA_RANGES,
+> +	IOMMUFD_CMD_IOAS_MAP,
+> +	IOMMUFD_CMD_IOAS_UNMAP,
+> +	IOMMUFD_CMD_OPTION,
+> +	IOMMUFD_CMD_VFIO_IOAS,
+> +	IOMMUFD_CMD_HWPT_ALLOC,
+> +	IOMMUFD_CMD_GET_HW_INFO,
+> +};
+> +
+> +/**
+> + * struct iommu_destroy - ioctl(IOMMU_DESTROY)
+> + * @size: sizeof(struct iommu_destroy)
+> + * @id: iommufd object ID to destroy. Can be any destroyable object type.
+> + *
+> + * Destroy any object held within iommufd.
+> + */
+> +struct iommu_destroy {
+> +	__u32 size;
+> +	__u32 id;
+> +};
+> +#define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
+> +
+> +/**
+> + * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
+> + * @size: sizeof(struct iommu_ioas_alloc)
+> + * @flags: Must be 0
+> + * @out_ioas_id: Output IOAS ID for the allocated object
+> + *
+> + * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address (IOVA)
+> + * to memory mapping.
+> + */
+> +struct iommu_ioas_alloc {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 out_ioas_id;
+> +};
+> +#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
+> +
+> +/**
+> + * struct iommu_iova_range - ioctl(IOMMU_IOVA_RANGE)
+> + * @start: First IOVA
+> + * @last: Inclusive last IOVA
+> + *
+> + * An interval in IOVA space.
+> + */
+> +struct iommu_iova_range {
+> +	__aligned_u64 start;
+> +	__aligned_u64 last;
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
+> + * @size: sizeof(struct iommu_ioas_iova_ranges)
+> + * @ioas_id: IOAS ID to read ranges from
+> + * @num_iovas: Input/Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @allowed_iovas: Pointer to the output array of struct iommu_iova_range
+> + * @out_iova_alignment: Minimum alignment required for mapping IOVA
+> + *
+> + * Query an IOAS for ranges of allowed IOVAs. Mapping IOVA outside these ranges
+> + * is not allowed. num_iovas will be set to the total number of iovas and
+> + * the allowed_iovas[] will be filled in as space permits.
+> + *
+> + * The allowed ranges are dependent on the HW path the DMA operation takes, and
+> + * can change during the lifetime of the IOAS. A fresh empty IOAS will have a
+> + * full range, and each attached device will narrow the ranges based on that
+> + * device's HW restrictions. Detaching a device can widen the ranges. Userspace
+> + * should query ranges after every attach/detach to know what IOVAs are valid
+> + * for mapping.
+> + *
+> + * On input num_iovas is the length of the allowed_iovas array. On output it is
+> + * the total number of iovas filled in. The ioctl will return -EMSGSIZE and set
+> + * num_iovas to the required value if num_iovas is too small. In this case the
+> + * caller should allocate a larger output array and re-issue the ioctl.
+> + *
+> + * out_iova_alignment returns the minimum IOVA alignment that can be given
+> + * to IOMMU_IOAS_MAP/COPY. IOVA's must satisfy::
+> + *
+> + *   starting_iova % out_iova_alignment == 0
+> + *   (starting_iova + length) % out_iova_alignment == 0
+> + *
+> + * out_iova_alignment can be 1 indicating any IOVA is allowed. It cannot
+> + * be higher than the system PAGE_SIZE.
+> + */
+> +struct iommu_ioas_iova_ranges {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 num_iovas;
+> +	__u32 __reserved;
+> +	__aligned_u64 allowed_iovas;
+> +	__aligned_u64 out_iova_alignment;
+> +};
+> +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_RANGES)
+> +
+> +/**
+> + * struct iommu_ioas_allow_iovas - ioctl(IOMMU_IOAS_ALLOW_IOVAS)
+> + * @size: sizeof(struct iommu_ioas_allow_iovas)
+> + * @ioas_id: IOAS ID to allow IOVAs from
+> + * @num_iovas: Input/Output total number of ranges in the IOAS
+> + * @__reserved: Must be 0
+> + * @allowed_iovas: Pointer to array of struct iommu_iova_range
+> + *
+> + * Ensure a range of IOVAs are always available for allocation. If this call
+> + * succeeds then IOMMU_IOAS_IOVA_RANGES will never return a list of IOVA ranges
+> + * that are narrower than the ranges provided here. This call will fail if
+> + * IOMMU_IOAS_IOVA_RANGES is currently narrower than the given ranges.
+> + *
+> + * When an IOAS is first created the IOVA_RANGES will be maximally sized, and as
+> + * devices are attached the IOVA will narrow based on the device restrictions.
+> + * When an allowed range is specified any narrowing will be refused, ie device
+> + * attachment can fail if the device requires limiting within the allowed range.
+> + *
+> + * Automatic IOVA allocation is also impacted by this call. MAP will only
+> + * allocate within the allowed IOVAs if they are present.
+> + *
+> + * This call replaces the entire allowed list with the given list.
+> + */
+> +struct iommu_ioas_allow_iovas {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u32 num_iovas;
+> +	__u32 __reserved;
+> +	__aligned_u64 allowed_iovas;
+> +};
+> +#define IOMMU_IOAS_ALLOW_IOVAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOW_IOVAS)
+> +
+> +/**
+> + * enum iommufd_ioas_map_flags - Flags for map and copy
+> + * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appropriate
+> + *                             IOVA to place the mapping at
+> + * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
+> + * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
+> + */
+> +enum iommufd_ioas_map_flags {
+> +	IOMMU_IOAS_MAP_FIXED_IOVA = 1 << 0,
+> +	IOMMU_IOAS_MAP_WRITEABLE = 1 << 1,
+> +	IOMMU_IOAS_MAP_READABLE = 1 << 2,
+> +};
+> +
+> +/**
+> + * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
+> + * @size: sizeof(struct iommu_ioas_map)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @__reserved: Must be 0
+> + * @user_va: Userspace pointer to start mapping from
+> + * @length: Number of bytes to map
+> + * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is set
+> + *        then this must be provided as input.
+> + *
+> + * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified then the
+> + * mapping will be established at iova, otherwise a suitable location based on
+> + * the reserved and allowed lists will be automatically selected and returned in
+> + * iova.
+> + *
+> + * If IOMMU_IOAS_MAP_FIXED_IOVA is specified then the iova range must currently
+> + * be unused, existing IOVA cannot be replaced.
+> + */
+> +struct iommu_ioas_map {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 ioas_id;
+> +	__u32 __reserved;
+> +	__aligned_u64 user_va;
+> +	__aligned_u64 length;
+> +	__aligned_u64 iova;
+> +};
+> +#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
+> +
+> +/**
+> + * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
+> + * @size: sizeof(struct iommu_ioas_copy)
+> + * @flags: Combination of enum iommufd_ioas_map_flags
+> + * @dst_ioas_id: IOAS ID to change the mapping of
+> + * @src_ioas_id: IOAS ID to copy from
+> + * @length: Number of bytes to copy and map
+> + * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is
+> + *            set then this must be provided as input.
+> + * @src_iova: IOVA to start the copy
+> + *
+> + * Copy an already existing mapping from src_ioas_id and establish it in
+> + * dst_ioas_id. The src iova/length must exactly match a range used with
+> + * IOMMU_IOAS_MAP.
+> + *
+> + * This may be used to efficiently clone a subset of an IOAS to another, or as a
+> + * kind of 'cache' to speed up mapping. Copy has an efficiency advantage over
+> + * establishing equivalent new mappings, as internal resources are shared, and
+> + * the kernel will pin the user memory only once.
+> + */
+> +struct iommu_ioas_copy {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dst_ioas_id;
+> +	__u32 src_ioas_id;
+> +	__aligned_u64 length;
+> +	__aligned_u64 dst_iova;
+> +	__aligned_u64 src_iova;
+> +};
+> +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
+> +
+> +/**
+> + * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
+> + * @size: sizeof(struct iommu_ioas_unmap)
+> + * @ioas_id: IOAS ID to change the mapping of
+> + * @iova: IOVA to start the unmapping at
+> + * @length: Number of bytes to unmap, and return back the bytes unmapped
+> + *
+> + * Unmap an IOVA range. The iova/length must be a superset of a previously
+> + * mapped range used with IOMMU_IOAS_MAP or IOMMU_IOAS_COPY. Splitting or
+> + * truncating ranges is not allowed. The values 0 to U64_MAX will unmap
+> + * everything.
+> + */
+> +struct iommu_ioas_unmap {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__aligned_u64 iova;
+> +	__aligned_u64 length;
+> +};
+> +#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
+> +
+> +/**
+> + * enum iommufd_option - ioctl(IOMMU_OPTION_RLIMIT_MODE) and
+> + *                       ioctl(IOMMU_OPTION_HUGE_PAGES)
+> + * @IOMMU_OPTION_RLIMIT_MODE:
+> + *    Change how RLIMIT_MEMLOCK accounting works. The caller must have privilege
+> + *    to invoke this. Value 0 (default) is user based accouting, 1 uses process
+> + *    based accounting. Global option, object_id must be 0
+> + * @IOMMU_OPTION_HUGE_PAGES:
+> + *    Value 1 (default) allows contiguous pages to be combined when generating
+> + *    iommu mappings. Value 0 disables combining, everything is mapped to
+> + *    PAGE_SIZE. This can be useful for benchmarking.  This is a per-IOAS
+> + *    option, the object_id must be the IOAS ID.
+> + */
+> +enum iommufd_option {
+> +	IOMMU_OPTION_RLIMIT_MODE = 0,
+> +	IOMMU_OPTION_HUGE_PAGES = 1,
+> +};
+> +
+> +/**
+> + * enum iommufd_option_ops - ioctl(IOMMU_OPTION_OP_SET) and
+> + *                           ioctl(IOMMU_OPTION_OP_GET)
+> + * @IOMMU_OPTION_OP_SET: Set the option's value
+> + * @IOMMU_OPTION_OP_GET: Get the option's value
+> + */
+> +enum iommufd_option_ops {
+> +	IOMMU_OPTION_OP_SET = 0,
+> +	IOMMU_OPTION_OP_GET = 1,
+> +};
+> +
+> +/**
+> + * struct iommu_option - iommu option multiplexer
+> + * @size: sizeof(struct iommu_option)
+> + * @option_id: One of enum iommufd_option
+> + * @op: One of enum iommufd_option_ops
+> + * @__reserved: Must be 0
+> + * @object_id: ID of the object if required
+> + * @val64: Option value to set or value returned on get
+> + *
+> + * Change a simple option value. This multiplexor allows controlling options
+> + * on objects. IOMMU_OPTION_OP_SET will load an option and IOMMU_OPTION_OP_GET
+> + * will return the current value.
+> + */
+> +struct iommu_option {
+> +	__u32 size;
+> +	__u32 option_id;
+> +	__u16 op;
+> +	__u16 __reserved;
+> +	__u32 object_id;
+> +	__aligned_u64 val64;
+> +};
+> +#define IOMMU_OPTION _IO(IOMMUFD_TYPE, IOMMUFD_CMD_OPTION)
+> +
+> +/**
+> + * enum iommufd_vfio_ioas_op - IOMMU_VFIO_IOAS_* ioctls
+> + * @IOMMU_VFIO_IOAS_GET: Get the current compatibility IOAS
+> + * @IOMMU_VFIO_IOAS_SET: Change the current compatibility IOAS
+> + * @IOMMU_VFIO_IOAS_CLEAR: Disable VFIO compatibility
+> + */
+> +enum iommufd_vfio_ioas_op {
+> +	IOMMU_VFIO_IOAS_GET = 0,
+> +	IOMMU_VFIO_IOAS_SET = 1,
+> +	IOMMU_VFIO_IOAS_CLEAR = 2,
+> +};
+> +
+> +/**
+> + * struct iommu_vfio_ioas - ioctl(IOMMU_VFIO_IOAS)
+> + * @size: sizeof(struct iommu_vfio_ioas)
+> + * @ioas_id: For IOMMU_VFIO_IOAS_SET the input IOAS ID to set
+> + *           For IOMMU_VFIO_IOAS_GET will output the IOAS ID
+> + * @op: One of enum iommufd_vfio_ioas_op
+> + * @__reserved: Must be 0
+> + *
+> + * The VFIO compatibility support uses a single ioas because VFIO APIs do not
+> + * support the ID field. Set or Get the IOAS that VFIO compatibility will use.
+> + * When VFIO_GROUP_SET_CONTAINER is used on an iommufd it will get the
+> + * compatibility ioas, either by taking what is already set, or auto creating
+> + * one. From then on VFIO will continue to use that ioas and is not effected by
+> + * this ioctl. SET or CLEAR does not destroy any auto-created IOAS.
+> + */
+> +struct iommu_vfio_ioas {
+> +	__u32 size;
+> +	__u32 ioas_id;
+> +	__u16 op;
+> +	__u16 __reserved;
+> +};
+> +#define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
+> +
+> +/**
+> + * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
+> + * @size: sizeof(struct iommu_hwpt_alloc)
+> + * @flags: Must be 0
+> + * @dev_id: The device to allocate this HWPT for
+> + * @pt_id: The IOAS to connect this HWPT to
+> + * @out_hwpt_id: The ID of the new HWPT
+> + * @__reserved: Must be 0
+> + *
+> + * Explicitly allocate a hardware page table object. This is the same object
+> + * type that is returned by iommufd_device_attach() and represents the
+> + * underlying iommu driver's iommu_domain kernel object.
+> + *
+> + * A HWPT will be created with the IOVA mappings from the given IOAS.
+> + */
+> +struct iommu_hwpt_alloc {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dev_id;
+> +	__u32 pt_id;
+> +	__u32 out_hwpt_id;
+> +	__u32 __reserved;
+> +};
+> +#define IOMMU_HWPT_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_ALLOC)
+> +
+> +/**
+> + * struct iommu_hw_info_vtd - Intel VT-d hardware information
+> + *
+> + * @flags: Must be 0
+> + * @__reserved: Must be 0
+> + *
+> + * @cap_reg: Value of Intel VT-d capability register defined in VT-d spec
+> + *           section 11.4.2 Capability Register.
+> + * @ecap_reg: Value of Intel VT-d capability register defined in VT-d spec
+> + *            section 11.4.3 Extended Capability Register.
+> + *
+> + * User needs to understand the Intel VT-d specification to decode the
+> + * register value.
+> + */
+> +struct iommu_hw_info_vtd {
+> +	__u32 flags;
+> +	__u32 __reserved;
+> +	__aligned_u64 cap_reg;
+> +	__aligned_u64 ecap_reg;
+> +};
+> +
+> +/**
+> + * enum iommu_hw_info_type - IOMMU Hardware Info Types
+> + * @IOMMU_HW_INFO_TYPE_NONE: Used by the drivers that do not report hardware
+> + *                           info
+> + * @IOMMU_HW_INFO_TYPE_INTEL_VTD: Intel VT-d iommu info type
+> + */
+> +enum iommu_hw_info_type {
+> +	IOMMU_HW_INFO_TYPE_NONE,
+> +	IOMMU_HW_INFO_TYPE_INTEL_VTD,
+> +};
+> +
+> +/**
+> + * struct iommu_hw_info - ioctl(IOMMU_GET_HW_INFO)
+> + * @size: sizeof(struct iommu_hw_info)
+> + * @flags: Must be 0
+> + * @dev_id: The device bound to the iommufd
+> + * @data_len: Input the length of a user buffer in bytes. Output the length of
+> + *            data that kernel supports
+> + * @data_uptr: User pointer to a user-space buffer used by the kernel to fill
+> + *             the iommu type specific hardware information data
+> + * @out_data_type: Output the iommu hardware info type as defined in the enum
+> + *                 iommu_hw_info_type.
+> + * @__reserved: Must be 0
+> + *
+> + * Query an iommu type specific hardware information data from an iommu behind
+> + * a given device that has been bound to iommufd. This hardware info data will
+> + * be used to sync capabilities between the virtual iommu and the physical
+> + * iommu, e.g. a nested translation setup needs to check the hardware info, so
+> + * a guest stage-1 page table can be compatible with the physical iommu.
+> + *
+> + * To capture an iommu type specific hardware information data, @data_uptr and
+> + * its length @data_len must be provided. Trailing bytes will be zeroed if the
+> + * user buffer is larger than the data that kernel has. Otherwise, kernel only
+> + * fills the buffer using the given length in @data_len. If the ioctl succeeds,
+> + * @data_len will be updated to the length that kernel actually supports,
+> + * @out_data_type will be filled to decode the data filled in the buffer
+> + * pointed by @data_uptr. Input @data_len == zero is allowed.
+> + */
+> +struct iommu_hw_info {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 dev_id;
+> +	__u32 data_len;
+> +	__aligned_u64 data_uptr;
+> +	__u32 out_data_type;
+> +	__u32 __reserved;
+> +};
+> +#define IOMMU_GET_HW_INFO _IO(IOMMUFD_TYPE, IOMMUFD_CMD_GET_HW_INFO)
+> +#endif
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 1f3f3333a4..0d74ee999a 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -1414,9 +1414,16 @@ struct kvm_device_attr {
+>  	__u64	addr;		/* userspace address of attr data */
+>  };
+>  
+> -#define  KVM_DEV_VFIO_GROUP			1
+> -#define   KVM_DEV_VFIO_GROUP_ADD			1
+> -#define   KVM_DEV_VFIO_GROUP_DEL			2
+> +#define  KVM_DEV_VFIO_FILE			1
+> +
+> +#define   KVM_DEV_VFIO_FILE_ADD			1
+> +#define   KVM_DEV_VFIO_FILE_DEL			2
+> +
+> +/* KVM_DEV_VFIO_GROUP aliases are for compile time uapi compatibility */
+> +#define  KVM_DEV_VFIO_GROUP	KVM_DEV_VFIO_FILE
+> +
+> +#define   KVM_DEV_VFIO_GROUP_ADD	KVM_DEV_VFIO_FILE_ADD
+> +#define   KVM_DEV_VFIO_GROUP_DEL	KVM_DEV_VFIO_FILE_DEL
+>  #define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE		3
+>  
+>  enum kvm_device_type {
+> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> index 16db89071e..7326ace436 100644
+> --- a/linux-headers/linux/vfio.h
+> +++ b/linux-headers/linux/vfio.h
+> @@ -677,11 +677,60 @@ enum {
+>   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
+>   *					      struct vfio_pci_hot_reset_info)
+>   *
+> + * This command is used to query the affected devices in the hot reset for
+> + * a given device.
+> + *
+> + * This command always reports the segment, bus, and devfn information for
+> + * each affected device, and selectively reports the group_id or devid per
+> + * the way how the calling device is opened.
+> + *
+> + *	- If the calling device is opened via the traditional group/container
+> + *	  API, group_id is reported.  User should check if it has owned all
+> + *	  the affected devices and provides a set of group fds to prove the
+> + *	  ownership in VFIO_DEVICE_PCI_HOT_RESET ioctl.
+> + *
+> + *	- If the calling device is opened as a cdev, devid is reported.
+> + *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set to indicate this
+> + *	  data type.  All the affected devices should be represented in
+> + *	  the dev_set, ex. bound to a vfio driver, and also be owned by
+> + *	  this interface which is determined by the following conditions:
+> + *	  1) Has a valid devid within the iommufd_ctx of the calling device.
+> + *	     Ownership cannot be determined across separate iommufd_ctx and
+> + *	     the cdev calling conventions do not support a proof-of-ownership
+> + *	     model as provided in the legacy group interface.  In this case
+> + *	     valid devid with value greater than zero is provided in the return
+> + *	     structure.
+> + *	  2) Does not have a valid devid within the iommufd_ctx of the calling
+> + *	     device, but belongs to the same IOMMU group as the calling device
+> + *	     or another opened device that has a valid devid within the
+> + *	     iommufd_ctx of the calling device.  This provides implicit ownership
+> + *	     for devices within the same DMA isolation context.  In this case
+> + *	     the devid value of VFIO_PCI_DEVID_OWNED is provided in the return
+> + *	     structure.
+> + *
+> + *	  A devid value of VFIO_PCI_DEVID_NOT_OWNED is provided in the return
+> + *	  structure for affected devices where device is NOT represented in the
+> + *	  dev_set or ownership is not available.  Such devices prevent the use
+> + *	  of VFIO_DEVICE_PCI_HOT_RESET ioctl outside of the proof-of-ownership
+> + *	  calling conventions (ie. via legacy group accessed devices).  Flag
+> + *	  VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED would be set when all the
+> + *	  affected devices are represented in the dev_set and also owned by
+> + *	  the user.  This flag is available only when
+> + *	  flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
+> + *	  When set, user could invoke VFIO_DEVICE_PCI_HOT_RESET with a zero
+> + *	  length fd array on the calling device as the ownership is validated
+> + *	  by iommufd_ctx.
+> + *
+>   * Return: 0 on success, -errno on failure:
+>   *	-enospc = insufficient buffer, -enodev = unsupported for device.
+>   */
+>  struct vfio_pci_dependent_device {
+> -	__u32	group_id;
+> +	union {
+> +		__u32   group_id;
+> +		__u32	devid;
+> +#define VFIO_PCI_DEVID_OWNED		0
+> +#define VFIO_PCI_DEVID_NOT_OWNED	-1
+> +	};
+>  	__u16	segment;
+>  	__u8	bus;
+>  	__u8	devfn; /* Use PCI_SLOT/PCI_FUNC */
+> @@ -690,6 +739,8 @@ struct vfio_pci_dependent_device {
+>  struct vfio_pci_hot_reset_info {
+>  	__u32	argsz;
+>  	__u32	flags;
+> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID		(1 << 0)
+> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED	(1 << 1)
+>  	__u32	count;
+>  	struct vfio_pci_dependent_device	devices[];
+>  };
+> @@ -700,6 +751,24 @@ struct vfio_pci_hot_reset_info {
+>   * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
+>   *				    struct vfio_pci_hot_reset)
+>   *
+> + * A PCI hot reset results in either a bus or slot reset which may affect
+> + * other devices sharing the bus/slot.  The calling user must have
+> + * ownership of the full set of affected devices as determined by the
+> + * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl.
+> + *
+> + * When called on a device file descriptor acquired through the vfio
+> + * group interface, the user is required to provide proof of ownership
+> + * of those affected devices via the group_fds array in struct
+> + * vfio_pci_hot_reset.
+> + *
+> + * When called on a direct cdev opened vfio device, the flags field of
+> + * struct vfio_pci_hot_reset_info reports the ownership status of the
+> + * affected devices and this ioctl must be called with an empty group_fds
+> + * array.  See above INFO ioctl definition for ownership requirements.
+> + *
+> + * Mixed usage of legacy groups and cdevs across the set of affected
+> + * devices is not supported.
+> + *
+>   * Return: 0 on success, -errno on failure.
+>   */
+>  struct vfio_pci_hot_reset {
+> @@ -828,6 +897,83 @@ struct vfio_device_feature {
+>  
+>  #define VFIO_DEVICE_FEATURE		_IO(VFIO_TYPE, VFIO_BASE + 17)
+>  
+> +/*
+> + * VFIO_DEVICE_BIND_IOMMUFD - _IOR(VFIO_TYPE, VFIO_BASE + 18,
+> + *				   struct vfio_device_bind_iommufd)
+> + * @argsz:	 User filled size of this data.
+> + * @flags:	 Must be 0.
+> + * @iommufd:	 iommufd to bind.
+> + * @out_devid:	 The device id generated by this bind. devid is a handle for
+> + *		 this device/iommufd bond and can be used in IOMMUFD commands.
+> + *
+> + * Bind a vfio_device to the specified iommufd.
+> + *
+> + * User is restricted from accessing the device before the binding operation
+> + * is completed.  Only allowed on cdev fds.
+> + *
+> + * Unbind is automatically conducted when device fd is closed.
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_device_bind_iommufd {
+> +	__u32		argsz;
+> +	__u32		flags;
+> +	__s32		iommufd;
+> +	__u32		out_devid;
+> +};
+> +
+> +#define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 18)
+> +
+> +/*
+> + * VFIO_DEVICE_ATTACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 19,
+> + *					struct vfio_device_attach_iommufd_pt)
+> + * @argsz:	User filled size of this data.
+> + * @flags:	Must be 0.
+> + * @pt_id:	Input the target id which can represent an ioas or a hwpt
+> + *		allocated via iommufd subsystem.
+> + *		Output the input ioas id or the attached hwpt id which could
+> + *		be the specified hwpt itself or a hwpt automatically created
+> + *		for the specified ioas by kernel during the attachment.
+> + *
+> + * Associate the device with an address space within the bound iommufd.
+> + * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.  This is only
+> + * allowed on cdev fds.
+> + *
+> + * If a vfio device is currently attached to a valid hw_pagetable, without doing
+> + * a VFIO_DEVICE_DETACH_IOMMUFD_PT, a second VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl
+> + * passing in another hw_pagetable (hwpt) id is allowed. This action, also known
+> + * as a hw_pagetable replacement, will replace the device's currently attached
+> + * hw_pagetable with a new hw_pagetable corresponding to the given pt_id.
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_device_attach_iommufd_pt {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +	__u32	pt_id;
+> +};
+> +
+> +#define VFIO_DEVICE_ATTACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 19)
+> +
+> +/*
+> + * VFIO_DEVICE_DETACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 20,
+> + *					struct vfio_device_detach_iommufd_pt)
+> + * @argsz:	User filled size of this data.
+> + * @flags:	Must be 0.
+> + *
+> + * Remove the association of the device and its current associated address
+> + * space.  After it, the device should be in a blocking DMA state.  This is only
+> + * allowed on cdev fds.
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +struct vfio_device_detach_iommufd_pt {
+> +	__u32	argsz;
+> +	__u32	flags;
+> +};
+> +
+> +#define VFIO_DEVICE_DETACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 20)
+> +
+>  /*
+>   * Provide support for setting a PCI VF Token, which is used as a shared
+>   * secret between PF and VF drivers.  This feature may only be set on a
 
-Line related to 'errp' is not needed i guess.
-
-> 
->> -static struct sk_buff *
->> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->> -               size_t len,
->> -               u32 src_cid,
->> -               u32 src_port,
->> -               u32 dst_cid,
->> -               u32 dst_port)
->> -{
->> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->> -    struct virtio_vsock_hdr *hdr;
->> -    struct sk_buff *skb;
->> -    void *payload;
->> -    int err;
->> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
->> +                       size_t pkt_len)
->> +{
->> +    const struct virtio_transport *t_ops;
->> +    struct iov_iter *iov_iter;
->>
->> -    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->> -    if (!skb)
->> -        return NULL;
->> +    if (!info->msg)
->> +        return false;
->>
->> -    hdr = virtio_vsock_hdr(skb);
->> -    hdr->type    = cpu_to_le16(info->type);
->> -    hdr->op        = cpu_to_le16(info->op);
->> -    hdr->src_cid    = cpu_to_le64(src_cid);
->> -    hdr->dst_cid    = cpu_to_le64(dst_cid);
->> -    hdr->src_port    = cpu_to_le32(src_port);
->> -    hdr->dst_port    = cpu_to_le32(dst_port);
->> -    hdr->flags    = cpu_to_le32(info->flags);
->> -    hdr->len    = cpu_to_le32(len);
->> +    iov_iter = &info->msg->msg_iter;
->>
->> -    if (info->msg && len > 0) {
->> -        payload = skb)put(skb, len);
->> -        err = memcpy_from_msg(payload, info->msg, len);
->> -        if (err)
->> -            goto out;
->> +    if (iov_iter->iov_offset)
->> +        return false;
->>
->> -        if (msg_data_left(info->msg) == 0 &&
->> -            info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
->> -            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->> +    /* We can't send whole iov. */
->> +    if (iov_iter->count > pkt_len)
->> +        return false;
->>
->> -            if (info->msg->msg_flags & MSG_EOR)
->> -                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->> -        }
->> +    /* Check that transport can send data in zerocopy mode. */
->> +    t_ops = virtio_transport_get_ops(info->vsk);
-> 
-> While reviewing I was wondering why here we don't check if `t_ops` is
-> NULL.
-> 
-> Then I realized that the only caller of this function
-> (virtio_transport_send_pkt_info()) already get the vsk ops calling
-> virtio_transport_get_ops() and also checks if it can be null.
-> 
-> So what about passing the ops as function parameter to avoid to call
-> virtio_transport_get_ops() again?
-
-Ack
-
-> 
->> +
->> +    if (t_ops->can_msgzerocopy) {
->> +        int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
->> +        int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
->> +
->> +        /* +1 is for packet header. */
->> +        return t_ops->can_msgzerocopy(pages_to_send + 1);
->>     }
->>
->> -    if (info->reply)
->> -        virtio_vsock_skb_set_reply(skb);
->> +    return true;
->> +}
->>
->> -    trace_virtio_transport_alloc_pkt(src_cid, src_port,
->> -                     dst_cid, dst_port,
->> -                     len,
->> -                     info->type,
->> -                     info->op,
->> -                     info->flags);
->> +static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
->> +                       struct sk_buff *skb,
->> +                       struct msghdr *msg,
->> +                       bool zerocopy)
->> +{
->> +    struct ubuf_info *uarg;
->>
->> -    if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
->> -        WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
->> -        goto out;
->> +    if (msg->msg_ubuf) {
->> +        uarg = msg->msg_ubuf;
->> +        net_zcopy_get(uarg);
->> +    } else {
->> +        struct iov_iter *iter = &msg->msg_iter;
->> +        struct ubuf_info_msgzc *uarg_zc;
->> +
->> +        uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->> +                        iter->count,
->> +                        NULL);
->> +        if (!uarg)
->> +            return -1;
->> +
->> +        uarg_zc = uarg_to_msgzc(uarg);
->> +        uarg_zc->zerocopy = zerocopy ? 1 : 0;
->>     }
->>
->> -    return skb;
->> +    skb_zcopy_init(skb, uarg);
->>
->> -out:
->> -    kfree_skb(skb);
->> -    return NULL;
->> +    return 0;
->> +}
->> +
->> +static int virtio_transport_fill_skb(struct sk_buff *skb,
->> +                     struct virtio_vsock_pkt_info *info,
->> +                     size_t len,
->> +                     bool zcopy)
->> +{
->> +    void *payload;
->> +    int err;
->> +
->> +    if (zcopy)
->> +        return __zerocopy_sg_from_iter(info->msg, NULL, skb,
->> +                           &info->msg->msg_iter,
->> +                           len);
->> +
->> +    payload = skb_put(skb, len);
->> +    err = memcpy_from_msg(payload, info->msg, len);
->> +    if (err)
->> +        return -1;
->> +
->> +    if (msg_data_left(info->msg))
->> +        return 0;
-> 
-> We are returning 0 in any case, what is the purpose of this check?
-
-Right, just forget to remove it.
-
-> 
->> +
->> +    return 0;
->> +}
->> +
->> +static void virtio_transport_init_hdr(struct sk_buff *skb,
->> +                      struct virtio_vsock_pkt_info *info,
->> +                      size_t payload_len,
->> +                      u32 src_cid,
->> +                      u32 src_port,
->> +                      u32 dst_cid,
->> +                      u32 dst_port)
->> +{
->> +    struct virtio_vsock_hdr *hdr;
->> +
->> +    hdr = virtio_vsock_hdr(skb);
->> +    hdr->type    = cpu_to_le16(info->type);
->> +    hdr->op        = cpu_to_le16(info->op);
->> +    hdr->src_cid    = cpu_to_le64(src_cid);
->> +    hdr->dst_cid    = cpu_to_le64(dst_cid);
->> +    hdr->src_port    = cpu_to_le32(src_port);
->> +    hdr->dst_port    = cpu_to_le32(dst_port);
->> +    hdr->flags    = cpu_to_le32(info->flags);
->> +    hdr->len    = cpu_to_le32(payload_len);
->> }
->>
->> static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
->> @@ -214,6 +251,77 @@ static u16 virtio_transport_get_type(struct sock *sk)
->>         return VIRTIO_VSOCK_TYPE_SEQPACKET;
->> }
->>
->> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
-> 
-> Before this patch we used `info->vsk` in virtio_transport_alloc_skb().
-> Is it now really necessary to add vsk as a parameter? If so, why?
-
-Agree, I think previous version of virtio_transport_alloc_skb() could be
-used.
-
-> 
->> +                          struct virtio_vsock_pkt_info *info,
->> +                          size_t payload_len,
->> +                          bool zcopy,
->> +                          u32 src_cid,
->> +                          u32 src_port,
->> +                          u32 dst_cid,
->> +                          u32 dst_port)
->> +{
->> +    struct sk_buff *skb;
->> +    size_t skb_len;
->> +
->> +    skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
->> +
->> +    if (!zcopy)
->> +        skb_len += payload_len;
->> +
->> +    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->> +    if (!skb)
->> +        return NULL;
->> +
->> +    virtio_transport_init_hdr(skb, info, payload_len, src_cid, src_port,
->> +                  dst_cid, dst_port);
->> +
->> +    /* If 'vsk' != NULL then payload is always present, so we
->> +     * will never call '__zerocopy_sg_from_iter()' below without
->> +     * setting skb owner in 'skb_set_owner_w()'. The only case
->> +     * when 'vsk' == NULL is VIRTIO_VSOCK_OP_RST control message
->> +     * without payload.
->> +     */
->> +    WARN_ON_ONCE(!(vsk && (info->msg && payload_len)) && zcopy);
->> +
->> +    /* Set owner here, because '__zerocopy_sg_from_iter()' uses
->> +     * owner of skb without check to update 'sk_wmem_alloc'.
->> +     */
->> +    if (vsk)
->> +        skb_set_owner_w(skb, sk_vsock(vsk));
->> +
->> +    if (info->msg && payload_len > 0) {
->> +        int err;
->> +
->> +        err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
->> +        if (err)
->> +            goto out;
->> +
->> +        if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
-> 
-> Before this patch, we did these steps only if
-> `msg_data_left(info->msg) == 0`, why now we do it in any case?
-
-Ack, it is bug
-
-> 
->> +            struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
->> +
->> +            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->> +
->> +            if (info->msg->msg_flags & MSG_EOR)
->> +                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->> +        }
->> +    }
->> +
->> +    if (info->reply)
->> +        virtio_vsock_skb_set_reply(skb);
->> +
->> +    trace_virtio_transport_alloc_pkt(src_cid, src_port,
->> +                     dst_cid, dst_port,
->> +                     payload_len,
->> +                     info->type,
->> +                     info->op,
->> +                     info->flags);
-> 
-> Maybe now we should trace also `zcopy`.
-
-Ack
-
-> 
->> +
->> +    return skb;
->> +out:
->> +    kfree_skb(skb);
->> +    return NULL;
->> +}
->> +
->> /* This function can only be used on connecting/connected sockets,
->>  * since a socket assigned to a transport is required.
->>  *
->> @@ -222,10 +330,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
->> static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>                       struct virtio_vsock_pkt_info *info)
->> {
->> +    u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->>     u32 src_cid, src_port, dst_cid, dst_port;
->>     const struct virtio_transport *t_ops;
->>     struct virtio_vsock_sock *vvs;
->>     u32 pkt_len = info->pkt_len;
->> +    bool can_zcopy = false;
->>     u32 rest_len;
->>     int ret;
->>
->> @@ -254,15 +364,30 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>     if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
->>         return pkt_len;
->>
->> +    if (info->msg) {
->> +        /* If zerocopy is not enabled by 'setsockopt()', we behave as
->> +         * there is no MSG_ZEROCOPY flag set.
->> +         */
->> +        if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
->> +            info->msg->msg_flags &= ~MSG_ZEROCOPY;
->> +
->> +        if (info->msg->msg_flags & MSG_ZEROCOPY)
->> +            can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
->> +
->> +        if (can_zcopy)
->> +            max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
->> +                        (MAX_SKB_FRAGS * PAGE_SIZE));
->> +    }
->> +
->>     rest_len = pkt_len;
->>
->>     do {
->>         struct sk_buff *skb;
->>         size_t skb_len;
->>
->> -        skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
->> +        skb_len = min(max_skb_len, rest_len);
->>
->> -        skb = virtio_transport_alloc_skb(info, skb_len,
->> +        skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
->>                          src_cid, src_port,
->>                          dst_cid, dst_port);
->>         if (!skb) {
->> @@ -270,6 +395,21 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>             break;
->>         }
->>
->> +        /* We process buffer part by part, allocating skb on
->> +         * each iteration. If this is last skb for this buffer
->> +         * and MSG_ZEROCOPY mode is in use - we must allocate
->> +         * completion for the current syscall.
->> +         */
->> +        if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
->> +            skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
->> +            if (virtio_transport_init_zcopy_skb(vsk, skb,
->> +                                info->msg,
->> +                                can_zcopy)) {
->> +                ret = -ENOMEM;
->> +                break;
->> +            }
->> +        }
->> +
->>         virtio_transport_inc_tx_pkt(vvs, skb);
->>
->>         ret = t_ops->send_pkt(skb);
->> @@ -985,7 +1125,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
->>     if (!t)
->>         return -ENOTCONN;
->>
->> -    reply = virtio_transport_alloc_skb(&info, 0,
->> +    reply = virtio_transport_alloc_skb(NULL, &info, 0, false,
->>                        le64_to_cpu(hdr->dst_cid),
->>                        le32_to_cpu(hdr->dst_port),
->>                        le64_to_cpu(hdr->src_cid),
->> -- 
->> 2.25.1
->>
-> 
