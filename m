@@ -2,140 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13CA57A0501
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC2F87A050F
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:10:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238742AbjINNHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 09:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45632 "EHLO
+        id S238721AbjINNKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 09:10:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238671AbjINNH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 09:07:27 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3351FD5;
-        Thu, 14 Sep 2023 06:07:23 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-401f68602a8so9748265e9.3;
-        Thu, 14 Sep 2023 06:07:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694696841; x=1695301641; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tej9b0LMdUKBSRZxH07jBOdxaJ6MquCE3RokLEVjR7k=;
-        b=rjoLWTXLiEKOlMZrYLKwMuRNi4V41FSZiO/Fyr1dsj/eufqx8ATVWylFkkOHpiJPg2
-         dCA56AD1LdD5T/VjMMCipoxTSB547oS64J6jxrpjXEtjacwQIN+7Cz6tVqqBVNEbWuEA
-         XyIx7qOWHodsnYhrZOckIOErmGbO6eFwhjgGkuojVFZOBvYo0hl9jP2pNsNmKLIw4fkD
-         PWR0m++xId7DOEDcbF8XIO9Dgr/ONtE3aMxorWoCjndLyB2QSjooJTaHK5Gc0Ck4OUs7
-         tS9xJk5Ecfi47JVvFmsYTRi4nErjrn4dgYz2NA5MA0wWN7BGY1GYyqQo961RsXJSf0/3
-         tGgw==
+        with ESMTP id S238601AbjINNKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 09:10:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BD4951FD4
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 06:09:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694696995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7ChIOmTfd7o/NKHWUFFWtkJ2XI7L7oPGwY6YJ68EaFI=;
+        b=TjIJrYYBf5Up6Ev0vrqyzQwdqawLUFCwEQqSNhfL0x0e2J0oiZVrAlUe+qhpUwgkZO0hwh
+        AYzvKqCfHOjH7AoWIgRaOEsB1GIY2OXfZaAvtxJVEfxnWr7ZFzBN0Qh22rF6Zt3tevUfBH
+        KjXsZlXjPkKONYh/oei99abTlj6GRhg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-548-SeKij2w7MQOYwo2i8hQ4fw-1; Thu, 14 Sep 2023 09:09:50 -0400
+X-MC-Unique: SeKij2w7MQOYwo2i8hQ4fw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40474c03742so2480405e9.3
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 06:09:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694696841; x=1695301641;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tej9b0LMdUKBSRZxH07jBOdxaJ6MquCE3RokLEVjR7k=;
-        b=EB/k0W3pjh2TTOf/f3FeQM1wZ+nmAtVaXfziggUe3P3xJFmjuJMxItz+zZ4zjXkbyc
-         w8X3lhUkvecgWHlsyQ9lyRBc3mw9GIhkbCU4Qihn3rtnwz2VzZNiexnuYRZhmTU3xsvB
-         zpNcEMEKF6mNEHYri2CSDYqZmpXzQ4UNPyZ2cDIZfQSN9g4ky3V0HEMVF/jMt1EoH52v
-         pcoDNTzpsDOhIoxhTl37qKqXbht4ObGgK3WeSgaIyByweDAEDnKA94EUeEJvyPhnQsCN
-         xu6iC8bacjXBRpOmx1dZsaBDME2KAa5V5Zh5FI2UcRedN3V1VMvhJ/krcKLEgvYoaWJL
-         tN1Q==
-X-Gm-Message-State: AOJu0YyXFuS9vax5HbpopifHZni6uxU39enYvKpWKZeoaEZXn0aEfop5
-        nFQInG0OpjdChRljf/dWEPs=
-X-Google-Smtp-Source: AGHT+IHUqdikwusaZ197Z7lAgvVUm0b2rKPwxGuDzuK0CfVPCbOiJ1CSjghXQW5EGPQAtAcuiR1wqg==
-X-Received: by 2002:a05:600c:2307:b0:402:e6a2:c8c7 with SMTP id 7-20020a05600c230700b00402e6a2c8c7mr4838002wmo.7.1694696841293;
-        Thu, 14 Sep 2023 06:07:21 -0700 (PDT)
-Received: from [192.168.5.8] (54-240-197-235.amazon.com. [54.240.197.235])
-        by smtp.gmail.com with ESMTPSA id u8-20020a5d6ac8000000b0031416362e23sm1759075wrw.3.2023.09.14.06.07.19
+        d=1e100.net; s=20230601; t=1694696988; x=1695301788;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7ChIOmTfd7o/NKHWUFFWtkJ2XI7L7oPGwY6YJ68EaFI=;
+        b=RwGgOnqntOZBmwqa4bYK27zrL1vLcQ9kpPzKxdWgRdEvcxmK3V2W96mRjsN0pLAXer
+         KOwh/kRHldix6humghpJ1BXb1oaCD5TUS+6JLLAlxKRePthx5sXh8P+lqYxxUhxjp8HD
+         NM8YT4+d1I7OFHuUMq0IUf1g2nKrDcppPoQ0N5cHruy4tR2LONzwoK90H217BLf8RI6T
+         JuO8HusCBEtModlQvyuGt7ATPvX3i3yWGTRPR9QXnfvWB/XZCIwJcOGWsGPXkEr3RD1w
+         xhNXxc/VSmBhFyUYi0dLb61SJMdUiuVZeD5m48d/P5We4pnNQ48/WLHRPmzK1tBPYJ0Q
+         Lqzw==
+X-Gm-Message-State: AOJu0Yxh07z0r+3WnMhHeyJEd7YVZJ6xl0SwE1i69U60RJ2kuVT74k8A
+        +urAXaNCOlSDC5I1TGNh2P+tRnTR4nofCJV8xLNCuWdgG/s43UD+rYEP7EdF1ayFIJnUXCIdTCC
+        PxNpqI+3Xukkf5tHpE/YP
+X-Received: by 2002:a05:6000:1d83:b0:31f:e1b4:5846 with SMTP id bk3-20020a0560001d8300b0031fe1b45846mr1230569wrb.53.1694696988340;
+        Thu, 14 Sep 2023 06:09:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWujUSunuwo9Kqn3OnEp5AQVDiwQj77GqWQB/Z9xX2vzqdYchUWZp0OuKiR/MfisxVkzDOxw==
+X-Received: by 2002:a05:6000:1d83:b0:31f:e1b4:5846 with SMTP id bk3-20020a0560001d8300b0031fe1b45846mr1230544wrb.53.1694696987868;
+        Thu, 14 Sep 2023 06:09:47 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
+        by smtp.gmail.com with ESMTPSA id t3-20020a05600001c300b003143b14848dsm1713172wrx.102.2023.09.14.06.09.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 06:07:20 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <75b00614-a3a5-44de-5a14-3b7c7c7eceb0@xen.org>
-Date:   Thu, 14 Sep 2023 15:07:18 +0200
+        Thu, 14 Sep 2023 06:09:46 -0700 (PDT)
+Message-ID: <fe9f3d19-df01-01e6-a253-f7fe5bdea41f@redhat.com>
+Date:   Thu, 14 Sep 2023 15:09:45 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 2/8] KVM: pfncache: add a mark-dirty helper
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
 Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-References: <20230914084946.200043-1-paul@xen.org>
- <20230914084946.200043-3-paul@xen.org>
- <87b3f6713a7c6aa57adc89b6c47be3e1511f66ca.camel@infradead.org>
- <69b2a8ae-fcae-75b8-4b2a-ca75bbd273f0@xen.org>
- <a689f4847d2272a75d89364723bab7a29508f646.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <a689f4847d2272a75d89364723bab7a29508f646.camel@infradead.org>
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [RFC PATCH v2 00/21] QEMU gmem implemention
+In-Reply-To: <20230914035117.3285885-1-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/2023 13:39, David Woodhouse wrote:
-> On Thu, 2023-09-14 at 11:34 +0200, Paul Durrant wrote:
->> On 14/09/2023 10:21, David Woodhouse wrote:
->>> On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
->>>> --- a/arch/x86/kvm/xen.c
->>>> +++ b/arch/x86/kvm/xen.c
->>>> @@ -430,14 +430,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
->>>>                   smp_wmb();
->>>>           }
->>>>    
->>>> -       if (user_len2)
->>>> +       if (user_len2) {
->>>> +               kvm_gpc_mark_dirty(gpc2);
->>>>                   read_unlock(&gpc2->lock);
->>>> +       }
->>>>    
->>>> +       kvm_gpc_mark_dirty(gpc1);
->>>>           read_unlock_irqrestore(&gpc1->lock, flags);
->>>> -
->>>> -       mark_page_dirty_in_slot(v->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
->>>> -       if (user_len2)
->>>> -               mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2->gpa >> PAGE_SHIFT);
->>>>    }
->>>>    
->>>>    void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
->>>
->>> ISTR there was a reason why the mark_page_dirty_in_slot() was called
->>> *after* unlocking. Although now I say it, that seems wrong... is that
->>> because the spinlock is only protecting the uHVA→kHVA mapping, while
->>> the memslot/gpa are going to remain valid even after unlock, because
->>> those are protected by sRCU?
->>
->> Without the lock you could see an inconsistent GPA and memslot so I
->> think you could theoretically calculate a bogus rel_gfn and walk off the
->> end of the dirty bitmap. Hence moving the call inside the lock while I
->> was in the neighbourhood seemed like a good idea. I could call it out in
->> the commit comment if you'd like.
+On 14.09.23 05:50, Xiaoyao Li wrote:
+> It's the v2 RFC of enabling KVM gmem[1] as the backend for private
+> memory.
 > 
-> Yeah, I can't see a reason why it needs to be outside the lock, and as
-> you note, there really is a reason why it should be *inside*. Whatever
-> reason there was, it either disappeared in the revisions of the gpc
-> patch set or it was stupidity on my part in the first place.
+> For confidential-computing, KVM provides gmem/guest_mem interfaces for
+> userspace, like QEMU, to allocate user-unaccesible private memory. This
+> series aims to add gmem support in QEMU's RAMBlock so that each RAM can
+> have both hva-based shared memory and gmem_fd based private memory. QEMU
+> does the shared-private conversion on KVM_MEMORY_EXIT and discards the
+> memory.
 > 
-> So yeah, let it move inside the lock, call that out in the commit
-> message (I did note some of the other commits could have used a 'No
-> functional change intended' too, FWIW), and
+> It chooses the design that adds "private" property to hostmeory backend.
+> If "private" property is set, QEMU will allocate/create KVM gmem when
+> initialize the RAMbloch of the memory backend.
+> 
+> This sereis also introduces the first user of kvm gmem,
+> KVM_X86_SW_PROTECTED_VM. A KVM_X86_SW_PROTECTED_VM with private KVM gmem
+> can be created with
+> 
+>    $qemu -object sw-protected-vm,id=sp-vm0 \
+> 	-object memory-backend-ram,id=mem0,size=1G,private=on \
+> 	-machine q35,kernel_irqchip=split,confidential-guest-support=sp-vm0,memory-backend=mem0 \
+> 	...
+> 
+> Unfortunately this patch series fails the boot of OVMF at very early
+> stage due to triple fault, because KVM doesn't support emulating string IO
+> to private memory.
 
-Ack. Will do.
+Is support being added? Or have we figured out what it would take to 
+make it work?
+
+How does this interact with other features (memory ballooning, virtiofs, 
+vfio/mdev/...)?
 
 > 
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> This version still leave some opens to be discussed:
+> 1. whether we need "private" propery to be user-settable?
+> 
+>     It seems unnecessary because vm-type is determined. If the VM is
+>     confidential-guest, then the RAM of the guest must be able to be
+>     mapped as private, i.e., have kvm gmem backend. So QEMU can
+>     determine the value of "private" property automatiacally based on vm
+>     type.
+> 
+>     This also aligns with the board internal MemoryRegion that needs to
+>     have kvm gmem backend, e.g., TDX requires OVMF to act as private
+>     memory so bios memory region needs to have kvm gmem fd associated.
+>     QEMU no doubt will do it internally automatically.
+
+Would it make sense to have some regions without "pivate" semantics? 
+Like NVDIMMs?
+
+> 
+> 2. hugepage support.
+> 
+>     KVM gmem can be allocated from hugetlbfs. How does QEMU determine
+>     when to allocate KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE. The
+>     easiest solution is create KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+>     only when memory backend is HostMemoryBackendFile of hugetlbfs.
+
+Good question.
+
+Probably "if the memory backend uses huge pages, also use huge pages for 
+the private gmem" makes sense.
+
+... but it becomes a mess with preallocation ... which is what people 
+should actually be using with hugetlb. Andeventual double 
+memory-consumption ... but maybe that's all been taken care of already?
+
+Probably it's best to leave hugetlb support as future work and start 
+with something minimal.
+
+> 
+> 3. What is KVM_X86_SW_PROTECTED_VM going to look like? and do we need it?
 > 
 
-Thanks.
+Why implement it when you have to ask others for a motivation? ;)
 
-   Paul
+Personally, I'm not sure if it is really useful, especially in this state.
+
+>     This series implements KVM_X86_SW_PROTECTED_VM because it's introduced
+>     with gmem together on KVM side and it's supposed to be the first user
+>     who requires KVM gmem. However the implementation is incomplete and
+>     there lacks the definition of how KVM_X86_SW_PROTECTED_VM works.
+
+Then it should not be included in this series such that you can make 
+progress with the gmem implementation for TDX guests instead?
+
+-- 
+Cheers,
+
+David / dhildenb
 
