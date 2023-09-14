@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C31879FA32
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 07:19:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60F0679FA36
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 07:19:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235209AbjINFTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 01:19:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49266 "EHLO
+        id S235216AbjINFTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 01:19:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234958AbjINFTV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 01:19:21 -0400
+        with ESMTP id S234961AbjINFTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 01:19:22 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC521BD0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5A3B1BD9;
         Wed, 13 Sep 2023 22:19:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694668757; x=1726204757;
+  t=1694668758; x=1726204758;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yFOHuHE47yU8Pv3f7vyK1KueQKaw2/ZJmrjuiwmDzLE=;
-  b=GtX6iexaKwL2JQc2EAbpztI5DF3vA0Wm4NIfInkkM9ih2OUW2lMHGYgV
-   Qw9LNoXNN50Jk+csKwD2uQwbcwfEt4M391jUsdgVtl7nFx4NSFVHxOUxD
-   uezJ1zTky9OBX4ikMssAPz8PGyJB5QXZUF77JpiLPY4CgpzBlS4J9n5iL
-   48O8FZjszvOdVx52WTd3fDnTQ8yjAMz0mZijGiVbfhCdutuO8pwsbI+JK
-   X3Wnv/nwoq8Qh2WyXVe/k5a17m/MBSB9VvwxnUrVvlAf8bUra5MbzgxwI
-   IQqbVtWaCex3kN+pZhG5yyR87dEopGtoGOKlQvw516bZw87/2qT3sBYQg
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382661260"
+  bh=/vulkjS/nAxN+RJ3C7R6J4h15cqNiAED/GUC9x16vUQ=;
+  b=Pmgh8gMAsLaS63sLuw+7ob7XINn80zbFPOBGwDd/S9Wy2T3DN6G4EoAf
+   ncX7+lvs5ShLgCng39vhaT7U7/akn0O8dc7dP1FmOEGVrHXzANPDlgN0A
+   yH/Spzj43T4FclED3al9Rhz4ij1R5ThhHbKc4HGc8du+18bLHhaZGC2+P
+   diuveLMyqrJIHRO0vWLIyiXjo2azwzJQJfzk4nfIKkl01zPXP2I7+zB7I
+   t802zZ5ZciY16Oabf4mMHtofSh6I2L8sD1bwGjFiZtOIN2I1SUzI6+Ho6
+   bc07VVHsJ6rg5flBhjw74AX0BXhUactOgwqXEyrj15bqYRsfq3V2QutEQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382661273"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="382661260"
+   d="scan'208";a="382661273"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 22:17:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="779488784"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="779488787"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="779488784"
+   d="scan'208";a="779488787"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orsmga001.jf.intel.com with ESMTP; 13 Sep 2023 22:17:36 -0700
+  by orsmga001.jf.intel.com with ESMTP; 13 Sep 2023 22:17:37 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com
-Subject: [PATCH v10 15/38] x86/ptrace: Cleanup the definition of the pt_regs structure
-Date:   Wed, 13 Sep 2023 21:47:42 -0700
-Message-Id: <20230914044805.301390-16-xin3.li@intel.com>
+Subject: [PATCH v10 16/38] x86/ptrace: Add FRED additional information to the pt_regs structure
+Date:   Wed, 13 Sep 2023 21:47:43 -0700
+Message-Id: <20230914044805.301390-17-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230914044805.301390-1-xin3.li@intel.com>
 References: <20230914044805.301390-1-xin3.li@intel.com>
@@ -60,129 +60,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-struct pt_regs is hard to read because the member or section related
-comments are not aligned with the members.
+FRED defines additional information in the upper 48 bits of cs/ss
+fields. Therefore add the information definitions into the pt_regs
+structure.
 
-The 'cs' and 'ss' members of pt_regs are type of 'unsigned long' while
-in reality they are only 16-bit wide. This works so far as the
-remaining space is unused, but FRED will use the remaining bits for
-other purposes.
-
-To prepare for FRED:
-
-  - Cleanup the formatting
-  - Convert 'cs' and 'ss' to u16 and embed them into an union
-    with a u64
-  - Fixup the related printk() format strings
+Specially introduce a new structure fred_ss to denote the FRED flags
+above SS selector, which avoids FRED_SSX_ macros and makes the code
+simpler and easier to read.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/vsyscall/vsyscall_64.c |  2 +-
- arch/x86/include/asm/ptrace.h         | 44 +++++++++++++++++++--------
- arch/x86/kernel/process_64.c          |  2 +-
- 3 files changed, 33 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/entry/vsyscall/vsyscall_64.c b/arch/x86/entry/vsyscall/vsyscall_64.c
-index e0ca8120aea8..a3c0df11d0e6 100644
---- a/arch/x86/entry/vsyscall/vsyscall_64.c
-+++ b/arch/x86/entry/vsyscall/vsyscall_64.c
-@@ -76,7 +76,7 @@ static void warn_bad_vsyscall(const char *level, struct pt_regs *regs,
- 	if (!show_unhandled_signals)
- 		return;
- 
--	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%lx sp:%lx ax:%lx si:%lx di:%lx\n",
-+	printk_ratelimited("%s%s[%d] %s ip:%lx cs:%x sp:%lx ax:%lx si:%lx di:%lx\n",
- 			   level, current->comm, task_pid_nr(current),
- 			   message, regs->ip, regs->cs,
- 			   regs->sp, regs->ax, regs->si, regs->di);
+Changes since v9:
+* Introduce a new structure fred_ss to denote the FRED flags above SS
+  selector, which avoids FRED_SSX_ macros and makes the code simpler
+  and easier to read (Thomas Gleixner).
+* Use type u64 to define FRED bit fields instead of type unsigned int
+  (Thomas Gleixner).
+
+Changes since v8:
+* Reflect stack frame definition changes from FRED spec 3.0 to 5.0.
+* Use __packed instead of __attribute__((__packed__)) (Borislav Petkov).
+* Put all comments above the members, like the rest of the file does
+  (Borislav Petkov).
+
+Changes since v3:
+* Rename csl/ssl of the pt_regs structure to csx/ssx (x for extended)
+  (Andrew Cooper).
+---
+ arch/x86/include/asm/ptrace.h | 51 +++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
+
 diff --git a/arch/x86/include/asm/ptrace.h b/arch/x86/include/asm/ptrace.h
-index f4db78b09c8f..f08ea073edd6 100644
+index f08ea073edd6..5786c8ca5f4c 100644
 --- a/arch/x86/include/asm/ptrace.h
 +++ b/arch/x86/include/asm/ptrace.h
-@@ -57,17 +57,19 @@ struct pt_regs {
+@@ -56,6 +56,25 @@ struct pt_regs {
+ 
  #else /* __i386__ */
  
++struct fred_ss {
++	u64	ss	: 16,	// SS selector
++		sti	:  1,	// STI state
++		swevent	:  1,	// Set if syscall, sysenter or INT n
++		nmi	:  1,	// Event is NMI type
++			: 13,
++		vector	:  8,	// Event vector
++			:  8,
++		type	:  4,	// Event type
++			:  4,
++		enclave	:  1,	// Event was incident to enclave execution
++		lm	:  1,	// CPU was in long mode
++		nested	:  1,	// Nested exception during FRED delivery
++				// not set for #DF
++			:  1,
++		insnlen	:  4;	// The length of the instruction causing the event
++				// Only set for INT0, INT1, INT3, INT n, SYSCALL
++};				// and SYSENTER. 0 otherwise.
++
  struct pt_regs {
--/*
-- * C ABI says these regs are callee-preserved. They aren't saved on kernel entry
-- * unless syscall needs a complete, fully filled "struct pt_regs".
-- */
-+	/*
-+	 * C ABI says these regs are callee-preserved. They aren't saved on
-+	 * kernel entry unless syscall needs a complete, fully filled
-+	 * "struct pt_regs".
-+	 */
- 	unsigned long r15;
- 	unsigned long r14;
- 	unsigned long r13;
- 	unsigned long r12;
- 	unsigned long bp;
- 	unsigned long bx;
--/* These regs are callee-clobbered. Always saved on kernel entry. */
-+
-+	/* These regs are callee-clobbered. Always saved on kernel entry. */
- 	unsigned long r11;
- 	unsigned long r10;
- 	unsigned long r9;
-@@ -77,18 +79,34 @@ struct pt_regs {
- 	unsigned long dx;
- 	unsigned long si;
- 	unsigned long di;
--/*
-- * On syscall entry, this is syscall#. On CPU exception, this is error code.
-- * On hw interrupt, it's IRQ number:
-- */
-+
-+	/*
-+	 * orig_ax is used on entry for:
-+	 * - the syscall number (syscall, sysenter, int80)
-+	 * - error_code stored by the CPU on traps and exceptions
-+	 * - the interrupt number for device interrupts
-+	 */
+ 	/*
+ 	 * C ABI says these regs are callee-preserved. They aren't saved on
+@@ -85,6 +104,12 @@ struct pt_regs {
+ 	 * - the syscall number (syscall, sysenter, int80)
+ 	 * - error_code stored by the CPU on traps and exceptions
+ 	 * - the interrupt number for device interrupts
++	 *
++	 * A FRED stack frame starts here:
++	 *   1) It _always_ includes an error code;
++	 *
++	 *   2) The return frame for ERET[US] starts here, but
++	 *	the content of orig_ax is ignored.
+ 	 */
  	unsigned long orig_ax;
--/* Return frame for iretq */
-+
-+	/* The IRETQ return frame starts here */
+ 
+@@ -92,20 +117,36 @@ struct pt_regs {
  	unsigned long ip;
--	unsigned long cs;
-+
-+	union {
-+		u64	csx;	// The full 64-bit data slot containing CS
-+		u16	cs;	// CS selector
-+	};
-+
+ 
+ 	union {
+-		u64	csx;	// The full 64-bit data slot containing CS
+-		u16	cs;	// CS selector
++		u64	csx;		// The full data for FRED
++		/*
++		 * The 'cs' member should be defined as a 16-bit bit-field
++		 * along with the 'sl' and 'wfe' members, which however
++		 * breaks compiling REG_OFFSET_NAME(cs), because compilers
++		 * disallow calculating the address of a bit-field.
++		 *
++		 * Therefore 'cs" is defined as an individual member with
++		 * type u16.
++		 */
++		u16	cs;		// CS selector
++		u64		: 16,
++			sl	:  2,	// Stack level at event time
++			wfe	:  1,	// IBT is in WAIT_FOR_BRANCH_STATE
++				: 45;
+ 	};
+ 
  	unsigned long flags;
  	unsigned long sp;
--	unsigned long ss;
--/* top of stack page */
-+
-+	union {
-+		u64	ssx;	// The full 64-bit data slot containing SS
-+		u16	ss;	// SS selector
-+	};
-+
-+	/*
-+	 * Top of stack on IDT systems.
-+	 */
+ 
+ 	union {
+-		u64	ssx;	// The full 64-bit data slot containing SS
+-		u16	ss;	// SS selector
++		u64		ssx;		// The full data for FRED
++		u16		ss;		// SS selector
++		struct fred_ss	fred_ss;	// The fred extension
+ 	};
+ 
+ 	/*
+-	 * Top of stack on IDT systems.
++	 * Top of stack on IDT systems, while FRED systems have extra fields
++	 * defined above for storing exception related information, e.g. CR2 or
++	 * DR6.
+ 	 */
  };
  
- #endif /* !__i386__ */
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index 33b268747bb7..0f78b58021bb 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -117,7 +117,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
- 
- 	printk("%sFS:  %016lx(%04x) GS:%016lx(%04x) knlGS:%016lx\n",
- 	       log_lvl, fs, fsindex, gs, gsindex, shadowgs);
--	printk("%sCS:  %04lx DS: %04x ES: %04x CR0: %016lx\n",
-+	printk("%sCS:  %04x DS: %04x ES: %04x CR0: %016lx\n",
- 		log_lvl, regs->cs, ds, es, cr0);
- 	printk("%sCR2: %016lx CR3: %016lx CR4: %016lx\n",
- 		log_lvl, cr2, cr3, cr4);
 -- 
 2.34.1
 
