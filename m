@@ -2,202 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4E6779F906
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B205F79F909
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:51:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233817AbjINDuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 23:50:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57742 "EHLO
+        id S234177AbjINDv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 23:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbjINDuO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 23:50:14 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5BD193;
-        Wed, 13 Sep 2023 20:50:10 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bf11b1c7d0so12391575ad.0;
-        Wed, 13 Sep 2023 20:50:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694663410; x=1695268210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kWLjIiBFHAPD99USdA8G+SnnWHVFRCtu/yWG2bUDOR0=;
-        b=ccsDqUYVBNAUL01Zhv38ITjMVzZ9kurc96qT6+LYPfdYJfE5WB9ZcPkayE3rrCPZiy
-         jL7Jx91244nF81FFUupruOks68grTf6M0vfE9a/mmkEmLV6d8FbiGo6q4JNWP3ZrQnwE
-         U8b8A95Ry3QHiQe30VjLONMWwewuIfxtEuz36n0WNyJw5S45GdEq16+7KCWZ3D812c5G
-         EYZhcMa5E0ovc+GmysZUudFGan3VLdulMmfEHfxIJ2bDQs9LAi9umEXLBZdUX9K3Vugu
-         JawnDXVCZ1DJPR9sgbySy6x9SmYGbvGhQl75iWXTuroDaz7sBV6d1qxY6r7Ues/5BdSc
-         WoVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694663410; x=1695268210;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWLjIiBFHAPD99USdA8G+SnnWHVFRCtu/yWG2bUDOR0=;
-        b=lnEYVkM7/WUZCpjjLdDIX0/augziUh4APKmRolc4FaDInQo5kJi57Nw4K9ycGRh5iI
-         DuOtw6E8VEZvEldCsHAiIpXYlZxcQGqcXy/oLCJ7AiXw9aYdhQoT2hpMBXKeEo9Y2E0l
-         uGWYe2abCc1JQfGWDqBmTG2/zXjqUmb2FQxKuN7v6GWXrDppgch1wDaP5eq/3bkXSGDj
-         0VMIMTq+8aeeDsV3Ol+tgJXgL8WJXmO4b+Fe8QlQooYalIppukWqwfo8YLEGU9FOVBOk
-         eiNF7Q32GNGm4chRIp5HhiObjeO5lOkKelT9fbtzNXamYIiWKMLszPek2VhGpSZne6um
-         +Esw==
-X-Gm-Message-State: AOJu0YxDbGKGlKAN1sGYAqCK2wkM+W7tGXSPhHTO4hHsnQ+9tANSvSDw
-        XIM45CT1xBzTlWqS7EUVou4=
-X-Google-Smtp-Source: AGHT+IFuz8hrGM3jP7zUM9akV5F9cp0bnNxU8tq8pyBDoSeX21nshNwtq4YDB31y4e5BInEfkwyohQ==
-X-Received: by 2002:a17:902:d4c3:b0:1c3:e3b1:98f9 with SMTP id o3-20020a170902d4c300b001c3e3b198f9mr982088plg.24.1694663409827;
-        Wed, 13 Sep 2023 20:50:09 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jw1-20020a170903278100b001bc676df6a9sm388238plb.132.2023.09.13.20.50.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 20:50:09 -0700 (PDT)
-Message-ID: <3912b026-7cd2-9981-27eb-e8e37be9bbad@gmail.com>
-Date:   Thu, 14 Sep 2023 11:50:02 +0800
+        with ESMTP id S229791AbjINDv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 23:51:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362DB99
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 20:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694663484; x=1726199484;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EJdytUvFegtFO4ub2tojVZa0daaV9vRq2OIwl9Ilnlg=;
+  b=IcqoctVIDFQwn1605mLypSwYlo+K6aFhrDgliJJLKd1SifCUKC34hb2x
+   +OxrrI9ae/DSh1AZ49uWPnzTr8aIYpplnGQrbArZWmBJH8ShjOUo8Pex8
+   ZZsPH8kn3xtEbWCswKTPLo1/4AxhygAjoEOUo8SCelnQcgYv+sovsvaeN
+   ls9J6eaZk020cjkk4OWgpWdTi0nATPCnDf+PGW65jwxQOy4RuT898Et4p
+   Kd7UWUkRw9Y5jUFyIMZXixM5++s2QEIvFUVJjKKJ/J50qBGGQXbyyVSf0
+   PqwFgnZJQKiO6XeWkJnEB7N7qt9YQjt399L25Us1eBQBjVvYQFmvdAABA
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="381528266"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="381528266"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:51:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="814500525"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="814500525"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
+  by fmsmga004.fm.intel.com with ESMTP; 13 Sep 2023 20:51:19 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, xiaoyao.li@intel.com,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+Subject: [RFC PATCH v2 00/21] QEMU gmem implemention
+Date:   Wed, 13 Sep 2023 23:50:56 -0400
+Message-Id: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH v6] KVM: x86/tsc: Don't sync user-written TSC against
- startup values
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20230913103729.51194-1-likexu@tencent.com>
- <5367c45df8e4730564ed7a55ed441a6a2d6ab0f9.camel@infradead.org>
- <2eaf612b-1ce3-0dfe-5d2e-2cf29bba7641@gmail.com>
- <ZQHLcs3VGyLUb6wW@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZQHLcs3VGyLUb6wW@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/9/2023 10:47 pm, Sean Christopherson wrote:
-> On Wed, Sep 13, 2023, Like Xu wrote:
->> I'll wait for a cooling off period to see if the maintainers need me to post v7.
-> 
-> You should have waiting to post v5, let alone v6.  Resurrecting a thread after a
-> month and not waiting even 7 hours for others to respond is extremely frustrating.
+It's the v2 RFC of enabling KVM gmem[1] as the backend for private
+memory.
 
-You are right. I don't seem to be keeping up with many of other issues. Sorry 
-for that.
-Wish there were 48 hours in a day.
+For confidential-computing, KVM provides gmem/guest_mem interfaces for
+userspace, like QEMU, to allocate user-unaccesible private memory. This
+series aims to add gmem support in QEMU's RAMBlock so that each RAM can
+have both hva-based shared memory and gmem_fd based private memory. QEMU
+does the shared-private conversion on KVM_MEMORY_EXIT and discards the
+memory.
 
-Back to this issue: for commit message, I'd be more inclined to David's 
-understanding,
-but you have the gavel; and for proposed code diff, how about the following changes:
+It chooses the design that adds "private" property to hostmeory backend.
+If "private" property is set, QEMU will allocate/create KVM gmem when
+initialize the RAMbloch of the memory backend. 
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1a4def36d5bb..9a7dfef9d32d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1324,6 +1324,7 @@ struct kvm_arch {
-  	int nr_vcpus_matched_tsc;
+This sereis also introduces the first user of kvm gmem,
+KVM_X86_SW_PROTECTED_VM. A KVM_X86_SW_PROTECTED_VM with private KVM gmem
+can be created with 
 
-  	u32 default_tsc_khz;
-+	bool user_set_tsc;
+  $qemu -object sw-protected-vm,id=sp-vm0 \
+	-object memory-backend-ram,id=mem0,size=1G,private=on \
+	-machine q35,kernel_irqchip=split,confidential-guest-support=sp-vm0,memory-backend=mem0 \
+	...
 
-  	seqcount_raw_spinlock_t pvclock_sc;
-  	bool use_master_clock;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..faaae8b3fec4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2714,8 +2714,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, 
-u64 offset, u64 tsc,
-  	kvm_track_tsc_matching(vcpu);
-  }
+Unfortunately this patch series fails the boot of OVMF at very early
+stage due to triple fault, because KVM doesn't support emulating string IO
+to private memory.
 
--static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
-+static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
-  {
-+	u64 data = user_value ? *user_value : 0;
-  	struct kvm *kvm = vcpu->kvm;
-  	u64 offset, ns, elapsed;
-  	unsigned long flags;
-@@ -2728,27 +2729,45 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, 
-u64 data)
-  	elapsed = ns - kvm->arch.last_tsc_nsec;
+This version still leave some opens to be discussed:
+1. whether we need "private" propery to be user-settable?
 
-  	if (vcpu->arch.virtual_tsc_khz) {
-+		/*
-+		 * Force synchronization when creating or hotplugging a vCPU,
-+		 * i.e. when the TSC value is '0', to help keep clocks stable.
-+		 * If this is NOT a hotplug/creation case, skip synchronization
-+		 * on the first write from userspace so as not to misconstrue
-+		 * state restoration after live migration as an attempt from
-+		 * userspace to synchronize.
-+		 */
-  		if (data == 0) {
--			/*
--			 * detection of vcpu initialization -- need to sync
--			 * with other vCPUs. This particularly helps to keep
--			 * kvm_clock stable after CPU hotplug
--			 */
-  			synchronizing = true;
--		} else {
-+		} else if (kvm->arch.user_set_tsc) {
-  			u64 tsc_exp = kvm->arch.last_tsc_write +
-  						nsec_to_cycles(vcpu, elapsed);
-  			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
-  			/*
--			 * Special case: TSC write with a small delta (1 second)
--			 * of virtual cycle time against real time is
--			 * interpreted as an attempt to synchronize the CPU.
-+			 * Here lies UAPI baggage: when a user-initiated TSC write has
-+			 * a small delta (1 second) of virtual cycle time against the
-+			 * previously set vCPU, we assume that they were intended to be
-+			 * in sync and the delta was only due to the racy nature of the
-+			 * legacy API.
-+			 *
-+			 * This trick falls down when restoring a guest which genuinely
-+			 * has been running for less time than the 1 second of imprecision
-+			 * which we allow for in the legacy API. In this case, the first
-+			 * value written by userspace (on any vCPU) should not be subject
-+			 * to this 'correction' to make it sync up with values that only
-+			 * from the kernel's default vCPU creation. Make the 1-second slop
-+			 * hack only trigger if the user_set_tsc flag is already set.
-+			 *
-+			 * The correct answer is for the VMM not to use the legacy API.
-  			 */
-  			synchronizing = data < tsc_exp + tsc_hz &&
-  					data + tsc_hz > tsc_exp;
-  		}
-  	}
+   It seems unnecessary because vm-type is determined. If the VM is
+   confidential-guest, then the RAM of the guest must be able to be
+   mapped as private, i.e., have kvm gmem backend. So QEMU can
+   determine the value of "private" property automatiacally based on vm
+   type.
 
-+	if (user_value)
-+		kvm->arch.user_set_tsc = true;
-+
-  	/*
-  	 * For a reliable TSC, we can match TSC offsets, and for an unstable
-  	 * TSC, we add elapsed time in this computation.  We could let the
-@@ -3777,7 +3796,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct 
-msr_data *msr_info)
-  		break;
-  	case MSR_IA32_TSC:
-  		if (msr_info->host_initiated) {
--			kvm_synchronize_tsc(vcpu, data);
-+			kvm_synchronize_tsc(vcpu, &data);
-  		} else {
-  			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
-  			adjust_tsc_offset_guest(vcpu, adj);
-@@ -5536,6 +5555,7 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
-  		tsc = kvm_scale_tsc(rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
-  		ns = get_kvmclock_base_ns();
+   This also aligns with the board internal MemoryRegion that needs to
+   have kvm gmem backend, e.g., TDX requires OVMF to act as private
+   memory so bios memory region needs to have kvm gmem fd associated.
+   QEMU no doubt will do it internally automatically.
 
-+		kvm->arch.user_set_tsc = true;
-  		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
-  		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
+2. hugepage support.
 
-@@ -11959,7 +11979,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
-  	if (mutex_lock_killable(&vcpu->mutex))
-  		return;
-  	vcpu_load(vcpu);
--	kvm_synchronize_tsc(vcpu, 0);
-+	kvm_synchronize_tsc(vcpu, NULL);
-  	vcpu_put(vcpu);
+   KVM gmem can be allocated from hugetlbfs. How does QEMU determine
+   when to allocate KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE. The
+   easiest solution is create KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+   only when memory backend is HostMemoryBackendFile of hugetlbfs.
 
-  	/* poll control enabled by default */
+3. What is KVM_X86_SW_PROTECTED_VM going to look like? and do we need it?
+
+   This series implements KVM_X86_SW_PROTECTED_VM because it's introduced
+   with gmem together on KVM side and it's supposed to be the first user
+   who requires KVM gmem. However the implementation is incomplete and
+   there lacks the definition of how KVM_X86_SW_PROTECTED_VM works.
+
+Any other idea/open/question is welcomed.
+
+Beside, TDX QEMU implemetation is based on this series to provide
+private gmem for TD private memory, which can be found at [2].
+And it can work corresponding KVM [3] to boot TDX guest. 
+
+[1] https://lore.kernel.org/all/20230718234512.1690985-1-seanjc@google.com/
+[2] https://github.com/intel/qemu-tdx/tree/tdx-qemu-upstream
+[3] https://github.com/intel/tdx/tree/kvm-upstream-2023.07.27-v6.5-rc2-workaround
+
+===
+Changes since rfc v1:
+- Implement KVM_X86_SW_PROTECTED_VM with confidential-guest-support
+interface;
+- rename memory_region_can_be_private() to memory_region_has_gmem_fd();
+- allocate kvm gmem fd when creating/initializing the memory backend by
+introducing the RAM_KVM_GMEM flag;
+
+
+Chao Peng (3):
+  RAMBlock: Add support of KVM private gmem
+  kvm: Enable KVM_SET_USER_MEMORY_REGION2 for memslot
+  kvm: handle KVM_EXIT_MEMORY_FAULT
+
+Isaku Yamahata (4):
+  HostMem: Add private property and associate it with RAM_KVM_GMEM
+  trace/kvm: Add trace for page convertion between shared and private
+  pci-host/q35: Move PAM initialization above SMRAM initialization
+  q35: Introduce smm_ranges property for q35-pci-host
+
+Xiaoyao Li (14):
+  *** HACK *** linux-headers: Update headers to pull in gmem APIs
+  memory: Introduce memory_region_has_gmem_fd()
+  i386: Add support for sw-protected-vm object
+  i386/pc: Drop pc_machine_kvm_type()
+  target/i386: Implement mc->kvm_type() to get VM type
+  target/i386: Introduce kvm_confidential_guest_init()
+  i386/kvm: Implement kvm_sw_protected_vm_init() for sw-protcted-vm
+    specific functions
+  kvm: Introduce support for memory_attributes
+  kvm/memory: Introduce the infrastructure to set the default
+    shared/private value
+  i386/kvm: Set memory to default private for KVM_X86_SW_PROTECTED_VM
+  physmem: replace function name with __func__ in
+    ram_block_discard_range()
+  physmem: extract ram_block_discard_range_fd() from
+    ram_block_discard_range()
+  physmem: Introduce ram_block_convert_range()
+  i386: Disable SMM mode for X86_SW_PROTECTED_VM
+
+ accel/kvm/kvm-all.c               | 180 ++++++++++++++++++++-
+ accel/kvm/trace-events            |   4 +-
+ backends/hostmem-file.c           |   1 +
+ backends/hostmem-memfd.c          |   1 +
+ backends/hostmem-ram.c            |   1 +
+ backends/hostmem.c                |  18 +++
+ hw/i386/pc.c                      |   5 -
+ hw/i386/pc_q35.c                  |   3 +-
+ hw/i386/x86.c                     |  12 ++
+ hw/pci-host/q35.c                 |  61 ++++---
+ include/exec/cpu-common.h         |   2 +
+ include/exec/memory.h             |  20 +++
+ include/exec/ramblock.h           |   1 +
+ include/hw/i386/pc.h              |   4 +-
+ include/hw/i386/x86.h             |   1 +
+ include/hw/pci-host/q35.h         |   1 +
+ include/sysemu/hostmem.h          |   2 +-
+ include/sysemu/kvm.h              |   5 +
+ include/sysemu/kvm_int.h          |   2 +
+ linux-headers/asm-x86/kvm.h       |   3 +
+ linux-headers/linux/kvm.h         |  50 ++++++
+ qapi/qom.json                     |   5 +
+ softmmu/memory.c                  |  18 +++
+ softmmu/physmem.c                 | 256 ++++++++++++++++++------------
+ target/i386/kvm/kvm.c             |  43 ++++-
+ target/i386/kvm/kvm_i386.h        |   1 +
+ target/i386/kvm/meson.build       |   1 +
+ target/i386/kvm/sw-protected-vm.c |  71 +++++++++
+ target/i386/kvm/sw-protected-vm.h |  19 +++
+ target/i386/sev.c                 |   1 -
+ target/i386/sev.h                 |   2 +
+ 31 files changed, 648 insertions(+), 146 deletions(-)
+ create mode 100644 target/i386/kvm/sw-protected-vm.c
+ create mode 100644 target/i386/kvm/sw-protected-vm.h
+
 -- 
-2.42.0
+2.34.1
+
