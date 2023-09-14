@@ -2,127 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75BB17A063C
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:39:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EDE77A064D
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:43:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239837AbjINNkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 09:40:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48536 "EHLO
+        id S239039AbjINNnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 09:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239287AbjINNjo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 09:39:44 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285054497
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 06:37:13 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97FBC433C8;
-        Thu, 14 Sep 2023 13:37:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694698632;
-        bh=Fl6RNpJimEuHpL5sPJLw45C8oocbmvKU729su9Dk9wo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=pt+eN9LPhV/y8mBV/XzMPHIkcxgQ/uO4qEu4xUKH+bsnFneOCl1sOpF8jmddmRMvy
-         PdiplUPKQdJaFy9ecE1NRUTl8zODWSLmxzNiXCPVkKZcn9CMvJTW5wQFpSe9lZozJW
-         6lJh6edujGtDNPh4VoGYSJA1TXVYvK7Q0aBRKQwlgog1vwyeKxogjWmjKhmk1yxlsY
-         PgHh3sHt6BpTSYNx72z6L/z9/MmjAUVOko7lti/QABrHl1A6I+ir9noq8hDxzoXkvZ
-         JAzOTqfG6waKPiMv2TPcugjQc7H3YBo89GikUnf4FWYzrOA/Nu7QaT9F5DAs45SPvY
-         LacycEtpqU7fw==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qgmWr-00CvtI-LK;
-        Thu, 14 Sep 2023 14:37:09 +0100
+        with ESMTP id S235397AbjINNnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 09:43:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD3C51AE;
+        Thu, 14 Sep 2023 06:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Eq0GAylXMyq6BiGBTyeJQhVNVEpEldZD1rwHZCoFnQ4=; b=UcdzDNybxfCsgaJnYXTnC6uqlF
+        E5Kb7icQxayh98HDszUgwEQmI7iiQ98nEJVwUGohHUl9y07kQx0/1FhkYKMUXZt8T3s/M92+94nOl
+        QaNg/bB+mx4oIkvL2El8BMYOUqrbFgc1RBioacJGgOj2wv31WgYvXDPX3ArHv/F8JYDalXniYOGBx
+        bfIeuAnIWXWwyPmJ9eHVv+YtTg0TgwMfBLp0N1Chu3sNEXC2DM0l1+wRE/bJichm1z+bwFw5zy4S4
+        NDqHJb8oBPCb/Zvl1iueDdc98uooipIn44BJAy+XO1/IySSKtDxv85TU7gbkL1ztikHZrXsaEQW2N
+        LvVfWUkQ==;
+Received: from [54.239.6.179] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qgmd7-003Dwh-8L; Thu, 14 Sep 2023 13:43:37 +0000
+Message-ID: <6467b9e49103c4d7afa1f961294552c1be336f13.camel@infradead.org>
+Subject: Re: [PATCH 6/8] KVM: xen: allow shared_info to be mapped by fixed
+ HVA
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Date:   Thu, 14 Sep 2023 15:43:35 +0200
+In-Reply-To: <20230914084946.200043-7-paul@xen.org>
+References: <20230914084946.200043-1-paul@xen.org>
+         <20230914084946.200043-7-paul@xen.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-aMKMJg82qjtCcw3bVy5r"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-Date:   Thu, 14 Sep 2023 14:37:09 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v10 29/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page
- tables
-In-Reply-To: <8d0f77a8-00db-93f7-aeae-bf96190b6f5b@os.amperecomputing.com>
-References: <20230515173103.1017669-1-maz@kernel.org>
- <20230515173103.1017669-30-maz@kernel.org>
- <8d0f77a8-00db-93f7-aeae-bf96190b6f5b@os.amperecomputing.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <3454100b4bb927a24b380f442f02d178@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ganapatrao,
 
-On 2023-09-14 14:10, Ganapatrao Kulkarni wrote:
-> Hi Marc,
-> 
-> On 15-05-2023 11:00 pm, Marc Zyngier wrote:
->> From: Christoffer Dall <christoffer.dall@linaro.org>
->> 
->> Unmap/flush shadow stage 2 page tables for the nested VMs as well as 
->> the
->> stage 2 page table for the guest hypervisor.
->> 
->> Note: A bunch of the code in mmu.c relating to MMU notifiers is
->> currently dealt with in an extremely abrupt way, for example by 
->> clearing
->> out an entire shadow stage-2 table. This will be handled in a more
->> efficient way using the reverse mapping feature in a later version of
->> the patch series.
-> 
-> We are seeing spin-lock contention due to this patch when the
-> Guest-Hypervisor(L1) is booted with higher number of cores and
-> auto-numa is enabled on L0.
-> kvm_nested_s2_unmap is called as part of notifier call-back when numa
-> page migration is happening and this function which holds lock becomes
-> source of contention when there are more vCPUs are processing the
-> auto-numa page fault/migration.
+--=-aMKMJg82qjtCcw3bVy5r
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-This is fully expected. Honestly, expecting any sort of performance at
-this stage is extremely premature (and I have zero sympathy for hacks
-like auto-numa...).
+T24gVGh1LCAyMDIzLTA5LTE0IGF0IDA4OjQ5ICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
+QEAgLTE3ODYsOSArMTc4NywxMCBAQCBzdHJ1Y3Qga3ZtX3hlbl9odm1fYXR0ciB7Cj4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBfX3U4IGxvbmdfbW9kZTsKPiDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoF9fdTggdmVjdG9yOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgX191OCBydW5zdGF0ZV91cGRhdGVfZmxhZzsKPiAtwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgc3RydWN0IHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgdW5p
+b24gewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoF9f
+dTY0IGdmbjsKPiDCoCNkZWZpbmUgS1ZNX1hFTl9JTlZBTElEX0dGTiAoKF9fdTY0KS0xKQo+ICvC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgX191NjQgaHZhOwo+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfSBzaGFyZWRfaW5mbzsKPiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgX191MzIgc2VuZF9wb3J0OwoKSG0sIGRvIHdlIGNv
+bnNpZGVyIHRoYXQgdG8gYmUgYW4gYWNjZXB0YWJsZSBBQkkgY2hhbmdlPyBJIHN1cHBvc2UKYXJn
+dWFibHkgaXQncyBjb21wYXRpYmxlIHdpdGggYW55IGV4aXN0aW5nIHNvdXJjZSBvciBiaW5hcnkg
+Y29kZSwgYW5kCnRoYXQncyB0aGUgY3JpdGVyaW9uIHRoYXQgcmVhbGx5IG1hdHRlcnM/CgpXb3J0
+aCBkcmF3aW5nIGF0dGVudGlvbiB0byBpdCBpbiBjYXNlIGFueW9uZSBzdHJvbmdseSBvYmplY3Rz
+LgoKUmV2aWV3ZWQtYnk6IERhdmlkIFdvb2Rob3VzZSA8ZHdtd0BhbWF6b24uY28udWs+CgpBcyBk
+aXNjdXNzZWQgdGhvdWdoLCBJJ2QgYmUgaW5jbGluZWQgbm90IHRvICphZHZlcnRpc2UqIHRoZSBu
+ZXcgY2FwCnlldDsgcm9sbCB0aGUgYXV0by12Y3B1LWluZm8gaW4gd2l0aCBpdCBhbmQgb25seSBz
+ZXQgaXQgaW4gdGhlIGZpbmFsCnBhdGNoIHdoZXJlIHlvdSBhZGQgdGhlIHRlc3QgY2FzZXMuCg==
 
-[...]
 
->>   +	kvm_nested_s2_unmap(kvm);
-> 
-> This kvm_nested_s2_unmap/kvm_unmap_stage2_range is called for every
-> active L2 and page table walk-through iterates for long iterations
-> since kvm_phys_size(mmu) is pretty big size(atleast 48bits).
-> What would be the best fix if we want to avoid this unnessary long
-> iteration of page table lookup?
+--=-aMKMJg82qjtCcw3bVy5r
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-The fix would be to have a reverse mapping for any canonical IPA to
-any shadow IPA, which would allow us to not fully tear down the shadow
-PTs but only the bit we need to remove. This is clearly stated in the
-commit message you quoted.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MTM0MzM1WjAvBgkqhkiG9w0BCQQxIgQggtCqmjvB
+PFAUwnjeMgf5/DWmYR+k4/8830hlvUgvTpkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBQHIXEx+fModRfcttqBJPXJmnKNQSyRS+z
+PFUOEWm0YusCg4VB9KHXvwBbCle0Eeqw1ITlzpagob4JeYgm2N5sOVrMir1IdChgCNbbuduneCmY
+1nrG+f9CNxSdxEyRUCoDCpCPKp+krWfke1o6YoAp/n6BNxc+RfDxBLG3ZVsn7XIhVqfbyRJnW2+a
+SRALPHP5YOJu6gapT/40WfqvqegK0z67nghqgyh2PQipSSEEq+EQZbOPUYoz/gfdHiJALp4y8vob
+hvN49iD6BgPKnrIfUZnc4B0eG9ea+xv/7HAqoYepF6vZPwwNxntroMX0iFxGl92y8QKQ/0dWTXEz
+IyNgUX6q9/A0j5LlLpMi1JLwqmnqHeTsqbjZahbFpzqvVicDBpMN8FomfweuetOY2d3tH2bLpTu9
+HxrA+Atl/aXf/yUFf9f8W3Lh266oetgV/X/OV2EVLUWLC7caG1NAI31qXa2Mt5OdLDgtMgKkwZt1
+B/9YJSp18d8LncFM7HzExAqmQ+CH5al7Y1yJ2Xejqy4Qe9/TbJ5V5Dx0m2+/XC8NoapErIEygJkF
+nRxgz7ReqJU/AKI/irEl5mvYiydW5fo9DmK49saNSs5YVBNFqgKRwHl2K3aE+HCoHl7BoXNdSQeS
+O7gReTKV4OTlnCFla4cbUAqtL4hshPAuzKT8QToHTgAAAAAAAA==
 
-However, this plan is pretty far down the list, and I have no plan to
-work on performance optimisations until we have basic support merged
-upstream.
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+--=-aMKMJg82qjtCcw3bVy5r--
