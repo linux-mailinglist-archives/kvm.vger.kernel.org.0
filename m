@@ -2,184 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E6E79F902
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4E6779F906
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:50:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233777AbjINDqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 23:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47562 "EHLO
+        id S233817AbjINDuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 23:50:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234170AbjINDqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 23:46:16 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2454F193;
-        Wed, 13 Sep 2023 20:45:58 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB2D8C433CD;
-        Thu, 14 Sep 2023 03:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694663157;
-        bh=MCfMmAki6C+9V+MZXu/IYFnhqZNAPw1ANqMYetafk4w=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Xf9/vjXirctVcvzS+xIQiDf7U87Sf4g/ogUBX4e2N7uBUQJ1gdHqWVOlSGuKXrNq2
-         cVb3WyyKp2y0dCD3f696EM5P8pPMGz/+fzxtwAg/IuAsHTKv9MS3fOgZF9PURgzN5e
-         1xI2mQezFXSo0umQ4A1T9WuZGSD7fDNju4eF9OeS80+0BbL4kciOA0mbHLP19PjSG3
-         x7U1VI7p5vcGLg9KEVckMeVNQ+9dKfzdzmAoLyMKha1fJPdtCMprfjT3YtXwYL74b/
-         tqOm3do5wXusRDOZe50z1XYqCjBLHL3NE87EAs534dqdEP9XoAeRNMQvATwwSdM4Cp
-         cPpUn7xXDxCEA==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-52889bc61b6so522247a12.0;
-        Wed, 13 Sep 2023 20:45:57 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzEumQ3J6+sVMkwtyZxLm0Xkfx2wj9KKRA5QocvdZib/LtR6+DA
-        1R1C3fhG2Gg8oMVxa+CElLPj9AaZEXRtx6+Sl6E=
-X-Google-Smtp-Source: AGHT+IGN/I5kRoKWpnBQrqKuqINc6SiZmkTI/B+YGMSeCGWGHdLbx8u+tTtskPB56qCPvFXRJAZz8pudxkeb3ifT82s=
-X-Received: by 2002:a05:6402:1359:b0:522:2711:873 with SMTP id
- y25-20020a056402135900b0052227110873mr4279544edw.1.1694663155985; Wed, 13 Sep
- 2023 20:45:55 -0700 (PDT)
+        with ESMTP id S229791AbjINDuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 23:50:14 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5BD193;
+        Wed, 13 Sep 2023 20:50:10 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bf11b1c7d0so12391575ad.0;
+        Wed, 13 Sep 2023 20:50:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694663410; x=1695268210; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kWLjIiBFHAPD99USdA8G+SnnWHVFRCtu/yWG2bUDOR0=;
+        b=ccsDqUYVBNAUL01Zhv38ITjMVzZ9kurc96qT6+LYPfdYJfE5WB9ZcPkayE3rrCPZiy
+         jL7Jx91244nF81FFUupruOks68grTf6M0vfE9a/mmkEmLV6d8FbiGo6q4JNWP3ZrQnwE
+         U8b8A95Ry3QHiQe30VjLONMWwewuIfxtEuz36n0WNyJw5S45GdEq16+7KCWZ3D812c5G
+         EYZhcMa5E0ovc+GmysZUudFGan3VLdulMmfEHfxIJ2bDQs9LAi9umEXLBZdUX9K3Vugu
+         JawnDXVCZ1DJPR9sgbySy6x9SmYGbvGhQl75iWXTuroDaz7sBV6d1qxY6r7Ues/5BdSc
+         WoVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694663410; x=1695268210;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kWLjIiBFHAPD99USdA8G+SnnWHVFRCtu/yWG2bUDOR0=;
+        b=lnEYVkM7/WUZCpjjLdDIX0/augziUh4APKmRolc4FaDInQo5kJi57Nw4K9ycGRh5iI
+         DuOtw6E8VEZvEldCsHAiIpXYlZxcQGqcXy/oLCJ7AiXw9aYdhQoT2hpMBXKeEo9Y2E0l
+         uGWYe2abCc1JQfGWDqBmTG2/zXjqUmb2FQxKuN7v6GWXrDppgch1wDaP5eq/3bkXSGDj
+         0VMIMTq+8aeeDsV3Ol+tgJXgL8WJXmO4b+Fe8QlQooYalIppukWqwfo8YLEGU9FOVBOk
+         eiNF7Q32GNGm4chRIp5HhiObjeO5lOkKelT9fbtzNXamYIiWKMLszPek2VhGpSZne6um
+         +Esw==
+X-Gm-Message-State: AOJu0YxDbGKGlKAN1sGYAqCK2wkM+W7tGXSPhHTO4hHsnQ+9tANSvSDw
+        XIM45CT1xBzTlWqS7EUVou4=
+X-Google-Smtp-Source: AGHT+IFuz8hrGM3jP7zUM9akV5F9cp0bnNxU8tq8pyBDoSeX21nshNwtq4YDB31y4e5BInEfkwyohQ==
+X-Received: by 2002:a17:902:d4c3:b0:1c3:e3b1:98f9 with SMTP id o3-20020a170902d4c300b001c3e3b198f9mr982088plg.24.1694663409827;
+        Wed, 13 Sep 2023 20:50:09 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id jw1-20020a170903278100b001bc676df6a9sm388238plb.132.2023.09.13.20.50.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Sep 2023 20:50:09 -0700 (PDT)
+Message-ID: <3912b026-7cd2-9981-27eb-e8e37be9bbad@gmail.com>
+Date:   Thu, 14 Sep 2023 11:50:02 +0800
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910082911.3378782-5-guoren@kernel.org>
- <f091ead0-99b9-b30a-a295-730ce321ac60@redhat.com> <CAJF2gTSbUUdLhN8PFdFzQd0M1T2MVOL1cdZn46WKq1S8MuQYHw@mail.gmail.com>
- <06714da1-d566-766f-7a13-a3c93b5953c4@redhat.com> <CAJF2gTQ3Q7f+FGorVTR66c6TGWsSeeKVvLF+LH1_m3kSHrm0yA@mail.gmail.com>
- <ZQF49GIZoFceUGYH@redhat.com> <CAJF2gTTHdCr-FQVSGUc+LapkJPmDiEYYa_1P6T86uCjRujgnTg@mail.gmail.com>
- <0ea8d0e7-6447-3a60-8cf4-d6a4e89fa8be@redhat.com>
-In-Reply-To: <0ea8d0e7-6447-3a60-8cf4-d6a4e89fa8be@redhat.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Thu, 14 Sep 2023 11:45:43 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTTjQP+gCXk152rkhy7rhnn30-GAoJVuPt8bZJoi9yBhaw@mail.gmail.com>
-Message-ID: <CAJF2gTTjQP+gCXk152rkhy7rhnn30-GAoJVuPt8bZJoi9yBhaw@mail.gmail.com>
-Subject: Re: [PATCH V11 04/17] locking/qspinlock: Improve xchg_tail for number
- of cpus >= 16k
-To:     Waiman Long <longman@redhat.com>
-Cc:     Leonardo Bras <leobras@redhat.com>, paul.walmsley@sifive.com,
-        anup@brainfault.org, peterz@infradead.org, mingo@redhat.com,
-        will@kernel.org, palmer@rivosinc.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH v6] KVM: x86/tsc: Don't sync user-written TSC against
+ startup values
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20230913103729.51194-1-likexu@tencent.com>
+ <5367c45df8e4730564ed7a55ed441a6a2d6ab0f9.camel@infradead.org>
+ <2eaf612b-1ce3-0dfe-5d2e-2cf29bba7641@gmail.com>
+ <ZQHLcs3VGyLUb6wW@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZQHLcs3VGyLUb6wW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 9:06=E2=80=AFPM Waiman Long <longman@redhat.com> wr=
-ote:
->
-> On 9/13/23 08:52, Guo Ren wrote:
-> > On Wed, Sep 13, 2023 at 4:55=E2=80=AFPM Leonardo Bras <leobras@redhat.c=
-om> wrote:
-> >> On Tue, Sep 12, 2023 at 09:10:08AM +0800, Guo Ren wrote:
-> >>> On Mon, Sep 11, 2023 at 9:03=E2=80=AFPM Waiman Long <longman@redhat.c=
-om> wrote:
-> >>>> On 9/10/23 23:09, Guo Ren wrote:
-> >>>>> On Mon, Sep 11, 2023 at 10:35=E2=80=AFAM Waiman Long <longman@redha=
-t.com> wrote:
-> >>>>>> On 9/10/23 04:28, guoren@kernel.org wrote:
-> >>>>>>> From: Guo Ren <guoren@linux.alibaba.com>
-> >>>>>>>
-> >>>>>>> The target of xchg_tail is to write the tail to the lock value, s=
-o
-> >>>>>>> adding prefetchw could help the next cmpxchg step, which may
-> >>>>>>> decrease the cmpxchg retry loops of xchg_tail. Some processors ma=
-y
-> >>>>>>> utilize this feature to give a forward guarantee, e.g., RISC-V
-> >>>>>>> XuanTie processors would block the snoop channel & irq for severa=
-l
-> >>>>>>> cycles when prefetch.w instruction (from Zicbop extension) retire=
-d,
-> >>>>>>> which guarantees the next cmpxchg succeeds.
-> >>>>>>>
-> >>>>>>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> >>>>>>> Signed-off-by: Guo Ren <guoren@kernel.org>
-> >>>>>>> ---
-> >>>>>>>     kernel/locking/qspinlock.c | 5 ++++-
-> >>>>>>>     1 file changed, 4 insertions(+), 1 deletion(-)
-> >>>>>>>
-> >>>>>>> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinloc=
-k.c
-> >>>>>>> index d3f99060b60f..96b54e2ade86 100644
-> >>>>>>> --- a/kernel/locking/qspinlock.c
-> >>>>>>> +++ b/kernel/locking/qspinlock.c
-> >>>>>>> @@ -223,7 +223,10 @@ static __always_inline void clear_pending_se=
-t_locked(struct qspinlock *lock)
-> >>>>>>>      */
-> >>>>>>>     static __always_inline u32 xchg_tail(struct qspinlock *lock, =
-u32 tail)
-> >>>>>>>     {
-> >>>>>>> -     u32 old, new, val =3D atomic_read(&lock->val);
-> >>>>>>> +     u32 old, new, val;
-> >>>>>>> +
-> >>>>>>> +     prefetchw(&lock->val);
-> >>>>>>> +     val =3D atomic_read(&lock->val);
-> >>>>>>>
-> >>>>>>>         for (;;) {
-> >>>>>>>                 new =3D (val & _Q_LOCKED_PENDING_MASK) | tail;
-> >>>>>> That looks a bit weird. You pre-fetch and then immediately read it=
-. How
-> >>>>>> much performance gain you get by this change alone?
-> >>>>>>
-> >>>>>> Maybe you can define an arch specific primitive that default back =
-to
-> >>>>>> atomic_read() if not defined.
-> >>>>> Thx for the reply. This is a generic optimization point I would lik=
-e
-> >>>>> to talk about with you.
-> >>>>>
-> >>>>> First, prefetchw() makes cacheline an exclusive state and serves fo=
-r
-> >>>>> the next cmpxchg loop semantic, which writes the idx_tail part of
-> >>>>> arch_spin_lock. The atomic_read only makes cacheline in the shared
-> >>>>> state, which couldn't give any guarantee for the next cmpxchg loop
-> >>>>> semantic. Micro-architecture could utilize prefetchw() to provide a
-> >>>>> strong forward progress guarantee for the xchg_tail, e.g., the T-HE=
-AD
-> >>>>> XuanTie processor would hold the exclusive cacheline state until th=
-e
-> >>>>> next cmpxchg write success.
-> >>>>>
-> >>>>> In the end, Let's go back to the principle: the xchg_tail is an ato=
-mic
-> >>>>> swap operation that contains write eventually, so giving a prefetch=
-w()
-> >>>>> at the beginning is acceptable for all architectures..
-> >>>>> =E2=80=A2=E2=80=A2=E2=80=A2=E2=80=A2=E2=80=A2=E2=80=A2=E2=80=A2=E2=
-=80=A2=E2=80=A2=E2=80=A2=E2=80=A2=E2=80=A2
-> >>>> I did realize afterward that prefetchw gets the cacheline in exclusi=
-ve
-> >>>> state. I will suggest you mention that in your commit log as well as
-> >>>> adding a comment about its purpose in the code.
-> >>> Okay, I would do that in v12, thx.
-> >> I would suggest adding a snippet from the ISA Extenstion doc:
-> >>
-> >> "A prefetch.w instruction indicates to hardware that the cache block w=
-hose
-> >> effective address is the sum of the base address specified in rs1 and =
-the
-> >> sign-extended offset encoded in imm[11:0], where imm[4:0] equals 0b000=
-00,
-> >> is likely to be accessed by a data write (i.e. store) in the near futu=
-re."
-> > Good point, thx.
->
-> qspinlock is generic code. I suppose this is for the RISCV architecture.
-> You can mention that in the commit log as an example, but I prefer more
-> generic comment especially in the code.
-Okay, I would only leave a generic comment on it and move Leonardo's
-advice into this patch:
-https://lore.kernel.org/linux-riscv/ZQF3qS1KRYAt3coC@redhat.com/
+On 13/9/2023 10:47 pm, Sean Christopherson wrote:
+> On Wed, Sep 13, 2023, Like Xu wrote:
+>> I'll wait for a cooling off period to see if the maintainers need me to post v7.
+> 
+> You should have waiting to post v5, let alone v6.  Resurrecting a thread after a
+> month and not waiting even 7 hours for others to respond is extremely frustrating.
 
+You are right. I don't seem to be keeping up with many of other issues. Sorry 
+for that.
+Wish there were 48 hours in a day.
 
->
-> Cheers,
-> Longman
->
+Back to this issue: for commit message, I'd be more inclined to David's 
+understanding,
+but you have the gavel; and for proposed code diff, how about the following changes:
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1a4def36d5bb..9a7dfef9d32d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1324,6 +1324,7 @@ struct kvm_arch {
+  	int nr_vcpus_matched_tsc;
 
---=20
-Best Regards
- Guo Ren
+  	u32 default_tsc_khz;
++	bool user_set_tsc;
+
+  	seqcount_raw_spinlock_t pvclock_sc;
+  	bool use_master_clock;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6c9c81e82e65..faaae8b3fec4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2714,8 +2714,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, 
+u64 offset, u64 tsc,
+  	kvm_track_tsc_matching(vcpu);
+  }
+
+-static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
++static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
+  {
++	u64 data = user_value ? *user_value : 0;
+  	struct kvm *kvm = vcpu->kvm;
+  	u64 offset, ns, elapsed;
+  	unsigned long flags;
+@@ -2728,27 +2729,45 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, 
+u64 data)
+  	elapsed = ns - kvm->arch.last_tsc_nsec;
+
+  	if (vcpu->arch.virtual_tsc_khz) {
++		/*
++		 * Force synchronization when creating or hotplugging a vCPU,
++		 * i.e. when the TSC value is '0', to help keep clocks stable.
++		 * If this is NOT a hotplug/creation case, skip synchronization
++		 * on the first write from userspace so as not to misconstrue
++		 * state restoration after live migration as an attempt from
++		 * userspace to synchronize.
++		 */
+  		if (data == 0) {
+-			/*
+-			 * detection of vcpu initialization -- need to sync
+-			 * with other vCPUs. This particularly helps to keep
+-			 * kvm_clock stable after CPU hotplug
+-			 */
+  			synchronizing = true;
+-		} else {
++		} else if (kvm->arch.user_set_tsc) {
+  			u64 tsc_exp = kvm->arch.last_tsc_write +
+  						nsec_to_cycles(vcpu, elapsed);
+  			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
+  			/*
+-			 * Special case: TSC write with a small delta (1 second)
+-			 * of virtual cycle time against real time is
+-			 * interpreted as an attempt to synchronize the CPU.
++			 * Here lies UAPI baggage: when a user-initiated TSC write has
++			 * a small delta (1 second) of virtual cycle time against the
++			 * previously set vCPU, we assume that they were intended to be
++			 * in sync and the delta was only due to the racy nature of the
++			 * legacy API.
++			 *
++			 * This trick falls down when restoring a guest which genuinely
++			 * has been running for less time than the 1 second of imprecision
++			 * which we allow for in the legacy API. In this case, the first
++			 * value written by userspace (on any vCPU) should not be subject
++			 * to this 'correction' to make it sync up with values that only
++			 * from the kernel's default vCPU creation. Make the 1-second slop
++			 * hack only trigger if the user_set_tsc flag is already set.
++			 *
++			 * The correct answer is for the VMM not to use the legacy API.
+  			 */
+  			synchronizing = data < tsc_exp + tsc_hz &&
+  					data + tsc_hz > tsc_exp;
+  		}
+  	}
+
++	if (user_value)
++		kvm->arch.user_set_tsc = true;
++
+  	/*
+  	 * For a reliable TSC, we can match TSC offsets, and for an unstable
+  	 * TSC, we add elapsed time in this computation.  We could let the
+@@ -3777,7 +3796,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct 
+msr_data *msr_info)
+  		break;
+  	case MSR_IA32_TSC:
+  		if (msr_info->host_initiated) {
+-			kvm_synchronize_tsc(vcpu, data);
++			kvm_synchronize_tsc(vcpu, &data);
+  		} else {
+  			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
+  			adjust_tsc_offset_guest(vcpu, adj);
+@@ -5536,6 +5555,7 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
+  		tsc = kvm_scale_tsc(rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
+  		ns = get_kvmclock_base_ns();
+
++		kvm->arch.user_set_tsc = true;
+  		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
+  		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
+
+@@ -11959,7 +11979,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+  	if (mutex_lock_killable(&vcpu->mutex))
+  		return;
+  	vcpu_load(vcpu);
+-	kvm_synchronize_tsc(vcpu, 0);
++	kvm_synchronize_tsc(vcpu, NULL);
+  	vcpu_put(vcpu);
+
+  	/* poll control enabled by default */
+-- 
+2.42.0
