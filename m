@@ -2,248 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38F8379FE34
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 10:23:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E854979FE7B
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 10:33:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236334AbjINIXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 04:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60942 "EHLO
+        id S236398AbjINIdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 04:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230413AbjINIX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 04:23:29 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82591BFC;
-        Thu, 14 Sep 2023 01:23:25 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-57790939a2bso473871a12.3;
-        Thu, 14 Sep 2023 01:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694679805; x=1695284605; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y4DVGHEKkh6DJ6bSb9WKSdfDpI9FMYgxcK/JHrHLUwY=;
-        b=W9nQqW8lT75p2gLWN1GVIAxtPcL7t7232jmZnqoRBnNfcr3AwxNctH1OhY1be+XyC4
-         2tvi/d4rWZrQHjezVGRX5fmAh+oh6k6MTs2EuYZXfIvui/J4TEvFzHX5rnGYOm3gIPOZ
-         dojctmW8ehsSICv8mT5U7zHY5g1BPvjBbzAczlIgBsTrzsthHbrGPyfeD91kHI133coT
-         PyzEcyGQzFJmjuB0wNFG8/kgUQB3F/nefO0Zh80VzVh5KbqvK97EvfYkdQUVbpfIlive
-         oeEOSw7I5xKN8a06U/6fPKc72Yrr496YpyCiJbpxWAUwfrDjHLv62gibeE9BjFubiTap
-         fCrg==
+        with ESMTP id S236420AbjINIdf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 04:33:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 272131FC4
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694680372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/v5LVGgI1bCh7IZ5F5HTHb9gqgvRzQ+J2np7/S42Q3I=;
+        b=P0C9IWfNUXHy4UOL33TYP4hvbjVD+wgMQ77xOuDZrF6uHa7nmPlSz/qrgXecYZPGJiMFye
+        47r9Rrf6Gkcls9SC6u0/4r1Krs84I/zd7Yef+CZ/jmwNJMq/+qmHrAmZ8sP/wd0FkvWcMc
+        OYFJIUND9j00vu89G+RLvoF9uoRLkM0=
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
+ [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-125-XKXMlN59NZeJprB7sEvJ4Q-1; Thu, 14 Sep 2023 04:32:50 -0400
+X-MC-Unique: XKXMlN59NZeJprB7sEvJ4Q-1
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-1b728bfb372so1040895fac.2
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:32:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694679805; x=1695284605;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4DVGHEKkh6DJ6bSb9WKSdfDpI9FMYgxcK/JHrHLUwY=;
-        b=kF6H+Y/Eh42TJIbkXAVnmWKlOBSptXYS7ZYXccbYCVg0ID3EFBW2JKYAWwNG4T6cHq
-         QzgZ4xww9oiehN9YxYuJpbi+REim/VfHvwBw/WW9hh4Ys9AnU44+sMfC1hUMCdEJQEIt
-         NXXaLHAfmwSw1khn2hfe/o3uWQ9FaPJTLT1wfYMLzdBHKIFjBWCow8DOMa4pPUqMnESi
-         CE/yEvgsfugLxepBtwxMYfQqQDSRcCB4vJfo43fPaJCDFyks0IKTbC+l35lHC4O6WPz9
-         YOkihtL1nmsNz4ST0+gq3iCcV6UiwESBOuD+uyYaQ+m7PV9zek5YqMZTz+gIpHx4zTtA
-         F/hQ==
-X-Gm-Message-State: AOJu0Yxw3A5c4wF4qVX//+3R59cQnH9DS4TAqZEmk3GxoMfc9SWlmS7e
-        4cpCXq/J8W9LiixanpSryPU=
-X-Google-Smtp-Source: AGHT+IEkhM0boEsH1csJYAlUVyFy80w/YI5btaaNgRG4LP+YfyPdSdsybSXgW39nzTyKSCXj3CkIZA==
-X-Received: by 2002:a05:6a20:3955:b0:13e:b58a:e3e8 with SMTP id r21-20020a056a20395500b0013eb58ae3e8mr5512715pzg.50.1694679805300;
-        Thu, 14 Sep 2023 01:23:25 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l6-20020a17090ac58600b002682392506bsm811438pjt.50.2023.09.14.01.23.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 01:23:24 -0700 (PDT)
-Message-ID: <6ee140c9-ccd5-9569-db17-a542a7e28d5c@gmail.com>
-Date:   Thu, 14 Sep 2023 16:23:16 +0800
+        d=1e100.net; s=20230601; t=1694680370; x=1695285170;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/v5LVGgI1bCh7IZ5F5HTHb9gqgvRzQ+J2np7/S42Q3I=;
+        b=jjazNQ/owgS/35QvI5B/6JkjztvHBqlR05PqZMld0HFj6FIhVfdrGkXIbRnLPEbRCm
+         z2TFaevZgDKYnEYGhXcqrYFTOLN1zkZBI5sREkiVTe5CQSiTm5MJHT88Yaxv2zePiJm8
+         il0YX0hZuma2wrtk1uN6I++/Ha7806SSt0IDtqVgoweg/QttelMb4ri4FnXoPeII+lbg
+         CUdp1WnDubM0zi6l2kGTXxqP1rJupl3WSVRGjUyrEgkYBeFKCYTsMPCAfhhQ9JQ3AsPK
+         K0KrgkuBPuY+VEtRBCpNricnTgQZ3YT60hAxLx05rvtMBmo0/bN2mCLMPDJkyPuFjot+
+         wzKA==
+X-Gm-Message-State: AOJu0YwnL+uEt0y0Rb7k8xV5jGSbkeHS2XgHJNC/jvLaTxQVAlc1SVBA
+        H51rHC3Fz5dFXOabVepLLwSEvKMPL3JqWYM5JEJ///6Isx7uhc0LOOlmjbTdaRNX3vgu54Q3+ca
+        MIzsP+k6BwNmn
+X-Received: by 2002:a05:6870:5608:b0:1b0:2f63:4ff6 with SMTP id m8-20020a056870560800b001b02f634ff6mr5153852oao.1.1694680369734;
+        Thu, 14 Sep 2023 01:32:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IETspTdZzZYvBIau8sxRS9qB0qJSQdMZkzC5B1Noxo923sXXDhRBNsu3bJAqLvOXStAslAzvg==
+X-Received: by 2002:a05:6870:5608:b0:1b0:2f63:4ff6 with SMTP id m8-20020a056870560800b001b02f634ff6mr5153842oao.1.1694680369455;
+        Thu, 14 Sep 2023 01:32:49 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
+        by smtp.gmail.com with ESMTPSA id sf23-20020a056871231700b001d4fe4293efsm535197oab.36.2023.09.14.01.32.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 01:32:48 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 05:32:39 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 09/17] riscv: qspinlock: errata: Add
+ ERRATA_THEAD_WRITE_ONCE fixup
+Message-ID: <ZQLFJ1cmQ8PAoMHm@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-10-guoren@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH V2] KVM: x86/pmu: Disable vPMU if EVENTSEL_GUESTONLY bit
- doesn't exist
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Ravi Bangoria <ravi.bangoria@amd.com>,
-        Manali Shukla <manali.shukla@amd.com>
-References: <20230407085646.24809-1-likexu@tencent.com>
- <ZDA4nsyAku9B2/58@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <ZDA4nsyAku9B2/58@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230910082911.3378782-10-guoren@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/4/2023 11:37 pm, Sean Christopherson wrote:
-> On Fri, Apr 07, 2023, Like Xu wrote:
->> From: Like Xu <likexu@tencent.com>
->>
->> Unlike Intel's MSR atomic_switch mechanism, AMD supports guest pmu
->> basic counter feature by setting the GUESTONLY bit on the host, so the
->> presence or absence of this bit determines whether vPMU is emulatable
->> (e.g. in nested virtualization). Since on AMD, writing reserved bits of
->> EVENTSEL register does not bring #GP, KVM needs to update the global
->> enable_pmu value by checking the persistence of this GUESTONLY bit.
+On Sun, Sep 10, 2023 at 04:29:03AM -0400, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
 > 
-> This is looking more and more like a bug fix, i.e. needs a Fixes:, no?
+> The early version of T-Head C9xx cores has a store merge buffer
+> delay problem. The store merge buffer could improve the store queue
+> performance by merging multi-store requests, but when there are not
+> continued store requests, the prior single store request would be
+> waiting in the store queue for a long time. That would cause
+> significant problems for communication between multi-cores. This
+> problem was found on sg2042 & th1520 platforms with the qspinlock
+> lock torture test.
+> 
+> So appending a fence w.o could immediately flush the store merge
+> buffer and let other cores see the write result.
+> 
+> This will apply the WRITE_ONCE errata to handle the non-standard
+> behavior via appending a fence w.o instruction for WRITE_ONCE().
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> ---
+>  arch/riscv/Kconfig.errata              | 19 +++++++++++++++++++
+>  arch/riscv/errata/thead/errata.c       | 20 ++++++++++++++++++++
+>  arch/riscv/include/asm/errata_list.h   | 13 -------------
+>  arch/riscv/include/asm/rwonce.h        | 24 ++++++++++++++++++++++++
+>  arch/riscv/include/asm/vendorid_list.h | 14 ++++++++++++++
+>  include/asm-generic/rwonce.h           |  2 ++
+>  6 files changed, 79 insertions(+), 13 deletions(-)
+>  create mode 100644 arch/riscv/include/asm/rwonce.h
+> 
+> diff --git a/arch/riscv/Kconfig.errata b/arch/riscv/Kconfig.errata
+> index 1aa85a427ff3..c919cc3f1a3a 100644
+> --- a/arch/riscv/Kconfig.errata
+> +++ b/arch/riscv/Kconfig.errata
+> @@ -77,4 +77,23 @@ config ERRATA_THEAD_PMU
+>  
+>  	  If you don't know what to do here, say "Y".
+>  
+> +config ERRATA_THEAD_WRITE_ONCE
+> +	bool "Apply T-Head WRITE_ONCE errata"
+> +	depends on ERRATA_THEAD
+> +	default y
+> +	help
+> +	  The early version of T-Head C9xx cores has a store merge buffer
+> +	  delay problem. The store merge buffer could improve the store queue
+> +	  performance by merging multi-store requests, but when there are no
+> +	  continued store requests, the prior single store request would be
+> +	  waiting in the store queue for a long time. That would cause
+> +	  significant problems for communication between multi-cores. Appending
+> +	  a fence w.o could immediately flush the store merge buffer and let
+> +	  other cores see the write result.
+> +
+> +	  This will apply the WRITE_ONCE errata to handle the non-standard
+> +	  behavior via appending a fence w.o instruction for WRITE_ONCE().
+> +
+> +	  If you don't know what to do here, say "Y".
+> +
+>  endmenu # "CPU errata selection"
+> diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+> index be84b14f0118..751eb5a7f614 100644
+> --- a/arch/riscv/errata/thead/errata.c
+> +++ b/arch/riscv/errata/thead/errata.c
+> @@ -69,6 +69,23 @@ static bool errata_probe_pmu(unsigned int stage,
+>  	return true;
+>  }
+>  
+> +static bool errata_probe_write_once(unsigned int stage,
+> +				    unsigned long arch_id, unsigned long impid)
+> +{
+> +	if (!IS_ENABLED(CONFIG_ERRATA_THEAD_WRITE_ONCE))
+> +		return false;
+> +
+> +	/* target-c9xx cores report arch_id and impid as 0 */
+> +	if (arch_id != 0 || impid != 0)
+> +		return false;
+> +
+> +	if (stage == RISCV_ALTERNATIVES_BOOT ||
+> +	    stage == RISCV_ALTERNATIVES_MODULE)
+> +		return true;
+> +
+> +	return false;
+> +}
+> +
+>  static u32 thead_errata_probe(unsigned int stage,
+>  			      unsigned long archid, unsigned long impid)
+>  {
+> @@ -83,6 +100,9 @@ static u32 thead_errata_probe(unsigned int stage,
+>  	if (errata_probe_pmu(stage, archid, impid))
+>  		cpu_req_errata |= BIT(ERRATA_THEAD_PMU);
+>  
+> +	if (errata_probe_write_once(stage, archid, impid))
+> +		cpu_req_errata |= BIT(ERRATA_THEAD_WRITE_ONCE);
+> +
+>  	return cpu_req_errata;
+>  }
+>  
+> diff --git a/arch/riscv/include/asm/errata_list.h b/arch/riscv/include/asm/errata_list.h
+> index 712cab7adffe..fbb2b8d39321 100644
+> --- a/arch/riscv/include/asm/errata_list.h
+> +++ b/arch/riscv/include/asm/errata_list.h
+> @@ -11,19 +11,6 @@
+>  #include <asm/hwcap.h>
+>  #include <asm/vendorid_list.h>
+>  
+> -#ifdef CONFIG_ERRATA_SIFIVE
+> -#define	ERRATA_SIFIVE_CIP_453 0
+> -#define	ERRATA_SIFIVE_CIP_1200 1
+> -#define	ERRATA_SIFIVE_NUMBER 2
+> -#endif
+> -
+> -#ifdef CONFIG_ERRATA_THEAD
+> -#define	ERRATA_THEAD_PBMT 0
+> -#define	ERRATA_THEAD_CMO 1
+> -#define	ERRATA_THEAD_PMU 2
+> -#define	ERRATA_THEAD_NUMBER 3
+> -#endif
+> -
 
-Fix: ca724305a2b0 ("KVM: x86/vPMU: Implement AMD vPMU code for KVM") ?
-Fix: 4b6e4dca7011 ("KVM: SVM: enable nested svm by default") ?
+Here I understand you are moving stuff from errata_list.h to 
+vendorid_list.h. Wouldn't it be better to do this on a separated patch 
+before this one?
 
-As far as I can tell, the current KVM code makes the PMU counter of AMD nested
-VMs have ridiculous values. One conservative fix is to disable nested PMU on AMD.
+I understand this is used here, but it looks like it's unrelated.
 
-> 
->> Cc: Ravi Bangoria <ravi.bangoria@amd.com>
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->> V1:
->> https://lore.kernel.org/kvm/20230307113819.34089-1-likexu@tencent.com
->> V1 -> V2 Changelog:
->> - Preemption needs to be disabled to ensure a stable CPU; (Sean)
->> - KVM should be restoring the original value too; (Sean)
->> - Disable vPMU once guest_only mode is not supported; (Sean)
-> 
-> Please respond to my questions, don't just send a new version.  When I asked
-> 
->   : Why does lack of AMD64_EVENTSEL_GUESTONLY disable the PMU, but if and only if
->   : X86_FEATURE_PERFCTR_CORE?  E.g. why does the behavior not also apply to legacy
->   : perfmon support?
-> 
-> I wanted an actual answer because I genuinely do not know what the correct
-> behavior is.
+>  #ifdef __ASSEMBLY__
+>  
+>  #define ALT_INSN_FAULT(x)						\
+> diff --git a/arch/riscv/include/asm/rwonce.h b/arch/riscv/include/asm/rwonce.h
+> new file mode 100644
+> index 000000000000..be0b8864969d
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/rwonce.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +
+> +#ifndef __ASM_RWONCE_H
+> +#define __ASM_RWONCE_H
+> +
+> +#include <linux/compiler_types.h>
+> +#include <asm/alternative-macros.h>
+> +#include <asm/vendorid_list.h>
+> +
+> +#define __WRITE_ONCE(x, val)				\
+> +do {							\
+> +	*(volatile typeof(x) *)&(x) = (val);		\
+> +	asm volatile(ALTERNATIVE(			\
+> +		__nops(1),				\
+> +		"fence w, o\n\t",			\
+> +		THEAD_VENDOR_ID,			\
+> +		ERRATA_THEAD_WRITE_ONCE,		\
+> +		CONFIG_ERRATA_THEAD_WRITE_ONCE)		\
+> +		: : : "memory");			\
+> +} while (0)
+> +
+> +#include <asm-generic/rwonce.h>
+> +
+> +#endif	/* __ASM_RWONCE_H */
 
-As far as I know, only AMD CPUs that support PERFCTR_CORE+ will have
-the GUESTONLY bit, if the BIOS doesn't disable it.
+IIUC the idea here is to have an alternative __WRITE_ONCE that replaces the 
+asm-generic one.
 
-The "GO/HO bit" is first introduced for perf-kvm usage (2011)
-before adding support for AMD guest vPMU (2015).
+Honestly, this asm alternative here seems too much information, and too 
+cryptic. I mean, yeah in the patch it all makes sense, but I imagine myself
+in the future looking at all this and trying to understand what is going 
+on.
 
-As the guest_only name implies, this bit can be used for SVM to emulate
-core counter for AMD guests. So if the host does not have this bit (e.g.
-on the L1 VM), the L2 VM's vPMU will work abnormally.
+Wouldn't it look better to have something like:
 
-> 
->> - Appreciate any better way to probe for GUESTONLY support;
-> 
-> Again, wait for discussion in previous versions to resolve before posting a new
-> version.  If your answer is "not as far as I know", that's totally fine, but
-> sending a new version without responding makes it unnecessarily difficult to
-> track down your "answer".  E.g. instead of seeing a very direct "I don't know",
-> I had to discover that answer by finding a hint buried in the ignored section of
-> a new patch.
+#####
 
-Okay, then. Nice rule to follow.
+/* Some explanation like the one on Kconfig */
 
-> 
->>   arch/x86/kvm/svm/svm.c | 17 +++++++++++++++++
->>   1 file changed, 17 insertions(+)
->>
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 7584eb85410b..1ab885596510 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -4884,6 +4884,20 @@ static __init void svm_adjust_mmio_mask(void)
->>   	kvm_mmu_set_mmio_spte_mask(mask, mask, PT_WRITABLE_MASK | PT_USER_MASK);
->>   }
->>   
->> +static __init bool pmu_has_guestonly_mode(void)
->> +{
->> +	u64 original, value;
->> +
->> +	preempt_disable();
->> +	rdmsrl(MSR_F15H_PERF_CTL0, original);
-> 
-> What guarantees this MSR actually exists?  In v1, it was guarded by enable_pmu=%true,
-> but that's longer the case.  And KVM does
-> 
-> 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-> 		if (!guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
-> 			return NULL;
-> 
-> which very strongly suggests this MSR doesn't exist if the CPU supports only the
-> "legacy" PMU.
+#define write_once_flush()			\
+do {						\
+	asm volatile(ALTERNATIVE(			\
+		__nops(1),			\
+		"fence w, o\n\t",		\
+		THEAD_VENDOR_ID,		\
+		ERRATA_THEAD_WRITE_ONCE,	\
+		CONFIG_ERRATA_THEAD_WRITE_ONCE)	\
+		: : : "memory");		\
+} while(0)
 
-Yes, the check for boot_cpu_has(X86_FEATURE_PERFCTR_CORE) is missing here.
 
-> 
->> +	wrmsrl(MSR_F15H_PERF_CTL0, AMD64_EVENTSEL_GUESTONLY);
->> +	rdmsrl(MSR_F15H_PERF_CTL0, value);
->> +	wrmsrl(MSR_F15H_PERF_CTL0, original);
->> +	preempt_enable();
->> +
->> +	return value == AMD64_EVENTSEL_GUESTONLY;
->> +}
->> +
->>   static __init void svm_set_cpu_caps(void)
->>   {
->>   	kvm_set_cpu_caps();
->> @@ -4928,6 +4942,9 @@ static __init void svm_set_cpu_caps(void)
->>   	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
->>   		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
->>   
->> +	/* Probe for AMD64_EVENTSEL_GUESTONLY support */
-> 
-> I've said this several times recently: use comments to explain _why_ and to call
-> out subtleties.  The code quite obviously is probing for guest-only support, what's
-> not obvious is why guest-only support is mandatory for vPMU support.  It may be
-> obvious to you, but pease try to view all of this code from the perspective of
-> someone who has only passing knowledge of the various components, i.e. doesn't
-> know the gory details of exactly what KVM supports.
+#define __WRITE_ONCE(x, val)			\
+do {						\
+     	*(volatile typeof(x) *)&(x) = (val);	\
+	write_once_flush();			\
+} while(0)
 
-How about:
+#####
 
-/*
-  * The guest vPMU counter emulation depends on the EVENTSEL_GUESTONLY bit.
-  * If this bit is present on the host, the host needs to support at least the 
-PERFCTR_CORE.
-  */
+	
+This way I could quickly see there is a flush after the writting of 
+WRITE_ONCE(), and this flush is the above "complicated" asm.
 
-> 
-> Poking around, I see that pmc_reprogram_counter() unconditionally does
-> 
-> 	.exclude_host = 1,
-> 
-> and amd_core_hw_config()
-> 
-> 	if (event->attr.exclude_host && event->attr.exclude_guest)
-> 		/*
-> 		 * When HO == GO == 1 the hardware treats that as GO == HO == 0
-> 		 * and will count in both modes. We don't want to count in that
-> 		 * case so we emulate no-counting by setting US = OS = 0.
-> 		 */
-> 		event->hw.config &= ~(ARCH_PERFMON_EVENTSEL_USR |
-> 				      ARCH_PERFMON_EVENTSEL_OS);
-> 	else if (event->attr.exclude_host)
-> 		event->hw.config |= AMD64_EVENTSEL_GUESTONLY;
-> 	else if (event->attr.exclude_guest)
-> 		event->hw.config |= AMD64_EVENTSEL_HOSTONLY;
-> 
-> and so something like this seems appropriate
-> 
-> 	/*
-> 	 * KVM requires guest-only event support in order to isolate guest PMCs
-> 	 * from host PMCs.  SVM doesn't provide a way to atomically load MSRs
-> 	 * on VMRUN, and manually adjusting counts before/after VMRUN is not
-> 	 * accurate enough to properly virtualize a PMU.
-> 	 */
-> 
-> But now I'm really confused, because if I'm reading the code correctly, perf
-> invokes amd_core_hw_config() for legacy PMUs, i.e. even if PERFCTR_CORE isn't
-> supported.  And the APM documents the host/guest bits only for "Core Performance
-> Event-Select Registers".
-> 
-> So either (a) GUESTONLY isn't supported on legacy CPUs and perf is relying on AMD
-> CPUs ignoring reserved bits or (b) GUESTONLY _is_ supported on legacy PMUs and
-> pmu_has_guestonly_mode() is checking the wrong MSR when running on older CPUs.
-> 
-> And if (a) is true, then how on earth does KVM support vPMU when running on a
-> legacy PMU?  Is vPMU on AMD just wildly broken?  Am I missing something?
+What do you think?
+
+> diff --git a/arch/riscv/include/asm/vendorid_list.h b/arch/riscv/include/asm/vendorid_list.h
+> index cb89af3f0704..73078cfe4029 100644
+> --- a/arch/riscv/include/asm/vendorid_list.h
+> +++ b/arch/riscv/include/asm/vendorid_list.h
+> @@ -8,4 +8,18 @@
+>  #define SIFIVE_VENDOR_ID	0x489
+>  #define THEAD_VENDOR_ID		0x5b7
+>  
+> +#ifdef CONFIG_ERRATA_SIFIVE
+> +#define	ERRATA_SIFIVE_CIP_453 0
+> +#define	ERRATA_SIFIVE_CIP_1200 1
+> +#define	ERRATA_SIFIVE_NUMBER 2
+> +#endif
+> +
+> +#ifdef CONFIG_ERRATA_THEAD
+> +#define	ERRATA_THEAD_PBMT 0
+> +#define	ERRATA_THEAD_CMO 1
+> +#define	ERRATA_THEAD_PMU 2
+> +#define	ERRATA_THEAD_WRITE_ONCE 3
+> +#define	ERRATA_THEAD_NUMBER 4
+> +#endif
+> +
+>  #endif
+> diff --git a/include/asm-generic/rwonce.h b/include/asm-generic/rwonce.h
+> index 8d0a6280e982..fb07fe8c6e45 100644
+> --- a/include/asm-generic/rwonce.h
+> +++ b/include/asm-generic/rwonce.h
+> @@ -50,10 +50,12 @@
+>  	__READ_ONCE(x);							\
+>  })
+>  
+> +#ifndef __WRITE_ONCE
+>  #define __WRITE_ONCE(x, val)						\
+>  do {									\
+>  	*(volatile typeof(x) *)&(x) = (val);				\
+>  } while (0)
+> +#endif
+>  
+>  #define WRITE_ONCE(x, val)						\
+>  do {									\
+> -- 
+> 2.36.1
 > 
 
-(a) It's true and AMD guest vPMU have only been implemented accurately with
-the help of this GUESTONLY bit.
-
-There are two other scenarios worth discussing here: one is support L2 vPMU
-on the PERFCTR_CORE+ host and this proposal is disabling it; and the other
-case is to support AMD legacy vPMU on the PERFCTR_CORE+ host.
-
-Please let me know if you have more concerns.
