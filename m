@@ -2,87 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C85E779F665
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 03:32:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8D9879F647
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 03:27:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233640AbjINBcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 21:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35816 "EHLO
+        id S233589AbjINB2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 21:28:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233280AbjINBcp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 21:32:45 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4BD10CC;
-        Wed, 13 Sep 2023 18:32:41 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-414b3da2494so2303061cf.3;
-        Wed, 13 Sep 2023 18:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694655160; x=1695259960; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L+YKSA6KAPAfRaImt9TgHHgpGnpBBCNQ6vAz9FWPYsc=;
-        b=m4flkd8cTN9aK/4Wl5bA/rNTEAK3JwZUj0MElF4n49cTQvnSsRVGWhEhOIEU+pD1Vr
-         xsUCkyBCJCTXRdsGltmJIMYb7vIU6XD+kgyCSBYGfr1GVE+EmlbiRSJP22HNu8NHEVUU
-         1e2AaUv/zLognrDNpAyTxbL46ZQdkZI21Fx1EN5MoHXxStQJF9qXPRCGqvRNIc8ZKAPy
-         6ABhN40dHxPIao/0iETeVhEeoor+o5SrQZhC680IeZ7wbRoNu7cWVo63Zavl9OhXlUgl
-         U2CKqProSBEc7vO8meFxTu/d1DcFMW+FzeDGN49zzFuCcMIt4NNwSTbYL1xd2Oghxykm
-         LCzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694655160; x=1695259960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L+YKSA6KAPAfRaImt9TgHHgpGnpBBCNQ6vAz9FWPYsc=;
-        b=okJHUb4+GhH+J+ZerwE9UWp176FzlVIXjQq1Ef4IM6ITfbMdblxwhIzg9R6eZspxSF
-         f3F4+OpDIJp5KYl0VlQWagZ9D4ICefZMvJJ7FDCGlTwHmhihmlS+MA9PAOS5knWVkBRx
-         tEh4Jmxm7DNVszzeKVcaBlamD7pjQIWGmf5bGK/jeQz9rsnSM8Ty/qA577ucfU5eKWmP
-         hs9sPAigyk86NEKKkk7wznJi71qkKz721KZAX4q6qyj51ACssJzt3h8eOzNbbVfo4mhO
-         n72psIw5zLzrAyiLuqpm5guKVUK2/aU7d3p2YvB6Ig2sR/BPv+wH3b+HHyDrv1PW8Tz5
-         9ejg==
-X-Gm-Message-State: AOJu0Yyus6Z8D/v+KjQTRc5uz8QWaTp02GCLYJlbLVeJG4w2CrQBUTNS
-        xBiOu5Biw/IRlSPRKLkcKiiY4mcrXkyVNg==
-X-Google-Smtp-Source: AGHT+IF7N6bmHeI/EjQa0qJcPaU06ldQ9gE/DgkLylKZAYikT+MO3weeu9Chov8N+OEsgfcHDH26Jw==
-X-Received: by 2002:a05:622a:448:b0:40f:da0c:aa24 with SMTP id o8-20020a05622a044800b0040fda0caa24mr4575180qtx.56.1694655160563;
-        Wed, 13 Sep 2023 18:32:40 -0700 (PDT)
-Received: from luigi.stachecki.net (pool-108-14-234-238.nycmny.fios.verizon.net. [108.14.234.238])
-        by smtp.gmail.com with ESMTPSA id g16-20020ac870d0000000b0041061a16791sm149723qtp.67.2023.09.13.18.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 18:32:40 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 21:33:10 -0400
-From:   Tyler Stachecki <stachecki.tyler@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     leobras@redhat.com, seanjc@google.com, pbonzini@redhat.com,
-        dgilbert@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, bp@alien8.de,
-        Tyler Stachecki <tstachecki@bloomberg.net>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
-Message-ID: <ZQJi1lzAqQxMFiHW@luigi.stachecki.net>
-References: <20230914010003.358162-1-tstachecki@bloomberg.net>
+        with ESMTP id S233400AbjINB2A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 21:28:00 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79FAD1BD1;
+        Wed, 13 Sep 2023 18:27:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694654876; x=1726190876;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ueE/011k9DiwV0Anf9SWAZccz4IuGXFEGSyhfc+Fk0k=;
+  b=DfQuoVf5XhvkZwpdK1eoYwINamWBmIwKEM8v2zvkqyJvs0jRrukzeC1G
+   GLh7IVjm7cQaLit+KIUKVlImqK/7VQzcywhCA0FjENG52xqtivS2DdRyS
+   bVIQRcbm+4Dt8P1mWmWgSTILE+4wdP3eOogXAlPY4MQzI7Z56qirQpb+M
+   XoubkjgdATql7y8+S3w35PrJIugrA2jXs3ax266DfwU602BOdvxUclgXn
+   RYXszGcLCjH2/mOAs+LfUv+XpEXC6eZXWj+oh8a2lYqt+9tewvRV5TEUk
+   55qECN7f5eQGFefAyDzxcmuqhygpVayLugyqKdo9ia8yjVCVsZkEbfHDT
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="377733953"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="377733953"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 18:27:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="694048860"
+X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
+   d="scan'208";a="694048860"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 18:27:48 -0700
+From:   Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Like Xu <likexu@tencent.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Subject: [PATCH v3 0/9] RISCV: Add kvm Sstc timer selftests
+Date:   Thu, 14 Sep 2023 09:36:54 +0800
+Message-Id: <cover.1694421911.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914010003.358162-1-tstachecki@bloomberg.net>
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 09:00:03PM -0400, Tyler Stachecki wrote:
-> qemu then both ceases to put the remaining (non-XSAVE) x86
-> architectural state into KVM and makes the fateful mistake
-> of resuming the guest anyways. This usually results in
-> immediate guest corruption, silent or not.
+The RISC-V arch_timer selftests is used to validate Sstc timer
+functionality in a guest, which sets up periodic timer interrupts
+and check the basic interrupt status upon its receipt.
 
-I just want to highlight that although this is probably more of a bug with
-respect to how qemu is handling things, the original patches from Leo are
-starting to appear in many distro stable kernels and are really putting a
-spanner in the works for maintaining VMs that are long-lived in nature.
+This KVM selftests was ported from aarch64 arch_timer and tested
+with Linux v6.6-rc1 on a Qemu riscv64 virt machine.
 
-At present, if you take the fix for PKRU migration issues (or if you are just
-in need a more recent kernel), you are dealt with a situation where live-
-migrating VMs to a kernel patched for the PKRU issue from one that is not
-potentially crashes or corrupts skads of VMs.
+---
+Changed since v2:
+  * Rebase to Linux 6.6-rc1
+  * Add separate patch for kvm/Makefile improvement
+  * Move aarch64 specific macros to aarch64/arch_timer.c
+  * Add -DCONFIG_64BIT to kvm/Makefile CFLAGS to ensure
+    only 64bit registers were available in csr.h
+  * Avoid some #ifdef in kvm/arch_timer.c by setting some
+    aarch64 specific variable to 0 on risc-v
 
-There is no fix for qemu that I am aware of yet. Although, I am willing to
-look into one if that is more palatable, I filed this patch on the premise
-of "don't break userspace"...
+Haibo Xu (9):
+  KVM: selftests: Unify the codes for guest exception handling
+  KVM: selftests: Unify the makefile rule for split targets
+  KVM: arm64: selftests: Split arch_timer test code
+  tools: riscv: Add header file csr.h
+  KVM: riscv: selftests: Switch to use macro from csr.h
+  KVM: riscv: selftests: Add exception handling support
+  KVM: riscv: selftests: Add guest helper to get vcpu id
+  KVM: riscv: selftests: Change vcpu_has_ext to a common function
+  KVM: riscv: selftests: Add sstc timer test
+
+ tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+ tools/testing/selftests/kvm/Makefile          |  14 +-
+ .../selftests/kvm/aarch64/arch_timer.c        | 291 +---------
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   4 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |   4 +-
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   4 +-
+ tools/testing/selftests/kvm/arch_timer.c      | 250 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  12 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   9 +
+ .../selftests/kvm/include/riscv/arch_timer.h  |  80 +++
+ .../selftests/kvm/include/riscv/processor.h   |  63 ++-
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/include/timer_test.h        |  43 ++
+ .../selftests/kvm/include/x86_64/processor.h  |   5 -
+ .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+ .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+ .../selftests/kvm/lib/riscv/processor.c       |  86 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |   4 +-
+ .../testing/selftests/kvm/riscv/arch_timer.c  | 107 ++++
+ .../selftests/kvm/riscv/get-reg-list.c        |  16 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |   4 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |   4 +-
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |   4 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |   8 +-
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |   6 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |   4 +-
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |   4 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        |   8 +-
+ .../smaller_maxphyaddr_emulation_test.c       |   4 +-
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |   4 +-
+ .../kvm/x86_64/svm_nested_shutdown_test.c     |   4 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |   4 +-
+ .../kvm/x86_64/ucna_injection_test.c          |   8 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      |   4 +-
+ .../vmx_exception_with_invalid_guest_state.c  |   4 +-
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |   4 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |   4 +-
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |   4 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |   4 +-
+ 39 files changed, 1338 insertions(+), 374 deletions(-)
+ create mode 100644 tools/arch/riscv/include/asm/csr.h
+ create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+ create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+ create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+
+-- 
+2.34.1
+
