@@ -2,137 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D29D79F609
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 02:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE2A979F620
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 03:06:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233219AbjINA7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 20:59:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33264 "EHLO
+        id S233423AbjINBGp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 21:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230033AbjINA7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 20:59:41 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAF3193;
-        Wed, 13 Sep 2023 17:59:37 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-770ef353b8fso30046585a.0;
-        Wed, 13 Sep 2023 17:59:37 -0700 (PDT)
+        with ESMTP id S233366AbjINBGo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 21:06:44 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 549BD1BCF
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:06:40 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-594e8207103so6177467b3.2
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:06:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694653176; x=1695257976; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vyIG8qUqPmvNMJFb0g0C2IH+k5z0grkX4aoQRyFdC1Y=;
-        b=oltzm7sljHBOyvYSIRtFywtOZoY7txcSUutSw2t/nKvKlCY9lErxRENfFUYZe7kQRZ
-         9/Uryql6tf6sj6CT5TxF9sp4rIaPUf9DA+QHTJ+FA1stemXgjR1w1AEUgNrd6IublwmG
-         eLze11gaVHkUpXGGCPEKa29LUiNEyhFQLYGmN1D64sR9M9GN53v833/jXt17/dh/00aA
-         KWtkl3tvsl7l45DVHLKaflnyuQDH0RN3i82eUL+5akwyK0TLvKZtyAOqjLXCRyQUk1iI
-         4QK7FaBpzFw9HbT4DYdO82AHWNQQaU9bZGICGEVzt+O0IuLZHZ1TKTtWaLxVD5eRg8v8
-         Mnug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694653176; x=1695257976;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1694653599; x=1695258399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vyIG8qUqPmvNMJFb0g0C2IH+k5z0grkX4aoQRyFdC1Y=;
-        b=ZmrDsCfwA7XGjRh2F6hZPrtsqpwrCFcO0wTotwz4Bf19s6x6x8U6pvGlCJUlSQmpU9
-         hqyUZV6JXw5Jo9sOOEOkVNturAQiiJyXMhzbNheXjsZ2aBAgxG/1qXez0wVn01Oo3olt
-         jxYI+6aWtrbMmM9UzX+zi7ZwJ25RgoLqUd0M7zis6D46dwju2PfvozIyPk8VXTGv5Quc
-         Ed6/9FMBFv1CCVbwTQ7teY1REu6euWZX+AwrYUNxGyvP9MFFEbghLjGIqnxDB3UK/zX+
-         bpWDN/e92QYZarbbu3FU6aX3OjUCjrmRWepLHpSBjWFCbflKMTEdHM1dIqB7qtaApsk4
-         RZZw==
-X-Gm-Message-State: AOJu0Yyp7wfJdHgILJw8ZV2q8MfjsSUCnwjajo+xAsIzAdBzW2oOD+BA
-        yC13c50Xd5vlYXVzHa811gzUlzeeRTxd8Q==
-X-Google-Smtp-Source: AGHT+IH7nYN8HUUE1tDJ1zKgrYEuoVMOzTW7sQMoU3G7v6Ssx0u3efjFLCR8GbJ/oGCM0r/C+lPytA==
-X-Received: by 2002:a05:620a:2a11:b0:767:18b5:f6d6 with SMTP id o17-20020a05620a2a1100b0076718b5f6d6mr5087220qkp.2.1694653175909;
-        Wed, 13 Sep 2023 17:59:35 -0700 (PDT)
-Received: from luigi.stachecki.net (pool-108-14-234-238.nycmny.fios.verizon.net. [108.14.234.238])
-        by smtp.gmail.com with ESMTPSA id cz7-20020a05620a36c700b0076cda7eab11sm122794qkb.133.2023.09.13.17.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 17:59:35 -0700 (PDT)
-From:   Tyler Stachecki <stachecki.tyler@gmail.com>
-X-Google-Original-From: Tyler Stachecki <tstachecki@bloomberg.net>
-To:     kvm@vger.kernel.org
-Cc:     stachecki.tyler@gmail.com, leobras@redhat.com, seanjc@google.com,
-        pbonzini@redhat.com, dgilbert@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, dave.hansen@linux.intel.com, bp@alien8.de,
-        Tyler Stachecki <tstachecki@bloomberg.net>,
-        stable@vger.kernel.org
-Subject: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
-Date:   Wed, 13 Sep 2023 21:00:03 -0400
-Message-Id: <20230914010003.358162-1-tstachecki@bloomberg.net>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        bh=2k/uDSMMkxzMgxotysOQ1I84LqRn/bUax7yAixLpqCc=;
+        b=lzYK9szfFMR/skBd7EWiGnbfbrK7oawEVT3fgrS0+WZI56uBIdqMjTSFIzVDfbcgDu
+         yUqXnMmAMaydCDSaQ/E5y+yJHqxUdIcyyqZHslmastkKAXef33nc2eeW6F6aTsHUXY/d
+         iyHvVkFxKTtb36aIvb+ztzAJYeA9ZOCTvthq8rnh2JFeX1AY0ueijqjNFGF2fI7hfAPX
+         eGu/3AWXCPNcajNEpTypoiywkCDhlpvgSTeE0nVv1NkBYedoevVFQBhP9PahRbwUOq0d
+         ezO9gyeo8Qgi/RrrY8hCEpUUEx7s8VZSAqmgzJ2yqL9FXUNcsMqHe7A2ke7BI+QwDKqZ
+         dZbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694653599; x=1695258399;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2k/uDSMMkxzMgxotysOQ1I84LqRn/bUax7yAixLpqCc=;
+        b=RmfoYAaNdFeQ2S06e71nTl6FgFBLnPENSVbFhgK55/Va652acDIVZJjNyu3xsSdx2k
+         OuExW5929QyidwSdSgu737oxht4r5VEoyZ0KrdjV1OgFfMrBRLdc3RN0hNMl+3rezrrd
+         P0IWErSl0IsNgpxPbhLWpgicryKPB/KR7TOviEIk9S3dZpPmOeXySGbX+1tN33ejs9/V
+         m94bCgN6+D2GnBPR7lNeKIjPAU18WfmKZ23NpoJPEpfKWnwt82pJgDaNUeGY4nf7QuaB
+         x7nrKCEvpQuU6NrynUniN6smXkrgajSeBv72/ez5y+7JjLyMAeVX6iY6Rxmfo4/9d7n6
+         7XAQ==
+X-Gm-Message-State: AOJu0Yw3OJzZRGNEVu8xGyiIUKU0zBdTUfGyvfSltnsCy1Mpp+HddSrP
+        dTQOkso0KB9QIoMkKuxZ3rlwD9Mrxz0=
+X-Google-Smtp-Source: AGHT+IEw9ZZhn0YdLMZxCCvSGbD9b5eWAH0z/RlOk+yU7xV5M++q8FPZWEHXTjqqB0hL5ZdTs5KmrrqsBlA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1816:b0:d0e:e780:81b3 with SMTP id
+ cf22-20020a056902181600b00d0ee78081b3mr101657ybb.2.1694653599563; Wed, 13 Sep
+ 2023 18:06:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 13 Sep 2023 18:06:36 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230914010636.1391735-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Assert that vasprintf() is successful
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Haibo Xu <haibo1.xu@intel.com>,
+        Anup Patel <anup@brainfault.org>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Live-migrations under qemu result in guest corruption when
-the following three conditions are all met:
+Assert that vasprintf() succeeds as the "returned" string is undefined
+on failure.  Checking the result also eliminates the only warning with
+default options in KVM selftests, i.e. is the only thing getting in the
+way of compile with -Werror.
 
-  * The source host CPU has capabilities that itself
-    extend that of the guest CPU fpstate->user_xfeatures
+  lib/test_util.c: In function =E2=80=98strdup_printf=E2=80=99:
+  lib/test_util.c:390:9: error: ignoring return value of =E2=80=98vasprintf=
+=E2=80=99
+  declared with attribute =E2=80=98warn_unused_result=E2=80=99 [-Werror=3Du=
+nused-result]
+  390 |         vasprintf(&str, fmt, ap);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
 
-  * The source kernel emits guest_fpu->user_xfeatures
-    with respect to the host CPU (i.e. it *does not* have
-    the "Fixes:" commit)
+Don't bother capturing the return value, allegedly vasprintf() can only
+fail due to a memory allocation failure.
 
-  * The destination kernel enforces that the xfeatures
-    in the buffer given to KVM_SET_IOCTL are compatible
-    with the guest CPU (i.e., it *does* have the "Fixes:"
-    commit)
-
-When these conditions are met, the semantical changes to
-fpstate->user_features trigger a subtle bug in qemu that
-results in qemu failing to put the XSAVE architectural
-state into KVM.
-
-qemu then both ceases to put the remaining (non-XSAVE) x86
-architectural state into KVM and makes the fateful mistake
-of resuming the guest anyways. This usually results in
-immediate guest corruption, silent or not.
-
-Due to the grave nature of this qemu bug, attempt to
-retain behavior of old kernels by clamping the xfeatures
-specified in the buffer given to KVM_SET_IOCTL such that
-it aligns with the guests fpstate->user_xfeatures instead
-of returning an error.
-
-Fixes: ad856280ddea ("x86/kvm/fpu: Limit guest user_xfeatures to supported bits of XCR0")
-Cc: stable@vger.kernel.org
-Cc: Leonardo Bras <leobras@redhat.com>
-Signed-off-by: Tyler Stachecki <tstachecki@bloomberg.net>
+Fixes: dfaf20af7649 ("KVM: arm64: selftests: Replace str_with_index with st=
+rdup_printf")
+Cc: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>
+Cc: Anup Patel <anup@brainfault.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..baad160b592f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5407,11 +5407,21 @@ static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
- static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
- 					struct kvm_xsave *guest_xsave)
- {
-+	union fpregs_state *ustate = (union fpregs_state *) guest_xsave->region;
-+	u64 user_xfeatures = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
-+
- 	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
- 		return 0;
- 
--	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
--					      guest_xsave->region,
-+	/*
-+	 * In previous kernels, kvm_arch_vcpu_create() set the guest's fpstate
-+	 * based on what the host CPU supported. Recent kernels changed this
-+	 * and only accept ustate containing xfeatures that the guest CPU is
-+	 * capable of supporting.
-+	 */
-+	ustate->xsave.header.xfeatures &= user_xfeatures;
-+
-+	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu, ustate,
- 					      kvm_caps.supported_xcr0,
- 					      &vcpu->arch.pkru);
- }
--- 
-2.30.2
+I haven't actually run the relevant tests, someone should probably do so on
+ARM and/or RISC-V to make sure I didn't do something stupid.
+
+ tools/testing/selftests/kvm/lib/test_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/se=
+lftests/kvm/lib/test_util.c
+index 3e36019eeb4a..5d7f28b02d73 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -387,7 +387,7 @@ char *strdup_printf(const char *fmt, ...)
+ 	char *str;
+=20
+ 	va_start(ap, fmt);
+-	vasprintf(&str, fmt, ap);
++	TEST_ASSERT(vasprintf(&str, fmt, ap) >=3D 0, "vasprintf() failed");
+ 	va_end(ap);
+=20
+ 	return str;
+
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+--=20
+2.42.0.283.g2d96d420d3-goog
 
