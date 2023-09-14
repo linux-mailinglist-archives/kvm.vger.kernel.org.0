@@ -2,51 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9BE379FFE6
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFFA779FFFE
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236753AbjINJYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 05:24:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43752 "EHLO
+        id S236874AbjINJ3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 05:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231925AbjINJYO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:24:14 -0400
+        with ESMTP id S233511AbjINJ3M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 05:29:12 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82CC1BEF;
-        Thu, 14 Sep 2023 02:24:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C2FBB;
+        Thu, 14 Sep 2023 02:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=DlmHERwVAkZbfpBOosU5hMdT+vr1WnvHs7PjnDCGgAA=; b=ETH+uNv/DAnqXUaz3l0hJDYUJj
-        4MoCIZsbZ3rST7v4E8588J7eMPJiXKiD0Cu52wbCWSmAQu2h46gfVxDmZY5mvfA0PQKZr9cf8yA37
-        QAhs+O/AcNCYePodJ7wj/4pdl7Z/CKAnGFD77JBLR7oVnGtligzd8+/4Am83Q7Zt2G3JTugX2swH4
-        ePd3ZCuhCs2AeaFhZDEjoE9Sw3iJj8mRGwhnk+fxJnZiAV/Jwod7ukWa5RMpOocP2iquMPzV0hAyo
-        tVQgAd7fVXRMps/tQg6dwHlF023rReQktr3J74rOu5bXySatQdzUftueYY8Tew8qZjSlJ8+LOygCl
-        LBG7qYIA==;
+        bh=8KkrcHsZY3teWQNYz6N5mrTi0QTJ1d6xW9Jb/F/p1aI=; b=qavWYNiNE1hITTEhxPYAGuRFnm
+        04366Jl30L89lWrzHIy8T1VlkSFJb7CKFEJxQL6uC0lY8EiV+1dLZGxBot93VgddgSaWvl5wM4ZG7
+        7kgb9KNsS2W8bNCjKXX6taTJuoW3YT1lTUgOdjvzJIx7axmyWo4TF2bplvqaP7gyb9Nr2J3DPdAgv
+        peHP9FdCdz8+5DglFiXaySTWiExd4zpoSVIbY5ImnopHOWWg/R1GflepDTW+uP4b92G6NQ1819RYp
+        MwozAR4xtuaKwONDQ91nLbI9kmxSO1IPRW9++ectWCJyBRRcbAWfzGPINN3m/sM9kcM5xySYNwBxz
+        agK6i/AA==;
 Received: from [54.239.6.190] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgia0-0025t5-L8; Thu, 14 Sep 2023 09:24:08 +0000
-Message-ID: <9f3a251d2b2bcd0368e95459c2fb277a9c2c6169.camel@infradead.org>
-Subject: Re: [PATCH 8/8] KVM: xen: automatically use the vcpu_info embedded
- in shared_info
+        id 1qgien-00269G-SV; Thu, 14 Sep 2023 09:29:06 +0000
+Message-ID: <7c023cb88c5f13e70b53ac695a7b45213c4f97a3.camel@infradead.org>
+Subject: Re: [PATCH 5/8] KVM: pfncache: allow a cache to be activated with a
+ fixed (userspace) HVA
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     paul@xen.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Date:   Thu, 14 Sep 2023 11:24:06 +0200
-In-Reply-To: <855b06c9-50d2-e2e3-c0e2-fd9c3652e65b@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 14 Sep 2023 11:29:04 +0200
+In-Reply-To: <20230914084946.200043-6-paul@xen.org>
 References: <20230914084946.200043-1-paul@xen.org>
-         <20230914084946.200043-9-paul@xen.org>
-         <340cf9f24c85b17a1fe752715d95b2c3b84ac700.camel@infradead.org>
-         <855b06c9-50d2-e2e3-c0e2-fd9c3652e65b@xen.org>
+         <20230914084946.200043-6-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-Z5hcIt3R3EMxT92hRCYO"
+        boundary="=-GFrsL03r8Eq8jjQH7a2L"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -55,42 +49,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-Z5hcIt3R3EMxT92hRCYO
+--=-GFrsL03r8Eq8jjQH7a2L
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2023-09-14 at 11:17 +0200, Paul Durrant wrote:
-> On 14/09/2023 10:09, David Woodhouse wrote:
-> > On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
-> > > From: Paul Durrant <pdurrant@amazon.com>
-> > >=20
-> > > Add a KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO flag so that the VMM knows=
- it
-> > > need only set the KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO attribute in respo=
-nse to
-> > > a VCPUOP_register_vcpu_info hypercall, and modify get_vcpu_info_cache=
-()
-> > > to pass back a pointer to the shared info pfn cache (and appropriate
-> > > offset) for any of the first 32 vCPUs if the attribute has not been s=
-et.
-> >=20
-> > Might be simpler just to link this behaviour to the
-> > KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA support? If userspace sets the
-> > shared_info as an HVA, then the default vcpu_info will be used therein.
+On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
 >=20
-> Well there's no problem in using the default embedded vcpu_info even if=
-=20
-> the guests sets the shared_info via GPA... it still saves the VMM making=
-=20
-> a few ioctls. So do we really want to link the two things?
+> =C2=A0int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len=
+)
+> =C2=A0{
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return __kvm_gpc_refresh(gpc, =
+gpc->gpa, len);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return __kvm_gpc_refresh(gpc, =
+gpc->addr, len, gpc->addr_is_gpa);
+> =C2=A0}
+> =C2=A0EXPORT_SYMBOL_GPL(kvm_gpc_refresh);
 
-I'd prefer to avoid the combinatorial explosion in the advertised features.
+I think I have a slight preference for leaving kvm_gpc_refresh()
+working on a GPA unconditionally, thus calling __kvm_gpc_refresh() with
+the final argument set to true.
 
-And ideally we need to allow the VMM to opt *in* to the new behaviour,
-although I suppose you could argue that it doesn't make much difference
-in this case.
+Introduce another one-line wrapper kvm_gpc_refresh_hva() for the false
+case. And perhaps BUG_ON() calling the 'wrong' refresh function?
 
---=-Z5hcIt3R3EMxT92hRCYO
+--=-GFrsL03r8Eq8jjQH7a2L
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -182,24 +164,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MDkyNDA2WjAvBgkqhkiG9w0BCQQxIgQg2Hj3vimG
-lgTANdKysBdW+GvF/YHF5A+rD86AhnR4Vo0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MDkyOTA0WjAvBgkqhkiG9w0BCQQxIgQgDnyy13e8
+DVbfAzHKNvedUUMpBRWOjTcNHjyuHFe4RJQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCxCD6alMvxz3809uEA9f0LDfLZQndRt8FS
-95RMaD8xL9Qu8smP7iB7lYQ7cqG5Isk/V/hDAtqoSNyAibsiOyzfk/ULog2rfAbgu78KtrUc3lkz
-3lXEuPTQ9C7jlnku0zlR3dX/3X8Zp6F+LjOezRa6iDaW4B61MDpXxv+Hq/Ycypl9s8wqKw7G3zZe
-O0EJt4nWFgUCs7K17vuNLul1Cop3qh1KjH28TOkAVzeJWfYKC8LkovdIFKF508cUUcVm9awBcLmg
-VYp4Tnuq+nkstL7RllPtl4Wl1DxmFp0B3/x+IzhjHgKi4ethwxQqMhBuWoECqJpLnDHLFhQJtjSQ
-SDjWYrZjvfux3Q4p0rtQTDFxaSIubkf1EukWbOn0V7g5VFgDcOnCPS5xa5qmG4dKIb7ZXW0H5sTm
-+qGrcNdV1m3kLcjD1FbB8/G/4rdV3Qje85ImQeReBjNZbPuz/dz9enEHOny/1n4p+l2iumMT6iUc
-lTOaPHcBjiiRrxjWcpuGFgcJyLJlu+ZSLDSLEDRqTEqzFMotuXUIEvuggrX61KP+a9gtGMjgS8o2
-z/YUrHzKlLd0Cra7Z1wRCApKuzPZhpU0QO1uxAlXrgw6usnDjpeQ0EzqJLC3F4zYwACQ3qBtucvq
-PCWREwmskQQgMbLihYo1bIc3T89b1O7KoaevpjyYywAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCrvnqlIsUWgD65y98OwZilVx1J/vGuIcRY
+qPv6TzlPtZ5BsQAWYQVav76SUnWyUIPD5E/Ded0j8EmGHKlhSrdFlcxRwAapdv9TbccY9/kArMNt
+/+CJ5oOOIH5eMz8xC3JMPdx8pDcVwR0dG4lcte+ZjxeuEtFa5tQCL7k8hUTPKIbVoedCoG0FuaAJ
+KaJuhGVzoMDPjav4i0aCrddgh4c+9x0Xhbt8hhXtjpxsnzXkfNh0+qU8FRDDV+nCbHugVhg/SgZV
+QKB5kSPXxEbYZNaPY9LJacGXf5WjwFLm7VsRKa95h/xkSwePZjLFAOIeyIZPSg9UeDeF/xz3K3dZ
+dkFoieDsXoRJ7WDjzamzlUjBkgRjUvUyMbxn7Ry5QRFaJPL97bKgZgrVs7sMHxGdp7CAc29OH8Jg
+msrxUqv8zp1geNDP1uUqNL/y4bSPPOCbPc4n4TZ9Rf8ryR5WnBCbslY3ITVkZ4n3qw59uRMTAgDo
+NJRoiYT3s5a4MxPTwh5yhhuS3/lnOT2UZEyXypeVkxc+D7/v7YvBegEFXkpt2y4S/dTjLk4UMtMZ
+z1VwdDOGqqZ3WJSomdrf8XF0LtNTdhXHN5EgTrfxy6FUfon2pGGIJTYaw14MScOCoONTCImnYVtn
+GoawO2ydVs7n7v4qiMpi7itJvaiTAZL30i/ooUeo5AAAAAAAAA==
 
 
---=-Z5hcIt3R3EMxT92hRCYO--
+--=-GFrsL03r8Eq8jjQH7a2L--
