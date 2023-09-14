@@ -2,114 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB8887A0163
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 12:15:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B413D7A031E
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 13:57:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230444AbjINKQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 06:16:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58004 "EHLO
+        id S234522AbjINL5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 07:57:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237175AbjINKP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 06:15:59 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA541BE8
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 03:15:54 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-401d80f4ef8so8495435e9.1
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 03:15:54 -0700 (PDT)
+        with ESMTP id S233897AbjINL5O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 07:57:14 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C87CC3
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 04:57:10 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-68fb898ab3bso655166b3a.3
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 04:57:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694686553; x=1695291353; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
-        b=QA3eGr+g541KCdar2tCcnj5cTCklF9uEIbH6NOz9SXHpL0vOAKJBOKvewdQFiNhQrD
-         ZBu9q3pL2wUuSBviEFP36/T5c02jF8lmYaxkpY1TOxj7UkB/H/4ZzkEMv/3DlvakqTqz
-         YV/NolPyqkBEjkIufXupEfjuF7kfCjUiGKNm/8AAYXlXjKw48qjqbeKjytASiU0RomIz
-         enDWv2eGMJ1Wz8WkC8vg7+0dMUWSCTjBXX0a4VqPD/4nx+LUOKbhTGo5ssvU4ssDG8ha
-         RGnAEPnT2AqoFf6MQ0NYSRRjosa1m1wzX+7CUMoyEG3dScBrDQwmEUz94hL6bzy22H9q
-         9l9Q==
+        d=gmail.com; s=20221208; t=1694692629; x=1695297429; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wIX/sfEDpgeH0ssfzAesFUh0H6mb5sL6q4aUywTmlSA=;
+        b=Nbj2WAC6syOa0rjV3YpMJJwxSJ/f2FHG6ultb2tBrcgmagQDtBnz/5JIPvFSdQ1FVq
+         3KXUG3KGbC7EsSlQWcsDGMabmnL+HnR3nSxJdPRhtytIoGVATeb69DC2CVmOJwcjd9qs
+         bzO0/nGoBvdXXv9yPPV+aObm8wN+AwYdppTVoxjAdlcRmmMh9P1AobChd4iSy2secW5L
+         o8566GaPxc0kDU8r0nancE7kKjp2kconlnXIsTjTmdlQVTZYgDVN/fc5xORyiDD1IyCF
+         nVvjMkdZF4Smj5tnGl+F12khYYu01zwAPxqMdOc0BLSGsBg5YKjvu52RjyVvYXbyBOYz
+         Qb4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694686553; x=1695291353;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
-        b=QmT7rAgjSo3EIeX5+FA8xKRTtTqNwWBD29wQBpiQ7obiAotvSS5Am27lH4L6IGN3uh
-         GFSABxfQFudkxfi+pDOdOV58dHentUg3vc5NP+RRj7NWsA9eLo0YOgSrgw5kBoE6QnbZ
-         s6VAD3+1u1iVWiEEODA9PkKZIeWyQoHnOBdvuAMveugPgnjHMLzH4LFPkxizwqcSazUz
-         C24Zycw0qlbo4wL5xSjk+RMUFfm0iQpJiNkqr/b3Ui7mlNVneaR9PTf+vjCN6KId6CId
-         f/ZLsyIYEyrFmjGZ4c4ly7mNyG1uUz9NyMHBMQHGieBSMerWBVsK5ZrbEV/EO7gyPMkN
-         Sf0Q==
-X-Gm-Message-State: AOJu0YwKtVQpNWuDYWLWIMc53nEq8x+RFEjj86VSaZuzaXmdUi8zLAIF
-        LXQoVPbFwctmDguUcaBz++xLYQ==
-X-Google-Smtp-Source: AGHT+IH7ZT746JOyiS+eOvZlolhRQEl4EX2Lm6S0kGQOnu5nvVuWeFGDXcIG88aW5kDFIAcnKh6/BQ==
-X-Received: by 2002:adf:d0c3:0:b0:31a:d2f9:7372 with SMTP id z3-20020adfd0c3000000b0031ad2f97372mr4347143wrh.29.1694686552802;
-        Thu, 14 Sep 2023 03:15:52 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id k8-20020a5d5248000000b0031fc4c31d77sm1340310wrc.88.2023.09.14.03.15.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 03:15:51 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 12:15:50 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, xiaobo55x@gmail.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
-Message-ID: <20230914-2232dea1c6d03fb5985755e6@orel>
-References: <cover.1694421911.git.haibo1.xu@intel.com>
- <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
- <20230914-ee133dd5e804282ce28833d6@orel>
- <20230914-reflector-preshow-786425ad7ae2@wendy>
+        d=1e100.net; s=20230601; t=1694692629; x=1695297429;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wIX/sfEDpgeH0ssfzAesFUh0H6mb5sL6q4aUywTmlSA=;
+        b=t/lxpgf3QXdCHI4TVTCqubb4qemSsyzW9LtuAGZMnw2oR4nYwoTU1dVpLG4uIQaOWN
+         2/zyeHcYHTfQz9tTtwOAxVL3YnxY2Ex2d7YNc3RDFJYIOsxI8IndYzkkEs5wyFiuPkIJ
+         lTrGVPrComxEYKR9GW2SR8oazxwP7BnA1ZIzkwI5wfU3WByXOhBWYMOqIyDaaGN882qe
+         zMU7vPO4hdmUYJM5KD5eM5tkp9M3+PnobFlEabg8N1ZyBnv5alS0fl+b9u8cVz6q9bkW
+         I8JA2OmMlJ1akp5JeCi8j79uLwUeUrm5euG1nlhK7Au6zdUs8ZQ/rfVQlZSZrw++9Lej
+         l7ow==
+X-Gm-Message-State: AOJu0Ywmr9GnEDIl/At+GbnxQ0r0aC7Z5C3dcpCphnkeQrrxRiywHySL
+        QmEvBV0EIB87mL+iuyJOZn4=
+X-Google-Smtp-Source: AGHT+IED/MNWAIqY0ZktpwugAnieYSSRxE6Txw6uNYBObEaY2R2+Z71v4vDDCdHo28pmxMr6TyEizA==
+X-Received: by 2002:a05:6a00:1a52:b0:68f:e0c2:6d46 with SMTP id h18-20020a056a001a5200b0068fe0c26d46mr5384572pfv.23.1694692629428;
+        Thu, 14 Sep 2023 04:57:09 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id e11-20020aa78c4b000000b006870ff20254sm1186091pfd.125.2023.09.14.04.57.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Sep 2023 04:57:08 -0700 (PDT)
+Message-ID: <3c012a84-de53-0c54-c294-97c1c52b84c3@gmail.com>
+Date:   Thu, 14 Sep 2023 19:57:02 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914-reflector-preshow-786425ad7ae2@wendy>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Cc:     Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <20230901185646.2823254-1-jmattson@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230901185646.2823254-1-jmattson@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 10:52:15AM +0100, Conor Dooley wrote:
-> On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
-> > > +static inline void cpu_relax(void)
-> > > +{
-> > > +#ifdef __riscv_zihintpause
-> > > +	asm volatile("pause" ::: "memory");
-> > > +#else
-> > > +	/* Encoding of the pause instruction */
-> > > +	asm volatile(".4byte 0x100000F" ::: "memory");
-> > > +#endif
-> > > +}
-> > 
-> > cpu_relax() should go to include/riscv/processor.h
+On 2/9/2023 2:56 am, Jim Mattson wrote:
+> When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
+> VM-exit that also invokes __kvm_perf_overflow() as a result of
+> instruction emulation, kvm_pmu_deliver_pmi() will be called twice
+> before the next VM-entry.
 > 
-> Can the one from asm/vdso/processor.h be reused, or are there special
-> considerations preventing that?
+> That shouldn't be a problem. The local APIC is supposed to
 
-We'd need to copy it into tools/arch/riscv/include/asm, but it could be
-done. Hmm, now that I look at it, I see we're missing the barrier() call
-in this kvm selftests version.
+As you said, that shouldn't be a problem.
 
-Thanks,
-drew
+> automatically set the mask flag in LVTPC when it handles a PMI, so the
+> second PMI should be inhibited. However, KVM's local APIC emulation
+> fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
+> are delivered via the local APIC. In the common case, where LVTPC is
+> configured to deliver an NMI, the first NMI is vectored through the
+> guest IDT, and the second one is held pending. When the NMI handler
+> returns, the second NMI is vectored through the IDT. For Linux guests,
+> this results in the "dazed and confused" spurious NMI message.
+> 
+> Though the obvious fix is to set the mask flag in LVTPC when handling
+> a PMI, KVM's logic around synthesizing a PMI is unnecessarily
+> convoluted.
+
+Any obstruction issues on fixing in this direction ?
+
+> 
+> Remove the irq_work callback for synthesizing a PMI, and all of the
+> logic for invoking it. Instead, to prevent a vcpu from leaving C0 with
+> a PMI pending, add a check for KVM_REQ_PMI to kvm_vcpu_has_events().
+> 
+> Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  1 -
+>   arch/x86/kvm/pmu.c              | 27 +--------------------------
+>   arch/x86/kvm/x86.c              |  3 +++
+>   3 files changed, 4 insertions(+), 27 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3bc146dfd38d..f6b9e3ae08bf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -528,7 +528,6 @@ struct kvm_pmu {
+>   	u64 raw_event_mask;
+>   	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
+>   	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
+> -	struct irq_work irq_work;
+>   
+>   	/*
+>   	 * Overlay the bitmap with a 64-bit atomic so that all bits can be
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index bf653df86112..0c117cd24077 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -93,14 +93,6 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
+>   #undef __KVM_X86_PMU_OP
+>   }
+>   
+> -static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
+> -{
+> -	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+> -	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+> -
+> -	kvm_pmu_deliver_pmi(vcpu);
+> -}
+> -
+>   static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+>   {
+>   	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> @@ -124,20 +116,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+>   		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+>   	}
+>   
+> -	if (!pmc->intr || skip_pmi)
+> -		return;
+> -
+> -	/*
+> -	 * Inject PMI. If vcpu was in a guest mode during NMI PMI
+> -	 * can be ejected on a guest mode re-entry. Otherwise we can't
+> -	 * be sure that vcpu wasn't executing hlt instruction at the
+> -	 * time of vmexit and is not going to re-enter guest mode until
+> -	 * woken up. So we should wake it, but this is impossible from
+> -	 * NMI context. Do it from irq work instead.
+> -	 */
+> -	if (in_pmi && !kvm_handling_nmi_from_guest(pmc->vcpu))
+> -		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
+> -	else
+> +	if (pmc->intr && !skip_pmi)
+>   		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
+>   }
+>   
+> @@ -677,9 +656,6 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>   
+>   void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+>   {
+> -	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> -
+> -	irq_work_sync(&pmu->irq_work);
+>   	static_call(kvm_x86_pmu_reset)(vcpu);
+>   }
+>   
+> @@ -689,7 +665,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>   
+>   	memset(pmu, 0, sizeof(*pmu));
+>   	static_call(kvm_x86_pmu_init)(vcpu);
+> -	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
+>   	pmu->event_count = 0;
+>   	pmu->need_cleanup = false;
+>   	kvm_pmu_refresh(vcpu);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c381770bcbf1..0732c09fbd2d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12841,6 +12841,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>   		return true;
+>   #endif
+>   
+> +	if (kvm_test_request(KVM_REQ_PMI, vcpu))
+> +		return true;
+> +
+>   	if (kvm_arch_interrupt_allowed(vcpu) &&
+>   	    (kvm_cpu_has_interrupt(vcpu) ||
+>   	    kvm_guest_apic_has_interrupt(vcpu)))
