@@ -2,799 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 057CE7A07A8
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:47:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9FCF7A07AD
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:47:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240313AbjINOrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 10:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33564 "EHLO
+        id S240275AbjINOr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 10:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240159AbjINOrK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:47:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75B621BFC
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694702783;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2QvcZvL63W/gB4lIrthqpAgfv9tf/kqXEO64jGCfdpw=;
-        b=M8kiDteQZ2Pr3tIEnnWDr6fS2L+xq7v0XjTJ2w8tmHvOo/lq459PA9dngk1dJvZixlcItV
-        OnBRWwsTspJgCchYw+d+HLOUMFN+ZQyyRIVgHiHRCH0A+Yavo/wge2y6GTx4kWfITBOvIL
-        GSCknglMSeB0FEewEo4W6q3NRrpS+l8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-WtRdralpOkmWIGCgFwO72Q-1; Thu, 14 Sep 2023 10:46:21 -0400
-X-MC-Unique: WtRdralpOkmWIGCgFwO72Q-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4011f56165eso9429615e9.0
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:46:21 -0700 (PDT)
+        with ESMTP id S240296AbjINOr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 10:47:26 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BE21FC9
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:47:22 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-401d6f6b2e0so14206115e9.1
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:47:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694702840; x=1695307640; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vHpWmHejf9EicOnbuTpXQSbFe9gmT4JUPIXQ/pQhLLs=;
+        b=OICqe2J+pAU/Tw1th392fVmAUa+8T60710r04130hvuY9Irz3uPklqPCNYiKH4N5tp
+         xaJWWXHhj5/wE040hJ9kSMtiEtj3yLpwmlXy4G9+5zTfiBd10Qt5CSsICqywQijxFcRW
+         je8Xf8KvgNIImwjEAQuKAwCKVvicotgOFQeKFpUVHsE58ly20i+nAxdQOyxX1bckKLXK
+         U0mVstkxeoV8WKZulfztUojq62+BLhyKlN2vYfkEjX2I+ieKe6sjku4C6BOEivTOZvc4
+         YWItytRxlm2VXgACWpOT9Y1q0CcvybbeOAxnvdP4ERRnggf+1Efu6xg17KaLkV8nSEM8
+         Kp1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694702780; x=1695307580;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2QvcZvL63W/gB4lIrthqpAgfv9tf/kqXEO64jGCfdpw=;
-        b=ffHvymHoUZgUwhW/7qTjsAm/NvFOp1QM7+TDD5/c4D9eM8kL1pkttXGS7LcoxD1kpz
-         ob3RBeNVCvgC1ngZby7tDk6ZpczEy/H7t0dURz0bxwKC6gafzRiVF5vpadJW1TgwGklW
-         yIQcP0V0xZQJOz+HH8+LreleK7r7djWnT4oV3QL17rlthmb6zduz0G1EbZCX7iUbQ92c
-         H7a/Nd4XV5hjyn6s+kV20QZXJ9AHkZ2YLy37Chy0K+f0/V1Ip99XuFVTIoMzGw88d6u4
-         u1+UvOKcq3B5NOLLIHej4kL1DS8te2lvhbaJ9C1JVNA2rZx7OSjnr6PklHRzA9/orgK5
-         TABg==
-X-Gm-Message-State: AOJu0YyMFGoFKIlpUDS8Yw1TtwRFtfD6wvVop5PXY9IGLIbY64Qad+5x
-        bLA5p6bJMnv/j2dEYeJcRN61jKcWcOUgNXZ09WKXcv5B/O9UWbD1SRopDrJ9gtjnX1BsE7quBwH
-        XUKGBOraW/NXm
-X-Received: by 2002:adf:f4c4:0:b0:319:6b56:94d9 with SMTP id h4-20020adff4c4000000b003196b5694d9mr1799502wrp.2.1694702780059;
-        Thu, 14 Sep 2023 07:46:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwurh8vxY5ig7Yiq2Av9cHzofzmrerCebMVykhv9I0mv6+IIaUsY2vPsRI4LchH5cctpzJWQ==
-X-Received: by 2002:adf:f4c4:0:b0:319:6b56:94d9 with SMTP id h4-20020adff4c4000000b003196b5694d9mr1799473wrp.2.1694702779434;
-        Thu, 14 Sep 2023 07:46:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id k3-20020a056000004300b0031fba0a746bsm1974881wrx.9.2023.09.14.07.46.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 07:46:18 -0700 (PDT)
-Message-ID: <c2fb72a1-2e83-d266-c428-72dcfcd95a75@redhat.com>
-Date:   Thu, 14 Sep 2023 16:46:16 +0200
+        d=1e100.net; s=20230601; t=1694702840; x=1695307640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vHpWmHejf9EicOnbuTpXQSbFe9gmT4JUPIXQ/pQhLLs=;
+        b=rt+dQ+lNFVYufwLp7u3Y/TG4R4vLUcozS7BvkBnKwgD9rEOpqGaIXyw+vXQwTAgEqb
+         aMCxUzTzHFnkAY7DW8qRrMFCG4kLPwz8oKMUg9ijVWbrSEKR2fZ1Nd/LLVOa8/5g8fId
+         p6zkfG0amILBEJol+B8DkhUkcHjpDA3OH8APO4wHShwt2Kt1CaetM4cyff8Lc+ye9pNL
+         wQbBhEkatNv/pitmv5xY4MtOplUqhMI0Jo72NEHEAy1oi7ma5+PiqMpRKsFVXjhBrId6
+         kNKrDqwXgIPfr3YT+fQzX+3PhOL8x4m9Mi2JEwKCcV4/8chr3xvB3fxsEkqWdPhxJAOG
+         /lHg==
+X-Gm-Message-State: AOJu0YyPcKBqmQza4Y0Ojs8cBgt6OEsJrsjokjCckMcxKQmEIEfHpi2L
+        YXF2opXgyBunj49GwQg2JdjiXQ==
+X-Google-Smtp-Source: AGHT+IE4vnDXBqfwShidPjq/u140Nh9Lf+YfW3WjJy+bEdPvCUxsYsEPIWnZNVPkTVSDMOA9EX84Jw==
+X-Received: by 2002:a05:600c:895:b0:401:b393:da18 with SMTP id l21-20020a05600c089500b00401b393da18mr1795468wmp.6.1694702840548;
+        Thu, 14 Sep 2023 07:47:20 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id n7-20020a7bcbc7000000b003fef3180e7asm4996897wmi.44.2023.09.14.07.47.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 07:47:19 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 16:47:18 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
+        wuwei2016@iscas.ac.cn, leobras@redhat.com,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <20230914-74d0cf00633c199758ee3450@orel>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <20230914-892327a75b4b86badac5de02@orel>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v1 02/22] Update linux-header to support iommufd cdev and
- hwpt alloc
-Content-Language: en-US
-To:     Zhenzhong Duan <zhenzhong.duan@intel.com>, qemu-devel@nongnu.org
-Cc:     alex.williamson@redhat.com, clg@redhat.com, jgg@nvidia.com,
-        nicolinc@nvidia.com, joao.m.martins@oracle.com, peterx@redhat.com,
-        jasowang@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com,
-        yi.y.sun@intel.com, chao.p.peng@intel.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
-References: <20230830103754.36461-1-zhenzhong.duan@intel.com>
- <20230830103754.36461-3-zhenzhong.duan@intel.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230830103754.36461-3-zhenzhong.duan@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914-892327a75b4b86badac5de02@orel>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zhenzhong,
+On Thu, Sep 14, 2023 at 04:25:53PM +0200, Andrew Jones wrote:
+> On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> > 
+> > Cache-block prefetch instructions are HINTs to the hardware to
+> > indicate that software intends to perform a particular type of
+> > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> > improve the arch_xchg for qspinlock xchg_tail.
+> > 
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > ---
+> >  arch/riscv/Kconfig                 | 15 +++++++++++++++
+> >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+> >  arch/riscv/include/asm/hwcap.h     |  1 +
+> >  arch/riscv/include/asm/insn-def.h  |  5 +++++
+> >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+> >  arch/riscv/kernel/cpufeature.c     |  1 +
+> >  6 files changed, 38 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index e9ae6fa232c3..2c346fe169c1 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+> >  
+> >  	   If you don't know what to do here, say Y.
+> >  
+> > +config RISCV_ISA_ZICBOP
+> 
+> Even if we're not concerned with looping over blocks yet, I think we
+> should introduce zicbop block size DT parsing at the same time we bring
+> zicbop support to the kernel (it's just more copy+paste from zicbom and
+> zicboz). It's a bit annoying that the CMO spec doesn't state that block
+> sizes should be the same for m/z/p. And, the fact that m/z/p are all
+> separate extensions leads us to needing to parse block sizes for all
+> three, despite the fact that in practice they'll probably be the same.
 
-On 8/30/23 12:37, Zhenzhong Duan wrote:
-> From https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git
-> branch: for_next
-> commit id: eb501c2d96cfce6b42528e8321ea085ec605e790
-I see that in your branch you have now updated against v6.6-rc1. However
-you should run a full ./scripts/update-linux-headers.sh,
-ie. not only importing the changes in linux-headers/linux/iommufd.h as
-it seems to do but also import all changes brought with this linux version.
+Although, I saw on a different mailing list that Andrei Warkentin
+interpreted section 2.7 "Software Discovery" of the spec, which states
 
-Thanks
+"""
+The initial set of CMO extensions requires the following information to be
+discovered by software:
 
-Eric
->
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
-> ---
-> Note this is a placeholder patch.
->
->  include/standard-headers/linux/fuse.h |   3 +
->  linux-headers/linux/iommufd.h         | 444 ++++++++++++++++++++++++++
->  linux-headers/linux/kvm.h             |  13 +-
->  linux-headers/linux/vfio.h            | 148 ++++++++-
->  4 files changed, 604 insertions(+), 4 deletions(-)
->  create mode 100644 linux-headers/linux/iommufd.h
->
-> diff --git a/include/standard-headers/linux/fuse.h b/include/standard-headers/linux/fuse.h
-> index 35c131a107..2c8b8de9c2 100644
-> --- a/include/standard-headers/linux/fuse.h
-> +++ b/include/standard-headers/linux/fuse.h
-> @@ -206,6 +206,7 @@
->   *  - add extension header
->   *  - add FUSE_EXT_GROUPS
->   *  - add FUSE_CREATE_SUPP_GROUP
-> + *  - add FUSE_HAS_EXPIRE_ONLY
->   */
->  
->  #ifndef _LINUX_FUSE_H
-> @@ -365,6 +366,7 @@ struct fuse_file_lock {
->   * FUSE_HAS_INODE_DAX:  use per inode DAX
->   * FUSE_CREATE_SUPP_GROUP: add supplementary group info to create, mkdir,
->   *			symlink and mknod (single group that matches parent)
-> + * FUSE_HAS_EXPIRE_ONLY: kernel supports expiry-only entry invalidation
->   */
->  #define FUSE_ASYNC_READ		(1 << 0)
->  #define FUSE_POSIX_LOCKS	(1 << 1)
-> @@ -402,6 +404,7 @@ struct fuse_file_lock {
->  #define FUSE_SECURITY_CTX	(1ULL << 32)
->  #define FUSE_HAS_INODE_DAX	(1ULL << 33)
->  #define FUSE_CREATE_SUPP_GROUP	(1ULL << 34)
-> +#define FUSE_HAS_EXPIRE_ONLY	(1ULL << 35)
->  
->  /**
->   * CUSE INIT request/reply flags
-> diff --git a/linux-headers/linux/iommufd.h b/linux-headers/linux/iommufd.h
-> new file mode 100644
-> index 0000000000..218bf7ac98
-> --- /dev/null
-> +++ b/linux-headers/linux/iommufd.h
-> @@ -0,0 +1,444 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
-> + */
-> +#ifndef _IOMMUFD_H
-> +#define _IOMMUFD_H
-> +
-> +#include <linux/types.h>
-> +#include <linux/ioctl.h>
-> +
-> +#define IOMMUFD_TYPE (';')
-> +
-> +/**
-> + * DOC: General ioctl format
-> + *
-> + * The ioctl interface follows a general format to allow for extensibility. Each
-> + * ioctl is passed in a structure pointer as the argument providing the size of
-> + * the structure in the first u32. The kernel checks that any structure space
-> + * beyond what it understands is 0. This allows userspace to use the backward
-> + * compatible portion while consistently using the newer, larger, structures.
-> + *
-> + * ioctls use a standard meaning for common errnos:
-> + *
-> + *  - ENOTTY: The IOCTL number itself is not supported at all
-> + *  - E2BIG: The IOCTL number is supported, but the provided structure has
-> + *    non-zero in a part the kernel does not understand.
-> + *  - EOPNOTSUPP: The IOCTL number is supported, and the structure is
-> + *    understood, however a known field has a value the kernel does not
-> + *    understand or support.
-> + *  - EINVAL: Everything about the IOCTL was understood, but a field is not
-> + *    correct.
-> + *  - ENOENT: An ID or IOVA provided does not exist.
-> + *  - ENOMEM: Out of memory.
-> + *  - EOVERFLOW: Mathematics overflowed.
-> + *
-> + * As well as additional errnos, within specific ioctls.
-> + */
-> +enum {
-> +	IOMMUFD_CMD_BASE = 0x80,
-> +	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
-> +	IOMMUFD_CMD_IOAS_ALLOC,
-> +	IOMMUFD_CMD_IOAS_ALLOW_IOVAS,
-> +	IOMMUFD_CMD_IOAS_COPY,
-> +	IOMMUFD_CMD_IOAS_IOVA_RANGES,
-> +	IOMMUFD_CMD_IOAS_MAP,
-> +	IOMMUFD_CMD_IOAS_UNMAP,
-> +	IOMMUFD_CMD_OPTION,
-> +	IOMMUFD_CMD_VFIO_IOAS,
-> +	IOMMUFD_CMD_HWPT_ALLOC,
-> +	IOMMUFD_CMD_GET_HW_INFO,
-> +};
-> +
-> +/**
-> + * struct iommu_destroy - ioctl(IOMMU_DESTROY)
-> + * @size: sizeof(struct iommu_destroy)
-> + * @id: iommufd object ID to destroy. Can be any destroyable object type.
-> + *
-> + * Destroy any object held within iommufd.
-> + */
-> +struct iommu_destroy {
-> +	__u32 size;
-> +	__u32 id;
-> +};
-> +#define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
-> +
-> +/**
-> + * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
-> + * @size: sizeof(struct iommu_ioas_alloc)
-> + * @flags: Must be 0
-> + * @out_ioas_id: Output IOAS ID for the allocated object
-> + *
-> + * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address (IOVA)
-> + * to memory mapping.
-> + */
-> +struct iommu_ioas_alloc {
-> +	__u32 size;
-> +	__u32 flags;
-> +	__u32 out_ioas_id;
-> +};
-> +#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
-> +
-> +/**
-> + * struct iommu_iova_range - ioctl(IOMMU_IOVA_RANGE)
-> + * @start: First IOVA
-> + * @last: Inclusive last IOVA
-> + *
-> + * An interval in IOVA space.
-> + */
-> +struct iommu_iova_range {
-> +	__aligned_u64 start;
-> +	__aligned_u64 last;
-> +};
-> +
-> +/**
-> + * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
-> + * @size: sizeof(struct iommu_ioas_iova_ranges)
-> + * @ioas_id: IOAS ID to read ranges from
-> + * @num_iovas: Input/Output total number of ranges in the IOAS
-> + * @__reserved: Must be 0
-> + * @allowed_iovas: Pointer to the output array of struct iommu_iova_range
-> + * @out_iova_alignment: Minimum alignment required for mapping IOVA
-> + *
-> + * Query an IOAS for ranges of allowed IOVAs. Mapping IOVA outside these ranges
-> + * is not allowed. num_iovas will be set to the total number of iovas and
-> + * the allowed_iovas[] will be filled in as space permits.
-> + *
-> + * The allowed ranges are dependent on the HW path the DMA operation takes, and
-> + * can change during the lifetime of the IOAS. A fresh empty IOAS will have a
-> + * full range, and each attached device will narrow the ranges based on that
-> + * device's HW restrictions. Detaching a device can widen the ranges. Userspace
-> + * should query ranges after every attach/detach to know what IOVAs are valid
-> + * for mapping.
-> + *
-> + * On input num_iovas is the length of the allowed_iovas array. On output it is
-> + * the total number of iovas filled in. The ioctl will return -EMSGSIZE and set
-> + * num_iovas to the required value if num_iovas is too small. In this case the
-> + * caller should allocate a larger output array and re-issue the ioctl.
-> + *
-> + * out_iova_alignment returns the minimum IOVA alignment that can be given
-> + * to IOMMU_IOAS_MAP/COPY. IOVA's must satisfy::
-> + *
-> + *   starting_iova % out_iova_alignment == 0
-> + *   (starting_iova + length) % out_iova_alignment == 0
-> + *
-> + * out_iova_alignment can be 1 indicating any IOVA is allowed. It cannot
-> + * be higher than the system PAGE_SIZE.
-> + */
-> +struct iommu_ioas_iova_ranges {
-> +	__u32 size;
-> +	__u32 ioas_id;
-> +	__u32 num_iovas;
-> +	__u32 __reserved;
-> +	__aligned_u64 allowed_iovas;
-> +	__aligned_u64 out_iova_alignment;
-> +};
-> +#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_RANGES)
-> +
-> +/**
-> + * struct iommu_ioas_allow_iovas - ioctl(IOMMU_IOAS_ALLOW_IOVAS)
-> + * @size: sizeof(struct iommu_ioas_allow_iovas)
-> + * @ioas_id: IOAS ID to allow IOVAs from
-> + * @num_iovas: Input/Output total number of ranges in the IOAS
-> + * @__reserved: Must be 0
-> + * @allowed_iovas: Pointer to array of struct iommu_iova_range
-> + *
-> + * Ensure a range of IOVAs are always available for allocation. If this call
-> + * succeeds then IOMMU_IOAS_IOVA_RANGES will never return a list of IOVA ranges
-> + * that are narrower than the ranges provided here. This call will fail if
-> + * IOMMU_IOAS_IOVA_RANGES is currently narrower than the given ranges.
-> + *
-> + * When an IOAS is first created the IOVA_RANGES will be maximally sized, and as
-> + * devices are attached the IOVA will narrow based on the device restrictions.
-> + * When an allowed range is specified any narrowing will be refused, ie device
-> + * attachment can fail if the device requires limiting within the allowed range.
-> + *
-> + * Automatic IOVA allocation is also impacted by this call. MAP will only
-> + * allocate within the allowed IOVAs if they are present.
-> + *
-> + * This call replaces the entire allowed list with the given list.
-> + */
-> +struct iommu_ioas_allow_iovas {
-> +	__u32 size;
-> +	__u32 ioas_id;
-> +	__u32 num_iovas;
-> +	__u32 __reserved;
-> +	__aligned_u64 allowed_iovas;
-> +};
-> +#define IOMMU_IOAS_ALLOW_IOVAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOW_IOVAS)
-> +
-> +/**
-> + * enum iommufd_ioas_map_flags - Flags for map and copy
-> + * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appropriate
-> + *                             IOVA to place the mapping at
-> + * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
-> + * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
-> + */
-> +enum iommufd_ioas_map_flags {
-> +	IOMMU_IOAS_MAP_FIXED_IOVA = 1 << 0,
-> +	IOMMU_IOAS_MAP_WRITEABLE = 1 << 1,
-> +	IOMMU_IOAS_MAP_READABLE = 1 << 2,
-> +};
-> +
-> +/**
-> + * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
-> + * @size: sizeof(struct iommu_ioas_map)
-> + * @flags: Combination of enum iommufd_ioas_map_flags
-> + * @ioas_id: IOAS ID to change the mapping of
-> + * @__reserved: Must be 0
-> + * @user_va: Userspace pointer to start mapping from
-> + * @length: Number of bytes to map
-> + * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is set
-> + *        then this must be provided as input.
-> + *
-> + * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified then the
-> + * mapping will be established at iova, otherwise a suitable location based on
-> + * the reserved and allowed lists will be automatically selected and returned in
-> + * iova.
-> + *
-> + * If IOMMU_IOAS_MAP_FIXED_IOVA is specified then the iova range must currently
-> + * be unused, existing IOVA cannot be replaced.
-> + */
-> +struct iommu_ioas_map {
-> +	__u32 size;
-> +	__u32 flags;
-> +	__u32 ioas_id;
-> +	__u32 __reserved;
-> +	__aligned_u64 user_va;
-> +	__aligned_u64 length;
-> +	__aligned_u64 iova;
-> +};
-> +#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
-> +
-> +/**
-> + * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
-> + * @size: sizeof(struct iommu_ioas_copy)
-> + * @flags: Combination of enum iommufd_ioas_map_flags
-> + * @dst_ioas_id: IOAS ID to change the mapping of
-> + * @src_ioas_id: IOAS ID to copy from
-> + * @length: Number of bytes to copy and map
-> + * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is
-> + *            set then this must be provided as input.
-> + * @src_iova: IOVA to start the copy
-> + *
-> + * Copy an already existing mapping from src_ioas_id and establish it in
-> + * dst_ioas_id. The src iova/length must exactly match a range used with
-> + * IOMMU_IOAS_MAP.
-> + *
-> + * This may be used to efficiently clone a subset of an IOAS to another, or as a
-> + * kind of 'cache' to speed up mapping. Copy has an efficiency advantage over
-> + * establishing equivalent new mappings, as internal resources are shared, and
-> + * the kernel will pin the user memory only once.
-> + */
-> +struct iommu_ioas_copy {
-> +	__u32 size;
-> +	__u32 flags;
-> +	__u32 dst_ioas_id;
-> +	__u32 src_ioas_id;
-> +	__aligned_u64 length;
-> +	__aligned_u64 dst_iova;
-> +	__aligned_u64 src_iova;
-> +};
-> +#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
-> +
-> +/**
-> + * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
-> + * @size: sizeof(struct iommu_ioas_unmap)
-> + * @ioas_id: IOAS ID to change the mapping of
-> + * @iova: IOVA to start the unmapping at
-> + * @length: Number of bytes to unmap, and return back the bytes unmapped
-> + *
-> + * Unmap an IOVA range. The iova/length must be a superset of a previously
-> + * mapped range used with IOMMU_IOAS_MAP or IOMMU_IOAS_COPY. Splitting or
-> + * truncating ranges is not allowed. The values 0 to U64_MAX will unmap
-> + * everything.
-> + */
-> +struct iommu_ioas_unmap {
-> +	__u32 size;
-> +	__u32 ioas_id;
-> +	__aligned_u64 iova;
-> +	__aligned_u64 length;
-> +};
-> +#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
-> +
-> +/**
-> + * enum iommufd_option - ioctl(IOMMU_OPTION_RLIMIT_MODE) and
-> + *                       ioctl(IOMMU_OPTION_HUGE_PAGES)
-> + * @IOMMU_OPTION_RLIMIT_MODE:
-> + *    Change how RLIMIT_MEMLOCK accounting works. The caller must have privilege
-> + *    to invoke this. Value 0 (default) is user based accouting, 1 uses process
-> + *    based accounting. Global option, object_id must be 0
-> + * @IOMMU_OPTION_HUGE_PAGES:
-> + *    Value 1 (default) allows contiguous pages to be combined when generating
-> + *    iommu mappings. Value 0 disables combining, everything is mapped to
-> + *    PAGE_SIZE. This can be useful for benchmarking.  This is a per-IOAS
-> + *    option, the object_id must be the IOAS ID.
-> + */
-> +enum iommufd_option {
-> +	IOMMU_OPTION_RLIMIT_MODE = 0,
-> +	IOMMU_OPTION_HUGE_PAGES = 1,
-> +};
-> +
-> +/**
-> + * enum iommufd_option_ops - ioctl(IOMMU_OPTION_OP_SET) and
-> + *                           ioctl(IOMMU_OPTION_OP_GET)
-> + * @IOMMU_OPTION_OP_SET: Set the option's value
-> + * @IOMMU_OPTION_OP_GET: Get the option's value
-> + */
-> +enum iommufd_option_ops {
-> +	IOMMU_OPTION_OP_SET = 0,
-> +	IOMMU_OPTION_OP_GET = 1,
-> +};
-> +
-> +/**
-> + * struct iommu_option - iommu option multiplexer
-> + * @size: sizeof(struct iommu_option)
-> + * @option_id: One of enum iommufd_option
-> + * @op: One of enum iommufd_option_ops
-> + * @__reserved: Must be 0
-> + * @object_id: ID of the object if required
-> + * @val64: Option value to set or value returned on get
-> + *
-> + * Change a simple option value. This multiplexor allows controlling options
-> + * on objects. IOMMU_OPTION_OP_SET will load an option and IOMMU_OPTION_OP_GET
-> + * will return the current value.
-> + */
-> +struct iommu_option {
-> +	__u32 size;
-> +	__u32 option_id;
-> +	__u16 op;
-> +	__u16 __reserved;
-> +	__u32 object_id;
-> +	__aligned_u64 val64;
-> +};
-> +#define IOMMU_OPTION _IO(IOMMUFD_TYPE, IOMMUFD_CMD_OPTION)
-> +
-> +/**
-> + * enum iommufd_vfio_ioas_op - IOMMU_VFIO_IOAS_* ioctls
-> + * @IOMMU_VFIO_IOAS_GET: Get the current compatibility IOAS
-> + * @IOMMU_VFIO_IOAS_SET: Change the current compatibility IOAS
-> + * @IOMMU_VFIO_IOAS_CLEAR: Disable VFIO compatibility
-> + */
-> +enum iommufd_vfio_ioas_op {
-> +	IOMMU_VFIO_IOAS_GET = 0,
-> +	IOMMU_VFIO_IOAS_SET = 1,
-> +	IOMMU_VFIO_IOAS_CLEAR = 2,
-> +};
-> +
-> +/**
-> + * struct iommu_vfio_ioas - ioctl(IOMMU_VFIO_IOAS)
-> + * @size: sizeof(struct iommu_vfio_ioas)
-> + * @ioas_id: For IOMMU_VFIO_IOAS_SET the input IOAS ID to set
-> + *           For IOMMU_VFIO_IOAS_GET will output the IOAS ID
-> + * @op: One of enum iommufd_vfio_ioas_op
-> + * @__reserved: Must be 0
-> + *
-> + * The VFIO compatibility support uses a single ioas because VFIO APIs do not
-> + * support the ID field. Set or Get the IOAS that VFIO compatibility will use.
-> + * When VFIO_GROUP_SET_CONTAINER is used on an iommufd it will get the
-> + * compatibility ioas, either by taking what is already set, or auto creating
-> + * one. From then on VFIO will continue to use that ioas and is not effected by
-> + * this ioctl. SET or CLEAR does not destroy any auto-created IOAS.
-> + */
-> +struct iommu_vfio_ioas {
-> +	__u32 size;
-> +	__u32 ioas_id;
-> +	__u16 op;
-> +	__u16 __reserved;
-> +};
-> +#define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
-> +
-> +/**
-> + * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
-> + * @size: sizeof(struct iommu_hwpt_alloc)
-> + * @flags: Must be 0
-> + * @dev_id: The device to allocate this HWPT for
-> + * @pt_id: The IOAS to connect this HWPT to
-> + * @out_hwpt_id: The ID of the new HWPT
-> + * @__reserved: Must be 0
-> + *
-> + * Explicitly allocate a hardware page table object. This is the same object
-> + * type that is returned by iommufd_device_attach() and represents the
-> + * underlying iommu driver's iommu_domain kernel object.
-> + *
-> + * A HWPT will be created with the IOVA mappings from the given IOAS.
-> + */
-> +struct iommu_hwpt_alloc {
-> +	__u32 size;
-> +	__u32 flags;
-> +	__u32 dev_id;
-> +	__u32 pt_id;
-> +	__u32 out_hwpt_id;
-> +	__u32 __reserved;
-> +};
-> +#define IOMMU_HWPT_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_ALLOC)
-> +
-> +/**
-> + * struct iommu_hw_info_vtd - Intel VT-d hardware information
-> + *
-> + * @flags: Must be 0
-> + * @__reserved: Must be 0
-> + *
-> + * @cap_reg: Value of Intel VT-d capability register defined in VT-d spec
-> + *           section 11.4.2 Capability Register.
-> + * @ecap_reg: Value of Intel VT-d capability register defined in VT-d spec
-> + *            section 11.4.3 Extended Capability Register.
-> + *
-> + * User needs to understand the Intel VT-d specification to decode the
-> + * register value.
-> + */
-> +struct iommu_hw_info_vtd {
-> +	__u32 flags;
-> +	__u32 __reserved;
-> +	__aligned_u64 cap_reg;
-> +	__aligned_u64 ecap_reg;
-> +};
-> +
-> +/**
-> + * enum iommu_hw_info_type - IOMMU Hardware Info Types
-> + * @IOMMU_HW_INFO_TYPE_NONE: Used by the drivers that do not report hardware
-> + *                           info
-> + * @IOMMU_HW_INFO_TYPE_INTEL_VTD: Intel VT-d iommu info type
-> + */
-> +enum iommu_hw_info_type {
-> +	IOMMU_HW_INFO_TYPE_NONE,
-> +	IOMMU_HW_INFO_TYPE_INTEL_VTD,
-> +};
-> +
-> +/**
-> + * struct iommu_hw_info - ioctl(IOMMU_GET_HW_INFO)
-> + * @size: sizeof(struct iommu_hw_info)
-> + * @flags: Must be 0
-> + * @dev_id: The device bound to the iommufd
-> + * @data_len: Input the length of a user buffer in bytes. Output the length of
-> + *            data that kernel supports
-> + * @data_uptr: User pointer to a user-space buffer used by the kernel to fill
-> + *             the iommu type specific hardware information data
-> + * @out_data_type: Output the iommu hardware info type as defined in the enum
-> + *                 iommu_hw_info_type.
-> + * @__reserved: Must be 0
-> + *
-> + * Query an iommu type specific hardware information data from an iommu behind
-> + * a given device that has been bound to iommufd. This hardware info data will
-> + * be used to sync capabilities between the virtual iommu and the physical
-> + * iommu, e.g. a nested translation setup needs to check the hardware info, so
-> + * a guest stage-1 page table can be compatible with the physical iommu.
-> + *
-> + * To capture an iommu type specific hardware information data, @data_uptr and
-> + * its length @data_len must be provided. Trailing bytes will be zeroed if the
-> + * user buffer is larger than the data that kernel has. Otherwise, kernel only
-> + * fills the buffer using the given length in @data_len. If the ioctl succeeds,
-> + * @data_len will be updated to the length that kernel actually supports,
-> + * @out_data_type will be filled to decode the data filled in the buffer
-> + * pointed by @data_uptr. Input @data_len == zero is allowed.
-> + */
-> +struct iommu_hw_info {
-> +	__u32 size;
-> +	__u32 flags;
-> +	__u32 dev_id;
-> +	__u32 data_len;
-> +	__aligned_u64 data_uptr;
-> +	__u32 out_data_type;
-> +	__u32 __reserved;
-> +};
-> +#define IOMMU_GET_HW_INFO _IO(IOMMUFD_TYPE, IOMMUFD_CMD_GET_HW_INFO)
-> +#endif
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 1f3f3333a4..0d74ee999a 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1414,9 +1414,16 @@ struct kvm_device_attr {
->  	__u64	addr;		/* userspace address of attr data */
->  };
->  
-> -#define  KVM_DEV_VFIO_GROUP			1
-> -#define   KVM_DEV_VFIO_GROUP_ADD			1
-> -#define   KVM_DEV_VFIO_GROUP_DEL			2
-> +#define  KVM_DEV_VFIO_FILE			1
-> +
-> +#define   KVM_DEV_VFIO_FILE_ADD			1
-> +#define   KVM_DEV_VFIO_FILE_DEL			2
-> +
-> +/* KVM_DEV_VFIO_GROUP aliases are for compile time uapi compatibility */
-> +#define  KVM_DEV_VFIO_GROUP	KVM_DEV_VFIO_FILE
-> +
-> +#define   KVM_DEV_VFIO_GROUP_ADD	KVM_DEV_VFIO_FILE_ADD
-> +#define   KVM_DEV_VFIO_GROUP_DEL	KVM_DEV_VFIO_FILE_DEL
->  #define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE		3
->  
->  enum kvm_device_type {
-> diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> index 16db89071e..7326ace436 100644
-> --- a/linux-headers/linux/vfio.h
-> +++ b/linux-headers/linux/vfio.h
-> @@ -677,11 +677,60 @@ enum {
->   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
->   *					      struct vfio_pci_hot_reset_info)
->   *
-> + * This command is used to query the affected devices in the hot reset for
-> + * a given device.
-> + *
-> + * This command always reports the segment, bus, and devfn information for
-> + * each affected device, and selectively reports the group_id or devid per
-> + * the way how the calling device is opened.
-> + *
-> + *	- If the calling device is opened via the traditional group/container
-> + *	  API, group_id is reported.  User should check if it has owned all
-> + *	  the affected devices and provides a set of group fds to prove the
-> + *	  ownership in VFIO_DEVICE_PCI_HOT_RESET ioctl.
-> + *
-> + *	- If the calling device is opened as a cdev, devid is reported.
-> + *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set to indicate this
-> + *	  data type.  All the affected devices should be represented in
-> + *	  the dev_set, ex. bound to a vfio driver, and also be owned by
-> + *	  this interface which is determined by the following conditions:
-> + *	  1) Has a valid devid within the iommufd_ctx of the calling device.
-> + *	     Ownership cannot be determined across separate iommufd_ctx and
-> + *	     the cdev calling conventions do not support a proof-of-ownership
-> + *	     model as provided in the legacy group interface.  In this case
-> + *	     valid devid with value greater than zero is provided in the return
-> + *	     structure.
-> + *	  2) Does not have a valid devid within the iommufd_ctx of the calling
-> + *	     device, but belongs to the same IOMMU group as the calling device
-> + *	     or another opened device that has a valid devid within the
-> + *	     iommufd_ctx of the calling device.  This provides implicit ownership
-> + *	     for devices within the same DMA isolation context.  In this case
-> + *	     the devid value of VFIO_PCI_DEVID_OWNED is provided in the return
-> + *	     structure.
-> + *
-> + *	  A devid value of VFIO_PCI_DEVID_NOT_OWNED is provided in the return
-> + *	  structure for affected devices where device is NOT represented in the
-> + *	  dev_set or ownership is not available.  Such devices prevent the use
-> + *	  of VFIO_DEVICE_PCI_HOT_RESET ioctl outside of the proof-of-ownership
-> + *	  calling conventions (ie. via legacy group accessed devices).  Flag
-> + *	  VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED would be set when all the
-> + *	  affected devices are represented in the dev_set and also owned by
-> + *	  the user.  This flag is available only when
-> + *	  flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
-> + *	  When set, user could invoke VFIO_DEVICE_PCI_HOT_RESET with a zero
-> + *	  length fd array on the calling device as the ownership is validated
-> + *	  by iommufd_ctx.
-> + *
->   * Return: 0 on success, -errno on failure:
->   *	-enospc = insufficient buffer, -enodev = unsupported for device.
->   */
->  struct vfio_pci_dependent_device {
-> -	__u32	group_id;
-> +	union {
-> +		__u32   group_id;
-> +		__u32	devid;
-> +#define VFIO_PCI_DEVID_OWNED		0
-> +#define VFIO_PCI_DEVID_NOT_OWNED	-1
-> +	};
->  	__u16	segment;
->  	__u8	bus;
->  	__u8	devfn; /* Use PCI_SLOT/PCI_FUNC */
-> @@ -690,6 +739,8 @@ struct vfio_pci_dependent_device {
->  struct vfio_pci_hot_reset_info {
->  	__u32	argsz;
->  	__u32	flags;
-> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID		(1 << 0)
-> +#define VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED	(1 << 1)
->  	__u32	count;
->  	struct vfio_pci_dependent_device	devices[];
->  };
-> @@ -700,6 +751,24 @@ struct vfio_pci_hot_reset_info {
->   * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
->   *				    struct vfio_pci_hot_reset)
->   *
-> + * A PCI hot reset results in either a bus or slot reset which may affect
-> + * other devices sharing the bus/slot.  The calling user must have
-> + * ownership of the full set of affected devices as determined by the
-> + * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl.
-> + *
-> + * When called on a device file descriptor acquired through the vfio
-> + * group interface, the user is required to provide proof of ownership
-> + * of those affected devices via the group_fds array in struct
-> + * vfio_pci_hot_reset.
-> + *
-> + * When called on a direct cdev opened vfio device, the flags field of
-> + * struct vfio_pci_hot_reset_info reports the ownership status of the
-> + * affected devices and this ioctl must be called with an empty group_fds
-> + * array.  See above INFO ioctl definition for ownership requirements.
-> + *
-> + * Mixed usage of legacy groups and cdevs across the set of affected
-> + * devices is not supported.
-> + *
->   * Return: 0 on success, -errno on failure.
->   */
->  struct vfio_pci_hot_reset {
-> @@ -828,6 +897,83 @@ struct vfio_device_feature {
->  
->  #define VFIO_DEVICE_FEATURE		_IO(VFIO_TYPE, VFIO_BASE + 17)
->  
-> +/*
-> + * VFIO_DEVICE_BIND_IOMMUFD - _IOR(VFIO_TYPE, VFIO_BASE + 18,
-> + *				   struct vfio_device_bind_iommufd)
-> + * @argsz:	 User filled size of this data.
-> + * @flags:	 Must be 0.
-> + * @iommufd:	 iommufd to bind.
-> + * @out_devid:	 The device id generated by this bind. devid is a handle for
-> + *		 this device/iommufd bond and can be used in IOMMUFD commands.
-> + *
-> + * Bind a vfio_device to the specified iommufd.
-> + *
-> + * User is restricted from accessing the device before the binding operation
-> + * is completed.  Only allowed on cdev fds.
-> + *
-> + * Unbind is automatically conducted when device fd is closed.
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +struct vfio_device_bind_iommufd {
-> +	__u32		argsz;
-> +	__u32		flags;
-> +	__s32		iommufd;
-> +	__u32		out_devid;
-> +};
-> +
-> +#define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 18)
-> +
-> +/*
-> + * VFIO_DEVICE_ATTACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 19,
-> + *					struct vfio_device_attach_iommufd_pt)
-> + * @argsz:	User filled size of this data.
-> + * @flags:	Must be 0.
-> + * @pt_id:	Input the target id which can represent an ioas or a hwpt
-> + *		allocated via iommufd subsystem.
-> + *		Output the input ioas id or the attached hwpt id which could
-> + *		be the specified hwpt itself or a hwpt automatically created
-> + *		for the specified ioas by kernel during the attachment.
-> + *
-> + * Associate the device with an address space within the bound iommufd.
-> + * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.  This is only
-> + * allowed on cdev fds.
-> + *
-> + * If a vfio device is currently attached to a valid hw_pagetable, without doing
-> + * a VFIO_DEVICE_DETACH_IOMMUFD_PT, a second VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl
-> + * passing in another hw_pagetable (hwpt) id is allowed. This action, also known
-> + * as a hw_pagetable replacement, will replace the device's currently attached
-> + * hw_pagetable with a new hw_pagetable corresponding to the given pt_id.
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +struct vfio_device_attach_iommufd_pt {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +	__u32	pt_id;
-> +};
-> +
-> +#define VFIO_DEVICE_ATTACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 19)
-> +
-> +/*
-> + * VFIO_DEVICE_DETACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 20,
-> + *					struct vfio_device_detach_iommufd_pt)
-> + * @argsz:	User filled size of this data.
-> + * @flags:	Must be 0.
-> + *
-> + * Remove the association of the device and its current associated address
-> + * space.  After it, the device should be in a blocking DMA state.  This is only
-> + * allowed on cdev fds.
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +struct vfio_device_detach_iommufd_pt {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +};
-> +
-> +#define VFIO_DEVICE_DETACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 20)
-> +
->  /*
->   * Provide support for setting a PCI VF Token, which is used as a shared
->   * secret between PF and VF drivers.  This feature may only be set on a
+* The size of the cache block for management and prefetch instructions
+* The size of the cache block for zero instructions
+* CBIE support at each privilege level
 
+Other general cache characteristics may also be specified in the discovery
+mechanism.
+"""
+
+as management and prefetch having the same block size and only zero
+potentially having a different size. That looks like a reasonable
+interpretation to me, too. So, we could maybe proceed with assuming we
+can use zicbom_block_size for prefetch, for now. If a platform comes along
+that interpreted the spec differently, requiring prefetch block size to
+be specified separately, then we'll cross that bridge when we get there.
+
+Thanks,
+drew
