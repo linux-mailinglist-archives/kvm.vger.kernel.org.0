@@ -2,157 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF0B67A06DA
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:05:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 887F57A06E6
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239617AbjINOFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 10:05:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        id S239712AbjINOIR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 10:08:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239594AbjINOFs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:05:48 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759741BE3
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:05:44 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-403004a96a4so10876695e9.3
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:05:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1694700343; x=1695305143; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4vYOPKXU60d+VwTOR7zcpHoS7EW3RwNwXYL0thebH04=;
-        b=BP6Wcb2AOM+ZA1fjpijwFsP3sdHAJoKEYJJcOiEAuw9Bv5822B60aaTu/r1wMLw38r
-         2QIMywqGQDP5+byc5UXoS/bedwfxn27igOXZukvL3E96JQI+CJ4/JdA+eludBI2x8sDH
-         LkYwexu+hF0RruyxCEybcA2ChsTCmNRU56SmQ=
+        with ESMTP id S234873AbjINOIP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 10:08:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0FBFBDF
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:07:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694700444;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yHudOf8iuVH8gSyXltnig2N3UnhuMoM7BMALuIknbpk=;
+        b=FoZdgdnZ0hzdCN3TmjNqc+o+UsF7x86j9rKhT7L830aY1R0QKBlZolnOxEhgcuTToujxRB
+        jUyA1PYLj/swq/H3PjIdKnU2/h9m+NKfqrJ4M4lejM8vZ3B292ZZq576BpMvE+g9hsdo8U
+        /UP/zB31UewGioPUqtrZ6UnlPWvpGQo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-99-npEySOqKNEqrt77I8vgPiA-1; Thu, 14 Sep 2023 10:07:22 -0400
+X-MC-Unique: npEySOqKNEqrt77I8vgPiA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40474e7323dso2855075e9.2
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:07:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694700343; x=1695305143;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4vYOPKXU60d+VwTOR7zcpHoS7EW3RwNwXYL0thebH04=;
-        b=V8dYAQb66eqaLr7vlKMmGHdGkKDRrBCHyPR43A5jUvgXj2BOxDBanHpJTyX/CTI3Pv
-         DkQ2RmWUAAuEpwq26oSuH730FL5P6CfFl6QKgH0+Hb5mwjjCrpN/+TYZI8eEItZvswIS
-         MOmFxvlSDwIwq/ozLpADouSZv4VjCw8CmIMhktmm8WyKuIUQU+6TWLAYFOy/4eU6s8zI
-         VITWc5mwlw7l1DOr0kvg3a2a1KkEkrK2tm6rkAfTG+geDUIVvuoMPrUNxB7UcZLNb4Xp
-         C1jZj4DVe4xZ+A7gNB1giMxcmDBhiSNoodtNjxAx1d3CH2ikGnrYein39cqbGlx+uGq2
-         xKPw==
-X-Gm-Message-State: AOJu0Yzixl+rsQDSZH9bYmlS2ckJGZsHU+ZzWqlFgS/J9UQv5pXpx+eJ
-        th3Yc4ZDSndmFEhiDhWgzoJNRQ==
-X-Google-Smtp-Source: AGHT+IEyocHSn+uMmNECVz8ii8zQMuIDZmm28KTVIUinAogCrqYkG9ProhxotsEPQjJrSGm8ruhh3w==
-X-Received: by 2002:a7b:c44b:0:b0:3f7:f2d0:b904 with SMTP id l11-20020a7bc44b000000b003f7f2d0b904mr4542256wmi.8.1694700342824;
-        Thu, 14 Sep 2023 07:05:42 -0700 (PDT)
-Received: from [10.80.67.28] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id z16-20020adfe550000000b0031980294e9fsm1839303wrm.116.2023.09.14.07.05.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 07:05:42 -0700 (PDT)
-Message-ID: <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com>
-Date:   Thu, 14 Sep 2023 15:05:41 +0100
+        d=1e100.net; s=20230601; t=1694700441; x=1695305241;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yHudOf8iuVH8gSyXltnig2N3UnhuMoM7BMALuIknbpk=;
+        b=N2ujqLP3Q9daDe56rwJ63VI//dIsfkCpmvQLol/2VRAPlmUFjYFOsd6leVpCQS666R
+         Fp7rYrv0T9Tr1P/iCXUFSEJgZfCHqLwBoku3r2RTCTZiMfWIsrRmevH0I33mpDL5VuAR
+         nwh+oxaSi91TEOAYkk97TrucTGBtpMzYhVbvdqvL6VOdscpICUYNAsHOOUtY/6IbDJ9o
+         BcBtmVXoCXQc7I5v8jjbdz2uU6cPH8aDkeF2PjfBqPyRDGl1Jhkbjk0OoHi9Rlk67AGl
+         uBC0smzW5gHIeUTjtRjArxTFKvsi/Aw1VbRxULsbcwWCUYBa0JUMGMxAlefzIdBtt/ZC
+         aNWg==
+X-Gm-Message-State: AOJu0YwMFYqSCj1Xy4s2xiJtks3NyXzp6fthdWoXcNhc+8Z9ZzVig2NX
+        /Y3V9GU55jUp++T6syT9EBU6ggrATdqNMH8UcSMvidQHXk7nux/+ULsxOFgmSghGasR4QH7vJXF
+        Fp/GiHR1tTZui
+X-Received: by 2002:a05:600c:22c6:b0:401:b53e:6c57 with SMTP id 6-20020a05600c22c600b00401b53e6c57mr4834844wmg.9.1694700441105;
+        Thu, 14 Sep 2023 07:07:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIqdAUEhMIPyjpv+aXEvjvAdHzcpL3PZnpBEW96reh9Fs+X2mFI8Jv7Jj2JWmjIb6ifqV2MQ==
+X-Received: by 2002:a05:600c:22c6:b0:401:b53e:6c57 with SMTP id 6-20020a05600c22c600b00401b53e6c57mr4834802wmg.9.1694700440710;
+        Thu, 14 Sep 2023 07:07:20 -0700 (PDT)
+Received: from sgarzare-redhat ([46.222.114.183])
+        by smtp.gmail.com with ESMTPSA id c3-20020a056000104300b003143cb109d5sm1889389wrx.14.2023.09.14.07.07.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 07:07:20 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 16:07:13 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v8 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
+Message-ID: <554ugdobcmxraek662xkxjdehcu5ri6awxvhvlvnygyru5zlsx@e7cyloz6so7u>
+References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-From:   andrew.cooper3@citrix.com
-Subject: Re: [PATCH v10 03/38] x86/msr: Add the WRMSRNS instruction support
-Content-Language: en-GB
-To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
-        mhiramat@kernel.org, jiangshanlai@gmail.com
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-4-xin3.li@intel.com>
-In-Reply-To: <20230914044805.301390-4-xin3.li@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/2023 5:47 am, Xin Li wrote:
-> Add an always inline API __wrmsrns() to embed the WRMSRNS instruction
-> into the code.
+Hi Arseniy,
+
+On Mon, Sep 11, 2023 at 11:22:30PM +0300, Arseniy Krasnov wrote:
+>Hello,
 >
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> ---
->  arch/x86/include/asm/msr.h | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>this patchset is first of three parts of another big patchset for
+>MSG_ZEROCOPY flag support:
+>https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 >
-> diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-> index 65ec1965cd28..c284ff9ebe67 100644
-> --- a/arch/x86/include/asm/msr.h
-> +++ b/arch/x86/include/asm/msr.h
-> @@ -97,6 +97,19 @@ static __always_inline void __wrmsr(unsigned int msr, u32 low, u32 high)
->  		     : : "c" (msr), "a"(low), "d" (high) : "memory");
->  }
->  
-> +/*
-> + * WRMSRNS behaves exactly like WRMSR with the only difference being
-> + * that it is not a serializing instruction by default.
-> + */
-> +static __always_inline void __wrmsrns(u32 msr, u32 low, u32 high)
-> +{
-> +	/* Instruction opcode for WRMSRNS; supported in binutils >= 2.40. */
-> +	asm volatile("1: .byte 0x0f,0x01,0xc6\n"
-> +		     "2:\n"
-> +		     _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
-> +		     : : "c" (msr), "a"(low), "d" (high));
-> +}
-> +
->  #define native_rdmsr(msr, val1, val2)			\
->  do {							\
->  	u64 __val = __rdmsr((msr));			\
-> @@ -297,6 +310,11 @@ do {							\
->  
->  #endif	/* !CONFIG_PARAVIRT_XXL */
->  
-> +static __always_inline void wrmsrns(u32 msr, u64 val)
-> +{
-> +	__wrmsrns(msr, val, val >> 32);
-> +}
+>During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+>suggested to split it for three parts to simplify review and merging:
+>
+>1) virtio and vhost updates (for fragged skbs) <--- this patchset
+>2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>   tx completions) and update for Documentation/.
+>3) Updates for tests and utils.
+>
+>This series enables handling of fragged skbs in virtio and vhost parts.
+>Newly logic won't be triggered, because SO_ZEROCOPY options is still
+>impossible to enable at this moment (next bunch of patches from big
+>set above will enable it).
+>
+>I've included changelog to some patches anyway, because there were some
+>comments during review of last big patchset from the link above.
 
-This API works in terms of this series where every WRMSRNS is hidden
-behind a FRED check, but it's an awkward interface to use anywhere else
-in the kernel.
+Thanks, I left some comments on patch 4, the others LGTM.
+Sorry to not having spotted them before, but moving
+virtio_transport_alloc_skb() around the file, made the patch a little
+confusing and difficult to review.
 
-I fully understand that you expect all FRED capable systems to have
-WRMSRNS, but it is not a hard requirement and you will end up with
-simpler (and therefore better) logic by deleting the dependency.
+In addition, I started having failures of test 14 (server: host,
+client: guest), so I looked better to see if there was anything wrong,
+but it fails me even without this series applied.
 
-As a "normal" user of the WRMSR APIs, the programmer only cares about:
+It happens to me intermittently (~30%), does it happen to you?
+Can you take a look at it?
 
-1) wrmsr() -> needs to be serialising
-2) wrmsr_ns() -> safe to be non-serialising
+host$ ./vsock_test --mode=server --control-port=12345 --peer-cid=4
+...
+14 - SOCK_STREAM virtio skb merge...expected recv(2) returns 8 bytes, got 3
 
+guest$ ./vsock_test --mode=client --control-host=192.168.133.2 --control-port=12345 --peer-cid=2
 
-In Xen, I added something of the form:
+Thanks,
+Stefano
 
-/* Non-serialising WRMSR, when available.  Falls back to a serialising
-WRMSR. */
-static inline void wrmsr_ns(uint32_t msr, uint32_t lo, uint32_t hi)
-{
-    /*
-     * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant CS
-     * prefix to avoid a trailing NOP.
-     */
-    alternative_input(".byte 0x2e; wrmsr",
-                      ".byte 0x0f,0x01,0xc6", X86_FEATURE_WRMSRNS,
-                      "c" (msr), "a" (lo), "d" (hi));
-}
-
-and despite what Juergen said, I'm going to recommend that you do wire
-this through the paravirt infrastructure, for the benefit of regular
-users having a nice API, not because XenPV is expecting to do something
-wildly different here.
-
-
-I'd actually go as far as suggesting that you break patches 1-3 into
-different series and e.g. update the regular context switch path to use
-the WRMSRNS-falling-back-to-WRMSR helpers, just to get started.
-
-~Andrew
