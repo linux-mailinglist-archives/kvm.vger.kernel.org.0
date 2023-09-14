@@ -2,163 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CBF579FD0D
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 09:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9570279FD1D
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 09:18:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231853AbjINHQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 03:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46502 "EHLO
+        id S232721AbjINHSl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 03:18:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbjINHQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 03:16:56 -0400
+        with ESMTP id S231857AbjINHSh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 03:18:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16EFA91
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 00:16:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32030CE5
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 00:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694675764;
+        s=mimecast20190719; t=1694675874;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eC3Q4tzSYTsbLn58OTI918IEI3Pmjt2ebY6pz298m/8=;
-        b=OYdcSxpGdzHZkypaZKMxt5jIPYVhFVLHxQ/RdMk3PP80yf+nikmWoVynQnseRXjXx8SX3Z
-        dj9ltr/oKp1yOriIjvwNnRxrywuui9eFgVOaP+MdvT1z2hXbq4ycSUdNefFHyo6N2/kwUJ
-        swnI11Xv0p0MuwImgJS9sR8IJ9tzkN8=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=eEyUVXw0mWMHoikQx5FXX/6OXRLTpxgiWnfiglWGV8E=;
+        b=M9Nuf+OuEZbsEEiwAef+d9dmar2CI9bEITwpbK5f2C0gMlXqUhGT4D27GEO1fQjYJeZXs8
+        sfB27GS7bbK6BKQWIBRCw6cCFZsnnxiw1h5s3Yo4o+6POtl72HjZrVMDLPz3Zj3r9c0mS3
+        ndIeTiEUcmRsJxPcSDXy2saGSh1HgfY=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-171-R-bYe_lAN-WV3WYE50_k1g-1; Thu, 14 Sep 2023 03:16:02 -0400
-X-MC-Unique: R-bYe_lAN-WV3WYE50_k1g-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3ab244d5c9cso955488b6e.3
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 00:16:02 -0700 (PDT)
+ us-mta-445--VqWv2gQNBGip-r-ZAGMYw-1; Thu, 14 Sep 2023 03:17:53 -0400
+X-MC-Unique: -VqWv2gQNBGip-r-ZAGMYw-1
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6b9cf208fb5so819104a34.3
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 00:17:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694675762; x=1695280562;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eC3Q4tzSYTsbLn58OTI918IEI3Pmjt2ebY6pz298m/8=;
-        b=LeII4f6joH6eoS16W0nP8OK7FqJl+2gAqb+kxm0AFpOhcHLe3fqUw6pJokl0m6UerX
-         2BzBJmQMhUnFlYIK0AAfFAHzvG0pxppUdlCXqn/1BzsEVjsXeGZMi4TiLKAeJEh0l0Ol
-         0xwjLD5d++bcP2H/+VXEa7g9KBBnH37sY19NTayxiG1OBbsTksxNzYxZQ4gnKL62mPqj
-         LaFgQtZD2RCBvl9y/OfhK9pewF+zhVpccZE0OsrKchGrtv+cMweIGV7tF6hk9cQlsbLW
-         VE3xEEpC6zohiXGbudV6sTxcQMHHoAE5spCZ6M2TqtOJPYi0BTrXoy2k86/xCAN7twqD
-         6tiA==
-X-Gm-Message-State: AOJu0YxcnEGAa2qXmu3A5AZ+/DeD0KjkCmyegweJ9l2x1DD0zu9KiZZA
-        vkfpYvCx36FIq+dhV6naTFoYictLI1g+x8fqbbE1xhcJsfdwl7rNEWblxSX4gyGqCbv3b1NAaaH
-        0P7UIOIyn42Hr
-X-Received: by 2002:a05:6808:23c9:b0:3a8:4903:5688 with SMTP id bq9-20020a05680823c900b003a849035688mr5939020oib.34.1694675762029;
-        Thu, 14 Sep 2023 00:16:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG1dHblLDCutO1e4SrBBOXVzPFTKh/pwI1PBXkNsyUyD3N+1Zj3QTMPNbg93xvLyuk+507vxw==
-X-Received: by 2002:a05:6808:23c9:b0:3a8:4903:5688 with SMTP id bq9-20020a05680823c900b003a849035688mr5939012oib.34.1694675761799;
-        Thu, 14 Sep 2023 00:16:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694675872; x=1695280672;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eEyUVXw0mWMHoikQx5FXX/6OXRLTpxgiWnfiglWGV8E=;
+        b=BGNx9/D4n2H/FL7t8qc7VRAVYhwZriwzJ9K4D5T7xeS3OIyVxKR9l0eS1p/tZ4Ke+p
+         9Jtx7xPhIYHP/j5YvwVklp2HmBqBlq4cSXRiRZb1nxmga4sWq8p94fwuZVujqdE1FME0
+         8Z61qCVvQGfidE/f2OHVBwLxIkhD8l676Z1sAmS5DT8vL2GiY2ASULmRrwyd+cpK/S3T
+         UtAymAnSBBKL3Z03CtCUSV3fkVzmjbM3O/yuc6UKj8baeCSa+QaEI828K2lsG46agmTl
+         l3iL/oxaMC2skKL9811aCR1+XJV688UZd3SSvP2kpjYKO0buspAYgT3MN1EKF1thgfUF
+         q8Xw==
+X-Gm-Message-State: AOJu0YyXXIzTgBt6XliRGMfAzJ2Y9ZzWriZDnGaDfFOOQhNSGUZCk45U
+        cUuMOeRj8dBP3LhWXqGFVz1zDwhHUlT2BFT42hzJt0xPN4MzXARUZQAo3C99Rnr4yMS8npCRM8f
+        btsWMxl+MR+Le
+X-Received: by 2002:a9d:4b15:0:b0:6b9:ed64:1423 with SMTP id q21-20020a9d4b15000000b006b9ed641423mr5620089otf.2.1694675872309;
+        Thu, 14 Sep 2023 00:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOAdtS3UbOt9zvLXyyE0sF8G5QOYDAkMf+vwqDvXVMptC9CKtp58xa3OrQHXJOdPOz3qvAzA==
+X-Received: by 2002:a9d:4b15:0:b0:6b9:ed64:1423 with SMTP id q21-20020a9d4b15000000b006b9ed641423mr5620068otf.2.1694675871980;
+        Thu, 14 Sep 2023 00:17:51 -0700 (PDT)
 Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id t25-20020a9d66d9000000b006b9a98b9659sm423555otm.19.2023.09.14.00.15.58
+        by smtp.gmail.com with ESMTPSA id s189-20020a4a51c6000000b0056e67f2f92asm380519ooa.22.2023.09.14.00.17.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 00:16:01 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 04:15:54 -0300
+        Thu, 14 Sep 2023 00:17:51 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 04:17:41 -0300
 From:   Leonardo Bras <leobras@redhat.com>
-To:     Tyler Stachecki <stachecki.tyler@gmail.com>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        dgilbert@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, bp@alien8.de,
-        Tyler Stachecki <tstachecki@bloomberg.net>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
-Message-ID: <ZQKzKkDEsY1n9dB1@redhat.com>
-References: <20230914010003.358162-1-tstachecki@bloomberg.net>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 06/17] riscv: qspinlock: Introduce combo spinlock
+Message-ID: <ZQKzlZ69M4nwqJt_@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-7-guoren@kernel.org>
+ <ZP2jL06TYGYVBhTN@gmail.com>
+ <ZQIdbbzW79s5tfiI@redhat.com>
+ <ZQIgTyJ-DETrK8k3@redhat.com>
+ <CAJF2gTQ=K_2km_AUZj1Vg8q2XgWB49-+nxViAa1mSAfppp6dnA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230914010003.358162-1-tstachecki@bloomberg.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJF2gTQ=K_2km_AUZj1Vg8q2XgWB49-+nxViAa1mSAfppp6dnA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 09:00:03PM -0400, Tyler Stachecki wrote:
-> Live-migrations under qemu result in guest corruption when
-> the following three conditions are all met:
-> 
->   * The source host CPU has capabilities that itself
->     extend that of the guest CPU fpstate->user_xfeatures
-> 
->   * The source kernel emits guest_fpu->user_xfeatures
->     with respect to the host CPU (i.e. it *does not* have
->     the "Fixes:" commit)
-> 
->   * The destination kernel enforces that the xfeatures
->     in the buffer given to KVM_SET_IOCTL are compatible
->     with the guest CPU (i.e., it *does* have the "Fixes:"
->     commit)
-> 
-> When these conditions are met, the semantical changes to
-> fpstate->user_features trigger a subtle bug in qemu that
-> results in qemu failing to put the XSAVE architectural
-> state into KVM.
-> 
-> qemu then both ceases to put the remaining (non-XSAVE) x86
-> architectural state into KVM and makes the fateful mistake
-> of resuming the guest anyways. This usually results in
-> immediate guest corruption, silent or not.
-> 
-> Due to the grave nature of this qemu bug, attempt to
-> retain behavior of old kernels by clamping the xfeatures
-> specified in the buffer given to KVM_SET_IOCTL such that
-> it aligns with the guests fpstate->user_xfeatures instead
-> of returning an error.
+On Thu, Sep 14, 2023 at 12:49:45PM +0800, Guo Ren wrote:
+> On Thu, Sep 14, 2023 at 4:49 AM Leonardo Bras <leobras@redhat.com> wrote:
+> >
+> > On Wed, Sep 13, 2023 at 05:37:01PM -0300, Leonardo Bras wrote:
+> > > On Sun, Sep 10, 2023 at 07:06:23AM -0400, Guo Ren wrote:
+> > > > On Sun, Sep 10, 2023 at 04:29:00AM -0400, guoren@kernel.org wrote:
+> > > > > From: Guo Ren <guoren@linux.alibaba.com>
+> > > > >
+> > > > > Combo spinlock could support queued and ticket in one Linux Image and
+> > > > > select them during boot time via errata mechanism. Here is the func
+> > > > > size (Bytes) comparison table below:
+> > > > >
+> > > > > TYPE                      : COMBO | TICKET | QUEUED
+> > > > > arch_spin_lock            : 106   | 60     | 50
+> > > > > arch_spin_unlock  : 54    | 36     | 26
+> > > > > arch_spin_trylock : 110   | 72     | 54
+> > > > > arch_spin_is_locked       : 48    | 34     | 20
+> > > > > arch_spin_is_contended    : 56    | 40     | 24
+> > > > > rch_spin_value_unlocked   : 48    | 34     | 24
+> > > > >
+> > > > > One example of disassemble combo arch_spin_unlock:
+> > > > >    0xffffffff8000409c <+14>:    nop                # detour slot
+> > > > >    0xffffffff800040a0 <+18>:    fence   rw,w       # queued spinlock start
+> > > > >    0xffffffff800040a4 <+22>:    sb      zero,0(a4) # queued spinlock end
+> > > > >    0xffffffff800040a8 <+26>:    ld      s0,8(sp)
+> > > > >    0xffffffff800040aa <+28>:    addi    sp,sp,16
+> > > > >    0xffffffff800040ac <+30>:    ret
+> > > > >    0xffffffff800040ae <+32>:    lw      a5,0(a4)   # ticket spinlock start
+> > > > >    0xffffffff800040b0 <+34>:    sext.w  a5,a5
+> > > > >    0xffffffff800040b2 <+36>:    fence   rw,w
+> > > > >    0xffffffff800040b6 <+40>:    addiw   a5,a5,1
+> > > > >    0xffffffff800040b8 <+42>:    slli    a5,a5,0x30
+> > > > >    0xffffffff800040ba <+44>:    srli    a5,a5,0x30
+> > > > >    0xffffffff800040bc <+46>:    sh      a5,0(a4)   # ticket spinlock end
+> > > > >    0xffffffff800040c0 <+50>:    ld      s0,8(sp)
+> > > > >    0xffffffff800040c2 <+52>:    addi    sp,sp,16
+> > > > >    0xffffffff800040c4 <+54>:    ret
+> > > > >
+> > > > > The qspinlock is smaller and faster than ticket-lock when all are in
+> > > > > fast-path, and combo spinlock could provide a compatible Linux Image
+> > > > > for different micro-arch design (weak/strict fwd guarantee LR/SC)
+> > > > > processors.
+> > > > >
+> > > > > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > > > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > > > > ---
+> > > > >  arch/riscv/Kconfig                |  9 +++-
+> > > > >  arch/riscv/include/asm/spinlock.h | 78 ++++++++++++++++++++++++++++++-
+> > > > >  arch/riscv/kernel/setup.c         | 14 ++++++
+> > > > >  3 files changed, 98 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > > > index 7f39bfc75744..4bcff2860f48 100644
+> > > > > --- a/arch/riscv/Kconfig
+> > > > > +++ b/arch/riscv/Kconfig
+> > > > > @@ -473,7 +473,7 @@ config NODES_SHIFT
+> > > > >
+> > > > >  choice
+> > > > >   prompt "RISC-V spinlock type"
+> > > > > - default RISCV_TICKET_SPINLOCKS
+> > > > > + default RISCV_COMBO_SPINLOCKS
+> > > > >
+> > > > >  config RISCV_TICKET_SPINLOCKS
+> > > > >   bool "Using ticket spinlock"
+> > > > > @@ -485,6 +485,13 @@ config RISCV_QUEUED_SPINLOCKS
+> > > > >   help
+> > > > >     Make sure your micro arch LL/SC has a strong forward progress guarantee.
+> > > > >     Otherwise, stay at ticket-lock.
+> > > > > +
+> > > > > +config RISCV_COMBO_SPINLOCKS
+> > > > > + bool "Using combo spinlock"
+> > > > > + depends on SMP && MMU
+> > > > > + select ARCH_USE_QUEUED_SPINLOCKS
+> > > > > + help
+> > > > > +   Select queued spinlock or ticket-lock via errata.
+> > > > >  endchoice
+> > > > >
+> > > > >  config RISCV_ALTERNATIVE
+> > > > > diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
+> > > > > index c644a92d4548..8ea0fee80652 100644
+> > > > > --- a/arch/riscv/include/asm/spinlock.h
+> > > > > +++ b/arch/riscv/include/asm/spinlock.h
+> > > > > @@ -7,11 +7,85 @@
+> > > > >  #define _Q_PENDING_LOOPS (1 << 9)
+> > > > >  #endif
+> > > > >
+> > > > > +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> > > > > +#include <asm-generic/ticket_spinlock.h>
+> > > > > +
+> > > > > +#undef arch_spin_is_locked
+> > > > > +#undef arch_spin_is_contended
+> > > > > +#undef arch_spin_value_unlocked
+> > > > > +#undef arch_spin_lock
+> > > > > +#undef arch_spin_trylock
+> > > > > +#undef arch_spin_unlock
+> > > > > +
+> > > > > +#include <asm-generic/qspinlock.h>
+> > > > > +#include <linux/jump_label.h>
+> > > > > +
+> > > > > +#undef arch_spin_is_locked
+> > > > > +#undef arch_spin_is_contended
+> > > > > +#undef arch_spin_value_unlocked
+> > > > > +#undef arch_spin_lock
+> > > > > +#undef arch_spin_trylock
+> > > > > +#undef arch_spin_unlock
+> > > > Sorry, I forgot __no_arch_spinlock_redefine advice here. I would add it in v12.
+> > > > https://lore.kernel.org/linux-riscv/4cc7113a-0e4e-763a-cba2-7963bcd26c7a@redhat.com/
+> > > >
+> > >
+> > > Please check a reply to a previous patch I sent earlier: I think these
+> > > #undef can be avoided.
+> > >
+> > > > > +
+> > > > > +DECLARE_STATIC_KEY_TRUE(combo_qspinlock_key);
+> > > > > +
+> > > > > +static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         queued_spin_lock(lock);
+> > > > > + else
+> > > > > +         ticket_spin_lock(lock);
+> > > > > +}
+> > > > > +
+> > > > > +static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         return queued_spin_trylock(lock);
+> > > > > + else
+> > > > > +         return ticket_spin_trylock(lock);
+> > > > > +}
+> > > > > +
+> > > > > +static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         queued_spin_unlock(lock);
+> > > > > + else
+> > > > > +         ticket_spin_unlock(lock);
+> > > > > +}
+> > > > > +
+> > > > > +static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         return queued_spin_value_unlocked(lock);
+> > > > > + else
+> > > > > +         return ticket_spin_value_unlocked(lock);
+> > > > > +}
+> > > > > +
+> > > > > +static __always_inline int arch_spin_is_locked(arch_spinlock_t *lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         return queued_spin_is_locked(lock);
+> > > > > + else
+> > > > > +         return ticket_spin_is_locked(lock);
+> > > > > +}
+> > > > > +
+> > > > > +static __always_inline int arch_spin_is_contended(arch_spinlock_t *lock)
+> > > > > +{
+> > > > > + if (static_branch_likely(&combo_qspinlock_key))
+> > > > > +         return queued_spin_is_contended(lock);
+> > > > > + else
+> > > > > +         return ticket_spin_is_contended(lock);
+> > > > > +}
+> > > > > +#else /* CONFIG_RISCV_COMBO_SPINLOCKS */
+> > > > > +
+> >
+> > Also, those functions all reproduce the same behavior, so maybe it would be
+> > better to keep that behavior in a macro such as:
+> >
+> > #define COMBO_SPINLOCK_DECLARE(f)                                       \
+> > static __always_inline int arch_spin_ ## f(arch_spinlock_t *lock)       \
+> > {                                                                       \
+> >         if (static_branch_likely(&combo_qspinlock_key))                 \
+> >                 return queued_spin_ ## f(lock);                         \
+> >         else                                                            \
+> >                 return ticket_spin_ ## f(lock);                         \
+> > }
+> >
+> > COMBO_SPINLOCK_DECLARE(lock)
+> > COMBO_SPINLOCK_DECLARE(trylock)
+> > COMBO_SPINLOCK_DECLARE(unlock)
+> > COMBO_SPINLOCK_DECLARE(value_unlocked)
+> > COMBO_SPINLOCK_DECLARE(is_locked)
+> > COMBO_SPINLOCK_DECLARE(is_contended)
+> >
+> > Does that make sense?
+> Yeah, thanks. I would try. You improved my macro skills. :)
 
-So, IIUC, the xfeatures from the source guest will be different than the 
-xfeatures of the target (destination) guest. Is that correct?
-
-It does not seem right to me. I mean, from the guest viewpoint, some 
-features will simply vanish during execution, and this could lead to major 
-issues in the guest.
-
-The idea here is that if the target (destination) host can't provide those 
-features for the guest, then migration should fail.
-
-I mean, qemu should fail the migration, and that's correct behavior.
-Is it what is happening?
-
-Regards,
-Leo
+Glad to be of any help :)
 
 > 
-> Fixes: ad856280ddea ("x86/kvm/fpu: Limit guest user_xfeatures to supported bits of XCR0")
-> Cc: stable@vger.kernel.org
-> Cc: Leonardo Bras <leobras@redhat.com>
-> Signed-off-by: Tyler Stachecki <tstachecki@bloomberg.net>
-> ---
->  arch/x86/kvm/x86.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> >
+> > Thanks!
+> > Leo
+> >
+> >
+> > > > >  #ifdef CONFIG_QUEUED_SPINLOCKS
+> > > > >  #include <asm/qspinlock.h>
+> > > > > -#include <asm/qrwlock.h>
+> > > > >  #else
+> > > > > -#include <asm-generic/spinlock.h>
+> > > > > +#include <asm-generic/ticket_spinlock.h>
+> > > > >  #endif
+> > > > >
+> > > > > +#endif /* CONFIG_RISCV_COMBO_SPINLOCKS */
+> > > > > +
+> > > > > +#include <asm/qrwlock.h>
+> > > > > +
+> > > > >  #endif /* __ASM_RISCV_SPINLOCK_H */
+> > > > > diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> > > > > index 32c2e1eb71bd..a447cf360a18 100644
+> > > > > --- a/arch/riscv/kernel/setup.c
+> > > > > +++ b/arch/riscv/kernel/setup.c
+> > > > > @@ -269,6 +269,18 @@ static void __init parse_dtb(void)
+> > > > >  #endif
+> > > > >  }
+> > > > >
+> > > > > +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> > > > > +DEFINE_STATIC_KEY_TRUE(combo_qspinlock_key);
+> > > > > +EXPORT_SYMBOL(combo_qspinlock_key);
+> > > > > +#endif
+> > > > > +
+> > > > > +static void __init riscv_spinlock_init(void)
+> > > > > +{
+> > > > > +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> > > > > + static_branch_disable(&combo_qspinlock_key);
+> > > > > +#endif
+> > > > > +}
+> > > > > +
+> > > > >  extern void __init init_rt_signal_env(void);
+> > > > >
+> > > > >  void __init setup_arch(char **cmdline_p)
+> > > > > @@ -317,6 +329,8 @@ void __init setup_arch(char **cmdline_p)
+> > > > >       riscv_isa_extension_available(NULL, ZICBOM))
+> > > > >           riscv_noncoherent_supported();
+> > > > >   riscv_set_dma_cache_alignment();
+> > > > > +
+> > > > > + riscv_spinlock_init();
+> > > > >  }
+> > > > >
+> > > > >  static int __init topology_init(void)
+> > > > > --
+> > > > > 2.36.1
+> > > > >
+> > > > >
+> > > > > _______________________________________________
+> > > > > linux-riscv mailing list
+> > > > > linux-riscv@lists.infradead.org
+> > > > > http://lists.infradead.org/mailman/listinfo/linux-riscv
+> > > > >
+> > > >
+> >
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 6c9c81e82e65..baad160b592f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5407,11 +5407,21 @@ static void kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
->  static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
->  					struct kvm_xsave *guest_xsave)
->  {
-> +	union fpregs_state *ustate = (union fpregs_state *) guest_xsave->region;
-> +	u64 user_xfeatures = vcpu->arch.guest_fpu.fpstate->user_xfeatures;
-> +
->  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
->  		return 0;
->  
-> -	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
-> -					      guest_xsave->region,
-> +	/*
-> +	 * In previous kernels, kvm_arch_vcpu_create() set the guest's fpstate
-> +	 * based on what the host CPU supported. Recent kernels changed this
-> +	 * and only accept ustate containing xfeatures that the guest CPU is
-> +	 * capable of supporting.
-> +	 */
-> +	ustate->xsave.header.xfeatures &= user_xfeatures;
-> +
-> +	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu, ustate,
->  					      kvm_caps.supported_xcr0,
->  					      &vcpu->arch.pkru);
->  }
+> 
 > -- 
-> 2.30.2
+> Best Regards
+>  Guo Ren
 > 
 
