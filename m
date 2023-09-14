@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A492F79F90B
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B51179F90D
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:51:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234266AbjINDvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 23:51:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
+        id S234279AbjINDvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 23:51:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234197AbjINDvc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 23:51:32 -0400
+        with ESMTP id S234274AbjINDvh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 23:51:37 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E785193
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 20:51:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F6899
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 20:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694663488; x=1726199488;
+  t=1694663493; x=1726199493;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ekv0ksBj/MNS9E1IHSCjapcpIdXM/HpSUStp7qPoMck=;
-  b=msqy4QS8EVOCRJB2Tg0rMWod/K3947DaJCwHuoueCday4W5Kx+UlkWcM
-   7aQU/AyKvTr+w55yPluw4KzqMTrWZo2DYXlsKNJxTDxB3EM8G0BAZBJbR
-   45XcfKJy42Bfs9u/Nk5XdkDbvDaa3VkmxDRHE8GDScmEtZ0HssG6D9Ltb
-   BNjKROtkZfRexoveGs3E89G9YHiX6u2I4obuBrlYcKJn7/oLp8cdglQu5
-   J1TH5xlngXbqAGWEQGkT2Be+h7JqNmL3Fj0JZQVVUEHVbpRINjrO8cwBv
-   EVAYMD6Z+jGfAgnIo0QPW27ym9oP81iuhM95d1AWFFdRW28b1A8jB3xd1
+  bh=hZCUPboW6UfJI06fOT3oOcMz9rEziUW2umb4XG87Vss=;
+  b=Dqwl5KX9e46WTloxQKstUkxcZ7E3SrLTCgspcON9lxn5G2pjZL3zXDh7
+   nbvJeBiMP7NzMJZ50aPbKvUqJ4IURZ7kowCVlY8vSmmFAxSiXhMA1fq0i
+   z4rvoqr2zUkNQbJmzwA/go01qP2a8ZYnTRNhC/YfbZFgwuEloeaK1xRBg
+   SUKWO1Rbb3TyC8+6YnBanfzp0N2Cy1xpxOOauC+LPLqQ6MeIbRf7Onuvb
+   A6XUvP3IsuHTcEcHmpbTtrj2ApjPgU4dP0q9J5iu+Qrf4E4+dp/qaOnpF
+   4yui3m46UBGow99anl5khWmWPYm2qg6nFk0c54P4DBjnfTDL1TQD22efw
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="381528281"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="381528297"
 X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="381528281"
+   d="scan'208";a="381528297"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:51:28 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:51:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="814500537"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="814500547"
 X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="814500537"
+   d="scan'208";a="814500547"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmsmga004.fm.intel.com with ESMTP; 13 Sep 2023 20:51:23 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 13 Sep 2023 20:51:28 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         David Hildenbrand <david@redhat.com>,
@@ -56,9 +56,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, xiaoyao.li@intel.com,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Claudio Fontana <cfontana@suse.de>
-Subject: [RFC PATCH v2 01/21] *** HACK *** linux-headers: Update headers to pull in gmem APIs
-Date:   Wed, 13 Sep 2023 23:50:57 -0400
-Message-Id: <20230914035117.3285885-2-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v2 02/21] RAMBlock: Add support of KVM private gmem
+Date:   Wed, 13 Sep 2023 23:50:58 -0400
+Message-Id: <20230914035117.3285885-3-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230914035117.3285885-1-xiaoyao.li@intel.com>
 References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
@@ -68,131 +68,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch needs to be updated by script
+From: Chao Peng <chao.p.peng@linux.intel.com>
 
-	scripts/update-linux-headers.sh
+Add KVM gmem support to RAMBlock so both normal hva based memory
+and kvm gmem fd based private memory can be associated in one RAMBlock.
 
-once gmem fd support is upstreamed in Linux kernel.
+Introduce new flag RAM_KVM_GMEM. It calls KVM ioctl to create private
+gmem for the RAMBlock when it's set.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- linux-headers/asm-x86/kvm.h |  3 +++
- linux-headers/linux/kvm.h   | 50 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+ accel/kvm/kvm-all.c     | 17 +++++++++++++++++
+ include/exec/memory.h   |  3 +++
+ include/exec/ramblock.h |  1 +
+ include/sysemu/kvm.h    |  2 ++
+ softmmu/physmem.c       | 18 +++++++++++++++---
+ 5 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-index 2b3a8f7bd2c0..003fb745347c 100644
---- a/linux-headers/asm-x86/kvm.h
-+++ b/linux-headers/asm-x86/kvm.h
-@@ -560,4 +560,7 @@ struct kvm_pmu_event_filter {
- /* x86-specific KVM_EXIT_HYPERCALL flags. */
- #define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
- 
-+#define KVM_X86_DEFAULT_VM	0
-+#define KVM_X86_SW_PROTECTED_VM	1
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 60aacd925393..185ae16d9620 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -4225,3 +4225,20 @@ void query_stats_schemas_cb(StatsSchemaList **result, Error **errp)
+         query_stats_schema_vcpu(first_cpu, &stats_args);
+     }
+ }
 +
- #endif /* _ASM_X86_KVM_H */
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 1f3f3333a4d8..278bed78f98e 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -95,6 +95,19 @@ struct kvm_userspace_memory_region {
- 	__u64 userspace_addr; /* start of the userspace allocated memory */
- };
- 
-+/* for KVM_SET_USER_MEMORY_REGION2 */
-+struct kvm_userspace_memory_region2 {
-+	__u32 slot;
-+	__u32 flags;
-+	__u64 guest_phys_addr;
-+	__u64 memory_size;
-+	__u64 userspace_addr;
-+	__u64 gmem_offset;
-+	__u32 gmem_fd;
-+	__u32 pad1;
-+	__u64 pad2[14];
-+};
++int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp)
++{
++    int fd;
++    struct kvm_create_guest_memfd gmem = {
++        .size = size,
++        /* TODO: to decide whether KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is supported */
++        .flags = flags,
++    };
 +
- /*
-  * The bit 0 ~ bit 15 of kvm_userspace_memory_region::flags are visible for
-  * userspace, other bits are reserved for kvm internal use which are defined
-@@ -102,6 +115,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_PRIVATE		(1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -264,6 +278,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_RISCV_SBI        35
- #define KVM_EXIT_RISCV_CSR        36
- #define KVM_EXIT_NOTIFY           37
-+#define KVM_EXIT_MEMORY_FAULT     38
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -506,6 +521,13 @@ struct kvm_run {
- #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
- 			__u32 flags;
- 		} notify;
-+		/* KVM_EXIT_MEMORY_FAULT */
-+		struct {
-+#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-+			__u64 flags;
-+			__u64 gpa;
-+			__u64 size;
-+		} memory;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -1188,6 +1210,9 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_COUNTER_OFFSET 227
- #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
- #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
-+#define KVM_CAP_USER_MEMORY2 230
-+#define KVM_CAP_MEMORY_ATTRIBUTES 231
-+#define KVM_CAP_VM_TYPES 232
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1462,6 +1487,8 @@ struct kvm_vfio_spapr_tce {
- 					struct kvm_userspace_memory_region)
- #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
- #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-+#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
-+					 struct kvm_userspace_memory_region2)
- 
- /* enable ucontrol for s390 */
- struct kvm_s390_ucas_mapping {
-@@ -2245,4 +2272,27 @@ struct kvm_s390_zpci_op {
- /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
- #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
- 
-+/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-+#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
-+#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
++    fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_GUEST_MEMFD, &gmem);
++    if (fd < 0) {
++        error_setg_errno(errp, errno, "%s: error creating kvm gmem\n", __func__);
++    }
 +
-+struct kvm_memory_attributes {
-+	__u64 address;
-+	__u64 size;
-+	__u64 attributes;
-+	__u64 flags;
-+};
++    return fd;
++}
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 68284428f87c..227cb2578e95 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -235,6 +235,9 @@ typedef struct IOMMUTLBEvent {
+ /* RAM is an mmap-ed named file */
+ #define RAM_NAMED_FILE (1 << 9)
+ 
++/* RAM can be private that has kvm gmem backend */
++#define RAM_KVM_GMEM    (1 << 10)
 +
-+#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+ static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+                                        IOMMUNotifierFlag flags,
+                                        hwaddr start, hwaddr end,
+diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
+index 69c6a5390293..0d158b3909c9 100644
+--- a/include/exec/ramblock.h
++++ b/include/exec/ramblock.h
+@@ -41,6 +41,7 @@ struct RAMBlock {
+     QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
+     int fd;
+     uint64_t fd_offset;
++    int gmem_fd;
+     size_t page_size;
+     /* dirty bitmap used during migration */
+     unsigned long *bmap;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 115f0cca79d1..f5b74c8dd8c5 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -580,4 +580,6 @@ bool kvm_arch_cpu_check_are_resettable(void);
+ bool kvm_dirty_ring_enabled(void);
+ 
+ uint32_t kvm_dirty_ring_size(void);
 +
-+#define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
++int kvm_create_guest_memfd(uint64_t size, uint64_t flags, Error **errp);
+ #endif
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index 3df73542e1fe..2d98a88f41f0 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -1824,6 +1824,16 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+         }
+     }
+ 
++    if (kvm_enabled() && new_block->flags & RAM_KVM_GMEM &&
++        new_block->gmem_fd < 0) {
++        new_block->gmem_fd = kvm_create_guest_memfd(new_block->max_length,
++                                                    0, errp);
++        if (new_block->gmem_fd < 0) {
++            qemu_mutex_unlock_ramlist();
++            return;
++        }
++    }
 +
-+#define KVM_GUEST_MEMFD_ALLOW_HUGEPAGE		(1ULL << 0)
-+
-+struct kvm_create_guest_memfd {
-+	__u64 size;
-+	__u64 flags;
-+	__u64 reserved[6];
-+};
-+
- #endif /* __LINUX_KVM_H */
+     new_ram_size = MAX(old_ram_size,
+               (new_block->offset + new_block->max_length) >> TARGET_PAGE_BITS);
+     if (new_ram_size > old_ram_size) {
+@@ -1885,7 +1895,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+ 
+     /* Just support these ram flags by now. */
+     assert((ram_flags & ~(RAM_SHARED | RAM_PMEM | RAM_NORESERVE |
+-                          RAM_PROTECTED | RAM_NAMED_FILE)) == 0);
++                          RAM_PROTECTED | RAM_NAMED_FILE | RAM_KVM_GMEM)) == 0);
+ 
+     if (xen_enabled()) {
+         error_setg(errp, "-mem-path not supported with Xen");
+@@ -1920,6 +1930,7 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->used_length = size;
+     new_block->max_length = size;
+     new_block->flags = ram_flags;
++    new_block->gmem_fd = -1;
+     new_block->host = file_ram_alloc(new_block, size, fd, readonly,
+                                      !file_size, offset, errp);
+     if (!new_block->host) {
+@@ -1978,7 +1989,7 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
+     Error *local_err = NULL;
+ 
+     assert((ram_flags & ~(RAM_SHARED | RAM_RESIZEABLE | RAM_PREALLOC |
+-                          RAM_NORESERVE)) == 0);
++                          RAM_NORESERVE| RAM_KVM_GMEM)) == 0);
+     assert(!host ^ (ram_flags & RAM_PREALLOC));
+ 
+     size = HOST_PAGE_ALIGN(size);
+@@ -1990,6 +2001,7 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
+     new_block->max_length = max_size;
+     assert(max_size >= size);
+     new_block->fd = -1;
++    new_block->gmem_fd = -1;
+     new_block->page_size = qemu_real_host_page_size();
+     new_block->host = host;
+     new_block->flags = ram_flags;
+@@ -2012,7 +2024,7 @@ RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+ RAMBlock *qemu_ram_alloc(ram_addr_t size, uint32_t ram_flags,
+                          MemoryRegion *mr, Error **errp)
+ {
+-    assert((ram_flags & ~(RAM_SHARED | RAM_NORESERVE)) == 0);
++    assert((ram_flags & ~(RAM_SHARED | RAM_NORESERVE | RAM_KVM_GMEM)) == 0);
+     return qemu_ram_alloc_internal(size, size, NULL, NULL, ram_flags, mr, errp);
+ }
+ 
 -- 
 2.34.1
 
