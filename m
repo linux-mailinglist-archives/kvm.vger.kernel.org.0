@@ -2,300 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 226FF79F9A7
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 06:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B41AC79F9F9
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 07:19:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234391AbjINErR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 00:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41842 "EHLO
+        id S234814AbjINFTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 01:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbjINErQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 00:47:16 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDC11985;
-        Wed, 13 Sep 2023 21:47:11 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A5CC433C7;
-        Thu, 14 Sep 2023 04:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694666831;
-        bh=wbZaz5+7tObBCqYetSuI7E67QYfxbIQdPqh38pxUDkM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=WqtMAThJh+poSSqb29rw2+T7uswV7ggu9hjmdW0p54GfjFvE5U+v+aUxwtxBiN5qF
-         dx/itf36PrheCAzOZSy/zkcNLSR0Ehl8WlbVoJ07IXtOx8OQ7sbYDsD4NtCV7nni+R
-         P1DQU7DelI66+1mEYG4DSJ3APhi4Gbz+SmE1ZWVs9i+SBshr5+cMRD1GaxZw9tnS81
-         rGjCPCOXm9/emeP18Ahwwd/gjhGEJxE1NVdBLHmBPwEfpHy2Q84ufl26YLn1Yz6Jsw
-         foJCWN1ZSVzdLu4whL3Lzlt5NsNmXEdpj/JvoIhsrIkh37JHK8mhA8qgEf0Rz2TvLl
-         yye0bAog9Vqag==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-52f33659d09so529284a12.1;
-        Wed, 13 Sep 2023 21:47:11 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyhaJr3Sxnt7ckfDj3PsXx5W2ErGw/Uvb4Mt0lkKjxGGTjS5RNo
-        zS3/mNU+2z/f/jHbO/3UsO5ijnC1UhG4su4Aa9k=
-X-Google-Smtp-Source: AGHT+IGDCkMlxbyCvE8jVTctTUxULWWRg97NcJe8bPyPSDotvlheW+2ga9D37kmu+fTfTEiyJaskFLRnMEdiN8aT0qc=
-X-Received: by 2002:a05:6402:70e:b0:52e:33ad:4031 with SMTP id
- w14-20020a056402070e00b0052e33ad4031mr3347433edx.40.1694666829899; Wed, 13
- Sep 2023 21:47:09 -0700 (PDT)
+        with ESMTP id S234582AbjINFTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 01:19:15 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890711BCF;
+        Wed, 13 Sep 2023 22:19:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694668751; x=1726204751;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ut3SQsni6+YOQ98PuGqQ9Bg1pmgPTft5nlrIOiIGVkM=;
+  b=e7OkMANML6xlnpazokXtlQqIUB3BI5jl97gLKWKvbi8Nm7j0Nas5bhR6
+   u/BMRopjyULKIQUUptoCt4tXkTQr2D5ImNyYYMtQnIbqW23tS1ayva9af
+   NVoqAsxPpwMh/JPsG7kf8jmX2ZVRrxEooLfbfmWBDXsx3Os8Kk1M33php
+   CcKRhS5LAzlYxVgqEm8NuxHj+SdsGqvnoNec1fHEXMJMLc5YeLVWr6MZY
+   Gdix6FebJILqyVdAcXufnnDI99ctAcPWb4qk33ZNI26D6Ddcy7GsXpAev
+   AC3JKruf1pNQZ+COGOjcfAdhUqHWi90KhdCjYnz01wfE7nAZKzrkJixjz
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382661063"
+X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
+   d="scan'208";a="382661063"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 22:17:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="779488733"
+X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
+   d="scan'208";a="779488733"
+Received: from unknown (HELO fred..) ([172.25.112.68])
+  by orsmga001.jf.intel.com with ESMTP; 13 Sep 2023 22:17:28 -0700
+From:   Xin Li <xin3.li@intel.com>
+To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
+        mhiramat@kernel.org, andrew.cooper3@citrix.com,
+        jiangshanlai@gmail.com
+Subject: [PATCH v10 00/38] x86: enable FRED for x86-64
+Date:   Wed, 13 Sep 2023 21:47:27 -0700
+Message-Id: <20230914044805.301390-1-xin3.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910082911.3378782-6-guoren@kernel.org>
- <ZQIbejhIev5tx6vl@redhat.com>
-In-Reply-To: <ZQIbejhIev5tx6vl@redhat.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Thu, 14 Sep 2023 12:46:56 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTSdjgUaUqhkfTPmJg6Mph+8Ej4j8MeDmfBOmFY5gkTpBQ@mail.gmail.com>
-Message-ID: <CAJF2gTSdjgUaUqhkfTPmJg6Mph+8Ej4j8MeDmfBOmFY5gkTpBQ@mail.gmail.com>
-Subject: Re: [PATCH V11 05/17] riscv: qspinlock: Add basic queued_spinlock support
-To:     Leonardo Bras <leobras@redhat.com>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 4:29=E2=80=AFAM Leonardo Bras <leobras@redhat.com> =
-wrote:
->
-> On Sun, Sep 10, 2023 at 04:28:59AM -0400, guoren@kernel.org wrote:
-> > From: Guo Ren <guoren@linux.alibaba.com>
-> >
-> > The requirements of qspinlock have been documented by commit:
-> > a8ad07e5240c ("asm-generic: qspinlock: Indicate the use of mixed-size
-> > atomics").
-> >
-> > Although RISC-V ISA gives out a weaker forward guarantee LR/SC, which
-> > doesn't satisfy the requirements of qspinlock above, it won't prevent
-> > some riscv vendors from implementing a strong fwd guarantee LR/SC in
-> > microarchitecture to match xchg_tail requirement. T-HEAD C9xx processor
-> > is the one.
-> >
-> > We've tested the patch on SOPHGO sg2042 & th1520 and passed the stress
-> > test on Fedora & Ubuntu & OpenEuler ... Here is the performance
-> > comparison between qspinlock and ticket_lock on sg2042 (64 cores):
-> >
-> > sysbench test=3Dthreads threads=3D32 yields=3D100 lock=3D8 (+13.8%):
-> >   queued_spinlock 0.5109/0.00
-> >   ticket_spinlock 0.5814/0.00
-> >
-> > perf futex/hash (+6.7%):
-> >   queued_spinlock 1444393 operations/sec (+- 0.09%)
-> >   ticket_spinlock 1353215 operations/sec (+- 0.15%)
-> >
-> > perf futex/wake-parallel (+8.6%):
-> >   queued_spinlock (waking 1/64 threads) in 0.0253 ms (+-2.90%)
-> >   ticket_spinlock (waking 1/64 threads) in 0.0275 ms (+-3.12%)
-> >
-> > perf futex/requeue (+4.2%):
-> >   queued_spinlock Requeued 64 of 64 threads in 0.0785 ms (+-0.55%)
-> >   ticket_spinlock Requeued 64 of 64 threads in 0.0818 ms (+-4.12%)
-> >
-> > System Benchmarks (+6.4%)
-> >   queued_spinlock:
-> >     System Benchmarks Index Values               BASELINE       RESULT =
-   INDEX
-> >     Dhrystone 2 using register variables         116700.0  628613745.4 =
- 53865.8
-> >     Double-Precision Whetstone                       55.0     182422.8 =
- 33167.8
-> >     Execl Throughput                                 43.0      13116.6 =
-  3050.4
-> >     File Copy 1024 bufsize 2000 maxblocks          3960.0    7762306.2 =
- 19601.8
-> >     File Copy 256 bufsize 500 maxblocks            1655.0    3417556.8 =
- 20649.9
-> >     File Copy 4096 bufsize 8000 maxblocks          5800.0    7427995.7 =
- 12806.9
-> >     Pipe Throughput                               12440.0   23058600.5 =
- 18535.9
-> >     Pipe-based Context Switching                   4000.0    2835617.7 =
-  7089.0
-> >     Process Creation                                126.0      12537.3 =
-   995.0
-> >     Shell Scripts (1 concurrent)                     42.4      57057.4 =
- 13456.9
-> >     Shell Scripts (8 concurrent)                      6.0       7367.1 =
- 12278.5
-> >     System Call Overhead                          15000.0   33308301.3 =
- 22205.5
-> >                                                                        =
-=3D=3D=3D=3D=3D=3D=3D=3D
-> >     System Benchmarks Index Score                                      =
- 12426.1
-> >
-> >   ticket_spinlock:
-> >     System Benchmarks Index Values               BASELINE       RESULT =
-   INDEX
-> >     Dhrystone 2 using register variables         116700.0  626541701.9 =
- 53688.2
-> >     Double-Precision Whetstone                       55.0     181921.0 =
- 33076.5
-> >     Execl Throughput                                 43.0      12625.1 =
-  2936.1
-> >     File Copy 1024 bufsize 2000 maxblocks          3960.0    6553792.9 =
- 16550.0
-> >     File Copy 256 bufsize 500 maxblocks            1655.0    3189231.6 =
- 19270.3
-> >     File Copy 4096 bufsize 8000 maxblocks          5800.0    7221277.0 =
- 12450.5
-> >     Pipe Throughput                               12440.0   20594018.7 =
- 16554.7
-> >     Pipe-based Context Switching                   4000.0    2571117.7 =
-  6427.8
-> >     Process Creation                                126.0      10798.4 =
-   857.0
-> >     Shell Scripts (1 concurrent)                     42.4      57227.5 =
- 13497.1
-> >     Shell Scripts (8 concurrent)                      6.0       7329.2 =
- 12215.3
-> >     System Call Overhead                          15000.0   30766778.4 =
- 20511.2
-> >                                                                        =
-=3D=3D=3D=3D=3D=3D=3D=3D
-> >     System Benchmarks Index Score                                      =
- 11670.7
-> >
-> > The qspinlock has a significant improvement on SOPHGO SG2042 64
-> > cores platform than the ticket_lock.
-> >
-> > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > ---
-> >  arch/riscv/Kconfig                | 16 ++++++++++++++++
-> >  arch/riscv/include/asm/Kbuild     |  3 ++-
-> >  arch/riscv/include/asm/spinlock.h | 17 +++++++++++++++++
-> >  3 files changed, 35 insertions(+), 1 deletion(-)
-> >  create mode 100644 arch/riscv/include/asm/spinlock.h
-> >
-> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > index 2c346fe169c1..7f39bfc75744 100644
-> > --- a/arch/riscv/Kconfig
-> > +++ b/arch/riscv/Kconfig
-> > @@ -471,6 +471,22 @@ config NODES_SHIFT
-> >         Specify the maximum number of NUMA Nodes available on the targe=
-t
-> >         system.  Increases memory reserved to accommodate various table=
-s.
-> >
-> > +choice
-> > +     prompt "RISC-V spinlock type"
-> > +     default RISCV_TICKET_SPINLOCKS
-> > +
-> > +config RISCV_TICKET_SPINLOCKS
-> > +     bool "Using ticket spinlock"
-> > +
-> > +config RISCV_QUEUED_SPINLOCKS
-> > +     bool "Using queued spinlock"
-> > +     depends on SMP && MMU
-> > +     select ARCH_USE_QUEUED_SPINLOCKS
-> > +     help
-> > +       Make sure your micro arch LL/SC has a strong forward progress g=
-uarantee.
-> > +       Otherwise, stay at ticket-lock.
-> > +endchoice
-> > +
-> >  config RISCV_ALTERNATIVE
-> >       bool
-> >       depends on !XIP_KERNEL
-> > diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbu=
-ild
-> > index 504f8b7e72d4..a0dc85e4a754 100644
-> > --- a/arch/riscv/include/asm/Kbuild
-> > +++ b/arch/riscv/include/asm/Kbuild
-> > @@ -2,10 +2,11 @@
-> >  generic-y +=3D early_ioremap.h
-> >  generic-y +=3D flat.h
-> >  generic-y +=3D kvm_para.h
-> > +generic-y +=3D mcs_spinlock.h
-> >  generic-y +=3D parport.h
-> > -generic-y +=3D spinlock.h
->
-> IIUC here you take the asm-generic/spinlock.h (which defines arch_spin_*(=
-))
-> and include the asm-generic headers of mcs_spinlock and qspinlock.
->
-> In this case, the qspinlock.h will provide the arch_spin_*() interfaces,
-> which seems the oposite of the above description (ticket spinlocks being
-> the standard).
->
-> Shouldn't ticket-spinlock.h also get included here?
-> (Also, I am probably missing something, as I dont' see the use of
-> mcs_spinlock here.)
-No, because asm-generic/spinlock.h:
-...
-#include <asm-generic/ticket_spinlock.h>
-...
+This patch set enables the Intel flexible return and event delivery
+(FRED) architecture for x86-64.
 
->
-> >  generic-y +=3D spinlock_types.h
-> >  generic-y +=3D qrwlock.h
-> >  generic-y +=3D qrwlock_types.h
-> > +generic-y +=3D qspinlock.h
-> >  generic-y +=3D user.h
-> >  generic-y +=3D vmlinux.lds.h
-> > diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm=
-/spinlock.h
-> > new file mode 100644
-> > index 000000000000..c644a92d4548
-> > --- /dev/null
-> > +++ b/arch/riscv/include/asm/spinlock.h
-> > @@ -0,0 +1,17 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef __ASM_RISCV_SPINLOCK_H
-> > +#define __ASM_RISCV_SPINLOCK_H
-> > +
-> > +#ifdef CONFIG_QUEUED_SPINLOCKS
-> > +#define _Q_PENDING_LOOPS     (1 << 9)
-> > +#endif
->
-> Any reason the above define couldn't be merged on the ifdef below?
-Easy for the next patch to modify. See Waiman's comment:
+The FRED architecture defines simple new transitions that change
+privilege level (ring transitions). The FRED architecture was
+designed with the following goals:
 
-https://lore.kernel.org/linux-riscv/4cc7113a-0e4e-763a-cba2-7963bcd26c7a@re=
-dhat.com/
+1) Improve overall performance and response time by replacing event
+   delivery through the interrupt descriptor table (IDT event
+   delivery) and event return by the IRET instruction with lower
+   latency transitions.
 
-> diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/s=
-pinlock.h
-> index c644a92d4548..9eb3ad31e564 100644
-> --- a/arch/riscv/include/asm/spinlock.h
-> +++ b/arch/riscv/include/asm/spinlock.h
-> @@ -7,11 +7,94 @@
->   #define _Q_PENDING_LOOPS (1 << 9)
->   #endif
->
+2) Improve software robustness by ensuring that event delivery
+   establishes the full supervisor context and that event return
+   establishes the full user context.
 
-I see why you separated the _Q_PENDING_LOOPS out.
+The new transitions defined by the FRED architecture are FRED event
+delivery and, for returning from events, two FRED return instructions.
+FRED event delivery can effect a transition from ring 3 to ring 0, but
+it is used also to deliver events incident to ring 0. One FRED
+instruction (ERETU) effects a return from ring 0 to ring 3, while the
+other (ERETS) returns while remaining in ring 0. Collectively, FRED
+event delivery and the FRED return instructions are FRED transitions.
+
+Search for the latest FRED spec in most search engines with this search pattern:
+
+  site:intel.com FRED (flexible return and event delivery) specification
+
+As of now there is no publicly avaiable CPU supporting FRED, thus the Intel
+Simics® Simulator is used as software development and testing vehicles. And
+it can be downloaded from:
+  https://www.intel.com/content/www/us/en/developer/articles/tool/simics-simulator.html
+
+To enable FRED, the Simics package 8112 QSP-CPU needs to be installed with CPU
+model configured as:
+	$cpu_comp_class = "x86-experimental-fred"
 
 
->
-> > +
-> > +#ifdef CONFIG_QUEUED_SPINLOCKS
-> > +#include <asm/qspinlock.h>
-> > +#include <asm/qrwlock.h>
-> > +#else
-> > +#include <asm-generic/spinlock.h>
-> > +#endif
-> > +
-> > +#endif /* __ASM_RISCV_SPINLOCK_H */
-> > --
-> > 2.36.1
-> >
->
-> Thanks!
-> Leo
->
+Changes since v9:
+* Set unused sysvec table entries to fred_handle_spurious_interrupt()
+  in fred_complete_exception_setup() (Thomas Gleixner).
+* Shove the whole thing into arch/x86/entry/entry_64_fred.S for invoking
+  external_interrupt() and fred_exc_nmi() (Sean Christopherson).
+* Correct and improve a few comments (Sean Christopherson).
+* Merge the two IRQ/NMI asm entries into one as it's fine to invoke
+  noinstr code from regular code (Thomas Gleixner).
+* Setup the long mode and NMI flags in the augmented SS field of FRED
+  stack frame in C instead of asm (Thomas Gleixner).
+* Don't use jump tables, indirect jumps are expensive (Thomas Gleixner).
+* Except #NMI/#DB/#MCE, FRED really can share the exception handlers
+  with IDT (Thomas Gleixner).
+* Avoid the sysvec_* idt_entry muck, do it at a central place, reuse code
+  instead of blindly copying it, which breaks the performance optimized
+  sysvec entries like reschedule_ipi (Thomas Gleixner).
+* Add asm_ prefix to FRED asm entry points (Thomas Gleixner).
+* Disable #DB to avoid endless recursion and stack overflow when a
+  watchpoint/breakpoint is set in the code path which is executed by
+  #DB handler (Thomas Gleixner).
+* Introduce a new structure fred_ss to denote the FRED flags above SS
+  selector, which avoids FRED_SSX_ macros and makes the code simpler
+  and easier to read (Thomas Gleixner).
+* Use type u64 to define FRED bit fields instead of type unsigned int
+  (Thomas Gleixner).
+* Avoid a type cast by defining X86_CR4_FRED as 0 on 32-bit (Thomas
+  Gleixner).
+* Add the WRMSRNS instruction support (Thomas Gleixner).
+
+Changes since v8:
+* Move the FRED initialization patch after all required changes are in
+  place (Thomas Gleixner).
+* Don't do syscall early out in fred_entry_from_user() before there are
+  proper performance numbers and justifications (Thomas Gleixner).
+* Add the control exception handler to the FRED exception handler table
+  (Thomas Gleixner).
+* Introduce a macro sysvec_install() to derive the asm handler name from
+  a C handler, which simplifies the code and avoids an ugly typecast
+  (Thomas Gleixner).
+* Remove junk code that assumes no local APIC on x86_64 (Thomas Gleixner).
+* Put IDTENTRY changes in a separate patch (Thomas Gleixner).
+* Use high-order 48 bits above the lowest 16 bit SS only when FRED is
+  enabled (Thomas Gleixner).
+* Explain why writing directly to the IA32_KERNEL_GS_BASE MSR is
+  doing the right thing (Thomas Gleixner).
+* Reword some patch descriptions (Thomas Gleixner).
+* Add a new macro VMX_DO_FRED_EVENT_IRQOFF for FRED instead of
+  refactoring VMX_DO_EVENT_IRQOFF (Sean Christopherson).
+* Do NOT use a trampoline, just LEA+PUSH the return RIP, PUSH the error
+  code, and jump to the FRED kernel entry point for NMI or call
+  external_interrupt() for IRQs (Sean Christopherson).
+* Call external_interrupt() only when FRED is enabled, and convert the
+  non-FRED handling to external_interrupt() after FRED lands (Sean
+  Christopherson).
+* Use __packed instead of __attribute__((__packed__)) (Borislav Petkov).
+* Put all comments above the members, like the rest of the file does
+  (Borislav Petkov).
+* Reflect the FRED spec 5.0 change that ERETS and ERETU add 8 to %rsp
+  before popping the return context from the stack.
+* Reflect stack frame definition changes from FRED spec 3.0 to 5.0.
+* Add ENDBR to the FRED_ENTER asm macro after kernel IBT is added to
+  FRED base line in FRED spec 5.0.
+* Add a document which briefly introduces FRED features.
+* Remove 2 patches, "allow FRED systems to use interrupt vectors
+  0x10-0x1f" and "allow dynamic stack frame size", from this patch set,
+  as they are "optimizations" only.
+* Send 2 patches, "header file for event types" and "do not modify the
+  DPL bits for a null selector", as pre-FRED patches.
+
+Changes since v7:
+* Always call external_interrupt() for VMX IRQ handling on x86_64, thus avoid
+  re-entering the noinstr code.
+* Create a FRED stack frame when FRED is compiled-in but not enabled, which
+  uses some extra stack space but simplifies the code.
+* Add a log message when FRED is enabled.
+
+Changes since v6:
+* Add a comment to explain why it is safe to write to a previous FRED stack
+  frame. (Lai Jiangshan).
+* Export fred_entrypoint_kernel(), required when kvm-intel built as a module.
+* Reserve a REDZONE for CALL emulation and Align RSP to a 64-byte boundary
+  before pushing a new FRED stack frame.
+* Replace pt_regs csx flags prefix FRED_CSL_ with FRED_CSX_.
+
+Changes since v5:
+* Initialize system_interrupt_handlers with dispatch_table_spurious_interrupt()
+  instead of NULL to get rid of a branch (Peter Zijlstra).
+* Disallow #DB inside #MCE for robustness sake (Peter Zijlstra).
+* Add a comment for FRED stack level settings (Lai Jiangshan).
+* Move the NMI bit from an invalid stack frame, which caused ERETU to fault,
+  to the fault handler's stack frame, thus to unblock NMI ASAP if NMI is blocked
+  (Lai Jiangshan).
+* Refactor VMX_DO_EVENT_IRQOFF to handle IRQ/NMI in IRQ/NMI induced VM exits
+  when FRED is enabled (Sean Christopherson).
+
+Changes since v4:
+* Do NOT use the term "injection", which in the KVM context means to
+  reinject an event into the guest (Sean Christopherson).
+* Add the explanation of why to execute "int $2" to invoke the NMI handler
+  in NMI caused VM exits (Sean Christopherson).
+* Use cs/ss instead of csx/ssx when initializing the pt_regs structure
+  for calling external_interrupt(), otherwise it breaks i386 build.
+
+Changes since v3:
+* Call external_interrupt() to handle IRQ in IRQ caused VM exits.
+* Execute "int $2" to handle NMI in NMI caused VM exits.
+* Rename csl/ssl of the pt_regs structure to csx/ssx (x for extended)
+  (Andrew Cooper).
+
+Changes since v2:
+* Improve comments for changes in arch/x86/include/asm/idtentry.h.
+
+Changes since v1:
+* call irqentry_nmi_{enter,exit}() in both IDT and FRED debug fault kernel
+  handler (Peter Zijlstra).
+* Initialize a FRED exception handler to fred_bad_event() instead of NULL
+  if no FRED handler defined for an exception vector (Peter Zijlstra).
+* Push calling irqentry_{enter,exit}() and instrumentation_{begin,end}()
+  down into individual FRED exception handlers, instead of in the dispatch
+  framework (Peter Zijlstra).
 
 
---=20
-Best Regards
- Guo Ren
+H. Peter Anvin (Intel) (22):
+  x86/fred: Add Kconfig option for FRED (CONFIG_X86_FRED)
+  x86/cpufeatures: Add the cpu feature bit for FRED
+  x86/fred: Disable FRED support if CONFIG_X86_FRED is disabled
+  x86/opcode: Add ERET[US] instructions to the x86 opcode map
+  x86/objtool: Teach objtool about ERET[US]
+  x86/cpu: Add X86_CR4_FRED macro
+  x86/cpu: Add MSR numbers for FRED configuration
+  x86/fred: Add a new header file for FRED definitions
+  x86/fred: Reserve space for the FRED stack frame
+  x86/fred: Update MSR_IA32_FRED_RSP0 during task switch
+  x86/fred: Disallow the swapgs instruction when FRED is enabled
+  x86/fred: No ESPFIX needed when FRED is enabled
+  x86/fred: Allow single-step trap and NMI when starting a new task
+  x86/fred: Make exc_page_fault() work for FRED
+  x86/fred: Add a debug fault entry stub for FRED
+  x86/fred: Add a NMI entry stub for FRED
+  x86/fred: FRED entry/exit and dispatch code
+  x86/traps: Add sysvec_install() to install a system interrupt handler
+  x86/fred: Let ret_from_fork_asm() jmp to asm_fred_exit_user when FRED
+    is enabled
+  x86/fred: Add fred_syscall_init()
+  x86/fred: Add FRED initialization functions
+  x86/fred: Invoke FRED initialization code to enable FRED
+
+Peter Zijlstra (Intel) (1):
+  x86/entry/calling: Allow PUSH_AND_CLEAR_REGS being used beyond actual
+    entry code
+
+Xin Li (15):
+  x86/cpufeatures: Add the cpu feature bit for WRMSRNS
+  x86/opcode: Add the WRMSRNS instruction to the x86 opcode map
+  x86/msr: Add the WRMSRNS instruction support
+  x86/entry: Remove idtentry_sysvec from entry_{32,64}.S
+  x86/trapnr: Add event type macros to <asm/trapnr.h>
+  Documentation/x86/64: Add a documentation for FRED
+  x86/fred: Disable FRED by default in its early stage
+  x86/ptrace: Cleanup the definition of the pt_regs structure
+  x86/ptrace: Add FRED additional information to the pt_regs structure
+  x86/idtentry: Incorporate definitions/declarations of the FRED entries
+  x86/fred: Add a machine check entry stub for FRED
+  x86/fred: Fixup fault on ERETU by jumping to fred_entrypoint_user
+  x86/entry: Add fred_entry_from_kvm() for VMX to handle IRQ/NMI
+  KVM: VMX: Call fred_entry_from_kvm() for IRQ/NMI handling
+  x86/syscall: Split IDT syscall setup code into idt_syscall_init()
+
+ .../admin-guide/kernel-parameters.txt         |   3 +
+ Documentation/arch/x86/x86_64/fred.rst        |  98 ++++++
+ Documentation/arch/x86/x86_64/index.rst       |   1 +
+ arch/x86/Kconfig                              |   9 +
+ arch/x86/entry/Makefile                       |   5 +-
+ arch/x86/entry/calling.h                      |  15 +-
+ arch/x86/entry/entry_32.S                     |   4 -
+ arch/x86/entry/entry_64.S                     |  14 +-
+ arch/x86/entry/entry_64_fred.S                | 129 ++++++++
+ arch/x86/entry/entry_fred.c                   | 279 ++++++++++++++++++
+ arch/x86/entry/vsyscall/vsyscall_64.c         |   2 +-
+ arch/x86/include/asm/asm-prototypes.h         |   1 +
+ arch/x86/include/asm/cpufeatures.h            |   2 +
+ arch/x86/include/asm/desc.h                   |   2 -
+ arch/x86/include/asm/disabled-features.h      |   8 +-
+ arch/x86/include/asm/extable_fixup_types.h    |   4 +-
+ arch/x86/include/asm/fred.h                   |  97 ++++++
+ arch/x86/include/asm/idtentry.h               |  88 +++++-
+ arch/x86/include/asm/msr-index.h              |  13 +-
+ arch/x86/include/asm/msr.h                    |  18 ++
+ arch/x86/include/asm/ptrace.h                 |  85 +++++-
+ arch/x86/include/asm/switch_to.h              |   8 +-
+ arch/x86/include/asm/thread_info.h            |  12 +-
+ arch/x86/include/asm/trapnr.h                 |  12 +
+ arch/x86/include/asm/vmx.h                    |  17 +-
+ arch/x86/include/uapi/asm/processor-flags.h   |   7 +
+ arch/x86/kernel/Makefile                      |   1 +
+ arch/x86/kernel/cpu/acrn.c                    |   4 +-
+ arch/x86/kernel/cpu/common.c                  |  53 +++-
+ arch/x86/kernel/cpu/cpuid-deps.c              |   2 +
+ arch/x86/kernel/cpu/mce/core.c                |  26 ++
+ arch/x86/kernel/cpu/mshyperv.c                |  15 +-
+ arch/x86/kernel/espfix_64.c                   |   8 +
+ arch/x86/kernel/fred.c                        |  59 ++++
+ arch/x86/kernel/idt.c                         |   4 +-
+ arch/x86/kernel/irqinit.c                     |   7 +-
+ arch/x86/kernel/kvm.c                         |   2 +-
+ arch/x86/kernel/nmi.c                         |  28 ++
+ arch/x86/kernel/process_64.c                  |  67 ++++-
+ arch/x86/kernel/traps.c                       |  48 ++-
+ arch/x86/kvm/vmx/vmx.c                        |  12 +-
+ arch/x86/lib/x86-opcode-map.txt               |   4 +-
+ arch/x86/mm/extable.c                         |  79 +++++
+ arch/x86/mm/fault.c                           |   5 +-
+ drivers/xen/events/events_base.c              |   2 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |   2 +
+ .../arch/x86/include/asm/disabled-features.h  |   8 +-
+ tools/arch/x86/include/asm/msr-index.h        |  13 +-
+ tools/arch/x86/lib/x86-opcode-map.txt         |   4 +-
+ tools/objtool/arch/x86/decode.c               |  19 +-
+ 50 files changed, 1291 insertions(+), 114 deletions(-)
+ create mode 100644 Documentation/arch/x86/x86_64/fred.rst
+ create mode 100644 arch/x86/entry/entry_64_fred.S
+ create mode 100644 arch/x86/entry/entry_fred.c
+ create mode 100644 arch/x86/include/asm/fred.h
+ create mode 100644 arch/x86/kernel/fred.c
+
+-- 
+2.34.1
+
