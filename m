@@ -2,284 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2137E79FDC8
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 10:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A81079FDC3
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 10:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235938AbjINIDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 04:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38072 "EHLO
+        id S235980AbjINICg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 04:02:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236156AbjINIDC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 04:03:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E041D8E
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:02:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694678534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HiAk3bKOlav/oFfLlqTgtje3RXVlrppDZ8NfAR80XpM=;
-        b=F5p1TBTAl2lu4wJZEUQLgihIpQInffc1Cn18P8RPGpJCBCYchL7NtsrZIR8kewUI5ue/Mr
-        ZYrj5877uT1WRkesQidXSaWkBWXRyzbWvntGJfXF9uSuLYM4CG/9Tc3a3Sppbd41pPx2cm
-        Ek44Ey82RW+pwQrTpcalqxxP5fn6Whk=
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
- [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-6qISUzIMPk-NUuylM26XZw-1; Thu, 14 Sep 2023 04:02:12 -0400
-X-MC-Unique: 6qISUzIMPk-NUuylM26XZw-1
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1d5f4d5d848so1110489fac.0
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:02:12 -0700 (PDT)
+        with ESMTP id S231164AbjINICg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 04:02:36 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB6181BFA
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:02:31 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-401c90ed2ecso7336525e9.0
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:02:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694678550; x=1695283350; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Yy7C3eh8AGJ5bOR1d/ShKLFT+panz2pLVtrtSqm2ZHg=;
+        b=XD76436IqKjCqyjfCqfMZRTQBNlgBe65EWcim9kOBLUT48ZwCcklXXHkGTmAMPbpqc
+         jksJbKz3t+2dZZjifjWIBcM4bwjhOi5Btdf3uCyLW9L0fYQXlvLAUBTm7rYHs6iEYOoW
+         71nJ7E1Go4X5VWgwy0b3Ni7h1WIkiVyhDubUnH8NCGOJD4UiqJp2JF2PXdKoesLlVEAU
+         0UWyFagIjEj/7idmggSoqlQUYHcy4fnajX709YcLmwEty0uYA9eDUTa2ExxcfDiwnofO
+         S5nmV1xcepEP77Imkro17DjGG9tClb4L9gxQh8gQusxEPsLy1cZ6DfG8YaUNdwjEmEOZ
+         SiAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694678532; x=1695283332;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HiAk3bKOlav/oFfLlqTgtje3RXVlrppDZ8NfAR80XpM=;
-        b=B5XyY22KSa2eRZAd681xN1TLi3XAtv+R27Adoqrt2f0WzqYt1/RqP1I0/jwGPF3y4w
-         h+ADcENAnZ2A4wUbfkWdfzgotCaxbnVN6DgV88f5TFGtfcu1iR/1jTUuB1ooU6pXR56r
-         u5IQOzwBD57cxRDVr+nwvYIbqJVEZGsp2Tp9owGWOYWW/HNEhBjpsolHSFLqZSHhvrPa
-         dsBa15WThiqzFHdN2Q45H3u0EV6+h5dHTlH/iYZUhC7aNLoeTtsIAtfLP5yOINclM4s9
-         S6hW05LYHylX1A48ofaMgXhvHjk9xfdzCQHE50x65BOZFn0iq7s2nKuVa0ZNhp6X5XFu
-         KRgA==
-X-Gm-Message-State: AOJu0Yx4qe4gj0yWOEAePM7lohz2j3pDaIGDYti1Yszyk4jpyEI84msC
-        wppD4zCcsui5glztPFgwdJMdbMZ52q07rVAmyruyHOOISf05mKFcN7/D6XjjM3xU2eR5vwMOwA1
-        X17zwblbYpAiZ
-X-Received: by 2002:a05:6870:35d3:b0:1b3:f1f7:999e with SMTP id c19-20020a05687035d300b001b3f1f7999emr5781396oak.45.1694678531978;
-        Thu, 14 Sep 2023 01:02:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjL5jH2q/nmHiozebZyY/fKINysNQaR6CzFyALeT3Qe+deBNOrapEDdrbheaETCUL++womdw==
-X-Received: by 2002:a05:6870:35d3:b0:1b3:f1f7:999e with SMTP id c19-20020a05687035d300b001b3f1f7999emr5781382oak.45.1694678531699;
-        Thu, 14 Sep 2023 01:02:11 -0700 (PDT)
-Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id h22-20020a056870a3d600b001ccab369c09sm515214oak.42.2023.09.14.01.02.04
+        d=1e100.net; s=20230601; t=1694678550; x=1695283350;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yy7C3eh8AGJ5bOR1d/ShKLFT+panz2pLVtrtSqm2ZHg=;
+        b=pqGPynaaZdCMfcOJapu8zxIovmZhDrqebID3KSl6sYaXpc+G68vOgwApKA1GE5PmJo
+         rt/FUOk0zJ82TwN7XqrvtAQ9X1VQIbnW7aPBx3Ra6OwvlRIoJWlN7bfYkBdtd2KLHZLn
+         lbG0fTZyG4rlCQUj9VQcrf0/2tHQl2ZcqLAF8y27UnXF9xDHjV8ViF1eLo5t4LPBAEYi
+         nc3WSnfZ48pe0kR3H3dD7c/hCEf1OzsHuuD05iSi38IdNlrRLPxw5/nOq4/6TlxrmBwT
+         S/fTRQnqik+47U3THNF8qImKRmlQbdt2+MSeUr/st6gYVYgHMYgfcMF1q9BNTHxvatSL
+         Up1g==
+X-Gm-Message-State: AOJu0YwNr2SRHsY2Q59XDFalPeZinsb2Fb/qL4EM0E2dfauQePEE5vL+
+        ZHdQJloIHWO6GNUmUNi1Lj6rzAh2rswDn3DvvqI=
+X-Google-Smtp-Source: AGHT+IG3SmBgVgZZJ5iJ7L/Ga7w0g/7ztmL7VNHiAqZIQ8zO3HOGSRNBtLv27Eam03BPW7kg9b1sOA==
+X-Received: by 2002:a7b:c414:0:b0:402:fe6d:6296 with SMTP id k20-20020a7bc414000000b00402fe6d6296mr4102677wmi.9.1694678550109;
+        Thu, 14 Sep 2023 01:02:30 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id t7-20020a1c7707000000b003fedcd02e2asm1233317wmi.35.2023.09.14.01.02.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 01:02:11 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 05:02:02 -0300
-From:   Leonardo Bras <leobras@redhat.com>
-To:     guoren@kernel.org
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 08/17] riscv: qspinlock: Add virt_spin_lock() support
- for KVM guest
-Message-ID: <ZQK9-tn2MepXlY1u@redhat.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-9-guoren@kernel.org>
+        Thu, 14 Sep 2023 01:02:29 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 10:02:28 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Haibo Xu <haibo1.xu@intel.com>,
+        Anup Patel <anup@brainfault.org>
+Subject: Re: [PATCH] KVM: selftests: Assert that vasprintf() is successful
+Message-ID: <20230914-d8d1bb0c3d71454c0a55f721@orel>
+References: <20230914010636.1391735-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230910082911.3378782-9-guoren@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230914010636.1391735-1-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 10, 2023 at 04:29:02AM -0400, guoren@kernel.org wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
+On Wed, Sep 13, 2023 at 06:06:36PM -0700, Sean Christopherson wrote:
+> Assert that vasprintf() succeeds as the "returned" string is undefined
+> on failure.  Checking the result also eliminates the only warning with
+> default options in KVM selftests, i.e. is the only thing getting in the
+> way of compile with -Werror.
 > 
-> Add a static key controlling whether virt_spin_lock() should be
-> called or not. When running on bare metal set the new key to
-> false.
+>   lib/test_util.c: In function ‘strdup_printf’:
+>   lib/test_util.c:390:9: error: ignoring return value of ‘vasprintf’
+>   declared with attribute ‘warn_unused_result’ [-Werror=unused-result]
+>   390 |         vasprintf(&str, fmt, ap);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~
 > 
-> The KVM guests fall back to a Test-and-Set spinlock, because fair
-> locks have horrible lock 'holder' preemption issues. The
-> virt_spin_lock_key would shortcut for the
-> queued_spin_lock_slowpath() function that allow virt_spin_lock to
-> hijack it.
+
+Oh, darn. My compilers didn't report that or I would have fixed it.
+
+> Don't bother capturing the return value, allegedly vasprintf() can only
+> fail due to a memory allocation failure.
 > 
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@kernel.org>
+> Fixes: dfaf20af7649 ("KVM: arm64: selftests: Replace str_with_index with strdup_printf")
+> Cc: Andrew Jones <ajones@ventanamicro.com>
+> Cc: Haibo Xu <haibo1.xu@intel.com>
+> Cc: Anup Patel <anup@brainfault.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  .../admin-guide/kernel-parameters.txt         |  4 +++
->  arch/riscv/include/asm/sbi.h                  |  8 +++++
->  arch/riscv/include/asm/spinlock.h             | 22 ++++++++++++++
->  arch/riscv/kernel/sbi.c                       |  2 +-
->  arch/riscv/kernel/setup.c                     | 30 ++++++++++++++++++-
->  5 files changed, 64 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 61cacb8dfd0e..f75bedc50e00 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -3927,6 +3927,10 @@
->  	no_uaccess_flush
->  	                [PPC] Don't flush the L1-D cache after accessing user data.
+> I haven't actually run the relevant tests, someone should probably do so on
+> ARM and/or RISC-V to make sure I didn't do something stupid.
+
+Done for both.
+
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Tested-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
+
+> 
+>  tools/testing/selftests/kvm/lib/test_util.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index 3e36019eeb4a..5d7f28b02d73 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -387,7 +387,7 @@ char *strdup_printf(const char *fmt, ...)
+>  	char *str;
 >  
-> +	no_virt_spin	[RISC-V] Disable virt_spin_lock in KVM guest to use
-> +			native_queued_spinlock when the nopvspin option is enabled.
-> +			This would help vcpu=pcpu scenarios.
-> +
->  	novmcoredd	[KNL,KDUMP]
->  			Disable device dump. Device dump allows drivers to
->  			append dump data to vmcore so you can collect driver
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index 501e06e52078..e0233b3d7a5f 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -50,6 +50,13 @@ enum sbi_ext_base_fid {
->  	SBI_EXT_BASE_GET_MIMPID,
->  };
+>  	va_start(ap, fmt);
+> -	vasprintf(&str, fmt, ap);
+> +	TEST_ASSERT(vasprintf(&str, fmt, ap) >= 0, "vasprintf() failed");
+>  	va_end(ap);
 >  
-> +enum sbi_ext_base_impl_id {
-> +	SBI_EXT_BASE_IMPL_ID_BBL = 0,
-> +	SBI_EXT_BASE_IMPL_ID_OPENSBI,
-> +	SBI_EXT_BASE_IMPL_ID_XVISOR,
-> +	SBI_EXT_BASE_IMPL_ID_KVM,
-> +};
-> +
->  enum sbi_ext_time_fid {
->  	SBI_EXT_TIME_SET_TIMER = 0,
->  };
-> @@ -269,6 +276,7 @@ int sbi_console_getchar(void);
->  long sbi_get_mvendorid(void);
->  long sbi_get_marchid(void);
->  long sbi_get_mimpid(void);
-> +long sbi_get_firmware_id(void);
->  void sbi_set_timer(uint64_t stime_value);
->  void sbi_shutdown(void);
->  void sbi_send_ipi(unsigned int cpu);
-> diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
-> index 8ea0fee80652..6b38d6616f14 100644
-> --- a/arch/riscv/include/asm/spinlock.h
-> +++ b/arch/riscv/include/asm/spinlock.h
-> @@ -4,6 +4,28 @@
->  #define __ASM_RISCV_SPINLOCK_H
->  
->  #ifdef CONFIG_QUEUED_SPINLOCKS
-> +/*
-> + * The KVM guests fall back to a Test-and-Set spinlock, because fair locks
-> + * have horrible lock 'holder' preemption issues. The virt_spin_lock_key
-> + * would shortcut for the queued_spin_lock_slowpath() function that allow
-> + * virt_spin_lock to hijack it.
-> + */
-> +DECLARE_STATIC_KEY_TRUE(virt_spin_lock_key);
-> +
-> +#define virt_spin_lock virt_spin_lock
-> +static inline bool virt_spin_lock(struct qspinlock *lock)
-> +{
-> +	if (!static_branch_likely(&virt_spin_lock_key))
-> +		return false;
-> +
-> +	do {
-> +		while (atomic_read(&lock->val) != 0)
-> +			cpu_relax();
-> +	} while (atomic_cmpxchg(&lock->val, 0, _Q_LOCKED_VAL) != 0);
-> +
-> +	return true;
-> +}
-> +
->  #define _Q_PENDING_LOOPS	(1 << 9)
->  #endif
->  
-> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
-> index 88eea3a99ee0..cdd45edc8db4 100644
-> --- a/arch/riscv/kernel/sbi.c
-> +++ b/arch/riscv/kernel/sbi.c
-> @@ -555,7 +555,7 @@ static inline long sbi_get_spec_version(void)
->  	return __sbi_base_ecall(SBI_EXT_BASE_GET_SPEC_VERSION);
->  }
->  
-> -static inline long sbi_get_firmware_id(void)
-> +long sbi_get_firmware_id(void)
->  {
->  	return __sbi_base_ecall(SBI_EXT_BASE_GET_IMP_ID);
->  }
-> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> index 0f084f037651..c57d15b05160 100644
-> --- a/arch/riscv/kernel/setup.c
-> +++ b/arch/riscv/kernel/setup.c
-> @@ -26,6 +26,7 @@
->  #include <asm/alternative.h>
->  #include <asm/cacheflush.h>
->  #include <asm/cpu_ops.h>
-> +#include <asm/cpufeature.h>
->  #include <asm/early_ioremap.h>
->  #include <asm/pgtable.h>
->  #include <asm/setup.h>
-> @@ -283,16 +284,43 @@ DEFINE_STATIC_KEY_TRUE(combo_qspinlock_key);
->  EXPORT_SYMBOL(combo_qspinlock_key);
->  #endif
->  
-> +#ifdef CONFIG_QUEUED_SPINLOCKS
-> +static bool no_virt_spin_key = false;
-
-I suggest no _key, also there is no need for "= false".
-To be consistent with enable_qspinlock, I also suggest
-adding __ro_after_init:
-
-static bool no_virt_spin __ro_after_init; 
-
-
-
-> +DEFINE_STATIC_KEY_TRUE(virt_spin_lock_key);
-> +
-> +static int __init no_virt_spin_setup(char *p)
-> +{
-> +	no_virt_spin_key = true;
-> +
-> +	return 0;
-> +}
-> +early_param("no_virt_spin", no_virt_spin_setup);
-> +
-> +static void __init virt_spin_lock_init(void)
-> +{
-> +	if (sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM ||
-> +	    no_virt_spin_key)
-> +		static_branch_disable(&virt_spin_lock_key);
-> +	else
-> +		pr_info("Enable virt_spin_lock\n");
-> +}
-> +#endif
-> +
-
-A new virt_no_spin kernel parameter was introduced, but without 
-CONFIG_QUEUED_SPINLOCKS it will silently fail.
-
-I would suggest an #else clause here with a function to print an error / 
-warning message about no_virt_spin being invalid in this scenario.
-It will probably help future debugging.
-
-
->  static void __init riscv_spinlock_init(void)
->  {
->  #ifdef CONFIG_RISCV_COMBO_SPINLOCKS
-> -	if (!enable_qspinlock_key) {
-> +	if (!enable_qspinlock_key &&
-> +	    (sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)) {
->  		static_branch_disable(&combo_qspinlock_key);
->  		pr_info("Ticket spinlock: enabled\n");
->  	} else {
->  		pr_info("Queued spinlock: enabled\n");
->  	}
->  #endif
-> +
-> +#ifdef CONFIG_QUEUED_SPINLOCKS
-> +	virt_spin_lock_init();
-> +#endif
->  }
->  
->  extern void __init init_rt_signal_env(void);
+>  	return str;
+> 
+> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
 > -- 
-> 2.36.1
+> 2.42.0.283.g2d96d420d3-goog
 > 
-
-I am probably missing something out, but it looks to me that this patch is 
-causing 2 different changes:
-1 - Enabling no_virt_spin parameter
-2 - Disabling queued spinlocks for some firmware_id
-
-Wouldn't be better to split those changes in multiple patches? 
-Or am I missing the point on why they need to be together?
-
-Thanks!
-Leo
-
