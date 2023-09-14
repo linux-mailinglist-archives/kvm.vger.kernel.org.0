@@ -2,141 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8A2F7A072E
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:22:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A4477A073D
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:26:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240069AbjINOWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 10:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53794 "EHLO
+        id S239857AbjINO0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 10:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240000AbjINOWe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:22:34 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D3FB9
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:22:29 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40472f9db24so6084765e9.2
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:22:29 -0700 (PDT)
+        with ESMTP id S239781AbjINO0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 10:26:06 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC08D115
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:26:01 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-401b5516104so10726605e9.2
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:26:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1694701348; x=1695306148; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ff9Ehpvke6LtFPxvHhzarjEmuj2e3YwgZf0e14rNLIQ=;
-        b=oFoJvRewtC6A80eeRdd+puYIumNM+E1bfXQYd3VmpzcXsIEabMXBB+vrO2KmBnsoWs
-         ppRNLJDdee40avDVqtKO4TsqeW/qOcSMLUjEGOPNCjhdrIVQqi+tozip8YfdZXL/Zu2y
-         2I8l2NE2J4QwrfM3W39ZSacGyERMECQsB8iqA=
+        d=ventanamicro.com; s=google; t=1694701560; x=1695306360; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YG4jj4GnceKWHFc9CDsOyyvWCOlMS/zle7Y09KSgtKI=;
+        b=g9aO+D0A7Vn87/QKbx6OjNyzvS41oJJljAbyt1gOMP0HFE/p0xVhJfDJyruCGJezsL
+         0Xp8U7T7SpVCoNljpptT6C8MQ3S8eOsCAMOBtX1wFniGrHDubaDjs++2PM9seSsFmVRv
+         i6pcY7ZcBzDbA+T4cOZtjvJYJPtWouq5DCINtoEMPlJYoUYS/7JstacfGZVNa56xbnxY
+         x9YkPFKN26qHx9kqXWnJ4aq4rvwAbRCYuKu3warY8gcutISNPKUNITeesF+LbvuReeVl
+         CA6RDVqiLMVMZaDVFD66wIuI5kGF2FlxSL1GXMa4JshALqWLyijVeJp3axBBWcHyd9kP
+         urcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694701348; x=1695306148;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ff9Ehpvke6LtFPxvHhzarjEmuj2e3YwgZf0e14rNLIQ=;
-        b=SUYQsiAVv++qaID6aj6yuq59mvGr4WNjiQFzOaGjkg5DYsc85NFFrl7w+5opJ2GiFf
-         2FwmMix+0HR16tMDvTbZrnCXmJfGor0h4Fla8n3scnwn8Pfm05JxhGf6/+YJL1UWfl6X
-         WTh7Ly+aU2K23qkDqGwIj6AiaPluvF1h5Is+0W0d8IkuWHzhy6ddWZi65vJQbRhXPpEI
-         ZDma7r3tp01aKjyVu/nh/9riJGtEDeLxxTe7SgMq1d4FaJxLab0tDXPfOxsZ3QoFi5Xj
-         ObFMOTcniiZuL/49xCLrs8vMti/stmZYyTMeiu/ck7Nk/P7+ocNC5N/M3YLk6mExF1kT
-         5KKA==
-X-Gm-Message-State: AOJu0Yy/8L316B3ak8nulxiJAzKswCzQG6UlmHX4vQCRWbRjLSqhaDuH
-        dsyxDwWYlcODY8JinOc+PRzKVw==
-X-Google-Smtp-Source: AGHT+IFve9l57veSgCPqyrpryNeRPxRNyvtIANtQFRamRYlphhlxA6Tmolp/NSw7/qlFLxzi7VWxww==
-X-Received: by 2002:a7b:c414:0:b0:402:fe6d:6296 with SMTP id k20-20020a7bc414000000b00402fe6d6296mr4934579wmi.9.1694701348349;
-        Thu, 14 Sep 2023 07:22:28 -0700 (PDT)
-Received: from [10.80.67.28] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id v26-20020a1cf71a000000b003fe1630a8f0sm5015544wmh.24.2023.09.14.07.22.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 07:22:28 -0700 (PDT)
-Message-ID: <cd4979cf-bcf4-75b4-a18b-c61a9b2e0ffb@citrix.com>
-Date:   Thu, 14 Sep 2023 15:22:27 +0100
+        d=1e100.net; s=20230601; t=1694701560; x=1695306360;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YG4jj4GnceKWHFc9CDsOyyvWCOlMS/zle7Y09KSgtKI=;
+        b=w6vS8FI8dmN4WsoyQKCM/+bF8KEdY6Eq8lci+7nKkWTpAom/MntEvo1HEHpUItPuxs
+         9H4DGa3PfyBeE158mVxlZMGX0hVyfOjdR9L2vDbnAS18BVSLh/gfHxhN090YK71UTXA2
+         fiywi+2Wkovygd/ls7Rs0aIXZ71VOp3aLnm04Mi69knuuHMkLnQ5VgkAY21i3/SmcDzK
+         LEIw8C8HHUfnXnwwLXGbdXAfWv9zD096G4AdMlgGjOA4kB4BpXNBkGgbqSHYff03Q7Kt
+         yGWeigj9o1jAijKgSedx0TkzbHEkSMTjyAmrJA/vmcWV0ReqZOHerq8Wgi9ye8sdvhRC
+         RtVw==
+X-Gm-Message-State: AOJu0Yy1bvfOLp5jRWhoKZs4vwYpTzc69n/u3zcs3jJbrIMqiLSdXPZr
+        uuPhajVq79rl1Zd0+JRHf7R0ZA==
+X-Google-Smtp-Source: AGHT+IFWc50omqudDyR0Nh+pUUfbse+nkODV23h/mlFUP8m4u/vojRIjASaeifFA7VSOhcKfy6pcrw==
+X-Received: by 2002:a05:600c:c8:b0:402:f5c2:c6d9 with SMTP id u8-20020a05600c00c800b00402f5c2c6d9mr5110748wmm.37.1694701559948;
+        Thu, 14 Sep 2023 07:25:59 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id f7-20020adff987000000b0031c8a43712asm1914525wrr.69.2023.09.14.07.25.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 07:25:59 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 16:25:53 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
+        wuwei2016@iscas.ac.cn, leobras@redhat.com,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <20230914-892327a75b4b86badac5de02@orel>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-From:   andrew.cooper3@citrix.com
-Subject: Re: [PATCH v10 05/38] x86/trapnr: Add event type macros to
- <asm/trapnr.h>
-Content-Language: en-GB
-To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
-        mhiramat@kernel.org, jiangshanlai@gmail.com
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-6-xin3.li@intel.com>
-In-Reply-To: <20230914044805.301390-6-xin3.li@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230910082911.3378782-4-guoren@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/09/2023 5:47 am, Xin Li wrote:
-> Intel VT-x classifies events into eight different types, which is
-> inherited by FRED for event identification. As such, event type
-> becomes a common x86 concept, and should be defined in a common x86
-> header.
->
-> Add event type macros to <asm/trapnr.h>, and use it in <asm/vmx.h>.
->
-> Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
+On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> Cache-block prefetch instructions are HINTs to the hardware to
+> indicate that software intends to perform a particular type of
+> memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> improve the arch_xchg for qspinlock xchg_tail.
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
 > ---
->  arch/x86/include/asm/trapnr.h | 12 ++++++++++++
->  arch/x86/include/asm/vmx.h    | 17 +++++++++--------
->  2 files changed, 21 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/include/asm/trapnr.h b/arch/x86/include/asm/trapnr.h
-> index f5d2325aa0b7..ab7e4c9d666f 100644
-> --- a/arch/x86/include/asm/trapnr.h
-> +++ b/arch/x86/include/asm/trapnr.h
-> @@ -2,6 +2,18 @@
->  #ifndef _ASM_X86_TRAPNR_H
->  #define _ASM_X86_TRAPNR_H
+>  arch/riscv/Kconfig                 | 15 +++++++++++++++
+>  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+>  arch/riscv/include/asm/hwcap.h     |  1 +
+>  arch/riscv/include/asm/insn-def.h  |  5 +++++
+>  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+>  arch/riscv/kernel/cpufeature.c     |  1 +
+>  6 files changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index e9ae6fa232c3..2c346fe169c1 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
 >  
-> +/*
-> + * Event type codes used by both FRED and Intel VT-x
-
-And AMD SVM.  This enumeration has never been unique to just VT-x.
-
-> + */
-> +#define EVENT_TYPE_EXTINT	0	// External interrupt
-> +#define EVENT_TYPE_RESERVED	1
-> +#define EVENT_TYPE_NMI		2	// NMI
-> +#define EVENT_TYPE_HWEXC	3	// Hardware originated traps, exceptions
-> +#define EVENT_TYPE_SWINT	4	// INT n
-> +#define EVENT_TYPE_PRIV_SWEXC	5	// INT1
-> +#define EVENT_TYPE_SWEXC	6	// INT0, INT3
-
-Typo.  into, not int0  (the difference shows up more clearly in lower case.)
-
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index 0e73616b82f3..c84acfefcd31 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -374,14 +375,14 @@ enum vmcs_field {
->  #define VECTORING_INFO_DELIVER_CODE_MASK    	INTR_INFO_DELIVER_CODE_MASK
->  #define VECTORING_INFO_VALID_MASK       	INTR_INFO_VALID_MASK
+>  	   If you don't know what to do here, say Y.
 >  
-> -#define INTR_TYPE_EXT_INTR              (0 << 8) /* external interrupt */
-> -#define INTR_TYPE_RESERVED              (1 << 8) /* reserved */
-> -#define INTR_TYPE_NMI_INTR		(2 << 8) /* NMI */
-> -#define INTR_TYPE_HARD_EXCEPTION	(3 << 8) /* processor exception */
-> -#define INTR_TYPE_SOFT_INTR             (4 << 8) /* software interrupt */
-> -#define INTR_TYPE_PRIV_SW_EXCEPTION	(5 << 8) /* ICE breakpoint - undocumented */
-> -#define INTR_TYPE_SOFT_EXCEPTION	(6 << 8) /* software exception */
-> -#define INTR_TYPE_OTHER_EVENT           (7 << 8) /* other event */
-> +#define INTR_TYPE_EXT_INTR		(EVENT_TYPE_EXTINT << 8)	/* external interrupt */
-> +#define INTR_TYPE_RESERVED		(EVENT_TYPE_RESERVED << 8)	/* reserved */
-> +#define INTR_TYPE_NMI_INTR		(EVENT_TYPE_NMI << 8)		/* NMI */
-> +#define INTR_TYPE_HARD_EXCEPTION	(EVENT_TYPE_HWEXC << 8)		/* processor exception */
-> +#define INTR_TYPE_SOFT_INTR		(EVENT_TYPE_SWINT << 8)		/* software interrupt */
-> +#define INTR_TYPE_PRIV_SW_EXCEPTION	(EVENT_TYPE_PRIV_SWEXC << 8)	/* ICE breakpoint - undocumented */
+> +config RISCV_ISA_ZICBOP
 
-ICEBP/INT1 is no longer undocumented.
+Even if we're not concerned with looping over blocks yet, I think we
+should introduce zicbop block size DT parsing at the same time we bring
+zicbop support to the kernel (it's just more copy+paste from zicbom and
+zicboz). It's a bit annoying that the CMO spec doesn't state that block
+sizes should be the same for m/z/p. And, the fact that m/z/p are all
+separate extensions leads us to needing to parse block sizes for all
+three, despite the fact that in practice they'll probably be the same.
 
-~Andrew
+Thanks,
+drew
