@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A4EF7A0DE4
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 21:14:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05B5A7A0DEB
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 21:15:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241255AbjINTOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 15:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36674 "EHLO
+        id S241579AbjINTQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 15:16:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237398AbjINTOq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 15:14:46 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2082.outbound.protection.outlook.com [40.107.220.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2960D213C;
-        Thu, 14 Sep 2023 12:14:42 -0700 (PDT)
+        with ESMTP id S241568AbjINTP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 15:15:59 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2058.outbound.protection.outlook.com [40.107.243.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC2D26B2;
+        Thu, 14 Sep 2023 12:15:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TTkFYnRyfsLYa49q0YFhLFo0FN6pVhPBOs4T3Bvw0R15s8nEz2/eAr/KzwGtgUEtKui8VZdG66Uj8dOdMxZFRvbO2CluSyByQdSJWlAYjv9IwLVKx9qmroKspGk4dA32jUUuOD1A0B5LcDRNFg0PNcfs6uT5Jl35c2mX0GuzyfmGkvFJtDcaU+rRTft0WeMAjUcI4Ul8osd3VTQBuq2Ak7TXNuMv6RHJu6HZIqF3NS0u/NDaCYQvyjagBLdwXYmP6OodLe08df0guuftQgjlex77uZVivyFoDsjGB9+gO2rC71C6D8un/G1wpa4JkGJFINX6KTjcIYtMXzqYehMFsA==
+ b=ZM8rmgLi/0F1wPJ8BPD4NOMvbjIhBi7Gb2HZeWAAXKMoAecXafTx/+vuvfkaA7tj9WDgYe0eOHQft9hjSwJhXxSQHJz089VJR5xtfiRbkX8MVxzOaCpe7ULVyTMhpImxikJglzXqGpZQ/oSJj1UwjhGh6DMM11kuHXJQj9W2qjcgK/+m5Fg25bQOKzh2H3TObm45OougiIjNhO1oOwnyiax4zMlDbjcP+9k0uKZqnKPJ31ioh/2ArrtNOZAlU6tK487HOcK97qsdzQPVLQl1WrgBvtmsPolKzEx5xMPtIP6UpUIDo8Dozzy11FFeow55CafpMH9e0xgEwjKf+DjtZA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DYWzJKwTnWNKMhTwUC4282dIQkyhbLWvPyqLk3IU39g=;
- b=kSkkcEo+/P8uIc27wAfL+5bn3uCYzPoIIx2UK4bJBRChc+5sxh3osNxTtj7NFppXOJQmP1doi5TioQEX3FwN7M5W7D0s0gVdVOSN3Ce9L18ljxXCa9jYgu3eY1JnApNLMlgH4/t9trV1BxTF6xfA+NSwCcbVh3562eH/ZQPFwJzZJKUEGx/XUXx3VcZGWBgAbdHLSsMwSniNN0roSCcFR2VhTql+1AA5n5DyvZFwl8MzLDASWpggbgkx1m11aTXpiN3kMcgZ9X+8i8H9VB9J91rTiCuhJ8wfXXgfB46+VdJzDbGpyZm0w1p8wvkiH/hJsgb+6wuFz4Xmly+MIbT8aA==
+ bh=lpGY4mX3sYfcbli+YvyyUGxQylw2BaNO79x9i5zt+TI=;
+ b=Yczc99Wy48Ktd6EWkG6gMosI6mG1NKmpPsAkmJC587wfPyeTCpc5TtXwoesk3I9D7N1pdkhHi0IMUinqyvnuR/EfvSHRPkef1HalMDlnFLKtwmxfO/z6tGhdNf0AP5bmSDvrgyv/bsVsIsbXfGEb2I52/YXZrpzCe4ZCAtWRbHP6JxZ5NuLZRc4/2agtrrODghqgHSTL32m/anbAUpy1gWgs13bZ8ysnKrRhTOB3Ol86lmYImEcDwRttR/lFH4HHgNnFqlgfLLHDI0Nw69KQZNHY+nExCIinkhC92FQfAdfqaV4srZh1BIOfjt5jpZeBMWLvzufmP3X5slVQZp6PMA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DYWzJKwTnWNKMhTwUC4282dIQkyhbLWvPyqLk3IU39g=;
- b=XU6XS9C3eX9dQzBTq04Ina2+D6dx+UyZzpbOE6apmu6r9DG7BPIA+tjJpSOEFr4f1DZKrki1ihRYs85f+TDhSPAZgb1Vt+d7LHql9C+etDvPwg/0hEJI8G6QWuuomZWSFQG5AW9RNIepuWKiBhveuDRQ98nAgRfHYKguavuckhk=
-Received: from DM6PR02CA0063.namprd02.prod.outlook.com (2603:10b6:5:177::40)
- by DM6PR12MB4861.namprd12.prod.outlook.com (2603:10b6:5:1bd::12) with
+ bh=lpGY4mX3sYfcbli+YvyyUGxQylw2BaNO79x9i5zt+TI=;
+ b=mgKFx6ukLkALHOfb3g0TzwxG2piUT8O8I4z5sUMe+cpB1CCuFoSIdnSlraKPTY5+pMe0kd6BwhoJrcyPVnUK7JMdJr3AWG7yOodEpTKpK8fxN4/dqVSTuzvmnge4p3db9cny6Qdc7JgiWxWnRJBhKGxay9YZe/xIpuT9fHg3guY=
+Received: from SN6PR05CA0032.namprd05.prod.outlook.com (2603:10b6:805:de::45)
+ by PH7PR12MB6786.namprd12.prod.outlook.com (2603:10b6:510:1ac::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Thu, 14 Sep
- 2023 19:14:39 +0000
-Received: from SN1PEPF00026368.namprd02.prod.outlook.com
- (2603:10b6:5:177:cafe::ab) by DM6PR02CA0063.outlook.office365.com
- (2603:10b6:5:177::40) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21 via Frontend
- Transport; Thu, 14 Sep 2023 19:14:39 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Thu, 14 Sep
+ 2023 19:15:52 +0000
+Received: from SN1PEPF00026367.namprd02.prod.outlook.com
+ (2603:10b6:805:de:cafe::48) by SN6PR05CA0032.outlook.office365.com
+ (2603:10b6:805:de::45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20 via Frontend
+ Transport; Thu, 14 Sep 2023 19:15:52 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,22 +46,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00026368.mail.protection.outlook.com (10.167.241.133) with Microsoft
+ SN1PEPF00026367.mail.protection.outlook.com (10.167.241.132) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 19:14:38 +0000
+ 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 19:15:51 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 14 Sep
- 2023 14:14:37 -0500
-From:   Shannon Nelson <shannon.nelson@amd.com>
-To:     <alex.williamson@redhat.com>, <jgg@ziepe.ca>,
-        <kevin.tian@intel.com>, <reinette.chatre@intel.com>,
-        <tglx@linutronix.de>, <kvm@vger.kernel.org>
-CC:     <shannon.nelson@amd.com>, <brett.creeley@amd.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH vfio] vfio/pci: remove msi domain on msi disable
-Date:   Thu, 14 Sep 2023 12:14:06 -0700
-Message-ID: <20230914191406.54656-1-shannon.nelson@amd.com>
+ 2023 14:15:50 -0500
+From:   Brett Creeley <brett.creeley@amd.com>
+To:     <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <alex.williamson@redhat.com>, <dan.carpenter@linaro.org>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <brett.creeley@amd.com>, <shannon.nelson@amd.com>
+Subject: [PATCH vfio 0/3] pds/vfio: Fixes for locking bugs
+Date:   Thu, 14 Sep 2023 12:15:37 -0700
+Message-ID: <20230914191540.54946-1-brett.creeley@amd.com>
 X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -70,92 +70,44 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00026368:EE_|DM6PR12MB4861:EE_
-X-MS-Office365-Filtering-Correlation-Id: 781570f6-45e9-4ccc-1ab3-08dbb556d765
+X-MS-TrafficTypeDiagnostic: SN1PEPF00026367:EE_|PH7PR12MB6786:EE_
+X-MS-Office365-Filtering-Correlation-Id: ad563476-c442-417e-77e2-08dbb5570300
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b1dF1rxwmBwl5NO6R2Q88buAyoMUi30q117ZEinKwh7/wNKrpaKi9sw7j/I0p9ItQ7WuFXi47Xr7aMwsQvbvWAQ9qaE8fYDI96G2qKMuyzKFF6MCfBak43ISCJJjdE5EOnVDqIBDRAFPg33vj65QZvTdOb41a/d7beOAQP7ugmRHMa73OCjml7HY97Mn9pQvYmcYkx6KWO5My5hVkcO38NQm0XqZopaXos6ENFUsjYumxDSnRRRIn2fxt6N2Gdpt10pvnZFN0c2A9HYQNbmV10NIX0R2Wbqs/swVqcylakTuPG3PeB9jY6383gm5sjg6K3K8YdKBgK2y+6mCj659eS3L1lwJN1TDBJ3SGfndQPks896jL5aGnZAyShNLcg0PnrWaHKRoy04z/jYzie1CRdqnJbkCf0YSDVyRIa8VShhz1ACm7zjjBkdyIT6hocQrp70ISzF9Ql8pKEz4hXjHwBlby6n6wWL53/gesjDbKsXUEScFG6ONlAZx6jaD+anClvs32KindM3Sid98vR5NFPIxMH36xhc8p+qOJs+XWZtOZiWGzFDLinJFTvxu+PwgJZGCrq+gJHQXlqJQLFniJqjblUlYim2yvdvp/uPjKCJXR2r9rj3IOAdQVm8Kc6QGfoTyi7ApuIO7nbAWxRLkbV6gccOxqB/Kfex1ssRb/I0XZtcddYIt+8gN5Z3PwhIHYz0skB/v6RekzmpGwrYMFU0cI/GI5d/W5ar9YjkdrxNXyhCPo5jTJ22UW+NqfhEW6HO22eYynzEUbN4UJC5/KrplzuCnKQ/ylSEmd6xKMaY=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(136003)(39860400002)(376002)(451199024)(82310400011)(1800799009)(186009)(36840700001)(40470700004)(46966006)(86362001)(8936002)(8676002)(81166007)(356005)(82740400003)(44832011)(5660300002)(4326008)(40480700001)(36860700001)(316002)(70586007)(70206006)(110136005)(47076005)(41300700001)(54906003)(40460700003)(2906002)(1076003)(478600001)(6666004)(966005)(336012)(16526019)(26005)(426003)(36756003)(83380400001)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: VS+p2tRn3yIE03hI+FeILsgpbhG5f8s6HTSQ3rZDYGpP+du9VH4SRzeUOZdRZkH7OI7JlcZkCVgVSWCTuDAACoowweJmrWbVBxa5TYQMsEp2PBprcguDpgRkTjJEVHTs5lvTgRGJNsqgRwP/cR0WZRejA6r652CB/CNGcqhxHpTIPeXmqiNP6LuNaJ+nvHy+N6kWTJlkSLX69PFGylGsqzWZ4vr5mNQHnFtujkbIfryBD4UEFCsDVp8Z+Ze6po8TNjvyKlwe2TW/GKezTv3jJpzJUlZczEpzlnVLebw1FEjPdIQwy4NuKxMDlYRTIq3eUdmp5j20B4ieDPpZqJiHKwoUIexIMFPH2dSkAwp8hlzo90INAOmFNlxShW6gL0x99CoHeJsXwD5DNXRA6aonQDdBHaHHq4g9V2AR1AfEirgsnw/t3jYvgdvCe0nHdw+gpa2NS44jlOLs60XsQNGGRFU5KZQt4JNlEJ1XRAi1hLtfTYfw/MWUVdb4ubdJDyxXmCR65wajxQEoD8mFTJZy20HjNH5qu9mtQNe28/Yv2aXGfdI5sTmQuqrxOdfic+XUYf1xlX9hTJu2QVLgEehFj5nh7vbFlljdml9iO2iF4dlSyDBYraYGwvdQ3s1wl/DOc+Ov+unUDad9LTB52grKCVS918Gj8ZaUXYKQwfqlvWA2V1B9O0QLhpW0VLD0QSnYf+8z9ylxpanct9OT5EXCMAthyMgE+tt/uaa247f8Jt6bDqjqjAjvUd1xPoRlMKstylAYnqBYS2UCr29Bz6NlBQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(136003)(376002)(1800799009)(82310400011)(186009)(451199024)(36840700001)(46966006)(40470700004)(41300700001)(40460700003)(86362001)(2906002)(110136005)(356005)(36756003)(316002)(4744005)(82740400003)(478600001)(966005)(54906003)(70206006)(70586007)(6666004)(40480700001)(83380400001)(2616005)(81166007)(5660300002)(1076003)(47076005)(8936002)(26005)(16526019)(8676002)(44832011)(36860700001)(426003)(4326008)(336012)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 19:14:38.7818
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 19:15:51.9576
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 781570f6-45e9-4ccc-1ab3-08dbb556d765
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad563476-c442-417e-77e2-08dbb5570300
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF00026368.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF00026367.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4861
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6786
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new MSI dynamic allocation machinery is great for making the irq
-management more flexible.  It includes caching information about the
-MSI domain which gets reused on each new open of a VFIO fd.  However,
-this causes an issue when the underlying hardware has flexible MSI-x
-configurations, as a changed configuration doesn't get seen between
-new opens, and is only refreshed between PCI unbind/bind cycles.
+This series contains fixes for locking bugs in the recently introduced
+pds-vfio-pci driver. There was an initial bug reported by Dan Carpenter
+at:
 
-In our device we can change the per-VF MSI-x resource allocation
-without the need for rebooting or function reset.  For example,
+https://lore.kernel.org/kvm/1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain/
 
-  1. Initial power up and kernel boot:
-	# lspci -s 2e:00.1 -vv | grep MSI-X
-	        Capabilities: [a0] MSI-X: Enable+ Count=8 Masked-
+However, more locking bugs were found when looking into the previously
+mentioned issue. So, all fixes are included in this series.
 
-  2. Device VF configuration change happens with no reset
+Brett Creeley (3):
+  pds/vfio: Fix spinlock bad magic BUG
+  pds/vfio: Fix mutex lock->magic != lock warning
+  pds/vfio: Fix possible sleep while in atomic context
 
-  3. New MSI-x count value seen:
-	# lspci -s 2e:00.1 -vv | grep MSI-X
-		Capabilities: [a0] MSI-X: Enable- Count=64 Masked-
+ drivers/vfio/pci/pds/vfio_dev.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-This allows for per-VF dynamic reconfiguration of interrupt resources
-for the VMs using the VFIO devices supported by our hardware.
-
-The problem comes where the dynamic IRQ management created the MSI
-domain when the VFIO device creates the first IRQ in the first ioctl()
-VFIO_DEVICE_SET_IRQS request.  The current MSI-x count (hwsize) is read
-when setting up the irq vectors under pci_alloc_irq_vectors_affinity(),
-and the MSI domain information is set up, which includes the hwsize.
-
-When the VFIO fd is closed, the IRQs are removed, but the MSI domain
-information is kept for later use since we're only closing the current
-VFIO fd, not unbinding the PCI device connection.  When a new VFIO fd
-open happens and a new VFIO_DEVICE_SET_IRQS request comes down, the cycle
-starts again, reusing the existing MSI domain with the previous hwsize.
-This is fine until this new QEMU instance has read the new larger MSI-x
-count from PCI config space (QEMU:vfio_msi_enable()) and tries to create
-more IRQs than were available before.  We fail in msi_insert_desc()
-because the MSI domain still is set up for the earlier hwsize and has no
-room for the n+1 IRQ.
-
-This can be easily fixed by simply adding msi_remove_device_irq_domain()
-into vfio_msi_disable() which is called when the VFIO IRQs are removed
-either by an ioctl() call from QEMU or from the VFIO fd close.  This forces
-the MSI domain to be recreated with the new MSI-x count on the next
-VFIO_DEVICE_SET_IRQS request.
-
-Link: https://lore.kernel.org/all/cover.1683740667.git.reinette.chatre@intel.com/
-Link: https://lore.kernel.org/r/20221124232325.798556374@linutronix.de
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
----
- drivers/vfio/pci/vfio_pci_intrs.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index cbb4bcbfbf83..f66d5e7e078b 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -538,6 +538,7 @@ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
- 	cmd = vfio_pci_memory_lock_and_enable(vdev);
- 	pci_free_irq_vectors(pdev);
- 	vfio_pci_memory_unlock_and_restore(vdev, cmd);
-+	msi_remove_device_irq_domain(&pdev->dev, MSI_DEFAULT_DOMAIN);
- 
- 	/*
- 	 * Both disable paths above use pci_intx_for_msi() to clear DisINTx
 -- 
 2.17.1
 
