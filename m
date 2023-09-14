@@ -2,48 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39CDD79FFCD
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:15:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6278579FFD2
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:17:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233672AbjINJPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 05:15:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52134 "EHLO
+        id S235913AbjINJRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 05:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230515AbjINJPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:15:36 -0400
+        with ESMTP id S230515AbjINJRj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 05:17:39 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B443BCEB;
-        Thu, 14 Sep 2023 02:15:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B52A9E;
+        Thu, 14 Sep 2023 02:17:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JsJPsTpwWFpzVVZeNPo1BZax52gHDIRYYUVVchDwJ3M=; b=B4YEAoOanRjVv2OjcjGuDw4eGa
-        20n1qriaULmEv8IhqbKsn+Q0UIvBsVJgR161kcKQLo3PYwIOMKrVaTlowg/jYeMU7LIfkWGZOaxCV
-        hkoFj9doGI4jSdw4GvZ5o3dc739gyfsuhyiPDiMCugcMeeG9kRDHckRVo6qfGddQ6HlZdPkTG0d01
-        0X2rZHN32WLIJ1NKltrYFE+sEsCjeQqb82QpizVC/01MPjmKmhg4Qu1os62GsvTi1lIEldMshzHGp
-        2sLpLNLmj8xKhvgXDAyh9hEsV+oXoy/iii26ZkxLrcGK9xmKlrvFilqeeP0gqvnrL8bPB+fuzR1hy
-        vfPUWjtA==;
+        bh=cgOOz1vTGm4Y1BK/0JM10mSlzu0/zzygcNXj+RjozvY=; b=rE4uKH5W3kYtbWOeb3EoaXe0n7
+        31NrG+rV7fqvYLGb1IHXZOLFApXFC2oH5WPy0TeLGFxckR3Pu7srBEszg4BD/n+odv/L2DAkPgBK7
+        zn2ZU8X+BYS/ZC/d8XbDxt1tL3mHQK3Un2RxiF1qaVFGFrJ6owPeMvwxYuZh4e3hgjiHwYzkS9UtB
+        9vxOjKCaEuWoQrsNfF/JAN9MJheBJvW5jgENjKTmOMt13BAEQ9g+RaDs00axqlR2PCQT/nP/ihyUO
+        +DCQPRva8JQigcrYC3xsVtIwyBvTolLvsBi7SjrJ4FrntpdMLyiQFvC6xJX1wFj14MqWffAyzjN7d
+        443I+eWA==;
 Received: from [54.239.6.190] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qgiRe-00235x-Ck; Thu, 14 Sep 2023 09:15:30 +0000
-Message-ID: <bb3ed190771eca5481613abcae05f5f5c3084c47.camel@infradead.org>
-Subject: Re: [PATCH 0/8] KVM: xen: update shared_info and vcpu_info handling
+        id 1qgiTd-0023D4-FO; Thu, 14 Sep 2023 09:17:33 +0000
+Message-ID: <90a31427a4ebea62ea861066a1b86556eb1b1767.camel@infradead.org>
+Subject: Re: [PATCH 1/8] KVM: pfncache: add a map helper function
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-Date:   Thu, 14 Sep 2023 11:15:28 +0200
-In-Reply-To: <20230914084946.200043-1-paul@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 14 Sep 2023 11:17:31 +0200
+In-Reply-To: <20230914084946.200043-2-paul@xen.org>
 References: <20230914084946.200043-1-paul@xen.org>
+         <20230914084946.200043-2-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-YJFPGXPOJUd2T57PB0mD"
+        boundary="=-0KVGzLlUfLLlpqVYWV6f"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -52,34 +48,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-YJFPGXPOJUd2T57PB0mD
+--=-0KVGzLlUfLLlpqVYWV6f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> Currently we treat the shared_info page as guest memory and the VMM infor=
-ms
-> KVM of its location using a GFN. However it is not guest memory as such;
-> it's an overlay page. So we pointlessly invalidate and re-cache a mapping
-> to the *same page* of memory every time the guest requests that shared_in=
-fo
-> be mapped into its address space. Let's avoid doing that by modifying the
-> pfncache code to allow activation using a fixed userspace HVA as well as
-> a GPA.
+> We have an unmap helper but mapping is open-coded. Arguably this is fine
+> because mapping is done in only one place, hva_to_pfn_retry(), but adding
+> the helper does make that function more readable.
+>=20
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
-Looks sane to me in general; thanks.
-
-The changes to the pfncache ended up being a little bit more than I
-originally anticipated when I said you just needed to disable the
-GPA=E2=86=92uHVA lookup via memslots which was about 10 lines... but I thin=
-k
-it's still true that it's worth using the pfncache to avoid reproducing
-the intricate mmu_notifier invalidations.
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
 
---=-YJFPGXPOJUd2T57PB0mD
+--=-0KVGzLlUfLLlpqVYWV6f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -171,24 +156,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MDkxNTI4WjAvBgkqhkiG9w0BCQQxIgQgAoalfmB1
-StMjBHBAr7OZxr+WbG5+TjAGXi8PyyhM7YAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MDkxNzMxWjAvBgkqhkiG9w0BCQQxIgQgNrVyuiFm
+57z6bpmEXl9Q3kxyLPRngrURXB+7+PjF9nwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCKYIHIk2Wv5k/LcW5g1Ofp1gD+W+d0sVMB
-8b7Rt0vh4rM9id980WB/LzZV/xCjvVogz8DRnIapJYvbYN6d3rHORxvnpBt6+Vu3OFSLLxkgYFGm
-3Vn7K96G6B4EdsRC5RkxP9t8+lu14B20sykCI0b0kUf86g/3iV9VIiLQtpIf2+UBVeROJXkYWXp1
-6U0SwiCaUxJ98zBujvl3UASHZN/BxmxHLMDN/xmfjytAiq7/8oFtcAfzr5m1GCOsyagvKag7HImE
-sb5CemgH6cShSKi3ST0ZLISd6UoI3Wjs0zObmIqkCrJk/YTMTr0CAk+snW/UmjuwXUr7KtFDQ2UU
-+ocICLA6ZQny5uST9TWJ88DgqU/YB0RTPF4ncBPMtAK+eSoAobreZLNkLBafbm52BJnM5aBtu0rh
-SJCfwo7XIUYRrNPJCyifqZRMggr8rOrvoEkLE/VI1FrS0Go9CqMF/WSLTt4/C0Rajy5/L68GYC8e
-Lp1Up6Z2YsjyuUffZWlA2+svkSBhzew6GxoRPL9nwJCT8XMFjuyNSlzgM+nYQc92SURICGmTquXi
-GXz35jtRx2VrDKqnsA3N3qu8skD/vDzIeQSyBe3P8RoitzvIL9cltv65eLcF+JTl9QpeKOqwtF9R
-tyVhV0fr1Reir6drMeLw9gJx9+mPSDW4QYpD9J1s+QAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCbC0GHsE4PRUJPhcQrCBl2hNqYXrwwQ2pH
+0XDs+7CHhCDySRuIxFu6/PKz7zcLyiuz3yXS89yPsjcRwq1SNnY4lwXmvaT9mNtcYMVbHlt8F283
+e5sw+o7sYmhJJLC8UXINrnasI5Sz0EaMBwDCIJc09ISCaFoRhNTNQpTZ0LGWr4O7PgQVS9XlkNwH
+gn0dh4ul1e+rAYA7o2qQgUwlvNvgJLvnTKfk8xP5s7wSxg8TMUWsTGlwvb4QtuFda4gSXpEe5Nky
+0W9JX4sM1FZ4JNf6KjA7OXSMY6m2wr3NnRZg3MtPqfknnZaoUUhuuFRaHxpK27V/EpNgO8cb3wyR
+DRtrl1iSrXY+OwGn2lD5j7WwidYu4X5K5Dg2zTc2sE7EbjXOuYZPicDQ68Ehm0wcK8CGYAJsBZ8a
+Qbn/ZRderexlWZLeYP5vtu6jJ3m/52LTuJ088jdCn61njDeRbdbQAaPs5J8vVAskdACXFoPqdQNl
+paOJBdnP3T7HI4iGuHKEGRD0+26WZKnrBNBTNKCMYFfGtpqo2MWKB94LvUdjpxno3MywrTtbJdVl
+VodlkjhjZI5Z3770M/xKXmUapsnQNNWMl6CoA2JejaUh8yoDb+WbazFdyKvWL2lM22qAOG5yYC0Y
+bgikSbQw0IExFZ7eDBdNjRftYF1hRuiGm8y5Ll/1egAAAAAAAA==
 
 
---=-YJFPGXPOJUd2T57PB0mD--
+--=-0KVGzLlUfLLlpqVYWV6f--
