@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6654479F90E
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:51:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0B5C79F910
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 05:51:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234342AbjINDvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 23:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49310 "EHLO
+        id S234338AbjINDvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 23:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234281AbjINDvl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 23:51:41 -0400
+        with ESMTP id S234274AbjINDvq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 23:51:46 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808CB193
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 20:51:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DEC1BE9
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 20:51:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694663497; x=1726199497;
+  t=1694663502; x=1726199502;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=H92kwpzNZpBa5P3PcIKApYqTKPa48fU3DQboSoQydpY=;
-  b=bhrUjP0S7m+s4HoRXH57vVxI9gmw9ouM5WbdWz8U9Fp2B6Q825qX+dYq
-   oEt+br/uvCaTEOUylHCyPm+UVvixlD/x6bMD2trnjVphQc92U1EOAVAO9
-   cAtJTTb8QYAAJHMDLbe88LwzsYYiF86hdBhfHytKXg74+kkEyjHAbT2kt
-   TZlRQpyQp2kWX0xh6xf4Ph5qlWdDtvroe/vasIlNq95jlbr2Fsx5iCmNp
-   Zgve45QvXIuJU1KpFUBQtsaviakRIL1me2ebMODHze1fINn+8e/QCAdww
-   +RdzQ7EbjPeQ7jYKQrH6rSy082PFjkP+9/CJQOqjO0QCgyyQhpC8qEhot
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="381528313"
+  bh=Bz7wCSve/nZkE1jWq4TK9eEpAIR2dm0qaoQY8fTWjd8=;
+  b=OCSLnPlrwZEYrx9SB8yPkD6FBxzkTY/4sIwxBx0FDLxEfhtd250L5sC8
+   pU486caFbudLR2sGcSGXDFzbITmOrpp6uRaXnV95nx9dTpDB+FHk2bLCe
+   nqnqif87auRbZiuSkFoNyHOke/Wuq37draFYx3yrNhRTxlhTK9p+hS8JU
+   VqsgJx/GB5s391Jly7xG89ubtouVZnexKujCbe4fF5Y6BvF2Rn8DoktX/
+   2TXE3Fz4jzXVKm7Kts/lLb5KjOuLY2APNODymOnlW65Vj5MYR7BmKnQOn
+   Qnj80SX9avOdQYx2NamNeYqxMgfCEWnPWdGvCUovdS1cbCq06o9Anluz3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="381528329"
 X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="381528313"
+   d="scan'208";a="381528329"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:51:37 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 20:51:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="814500557"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="814500562"
 X-IronPort-AV: E=Sophos;i="6.02,144,1688454000"; 
-   d="scan'208";a="814500557"
+   d="scan'208";a="814500562"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmsmga004.fm.intel.com with ESMTP; 13 Sep 2023 20:51:32 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 13 Sep 2023 20:51:37 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         David Hildenbrand <david@redhat.com>,
@@ -56,9 +56,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, xiaoyao.li@intel.com,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Claudio Fontana <cfontana@suse.de>
-Subject: [RFC PATCH v2 03/21] HostMem: Add private property and associate it with RAM_KVM_GMEM
-Date:   Wed, 13 Sep 2023 23:50:59 -0400
-Message-Id: <20230914035117.3285885-4-xiaoyao.li@intel.com>
+Subject: [RFC PATCH v2 04/21] memory: Introduce memory_region_has_gmem_fd()
+Date:   Wed, 13 Sep 2023 23:51:00 -0400
+Message-Id: <20230914035117.3285885-5-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230914035117.3285885-1-xiaoyao.li@intel.com>
 References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
@@ -68,129 +68,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Introduce memory_region_has_gmem_fd() to query if the MemoryRegion has
+KVM gmem fd allocated.
 
-Add a new property "private" to memory backends. When it's set to true,
-it indicates the RAMblock of the backend also requires kvm gmem.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- backends/hostmem-file.c  |  1 +
- backends/hostmem-memfd.c |  1 +
- backends/hostmem-ram.c   |  1 +
- backends/hostmem.c       | 18 ++++++++++++++++++
- include/sysemu/hostmem.h |  2 +-
- qapi/qom.json            |  4 ++++
- 6 files changed, 26 insertions(+), 1 deletion(-)
+ include/exec/memory.h | 10 ++++++++++
+ softmmu/memory.c      |  5 +++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index b4335a80e6da..861f76f2de8a 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -56,6 +56,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-     name = host_memory_backend_get_name(backend);
-     ram_flags = backend->share ? RAM_SHARED : 0;
-     ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-+    ram_flags |= backend->private ? RAM_KVM_GMEM : 0;
-     ram_flags |= fb->is_pmem ? RAM_PMEM : 0;
-     ram_flags |= RAM_NAMED_FILE;
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend), name,
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 3fc85c3db81b..f49990ce3bbd 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -55,6 +55,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-     name = host_memory_backend_get_name(backend);
-     ram_flags = backend->share ? RAM_SHARED : 0;
-     ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-+    ram_flags |= backend->private ? RAM_KVM_GMEM : 0;
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend), name,
-                                    backend->size, ram_flags, fd, 0, errp);
-     g_free(name);
-diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-index b8e55cdbd0f8..d6c46250dcfd 100644
---- a/backends/hostmem-ram.c
-+++ b/backends/hostmem-ram.c
-@@ -30,6 +30,7 @@ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-     name = host_memory_backend_get_name(backend);
-     ram_flags = backend->share ? RAM_SHARED : 0;
-     ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-+    ram_flags |= backend->private ? RAM_KVM_GMEM : 0;
-     memory_region_init_ram_flags_nomigrate(&backend->mr, OBJECT(backend), name,
-                                            backend->size, ram_flags, errp);
-     g_free(name);
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 747e7838c031..dbdbb0aafd45 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -461,6 +461,20 @@ static void host_memory_backend_set_reserve(Object *o, bool value, Error **errp)
-     }
-     backend->reserve = value;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 227cb2578e95..4b8486ca3632 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1674,6 +1674,16 @@ static inline bool memory_region_is_romd(MemoryRegion *mr)
+  */
+ bool memory_region_is_protected(MemoryRegion *mr);
+ 
++/**
++ * memory_region_has_gmem_fd: check whether a memory region has KVM gmem fd
++ *     associated
++ *
++ * Returns %true if a memory region's ram_block has valid gmem fd assigned.
++ *
++ * @mr: the memory region being queried
++ */
++bool memory_region_has_gmem_fd(MemoryRegion *mr);
++
+ /**
+  * memory_region_get_iommu: check whether a memory region is an iommu
+  *
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 7d9494ce7028..e69a5f96d5d1 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1846,6 +1846,11 @@ bool memory_region_is_protected(MemoryRegion *mr)
+     return mr->ram && (mr->ram_block->flags & RAM_PROTECTED);
  }
-+
-+static bool host_memory_backend_get_private(Object *o, Error **errp)
+ 
++bool memory_region_has_gmem_fd(MemoryRegion *mr)
 +{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-+
-+    return backend->private;
++    return mr->ram_block && mr->ram_block->gmem_fd >= 0;
 +}
 +
-+static void host_memory_backend_set_private(Object *o, bool value, Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-+
-+    backend->private = value;
-+}
- #endif /* CONFIG_LINUX */
- 
- static bool
-@@ -541,6 +555,10 @@ host_memory_backend_class_init(ObjectClass *oc, void *data)
-         host_memory_backend_get_reserve, host_memory_backend_set_reserve);
-     object_class_property_set_description(oc, "reserve",
-         "Reserve swap space (or huge pages) if applicable");
-+    object_class_property_add_bool(oc, "private",
-+        host_memory_backend_get_private, host_memory_backend_set_private);
-+    object_class_property_set_description(oc, "private",
-+        "Use KVM gmem private memory");
- #endif /* CONFIG_LINUX */
-     /*
-      * Do not delete/rename option. This option must be considered stable
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 39326f1d4f9c..d88970395618 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -65,7 +65,7 @@ struct HostMemoryBackend {
-     /* protected */
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
--    bool prealloc, is_mapped, share, reserve;
-+    bool prealloc, is_mapped, share, reserve, private;
-     uint32_t prealloc_threads;
-     ThreadContext *prealloc_context;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-diff --git a/qapi/qom.json b/qapi/qom.json
-index fa3e88c8e6ab..d28c5403bc0f 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -605,6 +605,9 @@
- # @reserve: if true, reserve swap space (or huge pages) if applicable
- #     (default: true) (since 6.1)
- #
-+# @private: if true, use KVM gmem private memory (default: false)
-+#     (since 8.2)
-+#
- # @size: size of the memory region in bytes
- #
- # @x-use-canonical-path-for-ramblock-id: if true, the canonical path
-@@ -631,6 +634,7 @@
-             '*prealloc-context': 'str',
-             '*share': 'bool',
-             '*reserve': 'bool',
-+            '*private': 'bool',
-             'size': 'size',
-             '*x-use-canonical-path-for-ramblock-id': 'bool' } }
- 
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
 -- 
 2.34.1
 
