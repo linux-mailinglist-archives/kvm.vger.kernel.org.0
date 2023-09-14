@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1428379FA2E
+	by mail.lfdr.de (Postfix) with ESMTP id 60F4079FA2F
 	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 07:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234805AbjINFTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 01:19:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49228 "EHLO
+        id S235026AbjINFTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 01:19:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234911AbjINFTU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234907AbjINFTU (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 14 Sep 2023 01:19:20 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF521BD2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE7C1BCD;
         Wed, 13 Sep 2023 22:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1694668756; x=1726204756;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kFEO+uu6A5ft6HNZsGdUlo7JkWRDUia/sG5iL2BNrkQ=;
-  b=ikiyUdqk8vTH+ahTfmG895V39i4pLxFHBPrbNLJp9OluQg/7DXdOHJ2I
-   A8IQXOI2USyDPSmC5tgQchf+crAqJY/Uy+7Ibmb1AtjPVbMHc8bX1Cp16
-   Qce4MuBcDX9ZuSeShoJZtt6FwcOhwVewHZbY7DtOIoltdQGq4MlIGbvm3
-   6UjbaWlKx0yMPWrtib2lf7aao709hlswr6tizflqKzyoMam+rRKEbH12I
-   bawMpc3QXcbNlkM/bGijx1Glr/y8kPt7Rvz7Jqn0HVu4PZFrnsOwcRevg
-   CDWWkiEoZsMnOumDk5yzUcKv5zFbi8oWh28CIppMsB0/ypRJ+Qf3PqH5q
+  bh=i5VPM7WJy8QX3AfDJPn+y86GzsjxiQoeNBcvUeRwUoQ=;
+  b=UGODVsBmokoMilRFn83AvtBSvYjuzfbFzd3Twx3gCNjw34GwLF+pb2Nw
+   WurVjqjVG3fpJckGjxw/1JP26CUUnpYPsePT3Xk3QBptezII3AsyOpQ7/
+   dvLqktUpaat1JuSLvnScOhQATbHee/osm+ei26AI6z3uW/UPlCEdnGfDy
+   EeCtH47ZRfo3CzI0oQCkn9cEK3hcGGQViCjbgiOjGQwKJy1tNguZAaDao
+   a4MN1zs8H4CWG+lwAcJYzcuibgHGKTElgA9SUiItzodslEnZOuqSFfAUZ
+   VTgs+5AIeeVuwreoaVLpvcRkKo0tEdWWkGAk0k9N8DMpKy7dFRfRuSaW8
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382661195"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="382661208"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="382661195"
+   d="scan'208";a="382661208"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 22:17:34 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 22:17:35 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="779488767"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="779488771"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="779488767"
+   d="scan'208";a="779488771"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by orsmga001.jf.intel.com with ESMTP; 13 Sep 2023 22:17:34 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -48,9 +48,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com
-Subject: [PATCH v10 10/38] x86/fred: Disable FRED by default in its early stage
-Date:   Wed, 13 Sep 2023 21:47:37 -0700
-Message-Id: <20230914044805.301390-11-xin3.li@intel.com>
+Subject: [PATCH v10 11/38] x86/opcode: Add ERET[US] instructions to the x86 opcode map
+Date:   Wed, 13 Sep 2023 21:47:38 -0700
+Message-Id: <20230914044805.301390-12-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230914044805.301390-1-xin3.li@intel.com>
 References: <20230914044805.301390-1-xin3.li@intel.com>
@@ -60,43 +60,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To enable FRED, a new kernel command line option "fred" needs to be added.
+From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
+ERETU returns from an event handler while making a transition to ring 3,
+and ERETS returns from an event handler while staying in ring 0.
+
+Add instruction opcodes used by ERET[US] to the x86 opcode map; opcode
+numbers are per FRED spec v5.0.
+
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
+Reviewed-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 ---
- Documentation/admin-guide/kernel-parameters.txt | 3 +++
- arch/x86/kernel/cpu/common.c                    | 3 +++
- 2 files changed, 6 insertions(+)
+ arch/x86/lib/x86-opcode-map.txt       | 2 +-
+ tools/arch/x86/lib/x86-opcode-map.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 0a1731a0f0ef..42def5cc7552 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -1525,6 +1525,9 @@
- 			Warning: use of this parameter will taint the kernel
- 			and may cause unknown problems.
+diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
+index 1efe1d9bf5ce..12af572201a2 100644
+--- a/arch/x86/lib/x86-opcode-map.txt
++++ b/arch/x86/lib/x86-opcode-map.txt
+@@ -1052,7 +1052,7 @@ EndTable
  
-+	fred		[X86-64]
-+			Enable flexible return and event delivery
-+
- 	ftrace=[tracer]
- 			[FTRACE] will set and start the specified tracer
- 			as early as possible in order to facilitate early
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 382d4e6b848d..317b4877e9c7 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1486,6 +1486,9 @@ static void __init cpu_parse_early_param(void)
- 	char *argptr = arg, *opt;
- 	int arglen, taint = 0;
+ GrpTable: Grp7
+ 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B) | WRMSRNS (110),(11B)
+-1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
++1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
+ 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
+ 3: LIDT Ms
+ 4: SMSW Mw/Rv
+diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
+index 1efe1d9bf5ce..12af572201a2 100644
+--- a/tools/arch/x86/lib/x86-opcode-map.txt
++++ b/tools/arch/x86/lib/x86-opcode-map.txt
+@@ -1052,7 +1052,7 @@ EndTable
  
-+	if (!cmdline_find_option_bool(boot_command_line, "fred"))
-+		setup_clear_cpu_cap(X86_FEATURE_FRED);
-+
- #ifdef CONFIG_X86_32
- 	if (cmdline_find_option_bool(boot_command_line, "no387"))
- #ifdef CONFIG_MATH_EMULATION
+ GrpTable: Grp7
+ 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B) | WRMSRNS (110),(11B)
+-1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
++1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
+ 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
+ 3: LIDT Ms
+ 4: SMSW Mw/Rv
 -- 
 2.34.1
 
