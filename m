@@ -2,115 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06DEC7A04FD
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:07:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13CA57A0501
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 15:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238717AbjINNHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 09:07:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33102 "EHLO
+        id S238742AbjINNHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 09:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238675AbjINNHL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 09:07:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3A3A41FD9
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 06:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694696785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=X/pGng4Jlz5jKGWmwVqa99A3qKH6EyoanXPEX+/wRiw=;
-        b=hIRVVVOzKiwgVi2u5A31m4hbSkkKjOsCcwEMo3YF2ynF969HokJTRo83QQm436VsU4RlMh
-        FlOxZoqZvMtAtR1KbYi9vKbEpTeZScmgp/BjxmvpxCDCgknoivMek3sm/ZZqMEPO4nM8fV
-        4OUCCXo4aMscBy4L5GQ3H2YND1drdHg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-1DGsIEI9Ooylc07uZA41hg-1; Thu, 14 Sep 2023 09:06:23 -0400
-X-MC-Unique: 1DGsIEI9Ooylc07uZA41hg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-2f2981b8364so570141f8f.1
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 06:06:23 -0700 (PDT)
+        with ESMTP id S238671AbjINNH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 09:07:27 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3351FD5;
+        Thu, 14 Sep 2023 06:07:23 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-401f68602a8so9748265e9.3;
+        Thu, 14 Sep 2023 06:07:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694696841; x=1695301641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tej9b0LMdUKBSRZxH07jBOdxaJ6MquCE3RokLEVjR7k=;
+        b=rjoLWTXLiEKOlMZrYLKwMuRNi4V41FSZiO/Fyr1dsj/eufqx8ATVWylFkkOHpiJPg2
+         dCA56AD1LdD5T/VjMMCipoxTSB547oS64J6jxrpjXEtjacwQIN+7Cz6tVqqBVNEbWuEA
+         XyIx7qOWHodsnYhrZOckIOErmGbO6eFwhjgGkuojVFZOBvYo0hl9jP2pNsNmKLIw4fkD
+         PWR0m++xId7DOEDcbF8XIO9Dgr/ONtE3aMxorWoCjndLyB2QSjooJTaHK5Gc0Ck4OUs7
+         tS9xJk5Ecfi47JVvFmsYTRi4nErjrn4dgYz2NA5MA0wWN7BGY1GYyqQo961RsXJSf0/3
+         tGgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694696782; x=1695301582;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1694696841; x=1695301641;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X/pGng4Jlz5jKGWmwVqa99A3qKH6EyoanXPEX+/wRiw=;
-        b=r9bTCK0mUIjxecbuwLmnoyaqbqsMv/YC7KUDllvZuKmJcym9u5/MUaM0QOTU0UjTjD
-         AyN+GmYGUeByBZMBrLc7NNsCfwvkRw+5pnmdzEnHIfca0flFnDmSzsjmnExpvHii5UV5
-         5MvtkC9ndoFKcfRBQ3axcI3xNVlXArAkUeR3nrLitfDXulMNijCaBar5Ko3nuhKB8+kR
-         2GE0oPIhZW+4jToX9XEAg6l1uu/ZWTVbVktR7LsjI2fQ+kAWXiBx++NMq/7w21p0JFCN
-         1xwIHZXb2itMx49H76eokfkaSL5FSUmytLJLI5Oe1UKSFUVRJ0z1OeGbSZ7Wfr5YXw6R
-         aXdg==
-X-Gm-Message-State: AOJu0YyvwlN1pkWHq9hxMe7oGjshqY2/S9qwH5yB69qtGoR3No8f9D82
-        bJxiVRyw49SjSY86BWOa/8dH90Ziz+EDKyu+Dybx+3idmjE9xS6bDgCMrnJH3EXOJcVbdKsk3+4
-        G1tXnyyT/zAsw
-X-Received: by 2002:a5d:6752:0:b0:31f:b91c:6ebc with SMTP id l18-20020a5d6752000000b0031fb91c6ebcmr4442865wrw.14.1694696782740;
-        Thu, 14 Sep 2023 06:06:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHMprSt5Eq7z2+zyD9pVdEhDhOcN3K4FFKy92OAHwhT7/UABz6yxx0vX6SGjsriWT02u92rgg==
-X-Received: by 2002:a5d:6752:0:b0:31f:b91c:6ebc with SMTP id l18-20020a5d6752000000b0031fb91c6ebcmr4442801wrw.14.1694696781669;
-        Thu, 14 Sep 2023 06:06:21 -0700 (PDT)
-Received: from sgarzare-redhat ([46.222.114.183])
-        by smtp.gmail.com with ESMTPSA id 4-20020a05600c22c400b00403b63e87f2sm1940671wmg.32.2023.09.14.06.06.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 06:06:21 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 15:06:17 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v8 2/4] vsock/virtio: support to send non-linear
- skb
-Message-ID: <nzguzjuchyk5uwdnexegayweyogv5wdfgaxrrw47fuw2rjkumq@4ybro57ixsga>
-References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
- <20230911202234.1932024-3-avkrasnov@salutedevices.com>
+        bh=Tej9b0LMdUKBSRZxH07jBOdxaJ6MquCE3RokLEVjR7k=;
+        b=EB/k0W3pjh2TTOf/f3FeQM1wZ+nmAtVaXfziggUe3P3xJFmjuJMxItz+zZ4zjXkbyc
+         w8X3lhUkvecgWHlsyQ9lyRBc3mw9GIhkbCU4Qihn3rtnwz2VzZNiexnuYRZhmTU3xsvB
+         zpNcEMEKF6mNEHYri2CSDYqZmpXzQ4UNPyZ2cDIZfQSN9g4ky3V0HEMVF/jMt1EoH52v
+         pcoDNTzpsDOhIoxhTl37qKqXbht4ObGgK3WeSgaIyByweDAEDnKA94EUeEJvyPhnQsCN
+         xu6iC8bacjXBRpOmx1dZsaBDME2KAa5V5Zh5FI2UcRedN3V1VMvhJ/krcKLEgvYoaWJL
+         tN1Q==
+X-Gm-Message-State: AOJu0YyXFuS9vax5HbpopifHZni6uxU39enYvKpWKZeoaEZXn0aEfop5
+        nFQInG0OpjdChRljf/dWEPs=
+X-Google-Smtp-Source: AGHT+IHUqdikwusaZ197Z7lAgvVUm0b2rKPwxGuDzuK0CfVPCbOiJ1CSjghXQW5EGPQAtAcuiR1wqg==
+X-Received: by 2002:a05:600c:2307:b0:402:e6a2:c8c7 with SMTP id 7-20020a05600c230700b00402e6a2c8c7mr4838002wmo.7.1694696841293;
+        Thu, 14 Sep 2023 06:07:21 -0700 (PDT)
+Received: from [192.168.5.8] (54-240-197-235.amazon.com. [54.240.197.235])
+        by smtp.gmail.com with ESMTPSA id u8-20020a5d6ac8000000b0031416362e23sm1759075wrw.3.2023.09.14.06.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Sep 2023 06:07:20 -0700 (PDT)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <75b00614-a3a5-44de-5a14-3b7c7c7eceb0@xen.org>
+Date:   Thu, 14 Sep 2023 15:07:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230911202234.1932024-3-avkrasnov@salutedevices.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 2/8] KVM: pfncache: add a mark-dirty helper
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+References: <20230914084946.200043-1-paul@xen.org>
+ <20230914084946.200043-3-paul@xen.org>
+ <87b3f6713a7c6aa57adc89b6c47be3e1511f66ca.camel@infradead.org>
+ <69b2a8ae-fcae-75b8-4b2a-ca75bbd273f0@xen.org>
+ <a689f4847d2272a75d89364723bab7a29508f646.camel@infradead.org>
+Organization: Xen Project
+In-Reply-To: <a689f4847d2272a75d89364723bab7a29508f646.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 11:22:32PM +0300, Arseniy Krasnov wrote:
->For non-linear skb use its pages from fragment array as buffers in
->virtio tx queue. These pages are already pinned by 'get_user_pages()'
->during such skb creation.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> Changelog:
-> v2 -> v3:
->  * Comment about 'page_to_virt()' is updated. I don't remove R-b,
->    as this change is quiet small I guess.
-> v6 -> v7:
->  * Move arrays '*sgs' and 'bufs' to 'virtio_vsock' instead of being
->    local variables. This allows to save stack space in cases of too
->    big MAX_SKB_FRAGS.
->  * Add 'WARN_ON_ONCE()' for handling nonlinear skbs - it checks that
->    linear part of such skb contains only header.
->  * R-b tag removed due to updates above.
-> v7 -> v8:
->  * Add comment in 'struct virtio_vsock' for both 'struct scatterlist'
->    fields.
->  * Rename '*sgs' and 'bufs' to '*out_sgs' and 'out_bufs'.
->  * Initialize '*out_sgs' in 'virtio_vsock_probe()' by always pointing
->    to the corresponding element of 'out_bufs'.
+On 14/09/2023 13:39, David Woodhouse wrote:
+> On Thu, 2023-09-14 at 11:34 +0200, Paul Durrant wrote:
+>> On 14/09/2023 10:21, David Woodhouse wrote:
+>>> On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
+>>>> --- a/arch/x86/kvm/xen.c
+>>>> +++ b/arch/x86/kvm/xen.c
+>>>> @@ -430,14 +430,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
+>>>>                   smp_wmb();
+>>>>           }
+>>>>    
+>>>> -       if (user_len2)
+>>>> +       if (user_len2) {
+>>>> +               kvm_gpc_mark_dirty(gpc2);
+>>>>                   read_unlock(&gpc2->lock);
+>>>> +       }
+>>>>    
+>>>> +       kvm_gpc_mark_dirty(gpc1);
+>>>>           read_unlock_irqrestore(&gpc1->lock, flags);
+>>>> -
+>>>> -       mark_page_dirty_in_slot(v->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
+>>>> -       if (user_len2)
+>>>> -               mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2->gpa >> PAGE_SHIFT);
+>>>>    }
+>>>>    
+>>>>    void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
+>>>
+>>> ISTR there was a reason why the mark_page_dirty_in_slot() was called
+>>> *after* unlocking. Although now I say it, that seems wrong... is that
+>>> because the spinlock is only protecting the uHVA→kHVA mapping, while
+>>> the memslot/gpa are going to remain valid even after unlock, because
+>>> those are protected by sRCU?
+>>
+>> Without the lock you could see an inconsistent GPA and memslot so I
+>> think you could theoretically calculate a bogus rel_gfn and walk off the
+>> end of the dirty bitmap. Hence moving the call inside the lock while I
+>> was in the neighbourhood seemed like a good idea. I could call it out in
+>> the commit comment if you'd like.
+> 
+> Yeah, I can't see a reason why it needs to be outside the lock, and as
+> you note, there really is a reason why it should be *inside*. Whatever
+> reason there was, it either disappeared in the revisions of the gpc
+> patch set or it was stupidity on my part in the first place.
+> 
+> So yeah, let it move inside the lock, call that out in the commit
+> message (I did note some of the other commits could have used a 'No
+> functional change intended' too, FWIW), and
 
-LGTM, thanks for addressing that comments!
+Ack. Will do.
 
->
-> net/vmw_vsock/virtio_transport.c | 60 ++++++++++++++++++++++++++++----
-> 1 file changed, 53 insertions(+), 7 deletions(-)
+> 
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+> 
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Thanks.
+
+   Paul
 
