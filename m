@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2302179F769
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 04:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D30279F766
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 04:01:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234406AbjINCBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 22:01:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39816 "EHLO
+        id S233827AbjINCBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 22:01:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234090AbjINCAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 22:00:25 -0400
+        with ESMTP id S234315AbjINCA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 22:00:26 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D2E3C27
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:56:39 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bee08c13aso2140007b3.0
-        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:56:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98E33C30
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:56:40 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59beb3a8291so3976607b3.1
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:56:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694656598; x=1695261398; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694656600; x=1695261400; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=mhn7+u5bXSh3DxSOzG9/ewBd6nzzrjcseQEqhhMfZJw=;
-        b=pXCQZOdQ0AvIcFrYCCczuYmLySIQ3bWrZwL560rqrT4E5eG7S/5uMl3nJPzs6YW6KP
-         Pf3dDip0nsGBBNXLblA+jzkdJPZ3ax73/C+7NHAaQs/BezWMdx17bOta6jTi4jG7RjxH
-         zvjLBXkFfaPcb8IC+ehkZz/3PYFsY+GdWcO427VEyTUNCObjV/di6jefuko9kq8+BueZ
-         TnzH10zIqqs0djJUI6QkKdfnh+Xo1JrJIaTwVmUqkxE4aELwEKjF92egvtSj71c4OIl6
-         zUJvc9/gWwggZ3Oy5kLa5vzo6U18Tms7FkqeuFrJAKH/s7J/ikIINQukrdXJDpV5UE0I
-         S6gw==
+        bh=i91JvGzfQg7A4MbSmUGyo4+8+JqUux5ifD59BoUsadA=;
+        b=XN95L1dXLkzuSG+hNiM+A+e7KQXKTh9khvx0jTBPuWI3JF2PPRtKZyTaYuBf3QArdV
+         Ev+PHhTTBPArtqEfTTiu/BuHluUhu1+F0rMi7JsnrpcyVeefLInusgTaEO8nZhLBncnc
+         ZL4iWZbS1BQMDmwvCodpQHxtpanuZLuYegsAY1glYt1Oo6icVhwjdNjVpIhb1iGw96e6
+         9XHWppHr9cvjiq24xl8CAxx46HEIH7FkuMUMX/ThCPAhbhIdOci92sudIHsZ2JHxJnOn
+         3sy2EdJwrQJA9yRbaEbaUDUEV/EEDFBNdL6UYBuNnJk7VPelfPD5s1rrC+hno80eDgFP
+         oBzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694656598; x=1695261398;
+        d=1e100.net; s=20230601; t=1694656600; x=1695261400;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mhn7+u5bXSh3DxSOzG9/ewBd6nzzrjcseQEqhhMfZJw=;
-        b=Sy3ANDOVrhVBZz7V8XHaAyup/Y/EDYx1ByF51+1A8BoASQdtuZgrLd08n0unNSKUvs
-         lFWzEcZ7enHbaPC+zsUwSpsGukxEjlhVYHaQ6N1JT0kr8oTWM/V7TpISI9n/hzt+OTlq
-         6VVADCUT2N4x8LLvXz83EUWd4kNrp7xg7VDi44fE88FcOXyUY2Nw03gh6nv2WgI8u67i
-         BK0hXihx0Sed9waahmXwylrfBnnXobs5qsdvqH2r9xUqFhEr63VK5N50kTGFiN0htMyu
-         Y4efCMV/UHFQSpvJLpL0wtfvibni5KnFn7PotUBPQ6mAgMwow5x10utH+EQL/Sg5j6aX
-         Z35w==
-X-Gm-Message-State: AOJu0Yxu59TxanLd1fXWYG6kqIyJY0drRIC2S8MbcTlJSNSbdaY5aFFf
-        myjGv5vgEgAWOZC87LIUJ/Ksyojakyw=
-X-Google-Smtp-Source: AGHT+IECmRUJsED8Us3qWlJnugvslNzA7dXsGOQfEOYZbUPHi7DQFFf33qpMB4ILXjFkyWuOYhA2SvRB6XQ=
+        bh=i91JvGzfQg7A4MbSmUGyo4+8+JqUux5ifD59BoUsadA=;
+        b=NPuuAmRxi1KIDYmjv+Rz8ydeJtCM2M0N252aZB2zm8qlhEKBrguLknobTGa3jasSOO
+         E0qFIRFJIoIzR7kzpTVk9pH5fUClQB2+Kt/EdlOXqNqAF2KE904rbZ+pejxeTtdjWCzs
+         S+d0g6G3haSjJGFD5GpBaTYHV+i37Q1qhBLDvdqKQg2Ys7mxfvkmj+jlTBdeu+UHBLc1
+         tgDYqgQbFVdjGRll3DgQU8GFQ28ueBQWWK72vrwSZUKE/t11ccJbqGFEw6awo9YY4Lfg
+         xN6lQT8J9h92MaGTr5vDWOCLbRI9zbanA0Iw2zQMdCpo/RqA0m8FEN0StWmTNsVrYL9u
+         Go1g==
+X-Gm-Message-State: AOJu0Yx1ieX9rNsmCxCSl9cGIVpUyMw9ariiN2V7CTtfhSuWcEXN9/iB
+        wq5Va004i2qOc1AqQdJ5DsED7mZJGwI=
+X-Google-Smtp-Source: AGHT+IEvLzTJgrzr2NLiV8Z9En5+JUJxc1EswgYLaEL3Jr6eWhED9/CQgA0jS1j6Htu+3uQxxbNwCvj4oqA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:e809:0:b0:59b:ebe0:9fcd with SMTP id
- a9-20020a81e809000000b0059bebe09fcdmr13568ywm.7.1694656597965; Wed, 13 Sep
- 2023 18:56:37 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:400c:0:b0:589:a855:7af with SMTP id
+ l12-20020a81400c000000b00589a85507afmr107432ywn.7.1694656599914; Wed, 13 Sep
+ 2023 18:56:39 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Sep 2023 18:55:29 -0700
+Date:   Wed, 13 Sep 2023 18:55:30 -0700
 In-Reply-To: <20230914015531.1419405-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230914015531.1419405-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230914015531.1419405-32-seanjc@google.com>
-Subject: [RFC PATCH v12 31/33] KVM: selftests: Expand set_memory_region_test
- to validate guest_memfd()
+Message-ID: <20230914015531.1419405-33-seanjc@google.com>
+Subject: [RFC PATCH v12 32/33] KVM: selftests: Add basic selftest for guest_memfd()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -101,163 +100,209 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Expand set_memory_region_test to exercise various positive and negative
-testcases for private memory.
+Add a selftest to verify the basic functionality of guest_memfd():
 
- - Non-guest_memfd() file descriptor for private memory
- - guest_memfd() from different VM
- - Overlapping bindings
- - Unaligned bindings
++ file descriptor created with the guest_memfd() ioctl does not allow
+  read/write/mmap operations
++ file size and block size as returned from fstat are as expected
++ fallocate on the fd checks that offset/length on
+  fallocate(FALLOC_FL_PUNCH_HOLE) should be page aligned
++ invalid inputs (misaligned size, invalid flags) are rejected
 
 Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-[sean: trim the testcases to remove duplicate coverage]
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  10 ++
- .../selftests/kvm/set_memory_region_test.c    | 100 ++++++++++++++++++
- 2 files changed, 110 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  | 165 ++++++++++++++++++
+ 2 files changed, 166 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index edc0f380acc0..ac9356108df6 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -819,6 +819,16 @@ static inline struct kvm_vm *vm_create_barebones(void)
- 	return ____vm_create(VM_SHAPE_DEFAULT);
- }
- 
-+static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
-+{
-+	const struct vm_shape shape = {
-+		.mode = VM_MODE_DEFAULT,
-+		.type = KVM_X86_SW_PROTECTED_VM,
-+	};
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index b709a52d5cdb..2b1ef809d73a 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -124,6 +124,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
++TEST_GEN_PROGS_x86_64 += guest_memfd_test
+ TEST_GEN_PROGS_x86_64 += guest_print_test
+ TEST_GEN_PROGS_x86_64 += hardware_disable_test
+ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+new file mode 100644
+index 000000000000..75073645aaa1
+--- /dev/null
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -0,0 +1,165 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright Intel Corporation, 2023
++ *
++ * Author: Chao Peng <chao.p.peng@linux.intel.com>
++ */
 +
-+	return ____vm_create(shape);
++#define _GNU_SOURCE
++#include "test_util.h"
++#include "kvm_util_base.h"
++#include <linux/bitmap.h>
++#include <linux/falloc.h>
++#include <sys/mman.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <stdio.h>
++#include <fcntl.h>
++
++static void test_file_read_write(int fd)
++{
++	char buf[64];
++
++	TEST_ASSERT(read(fd, buf, sizeof(buf)) < 0,
++		    "read on a guest_mem fd should fail");
++	TEST_ASSERT(write(fd, buf, sizeof(buf)) < 0,
++		    "write on a guest_mem fd should fail");
++	TEST_ASSERT(pread(fd, buf, sizeof(buf), 0) < 0,
++		    "pread on a guest_mem fd should fail");
++	TEST_ASSERT(pwrite(fd, buf, sizeof(buf), 0) < 0,
++		    "pwrite on a guest_mem fd should fail");
 +}
 +
- static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
- {
- 	return __vm_create(VM_SHAPE_DEFAULT, nr_runnable_vcpus, 0);
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index b32960189f5f..ca83e3307a98 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -385,6 +385,98 @@ static void test_add_max_memory_regions(void)
- 	kvm_vm_free(vm);
- }
- 
-+
-+static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
-+				     size_t offset, const char *msg)
++static void test_mmap(int fd, size_t page_size)
 +{
-+	int r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+					     MEM_REGION_GPA, MEM_REGION_SIZE,
-+					     0, memfd, offset);
-+	TEST_ASSERT(r == -1 && errno == EINVAL, "%s", msg);
++	char *mem;
++
++	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT_EQ(mem, MAP_FAILED);
 +}
 +
-+static void test_add_private_memory_region(void)
++static void test_file_size(int fd, size_t page_size, size_t total_size)
 +{
-+	struct kvm_vm *vm, *vm2;
-+	int memfd, i;
++	struct stat sb;
++	int ret;
 +
-+	pr_info("Testing ADD of KVM_MEM_PRIVATE memory regions\n");
-+
-+	vm = vm_create_barebones_protected_vm();
-+
-+	test_invalid_guest_memfd(vm, vm->kvm_fd, 0, "KVM fd should fail");
-+	test_invalid_guest_memfd(vm, vm->fd, 0, "VM's fd should fail");
-+
-+	memfd = kvm_memfd_alloc(MEM_REGION_SIZE, false);
-+	test_invalid_guest_memfd(vm, memfd, 0, "Regular memfd() should fail");
-+	close(memfd);
-+
-+	vm2 = vm_create_barebones_protected_vm();
-+	memfd = vm_create_guest_memfd(vm2, MEM_REGION_SIZE, 0);
-+	test_invalid_guest_memfd(vm, memfd, 0, "Other VM's guest_memfd() should fail");
-+
-+	vm_set_user_memory_region2(vm2, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
-+	close(memfd);
-+	kvm_vm_free(vm2);
-+
-+	memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE, 0);
-+	for (i = 1; i < PAGE_SIZE; i++)
-+		test_invalid_guest_memfd(vm, memfd, i, "Unaligned offset should fail");
-+
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
-+	close(memfd);
-+
-+	kvm_vm_free(vm);
++	ret = fstat(fd, &sb);
++	TEST_ASSERT(!ret, "fstat should succeed");
++	TEST_ASSERT_EQ(sb.st_size, total_size);
++	TEST_ASSERT_EQ(sb.st_blksize, page_size);
 +}
 +
-+static void test_add_overlapping_private_memory_regions(void)
++static void test_fallocate(int fd, size_t page_size, size_t total_size)
 +{
-+	struct kvm_vm *vm;
-+	int memfd;
-+	int r;
++	int ret;
 +
-+	pr_info("Testing ADD of overlapping KVM_MEM_PRIVATE memory regions\n");
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, 0, total_size);
++	TEST_ASSERT(!ret, "fallocate with aligned offset and size should succeed");
 +
-+	vm = vm_create_barebones_protected_vm();
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			page_size - 1, page_size);
++	TEST_ASSERT(ret, "fallocate with unaligned offset should fail");
 +
-+	memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE * 4, 0);
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size, page_size);
++	TEST_ASSERT(ret, "fallocate beginning at total_size should fail");
 +
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+				   MEM_REGION_GPA, MEM_REGION_SIZE * 2, 0, memfd, 0);
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size + page_size, page_size);
++	TEST_ASSERT(ret, "fallocate beginning after total_size should fail");
 +
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT + 1, KVM_MEM_PRIVATE,
-+				   MEM_REGION_GPA * 2, MEM_REGION_SIZE * 2,
-+				   0, memfd, MEM_REGION_SIZE * 2);
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			total_size, page_size);
++	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) at total_size should succeed");
 +
-+	/*
-+	 * Delete the first memslot, and then attempt to recreate it except
-+	 * with a "bad" offset that results in overlap in the guest_memfd().
-+	 */
-+	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+				   MEM_REGION_GPA, 0, NULL, -1, 0);
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			total_size + page_size, page_size);
++	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) after total_size should succeed");
 +
-+	/* Overlap the front half of the other slot. */
-+	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+					 MEM_REGION_GPA * 2 - MEM_REGION_SIZE,
-+					 MEM_REGION_SIZE * 2,
-+					 0, memfd, 0);
-+	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
-+		    "Overlapping guest_memfd() bindings should fail with EEXIST");
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			page_size, page_size - 1);
++	TEST_ASSERT(ret, "fallocate with unaligned size should fail");
 +
-+	/* And now the back half of the other slot. */
-+	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
-+					 MEM_REGION_GPA * 2 + MEM_REGION_SIZE,
-+					 MEM_REGION_SIZE * 2,
-+					 0, memfd, 0);
-+	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
-+		    "Overlapping guest_memfd() bindings should fail with EEXIST");
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
++			page_size, page_size);
++	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) with aligned offset and size should succeed");
 +
-+	close(memfd);
-+	kvm_vm_free(vm);
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, page_size, page_size);
++	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
 +}
 +
- int main(int argc, char *argv[])
- {
- #ifdef __x86_64__
-@@ -401,6 +493,14 @@ int main(int argc, char *argv[])
- 
- 	test_add_max_memory_regions();
- 
-+	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
-+	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
-+		test_add_private_memory_region();
-+		test_add_overlapping_private_memory_regions();
-+	} else {
-+		pr_info("Skipping tests for KVM_MEM_PRIVATE memory regions\n");
++static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
++{
++	uint64_t valid_flags = 0;
++	size_t page_size = getpagesize();
++	uint64_t flag;
++	size_t size;
++	int fd;
++
++	for (size = 1; size < page_size; size++) {
++		fd = __vm_create_guest_memfd(vm, size, 0);
++		TEST_ASSERT(fd == -1 && errno == EINVAL,
++			    "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
++			    size);
 +	}
 +
- #ifdef __x86_64__
- 	if (argc > 1)
- 		loops = atoi_positive("Number of iterations", argv[1]);
++	if (thp_configured()) {
++		for (size = page_size * 2; size < get_trans_hugepagesz(); size += page_size) {
++			fd = __vm_create_guest_memfd(vm, size, KVM_GUEST_MEMFD_ALLOW_HUGEPAGE);
++			TEST_ASSERT(fd == -1 && errno == EINVAL,
++				    "guest_memfd() with non-hugepage-aligned page size '0x%lx' should fail with EINVAL",
++				    size);
++		}
++
++		valid_flags = KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
++	}
++
++	for (flag = 1; flag; flag <<= 1) {
++		uint64_t bit;
++
++		if (flag & valid_flags)
++			continue;
++
++		fd = __vm_create_guest_memfd(vm, page_size, flag);
++		TEST_ASSERT(fd == -1 && errno == EINVAL,
++			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
++			    flag);
++
++		for_each_set_bit(bit, &valid_flags, 64) {
++			fd = __vm_create_guest_memfd(vm, page_size, flag | BIT_ULL(bit));
++			TEST_ASSERT(fd == -1 && errno == EINVAL,
++				    "guest_memfd() with flags '0x%llx' should fail with EINVAL",
++				    flag | BIT_ULL(bit));
++		}
++	}
++}
++
++
++int main(int argc, char *argv[])
++{
++	size_t page_size;
++	size_t total_size;
++	int fd;
++	struct kvm_vm *vm;
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
++
++	page_size = getpagesize();
++	total_size = page_size * 4;
++
++	vm = vm_create_barebones();
++
++	test_create_guest_memfd_invalid(vm);
++
++	fd = vm_create_guest_memfd(vm, total_size, 0);
++
++	test_file_read_write(fd);
++	test_mmap(fd, page_size);
++	test_file_size(fd, page_size, total_size);
++	test_fallocate(fd, page_size, total_size);
++
++	close(fd);
++}
 -- 
 2.42.0.283.g2d96d420d3-goog
 
