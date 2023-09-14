@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBDDF7A004D
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:38:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8F347A0050
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:38:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237404AbjINJi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 05:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
+        id S237430AbjINJi3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 05:38:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237139AbjINJiV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230413AbjINJiV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 14 Sep 2023 05:38:21 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E571B1BF9;
-        Thu, 14 Sep 2023 02:38:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4541783;
+        Thu, 14 Sep 2023 02:38:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694684296; x=1726220296;
+  t=1694684297; x=1726220297;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DH/kwoW6eRQtxK0yZo8tCx3soKPTztRafZKZYlHzFUA=;
-  b=DLXeEsQuY2bUJhHhoWPhTqwDe3ENNA7Aa++gb2KZjSAVZ7ka4t/bMDRj
-   GGT4SNXLy58fhmcnzse3yNCgDtxuyoF9qvyA5SY6ycYXF081oScV1We5g
-   11iocSNWjFR+D5r5fN3yqbt9sla6djjpQx/8Tg7BfqJk/V9LxCP34686w
-   l0vrYgOVFIKEBfOAzhF11kn0T95hTIlhU7bXNgMHMPCWkC1aq2jj/6KyP
-   akyoUhxDKUzSQH37TMr2EdDdKh4iUsN7Pd9cShx7MGKC5EeptdxRLjbYq
-   tpQ+drZnAhZMNqIqYmssq7PBzl0WXF5BQ5oedijemTSgTd7eUpyhXgRQm
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="409857318"
+  bh=RiRpO69NN4+D9BiPv1b8kqQ9mDIXR5b5ZIvKZMvuZW0=;
+  b=Ip7QVM/FkJrJHMMsv18V7r/amDdzk2zjr6TL2+txRHNxr1Qfpaji8jGp
+   ozOU1RHSoB2OtWrFCWQbpZAwc+j5KnX4q9GhcvGZ0++DhYsWQ/qXs4Rii
+   7gTLkxuMUIwKCkY8KCvIQdQjf99xKvP4s81lGCs++llFM0Bkas2tE6uia
+   try/Oqho+3WkPG5h0oA0eXRZzAa2qwjljKMNLEP/bhJK1YXnWdKPRU1hO
+   8PtJaBuUz/8UbIHwQ7J8UgQenrIAJg+hcyZz1pBTEl9kCe+hGzWHEi9R5
+   HP061Mg9fVqGBqrgY+wNuU1Wo0P8uzt4ZvH/vVKtFu/txAI/KTIdiAzrw
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="409857323"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="409857318"
+   d="scan'208";a="409857323"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 02:38:16 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 02:38:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="747656216"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="747656219"
 X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="scan'208";a="747656216"
+   d="scan'208";a="747656219"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 02:38:16 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
@@ -44,9 +44,9 @@ To:     seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
 Cc:     dave.hansen@intel.com, peterz@infradead.org, chao.gao@intel.com,
         rick.p.edgecombe@intel.com, weijiang.yang@intel.com,
         john.allen@amd.com
-Subject: [PATCH v6 03/25] x86/fpu/xstate: Add CET supervisor mode state support
-Date:   Thu, 14 Sep 2023 02:33:03 -0400
-Message-Id: <20230914063325.85503-4-weijiang.yang@intel.com>
+Subject: [PATCH v6 04/25] x86/fpu/xstate: Introduce kernel dynamic xfeature set
+Date:   Thu, 14 Sep 2023 02:33:04 -0400
+Message-Id: <20230914063325.85503-5-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230914063325.85503-1-weijiang.yang@intel.com>
 References: <20230914063325.85503-1-weijiang.yang@intel.com>
@@ -56,142 +56,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add supervisor mode state support within FPU xstate management framework.
-Although supervisor shadow stack is not enabled/used today in kernel,KVM
-requires the support because when KVM advertises shadow stack feature to
-guest, architechturally it claims the support for both user and supervisor
-modes for Linux and non-Linux guest OSes.
+Define a new kernel xfeature set including the features can be dynamically
+enabled, i.e., the relevant feature is enabled on demand. The xfeature set
+is currently used by KVM to configure __guest__ fpstate, i.e., calculating
+the xfeature and fpstate storage size etc. The xfeature set is initialized
+once and used whenever it's referenced to avoid repeat calculation.
 
-With the xstate support, guest supervisor mode shadow stack state can be
-properly saved/restored when 1) guest/host FPU context is swapped 2) vCPU
-thread is sched out/in.
+Currently it's used when 1) guest fpstate __state_size is calculated while
+guest permits are configured 2) guest vCPU is created and its fpstate is
+initialized.
 
-The alternative is to enable it in KVM domain, but KVM maintainers NAKed
-the solution. The external discussion can be found at [*], it ended up
-with adding the support in kernel instead of KVM domain.
-
-Note, in KVM case, guest CET supervisor state i.e., IA32_PL{0,1,2}_MSRs,
-are preserved after VM-Exit until host/guest fpstates are swapped, but
-since host supervisor shadow stack is disabled, the preserved MSRs won't
-hurt host.
-
-[*]: https://lore.kernel.org/all/806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com/
-
+Suggested-by: Dave Hansen <dave.hansen@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/include/asm/fpu/types.h  | 14 ++++++++++++--
- arch/x86/include/asm/fpu/xstate.h |  6 +++---
- arch/x86/kernel/fpu/xstate.c      |  6 +++++-
- 3 files changed, 20 insertions(+), 6 deletions(-)
+ arch/x86/kernel/fpu/xstate.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
-index eb810074f1e7..c6fd13a17205 100644
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -116,7 +116,7 @@ enum xfeature {
- 	XFEATURE_PKRU,
- 	XFEATURE_PASID,
- 	XFEATURE_CET_USER,
--	XFEATURE_CET_KERNEL_UNUSED,
-+	XFEATURE_CET_KERNEL,
- 	XFEATURE_RSRVD_COMP_13,
- 	XFEATURE_RSRVD_COMP_14,
- 	XFEATURE_LBR,
-@@ -139,7 +139,7 @@ enum xfeature {
- #define XFEATURE_MASK_PKRU		(1 << XFEATURE_PKRU)
- #define XFEATURE_MASK_PASID		(1 << XFEATURE_PASID)
- #define XFEATURE_MASK_CET_USER		(1 << XFEATURE_CET_USER)
--#define XFEATURE_MASK_CET_KERNEL	(1 << XFEATURE_CET_KERNEL_UNUSED)
-+#define XFEATURE_MASK_CET_KERNEL	(1 << XFEATURE_CET_KERNEL)
- #define XFEATURE_MASK_LBR		(1 << XFEATURE_LBR)
- #define XFEATURE_MASK_XTILE_CFG		(1 << XFEATURE_XTILE_CFG)
- #define XFEATURE_MASK_XTILE_DATA	(1 << XFEATURE_XTILE_DATA)
-@@ -264,6 +264,16 @@ struct cet_user_state {
- 	u64 user_ssp;
- };
- 
-+/*
-+ * State component 12 is Control-flow Enforcement supervisor states
-+ */
-+struct cet_supervisor_state {
-+	/* supervisor ssp pointers  */
-+	u64 pl0_ssp;
-+	u64 pl1_ssp;
-+	u64 pl2_ssp;
-+};
-+
- /*
-  * State component 15: Architectural LBR configuration state.
-  * The size of Arch LBR state depends on the number of LBRs (lbr_depth).
-diff --git a/arch/x86/include/asm/fpu/xstate.h b/arch/x86/include/asm/fpu/xstate.h
-index d4427b88ee12..3b4a038d3c57 100644
---- a/arch/x86/include/asm/fpu/xstate.h
-+++ b/arch/x86/include/asm/fpu/xstate.h
-@@ -51,7 +51,8 @@
- 
- /* All currently supported supervisor features */
- #define XFEATURE_MASK_SUPERVISOR_SUPPORTED (XFEATURE_MASK_PASID | \
--					    XFEATURE_MASK_CET_USER)
-+					    XFEATURE_MASK_CET_USER | \
-+					    XFEATURE_MASK_CET_KERNEL)
- 
- /*
-  * A supervisor state component may not always contain valuable information,
-@@ -78,8 +79,7 @@
-  * Unsupported supervisor features. When a supervisor feature in this mask is
-  * supported in the future, move it to the supported supervisor feature mask.
-  */
--#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT | \
--					      XFEATURE_MASK_CET_KERNEL)
-+#define XFEATURE_MASK_SUPERVISOR_UNSUPPORTED (XFEATURE_MASK_PT)
- 
- /* All supervisor states including supported and unsupported states. */
- #define XFEATURE_MASK_SUPERVISOR_ALL (XFEATURE_MASK_SUPERVISOR_SUPPORTED | \
 diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index 12c8cb278346..c3ed86732d33 100644
+index c3ed86732d33..eaec05bc1b3c 100644
 --- a/arch/x86/kernel/fpu/xstate.c
 +++ b/arch/x86/kernel/fpu/xstate.c
-@@ -51,7 +51,7 @@ static const char *xfeature_names[] =
- 	"Protection Keys User registers",
- 	"PASID state",
- 	"Control-flow User registers",
--	"Control-flow Kernel registers (unused)",
-+	"Control-flow Kernel registers",
- 	"unknown xstate feature",
- 	"unknown xstate feature",
- 	"unknown xstate feature",
-@@ -73,6 +73,7 @@ static unsigned short xsave_cpuid_features[] __initdata = {
- 	[XFEATURE_PT_UNIMPLEMENTED_SO_FAR]	= X86_FEATURE_INTEL_PT,
- 	[XFEATURE_PKRU]				= X86_FEATURE_OSPKE,
- 	[XFEATURE_PASID]			= X86_FEATURE_ENQCMD,
-+	[XFEATURE_CET_KERNEL]			= X86_FEATURE_SHSTK,
- 	[XFEATURE_XTILE_CFG]			= X86_FEATURE_AMX_TILE,
- 	[XFEATURE_XTILE_DATA]			= X86_FEATURE_AMX_TILE,
- };
-@@ -277,6 +278,7 @@ static void __init print_xstate_features(void)
- 	print_xstate_feature(XFEATURE_MASK_PKRU);
- 	print_xstate_feature(XFEATURE_MASK_PASID);
- 	print_xstate_feature(XFEATURE_MASK_CET_USER);
-+	print_xstate_feature(XFEATURE_MASK_CET_KERNEL);
- 	print_xstate_feature(XFEATURE_MASK_XTILE_CFG);
- 	print_xstate_feature(XFEATURE_MASK_XTILE_DATA);
- }
-@@ -346,6 +348,7 @@ static __init void os_xrstor_booting(struct xregs_state *xstate)
- 	 XFEATURE_MASK_BNDCSR |			\
- 	 XFEATURE_MASK_PASID |			\
- 	 XFEATURE_MASK_CET_USER |		\
-+	 XFEATURE_MASK_CET_KERNEL |		\
- 	 XFEATURE_MASK_XTILE)
+@@ -84,6 +84,8 @@ static unsigned int xstate_sizes[XFEATURE_MAX] __ro_after_init =
+ 	{ [ 0 ... XFEATURE_MAX - 1] = -1};
+ static unsigned int xstate_flags[XFEATURE_MAX] __ro_after_init;
  
++u64 fpu_kernel_dynamic_xfeatures __ro_after_init;
++
+ #define XSTATE_FLAG_SUPERVISOR	BIT(0)
+ #define XSTATE_FLAG_ALIGNED64	BIT(1)
+ 
+@@ -740,6 +742,23 @@ static void __init fpu__init_disable_system_xstate(unsigned int legacy_size)
+ 	fpstate_reset(&current->thread.fpu);
+ }
+ 
++static unsigned short xsave_kernel_dynamic_xfeatures[] = {
++	[XFEATURE_CET_KERNEL]	= X86_FEATURE_SHSTK,
++};
++
++static void __init init_kernel_dynamic_xfeatures(void)
++{
++	unsigned short cid;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(xsave_kernel_dynamic_xfeatures); i++) {
++		cid = xsave_kernel_dynamic_xfeatures[i];
++
++		if (cid && boot_cpu_has(cid))
++			fpu_kernel_dynamic_xfeatures |= BIT_ULL(i);
++	}
++}
++
  /*
-@@ -546,6 +549,7 @@ static bool __init check_xstate_against_struct(int nr)
- 	case XFEATURE_PASID:	  return XCHECK_SZ(sz, nr, struct ia32_pasid_state);
- 	case XFEATURE_XTILE_CFG:  return XCHECK_SZ(sz, nr, struct xtile_cfg);
- 	case XFEATURE_CET_USER:	  return XCHECK_SZ(sz, nr, struct cet_user_state);
-+	case XFEATURE_CET_KERNEL: return XCHECK_SZ(sz, nr, struct cet_supervisor_state);
- 	case XFEATURE_XTILE_DATA: check_xtile_data_against_struct(sz); return true;
- 	default:
- 		XSTATE_WARN_ON(1, "No structure for xstate: %d\n", nr);
+  * Enable and initialize the xsave feature.
+  * Called once per system bootup.
+@@ -809,6 +828,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+ 	if (boot_cpu_has(X86_FEATURE_SHSTK) || boot_cpu_has(X86_FEATURE_IBT))
+ 		fpu_kernel_cfg.max_features |= BIT_ULL(XFEATURE_CET_USER);
+ 
++	init_kernel_dynamic_xfeatures();
++
+ 	if (!cpu_feature_enabled(X86_FEATURE_XFD))
+ 		fpu_kernel_cfg.max_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+ 
 -- 
 2.27.0
 
