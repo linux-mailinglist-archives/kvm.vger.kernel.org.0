@@ -2,181 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C6077A113E
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 00:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E9727A1158
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 01:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjINWrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 18:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41162 "EHLO
+        id S230118AbjINXAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 19:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjINWrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 18:47:09 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D177A26B7;
-        Thu, 14 Sep 2023 15:47:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694731624; x=1726267624;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=nTNrjza1iksvr4e+omfyUIQNP56R/MKZD/lBNSASmoc=;
-  b=nvgTgDlrQqkZW3pZCm5HcFr7yEQmBHXVGGhexW8EvThM0cRWQ1+Xikul
-   lZPhpyTHLwnNvSc6NfvkbbU82xe37S0y3cxsPVxQjmegsePuDRLtxqQEW
-   Nbw6wxD2DVKSKtmQZiyeJ105TOWByZqzSNsMWoDimiA8dGioKKPp2vb/4
-   CCg3nIvuLWvnNJgGzozxIjIIQJNXAhjBRz+7oYmjgF+PYxOdEKqpOTvkY
-   cbpeR4N0bYDw8qQhI4KNZ9Lr1wTRGn+dgSnFPeImhymCyk+9ojG9Ewao2
-   k7jCEdofY0nMr5Ju3+q+XE6JaXSPGBNhJhybS32u2GebCCUTd2QGrdZrE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="376434058"
-X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
-   d="scan'208";a="376434058"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 15:45:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="721457117"
-X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
-   d="scan'208";a="721457117"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 15:45:53 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 15:45:52 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 15:45:52 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 14 Sep 2023 15:45:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J3rOkN6ww4wEAUggArZ3eUCMx84S8uXSImrSt4gVTkqoVLjeUfqsseSjO+ZIrF28VtOAQdnMD+fGB1WP7TUVkfrKEr5ceeLVTbKcL0Qv/7h6e4OdYUJkkFxdHehiM5oVEHMWRwpaFS8iSuUxsqkpRPAxSWdan2Hu1/e4ecIGlTLK6zY2AS7zW4NpmEj/Ljr9e+vfiGEqeKNtMVhmdqp+Gb3H51A033ZQQ/fjHY/iTql4jzH77pEm6TQlI3IN9lcNuNp2XYAj8pwG+IeiUUqMQ8BfaVUzFvZaBPX4gZbJQQMG0FcO4TMdbgwt9Jk0SYGXyU+hf8UWl303RhA6QDNbRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nTNrjza1iksvr4e+omfyUIQNP56R/MKZD/lBNSASmoc=;
- b=kCout+Or2t/udL57nHu/bad3mogLV7skHavSTfTLUmyRTlWiTSTKhaVqFT9SYzPSL62HiY1hUcFYg44WX9619mgMC1KLlWSDYBOyQpZGTUBI3mXTI7LBtwmqQDS0pnySsAyROhxkXvUVKDSobJxh91vBYGGX3T5kVBaLY6VMCawlDx8vXREyA7d/DOOVH5HgpDbsefwfJDFc9b7cw10nxSCFLEmj1t3CB9fZC17Kqto3x/MAk+y5wyQWNlyJOK/vrcsSQJvp9xN+QnR5HsDO0HJelig3WbWl8ZtnBfqNjNFrRphs6Ze6kLkSdeYVYWkPn7xlUA3q1iWgsLOwY13mcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CY8PR11MB7134.namprd11.prod.outlook.com (2603:10b6:930:62::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Thu, 14 Sep
- 2023 22:45:51 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::56f1:507b:133e:57cf]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::56f1:507b:133e:57cf%4]) with mapi id 15.20.6768.029; Thu, 14 Sep 2023
- 22:45:50 +0000
-From:   "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "peterz@infradead.org" <peterz@infradead.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "john.allen@amd.com" <john.allen@amd.com>
-Subject: Re: [PATCH v6 02/25] x86/fpu/xstate: Fix guest fpstate allocation
- size calculation
-Thread-Topic: [PATCH v6 02/25] x86/fpu/xstate: Fix guest fpstate allocation
- size calculation
-Thread-Index: AQHZ5u85jsakadGf40+tOzEQaa/IwbAa7IMA
-Date:   Thu, 14 Sep 2023 22:45:50 +0000
-Message-ID: <d05a91f12cbce9827911c23afcfa5fdaf2acb5cf.camel@intel.com>
-References: <20230914063325.85503-1-weijiang.yang@intel.com>
-         <20230914063325.85503-3-weijiang.yang@intel.com>
-In-Reply-To: <20230914063325.85503-3-weijiang.yang@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CY8PR11MB7134:EE_
-x-ms-office365-filtering-correlation-id: 0f2a1e00-b76f-4e49-dbdf-08dbb5745886
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: V3DA++Mqk3lOYTPVbLPG2gsbn1Q6K/LZWxdgMtxxS/9uMe5tW/ed4tmCDRigixrv57wUe+KVkBt520DTy2ZACyZ5vlBCBXiRpKPZ+AVEgLvL0fjW4XTZLrpUBnMeTe6/iPa01s/zlEY7R+X15yf416Mm8nAtpqTNcsWfbH/KAf2RzhCnlR7Pqa4MKyjdbu2ukRRDoF4qL+fEU5bnBksJjRX3BxeHSNVNy4b2D78ngA6dR7L+y5oFocc088jLXgs9QX3XU3HmIPhwPT3h7hHV/sbTal0SJEoPx9pFEGCJXDtft6Y8JJ/eVVMTcktaajpCjisHP0tByiDgkoGPU3XGvvAkA0Ju7D252lskHV3fYuWTXhEX0ufjjsiC8YvjCYKzR1Le0i6CgiZNmrlYoP0FaB+GhxLzatrr7vKm5q5ytjUBf2o0SZDF+xKFA6lK3eNbMvjQBv4so6eJFThH0PDhOLdvw2SdxFrHmnVt0hh51IIQ3THd+NFI91Hx8RMg1DmwC/HW51Lgb9BPqUeEPbV7NDj7wJe+TzfOxFlw94cUnwhotT9h79LrLZ8a1jm6bukHukVyU+Ufc6FKguiItypdvhcsCetnXQ4+VY9sDKnX9iyQOmTtgaUMRuldQVSEqQXv
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(366004)(396003)(136003)(186009)(1800799009)(451199024)(122000001)(38100700002)(38070700005)(82960400001)(86362001)(36756003)(91956017)(110136005)(6512007)(316002)(478600001)(71200400001)(5660300002)(6506007)(76116006)(8676002)(66946007)(4744005)(64756008)(54906003)(66476007)(4326008)(66556008)(41300700001)(66446008)(8936002)(6486002)(2906002)(26005)(2616005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OXlna1NLeWVkZHJrMG1xUlc3bHNSa1FneEhOUHVBMlVOTWcycFpmL0d1Q0dr?=
- =?utf-8?B?cUV6NEhVYWNOaWFJWDNKOEV3dDZUa3ZpWmd0U1FZOFZOejRsQUFwdWVvMWcw?=
- =?utf-8?B?N0lKcUtEQlBkQUlDYU1TNU9HSis4Q2J1QkhmaGdsbkcrT0o4c21PU1R4Wm9j?=
- =?utf-8?B?MTM4UUhmUkdFQXNZWDJ5Um9ETENUQnJoVkdyUU9QcG0wd28vTXNhUTFDbzBm?=
- =?utf-8?B?TU0zR2RlRzI1Vzd2bm5oS2E4ODVyanNraVFDbS9GdC9tL2U5MG1PSHhqVGhT?=
- =?utf-8?B?Z1h2K1BxSmVkNnhsZnNNY0x3UkNQR2ZxTVlBSVFjUkpMVHdmQ2JrekJRdTlS?=
- =?utf-8?B?S3dHdTRuNUJyWGxKZGFPUVR5bklWeXJ2Q3pMRVYydXhlcGJsVTR1WlF0M0VM?=
- =?utf-8?B?NEgxRUU5dkxMazFzdDdsSVpyUWN5N3FKN0ovYTJYdUtmcnd6ZWZZeTJzRzJT?=
- =?utf-8?B?VlMrNEdVRlZCdGlYNzlYbFd6K2l3ZUxaQ2tnL2lyUk9za2tOMUxwbTk4cmlS?=
- =?utf-8?B?R3VZT0o4YStiSk1HVkk3dmlBNnJETTVuR2VVb0szd01wcnhQWUJXdS9zUCs0?=
- =?utf-8?B?RnR3d2NxcktTSmZRZmFTd0xzdkhtcFErQkxLaGFUZTNNU3R1L3Nwc21nQ050?=
- =?utf-8?B?NUJaRUZPT2NlMWhvSHQzUUh4aU4zVDlvYmRvRXRES3dUYmlHcWtoT3BuS1M0?=
- =?utf-8?B?QTBGVS80dDNzdjlXRkVJOWxTMGdaTnNuZjdQV3hxQkFYVTR2OTUrRXB0QXN5?=
- =?utf-8?B?dVI4Y3E0SG5ybVF2cE9EUE5vMTd6MDNsV0FPamVyQ05Fb0ttcnlxNXg1czdG?=
- =?utf-8?B?Ny9LdmxWSUJFYVNGUTRLR2V0MldIMFBndmkzQmhJWXV2QjB0enhtQ0RONW1t?=
- =?utf-8?B?RmZ1YnRYY05CeGhZNlpTVnVtU09tclVERFoxZWYvVGRVS082aDBZQ1BYMG9v?=
- =?utf-8?B?SUFuVW1RYXdHQWFwdW9EQmlzcmY1VE1PNlBsVzdFc3hRV2VsNW01ckM4NXBn?=
- =?utf-8?B?ajhueU9KMWtDSDJybXlpY2xBYkdCbVR2cXRuUmRaSWFhZG8yeFlWZ2FvRGZa?=
- =?utf-8?B?SWVyRFhDMHgxZ2hSS1JNemowTllFTVdXWDNFdkFiOVdJWE9YZ201MW5pbEJI?=
- =?utf-8?B?SkJDNWNPRWt6S1ZVYi9aRUJSOG8xZFVsdVFldjJIaFQzQmhINWFOYWlRNUlE?=
- =?utf-8?B?RnZwSjR0OGcxUnVEZjNBbGhGTVN3RjZILzdlbStURGtWRThTeUR0RFA0T3FN?=
- =?utf-8?B?T3UwMFlFdWoyeEZqUFhUUkVqT2ZTTE8wOXNHaW5Dek1IU0JRVEFoMjhCUG5N?=
- =?utf-8?B?c2p0d2ZVeGJKaWlXUlJtQ21GL3RqU1ZKZlRKeEhlR3ZWbi9wN0hucjlRUDYz?=
- =?utf-8?B?bFBONUR1aWs5Qy82MDJLVXlCZTYzOWtVQ3RVb3c2OHNlUXN1Z2JOaDdGb0tT?=
- =?utf-8?B?SDFxZmdJT3A3c1hicHZvSUl5NFRsUmZJZDlKZ2owUDR4bGtIcXJwNnI5Z3dH?=
- =?utf-8?B?YWRyTzJjcHNsNVVlQjhtLzQ1TXdRNzR6cmFDRXQ5NW5DUXBndU96T05ma0xT?=
- =?utf-8?B?MzJpZ1dsVzQ1QStkTE8yMGNrM3Z5RUxkTW9BMWgrNkR5amRPTHZ3RmZMMUpm?=
- =?utf-8?B?cWZzaXZCcndiMDRwNElBNDlJRlY3Sk15Q2I4NkJidXBnZjcyVlU0ZndiTC84?=
- =?utf-8?B?emoxT3dDY0ZOaCtkbUJqemF6M3BNY09RZnZlL0czc210Y1g3dHh3YWs1K0Rr?=
- =?utf-8?B?STA5QmpYaHdtV295WUdqYjY2K09iR1VYc0JHTGVTZ29GS1RCRHR4K3psVHlV?=
- =?utf-8?B?TmhXckQvNHc4L0xIOG5EaVNkdEtWdVdVMDZHd0U4RTBaY2FRMW44RnBEMlJw?=
- =?utf-8?B?OWtyejIrZHFROXFDdHlsOENKbHRYZm5wcHRmNnlBMDRHR1ZYeTVrdDZxNmhU?=
- =?utf-8?B?cEpyODNLWkVOWmNBODZBRVlUaGhyMGN4NEJUa0lYMmhXVTNWNTNjYXNSNzdJ?=
- =?utf-8?B?WjB4YTZrR2NoQWszcExWWUFsS2VLY05waUJHb2VBQkhKbzNyc2NKelJtRkg0?=
- =?utf-8?B?bmFsaEQrbWZYT2pFNzN0U0cvOUZ5QWtLb2hMYlFxRkQrMWtuT2RuUnVZQy80?=
- =?utf-8?B?VXl4ZExpU0JnMS9DNW9ZWS84RENEWEJROFhpK0lId3Myd0xQMElKbElIajBv?=
- =?utf-8?B?d2c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A2C52F59E205FC4BA357194FF226D22D@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229818AbjINXAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 19:00:47 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA63E6A;
+        Thu, 14 Sep 2023 16:00:43 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1694732439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y9UPmbkXZRNuioCyvMTxakQr1LFj1kbpXONIFu2xSbU=;
+        b=lg2xYIiFHmDQ94KTGhglBSA6Z0t67NpbKHOIiF7u/MK/QNmaP++hoHuiLV+K+pCpRbvrny
+        3/iljaw4BlgVWi/Axp6VS4fmMqKGyXg21eMc5ZV4tP/U4RlYANeOwmzU8va1MEOljqy3TT
+        btUeGlhB3sh0EMaUYvltsYDxwKSXnXEylIIdoo/fFFa9bHszzToBmfF7mWfvAeUCCTtYF7
+        dLVR6DZAro2zzE9j6g8fxSwh1UCUDJaHZwjyB+5Hh3UOpHfdYzQSP58MDIwDkxgh0AroPW
+        ApRPA6r3z/oN2U1ADa5bw8cimXbGYP6+gkTTb8YmUICXl2qp0JQtDGwblbFK+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1694732439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y9UPmbkXZRNuioCyvMTxakQr1LFj1kbpXONIFu2xSbU=;
+        b=48C9u5FtSr/8YhitFLfTJzZIuTnlSrzcd0C4TaCewwtRO7Oehv/gGi/6/V2pnG6aVMDDrx
+        +xZpy5dDgM7R8iDQ==
+To:     andrew.cooper3@citrix.com, Xin Li <xin3.li@intel.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, peterz@infradead.org,
+        jgross@suse.com, ravi.v.shankar@intel.com, mhiramat@kernel.org,
+        jiangshanlai@gmail.com
+Subject: Re: [PATCH v10 03/38] x86/msr: Add the WRMSRNS instruction support
+In-Reply-To: <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com>
+References: <20230914044805.301390-1-xin3.li@intel.com>
+ <20230914044805.301390-4-xin3.li@intel.com>
+ <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com>
+Date:   Fri, 15 Sep 2023 01:00:39 +0200
+Message-ID: <87y1h81ht4.ffs@tglx>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f2a1e00-b76f-4e49-dbdf-08dbb5745886
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2023 22:45:50.8815
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 207aPS94tJwpKbe4pLcXJ8Q+GNlefn9DAbX59crGydcXQ0/u5MZq+ddHN6MkaIMoJYcnMUAPor1uXGyb2Qkx36peEbCYaSMfS2VBQB6SHAw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7134
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVGh1LCAyMDIzLTA5LTE0IGF0IDAyOjMzIC0wNDAwLCBZYW5nIFdlaWppYW5nIHdyb3RlOg0K
-PiBGaXggZ3Vlc3QgeHNhdmUgYXJlYSBhbGxvY2F0aW9uIHNpemUgZnJvbSBmcHVfdXNlcl9jZmcu
-ZGVmYXVsdF9zaXplDQo+IHRvDQo+IGZwdV9rZXJuZWxfY2ZnLmRlZmF1bHRfc2l6ZSBzbyB0aGF0
-IHRoZSB4c2F2ZSBhcmVhIHNpemUgaXMgY29uc2lzdGVudA0KPiB3aXRoIGZwc3RhdGUtPnNpemUg
-c2V0IGluIF9fZnBzdGF0ZV9yZXNldCgpLg0KPiANCj4gV2l0aCB0aGUgZml4LCBndWVzdCBmcHN0
-YXRlIHNpemUgaXMgc3VmZmljaWVudCBmb3IgS1ZNIHN1cHBvcnRlZA0KPiBndWVzdA0KPiB4ZmVh
-dHVyZXMuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBZYW5nIFdlaWppYW5nIDx3ZWlqaWFuZy55YW5n
-QGludGVsLmNvbT4NCg0KVGhlcmUgaXMgbm8gZml4IChGaXhlczogLi4uKSBoZXJlLCByaWdodD8g
-SSB0aGluayB0aGlzIGNoYW5nZSBpcyBuZWVkZWQNCnRvIG1ha2Ugc3VyZSBLVk0gZ3Vlc3RzIGNh
-biBzdXBwb3J0IHN1cGVydmlzb3IgZmVhdHVyZXMuIEJ1dCBLVk0gQ0VUDQpzdXBwb3J0ICh0byBm
-b2xsb3cgaW4gZnV0dXJlIHBhdGNoZXMpIHdpbGwgYmUgdGhlIGZpcnN0IG9uZSwgcmlnaHQ/DQoN
-ClRoZSBzaWRlIGVmZmVjdCB3aWxsIGJlIHRoYXQgS1ZNIGd1ZXN0IEZQVXMgbm93IGdldCBndWFy
-YW50ZWVkIHJvb20gZm9yDQpQQVNJRCBhcyB3ZWxsIGFzIENFVC4gSSB0aGluayBJIHJlbWVtYmVy
-IHlvdSBtZW50aW9uZWQgdGhhdCBkdWUgdG8NCmFsaWdubWVudCByZXF1aXJlbWVudHMsIHRoZXJl
-IHNob3VsZG4ndCB1c3VhbGx5IGJlIGFueSBzaXplIGNoYW5nZQ0KdGhvdWdoPyBJdCBtaWdodCBi
-ZSBuaWNlIHRvIGFkZCB0aGF0IGluIHRoZSBsb2csIGlmIEknbSByZW1lbWJlcmluZw0KY29ycmVj
-dGx5Lg0K
+Andrew!
+
+On Thu, Sep 14 2023 at 15:05, andrew wrote:
+> On 14/09/2023 5:47 am, Xin Li wrote:
+>> +static __always_inline void wrmsrns(u32 msr, u64 val)
+>> +{
+>> +	__wrmsrns(msr, val, val >> 32);
+>> +}
+>
+> This API works in terms of this series where every WRMSRNS is hidden
+> behind a FRED check, but it's an awkward interface to use anywhere else
+> in the kernel.
+
+Agreed.
+
+> I fully understand that you expect all FRED capable systems to have
+> WRMSRNS, but it is not a hard requirement and you will end up with
+> simpler (and therefore better) logic by deleting the dependency.
+
+According to the CPU folks FRED systems are guaranteed to have WRMSRNS -
+I asked for that :). It's just not yet documented.
+
+But that I aside, I agree that we should opt for the safe side with a
+fallback like the one you have in XEN even for the places which are
+strictly FRED dependent.
+
+> As a "normal" user of the WRMSR APIs, the programmer only cares about:
+>
+> 1) wrmsr() -> needs to be serialising
+> 2) wrmsr_ns() -> safe to be non-serialising
+
+Correct.
+
+> In Xen, I added something of the form:
+>
+> /* Non-serialising WRMSR, when available.=C2=A0 Falls back to a serialisi=
+ng
+> WRMSR. */
+> static inline void wrmsr_ns(uint32_t msr, uint32_t lo, uint32_t hi)
+> {
+> =C2=A0=C2=A0=C2=A0 /*
+> =C2=A0=C2=A0=C2=A0=C2=A0 * WRMSR is 2 bytes.=C2=A0 WRMSRNS is 3 bytes.=C2=
+=A0 Pad WRMSR with a redundant CS
+> =C2=A0=C2=A0=C2=A0=C2=A0 * prefix to avoid a trailing NOP.
+> =C2=A0=C2=A0=C2=A0=C2=A0 */
+> =C2=A0=C2=A0=C2=A0 alternative_input(".byte 0x2e; wrmsr",
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ".byte 0x0f,0x01,0xc=
+6", X86_FEATURE_WRMSRNS,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "c" (msr), "a" (lo),=
+ "d" (hi));
+> }
+>
+> and despite what Juergen said, I'm going to recommend that you do wire
+> this through the paravirt infrastructure, for the benefit of regular
+> users having a nice API, not because XenPV is expecting to do something
+> wildly different here.
+
+I fundamentaly hate adding this to the PV infrastructure. We don't want
+more PV ops, quite the contrary.
+
+For the initial use case at hand, there is an explicit FRED dependency
+and the code in question really wants to use WRMSRNS directly and not
+through a PV function call.
+
+I agree with your reasoning for the more generic use case where we can
+gain performance independent of FRED by using WRMSRNS for cases where
+the write has no serialization requirements.
+
+But this made me look into PV ops some more. For actual performance
+relevant code the current PV ops mechanics are a horrorshow when the op
+defaults to the native instruction.
+
+Let's look at wrmsrl():
+
+wrmsrl(msr, val
+ wrmsr(msr, (u32)val, (u32)val >> 32))
+  paravirt_write_msr(msr, low, high)
+    PVOP_VCALL3(cpu.write_msr, msr, low, high)
+
+Which results in
+
+	mov	$msr, %edi
+	mov	$val, %rdx
+	mov	%edx, %esi
+	shr	$0x20, %rdx
+	call	native_write_msr
+
+and native_write_msr() does at minimum:
+
+	mov    %edi,%ecx
+	mov    %esi,%eax
+	wrmsr
+        ret
+
+In the worst case 'ret' is going through the return thunk. Not to talk
+about function prologues and whatever.
+
+This becomes even more silly for trivial instructions like STI/CLI or in
+the worst case paravirt_nop().
+
+The call makes only sense, when the native default is an actual
+function, but for the trivial cases it's a blatant engineering
+trainwreck.
+
+I wouldn't care at all if CONFIG_PARAVIRT_XXL would be the esoteric use
+case, but AFAICT it's default enabled on all major distros.
+
+So no. I'm fundamentally disagreeing with your recommendation. The way
+forward is:
+
+  1) Provide the native variant for wrmsrns(), i.e. rename the proposed
+     wrmsrns() to native_wrmsr_ns() and have the X86_FEATURE_WRMSRNS
+     safety net as you pointed out.
+
+     That function can be used in code which is guaranteed to be not
+     affected by the PV_XXL madness.
+
+  2) Come up with a sensible solution for the PV_XXL horrorshow
+
+  3) Implement a sane general variant of wrmsr_ns() which handles
+     both X86_FEATURE_WRMSRNS and X86_MISFEATURE_PV_XXL
+
+  4) Convert other code which benefits from the non-serializing variant
+     to wrmsr_ns()
+
+Thanks,
+
+        tglx
