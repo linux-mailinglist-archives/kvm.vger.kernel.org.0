@@ -2,135 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A9367A0BE1
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 19:37:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A65D57A0BCB
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 19:32:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239406AbjINRhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 13:37:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38876 "EHLO
+        id S238993AbjINRcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 13:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240203AbjINR0H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 13:26:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B130149D4
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 10:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694712244;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N0ikbkJVQghcPjJgsQrA+sUTUrPSvE6Jh+YB8KXgR/g=;
-        b=KJmOD/88T422PBzboRwnW504Jp6pE+MiqqDJa5iMDT6yq/yc2w/jmwxzmGjZdxfdo2PXCi
-        Et4n6Qncl+t3KE39sXNBdQvyP1sXAInEjFzEfTUUTc5N3W7sveE6NTl/5D6kf1ywgve25v
-        Vd4/b0jJYLsZajjNjPMMacF+5mBLcOE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-41-mt1uKXGTNm6m770irEEv9Q-1; Thu, 14 Sep 2023 13:24:02 -0400
-X-MC-Unique: mt1uKXGTNm6m770irEEv9Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1F4684ACAA;
-        Thu, 14 Sep 2023 17:24:00 +0000 (UTC)
-Received: from [10.22.34.133] (unknown [10.22.34.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5003640C2070;
-        Thu, 14 Sep 2023 17:23:57 +0000 (UTC)
-Message-ID: <fb7d6e67-f396-dfe7-1461-8790bdeaad01@redhat.com>
-Date:   Thu, 14 Sep 2023 13:23:57 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        with ESMTP id S233045AbjINRcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 13:32:03 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2042.outbound.protection.outlook.com [40.107.92.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90B59B;
+        Thu, 14 Sep 2023 10:31:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T7m6P628o36NRi1lAVrT7ge1u6nmsOyxNgtW4CgDXmRdwZxI9Tj+gQVDNXx7C6E8ZRqG6N8WPumLDDYWxA+g5h1KppPFCga0w+cXkOi8Bn+OH3qYrZrjn6AOb5DjTAj4TGSZgwHmgnhBiDjRb20sozkTLCZtgZgGmN/OSBK1AMhNpnb6b8kxfZ7SMomOixyYXik7LuaBMlL4PzwMGUxKP3n8pMOdSoB7HkUt3ulB8jLc7PPULjODXue919EUGRwE1yJn/D6AHmjvUCuzZ11Cxa0cID3NK9avrmmctLvhNu+Wrlh0JM3PFvEz71hGTPpFz3628+FGmuzORqhfgDjeuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ju7DBkHVThJ1aNIxhtSMONfc6y6/YfGIYo5m4YyRJgk=;
+ b=k0pzVqD+RZHGm3M4+SYHwwdwPBZcFXKkgc60ahKza7q8SmYVPdmXrDsSZ58Tkvpztl7HPK2LbDg91RY/LJIfVryHU8GYfCVJXCchmRbNTaj6qNHK7C+vhrqj3mRKQNXbuYKpIlHZz2npMydkDOAedX99OK2EqRLtyn+j9HMamBhog4B/54jKEda45IG1g6ZwsgOA3t90B1O7IlpQ/AJBFgHi6MjcJtL9VGnunrfbZ1i6tjysijs4flFSywuxSmrZSjp3M2Z6rvtLaXDD5yfvi6EbjU4yQdZc+2+s4QOIGH733QDsSE7sl0JRTzHd7/NGrvZtVtYqOtUi+piYq5yrPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ju7DBkHVThJ1aNIxhtSMONfc6y6/YfGIYo5m4YyRJgk=;
+ b=VUsJsD+ai2GnqT6v1E0GI0gCWk3O2BNFh1QJ6U5eF5+MrLpS+N9bmBtnhqgYr/S+sDz2dctycA8NAazGVYDGagT5xoGWFP8RjMm5YIygiJvkKY+GlIjIfbKj7axrt2tg7+h1zFEVqfYMb8bwpyCZzfCod71braz1vjPfRzta0k0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by SA1PR12MB7038.namprd12.prod.outlook.com (2603:10b6:806:24d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.19; Thu, 14 Sep
+ 2023 17:31:55 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6768.029; Thu, 14 Sep 2023
+ 17:31:55 +0000
+Message-ID: <08009a16-f6b6-f644-406e-ea3dd0a858f1@amd.com>
+Date:   Thu, 14 Sep 2023 10:31:53 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: Re: [PATCH V11 07/17] riscv: qspinlock: Introduce qspinlock param for
- command line
+Subject: Re: [PATCH] vfio/pds: Use proper PF device access helper
 Content-Language: en-US
-To:     Leonardo Bras <leobras@redhat.com>, Guo Ren <guoren@kernel.org>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
-        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, conor.dooley@microchip.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-8-guoren@kernel.org>
- <5ba0b8f3-f8f5-3a25-e9b7-f29a1abe654a@redhat.com>
- <CAJF2gTT2hRxgnQt+WJ9P0YBWnUaZJ1-9g3ZE9tOz_MiLSsUjwQ@mail.gmail.com>
- <ZQK2-CIL9U_QdMjh@redhat.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <ZQK2-CIL9U_QdMjh@redhat.com>
+To:     oushixiong <oushixiong@kylinos.cn>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230914021332.1929155-1-oushixiong@kylinos.cn>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230914021332.1929155-1-oushixiong@kylinos.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0117.namprd05.prod.outlook.com
+ (2603:10b6:a03:334::32) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA1PR12MB7038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 62859b52-b507-43e7-eccb-08dbb5487d94
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: K6DmhzhNBYrjEM3ML2dNeooM6nsxPHKqAQLeWzqVy/8lL2MPiXeW+ScteGiortTND6W4RfN98U7coe8924/zWvSI/lb1dw0bwHMEurmWCOnDvLUfEDEbSaA+cDjXVGO2q6bxapm2b1pQ+K+jl4Zy8VINN8pnQHCB5VbQjOMEql0RWjIa9kIx+/9SPmW2OW61B/5aIjKM1SfMVwY9djBwiN2clM6jKvQPhFUzuJUScZfNtMSzk/yopDeznf0ZjkEk4FmtwtzwHTcKtpBX4MxdEbYcfFBK7Br1gvo5+A9AQRK8kj1sHX3gazCLzY90mWs62KUOwvRmg68zVoTtt9VVVrnk5AztSdMelRNfNMq9fA3jAu9w3OsCUK8bv2FYztQmpnxKX/sopvquFcl8TPZrMREM7npjj8ER2dsnh6yzx73Z0Iu3pINIZ7pBZL5NrZUC/4MujMgn/BtpjAvon8dCddA6Ne5U+m3TQXPy9EuPZwyX/DPS3H+prmA61cHwGZikR+8KhiqUwZBXO0OXoxl/6/QEBeiLTwhPUiy+7sPCmA09Gh2eCxKPZzMnttp+HlHju0m+w6h3V7kTrFTYAzA1v3vD02tfsq6pbNwc8rp5zD7rZRJqlYveU5EsBSO3wcwA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(396003)(136003)(39860400002)(376002)(451199024)(186009)(1800799009)(478600001)(6506007)(53546011)(6486002)(6512007)(26005)(83380400001)(2906002)(8936002)(54906003)(66556008)(66476007)(66946007)(2616005)(316002)(110136005)(5660300002)(41300700001)(4326008)(8676002)(38100700002)(31696002)(36756003)(966005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QUZsV0JhN2Z3aTRIRzZibnM2TXptVjVDTzVYVXRNNzVKVGgxd2ZUNXVKT2xD?=
+ =?utf-8?B?b2lLRzJ2VWFQcFVlSGhnV1ljRkJ1VUx0cVRhZFV1d0QxSEEzQVQxZHlFbVZS?=
+ =?utf-8?B?eFBFa0w1WGYwZitVMk5lejd1ME53YjNBbGExYUdFbnJuNndPK3dFdFdJeG1l?=
+ =?utf-8?B?ZUhTVEkySnVKcE5BcDFudk90bldSczh4MXRPMWdFaVliYjR1QTFaSndGRFFo?=
+ =?utf-8?B?Q0gyZkxKS1BFbE9TVUlueW5remdBSnNTa0FhWHdnbXRRZEZRRUtrY1RHMHp5?=
+ =?utf-8?B?ZklNazM0YXBoNUxDWjdReERCMTFQZTVwRTY4eXA5S3c5eG56Q25xYVFwWUlJ?=
+ =?utf-8?B?RDJlUE5KY3NBZUhUOExtSzJLVkNDblRlSUJSV3RWK2Q5eDFYRUo2Vlkrcml6?=
+ =?utf-8?B?NTBFeGRiUmV2Q0ZHbXVtMXRSdmJJYWhwTzdWWUtTWW40UWYxbTIvV0pHY05F?=
+ =?utf-8?B?OTg0WnlXYUJ3NWF2ckxydlkxWGFRZnZOVGRkZUdQb3l5SnlVMHRJcHZlTFF1?=
+ =?utf-8?B?VHBJSUdVYmxVRVp4bGRNdUo5TTg2Z1J0L1FkTjlrVEhiQnJCRGUyVVRMME4y?=
+ =?utf-8?B?a08wRzEzSXFETXFNM3NzZnlOdDhSajJuWXVYbndlZGFFUjdTMk8zVHdLcDJ0?=
+ =?utf-8?B?K2V1aXpiMG82cmVKZ3VyNjlPNkNPSHBrM2FWWTBkN1NKeVU5M2FRekFzNEFo?=
+ =?utf-8?B?WnZTWTBYU2ZpSnkvYUNSL0JEd2lMZTdMUklSTUpUeStaM0hnMStzZEtZTDZm?=
+ =?utf-8?B?WC9hamV6Nmh2Z1dHNUZuWFQwWnRCa25LV0h3QVhJS0lJQVhXYjRhbkYvUG1n?=
+ =?utf-8?B?OFBqSVZYZU5BcWtrY0xHVjZGSFM5VHd6WlhlZ1BxWjdGd0NOTk5PeVhXYTcv?=
+ =?utf-8?B?bEIxUXVFZlNTVlEwUHM5WXg1cit3WjhwajJLRGNWRXc2blJhRDFCM2VndmRW?=
+ =?utf-8?B?d1NmUk1hbFZCNW5SUXp4aTJrQmd2ejE4NnRQMUN3QWZJV2IxbUhLb21mS3J1?=
+ =?utf-8?B?QllXVSsyL1A3cUtvT21kQXBINnNBWGVXTitSYVoyZjcrQUlVYmozQXI2Q0k4?=
+ =?utf-8?B?TjZ2cXN3NFQ1S0kxeXFSRWt6QXQ2TU5Cc3p5eGQ5MGJXbytwRGdQQ3U1cGVl?=
+ =?utf-8?B?anNpMkRacUF3MnVrNHI5dGZpd05OaEdVSHRsVkdLcGxUR1h3V0ZBei9aTHhs?=
+ =?utf-8?B?UExPRGJIQXlJQnVCUy9uVUVHSG0yMURqY2RjSHdJb3VJbVNjVkg0NjlaVTNC?=
+ =?utf-8?B?eWxMUHU4c3MyZzZuTmJzREhoYS8yM000ZERZaThaWnhWSXNHQjBFMDJnWUpY?=
+ =?utf-8?B?Q2loSGpUcVR5WXN1RGZWdFhrckx2NDBhK2Q4azhxUHNpeTJnUzZVYkxTcXVG?=
+ =?utf-8?B?c2tCNy84ZjNrRkw3SUxVR21sWVZsMFlSa1VZMlgySWdrdlRVWWpXWnNtL0Qx?=
+ =?utf-8?B?VlNZWWRhcDU5NmNtblRwWDRUVXFtdjRHRjlGQzlQbnNPMnMrRDlYYWMzT2xp?=
+ =?utf-8?B?SW1oUDIzSmFiU29xcmsvaEhOQXVYUXBIdTQ4bk9NeHZ2YXI1SlVVdTNUdWRi?=
+ =?utf-8?B?Q1pncDEvWE16N05CWVVKRW1rcmJWb1BXSnFwSWVDcmJWQ1J1YzhTNERJRTVn?=
+ =?utf-8?B?c3pKNzdwN1h3UFMreGdVc2YvSmplZVNMamJMejZrNGNhbTBWOEk3UGlOUVRi?=
+ =?utf-8?B?QTNSQTdkYjY3a2IybTcydGtIUzZJRUdVMC8vRmhTeUUvWXB1eWhaeFIwaEZH?=
+ =?utf-8?B?T0xsTDZrSWsxdnZVSENhTCtjK25jNXBucFQ1ZkJrSDN6QmNZeTVUUSs3QjZU?=
+ =?utf-8?B?b01aTWtlSFRPZCthOFFudHVCUGtxUlVnVkZLd2xydE51ZlpwVXVNL29RUThL?=
+ =?utf-8?B?am8wZk5iTHZNQUpSdWM5N1BCY3pzQVRVblU2QWl5ZlNYME5Vb28vdzZJMVpH?=
+ =?utf-8?B?b2lTaEJPN20wdHFSczFaZkVMTzZEMXFNa2hYWG1OdTZJWXdwaWIxWXErS24x?=
+ =?utf-8?B?VnpTeTlWbzBSWHUrbU55Q0tCVWJZcXBRVWVMWStobzQvZGQ0QU1ONVVmUzlT?=
+ =?utf-8?B?eDRzb1prdWZDcHJWQ3VhV0dBN0FZTjg1Z3JzZXovd0hlZ1ZRYXhRaWpTOUJP?=
+ =?utf-8?Q?9bI9HykKzfAlq4TMVp8c3R4iA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62859b52-b507-43e7-eccb-08dbb5487d94
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 17:31:55.3406
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Vp3Cm4AvcBFYNs/xIwDpoVMSipevF3CaPTbbuAlXfO3fXTv3uwFhATfKRrf+eC9CMODx9qPH+lwVPjIkFJPxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7038
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/14/23 03:32, Leonardo Bras wrote:
-> On Tue, Sep 12, 2023 at 09:08:34AM +0800, Guo Ren wrote:
->> On Mon, Sep 11, 2023 at 11:34 PM Waiman Long <longman@redhat.com> wrote:
->>> On 9/10/23 04:29, guoren@kernel.org wrote:
->>>> From: Guo Ren <guoren@linux.alibaba.com>
->>>>
->>>> Allow cmdline to force the kernel to use queued_spinlock when
->>>> CONFIG_RISCV_COMBO_SPINLOCKS=y.
->>>>
->>>> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
->>>> Signed-off-by: Guo Ren <guoren@kernel.org>
->>>> ---
->>>>    Documentation/admin-guide/kernel-parameters.txt |  2 ++
->>>>    arch/riscv/kernel/setup.c                       | 16 +++++++++++++++-
->>>>    2 files changed, 17 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->>>> index 7dfb540c4f6c..61cacb8dfd0e 100644
->>>> --- a/Documentation/admin-guide/kernel-parameters.txt
->>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
->>>> @@ -4693,6 +4693,8 @@
->>>>                        [KNL] Number of legacy pty's. Overwrites compiled-in
->>>>                        default number.
->>>>
->>>> +     qspinlock       [RISCV] Force to use qspinlock or auto-detect spinlock.
->>>> +
->>>>        qspinlock.numa_spinlock_threshold_ns=   [NUMA, PV_OPS]
->>>>                        Set the time threshold in nanoseconds for the
->>>>                        number of intra-node lock hand-offs before the
->>>> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
->>>> index a447cf360a18..0f084f037651 100644
->>>> --- a/arch/riscv/kernel/setup.c
->>>> +++ b/arch/riscv/kernel/setup.c
->>>> @@ -270,6 +270,15 @@ static void __init parse_dtb(void)
->>>>    }
->>>>
->>>>    #ifdef CONFIG_RISCV_COMBO_SPINLOCKS
->>>> +bool enable_qspinlock_key = false;
->>> You can use __ro_after_init qualifier for enable_qspinlock_key. BTW,
->>> this is not a static key, just a simple flag. So what is the point of
->>> the _key suffix?
->> Okay, I would change it to:
->> bool enable_qspinlock_flag __ro_after_init = false;
-> IIUC, this bool / flag is used in a single file, so it makes sense for it
-> to be static. Being static means it does not need to be initialized to
-> false, as it's standard to zero-fill this areas.
->
-> Also, since it's a bool, it does not need to be called _flag.
->
-> I would go with:
->
-> static bool enable_qspinlock __ro_after_init;
+On 9/13/2023 7:13 PM, oushixiong wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> From: Shixiong Ou <oushixiong@kylinos.cn>
+> 
+> The pci_physfn() helper exists to support cases where the physfn
+> field may not be compiled into the pci_dev structure. We've
+> declared this driver dependent on PCI_IOV to avoid this problem,
+> but regardless we should follow the precedent not to access this
+> field directly.
+> 
+> Signed-off-by: Shixiong Ou <oushixiong@kylinos.cn>
+> ---
+> 
+> This patch changes the subject line and commit log, and the previous
+> patch's links is:
+>          https://patchwork.kernel.org/project/kvm/patch/20230911080828.635184-1-oushixiong@kylinos.cn/
+> 
+>   drivers/vfio/pci/pds/vfio_dev.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+> index b46174f5eb09..649b18ee394b 100644
+> --- a/drivers/vfio/pci/pds/vfio_dev.c
+> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+> @@ -162,7 +162,7 @@ static int pds_vfio_init_device(struct vfio_device *vdev)
+>          pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
+>          dev_dbg(&pdev->dev,
+>                  "%s: PF %#04x VF %#04x vf_id %d domain %d pds_vfio %p\n",
+> -               __func__, pci_dev_id(pdev->physfn), pci_id, vf_id,
+> +               __func__, pci_dev_id(pci_physfn(pdev)), pci_id, vf_id,
+>                  pci_domain_nr(pdev->bus), pds_vfio);
+> 
+>          return 0;
+> --
+> 2.25.1
+> 
 
-I actually was thinking about the same suggestion to add static. Then I 
-realized that the flag was also used in another file in a later patch. 
-Of course, if it turns out that this flag is no longer needed outside of 
-this file, it should be static.
+LGTM! Thanks again.
 
-Cheers,
-Longman
-
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
