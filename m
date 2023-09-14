@@ -2,50 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD9C07A040E
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 14:39:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00FAA7A0430
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 14:42:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237943AbjINMjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 08:39:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33670 "EHLO
+        id S232292AbjINMmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 08:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbjINMjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 08:39:21 -0400
+        with ESMTP id S229485AbjINMmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 08:42:37 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25091FC9;
-        Thu, 14 Sep 2023 05:39:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DCB1FC9;
+        Thu, 14 Sep 2023 05:42:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=arb/T2WdQN21qweVAZKPPu9PFteEGeWTwFzeWX3E46c=; b=Nhn3CrTFXAvQ//mi33hExf1NUU
-        Wn6btrhFtL6yVqvMdl2hY85+OiB3BdNJwOjDQp70nSy2OgSEEtz5pwHjX+MRpHk4IV8OnJBzWF9D0
-        GBeGMpI7u3N+fKKnjd270M+NM3570voUeYU3Jl9QiUaCg8zN27GNFe3ZhFEJwnK+NcZJpxUUd/1US
-        Fhe6IvXS4lulZveKFtcqWzZRztU2qcbilpH6yIH743Wc0rES2FQfaUQ/ytrpMBX+RWVtG0U2lnJtY
-        OnX9IrpOLfhYDmimHNMP88ir4dMwBr2z9bS0r2+Hru0IAdlBXYQQ9mXQUyQR8b385t9uL6Txo1kHV
-        7bNoyDGw==;
+        bh=wfCoYr4MB0qRmxneTiXLJplTS9MxlOOJ1vFfY2Z2FRo=; b=aqNZ7tR4051TfUg1598nkCYfWI
+        p1lNL6KPVCo04iiPyfjdSWht2Em1NS6opHoDWF6RO64jnEyLcs0G3Ut2zl69J1+OWIuTmVq1y+DGT
+        o40lSrS18p7Fi4iPWFvmSN1OauPq33Vu/u4nF4Nfu49TphKzZDLscGUiouwiezMdjDKEgDqoAKjTj
+        Hwkajjf/3LkBWsnx3i+Kbs1oCqoXBIZf+q7Ep0/dknm7PzzYLyoM3aJ26C3Tip/xtNpMdi3eXbfIE
+        K0eazq8UY/sY8ST/DlLkA6Bg9RVht4xHeiZ/RwuOqFcvroC8cHwOus6Sf0LltCkh2TcgStm4XeW2T
+        u7wM/t+g==;
 Received: from [213.86.228.42] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qglcm-002vUZ-1p; Thu, 14 Sep 2023 12:39:12 +0000
-Message-ID: <a689f4847d2272a75d89364723bab7a29508f646.camel@infradead.org>
-Subject: Re: [PATCH 2/8] KVM: pfncache: add a mark-dirty helper
+        id 1qglfz-002xvG-Tf; Thu, 14 Sep 2023 12:42:32 +0000
+Message-ID: <08371c572d99df19f35fe180c0e3afc9612c34c9.camel@infradead.org>
+Subject: Re: [PATCH 4/8] KVM: pfncache: base offset check on khva rather
+ than gpa
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     paul@xen.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Date:   Thu, 14 Sep 2023 14:39:09 +0200
-In-Reply-To: <69b2a8ae-fcae-75b8-4b2a-ca75bbd273f0@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 14 Sep 2023 14:42:30 +0200
+In-Reply-To: <20230914084946.200043-5-paul@xen.org>
 References: <20230914084946.200043-1-paul@xen.org>
-         <20230914084946.200043-3-paul@xen.org>
-         <87b3f6713a7c6aa57adc89b6c47be3e1511f66ca.camel@infradead.org>
-         <69b2a8ae-fcae-75b8-4b2a-ca75bbd273f0@xen.org>
+         <20230914084946.200043-5-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-+uwY+nNjuyPjmvhrTKYh"
+        boundary="=-LvB9+SnEY9pLKoiWb+BH"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,74 +49,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-+uwY+nNjuyPjmvhrTKYh
+--=-LvB9+SnEY9pLKoiWb+BH
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2023-09-14 at 11:34 +0200, Paul Durrant wrote:
-> On 14/09/2023 10:21, David Woodhouse wrote:
-> > On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
-> > > --- a/arch/x86/kvm/xen.c
-> > > +++ b/arch/x86/kvm/xen.c
-> > > @@ -430,14 +430,13 @@ static void kvm_xen_update_runstate_guest(struc=
-t kvm_vcpu *v, bool atomic)
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smp_wmb();
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > =C2=A0=20
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (user_len2)
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (user_len2) {
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_mark_dirty(gpc2);
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0read_unlock(&gpc2->lock);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > > =C2=A0=20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_mark_dirty(gpc1);
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0read_unlock_irq=
-restore(&gpc1->lock, flags);
-> > > -
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mark_page_dirty_in_slot(v-=
->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (user_len2)
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2=
-->gpa >> PAGE_SHIFT);
-> > > =C2=A0=C2=A0}
-> > > =C2=A0=20
-> > > =C2=A0=C2=A0void kvm_xen_update_runstate(struct kvm_vcpu *v, int stat=
-e)
-> >=20
-> > ISTR there was a reason why the mark_page_dirty_in_slot() was called
-> > *after* unlocking. Although now I say it, that seems wrong... is that
-> > because the spinlock is only protecting the uHVA=E2=86=92kHVA mapping, =
-while
-> > the memslot/gpa are going to remain valid even after unlock, because
-> > those are protected by sRCU?
+On Thu, 2023-09-14 at 08:49 +0000, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> Without the lock you could see an inconsistent GPA and memslot so I=20
-> think you could theoretically calculate a bogus rel_gfn and walk off the=
-=20
-> end of the dirty bitmap. Hence moving the call inside the lock while I=
-=20
-> was in the neighbourhood seemed like a good idea. I could call it out in=
-=20
-> the commit comment if you'd like.
+> After a subsequent patch, the gpa may not always be set whereas khva will
+> (as long as the cache valid flag is also set).
+>=20
 
-Yeah, I can't see a reason why it needs to be outside the lock, and as
-you note, there really is a reason why it should be *inside*. Whatever
-reason there was, it either disappeared in the revisions of the gpc
-patch set or it was stupidity on my part in the first place.
+No functional change intended.
 
-So yeah, let it move inside the lock, call that out in the commit
-message (I did note some of the other commits could have used a 'No
-functional change intended' too, FWIW), and
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-Thanks.
 
---=-+uwY+nNjuyPjmvhrTKYh
+--=-LvB9+SnEY9pLKoiWb+BH
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -213,24 +159,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MTIzOTA5WjAvBgkqhkiG9w0BCQQxIgQgbFmxC4mi
-RohpRdHBA2UV+elSsfqWr026czv59TZxFoAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE0MTI0MjMwWjAvBgkqhkiG9w0BCQQxIgQgD6AQLgqs
+8vESLhco5ugmituNXqIEVRAWQcmLelUl8Oowgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCatSHolq2lXtBmlzVBGQeaLG3JR68SPd3t
-/1Y+VJvZrCxftX3th4QYCc5O7xlcRGLXCoX5ZQrcnPVMtAmHbMnXNVYb8RtHkEIjMBhanmd7or29
-xcCmQKKdEKIx33tgNnlcN9Og5plCFLYbpAlVF1aG4euu3OsPadNAkkKDiH1NvuiSgOhrIImZaBxN
-idfR/eX5i+Vmo84lwMHnTmQDaNjZRhTvMa8Ahkf0nCRqYix8Tk8fH833EJ2xR/RPOiy3XXzJFafS
-aTZ7x5JNElF8b954oAphMdiLeqHWUHnXPtu+pO1wRVCS9wrvXOAXD9GM+N+iNPN4nKG0lyGtzoP7
-dhiKj2oNJyWl4BPgRyyIszA/qfzG2k4YIzTAsBpGG7RzAgXRS1UTW7qBK/LW0oipSWUjQLQK73nz
-MTSmmG7LVtj9ZAShpoup9QqRWZthafpdLxs2R9pBQfc8+oGLMD6ie1JvM8XnJ7fiqbzcn3UUpYSE
-7426QbrI6SWV7LX5XjWXgqukpZ8G8GrryPouYj5ouwWzmT6mIJi9spCYF6HWbvbsdpwyu6oKt5Tk
-OiMr7wOUdDKwzwnpqOkCguSZJb8TuB+HG1+gYwlzaW7wi8eftCQ16O/tVfN+TE0nWAPcMjYHqLK9
-Pjo3nLIcnN+dHPDR0j0i09wBcQrXC1QBJeG3xa6/awAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBMS1JOmgbLJRslUY3GBFkbsrm8DX+abPwd
+z/Ijt0AOpf7bWX4mjVXdI1clWvuAPIbRFyj+qwPmTIivZawBPwn9XhlySS3iaX71tQk4EPNEs/ZZ
+E1OhDPbmVUqk+/K9q18exnd4mXP9tA6i2lPPUKHzkmNgg0Mf2kkhkciiw1uD2ldBncWpbeM7RBAj
+9MtmInbk1HWHyhFmpnoBy65Wx8XQ8fH1n/L1EectJX1mDp4mysi9Ag2xNJQDVBRZRvOP22be/8FK
+fMXUZEnPMUiYov5SplbxtfQsWO4wCFMtuptZYk3XKGl3pYkNo7yi5Fze4BwVrNog1tN07HPwZ+m9
+Uvi+yQn9gZodTubzifi7Aue0i1FwdzpeJCldSvsX6bL1WT+di6uw+N4KSlfMpAzk/WnlkUrZpqR+
+9gPX5dsu18Xa0TkXrxaqFgrTbjvqgzOFu7rn4aFLRdX6C3MMEvAdr69NfCaHGZDv3ytnMCKPeOnD
+6cyg+m/Rh9vyzF6oNInQQSj/sppkqoHAWkNJgMPziJVZgRkRRfLWqQ799ucT6a6u0PjuatBlD5k5
+g4ycj8m21HWN5xznxD/r+nwzyyxhSOLCQd/I2vlfLbgqzCrZAL+he8aAu3rdJLmmhszsJ8mBhsyL
+p9UTNDIf++dUkwiHLUP1hhwbwJH/cJuVw4aQCIZeTwAAAAAAAA==
 
 
---=-+uwY+nNjuyPjmvhrTKYh--
+--=-LvB9+SnEY9pLKoiWb+BH--
