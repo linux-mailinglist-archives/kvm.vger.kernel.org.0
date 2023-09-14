@@ -2,52 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 912507A00E1
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:52:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8887A0163
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 12:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237531AbjINJxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 05:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35716 "EHLO
+        id S230444AbjINKQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 06:16:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237299AbjINJw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:52:58 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF708CCD;
-        Thu, 14 Sep 2023 02:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1694685174; x=1726221174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zsiz6QuHidta1MZIjKdX2IK5RrYiU1OXGZGUU7TjwBM=;
-  b=UUAUK2MCMYTCIWfGqR91kF7hPczvS6zwvGys9kh9WxzFse1w6/nxcGNH
-   m4H3I8XbYjL+4JkOVqurO8h9l30GBllpXC7Qf8txlARlwYY+6Vk0+Zu39
-   /uH7SWstSRj89LWrnvh81tZyPtkp25CwgAxtqFJ0HyZYWFBRiait541Za
-   lUER8RLJuIXmiHh92AUQWPLBqmSsob7QkJxL/4cSk3hQkZbwzo157Ys+I
-   6hHNIOcADQlZlGNdFXKhEbL0nzW11R7YEeGQrqC0x50PuuopQaF+WCUra
-   U74a3hntGjlRiO391fpg5YZYSHk+zfSP8IULJVoyc5Xz3k9Ty/uOUT8uM
-   w==;
-X-CSE-ConnectionGUID: jCeTh2jUTiuWpEOHIgZ08A==
-X-CSE-MsgGUID: UY8Fpe7jT9qj55hJGpC4ZQ==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.02,145,1688454000"; 
-   d="asc'?scan'208";a="4801598"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Sep 2023 02:52:53 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 14 Sep 2023 02:52:36 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Thu, 14 Sep 2023 02:52:31 -0700
-Date:   Thu, 14 Sep 2023 10:52:15 +0100
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Andrew Jones <ajones@ventanamicro.com>
-CC:     Haibo Xu <haibo1.xu@intel.com>, <xiaobo55x@gmail.com>,
+        with ESMTP id S237175AbjINKP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 06:15:59 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA541BE8
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 03:15:54 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-401d80f4ef8so8495435e9.1
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 03:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694686553; x=1695291353; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
+        b=QA3eGr+g541KCdar2tCcnj5cTCklF9uEIbH6NOz9SXHpL0vOAKJBOKvewdQFiNhQrD
+         ZBu9q3pL2wUuSBviEFP36/T5c02jF8lmYaxkpY1TOxj7UkB/H/4ZzkEMv/3DlvakqTqz
+         YV/NolPyqkBEjkIufXupEfjuF7kfCjUiGKNm/8AAYXlXjKw48qjqbeKjytASiU0RomIz
+         enDWv2eGMJ1Wz8WkC8vg7+0dMUWSCTjBXX0a4VqPD/4nx+LUOKbhTGo5ssvU4ssDG8ha
+         RGnAEPnT2AqoFf6MQ0NYSRRjosa1m1wzX+7CUMoyEG3dScBrDQwmEUz94hL6bzy22H9q
+         9l9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694686553; x=1695291353;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VyIjI/I6fiuQb5fro76kkYxOSc4xq/0TuIo+mtjDBWI=;
+        b=QmT7rAgjSo3EIeX5+FA8xKRTtTqNwWBD29wQBpiQ7obiAotvSS5Am27lH4L6IGN3uh
+         GFSABxfQFudkxfi+pDOdOV58dHentUg3vc5NP+RRj7NWsA9eLo0YOgSrgw5kBoE6QnbZ
+         s6VAD3+1u1iVWiEEODA9PkKZIeWyQoHnOBdvuAMveugPgnjHMLzH4LFPkxizwqcSazUz
+         C24Zycw0qlbo4wL5xSjk+RMUFfm0iQpJiNkqr/b3Ui7mlNVneaR9PTf+vjCN6KId6CId
+         f/ZLsyIYEyrFmjGZ4c4ly7mNyG1uUz9NyMHBMQHGieBSMerWBVsK5ZrbEV/EO7gyPMkN
+         Sf0Q==
+X-Gm-Message-State: AOJu0YwKtVQpNWuDYWLWIMc53nEq8x+RFEjj86VSaZuzaXmdUi8zLAIF
+        LXQoVPbFwctmDguUcaBz++xLYQ==
+X-Google-Smtp-Source: AGHT+IH7ZT746JOyiS+eOvZlolhRQEl4EX2Lm6S0kGQOnu5nvVuWeFGDXcIG88aW5kDFIAcnKh6/BQ==
+X-Received: by 2002:adf:d0c3:0:b0:31a:d2f9:7372 with SMTP id z3-20020adfd0c3000000b0031ad2f97372mr4347143wrh.29.1694686552802;
+        Thu, 14 Sep 2023 03:15:52 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id k8-20020a5d5248000000b0031fc4c31d77sm1340310wrc.88.2023.09.14.03.15.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 03:15:51 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 12:15:50 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, xiaobo55x@gmail.com,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
@@ -67,55 +71,45 @@ CC:     Haibo Xu <haibo1.xu@intel.com>, <xiaobo55x@gmail.com>,
         David Matlack <dmatlack@google.com>,
         Colton Lewis <coltonlewis@google.com>,
         Aaron Lewis <aaronlewis@google.com>,
-        Thomas Huth <thuth@redhat.com>, <linux-kernel@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-        <kvm-riscv@lists.infradead.org>
+        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
 Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
-Message-ID: <20230914-reflector-preshow-786425ad7ae2@wendy>
+Message-ID: <20230914-2232dea1c6d03fb5985755e6@orel>
 References: <cover.1694421911.git.haibo1.xu@intel.com>
  <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
  <20230914-ee133dd5e804282ce28833d6@orel>
+ <20230914-reflector-preshow-786425ad7ae2@wendy>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="QNGDKlO9qNzaNQl+"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230914-ee133dd5e804282ce28833d6@orel>
+In-Reply-To: <20230914-reflector-preshow-786425ad7ae2@wendy>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---QNGDKlO9qNzaNQl+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Sep 14, 2023 at 10:52:15AM +0100, Conor Dooley wrote:
+> On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
+> > > +static inline void cpu_relax(void)
+> > > +{
+> > > +#ifdef __riscv_zihintpause
+> > > +	asm volatile("pause" ::: "memory");
+> > > +#else
+> > > +	/* Encoding of the pause instruction */
+> > > +	asm volatile(".4byte 0x100000F" ::: "memory");
+> > > +#endif
+> > > +}
+> > 
+> > cpu_relax() should go to include/riscv/processor.h
+> 
+> Can the one from asm/vdso/processor.h be reused, or are there special
+> considerations preventing that?
 
-On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
-> > +static inline void cpu_relax(void)
-> > +{
-> > +#ifdef __riscv_zihintpause
-> > +	asm volatile("pause" ::: "memory");
-> > +#else
-> > +	/* Encoding of the pause instruction */
-> > +	asm volatile(".4byte 0x100000F" ::: "memory");
-> > +#endif
-> > +}
->=20
-> cpu_relax() should go to include/riscv/processor.h
+We'd need to copy it into tools/arch/riscv/include/asm, but it could be
+done. Hmm, now that I look at it, I see we're missing the barrier() call
+in this kvm selftests version.
 
-Can the one from asm/vdso/processor.h be reused, or are there special
-considerations preventing that?
-
---QNGDKlO9qNzaNQl+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQLXzgAKCRB4tDGHoIJi
-0jRlAP0UeFru9d2hDB+V95CsBHvHieORe8d/jeHJTK7NMGIDgwD8Dqdge5VTTSyn
-ljeYudKmUM0GDQOhOOq8DQG3G+sO5gM=
-=uzJX
------END PGP SIGNATURE-----
-
---QNGDKlO9qNzaNQl+--
+Thanks,
+drew
