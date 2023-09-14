@@ -2,140 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9FCF7A07AD
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:47:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4393E7A07C6
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 16:48:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240275AbjINOr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 10:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
+        id S240440AbjINOsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 10:48:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240296AbjINOr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:47:26 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BE21FC9
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:47:22 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-401d6f6b2e0so14206115e9.1
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:47:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694702840; x=1695307640; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vHpWmHejf9EicOnbuTpXQSbFe9gmT4JUPIXQ/pQhLLs=;
-        b=OICqe2J+pAU/Tw1th392fVmAUa+8T60710r04130hvuY9Irz3uPklqPCNYiKH4N5tp
-         xaJWWXHhj5/wE040hJ9kSMtiEtj3yLpwmlXy4G9+5zTfiBd10Qt5CSsICqywQijxFcRW
-         je8Xf8KvgNIImwjEAQuKAwCKVvicotgOFQeKFpUVHsE58ly20i+nAxdQOyxX1bckKLXK
-         U0mVstkxeoV8WKZulfztUojq62+BLhyKlN2vYfkEjX2I+ieKe6sjku4C6BOEivTOZvc4
-         YWItytRxlm2VXgACWpOT9Y1q0CcvybbeOAxnvdP4ERRnggf+1Efu6xg17KaLkV8nSEM8
-         Kp1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694702840; x=1695307640;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vHpWmHejf9EicOnbuTpXQSbFe9gmT4JUPIXQ/pQhLLs=;
-        b=rt+dQ+lNFVYufwLp7u3Y/TG4R4vLUcozS7BvkBnKwgD9rEOpqGaIXyw+vXQwTAgEqb
-         aMCxUzTzHFnkAY7DW8qRrMFCG4kLPwz8oKMUg9ijVWbrSEKR2fZ1Nd/LLVOa8/5g8fId
-         p6zkfG0amILBEJol+B8DkhUkcHjpDA3OH8APO4wHShwt2Kt1CaetM4cyff8Lc+ye9pNL
-         wQbBhEkatNv/pitmv5xY4MtOplUqhMI0Jo72NEHEAy1oi7ma5+PiqMpRKsFVXjhBrId6
-         kNKrDqwXgIPfr3YT+fQzX+3PhOL8x4m9Mi2JEwKCcV4/8chr3xvB3fxsEkqWdPhxJAOG
-         /lHg==
-X-Gm-Message-State: AOJu0YyPcKBqmQza4Y0Ojs8cBgt6OEsJrsjokjCckMcxKQmEIEfHpi2L
-        YXF2opXgyBunj49GwQg2JdjiXQ==
-X-Google-Smtp-Source: AGHT+IE4vnDXBqfwShidPjq/u140Nh9Lf+YfW3WjJy+bEdPvCUxsYsEPIWnZNVPkTVSDMOA9EX84Jw==
-X-Received: by 2002:a05:600c:895:b0:401:b393:da18 with SMTP id l21-20020a05600c089500b00401b393da18mr1795468wmp.6.1694702840548;
-        Thu, 14 Sep 2023 07:47:20 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id n7-20020a7bcbc7000000b003fef3180e7asm4996897wmi.44.2023.09.14.07.47.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 07:47:19 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 16:47:18 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     guoren@kernel.org
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
-        wuwei2016@iscas.ac.cn, leobras@redhat.com,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
-Message-ID: <20230914-74d0cf00633c199758ee3450@orel>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-4-guoren@kernel.org>
- <20230914-892327a75b4b86badac5de02@orel>
+        with ESMTP id S240486AbjINOsZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 10:48:25 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8311A1FFD
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 07:48:21 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC38BC433B6;
+        Thu, 14 Sep 2023 14:48:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694702901;
+        bh=elTaVfoRjBAQ+RlyBd8HEpdgL87y4NjXRY4zEkFLP1A=;
+        h=From:To:Cc:Subject:Date:From;
+        b=TW6Bym8Oh7v/18JtJe1Xo1GeJcM/NCNKRtV6UTvMcKZUB53s0atl+kO/tVpcN1OEa
+         RZQfCpdY5U8mdymgvBzDLhOLwamo1tzsKEgRRj5729G3kSoWTCn1aoJFRzmYu1HgEz
+         Yz7y6b8ADrybcFFw8o3HQHmNyVEfHwVBUpnGCMCK7c5I6vXOtqXzl5emY80kzglrQ+
+         MqK7hNnIvL5U/Eltu0Kvj3iU9Dsd25SyKwHNSoWDgNN/rOnoAwAWVF0b0i1MERn1ZA
+         i200P8K+SLDQTqb/cqpf3Jb1Z8zMUn4WluPdESBbSonmrvzd8yYBoc3BMz93Y96hwB
+         Etr0lOC2GMj2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qgndi-00Cx4Y-8z;
+        Thu, 14 Sep 2023 15:48:18 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ben Horgan <ben.horgan@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.6, take #1
+Date:   Thu, 14 Sep 2023 15:48:02 +0100
+Message-Id: <20230914144802.1637804-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914-892327a75b4b86badac5de02@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, ben.horgan@arm.com, jean-philippe@linaro.org, m.szyprowski@samsung.com, philmd@linaro.org, vdonnefort@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 04:25:53PM +0200, Andrew Jones wrote:
-> On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
-> > From: Guo Ren <guoren@linux.alibaba.com>
-> > 
-> > Cache-block prefetch instructions are HINTs to the hardware to
-> > indicate that software intends to perform a particular type of
-> > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
-> > improve the arch_xchg for qspinlock xchg_tail.
-> > 
-> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > ---
-> >  arch/riscv/Kconfig                 | 15 +++++++++++++++
-> >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
-> >  arch/riscv/include/asm/hwcap.h     |  1 +
-> >  arch/riscv/include/asm/insn-def.h  |  5 +++++
-> >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
-> >  arch/riscv/kernel/cpufeature.c     |  1 +
-> >  6 files changed, 38 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > index e9ae6fa232c3..2c346fe169c1 100644
-> > --- a/arch/riscv/Kconfig
-> > +++ b/arch/riscv/Kconfig
-> > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
-> >  
-> >  	   If you don't know what to do here, say Y.
-> >  
-> > +config RISCV_ISA_ZICBOP
-> 
-> Even if we're not concerned with looping over blocks yet, I think we
-> should introduce zicbop block size DT parsing at the same time we bring
-> zicbop support to the kernel (it's just more copy+paste from zicbom and
-> zicboz). It's a bit annoying that the CMO spec doesn't state that block
-> sizes should be the same for m/z/p. And, the fact that m/z/p are all
-> separate extensions leads us to needing to parse block sizes for all
-> three, despite the fact that in practice they'll probably be the same.
+Paolo,
 
-Although, I saw on a different mailing list that Andrei Warkentin
-interpreted section 2.7 "Software Discovery" of the spec, which states
+Here's the first set of fixes for 6.6, addressing two regressions: use
+of uninitialised memory as a VA to map the GICv2 CPU interface at EL2
+stage-1, and a SMCCC fix covering the use of the SVE hint.
 
-"""
-The initial set of CMO extensions requires the following information to be
-discovered by software:
+Please pull.,
 
-* The size of the cache block for management and prefetch instructions
-* The size of the cache block for zero instructions
-* CBIE support at each privilege level
+	M.
 
-Other general cache characteristics may also be specified in the discovery
-mechanism.
-"""
+The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d1d:
 
-as management and prefetch having the same block size and only zero
-potentially having a different size. That looks like a reasonable
-interpretation to me, too. So, we could maybe proceed with assuming we
-can use zicbom_block_size for prefetch, for now. If a platform comes along
-that interpreted the spec differently, requiring prefetch block size to
-be specified separately, then we'll cross that bridge when we get there.
+  Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
 
-Thanks,
-drew
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.6-1
+
+for you to fetch changes up to 373beef00f7d781a000b12c31fb17a5a9c25969c:
+
+  KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:07:37 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.6, take #1
+
+- Fix EL2 Stage-1 MMIO mappings where a random address was used
+
+- Fix SMCCC function number comparison when the SVE hint is set
+
+----------------------------------------------------------------
+Jean-Philippe Brucker (1):
+      KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID
+
+Marc Zyngier (1):
+      KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private_va_range()
+
+ arch/arm64/include/asm/kvm_hyp.h      | 2 +-
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c         | 3 +--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S    | 1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c    | 8 ++++++--
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c  | 3 +--
+ arch/arm64/kvm/mmu.c                  | 3 +++
+ include/linux/arm-smccc.h             | 2 ++
+ 8 files changed, 16 insertions(+), 8 deletions(-)
