@@ -2,254 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3E6779F68F
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 03:55:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A855B79F6B5
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 03:56:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233525AbjINBzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Sep 2023 21:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49670 "EHLO
+        id S234200AbjINB4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Sep 2023 21:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232970AbjINBzI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Sep 2023 21:55:08 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E93271BCF;
-        Wed, 13 Sep 2023 18:55:03 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 321D8C433C8;
-        Thu, 14 Sep 2023 01:55:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694656503;
-        bh=gFr1Z0t8lDWElOFrhucMKK+wTDT9agGBysTTIRiyjWI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=PbJW1V59ZwgXRoS7IRcpRXGd7J2y2ufjX9akdAN4IZQNP756itdOJBYkCb1ONnR7b
-         U3siMpRichKCogyZ16zc2E2pml+mwfrDjHtKYlGBvVz2uu1epIJ60iIufzaZ0nfqeJ
-         2KL4EJuDMnKR1XppyyZ8pvtajb1LOBlM9SelhT2Qep+uxREtK3nTKZP9jkIaaBcpo9
-         YhuuF1iMhbS9mLMp2zcGct/61lMEdFWmY3vq5m8uuIzY8dkR6xv6B16MHo8HBcG5YQ
-         Uulkvjf3xb7eQHzyWh8QpwAdjv3mLnFIAc06tO76Azkk6cXUs67Nz0+GaJGIvzHkHT
-         J73Wq6MDZUGQQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Andrew Cooper <Andrew.Cooper3@citrix.com>,
-        Sasha Levin <sashal@kernel.org>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, pbonzini@redhat.com, akpm@linux-foundation.org,
-        bhe@redhat.com, eric.devolder@oracle.com, hbathini@linux.ibm.com,
-        sourabhjain@linux.ibm.com, bhelgaas@google.com,
-        kai.huang@intel.com, peterz@infradead.org, jpoimboe@kernel.org,
-        tiwai@suse.de, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 1/7] x86/reboot: VMCLEAR active VMCSes before emergency reboot
-Date:   Wed, 13 Sep 2023 21:54:45 -0400
-Message-Id: <20230914015459.51740-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.5.3
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S234058AbjINBzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Sep 2023 21:55:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273841BDD
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:55:36 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bf681d3d04so3893025ad.2
+        for <kvm@vger.kernel.org>; Wed, 13 Sep 2023 18:55:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694656535; x=1695261335; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bJKy84XSuMTmOC63vQkGfkXTGkwOOuRa5fNJs1nSv9Y=;
+        b=OmuuHmVp88oV0ZN3hZneCd3NQcP8EpH+nCF9AJeg07IQEEJGUgx+JQcAqnKVzOhs/N
+         wD/5hTrs4+3L1wdSxsivTdczQ9+GFlaeSzD0r9Nyz8I/MoFmP98hkTY1NEz6yGDILjyT
+         WY9l+VT3Muh5SS43js3l9zMDeJN8Vfsxe1jpPnmcvCYpxfUVNLUMF9b15oNtLmtGHZBF
+         JTD887sOuuGmszapf8eR1Qdc/KM9HW/JEntrvs7aSsIxYqnEeu2WaJX8JZw4Chz3XshG
+         o9N1oUr70zvmwoj1FNfBubKfB5GVLoL/MXjFlD11N0/AEwyWRkbhVGJvtX/arbuehnI5
+         H6tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694656535; x=1695261335;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJKy84XSuMTmOC63vQkGfkXTGkwOOuRa5fNJs1nSv9Y=;
+        b=KeqE9t2xt6dNeuGTBW8p6s4APJxtso/j4GL0ZNblXTip1Yc+gtYXoBrSq/YdhMFD3g
+         cyKWeJvfYq+bun3T34UuRdSeTMahkwQ7bRCWF+G+LcnFsnPsMNvYGJBw7h8HnFVsGCvv
+         +2Kw6Mf/d41+/noN5v9bo8nmNCXaWR/geE+zdu7ITlwaR3dangb36vjBdC+i2332o/zN
+         tg7xWPqLYhyuHH5DS2MgVNEguIHVGXfSgTxk9jTEacoLZOO7I7d+4qR+OPgyiKvoZuHS
+         a16+wqYYCi6efhYo7/MezQHcaoKWd6e2e1qUlAhYkpwIs/JhQYCFYAHffi0D2rvKLSrU
+         B4KA==
+X-Gm-Message-State: AOJu0Yx8OSt5VVLoVyDIUjEL9zPVJJbYu/QH3HXi/oQehx69eLyXf3rV
+        zkFeNiF7zg+vhQ1pmccPyi/6ZFiLO0s=
+X-Google-Smtp-Source: AGHT+IGnw6PJDWM0E1VK/7ZuUO30qpP9NQbgvDz7dNd87qt+PDes/hO2OajwY8ZpLg9diAiXM3Vfd4Drz0o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2445:b0:1c3:1ceb:97b6 with SMTP id
+ l5-20020a170903244500b001c31ceb97b6mr183120pls.7.1694656535510; Wed, 13 Sep
+ 2023 18:55:35 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 13 Sep 2023 18:54:58 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230914015531.1419405-1-seanjc@google.com>
+Subject: [RFC PATCH v12 00/33] KVM: guest_memfd() and per-page attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+This is hopefully the last RFC for implementing fd-based (instead of vma-based)
+memory for KVM guests.  If you want the full background of why we are doing
+this, please go read the v10 cover letter.  With luck, v13 will be a "normal"
+series that's ready for inclusion.
 
-[ Upstream commit b23c83ad2c638420ec0608a9de354507c41bec29 ]
+Tagged RFC as there are still several empty changelogs, a lot of missing
+documentation, and a handful of TODOs.  And I haven't tested or proofread this
+anywhere near as much as I normally would.  I am posting even though the
+remaining TODOs aren't _that_ big so that people can test this new version
+without having to wait a few weeks to close out the remaining TODOs, i.e. to
+give us at least some chance of hitting v6.7.
 
-VMCLEAR active VMCSes before any emergency reboot, not just if the kernel
-may kexec into a new kernel after a crash.  Per Intel's SDM, the VMX
-architecture doesn't require the CPU to flush the VMCS cache on INIT.  If
-an emergency reboot doesn't RESET CPUs, cached VMCSes could theoretically
-be kept and only be written back to memory after the new kernel is booted,
-i.e. could effectively corrupt memory after reboot.
+The most relevant TODO item for non-KVM folks is that we are planning on
+dropping the dedicated "gmem" file system.  Assuming that pans out, the patch
+to export security_inode_init_security_anon() should go away.
 
-Opportunistically remove the setting of the global pointer to NULL to make
-checkpatch happy.
+KVM folks, there a few changes I want to highlight and get feedback on, all of
+which are directly related to the "annotated memory faults" series[*]:
 
-Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>
-Link: https://lore.kernel.org/r/20230721201859.2307736-2-seanjc@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/include/asm/kexec.h  |  2 --
- arch/x86/include/asm/reboot.h |  2 ++
- arch/x86/kernel/crash.c       | 31 -------------------------------
- arch/x86/kernel/reboot.c      | 22 ++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.c        | 10 +++-------
- 5 files changed, 27 insertions(+), 40 deletions(-)
+ - Rename kvm_run.memory to kvm_run.memory_fault
+ - Place "memory_fault" in a separate union
+ - Return -EFAULT or -EHWPOISON with exiting with KVM_EXIT_MEMORY_FAULT
 
-diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
-index 5b77bbc28f969..819046974b997 100644
---- a/arch/x86/include/asm/kexec.h
-+++ b/arch/x86/include/asm/kexec.h
-@@ -205,8 +205,6 @@ int arch_kimage_file_post_load_cleanup(struct kimage *image);
- #endif
- #endif
- 
--typedef void crash_vmclear_fn(void);
--extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
- extern void kdump_nmi_shootdown_cpus(void);
- 
- #endif /* __ASSEMBLY__ */
-diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.h
-index 9177b4354c3f5..dc201724a6433 100644
---- a/arch/x86/include/asm/reboot.h
-+++ b/arch/x86/include/asm/reboot.h
-@@ -25,6 +25,8 @@ void __noreturn machine_real_restart(unsigned int type);
- #define MRR_BIOS	0
- #define MRR_APM		1
- 
-+typedef void crash_vmclear_fn(void);
-+extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
- void cpu_emergency_disable_virtualization(void);
- 
- typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
-diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
-index cdd92ab43cda4..54cd959cb3160 100644
---- a/arch/x86/kernel/crash.c
-+++ b/arch/x86/kernel/crash.c
-@@ -48,38 +48,12 @@ struct crash_memmap_data {
- 	unsigned int type;
- };
- 
--/*
-- * This is used to VMCLEAR all VMCSs loaded on the
-- * processor. And when loading kvm_intel module, the
-- * callback function pointer will be assigned.
-- *
-- * protected by rcu.
-- */
--crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss = NULL;
--EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
--
--static inline void cpu_crash_vmclear_loaded_vmcss(void)
--{
--	crash_vmclear_fn *do_vmclear_operation = NULL;
--
--	rcu_read_lock();
--	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
--	if (do_vmclear_operation)
--		do_vmclear_operation();
--	rcu_read_unlock();
--}
--
- #if defined(CONFIG_SMP) && defined(CONFIG_X86_LOCAL_APIC)
- 
- static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
- {
- 	crash_save_cpu(regs, cpu);
- 
--	/*
--	 * VMCLEAR VMCSs loaded on all cpus if needed.
--	 */
--	cpu_crash_vmclear_loaded_vmcss();
--
- 	/*
- 	 * Disable Intel PT to stop its logging
- 	 */
-@@ -133,11 +107,6 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
- 
- 	crash_smp_send_stop();
- 
--	/*
--	 * VMCLEAR VMCSs loaded on this cpu if needed.
--	 */
--	cpu_crash_vmclear_loaded_vmcss();
--
- 	cpu_emergency_disable_virtualization();
- 
- 	/*
-diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index 3adbe97015c13..3fa4c6717a1db 100644
---- a/arch/x86/kernel/reboot.c
-+++ b/arch/x86/kernel/reboot.c
-@@ -787,6 +787,26 @@ void machine_crash_shutdown(struct pt_regs *regs)
- }
- #endif
- 
-+/*
-+ * This is used to VMCLEAR all VMCSs loaded on the
-+ * processor. And when loading kvm_intel module, the
-+ * callback function pointer will be assigned.
-+ *
-+ * protected by rcu.
-+ */
-+crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
-+EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
-+
-+static inline void cpu_crash_vmclear_loaded_vmcss(void)
-+{
-+	crash_vmclear_fn *do_vmclear_operation = NULL;
-+
-+	rcu_read_lock();
-+	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
-+	if (do_vmclear_operation)
-+		do_vmclear_operation();
-+	rcu_read_unlock();
-+}
- 
- /* This is the CPU performing the emergency shutdown work. */
- int crashing_cpu = -1;
-@@ -798,6 +818,8 @@ int crashing_cpu = -1;
-  */
- void cpu_emergency_disable_virtualization(void)
- {
-+	cpu_crash_vmclear_loaded_vmcss();
-+
- 	cpu_emergency_vmxoff();
- 	cpu_emergency_svm_disable();
- }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index df461f387e20d..f60fb79fea881 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -41,7 +41,7 @@
- #include <asm/idtentry.h>
- #include <asm/io.h>
- #include <asm/irq_remapping.h>
--#include <asm/kexec.h>
-+#include <asm/reboot.h>
- #include <asm/perf_event.h>
- #include <asm/mmu_context.h>
- #include <asm/mshyperv.h>
-@@ -754,7 +754,6 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vmx,
- 	return ret;
- }
- 
--#ifdef CONFIG_KEXEC_CORE
- static void crash_vmclear_local_loaded_vmcss(void)
- {
- 	int cpu = raw_smp_processor_id();
-@@ -764,7 +763,6 @@ static void crash_vmclear_local_loaded_vmcss(void)
- 			    loaded_vmcss_on_cpu_link)
- 		vmcs_clear(v->vmcs);
- }
--#endif /* CONFIG_KEXEC_CORE */
- 
- static void __loaded_vmcs_clear(void *arg)
- {
-@@ -8622,10 +8620,9 @@ static void __vmx_exit(void)
- {
- 	allow_smaller_maxphyaddr = false;
- 
--#ifdef CONFIG_KEXEC_CORE
- 	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
- 	synchronize_rcu();
--#endif
-+
- 	vmx_cleanup_l1d_flush();
- }
- 
-@@ -8674,10 +8671,9 @@ static int __init vmx_init(void)
- 		pi_init_cpu(cpu);
- 	}
- 
--#ifdef CONFIG_KEXEC_CORE
- 	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
- 			   crash_vmclear_local_loaded_vmcss);
--#endif
-+
- 	vmx_check_vmcs12_offsets();
- 
- 	/*
+The first one is pretty self-explanatory, "run->memory.gpa" looks quite odd and
+would prevent ever doing something directly with memory.
+
+Putting the struct in a separate union is not at all necessary for supporting
+private memory, it's purely forward looking to Anish series, which wants to
+annotate (fill memory_fault) on all faults, even if KVM ultimately doesn't exit
+to userspace (x86 has a few unfortunate flows where KVM can clobber a previous
+exit, or suppress a memory fault exit).  Using a separate union, i.e. different
+bytes in kvm_run, allows exiting to userspace with both memory_fault and the
+"normal" union filled, e.g. if KVM starts an MMIO exit and then hits a memory
+fault exit, the MMIO exit will be preserved.  It's unlikely userspace will be
+able to do anything useful with the info in that case, but the reverse will
+likely be much more interesting, e.g. if KVM hits a memory fault and then doesn't
+report it to userspace for whatever reason.
+
+As for returning -EFAULT/-EHWPOISON, far too many helpers that touch guest
+memory, i.e. can "fault", return 0 on success, which makes it all bug impossible
+to use '0' to signal "exit to userspace".  Rather than use '0' for _just_ the
+case where the guest is accessing private vs. shared, my thought is to use
+-EFAULT everywhere except for the poisoned page case.
+
+[*] https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@google.com
+
+TODOs [owner]:
+ - Documentation [none]
+ - Changelogs [Sean]
+ - Fully anonymous inode vs. proper filesystem [Paolo]
+ - kvm_gmem_error_page() testing (my version is untested) [Isaku?]
+
+v12:
+ - Squash fixes from others. [Many people]
+ - Kill of the .on_unlock() callback and use .on_lock() when handling
+   memory attributes updates. [Isaku]
+ - Add more tests. [Ackerley]
+ - Move range_has_attrs() to common code. [Paolo]
+ - Return actually number of address spaces for the VM-scoped version of
+   KVM_CAP_MULTI_ADDRESS_SPACE. [Paolo]
+ - Move forward declaration of "struct kvm_gfn_range" to kvm_types.h. [Yuan]
+ - Plumb code to have HVA-based mmu_notifier events affect only shared
+   mappings. [Asish]
+ - Clean up kvm_vm_ioctl_set_mem_attributes() math. [Binbin]
+ - Collect a few reviews and acks. [Paolo, Paul]
+ - Unconditionally advertise a synchronized MMU on PPC. [Paolo]
+ - Check for error return from filemap_grab_folio(). [A
+ - Make max_order optional. [Fuad]
+ - Remove signal injection, zap SPTEs on memory error. [Isaku]
+ - Add KVM_CAP_GUEST_MEMFD. [Xiaoyao]
+ - Invoke kvm_arch_pre_set_memory_attributes() instead of
+   kvm_mmu_unmap_gfn_range().
+ - Rename kvm_run.memory to kvm_run.memory_fault
+ - Place "memory_fault" in a separate union
+ - Return -EFAULT and -EHWPOISON with KVM_EXIT_MEMORY_FAULT
+ - "Init" run->exit_reason in x86's vcpu_run()
+
+v11:
+ - https://lore.kernel.org/all/20230718234512.1690985-1-seanjc@google.com
+ - Test private<=>shared conversions *without* doing fallocate()
+ - PUNCH_HOLE all memory between iterations of the conversion test so that
+   KVM doesn't retain pages in the guest_memfd
+ - Rename hugepage control to be a very generic ALLOW_HUGEPAGE, instead of
+   giving it a THP or PMD specific name.
+ - Fold in fixes from a lot of people (thank you!)
+ - Zap SPTEs *before* updating attributes to ensure no weirdness, e.g. if
+   KVM handles a page fault and looks at inconsistent attributes
+ - Refactor MMU interaction with attributes updates to reuse much of KVM's
+   framework for mmu_notifiers.
+
+v10: https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+
+Ackerley Tng (1):
+  KVM: selftests: Test KVM exit behavior for private memory/access
+
+Chao Peng (8):
+  KVM: Use gfn instead of hva for mmu_notifier_retry
+  KVM: Add KVM_EXIT_MEMORY_FAULT exit to report faults to userspace
+  KVM: Introduce per-page memory attributes
+  KVM: x86: Disallow hugepages when memory attributes are mixed
+  KVM: x86/mmu: Handle page fault for private memory
+  KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
+  KVM: selftests: Expand set_memory_region_test to validate
+    guest_memfd()
+  KVM: selftests: Add basic selftest for guest_memfd()
+
+Sean Christopherson (21):
+  KVM: Tweak kvm_hva_range and hva_handler_t to allow reusing for gfn
+    ranges
+  KVM: PPC: Drop dead code related to KVM_ARCH_WANT_MMU_NOTIFIER
+  KVM: PPC: Return '1' unconditionally for KVM_CAP_SYNC_MMU
+  KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
+    CONFIG_KVM_GENERIC_MMU_NOTIFIER
+  KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+  KVM: Add a dedicated mmu_notifier flag for reclaiming freed memory
+  KVM: Drop .on_unlock() mmu_notifier hook
+  KVM: Set the stage for handling only shared mappings in mmu_notifier
+    events
+  mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
+  security: Export security_inode_init_security_anon() for use by KVM
+  KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing
+    memory
+  KVM: Add transparent hugepage support for dedicated guest memory
+  KVM: x86: "Reset" vcpu->run->exit_reason early in KVM_RUN
+  KVM: Drop superfluous __KVM_VCPU_MULTIPLE_ADDRESS_SPACE macro
+  KVM: Allow arch code to track number of memslot address spaces per VM
+  KVM: x86: Add support for "protected VMs" that can utilize private
+    memory
+  KVM: selftests: Drop unused kvm_userspace_memory_region_find() helper
+  KVM: selftests: Convert lib's mem regions to
+    KVM_SET_USER_MEMORY_REGION2
+  KVM: selftests: Add support for creating private memslots
+  KVM: selftests: Introduce VM "shape" to allow tests to specify the VM
+    type
+  KVM: selftests: Add GUEST_SYNC[1-6] macros for synchronizing more data
+
+Vishal Annapurve (3):
+  KVM: selftests: Add helpers to convert guest memory b/w private and
+    shared
+  KVM: selftests: Add helpers to do KVM_HC_MAP_GPA_RANGE hypercalls
+    (x86)
+  KVM: selftests: Add x86-only selftest for private memory conversions
+
+ Documentation/virt/kvm/api.rst                | 116 ++++
+ arch/arm64/include/asm/kvm_host.h             |   2 -
+ arch/arm64/kvm/Kconfig                        |   2 +-
+ arch/mips/include/asm/kvm_host.h              |   2 -
+ arch/mips/kvm/Kconfig                         |   2 +-
+ arch/powerpc/include/asm/kvm_host.h           |   2 -
+ arch/powerpc/kvm/Kconfig                      |   8 +-
+ arch/powerpc/kvm/book3s_hv.c                  |   2 +-
+ arch/powerpc/kvm/powerpc.c                    |   7 +-
+ arch/riscv/include/asm/kvm_host.h             |   2 -
+ arch/riscv/kvm/Kconfig                        |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  17 +-
+ arch/x86/include/uapi/asm/kvm.h               |   3 +
+ arch/x86/kvm/Kconfig                          |  14 +-
+ arch/x86/kvm/debugfs.c                        |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        | 264 +++++++-
+ arch/x86/kvm/mmu/mmu_internal.h               |   2 +
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   2 +-
+ arch/x86/kvm/vmx/vmx.c                        |  11 +-
+ arch/x86/kvm/x86.c                            |  25 +-
+ include/linux/kvm_host.h                      | 143 +++-
+ include/linux/kvm_types.h                     |   1 +
+ include/linux/pagemap.h                       |  19 +-
+ include/uapi/linux/kvm.h                      |  67 ++
+ include/uapi/linux/magic.h                    |   1 +
+ mm/compaction.c                               |  43 +-
+ mm/migrate.c                                  |   2 +
+ security/security.c                           |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  | 165 +++++
+ .../selftests/kvm/include/kvm_util_base.h     | 148 +++-
+ .../testing/selftests/kvm/include/test_util.h |   5 +
+ .../selftests/kvm/include/ucall_common.h      |  11 +
+ .../selftests/kvm/include/x86_64/processor.h  |  15 +
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 231 ++++---
+ tools/testing/selftests/kvm/lib/memstress.c   |   3 +-
+ .../selftests/kvm/set_memory_region_test.c    | 100 +++
+ .../kvm/x86_64/private_mem_conversions_test.c | 410 +++++++++++
+ .../kvm/x86_64/private_mem_kvm_exits_test.c   | 121 ++++
+ .../kvm/x86_64/ucna_injection_test.c          |   2 +-
+ virt/kvm/Kconfig                              |  17 +
+ virt/kvm/Makefile.kvm                         |   1 +
+ virt/kvm/dirty_ring.c                         |   2 +-
+ virt/kvm/guest_mem.c                          | 637 ++++++++++++++++++
+ virt/kvm/kvm_main.c                           | 482 +++++++++++--
+ virt/kvm/kvm_mm.h                             |  38 ++
+ 48 files changed, 2888 insertions(+), 271 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+ create mode 100644 virt/kvm/guest_mem.c
+
+
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
 -- 
-2.40.1
+2.42.0.283.g2d96d420d3-goog
 
