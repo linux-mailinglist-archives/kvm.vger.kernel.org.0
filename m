@@ -2,132 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A871A79FF92
-	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 11:07:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A66F679FF01
+	for <lists+kvm@lfdr.de>; Thu, 14 Sep 2023 10:52:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237070AbjINJHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 05:07:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51214 "EHLO
+        id S236098AbjINIwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 04:52:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237134AbjINJHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:07:16 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFF11BF9;
-        Thu, 14 Sep 2023 02:07:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=b1ozqveOAFRuO/wOLzb/wpotEM9GW9TMSEMYXUlq+eo=; b=seWWyEITPDYjae4Nj30M50y4M3
-        HgTVvcdf04i37rSRTFWMkg+p4yMK7DRpKb4KtFf9Rn+ngHcUlgmr2q7D7K6DcHk2poBFQ5LmL/5eX
-        hBBLHHZBCV+EQ/Hfu4hn0bVQYXXl/tGGqcQQi17tMebimnVGwgqnAXFMzPf1E7p/QWqg=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qgi3O-0001kl-Rt; Thu, 14 Sep 2023 08:50:26 +0000
-Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qgi3O-0002T9-Ij; Thu, 14 Sep 2023 08:50:26 +0000
-From:   Paul Durrant <paul@xen.org>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S235921AbjINIwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 04:52:22 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 296311BF1
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:52:17 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-404732a0700so2396035e9.0
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 01:52:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1694681535; x=1695286335; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lMUcG5dET7EFobfbAHbzg2lwyOfsWQ8F2tpkEXeY8DY=;
+        b=StgrfO85sslASZLu1luVqtO7tb55qbJgvfpXkg9pTAfsDnQnC7nM+Yxjs2Ar02n6aW
+         SsYJ/0RYNy1wMPnHBZz5y7uxU2qdGDeWZ3CbMk4AD5jVwtTuHxIwtMsW1VGfwUv5xmNg
+         8EzC7EGHo288N93zQg/H35PEtCrEC8RMTLHNQZLpN8z/XXhiyWB1gI5nlTUjBLTNfhg6
+         vk6/BTYqcwyVUuPNOCJ1Vz5mxMrLZdNqnAYbhxj7BKsQohSCRBtbxK0ucHGuFyje3ecI
+         zqu395Teyh74NhcpJnFEGQbtFjyZtJETeej3Cp93WIsDYUkHWJK5Gff/O3ScKKO+PKKW
+         cAlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694681535; x=1695286335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lMUcG5dET7EFobfbAHbzg2lwyOfsWQ8F2tpkEXeY8DY=;
+        b=h5D4q9kWBdwFYuR2NFvxS++YO8F9o4O+EtLZQv6hWvguPbpZ50aX71Gnfy7smanXHE
+         HRHJftnNGlRQNmpqmDNjoT6N4Io8At6I43JX2J5DFD6V55c9wiK3BgG+h5EZ7DhMrePn
+         UaKwSbWSv4ldTdBdPCoWiQoVFZ2qw59UCbus77Mq3jRfie357tG+4lEGqrQ5V+qE/6Tp
+         +2EhpFhPQX58V4llgtF/dz1NxqQtqyjwaOhqcAJJay/DHTDQcyFcEAN6pYQYwmxrPOFz
+         aRdCq0KVBZA4U3TizOkS+dkTEu6BUdqzNPlofYni2/Vn3UjzqJdQjJtJLFUPe4Cd8h7r
+         snKA==
+X-Gm-Message-State: AOJu0YxXbhn4zVmjAPOmfFeSARVySB7uYf5h/UkxNTMc4du56UPeTQOq
+        KXBs9VseD4D9iiKB/aovRnodPQ==
+X-Google-Smtp-Source: AGHT+IF/71ROIOoJExJf8FEqPIRkV7f1W6lv97o8MVa7W5dAed2t55G5dPLBGqXoAtZVnyXGa4aJ8Q==
+X-Received: by 2002:a5d:4f88:0:b0:319:83e4:bbbf with SMTP id d8-20020a5d4f88000000b0031983e4bbbfmr4097683wru.20.1694681535355;
+        Thu, 14 Sep 2023 01:52:15 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id r8-20020a5d4e48000000b0031ad2f9269dsm1137143wrt.40.2023.09.14.01.52.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 01:52:14 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 10:52:08 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Subject: [PATCH 8/8] KVM: xen: automatically use the vcpu_info embedded in shared_info
-Date:   Thu, 14 Sep 2023 08:49:46 +0000
-Message-Id: <20230914084946.200043-9-paul@xen.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230914084946.200043-1-paul@xen.org>
-References: <20230914084946.200043-1-paul@xen.org>
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 5/9] KVM: riscv: selftests: Switch to use macro from
+ csr.h
+Message-ID: <20230914-18bfe93b679e290188e70307@orel>
+References: <cover.1694421911.git.haibo1.xu@intel.com>
+ <6cdda82518977c67004ee01a767bc67962352c13.1694421911.git.haibo1.xu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6cdda82518977c67004ee01a767bc67962352c13.1694421911.git.haibo1.xu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paul Durrant <pdurrant@amazon.com>
+On Thu, Sep 14, 2023 at 09:36:59AM +0800, Haibo Xu wrote:
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> ---
+>  tools/testing/selftests/kvm/include/riscv/processor.h | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+> index 5b62a3d2aa9b..67766baed4f7 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -8,6 +8,7 @@
+>  #define SELFTEST_KVM_PROCESSOR_H
+>  
+>  #include "kvm_util.h"
+> +#include <asm/csr.h>
+>  #include <linux/stringify.h>
 
-Add a KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO flag so that the VMM knows it
-need only set the KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO attribute in response to
-a VCPUOP_register_vcpu_info hypercall, and modify get_vcpu_info_cache()
-to pass back a pointer to the shared info pfn cache (and appropriate
-offset) for any of the first 32 vCPUs if the attribute has not been set.
+nit: Usually we try to keep the order of our includes separated into five
+categories, listed below, where each category is sorted alphabetically. Of
+course any dependencies the includes have on each other need to be
+considered too.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: x86@kernel.org
----
- arch/x86/kvm/x86.c       |  3 ++-
- arch/x86/kvm/xen.c       | 15 +++++++++++++++
- include/uapi/linux/kvm.h |  1 +
- 3 files changed, 18 insertions(+), 1 deletion(-)
+<library-includes-without-a-subdir>
+<library-includes-with-subdir>
+<linux/...>
+<asm/...>
+"local-includes"
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4cd577d01bc4..cdce8c463a1b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4528,7 +4528,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
- 		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
- 		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
--		    KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA;
-+		    KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA |
-+		    KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO;
- 		if (sched_info_on())
- 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
- 			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 892563fea40f..66050a96ba25 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -491,6 +491,21 @@ static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
- 
- struct gfn_to_pfn_cache *get_vcpu_info_cache(struct kvm_vcpu *v, unsigned long *offset)
- {
-+	if (!v->arch.xen.vcpu_info_cache.active && v->arch.xen.vcpu_id < MAX_VIRT_CPUS) {
-+		struct kvm *kvm = v->kvm;
-+
-+		if (offset) {
-+			if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
-+				*offset = offsetof(struct shared_info,
-+						   vcpu_info[v->arch.xen.vcpu_id]);
-+			else
-+				*offset = offsetof(struct compat_shared_info,
-+						   vcpu_info[v->arch.xen.vcpu_id]);
-+		}
-+
-+		return &kvm->arch.xen.shinfo_cache;
-+	}
-+
- 	if (offset)
- 		*offset = 0;
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d3f371bafad8..480612f73fc2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1283,6 +1283,7 @@ struct kvm_x86_mce {
- #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
- #define KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG	(1 << 6)
- #define KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA	(1 << 7)
-+#define KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO	(1 << 8)
- 
- struct kvm_xen_hvm_config {
- 	__u32 flags;
--- 
-2.39.2
+>  
+>  static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+> @@ -95,13 +96,6 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+>  #define PGTBL_PAGE_SIZE				PGTBL_L0_BLOCK_SIZE
+>  #define PGTBL_PAGE_SIZE_SHIFT			PGTBL_L0_BLOCK_SHIFT
+>  
+> -#define SATP_PPN				_AC(0x00000FFFFFFFFFFF, UL)
+> -#define SATP_MODE_39				_AC(0x8000000000000000, UL)
+> -#define SATP_MODE_48				_AC(0x9000000000000000, UL)
+> -#define SATP_ASID_BITS				16
+> -#define SATP_ASID_SHIFT				44
+> -#define SATP_ASID_MASK				_AC(0xFFFF, UL)
+> -
+>  #define SBI_EXT_EXPERIMENTAL_START		0x08000000
+>  #define SBI_EXT_EXPERIMENTAL_END		0x08FFFFFF
+>  
+> -- 
+> 2.34.1
+>
 
+Assuming the CONFIG_64BIT patch will come before this, then
+
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
