@@ -2,223 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEB367A1577
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 07:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A59847A1598
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 07:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232101AbjIOFc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 01:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59160 "EHLO
+        id S230479AbjIOFnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 01:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232062AbjIOFcZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 01:32:25 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BB62711;
-        Thu, 14 Sep 2023 22:32:05 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 7416B1F38C;
-        Fri, 15 Sep 2023 05:32:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1694755923; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=JHk09nPjxFZrJgb8m7unTMF/azz4TxdRPAGo/tOeBHk=;
-        b=RdcOfw73eNUBMj5nBCcvzq91XSANz6JckowZgDJVrroVdxIYUkUoyr353mcuRRIfxjCc16
-        nLDy1Iy4gedYedRcWEn1Hl7i9RzsuGkF5Yb+xYTRKe/89zEvBuHegMziQjQLf6T5u5hRl+
-        fhdUPLuCZRgshltifM6T7TQtfALszJE=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D489513479;
-        Fri, 15 Sep 2023 05:32:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id AzSFMlLsA2WNZQAAMHmgww
-        (envelope-from <jgross@suse.com>); Fri, 15 Sep 2023 05:32:02 +0000
-Message-ID: <59a556d0-b962-4b63-9127-ba799db3b0ed@suse.com>
-Date:   Fri, 15 Sep 2023 07:32:02 +0200
+        with ESMTP id S231997AbjIOFnX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 01:43:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 893D32709
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 22:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694756552;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gFO8+T730lSxbR4eXXN1KRpuEmnACBgmkqkqaO3f0p0=;
+        b=KKwViUoygnfHpo7hUnyI+rgP2Mxz7BqSTgep4QBIRsd0sqHB2zSWKJKvUk4dgjAPsBRcGi
+        X5yeafMprYhWUDCze5peZhxnxbvOnoG7XmFfM8RPIL2Ub+OP02hxlVhH4E0vMT1uhPwb43
+        9XiM3JSHEpZxXt6WT3C2uA2gPxAEZ+4=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-024BEC2NOsqOb5H-AZkkcw-1; Fri, 15 Sep 2023 01:42:31 -0400
+X-MC-Unique: 024BEC2NOsqOb5H-AZkkcw-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1cc61e461deso2648304fac.2
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 22:42:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694756550; x=1695361350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gFO8+T730lSxbR4eXXN1KRpuEmnACBgmkqkqaO3f0p0=;
+        b=bohKxaUtq9/qewHOYjhl6KX6h+CgqoGdXQbl57evYt+6uxKUm5ArZFU8aFnyN3Cmv0
+         rU9N1gWcGM0tqydVxR1y6iwZbO9eo4lZtp9s+mn51o19faUHfRFy85eONNLn3IHNfngR
+         MSGwcLgwjefS3ZnOiuJ6c7vcjedLOCTpaWuzXPafgPC8B+13wTN+EPTjhN+QYfX9l7Sh
+         /BVCJ5v0yi79Zdrmhpi0a2ZBj2h6SGuFpdnRDj9ShRH7TO/UeqcF2J1bAS026dclkl9o
+         3s83IiSzWVNcKP5pnfB/ppFxlR1w6WBBI1kgCJ1ReDi0UgvLEihPfZhSaLw5rJxETrtL
+         Ljsw==
+X-Gm-Message-State: AOJu0YyNCEbSfM8MhkLLP37sEv6Sy5btKFG0ASSoauoa8OX3YqMP3ueG
+        T0phwtVvcbm6thnPkoHvvBU5bVTziyg7HpPEnAIvUn9V4QTMLeQAek133iZ59iUpkh2PB5y8x5i
+        vwAILx3FQy/HY
+X-Received: by 2002:a05:6870:659e:b0:1d5:a72e:154e with SMTP id fp30-20020a056870659e00b001d5a72e154emr914817oab.36.1694756550509;
+        Thu, 14 Sep 2023 22:42:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHt0gjdD2W1OMPtXYFw18q1B6hx8A/UEEDl5ieKzaDTp4knHfwN8c0lVL2v/Jr+kPERmtLQiw==
+X-Received: by 2002:a05:6870:659e:b0:1d5:a72e:154e with SMTP id fp30-20020a056870659e00b001d5a72e154emr914789oab.36.1694756550218;
+        Thu, 14 Sep 2023 22:42:30 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
+        by smtp.gmail.com with ESMTPSA id ed23-20020a056870b79700b001cd14c60b35sm1591100oab.5.2023.09.14.22.42.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 22:42:29 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 02:42:20 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     guoren@kernel.org
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 11/17] RISC-V: paravirt: pvqspinlock: Add paravirt
+ qspinlock skeleton
+Message-ID: <ZQPuvCNq5IAYlMR6@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-12-guoren@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 03/38] x86/msr: Add the WRMSRNS instruction support
-Content-Language: en-US
-To:     andrew.cooper3@citrix.com, "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, luto@kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, peterz@infradead.org, ravi.v.shankar@intel.com,
-        mhiramat@kernel.org, jiangshanlai@gmail.com
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-4-xin3.li@intel.com>
- <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com> <87y1h81ht4.ffs@tglx>
- <7ba4ae3e-f75d-66a8-7669-b6eb17c1aa1c@citrix.com>
- <0e7d37db-e1af-ac40-6eca-5565d1bebcde@zytor.com>
- <6575702e-fea5-61b2-dd61-7b556a8603e8@citrix.com>
-From:   Juergen Gross <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <6575702e-fea5-61b2-dd61-7b556a8603e8@citrix.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------hZDkENmzAqDrTPHAvl4iVr8s"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230910082911.3378782-12-guoren@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------hZDkENmzAqDrTPHAvl4iVr8s
-Content-Type: multipart/mixed; boundary="------------G5kOFu6QJX70g00rNoeOWpMy";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: andrew.cooper3@citrix.com, "H. Peter Anvin" <hpa@zytor.com>,
- Thomas Gleixner <tglx@linutronix.de>, Xin Li <xin3.li@intel.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org
-Cc: mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
- peterz@infradead.org, ravi.v.shankar@intel.com, mhiramat@kernel.org,
- jiangshanlai@gmail.com
-Message-ID: <59a556d0-b962-4b63-9127-ba799db3b0ed@suse.com>
-Subject: Re: [PATCH v10 03/38] x86/msr: Add the WRMSRNS instruction support
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-4-xin3.li@intel.com>
- <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com> <87y1h81ht4.ffs@tglx>
- <7ba4ae3e-f75d-66a8-7669-b6eb17c1aa1c@citrix.com>
- <0e7d37db-e1af-ac40-6eca-5565d1bebcde@zytor.com>
- <6575702e-fea5-61b2-dd61-7b556a8603e8@citrix.com>
-In-Reply-To: <6575702e-fea5-61b2-dd61-7b556a8603e8@citrix.com>
+On Sun, Sep 10, 2023 at 04:29:05AM -0400, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+> 
+> Using static_call to switch between:
+>   native_queued_spin_lock_slowpath()    __pv_queued_spin_lock_slowpath()
+>   native_queued_spin_unlock()           __pv_queued_spin_unlock()
+> 
+> Finish the pv_wait implementation, but pv_kick needs the SBI
+> definition of the next patches.
+> 
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> ---
+>  arch/riscv/include/asm/Kbuild               |  1 -
+>  arch/riscv/include/asm/qspinlock.h          | 35 +++++++++++++
+>  arch/riscv/include/asm/qspinlock_paravirt.h | 29 +++++++++++
+>  arch/riscv/include/asm/spinlock.h           |  2 +-
+>  arch/riscv/kernel/qspinlock_paravirt.c      | 57 +++++++++++++++++++++
+>  arch/riscv/kernel/setup.c                   |  4 ++
+>  6 files changed, 126 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/riscv/include/asm/qspinlock.h
+>  create mode 100644 arch/riscv/include/asm/qspinlock_paravirt.h
+>  create mode 100644 arch/riscv/kernel/qspinlock_paravirt.c
+> 
+> diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
+> index a0dc85e4a754..b89cb3b73c13 100644
+> --- a/arch/riscv/include/asm/Kbuild
+> +++ b/arch/riscv/include/asm/Kbuild
+> @@ -7,6 +7,5 @@ generic-y += parport.h
+>  generic-y += spinlock_types.h
+>  generic-y += qrwlock.h
+>  generic-y += qrwlock_types.h
+> -generic-y += qspinlock.h
+>  generic-y += user.h
+>  generic-y += vmlinux.lds.h
+> diff --git a/arch/riscv/include/asm/qspinlock.h b/arch/riscv/include/asm/qspinlock.h
+> new file mode 100644
+> index 000000000000..7d4f416c908c
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/qspinlock.h
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c), 2023 Alibaba Cloud
+> + * Authors:
+> + *	Guo Ren <guoren@linux.alibaba.com>
+> + */
+> +
+> +#ifndef _ASM_RISCV_QSPINLOCK_H
+> +#define _ASM_RISCV_QSPINLOCK_H
+> +
+> +#ifdef CONFIG_PARAVIRT_SPINLOCKS
+> +#include <asm/qspinlock_paravirt.h>
+> +
+> +/* How long a lock should spin before we consider blocking */
+> +#define SPIN_THRESHOLD		(1 << 15)
+> +
+> +void native_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +void __pv_init_lock_hash(void);
+> +void __pv_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +
+> +static inline void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+> +{
+> +	static_call(pv_queued_spin_lock_slowpath)(lock, val);
+> +}
+> +
+> +#define queued_spin_unlock	queued_spin_unlock
+> +static inline void queued_spin_unlock(struct qspinlock *lock)
+> +{
+> +	static_call(pv_queued_spin_unlock)(lock);
+> +}
+> +#endif /* CONFIG_PARAVIRT_SPINLOCKS */
+> +
+> +#include <asm-generic/qspinlock.h>
+> +
+> +#endif /* _ASM_RISCV_QSPINLOCK_H */
+> diff --git a/arch/riscv/include/asm/qspinlock_paravirt.h b/arch/riscv/include/asm/qspinlock_paravirt.h
+> new file mode 100644
+> index 000000000000..9681e851f69d
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/qspinlock_paravirt.h
+> @@ -0,0 +1,29 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c), 2023 Alibaba Cloud
+> + * Authors:
+> + *	Guo Ren <guoren@linux.alibaba.com>
+> + */
+> +
+> +#ifndef _ASM_RISCV_QSPINLOCK_PARAVIRT_H
+> +#define _ASM_RISCV_QSPINLOCK_PARAVIRT_H
+> +
+> +void pv_wait(u8 *ptr, u8 val);
+> +void pv_kick(int cpu);
+> +
+> +void dummy_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
+> +void dummy_queued_spin_unlock(struct qspinlock *lock);
+> +
+> +DECLARE_STATIC_CALL(pv_queued_spin_lock_slowpath, dummy_queued_spin_lock_slowpath);
+> +DECLARE_STATIC_CALL(pv_queued_spin_unlock, dummy_queued_spin_unlock);
+> +
+> +void __init pv_qspinlock_init(void);
+> +
+> +static inline bool pv_is_native_spin_unlock(void)
+> +{
+> +	return false;
+> +}
+> +
+> +void __pv_queued_spin_unlock(struct qspinlock *lock);
+> +
+> +#endif /* _ASM_RISCV_QSPINLOCK_PARAVIRT_H */
+> diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
+> index 6b38d6616f14..ed4253f491fe 100644
+> --- a/arch/riscv/include/asm/spinlock.h
+> +++ b/arch/riscv/include/asm/spinlock.h
+> @@ -39,7 +39,7 @@ static inline bool virt_spin_lock(struct qspinlock *lock)
+>  #undef arch_spin_trylock
+>  #undef arch_spin_unlock
+>  
+> -#include <asm-generic/qspinlock.h>
+> +#include <asm/qspinlock.h>
+>  #include <linux/jump_label.h>
+>  
+>  #undef arch_spin_is_locked
+> diff --git a/arch/riscv/kernel/qspinlock_paravirt.c b/arch/riscv/kernel/qspinlock_paravirt.c
+> new file mode 100644
+> index 000000000000..85ff5a3ec234
+> --- /dev/null
+> +++ b/arch/riscv/kernel/qspinlock_paravirt.c
+> @@ -0,0 +1,57 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c), 2023 Alibaba Cloud
+> + * Authors:
+> + *	Guo Ren <guoren@linux.alibaba.com>
+> + */
+> +
+> +#include <linux/static_call.h>
+> +#include <asm/qspinlock_paravirt.h>
+> +#include <asm/sbi.h>
+> +
+> +void pv_kick(int cpu)
+> +{
+> +	return;
+> +}
+> +
+> +void pv_wait(u8 *ptr, u8 val)
+> +{
+> +	unsigned long flags;
+> +
+> +	if (in_nmi())
+> +		return;
+> +
+> +	local_irq_save(flags);
+> +	if (READ_ONCE(*ptr) != val)
+> +		goto out;
+> +
+> +	/* wait_for_interrupt(); */
+> +out:
+> +	local_irq_restore(flags);
+> +}
+> +
+> +static void native_queued_spin_unlock(struct qspinlock *lock)
+> +{
+> +	smp_store_release(&lock->locked, 0);
+> +}
+> +
+> +DEFINE_STATIC_CALL(pv_queued_spin_lock_slowpath, native_queued_spin_lock_slowpath);
+> +EXPORT_STATIC_CALL(pv_queued_spin_lock_slowpath);
+> +
+> +DEFINE_STATIC_CALL(pv_queued_spin_unlock, native_queued_spin_unlock);
+> +EXPORT_STATIC_CALL(pv_queued_spin_unlock);
+> +
+> +void __init pv_qspinlock_init(void)
+> +{
+> +	if (num_possible_cpus() == 1)
+> +		return;
+> +
+> +	if(sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)
 
---------------G5kOFu6QJX70g00rNoeOWpMy
-Content-Type: multipart/mixed; boundary="------------uZgzuBBDELwhBg4RgPtVNbpB"
+Checks like this seem to be very common on this patchset.
+For someone not much familiar with this, it can be hard to 
+understand.
 
---------------uZgzuBBDELwhBg4RgPtVNbpB
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+I mean, on patch 8/17 you introduce those IDs, which look to be 
+incremental ( ID == N includes stuff from ID < N ), but I am not sure as I 
+couln't find much documentation on that.
 
-T24gMTUuMDkuMjMgMDM6MTYsIGFuZHJldy5jb29wZXIzQGNpdHJpeC5jb20gd3JvdGU6DQo+
-IE9uIDE1LzA5LzIwMjMgMjowMSBhbSwgSC4gUGV0ZXIgQW52aW4gd3JvdGU6DQo+PiBUaGUg
-d2hvbGUgYml0IHdpdGggYWx0ZXJuYXRpdmVzIGFuZCBwdm9wcyBiZWluZyBzZXBhcmF0ZSBp
-cyBhIG1ham9yDQo+PiBtYWludGFpbmFiaWxpdHkgcHJvYmxlbSwgYW5kIGhvbmVzdGx5IGl0
-IG5ldmVyIG1hZGUgYW55IHNlbnNlIGluIHRoZQ0KPj4gZmlyc3QgcGxhY2UuIE5ldmVyIGhh
-dmUgdHdvIG1lY2hhbmlzbXMgdG8gZG8gb25lIGpvYjsgaXQgbWFrZXMgaXQNCj4+IGhhcmRl
-ciB0byBncm9rIHRoZWlyIGludGVyYWN0aW9ucy4NCj4gDQo+IFRoaXMgYml0IGlzIGVhc3ku
-DQo+IA0KPiBKdWVyZ2VuIGhhcyBhbHJlYWR5IGRvbmUgdGhlIHdvcmsgdG8gZGVsZXRlIG9u
-ZSBvZiB0aGVzZSB0d28gcGF0Y2hpbmcNCj4gbWVjaGFuaXNtcyBhbmQgcmVwbGFjZSBpdCB3
-aXRoIHRoZSBvdGhlci4NCj4gDQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvYTMy
-ZTIxMWYtNGFkZC00ZmIyLTllNWEtNDgwYWU5YjliYmYyQHN1c2UuY29tLw0KPiANCj4gVW5m
-b3J0dW5hdGVseSwgaXQncyBvbmx5IGNvbGxlY3RpbmcgcGluZ3MgYW5kIHR1bWJsZXdlZWRz
-Lg0KDQpJbmRlZWQuDQoNClVuZm9ydHVuYXRlbHkgdGhlcmUgaXMgcHJvYmFibHkgc29tZSBv
-Ymp0b29sIHN1cHBvcnQgbmVlZGVkIGZvciB0aGF0LCB3aGljaCBJJ20NCm5vdCBzdXJlIGhv
-dyB0byBpbXBsZW1lbnQuDQoNCg0KSnVlcmdlbg0K
---------------uZgzuBBDELwhBg4RgPtVNbpB
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+Then above you test for the id being different than 
+SBI_EXT_BASE_IMPL_ID_KVM, but if they are actually incremental and a new 
+version lands, the new version will also return early because it passes the 
+test.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+I am no sure if above is right, but it's all I could understand without 
+documentation.
 
-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
-jR/i1DG86lem3iBDXzXsZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
+Well, my point is: this seems hard to understand & review, so it would be 
+nice to have a macro like this to be used instead:
 
---------------uZgzuBBDELwhBg4RgPtVNbpB--
+#define sbi_fw_implements_kvm() \
+	(sbi_get_firmware_id() >= SBI_EXT_BASE_IMPL_ID_KVM)
 
---------------G5kOFu6QJX70g00rNoeOWpMy--
+if(!sbi_fw_implements_kvm())
+	return;
 
---------------hZDkENmzAqDrTPHAvl4iVr8s
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+What do you think?
 
------BEGIN PGP SIGNATURE-----
+Other than that, LGTM.
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmUD7FIFAwAAAAAACgkQsN6d1ii/Ey+M
-9Af9HJCpFeU8EHkw53/InfDtLEXQPqGNDIYig8DyWwhnNdhICFI88NOIVSjLS9SyjJPGwf0LlHk6
-IKiP/qXdFyhv6iqTp1tlkIylssrvcYsugH3zLG8k4osgsLoxtjh06Yuh0XIIuLiNtNUihmBWxTHU
-608bvQO34to6Pi+dcsJ2B8R9Mgpuk4+9fPFTKjf4T4qziA+8OJWVIt/hwPDpxygf9nU8eseyQtQK
-7s3ODrbpUx5pKDc33RPhAHYunKbX97HmiX6DnVTHUZIcGjinZi+7ht2hqSFUjLOf7BlUA9HLVJA0
-dry2jvk6MkfXh5Aw2Q3LFC8p4DNlQZpKtD5ODHsr6A==
-=PDSQ
------END PGP SIGNATURE-----
+Thanks!
+Leo
 
---------------hZDkENmzAqDrTPHAvl4iVr8s--
+> +		return;
+> +
+> +	pr_info("PV qspinlocks enabled\n");
+> +	__pv_init_lock_hash();
+> +
+> +	static_call_update(pv_queued_spin_lock_slowpath, __pv_queued_spin_lock_slowpath);
+> +	static_call_update(pv_queued_spin_unlock, __pv_queued_spin_unlock);
+> +}
+> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> index c57d15b05160..88690751f2ee 100644
+> --- a/arch/riscv/kernel/setup.c
+> +++ b/arch/riscv/kernel/setup.c
+> @@ -321,6 +321,10 @@ static void __init riscv_spinlock_init(void)
+>  #ifdef CONFIG_QUEUED_SPINLOCKS
+>  	virt_spin_lock_init();
+>  #endif
+> +
+> +#ifdef CONFIG_PARAVIRT_SPINLOCKS
+> +	pv_qspinlock_init();
+> +#endif
+>  }
+>  
+>  extern void __init init_rt_signal_env(void);
+> -- 
+> 2.36.1
+> 
+
