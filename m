@@ -2,165 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E1C97A20D1
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 16:26:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60E8B7A20D6
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 16:26:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235712AbjIOO0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 10:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43428 "EHLO
+        id S235762AbjIOO0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 10:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235323AbjIOO0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 10:26:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E411AC
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 07:26:19 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d8153284d6eso2682111276.3
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 07:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694787978; x=1695392778; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=n3wwM0IxTv36mTuzbjanMwII1EwyeoxiFmog5O5ddM4=;
-        b=fq/Z51Vl+wsdyQeFFTigKSJR/xZ5ekxgC0VPW+sxlOZjsXFQYVeCN1l4NLXvaxsfPX
-         lBZW4eUXMZ5ZpCEcIK9CTAo/kYuG0IuVEK/nJYBUDODEvqV8S2yQXSb8opZue6gk+gR7
-         7TKaLmemzjsULzHlVAfxEzORHOEbfrBfrZv0y+UHE3yuSV0QWuuO7/TStU6B1Gu5eE1U
-         793YcHzKnwESwHWSIud2iQfG4jbTVZniCyUdD/aFjkGGzcGwzZ/Q/A8ymOekRe7cZMXx
-         R2AVrzJjxkBpflOkQj5nyQ7CSVTLosaDnlUtjdyPCGxHfPnIvrJ0XxWa1lidx7r5AMDt
-         dP1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694787978; x=1695392778;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n3wwM0IxTv36mTuzbjanMwII1EwyeoxiFmog5O5ddM4=;
-        b=JXXlkcwLCEaiATCD9pF3rD6jptiEAaG+uobNhLTobn84EndUWJJCS1W7EvptTcPfwo
-         c9yghKc0yKk4wwH6UwQARXWf+xwHf/nfgzi7kbmDih82DJ4qAKgmWL/LhHashBWqFOWz
-         s5ONAb6CUDbCpMWRqHqCTQMoVyWKNHiNsOU6K7C7pEUNa9EMW40lpAGsFnSnKkX5BcNl
-         uYhnLXIGJ03iiekHgL/CEExpGcWYzzhCQvwJCfWB0AbUgqDRXBG3kY6VQaggGD4dP+I5
-         n841y11Aqlb3sRko4CCVGz9opWewxu45akvJ9SSLbMSNqOz7XgtcAz8+mslFXvDC1V10
-         Niig==
-X-Gm-Message-State: AOJu0YxTDh9+f16sXKK4XrYBB1svqb3+VnGQkfvd3yHekH4MBTYarJds
-        ucrTMHtkKU0OU02SPp31Y9ZlRnyYewc=
-X-Google-Smtp-Source: AGHT+IEtd+ZFiwjGOxGj1IwoYm6uY+zMlhHeo3LWWwltDCF+cgsfqNfOOXS7Bflkew1pSHX6ZJTGM/96YR0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:bc8:0:b0:d80:eb4:9ca with SMTP id
- 191-20020a250bc8000000b00d800eb409camr37310ybl.0.1694787978719; Fri, 15 Sep
- 2023 07:26:18 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 07:26:16 -0700
-In-Reply-To: <ZQPuMK6D/7UzDH+D@yzhao56-desk.sh.intel.com>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-19-seanjc@google.com>
- <ZQPuMK6D/7UzDH+D@yzhao56-desk.sh.intel.com>
-Message-ID: <ZQRpiOd1DNDDJQ3r@google.com>
-Subject: Re: [RFC PATCH v12 18/33] KVM: x86/mmu: Handle page fault for private memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S235759AbjIOO0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 10:26:32 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2045.outbound.protection.outlook.com [40.107.96.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080EF1FD2;
+        Fri, 15 Sep 2023 07:26:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aRGJJtcyUGxKOUQL6/71e6mNxEpWiUJqujsjNYq4Ld6yAu7pWo1VPF4tQF6Nx2XwZd2ymmRi2nPE/UgxzmYly1oe5WvVooBe9qewxbnDJYT6tLpbHXOn+580Be1LTGVxku+dI79NiUvZ2i8s9gjmYLgvjxM2FmgGwQ3pALDN9myMBSYHA0WteBmYeFRy7OLU0w9+Ya5OGsozB3QFtfNdO8iDOPS5n+JFrmi15CnWM3Xa9c9pLCuaKxGKiaLv/6OKAx9ZuCVAA8/sfQUFhlpqgKhMt82ytDFWDOIX6PC16jG0A9ZV/T9NarWrPktEIiBGcP1jcTn0DPkGzOBZcElaFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nVl2sHTUylLVe32EPwOl9aQDDMDafc6Tz/TlUhf+XKU=;
+ b=C8jV4hvO9k2I16+3mSsLDAI1qfDLiO/fRKANp/9ThyE4P+kafpYvnL/Cs+nUtZyHRLqUgfRbVRgrUEd1ffthF3IR8K4BGIa0tA0oyl7nGuANyDwjKhH0ytmClXAL4lT4jQx8/lHYq6Ik9lnTTEnl0i6pSXQ4IDatTIPzAJhGCg1GAQObZSDnyZr+MQ789es1153Njr+AWZLouMZ03a1Xf9inQuNohpE5K4xDReRAtRrtwzZRJ+fCMlW4Nq+IjkbTjNGEBxlNaoc+BvIsVd6s/NoGjzZ5G50/fqYcasO7uw8ghFfMs47IVD1sAdyL835ecBtdu6vVLjG3Eai7eHYiMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nVl2sHTUylLVe32EPwOl9aQDDMDafc6Tz/TlUhf+XKU=;
+ b=s2qtKNl0kWR/M+ewTGBPJ6s/OZw1KD/Bkpq/5oI3yiFfHXGSfri8Vr9uc36+qzz0sLulRuTd5zuHTjwagmvEf+DFPqrUo2pgPgyCQTYlt3TKxEOohe1PkJyprIjk2E3MRgyuV70bG8W/rrZDXVlcVwyYeqEFT9x141hLc6CJeP0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CY8PR12MB8410.namprd12.prod.outlook.com (2603:10b6:930:6d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21; Fri, 15 Sep
+ 2023 14:26:23 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6792.021; Fri, 15 Sep 2023
+ 14:26:23 +0000
+Message-ID: <1e155a46-78f3-51f4-40a0-a94386e8f627@amd.com>
+Date:   Fri, 15 Sep 2023 09:26:20 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix TSC_AUX virtualization setup
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Babu Moger <babu.moger@amd.com>
+References: <cover.1694721045.git.thomas.lendacky@amd.com>
+ <8a5c1d2637475c7fb9657cdd6cb0e86f2bb3bab6.1694721045.git.thomas.lendacky@amd.com>
+ <ZQNs7uo8F62XQawJ@google.com> <f2c0907c-9e30-e01b-7d65-a20e6be4bf49@amd.com>
+ <ZQN3Xbi5bEqlSkY3@google.com>
+Content-Language: en-US
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <ZQN3Xbi5bEqlSkY3@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR02CA0075.namprd02.prod.outlook.com
+ (2603:10b6:5:1f4::16) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CY8PR12MB8410:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a0db2e1-ff3d-4eaa-fc3a-08dbb5f7bcf4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7sAeOAgpzx46kUYbT+XC1UHadVkLmmPsJBiFkgN2NcaOWALZz0SGqZb1cLmDbkLEazOEssrja6ljH9GHEJlb1NHP9lZkG7P2mP1bvrzUPEtXTNkUL7ORgJScVpYcp8647G2O+xC6UbxQ4BHfGtk8dYJ8tzXL8QSoUY2Xv7ICS5IGnQ6viQzysd8bt94ytOYc/WPV1bUnLDsJeknFItN3zT/Nw96b6nl7GAvA37TX8oFZXabvoZ6rMSWtWIDSjg2iIuIfYnvKZ2O3g+/lumzV5N+n4cr5v/cVVAxq7foiMbiFI75Bg00QKCCk0OERkfhZYKkjps5VIsxx+XkDjFsx4HmloM/yOWaLIj92eBLynoImjlMVPelOnU6CU9Q+tw1YwLe+78+R8QBlORRYFRgEFFZnJM/wL/olPYANS62QOA5DhM4cbERTa+8L/IrXDH3qM5v68XZkck6BXQK6d9IY/8Z5+ki/tyICGdBvHDQ8Mn9egzEXbTz6UzEXpLqhEL6c8GG2aym02dvGKe+3SiX7o6GQPeWMqRQ9Qs5jdXTWeXvB184N95oeSFYzMkFMdcvKnXH362BwMGr/Zh6qdjzuee6xwtWYFb9PBHATvXbRStKB0iv5/6uWqUU8L5DYyrAz0JF9TX4kCxDuLjoY4JSPxg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(346002)(376002)(136003)(186009)(1800799009)(451199024)(6512007)(6506007)(6486002)(53546011)(26005)(83380400001)(38100700002)(31696002)(86362001)(36756003)(2616005)(4326008)(8676002)(41300700001)(5660300002)(66946007)(6916009)(316002)(54906003)(66556008)(66476007)(31686004)(2906002)(478600001)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SU5raFg5WitXVkl2TDd2NDRTbTVmV3FQQlRYM0NHWGdGM0JwYmk5MlBiZVlW?=
+ =?utf-8?B?ZGt6bG81T3VDNmYwOTlZWW1QRTRXb3JBYmlYVXMxSU1vbmJoTnRFTWhITFM4?=
+ =?utf-8?B?OWFnMFFaRXB3WFkzbVhzRHpldExNSGNTRjcvdWFQTEs5WlQwRllmZEwrcys1?=
+ =?utf-8?B?UlVvdWF6a2E3aWdJSGVXY3V3RXVlbGxTYlowYzVndVN0VHdpOStLQUIrUWh3?=
+ =?utf-8?B?QWlMeXNYdmNjWXJuaXBNeE4xdUhyeVlLcmFpa2NvdHZ4eSt1LzJGQkcyajlr?=
+ =?utf-8?B?TGEvWjFRNGw0WEtCeVN1M3JNN092NHRIa1I0ZUNNNFEvNTdRUmRvSVBTRmcy?=
+ =?utf-8?B?UnRoV1NhTDhrRUw5Ri9VczQzMXB1TDFvR3ZZRzU4SDJiUEN5ZDRVV1ZWQ21I?=
+ =?utf-8?B?TmNVTm9Xa1d1MzVZSlU1cnZUVHVpQ3dnQmg4Mk54UUpVSjZ2bjNLL000Q2J6?=
+ =?utf-8?B?eW1GNzVqRVkzZ0hPMkhuVkNQWmVScExIaUNXUitxMnhZZWJSeHlBdlh6TXho?=
+ =?utf-8?B?NGp1WDBSVWxuV0VXTkxFWmVFc0pZYzJxVlpsYnRWTjMzWGI4cHdmRVErV3BS?=
+ =?utf-8?B?R3pqWUFZdUcvYkVoUGc5RmNYRjF4aVB6MjBjazd1VzE5UEd5YUVKa3ZYYkFK?=
+ =?utf-8?B?c3gvZmhBZE05MEtwenh0bHh1TURyNDRFdFQxczUveW5TWXlLWlRvUHJ2b2x0?=
+ =?utf-8?B?b1EvQVVIREtmUENyMS90c3BzdTRLejU5NU52T0Exd2FxNHdmbWFYWWhRenhF?=
+ =?utf-8?B?elcxU21kaWRodDlNNCtmaWRIMVdxU1B2elpvN0JyR0pVelUwTHRzWG81ZW1O?=
+ =?utf-8?B?VG1TTjNZWEh1S3dBaHcvT0svMVhOWmlnRWFOSElVSWcrWUw3NTVSSEYxRGFt?=
+ =?utf-8?B?SEllRkU5K01oY01oSytVQU02STFMZmUyY2svQUk3cGtEaVBKbkJCZkNZcGUz?=
+ =?utf-8?B?bEdRNm83aHpkRmZZVzdqejF3Nk9QNUJJclZkTjFKUEY5OWZZQXlSVUZ6d3I5?=
+ =?utf-8?B?TGxZYjR5dTE5VVFMazE4QWZUTUJpbGdzY1MwWG5wSjRvWnEvMUdDTGtWU05p?=
+ =?utf-8?B?b1dYYWpWdnljdTUyekU1RVloNG8raEpoR210MmtpQkNNZThtQjN6d0lLV0k3?=
+ =?utf-8?B?ME4wZGlXcEJLaVovdlN6ZnZzMnVJczlwKzlTSTVaT1QyUlRYWXk5cWprVVB6?=
+ =?utf-8?B?QUNWajduR3ZpUThlQUNOdTNSdkJBTGFoWjB5L2hCTUc5RmpBOGtaSlEvQU1P?=
+ =?utf-8?B?VlJTdDEyRjNGaGZtT1VER0o2N0RVa015L1gxSS9pdmd0UkphUmY0YmI1WHk2?=
+ =?utf-8?B?RnBqMHRpWkYxZWxuS1F0VDJwZGxTNTAvVUdsRVBFenhoWW81eWFFT0pPYklX?=
+ =?utf-8?B?R3h2OWtJRnRoRUNSRUZDMTltaHBzazdDbU10cEU3T0ZuV0ZZYkwwTHVUNFRz?=
+ =?utf-8?B?bmdyQkhwOHlCZHZXQlFMK1pOK3A1SnluY1hLbzFkU2ZaaXk0VC9Uc0E5SnZM?=
+ =?utf-8?B?RjJtaXljMjZOS3l4VFd3RlVwZk92eTFSZmlkTkQzbEJTYUdXaEF1QUYvdkhu?=
+ =?utf-8?B?Q1B5UDlTMSttbFl0Wkx1emQyVzNLQ2F1N2wrN2VSNWhGWnVQaVAyRzgxaGc3?=
+ =?utf-8?B?YmNObXRkaGtYdXQ1SXZDZHlIcVU5dTFaV1I1NlhRNUN2UUJISUxnRHUvSmF3?=
+ =?utf-8?B?VUpGUDZNdGtwcTQzL3VBRUNoQ2I5QUorUTVBUlVibjhuTUZCMi9YNXhHdEpt?=
+ =?utf-8?B?cWlnb3BSbEhyOTRhWTNFZTRUZjJGWXhiTXpERjVUZmNoY2wvaVJFcTVacGZI?=
+ =?utf-8?B?UUtEL005elVnZm9NdE1BMXFyaWxtZU51Z0Ztd1FodXhUeWhEOEFlSzVkdFFU?=
+ =?utf-8?B?UE8xNitDQ0FTcVJLbGJqMFVhNndNYXdQVU1NWjBjdGQ0WUZhR25VRXhOM3Jr?=
+ =?utf-8?B?ME9MWGJJbVluZEVHOG1FVHo4b01iK3YzeDRQS2s3SHRPWkhEeEJUSGRWWXpu?=
+ =?utf-8?B?TDdQMUE1cXZLWmFtbFZ5RWl2UUxUdjQzQXRFT2ZFcUU4cVI0T3lWK25Jcjl4?=
+ =?utf-8?B?LzlqaHhLalVwTnhaUkNzeVlUNVVBZjg3S3dSek5iY0ZTY1hFc1VpNzFkMTZU?=
+ =?utf-8?Q?1WgHDBoSDB5z8LpHikMPTeqZ7?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a0db2e1-ff3d-4eaa-fc3a-08dbb5f7bcf4
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 14:26:23.5912
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UiOCA6se+fiA1HE2/9n+9jQLa3eFH2B6er0CcM67L6D7qBzZoeNeznGYsE42AiBUJ9J9r+sAJo16O8GL9OF//w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8410
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 15, 2023, Yan Zhao wrote:
-> On Wed, Sep 13, 2023 at 06:55:16PM -0700, Sean Christopherson wrote:
-> ....
-> > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> > +					      struct kvm_page_fault *fault)
-> > +{
-> > +	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> > +				      PAGE_SIZE, fault->write, fault->exec,
-> > +				      fault->is_private);
-> > +}
-> > +
-> > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > +				   struct kvm_page_fault *fault)
-> > +{
-> > +	int max_order, r;
-> > +
-> > +	if (!kvm_slot_can_be_private(fault->slot)) {
-> > +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > +		return -EFAULT;
-> > +	}
-> > +
-> > +	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-> > +			     &max_order);
-> > +	if (r) {
-> > +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > +		return r;
-> > +	}
-> > +
-> > +	fault->max_level = min(kvm_max_level_for_order(max_order),
-> > +			       fault->max_level);
-> > +	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> > +
-> > +	return RET_PF_CONTINUE;
-> > +}
-> > +
-> >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  {
-> >  	struct kvm_memory_slot *slot = fault->slot;
-> > @@ -4293,6 +4356,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  			return RET_PF_EMULATE;
-> >  	}
-> >  
-> > +	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-> In patch 21,
-> fault->is_private is set as:
-> 	".is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT)",
-> then, the inequality here means memory attribute has been updated after
-> last check.
-> So, why an exit to user space for converting is required instead of a mere retry?
+On 9/14/23 16:13, Sean Christopherson wrote:
+> On Thu, Sep 14, 2023, Tom Lendacky wrote:
+>> On 9/14/23 15:28, Sean Christopherson wrote:
+>>> On Thu, Sep 14, 2023, Tom Lendacky wrote:
+>>>> The checks for virtualizing TSC_AUX occur during the vCPU reset processing
+>>>> path. However, at the time of initial vCPU reset processing, when the vCPU
+>>>> is first created, not all of the guest CPUID information has been set. In
+>>>> this case the RDTSCP and RDPID feature support for the guest is not in
+>>>> place and so TSC_AUX virtualization is not established.
+>>>>
+>>>> This continues for each vCPU created for the guest. On the first boot of
+>>>> an AP, vCPU reset processing is executed as a result of an APIC INIT
+>>>> event, this time with all of the guest CPUID information set, resulting
+>>>> in TSC_AUX virtualization being enabled, but only for the APs. The BSP
+>>>> always sees a TSC_AUX value of 0 which probably went unnoticed because,
+>>>> at least for Linux, the BSP TSC_AUX value is 0.
+>>>>
+>>>> Move the TSC_AUX virtualization enablement into the vcpu_after_set_cpuid()
+>>>> path to allow for proper initialization of the support after the guest
+>>>> CPUID information has been set.
+>>>>
+>>>> Fixes: 296d5a17e793 ("KVM: SEV-ES: Use V_TSC_AUX if available instead of RDTSC/MSR_TSC_AUX intercepts")
+>>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>>>> ---
+>>>>    arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++++--------
+>>>>    arch/x86/kvm/svm/svm.c |  3 +++
+>>>>    arch/x86/kvm/svm/svm.h |  1 +
+>>>>    3 files changed, 23 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>> index b9a0a939d59f..565c9de87c6d 100644
+>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>> @@ -2962,6 +2962,25 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+>>>>    				    count, in);
+>>>>    }
+>>>> +static void sev_es_init_vmcb_after_set_cpuid(struct vcpu_svm *svm)
+>>>
+>>> I would rather name this sev_es_after_set_cpuid() and call it directly from
+>>> svm_vcpu_after_set_cpuid().  Or I suppose bounce through sev_after_set_cpuid(),
+>>> but that seems gratuitous.
+>>
+>> There is a sev_guest() check in svm_vcpu_after_set_cpuid(), so I can move
+>> that into sev_vcpu_after_set_cpuid() and keep the separate
+>> sev_es_vcpu_after_set_cpuid().
 > 
-> Or, is it because how .is_private is assigned in patch 21 is subjected to change
-> in future? 
+> Works for me.
+> 
+>> And it looks like you would prefer to not have "vcpu" in the function name?
+>> Might be better search-wise if vcpu remains part of the name?
+> 
+> Oh, that was just a typo/oversight, not intentional.
+> 
+>>> AFAICT, there's no point in calling this from init_vmcb(); guest_cpuid_has() is
+>>> guaranteed to be false when called during vCPU creation and so the intercept
+>>> behavior will be correct, and even if SEV-ES called init_vmcb() from
+>>> shutdown_interception(), which it doesn't, guest_cpuid_has() wouldn't change,
+>>> i.e. the intercepts wouldn't need to be changed.
+>>
+>> Ok, I thought that's how it worked, but wasn't 100% sure. I'll move it out
+>> of the init_vmcb() path.
+>>
+>>>
+>>> init_vmcb_after_set_cpuid() is a special snowflake because it handles both SVM's
+>>> true defaults *and* guest CPUID updates.
+>>>
+>>>> +{
+>>>> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+>>>> +
+>>>> +	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX) &&
+>>>> +	    (guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
+>>>> +	     guest_cpuid_has(vcpu, X86_FEATURE_RDPID))) {
+>>>> +		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, 1, 1);
+>>>
+>>> This needs to toggled interception back on if RDTSCP and RDPID are hidden from
+>>> the guest.  KVM's wonderful ABI doesn't disallow multiple calls to KVM_SET_CPUID2
+>>> before KVM_RUN.
+>>
+>> Do you want that as a separate patch with the first patch purely addressing
+>> the current issue? Or combine them?
+> 
+> Hmm, now that you mention it, probably a seperate patch on top.
 
-This.  Retrying on SNP or TDX would hang the guest.  I suppose we could special
-case VMs where .is_private is derived from the memory attributes, but the
-SW_PROTECTED_VM type is primary a development vehicle at this point.  I'd like to
-have it mimic SNP/TDX as much as possible; performance is a secondary concern.
+This toggling possibility raises a question related to the second patch in 
+this series that eliminates the use of the user return MSR for TSC_AUX. 
+Depending on when the interfaces are called (set CPUID, host-initiated 
+WRMSR of TSC_AUX, set CPUID again), I think we could end up in a state 
+where the host TSC_AUX may not get restored properly, not 100% sure at the 
+moment, though.
 
-E.g. userspace needs to be prepared for "spurious" exits due to races on SNP and
-TDX, which this can theoretically exercise.  Though the window is quite small so
-I doubt that'll actually happen in practice; which of course also makes it less
-important to retry instead of exiting.
+Let me drop that patch from the series for now and just send the fix(es). 
+I'll work through the other scenarios and code paths and send the user 
+return MSR optimization as a separate series later.
+
+Thanks,
+Tom
