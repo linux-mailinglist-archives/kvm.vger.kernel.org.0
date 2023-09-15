@@ -2,180 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B537A1713
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 09:14:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 622467A176C
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 09:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232666AbjIOHOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 03:14:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
+        id S232531AbjIOH3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 03:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232590AbjIOHOS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 03:14:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5963610E6
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 00:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694761999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ouP+ZP8Mbe0wZaRCaE13qGCiJURFQJ92+/y4fHbKuP8=;
-        b=JdLmATjAu+utud2j6Me5RJvuSRhKFmFN+O7423//Zwgh4RhdqQRDWguox6Yy3QDujlqOQ9
-        KtPOA1eJ/9qpBIQ1LJV97FnQ3q7n5Dcb7j/Loj1y3GtK7gzJjuOcd7fzbpgpDSjumalmVl
-        iRo8S6ZWmwagybQgXX3He6TVLUg6JwE=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-427-lrserVNYO9ylFakdU8wRHw-1; Fri, 15 Sep 2023 03:13:16 -0400
-X-MC-Unique: lrserVNYO9ylFakdU8wRHw-1
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6c20f3269e4so2293660a34.2
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 00:13:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694761996; x=1695366796;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ouP+ZP8Mbe0wZaRCaE13qGCiJURFQJ92+/y4fHbKuP8=;
-        b=KWfAadlQQHqlhpBw5BU2eE/8ONw+gQbQ4DpnDGkuYHocDAL7Vl8qJfLIcwJVCk2fpm
-         5Vw8RtALaMA4BTJysfg9PNd+XeJW3B8WTvam3x6qCWsJT+G2qtGBHwWxOfs5Aojrdr1b
-         3hQyqEjYSpTsj3dTUwFKLbzIU9/r/H2ogbRfGODW8tg1HP2BxDgi7ajX0lsnrT33UopY
-         Eb3BOrBqXiq5SnIy0qLstIElYS9DAAQipFd7te6smJNSTElW6DwUiZdv+7Dpzu9ry3jl
-         WXmh56EYd1G85MzVa849O2/EOJh9vBXShWQvndIVTi6UzW6xIYwcBvXej8SD+08Nrgs/
-         fdcQ==
-X-Gm-Message-State: AOJu0YxHLYE3xLkqn7VoMHjuT2I7d45jgSBkS91pdpzrvKL7f8+F6xde
-        T8owS1nQQKGF2O2J+rRico3a4syJE/HkFVrK//3HS976oSKfRKym8HB4YiPfYKlPU3WcFpjVaup
-        51d3ojU5ql7Kr
-X-Received: by 2002:a9d:68da:0:b0:6bc:88da:af44 with SMTP id i26-20020a9d68da000000b006bc88daaf44mr781615oto.6.1694761995984;
-        Fri, 15 Sep 2023 00:13:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpVrhOh7Vo+lEanWcrsNYHpYt/SL3pA60poShm0YciHWUK9jTEihaeETy+P4b98zP+SJhiQA==
-X-Received: by 2002:a9d:68da:0:b0:6bc:88da:af44 with SMTP id i26-20020a9d68da000000b006bc88daaf44mr781608oto.6.1694761995743;
-        Fri, 15 Sep 2023 00:13:15 -0700 (PDT)
-Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id b6-20020a9d6b86000000b006b9848f8aa7sm1439011otq.45.2023.09.15.00.13.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 00:13:15 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 04:13:10 -0300
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     Tyler Stachecki <stachecki.tyler@gmail.com>, kvm@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com, dgilbert@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        bp@alien8.de, Tyler Stachecki <tstachecki@bloomberg.net>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
-Message-ID: <ZQQEBpJZ-_hg42Vi@redhat.com>
-References: <20230914010003.358162-1-tstachecki@bloomberg.net>
- <ZQKzKkDEsY1n9dB1@redhat.com>
- <ZQLOVjLtFnGESG0S@luigi.stachecki.net>
- <93592292-ab7e-71ac-dd72-74cc76e97c74@oracle.com>
+        with ESMTP id S232487AbjIOH26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 03:28:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E4D19A5
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 00:28:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694762923; x=1726298923;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=CtOBPQZyUBN5NDue58Zh64Cy4DA7T1sPgVLCsteFWak=;
+  b=Vgy+RH8vcN46W2L27EDAj79LsdlXBR8Gyp1SNIXSu7vdPGTT/EAMYnRr
+   jU5H0lO1tx8LgLLKUUVFlMBzgodLyT8pRjMLX171eivYbhQetSHLT2zPJ
+   9k1II+Tl6uTS03QNqRNMdEicTtC1Ke4KsG8x9Vv1sFoZdHUjU/eEullqj
+   vpX2lPtfTpOmmRmeepSECV13Nv4PvrzUTyrXDtbh8Maxlntqn15HvrjzS
+   Yq48uj21aacjdXVNE+Hj82aHznkO2KnhWMyPauPdoxXYvLCIvJ8kNWdYd
+   oeIkJriQz0cuoG7MaCFN+DjTjn3v6tswWTxP1QhQz7jOmH3v81pkM/4gX
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="358597075"
+X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
+   d="scan'208";a="358597075"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 00:28:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="918558582"
+X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
+   d="scan'208";a="918558582"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orsmga005.jf.intel.com with ESMTP; 15 Sep 2023 00:28:39 -0700
+Date:   Fri, 15 Sep 2023 15:39:41 +0800
+From:   Zhao Liu <zhao1.liu@linux.intel.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc:     Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Zhao Liu <zhao1.liu@intel.com>,
+        Zhuocheng Ding <zhuocheng.ding@intel.com>
+Subject: Re: [PATCH v4 03/21] softmmu: Fix CPUSTATE.nr_cores' calculation
+Message-ID: <ZQQKPbiMSV3s+h0Z@liuzhao-OptiPlex-7080>
+References: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
+ <20230914072159.1177582-4-zhao1.liu@linux.intel.com>
+ <b6f8be4e-2c47-95ec-c29c-dcca67d882ae@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=gb2312
 Content-Disposition: inline
-In-Reply-To: <93592292-ab7e-71ac-dd72-74cc76e97c74@oracle.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_NONE autolearn=no
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b6f8be4e-2c47-95ec-c29c-dcca67d882ae@linaro.org>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 10:05:57AM -0700, Dongli Zhang wrote:
-> 
-> 
-> On 9/14/23 2:11 AM, Tyler Stachecki wrote:
-> > On Thu, Sep 14, 2023 at 04:15:54AM -0300, Leonardo Bras wrote:
-> >> So, IIUC, the xfeatures from the source guest will be different than the 
-> >> xfeatures of the target (destination) guest. Is that correct?
-> > 
-> > Correct.
-> >  
-> >> It does not seem right to me. I mean, from the guest viewpoint, some 
-> >> features will simply vanish during execution, and this could lead to major 
-> >> issues in the guest.
-> 
-> I fully agree with this.
-> 
-> I think the original commit ad856280ddea ("x86/kvm/fpu: Limit guest
-> user_xfeatures to supported bits of XCR0") is for the source server, not
-> destination server.
-> 
-> That is:
-> 
-> 1. Without the commit (src and dst), something bad may happen.
-> 
-> 2. With the commit on src, issue is fixed.
-> 
-> 3. With the commit only dst, it is expected that issue is not fixed.
-> 
-> Therefore, from administrator's perspective, the bugfix should always be applied
-> no the source server, in order to succeed the migration.
-> 
-> 
-> BTW, we may not be able to use commit ad856280ddea in the Fixes tag.
-> 
-> > 
-> > My assumption is that the guest CPU model should confine access to registers
-> > that make sense for that (guest) CPU.
-> > 
-> > e.g., take a host CPU capable of AVX-512 running a guest CPU model that only
-> > has AVX-256. If the guest suddenly loses the top 256 bits of %zmm*, it should
-> > not really be perceivable as %ymm architecturally remains unchanged.
-> > 
-> > Though maybe I'm being too rash here? Is there a case where this assumption
-> > breaks down?
-> > 
-> >> The idea here is that if the target (destination) host can't provide those 
-> >> features for the guest, then migration should fail.
-> >>
-> >> I mean, qemu should fail the migration, and that's correct behavior.
-> >> Is it what is happening?
-> > 
-> > Unfortunately, no, it is not... and that is biggest concern right now.
-> > 
-> > I do see some discussion between Peter and you on this topic and see that
-> > there was an RFC to implement such behavior stemming from it, here:
-> > https://lore.kernel.org/qemu-devel/20220607230645.53950-1-peterx@redhat.com/
-> 
-> I agree that bug is at QEMU side, not KVM side.
-> 
-> It is better to improve at QEMU side.
+Hi Philippe,
 
-I agree fixing QEMU is the best solution we have.
+On Thu, Sep 14, 2023 at 09:31:52AM +0200, Philippe Mathieu-Daud¨¦ wrote:
+> Date: Thu, 14 Sep 2023 09:31:52 +0200
+> From: Philippe Mathieu-Daud¨¦ <philmd@linaro.org>
+> Subject: Re: [PATCH v4 03/21] softmmu: Fix CPUSTATE.nr_cores' calculation
+> 
+> Hi,
+> 
+> On 14/9/23 09:21, Zhao Liu wrote:
+> > From: Zhuocheng Ding <zhuocheng.ding@intel.com>
+> > 
+> >  From CPUState.nr_cores' comment, it represents "number of cores within
+> > this CPU package".
+> > 
+> > After 003f230e37d7 ("machine: Tweak the order of topology members in
+> > struct CpuTopology"), the meaning of smp.cores changed to "the number of
+> > cores in one die", but this commit missed to change CPUState.nr_cores'
+> > calculation, so that CPUState.nr_cores became wrong and now it
+> > misses to consider numbers of clusters and dies.
+> > 
+> > At present, only i386 is using CPUState.nr_cores.
+> > 
+> > But as for i386, which supports die level, the uses of CPUState.nr_cores
+> > are very confusing:
+> > 
+> > Early uses are based on the meaning of "cores per package" (before die
+> > is introduced into i386), and later uses are based on "cores per die"
+> > (after die's introduction).
+> > 
+> > This difference is due to that commit a94e1428991f ("target/i386: Add
+> > CPUID.1F generation support for multi-dies PCMachine") misunderstood
+> > that CPUState.nr_cores means "cores per die" when calculated
+> > CPUID.1FH.01H:EBX. After that, the changes in i386 all followed this
+> > wrong understanding.
+> > 
+> > With the influence of 003f230e37d7 and a94e1428991f, for i386 currently
+> > the result of CPUState.nr_cores is "cores per die", thus the original
+> > uses of CPUState.cores based on the meaning of "cores per package" are
+> > wrong when multiple dies exist:
+> > 1. In cpu_x86_cpuid() of target/i386/cpu.c, CPUID.01H:EBX[bits 23:16] is
+> >     incorrect because it expects "cpus per package" but now the
+> >     result is "cpus per die".
+> > 2. In cpu_x86_cpuid() of target/i386/cpu.c, for all leaves of CPUID.04H:
+> >     EAX[bits 31:26] is incorrect because they expect "cpus per package"
+> >     but now the result is "cpus per die". The error not only impacts the
+> >     EAX calculation in cache_info_passthrough case, but also impacts other
+> >     cases of setting cache topology for Intel CPU according to cpu
+> >     topology (specifically, the incoming parameter "num_cores" expects
+> >     "cores per package" in encode_cache_cpuid4()).
+> > 3. In cpu_x86_cpuid() of target/i386/cpu.c, CPUID.0BH.01H:EBX[bits
+> >     15:00] is incorrect because the EBX of 0BH.01H (core level) expects
+> >     "cpus per package", which may be different with 1FH.01H (The reason
+> >     is 1FH can support more levels. For QEMU, 1FH also supports die,
+> >     1FH.01H:EBX[bits 15:00] expects "cpus per die").
+> > 4. In cpu_x86_cpuid() of target/i386/cpu.c, when CPUID.80000001H is
+> >     calculated, here "cpus per package" is expected to be checked, but in
+> >     fact, now it checks "cpus per die". Though "cpus per die" also works
+> >     for this code logic, this isn't consistent with AMD's APM.
+> > 5. In cpu_x86_cpuid() of target/i386/cpu.c, CPUID.80000008H:ECX expects
+> >     "cpus per package" but it obtains "cpus per die".
+> > 6. In simulate_rdmsr() of target/i386/hvf/x86_emu.c, in
+> >     kvm_rdmsr_core_thread_count() of target/i386/kvm/kvm.c, and in
+> >     helper_rdmsr() of target/i386/tcg/sysemu/misc_helper.c,
+> >     MSR_CORE_THREAD_COUNT expects "cpus per package" and "cores per
+> >     package", but in these functions, it obtains "cpus per die" and
+> >     "cores per die".
+> > 
+> > On the other hand, these uses are correct now (they are added in/after
+> > a94e1428991f):
+> > 1. In cpu_x86_cpuid() of target/i386/cpu.c, topo_info.cores_per_die
+> >     meets the actual meaning of CPUState.nr_cores ("cores per die").
+> > 2. In cpu_x86_cpuid() of target/i386/cpu.c, vcpus_per_socket (in CPUID.
+> >     04H's calculation) considers number of dies, so it's correct.
+> > 3. In cpu_x86_cpuid() of target/i386/cpu.c, CPUID.1FH.01H:EBX[bits
+> >     15:00] needs "cpus per die" and it gets the correct result, and
+> >     CPUID.1FH.02H:EBX[bits 15:00] gets correct "cpus per package".
+> > 
+> > When CPUState.nr_cores is correctly changed to "cores per package" again
+> > , the above errors will be fixed without extra work, but the "currently"
+> > correct cases will go wrong and need special handling to pass correct
+> > "cpus/cores per die" they want.
+> > 
+> > Fix CPUState.nr_cores' calculation to fit the original meaning "cores
+> > per package", as well as changing calculation of topo_info.cores_per_die,
+> > vcpus_per_socket and CPUID.1FH.
+> 
+> What a pain. Can we split this patch in 2, first the x86 part
+> and then the common part (softmmu/cpus.c)?
+
+Since x86 uses this nr_cores to calculate many things, if the first
+patch just fix nr_cores without changing x86 related code, then that
+first patch will break many places (there will be many incorrect CPUIDs).
+
+So I think it¡¯s more appropriate to make these changes into one patch.
+
+Thanks,
+Zhao
 
 > 
-> 4508 int kvm_arch_put_registers(CPUState *cpu, int level)
-> 4509 {
-> 4510     X86CPU *x86_cpu = X86_CPU(cpu);
-> 4511     int ret;
-> ... ...
-> 4546     ret = kvm_put_xsave(x86_cpu);
-> 4547     if (ret < 0) {
-> 4548         return ret;
-> 4549     }
-> ... ...--> the rest of kvm_arch_put_registers() won't execute !!!
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
+> > Fixes: a94e1428991f ("target/i386: Add CPUID.1F generation support for multi-dies PCMachine")
+> > Fixes: 003f230e37d7 ("machine: Tweak the order of topology members in struct CpuTopology")
+> > Signed-off-by: Zhuocheng Ding <zhuocheng.ding@intel.com>
+> > Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> > ---
+> > Changes since v3:
+> >   * Describe changes in imperative mood. (Babu)
+> >   * Fix spelling typo. (Babu)
+> >   * Split the comment change into a separate patch. (Xiaoyao)
 > > 
-> > ... though I do not believe that work ever landed in the tree. Looking at
-> > qemu's master branch now, the error from kvm_arch_put_registers is just
-> > discarded in do_kvm_cpu_synchronize_post_init...
+> > Changes since v2:
+> >   * Use wrapped helper to get cores per socket in qemu_init_vcpu().
 > > 
-> > ```
-> > static void do_kvm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
-> > {
-> >     kvm_arch_put_registers(cpu, KVM_PUT_FULL_STATE);
-> >     cpu->vcpu_dirty = false;
-> > }
-> > ```
+> > Changes since v1:
+> >   * Add comment for nr_dies in CPUX86State. (Yanan)
+> > ---
+> >   softmmu/cpus.c    | 2 +-
+> >   target/i386/cpu.c | 9 ++++-----
+> >   2 files changed, 5 insertions(+), 6 deletions(-)
 > > 
-> > Best,
-> > Tyler
+> > diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> > index 0848e0dbdb3f..fa8239c217ff 100644
+> > --- a/softmmu/cpus.c
+> > +++ b/softmmu/cpus.c
+> > @@ -624,7 +624,7 @@ void qemu_init_vcpu(CPUState *cpu)
+> >   {
+> >       MachineState *ms = MACHINE(qdev_get_machine());
+> > -    cpu->nr_cores = ms->smp.cores;
+> > +    cpu->nr_cores = machine_topo_get_cores_per_socket(ms);
+> >       cpu->nr_threads =  ms->smp.threads;
+> >       cpu->stopped = true;
+> >       cpu->random_seed = qemu_guest_random_seed_thread_part1();
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 24ee67b42d05..709c055c8468 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -6015,7 +6015,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> >       X86CPUTopoInfo topo_info;
+> >       topo_info.dies_per_pkg = env->nr_dies;
+> > -    topo_info.cores_per_die = cs->nr_cores;
+> > +    topo_info.cores_per_die = cs->nr_cores / env->nr_dies;
+> >       topo_info.threads_per_core = cs->nr_threads;
+> >       /* Calculate & apply limits for different index ranges */
+> > @@ -6091,8 +6091,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> >                */
+> >               if (*eax & 31) {
+> >                   int host_vcpus_per_cache = 1 + ((*eax & 0x3FFC000) >> 14);
+> > -                int vcpus_per_socket = env->nr_dies * cs->nr_cores *
+> > -                                       cs->nr_threads;
+> > +                int vcpus_per_socket = cs->nr_cores * cs->nr_threads;
+> >                   if (cs->nr_cores > 1) {
+> >                       *eax &= ~0xFC000000;
+> >                       *eax |= (pow2ceil(cs->nr_cores) - 1) << 26;
+> > @@ -6270,12 +6269,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> >               break;
+> >           case 1:
+> >               *eax = apicid_die_offset(&topo_info);
+> > -            *ebx = cs->nr_cores * cs->nr_threads;
+> > +            *ebx = topo_info.cores_per_die * topo_info.threads_per_core;
+> >               *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
+> >               break;
+> >           case 2:
+> >               *eax = apicid_pkg_offset(&topo_info);
+> > -            *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
+> > +            *ebx = cs->nr_cores * cs->nr_threads;
+> >               *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
+> >               break;
+> >           default:
 > 
-
