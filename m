@@ -2,186 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42A597A1419
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 05:02:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03AD97A1474
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 05:37:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjIODCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 23:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
+        id S231532AbjIODhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 23:37:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbjIODCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 23:02:33 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB812709
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 20:02:29 -0700 (PDT)
+        with ESMTP id S231438AbjIODhh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 23:37:37 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B49E270C
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 20:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694746949; x=1726282949;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Yqn3JJnxCOAOloWFh9cxV78DhyY4dbRnETfbLWgbwTQ=;
-  b=XKPK3+CUYMWkkOQMj9dYRULm2ih00bKFD/Mp6RisZwtCBTIcrMt4mzvs
-   9exBX/0WVqei0NSA3SPT6dLe8v2cF89Xjvb/uqWdSkwU7PYr/dq3tljcW
-   EbcxzyCbvJY8vHE0JAuuwqbG2m6Q46V6opL8cMb8E+lBhuybVI10ShDhL
-   ODAbKLfTtpHafNki9eACE7r7r4I1xEJnjodLxlBSAZeZmuod581KFHP77
-   O1nQn/r8Q/OGM+THIg0Il/ZlKjXJCUPGm3wYXchOnOp4GSBxDq/YBZJZt
-   l87QJpV5f5PHpgHu5Z75qRW6QV97AtzN0mIwMZ9rwEMx4YuvgSWxFgPb6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="382964969"
+  t=1694749053; x=1726285053;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PEq7BbJOpK/YDddrwIkD9257uy7E4R+5/3E5LkWOrPc=;
+  b=mnb9vlSkEgzGMJmncgLaK2mR8L+KLMTIiYaPV998BUq2U1/KWUdxg/sA
+   gxVeVT9nL84H1+DiRqjoMO684BZlKITJ8n+b/w34htpx4nETbz2htMW84
+   sSJXAmc2b9Dl2Db4E6O0LijWOD011ScpjJkKYggCckIxX4AuqWjPQ4gud
+   NzoDKL2ISgGnzKX/zLgRoIsTzedHV+mukkFuoiLIYlMM5vt+QHzXQpijt
+   +JJEWAI7pmyD6rSWIBJ3hoRdd+uTsvUGi8JHnagvtugtFXSb7pI0U63dn
+   7cJDl7KHI3ZiCadil7cjGPNnozAs7Ez6KLvbg8NwKTLGH0+s7zG513jvD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="379066321"
 X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
-   d="scan'208";a="382964969"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 20:02:29 -0700
+   d="scan'208";a="379066321"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 20:37:33 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="779920844"
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="888055878"
 X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
-   d="scan'208";a="779920844"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 20:02:28 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 20:02:28 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 20:02:28 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 14 Sep 2023 20:02:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JiXLVacKKlyAKn3S/mP/crOIrVlK2Xqdbd8Uv7AbnO2sLRRYQIzgacoa6tepK8KaFoW4A+P64UwntJom4mcgNyWAIACQAjOLfumMiSR+rFVc3id3DFkSfOz+NoJDdYTlpOZc8E6OOvsWv7W9+HfiQspfmMalUUD5bldwJaj97GFQByhfHm4A6yRzjoL38zet9UY7tH8YWWLBo1W3cbcv+qjHWlK6k869oH/7E/TaKs74v9HXKRprq6B5ieFptIwLg8gYsuFFfYjnxoZslhOPEmIxO0Jck4W+Wzw+V7g8UTU4M3j2Mu5w0a7WJ1znw0JgdziZM7JcX3YRQTuaJx4FwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yqn3JJnxCOAOloWFh9cxV78DhyY4dbRnETfbLWgbwTQ=;
- b=Zie/ee7qQ6yY1YPhSfdaTm/QW9uoBZ6+Ketz66YBsNzKNTJTZJsndJUCHEIxrE0cLiuyroUoll3Rk5i4weK5vfY0UTPVckGKT9W0uIfhfJqA73qi2MpFA+AK+eOoAjO6I9lAJ82SKMLrbJBuxpix/1gZ7NoqFqTmYqoDa9Tgj4Khdv+Rx+s7smqDQTcAr5UqJBpFOPg0ximls1uIjcRdhaB759j+e1Z2hA0aDz/GBNQMr9VS1VCkJym1qtJaRr5xDTDWGJWWiHyTd1r1OZL8mN17cvKbiaG0Eei3zDY3hR1AgbOLYe3L5MFAZnmgh+aTGnzxqO0gigU6p+Sl4bnvCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB6744.namprd11.prod.outlook.com (2603:10b6:a03:47d::10)
- by SN7PR11MB6851.namprd11.prod.outlook.com (2603:10b6:806:2a3::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.36; Fri, 15 Sep
- 2023 03:02:25 +0000
-Received: from SJ0PR11MB6744.namprd11.prod.outlook.com
- ([fe80::dcc5:b253:97d0:ff70]) by SJ0PR11MB6744.namprd11.prod.outlook.com
- ([fe80::dcc5:b253:97d0:ff70%4]) with mapi id 15.20.6792.020; Fri, 15 Sep 2023
- 03:02:25 +0000
-From:   "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-To:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "clg@redhat.com" <clg@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "Peng, Chao P" <chao.p.peng@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v1 02/22] Update linux-header to support iommufd cdev and
- hwpt alloc
-Thread-Topic: [PATCH v1 02/22] Update linux-header to support iommufd cdev and
- hwpt alloc
-Thread-Index: AQHZ2zAiRSEfZNgVY0KFJh4NW0O0irAafg0AgADLkaA=
-Date:   Fri, 15 Sep 2023 03:02:25 +0000
-Message-ID: <SJ0PR11MB6744FE3F0DBD0E5A69EC37FF92F6A@SJ0PR11MB6744.namprd11.prod.outlook.com>
-References: <20230830103754.36461-1-zhenzhong.duan@intel.com>
- <20230830103754.36461-3-zhenzhong.duan@intel.com>
- <c2fb72a1-2e83-d266-c428-72dcfcd95a75@redhat.com>
-In-Reply-To: <c2fb72a1-2e83-d266-c428-72dcfcd95a75@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB6744:EE_|SN7PR11MB6851:EE_
-x-ms-office365-filtering-correlation-id: 19c183eb-fd6a-4539-a32f-08dbb598303a
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rJ8ada7YQ2ML6+T0T7dl1xuwfuk+3L1uAYcGk3LfZi98ccuqV/i48uUDc6BMJcEdrbkrW3lt/hdazdSn8+Y9zTO8d/PM66ev8TkzgO7Jb0TzrhVZza4jLcyDha9D2ygzkSqPJlyUY+zLsQ1CuOTam5yMYIvUKDzToeytCJLqeM5m/Y7Qx2e2h9uglczdBNs/iPKY3+Du1DwpenuMmbg/j8bMd1AARpXYkywIk2I039DUyjv/DBRoVLQGoSJv6/QqnMl5oAGhnx/1imlJVeIC+H30xrQ6Jdgn6t588ntThsKyv2zV9bSX0LX25a+wL+FTu77PfDqlDax/3MdfWtmZZB+8GS6//W/KNFZ7OLGEsmtMLzb0SUOyXvDhXIeI74IQA/ygYri+6qj3E4UFI9b8E2bRMYJ2t6nYOxZqfMxNZE62qNtCHkR6XIz2RrWrUEKvbGxu7vk+1PjYAJU6vD6ihSRHUtRc4dqc1BMQW2khSG7UblgqmjisQVt1sPc2q0VNqSJOF5ZkfYlm8XwXWlKasCrwfq6/Bxz3vZPpLDDWujw3x9aMZ3nWIjy0J/XFiOnSUPWzDesJS/eQW0sqxIt9Yv6bwhIJpjqIuuhyzkgrlj4=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB6744.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(396003)(366004)(39860400002)(136003)(451199024)(186009)(1800799009)(54906003)(66446008)(4326008)(64756008)(52536014)(966005)(478600001)(316002)(76116006)(110136005)(66946007)(41300700001)(8676002)(5660300002)(8936002)(66476007)(15650500001)(55016003)(7416002)(66556008)(2906002)(122000001)(83380400001)(82960400001)(38070700005)(38100700002)(86362001)(71200400001)(26005)(4744005)(7696005)(33656002)(6506007)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dkd2dUxaWm12T3VLU0RUM2Jkb2pYemdXbWpQcHY1Q3VjL0FrYnh2dDVWckhh?=
- =?utf-8?B?R29PV3ZzODJOTk5ZUlI2MDFna085QTNybEszTWJ5NFQ2TytYR3ViMzZyQis1?=
- =?utf-8?B?aEQrQ1phZVB6ZmlCT28zblpCWWRPZUxpdEZVenJITWlCSjRLdzE2MVFCVVVB?=
- =?utf-8?B?VFgwMG9tR3NxRXdMRzFkbnVhcDQ1MXhMMGVjeDYwYnc1RmRLVXg3cEpDN2RX?=
- =?utf-8?B?U2ZhckYxL1JuOUFZT2FycERHMXBodVBicmhJaTJvSlA2TmxqT290cWpQNERQ?=
- =?utf-8?B?RGJEbFg0V2pRNEpqTjBxU3dubGNDYVNiUzdJbDlwc2FRQ2Q0eWRMTkc2VE9L?=
- =?utf-8?B?dnVsOEQ4eStnZmloYTkrZUl3bkpRSTF4bUpRcEtveVlPTkdmOVdMMjhLV2I1?=
- =?utf-8?B?RzFOdTcvNmRMVFpCQ0UzL3R4SEdxaTFUTUNtOWYyMEZXMkhVVHJVaHhJS0dN?=
- =?utf-8?B?L2NmWVB2cjFvMkhQNGI3K3l3Ykx6RWRtVEJ4Y0RzdjNUMkkvYytzSzVkWUc0?=
- =?utf-8?B?SWEvRmU4azJEcUpqQ01VYXI2aFp3SzZteERNV1hXc0tKN1QwUVl3U2ozT0sr?=
- =?utf-8?B?NkVnaUU4Znp1VFhjM2dXY2lRbXpyMThLNVlxLzkzVnJVVTNUQlNYRXNmbzdT?=
- =?utf-8?B?QkM1Y3ZEZjMrVjAxNm5xNHFLWFVMa1NjTlk5YXVJYTRqdDBzSW5mNGduTGp0?=
- =?utf-8?B?cFNaeEhXZXlYZlNTQ2Q0TFJlRWh0UENpSTdVYTduaXNxRjN0TnBnS3lkRjRC?=
- =?utf-8?B?eEFJSE16UGxQMVpMZW91ZUpzemROa1BnU2JRZm1mV3hONDNRaWgrUm51aHFF?=
- =?utf-8?B?RGNVS0lqRE9Gc1RqVkZJR2lRU01OTS9NRDVCV2tsd0swT0tDbjhQUldyeDZz?=
- =?utf-8?B?dDBFNUFCU2EvdldTOGQ0L1dtUDRWRWhiUFpqWDBnVGNqRHgyR3Q0UVdKVklW?=
- =?utf-8?B?NEwwWGV0YVJ2dzJDR1paSmtCM1pXV1JQcjhJZTVDQjBwbTFpMkNFU1Nnd1Yv?=
- =?utf-8?B?cmJra0QrUlEvQUY4cVozY25zQkVzTUh6SVgwSG0rZm14bWEzVFdwVnpRVHlJ?=
- =?utf-8?B?Njk0aCswRzlPQ2tKeHYxeitoTzF4K3hCcmFCdWxydzQ2VEo0QnA0ZnNQVkN5?=
- =?utf-8?B?Skw1UUVzT1ZNeUYyYnhSby9aRGRtZElKY0JTaG1kSW1pSitVWlZ2TFB5Qjh2?=
- =?utf-8?B?YWhYWG9pbXNLME9NWVkzRjBuVjBMSnhqYW9TejZsQW0wNXcwbXhuVUVkVDR5?=
- =?utf-8?B?eGhhd2ErUFJkV1BodVU4ZkFBZ3dKUkFudTdvRDdqQ3J1dGl0ZnpWMW9kU1Ja?=
- =?utf-8?B?K0RDc1g1UVY4OXFPb1pLb1pUTU9NSmlSS1hvVTQveXFVQzh1UFVjU0svV2pK?=
- =?utf-8?B?RCtBZlp2UUpKdFdTNjZpSlM1MG5xZTZlY09KYWF5Z0RicU1ibkg0eFAxMVpU?=
- =?utf-8?B?aXR1WTRsL1JBRmY1VW5ZQm5jZW9iaFZqajhqTWY3ajBudWFJTms5M1AxeG1S?=
- =?utf-8?B?aW9rbTVrZXJmZ245b1graUc5dXJTMS8zNWowdnRuQVBNK1BYak5OdGJSdDNz?=
- =?utf-8?B?MGVDQkFMcGgzUWRpOXF5bC92YnFrTWVPUGhHcVpxemMxRXpuMlNubmh2SXQ1?=
- =?utf-8?B?eDhHV3FlSDU1dVlsOWNlWTBud0JFSlI3cFJNT2xWc0E2U2JFdzdRRVdFb0hU?=
- =?utf-8?B?MklYaW4vNWNwZzlVc3o4K1pwL3U5RStrWFFuRmdObnR0bVdZKzNrbzY1ajJz?=
- =?utf-8?B?RWM3N2lOeWlVMjFKbG1LTEVkdjY3SEpiM281WnZKVmR3Sk9jMUZUcHlQWFRl?=
- =?utf-8?B?TWh0QldXOThrNVZoSjVaSjViZGlpQzlTSjJ3dFZvTHFoZFVpejFVV2MxaXlL?=
- =?utf-8?B?SHRJb1IyQmRtN0p0U1pPUDk3cHVmZW50UENRMUtVSUlsdlhtd0thWi9wRXd2?=
- =?utf-8?B?Z2twVGw3RTdtYXlqOURpczJ5Ty9HS0cvSW5INmt1Qml1SGFWQVQrMVhiVnY1?=
- =?utf-8?B?RnZXNGh1MDZpRUpBa2tsaVZud09YbDEvWVRPeVJYdkRDY0E5SHNWWG1mdExJ?=
- =?utf-8?B?SWRvVXRFM3JiK01sUG11RHdtTWlNb1RzTEFuc3E5MlJQaDdUWnYrd210WDJD?=
- =?utf-8?Q?XzjmyCX/nqEhnJkEnFy2BVDPg?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="888055878"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 20:36:54 -0700
+Message-ID: <a8cf6824-4228-8de5-0727-96ea6c5bad36@intel.com>
+Date:   Fri, 15 Sep 2023 11:37:26 +0800
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB6744.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19c183eb-fd6a-4539-a32f-08dbb598303a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2023 03:02:25.1425
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: q30ZVHazrO/XIOAnprivMv6QqI6RLkmgEn10GkiKUClebYbleVCsiOgnyWn17FtzGtZVKBxapbIjjWDGFhQot3dbrV3ivk79Tal/lDz1PA8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6851
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.15.1
+Subject: Re: [RFC PATCH v2 00/21] QEMU gmem implemention
+To:     David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+ <fe9f3d19-df01-01e6-a253-f7fe5bdea41f@redhat.com>
+Content-Language: en-US
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <fe9f3d19-df01-01e6-a253-f7fe5bdea41f@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgRXJpYywNCg0KPi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogRXJpYyBBdWdl
-ciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPlNlbnQ6IFRodXJzZGF5LCBTZXB0ZW1iZXIgMTQs
-IDIwMjMgMTA6NDYgUE0NCj5TdWJqZWN0OiBSZTogW1BBVENIIHYxIDAyLzIyXSBVcGRhdGUgbGlu
-dXgtaGVhZGVyIHRvIHN1cHBvcnQgaW9tbXVmZCBjZGV2IGFuZA0KPmh3cHQgYWxsb2MNCj4NCj5I
-aSBaaGVuemhvbmcsDQo+DQo+T24gOC8zMC8yMyAxMjozNywgWmhlbnpob25nIER1YW4gd3JvdGU6
-DQo+PiBGcm9tIGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0
-L2pnZy9pb21tdWZkLmdpdA0KPj4gYnJhbmNoOiBmb3JfbmV4dA0KPj4gY29tbWl0IGlkOiBlYjUw
-MWMyZDk2Y2ZjZTZiNDI1MjhlODMyMWVhMDg1ZWM2MDVlNzkwDQo+SSBzZWUgdGhhdCBpbiB5b3Vy
-IGJyYW5jaCB5b3UgaGF2ZSBub3cgdXBkYXRlZCBhZ2FpbnN0IHY2LjYtcmMxLiBIb3dldmVyDQo+
-eW91IHNob3VsZCBydW4gYSBmdWxsIC4vc2NyaXB0cy91cGRhdGUtbGludXgtaGVhZGVycy5zaCwN
-Cj5pZS4gbm90IG9ubHkgaW1wb3J0aW5nIHRoZSBjaGFuZ2VzIGluIGxpbnV4LWhlYWRlcnMvbGlu
-dXgvaW9tbXVmZC5oIGFzDQo+aXQgc2VlbXMgdG8gZG8gYnV0IGFsc28gaW1wb3J0IGFsbCBjaGFu
-Z2VzIGJyb3VnaHQgd2l0aCB0aGlzIGxpbnV4IHZlcnNpb24uDQoNCkZvdW5kIHJlYXNvbi4gVGhl
-IGJhc2UgaXMgYWxyZWFkeSBhZ2FpbnN0IHY2LjYtcmMxLCBbUEFUQ0ggdjEgMDEvMjJdIGFkZGVk
-DQpJb21tdWZkLmggaW50byBzY3JpcHQgYW5kIHRoaXMgcGF0Y2ggYWRkZWQgaXQuDQpJIGFncmVl
-IHRoZSBzdWJqZWN0IGlzIGNvbmZ1c2luZywgbmVlZCB0byBiZSBsaWtlICJVcGRhdGUgaW9tbXVm
-ZC5oIHRvIGxpbnV4LWhlYWRlciINCkknbGwgZml4IHRoZSBzdWJqZWN0IGluIG5leHQgdmVyc2lv
-biwgdGhhbmtzIGZvciBwb2ludCBvdXQuDQoNCkJSLg0KWmhlbnpob25nDQoNCg==
+On 9/14/2023 9:09 PM, David Hildenbrand wrote:
+> On 14.09.23 05:50, Xiaoyao Li wrote:
+>> It's the v2 RFC of enabling KVM gmem[1] as the backend for private
+>> memory.
+>>
+>> For confidential-computing, KVM provides gmem/guest_mem interfaces for
+>> userspace, like QEMU, to allocate user-unaccesible private memory. This
+>> series aims to add gmem support in QEMU's RAMBlock so that each RAM can
+>> have both hva-based shared memory and gmem_fd based private memory. QEMU
+>> does the shared-private conversion on KVM_MEMORY_EXIT and discards the
+>> memory.
+>>
+>> It chooses the design that adds "private" property to hostmeory backend.
+>> If "private" property is set, QEMU will allocate/create KVM gmem when
+>> initialize the RAMbloch of the memory backend.
+>>
+>> This sereis also introduces the first user of kvm gmem,
+>> KVM_X86_SW_PROTECTED_VM. A KVM_X86_SW_PROTECTED_VM with private KVM gmem
+>> can be created with
+>>
+>>    $qemu -object sw-protected-vm,id=sp-vm0 \
+>>     -object memory-backend-ram,id=mem0,size=1G,private=on \
+>>     -machine 
+>> q35,kernel_irqchip=split,confidential-guest-support=sp-vm0,memory-backend=mem0 \
+>>     ...
+>>
+>> Unfortunately this patch series fails the boot of OVMF at very early
+>> stage due to triple fault, because KVM doesn't support emulating 
+>> string IO
+>> to private memory.
+> 
+> Is support being added? Or have we figured out what it would take to 
+> make it work?
+
+Hi David,
+
+I only reply the questions that werrn't covered by Sean's reply.
+
+> How does this interact with other features (memory ballooning, virtiofs, 
+> vfio/mdev/...)?
+
+I need time to learn them before I can answer it.
+
+>>
+>> This version still leave some opens to be discussed:
+>> 1. whether we need "private" propery to be user-settable?
+>>
+>>     It seems unnecessary because vm-type is determined. If the VM is
+>>     confidential-guest, then the RAM of the guest must be able to be
+>>     mapped as private, i.e., have kvm gmem backend. So QEMU can
+>>     determine the value of "private" property automatiacally based on vm
+>>     type.
+>>
+>>     This also aligns with the board internal MemoryRegion that needs to
+>>     have kvm gmem backend, e.g., TDX requires OVMF to act as private
+>>     memory so bios memory region needs to have kvm gmem fd associated.
+>>     QEMU no doubt will do it internally automatically.
+> 
+> Would it make sense to have some regions without "pivate" semantics? 
+> Like NVDIMMs?
+
+Of course it can have regions without "private" semantics.
+
+Whether a region needs "private" backend depends on the definition of VM 
+type. E.g., for TDX,
+  - all the RAM needs to able to mapped as private. So it needs private 
+gmem.
+  - TDVF(OVMF) code must be mapped as private. So it needs private gmem.
+  - MMIO region needs to be shared for TDX 1.0, and it doesn't need 
+private gmem;
+
+>>
+>> 2. hugepage support.
+>>
+>>     KVM gmem can be allocated from hugetlbfs. How does QEMU determine
+>>     when to allocate KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE. The
+>>     easiest solution is create KVM gmem with 
+>> KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+>>     only when memory backend is HostMemoryBackendFile of hugetlbfs.
+> 
+> Good question.
+> 
+> Probably "if the memory backend uses huge pages, also use huge pages for 
+> the private gmem" makes sense.
+> 
+> ... but it becomes a mess with preallocation ... which is what people 
+> should actually be using with hugetlb. Andeventual double 
+> memory-consumption ... but maybe that's all been taken care of already?
+> 
+> Probably it's best to leave hugetlb support as future work and start 
+> with something minimal.
+> 
+
+As Sean replied, I had some misunderstanding of 
+KVM_GUEST_MEMFD_ALLOW_HUGEPAGE. If it's for THP, I think we can allow it 
+for every gmem.
+
+As for hugetlb, we can leave it as future work.
+
