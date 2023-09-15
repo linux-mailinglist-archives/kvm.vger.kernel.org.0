@@ -2,86 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B265B7A1899
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 10:24:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 549047A18D3
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 10:29:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232940AbjIOIYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 04:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
+        id S232791AbjIOI3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 04:29:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232925AbjIOIYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 04:24:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A82D4E9
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 01:22:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694766160;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EX4Tss94LQ/rIrtA1dGhkDHsEmNjKI6XV7p1bhSUC6E=;
-        b=N8fgPMQ1CS/m+86XE4/F9+1cTCTwG45vRwiHhtqXszML/0eMKZI+8l6WXnPT2QWqAVmFiR
-        /Dk63knRaIp5bPYFeoxrpWgP+1VhjVZy+Dd+rmiSGgwP0cVb/V4NochnuCXh9ZlzvSIElC
-        1EK49Z9snA4KpDqlPrAxXYyuc1KwL1U=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-_x9T0gyvOoOc36JmX-4y6g-1; Fri, 15 Sep 2023 04:22:38 -0400
-X-MC-Unique: _x9T0gyvOoOc36JmX-4y6g-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-576925c8921so2423216eaf.0
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 01:22:38 -0700 (PDT)
+        with ESMTP id S232141AbjIOI3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 04:29:38 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF54F2D58
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 01:27:23 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c39a4f14bcso17101625ad.3
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 01:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1694766443; x=1695371243; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vCzI3E8aO188t/F32/cMXTqfHUINrJvH0Tp5qCpKPJc=;
+        b=RnH9JHz283ZLJuYD7ZhBVFWdfOoi++hgmVADdJMIxV5KzeRtPWg/XZG7HdZcrEVy/f
+         B6lRJK1W2bqTQ+GkbXUq7vYOjMpbQg7v1z28MORLOuD1aySToktuGpTNC5G2u7hIfk4R
+         0Qv+D0HUuz7T3+cba1wm/SSb0oB6SUm9KCP00C5MAzxbWEkMNXuRiG1HzTeq34mltysg
+         A99HEHQZqfoau7pvL7et5jdj7aCpzkBQpUm73B7VYJjIh/5jA0Sihc7qKYpNip4mDP6Z
+         7pdcden5gWRB7lq4V6ZW8q5li4rU11VMIM5t3y/yxRekXQ2dEASmsaov0fVG8h69gbLE
+         ydtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694766158; x=1695370958;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EX4Tss94LQ/rIrtA1dGhkDHsEmNjKI6XV7p1bhSUC6E=;
-        b=WF53zzHrf5xZa3yY56gS9QpjwfD+YsfmaO2GwmQ/igXnohDWY/3izPhax4U3PLpqqK
-         6CylPVZyihVn+XqHABo81g/g/KC6YtYPdP8POrlzGy9rDqscL/KVywSVa3VTVXV6S+UX
-         +rWqDBFbykiGSpJFeXD0vaOk10RX/ARMcMk4ke/9FK7on33pCIv8YDsuubhSO2eivfKp
-         eDFsSisUbDTKlQuAnCKn8C94nZyMXQVhpg7/GDTXmED8f1ffMoyFf+64Lea3rei38tpX
-         g+WGyTQbxv1BAk0THdflse7uj+nCiyuViCO5tJevBi5sRYgwN0v+NDUx9N4zRfTVONup
-         fKIQ==
-X-Gm-Message-State: AOJu0YxGNOrEi09FP2gOxWx/Rjuvk2FqElR40X6dlLJXmPsTMga1P4c1
-        mGUC8H6G7dq8B4W+W2YO71dF1cn7HUUfqz0hGUDoUMngX5cl8aUzPv3eKS4GnnbfBojTR1RaEz3
-        G02dGBoQinZCO
-X-Received: by 2002:a4a:2a05:0:b0:573:bf68:8dbc with SMTP id k5-20020a4a2a05000000b00573bf688dbcmr913037oof.7.1694766157925;
-        Fri, 15 Sep 2023 01:22:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZRVa3tHzbVBpWYN0809AqN2jbKzoyT3PWcZldC1frQ5YeRmbIbyU7x5txQtTFP0VI4BE0lg==
-X-Received: by 2002:a4a:2a05:0:b0:573:bf68:8dbc with SMTP id k5-20020a4a2a05000000b00573bf688dbcmr913029oof.7.1694766157618;
-        Fri, 15 Sep 2023 01:22:37 -0700 (PDT)
-Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id d129-20020a4a5287000000b0057346742d82sm1529920oob.6.2023.09.15.01.22.30
+        d=1e100.net; s=20230601; t=1694766443; x=1695371243;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vCzI3E8aO188t/F32/cMXTqfHUINrJvH0Tp5qCpKPJc=;
+        b=knWiqs+z5dBnJVPOq3P/wgUIW6cg1B71+ac9Nq5j1d7pp1FZwSO/cNascYDnCl0zOr
+         wUmSO382gbFQDjYujpw9hwWQdTXAh4a6Kp8iPcu6+Ppq5Z7/bzgffZgn/2EhUiz8vuTG
+         OBVisHjyTC6i/JOHvQBtkTlEZ8v0ftSdHIjtpmSD4UKWti5POr5Q+7fy4PA3D3gpTMNt
+         aDJ57zcYaBsOzHxDTMcybavsNSHF68+ABQ0crq7fS7dOBqCuySR+5+Ue8PCz0fpPcmlE
+         T5scOnr/SnAx962hJAQgB9pP6vqMhkyZvMV/CeJyqP0hpK0sCyBUsLVzkgBGmdeIZ9FJ
+         uJhw==
+X-Gm-Message-State: AOJu0YyN5b6EgOdhrJCDXa03d/v6PVV2EawGDevdXCDqwuzJZUzdIrFx
+        E2LkXhjbP2TNUhJ321WHCGzxLQ==
+X-Google-Smtp-Source: AGHT+IH1wq43BqO+fEUmA+uIVRiNalmd9lYZ4iknzz4/CvLaHWfCEV+kAVOQ50zw87BzU2Q8qcJyUg==
+X-Received: by 2002:a17:902:6848:b0:1c0:e091:6a08 with SMTP id f8-20020a170902684800b001c0e0916a08mr847355pln.69.1694766443167;
+        Fri, 15 Sep 2023 01:27:23 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id f4-20020a170902ab8400b001c0af36dd64sm2912806plr.162.2023.09.15.01.27.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 01:22:37 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 05:22:26 -0300
-From:   Leonardo Bras <leobras@redhat.com>
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
-        wuwei2016@iscas.ac.cn, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
-Message-ID: <ZQQUQjOaAIc95GXP@redhat.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-4-guoren@kernel.org>
- <20230914-1ce4f391a14e56b456d88188@orel>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914-1ce4f391a14e56b456d88188@orel>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        Fri, 15 Sep 2023 01:27:22 -0700 (PDT)
+From:   Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To:     linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org
+Cc:     greentime.hu@sifive.com, vincent.chen@sifive.com, tjytimi@163.com,
+        alex@ghiti.fr, Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] RISC-V: KVM: Add Svadu Extension Support for Guest/VM
+Date:   Fri, 15 Sep 2023 08:26:58 +0000
+Message-Id: <20230915082701.3643-3-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230915082701.3643-1-yongxuan.wang@sifive.com>
+References: <20230915082701.3643-1-yongxuan.wang@sifive.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,220 +73,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 03:47:59PM +0200, Andrew Jones wrote:
-> On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
-> > From: Guo Ren <guoren@linux.alibaba.com>
-> > 
-> > Cache-block prefetch instructions are HINTs to the hardware to
-> > indicate that software intends to perform a particular type of
-> > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
-> > improve the arch_xchg for qspinlock xchg_tail.
-> > 
-> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > ---
-> >  arch/riscv/Kconfig                 | 15 +++++++++++++++
-> >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
-> >  arch/riscv/include/asm/hwcap.h     |  1 +
-> >  arch/riscv/include/asm/insn-def.h  |  5 +++++
-> >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
-> >  arch/riscv/kernel/cpufeature.c     |  1 +
-> >  6 files changed, 38 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > index e9ae6fa232c3..2c346fe169c1 100644
-> > --- a/arch/riscv/Kconfig
-> > +++ b/arch/riscv/Kconfig
-> > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
-> >  
-> >  	   If you don't know what to do here, say Y.
-> >  
-> > +config RISCV_ISA_ZICBOP
-> > +	bool "Zicbop extension support for cache block prefetch"
-> > +	depends on MMU
-> > +	depends on RISCV_ALTERNATIVE
-> > +	default y
-> > +	help
-> > +	   Adds support to dynamically detect the presence of the ZICBOP
-> > +	   extension (Cache Block Prefetch Operations) and enable its
-> > +	   usage.
-> > +
-> > +	   The Zicbop extension can be used to prefetch cache block for
-> > +	   read/write/instruction fetch.
-> > +
-> > +	   If you don't know what to do here, say Y.
-> > +
-> >  config TOOLCHAIN_HAS_ZIHINTPAUSE
-> >  	bool
-> >  	default y
-> > diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
-> > index 702725727671..56eff7a9d2d2 100644
-> > --- a/arch/riscv/include/asm/cmpxchg.h
-> > +++ b/arch/riscv/include/asm/cmpxchg.h
-> > @@ -11,6 +11,7 @@
-> >  
-> >  #include <asm/barrier.h>
-> >  #include <asm/fence.h>
-> > +#include <asm/processor.h>
-> >  
-> >  #define __arch_xchg_masked(prepend, append, r, p, n)			\
-> >  ({									\
-> > @@ -25,6 +26,7 @@
-> >  									\
-> >  	__asm__ __volatile__ (						\
-> >  	       prepend							\
-> > +	       PREFETCHW_ASM(%5)					\
-> >  	       "0:	lr.w %0, %2\n"					\
-> >  	       "	and  %1, %0, %z4\n"				\
-> >  	       "	or   %1, %1, %z3\n"				\
-> > @@ -32,7 +34,7 @@
-> >  	       "	bnez %1, 0b\n"					\
-> >  	       append							\
-> >  	       : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))	\
-> > -	       : "rJ" (__newx), "rJ" (~__mask)				\
-> > +	       : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)		\
-> >  	       : "memory");						\
-> >  									\
-> >  	r = (__typeof__(*(p)))((__retx & __mask) >> __s);		\
-> > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> > index b7b58258f6c7..78b7b8b53778 100644
-> > --- a/arch/riscv/include/asm/hwcap.h
-> > +++ b/arch/riscv/include/asm/hwcap.h
-> > @@ -58,6 +58,7 @@
-> >  #define RISCV_ISA_EXT_ZICSR		40
-> >  #define RISCV_ISA_EXT_ZIFENCEI		41
-> >  #define RISCV_ISA_EXT_ZIHPM		42
-> > +#define RISCV_ISA_EXT_ZICBOP		43
-> >  
-> >  #define RISCV_ISA_EXT_MAX		64
-> >  
-> > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
-> > index 6960beb75f32..dc590d331894 100644
-> > --- a/arch/riscv/include/asm/insn-def.h
-> > +++ b/arch/riscv/include/asm/insn-def.h
-> > @@ -134,6 +134,7 @@
-> >  
-> >  #define RV_OPCODE_MISC_MEM	RV_OPCODE(15)
-> >  #define RV_OPCODE_SYSTEM	RV_OPCODE(115)
-> > +#define RV_OPCODE_PREFETCH	RV_OPCODE(19)
-> 
-> This should be named RV_OPCODE_OP_IMM and be placed in
-> numerical order with the others, i.e. above SYSTEM.
-> 
-> >  
-> >  #define HFENCE_VVMA(vaddr, asid)				\
-> >  	INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),		\
-> > @@ -196,4 +197,8 @@
-> >  	INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),		\
-> >  	       RS1(base), SIMM12(4))
-> >  
-> > +#define CBO_prefetchw(base)					\
-> 
-> Please name this 'PREFETCH_w' and it should take an immediate parameter,
-> even if we intend to pass 0 for it.
+We extend the KVM ISA extension ONE_REG interface to allow VMM
+tools  to detect and enable Svadu extension for Guest/VM.
 
-It makes sense.
+Also set the HADE bit in henvcfg CSR if Svadu extension is
+available for Guest/VM.
 
-The mnemonic in the previously mentioned documentation is:
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+---
+ arch/riscv/include/uapi/asm/kvm.h | 1 +
+ arch/riscv/kvm/vcpu.c             | 3 +++
+ arch/riscv/kvm/vcpu_onereg.c      | 1 +
+ 3 files changed, 5 insertions(+)
 
-prefetch.w offset(base)
-
-So yeah, makes sense to have both offset and base as parameters for 
-CBO_prefetchw (or PREFETCH_w, I have no strong preference).
-
-> 
-> > +	INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),		\
-> > +	       RD(x0), RS1(base), RS2(x0))
-> 
-> prefetch.w is not an R-type instruction, it's an S-type. While the bit
-> shifts are the same, the names are different. We need to add S-type
-> names while defining this instruction. 
-
-That is correct, it is supposed to look like a store instruction (S-type), 
-even though documentation don't explicitly state that.
-
-Even though it works fine with the R-type definition, code documentation 
-would be wrong, and future changes could break it.
-
-> Then, this define would be
-> 
->  #define PREFETCH_w(base, imm) \
->      INSN_S(OPCODE_OP_IMM, FUNC3(6), IMM_11_5(imm), __IMM_4_0(0), \
->             RS1(base), __RS2(3))
-
-s/OPCODE_OP_IMM/OPCODE_PREFETCH
-0x4 vs 0x13
-
-RS2 == 0x3 is correct (PREFETCH.W instead of PREFETCH.I)
-
-
-So IIUC, it should be:
-
-INSN_S(OPCODE_PREFETCH, FUNC3(6), IMM_11_5(imm), __IMM_4_0(0), \
-       RS1(base), __RS2(3)
-
-Thanks,
-Leo
-
-
-> 
-> When the assembler as insn_r I hope it will validate that
-> (imm & 0xfe0) == imm
-> 
-> > +
-> >  #endif /* __ASM_INSN_DEF_H */
-> > diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
-> > index de9da852f78d..7ad3a24212e8 100644
-> > --- a/arch/riscv/include/asm/processor.h
-> > +++ b/arch/riscv/include/asm/processor.h
-> > @@ -12,6 +12,8 @@
-> >  #include <vdso/processor.h>
-> >  
-> >  #include <asm/ptrace.h>
-> > +#include <asm/insn-def.h>
-> > +#include <asm/hwcap.h>
-> >  
-> >  #ifdef CONFIG_64BIT
-> >  #define DEFAULT_MAP_WINDOW	(UL(1) << (MMAP_VA_BITS - 1))
-> > @@ -103,6 +105,17 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
-> >  #define KSTK_EIP(tsk)		(ulong)(task_pt_regs(tsk)->epc)
-> >  #define KSTK_ESP(tsk)		(ulong)(task_pt_regs(tsk)->sp)
-> >  
-> > +#define ARCH_HAS_PREFETCHW
-> > +#define PREFETCHW_ASM(base)	ALTERNATIVE(__nops(1), \
-> > +					    CBO_prefetchw(base), \
-> > +					    0, \
-> > +					    RISCV_ISA_EXT_ZICBOP, \
-> > +					    CONFIG_RISCV_ISA_ZICBOP)
-> > +static inline void prefetchw(const void *ptr)
-> > +{
-> > +	asm volatile(PREFETCHW_ASM(%0)
-> > +		: : "r" (ptr) : "memory");
-> > +}
-> >  
-> >  /* Do necessary setup to start up a newly executed thread. */
-> >  extern void start_thread(struct pt_regs *regs,
-> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> > index ef7b4fd9e876..e0b897db0b97 100644
-> > --- a/arch/riscv/kernel/cpufeature.c
-> > +++ b/arch/riscv/kernel/cpufeature.c
-> > @@ -159,6 +159,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
-> >  	__RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
-> >  	__RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
-> >  	__RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
-> > +	__RISCV_ISA_EXT_DATA(zicbop, RISCV_ISA_EXT_ZICBOP),
-> 
-> zicbop should be above zicboz (extensions alphabetical within their
-> category).
-> 
-> >  	__RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
-> >  	__RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
-> >  	__RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
-> > -- 
-> > 2.36.1
-> >
-> 
-> Thanks,
-> drew
-> 
+diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+index 992c5e407104..3c7a6c762d0f 100644
+--- a/arch/riscv/include/uapi/asm/kvm.h
++++ b/arch/riscv/include/uapi/asm/kvm.h
+@@ -131,6 +131,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+ 	KVM_RISCV_ISA_EXT_ZICSR,
+ 	KVM_RISCV_ISA_EXT_ZIFENCEI,
+ 	KVM_RISCV_ISA_EXT_ZIHPM,
++	KVM_RISCV_ISA_EXT_SVADU,
+ 	KVM_RISCV_ISA_EXT_MAX,
+ };
+ 
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 82229db1ce73..91b92a1f4e33 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -487,6 +487,9 @@ static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
+ 	if (riscv_isa_extension_available(isa, ZICBOZ))
+ 		henvcfg |= ENVCFG_CBZE;
+ 
++	if (riscv_isa_extension_available(isa, SVADU))
++		henvcfg |= ENVCFG_HADE;
++
+ 	csr_write(CSR_HENVCFG, henvcfg);
+ #ifdef CONFIG_32BIT
+ 	csr_write(CSR_HENVCFGH, henvcfg >> 32);
+diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+index 1b7e9fa265cb..211915dad677 100644
+--- a/arch/riscv/kvm/vcpu_onereg.c
++++ b/arch/riscv/kvm/vcpu_onereg.c
+@@ -36,6 +36,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+ 	/* Multi letter extensions (alphabetically sorted) */
+ 	KVM_ISA_EXT_ARR(SSAIA),
+ 	KVM_ISA_EXT_ARR(SSTC),
++	KVM_ISA_EXT_ARR(SVADU),
+ 	KVM_ISA_EXT_ARR(SVINVAL),
+ 	KVM_ISA_EXT_ARR(SVNAPOT),
+ 	KVM_ISA_EXT_ARR(SVPBMT),
+-- 
+2.17.1
 
