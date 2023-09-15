@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C74787A133F
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 03:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FC317A1343
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 03:51:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231776AbjIOBvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 21:51:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38862 "EHLO
+        id S231703AbjIOBvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 21:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231755AbjIOBuw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 21:50:52 -0400
+        with ESMTP id S231792AbjIOBuz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 21:50:55 -0400
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ABD993A8B;
-        Thu, 14 Sep 2023 18:50:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 972903AA0;
+        Thu, 14 Sep 2023 18:50:17 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8DxBfFNuANlhP8nAA--.11623S3;
-        Fri, 15 Sep 2023 09:50:05 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8Dxl+hOuANlmf8nAA--.41047S3;
+        Fri, 15 Sep 2023 09:50:06 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axndw9uANl+ioGAA--.11927S28;
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axndw9uANl+ioGAA--.11927S29;
         Fri, 15 Sep 2023 09:50:04 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -30,16 +30,17 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Mark Brown <broonie@kernel.org>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn
-Subject: [PATCH v21 26/29] LoongArch: KVM: Implement vcpu world switch
-Date:   Fri, 15 Sep 2023 09:49:46 +0800
-Message-Id: <20230915014949.1222777-27-zhaotianrui@loongson.cn>
+        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v21 27/29] LoongArch: KVM: Enable kvm config and add the makefile
+Date:   Fri, 15 Sep 2023 09:49:47 +0800
+Message-Id: <20230915014949.1222777-28-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
 References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Axndw9uANl+ioGAA--.11927S28
+X-CM-TRANSID: AQAAf8Axndw9uANl+ioGAA--.11927S29
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
         ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
@@ -48,326 +49,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement LoongArch vcpu world switch, including vcpu enter guest and
-vcpu exit from guest, both operations need to save or restore the host
-and guest registers.
+Enable LoongArch kvm config and add the makefile to support build kvm
+module.
 
 Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com/
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/kernel/asm-offsets.c |  32 ++++
- arch/loongarch/kvm/switch.S         | 255 ++++++++++++++++++++++++++++
- 2 files changed, 287 insertions(+)
- create mode 100644 arch/loongarch/kvm/switch.S
+ arch/loongarch/Kbuild                      |  1 +
+ arch/loongarch/Kconfig                     |  3 ++
+ arch/loongarch/configs/loongson3_defconfig |  2 +
+ arch/loongarch/kvm/Kconfig                 | 45 ++++++++++++++++++++++
+ arch/loongarch/kvm/Makefile                | 20 ++++++++++
+ 5 files changed, 71 insertions(+)
+ create mode 100644 arch/loongarch/kvm/Kconfig
+ create mode 100644 arch/loongarch/kvm/Makefile
 
-diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/asm-offsets.c
-index 8da0726777..9c86ff9b53 100644
---- a/arch/loongarch/kernel/asm-offsets.c
-+++ b/arch/loongarch/kernel/asm-offsets.c
-@@ -9,6 +9,7 @@
- #include <linux/mm.h>
- #include <linux/kbuild.h>
- #include <linux/suspend.h>
-+#include <linux/kvm_host.h>
- #include <asm/cpu-info.h>
- #include <asm/ptrace.h>
- #include <asm/processor.h>
-@@ -289,3 +290,34 @@ void output_fgraph_ret_regs_defines(void)
- 	BLANK();
- }
- #endif
+diff --git a/arch/loongarch/Kbuild b/arch/loongarch/Kbuild
+index b01f5cdb27..9679c798c2 100644
+--- a/arch/loongarch/Kbuild
++++ b/arch/loongarch/Kbuild
+@@ -2,6 +2,7 @@ obj-y += kernel/
+ obj-y += mm/
+ obj-y += net/
+ obj-y += vdso/
++obj-$(CONFIG_KVM) += kvm/
+ 
+ # for cleaning
+ subdir- += boot
+diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+index e14396a2dd..0abb1f12eb 100644
+--- a/arch/loongarch/Kconfig
++++ b/arch/loongarch/Kconfig
+@@ -129,6 +129,7 @@ config LOONGARCH
+ 	select HAVE_KPROBES
+ 	select HAVE_KPROBES_ON_FTRACE
+ 	select HAVE_KRETPROBES
++	select HAVE_KVM
+ 	select HAVE_MOD_ARCH_SPECIFIC
+ 	select HAVE_NMI
+ 	select HAVE_PCI
+@@ -676,3 +677,5 @@ source "kernel/power/Kconfig"
+ source "drivers/acpi/Kconfig"
+ 
+ endmenu
 +
-+static void __used output_kvm_defines(void)
-+{
-+	COMMENT(" KVM/LoongArch Specific offsets. ");
-+
-+	OFFSET(VCPU_FCSR0, kvm_vcpu_arch, fpu.fcsr);
-+	OFFSET(VCPU_FCC, kvm_vcpu_arch, fpu.fcc);
-+	BLANK();
-+
-+	OFFSET(KVM_VCPU_ARCH, kvm_vcpu, arch);
-+	OFFSET(KVM_VCPU_KVM, kvm_vcpu, kvm);
-+	OFFSET(KVM_VCPU_RUN, kvm_vcpu, run);
-+	BLANK();
-+
-+	OFFSET(KVM_ARCH_HSP, kvm_vcpu_arch, host_sp);
-+	OFFSET(KVM_ARCH_HTP, kvm_vcpu_arch, host_tp);
-+	OFFSET(KVM_ARCH_HANDLE_EXIT, kvm_vcpu_arch, handle_exit);
-+	OFFSET(KVM_ARCH_HPGD, kvm_vcpu_arch, host_pgd);
-+	OFFSET(KVM_ARCH_GEENTRY, kvm_vcpu_arch, guest_eentry);
-+	OFFSET(KVM_ARCH_GPC, kvm_vcpu_arch, pc);
-+	OFFSET(KVM_ARCH_GGPR, kvm_vcpu_arch, gprs);
-+	OFFSET(KVM_ARCH_HESTAT, kvm_vcpu_arch, host_estat);
-+	OFFSET(KVM_ARCH_HBADV, kvm_vcpu_arch, badv);
-+	OFFSET(KVM_ARCH_HBADI, kvm_vcpu_arch, badi);
-+	OFFSET(KVM_ARCH_HECFG, kvm_vcpu_arch, host_ecfg);
-+	OFFSET(KVM_ARCH_HEENTRY, kvm_vcpu_arch, host_eentry);
-+	OFFSET(KVM_ARCH_HPERCPU, kvm_vcpu_arch, host_percpu);
-+
-+	OFFSET(KVM_GPGD, kvm, arch.pgd);
-+	BLANK();
-+}
-diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
++source "arch/loongarch/kvm/Kconfig"
+diff --git a/arch/loongarch/configs/loongson3_defconfig b/arch/loongarch/configs/loongson3_defconfig
+index a3b52aaa83..2a8edebcc5 100644
+--- a/arch/loongarch/configs/loongson3_defconfig
++++ b/arch/loongarch/configs/loongson3_defconfig
+@@ -67,11 +67,13 @@ CONFIG_EFI_GENERIC_STUB_INITRD_CMDLINE_LOADER=y
+ CONFIG_EFI_CAPSULE_LOADER=m
+ CONFIG_EFI_TEST=m
+ CONFIG_JUMP_LABEL=y
++CONFIG_KVM=m
+ CONFIG_MODULES=y
+ CONFIG_MODULE_FORCE_LOAD=y
+ CONFIG_MODULE_UNLOAD=y
+ CONFIG_MODULE_FORCE_UNLOAD=y
+ CONFIG_MODVERSIONS=y
++CONFIG_VIRTUALIZATION=y
+ CONFIG_BLK_DEV_THROTTLING=y
+ CONFIG_PARTITION_ADVANCED=y
+ CONFIG_BSD_DISKLABEL=y
+diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
 new file mode 100644
-index 0000000000..48b1f6a4f3
+index 0000000000..b517785c50
 --- /dev/null
-+++ b/arch/loongarch/kvm/switch.S
-@@ -0,0 +1,255 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-+ */
++++ b/arch/loongarch/kvm/Kconfig
+@@ -0,0 +1,45 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# KVM configuration
++#
 +
-+#include <linux/linkage.h>
-+#include <asm/stackframe.h>
-+#include <asm/asm.h>
-+#include <asm/asmmacro.h>
-+#include <asm/regdef.h>
-+#include <asm/loongarch.h>
++source "virt/kvm/Kconfig"
 +
-+#define PT_GPR_OFFSET(x)	(PT_R0 + 8*x)
-+#define GGPR_OFFSET(x)		(KVM_ARCH_GGPR + 8*x)
++menuconfig VIRTUALIZATION
++	bool "Virtualization"
++	help
++	  Say Y here to get to see options for using your Linux host to run
++	  other operating systems inside virtual machines (guests).
++	  This option alone does not add any kernel code.
 +
-+.macro kvm_save_host_gpr base
-+	.irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
-+	st.d	$r\n, \base, PT_GPR_OFFSET(\n)
-+	.endr
-+.endm
++	  If you say N, all options in this submenu will be skipped and
++	  disabled.
 +
-+.macro kvm_restore_host_gpr base
-+	.irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
-+	ld.d	$r\n, \base, PT_GPR_OFFSET(\n)
-+	.endr
-+.endm
++if VIRTUALIZATION
 +
-+/*
-+ * save and restore all gprs except base register,
-+ * and default value of base register is a2.
-+ */
-+.macro kvm_save_guest_gprs base
-+	.irp n,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
-+	st.d	$r\n, \base, GGPR_OFFSET(\n)
-+	.endr
-+.endm
++config AS_HAS_LVZ_EXTENSION
++	def_bool $(as-instr,hvcl 0)
 +
-+.macro kvm_restore_guest_gprs base
-+	.irp n,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
-+	ld.d	$r\n, \base, GGPR_OFFSET(\n)
-+	.endr
-+.endm
++config KVM
++	tristate "Kernel-based Virtual Machine (KVM) support"
++	depends on AS_HAS_LVZ_EXTENSION
++	depends on HAVE_KVM
++	select ANON_INODES
++	select HAVE_KVM_DIRTY_RING_ACQ_REL
++	select HAVE_KVM_EVENTFD
++	select HAVE_KVM_VCPU_ASYNC_IOCTL
++	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
++	select KVM_GENERIC_HARDWARE_ENABLING
++	select KVM_MMIO
++	select KVM_XFER_TO_GUEST_WORK
++	select MMU_NOTIFIER
++	select PREEMPT_NOTIFIERS
++	select SRCU
++	help
++	  Support hosting virtualized guest machines using
++	  hardware virtualization extensions. You will need
++	  a processor equipped with virtualization extensions.
 +
-+/*
-+ * prepare switch to guest, save host reg and restore guest reg.
-+ * a2: kvm_vcpu_arch, don't touch it until 'ertn'
-+ * t0, t1: temp register
-+ */
-+.macro kvm_switch_to_guest
-+	/* set host excfg.VS=0, all exceptions share one exception entry */
-+	csrrd		t0, LOONGARCH_CSR_ECFG
-+	bstrins.w	t0, zero, CSR_ECFG_VS_SHIFT_END, CSR_ECFG_VS_SHIFT
-+	csrwr		t0, LOONGARCH_CSR_ECFG
++	  If unsure, say N.
 +
-+	/* Load up the new EENTRY */
-+	ld.d	t0, a2, KVM_ARCH_GEENTRY
-+	csrwr	t0, LOONGARCH_CSR_EENTRY
++endif # VIRTUALIZATION
+diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+new file mode 100644
+index 0000000000..77e9ba2b7a
+--- /dev/null
++++ b/arch/loongarch/kvm/Makefile
+@@ -0,0 +1,20 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for LoongArch KVM support
++#
 +
-+	/* Set Guest ERA */
-+	ld.d	t0, a2, KVM_ARCH_GPC
-+	csrwr	t0, LOONGARCH_CSR_ERA
++ccflags-y += -I $(srctree)/$(src)
 +
-+	/* Save host PGDL */
-+	csrrd	t0, LOONGARCH_CSR_PGDL
-+	st.d	t0, a2, KVM_ARCH_HPGD
++include $(srctree)/virt/kvm/Makefile.kvm
 +
-+	/* Switch to kvm */
-+	ld.d	t1, a2, KVM_VCPU_KVM - KVM_VCPU_ARCH
++obj-$(CONFIG_KVM) += kvm.o
 +
-+	/* Load guest PGDL */
-+	li.w    t0, KVM_GPGD
-+	ldx.d   t0, t1, t0
-+	csrwr	t0, LOONGARCH_CSR_PGDL
-+
-+	/* Mix GID and RID */
-+	csrrd		t1, LOONGARCH_CSR_GSTAT
-+	bstrpick.w	t1, t1, CSR_GSTAT_GID_SHIFT_END, CSR_GSTAT_GID_SHIFT
-+	csrrd		t0, LOONGARCH_CSR_GTLBC
-+	bstrins.w	t0, t1, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
-+	csrwr		t0, LOONGARCH_CSR_GTLBC
-+
-+	/*
-+	 * Switch to guest:
-+	 *  GSTAT.PGM = 1, ERRCTL.ISERR = 0, TLBRPRMD.ISTLBR = 0
-+	 *  ertn
-+	 */
-+
-+	/*
-+	 * Enable intr in root mode with future ertn so that host interrupt
-+	 * can be responsed during VM runs
-+	 * guest crmd comes from separate gcsr_CRMD register
-+	 */
-+	ori	t0, zero, CSR_PRMD_PIE
-+	csrxchg	t0, t0,   LOONGARCH_CSR_PRMD
-+
-+	/* Set PVM bit to setup ertn to guest context */
-+	ori	t0, zero, CSR_GSTAT_PVM
-+	csrxchg	t0, t0,   LOONGARCH_CSR_GSTAT
-+
-+	/* Load Guest gprs */
-+	kvm_restore_guest_gprs a2
-+	/* Load KVM_ARCH register */
-+	ld.d	a2, a2,	(KVM_ARCH_GGPR + 8 * REG_A2)
-+
-+	ertn
-+.endm
-+
-+	/*
-+	 * exception entry for general exception from guest mode
-+	 *  - IRQ is disabled
-+	 *  - kernel privilege in root mode
-+	 *  - page mode keep unchanged from previous prmd in root mode
-+	 *  - Fixme: tlb exception cannot happen since registers relative with TLB
-+	 *  -        is still in guest mode, such as pgd table/vmid registers etc,
-+	 *  -        will fix with hw page walk enabled in future
-+	 * load kvm_vcpu from reserved CSR KVM_VCPU_KS, and save a2 to KVM_TEMP_KS
-+	 */
-+	.text
-+	.cfi_sections	.debug_frame
-+SYM_CODE_START(kvm_vector_entry)
-+	csrwr	a2,   KVM_TEMP_KS
-+	csrrd	a2,   KVM_VCPU_KS
-+	addi.d	a2,   a2, KVM_VCPU_ARCH
-+
-+	/* After save gprs, free to use any gpr */
-+	kvm_save_guest_gprs a2
-+	/* Save guest a2 */
-+	csrrd	t0,	KVM_TEMP_KS
-+	st.d	t0,	a2,	(KVM_ARCH_GGPR + 8 * REG_A2)
-+
-+	/* a2: kvm_vcpu_arch, a1 is free to use */
-+	csrrd	s1,   KVM_VCPU_KS
-+	ld.d	s0,   s1, KVM_VCPU_RUN
-+
-+	csrrd	t0,   LOONGARCH_CSR_ESTAT
-+	st.d	t0,   a2, KVM_ARCH_HESTAT
-+	csrrd	t0,   LOONGARCH_CSR_ERA
-+	st.d	t0,   a2, KVM_ARCH_GPC
-+	csrrd	t0,   LOONGARCH_CSR_BADV
-+	st.d	t0,   a2, KVM_ARCH_HBADV
-+	csrrd	t0,   LOONGARCH_CSR_BADI
-+	st.d	t0,   a2, KVM_ARCH_HBADI
-+
-+	/* Restore host excfg.VS */
-+	csrrd	t0, LOONGARCH_CSR_ECFG
-+	ld.d	t1, a2, KVM_ARCH_HECFG
-+	or	t0, t0, t1
-+	csrwr	t0, LOONGARCH_CSR_ECFG
-+
-+	/* Restore host eentry */
-+	ld.d	t0, a2, KVM_ARCH_HEENTRY
-+	csrwr	t0, LOONGARCH_CSR_EENTRY
-+
-+	/* restore host pgd table */
-+	ld.d    t0, a2, KVM_ARCH_HPGD
-+	csrwr   t0, LOONGARCH_CSR_PGDL
-+
-+	/*
-+	 * Disable PGM bit to enter root mode by default with next ertn
-+	 */
-+	ori	t0, zero, CSR_GSTAT_PVM
-+	csrxchg	zero, t0, LOONGARCH_CSR_GSTAT
-+	/*
-+	 * Clear GTLBC.TGID field
-+	 *       0: for root  tlb update in future tlb instr
-+	 *  others: for guest tlb update like gpa to hpa in future tlb instr
-+	 */
-+	csrrd	t0, LOONGARCH_CSR_GTLBC
-+	bstrins.w	t0, zero, CSR_GTLBC_TGID_SHIFT_END, CSR_GTLBC_TGID_SHIFT
-+	csrwr	t0, LOONGARCH_CSR_GTLBC
-+	ld.d	tp, a2, KVM_ARCH_HTP
-+	ld.d	sp, a2, KVM_ARCH_HSP
-+	/* restore per cpu register */
-+	ld.d	u0, a2, KVM_ARCH_HPERCPU
-+	addi.d	sp, sp, -PT_SIZE
-+
-+	/* Prepare handle exception */
-+	or	a0, s0, zero
-+	or	a1, s1, zero
-+	ld.d	t8, a2, KVM_ARCH_HANDLE_EXIT
-+	jirl	ra, t8, 0
-+
-+	or	a2, s1, zero
-+	addi.d	a2, a2, KVM_VCPU_ARCH
-+
-+	/* resume host when ret <= 0 */
-+	bge	zero, a0, ret_to_host
-+
-+	/*
-+         * return to guest
-+         * save per cpu register again, maybe switched to another cpu
-+         */
-+	st.d	u0, a2, KVM_ARCH_HPERCPU
-+
-+	/* Save kvm_vcpu to kscratch */
-+	csrwr	s1, KVM_VCPU_KS
-+	kvm_switch_to_guest
-+
-+ret_to_host:
-+	ld.d    a2, a2, KVM_ARCH_HSP
-+	addi.d  a2, a2, -PT_SIZE
-+	kvm_restore_host_gpr    a2
-+	jr      ra
-+
-+SYM_INNER_LABEL(kvm_vector_entry_end, SYM_L_LOCAL)
-+SYM_CODE_END(kvm_vector_entry)
-+
-+/*
-+ * int kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu)
-+ *
-+ * @register_param:
-+ *  a0: kvm_run* run
-+ *  a1: kvm_vcpu* vcpu
-+ */
-+SYM_FUNC_START(kvm_enter_guest)
-+	/* allocate space in stack bottom */
-+	addi.d	a2, sp, -PT_SIZE
-+	/* save host gprs */
-+	kvm_save_host_gpr a2
-+
-+	/* save host crmd,prmd csr to stack */
-+	csrrd	a3, LOONGARCH_CSR_CRMD
-+	st.d	a3, a2, PT_CRMD
-+	csrrd	a3, LOONGARCH_CSR_PRMD
-+	st.d	a3, a2, PT_PRMD
-+
-+	addi.d	a2, a1, KVM_VCPU_ARCH
-+	st.d	sp, a2, KVM_ARCH_HSP
-+	st.d	tp, a2, KVM_ARCH_HTP
-+	/* Save per cpu register */
-+	st.d	u0, a2, KVM_ARCH_HPERCPU
-+
-+	/* Save kvm_vcpu to kscratch */
-+	csrwr	a1, KVM_VCPU_KS
-+	kvm_switch_to_guest
-+SYM_INNER_LABEL(kvm_enter_guest_end, SYM_L_LOCAL)
-+SYM_FUNC_END(kvm_enter_guest)
-+
-+SYM_FUNC_START(kvm_save_fpu)
-+	fpu_save_csr	a0 t1
-+	fpu_save_double a0 t1
-+	fpu_save_cc	a0 t1 t2
-+	jr              ra
-+SYM_FUNC_END(kvm_save_fpu)
-+
-+SYM_FUNC_START(kvm_restore_fpu)
-+	fpu_restore_double a0 t1
-+	fpu_restore_csr    a0 t1 t2
-+	fpu_restore_cc	   a0 t1 t2
-+	jr                 ra
-+SYM_FUNC_END(kvm_restore_fpu)
-+
-+	.section ".rodata"
-+SYM_DATA(kvm_vector_size, .quad kvm_vector_entry_end - kvm_vector_entry)
-+SYM_DATA(kvm_enter_guest_size, .quad kvm_enter_guest_end - kvm_enter_guest)
++kvm-y += exit.o
++kvm-y += interrupt.o
++kvm-y += main.o
++kvm-y += mmu.o
++kvm-y += switch.o
++kvm-y += timer.o
++kvm-y += tlb.o
++kvm-y += vcpu.o
++kvm-y += vm.o
 -- 
 2.39.1
 
