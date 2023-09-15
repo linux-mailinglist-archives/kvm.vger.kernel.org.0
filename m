@@ -2,136 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D89C7A29D5
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 23:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C67537A2A38
+	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 00:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236560AbjIOVyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 17:54:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49240 "EHLO
+        id S236560AbjIOWGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 18:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236926AbjIOVyT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 17:54:19 -0400
-Received: from out-222.mta0.migadu.com (out-222.mta0.migadu.com [91.218.175.222])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9058D139
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 14:54:12 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 21:54:05 +0000
+        with ESMTP id S229776AbjIOWFp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 18:05:45 -0400
+Received: from out-213.mta0.migadu.com (out-213.mta0.migadu.com [91.218.175.213])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D925E1FD0
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 15:05:40 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 22:05:34 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1694814850;
+        t=1694815539;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=IRK5mFLmf/ekVrKw/W6wumPqbLTXGlC7g336g390ZFg=;
-        b=HM4B49eRkbN+AztPqOtcIBPQC13taubkjpx98EkeUP/8Y+6/ptecJDrBvfnA/jQphRy9pj
-        2LFFJMqKbLJ6s3StvU6XlyXPsr0+lYYUqilCc/R79wnSGIeoyFR+griit9Y7i+qyOq48ee
-        oT5hUVuAEb96mZXronFcO5nwBXzvVHI=
+        bh=nyE4OiRbYG9EbFXNkk64LoCgnlBLw/RwLs8vt956zVY=;
+        b=oSwgRQ5loxpve75EPP8dm+vhouR6+tNUX66KK5FT98J82+qt9gRWQctoRoIkFKRse2n8Vc
+        +9ZxMKf8KFJp1GeIYS+9Bjv+oBd6ey8yy0ukBl6UOLHxx1WEwitOWOT5Ryg/t6by7GF7KN
+        jbbMjWvYSlGwFSZB2Hx8t98+ThlhVws=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
- PMCR_EL0.N for the guest
-Message-ID: <ZQTSffkkI1x5lWIG@linux.dev>
-References: <20230817003029.3073210-1-rananta@google.com>
- <20230817003029.3073210-9-rananta@google.com>
- <ZQTEN664F/5PzyId@linux.dev>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        zhukeqian1@huawei.com, jonathan.cameron@huawei.com,
+        linuxarm@huawei.com
+Subject: Re: [RFC PATCH v2 2/8] KVM: arm64: Add KVM_PGTABLE_WALK_HW_DBM for
+ HW DBM support
+Message-ID: <ZQTVLiFK2dGBd87v@linux.dev>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+ <20230825093528.1637-3-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZQTEN664F/5PzyId@linux.dev>
+In-Reply-To: <20230825093528.1637-3-shameerali.kolothum.thodi@huawei.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 08:53:16PM +0000, Oliver Upton wrote:
-> Hi Raghu,
-> 
-> On Thu, Aug 17, 2023 at 12:30:25AM +0000, Raghavendra Rao Ananta wrote:
-> > From: Reiji Watanabe <reijiw@google.com>
-> > 
-> > KVM does not yet support userspace modifying PMCR_EL0.N (With
-> > the previous patch, KVM ignores what is written by upserspace).
-> 
-> typo: userspace
-> 
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index ce7de6bbdc967..39ad56a71ad20 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-> >  	 * while the latter does not.
-> >  	 */
-> >  	kvm->arch.pmcr_n = arm_pmu->num_events - 1;
-> > +	kvm->arch.pmcr_n_limit = arm_pmu->num_events - 1;
-> 
-> Can't we just get at this through the arm_pmu instance rather than
-> copying it into kvm_arch?
-> 
-> >  	return 0;
-> >  }
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 2075901356c5b..c01d62afa7db4 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> >  	return 0;
-> >  }
-> >  
-> > +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> > +		    u64 val)
-> > +{
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	u64 new_n, mutable_mask;
-> > +	int ret = 0;
-> > +
-> > +	new_n = FIELD_GET(ARMV8_PMU_PMCR_N, val);
-> > +
-> > +	mutex_lock(&kvm->arch.config_lock);
-> > +	if (unlikely(new_n != kvm->arch.pmcr_n)) {
-> > +		/*
-> > +		 * The vCPU can't have more counters than the PMU
-> > +		 * hardware implements.
-> > +		 */
-> > +		if (new_n <= kvm->arch.pmcr_n_limit)
-> > +			kvm->arch.pmcr_n = new_n;
-> > +		else
-> > +			ret = -EINVAL;
-> > +	}
-> 
-> Hmm, I'm not so sure about returning an error here. ABI has it that
-> userspace can write any value to PMCR_EL0 successfully. Can we just
-> ignore writes that attempt to set PMCR_EL0.N to something higher than
-> supported by hardware? Our general stance should be that system register
-> fields responsible for feature identification are immutable after the VM
-> has started.
+Hi Shameer,
 
-I hacked up my reply and dropped some context; this doesn't read right.
-Shaoqin made the point about preventing changes to PMCR_EL0.N after the
-VM has started and I firmly agree. The behavior should be:
+On Fri, Aug 25, 2023 at 10:35:22AM +0100, Shameer Kolothum wrote:
+> KVM_PGTABLE_WALK_HW_DBM - Indicates page table walk is for HW DBM
+>  related updates.
+> 
+> No functional changes here. Only apply any HW DBM bit updates to last
+> level only. These will be used by a future commit where we will add
+> support for HW DBM.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  3 +++
+>  arch/arm64/kvm/hyp/pgtable.c         | 10 ++++++++++
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index d3e354bb8351..3f96bdd2086f 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -219,6 +219,8 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>   * @KVM_PGTABLE_WALK_SKIP_CMO:		Visit and update table entries
+>   *					without Cache maintenance
+>   *					operations required.
+> + * @KVM_PGTABLE_WALK_HW_DBM:		Indicates that the attribute update is
+> + *					HW DBM related.
+>   */
+>  enum kvm_pgtable_walk_flags {
+>  	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+> @@ -228,6 +230,7 @@ enum kvm_pgtable_walk_flags {
+>  	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
+>  	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
+>  	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
+> +	KVM_PGTABLE_WALK_HW_DBM			= BIT(7),
+>  };
 
- - Writes to PMCR always succeed
-
- - PMCR_EL0.N values greater than what's supported by hardware are
-   ignored
-
- - Changes to N after the VM has started are ignored.
+Rather than making this DBM specific, call it KVM_PGTABLE_WALK_FORCE_PTE
+and get rid of stage2_map_data::force_pte. Then it becomes immediately
+obvious what this flag implies.
 
 -- 
 Thanks,
