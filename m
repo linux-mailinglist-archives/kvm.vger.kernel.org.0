@@ -2,128 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 392507A21F5
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 17:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18EB47A22F9
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 17:54:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235980AbjIOPJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 11:09:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41874 "EHLO
+        id S236212AbjIOPyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 11:54:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236027AbjIOPJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 11:09:36 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B2630F8;
-        Fri, 15 Sep 2023 08:08:46 -0700 (PDT)
+        with ESMTP id S236199AbjIOPyO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 11:54:14 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5327E6D;
+        Fri, 15 Sep 2023 08:54:08 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Oi08XULtHYVFNm8qnmRumeTCkbEPhalbf9Nl3L4Ow42lRlNuzlx3Ia+QCMmmewj5zoWiDeZmsK6pU7finOgRRNtN1A4UWG3ht/w/lVBmMFBiSxg5Wuxlgi8c2qlCcHyS2nYibGZTS4zkyjRPZw919P+0KgCGMVp6axzAKSzCXn/q+eB3G5iNAmelU7l5nx227pQOAZKFYV9vdM4t8UfRH7C54m1qUA+pZ2FEENtnHEoxbBaz/qmfNargg9DhSG5qdWch+rJyzutaNOFHzCz+DyjtPMLQxEW5OgYJqr5+p50Lai5IBOe6sZ3NyYGsZwBDTlDq8feg+x1t5esKs5O7FA==
+ b=aQKT3tERVEqgp7+jeIk1hij4B8557Mq/lBhgvgZs0OH5+3b510b9Tfkd9vWCBhK/VU/oPl/PABLa1+jyQ2s2DxiJ/Droxo2PloLlcoi6RPZ4AasRaOy5YSK8OyEyQw4Gxtzmn89IdLjU2QXazdVde8ySyNCgfkqmunnISBaB6ZlQWhnt+dkpMMAYPn0edh35uKLFgMH91s9nQ/2PEy6nWoOLJijpu3bynj+yQ93QQOc5rcPiY4SpbmzZUiTsYyAwzvKD37f1wguH9Q0XegTsoc47U3Zl4WJHmmTbgltHzBgPFJuLbDgIK2mPc3SVmaxYROtBKgsjJpRVM4pTzwve7Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C57jSI/Css3VBFklk1lzdoGndFZVLMtIrsOaz4PD758=;
- b=OWEHlSjEYocbpbxpZ6fqzNwDqNi+OxSSywcOMyuqlxCfcIOeb6q5HPrRmwWxDoNfEGP3AjzrySfsoktef/bb75xtwrmXENXI9VX5OVq4AuuRkaC/s6aREhmmGA+8vextpNj49lRlgfE/cP1MKnOFN1ZEdI7L1OIxPUnlumDMXUnLZ1HKJTqsYOBIKVsPHLPI124vIzkLc3h3JEOYzRW4XIstSJfhb9nluWO/YeKMJHVTPJztseA2p9Qso3zTIHXKQg35AVf+YgoLBioSd8OM0oh1r0FK/1GergDdeSD/5I/h+kDHur3gxlgSt3Ad/cRQMEVnhfjEeWtW5qXoKbaGEQ==
+ bh=Ukvevd3zLEiGJTBaEs70vFMhmXKMPQWH2QjaYKtH778=;
+ b=nhjEsjCPcFp0ncLUEQCAktk9sYOBsizBSrtMhdhqWIWeVEe2uFdNo3UJkcfQfXMrCmngGCaboKYcZBhc0rj9YGSJ0N9ZW5iPHiuaJfnedf6sNY9v6tN4+kqq0p1MVbHlWlqga66BOGHj7Iu49Onyfyi2ZUX1/nd1iS5URN2AfxnYWWhc+u41sDonBnuJ+yEBSW953fVfwOZIWJSQvja9LsX89huI4PYVmTg0lGDrk3GIcrUj7q3vD5RGkIvPn93Fg1ch/ZgJ0JBnSsowKaJDi7b+JiuFZ2mT3M2mG/0GbEuRrNnbbxvZtSI1GSFRnMTSpcWc2FN/ABIanuAynCqP4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C57jSI/Css3VBFklk1lzdoGndFZVLMtIrsOaz4PD758=;
- b=jlHBr8avxmCWEd/TuI/oM7HcFfF7ByVG616BVh8+Y/UQuWb1A2CUw4E880AONWyg49YKe/Yl4whaDm3dFoAd5oIoD1p7ZTmW/d+O0lxrQCH97mmbHKXGWl60cBURCa96fDXFPtlxuMTlduTk92IJG1qxnzUdLX4I76Dk0n5O0ZY=
+ bh=Ukvevd3zLEiGJTBaEs70vFMhmXKMPQWH2QjaYKtH778=;
+ b=aU/RcjsRWuITPCDyeZR0ZYEZuK0tkrL17Q6JAJ0aM1nXAF1C0fbBMOVo5LwH8ZTWWhdT8fBzAq+H4Wsvhe4BB0pGtONE2IsWAWnjrT3T2CsLFTlFeWdeHj3pSFDwEV6+lvHjmek0dClZl5haTLSuNlD/j0Au1CbguEE+FF89shI=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5072.namprd12.prod.outlook.com (2603:10b6:5:38b::22) with
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by CH2PR12MB4088.namprd12.prod.outlook.com (2603:10b6:610:a5::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21; Fri, 15 Sep
- 2023 15:08:43 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6792.021; Fri, 15 Sep 2023
- 15:08:43 +0000
-Message-ID: <380463c9-30ee-ce7e-32ab-0ed91825bdaa@amd.com>
-Date:   Fri, 15 Sep 2023 10:08:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 2/2] KVM: SVM: Do not use user return MSR support for
- virtualized TSC_AUX
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Fri, 15 Sep
+ 2023 15:54:04 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%5]) with mapi id 15.20.6792.021; Fri, 15 Sep 2023
+ 15:54:04 +0000
+Message-ID: <011ad9da-1df9-3129-1f8d-543e8f598ee5@amd.com>
+Date:   Fri, 15 Sep 2023 08:54:01 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH vfio 3/3] pds/vfio: Fix possible sleep while in atomic
+ context
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Babu Moger <babu.moger@amd.com>
-References: <cover.1694721045.git.thomas.lendacky@amd.com>
- <025fd734d35acbbbbca74c4b3ed671a02d4af628.1694721045.git.thomas.lendacky@amd.com>
- <ZQRtpVjXTwjeJ5rI@google.com> <ZQRvjy/NQa3HcKsY@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <ZQRvjy/NQa3HcKsY@google.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Brett Creeley <brett.creeley@amd.com>
+Cc:     jgg@ziepe.ca, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        dan.carpenter@linaro.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shannon.nelson@amd.com
+References: <20230914191540.54946-1-brett.creeley@amd.com>
+ <20230914191540.54946-4-brett.creeley@amd.com>
+ <20230914163837.07607d8a.alex.williamson@redhat.com>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20230914163837.07607d8a.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR11CA0019.namprd11.prod.outlook.com
- (2603:10b6:806:6e::24) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+X-ClientProxiedBy: SJ0PR03CA0035.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e::10) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|DM4PR12MB5072:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4a08b102-2133-47d9-ba9f-08dbb5fda6e9
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|CH2PR12MB4088:EE_
+X-MS-Office365-Filtering-Correlation-Id: 559754b0-2388-44ae-6cf0-08dbb603fc83
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UQ1obqC6/RzVsfD0YBZJBEU0gnxso1Nh1LWiP71w/e+W2sTBOUmXn393dKKSdxHgabQJiqw7vBWhF1iZzS2aGXkWY5BZ2pbYVpXIly1+iNCrT5cugOUA7/pg70y8AerlvN39QxWnA70h0ug0wX7ez2uJRDMTJfrzkAAD2ahQSt01JclIp/oPwSR43YgkwcYTcSBx6RMilo71wk1U4IbBgckyd8z/zPQ4CyKCrBLZ8xXGYP1+HlM3j7+FsIKnNTkr+jr0gDVGhotiLYO33IZYQVFHEvH8j6wXFJ/8vEGi7zCTa0Jn0Kc1X/S6mk5kl9Dh6NRBXYDv8/Z84YrrOq3YEZ74gwqRvgtR3pmf1z+jLWqHqOeWyQ2g06stT4ju6qlvllSx96DClqJMSbDKFqGjSGl5gwzrqZobN9TgsPmICzGioKr0byrzV6Bawo9+m18wiJMplYKFRHMRFgx5Ej5I3wpfzUJKCWgqIiMNJ/eWKvjUynPqXkn3J4HwNA3JCGCk4pm2qONowRSTiuIumhbkjE5++Rkbx8Nepn5Qnn1xAypVaMBKrf7cAKWoMzv6iuUm+L2ZnL5tYPQ/DLcx+kOgvqPlvWtsyu0FFHgsEL8ONYfM6vAccPsEXnEQ4hk4205JJoRQES0eivTz1b+uPDugAQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(396003)(376002)(39860400002)(186009)(451199024)(1800799009)(26005)(41300700001)(6916009)(316002)(66476007)(54906003)(66946007)(66556008)(2906002)(478600001)(5660300002)(8936002)(4326008)(8676002)(31686004)(6486002)(6506007)(53546011)(6512007)(36756003)(2616005)(83380400001)(38100700002)(31696002)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: shkNxVcnYTIdtMPKkqIS2w3sWBqlhObAjf0RUvLXUV2TfKVTHI14IEdrgAalK8Ia9R9vuOKz4VTjWtTNZaKaDFp4RUfs5XqmBKTz7GRj387xoQkuzh2t9ZvkIH2qa9rBWIZ7S/WpFoLOIkGaINzMEAwIhVTBGZLxrlW37A87cPIvcRJPM2Om0SvAv6JbTbsZJhvorD3MBCW5lwBt396XZxF30jhCxg98WFKXF/MoE/4c0f2Ec/nKaGifZFEGkMfLZq2GSDxGJ4Oy23a/gQCFe02TGEK4lzl/xbzAzH+QN42vbNn4OJa5Fl4R6Ob3EK8vh80Vkwtpw1EYHblKQ/saVjR6tOQ4wh+H5dKYHmjtss7CdGp23aZVp236YK24VZwP7x+u77q4fz1RVf6eoCbYQYk59i8x9AsUZJOZuXU5onDPYQ4SGoJ1bcrDdPa6JRwc1V+HbSeW8nrTnm8jrV0sAO+z0YqU+g3lC+1IqKRNOSEGp2lhuxwig9XtIDIE38tZt2FOm1eeBFjez3KZjpk00c9xobcoTqAB5CZlmfLKhD/ac1UOw7dOfLKwfV9l2UbtzQnrXPNxe3lhH57u9b9SEPPFgHvgKfH0F3kvpNYpKARjSJE8dA3x9skg3hNGbbwtkablhhmdWeLPp+JXDZ7DmhnZdkStBCjRoLIWB55vOPN5sgkrODu3iGEeKqW5c+KN
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(396003)(39860400002)(366004)(186009)(1800799009)(451199024)(26005)(8936002)(8676002)(2616005)(4326008)(83380400001)(2906002)(36756003)(6486002)(6506007)(38100700002)(6666004)(53546011)(31696002)(966005)(5660300002)(31686004)(6512007)(41300700001)(66556008)(66476007)(110136005)(6636002)(66946007)(316002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aERlVWFWVFhxTnZCSThJZW16aUkxZ2Nkd3RpNFYvbHVXbnNQdmFqdmdWZit2?=
- =?utf-8?B?UTlUUWlvM0FFRC9KRk1rQWVrM2FQNzFSdTQ5cEZ2Q2Iwa0FMblJiVysrcGhj?=
- =?utf-8?B?UXczNUZZRVUxR2lGQ0pHV2x5Y3drNkQyUzBRY1YwcVhBVGdYNkhvamMzSFNE?=
- =?utf-8?B?dC9sc0JKaS9Gdk42UUxiRk02MDdKUkIyZTY4aTYwWDgxNkU3KzFGYStjYjky?=
- =?utf-8?B?cXpLWmNTa0FrU01vRFVENGh3dEpNa21VKzAvR0s0aFJNL0pDdkFCZldqeG50?=
- =?utf-8?B?VmJwYVBtdTY2RVNwL3NTQXV4ckVGMDE4ZnpPNDUyTEpYay9FRTF0K1FlUWVI?=
- =?utf-8?B?R0tUdjRHT0ZZZzFXTG9KZWlEZEVlQUVjQUJJYWZnSExVQmNzN2lUVHAxSlZk?=
- =?utf-8?B?aHFGVFlBWmlybWZ4aEVjRWJtMlAzY0x5RzNHbnJxRlZyUFhtSVIvdTNmSEpV?=
- =?utf-8?B?OVJuaUw4MXVzcHFldzdoOTZNUk1mRkJVTGVnUHJBOFF3KytDTG52Z1ZZMDg3?=
- =?utf-8?B?ZE1qUUFzdVR1TlAxV3pybzVmVVB2OXNEYkN4NitRTDI3Q204aWFnS053SWxX?=
- =?utf-8?B?aURzUmtTdnJoVFBZam5GTUkyQXFORUdxaXV4bFNLOEJ0WE8zTGg1ekpPdGhN?=
- =?utf-8?B?cjBTcmM2dkZKRjhxYjZZL2FMV2dSbVkxdzFHd0U0NWl3cFJ5Y0FjZU5oYUpT?=
- =?utf-8?B?L2c5VUFlYk9aR3FsQ1luNlZTRFRXTE9FZzFoaWZEbFJzb2ZEMmJ3TzhieENL?=
- =?utf-8?B?cmtjOVp5a3VNNE1PWXNEYTdBalBGV3pBUXV4SGYyM3QyZytWdmY5ZUtQZEFm?=
- =?utf-8?B?VHNHZmp5MHZKSWFQR1dyMlJRNHpJTG44QTVOTmZRV0NpS3VDblc1TktBL0or?=
- =?utf-8?B?NDR1ZTZHbFRVbVJxSStoMUxDbHNnRWNPZzZTVlVhVHNlVVNhU3haalJDcG12?=
- =?utf-8?B?K0s1ak9pb01rQ2ZabXdYYlRRT1JUWWNKOU1aV1JOQWU0REpDbDBHQS9ROG5N?=
- =?utf-8?B?WUNuRDgrdW9WRFBJOUJLRGJINEtSUDRKcjlyRWcwVUlITWNobEY1SEpFdVlX?=
- =?utf-8?B?aHBCamRmeTAvem1zTzhhYUM4anNJdkNzTjU4c1VMSElIS3J4eFZiZ2R0TzA2?=
- =?utf-8?B?eUNrWFM1ZmpDRjRYREtQalNxOW1IalpiR2VGSEd6WjBmTGdZQkF6cTQ1OXJM?=
- =?utf-8?B?UENJY0xnUXlHU3BwTGxWWHVZbVJMbDUvOXpJaXVpd2hHd3BZakNrZ3hCNTdV?=
- =?utf-8?B?ay9ZU1M1d0FhbTNCcCtpNEUvQWtwenJCa1h0WGlYekhFd3cvSitBR0I1eXph?=
- =?utf-8?B?Ni8xUm82T2hkdjAxbGxHMDlVaHdkaURyUHcrNDhIWWxzdzZ2anpxTVg3elNh?=
- =?utf-8?B?MHJkOGc1RUsxUkZwK2JoQ2pLbzBLMFpGMTE2UlJiVHpUZkJoelduSVVOaG5i?=
- =?utf-8?B?T1U2Q2JsWTM1QXZkTmlRYy9ibnB3ZUVzckRkejVTNWg3S01iMkl1NzhWOGh5?=
- =?utf-8?B?bDJSREVwUXBXeWpoalY0cmdlaVpEd3dVcTgxUHpUMVhOQjR3MGZURFh2b2g3?=
- =?utf-8?B?cDFFV1hUVGtUa1ZPL1FvNkFMcDc5Z1pMRlVpTjFqSzFJU1J5TFJPMFVORlhw?=
- =?utf-8?B?TGZ4N3U5WXI3REpsYS85Rk1aZWRQWnBxeHpIa085R0NMMkwxWkF6emxleFlh?=
- =?utf-8?B?NnYwZFNObUZTcDlxRmJ6WGdhL1FkeVJKM3EzSlV4OEZpUFhyeVFmK0VCa0du?=
- =?utf-8?B?OFF4NlhwdHZtblBiVWFqRUxFU0Z5aUFCTnMzZTY1MVMwUUF4ODg4TlliRHpv?=
- =?utf-8?B?WnNOOVJaSCtEWXdoelBzUFIxaVVJVkZPYXdaalNPUExvV29jYndQa2tWSEJm?=
- =?utf-8?B?emRlVXpXL1NRRjVVa1hZbHo3MjhEQUFBN2tmT2dqalQ4V1gyc2gySzMvSzNk?=
- =?utf-8?B?em92SjUxYWg3NHpCd21tUDc5YnhQbzdGS2VYd25iVi9qbUthSFdqakJrMTF2?=
- =?utf-8?B?MkVrcHhTNjEwb1VxTzZOdWlCOFpSZnRXS3VOMGdXbmdMYjh1aHk2NDk1NDln?=
- =?utf-8?B?MDZ2QW1heFVEa1l6NVdzeDh3TzBsd04xQ3d3OEQxS2VIei9xcEJUdFJoVTFS?=
- =?utf-8?Q?sEQD/gEBiBLLq9q2HogJPhi/9?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d0dUMlhXK2hiWFZXU00ycDQ1RlpUTU9WcFU5eHJKS0p1ZEJUUUlkdzFMeGxv?=
+ =?utf-8?B?Y251SEpiNm44Y3dkN2FFYUtTRDVrNElpaEU5cUE2QzZkc3l4cmpyZnpBZ3Zy?=
+ =?utf-8?B?bWV3YXNPaWZ5RjZmTHQ3THpOQ0Vkc3JCeFZEcElKdnplZXN0M2tuTGVjRGVR?=
+ =?utf-8?B?d05FU1FRUHdOWER1Q25OWlZuRkRuT0YvT0VLbVYrOXZSTUV4OHY0ak56cUZQ?=
+ =?utf-8?B?Y2tUR0I3aWhzR1EyT1pyeTk3UTN5TmgveFF2d3FGRlJ3TEZnZUoxMm5VdTJs?=
+ =?utf-8?B?OGVWdEQ2TFFuVUY5eVFyd2M2VC9UcEp2UnMxajNRb2VuUXFNWEt4ZEIzK0Np?=
+ =?utf-8?B?WEYvcnhQUVlWd2ErUkFyWDUxbGZ4MTgvWGMySWN4R0IxRHBHR21odmNTNHB2?=
+ =?utf-8?B?Q09zL2VRbjVDZE1GaFRlREhvcGFKTTIzUlRBbzkzUGxZZ3BjMFhYU0FjR3dD?=
+ =?utf-8?B?ZXVCbUgrWjNRR01jbWxTZm45bnY3V3cxWk9WYVR4RWtvWlY1cVF6cmY5LzRk?=
+ =?utf-8?B?MWZFUVlHVC9jQkpkcTN6dDZReGFLSXVLb3ozSnZ6U0N6dDlmTXlvVW1XanFT?=
+ =?utf-8?B?UWtFRm9vZlJIMHFtaTFSZFF4amllakgwdzlwQlFpUHJQa3d2ZEk2T0txZ1U2?=
+ =?utf-8?B?bEt3SjFsMUpGN1Vabm14Q0VhUWdjYVNsV0d0UE5vSkxQUVJueVFORlNTMVBX?=
+ =?utf-8?B?NzgveUNSTlZERGhaa1dhaHhQNG1wYkFQSitaTWFUQ2xGeVlnQURnaGFXRlFX?=
+ =?utf-8?B?R2M2LzFvVXZoUHg0ODlLSm50TFBjbFdnUGZySEcxT01EY29QWVQ1L1llaThy?=
+ =?utf-8?B?Y3U2RFZRVWl6azdsOElsckQzUkNkYVJhVWFJcllzWURHRmRGTExRK2ZWQXZ0?=
+ =?utf-8?B?b21qTzl4L2JpOWU4dzdJNVArK0NGNVg5OFBlb1Nta0xSMG1sUm9XeFY5c2d2?=
+ =?utf-8?B?M0pjMEhjSzNReWVJNVU0eVptZG81UHBrQkZSSGNLVXRxajRqSmpRcFRRUVVB?=
+ =?utf-8?B?TmZDRm1TVFJrcy9tQUhOVkMzUGtOYXR2cmg2UDV0OVJsT056Y0VMYVpma2FF?=
+ =?utf-8?B?R1RldnhMQmRwekdlSmY1c2dNdVk3dmlyTTRMbHNDOUh1RHZaYXFJSVlxS3RT?=
+ =?utf-8?B?TlZEUERjSE83a28zcjlHNkZKQWlWTCtCWDE1bmppU2phTVZGa0lucU5RcFFT?=
+ =?utf-8?B?bkpacmFMS3pEZTF2dC9RRjhzTmp6a1NyVytvL0s5Wk5UVitwK0tpajUrVGJR?=
+ =?utf-8?B?dFlZY21JUFNrNTN1ZklrWi9qSi85MmtrL055VmlMMXVmcHhHbEx6SldIaHJM?=
+ =?utf-8?B?dWxOOTI3cnZKOXZpN2xOd2ZxTkQrTzN4ZytINGVWS2Zwek51V2lVK2N4OGN2?=
+ =?utf-8?B?UXFicExHckhXSUVYeXprNHhDVjhaL0wwbXF1VG1GbWNxUmNFbE9iQndzZi96?=
+ =?utf-8?B?N1htMkhKQ0JtYmZVYlhqLzZpNUQwYW1YSGQ2TGdZbW5iYmFUNVVhaHR0VXVo?=
+ =?utf-8?B?SjJubmFkYlhydk05YTUwSEV5cTBIWjlhbnVFLy9CWXZLZDJQaFJrdEsveXJN?=
+ =?utf-8?B?SnNXU1h5TjFjVVNYZVBndlRDTzkydzlOSDc0M1ZiU2dZSVRROE5LMjIxMGFI?=
+ =?utf-8?B?TEREUFB0VkgxeTZvdlR2OWlQeG1lTlZPVWhjSUdTTFMrMW9PNHNBa3MycFFt?=
+ =?utf-8?B?WDVTY2w3VmdCWmFiT2xMeFNSSktMNHlFeWRYdkQxTXEvSHFxU2drQmlRTTY3?=
+ =?utf-8?B?NVNQQ3VXcWloVDZBQy9wdHd4V3NtOHhCck9BbmZ6czJiWks3aGcwTG5Wd0VC?=
+ =?utf-8?B?YUFlVjB0MkEySzBvOVAxYVpJUm5Wdmg2KzBkanRHc0FxcmlhM0pLb2lVY003?=
+ =?utf-8?B?b0k0OVZmQ1BDUUl1NEtUY2g5SnFPWEt6b2hHeU9oenJSOWdrQTUvQUd4dVpS?=
+ =?utf-8?B?WUVwak1CdmpqeUROT2p2NVlCclA1UjJsTlVFVGJ6aFN5dWEvaStBT2lZbmlJ?=
+ =?utf-8?B?ZHArLzlxck1wL1psNDhiUEZaQnNCTU11THVVL21lb2N1djVsK0w3b3dWd1p0?=
+ =?utf-8?B?Y0VjS2tEMmNzangvQ1I2NVE5M0JrWDhkQmtTdDlBalJ4OWNmcUhUVjlhRUFX?=
+ =?utf-8?Q?F5zDDDDANrRf97c5TFxIvFuvf?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a08b102-2133-47d9-ba9f-08dbb5fda6e9
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 559754b0-2388-44ae-6cf0-08dbb603fc83
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 15:08:43.7366
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 15:54:04.1929
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xhPr5wxndXvUWkEplTKlAH/2TllohQxeqG59CDSI5pRCOWsmi1yeCwy+pb+StTk9ochoO5aEFc2Brj+IzYSUQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5072
+X-MS-Exchange-CrossTenant-UserPrincipalName: sB5StMSyOuR9sAXRaKUClsT0Qo5RDCG7HdL5Bly8iYWH4vn++dw6qzZ6Q9fw0v8qzWgQW8jqMCLOxmHIvU/T9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4088
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -131,80 +129,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/15/23 09:51, Sean Christopherson wrote:
-> On Fri, Sep 15, 2023, Sean Christopherson wrote:
->> On Thu, Sep 14, 2023, Tom Lendacky wrote:
->>> When the TSC_AUX MSR is virtualized, the TSC_AUX value is swap type "B"
->>> within the VMSA. This means that the guest value is loaded on VMRUN and
->>> the host value is restored from the host save area on #VMEXIT.
->>>
->>> Since the value is restored on #VMEXIT, the KVM user return MSR support
->>> for TSC_AUX can be replaced by populating the host save area with current
->>> host value of TSC_AUX. This replaces two WRMSR instructions with a single
->>> RDMSR instruction.
->>>
->>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->>> ---
->>>   arch/x86/kvm/svm/sev.c | 14 +++++++++++++-
->>>   arch/x86/kvm/svm/svm.c | 26 ++++++++++++++++----------
->>>   arch/x86/kvm/svm/svm.h |  4 +++-
->>>   3 files changed, 32 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>> index 565c9de87c6d..1bbaae2fed96 100644
->>> --- a/arch/x86/kvm/svm/sev.c
->>> +++ b/arch/x86/kvm/svm/sev.c
->>> @@ -2969,6 +2969,7 @@ static void sev_es_init_vmcb_after_set_cpuid(struct vcpu_svm *svm)
->>>   	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX) &&
->>>   	    (guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
->>>   	     guest_cpuid_has(vcpu, X86_FEATURE_RDPID))) {
->>> +		svm->v_tsc_aux = true;
->>>   		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, 1, 1);
->>>   		if (guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->>>   			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
->>> @@ -3071,8 +3072,10 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
->>>   					    sev_enc_bit));
->>>   }
->>>   
->>> -void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
->>> +void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_area *hostsa)
->>>   {
->>> +	u32 msr_hi;
->>> +
->>>   	/*
->>>   	 * All host state for SEV-ES guests is categorized into three swap types
->>>   	 * based on how it is handled by hardware during a world switch:
->>> @@ -3109,6 +3112,15 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
->>>   		hostsa->dr2_addr_mask = amd_get_dr_addr_mask(2);
->>>   		hostsa->dr3_addr_mask = amd_get_dr_addr_mask(3);
->>>   	}
->>> +
->>> +	/*
->>> +	 * If TSC_AUX virtualization is enabled, MSR_TSC_AUX is loaded but NOT
->>> +	 * saved by the CPU (Type-B). If TSC_AUX is not virtualized, the user
->>> +	 * return MSR support takes care of restoring MSR_TSC_AUX. This
->>> +	 * exchanges two WRMSRs for one RDMSR.
->>> +	 */
->>> +	if (svm->v_tsc_aux)
->>> +		rdmsr(MSR_TSC_AUX, hostsa->tsc_aux, msr_hi);
->>
->> IIUC, when V_TSC_AUX is supported, SEV-ES guests context switch MSR_TSC_AUX
->> regardless of what has been exposed to the guest.  So rather than condition the
->> hostsa->tsc_aux update on guest CPUID, just do it if V_TSC_AUX is supported.
->>
->> And then to avoid the RDMSR, which is presumably the motivation for checking
->> guest CPUID, grab the host value from user return framework.  The host values
->> are per-CPU, but constant after boot, so the only requirement is that KVM sets
->> up MSR_TSC_AUX in the user return framework.
+On 9/14/2023 3:38 PM, Alex Williamson wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Actually, duh.  The save area is also per-CPU, so just fill hostsa->tsc_aux in
-> svm_hardware_setup() and then sev_es_prepare_switch_to_guest() never has to do
-> anything.
+> 
+> On Thu, 14 Sep 2023 12:15:40 -0700
+> Brett Creeley <brett.creeley@amd.com> wrote:
+> 
+>> The driver could possibly sleep while in atomic context resulting
+>> in the following call trace while CONFIG_DEBUG_ATOMIC_SLEEP=y is
+>> set:
+>>
+>> [  227.229806] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:283
+>> [  227.229818] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 2817, name: bash
+>> [  227.229824] preempt_count: 1, expected: 0
+>> [  227.229827] RCU nest depth: 0, expected: 0
+>> [  227.229832] CPU: 5 PID: 2817 Comm: bash Tainted: G S         OE      6.6.0-rc1-next-20230911 #1
+>> [  227.229839] Hardware name: HPE ProLiant DL360 Gen10/ProLiant DL360 Gen10, BIOS U32 01/23/2021
+>> [  227.229843] Call Trace:
+>> [  227.229848]  <TASK>
+>> [  227.229853]  dump_stack_lvl+0x36/0x50
+>> [  227.229865]  __might_resched+0x123/0x170
+>> [  227.229877]  mutex_lock+0x1e/0x50
+>> [  227.229891]  pds_vfio_put_lm_file+0x1e/0xa0 [pds_vfio_pci]
+>> [  227.229909]  pds_vfio_put_save_file+0x19/0x30 [pds_vfio_pci]
+>> [  227.229923]  pds_vfio_state_mutex_unlock+0x2e/0x80 [pds_vfio_pci]
+>> [  227.229937]  pci_reset_function+0x4b/0x70
+>> [  227.229948]  reset_store+0x5b/0xa0
+>> [  227.229959]  kernfs_fop_write_iter+0x137/0x1d0
+>> [  227.229972]  vfs_write+0x2de/0x410
+>> [  227.229986]  ksys_write+0x5d/0xd0
+>> [  227.229996]  do_syscall_64+0x3b/0x90
+>> [  227.230004]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>> [  227.230017] RIP: 0033:0x7fb202b1fa28
+>> [  227.230023] Code: 89 02 48 c7 c0 ff ff ff ff eb b3 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 8d 05 15 4d 2a 00 8b 00 85 c0 75 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 41 54 49 89 d4 55
+>> [  227.230028] RSP: 002b:00007fff6915fbd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+>> [  227.230036] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007fb202b1fa28
+>> [  227.230040] RDX: 0000000000000002 RSI: 000055f3834d5aa0 RDI: 0000000000000001
+>> [  227.230044] RBP: 000055f3834d5aa0 R08: 000000000000000a R09: 00007fb202b7fae0
+>> [  227.230047] R10: 000000000000000a R11: 0000000000000246 R12: 00007fb202dc06e0
+>> [  227.230050] R13: 0000000000000002 R14: 00007fb202dbb860 R15: 0000000000000002
+>> [  227.230056]  </TASK>
+>>
+>> This can happen if pds_vfio_put_restore_file() and/or
+>> pds_vfio_put_save_file() grab the mutex_lock(&lm_file->lock)
+>> while the spin_lock(&pds_vfio->reset_lock) is held, which can
+>> happen during while calling pds_vfio_state_mutex_unlock().
+>>
+>> Fix this by releasing the spin_unlock(&pds_vfio->reset_lock) before
+>> calling pds_vfio_put_restore_file() and pds_vfio_put_save_file() and
+>> re-acquiring spin_lock(&pds_vfio->reset_lock) after the previously
+>> mentioned functions are called to protect setting the subsequent
+>> state/deferred reset settings.
+>>
+>> The only possible concerns are other threads that may call
+>> pds_vfio_put_restore_file() and/or pds_vfio_put_save_file(). However,
+>> those paths are already protected by the state mutex_lock().
+> 
+> Is there another viable solution to change reset_lock to a mutex?
+> 
+> I think this is the origin of this algorithm:
+> 
+> https://lore.kernel.org/all/20211019191025.GA4072278@nvidia.com/
+> 
+> But it's not clear to me why Jason chose an example with a spinlock and
+> if some subtlety here requires it.  Thanks,
+> 
+> Alex
 
-Ah, right, because Linux never changes TSC_AUX post boot. Much simpler.
-
-I'll rework based on the comments and send a v2 series.
+It would be good to get some feedback from Jason on this before thinking 
+about a different solution.
 
 Thanks,
-Tom
 
+Brett
+
+> 
+>> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+>> Closes: https://lore.kernel.org/kvm/1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain/
+>> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+>> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+>> ---
+>>   drivers/vfio/pci/pds/vfio_dev.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+>> index 9db5f2c8f1ea..6e664cb05dd1 100644
+>> --- a/drivers/vfio/pci/pds/vfio_dev.c
+>> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+>> @@ -33,8 +33,10 @@ void pds_vfio_state_mutex_unlock(struct pds_vfio_pci_device *pds_vfio)
+>>        if (pds_vfio->deferred_reset) {
+>>                pds_vfio->deferred_reset = false;
+>>                if (pds_vfio->state == VFIO_DEVICE_STATE_ERROR) {
+>> +                     spin_unlock(&pds_vfio->reset_lock);
+>>                        pds_vfio_put_restore_file(pds_vfio);
+>>                        pds_vfio_put_save_file(pds_vfio);
+>> +                     spin_lock(&pds_vfio->reset_lock);
+>>                        pds_vfio_dirty_disable(pds_vfio, false);
+>>                }
+>>                pds_vfio->state = pds_vfio->deferred_reset_state;
+> 
