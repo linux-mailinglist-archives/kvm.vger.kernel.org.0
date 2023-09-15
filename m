@@ -2,218 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 706867A279F
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 22:07:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D6327A282C
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 22:34:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236780AbjIOUGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 16:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53972 "EHLO
+        id S237290AbjIOUeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 16:34:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237183AbjIOUGV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 16:06:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 59287272A
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 13:05:03 -0700 (PDT)
+        with ESMTP id S237410AbjIOUeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 16:34:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04EF82721
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 13:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694808302;
+        s=mimecast20190719; t=1694809985;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7NfUcQ09mB7dsUpfhcIFawf5HcTW8vmdNnitXI7u8bM=;
-        b=PPTPLSC8u4Z9AZdKX188RcDT3DmA3lATsZ9vTxmRlpVah2hRfUGrbAZetQItbmFRT8Exlf
-        ulblrfZeUU55kK6JQMsp1LMogLDGGt4ZHoglTWtkn9xzyXmDOve0Ar5+37M15/MS+iIisx
-        m6U93JiQhQKkISLLK1RrwpTe1cliaQs=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WrVjZ7kgC4jcFpjJhN66OHF12lqiZOVlHb3znhdjkek=;
+        b=Bmy8n6yBFrSIg9KcCVOV1sfrTKJqte4EFS0iICDWpe3etF7BOiSXhUBfnC0AwFSvylQ/9w
+        yLaJ1EAhu9Ajw6GPerM0eaZEiIBxNaA7oH7bzWdQuUfM+uz/hfWjwq6w/CidrCBrU94IVB
+        JVOsv5SEXigo8cGYagUy6PB/4f10GGE=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-ndYxBt6aOx-p3VFlZK7urg-1; Fri, 15 Sep 2023 16:05:01 -0400
-X-MC-Unique: ndYxBt6aOx-p3VFlZK7urg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-786a6443490so239410039f.0
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 13:05:01 -0700 (PDT)
+ us-mta-595-nqR01wBnPYiEwwdyP_14-Q-1; Fri, 15 Sep 2023 16:33:03 -0400
+X-MC-Unique: nqR01wBnPYiEwwdyP_14-Q-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-573411a9ad6so3566002eaf.0
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 13:33:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694808300; x=1695413100;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7NfUcQ09mB7dsUpfhcIFawf5HcTW8vmdNnitXI7u8bM=;
-        b=So5Ph1771Ezlj2ClfIfTqPh5YzgbHxooY+B/j6HZT3Z7n62jMQmUYCKcpAriJtusRb
-         Qo/YxncskJSRmJDbhSFHcUBPDCZF6ILk2ueILURYLE3k4p/nBX8c2+lp8Q5WM9Cheg22
-         p0vVaY+5Un613UANxjltE8Iddz6Rsaj4P62q3PqIpYiUAjHiIjJX+kXxT41xw16Sc/LM
-         wmVhgViWBEo7ZJN4O46ANWtwYcwZiEhUxByLJW0iQ11M30OrD09NQH9CL/bw9+7eZFcV
-         r2tLbQXZYU9JSj+zzbpU3kkrW5tQ3pl81qI9ypAE5ZNhwPu8KgZbDuKkKxpTxG3ObRlD
-         s4hQ==
-X-Gm-Message-State: AOJu0YyF7TBMvZuMcJMeWkq2esOyehIiB+XhI429whEgfL+V8yRCtY8E
-        qLkqEWzm9L3K49W5yg5WUGcnSJuyTImHIY1oaTU1LztVc+9hRcVFmT/Cx4dfpzgvg7FdM8VxgtZ
-        egAPdg6jwQrcHBZj0PWJ+
-X-Received: by 2002:a5e:d60f:0:b0:786:ca40:cc88 with SMTP id w15-20020a5ed60f000000b00786ca40cc88mr2412921iom.11.1694808300564;
-        Fri, 15 Sep 2023 13:05:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG79Z55l7FWxwdyALDEtiQh1NRLDz1G37ohGh9uUvII18nmS6T558Af+KIpjkgLftQaXJ32DQ==
-X-Received: by 2002:a5e:d60f:0:b0:786:ca40:cc88 with SMTP id w15-20020a5ed60f000000b00786ca40cc88mr2412906iom.11.1694808300220;
-        Fri, 15 Sep 2023 13:05:00 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id j3-20020a02cc63000000b0042b320c13aasm1290128jaq.89.2023.09.15.13.04.59
+        d=1e100.net; s=20230601; t=1694809983; x=1695414783;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WrVjZ7kgC4jcFpjJhN66OHF12lqiZOVlHb3znhdjkek=;
+        b=fffLlZUwMjuErh+bxIWob2zMyfL9nEhtw5VoQvOqUCtHgKkyI5wchTZuQUkGNpCzQk
+         sD3HkpfrM6zT5m08LBxKh5r3iD/Bhl/DFs/o7/y3Ieb8AALjtj4tIpMacC+DVVwk0T27
+         SVpLKzvOYlmS1gGabm45xudcQr36xtakR7sbblGF7TkO/vv/UJ47ePnBPS6fedWeGuYX
+         8LtuDg9NMZkMueMIbXo3z0HQQ5vreQa6XtIK8WCB6ABD9HwNcvAsYxajD/YztK+5sJww
+         0tnb1jF68q4jJvRDODYRoDrqiaOmuqtp3LhpCNayf1V7qqliyE+VjuBkFoPRkMtaRhx+
+         DyJg==
+X-Gm-Message-State: AOJu0YzqUhsV9SYnnYuMUXR1ZzxUJdR6XnbWDp0WE0Xa0iLHi4ncH+oz
+        Pje7Y2IsT1+RdjbOdbKYQkxdciXu9mVsR8j0/GmjdDHZqCEYMtxOuC/n9lJOVeP+FjxPZRUbnhr
+        nK6OghDiIuOQ0
+X-Received: by 2002:a05:6820:288:b0:571:28d5:2c78 with SMTP id q8-20020a056820028800b0057128d52c78mr3082797ood.4.1694809982781;
+        Fri, 15 Sep 2023 13:33:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwxF2PNP32An2sFg0rqEJUH0BvQzKLEJn+zbHJmo4XuW0EFunfLplYJcbkoEVl93ib63Hqtw==
+X-Received: by 2002:a05:6820:288:b0:571:28d5:2c78 with SMTP id q8-20020a056820028800b0057128d52c78mr3082766ood.4.1694809982501;
+        Fri, 15 Sep 2023 13:33:02 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:677d:42e9:f426:9422:f020])
+        by smtp.gmail.com with ESMTPSA id e8-20020a4a5508000000b00573a3e283e1sm2172349oob.39.2023.09.15.13.32.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 13:04:59 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 14:04:58 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     kvm@vger.kernel.org, David Laight <David.Laight@ACULAB.COM>,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 2/3] vfio: use __aligned_u64 in struct
- vfio_device_gfx_plane_info
-Message-ID: <20230915140458.392e436a.alex.williamson@redhat.com>
-In-Reply-To: <20230829182720.331083-3-stefanha@redhat.com>
-References: <20230829182720.331083-1-stefanha@redhat.com>
-        <20230829182720.331083-3-stefanha@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Fri, 15 Sep 2023 13:33:02 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 17:32:51 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
+        wuwei2016@iscas.ac.cn, linux-arch@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <ZQS_cw2m3AtnkJxp@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <20230914-1ce4f391a14e56b456d88188@orel>
+ <ZQQUQjOaAIc95GXP@redhat.com>
+ <20230915-85238ac7734cf543bff3ddad@orel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915-85238ac7734cf543bff3ddad@orel>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Aug 2023 14:27:19 -0400
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-
-> The memory layout of struct vfio_device_gfx_plane_info is
-> architecture-dependent due to a u64 field and a struct size that is not
-> a multiple of 8 bytes:
-> - On x86_64 the struct size is padded to a multiple of 8 bytes.
-> - On x32 the struct size is only a multiple of 4 bytes, not 8.
-> - Other architectures may vary.
+On Fri, Sep 15, 2023 at 01:07:40PM +0200, Andrew Jones wrote:
+> On Fri, Sep 15, 2023 at 05:22:26AM -0300, Leonardo Bras wrote:
+> > On Thu, Sep 14, 2023 at 03:47:59PM +0200, Andrew Jones wrote:
+> > > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > > > From: Guo Ren <guoren@linux.alibaba.com>
+> ...
+> > > > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
+> > > > index 6960beb75f32..dc590d331894 100644
+> > > > --- a/arch/riscv/include/asm/insn-def.h
+> > > > +++ b/arch/riscv/include/asm/insn-def.h
+> > > > @@ -134,6 +134,7 @@
+> > > >  
+> > > >  #define RV_OPCODE_MISC_MEM	RV_OPCODE(15)
+> > > >  #define RV_OPCODE_SYSTEM	RV_OPCODE(115)
+> > > > +#define RV_OPCODE_PREFETCH	RV_OPCODE(19)
+> > > 
+> > > This should be named RV_OPCODE_OP_IMM and be placed in
+> > > numerical order with the others, i.e. above SYSTEM.
+> > > 
+> > > >  
+> > > >  #define HFENCE_VVMA(vaddr, asid)				\
+> > > >  	INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),		\
+> > > > @@ -196,4 +197,8 @@
+> > > >  	INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),		\
+> > > >  	       RS1(base), SIMM12(4))
+> > > >  
+> > > > +#define CBO_prefetchw(base)					\
+> > > 
+> > > Please name this 'PREFETCH_w' and it should take an immediate parameter,
+> > > even if we intend to pass 0 for it.
+> > 
+> > It makes sense.
+> > 
+> > The mnemonic in the previously mentioned documentation is:
+> > 
+> > prefetch.w offset(base)
+> > 
+> > So yeah, makes sense to have both offset and base as parameters for 
+> > CBO_prefetchw (or PREFETCH_w, I have no strong preference).
 > 
-> Use __aligned_u64 to make memory layout consistent. This reduces the
-> chance of 32-bit userspace on a 64-bit kernel breakage.
+> I have a strong preference :-)
 > 
-> This patch increases the struct size on x32 but this is safe because of
-> the struct's argsz field. The kernel may grow the struct as long as it
-> still supports smaller argsz values from userspace (e.g. applications
-> compiled against older kernel headers).
+> PREFETCH_w is consistent with the naming we already have for e.g.
+> cbo.clean, which is CBO_clean. The instruction we're picking a name
+> for now is prefetch.w, not cbo.prefetchw.
 > 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  include/uapi/linux/vfio.h        | 3 ++-
->  drivers/gpu/drm/i915/gvt/kvmgt.c | 4 +++-
->  samples/vfio-mdev/mbochs.c       | 6 ++++--
->  samples/vfio-mdev/mdpy.c         | 4 +++-
->  4 files changed, 12 insertions(+), 5 deletions(-)
+> > 
+> > > 
+> > > > +	INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),		\
+> > > > +	       RD(x0), RS1(base), RS2(x0))
+> > > 
+> > > prefetch.w is not an R-type instruction, it's an S-type. While the bit
+> > > shifts are the same, the names are different. We need to add S-type
+> > > names while defining this instruction. 
+> > 
+> > That is correct, it is supposed to look like a store instruction (S-type), 
+> > even though documentation don't explicitly state that.
+> > 
+> > Even though it works fine with the R-type definition, code documentation 
+> > would be wrong, and future changes could break it.
+> > 
+> > > Then, this define would be
+> > > 
+> > >  #define PREFETCH_w(base, imm) \
 > 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 94007ca348ed..777374dd7725 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -816,7 +816,7 @@ struct vfio_device_gfx_plane_info {
->  	__u32 drm_plane_type;	/* type of plane: DRM_PLANE_TYPE_* */
->  	/* out */
->  	__u32 drm_format;	/* drm format of plane */
-> -	__u64 drm_format_mod;   /* tiled mode */
-> +	__aligned_u64 drm_format_mod;   /* tiled mode */
->  	__u32 width;	/* width of plane */
->  	__u32 height;	/* height of plane */
->  	__u32 stride;	/* stride of plane */
-> @@ -829,6 +829,7 @@ struct vfio_device_gfx_plane_info {
->  		__u32 region_index;	/* region index */
->  		__u32 dmabuf_id;	/* dma-buf id */
->  	};
-> +	__u32 reserved;
->  };
->  
->  #define VFIO_DEVICE_QUERY_GFX_PLANE _IO(VFIO_TYPE, VFIO_BASE + 14)
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> index 9cd9e9da60dd..813cfef23453 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -1382,7 +1382,7 @@ static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
->  		intel_gvt_reset_vgpu(vgpu);
->  		return 0;
->  	} else if (cmd == VFIO_DEVICE_QUERY_GFX_PLANE) {
-> -		struct vfio_device_gfx_plane_info dmabuf;
-> +		struct vfio_device_gfx_plane_info dmabuf = {};
->  		int ret = 0;
->  
->  		minsz = offsetofend(struct vfio_device_gfx_plane_info,
-> @@ -1392,6 +1392,8 @@ static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
->  		if (dmabuf.argsz < minsz)
->  			return -EINVAL;
->  
-> +		minsz = min(dmabuf.argsz, sizeof(dmabuf));
-> +
->  		ret = intel_vgpu_query_plane(vgpu, &dmabuf);
->  		if (ret != 0)
->  			return ret;
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> index 3764d1911b51..78aa977ae597 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -1262,7 +1262,7 @@ static long mbochs_ioctl(struct vfio_device *vdev, unsigned int cmd,
->  
->  	case VFIO_DEVICE_QUERY_GFX_PLANE:
->  	{
-> -		struct vfio_device_gfx_plane_info plane;
-> +		struct vfio_device_gfx_plane_info plane = {};
->  
->  		minsz = offsetofend(struct vfio_device_gfx_plane_info,
->  				    region_index);
-> @@ -1273,11 +1273,13 @@ static long mbochs_ioctl(struct vfio_device *vdev, unsigned int cmd,
->  		if (plane.argsz < minsz)
->  			return -EINVAL;
->  
-> +		outsz = min_t(unsigned long, plane.argsz, sizeof(plane));
+> I should have suggested 'offset' instead of 'imm' for the second parameter
+> name.
+> 
+> > >      INSN_S(OPCODE_OP_IMM, FUNC3(6), IMM_11_5(imm), __IMM_4_0(0), \
+> > >             RS1(base), __RS2(3))
+> > 
+> > s/OPCODE_OP_IMM/OPCODE_PREFETCH
+> > 0x4 vs 0x13
+> 
+> There's no major opcode named "PREFETCH" and the spec says that the major
+> opcode used for prefetch instructions is OP-IMM. That's why we want to
+> name this OPCODE_OP_IMM. I'm not sure where the 0x4 you're referring to
+> comes from
 
-Sorry, I'm struggling with why these two sample drivers use min_t()
-when passed the exact same args as kvmgt above which just uses min().
+Oh, you are right.
 
-But more importantly I'm also confused why we need this at all.  The
-buffer we're copying to is provided by the user, so what's wrong with
-leaving the user provided reserved data?  Are we just trying to return
-a zero'd reserved field if argsz allows for it?
+Sorry about this, I misinterpreted table 24.1 from the 
+Unprivileged ISA (20191213). 
 
-Any use of the reserved field other than as undefined data would need
-to be associated with a flags bit, so I don't think it's buying us
-anything to return it zero'd.  What am I missing?  Thanks,
+Yeap, everything make sense now, and the define below is not actually 
+needed:
 
-Alex
+> > > > +#define RV_OPCODE_PREFETCH     RV_OPCODE(19)
 
-> +
->  		ret = mbochs_query_gfx_plane(mdev_state, &plane);
->  		if (ret)
->  			return ret;
->  
-> -		if (copy_to_user((void __user *)arg, &plane, minsz))
-> +		if (copy_to_user((void __user *)arg, &plane, outsz))
->  			return -EFAULT;
->  
->  		return 0;
-> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-> index 064e1c0a7aa8..f5c2effc1cec 100644
-> --- a/samples/vfio-mdev/mdpy.c
-> +++ b/samples/vfio-mdev/mdpy.c
-> @@ -591,7 +591,7 @@ static long mdpy_ioctl(struct vfio_device *vdev, unsigned int cmd,
->  
->  	case VFIO_DEVICE_QUERY_GFX_PLANE:
->  	{
-> -		struct vfio_device_gfx_plane_info plane;
-> +		struct vfio_device_gfx_plane_info plane = {};
->  
->  		minsz = offsetofend(struct vfio_device_gfx_plane_info,
->  				    region_index);
-> @@ -602,6 +602,8 @@ static long mdpy_ioctl(struct vfio_device *vdev, unsigned int cmd,
->  		if (plane.argsz < minsz)
->  			return -EINVAL;
->  
-> +		minsz = min_t(unsigned long, plane.argsz, sizeof(plane));
-> +
->  		ret = mdpy_query_gfx_plane(mdev_state, &plane);
->  		if (ret)
->  			return ret;
+Thanks!
+Leo
+
+
+> . A 32-bit instruction has the lowest two bits set (figure 1.1
+> of the unpriv spec) and table 27.1 of the unpriv spec shows OP-IMM is
+> 0b00100xx, so we have 0b0010011. Keeping the naming of the opcode macros
+> consistent with the spec also keeps them consistent with the .insn
+> directive where we could even use the names directly, i.e.
+> 
+>  .insn s OP_IMM, 6, x3, 0(a0)
+> 
+> > > 
+> > > When the assembler as insn_r I hope it will validate that
+> 
+> I meant insn_s here, which would be the macro for '.insn s'
+> 
+> > > (imm & 0xfe0) == imm
+> 
+> I played with it. It won't do what we want for prefetch, only
+> what works for s-type instructions in general, i.e. it allows
+> +/-2047 offsets and fails for everything else. That's good enough.
+> We can just mask off the low 5 bits here in our macro
+> 
+>  #define PREFETCH_w(base, offset) \
+>     INSN_S(OPCODE_OP_IMM, FUNC3(6), IMM_11_5((offset) & ~0x1f), \
+>            __IMM_4_0(0), RS1(base), __RS2(3))
+> 
+> Thanks,
+> drew
+> 
 
