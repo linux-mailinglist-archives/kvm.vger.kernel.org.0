@@ -2,354 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D8E67A1398
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 04:10:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E67967A13C5
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 04:23:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231374AbjIOCKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 22:10:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38566 "EHLO
+        id S231494AbjIOCXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 22:23:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbjIOCKp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 22:10:45 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16371FCE;
-        Thu, 14 Sep 2023 19:10:40 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47A0FC433C9;
-        Fri, 15 Sep 2023 02:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694743840;
-        bh=H4peK7/Mx5CDu/1O9wTXBMeibtsHq958OKN8Kc01/TA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JqWhsvZc7iIoAE7APKfQgH5c3AouN4YAe3iumbXDsC+5qITNTjme4meegPKHtnNcj
-         OCfy2N2rw4ikX9QCeX/jxyozhea3hk79gvrSOv9OAvHLpxRzEmh7Lj3QzYgDb3Ciqs
-         KGHmAONa2tdSQePEkCpGhwaP9Sc4JltkL2FinrI/GCtofX/1LMB4tU4b0eGTtXNbQA
-         /ERh6egjQbpUqhH67BVXJPi6i79Tz2N4ny19v6RhMYSZLymFothQzgdF+VsgGy84Rr
-         1uQHuTsYRIVrGS/ZKviT1nWrWYYZaRF7JGUyAAKLR3Pmt3T5RpOaJQNb/5r/ph2l//
-         c6IG/xWewNm6w==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-52a4737a08fso1796332a12.3;
-        Thu, 14 Sep 2023 19:10:40 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxDvR6Qm9mMMQBaV9tsp3EpobIyUDZF5gW3tfXf8fQkwxUcwI0B
-        eqbkkycZlGbYoWw1mPKy8gq1eI3il7n21EEdrn0=
-X-Google-Smtp-Source: AGHT+IGlBZEBLeOpPiY2OjtH1L7jaQh4g/3yO4ZFve5QQCpfWKQwx78LuRffM/CeRhTTa3fCgbFI5kBSMtxudiIb+D4=
-X-Received: by 2002:aa7:cc0a:0:b0:522:3855:7ec5 with SMTP id
- q10-20020aa7cc0a000000b0052238557ec5mr201422edt.10.1694743838675; Thu, 14 Sep
- 2023 19:10:38 -0700 (PDT)
+        with ESMTP id S230512AbjIOCXC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 22:23:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD4E269D;
+        Thu, 14 Sep 2023 19:22:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694744578; x=1726280578;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IlRJpOupCvqzoLgQbZY1zCoOi577aMScJbvZoXiKEtM=;
+  b=fhrkEFtdzbAHm2NqPPJzMhzZ0VSu5vH+h6TiOckGTWDRAWD9qYebR625
+   fgiVbulqm1m3Ixerd1M+CvLYi+E0EwvgnUZ4RKwvOdL362m+A/aakjhej
+   zT8FOMhl5h8bK8eGdv8+ah1Wx/JBU++MiJ/CUzVGWe6IucygDRQpmA+T1
+   8njRpN0K4eButrSQaHs5JH65XIHWKmTbhsZbcN+r+Tt/8H6GN/dV9Sku5
+   qs+dZ1H8yTow1JnSFJTckVU5dEmsHOvsFzqm/RLVMg+3N2AmM4vL50hvt
+   Wocdz89/m08OD+2H05MZE8B5tA5veVZJBnk7vUjYOLMEXhdsE62m3ZUya
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="358548443"
+X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
+   d="scan'208";a="358548443"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 19:22:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="888043954"
+X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
+   d="scan'208";a="888043954"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 19:22:22 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 14 Sep 2023 19:22:55 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 14 Sep 2023 19:22:55 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 19:22:55 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 14 Sep 2023 19:22:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=III2pxLSNQYqOeJm25srMhnZD76/dpinYTdPMoe8hFV26Dy08I6TfAZgIxfl4bsi7PtafqrYS5bUtiBC7OYSvL40mDgTo7G6B3njLWhQeDdwgtLXtEZTo7/Rp3mPfHq6AfskQ3cYqHGHapjTvI/r2bshBgegk1n8645YlVZxXMdN+DAIiKASX7eNAYRyLJeFkO5+o0Gpu2aq0T4e9QxRIPX6I0bfH6Hlhzsa/LHxe5epVviCYaGexUtolgFqVxPHLR5re5uQQH9CAnESN+A1BmaUXgLAdKCP8R/hQ6D1RrCF9+qZ15vuqoHiBYEbBdfZCV/Eh9CWQjOjr3Om2c6iiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9qVftlHf2byRilBg+Ke1Iz+lhYxJSd6njGzVDIC0iL8=;
+ b=DAR8DkFoDMHHA7iYj/1DyhEHufBe7aCumO3FXPFE3J/83Mqx1WkQyf4qyotxxkimq2serN+ryGUhYNhuVNJJgPcugVWjuFbBX4PrWlfXt5c4PSJ2h7TYt41x8lceErGr69nq9vkdXn1/HQChxumF4fsZwU2CIOkcTqtf3yQDoFyaHyVw7TgNpuDB+Gk1aCQu5EI2EPj25D+yApCwO0JRLsv1W95287pXNLA3Rwr3Rkg1stYbVel9UoQKoKB2xK36cQf/tiBcenUmlpP9qFVGTf3/KiOGXCHZdaaq/Ve/1UiTpt2Po1j65mATE4njjPsGzJYIX0ASFcWilGBOQthS9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by PH7PR11MB5887.namprd11.prod.outlook.com (2603:10b6:510:136::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Fri, 15 Sep
+ 2023 02:22:53 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::a64d:9793:1235:dd90]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::a64d:9793:1235:dd90%7]) with mapi id 15.20.6792.021; Fri, 15 Sep 2023
+ 02:22:53 +0000
+Message-ID: <1347cf03-4598-f923-74e4-a3d193d9d2e9@intel.com>
+Date:   Fri, 15 Sep 2023 10:22:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH v6 06/25] x86/fpu/xstate: Opt-in kernel dynamic bits when
+ calculate guest xstate size
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>, <seanjc@google.com>,
+        <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <peterz@infradead.org>, <chao.gao@intel.com>,
+        <rick.p.edgecombe@intel.com>, <john.allen@amd.com>
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-7-weijiang.yang@intel.com>
+ <e0db6ffd-5d92-2a1a-bdfb-a190fe1ccd25@intel.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <e0db6ffd-5d92-2a1a-bdfb-a190fe1ccd25@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG3P274CA0015.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::27)
+ To PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
 MIME-Version: 1.0
-References: <20230910082911.3378782-1-guoren@kernel.org> <20230910082911.3378782-6-guoren@kernel.org>
- <ZQIbejhIev5tx6vl@redhat.com> <CAJF2gTSdjgUaUqhkfTPmJg6Mph+8Ej4j8MeDmfBOmFY5gkTpBQ@mail.gmail.com>
- <ZQLVqoCGJ1ExMU3e@redhat.com>
-In-Reply-To: <ZQLVqoCGJ1ExMU3e@redhat.com>
-From:   Guo Ren <guoren@kernel.org>
-Date:   Fri, 15 Sep 2023 10:10:25 +0800
-X-Gmail-Original-Message-ID: <CAJF2gTQWUCLOpKMQsybMoJdZrso2FEbBRVYV+2U1veFC=7U8_A@mail.gmail.com>
-Message-ID: <CAJF2gTQWUCLOpKMQsybMoJdZrso2FEbBRVYV+2U1veFC=7U8_A@mail.gmail.com>
-Subject: Re: [PATCH V11 05/17] riscv: qspinlock: Add basic queued_spinlock support
-To:     Leonardo Bras <leobras@redhat.com>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|PH7PR11MB5887:EE_
+X-MS-Office365-Filtering-Correlation-Id: 574679d7-a698-44ee-3c37-08dbb592aa44
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ltCB8PkA9Xp8D5z/t733xl3lWcI4jmuqTHzPKYEHufqULzNmz4kelZraewx59CoCvz36f3spDxBYGZ9RbHehQXBLinS//Jx3n1wXKi64F5wJodgHdfSnlqbDgE7axrLzF/HXCyZ0c5T0YsnF8qLJ17+qFcrhf1PlmOqcGIiPgaqu0biRZmpp1hEsmgFWBxkn0GM1OZVdjec+qfr9c38NtJgA5Njtp1/QhVo0wkwr+IqNcrsBwfGQvJYbUsoTOcmi7IN5QUVZ0g6cutrfzZ54CXnzkc6G0+rIiKLgqqvaDPK89Q/0QeJdQfRc/uAK5S+jKgunzBDmt6JURBbUI4zi3+LuvgTN7KmMk4mpYo/cq75BRoIiEo8ChViICFAnsL18CwSPOoryQHp8yLNCc7noA1GlcMPR//CXB8Ch4WqBLWX3sDf3DIiDtOgER3LZKTsCXXCDe8T1jkPMcakQBgg5gStsCQbFgs/CZiZdhvLMei/szveZMjpBCCeDwJhlqoO3zZvsW+MCKVGm+oilOATRTLr2mc4QqvoeOo9WUgNgrv11VVYyGQ05bkpqq2Yt+utufAojK3NTenJbxniLzh5XCdXqMZAGbS+Al18FZrc6yxoRUHWEHqNqK/vZ1a6Wkd9p0NB1dcfbxnjC4Z3/42FstQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(39860400002)(346002)(396003)(376002)(451199024)(1800799009)(186009)(31686004)(38100700002)(36756003)(82960400001)(31696002)(86362001)(6506007)(6486002)(53546011)(6666004)(478600001)(5660300002)(66946007)(8936002)(8676002)(4326008)(66556008)(66476007)(2906002)(6512007)(83380400001)(316002)(41300700001)(26005)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cndPdVlIR04zMTQ4UjlvWDF2RXY2V0FmYTZJaEk4NkszSFNuWXV5NlZDbjcr?=
+ =?utf-8?B?YU1Fay9zUUJKRlYzaU42dCtiaHR6ZzllTEhadHJtUjU4K3h3dnVmN3JGMkpS?=
+ =?utf-8?B?UjlZTnlEc0FGZE1tbUNJdE9QbllKWWJCOW9ZSEtUcGpJRnl5cS9Da1pHM0FF?=
+ =?utf-8?B?K2ROVk0wRDdEdU5rYW9XZEZGMnFlN1UzUWVSWU9JdDErNmxNSmF1UDArdGRJ?=
+ =?utf-8?B?MlNIU25POUlrRW4vZmQxL2tHcVl6RVlwWDEzbldOQjVFV2wxc25JK01JVmV6?=
+ =?utf-8?B?WW14dWl5c1NPVytsNkhYZHVjdk5hOGRpdUZzV29wejNDSUZONStlc2U3eS9C?=
+ =?utf-8?B?Z3E1a2E3RUNhaVRQam5CZFlacVgrYXl5RmZZMUtnNStIVUlMbDNtZU5sbDhy?=
+ =?utf-8?B?cmo3MG9hRW9UN1M1OVpKM0c4S2hmaFNsZ3ZhNVp4WEp1cHRMaFkrWElSMmVi?=
+ =?utf-8?B?U3FmTTFVRjFoLzh3eXZVditacnh3d2tiSTRTRFpmVm1tMTdCQjNDczVJTWRt?=
+ =?utf-8?B?MnVLWHdtODQ0aHVLcGpRbkVwUTlyNjhVTkdvbGtUbmVjajc0QlBUQkY4VTJC?=
+ =?utf-8?B?cVZvV28yNitnVlFGNnR0VENzOERYUDJCT0wybHdtajB4SVZmWDRIdGxscUJw?=
+ =?utf-8?B?UGZCdzlUZ3k0M1pINUVpV2R5YTlHU0UwdXkxVlI5Y29IQU5HeVQ2a2h1STk5?=
+ =?utf-8?B?WFpMd0dmNHpVU3lxay8rbUNVM2NKWVBXaXZBeVllRDgxUDdxRUJnSHV1TDVL?=
+ =?utf-8?B?Tms4V1dVNE5selNVOFNPdWk4Smo3TjNONjAwMkZHNkhjVUJTVXNNTjNIKys0?=
+ =?utf-8?B?WVlVZHpIYXVsdytEd2hJQ1BQa0pKaGx0WDZLZVYxRWg3UEl5dUJDTnowMnI4?=
+ =?utf-8?B?WkVWa1dpWEhYTVBTak1OR3dOTXE3Qzd0UEpIaVhwWktCMlZ0b2xsZHd0eDNW?=
+ =?utf-8?B?WHBIYmJzY3RncVhoV0ZwSmNyS2xidGd4K3NYUDZwaXgzWWN2d2tKOTVFU28x?=
+ =?utf-8?B?RmNiekNlbHRldnlSNkp2OTZ0cExyc1BkNW9sNVZwbk1YTmpKeVdXODhrQXVO?=
+ =?utf-8?B?bng2NkFuVVhBTUk1ZEowU0k0Z2JkMzNWVEo3YUFzc2pXVjdCRGdkQjR4c2tu?=
+ =?utf-8?B?MkNNQXdwUDJQUVJiejEwb0JYN2xsT1B4OVdmalh6V2xRNjFGTXc4QmFFL0kv?=
+ =?utf-8?B?NWMrMVBGOXNaZ29SaFVkaEFoS1pGSnlXU3JJUmRtMkh3blJXS3REMjhBYUU5?=
+ =?utf-8?B?ZVZYV0QvMHFxVS92NCtCbml0TE9POHgyMWFiRlRJUHdPRzlBNWhYQ3pPNGpy?=
+ =?utf-8?B?WHNoUUZqbHpyYXFmNi9WdUtiQUlHanlPS3JnUnVCbVl4bzhCcFF4RHNORFRZ?=
+ =?utf-8?B?Y2lVTVA4bXV2SWpkRnFmNm9CZng5c2NTc3JoN1Z0SEtleW8weFZxR1BrVkdD?=
+ =?utf-8?B?b05iV2JadXIxNStoNkQzcXY1NUR3V0xwZ1JxT2NNK0VGRmlzZ2JOSVBrR0ZF?=
+ =?utf-8?B?dHNZUzdyWXJCMHlYOVBGSXJDQVBMRW9mdGZIWW1oL0dCMlkwejMzMU5iL3hy?=
+ =?utf-8?B?ZXlXNWpSbnIyY21LQVRRaGkveDJjc2dvcjlJT0JNTmsrRHdLYTFGdk52Y1Vn?=
+ =?utf-8?B?RmRHMFh5Tm5vM3NZQ0w4VEszeUN3OFFWeEZRK2IrYnV2Y3hwUFI4bHRoSHls?=
+ =?utf-8?B?N2Y2bnZmbTVtM0hpQ29OZ3l2YmpsSFVuaHhwWWdwdmRCOExveWpOblFFQ2lu?=
+ =?utf-8?B?NXNoOVJVei8vcUYrWGY0TlF5blF5Y2JiK1NBZlFqcUFFWEVpTUdRWUFMQ1Y5?=
+ =?utf-8?B?R3FqS3dURjR5S05zNkZsa3pXeGk4Vk1MYUNyUXdvbHp6K1V0Wlk2MzNnbXdO?=
+ =?utf-8?B?dTNPUmRXdzQ2WGRvUkJyWjUveVFMcXprVE5rSUNBYkVOK0Eybnoyc2dseEhU?=
+ =?utf-8?B?N2ZNckZoRExiTERQcUlOdGhybEt3aGFFR3BUMmJjUUNqQTh4Y0hmcXZOdGxM?=
+ =?utf-8?B?TzFERDZYdnd0SlJna3A0QVNMbklMV0NuMnFyamdkSHFXNGVxNGlMSk9IaEI1?=
+ =?utf-8?B?SDRSMW5RYnBRK01IQy9vYWdOQ2V5WHpneUd1cEw5R2VqRENiWkdoTjBsL0wy?=
+ =?utf-8?B?dkpvdXpsMlBkM1NGQUZrSUF4Y1UyWDMvRStVSDJsVEI4QmYxNHl5bnRxRjBy?=
+ =?utf-8?B?a3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 574679d7-a698-44ee-3c37-08dbb592aa44
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 02:22:53.1189
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NR13/7SSp5TInxdH+aZMQbxmEnZbTMm9KLPdvg2LPMrcq2/sI7z8uqBCIl3gZrtAwWpJ7Ma4VR1aK2OFOD5+xA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5887
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 5:43=E2=80=AFPM Leonardo Bras <leobras@redhat.com> =
-wrote:
+On 9/15/2023 1:40 AM, Dave Hansen wrote:
+> On 9/13/23 23:33, Yang Weijiang wrote:
+>> --- a/arch/x86/kernel/fpu/xstate.c
+>> +++ b/arch/x86/kernel/fpu/xstate.c
+>> @@ -1636,9 +1636,17 @@ static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
+>>   
+>>   	/* Calculate the resulting kernel state size */
+>>   	mask = permitted | requested;
+>> -	/* Take supervisor states into account on the host */
+>> +	/*
+>> +	 * Take supervisor states into account on the host. And add
+>> +	 * kernel dynamic xfeatures to guest since guest kernel may
+>> +	 * enable corresponding CPU feaures and the xstate registers
+>> +	 * need to be saved/restored properly.
+>> +	 */
+>>   	if (!guest)
+>>   		mask |= xfeatures_mask_supervisor();
+>> +	else
+>> +		mask |= fpu_kernel_dynamic_xfeatures;
+>> +
+>>   	ksize = xstate_calculate_size(mask, compacted);
+> Heh, you changed the "guest" naming in "fpu_kernel_dynamic_xfeatures"
+> but didn't change the logic.
 >
-> On Thu, Sep 14, 2023 at 12:46:56PM +0800, Guo Ren wrote:
-> > On Thu, Sep 14, 2023 at 4:29=E2=80=AFAM Leonardo Bras <leobras@redhat.c=
-om> wrote:
-> > >
-> > > On Sun, Sep 10, 2023 at 04:28:59AM -0400, guoren@kernel.org wrote:
-> > > > From: Guo Ren <guoren@linux.alibaba.com>
-> > > >
-> > > > The requirements of qspinlock have been documented by commit:
-> > > > a8ad07e5240c ("asm-generic: qspinlock: Indicate the use of mixed-si=
-ze
-> > > > atomics").
-> > > >
-> > > > Although RISC-V ISA gives out a weaker forward guarantee LR/SC, whi=
-ch
-> > > > doesn't satisfy the requirements of qspinlock above, it won't preve=
-nt
-> > > > some riscv vendors from implementing a strong fwd guarantee LR/SC i=
-n
-> > > > microarchitecture to match xchg_tail requirement. T-HEAD C9xx proce=
-ssor
-> > > > is the one.
-> > > >
-> > > > We've tested the patch on SOPHGO sg2042 & th1520 and passed the str=
-ess
-> > > > test on Fedora & Ubuntu & OpenEuler ... Here is the performance
-> > > > comparison between qspinlock and ticket_lock on sg2042 (64 cores):
-> > > >
-> > > > sysbench test=3Dthreads threads=3D32 yields=3D100 lock=3D8 (+13.8%)=
-:
-> > > >   queued_spinlock 0.5109/0.00
-> > > >   ticket_spinlock 0.5814/0.00
-> > > >
-> > > > perf futex/hash (+6.7%):
-> > > >   queued_spinlock 1444393 operations/sec (+- 0.09%)
-> > > >   ticket_spinlock 1353215 operations/sec (+- 0.15%)
-> > > >
-> > > > perf futex/wake-parallel (+8.6%):
-> > > >   queued_spinlock (waking 1/64 threads) in 0.0253 ms (+-2.90%)
-> > > >   ticket_spinlock (waking 1/64 threads) in 0.0275 ms (+-3.12%)
-> > > >
-> > > > perf futex/requeue (+4.2%):
-> > > >   queued_spinlock Requeued 64 of 64 threads in 0.0785 ms (+-0.55%)
-> > > >   ticket_spinlock Requeued 64 of 64 threads in 0.0818 ms (+-4.12%)
-> > > >
-> > > > System Benchmarks (+6.4%)
-> > > >   queued_spinlock:
-> > > >     System Benchmarks Index Values               BASELINE       RES=
-ULT    INDEX
-> > > >     Dhrystone 2 using register variables         116700.0  62861374=
-5.4  53865.8
-> > > >     Double-Precision Whetstone                       55.0     18242=
-2.8  33167.8
-> > > >     Execl Throughput                                 43.0      1311=
-6.6   3050.4
-> > > >     File Copy 1024 bufsize 2000 maxblocks          3960.0    776230=
-6.2  19601.8
-> > > >     File Copy 256 bufsize 500 maxblocks            1655.0    341755=
-6.8  20649.9
-> > > >     File Copy 4096 bufsize 8000 maxblocks          5800.0    742799=
-5.7  12806.9
-> > > >     Pipe Throughput                               12440.0   2305860=
-0.5  18535.9
-> > > >     Pipe-based Context Switching                   4000.0    283561=
-7.7   7089.0
-> > > >     Process Creation                                126.0      1253=
-7.3    995.0
-> > > >     Shell Scripts (1 concurrent)                     42.4      5705=
-7.4  13456.9
-> > > >     Shell Scripts (8 concurrent)                      6.0       736=
-7.1  12278.5
-> > > >     System Call Overhead                          15000.0   3330830=
-1.3  22205.5
-> > > >                                                                    =
-    =3D=3D=3D=3D=3D=3D=3D=3D
-> > > >     System Benchmarks Index Score                                  =
-     12426.1
-> > > >
-> > > >   ticket_spinlock:
-> > > >     System Benchmarks Index Values               BASELINE       RES=
-ULT    INDEX
-> > > >     Dhrystone 2 using register variables         116700.0  62654170=
-1.9  53688.2
-> > > >     Double-Precision Whetstone                       55.0     18192=
-1.0  33076.5
-> > > >     Execl Throughput                                 43.0      1262=
-5.1   2936.1
-> > > >     File Copy 1024 bufsize 2000 maxblocks          3960.0    655379=
-2.9  16550.0
-> > > >     File Copy 256 bufsize 500 maxblocks            1655.0    318923=
-1.6  19270.3
-> > > >     File Copy 4096 bufsize 8000 maxblocks          5800.0    722127=
-7.0  12450.5
-> > > >     Pipe Throughput                               12440.0   2059401=
-8.7  16554.7
-> > > >     Pipe-based Context Switching                   4000.0    257111=
-7.7   6427.8
-> > > >     Process Creation                                126.0      1079=
-8.4    857.0
-> > > >     Shell Scripts (1 concurrent)                     42.4      5722=
-7.5  13497.1
-> > > >     Shell Scripts (8 concurrent)                      6.0       732=
-9.2  12215.3
-> > > >     System Call Overhead                          15000.0   3076677=
-8.4  20511.2
-> > > >                                                                    =
-    =3D=3D=3D=3D=3D=3D=3D=3D
-> > > >     System Benchmarks Index Score                                  =
-     11670.7
-> > > >
-> > > > The qspinlock has a significant improvement on SOPHGO SG2042 64
-> > > > cores platform than the ticket_lock.
-> > > >
-> > > > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > > > ---
-> > > >  arch/riscv/Kconfig                | 16 ++++++++++++++++
-> > > >  arch/riscv/include/asm/Kbuild     |  3 ++-
-> > > >  arch/riscv/include/asm/spinlock.h | 17 +++++++++++++++++
-> > > >  3 files changed, 35 insertions(+), 1 deletion(-)
-> > > >  create mode 100644 arch/riscv/include/asm/spinlock.h
-> > > >
-> > > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> > > > index 2c346fe169c1..7f39bfc75744 100644
-> > > > --- a/arch/riscv/Kconfig
-> > > > +++ b/arch/riscv/Kconfig
-> > > > @@ -471,6 +471,22 @@ config NODES_SHIFT
-> > > >         Specify the maximum number of NUMA Nodes available on the t=
-arget
-> > > >         system.  Increases memory reserved to accommodate various t=
-ables.
-> > > >
-> > > > +choice
-> > > > +     prompt "RISC-V spinlock type"
-> > > > +     default RISCV_TICKET_SPINLOCKS
-> > > > +
-> > > > +config RISCV_TICKET_SPINLOCKS
-> > > > +     bool "Using ticket spinlock"
-> > > > +
-> > > > +config RISCV_QUEUED_SPINLOCKS
-> > > > +     bool "Using queued spinlock"
-> > > > +     depends on SMP && MMU
-> > > > +     select ARCH_USE_QUEUED_SPINLOCKS
-> > > > +     help
-> > > > +       Make sure your micro arch LL/SC has a strong forward progre=
-ss guarantee.
-> > > > +       Otherwise, stay at ticket-lock.
-> > > > +endchoice
-> > > > +
-> > > >  config RISCV_ALTERNATIVE
-> > > >       bool
-> > > >       depends on !XIP_KERNEL
-> > > > diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm=
-/Kbuild
-> > > > index 504f8b7e72d4..a0dc85e4a754 100644
-> > > > --- a/arch/riscv/include/asm/Kbuild
-> > > > +++ b/arch/riscv/include/asm/Kbuild
-> > > > @@ -2,10 +2,11 @@
-> > > >  generic-y +=3D early_ioremap.h
-> > > >  generic-y +=3D flat.h
-> > > >  generic-y +=3D kvm_para.h
-> > > > +generic-y +=3D mcs_spinlock.h
-> > > >  generic-y +=3D parport.h
-> > > > -generic-y +=3D spinlock.h
-> > >
-> > > IIUC here you take the asm-generic/spinlock.h (which defines arch_spi=
-n_*())
-> > > and include the asm-generic headers of mcs_spinlock and qspinlock.
-> > >
-> > > In this case, the qspinlock.h will provide the arch_spin_*() interfac=
-es,
-> > > which seems the oposite of the above description (ticket spinlocks be=
-ing
-> > > the standard).
-> > >
-> > > Shouldn't ticket-spinlock.h also get included here?
-> > > (Also, I am probably missing something, as I dont' see the use of
-> > > mcs_spinlock here.)
-> > No, because asm-generic/spinlock.h:
-> > ...
-> > #include <asm-generic/ticket_spinlock.h>
-> > ...
-> >
+> As it's coded at the moment *ALL* "fpu_kernel_dynamic_xfeatures" are
+> guest xfeatures.  So, they're different in name only.
 >
-> But aren't you removing asm-generic/spinlock.h below ?
-> -generic-y +=3D spinlock.h
-Yes, current is:
+> If you want to change the rules for guests, we have *ONE* place that's
+> done: fpstate_reset().  It establishes the permissions and the sizes for
+> the default guest FPU.  Start there.  If you want to make the guest
+> defaults include XFEATURE_CET_USER, then you need to put the bit in *there*.
 
-arch/riscv/include/asm/spinlock.h -> include/asm-generic/spinlock.h ->
-include/asm-generic/ticket_spinlock.h
+Yeah, fpstate_reset() is the right place to hold the guest init permits and  propagate
+them here, thanks for the suggestion!
 
-+#ifdef CONFIG_QUEUED_SPINLOCKS
-+#include <asm/qspinlock.h>
-+#include <asm/qrwlock.h>
-+#else
-+#include <asm-generic/spinlock.h>
-+#endif
+Nit, did you actually mean XFEATURE_CET_KERNEL instead of XFEATURE_CET_USER above?
+because the latter is already supported by upstream kernel.
 
-So, you want me:
-+#ifdef CONFIG_QUEUED_SPINLOCKS
-+#include <asm/qspinlock.h>
-+#else
-+#include <asm-generic/ticket_spinlock.h>
-+#endif
+> The other option is to have the KVM code actually go and "request" that
+> the dynamic states get added to 'fpu->guest_perm'.
 
-+#include <asm/qrwlock.h>
+Yes, compared with above option, it will change current userspace handling logic, i.e.,
+only user xstates are dynamically requested. So I'd try above option first.
 
-Right?
+>   Would there ever be
+> any reason for KVM to be on a system which supports a dynamic kernel
+> feature but where it doesn't get enabled for guest use, or at least
+> shouldn't have the FPU space allocated?
 
->
-> > >
-> > > >  generic-y +=3D spinlock_types.h
-> > > >  generic-y +=3D qrwlock.h
-> > > >  generic-y +=3D qrwlock_types.h
-> > > > +generic-y +=3D qspinlock.h
-> > > >  generic-y +=3D user.h
-> > > >  generic-y +=3D vmlinux.lds.h
-> > > > diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include=
-/asm/spinlock.h
-> > > > new file mode 100644
-> > > > index 000000000000..c644a92d4548
-> > > > --- /dev/null
-> > > > +++ b/arch/riscv/include/asm/spinlock.h
-> > > > @@ -0,0 +1,17 @@
-> > > > +/* SPDX-License-Identifier: GPL-2.0 */
-> > > > +
-> > > > +#ifndef __ASM_RISCV_SPINLOCK_H
-> > > > +#define __ASM_RISCV_SPINLOCK_H
-> > > > +
-> > > > +#ifdef CONFIG_QUEUED_SPINLOCKS
-> > > > +#define _Q_PENDING_LOOPS     (1 << 9)
-> > > > +#endif
-> > >
-> > > Any reason the above define couldn't be merged on the ifdef below?
-> > Easy for the next patch to modify. See Waiman's comment:
-> >
-> > https://lore.kernel.org/linux-riscv/4cc7113a-0e4e-763a-cba2-7963bcd26c7=
-a@redhat.com/
-> >
-> > > diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/a=
-sm/spinlock.h
-> > > index c644a92d4548..9eb3ad31e564 100644
-> > > --- a/arch/riscv/include/asm/spinlock.h
-> > > +++ b/arch/riscv/include/asm/spinlock.h
-> > > @@ -7,11 +7,94 @@
-> > >   #define _Q_PENDING_LOOPS (1 << 9)
-> > >   #endif
-> > >
-> >
-> > I see why you separated the _Q_PENDING_LOOPS out.
-> >
->
-> I see, should be fine then.
->
-> Thanks!
-> Leo
->
-> >
-> > >
-> > > > +
-> > > > +#ifdef CONFIG_QUEUED_SPINLOCKS
-> > > > +#include <asm/qspinlock.h>
-> > > > +#include <asm/qrwlock.h>
-> > > > +#else
-> > > > +#include <asm-generic/spinlock.h>
-> > > > +#endif
-> > > > +
-> > > > +#endif /* __ASM_RISCV_SPINLOCK_H */
-> > > > --
-> > > > 2.36.1
-> > > >
-> > >
-> > > Thanks!
-> > > Leo
-> > >
-> >
-> >
-> > --
-> > Best Regards
-> >  Guo Ren
-> >
->
+I haven't heard of that kind of usage for other features so far, CET supervisor xstate is the
+only dynamic kernel feature now,  not sure whether other CPU features having supervisor
+xstate would share the handling logic like CET does one day.
 
 
---=20
-Best Regards
- Guo Ren
