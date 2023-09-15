@@ -2,177 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F1A67A1608
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 08:24:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58BA37A1603
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 08:23:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232215AbjIOGYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 02:24:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34422 "EHLO
+        id S232195AbjIOGX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 02:23:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjIOGYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 02:24:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 700BC1BFA
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 23:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1694758998;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=h49HJZ/O577BqKvSVyAVyTrcbTxM3sCo8B/Q+wbyQ4s=;
-        b=aQMWXYcBeXTCbrRyYq8fzs6BBjH0TBlJ4I9UYJ1Xk2tfYeBYbHT26Xi8yYoYY70rbrQyGp
-        jl9bjSY2OMexqhfwPG1s2n7DUf5tydfbMNw65bVf3xKdbWLPf2EYXuzNwCn/tgx3EWtNfv
-        ElGF1Uwr/9MG3oDLJhfSl2PxWlZC5Js=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-KM1FH1sFOsGbIWU6r_TrFg-1; Fri, 15 Sep 2023 02:23:16 -0400
-X-MC-Unique: KM1FH1sFOsGbIWU6r_TrFg-1
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3aa142796a5so2755591b6e.0
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 23:23:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694758995; x=1695363795;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        with ESMTP id S229561AbjIOGXz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 02:23:55 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4B6270B;
+        Thu, 14 Sep 2023 23:23:50 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-500bbe3ef0eso2141635e87.1;
+        Thu, 14 Sep 2023 23:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694759029; x=1695363829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h49HJZ/O577BqKvSVyAVyTrcbTxM3sCo8B/Q+wbyQ4s=;
-        b=hNTvtDFy0pf+iztJt8b9tQKA+Yxy/w57GvDy4hn82GeqCCxM/3j1xVoROVHmBjvtz/
-         zg7/gb6Y+KijKJnAsONg9+4zVnRbB2WZP5JfpUm0inkExYJZ5uuMrUkR2BoHi6YFDTed
-         CiStrK8UvzzKMWikif8y1P6bo1wL2EUN6NbObDzTs15ZeCbl9y1tJ67XJf21y8amzkE4
-         dJXeizpWO1WP71RXBcAsiVFRaIUJ/PNhpLO+W+FesShHgvLXnUzpYTFTPmlio5fpAqHM
-         SuEGYXoc/3m0/af01Eo4wBdIbkKp3yUlgr/wYoF4LPnsdzXabdim3I0ICm4WTvvDhUub
-         E9Ig==
-X-Gm-Message-State: AOJu0YwjT32Lt2omUpwTMNwfRlevYpSkR8e/vh2rLYHsIo0b/pWQGZt9
-        zVPJ20Vl+Hhti+YrNiUoNoHk48xYIV5keKs464KVJZW3pXeFDJpJ/zE6NeJjo+Fup+hKIMsAkgx
-        KeJGJl9WJbG24
-X-Received: by 2002:a05:6808:15a4:b0:3a1:e12b:2f80 with SMTP id t36-20020a05680815a400b003a1e12b2f80mr1008576oiw.35.1694758995704;
-        Thu, 14 Sep 2023 23:23:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnXl+iWXUNkjlGJTgGvcCE0+QSxnHePkAelhd7hHtYCVfy9sGfEJ3pO9ERuYXBQlky5+8lHw==
-X-Received: by 2002:a05:6808:15a4:b0:3a1:e12b:2f80 with SMTP id t36-20020a05680815a400b003a1e12b2f80mr1008543oiw.35.1694758995419;
-        Thu, 14 Sep 2023 23:23:15 -0700 (PDT)
-Received: from redhat.com ([2804:1b3:a803:4ff9:7c29:fe41:6aa7:43df])
-        by smtp.gmail.com with ESMTPSA id e2-20020a9d7302000000b006c0d686f76esm1338510otk.63.2023.09.14.23.23.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 23:23:14 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 03:23:05 -0300
-From:   Leonardo Bras <leobras@redhat.com>
-To:     guoren@kernel.org
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
-        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 13/17] RISC-V: paravirt: pvqspinlock: Add SBI
- implementation
-Message-ID: <ZQP4SXLf00IntVWd@redhat.com>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-14-guoren@kernel.org>
+        bh=g1zuvJ7RRCqy9MSyULz3DiU3qO3y4/pQtJW6GP4mEKM=;
+        b=hNEqoUQO/cTfVnBAqJ435MWPucNekQCo7hLibOtNN6t3uywMByiX0hlg093awL6lv7
+         d0fZH7aZxzNMWL0j3hb2Tcaoex8P1GhymqJ3BSbjvQCDmazK0NtbsZG52W7fHnpeqZ+g
+         hCJPraPNGxRkYqiXkqklDg0MGvIWdVKR/2THGlSJBK6F/RmrPNRWTpc6lJXtJ/lcRxN0
+         4x+f1Uheh3cY5/ASavdQz89nrKpR6owZ6WZNfU3l+jv+yvnaxs9jilDNLWTbqPFwy3Gk
+         pcIwuOWDLbDufm2D8JYDN/z3xC1nYOoFkcLcbFjMKqj48PmIJ+AKtWhW4SPQarNDZGUg
+         8qPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694759029; x=1695363829;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g1zuvJ7RRCqy9MSyULz3DiU3qO3y4/pQtJW6GP4mEKM=;
+        b=v1ZFMLuhljvYHmsC8zO80hcCwa/xgb84uYwI1CeFZaAxaFIC/W0XkDOEzE440yuC4K
+         3UpySiW9s56EBq3BoRAk6dSVQq4WjNC+tOhXRPrY+IR7GtfMpp8Q4jC3MID+01XLp8KI
+         K5+NWURitc6WgeIukpK5t2CQS+TPMm1WjDB9pe0Bq+k6nAaT+Cskk/cTxxTUZMC37rdi
+         GNN0Uvle2YJuVXKYub2tUWLJsqWUz61QnqdpumP/cXa99Kv8fD8e5ISBHUO3F5WdDfhY
+         x5PuKXeDPTlBDUsRucjk4XyiafuE98y6tMV1mF45f8rKR8YBJ2IYU6mCzjzQ4LkLPMIi
+         4+/w==
+X-Gm-Message-State: AOJu0YzLkqgyT8uzZFsmYSoxbjGEwNpus88nwnRn93dZ7x++IwYt0x16
+        5fFOcqDMjZaaQ6FJB1VHrFypynnRcIqGblAuNJs=
+X-Google-Smtp-Source: AGHT+IGj/HsfBsymLbWepYETxK1fPN+QHY/uRqAGLNuLGZZu2qI+OypS0+lHToloM5nAwXB8QRxambJWef0/qHqiQfY=
+X-Received: by 2002:a05:6512:1095:b0:502:d973:3206 with SMTP id
+ j21-20020a056512109500b00502d9733206mr1476766lfg.6.1694759028702; Thu, 14 Sep
+ 2023 23:23:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230910082911.3378782-14-guoren@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1694421911.git.haibo1.xu@intel.com> <64e0637cd6f22dd7557ed44bd2242001e7830d1c.1694421911.git.haibo1.xu@intel.com>
+ <20230914-ee133dd5e804282ce28833d6@orel> <20230914-reflector-preshow-786425ad7ae2@wendy>
+ <20230914-2232dea1c6d03fb5985755e6@orel>
+In-Reply-To: <20230914-2232dea1c6d03fb5985755e6@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Fri, 15 Sep 2023 14:23:37 +0800
+Message-ID: <CAJve8ok9de0bGMU24iyUSX6V4+1tZM3ca=Ntyk=2gythd4uWCg@mail.gmail.com>
+Subject: Re: [PATCH v3 9/9] KVM: riscv: selftests: Add sstc timer test
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Conor Dooley <conor.dooley@microchip.com>,
+        Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 10, 2023 at 04:29:07AM -0400, guoren@kernel.org wrote:
-> From: Guo Ren <guoren@linux.alibaba.com>
-> 
-> Implement pv_kick with SBI implementation, and add SBI_EXT_PVLOCK
-> extension detection.
-> 
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@kernel.org>
-> ---
->  arch/riscv/include/asm/sbi.h           | 6 ++++++
->  arch/riscv/kernel/qspinlock_paravirt.c | 7 ++++++-
->  2 files changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index e0233b3d7a5f..3533f8d4f3e2 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -30,6 +30,7 @@ enum sbi_ext_id {
->  	SBI_EXT_HSM = 0x48534D,
->  	SBI_EXT_SRST = 0x53525354,
->  	SBI_EXT_PMU = 0x504D55,
-> +	SBI_EXT_PVLOCK = 0xAB0401,
->  
->  	/* Experimentals extensions must lie within this range */
->  	SBI_EXT_EXPERIMENTAL_START = 0x08000000,
-> @@ -243,6 +244,11 @@ enum sbi_pmu_ctr_type {
->  /* Flags defined for counter stop function */
->  #define SBI_PMU_STOP_FLAG_RESET (1 << 0)
->  
-> +/* SBI PVLOCK (kick cpu out of wfi) */
-> +enum sbi_ext_pvlock_fid {
-> +	SBI_EXT_PVLOCK_KICK_CPU = 0,
-> +};
-> +
->  #define SBI_SPEC_VERSION_DEFAULT	0x1
->  #define SBI_SPEC_VERSION_MAJOR_SHIFT	24
->  #define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
-> diff --git a/arch/riscv/kernel/qspinlock_paravirt.c b/arch/riscv/kernel/qspinlock_paravirt.c
-> index a0ad4657f437..571626f350be 100644
-> --- a/arch/riscv/kernel/qspinlock_paravirt.c
-> +++ b/arch/riscv/kernel/qspinlock_paravirt.c
-> @@ -11,6 +11,8 @@
->  
->  void pv_kick(int cpu)
->  {
-> +	sbi_ecall(SBI_EXT_PVLOCK, SBI_EXT_PVLOCK_KICK_CPU,
-> +		  cpuid_to_hartid_map(cpu), 0, 0, 0, 0, 0);
->  	return;
->  }
->  
-> @@ -25,7 +27,7 @@ void pv_wait(u8 *ptr, u8 val)
->  	if (READ_ONCE(*ptr) != val)
->  		goto out;
->  
-> -	/* wait_for_interrupt(); */
-> +	wait_for_interrupt();
->  out:
->  	local_irq_restore(flags);
->  }
-> @@ -62,6 +64,9 @@ void __init pv_qspinlock_init(void)
->  	if(sbi_get_firmware_id() != SBI_EXT_BASE_IMPL_ID_KVM)
->  		return;
->  
-> +	if (!sbi_probe_extension(SBI_EXT_PVLOCK))
-> +		return;
-> +
->  	pr_info("PV qspinlocks enabled\n");
->  	__pv_init_lock_hash();
->  
-> -- 
-> 2.36.1
-> 
+On Thu, Sep 14, 2023 at 6:15=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Thu, Sep 14, 2023 at 10:52:15AM +0100, Conor Dooley wrote:
+> > On Thu, Sep 14, 2023 at 11:36:01AM +0200, Andrew Jones wrote:
+> > > > +static inline void cpu_relax(void)
+> > > > +{
+> > > > +#ifdef __riscv_zihintpause
+> > > > + asm volatile("pause" ::: "memory");
+> > > > +#else
+> > > > + /* Encoding of the pause instruction */
+> > > > + asm volatile(".4byte 0x100000F" ::: "memory");
+> > > > +#endif
+> > > > +}
+> > >
+> > > cpu_relax() should go to include/riscv/processor.h
+> >
+> > Can the one from asm/vdso/processor.h be reused, or are there special
+> > considerations preventing that?
+>
+> We'd need to copy it into tools/arch/riscv/include/asm, but it could be
+> done. Hmm, now that I look at it, I see we're missing the barrier() call
+> in this kvm selftests version.
+>
 
-IIUC this PVLOCK extension is now a requirement to use pv_qspinlock(), and 
-it allows a cpu to use an instruction to wait for interrupt in pv_wait(), 
-and kicks it out of this wait using a new sbi_ecall() on pv_kick().
+Will reuse the one from asm/vdso/processor.h and copy it to
+tools/arch/riscv/include/asm.
 
-Overall it LGTM, but would be nice to have the reference doc in the commit
-msg. I end up inferring some of the inner workings by your implementation, 
-which is not ideal for reviewing.
-
-If understanding above is right,
-Reviewed-by: Leonardo Bras <leobras@redhat.com>
-
-Thanks!
-Leo
-
+> Thanks,
+> drew
