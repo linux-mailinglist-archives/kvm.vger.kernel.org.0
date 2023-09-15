@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B97117A24B4
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 19:29:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A145F7A24AD
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 19:29:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235915AbjIOR3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 13:29:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
+        id S235816AbjIOR3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 13:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235876AbjIOR2r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 13:28:47 -0400
+        with ESMTP id S235862AbjIOR2l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 13:28:41 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE74F2120;
-        Fri, 15 Sep 2023 10:28:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492BE1FF5;
+        Fri, 15 Sep 2023 10:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=ljKmIcCKst9DHe3IfbavuoPBudCpT3+oRR2H1OkUvA4=; b=BRBrYogwJLaEabmxwgaUjlbSMe
-        CV4/6qA1wg4YbLawsYY/VjTxp1stCVMiCAgB+7R6R1Hr8iIZrKnUsgRIJgSLZCwquuBYaop7JUycL
-        nnI55Gtyn7HE1B7S/aAmNZPp6xWVHaWcZYCRAavD/29BcSWVAVHStrrm4JEluywCFhysOG5RdTR3F
-        CEps4GThOwQsircqgTvFoEEnrxZ9BS3hNq5jpnpRVg5oLKNbRO3RUNyIds+CQu5wawdN1MyJXwu/0
-        LrkZJ8R8iDRKcZkHEmRa8QaPMfd5AQxzdnBpcfJHjVJqRLGVf+RYyy8dXMgXHqMoxUy8OHEEJlmrN
-        fvln2Fgg==;
+        bh=yD9ktfId0rEPTuzY1QWVmcz2oEdRPlEREsQSBWfYTjA=; b=HX7V942nk7CHODHYQIA5tKfGxK
+        cqfI5oqlGmQtDriP6IOkzJVbb4aQ9RVu+dirfylSh9gv/23r1hv78HpgIe6qdGAv9305ibm/CcUiP
+        Cy7+3Mb8ROXAJWT218q0vG0yenqlmVqwmpfUAiqkSYIU1i8d6Kllw2K8786NlWuL+qk9sic5Q84av
+        vz6Tnnu+8qAIDYA6k0PurN9+jHhz8oS1Zz1yC7jBuK7KTc9AMNsD0E2OnAnjGA97omR5Dc2FrvaBt
+        NHsa8YRE+hRQ5/zTc7ddCWQ201F0sGDveVYd+7PeKe+MhfDy0+FawWBchRl7RY8NXygzu1sr3awRc
+        EYMtiwEg==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qhCcI-00B2xt-Jb; Fri, 15 Sep 2023 17:28:30 +0000
+        id 1qhCcI-00B2xv-MV; Fri, 15 Sep 2023 17:28:30 +0000
 From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To:     Andrew Morton <akpm@linux-foundation.org>
 Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
@@ -34,9 +34,9 @@ Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 2/3] mm: Convert follow_page_pte() to use a folio
-Date:   Fri, 15 Sep 2023 18:28:27 +0100
-Message-Id: <20230915172829.2632994-3-willy@infradead.org>
+Subject: [PATCH 3/3] s390: Convert arch_make_page_accessible() to arch_make_folio_accessible()
+Date:   Fri, 15 Sep 2023 18:28:28 +0100
+Message-Id: <20230915172829.2632994-4-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20230915172829.2632994-1-willy@infradead.org>
 References: <20230915172829.2632994-1-willy@infradead.org>
@@ -51,73 +51,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove uses of PageAnon(), unpin_user_page(), PageDirty(),
-set_page_dirty() and mark_page_accessed(), all of which have a hidden
-call to compound_head().
+With all users now using arch_make_folio_accessible(), move the loop
+over each page from common code into the only implementation.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- mm/gup.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ arch/s390/include/asm/page.h |  5 ++--
+ arch/s390/kernel/uv.c        | 46 +++++++++++++++++++++++-------------
+ arch/s390/mm/fault.c         | 15 ++++++------
+ include/linux/mm.h           | 20 ++--------------
+ 4 files changed, 42 insertions(+), 44 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index ab8a0ebc728e..ff1eaaba5720 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -582,6 +582,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+index cfec0743314e..4f1b7107f0d9 100644
+--- a/arch/s390/include/asm/page.h
++++ b/arch/s390/include/asm/page.h
+@@ -162,6 +162,7 @@ static inline int page_reset_referenced(unsigned long addr)
+ #define _PAGE_ACC_BITS		0xf0	/* HW access control bits	*/
+ 
+ struct page;
++struct folio;
+ void arch_free_page(struct page *page, int order);
+ void arch_alloc_page(struct page *page, int order);
+ void arch_set_page_dat(struct page *page, int order);
+@@ -175,8 +176,8 @@ static inline int devmem_is_allowed(unsigned long pfn)
+ #define HAVE_ARCH_ALLOC_PAGE
+ 
+ #if IS_ENABLED(CONFIG_PGSTE)
+-int arch_make_page_accessible(struct page *page);
+-#define HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
++int arch_make_folio_accessible(struct folio *folio);
++#define arch_make_folio_accessible arch_make_folio_accessible
+ #endif
+ 
+ #define __PAGE_OFFSET		0x0UL
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index fc07bc39e698..dadf29469b46 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -426,46 +426,58 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+ EXPORT_SYMBOL_GPL(gmap_destroy_page);
+ 
+ /*
+- * To be called with the page locked or with an extra reference! This will
+- * prevent gmap_make_secure from touching the page concurrently. Having 2
+- * parallel make_page_accessible is fine, as the UV calls will become a
+- * no-op if the page is already exported.
++ * To be called with the folio locked or with an extra reference! This will
++ * prevent gmap_make_secure from touching the folio concurrently. Having 2
++ * parallel make_folio_accessible is fine, as the UV calls will become a
++ * no-op if the folio is already exported.
++ *
++ * Returns 0 on success or negative errno.
+  */
+-int arch_make_page_accessible(struct page *page)
++int arch_make_folio_accessible(struct folio *folio)
  {
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct page *page;
-+	struct folio *folio;
- 	spinlock_t *ptl;
- 	pte_t *ptep, pte;
- 	int ret;
-@@ -644,7 +645,8 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 		goto out;
- 	}
+-	int rc = 0;
++	unsigned long i, nr = folio_nr_pages(folio);
++	unsigned long pfn = folio_pfn(folio);
++	int err = 0;
  
--	VM_BUG_ON_PAGE((flags & FOLL_PIN) && PageAnon(page) &&
-+	folio = page_folio(page);
-+	VM_BUG_ON_PAGE((flags & FOLL_PIN) && folio_test_anon(folio) &&
- 		       !PageAnonExclusive(page), page);
- 
- 	/* try_grab_page() does nothing unless FOLL_GET or FOLL_PIN is set. */
-@@ -655,28 +657,28 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 	}
+ 	/* Hugepage cannot be protected, so nothing to do */
+-	if (PageHuge(page))
++	if (folio_test_hugetlb(folio))
+ 		return 0;
  
  	/*
--	 * We need to make the page accessible if and only if we are going
-+	 * We need to make the folio accessible if and only if we are going
- 	 * to access its content (the FOLL_PIN case).  Please see
- 	 * Documentation/core-api/pin_user_pages.rst for details.
+ 	 * PG_arch_1 is used in 3 places:
+ 	 * 1. for kernel page tables during early boot
+ 	 * 2. for storage keys of huge pages and KVM
+-	 * 3. As an indication that this page might be secure. This can
++	 * 3. As an indication that this folio might be secure. This can
+ 	 *    overindicate, e.g. we set the bit before calling
+ 	 *    convert_to_secure.
+ 	 * As secure pages are never huge, all 3 variants can co-exists.
  	 */
- 	if (flags & FOLL_PIN) {
--		ret = arch_make_page_accessible(page);
-+		ret = arch_make_folio_accessible(folio);
- 		if (ret) {
--			unpin_user_page(page);
-+			gup_put_folio(folio, 1, FOLL_PIN);
- 			page = ERR_PTR(ret);
- 			goto out;
+-	if (!test_bit(PG_arch_1, &page->flags))
++	if (!test_bit(PG_arch_1, &folio->flags))
+ 		return 0;
+ 
+-	rc = uv_pin_shared(page_to_phys(page));
+-	if (!rc) {
+-		clear_bit(PG_arch_1, &page->flags);
++	for (i = 0; i < nr; i++) {
++		err = uv_pin_shared((pfn + i) * PAGE_SIZE);
++		if (err)
++			break;
++	}
++	if (!err) {
++		clear_bit(PG_arch_1, &folio->flags);
+ 		return 0;
+ 	}
+ 
+-	rc = uv_convert_from_secure(page_to_phys(page));
+-	if (!rc) {
+-		clear_bit(PG_arch_1, &page->flags);
++	for (i = 0; i < nr; i++) {
++		err = uv_convert_from_secure((pfn + i) * PAGE_SIZE);
++		if (err)
++			break;
++	}
++	if (!err) {
++		clear_bit(PG_arch_1, &folio->flags);
+ 		return 0;
+ 	}
+ 
+-	return rc;
++	return err;
+ }
+-EXPORT_SYMBOL_GPL(arch_make_page_accessible);
++EXPORT_SYMBOL_GPL(arch_make_folio_accessible);
+ 
+ #endif
+ 
+diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+index b678295931c3..ac707e5d58ab 100644
+--- a/arch/s390/mm/fault.c
++++ b/arch/s390/mm/fault.c
+@@ -588,6 +588,7 @@ void do_secure_storage_access(struct pt_regs *regs)
+ 	struct vm_area_struct *vma;
+ 	struct mm_struct *mm;
+ 	struct page *page;
++	struct folio *folio;
+ 	struct gmap *gmap;
+ 	int rc;
+ 
+@@ -643,17 +644,17 @@ void do_secure_storage_access(struct pt_regs *regs)
+ 			mmap_read_unlock(mm);
+ 			break;
  		}
- 	}
- 	if (flags & FOLL_TOUCH) {
- 		if ((flags & FOLL_WRITE) &&
--		    !pte_dirty(pte) && !PageDirty(page))
--			set_page_dirty(page);
-+		    !pte_dirty(pte) && !folio_test_dirty(folio))
-+			folio_mark_dirty(folio);
- 		/*
- 		 * pte_mkyoung() would be more correct here, but atomic care
- 		 * is needed to avoid losing the dirty bit: it is easier to use
--		 * mark_page_accessed().
-+		 * folio_mark_accessed().
- 		 */
--		mark_page_accessed(page);
-+		folio_mark_accessed(folio);
- 	}
- out:
- 	pte_unmap_unlock(ptep, ptl);
+-		if (arch_make_page_accessible(page))
++		folio = page_folio(page);
++		if (arch_make_folio_accessible(folio))
+ 			send_sig(SIGSEGV, current, 0);
+-		put_page(page);
++		folio_put(folio);
+ 		mmap_read_unlock(mm);
+ 		break;
+ 	case KERNEL_FAULT:
+-		page = phys_to_page(addr);
+-		if (unlikely(!try_get_page(page)))
+-			break;
+-		rc = arch_make_page_accessible(page);
+-		put_page(page);
++		folio = page_folio(phys_to_page(addr));
++		folio_get(folio);
++		rc = arch_make_folio_accessible(folio);
++		folio_put(folio);
+ 		if (rc)
+ 			BUG();
+ 		break;
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index bf5d0b1b16f4..55d3e466d3cb 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2139,26 +2139,10 @@ static inline int folio_estimated_sharers(struct folio *folio)
+ 	return page_mapcount(folio_page(folio, 0));
+ }
+ 
+-#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+-static inline int arch_make_page_accessible(struct page *page)
+-{
+-	return 0;
+-}
+-#endif
+-
+-#ifndef HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE
++#ifndef arch_make_folio_accessible
+ static inline int arch_make_folio_accessible(struct folio *folio)
+ {
+-	int ret;
+-	long i, nr = folio_nr_pages(folio);
+-
+-	for (i = 0; i < nr; i++) {
+-		ret = arch_make_page_accessible(folio_page(folio, i));
+-		if (ret)
+-			break;
+-	}
+-
+-	return ret;
++	return 0;
+ }
+ #endif
+ 
 -- 
 2.40.1
 
