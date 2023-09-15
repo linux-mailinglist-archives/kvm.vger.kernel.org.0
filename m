@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FC317A1343
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 03:51:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 059037A1346
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 03:51:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231703AbjIOBvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 21:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
+        id S231646AbjIOBvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 21:51:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231792AbjIOBuz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 21:50:55 -0400
+        with ESMTP id S231642AbjIOBu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 21:50:57 -0400
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 972903AA0;
-        Thu, 14 Sep 2023 18:50:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B05943ABB;
+        Thu, 14 Sep 2023 18:50:18 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8Dxl+hOuANlmf8nAA--.41047S3;
+        by gateway (Coremail) with SMTP id _____8Dxl+hOuANlqv8nAA--.41049S3;
         Fri, 15 Sep 2023 09:50:06 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axndw9uANl+ioGAA--.11927S29;
-        Fri, 15 Sep 2023 09:50:04 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Axndw9uANl+ioGAA--.11927S30;
+        Fri, 15 Sep 2023 09:50:05 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -31,16 +31,16 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alex Deucher <alexander.deucher@amd.com>,
         Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
         Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH v21 27/29] LoongArch: KVM: Enable kvm config and add the makefile
-Date:   Fri, 15 Sep 2023 09:49:47 +0800
-Message-Id: <20230915014949.1222777-28-zhaotianrui@loongson.cn>
+        Huacai Chen <chenhuacai@loongson.cn>
+Subject: [PATCH v21 28/29] LoongArch: KVM: Supplement kvm document about LoongArch-specific part
+Date:   Fri, 15 Sep 2023 09:49:48 +0800
+Message-Id: <20230915014949.1222777-29-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
 References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Axndw9uANl+ioGAA--.11927S29
+X-CM-TRANSID: AQAAf8Axndw9uANl+ioGAA--.11927S30
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
         ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
@@ -49,148 +49,197 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable LoongArch kvm config and add the makefile to support build kvm
-module.
+Supplement kvm document about LoongArch-specific part, such as add
+api introduction for GET/SET_ONE_REG, GET/SET_FPU, GET/SET_MP_STATE,
+etc.
 
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202304131526.iXfLaVZc-lkp@intel.com/
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
 Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
 ---
- arch/loongarch/Kbuild                      |  1 +
- arch/loongarch/Kconfig                     |  3 ++
- arch/loongarch/configs/loongson3_defconfig |  2 +
- arch/loongarch/kvm/Kconfig                 | 45 ++++++++++++++++++++++
- arch/loongarch/kvm/Makefile                | 20 ++++++++++
- 5 files changed, 71 insertions(+)
- create mode 100644 arch/loongarch/kvm/Kconfig
- create mode 100644 arch/loongarch/kvm/Makefile
+ Documentation/virt/kvm/api.rst | 70 +++++++++++++++++++++++++++++-----
+ 1 file changed, 61 insertions(+), 9 deletions(-)
 
-diff --git a/arch/loongarch/Kbuild b/arch/loongarch/Kbuild
-index b01f5cdb27..9679c798c2 100644
---- a/arch/loongarch/Kbuild
-+++ b/arch/loongarch/Kbuild
-@@ -2,6 +2,7 @@ obj-y += kernel/
- obj-y += mm/
- obj-y += net/
- obj-y += vdso/
-+obj-$(CONFIG_KVM) += kvm/
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 21a7578142..2be69d9f30 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -416,6 +416,13 @@ Reads the general purpose registers from the vcpu.
+ 	__u64 pc;
+   };
  
- # for cleaning
- subdir- += boot
-diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
-index e14396a2dd..0abb1f12eb 100644
---- a/arch/loongarch/Kconfig
-+++ b/arch/loongarch/Kconfig
-@@ -129,6 +129,7 @@ config LOONGARCH
- 	select HAVE_KPROBES
- 	select HAVE_KPROBES_ON_FTRACE
- 	select HAVE_KRETPROBES
-+	select HAVE_KVM
- 	select HAVE_MOD_ARCH_SPECIFIC
- 	select HAVE_NMI
- 	select HAVE_PCI
-@@ -676,3 +677,5 @@ source "kernel/power/Kconfig"
- source "drivers/acpi/Kconfig"
++  /* LoongArch */
++  struct kvm_regs {
++	/* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
++        unsigned long gpr[32];
++        unsigned long pc;
++  };
++
  
- endmenu
+ 4.12 KVM_SET_REGS
+ -----------------
+@@ -506,7 +513,7 @@ translation mode.
+ ------------------
+ 
+ :Capability: basic
+-:Architectures: x86, ppc, mips, riscv
++:Architectures: x86, ppc, mips, riscv, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_interrupt (in)
+ :Returns: 0 on success, negative on failure.
+@@ -592,6 +599,14 @@ b) KVM_INTERRUPT_UNSET
+ 
+ This is an asynchronous vcpu ioctl and can be invoked from any thread.
+ 
++LOONGARCH:
++^^^^^^^^^^
 +
-+source "arch/loongarch/kvm/Kconfig"
-diff --git a/arch/loongarch/configs/loongson3_defconfig b/arch/loongarch/configs/loongson3_defconfig
-index a3b52aaa83..2a8edebcc5 100644
---- a/arch/loongarch/configs/loongson3_defconfig
-+++ b/arch/loongarch/configs/loongson3_defconfig
-@@ -67,11 +67,13 @@ CONFIG_EFI_GENERIC_STUB_INITRD_CMDLINE_LOADER=y
- CONFIG_EFI_CAPSULE_LOADER=m
- CONFIG_EFI_TEST=m
- CONFIG_JUMP_LABEL=y
-+CONFIG_KVM=m
- CONFIG_MODULES=y
- CONFIG_MODULE_FORCE_LOAD=y
- CONFIG_MODULE_UNLOAD=y
- CONFIG_MODULE_FORCE_UNLOAD=y
- CONFIG_MODVERSIONS=y
-+CONFIG_VIRTUALIZATION=y
- CONFIG_BLK_DEV_THROTTLING=y
- CONFIG_PARTITION_ADVANCED=y
- CONFIG_BSD_DISKLABEL=y
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-new file mode 100644
-index 0000000000..b517785c50
---- /dev/null
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -0,0 +1,45 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# KVM configuration
-+#
++Queues an external interrupt to be injected into the virtual CPU. A negative
++interrupt number dequeues the interrupt.
 +
-+source "virt/kvm/Kconfig"
++This is an asynchronous vcpu ioctl and can be invoked from any thread.
 +
-+menuconfig VIRTUALIZATION
-+	bool "Virtualization"
-+	help
-+	  Say Y here to get to see options for using your Linux host to run
-+	  other operating systems inside virtual machines (guests).
-+	  This option alone does not add any kernel code.
+ 
+ 4.17 KVM_DEBUG_GUEST
+ --------------------
+@@ -737,7 +752,7 @@ signal mask.
+ ----------------
+ 
+ :Capability: basic
+-:Architectures: x86
++:Architectures: x86, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_fpu (out)
+ :Returns: 0 on success, -1 on error
+@@ -746,7 +761,7 @@ Reads the floating point state from the vcpu.
+ 
+ ::
+ 
+-  /* for KVM_GET_FPU and KVM_SET_FPU */
++  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+   struct kvm_fpu {
+ 	__u8  fpr[8][16];
+ 	__u16 fcw;
+@@ -761,12 +776,21 @@ Reads the floating point state from the vcpu.
+ 	__u32 pad2;
+   };
+ 
++  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
++  struct kvm_fpu {
++        __u32 fcsr;
++        __u64 fcc;
++        struct kvm_fpureg {
++                __u64 val64[4];
++        }fpr[32];
++  };
 +
-+	  If you say N, all options in this submenu will be skipped and
-+	  disabled.
+ 
+ 4.23 KVM_SET_FPU
+ ----------------
+ 
+ :Capability: basic
+-:Architectures: x86
++:Architectures: x86, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_fpu (in)
+ :Returns: 0 on success, -1 on error
+@@ -775,7 +799,7 @@ Writes the floating point state to the vcpu.
+ 
+ ::
+ 
+-  /* for KVM_GET_FPU and KVM_SET_FPU */
++  /* x86: for KVM_GET_FPU and KVM_SET_FPU */
+   struct kvm_fpu {
+ 	__u8  fpr[8][16];
+ 	__u16 fcw;
+@@ -790,6 +814,15 @@ Writes the floating point state to the vcpu.
+ 	__u32 pad2;
+   };
+ 
++  /* LoongArch: for KVM_GET_FPU and KVM_SET_FPU */
++  struct kvm_fpu {
++        __u32 fcsr;
++        __u64 fcc;
++        struct kvm_fpureg {
++                __u64 val64[4];
++        }fpr[32];
++  };
 +
-+if VIRTUALIZATION
+ 
+ 4.24 KVM_CREATE_IRQCHIP
+ -----------------------
+@@ -1387,7 +1420,7 @@ documentation when it pops into existence).
+ -------------------
+ 
+ :Capability: KVM_CAP_ENABLE_CAP
+-:Architectures: mips, ppc, s390, x86
++:Architectures: mips, ppc, s390, x86, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_enable_cap (in)
+ :Returns: 0 on success; -1 on error
+@@ -1442,7 +1475,7 @@ for vm-wide capabilities.
+ ---------------------
+ 
+ :Capability: KVM_CAP_MP_STATE
+-:Architectures: x86, s390, arm64, riscv
++:Architectures: x86, s390, arm64, riscv, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_mp_state (out)
+ :Returns: 0 on success; -1 on error
+@@ -1460,7 +1493,7 @@ Possible values are:
+ 
+    ==========================    ===============================================
+    KVM_MP_STATE_RUNNABLE         the vcpu is currently running
+-                                 [x86,arm64,riscv]
++                                 [x86,arm64,riscv,loongarch]
+    KVM_MP_STATE_UNINITIALIZED    the vcpu is an application processor (AP)
+                                  which has not yet received an INIT signal [x86]
+    KVM_MP_STATE_INIT_RECEIVED    the vcpu has received an INIT signal, and is
+@@ -1516,11 +1549,14 @@ For riscv:
+ The only states that are valid are KVM_MP_STATE_STOPPED and
+ KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+ 
++On LoongArch, only the KVM_MP_STATE_RUNNABLE state is used to reflect
++whether the vcpu is runnable.
 +
-+config AS_HAS_LVZ_EXTENSION
-+	def_bool $(as-instr,hvcl 0)
+ 4.39 KVM_SET_MP_STATE
+ ---------------------
+ 
+ :Capability: KVM_CAP_MP_STATE
+-:Architectures: x86, s390, arm64, riscv
++:Architectures: x86, s390, arm64, riscv, loongarch
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_mp_state (in)
+ :Returns: 0 on success; -1 on error
+@@ -1538,6 +1574,9 @@ For arm64/riscv:
+ The only states that are valid are KVM_MP_STATE_STOPPED and
+ KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
+ 
++On LoongArch, only the KVM_MP_STATE_RUNNABLE state is used to reflect
++whether the vcpu is runnable.
 +
-+config KVM
-+	tristate "Kernel-based Virtual Machine (KVM) support"
-+	depends on AS_HAS_LVZ_EXTENSION
-+	depends on HAVE_KVM
-+	select ANON_INODES
-+	select HAVE_KVM_DIRTY_RING_ACQ_REL
-+	select HAVE_KVM_EVENTFD
-+	select HAVE_KVM_VCPU_ASYNC_IOCTL
-+	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	select KVM_GENERIC_HARDWARE_ENABLING
-+	select KVM_MMIO
-+	select KVM_XFER_TO_GUEST_WORK
-+	select MMU_NOTIFIER
-+	select PREEMPT_NOTIFIERS
-+	select SRCU
-+	help
-+	  Support hosting virtualized guest machines using
-+	  hardware virtualization extensions. You will need
-+	  a processor equipped with virtualization extensions.
+ 4.40 KVM_SET_IDENTITY_MAP_ADDR
+ ------------------------------
+ 
+@@ -2841,6 +2880,19 @@ Following are the RISC-V D-extension registers:
+   0x8020 0000 0600 0020 fcsr      Floating point control and status register
+ ======================= ========= =============================================
+ 
++LoongArch registers are mapped using the lower 32 bits. The upper 16 bits of
++that is the register group type.
 +
-+	  If unsure, say N.
++LoongArch csr registers are used to control guest cpu or get status of guest
++cpu, and they have the following id bit patterns::
 +
-+endif # VIRTUALIZATION
-diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-new file mode 100644
-index 0000000000..77e9ba2b7a
---- /dev/null
-+++ b/arch/loongarch/kvm/Makefile
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for LoongArch KVM support
-+#
++  0x9030 0000 0001 00 <reg:5> <sel:3>   (64-bit)
 +
-+ccflags-y += -I $(srctree)/$(src)
++LoongArch KVM control registers are used to implement some new defined functions
++such as set vcpu counter or reset vcpu, and they have the following id bit patterns::
 +
-+include $(srctree)/virt/kvm/Makefile.kvm
++  0x9030 0000 0002 <reg:16>
 +
-+obj-$(CONFIG_KVM) += kvm.o
-+
-+kvm-y += exit.o
-+kvm-y += interrupt.o
-+kvm-y += main.o
-+kvm-y += mmu.o
-+kvm-y += switch.o
-+kvm-y += timer.o
-+kvm-y += tlb.o
-+kvm-y += vcpu.o
-+kvm-y += vm.o
+ 
+ 4.69 KVM_GET_ONE_REG
+ --------------------
 -- 
 2.39.1
 
