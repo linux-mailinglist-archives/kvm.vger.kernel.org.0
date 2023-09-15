@@ -2,115 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEC827A1257
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 02:33:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D2767A1260
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 02:34:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbjIOAdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Sep 2023 20:33:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53254 "EHLO
+        id S231161AbjIOAeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Sep 2023 20:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbjIOAdW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Sep 2023 20:33:22 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9937C269D
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 17:33:17 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52e828ad46bso1841710a12.1
-        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 17:33:17 -0700 (PDT)
+        with ESMTP id S230263AbjIOAeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Sep 2023 20:34:02 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4DF26A4
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 17:33:57 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7b957fd276so1901342276.0
+        for <kvm@vger.kernel.org>; Thu, 14 Sep 2023 17:33:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1694737996; x=1695342796; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qvr3LUTPCnlzdeJGe9jKxP+vA9Fp/a5KVBNv/Iu61xg=;
-        b=dPizM96qwGUo6ZwfI/O2/2F49Ck60Q1KeThW4F22LbZyWxuizHjiElHS8Liz1fFS1d
-         TsbsNZJlblxaA/LVKE/pWh3jqWI891OgTNLOLhgAP0oBplv65JrFR3P2SRQhwmWePzFG
-         d3LD4qT4VTGQNK74qcMuYA9mumqgoIEFMEGdk=
+        d=google.com; s=20230601; t=1694738035; x=1695342835; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J23lG2GsSAJUhRlfXZ8Nll1xYHKwqpwqAHVfDlHiwRQ=;
+        b=EKJdNUoxAcwI4xNMhSQg70ujG6bbjdwcSmBuufl2Bz/yre0DtfLkQd8OIAqBtc9Mmu
+         DFoSpXJ0GuNyyKSxlxW09z8+l3SMPOwTFdPg9AnKuYklIHELthmqE+8mAdOe/5LwpD3F
+         KUT8t+/L03/+nihL9nTOs9k4cJqsQ2cYkexZCzFPiFJB/3FILVN58Y6N3CNlyUsPmmke
+         3ligqj/xU3Ftbay7d7bM1GhFeXt+S1smOi5O7aon/D9Oyrw6jqnoH6xj7WOr2PMn9Ob4
+         RA4LQap02I1S3v/ZaDZwbfMFzbCZ3viO/uou+VKvw7fHswzDLTYQQPLP5oAsQ+EOn3jZ
+         +jmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694737996; x=1695342796;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:from:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qvr3LUTPCnlzdeJGe9jKxP+vA9Fp/a5KVBNv/Iu61xg=;
-        b=oMGszkHPO/34Bx5spJA4SllA5SVBQE5qruDTjz/ETaC2HqM5mZ2i0wXPxxBbzvgG+i
-         dkttFK7zzWnjoXQuW8D+Jng/5Ps9qUYCSdT4qmP1SFxU7K/7EzAg+HhmQ24daMNFxJag
-         exchxtAuLmkAQL1r39wkiPfMwJCl4VrbRl+q77K4HEZziI0FpUXKBJUT7dD95s9RZ65a
-         nFx8lD/htXIgVPWqLexeCnpxAMUVHnU2g/A4bIaMtQ382HeiIbJyHIiwaZfPAj6CuyfV
-         PR3meZi8I7YEbyLmWoHxWf8Huq1GGond5g+bIa0Q29xBNrPJnJO+IJ08yDxkBBl5aZGy
-         eLcA==
-X-Gm-Message-State: AOJu0YyrPtS1YWywE0RTgF180uu/WkXzOutsiajEg9HUGfPdQ0f7qRLl
-        Svc/sN6QZhAd6Htgc2WLKbv9Tg==
-X-Google-Smtp-Source: AGHT+IHViSUcArYmWr6MhrGopGlxIfnNZ7LWPvwSUNL0WVRYHkDsfzmJtBUWnPFw5fHbDPHMAHqaLQ==
-X-Received: by 2002:a17:906:5392:b0:9a2:23b:db60 with SMTP id g18-20020a170906539200b009a2023bdb60mr16582ejo.54.1694737996072;
-        Thu, 14 Sep 2023 17:33:16 -0700 (PDT)
-Received: from [192.168.1.10] (host-92-12-44-130.as13285.net. [92.12.44.130])
-        by smtp.gmail.com with ESMTPSA id lc3-20020a170906dfe300b00982a352f078sm1657125ejc.124.2023.09.14.17.33.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Sep 2023 17:33:15 -0700 (PDT)
-Message-ID: <50e96f85-66f8-2a4f-45c9-a685c757bb28@citrix.com>
-Date:   Fri, 15 Sep 2023 01:33:14 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-From:   andrew.cooper3@citrix.com
-Subject: Re: [PATCH v10 03/38] x86/msr: Add the WRMSRNS instruction support
-Content-Language: en-GB
-To:     Thomas Gleixner <tglx@linutronix.de>, Xin Li <xin3.li@intel.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, luto@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, peterz@infradead.org,
-        jgross@suse.com, ravi.v.shankar@intel.com, mhiramat@kernel.org,
-        jiangshanlai@gmail.com
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-4-xin3.li@intel.com>
- <6f5678ff-f8b1-9ada-c8c7-f32cfb77263a@citrix.com> <87y1h81ht4.ffs@tglx>
- <7ba4ae3e-f75d-66a8-7669-b6eb17c1aa1c@citrix.com> <87v8cc1ehe.ffs@tglx>
-In-Reply-To: <87v8cc1ehe.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        d=1e100.net; s=20230601; t=1694738035; x=1695342835;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J23lG2GsSAJUhRlfXZ8Nll1xYHKwqpwqAHVfDlHiwRQ=;
+        b=SNS+lUqYS0mMTDBqj6AP1iVU1Zsd9EILswrXb7OL+FpxSPW7BAAJvDGfAwwlTK+AeJ
+         8YwWjNaAHmwlm9J/96wdIEyCFi2qhmzQhqVff5LikgwDN73X/O4tNYfe/co8ab54o+C0
+         23Q4ZXHNwT/8nr6gTknjCxMPBwcXJmTR0+rtjLROLzLQ2VfBqSY7/6ZV3qywtQYAedZq
+         4vQWHM4RDCfGqRj7PmY79Zhejt7JLiob1KkHXM1zuxcyGlk/6gPkDWYBjxDcGsALui2Y
+         h7g6ke3mKb2500Zp4L2NajXFBxXyhA8wVAP6woWuGbdHplHBqKybmIzcJude0aL0cemQ
+         Ywhw==
+X-Gm-Message-State: AOJu0YyoY1l9midCY7beDqpTf4zjglvQIa+susKYTe2LVNqgiJC1fWo5
+        zpjQjNcHhaoV54wEMr/he0IjW73+0WI=
+X-Google-Smtp-Source: AGHT+IHBN6t0jhuW16tvzWJMbA1thelqq1JkZNxaAmcO8xrBGxWQKZuWbB7lmKVGkcmoGzwdDBC0p73x1Zc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ad5c:0:b0:d7b:9830:c172 with SMTP id
+ l28-20020a25ad5c000000b00d7b9830c172mr2934ybe.0.1694738035530; Thu, 14 Sep
+ 2023 17:33:55 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 17:33:53 -0700
+In-Reply-To: <diqzv8ccjqbd.fsf@ackerleytng-ctop.c.googlers.com>
+Mime-Version: 1.0
+References: <ZOO782YGRY0YMuPu@google.com> <diqzttsiu67n.fsf@ackerleytng-ctop.c.googlers.com>
+ <ZQNN2AyDJ8dF0/6D@google.com> <diqzv8ccjqbd.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZQOmcc969s90DwNz@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        david@redhat.com, qperret@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/09/2023 1:12 am, Thomas Gleixner wrote:
-> On Fri, Sep 15 2023 at 00:46, andrew wrote:
->> On 15/09/2023 12:00 am, Thomas Gleixner wrote:
->>> So no. I'm fundamentally disagreeing with your recommendation. The way
->>> forward is:
->>>
->>>   1) Provide the native variant for wrmsrns(), i.e. rename the proposed
->>>      wrmsrns() to native_wrmsr_ns() and have the X86_FEATURE_WRMSRNS
->>>      safety net as you pointed out.
->>>
->>>      That function can be used in code which is guaranteed to be not
->>>      affected by the PV_XXL madness.
->>>
->>>   2) Come up with a sensible solution for the PV_XXL horrorshow
->>>
->>>   3) Implement a sane general variant of wrmsr_ns() which handles
->>>      both X86_FEATURE_WRMSRNS and X86_MISFEATURE_PV_XXL
->>>
->>>   4) Convert other code which benefits from the non-serializing variant
->>>      to wrmsr_ns()
->> Well - point 1 is mostly work that needs reverting as part of completing
->> point 3, and point 2 clearly needs doing irrespective of anything else.
-> No. #1 has a value on its own independent of the general variant in #3.
->
->>>      That function can be used in code which is guaranteed to be not
->>>      affected by the PV_XXL madness.
-> That makes a lot of sense because it's guaranteed to generate better
-> code than whatever we come up with for the PV_XXL nonsense.
+On Thu, Sep 14, 2023, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Mon, Aug 28, 2023, Ackerley Tng wrote:
+> >> Sean Christopherson <seanjc@google.com> writes:
+> >> >> If we track struct kvm with the inode, then I think (a), (b) and (c) can
+> >> >> be independent of the refcounting method. What do you think?
+> >> >
+> >> > No go.  Because again, the inode (physical memory) is coupled to the virtual machine
+> >> > as a thing, not to a "struct kvm".  Or more concretely, the inode is coupled to an
+> >> > ASID or an HKID, and there can be multiple "struct kvm" objects associated with a
+> >> > single ASID.  And at some point in the future, I suspect we'll have multiple KVM
+> >> > objects per HKID too.
+> >> >
+> >> > The current SEV use case is for the migration helper, where two KVM objects share
+> >> > a single ASID (the "real" VM and the helper).  I suspect TDX will end up with
+> >> > similar behavior where helper "VMs" can use the HKID of the "real" VM.  For KVM,
+> >> > that means multiple struct kvm objects being associated with a single HKID.
+> >> >
+> >> > To prevent use-after-free, KVM "just" needs to ensure the helper instances can't
+> >> > outlive the real instance, i.e. can't use the HKID/ASID after the owning virtual
+> >> > machine has been destroyed.
+> >> >
+> >> > To put it differently, "struct kvm" is a KVM software construct that _usually_,
+> >> > but not always, is associated 1:1 with a virtual machine.
+> >> >
+> >> > And FWIW, stashing the pointer without holding a reference would not be a complete
+> >> > solution, because it couldn't guard against KVM reusing a pointer.  E.g. if a
+> >> > struct kvm was unbound and then freed, KVM could reuse the same memory for a new
+> >> > struct kvm, with a different ASID/HKID, and get a false negative on the rebinding
+> >> > check.
+> >> 
+> >> I agree that inode (physical memory) is coupled to the virtual machine
+> >> as a more generic concept.
+> >> 
+> >> I was hoping that in the absence of CC hardware providing a HKID/ASID,
+> >> the struct kvm pointer could act as a representation of the "virtual
+> >> machine". You're definitely right that KVM could reuse a pointer and so
+> >> that idea doesn't stand.
+> >> 
+> >> I thought about generating UUIDs to represent "virtual machines" in the
+> >> absence of CC hardware, and this UUID could be transferred during
+> >> intra-host migration, but this still doesn't take host userspace out of
+> >> the TCB. A malicious host VMM could just use the migration ioctl to copy
+> >> the UUID to a malicious dumper VM, which would then pass checks with a
+> >> gmem file linked to the malicious dumper VM. This is fine for HKID/ASIDs
+> >> because the memory is encrypted; with UUIDs there's no memory
+> >> encryption.
+> >
+> > I don't understand what problem you're trying to solve.  I don't see a need to
+> > provide a single concrete representation/definition of a "virtual machine".  E.g.
+> > there's no need for a formal definition to securely perform intrahost migration,
+> > KVM just needs to ensure that the migration doesn't compromise guest security,
+> > functionality, etc.
+> >
+> > That gets a lot more complex if the target KVM instance (module, not "struct kvm")
+> > is a different KVM, e.g. when migrating to a different host.  Then there needs to
+> > be a way to attest that the target is trusted and whatnot, but that still doesn't
+> > require there to be a formal definition of a "virtual machine".
+> >
+> >> Circling back to the original topic, was associating the file with
+> >> struct kvm at gmem file creation time meant to constrain the use of the
+> >> gmem file to one struct kvm, or one virtual machine, or something else?
+> >
+> > It's meant to keep things as simple as possible (relatively speaking).  A 1:1
+> > association between a KVM instance and a gmem instance means we don't have to
+> > worry about the edge cases and oddities I pointed out earlier in this thread.
+> >
+> 
+> I looked through this thread again and re-read the edge cases and
+> oddities that was pointed out earlier (last paragraph at [1]) and I
+> think I understand better, and I have just one last clarification.
+> 
+> It was previously mentioned that binding on creation time simplifies the
+> lifecycle of memory:
+> 
+> "(a) prevent a different VM from *ever* binding to the gmem instance" [1]
+> 
+> Does this actually mean
+> 
+> "prevent a different struct kvm from *ever* binding to this gmem file"
+> 
+> ?
 
-It's an assumption about what "definitely won't" be paravirt in the future.
+Yes.
 
-XenPV stack handling is almost-FRED-like and has been for the better
-part of two decades.
+> If so, then binding on creation
+> 
+> + Makes the gmem *file* (and just not the bindings xarray) the binding
+>   between struct kvm and the file.
 
-You frequently complain that there's too much black magic holding XenPV
-together.  A paravirt-FRED will reduce the differences vs native
-substantially.
+Yep.
 
-~Andrew
+> + Simplifies the KVM-userspace contract to "this gmem file can only be
+>   used with this struct kvm"
+
+Yep.
+
+> Binding on creation doesn't offer any way to block the contents of the
+> inode from being used with another "virtual machine" though, since we
+> can have more than one gmem file pointing to the same inode, and the
+> other gmem file is associated with another struct kvm. (And a strut kvm
+> isn't associated 1:1 with a virtual machine [2])
+
+Yep.
+
+> The point about an inode needing to be coupled to a virtual machine as a
+> thing [2] led me to try to find a single concrete representation of a
+> "virtual machine".
+> 
+> Is locking inode contents to a "virtual machine" outside the scope of
+> gmem?
+
+Yes, because it's not gmem's responsibility to define "secure" (from a guest
+perspective) or "safe" (from a platform stability and correctness perspective).
+
+E.g. inserting additional vCPUs into the VM a la the SEV migration helper thing
+is comically insecure without some way to attest the helper code.  Building policy
+into the host kernel/KVM to do that attestation or otherwise determine what code
+is/isn't safe for the guest to run is firmly out-of-scope.  KVM can certainly
+provide the tools and help with enforcement, but the policy needs to be defined
+elsewhere.  Even for something like pKVM, where KVM is in the TCB, KVM still doesn't
+define who/what to trust (though KVM is heavily involved in enforcing security
+stuff).
+
+And for platform safety, e.g. not allowing two VMs to use the same HKID (ignoring
+helpers for the moment), that's a KVM problem but NOT a gmem problem.  The point
+I raised in link[2] about a gmem inode and thus the HKID/ASID associated with the
+inode being bound to the "virtual machine" still holds true, but (a) it's not a
+1:1 correlation, e.g. a VM could utilize multiple gmem inodes (all with the same
+HKID/ASID), and (b) the safety and functional correctness aspects aren't unique
+to gmem, e.g. even when when gmem isn't in the picture, KVM needs to make sure it
+manages ASIDs correctly.  The only difference with SNP in the picture is that if
+KVM screws up ASID management, bad things happen to the host, not (just) the guest.
+
+>  If so, then it is fine to bind on creation time, use a VM ioctl
+> over a system ioctl, and the method of refcounting in gmem v12 is okay.
+> 
+> [1] https://lore.kernel.org/lkml/ZNKv9ul2I7A4V7IF@google.com/
+> [2] https://lore.kernel.org/lkml/ZOO782YGRY0YMuPu@google.com/
+> 
+> > <snip>
