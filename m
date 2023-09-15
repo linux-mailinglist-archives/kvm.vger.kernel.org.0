@@ -2,73 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 946B77A26D4
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 21:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 768107A2721
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 21:23:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236988AbjIOTBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 15:01:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35818 "EHLO
+        id S236873AbjIOTXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 15:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236834AbjIOTBE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 15:01:04 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A162700
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 12:00:49 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9aa0495f9cfso775997866b.1
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 12:00:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694804448; x=1695409248; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oOpx/VA/+gwdtEbnTetIr2FQsXveadRswnAsnH4GXos=;
-        b=BD3S+lptWgYbVUp07tAI39aXmGHExjkVI+ULI4guCoMcX2UaJt/VcJfNLn+L/kL2MP
-         1bQl/GaJ94PJuYfMHKdxw9xyA5C/5Ubxt7pmltSmvHLmgYGur6x1AZEQUOtYC0tOFoes
-         4HQYFD+xCXNX6/eiPMmyLkOHasgzkditqy+BMYmQ/TvskYQOVKyNpffdNzMDqG3FiVEL
-         UtmbnIclVcnvBgtl8fNMYdiKcMNVrwNL8gDprbiG5p3TeHer/qN8Ih4n8p0pg2mhGvTO
-         5bpsuwiI6o6j7iOky8uNiDbKRtyFhlgpCcxh74KD2pImVLLZEQJ6KL118ZFcvP+dpeW5
-         HxoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694804448; x=1695409248;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oOpx/VA/+gwdtEbnTetIr2FQsXveadRswnAsnH4GXos=;
-        b=fY/U9ioprgoL+pCD6ZsPi5C+zgJ0S6e9z3lAT0tqDfCOIXvI+83pIeY+NEv25Po6Ww
-         5ULzfRc/j8w67dycq2MNYnkRmrgFwxDckbweLhoZeHJGEv/nF4ItUl9prHp34azRdNEG
-         H0PNgbagU/oCQ/u1kkqs09qszx+my3xTttlF+YWqAN9irK0WvcrIGb0UagRC4e3zvPRJ
-         ro3i1C2bvhfkKfVU3LZp96MXzmhawx0Qc/KHuyf0vAYmrMVKtePcWf6cseruvavcV/J+
-         jdmrucnogm6MTx00Af0phMzN0gM50IhkkD1/q0XABr8LRrxDeJOLongbON9Ay72LzCej
-         tjDg==
-X-Gm-Message-State: AOJu0YxKo9TB0U6vBuyjH4ZGBJKYrf0aXFA8eNHH70t/vwdL/kyTHvzD
-        oXq2KucdD3Dbk7SSBW155C13WA==
-X-Google-Smtp-Source: AGHT+IELleuQSkuMS3U2vjtSOoyli3O0jtH4oH1By3hb7PvHE0MO+UI88qPm19yIOTSyq5wf6F29XQ==
-X-Received: by 2002:a17:907:3f91:b0:9a5:b247:3ab with SMTP id hr17-20020a1709073f9100b009a5b24703abmr9362665ejc.19.1694804445231;
-        Fri, 15 Sep 2023 12:00:45 -0700 (PDT)
-Received: from m1x-phil.lan (6lp61-h01-176-171-209-234.dsl.sta.abo.bbox.fr. [176.171.209.234])
-        by smtp.gmail.com with ESMTPSA id mf13-20020a170906cb8d00b0099caf5bed64sm2735321ejb.57.2023.09.15.12.00.43
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 15 Sep 2023 12:00:44 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     Richard Henderson <richard.henderson@linaro.org>,
-        Fabiano Rosas <farosas@suse.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Claudio Fontana <cfontana@suse.de>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        kvm@vger.kernel.org, Yanan Wang <wangyanan55@huawei.com>,
+        with ESMTP id S237046AbjIOTXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 15:23:06 -0400
+Received: from out-229.mta0.migadu.com (out-229.mta0.migadu.com [91.218.175.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6611FDE
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 12:22:56 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 19:22:47 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1694805774;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=f6A1k8x4/KZw+o1a8WwOEfU/+PCk8Ghi0Fb9Ywzdmuc=;
+        b=u8sqfMd5XvQFcuyvVmb00KMHIveZCJpd1PJ/o6SPWEWjThqR1m6L9Od8mQk4TgzRyIBrkm
+        b+TXHCJkNTPKVPlMZ7+o5IfMeQ0xESl0/ZLnxKUehTAf2NOWtXhyGSReXf56VKj+X+uRkx
+        P/b6Y7DyjadqHA0r48vCRcethFP4WRc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Subject: [PATCH 5/5] accel/tcg: Restrict tcg_exec_[un]realizefn() to TCG
-Date:   Fri, 15 Sep 2023 21:00:08 +0200
-Message-ID: <20230915190009.68404-6-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230915190009.68404-1-philmd@linaro.org>
-References: <20230915190009.68404-1-philmd@linaro.org>
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 01/12] KVM: arm64: PMU: Introduce a helper to set the
+ guest's PMU
+Message-ID: <ZQSvB4ZZ25eIHt/G@linux.dev>
+References: <20230817003029.3073210-1-rananta@google.com>
+ <20230817003029.3073210-2-rananta@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230817003029.3073210-2-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -78,84 +58,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We don't need to expose these TCG-specific methods to the
-whole code base. Register them as AccelClass handlers, they
-will be called by the generic accel_cpu_[un]realize() methods.
+Hi Raghu,
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- accel/tcg/internal.h   | 3 +++
- include/exec/cpu-all.h | 2 --
- accel/tcg/tcg-all.c    | 2 ++
- cpu.c                  | 8 --------
- 4 files changed, 5 insertions(+), 10 deletions(-)
+On Thu, Aug 17, 2023 at 12:30:18AM +0000, Raghavendra Rao Ananta wrote:
+> From: Reiji Watanabe <reijiw@google.com>
+> 
+> Introduce a new helper function to set the guest's PMU
+> (kvm->arch.arm_pmu), and use it when the guest's PMU needs
+> to be set. This helper will make it easier for the following
+> patches to modify the relevant code.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 52 +++++++++++++++++++++++++++------------
+>  1 file changed, 36 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 5606509724787..0ffd1efa90c07 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -865,6 +865,32 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  	return true;
+>  }
+>  
+> +static int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+> +{
+> +	lockdep_assert_held(&kvm->arch.config_lock);
+> +
+> +	if (!arm_pmu) {
+> +		/*
+> +		 * No PMU set, get the default one.
+> +		 *
+> +		 * The observant among you will notice that the supported_cpus
+> +		 * mask does not get updated for the default PMU even though it
+> +		 * is quite possible the selected instance supports only a
+> +		 * subset of cores in the system. This is intentional, and
+> +		 * upholds the preexisting behavior on heterogeneous systems
+> +		 * where vCPUs can be scheduled on any core but the guest
+> +		 * counters could stop working.
+> +		 */
+> +		arm_pmu = kvm_pmu_probe_armpmu();
+> +		if (!arm_pmu)
+> +			return -ENODEV;
+> +	}
+> +
+> +	kvm->arch.arm_pmu = arm_pmu;
+> +
+> +	return 0;
+> +}
+> +
 
-diff --git a/accel/tcg/internal.h b/accel/tcg/internal.h
-index e8cbbde581..57ab397df1 100644
---- a/accel/tcg/internal.h
-+++ b/accel/tcg/internal.h
-@@ -80,6 +80,9 @@ bool tb_invalidate_phys_page_unwind(tb_page_addr_t addr, uintptr_t pc);
- void cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-                                uintptr_t host_pc);
- 
-+bool tcg_exec_realizefn(CPUState *cpu, Error **errp);
-+void tcg_exec_unrealizefn(CPUState *cpu);
-+
- /* Return the current PC from CPU, which may be cached in TB. */
- static inline vaddr log_pc(CPUState *cpu, const TranslationBlock *tb)
- {
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 1e5c530ee1..230525ebf7 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -422,8 +422,6 @@ void dump_exec_info(GString *buf);
- 
- /* accel/tcg/cpu-exec.c */
- int cpu_exec(CPUState *cpu);
--bool tcg_exec_realizefn(CPUState *cpu, Error **errp);
--void tcg_exec_unrealizefn(CPUState *cpu);
- 
- /**
-  * cpu_set_cpustate_pointers(cpu)
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index 03dfd67e9e..6942a9766a 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -227,6 +227,8 @@ static void tcg_accel_class_init(ObjectClass *oc, void *data)
-     AccelClass *ac = ACCEL_CLASS(oc);
-     ac->name = "tcg";
-     ac->init_machine = tcg_init_machine;
-+    ac->realize_cpu = tcg_exec_realizefn;
-+    ac->unrealize_cpu = tcg_exec_unrealizefn;
-     ac->allowed = &tcg_allowed;
-     ac->gdbstub_supported_sstep_flags = tcg_gdbstub_supported_sstep_flags;
- 
-diff --git a/cpu.c b/cpu.c
-index b928bbed50..1a8e730bed 100644
---- a/cpu.c
-+++ b/cpu.c
-@@ -140,11 +140,6 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-         return;
-     }
- 
--    /* NB: errp parameter is unused currently */
--    if (tcg_enabled()) {
--        tcg_exec_realizefn(cpu, errp);
--    }
--
-     /* Wait until cpu initialization complete before exposing cpu. */
-     cpu_list_add(cpu);
- 
-@@ -190,9 +185,6 @@ void cpu_exec_unrealizefn(CPUState *cpu)
-      * accel_cpu_unrealize, which may free fields using call_rcu.
-      */
-     accel_cpu_unrealize(cpu);
--    if (tcg_enabled()) {
--        tcg_exec_unrealizefn(cpu);
--    }
- }
- 
- /*
+I'm not too big of a fan of adding the 'default' path to this helper.
+I'd prefer it if kvm_arm_set_vm_pmu() does all the necessary
+initialization for a valid pmu instance. You then avoid introducing
+unexpected error handling where it didn't exist before.
+
+  static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+  {
+  	lockdep_assert_held(&kvm->arch.config_lock);
+
+	kvm->arch.arm_pmu = arm_pmu;
+  }
+
+  /*
+   * Blurb about default PMUs I'm too lazy to copy/paste
+   */
+  static int kvm_arm_set_default_pmu(struct kvm *kvm)
+  {
+  	struct arm_pmu *arm_pmu = kvm_pmu_probe_armpmu();
+
+	if (!arm_pmu)
+		return -ENODEV;
+
+	kvm_arm_set_pmu(kvm, arm_pmu);
+	return 0;
+  }
+
 -- 
-2.41.0
-
+Thanks,
+Oliver
