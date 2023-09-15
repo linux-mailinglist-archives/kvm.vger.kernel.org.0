@@ -2,104 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC4907A1DC7
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 13:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F99B7A1E34
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 14:14:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234422AbjIOL7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 07:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
+        id S234600AbjIOMOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 08:14:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232836AbjIOL7i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 07:59:38 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E65CD8;
-        Fri, 15 Sep 2023 04:59:32 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31ff1f3cde5so560736f8f.2;
-        Fri, 15 Sep 2023 04:59:32 -0700 (PDT)
+        with ESMTP id S234495AbjIOMOt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 08:14:49 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32152113
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 05:14:43 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5308430052fso805907a12.1
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 05:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694779171; x=1695383971; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1694780082; x=1695384882; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iniQNpxeJMnhN0yeQ4uN2ztNWPHxjhWGs1K97TxC2M4=;
-        b=GaVfTP2Ub/O67fDjJ0bLZN1+Dfd1ar3f/LVmpOCOtwD1bjTAWPu4v5JDIrc+00plw/
-         b0OsTYsAqSREPfDoons5J1mIkTpxyMWzLlHMGWFFgsCrE8Ia4OQowSuFBSxqQYo/L1Rl
-         1SEim7QUOabhZ77n6z8SVC+2CJromjSCw8xynCQf1vdK0vMpzdqObBEYIv7npxDVUoKk
-         nY9EqTw/XWXAtLeTf7Vz82jgW4SBeiKS33REVuAzNv9ttNpaUNcRUaRSekjQG8V1NOJ6
-         QLs+mCAZj0QOoa5Myp8M8O6fUXAHW2CB9yQLvRuyOcSZy9pXngQD8wZz1doFh8BKiI4x
-         78EQ==
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=szs0z99Qb90KUWcFs/6Ik8kAwcoyMXLC77ZFiHuCf3w=;
+        b=PN/DFbN3DgFGIFvxXPGLIPBydhha7d+JZ/+dkvCkANB/401vidWXEa51pmtLhFzZEK
+         drYOmTx7iO5Xw4XSmDFlGHZ3/aqgnitOTIwElnq8nskdDZieTy0aj5eUlWz1cKc5BNkZ
+         S5C0OXxJyPCfkJJsdG5LxUB6w1sogjM/+zpdA3E0ErL5HG+hsOW9cmZ3/h88YsjMeIZr
+         +M1g9UTUKlVrsHOCV7EcAZpDZwOTI2Wmd8f0UVQ7xOwSRH+YFeJY/LY54bml0I2M12YZ
+         BsiTrX8+ys808Oa4N+n4WhWCu4RS5NKbxvPPqtqDFqe6+RjyyEbf4x1G/0szm0l5Li/0
+         EvFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694779171; x=1695383971;
+        d=1e100.net; s=20230601; t=1694780082; x=1695384882;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iniQNpxeJMnhN0yeQ4uN2ztNWPHxjhWGs1K97TxC2M4=;
-        b=KBHWfZrG6LsD4czHBRqFH11ktAoi60yIUj1zSbRZaJApLJvTxnSQYjVMYoyiHDZdqE
-         L1sJxUOKxdixb+s8P2BeMlssb2k5GIJ0iYRQ4Yu016bYzT3jWTs67/MtLuE7O8lYbJaT
-         4aQb5XApx2/olCiN12vBpg2vkSxE5NkRvGEu+ATKJSNlFjU8+pGhK+bZ8wSPPPOD2gEo
-         KW9XyaqZ9SegTZ8F+D3nM7O3ul3GJAzvN+glj9rQgdAWEZD+e4SmYUARtUtsnn3KZscC
-         L8vMOFdJy5fCmmco2fQd8c/RcQWGNaJmv/xJtAUUUQks+ZiAC9hZbwh3E6/E8slHDq2x
-         kSuA==
-X-Gm-Message-State: AOJu0YyL3z3EobmBEBVY+tUNsLmRYdwsbMC7jLdHItjWEUCoAEfBSs0z
-        PehUQkpWF7MgBio08T/XBWw=
-X-Google-Smtp-Source: AGHT+IFoOUevIZ6RMJ0jm/kPpnWnjjeV6chX8eEK6W6Hp4h6S/m2viQ2l13JZcpn/oFOu2cu86F4Tw==
-X-Received: by 2002:a05:6000:91:b0:314:1b4d:bb27 with SMTP id m17-20020a056000009100b003141b4dbb27mr1266743wrx.64.1694779171214;
-        Fri, 15 Sep 2023 04:59:31 -0700 (PDT)
-Received: from gmail.com (1F2EF265.nat.pool.telekom.hu. [31.46.242.101])
-        by smtp.gmail.com with ESMTPSA id q11-20020adff50b000000b0031c71693449sm4304510wro.1.2023.09.15.04.59.29
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=szs0z99Qb90KUWcFs/6Ik8kAwcoyMXLC77ZFiHuCf3w=;
+        b=cUk/wJ2I7nfVQI9f7042FvsauBRmTYrkE45uVMU4jKYDgxJCPiZKPaGR7BjuMPEHDy
+         SWzilFeU06pAbLfZjWHu9ildKIuj+GMKM1CgmGsCGMdcBQ75jjJu2CJtIjzytdS8rJ3E
+         DHFi52N7zJHprtjqT+x+xb817chA4tw/UDe0bYh50Xu9ZEUjlTZBRzEVtAf5EBMFRQaW
+         gk4c97qxrOSuijjbjSKfEvDOhSr/+YHRLfCZ7We8l67UL5U/7mM/H1/mfcqDxACPcMnT
+         9eV69kgWNp9L54CkBbBeVrw8h6o9N+S1tAy2AQZfYNL9hVQ9q0eJh9l8S9+ewcFTvd7p
+         TuwA==
+X-Gm-Message-State: AOJu0YxMqHnQkI08PLQR90/OLP7Ojb236M/JU74Fs94tgXFjVKeg7+eA
+        K9tdW/m8MUG3wP4YolVjbgW71Q==
+X-Google-Smtp-Source: AGHT+IGJZenyDQYnb3LjVAUFoWcYxvrgK5cLrtdOozPVvSraBAlkkM7GZOO5BDI5gIu6HsXU6mBNpQ==
+X-Received: by 2002:aa7:d699:0:b0:522:30cc:a1f4 with SMTP id d25-20020aa7d699000000b0052230cca1f4mr1309802edr.0.1694780082187;
+        Fri, 15 Sep 2023 05:14:42 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id o7-20020aa7d3c7000000b005233deb30aesm2196718edr.10.2023.09.15.05.14.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 04:59:30 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date:   Fri, 15 Sep 2023 13:59:28 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
-        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
-Subject: Re: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page
- aligned
-Message-ID: <ZQRHIN7as8f+PFeh@gmail.com>
-References: <20230818233451.3615464-1-srutherford@google.com>
+        Fri, 15 Sep 2023 05:14:41 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 14:14:40 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
+        alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
+        wuwei2016@iscas.ac.cn, leobras@redhat.com,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <20230915-ff4bd6cd721ed9bc4c4eb101@orel>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <20230914-892327a75b4b86badac5de02@orel>
+ <20230914-74d0cf00633c199758ee3450@orel>
+ <20230915-removing-flaky-44c66da669ae@wendy>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230818233451.3615464-1-srutherford@google.com>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230915-removing-flaky-44c66da669ae@wendy>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-* Steve Rutherford <srutherford@google.com> wrote:
-
-> early_set_memory_decrypted() assumes its parameters are page aligned.
-> Non-page aligned calls result in additional pages being marked as
-> decrypted via the encryption status hypercall, which results in
-> consistent corruption of pages during live migration. Live
-> migration requires accurate encryption status information to avoid
-> migrating pages from the wrong perspective.
+On Fri, Sep 15, 2023 at 12:37:50PM +0100, Conor Dooley wrote:
+> Yo,
 > 
-> Fixes: 4716276184ec ("X86/KVM: Decrypt shared per-cpu variables when SEV is active")
-> Signed-off-by: Steve Rutherford <srutherford@google.com>
-> ---
->  arch/x86/kernel/kvm.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+> On Thu, Sep 14, 2023 at 04:47:18PM +0200, Andrew Jones wrote:
+> > On Thu, Sep 14, 2023 at 04:25:53PM +0200, Andrew Jones wrote:
+> > > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > > > From: Guo Ren <guoren@linux.alibaba.com>
+> > > > 
+> > > > Cache-block prefetch instructions are HINTs to the hardware to
+> > > > indicate that software intends to perform a particular type of
+> > > > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> > > > improve the arch_xchg for qspinlock xchg_tail.
+> > > > 
+> > > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > > > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > > > ---
+> > > >  arch/riscv/Kconfig                 | 15 +++++++++++++++
+> > > >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+> > > >  arch/riscv/include/asm/hwcap.h     |  1 +
+> > > >  arch/riscv/include/asm/insn-def.h  |  5 +++++
+> > > >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+> > > >  arch/riscv/kernel/cpufeature.c     |  1 +
+> > > >  6 files changed, 38 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > > index e9ae6fa232c3..2c346fe169c1 100644
+> > > > --- a/arch/riscv/Kconfig
+> > > > +++ b/arch/riscv/Kconfig
+> > > > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+> > > >  
+> > > >  	   If you don't know what to do here, say Y.
+> > > >  
+> > > > +config RISCV_ISA_ZICBOP
+> > > 
+> > > Even if we're not concerned with looping over blocks yet, I think we
+> > > should introduce zicbop block size DT parsing at the same time we bring
+> > > zicbop support to the kernel (it's just more copy+paste from zicbom and
+> > > zicboz). It's a bit annoying that the CMO spec doesn't state that block
+> > > sizes should be the same for m/z/p. And, the fact that m/z/p are all
+> > > separate extensions leads us to needing to parse block sizes for all
+> > > three, despite the fact that in practice they'll probably be the same.
+> > 
+> > Although, I saw on a different mailing list that Andrei Warkentin
+> > interpreted section 2.7 "Software Discovery" of the spec, which states
+> > 
+> > """
+> > The initial set of CMO extensions requires the following information to be
+> > discovered by software:
+> > 
+> > * The size of the cache block for management and prefetch instructions
+> > * The size of the cache block for zero instructions
+> > * CBIE support at each privilege level
+> > 
+> > Other general cache characteristics may also be specified in the discovery
+> > mechanism.
+> > """
+> > 
+> > as management and prefetch having the same block size and only zero
+> > potentially having a different size. That looks like a reasonable
+> > interpretation to me, too.
+> 
+> TBH, I don't really care what ambiguous wording the spec has used, we
+> have the opportunity to make better decisions if we please. I hate the
+> fact that the specs are often not abundantly clear about things like this.
+> 
+> > So, we could maybe proceed with assuming we
+> > can use zicbom_block_size for prefetch, for now. If a platform comes along
+> > that interpreted the spec differently, requiring prefetch block size to
+> > be specified separately, then we'll cross that bridge when we get there.
+> 
+> That said, I think I suggested originally having the zicboz stuff default
+> to the zicbom size too, so I'd be happy with prefetch stuff working
+> exclusively that way until someone comes along looking for different sizes.
+> The binding should be updated though since
+> 
+>   riscv,cbom-block-size:
+>     $ref: /schemas/types.yaml#/definitions/uint32
+>     description:
+>       The blocksize in bytes for the Zicbom cache operations.
+> 
+> would no longer be a complete description.
+> 
+> While thinking about new wording though, it feels really clunky to describe
+> it like:
+> 	The block size in bytes for the Zicbom cache operations, Zicbop
+> 	cache operations will default to this block size where not
+> 	explicitly defined.
+> 
+> since there's then no way to actually define the block size if it is
+> different. Unless you've got some magic wording, I'd rather document
+> riscv,cbop-block-size, even if we are going to use riscv,cbom-block-size
+> as the default.
+>
 
-I suppose this fix is going through the KVM tree, or should we pick it up
-in the x86 tree?
+Sounds good to me, but if it's documented, then we should probably
+implement its parsing. Then, at that point, I wonder if it makes sense to
+have the fallback at all, or if it's not better just to require all the
+DTs to be explicit (even if redundant).
 
 Thanks,
-
-	Ingo
+drew
