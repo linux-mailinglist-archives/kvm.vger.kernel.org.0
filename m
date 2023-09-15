@@ -2,157 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B36D7A1E8C
-	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 14:23:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 856807A1EAD
+	for <lists+kvm@lfdr.de>; Fri, 15 Sep 2023 14:26:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234844AbjIOMXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 08:23:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
+        id S234888AbjIOM0s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 08:26:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234645AbjIOMXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 08:23:06 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4455E2D7E
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 05:22:24 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9a645e54806so257821766b.0
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 05:22:24 -0700 (PDT)
+        with ESMTP id S234882AbjIOM0p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 08:26:45 -0400
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E2B186;
+        Fri, 15 Sep 2023 05:26:36 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-45106d2b5f8so772261137.2;
+        Fri, 15 Sep 2023 05:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1694780542; x=1695385342; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1694780795; x=1695385595; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+sgd0SQIzfDYqArl7ZJk837xYiiqp8Hlxo1eN43ivow=;
-        b=ZXOHvqtR054spzQNdNa/BAv+K24FNOLN/bn869LKR2wEx/Q6epI1snO/JSpoiBYkjO
-         9m8XbmaHxmJzW6grrqp2mP+EAxsYo42p8sH9yyGQusaIc9nfHdgTJoqekzrJhBJs6TPA
-         v3reJRdlzchVQZnhOodlcyWH/at2Vaj5Uyyb59bW1fjTWYWUD7CNAKRMr2li1HlOBB9I
-         2d+FdhBd5Hh9y8zkwLFY2vqmBZVYrMMSwl1AWEyZytvB7WWUdUwNGBn6S/CrfjRZXzdw
-         5Z/BX08ZsXGFPw2VrSYoG6zdbfqvqT5NID/eReOHbGs1RyjDezTT7/vC4PIziJIKS2qw
-         9ehw==
+        bh=kHElfVadtdeNXyKByLJb9K0voGTVAFQ8JwtjncMHuUE=;
+        b=mwnRj1vdsx5yeOgA4nH2WUZOyB81aEVa6Xxz30qM1GZ+qVPUh16IbY2mxYTGBCQ86H
+         I2tRqjJ+56TctM2Sr7DbAcXK/CIY6IgNx3uYsBKWa0rNv+WBa/IaxaZGafiPMYdk4ykw
+         BWZVUUX3ydTYlop1hCqntJJjapIEbfh79M6dpBpWCKjEEetUM0pMvPJauWx7bynjdM1v
+         0UzKM/cvEgk14caOM4BFtE0Ozzb0os8mhlYqR50DQ3qVX7t9fN8npolyu2e6SLFsH8io
+         OZYppffBJ+8HMeISbABMQjfjn98rzcCogu20AHH7xstWzx3MszXu1lCxnFCYMcWVsg9o
+         Wurw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694780542; x=1695385342;
+        d=1e100.net; s=20230601; t=1694780795; x=1695385595;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+sgd0SQIzfDYqArl7ZJk837xYiiqp8Hlxo1eN43ivow=;
-        b=Sm50uSnZ/aye4BZkvorANzQHiGn3lRNW8VJEbqNtroUxknRNgO2sny+w+9MYXqPDzO
-         pOOEraFW3zIL0V6oWWkSV9ctHo4Q6ZT03HqUwuYsEDq8zSwS3lzylEqnhLKKjlfuSwH4
-         JPtl46EKcV217vv6yLpprPWI5UcNDkAlmUK0SHVJRDXVT3f7OrE9TMRSFBuArzpz+ShT
-         mIzfHlGYKVd9fA6ounEAhi2oLPzl4ZZHb/GBWDPFNMiz1Pt7lZOgQrK8CgTQDag/p5Hn
-         xyAWyMmZugMCvotsDQa2j44KDmupUreFiWvizHCI+t0C6JBgl17zCC3Bx7WXo453Clsu
-         71TA==
-X-Gm-Message-State: AOJu0YxCjIlgNdSolm12Ky4V3a2L0nPVw5s8VpEXx+J1coJU9BHh1llV
-        qv2MprlDFqzGm64jg4KhVjSkEg==
-X-Google-Smtp-Source: AGHT+IGQDixv4KWDUPWov7KbIiiYnnPGZejnzWBzk+C5wrXNyJ/XJxdD3iWD4oGpKAVkYFj5R24yJw==
-X-Received: by 2002:a17:906:31d6:b0:9a1:c447:3c62 with SMTP id f22-20020a17090631d600b009a1c4473c62mr1220416ejf.49.1694780542706;
-        Fri, 15 Sep 2023 05:22:22 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id z13-20020a1709067e4d00b009829dc0f2a0sm2330135ejr.111.2023.09.15.05.22.22
+        bh=kHElfVadtdeNXyKByLJb9K0voGTVAFQ8JwtjncMHuUE=;
+        b=j88zxkg2cr4MciNc3lbVqiXKlcZg2RTm5Nym1//w5bxfUSN9yrHh8F+fxLtV05398Z
+         9brH5flVnHZdciqddhPbx5CtKjg7D3N0YvD+dkmdvg0ApWryD5/R0JhIHic0OFJ3W97T
+         pz1dIGmnS6JOY/lc476m1X8uGfAPiN0aQiJ8d/cLrKt9uKubpfBmivWoOJ4dWVj25XYi
+         kNYfJmIgqW7cOB1LPYGKw/xBOnE0UM7MVVUnXjy4Uaj2TnKyFE+BKyY8FRofZY2e98lK
+         Up1mW7uOxte4r7ssbDomf6qXLvi3X/2VN1cwkgJ9OETAOGAisTD2B6q5QC5TnBT4CZrQ
+         4cmQ==
+X-Gm-Message-State: AOJu0Yzk8a/uOdUzN9bPhcnPTvX27gV+xiXkv6TTCYlCccnEslCvsTe9
+        yqZwQg+Cu1ZDMvi5tAj2FO4=
+X-Google-Smtp-Source: AGHT+IEqyfCln0MI+0FEx+rL5pOXul0ADYwpkkHaDWIywOehi5BqQX9ftWEB0d4eS+Q6nScZOV5TkQ==
+X-Received: by 2002:a67:ea86:0:b0:44e:8773:8c72 with SMTP id f6-20020a67ea86000000b0044e87738c72mr1606437vso.0.1694780794961;
+        Fri, 15 Sep 2023 05:26:34 -0700 (PDT)
+Received: from luigi.stachecki.net (pool-108-14-234-238.nycmny.fios.verizon.net. [108.14.234.238])
+        by smtp.gmail.com with ESMTPSA id a7-20020a0ca987000000b0063f88855ef2sm1232563qvb.101.2023.09.15.05.26.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 05:22:22 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 14:22:21 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Leonardo Bras <leobras@redhat.com>, guoren@kernel.org,
-        paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
-        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
-        rdunlap@infradead.org, catalin.marinas@arm.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, jszhang@kernel.org, wefu@redhat.com,
-        wuwei2016@iscas.ac.cn, linux-arch@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
-Message-ID: <20230915-1c2b122672642e2cbcbaaaef@orel>
-References: <20230910082911.3378782-1-guoren@kernel.org>
- <20230910082911.3378782-4-guoren@kernel.org>
- <20230914-1ce4f391a14e56b456d88188@orel>
- <ZQQUQjOaAIc95GXP@redhat.com>
- <20230915-85238ac7734cf543bff3ddad@orel>
- <20230915-take-virus-1245c5dfed0a@wendy>
+        Fri, 15 Sep 2023 05:26:34 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 08:27:06 -0400
+From:   Tyler Stachecki <stachecki.tyler@gmail.com>
+To:     Leonardo Bras <leobras@redhat.com>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
+        seanjc@google.com, pbonzini@redhat.com, dgilbert@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+        bp@alien8.de, Tyler Stachecki <tstachecki@bloomberg.net>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
+Message-ID: <ZQRNmsWcOM1xbNsZ@luigi.stachecki.net>
+References: <20230914010003.358162-1-tstachecki@bloomberg.net>
+ <ZQKzKkDEsY1n9dB1@redhat.com>
+ <ZQLOVjLtFnGESG0S@luigi.stachecki.net>
+ <93592292-ab7e-71ac-dd72-74cc76e97c74@oracle.com>
+ <ZQOsQjsa4bEfB28H@luigi.stachecki.net>
+ <ZQQKoIEgFki0KzxB@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230915-take-virus-1245c5dfed0a@wendy>
+In-Reply-To: <ZQQKoIEgFki0KzxB@redhat.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 12:26:20PM +0100, Conor Dooley wrote:
-> On Fri, Sep 15, 2023 at 01:07:40PM +0200, Andrew Jones wrote:
-> > On Fri, Sep 15, 2023 at 05:22:26AM -0300, Leonardo Bras wrote:
-> > > On Thu, Sep 14, 2023 at 03:47:59PM +0200, Andrew Jones wrote:
-> > > > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
-> > > > > From: Guo Ren <guoren@linux.alibaba.com>
-> > ...
-> > > > > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
-> > > > > index 6960beb75f32..dc590d331894 100644
-> > > > > --- a/arch/riscv/include/asm/insn-def.h
-> > > > > +++ b/arch/riscv/include/asm/insn-def.h
-> > > > > @@ -134,6 +134,7 @@
-> > > > >  
-> > > > >  #define RV_OPCODE_MISC_MEM	RV_OPCODE(15)
-> > > > >  #define RV_OPCODE_SYSTEM	RV_OPCODE(115)
-> > > > > +#define RV_OPCODE_PREFETCH	RV_OPCODE(19)
-> > > > 
-> > > > This should be named RV_OPCODE_OP_IMM and be placed in
-> > > > numerical order with the others, i.e. above SYSTEM.
-> > > > 
-> > > > >  
-> > > > >  #define HFENCE_VVMA(vaddr, asid)				\
-> > > > >  	INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),		\
-> > > > > @@ -196,4 +197,8 @@
-> > > > >  	INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),		\
-> > > > >  	       RS1(base), SIMM12(4))
-> > > > >  
-> > > > > +#define CBO_prefetchw(base)					\
-> > > > 
-> > > > Please name this 'PREFETCH_w' and it should take an immediate parameter,
-> > > > even if we intend to pass 0 for it.
-> > > 
-> > > It makes sense.
-> > > 
-> > > The mnemonic in the previously mentioned documentation is:
-> > > 
-> > > prefetch.w offset(base)
-> > > 
-> > > So yeah, makes sense to have both offset and base as parameters for 
-> > > CBO_prefetchw (or PREFETCH_w, I have no strong preference).
-> > 
-> > I have a strong preference :-)
-> > 
-> > PREFETCH_w is consistent with the naming we already have for e.g.
-> > cbo.clean, which is CBO_clean. The instruction we're picking a name
-> > for now is prefetch.w, not cbo.prefetchw.
+On Fri, Sep 15, 2023 at 04:41:20AM -0300, Leonardo Bras wrote:
+> Other than that, all I can think of is removing the features from guest:
 > 
-> btw, the CBO_foo stuff was named that way as we were using them in
-> alternatives originally as an argument, that manifested as:
-> "cbo." __stringify(_op) " (a0)\n\t"
-> That was later changed to
-> CBO_##_op(a0)
-> but the then un-needed (AFAICT) capitalisation was kept to avoid
-> touching the callsites of the alternative. Maybe you remember better
-> than I do drew, since the idea was yours & I forgot I even wrote that
-> pattch.
+> As you commented, there may be some features that would not be a problem 
+> to be removed, and also there may be features which are not used by the 
+> workload, and could be removed. But this would depend on the feature, and 
+> the workload, beind a custom solution for every case.
 
-And I forgot anything I may have suggested about it :-)
+Yes, the "fixup back" should be refined to pointed and verified cases.
+ 
+> For this (removing guest features), from kernel side, I would suggest using 
+> SystemTap (and eBPF, IIRC). The procedures should be something like:
+> - Try to migrate VM from host with older kernel: fail
+> - Look at qemu error, which features are missing?
+> - Are those features safely removable from guest ? 
+>   - If so, get an SystemTap / eBPF script masking out the undesired bits.
+>   - Try the migration again, it should succeed.
+> 
+> IIRC, this could also be done in qemu side, with a custom qemu:
+> - Try to migrate VM from host with older kernel: fail
+> - Look at qemu error, which features are missing?
+> - Are those features safely removable from guest ?
+>   - If so, get a custom qemu which mask-out the desired flags before the VM 
+>     starts
+>   - Live migrate (can be inside the source host) to the custom qemu
+>   - Live migrate from custom qemu to target host.
+> - The custom qemu could be on a auxiliary host, and used only for this
+> 
+> Yes, it's hard, takes time, and may not solve every case, but it gets a 
+> higher chance of the VM surviving in the long run.
 
-> If this isn't being used in a similar manner, then the w has no reason
-> to be in the odd lowercase form.
+Thank you for taking the time to throughly consider the issue and suggest some
+ways out - I really appreciate it.
 
-Other than to be consistent... However, the CBO_* instructions are not
-consistent with the rest of macros. If we don't need lowercase for any
-reason, then my preference would be to bite the bullet and change all the
-callsites of CBO_* macros and then introduce this new instruction as
-PREFETCH_W
+> But keep in mind this is a hack.
+> Taking features from a live guest is not supported in any way, and has a 
+> high chance of crashing the VM.
 
-Thanks,
-drew
+OK - if there's no interest in the below, I will not push for including this
+patch in the kernel tree any longer. I do think the specific case below is what
+a vast majority of KVM users will struggle with in the near future, though:
+
+I have a test environment with Broadwell-based (have only AVX-256) guests
+running under Skylake (PKRU, AVX512, ...) hypervisors.
+
+I added some pr_debug statements to a guest kernel running under a hypervisor,
+with said hypervisor containing neither your nor my patches, and printed the
+guests view of `fpu_kernel_cfg.max_features` at boot. It was 0x7, or:
+  XFEATURE_MASK_FP, XFEATURE_MASK_SSE, XFEATURE_MASK_YMM
+
+Thus, I'm pretty sure that all that's happening here is that the guest's FP
+context is having PKRU/ZMM. saved and restored needlessly by the hypervisor.
+Stripping it on a live-migration does not seem to have any ill-effects in
+all the testing I have done.
+
+Cheers,
+Tyler
