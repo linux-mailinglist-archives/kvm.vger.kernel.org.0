@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FC647A309B
-	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 15:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06C4B7A309E
+	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 15:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239232AbjIPNQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Sep 2023 09:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
+        id S239282AbjIPNQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Sep 2023 09:16:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239195AbjIPNQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Sep 2023 09:16:25 -0400
+        with ESMTP id S239215AbjIPNQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Sep 2023 09:16:26 -0400
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D676139;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E74313E;
         Sat, 16 Sep 2023 06:16:18 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 96C1112000D;
+        by mx1.sberdevices.ru (Postfix) with ESMTP id BF209120010;
         Sat, 16 Sep 2023 16:16:16 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 96C1112000D
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru BF209120010
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
         s=mail; t=1694870176;
-        bh=nSsEP25rOzJ9FsM0Cv0YZEGkgcCoBjB0L3innf2BUEc=;
+        bh=xFK2zZglKSg74HZYjaJqEfKu/loXA70ororX/hFfqQY=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=X6Y7DNGygjjNrvXGKH41YMPjhdRUfSB15p1b872LlEndX7jhDKup8qOHrLqD7kCwp
-         /DadNJ1B0+0Tngmg+enu2ab0GOv39iAWusDSdSpxBbmUm/wVoomIU2JnO2vXtrPEZN
-         5YnoPgAmfCnlltjwWvvOJi+GCxerbMvy3HpO+Q8o0rhSPuDK+gAtmnD8OqvnAX0UqP
-         BH2qcYlNMhnllDh0t/GVFlBKg0ZEtJs3URu/Y7s0Sz632JiYSY2CyYMwoI0bwuLNKl
-         rTuHrQ+maUjOxg0sQ/lRyCDhTrScHaGvBDD8mSFPqEWfys3bndVhEEWcBHXlbisQ92
-         NJpvuBv+5wf1g==
+        b=ItX/9E6a4i6nw63wUN1EjSNnRSi/kQ4YxYMSSDa96sg5GgmA8trD9rlfv2tPlt+O4
+         k8vTUlTNWj5knOMkaO0LVDJ2t1Iybuj3GO6fa0AQffPN0HZNmnERN5rGK5/mkl2oh+
+         09Qs9s4sPiw7UUbp5OQA69KQG2ysBrl8EjDDiVPaamQFXv3I4QnUjeNylAZWXlBAT6
+         b4M4aIxFUgpeQsn92baMs8yDUAm4pH9AQrvhVWIMGjMRhiDSmc/GNsd2v3KQHQ+o4e
+         AOhi1pKsktiNMvaMTtDuO2SEpIWLtgx1pFcfl2H7dPhepqbvvAocjTuX+EdqgYaBgR
+         UsDDNB5vMIFcw==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
@@ -51,9 +51,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v9 2/4] vsock/virtio: support to send non-linear skb
-Date:   Sat, 16 Sep 2023 16:09:16 +0300
-Message-ID: <20230916130918.4105122-3-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v9 3/4] vsock/virtio: non-linear skb handling for tap
+Date:   Sat, 16 Sep 2023 16:09:17 +0300
+Message-ID: <20230916130918.4105122-4-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
 References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
@@ -89,134 +89,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For non-linear skb use its pages from fragment array as buffers in
-virtio tx queue. These pages are already pinned by 'get_user_pages()'
-during such skb creation.
+For tap device new skb is created and data from the current skb is
+copied to it. This adds copying data from non-linear skb to new
+the skb.
 
 Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- Changelog:
- v2 -> v3:
-  * Comment about 'page_to_virt()' is updated. I don't remove R-b,
-    as this change is quiet small I guess.
- v6 -> v7:
-  * Move arrays '*sgs' and 'bufs' to 'virtio_vsock' instead of being
-    local variables. This allows to save stack space in cases of too
-    big MAX_SKB_FRAGS.
-  * Add 'WARN_ON_ONCE()' for handling nonlinear skbs - it checks that
-    linear part of such skb contains only header.
-  * R-b tag removed due to updates above.
- v7 -> v8:
-  * Add comment in 'struct virtio_vsock' for both 'struct scatterlist'
-    fields.
-  * Rename '*sgs' and 'bufs' to '*out_sgs' and 'out_bufs'.
-  * Initialize '*out_sgs' in 'virtio_vsock_probe()' by always pointing
-    to the corresponding element of 'out_bufs'.
+ net/vmw_vsock/virtio_transport_common.c | 31 ++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
- net/vmw_vsock/virtio_transport.c | 60 ++++++++++++++++++++++++++++----
- 1 file changed, 53 insertions(+), 7 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index e95df847176b..73d730156349 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -63,6 +63,17 @@ struct virtio_vsock {
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 3e08d52a9355..3a48e48a99ac 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -106,6 +106,27 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+ 	return NULL;
+ }
  
- 	u32 guest_cid;
- 	bool seqpacket_allow;
++static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
++						void *dst,
++						size_t len)
++{
++	struct iov_iter iov_iter = { 0 };
++	struct kvec kvec;
++	size_t to_copy;
 +
-+	/* These fields are used only in tx path in function
-+	 * 'virtio_transport_send_pkt_work()', so to save
-+	 * stack space in it, place both of them here. Each
-+	 * pointer from 'out_sgs' points to the corresponding
-+	 * element in 'out_bufs' - this is initialized in
-+	 * 'virtio_vsock_probe()'. Both fields are protected
-+	 * by 'tx_lock'. +1 is needed for packet header.
-+	 */
-+	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
-+	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
- };
- 
- static u32 virtio_transport_get_local_cid(void)
-@@ -100,8 +111,8 @@ virtio_transport_send_pkt_work(struct work_struct *work)
- 	vq = vsock->vqs[VSOCK_VQ_TX];
- 
- 	for (;;) {
--		struct scatterlist hdr, buf, *sgs[2];
- 		int ret, in_sg = 0, out_sg = 0;
-+		struct scatterlist **sgs;
- 		struct sk_buff *skb;
- 		bool reply;
- 
-@@ -111,12 +122,43 @@ virtio_transport_send_pkt_work(struct work_struct *work)
- 
- 		virtio_transport_deliver_tap_pkt(skb);
- 		reply = virtio_vsock_skb_reply(skb);
--
--		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
--		sgs[out_sg++] = &hdr;
--		if (skb->len > 0) {
--			sg_init_one(&buf, skb->data, skb->len);
--			sgs[out_sg++] = &buf;
-+		sgs = vsock->out_sgs;
-+		sg_init_one(sgs[out_sg], virtio_vsock_hdr(skb),
-+			    sizeof(*virtio_vsock_hdr(skb)));
-+		out_sg++;
++	kvec.iov_base = dst;
++	kvec.iov_len = len;
 +
-+		if (!skb_is_nonlinear(skb)) {
-+			if (skb->len > 0) {
-+				sg_init_one(sgs[out_sg], skb->data, skb->len);
-+				out_sg++;
-+			}
-+		} else {
-+			struct skb_shared_info *si;
-+			int i;
++	iov_iter.iter_type = ITER_KVEC;
++	iov_iter.kvec = &kvec;
++	iov_iter.nr_segs = 1;
 +
-+			/* If skb is nonlinear, then its buffer must contain
-+			 * only header and nothing more. Data is stored in
-+			 * the fragged part.
-+			 */
-+			WARN_ON_ONCE(skb_headroom(skb) != sizeof(*virtio_vsock_hdr(skb)));
++	to_copy = min_t(size_t, len, skb->len);
 +
-+			si = skb_shinfo(skb);
++	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
++			       &iov_iter, to_copy);
++}
 +
-+			for (i = 0; i < si->nr_frags; i++) {
-+				skb_frag_t *skb_frag = &si->frags[i];
-+				void *va;
-+
-+				/* We will use 'page_to_virt()' for the userspace page
-+				 * here, because virtio or dma-mapping layers will call
-+				 * 'virt_to_phys()' later to fill the buffer descriptor.
-+				 * We don't touch memory at "virtual" address of this page.
-+				 */
-+				va = page_to_virt(skb_frag->bv_page);
-+				sg_init_one(sgs[out_sg],
-+					    va + skb_frag->bv_offset,
-+					    skb_frag->bv_len);
-+				out_sg++;
-+			}
- 		}
- 
- 		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
-@@ -621,6 +663,7 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ /* Packet capture */
+ static struct sk_buff *virtio_transport_build_skb(void *opaque)
  {
- 	struct virtio_vsock *vsock = NULL;
- 	int ret;
-+	int i;
+@@ -114,7 +135,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	struct af_vsockmon_hdr *hdr;
+ 	struct sk_buff *skb;
+ 	size_t payload_len;
+-	void *payload_buf;
  
- 	ret = mutex_lock_interruptible(&the_virtio_vsock_mutex);
- 	if (ret)
-@@ -663,6 +706,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 	if (ret < 0)
- 		goto out;
+ 	/* A packet could be split to fit the RX buffer, so we can retrieve
+ 	 * the payload length from the header and the buffer pointer taking
+@@ -122,7 +142,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	 */
+ 	pkt_hdr = virtio_vsock_hdr(pkt);
+ 	payload_len = pkt->len;
+-	payload_buf = pkt->data;
  
-+	for (i = 0; i < ARRAY_SIZE(vsock->out_sgs); i++)
-+		vsock->out_sgs[i] = &vsock->out_bufs[i];
+ 	skb = alloc_skb(sizeof(*hdr) + sizeof(*pkt_hdr) + payload_len,
+ 			GFP_ATOMIC);
+@@ -165,7 +184,13 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	skb_put_data(skb, pkt_hdr, sizeof(*pkt_hdr));
+ 
+ 	if (payload_len) {
+-		skb_put_data(skb, payload_buf, payload_len);
++		if (skb_is_nonlinear(pkt)) {
++			void *data = skb_put(skb, payload_len);
 +
- 	rcu_assign_pointer(the_virtio_vsock, vsock);
++			virtio_transport_copy_nonlinear_skb(pkt, data, payload_len);
++		} else {
++			skb_put_data(skb, pkt->data, payload_len);
++		}
+ 	}
  
- 	mutex_unlock(&the_virtio_vsock_mutex);
+ 	return skb;
 -- 
 2.25.1
 
