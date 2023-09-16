@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 33FA67A2C2E
-	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 02:33:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 755827A2C6E
+	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 02:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238703AbjIPAcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 20:32:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34276 "EHLO
+        id S238796AbjIPAd0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 20:33:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238441AbjIPAcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 20:32:20 -0400
+        with ESMTP id S238809AbjIPAcs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 20:32:48 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B99C2736
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:31:37 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d818e01823aso3037313276.2
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:31:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CED68E
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:31:39 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso2867951276.1
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:31:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694824296; x=1695429096; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694824298; x=1695429098; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bGNmVCdNvvogzEXgW0zNdAXreJziaadtBBldNfFmhI=;
-        b=4WEhzq8YYbH5MYS8LF3fNZDW9/doxPBMM5mnRkHh7rJfKucqCpmHfMn8Dk8I5T1Vjw
-         r7GKVcMcJezlwbwZdQwe5awi4/JsVEXewSxl/8kp7Zq7Jsnufc0JDsztP0h7mR5pI0hk
-         90GGOrwszrDkx1ckPXbKoPWJITxFpbbVdVMfjuB1P12117rdZoMXWD/T6fi2bLBNYM37
-         qNnR1Xa0L12cfVJN4IQcUJIBgcxgx3WqXFeJlD79YjBEClF6YfD2xbgF61lTjSnKppKl
-         wuTsp8sAceoHv77LPkGb4unAjBl8gAta2F+LLf2CZKmCUljmlURPF6ZLjRkpYyfMkyjv
-         k+QA==
+        bh=OjnVLG9a9LJLqorH8Rj1ZnrY26noTE5ZeEoscx0wCrE=;
+        b=3iwsnBBg9U9rpDKqYhVnwIOmDRQRmg6VPUkonz/huNUXNLJwhQBvwByqsEaueNfXsG
+         3FRR/r+a38kQBwhJqk8rnRXZ6B25yca5VIiPhk/HlCGmCwQFo7S0Jy7SCZt7mDqcRtaS
+         WNfLsZPOSBNhaWmq59Gx9VrL5De2F0OpOU9uoEPEnntmkk/j5pSN5+lhF0SoyvbSmLGg
+         0jdpYz2TnQgNkxXIhgUFs6rHAycucPVycDEZ+eIzigDEm96Ewq8OuxMO0cFbbQVTYRzG
+         ZS4R7RSd4dPGC/Kbd5b65d+sV1BBGAKwQ167T0oAG8kRxOWlmFQSICPuARM7hNT4eYFs
+         w2Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694824296; x=1695429096;
+        d=1e100.net; s=20230601; t=1694824298; x=1695429098;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2bGNmVCdNvvogzEXgW0zNdAXreJziaadtBBldNfFmhI=;
-        b=w5EJD7j78efVffvCIZAigJqQmAkPVjHYsOjJAvmRNwMBpSfEnZhpe1xehbDMgyOqrv
-         H2yT3+vCu5TLsm5MGphA9L+hAhVt0iCUNlHckVVb6YZ2N4VLRV9v8MU1LrXGRIKJgDWN
-         QaQPa6bja2ynVQXV8wl3UleQf462M1g62XMSDS4V9BJqAncNUzXcZcrDsjJh+/0sYX2g
-         kJO60oq7MeyTHwefixwQWuA4iRNr4JYC1ozEz88c+cH3TdoEsO9B6xvofaBnoENxjley
-         M8NpDz2x+KLy9Jj2c+6tWThNjmxfaeL+BbLl0TOAxYPVR5jTD3bMudk1TMRH0GqrWQ/N
-         F/hA==
-X-Gm-Message-State: AOJu0YwOTI7PC5c2tVpekB2rx3UruUhf178/kQvu1iEL2S/rcLFDaQh2
-        bU17agzMBKxbIheC9gnExhiEjET+bF4=
-X-Google-Smtp-Source: AGHT+IEii4782d+JzWBACVp4gsfxYcFW3PZ67SLHnb796XbOz2rrTeQdE9Xb83Qlv7LO8McNRbBpWAwnK1E=
+        bh=OjnVLG9a9LJLqorH8Rj1ZnrY26noTE5ZeEoscx0wCrE=;
+        b=qv7taoCek6AZrtxOANWl4z68k+DVzskBYrhqXGfHJ/H09mUQixLkTIkPQTS9bvKnb4
+         IRsaqME1RfMWXtZb9vC2Wcscl946HxlQuYpsq6QZAgQojI9VXwdLAE/ixelvy5y+FgR1
+         vYAKds+g6NL2yyUIh7cgEEFuFySMfgxNmP1IAV/zki55e9HwCNXMfKAlTrdo2XbcqDJH
+         bCVXol+ZdBXPAPzxhRuFtJxMe+3gKNzbKBgMWFi6WpvFLuPfmxSx1wRDF43JmyAmVnw2
+         UBtRZJ4fAGP4ibJq8acOC0eRAZ/QptSzXGVu68EbKwjxvAQ3ojCw2/SOf1GS5BX16aC7
+         V4Zg==
+X-Gm-Message-State: AOJu0YzeR8aaCRhYwscortsbzm/cl7ctB1ocygAOOPqdMRnyacbJI7CO
+        TLLMGm4LQuzdhSUqJxz1zZuY/LQxGus=
+X-Google-Smtp-Source: AGHT+IEejUplN0yThqJglSyf2PAl899GMvDcyB4OaKD9HL7AL2P8QSuIFDWAjhltJc72cwzADimsWD5lopA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:2982:0:b0:d05:98ef:c16b with SMTP id
- p124-20020a252982000000b00d0598efc16bmr77753ybp.5.1694824296181; Fri, 15 Sep
- 2023 17:31:36 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:138e:b0:d78:245a:aac4 with SMTP id
+ x14-20020a056902138e00b00d78245aaac4mr82623ybu.1.1694824298283; Fri, 15 Sep
+ 2023 17:31:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Sep 2023 17:31:00 -0700
+Date:   Fri, 15 Sep 2023 17:31:01 -0700
 In-Reply-To: <20230916003118.2540661-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230916003118.2540661-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230916003118.2540661-9-seanjc@google.com>
-Subject: [PATCH 08/26] KVM: x86: Stop selecting and depending on HAVE_KVM
+Message-ID: <20230916003118.2540661-10-seanjc@google.com>
+Subject: [PATCH 09/26] KVM: arm64: Stop selecting and depending on HAVE_KVM
 From:   Sean Christopherson <seanjc@google.com>
 To:     Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
@@ -95,54 +95,46 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that nothing in x86 or architecture agnostic code consumes HAVE_KVM,
-stop selecting it in x86.  This is one of several steps towards deleting
+Now that nothing in arm64 or architecture agnostic code consumes HAVE_KVM,
+stop selecting it in arm64.  This is one of several steps towards deleting
 HAVE_KVM from the common KVM Kconfig.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/Kconfig     | 1 -
- arch/x86/kvm/Kconfig | 2 --
- 2 files changed, 3 deletions(-)
+ arch/arm64/Kconfig     | 1 -
+ arch/arm64/kvm/Kconfig | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 982b777eadc7..32eb288a4e3a 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -240,7 +240,6 @@ config X86
- 	select HAVE_FUNCTION_ERROR_INJECTION
- 	select HAVE_KRETPROBES
- 	select HAVE_RETHOOK
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b10515c0200b..7d99f132e57c 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -214,7 +214,6 @@ config ARM64
+ 	select HAVE_HW_BREAKPOINT if PERF_EVENTS
+ 	select HAVE_IOREMAP_PROT
+ 	select HAVE_IRQ_TIME_ACCOUNTING
 -	select HAVE_KVM
- 	select HAVE_LIVEPATCH			if X86_64
- 	select HAVE_MIXED_BREAKPOINTS_REGS
  	select HAVE_MOD_ARCH_SPECIFIC
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 0f01e5600b5f..8c5fb7f57b4c 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -7,7 +7,6 @@ source "virt/kvm/Kconfig"
+ 	select HAVE_NMI
+ 	select HAVE_PERF_EVENTS
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 2b5c332f157d..c76af1973315 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -20,7 +20,6 @@ if VIRTUALIZATION
  
- menuconfig VIRTUALIZATION
- 	bool "Virtualization"
--	depends on HAVE_KVM || X86
- 	default y
- 	help
- 	  Say Y here to get to see options for using your Linux host to run other
-@@ -20,7 +19,6 @@ if VIRTUALIZATION
- 
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support"
+ menuconfig KVM
+ 	bool "Kernel-based Virtual Machine (KVM) support"
 -	depends on HAVE_KVM
- 	depends on HIGH_RES_TIMERS
- 	depends on X86_LOCAL_APIC
+ 	select KVM_GENERIC_HARDWARE_ENABLING
+ 	select MMU_NOTIFIER
  	select PREEMPT_NOTIFIERS
 -- 
 2.42.0.459.ge4e396fd5e-goog
