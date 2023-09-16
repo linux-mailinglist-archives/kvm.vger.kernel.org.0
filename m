@@ -2,439 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BA1A7A2CA8
-	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 02:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 006697A2D0C
+	for <lists+kvm@lfdr.de>; Sat, 16 Sep 2023 03:27:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238426AbjIPApk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Sep 2023 20:45:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54324 "EHLO
+        id S234235AbjIPB1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Sep 2023 21:27:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238567AbjIPApT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Sep 2023 20:45:19 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0E818E
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:43:24 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81d85aae7cso2246436276.0
-        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 17:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694824764; x=1695429564; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cj9kWw04pNJMtISmJeHkwKC2N/5/ZVS25i920GH/+3E=;
-        b=rVc8HV2YAqHN13X6dpScqho2WoQPca2aFH6eLGGXY+Ae5rCRsV4kKxt+rAo82psqst
-         NeYkQUQjPBvQDw2QnZf5YYwafQ0pYFr3GReIzlR4QADp7/9qBL58LuXt8jd0w6/NoMR0
-         jJfjqIkbI4yDlw6oQKlBsZ/ZZBvOmL4RyqJhkMfBuEyJGGbpT632Wb1qOaQPquZz0dqe
-         lTzWg5AWnFMZjyJC/NqosIJGSOZsH2etnVynI/zSvSE1T7lenPMZdAwIG+LmPY5bb9u2
-         ZsAB9M2FXhGNZS71Qo91QiNbuicj9JioosKEdpBWF6c0fq5xgVC/f+2UBesobV9og5gU
-         xkIQ==
+        with ESMTP id S237786AbjIPB0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Sep 2023 21:26:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4818D139
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 18:25:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694827550;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a841Dj9MVAHe6LjBb/D3WBLUQoc5e6SIAZrfTaBUOzc=;
+        b=Faj0gjzdeOSNK18cnOOy0KN2ADRXVDtt/ZMyScrXCtTxyB5DZ3BjJoWt6R1p75NTvbBabP
+        6R+2mIdVtK4+WYJTchwjjZQ7O8ZvjtPt63AoMOCZBpNkN9QPOHZZS0x3I+Umma7pQRWeG8
+        n1OEh3O1OU6KP5B2Kxdywnndq1/cwUM=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-453-pVcd7vlUOieUfIRXo_wFbw-1; Fri, 15 Sep 2023 21:25:48 -0400
+X-MC-Unique: pVcd7vlUOieUfIRXo_wFbw-1
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6b9efedaeebso3642815a34.2
+        for <kvm@vger.kernel.org>; Fri, 15 Sep 2023 18:25:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694824764; x=1695429564;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cj9kWw04pNJMtISmJeHkwKC2N/5/ZVS25i920GH/+3E=;
-        b=P+e2wUPw9eXxq9HwW9cXnz41zw2Tp9xd4uzhIj741qB/LsDFBNa1cw5Oy8i55/vK9d
-         4DhYYd7EJnxTDSp9NM9LwuaMDUdVaxLlUnul65Nb+CdcoGKbYlltlbXSuIEuL05nTfun
-         ub+F2eLOYm205ahxkrQCXCv1xY4AvuUBncyPKDk2ClO/c9rvzzUcx6ZYxNBSw6CCSzYL
-         ujNupiCQPultZFphV/4PDMgLbMH8Dy9QTJhRg4nzvRjUMmMF9DgwajGdDNg8tABW4fS/
-         +yZNTqp7cvGocFEVMhttHDpX9NC0m9G97ly7HxzhirNHT9jzvOe2k11lYoOS6yYu7AFz
-         Lctg==
-X-Gm-Message-State: AOJu0YyiulyFo4CXLJcipxO18+dcsLy/LOL6i4eKJ0DbX1OYCtVNJnLE
-        sNP7FtzJjXLIqLUJ+dLG9Dbq8ChGDKw=
-X-Google-Smtp-Source: AGHT+IGDu08KgobyXwEGtcWy5d6Zb6nBPRhoIKfuJ257ue472s/YqHrP1KRVeg1nNqD4WezPfWNiCDJlzsc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ab47:0:b0:d7e:78db:d264 with SMTP id
- u65-20020a25ab47000000b00d7e78dbd264mr185764ybi.5.1694824764466; Fri, 15 Sep
- 2023 17:39:24 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 15 Sep 2023 17:39:16 -0700
-In-Reply-To: <20230916003916.2545000-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230916003916.2545000-1-seanjc@google.com>
-X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230916003916.2545000-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: x86/mmu: Stop zapping invalidated TDP MMU roots asynchronously
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pattara Teerapong <pteerapong@google.com>,
-        David Stevens <stevensd@google.com>,
-        Yiwei Zhang <zzyiwei@google.com>,
-        Paul Hsia <paulhsia@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20230601; t=1694827548; x=1695432348;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a841Dj9MVAHe6LjBb/D3WBLUQoc5e6SIAZrfTaBUOzc=;
+        b=hnLXTHesBzlbrV+Bjs7WXt02VmhiomNHnjhN+Xiv4K1We8Y2mJRcQUEukEXsMwKoDe
+         dbciHeueZ6X/dthQikWRy9BOXZNeK0UkA46ZLoAj7F4uSevmJE2ZGlqfS49O//jmrcCD
+         Sp2mq7QhQ3bLdOF4wBHNKabGjTjopDqwTwlUxsGbn1ur/gDbqV/gkL/lN67LgMSHSyXQ
+         7tLNsKQdL0KdSnna5pu2/FBO3VYRKrAb4xrgjb9X9u9ItodMxy17jbKI6zWpHobSBv90
+         2JMVdDmVtOBEyim0bEFJOrwS/7IyBiNZoIn8WOkbmeYsXwAQQu8sXFknXBYPbJHYbnA2
+         1jyg==
+X-Gm-Message-State: AOJu0YyabTXUWqS5lt2zLAXU3zI/GR2sTVxQVCwqxmwRudIpY3Atosy1
+        VZDavw2/2v/l0GV1w+wqP46BNf9a5icvwJED8tsHRS3/pJrACVF6Ml80BXRAhkOTJML3Ky6kRRm
+        z3lJ8UCooz0Aw
+X-Received: by 2002:a05:6830:1e5c:b0:6b9:1af3:3307 with SMTP id e28-20020a0568301e5c00b006b91af33307mr3240722otj.17.1694827547982;
+        Fri, 15 Sep 2023 18:25:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/U7QGt/zB+NEyg+/yyYN+WrebgCYeIPjC/Iw6wpK8vc1LFQt+wzF39sF5ABwfBunU6FyGiw==
+X-Received: by 2002:a05:6830:1e5c:b0:6b9:1af3:3307 with SMTP id e28-20020a0568301e5c00b006b91af33307mr3240694otj.17.1694827547715;
+        Fri, 15 Sep 2023 18:25:47 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:677d:42e9:f426:9422:f020])
+        by smtp.gmail.com with ESMTPSA id d5-20020a05683018e500b006b9443ce478sm2192319otf.27.2023.09.15.18.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 18:25:47 -0700 (PDT)
+Date:   Fri, 15 Sep 2023 22:25:37 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <ZQUEEckIEbtxwLEG@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <ZQF3qS1KRYAt3coC@redhat.com>
+ <CAJF2gTT5s2-vhgrxnkE1EGqJMvXn8ftYrrwRMdJH1tjEqAv5kQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJF2gTT5s2-vhgrxnkE1EGqJMvXn8ftYrrwRMdJH1tjEqAv5kQ@mail.gmail.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Stop zapping invalidate TDP MMU roots via work queue now that KVM
-preserves TDP MMU roots until they are explicitly invalidated.  Zapping
-roots asynchronously was effectively a workaround to avoid stalling a vCPU
-for an extended during if a vCPU unloaded a root, which at the time
-happened whenever the guest toggled CR0.WP (a frequent operation for some
-guest kernels).
+On Fri, Sep 15, 2023 at 08:36:31PM +0800, Guo Ren wrote:
+> On Wed, Sep 13, 2023 at 4:50 PM Leonardo Bras <leobras@redhat.com> wrote:
+> >
+> > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > > From: Guo Ren <guoren@linux.alibaba.com>
+> > >
+> > > Cache-block prefetch instructions are HINTs to the hardware to
+> > > indicate that software intends to perform a particular type of
+> > > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> > > improve the arch_xchg for qspinlock xchg_tail.
+> > >
+> > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > > ---
+> > >  arch/riscv/Kconfig                 | 15 +++++++++++++++
+> > >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+> > >  arch/riscv/include/asm/hwcap.h     |  1 +
+> > >  arch/riscv/include/asm/insn-def.h  |  5 +++++
+> > >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+> > >  arch/riscv/kernel/cpufeature.c     |  1 +
+> > >  6 files changed, 38 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > index e9ae6fa232c3..2c346fe169c1 100644
+> > > --- a/arch/riscv/Kconfig
+> > > +++ b/arch/riscv/Kconfig
+> > > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+> > >
+> > >          If you don't know what to do here, say Y.
+> > >
+> > > +config RISCV_ISA_ZICBOP
+> > > +     bool "Zicbop extension support for cache block prefetch"
+> > > +     depends on MMU
+> > > +     depends on RISCV_ALTERNATIVE
+> > > +     default y
+> > > +     help
+> > > +        Adds support to dynamically detect the presence of the ZICBOP
+> > > +        extension (Cache Block Prefetch Operations) and enable its
+> > > +        usage.
+> > > +
+> > > +        The Zicbop extension can be used to prefetch cache block for
+> > > +        read/write/instruction fetch.
+> > > +
+> > > +        If you don't know what to do here, say Y.
+> > > +
+> > >  config TOOLCHAIN_HAS_ZIHINTPAUSE
+> > >       bool
+> > >       default y
+> > > diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+> > > index 702725727671..56eff7a9d2d2 100644
+> > > --- a/arch/riscv/include/asm/cmpxchg.h
+> > > +++ b/arch/riscv/include/asm/cmpxchg.h
+> > > @@ -11,6 +11,7 @@
+> > >
+> > >  #include <asm/barrier.h>
+> > >  #include <asm/fence.h>
+> > > +#include <asm/processor.h>
+> > >
+> > >  #define __arch_xchg_masked(prepend, append, r, p, n)                 \
+> > >  ({                                                                   \
+> > > @@ -25,6 +26,7 @@
+> > >                                                                       \
+> > >       __asm__ __volatile__ (                                          \
+> > >              prepend                                                  \
+> > > +            PREFETCHW_ASM(%5)                                        \
+> > >              "0:      lr.w %0, %2\n"                                  \
+> > >              "        and  %1, %0, %z4\n"                             \
+> > >              "        or   %1, %1, %z3\n"                             \
+> > > @@ -32,7 +34,7 @@
+> > >              "        bnez %1, 0b\n"                                  \
+> > >              append                                                   \
+> > >              : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))       \
+> > > -            : "rJ" (__newx), "rJ" (~__mask)                          \
+> > > +            : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)         \
+> > >              : "memory");                                             \
+> > >                                                                       \
+> > >       r = (__typeof__(*(p)))((__retx & __mask) >> __s);               \
+> > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> > > index b7b58258f6c7..78b7b8b53778 100644
+> > > --- a/arch/riscv/include/asm/hwcap.h
+> > > +++ b/arch/riscv/include/asm/hwcap.h
+> > > @@ -58,6 +58,7 @@
+> > >  #define RISCV_ISA_EXT_ZICSR          40
+> > >  #define RISCV_ISA_EXT_ZIFENCEI               41
+> > >  #define RISCV_ISA_EXT_ZIHPM          42
+> > > +#define RISCV_ISA_EXT_ZICBOP         43
+> > >
+> > >  #define RISCV_ISA_EXT_MAX            64
+> > >
+> > > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
+> > > index 6960beb75f32..dc590d331894 100644
+> > > --- a/arch/riscv/include/asm/insn-def.h
+> > > +++ b/arch/riscv/include/asm/insn-def.h
+> > > @@ -134,6 +134,7 @@
+> > >
+> > >  #define RV_OPCODE_MISC_MEM   RV_OPCODE(15)
+> > >  #define RV_OPCODE_SYSTEM     RV_OPCODE(115)
+> > > +#define RV_OPCODE_PREFETCH   RV_OPCODE(19)
+> > >
+> > >  #define HFENCE_VVMA(vaddr, asid)                             \
+> > >       INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),              \
+> > > @@ -196,4 +197,8 @@
+> > >       INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),              \
+> > >              RS1(base), SIMM12(4))
+> > >
+> > > +#define CBO_prefetchw(base)                                  \
+> > > +     INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> > > +            RD(x0), RS1(base), RS2(x0))
+> > > +
+> >
+> > I understand that here you create the instruction via bitfield, following
+> > the ISA, and this enables using instructions not available on the
+> > toolchain.
+> >
+> > It took me some time to find the document with this instruction, so please
+> > add this to the commit msg:
+> >
+> > https://github.com/riscv/riscv-CMOs/blob/master/specifications/cmobase-v1.0.pdf
+> > Page 23.
+> >
+> > IIUC, the instruction is "prefetch.w".
+> >
+> > Maybe I am missing something, but in the document the rs2 field
+> > (PREFETCH.W) contains a 0x3, while the above looks to have a 0 instead.
+> >
+> > rs2 field = 0x0 would be a prefetch.i (instruction prefetch) instead.
+> >
+> > Is the above correct, or am I missing something?
+> Oh, you are right. My fault, thx for pointing out. It should be:
+> +       INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> +              RD(x0), RS1(base), RS2(x3))
 
-While a clever hack, zapping roots via an unbound worker had subtle,
-unintended consequences on host scheduling, especially when zapping
-multiple roots, e.g. as part of a memslot.  Because the work of zapping a
-root is no longer bound to the task that initiated the zap, things like
-the CPU affinity and priority of the original task get lost.  Losing the
-affinity and priority can be especially problematic if unbound workqueues
-aren't affined to a small number of CPUs, as zapping multiple roots can
-cause KVM to heavily utilize the majority of CPUs in the system, *beyond*
-the CPUs KVM is already using to run vCPUs.
+Now I am curious to check if / how will this impact performance. :)
+(Please let me know)
 
-When deleting a memslot via KVM_SET_USER_MEMORY_REGION, the async root
-zap can result in KVM occupying all logical CPUs for ~8ms, and result in
-high priority tasks not being scheduled in in a timely manner.  In v5.15,
-which doesn't preserve unloaded roots, the issues were even more noticeable
-as KVM would zap roots more frequently and could occupy all CPUs for 50ms+.
 
-Consuming all CPUs for an extended duration can lead to significant jitter
-throughout the system, e.g. on ChromeOS with virtio-gpu, deleting memslots
-is a semi-frequent operation as memslots are deleted and recreated with
-different host virtual addresses to react to host GPU drivers allocating
-and freeing GPU blobs.  On ChromeOS, the jitter manifests as audio blips
-during games due to the audio server's tasks not getting scheduled in
-promptly, despite the tasks having a high realtime priority.
-
-Deleting memslots isn't exactly a fast path and should be avoided when
-possible, and ChromeOS is working towards utilizing MAP_FIXED to avoid the
-memslot shenanigans, but KVM is squarely in the wrong.  Not to mention
-that removing the async zapping eliminates a non-trivial amount of
-complexity.
-
-Note, one of the subtle behaviors hidden behind the async zapping is that
-KVM would zap invalidated roots only once (ignoring partial zaps from
-things like mmu_notifier events).  Preserve this behavior by adding a flag
-to identify roots that are scheduled to be zapped versus roots that have
-already been zapped but not yet freed.
-
-Add a comment calling out why kvm_tdp_mmu_invalidate_all_roots() can
-encounter invalid roots, as it's not at all obvious why zapping
-invalidated roots shouldn't simply zap all invalid roots.
-
-Reported-by: Pattara Teerapong <pteerapong@google.com>
-Cc: David Stevens <stevensd@google.com>
-Cc: Yiwei Zhang<zzyiwei@google.com>
-Cc: Paul Hsia <paulhsia@google.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |   3 +-
- arch/x86/kvm/mmu/mmu.c          |  13 +---
- arch/x86/kvm/mmu/mmu_internal.h |  13 ++--
- arch/x86/kvm/mmu/tdp_mmu.c      | 116 +++++++++++++-------------------
- arch/x86/kvm/mmu/tdp_mmu.h      |   2 +-
- arch/x86/kvm/x86.c              |   5 +-
- 6 files changed, 59 insertions(+), 93 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1a4def36d5bb..17715cb8731d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1419,7 +1419,6 @@ struct kvm_arch {
- 	 * the thread holds the MMU lock in write mode.
- 	 */
- 	spinlock_t tdp_mmu_pages_lock;
--	struct workqueue_struct *tdp_mmu_zap_wq;
- #endif /* CONFIG_X86_64 */
- 
- 	/*
-@@ -1835,7 +1834,7 @@ void kvm_mmu_vendor_module_exit(void);
- 
- void kvm_mmu_destroy(struct kvm_vcpu *vcpu);
- int kvm_mmu_create(struct kvm_vcpu *vcpu);
--int kvm_mmu_init_vm(struct kvm *kvm);
-+void kvm_mmu_init_vm(struct kvm *kvm);
- void kvm_mmu_uninit_vm(struct kvm *kvm);
- 
- void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 54f94f644b42..f7901cb4d2fa 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6167,20 +6167,15 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
- 	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
- }
- 
--int kvm_mmu_init_vm(struct kvm *kvm)
-+void kvm_mmu_init_vm(struct kvm *kvm)
- {
--	int r;
--
- 	INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
- 	INIT_LIST_HEAD(&kvm->arch.zapped_obsolete_pages);
- 	INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
- 	spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
- 
--	if (tdp_mmu_enabled) {
--		r = kvm_mmu_init_tdp_mmu(kvm);
--		if (r < 0)
--			return r;
--	}
-+	if (tdp_mmu_enabled)
-+		kvm_mmu_init_tdp_mmu(kvm);
- 
- 	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
- 	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
-@@ -6189,8 +6184,6 @@ int kvm_mmu_init_vm(struct kvm *kvm)
- 
- 	kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
- 	kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
--
--	return 0;
- }
- 
- static void mmu_free_vm_memory_caches(struct kvm *kvm)
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index b102014e2c60..93b9d50c24ad 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -58,7 +58,10 @@ struct kvm_mmu_page {
- 
- 	bool tdp_mmu_page;
- 	bool unsync;
--	u8 mmu_valid_gen;
-+	union {
-+		u8 mmu_valid_gen;
-+		bool tdp_mmu_scheduled_root_to_zap;
-+	};
- 
- 	 /*
- 	  * The shadow page can't be replaced by an equivalent huge page
-@@ -100,13 +103,7 @@ struct kvm_mmu_page {
- 		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
- 		tdp_ptep_t ptep;
- 	};
--	union {
--		DECLARE_BITMAP(unsync_child_bitmap, 512);
--		struct {
--			struct work_struct tdp_mmu_async_work;
--			void *tdp_mmu_async_data;
--		};
--	};
-+	DECLARE_BITMAP(unsync_child_bitmap, 512);
- 
- 	/*
- 	 * Tracks shadow pages that, if zapped, would allow KVM to create an NX
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7cb1902ae032..ca3304c2c00c 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -12,18 +12,10 @@
- #include <trace/events/kvm.h>
- 
- /* Initializes the TDP MMU for the VM, if enabled. */
--int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
-+void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- {
--	struct workqueue_struct *wq;
--
--	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
--	if (!wq)
--		return -ENOMEM;
--
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
- 	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
--	kvm->arch.tdp_mmu_zap_wq = wq;
--	return 1;
- }
- 
- /* Arbitrarily returns true so that this may be used in if statements. */
-@@ -46,20 +38,15 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 	 * ultimately frees all roots.
- 	 */
- 	kvm_tdp_mmu_invalidate_all_roots(kvm);
--
--	/*
--	 * Destroying a workqueue also first flushes the workqueue, i.e. no
--	 * need to invoke kvm_tdp_mmu_zap_invalidated_roots().
--	 */
--	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
-+	kvm_tdp_mmu_zap_invalidated_roots(kvm);
- 
- 	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
- 	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
- 
- 	/*
- 	 * Ensure that all the outstanding RCU callbacks to free shadow pages
--	 * can run before the VM is torn down.  Work items on tdp_mmu_zap_wq
--	 * can call kvm_tdp_mmu_put_root and create new callbacks.
-+	 * can run before the VM is torn down.  Putting the last reference to
-+	 * zapped roots will create new callbacks.
- 	 */
- 	rcu_barrier();
- }
-@@ -89,43 +76,6 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
- static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			     bool shared);
- 
--static void tdp_mmu_zap_root_work(struct work_struct *work)
--{
--	struct kvm_mmu_page *root = container_of(work, struct kvm_mmu_page,
--						 tdp_mmu_async_work);
--	struct kvm *kvm = root->tdp_mmu_async_data;
--
--	read_lock(&kvm->mmu_lock);
--
--	/*
--	 * A TLB flush is not necessary as KVM performs a local TLB flush when
--	 * allocating a new root (see kvm_mmu_load()), and when migrating vCPU
--	 * to a different pCPU.  Note, the local TLB flush on reuse also
--	 * invalidates any paging-structure-cache entries, i.e. TLB entries for
--	 * intermediate paging structures, that may be zapped, as such entries
--	 * are associated with the ASID on both VMX and SVM.
--	 */
--	tdp_mmu_zap_root(kvm, root, true);
--
--	/*
--	 * Drop the refcount using kvm_tdp_mmu_put_root() to test its logic for
--	 * avoiding an infinite loop.  By design, the root is reachable while
--	 * it's being asynchronously zapped, thus a different task can put its
--	 * last reference, i.e. flowing through kvm_tdp_mmu_put_root() for an
--	 * asynchronously zapped root is unavoidable.
--	 */
--	kvm_tdp_mmu_put_root(kvm, root, true);
--
--	read_unlock(&kvm->mmu_lock);
--}
--
--static void tdp_mmu_schedule_zap_root(struct kvm *kvm, struct kvm_mmu_page *root)
--{
--	root->tdp_mmu_async_data = kvm;
--	INIT_WORK(&root->tdp_mmu_async_work, tdp_mmu_zap_root_work);
--	queue_work(kvm->arch.tdp_mmu_zap_wq, &root->tdp_mmu_async_work);
--}
--
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 			  bool shared)
- {
-@@ -917,18 +867,47 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
-  */
- void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
- {
--	flush_workqueue(kvm->arch.tdp_mmu_zap_wq);
-+	struct kvm_mmu_page *root;
-+
-+	read_lock(&kvm->mmu_lock);
-+
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, true) {
-+		if (!root->tdp_mmu_scheduled_root_to_zap)
-+			continue;
-+
-+		root->tdp_mmu_scheduled_root_to_zap = false;
-+		KVM_BUG_ON(!root->role.invalid, kvm);
-+
-+		/*
-+		 * A TLB flush is not necessary as KVM performs a local TLB
-+		 * flush when allocating a new root (see kvm_mmu_load()), and
-+		 * when migrating a vCPU to a different pCPU.  Note, the local
-+		 * TLB flush on reuse also invalidates paging-structure-cache
-+		 * entries, i.e. TLB entries for intermediate paging structures,
-+		 * that may be zapped, as such entries are associated with the
-+		 * ASID on both VMX and SVM.
-+		 */
-+		tdp_mmu_zap_root(kvm, root, true);
-+
-+		/*
-+		 * The referenced needs to be put *after* zapping the root, as
-+		 * the root must be reachable by mmu_notifiers while it's being
-+		 * zapped
-+		 */
-+		kvm_tdp_mmu_put_root(kvm, root, true);
-+	}
-+
-+	read_unlock(&kvm->mmu_lock);
- }
- 
- /*
-  * Mark each TDP MMU root as invalid to prevent vCPUs from reusing a root that
-  * is about to be zapped, e.g. in response to a memslots update.  The actual
-- * zapping is performed asynchronously.  Using a separate workqueue makes it
-- * easy to ensure that the destruction is performed before the "fast zap"
-- * completes, without keeping a separate list of invalidated roots; the list is
-- * effectively the list of work items in the workqueue.
-+ * zapping is done separately so that it happens with mmu_lock with read,
-+ * whereas invalidating roots must be done with mmu_lock held for write (unless
-+ * the VM is being destroyed).
-  *
-- * Note, the asynchronous worker is gifted the TDP MMU's reference.
-+ * Note, kvm_tdp_mmu_zap_invalidated_roots() is gifted the TDP MMU's reference.
-  * See kvm_tdp_mmu_get_vcpu_root_hpa().
-  */
- void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
-@@ -953,19 +932,20 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm)
- 	/*
- 	 * As above, mmu_lock isn't held when destroying the VM!  There can't
- 	 * be other references to @kvm, i.e. nothing else can invalidate roots
--	 * or be consuming roots, but walking the list of roots does need to be
--	 * guarded against roots being deleted by the asynchronous zap worker.
-+	 * or get/put references to roots.
- 	 */
--	rcu_read_lock();
--
--	list_for_each_entry_rcu(root, &kvm->arch.tdp_mmu_roots, link) {
-+	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
-+		/*
-+		 * Note, invalid roots can outlive a memslot update!  Invalid
-+		 * roots must be *zapped* before the memslot update completes,
-+		 * but a different task can acquire a reference and keep the
-+		 * root alive after its been zapped.
-+		 */
- 		if (!root->role.invalid) {
-+			root->tdp_mmu_scheduled_root_to_zap = true;
- 			root->role.invalid = true;
--			tdp_mmu_schedule_zap_root(kvm, root);
- 		}
- 	}
--
--	rcu_read_unlock();
- }
- 
- /*
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index bc088953f929..733a3aef3a96 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -7,7 +7,7 @@
- 
- #include "spte.h"
- 
--int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-+void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
- 
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..9f18b06bbda6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12308,9 +12308,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		goto out;
- 
--	ret = kvm_mmu_init_vm(kvm);
--	if (ret)
--		goto out_page_track;
-+	kvm_mmu_init_vm(kvm);
- 
- 	ret = static_call(kvm_x86_vm_init)(kvm);
- 	if (ret)
-@@ -12355,7 +12353,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 
- out_uninit_mmu:
- 	kvm_mmu_uninit_vm(kvm);
--out_page_track:
- 	kvm_page_track_cleanup(kvm);
- out:
- 	return ret;
--- 
-2.42.0.459.ge4e396fd5e-goog
+> 
+> >
+> >
+> > Thanks!
+> > Leo
+> >
+> > >  #endif /* __ASM_INSN_DEF_H */
+> > > diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
+> > > index de9da852f78d..7ad3a24212e8 100644
+> > > --- a/arch/riscv/include/asm/processor.h
+> > > +++ b/arch/riscv/include/asm/processor.h
+> > > @@ -12,6 +12,8 @@
+> > >  #include <vdso/processor.h>
+> > >
+> > >  #include <asm/ptrace.h>
+> > > +#include <asm/insn-def.h>
+> > > +#include <asm/hwcap.h>
+> > >
+> > >  #ifdef CONFIG_64BIT
+> > >  #define DEFAULT_MAP_WINDOW   (UL(1) << (MMAP_VA_BITS - 1))
+> > > @@ -103,6 +105,17 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+> > >  #define KSTK_EIP(tsk)                (ulong)(task_pt_regs(tsk)->epc)
+> > >  #define KSTK_ESP(tsk)                (ulong)(task_pt_regs(tsk)->sp)
+> > >
+> > > +#define ARCH_HAS_PREFETCHW
+> > > +#define PREFETCHW_ASM(base)  ALTERNATIVE(__nops(1), \
+> > > +                                         CBO_prefetchw(base), \
+> > > +                                         0, \
+> > > +                                         RISCV_ISA_EXT_ZICBOP, \
+> > > +                                         CONFIG_RISCV_ISA_ZICBOP)
+> > > +static inline void prefetchw(const void *ptr)
+> > > +{
+> > > +     asm volatile(PREFETCHW_ASM(%0)
+> > > +             : : "r" (ptr) : "memory");
+> > > +}
+> > >
+> > >  /* Do necessary setup to start up a newly executed thread. */
+> > >  extern void start_thread(struct pt_regs *regs,
+> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > > index ef7b4fd9e876..e0b897db0b97 100644
+> > > --- a/arch/riscv/kernel/cpufeature.c
+> > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > @@ -159,6 +159,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+> > >       __RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
+> > >       __RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+> > >       __RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
+> > > +     __RISCV_ISA_EXT_DATA(zicbop, RISCV_ISA_EXT_ZICBOP),
+> > >       __RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+> > >       __RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+> > >       __RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
+> > > --
+> > > 2.36.1
+> > >
+> >
+> 
+> 
+> -- 
+> Best Regards
+>  Guo Ren
+> 
 
