@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F10EC7A4BE4
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:23:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68EFB7A4DE9
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:03:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240115AbjIRPXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 11:23:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60630 "EHLO
+        id S229845AbjIRQDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:03:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238605AbjIRPXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:23:32 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472C0134;
-        Mon, 18 Sep 2023 08:18:31 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-401ec23be82so49654455e9.0;
-        Mon, 18 Sep 2023 08:18:31 -0700 (PDT)
+        with ESMTP id S229630AbjIRQDp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:03:45 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9DB1BF7;
+        Mon, 18 Sep 2023 09:03:22 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2bffd6c1460so25506301fa.3;
+        Mon, 18 Sep 2023 09:03:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695050309; x=1695655109; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695052885; x=1695657685; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w54mgLsXZyF9Sm0smxclmce0mhDWz8ur28XiwaO9K0k=;
-        b=bIl8TWunvgTXQoJvFqAlgKAINfWznxSCGcfjYHtswN3+3UDSw2oMDVE/+h4aj7eVge
-         abeZQv7xM4BRXidVUizOWWe1EZxHQN9hp7SwAvHWdWTzK+0DyM0tke4Ra9jpxHf13MBI
-         bg5DXmIEpwPXfRF4VKwIWj8Act7ymBsG52dCA92oTe8FHc9Bdp2Jnq48PtXVliBYi8D8
-         BaIZIV0y8J3lQB+X3LzVU9J/mT+IBztiXKlKLDslMeCOo0MU7yS0S/ZSJ8lihX/ZRDld
-         etIjbZ5A6fe+DohDS+nTaqurEdYHFEoLvS/2fS3DTMLDvaZR/UWLYHzGOnCsyMgMIBut
-         fpdQ==
+        bh=TU39xba6Mf5d40trDmwMhXy8UK9IvNBAEpc/fRS5lwU=;
+        b=KvBUO8O4pcIpu62x6rBzvjzeMjiFAIuyBL6gxUUmO8e+d5nGwMCHTP9HAaLByp58ZT
+         EWXpODTpfCXyxqbns2zThfk2/FDjj2YsKZwCUZma6S80oFWBPjoDhvzwCg/UIHJtDRVh
+         wsg1KcNLLbzeewBD9Xi4EzJHdqKglcVCOxl7ANQrYgdAAHBsmu+rZWFi4toYxPWbxdsf
+         aWI5GPSQxJJ1xTu1zqmnqUmVN/JJUI1tJ0CWNWCbGBl3kG9HeBr4H+W6RwhHcGgadIuX
+         Vu2b/5qbtmxD2xXT7Wy1v9lRi0FOYfvMzxP3O6UANrTIujklwww4xmMFYJxsYVkDKZL8
+         Jp7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695050309; x=1695655109;
+        d=1e100.net; s=20230601; t=1695052885; x=1695657685;
         h=content-transfer-encoding:in-reply-to:organization:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w54mgLsXZyF9Sm0smxclmce0mhDWz8ur28XiwaO9K0k=;
-        b=KR/KXhvOoEwFJQkhBeYP1AIG9GPglWW2UGCNwNqLSv7SuBeY83ObKhOjttWBm2W9DP
-         /VxHaRM6Pqc2hqPTWVa1qiuqdQMQwBrn6czTvQS5dneOoWlNokQeARtKb6sUJLYbUgRb
-         HmsnRfggx93mUuHObS7JMrYJ/UU268aTZy2gDfKtzoKILx6hZpntWL5yk9yBTzue5ZgV
-         1Z6sVUMlfVGu5/jQpLLvpdu2iiGvqMJ3Avd4Q5Yf+g+8ocsAN5mfL1oi9MGqj0ELVXLc
-         W4UKiB5ZlGHriESEoIyldFBXRrErABPlwlvztf0HLTO22othrrIbFnFrB66UHoTV5WtB
-         yYlQ==
-X-Gm-Message-State: AOJu0Yzi3T04VNa0pg/iOeEh4K/zNwIryIDcV0BR3ZtXM6qrca+oaGMW
-        mqqG3ep5FOSvVIsBoR5tQCYIZM5OZP6iXHWZ
-X-Google-Smtp-Source: AGHT+IEeybKZqRsHJfjXdSZZ4nUev8Gj95QgSsAtbd8Cd2rs1soTdJJGYN81BScGjqPkhrDPOWUOEw==
-X-Received: by 2002:adf:a3c4:0:b0:31f:f664:d87 with SMTP id m4-20020adfa3c4000000b0031ff6640d87mr7135072wrb.20.1695043461087;
-        Mon, 18 Sep 2023 06:24:21 -0700 (PDT)
+        bh=TU39xba6Mf5d40trDmwMhXy8UK9IvNBAEpc/fRS5lwU=;
+        b=wmILkAKJU5rs369R5rYOf6jLdzj/pZZsnH0cwox35Z4/N6rEJKTQcs6FB46MaTFP8p
+         17E6JiWaj46G2092Dw6BZIXQm66DfHReuNT0mG9vereq1zQQZSTtNIedTbJckyDx7UJT
+         ivLrO84ArftoBrkPNJCixIU+dQiMSE+n8KQa1MxftpdNhKhC2AXlqKMzeKwy4FsZTvYi
+         TPEx+93NjKt0cMeGrj2qG8BclDAQrS4vveOfFa8DWcY2YJ/ftsbA5xQYr8MVZAuvnATg
+         SlTcbvS67fwZLqyew0QT8d9Iw4h/u1Rh7LyuN5ryyJnN/nKhcVA4f1R3CPrjww9UDwsg
+         odvg==
+X-Gm-Message-State: AOJu0YwB67x53JYwH0qKNLYTEcpYyJZk6BB8MTQz+mGXECFzq+cA4j8T
+        2eVp3iFiRfS0Lyi2s90QGHI49DJTb5P7DuoZ
+X-Google-Smtp-Source: AGHT+IHakujEQyfS0HR8ZcXYnOYlRKiG1/prvo8FsAtp2f4QZJhz5Zq2A1vtZwTyFMkSPvVn0T/pQg==
+X-Received: by 2002:a05:6000:1370:b0:31f:bab8:a31a with SMTP id q16-20020a056000137000b0031fbab8a31amr7674777wrz.39.1695043597369;
+        Mon, 18 Sep 2023 06:26:37 -0700 (PDT)
 Received: from [192.168.7.59] (54-240-197-236.amazon.com. [54.240.197.236])
-        by smtp.gmail.com with ESMTPSA id f13-20020a5d568d000000b0031fd849e797sm12502050wrv.105.2023.09.18.06.24.20
+        by smtp.gmail.com with ESMTPSA id t3-20020a5d5343000000b00317ab75748bsm12658526wrv.49.2023.09.18.06.26.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 06:24:20 -0700 (PDT)
+        Mon, 18 Sep 2023 06:26:37 -0700 (PDT)
 From:   Paul Durrant <xadimgnik@gmail.com>
 X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <e5cba995-7525-de56-fb0a-97697fe41cc7@xen.org>
-Date:   Mon, 18 Sep 2023 14:24:20 +0100
+Message-ID: <56dad458-8816-2de5-544e-a5e50c5ad2a2@xen.org>
+Date:   Mon, 18 Sep 2023 14:26:36 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
 Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 10/12] KVM: selftests / xen: map shared_info using HVA
- rather than GFN
+Subject: Re: [PATCH v2 11/12] KVM: selftests / xen: don't explicitly set the
+ vcpu_info address
 Content-Language: en-US
 To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -67,52 +67,33 @@ Cc:     Paul Durrant <pdurrant@amazon.com>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 References: <20230918112148.28855-1-paul@xen.org>
- <20230918112148.28855-11-paul@xen.org>
- <9b172014d6ce533fd45b4c79f9cd0dc30b0029d2.camel@infradead.org>
+ <20230918112148.28855-12-paul@xen.org>
+ <f649285c0973ec59180ed51c4ee10cdc51279505.camel@infradead.org>
 Organization: Xen Project
-In-Reply-To: <9b172014d6ce533fd45b4c79f9cd0dc30b0029d2.camel@infradead.org>
+In-Reply-To: <f649285c0973ec59180ed51c4ee10cdc51279505.camel@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/2023 14:19, David Woodhouse wrote:
+On 18/09/2023 14:21, David Woodhouse wrote:
 > On Mon, 2023-09-18 at 11:21 +0000, Paul Durrant wrote:
+>> From: Paul Durrant <pdurrant@amazon.com>
 >>
->> -                               ret = pthread_create(&thread, NULL, &juggle_shinfo_state, (void *)vm);
->> +                               if (has_shinfo_hva)
->> +                                       ret = pthread_create(&thread, NULL,
->> +                                                            &juggle_shinfo_state_hva, (void *)vm);
->> +                               else
->> +                                       ret = pthread_create(&thread, NULL,
->> +                                                            &juggle_shinfo_state_gfn, (void *)vm);
->>                                  TEST_ASSERT(ret == 0, "pthread_create() failed: %s", strerror(ret));
->>   
+>> If the vCPU id is set and the shared_info is mapped using HVA then we can
+>> infer that KVM has the ability to use a default vcpu_info mapping. Hence
+>> we can stop setting the address of the vcpu_info structure.
 > 
+> Again that means we're not *testing* it any more when the test is run
+> on newer kernels. Can we perhaps set it explicitly, after *half* the
+> tests are done? Maybe to a *different* address than the default which
+> is derived from the Xen vcpu_id? And check that the memcpy works right
+> when we do?
 > 
-> This means you don't exercise the GFN-based path (which all current VMM
-> implementations use) on newer kernels. Could you have a single
-> juggle_shinfo_state() function as before, but make it repeatedly set
-> and clear the shinfo using *both* HVA and GFN (if the former is
-> available, of course).
 
-The guidance is to use HVA if the feature is available; a VMM should not 
-really be mixing and matching. That said, setting it either way should 
-be equivalent.
-
-> 
-> While you're at it, it looks like the thread leaves the shinfo
-> *deactivated*, which might come as a surprise to anyone who adds tests
-> at the end near the existing TEST_DONE. Can we make it leave the shinfo
-> *active* instead?
-
-Ok.
+Ok. The VMM is currently responsible for that memcpy. Are you suggesting 
+we push that into KVM too?
 
    Paul
+
