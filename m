@@ -2,148 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75DA67A41A0
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 08:57:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E3A17A4217
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 09:17:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239955AbjIRG5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 02:57:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37946 "EHLO
+        id S233318AbjIRHRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 03:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240051AbjIRG5K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 02:57:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB4ED2
-        for <kvm@vger.kernel.org>; Sun, 17 Sep 2023 23:56:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695020178;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h2mcwAczqQrH8FC4T+/52u6VelTTkFaOGAGOTHdcUPg=;
-        b=LVFp946NjTAYtfFMFGvgzS+Yd69swf07fQIhh6FWhf6RjXjHBvATrXkB3ZjvN18m5CkNSj
-        p+uJ9TKv/NWsby/ifnVURI1O+BCUQUDE3m5f0P1MnGPZYh0EwAk2GzJ96ZlpH5Cmu2EaHg
-        kkUx/ORbgHD5mkbKb2OtCZiz8dEjYIw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-bmJZC2HMM-SMAeYSW6VgyA-1; Mon, 18 Sep 2023 02:56:13 -0400
-X-MC-Unique: bmJZC2HMM-SMAeYSW6VgyA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-320bf1de0a6so550910f8f.3
-        for <kvm@vger.kernel.org>; Sun, 17 Sep 2023 23:56:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695020172; x=1695624972;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h2mcwAczqQrH8FC4T+/52u6VelTTkFaOGAGOTHdcUPg=;
-        b=mnVXZIbDksR7P3OHCYJzMPZxTbFnI9n1pxIM+8/zptfPXiT847IvOs0c6z7L7UGRQl
-         6nJwENxcjp2Wzp0jhmj9O1lnXh9cg4zcV86FO6sRykS1D9D3VcSPByj83+dwVBDpCMjc
-         bm8Qr+ec7DgYXmqEyQhHKsNenLTLpK8jHNNSvYogVsm4pvhBzy/u7soDUgU4W/sWK6ID
-         4fHoZqcQWllHgLsK2JUmODnTfq6Sr4r0HSGj9rxpkujKm46VsmqorfJmR2l61pYs3uNB
-         aEmBuZScXchHZZMLhZR3ajYmMa8zH9vcJBz98EojQxMuNE/EvFvqw1kbo3SvHj2D84+/
-         y7Pw==
-X-Gm-Message-State: AOJu0YxulHLBv3D1PjdfEkBrXJO3EsTCqcYlJQaTfaaMMOmz1nH5cdix
-        ButsuIrTsreXaYrbdWQJafiD8jwPGiFE/ySyheOvefsmr7Ompynw/mLoKUcZg+wTA8CBsLt+7gM
-        Q1wwKoEam34zS
-X-Received: by 2002:a5d:4c4a:0:b0:31f:8999:c409 with SMTP id n10-20020a5d4c4a000000b0031f8999c409mr6947622wrt.66.1695020172215;
-        Sun, 17 Sep 2023 23:56:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6F/Z9q4tB58E26+mCTcb2TpjD2EEslfwOYb0HqPPBuG0zLaR6K3OsqOUHedxMDM3AqkpDEA==
-X-Received: by 2002:a5d:4c4a:0:b0:31f:8999:c409 with SMTP id n10-20020a5d4c4a000000b0031f8999c409mr6947581wrt.66.1695020171900;
-        Sun, 17 Sep 2023 23:56:11 -0700 (PDT)
-Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id t3-20020a05600001c300b003143b14848dsm11523936wrx.102.2023.09.17.23.56.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Sep 2023 23:56:11 -0700 (PDT)
-Message-ID: <a6a77718-219f-30f6-b8de-acd7aadf3b0c@redhat.com>
-Date:   Mon, 18 Sep 2023 08:56:09 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 18/26] KVM: s390: Stop adding virt/kvm to the arch include
- path
+        with ESMTP id S236754AbjIRHRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 03:17:11 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1EA2A8;
+        Mon, 18 Sep 2023 00:17:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695021425; x=1726557425;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WudwTdJWgMId2gb+WYdeD6IceQKY4AoHNVJkE2gntwQ=;
+  b=SaQ2kkeu5+JN44X7hhb+JkSsfFAPPuPGchF7uWQP9GaBDDKz+5pvpu8h
+   CvgBSSYc9lO7l/krtquthikXbi0GoEHeWamzG8MMGF+Xk/GvvNunmThWZ
+   5a7Ox54bFbkmr6v/a6KGnjW9vH7u8prKOP4pqGz6U4NMiLrdUfCeehz9b
+   mFifPlV6RZoyvmZJ00m96CTCh0p0CMk8oyOEOBrpTDHRYafjb6TfP5Mlz
+   ysKmjj2LXhTpJIGbSc19qZR9j0SUhl8L2b1bsXRp3V2xYLK7eHBsJpkcX
+   azkWJX70ijdiB9AdZTFxEd/SMh9TEy4VKEUn9GqmVivByfrFbO7zoKq9e
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="382328358"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="382328358"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 00:17:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="888926722"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="888926722"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Sep 2023 00:16:21 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 18 Sep 2023 00:17:03 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 18 Sep 2023 00:17:03 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 18 Sep 2023 00:17:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DWiI2HS9lyjwQ8Df80Fhsg0/sLFcUckKVeK54LZyMX0UQ0uZ+fcyXFpoOsK60KDTwvQl4j+JtWiNu5a24DC3SBdFkqGhk6gGeidosOZDDcH7iRIm+HEbXsBNvTw8mnFSUijvWN04b2mn+nljjYG6/yzyHPki79pXtvIO/M87661dDH/haDluWGbk36xnqJBQTLPCvjHxOIR5h/FKR00ObpyieUN43i9ZzLaRBgUjCgvBuexWRuO9rMwfDH2G9GaJrTnlDsq2feFMkRlvT7v6aC+ehnQo6tiqCiNNjZXzaAKLroDOc49BxY3kykI95qhL4Yg9GijQHniYXf6CLRV5EQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WudwTdJWgMId2gb+WYdeD6IceQKY4AoHNVJkE2gntwQ=;
+ b=TGmxbC+KvqZyftZ5Bpd5wG27HpSFDfvjsFqHjd0GSsYKSHK8l7gSV5kbFojH6cvFgrSdEEJ0G13NQUzoQugXczcEN3QmUyjPfwptn7t2fvjxphPPA0gnbDONofF6ufJQ/0MmvMm+hQWzmCypRO90X/amvBrZrfoEsKbknFgjNMGo5Ro6uqWycudY/ZCkf3YTM7T80wxDHMDFKZ4v/LwBlYKZCo2PSi10j4Gl71lzOCDttJdEocJC+7hRvpqkxhLNXzfLEYRRP9SJfWsaZFMRK6XiZ1uzK1bDkNkJpmWS9CBpm5D+D92KaUC19N8QXQ+LsYxGFhTE8xz2l7aS17RIwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by LV3PR11MB8508.namprd11.prod.outlook.com (2603:10b6:408:1b4::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.24; Mon, 18 Sep
+ 2023 07:17:00 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::a64d:9793:1235:dd90]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::a64d:9793:1235:dd90%7]) with mapi id 15.20.6792.024; Mon, 18 Sep 2023
+ 07:17:00 +0000
+Message-ID: <7d783993-1ef5-e1ed-591c-c87a9d879782@intel.com>
+Date:   Mon, 18 Sep 2023 15:16:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v6 01/25] x86/fpu/xstate: Manually check and add
+ XFEATURE_CET_USER xstate bit
+To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "peterz@infradead.org" <peterz@infradead.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "john.allen@amd.com" <john.allen@amd.com>
+References: <20230914063325.85503-1-weijiang.yang@intel.com>
+ <20230914063325.85503-2-weijiang.yang@intel.com>
+ <868ea527d82f8b9ab7360663db0ef42e6900dc87.camel@intel.com>
+ <8307c089-cff5-db41-5248-7e0f2801143f@intel.com>
+ <c91f6e5885b8d052b0a1d96d0ccc5a479d9f2b69.camel@intel.com>
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        Anish Ghulati <aghulati@google.com>,
-        Venkatesh Srinivas <venkateshs@chromium.org>,
-        Andrew Thornton <andrewth@google.com>
-References: <20230916003118.2540661-1-seanjc@google.com>
- <20230916003118.2540661-19-seanjc@google.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230916003118.2540661-19-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <c91f6e5885b8d052b0a1d96d0ccc5a479d9f2b69.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SGBP274CA0015.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::27)
+ To PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|LV3PR11MB8508:EE_
+X-MS-Office365-Filtering-Correlation-Id: f37c4eaf-a4bf-4545-95aa-08dbb8173ff7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: atAVCWWRfRHhHohz3By+HXzhopMrNaZg0yn8fagsHLQ8rB8IP7G2YGZQT68Dgak4Uqfmjc+WuTWy9uq62LXv2z8dyIQehxuxphONiHHx3X4rCKeC8Qtnebj3J7xVZNWGNSMjAp7MM7FDD9ddla0RcJUl0aIlyh1bEhaohxChkEYMOuRaAVKDPpfl7RasE/fmPQHm5mrxOout/rdSLpXn35jS5/P0Sgh8cHRGPBPAKvfoj0gK0fdWC5kCFYfTG6R8YYu65UYVSiN9JFrvggXWyjFdgpZk+m7VyZA5f7qdgWYUkbpKAdy8rx+lxzhf8WD2yeKS5UEivsRBjl77mW4Zzq+FkaoFjfSz3tMoOf3Io2/LklLXxTZ9UQmIfIWoyJxZ0OyiUU37+y8J34UpQ1PochA07u+6YyYPoxflfK8n9KgJ7veXJ0yhpmIum6b4SuMtONWVHVUC0WoIO6CmYtuHDRQ2JR2ZmYoy/BrtrF+KJL9iy8iTTW4Z28JZCDDCSdmfIXEaL6THEQc9AiWoVTG8tCdQMH6jn1xhJZLebmu9fdD+vIeHj+5+BC4x1m7671qNLoU9yk2OC0024YxmGwY0tYfSJxeHpSlICUuOPMu3N1nDLq3ctiy3z1ocWEa0U92w5Xox6BDHs8VkjjXfK5R8gQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(396003)(366004)(376002)(346002)(186009)(451199024)(1800799009)(54906003)(66556008)(36756003)(31686004)(26005)(2616005)(2906002)(82960400001)(4744005)(38100700002)(5660300002)(31696002)(86362001)(8936002)(8676002)(4326008)(316002)(41300700001)(66946007)(66476007)(478600001)(110136005)(53546011)(6486002)(6666004)(6506007)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SEVjWExTNzZqVFlrVnRwd2k3dW9CZVk4OTBWSy82bE9SVlhiQTFjYWEwREhn?=
+ =?utf-8?B?VmpickhRTForSWVRa1NlelJqbVMvWlo2V0tyTHlKMENRNW02eG1sakwyaWti?=
+ =?utf-8?B?M0hybWdLSjNRVFFwMVZlQmJMMndORG4wdEVpRVFmN2JNMlZPbXRxS0lZRG9H?=
+ =?utf-8?B?blJxQVBSUGkrRkpqN3lxVDRjMDh3N0ljSFdqUXUraUs0N0twZURUMFJtcUp4?=
+ =?utf-8?B?ZGh2VFgxc3lJcmlSRHB4eDNXUWVzMEgxemRlUTBlZDE4YkRhNmFrODZnVlpt?=
+ =?utf-8?B?UVNXemxZTTdVNlVRakpIOGUrbkJhK0o2dmNyTkpYM0RXbU5kaGZpRGJDTlNT?=
+ =?utf-8?B?ZkJMSU5wWEhtV3pheHpncStZVHQzMEJhZWlZeWprZ3EvcFpGQWdIbnZvK1pt?=
+ =?utf-8?B?VHQxdGFpL3hYWFpwaHI3LzVJVnYwUlFaVEVCendkVUFROFdESkt3VnM4KzFI?=
+ =?utf-8?B?ZWRuK042UGdiemh2VFQ0U2pKSVlGSUFRSUp3Q1hWb3FQNFNXOE4wMDRhdS9v?=
+ =?utf-8?B?N2VET3hsMmYzeCtLdVFXMEJCRTk4TVFuSEE0VFJNbzFJdkJCaDNHd0JONDFY?=
+ =?utf-8?B?WmFyaVhEdXNpcXZTRDQrb1BYM1NmanJWTVZVOE5waENOcEZEOGdoc3VPaEFk?=
+ =?utf-8?B?TzlHRE5pclNMTHUwdCtLQ2ZqYlliS1BDaVNCOC9xUkkrUXprdXpVMVRvdFpD?=
+ =?utf-8?B?NEhmM2lTMkthRXdrbExUaWVqQ0ZOenMyU0dnZFpJTlR6c2I0N2lVcWo3cmZF?=
+ =?utf-8?B?OUlMTUdpdFBJbTQ5M2VwazI0Mk1KUG9VeElkV082ZFo3T3JLaG5BR2NSRVVW?=
+ =?utf-8?B?aTd5ODJlQk0vY2RITjRhVS9oN3hKYUJHQ29Xcm1VZS8va0hBa3VYNzFrL3ky?=
+ =?utf-8?B?SWdyT3BGOUYwd0trM3daMklrek41V0lRTy91a0Jsa1JOL21VbkZnVlhBSlBj?=
+ =?utf-8?B?Y1ZaOWtPOFRFRkc2SHhaSDl4R2ZSZ1luNThndnlNWExiaHlCaTJSN2M3UmJj?=
+ =?utf-8?B?VzFITmJ3aDAycURidURsenU0M256TW8zL2lsNmNtSnFPYnk5S1ZYZzFwb1Zv?=
+ =?utf-8?B?cUp5YUZQU0pLT29SbkVyakFLSkVjWndJaGZFSFlOVENBbU5HckxFSThnK0Np?=
+ =?utf-8?B?ZzlKYXFSdDVpOEVOUEJTOTN3d3lJS0swUzFXWGpUNE4yOEU3a1VsSEExZFBI?=
+ =?utf-8?B?MjVzd1U2eXBlNmo0Yktnck45Y0l3TVdjdlpTUGtabFBSNStxOXEwRWZuSzZI?=
+ =?utf-8?B?dHZwblB0L3F1TTd2MUxzLzMveHFvOE9Uc29TRnRzWDVVdytNMksrTWdoTGVX?=
+ =?utf-8?B?Z01oS3FyMTJzRnBpZkpBS05VTER2d0VJT3VBY29RTVFCODB4L0MxdHZXQTR1?=
+ =?utf-8?B?WUgrNVZ2bHlRdUtqTTVwekRQUTBZcG5PZjVYNXVrajJaQUsyMGt6QmxxenVW?=
+ =?utf-8?B?UEpGUHhKY3QwcDg0N0hYSzFhODNFejBNay9wTnpod1FoWnNsdHBGVnY3R21U?=
+ =?utf-8?B?UnAvUFFkL3JMNVBNTXN4ZFVjNGttRk5xai9JTFZmamx3N3VEbXZ5ZjVxK3Fl?=
+ =?utf-8?B?ZWFGSzhnQlFyMnhuV3Ntb3Z3QitQMlpvMEdOUjBWTUFTOS9MY3gzdVhwdm13?=
+ =?utf-8?B?V0drQ3N3UUFxNytTdG1KOEN5b1dwMHJGbHVJZnBRUDBtRi93ZFV5cnNOVzIy?=
+ =?utf-8?B?ZWMvWGpTZmhYNGE4SWJxMkoyUHQ4QzJRZldNRFB6ZVdxVWFKYUFIazJKa25T?=
+ =?utf-8?B?VGJKOGRNcWNnT3llMWIxUkovM3o4d3c3b0REd09FRWRRdkoweHZjN2FQWnIv?=
+ =?utf-8?B?OE1OcUZBd2R1TVpSdGJycTkzU1hSOVA3d0FvUzNnUnRIVy84akRDWHNubDlY?=
+ =?utf-8?B?VVV0bVpGQmtPZ2YxcTNwYzFsUjdQek43LzNjZHRSVVNDUmtUWUwzWktGSldY?=
+ =?utf-8?B?ZzBkc3B3N2lrTWNmQTFQVzREbk5Ba3grWE1hNzFXTjQ1UUFMOWRrV1VLa1JC?=
+ =?utf-8?B?MXNsNHNTWm4wNklzaE9UTEpUWU9VQWdhMmtVa0dQaVJ3WHFNa2EvMk94aEdy?=
+ =?utf-8?B?bTcwaVNDUkRwM2lrR243MHg0Wm1JeC9VTXpRMm1VbEFXQjBrRnNpcHZvV0Nj?=
+ =?utf-8?B?WFVwejRNWGQ4c2szdndCYlVsSE1ubUlqc1Q4WHlLRHJRL3FBSlF1djVUQTd1?=
+ =?utf-8?B?L3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f37c4eaf-a4bf-4545-95aa-08dbb8173ff7
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2023 07:17:00.2046
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VU6+ZevLyLJDToWuVzvUOLwN8AkTYAMYYqkDPDKDA43s/1WqnLFWhueEsjsk0qJlJPpLKWtJl1FM4j1oS/YaEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8508
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/09/2023 02.31, Sean Christopherson wrote:
-> Don't add virt/kvm to KVM s390's include path, the headers in virt/kvm are
-> intended to be used only by other code in virt/kvm, i.e. are "private" to
-> the core KVM code.  It's not clear that s390 *ever* included a header from
-> virt/kvm, i.e. odds are good the "-Ivirt/kvm" was copied from a x86's
-> Makefile when s390 support was first added.
-> 
-> The only headers in virt/kvm at the time were the x86 specific ioapic.h,
-> and iodev.h, neither of which shows up as an #include in the diff for the
-> commit range 37817f2982d0f..e976a2b997fc4.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/s390/kvm/Makefile | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
-> index 02217fb4ae10..f17249ab2a72 100644
-> --- a/arch/s390/kvm/Makefile
-> +++ b/arch/s390/kvm/Makefile
-> @@ -5,7 +5,7 @@
->   
->   include $(srctree)/virt/kvm/Makefile.kvm
->   
-> -ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
-> +ccflags-y := -Iarch/s390/kvm
->   
->   kvm-y += kvm-s390.o intercept.o interrupt.o priv.o sigp.o
->   kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o
+On 9/16/2023 12:35 AM, Edgecombe, Rick P wrote:
+> On Fri, 2023-09-15 at 10:32 +0800, Yang, Weijiang wrote:
+>>> Also, this doesn't discuss the real main reason for this patch, and
+>>> that is that KVM will soon use the xfeature for user ibt, and so
+>>> there
+>>> will now be a reason to have XFEATURE_CET_USER depend on IBT.
+>> This is one justification for Linux OS, another reason is there's
+>> non-Linux
+>> OS which is using the user IBT feature.  I should make the reasons
+>> clearer
+>> in changelog, thanks for pointing it out!
+> The point I was trying to make was today (before this series) nothing
+> on the system can use user IBT. Not the host, and not in any guest
+> because KVM doesn't support it. So the added xfeature dependency on IBT
+> was not previously needed. It is being added only for KVM CET support
+> (which, yes, may run on guests with non-standard CPUID).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Agree, I'll highlight this in changelog, thanks!
+
 
