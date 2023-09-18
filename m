@@ -2,186 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FFA7A4BB6
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:21:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F5BF7A4D3A
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:47:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236739AbjIRPVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 11:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
+        id S229691AbjIRPrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 11:47:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235917AbjIRPVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:21:18 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2064.outbound.protection.outlook.com [40.107.101.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57484CD5;
-        Mon, 18 Sep 2023 08:17:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=coV11WyES7OsY8ZXcsO5ZzBGNrIWbl6bFnx/I1nokXVpNKhpJ9kaFn0BHFhBzpj6ngzWBjbDuDVrWday7zjfcmKCblgq3RsYdBvgef3vEhU864BvUbKv/cWalM8HQKZYHx5g7PAMZuqnrQR833HDJETISScAEROfcIi8SquxVvx3kNMlNybkZ5WfOPbgtEWPb8FojgA/qFKgv88KQSaM/2Af0kLutyEUlKGuodAUVXq7ZI8JMyuyw9raqdJltfCfay7oUdSyH+VSaKN0xvAxRAnxKiR0gSrizNY8TNy/jRRthMz4zt7T4xqtuoTWZcmPAhkRDDBIwtlYDKV9UoZ+RQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zx5uPsFKEQhOAtQGG5/9UiJPBFjc4uh7M8xzHF5h8K8=;
- b=IdRTed6zkBHrlCHhpVVfOS9AVlaCRg3otENKDLzk+6oVv+UQhmNGkzA/3DH3dCihzaS3EeZSnLlhoZJy0NzkXRKXqoA16ndIktmDQdWm3lSCJBTWh7F64ogJgaxN+QhlZs67cXmQgV0pp/+JP9SgYM579RSE2LE03TLBKl5Rei8bm0pbedZBsIo9IHu4U4smeuOx3wlS9xfJssi3BfyBfbHBUj50OI87i/4yruYzGdVsNH864eD8DboRl9B8dFPoC7lS2RC4JPj48OecFN8Bq+b5Dg0P6wch+cfKKOi36vvq5t2p60FtBjDoDd6FrQ7Ra3szW0aaPIahb2SRD9qi+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zx5uPsFKEQhOAtQGG5/9UiJPBFjc4uh7M8xzHF5h8K8=;
- b=QTyBfQ3Ul3R6h1RZFE1fb/yrKPnchBRqohipmSZOIrDhg6jEqe0Donzo463MVH99fwbsvBPsmANfmNXI68dnRvNx+qXg4CjcFF5HdLeq4vakmfHig+spxZscGIepzodmFXDZyxUXDDqPhRSAwuZ3rXEvUS0R+zrPOpPpazkLYKxFnWZyxAthyaNH3/MG+COLeLLvQiZfJ8u7xth+JhY6iTVpXLT9KX8P4KvAkw2c03wdGFZ+QF3Eq6NHzcxWsZAp9moy7fQfHROeJUoV2nhaSnJi58Xoj3G+o1GHRIJjwFGnxeXwOzRseNA9hahrdZ+D8jLdJXf9AB8tS96WoMIa1Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA0PR12MB7604.namprd12.prod.outlook.com (2603:10b6:208:438::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Mon, 18 Sep
- 2023 13:02:57 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Mon, 18 Sep 2023
- 13:02:57 +0000
-Date:   Mon, 18 Sep 2023 10:02:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     ankita@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-        apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-        anuaggarwal@nvidia.com, kvm@vger.kernel.org,
+        with ESMTP id S229839AbjIRPrY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 11:47:24 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5205626B6;
+        Mon, 18 Sep 2023 08:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PAkyuohpShfhkjqMOOY7UlTd9ozwgnR7FeUd9SVbvSQ=; b=HcOS3dyJgAR70j8tvtkTbX2xdS
+        ZAyPkHn2DR3u8S3f0eZ7sFBpSU1YJckO+8Xi/i6V4wy2PIMGorwhRbQlMwDDBUY/bNmxeolirRYZm
+        ZBE9dk7s12+u5Qbf6ymrDfdRBYSyo4zaoWXIGRhSVg3bj8yRhh4p73iqdnwllIBctHcCoznAM/3/D
+        sg9rpGlCHJU7FgDNQRGXXQiuHVyP7D1d6oovv8SEjF3BjYP1sh6vHl9swG61G2QMVgfawe6UD1KL4
+        c+ImSFBRW3nLTkPLH4txERLAEZUDIdoayw9X6eJHlcCgnlSleKmSOc/xUhUpq6Yu4czzth55dJ7L7
+        hDqWWBuQ==;
+Received: from [2001:8b0:10b:5:cea0:d147:7c2e:9e61] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qiEA8-00BCmQ-UJ; Mon, 18 Sep 2023 13:19:41 +0000
+Message-ID: <9b172014d6ce533fd45b4c79f9cd0dc30b0029d2.camel@infradead.org>
+Subject: Re: [PATCH v2 10/12] KVM: selftests / xen: map shared_info using
+ HVA rather than GFN
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20230918130256.GE13733@nvidia.com>
-References: <20230915025415.6762-1-ankita@nvidia.com>
- <20230915082430.11096aa3.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230915082430.11096aa3.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR05CA0056.namprd05.prod.outlook.com
- (2603:10b6:208:236::25) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Mon, 18 Sep 2023 14:19:40 +0100
+In-Reply-To: <20230918112148.28855-11-paul@xen.org>
+References: <20230918112148.28855-1-paul@xen.org>
+         <20230918112148.28855-11-paul@xen.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-SGFEyb3zjNbVkm+hZ87i"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7604:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9b0e115-9019-4a2b-8250-08dbb847940a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6WPUQQWxob5TpOEQE0tnWNG7iFpRQaIjuYtqf9afsvzyZ/lrZCG+Rqn2KiZlc0L+zmmPi01K3WsNb1uiU3HhxcIJXoCopMK8F3ls8MHGANHFnmE+Gau/PDihnQpet4I5CgH0qbEvv4lTL3Ajxm+8oKM7ptUYivavaHk4Iq6pBCnH5/IEiMOv3zT4kuaTJ/oRJExOoGdUL6ZvjzkeRRHCB1YltSgsqctZMG/ILNd/mpIzpJqbt2s9oXhJj6G7M+qVvgpTbCXrkaa979fMpBX05B+6/F+RSpbLtT2onXHO6mCQsCWq7pBVLpTTaEXVp14IoeeFiXrYPw/kayN9FgPleUBQpEmUbY95kM5V216x6Sni/kqkjToki7IcpCBPgWV1U/Y54UejiR02spS55KYJSG0MFLHeX2cUyu614Oj/Dcf9YBLqVl9P05IxkL5RytKN71QlJw/r60DIzhL2OaXow9gGR/9N2xThw0lBaqt8uBhCS16LMKAmImodS7XkrhOCehUkFi9kKJaCnYa9v5GPPkloFVnfLLdBBXIg8odP0OHF5b3YxzE9153kA8u3gLXC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(39860400002)(376002)(366004)(451199024)(186009)(1800799009)(6506007)(6486002)(6512007)(478600001)(83380400001)(26005)(2616005)(1076003)(2906002)(4326008)(66946007)(66556008)(66476007)(316002)(6916009)(8676002)(5660300002)(8936002)(41300700001)(36756003)(86362001)(33656002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oFl+ErWOWJSF/nm+C06pF5kZsIsnmlYMxvuqOFkRGyJElFNjP2D1gIEblDjZ?=
- =?us-ascii?Q?aDqFBq/8sh90Xo5DDPqLKcZV0xiIfuQ4AgialVUQgu7RT7l3zs97oWr/vL2/?=
- =?us-ascii?Q?uhg1VATcNp29S0fAkyua+e1ooY2beCcg/d+X4EzWZtnX+7YEPsSJdqT7oA0V?=
- =?us-ascii?Q?66dJm77YwnByupvPVhbK1Or2mateGKLIXpJYdeuiIWzbPEOpkFSdCqB+JLVv?=
- =?us-ascii?Q?MG7GwKL8qzYAqvLaLMr3d3HC/u8Fs0a9Bp3khSV1JGGonu1rO7wXWY9KDLa5?=
- =?us-ascii?Q?IpeMj0nYDhH3/RP1HIgC4HZ+1jrakey4Ya/WDxCp6ch4G8PUi5JW1pXyQL3L?=
- =?us-ascii?Q?xq65SkbVw0HPX1lf5FDxNeerPwarjEuUzdvTr+oVRjpuaFjQArUK/nzikpjc?=
- =?us-ascii?Q?bOZeLA2N2Tr/wk0Vuf6DkvfmCSHB3hGxGTgToi+HiICIvBz0VzdiE2UmFyCX?=
- =?us-ascii?Q?6Xe0EP7Y/8fgLn+yukd8DwVMmlJblBWxZySFI+KbqhkNWTUqRt8/wjvrMFtX?=
- =?us-ascii?Q?Tw59C6T1NZgkbbjAIONFsobK6TILuTReUgFnrwzTESCsWkUJx19xiyG6ZV88?=
- =?us-ascii?Q?bqaS2AShqgWhW9Fev3STD0BdsV3lmnOCm73mufHJSYY4QDItrxiVQWGYsZ+i?=
- =?us-ascii?Q?SDmWyOaHHqIma2mX4fsMWB2wEAonUT9ofjY3gP24plr+ddEMX4PkpF2ubCIl?=
- =?us-ascii?Q?ombBLwR+VZcmgkNuUunghUA7F5cBBXNQAWCvaxGfTwusKLqZVsRkMBWM8GU+?=
- =?us-ascii?Q?mZxN9H6txsSqe84FTxCedjvVARY7OaDzBxKAxzYOUvZUBdWUtrfc4jhl2f3P?=
- =?us-ascii?Q?jgfXKOHW8tVI2VAUTcPDWuBiekOwyP/jMIAkdzGVBDr+xJ5K6i+UdlrbQWWF?=
- =?us-ascii?Q?1NuCUvE2Z1z2OVuYjq0ddF3hYMa9UefAHc9RIzWJJt4y+9WIWOpGrfO9UBiZ?=
- =?us-ascii?Q?sWyJS27Ru8Sqb21NmiqZj6yvRW7p0wzNS2NSVFyiDOBGT4BH8tcjtauCdgsn?=
- =?us-ascii?Q?p1tLv6EuFFj/Vusjjc56RZHUHGb6zvnHR2V4jCv4+IjYwafacbkhKjGbT6st?=
- =?us-ascii?Q?U167ctBBrN2j6LRisMCQFmpGB2ZFpRW8fscbRLRTk9wx8OVQk+yz2OncK3cd?=
- =?us-ascii?Q?AtpPq3j7l99cmloEQ8aoqZFJVZhxuvDfPdgmP+rSrnaMyYfRiRhHHlUo7rCE?=
- =?us-ascii?Q?ikIVE/r/AfNqTNuSSTcQDeBrfUqLmzngmOUMn8TCujMZvqn86VNYxvpJeRkW?=
- =?us-ascii?Q?tlpLZ4+zkgxsAKltdJYQ6LcHpCJWN2FvxmcrK+ElwETQrqSd0t87EvMrMdQh?=
- =?us-ascii?Q?HjUnjlrMCjjLccalRCgdI6xmnQNhn3mtFFlSqaoQr9Ed0FYtf+miZGo+8IQS?=
- =?us-ascii?Q?ODMC/T4w69tSGn0eBzbfTPHCWKDr9PaDEpOVjHYkFjCUrQZ/AZMTFqeknTzE?=
- =?us-ascii?Q?dtoFVJ8q9Sy4Dwb3abs7J4ndQibw9Lcor6iJ2tOwVtt+wifk99N0hp/e2HFW?=
- =?us-ascii?Q?67WN2Cb1LQPDtRdkKtrwwdBFwK/0oPAilYku3laX7emSpTJHh/VcjMMWeCXS?=
- =?us-ascii?Q?OjmvQBZl2F76OxAZlyU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9b0e115-9019-4a2b-8250-08dbb847940a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2023 13:02:57.1024
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8b8khOcunp91Up2GrqMwUdu2CSHili1w6nfQjsEiAMlfpuaKr9SSrARynDOs0SIX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7604
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 15, 2023 at 08:24:30AM -0600, Alex Williamson wrote:
-> On Thu, 14 Sep 2023 19:54:15 -0700
-> <ankita@nvidia.com> wrote:
-> 
-> > From: Ankit Agrawal <ankita@nvidia.com>
-> > 
-> > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
-> > for the on-chip GPU that is the logical OS representation of the
-> > internal proprietary cache coherent interconnect.
-> > 
-> > This representation has a number of limitations compared to a real PCI
-> > device, in particular, it does not model the coherent GPU memory
-> > aperture as a PCI config space BAR, and PCI doesn't know anything
-> > about cacheable memory types.
-> > 
-> > Provide a VFIO PCI variant driver that adapts the unique PCI
-> > representation into a more standard PCI representation facing
-> > userspace. The GPU memory aperture is obtained from ACPI using
-> > device_property_read_u64(), according to the FW specification,
-> > and exported to userspace as a separate VFIO_REGION. Since the device
-> > implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
-> > to the next available PCI BAR (BAR2). Qemu will then naturally generate a
-> > PCI device in the VM with two 64-bit BARs (where the cacheable aperture
-> > reported in BAR2).
-> > 
-> > Since this memory region is actually cache coherent with the CPU, the
-> > VFIO variant driver will mmap it into VMA using a cacheable mapping. The
-> > mapping is done using remap_pfn_range().
-> > 
-> > PCI BAR are aligned to the power-of-2, but the actual memory on the
-> > device may not. A read or write access to the physical address from the
-> > last device PFN up to the next power-of-2 aligned physical address
-> > results in reading ~0 and dropped writes.
-> > 
-> > Lastly the presence of CPU cache coherent device memory is exposed
-> > through sysfs for use by user space.
-> 
-> This looks like a giant red flag that this approach of masquerading the
-> coherent memory as a PCI BAR is the wrong way to go.  If the VMM needs
-> to know about this coherent memory, it needs to get that information
-> in-band. 
 
-The VMM part doesn't need this flag, nor does the VM. The
-orchestration needs to know when to setup the pxm stuff.
+--=-SGFEyb3zjNbVkm+hZ87i
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-I think we should drop the sysfs for now until the qemu thread about
-the pxm stuff settles into an idea.
+T24gTW9uLCAyMDIzLTA5LTE4IGF0IDExOjIxICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
+Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgcmV0ID0gcHRocmVhZF9jcmVhdGUoJnRocmVhZCwgTlVMTCwgJmp1Z2dsZV9zaGlu
+Zm9fc3RhdGUsICh2b2lkICopdm0pOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmIChoYXNfc2hpbmZvX2h2YSkKPiArwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gcHRocmVhZF9jcmVhdGUoJnRocmVhZCwgTlVMTCwKPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCAmanVnZ2xlX3NoaW5mb19zdGF0ZV9odmEsICh2b2lkICopdm0pOwo+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGVsc2UK
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0ID0gcHRocmVhZF9jcmVhdGUoJnRocmVhZCwgTlVM
+TCwKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCAmanVnZ2xlX3NoaW5mb19zdGF0ZV9nZm4sICh2b2lkICopdm0pOwo+IMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqBURVNUX0FTU0VSVChyZXQgPT0gMCwgInB0aHJlYWRfY3JlYXRlKCkgZmFpbGVkOiAlcyIsIHN0
+cmVycm9yKHJldCkpOwo+IMKgCgoKVGhpcyBtZWFucyB5b3UgZG9uJ3QgZXhlcmNpc2UgdGhlIEdG
+Ti1iYXNlZCBwYXRoICh3aGljaCBhbGwgY3VycmVudCBWTU0KaW1wbGVtZW50YXRpb25zIHVzZSkg
+b24gbmV3ZXIga2VybmVscy4gQ291bGQgeW91IGhhdmUgYSBzaW5nbGUKanVnZ2xlX3NoaW5mb19z
+dGF0ZSgpIGZ1bmN0aW9uIGFzIGJlZm9yZSwgYnV0IG1ha2UgaXQgcmVwZWF0ZWRseSBzZXQKYW5k
+IGNsZWFyIHRoZSBzaGluZm8gdXNpbmcgKmJvdGgqIEhWQSBhbmQgR0ZOIChpZiB0aGUgZm9ybWVy
+IGlzCmF2YWlsYWJsZSwgb2YgY291cnNlKS4KCldoaWxlIHlvdSdyZSBhdCBpdCwgaXQgbG9va3Mg
+bGlrZSB0aGUgdGhyZWFkIGxlYXZlcyB0aGUgc2hpbmZvCipkZWFjdGl2YXRlZCosIHdoaWNoIG1p
+Z2h0IGNvbWUgYXMgYSBzdXJwcmlzZSB0byBhbnlvbmUgd2hvIGFkZHMgdGVzdHMKYXQgdGhlIGVu
+ZCBuZWFyIHRoZSBleGlzdGluZyBURVNUX0RPTkUuIENhbiB3ZSBtYWtlIGl0IGxlYXZlIHRoZSBz
+aGluZm8KKmFjdGl2ZSogaW5zdGVhZD8K
 
-When the qemu API is clear we can have a discussion on what component
-should detect this driver and setup the pxm things, then answer the
-how should the detection work from the kernel side.
 
-> be reaching out to arbitrary sysfs attributes.  Minimally this
-> information should be provided via a capability on the region info
-> chain, 
+--=-SGFEyb3zjNbVkm+hZ87i
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-That definitely isn't suitable, eg libvirt won't have access to inband
-information if it turns out libvirt is supposed to setup the pxm qemu
-arguments?
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTMxOTQwWjAvBgkqhkiG9w0BCQQxIgQgpBAZ1kS0
+U7E7YF2k4zHc1AJLhQUQDvv4x981+hJYThYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCoXnoevU2hY1mDS4Ev+TeEl9qMOG/EsyOw
+QpXlVLzwKGrYSmae0POgRqas97i+we+WYgm2EmScPQTMRa9XdrF0yZF8XV8/q7UYgmVI8d7s2WZH
+vE3kDljcdRu+QpvSTdk5kBtqhDLivikHR9vbhxS6Xh9t/rjY3svVruhlaZkXkjWSoTnV7HXpz+MI
+spP3R+QweODvRXQAzN6WOlTv7nTZpLCvKJYPyyEy5HIIZziurA2PGE7LYNgLu5BuYEMhZaKu3QXT
+Wvr1hdYTwliNp3nrp27ZxV1HNWvSX3nD3zHJNR7MvxXu9IZeCvC4+DsgEDjhfgseTKauA/urYGGO
+G3Syv1kOgaUHGYodVJFtoV5i2HlGpiYclgDoCrKWYM31No24PXtiGXTmGYWSXKb2nIuf8T7pPw5r
+3f3koKbyUDYRzrSckIrP6pj0B9AlSoFdQoMl8+wni/dIi/LCQMv79LDf0+ycfkYk44tFDJcIFQkM
+9LtbncYjNSUXYq6FGegHDhts7yGwdGeK2OAYBSP84LFLh/YJX2XqRjjh8fW3aUN1PvC/IIU7atEq
+ekM6KzVi5469rh9YL+OWlaQxk82qt6bUVCHKl/VA8b5dDwVljtL4GEaiz5kuskJdDOUZRg2RJZYN
+xcRoKwT52m8TI0yrKLCnRdDEraCVo2fRi5lJFjch6wAAAAAAAA==
 
-> A "coherent_mem" attribute on the device provides a very weak
-> association to the memory region it's trying to describe.
 
-That's because it's use has nothing to do with the memory region :)
-
-Jason
+--=-SGFEyb3zjNbVkm+hZ87i--
