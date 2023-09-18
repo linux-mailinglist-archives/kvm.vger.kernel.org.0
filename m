@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26ECD7A44FD
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 10:42:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29C577A451F
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 10:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240569AbjIRIm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 04:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44918 "EHLO
+        id S235516AbjIRIsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 04:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240915AbjIRImV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 04:42:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F134121
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 01:41:16 -0700 (PDT)
+        with ESMTP id S233920AbjIRIs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 04:48:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D567E137
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 01:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695026475;
+        s=mimecast20190719; t=1695026801;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UCPsfcbIVqzhPMc9WpjHh54nSWIDbNSd7gzRQ5+/f94=;
-        b=ZtOOpbhrAAN6iKIa5oCGAQadxZQ7RulnPPpfo69X0gJ7vj5shF0EcfIXVS0VLmLHpmyhxb
-        DctLn5RPK7302cUdbUU9Z+lQdPwSNkwcaSaVB9RHK/aVovO2+ZD8bSaaVqVyj9oJH+Gawa
-        YRxsIw/fMimmEoLjpgr3pNOien5qj24=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Ne/6wvHEM171/1YnTSavkevXbhaVIZD2o3rmnI4AXAc=;
+        b=UKTzksy8AVDt14/rn6akbJ7ffdDC4vkvOBosr3+mCTaxSrcYX5klQcuL2Gxz4t1Mt/bPVX
+        Ur4M2F4iPRo0a5O8f+MBtZFLUor2u44nH18efzU5iiHA/kQhUDhIZDDF9x62f/N9QLROYZ
+        cJ90fUihwsauwmxctklZpegPBb4IvRE=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-399-GCQgKU96PzCDhF2BXdcjqQ-1; Mon, 18 Sep 2023 04:41:13 -0400
-X-MC-Unique: GCQgKU96PzCDhF2BXdcjqQ-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50076a3fd35so4889973e87.1
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 01:41:13 -0700 (PDT)
+ us-mta-612-pwyuw9W3MPqGkCvpWcOP3g-1; Mon, 18 Sep 2023 04:46:31 -0400
+X-MC-Unique: pwyuw9W3MPqGkCvpWcOP3g-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50076a3fd35so4895847e87.1
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 01:46:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695026472; x=1695631272;
+        d=1e100.net; s=20230601; t=1695026789; x=1695631589;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UCPsfcbIVqzhPMc9WpjHh54nSWIDbNSd7gzRQ5+/f94=;
-        b=US7uYfeyjHxcob9XWOv2Su8QpPhaWPyWAfKX5vbXQGLBRYVUnarNqMN1sEqPd677uv
-         BE/TmKffmdQmgrCV3xEvSEg15/m0yVs9lgK15PZmRtmMm6bbcuppVuRwJ0qrAlGF8LVj
-         UhSiy+OegViJtpbqS41UcVkATga7ntjDDlzLpgobMnYbdGHfFlGm1X7AUa9k4GH3qom+
-         gX9neJIjER0nrXp5cn3+5Qgu3yEcXDO9FSR87wFOAPDQbc5FtMEcycwNXzrl2o8ueft+
-         BduZhOAAbhuFYL55uB1UOXMZM+FUT4Ydf154wjWsQXoAYID6VbI20TO0goLZvxFA1rVK
-         zRgw==
-X-Gm-Message-State: AOJu0Yxmiwj32+jP8ubvnLSWxKy5ZzQHOSX7apWaUwayo2DjxOG0wZSu
-        ELAsB1dXPe41mKMoZEkParzdg+cj9NOGweUBPQUs3jZvnAQtezy7dSJLoHoXhgVuZqxjl8+qsiM
-        mBOPV0tpNhmX9FPXiMKd1WuVbdfXo
-X-Received: by 2002:a05:6512:23a7:b0:500:a092:d085 with SMTP id c39-20020a05651223a700b00500a092d085mr7708218lfv.68.1695026472251;
-        Mon, 18 Sep 2023 01:41:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHftb4P10wWIp3v1EHXZOaP1ysBNS2M6oNZ6GDQlDzpedtNdGUMoZMBhfxfUMabxjFMqZEsMi5wHIELNox0cn8=
-X-Received: by 2002:a05:6512:23a7:b0:500:a092:d085 with SMTP id
- c39-20020a05651223a700b00500a092d085mr7708204lfv.68.1695026471949; Mon, 18
- Sep 2023 01:41:11 -0700 (PDT)
+        bh=Ne/6wvHEM171/1YnTSavkevXbhaVIZD2o3rmnI4AXAc=;
+        b=Ba8hMjLUjmPhcUdWz+YmbKgFusIaE0d+cLDzJA4fryIZZHG/ZyuQLyaanEdzt1yFxb
+         StreGsqgah875OiuONF6XH7TaqFF/d/8/2H34MaGhXYgb7JYKpudCESq0euQewCmets/
+         6xFfQNhZmGrU+Mgdh4KeaFHM7J4qJMv2QyCdg1FqlaRrmIqJDRaYu9Yls1jT4D61w2Zg
+         2e4SpunOCY7x2x97KbApFxcXON/q6I9degfoI5eBeZRRFNyAwg8ZgvrC+BgxAaVaLv15
+         cTAv6HLWskkgZPXkS2WQl/3eTHLhp4jgKJJsnyB1TMRMlQUZbWd9lM3I90R3OEunRRyo
+         3hNQ==
+X-Gm-Message-State: AOJu0YxRU8tlRvhkrzXJ/WXGXd/WZcMM/S/4pmfYDg3blgeyAA2ZkgMJ
+        dfT6LrlyUqKGb7vdriZwq58SgMoV4s5vqwyraU9DJULck09YceOxS7MFA3wliVotTcJR0kKN0RM
+        Ct0yKnStJGMsIyCUssf9P5KhCsGfk
+X-Received: by 2002:a05:6512:3d27:b0:503:5d8:da33 with SMTP id d39-20020a0565123d2700b0050305d8da33mr5511660lfv.20.1695026789532;
+        Mon, 18 Sep 2023 01:46:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFgMCrTK06HsA1jmrN2m8hmh2JeHg5MHIGzt2YqOFrbMXyCjP3e56ikeAOpp3+Aew9hlguYd0zxzDgNAWMVZ90=
+X-Received: by 2002:a05:6512:3d27:b0:503:5d8:da33 with SMTP id
+ d39-20020a0565123d2700b0050305d8da33mr5511649lfv.20.1695026789253; Mon, 18
+ Sep 2023 01:46:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-2-lulu@redhat.com>
-In-Reply-To: <20230912030008.3599514-2-lulu@redhat.com>
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-3-lulu@redhat.com>
+In-Reply-To: <20230912030008.3599514-3-lulu@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 18 Sep 2023 16:41:00 +0800
-Message-ID: <CACGkMEuwjga949gGBKyZozfppMa2UF5mu8wuk4o88Qi6GthtXw@mail.gmail.com>
-Subject: Re: [RFC v2 1/4] vduse: Add function to get/free the pages for reconnection
+Date:   Mon, 18 Sep 2023 16:46:18 +0800
+Message-ID: <CACGkMEuOYWYYGta5VoZaURVxrBFwU+1aNwoh7RyT1woQCNHJtg@mail.gmail.com>
+Subject: Re: [RFC v2 2/4] vduse: Add file operation for mmap
 To:     Cindy Lu <lulu@redhat.com>
 Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
         xieyongji@bytedance.com, kvm@vger.kernel.org,
@@ -69,7 +69,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,105 +79,111 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Sep 12, 2023 at 11:00=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
 >
-> Add the function vduse_alloc_reconnnect_info_mem
-> and vduse_alloc_reconnnect_info_mem
-> In this 2 function, vduse will get/free (vq_num + 1)*page
-> Page 0 will be used to save the reconnection information, The
-> Userspace App will maintain this. Page 1 ~ vq_num + 1 will save
-> the reconnection information for vqs.
-
-Please explain why this is needed instead of only describing how it is
-implemented. (Code can explain itself).
-
+> Add the operation for mmap, The user space APP will
+> use this function to map the pages to userspace
 >
 > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 86 ++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
+>  drivers/vdpa/vdpa_user/vduse_dev.c | 63 ++++++++++++++++++++++++++++++
+>  1 file changed, 63 insertions(+)
 >
 > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
 vduse_dev.c
-> index 26b7e29cb900..4c256fa31fc4 100644
+> index 4c256fa31fc4..2c69f4004a6e 100644
 > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
 > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -30,6 +30,10 @@
->  #include <uapi/linux/virtio_blk.h>
->  #include <linux/mod_devicetable.h>
->
-> +#ifdef CONFIG_X86
-> +#include <asm/set_memory.h>
-> +#endif
-> +
->  #include "iova_domain.h"
->
->  #define DRV_AUTHOR   "Yongji Xie <xieyongji@bytedance.com>"
-> @@ -41,6 +45,23 @@
->  #define VDUSE_IOVA_SIZE (128 * 1024 * 1024)
->  #define VDUSE_MSG_DEFAULT_TIMEOUT 30
->
-> +/* struct vdpa_reconnect_info save the page information for reconnection
-> + * kernel will init these information while alloc the pages
-> + * and use these information to free the pages
-> + */
-> +struct vdpa_reconnect_info {
-> +       /* Offset (within vm_file) in PAGE_SIZE,
-> +        * this just for check, not using
-> +        */
-> +       u32 index;
-> +       /* physical address for this page*/
-> +       phys_addr_t addr;
-> +       /* virtual address for this page*/
-> +       unsigned long vaddr;
-
-If it could be switched by virt_to_phys() why duplicate those fields?
-
-> +       /* memory size, here always page_size*/
-> +       phys_addr_t size;
-
-If it's always PAGE_SIZE why would we have this?
-
-> +};
-> +
->  struct vduse_virtqueue {
->         u16 index;
->         u16 num_max;
-> @@ -57,6 +78,7 @@ struct vduse_virtqueue {
->         struct vdpa_callback cb;
->         struct work_struct inject;
->         struct work_struct kick;
-> +       struct vdpa_reconnect_info reconnect_info;
->  };
->
->  struct vduse_dev;
-> @@ -106,6 +128,7 @@ struct vduse_dev {
->         u32 vq_align;
->         struct vduse_umem *umem;
->         struct mutex mem_lock;
-> +       struct vdpa_reconnect_info reconnect_status;
->  };
->
->  struct vduse_dev_msg {
-> @@ -1030,6 +1053,65 @@ static int vduse_dev_reg_umem(struct vduse_dev *de=
-v,
->         return ret;
+> @@ -1388,6 +1388,67 @@ static struct vduse_dev *vduse_dev_get_from_minor(=
+int minor)
+>         return dev;
 >  }
 >
-> +int vduse_alloc_reconnnect_info_mem(struct vduse_dev *dev)
+> +static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
 > +{
-> +       struct vdpa_reconnect_info *info;
+> +       struct vduse_dev *dev =3D vmf->vma->vm_file->private_data;
+> +       struct vm_area_struct *vma =3D vmf->vma;
+> +       u16 index =3D vma->vm_pgoff;
 > +       struct vduse_virtqueue *vq;
-> +       void *addr;
+> +       struct vdpa_reconnect_info *info;
 > +
-> +       /*page 0 is use to save status,dpdk will use this to save the inf=
-ormation
-> +        *needed in reconnection,kernel don't need to maintain this
-> +        */
-> +       info =3D &dev->reconnect_status;
-> +       addr =3D (void *)get_zeroed_page(GFP_KERNEL);
-> +       if (!addr)
-> +               return -1;
+> +       if (index =3D=3D 0) {
+> +               info =3D &dev->reconnect_status;
+> +       } else {
+> +               vq =3D &dev->vqs[index - 1];
+> +               info =3D &vq->reconnect_info;
+> +       }
+> +       vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
+> +       if (remap_pfn_range(vma, vmf->address & PAGE_MASK, PFN_DOWN(info-=
+>addr),
+> +                           PAGE_SIZE, vma->vm_page_prot))
+> +               return VM_FAULT_SIGBUS;
+> +       return VM_FAULT_NOPAGE;
+> +}
+> +
+> +static const struct vm_operations_struct vduse_vm_ops =3D {
+> +       .fault =3D vduse_vm_fault,
+> +};
+> +
+> +static int vduse_dev_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +       struct vduse_dev *dev =3D file->private_data;
+> +       struct vdpa_reconnect_info *info;
+> +       unsigned long index =3D vma->vm_pgoff;
+> +       struct vduse_virtqueue *vq;
+> +
+> +       if (vma->vm_end - vma->vm_start !=3D PAGE_SIZE)
+> +               return -EINVAL;
+> +       if ((vma->vm_flags & VM_SHARED) =3D=3D 0)
+> +               return -EINVAL;
+> +
+> +       if (index > 65535)
+> +               return -EINVAL;
+> +
+> +       if (index =3D=3D 0) {
+> +               info =3D &dev->reconnect_status;
+> +       } else {
+> +               vq =3D &dev->vqs[index - 1];
+> +               info =3D &vq->reconnect_info;
+> +       }
+> +
+> +       if (info->index !=3D index)
+> +               return -EINVAL;
 
--ENOMEM?
+Under which case could we meet this?
+
+> +
+> +       if (info->addr & (PAGE_SIZE - 1))
+> +               return -EINVAL;
+
+And this?
+
+> +       if (vma->vm_end - vma->vm_start !=3D info->size)
+> +               return -EOPNOTSUPP;
+> +
+> +       vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTDUMP);
+
+Why do you use VM_IO, VM_PFNMAP and VM_DONTDUMP?
 
 Thanks
+
+> +       vma->vm_ops =3D &vduse_vm_ops;
+> +
+> +       return 0;
+> +}
+> +
+>  static int vduse_dev_open(struct inode *inode, struct file *file)
+>  {
+>         int ret;
+> @@ -1420,6 +1481,8 @@ static const struct file_operations vduse_dev_fops =
+=3D {
+>         .unlocked_ioctl =3D vduse_dev_ioctl,
+>         .compat_ioctl   =3D compat_ptr_ioctl,
+>         .llseek         =3D noop_llseek,
+> +       .mmap           =3D vduse_dev_mmap,
+> +
+>  };
+>
+>  static struct vduse_dev *vduse_dev_create(void)
+> --
+> 2.34.3
+>
 
