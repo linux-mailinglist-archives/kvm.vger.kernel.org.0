@@ -2,44 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F27A7A47CD
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:06:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A25C7A47D4
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:06:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233284AbjIRLFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
+        id S239849AbjIRLFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237590AbjIRLFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:05:36 -0400
+        with ESMTP id S238345AbjIRLFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 07:05:47 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7CE8F
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 04:05:31 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99572C433C7;
-        Mon, 18 Sep 2023 11:05:28 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8F88F
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 04:05:42 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C15A4C433C7;
+        Mon, 18 Sep 2023 11:05:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695035130;
-        bh=wC7QnFLvCqU8DsHm5B4yuOBZaQeAGaIgKbEwgAUZiSc=;
+        s=k20201202; t=1695035142;
+        bh=nW0F/jeLDs+j1BbOOAMNwLCvRYGq+1XknmLHE2Oerg8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gD2vsMJ1bJvnPFq93NWl5TCMjL+stqIaMJxJtFZNN4AS6DBEQHjIMYLt6yP4dAVWH
-         qI5aa+RpaGdN6Ldi2uw8AhafuAFFdl6cm5V4BH4tSQv1bgWVSImWi/NsAvcaBtIX1K
-         cVklO6JE9u/xQCu+qRiabtpVH86SEOgXffoOU1/i8zJxPK/rxPSyn754PHtslPMUED
-         A5mgLRN7wBAsareOE4lmNaVS+gZWnEqXC/0HhT6wXM/hAqrlCfHUWPaCPzl6EdY4Qb
-         7E+PZcKIRxzGE5AEOrrZMT17mwxa/Bcc2METS76+q6ENSXCA6C901QaVyD2ODYC6bn
-         g4E4Jm4LpUC+w==
+        b=bb6QuCt9Yx6m9963C4h4SVwf+Ur+mBHhPMLSWTGG9YHTNfmkteo9rL0xVyBMbREyn
+         VuhRGCQsKEHXp1ARnkaPeGjs/jDjAnWgpztpxvXbetKT+xwAuZbxow/TeRd7Iw6Vpb
+         3JHU2sIv8fC/YsuDwpdQs8amCrb+M37yl49O9hdcLWDZx4Xtvo9rbfgyC6ayfm779t
+         5jBJE1t0FqpGiF9GzivOzQ4klZ7DUSNYJMi+IwEyyHXGeS1ELxaVwXGY7iGLbmhvke
+         4YVw4Ue+X/jgS7jW8r6Dv664Hg29LCyw8NlaUfn2bJfVi3XuAjcmdmwsWbEURtHaSq
+         TdY2ROaHhN0hg==
 From:   Will Deacon <will@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, maz@kernel.org,
-        andre.przywara@arm.com, jean-philippe.brucker@arm.com,
-        suzuki.poulose@arm.com, kvm@vger.kernel.org,
-        julien.thierry.kdev@gmail.com, apatel@ventanamicro.com,
-        oliver.upton@linux.dev
+To:     kvm@vger.kernel.org, Tan En De <ende.tan@starfivetech.com>
 Cc:     catalin.marinas@arm.com, kernel-team@android.com,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH kvmtool 0/3] Change what --nodefaults does and a revert
-Date:   Mon, 18 Sep 2023 12:05:14 +0100
-Message-Id: <169503375704.3755487.15995711453259792866.b4-ty@kernel.org>
+        Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com
+Subject: Re: [kvmtool] pci: Deregister KVM_PCI_CFG_AREA on pci__exit
+Date:   Mon, 18 Sep 2023 12:05:17 +0100
+Message-Id: <169503433987.3759479.15076349640789065997.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230907171655.6996-1-alexandru.elisei@arm.com>
-References: <20230907171655.6996-1-alexandru.elisei@arm.com>
+In-Reply-To: <20230916052303.1003-1-ende.tan@starfivetech.com>
+References: <20230916052303.1003-1-ende.tan@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -53,31 +49,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 Sep 2023 18:16:52 +0100, Alexandru Elisei wrote:
-> The first two patches revert "virtio-net: Don't print the compat warning
-> for the default device" because using --network mode=none disables the
-> device and lets the user know that it can use that to disable the default
-> virtio-net device. I don't think the changes are controversial.
+On Sat, 16 Sep 2023 13:23:03 +0800, Tan En De wrote:
+> KVM_PCI_CFG_AREA is registered with kvm__register_mmio during pci__init,
+> but it isn't deregistered during pci__exit.
 > 
-> And the last patch is there to get the conversation going about changing
-> what --nodefaults does. Details in the patch.
+> So, this commit is to kvm__deregister_mmio the KVM_PCI_CFG_AREA on pci__exit.
 > 
-> [...]
+> 
 
-Applied first two to kvmtool (master), thanks!
+Applied to kvmtool (master), thanks!
 
-[1/3] Revert "virtio-net: Don't print the compat warning for the default device"
-      https://git.kernel.org/will/kvmtool/c/4498eb7400c6
-[2/3] builtin-run: Document mode=none for -n/--network
-      https://git.kernel.org/will/kvmtool/c/c7b7a542cdcd
-
-I'm also not sure about the final RFC patch:
-
-[3/3] builtin-run: Have --nodefaults disable the default virtio-net device
-
-so it would be great to hear if anybody else has an opinion on that. IIRC,
-we introduced this for some EFI work, so perhaps those folks might have
-an opinion?
+[1/1] pci: Deregister KVM_PCI_CFG_AREA on pci__exit
+      https://git.kernel.org/will/kvmtool/c/9cb1b46cb765
 
 Cheers,
 -- 
