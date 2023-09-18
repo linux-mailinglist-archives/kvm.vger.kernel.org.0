@@ -2,46 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 317AA7A4D61
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:49:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 289577A4C8B
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:36:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbjIRPtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 11:49:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
+        id S229510AbjIRPf6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 11:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbjIRPtV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:49:21 -0400
+        with ESMTP id S229696AbjIRPfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 11:35:47 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BBA1FDB;
-        Mon, 18 Sep 2023 08:46:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4EB910E2;
+        Mon, 18 Sep 2023 08:33:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JVQ6ANBtATSLAJHLNINZILZrT60zn9vlpAGzINoCqBk=; b=iCp4Cvpv/W2w2LWsGdp3wCMA1e
-        Bl8g4n/dmRSfZAaH2rNYxrN5XXvbMW8ds1QRXZhnp+271AN5iAx6ogPKfel446WEkcHuRAelFX1TZ
-        KdZm02itJrGthKBtxrO0+D9W7vwGQLeTIE9c/k8ykOvZWZfIktL63FzJwywaNG+DojJFiq0okKG3T
-        8F25+ZWFeiNGUQDrGEP+BSUGcqIQs1kR7oSYFv6WHnus7iutFbTuf33dPiPObNhcUtkEcriimfBt4
-        ya/YJHeyffxMifM2AiG9+9aPSBMIcqqAK2C3el+fru9p2ppCuWmRmaqYs4LdogcOZcc7gk5FhtaZU
-        JXP+OIqQ==;
+        bh=08gy1MzF8nbM+e66ZwfR0CJFbkNtzLfSbixvwxb/nCU=; b=EyBVDei1Lravi6UQ3Vpn24SphU
+        9qRzI6dZ6waPo7aQXht9uL0f9TxBIywsYzVE1x/Td7QDblX9d0wHCDd/flkI9i4x05DOOzSqwGC8e
+        8BD19EHuYtYlz56CGbFLgeGY52ve4JSuhuNe4F9Oxa79vjJWZeCegPafuq8x300+uQpRXjrV71zRp
+        RmOPSVGsR9UvGG5HTIE4bNDSo7tE3Fmah7w39YnFfPWyAhCx/IOQazvPe7+3f5yT7TH/Std7uPmQQ
+        YxVEQm+Sq3n03QIUB1Mx7cCVF1RnpmlZJKIX+zYZCpVxSGRJ/MUm+3nieMO1j2hnlP5spKlPcm6qR
+        uAfLszEw==;
 Received: from [2001:8b0:10b:5:cea0:d147:7c2e:9e61] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiEBo-00BF5X-7x; Mon, 18 Sep 2023 13:21:24 +0000
-Message-ID: <f649285c0973ec59180ed51c4ee10cdc51279505.camel@infradead.org>
-Subject: Re: [PATCH v2 11/12] KVM: selftests / xen: don't explicitly set the
- vcpu_info address
+        id 1qiECb-00BF7Y-QA; Mon, 18 Sep 2023 13:22:13 +0000
+Message-ID: <564b962ab966d522d2634e6966a42b3fbe808aac.camel@infradead.org>
+Subject: Re: [PATCH v2 12/12] KVM: xen: advertize the
+ KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
         Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 18 Sep 2023 14:21:23 +0100
-In-Reply-To: <20230918112148.28855-12-paul@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Date:   Mon, 18 Sep 2023 14:22:13 +0100
+In-Reply-To: <20230918112148.28855-13-paul@xen.org>
 References: <20230918112148.28855-1-paul@xen.org>
-         <20230918112148.28855-12-paul@xen.org>
+         <20230918112148.28855-13-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-4CUiU3Vv9ZmR+WCb3oF8"
+        boundary="=-OtqP/f79d4VDZMjWsUZr"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -55,25 +59,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-4CUiU3Vv9ZmR+WCb3oF8
+--=-OtqP/f79d4VDZMjWsUZr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2023-09-18 at 11:21 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> If the vCPU id is set and the shared_info is mapped using HVA then we can
-> infer that KVM has the ability to use a default vcpu_info mapping. Hence
-> we can stop setting the address of the vcpu_info structure.
+> Now that all relevant kernel changes and selftests are in place, enable t=
+he
+> new capability.
+>=20
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
-Again that means we're not *testing* it any more when the test is run
-on newer kernels. Can we perhaps set it explicitly, after *half* the
-tests are done? Maybe to a *different* address than the default which
-is derived from the Xen vcpu_id? And check that the memcpy works right
-when we do?
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
 
---=-4CUiU3Vv9ZmR+WCb3oF8
+--=-OtqP/f79d4VDZMjWsUZr
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -165,24 +167,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTMyMTIzWjAvBgkqhkiG9w0BCQQxIgQgoMbbyfR3
-XtdpGP5W5OMpp4zojbnXL67+g/bWUWuZRhkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTMyMjEzWjAvBgkqhkiG9w0BCQQxIgQgkQkP6Pcj
+XYjdgfF9yX8HMKCj+AAd2id4PRzGZob2mmAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBARCCI6/9NXUbE5VnP0TyaUlESeL0rePsw
-jYdF7fwLzMoSmfWCLylT8jTjZogvazEfUFjCwYWNbEQXX509SUBq80fjO+yRc6x4c0KXkAvAXWyM
-Ie8Wje+N38vQFDqtUHjviNya2DyoZV1ytWB8EJyZyVjoS+iE4kzwveUcmo+BcAUOBwKcV3pxz4kc
-VqakypLqHiBxk6bY7yMmfcn3DQ6bxGbRpgRNvWSvNWoYYmc6aaimLefQl5J+J1qT1hfhA9mUXpCe
-MIPvh2rBtfxtBrpDqcCorkl29KaHYkLAFDiL1AzAshddpJN8KboiANwEf1OWSZBQCNDF9I+uw5ft
-LWCbJBJG9gaHuEmUxVNv4UiorjVQ/eYT++qBNov/TWm98XNK/8enrhfQOPlXJw+IqqSxCJDcBxn6
-bk0rJdHirZhrqy6eI+tCRHlGPYUS2tQwUpGFe5V1fZJjIK0OO6fmRXlzEJK42af5xYUcajNyYED4
-4B4BxtzqkEP0FZQ1IBE0aq4+ljnpqA4zH+6eyQ12ELrEvhDUKDd0K+00Cf85A1mGqLgQvbq+GEox
-vDVn5bjwO66aaJ4feV3nsDIbZFYP1iqLRixMMe6k7xnHc9z6jFbl4ugog2+FLra6+tXNzUzztFLB
-tDF44eM8xOLNU2YxDEyt8nAUCGdJLo+zC2v1FhhisQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBXonufY1U0fltk6wRJ5D84mpDn3SJMBUfy
+Ao93fEGNTry0l4orALCbvjWUGIftYnomR06ZOrwblvdHCcMHwqExPx2WjMegOEeAYhzHb8dxlVVN
+kzaphapAO89qHM1j7nJfC4lSQZXUli6smv+aF2pq5MRgLF4ej2QcIal839PdIlV2p2V9NsXOoRD1
+nMA+kgo446aRzeOsFHjqjtcx4l5H3RjeEdWa0FpyEt0eTL4n6gePlyJ/am34mGErjjd97KC2OSSu
+sAUlue5FZn7M6lx/TuheU/Q0v9dQCrgRbtghIiTvR0nSIx6HpO7ck9q+7G8zyRGJJJirBA4y2Xpy
+2en+F9eHCmTRqfyto/Y5F9AZENW7tavBMGSFZnlQI45f7fpesOsWjfYpecmCpl0TECoiKRHUKtWH
+BbzXCUxo/xNtmJZoHZ443sdsoCMoA3H0iLoEVONDspLp/bbvdNwXHfa7USTUQlcBHrGzfZtNl8Ej
+1QAB8/AJnawDCZaBf2ZDTbP9YVnj6SPYy2TGdudmDWgttn2ALElMpwjMbY0m1lewEGILiR0iqehs
+PaaCcdNdw+gVhqVK/J92O9/XtmU2GHkrgBGL0RbsGkti4SzZdKNup6WpK/2Sm1pNJdZZMxXPeC5s
+gWtv0YY4JVjumkZqDfEMI71lkMz51JwnXQwJ2GBDKgAAAAAAAA==
 
 
---=-4CUiU3Vv9ZmR+WCb3oF8--
+--=-OtqP/f79d4VDZMjWsUZr--
