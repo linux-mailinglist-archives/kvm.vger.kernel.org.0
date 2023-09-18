@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E3267A4F71
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06D147A4E96
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:19:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230472AbjIRQmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:42:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38220 "EHLO
+        id S229969AbjIRQTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbjIRQmS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:42:18 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E9B1727
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:05:02 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-986d8332f50so638393166b.0
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:05:02 -0700 (PDT)
+        with ESMTP id S230026AbjIRQT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:19:28 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40355CEC
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:10:56 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-403012f276dso50790725e9.0
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:10:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053058; x=1695657858; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053440; x=1695658240; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NjaIM1Qc6nHbnxZLIT5jjyB717NwyoCy1EteOD4KAlE=;
-        b=qqBtnTQUBVmH8Adkd4X0AhyVbVdXNfDZG7t+B+TYQZRDL7XyxOYC7aVG7vGmpOcdvw
-         /dpFyQz3B+Y0CwZB2i4kA83dDutQ/8Oto2DYd57Xgys76J5f+DzuLAS052XPDDz4VVV+
-         8NSAKywqDq/eAHyTJdB/QkRIdm5eCJmhNjYk8qzyBRQCx1eI33wigqXiJ6UPbH2PCIDZ
-         b5wudXt3L564M5SnITjPQ6ZR1xmLX3K6pPd16gIU1LswPcQx7fgU/S2Gy4n9XJgYy1Op
-         lK1XXNIwQB1/wcS/+0k+40VEhvO5qZlVQdkGr4tyr5ZKU/gC4ys46tAaE8fsIU9BZ1Mt
-         Sxwg==
+        bh=s5SThQE8VrEigaiBVVD1aPn+S9Eqq7fLgyN+q+7eopw=;
+        b=Gh03zHCe7gK1jzIbBWZcdDMy6iDkfsp1t5W7J6Gy7qNIt3qF3uUbF3lMBLlBpdKkGI
+         BazjU4mVcdms/RlcNVNh9AH8cWn6XF1Xnb5u4hJwNqeOqlckPBgngmH5zPyiBfD7OPm7
+         KcWzyIyNTGtOXEK35xremOZUE0TwS3/ZAJBsITqpZixyAsdtjR7rVb8XzPbMXdk+1ej8
+         QHoZ5Zqzgnk5A+rt2p8HVx6I6vdWL+sW7mjysclW2M3jWqcfQZuN7U3kT9YgAzihwjaG
+         5E64Cs1lGb0G14XZNMdzYcG0dndM/L1eHjGXWABzwFADD+2aDjwG6kBjMc3+Dac6gQFK
+         T4uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053058; x=1695657858;
+        d=1e100.net; s=20230601; t=1695053440; x=1695658240;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NjaIM1Qc6nHbnxZLIT5jjyB717NwyoCy1EteOD4KAlE=;
-        b=CMEB55ltQnTirQG8OtO98algtqMgip/ELBtllbLbtGAd3vwwD8qLvsZDCKub2Z0bRZ
-         EjXZdZtCvT3nDfdvweZGL8nrU7SA4Fc3WQ8Jsdph/zas243bRQGgXz0VcAFbbmQwoOQe
-         O+xq9ThWnSqBcJN1qg7kCQrMRuJVSThcuIXVTZ8wv92xv0eZxY2L1w82qM1jNpVGbOi6
-         zAJ2EHRe4EaRNwisX7KVGwbf4lZpzytt5D+RIyLLsGPeZlWTvAj2bdbGqaRwtaqEryKo
-         ZnZTDQn97c0JbfD2VmSFhtkybxQfJrrM1HLIDasjbIhCKCrQSS3G/v1F8oitgliieP4y
-         eW0A==
-X-Gm-Message-State: AOJu0Yz2SjeI7KBl/+hDCoM72LijdjD44Aq8pLydxgjxLs5SSWX8v4nA
-        Z9/e0ygANcEPyA64+qBaaAXEJg==
-X-Google-Smtp-Source: AGHT+IH1BGqTiq3uZIcjIgDgFSn4hEE/bGsbSKhsdURXDBkyUNQTShuSyFgzOD2PM8QK12Z2NIlVUQ==
-X-Received: by 2002:a17:907:75f1:b0:9a1:da9a:f1c2 with SMTP id jz17-20020a17090775f100b009a1da9af1c2mr7861010ejc.11.1695053058645;
-        Mon, 18 Sep 2023 09:04:18 -0700 (PDT)
+        bh=s5SThQE8VrEigaiBVVD1aPn+S9Eqq7fLgyN+q+7eopw=;
+        b=ivdw3StIMHq3GrwIsjNExwoHcdPKtNOri/myhn0zyJROeUHiJlc6BeK4oukNSVFJnz
+         OFU/fRvOO2dV32KiC7ihaNZxIUQb3snxFmDIrwNzUDuz5BvetYMoCs2h5+qvbo6S4y6K
+         qkssxw3jA0/Em3bPwFG6Sy70uQ23PL1TTwU+aFd0AkgmuUsyV5KHgNvyZo0X/EjTCQtz
+         rbrp+19VqFMVhpxHkgwM1DsnVi700YTEtBhDwFixDmjCQUhp5DJgrPCuqyWRI3bFSLzM
+         Wh4vEZj4p3ohU9c6elZkdJzrNzdszlPjP81oHwq9ndoHOsslIoQPTInwSWvIt+S7moBz
+         k2zw==
+X-Gm-Message-State: AOJu0YzsiZnNC1cg9v5NYn4DHen4CRdMfCw/JGdOuDAI45BVYWSkqflX
+        1WDq5tgsCjF5Wd3p7qD8HRou+MkNUCdmwytjhIjaDOWA
+X-Google-Smtp-Source: AGHT+IFdhAv8NMQe3eDFfz6fXbmFXmpOAUlZ51p/ozjG+nSdvaZT7LZnHlxk4GI+z0N+RInhKW7YXQ==
+X-Received: by 2002:a17:906:768f:b0:9ad:fb23:21cf with SMTP id o15-20020a170906768f00b009adfb2321cfmr4715553ejm.15.1695053064161;
+        Mon, 18 Sep 2023 09:04:24 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id f13-20020a170906390d00b00982a92a849asm6628019eje.91.2023.09.18.09.04.17
+        by smtp.gmail.com with ESMTPSA id c26-20020a170906341a00b00993470682e5sm6646928ejb.32.2023.09.18.09.04.22
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:04:18 -0700 (PDT)
+        Mon, 18 Sep 2023 09:04:23 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,9 +100,9 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 15/22] exec/cpu: Introduce CPUClass::verify_accel_features()
-Date:   Mon, 18 Sep 2023 18:02:48 +0200
-Message-ID: <20230918160257.30127-16-philmd@linaro.org>
+Subject: [PATCH 16/22] target/arm: Extract verify_accel_features() from cpu_realize()
+Date:   Mon, 18 Sep 2023 18:02:49 +0200
+Message-ID: <20230918160257.30127-17-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
@@ -113,56 +113,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some CPUs need to check the requested features are compatible
-with the requested accelerator. This has to be done *before*
-the accelerator realizes a vCPU.
-Introduce the verify_accel_features() handler and call it
-just before accel_cpu_realizefn().
+When looking at the arm_cpu_realizefn() method, most of the
+code run before the cpu_exec_realizefn() call checks whether
+the requested CPU features are compatible with the requested
+accelerator. Extract this code to a dedicated handler matching
+our recently added CPUClass::verify_accel_features() handler.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/hw/core/cpu.h | 4 ++++
- cpu.c                 | 5 +++++
- 2 files changed, 9 insertions(+)
+ target/arm/cpu.c | 41 ++++++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 17 deletions(-)
 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index c90cf3a162..1e940f6bb5 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -103,6 +103,9 @@ struct SysemuCPUOps;
-  * @class_by_name: Callback to map -cpu command line model name to an
-  * instantiatable CPU type.
-  * @parse_features: Callback to parse command line arguments.
-+ * @verify_accel_features: Callback to verify if all requested CPU are
-+ *        compatible with the requested accelerator. Called before the
-+ *        accelerator realize a vCPU.
-  * @reset_dump_flags: #CPUDumpFlags to use for reset logging.
-  * @has_work: Callback for checking if there is work to do.
-  * @memory_rw_debug: Callback for GDB memory access.
-@@ -183,6 +186,7 @@ struct CPUClass {
-      * class data that depends on the accelerator, see accel/accel-common.c.
-      */
-     void (*init_accel_cpu)(struct AccelCPUClass *accel_cpu, CPUClass *cc);
-+    bool (*verify_accel_features)(CPUState *cs, Error **errp);
- 
-     /*
-      * Keep non-pointer data at the end to minimize holes.
-diff --git a/cpu.c b/cpu.c
-index 0769b0b153..84b03c09ac 100644
---- a/cpu.c
-+++ b/cpu.c
-@@ -136,6 +136,11 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-     /* cache the cpu class for the hotpath */
-     cpu->cc = CPU_GET_CLASS(cpu);
- 
-+    if (cpu->cc->verify_accel_features
-+        && !cpu->cc->verify_accel_features(cpu, errp)) {
-+        return false;
-+    }
-+
-     if (!accel_cpu_realizefn(cpu, errp)) {
-         return;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 46d3f70d63..a551383fd3 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1675,19 +1675,10 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
      }
+ }
+ 
+-static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
++static bool arm_cpu_verify_accel_features(CPUState *cs, Error **errp)
+ {
+-    CPUState *cs = CPU(dev);
+-    ARMCPU *cpu = ARM_CPU(dev);
+-    ARMCPUClass *acc = ARM_CPU_GET_CLASS(dev);
++    ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+-    int pagebits;
+-    Error *local_err = NULL;
+-
+-    /* Use pc-relative instructions in system-mode */
+-#ifndef CONFIG_USER_ONLY
+-    cs->tcg_cflags |= CF_PCREL;
+-#endif
+ 
+     /* If we needed to query the host kernel for the CPU features
+      * then it's possible that might have failed in the initfn, but
+@@ -1699,10 +1690,13 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         } else {
+             error_setg(errp, "Failed to retrieve host CPU features");
+         }
+-        return;
++        return false;
+     }
+ 
+ #ifndef CONFIG_USER_ONLY
++    /* Use pc-relative instructions in system-mode */
++    cs->tcg_cflags |= CF_PCREL;
++
+     /* The NVIC and M-profile CPU are two halves of a single piece of
+      * hardware; trying to use one without the other is a command line
+      * error and will result in segfaults if not caught here.
+@@ -1710,12 +1704,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (arm_feature(env, ARM_FEATURE_M)) {
+         if (!env->nvic) {
+             error_setg(errp, "This board cannot be used with Cortex-M CPUs");
+-            return;
++            return false;
+         }
+     } else {
+         if (env->nvic) {
+             error_setg(errp, "This board can only be used with Cortex-M CPUs");
+-            return;
++            return false;
+         }
+     }
+ 
+@@ -1733,23 +1727,35 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+             error_setg(errp,
+                        "Cannot enable %s when using an M-profile guest CPU",
+                        current_accel_name());
+-            return;
++            return false;
+         }
+         if (cpu->has_el3) {
+             error_setg(errp,
+                        "Cannot enable %s when guest CPU has EL3 enabled",
+                        current_accel_name());
+-            return;
++            return false;
+         }
+         if (cpu->tag_memory) {
+             error_setg(errp,
+                        "Cannot enable %s when guest CPUs has MTE enabled",
+                        current_accel_name());
+-            return;
++            return false;
+         }
+     }
+ #endif
+ 
++    return true;
++}
++
++static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
++{
++    CPUState *cs = CPU(dev);
++    ARMCPU *cpu = ARM_CPU(dev);
++    ARMCPUClass *acc = ARM_CPU_GET_CLASS(dev);
++    CPUARMState *env = &cpu->env;
++    int pagebits;
++    Error *local_err = NULL;
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+@@ -2383,6 +2389,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+                                        &acc->parent_phases);
+ 
+     cc->class_by_name = arm_cpu_class_by_name;
++    cc->verify_accel_features = arm_cpu_verify_accel_features;
+     cc->has_work = arm_cpu_has_work;
+     cc->dump_state = arm_cpu_dump_state;
+     cc->set_pc = arm_cpu_set_pc;
 -- 
 2.41.0
 
