@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E51E7A4F73
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBCC87A4F68
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbjIRQmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:42:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57150 "EHLO
+        id S230348AbjIRQm1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:42:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbjIRQmY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:42:24 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B280A2D69
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:08 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-51e28cac164so12373095a12.1
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:08 -0700 (PDT)
+        with ESMTP id S230346AbjIRQmO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:42:14 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8530930FC
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:11 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-991c786369cso637508466b.1
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053021; x=1695657821; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053026; x=1695657826; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fSCS2zUfZAE6ogrinmDPrOXdED/BfB+BaLaX0u0zcLg=;
-        b=DrsWzepJBQKFVAtKapF2DbXUL7A+GJxmCStgp/qH2o5iu+8icPa6iZk1+xQIGgqFrc
-         hpIfaNb7PIN0g3GYs/XMTF/aVOtHieYKIM/EPFg+G0wpd1I6OOc34aYok/LANaNCOl90
-         wQAYPMBNnYbvlFPhq04fpR+tFmAMVc4Wo5VOSuSJXk7926X0bmO52JmhNju17yiRKicC
-         J4n0Rm2TClt1SiWGcQT8+NGFIScdEbSXkDyNVkpHg5uaFkZ6VdzH1sOaDSDzAKkH35ZA
-         OYUiUR1DDKc3fbqVKwz0EwBgBX7O+aV26FDjAYtiQ2es6/ct+4H2TTqApA7iyzcd94ae
-         kAxw==
+        bh=hSVRQGIJEmce1VSEx8yaDe0o7AipRr5BDfgLzGOyz48=;
+        b=M2kBVeM3dI60skb5HWNU5zPVPQw4We/Zu1++N/sMSBDSlWRIPW8ZRgsfEI5DhTO4Y/
+         8PXyb7qsYu8kTS+sEb2W9ktjLRaLrCY0FRyncACqpxoa+YdWKinIgdR+u3tKibg07XBP
+         DCns4AQ6x6/4HwQC9VCAWca8Mruk9RIII9UhWbnbwu4ctbjjkDOQ7NRZhRj+oCpWd9Di
+         wnToxbwGG6Of53KO7HvE7QktEzwjR/zXAvkflgw4ui21VuvgaFyvUK63Axr/v+NkQQrm
+         w88qB9GGiBDRRDRgYWc0mLOsuB1M0A471U2hlOnV0lkLx5JhmzHSUY/zRf51CAR+UKv9
+         8Q1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053021; x=1695657821;
+        d=1e100.net; s=20230601; t=1695053026; x=1695657826;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fSCS2zUfZAE6ogrinmDPrOXdED/BfB+BaLaX0u0zcLg=;
-        b=xH4zSRtMaflNV0JYCSzwD4D8YSGgh2985Sg16jDXKo8B9kJiOqb8iFgKnx7Oi/nqgI
-         A9ht2yFO1i8wrMElKqiBAA/EGVCsP19gDuAnprXsJamIQnW50akIuSLjNhI2HIMz9mxl
-         B9YcBLcgZSJTcnImKqDuENKWJjFCzMMP2PZ8nvcyEjmKFUVDLQWWeRyFp/oA63K1l44u
-         K1ePxuZRe4BJpu/N13tSb9yq+wS4P+KXZPDVCfvICs/V3Z1tmpWByblE5q0psXU4ogay
-         CFZLajqBVhknyL3ikkKQ1r250Peb3kZUP3iiP4Bpt8yWwkPrBZ8tu3hgQpqXXAFAdaYC
-         WZ/w==
-X-Gm-Message-State: AOJu0YylvlSbdtVgH7tNKtvFzyXN4ffJTgtG/S6WMD634KGe2bHabGGx
-        p3RmCsZsP7E9kfD70pG+9M/tow==
-X-Google-Smtp-Source: AGHT+IFbTianQZOGFuSjVlX566F74BXdJs5acopl7EmpAQkaG51ohmS+uPCdYH5B96NaIiVcrKe7YA==
-X-Received: by 2002:a17:907:62a6:b0:9ad:cbc0:9f47 with SMTP id nd38-20020a17090762a600b009adcbc09f47mr116109ejc.12.1695053021006;
-        Mon, 18 Sep 2023 09:03:41 -0700 (PDT)
+        bh=hSVRQGIJEmce1VSEx8yaDe0o7AipRr5BDfgLzGOyz48=;
+        b=iMSHnf/NRT66slhfqjn0eraeVYUpMgJJEpw2Kpo1Qle03qrH3egc3+AzHKmvdlF58E
+         WCT5Jx2pbh3eVMay3hnWcEUyxyehg9NEBZWNufgAglIQNugsP34i7RxaiOdXowIdqKYO
+         5QDmrgQNi8iGEDLlChbucPRsPundgiEFGmgK5mV9D6UWYesopXMl3yxJDuSjbnQdDhKr
+         nacI+nVk94OePQo0vw8xCn4Z2V90gA2NAe+AcwfOA/W5HZCChPrKkVSa7XUV62wQ9FQz
+         sh5+0rA/NJFVyLYJyfArBvPmPJ1Hcue94iWcaBZTcj3j5CCVa25maKlSuG0Wych4hmsG
+         7dYw==
+X-Gm-Message-State: AOJu0YxpiftjhkFtns1CmG0kfV4/Q5j0dCoptxHjMMsCkDsWqkpMCAzC
+        XizIN0wt3zUHSp6uG6UlpZdrOg==
+X-Google-Smtp-Source: AGHT+IG4piDQtxZVYFiU0HjN8n/Q699dig17N/FQPVs1xyeDcBS2KjVyyREmZ08RNzkeawSSuXGK6A==
+X-Received: by 2002:a17:906:74d5:b0:9a1:8ee9:cc0b with SMTP id z21-20020a17090674d500b009a18ee9cc0bmr8829825ejl.21.1695053026100;
+        Mon, 18 Sep 2023 09:03:46 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id ck9-20020a0564021c0900b005231e3d89efsm2684962edb.31.2023.09.18.09.03.39
+        by smtp.gmail.com with ESMTPSA id g5-20020a170906394500b0099bc038eb2bsm6614676eje.58.2023.09.18.09.03.44
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:03:40 -0700 (PDT)
+        Mon, 18 Sep 2023 09:03:45 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,9 +100,9 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 08/22] exec/cpu: RFC Destroy vCPU address spaces in cpu_common_unrealize()
-Date:   Mon, 18 Sep 2023 18:02:41 +0200
-Message-ID: <20230918160257.30127-9-philmd@linaro.org>
+Subject: [PATCH 09/22] target/arm: Create timers *after* accelerator vCPU is realized
+Date:   Mon, 18 Sep 2023 18:02:42 +0200
+Message-ID: <20230918160257.30127-10-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
@@ -113,36 +113,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We create at least one vCPU address space by default in
-qemu_init_vcpu(), itself called in cpu_common_realizefn().
-Since we don't have qemu_deinit_vcpu() helper (we probably
-don't need any), simply destroy all the address spaces in
-cpu_common_unrealizefn(), *after* the thread is destroyed.
-
-Note: all targets were leaking the vCPU address spaces upon
-vCPU unrealize (like hot-unplugged actions).
+Architecture specific hardware doesn't have a particular dependency
+on the accelerator vCPU (created with cpu_exec_realizefn), and can
+be initialized *after* the vCPU is realized. Doing so allows further
+generic API simplification (in few commits).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/core/cpu-common.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/arm/cpu.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
-index e5841c59df..35c0cc4dad 100644
---- a/hw/core/cpu-common.c
-+++ b/hw/core/cpu-common.c
-@@ -224,6 +224,11 @@ static void cpu_common_unrealizefn(DeviceState *dev)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index fc3772025c..46d3f70d63 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1748,7 +1748,15 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+             return;
+         }
+     }
++#endif
  
-     /* Destroy vCPU thread */
-     cpu_remove_sync(cpu);
-+
-+    /* Destroy CPU address space */
-+    for (unsigned idx = 0; idx < cpu->num_ases; idx++) {
-+        cpu_address_space_destroy(cpu, idx);
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
 +    }
- }
++
++#ifndef CONFIG_USER_ONLY
+     {
+         uint64_t scale;
  
- static void cpu_common_initfn(Object *obj)
+@@ -1776,12 +1784,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ #endif
+ 
+-    cpu_exec_realizefn(cs, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+     arm_cpu_finalize_features(cpu, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 -- 
 2.41.0
 
