@@ -2,47 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A63BC7A483F
+	by mail.lfdr.de (Postfix) with ESMTP id 5A8117A483E
 	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241446AbjIRLWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:22:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
+        id S239962AbjIRLWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240032AbjIRLWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S240006AbjIRLWU (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 18 Sep 2023 07:22:20 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF95DD2;
-        Mon, 18 Sep 2023 04:22:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3184C3;
+        Mon, 18 Sep 2023 04:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-        Subject:Cc:To:From; bh=5CL3lRMr4h6Yv7jfUDZjcA0xe9rzs8HRb/2DF4BY+Bw=; b=rrwgy0
-        zX5njfIIzptNSykTDm/XipxW4f53oyBgxFwpc+M/NXcJjHiA8U598P2vi/NEF+DZgxsyaEYSVAmCC
-        Ey858ual9StvcYPbjcjV+NNngyeQVho2eSeGA2jcaQgXzvUxklm5VZAaDGHgzvtyLfAEI5mVEJmrq
-        k0CcZcNhGNs=;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
+        In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+        bh=fTbn2s70JU4n6q7zX5A96rrHyiVEJajbsq63guaOv5g=; b=HaR9Wx4m0UWITRpcI3ReX3juWh
+        t7c0zmSrvP4F/zqnGlXxs3AZSc4SkZTVJYWuzJW51K9H0gm645xjxd8oUWaK7YcK0Z9SNhqk036f0
+        ajgtVfrtdafxrd/R+IDgFCpXvxD+Q2x1DOQm+V10BInuCiqu+JLMzst8QfBE7R9wgd+g=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiCKM-00071n-QP; Mon, 18 Sep 2023 11:22:06 +0000
+        id 1qiCKN-00071p-J1; Mon, 18 Sep 2023 11:22:07 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiCKM-0005f3-GB; Mon, 18 Sep 2023 11:22:06 +0000
+        id 1qiCKN-0005f3-Bc; Mon, 18 Sep 2023 11:22:07 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
         David Woodhouse <dwmw2@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-Subject: [PATCH v2 00/12] KVM: xen: update shared_info and vcpu_info handling
-Date:   Mon, 18 Sep 2023 11:21:36 +0000
-Message-Id: <20230918112148.28855-1-paul@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 01/12] KVM: pfncache: add a map helper function
+Date:   Mon, 18 Sep 2023 11:21:37 +0000
+Message-Id: <20230918112148.28855-2-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230918112148.28855-1-paul@xen.org>
+References: <20230918112148.28855-1-paul@xen.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -56,58 +53,107 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-Currently we treat the shared_info page as guest memory and the VMM informs
-KVM of its location using a GFN. However it is not guest memory as such;
-it's an overlay page. So we pointlessly invalidate and re-cache a mapping
-to the *same page* of memory every time the guest requests that shared_info
-be mapped into its address space. Let's avoid doing that by modifying the
-pfncache code to allow activation using a fixed userspace HVA as well as
-a GPA.
+We have an unmap helper but mapping is open-coded. Arguably this is fine
+because mapping is done in only one place, hva_to_pfn_retry(), but adding
+the helper does make that function more readable.
 
-Also, if the guest does not hypercall to explicitly set a pointer to a
-vcpu_info in its own memory, the default vcpu_info embedded in the
-shared_info page should be used. At the moment the VMM has to set up a
-pointer to the structure explicitly (again treating it like it's in
-guest memory, despite being in an overlay page). Let's also avoid the
-need for that. We already have a cached mapping for the shared_info
-page so just use that directly by default.
+No functional change intended.
 
-Paul Durrant (12):
-  KVM: pfncache: add a map helper function
-  KVM: pfncache: add a mark-dirty helper
-  KVM: pfncache: add a helper to get the gpa
-  KVM: pfncache: base offset check on khva rather than gpa
-  KVM: pfncache: allow a cache to be activated with a fixed (userspace)
-    HVA
-  KVM: xen: allow shared_info to be mapped by fixed HVA
-  KVM: xen: prepare for using 'default' vcpu_info
-  KVM: xen: automatically use the vcpu_info embedded in shared_info
-  KVM: selftests / xen: set KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
-  KVM: selftests / xen: map shared_info using HVA rather than GFN
-  KVM: selftests / xen: don't explicitly set the vcpu_info address
-  KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
-
- Documentation/virt/kvm/api.rst                |  43 ++++--
- arch/x86/include/asm/kvm_host.h               |   4 +
- arch/x86/kvm/x86.c                            |  17 +--
- arch/x86/kvm/xen.c                            | 121 ++++++++++++----
- arch/x86/kvm/xen.h                            |   6 +-
- include/linux/kvm_host.h                      |  43 ++++++
- include/linux/kvm_types.h                     |   3 +-
- include/uapi/linux/kvm.h                      |   6 +-
- .../selftests/kvm/x86_64/xen_shinfo_test.c    |  79 +++++++++--
- virt/kvm/pfncache.c                           | 129 +++++++++++++-----
- 10 files changed, 342 insertions(+), 109 deletions(-)
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+Reviewed-by: David Woodhouse <dwmw2@infradead.org>
 ---
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: x86@kernel.org
+---
+ virt/kvm/pfncache.c | 43 +++++++++++++++++++++++++------------------
+ 1 file changed, 25 insertions(+), 18 deletions(-)
+
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 2d6aba677830..0f36acdf577f 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -96,17 +96,28 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ }
+ EXPORT_SYMBOL_GPL(kvm_gpc_check);
+ 
+-static void gpc_unmap_khva(kvm_pfn_t pfn, void *khva)
++static void *gpc_map(kvm_pfn_t pfn)
++{
++	if (pfn_valid(pfn))
++		return kmap(pfn_to_page(pfn));
++#ifdef CONFIG_HAS_IOMEM
++	else
++		return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
++#endif
++}
++
++static void gpc_unmap(kvm_pfn_t pfn, void *khva)
+ {
+ 	/* Unmap the old pfn/page if it was mapped before. */
+-	if (!is_error_noslot_pfn(pfn) && khva) {
+-		if (pfn_valid(pfn))
+-			kunmap(pfn_to_page(pfn));
++	if (is_error_noslot_pfn(pfn) || !khva)
++		return;
++
++	if (pfn_valid(pfn))
++		kunmap(pfn_to_page(pfn));
+ #ifdef CONFIG_HAS_IOMEM
+-		else
+-			memunmap(khva);
++	else
++		memunmap(khva);
+ #endif
+-	}
+ }
+ 
+ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_seq)
+@@ -175,7 +186,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 			 * the existing mapping and didn't create a new one.
+ 			 */
+ 			if (new_khva != old_khva)
+-				gpc_unmap_khva(new_pfn, new_khva);
++				gpc_unmap(new_pfn, new_khva);
+ 
+ 			kvm_release_pfn_clean(new_pfn);
+ 
+@@ -193,15 +204,11 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 		 * too must be done outside of gpc->lock!
+ 		 */
+ 		if (gpc->usage & KVM_HOST_USES_PFN) {
+-			if (new_pfn == gpc->pfn) {
++			if (new_pfn == gpc->pfn)
+ 				new_khva = old_khva;
+-			} else if (pfn_valid(new_pfn)) {
+-				new_khva = kmap(pfn_to_page(new_pfn));
+-#ifdef CONFIG_HAS_IOMEM
+-			} else {
+-				new_khva = memremap(pfn_to_hpa(new_pfn), PAGE_SIZE, MEMREMAP_WB);
+-#endif
+-			}
++			else
++				new_khva = gpc_map(new_pfn);
++
+ 			if (!new_khva) {
+ 				kvm_release_pfn_clean(new_pfn);
+ 				goto out_error;
+@@ -326,7 +333,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
+ 	mutex_unlock(&gpc->refresh_lock);
+ 
+ 	if (unmap_old)
+-		gpc_unmap_khva(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva);
+ 
+ 	return ret;
+ }
+@@ -412,7 +419,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 		list_del(&gpc->list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 
+-		gpc_unmap_khva(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(kvm_gpc_deactivate);
 -- 
 2.39.2
 
