@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 127047A4E73
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC237A4E72
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:18:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbjIRQSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:18:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50852 "EHLO
+        id S230038AbjIRQSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:18:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229802AbjIRQR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230037AbjIRQR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 18 Sep 2023 12:17:57 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193DE2D75
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:11:24 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52a49a42353so5785268a12.2
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:11:24 -0700 (PDT)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C32A2
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:09:43 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-52f3ba561d9so10226824a12.1
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053483; x=1695658283; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053381; x=1695658181; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YpBrxdgyPGajszRQj4tnQ2gfsy466T4SLwv71ztnz3k=;
-        b=SszZNijQT/yp5ZpkflRip3fRzo82wxbzEfG6dRif3yB6LzHKUlQoqQDa977SuyoTtv
-         X54RWNTtemaC0VGVOgjVv9IlQfqL7ovEw15y+NbUqI5W1ofrIl8io0hpNwYPPHN1sgmW
-         Y8ntWs/UCeLIZN4X5sSDfBUxhMOOCxrElRUiB9fqkWCXTQcKnIVH3DZXTvr0lJmyBJck
-         gbyNKXaDeMI27OA/PK7LEuPmzAdmMBKJ4veQFdLEpZW9b2XQxvHJk8NacQIqFQdQPsxl
-         fCrcj2/6TrmhjUMbClUBvsUzkzY6o/vV1h+3s3OYuIOSejQKPM0x7dehBhpN4vumH3go
-         IIjQ==
+        bh=wbLvVhCdjkLoKVSI3XlIe8h3b/C8JwK6Lt4fUZyBeQw=;
+        b=MSEwH4vKfd0quO6q5e7dnGQrLGblqgd85rR3+R1OP9mzcGRwYJ77anICgeWWvtQvq3
+         tXOReoA3QkkryDhvazpG2E4LAr9c8saaqDUSuFS9PWunhZkPqwUFc3Rwt2OSku8zGDwP
+         37eEzBnbePhYGrhk63TkdlficlUJwX3UfadffN+0gwMbzTi9v08uR0dpIBKt67LnmfEk
+         boHbFZfgqsuRac7qipNXCixXQnRcgTJS22mzBuAvDJJAEqConIZl4PJoPnlPn4B96xdc
+         AWdzsXIMLq1CnbAKRIADJtUcFIhDxDWLkzANX544ObBYPM+VVBtI6T217ZNY8CGGdrQf
+         cW6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053483; x=1695658283;
+        d=1e100.net; s=20230601; t=1695053381; x=1695658181;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YpBrxdgyPGajszRQj4tnQ2gfsy466T4SLwv71ztnz3k=;
-        b=VmLERxGVqm/BlwKIjeOcuK9wwoN6Z5Qr9hxSt8AWWCC0Hsi28+Aft8h1cesEj2mOOq
-         vVrJT5uAOQEV/ymReDlKpZLk7ft69/Z4dB3ildjNeJeHSehcWxQsz+r6Xjx9X3LBqVdT
-         jPXtUzy4q5xr45FRGrKP3W4PzKtTRaNITswpsXc54Da8ghWrM/DibWevZ722m7Nxy+8X
-         3vdBpEftvCb7NGacI613EGMBKeDeJ7fsDWM4oeNg60sSXShF1FFcxQrSTWpa7gbjlIMB
-         lmgNj65KSZjjopez9YbFgf9VkfC7U23fe69gzt6O3GO7wiafFb8BH7Su8s5Res++DTYJ
-         Mejw==
-X-Gm-Message-State: AOJu0YwrKSzSYmZFZQAoh1EMbl4ROo4nlUDZzdkqaWtL5wh0lswJfAbB
-        JSCiU9bkdup1UJGZoQhY9Be/xNAvcElB4/U1HHoYU8Xg
-X-Google-Smtp-Source: AGHT+IG6EnV1NPtLa02ojf1AOOFHw9u/ZZVKTH8rmKjYxc3URy3huazjFDCLq8lcPx0zxuOm3uW8nA==
-X-Received: by 2002:a17:907:2cd8:b0:9a5:c9a4:ba1a with SMTP id hg24-20020a1709072cd800b009a5c9a4ba1amr8408544ejc.59.1695053048266;
-        Mon, 18 Sep 2023 09:04:08 -0700 (PDT)
+        bh=wbLvVhCdjkLoKVSI3XlIe8h3b/C8JwK6Lt4fUZyBeQw=;
+        b=xOrA0aGUm+58geGcdrWuHi1rFgJt5wHInPocM6+UE/zFsjGupA4hVSWEMKgCzTdfNW
+         XglZ5UW2AGeG4hGbATvWK7IDMMTD6x3qrEdO9CVjyAr1TYlVbTUEbVQmeIpA49CaIXQn
+         x/jIjEf/PCQ9jyMp7Lx6A0vO4+sk3cF1jgJ9yQQmCHHRiuil8bR6gFUFrWxnk0nLuiMy
+         5VFcHWNtVUSL1fwY2JpwcLuYXfFWhUwibF7hMvUiiuzyd4mSSTX+nwyGEV4ziZ4Wwmaj
+         d7L/O/JTwU4KBugW8Qhu2m7uFtA57R1nQwHBlkkUenMz6tb2vZJdz++VJ7cWV9HRDgwk
+         qMrw==
+X-Gm-Message-State: AOJu0YygsArK/Lem8MNGZo+CjAMWRkcGjywerAu/+qB4K7XuDc9mjeit
+        slqyY7gjcmkd6nrasFoBN0XRogrgtb/9NfEjsDdC6pUP
+X-Google-Smtp-Source: AGHT+IGUIRL/Cj2QgpL/SWnZOOte/5aXBCe8PvtqKJ8rdHwjYW7XrtiQqR5SrkqTU7jQZeCu2Klurw==
+X-Received: by 2002:a17:906:311a:b0:9a9:f0e6:904e with SMTP id 26-20020a170906311a00b009a9f0e6904emr154241ejx.16.1695053053645;
+        Mon, 18 Sep 2023 09:04:13 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170906088400b009928b4e3b9fsm6613541eje.114.2023.09.18.09.04.06
+        by smtp.gmail.com with ESMTPSA id n26-20020a170906119a00b00997cce73cc7sm6586020eja.29.2023.09.18.09.04.11
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:04:07 -0700 (PDT)
+        Mon, 18 Sep 2023 09:04:13 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,53 +100,62 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 13/22] target/xtensa: Create IRQs *after* accelerator vCPU is realized
-Date:   Mon, 18 Sep 2023 18:02:46 +0200
-Message-ID: <20230918160257.30127-14-philmd@linaro.org>
+Subject: [PATCH 14/22] target/sparc: Init CPU environment *after* accelerator vCPU is realized
+Date:   Mon, 18 Sep 2023 18:02:47 +0200
+Message-ID: <20230918160257.30127-15-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Architecture specific hardware doesn't have a particular dependency
-on the accelerator vCPU (created with cpu_exec_realizefn), and can
-be initialized *after* the vCPU is realized. Doing so allows further
-generic API simplification (in few commits).
+These fields from the environment don't affect how accelerators
+create their vCPU thread. We can safely reorder them *after* the
+cpu_exec_realizefn() call. Doing so allows further generic API
+simplification (in the next commit).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/xtensa/cpu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/sparc/cpu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-index 300d19d45c..bbfd2d42a8 100644
---- a/target/xtensa/cpu.c
-+++ b/target/xtensa/cpu.c
-@@ -162,10 +162,6 @@ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
-     XtensaCPUClass *xcc = XTENSA_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 2fdc95eda9..88157fcd33 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -756,6 +756,12 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
+     SPARCCPU *cpu = SPARC_CPU(dev);
+     CPUSPARCState *env = &cpu->env;
  
--#ifndef CONFIG_USER_ONLY
--    xtensa_irq_init(&XTENSA_CPU(dev)->env);
--#endif
--
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-@@ -174,6 +170,10 @@ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     cs->gdb_num_regs = xcc->config->gdb_regmap.num_regs;
- 
-+#ifndef CONFIG_USER_ONLY
-+    xtensa_irq_init(&XTENSA_CPU(dev)->env);
-+#endif
++    cpu_exec_realizefn(cs, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
++        return;
++    }
 +
-     xcc->parent_realize(dev, errp);
+ #if defined(CONFIG_USER_ONLY)
+     if ((env->def.features & CPU_FEATURE_FLOAT)) {
+         env->def.features |= CPU_FEATURE_FLOAT128;
+@@ -776,12 +782,6 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
+     env->version |= env->def.nwindows - 1;
+ #endif
+ 
+-    cpu_exec_realizefn(cs, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+     scc->parent_realize(dev, errp);
  }
  
 -- 
