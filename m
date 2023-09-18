@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A1917A4F31
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1BE7A4F6C
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjIRQfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59086 "EHLO
+        id S230305AbjIRQma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:42:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjIRQfT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:35:19 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD3357DBB
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:12:29 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40476ce8b2fso40864245e9.3
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:12:29 -0700 (PDT)
+        with ESMTP id S229731AbjIRQmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:42:16 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A401712
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:56 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-500a8b2b73eso7543003e87.0
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053548; x=1695658348; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053091; x=1695657891; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y7slh/pNTWelLfh1FzXsOutH1+zxCT/FLHdOf8nTB6I=;
-        b=q0KcQo2KVWnKZDombc6Jx6vXOjJ0S4RVxmLvSf7KN8Ej5/rjHLk1JjIegT6TQ67xPr
-         +YBD9iADYzlVmF9tDkYp6hqlkKPmtmKS/d4Rpx68Z5Nx6n0hvPS1s47L6GsileLFvXHj
-         rbaHG3HBTbeCTbPQXKFF/ebujU1ywy1UpLF8ScvX70f0Pd++AZt+bO9AawAb/hdUsA2C
-         lK09ewdbTwHS9t8aImPtH9+E4ieyxOJ1A0yPP17b+3DKnIjC4uSe7R7cbpcXg3jHR6ZX
-         tiJu9DobWPaCKOmVP375GLnJImOdIogdqZ61t1od1P+X1PK6x5Fl7xG4xRU7/pUlO5uk
-         NL4Q==
+        bh=GMzTvk0FEO6I+ReA5ceoXcLeA6ER1WjzLpFKcs1vmU4=;
+        b=POxpTtvRLsy2KrAPmkEKhjGKXMfIUvVFSGXJNTSc6J/LJUUwFqKL52eAggUZEzTyCw
+         rahSekiU1eGAlWdauZ4zZGLgJ2vgrNZFvqJPSs4Kve2QpqHF+om4n3yTM5A6Yk5YPXQq
+         Ska0KVFnjzJcXEQk36xDyeSu9YcdW1ZlageIzWPHwmusD9SFWWRPeuur7HCLG/o0i3xS
+         j2shSeWCNEknu68rEncQXIj3+i2OYVGeBSm9rTB//3eHwIgII9B2jzPJX0ATlg2OrZfT
+         qrIi3OqPC2E/CLrqBM9jPWdW8AJ7OhY24o/hWHueNdFZa6+apXAXkqmMoDpvosIIzfbf
+         Fzjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053548; x=1695658348;
+        d=1e100.net; s=20230601; t=1695053091; x=1695657891;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y7slh/pNTWelLfh1FzXsOutH1+zxCT/FLHdOf8nTB6I=;
-        b=OnXdnRllB8r69DVEdEsPKbdtcpjp531CE9CDg6rrhVPXk3hP5OI2++ER8cBMhKBSdG
-         IVIBuJ2xI84/VdMOmoaP0jAHyu8rU6jEDIQg8HXONSh/kiLngERbA16Pjm3Smj24wwrx
-         E1mNAjKxZfv2IaPJhQQtAHwMhpVna+vX0zU8/0w0CjHaDbFGpje+k7kx9hZgjtwQh15J
-         tWmW/ipzvguvWjZhZiT1KKX3v5dvLkBkzqguuthBxDtAjMGKA1XiqGwrona0pDR/w9CM
-         eTNQjzDXg+gYKg2Qe3G5pq1ttVKFblw2QQpNmmBX18X5N7EVCq06OULD1m5DjOxTnFe0
-         srmw==
-X-Gm-Message-State: AOJu0YxSqFT9R/2v9kL9YhUqxOxPguwlVIU7y1ZFdXlc0QKUBw2EnksE
-        /D6t7+Rn5SkB335AuR5fmSoN+zDEww3NSBgtrRS8kZ5I
-X-Google-Smtp-Source: AGHT+IF1uzqoMGcGEAlyaETsh01GEqG5TP+8vhZBqOT31xYKgtT4aKTdO73/67eFYWfUVkYSZ8Rjqw==
-X-Received: by 2002:a17:907:75f1:b0:9a5:cc73:a2a5 with SMTP id jz17-20020a17090775f100b009a5cc73a2a5mr6784701ejc.1.1695053085243;
-        Mon, 18 Sep 2023 09:04:45 -0700 (PDT)
+        bh=GMzTvk0FEO6I+ReA5ceoXcLeA6ER1WjzLpFKcs1vmU4=;
+        b=FdzijzIXK5UNkMqqOfMdnQTQE9bcI86LyOUzm3O586CeBv2jHYF4ie+2OXlqp71in9
+         MQ+W1fm8exSxCxf2ZzRAfCWz4S3zQx8vcu/g1/tSDIZSo1FpjXiusVWc2frcNybWKQ3l
+         gAyJwrMvo7QGtRiDNp+zLtDLhGRbkSgZAOtT9O/jgeshWXzrrjTZUzo6BZ/C/O6ECedJ
+         TPi+WOLyZY1nVLf4KtJYzhYmgJ06e+jV/MdN/gcORJA+mABBXkJsGxrULJraRBHsAKwq
+         2ByZtswE7n3g+3s2v1aQTABHDNqaJC6spw4YyWdASVvatNxORwOBZI5C25nOCBzgGAMR
+         gT3A==
+X-Gm-Message-State: AOJu0YzkvcN9mhiBpCwcNHrFu88KoRbhXMsxGNUViiEgZ/5hMOcJhMkH
+        Pih/s+SABpGJsH93dhbEArk3jA==
+X-Google-Smtp-Source: AGHT+IF2lowlwslUXKPMUOsRhTSe1sID6DU3fFY6oz4zaM9BZXy8URyT0npkn+KMnJlFujwR995gHQ==
+X-Received: by 2002:a05:6512:3f8:b0:503:95d:f2bd with SMTP id n24-20020a05651203f800b00503095df2bdmr4180507lfq.34.1695053091074;
+        Mon, 18 Sep 2023 09:04:51 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id lt10-20020a170906fa8a00b009737b8d47b6sm6568567ejb.203.2023.09.18.09.04.43
+        by smtp.gmail.com with ESMTPSA id i8-20020a0564020f0800b005309eb7544fsm4528407eda.45.2023.09.18.09.04.48
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:04:44 -0700 (PDT)
+        Mon, 18 Sep 2023 09:04:50 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,58 +100,73 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 20/22] target/s390x: Use s390_realize_cpu_model() as verify_accel_features()
-Date:   Mon, 18 Sep 2023 18:02:53 +0200
-Message-ID: <20230918160257.30127-21-philmd@linaro.org>
+Subject: [PATCH 21/22] exec/cpu: Have cpu_exec_realize() return a boolean
+Date:   Mon, 18 Sep 2023 18:02:54 +0200
+Message-ID: <20230918160257.30127-22-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-s390_realize_cpu_model() checks if CPU model and definitions
-are compatible with the KVM / TCG accelerators, before realizing
-the vCPU. Use it directly as CPUClass::verify_accel_features()
-handler (called from cpu_exec_realizefn()).
+Following the example documented since commit e3fe3988d7 ("error:
+Document Error API usage rules"), have cpu_exec_realizefn()
+return a boolean indicating whether an error is set or not.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/s390x/cpu.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ include/hw/core/cpu.h | 2 +-
+ cpu.c                 | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 1a44a6d2b2..983dbfe563 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -231,11 +231,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
-     Error *err = NULL;
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 1e940f6bb5..3dc6968428 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -1014,7 +1014,7 @@ G_NORETURN void cpu_abort(CPUState *cpu, const char *fmt, ...)
+ /* $(top_srcdir)/cpu.c */
+ void cpu_class_init_props(DeviceClass *dc);
+ void cpu_exec_initfn(CPUState *cpu);
+-void cpu_exec_realizefn(CPUState *cpu, Error **errp);
++bool cpu_exec_realizefn(CPUState *cpu, Error **errp);
+ void cpu_exec_unrealizefn(CPUState *cpu);
  
--    /* the model has to be realized before qemu_init_vcpu() due to kvm */
--    if (!s390_realize_cpu_model(cs, &err)) {
--        goto out;
--    }
--
-     cpu_exec_realizefn(cs, &err);
-     if (err != NULL) {
-         goto out;
-@@ -329,6 +324,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+ /**
+diff --git a/cpu.c b/cpu.c
+index 84b03c09ac..96ae440b81 100644
+--- a/cpu.c
++++ b/cpu.c
+@@ -131,7 +131,7 @@ const VMStateDescription vmstate_cpu_common = {
+ };
+ #endif
  
-     scc->reset = s390_cpu_reset;
-     cc->class_by_name = s390_cpu_class_by_name,
-+    cc->verify_accel_features = s390_realize_cpu_model;
-     cc->has_work = s390_cpu_has_work;
-     cc->dump_state = s390_cpu_dump_state;
-     cc->query_cpu_fast = s390_query_cpu_fast;
+-void cpu_exec_realizefn(CPUState *cpu, Error **errp)
++bool cpu_exec_realizefn(CPUState *cpu, Error **errp)
+ {
+     /* cache the cpu class for the hotpath */
+     cpu->cc = CPU_GET_CLASS(cpu);
+@@ -142,7 +142,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+     }
+ 
+     if (!accel_cpu_realizefn(cpu, errp)) {
+-        return;
++        return false;
+     }
+ 
+     /* NB: errp parameter is unused currently */
+@@ -169,6 +169,8 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+         vmstate_register(NULL, cpu->cpu_index, cpu->cc->sysemu_ops->legacy_vmsd, cpu);
+     }
+ #endif /* CONFIG_USER_ONLY */
++
++    return true;
+ }
+ 
+ void cpu_exec_unrealizefn(CPUState *cpu)
 -- 
 2.41.0
 
