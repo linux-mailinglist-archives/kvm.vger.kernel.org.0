@@ -2,45 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DC4F7A4885
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:36:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 512F87A48BB
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:50:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241597AbjIRLf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:35:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53958 "EHLO
+        id S240208AbjIRLtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:49:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241821AbjIRLfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:35:54 -0400
+        with ESMTP id S241769AbjIRLtv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 07:49:51 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF03F12E;
-        Mon, 18 Sep 2023 04:34:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EA5E3;
+        Mon, 18 Sep 2023 04:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lcMc94k377L0RtG7zfE5GRCtv6klLjT8RZUn9jMyTsk=; b=FAMTnFtoCj93B8t/+BLcetfVHJ
-        cq9H6JA79Wdovfqsj9+FRplzdhJrETR00Uxxz9QhhohYnw8/LPV/G60AtW89+RGyDCr50r2aQC82J
-        GE1coUuPOyEEzTop+riRRVNZ0K+0S7FvTO4nO1EkZbuSksqmMKQzh+CQrCRd4AEybm3rYh1pwCsw+
-        sLoMJuFigcX85ujnazk+atLmbLuMTSs2iel7/CQ2BAaBdqxBaTCL293xo/UUk0nSbdfwaaqpSgeNK
-        olgyMkd/hcpNN55yJ1VZ2As38Z99QpwOGb6TTijKa4sfRD7buul38Ifa/E5pBqNjmGB8NHiAY4kH9
-        dTs4Vm7Q==;
+        bh=+Zla40yBeTjqO403RnbEECOA9lbJYqdXZE9AJUrnj7o=; b=E5Favm2RX6bIdAAyvY5mnOC94f
+        /lLpilx1IR1CeLuPXaj9UyA2MUPtkPyfCZuRLSg70Trits2uAfmNJJVbVcrNxtUgwXHSmab23eUbX
+        fhlNuwPK+TZKgOxjf3ANzUDTLLMlee2zHVYZ3QwbyWudB7yPKDV0s2exhRSywojM1xy5VuuyAOtnz
+        claZx1R1Ydc/nVALP7mK7+yUp2GPGSVDTxAw7pNJAVjRYGCnbrHJ/co4nrijgFkd+foMcMIOQ/kMW
+        z6+hb6PRq4sFTdGJ5a2WufWGmtp4s95FwH9amsfpCT7+jygGnC7rzUxxKnrujnwCOd1Gs8EWn345N
+        YfE6WiMw==;
 Received: from [2001:8b0:10b:5:cea0:d147:7c2e:9e61] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiCWf-00Al9j-R2; Mon, 18 Sep 2023 11:34:49 +0000
-Message-ID: <e4ac95d3370b997c17ce6924425d693a7e856c7e.camel@infradead.org>
-Subject: Re: [PATCH v2 05/12] KVM: pfncache: allow a cache to be activated
- with a fixed (userspace) HVA
+        id 1qiCl5-00AorF-5E; Mon, 18 Sep 2023 11:49:43 +0000
+Message-ID: <51027eb7552cac992f4c856ea2344f7d35c0185d.camel@infradead.org>
+Subject: Re: [PATCH v2 08/12] KVM: xen: automatically use the vcpu_info
+ embedded in shared_info
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 18 Sep 2023 12:34:49 +0100
-In-Reply-To: <20230918112148.28855-6-paul@xen.org>
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Date:   Mon, 18 Sep 2023 12:49:42 +0100
+In-Reply-To: <20230918112148.28855-9-paul@xen.org>
 References: <20230918112148.28855-1-paul@xen.org>
-         <20230918112148.28855-6-paul@xen.org>
+         <20230918112148.28855-9-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-t7NXodRzZKv+xz5YsdZv"
+        boundary="=-NvTxCzm21jgrjqvdo3RP"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,30 +59,38 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-t7NXodRzZKv+xz5YsdZv
+--=-NvTxCzm21jgrjqvdo3RP
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2023-09-18 at 11:21 +0000, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
->=20
-> Some cached pages may actually be overlays on guest memory that have a
-> fixed HVA within the VMM. It's pointless to invalidate such cached
-> mappings if the overlay is moved so allow a cache to be activated directl=
-y
-> with the HVA to cater for such cases. A subsequent patch will make use
-> of this facility.
->=20
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+> -                                              This is because KVM may
+> -=C2=A0 not be aware of the Xen CPU id which is used as the index into th=
+e
+> -=C2=A0 vcpu_info[] array, so may know the correct default location.
 
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Hm, that *was* true at the time of writing, but we did end up teaching
+KVM about the Xen vcpu_id so that we can handle timers. (We required
+userspace to provide the APIC ID for all the other event channel stuff,
+but timer hypercalls come straight from the guest).
 
-Btw, I think you have falsified some Reviewed-by: tags on the rest of
-the series. Remember, if they aren't literally cut and pasted, the
-magic gets lost. Just the same as Signed-off-by: tags. Never type them
-for someone else.
+But I think the *only* thing we use vcpu->arch.xen.vcpu_id for right
+now is acceleration of the timer hypercalls that are restricted to the
+vCPU that they're called from, e.g.:
 
---=-t7NXodRzZKv+xz5YsdZv
+	case VCPUOP_set_singleshot_timer:
+		if (vcpu->arch.xen.vcpu_id !=3D vcpu_id) {
+			*r =3D -EINVAL;
+
+So it's never mattered much before now if the Xen vcpu_id changes at
+runtime.
+
+Maybe you now want to invalidate the vcpu_info pfncache for a vCPU if
+its Xen vcpu_id changes? Or just *forbid* such a change after the
+shinfo page has been set up? What locking prevents the xen.vcpu_id
+changing in the middle of your new get_vcpu_info_cache() function?
+
+--=-NvTxCzm21jgrjqvdo3RP
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -169,24 +182,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTEzNDQ5WjAvBgkqhkiG9w0BCQQxIgQgYPCU9/OP
-WP0VTvz296OG3Qkhr7Cz0UT6Xf+j679lMfYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTE0OTQyWjAvBgkqhkiG9w0BCQQxIgQg65b3KUT8
+DzNbIPQI3YgPh0c9hF/9CrYr8Qr+ism0zdcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCC2JE9/oDgsA0IovjjoQ3Dfb0J9uD13tSE
-YX19hZV8YKvViS8gHMH/k+THwJ+RS3aJC14WGmWarJBOq4knJ3SaK2oXpllLMTEBL1dDJyh4DYJc
-c2a4kJ+Q963EcVhKVgiiRaFJ5usDh7uSCwXtz3yAxMYnicNal/A0YWY79rDc9nifx8za+NozzRCi
-nTzInj3eJ5qWhIbFjQJp4bia4P0l2T25hOV69ntQ5J92CtQZD3Zl3R2rDaXoU44gCelC6dyZ4Yk0
-nCrfTE1UQXtZQSAecbbGj2QcFj0qWs9SddvG4ywPFG5LLRx0yHy/rvQJv3zi0oES3XkS/eUi4NrK
-sb/sNgLpLIhjby/mBxpr1YAbRtYA7oBTN/n5LOFNAxRsi8vcYcd6Idv/JADGhwvKKaT2CBgAxHw/
-s8gDCLK4UYZb25v7bA36mS8i9wj3C9BuxDFD/+h6gTdAsGZSAZEHhsp71i+C1U1+xtcrwH9Yb+Pi
-kyM5rrXhf5wBEdrAszym+GDzPzh9S2eXeK5StDSJSDT4/LtR5Qnlnc/6lU/w+KvMpdIEwCMGljKe
-qvnvYVVZTW0JflJ2VbRSXMgfLfWw1iSyf0mcdagpGPs8PM56eTYUWbPv0j1xshl80L/691JSAduh
-Z5tmSRJbKpS5dV2EXNp9YZVDBLrkN/K8zA6jr2o58wAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBCRJRrbMYx4k/XWpxe9KPJw8RbUfAzxNtI
+TIA8ocINuQj5NmQ0tvrRwH27dFVZOiThhijmmk+PcDe+mcw5U19bTgVWfkxjTLEdKpnUWu8hSUbT
+2uZzNTXSNjlNtchUEUke9PGm1E5TwhSBP6YDT8Aw+408PGHxQO5yUMyhHwJINWbp/gRuzoO6rAQq
+vzAG0JvvJtDNiRQlqeYBAPT7TK48wwG0Gk5pWuAK/9XPc3UMZclx7W2FOfG+MRJda4TWYKlLT0Dh
+sBaNoYAW0sW3SITY3pBpKOMynvdS+tf7A3B1GqmLwpx1+txINebgNd+1MujvT6MlNYbOdVBj8Vyq
+47jud+SiCcer1N9WrybGKj6xDr6uIqgxo25hXBhn73uwPAOJ+0HEQHjT6sVneb+LRiZ2O80T5KFr
+T1HOA+N949tM3UngfyS4Mk4ZShGLoaI2aoQEYp6EA53THeo40CQMv9l88DUaNmSUVI4u9CFDhLxZ
+Jx4qxJ/nyMK2rBedxXc5mTE0uWV58BF9+zPpGqcit9uSFCtVc/CZ5eHMM5nlyA7oA74TtkwY6wij
+ClkkR6I9o4Cr7GKd3iil07hdzw5YqmXuxwHMSpDp5QML55MOkxqm7ebom9uiVpdUSvdMMKFw+oMM
+5Yc5jBvndmxSzz8J1TpEFaw/jjIbrgu3ZhM9JBu0zgAAAAAAAA==
 
 
---=-t7NXodRzZKv+xz5YsdZv--
+--=-NvTxCzm21jgrjqvdo3RP--
