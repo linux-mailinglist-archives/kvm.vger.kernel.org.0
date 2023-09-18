@@ -2,88 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A187A5053
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 19:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73BA17A5014
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbjIRRDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 13:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        id S231381AbjIRQ7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231520AbjIRRDR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 13:03:17 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D88CCA;
-        Mon, 18 Sep 2023 10:02:52 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 391A1120005;
-        Mon, 18 Sep 2023 20:02:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 391A1120005
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1695056569;
-        bh=0o7hfC4+F2euSGNP8krkD3xbGeD5dgDDhH9/E/Lq2pU=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=alLQUDbysr3L8dz+yeBvWT/+riB6RuYqj7NgmEpmNffdudRO0n1tnLS3FhR/bUSzj
-         7xupnALTsYbWRHcoHWJBLuj/wWLdObKCAXFtGT5Pq+pjt0Sj9X8a3YYcCwftuBhPVZ
-         N4GKOnCVOsdacrg3XxJ3rg8Gurb/r5JXe8AHsKv/TmDCFY7dKzJqoyfs79P+cdbkUz
-         9y49nVvJ52TdBH/W6r4QZCvBd5V4HH1TZxbxMUOH0kLzrjzqB23b5gIrTh3TLRJXE4
-         msqgEqiqmlu3mrokmPsaplWm9+V2JGxws9bCJbYcu/OTHHAiSphOnz/O4/Znwunr0p
-         6Nqhqfn27mdKQ==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Mon, 18 Sep 2023 20:02:48 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 18 Sep 2023 20:02:47 +0300
-Message-ID: <b5873e36-fe8c-85e8-e11b-4ccec386c015@salutedevices.com>
-Date:   Mon, 18 Sep 2023 19:56:00 +0300
+        with ESMTP id S231320AbjIRQ6v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:58:51 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2649182
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:58:43 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34fa117f92bso2395ab.1
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695056323; x=1695661123; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=knRagvKuCPzhCIYhCOjRCh44VjecKJtrl8eHwZBErg4=;
+        b=0ru6f5T3Isq+RB3EWYvBlX+hnugBdW6UtTSaogmPXLEWWqijFNwxdzyVkg+uO4EN0m
+         8K/IkdJ8wvDl8vxhpbB3gW6YTYFBbw8diAsbTUs271KqiiPieoWOpM4wiCoAaUO6yyYW
+         RK0IWCgm8XmuubaM7FX2sVNML0fysv/+Q2LXOWpq1GMOHu0fe5n6nLjRS4NFlwJ3FgLo
+         poZBImG3T7wVXeQziDPrVc/Hm8v4DtUVAzLUHkgm4ay4vVy5hD+Bgz1prV2E6XIqruXN
+         Zthv32XmTtWmfl2ZKzOIuxktGxtQ7INzwM3trKdp6GzlPTTNkLls0p5Nfx/CAV9J7tgh
+         ZYIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695056323; x=1695661123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=knRagvKuCPzhCIYhCOjRCh44VjecKJtrl8eHwZBErg4=;
+        b=RjhQQ5Z3uHmV09TzcuBb883+VSV0EapLJpnaUYCVk7w8kIJCPdC6RiTpaQcKexeCvd
+         0roNgr78fKs2GdM95Tt3PL8nXHb+sT3o6PnR9VSb4CcvIVT2WTlqOnqSK/2L0gzXUBaW
+         a+ve+eLQlqMWVSD4mMhkCxBxk918ZF4SrBJI+AW8MbuZY0+OLi9bvm8QoH1fm13YxvPM
+         RKZNxe8MSZD+gq94ySwHbk6dCcVxY5HFPVEnIB9S8knludJAXUKijsxibUHgWMZwQo/U
+         W9f1uWqoAg6WuQeBow0v0havTQbpK7DiKI5EIhye5dF3QJca6o+BFTsjE4ngeFsBotBj
+         2RRQ==
+X-Gm-Message-State: AOJu0YydE1hMvVoJdXOMDNuBNuxIgk3p52JyRgKDZjlI++G/Bq1M7ibO
+        aypKffsjGm8LAE61drw8RiMPhx9HlEAm9L49USDqbw==
+X-Google-Smtp-Source: AGHT+IFv1Ps0KGN+3uXX0L5vlmsQqy+WtzDDn/VsgDwBehY5y6fNEdqefWeJzC7fg+gcv+GeSBBp0dzvFA3WkKepQm0=
+X-Received: by 2002:a05:6e02:19c5:b0:34f:71b0:e72b with SMTP id
+ r5-20020a056e0219c500b0034f71b0e72bmr553193ill.27.1695056322944; Mon, 18 Sep
+ 2023 09:58:42 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v9 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
- preparations
-Content-Language: en-US
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
-From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+References: <20230817003029.3073210-1-rananta@google.com> <20230817003029.3073210-3-rananta@google.com>
+ <ZQSxgWWZ3YdNgeiC@linux.dev> <CAJHc60ytL7T73wwabD8C2+RkVgN3OQsNuBwdQKz+Qen9b_hq9A@mail.gmail.com>
+ <ZQh/H5aMoqpYgVZg@linux.dev>
+In-Reply-To: <ZQh/H5aMoqpYgVZg@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 18 Sep 2023 09:58:31 -0700
+Message-ID: <CAJHc60wnYYxkav7+Lu3b0iPmyujz-cW-py5Ksg2+098fh5BtVQ@mail.gmail.com>
+Subject: Re: [PATCH v5 02/12] KVM: arm64: PMU: Set the default PMU for the
+ guest on vCPU reset
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179934 [Sep 18 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;git.kernel.org:7.1.1;lore.kernel.org:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/09/18 14:42:00
-X-KSMG-LinksScanning: Clean, bases: 2023/09/18 16:49:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/18 14:09:00 #21917825
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,85 +82,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Stefano,
+On Mon, Sep 18, 2023 at 9:47=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Mon, Sep 18, 2023 at 09:41:02AM -0700, Raghavendra Rao Ananta wrote:
+> > On Fri, Sep 15, 2023 at 12:33=E2=80=AFPM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+>
+> [...]
+>
+> > > This would eliminate the possibility of returning ENODEV to userspace
+> > > where we shouldn't.
+> > >
+> > I understand that we'll be breaking the API contract and userspace may
+> > have to adapt to this change, but is it not acceptable to document and
+> > return ENODEV, since ENODEV may offer more clarity to userspace as to
+> > why the ioctl failed? In general, do we never extend the APIs?
+>
+> Yes, we extend the existing interfaces all the time, but we almost
+> always require user opt in for user-visible changes in behavior. Look at
+> the way arm64_check_features() is handled -- we hide the 'detailed'
+> error and return EINVAL due to UAPI.
+>
+Got it. Let's return EINVAL then. Thanks!
 
-thanks for review! So when this patchset will be merged to net-next,
-I'll start sending next part of MSG_ZEROCOPY patchset, e.g. AF_VSOCK +
-Documentation/ patches.
-
-Thanks, Arseniy
-
-On 16.09.2023 16:09, Arseniy Krasnov wrote:
-> Hello,
-> 
-> this patchset is first of three parts of another big patchset for
-> MSG_ZEROCOPY flag support:
-> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
-> 
-> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
-> suggested to split it for three parts to simplify review and merging:
-> 
-> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
-> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->    tx completions) and update for Documentation/.
-> 3) Updates for tests and utils.
-> 
-> This series enables handling of fragged skbs in virtio and vhost parts.
-> Newly logic won't be triggered, because SO_ZEROCOPY options is still
-> impossible to enable at this moment (next bunch of patches from big
-> set above will enable it).
-> 
-> I've included changelog to some patches anyway, because there were some
-> comments during review of last big patchset from the link above.
-> 
-> Head for this patchset is:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=f2fa1c812c91e99d0317d1fc7d845e1e05f39716
-> 
-> Link to v1:
-> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
-> Link to v2:
-> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
-> Link to v3:
-> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
-> Link to v4:
-> https://lore.kernel.org/netdev/20230727222627.1895355-1-AVKrasnov@sberdevices.ru/
-> Link to v5:
-> https://lore.kernel.org/netdev/20230730085905.3420811-1-AVKrasnov@sberdevices.ru/
-> Link to v6:
-> https://lore.kernel.org/netdev/20230814212720.3679058-1-AVKrasnov@sberdevices.ru/
-> Link to v7:
-> https://lore.kernel.org/netdev/20230827085436.941183-1-avkrasnov@salutedevices.com/
-> Link to v8:
-> https://lore.kernel.org/netdev/20230911202234.1932024-1-avkrasnov@salutedevices.com/
-> 
-> Changelog:
->  v3 -> v4:
->  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->  v4 -> v5:
->  * See per-patch changelog after ---.
->  v5 -> v6:
->  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->  * See per-patch changelog after ---.
->  v6 -> v7:
->  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->  * See per-patch changelog after ---.
->  v7 -> v8:
->  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->  * See per-patch changelog after ---.
->  v8 -> v9:
->  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->  * See per-patch changelog after ---.
-> 
-> Arseniy Krasnov (4):
->   vsock/virtio/vhost: read data from non-linear skb
->   vsock/virtio: support to send non-linear skb
->   vsock/virtio: non-linear skb handling for tap
->   vsock/virtio: MSG_ZEROCOPY flag support
-> 
->  drivers/vhost/vsock.c                         |  14 +-
->  include/linux/virtio_vsock.h                  |  10 +
->  .../events/vsock_virtio_transport_common.h    |  12 +-
->  net/vmw_vsock/virtio_transport.c              |  92 +++++-
->  net/vmw_vsock/virtio_transport_common.c       | 307 ++++++++++++++----
->  5 files changed, 348 insertions(+), 87 deletions(-)
-> 
+- Raghavendra
+> --
+> Thanks,
+> Oliver
