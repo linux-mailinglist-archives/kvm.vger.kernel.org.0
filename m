@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2B2A7A4F11
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 127047A4E73
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:18:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbjIRQdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58772 "EHLO
+        id S230147AbjIRQSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:18:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbjIRQd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:33:28 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A9C7DAD
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:12:26 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-50307acd445so3036189e87.0
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:12:26 -0700 (PDT)
+        with ESMTP id S229802AbjIRQR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:17:57 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193DE2D75
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:11:24 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52a49a42353so5785268a12.2
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:11:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053544; x=1695658344; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053483; x=1695658283; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DBZjR8eqTRO2FcjHJbn6UW72+cRDsZ12eh5J24aMJRM=;
-        b=haspA+XP0LsiyjV075ImbvGI2G6QezOcMkCNOOeBt3WgQGvpfzlghwViDOuEfD1g/L
-         VypNe2MQ3ZOKuaZfW0d/SK88QT3ZezVn2bPUU/l1htDeV6nEOWnT6pQYouKit6ggZpyd
-         9MswgzN9xRk5cqHlHZ83tQbsCuFPmWf7ENOWNQCIMfB4NODYaIvDRbFBksLB1OxwJ37Y
-         +gUC2xw/fDh92xE2H6eFhGL+t+4EXfJo3DOxr/xczW1rEe2tODkniwQPVOloHzhdmjhg
-         AoWPZn+dCdMvp5BftXaXaizxRndr7aZOHqLtzRkJomxl0Jxuba07UK+ufWEbtXDLMmbL
-         gPtw==
+        bh=YpBrxdgyPGajszRQj4tnQ2gfsy466T4SLwv71ztnz3k=;
+        b=SszZNijQT/yp5ZpkflRip3fRzo82wxbzEfG6dRif3yB6LzHKUlQoqQDa977SuyoTtv
+         X54RWNTtemaC0VGVOgjVv9IlQfqL7ovEw15y+NbUqI5W1ofrIl8io0hpNwYPPHN1sgmW
+         Y8ntWs/UCeLIZN4X5sSDfBUxhMOOCxrElRUiB9fqkWCXTQcKnIVH3DZXTvr0lJmyBJck
+         gbyNKXaDeMI27OA/PK7LEuPmzAdmMBKJ4veQFdLEpZW9b2XQxvHJk8NacQIqFQdQPsxl
+         fCrcj2/6TrmhjUMbClUBvsUzkzY6o/vV1h+3s3OYuIOSejQKPM0x7dehBhpN4vumH3go
+         IIjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053544; x=1695658344;
+        d=1e100.net; s=20230601; t=1695053483; x=1695658283;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DBZjR8eqTRO2FcjHJbn6UW72+cRDsZ12eh5J24aMJRM=;
-        b=HrsF1ZLIfP631hOTJZ1Z9isyl/bfCE8I2zLwHR7Nt7e3XB1aYXU8cpaTvKgY+vbJ2Z
-         RNg3RnvVUngZhiBkwP8T1SOKfDI/wcWZZxMFBPDn9xnYl9fzvIcawjlXdD70EtNKWga7
-         qRqNQGWqvi62z28UVWudJM8sXS55YTdpe+nAiutzgsb9FePAAvC+gXVJQ/OqeKQTc5Qa
-         jRJ1Gszcvsaly3Lp5W7IhfuV9OtcPDriXA9ryGpkKFh/nql0pxiC2EV4Fub/aWQVAL6d
-         GhE9DF4Plezh9OjkOPRchsDg5FwacclXsCtbaUY3AqND2Iqy3x3w6mTllk+wdF9+Eois
-         I/tQ==
-X-Gm-Message-State: AOJu0YwdjpJDv5B12UsqQii6ogHz5qnhxH5B7ENgK602bJR0+hhh1OfK
-        UlaJyu4axvdMxygpvPCwQC4PRYtBEWTfWMRUFNEHZ6wr
-X-Google-Smtp-Source: AGHT+IFSQh3aSy8WNfVsJ8gBPwr/UHTrTRJ5GVnUXxcFo9z61kuLhRihhFERCd0BfPS6IwLRcpPE5w==
-X-Received: by 2002:a17:906:209b:b0:9a9:fa50:1fa8 with SMTP id 27-20020a170906209b00b009a9fa501fa8mr8796931ejq.40.1695053042868;
-        Mon, 18 Sep 2023 09:04:02 -0700 (PDT)
+        bh=YpBrxdgyPGajszRQj4tnQ2gfsy466T4SLwv71ztnz3k=;
+        b=VmLERxGVqm/BlwKIjeOcuK9wwoN6Z5Qr9hxSt8AWWCC0Hsi28+Aft8h1cesEj2mOOq
+         vVrJT5uAOQEV/ymReDlKpZLk7ft69/Z4dB3ildjNeJeHSehcWxQsz+r6Xjx9X3LBqVdT
+         jPXtUzy4q5xr45FRGrKP3W4PzKtTRaNITswpsXc54Da8ghWrM/DibWevZ722m7Nxy+8X
+         3vdBpEftvCb7NGacI613EGMBKeDeJ7fsDWM4oeNg60sSXShF1FFcxQrSTWpa7gbjlIMB
+         lmgNj65KSZjjopez9YbFgf9VkfC7U23fe69gzt6O3GO7wiafFb8BH7Su8s5Res++DTYJ
+         Mejw==
+X-Gm-Message-State: AOJu0YwrKSzSYmZFZQAoh1EMbl4ROo4nlUDZzdkqaWtL5wh0lswJfAbB
+        JSCiU9bkdup1UJGZoQhY9Be/xNAvcElB4/U1HHoYU8Xg
+X-Google-Smtp-Source: AGHT+IG6EnV1NPtLa02ojf1AOOFHw9u/ZZVKTH8rmKjYxc3URy3huazjFDCLq8lcPx0zxuOm3uW8nA==
+X-Received: by 2002:a17:907:2cd8:b0:9a5:c9a4:ba1a with SMTP id hg24-20020a1709072cd800b009a5c9a4ba1amr8408544ejc.59.1695053048266;
+        Mon, 18 Sep 2023 09:04:08 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id z15-20020a170906240f00b0099bd1ce18fesm6723198eja.10.2023.09.18.09.04.01
+        by smtp.gmail.com with ESMTPSA id n4-20020a170906088400b009928b4e3b9fsm6613541eje.114.2023.09.18.09.04.06
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:04:02 -0700 (PDT)
+        Mon, 18 Sep 2023 09:04:07 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,20 +100,15 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 12/22] target/mips: Create clock *after* accelerator vCPU is realized
-Date:   Mon, 18 Sep 2023 18:02:45 +0200
-Message-ID: <20230918160257.30127-13-philmd@linaro.org>
+Subject: [PATCH 13/22] target/xtensa: Create IRQs *after* accelerator vCPU is realized
+Date:   Mon, 18 Sep 2023 18:02:46 +0200
+Message-ID: <20230918160257.30127-14-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -125,55 +120,35 @@ generic API simplification (in few commits).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/mips/cpu.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ target/xtensa/cpu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 0aea69aaf9..7c81e6c356 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -464,20 +464,6 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
-     MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(dev);
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index 300d19d45c..bbfd2d42a8 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -162,10 +162,6 @@ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
+     XtensaCPUClass *xcc = XTENSA_CPU_GET_CLASS(dev);
      Error *local_err = NULL;
  
--    if (!clock_get(cpu->clock)) {
 -#ifndef CONFIG_USER_ONLY
--        if (!qtest_enabled()) {
--            g_autofree char *cpu_freq_str = freq_to_str(CPU_FREQ_HZ_DEFAULT);
--
--            warn_report("CPU input clock is not connected to any output clock, "
--                        "using default frequency of %s.", cpu_freq_str);
--        }
+-    xtensa_irq_init(&XTENSA_CPU(dev)->env);
 -#endif
--        /* Initialize the frequency in case the clock remains unconnected. */
--        clock_set_hz(cpu->clock, CPU_FREQ_HZ_DEFAULT);
--    }
--    mips_cp0_period_set(cpu);
 -
      cpu_exec_realizefn(cs, &local_err);
      if (local_err != NULL) {
          error_propagate(errp, local_err);
-@@ -492,6 +478,20 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
-     fpu_init(env, env->cpu_model);
-     mvp_init(env);
+@@ -174,6 +170,10 @@ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
  
-+    if (!clock_get(cpu->clock)) {
+     cs->gdb_num_regs = xcc->config->gdb_regmap.num_regs;
+ 
 +#ifndef CONFIG_USER_ONLY
-+        if (!qtest_enabled()) {
-+            g_autofree char *cpu_freq_str = freq_to_str(CPU_FREQ_HZ_DEFAULT);
-+
-+            warn_report("CPU input clock is not connected to any output clock, "
-+                        "using default frequency of %s.", cpu_freq_str);
-+        }
++    xtensa_irq_init(&XTENSA_CPU(dev)->env);
 +#endif
-+        /* Initialize the frequency in case the clock remains unconnected. */
-+        clock_set_hz(cpu->clock, CPU_FREQ_HZ_DEFAULT);
-+    }
-+    mips_cp0_period_set(cpu);
 +
-     mcc->parent_realize(dev, errp);
-     cpu_reset(cs);
+     xcc->parent_realize(dev, errp);
  }
+ 
 -- 
 2.41.0
 
