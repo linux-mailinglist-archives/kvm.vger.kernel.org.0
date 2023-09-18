@@ -2,112 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA2A57A4DD9
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:02:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5FFA7A4BB6
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjIRQCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34774 "EHLO
+        id S236739AbjIRPVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 11:21:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjIRQCK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:02:10 -0400
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F23CE3;
-        Mon, 18 Sep 2023 08:57:06 -0700 (PDT)
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-9ad810be221so613514466b.2;
-        Mon, 18 Sep 2023 08:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695052119; x=1695656919; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1mWBoR8cjvI28Qx4Es7Eis9ldLxd8cY4D2ygIGo/u3s=;
-        b=c8G2x7Ci5mt7AGiSJm0qN4YjvTyeJx2X85tRzmXmjOr3bY0O482AtHwegH7WqeKOMv
-         0vw80EjOye0GUhQOg31H3+GcLu2VS0chgeBmP5B8ygi4zKmy0Z7+9YVM4xGBvBw5nARJ
-         JmuAjAtEQIu8qw2uGca8IRdDFc5wkPVXrIYDK71+vzsnE45imNrfw3Gno6hcciWDEMoP
-         PCgH0Y8XiNrUQmWFJQwkegq7shlYdu0EYuVfJJgrLUbCCjJkEXMKRLoWTUhxbC+EaYw6
-         jIPGlHbWAt9jxGB/qWX8OKyhdKawh4AnBQRAmoKdeMQJJUvQC/3FHnLgd+NtKH6+AlMF
-         UqQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695052119; x=1695656919;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1mWBoR8cjvI28Qx4Es7Eis9ldLxd8cY4D2ygIGo/u3s=;
-        b=wN6KchCrMTnNo0swd9Oox8E3DgdHmVB5WcE6xZDrv+C32rP67YQm3qE2FzVTzPc2/z
-         sZW7dpNyu3EBI3RQUqMVROE/J1huoabnuO8hk7iUP9MzGjooDf5pQuDd+IUzaUpGi2b/
-         9gRAdEVagHpMIec7D8oIUa5LiZxEXHwBUnEPo2bjU+/YlQQ3L3wervDSX8WsCPLej52X
-         Szn5CBNSj0tNsiy4+ZnWck23OzU1HOIECdiO1kBHaroUt+WD6SViSGwV/KqsJKQZ3g7q
-         7XhTuMKvBrWMNPmJPZJGfUcPngqBgtAO4HDBl2hzSfNTA9ssoEMdNI7aUN8S/F0fEUfx
-         0Krw==
-X-Gm-Message-State: AOJu0Yzhsz6Vn/DFcorKvJ1ZhJJoQBKaLKFCbHmY3P4iU0BPCvoWfku7
-        OQ6tOuSu+JekRy5br0G7SUIAUXZQ11QtWBWF
-X-Google-Smtp-Source: AGHT+IE+MgxWvuY/MatkBPDgOvaiawXCow9mDNPiq3/MNjOHjKkFFZSa3jadIZXNHMveQiM+8GJCKA==
-X-Received: by 2002:adf:ed8f:0:b0:317:6e62:b124 with SMTP id c15-20020adfed8f000000b003176e62b124mr6834984wro.18.1695042051780;
-        Mon, 18 Sep 2023 06:00:51 -0700 (PDT)
-Received: from [192.168.7.59] (54-240-197-236.amazon.com. [54.240.197.236])
-        by smtp.gmail.com with ESMTPSA id f2-20020a7bc8c2000000b003fed70fb09dsm12403002wml.26.2023.09.18.06.00.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 06:00:51 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <1b8d4928-fd39-6d8f-e254-bb5e72c740c1@xen.org>
-Date:   Mon, 18 Sep 2023 14:00:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 05/12] KVM: pfncache: allow a cache to be activated
- with a fixed (userspace) HVA
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
+        with ESMTP id S235917AbjIRPVS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 11:21:18 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2064.outbound.protection.outlook.com [40.107.101.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57484CD5;
+        Mon, 18 Sep 2023 08:17:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=coV11WyES7OsY8ZXcsO5ZzBGNrIWbl6bFnx/I1nokXVpNKhpJ9kaFn0BHFhBzpj6ngzWBjbDuDVrWday7zjfcmKCblgq3RsYdBvgef3vEhU864BvUbKv/cWalM8HQKZYHx5g7PAMZuqnrQR833HDJETISScAEROfcIi8SquxVvx3kNMlNybkZ5WfOPbgtEWPb8FojgA/qFKgv88KQSaM/2Af0kLutyEUlKGuodAUVXq7ZI8JMyuyw9raqdJltfCfay7oUdSyH+VSaKN0xvAxRAnxKiR0gSrizNY8TNy/jRRthMz4zt7T4xqtuoTWZcmPAhkRDDBIwtlYDKV9UoZ+RQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zx5uPsFKEQhOAtQGG5/9UiJPBFjc4uh7M8xzHF5h8K8=;
+ b=IdRTed6zkBHrlCHhpVVfOS9AVlaCRg3otENKDLzk+6oVv+UQhmNGkzA/3DH3dCihzaS3EeZSnLlhoZJy0NzkXRKXqoA16ndIktmDQdWm3lSCJBTWh7F64ogJgaxN+QhlZs67cXmQgV0pp/+JP9SgYM579RSE2LE03TLBKl5Rei8bm0pbedZBsIo9IHu4U4smeuOx3wlS9xfJssi3BfyBfbHBUj50OI87i/4yruYzGdVsNH864eD8DboRl9B8dFPoC7lS2RC4JPj48OecFN8Bq+b5Dg0P6wch+cfKKOi36vvq5t2p60FtBjDoDd6FrQ7Ra3szW0aaPIahb2SRD9qi+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zx5uPsFKEQhOAtQGG5/9UiJPBFjc4uh7M8xzHF5h8K8=;
+ b=QTyBfQ3Ul3R6h1RZFE1fb/yrKPnchBRqohipmSZOIrDhg6jEqe0Donzo463MVH99fwbsvBPsmANfmNXI68dnRvNx+qXg4CjcFF5HdLeq4vakmfHig+spxZscGIepzodmFXDZyxUXDDqPhRSAwuZ3rXEvUS0R+zrPOpPpazkLYKxFnWZyxAthyaNH3/MG+COLeLLvQiZfJ8u7xth+JhY6iTVpXLT9KX8P4KvAkw2c03wdGFZ+QF3Eq6NHzcxWsZAp9moy7fQfHROeJUoV2nhaSnJi58Xoj3G+o1GHRIJjwFGnxeXwOzRseNA9hahrdZ+D8jLdJXf9AB8tS96WoMIa1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA0PR12MB7604.namprd12.prod.outlook.com (2603:10b6:208:438::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Mon, 18 Sep
+ 2023 13:02:57 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Mon, 18 Sep 2023
+ 13:02:57 +0000
+Date:   Mon, 18 Sep 2023 10:02:56 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     ankita@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+        apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+        anuaggarwal@nvidia.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230918112148.28855-1-paul@xen.org>
- <20230918112148.28855-6-paul@xen.org>
- <e4ac95d3370b997c17ce6924425d693a7e856c7e.camel@infradead.org>
- <3cf7adca-aa69-4ac8-ca92-f10b1bd2e163@xen.org>
- <6ecf8daee684536ee2aa2b9b47f7926a05b5e664.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <6ecf8daee684536ee2aa2b9b47f7926a05b5e664.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v10 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230918130256.GE13733@nvidia.com>
+References: <20230915025415.6762-1-ankita@nvidia.com>
+ <20230915082430.11096aa3.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915082430.11096aa3.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR05CA0056.namprd05.prod.outlook.com
+ (2603:10b6:208:236::25) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7604:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9b0e115-9019-4a2b-8250-08dbb847940a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6WPUQQWxob5TpOEQE0tnWNG7iFpRQaIjuYtqf9afsvzyZ/lrZCG+Rqn2KiZlc0L+zmmPi01K3WsNb1uiU3HhxcIJXoCopMK8F3ls8MHGANHFnmE+Gau/PDihnQpet4I5CgH0qbEvv4lTL3Ajxm+8oKM7ptUYivavaHk4Iq6pBCnH5/IEiMOv3zT4kuaTJ/oRJExOoGdUL6ZvjzkeRRHCB1YltSgsqctZMG/ILNd/mpIzpJqbt2s9oXhJj6G7M+qVvgpTbCXrkaa979fMpBX05B+6/F+RSpbLtT2onXHO6mCQsCWq7pBVLpTTaEXVp14IoeeFiXrYPw/kayN9FgPleUBQpEmUbY95kM5V216x6Sni/kqkjToki7IcpCBPgWV1U/Y54UejiR02spS55KYJSG0MFLHeX2cUyu614Oj/Dcf9YBLqVl9P05IxkL5RytKN71QlJw/r60DIzhL2OaXow9gGR/9N2xThw0lBaqt8uBhCS16LMKAmImodS7XkrhOCehUkFi9kKJaCnYa9v5GPPkloFVnfLLdBBXIg8odP0OHF5b3YxzE9153kA8u3gLXC
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(39860400002)(376002)(366004)(451199024)(186009)(1800799009)(6506007)(6486002)(6512007)(478600001)(83380400001)(26005)(2616005)(1076003)(2906002)(4326008)(66946007)(66556008)(66476007)(316002)(6916009)(8676002)(5660300002)(8936002)(41300700001)(36756003)(86362001)(33656002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oFl+ErWOWJSF/nm+C06pF5kZsIsnmlYMxvuqOFkRGyJElFNjP2D1gIEblDjZ?=
+ =?us-ascii?Q?aDqFBq/8sh90Xo5DDPqLKcZV0xiIfuQ4AgialVUQgu7RT7l3zs97oWr/vL2/?=
+ =?us-ascii?Q?uhg1VATcNp29S0fAkyua+e1ooY2beCcg/d+X4EzWZtnX+7YEPsSJdqT7oA0V?=
+ =?us-ascii?Q?66dJm77YwnByupvPVhbK1Or2mateGKLIXpJYdeuiIWzbPEOpkFSdCqB+JLVv?=
+ =?us-ascii?Q?MG7GwKL8qzYAqvLaLMr3d3HC/u8Fs0a9Bp3khSV1JGGonu1rO7wXWY9KDLa5?=
+ =?us-ascii?Q?IpeMj0nYDhH3/RP1HIgC4HZ+1jrakey4Ya/WDxCp6ch4G8PUi5JW1pXyQL3L?=
+ =?us-ascii?Q?xq65SkbVw0HPX1lf5FDxNeerPwarjEuUzdvTr+oVRjpuaFjQArUK/nzikpjc?=
+ =?us-ascii?Q?bOZeLA2N2Tr/wk0Vuf6DkvfmCSHB3hGxGTgToi+HiICIvBz0VzdiE2UmFyCX?=
+ =?us-ascii?Q?6Xe0EP7Y/8fgLn+yukd8DwVMmlJblBWxZySFI+KbqhkNWTUqRt8/wjvrMFtX?=
+ =?us-ascii?Q?Tw59C6T1NZgkbbjAIONFsobK6TILuTReUgFnrwzTESCsWkUJx19xiyG6ZV88?=
+ =?us-ascii?Q?bqaS2AShqgWhW9Fev3STD0BdsV3lmnOCm73mufHJSYY4QDItrxiVQWGYsZ+i?=
+ =?us-ascii?Q?SDmWyOaHHqIma2mX4fsMWB2wEAonUT9ofjY3gP24plr+ddEMX4PkpF2ubCIl?=
+ =?us-ascii?Q?ombBLwR+VZcmgkNuUunghUA7F5cBBXNQAWCvaxGfTwusKLqZVsRkMBWM8GU+?=
+ =?us-ascii?Q?mZxN9H6txsSqe84FTxCedjvVARY7OaDzBxKAxzYOUvZUBdWUtrfc4jhl2f3P?=
+ =?us-ascii?Q?jgfXKOHW8tVI2VAUTcPDWuBiekOwyP/jMIAkdzGVBDr+xJ5K6i+UdlrbQWWF?=
+ =?us-ascii?Q?1NuCUvE2Z1z2OVuYjq0ddF3hYMa9UefAHc9RIzWJJt4y+9WIWOpGrfO9UBiZ?=
+ =?us-ascii?Q?sWyJS27Ru8Sqb21NmiqZj6yvRW7p0wzNS2NSVFyiDOBGT4BH8tcjtauCdgsn?=
+ =?us-ascii?Q?p1tLv6EuFFj/Vusjjc56RZHUHGb6zvnHR2V4jCv4+IjYwafacbkhKjGbT6st?=
+ =?us-ascii?Q?U167ctBBrN2j6LRisMCQFmpGB2ZFpRW8fscbRLRTk9wx8OVQk+yz2OncK3cd?=
+ =?us-ascii?Q?AtpPq3j7l99cmloEQ8aoqZFJVZhxuvDfPdgmP+rSrnaMyYfRiRhHHlUo7rCE?=
+ =?us-ascii?Q?ikIVE/r/AfNqTNuSSTcQDeBrfUqLmzngmOUMn8TCujMZvqn86VNYxvpJeRkW?=
+ =?us-ascii?Q?tlpLZ4+zkgxsAKltdJYQ6LcHpCJWN2FvxmcrK+ElwETQrqSd0t87EvMrMdQh?=
+ =?us-ascii?Q?HjUnjlrMCjjLccalRCgdI6xmnQNhn3mtFFlSqaoQr9Ed0FYtf+miZGo+8IQS?=
+ =?us-ascii?Q?ODMC/T4w69tSGn0eBzbfTPHCWKDr9PaDEpOVjHYkFjCUrQZ/AZMTFqeknTzE?=
+ =?us-ascii?Q?dtoFVJ8q9Sy4Dwb3abs7J4ndQibw9Lcor6iJ2tOwVtt+wifk99N0hp/e2HFW?=
+ =?us-ascii?Q?67WN2Cb1LQPDtRdkKtrwwdBFwK/0oPAilYku3laX7emSpTJHh/VcjMMWeCXS?=
+ =?us-ascii?Q?OjmvQBZl2F76OxAZlyU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9b0e115-9019-4a2b-8250-08dbb847940a
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2023 13:02:57.1024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8b8khOcunp91Up2GrqMwUdu2CSHili1w6nfQjsEiAMlfpuaKr9SSrARynDOs0SIX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7604
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/09/2023 13:59, David Woodhouse wrote:
-> On Mon, 2023-09-18 at 13:11 +0100, Paul Durrant wrote:
->> On 18/09/2023 12:34, David Woodhouse wrote:
->>> On Mon, 2023-09-18 at 11:21 +0000, Paul Durrant wrote:
->>>> From: Paul Durrant <pdurrant@amazon.com>
->>>>
->>>> Some cached pages may actually be overlays on guest memory that have a
->>>> fixed HVA within the VMM. It's pointless to invalidate such cached
->>>> mappings if the overlay is moved so allow a cache to be activated directly
->>>> with the HVA to cater for such cases. A subsequent patch will make use
->>>> of this facility.
->>>>
->>>> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
->>>
->>> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
->>>
->>> Btw, I think you have falsified some Reviewed-by: tags on the rest of
->>> the series. Remember, if they aren't literally cut and pasted, the
->>> magic gets lost. Just the same as Signed-off-by: tags. Never type them
->>> for someone else.
->>
->> Indeed. They were all copied and pasted.
+On Fri, Sep 15, 2023 at 08:24:30AM -0600, Alex Williamson wrote:
+> On Thu, 14 Sep 2023 19:54:15 -0700
+> <ankita@nvidia.com> wrote:
 > 
-> I'm prepared to believe my fingers betrayed me and autocompleted
-> @infradead.org for one or two of them when I meant to use the @amazon
-> address, but surely not *all* of them that I reviewed last time round?
+> > From: Ankit Agrawal <ankita@nvidia.com>
+> > 
+> > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+> > for the on-chip GPU that is the logical OS representation of the
+> > internal proprietary cache coherent interconnect.
+> > 
+> > This representation has a number of limitations compared to a real PCI
+> > device, in particular, it does not model the coherent GPU memory
+> > aperture as a PCI config space BAR, and PCI doesn't know anything
+> > about cacheable memory types.
+> > 
+> > Provide a VFIO PCI variant driver that adapts the unique PCI
+> > representation into a more standard PCI representation facing
+> > userspace. The GPU memory aperture is obtained from ACPI using
+> > device_property_read_u64(), according to the FW specification,
+> > and exported to userspace as a separate VFIO_REGION. Since the device
+> > implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
+> > to the next available PCI BAR (BAR2). Qemu will then naturally generate a
+> > PCI device in the VM with two 64-bit BARs (where the cacheable aperture
+> > reported in BAR2).
+> > 
+> > Since this memory region is actually cache coherent with the CPU, the
+> > VFIO variant driver will mmap it into VMA using a cacheable mapping. The
+> > mapping is done using remap_pfn_range().
+> > 
+> > PCI BAR are aligned to the power-of-2, but the actual memory on the
+> > device may not. A read or write access to the physical address from the
+> > last device PFN up to the next power-of-2 aligned physical address
+> > results in reading ~0 and dropped writes.
+> > 
+> > Lastly the presence of CPU cache coherent device memory is exposed
+> > through sysfs for use by user space.
 > 
+> This looks like a giant red flag that this approach of masquerading the
+> coherent memory as a PCI BAR is the wrong way to go.  If the VMM needs
+> to know about this coherent memory, it needs to get that information
+> in-band. 
 
-Hmm. I guess I must have cut'n'pasted from the wrong place then. I'll be 
-more careful.
+The VMM part doesn't need this flag, nor does the VM. The
+orchestration needs to know when to setup the pxm stuff.
 
-   Paul
+I think we should drop the sysfs for now until the qemu thread about
+the pxm stuff settles into an idea.
 
+When the qemu API is clear we can have a discussion on what component
+should detect this driver and setup the pxm things, then answer the
+how should the detection work from the kernel side.
+
+> be reaching out to arbitrary sysfs attributes.  Minimally this
+> information should be provided via a capability on the region info
+> chain, 
+
+That definitely isn't suitable, eg libvirt won't have access to inband
+information if it turns out libvirt is supposed to setup the pxm qemu
+arguments?
+
+> A "coherent_mem" attribute on the device provides a very weak
+> association to the memory region it's trying to describe.
+
+That's because it's use has nothing to do with the memory region :)
+
+Jason
