@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19E517A4848
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:23:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B49947A484D
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:23:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241635AbjIRLWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:22:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39348 "EHLO
+        id S241663AbjIRLW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:22:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241273AbjIRLWX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:22:23 -0400
+        with ESMTP id S241350AbjIRLW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 07:22:26 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B32EA;
-        Mon, 18 Sep 2023 04:22:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFAFED2;
+        Mon, 18 Sep 2023 04:22:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=nnpKeQBtwPjvxTHgphDfzLGtTBiI7BDIYpA6sLVmgdE=; b=THet80rIIYQMVilXQm5fY8Nnhc
-        uCE0gCwFKfGgwjOWP8GlVOS+mUOUER0lKftGSZEGibSe5MT8zzTqkpz9JW2q6R6XJwxEaG11QMim5
-        pVuvFbiMduxcCwztztsPg9X+tixdLYVrcxHQT5drWoMJk8ZTmnmwFrI5Oc76DaiL+vNY=;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
+        In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+        bh=NjU5Cy4jYQ61luXdEkL5wcGtwr03KyAKhtQAIMcDJIc=; b=hxW2QigAROXOCTm1nHmbOL+hT0
+        atNw1DtdxjHChb+dx/VONcCcIE8xR8M0OzLWX81J+3aOS1QPbya1Z6Xj5ViHHiaswx5cbXilIV6YM
+        boKMK3pXYphxsOBxTy0qrp3xuZWkV5gjkRlQNpkE/KsXsC5QeGa1O5flz2P0Anv5DDAY=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiCKT-00072G-Tk; Mon, 18 Sep 2023 11:22:13 +0000
+        id 1qiCKV-00072P-Cj; Mon, 18 Sep 2023 11:22:15 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiCKT-0005f3-Kd; Mon, 18 Sep 2023 11:22:13 +0000
+        id 1qiCKV-0005f3-5E; Mon, 18 Sep 2023 11:22:15 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
@@ -39,14 +39,13 @@ Cc:     Paul Durrant <pdurrant@amazon.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Subject: [PATCH v2 06/12] KVM: xen: allow shared_info to be mapped by fixed HVA
-Date:   Mon, 18 Sep 2023 11:21:42 +0000
-Message-Id: <20230918112148.28855-7-paul@xen.org>
+Subject: [PATCH v2 07/12] KVM: xen: prepare for using 'default' vcpu_info
+Date:   Mon, 18 Sep 2023 11:21:43 +0000
+Message-Id: <20230918112148.28855-8-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230918112148.28855-1-paul@xen.org>
 References: <20230918112148.28855-1-paul@xen.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
@@ -59,22 +58,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-The shared_info page is not guest memory as such. It is a dedicated page
-allocated by the VMM and overlaid onto guest memory in a GFN chosen by the
-guest. The guest may even request that shared_info be moved from one GFN
-to another, but the HVA is never going to change. Thus it makes much more
-sense to map the shared_info page in kernel once using this fixed HVA.
-Hence add a new KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA attribute type for this
-purpose and a KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA flag to advertize its
-availability. Don't actually advertize it yet though. That will be done in
-a subsequent patch, which will also add tests for the new attribute type.
+The shared_info page contains an array of 32 vcpu_info structures
+which may be used by guests (with fewer than 32 vCPUs) if they don't
+explicitly register vcpu_info structures in their own memory, using
+a VCPUOP_register_vcpu_info hypercall.
+Currently we rely on the VMM always registering vcpu_info structures,
+even if the guest doesn't make that hypercall, which is somewhat
+bogus as (as has been stated in the comment of a previous commit)
+the shared_info page is not guest memory.
+Prepare to automatically use the vcpu_info info embedded in shared_info
+by default, by adding a get_vcpu_info_cache() helper function. This
+function also passes back an offset to be added to the cached khva.
+This is currently always zero since we're still relying on the
+current VMM behaviour. A subsequent patch will make proper use of
+it.
 
-Also update the KVM API documentation with the new attribute and also fix
-it up to consistently refer to 'shared_info' (with the underscore).
+No functional change intended.
 
-NOTE: The change of the kvm_xen_hvm_attr shared_info from struct to union
-      is technically an ABI change but it's entirely compatible with
-      existing users.
+NOTE: To avoid leaking detail of the vcpu_info duality into the main
+      x86 code, a kvm_xen_guest_time_update() has also been added
+      and use of this requires that kvm_setup_guest_pvclock() ceases
+      to be a static function.
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 Reviewed-by: David Woodhouse <dwmw2@infradead.org>
@@ -89,191 +93,227 @@ Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: x86@kernel.org
 
 v2:
- - Define the new attribute and capability but don't advertize the
-   capability yet.
- - Add API documentation.
+ - Fix build warning.
 ---
- Documentation/virt/kvm/api.rst | 25 +++++++++++++++++++------
- arch/x86/kvm/xen.c             | 28 ++++++++++++++++++++++------
- include/uapi/linux/kvm.h       |  6 +++++-
- 3 files changed, 46 insertions(+), 13 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  4 +++
+ arch/x86/kvm/x86.c              | 12 +++-----
+ arch/x86/kvm/xen.c              | 50 ++++++++++++++++++++++++++-------
+ arch/x86/kvm/xen.h              |  6 +++-
+ 4 files changed, 53 insertions(+), 19 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 21a7578142a1..e9df4df6fe48 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -353,7 +353,7 @@ The bits in the dirty bitmap are cleared before the ioctl returns, unless
- KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is enabled.  For more information,
- see the description of the capability.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1a4def36d5bb..6d896f9161c2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2238,4 +2238,8 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+  */
+ #define KVM_EXIT_HYPERCALL_MBZ		GENMASK_ULL(31, 1)
  
--Note that the Xen shared info page, if configured, shall always be assumed
-+Note that the Xen shared_info page, if configured, shall always be assumed
- to be dirty. KVM will not explicitly mark it such.
- 
- 
-@@ -5408,8 +5408,9 @@ KVM_PV_ASYNC_CLEANUP_PERFORM
- 		__u8 long_mode;
- 		__u8 vector;
- 		__u8 runstate_update_flag;
--		struct {
-+		union {
- 			__u64 gfn;
-+			__u64 hva;
- 		} shared_info;
- 		struct {
- 			__u32 send_port;
-@@ -5437,10 +5438,10 @@ type values:
- 
- KVM_XEN_ATTR_TYPE_LONG_MODE
-   Sets the ABI mode of the VM to 32-bit or 64-bit (long mode). This
--  determines the layout of the shared info pages exposed to the VM.
-+  determines the layout of the shared_info page exposed to the VM.
- 
- KVM_XEN_ATTR_TYPE_SHARED_INFO
--  Sets the guest physical frame number at which the Xen "shared info"
-+  Sets the guest physical frame number at which the Xen shared_info
-   page resides. Note that although Xen places vcpu_info for the first
-   32 vCPUs in the shared_info page, KVM does not automatically do so
-   and instead requires that KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO be used
-@@ -5449,7 +5450,7 @@ KVM_XEN_ATTR_TYPE_SHARED_INFO
-   not be aware of the Xen CPU id which is used as the index into the
-   vcpu_info[] array, so may know the correct default location.
- 
--  Note that the shared info page may be constantly written to by KVM;
-+  Note that the shared_info page may be constantly written to by KVM;
-   it contains the event channel bitmap used to deliver interrupts to
-   a Xen guest, amongst other things. It is exempt from dirty tracking
-   mechanisms — KVM will not explicitly mark the page as dirty each
-@@ -5458,9 +5459,21 @@ KVM_XEN_ATTR_TYPE_SHARED_INFO
-   any vCPU has been running or any event channel interrupts can be
-   routed to the guest.
- 
--  Setting the gfn to KVM_XEN_INVALID_GFN will disable the shared info
-+  Setting the gfn to KVM_XEN_INVALID_GFN will disable the shared_info
-   page.
- 
-+KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA
-+  If the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA flag is also set in the
-+  Xen capabilities, then this attribute may be used to set the
-+  userspace address at which the shared_info page resides, which
-+  will always be fixed in the VMM regardless of where it is mapped
-+  in guest physical address space. This attribute should be used in
-+  preference to KVM_XEN_ATTR_TYPE_SHARED_INFO as it avoids
-+  unnecessary invalidation of an internal cache when the page is
-+  re-mapped in guest physcial address space.
++void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
++			     struct gfn_to_pfn_cache *gpc,
++			     unsigned int offset);
 +
-+  Setting the hva to zero will disable the shared_info page.
-+
- KVM_XEN_ATTR_TYPE_UPCALL_VECTOR
-   Sets the exception vector used to deliver Xen event channel upcalls.
-   This is the HVM-wide vector injected directly by the hypervisor
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d669a8801265..2d7d0ae18820 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3094,9 +3094,9 @@ u64 get_kvmclock_ns(struct kvm *kvm)
+ 	return data.clock;
+ }
+ 
+-static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+-				    struct gfn_to_pfn_cache *gpc,
+-				    unsigned int offset)
++void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
++			     struct gfn_to_pfn_cache *gpc,
++			     unsigned int offset)
+ {
+ 	struct kvm_vcpu_arch *vcpu = &v->arch;
+ 	struct pvclock_vcpu_time_info *guest_hv_clock;
+@@ -3232,11 +3232,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 
+ 	if (vcpu->pv_time.active)
+ 		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0);
+-	if (vcpu->xen.vcpu_info_cache.active)
+-		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
+-					offsetof(struct compat_vcpu_info, time));
+-	if (vcpu->xen.vcpu_time_info_cache.active)
+-		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
++	kvm_xen_guest_time_update(v);
+ 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+ 	return 0;
+ }
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 8e6fdcd7bb6e..1abb4547642a 100644
+index 1abb4547642a..7fc4fc2e54d8 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -34,24 +34,27 @@ static bool kvm_xen_hcall_evtchn_send(struct kvm_vcpu *vcpu, u64 param, u64 *r);
+@@ -489,6 +489,29 @@ static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+ 	WARN_ON_ONCE(!kvm_irq_delivery_to_apic_fast(v->kvm, NULL, &irq, &r, NULL));
+ }
  
- DEFINE_STATIC_KEY_DEFERRED_FALSE(kvm_xen_enabled, HZ);
- 
--static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
-+static int kvm_xen_shared_info_init(struct kvm *kvm, u64 addr, bool addr_is_gfn)
++static struct gfn_to_pfn_cache *get_vcpu_info_cache(struct kvm_vcpu *v, unsigned long *offset)
++{
++	if (offset)
++		*offset = 0;
++
++	return &v->arch.xen.vcpu_info_cache;
++}
++
++void kvm_xen_guest_time_update(struct kvm_vcpu *v)
++{
++	unsigned long offset;
++	struct gfn_to_pfn_cache *gpc = get_vcpu_info_cache(v, &offset);
++
++	BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
++		     offsetof(struct compat_vcpu_info, time));
++
++	if (gpc->active)
++		kvm_setup_guest_pvclock(v, gpc, offset + offsetof(struct compat_vcpu_info, time));
++
++	if (v->arch.xen.vcpu_time_info_cache.active)
++		kvm_setup_guest_pvclock(v, &v->arch.xen.vcpu_time_info_cache, 0);
++}
++
+ /*
+  * On event channel delivery, the vcpu_info may not have been accessible.
+  * In that case, there are bits in vcpu->arch.xen.evtchn_pending_sel which
+@@ -499,7 +522,8 @@ static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
+ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
  {
- 	struct gfn_to_pfn_cache *gpc = &kvm->arch.xen.shinfo_cache;
- 	struct pvclock_wall_clock *wc;
--	gpa_t gpa = gfn_to_gpa(gfn);
- 	u32 *wc_sec_hi;
- 	u32 wc_version;
- 	u64 wall_nsec;
- 	int ret = 0;
- 	int idx = srcu_read_lock(&kvm->srcu);
+ 	unsigned long evtchn_pending_sel = READ_ONCE(v->arch.xen.evtchn_pending_sel);
+-	struct gfn_to_pfn_cache *gpc = &v->arch.xen.vcpu_info_cache;
++	unsigned long offset;
++	struct gfn_to_pfn_cache *gpc = get_vcpu_info_cache(v, &offset);
+ 	unsigned long flags;
  
--	if (gfn == KVM_XEN_INVALID_GFN) {
-+	if ((addr_is_gfn && addr == KVM_XEN_INVALID_GFN) ||
-+	    (!addr_is_gfn && addr == 0)) {
- 		kvm_gpc_deactivate(gpc);
- 		goto out;
+ 	if (!evtchn_pending_sel)
+@@ -522,7 +546,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 
+ 	/* Now gpc->khva is a valid kernel address for the vcpu_info */
+ 	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode) {
+-		struct vcpu_info *vi = gpc->khva;
++		struct vcpu_info *vi = gpc->khva + offset;
+ 
+ 		asm volatile(LOCK_PREFIX "orq %0, %1\n"
+ 			     "notq %0\n"
+@@ -534,7 +558,7 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 		WRITE_ONCE(vi->evtchn_upcall_pending, 1);
+ 	} else {
+ 		u32 evtchn_pending_sel32 = evtchn_pending_sel;
+-		struct compat_vcpu_info *vi = gpc->khva;
++		struct compat_vcpu_info *vi = gpc->khva + offset;
+ 
+ 		asm volatile(LOCK_PREFIX "orl %0, %1\n"
+ 			     "notl %0\n"
+@@ -556,7 +580,8 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ {
+-	struct gfn_to_pfn_cache *gpc = &v->arch.xen.vcpu_info_cache;
++	unsigned long offset;
++	struct gfn_to_pfn_cache *gpc = get_vcpu_info_cache(v, &offset);
+ 	unsigned long flags;
+ 	u8 rc = 0;
+ 
+@@ -598,7 +623,7 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 		read_lock_irqsave(&gpc->lock, flags);
  	}
  
- 	do {
--		ret = kvm_gpc_activate(gpc, gpa, PAGE_SIZE);
-+		if (addr_is_gfn)
-+			ret = kvm_gpc_activate(gpc, gfn_to_gpa(addr), PAGE_SIZE);
-+		else
-+			ret = kvm_gpc_activate_hva(gpc, addr, PAGE_SIZE);
- 		if (ret)
- 			goto out;
- 
-@@ -604,7 +607,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+-	rc = ((struct vcpu_info *)gpc->khva)->evtchn_upcall_pending;
++	rc = ((struct vcpu_info *)(gpc->khva + offset))->evtchn_upcall_pending;
+ 	read_unlock_irqrestore(&gpc->lock, flags);
+ 	return rc;
+ }
+@@ -1567,7 +1592,7 @@ static void kvm_xen_check_poller(struct kvm_vcpu *vcpu, int port)
+  */
+ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
  {
- 	int r = -ENOENT;
+-	struct gfn_to_pfn_cache *gpc = &kvm->arch.xen.shinfo_cache;
++	struct gfn_to_pfn_cache *gpc;
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long *pending_bits, *mask_bits;
+ 	unsigned long flags;
+@@ -1585,7 +1610,8 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 		WRITE_ONCE(xe->vcpu_idx, vcpu->vcpu_idx);
+ 	}
  
--
- 	switch (data->type) {
- 	case KVM_XEN_ATTR_TYPE_LONG_MODE:
- 		if (!IS_ENABLED(CONFIG_64BIT) && data->u.long_mode) {
-@@ -619,7 +621,13 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+-	if (!vcpu->arch.xen.vcpu_info_cache.active)
++	gpc = get_vcpu_info_cache(vcpu, NULL);
++	if (!gpc->active)
+ 		return -EINVAL;
  
- 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
- 		mutex_lock(&kvm->arch.xen.xen_lock);
--		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
-+		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn, true);
-+		mutex_unlock(&kvm->arch.xen.xen_lock);
-+		break;
+ 	if (xe->port >= max_evtchn_port(kvm))
+@@ -1594,6 +1620,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 	rc = -EWOULDBLOCK;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
++	gpc = &kvm->arch.xen.shinfo_cache;
+ 
+ 	read_lock_irqsave(&gpc->lock, flags);
+ 	if (!kvm_gpc_check(gpc, PAGE_SIZE))
+@@ -1624,10 +1651,13 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 		rc = -ENOTCONN; /* Masked */
+ 		kvm_xen_check_poller(vcpu, xe->port);
+ 	} else {
++		unsigned long offset;
 +
-+	case KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA:
-+		mutex_lock(&kvm->arch.xen.xen_lock);
-+		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.hva, false);
- 		mutex_unlock(&kvm->arch.xen.xen_lock);
- 		break;
- 
-@@ -684,6 +692,14 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		r = 0;
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA:
-+		if (kvm->arch.xen.shinfo_cache.active)
-+			data->u.shared_info.hva = kvm_gpc_hva(&kvm->arch.xen.shinfo_cache);
-+		else
-+			data->u.shared_info.hva = 0;
-+		r = 0;
-+		break;
+ 		rc = 1; /* Delivered to the bitmap in shared_info. */
 +
- 	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
- 		data->u.vector = kvm->arch.xen.upcall_vector;
- 		r = 0;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 13065dd96132..062bfa14b4d9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1282,6 +1282,7 @@ struct kvm_x86_mce {
- #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
- #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
- #define KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG	(1 << 6)
-+#define KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA	(1 << 7)
+ 		/* Now switch to the vCPU's vcpu_info to set the index and pending_sel */
+ 		read_unlock_irqrestore(&gpc->lock, flags);
+-		gpc = &vcpu->arch.xen.vcpu_info_cache;
++		gpc = get_vcpu_info_cache(vcpu, &offset);
  
- struct kvm_xen_hvm_config {
- 	__u32 flags;
-@@ -1793,9 +1794,10 @@ struct kvm_xen_hvm_attr {
- 		__u8 long_mode;
- 		__u8 vector;
- 		__u8 runstate_update_flag;
--		struct {
-+		union {
- 			__u64 gfn;
- #define KVM_XEN_INVALID_GFN ((__u64)-1)
-+			__u64 hva;
- 		} shared_info;
- 		struct {
- 			__u32 send_port;
-@@ -1837,6 +1839,8 @@ struct kvm_xen_hvm_attr {
- #define KVM_XEN_ATTR_TYPE_XEN_VERSION		0x4
- /* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG */
- #define KVM_XEN_ATTR_TYPE_RUNSTATE_UPDATE_FLAG	0x5
-+/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA */
-+#define KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA	0x6
+ 		read_lock_irqsave(&gpc->lock, flags);
+ 		if (!kvm_gpc_check(gpc, sizeof(struct vcpu_info))) {
+@@ -1641,13 +1671,13 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 		}
  
- /* Per-vCPU Xen attributes */
- #define KVM_XEN_VCPU_GET_ATTR	_IOWR(KVMIO, 0xca, struct kvm_xen_vcpu_attr)
+ 		if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode) {
+-			struct vcpu_info *vcpu_info = gpc->khva;
++			struct vcpu_info *vcpu_info = gpc->khva + offset;
+ 			if (!test_and_set_bit(port_word_bit, &vcpu_info->evtchn_pending_sel)) {
+ 				WRITE_ONCE(vcpu_info->evtchn_upcall_pending, 1);
+ 				kick_vcpu = true;
+ 			}
+ 		} else {
+-			struct compat_vcpu_info *vcpu_info = gpc->khva;
++			struct compat_vcpu_info *vcpu_info = gpc->khva + offset;
+ 			if (!test_and_set_bit(port_word_bit,
+ 					      (unsigned long *)&vcpu_info->evtchn_pending_sel)) {
+ 				WRITE_ONCE(vcpu_info->evtchn_upcall_pending, 1);
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index f8f1fe22d090..c4d29ccbc3ab 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -16,6 +16,7 @@
+ 
+ extern struct static_key_false_deferred kvm_xen_enabled;
+ 
++void kvm_xen_guest_time_update(struct kvm_vcpu *vcpu);
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
+ void kvm_xen_inject_pending_events(struct kvm_vcpu *vcpu);
+ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data);
+@@ -52,7 +53,6 @@ static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
+ static inline int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_xen_enabled.key) &&
+-	    vcpu->arch.xen.vcpu_info_cache.active &&
+ 	    vcpu->kvm->arch.xen.upcall_vector)
+ 		return __kvm_xen_has_interrupt(vcpu);
+ 
+@@ -80,6 +80,10 @@ static inline int kvm_xen_has_pending_timer(struct kvm_vcpu *vcpu)
+ 
+ void kvm_xen_inject_timer_irqs(struct kvm_vcpu *vcpu);
+ #else
++static inline void kvm_xen_guest_time_update(struct kvm_vcpu *vcpu)
++{
++}
++
+ static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+ {
+ 	return 1;
 -- 
 2.39.2
 
