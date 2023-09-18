@@ -2,159 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51E9C7A4835
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A63BC7A483F
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239847AbjIRLTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50446 "EHLO
+        id S241446AbjIRLWp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241638AbjIRLTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:19:38 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6C694;
-        Mon, 18 Sep 2023 04:19:31 -0700 (PDT)
-Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id F38DE6607181;
-        Mon, 18 Sep 2023 12:19:29 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1695035970;
-        bh=hgnk48RgG+7cwbqcRVLD9sBkHSjtoXbVw0Wf/m2TIho=;
-        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-        b=Hg2rvjWDbAtt9zyN/6VUG9k4ys3RaaAGEoyLFGIezgW+Uos5TX8wEmjQ6ecZAbq7l
-         XBoaIVFRHfXyJJH+PG9upVQG+pKyXj+4+VZRFq+AUE8o9wa80TNtkMHEtmLG1hQdS3
-         lPimLpF4Aqc06t+CnwguDX3nJVz/TnemE+oSluae5+OANtdnqVhhNDj+O8x8QMsucn
-         lqknbR2nO/mTE/7YEUrzpirP61UUywYq600UE+DdosRs/pTtqGS/LbBlavecnYa8bn
-         d6lSQYdURwN+dxkWyYSShW0KEFnr/IyeYGSRRA9CxqFnJlylocRHY2lPkS7tt92XxG
-         jXM1+rczch0OA==
-Message-ID: <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
-Date:   Mon, 18 Sep 2023 14:19:27 +0300
+        with ESMTP id S240032AbjIRLWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 07:22:20 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF95DD2;
+        Mon, 18 Sep 2023 04:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+        Subject:Cc:To:From; bh=5CL3lRMr4h6Yv7jfUDZjcA0xe9rzs8HRb/2DF4BY+Bw=; b=rrwgy0
+        zX5njfIIzptNSykTDm/XipxW4f53oyBgxFwpc+M/NXcJjHiA8U598P2vi/NEF+DZgxsyaEYSVAmCC
+        Ey858ual9StvcYPbjcjV+NNngyeQVho2eSeGA2jcaQgXzvUxklm5VZAaDGHgzvtyLfAEI5mVEJmrq
+        k0CcZcNhGNs=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qiCKM-00071n-QP; Mon, 18 Sep 2023 11:22:06 +0000
+Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qiCKM-0005f3-GB; Mon, 18 Sep 2023 11:22:06 +0000
+From:   Paul Durrant <paul@xen.org>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
+Subject: [PATCH v2 00/12] KVM: xen: update shared_info and vcpu_info handling
+Date:   Mon, 18 Sep 2023 11:21:36 +0000
+Message-Id: <20230918112148.28855-1-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-Content-Language: en-US
-From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
-To:     David Stevens <stevensd@chromium.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230911021637.1941096-1-stevensd@google.com>
- <20230911021637.1941096-7-stevensd@google.com>
- <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
-In-Reply-To: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/18/23 12:58, Dmitry Osipenko wrote:
-> On 9/11/23 05:16, David Stevens wrote:
->> From: David Stevens <stevensd@chromium.org>
->>
->> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
->> to map memory into the guest that is backed by non-refcounted struct
->> pages - for example, the tail pages of higher order non-compound pages
->> allocated by the amdgpu driver via ttm_pool_alloc_page.
->>
->> The bulk of this change is tracking the is_refcounted_page flag so that
->> non-refcounted pages don't trigger page_count() == 0 warnings. This is
->> done by storing the flag in an unused bit in the sptes. There are no
->> bits available in PAE SPTEs, so non-refcounted pages can only be handled
->> on TDP and x86-64.
->>
->> Signed-off-by: David Stevens <stevensd@chromium.org>
->> ---
->>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->>  arch/x86/kvm/mmu/spte.c         |  4 ++-
->>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->>  include/linux/kvm_host.h        |  3 ++
->>  virt/kvm/kvm_main.c             |  6 ++--
->>  8 files changed, 76 insertions(+), 32 deletions(-)
-> 
-> Could you please tell which kernel tree you used for the base of this
-> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
-> 
-> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
-> error: could not build fake ancestor
+From: Paul Durrant <pdurrant@amazon.com>
 
-I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
+Currently we treat the shared_info page as guest memory and the VMM informs
+KVM of its location using a GFN. However it is not guest memory as such;
+it's an overlay page. So we pointlessly invalidate and re-cache a mapping
+to the *same page* of memory every time the guest requests that shared_info
+be mapped into its address space. Let's avoid doing that by modifying the
+pfncache code to allow activation using a fixed userspace HVA as well as
+a GPA.
 
-   BUG: kernel NULL pointer dereference, address: 0000000000000058
-   #PF: supervisor read access in kernel mode
-   #PF: error_code(0x0000) - not-present page
-   PGD 0 P4D 0 
-   Oops: 0000 [#1] PREEMPT SMP
-   CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
-   Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
-   RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
-   Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
-   RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
-   RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
-   RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
-   RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
-   R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
-   R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
-   FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
-   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-   CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
-   PKRU: 55555554
-   Call Trace:
-    <TASK>
-    ? __die+0x1f/0x60
-    ? page_fault_oops+0x14d/0x420
-    ? exc_page_fault+0x3d7/0x880
-    ? lock_acquire+0xc9/0x290
-    ? asm_exc_page_fault+0x22/0x30
-    ? gen8_ppgtt_insert+0x50b/0x8f0
-    ppgtt_bind_vma+0x4f/0x60
-    fence_work+0x1b/0x70
-    fence_notify+0x8f/0x130
-    __i915_sw_fence_complete+0x58/0x230
-    i915_vma_pin_ww+0x513/0xa80
-    eb_validate_vmas+0x17e/0x9e0
-    ? eb_pin_engine+0x2bb/0x340
-    i915_gem_do_execbuffer+0xc85/0x2bf0
-    ? __lock_acquire+0x3b6/0x21c0
-    i915_gem_execbuffer2_ioctl+0xee/0x240
-    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
-    drm_ioctl_kernel+0x9d/0x140
-    drm_ioctl+0x1dd/0x410
-    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
-    ? __fget_files+0xc5/0x170
-    __x64_sys_ioctl+0x8c/0xc0
-    do_syscall_64+0x34/0x80
-    entry_SYSCALL_64_after_hwframe+0x46/0xb0
-   RIP: 0033:0x7f2a60b0c9df
+Also, if the guest does not hypercall to explicitly set a pointer to a
+vcpu_info in its own memory, the default vcpu_info embedded in the
+shared_info page should be used. At the moment the VMM has to set up a
+pointer to the structure explicitly (again treating it like it's in
+guest memory, despite being in an overlay page). Let's also avoid the
+need for that. We already have a cached mapping for the shared_info
+page so just use that directly by default.
 
+Paul Durrant (12):
+  KVM: pfncache: add a map helper function
+  KVM: pfncache: add a mark-dirty helper
+  KVM: pfncache: add a helper to get the gpa
+  KVM: pfncache: base offset check on khva rather than gpa
+  KVM: pfncache: allow a cache to be activated with a fixed (userspace)
+    HVA
+  KVM: xen: allow shared_info to be mapped by fixed HVA
+  KVM: xen: prepare for using 'default' vcpu_info
+  KVM: xen: automatically use the vcpu_info embedded in shared_info
+  KVM: selftests / xen: set KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+  KVM: selftests / xen: map shared_info using HVA rather than GFN
+  KVM: selftests / xen: don't explicitly set the vcpu_info address
+  KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
 
-$ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
-gen8_ppgtt_insert+0x50b/0x8f0:
-i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
-(inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
-(inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
-
-It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling. 
-
-David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
-
+ Documentation/virt/kvm/api.rst                |  43 ++++--
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/kvm/x86.c                            |  17 +--
+ arch/x86/kvm/xen.c                            | 121 ++++++++++++----
+ arch/x86/kvm/xen.h                            |   6 +-
+ include/linux/kvm_host.h                      |  43 ++++++
+ include/linux/kvm_types.h                     |   3 +-
+ include/uapi/linux/kvm.h                      |   6 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |  79 +++++++++--
+ virt/kvm/pfncache.c                           | 129 +++++++++++++-----
+ 10 files changed, 342 insertions(+), 109 deletions(-)
+---
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: x86@kernel.org
 -- 
-Best regards,
-Dmitry
+2.39.2
 
