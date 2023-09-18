@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9D317A4F8A
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C75777A4F70
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjIRQpj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:45:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56618 "EHLO
+        id S230394AbjIRQme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbjIRQpT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:45:19 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A89861A5
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:10:28 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bffdf50212so24780581fa.1
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:10:28 -0700 (PDT)
+        with ESMTP id S230365AbjIRQmS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:42:18 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BFB1731
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:05:02 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bcb50e194dso74354761fa.3
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:05:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053426; x=1695658226; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053075; x=1695657875; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZP1Jq5UriapAIWJmFwmSYSQUUVqpdEGdHuUn9UNvH2c=;
-        b=Sa7jQTAmeO+PCW88D6d6oLjctD7vUw7AriFjDWuIQLw2tL8klrZMWxtovvNkVG5KSV
-         8URESMwCvnjb0r/13BUyWd86GNmYdYWxDvEPtx9V8QavBXUiVIEp2QvFwyTehw2GJGkh
-         v/MFdm1XFoqlvacjQP/WphM8BARvQ8Hgxka00Q9K4RgzrrfARLqv63m3wkqnW9dydWuQ
-         N3DRUfY2SttjzDGxZtlQvOkY3/tuHHTgd2tSOgtLzi469lggws4pj6Aabz9eX6xaqei0
-         r3BImaVFwafAerHc/N3QQ6JgnKJwrX4aedNSbs+YVwqKKaayRnyXFT+quAuO3zpsksOl
-         62Fg==
+        bh=CLYCBr4NSqb4Srk/T+P7jn9AmbCAT10Txre246ezJ94=;
+        b=HSf8yjt+bOEHTC6NTjwv+GgSjKmm2P2WIHZxcE+NB6tWgKVoLUa7xZoHQAkFGoOGF5
+         Q/9L20OSiVwS52pn8lA3XnA2L76kXOtnSP3+dWErpWjOofbboanjUsElPOEOdzWehtUw
+         SaOlYj3kTOSdgTxj3KfxbhMYUQmmSNVNwzsa9HtoQmhhinVq5ptynNYrmK2OCOx9Ilrh
+         +ADqGU7FM+UEfbKoIxullyZX43SruP38qLJoHJIGISuJhcUJfdBvLfh6yf8z/zuFW5SY
+         7Csu/fiqqwEaVMPfxNVnPc7FxHGyeJbBTvPoZ+/Z7s6yHUXaNvUJTjAgXDNatqkU3o1F
+         D/TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053426; x=1695658226;
+        d=1e100.net; s=20230601; t=1695053075; x=1695657875;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZP1Jq5UriapAIWJmFwmSYSQUUVqpdEGdHuUn9UNvH2c=;
-        b=NLnq4bk1cdopce/5zCrmA8Dykd3+brV5964efdEw9N9KKbKxTjmwU3lQ3eMlzXKxGs
-         TUDZePYCLaA6Aqe9iMhReBcN8YrapfepObEcqgnYhmJB0lhpbIlolYIgZJUTq8PJutYy
-         c/lpCb2xS0ZOb8VHZzTEcriT6fMsnpFfGYZYnmWFA7rNEq3qSS76I3R9cbCwoDgDoxFs
-         1l4lpdSsWUaLBTn1931qsQSA17MzmPS2kbr6hsNrNi98R4FuoTOCRYMbz9EENu8SMm0E
-         /VPpPkp48Tt4ybx2SLKipTWPEAuQn7S1ZkV9uc7u+PLcbpyfMEMNGMhOJNlh/e+TBF8u
-         L2Cw==
-X-Gm-Message-State: AOJu0YxvIsoOnWX3lw66dOBjn8JYoKqNZrqew5IcGCqKc5aHpfGiju84
-        oEii+Gjv7kUajg3Y4X76W5939FgsDW6Sv9jOKVDNJyrC
-X-Google-Smtp-Source: AGHT+IHqyjalPcNFI3j/eC2mJhJCqyXLJDQU80ViEPpsSEn13nBGjwNzQvCpQXl9ahmUuhJ660k6zA==
-X-Received: by 2002:a05:6512:31cd:b0:503:1722:bf3a with SMTP id j13-20020a05651231cd00b005031722bf3amr3370635lfe.1.1695053069418;
-        Mon, 18 Sep 2023 09:04:29 -0700 (PDT)
+        bh=CLYCBr4NSqb4Srk/T+P7jn9AmbCAT10Txre246ezJ94=;
+        b=wdsgV5qoI0DdUImXTPnLnYXCZja/YUoUV7BIJpGNhYWhjnAyyLjpY0LKGqy/lGiYn7
+         QvWjjxbNw3t65RXyTVErNMKInTXdwK/wr0ZRxgK4BS9Fb0EjWvXpr1ITBC0x2orm9g2e
+         C86JPASzFPAdV+8A1vmgSgSdNTjka5pNoFTf1SPRhs7MvB1WMDzFr/7qPhfdE/8x70+f
+         UmwQYDDgBQdlJ0xwXxxQ9n4RT0ppeJIsd+XOR1kitnifsa3UQ7dzfOqmjc6Q/8Q8T1m/
+         XYBkxodXNn22pNqeJQlrscRA6wIMPN0npCMPS1lHqf1hiVOAHYt799coYRxKwBHWMql5
+         lB9Q==
+X-Gm-Message-State: AOJu0YwspqAzyh0WDc+9p8RnnlS7tr0WWvoI5k8P+DndsP+0KkL/HIjn
+        J/gPYWvPoiSdproF5lEGLJLang==
+X-Google-Smtp-Source: AGHT+IEszpq6z0T8KHVLe1aYl3TXIxtDx0wMS/QiHJe0YDjbBZ7toGFiwcuS0GxUEQgehFRPXlIxjg==
+X-Received: by 2002:a2e:8046:0:b0:2bc:b821:84ad with SMTP id p6-20020a2e8046000000b002bcb82184admr8047755ljg.16.1695053075234;
+        Mon, 18 Sep 2023 09:04:35 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id ec31-20020a0564020d5f00b00530a9488623sm4149603edb.46.2023.09.18.09.04.27
+        by smtp.gmail.com with ESMTPSA id f10-20020a170906560a00b0099d0c0bb92bsm6569110ejq.80.2023.09.18.09.04.33
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:04:28 -0700 (PDT)
+        Mon, 18 Sep 2023 09:04:34 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,160 +100,96 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 17/22] target/i386: Extract verify_accel_features() from cpu_realize()
-Date:   Mon, 18 Sep 2023 18:02:50 +0200
-Message-ID: <20230918160257.30127-18-philmd@linaro.org>
+Subject: [PATCH 18/22] target/s390x: Call s390_cpu_realize_sysemu from s390_realize_cpu_model
+Date:   Mon, 18 Sep 2023 18:02:51 +0200
+Message-ID: <20230918160257.30127-19-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When looking at the x86_cpu_realizefn() method, most of the
-code run before the cpu_exec_realizefn() call checks whether
-the requested CPU features are compatible with the requested
-accelerator. Extract this code to a dedicated handler matching
-our recently added CPUClass::verify_accel_features() handler.
+s390_cpu_realize_sysemu() runs some checks for the TCG accelerator,
+previous to creating the vCPU. s390_realize_cpu_model() also does
+run some checks for KVM.
+Move the sysemu call to s390_realize_cpu_model(). Having a single
+call before cpu_exec_realizefn() will allow us to factor a
+verify_accel_features() handler out in a pair of commits.
+
+Directly pass a S390CPU* to s390_cpu_realize_sysemu() to simplify.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/i386/cpu.c | 62 +++++++++++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 26 deletions(-)
+ target/s390x/s390x-internal.h | 2 +-
+ target/s390x/cpu-sysemu.c     | 3 +--
+ target/s390x/cpu.c            | 6 ------
+ target/s390x/cpu_models.c     | 4 ++++
+ 4 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d79797d963..2884733397 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7208,26 +7208,19 @@ static void x86_cpu_hyperv_realize(X86CPU *cpu)
-     cpu->hyperv_limits[2] = 0;
+diff --git a/target/s390x/s390x-internal.h b/target/s390x/s390x-internal.h
+index 825252d728..781ac08458 100644
+--- a/target/s390x/s390x-internal.h
++++ b/target/s390x/s390x-internal.h
+@@ -241,7 +241,7 @@ uint32_t calc_cc(CPUS390XState *env, uint32_t cc_op, uint64_t src, uint64_t dst,
+ unsigned int s390_cpu_halt(S390CPU *cpu);
+ void s390_cpu_unhalt(S390CPU *cpu);
+ void s390_cpu_init_sysemu(Object *obj);
+-bool s390_cpu_realize_sysemu(DeviceState *dev, Error **errp);
++bool s390_cpu_realize_sysemu(S390CPU *cpu, Error **errp);
+ void s390_cpu_finalize(Object *obj);
+ void s390_cpu_class_init_sysemu(CPUClass *cc);
+ void s390_cpu_machine_reset_cb(void *opaque);
+diff --git a/target/s390x/cpu-sysemu.c b/target/s390x/cpu-sysemu.c
+index 8112561e5e..5178736c46 100644
+--- a/target/s390x/cpu-sysemu.c
++++ b/target/s390x/cpu-sysemu.c
+@@ -122,9 +122,8 @@ void s390_cpu_init_sysemu(Object *obj)
+     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
  }
  
--static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-+/*
-+ * note: the call to the framework needs to happen after feature expansion,
-+ * but before the checks/modifications to ucode_rev, mwait, phys_bits.
-+ * These may be set by the accel-specific code,
-+ * and the results are subsequently checked / assumed in x86_cpu_realizefn().
-+ */
-+static bool x86_cpu_verify_accel_features(CPUState *cs, Error **errp)
+-bool s390_cpu_realize_sysemu(DeviceState *dev, Error **errp)
++bool s390_cpu_realize_sysemu(S390CPU *cpu, Error **errp)
  {
--    CPUState *cs = CPU(dev);
--    X86CPU *cpu = X86_CPU(dev);
--    X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
-+    X86CPU *cpu = X86_CPU(cs);
-     CPUX86State *env = &cpu->env;
-     Error *local_err = NULL;
--    static bool ht_warned;
-     unsigned requested_lbr_fmt;
+-    S390CPU *cpu = S390_CPU(dev);
+     MachineState *ms = MACHINE(qdev_get_machine());
+     unsigned int max_cpus = ms->smp.max_cpus;
  
--    /* Use pc-relative instructions in system-mode */
--#ifndef CONFIG_USER_ONLY
--    cs->tcg_cflags |= CF_PCREL;
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 416ac6c4e0..7257d4bc19 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -237,12 +237,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+         goto out;
+     }
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-    if (!s390_cpu_realize_sysemu(dev, &err)) {
+-        goto out;
+-    }
 -#endif
 -
--    if (cpu->apic_id == UNASSIGNED_APIC_ID) {
--        error_setg(errp, "apic-id property was not initialized properly");
--        return;
--    }
--
-     /*
-      * Process Hyper-V enlightenments.
-      * Note: this currently has to happen before the expansion of CPU features.
-@@ -7236,7 +7229,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     x86_cpu_expand_features(cpu, &local_err);
-     if (local_err) {
--        goto out;
-+        return false;
+     cpu_exec_realizefn(cs, &err);
+     if (err != NULL) {
+         goto out;
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 98f14c09c2..f030be0d55 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -612,6 +612,10 @@ void s390_realize_cpu_model(CPUState *cs, Error **errp)
+         cpu->env.cpuid = deposit64(cpu->env.cpuid, CPU_PHYS_ADDR_SHIFT,
+                                    CPU_PHYS_ADDR_BITS, cpu->env.core_id);
      }
- 
-     /*
-@@ -7246,7 +7239,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     if (cpu->lbr_fmt != ~PERF_CAP_LBR_FMT) {
-         if ((cpu->lbr_fmt & PERF_CAP_LBR_FMT) != cpu->lbr_fmt) {
-             error_setg(errp, "invalid lbr-fmt");
--            return;
-+            return false;
-         }
-         env->features[FEAT_PERF_CAPABILITIES] &= ~PERF_CAP_LBR_FMT;
-         env->features[FEAT_PERF_CAPABILITIES] |= cpu->lbr_fmt;
-@@ -7265,13 +7258,13 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-         if (!cpu->enable_pmu) {
-             error_setg(errp, "vPMU: LBR is unsupported without pmu=on");
--            return;
-+            return false;
-         }
-         if (requested_lbr_fmt != host_lbr_fmt) {
-             error_setg(errp, "vPMU: the lbr-fmt value (0x%x) does not match "
-                         "the host value (0x%x).",
-                         requested_lbr_fmt, host_lbr_fmt);
--            return;
-+            return false;
-         }
-     }
- 
-@@ -7282,7 +7275,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-                    accel_uses_host_cpuid() ?
-                        "Host doesn't support requested features" :
-                        "TCG doesn't support requested features");
--        goto out;
-+        return false;
-     }
- 
-     /* On AMD CPUs, some CPUID[8000_0001].EDX bits must match the bits on
-@@ -7296,12 +7289,28 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     x86_cpu_set_sgxlepubkeyhash(env);
- 
--    /*
--     * note: the call to the framework needs to happen after feature expansion,
--     * but before the checks/modifications to ucode_rev, mwait, phys_bits.
--     * These may be set by the accel-specific code,
--     * and the results are subsequently checked / assumed in this function.
--     */
-+    return true;
-+}
 +
-+static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs = CPU(dev);
-+    X86CPU *cpu = X86_CPU(dev);
-+    X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
-+    CPUX86State *env = &cpu->env;
-+    Error *local_err = NULL;
-+    static bool ht_warned;
-+
-+    /* Use pc-relative instructions in system-mode */
-+#ifndef CONFIG_USER_ONLY
-+    cs->tcg_cflags |= CF_PCREL;
-+#endif
-+
-+    if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-+        error_setg(errp, "apic-id property was not initialized properly");
++    if (!s390_cpu_realize_sysemu(cpu, &err)) {
 +        return;
 +    }
-+
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-@@ -7950,6 +7959,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+ #endif
+ }
  
-     cc->class_by_name = x86_cpu_class_by_name;
-     cc->parse_features = x86_cpu_parse_featurestr;
-+    cc->verify_accel_features = x86_cpu_verify_accel_features;
-     cc->has_work = x86_cpu_has_work;
-     cc->dump_state = x86_cpu_dump_state;
-     cc->set_pc = x86_cpu_set_pc;
 -- 
 2.41.0
 
