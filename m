@@ -2,56 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F36927A467A
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 11:59:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 670F87A475D
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 12:42:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240935AbjIRJ6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 05:58:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54748 "EHLO
+        id S241129AbjIRKlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 06:41:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241001AbjIRJ6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 05:58:42 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A24B3;
-        Mon, 18 Sep 2023 02:58:36 -0700 (PDT)
-Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 1279F6607181;
-        Mon, 18 Sep 2023 10:58:34 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1695031115;
-        bh=1RNaixjMXA54V+2/e4luR24uvJkM1LcXIR0eY3+Epv8=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=PXGmfVf/NVnH7ZhV99d4xVXJ2zHhS05iCl/sOAl7OfLwMIGhXCok/5smR1lTKJRxR
-         FUTIaUvF+Yg06PS4GxXOd4B/z+RgDUnn1wumQfgKJUCQEx6DruNnLFAvTMT8zTCnPQ
-         tiZwaNKOWGzJVmXf/dxsAqE9LYplPWpcouLnIDASr+G+EDVkyEOi2+Igj13qS+gzQu
-         Wr32PJ41n/sboSnmUhnBCkVDp9Gczd/Ds2HBnLyC7Kr8c2plHT5ibgbnAHsLVSdoOU
-         ZaMNowQbx1sw8sDZDoCbclA+wFMVjpLKGbEtuz9ztpkhz8zT5x5KfaIxmcR++3QDE0
-         vbVJnZUJ6NAaQ==
-Message-ID: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
-Date:   Mon, 18 Sep 2023 12:58:32 +0300
+        with ESMTP id S241214AbjIRKlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 06:41:10 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57239DB
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 03:40:34 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BD7AC433C8;
+        Mon, 18 Sep 2023 10:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695033634;
+        bh=mfTaBjYA8HHTuisBF3KK0QkdJTAjBxJvpOzzYrlDNk8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=i1auMnEBV0IIbkZj7b5zMuVtDCupKfx6QXVclJ9FEr5S9WDXQeP0VC3mvkhmYNjDa
+         SgVfoS8D+QD1Q0gtmekwcbCfhu7bNQdfJlUVOWLzUG740S6ZDHj3xiQwPTh70kumut
+         Js6JOvG/QXdHCbrBxIVbCtb9hmh5FpuaA9150V0rgcmPq2YhDQP3W/YiBYs8FDWP7x
+         o5P0zhjNNGdA+g57TMY4IcF6G0DnRNtiCjNEOPrccuh9GPn24m1ZXVLCBA2LIow+ip
+         7BBuIB7Xe5/YETeOeRs7BNKr3quCFEr6th+FnQSEpfr5rxavTD1YbOH9Myu32IY9rG
+         WtOTzy0M0XefA==
+Date:   Mon, 18 Sep 2023 11:40:28 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [PATCH kvmtool v3 08/17] Add helpers to pause the VM from vCPU
+ thread
+Message-ID: <20230918104028.GA17744@willie-the-truck>
+References: <20230802234255.466782-1-oliver.upton@linux.dev>
+ <20230802234255.466782-9-oliver.upton@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-Content-Language: en-US
-To:     David Stevens <stevensd@chromium.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230911021637.1941096-1-stevensd@google.com>
- <20230911021637.1941096-7-stevensd@google.com>
-From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802234255.466782-9-oliver.upton@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -60,39 +56,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/11/23 05:16, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+On Wed, Aug 02, 2023 at 11:42:46PM +0000, Oliver Upton wrote:
+> Pausing the VM from a vCPU thread is perilous with the current helpers,
+> as it waits indefinitely for a signal that never comes when invoked from
+> a vCPU thread. Instead, add a helper for pausing the VM from a vCPU,
+> working around the issue by explicitly marking the caller as paused
+> before proceeding.
 > 
-> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
-> to map memory into the guest that is backed by non-refcounted struct
-> pages - for example, the tail pages of higher order non-compound pages
-> allocated by the amdgpu driver via ttm_pool_alloc_page.
-> 
-> The bulk of this change is tracking the is_refcounted_page flag so that
-> non-refcounted pages don't trigger page_count() == 0 warnings. This is
-> done by storing the flag in an unused bit in the sptes. There are no
-> bits available in PAE SPTEs, so non-refcounted pages can only be handled
-> on TDP and x86-64.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->  arch/x86/kvm/mmu/spte.c         |  4 ++-
->  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->  include/linux/kvm_host.h        |  3 ++
->  virt/kvm/kvm_main.c             |  6 ++--
->  8 files changed, 76 insertions(+), 32 deletions(-)
+>  include/kvm/kvm-cpu.h |  3 +++
+>  kvm-cpu.c             | 16 ++++++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/include/kvm/kvm-cpu.h b/include/kvm/kvm-cpu.h
+> index 0f16f8d6e872..9a4901bf94ca 100644
+> --- a/include/kvm/kvm-cpu.h
+> +++ b/include/kvm/kvm-cpu.h
+> @@ -29,4 +29,7 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu);
+>  void kvm_cpu__arch_nmi(struct kvm_cpu *cpu);
+>  void kvm_cpu__run_on_all_cpus(struct kvm *kvm, struct kvm_cpu_task *task);
+>  
+> +void kvm_cpu__pause_vm(struct kvm_cpu *vcpu);
+> +void kvm_cpu__continue_vm(struct kvm_cpu *vcpu);
+> +
+>  #endif /* KVM__KVM_CPU_H */
+> diff --git a/kvm-cpu.c b/kvm-cpu.c
+> index 1c566b3f21d6..9adc9d4f7841 100644
+> --- a/kvm-cpu.c
+> +++ b/kvm-cpu.c
+> @@ -141,6 +141,22 @@ void kvm_cpu__run_on_all_cpus(struct kvm *kvm, struct kvm_cpu_task *task)
+>  	mutex_unlock(&task_lock);
+>  }
+>  
+> +void kvm_cpu__pause_vm(struct kvm_cpu *vcpu)
+> +{
+> +	/*
+> +	 * Mark the calling vCPU as paused to avoid waiting indefinitely for a
+> +	 * signal exit.
+> +	 */
+> +	vcpu->paused = true;
+> +	kvm__pause(vcpu->kvm);
+> +}
+> +
+> +void kvm_cpu__continue_vm(struct kvm_cpu *vcpu)
+> +{
+> +	vcpu->paused = false;
+> +	kvm__continue(vcpu->kvm);
+> +}
 
-Could you please tell which kernel tree you used for the base of this
-series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
+Why is it safe to manipulate 'vcpu->paused' here without the pause_lock
+held? Relatedly, how does this interact with the 'pause' and 'resume'
+lkvm commands?
 
-error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
-error: could not build fake ancestor
-
--- 
-Best regards,
-Dmitry
-
+Will
