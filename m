@@ -2,50 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEABB7A4E3A
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84FDD7A50C2
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 19:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbjIRQJW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:09:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54816 "EHLO
+        id S231543AbjIRRO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 13:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbjIRQJF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:09:05 -0400
+        with ESMTP id S231414AbjIRROx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 13:14:53 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F301644BA;
-        Mon, 18 Sep 2023 09:07:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 864B55FCF;
+        Mon, 18 Sep 2023 09:10:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7ydROei8VlxicBn5/ZdpkjRZdnRCTyhqPyMsALiH8Ok=; b=neXWrZ/GN4cxvmJfQbgThS5fRc
-        5+nB6FhrOJHFBqI7Gr2BZYRSHDIPTAKsW3gppCKhQXjIJvdlvJywuPSfLHDqa13tb/Ch715bDW8FW
-        uBccyEWx6xx4EEqSUiroOzGU9AnTdS4EYPkpxTmXJ0EdNTXyaJmhbc9y6ld9KiYanoyOLDbaOVOfH
-        9HN9Qpan9zUAf7LO6qmnaAEJTsu2rqOUSIBRPSCKtmWIIim82P1f3WWDp79Y8jHTtMYspcs0gHy29
-        L2QGJUaJ3O1bKYhLxA4dd6MIggy1AqSfJY6gJlpc07JoQmD1Z5CCFqoCrd3hEN+Q/5NFXJ/wtkwmY
-        ER25s/7A==;
+        bh=6Nm7HFeQaWGkG0LmLk96FaX4LQaVLrNlxbVbe1pBL/Q=; b=sGqrcr327noY4lfSS9+6nXUGHQ
+        99GRK812HfxCD4yCnZTjF+CmXMAymR6eGAuFZVepOSW4yDquXzTTBeahhRLKf+wHBolINv+Sk4vsQ
+        w12H7poskIdqHqeAfh8OSxug86I7HE/Qu19XdHP3PulYzxwhvpUod06Do8a8zOtodFNz2Qas9YU+n
+        TJaCCGUFLViKuHH5ync82lCTm/WpTv8QEuKq6QAxmcCgPb/lh+rXjjND2ZLO9jo6alrm1m/g8oMly
+        7YMH/6EOCQZF7mIo2CjIGxqMTAfNjONUe34JY4K1MgOotneZiLDKWeOH7lAnt1+VnHN3Z8qIhoEpg
+        VfPh2V3A==;
 Received: from [2001:8b0:10b:5:7930:9714:474a:dcad] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiGmU-00Bvf3-Jr; Mon, 18 Sep 2023 16:07:26 +0000
-Message-ID: <dde3cb9dc2fb26db9d5508c11c6d9dee1505b0df.camel@infradead.org>
-Subject: Re: [PATCH v3 09/13] KVM: xen: automatically use the vcpu_info
- embedded in shared_info
+        id 1qiGp8-00BvpD-S3; Mon, 18 Sep 2023 16:10:10 +0000
+Message-ID: <5787ee4cc9b2a3aab21c0cf052d4508e34b8690d.camel@infradead.org>
+Subject: Re: [PATCH v3 12/13] KVM: selftests / xen: don't explicitly set the
+ vcpu_info address
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
         Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Date:   Mon, 18 Sep 2023 17:07:26 +0100
-In-Reply-To: <20230918144111.641369-10-paul@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>
+Date:   Mon, 18 Sep 2023 17:10:10 +0100
+In-Reply-To: <20230918144111.641369-13-paul@xen.org>
 References: <20230918144111.641369-1-paul@xen.org>
-         <20230918144111.641369-10-paul@xen.org>
+         <20230918144111.641369-13-paul@xen.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-74fRSbl1qn1ttLJDp1io"
+        boundary="=-R1F+OKKZJUmf7U+cz7EO"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,191 +55,31 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-74fRSbl1qn1ttLJDp1io
+--=-R1F+OKKZJUmf7U+cz7EO
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2023-09-18 at 14:41 +0000, Paul Durrant wrote:
 > From: Paul Durrant <pdurrant@amazon.com>
 >=20
-> The VMM should only need to set the KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO
-> attribute in response to a VCPUOP_register_vcpu_info hypercall. We can
-> handle the default case internally since we already know where the
-> shared_info page is. Modify get_vcpu_info_cache() to pass back a pointer
-> to the shared info pfn cache (and appropriate offset) for any of the
-> first 32 vCPUs if the attribute has not been set.
+> If the vCPU id is set and the shared_info is mapped using HVA then we can
+> infer that KVM has the ability to use a default vcpu_info mapping. Hence
+> we can stop setting the address of the vcpu_info structure.
 >=20
-> A VMM will be able to determine whether it needs to set up default
-> vcpu_info using the previously defined KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA
-> Xen capability flag, which will be advertized in a subsequent patch.
->=20
-> Also update the KVM API documentation to describe the new behaviour.
+> NOTE: We still explicitly set vcpu_info half way through testing (to poin=
+t
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 at exactly the place it already is) to mak=
+e sure that setting the
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 attribute does not fail.
 >=20
 > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> ---
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: David Woodhouse <dwmw2@infradead.org>
-> Cc: x86@kernel.org
->=20
-> v3:
-> =C2=A0- Add a note to the API documentation discussing vcpu_info copying.
->=20
-> v2:
-> =C2=A0- Dispense with the KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO capability=
-.
-> =C2=A0- Add API documentation.
-> ---
-> =C2=A0Documentation/virt/kvm/api.rst | 22 +++++++++++++++-------
-> =C2=A0arch/x86/kvm/xen.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 15 +++++++++++++++
-> =C2=A02 files changed, 30 insertions(+), 7 deletions(-)
->=20
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index e9df4df6fe48..47bf3db74674 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -5442,13 +5442,7 @@ KVM_XEN_ATTR_TYPE_LONG_MODE
-> =C2=A0
-> =C2=A0KVM_XEN_ATTR_TYPE_SHARED_INFO
-> =C2=A0=C2=A0 Sets the guest physical frame number at which the Xen shared=
-_info
-> -=C2=A0 page resides. Note that although Xen places vcpu_info for the fir=
-st
-> -=C2=A0 32 vCPUs in the shared_info page, KVM does not automatically do s=
-o
-> -=C2=A0 and instead requires that KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO be use=
-d
-> -=C2=A0 explicitly even when the vcpu_info for a given vCPU resides at th=
-e
-> -=C2=A0 "default" location in the shared_info page. This is because KVM m=
-ay
-> -=C2=A0 not be aware of the Xen CPU id which is used as the index into th=
-e
-> -=C2=A0 vcpu_info[] array, so may know the correct default location.
-> +=C2=A0 page resides.
-> =C2=A0
-> =C2=A0=C2=A0 Note that the shared_info page may be constantly written to =
-by KVM;
-> =C2=A0=C2=A0 it contains the event channel bitmap used to deliver interru=
-pts to
-> @@ -5564,12 +5558,26 @@ type values:
-> =C2=A0
-> =C2=A0KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO
-> =C2=A0=C2=A0 Sets the guest physical address of the vcpu_info for a given=
- vCPU.
-> +=C2=A0 The vcpu_info for the first 32 vCPUs defaults to the structures
-> +=C2=A0 embedded in the shared_info page.
 
-The above is true only if KVM has KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA.
-You kind of touch on that next, but perhaps the 'if the KVM_...'
-condition should be moved up?
-
-> +=C2=A0 If the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA flag is also set in the
-> +=C2=A0 Xen capabilities then the VMM is not required to set this default
-> +=C2=A0 location; KVM will handle that internally. Otherwise this attribu=
-te
-> +=C2=A0 must be set for all vCPUs.
-> +
-> =C2=A0=C2=A0 As with the shared_info page for the VM, the corresponding p=
-age may be
-> =C2=A0=C2=A0 dirtied at any time if event channel interrupt delivery is e=
-nabled, so
-> =C2=A0=C2=A0 userspace should always assume that the page is dirty withou=
-t relying
-> =C2=A0=C2=A0 on dirty logging. Setting the gpa to KVM_XEN_INVALID_GPA wil=
-l disable
-> =C2=A0=C2=A0 the vcpu_info.
-> =C2=A0
-> +=C2=A0 Note that, if the guest sets an explicit vcpu_info location in gu=
-est
-> +=C2=A0 memory then the VMM is expected to copy the content of the struct=
-ure
-> +=C2=A0 embedded in the shared_info page to the new location. It is there=
-fore
-> +=C2=A0 important that no event delivery is in progress at this time, oth=
-erwise
-> +=C2=A0 events may be missed.
->=20
-
-That's difficult. It means tearing down all interrupts from passthrough
-devices which are mapped via PIRQs, and also all IPIs.=20
-
-The IPI code *should* be able to fall back to just letting the VMM
-handle the hypercall in userspace. But PIRQs are harder. I'd be happier
-if our plan =E2=80=94 handwavy though it may be =E2=80=94 led to being able=
- to use the
-existing slow path for delivering interrupts by just *invalidating* the
-cache. Maybe we *should* move the memcpy into the kernel, and let it
-lock *both* the shinfo and new vcpu_info caches while it's doing the
-copy? Given that that's the only valid transition, that shouldn't be so
-hard, should it?
-
-> =C2=A0KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO
-> =C2=A0=C2=A0 Sets the guest physical address of an additional pvclock str=
-ucture
-> =C2=A0=C2=A0 for a given vCPU. This is typically used for guest vsyscall =
-support.
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 459f3ca4710e..660a808c0b50 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -491,6 +491,21 @@ static void kvm_xen_inject_vcpu_vector(struct kvm_vc=
-pu *v)
-> =C2=A0
-> =C2=A0static struct gfn_to_pfn_cache *get_vcpu_info_cache(struct kvm_vcpu=
- *v, unsigned long *offset)
-> =C2=A0{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!v->arch.xen.vcpu_info_cac=
-he.active && v->arch.xen.vcpu_id < MAX_VIRT_CPUS) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0struct kvm *kvm =3D v->kvm;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0if (offset) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (IS_EN=
-ABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*offset =3D offsetof(struct shared_i=
-nfo,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vc=
-pu_info[v->arch.xen.vcpu_id]);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0else
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0*offset =3D offsetof(struct compat_s=
-hared_info,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vc=
-pu_info[v->arch.xen.vcpu_id]);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0}
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return &kvm->arch.xen.shinfo_cache;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> +
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (offset)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0*offset =3D 0;
-> =C2=A0
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
 
---=-74fRSbl1qn1ttLJDp1io
+
+
+--=-R1F+OKKZJUmf7U+cz7EO
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -335,24 +171,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTYwNzI2WjAvBgkqhkiG9w0BCQQxIgQg3TgtqCUz
-QhM8AZymvZyBWJg/uWyvFkz8yerkyVySJ/Awgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE4MTYxMDEwWjAvBgkqhkiG9w0BCQQxIgQggIR2Wa3S
+4Kv/TEoHibV/qdInUpIhgkmxhaagQU/AzOEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA0gzydD5NrIDacQK9ixhdUyIiNn82Dy9WU
-d/iePxyRqKoGp5v5bETlwulPxxr9Jaxw2IcgdHTAcCksjcroqeNBvRlRPb4WI30NXpFIdZp8SM7H
-BLP1S8gyXQnDpbjLBEFiFPNHGD7BcGRrtH26NIEkjOej3HaeLpoHpqjlR1e9QAVRJm7Q47Qd0gIZ
-9kUn6nts5rmtrz4ckYMVCDDQcLmAHY+3DYcZX+dj23l8+jZ6exBPsACF578QgBZeKiFmchrsKjSq
-4gITH4J1+74mF5oYsvERO551VMgPSYrwJq8LcFylsDyH1+00Xd4B59OrqZ5yDRkA1HfeLD/XNKb5
-jUYVBfwbuyTtUFricud6tpq7Ej9AXVWLLQPVuzMp1k/Q25QhbEFAmXl2DVIc/2lB6LcxLCbuw3Ek
-A27Y1Lh31KSSNSOUhKGP5IHUiF2pQUFA+oXkBgyKsktjYXCtZM+VMASaykdktnnGOYh6I+/K9nB3
-TWbV/SqKAec2xYaWtD3sk0vOP3tZGai7R2KqXW/weRNb7+Tg4ZQxIzhK4OGMSgz4Pp6rWpENNFcW
-OPReG3NIeeNXypj5pPaBTlhxdQXxxhHD80mfaOuJpXwcge4sOQD9NUJdG0SbMpRMzc5FiMdwo15w
-iJGxOB4oJaO2z1yNulcqMkqgJpvU8PYzqibJYvb4pQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCAF57yhHkDSWq2c6hXa8nhh8xuicaqLf4L
+fRHQRyj3g2WZsOSCvYyKD4D8S7Hu0z6bv7h7FBajTjqgByBpB78yeXA132+7guMoJ/ovfNk633TK
+6StPdCGmPHLifhOV6A8LCodLaUgo01QWn8bh2avi2Ad5HmArJ4lygxl3oQ5Thj0uFJwudB/1rhvZ
+o2HNWb0HiBd665KHeQn6YiCfNSLSPu/fujLXXWs/aWHexbQMsGfMFQS7mR9LT+mlEjfBfmz9Okbo
++ZkA78zstLcfoFch7qMlboap9QXh9h27+jUOKeEkjTgQo/GEjtABcXCM7atejgV1QqUnlygGpt2Q
+eCXRrheR9RSMqi/59weUcfQlw61tWH12Kba4+OmAPQGoYReQKN8IJCVgew2nFCYC3sncKhVwuXBb
+HVCnq/wpvr+JFE5q5m+ZCqu092lvbYKGUfOx4IiBIomuhVg3gvWe3UZJ64mI6FaxC6C40vL4JhtY
+Cf+Dto3al0VrOLUfZkXX7dS5YNpT0bkDRlEq3A/iDIxEK7plFnV0L+4VXu/QXt2GkzUvSMrZtr+P
+eeu3mIdxvJzzk4gnrEHYUTvy8ixSEQHla/qvXbyZ8/WnfIOm3x6HLF9p8vgXZByl86hBySxPdLtZ
+FBflIKOcTxrOZRYp9U9iKjeiKxM4CFkm5sdUQv7TZQAAAAAAAA==
 
 
---=-74fRSbl1qn1ttLJDp1io--
+--=-R1F+OKKZJUmf7U+cz7EO--
