@@ -2,52 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F8517A4D6C
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:49:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A2E77A4CF0
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:44:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjIRPtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 11:49:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
+        id S229588AbjIRPoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 11:44:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229883AbjIRPto (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:49:44 -0400
+        with ESMTP id S229636AbjIRPoF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 11:44:05 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC5710D1;
-        Mon, 18 Sep 2023 08:48:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5D2E52;
+        Mon, 18 Sep 2023 08:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-        Subject:Cc:To:From; bh=nMePW2zZ3mPcULLvl9sSJ73P4NmXq2jKUmrnGmKZIsQ=; b=PsPSD9
-        01FfQaMvvuS7NepqPpKn+bffGL5tWMjMUm4vSeKGGzD1MHlW4TUF9jJhPYWU78+QqtaTMuiIMZkxe
-        IjYPzfj93wP5MDViEuJsp5cSyEVVys1JXH9HpDYVhoOTR7k2eN7+net7B4oCKOgWD4dh4K5kCZt9l
-        JhuuUUfQau8=;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
+        In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+        bh=AwPzUZ/Z6+s02+eLaJ3LQ0RcvLB4vo4D1x3Qrf158Cc=; b=0+ep+zWiORzxA56Tnase0hTPvo
+        P9/UCv0B6Gl+U68MFx4BK7WhNvNwjHWqaIjvdSUDswILcFS1oN6Q51zqaY5VA8dgk9wGOuc758odz
+        TRfOuFr54FSmrJQnsrtvkdOT/C5zMgH9dpZYBvMGdTM6+wbef3h8YJZ3H99ZeBEvVta0=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiFR5-0003Q2-Vc; Mon, 18 Sep 2023 14:41:15 +0000
+        id 1qiFSh-0003UE-Ce; Mon, 18 Sep 2023 14:42:55 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qiFR5-0006IJ-Kk; Mon, 18 Sep 2023 14:41:15 +0000
+        id 1qiFRM-0006IJ-Ho; Mon, 18 Sep 2023 14:41:32 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
         Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
-Subject: [PATCH v3 00/13] KVM: xen: update shared_info and vcpu_info handling
-Date:   Mon, 18 Sep 2023 14:40:58 +0000
-Message-Id: <20230918144111.641369-1-paul@xen.org>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
+Subject: [PATCH v3 13/13] KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
+Date:   Mon, 18 Sep 2023 14:41:11 +0000
+Message-Id: <20230918144111.641369-14-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230918144111.641369-1-paul@xen.org>
+References: <20230918144111.641369-1-paul@xen.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+        DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+        SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -56,59 +59,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-Currently we treat the shared_info page as guest memory and the VMM informs
-KVM of its location using a GFN. However it is not guest memory as such;
-it's an overlay page. So we pointlessly invalidate and re-cache a mapping
-to the *same page* of memory every time the guest requests that shared_info
-be mapped into its address space. Let's avoid doing that by modifying the
-pfncache code to allow activation using a fixed userspace HVA as well as
-a GPA.
+Now that all relevant kernel changes and selftests are in place, enable the
+new capability.
 
-Also, if the guest does not hypercall to explicitly set a pointer to a
-vcpu_info in its own memory, the default vcpu_info embedded in the
-shared_info page should be used. At the moment the VMM has to set up a
-pointer to the structure explicitly (again treating it like it's in
-guest memory, despite being in an overlay page). Let's also avoid the
-need for that. We already have a cached mapping for the shared_info
-page so just use that directly by default.
-
-Paul Durrant (13):
-  KVM: pfncache: add a map helper function
-  KVM: pfncache: add a mark-dirty helper
-  KVM: pfncache: add a helper to get the gpa
-  KVM: pfncache: base offset check on khva rather than gpa
-  KVM: pfncache: allow a cache to be activated with a fixed (userspace)
-    HVA
-  KVM: xen: allow shared_info to be mapped by fixed HVA
-  KVM: xen: prepare for using 'default' vcpu_info
-  KVM: xen: prevent vcpu_id from changing whilst shared_info is valid
-  KVM: xen: automatically use the vcpu_info embedded in shared_info
-  KVM: selftests / xen: set KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
-  KVM: selftests / xen: map shared_info using HVA rather than GFN
-  KVM: selftests / xen: don't explicitly set the vcpu_info address
-  KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
-
- Documentation/virt/kvm/api.rst                |  49 ++++--
- arch/x86/include/asm/kvm_host.h               |   4 +
- arch/x86/kvm/x86.c                            |  17 +--
- arch/x86/kvm/xen.c                            | 139 +++++++++++++-----
- arch/x86/kvm/xen.h                            |   6 +-
- include/linux/kvm_host.h                      |  43 ++++++
- include/linux/kvm_types.h                     |   3 +-
- include/uapi/linux/kvm.h                      |   6 +-
- .../selftests/kvm/x86_64/xen_shinfo_test.c    |  75 ++++++++--
- virt/kvm/pfncache.c                           | 129 +++++++++++-----
- 10 files changed, 360 insertions(+), 111 deletions(-)
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
-Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: x86@kernel.org
+
+v2:
+ - New in this version.
+---
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2d7d0ae18820..4cd577d01bc4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4527,7 +4527,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+ 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
+ 		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
+-		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
++		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
++		    KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA;
+ 		if (sched_info_on())
+ 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
+ 			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
 -- 
 2.39.2
 
