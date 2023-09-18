@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBCC87A4F68
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:42:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D42087A4E75
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:18:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230348AbjIRQm1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:42:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56550 "EHLO
+        id S230103AbjIRQSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:18:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjIRQmO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:42:14 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8530930FC
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:11 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-991c786369cso637508466b.1
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:11 -0700 (PDT)
+        with ESMTP id S230012AbjIRQSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:18:02 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133CDCF4
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:15 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-5031426b626so2063493e87.3
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695053026; x=1695657826; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695053031; x=1695657831; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hSVRQGIJEmce1VSEx8yaDe0o7AipRr5BDfgLzGOyz48=;
-        b=M2kBVeM3dI60skb5HWNU5zPVPQw4We/Zu1++N/sMSBDSlWRIPW8ZRgsfEI5DhTO4Y/
-         8PXyb7qsYu8kTS+sEb2W9ktjLRaLrCY0FRyncACqpxoa+YdWKinIgdR+u3tKibg07XBP
-         DCns4AQ6x6/4HwQC9VCAWca8Mruk9RIII9UhWbnbwu4ctbjjkDOQ7NRZhRj+oCpWd9Di
-         wnToxbwGG6Of53KO7HvE7QktEzwjR/zXAvkflgw4ui21VuvgaFyvUK63Axr/v+NkQQrm
-         w88qB9GGiBDRRDRgYWc0mLOsuB1M0A471U2hlOnV0lkLx5JhmzHSUY/zRf51CAR+UKv9
-         8Q1Q==
+        bh=dCQpcHiGYl2b5PMw9sHU7Xzs4il9aZ3go8echWC+OUY=;
+        b=TLTCmuWT1Byc58c/W3YshvclXkn1rzKiKOc71GGQ5Bk2pT7sf8FEJsyF0SIs+IMVfb
+         qRUQUEkta7xOl0Ih4pJ/U1bC+NG8G8qBM1KW1mXOT/e1QntSODpCut/TbyHPBXCKSe6B
+         uLiND/bIvmbu2dlFy2dQTdnKC1FZd8YMnODI9eOFSN8o8h9TtiptpuJXGtgF+PRwo19d
+         UuZojQVJhowHgTiB0D5YeybyUpjVHvzXCevl5mK51Jnokr0XdwjPYc5MCdQwjCtMS3Uh
+         msfjLT/clsWaBk3E84+l2sS9yQBuSTM9tBMTnqJzVa1123z8tvP0hzFFHzxMY8j+ygZD
+         xxIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053026; x=1695657826;
+        d=1e100.net; s=20230601; t=1695053031; x=1695657831;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hSVRQGIJEmce1VSEx8yaDe0o7AipRr5BDfgLzGOyz48=;
-        b=iMSHnf/NRT66slhfqjn0eraeVYUpMgJJEpw2Kpo1Qle03qrH3egc3+AzHKmvdlF58E
-         WCT5Jx2pbh3eVMay3hnWcEUyxyehg9NEBZWNufgAglIQNugsP34i7RxaiOdXowIdqKYO
-         5QDmrgQNi8iGEDLlChbucPRsPundgiEFGmgK5mV9D6UWYesopXMl3yxJDuSjbnQdDhKr
-         nacI+nVk94OePQo0vw8xCn4Z2V90gA2NAe+AcwfOA/W5HZCChPrKkVSa7XUV62wQ9FQz
-         sh5+0rA/NJFVyLYJyfArBvPmPJ1Hcue94iWcaBZTcj3j5CCVa25maKlSuG0Wych4hmsG
-         7dYw==
-X-Gm-Message-State: AOJu0YxpiftjhkFtns1CmG0kfV4/Q5j0dCoptxHjMMsCkDsWqkpMCAzC
-        XizIN0wt3zUHSp6uG6UlpZdrOg==
-X-Google-Smtp-Source: AGHT+IG4piDQtxZVYFiU0HjN8n/Q699dig17N/FQPVs1xyeDcBS2KjVyyREmZ08RNzkeawSSuXGK6A==
-X-Received: by 2002:a17:906:74d5:b0:9a1:8ee9:cc0b with SMTP id z21-20020a17090674d500b009a18ee9cc0bmr8829825ejl.21.1695053026100;
-        Mon, 18 Sep 2023 09:03:46 -0700 (PDT)
+        bh=dCQpcHiGYl2b5PMw9sHU7Xzs4il9aZ3go8echWC+OUY=;
+        b=XnmDfMnY82A0roHiBO8suwy6ZxuV81Z3omG9C4l8mCuk9iRW1CEEuJ0L+Ku8rq2Seb
+         Wy87t2QxV5tCMdFlMa7u0rFum0dPR44loBX1rQiWa/Nob8IXvyzI7AC1L8t3GEETwTq9
+         jVlUfCH8yTosvufkEg9MBh7vaeL9fE8XSsL0IY10hY9kwbQ6DTjfeWIhQGCDTHbmvbCe
+         2D+qrxdJi2DY/CJ2H5JSaM4FETBDZPhcpoPqnes5k6eFxl7Uv9EN1u7sOoiw+sMUKPsy
+         4vIYNOXCcXZZ+hIciln6DRYlugcztc3IVwRz51vT/Hheus2SHTUwr7LNMa3FV3RKmqTh
+         Ck/w==
+X-Gm-Message-State: AOJu0YyGfyt2Eov3fGjk2GMmT1qJmgEjz6CUjY6EIi7QFfcI7qffgoIV
+        oPE5Y0SNnaA8Aok3HVADTgrNdg==
+X-Google-Smtp-Source: AGHT+IGy+sW3/rMWVgA+iQsVUNjPLRtt/VMoay0ZFOuWvfTpfSlLeQiHWwG9NxI8+yiSPP5hV5k4jw==
+X-Received: by 2002:a05:6512:3a9:b0:4fe:5860:7abf with SMTP id v9-20020a05651203a900b004fe58607abfmr6929316lfp.13.1695053031505;
+        Mon, 18 Sep 2023 09:03:51 -0700 (PDT)
 Received: from localhost.localdomain (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id g5-20020a170906394500b0099bc038eb2bsm6614676eje.58.2023.09.18.09.03.44
+        by smtp.gmail.com with ESMTPSA id n3-20020a50cc43000000b0053132e5ea61sm913803edi.30.2023.09.18.09.03.49
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 18 Sep 2023 09:03:45 -0700 (PDT)
+        Mon, 18 Sep 2023 09:03:51 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Laurent Vivier <laurent@vivier.eu>,
@@ -100,9 +100,9 @@ Cc:     Laurent Vivier <laurent@vivier.eu>,
         Eduardo Habkost <eduardo@habkost.net>,
         Markus Armbruster <armbru@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>
-Subject: [PATCH 09/22] target/arm: Create timers *after* accelerator vCPU is realized
-Date:   Mon, 18 Sep 2023 18:02:42 +0200
-Message-ID: <20230918160257.30127-10-philmd@linaro.org>
+Subject: [PATCH 10/22] target/hppa: Create timer *after* accelerator vCPU is realized
+Date:   Mon, 18 Sep 2023 18:02:43 +0200
+Message-ID: <20230918160257.30127-11-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918160257.30127-1-philmd@linaro.org>
 References: <20230918160257.30127-1-philmd@linaro.org>
@@ -120,42 +120,31 @@ generic API simplification (in few commits).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/arm/cpu.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ target/hppa/cpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index fc3772025c..46d3f70d63 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1748,7 +1748,15 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-             return;
-         }
+diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
+index 49082bd2ba..b0d106b6c7 100644
+--- a/target/hppa/cpu.c
++++ b/target/hppa/cpu.c
+@@ -131,8 +131,6 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
      }
-+#endif
  
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+#ifndef CONFIG_USER_ONLY
+-    acc->parent_realize(dev, errp);
+-
+ #ifndef CONFIG_USER_ONLY
      {
-         uint64_t scale;
- 
-@@ -1776,12 +1784,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         HPPACPU *cpu = HPPA_CPU(cs);
+@@ -140,6 +138,8 @@ static void hppa_cpu_realizefn(DeviceState *dev, Error **errp)
+                                         hppa_cpu_alarm_timer, cpu);
      }
  #endif
++
++    acc->parent_realize(dev, errp);
+ }
  
--    cpu_exec_realizefn(cs, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
-     arm_cpu_finalize_features(cpu, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
+ static void hppa_cpu_initfn(Object *obj)
 -- 
 2.41.0
 
