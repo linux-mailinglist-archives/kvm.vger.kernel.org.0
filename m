@@ -2,63 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C86887A4141
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 08:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE2537A412A
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 08:29:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239893AbjIRG30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 02:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
+        id S239897AbjIRG27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 02:28:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239994AbjIRG3L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 02:29:11 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274C1196;
-        Sun, 17 Sep 2023 23:28:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695018537; x=1726554537;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BYqtARKbdwN0UZ9MRl8Yh4ddeA5cCMaKnoseZlIqpBs=;
-  b=EhzBBh77jTEAjC1EPptAs4yPwJwEk0J3YxfqdGZ5yqaO9RGo372KcEgY
-   MWFYJ3Vh+pWBvKnJ+CaF+rgRepc008jkyU3h3Aj8ZA5q51FNYszlUbP0m
-   pYjUD1uRcivXXdbRHSwgWnaNUhG5aalO4/r4FRhjXpSws9CDEBZ44oqvI
-   ZCse55XE9zh4v561nJ0IPYl/OaKOuw2J/KJ6MrDLUj/+grp+8N6Q+fMLG
-   VvLr9wmyBcna4CALXfV0Z0VDQTYLprd3y1OMlpOuboFHGiuiKMFoFo2Ep
-   FKeqZUwAmjBlynrvG5W3+kC9IHJySqhGgCSgEvLMc74eanO0SaaezFT0N
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="378488682"
-X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
-   d="scan'208";a="378488682"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 23:28:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="815893685"
-X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
-   d="scan'208";a="815893685"
-Received: from dpdk-yahui-icx1.sh.intel.com ([10.67.111.186])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Sep 2023 23:28:51 -0700
-From:   Yahui Cao <yahui.cao@intel.com>
-To:     intel-wired-lan@lists.osuosl.org
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org, lingyu.liu@intel.com,
-        kevin.tian@intel.com, madhu.chittim@intel.com,
-        sridhar.samudrala@intel.com, alex.williamson@redhat.com,
-        jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, brett.creeley@amd.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, jesse.brandeburg@intel.com,
-        anthony.l.nguyen@intel.com
-Subject: [PATCH iwl-next v3 13/13] vfio/ice: Implement vfio_pci driver for E800 devices
-Date:   Mon, 18 Sep 2023 06:25:46 +0000
-Message-Id: <20230918062546.40419-14-yahui.cao@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230918062546.40419-1-yahui.cao@intel.com>
-References: <20230918062546.40419-1-yahui.cao@intel.com>
+        with ESMTP id S239905AbjIRG21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 02:28:27 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D87B811A;
+        Sun, 17 Sep 2023 23:28:15 -0700 (PDT)
+Received: from loongson.cn (unknown [10.40.46.158])
+        by gateway (Coremail) with SMTP id _____8Axuer+7QdlQYYpAA--.4088S3;
+        Mon, 18 Sep 2023 14:28:14 +0800 (CST)
+Received: from [192.168.124.126] (unknown [10.40.46.158])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxL9367QdlPCsKAA--.22483S3;
+        Mon, 18 Sep 2023 14:28:13 +0800 (CST)
+Subject: Re: [PATCH v21 01/29] LoongArch: KVM: Add kvm related header files
+To:     Huacai Chen <chenhuacai@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
+ <20230915014949.1222777-2-zhaotianrui@loongson.cn>
+ <CAAhV-H6dC9bmoYsxCZ7OXzzBgEEybt6OauWBox3e7p4VKDLqkg@mail.gmail.com>
+ <f0e8a0ab-280b-7d9b-b0c7-5d9480329701@loongson.cn>
+ <CAAhV-H7wupCarC+9dn9Sps1ZhyoqsOJVzAPuaQM03N_TohbbKA@mail.gmail.com>
+From:   zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <75531403-a08d-bd81-6847-34311e2c6b57@loongson.cn>
+Date:   Mon, 18 Sep 2023 14:28:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <CAAhV-H7wupCarC+9dn9Sps1ZhyoqsOJVzAPuaQM03N_TohbbKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Language: en-US
+X-CM-TRANSID: AQAAf8BxL9367QdlPCsKAA--.22483S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3KryfAw18Zr1UAF18ArWfXrc_yoW8Wr17Xo
+        W7JF4xXF48Gr1UAw4UG34qqa4Yv34rGw4UArW5Cr95Gr17ta47Cr4jgw15XF43WF1UKr43
+        Casrt3WkZayavwn5l-sFpf9Il3svdjkaLaAFLSUrUUUUeb8apTn2vfkv8UJUUUU8wcxFpf
+        9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+        UjIYCTnIWjp_UUUO57kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+        8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+        Y2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+        v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+        wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+        xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+        Jw0_WrylYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64
+        vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j
+        6r4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU28
+        nYUUUUU
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,808 +75,468 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lingyu Liu <lingyu.liu@intel.com>
 
-Add a vendor-specific vfio_pci driver for E800 devices.
+在 2023/9/18 上午9:36, Huacai Chen 写道:
+> Hi, Tianrui,
+>
+> On Mon, Sep 18, 2023 at 9:32 AM zhaotianrui <zhaotianrui@loongson.cn> wrote:
+>>
+>> 在 2023/9/16 下午4:48, Huacai Chen 写道:
+>>> Hi, Tianrui,
+>>>
+>>> On Fri, Sep 15, 2023 at 9:50 AM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
+>>>> Add LoongArch KVM related header files, including kvm.h,
+>>>> kvm_host.h, kvm_types.h. All of those are about LoongArch
+>>>> virtualization features and kvm interfaces.
+>>>>
+>>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/asm/kvm_host.h  | 245 +++++++++++++++++++++++++
+>>>>    arch/loongarch/include/asm/kvm_types.h |  11 ++
+>>>>    arch/loongarch/include/uapi/asm/kvm.h  | 108 +++++++++++
+>>>>    include/uapi/linux/kvm.h               |   9 +
+>>>>    4 files changed, 373 insertions(+)
+>>>>    create mode 100644 arch/loongarch/include/asm/kvm_host.h
+>>>>    create mode 100644 arch/loongarch/include/asm/kvm_types.h
+>>>>    create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
+>>>>
+>>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+>>>> new file mode 100644
+>>>> index 0000000000..00e0c1876b
+>>>> --- /dev/null
+>>>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>>>> @@ -0,0 +1,245 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>>> +/*
+>>>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>>>> + */
+>>>> +
+>>>> +#ifndef __ASM_LOONGARCH_KVM_HOST_H__
+>>>> +#define __ASM_LOONGARCH_KVM_HOST_H__
+>>>> +
+>>>> +#include <linux/cpumask.h>
+>>>> +#include <linux/mutex.h>
+>>>> +#include <linux/hrtimer.h>
+>>>> +#include <linux/interrupt.h>
+>>>> +#include <linux/types.h>
+>>>> +#include <linux/kvm.h>
+>>>> +#include <linux/kvm_types.h>
+>>>> +#include <linux/threads.h>
+>>>> +#include <linux/spinlock.h>
+>>>> +
+>>>> +#include <asm/inst.h>
+>>>> +#include <asm/kvm_mmu.h>
+>>>> +#include <asm/loongarch.h>
+>>>> +
+>>>> +/* Loongarch KVM register ids */
+>>>> +#define KVM_GET_IOC_CSRIDX(id)         ((id & KVM_CSR_IDX_MASK) >> LOONGARCH_REG_SHIFT)
+>>>> +#define KVM_GET_IOC_CPUCFG_IDX(id)     ((id & KVM_CPUCFG_IDX_MASK) >> LOONGARCH_REG_SHIFT)
+>>>> +
+>>>> +#define KVM_MAX_VCPUS                  256
+>>>> +#define KVM_MAX_CPUCFG_REGS            21
+>>>> +/* memory slots that does not exposed to userspace */
+>>>> +#define KVM_PRIVATE_MEM_SLOTS          0
+>>>> +
+>>>> +#define KVM_HALT_POLL_NS_DEFAULT       500000
+>>>> +
+>>>> +struct kvm_vm_stat {
+>>>> +       struct kvm_vm_stat_generic generic;
+>>>> +       u64 pages;
+>>>> +       u64 hugepages;
+>>>> +};
+>>>> +
+>>>> +struct kvm_vcpu_stat {
+>>>> +       struct kvm_vcpu_stat_generic generic;
+>>>> +       u64 idle_exits;
+>>>> +       u64 signal_exits;
+>>>> +       u64 int_exits;
+>>>> +       u64 cpucfg_exits;
+>>>> +};
+>>>> +
+>>>> +struct kvm_arch_memory_slot {
+>>>> +};
+>>>> +
+>>>> +struct kvm_context {
+>>>> +       unsigned long vpid_cache;
+>>>> +       struct kvm_vcpu *last_vcpu;
+>>>> +};
+>>>> +
+>>>> +struct kvm_world_switch {
+>>>> +       int (*guest_eentry)(void);
+>>>> +       int (*enter_guest)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+>>>> +       unsigned long page_order;
+>>>> +};
+>>>> +
+>>>> +#define MAX_PGTABLE_LEVELS     4
+>>>> +struct kvm_arch {
+>>>> +       /* Guest physical mm */
+>>>> +       kvm_pte_t *pgd;
+>>>> +       unsigned long gpa_size;
+>>>> +       unsigned long invalid_ptes[MAX_PGTABLE_LEVELS];
+>>>> +       unsigned int  pte_shifts[MAX_PGTABLE_LEVELS];
+>>>> +       unsigned int  root_level;
+>>>> +
+>>>> +       s64 time_offset;
+>>>> +       struct kvm_context __percpu *vmcs;
+>>>> +};
+>>>> +
+>>>> +#define CSR_MAX_NUMS           0x800
+>>>> +
+>>>> +struct loongarch_csrs {
+>>>> +       unsigned long csrs[CSR_MAX_NUMS];
+>>>> +};
+>>>> +
+>>>> +/* Resume Flags */
+>>>> +#define RESUME_HOST            0
+>>>> +#define RESUME_GUEST           1
+>>>> +
+>>>> +enum emulation_result {
+>>>> +       EMULATE_DONE,           /* no further processing */
+>>>> +       EMULATE_DO_MMIO,        /* kvm_run filled with MMIO request */
+>>>> +       EMULATE_FAIL,           /* can't emulate this instruction */
+>>>> +       EMULATE_EXCEPT,         /* A guest exception has been generated */
+>>>> +       EMULATE_DO_IOCSR,       /* handle IOCSR request */
+>>>> +};
+>>>> +
+>>>> +#define KVM_LARCH_FPU          (0x1 << 0)
+>>>> +#define KVM_LARCH_CSR          (0x1 << 1)
+>>>> +#define KVM_LARCH_HWCSR_USABLE (0x1 << 2)
+>>>> +
+>>>> +struct kvm_vcpu_arch {
+>>>> +       /*
+>>>> +        * Switch pointer-to-function type to unsigned long
+>>>> +        * for loading the value into register directly.
+>>>> +        */
+>>>> +       unsigned long host_eentry;
+>>>> +       unsigned long guest_eentry;
+>>>> +
+>>>> +       /* Pointers stored here for easy accessing from assembly code */
+>>>> +       int (*handle_exit)(struct kvm_run *run, struct kvm_vcpu *vcpu);
+>>>> +
+>>>> +       /* Host registers preserved across guest mode execution */
+>>>> +       unsigned long host_sp;
+>>>> +       unsigned long host_tp;
+>>>> +       unsigned long host_pgd;
+>>>> +
+>>>> +       /* Host CSRs are used when handling exits from guest */
+>>>> +       unsigned long badi;
+>>>> +       unsigned long badv;
+>>>> +       unsigned long host_ecfg;
+>>>> +       unsigned long host_estat;
+>>>> +       unsigned long host_percpu;
+>>>> +
+>>>> +       /* GPRs */
+>>>> +       unsigned long gprs[32];
+>>>> +       unsigned long pc;
+>>>> +
+>>>> +       /* Which auxiliary state is loaded (KVM_LARCH_*) */
+>>>> +       unsigned int aux_inuse;
+>>>> +       /* FPU state */
+>>>> +       struct loongarch_fpu fpu FPU_ALIGN;
+>>>> +
+>>>> +       /* CSR state */
+>>>> +       struct loongarch_csrs *csr;
+>>>> +
+>>>> +       /* GPR used as IO source/target */
+>>>> +       u32 io_gpr;
+>>>> +
+>>>> +       struct hrtimer swtimer;
+>>>> +       /* KVM register to control count timer */
+>>>> +       u32 count_ctl;
+>>>> +
+>>>> +       /* Bitmask of intr that are pending */
+>>>> +       unsigned long irq_pending;
+>>>> +       /* Bitmask of pending intr to be cleared */
+>>>> +       unsigned long irq_clear;
+>>>> +
+>>>> +       /* Bitmask of exceptions that are pending */
+>>>> +       unsigned long exception_pending;
+>>>> +       unsigned int  subcode;
+>>>> +
+>>>> +       /* Cache for pages needed inside spinlock regions */
+>>>> +       struct kvm_mmu_memory_cache mmu_page_cache;
+>>>> +
+>>>> +       /* vcpu's vpid */
+>>>> +       u64 vpid;
+>>>> +
+>>>> +       /* Frequency of stable timer in Hz */
+>>>> +       u64 timer_mhz;
+>>>> +       ktime_t expire;
+>>>> +
+>>>> +       u64 core_ext_ioisr[4];
+>>>> +
+>>>> +       /* Last CPU the vCPU state was loaded on */
+>>>> +       int last_sched_cpu;
+>>>> +       /* mp state */
+>>>> +       struct kvm_mp_state mp_state;
+>>>> +       /* cpucfg */
+>>>> +       u32 cpucfg[KVM_MAX_CPUCFG_REGS];
+>>>> +};
+>>>> +
+>>>> +static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, int reg)
+>>>> +{
+>>>> +       return csr->csrs[reg];
+>>>> +}
+>>>> +
+>>>> +static inline void writel_sw_gcsr(struct loongarch_csrs *csr, int reg, unsigned long val)
+>>>> +{
+>>>> +       csr->csrs[reg] = val;
+>>>> +}
+>>>> +
+>>>> +/* Helpers */
+>>>> +static inline bool kvm_guest_has_fpu(struct kvm_vcpu_arch *arch)
+>>>> +{
+>>>> +       return cpu_has_fpu;
+>>>> +}
+>>>> +
+>>>> +void kvm_init_fault(void);
+>>>> +
+>>>> +/* Debug: dump vcpu state */
+>>>> +int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+>>>> +
+>>>> +/* MMU handling */
+>>>> +int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsigned long badv, bool write);
+>>>> +void kvm_flush_tlb_all(void);
+>>>> +
+>>>> +#define KVM_ARCH_WANT_MMU_NOTIFIER
+>>>> +int kvm_unmap_hva_range(struct kvm *kvm,
+>>>> +                       unsigned long start, unsigned long end, bool blockable);
+>>>> +void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
+>>>> +int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
+>>>> +int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+>>>> +
+>>>> +static inline void update_pc(struct kvm_vcpu_arch *arch)
+>>>> +{
+>>>> +       arch->pc += 4;
+>>>> +}
+>>>> +
+>>>> +/**
+>>>> + * kvm_is_ifetch_fault() - Find whether a TLBL exception is due to ifetch fault.
+>>>> + * @vcpu:      Virtual CPU.
+>>>> + *
+>>>> + * Returns:    Whether the TLBL exception was likely due to an instruction
+>>>> + *             fetch fault rather than a data load fault.
+>>>> + */
+>>>> +static inline bool kvm_is_ifetch_fault(struct kvm_vcpu_arch *arch)
+>>>> +{
+>>>> +       return arch->pc == arch->badv;
+>>>> +}
+>>>> +
+>>>> +/* Misc */
+>>>> +static inline void kvm_arch_hardware_unsetup(void) {}
+>>>> +static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>>>> +static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+>>>> +static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>>>> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+>>>> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>>>> +static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+>>>> +static inline void kvm_arch_free_memslot(struct kvm *kvm,
+>>>> +                                  struct kvm_memory_slot *slot) {}
+>>>> +void kvm_check_vpid(struct kvm_vcpu *vcpu);
+>>>> +enum hrtimer_restart kvm_swtimer_wakeup(struct hrtimer *timer);
+>>>> +int kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa);
+>>>> +void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+>>>> +                                       const struct kvm_memory_slot *memslot);
+>>>> +void kvm_init_vmcs(struct kvm *kvm);
+>>>> +void kvm_vector_entry(void);
+>>>> +int  kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu);
+>>>> +extern const unsigned long kvm_vector_size;
+>>>> +extern const unsigned long kvm_enter_guest_size;
+>>>> +extern unsigned long vpid_mask;
+>>>> +extern struct kvm_world_switch *kvm_loongarch_ops;
+>>>> +
+>>>> +#define SW_GCSR                (1 << 0)
+>>>> +#define HW_GCSR                (1 << 1)
+>>>> +#define INVALID_GCSR   (1 << 2)
+>>>> +int get_gcsr_flag(int csr);
+>>>> +extern void set_hw_gcsr(int csr_id, unsigned long val);
+>>>> +#endif /* __ASM_LOONGARCH_KVM_HOST_H__ */
+>>>> diff --git a/arch/loongarch/include/asm/kvm_types.h b/arch/loongarch/include/asm/kvm_types.h
+>>>> new file mode 100644
+>>>> index 0000000000..2fe1d4bdff
+>>>> --- /dev/null
+>>>> +++ b/arch/loongarch/include/asm/kvm_types.h
+>>>> @@ -0,0 +1,11 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>>> +/*
+>>>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>>>> + */
+>>>> +
+>>>> +#ifndef _ASM_LOONGARCH_KVM_TYPES_H
+>>>> +#define _ASM_LOONGARCH_KVM_TYPES_H
+>>>> +
+>>>> +#define KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE      40
+>>>> +
+>>>> +#endif /* _ASM_LOONGARCH_KVM_TYPES_H */
+>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+>>>> new file mode 100644
+>>>> index 0000000000..fafda487d6
+>>>> --- /dev/null
+>>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>>>> @@ -0,0 +1,108 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>>>> +/*
+>>>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
+>>>> + */
+>>>> +
+>>>> +#ifndef __UAPI_ASM_LOONGARCH_KVM_H
+>>>> +#define __UAPI_ASM_LOONGARCH_KVM_H
+>>>> +
+>>>> +#include <linux/types.h>
+>>>> +
+>>>> +/*
+>>>> + * KVM Loongarch specific structures and definitions.
+>>>> + *
+>>>> + * Some parts derived from the x86 version of this file.
+>>>> + */
+>>>> +
+>>>> +#define __KVM_HAVE_READONLY_MEM
+>>>> +
+>>>> +#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>>> +#define KVM_DIRTY_LOG_PAGE_OFFSET      64
+>>>> +
+>>>> +/*
+>>>> + * for KVM_GET_REGS and KVM_SET_REGS
+>>>> + */
+>>>> +struct kvm_regs {
+>>>> +       /* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
+>>>> +       __u64 gpr[32];
+>>>> +       __u64 pc;
+>>>> +};
+>>>> +
+>>>> +/*
+>>>> + * for KVM_GET_FPU and KVM_SET_FPU
+>>>> + */
+>>>> +struct kvm_fpu {
+>>>> +       __u32 fcsr;
+>>>> +       __u64 fcc;    /* 8x8 */
+>>>> +       struct kvm_fpureg {
+>>>> +               __u64 val64[4];
+>>>> +       } fpr[32];
+>>>> +};
+>>>> +
+>>>> +/*
+>>>> + * For LoongArch, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access various
+>>>> + * registers.  The id field is broken down as follows:
+>>>> + *
+>>>> + *  bits[63..52] - As per linux/kvm.h
+>>>> + *  bits[51..32] - Must be zero.
+>>>> + *  bits[31..16] - Register set.
+>>>> + *
+>>>> + * Register set = 0: GP registers from kvm_regs (see definitions below).
+>>>> + *
+>>>> + * Register set = 1: CSR registers.
+>>>> + *
+>>>> + * Register set = 2: KVM specific registers (see definitions below).
+>>>> + *
+>>>> + * Register set = 3: FPU / SIMD registers (see definitions below).
+>>>> + *
+>>>> + * Other sets registers may be added in the future.  Each set would
+>>>> + * have its own identifier in bits[31..16].
+>>>> + */
+>>>> +
+>>>> +#define KVM_REG_LOONGARCH_GPR          (KVM_REG_LOONGARCH | 0x00000ULL)
+>>>> +#define KVM_REG_LOONGARCH_CSR          (KVM_REG_LOONGARCH | 0x10000ULL)
+>>>> +#define KVM_REG_LOONGARCH_KVM          (KVM_REG_LOONGARCH | 0x20000ULL)
+>>>> +#define KVM_REG_LOONGARCH_FPU          (KVM_REG_LOONGARCH | 0x30000ULL)
+>>> How about rename to KVM_REG_LOONGARCH_FPSIMD？
+>>>
+>>> Huacai
+>> It will broke uapi used by user space software, it may cause
+>> incompatible issue, so I think it is better to keep the original name.
+> In your comments above it is not only FPU but FPU&SIMD, and this code
+> hasn't been upstream yet, how to break UAPI?
+We want to apply this patch series to our other project when it is 
+upstream, so we need update the previous codes and it may break the 
+uapi. What do you think of it?
 
-It uses vfio_pci_core to register to the VFIO subsystem and then
-implements the E800 specific logic to support VF live migration.
-
-It implements the device state transition flow for live
-migration.
-
-Signed-off-by: Lingyu Liu <lingyu.liu@intel.com>
-Signed-off-by: Yahui Cao <yahui.cao@intel.com>
----
- MAINTAINERS                         |   7 +
- drivers/vfio/pci/Kconfig            |   2 +
- drivers/vfio/pci/Makefile           |   2 +
- drivers/vfio/pci/ice/Kconfig        |  10 +
- drivers/vfio/pci/ice/Makefile       |   4 +
- drivers/vfio/pci/ice/ice_vfio_pci.c | 707 ++++++++++++++++++++++++++++
- 6 files changed, 732 insertions(+)
- create mode 100644 drivers/vfio/pci/ice/Kconfig
- create mode 100644 drivers/vfio/pci/ice/Makefile
- create mode 100644 drivers/vfio/pci/ice/ice_vfio_pci.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 389fe9e38884..09ea8454219a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22608,6 +22608,13 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/mlx5/
- 
-+VFIO ICE PCI DRIVER
-+M:	Yahui Cao <yahui.cao@intel.com>
-+M:	Lingyu Liu <lingyu.liu@intel.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+F:	drivers/vfio/pci/ice/
-+
- VFIO PCI DEVICE SPECIFIC DRIVERS
- R:	Jason Gunthorpe <jgg@nvidia.com>
- R:	Yishai Hadas <yishaih@nvidia.com>
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 8125e5f37832..6618208947af 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -65,4 +65,6 @@ source "drivers/vfio/pci/hisilicon/Kconfig"
- 
- source "drivers/vfio/pci/pds/Kconfig"
- 
-+source "drivers/vfio/pci/ice/Kconfig"
-+
- endmenu
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 45167be462d8..fc1df82df3ac 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -13,3 +13,5 @@ obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
- obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
- 
- obj-$(CONFIG_PDS_VFIO_PCI) += pds/
-+
-+obj-$(CONFIG_ICE_VFIO_PCI) += ice/
-diff --git a/drivers/vfio/pci/ice/Kconfig b/drivers/vfio/pci/ice/Kconfig
-new file mode 100644
-index 000000000000..4c6f348d3062
---- /dev/null
-+++ b/drivers/vfio/pci/ice/Kconfig
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config ICE_VFIO_PCI
-+	tristate "VFIO support for Intel(R) Ethernet Connection E800 Series"
-+	depends on ICE
-+	depends on VFIO_PCI_CORE
-+	help
-+	  This provides migration support for Intel(R) Ethernet connection E800
-+	  series devices using the VFIO framework.
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/pci/ice/Makefile b/drivers/vfio/pci/ice/Makefile
-new file mode 100644
-index 000000000000..259d4ab89105
---- /dev/null
-+++ b/drivers/vfio/pci/ice/Makefile
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_ICE_VFIO_PCI) += ice-vfio-pci.o
-+ice-vfio-pci-y := ice_vfio_pci.o
-+
-diff --git a/drivers/vfio/pci/ice/ice_vfio_pci.c b/drivers/vfio/pci/ice/ice_vfio_pci.c
-new file mode 100644
-index 000000000000..60a0582d7932
---- /dev/null
-+++ b/drivers/vfio/pci/ice/ice_vfio_pci.c
-@@ -0,0 +1,707 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2018-2023 Intel Corporation */
-+
-+#include <linux/device.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/file.h>
-+#include <linux/pci.h>
-+#include <linux/vfio_pci_core.h>
-+#include <linux/net/intel/ice_migration.h>
-+#include <linux/anon_inodes.h>
-+
-+#define DRIVER_DESC     "ICE VFIO PCI - User Level meta-driver for Intel E800 device family"
-+
-+struct ice_vfio_pci_migration_file {
-+	struct file *filp;
-+	struct mutex lock; /* protect migration file access */
-+	bool disabled;
-+
-+	u8 mig_data[SZ_128K];
-+	size_t total_length;
-+};
-+
-+struct ice_vfio_pci_core_device {
-+	struct vfio_pci_core_device core_device;
-+	u8 deferred_reset:1;
-+	struct mutex state_mutex; /* protect migration state */
-+	enum vfio_device_mig_state mig_state;
-+	/* protect the reset_done flow */
-+	spinlock_t reset_lock;
-+	struct ice_vfio_pci_migration_file *resuming_migf;
-+	struct ice_vfio_pci_migration_file *saving_migf;
-+	struct vfio_device_migration_info mig_info;
-+	u8 *mig_data;
-+	u8 __iomem *io_base;
-+	struct ice_pf *pf;
-+	int vf_id;
-+};
-+
-+/**
-+ * ice_vfio_pci_load_state - VFIO device state reloading
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Load device state and restore it. This function is called when the VFIO uAPI
-+ * consumer wants to load the device state info from VFIO migration region and
-+ * restore them into the device. This function should make sure all the device
-+ * state info is loaded and restored successfully. As a result, return value is
-+ * mandatory to be checked.
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static int __must_check
-+ice_vfio_pci_load_state(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf = ice_vdev->resuming_migf;
-+
-+	return ice_migration_restore_devstate(ice_vdev->pf,
-+					      ice_vdev->vf_id,
-+					      migf->mig_data,
-+					      SZ_128K);
-+}
-+
-+/**
-+ * ice_vfio_pci_save_state - VFIO device state saving
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ * @migf: pointer to migration file
-+ *
-+ * Snapshot the device state and save it. This function is called when the
-+ * VFIO uAPI consumer wants to snapshot the current device state and saves
-+ * it into the VFIO migration region. This function should make sure all
-+ * of the device state info is collectted and saved successfully. As a
-+ * result, return value is mandatory to be checked.
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static int __must_check
-+ice_vfio_pci_save_state(struct ice_vfio_pci_core_device *ice_vdev,
-+			struct ice_vfio_pci_migration_file *migf)
-+{
-+	migf->total_length = SZ_128K;
-+
-+	return ice_migration_save_devstate(ice_vdev->pf,
-+					   ice_vdev->vf_id,
-+					   migf->mig_data,
-+					   SZ_128K);
-+}
-+
-+/**
-+ * ice_vfio_migration_init - Initialization for live migration function
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Returns 0 on success, negative value on error
-+ */
-+static int ice_vfio_migration_init(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct pci_dev *pdev = ice_vdev->core_device.pdev;
-+	int ret = 0;
-+
-+	ice_vdev->pf = ice_migration_get_pf(pdev);
-+	if (!ice_vdev->pf)
-+		return -EFAULT;
-+
-+	ice_vdev->vf_id = pci_iov_vf_id(pdev);
-+	if (ice_vdev->vf_id < 0)
-+		return -EINVAL;
-+
-+	ret = ice_migration_init_dev(ice_vdev->pf, ice_vdev->vf_id);
-+	if (ret)
-+		return ret;
-+
-+	ice_vdev->io_base = (u8 __iomem *)pci_iomap(pdev, 0, 0);
-+	if (!ice_vdev->io_base)
-+		return -EFAULT;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_migration_uninit - Cleanup for live migration function
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void ice_vfio_migration_uninit(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	pci_iounmap(ice_vdev->core_device.pdev, ice_vdev->io_base);
-+	ice_migration_uninit_dev(ice_vdev->pf, ice_vdev->vf_id);
-+}
-+
-+/**
-+ * ice_vfio_pci_disable_fd - Close migration file
-+ * @migf: pointer to ice vfio pci migration file
-+ */
-+static void ice_vfio_pci_disable_fd(struct ice_vfio_pci_migration_file *migf)
-+{
-+	mutex_lock(&migf->lock);
-+	migf->disabled = true;
-+	migf->total_length = 0;
-+	migf->filp->f_pos = 0;
-+	mutex_unlock(&migf->lock);
-+}
-+
-+/**
-+ * ice_vfio_pci_disable_fds - Close migration files of ice vfio pci device
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void ice_vfio_pci_disable_fds(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	if (ice_vdev->resuming_migf) {
-+		ice_vfio_pci_disable_fd(ice_vdev->resuming_migf);
-+		fput(ice_vdev->resuming_migf->filp);
-+		ice_vdev->resuming_migf = NULL;
-+	}
-+	if (ice_vdev->saving_migf) {
-+		ice_vfio_pci_disable_fd(ice_vdev->saving_migf);
-+		fput(ice_vdev->saving_migf->filp);
-+		ice_vdev->saving_migf = NULL;
-+	}
-+}
-+
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ */
-+static void
-+ice_vfio_pci_state_mutex_unlock(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+again:
-+	spin_lock(&ice_vdev->reset_lock);
-+	if (ice_vdev->deferred_reset) {
-+		ice_vdev->deferred_reset = false;
-+		spin_unlock(&ice_vdev->reset_lock);
-+		ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		goto again;
-+	}
-+	mutex_unlock(&ice_vdev->state_mutex);
-+	spin_unlock(&ice_vdev->reset_lock);
-+}
-+
-+static void ice_vfio_pci_reset_done(struct pci_dev *pdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&ice_vdev->reset_lock);
-+	ice_vdev->deferred_reset = true;
-+	if (!mutex_trylock(&ice_vdev->state_mutex)) {
-+		spin_unlock(&ice_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&ice_vdev->reset_lock);
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+}
-+
-+/**
-+ * ice_vfio_pci_open_device - Called when a vfio device is probed by VFIO UAPI
-+ * @core_vdev: the vfio device to open
-+ *
-+ * Initialization of the vfio device
-+ *
-+ * Returns 0 on success, negative value on error
-+ */
-+static int ice_vfio_pci_open_device(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+	struct vfio_pci_core_device *vdev = &ice_vdev->core_device;
-+	int ret;
-+
-+	ret = vfio_pci_core_enable(vdev);
-+	if (ret)
-+		return ret;
-+
-+	ret = ice_vfio_migration_init(ice_vdev);
-+	if (ret) {
-+		vfio_pci_core_disable(vdev);
-+		return ret;
-+	}
-+	ice_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+	vfio_pci_core_finish_enable(vdev);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_close_device - Called when a vfio device fd is closed
-+ * @core_vdev: the vfio device to close
-+ */
-+static void ice_vfio_pci_close_device(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+
-+	ice_vfio_pci_disable_fds(ice_vdev);
-+	vfio_pci_core_close_device(core_vdev);
-+	ice_vfio_migration_uninit(ice_vdev);
-+}
-+
-+/**
-+ * ice_vfio_pci_release_file - release ice vfio pci migration file
-+ * @inode: pointer to inode
-+ * @filp: pointer to the file to release
-+ *
-+ * Return 0 for success, negative for error
-+ */
-+static int ice_vfio_pci_release_file(struct inode *inode, struct file *filp)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+
-+	ice_vfio_pci_disable_fd(migf);
-+	mutex_destroy(&migf->lock);
-+	kfree(migf);
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_save_read - save migration file data to user space
-+ * @filp: pointer to migration file
-+ * @buf: pointer to user space buffer
-+ * @len: data length to be saved
-+ * @pos: should be 0
-+ *
-+ * Return len of saved data, negative for error
-+ */
-+static ssize_t ice_vfio_pci_save_read(struct file *filp, char __user *buf,
-+				      size_t len, loff_t *pos)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+	loff_t *off = &filp->f_pos;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+
-+	mutex_lock(&migf->lock);
-+	if (*off > migf->total_length) {
-+		done = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	len = min_t(size_t, migf->total_length - *off, len);
-+	if (len) {
-+		ret = copy_to_user(buf, migf->mig_data + *off, len);
-+		if (ret) {
-+			done = -EFAULT;
-+			goto out_unlock;
-+		}
-+		*off += len;
-+		done = len;
-+	}
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations ice_vfio_pci_save_fops = {
-+	.owner = THIS_MODULE,
-+	.read = ice_vfio_pci_save_read,
-+	.release = ice_vfio_pci_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+/**
-+ * ice_vfio_pci_stop_copy - create migration file and save migration state to it
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Return migration file handler
-+ */
-+static struct ice_vfio_pci_migration_file *
-+ice_vfio_pci_stop_copy(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
-+					&ice_vfio_pci_save_fops, migf,
-+					O_RDONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	ret = ice_vfio_pci_save_state(ice_vdev, migf);
-+	if (ret) {
-+		fput(migf->filp);
-+		kfree(migf);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return migf;
-+}
-+
-+/**
-+ * ice_vfio_pci_resume_write- copy migration file data from user space
-+ * @filp: pointer to migration file
-+ * @buf: pointer to user space buffer
-+ * @len: data length to be copied
-+ * @pos: should be 0
-+ *
-+ * Return len of saved data, negative for error
-+ */
-+static ssize_t
-+ice_vfio_pci_resume_write(struct file *filp, const char __user *buf,
-+			  size_t len, loff_t *pos)
-+{
-+	struct ice_vfio_pci_migration_file *migf = filp->private_data;
-+	loff_t *off = &filp->f_pos;
-+	loff_t requested_length;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+
-+	if (*off < 0 ||
-+	    check_add_overflow((loff_t)len, *off, &requested_length))
-+		return -EINVAL;
-+
-+	if (requested_length > sizeof(migf->mig_data))
-+		return -ENOMEM;
-+
-+	mutex_lock(&migf->lock);
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	ret = copy_from_user(migf->mig_data + *off, buf, len);
-+	if (ret) {
-+		done = -EFAULT;
-+		goto out_unlock;
-+	}
-+	*off += len;
-+	done = len;
-+	migf->total_length += len;
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations ice_vfio_pci_resume_fops = {
-+	.owner = THIS_MODULE,
-+	.write = ice_vfio_pci_resume_write,
-+	.release = ice_vfio_pci_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+/**
-+ * ice_vfio_pci_resume - create resuming migration file
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ *
-+ * Return migration file handler, negative value for failure
-+ */
-+static struct ice_vfio_pci_migration_file *
-+ice_vfio_pci_resume(struct ice_vfio_pci_core_device *ice_vdev)
-+{
-+	struct ice_vfio_pci_migration_file *migf;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("ice_vfio_pci_mig",
-+					&ice_vfio_pci_resume_fops, migf,
-+					O_WRONLY);
-+	if (IS_ERR(migf->filp)) {
-+		int err = PTR_ERR(migf->filp);
-+
-+		kfree(migf);
-+		return ERR_PTR(err);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+	return migf;
-+}
-+
-+/**
-+ * ice_vfio_pci_step_device_state_locked - process device state change
-+ * @ice_vdev: pointer to ice vfio pci core device structure
-+ * @new: new device state
-+ * @final: final device state
-+ *
-+ * Return migration file handler or NULL for success, negative value for failure
-+ */
-+static struct file *
-+ice_vfio_pci_step_device_state_locked(struct ice_vfio_pci_core_device *ice_vdev,
-+				      u32 new, u32 final)
-+{
-+	u32 cur = ice_vdev->mig_state;
-+	int ret;
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		ice_migration_suspend_dev(ice_vdev->pf, ice_vdev->vf_id);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_STOP)
-+		return NULL;
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
-+		struct ice_vfio_pci_migration_file *migf;
-+
-+		migf = ice_vfio_pci_stop_copy(ice_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		ice_vdev->saving_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) {
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RESUMING) {
-+		struct ice_vfio_pci_migration_file *migf;
-+
-+		migf = ice_vfio_pci_resume(ice_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		ice_vdev->resuming_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP)
-+		return NULL;
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RUNNING_P2P) {
-+		ret = ice_vfio_pci_load_state(ice_vdev);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		ice_vfio_pci_disable_fds(ice_vdev);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING)
-+		return NULL;
-+
-+	/*
-+	 * vfio_mig_get_next_state() does not use arcs other than the above
-+	 */
-+	WARN_ON(true);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+/**
-+ * ice_vfio_pci_set_device_state - Config device state
-+ * @vdev: pointer to vfio pci device
-+ * @new_state: device state
-+ *
-+ * Return 0 for success, negative value for failure.
-+ */
-+static struct file *
-+ice_vfio_pci_set_device_state(struct vfio_device *vdev,
-+			      enum vfio_device_mig_state new_state)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(vdev,
-+								 struct ice_vfio_pci_core_device,
-+								 core_device.vdev);
-+	enum vfio_device_mig_state next_state;
-+	struct file *res = NULL;
-+	int ret;
-+
-+	mutex_lock(&ice_vdev->state_mutex);
-+	while (new_state != ice_vdev->mig_state) {
-+		ret = vfio_mig_get_next_state(vdev, ice_vdev->mig_state,
-+					      new_state, &next_state);
-+		if (ret) {
-+			res = ERR_PTR(ret);
-+			break;
-+		}
-+		res = ice_vfio_pci_step_device_state_locked(ice_vdev, next_state,
-+							    new_state);
-+		if (IS_ERR(res))
-+			break;
-+		ice_vdev->mig_state = next_state;
-+		if (WARN_ON(res && new_state != ice_vdev->mig_state)) {
-+			fput(res);
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+	}
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+	return res;
-+}
-+
-+/**
-+ * ice_vfio_pci_get_device_state - get device state
-+ * @vdev: pointer to vfio pci device
-+ * @curr_state: device state
-+ *
-+ * Return 0 for success
-+ */
-+static int ice_vfio_pci_get_device_state(struct vfio_device *vdev,
-+					 enum vfio_device_mig_state *curr_state)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+		container_of(vdev, struct ice_vfio_pci_core_device, core_device.vdev);
-+
-+	mutex_lock(&ice_vdev->state_mutex);
-+	*curr_state = ice_vdev->mig_state;
-+	ice_vfio_pci_state_mutex_unlock(ice_vdev);
-+	return 0;
-+}
-+
-+/**
-+ * ice_vfio_pci_get_data_size - get migration data size
-+ * @vdev: pointer to vfio pci device
-+ * @stop_copy_length: migration data size
-+ *
-+ * Return 0 for success
-+ */
-+static int
-+ice_vfio_pci_get_data_size(struct vfio_device *vdev,
-+			   unsigned long *stop_copy_length)
-+{
-+	*stop_copy_length = SZ_128K;
-+	return 0;
-+}
-+
-+static const struct vfio_migration_ops ice_vfio_pci_migrn_state_ops = {
-+	.migration_set_state = ice_vfio_pci_set_device_state,
-+	.migration_get_state = ice_vfio_pci_get_device_state,
-+	.migration_get_data_size = ice_vfio_pci_get_data_size,
-+};
-+
-+/**
-+ * ice_vfio_pci_core_init_dev - initialize vfio device
-+ * @core_vdev: pointer to vfio device
-+ *
-+ * Return 0 for success
-+ */
-+static int ice_vfio_pci_core_init_dev(struct vfio_device *core_vdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev = container_of(core_vdev,
-+			struct ice_vfio_pci_core_device, core_device.vdev);
-+
-+	mutex_init(&ice_vdev->state_mutex);
-+	spin_lock_init(&ice_vdev->reset_lock);
-+
-+	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P;
-+	core_vdev->mig_ops = &ice_vfio_pci_migrn_state_ops;
-+
-+	return vfio_pci_core_init_dev(core_vdev);
-+}
-+
-+static const struct vfio_device_ops ice_vfio_pci_ops = {
-+	.name		= "ice-vfio-pci",
-+	.init		= ice_vfio_pci_core_init_dev,
-+	.release	= vfio_pci_core_release_dev,
-+	.open_device	= ice_vfio_pci_open_device,
-+	.close_device	= ice_vfio_pci_close_device,
-+	.device_feature = vfio_pci_core_ioctl_feature,
-+	.read		= vfio_pci_core_read,
-+	.write		= vfio_pci_core_write,
-+	.ioctl		= vfio_pci_core_ioctl,
-+	.mmap		= vfio_pci_core_mmap,
-+	.request	= vfio_pci_core_request,
-+	.match		= vfio_pci_core_match,
-+	.bind_iommufd	= vfio_iommufd_physical_bind,
-+	.unbind_iommufd	= vfio_iommufd_physical_unbind,
-+	.attach_ioas	= vfio_iommufd_physical_attach_ioas,
-+	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
-+};
-+
-+/**
-+ * ice_vfio_pci_probe - Device initialization routine
-+ * @pdev: PCI device information struct
-+ * @id: entry in ice_vfio_pci_table
-+ *
-+ * Returns 0 on success, negative on failure
-+ */
-+static int
-+ice_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev;
-+	int ret;
-+
-+	ice_vdev = vfio_alloc_device(ice_vfio_pci_core_device, core_device.vdev,
-+				     &pdev->dev, &ice_vfio_pci_ops);
-+	if (!ice_vdev)
-+		return -ENOMEM;
-+
-+	dev_set_drvdata(&pdev->dev, &ice_vdev->core_device);
-+
-+	ret = vfio_pci_core_register_device(&ice_vdev->core_device);
-+	if (ret)
-+		goto out_free;
-+
-+	return 0;
-+
-+out_free:
-+	vfio_put_device(&ice_vdev->core_device.vdev);
-+	return ret;
-+}
-+
-+/**
-+ * ice_vfio_pci_remove - Device removal routine
-+ * @pdev: PCI device information struct
-+ */
-+static void ice_vfio_pci_remove(struct pci_dev *pdev)
-+{
-+	struct ice_vfio_pci_core_device *ice_vdev =
-+		(struct ice_vfio_pci_core_device *)dev_get_drvdata(&pdev->dev);
-+
-+	vfio_pci_core_unregister_device(&ice_vdev->core_device);
-+	vfio_put_device(&ice_vdev->core_device.vdev);
-+}
-+
-+/* ice_pci_tbl - PCI Device ID Table
-+ *
-+ * Wildcard entries (PCI_ANY_ID) should come last
-+ * Last entry must be all 0s
-+ *
-+ * { Vendor ID, Device ID, SubVendor ID, SubDevice ID,
-+ *   Class, Class Mask, private data (not used) }
-+ */
-+static const struct pci_device_id ice_vfio_pci_table[] = {
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x1889) },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(pci, ice_vfio_pci_table);
-+
-+static const struct pci_error_handlers ice_vfio_pci_core_err_handlers = {
-+	.reset_done = ice_vfio_pci_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
-+static struct pci_driver ice_vfio_pci_driver = {
-+	.name			= "ice-vfio-pci",
-+	.id_table		= ice_vfio_pci_table,
-+	.probe			= ice_vfio_pci_probe,
-+	.remove			= ice_vfio_pci_remove,
-+	.err_handler            = &ice_vfio_pci_core_err_handlers,
-+	.driver_managed_dma	= true,
-+};
-+
-+module_pci_driver(ice_vfio_pci_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Intel Corporation, <linux.nics@intel.com>");
-+MODULE_DESCRIPTION(DRIVER_DESC);
--- 
-2.34.1
+Thanks
+Tianrui Zhao
+>
+> Huacai
+>
+>> Thanks
+>> Tianrui Zhao
+>>>> +#define KVM_REG_LOONGARCH_CPUCFG       (KVM_REG_LOONGARCH | 0x40000ULL)
+>>>> +#define KVM_REG_LOONGARCH_MASK         (KVM_REG_LOONGARCH | 0x70000ULL)
+>>>> +#define KVM_CSR_IDX_MASK               0x7fff
+>>>> +#define KVM_CPUCFG_IDX_MASK            0x7fff
+>>>> +
+>>>> +/*
+>>>> + * KVM_REG_LOONGARCH_KVM - KVM specific control registers.
+>>>> + */
+>>>> +
+>>>> +#define KVM_REG_LOONGARCH_COUNTER      (KVM_REG_LOONGARCH_KVM | KVM_REG_SIZE_U64 | 3)
+>>>> +#define KVM_REG_LOONGARCH_VCPU_RESET   (KVM_REG_LOONGARCH_KVM | KVM_REG_SIZE_U64 | 4)
+>>>> +
+>>>> +#define LOONGARCH_REG_SHIFT            3
+>>>> +#define LOONGARCH_REG_64(TYPE, REG)    (TYPE | KVM_REG_SIZE_U64 | (REG << LOONGARCH_REG_SHIFT))
+>>>> +#define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOONGARCH_CSR, REG)
+>>>> +#define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_LOONGARCH_CPUCFG, REG)
+>>>> +
+>>>> +struct kvm_debug_exit_arch {
+>>>> +};
+>>>> +
+>>>> +/* for KVM_SET_GUEST_DEBUG */
+>>>> +struct kvm_guest_debug_arch {
+>>>> +};
+>>>> +
+>>>> +/* definition of registers in kvm_run */
+>>>> +struct kvm_sync_regs {
+>>>> +};
+>>>> +
+>>>> +/* dummy definition */
+>>>> +struct kvm_sregs {
+>>>> +};
+>>>> +
+>>>> +struct kvm_iocsr_entry {
+>>>> +       __u32 addr;
+>>>> +       __u32 pad;
+>>>> +       __u64 data;
+>>>> +};
+>>>> +
+>>>> +#define KVM_NR_IRQCHIPS                1
+>>>> +#define KVM_IRQCHIP_NUM_PINS   64
+>>>> +#define KVM_MAX_CORES          256
+>>>> +
+>>>> +#endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+>>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>>> index 13065dd961..863f84619a 100644
+>>>> --- a/include/uapi/linux/kvm.h
+>>>> +++ b/include/uapi/linux/kvm.h
+>>>> @@ -264,6 +264,7 @@ struct kvm_xen_exit {
+>>>>    #define KVM_EXIT_RISCV_SBI        35
+>>>>    #define KVM_EXIT_RISCV_CSR        36
+>>>>    #define KVM_EXIT_NOTIFY           37
+>>>> +#define KVM_EXIT_LOONGARCH_IOCSR  38
+>>>>
+>>>>    /* For KVM_EXIT_INTERNAL_ERROR */
+>>>>    /* Emulate instruction failed. */
+>>>> @@ -336,6 +337,13 @@ struct kvm_run {
+>>>>                           __u32 len;
+>>>>                           __u8  is_write;
+>>>>                   } mmio;
+>>>> +               /* KVM_EXIT_LOONGARCH_IOCSR */
+>>>> +               struct {
+>>>> +                       __u64 phys_addr;
+>>>> +                       __u8  data[8];
+>>>> +                       __u32 len;
+>>>> +                       __u8  is_write;
+>>>> +               } iocsr_io;
+>>>>                   /* KVM_EXIT_HYPERCALL */
+>>>>                   struct {
+>>>>                           __u64 nr;
+>>>> @@ -1362,6 +1370,7 @@ struct kvm_dirty_tlb {
+>>>>    #define KVM_REG_ARM64          0x6000000000000000ULL
+>>>>    #define KVM_REG_MIPS           0x7000000000000000ULL
+>>>>    #define KVM_REG_RISCV          0x8000000000000000ULL
+>>>> +#define KVM_REG_LOONGARCH      0x9000000000000000ULL
+>>>>
+>>>>    #define KVM_REG_SIZE_SHIFT     52
+>>>>    #define KVM_REG_SIZE_MASK      0x00f0000000000000ULL
+>>>> --
+>>>> 2.39.1
+>>>>
+>>
 
