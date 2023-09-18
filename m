@@ -2,63 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BADF57A485E
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:28:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51E9C7A4835
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 13:20:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241168AbjIRL2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 07:28:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
+        id S239847AbjIRLTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 07:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241721AbjIRL17 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 07:27:59 -0400
-X-Greylist: delayed 537 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 18 Sep 2023 04:26:13 PDT
-Received: from mail.blanda.com.pl (mail.blanda.com.pl [198.244.150.235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14CE2171E
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 04:26:13 -0700 (PDT)
-Received: by mail.blanda.com.pl (Postfix, from userid 1002)
-        id 769EA23B06; Mon, 18 Sep 2023 11:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=blanda.com.pl;
-        s=mail; t=1695035833;
-        bh=WpXRhsrIjT5+eYfrloGAzb2dGoIrMoW5e12R+x+Pw88=;
-        h=Date:From:To:Subject:From;
-        b=A5rD855svf++zJHn903Z0ZpzpLQGCb5ReVbCGDieyF2iMIsBZ511+aQ+0Z1p3/0Md
-         mXSP3U62T5REyA31tS81wqf7w24kltPPt37AiK0ruTqNss+gbsxUZ5hTDBN4iPjcjL
-         GrLWZR0kmUfig2hE6CzOHw89+8LpW9u7jsDEkgPSsDTha+mJdDWCOqZZI84nG4aX0g
-         B+mpnKHEw2UImx8fMRnq9le/fLxkJraCbrKUqxgkDeJOEbSUMq4oRY95sk2ji5DCqE
-         nsl5pkgwMo4in2rTQAxTm66Kvz31QkFdt1p/Xw+Efm33bxVylUD9wg+vgssbnHhfij
-         U7kRzGktzxiYQ==
-Received: by mail.blanda.com.pl for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 11:15:58 GMT
-Message-ID: <20230918094500-0.1.1m.8vlv.0.nje35b1ms8@blanda.com.pl>
-Date:   Mon, 18 Sep 2023 11:15:58 GMT
-From:   "Karol Winiarski" <karol.winiarski@blanda.com.pl>
-To:     <kvm@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania_?=
-X-Mailer: mail.blanda.com.pl
+        with ESMTP id S241638AbjIRLTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 07:19:38 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6C694;
+        Mon, 18 Sep 2023 04:19:31 -0700 (PDT)
+Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: dmitry.osipenko)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id F38DE6607181;
+        Mon, 18 Sep 2023 12:19:29 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1695035970;
+        bh=hgnk48RgG+7cwbqcRVLD9sBkHSjtoXbVw0Wf/m2TIho=;
+        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+        b=Hg2rvjWDbAtt9zyN/6VUG9k4ys3RaaAGEoyLFGIezgW+Uos5TX8wEmjQ6ecZAbq7l
+         XBoaIVFRHfXyJJH+PG9upVQG+pKyXj+4+VZRFq+AUE8o9wa80TNtkMHEtmLG1hQdS3
+         lPimLpF4Aqc06t+CnwguDX3nJVz/TnemE+oSluae5+OANtdnqVhhNDj+O8x8QMsucn
+         lqknbR2nO/mTE/7YEUrzpirP61UUywYq600UE+DdosRs/pTtqGS/LbBlavecnYa8bn
+         d6lSQYdURwN+dxkWyYSShW0KEFnr/IyeYGSRRA9CxqFnJlylocRHY2lPkS7tt92XxG
+         jXM1+rczch0OA==
+Message-ID: <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
+Date:   Mon, 18 Sep 2023 14:19:27 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+Content-Language: en-US
+From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
+To:     David Stevens <stevensd@chromium.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230911021637.1941096-1-stevensd@google.com>
+ <20230911021637.1941096-7-stevensd@google.com>
+ <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+In-Reply-To: <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On 9/18/23 12:58, Dmitry Osipenko wrote:
+> On 9/11/23 05:16, David Stevens wrote:
+>> From: David Stevens <stevensd@chromium.org>
+>>
+>> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
+>> to map memory into the guest that is backed by non-refcounted struct
+>> pages - for example, the tail pages of higher order non-compound pages
+>> allocated by the amdgpu driver via ttm_pool_alloc_page.
+>>
+>> The bulk of this change is tracking the is_refcounted_page flag so that
+>> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+>> done by storing the flag in an unused bit in the sptes. There are no
+>> bits available in PAE SPTEs, so non-refcounted pages can only be handled
+>> on TDP and x86-64.
+>>
+>> Signed-off-by: David Stevens <stevensd@chromium.org>
+>> ---
+>>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
+>>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
+>>  arch/x86/kvm/mmu/spte.c         |  4 ++-
+>>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
+>>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
+>>  include/linux/kvm_host.h        |  3 ++
+>>  virt/kvm/kvm_main.c             |  6 ++--
+>>  8 files changed, 76 insertions(+), 32 deletions(-)
+> 
+> Could you please tell which kernel tree you used for the base of this
+> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
+> 
+> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
+> error: could not build fake ancestor
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+   BUG: kernel NULL pointer dereference, address: 0000000000000058
+   #PF: supervisor read access in kernel mode
+   #PF: error_code(0x0000) - not-present page
+   PGD 0 P4D 0 
+   Oops: 0000 [#1] PREEMPT SMP
+   CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
+   Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
+   RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
+   Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
+   RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
+   RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
+   RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
+   RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
+   R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
+   R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
+   FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
+   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+   CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
+   PKRU: 55555554
+   Call Trace:
+    <TASK>
+    ? __die+0x1f/0x60
+    ? page_fault_oops+0x14d/0x420
+    ? exc_page_fault+0x3d7/0x880
+    ? lock_acquire+0xc9/0x290
+    ? asm_exc_page_fault+0x22/0x30
+    ? gen8_ppgtt_insert+0x50b/0x8f0
+    ppgtt_bind_vma+0x4f/0x60
+    fence_work+0x1b/0x70
+    fence_notify+0x8f/0x130
+    __i915_sw_fence_complete+0x58/0x230
+    i915_vma_pin_ww+0x513/0xa80
+    eb_validate_vmas+0x17e/0x9e0
+    ? eb_pin_engine+0x2bb/0x340
+    i915_gem_do_execbuffer+0xc85/0x2bf0
+    ? __lock_acquire+0x3b6/0x21c0
+    i915_gem_execbuffer2_ioctl+0xee/0x240
+    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+    drm_ioctl_kernel+0x9d/0x140
+    drm_ioctl+0x1dd/0x410
+    ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
+    ? __fget_files+0xc5/0x170
+    __x64_sys_ioctl+0x8c/0xc0
+    do_syscall_64+0x34/0x80
+    entry_SYSCALL_64_after_hwframe+0x46/0xb0
+   RIP: 0033:0x7f2a60b0c9df
 
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
 
+$ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
+gen8_ppgtt_insert+0x50b/0x8f0:
+i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
+(inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
+(inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
 
-Pozdrawiam serdecznie,
-Karol Winiarski
+It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling. 
+
+David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
+
+-- 
+Best regards,
+Dmitry
+
