@@ -2,99 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65A767A4DE5
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:03:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 566607A4CA3
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 17:37:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjIRQDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:03:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45502 "EHLO
+        id S229650AbjIRPhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 11:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbjIRQDV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:03:21 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC6F35B5
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 08:59:33 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3add37de892so683800b6e.1
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 08:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1695052524; x=1695657324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lj5dxmdz31KH6AK++Iu1oSHNEdMOKTOEa8EzHyb8OO4=;
-        b=mAlG9Wo/6Yb6wH7+3WDqvnhWL/XgCrNW1T9p+UbWkn80AarYjXlKXSJu7QYprqxN8L
-         WiN+0LSjjc8HuN5/rmbhnxCzJYCdPc9Tjyl3FvcIZDG+IfsLmvNLNjWDJYqOXDm81tFD
-         ggnV3FsaYH4ukAkmi4bQFYqlkYCHlQC/W5iQp6HOHX/+OBQybRY8YDYxxR44j03Uafkr
-         6hmb9phX4yGiIfGLnA6qPVekl48BI9WY0F4loIMd2E68BjAMX79rFXSM/bX2HiOlCX/3
-         4Dhx/AlxkK52FrQL5LNipWiPowqnqdvOipxPXatC+kdYZR7mZmrBl+DUexHsKKghKsDf
-         v0HQ==
+        with ESMTP id S229511AbjIRPhm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 11:37:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF42C2D50
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 08:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695050892;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uwOvxKK5V+5dUlaNETTwFMhcAk/xyIs4LAekRnKndPE=;
+        b=XGuNVopuLHzrJGyAjfx5ISI1E81HF5YbNwtaQkdPkDzv20O4+g3unI4yPQbDEKJSF9Xuej
+        3XlZOmZkvC0yAMoPBFj3gTzQZjenb5I5BifsupmmoIYPWE05VtrCtsEPGagEW7nrTwnHdT
+        hO0jNCvR69bFSQR4xWMAl3u9xkab5os=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-222-mWMLmfYIMI6kTGwKR89oTA-1; Mon, 18 Sep 2023 10:27:52 -0400
+X-MC-Unique: mWMLmfYIMI6kTGwKR89oTA-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-34f6978052aso37996995ab.3
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 07:27:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695052524; x=1695657324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lj5dxmdz31KH6AK++Iu1oSHNEdMOKTOEa8EzHyb8OO4=;
-        b=sbaGmCvQoPAAPZR2SgH0TOg1ajYv49rpw/ulBIMAdz6vwURO4t5P+BceLp6kmMf/O5
-         iajlsDO4MjTPe71arwIEPgEz0UwAZ9UnvibDmtMYXVn0yzZ32XWSNfQjBV0f5u01TIOb
-         TT8dpwav0X3tV7j2A77S/a1P8wRIwT5Si9WFYqQ8PKx0wohK8SEVPljybZCoRg+yyM/z
-         DPs98qU0T1H5lScigjKfbDe+NsdFukULuPW+FSGygX6cysGuzUSrommJSgMYD76OeXn3
-         3YNDhUa8xAsJv1kDh2JpjEnwokDWrufJusIVaaCz32fE+l7kEldZUxrAzbdpueiO4Yj6
-         oAzQ==
-X-Gm-Message-State: AOJu0Yy79XJHamfs2RLWgX6R/KrxiPo01jqgZ6sFxyk8xwFUVR9rFJBK
-        nsF5k5S1KfTFb4O5rECEfq7iX+w8tc3hWUuAoDw=
-X-Google-Smtp-Source: AGHT+IFNhLbse4fMScsyVGa4C7/zZePvwAGFSXOes1CURAA9QoCkvaC8bU10ioWe6oH7Sby42aFfXg==
-X-Received: by 2002:ad4:4110:0:b0:64f:91de:3aab with SMTP id i16-20020ad44110000000b0064f91de3aabmr9453857qvp.29.1695046626845;
-        Mon, 18 Sep 2023 07:17:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id w26-20020a0ca81a000000b00655e2005350sm3491584qva.9.2023.09.18.07.17.06
+        d=1e100.net; s=20230601; t=1695047271; x=1695652071;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uwOvxKK5V+5dUlaNETTwFMhcAk/xyIs4LAekRnKndPE=;
+        b=In/ixnhEiMlq9tGu3DSUWd20hnjn/CUk31e9B9+LvjD4tYf2AcCmXIB48ESl3vhmsf
+         gk/EQRbDhrTPIwJyTmRh8NSCL4pt62nR2kS8GpUstCVRhnUJYb+8Ro7C30Hk64Mn//n3
+         IL85izrLyQcWZxZT8P9ArgNcpyLXHGVdDMdhIhMdBFc6U+7oZu1D2jpNLxWZ7NXHzuL1
+         pWGQLCx63TE70wjTmO+egyCieSzCXJ8dejeG64F6dqvyE5huUaSna2U9WuCcaneDAIZC
+         vCPpXIkIzwrFDkG15Q+zBHXYQM9fa5OFy8sBUF6ivxwkUunrWTbJ+Cs5mIEoegPfOtV6
+         4L8g==
+X-Gm-Message-State: AOJu0Yxhh3DgcNYRrktvgyVvHp4vEkaH23vNWOT1Zq2MMMaJ+oDpkvS9
+        zzJ06efIq3PE8euHFHeOWczSDxWfewX+OuZ8J+/Dza0xv5xEYJnP5fe5jUu0llkSiK1li6sitAQ
+        DwQOSF03LQrkH
+X-Received: by 2002:a05:6e02:1a4b:b0:34c:a166:9866 with SMTP id u11-20020a056e021a4b00b0034ca1669866mr12969234ilv.4.1695047270843;
+        Mon, 18 Sep 2023 07:27:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGTHmr8VlLs//iyGPIG4Vq8auG4SfRhNLO7LTZ34vrsk9xsuOivgMMQEw7TyRmCfyxKCTqx6g==
+X-Received: by 2002:a05:6e02:1a4b:b0:34c:a166:9866 with SMTP id u11-20020a056e021a4b00b0034ca1669866mr12969209ilv.4.1695047270482;
+        Mon, 18 Sep 2023 07:27:50 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id k3-20020a02c643000000b0043167542399sm2753004jan.99.2023.09.18.07.27.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 07:17:06 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qiF3h-00054J-Oj;
-        Mon, 18 Sep 2023 11:17:05 -0300
-Date:   Mon, 18 Sep 2023 11:17:05 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Shannon Nelson <shannon.nelson@amd.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
-        reinette.chatre@intel.com, tglx@linutronix.de, kvm@vger.kernel.org,
-        brett.creeley@amd.com, linux-kernel@vger.kernel.org,
-        Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH vfio] vfio/pci: remove msi domain on msi disable
-Message-ID: <20230918141705.GE13795@ziepe.ca>
-References: <20230914191406.54656-1-shannon.nelson@amd.com>
+        Mon, 18 Sep 2023 07:27:49 -0700 (PDT)
+Date:   Mon, 18 Sep 2023 08:27:48 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     ankita@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+        apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+        anuaggarwal@nvidia.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230918082748.631e9fd9.alex.williamson@redhat.com>
+In-Reply-To: <20230918130256.GE13733@nvidia.com>
+References: <20230915025415.6762-1-ankita@nvidia.com>
+        <20230915082430.11096aa3.alex.williamson@redhat.com>
+        <20230918130256.GE13733@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914191406.54656-1-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 12:14:06PM -0700, Shannon Nelson wrote:
-> The new MSI dynamic allocation machinery is great for making the irq
-> management more flexible.  It includes caching information about the
-> MSI domain which gets reused on each new open of a VFIO fd.  However,
-> this causes an issue when the underlying hardware has flexible MSI-x
-> configurations, as a changed configuration doesn't get seen between
-> new opens, and is only refreshed between PCI unbind/bind cycles.
+On Mon, 18 Sep 2023 10:02:56 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Fri, Sep 15, 2023 at 08:24:30AM -0600, Alex Williamson wrote:
+> > On Thu, 14 Sep 2023 19:54:15 -0700
+> > <ankita@nvidia.com> wrote:
+> >   
+> > > From: Ankit Agrawal <ankita@nvidia.com>
+> > > 
+> > > NVIDIA's upcoming Grace Hopper Superchip provides a PCI-like device
+> > > for the on-chip GPU that is the logical OS representation of the
+> > > internal proprietary cache coherent interconnect.
+> > > 
+> > > This representation has a number of limitations compared to a real PCI
+> > > device, in particular, it does not model the coherent GPU memory
+> > > aperture as a PCI config space BAR, and PCI doesn't know anything
+> > > about cacheable memory types.
+> > > 
+> > > Provide a VFIO PCI variant driver that adapts the unique PCI
+> > > representation into a more standard PCI representation facing
+> > > userspace. The GPU memory aperture is obtained from ACPI using
+> > > device_property_read_u64(), according to the FW specification,
+> > > and exported to userspace as a separate VFIO_REGION. Since the device
+> > > implements only one 64-bit BAR (BAR0), the GPU memory aperture is mapped
+> > > to the next available PCI BAR (BAR2). Qemu will then naturally generate a
+> > > PCI device in the VM with two 64-bit BARs (where the cacheable aperture
+> > > reported in BAR2).
+> > > 
+> > > Since this memory region is actually cache coherent with the CPU, the
+> > > VFIO variant driver will mmap it into VMA using a cacheable mapping. The
+> > > mapping is done using remap_pfn_range().
+> > > 
+> > > PCI BAR are aligned to the power-of-2, but the actual memory on the
+> > > device may not. A read or write access to the physical address from the
+> > > last device PFN up to the next power-of-2 aligned physical address
+> > > results in reading ~0 and dropped writes.
+> > > 
+> > > Lastly the presence of CPU cache coherent device memory is exposed
+> > > through sysfs for use by user space.  
+> > 
+> > This looks like a giant red flag that this approach of masquerading the
+> > coherent memory as a PCI BAR is the wrong way to go.  If the VMM needs
+> > to know about this coherent memory, it needs to get that information
+> > in-band.   
 > 
-> In our device we can change the per-VF MSI-x resource allocation
-> without the need for rebooting or function reset.  For example,
+> The VMM part doesn't need this flag, nor does the VM. The
+> orchestration needs to know when to setup the pxm stuff.
+
+Subject: [PATCH v1 1/4] vfio: new command line params for device memory NUMA nodes
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+...
++static bool vfio_pci_read_cohmem_support_sysfs(VFIODevice *vdev)
++{
++    gchar *contents = NULL;
++    gsize length;
++    char *path;
++    bool ret = false;
++    uint32_t supported;
++
++    path = g_strdup_printf("%s/coherent_mem", vdev->sysfsdev);
++    if (g_file_get_contents(path, &contents, &length, NULL) && length > 0) {
++        if ((sscanf(contents, "%u", &supported) == 1) && supported) {
++            ret = true;
++        }
++    }
+
+> I think we should drop the sysfs for now until the qemu thread about
+> the pxm stuff settles into an idea.
 > 
->   1. Initial power up and kernel boot:
-> 	# lspci -s 2e:00.1 -vv | grep MSI-X
-> 	        Capabilities: [a0] MSI-X: Enable+ Count=8 Masked-
+> When the qemu API is clear we can have a discussion on what component
+> should detect this driver and setup the pxm things, then answer the
+> how should the detection work from the kernel side.
 > 
->   2. Device VF configuration change happens with no reset
+> > be reaching out to arbitrary sysfs attributes.  Minimally this
+> > information should be provided via a capability on the region info
+> > chain,   
+> 
+> That definitely isn't suitable, eg libvirt won't have access to inband
+> information if it turns out libvirt is supposed to setup the pxm qemu
+> arguments?
 
-Is this an out of tree driver problem?
+Why would libvirt look for a "coherent_mem" attribute in sysfs when it
+can just look at the driver used by the device.  Part of the QEMU
+series is also trying to invoke the VM configuration based only on this
+device being attached to avoid libvirt orchestration changes:
 
-The intree way to alter the MSI configuration is via
-sriov_set_msix_vec_count, and there is only one in-tree driver that
-uses it right now.
+Subject: [PATCH v1 2/4] vfio: assign default values to node params
 
-If something is going wrong here it should be fixed in the
-sriov_set_msix_vec_count() machinery, possibly in the pci core to
-synchronize the msi_domain view of the world.
+    It may be desirable for some deployments to have QEMU automatically
+    pick a range and create the NUMA nodes. So the admin need not care
+    about passing any additional params. Another advantage is that the
+    feature is not dependent on newer libvirt that support the new
+    parameters pxm-ns and pxm-nc.
+ 
+> > A "coherent_mem" attribute on the device provides a very weak
+> > association to the memory region it's trying to describe.  
+> 
+> That's because it's use has nothing to do with the memory region :)
 
-Jason
+So we're creating a very generic sysfs attribute, which is meant to be
+used by orchestration to invoke device specific configuration, but is
+currently only proposed for use by the VMM.  The orchestration problem
+doesn't really exist, libvirt could know simply by the driver name that
+the device requires this configuration.  And the VMM usage is self
+inflicted because we insist on masquerading the coherent memory as a
+nondescript PCI BAR rather than providing a device specific region to
+enlighten the VMM to this unique feature.  Thanks,
+
+Alex
+
