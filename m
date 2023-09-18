@@ -2,127 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E127A4EB3
-	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:21:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D27B7A4E7D
+	for <lists+kvm@lfdr.de>; Mon, 18 Sep 2023 18:18:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbjIRQVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 12:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51982 "EHLO
+        id S230183AbjIRQSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 12:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbjIRQVR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:21:17 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D85441334;
-        Mon, 18 Sep 2023 09:14:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=daQKqPz4lN3mboBM/jvRe9yPAi0c9kCRdyVAIEbpHSg=; b=oBLNzGO4uvOnKtz8aUtc1XyVxn
-        xjknr6v97cYtOEoKTO6DeCSZmbfMiIWRqSJN5Yq6C9sWz8nuXeVQOsByMxoRtY9wkrfN74+qKVzlb
-        fr9kIevqkNYOni4qHhEMTyrFam3PH81rLq9vzAudDvZuSRK5QpaZn6MGhEG2uJC14ZRE=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qiFSh-0003UC-Av; Mon, 18 Sep 2023 14:42:55 +0000
-Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qiFRK-0006IJ-U1; Mon, 18 Sep 2023 14:41:31 +0000
-From:   Paul Durrant <paul@xen.org>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
+        with ESMTP id S230152AbjIRQS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 12:18:27 -0400
+Received: from mail-oi1-x24a.google.com (mail-oi1-x24a.google.com [IPv6:2607:f8b0:4864:20::24a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224993A8F
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:02:25 -0700 (PDT)
+Received: by mail-oi1-x24a.google.com with SMTP id 5614622812f47-3ab7fb11711so7272225b6e.2
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 09:02:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695052721; x=1695657521; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNXD76U7haNeW91VMZlpdLB8TVqFEiovhx95zes76gg=;
+        b=t5mSXj+WYVvGCM7Bn13Zc0YrI90IgYKLjhJOy29Uzxlz4VjGWlWrgGGRHBUEI41Yix
+         09gsZgKz2yJUQRc4Z/ikMdA4dHELJS8CPcr8XQLa2tooiIKK40DoCjG4QZULgDBCL4ZX
+         1nTEoce1K+VByHmj8A5tnLnj6dv/U3+wOLkV3UYvR1+DIxAIqw/TCc7XmxTz1IrPxnDw
+         Q20hOdIOLVIkbSCXux3ro+59Y8oHqqVJncd54y+8QTEHVFQXo1a/DlfJVwIID7usHWD2
+         8EDaXU64SJaG52yrcosMnupQ7IrtWaiIy7g8dT86FCNF/xgOg4zN4U2heze/VgxmAP2t
+         c1jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695052721; x=1695657521;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNXD76U7haNeW91VMZlpdLB8TVqFEiovhx95zes76gg=;
+        b=sGK6dl3oowjHA3XCjU+DFhx52BkYUKgzg6aEYr4bebQo+MkqlC8Fo3FZI0asXc5o2Q
+         4FrJY5lwI7aEF1hL1fEBBTG30kgXmy0k43V670WjFGQwhwbK+lSRkIpw6e0m5KL0qxJT
+         8wQu50TiF0P8wy+6HU1c30dR23NgCfVYQZHdVrT0r+jvlHfyjJ+K8rZVELk49Nm9vEvM
+         LFL2ScnglmHRHAEzMub5dBJPJLobg5Ch9vn5VVhlWALWk9j3nEO+q40By8RdhPQ5Ed/M
+         HPyu2KJTm+vvXpFY3gRIFmJr4i7JSnG3nr2Dkpf+HsvSQZCMgvLmKgfk7MbfwlgWn3qk
+         36FQ==
+X-Gm-Message-State: AOJu0YxPVr4iTnIBzL15lJ54KKkXvNu/IpYnQycI7pq9aMl9HoE3JL4h
+        F5VecmUlApnvBSXbnyZ/qPsZ2v8gmH4=
+X-Google-Smtp-Source: AGHT+IE1DPoRp0N2nDleDeL+nMknRqhKzdJCPwHMJrwMUBjkYLBNjcfJz91+ASKxJdGzFGGlGgloaP/fXoU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2411:0:b0:d81:78ec:c403 with SMTP id
+ k17-20020a252411000000b00d8178ecc403mr192905ybk.12.1695052199184; Mon, 18 Sep
+ 2023 08:49:59 -0700 (PDT)
+Date:   Mon, 18 Sep 2023 08:49:57 -0700
+In-Reply-To: <20230918152110.GI13795@ziepe.ca>
+Mime-Version: 1.0
+References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-6-seanjc@google.com>
+ <20230918152110.GI13795@ziepe.ca>
+Message-ID: <ZQhxpesyXeG+qbS6@google.com>
+Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
+ don't do circular lookup
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH v3 12/13] KVM: selftests / xen: don't explicitly set the vcpu_info address
-Date:   Mon, 18 Sep 2023 14:41:10 +0000
-Message-Id: <20230918144111.641369-13-paul@xen.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230918144111.641369-1-paul@xen.org>
-References: <20230918144111.641369-1-paul@xen.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        Anish Ghulati <aghulati@google.com>,
+        Venkatesh Srinivas <venkateshs@chromium.org>,
+        Andrew Thornton <andrewth@google.com>
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paul Durrant <pdurrant@amazon.com>
+On Mon, Sep 18, 2023, Jason Gunthorpe wrote:
+> On Fri, Sep 15, 2023 at 05:30:57PM -0700, Sean Christopherson wrote:
+> > Explicitly pass KVM's get/put helpers to VFIO when attaching a VM to
+> > VFIO instead of having VFIO do a symbol lookup back into KVM.  Having both
+> > KVM and VFIO do symbol lookups increases the overall complexity and places
+> > an unnecessary dependency on KVM (from VFIO) without adding any value.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  drivers/vfio/vfio.h      |  2 ++
+> >  drivers/vfio/vfio_main.c | 74 +++++++++++++++++++---------------------
+> >  include/linux/vfio.h     |  4 ++-
+> >  virt/kvm/vfio.c          |  9 +++--
+> >  4 files changed, 47 insertions(+), 42 deletions(-)
+> 
+> I don't mind this, but Christoph had disliked my prior attempt to do
+> this with function pointers..
+> 
+> The get can be inlined, IIRC, what about putting a pointer to the put
+> inside the kvm struct?
 
-If the vCPU id is set and the shared_info is mapped using HVA then we can
-infer that KVM has the ability to use a default vcpu_info mapping. Hence
-we can stop setting the address of the vcpu_info structure.
+That wouldn't allow us to achieve our goal, which is to hide the details of
+"struct kvm" from VFIO (and the rest of the kernel).
 
-NOTE: We still explicitly set vcpu_info half way through testing (to point
-      at exactly the place it already is) to make sure that setting the
-      attribute does not fail.
+What's the objection to handing VFIO a function pointer?
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
+> The the normal kvm get/put don't have to exported symbols at all?
 
-v3:
- - Add a guest sync point to set the vcpu_info attribute
+The export of kvm_get_kvm_safe() can go away (I forgot to do that in this series),
+but kvm_get_kvm() will hang around as it's needed by KVM sub-modules (PPC and x86),
+KVMGT (x86), and drivers/s390/crypto/vfio_ap_ops.c (no idea what to call that beast).
 
-v2:
- - New in this version.
----
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Gah, KVMGT doesn't actually need to call get/put, that can be handled by
+kvm_page_track_register_notifier().
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index e786fa370140..7e74b3063437 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -68,6 +68,7 @@ enum {
- 	TEST_POLL_TIMEOUT,
- 	TEST_POLL_MASKED,
- 	TEST_POLL_WAKE,
-+	SET_VCPU_INFO,
- 	TEST_TIMER_PAST,
- 	TEST_LOCKING_SEND_RACE,
- 	TEST_LOCKING_POLL_RACE,
-@@ -327,6 +328,10 @@ static void guest_code(void)
- 
- 	GUEST_SYNC(TEST_POLL_WAKE);
- 
-+	/* Set the vcpu_info to point at exactly the place it already is to
-+	 * make sure the attribute is functional. */
-+	GUEST_SYNC(SET_VCPU_INFO);
-+
- 	/* A timer wake an *unmasked* port which should wake us with an
- 	 * actual interrupt, while we're polling on a different port. */
- 	ports[0]++;
-@@ -549,7 +554,10 @@ int main(int argc, char *argv[])
- 		.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO,
- 		.u.gpa = VCPU_INFO_ADDR,
- 	};
--	vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &vi);
-+
-+	if (!has_vcpu_id || !has_shinfo_hva) {
-+		vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &vi);
-+	}
- 
- 	struct kvm_xen_vcpu_attr pvclock = {
- 		.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO,
-@@ -903,6 +911,10 @@ int main(int argc, char *argv[])
- 				alarm(1);
- 				break;
- 
-+			case SET_VCPU_INFO:
-+				vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &vi);
-+				break;
-+
- 			case TEST_TIMER_PAST:
- 				TEST_ASSERT(!evtchn_irq_expected,
- 					    "Expected event channel IRQ but it didn't happen");
--- 
-2.39.2
-
+I am planning on making exports for sub-modules conditional on there actually
+being submodules, so that's 2 of the 3 gone, but tackling the s390 crypto driver
+is an entirely different story.
