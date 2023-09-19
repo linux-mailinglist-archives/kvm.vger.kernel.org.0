@@ -2,280 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D8EA7A66C6
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 16:34:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F13E7A66E6
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 16:39:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232836AbjISOeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 10:34:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41396 "EHLO
+        id S232873AbjISOj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 10:39:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232761AbjISOeO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 10:34:14 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8698CBC;
-        Tue, 19 Sep 2023 07:34:07 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-40476ce8b2fso52429005e9.3;
-        Tue, 19 Sep 2023 07:34:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695134046; x=1695738846; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lqJvPFmgqoOTX72N2Rr3WDY0GncM240kQ4I/QG2dQUs=;
-        b=nZ0Bmayv3WYTebpIcHPHFElJxVkCKekEiy7m0Xg0bNwmGiScj8yPRGlr/z74ac3kx8
-         GPbMsjD76ikpkyuy98s8WSnxVG6uUFq0if7JEG06mfoyYhkDO46MNYsoQRqNXgvmCIcG
-         spbX/jXOiRjHd9sWyZEkji6yGbtL1EL+RQY1k2Jbvpri0F+KxaSg3MDkAl91JTGD+IDB
-         EweEC83fqisjyQmSMNwQCBsqLEdBE2jUEHOdXHznwlXhtb5cXhGnGgHXixgXh8hC56/x
-         83puByYcKphyxL0TFXYmAZFZev7Y1274h5yRHCrFXvVSBU2Ofz8Yvw2MKjUGVTkoLSBV
-         g0lQ==
+        with ESMTP id S232759AbjISOjz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 10:39:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CD1C9
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 07:39:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695134342;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8AFBj6O2dexyfgwENM9li8XfLnMidpE9cyKwL3I7ggw=;
+        b=FdOWM2CAjzVdB1tp4D3I68g62jFvVWb+EA36hcPazcRoG7QaxuX0eM4Kq07RkG3/ofarZ3
+        vl9HjLs/MrSvIcNS9OSbreK2neqGNLTDEiwyWwYxSeX8sd+mPcBieJpcMOehRcVzelz4eq
+        wm3LFGA196k7Lge2xRmHl4wc1uapAiY=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-499-U5aYxOQvM9GTnz-YzxolXg-1; Tue, 19 Sep 2023 10:39:01 -0400
+X-MC-Unique: U5aYxOQvM9GTnz-YzxolXg-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b9ef9cd887so7335774a34.0
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 07:38:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695134046; x=1695738846;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lqJvPFmgqoOTX72N2Rr3WDY0GncM240kQ4I/QG2dQUs=;
-        b=HUq+iCzz0Y1Pmli0/sjkbJlIvrY7ENys4XjPMvdQ4V7xtpsj7wwYN1YiU0Y7lJX4GS
-         K7P746nufY63pK7kOQZ6sxJwHPWhVFFtkHR294VjzbHGL444zn61vEDWVq7wn1x4wvyQ
-         zBasuWsoTiGcqcdEs1jj839peLWCj2Wt5P4XTLtkBoabBSoSh7ddW+s0SxrhYOOQTAnH
-         xK3YLaxLxcnwO+lSIRmIwemhiWyP2ejNxfrbN6lizzQXGJv/gINVjoW9+jwo2xY/Us6c
-         ZvunMmkrBRR0nbO2930whr95l5uTkZKIkkjQLFk9CYAIHHShfn4BfkvIkzz41Eu85xBs
-         p/yQ==
-X-Gm-Message-State: AOJu0Yxva7CjpLhMRTWxEbyTWcuQERGKdvtagrYONvw6jjLRGsjM3sor
-        fgQpvgvADVhmAwc55TVmcUM=
-X-Google-Smtp-Source: AGHT+IEzyB0JNFcrAyJfLZuHQ9lS+0XHPaqBZTrl/pVLxSTgSeoyVAhmsvj9jMH0LblOBe9kPxiJYg==
-X-Received: by 2002:a05:600c:228c:b0:401:c52c:5ed8 with SMTP id 12-20020a05600c228c00b00401c52c5ed8mr10325465wmf.13.1695134045697;
-        Tue, 19 Sep 2023 07:34:05 -0700 (PDT)
-Received: from [192.168.4.177] (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id m13-20020a7bca4d000000b003fe4548188bsm18380179wml.48.2023.09.19.07.34.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Sep 2023 07:34:05 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <451eebfe-1df5-4f02-2ce1-998560feaa98@xen.org>
-Date:   Tue, 19 Sep 2023 15:34:03 +0100
+        d=1e100.net; s=20230601; t=1695134337; x=1695739137;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8AFBj6O2dexyfgwENM9li8XfLnMidpE9cyKwL3I7ggw=;
+        b=vNmcFfml8h/yK9D6Z/3+NQGq/ElUZ3Mw0JUAQpAmAGrdWKKhCrUoGiIwdspsypS/Pb
+         1frh0sNuqNgReAJ/biZztjF9mWca6dWnwX3dDhepSAjIAiOrC91jP4Bh3cMSriA4HHIW
+         CGimIekoBTRxTghl/+MuqeO1xcBy5qM0RO/PuYYwi3AjOac7wvqegahD8R+/Q31NJ/1P
+         MbD8KQDDmZP9EbmlX4coRNQfN54Y9MP50DycjcX4rPMyDCt91bBsa8MGSclUNkZxuxGA
+         BhAWgcIqBW15Jwnt87eMiuQp36RKqd2xma6lzIMMb16LIi0WEEQpR3ajhY3N8wZQ6IVR
+         FHbQ==
+X-Gm-Message-State: AOJu0YzCD3tghb+8YZ5w/M2xmooRVszg6ZCaC3Pr02pi2e51WjjBn+ye
+        P8zLzsNvNAhhdoLQACNoM/RS2fAdqTYsEfebKX5BAFj+qJstXG07d3xN0To1kw42PK5JPjrv97l
+        6//j84r9aMZ0e
+X-Received: by 2002:a9d:758b:0:b0:6b7:4ffb:35c3 with SMTP id s11-20020a9d758b000000b006b74ffb35c3mr1671117otk.16.1695134337608;
+        Tue, 19 Sep 2023 07:38:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG0YRqdq68X0oQTgYebro1jmtMtzaujrkXDYVVp1Zy+kDS2txQ76xgPTSWVpzlittGyKI4+GA==
+X-Received: by 2002:a9d:758b:0:b0:6b7:4ffb:35c3 with SMTP id s11-20020a9d758b000000b006b74ffb35c3mr1671109otk.16.1695134337358;
+        Tue, 19 Sep 2023 07:38:57 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:677d:42e9:f426:9422:f020])
+        by smtp.gmail.com with ESMTPSA id n11-20020a0568301e8b00b006b8bf76174fsm5137118otr.21.2023.09.19.07.38.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 07:38:56 -0700 (PDT)
+Date:   Tue, 19 Sep 2023 11:38:47 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <ZQmyd9_v4UwBP2mp@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <ZQF3qS1KRYAt3coC@redhat.com>
+ <CAJF2gTT5s2-vhgrxnkE1EGqJMvXn8ftYrrwRMdJH1tjEqAv5kQ@mail.gmail.com>
+ <ZQUEEckIEbtxwLEG@redhat.com>
+ <CAJF2gTQLBNy9uS4AF+UgD+ew3BN1dLs0f0+z0jzpieR75kv_Dw@mail.gmail.com>
+ <ZQkuA7WloWIIteVR@redhat.com>
+ <CAJF2gTRnApmiwWhvKt0y43VKSy7_k=i3qjLkJcVX7Btjr--aNw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v4 09/13] KVM: xen: automatically use the vcpu_info
- embedded in shared_info
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-References: <20230919134149.6091-1-paul@xen.org>
- <20230919134149.6091-10-paul@xen.org>
- <3d7070d51dd0094e426b420bc5e7d09657dd8d38.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <3d7070d51dd0094e426b420bc5e7d09657dd8d38.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CAJF2gTRnApmiwWhvKt0y43VKSy7_k=i3qjLkJcVX7Btjr--aNw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/09/2023 15:18, David Woodhouse wrote:
-> On Tue, 2023-09-19 at 13:41 +0000, Paul Durrant wrote:
->> --- a/arch/x86/kvm/xen.c
->> +++ b/arch/x86/kvm/xen.c
->> @@ -491,6 +491,21 @@ static void kvm_xen_inject_vcpu_vector(struct kvm_vcpu *v)
->>   
->>   static struct gfn_to_pfn_cache *get_vcpu_info_cache(struct kvm_vcpu *v, unsigned long *offset)
->>   {
->> +       if (!v->arch.xen.vcpu_info_cache.active && v->arch.xen.vcpu_id < MAX_VIRT_CPUS) {
->> +               struct kvm *kvm = v->kvm;
->> +
->> +               if (offset) {
->> +                       if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
->> +                               *offset = offsetof(struct shared_info,
->> +                                                  vcpu_info[v->arch.xen.vcpu_id]);
->> +                       else
->> +                               *offset = offsetof(struct compat_shared_info,
->> +                                                  vcpu_info[v->arch.xen.vcpu_id]);
->> +               }
->> +
->> +               return &kvm->arch.xen.shinfo_cache;
->> +       }
->> +
->>          if (offset)
->>                  *offset = 0;
->>   
->> @@ -764,6 +779,92 @@ static int kvm_xen_set_vcpu_id(struct kvm_vcpu *vcpu, unsigned int vcpu_id)
->>          return 0;
->>   }
->>   
->> +static int kvm_xen_set_vcpu_info(struct kvm_vcpu *vcpu, gpa_t gpa)
->> +{
->> +       struct kvm *kvm = vcpu->kvm;
->> +       struct gfn_to_pfn_cache *si_gpc = &kvm->arch.xen.shinfo_cache;
->> +       struct gfn_to_pfn_cache *vi_gpc = &vcpu->arch.xen.vcpu_info_cache;
->> +       unsigned long flags;
->> +       unsigned long offset;
->> +       int ret;
->> +
->> +       if (gpa == KVM_XEN_INVALID_GPA) {
->> +               kvm_gpc_deactivate(vi_gpc);
->> +               return 0;
->> +       }
->> +
->> +       /*
->> +        * In Xen it is not possible for an explicit vcpu_info to be set
->> +        * before the shared_info exists since the former is done in response
->> +        * to a hypercall and the latter is set up as part of domain creation.
->> +        * The first 32 vCPUs have a default vcpu_info embedded in shared_info
->> +        * the content of which is copied across when an explicit vcpu_info is
->> +        * set, which can also clearly not be done if we don't know where the
->> +        * shared_info is. Hence we need to enforce that the shared_info cache
->> +        * is active here.
->> +        */
->> +       if (!si_gpc->active)
->> +               return -EINVAL;
->> +
->> +       /* Setting an explicit vcpu_info is a one-off operation */
->> +       if (vi_gpc->active)
->> +               return -EINVAL;
+On Tue, Sep 19, 2023 at 03:53:22PM +0800, Guo Ren wrote:
+> On Tue, Sep 19, 2023 at 1:13 PM Leonardo Bras <leobras@redhat.com> wrote:
+> >
+> > On Sun, Sep 17, 2023 at 10:34:36PM +0800, Guo Ren wrote:
+> > > On Sat, Sep 16, 2023 at 9:25 AM Leonardo Bras <leobras@redhat.com> wrote:
+> > > >
+> > > > On Fri, Sep 15, 2023 at 08:36:31PM +0800, Guo Ren wrote:
+> > > > > On Wed, Sep 13, 2023 at 4:50 PM Leonardo Bras <leobras@redhat.com> wrote:
+> > > > > >
+> > > > > > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > > > > > > From: Guo Ren <guoren@linux.alibaba.com>
+> > > > > > >
+> > > > > > > Cache-block prefetch instructions are HINTs to the hardware to
+> > > > > > > indicate that software intends to perform a particular type of
+> > > > > > > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> > > > > > > improve the arch_xchg for qspinlock xchg_tail.
+> > > > > > >
+> > > > > > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > > > > > > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > > > > > > ---
+> > > > > > >  arch/riscv/Kconfig                 | 15 +++++++++++++++
+> > > > > > >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+> > > > > > >  arch/riscv/include/asm/hwcap.h     |  1 +
+> > > > > > >  arch/riscv/include/asm/insn-def.h  |  5 +++++
+> > > > > > >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+> > > > > > >  arch/riscv/kernel/cpufeature.c     |  1 +
+> > > > > > >  6 files changed, 38 insertions(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > > > > > index e9ae6fa232c3..2c346fe169c1 100644
+> > > > > > > --- a/arch/riscv/Kconfig
+> > > > > > > +++ b/arch/riscv/Kconfig
+> > > > > > > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+> > > > > > >
+> > > > > > >          If you don't know what to do here, say Y.
+> > > > > > >
+> > > > > > > +config RISCV_ISA_ZICBOP
+> > > > > > > +     bool "Zicbop extension support for cache block prefetch"
+> > > > > > > +     depends on MMU
+> > > > > > > +     depends on RISCV_ALTERNATIVE
+> > > > > > > +     default y
+> > > > > > > +     help
+> > > > > > > +        Adds support to dynamically detect the presence of the ZICBOP
+> > > > > > > +        extension (Cache Block Prefetch Operations) and enable its
+> > > > > > > +        usage.
+> > > > > > > +
+> > > > > > > +        The Zicbop extension can be used to prefetch cache block for
+> > > > > > > +        read/write/instruction fetch.
+> > > > > > > +
+> > > > > > > +        If you don't know what to do here, say Y.
+> > > > > > > +
+> > > > > > >  config TOOLCHAIN_HAS_ZIHINTPAUSE
+> > > > > > >       bool
+> > > > > > >       default y
+> > > > > > > diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+> > > > > > > index 702725727671..56eff7a9d2d2 100644
+> > > > > > > --- a/arch/riscv/include/asm/cmpxchg.h
+> > > > > > > +++ b/arch/riscv/include/asm/cmpxchg.h
+> > > > > > > @@ -11,6 +11,7 @@
+> > > > > > >
+> > > > > > >  #include <asm/barrier.h>
+> > > > > > >  #include <asm/fence.h>
+> > > > > > > +#include <asm/processor.h>
+> > > > > > >
+> > > > > > >  #define __arch_xchg_masked(prepend, append, r, p, n)                 \
+> > > > > > >  ({                                                                   \
+> > > > > > > @@ -25,6 +26,7 @@
+> > > > > > >                                                                       \
+> > > > > > >       __asm__ __volatile__ (                                          \
+> > > > > > >              prepend                                                  \
+> > > > > > > +            PREFETCHW_ASM(%5)                                        \
+> > > > > > >              "0:      lr.w %0, %2\n"                                  \
+> > > > > > >              "        and  %1, %0, %z4\n"                             \
+> > > > > > >              "        or   %1, %1, %z3\n"                             \
+> > > > > > > @@ -32,7 +34,7 @@
+> > > > > > >              "        bnez %1, 0b\n"                                  \
+> > > > > > >              append                                                   \
+> > > > > > >              : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))       \
+> > > > > > > -            : "rJ" (__newx), "rJ" (~__mask)                          \
+> > > > > > > +            : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)         \
+> > > > > > >              : "memory");                                             \
+> > > > > > >                                                                       \
+> > > > > > >       r = (__typeof__(*(p)))((__retx & __mask) >> __s);               \
+> > > > > > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> > > > > > > index b7b58258f6c7..78b7b8b53778 100644
+> > > > > > > --- a/arch/riscv/include/asm/hwcap.h
+> > > > > > > +++ b/arch/riscv/include/asm/hwcap.h
+> > > > > > > @@ -58,6 +58,7 @@
+> > > > > > >  #define RISCV_ISA_EXT_ZICSR          40
+> > > > > > >  #define RISCV_ISA_EXT_ZIFENCEI               41
+> > > > > > >  #define RISCV_ISA_EXT_ZIHPM          42
+> > > > > > > +#define RISCV_ISA_EXT_ZICBOP         43
+> > > > > > >
+> > > > > > >  #define RISCV_ISA_EXT_MAX            64
+> > > > > > >
+> > > > > > > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
+> > > > > > > index 6960beb75f32..dc590d331894 100644
+> > > > > > > --- a/arch/riscv/include/asm/insn-def.h
+> > > > > > > +++ b/arch/riscv/include/asm/insn-def.h
+> > > > > > > @@ -134,6 +134,7 @@
+> > > > > > >
+> > > > > > >  #define RV_OPCODE_MISC_MEM   RV_OPCODE(15)
+> > > > > > >  #define RV_OPCODE_SYSTEM     RV_OPCODE(115)
+> > > > > > > +#define RV_OPCODE_PREFETCH   RV_OPCODE(19)
+> > > > > > >
+> > > > > > >  #define HFENCE_VVMA(vaddr, asid)                             \
+> > > > > > >       INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),              \
+> > > > > > > @@ -196,4 +197,8 @@
+> > > > > > >       INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),              \
+> > > > > > >              RS1(base), SIMM12(4))
+> > > > > > >
+> > > > > > > +#define CBO_prefetchw(base)                                  \
+> > > > > > > +     INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> > > > > > > +            RD(x0), RS1(base), RS2(x0))
+> > > > > > > +
+> > > > > >
+> > > > > > I understand that here you create the instruction via bitfield, following
+> > > > > > the ISA, and this enables using instructions not available on the
+> > > > > > toolchain.
+> > > > > >
+> > > > > > It took me some time to find the document with this instruction, so please
+> > > > > > add this to the commit msg:
+> > > > > >
+> > > > > > https://github.com/riscv/riscv-CMOs/blob/master/specifications/cmobase-v1.0.pdf
+> > > > > > Page 23.
+> > > > > >
+> > > > > > IIUC, the instruction is "prefetch.w".
+> > > > > >
+> > > > > > Maybe I am missing something, but in the document the rs2 field
+> > > > > > (PREFETCH.W) contains a 0x3, while the above looks to have a 0 instead.
+> > > > > >
+> > > > > > rs2 field = 0x0 would be a prefetch.i (instruction prefetch) instead.
+> > > > > >
+> > > > > > Is the above correct, or am I missing something?
+> > > > > Oh, you are right. My fault, thx for pointing out. It should be:
+> > > > > +       INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> > > > > +              RD(x0), RS1(base), RS2(x3))
+> > > >
+> > > > Now I am curious to check if / how will this impact performance. :)
+> > > > (Please let me know)
+> > > Ref:
+> > > commit 0ea366f5e1b6 ("arm64: atomics: prefetch the destination word
+> > > for write prior to stxr")
+> > > commit 86d231459d6d ("bpf: cpumap memory prefetchw optimizations for
+> > > struct page")
+> >
+> > Oh, I understand that prefetch.w is very useful for performance :)
+> >
+> > What I meant is that previously this patch was issuing a prefetch.i,
+> > and now it's issuing a prefetch.w (as intended).
+> >
+> > What got me curious is how much would it impact the performance to change
+> > the prefetch.i to prefetch.w. :)
+> The current SOPHO sg2042 hardware platform didn't support prefetch.w
+> instruction. So there is no performance result I could share with you.
 > 
-> Is that the errno that Xen will return to the hypercall if a guest
-> tries it? I.e. if the VMM simply returns the errno that it gets from
-> the kernel, is that OK?
-> 
+> Our next generation of processors would support ZICBOP.
 
-Yes, I checked. Xen returns -EINVAL.
+Oh, okay then.
 
->> +       ret = kvm_gpc_activate(vi_gpc, gpa, sizeof(struct vcpu_info));
-> 
->  From this moment, can't interrupts be delivered to the new vcpu_info,
-> even though the memcpy hasn't happened yet?
-> 
-
-Hmm, that's a good point. TBH it would be nice to have an 'activate and 
-leave locked' primitive to avoid this.
-
-> I think we need to ensure that any kvm_xen_set_evtchn_fast() which
-> happens at this point cannot proceed, and falls back to the slow path.
-> 
-> Can we set a flag before we activate the vcpu_info and clear it after
-> the memcpy is done, then make kvm_xen_set_evtchn_fast() return
-> EWOULDBLOCK whenever that flag is set?
-> 
-> The slow path in kvm_xen_set_evtchn() takes kvm->arch.xen.xen_lock and
-> I think kvm_xen_vcpu_set_attr() has taken that same lock before you get
-> to this code, so it works out nicely?
-> 
-
-Yes, I think that is safe... but if we didn't have the window between 
-activating the vcpu_info cache and doing the copy we'd also be ok I 
-think... Or perhaps we could simply preserve evtchn_pending_sel and copy 
-the rest of it?
+Thanks for sharing this info!
+Leo
 
 > 
+> >
+> > Thanks!
+> > Leo
+> >
+> >
+> > >
+> > > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > Thanks!
+> > > > > > Leo
+> > > > > >
+> > > > > > >  #endif /* __ASM_INSN_DEF_H */
+> > > > > > > diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
+> > > > > > > index de9da852f78d..7ad3a24212e8 100644
+> > > > > > > --- a/arch/riscv/include/asm/processor.h
+> > > > > > > +++ b/arch/riscv/include/asm/processor.h
+> > > > > > > @@ -12,6 +12,8 @@
+> > > > > > >  #include <vdso/processor.h>
+> > > > > > >
+> > > > > > >  #include <asm/ptrace.h>
+> > > > > > > +#include <asm/insn-def.h>
+> > > > > > > +#include <asm/hwcap.h>
+> > > > > > >
+> > > > > > >  #ifdef CONFIG_64BIT
+> > > > > > >  #define DEFAULT_MAP_WINDOW   (UL(1) << (MMAP_VA_BITS - 1))
+> > > > > > > @@ -103,6 +105,17 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+> > > > > > >  #define KSTK_EIP(tsk)                (ulong)(task_pt_regs(tsk)->epc)
+> > > > > > >  #define KSTK_ESP(tsk)                (ulong)(task_pt_regs(tsk)->sp)
+> > > > > > >
+> > > > > > > +#define ARCH_HAS_PREFETCHW
+> > > > > > > +#define PREFETCHW_ASM(base)  ALTERNATIVE(__nops(1), \
+> > > > > > > +                                         CBO_prefetchw(base), \
+> > > > > > > +                                         0, \
+> > > > > > > +                                         RISCV_ISA_EXT_ZICBOP, \
+> > > > > > > +                                         CONFIG_RISCV_ISA_ZICBOP)
+> > > > > > > +static inline void prefetchw(const void *ptr)
+> > > > > > > +{
+> > > > > > > +     asm volatile(PREFETCHW_ASM(%0)
+> > > > > > > +             : : "r" (ptr) : "memory");
+> > > > > > > +}
+> > > > > > >
+> > > > > > >  /* Do necessary setup to start up a newly executed thread. */
+> > > > > > >  extern void start_thread(struct pt_regs *regs,
+> > > > > > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > > > > > > index ef7b4fd9e876..e0b897db0b97 100644
+> > > > > > > --- a/arch/riscv/kernel/cpufeature.c
+> > > > > > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > > > > > @@ -159,6 +159,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+> > > > > > >       __RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
+> > > > > > >       __RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+> > > > > > >       __RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
+> > > > > > > +     __RISCV_ISA_EXT_DATA(zicbop, RISCV_ISA_EXT_ZICBOP),
+> > > > > > >       __RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+> > > > > > >       __RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+> > > > > > >       __RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
+> > > > > > > --
+> > > > > > > 2.36.1
+> > > > > > >
+> > > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Best Regards
+> > > > >  Guo Ren
+> > > > >
+> > > >
+> > >
+> > >
+> > > --
+> > > Best Regards
+> > >  Guo Ren
+> > >
+> >
 > 
->> +       if (ret)
->> +               return ret;
->> +
->> +       /* Nothing more to do if the vCPU is not among the first 32 */
->> +       if (vcpu->arch.xen.vcpu_id >= MAX_VIRT_CPUS)
->> +               return 0;
->> +
->> +       /*
->> +        * It's possible that the vcpu_info cache has been invalidated since
->> +        * we activated it so we need to go through the check-refresh dance.
->> +        */
->> +       read_lock_irqsave(&vi_gpc->lock, flags);
->> +       while (!kvm_gpc_check(vi_gpc, sizeof(struct vcpu_info))) {
->> +               read_unlock_irqrestore(&vi_gpc->lock, flags);
->> +
->> +               ret = kvm_gpc_refresh(vi_gpc, sizeof(struct vcpu_info));
->> +               if (ret) {
->> +                       kvm_gpc_deactivate(vi_gpc);
->> +                       return ret;
->> +               }
->> +
->> +               read_lock_irqsave(&vi_gpc->lock, flags);
->> +       }
->> +
->> +       /* Now lock the shared_info cache so we can copy the vcpu_info */
->> +       read_lock(&si_gpc->lock);
 > 
-> This adds a new lock ordering rule of the vcpu_info lock(s) before the
-> shared_info lock. I don't know that it's *wrong* but it seems weird to
-> me; I expected the shared_info to come first?
-> 
-> I avoided taking both at once in kvm_xen_set_evtchn_fast(), although
-> maybe if we are going to have a rule that allows both, we could revisit
-> that. Suspect it isn't needed.
-> 
-> Either way it is worth a clear comment somewhere to document the lock
-> ordering, and I'd also like to know this has been tested with lockdep,
-> which is often cleverer than me.
-> 
-
-Ok. I agree that shared_info before vcpu_info does seem more intuitive 
-and maybe it would be better given the code in 
-kvm_xen_set_evtchn_fast(). I'll seem how messy it gets in re-ordering 
-and add a comment as you suggest.
-
-   Paul
-
->> +       while (!kvm_gpc_check(si_gpc, PAGE_SIZE)) {
->> +               read_unlock(&si_gpc->lock);
->> +
->> +               ret = kvm_gpc_refresh(si_gpc, PAGE_SIZE);
->> +               if (ret) {
->> +                       read_unlock_irqrestore(&vi_gpc->lock, flags);
->> +                       kvm_gpc_deactivate(vi_gpc);
->> +                       return ret;
->> +               }
->> +
->> +               read_lock(&si_gpc->lock);
->> +       }
->> +
->> +       if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
->> +               offset = offsetof(struct shared_info,
->> +                                 vcpu_info[vcpu->arch.xen.vcpu_id]);
->> +       else
->> +               offset = offsetof(struct compat_shared_info,
->> +                                 vcpu_info[vcpu->arch.xen.vcpu_id]);
->> +
->> +       memcpy(vi_gpc->khva, si_gpc->khva + offset, sizeof(struct vcpu_info));
->> +
->> +       read_unlock(&si_gpc->lock);
->> +       read_unlock_irqrestore(&vi_gpc->lock, flags);
->> +
->> +       return 0;
->> +}
->> +
->>   int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
->>   {
->>          int idx, r = -ENOENT;
->> @@ -779,14 +880,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
->>                  BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
->>                               offsetof(struct compat_vcpu_info, time));
->>   
->> -               if (data->u.gpa == KVM_XEN_INVALID_GPA) {
->> -                       kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
->> -                       r = 0;
->> -                       break;
->> -               }
->> -
->> -               r = kvm_gpc_activate(&vcpu->arch.xen.vcpu_info_cache,
->> -                                    data->u.gpa, sizeof(struct vcpu_info));
->> +               r = kvm_xen_set_vcpu_info(vcpu, data->u.gpa);
->>                  if (!r)
->>                          kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
->>   
+> -- 
+> Best Regards
+>  Guo Ren
 > 
 
