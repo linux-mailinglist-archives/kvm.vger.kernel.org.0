@@ -2,163 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310457A6A66
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 20:05:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4C07A6AF7
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 20:57:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232043AbjISSF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 14:05:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33166 "EHLO
+        id S232526AbjISS57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 14:57:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbjISSF4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 14:05:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D598C6
-        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 11:05:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695146701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yPQFDee6tmhjQOr4CBnPWVdaics0wkhWkFarLbL/j5Q=;
-        b=BKriXNdGtyswcts/K3gC9+qGWpa2qZ6NdZqTZfq0rh/py6UHlihHwsW6R0gQ0GQ3wYOlK/
-        /8EQKkqDnpU7y55ZXgoR8ZR2ZKolAZ/+6VweLi2UvfE3f2miH8yDNojVraS1uWYHzdHx2Q
-        C8ytEYOvRAAZ2nqH1QRz35krEgTwnnI=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-uABn39bLOeOjNOFYfmtCoQ-1; Tue, 19 Sep 2023 14:04:59 -0400
-X-MC-Unique: uABn39bLOeOjNOFYfmtCoQ-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-34df876e560so47416725ab.0
-        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 11:04:59 -0700 (PDT)
+        with ESMTP id S232438AbjISS56 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 14:57:58 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBEDE9D
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 11:57:52 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-500a8b2b73eso9827074e87.0
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 11:57:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google; t=1695149871; x=1695754671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vhVTmCY18AAwuZtx0mwKmmrwAcWS17iU82Rcu9KB1Uo=;
+        b=PjeRXiIgIo5irZi0xds6a4vSeJX8/FWPN5gEBvv9ZakAtHMfjqpt51cEBmz3AXzv/7
+         NyLXsQQO8GN2ySiFoUGN3b1E/hLoUQOSHuXirYCWRsAW7s0IEDFQPk7dt3dXenKtNvTe
+         kgIeF1l+PlrxG16BJv31Aba7GDUwEPUldUghU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695146698; x=1695751498;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695149871; x=1695754671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yPQFDee6tmhjQOr4CBnPWVdaics0wkhWkFarLbL/j5Q=;
-        b=nVOHdsp7yL7gHz6evtM23+3H9HXlV9Ho3TePDsnNXTb132h0QPkY6/VIOGX5ChnV/I
-         eGemsDD9zQ0jbVjyS/QKFvhCWsu8x9ITojKThDl3BizKeANXts+Ca2Qypad1di6rctWM
-         qjEf0AUvEFvcG3WEDlIAGDZRz09qp8lcQuyKFtD7DC8c+VG8CraGZ+Z73Q3k/jcrHfKY
-         +wz1GKqMEnekhZlKNduXSyGyZcbFfhfqw31p0iHS6g+HD9DLvKVFRuzMgN7cr7x13Mwv
-         isDjgXv3xuKBb6bMEx8119d6CyHKM4o5KymgAd9CBdvOZapTED3/Qa2MiDQdDQAJZTMu
-         9WSw==
-X-Gm-Message-State: AOJu0YxSbkGzowA7OAzzW+9WDOOaSN88nhpZEAGAc/yWZiukNzr5pfC8
-        YNkQJW8ueP5C6dfgcor+35FaizC+IT8N9JcfQAgHnBSW9KAgnLsCl/N2D/B1tgzPgESy5ubb9jD
-        uIjBYJhxA7qgkHxuSmkxy
-X-Received: by 2002:a92:c10b:0:b0:350:ecf2:8eca with SMTP id p11-20020a92c10b000000b00350ecf28ecamr542598ile.19.1695146697699;
-        Tue, 19 Sep 2023 11:04:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHow4QEWp5PgAICiygV3zUpB9qg2AEwKhayIppVcrOusKPypNKokF3av7XY+kYtGxweePqDSQ==
-X-Received: by 2002:a92:c10b:0:b0:350:ecf2:8eca with SMTP id p11-20020a92c10b000000b00350ecf28ecamr542576ile.19.1695146697461;
-        Tue, 19 Sep 2023 11:04:57 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id q18-20020a02cf12000000b004302760aa6bsm3522374jar.4.2023.09.19.11.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 11:04:56 -0700 (PDT)
-Date:   Tue, 19 Sep 2023 12:04:56 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cong Liu <liucong2@kylinos.cn>
-Cc:     jgg@ziepe.ca, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] vfio: Fix uninitialized symbol and potential
- dereferencing errors in vfio_combine_iova_ranges
-Message-ID: <20230919120456.1a68dc4d.alex.williamson@redhat.com>
-In-Reply-To: <20230914090839.196314-1-liucong2@kylinos.cn>
-References: <ZQGs6F5y3YzlAJaL@ziepe.ca>
-        <20230914090839.196314-1-liucong2@kylinos.cn>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        bh=vhVTmCY18AAwuZtx0mwKmmrwAcWS17iU82Rcu9KB1Uo=;
+        b=HuEFzOcrNnXbPrKjw8m3bHgJO2n0aEmLbkoyN7T/RRo6Vu6VApEhypWSlR1hhGOV6H
+         8HzzJYId+L7a9CP40oDiWJtekuB3LPdj29BNwkEPM4vDveGZuLzCBSumsV0MUYOrkW86
+         kotK91g3JvDYdRVks6IGh6htWfjWHrcXukUawArmZdPDpre30zIqHXIC425I7ugrLPh0
+         BTdV941sOtsrLJtQ9rvMYB5GiLKVtpbnXtoVyKu1wbdIScZzzCbzP9ZeWcyKou35irxt
+         BfYSxcGolGhd7vcIo70v7RvIl6NxnfF337SB+LW2jV1mRD/qhyX2kjFu7JRVHysiHgjs
+         2UQw==
+X-Gm-Message-State: AOJu0Yws6MnN9aiqWgCMmcsQyFRg1HD6AWvigZNGByteXiF/jt8zQ67R
+        dONu2w49hjVenUzAcXaAsKJbWqgJI59TYQxNK1k9
+X-Google-Smtp-Source: AGHT+IGzgFUkeaLucDDy+VjfOLYnjbzLxksr6Bjjy8m/XEtgrZyisbaxP5h6+A9hOORSOeSpaVrcf+At/pha0PYjcCA=
+X-Received: by 2002:ac2:5b1c:0:b0:503:314f:affe with SMTP id
+ v28-20020ac25b1c000000b00503314faffemr498289lfn.17.1695149870227; Tue, 19 Sep
+ 2023 11:57:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230918180646.1398384-1-apatel@ventanamicro.com> <20230918180646.1398384-2-apatel@ventanamicro.com>
+In-Reply-To: <20230918180646.1398384-2-apatel@ventanamicro.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 19 Sep 2023 11:57:38 -0700
+Message-ID: <CAOnJCULNPvZzWH5bAFW+zKL_kM15Du+qV50atfqUsB1pzp0dmA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Sep 2023 17:08:39 +0800
-Cong Liu <liucong2@kylinos.cn> wrote:
-
-> when compiling with smatch check, the following errors were encountered:
-> 
-> drivers/vfio/vfio_main.c:957 vfio_combine_iova_ranges() error: uninitialized symbol 'last'.
-> drivers/vfio/vfio_main.c:978 vfio_combine_iova_ranges() error: potentially dereferencing uninitialized 'comb_end'.
-> drivers/vfio/vfio_main.c:978 vfio_combine_iova_ranges() error: potentially dereferencing uninitialized 'comb_start'.
-> 
-> this patch fix these error.
-> 
-> Signed-off-by: Cong Liu <liucong2@kylinos.cn>
+On Mon, Sep 18, 2023 at 11:07=E2=80=AFAM Anup Patel <apatel@ventanamicro.co=
+m> wrote:
+>
+> The ISA_EXT registers to enabled/disable ISA extensions for VCPU
+> are always available when underlying host has the corresponding
+> ISA extension. The copy_isa_ext_reg_indices() called by the
+> KVM_GET_REG_LIST API does not align with this expectation so
+> let's fix it.
+>
+> Fixes: 031f9efafc08 ("KVM: riscv: Add KVM_GET_REG_LIST API support")
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
->  drivers/vfio/vfio_main.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 40732e8ed4c6..96d2f3030ebb 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -938,14 +938,17 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
->  void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
->  			      u32 req_nodes)
->  {
-> -	struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
-> +	struct interval_tree_node *prev, *curr;
-> +	struct interval_tree_node *comb_start = NULL, *comb_end = NULL;
->  	unsigned long min_gap, curr_gap;
->  
->  	/* Special shortcut when a single range is required */
->  	if (req_nodes == 1) {
-> -		unsigned long last;
-> +		unsigned long last = 0;
->  
->  		comb_start = interval_tree_iter_first(root, 0, ULONG_MAX);
-> +		if (!comb_start)
-> +			return;
->  		curr = comb_start;
->  		while (curr) {
->  			last = curr->last;
-
-@last no longer requires initialization with the @comb_start test.
-
-However, all of these are testing for invalid parameters, which I think
-we can eliminate if we simply introduce the following at the start of
-the function:
-
-        if (!cur_nodes || cur_nodes <= req_nodes ||
-            WARN_ON(!req_nodes || !root->rb_root.rb_node))
-                return;
-
-At that point we're guaranteed to have any entry for both the above and
-below first entry and there must be at least a second entry (or a
-driver bug telling us there are more entries than actually exist) for
-the next call below.  Thanks,
-
-Alex
+>  arch/riscv/kvm/vcpu_onereg.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index 1b7e9fa265cb..e7e833ced91b 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -842,7 +842,7 @@ static int copy_isa_ext_reg_indices(const struct kvm_=
+vcpu *vcpu,
+>                 u64 reg =3D KVM_REG_RISCV | size | KVM_REG_RISCV_ISA_EXT =
+| i;
+>
+>                 isa_ext =3D kvm_isa_ext_arr[i];
+> -               if (!__riscv_isa_extension_available(vcpu->arch.isa, isa_=
+ext))
+> +               if (!__riscv_isa_extension_available(NULL, isa_ext))
+>                         continue;
+>
+>                 if (uindices) {
+> --
+> 2.34.1
+>
 
 
-> @@ -963,6 +966,10 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
->  		prev = NULL;
->  		min_gap = ULONG_MAX;
->  		curr = interval_tree_iter_first(root, 0, ULONG_MAX);
-> +		if (!curr) {
-> +			/* No more ranges to combine */
-> +			break;
-> +		}
->  		while (curr) {
->  			if (prev) {
->  				curr_gap = curr->start - prev->last;
-> @@ -975,6 +982,10 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
->  			prev = curr;
->  			curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
->  		}
-> +		if (!comb_start || !comb_end) {
-> +			/* No more ranges to combine */
-> +			break;
-> +		}
->  		comb_start->last = comb_end->last;
->  		interval_tree_remove(comb_end, root);
->  		cur_nodes--;
-
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
+--=20
+Regards,
+Atish
