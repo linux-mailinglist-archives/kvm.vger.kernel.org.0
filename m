@@ -2,87 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A32C7A5D59
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 11:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66C407A5DBE
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 11:25:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230504AbjISJFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 05:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35084 "EHLO
+        id S231178AbjISJZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 05:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbjISJFR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 05:05:17 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A63114;
-        Tue, 19 Sep 2023 02:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9Um9xivfZIzOpGAbhiiXrCDCVB724N5qIHjbsLgt4Ac=; b=iZvMDqxgfVG849kaE5gtwfVFMM
-        YNYWJLuio+/Rs8inIPe/YyI7Rr6GVuUwmlpiqnStl1uQDFzxqdmU2p6+HsopumMBvl/UZYqGzDhoC
-        EQJIEePHbzuHZKCM0DIT/5+E8x8UD6OhQxJRy4A0O77fQ+ej6MIEHr3Q2jSg/WjpDWqdlhG6J/aqq
-        q+w8YLveHwMZF8wwmkMRp2cOLKzd8et2daNDzFZT1U9AxOAVfwh+lUE6hsHfdue0cbkfDuPOTc9NE
-        1K6YV47tOLe+BdI2tVe0FFQPK/l+GXJqi7PRKo2sqe32njJAfdrpA7lx1hbcpxaJldo0Y5ONJlkNm
-        sIQVfavQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qiWf1-00GKUe-4M; Tue, 19 Sep 2023 09:04:47 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C60CF30042E; Tue, 19 Sep 2023 11:04:46 +0200 (CEST)
-Date:   Tue, 19 Sep 2023 11:04:46 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Alexander Graf <graf@amazon.de>
-Cc:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Nicolas Saenz Julienne <nsaenz@amazon.es>,
-        "Griffoul, Fred" <fgriffo@amazon.com>
-Subject: Re: [RFC] KVM: x86: Allow userspace exit on HLT and MWAIT, else
- yield on MWAIT
-Message-ID: <20230919090446.GC21729@noisy.programming.kicks-ass.net>
-References: <1b52b557beb6606007f7ec5672eab0adf1606a34.camel@infradead.org>
- <63b382bf-d1fb-464f-ab06-4185f796a85f@amazon.de>
- <b3c1a64daa6d265b295aedd6176daa8ab95e273f.camel@infradead.org>
- <db756c13-eee5-414a-a28d-2ce08e7b77d9@amazon.de>
+        with ESMTP id S231176AbjISJZg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 05:25:36 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79D8116;
+        Tue, 19 Sep 2023 02:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695115526; x=1726651526;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P2SZV7XNPkJc7Awaa/pjBYWEEgfBie06vXhRPpUVPPM=;
+  b=Mox+UEkQp5NT2HzlZ6Mc8vkAN6uzEoI8rPbBt0Bznh8kc3TA6oii75UQ
+   zQ2M4wM4rQiejywPnmNNPguWI0WPsjHXRiOO11jqV5Pz9V7mzZSZuXyUL
+   /7PRISqQP6w8VsvQlcKuKnzrk2g8jT9eDOceqP5hpoBb1OswBWMpH7YbH
+   Eyn6IErU4KQTJZGbvA+2fnKWoMveKG+o4Ge7m4RMiqjgEd9GsD+viQRv2
+   fu9p51B9dndLMONLxQcuU8AmZm6wB7BT26X4yMSzmBL/bmULgrNoMTEJ+
+   YINkQZZaXo4Fww5ljwuxyxKd0d95IeGiowFm0qH1+oiMTyR/NQRzBIQve
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446368817"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="446368817"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 02:25:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="722804612"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="722804612"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga006.jf.intel.com with ESMTP; 19 Sep 2023 02:25:24 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: [PATCH 0/6] iommufd support allocating nested parent domain
+Date:   Tue, 19 Sep 2023 02:25:17 -0700
+Message-Id: <20230919092523.39286-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db756c13-eee5-414a-a28d-2ce08e7b77d9@amazon.de>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 01:59:50PM +0200, Alexander Graf wrote:
-> The problem with MWAIT is that you don't really know when it's done.
+IOMMU hardwares that support nested translation would have two stages
+address translation (normally mentioned as stage-1 and stage-2). The page
+table formats of the stage-1 and stage-2 can be different. e.g., VT-d has
+different page table formats for stage-1 and stage-2.
 
-This isn't really a problem. MWAIT is allowed (expected even) to return
-early.
+Nested parent domain is the iommu domain used to represent the stage-2
+translation. In IOMMUFD, both stage-1 and stage-2 translation are tracked
+as HWPT (a.k.a. iommu domain). Stage-2 HWPT is parent of stage-1 HWPT as
+stage-1 cannot work alone in nested translation. In the cases of stage-1 and
+stage-2 page table format are different, the parent HWPT should use exactly
+the stage-2 page table format. However, the existing kernel hides the format
+selection in iommu drivers, so the domain allocated via IOMMU_HWPT_ALLOC can
+use either stage-1 page table format or stage-2 page table format, there is
+no guarantees for it.
 
-REP;NOP is a valid implementation of MWAIT.
+To enforce the page table format of the nested parent domain, this series
+introduces a new iommu op (domain_alloc_user) which can accept user flags
+to allocate domain as userspace requires. It also converts IOMMUFD to use
+the new domain_alloc_user op for domain allocation if supported, then extends
+the IOMMU_HWPT_ALLOC ioctl to pass down a NEST_PARENT flag to allocate a HWPT
+which can be used as parent. This series implements the new op in Intel iommu
+driver to have a complete picture. It is a preparation for adding nesting
+support in IOMMUFD/IOMMU.
 
-MWAIT must not delay waking (much) after either:
+Complete code can be found:
+https://github.com/yiliu1765/iommufd/tree/iommufd_alloc_user_v1
 
- - write to monitored address
- - interrupt pending
+Regards,
+	Yi Liu
 
-But it doesn't say anything about not waking up sooner.
+Yi Liu (6):
+  iommu: Add new iommu op to create domains owned by userspace
+  iommufd/hw_pagetable: Use domain_alloc_user op for domain allocation
+  iommufd/hw_pagetable: Accepts user flags for domain allocation
+  iommufd/hw_pagetable: Support allocating nested parent domain
+  iommufd/selftest: Add domain_alloc_user() support in iommu mock
+  iommu/vt-d: Add domain_alloc_user op
 
-Now, obviously on real hardware you prefer if MWAIT were to also do the
-whole C-state thing and safe your some actual power, but this is virt,
-real hardware is not a concern and wakeup-timeliness also not much.
+ drivers/iommu/intel/iommu.c                   | 20 ++++++++++++
+ drivers/iommu/iommufd/device.c                |  2 +-
+ drivers/iommu/iommufd/hw_pagetable.c          | 31 ++++++++++++++-----
+ drivers/iommu/iommufd/iommufd_private.h       |  3 +-
+ drivers/iommu/iommufd/selftest.c              | 16 ++++++++++
+ include/linux/iommu.h                         |  8 +++++
+ include/uapi/linux/iommufd.h                  | 12 ++++++-
+ tools/testing/selftests/iommu/iommufd.c       | 24 +++++++++++---
+ .../selftests/iommu/iommufd_fail_nth.c        |  2 +-
+ tools/testing/selftests/iommu/iommufd_utils.h | 11 +++++--
+ 10 files changed, 111 insertions(+), 18 deletions(-)
 
+-- 
+2.34.1
 
-IIRC the ARM64 WFE thing has a 10khz timer or something it wakes from if
-nothing else. So I suppose what I'm saying is that: nanosleep(100000)
-might be a suitable MWAIT implementation.
-
-It's virt, it sucks anyway :-)
