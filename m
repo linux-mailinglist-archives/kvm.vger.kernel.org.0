@@ -2,492 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AF637A5928
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 07:07:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B38F37A5938
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 07:14:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbjISFHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 01:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50190 "EHLO
+        id S231144AbjISFOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 01:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjISFHn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 01:07:43 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB9EFFD;
-        Mon, 18 Sep 2023 22:07:34 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8CxyOiULAllyNMpAA--.44555S3;
-        Tue, 19 Sep 2023 13:07:32 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxrdyQLAllCDwLAA--.22413S3;
-        Tue, 19 Sep 2023 13:07:31 +0800 (CST)
-Subject: Re: [PATCH v21 02/29] LoongArch: KVM: Implement kvm module related
- interface
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
- <20230915014949.1222777-3-zhaotianrui@loongson.cn>
- <CAAhV-H5MEEACwp-NAPMWDhv31YT9cqJE6o8Z_O3UtHepyKF81g@mail.gmail.com>
- <a6a8ce42-54ad-659a-95c9-c5f47f74aecd@loongson.cn>
- <CAAhV-H4SO4sDV5o9+hMGL65qsh-0X9f68FaKY7TkrNOQ+G3_wA@mail.gmail.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <3398bb30-a66a-c2ee-9f1f-da5e05db3a96@loongson.cn>
-Date:   Tue, 19 Sep 2023 13:07:29 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S230454AbjISFOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 01:14:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11CAFFF
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 22:13:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695100432;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4GZT13TAwSFlgcmBEe3p4sewwUQikjB5LnKu1cjTHTo=;
+        b=AZF+JRkJjFCB5cOGUJo/PPeEUmhPHts9xdaNmTQECk7l3eR6nBU1IGL1We6ksShpdMEpfg
+        1LIz8UMdyNdMLIptPCL+ZPY3M52cz/rYyInKmkXuvwQ2cpN1T2ByftNuaQn1SiSmorFsiu
+        6iSLbtgAbTQmKbJgNGbRxQukYtNizbs=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-693-cDBKv-d8PpupViHdZuWfiQ-1; Tue, 19 Sep 2023 01:13:50 -0400
+X-MC-Unique: cDBKv-d8PpupViHdZuWfiQ-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6c0f6c0a017so7806913a34.1
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 22:13:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695100430; x=1695705230;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4GZT13TAwSFlgcmBEe3p4sewwUQikjB5LnKu1cjTHTo=;
+        b=fjpvbhSpO8+XVcEuF42vw+GWXnoBHdWgxC9/7G1wunfBijn4iJlTWrl11fkUue+fy5
+         hOcPNjsNSmJloAn7Af2D4ah/E4iN5eUrh+aqulpk3jsn5If9IFi3WnonM89JX7CmTfJq
+         Vl5rXW7wpZGGNOihgzMz8HfIfbYRmtu9bGv8441F+gy8EY8TpzmUD/dc0NpBKZw/d3U8
+         uyo3zt0NfyqjuzrNdws1l5DgjfG2GgR5qf3u1//qjmQpkYs7j0j+ALQlzcCKGuY/eOYO
+         nf+C6MV2Np8c5USvcip8eRleZesfJU/9+c9S4xBPJqrcKFRU4928qgjEMp45vtk5AlxD
+         20rw==
+X-Gm-Message-State: AOJu0YyHySJEPvqnIc2XvmUKkiVQVCSx+4XwGTJMBD2O0vlcUmc9arXK
+        thmo5lLT0/VH46kaxFxdaVmHE2fXPTi5UwnF5a6b7ol56VbvN22aqGg9+cpWU0RdjaCXfysVdQ0
+        e4z4g1J6w04lY
+X-Received: by 2002:a9d:4d85:0:b0:6bd:78a:460 with SMTP id u5-20020a9d4d85000000b006bd078a0460mr12957267otk.32.1695100429987;
+        Mon, 18 Sep 2023 22:13:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF5ILH35twxznQW0Ej6u7DI9g60WcJhE2TstDk41zWTR2DprqxjK01MIBFqaLSsyUqs0vRlGg==
+X-Received: by 2002:a9d:4d85:0:b0:6bd:78a:460 with SMTP id u5-20020a9d4d85000000b006bd078a0460mr12957247otk.32.1695100429689;
+        Mon, 18 Sep 2023 22:13:49 -0700 (PDT)
+Received: from redhat.com ([2804:1b3:a803:677d:42e9:f426:9422:f020])
+        by smtp.gmail.com with ESMTPSA id q4-20020a9d7c84000000b006b45be2fdc2sm4759631otn.65.2023.09.18.22.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 22:13:49 -0700 (PDT)
+Date:   Tue, 19 Sep 2023 02:13:39 -0300
+From:   Leonardo Bras <leobras@redhat.com>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, longman@redhat.com, boqun.feng@gmail.com,
+        tglx@linutronix.de, paulmck@kernel.org, rostedt@goodmis.org,
+        rdunlap@infradead.org, catalin.marinas@arm.com,
+        conor.dooley@microchip.com, xiaoguang.xing@sophgo.com,
+        bjorn@rivosinc.com, alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+Subject: Re: [PATCH V11 03/17] riscv: Use Zicbop in arch_xchg when available
+Message-ID: <ZQkuA7WloWIIteVR@redhat.com>
+References: <20230910082911.3378782-1-guoren@kernel.org>
+ <20230910082911.3378782-4-guoren@kernel.org>
+ <ZQF3qS1KRYAt3coC@redhat.com>
+ <CAJF2gTT5s2-vhgrxnkE1EGqJMvXn8ftYrrwRMdJH1tjEqAv5kQ@mail.gmail.com>
+ <ZQUEEckIEbtxwLEG@redhat.com>
+ <CAJF2gTQLBNy9uS4AF+UgD+ew3BN1dLs0f0+z0jzpieR75kv_Dw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H4SO4sDV5o9+hMGL65qsh-0X9f68FaKY7TkrNOQ+G3_wA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: AQAAf8BxrdyQLAllCDwLAA--.22413S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3ZF48ZrW3GryrCrW8Xw1xCrX_yoW8Wryruo
-        WrKF4fJF1UAr1UArZxW34qqay09w15Ga9av3W7Arn3tw1Dt3Wa9rZ8C3WUJFsxWr1UAry7
-        Ja9FgF4F9FW2gr15l-sFpf9Il3svdjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf
-        9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-        UjIYCTnIWjp_UUUO57kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-        8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-        Y2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-        wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-        xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-        JF0_Jw1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64
-        vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F4
-        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxV
-        AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j
-        6r4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7p
-        nQUUUUU
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAJF2gTQLBNy9uS4AF+UgD+ew3BN1dLs0f0+z0jzpieR75kv_Dw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Sep 17, 2023 at 10:34:36PM +0800, Guo Ren wrote:
+> On Sat, Sep 16, 2023 at 9:25 AM Leonardo Bras <leobras@redhat.com> wrote:
+> >
+> > On Fri, Sep 15, 2023 at 08:36:31PM +0800, Guo Ren wrote:
+> > > On Wed, Sep 13, 2023 at 4:50 PM Leonardo Bras <leobras@redhat.com> wrote:
+> > > >
+> > > > On Sun, Sep 10, 2023 at 04:28:57AM -0400, guoren@kernel.org wrote:
+> > > > > From: Guo Ren <guoren@linux.alibaba.com>
+> > > > >
+> > > > > Cache-block prefetch instructions are HINTs to the hardware to
+> > > > > indicate that software intends to perform a particular type of
+> > > > > memory access in the near future. Enable ARCH_HAS_PREFETCHW and
+> > > > > improve the arch_xchg for qspinlock xchg_tail.
+> > > > >
+> > > > > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > > > > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > > > > ---
+> > > > >  arch/riscv/Kconfig                 | 15 +++++++++++++++
+> > > > >  arch/riscv/include/asm/cmpxchg.h   |  4 +++-
+> > > > >  arch/riscv/include/asm/hwcap.h     |  1 +
+> > > > >  arch/riscv/include/asm/insn-def.h  |  5 +++++
+> > > > >  arch/riscv/include/asm/processor.h | 13 +++++++++++++
+> > > > >  arch/riscv/kernel/cpufeature.c     |  1 +
+> > > > >  6 files changed, 38 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > > > > index e9ae6fa232c3..2c346fe169c1 100644
+> > > > > --- a/arch/riscv/Kconfig
+> > > > > +++ b/arch/riscv/Kconfig
+> > > > > @@ -617,6 +617,21 @@ config RISCV_ISA_ZICBOZ
+> > > > >
+> > > > >          If you don't know what to do here, say Y.
+> > > > >
+> > > > > +config RISCV_ISA_ZICBOP
+> > > > > +     bool "Zicbop extension support for cache block prefetch"
+> > > > > +     depends on MMU
+> > > > > +     depends on RISCV_ALTERNATIVE
+> > > > > +     default y
+> > > > > +     help
+> > > > > +        Adds support to dynamically detect the presence of the ZICBOP
+> > > > > +        extension (Cache Block Prefetch Operations) and enable its
+> > > > > +        usage.
+> > > > > +
+> > > > > +        The Zicbop extension can be used to prefetch cache block for
+> > > > > +        read/write/instruction fetch.
+> > > > > +
+> > > > > +        If you don't know what to do here, say Y.
+> > > > > +
+> > > > >  config TOOLCHAIN_HAS_ZIHINTPAUSE
+> > > > >       bool
+> > > > >       default y
+> > > > > diff --git a/arch/riscv/include/asm/cmpxchg.h b/arch/riscv/include/asm/cmpxchg.h
+> > > > > index 702725727671..56eff7a9d2d2 100644
+> > > > > --- a/arch/riscv/include/asm/cmpxchg.h
+> > > > > +++ b/arch/riscv/include/asm/cmpxchg.h
+> > > > > @@ -11,6 +11,7 @@
+> > > > >
+> > > > >  #include <asm/barrier.h>
+> > > > >  #include <asm/fence.h>
+> > > > > +#include <asm/processor.h>
+> > > > >
+> > > > >  #define __arch_xchg_masked(prepend, append, r, p, n)                 \
+> > > > >  ({                                                                   \
+> > > > > @@ -25,6 +26,7 @@
+> > > > >                                                                       \
+> > > > >       __asm__ __volatile__ (                                          \
+> > > > >              prepend                                                  \
+> > > > > +            PREFETCHW_ASM(%5)                                        \
+> > > > >              "0:      lr.w %0, %2\n"                                  \
+> > > > >              "        and  %1, %0, %z4\n"                             \
+> > > > >              "        or   %1, %1, %z3\n"                             \
+> > > > > @@ -32,7 +34,7 @@
+> > > > >              "        bnez %1, 0b\n"                                  \
+> > > > >              append                                                   \
+> > > > >              : "=&r" (__retx), "=&r" (__rc), "+A" (*(__ptr32b))       \
+> > > > > -            : "rJ" (__newx), "rJ" (~__mask)                          \
+> > > > > +            : "rJ" (__newx), "rJ" (~__mask), "rJ" (__ptr32b)         \
+> > > > >              : "memory");                                             \
+> > > > >                                                                       \
+> > > > >       r = (__typeof__(*(p)))((__retx & __mask) >> __s);               \
+> > > > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> > > > > index b7b58258f6c7..78b7b8b53778 100644
+> > > > > --- a/arch/riscv/include/asm/hwcap.h
+> > > > > +++ b/arch/riscv/include/asm/hwcap.h
+> > > > > @@ -58,6 +58,7 @@
+> > > > >  #define RISCV_ISA_EXT_ZICSR          40
+> > > > >  #define RISCV_ISA_EXT_ZIFENCEI               41
+> > > > >  #define RISCV_ISA_EXT_ZIHPM          42
+> > > > > +#define RISCV_ISA_EXT_ZICBOP         43
+> > > > >
+> > > > >  #define RISCV_ISA_EXT_MAX            64
+> > > > >
+> > > > > diff --git a/arch/riscv/include/asm/insn-def.h b/arch/riscv/include/asm/insn-def.h
+> > > > > index 6960beb75f32..dc590d331894 100644
+> > > > > --- a/arch/riscv/include/asm/insn-def.h
+> > > > > +++ b/arch/riscv/include/asm/insn-def.h
+> > > > > @@ -134,6 +134,7 @@
+> > > > >
+> > > > >  #define RV_OPCODE_MISC_MEM   RV_OPCODE(15)
+> > > > >  #define RV_OPCODE_SYSTEM     RV_OPCODE(115)
+> > > > > +#define RV_OPCODE_PREFETCH   RV_OPCODE(19)
+> > > > >
+> > > > >  #define HFENCE_VVMA(vaddr, asid)                             \
+> > > > >       INSN_R(OPCODE_SYSTEM, FUNC3(0), FUNC7(17),              \
+> > > > > @@ -196,4 +197,8 @@
+> > > > >       INSN_I(OPCODE_MISC_MEM, FUNC3(2), __RD(0),              \
+> > > > >              RS1(base), SIMM12(4))
+> > > > >
+> > > > > +#define CBO_prefetchw(base)                                  \
+> > > > > +     INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> > > > > +            RD(x0), RS1(base), RS2(x0))
+> > > > > +
+> > > >
+> > > > I understand that here you create the instruction via bitfield, following
+> > > > the ISA, and this enables using instructions not available on the
+> > > > toolchain.
+> > > >
+> > > > It took me some time to find the document with this instruction, so please
+> > > > add this to the commit msg:
+> > > >
+> > > > https://github.com/riscv/riscv-CMOs/blob/master/specifications/cmobase-v1.0.pdf
+> > > > Page 23.
+> > > >
+> > > > IIUC, the instruction is "prefetch.w".
+> > > >
+> > > > Maybe I am missing something, but in the document the rs2 field
+> > > > (PREFETCH.W) contains a 0x3, while the above looks to have a 0 instead.
+> > > >
+> > > > rs2 field = 0x0 would be a prefetch.i (instruction prefetch) instead.
+> > > >
+> > > > Is the above correct, or am I missing something?
+> > > Oh, you are right. My fault, thx for pointing out. It should be:
+> > > +       INSN_R(OPCODE_PREFETCH, FUNC3(6), FUNC7(0),             \
+> > > +              RD(x0), RS1(base), RS2(x3))
+> >
+> > Now I am curious to check if / how will this impact performance. :)
+> > (Please let me know)
+> Ref:
+> commit 0ea366f5e1b6 ("arm64: atomics: prefetch the destination word
+> for write prior to stxr")
+> commit 86d231459d6d ("bpf: cpumap memory prefetchw optimizations for
+> struct page")
 
-在 2023/9/19 上午10:41, Huacai Chen 写道:
-> On Tue, Sep 19, 2023 at 10:38 AM zhaotianrui <zhaotianrui@loongson.cn> wrote:
->>
->> 在 2023/9/17 下午12:21, Huacai Chen 写道:
->>> Hi, Tianrui,
->>>
->>> On Fri, Sep 15, 2023 at 9:50 AM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->>>> Implement LoongArch kvm module init, module exit interface,
->>>> using kvm context to save the vpid info and vcpu world switch
->>>> interface pointer.
->>>>
->>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
->>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->>>> ---
->>>>    arch/loongarch/kvm/main.c | 367 ++++++++++++++++++++++++++++++++++++++
->>>>    1 file changed, 367 insertions(+)
->>>>    create mode 100644 arch/loongarch/kvm/main.c
->>>>
->>>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
->>>> new file mode 100644
->>>> index 0000000000..0deb9273d8
->>>> --- /dev/null
->>>> +++ b/arch/loongarch/kvm/main.c
->>>> @@ -0,0 +1,367 @@
->>>> +// SPDX-License-Identifier: GPL-2.0
->>>> +/*
->>>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
->>>> + */
->>>> +
->>>> +#include <linux/err.h>
->>>> +#include <linux/module.h>
->>>> +#include <linux/kvm_host.h>
->>>> +#include <asm/cacheflush.h>
->>>> +#include <asm/cpufeature.h>
->>>> +#include <asm/kvm_csr.h>
->>>> +#include "trace.h"
->>>> +
->>>> +static struct kvm_context __percpu *vmcs;
->>>> +struct kvm_world_switch *kvm_loongarch_ops;
->>>> +unsigned long vpid_mask;
->>>> +static int gcsr_flag[CSR_MAX_NUMS];
->>>> +
->>>> +int get_gcsr_flag(int csr)
->>>> +{
->>>> +       if (csr < CSR_MAX_NUMS)
->>>> +               return gcsr_flag[csr];
->>>> +
->>>> +       return INVALID_GCSR;
->>>> +}
->>>> +
->>>> +static inline void set_gcsr_sw_flag(int csr)
->>>> +{
->>>> +       if (csr < CSR_MAX_NUMS)
->>>> +               gcsr_flag[csr] |= SW_GCSR;
->>>> +}
->>>> +
->>>> +static inline void set_gcsr_hw_flag(int csr)
->>>> +{
->>>> +       if (csr < CSR_MAX_NUMS)
->>>> +               gcsr_flag[csr] |= HW_GCSR;
->>>> +}
->>>> +
->>>> +/*
->>>> + * The default value of gcsr_flag[CSR] is 0, and we use this
->>>> + * function to set the flag to 1(SW_GCSR) or 2(HW_GCSR) if the
->>>> + * gcsr is software or hardware. It will be used by get/set_gcsr,
->>>> + * if gcsr_flag is HW we should use gcsrrd/gcsrwr to access it,
->>>> + * else use sw csr to emulate it.
->>>> + */
->>>> +static void kvm_init_gcsr_flag(void)
->>>> +{
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CRMD);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRMD);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_EUEN);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_MISC);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ECFG);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ESTAT);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ERA);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_BADV);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_BADI);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_EENTRY);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBIDX);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBEHI);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBELO0);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBELO1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ASID);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PGDL);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PGDH);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PWCTL0);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PWCTL1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_STLBPGSIZE);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_RVACFG);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CPUID);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG2);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG3);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS0);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS2);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS3);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS4);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS5);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS6);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS7);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TMID);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TCFG);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TVAL);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CNTC);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_LLBCTL);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRENTRY);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRBADV);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRERA);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRSAVE);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRELO0);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRELO1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBREHI);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRPRMD);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN0);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN1);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN2);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN3);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_MWPS);
->>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_FWPS);
->>>> +
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IMPCTL1);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IMPCTL2);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRCTL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRINFO1);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRINFO2);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRENTRY);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRERA);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRSAVE);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_CTAG);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DEBUG);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DERA);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DESAVE);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG1);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG2);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG3);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PGD);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_TINTCLR);
->>>> +
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_FWPS);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_FWPC);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MWPS);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MWPC);
->>>> +
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7ASID);
->>>> +
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6ASID);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7ADDR);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7MASK);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7CTRL);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7ASID);
->>>> +
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL0);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR0);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL1);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR1);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL2);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR2);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL3);
->>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR3);
->>>> +}
->>>> +
->>>> +static void kvm_update_vpid(struct kvm_vcpu *vcpu, int cpu)
->>>> +{
->>>> +       struct kvm_context *context;
->>>> +       unsigned long vpid;
->>>> +
->>>> +       context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
->>>> +       vpid = context->vpid_cache + 1;
->>>> +       if (!(vpid & vpid_mask)) {
->>>> +               /* finish round of 64 bit loop */
->>>> +               if (unlikely(!vpid))
->>>> +                       vpid = vpid_mask + 1;
->>>> +
->>>> +               /* vpid 0 reserved for root */
->>>> +               ++vpid;
->>>> +
->>>> +               /* start new vpid cycle */
->>>> +               kvm_flush_tlb_all();
->>>> +       }
->>>> +
->>>> +       context->vpid_cache = vpid;
->>>> +       vcpu->arch.vpid = vpid;
->>>> +}
->>>> +
->>>> +void kvm_check_vpid(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +       struct kvm_context *context;
->>>> +       bool migrated;
->>>> +       unsigned long ver, old, vpid;
->>>> +       int cpu;
->>>> +
->>>> +       cpu = smp_processor_id();
->>>> +       /*
->>>> +        * Are we entering guest context on a different CPU to last time?
->>>> +        * If so, the vCPU's guest TLB state on this CPU may be stale.
->>>> +        */
->>>> +       context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
->>>> +       migrated = (vcpu->cpu != cpu);
->>>> +
->>>> +       /*
->>>> +        * Check if our vpid is of an older version
->>>> +        *
->>>> +        * We also discard the stored vpid if we've executed on
->>>> +        * another CPU, as the guest mappings may have changed without
->>>> +        * hypervisor knowledge.
->>>> +        */
->>>> +       ver = vcpu->arch.vpid & ~vpid_mask;
->>>> +       old = context->vpid_cache  & ~vpid_mask;
->>>> +       if (migrated || (ver != old)) {
->>>> +               kvm_update_vpid(vcpu, cpu);
->>>> +               trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
->>>> +               vcpu->cpu = cpu;
->>>> +       }
->>>> +
->>>> +       /* Restore GSTAT(0x50).vpid */
->>>> +       vpid = (vcpu->arch.vpid & vpid_mask) << CSR_GSTAT_GID_SHIFT;
->>>> +       change_csr_gstat(vpid_mask << CSR_GSTAT_GID_SHIFT, vpid);
->>>> +}
->>>> +
->>>> +static int kvm_loongarch_env_init(void)
->>>> +{
->>>> +       struct kvm_context *context;
->>>> +       int cpu, order;
->>>> +       void *addr;
->>>> +
->>>> +       vmcs = alloc_percpu(struct kvm_context);
->>>> +       if (!vmcs) {
->>>> +               pr_err("kvm: failed to allocate percpu kvm_context\n");
->>>> +               return -ENOMEM;
->>>> +       }
->>>> +
->>>> +       kvm_loongarch_ops = kzalloc(sizeof(*kvm_loongarch_ops), GFP_KERNEL);
->>>> +       if (!kvm_loongarch_ops) {
->>>> +               free_percpu(vmcs);
->>>> +               vmcs = NULL;
->>>> +               return -ENOMEM;
->>>> +       }
->>>> +       /*
->>>> +        * There will be problem in world switch code if there
->>>> +        * is page fault reenter, since pgd register is shared
->>>> +        * between root kernel and kvm hypervisor. World switch
->>>> +        * entry need be unmapped area, cannot be tlb mapped area.
->>>> +        * In future if hw pagetable walking is supported, or there
->>>> +        * is separate pgd registers between root kernel and kvm
->>>> +        * hypervisor, copying about world switch code will not be used.
->>>> +        */
->>>> +
->>>> +       order = get_order(kvm_vector_size + kvm_enter_guest_size);
->>>> +       addr = (void *)__get_free_pages(GFP_KERNEL, order);
->>>> +       if (!addr) {
->>>> +               free_percpu(vmcs);
->>>> +               vmcs = NULL;
->>>> +               kfree(kvm_loongarch_ops);
->>>> +               kvm_loongarch_ops = NULL;
->>>> +               return -ENOMEM;
->>>> +       }
->>>> +
->>>> +       memcpy(addr, kvm_vector_entry, kvm_vector_size);
->>>> +       memcpy(addr + kvm_vector_size, kvm_enter_guest, kvm_enter_guest_size);
->>> Why memcpy? In our internal repo, we use kvm_vector_entry and
->>> kvm_enter_guest directly. The long comments above make me nervous
->>> because Loongson-3A6000 already supports hardware pagetable walker.
->>>
->>> Huacai
->> As mentioned in the comments, it need not this memcpy if hardware page
->> walk is supported in 3A6000.
-> But why in our internal repo we don't use memcpy() but kvm can still
-> work on Loongson-3A5000?
->
-> Huacai
-Because in our internal repo, the KVM is build along with the linux 
-kernel, however, this KVM patch series is build in module.
+Oh, I understand that prefetch.w is very useful for performance :)
 
-Thanks
-Tianrui Zhao
->
->> Thanks
->> Tianrui Zhao
->>>> +       flush_icache_range((unsigned long)addr, (unsigned long)addr +
->>>> +                               kvm_vector_size + kvm_enter_guest_size);
->>>> +       kvm_loongarch_ops->guest_eentry = addr;
->>>> +       kvm_loongarch_ops->enter_guest = addr + kvm_vector_size;
->>>> +       kvm_loongarch_ops->page_order = order;
->>>> +
->>>> +       vpid_mask = read_csr_gstat();
->>>> +       vpid_mask = (vpid_mask & CSR_GSTAT_GIDBIT) >> CSR_GSTAT_GIDBIT_SHIFT;
->>>> +       if (vpid_mask)
->>>> +               vpid_mask = GENMASK(vpid_mask - 1, 0);
->>>> +
->>>> +       for_each_possible_cpu(cpu) {
->>>> +               context = per_cpu_ptr(vmcs, cpu);
->>>> +               context->vpid_cache = vpid_mask + 1;
->>>> +               context->last_vcpu = NULL;
->>>> +       }
->>>> +
->>>> +       kvm_init_fault();
->>>> +       kvm_init_gcsr_flag();
->>>> +
->>>> +       return 0;
->>>> +}
->>>> +
->>>> +static void kvm_loongarch_env_exit(void)
->>>> +{
->>>> +       unsigned long addr;
->>>> +
->>>> +       if (vmcs)
->>>> +               free_percpu(vmcs);
->>>> +
->>>> +       if (kvm_loongarch_ops) {
->>>> +               if (kvm_loongarch_ops->guest_eentry) {
->>>> +                       addr = (unsigned long)kvm_loongarch_ops->guest_eentry;
->>>> +                       free_pages(addr, kvm_loongarch_ops->page_order);
->>>> +               }
->>>> +               kfree(kvm_loongarch_ops);
->>>> +       }
->>>> +}
->>>> +
->>>> +static int kvm_loongarch_init(void)
->>>> +{
->>>> +       int r;
->>>> +
->>>> +       if (!cpu_has_lvz) {
->>>> +               kvm_info("hardware virtualization not available\n");
->>>> +               return -ENODEV;
->>>> +       }
->>>> +       r = kvm_loongarch_env_init();
->>>> +       if (r)
->>>> +               return r;
->>>> +
->>>> +       return kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
->>>> +}
->>>> +
->>>> +static void kvm_loongarch_exit(void)
->>>> +{
->>>> +       kvm_exit();
->>>> +       kvm_loongarch_env_exit();
->>>> +}
->>>> +
->>>> +module_init(kvm_loongarch_init);
->>>> +module_exit(kvm_loongarch_exit);
->>>> +
->>>> +#ifdef MODULE
->>>> +static const struct cpu_feature loongarch_kvm_feature[] = {
->>>> +       { .feature = cpu_feature(LOONGARCH_LVZ) },
->>>> +       {},
->>>> +};
->>>> +MODULE_DEVICE_TABLE(cpu, loongarch_kvm_feature);
->>>> +#endif
->>>> --
->>>> 2.39.1
->>>>
->>
+What I meant is that previously this patch was issuing a prefetch.i,
+and now it's issuing a prefetch.w (as intended). 
+
+What got me curious is how much would it impact the performance to change 
+the prefetch.i to prefetch.w. :)
+
+Thanks!
+Leo
+
+
+> 
+> >
+> >
+> > >
+> > > >
+> > > >
+> > > > Thanks!
+> > > > Leo
+> > > >
+> > > > >  #endif /* __ASM_INSN_DEF_H */
+> > > > > diff --git a/arch/riscv/include/asm/processor.h b/arch/riscv/include/asm/processor.h
+> > > > > index de9da852f78d..7ad3a24212e8 100644
+> > > > > --- a/arch/riscv/include/asm/processor.h
+> > > > > +++ b/arch/riscv/include/asm/processor.h
+> > > > > @@ -12,6 +12,8 @@
+> > > > >  #include <vdso/processor.h>
+> > > > >
+> > > > >  #include <asm/ptrace.h>
+> > > > > +#include <asm/insn-def.h>
+> > > > > +#include <asm/hwcap.h>
+> > > > >
+> > > > >  #ifdef CONFIG_64BIT
+> > > > >  #define DEFAULT_MAP_WINDOW   (UL(1) << (MMAP_VA_BITS - 1))
+> > > > > @@ -103,6 +105,17 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+> > > > >  #define KSTK_EIP(tsk)                (ulong)(task_pt_regs(tsk)->epc)
+> > > > >  #define KSTK_ESP(tsk)                (ulong)(task_pt_regs(tsk)->sp)
+> > > > >
+> > > > > +#define ARCH_HAS_PREFETCHW
+> > > > > +#define PREFETCHW_ASM(base)  ALTERNATIVE(__nops(1), \
+> > > > > +                                         CBO_prefetchw(base), \
+> > > > > +                                         0, \
+> > > > > +                                         RISCV_ISA_EXT_ZICBOP, \
+> > > > > +                                         CONFIG_RISCV_ISA_ZICBOP)
+> > > > > +static inline void prefetchw(const void *ptr)
+> > > > > +{
+> > > > > +     asm volatile(PREFETCHW_ASM(%0)
+> > > > > +             : : "r" (ptr) : "memory");
+> > > > > +}
+> > > > >
+> > > > >  /* Do necessary setup to start up a newly executed thread. */
+> > > > >  extern void start_thread(struct pt_regs *regs,
+> > > > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > > > > index ef7b4fd9e876..e0b897db0b97 100644
+> > > > > --- a/arch/riscv/kernel/cpufeature.c
+> > > > > +++ b/arch/riscv/kernel/cpufeature.c
+> > > > > @@ -159,6 +159,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+> > > > >       __RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
+> > > > >       __RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+> > > > >       __RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
+> > > > > +     __RISCV_ISA_EXT_DATA(zicbop, RISCV_ISA_EXT_ZICBOP),
+> > > > >       __RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+> > > > >       __RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+> > > > >       __RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
+> > > > > --
+> > > > > 2.36.1
+> > > > >
+> > > >
+> > >
+> > >
+> > > --
+> > > Best Regards
+> > >  Guo Ren
+> > >
+> >
+> 
+> 
+> -- 
+> Best Regards
+>  Guo Ren
+> 
 
