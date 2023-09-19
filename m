@@ -2,130 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BD337A6556
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 15:36:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27C1F7A657B
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 15:42:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232420AbjISNg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 09:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
+        id S232461AbjISNmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 09:42:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232410AbjISNgy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 09:36:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B79F4
-        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 06:36:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695130561;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BQmRjXCmgAQl3a6tpa/J+d//osgH4H/G1TUy2TGbM10=;
-        b=enFmpdmPnDJUjCGdFo2A+7ljU6lVl06QBRf4XfQhtrxaUVwKsHRoWSV+7i9iVDfpwhyY6i
-        29utuKROz4Fz2xuWWGsdyX6yx2zoVL6xdDqJVQEUMrtY1OQ1Ssrv+2Xd/dSNnH+nTIGzaS
-        LHj14iahnvgWIw7pomcemw5UDyvxLxM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-ERlllHtSP5mnHAyRXQqVqA-1; Tue, 19 Sep 2023 09:35:59 -0400
-X-MC-Unique: ERlllHtSP5mnHAyRXQqVqA-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-773c03f2bdaso374236085a.2
-        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695130559; x=1695735359;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BQmRjXCmgAQl3a6tpa/J+d//osgH4H/G1TUy2TGbM10=;
-        b=SIsYvEd9ByjbccpnadDSXgqw6BA1xNBfCaPe2ocHvTbmoOET175QCFmobRMiXaCChf
-         5obTJzQ6YnI2bv//JlkRqnC50jfh6wqUShglynb6coWrOWo1O60AirFXr8UkdL5jTH3p
-         FjjBI6jumIBdHmZbbliWrB1ulmaVXt939UShJeNtgqQXmV1djR/Z9g/RmZUIW09RM1Zp
-         o3OBTsvVoaXKqr0NPh1pbH45ceSSUg2TkqT1kUTGmcKlN6qPdPgWLpDgKW/wt1I5ywZc
-         jIBOVjHCHSTc0LmI4m+NMIXjIMpnVKxY9wvvETgwQ/RE8iu0atd1gfTwygBNI4NbRDHN
-         vujw==
-X-Gm-Message-State: AOJu0YwN+/Nofs2T3GPut8ceSqDMTyuWHTAmdSsfnJzV61yvpBFObDKU
-        EQjLC5M64bEdO2OogOcMdPhu0CMSzeHyrjhbXYhMjo9Catu8zpllCSmfolUzJqN5hLhDqCb5yP/
-        WVWDAmQ3y+0vP
-X-Received: by 2002:a0c:f001:0:b0:656:4a25:2080 with SMTP id z1-20020a0cf001000000b006564a252080mr7874556qvk.14.1695130559371;
-        Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IELog22rYA2MEE9wvtU9k2iQ0qP5GVCV4XB9+NFnOEeZMlYRp+cnMnNZiRhNH7IqEct7Tt4FA==
-X-Received: by 2002:a0c:f001:0:b0:656:4a25:2080 with SMTP id z1-20020a0cf001000000b006564a252080mr7874542qvk.14.1695130559155;
-        Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
-Received: from sgarzare-redhat ([46.222.165.38])
-        by smtp.gmail.com with ESMTPSA id g28-20020a0caadc000000b0064d6a81e4d4sm1773184qvb.113.2023.09.19.06.35.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 06:35:58 -0700 (PDT)
-Date:   Tue, 19 Sep 2023 15:35:51 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Arseniy Krasnov <avkrasnov@salutedevices.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v9 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
- preparations
-Message-ID: <hq67e2b3ljfjikvbaneczdve3fzg3dl5ziyc7xtujyqesp6dzm@fh5nqkptpb4n>
-References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
- <b5873e36-fe8c-85e8-e11b-4ccec386c015@salutedevices.com>
- <yys5jgwkukvfyrgfz6txxzqc7el5megf2xntnk6j4ausvjdgld@7aan4quqy4bs>
- <a5b25ee07245125fac4bbdc3b3604758251907d2.camel@redhat.com>
+        with ESMTP id S231863AbjISNmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 09:42:09 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC07F4;
+        Tue, 19 Sep 2023 06:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+        Subject:Cc:To:From; bh=y2odupsqdyYFtVH01DAeQQ9s6gOIdXVgvjaA8jYAyJA=; b=2HQaQ7
+        VwhLGYJXBUiEDE+j6Q7JaqFyo0KyAbGPnsmYH5mwmJYy/xNoEMlYAHgbsAAePat2ouQMrV6aH9o/s
+        K5FZjS65RjuiELBu3rHJFSoGgYN9TJ5PT4cUvQ+0JoPbUphUlZebTG2QS4s228eWheMikD9061c+t
+        WllJZ6ZKOSM=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qiazD-00045Z-OI; Tue, 19 Sep 2023 13:41:55 +0000
+Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qiazD-0005jy-Ce; Tue, 19 Sep 2023 13:41:55 +0000
+From:   Paul Durrant <paul@xen.org>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org
+Subject: [PATCH v4 00/13] KVM: xen: update shared_info and vcpu_info handling
+Date:   Tue, 19 Sep 2023 13:41:36 +0000
+Message-Id: <20230919134149.6091-1-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <a5b25ee07245125fac4bbdc3b3604758251907d2.camel@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 19, 2023 at 03:19:54PM +0200, Paolo Abeni wrote:
->On Tue, 2023-09-19 at 09:54 +0200, Stefano Garzarella wrote:
->> On Mon, Sep 18, 2023 at 07:56:00PM +0300, Arseniy Krasnov wrote:
->> > Hi Stefano,
->> >
->> > thanks for review! So when this patchset will be merged to net-next,
->> > I'll start sending next part of MSG_ZEROCOPY patchset, e.g. AF_VSOCK +
->> > Documentation/ patches.
->>
->> Ack, if it is not a very big series, maybe better to include also the
->> tests so we can run them before merge the feature.
->
->I understand that at least 2 follow-up series are waiting for this, one
->of them targeting net-next and the bigger one targeting the virtio
->tree. Am I correct?
+From: Paul Durrant <pdurrant@amazon.com>
 
-IIUC the next series will touch only the vsock core
-(net/vmw_vsock/af_vsock.c), tests, and documentation.
+Changed in v4:
+ - The offset into the cache returned from get_vcpu_info_cache() was not
+   being factored into kvm_gpc_check() or kvm_gpc_refresh() calls. Fix
+   this.
+ - When transitioning from a default vcpu_info to an explicit one, copy
+   the content across. This was previously the responsibility of the
+   VMM.
 
-The virtio part should be fully covered by this series.
+Changed in v3:
+ - Patch added to make sure Xen vcpu_id is immutable once shared_info is
+   set.
+ - Adjust the xen_shinfo_test selftest accordingly.
+ - Also have the selftest use both mechanisms to set shared_info.
+ - Add text to API documentation discussing copying of vcpu_info. This
+   has been removed in v4.
+ - Adjust the selftest to switch from default to explicit vcpu_info
+   part way through.
 
-@Arseniy feel free to correct me!
+Changed in v2:
+ - Defer advertizement of KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA to a patch
+   at the end of the series.
+ - Remove the KVM_XEN_HVM_CONFIG_DEFAULT_VCPU_INFO capability.
+ - Add selftests and API documentation.
 
->
->DaveM suggests this should go via the virtio tree, too. Any different
->opinion?
+Original text:
 
-For this series should be fine, I'm not sure about the next series.
-Merging this with the virtio tree, then it forces us to do it for
-followup as well right?
+Currently we treat the shared_info page as guest memory and the VMM informs
+KVM of its location using a GFN. However it is not guest memory as such;
+it's an overlay page. So we pointlessly invalidate and re-cache a mapping
+to the *same page* of memory every time the guest requests that shared_info
+be mapped into its address space. Let's avoid doing that by modifying the
+pfncache code to allow activation using a fixed userspace HVA as well as
+a GPA.
 
-In theory followup is more on the core, so better with net-next, but
-it's also true that for now only virtio transports support it, so it
-might be okay to continue with virtio.
+Also, if the guest does not hypercall to explicitly set a pointer to a
+vcpu_info in its own memory, the default vcpu_info embedded in the
+shared_info page should be used. At the moment the VMM has to set up a
+pointer to the structure explicitly (again treating it like it's in
+guest memory, despite being in an overlay page). Let's also avoid the
+need for that. We already have a cached mapping for the shared_info
+page so just use that directly by default.
 
-@Michael WDYT?
+Paul Durrant (13):
+  KVM: pfncache: add a map helper function
+  KVM: pfncache: add a mark-dirty helper
+  KVM: pfncache: add a helper to get the gpa
+  KVM: pfncache: base offset check on khva rather than gpa
+  KVM: pfncache: allow a cache to be activated with a fixed (userspace)
+    HVA
+  KVM: xen: allow shared_info to be mapped by fixed HVA
+  KVM: xen: prepare for using 'default' vcpu_info
+  KVM: xen: prevent vcpu_id from changing whilst shared_info is valid
+  KVM: xen: automatically use the vcpu_info embedded in shared_info
+  KVM: selftests / xen: set KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID
+  KVM: selftests / xen: map shared_info using HVA rather than GFN
+  KVM: selftests / xen: don't explicitly set the vcpu_info address
+  KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
 
-Thanks,
-Stefano
+ Documentation/virt/kvm/api.rst                |  52 ++--
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/kvm/x86.c                            |  17 +-
+ arch/x86/kvm/xen.c                            | 244 ++++++++++++++----
+ arch/x86/kvm/xen.h                            |   6 +-
+ include/linux/kvm_host.h                      |  43 +++
+ include/linux/kvm_types.h                     |   3 +-
+ include/uapi/linux/kvm.h                      |   6 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |  75 +++++-
+ virt/kvm/pfncache.c                           | 129 ++++++---
+ 10 files changed, 454 insertions(+), 125 deletions(-)
+---
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: x86@kernel.org
+-- 
+2.39.2
 
