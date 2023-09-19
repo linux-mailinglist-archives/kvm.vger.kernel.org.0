@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB2F07A5746
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 04:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F1FB7A5762
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 04:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbjISCOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 22:14:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
+        id S231136AbjISCZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 22:25:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjISCOd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 22:14:33 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D67F10A;
-        Mon, 18 Sep 2023 19:14:27 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0507C433CC;
-        Tue, 19 Sep 2023 02:14:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695089666;
-        bh=OMt4GQANW17AOTVywMJlnhgnS6ILkUeHzqXh5bdrVY8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=bGmDIfyad+evsQ7xIwhKgogOz7Of6oo3Oi2amSnHTaG8YzWxNYbzZmxaeZcXSNMkI
-         3ccZu6SzJo4t3Nm+3wqUaCj9FDCF6n3fXXsBHJH48Zm7D76ZqG7FzyP6Ow/xr6DVsJ
-         64rUYL62i5bN60qH8khSfrIjby70mKbxULCn+RVROdAJgX8eue9x+Mm6HEUNAGrFma
-         dPiG1kCIpi83F3QJ7vlKHnEqQL29eHUjIZGzi9r8Ekp6YKg0rkkuAlnSv0IGB1dYCW
-         10C+qJEGfmZDvu26+AnQNhBWHyyiLDD19JFMWte7i0FZz5UNAfNUOn9g3uxEml6AYZ
-         +7k1SxDx/gkTA==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-99c1c66876aso643944166b.2;
-        Mon, 18 Sep 2023 19:14:26 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwGv58yuUifbUKdIN/c0fpWhC1SyQUYiVu5OAuwwNirinSDJFeo
-        7lWr67L0mxPI+MsfDpdK4sfW+12kpWsytHGEfC4=
-X-Google-Smtp-Source: AGHT+IFQzMiliwx9t+rn9bjNG0gueebSbkZ0doD6dC2lnGwzVtdtO99nFfsELv00UENnlRjK1ECxQ1AK1d+Xb7VlOjo=
-X-Received: by 2002:aa7:c649:0:b0:522:2aba:bc3b with SMTP id
- z9-20020aa7c649000000b005222ababc3bmr9053941edr.28.1695089665150; Mon, 18 Sep
- 2023 19:14:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
- <20230915014949.1222777-3-zhaotianrui@loongson.cn> <CAAhV-H5ti7L+QXJ=boK8aKNwt74Pvn1-vm71B9Bymi+2zXXzHw@mail.gmail.com>
- <525aa9e2-1ebc-6c49-55ef-9f3c7d18d3e0@loongson.cn> <CAAhV-H7wB_N0nFm1JMhKJR=8NAuDR3XNC6NfeZis0VhDECAUjg@mail.gmail.com>
- <b11389ee-7740-7911-2e57-75edadade703@loongson.cn> <CAAhV-H5bmk5jF8Rbso7uUc2-pUvduwdJOoD2Gj_krJZoZ+y1ag@mail.gmail.com>
- <8e23325a-b4d3-db80-7d65-ebadcd3ef5a9@loongson.cn> <CAAhV-H7cKTqAhaDrnrLMHfS0Y0pzwUugdwX0oK2hj7i06Q6_tg@mail.gmail.com>
- <a3589841-e093-e19a-3f41-94da04344a20@loongson.cn> <33da46a6-45ef-ffbe-f2b3-45a1b29eaa3d@loongson.cn>
-In-Reply-To: <33da46a6-45ef-ffbe-f2b3-45a1b29eaa3d@loongson.cn>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Tue, 19 Sep 2023 10:14:12 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H49YTLJKW=rnp_=GOtGby-QG_S=bwQSFy+MWgkFRmUjCg@mail.gmail.com>
-Message-ID: <CAAhV-H49YTLJKW=rnp_=GOtGby-QG_S=bwQSFy+MWgkFRmUjCg@mail.gmail.com>
-Subject: Re: [PATCH v21 02/29] LoongArch: KVM: Implement kvm module related interface
-To:     bibo mao <maobibo@loongson.cn>
-Cc:     zhaotianrui <zhaotianrui@loongson.cn>,
+        with ESMTP id S229698AbjISCZd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 22:25:33 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF7E10A
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 19:25:26 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c43b4b02c1so23542345ad.3
+        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 19:25:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1695090326; x=1695695126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yRgKdJmzYKRPDUBlvijGWHc0m2uR5nOKamFSVK+OxX4=;
+        b=nhQkE58kiOCWnk5rH6+FUA81qWLnAoNRlry+tHdcntTl+cYHp+RcPkuS9YjroQBWGp
+         N9XW3WOiLBplXMS9WRO6BS68tRtw6td6y9XU0l8ZLqDJLD6SsviUev0IvynrIjfp4+P0
+         H/6voC841LChFb5QUu+gBwwkIcaDXHigX6hck=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695090326; x=1695695126;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yRgKdJmzYKRPDUBlvijGWHc0m2uR5nOKamFSVK+OxX4=;
+        b=W/2wBFbhT+eNXJY70yenXbyimYfBwfbQVDfPWmF5GGgtAXBx7MEeKNzt3FO+eICiWr
+         yuNVdZmE7+8oOpoL/q3MmkpBI+GwHuZuidlb4BBNaHNJvylp4AXied8HGkgFzAQqXeHl
+         MSRvvYleDrMCuRZhyYzuo1GXAioSEuliALdL5oke2NWGe5escCBBq3Mv+wjU2CaupBIp
+         ZSCVzek4oXL96v1550Lno1uzpRvJ+aeMYUNcGO/xMx5EFBwfs+UsRxejMwoYebbZNTgH
+         eoC/zdZWUJfrsq6G4HZAmgtIRlEDmynE8BhyUFacj8M7fArhmwB22P+T62ncNdZU+NeX
+         2gxA==
+X-Gm-Message-State: AOJu0YwVePW9oqGxhcrJ6TTGY6vtO3+olhcTEEZhTiJ0TpqgFFafSn+b
+        JKXWmDLK4L3Qq7gW8/0ofrogbA==
+X-Google-Smtp-Source: AGHT+IEGyedbt/KelU1o+lc1b5wTP54HBT+PPTvmsjgFGj+juiBb9K1MRwSbRxtaWi7qM7zeWSGzew==
+X-Received: by 2002:a17:902:6806:b0:1b3:d4ae:7e21 with SMTP id h6-20020a170902680600b001b3d4ae7e21mr10149851plk.63.1695090325874;
+        Mon, 18 Sep 2023 19:25:25 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:3632:47f7:e44b:9a16])
+        by smtp.gmail.com with UTF8SMTPSA id l7-20020a170903120700b001bd99fd1114sm8941317plh.288.2023.09.18.19.25.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Sep 2023 19:25:25 -0700 (PDT)
+From:   David Stevens <stevensd@chromium.org>
+To:     Dmitry Osipenko <dmitry.osipenko@collabora.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        David Stevens <stevensd@chromium.org>
+Subject: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
+Date:   Tue, 19 Sep 2023 11:25:03 +0900
+Message-ID: <20230919022504.3153043-1-stevensd@chromium.org>
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+In-Reply-To: <d272613e-aed9-4cbc-26dd-78bc8fca2650@collabora.com>
+References: <d272613e-aed9-4cbc-26dd-78bc8fca2650@collabora.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -70,514 +73,395 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 4:39=E2=80=AFPM bibo mao <maobibo@loongson.cn> wrot=
-e:
+On Mon, Sep 18, 2023 at 6:53 PM Dmitry Osipenko <dmitry.osipenko@collabora.com> wrote:
 >
->
->
-> =E5=9C=A8 2023/9/18 14:25, zhaotianrui =E5=86=99=E9=81=93:
-> >
-> > =E5=9C=A8 2023/9/18 =E4=B8=8B=E5=8D=8812:03, Huacai Chen =E5=86=99=E9=
-=81=93:
-> >> On Mon, Sep 18, 2023 at 11:20=E2=80=AFAM zhaotianrui <zhaotianrui@loon=
-gson.cn> wrote:
-> >>>
-> >>> =E5=9C=A8 2023/9/18 =E4=B8=8A=E5=8D=8811:12, Huacai Chen =E5=86=99=E9=
-=81=93:
-> >>>> On Mon, Sep 18, 2023 at 11:08=E2=80=AFAM zhaotianrui <zhaotianrui@lo=
-ongson.cn> wrote:
-> >>>>> =E5=9C=A8 2023/9/18 =E4=B8=8A=E5=8D=889:45, Huacai Chen =E5=86=99=
-=E9=81=93:
-> >>>>>> On Mon, Sep 18, 2023 at 9:21=E2=80=AFAM zhaotianrui <zhaotianrui@l=
-oongson.cn> wrote:
-> >>>>>>> =E5=9C=A8 2023/9/16 =E4=B8=8B=E5=8D=884:51, Huacai Chen =E5=86=99=
-=E9=81=93:
-> >>>>>>>> Hi, Tianrui,
-> >>>>>>>>
-> >>>>>>>> On Fri, Sep 15, 2023 at 9:50=E2=80=AFAM Tianrui Zhao <zhaotianru=
-i@loongson.cn> wrote:
-> >>>>>>>>> Implement LoongArch kvm module init, module exit interface,
-> >>>>>>>>> using kvm context to save the vpid info and vcpu world switch
-> >>>>>>>>> interface pointer.
-> >>>>>>>>>
-> >>>>>>>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> >>>>>>>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> >>>>>>>>> ---
-> >>>>>>>>>      arch/loongarch/kvm/main.c | 367 ++++++++++++++++++++++++++=
-++++++++++++
-> >>>>>>>>>      1 file changed, 367 insertions(+)
-> >>>>>>>>>      create mode 100644 arch/loongarch/kvm/main.c
-> >>>>>>>>>
-> >>>>>>>>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/mai=
-n.c
-> >>>>>>>>> new file mode 100644
-> >>>>>>>>> index 0000000000..0deb9273d8
-> >>>>>>>>> --- /dev/null
-> >>>>>>>>> +++ b/arch/loongarch/kvm/main.c
-> >>>>>>>>> @@ -0,0 +1,367 @@
-> >>>>>>>>> +// SPDX-License-Identifier: GPL-2.0
-> >>>>>>>>> +/*
-> >>>>>>>>> + * Copyright (C) 2020-2023 Loongson Technology Corporation Lim=
-ited
-> >>>>>>>>> + */
-> >>>>>>>>> +
-> >>>>>>>>> +#include <linux/err.h>
-> >>>>>>>>> +#include <linux/module.h>
-> >>>>>>>>> +#include <linux/kvm_host.h>
-> >>>>>>>>> +#include <asm/cacheflush.h>
-> >>>>>>>>> +#include <asm/cpufeature.h>
-> >>>>>>>>> +#include <asm/kvm_csr.h>
-> >>>>>>>>> +#include "trace.h"
-> >>>>>>>>> +
-> >>>>>>>>> +static struct kvm_context __percpu *vmcs;
-> >>>>>>>>> +struct kvm_world_switch *kvm_loongarch_ops;
-> >>>>>>>>> +unsigned long vpid_mask;
-> >>>>>>>>> +static int gcsr_flag[CSR_MAX_NUMS];
-> >>>>>>>>> +
-> >>>>>>>>> +int get_gcsr_flag(int csr)
-> >>>>>>>>> +{
-> >>>>>>>>> +       if (csr < CSR_MAX_NUMS)
-> >>>>>>>>> +               return gcsr_flag[csr];
-> >>>>>>>>> +
-> >>>>>>>>> +       return INVALID_GCSR;
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static inline void set_gcsr_sw_flag(int csr)
-> >>>>>>>>> +{
-> >>>>>>>>> +       if (csr < CSR_MAX_NUMS)
-> >>>>>>>>> +               gcsr_flag[csr] |=3D SW_GCSR;
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static inline void set_gcsr_hw_flag(int csr)
-> >>>>>>>>> +{
-> >>>>>>>>> +       if (csr < CSR_MAX_NUMS)
-> >>>>>>>>> +               gcsr_flag[csr] |=3D HW_GCSR;
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +/*
-> >>>>>>>>> + * The default value of gcsr_flag[CSR] is 0, and we use this
-> >>>>>>>>> + * function to set the flag to 1(SW_GCSR) or 2(HW_GCSR) if the
-> >>>>>>>>> + * gcsr is software or hardware. It will be used by get/set_gc=
-sr,
-> >>>>>>>>> + * if gcsr_flag is HW we should use gcsrrd/gcsrwr to access it=
-,
-> >>>>>>>>> + * else use sw csr to emulate it.
-> >>>>>>>>> + */
-> >>>>>>>>> +static void kvm_init_gcsr_flag(void)
-> >>>>>>>>> +{
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CRMD);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRMD);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_EUEN);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_MISC);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ECFG);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ESTAT);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ERA);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_BADV);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_BADI);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_EENTRY);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBIDX);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBEHI);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBELO0);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBELO1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_ASID);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PGDL);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PGDH);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PWCTL0);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PWCTL1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_STLBPGSIZE);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_RVACFG);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CPUID);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG2);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_PRCFG3);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS0);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS2);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS3);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS4);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS5);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS6);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_KS7);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TMID);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TCFG);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TVAL);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_CNTC);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_LLBCTL);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRENTRY);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRBADV);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRERA);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRSAVE);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRELO0);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRELO1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBREHI);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_TLBRPRMD);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN0);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN1);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN2);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_DMWIN3);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_MWPS);
-> >>>>>>>>> +       set_gcsr_hw_flag(LOONGARCH_CSR_FWPS);
-> >>>>>>>>> +
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IMPCTL1);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IMPCTL2);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRCTL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRINFO1);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRINFO2);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRENTRY);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRERA);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MERRSAVE);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_CTAG);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DEBUG);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DERA);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DESAVE);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG1);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG2);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PRCFG3);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PGD);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_TINTCLR);
-> >>>>>>>>> +
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_FWPS);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_FWPC);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MWPS);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_MWPC);
-> >>>>>>>> FWPS and MWPS are both HW CSR and SW CSR?
-> >>>>>>>>
-> >>>>>>>> Huacai
-> >>>>>>> The FWPC and MWPC should be SW GCSR, FWPS and MWPS should be HW G=
-CSR, it
-> >>>>>>> is my mistake.
-> >>>>>> But in user manual vol 3, section 1.5, FWPC/FWPS/MWPC/MWPS are all=
- HW
-> >>>>>> GCSR, while DBxxxx and IBxxxx are SW GCSR.
-> >>>>> Ok, It is my misunderstanding, as the FWPC and MWPC can control gue=
-st
-> >>>>> debug register numbers, but I know they are all HW GCSR when I look=
- up
-> >>>>> the manual again.
-> >>>> So these lines can be removed?
-> >>>>
-> >>>>           set_gcsr_sw_flag(LOONGARCH_CSR_FWPS);
-> >>>>           set_gcsr_sw_flag(LOONGARCH_CSR_FWPC);
-> >>>>           set_gcsr_sw_flag(LOONGARCH_CSR_MWPS);
-> >>>>           set_gcsr_sw_flag(LOONGARCH_CSR_MWPC);
-> >>>>
-> >>>> And add FWPC/MWPC to hw list?
-> >> Can you discuss more with our hw engineers? I found in section 1.8:
-> >> PGD, TINTCLR, PRCFG1~3 are all HW GCSR.
-> > If guest can access hw CSR directly and do not cause a exception, it me=
-ans hw GCSR. on the other hand, if cause a exception to return to KVM to em=
-ulate it by software, it means SW GCSR. And I re-check the PGD, TINTCLR, PR=
-CFG1~3 CSR, they should be hw GCSR.
->
-> CSR_PGD is logical read only register instead, its content is the same
-> CSR_PGDL if highest bit of BADV is 0, else its content is the same with
-> CSR_PGDH.
->
-> TINTCLR is write only register, write 1 to clear timer interrupt and read
-> value is 0.
->
-> So CSR_PGD and TINTCLR need not save and restore during vcpu switching or
-> vm migration, it is not necessary to set CSR_PGD/TINTCLR from qemu user s=
-pace.
->
-> PRCFG1~3 is read only registers, it is decided by hardware and can not be
-> set by kvm, it is not necessary to save or retore. However there maybe br=
-ings
-> problems for vm migration on diferent hardwares if PRCFG1~3 is different.
-During my tests, reading FWPC/FWPS/MWPC/MWPS causes guest exit, but
-user manual vol 3 says they are HW GCSR, who can tell me why?
+> On 9/11/23 05:16, David Stevens wrote:
+> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> > @@ -848,7 +848,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  
+> >  out_unlock:
+> >       write_unlock(&vcpu->kvm->mmu_lock);
+> > -     kvm_release_pfn_clean(fault->pfn);
+> > +     if (fault->is_refcounted_page)
+> > +             kvm_set_page_accessed(pfn_to_page(fault->pfn));
+> 
+> The other similar occurrences in the code that replaced
+> kvm_release_pfn_clean() with kvm_set_page_accessed() did it under the
+> held mmu_lock.
+> 
+> Does kvm_set_page_accessed() needs to be invoked under the lock?
 
-Huacai
+It looks like I made a mistake when folding the v8->v9 delta into the stack of
+patches to get a clean v9 series. v8 of the series returned pfns without
+reference counts from __kvm_follow_pfn, so the x86 MMU needed to mark the pages
+as accessed under the lock. v9 instead returns pfns with a refcount (i.e. does
+the same thing as __gfn_to_pfn_memslot), so the x86 MMU should instead call
+kvm_release_page_clean outside of the lock. I've included the corrected version
+of this patch in this email.
 
->
-> Regards
-> Bibo Mao
-> >
-> > Thanks
-> > Tianrui Zhao
-> >>
-> >> Huacai
-> >>
-> >>>> Huacai
-> >>> Yes, It is.
-> >>>
-> >>> Thanks
-> >>> Tianrui Zhao
-> >>>>> Thanks
-> >>>>> Tianrui Zhao
-> >>>>>> Huacai
-> >>>>>>
-> >>>>>>> Thanks
-> >>>>>>> Tianrui Zhao
-> >>>>>>>>> +
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB0ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB1ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB2ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB3ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB4ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB5ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB6ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_DB7ASID);
-> >>>>>>>>> +
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB0ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB1ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB2ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB3ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB4ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB5ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB6ASID);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7ADDR);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7MASK);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7CTRL);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_IB7ASID);
-> >>>>>>>>> +
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL0);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR0);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL1);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR1);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL2);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR2);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCTRL3);
-> >>>>>>>>> +       set_gcsr_sw_flag(LOONGARCH_CSR_PERFCNTR3);
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static void kvm_update_vpid(struct kvm_vcpu *vcpu, int cpu)
-> >>>>>>>>> +{
-> >>>>>>>>> +       struct kvm_context *context;
-> >>>>>>>>> +       unsigned long vpid;
-> >>>>>>>>> +
-> >>>>>>>>> +       context =3D per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
-> >>>>>>>>> +       vpid =3D context->vpid_cache + 1;
-> >>>>>>>>> +       if (!(vpid & vpid_mask)) {
-> >>>>>>>>> +               /* finish round of 64 bit loop */
-> >>>>>>>>> +               if (unlikely(!vpid))
-> >>>>>>>>> +                       vpid =3D vpid_mask + 1;
-> >>>>>>>>> +
-> >>>>>>>>> +               /* vpid 0 reserved for root */
-> >>>>>>>>> +               ++vpid;
-> >>>>>>>>> +
-> >>>>>>>>> +               /* start new vpid cycle */
-> >>>>>>>>> +               kvm_flush_tlb_all();
-> >>>>>>>>> +       }
-> >>>>>>>>> +
-> >>>>>>>>> +       context->vpid_cache =3D vpid;
-> >>>>>>>>> +       vcpu->arch.vpid =3D vpid;
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +void kvm_check_vpid(struct kvm_vcpu *vcpu)
-> >>>>>>>>> +{
-> >>>>>>>>> +       struct kvm_context *context;
-> >>>>>>>>> +       bool migrated;
-> >>>>>>>>> +       unsigned long ver, old, vpid;
-> >>>>>>>>> +       int cpu;
-> >>>>>>>>> +
-> >>>>>>>>> +       cpu =3D smp_processor_id();
-> >>>>>>>>> +       /*
-> >>>>>>>>> +        * Are we entering guest context on a different CPU to =
-last time?
-> >>>>>>>>> +        * If so, the vCPU's guest TLB state on this CPU may be=
- stale.
-> >>>>>>>>> +        */
-> >>>>>>>>> +       context =3D per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
-> >>>>>>>>> +       migrated =3D (vcpu->cpu !=3D cpu);
-> >>>>>>>>> +
-> >>>>>>>>> +       /*
-> >>>>>>>>> +        * Check if our vpid is of an older version
-> >>>>>>>>> +        *
-> >>>>>>>>> +        * We also discard the stored vpid if we've executed on
-> >>>>>>>>> +        * another CPU, as the guest mappings may have changed =
-without
-> >>>>>>>>> +        * hypervisor knowledge.
-> >>>>>>>>> +        */
-> >>>>>>>>> +       ver =3D vcpu->arch.vpid & ~vpid_mask;
-> >>>>>>>>> +       old =3D context->vpid_cache  & ~vpid_mask;
-> >>>>>>>>> +       if (migrated || (ver !=3D old)) {
-> >>>>>>>>> +               kvm_update_vpid(vcpu, cpu);
-> >>>>>>>>> +               trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
-> >>>>>>>>> +               vcpu->cpu =3D cpu;
-> >>>>>>>>> +       }
-> >>>>>>>>> +
-> >>>>>>>>> +       /* Restore GSTAT(0x50).vpid */
-> >>>>>>>>> +       vpid =3D (vcpu->arch.vpid & vpid_mask) << CSR_GSTAT_GID=
-_SHIFT;
-> >>>>>>>>> +       change_csr_gstat(vpid_mask << CSR_GSTAT_GID_SHIFT, vpid=
-);
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static int kvm_loongarch_env_init(void)
-> >>>>>>>>> +{
-> >>>>>>>>> +       struct kvm_context *context;
-> >>>>>>>>> +       int cpu, order;
-> >>>>>>>>> +       void *addr;
-> >>>>>>>>> +
-> >>>>>>>>> +       vmcs =3D alloc_percpu(struct kvm_context);
-> >>>>>>>>> +       if (!vmcs) {
-> >>>>>>>>> +               pr_err("kvm: failed to allocate percpu kvm_cont=
-ext\n");
-> >>>>>>>>> +               return -ENOMEM;
-> >>>>>>>>> +       }
-> >>>>>>>>> +
-> >>>>>>>>> +       kvm_loongarch_ops =3D kzalloc(sizeof(*kvm_loongarch_ops=
-), GFP_KERNEL);
-> >>>>>>>>> +       if (!kvm_loongarch_ops) {
-> >>>>>>>>> +               free_percpu(vmcs);
-> >>>>>>>>> +               vmcs =3D NULL;
-> >>>>>>>>> +               return -ENOMEM;
-> >>>>>>>>> +       }
-> >>>>>>>>> +       /*
-> >>>>>>>>> +        * There will be problem in world switch code if there
-> >>>>>>>>> +        * is page fault reenter, since pgd register is shared
-> >>>>>>>>> +        * between root kernel and kvm hypervisor. World switch
-> >>>>>>>>> +        * entry need be unmapped area, cannot be tlb mapped ar=
-ea.
-> >>>>>>>>> +        * In future if hw pagetable walking is supported, or t=
-here
-> >>>>>>>>> +        * is separate pgd registers between root kernel and kv=
-m
-> >>>>>>>>> +        * hypervisor, copying about world switch code will not=
- be used.
-> >>>>>>>>> +        */
-> >>>>>>>>> +
-> >>>>>>>>> +       order =3D get_order(kvm_vector_size + kvm_enter_guest_s=
-ize);
-> >>>>>>>>> +       addr =3D (void *)__get_free_pages(GFP_KERNEL, order);
-> >>>>>>>>> +       if (!addr) {
-> >>>>>>>>> +               free_percpu(vmcs);
-> >>>>>>>>> +               vmcs =3D NULL;
-> >>>>>>>>> +               kfree(kvm_loongarch_ops);
-> >>>>>>>>> +               kvm_loongarch_ops =3D NULL;
-> >>>>>>>>> +               return -ENOMEM;
-> >>>>>>>>> +       }
-> >>>>>>>>> +
-> >>>>>>>>> +       memcpy(addr, kvm_vector_entry, kvm_vector_size);
-> >>>>>>>>> +       memcpy(addr + kvm_vector_size, kvm_enter_guest, kvm_ent=
-er_guest_size);
-> >>>>>>>>> +       flush_icache_range((unsigned long)addr, (unsigned long)=
-addr +
-> >>>>>>>>> +                               kvm_vector_size + kvm_enter_gue=
-st_size);
-> >>>>>>>>> +       kvm_loongarch_ops->guest_eentry =3D addr;
-> >>>>>>>>> +       kvm_loongarch_ops->enter_guest =3D addr + kvm_vector_si=
-ze;
-> >>>>>>>>> +       kvm_loongarch_ops->page_order =3D order;
-> >>>>>>>>> +
-> >>>>>>>>> +       vpid_mask =3D read_csr_gstat();
-> >>>>>>>>> +       vpid_mask =3D (vpid_mask & CSR_GSTAT_GIDBIT) >> CSR_GST=
-AT_GIDBIT_SHIFT;
-> >>>>>>>>> +       if (vpid_mask)
-> >>>>>>>>> +               vpid_mask =3D GENMASK(vpid_mask - 1, 0);
-> >>>>>>>>> +
-> >>>>>>>>> +       for_each_possible_cpu(cpu) {
-> >>>>>>>>> +               context =3D per_cpu_ptr(vmcs, cpu);
-> >>>>>>>>> +               context->vpid_cache =3D vpid_mask + 1;
-> >>>>>>>>> +               context->last_vcpu =3D NULL;
-> >>>>>>>>> +       }
-> >>>>>>>>> +
-> >>>>>>>>> +       kvm_init_fault();
-> >>>>>>>>> +       kvm_init_gcsr_flag();
-> >>>>>>>>> +
-> >>>>>>>>> +       return 0;
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static void kvm_loongarch_env_exit(void)
-> >>>>>>>>> +{
-> >>>>>>>>> +       unsigned long addr;
-> >>>>>>>>> +
-> >>>>>>>>> +       if (vmcs)
-> >>>>>>>>> +               free_percpu(vmcs);
-> >>>>>>>>> +
-> >>>>>>>>> +       if (kvm_loongarch_ops) {
-> >>>>>>>>> +               if (kvm_loongarch_ops->guest_eentry) {
-> >>>>>>>>> +                       addr =3D (unsigned long)kvm_loongarch_o=
-ps->guest_eentry;
-> >>>>>>>>> +                       free_pages(addr, kvm_loongarch_ops->pag=
-e_order);
-> >>>>>>>>> +               }
-> >>>>>>>>> +               kfree(kvm_loongarch_ops);
-> >>>>>>>>> +       }
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static int kvm_loongarch_init(void)
-> >>>>>>>>> +{
-> >>>>>>>>> +       int r;
-> >>>>>>>>> +
-> >>>>>>>>> +       if (!cpu_has_lvz) {
-> >>>>>>>>> +               kvm_info("hardware virtualization not available=
-\n");
-> >>>>>>>>> +               return -ENODEV;
-> >>>>>>>>> +       }
-> >>>>>>>>> +       r =3D kvm_loongarch_env_init();
-> >>>>>>>>> +       if (r)
-> >>>>>>>>> +               return r;
-> >>>>>>>>> +
-> >>>>>>>>> +       return kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE=
-);
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +static void kvm_loongarch_exit(void)
-> >>>>>>>>> +{
-> >>>>>>>>> +       kvm_exit();
-> >>>>>>>>> +       kvm_loongarch_env_exit();
-> >>>>>>>>> +}
-> >>>>>>>>> +
-> >>>>>>>>> +module_init(kvm_loongarch_init);
-> >>>>>>>>> +module_exit(kvm_loongarch_exit);
-> >>>>>>>>> +
-> >>>>>>>>> +#ifdef MODULE
-> >>>>>>>>> +static const struct cpu_feature loongarch_kvm_feature[] =3D {
-> >>>>>>>>> +       { .feature =3D cpu_feature(LOONGARCH_LVZ) },
-> >>>>>>>>> +       {},
-> >>>>>>>>> +};
-> >>>>>>>>> +MODULE_DEVICE_TABLE(cpu, loongarch_kvm_feature);
-> >>>>>>>>> +#endif
-> >>>>>>>>> --
-> >>>>>>>>> 2.39.1
-> >>>>>>>>>
-> >>>
->
->
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e1eca26215e2..5e7124f63fbc 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -545,12 +545,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ 
+ 	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		if (is_refcounted_page_pte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+ 		flush = true;
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		if (is_refcounted_page_pte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+ 	}
+ 
+ 	return flush;
+@@ -588,14 +590,18 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+ 	 * before they are reclaimed.  Sanity check that, if the pfn is backed
+ 	 * by a refcounted page, the refcount is elevated.
+ 	 */
+-	page = kvm_pfn_to_refcounted_page(pfn);
+-	WARN_ON_ONCE(page && !page_count(page));
++	if (is_refcounted_page_pte(old_spte)) {
++		page = kvm_pfn_to_refcounted_page(pfn);
++		WARN_ON_ONCE(!page || !page_count(page));
++	}
+ 
+-	if (is_accessed_spte(old_spte))
+-		kvm_set_pfn_accessed(pfn);
++	if (is_refcounted_page_pte(old_spte)) {
++		if (is_accessed_spte(old_spte))
++			kvm_set_page_accessed(pfn_to_page(pfn));
+ 
+-	if (is_dirty_spte(old_spte))
+-		kvm_set_pfn_dirty(pfn);
++		if (is_dirty_spte(old_spte))
++			kvm_set_page_dirty(pfn_to_page(pfn));
++	}
+ 
+ 	return old_spte;
+ }
+@@ -631,8 +637,8 @@ static bool mmu_spte_age(u64 *sptep)
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(spte));
++		if (is_writable_pte(spte) && is_refcounted_page_pte(spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
+ 
+ 		spte = mark_spte_for_access_track(spte);
+ 		mmu_spte_update_no_track(sptep, spte);
+@@ -1261,8 +1267,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
+ {
+ 	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
+ 					       (unsigned long *)sptep);
+-	if (was_writable && !spte_ad_enabled(*sptep))
+-		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
++	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_pte(*sptep))
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
+ 
+ 	return was_writable;
+ }
+@@ -2913,6 +2919,11 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	bool host_writable = !fault || fault->map_writable;
+ 	bool prefetch = !fault || fault->prefetch;
+ 	bool write_fault = fault && fault->write;
++	/*
++	 * Prefetching uses gfn_to_page_many_atomic, which never gets
++	 * non-refcounted pages.
++	 */
++	bool is_refcounted = !fault || fault->is_refcounted_page;
+ 
+ 	if (unlikely(is_noslot_pfn(pfn))) {
+ 		vcpu->stat.pf_mmio_spte_created++;
+@@ -2940,7 +2951,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	}
+ 
+ 	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+-			   true, host_writable, &spte);
++			   true, host_writable, is_refcounted, &spte);
+ 
+ 	if (*sptep == spte) {
+ 		ret = RET_PF_SPURIOUS;
+@@ -4254,13 +4265,18 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_memory_slot *slot = fault->slot;
++	/*
++	 * There are no extra bits for tracking non-refcounted pages in
++	 * PAE SPTEs, so reject non-refcounted struct pages in that case.
++	 */
++	bool has_spte_refcount_bit = tdp_enabled && IS_ENABLED(CONFIG_X86_64);
+ 	struct kvm_follow_pfn foll = {
+ 		.slot = slot,
+ 		.gfn = fault->gfn,
+ 		.flags = fault->write ? FOLL_WRITE : 0,
+ 		.try_map_writable = true,
+ 		.guarded_by_mmu_notifier = true,
+-		.allow_non_refcounted_struct_page = false,
++		.allow_non_refcounted_struct_page = has_spte_refcount_bit,
+ 	};
+ 
+ 	/*
+@@ -4277,6 +4293,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 			fault->slot = NULL;
+ 			fault->pfn = KVM_PFN_NOSLOT;
+ 			fault->map_writable = false;
++			fault->is_refcounted_page = false;
+ 			return RET_PF_CONTINUE;
+ 		}
+ 		/*
+@@ -4332,6 +4349,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ success:
+ 	fault->hva = foll.hva;
+ 	fault->map_writable = foll.writable;
++	fault->is_refcounted_page = foll.is_refcounted_page;
+ 	return RET_PF_CONTINUE;
+ }
+ 
+@@ -4421,7 +4439,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ 
+@@ -4497,7 +4516,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+ 
+ out_unlock:
+ 	read_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index b102014e2c60..7f73bc2a552e 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -239,6 +239,7 @@ struct kvm_page_fault {
+ 	kvm_pfn_t pfn;
+ 	hva_t hva;
+ 	bool map_writable;
++	bool is_refcounted_page;
+ 
+ 	/*
+ 	 * Indicates the guest is trying to write a gfn that contains one or
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index c85255073f67..b2d62fd9634c 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -848,7 +848,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 
+ out_unlock:
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-	kvm_release_pfn_clean(fault->pfn);
++	if (fault->is_refcounted_page)
++		kvm_release_page_clean(pfn_to_page(fault->pfn));
+ 	return r;
+ }
+ 
+@@ -902,7 +903,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+  */
+ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+ {
+-	bool host_writable;
++	bool host_writable, is_refcounted;
+ 	gpa_t first_pte_gpa;
+ 	u64 *sptep, spte;
+ 	struct kvm_memory_slot *slot;
+@@ -959,10 +960,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	sptep = &sp->spt[i];
+ 	spte = *sptep;
+ 	host_writable = spte & shadow_host_writable_mask;
++	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	make_spte(vcpu, sp, slot, pte_access, gfn,
+ 		  spte_to_pfn(spte), spte, true, false,
+-		  host_writable, &spte);
++		  host_writable, is_refcounted, &spte);
+ 
+ 	return mmu_spte_update(sptep, spte);
+ }
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..ce495819061f 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -138,7 +138,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte)
++	       bool host_writable, bool is_refcounted, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+ 	u64 spte = SPTE_MMU_PRESENT_MASK;
+@@ -188,6 +188,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 
+ 	if (level > PG_LEVEL_4K)
+ 		spte |= PT_PAGE_SIZE_MASK;
++	if (is_refcounted)
++		spte |= SPTE_MMU_PAGE_REFCOUNTED;
+ 
+ 	if (shadow_memtype_mask)
+ 		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index a129951c9a88..4bf4a535c23d 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -96,6 +96,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
+ /* Defined only to keep the above static asserts readable. */
+ #undef SHADOW_ACC_TRACK_SAVED_MASK
+ 
++/*
++ * Indicates that the SPTE refers to a page with a valid refcount.
++ */
++#define SPTE_MMU_PAGE_REFCOUNTED        BIT_ULL(59)
++
+ /*
+  * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
+  * the memslots generation and is derived as follows:
+@@ -345,6 +350,11 @@ static inline bool is_dirty_spte(u64 spte)
+ 	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
+ }
+ 
++static inline bool is_refcounted_page_pte(u64 spte)
++{
++	return spte & SPTE_MMU_PAGE_REFCOUNTED;
++}
++
+ static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+ 				int level)
+ {
+@@ -475,7 +485,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte);
++	       bool host_writable, bool is_refcounted, u64 *new_spte);
+ u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
+ 		      	      union kvm_mmu_page_role role, int index);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6c63f2d1675f..185f3c666c2b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -474,6 +474,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool was_leaf = was_present && is_last_spte(old_spte, level);
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
++	bool is_refcounted = is_refcounted_page_pte(old_spte);
+ 
+ 	WARN_ON_ONCE(level > PT64_ROOT_MAX_LEVEL);
+ 	WARN_ON_ONCE(level < PG_LEVEL_4K);
+@@ -538,9 +539,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	if (is_leaf != was_leaf)
+ 		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
+ 
+-	if (was_leaf && is_dirty_spte(old_spte) &&
++	if (was_leaf && is_dirty_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+ 
+ 	/*
+ 	 * Recursively handle child PTs if the change removed a subtree from
+@@ -552,9 +553,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
+ 		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+ 
+-	if (was_leaf && is_accessed_spte(old_spte) &&
++	if (was_leaf && is_accessed_spte(old_spte) && is_refcounted &&
+ 	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
+-		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
++		kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+ }
+ 
+ /*
+@@ -988,8 +989,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+ 	else
+ 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-					 fault->pfn, iter->old_spte, fault->prefetch, true,
+-					 fault->map_writable, &new_spte);
++				   fault->pfn, iter->old_spte, fault->prefetch, true,
++				   fault->map_writable, fault->is_refcounted_page,
++				   &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
+@@ -1205,8 +1207,9 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
+ 		 * Capture the dirty status of the page, so that it doesn't get
+ 		 * lost when the SPTE is marked for access tracking.
+ 		 */
+-		if (is_writable_pte(iter->old_spte))
+-			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
++		if (is_writable_pte(iter->old_spte) &&
++		    is_refcounted_page_pte(iter->old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter->old_spte)));
+ 
+ 		new_spte = mark_spte_for_access_track(iter->old_spte);
+ 		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
+@@ -1628,7 +1631,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+ 					       iter.old_spte,
+ 					       iter.old_spte & ~dbit);
+-		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
++		if (is_refcounted_page_pte(iter.old_spte))
++			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter.old_spte)));
+ 	}
+ 
+ 	rcu_read_unlock();
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index b95c79b7833b..6696925f01f1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1179,6 +1179,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
+ void kvm_release_page_clean(struct page *page);
+ void kvm_release_page_dirty(struct page *page);
+ 
++void kvm_set_page_accessed(struct page *page);
++void kvm_set_page_dirty(struct page *page);
++
+ struct kvm_follow_pfn {
+ 	const struct kvm_memory_slot *slot;
+ 	gfn_t gfn;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 913de4e86d9d..4d8538cdb690 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2979,17 +2979,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
+ 	return !PageReserved(page);
+ }
+ 
+-static void kvm_set_page_dirty(struct page *page)
++void kvm_set_page_dirty(struct page *page)
+ {
+ 	if (kvm_is_ad_tracked_page(page))
+ 		SetPageDirty(page);
+ }
++EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
+ 
+-static void kvm_set_page_accessed(struct page *page)
++void kvm_set_page_accessed(struct page *page)
+ {
+ 	if (kvm_is_ad_tracked_page(page))
+ 		mark_page_accessed(page);
+ }
++EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
+ 
+ void kvm_release_page_clean(struct page *page)
+ {
+-- 
+2.42.0.459.ge4e396fd5e-goog
+
