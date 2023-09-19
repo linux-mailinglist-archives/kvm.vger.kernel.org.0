@@ -2,185 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94ED77A5D38
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 11:01:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A32C7A5D59
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 11:05:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230502AbjISJBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 05:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59074 "EHLO
+        id S230504AbjISJFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 05:05:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbjISJBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 05:01:53 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDF64102;
-        Tue, 19 Sep 2023 02:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695114107; x=1726650107;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3lbpMHnCnN4tgBMsnlxIOe9ua6EYGffh/u6hevJylxY=;
-  b=QgfyaQEKqkUA78LLt4ACvbxztG+rDwxAXhUlnqRGeP8yg31t5m9a88pJ
-   zYYdyxJuRlC2zkRcqVdJjnSDuiERgzNDAcx3w+/8TPMBYCkhlSaAFi3qk
-   Cy/pP6qj2mlVWorpDwsUjalNl+pIk4FL5zN+bvyQtBDrpJT6GfMd3uPVd
-   QJRRQB+RrpfNG6qZmZ6mMz4VmIHv68939bZUcJ04YeTkBkP29ZRYvEXR+
-   49L59+6dJDUGuQ9dlZXHySMcPjHud85ybqNFVUe3D7CHyeEzhlBw1VQYd
-   SV15XhdDtiwFtBZ2y4wXCxrKG069ehgmb51lSwWtr3x1PMSQPYFdkB9/S
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="377201128"
-X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
-   d="scan'208";a="377201128"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 02:01:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="695833326"
-X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
-   d="scan'208";a="695833326"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.8.84]) ([10.238.8.84])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 02:01:36 -0700
-Message-ID: <e397d30c-c6af-e68f-d18e-b4e3739c5389@linux.intel.com>
-Date:   Tue, 19 Sep 2023 17:01:31 +0800
+        with ESMTP id S230424AbjISJFR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 05:05:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A63114;
+        Tue, 19 Sep 2023 02:05:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9Um9xivfZIzOpGAbhiiXrCDCVB724N5qIHjbsLgt4Ac=; b=iZvMDqxgfVG849kaE5gtwfVFMM
+        YNYWJLuio+/Rs8inIPe/YyI7Rr6GVuUwmlpiqnStl1uQDFzxqdmU2p6+HsopumMBvl/UZYqGzDhoC
+        EQJIEePHbzuHZKCM0DIT/5+E8x8UD6OhQxJRy4A0O77fQ+ej6MIEHr3Q2jSg/WjpDWqdlhG6J/aqq
+        q+w8YLveHwMZF8wwmkMRp2cOLKzd8et2daNDzFZT1U9AxOAVfwh+lUE6hsHfdue0cbkfDuPOTc9NE
+        1K6YV47tOLe+BdI2tVe0FFQPK/l+GXJqi7PRKo2sqe32njJAfdrpA7lx1hbcpxaJldo0Y5ONJlkNm
+        sIQVfavQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qiWf1-00GKUe-4M; Tue, 19 Sep 2023 09:04:47 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+        id C60CF30042E; Tue, 19 Sep 2023 11:04:46 +0200 (CEST)
+Date:   Tue, 19 Sep 2023 11:04:46 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Alexander Graf <graf@amazon.de>
+Cc:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Nicolas Saenz Julienne <nsaenz@amazon.es>,
+        "Griffoul, Fred" <fgriffo@amazon.com>
+Subject: Re: [RFC] KVM: x86: Allow userspace exit on HLT and MWAIT, else
+ yield on MWAIT
+Message-ID: <20230919090446.GC21729@noisy.programming.kicks-ass.net>
+References: <1b52b557beb6606007f7ec5672eab0adf1606a34.camel@infradead.org>
+ <63b382bf-d1fb-464f-ab06-4185f796a85f@amazon.de>
+ <b3c1a64daa6d265b295aedd6176daa8ab95e273f.camel@infradead.org>
+ <db756c13-eee5-414a-a28d-2ce08e7b77d9@amazon.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230914015531.1419405-1-seanjc@google.com>
- <20230914015531.1419405-15-seanjc@google.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230914015531.1419405-15-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <db756c13-eee5-414a-a28d-2ce08e7b77d9@amazon.de>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 18, 2023 at 01:59:50PM +0200, Alexander Graf wrote:
+> The problem with MWAIT is that you don't really know when it's done.
+
+This isn't really a problem. MWAIT is allowed (expected even) to return
+early.
+
+REP;NOP is a valid implementation of MWAIT.
+
+MWAIT must not delay waking (much) after either:
+
+ - write to monitored address
+ - interrupt pending
+
+But it doesn't say anything about not waking up sooner.
+
+Now, obviously on real hardware you prefer if MWAIT were to also do the
+whole C-state thing and safe your some actual power, but this is virt,
+real hardware is not a concern and wakeup-timeliness also not much.
 
 
-On 9/14/2023 9:55 AM, Sean Christopherson wrote:
-[...]
-> +
-> +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-> +				      pgoff_t end)
-> +{
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm *kvm = gmem->kvm;
-> +	unsigned long index;
-> +	bool flush = false;
-> +
-> +	KVM_MMU_LOCK(kvm);
-> +
-> +	kvm_mmu_invalidate_begin(kvm);
-> +
-> +	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
-> +		pgoff_t pgoff = slot->gmem.pgoff;
-> +
-> +		struct kvm_gfn_range gfn_range = {
-> +			.start = slot->base_gfn + max(pgoff, start) - pgoff,
-> +			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
-> +			.slot = slot,
-> +			.may_block = true,
-> +		};
-> +
-> +		flush |= kvm_mmu_unmap_gfn_range(kvm, &gfn_range);
-> +	}
-> +
-> +	if (flush)
-> +		kvm_flush_remote_tlbs(kvm);
-> +
-> +	KVM_MMU_UNLOCK(kvm);
-> +}
-> +
-> +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
-> +				    pgoff_t end)
-> +{
-> +	struct kvm *kvm = gmem->kvm;
-> +
-> +	KVM_MMU_LOCK(kvm);
-> +	if (xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT))
-> +		kvm_mmu_invalidate_end(kvm);
-kvm_mmu_invalidate_begin() is called unconditionally in 
-kvm_gmem_invalidate_begin(),
-but kvm_mmu_invalidate_end() is not here.
-This makes the kvm_gmem_invalidate_{begin, end}() calls asymmetric.
+IIRC the ARM64 WFE thing has a 10khz timer or something it wakes from if
+nothing else. So I suppose what I'm saying is that: nanosleep(100000)
+might be a suitable MWAIT implementation.
 
-
-> +	KVM_MMU_UNLOCK(kvm);
-> +}
-> +
-> +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
-> +{
-> +	struct list_head *gmem_list = &inode->i_mapping->private_list;
-> +	pgoff_t start = offset >> PAGE_SHIFT;
-> +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
-> +	struct kvm_gmem *gmem;
-> +
-> +	/*
-> +	 * Bindings must stable across invalidation to ensure the start+end
-> +	 * are balanced.
-> +	 */
-> +	filemap_invalidate_lock(inode->i_mapping);
-> +
-> +	list_for_each_entry(gmem, gmem_list, entry) {
-> +		kvm_gmem_invalidate_begin(gmem, start, end);
-> +		kvm_gmem_invalidate_end(gmem, start, end);
-> +	}
-Why to loop for each gmem in gmem_list here?
-
-IIUIC, offset is the offset according to the inode, it is only 
-meaningful to the
-inode passed in, i.e, it is only meaningful to the gmem binding with the 
-inode,
-not others.
-
-
-> +
-> +	filemap_invalidate_unlock(inode->i_mapping);
-> +
-> +	return 0;
-> +}
-> +
-[...]
+It's virt, it sucks anyway :-)
