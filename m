@@ -2,67 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7446B7A6851
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 17:47:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D4CB7A68A8
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 18:14:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbjISPsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Sep 2023 11:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
+        id S230351AbjISQOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Sep 2023 12:14:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233184AbjISPsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Sep 2023 11:48:00 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10B39C;
-        Tue, 19 Sep 2023 08:47:54 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3200bc30666so2558289f8f.2;
-        Tue, 19 Sep 2023 08:47:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695138473; x=1695743273; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ANj/G1QqgtW6bo0+EDli+wp6aYMdZfH9ByTF2IjfuOs=;
-        b=R/DOZI19Eod6bHXvnPKXYhLzyEF94lX71Rp4DtSEdwCGr/AUUaDLjcvhXiQhFGQwUi
-         iKIpPc9rEzjpgJ0bc47X7qSKiyTzaHbTCGrvlqztVUsAddwcwmAJo/ZL8RZKWak9uL9l
-         v1wC8ipb4axHrnAQNukJC6naMxmquFZSPhqU6qTM/vN0jV97vt7whvmGy2zzvlfr3TrI
-         IEzRlxVUAV+jL+Q7Mr/o9/vqQ9r7brAF8U/XnSfXAmK0LUylZjzXgg+9aMJjqhEEWrGU
-         YLJKQj/1EVXJTWJgjlNywYhlW786zwfycda3oSXOvDRXdclGbctmeg5GHZJxuZWWO+H+
-         Cskw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695138473; x=1695743273;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ANj/G1QqgtW6bo0+EDli+wp6aYMdZfH9ByTF2IjfuOs=;
-        b=XekyBD7pz+wjsCsemA76nHDi/EVOU/DMw923QvgU1O9X3xnAD9nDXsiNVQ63nnB0+O
-         ubjXfT5Y4ZoJueBwekzKrYi7w35usebnt8v71COA8c7kqTAyYvFw3vAlg4QKS2NyQ5xu
-         g/oQS72Wpe9Ch3poATaBdVgO6Z79BDu3TlLwcJ2MfMlLK7eQnVseHCBScrtXv73vlHzk
-         U/QpvULilXa24Tszop3F8HAZVIOfg3wxzh0ZxKLQIgE77618RqACBHC7RTiIsYiDWt8i
-         RjPxyifiwF4XKghDMCTWf7pAYQ/3KaCUIct0uq0LVqEKyuhOR/ShY0ChFCfFH0N5VHjm
-         ouVQ==
-X-Gm-Message-State: AOJu0YxK+i+6xc2loAqxOmLLJ183d6mvF+Hac0rzGXEgXo20f/dbxmz3
-        7RSq4lqyTGLchryNwjR3FQ8=
-X-Google-Smtp-Source: AGHT+IHcntaufHjjMwfAihNVW2MO3QORi/UOuYmQjOol84n1VtL8VzzsiTAo0jqjf4LDnrEQ0FOffw==
-X-Received: by 2002:a5d:4843:0:b0:31f:9398:3654 with SMTP id n3-20020a5d4843000000b0031f93983654mr23449wrs.40.1695138473025;
-        Tue, 19 Sep 2023 08:47:53 -0700 (PDT)
-Received: from [192.168.4.177] (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id c1-20020a5d4141000000b0031f300a4c26sm15796972wrq.93.2023.09.19.08.47.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Sep 2023 08:47:52 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <7de61c43-e88d-9c22-7e5f-2229d8c49523@xen.org>
-Date:   Tue, 19 Sep 2023 16:47:51 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Reply-To: paul@xen.org
+        with ESMTP id S229497AbjISQOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Sep 2023 12:14:30 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8519D;
+        Tue, 19 Sep 2023 09:14:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ba8lerX/+ge9vHSgmhOiikPr59qvMRdWbY//deZVhWY=; b=c1HZ19jnNn10gn9yGwuspWthTe
+        leY2oFkj0TT7JFTv4OrQMGCcsl25H0cHb9ptaGulO7Nv7Gy+SskpNbgqnwcePeRt1ygO/5f8bUikI
+        9PVGxBMr5+5iXICr/PXreLp/fl+N6ihRKJ8hrKUtVsn4/f8wTijp5kBWPXMEo/EzkNcQqOD0/T3Z5
+        IZ2eJ5G27a+y4CWKPdRtZB2J0EbQ+XG1Qs0Cdx3p15NPX3EOnw5Q4x20L2GWwVC0Du+XBlEwvAAVt
+        aHT/fqHw0lOU1/CGqyB78ENbYM1S3CowVQrs5QEvqBmuTImOEtOm1xoHdzL6jIRolhIG6bzCWSQp8
+        csIrDWOw==;
+Received: from [2001:8b0:10b:5:db09:b801:9fa2:7293] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qidMk-000Ybv-Aw; Tue, 19 Sep 2023 16:14:22 +0000
+Message-ID: <5f33490c1b9c201fba52fe146aca0cf828754129.camel@infradead.org>
 Subject: Re: [PATCH v4 09/13] KVM: xen: automatically use the vcpu_info
  embedded in shared_info
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     paul@xen.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -70,117 +39,170 @@ Cc:     Paul Durrant <pdurrant@amazon.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Date:   Tue, 19 Sep 2023 17:14:21 +0100
+In-Reply-To: <7de61c43-e88d-9c22-7e5f-2229d8c49523@xen.org>
 References: <20230919134149.6091-1-paul@xen.org>
- <20230919134149.6091-10-paul@xen.org>
- <3d7070d51dd0094e426b420bc5e7d09657dd8d38.camel@infradead.org>
- <451eebfe-1df5-4f02-2ce1-998560feaa98@xen.org>
- <6b20173bae6bbf2de03c64c158198b351900f4ea.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <6b20173bae6bbf2de03c64c158198b351900f4ea.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+         <20230919134149.6091-10-paul@xen.org>
+         <3d7070d51dd0094e426b420bc5e7d09657dd8d38.camel@infradead.org>
+         <451eebfe-1df5-4f02-2ce1-998560feaa98@xen.org>
+         <6b20173bae6bbf2de03c64c158198b351900f4ea.camel@infradead.org>
+         <7de61c43-e88d-9c22-7e5f-2229d8c49523@xen.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-B4WfDCJr6frYk8gdTrwE"
+User-Agent: Evolution 3.44.4-0ubuntu2 
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/09/2023 16:38, David Woodhouse wrote:
-> On Tue, 2023-09-19 at 15:34 +0100, Paul Durrant wrote:
->>>> +       ret = kvm_gpc_activate(vi_gpc, gpa, sizeof(struct vcpu_info));
->>>
->>>   From this moment, can't interrupts be delivered to the new vcpu_info,
->>> even though the memcpy hasn't happened yet?
->>>
->>
->> Hmm, that's a good point. TBH it would be nice to have an 'activate and
->> leave locked' primitive to avoid this.
-> 
-> I suppose so from the caller's point of view in this case, but I'm
-> somewhat disinclined to add that complexity to the pfncache code.
-> 
-> We take the refresh_lock *mutex* in __kvm_gpc_refresh() so it's not as
-> simple as declaring that said function is called with the gpc rwlock
-> already held.
-> 
-> We also do the final gpc_unmap_khva() of the old mapping after dropping
-> the lock; *could* we call that with a write lock held? A write lock
-> which is going to be taken the MM notifier callbacks? Well, maybe not
-> in the case of the first *activate* which isn't really a 'refresh' per
-> se but the whole thing is making my skin itch. I don't like it.
-> 
->>> I think we need to ensure that any kvm_xen_set_evtchn_fast() which
->>> happens at this point cannot proceed, and falls back to the slow path.
->>>
->>> Can we set a flag before we activate the vcpu_info and clear it after
->>> the memcpy is done, then make kvm_xen_set_evtchn_fast() return
->>> EWOULDBLOCK whenever that flag is set?
->>>
->>> The slow path in kvm_xen_set_evtchn() takes kvm->arch.xen.xen_lock and
->>> I think kvm_xen_vcpu_set_attr() has taken that same lock before you get
->>> to this code, so it works out nicely?
->>>
->>
->> Yes, I think that is safe... but if we didn't have the window between
->> activating the vcpu_info cache and doing the copy we'd also be ok I
->> think... Or perhaps we could simply preserve evtchn_pending_sel and copy
->> the rest of it?
-> 
->>
-> I suppose you could just write the evtchn_pending_sel word in the new
-> vcpu_info GPA to zero before setting up the pfncache for it.
-> 
-> When when you do the memcpy, you don't *just* memcpy the
-> evtchn_pending_sel word; you use the bitwise OR of the old and new, so
-> you catch any bits which got set in the new word in the interim?
-> 
-> But then again, who moves the vcpu_info while there are actually
-> interrupts in-flight to the vCPU in question? Maybe we just declare
-> that we don't care, and that interrupts may be lost in that case? Even
-> if *Xen* wouldn't have lost them (and I don't even know that part is
-> true).
-> 
->>> This adds a new lock ordering rule of the vcpu_info lock(s) before the
->>> shared_info lock. I don't know that it's *wrong* but it seems weird to
->>> me; I expected the shared_info to come first?
->>>
->>> I avoided taking both at once in kvm_xen_set_evtchn_fast(), although
->>> maybe if we are going to have a rule that allows both, we could revisit
->>> that. Suspect it isn't needed.
->>>
->>> Either way it is worth a clear comment somewhere to document the lock
->>> ordering, and I'd also like to know this has been tested with lockdep,
->>> which is often cleverer than me.
->>>
->>
->> Ok. I agree that shared_info before vcpu_info does seem more intuitive
->> and maybe it would be better given the code in
->> kvm_xen_set_evtchn_fast(). I'll seem how messy it gets in re-ordering
->> and add a comment as you suggest.
->>
-> 
-> I think they look interchangeable in this case. If we *do* take them
-> both in kvm_xen_set_evtchn_fast() then maybe we can simplify the slow
-> path where it set the bits in shared_info but then the vcpu_info gpc
-> was invalid. That currently uses a kvm->arch.xen.evtchn_pending_sel
-> shadow of the bits, and just kicks the vCPU to deliver them for
-> itself... but maybe that whole thing could be dropped, and
-> kvm_xen_set_evtchn_fast() can just return EWOULDBLOCK if it fails to
-> lock *both* shared_info and vcpu_info at the same time?
-> 
 
-Yes, I think that sounds like a neater approach.
+--=-B4WfDCJr6frYk8gdTrwE
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I didn't do that before, because I didn't want to introduce lock
-> ordering rules. But I'm happier to do so now. And I think we can ditch
-> a lot of hairy asm in kvm_xen_inject_pending_events() ?
-> 
+On Tue, 2023-09-19 at 16:47 +0100, Paul Durrant wrote:
+>=20
+> >=20
+> > I think they look interchangeable in this case. If we *do* take them
+> > both in kvm_xen_set_evtchn_fast() then maybe we can simplify the slow
+> > path where it set the bits in shared_info but then the vcpu_info gpc
+> > was invalid. That currently uses a kvm->arch.xen.evtchn_pending_sel
+> > shadow of the bits, and just kicks the vCPU to deliver them for
+> > itself... but maybe that whole thing could be dropped, and
+> > kvm_xen_set_evtchn_fast() can just return EWOULDBLOCK if it fails to
+> > lock *both* shared_info and vcpu_info at the same time?
+> >=20
+>=20
+> Yes, I think that sounds like a neater approach.
+>=20
+> > I didn't do that before, because I didn't want to introduce lock
+> > ordering rules. But I'm happier to do so now. And I think we can ditch
+> > a lot of hairy asm in kvm_xen_inject_pending_events() ?
+> >=20
+>=20
+> Messing with the asm sounds like something for a follow-up though.
 
-Messing with the asm sounds like something for a follow-up though.
+AFAICT we can just delete the whole bloody lot. But yes, it's
+definitely a later cleanup, enabled by the fact that we (will) now have
+an agreed way of taking both locks at once, which I didn't want to do
+in the first place.
 
-   Paul
+--=-B4WfDCJr6frYk8gdTrwE
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTE5MTYxNDIxWjAvBgkqhkiG9w0BCQQxIgQgb5xRR0Fh
+e0/YOc+ZsBPfHmkZXPmSQ6p/Q5v1anHidLIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCJ7mABWcTmXFbB67yNozNVIouVz5Bp7oig
+6s3fwaX/w4sS+CfaulnbNPPG2kwVwF/lNpzPjnRV5emGD0Ag5HUerrD2r9T/ttNMyh3xQLyb5GXD
+FBoPCHcOAYyP1vSoDqWgo2T7O5nb1oaKYuKnn5mhihC5TXjmuAQ/pnRS1TGcrqa5M6SLUybMspIB
+Puzlhf5Bo0/F1ySR+452FKvluFiC1AUasFYKDwfNTP2dp2uiFbzle6jeYfDUT9lpq+FbLqWXdCp3
+x+EakcY5jguqRq2gRtWFP3pM/E7SQd0dXt6e2H3RqTnPnL3K1bhSU/ZtP0jJpTmVLsI9qEB9sRyW
+dP8l2Wvr96TU5JYTdv/dFm6QIOYAvdKlqsNMtLvmY1dxh65QvMIVkI6uoIuAcdm1SJt4JYwm99wG
+tbu+KYCwGBARr0ZNYXk6A9pN9MNkEeDCDYxGmR+Z/4Cfq0rMyYkiYczmlCbgfzKXL7eF2yiKdD64
+6XdV1hEtdopwpNK0BVNitEGuBr2bJgREdmC9FxEjDzzonU8DpIgSnP+AT2p3z/ddzIYE2dMxX6W/
+DvR9ZcOpmuh/8+5LEsPeUDNMXiwIOmd/kTkl22dI1+KA5Bv4H4jIBwSoD+6BV27F32nh16if/oy+
+6z3sdkwsJv3tOTWpMTdaDDXC0TdOVth1l8+RpoBK+AAAAAAAAA==
+
+
+--=-B4WfDCJr6frYk8gdTrwE--
