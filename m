@@ -2,197 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2FD87A5679
-	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 02:08:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FB357A5680
+	for <lists+kvm@lfdr.de>; Tue, 19 Sep 2023 02:14:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbjISAIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Sep 2023 20:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50116 "EHLO
+        id S230333AbjISAOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Sep 2023 20:14:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjISAIv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Sep 2023 20:08:51 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 952A8E6
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 17:08:43 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81ff714678so3196229276.2
-        for <kvm@vger.kernel.org>; Mon, 18 Sep 2023 17:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695082122; x=1695686922; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dInZugQi4I3jT3AsjQuL7R2MGGG9K+dIBnr86/ph3q8=;
-        b=VJUIHw8Fmsiavp0KTCXmgZgCZ8Iyepu5kOhEf4xUuuGu4VEqaGuL+jLfjmvTIoE0rx
-         5BOwSekVninQB37pK8K4fg/Kk7NkoyV4SzWzllnPc6R40E1bWE7ZHOYuSNbSzxzChclc
-         NvqVZ/HEvtp5ivOwqXHJrrqBfOv4/GucNjurKELOZ7Lgy6RARCV+c3PauTUVYeUYgYbc
-         9pEwJtrSso4Hj2P1FVDoHbfCmxrq6pkp4t7DfU5ywZRv9tJc5QwHe2a9d58Zl68+vun/
-         A7wLK4WY1/LGXAIA8ECdFhpldv9/jyxAxdsLrwAP8wLQWiIB6x4Qn9x9+Kcsk4DCtN3A
-         sojw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695082122; x=1695686922;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dInZugQi4I3jT3AsjQuL7R2MGGG9K+dIBnr86/ph3q8=;
-        b=U9H4Xka1Kp7QDqBPHzalQHQ5ngeYYLFpv547WoFgQgOY6fvRAsRYpKL6/dARZRjt86
-         DYdZ46O8zF8XjoIMoYxcqTdYgtwoTgyfMJ5u2YZErLoxR9HfHdk7Kp7y07gqh4/WpIGw
-         a4dUrJtsC9y4GsWnj/C/jGtUfKkRYVlk6XP34FC2GSQDF7zeSm+jRbkZDR/cv5FuKfXp
-         QDFxzaaXlcbgWGyE7rIAKCy3nUyTi7HPsvp8EkE4j2dH1wZp4ojGpg6js/v/jonWBE5V
-         Hl2wD0Yh3f5LlygMztM6dUitewu07M7S4e6EmTEaBhMNgq0oSZbPjzpQnraKtpO0vOHu
-         cf7g==
-X-Gm-Message-State: AOJu0YwpBznZ9MEgekk/SlxpiVC03XzVNT77o/DhW+R2CWeU5ZPsYcBX
-        pPUQ+RuTnKlDWYBK38u/Bv/tKf+inWg=
-X-Google-Smtp-Source: AGHT+IHHNvt5OesaYTZ4SrOkO6G/E0GpOB67x3jgD/5Z7IEbZFEyHH5t/MUiil/50JGkevI3xvv2hT/ge04=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:11cf:b0:d80:23ff:ae7f with SMTP id
- n15-20020a05690211cf00b00d8023ffae7fmr237508ybu.4.1695082122578; Mon, 18 Sep
- 2023 17:08:42 -0700 (PDT)
-Date:   Mon, 18 Sep 2023 17:08:40 -0700
-In-Reply-To: <20230918180754.iomoaqnw75j3rrxb@amd.com>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-11-seanjc@google.com>
- <20230918180754.iomoaqnw75j3rrxb@amd.com>
-Message-ID: <ZQjmiE7cQ/4UynNz@google.com>
-Subject: Re: [RFC PATCH v12 10/33] KVM: Set the stage for handling only shared
- mappings in mmu_notifier events
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229508AbjISAOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Sep 2023 20:14:04 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2062.outbound.protection.outlook.com [40.107.100.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ED590;
+        Mon, 18 Sep 2023 17:13:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F4o1dz4JiwPCnbc18PcssmzHd7tk+wHZGK59VYvBrk7apZ605JUPmpbybs33xT7r5/J83QUYZoZaoOEes5AiXEPWHe0VPDFxJ8dLWQZAULaqPZUuCsKqt3dsKzVfrgCVLqNm2u5M8hB8CVCU+IE52rG+B/8rd7HfjK9BFuT12VkYDPelsZ0TYJuRyM/jjias2zNiBgOQSVVtfeihsPSS7cj9kfvWM3VFb1VjsdG9uZpRtUw8YzciveOQzL/0vHRHteuCBdUjAT/NdJ8SbTyJwix2NG5u/Hxyrc0N+joiAik+b8Yy5Co3kcyvoyeP8Wvnl5e6DGkWlfU5E9lMHWmitQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UCMwGY2Kiq+Gg6zIzSePalKikQ6D/7OFsySJfmYK3KA=;
+ b=CSbDJMovKWfTYi+iVLcHUT4PfW1UG6MHm+XXZGuOWm0s6HbvAtAGBZk4xx4eUFEWi55D869kG9rW4TWp3EuEFx4gP/glBu4lLpINQoHJraUcF3eZ6LBXnPYVSXnIZxsE4F2Z7wMxcySxZwTjzlPBT/m7wrLSZucJtthnYYZDJI/YSMROb/TDjocmUF43ghadkPvunp6yFoVDzhCL5sfycCNluRhlM8N94Q6jGq86ldbvmF45l+t704TLJjzqOyM5m0supCeOS2uZYZkCMSs36CkoilPrJYNdwvix9zXlsG1P+qjlnh0ZarrNWuHlU1dI5kg5Ij3TKE+pmSfs88Nf0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UCMwGY2Kiq+Gg6zIzSePalKikQ6D/7OFsySJfmYK3KA=;
+ b=GFi8SjA38Hy4gkPPOrtwRbY0ConNLkkl/Q9N7wiirodzumtqFeMD+mcIoe2D0poh4ijJXnUCWYzlo1wZqfAw/RBHEHw4yQytKApV6A7RWYnp3xPJS1CamEcFLdpGtjcCPQ35AZi2I1hMB8e6yPxvP4KiEGdQN2BKeiz+x0gz1ew=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ MN0PR12MB5788.namprd12.prod.outlook.com (2603:10b6:208:377::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.34; Tue, 19 Sep 2023 00:13:54 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6792.020; Tue, 19 Sep 2023
+ 00:13:53 +0000
+Message-ID: <91e0842c-1ba1-449d-b2d8-a3e2fc5ac95a@amd.com>
+Date:   Mon, 18 Sep 2023 17:13:50 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vfio] vfio/pci: remove msi domain on msi disable
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
+        reinette.chatre@intel.com, tglx@linutronix.de, kvm@vger.kernel.org,
+        brett.creeley@amd.com, linux-kernel@vger.kernel.org,
+        Leon Romanovsky <leonro@nvidia.com>
+References: <20230914191406.54656-1-shannon.nelson@amd.com>
+ <20230918141705.GE13795@ziepe.ca>
+ <acfa5d59-242b-4b31-a3ef-b4163972f26b@amd.com>
+ <20230918233219.GO13795@ziepe.ca>
+Content-Language: en-US
+From:   "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20230918233219.GO13795@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH7PR17CA0050.namprd17.prod.outlook.com
+ (2603:10b6:510:325::22) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MN0PR12MB5788:EE_
+X-MS-Office365-Filtering-Correlation-Id: cdcfc84a-a579-4c60-e539-08dbb8a54ebb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: f0pXSYUG+bL49Di8Lt8N7LGcclTXdIQWlBSE9zqvQi284rg2AS7wtH8QHlwqk7LOrgiaLtWULpuSfhHm7tDlAX2ycGHrcpH3QKPCfixlikU6VVx/C9jP7Q/HnlC6uajfhNiIBmri61UBr7OTGGano1zDAKGJH07TmzcRrJJFMz/XQky8UwYaQFHYpT7Z6nUK8ZNKop9+/EJTIhSSLqj1zVRteuYUbdWXvZQfa2hPMLb+UiCJacZdtEDGM+ZF2/FLOQ23wDpAYQjwL6lABb2+Na9M4icW48Rxx5yTadS0CP/EdB+3z1k3V3YAuqU68QddnvpvLCaFz7cgmFCHeMNzAeUjlIbRXge6pAGWPaQRMn/DorwpIDISpPjeOYyK5GRYS1X6uBxzFZN/GyEYTmXDNCqqjcS07dR4TRIYZJAI+5YNdB0+UqNpqD5VDU0uatxpX6it3D42IOKulJjfnLS+TLWvKphrPNPNcJXpDt33dM+eiT/dwQXQ5Jna0Juzp9w3pgILzOFDAEfpACBQCXe+UPgxH00+XeqrSG/9TnttGTkPhAIT/OYUWxY3mLxCyGtPo/7w8xjkxiJgaPqDlWo0tz3/F5X4lo3B87kq/JcjbCKIhqUTB0J4jVaKRCBXMPeUjfwQ76sNUsjeIF/M9pxr2g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(39860400002)(136003)(396003)(346002)(451199024)(1800799009)(186009)(38100700002)(31696002)(41300700001)(86362001)(4326008)(36756003)(66556008)(66476007)(66946007)(2906002)(8936002)(4744005)(316002)(6916009)(8676002)(26005)(53546011)(83380400001)(5660300002)(6512007)(6506007)(6486002)(31686004)(2616005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eUVST2o0blZBZzd1YUpqRXR0YmplTWxWTEVab3E4K2JaaFFjRkNCb1FDTk5w?=
+ =?utf-8?B?WXMremZtdmxIUDFWSmo4WlA3VGxNSkRPcGRsc1F6ZmV1YmxldnF2UEZWMmo4?=
+ =?utf-8?B?Q0pCSmpmY3JWU250YzZRVkwwVHFUV2xkTXlLRzkyVVhyOXJwYm9RREJyN0Iw?=
+ =?utf-8?B?aFcvNmJQNDZRTmZXNGNQUm1OMmtLUXBVLyt2VVBhVDloL2tiMUZtRlRpaVZK?=
+ =?utf-8?B?THdubFAwV3RxL0cxZEoxcUQ5bUx1ckVJL0tKRy80NmQ0djBMT0x5c1hqNGwx?=
+ =?utf-8?B?WUloQ2ZWd1JyelZ4Q0Jvcno1VitiNW1QV3p4c2s0elU1WG5EU2tuWk13TEZr?=
+ =?utf-8?B?SjJHUjRWbG5vbDdpNjBzeWtBUFMydDVqcEt3ZVo2cEJuaGpLdWliL1VaeTg5?=
+ =?utf-8?B?dTZuR1lpNGNNRHE0N0RxR1hVcUVFdTdKSzczUlZYY1RzdlhJTHFzUW8yRlN4?=
+ =?utf-8?B?T3p5bE14R25DdzdsTzdrQWdkdHZQazlvemRaLzBwdGtNd2IyVzFwSmp4MGF4?=
+ =?utf-8?B?Y2JzRTRpR1pSVzNoS3RHVE00OHNPSWFGWm9YeFVkNDdDS1FSS0prYnVqWDB4?=
+ =?utf-8?B?N0Z0NDlqV3N1TTA0MklNOXFUWExHUnhrNlRLcUVKcDJjbnpsbFBqZzZ2YlNu?=
+ =?utf-8?B?b25GTE55bXgxNXF1YkU4Uy9zU1ExVTl0Q0N2QlpWR2RjNlhuWDRaSzM1SGNT?=
+ =?utf-8?B?QUpIU2lSK1JzV2pmY29rWjJPZUdMcFdaT2IzSmNWTzhZZWRDdjladUFNZEx0?=
+ =?utf-8?B?VHNSTnNGTm84b3hqbHdhNVkwSmdkZzY3cWUwMVZFNWRIMGt3TE1WT2dPYkFH?=
+ =?utf-8?B?MGR4TlQ0ZzVwbmVCZDBvdVVlazBTczk3UWN5WVV0QlNxbnQvL3ltY3ZLM1Br?=
+ =?utf-8?B?c21kOTVGUHVlYm45SFFuQmZKa2Y2RGk0UXNGclhtemhERlNwdUFOK0NSOUpo?=
+ =?utf-8?B?Wm9xL2FXUkd0bkwrVTczSDdHYnZOOHNXSmt0QVhpZW12ckdibC9vU1VWc1Ni?=
+ =?utf-8?B?RXlqOE8vemVJMDhya1ZTYTh1QzBoZ0UrTHdNYzBwNkg2K0JHaWJoRksyT2Ex?=
+ =?utf-8?B?L0cwZmxqQk1ISFFoZ0trYmdZODVhVzMxNW5odEdDV1B1TTlLbXJvQ0lsclVB?=
+ =?utf-8?B?UnFKNUtrT2VKTWM2bUUxTmRCOHNsNGgxcFBSR1JEWm10Y2c2SDJHS01TZTRV?=
+ =?utf-8?B?RVpTNjNZcThOek9ZTkF6NE9yMXFXWTUwQXZIT1pxMEhScVBsRkdDVTljSThX?=
+ =?utf-8?B?OWdLWkllVXorU1o2OG1PbU50NzVxYXo2eG8rSTAzQVgvSGpNL3hZSDlXaWJl?=
+ =?utf-8?B?Y3RsdnRoQkJ5aUtWcDFjTEJ4NHFkNXRrY2dDbG1ON2dEK3huZkRUdFUxMzBE?=
+ =?utf-8?B?MHh0d0VMeHRmTDBEZis0R0lQQ1hXZ2huQUdkWlovUTROZGJxVFhSaXZQOUx3?=
+ =?utf-8?B?WUZWUFJ2UGthS01EQ2w1QXczZkZ4SGlaMlp3aHJRVng1NVNwWWxTYmNONTd4?=
+ =?utf-8?B?bTB1dkdxV0tyWjRORlFsbVBFWnRzbTRCeXFVd3NTYTRkSEs5S1Z6N0RIeks4?=
+ =?utf-8?B?REw3VE43MEJybzZDckU2YThBcXduWDdBakJOQW1xYVNSVXUrN1BlQnRXZUJv?=
+ =?utf-8?B?WkFJOGlseCtsM2s3UnJSd2s4cEpzZ2UyWDBUNzFDT3VxOEdnb2l6VHVITWk0?=
+ =?utf-8?B?eUxiTnMwOGx0NmQ2TnRNOGhLN3ZwVE1ZTXd2bzVicmlLM08rVnNGQ0Myc2gz?=
+ =?utf-8?B?cGtwRlVxQU1aQVAxWk10MGFucUlkMFJmMjlNOWJZd2lTMjAzOEhrZXlTTHRX?=
+ =?utf-8?B?UXRPQ0JCZXZoR0o5VmdvSHh5Q0k4ckpPc2tSUmk0VS80cWdvOW8xUENqRHBw?=
+ =?utf-8?B?cVhSbzJYOC8zRFNNN2gxUzliU1JLWTdBYllHTGRqUGtrSXRWdEExYkwvbmQw?=
+ =?utf-8?B?SEJsbzJXWnZxb1pMWXdnU0cwSDBMYVh6SXpReUlzaHJmVElqaWJUdlNsUGVJ?=
+ =?utf-8?B?LzBFVHBGQkZqRGNrTDFwWFdoajVGcGNxbU14WG91QVN2R2ZlTUdXNkJYVFUx?=
+ =?utf-8?B?bXozVEVEWVBSc2dzYW9PQ1FLK09icStBcHdXbkZTdGZtb3k1THRXUk4rajFZ?=
+ =?utf-8?Q?on8Dwv3w1FU8SC96mjXvcp5nT?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cdcfc84a-a579-4c60-e539-08dbb8a54ebb
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2023 00:13:53.6771
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R5dDQXIdX8/gEw0a4aZimhLaTg68ur+S3drRTBAcurzXgkPF25gsEv1wRGuGEDkV3Mr8aqRjCStJlNwdwD/GOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5788
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023, Michael Roth wrote:
-> On Wed, Sep 13, 2023 at 06:55:08PM -0700, Sean Christopherson wrote:
-> > Add flags to "struct kvm_gfn_range" to let notifier events target only
-> > shared and only private mappings, and write up the existing mmu_notifier
-> > events to be shared-only (private memory is never associated with a
-> > userspace virtual address, i.e. can't be reached via mmu_notifiers).
-> > 
-> > Add two flags so that KVM can handle the three possibilities (shared,
-> > private, and shared+private) without needing something like a tri-state
-> > enum.
-> > 
-> > Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  include/linux/kvm_host.h | 2 ++
-> >  virt/kvm/kvm_main.c      | 7 +++++++
-> >  2 files changed, 9 insertions(+)
-> > 
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index d8c6ce6c8211..b5373cee2b08 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -263,6 +263,8 @@ struct kvm_gfn_range {
-> >  	gfn_t start;
-> >  	gfn_t end;
-> >  	union kvm_mmu_notifier_arg arg;
-> > +	bool only_private;
-> > +	bool only_shared;
-> >  	bool may_block;
-> >  };
-> >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 174de2789657..a41f8658dfe0 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
-> >  			 * the second or later invocation of the handler).
-> >  			 */
-> >  			gfn_range.arg = range->arg;
-> > +
-> > +			/*
-> > +			 * HVA-based notifications aren't relevant to private
-> > +			 * mappings as they don't have a userspace mapping.
-> > +			 */
-> > +			gfn_range.only_private = false;
-> > +			gfn_range.only_shared = true;
-> >  			gfn_range.may_block = range->may_block;
+On 9/18/2023 4:32 PM, Jason Gunthorpe wrote:
 > 
-> Who is supposed to read only_private/only_shared? Is it supposed to be
-> plumbed onto arch code and handled specially there?
-
-Yeah, that's the idea.  Though I don't know that it's worth using for SNP, the
-cost of checking the RMP may be higher than just eating the extra faults.
-
-> I ask because I see elsewhere you have:
+> On Mon, Sep 18, 2023 at 10:48:54AM -0700, Nelson, Shannon wrote:
 > 
->     /*
->      * If one or more memslots were found and thus zapped, notify arch code
->      * that guest memory has been reclaimed.  This needs to be done *after*
->      * dropping mmu_lock, as x86's reclaim path is slooooow.
->      */
->     if (__kvm_handle_hva_range(kvm, &hva_range).found_memslot)
->             kvm_arch_guest_memory_reclaimed(kvm);
+>> In our case, the VF device's msix count value found in PCI config space is
+>> changed by device configuration management outside of the baremetal host and
+>> read by the QEMU instance when it starts up, and then read by the vfio PCI
+>> core when QEMU requests the first IRQ.
 > 
-> and if there are any MMU notifier events that touch HVAs, then
-> kvm_arch_guest_memory_reclaimed()->wbinvd_on_all_cpus() will get called,
-> which causes the performance issues for SEV and SNP that Ashish had brought
-> up. Technically that would only need to happen if there are GPAs in that
-> memslot that aren't currently backed by gmem pages (and then gmem could handle
-> its own wbinvd_on_all_cpus() (or maybe clflush per-page)). 
+> Oh, you definitely can't do that!
 > 
-> Actually, even if there are shared pages in the GPA range, the
-> kvm_arch_guest_memory_reclaimed()->wbinvd_on_all_cpus() can be skipped for
-> guests that only use gmem pages for private memory. Is that acceptable?
+> PCI config space is not allowed to change outside the OS's view and we
+> added sriov_set_msix_vec_count() specifically as a way to provide the
+> necessary synchronization between all the parts.
+> 
+> Randomly changing, what should be immutable, parts of the config space
+> from under a running OS is just non-compliant PCI behavior.
 
-Yes, that was my original plan.  I may have forgotten that exact plan at one point
-or another and not communicated it well.  But the idea is definitely that if a VM
-type, a.k.a. SNP guests, is required to use gmem for private memory, then there's
-no need to blast WBINVD because barring a KVM bug, the mmu_notifier event can't
-have freed private memory, even if it *did* zap SPTEs.
+Hmmm... I guess I need to have a little chat with my friendly HW/FW folks.
 
-For gmem, if KVM doesn't precisely zap only shared SPTEs for SNP (is that even
-possible to do race-free?), then KVM needs to blast WBINVD when freeing memory
-from gmem even if there are no SPTEs.  But that seems like a non-issue for a
-well-behaved setup because the odds of there being *zero* SPTEs should be nil.
+Thanks,
+sln
 
-> Just trying to figure out where this only_private/only_shared handling ties
-> into that (or if it's a separate thing entirely).
 
-It's mostly a TDX thing.  I threw it in this series mostly to "formally" document
-that the mmu_notifier path only affects shared mappings.  If the code causes
-confusion without the TDX context, and won't be used by SNP, we can and should
-drop it from the initial merge and have it go along with the TDX series.
+
+
