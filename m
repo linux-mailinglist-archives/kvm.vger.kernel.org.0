@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 487A07A8AF2
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 19:55:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDB4C7A8AF7
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 19:55:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbjITRzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 13:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36826 "EHLO
+        id S229520AbjITRz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 13:55:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjITRzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 13:55:48 -0400
+        with ESMTP id S229583AbjITRz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 13:55:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9697BDD
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 10:55:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DF1D8
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 10:55:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695232500;
+        s=mimecast20190719; t=1695232507;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h5xYFinNZipHsHGmHUqZFR1epFlz8wPv/8ryGu1Ybe8=;
-        b=TkI/3/86NJCEXVvamz1vLwb8rTym/0BNZ4FtOe9aeTUstWOXdALWFchDfJ4H0VakgC8CHk
-        oRB3T1dU0cI5LUDBn31m85q5GOsbSjDqo4f6HAjVHjuRTRkxxD+e2lexI3qCEPrha/o0V8
-        ncb2RnUPI7mtI6QhPNj2oG2CetFwBjQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=NnqOeIozWLoSx9J0xtQeCKdqhemo3EjzKycC15MNaXI=;
+        b=SzKDMcCNnBBP6byCzE2SirR83Sn6/tTo6qEk0byuZHezX5Sv9AN+4nKmL/sIZDvJlgdGJs
+        H0R64p7wYptixyOx9rgL4GzGBr/H07NpCQevtkJkLNHgUrQLD3SSUjkRfFRpBFg0Yxwase
+        dwKc2S6KA2/NgZZcnSbD5ZBbirOKUww=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-zkBCouebPZ2Gt4wl2kGggw-1; Wed, 20 Sep 2023 13:54:59 -0400
-X-MC-Unique: zkBCouebPZ2Gt4wl2kGggw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f5df65f9f4so570635e9.2
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 10:54:58 -0700 (PDT)
+ us-mta-90-GGHfpVAlPQONheaGwS2Z2w-1; Wed, 20 Sep 2023 13:55:05 -0400
+X-MC-Unique: GGHfpVAlPQONheaGwS2Z2w-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-403ca0e2112so850685e9.0
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 10:55:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695232498; x=1695837298;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1695232504; x=1695837304;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h5xYFinNZipHsHGmHUqZFR1epFlz8wPv/8ryGu1Ybe8=;
-        b=uU9hFvWUcXbxeBJTTf7jl6jVERIE99ahENISINF6A/N1SLtgKdTp2e63kLNzAwIIKr
-         PAZCfiuA5OqFwL95nNFGUdUcenzSFhx97lCg75jkAriwWAgt5VozcLTNl/eEPNfxlHTM
-         cLBRbo0VJ9cZl95nQyxsnjWDlU7E6q+Ry8I6HkuMQW73YaVxoPcsr10w6jD71sQYqjrI
-         CZyEroai0wLisIuIOJ0tWAGMZ4rISUKqAWGy50O5q7Cvgm6w71+Xbvvs7ABNY1EceWkw
-         EnxwIb5849tVEkJKMczjnrZhrLV7nlyUj8E2Elo7w/U4MN47z56JAqp+6EK5d09MAXsM
-         lNVA==
-X-Gm-Message-State: AOJu0YzgEpB9JIA4GwCV7I6fsgakrT56e9Jwc/EFS3JYgIp8xVDIbpcf
-        kqTuk1enYycOvnWTCHXqum0I/wLCinomygxXUJpCQ0J/VfrGqSV7HULdsVzlH/Z681AXUqfi3gk
-        Q37dkBNyu6I5O
-X-Received: by 2002:a7b:ce88:0:b0:400:57d1:4910 with SMTP id q8-20020a7bce88000000b0040057d14910mr3302449wmj.17.1695232497863;
-        Wed, 20 Sep 2023 10:54:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHnadv5Rrllbv+1DebvWmStjUdr36msQ4bItIjpfqmG73HPxauN1Zj4NCrq5iVMGFuoky2thA==
-X-Received: by 2002:a7b:ce88:0:b0:400:57d1:4910 with SMTP id q8-20020a7bce88000000b0040057d14910mr3302418wmj.17.1695232497523;
-        Wed, 20 Sep 2023 10:54:57 -0700 (PDT)
+        bh=NnqOeIozWLoSx9J0xtQeCKdqhemo3EjzKycC15MNaXI=;
+        b=NPBKOkhDXIY8SIukXauFIHGL+oP4I1krgw+gllTgIOPjS1q0DagHh4l4IX6S7E6bf3
+         aW5UFixq+S93V/HLn8ICX66y3MUdjmdqtktMZKTJ+Oj3tyjfKCg0Ip0a3RhzSy02vjRh
+         wVA63Dk5SFnRG/6fWgPAG/SQCrJZCAIa9a1R8OyoBcxMiX4vXzB1EITVx7HEGidF3bIU
+         ddPQVHf+htrF7c5dPhIb24kJIBS9tK8X75YfCmg1RhbV6OQfd+1lvy7IvbUNtZqK6XiT
+         JgcQckbNS3RlnfaVAP/57dsDRPPzYjuN3EdsUA7kEYUOTLtA+DJ1BjXrFw3zE5k/9GBX
+         +xGA==
+X-Gm-Message-State: AOJu0Ywp9g3olVI97lyPW64uXVznLYsEVZsB3qo+w9Vet6GReDZ4OMoM
+        8cmQ0dMdykmteUtG47CpWYJzTNVa/4ZXdE3PleW3oSqljBwh79RoAqh6xyUAcbj2cPCV/pG6GAL
+        +prJBHgm12Y/T
+X-Received: by 2002:adf:ee88:0:b0:313:ecd3:7167 with SMTP id b8-20020adfee88000000b00313ecd37167mr2737764wro.42.1695232504616;
+        Wed, 20 Sep 2023 10:55:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG0pIzmkmEwrfJkDIWYrHXNUyhISLDh7IqFEh0BjNiUe37zgzv0CZuijHzQCZR9e7yYqC6CoA==
+X-Received: by 2002:adf:ee88:0:b0:313:ecd3:7167 with SMTP id b8-20020adfee88000000b00313ecd37167mr2737745wro.42.1695232504286;
+        Wed, 20 Sep 2023 10:55:04 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id g7-20020a05600c310700b003fe15ac0934sm1501378wmo.1.2023.09.20.10.54.51
+        by smtp.googlemail.com with ESMTPSA id w11-20020a5d608b000000b0031ad5fb5a0fsm10876963wrt.58.2023.09.20.10.55.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 10:54:54 -0700 (PDT)
-Message-ID: <facdf62c-d0b4-597d-a85d-5772ecaa2b86@redhat.com>
-Date:   Wed, 20 Sep 2023 19:54:48 +0200
+        Wed, 20 Sep 2023 10:55:03 -0700 (PDT)
+Message-ID: <26b92bbb-0519-8b94-07fc-75d900fde600@redhat.com>
+Date:   Wed, 20 Sep 2023 19:54:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v10 33/38] x86/entry: Add fred_entry_from_kvm() for VMX to
- handle IRQ/NMI
+Subject: Re: [PATCH v10 34/38] KVM: VMX: Call fred_entry_from_kvm() for
+ IRQ/NMI handling
+Content-Language: en-US
 To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
         linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
@@ -72,10 +73,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         jgross@suse.com, ravi.v.shankar@intel.com, mhiramat@kernel.org,
         andrew.cooper3@citrix.com, jiangshanlai@gmail.com
 References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-34-xin3.li@intel.com>
-Content-Language: en-US
+ <20230914044805.301390-35-xin3.li@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230914044805.301390-34-xin3.li@intel.com>
+In-Reply-To: <20230914044805.301390-35-xin3.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -90,16 +90,59 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 9/14/23 06:48, Xin Li wrote:
-> +	/*
-> +	 * Don't check the FRED stack level, the call stack leading to this
-> +	 * helper is effectively constant and shallow (relatively speaking).
+> When FRED is enabled, call fred_entry_from_kvm() to handle IRQ/NMI in
+> IRQ/NMI induced VM exits.
+> 
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 
-It's more that we don't need to protect from reentrancy.  The external 
-interrupt uses stack level 0 so no adjustment would be needed anyway, 
-and NMI does not use an IST even in the non-FRED case.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> +	 * Emulate the FRED-defined redzone and stack alignment.
-> +	 */
-> +	sub $(FRED_CONFIG_REDZONE_AMOUNT << 6), %rsp
-> +	and $FRED_STACK_FRAME_RSP_MASK, %rsp
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 72e3943f3693..db55b8418fa3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -38,6 +38,7 @@
+>   #include <asm/desc.h>
+>   #include <asm/fpu/api.h>
+>   #include <asm/fpu/xstate.h>
+> +#include <asm/fred.h>
+>   #include <asm/idtentry.h>
+>   #include <asm/io.h>
+>   #include <asm/irq_remapping.h>
+> @@ -6962,14 +6963,16 @@ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+>   {
+>   	u32 intr_info = vmx_get_intr_info(vcpu);
+>   	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> -	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+>   
+>   	if (KVM_BUG(!is_external_intr(intr_info), vcpu->kvm,
+>   	    "unexpected VM-Exit interrupt info: 0x%x", intr_info))
+>   		return;
+>   
+>   	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+> -	vmx_do_interrupt_irqoff(gate_offset(desc));
+> +	if (cpu_feature_enabled(X86_FEATURE_FRED))
+> +		fred_entry_from_kvm(EVENT_TYPE_EXTINT, vector);
+> +	else
+> +		vmx_do_interrupt_irqoff(gate_offset((gate_desc *)host_idt_base + vector));
+>   	kvm_after_interrupt(vcpu);
+>   
+>   	vcpu->arch.at_instruction_boundary = true;
+> @@ -7262,7 +7265,10 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+>   	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
+>   	    is_nmi(vmx_get_intr_info(vcpu))) {
+>   		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+> -		vmx_do_nmi_irqoff();
+> +		if (cpu_feature_enabled(X86_FEATURE_FRED))
+> +			fred_entry_from_kvm(EVENT_TYPE_NMI, NMI_VECTOR);
+> +		else
+> +			vmx_do_nmi_irqoff();
+>   		kvm_after_interrupt(vcpu);
+>   	}
+>   
 
