@@ -2,121 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1651D7A75A4
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 10:19:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1AB07A77D6
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 11:44:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233672AbjITITG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 04:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45746 "EHLO
+        id S234195AbjITJow (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 05:44:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233675AbjITIS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 04:18:59 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A37125
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 01:18:52 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4050bd2e33aso31550835e9.2
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 01:18:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695197931; x=1695802731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LqBFN5FLB49lnK/5qmtGVnKUxCOh5CXzqPeEzI92Gus=;
-        b=H/Q66Ri5aVz8NB1wAKAM3VNIBTPApCowNWaRlZopnkcBTDnIRvtVsrcvEApkM14cGJ
-         K45ugsy/hyZMkcGKsxou6GqsGyszxX9AzfdO+Mog2ljcczoiGRU6Ofu2a+5b2bODg771
-         CCLQEp3BtZ2eEcKT2yAEyQSPUOTeVXvhIzubmnj8JlxvZ9r8CuZdaNjHQodVs1hd7wuV
-         +wHxfqt15K7ckzrhC+EGWhnk4LYd5QiIO5q7TsbvcoI6XoYyzZjDsYT6iN/mmNXbQxWu
-         CNu0GzpTkQsH8Vjb/wkQI1Jxe7v2Yf2Q2D34wkIwmOsBGBqvKDzgrr8BGWH1QcIWWLpF
-         RTDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695197931; x=1695802731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LqBFN5FLB49lnK/5qmtGVnKUxCOh5CXzqPeEzI92Gus=;
-        b=AqD2ETYalhOTWcQURQb++OIjs5OOn2bkVsMpLeIAdfp+7Fn/K6X4sRqQpyFutTffYM
-         3NO7gBQKZ5orMw9zUwwDVY35ZVAdRP5IXqSxE3867CgKJF56G6IZXYUSpGts8EewaBVm
-         ruoj5M7O9cvWKqBG5nk3rRpz/SOoQBZF/e5fErErOuhw25+rAII3xHFiLEJp2w8ORh+Z
-         xqO9p8T1tX7sS6CVlfSzZYeN9UyjS8DwdAZISq2zriZ31ohyblZjFym05MQYr9xF1z/w
-         tyjt8ldvio7Ypc3zmfTtwku5PYTEGFaKDw5J4G7eOPw0fWqnvNliQWWrbYgUIt2rAx1B
-         QjGg==
-X-Gm-Message-State: AOJu0Ywhghh/d5UIOLp/GoNjQqyuXpR02KBdImwuU6G3uKVXeqGixyf6
-        9TqseR0r0Fn0S++5tHXUznqahQ==
-X-Google-Smtp-Source: AGHT+IEL6XDWeA1RRkJT2O9NGVoH7Skvq4BGuzq8l9Y1wg1d+Qpftyi3lW7iMmOUd4m4gogg1F9R8g==
-X-Received: by 2002:a05:600c:ace:b0:401:b53e:6c40 with SMTP id c14-20020a05600c0ace00b00401b53e6c40mr1791966wmr.10.1695197930897;
-        Wed, 20 Sep 2023 01:18:50 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id c26-20020a05600c0ada00b00400268671c6sm1250996wmr.13.2023.09.20.01.18.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 01:18:50 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 10:18:49 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 7/7] KVM: riscv: selftests: Add condops extensions to
- get-reg-list test
-Message-ID: <20230920-d30b398a99804418792264c3@orel>
-References: <20230919035343.1399389-1-apatel@ventanamicro.com>
- <20230919035343.1399389-8-apatel@ventanamicro.com>
+        with ESMTP id S233968AbjITJot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 05:44:49 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2088.outbound.protection.outlook.com [40.107.6.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 211BECE;
+        Wed, 20 Sep 2023 02:44:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bVvKZIsC0e3cKTuIVD1pCshC/K6pE82ujA8i/GBe28wm1DKRqrXi7kJfpMZ1PjTI2/mCUno1E/vz+bO4k/5j9iSECCU4zKZo+jj4p5xHTARSX+yKqEvxItfQjbX66A9CYgCzlCHcMP95EoTP5J4waE8o64Z8B+YSOIHIA4oJJvaj5X5GRyrTAAaw6N+AGnwX4SthZZ2G7MB1xSA+RKYd+5at3OpEj9hxpAIMfPoXUW/kB66bGUOpfKewRHdDuCS6JKxeVtXbL4rWFaVB9eZ7Vata6gb+bJUm4gXvS82rnlpPDR7Oa9eorGuHHydyLRriYmDbnFryeUrx20N6wu/l7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5UtxivITkJkOtaPuJj7c32JRnWGOu72fRn859bMMgK8=;
+ b=noMzkIeB77uM0h9ZYPMDXxRoTqbk+lxO4xDeJuzVVVO/G0mE93sR+eGki1VoxLcZFMT17FUYr6CS7yESPofRO/cspJuBKr7C+Fo20+rTsJ2tJm64fS9mgGcDUPW05UlOPgV7m7biLDdQuyvhxzH/yOpvDr0QGGKOlgwwci2BGOKjGO4ln4SLJGTYRHjG8Tbj9hHHA5yM8WoQzNQ59w5GRx3BGRwMI20v8ZNVW9jJt+ar0Qh9NKHjxbYRyK/YglquYUUzL1fv9QqJ27mn66+Ev2W9lUpHXjt0NmZJfik2blwOXPx7kcZbS+281/IPpTEdgFm3Ytsf3fuerx9qTli6gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5UtxivITkJkOtaPuJj7c32JRnWGOu72fRn859bMMgK8=;
+ b=OEc6dkzJUEFYROlXBQI2n9DW+N+xZmMREPNfVS2hBlHdmz5WWBRM+r2uMGGpvD2thyXhUkkVIXhZxg0P5IqM8GJpEY0wCEZ/2G+bKQEa9v39SnruAITJNz6uS+GTK/GG6MOrpsNayhylG4Cmz9djBumdj1SzozYQyh/gTKpKaKWAFf9c/9NCAhctbjSIuzd6vxLoVu++uciLvpdSZg4i8BhMmOVOGVKne5c90wHwOnLDCFYhMjPV3a1iaZ9Xlq/8tVGKiA/X30d0NozoufV2Kj0jtpmZRzABL5ET0On1HwAeX9d2mknu+KTxfdHG1hFr35LoNt/LspIMdS8EqBRDXA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from DBBPR04MB7788.eurprd04.prod.outlook.com (2603:10a6:10:1e4::15)
+ by AM9PR04MB8132.eurprd04.prod.outlook.com (2603:10a6:20b:3eb::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Wed, 20 Sep
+ 2023 09:44:38 +0000
+Received: from DBBPR04MB7788.eurprd04.prod.outlook.com
+ ([fe80::5b25:12c8:9f51:9b31]) by DBBPR04MB7788.eurprd04.prod.outlook.com
+ ([fe80::5b25:12c8:9f51:9b31%4]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
+ 09:44:38 +0000
+Message-ID: <b28b68ec-b86d-6641-e303-41747b9b5c10@suse.com>
+Date:   Wed, 20 Sep 2023 12:44:33 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v10 06/38] Documentation/x86/64: Add a documentation for
+ FRED
+Content-Language: en-US
+To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
+        mhiramat@kernel.org, andrew.cooper3@citrix.com,
+        jiangshanlai@gmail.com
+References: <20230914044805.301390-1-xin3.li@intel.com>
+ <20230914044805.301390-7-xin3.li@intel.com>
+From:   Nikolay Borisov <nik.borisov@suse.com>
+In-Reply-To: <20230914044805.301390-7-xin3.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VE1PR03CA0032.eurprd03.prod.outlook.com
+ (2603:10a6:803:118::21) To DBBPR04MB7788.eurprd04.prod.outlook.com
+ (2603:10a6:10:1e4::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230919035343.1399389-8-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7788:EE_|AM9PR04MB8132:EE_
+X-MS-Office365-Filtering-Correlation-Id: 007d6d41-c1c3-459f-c13f-08dbb9be3484
+X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /820x9R7hkhc/SawfUZtrBxb7wgHZN0RAYHKWqZZpr3GDoEmZ+WpPPtv531UHqsK2eTX/AP2eiV3xBJbSbtj56cQgX74KxWZKUkJVIaW+4AeF+3JIR8pSdaEh+w9aS+wiAOsrdqwdUaSunkL89OYjt4orPFiVWbikQ9X7NP8oA3GO1H0w26RVjLI63d8fbgRVeghV1fiODxi161Wu8ErXgmhNDrn2BO5GbnYMzixtgzgUZ/9xCE08BI5Cdp0lbaUtoNz7YjLGX/0oceeFHNsW8pAVBCOmZWL4UlslB9mUW2qHKW7x7uylnwo08uyba+WsrjpZP5MqXeutioW3QWJuEO73gS3A+aN4CdMaQ+Ej7JNt3eHqmsBeVQYHkpR3e0eZx/O9ZtMdwpBYBMOOSQs4ijUOa8H3k44soZy3K1B0vLfJfmU/9mmPw2Th3lx0IDTNpGXilcr91VG9IVvOYbsrUzl+o/xTZ6i5a5nfKt5NimS+BZfuV/ckV8HWKGNtC1OLKgSvyfR/YS2ZBSlKEEs9aD6pHN8Cnn+wxBp1EpgHhhmGK2hNZp8u7+lOfleaM0zWH6pPnNBClUhbMTt6q8Q9TpmeyCqLYH5YfJfKc1YuQq6OrCieTmnwuusHLCJXhpIzIhqA1NQLDtea1luj6Rk0Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7788.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(396003)(366004)(136003)(346002)(186009)(1800799009)(451199024)(8676002)(6486002)(83380400001)(6512007)(26005)(7416002)(316002)(41300700001)(2616005)(66556008)(66476007)(8936002)(5660300002)(66946007)(4326008)(6666004)(6506007)(2906002)(478600001)(31696002)(86362001)(38100700002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Qm9nSldNZzNqcVdJcWd1YURUcThiNXdxb0MwaFZ3a1FqUXgxOVV4OTdvUEtX?=
+ =?utf-8?B?S0ZxcW9TMEpTMlk1Tk04SlExT2Rqbm1pOWR3YUNabDVwRXJFWmhTUzlTNVF5?=
+ =?utf-8?B?Sm9kNUtWb2ZZMU9QanFHRk5WT1gxbzBKRTh0S3dMdkV6amNodmZ6OWR0cnJR?=
+ =?utf-8?B?WDFzMFZ0dEhwV1RTdzlqOUdwc1hsZUNQcU15a0RTL2dqbWE0S0VkV2NZT005?=
+ =?utf-8?B?QnpSZW83S2ZaTWdtUWc0MmNOWDJjeGJ1UWhFdktkYzZoMWFacTVyWlk3cEtu?=
+ =?utf-8?B?cUxQeUhkcjd0bURSVWgzMkMvaGZwL0FaQzFQdnY1cTd3ZHBkaW1Pd00wS3Vq?=
+ =?utf-8?B?ZkpQMlZ5VlIxYVVReWlad3padjQzOWFIbE03aVJRa042T3pxVmtWNzQ3WThI?=
+ =?utf-8?B?VjFHTHBmV0h3aGQ3dzJPZEN0ZWpkZ2pCaW9kRUVKZm92RHduUHY5NFRmMXFR?=
+ =?utf-8?B?aFhRZ1h1MmV3UXJZU0VPcEUvYVZvZWFSaEJFRGxXbzcwMkQrcVNXYUdsWHAz?=
+ =?utf-8?B?YnBqSXprazB6YnYvL3FIRXI0RnUyVUJoS2x0NXR5ZkcwU3Vud1VjRXlMaUly?=
+ =?utf-8?B?YTFleUZkdnhOQjJCTTAwMW1sS0tQWFNjdFV6clA1ZGxrM3REV1FwVE1xd1Jj?=
+ =?utf-8?B?VVBQRkNNWTloRmFyZFBCYmxhbUJkd2RZZ2xBSTlQSWpoL29CNHZxQUFFTU44?=
+ =?utf-8?B?OXNWeStmL0I4Ui9ZaStNbzQxTkVsMHB6YWVJeERQMHJOSkplam50UW5VN1BW?=
+ =?utf-8?B?WlZhTkVxcGZNYzRLY2tORURKYkdyZFJJbDdHTEtTaldSazRRcTdWcUZNRkEv?=
+ =?utf-8?B?TE9ucHlzTy9ma2dDVjEvRUNoam1VTnRqTDZ3ZnE0NTkrVGlCeDVXZHFYWVd6?=
+ =?utf-8?B?aXF6WTBOQ3huYzdKeng1MEZ5ZFF0azZ5VkxEdis4TTZxREVROFBSK3Q1R3k0?=
+ =?utf-8?B?L2RYOUlDTXVsTmNmOTU2TVZaUXpKNlhzd2NpU0dTMzZPZEEzN0RmL1RjcFVB?=
+ =?utf-8?B?OVVBK0xGRVpuMEJSVHVoNjNNbEZTTlN2TmFIcEczZ2QwZWYrcUpmN3pEZEhK?=
+ =?utf-8?B?SDNZcjFJSGZ4VGptSmhjM3ZsSDhsamw0L1B4bXJBS0RvYytqd2xuL3BkK1RJ?=
+ =?utf-8?B?ZE5kRDBvaFdoanhKeStnckhVVmdlekxxSmI3bm5KUk40Z3ZrRHdQTWtlYmpK?=
+ =?utf-8?B?MjhnYTUvNXVScXdSV0pxWm9NeWVuSVJCSEZLRGQwNUZ3UlJBb0tPaFVIbGxN?=
+ =?utf-8?B?aERMK0JHMkk2RHd5WUhtSU1NT24vbTM2aTBNcUcwRDBzd1NVMXJQR1hRSGI4?=
+ =?utf-8?B?VEVibkRMZzI0SjAxOVpCWXdlV0Y1VHlnUW9uKzJHQTA3SWJhcS9TdDRhS3FW?=
+ =?utf-8?B?c1lZSFZaVDRRU2lYajBHOFRWS3ppUGUrbklyU0MzbWpjQ0NiM2tEOHVkVnpu?=
+ =?utf-8?B?NVJOVmlyT0RINk1LTzFWUXB4ZE14MmNIQmEyL0JlRjJCVWZvMjRwUzVDZnNT?=
+ =?utf-8?B?NG4rYWtCSHpENy9mYXdqTVVLaVpGZklMaWhodzlQdlIrSVlJTllQZVlsbjlk?=
+ =?utf-8?B?QllLc3Z5SlVvRldpc3UyRlpjV0FIbU8xZm9mRnUzMUg3SjdHalhpYlZzVGJy?=
+ =?utf-8?B?Z0Uya0NZSnp1TVBMWkQrOUxFRDJIL01hVlBhWlB0d05DamdBWFJLb3Nsdm5I?=
+ =?utf-8?B?ZnB1VU5UUTFEb3h6bmdwSTJtSHhZdFVkMmpLU3RjVEVFQytma3A2V25DWTNl?=
+ =?utf-8?B?Rmp0ZDBnMzVCS1NmeEF0RVE4QS9jR0hoVWdPRXJ5T0N4VC9nRlp5L1B4VWVM?=
+ =?utf-8?B?OGwyalBTOVNCemxVOWpCS3h2QlNPOFFpZ3FvWXQzbnN0TDF4U3J0U2xraTli?=
+ =?utf-8?B?VE9ObFhJc3BPcTZFdGtFNnlqOHhFZXQ2OTc3Nm1WWGoxTnVzWDV6c2dtcDhZ?=
+ =?utf-8?B?a3NSd0xxTFEwTzg4K1dVWklJZ1pCR2Y1dlplbEFreDZEbzJpYXJiQ1RCWFVX?=
+ =?utf-8?B?VGNHZU1nUGJQUVhkcFZkaWVxWEdnT2dPK3NSOUYvaTByOUdTeENsV3BzdnJq?=
+ =?utf-8?B?MVA2UEhnTndVQ1dkY0NuNklGeG96d3k3QW8rL1JkbzBaT2dmVDFPSXM1ZThQ?=
+ =?utf-8?Q?9bQg/GoKF8dfNw8GdV5kbP/Sm?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 007d6d41-c1c3-459f-c13f-08dbb9be3484
+X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7788.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 09:44:38.2383
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2XMekrE4+SoCTkFVNs/qagiRU44pYDYVD0SoV2WR4VN+qkAjWlrAIfM73A6wOPqieUCnZEX4x8Y7lY6xQbbLQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8132
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 19, 2023 at 09:23:43AM +0530, Anup Patel wrote:
-> We have a new conditional operations related ISA extensions so let us add
-> these extensions to get-reg-list test.
+
+
+On 14.09.23 г. 7:47 ч., Xin Li wrote:
+> Briefly introduce FRED, and its advantages compared to IDT.
 > 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
 > ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>   Documentation/arch/x86/x86_64/fred.rst  | 98 +++++++++++++++++++++++++
+>   Documentation/arch/x86/x86_64/index.rst |  1 +
+>   2 files changed, 99 insertions(+)
+>   create mode 100644 Documentation/arch/x86/x86_64/fred.rst
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index 9f464c7996c6..4ad4bf87fa78 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -50,6 +50,8 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SMSTATEEN:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_XVENTANACONDOPS:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICOND:
->  		return true;
->  	/* AIA registers are always available when Ssaia can't be disabled */
->  	case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect):
-> @@ -360,6 +362,8 @@ static const char *isa_ext_id_to_str(__u64 id)
->  		"KVM_RISCV_ISA_EXT_ZIFENCEI",
->  		"KVM_RISCV_ISA_EXT_ZIHPM",
->  		"KVM_RISCV_ISA_EXT_SMSTATEEN",
-> +		"KVM_RISCV_ISA_EXT_XVENTANACONDOPS",
-> +		"KVM_RISCV_ISA_EXT_ZICOND",
->  	};
->  
->  	if (reg_off >= ARRAY_SIZE(kvm_isa_ext_reg_name)) {
-> -- 
-> 2.34.1
->
+> diff --git a/Documentation/arch/x86/x86_64/fred.rst b/Documentation/arch/x86/x86_64/fred.rst
+> new file mode 100644
+> index 000000000000..a4ebb95f92c8
+> --- /dev/null
+> +++ b/Documentation/arch/x86/x86_64/fred.rst
+> @@ -0,0 +1,98 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=========================================
+> +Flexible Return and Event Delivery (FRED)
+> +=========================================
+> +
+> +Overview
+> +========
+> +
+> +The FRED architecture defines simple new transitions that change
+> +privilege level (ring transitions). The FRED architecture was
+> +designed with the following goals:
+> +
+> +1) Improve overall performance and response time by replacing event
+> +   delivery through the interrupt descriptor table (IDT event
+> +   delivery) and event return by the IRET instruction with lower
+> +   latency transitions.
+> +
+> +2) Improve software robustness by ensuring that event delivery
+> +   establishes the full supervisor context and that event return
+> +   establishes the full user context.
+> +
+> +The new transitions defined by the FRED architecture are FRED event
+> +delivery and, for returning from events, two FRED return instructions.
+> +FRED event delivery can effect a transition from ring 3 to ring 0, but
+> +it is used also to deliver events incident to ring 0. One FRED
+> +instruction (ERETU) effects a return from ring 0 to ring 3, while the
+> +other (ERETS) returns while remaining in ring 0. Collectively, FRED
+> +event delivery and the FRED return instructions are FRED transitions.
+> +
+> +In addition to these transitions, the FRED architecture defines a new
+> +instruction (LKGS) for managing the state of the GS segment register.
+> +The LKGS instruction can be used by 64-bit operating systems that do
+> +not use the new FRED transitions.
+> +
+> +Furthermore, the FRED architecture is easy to extend for future CPU
+> +architectures.
+> +
+> +Software based event dispatching
+> +================================
+> +
+> +FRED operates differently from IDT in terms of event handling. Instead
+> +of directly dispatching an event to its handler based on the event
+> +vector, FRED requires the software to dispatch an event to its handler
+> +based on both the event's type and vector. Therefore, an event dispatch
+> +framework must be implemented to facilitate the event-to-handler
+> +dispatch process. The FRED event dispatch framework takes control
+> +once an event is delivered, and employs a two-level dispatch.
+> +
+> +The first level dispatching is event type based, and the second level
+> +dispatching is event vector based.
+> +
+> +Full supervisor/user context
+> +============================
+> +
+> +FRED event delivery atomically save and restore full supervisor/user
+> +context upon event delivery and return. Thus it avoids the problem of
+> +transient states due to %cr2 and/or %dr6, and it is no longer needed
+> +to handle all the ugly corner cases caused by half baked entry states.
+> +
+> +FRED allows explicit unblock of NMI with new event return instructions
+> +ERETS/ERETU, avoiding the mess caused by IRET which unconditionally
+> +unblocks NMI, e.g., when an exception happens during NMI handling.
+> +
+> +FRED always restores the full value of %rsp, thus ESPFIX is no longer
+> +needed when FRED is enabled.
+> +
+> +LKGS
+> +====
+> +
+> +LKGS behaves like the MOV to GS instruction except that it loads the
+> +base address into the IA32_KERNEL_GS_BASE MSR instead of the GS
+> +segment’s descriptor cache. With LKGS, it ends up with avoiding
+> +mucking with kernel GS, i.e., an operating system can always operate
+> +with its own GS base address.
+> +
+> +Because FRED event delivery from ring 3 swaps the value of the GS base
+> +address and that of the IA32_KERNEL_GS_BASE MSR, and ERETU swaps the
+> +value of the GS base address and that of the IA32_KERNEL_GS_BASE MSR,
+> +plus the introduction of LKGS instruction, the SWAPGS instruction is
+> +no longer needed when FRED is enabled, thus is disallowed (#UD).
 
-Don't we want to add test configs for these?
+nit: This will be more clear if rewritten: "Because FRED event delivery 
+from ring 3 and ERETU both swap the value of the GS base, plus the..." .
 
-Thanks,
-drew
+The idea is to remove the duplicate statement that IA32_KERNEL_GS_BASE 
+and the GS registers are swapped as it makes the sentence somewhat hard 
+to read.
+
+
+<snip>
