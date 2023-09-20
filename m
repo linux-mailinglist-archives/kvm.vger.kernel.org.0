@@ -2,49 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98C427A7906
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 12:20:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19B857A79BD
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 12:51:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234312AbjITKUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 06:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35320 "EHLO
+        id S234286AbjITKvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 06:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233864AbjITKUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 06:20:10 -0400
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2048.outbound.protection.outlook.com [40.107.247.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871C5AC;
-        Wed, 20 Sep 2023 03:20:03 -0700 (PDT)
+        with ESMTP id S234054AbjITKvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 06:51:11 -0400
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2041.outbound.protection.outlook.com [40.107.247.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5952E4;
+        Wed, 20 Sep 2023 03:51:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O5HQwT670UVX8mnI0ax+FZj9EsuY4esnkzbGJCLSr3sgHEbv+A0PtTLSObG5YKXPWqmENTjruN0bIPsmLSaZ7Xdgi4lD2Y0EvL7wf1ZFGOHk958e2ZNomWAC0aTkT3fwjCEJpB92qw3diCmSzea+Si8AwyhXJ3LFbgg9CAATA6UrImQajy33h/WZYLst+Z/K+58SNHKO4NdvvGvygugCOSF4ZSjd4bmMcsgJeVq8YSqHer8Q27SYBuYaLZihmlX9lzB8payeJ2SpJYwBGcYoyQJLRrjkc3arM3eksbvAYB8+G30T/7N+Lr39dwxTOBHdH6YkGJRk0hhPtvU5v2mdPg==
+ b=mRwNMxBxr5L2Gy6QsNvOdh+bMiuQPG0dfXJXa1q5XnPBYHvvkZ++inBkDdnaaenmRY4wc1qhs41VsQD7XO77iIkd5fhTVJ9NmmIg8dawiLr29DVeIsN+kI6bykRdohZx4109euTkLwf0grTvy80ZJXq3PW9Gms6B2LFpvy6TMb+OXarQp8gkHdSZ73IW2cqWI76wE1AW4+QFlQG90lrpmxCXE9qg6B/XVNoI/CRHoT6qxwPHovGc9f4wtFyomT7j6ppOFVY7nDTF67S2DXNym1BA9XmZxnlFIT5YNTP9fqTXmCIqebtHKTGiB0afmhgxCt34R5puTKJclF6DsqkTqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YAINhEdYTcENyXk8OY5ai9zN5pJCicyvFXeYrjOYSPk=;
- b=Tk055o/G+0dcH5nVVPu9VlH1hxH7IhX5z7RJXT5M0BCw21Lw9/E3Hi41eI6rEfUGOZGGybO9QWdVrY0HKfa2us17bC4/kndQh24Xv6G/AZ2QdnUv4P7F5ijRCr6NSbc7xVcchYjzS3+Pi52ePlvQw5il0i7xBmDoNO9KQd63Hl3f5JwN+18eCHkGvV7OWbrHMRsuzO5RPVnTfx6dmdqVGeW8CVboANe2qZP7tGhl3U3ofPMZDNInd7q+OWy17yYMlSwrCoSSMerTK4LmrU3YLX+3pucK1sonCwvPp3qne8ycMKWXWDCGWW2GpJxlxoaMDZwEy/WsU/f8ErwbVkT6qw==
+ bh=7mn48O79cCJUHPDmHf5UU3FL2KFU9vaaPc5Rcjmf5v4=;
+ b=awFkq182LhHFar7MkwgPIksVv6nUSnHBj/kWomi/14S08SZSq9Fc3/mqqnqurEztfdhd+xvHqo9RH8yQ0ezy+b7THAldpIZV8VBulog4N54tPL09pwezHUMVgEdPjcMI9jVuLuq+gG24wkYeC5lQxkcqK7EVZG39Y1zaEWsWOWLbSMH301RYZnoW+15yIzE2m/RUl/IoL4Py245BZoidHDsNJEqeYszXLQCPAt0dAnauo5GJcNvWtm/WZkMO4PayZLdzzkmKafziONJH5u2QznpDWrsmuuQIRXHmOX1iL/825DSAQqfoyz1hWtKSS8jH3CHOEp5HjWlQXuxrX9gkbw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YAINhEdYTcENyXk8OY5ai9zN5pJCicyvFXeYrjOYSPk=;
- b=4dMO9RPLB8esifBXGX+b69aSKwYBMKuuu9SbliM2w+93wU3sv8Wh0ypn6QH1p5e2pLrGGsGlX5zBguqFOfjixxMG6DNB/LhVhz9ujtqLtoow8uZliP2SgPIs9SUAImRtiHdt7K82+QRBgNyEBhSQHbl2H18jtGyoffTOd49SNCHhFmIqnv51HMK4cpDXI0B9+zhDzbcsfZRYLPTq6Q5t+o5vKOsEZVOWieQtE7F9ovHr+BAEd2L2dO92Lb+6M3vdXY7OswSe9uFRZ2ER4YhpDzXBz91uKTRKFkmdaQV+MvypNYOVKX087sx6eZ6L7BRHgwbPnUpYBXMkFhQktqlnNA==
+ bh=7mn48O79cCJUHPDmHf5UU3FL2KFU9vaaPc5Rcjmf5v4=;
+ b=xvCSw0qU3Wncbc9h17hm9HBWqhMBFabuQ5pAMKU7p4/+tZGQzcA2h/jYAVlZG9oxlAkLS8GNaT9ZAtsQ+DAP6zRgGnVh/UK9ACvGDZGpXFHAu43zxW0znd6BW1oyeBTNDH3jlMFC2c8KFp7RJhXWdJp23eGOwahod1p5thrR58ctEzZmwOZ70E1QsYwMDkB+AAnIYGQYFwaQiceMhKzFXTkaeY5CMntJMRDawP+N828//RBpORLPGaQHNX6aeZYx8C80mB949Lcd0lpOWagwOHUrFiJP+nw3Wue0cMNMcvaI3BCKsEVvS6BVXQx3Gu5P2fGv8CimesgjNL6DyeQ07Q==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=suse.com;
 Received: from DBBPR04MB7788.eurprd04.prod.outlook.com (2603:10a6:10:1e4::15)
- by DB9PR04MB9703.eurprd04.prod.outlook.com (2603:10a6:10:302::20) with
+ by AS1PR04MB9697.eurprd04.prod.outlook.com (2603:10a6:20b:480::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Wed, 20 Sep
- 2023 10:20:00 +0000
+ 2023 10:50:57 +0000
 Received: from DBBPR04MB7788.eurprd04.prod.outlook.com
  ([fe80::5b25:12c8:9f51:9b31]) by DBBPR04MB7788.eurprd04.prod.outlook.com
  ([fe80::5b25:12c8:9f51:9b31%4]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
- 10:20:00 +0000
-Message-ID: <aaed79d5-d683-d1bc-7ba1-b33c8d6db618@suse.com>
-Date:   Wed, 20 Sep 2023 13:19:56 +0300
+ 10:50:57 +0000
+Message-ID: <085176da-924e-8d6d-1c56-8bfc9d457b0b@suse.com>
+Date:   Wed, 20 Sep 2023 13:50:53 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH v10 09/38] x86/fred: Disable FRED support if
- CONFIG_X86_FRED is disabled
 Content-Language: en-US
 To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
@@ -57,72 +55,73 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com
 References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-10-xin3.li@intel.com>
+ <20230914044805.301390-14-xin3.li@intel.com>
 From:   Nikolay Borisov <nik.borisov@suse.com>
-In-Reply-To: <20230914044805.301390-10-xin3.li@intel.com>
+Subject: Re: [PATCH v10 13/38] x86/cpu: Add X86_CR4_FRED macro
+In-Reply-To: <20230914044805.301390-14-xin3.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0098.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cb::15) To DBBPR04MB7788.eurprd04.prod.outlook.com
+X-ClientProxiedBy: VI1PR06CA0113.eurprd06.prod.outlook.com
+ (2603:10a6:803:8c::42) To DBBPR04MB7788.eurprd04.prod.outlook.com
  (2603:10a6:10:1e4::15)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBBPR04MB7788:EE_|DB9PR04MB9703:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e38e81a-8c4e-4991-7042-08dbb9c32549
+X-MS-TrafficTypeDiagnostic: DBBPR04MB7788:EE_|AS1PR04MB9697:EE_
+X-MS-Office365-Filtering-Correlation-Id: 315d7862-073f-4fde-51e0-08dbb9c77872
 X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZbyrK9C+nN2sIcAa9U8A4mG00Z/bAaHO+AuovHU6defTCjOQsINvYY6lphvwL0TupGeSiieGz/Jg3WyX2rp8veexmyXx4Tz8KgWFzTm0rYAbgWmwivrGvLMgn0jPuYS7q5IklfIhkYrUYtUleH8ejqAZNpj2k0gtYK7pmuP3Ds+3277tuBgv6anaALRNczHIlJU6kJY0NTVzCPxyGetMn5mMFIBoZIOTaFsGR8UySX7rg1LjpHw0zOa3YXs6MriIb/8fltt5zHFk97Xdz+eoVwlq7BkTMCDp+5LWWRRl70HmwyYqy/+9t5f3u8yQHN/uP17w2SLDjAooROBR8SwrdOtiOQV5HIVQyIRxW/zucBlLwAt9dhWIKRsmvT4Cq2E8AHusYguWNs6el1oMkHBRntcxelM0k1fnffndSLb2Aif1XQFTESChf3rGxkqPewgS3uA0I4ogsns/n3nkaoIlp9Uy5VQKwLidtK3538JzuupBYfFw3hvmJRd3ihWuAKRiOGMS8tylKQnUJAuwrQ1W9FWAeIdTwca7ouCh/r0q3Gi7WeFxxuIokus/XoikFSUpaxLk7/aJYPDv0CNfZonsPkqEZ+65qSM3KPaB97V2Xvzs1a9jv6pmMzE/vByQ9Ndh0KrqQhM/q1wG/56fXMTipg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7788.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(396003)(376002)(39860400002)(136003)(1800799009)(186009)(451199024)(26005)(2616005)(8676002)(8936002)(4326008)(7416002)(83380400001)(2906002)(31696002)(36756003)(86362001)(6506007)(6486002)(31686004)(5660300002)(6666004)(316002)(6512007)(478600001)(66946007)(66556008)(41300700001)(38100700002)(66476007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: fHYxRv9+gqf7o8sRdcd6/eZzkDX1Beo0yXUyTzHw0+uHfyARhX+uEd8BWiN+benYIxURj1+YboOrusNvBezSBVe3LYbquziWpqeSt35TDYZFe8OEn80WiNSAsnvUCe5YFhCCdm1WYiPcWNhnH1cgu9BtjcUlIwo2sYHteOtTvSasfuQyPMOG7KXyEkvYWylx7mUXTWUv1tvJdH2gyfcxv2FAFBbaN0GYbO+AUpDgO9WTx8h9CfXpCUmRqjcWQnLDl+9AzXW2s1Lvhwik5TolotcOJEm6Nm+ON9uW73nEoehGGo2l9iWp8eYo3K8EGldxDYLfvsPzoh1r4Iuw+IQz28wkf6Rgt7c2kWPWyZcO9Omgq1mhmVz0g9Hh5nerbYt8XbhEnXzcuc8QLP+sGKF8OQI2/Ca9oOTpoUn6nJzUPY4ouEkljFGhjKHENVMSzj7zcfLfFyp7/lQaVD/fwx3E0niwGXqXovBZqGOV3KjhwP4AR04kYPZDCEn2l0sjkcQFH4IilMJzIdysbQ/YYiqtOV/lK2/2Wra/q+/xnvupOSelMftxGf2fwG/NSoqgVIC/DQmxB4S8SEfTseK/Q+hSHwphNmbPAmQI58Wxrv0UDM3uVWh0FOv4nVwoyyOce42pJ5iHge8ACLWGlc4QZ6jqPA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBBPR04MB7788.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(396003)(346002)(1800799009)(186009)(451199024)(6506007)(2616005)(31686004)(26005)(5660300002)(8936002)(8676002)(4326008)(6486002)(6512007)(83380400001)(478600001)(6666004)(316002)(66946007)(41300700001)(66476007)(66556008)(86362001)(31696002)(36756003)(7416002)(2906002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dGUzUzVlT09tVWt4cTltMXQ3cEZnME5OUmJqUFJnUXgzRlBBa3dGbmdMVDVV?=
- =?utf-8?B?ZFZhZWhLdU9ZWFlKQ2FiUFVnNXZhN2QyK2I3clBxN2dsWDV2clZ3aWRsKzEr?=
- =?utf-8?B?dzd6WUhlSC9ick1uSG9teFR2eGVwb0cxK1lNVTRVY1pTaDNQdzRjaDh4NkJl?=
- =?utf-8?B?VDF5d3BHank3dnFKUGtCQmgzVk5uTmhJR01MMHVDZ3pjNm9QczZqQU9TeHJn?=
- =?utf-8?B?K1owVitaaVU3bUNuYWwvdGlhZDFxell4UEtHVmtvejgyV3VTYlhUSk9kRkht?=
- =?utf-8?B?ejl1Q1FrYlVPeFlubTBDTFhzMHhqNi9EVjJVOWRNNnMwdzVIR0hFbU8vSExm?=
- =?utf-8?B?dWZ5U2V3WWhDRy9wZVU3Sk13T25XSTdjWVh1V3dZeThsbE5TRTJ3WFArUXdR?=
- =?utf-8?B?QVNXRlFFb3R3TDg0Z1ZXUlU4ZUgvU1QyQmdJS05BTEhlL1BPeUtEQWU5WDFP?=
- =?utf-8?B?QmVzb3VKSTJLcVlSSnVpWDNIZjBEZ0I5eVVGOHVPUjZXSGRseWo3TXhDMDN4?=
- =?utf-8?B?MElteE9mTFhoNkdrZmJSM3FVcm9pTzBnelFNaHhEbVF2cVFRZW5KK1pqQith?=
- =?utf-8?B?QU1wZ0dqdW9CQ2o3ZExaOGQzbGE2RHFpRFVRd21JOGhYTHBOTzRSd0QvYkZJ?=
- =?utf-8?B?MkZ0dEdpYmswd3BDSFc4ZVZ1bnE0SS9QanZZbTVORm9sSVVSQkE5empUdHpz?=
- =?utf-8?B?dlFVa0pyTlY1WUZZb01JblRoSDRhU09nMjZQUXNMZ3diK1NiRFovK2FKenhC?=
- =?utf-8?B?V2lyeklWUGUxampJdXNvZTFxRXBGVExJOEpRV3NQZWhseHZNZ0ZyTkMzNE5C?=
- =?utf-8?B?cVFRcXlSTGlPcitERWRENmF0bDY1WUZPeVFqQ3YxclVzZGVMUjVReTFiMThO?=
- =?utf-8?B?bGdqenJNZXNIV05RSC9IaWwrY01jVHpFTmp0bDJuYUl2NG1CakRUWVI1OEtX?=
- =?utf-8?B?T3N2UFFXY2lDUFU4NVNWODJVOEdlYUxOUDdRcXcra2lKd3IyTnVuUTRRRWIv?=
- =?utf-8?B?cTRvUjRoOHVMdkpPUkZzUGlDK2p1MlhDRFMwbldoaTAraE0zQklIcWhlQmp1?=
- =?utf-8?B?OWZjdUx6M0d0NmtDQmhhVlVjNUxmakcxbnl5UzBJUmJmM0tKVXZ4cGQ4bUQv?=
- =?utf-8?B?clJwZ0U0Z1dqN24vbFFLY2orZDFpMEtncENMdkMrdDZxa0lXYzc0Q1dzUkp0?=
- =?utf-8?B?STlCdlIwVUVUTG50TWU2UUJhRllVTENPWlQzNi8vVnNYTWNQeWdveHB6blpl?=
- =?utf-8?B?OUNWemkxbnpHd05JK3dnNUttSVJzazNGNUtjWjh2VGJWa2RjVENpV2xYTmFT?=
- =?utf-8?B?SU9FV3J5QlNGMDF6UnVWUTlyU2J1bkpRcWVLbFNVYzRhWXJsbmRpZGRpd2s0?=
- =?utf-8?B?U0Z2NExTSWFIclNoZzBtL1dud3dxQ2RGOTZ3NE8rc0Z6UGR1YmVrRjMyRHFT?=
- =?utf-8?B?Q29JNk5CdjR4K2kyUUZGZEt1eHJ3QTBDTXJzQ0FSSVArT0hLR24zYkg1cVR4?=
- =?utf-8?B?M3B5VWVJUmJCT2FCbVBEbWxXWk1pNUl6ZXY5blowYkg2ekpscVNIaFcrQkts?=
- =?utf-8?B?N1RYcXJ3T2dEZ0ZLYnhHN2FZODI0V05idjdvL1NxTFZPN1RoQnhPSDJidy94?=
- =?utf-8?B?ZTdwYnVEajIwd0dFRzdjNjZMYUNBbzRhSnJNU1BCNmVZZjdkc3ZFanZnMUZU?=
- =?utf-8?B?RmoxOWtIYks5anJVdlRQQkh1N0kxTnRUTk9Vd0IxTkJXaTk4MGVuM2xuQ3NB?=
- =?utf-8?B?T1hLcm9oMnNQWlN6RVlYQ3lUNnFqQVlreVVzNGlrNVJ2TzhFd2k2cEYvVlJQ?=
- =?utf-8?B?QXg2d2REWGRjcUpRMzNDc3RVUVMvNExPbHBpTXA1SHRsbnByZW02ajQ5azNG?=
- =?utf-8?B?TUNTaC80L3E3cjZQUW10dlI2Ni9pbDNyUmJYZVhmYzdsNmlsSkN0em5rV1BS?=
- =?utf-8?B?Q2xPTDdGQ1pPZXdpNmhkb3lwTUdDTWtwVDhIT1BUSXV4Yjh3L3FmWXBlUXpU?=
- =?utf-8?B?YWJIMDdVM2ZKbFlab3YwUzZWU3Q2VXlEa3FiMlNNN1FFeTgwNVlpM3I3Tmw5?=
- =?utf-8?B?Zit2VWhlTWU5MWlHRkdRRjIybHNJY2p4NUFNM3JuU3hZeVFaRnpWZVJ6aTRL?=
- =?utf-8?Q?gkjQgbXLoUdX8YFCFNLsh28bJ?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SzJMV0h1cnZSSWswWGJQbk8vcGFOUS9NK0FRbEFqcnhzSnVPYVZHV0pzSFZX?=
+ =?utf-8?B?ajhKTXhEaS8vOUZpdi9oV2hBbnVJN1AzRUUrSllrbDNGbVpmYys0Y29mM3lQ?=
+ =?utf-8?B?VTczZ3g2VzVETlRaYTFRSHNjK2ZPZktZWURxbzFtcitWbUhtMWwxM2QvaXRW?=
+ =?utf-8?B?WTVjc2pJb3NJaGxENTZmTzY1cFhqVGUxMHQyaVBvek5tRjJwaUd0RUVoQzdh?=
+ =?utf-8?B?czIzZkpmOXlSWnJQd3pnUWFHNllJMlYzRWEzUlV3MEZXdTZDVEFWWm13MnAv?=
+ =?utf-8?B?OGtSbVYwemJSMWxQZVIzQTF2VHVaWDdnYWRyOWZmNlllQnlEdU5iSmpvamlt?=
+ =?utf-8?B?dk5DTkcrbzEwWmJxdGZtNXNZbS9EdFdXaFhOb3RGWFdNLy9NUHVqNG1Ock1M?=
+ =?utf-8?B?VjB4Y3BMMWRObjlmUGdFYXN3WlQxT1JDdmRlRXQ0L2V6WWF4UjN2RWNlbjRB?=
+ =?utf-8?B?MS9UY29hOVlESWVMTFVwM2F0Vk1La1U3TFJnVzBXdHdqRUZiYURyR0NpOU45?=
+ =?utf-8?B?cjhYUlBPR3BMNStqa2t3Z1FzZ2lRRDMxRWxXQTBsTjlDaklZVEZVN2MzMmtt?=
+ =?utf-8?B?V0FEMzZJQU93YzNWSEdrMUsxWnFyRXdCc1ppaGhPTmI2dmRXV1Z3c2FWa09P?=
+ =?utf-8?B?SmwzYnBUdWdPUi9WZjM2bWlsU1E0VWhKdDBWd1BvVzN2UzBwWERSU1hpUVVY?=
+ =?utf-8?B?S2NmRWxLQkhMbjZOakZtK2liWUZ0QTBFeDhyZGxFUWJvdUdLeEJuenNBL25O?=
+ =?utf-8?B?UnlUVlF3dWF5czhIcFdheVlRSkIxUEJYbVVOWEdGM1dSWlNGSVpMQ0QzSVM1?=
+ =?utf-8?B?Wmd1cjdIMUtnL2E3bzkvWkJ4U0FWM0sremhOTFFFT2lJYTVsN0ZvT1JvYmR2?=
+ =?utf-8?B?dXJSSURyQkx1eTZJazcxZnh6Q0JQYmtQeFYrWlluQ1pNemFYS09kQlJRQTB4?=
+ =?utf-8?B?bUVybWZGN2F5QUdqWFZMRC9ScmpQWTR6Y0QzZHd2QmtKaC8xb2U4eldqRnpr?=
+ =?utf-8?B?cHo0N3ZnSFRURitlTDFrRnhqTlU5d2NlQXJySXhwSVl6bmVpbXNXSHk1dktT?=
+ =?utf-8?B?Y3dIOXJ6K1piUGpHU0Y2Vm94dUMyNnlUdFVRRlBjM1RnZEVNK0JkVXFLOGxK?=
+ =?utf-8?B?Zk1uRFJvYTJYcVBSaW9lVjh2MEJtcDU3ZjR0V3Y1YUxGcGMxWm9qN1hkdldi?=
+ =?utf-8?B?SVVaV1ZlOVpFN0g4ZG0vVFhzOTdMZStpQ1pCaGp2NDRVb3F3bFVJdUlzUC90?=
+ =?utf-8?B?bC9ZTEVlMHQ2YVZYZ1Nab2dEUHRLUU91U1N4UU0wUHU3QWFBTDRwcEQrZ1dS?=
+ =?utf-8?B?Qzc2MzZwS3ZvZlEvTmwrbkFjaVJWVVZFK1ZMdnkwa29BZk9UYm5YUUcyMFRR?=
+ =?utf-8?B?Q1FoQjYzcEJkUkdiOEdjTmFsd2VkeHJPSmNMb1FOTXd1eXkyZ0txMWdKeml6?=
+ =?utf-8?B?bUx1WmRrODZjcm9rSnQzWDZsblhnSFVKNHV0cG55dmUrWG5zcjFmbDBJRjNp?=
+ =?utf-8?B?Q3pHNVRmRURWVDYzdXNKczFMR0UyUDNtaVNFa0hFNVpXUk11ZklSZ3BrejNs?=
+ =?utf-8?B?SXFJdmsrbTQ1eUNGNzd2c3ZXYW9tdXBOVkVjMVdkeDE1b1FGZlJUTUtLWWk1?=
+ =?utf-8?B?eDNFdWZOWEtYMVI1aFF0WmkyZ1duNzQya1VzUDkzS3VGZDh3TEY3eFlzK0Fx?=
+ =?utf-8?B?cU9nYWhyWENYRng0OVZva3ZzaGNFd2RuSkUyY0cxRlppY2tKdXFHWjBJakhI?=
+ =?utf-8?B?MXcwQUNQb2hIcUk4dHNPNWZxTVY1NzJUU1Y2Qi9iQmZPdGhrenZZN0tkSXp1?=
+ =?utf-8?B?empWQWhHWVRnYkFTUjdEN1psQzVneGRPZzBvK2hQWFJMblhkOEZjdzFyUWlv?=
+ =?utf-8?B?VTlKN0xUczMyTHhnTTFmYk8yclE3eGVWdm16bUR0UW9FMUdOWEREZk5qRk1m?=
+ =?utf-8?B?SlZac2swRkdKQjhHTnpvTmdZYXo0bG0wenVuV05ISThDbFphd1EwYXk0RmVE?=
+ =?utf-8?B?TUZpU1Q4TU0rWVdtWVpVdEcydWZrZmc1U0xvZDA1RVcwaE44V3FGVVRZSXVD?=
+ =?utf-8?B?QWt0dUc2NzVyV0Q1UHNrc3liNVlpSzg3Y1RoeE5VWGZJS0hkdVUwd0JnYjJt?=
+ =?utf-8?Q?HLy8YoQUSgE+KJTM2BFuapYYY?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e38e81a-8c4e-4991-7042-08dbb9c32549
+X-MS-Exchange-CrossTenant-Network-Message-Id: 315d7862-073f-4fde-51e0-08dbb9c77872
 X-MS-Exchange-CrossTenant-AuthSource: DBBPR04MB7788.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 10:20:00.0455
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 10:50:57.5825
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Gw/P3fDnlhKg24u3Qd13vdZu029a/Zv4oqik/MLVWTKMPaHSo3OcXBRu7GKof8FbiJ6sBXov8DVqEYMP+/5FNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9703
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qwkcv/VyZxNurR2292Q8b5NzmCjdzC5pRDe7q64nr4B31dfPUo90H1Zgp3AYkuNC0gyfr0R3b9Z0t1dNBYSw4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9697
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
@@ -138,70 +137,59 @@ X-Mailing-List: kvm@vger.kernel.org
 On 14.09.23 г. 7:47 ч., Xin Li wrote:
 > From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 > 
-> Add CONFIG_X86_FRED to <asm/disabled-features.h> to make
-> cpu_feature_enabled() work correctly with FRED.
+> Add X86_CR4_FRED macro for the FRED bit in %cr4. This bit must not be
+> changed after initialization, so add it to the pinned CR4 bits.
 > 
-> Originally-by: Megha Dey <megha.dey@intel.com>
 > Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 > Tested-by: Shan Kang <shan.kang@intel.com>
 > Signed-off-by: Xin Li <xin3.li@intel.com>
 > ---
->   arch/x86/include/asm/disabled-features.h       | 8 +++++++-
->   tools/arch/x86/include/asm/disabled-features.h | 8 +++++++-
->   2 files changed, 14 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-> index 702d93fdd10e..3cde57cb5093 100644
-> --- a/arch/x86/include/asm/disabled-features.h
-> +++ b/arch/x86/include/asm/disabled-features.h
-> @@ -117,6 +117,12 @@
->   #define DISABLE_IBT	(1 << (X86_FEATURE_IBT & 31))
->   #endif
+> Changes since v9:
+> * Avoid a type cast by defining X86_CR4_FRED as 0 on 32-bit (Thomas
+>    Gleixner).
+> ---
+>   arch/x86/include/uapi/asm/processor-flags.h | 7 +++++++
+>   arch/x86/kernel/cpu/common.c                | 5 ++---
+>   2 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
+> index d898432947ff..f1a4adc78272 100644
+> --- a/arch/x86/include/uapi/asm/processor-flags.h
+> +++ b/arch/x86/include/uapi/asm/processor-flags.h
+> @@ -139,6 +139,13 @@
+>   #define X86_CR4_LAM_SUP_BIT	28 /* LAM for supervisor pointers */
+>   #define X86_CR4_LAM_SUP		_BITUL(X86_CR4_LAM_SUP_BIT)
 >   
-> +#ifdef CONFIG_X86_FRED
-> +# define DISABLE_FRED	0
+> +#ifdef __x86_64__
+> +#define X86_CR4_FRED_BIT	32 /* enable FRED kernel entry */
+> +#define X86_CR4_FRED		_BITUL(X86_CR4_FRED_BIT)
+
+nit: s/BITUL/BITULL I guess if __x86_64__ is defined then we are 
+guaranteed that unsigned long will be a 64 bit, but for the sake of 
+clarity I'd rather have this spelled out explicitly by using BITULL
+
+
 > +#else
-> +# define DISABLE_FRED	(1 << (X86_FEATURE_FRED & 31))
+> +#define X86_CR4_FRED		(0)
 > +#endif
 > +
 >   /*
->    * Make sure to add features to the correct mask
+>    * x86-64 Task Priority Register, CR8
 >    */
-> @@ -134,7 +140,7 @@
->   #define DISABLED_MASK11	(DISABLE_RETPOLINE|DISABLE_RETHUNK|DISABLE_UNRET| \
->   			 DISABLE_CALL_DEPTH_TRACKING|DISABLE_USER_SHSTK)
->   #define DISABLED_MASK12	(DISABLE_LAM)
-> -#define DISABLED_MASK13	0
-> +#define DISABLED_MASK13	(DISABLE_FRED)
->   #define DISABLED_MASK14	0
->   #define DISABLED_MASK15	0
->   #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
-> diff --git a/tools/arch/x86/include/asm/disabled-features.h b/tools/arch/x86/include/asm/disabled-features.h
-> index fafe9be7a6f4..d540ecdd8812 100644
-> --- a/tools/arch/x86/include/asm/disabled-features.h
-> +++ b/tools/arch/x86/include/asm/disabled-features.h
-> @@ -105,6 +105,12 @@
->   # define DISABLE_TDX_GUEST	(1 << (X86_FEATURE_TDX_GUEST & 31))
->   #endif
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 317b4877e9c7..42511209469b 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -400,9 +400,8 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
+>   }
 >   
-> +#ifdef CONFIG_X86_FRED
-> +# define DISABLE_FRED	0
-> +#else
-> +# define DISABLE_FRED	(1 << (X86_FEATURE_FRED & 31))
-> +#endif
-> +
->   /*
->    * Make sure to add features to the correct mask
->    */
-> @@ -122,7 +128,7 @@
->   #define DISABLED_MASK11	(DISABLE_RETPOLINE|DISABLE_RETHUNK|DISABLE_UNRET| \
->   			 DISABLE_CALL_DEPTH_TRACKING)
->   #define DISABLED_MASK12	(DISABLE_LAM)
-> -#define DISABLED_MASK13	0
-> +#define DISABLED_MASK13	(DISABLE_FRED)
-
-FRED feature is defined in cpuid word 12, not 13
-
->   #define DISABLED_MASK14	0
->   #define DISABLED_MASK15	0
->   #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
+>   /* These bits should not change their value after CPU init is finished. */
+> -static const unsigned long cr4_pinned_mask =
+> -	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
+> -	X86_CR4_FSGSBASE | X86_CR4_CET;
+> +static const unsigned long cr4_pinned_mask = X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
+> +					     X86_CR4_FSGSBASE | X86_CR4_CET | X86_CR4_FRED;
+>   static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
+>   static unsigned long cr4_pinned_bits __ro_after_init;
+>   
