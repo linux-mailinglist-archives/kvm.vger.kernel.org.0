@@ -2,188 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D04ED7A718A
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 06:33:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 378F37A7195
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 06:48:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232487AbjITEdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 00:33:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43522 "EHLO
+        id S231695AbjITEsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 00:48:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231269AbjITEdu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 00:33:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47CFAF;
-        Tue, 19 Sep 2023 21:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695184424; x=1726720424;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KodWI222Ne4KcR+J4h7jJIpwYezt6mL7WzTywnyFLHo=;
-  b=XkhIbcKfeBKbvtlFkA3d3RYD85WqWTVPKQXMdDwmWk+fm5vH8LS8gtx8
-   c3I0/LnaK+PVqcOaoYljji+jtIcKEkLgjqEBfAESboKlcVPPa7wKsYwBD
-   ab30IUDBCcPBfW+DNPIMpfzTeFGQmozTQ1IxJa6HfXB9KyrDJui9/0OlT
-   dC5JKZlJ4oNaSqGK9XBo2S0zZ3lcAPslEuXZCGr7yZwQ4mQXFtCW3Tlpg
-   zAc9NMOSB21krgx1wVXWE2xEmSeI8unuU0gL1TUpgyG14cyWdr5D2bbE1
-   8SccVGF0TTc60j3i/fYRBvmHL2/8lFB/V5FUvBpOf1B+Nkc4DVQEx+cW8
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="380020870"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="380020870"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 21:33:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="836695527"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="836695527"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Sep 2023 21:33:41 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 19 Sep 2023 21:33:41 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 19 Sep 2023 21:33:41 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 19 Sep 2023 21:33:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GDGdrb+ENySOSoaJwFbw7TvyFIbnqaTP8IP40GnC2Ulga0UvZKEfvRIVJwHjXVsAzYHuJSp9m8u9qrhNzRWgJiUu/u8bZAv36Cpbd8Ny1ImyCdIz8giK6bIu6UrqMp250UTCM30io5a+c29ronDjWWdSxwJbxQIJPLR/tXY8fMY/CUBrnBR2NPQ7fWok52VyK7ag27HIBSLIqj01w0fw7PdF5zp8wcj5q4O0hYLT1YkfLmz+Xd54KCV6pZiIID/+8cBVMMk5WimrfgVwgLcl8aHJ3m/8JPEurF/Ee/wAbjXb0Am4VZzuiyVl0rpbqVgdYWEWnP8pnxEgOEvC6wae5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cuWtYsNSV45fWFoOBKicjRCIAtGyvumISLu68v8Tnfw=;
- b=UwqzdeYdSGLKU4z2foRy/kpYEqkZ8JwwcOv5KKxve7edM1IpzozjbIPX7JyifsUpfIrLARDIKjGSHHX4/EAjYLvMWLhi4EgxSCggbBcK5Q0D3EgkWkRF9p1lFyxeY2US5mgz/5d5P8Uow8e7JpbnsErbyzj067ugsR0JjZBz/uEu7gmGugk8UsWBSZ5/+uAM0hZNyMhNVdpoDEHrBEtOUvP7E2O6KwQDcmt2LZg6YOAKQZ/SA9ZY926YG6xx52PKIdEbeeoZG15IOcX+tw5cEAS0dhZ1g1bekwFtB5irj3TNK41y8X7JCrFfgLOXEbw+plt0Pfmdm9qgqhxp11FRaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
- by CH3PR11MB8187.namprd11.prod.outlook.com (2603:10b6:610:160::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Wed, 20 Sep
- 2023 04:33:38 +0000
-Received: from SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::922f:ec7c:601b:7f61]) by SA1PR11MB6734.namprd11.prod.outlook.com
- ([fe80::922f:ec7c:601b:7f61%5]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
- 04:33:38 +0000
-From:   "Li, Xin3" <xin3.li@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-CC:     "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "Lutomirski, Andy" <luto@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Gross, Jurgen" <jgross@suse.com>,
-        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
-        "mhiramat@kernel.org" <mhiramat@kernel.org>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-        "jiangshanlai@gmail.com" <jiangshanlai@gmail.com>
-Subject: RE: [PATCH v10 36/38] x86/fred: Add fred_syscall_init()
-Thread-Topic: [PATCH v10 36/38] x86/fred: Add fred_syscall_init()
-Thread-Index: AQHZ5strXMSQ17oxYk2by6W1B7FxqLAh2QeAgAFNrPA=
-Date:   Wed, 20 Sep 2023 04:33:38 +0000
-Message-ID: <SA1PR11MB6734C02FFB973B2074EC6CC8A8F9A@SA1PR11MB6734.namprd11.prod.outlook.com>
-References: <20230914044805.301390-1-xin3.li@intel.com>
- <20230914044805.301390-37-xin3.li@intel.com> <87v8c6woqo.ffs@tglx>
-In-Reply-To: <87v8c6woqo.ffs@tglx>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|CH3PR11MB8187:EE_
-x-ms-office365-filtering-correlation-id: c40c0e54-f61e-4c4f-7255-08dbb992c296
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: khPSh9PhOUeMIRmEw4KIle6Rf8sOG8VwkEu2VnURKMnAICdS9+mt1eUdVSS2cafnVDyKS0tFtQQSmp7Fib4DZYOobmiukEGiAqCDNX5XNx6dPKJfO/CJsrN19Qov80o5qSeqdAlRdvIbY+N+WlIeP8KFSokZO7aCVsMnO4G/lgxazUNZrj+a450O/DDrUfTlKen/l7sZpgcz3gq5MY6u1NWj2eoir8GVpVV3ujfbUOCQnOxOynUA3JAqr4g84OksuOb2HJ8AUuwPEiz4aEMasYXmoGavXxMu/29s7yr3RKj9dkMMTT/PIcH6LHZJHh499izxOgi65n3LeqS73eEb17IbeQKIE+fauLH4rAJg6XQSPIdEyjSfLIqwktE/frhqFQmlF/YfiD9iF3vzMtwT0ZIDSMzuUzz7HTxDGcDIEPwGKVH1Q7UQteoLTZPCNlbhIkHrdasfhf2J2aLJdOaC5kSq0SYDXb15hSiC+W8K1+Aev50yhEswlwtWAE3l+MR+tQMcqmwbmkeNTlCZ0v2L4hxO80t+GRiVil8CspzAtkHbHny+Y3r2zO9P8GasgKahnwCLogd6EhHqPjYLBMLFxNqVAfeCEi/uIeDWZMH+PDLoYItU9avgLD9LlAua7TM1
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(346002)(366004)(376002)(186009)(451199024)(1800799009)(26005)(52536014)(33656002)(8676002)(4326008)(8936002)(7416002)(2906002)(4744005)(66476007)(5660300002)(55016003)(86362001)(9686003)(71200400001)(6506007)(7696005)(122000001)(38070700005)(38100700002)(82960400001)(41300700001)(110136005)(76116006)(66946007)(66556008)(316002)(478600001)(64756008)(54906003)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jZ6ohgHOzvXsD6IYtOKwm9p/axEO9d/fyVqePdBFmr/1y1yiGkLHAr8PIBYG?=
- =?us-ascii?Q?wT1efeGaLkeHQ9qIMw5lrRR6quIMkiIBdGVvlyzlt0rCmgHqyDa/AVdi1tGg?=
- =?us-ascii?Q?i2qnmeEgZmoeM/A2uLtoOQNj7cfjTe5GlsWgHSZ3boxDnM8U+Myqw9rb/rHd?=
- =?us-ascii?Q?fYSASLigfqu1p1UwGl58x4/DMMz0Gyxx2Oq2vXSQnvdQkcqPMV6pE3GVwPFk?=
- =?us-ascii?Q?EhzQJFKNWmFLV6jv3W2QAQJ984ty09YjsqQ7esDMNLuDzy4hEhXJRvoCa9yS?=
- =?us-ascii?Q?2N0SSzALvJvlBqS6F4U1MITb9Cp1eXNDzDh1Ji9UPJf4/8vMOQsfiuNQgz94?=
- =?us-ascii?Q?3SoHMb6B8H6x18YwhXH0CNBj9czoUaT57MAdfu68ww51Uoce5FFbo+BwJ0kM?=
- =?us-ascii?Q?K/iMKTpvAq4NPz5cpdwtRfV1A3KojQWoPIBdP2buV2lvgUiqkbak6my1Xj+N?=
- =?us-ascii?Q?bO+sxDXIS5JVhu+PG57PCCytJewputXFT9RDOfJDQJ/5RTV+WcgJYGQYTSTj?=
- =?us-ascii?Q?f5kf0Ci2zc+LU7iHl4b92xsNCtLOEeOlUz2UeNTAWrmSFv3yczcBxHgzW7ya?=
- =?us-ascii?Q?JGEI4JyLHnu8LDewB3SGBTOSd3h2ASDp9fZz3Vmw1m6Uq4u8ZqcyqCGCgeVS?=
- =?us-ascii?Q?mor6DT+e5qpeSVbyh5XR4l6w5JVyjiYkY+P9FoYCqTQqPP/LQjFL5ZxuKLy2?=
- =?us-ascii?Q?lB7eUfjCKcxrE6x371W4u8cqPfquOA4S+CbCMTfTnGqG8DnNE/+yeqmo1AH5?=
- =?us-ascii?Q?0V5ZwEjEFoslpkuvfCcZpuTjLVGspRaqmdGt3hwCwK5cYzAann3cK+LYMuhe?=
- =?us-ascii?Q?bXSYlkgD8MKSNMdRjk9rImOZ2604+2rlJD0Kk2PvR9cInM/yw8eN5RD/Fo+5?=
- =?us-ascii?Q?HRaBq1bRoehr3GyY9UtJQIhVygtoyhfZRFDQLnDOw/f1vcIoaQ/W+SYzB5or?=
- =?us-ascii?Q?jSVLKQA8NOow3l0N9mQwPGsn0q0Vqt9iU54zpfV6F8Rad9MOcki9op8aKB57?=
- =?us-ascii?Q?HbYGMAOfN6+P3pmkczBDLTbrLVkN0Q336ITpbT5yEMZAnAqPE4csMuS+OS5t?=
- =?us-ascii?Q?cTYqR74VW2Lqlz4WmuAK/Oleo2L3B29KmaUCIt+A/KoVc9LlrAEl5cX+tEXG?=
- =?us-ascii?Q?ygrmQ44DrAWbHrxzGy2uL1BivUPKS2v0tkGopp2b90XZCpM5c+fuaA4fOWck?=
- =?us-ascii?Q?8qO2Y70Z76lbUAR5lrbw/P8/xC7YQIqLw8xl08IDBNHRUaiJBqgCXVswm+px?=
- =?us-ascii?Q?8WzM3gxPdlhAAIuJ87KSXANYULGk7pSaTo9sWGf/CUSVhi0Ve3966jBRL1Kx?=
- =?us-ascii?Q?hw+PHDkSNyDM67aY8mccqstPlpVhOuaf1FfrQM30HOAAFYpsXzGwREP+IaNV?=
- =?us-ascii?Q?jJpvoWilQCAr59Qe1q0BWL6EXJJJ4qp35BOnGcbCRIbIKxt3neCs1Alh7FO6?=
- =?us-ascii?Q?jdjQCIcbtnJqQ3oVTjLXXQ5ssMEzzT85orUauR//KK4vUbwWciUAVi5rD+3/?=
- =?us-ascii?Q?cH4O+qogp1db1dqBsoaUn2H1TvBdcuS+G7JdKnpLo1rJqVCYgdHF/J/o41s2?=
- =?us-ascii?Q?Sej5cA8gCWV+b25DTqU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229534AbjITEsV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 00:48:21 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D7AAF
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 21:48:14 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4051f8e1ba0so5708325e9.1
+        for <kvm@vger.kernel.org>; Tue, 19 Sep 2023 21:48:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1695185293; x=1695790093; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=m1zNdUzVc6Pr4pcVKMskltzftfT89TOksGte9XFhwTk=;
+        b=NNPGHjV53xANPWwuwjnbRMVW11TDIyX6tRzO2So/mXhIYKDkn8IPbQkLNlLe7CUGPR
+         2Dg5tYoH33JqtyKSPzztxF11jy3y+rR3RwAXA12dck7wlzlD5EthXdnHM/e0lp69VDyy
+         L7wldaV8/Y5vX+Bf8SciY7BTDPlBYmvX9WV6BLpB6Vo4BkbZkQuahtxOzSrYTKJ3yS9l
+         dJ0HQdmKQZrIVj6D0BBdnkBHzWEMGAotkoH9okLmzWnStK2bsmT/fSoIIvWaEmeMjBN3
+         ywegrRZYL7yRHCAR4ofb6n5vdWjIXby6b8ArjfriVqIdY4ak1yUqs7i8f2AdNvOh84Cz
+         J+zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695185293; x=1695790093;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m1zNdUzVc6Pr4pcVKMskltzftfT89TOksGte9XFhwTk=;
+        b=N2C3v/jKiZikBRgDW6Yo3Wfmm/AoqL/JgLJrXl8MXuiB+UYPUHx6BH50GihXmEmWvN
+         5s3AU++3IhUHb1GitiXMUlM4ryJC7OrGp9OYx9vBBcpLKasukHQjNNSM3TsI3MX2QB7q
+         WH0SKrJm8CtftevJTxyJAKh919amp46RPchR1r9ZnPisI/6VEvw5DNQMJNo+QHsLN2fm
+         u3ijgRk5uDOSdiiyEUAMbGXog1rPyn+94Z1lC8PbqgMAU/QeXvg6lC6mZh0lsNf6zN3j
+         o/TEzVVEWso1kGPs+2j2vO8o+6h2lvwwegBlQXnSCDlj1NjRGvcHsrqRh9xaua8+bJdm
+         UxOw==
+X-Gm-Message-State: AOJu0YxfOEgRS10Gpb1CzLfUYE5ddpuR9qPLmTkLwcqSCZSb2PL5q6vF
+        j56Ib1sw+ZZ0dFWpByfVSnxU2A==
+X-Google-Smtp-Source: AGHT+IHNTj0/2lmbfWYjEmf3kCedBQ4IVwJ4KHiViE5ekRfu5L22Fq6enMo4axMx60gYT7DGOhz9tg==
+X-Received: by 2002:a7b:cd8c:0:b0:401:d2cb:e6f3 with SMTP id y12-20020a7bcd8c000000b00401d2cbe6f3mr1247667wmj.1.1695185293390;
+        Tue, 19 Sep 2023 21:48:13 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id 15-20020a05600c020f00b00401d8810c8bsm805326wmi.15.2023.09.19.21.48.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 21:48:12 -0700 (PDT)
+Date:   Wed, 20 Sep 2023 06:48:11 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Atish Patra <atishp@atishpatra.org>
+Cc:     Anup Patel <apatel@ventanamicro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 4/4] KVM: riscv: selftests: Selectively filter-out AIA
+ registers
+Message-ID: <20230920-bc0e3956d144be651727e252@orel>
+References: <20230918180646.1398384-1-apatel@ventanamicro.com>
+ <20230918180646.1398384-5-apatel@ventanamicro.com>
+ <CAOnJCU+h-Y_i=HkCf194SLWp-7bqzMhRLC31q0xxQDMuLppapA@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c40c0e54-f61e-4c4f-7255-08dbb992c296
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Sep 2023 04:33:38.3441
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KIdLu7r7wJ74jFtFEdlCvuzKRT84bG+qv3nJ0V30Fcf2ryKHYN9rOKCDbpFuBYkE4e+J9fkJcJF7y0cJuSi9Sw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8187
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOnJCU+h-Y_i=HkCf194SLWp-7bqzMhRLC31q0xxQDMuLppapA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > +static inline void fred_syscall_init(void) {
-> > +	/*
-> > +	 * Per FRED spec 5.0, FRED uses the ring 3 FRED entrypoint for SYSCAL=
-L
-> > +	 * and SYSENTER, and ERETU is the only legit instruction to return to
-> > +	 * ring 3, as a result there is _no_ need to setup the SYSCALL and
-> > +	 * SYSENTER MSRs.
-> > +	 *
-> > +	 * Note, both sysexit and sysret cause #UD when FRED is enabled.
-> > +	 */
-> > +	wrmsrl(MSR_LSTAR, 0ULL);
-> > +	wrmsrl_cstar(0ULL);
->=20
-> That write is pointless. See the comment in wrmsrl_cstar().
+On Tue, Sep 19, 2023 at 01:12:47PM -0700, Atish Patra wrote:
+> On Mon, Sep 18, 2023 at 11:07 AM Anup Patel <apatel@ventanamicro.com> wrote:
+> >
+> > Currently the AIA ONE_REG registers are reported by get-reg-list
+> > as new registers for various vcpu_reg_list configs whenever Ssaia
+> > is available on the host because Ssaia extension can only be
+> > disabled by Smstateen extension which is not always available.
+> >
+> > To tackle this, we should filter-out AIA ONE_REG registers only
+> > when Ssaia can't be disabled for a VCPU.
+> >
+> > Fixes: 477069398ed6 ("KVM: riscv: selftests: Add get-reg-list test")
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  .../selftests/kvm/riscv/get-reg-list.c        | 23 +++++++++++++++++--
+> >  1 file changed, 21 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > index 76c0ad11e423..85907c86b835 100644
+> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > @@ -12,6 +12,8 @@
+> >
+> >  #define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK)
+> >
+> > +static bool isa_ext_cant_disable[KVM_RISCV_ISA_EXT_MAX];
+> > +
+> >  bool filter_reg(__u64 reg)
+> >  {
+> >         switch (reg & ~REG_MASK) {
+> > @@ -48,6 +50,15 @@ bool filter_reg(__u64 reg)
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM:
+> >                 return true;
+> > +       /* AIA registers are always available when Ssaia can't be disabled */
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio2):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(sieh):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siph):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1h):
+> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio2h):
+> > +               return isa_ext_cant_disable[KVM_RISCV_ISA_EXT_SSAIA] ? true : false;
+> 
+> Ahh I guess. you do need the switch case for AIA CSRs but for ISA
+> extensions can be avoided as it is contiguous.
 
-What I heard is that AMD is going to support FRED.
+I guess we could so something like
 
-Both LSTAR and CSTAR have no function when FRED is enabled, so maybe
-just do NOT write to them?
+case KVM_REG_RISCV_ISA_EXT ... KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_MAX:
 
-Thanks!
-    Xin
+for the ISA extensions.
 
+Thanks,
+drew
