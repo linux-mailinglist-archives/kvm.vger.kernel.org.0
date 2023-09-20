@@ -2,133 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CDDC7A752B
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 10:01:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BB467A758C
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 10:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232960AbjITIB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 04:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52358 "EHLO
+        id S233663AbjITINk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 04:13:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232708AbjITIB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 04:01:58 -0400
-Received: from out-227.mta1.migadu.com (out-227.mta1.migadu.com [95.215.58.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AFE97
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 01:01:53 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695196911;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uvviR8Tdi7KfiLkhBYZ0V8IZJiQLCIG8mWutZwpfO4Y=;
-        b=Q1pRgANn7cLFCdOOTwJefgK8ef5xMI97aclHzaRwSuCodeYZsifg5u26btwIoIXqgTSVun
-        Tw5dCgzGObGsSXFOGHa8XwTJ6jjKLuelPFfppgW7g6gr8g2E+AslCe0NHEtcrlsoyqagbw
-        4cFdYCu7vDkYD7n60OEMvc9d7EF3pPc=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Gavin Shan <gshan@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 2/2] KVM: arm64: Avoid soft lockups due to I-cache maintenance
-Date:   Wed, 20 Sep 2023 08:01:33 +0000
-Message-ID: <20230920080133.944717-3-oliver.upton@linux.dev>
-In-Reply-To: <20230920080133.944717-1-oliver.upton@linux.dev>
-References: <20230920080133.944717-1-oliver.upton@linux.dev>
+        with ESMTP id S232190AbjITINi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 04:13:38 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7090DCF
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 01:13:32 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3200bc30666so3213010f8f.2
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 01:13:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1695197611; x=1695802411; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bFVwkQGYHLyQMWXHCf9YewQuFfTq2ysEb3BcSmI7FIU=;
+        b=BJ6u2Pql7OkqQ1r+Iqe2+y7461xtkaFj69u7uawVgPKyR72fkCZVGwJCYK0AGWL+eS
+         aprYUV4ov1ZUtjnTXKTL7YISl98GwfBKD1gGuTOPD4BL0uiNPAyZqHRgOzcs3euMvvYp
+         9AQBKpx6KZ7RFC//lhJgAH7pHT4KDyDR6pVe8YZEcm/cT+E4X/0PihZe57Hjqy6/Jxg6
+         ol5xC1GUuHjf/6SivCb8J8yVzXg51d9Y96GQZy7A/8P46ku/F6xSXTG3J/jzu9CvnBBQ
+         jYf4aFlwINk8FNwESFV3b5UFiowOCYZRB7NErkUwBLlxYLbhcef4+yQAnQaAs/3TjGfV
+         /OcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695197611; x=1695802411;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bFVwkQGYHLyQMWXHCf9YewQuFfTq2ysEb3BcSmI7FIU=;
+        b=DmizpHX25g+iwKJ3P7XGJiI4wb8jZRqWsgLxpg04Dr/PsVHYnLTnCBJOmnlnKEl6FL
+         K//bsSkqw1ilAEhkjOyuLpdm3Sp5VXa6VLddURpQIrjnbhUm6FIfbnz9fhEetmRrDvms
+         RDuof5nP3pGhde2l6T9JHRyizdVhKUMgoTRuaamAZs91sBxhzHn7dxdKSooQDotW2idM
+         aNsNQEOhKAJFl0tfYOadRRjcZAci7a0H5FfJMg5Jh4avzBplqjHGAau98P4YTdk+/+se
+         ziaUDD2nk2HeobZ6Tev3dy9oGw50HnQ2GtYn2kdD6afIfYRdXoNjTfrup3lh33XRcV9A
+         sUZA==
+X-Gm-Message-State: AOJu0YwcjWJ7ztRuHeMf0+Ct23C69opc92zmaWzd/gfOYtVGcfwiLaMS
+        QdptmJu7TZHhj1J4z6GY4dtQHw==
+X-Google-Smtp-Source: AGHT+IGq8/xjn/oNq2PTpNaOrP+pjj6Y9zwWhdZGp94uECltWuxSC0BJqvKxel2SPT2PaHs+TjltqA==
+X-Received: by 2002:a5d:56ce:0:b0:31c:8c93:61e3 with SMTP id m14-20020a5d56ce000000b0031c8c9361e3mr1658749wrw.60.1695197610866;
+        Wed, 20 Sep 2023 01:13:30 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id e1-20020a5d65c1000000b00315af025098sm17764141wrw.46.2023.09.20.01.13.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 01:13:30 -0700 (PDT)
+Date:   Wed, 20 Sep 2023 10:13:29 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Conor Dooley <conor@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 6/7] KVM: riscv: selftests: Add smstateen registers to
+ get-reg-list test
+Message-ID: <20230920-af833495ead3e2f8c32d63cc@orel>
+References: <20230919035343.1399389-1-apatel@ventanamicro.com>
+ <20230919035343.1399389-7-apatel@ventanamicro.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230919035343.1399389-7-apatel@ventanamicro.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gavin reports of soft lockups on his Ampere Altra Max machine when
-backing KVM guests with hugetlb pages. Upon further investigation, it
-was found that the system is unable to keep up with parallel I-cache
-invalidations done by KVM's stage-2 fault handler.
+On Tue, Sep 19, 2023 at 09:23:42AM +0530, Anup Patel wrote:
+> We have a new smstateen registers as separate sub-type of CSR ONE_REG
+> interface so let us add these registers to get-reg-list test.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  .../selftests/kvm/riscv/get-reg-list.c        | 34 +++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> index 0928c35470ae..9f464c7996c6 100644
+> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> @@ -49,6 +49,7 @@ bool filter_reg(__u64 reg)
+>  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICSR:
+>  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI:
+>  	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM:
+> +	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SMSTATEEN:
+>  		return true;
+>  	/* AIA registers are always available when Ssaia can't be disabled */
+>  	case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect):
+> @@ -184,6 +185,8 @@ static const char *core_id_to_str(const char *prefix, __u64 id)
+>  	"KVM_REG_RISCV_CSR_GENERAL | KVM_REG_RISCV_CSR_REG(" #csr ")"
+>  #define RISCV_CSR_AIA(csr) \
+>  	"KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_REG(" #csr ")"
+> +#define RISCV_CSR_SMSTATEEN(csr) \
+> +	"KVM_REG_RISCV_CSR_SMSTATEEN | KVM_REG_RISCV_CSR_REG(" #csr ")"
+>  
+>  static const char *general_csr_id_to_str(__u64 reg_off)
+>  {
+> @@ -241,6 +244,18 @@ static const char *aia_csr_id_to_str(__u64 reg_off)
+>  	return NULL;
+>  }
+>  
+> +static const char *smstateen_csr_id_to_str(__u64 reg_off)
+> +{
+> +	/* reg_off is the offset into struct kvm_riscv_smstateen_csr */
+> +	switch (reg_off) {
+> +	case KVM_REG_RISCV_CSR_SMSTATEEN_REG(sstateen0):
+> +		return RISCV_CSR_SMSTATEEN(sstateen0);
+> +	}
+> +
+> +	TEST_FAIL("Unknown smstateen csr reg: 0x%llx", reg_off);
+> +	return NULL;
+> +}
+> +
+>  static const char *csr_id_to_str(const char *prefix, __u64 id)
+>  {
+>  	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CSR);
+> @@ -253,6 +268,8 @@ static const char *csr_id_to_str(const char *prefix, __u64 id)
+>  		return general_csr_id_to_str(reg_off);
+>  	case KVM_REG_RISCV_CSR_AIA:
+>  		return aia_csr_id_to_str(reg_off);
+> +	case KVM_REG_RISCV_CSR_SMSTATEEN:
+> +		return smstateen_csr_id_to_str(reg_off);
+>  	}
+>  
+>  	TEST_FAIL("%s: Unknown csr subtype: 0x%llx", prefix, reg_subtype);
+> @@ -342,6 +359,7 @@ static const char *isa_ext_id_to_str(__u64 id)
+>  		"KVM_RISCV_ISA_EXT_ZICSR",
+>  		"KVM_RISCV_ISA_EXT_ZIFENCEI",
+>  		"KVM_RISCV_ISA_EXT_ZIHPM",
+> +		"KVM_RISCV_ISA_EXT_SMSTATEEN",
 
-This is ultimately an implementation problem. I-cache maintenance
-instructions are available at EL0, so nothing stops a malicious
-userspace from hammering a system with CMOs and cause it to fall over.
-"Fixing" this problem in KVM is nothing more than slapping a bandage
-over a much deeper problem.
+If we merge [1] first, then this would be added in alphabetical order.
 
-Anyway, the kernel already has a heuristic for limiting TLB
-invalidations to avoid soft lockups. Reuse that logic to limit I-cache
-CMOs done by KVM to map executable pages on systems without FEAT_DIC.
-While at it, restructure __invalidate_icache_guest_page() to improve
-readability and squeeze our new condition into the existing branching
-structure.
+[1] https://lore.kernel.org/all/20230817162344.17076-6-ajones@ventanamicro.com/
 
-Link: https://lore.kernel.org/kvmarm/20230904072826.1468907-1-gshan@redhat.com/
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_mmu.h | 37 ++++++++++++++++++++++++++------
- 1 file changed, 31 insertions(+), 6 deletions(-)
+>  	};
+>  
+>  	if (reg_off >= ARRAY_SIZE(kvm_isa_ext_reg_name)) {
+> @@ -629,6 +647,11 @@ static __u64 aia_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSAIA,
+>  };
+>  
+> +static __u64 smstateen_regs[] = {
+> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_SMSTATEEN | KVM_REG_RISCV_CSR_SMSTATEEN_REG(sstateen0),
+> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SMSTATEEN,
+> +};
+> +
+>  static __u64 fp_f_regs[] = {
+>  	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[0]),
+>  	KVM_REG_RISCV | KVM_REG_SIZE_U32 | KVM_REG_RISCV_FP_F | KVM_REG_RISCV_FP_F_REG(f[1]),
+> @@ -736,6 +759,8 @@ static __u64 fp_d_regs[] = {
+>  	{"zihpm", .feature = KVM_RISCV_ISA_EXT_ZIHPM, .regs = zihpm_regs, .regs_n = ARRAY_SIZE(zihpm_regs),}
+>  #define AIA_REGS_SUBLIST \
+>  	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_regs, .regs_n = ARRAY_SIZE(aia_regs),}
+> +#define SMSTATEEN_REGS_SUBLIST \
+> +	{"smstateen", .feature = KVM_RISCV_ISA_EXT_SMSTATEEN, .regs = smstateen_regs, .regs_n = ARRAY_SIZE(smstateen_regs),}
+>  #define FP_F_REGS_SUBLIST \
+>  	{"fp_f", .feature = KVM_RISCV_ISA_EXT_F, .regs = fp_f_regs, \
+>  		.regs_n = ARRAY_SIZE(fp_f_regs),}
+> @@ -863,6 +888,14 @@ static struct vcpu_reg_list aia_config = {
+>  	},
+>  };
+>  
+> +static struct vcpu_reg_list smstateen_config = {
+> +	.sublists = {
+> +	BASE_SUBLIST,
+> +	SMSTATEEN_REGS_SUBLIST,
+> +	{0},
+> +	},
+> +};
+> +
+>  static struct vcpu_reg_list fp_f_config = {
+>  	.sublists = {
+>  	BASE_SUBLIST,
+> @@ -895,6 +928,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
+>  	&zifencei_config,
+>  	&zihpm_config,
+>  	&aia_config,
+> +	&smstateen_config,
+>  	&fp_f_config,
+>  	&fp_d_config,
+>  };
+> -- 
+> 2.34.1
+>
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 96a80e8f6226..a425ecdd7be0 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -224,16 +224,41 @@ static inline void __clean_dcache_guest_page(void *va, size_t size)
- 	kvm_flush_dcache_to_poc(va, size);
- }
- 
-+static inline size_t __invalidate_icache_max_range(void)
-+{
-+	u8 iminline;
-+	u64 ctr;
-+
-+	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
-+				    "movk %0, #0, lsl #16\n"
-+				    "movk %0, #0, lsl #32\n"
-+				    "movk %0, #0, lsl #48\n",
-+				    ARM64_ALWAYS_SYSTEM,
-+				    kvm_compute_final_ctr_el0)
-+		     : "=r" (ctr));
-+
-+	iminline = SYS_FIELD_GET(CTR_EL0, IminLine, ctr) + 2;
-+	return MAX_DVM_OPS << iminline;
-+}
-+
- static inline void __invalidate_icache_guest_page(void *va, size_t size)
- {
--	if (icache_is_aliasing()) {
--		/* any kind of VIPT cache */
-+	/*
-+	 * VPIPT I-cache maintenance must be done from EL2. See comment in the
-+	 * nVHE flavor of __kvm_tlb_flush_vmid_ipa().
-+	 */
-+	if (icache_is_vpipt() && read_sysreg(CurrentEL) != CurrentEL_EL2)
-+		return;
-+
-+	/*
-+	 * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
-+	 * invalidation range exceeds our arbitrary limit on invadations by
-+	 * cache line.
-+	 */
-+	if (icache_is_aliasing() || size > __invalidate_icache_max_range())
- 		icache_inval_all_pou();
--	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
--		   !icache_is_vpipt()) {
--		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
-+	else
- 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
--	}
- }
- 
- void kvm_set_way_flush(struct kvm_vcpu *vcpu);
--- 
-2.42.0.459.ge4e396fd5e-goog
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
+Thanks,
+drew
