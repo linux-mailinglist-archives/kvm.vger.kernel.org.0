@@ -2,107 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F25DB7A88C6
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 17:45:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B61D7A88CA
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 17:46:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236753AbjITPp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 11:45:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41878 "EHLO
+        id S236751AbjITPqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 11:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235498AbjITPp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 11:45:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD04A9
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695224705;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cGZYuFjdSw+7IgfMrv/noB8jmBNqmEPIrY3uHZWkK7w=;
-        b=Kk54+y/v4MEjPfQK0mJEpWRkWxnrhAkaQLJb/6w4ByBiaviJtMdgZbskFtiZoBN/qkrzwQ
-        rcuBkkExSsYw17xvjm+v1/l+M/1insbs6pDI1U1CMpyxyH/CVIU+5YIAaN4/SnECz0S5CU
-        WEuRfDXBCY9kpz2EeCTiVAQxbZQLmoE=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-96-MxVr0ploPTyG-CHvKba-Pw-1; Wed, 20 Sep 2023 11:45:03 -0400
-X-MC-Unique: MxVr0ploPTyG-CHvKba-Pw-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-7a80738ec28so2656904241.0
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:45:03 -0700 (PDT)
+        with ESMTP id S235426AbjITPq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 11:46:29 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46776AF
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:24 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c4194f769fso51340435ad.3
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1695224784; x=1695829584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HIC1z+Y5X7nE4BXr1975QA3QvmpInOTVPTiyv7G4DQk=;
+        b=Zc4mumcs4PLbklSIehlaVVP4N/0QW604dbJlsdHfeJjeTzimaTiUyYP4lJMPUwb2Wj
+         K/0oPDgTqY8Wed0KEqKrKdqiX2PaP9a3/FgYWzVj3gCQuNSDMjlEZfW7uKh5LpDv0geh
+         hs1HHCQTxWLHGQLSZOg9bH/Z7oTdbVI2OJAQdJwCsyv4dgwEdiwYiEkjFReXahFuUuCK
+         MCczDjB3xIqRcKkpafTDMC73usHZi58yIVHJS4odLzidZTJhkBLBjkt7kOnqCuhgyH3z
+         yzPoBjmPmFWWzmXUVv1ZT5ZJ3iP4P1Y7dHR8q2KQpM5py2xDU0kM6vRcAyru5sKpdGvo
+         0ang==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695224702; x=1695829502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cGZYuFjdSw+7IgfMrv/noB8jmBNqmEPIrY3uHZWkK7w=;
-        b=h0xM2J81rPDTHk1I2Z9XJvTKybdNDvkYjNu+xXv04pbTFhuaP3ZSYNvkpp2xCLAMcd
-         OFUPdRYwGbSS5PtSBzGvRlECNdKmw/NH7vqnCEMzJdxUStceds31IZ/OAjZunfQa2mHX
-         oaTwYACoi5HE31Uuh1Zgn4lSEczetHaK6NsKjWrHmlwu0DXUvrdfFDraGNzzc1iAFtmM
-         XRDPZsVDv0tIkDuNYG6bk+MhwlF23wq16fM9B65azVN2RtxKd1TrANux1iGHzel41jNO
-         3ZTfE3dtlpMTzxTLYMcJScQm9cQ2Is3kxSMttkr9WL9AuQWVqH0HOHDu57ubHxHLYQqE
-         uK0g==
-X-Gm-Message-State: AOJu0YyoqgnNXcHfwEcVyiIZfTQQT/lY+hb5EIYzJa2+9tPPAkVerP3h
-        eHNYB6pbMa/gghqMb2bKwC3HxHNBGaG2jQ7mTqdlobbd2Iv1wCNrnBeLh5j2GTCvINrypu1ydny
-        1zIbQONGP1NLv9zMEF4HcTf6/5+JgZuOdTV9w
-X-Received: by 2002:a1f:de04:0:b0:495:db2f:f4e7 with SMTP id v4-20020a1fde04000000b00495db2ff4e7mr3173037vkg.1.1695224702276;
-        Wed, 20 Sep 2023 08:45:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3vx/LEdU4pP4MJpwiU0IyO/UWelTJ4jAHGNyRLV7gJxot0q2gDS22MkHcPgnHAL/8Nwg3EuwhzVuUmsaXdpo=
-X-Received: by 2002:a1f:de04:0:b0:495:db2f:f4e7 with SMTP id
- v4-20020a1fde04000000b00495db2ff4e7mr3173027vkg.1.1695224702015; Wed, 20 Sep
- 2023 08:45:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695224784; x=1695829584;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HIC1z+Y5X7nE4BXr1975QA3QvmpInOTVPTiyv7G4DQk=;
+        b=hFnOKUAuNOQeL63tNjAffsZ6qCwhm9NNQZNAh4MCpUFEKEVOlNnwFzzq4el8mrFm9d
+         2K62ezmO+p7uyWt/dRXpPLBDpo3BelR1jt6Vis2tT1LBOaFM48fyVJQARFdAy3ZjQK0O
+         CWdBxiWYAXN1gB9gIFb9BC7Njhe58cv3Q+nzFVhb3UhOrfi6jrOvSakImvAHT1MnRsZd
+         ZPcrcEYmPg6E8JZqWencaiHRhxw2GcBgvAgRr10ZIBDHP0Sw4/eBwPBe0yKrG8E2frFC
+         jEJOJzx0d3uhMhCOr3xmEpYaY78412bGBDewyyFlN4+lv+G6foUkr5mZvZ8myTUElGwo
+         EI1A==
+X-Gm-Message-State: AOJu0Yz1PaH/MzI5hsxkdCfbfLYA8RMcEkVf+zGjQo52MaoQS+9rwNca
+        jlNwkD6zpZiLNB1CqE6dx+dmQg==
+X-Google-Smtp-Source: AGHT+IH3EjLrv/byDVEUBKjQ6K2VTEFNBFwq6oAb2NPMTHvNIVpZJ/QjFXRiSyjLYbNycwjvDS1j2g==
+X-Received: by 2002:a17:902:dad2:b0:1c4:c92:2320 with SMTP id q18-20020a170902dad200b001c40c922320mr3107163plx.31.1695224783665;
+        Wed, 20 Sep 2023 08:46:23 -0700 (PDT)
+Received: from anup-ubuntu-vm.localdomain ([171.76.85.109])
+        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b001c0de73564dsm11995153plx.205.2023.09.20.08.46.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 08:46:22 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH v2 0/4] KVM RISC-V fixes for ONE_REG interface
+Date:   Wed, 20 Sep 2023 21:16:04 +0530
+Message-Id: <20230920154608.1447057-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230913235006.74172-1-weijiang.yang@intel.com>
-In-Reply-To: <20230913235006.74172-1-weijiang.yang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 20 Sep 2023 17:44:50 +0200
-Message-ID: <CABgObfb-cfZTW=xb7Vf3Fh0pAsQkkrrxuB2MczrR5X3bTpWr3Q@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Fix test failures caused by CET KVM series
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 4:55=E2=80=AFAM Yang Weijiang <weijiang.yang@intel.=
-com> wrote:
->
-> CET KVM series causes sereral test cases fail due to:
-> 1) New introduced constraints between CR0.WP and CR4.CET bits, i.e., sett=
-ing
->  CR4.CET =3D=3D 1 fails if CR0.WP =3D=3D 0, and setting CR0.WP =3D=3D 0 f=
-ails if CR4.CET
-> =3D=3D 1
-> 2) New introduced support of VMX_BASIC[bit56], i.e., skipping HW consiste=
-nt
-> check for event error code if the bit is set.
+This series includes few assorted fixes for KVM RISC-V ONE_REG interface
+and KVM_GET_REG_LIST API.
 
-Queued, thanks.
+These patches can also be found in riscv_kvm_onereg_fixes_v2 branch at:
+https://github.com/avpatel/linux.git
 
-Paolo
+Changes since v1:
+ - Addressed Drew's comments in PATCH4
 
-> Opportunistically rename related struct and variable to avoid confusion.
->
-> Yang Weijiang (3):
->   x86: VMX: Exclude CR4.CET from the test_vmxon_bad_cr()
->   x86: VMX: Rename union vmx_basic and related global variable
->   x86:VMX: Introduce new vmx_basic MSR feature bit for vmx tests
->
->  x86/vmx.c       | 46 +++++++++++++++++++++++-----------------------
->  x86/vmx.h       |  7 ++++---
->  x86/vmx_tests.c | 31 ++++++++++++++++++++++---------
->  3 files changed, 49 insertions(+), 35 deletions(-)
->
-> --
-> 2.27.0
->
+Anup Patel (4):
+  RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
+  RISC-V: KVM: Fix riscv_vcpu_get_isa_ext_single() for missing
+    extensions
+  KVM: riscv: selftests: Fix ISA_EXT register handling in get-reg-list
+  KVM: riscv: selftests: Selectively filter-out AIA registers
+
+ arch/riscv/kvm/vcpu_onereg.c                  |  7 ++-
+ .../selftests/kvm/riscv/get-reg-list.c        | 58 ++++++++++++++-----
+ 2 files changed, 47 insertions(+), 18 deletions(-)
+
+-- 
+2.34.1
 
