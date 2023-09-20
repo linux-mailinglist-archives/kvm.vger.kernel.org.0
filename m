@@ -2,138 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 701687A8422
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 15:56:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 091447A8449
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 15:57:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236598AbjITN4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 09:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35718 "EHLO
+        id S236735AbjITN5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 09:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236606AbjITNzj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 09:55:39 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76062D9
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:55:07 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c15767524so66874727b3.0
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:55:07 -0700 (PDT)
+        with ESMTP id S236668AbjITN4j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 09:56:39 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A20EB
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:56:33 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-578a91ac815so1865073a12.1
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:56:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695218106; x=1695822906; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
-        b=qYN6MLIfTj4icmmBpIkd0WLhJxjSRWRnp5CVrZ5zO23Hc6SEWKaxnDv2NJItwfDuFQ
-         6RVvMGhZPLFVWocauiDyLryXn63S6KPTLdALA3Qsdgqj3uuPB/A2o/4ptf1HYp9bQI/0
-         1cYLmwlGz2SJqRrIPPncawpZ4aDzCTJ8sW2gL6tfKGnzilsZLa6El4ASlO1PaFkjNm/O
-         bYywfPO/0UW/nevxIlFfp0aeaozdgulhoho9Sa50zXYSvg9W6zOTkgKB/8FODKp3Zw2Z
-         dwA7/f8AInE7LDVv1jVJABSqsl1VCpa8fzDiXuUQzjW4V/dFydMGpeKFv2KS3ghLlvrS
-         QzZA==
+        d=ventanamicro.com; s=google; t=1695218193; x=1695822993; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gWvN1Bpbs1PF50qBbgm5YoDriWQXveHOdhR/Dx6i6jg=;
+        b=jumE20PqqxAOG4i4XuVhj2Nh8I6uySmZUS93YfHY39qWcwjbLIRR5M+ck+mKp0NWXD
+         uzeC4VI/6nKwqJwmoIyQ056PUqpI0++aifGvopEMs8T5eaLR3VVSL6DmsUZt0ddgXphm
+         ySlNyon5TUygh10a/CidiQU9h5nt+LUG2TTFq7PH927GexnxrnMLUOw0x617/Q2LW3Is
+         RykXdeC9AKumyTPXURHuJRExonlMn70okeL6/moqXpUiRjiHol1JZNre3vAt/oHq0+Hj
+         FuRww++Vb5LYoff/watqnwLyHGPhJnGElUpjR1dVbXMFoI4rKFfqh7bi0o4Ane2Gq+Yv
+         RQDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695218106; x=1695822906;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
-        b=LDJr9JGxr8qEOv/sPhjkexLqpags/m7YiKsLcVZ+at60cfhw7hvLgOhh2kKzKSjLRk
-         JmL1zY62EZr+urL9lhIVSxdzCqc7uwa9oiN+G9GkLf81dFJ1N9cKFM0fGStIs/x6AlyK
-         6Vg/biGQTsWDLzfFXfFk3BI8fJ0VfIE5d30ug4g9HcDC6r0mjsgKRYoFCJjO5d3lWy1p
-         GamCxqgB5YgEd2MEC0caS9MMRuK+KYEzCmrPWMvEQr5TauDOzUQz5Yc1N9KX0lEuor+s
-         0StoyFcNQv+t4r1YJNOTuEyTFCPvXIjHrYAGs6d5F/T4sXIRZl0sPAOS4dt2tzgHp7uy
-         Kxfg==
-X-Gm-Message-State: AOJu0YyxF6y3+lDAE5H7u4AJeMY7wBNzdkVKzbS/O3BC0cZ9l9vdwggu
-        SzPcrBRAj0zRUidVwlJrS4oTX22dXtw=
-X-Google-Smtp-Source: AGHT+IHuQ24Hy0wlZqpKThD2hndi3rYWapG+J/d1L/ai4z7W/k7rmZdxNg2zwHr4zmYKJTJyjaSKmjFgB/U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ae57:0:b0:59b:ee27:bbe9 with SMTP id
- g23-20020a81ae57000000b0059bee27bbe9mr35901ywk.9.1695218106527; Wed, 20 Sep
- 2023 06:55:06 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 06:55:05 -0700
-In-Reply-To: <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-3-seanjc@google.com>
- <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
-Message-ID: <ZQr5uXhV6Cnx4DYT@google.com>
-Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for mmu_notifier_retry
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xu Yilun <yilun.xu@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
+        d=1e100.net; s=20230601; t=1695218193; x=1695822993;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gWvN1Bpbs1PF50qBbgm5YoDriWQXveHOdhR/Dx6i6jg=;
+        b=obieMKBTEXslrxHobek9sod823uwAPG0fR1jDfuaP1K9Nwx1b1LARHIEBBAnFiK7br
+         lz+Y87KuPmi7aRNzWQHkNSagOUH15NYqLyW3OJSGesy9OJlhuMC6aiwaQfgo4mxdECH1
+         mnDLFBoiX9hOdaWQzkaU7kjndmnfDTtfFpNgeHGRS/+HCoAVf/dOXI7q4vMBBoDXXjue
+         +fo5GQLJM41FaCMDlYNsa/tJrksbjXFh0SAS0KRc6oqbOZf8FeGxIEiHB7OerM4s3hSZ
+         6vFh+6jlnmRECmfGkfKOGp4pfCz2rU4ZhSKt1OdiFI2FU25luyTiO/bNduZCSb+0bZKX
+         2eVA==
+X-Gm-Message-State: AOJu0YzyITco2jS6LcXM/tmKHDpi56YeICplCb/HmKmhdy3r9p1oeLLa
+        Kh/StM/lSCqUjrCCYBOL/4n9f79b8WJa+y2BaOd9u4119amx5yEbdcbPDQ==
+X-Google-Smtp-Source: AGHT+IFb9PPNvdqtSUNwQS6mJlCIQK/y8XDdGfu9RdEx32Z3P7W7GzvDtIiLZCDP6pBGCTmuF0vbzKB6JetQRNt81ig=
+X-Received: by 2002:a05:6a20:6a27:b0:14c:383b:294a with SMTP id
+ p39-20020a056a206a2700b0014c383b294amr2839055pzk.5.1695218193018; Wed, 20 Sep
+ 2023 06:56:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230918180646.1398384-1-apatel@ventanamicro.com>
+ <20230918180646.1398384-4-apatel@ventanamicro.com> <CAOnJCUJYDHtbYS4js7PSAeLqT4sL5zi7DT5xeSww+5Nvs2UhcA@mail.gmail.com>
+In-Reply-To: <CAOnJCUJYDHtbYS4js7PSAeLqT4sL5zi7DT5xeSww+5Nvs2UhcA@mail.gmail.com>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Wed, 20 Sep 2023 19:26:21 +0530
+Message-ID: <CAK9=C2UbjOGyxo8oP36Tinjhv1jRpCb+hVbZCOJ70G4-WiHw1g@mail.gmail.com>
+Subject: Re: [PATCH 3/4] KVM: riscv: selftests: Fix ISA_EXT register handling
+ in get-reg-list
+To:     Atish Patra <atishp@atishpatra.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 20, 2023, Xu Yilun wrote:
-> On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
-> > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
-> > +{
-> > +	lockdep_assert_held_write(&kvm->mmu_lock);
-> > +
-> > +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
-> > +
-> >  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
-> >  		kvm->mmu_invalidate_range_start = start;
-> >  		kvm->mmu_invalidate_range_end = end;
-> 
-> IIUC, Now we only add or override a part of the invalidate range in
-> these fields, IOW only the range in last slot is stored when we unlock.
+On Wed, Sep 20, 2023 at 1:24=E2=80=AFAM Atish Patra <atishp@atishpatra.org>=
+ wrote:
+>
+> On Mon, Sep 18, 2023 at 11:07=E2=80=AFAM Anup Patel <apatel@ventanamicro.=
+com> wrote:
+> >
+> > Same set of ISA_EXT registers are not present on all host because
+> > ISA_EXT registers are visible to the KVM user space based on the
+> > ISA extensions available on the host. Also, disabling an ISA
+> > extension using corresponding ISA_EXT register does not affect
+> > the visibility of the ISA_EXT register itself.
+> >
+> > Based on the above, we should filter-out all ISA_EXT registers.
+> >
+>
+> In that case, we don't need the switch case any more. Just a
+> conditional check with KVM_RISCV_ISA_EXT_MAX should be sufficient.
 
-Ouch.  Good catch!
+If we compare against KVM_RISCV_ISA_EXT_MAX then we will forget
+adding test configs for newer ISA extensions.
 
-> That may break mmu_invalidate_retry_gfn() cause it can never know the
-> whole invalidate range.
-> 
-> How about we extend the mmu_invalidate_range_start/end everytime so that
-> it records the whole invalidate range:
-> 
-> if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
-> 	kvm->mmu_invalidate_range_start = start;
-> 	kvm->mmu_invalidate_range_end = end;
-> } else {
-> 	kvm->mmu_invalidate_range_start =
-> 		min(kvm->mmu_invalidate_range_start, start);
-> 	kvm->mmu_invalidate_range_end =
-> 		max(kvm->mmu_invalidate_range_end, end);
-> }
+>
+> > Fixes: 477069398ed6 ("KVM: riscv: selftests: Add get-reg-list test")
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  .../selftests/kvm/riscv/get-reg-list.c        | 35 +++++++++++--------
+> >  1 file changed, 21 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/t=
+esting/selftests/kvm/riscv/get-reg-list.c
+> > index d8ecacd03ecf..76c0ad11e423 100644
+> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > @@ -14,17 +14,33 @@
+> >
+> >  bool filter_reg(__u64 reg)
+> >  {
+> > +       switch (reg & ~REG_MASK) {
+> >         /*
+> > -        * Some ISA extensions are optional and not present on all host=
+,
+> > -        * but they can't be disabled through ISA_EXT registers when pr=
+esent.
+> > -        * So, to make life easy, just filtering out these kind of regi=
+sters.
+> > +        * Same set of ISA_EXT registers are not present on all host be=
+cause
+> > +        * ISA_EXT registers are visible to the KVM user space based on=
+ the
+> > +        * ISA extensions available on the host. Also, disabling an ISA
+> > +        * extension using corresponding ISA_EXT register does not affe=
+ct
+> > +        * the visibility of the ISA_EXT register itself.
+> > +        *
+> > +        * Based on above, we should filter-out all ISA_EXT registers.
+> >          */
+> > -       switch (reg & ~REG_MASK) {
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_A:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_C:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_F:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_H:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_I:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_M:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSTC:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBB:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSAIA:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_V:
+> > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVNAPOT:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBA:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBS:
+> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR:
+> > @@ -50,12 +66,7 @@ static inline bool vcpu_has_ext(struct kvm_vcpu *vcp=
+u, int ext)
+> >         unsigned long value;
+> >
+> >         ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> > -       if (ret) {
+> > -               printf("Failed to get ext %d", ext);
+> > -               return false;
+> > -       }
+> > -
+> > -       return !!value;
+> > +       return (ret) ? false : !!value;
+> >  }
+> >
+> >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+> > @@ -506,10 +517,6 @@ static __u64 base_regs[] =3D {
+> >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_RE=
+G_RISCV_TIMER_REG(time),
+> >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_RE=
+G_RISCV_TIMER_REG(compare),
+> >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_RE=
+G_RISCV_TIMER_REG(state),
+> > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KV=
+M_RISCV_ISA_EXT_A,
+> > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KV=
+M_RISCV_ISA_EXT_C,
+> > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KV=
+M_RISCV_ISA_EXT_I,
+> > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KV=
+M_RISCV_ISA_EXT_M,
+> >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KV=
+M_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_V01,
+> >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KV=
+M_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_TIME,
+> >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KV=
+M_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_IPI,
+> > --
+> > 2.34.1
+> >
+>
+>
+> --
+> Regards,
+> Atish
 
-Yeah, that does seem to be the easiest solution.
-
-I'll post a fixup patch, unless you want the honors.
+Regards,
+Anup
