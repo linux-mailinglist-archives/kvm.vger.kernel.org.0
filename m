@@ -2,134 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 534B97A893B
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 18:04:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 682097A8967
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 18:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235590AbjITQEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 12:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
+        id S234494AbjITQ1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 12:27:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234961AbjITQEe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 12:04:34 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2060.outbound.protection.outlook.com [40.107.93.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C41CB9;
-        Wed, 20 Sep 2023 09:04:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QIARuCGABWNvxkVyGd+1ksy9c3PZc4EcSO3HPOAozDYUwjJpxHJSmzs4RswmHRLpHnSw/e5DGRBhuQD15eHaqkDE10gGk1gTkpgt2Ge88gSv9EEh6mqIee4XpWGpMIwgZ06msv6aUEo2x/nN77fsgOfOXBKdJm9dqbSvTPSaeYquvUcFRlY4jZC2mAESJF8Alh4NB8cxKn1RZaEC1oBuRjSmumRAofE1MfB4u23K1wLjsAvsP+TBgxWP8JoXWf1Xxer1MCZ0NK3hFNLqqGqikPA+oK8VqW2NMMq//+rTTpSXU0dAXvVDGFlLQAv/wdA+bnCBxKDn4SnIthPABXr5QA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dbHWXoGiEvc70TXCCHmYfomlEXfG+J/7xwnBUkptj2U=;
- b=eOcU/L3raPW8B84Xt2gPdgEQd6HDijM5J24Kag7C7iFk2ZxRpTZg2c0tzJf2xXG31Ry7xbefwOpAhcMafebeOQ3XJCJbZOUnAR544cXudh7YDGkKrrzJ+17Ea1QOm2rF31Q5uT7MjRohXzq8zERAiurRejkl7GgiAJo/GkjzCqFXicakYjV500/7TU0sW0I3RGRI8iFuKSvKvHQLw4dYelbJhaXn/9fvT1rF8AEIjPErLwV7T+iwocqXtGG6bp6HH4SagOCivpJu/Twv9Wjoq/8lGMNS1+GFZDqHxyi8+9rkF3oMexjCTyqabojCG5Zm/HfgSZzQSppsvpb1lG3nlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dbHWXoGiEvc70TXCCHmYfomlEXfG+J/7xwnBUkptj2U=;
- b=bngCi2gtrxiikIrBTT521jlVVSH39LEK/1B/bNIeCJj2tXeNNBtXequHopEj0e/jGU+xBwCKyg9ntKVTxuLcrRDT5i8byG9ZE61x07rLkJYRs9KW8XSD2ZiHD7FVS3c2p7oDpG37YTKsn4Jdn6mZC4QUOiScfG/HEhJ2fCsb28Pnl5BdxH5TZCvCXvMAgqTtNaB8I+MFtyNF0xmj6g3F9Hsmab4OfAZKh+ItcxjZ4z1Vs7tsNNFyBNnVaAiGVtxxCb+hn6hk9oKhO89EQUmAR2X9c8CgYavIrV6OSQ8KdOlQ2c7OZNlxLuKtpD8+779yahUGfI62xiYJ5Zw0Y/ofkQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB6534.namprd12.prod.outlook.com (2603:10b6:8:c1::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Wed, 20 Sep
- 2023 16:04:25 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
- 16:04:25 +0000
-Date:   Wed, 20 Sep 2023 13:04:24 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     ankita@nvidia.com, alex.williamson@redhat.com, tony.luck@intel.com,
-        bp@alien8.de, naoya.horiguchi@nec.com, linmiaohe@huawei.com,
-        aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-        targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-        anuaggarwal@nvidia.com, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-edac@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 0/4] mm: Implement ECC handling for pfn with no struct
- page
-Message-ID: <20230920160424.GD13733@nvidia.com>
-References: <20230920140210.12663-1-ankita@nvidia.com>
- <20230920090222.580f2b3ca43f21f752c10e0a@linux-foundation.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230920090222.580f2b3ca43f21f752c10e0a@linux-foundation.org>
-X-ClientProxiedBy: YT3PR01CA0009.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:86::21) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234462AbjITQ1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 12:27:54 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F509F
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 09:27:48 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38KGIuvn018978;
+        Wed, 20 Sep 2023 16:27:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=nYjl1sbzEhK9CsJFcP4t1U/LXzN/OiB/JyBAhZuS9zw=;
+ b=hdROw481DK3NzAUbKkvDiVDEGYxpXVnIQIRE4k8cd0MEPi1E1mRTzSGS4dwP8D52jKU/
+ VAXsos3DGQsWH8uytTf821bCAVuS5IKwt/TnD1gzFpo1UoUhp2bwU//+4VquwJYu91Xh
+ NEfpaFNlS2sYmOj50Lkp72SpM9eMw3MW/8VcfkYbeaErzHYarK1aiXTIINoUNO7EwsFJ
+ wn6yE7Jtk1DaDtqQmuKqJaqbyhTMETfMan+I3BeBuSOdaKAJz2K9fbdMCPhPCxkxaOOU
+ CmH5nQ7SVhsswv8bzspu5F4mD9j7TEcP20yXNEF1cwUTjHx3jHb5LExqqzbW3D+o65XW yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t84230ch2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Sep 2023 16:27:36 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38KGGDAK011067;
+        Wed, 20 Sep 2023 16:27:35 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t84230cgh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Sep 2023 16:27:35 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38KGO5eI011671;
+        Wed, 20 Sep 2023 16:27:34 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t5qpnqknv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Sep 2023 16:27:34 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38KGRX073867244
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Sep 2023 16:27:34 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E352B5805A;
+        Wed, 20 Sep 2023 16:27:33 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A4B458056;
+        Wed, 20 Sep 2023 16:27:33 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.182.187])
+        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Sep 2023 16:27:33 +0000 (GMT)
+Message-ID: <f7419e537b8cf3471688619b808c2f70d8ae5649.camel@linux.ibm.com>
+Subject: Re: [PATCH] vfio/mdev: Fix a null-ptr-deref bug for
+ mdev_unregister_parent()
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jinjie Ruan <ruanjinjie@huawei.com>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Date:   Wed, 20 Sep 2023 12:27:32 -0400
+In-Reply-To: <20230918115551.1423193-1-ruanjinjie@huawei.com>
+References: <20230918115551.1423193-1-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB6534:EE_
-X-MS-Office365-Filtering-Correlation-Id: 29c043b6-a8e2-4996-f407-08dbb9f342e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Oxost35uNTEuHw4fR60NSN3i9CLNMcgyPfGUtqf8odI3YR2R0gJ/QS4FcvPHZquXBkqCbEwmik8/yDlktAyFtniz0DhtOIVG8P2suMh3ZwzFtNpu26FwfPiNfEAtZRtyMDy0IhGOc9pOEINpUv4MJTdzU2rmoVDTCNEypOcVPYER51aNQ966ghPMZL/t6MzYI6QEWDVRY7+xD38Bs3DAryOQLOvYG3wcEeQYesuI/dt2IcKbUnO2cdynaaWfuNDS01ngiuR3E8zNqGiTO4tFNQ/g2W2Yh5gwKEsrmdMjVucAfuS+vPZkB5TSIf7Ls8E4b0VpRbtFL6NUhnBLv/thBeGDMold5Igu4V4cTwwuKAR5wNrXHqKG2mrvr6JpHICvchkd1qh1ifdwfAmTGRhWV6yCZ1n5zvCCXfiyKvDN2w+1ahAUfky8499WREG0B7mVTJrEgORGtOcJsE+LJywMdeAzKPUYSQSR2qiQ2vF87g6k64m6Y4egPFnI/pJXut4qWlbGypJOIi7iMWcJk8u7sFMYO02d4Mqj1etcxqq7ifXhAd9eOMwVakPK7C8CB0yN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(376002)(39860400002)(186009)(1800799009)(451199024)(316002)(6916009)(66556008)(66946007)(86362001)(66476007)(33656002)(4744005)(38100700002)(2906002)(41300700001)(36756003)(7416002)(5660300002)(478600001)(6506007)(6486002)(6512007)(4326008)(8936002)(8676002)(1076003)(26005)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/V1RtyOCfrl0II6mlFjL/kQc81jyuodS9JTh0RBiWNOSMfaI30qwZNM9iliH?=
- =?us-ascii?Q?uJLsWdvpBcjo4qpgb9DtfKqw0lKWLceqKPd3pubRv2ZC/Acfb1GpvdYotXBJ?=
- =?us-ascii?Q?autLCvhs+VCQ6WYYA+D5iBTe0g5Kcbjqmz5RkGNnU2ngJVQhIoRc9RFdl4Bs?=
- =?us-ascii?Q?KdFIcQKkk8OtaPcSCDrjRaI6WL6b2hA/rfqxPSC+MovAjUKCzqlp/NpfdTwM?=
- =?us-ascii?Q?CP1cky0/KqPBsQSDETwDWzQbhAats9cxAyqkHriA/shKxUAkKduo58o7Br/Y?=
- =?us-ascii?Q?99gaZKfEQZOJqIeSVMrYLxFdL6CjyT3GCRAtPbtPX6PgWBvUrI+MfrLdVwVu?=
- =?us-ascii?Q?rTwHFcln57CQTXNIe7XikObI6nlXl1+VdPaPXzlT01CSePn8SpFWujAE56w1?=
- =?us-ascii?Q?Av5bZ0q3VJpbKG39GyZyatJfDNHSaKNrV6IMrwrLsT9rNIbKoSVqkb6Y6Y+2?=
- =?us-ascii?Q?EskyVD5cR/UhAqGfWo9PVNAfuUJtGC3mnLDNYC7hPf6FeDQB6U2JV0u6BXtP?=
- =?us-ascii?Q?z8YKC7n2+XSy1RIDMPRh7y1UIFfXAA3iHUoVSZPleO5zHaxYiLNe7xFFHcCt?=
- =?us-ascii?Q?z5H2B7ezuIGMJby7B6GRQrY6zPUMF60C4hrrJ+yUwddYvwVO7bFFl4MyiEC8?=
- =?us-ascii?Q?mtT7If+MWYGdEG0Fo7K3sq34ujNEpz2gzJFy73qsI4difaFk3C3QNfer+VWP?=
- =?us-ascii?Q?7iChbh+/NWAYYcHnnAYUMWNAu0cOyCg9+FhmbmlIWR2v9TvMpx7knLoned9i?=
- =?us-ascii?Q?AlfR5GV9X1AGXvDUzbkQiQwa1hIht8JZQWQrtO0Fhj8IEiqCrmUBLAvZvlqU?=
- =?us-ascii?Q?VT5+sPa5X+B81YsXn5LhO/Gy6+OEHnCd2JzoVnuutnzmFGdYviCnGEcLQPuq?=
- =?us-ascii?Q?KnLjpZedrD4Jq1PemaQdYWpEMdiktuwNXkeOrvXLxK/MdpIvn+Xc8MekZfpE?=
- =?us-ascii?Q?l8k+B6cPzUZXSdhh6ArVgDt2kACejMTzVkyY6baWVlLu5Qi8Z5lsBr1CZ6ty?=
- =?us-ascii?Q?ttPdbP3is3hkT8kiyds7BwssdbC100OYdZnFxNFUVsHiGvkvXVHezyGwWkb2?=
- =?us-ascii?Q?AltR/VYe6Pou5UKkD0ppuioe5tH4YIkMUK5IqvHZoD6zBrtuBuKT6LlDPWom?=
- =?us-ascii?Q?7eXdqV8Q5cEvSmRsvXnckKQs2cSK74U8499d6ws9vcxElXRnyhSI4V8PU2/L?=
- =?us-ascii?Q?4iYCFPLmfB170CoBp0qGgsCxQEq/4zsy9x+sWAhExKJ+saHyYLsfL16DqAnw?=
- =?us-ascii?Q?BDsLNKgrlP/tcnoEOvK+3l4mzSGA0MgGaQpKPuMNKN+6HsRYR+V5GczzdUKS?=
- =?us-ascii?Q?YCt2+kf0Idh+VNWfWs64lgkN6w8wHUBHj++zbFNHaEJCA4mCm6/FcdJPISVd?=
- =?us-ascii?Q?uQBhtZHv1q3OphZjqy9XDLsGcY8pzCps2emghO/CwaP9Y3g0rozS19hJT1T+?=
- =?us-ascii?Q?ndkTT+aRja8TLMFraE2WjtzORf0XVDdT9pRzoiXq2tHD6psGnPUvEcurLA/q?=
- =?us-ascii?Q?S6RUk7aVryz9iGzJ5no7brhg6BomtCcon9cSaZdRhX8n6JNCU+wpy0CHiHal?=
- =?us-ascii?Q?a6td3SOwC1rWUtLz7xf4SRnxfFdhM5HQ39VLyY2O?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29c043b6-a8e2-4996-f407-08dbb9f342e0
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 16:04:25.5152
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hDO0GrdqwbPOhGA8myyDqRsuPyUnpQp5B824jo41gEvUIlUx0zwOrOUOE1DpZ0N8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6534
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JaX13kIwYU3yfqO2pasyPRLPfyepKNpo
+X-Proofpoint-ORIG-GUID: A1fKzdmmCgilX9Wussqhf2JUbsFGTLPV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-20_05,2023-09-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ spamscore=0 impostorscore=0 mlxlogscore=691 malwarescore=0 bulkscore=0
+ clxscore=1011 phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309200132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 20, 2023 at 09:02:22AM -0700, Andrew Morton wrote:
-> On Wed, 20 Sep 2023 19:32:06 +0530 <ankita@nvidia.com> wrote:
-> 
-> > The kernel MM currently handles ECC errors / poison only on memory page
-> > backed by struct page. As part of [1], the nvgrace-gpu-vfio-pci module
-> > maps the device memory to user VA (Qemu) using remap_pfn_range without
-> > being added to the kernel. These pages are not backed by struct page.
-> 
-> Are you able to identify any other drivers which can (or will) use
-> this?  Or is it likely that this feature will only ever be for
-> nvgrace-gpu-vfio-pci?
+On Mon, 2023-09-18 at 19:55 +0800, Jinjie Ruan wrote:
+> Inject fault while probing mdpy.ko, if kstrdup() of create_dir()
+> fails in
+> kobject_add_internal() in kobject_init_and_add() in mdev_type_add()
+> in parent_create_sysfs_files(), it will return 0 and probe
+> successfully.
+> And when rmmod mdpy.ko, the mdpy_dev_exit() will call
+> mdev_unregister_parent(), the mdev_type_remove() may traverse
+> uninitialized
+> parent->types[i] in parent_remove_sysfs_files(), and it will cause
+> below null-ptr-deref.
+>=20
+> If mdev_type_add() fails, return the error code and kset_unregister()
+> to fix the issue.
+>=20
+> =C2=A0general protection fault, probably for non-canonical address
+> 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN
+> =C2=A0KASAN: null-ptr-deref in range [0x0000000000000010-
+> 0x0000000000000017]
+> =C2=A0CPU: 2 PID: 10215 Comm: rmmod Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 W=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 N 6.6.0-
+> rc2+ #20
+> =C2=A0Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-=
+1
+> 04/01/2014
+> =C2=A0RIP: 0010:__kobject_del+0x62/0x1c0
+> =C2=A0Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 51 01 00 00 48 b8 00 0=
+0
+> 00 00 00 fc ff df 48 8b 6b 28 48 8d 7d 10 48 89 fa 48 c1 ea 03 <80>
+> 3c 02 00 0f 85 24 01 00 00 48 8b 75 10 48 89 df 48 8d 6b 3c e8
+> =C2=A0RSP: 0018:ffff88810695fd30 EFLAGS: 00010202
+> =C2=A0RAX: dffffc0000000000 RBX: ffffffffa0270268 RCX: 0000000000000000
+> =C2=A0RDX: 0000000000000002 RSI: 0000000000000004 RDI: 0000000000000010
+> =C2=A0RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed10233a4ef1
+> =C2=A0R10: ffff888119d2778b R11: 0000000063666572 R12: 0000000000000000
+> =C2=A0R13: fffffbfff404e2d4 R14: dffffc0000000000 R15: ffffffffa0271660
+> =C2=A0FS:=C2=A0 00007fbc81981540(0000) GS:ffff888119d00000(0000)
+> knlGS:0000000000000000
+> =C2=A0CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> =C2=A0CR2: 00007fc14a142dc0 CR3: 0000000110a62003 CR4: 0000000000770ee0
+> =C2=A0DR0: ffffffff8fb0bce8 DR1: ffffffff8fb0bce9 DR2: ffffffff8fb0bcea
+> =C2=A0DR3: ffffffff8fb0bceb DR6: 00000000fffe0ff0 DR7: 0000000000000600
+> =C2=A0PKRU: 55555554
+> =C2=A0Call Trace:
+> =C2=A0 <TASK>
+> =C2=A0 ? die_addr+0x3d/0xa0
+> =C2=A0 ? exc_general_protection+0x144/0x220
+> =C2=A0 ? asm_exc_general_protection+0x22/0x30
+> =C2=A0 ? __kobject_del+0x62/0x1c0
+> =C2=A0 kobject_del+0x32/0x50
+> =C2=A0 parent_remove_sysfs_files+0xd6/0x170 [mdev]
+> =C2=A0 mdev_unregister_parent+0xfb/0x190 [mdev]
+> =C2=A0 ? mdev_register_parent+0x270/0x270 [mdev]
+> =C2=A0 ? find_module_all+0x9d/0xe0
+> =C2=A0 mdpy_dev_exit+0x17/0x63 [mdpy]
+> =C2=A0 __do_sys_delete_module.constprop.0+0x2fa/0x4b0
+> =C2=A0 ? module_flags+0x300/0x300
+> =C2=A0 ? __fput+0x4e7/0xa00
+> =C2=A0 do_syscall_64+0x35/0x80
+> =C2=A0 entry_SYSCALL_64_after_hwframe+0x46/0xb0
+> =C2=A0RIP: 0033:0x7fbc813221b7
+> =C2=A0Code: 73 01 c3 48 8b 0d d1 8c 2c 00 f7 d8 64 89 01 48 83 c8 ff c3 6=
+6
+> 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 b0 00 00 00 0f 05 <48>
+> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a1 8c 2c 00 f7 d8 64 89 01 48
+> =C2=A0RSP: 002b:00007ffe780e0648 EFLAGS: 00000206 ORIG_RAX:
+> 00000000000000b0
+> =C2=A0RAX: ffffffffffffffda RBX: 00007ffe780e06a8 RCX: 00007fbc813221b7
+> =C2=A0RDX: 000000000000000a RSI: 0000000000000800 RDI: 000055e214df9b58
+> =C2=A0RBP: 000055e214df9af0 R08: 00007ffe780df5c1 R09: 0000000000000000
+> =C2=A0R10: 00007fbc8139ecc0 R11: 0000000000000206 R12: 00007ffe780e0870
+> =C2=A0R13: 00007ffe780e0ed0 R14: 000055e214df9260 R15: 000055e214df9af0
+> =C2=A0 </TASK>
+> =C2=A0Modules linked in: mdpy(-) mdev vfio_iommu_type1 vfio [last
+> unloaded: mdpy]
+> =C2=A0Dumping ftrace buffer:
+> =C2=A0=C2=A0=C2=A0 (ftrace buffer empty)
+> =C2=A0---[ end trace 0000000000000000 ]---
+> =C2=A0RIP: 0010:__kobject_del+0x62/0x1c0
+> =C2=A0Code: 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 51 01 00 00 48 b8 00 0=
+0
+> 00 00 00 fc ff df 48 8b 6b 28 48 8d 7d 10 48 89 fa 48 c1 ea 03 <80>
+> 3c 02 00 0f 85 24 01 00 00 48 8b 75 10 48 89 df 48 8d 6b 3c e8
+> =C2=A0RSP: 0018:ffff88810695fd30 EFLAGS: 00010202
+> =C2=A0RAX: dffffc0000000000 RBX: ffffffffa0270268 RCX: 0000000000000000
+> =C2=A0RDX: 0000000000000002 RSI: 0000000000000004 RDI: 0000000000000010
+> =C2=A0RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed10233a4ef1
+> =C2=A0R10: ffff888119d2778b R11: 0000000063666572 R12: 0000000000000000
+> =C2=A0R13: fffffbfff404e2d4 R14: dffffc0000000000 R15: ffffffffa0271660
+> =C2=A0FS:=C2=A0 00007fbc81981540(0000) GS:ffff888119d00000(0000)
+> knlGS:0000000000000000
+> =C2=A0CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> =C2=A0CR2: 00007fc14a142dc0 CR3: 0000000110a62003 CR4: 0000000000770ee0
+> =C2=A0DR0: ffffffff8fb0bce8 DR1: ffffffff8fb0bce9 DR2: ffffffff8fb0bcea
+> =C2=A0DR3: ffffffff8fb0bceb DR6: 00000000fffe0ff0 DR7: 0000000000000600
+> =C2=A0PKRU: 55555554
+> =C2=A0Kernel panic - not syncing: Fatal exception
+> =C2=A0Dumping ftrace buffer:
+> =C2=A0=C2=A0=C2=A0 (ftrace buffer empty)
+> =C2=A0Kernel Offset: disabled
+> =C2=A0Rebooting in 1 seconds..
+>=20
+> Fixes: da44c340c4fe ("vfio/mdev: simplify mdev_type handling")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+> =C2=A0drivers/vfio/mdev/mdev_sysfs.c | 3 ++-
+> =C2=A01 file changed, 2 insertions(+), 1 deletion(-)
 
-I think a future vfio-cxl will have a similar desire at least.
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
 
-Jason
