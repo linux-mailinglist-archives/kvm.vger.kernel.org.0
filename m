@@ -2,249 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE3717A8B88
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 20:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A5487A8BC2
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 20:31:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229775AbjITSS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 14:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55830 "EHLO
+        id S229513AbjITSbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 14:31:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjITSS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 14:18:58 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2052.outbound.protection.outlook.com [40.107.94.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92273CF;
-        Wed, 20 Sep 2023 11:18:46 -0700 (PDT)
+        with ESMTP id S229461AbjITSbd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 14:31:33 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D3EAB
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 11:31:28 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Nlw2mcU3zX9QDYO49IGntlEHfQh+eRyePFjjXHOJJkbnLlaJmk0t1fgGUpdfI2UPYXhoFqNa7vibbMB2Ec5p3Zt2grgeLzz+oyroQC+erOTYjDca1KYgymS6yI4yYUGdIr3xTNJtGgErPIygndxRoMvXERhmaoJ9UxkDTupFHcbLz+AUfZVSYWupPSzXpC94+4T/X2XFW55zN5v04uq36MVgIuRQFDuZTsM2vcNvroN2KbW+OtsJ6BYAz/N3FM1YXCCs0fs+iZ9HtbtT1ZQwAngbpPX/IyeZvcacBq+UxoUQeu7Q/3EHcdghkd6COU/i3Xr/rw8rSy/p1kLX+ujEKA==
+ b=DjG6qVebAf2NuyoytUPWwyjHXUcbOSJIYP8JHnsxQm3Q6LikXgifNYna63EzL8uXJyc+bYo/Mqa05HubcKWc9O05QrGVX+1dcD5K7bHbQ9Cm2z3+mvgCnCgFNFpI6WO7sqdeqdGJZGHodPeKSOCx17L7dBT7jn/rGs6H1DUMKPrkbdQOPsFC0Xys0nkVGCdOQZpIxnUSYv/Bw+g01/y6QwBWDy+K6Eexjwo2f2ZgTMNeWPGTqOVxJBHKsN1NJYvQoyzVA2P6DswnYeN/y5W1rB1x0GO+Bq2lqJGMcyQ42PfygpjqFTZCoGsSZAgE59CJyHJpyLR4OIP9oJrlH55bSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ONOlYSkAUskXnG8NC46lJLrDYInndfas+vsGNRsOjTI=;
- b=YxMijU/aqelR2DIzbnyjJdJp7J1MkyyMaLFd4YELs1xjo77+WdQJuPPqATtdwRPDOBOwSz0UWq/imFScQh1Mtn3F1vMDLdE+2bhw/wNN5BxOMu1yOkiokQ5L8S3myQsOH3pEByYmVbSf5NZqhLcDFmiE/2F+KO90fNy3a/5Da62R5ZPSPpiafaPy7uFEWYKZyBrxGCv7a6Znm3mEqs7Mm6BQf6bdAEjOfNFbcK/HZ+HSDV1Ea6O1DAx755yYKkLGatWL1I8IY/VzcQMXSG7QvhL5C7/kcIlmvlz8dOnxLMWFbc2HMS6T2lksmRJF4IU2oXQwK5zh+RuSU7pfx1hBpw==
+ bh=+wctnVedr2+K8znRrUQmXrSPvkI4a1WWRYZjbdRAhxE=;
+ b=Ox8r2dT1OkAgu7v+O8flAFZMr1gVgtdFyUpF4/KB41WvVrfrC/bJU8tn5+znPMVadab12JV/nWtv9w6fO8h5ZUc35kzcA3y7YTE2IMD6R0QC93WeZrq1MUmbtfzcJbYCOU0b/t/nz7i3iZ6HZGH81iHQi/EImp2JxpXM9YTb5DpjMXr49Yuhgqd8v4VEd2t+emhWmC9+VWVlt+XEnhhRfRENUOOH7bJ6g+x/HXqzWsidlvQyr3xJ2qvCFVAmc43V0DOFDFDCnr72QyJzZV0RP30JuhrxDps/5txT/LNdfBslWWcbRpSOeqKQCEi5tTHhqFVJcW1o6yBSnEVmFC5bNg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ONOlYSkAUskXnG8NC46lJLrDYInndfas+vsGNRsOjTI=;
- b=sihvanFbZ+t21Tthz59Wrmtsbp7M4/0nUugl9n3HiEmsAYWcZZLIQGrkfqgjEzvKhi4qtKyXfAaC+9ulNUfH9jndhpA+njIvdN2ywsPsTGAa4cCS8tbCQnoNK0AQhgxrns9Icp3eurRPU/YRiSyXdksgG2EmBhlOiHkVkHx+Bxg3seCjeL9FDK5tXYc2eymPGCbnmRHsqDzn4Gt4AFSlFW47VRbNtTHSWS1J3Vu/2kaO6qA+fRR6d8KEEoo5Qz42C3IiUGVCz57AMHqopXG2w68NQRjOQJig2xSvvsZchoTHKdlR8QgbaDWLWhUwSPDyPTxCYzV8mIcxlu5FXiWykQ==
+ bh=+wctnVedr2+K8znRrUQmXrSPvkI4a1WWRYZjbdRAhxE=;
+ b=FbSmBQ6klwTBhb6BhVvc1T+gfVDyLJrme6Cfz/W5J2zzeLbYsOhKMiYMczBwZRBejJ6HdK8VCl6JgipL4NPV0H6WcW6gZA34PEUkydx77uXTCHwGpeaaJiVUTZutBNNj7eEqaAd2IzoMlRwZBmkqmB71d2G1R1dfAPSXzpAXSk2NOYaLmc6h6OxScYG7wdFCsPXakim6GMiUR3pOAUmRVOJigNjXkc/VR7eCFKvgDv+D6JVFesux3boiTB3MxtJBCtX4WS3gEERLXn/Jb7oA65FldtiJ04d50dO65Thfy1uXmpDuW7NdPQGMVL4vZFLjtHzfavPdYLiflcRRafAcqQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7414.namprd12.prod.outlook.com (2603:10b6:930:5e::16) with
+ by DM8PR12MB5461.namprd12.prod.outlook.com (2603:10b6:8:3a::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.30; Wed, 20 Sep
- 2023 18:18:43 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28; Wed, 20 Sep
+ 2023 18:31:26 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
- 18:18:42 +0000
+ 18:31:25 +0000
+Date:   Wed, 20 Sep 2023 15:31:23 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, x86@kernel.org,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c unless VFIO is selected
-Date:   Wed, 20 Sep 2023 15:18:40 -0300
-Message-ID: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: YT4PR01CA0300.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:10e::25) To LV2PR12MB5869.namprd12.prod.outlook.com
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
+        maorg@nvidia.com
+Subject: Re: [PATCH vfio 0/9] Add chunk mode support for mlx5 driver
+Message-ID: <20230920183123.GJ13733@nvidia.com>
+References: <20230911093856.81910-1-yishaih@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230911093856.81910-1-yishaih@nvidia.com>
+X-ClientProxiedBy: CH0PR04CA0053.namprd04.prod.outlook.com
+ (2603:10b6:610:77::28) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7414:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb035663-8985-448a-aac4-08dbba060580
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM8PR12MB5461:EE_
+X-MS-Office365-Filtering-Correlation-Id: beed3f80-9636-4083-9251-08dbba07cc16
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: akF1jWMmrhSXHr/nsWp/EZ/tVQWxt9lE5f43rKIjziO2r6hG5/tZAWR8boelX5U+vVKfhUBeXdjmv3R7iXrcyco4sgzyEABMx6mbcczePsBxCVlkZIcHk2W5URUlEQGN36H0jjJr9CVRGHGvQoud29BWMl4lQCt2DlTLfik6mXB27jiV9ZXGaF+lQKUy+x9H6vhKyf6DMM1Dc+ZxHjrB2q3BBlyy9nhd9M3Gb6g4dx6X/i2vs2q0h6jsyGnMZCDk1lLWZq3q7f0Ua5hEbWrEc0y3uMZaz/8K1vKC2YvKM0VnaWo93emH+kDfeYFqeyOz5+SOk4Ufxgaz8+pN3kT8UC53baJIjsLTRS1Y5JHlLlEO1mJdaA4aV5QL3c8c7UkFJEvi+o1jY3jB5qUiQqfYa+YFC6IM00wXfDPp5zv8ZHFZYXhsdsPUdCcneaNPxIwMEG4XDz8HZTO9P6+43ciKuZOkyiw5MRGCxUpPnlcipdXAHa1Q3syNZnis2tSUxr5s1ruHdfHBFRVfJ4ZnbnaIwiuv1Q5qJ2f7IJkHaorwCzazkWyTrRGWgkVOlhb5dlOFHFBHVkdqi3pGIkdSXTcpyG4O30C3J6t3Vz25Iu9VO5NCSzYWsBJfVVwT92JeJ+fiSo9NmV1Tua+LaIIppeAB7fzKaZfMWmKwPju8E0hhmc4swNDIBiWeV1KIA/Kvkgeo1T9n+ljdJHhmfata16hc/g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(376002)(366004)(396003)(1800799009)(186009)(451199024)(478600001)(6486002)(6506007)(966005)(6512007)(83380400001)(2616005)(2906002)(26005)(66476007)(7406005)(7416002)(66946007)(66556008)(316002)(41300700001)(8676002)(110136005)(5660300002)(8936002)(36756003)(86362001)(921005)(38100700002)(4216001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: nsb1acbSS959wQKej3bOVL81XTdZNSyDyn+VGFYt1tbCEKATo2EKppt0cYf/ALBVkpx351omDQy1U2zDyWCuUePy0Hwjtv7ujOZ1hbBtO6tVbempydDd2kzEl3qbv1K/9hXNrrmwnuC3qa855nooHclAcGFU3Yj0DViSbPocK0oTS8FSAyQ4ryaY2GnlRpiGORVzzPOwePJzE7mdCDUrphkVEuq6+2VfQU6jfW86xl8pNOjOK7X83Eh2NEZ3vkOz4IDAUNztQdY90ucSSrZaoBnL9rQCRFHnjt+Y8EbA5JqT9Vpd9DXZspV1mmGHEUU/emUkyNm1OtzzGzg1wdL+C0z+JgLi/owVhxggqE4qC4OttMicospRsXXdycgu1QaJUPoe4HW2ZSPhJ5nauD6extJBhcxg+3CHYnduRrXRzDxO2RXK7m+wMTslgBruc2KnjxCcnd3MSgDFRg2dr2fMm0jbiNveuSl/maapnpsfjjLTfkG/IOxxkdSlmk46+iwIYPcB3lls88AkniUB1gz6uHsu+MxesdvZK+wbVkq5VI36VrJbz3BwVXvWZdSdNFKN
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(136003)(366004)(39860400002)(1800799009)(186009)(451199024)(5660300002)(2906002)(6862004)(8676002)(41300700001)(4326008)(8936002)(316002)(26005)(37006003)(66476007)(66556008)(66946007)(6636002)(478600001)(6506007)(6486002)(6512007)(2616005)(83380400001)(1076003)(36756003)(38100700002)(33656002)(107886003)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?omifWeHF9snkGB0ePFj2C3Emw2SGA5w+eKF72AXi27yKyjnxu3qQxbu9aw6G?=
- =?us-ascii?Q?/gfDTRcQ4+r27/DGqehcr0jFjigqzCtdHijHB8Z4HmINI0ndpS8A3pagINTG?=
- =?us-ascii?Q?Z0AyQx8oyM1DMBTcFJCGyRWEjq9YiRYWmYGktWbUt4DVSanoXpKHZeJU0RpA?=
- =?us-ascii?Q?vILQsqtG2xioZi4coPoFtDHhPhXdmDBtHdTVrPZE9c44Y0K4fdnb4rWveqEq?=
- =?us-ascii?Q?dZFo6iUJlEmTPjv6A7QwiD7FvDL+63D+ERuG8geMvJB0WvaVEyE6H4ULY3rN?=
- =?us-ascii?Q?CzZneVI5GdHrhzDkh2HBgqd2FO5AfEfNmXLV+9EROtkdxI8l2kw642SV0Szm?=
- =?us-ascii?Q?nXFBQQXAOWrPq0CQF7bH7HVNS2t5/z3Ejiq7vJgxwwbRiSi0pEPalpU3vLs+?=
- =?us-ascii?Q?jtZ8ky+4F30N3rIwVxucQO4WABCquNpAjEGuT+D4TDvQ0ChMuNbg/JWQInmS?=
- =?us-ascii?Q?UY0GUi9ffHILmQG/XHrZjEZiKxXELKnLM8mtg8bRjyvUqWdpmQJUbPpUHfhK?=
- =?us-ascii?Q?PTkzfT3V2i2A48j0mO+aMOwdmkt6LiWPrlCj3WT7DkzQTEPkYh3L/3B76EWo?=
- =?us-ascii?Q?R4mBBzAOZp/b0Irp9KMR7gKnyKs5eT64+AVJquGFsE2z1cmg1fKA0jk9cihL?=
- =?us-ascii?Q?EyPD/RRa8ZFmw+Dg8DcmWy8uqriei5HWynqRb5cQ6aVnNo7lCq6js2Pzefox?=
- =?us-ascii?Q?nQE4Rja5O3IifKBby6p6mo8Ca8MpJ3ZLYTVONgrNM8xZdwJ/qr/oRhznCQgb?=
- =?us-ascii?Q?OssKEqmvOO+v99jElAifturubFntRDoVA3HPZ0ZySJ8l1t8AAmwIL09VtUb2?=
- =?us-ascii?Q?1eKpRsNjgjJnFNVC7LYKJjCkCMlhZj/beRrnDfpQ19Qa/xKcbl163nY+cbuN?=
- =?us-ascii?Q?WgHLlcwBjsJm+FGp/OzRKeA/7kLBhz66HhmsRhweD7LOgzA5hmqA6kuNx9zj?=
- =?us-ascii?Q?KTlyoMvI+3ij7g5o1J1gBReiGEv1Aky9Zyxo8bqO3rFeto/5AK65Zgmv9rMT?=
- =?us-ascii?Q?nzepuIJjnEqUcYzWYexnO/bC0Nm6axSXQPI43I+beobJzgTtx1VqnX7iOnf7?=
- =?us-ascii?Q?NZiOYByDTytHmXj6CqHwfJwYXklBQec0rZWmKmiF1hxa1Fd4HDcRFdNMmnJt?=
- =?us-ascii?Q?7UAQuJ3ZppJTA/7qzs3kLFL/K/phzhpNuPwNx2lhDIPNEx0vZtw7yyHJGTdV?=
- =?us-ascii?Q?rhT6xCBQVWJTWSUDN5pbtg/ZxBEtr5zIXLnqMKd1CPs3/IlKTWXVZI730FuQ?=
- =?us-ascii?Q?DNmG3f6S8daH279SVcbKtrzEBNhaXbdq63lZ4JRVgzQK+HUxK6gJY/DCbvyS?=
- =?us-ascii?Q?l5IH7PPf+juC+8pSUaVt5SON3RIZtqra9AqRH1dw5h4s7aCoN28R7fQ8uSqs?=
- =?us-ascii?Q?b7hU0UigyNtggh53LvI76sha0dm3WzpDwbfDBXsyYexxaieZoZ9vC7SYFkfh?=
- =?us-ascii?Q?L4sR+cwkp0JIpESK4rqzFULLV3aTCNcfmuFUvBqp8IIvfRZecG74v0zIDqqF?=
- =?us-ascii?Q?ZdIS+OiJk7RqnebcdNCCp8BRJEVE7k0Tfb1gYSkIpZjW5j7rYVsdYUhdivct?=
- =?us-ascii?Q?5zZjZaqgqlHofHiqhwhXYMJLSa+8me7Yol70nRby?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g8crQfw1wGcuy9u9SkwGO9slNzkZiomK8XXNrUv4DBVJSlpBTRLvYUq+YYPw?=
+ =?us-ascii?Q?GJJQfjRS/8xyPVl9xDAyWxxJ6tRChEqHJv58vFYUL0X6MlnwdDRWMfmtWLFQ?=
+ =?us-ascii?Q?Rr9tg5j+7bsjAhiv3RHvqOOxHSQAovWw5XwVhrTRGwW0HSXhwm8084qE8q8Z?=
+ =?us-ascii?Q?53jb8K9cpvLB2OQZRnvgFhs/n50Y9xV2uZbZQDI6dep/6lMRbLo5IcwIL+Re?=
+ =?us-ascii?Q?fOLTfcxKDweXbvf4ZtLFqnyX8fKSfV9k6iuEk5jOIp0Phut+O6T8WZx4upsz?=
+ =?us-ascii?Q?Vov6yti1jTSGQR6SluOULZLViCS5VTLW0ZP+z98BFcYTshlwHbvjlnYA77T5?=
+ =?us-ascii?Q?0BXTuUCLKijW9HCYguOzA3ZLR5pJPSzRlexTbK6sOhIofqJJ8kHBhCgKJhHg?=
+ =?us-ascii?Q?S5yZwU8Kg6gGiAXahz8vOui87AmkoTW8VDXHQJ8jHImGapqrnL+yL+6RMsIr?=
+ =?us-ascii?Q?5C5Ai3iO1wAuk85CrzH+pSNHRlSk4lCLhplPzTCl/06FT0gRKiuMujpZRIGH?=
+ =?us-ascii?Q?tDUum7W6EyOEVeh3R0Tm/qplt8tdaF970SX6T6j76r0HY+dDQ7qVsW4kZ80O?=
+ =?us-ascii?Q?/Irz4BaBeq5yrMQpoVWK1ynW+FRDlWH8KXonOw0gx6b9Hr7i2piH/yGETAhr?=
+ =?us-ascii?Q?SX7iM6P5U/+I0MDOpx1mTR0uUYId/d4DRlawvzo/TitzTw7oaEXN5csAE77Q?=
+ =?us-ascii?Q?Ce4UJhFI3nuGhmeiZxLSdk/HWSLk/i5DgklrsuWG2zLmAvzSM1Sp4zc+Aq9l?=
+ =?us-ascii?Q?zx8u0eWf025tGNvO7f6BGSKkfmqo/MJME9oYTnvGSISZCAHljx/68nRsMBpV?=
+ =?us-ascii?Q?iPe7dpCtEEl5iTuQGEA52BnFKlOkT57tVXWhiiQIgL7Y4B4bjalxcdRx5uzF?=
+ =?us-ascii?Q?Fso9hFgSFDP7/HBfMnP+iGBjzvAoWDWDMbsu//gF5isVHZxncggvHxSM08Rg?=
+ =?us-ascii?Q?AxuU+2dWecZxnpMPmUYBWsuYTSGdolzV2IRVpu3xkQiD/He/CfG0iqrVs+nF?=
+ =?us-ascii?Q?RRlcwyqRhr68QcO58DV0zMbuaCBPbFtKTbeS5jsAso1mmc55KfISUBa8SbdW?=
+ =?us-ascii?Q?ZyVPmY6+Kti7gJfEnDsx8477xBgzB0brPwi9u2R4wC1F7NnJ++VDOSY/8XDl?=
+ =?us-ascii?Q?R9ntRbj+936//VEI7P+lw8ghV70Jrctst9I/84YQUHLcjMWWEJZMVHjWZW6w?=
+ =?us-ascii?Q?M4r7ltZrbLhCqy0Z1QzW25ve8tQhUZ76kGWEJXH82wEs9k9dTfWhE5KWbZ/8?=
+ =?us-ascii?Q?y0ibzjOHzGM4Rkd5BgoEY1ERV8kWAP5gm24mnKUG2zKBF6se0lk3WOloIkNS?=
+ =?us-ascii?Q?FIN8gQQFf7W3FL4B6fwYu7pmV4SMGRePyeCsnhL+DPwNQG4X2U3Q5MgUKPUI?=
+ =?us-ascii?Q?oJUZBkh81D83fsH2iBh8zc7BgKpTdo/1jYqzyS1tu7iWPKWB5M6Z7e2TZHah?=
+ =?us-ascii?Q?AhLkwy/m2TfZxwNWk7Ngh/cv9r/ETeU55dEvJ+oUQwVnvaAzHp+B8vB8YxxF?=
+ =?us-ascii?Q?ffoimZA2k1YxjnpLn8LWqVHozagF8zOOiRvY7oFwMRUfX6/32r34wK3MSwSJ?=
+ =?us-ascii?Q?p6CEVVTwHvpeNhXwaPzmXEdHQ858bQKr2+wBV/cn?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb035663-8985-448a-aac4-08dbba060580
+X-MS-Exchange-CrossTenant-Network-Message-Id: beed3f80-9636-4083-9251-08dbba07cc16
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 18:18:42.8925
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 18:31:25.5898
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: opa3BNPFW9b76Wi03pf5tKZfjHJZL6BqnrC6sg4ffm/GrFagxKLYWeMnD5u0i4Tl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7414
-X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-MS-Exchange-CrossTenant-UserPrincipalName: SrT53M85CGXJaa0XEMcgRWneBlZuInn/EwMffBLitXrbb44tJqWcJGUuGj74N4xX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5461
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are a bunch of reported randconfig failures now because of this,
-something like:
+On Mon, Sep 11, 2023 at 12:38:47PM +0300, Yishai Hadas wrote:
+> This series adds 'chunk mode' support for mlx5 driver upon the migration
+> flow.
+> 
+> Before this series, we were limited to 4GB state size, as of the 4 bytes
+> max value based on the device specification for the query/save/load
+> commands.
+> 
+> Once the device supports 'chunk mode' the driver can support state size
+> which is larger than 4GB.
+> 
+> In that case, the device has the capability to split a single image to
+> multiple chunks as long as the software provides a buffer in the minimum
+> size reported by the device.
+> 
+> The driver should query for the minimum buffer size required using
+> QUERY_VHCA_MIGRATION_STATE command with the 'chunk' bit set in its
+> input, in that case, the output will include both the minimum buffer
+> size and also the remaining total size to be reported/used where it will
+> be applicable.
+> 
+> Upon chunk mode, there may be multiple images that will be read from the
+> device upon STOP_COPY. The driver will read ahead from the firmware the
+> full state in small/optimized chunks while letting QEMU/user space read
+> in parallel the available data.
+> 
+> The chunk buffer size is picked up based on the minimum size that
+> firmware requires, the total full size and some max value in the driver
+> code which was set to 8MB to achieve some optimized downtime in the
+> general case.
+> 
+> With that series in place, we could migrate successfully a device state
+> with a larger size than 4GB, while even improving the downtime in some
+> scenarios.
+> 
+> Note:
+> As the first patch should go to net/mlx5 we may need to send it as a
+> pull request format to VFIO to avoid conflicts before acceptance.
+> 
+> Yishai
+> 
+> Yishai Hadas (9):
+>   net/mlx5: Introduce ifc bits for migration in a chunk mode
+>   vfio/mlx5: Wake up the reader post of disabling the SAVING migration
+>     file
+>   vfio/mlx5: Refactor the SAVE callback to activate a work only upon an
+>     error
+>   vfio/mlx5: Enable querying state size which is > 4GB
+>   vfio/mlx5: Rename some stuff to match chunk mode
+>   vfio/mlx5: Pre-allocate chunks for the STOP_COPY phase
+>   vfio/mlx5: Add support for SAVING in chunk mode
+>   vfio/mlx5: Add support for READING in chunk mode
+>   vfio/mlx5: Activate the chunk mode functionality
 
->> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
-           fn = symbol_get(vfio_file_iommu_group);
-                ^
-   include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
-   #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+I didn't check in great depth but this looks OK to me
 
-It happens because the arch forces KVM_VFIO without knowing if VFIO is
-even enabled.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
-then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
+I think this is a good design to start motivating more qmeu
+improvements, eg using io_uring as we could go further in the driver
+to optimize with that kind of support.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com/
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- arch/arm64/kvm/Kconfig   | 2 +-
- arch/powerpc/kvm/Kconfig | 2 +-
- arch/s390/kvm/Kconfig    | 2 +-
- arch/x86/kvm/Kconfig     | 2 +-
- virt/kvm/Kconfig         | 7 ++++++-
- 5 files changed, 10 insertions(+), 5 deletions(-)
-
-Sean's large series will also address this:
-
-https://lore.kernel.org/kvm/20230916003118.2540661-7-seanjc@google.com/
-
-I don't know if it is sever enough to fix in the rc cycle, but here is the
-patch.
-
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 83c1e09be42e5b..7c43eaea51ce05 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -28,7 +28,7 @@ menuconfig KVM
- 	select KVM_MMIO
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_XFER_TO_GUEST_WORK
--	select KVM_VFIO
-+	select HAVE_KVM_ARCH_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select HAVE_KVM_DIRTY_RING_ACQ_REL
-diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-index 902611954200df..b64824e4cbc1eb 100644
---- a/arch/powerpc/kvm/Kconfig
-+++ b/arch/powerpc/kvm/Kconfig
-@@ -22,7 +22,7 @@ config KVM
- 	select PREEMPT_NOTIFIERS
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
--	select KVM_VFIO
-+	select HAVE_KVM_ARCH_VFIO
- 	select IRQ_BYPASS_MANAGER
- 	select HAVE_KVM_IRQ_BYPASS
- 	select INTERVAL_TREE
-diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-index 45fdf2a9b2e326..d206ad3a777d5d 100644
---- a/arch/s390/kvm/Kconfig
-+++ b/arch/s390/kvm/Kconfig
-@@ -31,7 +31,7 @@ config KVM
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_INVALID_WAKEUPS
- 	select HAVE_KVM_NO_POLL
--	select KVM_VFIO
-+	select HAVE_KVM_ARCH_VFIO
- 	select INTERVAL_TREE
- 	select MMU_NOTIFIER
- 	help
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ed90f148140dfe..8e70e693f90e30 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -45,7 +45,7 @@ config KVM
- 	select HAVE_KVM_NO_POLL
- 	select KVM_XFER_TO_GUEST_WORK
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
--	select KVM_VFIO
-+	select HAVE_KVM_ARCH_VFIO
- 	select INTERVAL_TREE
- 	select HAVE_KVM_PM_NOTIFIER if PM
- 	select KVM_GENERIC_HARDWARE_ENABLING
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 484d0873061ca5..0bf34809e1bbfe 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -59,9 +59,14 @@ config HAVE_KVM_MSI
- config HAVE_KVM_CPU_RELAX_INTERCEPT
-        bool
- 
--config KVM_VFIO
-+config HAVE_KVM_ARCH_VFIO
-        bool
- 
-+config KVM_VFIO
-+       def_bool y
-+       depends on HAVE_KVM_ARCH_VFIO
-+       depends on VFIO
-+
- config HAVE_KVM_INVALID_WAKEUPS
-        bool
- 
-
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
--- 
-2.42.0
-
+Jason
