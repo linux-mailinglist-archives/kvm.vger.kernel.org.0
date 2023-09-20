@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AF147A88CE
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 17:46:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2D5A7A88D2
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 17:46:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236798AbjITPqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 11:46:37 -0400
+        id S236837AbjITPqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 11:46:42 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236779AbjITPqf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 11:46:35 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A031ACA
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:28 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-690f7d73a3aso534711b3a.0
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:28 -0700 (PDT)
+        with ESMTP id S236768AbjITPqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 11:46:39 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D9DAF
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:32 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bf6ea270b2so53809625ad.0
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 08:46:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695224788; x=1695829588; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1695224792; x=1695829592; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sAr/f3EP2NDO5TcbIFTZtzzZHLVf3n++r+Cj6Pd3+Fs=;
-        b=Drsvbd7BiH5l19WrmmwzoEKJC8NtpPdS0J9DbFak31f859CyaM6sOmnUBMDp/IfL1F
-         LkJ5jteocsE2/eQBBmGI9+fDXDxTR7EbIwNIr1Bzsb+oidwi2oqYqFwN1ki2jk1CNGgz
-         gPXgEMAJ2R35uCLOUn6qRKZU6vrWFLf7kyincqCPQ6NgH8cpf7BNzIwpaZv+8bgVvKqq
-         UXF9DYK/3uZvaKEe3AF0xPCHYdr8qkVSUo1nLUe+bdQMTfiNPXLMoqr6MeuNXvYu+pva
-         YJ1Ky/7r9zVEZVb4PEgymE0HF8ibqr4rV9kS9nmDK7xgrkIwJXjPB2GQXdkUGmtnTtoD
-         JPRA==
+        bh=0WW4VSH0fAhQvFEKg4libvP4KxfqhgcxX9zTpJuWWZQ=;
+        b=JTE3Q4KZNmEdUfs+/qgEQ9QGU4qBiEoXXDvkuzh7Y12FlV2UT9u2VeRkPLvlLXBQRt
+         cmL+MPPPRg0zZRNrj6oNwTLOkiT6+cHpFqErMXA0jrt0m5OeAsJ50DMoW6F0WBh8QYPY
+         s+VuqRmdHOKmxFU+VaBJzZ2lD/1mru24rThiVBFdah+jxtOgMHHH/cSKBD5qSMnjlkdv
+         F7kKZOul0ARaXEqqf+AFPu5BSQMu+wW2PG4sN4IgeXhOTLgKSBY31uilyP9gra+JZ3bs
+         YLJuDAq6hbjjAWeFFRZBm35V3U77XzQAYfvPG3AO2moqG8HXcuBUg9j/5DMifXU3QiAV
+         XkBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695224788; x=1695829588;
+        d=1e100.net; s=20230601; t=1695224792; x=1695829592;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sAr/f3EP2NDO5TcbIFTZtzzZHLVf3n++r+Cj6Pd3+Fs=;
-        b=Gg+znHJoa00dV+0ziTyegIEF4HszjuBrczFWIT3dIjZj8mPTxl2Bq6jo3fDIcVSM/r
-         ZzhQ8Iir3oqh0vws1x3f/rAFDH6B2Bx3SA8CwrLerpYqOovS3y7tGhPISX1+KQj6Dhxs
-         zWEGlFRWO6pVZenlWcA9bdH09BlAlT8U01oxAN7dMUNrvRRInEKORBfzMTrVITHdGEJS
-         4RG7kso8nGkYAziht+n3yQLrZVxIFQMAeU2Br/562dhTo8pUX3IgYsIZIBdIZfMy48yz
-         MgrOQTEOyd4UcUuB685exVHRqf+jdyeL8nLKH8IyQCoLX/H+TNLoRX07Q97Qq0gvLy8w
-         RKxw==
-X-Gm-Message-State: AOJu0YyKsjDDGxkgArIdWlQnEkDGfVpMMKcesfFBaFnPjUzYgeLwuHgX
-        cS2k1e6WA9NVS93FVLu7yeiGuA==
-X-Google-Smtp-Source: AGHT+IGnfiCYXMUmmIwvFThBwyKCEOTkAK3sfnR/6AJriLPtWNmFBovg3gxnmLqki1f202xQpXq59A==
-X-Received: by 2002:a05:6a20:8410:b0:12e:5f07:7ede with SMTP id c16-20020a056a20841000b0012e5f077edemr3874367pzd.41.1695224787947;
-        Wed, 20 Sep 2023 08:46:27 -0700 (PDT)
+        bh=0WW4VSH0fAhQvFEKg4libvP4KxfqhgcxX9zTpJuWWZQ=;
+        b=cWQgc5CH/Ea7bUsjxG+LXanZLtLH9iuEcgOzieeCBAQZnJ/coBten/Ku/A9VJGM8xl
+         foLVtBpRLMFKR63Jf+V+EgKIYecjxokDaWccGgYjIi+PegyQ2lJ8H7fIEfXtglEEo9ZD
+         d0HlcHA2x/Pu3TO68hCBBq2HrKk4IJoVqlyJEwEh+vFRbm845qKMirAq5SEIFSrUIAgO
+         G7NMfWB8VhdNKaKEqrjBLxf7/jqD6Gx/tXIIJHhLFk3ilHc+DtTcgZS15nNupLIqdbuv
+         m2To6A8B/u1Qn4SINX77XcrkXPWJpzPAzxdn2fbxaEonCDBjSDhjxbIbvHJa6p6ggDN8
+         YKeg==
+X-Gm-Message-State: AOJu0YzppfhHc1urK/vzuV2gL6337NRj81fNvNii40MIPDpmPCyDqMYv
+        kYt7z9BDwk+TpJYVEbXKsEE6ZA==
+X-Google-Smtp-Source: AGHT+IEQwIPKCinnV/MX16/4WhhXgBUWvl9vAEkhPYp7GStfJsefOl4SMlV88d8R5cEXT5ASSUov4A==
+X-Received: by 2002:a17:902:ed54:b0:1c3:9764:764f with SMTP id y20-20020a170902ed5400b001c39764764fmr2676177plb.48.1695224792293;
+        Wed, 20 Sep 2023 08:46:32 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([171.76.85.109])
-        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b001c0de73564dsm11995153plx.205.2023.09.20.08.46.24
+        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b001c0de73564dsm11995153plx.205.2023.09.20.08.46.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 08:46:27 -0700 (PDT)
+        Wed, 20 Sep 2023 08:46:31 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>,
@@ -60,9 +60,9 @@ Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
         Anup Patel <apatel@ventanamicro.com>,
         Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v2 1/4] RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
-Date:   Wed, 20 Sep 2023 21:16:05 +0530
-Message-Id: <20230920154608.1447057-2-apatel@ventanamicro.com>
+Subject: [PATCH v2 2/4] RISC-V: KVM: Fix riscv_vcpu_get_isa_ext_single() for missing extensions
+Date:   Wed, 20 Sep 2023 21:16:06 +0530
+Message-Id: <20230920154608.1447057-3-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230920154608.1447057-1-apatel@ventanamicro.com>
 References: <20230920154608.1447057-1-apatel@ventanamicro.com>
@@ -77,33 +77,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ISA_EXT registers to enabled/disable ISA extensions for VCPU
-are always available when underlying host has the corresponding
-ISA extension. The copy_isa_ext_reg_indices() called by the
-KVM_GET_REG_LIST API does not align with this expectation so
-let's fix it.
+The riscv_vcpu_get_isa_ext_single() should fail with -ENOENT error
+when corresponding ISA extension is not available on the host.
 
-Fixes: 031f9efafc08 ("KVM: riscv: Add KVM_GET_REG_LIST API support")
+Fixes: e98b1085be79 ("RISC-V: KVM: Factor-out ONE_REG related code to its own source file")
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 ---
- arch/riscv/kvm/vcpu_onereg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/riscv/kvm/vcpu_onereg.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 1b7e9fa265cb..e7e833ced91b 100644
+index e7e833ced91b..b7e0e03c69b1 100644
 --- a/arch/riscv/kvm/vcpu_onereg.c
 +++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -842,7 +842,7 @@ static int copy_isa_ext_reg_indices(const struct kvm_vcpu *vcpu,
- 		u64 reg = KVM_REG_RISCV | size | KVM_REG_RISCV_ISA_EXT | i;
+@@ -460,8 +460,11 @@ static int riscv_vcpu_get_isa_ext_single(struct kvm_vcpu *vcpu,
+ 	    reg_num >= ARRAY_SIZE(kvm_isa_ext_arr))
+ 		return -ENOENT;
  
- 		isa_ext = kvm_isa_ext_arr[i];
--		if (!__riscv_isa_extension_available(vcpu->arch.isa, isa_ext))
-+		if (!__riscv_isa_extension_available(NULL, isa_ext))
- 			continue;
+-	*reg_val = 0;
+ 	host_isa_ext = kvm_isa_ext_arr[reg_num];
++	if (!__riscv_isa_extension_available(NULL, host_isa_ext))
++		return -ENOENT;
++
++	*reg_val = 0;
+ 	if (__riscv_isa_extension_available(vcpu->arch.isa, host_isa_ext))
+ 		*reg_val = 1; /* Mark the given extension as available */
  
- 		if (uindices) {
 -- 
 2.34.1
 
