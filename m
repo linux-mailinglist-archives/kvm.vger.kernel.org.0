@@ -2,28 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 084FD7A8BD6
+	by mail.lfdr.de (Postfix) with ESMTP id D0A837A8BD7
 	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 20:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbjITSdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 14:33:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57564 "EHLO
+        id S229539AbjITSdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 14:33:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjITSde (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 14:33:34 -0400
-Received: from out-229.mta1.migadu.com (out-229.mta1.migadu.com [IPv6:2001:41d0:203:375::e5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81CAC9
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 11:33:27 -0700 (PDT)
+        with ESMTP id S229527AbjITSdf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 14:33:35 -0400
+Received: from out-230.mta1.migadu.com (out-230.mta1.migadu.com [IPv6:2001:41d0:203:375::e6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A11CA
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 11:33:28 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695234804;
+        t=1695234806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7Nhz4H8l1rfYTcw7mM0IBP0p2Qb41WdKVQC8nCsXgMk=;
-        b=gHcL/vSvfZM8btz3RWbjVBSooZ3+qS4fr7XTgqXoa1jTSQKV5jwIHc1Orw+m/MGh137Vx2
-        Hxv9EsHXxbnfM8ZH0du+Pyh31ODuOl2k2tncREOjgFEYiK/t4LkxRCSZHZWfhoyx3gh35N
-        opQ0p+dfZLfa0NY8z/44Egnpnewow4w=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M02LPbGRkqUCqocjBHRW2qD7GepRB2zieCdN3vBNTfg=;
+        b=gj79tL4L8C362CGx75M2Mx9cMyHOBLIBl60x2yMLUvuyS3XJx8JFCVyAkD/J43pI8JAN3K
+        5KV3w5839ZYgZ7qWF3uMTaF47vxC/AKyFs+PVSmz7NN6XlmeoDcNIxKTKKrsHkiM87XCAQ
+        EeRkjuposlR5aYDMszXDWV4AuZ0kN8U=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -32,10 +33,12 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Will Deacon <will@kernel.org>,
         Cornelia Huck <cohuck@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v10 00/12] KVM: arm64: Enable 'writable' ID registers
-Date:   Wed, 20 Sep 2023 18:32:57 +0000
-Message-ID: <20230920183310.1163034-1-oliver.upton@linux.dev>
+        Jing Zhang <jingzhangos@google.com>
+Subject: [PATCH v10 01/12] KVM: arm64: Allow userspace to get the writable masks for feature ID registers
+Date:   Wed, 20 Sep 2023 18:32:58 +0000
+Message-ID: <20230920183310.1163034-2-oliver.upton@linux.dev>
+In-Reply-To: <20230920183310.1163034-1-oliver.upton@linux.dev>
+References: <20230920183310.1163034-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -48,71 +51,223 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi folks,
+From: Jing Zhang <jingzhangos@google.com>
 
-This is hopefully the last take on the 'writable' ID registers series.
-The patches have been sitting on the mailing list for years in some form
-and it seems like we're approaching critical mass in terms of interest
-in the feature.
+While the Feature ID range is well defined and pretty large, it isn't
+inconceivable that the architecture will eventually grow some other
+ranges that will need to similarly be described to userspace.
 
-I've taken Jing's series and applied some cleanups to get things in
-order for 6.7.
+Add a VM ioctl to allow userspace to get writable masks for feature ID
+registers in below system register space:
+op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
+This is used to support mix-and-match userspace and kernels for writable
+ID registers, where userspace may want to know upfront whether it can
+actually tweak the contents of an idreg or not.
 
-v9 -> v10:
- - Picked up the latest KVM_ARM_GET_REG_WRITABLE_MASKS patch
- - Cleaned up the initializer macros for sys_reg_descs
- - Aggressively masked-out features that make no sense to modify
- - Added ZFR0 and the ISAR registers to the mix
- - Added documentation on how userspace is expected to use all the UAPI
+Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES) that
+returns a bitmap of the valid ranges, which can subsequently be
+retrieved, one at a time by setting the index of the set bit as the
+range identifier.
 
-v9: https://lore.kernel.org/kvmarm/20230821212243.491660-1-jingzhangos@google.com/
+Suggested-by: Marc Zyngier <maz@kernel.org>
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h |  2 +
+ arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++
+ arch/arm64/kvm/arm.c              | 10 +++++
+ arch/arm64/kvm/sys_regs.c         | 66 +++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h          |  2 +
+ 5 files changed, 112 insertions(+)
 
-Jing Zhang (7):
-  KVM: arm64: Allow userspace to get the writable masks for feature ID
-    registers
-  KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
-  KVM: arm64: Use guest ID register values for the sake of emulation
-  KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1
-  KVM: arm64: Allow userspace to change ID_AA64PFR0_EL1
-  KVM: arm64: selftests: Import automatic generation of sysreg defs
-  KVM: arm64: selftests: Test for setting ID register from usersapce
-
-Oliver Upton (5):
-  KVM: arm64: Reject attempts to set invalid debug arch version
-  KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
-  KVM: arm64: Allow userspace to change ID_AA64ISAR{0-2}_EL1
-  KVM: arm64: Allow userspace to change ID_AA64ZFR0_EL1
-  KVM: arm64: Document vCPU feature selection UAPIs
-
- Documentation/virt/kvm/api.rst                |   43 +
- Documentation/virt/kvm/arm/index.rst          |    1 +
- Documentation/virt/kvm/arm/vcpu-features.rst  |   47 +
- arch/arm64/include/asm/kvm_host.h             |    2 +
- arch/arm64/include/uapi/asm/kvm.h             |   32 +
- arch/arm64/kvm/arm.c                          |   10 +
- arch/arm64/kvm/sys_regs.c                     |  185 +-
- include/uapi/linux/kvm.h                      |    2 +
- tools/arch/arm64/include/.gitignore           |    1 +
- tools/arch/arm64/include/asm/gpr-num.h        |   26 +
- tools/arch/arm64/include/asm/sysreg.h         |  839 ++----
- tools/arch/arm64/tools/gen-sysreg.awk         |  336 +++
- tools/arch/arm64/tools/sysreg                 | 2497 +++++++++++++++++
- tools/testing/selftests/kvm/Makefile          |   15 +-
- .../selftests/kvm/aarch64/aarch32_id_regs.c   |    4 +-
- .../selftests/kvm/aarch64/debug-exceptions.c  |   12 +-
- .../selftests/kvm/aarch64/page_fault_test.c   |    6 +-
- .../selftests/kvm/aarch64/set_id_regs.c       |  478 ++++
- .../selftests/kvm/lib/aarch64/processor.c     |    6 +-
- 19 files changed, 3853 insertions(+), 689 deletions(-)
- create mode 100644 Documentation/virt/kvm/arm/vcpu-features.rst
- create mode 100644 tools/arch/arm64/include/.gitignore
- create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
- create mode 100755 tools/arch/arm64/tools/gen-sysreg.awk
- create mode 100644 tools/arch/arm64/tools/sysreg
- create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
-
-
-base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index af06ccb7ee34..5e3f778f81db 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1078,6 +1078,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			       struct kvm_arm_copy_mte_tags *copy_tags);
+ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+ 				    struct kvm_arm_counter_offset *offset);
++int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm,
++					struct reg_mask_range *range);
+ 
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f7ddd73a8c0f..01242274db87 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -505,6 +505,38 @@ struct kvm_smccc_filter {
+ #define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
+ #define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+ 
++/*
++ * Get feature ID registers userspace writable mask.
++ *
++ * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
++ * Feature Register 2"):
++ *
++ * "The Feature ID space is defined as the System register space in
++ * AArch64 with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7},
++ * op2=={0-7}."
++ *
++ * This covers all currently known R/O registers that indicate
++ * anything useful feature wise, including the ID registers.
++ *
++ * If we ever need to introduce a new range, it will be described as
++ * such in the range field.
++ */
++#define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)		\
++	({								\
++		__u64 __op1 = (op1) & 3;				\
++		__op1 -= (__op1 == 3);					\
++		(__op1 << 6 | ((crm) & 7) << 3 | (op2));		\
++	})
++
++#define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
++#define ARM64_FEATURE_ID_RANGE_IDREGS	BIT(0)
++
++struct reg_mask_range {
++	__u64 addr;		/* Pointer to mask array */
++	__u32 range;		/* Requested range */
++	__u32 reserved[13];
++};
++
+ #endif
+ 
+ #endif /* __ARM_KVM_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4866b3f7b4ea..1c4017a253fd 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -317,6 +317,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+ 		r = kvm_supported_block_sizes();
+ 		break;
++	case KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES:
++		r = ARM64_FEATURE_ID_RANGE_IDREGS;
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+@@ -1629,6 +1632,13 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+ 
+ 		return kvm_vm_set_attr(kvm, &attr);
+ 	}
++	case KVM_ARM_GET_REG_WRITABLE_MASKS: {
++		struct reg_mask_range range;
++
++		if (copy_from_user(&range, argp, sizeof(range)))
++			return -EFAULT;
++		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e92ec810d449..cdb9976d8091 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1373,6 +1373,13 @@ static inline bool is_id_reg(u32 id)
+ 		sys_reg_CRm(id) < 8);
+ }
+ 
++static inline bool is_aa32_id_reg(u32 id)
++{
++	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
++		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
++		sys_reg_CRm(id) <= 3);
++}
++
+ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+ 				  const struct sys_reg_desc *r)
+ {
+@@ -3572,6 +3579,65 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ 	return write_demux_regids(uindices);
+ }
+ 
++#define ARM64_FEATURE_ID_SPACE_INDEX(r)			\
++	ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(r),	\
++		sys_reg_Op1(r),				\
++		sys_reg_CRn(r),				\
++		sys_reg_CRm(r),				\
++		sys_reg_Op2(r))
++
++static bool is_feature_id_reg(u32 encoding)
++{
++	return (sys_reg_Op0(encoding) == 3 &&
++		(sys_reg_Op1(encoding) < 2 || sys_reg_Op1(encoding) == 3) &&
++		sys_reg_CRn(encoding) == 0 &&
++		sys_reg_CRm(encoding) <= 7);
++}
++
++int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *range)
++{
++	const void *zero_page = page_to_virt(ZERO_PAGE(0));
++	u64 __user *masks = (u64 __user *)range->addr;
++
++	/* Only feature id range is supported, reserved[13] must be zero. */
++	if (range->range != ARM64_FEATURE_ID_RANGE_IDREGS ||
++	    memcmp(range->reserved, zero_page, sizeof(range->reserved)))
++		return -EINVAL;
++
++	/* Wipe the whole thing first */
++	if (clear_user(masks, ARM64_FEATURE_ID_SPACE_SIZE * sizeof(__u64)))
++		return -EFAULT;
++
++	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
++		const struct sys_reg_desc *reg = &sys_reg_descs[i];
++		u32 encoding = reg_to_encoding(reg);
++		u64 val;
++
++		if (!is_feature_id_reg(encoding) || !reg->set_user)
++			continue;
++
++		/*
++		 * For ID registers, we return the writable mask. Other feature
++		 * registers return a full 64bit mask. That's not necessary
++		 * compliant with a given revision of the architecture, but the
++		 * RES0/RES1 definitions allow us to do that.
++		 */
++		if (is_id_reg(encoding)) {
++			if (!reg->val ||
++			    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0()))
++				continue;
++			val = reg->val;
++		} else {
++			val = ~0UL;
++		}
++
++		if (put_user(val, (masks + ARM64_FEATURE_ID_SPACE_INDEX(encoding))))
++			return -EFAULT;
++	}
++
++	return 0;
++}
++
+ int __init kvm_sys_reg_table_init(void)
+ {
+ 	struct sys_reg_params params;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 13065dd96132..2102df261f1b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1192,6 +1192,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_COUNTER_OFFSET 227
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
++#define KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES 230
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1562,6 +1563,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ /* Available with KVM_CAP_COUNTER_OFFSET */
+ #define KVM_ARM_SET_COUNTER_OFFSET _IOW(KVMIO,  0xb5, struct kvm_arm_counter_offset)
++#define KVM_ARM_GET_REG_WRITABLE_MASKS _IOR(KVMIO,  0xb6, struct reg_mask_range)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
