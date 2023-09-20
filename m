@@ -2,181 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A56B7A83E9
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 15:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 701687A8422
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 15:56:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236359AbjITNwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 09:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54580 "EHLO
+        id S236598AbjITN4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 09:56:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234565AbjITNwO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 09:52:14 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9F1AC
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:52:08 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-274d3ff35e5so2624175a91.2
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:52:08 -0700 (PDT)
+        with ESMTP id S236606AbjITNzj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 09:55:39 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76062D9
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:55:07 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c15767524so66874727b3.0
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 06:55:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695217928; x=1695822728; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FzKUIkp2N4mFsPMBkGOtGZ83qroR9oeUcPf9C3+REGI=;
-        b=Afz5XzDwptMY7dWBZQPXw2i0KdFVRR6oMLfCqIQ9e7jBl6L8qTcD5KYq5ZThPKHSv4
-         t49sU10OIwYxFm0vm2HM9LJjDpPlhBxYQtQvW5PKAuFvf1h9nRVSFgW409JijUhfwDtk
-         FM31hIqH8mmQ50yRJXCu4e28aNrpm2h6MKLutBcb6EgpzMsS3DP0DIkzK4rBBi30cJOR
-         1+VWSEmGmvo6XyqtYLfIRrZyeojrpCbKjoiQi+7AZRzIAN8JcOYDrgfqOO2VwMvTTjku
-         KbuRfhoEThYJGT1bSb8+FdOLSG3cX9hqSd18DLatbNq0Ewvilc62/H2UcUU/ftddgtn4
-         sofQ==
+        d=google.com; s=20230601; t=1695218106; x=1695822906; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
+        b=qYN6MLIfTj4icmmBpIkd0WLhJxjSRWRnp5CVrZ5zO23Hc6SEWKaxnDv2NJItwfDuFQ
+         6RVvMGhZPLFVWocauiDyLryXn63S6KPTLdALA3Qsdgqj3uuPB/A2o/4ptf1HYp9bQI/0
+         1cYLmwlGz2SJqRrIPPncawpZ4aDzCTJ8sW2gL6tfKGnzilsZLa6El4ASlO1PaFkjNm/O
+         bYywfPO/0UW/nevxIlFfp0aeaozdgulhoho9Sa50zXYSvg9W6zOTkgKB/8FODKp3Zw2Z
+         dwA7/f8AInE7LDVv1jVJABSqsl1VCpa8fzDiXuUQzjW4V/dFydMGpeKFv2KS3ghLlvrS
+         QzZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695217928; x=1695822728;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FzKUIkp2N4mFsPMBkGOtGZ83qroR9oeUcPf9C3+REGI=;
-        b=IClRie2UgfyimtLF0PhiuifQqew838sYlwQbVHegkDa+IpDqIAz5MYp0HEAowkT4w2
-         UoUpzbYYZRuojaqvIYOPfMrXhTnXI1CFgNtbAl5yAG0XdF8zc0rz3vDpOWrRXYj7IPuh
-         WY2Sz0C31IDgCiguukdsF2itsMvsYN4hZBNiAXP4EI/vfmdmVMLXoYtYmAEuzonTwEgt
-         C5qvLs004BH6WNQaaTfJohhjaOkOF71njeoaWWdeJgsOUcUbtzBiStFZ+83s+sWcJlnC
-         1pQmV3ByEUSNcBLiDXa4GlVvEHhAb/sehrr4tgw6RdMsNlROR2r0lJWCPJAqPuBvhW1W
-         L06A==
-X-Gm-Message-State: AOJu0Yyuc/mEjRFsucTxJGkTehZ0OCRR6nmPxi6Pm9yezn2o9DnR6jA4
-        WD9L/ZTVsT0kecbPmYqNR35z+14JQ9Rfebcif7KjJQ==
-X-Google-Smtp-Source: AGHT+IGXSUP8486WAuGjNv3n0pBFc9g0bpvw4aa5VzPg+ObGcV35R+/p4WGbHUmzy1ayTCndxJcGUvNBRm3i9v1Kurw=
-X-Received: by 2002:a17:90a:3d43:b0:26b:7d8e:edf9 with SMTP id
- o3-20020a17090a3d4300b0026b7d8eedf9mr2256888pjf.49.1695217928154; Wed, 20 Sep
- 2023 06:52:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230918180646.1398384-1-apatel@ventanamicro.com>
- <20230918180646.1398384-5-apatel@ventanamicro.com> <CAOnJCU+h-Y_i=HkCf194SLWp-7bqzMhRLC31q0xxQDMuLppapA@mail.gmail.com>
-In-Reply-To: <CAOnJCU+h-Y_i=HkCf194SLWp-7bqzMhRLC31q0xxQDMuLppapA@mail.gmail.com>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Wed, 20 Sep 2023 19:21:56 +0530
-Message-ID: <CAK9=C2XFGoZ-JZmMv4qmgzE+0Rt_pv+5k8UMJ0ivh=MaBoxxhA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] KVM: riscv: selftests: Selectively filter-out AIA registers
-To:     Atish Patra <atishp@atishpatra.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
+        d=1e100.net; s=20230601; t=1695218106; x=1695822906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0APReAt4bNnnd5kx+NahuCYj0tgbUgwxY6/xmv3q1x8=;
+        b=LDJr9JGxr8qEOv/sPhjkexLqpags/m7YiKsLcVZ+at60cfhw7hvLgOhh2kKzKSjLRk
+         JmL1zY62EZr+urL9lhIVSxdzCqc7uwa9oiN+G9GkLf81dFJ1N9cKFM0fGStIs/x6AlyK
+         6Vg/biGQTsWDLzfFXfFk3BI8fJ0VfIE5d30ug4g9HcDC6r0mjsgKRYoFCJjO5d3lWy1p
+         GamCxqgB5YgEd2MEC0caS9MMRuK+KYEzCmrPWMvEQr5TauDOzUQz5Yc1N9KX0lEuor+s
+         0StoyFcNQv+t4r1YJNOTuEyTFCPvXIjHrYAGs6d5F/T4sXIRZl0sPAOS4dt2tzgHp7uy
+         Kxfg==
+X-Gm-Message-State: AOJu0YyxF6y3+lDAE5H7u4AJeMY7wBNzdkVKzbS/O3BC0cZ9l9vdwggu
+        SzPcrBRAj0zRUidVwlJrS4oTX22dXtw=
+X-Google-Smtp-Source: AGHT+IHuQ24Hy0wlZqpKThD2hndi3rYWapG+J/d1L/ai4z7W/k7rmZdxNg2zwHr4zmYKJTJyjaSKmjFgB/U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ae57:0:b0:59b:ee27:bbe9 with SMTP id
+ g23-20020a81ae57000000b0059bee27bbe9mr35901ywk.9.1695218106527; Wed, 20 Sep
+ 2023 06:55:06 -0700 (PDT)
+Date:   Wed, 20 Sep 2023 06:55:05 -0700
+In-Reply-To: <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-3-seanjc@google.com>
+ <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+Message-ID: <ZQr5uXhV6Cnx4DYT@google.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for mmu_notifier_retry
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xu Yilun <yilun.xu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 20, 2023 at 1:43=E2=80=AFAM Atish Patra <atishp@atishpatra.org>=
- wrote:
->
-> On Mon, Sep 18, 2023 at 11:07=E2=80=AFAM Anup Patel <apatel@ventanamicro.=
-com> wrote:
-> >
-> > Currently the AIA ONE_REG registers are reported by get-reg-list
-> > as new registers for various vcpu_reg_list configs whenever Ssaia
-> > is available on the host because Ssaia extension can only be
-> > disabled by Smstateen extension which is not always available.
-> >
-> > To tackle this, we should filter-out AIA ONE_REG registers only
-> > when Ssaia can't be disabled for a VCPU.
-> >
-> > Fixes: 477069398ed6 ("KVM: riscv: selftests: Add get-reg-list test")
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  .../selftests/kvm/riscv/get-reg-list.c        | 23 +++++++++++++++++--
-> >  1 file changed, 21 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/t=
-esting/selftests/kvm/riscv/get-reg-list.c
-> > index 76c0ad11e423..85907c86b835 100644
-> > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > @@ -12,6 +12,8 @@
-> >
-> >  #define REG_MASK (KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK)
-> >
-> > +static bool isa_ext_cant_disable[KVM_RISCV_ISA_EXT_MAX];
+On Wed, Sep 20, 2023, Xu Yilun wrote:
+> On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
+> > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+> > +{
+> > +	lockdep_assert_held_write(&kvm->mmu_lock);
 > > +
-> >  bool filter_reg(__u64 reg)
-> >  {
-> >         switch (reg & ~REG_MASK) {
-> > @@ -48,6 +50,15 @@ bool filter_reg(__u64 reg)
-> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI:
-> >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM:
-> >                 return true;
-> > +       /* AIA registers are always available when Ssaia can't be disab=
-led */
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(siselect):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(iprio1):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(iprio2):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(sieh):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(siph):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(iprio1h):
-> > +       case KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_=
-CSR_AIA_REG(iprio2h):
-> > +               return isa_ext_cant_disable[KVM_RISCV_ISA_EXT_SSAIA] ? =
-true : false;
->
-> Ahh I guess. you do need the switch case for AIA CSRs but for ISA
-> extensions can be avoided as it is contiguous.
-
-Fow now, let's leave it as-is because this way get-reg-list will
-complain if some new ONE_REG register is missed out.
-
->
-> >         default:
-> >                 break;
-> >         }
-> > @@ -71,14 +82,22 @@ static inline bool vcpu_has_ext(struct kvm_vcpu *vc=
-pu, int ext)
-> >
-> >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
-> >  {
-> > +       int rc;
-> >         struct vcpu_reg_sublist *s;
-> > +       unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] =3D { 0 };
+> > +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
 > > +
-> > +       for (int i =3D 0; i < KVM_RISCV_ISA_EXT_MAX; i++)
-> > +               __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(i), &isa_ext_sta=
-te[i]);
-> >
-> >         /*
-> >          * Disable all extensions which were enabled by default
-> >          * if they were available in the risc-v host.
-> >          */
-> > -       for (int i =3D 0; i < KVM_RISCV_ISA_EXT_MAX; i++)
-> > -               __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(i), 0);
-> > +       for (int i =3D 0; i < KVM_RISCV_ISA_EXT_MAX; i++) {
-> > +               rc =3D __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(i), 0);
-> > +               if (rc && isa_ext_state[i])
-> > +                       isa_ext_cant_disable[i] =3D true;
-> > +       }
-> >
-> >         for_each_sublist(c, s) {
-> >                 if (!s->feature)
-> > --
-> > 2.34.1
-> >
->
-> Otherwise, LGTM.
->
-> Reviewed-by: Atish Patra <atishp@rivosinc.com>
->
-> --
-> Regards,
-> Atish
+> >  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+> >  		kvm->mmu_invalidate_range_start = start;
+> >  		kvm->mmu_invalidate_range_end = end;
+> 
+> IIUC, Now we only add or override a part of the invalidate range in
+> these fields, IOW only the range in last slot is stored when we unlock.
 
-Regards,
-Anup
+Ouch.  Good catch!
+
+> That may break mmu_invalidate_retry_gfn() cause it can never know the
+> whole invalidate range.
+> 
+> How about we extend the mmu_invalidate_range_start/end everytime so that
+> it records the whole invalidate range:
+> 
+> if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
+> 	kvm->mmu_invalidate_range_start = start;
+> 	kvm->mmu_invalidate_range_end = end;
+> } else {
+> 	kvm->mmu_invalidate_range_start =
+> 		min(kvm->mmu_invalidate_range_start, start);
+> 	kvm->mmu_invalidate_range_end =
+> 		max(kvm->mmu_invalidate_range_end, end);
+> }
+
+Yeah, that does seem to be the easiest solution.
+
+I'll post a fixup patch, unless you want the honors.
