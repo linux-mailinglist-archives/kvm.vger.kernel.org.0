@@ -2,217 +2,390 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5EF87A723B
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 07:41:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F3557A728C
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 08:07:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbjITFll (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 01:41:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37686 "EHLO
+        id S233009AbjITGHr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 02:07:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbjITFli (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 01:41:38 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475EE8F;
-        Tue, 19 Sep 2023 22:41:32 -0700 (PDT)
+        with ESMTP id S232327AbjITGHo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 02:07:44 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7FB9F;
+        Tue, 19 Sep 2023 23:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695188492; x=1726724492;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=2w3CXv16jh/HeLZ2b8RizYCEaY8sdsLRpWeMt5tRBxM=;
-  b=ZbAh41I4RHEQu5CiUwWpFC4Rq9ZPUaojGbnAq2G++g0+FiC+8xrqidgA
-   yRoXrttzXplw3xnfwJAvoXkxigvx9eOAPcxbVEdisR1RA/602bUki9Y1a
-   q6d6ARkR3afCZtIldlJwMTVH8HHijrAob3A2rvHOHGh4yXQWb0g7cyAV1
-   PgA/zDTT+lesH3IQx8Zhe7bgJcAk4WnVWbxeIBeef0ud2jdwMoem8leo0
-   fKchCHEYD7b1mioDrc6ubCjneMCAe/Syu3PmYMs0OhscY6Rix01NNl8RS
-   QebsKZ8kZsuM2q02HDuuEITqgHLmWMTOzgbqdC9SixG9iFXfN4h8OCYTp
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="444224174"
+  t=1695190058; x=1726726058;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xzxB1PT2WKDcrdmJMNjWM/AAXQaE89QtQicHLkgqo00=;
+  b=A1v4TLGsGJN4X97sihnhKoI/glVKnszfX7eLqp+z3AokryJ7MDaG/gSN
+   tI5O52F6mQwRbQjxT9OF2V4qV9tLh3TeYuMD+WUt3anSIqgb/ovhVmMKw
+   +k+W9/h85KNV2JPX7ysi/2QqRb/fV0WdUEdjHbPsdel4mllAZaIrZBq+2
+   8THqIin624HeltQHBzAGmP285om3W8bhe2zUqfnUISVAzgOTCd6GNJNPk
+   pFcqevuqOVlBwRuQDihYiMJJaNxAjsYL9+jmaB1icIfy2Whqn0ZSDRJlv
+   cra+5L3X/mA7162Y7AIqKKMo96gTng5c8rX2Eb7EIPBpXIY/B36OYDF1o
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="370449369"
 X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="444224174"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 22:41:31 -0700
+   d="scan'208";a="370449369"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 23:07:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="920145390"
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="870242723"
 X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="920145390"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Sep 2023 22:41:31 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 19 Sep 2023 22:41:30 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 19 Sep 2023 22:41:30 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 19 Sep 2023 22:41:30 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 19 Sep 2023 22:41:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F10j0F/gnzqQmE5yAJ8E1gJ3Um6bTKeUMh7JwgbiwvzLFlE0P+5anxwiLwSqM5epHyFTrk8paUZFBpVMGY35xOanE9GosAqtMbE4nQx35ngqrnK7vevhr13Vv52Bfn8z/Rz28Pj/aenkrEVI6f9zPlaUBn5KYvj2xmqdGY/yLzSg7ghH8WBMHW5d25s7ItnnUBN+oJcfZq2O/uEQz7P67uXiXbh2N3Soa5+CjNpbfh3gF0r86t7YaVPbzuHovOG3+7aLuR0YGaLt7UPvWFmIOrAiG2sxEFRqIMZysOfxjFjn+lF8/xyAarza453TJTx6z814f8jdCilPtdlkeSqdcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+pP2dI0ru7CTFHmTlRaccfgPZMzozAFI+dCUPYMEX+8=;
- b=dTLEjSqGdinI+w26/N3r8iSPG8ilrnuRyxwKw63OJjOBhV90zS3XnLlup9+rnTXApr9Ja10TY5hfpBBPY1d/fZSFfpj/JWczDUQEb8aIyty4/ds1z7CPTsyDzZtTV4WK79l4X4/4PjPIldbYPViPBn63Mk94TQWzYRsVW/b/5Mk6R06VSDtxBwq+uiXYy861KFs8GNDHZuyhmM2RwCZicWlVMSJkT+HKlU1XL7ho5QA5FRjrStV6s1C5Pq8Gdc9oOejmrH03vkGnIWazV/8plWLSQ8dm16FBeDzLz5xd34wJTqmZOUzk7xxeXqcOVKoAdD45tB+eF+CQUsbBYPhlGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by SA1PR11MB6846.namprd11.prod.outlook.com (2603:10b6:806:2b0::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28; Wed, 20 Sep
- 2023 05:41:26 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::a64d:9793:1235:dd90]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::a64d:9793:1235:dd90%7]) with mapi id 15.20.6813.018; Wed, 20 Sep 2023
- 05:41:26 +0000
-Message-ID: <74533792-7dcd-d745-dc07-671260bc9e22@intel.com>
-Date:   Wed, 20 Sep 2023 13:41:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 6/6] iommu/vt-d: Add domain_alloc_user op
-To:     Yi Liu <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-References: <20230919092523.39286-1-yi.l.liu@intel.com>
- <20230919092523.39286-7-yi.l.liu@intel.com>
-Content-Language: en-US
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <20230919092523.39286-7-yi.l.liu@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI1PR02CA0033.apcprd02.prod.outlook.com
- (2603:1096:4:1f6::14) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+   d="scan'208";a="870242723"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orsmga004.jf.intel.com with ESMTP; 19 Sep 2023 23:07:26 -0700
+Date:   Wed, 20 Sep 2023 14:07:00 +0800
+From:   Xu Yilun <yilun.xu@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v12 02/33] KVM: Use gfn instead of hva for
+ mmu_notifier_retry
+Message-ID: <ZQqMBEL61p739dpF@yilunxu-OptiPlex-7050>
+References: <20230914015531.1419405-1-seanjc@google.com>
+ <20230914015531.1419405-3-seanjc@google.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|SA1PR11MB6846:EE_
-X-MS-Office365-Filtering-Correlation-Id: 51dc0fcd-be76-4bd8-7fce-08dbb99c3b11
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +Dud2Tb5bnIk5JBCdCmFEwf11rJ3VPCnASI8KvrDLbHGQby7Bu/BsUnLpGd7WjlgStURNclWN4URMg34AJTTdZRi+Q1b6BEYsxCIAsK4n/0cYp4dN5YqpxlUeXeFC1NwZnsDdo6B7IPo1vj9ER9ytYemqw82Le6x/rJX8hfRwkK2ucBPLEifrtUCxLqWe5NP1cPucdyQwWPGc3EXUYC9NRYTowBbnSy4CvK2vRA9JmXyzTGOEGoqVUj81hI1USoDXs1+2T0EKau6MGZcgPpBD6plwoNmF9xBBhr923iVT9AI6rwSZcvh5bPBd0I7+edLdW64Nti80lke/D6gLk+aNiRnt23KX+kCmQhOTxSJXu2Mww0siXLyEgvxwvI1HJdZGGPpQDZ0g9/NzDLguZUlpeRkOlGYYOT2YP2cRZm2tC4EEChg4JTu5wxlAlfes98EoNwMOs+/QCMo0iTrS2zREnQIZfAAiJL+PyMuvWhqLX2D2uOnPbx58WX50B5Fg8jgAPtM7/i+q+wF1U5u5Bn5nc+RyWotTIzYplS1q32b8oK2qfEbl9f586s0bIeSqDSbfe5L0kLLXttTir4Sey1J+TFEw1tvkPiXNZ39JwnCkRnBeeLyhpvhi6blDU5om16zGSLOjUrqIxnzLyo3ZxRPlQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(39860400002)(396003)(1800799009)(186009)(451199024)(478600001)(6666004)(53546011)(6486002)(6506007)(6512007)(26005)(2616005)(2906002)(4326008)(66476007)(66556008)(66946007)(54906003)(316002)(110136005)(8676002)(5660300002)(41300700001)(8936002)(7416002)(82960400001)(31696002)(36756003)(86362001)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N29wS2ZyUHBDN1hBbVBONzYwdmVMSEJqc3pCckVqcVBIZGM0QUZrUG1hOUQ1?=
- =?utf-8?B?VDhRMEhQTXlnYkU2anQxSDQ3Ymx2clliUXlCZDlFNisyQXErVEJjeU02WWVK?=
- =?utf-8?B?ZU96ekNnT3pWN0ZDVHNrYjRwWFlkRTZkT2RKd1pnVS90am1QWDJ3b0ExOWVQ?=
- =?utf-8?B?bGlDdFJaY21sT3QrVkdhY0pDZHBEc1k1ZWNCOEtmdU54UGFtU25ablNOLzEz?=
- =?utf-8?B?bFZPbGpMR1RSSlIyN24vaERlb05FTWRocmE4UzgyelZjUFlwa1JNR0tpN2lO?=
- =?utf-8?B?aDI4N3ZpRXJZSVBEenNRdkdkZ0Mxb09BeERMendPN01iUzduY0hNMXZ6R1Bs?=
- =?utf-8?B?WksvYW55cTVRUlNSSFdkUVJxd1NxSy9Tdm9QVzlqTGdiSE1pSkN1SnMwTnk3?=
- =?utf-8?B?bmRuTU1zSGpPQmZCNDArZjZuOTNoaEYzM0tqajFqSHRkUlh3My9PY3hzMklE?=
- =?utf-8?B?R0Q3YWFhZ2NWR20yZFVKV0o4TGYxWUhKTVYxUWdIUUxGa0lvVUt4QzJOV1ln?=
- =?utf-8?B?R2lvZ3ZUblNXSFRxc1BZcUF3bTNTNjEwRm96Rm9ENm5PRFJqc0FLSUdiRVli?=
- =?utf-8?B?UVNKWEc1UFk1QUpzaEtTbnNsUkc1NGhVVmM5bHk4eUMzQnJUWHJ6eWYxdUZl?=
- =?utf-8?B?UHdIZGQyL3RLTHgrTTgyQnI3aWpNRk55bUdZQmVNTTNXSHdHTFdzNmZyWlhj?=
- =?utf-8?B?L2RrczFDbFc0YTBpK1g1OW0vTWJyTFJYSTBkdkRhUjVEaU9wRklwUnBNT24r?=
- =?utf-8?B?YUVGbW9NeHZxTmV0NDh0aWlxUEhYTktkbXBwOGk2MHlIdFlIVDF3MWZLRXo3?=
- =?utf-8?B?b2hTRHBDZGFmeElRSkdFU0Y5VEhmQUxGQTNHYzNVTm80NlZhOGRocG9oM3F3?=
- =?utf-8?B?WURERE9ZKzZ0MFloSFZCUjBwWG5iMmVtL01MTVpMMUFMR2FacHNVeHlYQ2RX?=
- =?utf-8?B?K0d5L0FpVmhoV3NVNEFvTlp3R2EveFRBNXVxMUNSZEF0ZTBFem1iQjRqOTV5?=
- =?utf-8?B?Y29KdnBSZUlLcUhiNkNuUG15VjZ0TGErRk1GSTAzZmVNMy9zTFZnOSt4WUpj?=
- =?utf-8?B?VWpobVU5MEltY0w5ZmRHTk1TRW1CTEZBK2FQNDhQVVV6MUo0RFBhdVZSZkFH?=
- =?utf-8?B?VTVoaS9QYTg5dGZGU0VKRmsrSDBDOWZGNTEyS2NxNjRyd2N3QnRlZENPYWdH?=
- =?utf-8?B?SGRjMGdsTGxHR0JlYmZua09IQU1GMkhwcUhsNUs4ZFNPdVRBUzBhWmdJb0Fx?=
- =?utf-8?B?ckxMMXhZZXhDK3hJQXZWQzZDMmFoWCs5dEJsTTJNMExRbmpaQTJhNXBGaTht?=
- =?utf-8?B?NW1DVERncTFXVS90S25JL21rb1J1UThiUjZlTXl5U0hDUVYwS3RFdGFaWms1?=
- =?utf-8?B?L0E3enl2RENxeGJRS0pIL1ZXN0RvMmRQYmJpRDJad3M4T0RCdzRyOG14RDhC?=
- =?utf-8?B?dEZkcUprRnVxZDdlU0FqTk4ydFZJYVMzQ3FJSVMrVTUzVnpFRGZ0RU9hOGY0?=
- =?utf-8?B?NmVhaWhiK3RGN0NyVmJhclp4RWNGdjU4Z2xDZnVtSGhnWWF6SkN0QTVWQnBs?=
- =?utf-8?B?NlkzMlFHcldmSEp1ZGx3eTFJL3Byek0zUGVZZ2k4UXBWT0ZTOU54cU0vVk1i?=
- =?utf-8?B?c0wvV3dMSlVOeTdVSk90dXIvSys0b3dmMlhTZmtNbVNSK010VXY2S0d5eHRN?=
- =?utf-8?B?Rm9GME1CTTFqeGoyeUJGVDNoSExiS1VBVXJzeGxxdXhVejFIVTVJbGZQK3pX?=
- =?utf-8?B?eU1Md21BMzZJNy9WbEZjeGt0RU84L1BEK2NJNGJGQ3FvdWhOZDB0OTNZeFN1?=
- =?utf-8?B?SkdhVnRIaytlQnUyaXNwL0w5djl1VmNyQWd6WFY4elVmZ09FZDc1WTl2aDAv?=
- =?utf-8?B?YXRJZTl6blZYeGUreVRscW1mMHBBVFVRcnZNd1BkL1EwT205a29LY05ZdFlQ?=
- =?utf-8?B?RUtpNjVYSWt6QnBKQWhxVWJmaTRvakxPdmNqMTBFOHVhcUZtR29MbHgzK0hG?=
- =?utf-8?B?WHhlT1NHUElyelNqNnBrRnBibmMxNkFsRmxCOTBlNjdpQ1hFbU9za0VBS3BM?=
- =?utf-8?B?RU02YzdEOFA0N2NPOEEyZ25NQUVGdjh2R1hSNm02WU5TaGdwMDlBbWZtWXFr?=
- =?utf-8?B?Z0xFdXVOQnR0ejlKUG84d1U0YnpkcWRpWGVsVXo3emk4UVg0YjdRZWRpSENt?=
- =?utf-8?B?bFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51dc0fcd-be76-4bd8-7fce-08dbb99c3b11
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 05:41:26.3146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R8tFE/Jm0aESYOK+l+BnxRdfGitbLUstImfGq0NJIPVlzo4iIjnE+1R5wy3cwnwBT6dCDn1MxlLUMGo9Kgybgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6846
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914015531.1419405-3-seanjc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/19/2023 5:25 PM, Yi Liu wrote:
-> This adds the domain_alloc_user op implementation. It supports allocating
-> domains to be used as parent under nested translation.
->
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+On 2023-09-13 at 18:55:00 -0700, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> Currently in mmu_notifier invalidate path, hva range is recorded and
+> then checked against by mmu_notifier_retry_hva() in the page fault
+                          ^
+
+Now it is mmu_invalidate_retry_hva().
+
+> handling path. However, for the to be introduced private memory, a page
+> fault may not have a hva associated, checking gfn(gpa) makes more sense.
+> 
+> For existing hva based shared memory, gfn is expected to also work. The
+> only downside is when aliasing multiple gfns to a single hva, the
+> current algorithm of checking multiple ranges could result in a much
+> larger range being rejected. Such aliasing should be uncommon, so the
+> impact is expected small.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> [sean: convert vmx_set_apic_access_page_addr() to gfn-based API]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   drivers/iommu/intel/iommu.c | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
->
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index 5db283c17e0d..491bcde1ff96 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -4074,6 +4074,25 @@ static struct iommu_domain *intel_iommu_domain_alloc(unsigned type)
->   	return NULL;
->   }
->   
-> +static struct iommu_domain *
-> +intel_iommu_domain_alloc_user(struct device *dev, u32 flags)
+>  arch/x86/kvm/mmu/mmu.c   | 10 ++++++----
+>  arch/x86/kvm/vmx/vmx.c   | 11 +++++------
+>  include/linux/kvm_host.h | 33 +++++++++++++++++++++------------
+>  virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++++++++---------
+>  4 files changed, 63 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e1d011c67cc6..0f0231d2b74f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3056,7 +3056,7 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>   *
+>   * There are several ways to safely use this helper:
+>   *
+> - * - Check mmu_invalidate_retry_hva() after grabbing the mapping level, before
+> + * - Check mmu_invalidate_retry_gfn() after grabbing the mapping level, before
+>   *   consuming it.  In this case, mmu_lock doesn't need to be held during the
+>   *   lookup, but it does need to be held while checking the MMU notifier.
+>   *
+> @@ -4358,7 +4358,7 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+>  		return true;
+>  
+>  	return fault->slot &&
+> -	       mmu_invalidate_retry_hva(vcpu->kvm, fault->mmu_seq, fault->hva);
+> +	       mmu_invalidate_retry_gfn(vcpu->kvm, fault->mmu_seq, fault->gfn);
+>  }
+>  
+>  static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> @@ -6253,7 +6253,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  
+>  	write_lock(&kvm->mmu_lock);
+>  
+> -	kvm_mmu_invalidate_begin(kvm, 0, -1ul);
+> +	kvm_mmu_invalidate_begin(kvm);
+> +
+> +	kvm_mmu_invalidate_range_add(kvm, gfn_start, gfn_end);
+>  
+>  	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+>  
+> @@ -6266,7 +6268,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  	if (flush)
+>  		kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end - gfn_start);
+>  
+> -	kvm_mmu_invalidate_end(kvm, 0, -1ul);
+> +	kvm_mmu_invalidate_end(kvm);
+>  
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 72e3943f3693..6e502ba93141 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6757,10 +6757,10 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	/*
+> -	 * Grab the memslot so that the hva lookup for the mmu_notifier retry
+> -	 * is guaranteed to use the same memslot as the pfn lookup, i.e. rely
+> -	 * on the pfn lookup's validation of the memslot to ensure a valid hva
+> -	 * is used for the retry check.
+> +	 * Explicitly grab the memslot using KVM's internal slot ID to ensure
+> +	 * KVM doesn't unintentionally grab a userspace memslot.  It _should_
+> +	 * be impossible for userspace to create a memslot for the APIC when
+> +	 * APICv is enabled, but paranoia won't hurt in this case.
+>  	 */
+>  	slot = id_to_memslot(slots, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT);
+>  	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+> @@ -6785,8 +6785,7 @@ static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	read_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_invalidate_retry_hva(kvm, mmu_seq,
+> -				     gfn_to_hva_memslot(slot, gfn))) {
+> +	if (mmu_invalidate_retry_gfn(kvm, mmu_seq, gfn)) {
+>  		kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
+>  		read_unlock(&vcpu->kvm->mmu_lock);
+>  		goto out;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index fb6c6109fdca..11d091688346 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -787,8 +787,8 @@ struct kvm {
+>  	struct mmu_notifier mmu_notifier;
+>  	unsigned long mmu_invalidate_seq;
+>  	long mmu_invalidate_in_progress;
+> -	unsigned long mmu_invalidate_range_start;
+> -	unsigned long mmu_invalidate_range_end;
+> +	gfn_t mmu_invalidate_range_start;
+> +	gfn_t mmu_invalidate_range_end;
+>  #endif
+>  	struct list_head devices;
+>  	u64 manual_dirty_log_protect;
+> @@ -1392,10 +1392,9 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+>  #endif
+>  
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+> -			      unsigned long end);
+> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+> -			    unsigned long end);
+> +void kvm_mmu_invalidate_begin(struct kvm *kvm);
+> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+> +void kvm_mmu_invalidate_end(struct kvm *kvm);
+>  
+>  long kvm_arch_dev_ioctl(struct file *filp,
+>  			unsigned int ioctl, unsigned long arg);
+> @@ -1970,9 +1969,9 @@ static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  	return 0;
+>  }
+>  
+> -static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
+> +static inline int mmu_invalidate_retry_gfn(struct kvm *kvm,
+>  					   unsigned long mmu_seq,
+> -					   unsigned long hva)
+> +					   gfn_t gfn)
+>  {
+>  	lockdep_assert_held(&kvm->mmu_lock);
+>  	/*
+> @@ -1981,10 +1980,20 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
+>  	 * that might be being invalidated. Note that it may include some false
+>  	 * positives, due to shortcuts when handing concurrent invalidations.
+>  	 */
+> -	if (unlikely(kvm->mmu_invalidate_in_progress) &&
+> -	    hva >= kvm->mmu_invalidate_range_start &&
+> -	    hva < kvm->mmu_invalidate_range_end)
+> -		return 1;
+> +	if (unlikely(kvm->mmu_invalidate_in_progress)) {
+> +		/*
+> +		 * Dropping mmu_lock after bumping mmu_invalidate_in_progress
+> +		 * but before updating the range is a KVM bug.
+> +		 */
+> +		if (WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA ||
+> +				 kvm->mmu_invalidate_range_end == INVALID_GPA))
+> +			return 1;
+> +
+> +		if (gfn >= kvm->mmu_invalidate_range_start &&
+> +		    gfn < kvm->mmu_invalidate_range_end)
+> +			return 1;
+> +	}
+> +
+>  	if (kvm->mmu_invalidate_seq != mmu_seq)
+>  		return 1;
+>  	return 0;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 0524933856d4..4fad3b01dc1f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -543,9 +543,7 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+>  
+>  typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+>  
+> -typedef void (*on_lock_fn_t)(struct kvm *kvm, unsigned long start,
+> -			     unsigned long end);
+> -
+> +typedef void (*on_lock_fn_t)(struct kvm *kvm);
+>  typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+>  
+>  struct kvm_mmu_notifier_range {
+> @@ -637,7 +635,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>  				locked = true;
+>  				KVM_MMU_LOCK(kvm);
+>  				if (!IS_KVM_NULL_FN(range->on_lock))
+> -					range->on_lock(kvm, range->start, range->end);
+> +					range->on_lock(kvm);
+> +
+>  				if (IS_KVM_NULL_FN(range->handler))
+>  					break;
+>  			}
+> @@ -742,15 +741,26 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>  	kvm_handle_hva_range(mn, address, address + 1, arg, kvm_change_spte_gfn);
+>  }
+>  
+> -void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+> -			      unsigned long end)
+> +void kvm_mmu_invalidate_begin(struct kvm *kvm)
+>  {
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+>  	/*
+>  	 * The count increase must become visible at unlock time as no
+>  	 * spte can be established without taking the mmu_lock and
+>  	 * count is also read inside the mmu_lock critical section.
+>  	 */
+>  	kvm->mmu_invalidate_in_progress++;
+> +
+> +	if (likely(kvm->mmu_invalidate_in_progress == 1))
+> +		kvm->mmu_invalidate_range_start = INVALID_GPA;
+> +}
+> +
+> +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
 > +{
-> +	struct iommu_domain *domain;
-> +	struct intel_iommu *iommu;
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
 > +
-> +	iommu = device_to_iommu(dev, NULL, NULL);
-> +	if (!iommu)
-> +		return ERR_PTR(-ENODEV);
+> +	WARN_ON_ONCE(!kvm->mmu_invalidate_in_progress);
 > +
-> +	if ((flags & IOMMU_HWPT_ALLOC_NEST_PARENT) && !ecap_nest(iommu->ecap))
-> +		return ERR_PTR(-EOPNOTSUPP);
+>  	if (likely(kvm->mmu_invalidate_in_progress == 1)) {
+>  		kvm->mmu_invalidate_range_start = start;
+>  		kvm->mmu_invalidate_range_end = end;
 
-The outer caller has checked (flags & IOMMU_HWPT_ALLOC_NEST_PARENT) before it comes here.
-If this callback is dedicated for nested domain allocation, then you may omit the condition here.
+IIUC, Now we only add or override a part of the invalidate range in
+these fields, IOW only the range in last slot is stored when we unlock.
+That may break mmu_invalidate_retry_gfn() cause it can never know the
+whole invalidate range.
 
+How about we extend the mmu_invalidate_range_start/end everytime so that
+it records the whole invalidate range:
+
+if (kvm->mmu_invalidate_range_start == INVALID_GPA) {
+	kvm->mmu_invalidate_range_start = start;
+	kvm->mmu_invalidate_range_end = end;
+} else {
+	kvm->mmu_invalidate_range_start =
+		min(kvm->mmu_invalidate_range_start, start);
+	kvm->mmu_invalidate_range_end =
+		max(kvm->mmu_invalidate_range_end, end);
+}
+
+Thanks,
+Yilun
+
+> @@ -771,6 +781,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+>  	}
+>  }
+>  
+> +static bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
+> +	return kvm_unmap_gfn_range(kvm, range);
+> +}
+> +
+>  static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  					const struct mmu_notifier_range *range)
+>  {
+> @@ -778,7 +794,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	const struct kvm_mmu_notifier_range hva_range = {
+>  		.start		= range->start,
+>  		.end		= range->end,
+> -		.handler	= kvm_unmap_gfn_range,
+> +		.handler	= kvm_mmu_unmap_gfn_range,
+>  		.on_lock	= kvm_mmu_invalidate_begin,
+>  		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+>  		.flush_on_ret	= true,
+> @@ -817,8 +833,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	return 0;
+>  }
+>  
+> -void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+> -			    unsigned long end)
+> +void kvm_mmu_invalidate_end(struct kvm *kvm)
+>  {
+>  	/*
+>  	 * This sequence increase will notify the kvm page fault that
+> @@ -833,6 +848,13 @@ void kvm_mmu_invalidate_end(struct kvm *kvm, unsigned long start,
+>  	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
+>  	 */
+>  	kvm->mmu_invalidate_in_progress--;
+> +
+> +	/*
+> +	 * Assert that at least one range must be added between start() and
+> +	 * end().  Not adding a range isn't fatal, but it is a KVM bug.
+> +	 */
+> +	WARN_ON_ONCE(kvm->mmu_invalidate_in_progress &&
+> +		     kvm->mmu_invalidate_range_start == INVALID_GPA);
+>  }
+>  
+>  static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+> -- 
+> 2.42.0.283.g2d96d420d3-goog
+> 
