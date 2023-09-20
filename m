@@ -2,223 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 272FF7A866C
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 16:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 742567A86A9
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 16:35:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235102AbjITOYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 10:24:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44510 "EHLO
+        id S234658AbjITOfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 10:35:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234779AbjITOYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 10:24:17 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99ECBCF
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 07:24:10 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5789f2f13fcso2085365a12.3
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 07:24:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695219850; x=1695824650; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DOI6e5Fz0eSccYOGv0a2XgOrMIQyrqURVkPdu4XpUSk=;
-        b=OdKcggWCZY2WLZg3BR5y9Qaj6VyhXLyvl6oJlR09C7EAcdWY7dpuz50dDSjkdtsSix
-         RMq4f2c/gEEGfZc3SPb7ZbGg38xceu/gcoJCvba3XRu7T9YAfJmD94dU2FUkIKE8Scpv
-         AjMy76ufmRmNk7SZqkvRXWqyoQMPu2HUzT3Xi1u7MZjreQ/5XUKrlvPn57iY//9mAIEO
-         uhPy6gEzm3RXtu+TSpKXLcEc//YAmg35x5qKKnXJG/tuB4GKwyzMKJABJ8gPnDz/mO6q
-         /giYzhixp+w5k4J00eWuKJF+0OWk+J0bGfmL7vSpMRs5E9O8HO4hXDdrjVXFbI0ThYsn
-         eOqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695219850; x=1695824650;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DOI6e5Fz0eSccYOGv0a2XgOrMIQyrqURVkPdu4XpUSk=;
-        b=SYt/EVLXjAjcwJ0rf1QdPBPHdoL/TFFZ8bTE3dxjW4IHkXv1dEDKm5RT6R66f4HrZq
-         vbTI7+BYiHMz8aHfBIHOKiKQ0JNjX2hA0n2XsBBzVj5vfuGuaizTN43/VgyyOS+K3vvp
-         MX7RY5ieNaIlevWWRqbKGVPS26puHEi1RfkbTz4WYPtut5kUC7oJojWvHi5cxZD6Kkl8
-         dGwSyZaDZjUHLnZeFxJyaFr4skUDTpvYbilYbAqqLq8TijleEXjw+R6UFqsrjiHx+I1F
-         aTl1uq8y6z9Kltj+qzWbRjVzYWgHo8bkRBE8ktROam9Qf0Sgc+JillU5hnrthROPWkX7
-         d5tA==
-X-Gm-Message-State: AOJu0YwHbaqOfZhB3uIUFp7J+iUNlzB4t1yF3TLiuuVPUho3Kk4YFpoH
-        X/d1L7+2XfkXKZvZa9MQzgnS35FhCKE=
-X-Google-Smtp-Source: AGHT+IG+7+KaIB01fLVIPGeb7tjb/zu/hrsNFs+xXo/mmyM/aDSVQYbb0kWI4ACm+gkgu18FM/xCEI0V+P0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f203:b0:1c0:ac09:4032 with SMTP id
- m3-20020a170902f20300b001c0ac094032mr25326plc.9.1695219850013; Wed, 20 Sep
- 2023 07:24:10 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 07:24:08 -0700
-In-Reply-To: <e397d30c-c6af-e68f-d18e-b4e3739c5389@linux.intel.com>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-15-seanjc@google.com>
- <e397d30c-c6af-e68f-d18e-b4e3739c5389@linux.intel.com>
-Message-ID: <ZQsAiGuw/38jIOV7@google.com>
-Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        with ESMTP id S232318AbjITOfm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 10:35:42 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D32AAD
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 07:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695220537; x=1726756537;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=sH0b1baKbczKWombPJgtMInrODweXnPkKAuTu8OU4t0=;
+  b=JGkbgwcoN93sF2o2dK7qMjtpPFtrK65pVZKKTZTffEH9Dp65jJROV3ce
+   tHgV0OyRhZ7RFr/sGtxv0qx05X7PkMIIxi/z4KofzzLgt+dLsoVopCPK2
+   7/ZEo+qN3f0LcbtNoIUxWZat6BGKlHotsy3RmhL9v7PWs9ENdKWyZJjm9
+   jum0C18EkdIogd7vbXAAgw/iTmIi+48RzZ1W7ox3cVJaKV+JUH+rlnqNW
+   orabbEQ0LGDXleOJf+DzbccdJ6XccdOmlwmpvcGq33REh/4Da6oITLNYZ
+   fFOKyeBfgOSrfMUy+nlWLUK6nqJ+l/WMvfzxS6KtvEttJMmCF3xeHm/R/
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="365292557"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="365292557"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 07:35:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="696318566"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="696318566"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.29.154]) ([10.93.29.154])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 07:35:31 -0700
+Message-ID: <da598ffc-fa47-3c25-64ea-27ea90d712aa@intel.com>
+Date:   Wed, 20 Sep 2023 22:35:28 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.15.1
+Subject: Re: [RFC PATCH v2 03/21] HostMem: Add private property and associate
+ it with RAM_KVM_GMEM
+To:     Markus Armbruster <armbru@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        isaku.yamahata@gmail.com, Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+ <20230914035117.3285885-4-xiaoyao.li@intel.com> <8734zazeag.fsf@pond.sub.org>
+ <d0e7e2f8-581d-e708-5ddd-947f2fe9676a@intel.com>
+ <878r91nvy4.fsf@pond.sub.org>
+Content-Language: en-US
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <878r91nvy4.fsf@pond.sub.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 19, 2023, Binbin Wu wrote:
+On 9/20/2023 3:30 PM, Markus Armbruster wrote:
+> Xiaoyao Li <xiaoyao.li@intel.com> writes:
 > 
+>> On 9/19/2023 5:46 PM, Markus Armbruster wrote:
+>>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>>
+>>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>>>
+>>>> Add a new property "private" to memory backends. When it's set to true,
+>>>> it indicates the RAMblock of the backend also requires kvm gmem.
+>>> Can you add a brief explanation why you need the property?
+>>
+>> It provides a mechanism for user to specify whether the memory can serve as private memory (need request kvm gmem).
 > 
-> On 9/14/2023 9:55 AM, Sean Christopherson wrote:
-> [...]
-> > +
-> > +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-> > +				      pgoff_t end)
-> > +{
-> > +	struct kvm_memory_slot *slot;
-> > +	struct kvm *kvm = gmem->kvm;
-> > +	unsigned long index;
-> > +	bool flush = false;
-> > +
-> > +	KVM_MMU_LOCK(kvm);
-> > +
-> > +	kvm_mmu_invalidate_begin(kvm);
-> > +
-> > +	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
-> > +		pgoff_t pgoff = slot->gmem.pgoff;
-> > +
-> > +		struct kvm_gfn_range gfn_range = {
-> > +			.start = slot->base_gfn + max(pgoff, start) - pgoff,
-> > +			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
-> > +			.slot = slot,
-> > +			.may_block = true,
-> > +		};
-> > +
-> > +		flush |= kvm_mmu_unmap_gfn_range(kvm, &gfn_range);
-> > +	}
-> > +
-> > +	if (flush)
-> > +		kvm_flush_remote_tlbs(kvm);
-> > +
-> > +	KVM_MMU_UNLOCK(kvm);
-> > +}
-> > +
-> > +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
-> > +				    pgoff_t end)
-> > +{
-> > +	struct kvm *kvm = gmem->kvm;
-> > +
-> > +	KVM_MMU_LOCK(kvm);
-> > +	if (xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT))
-> > +		kvm_mmu_invalidate_end(kvm);
-> kvm_mmu_invalidate_begin() is called unconditionally in
-> kvm_gmem_invalidate_begin(),
-> but kvm_mmu_invalidate_end() is not here.
-> This makes the kvm_gmem_invalidate_{begin, end}() calls asymmetric.
-
-Another ouch :-(
-
-And there should be no need to acquire mmu_lock() unconditionally, the inode's
-mutex protects the bindings, not mmu_lock.
-
-I'll get a fix posted today.  I think KVM can also add a sanity check to detect
-unresolved invalidations, e.g.
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7ba1ab1832a9..2a2d18070856 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1381,8 +1381,13 @@ static void kvm_destroy_vm(struct kvm *kvm)
-         * No threads can be waiting in kvm_swap_active_memslots() as the
-         * last reference on KVM has been dropped, but freeing
-         * memslots would deadlock without this manual intervention.
-+        *
-+        * If the count isn't unbalanced, i.e. KVM did NOT unregister between
-+        * a start() and end(), then there shouldn't be any in-progress
-+        * invalidations.
-         */
-        WARN_ON(rcuwait_active(&kvm->mn_memslots_update_rcuwait));
-+       WARN_ON(!kvm->mn_active_invalidate_count && kvm->mmu_invalidate_in_progress);
-        kvm->mn_active_invalidate_count = 0;
- #else
-        kvm_flush_shadow_all(kvm);
-
-
-or an alternative style
-
-	if (kvm->mn_active_invalidate_count)
-		kvm->mn_active_invalidate_count = 0;
-	else
-		WARN_ON(kvm->mmu_invalidate_in_progress)
-
-> > +	KVM_MMU_UNLOCK(kvm);
-> > +}
-> > +
-> > +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
-> > +{
-> > +	struct list_head *gmem_list = &inode->i_mapping->private_list;
-> > +	pgoff_t start = offset >> PAGE_SHIFT;
-> > +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
-> > +	struct kvm_gmem *gmem;
-> > +
-> > +	/*
-> > +	 * Bindings must stable across invalidation to ensure the start+end
-> > +	 * are balanced.
-> > +	 */
-> > +	filemap_invalidate_lock(inode->i_mapping);
-> > +
-> > +	list_for_each_entry(gmem, gmem_list, entry) {
-> > +		kvm_gmem_invalidate_begin(gmem, start, end);
-> > +		kvm_gmem_invalidate_end(gmem, start, end);
-> > +	}
-> Why to loop for each gmem in gmem_list here?
+> Yes, but why would a user want such memory?
 > 
-> IIUIC, offset is the offset according to the inode, it is only meaningful to
-> the inode passed in, i.e, it is only meaningful to the gmem binding with the
-> inode, not others.
 
-The code is structured to allow for multiple gmem instances per inode.  This isn't
-actually possible in the initial code base, but it's on the horizon[*].  I included
-the list-based infrastructure in this initial series to ensure that guest_memfd
-can actually support multiple files per inode, and to minimize the churn when the
-"link" support comes along.
-
-[*] https://lore.kernel.org/all/cover.1691446946.git.ackerleytng@google.com
-
+Because KVM demands it for confidential guest, e.g., TDX guest. KVM 
+demands that the mem slot needs to have KVM_MEM_PRIVATE set and has 
+valid gmem associated if the guest accesses it as private memory.
