@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B88C7A8B7D
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 20:17:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D61557A8B7C
+	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 20:17:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbjITSRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 14:17:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
+        id S229808AbjITSRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 14:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbjITSRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229782AbjITSRq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 20 Sep 2023 14:17:46 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0930DD9
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A29CDC
         for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 11:17:41 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AD7DC433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10623C433D9;
         Wed, 20 Sep 2023 18:17:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1695233860;
-        bh=OvTnh8UHlSYCCG4Btbi7L6uQqPfkzFjL8On87GirJBA=;
+        bh=0lCI9vVo+XFWhmo/qM09sP7BePJ3MPGwh8pEm0Qjxe4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gBA/WMH2f0BrCPdItWtCNO2MiygAFYVeUtaNjx8o7exjoh5T/eOv7/6F4sMJM/opJ
-         FIHXNCXzQsbqT8Ea78BnWU3kCdORaVSkHGVFhadcN+rE4b3LEBhWM8ewcU0LyvWni3
-         3U0sAW7yM0U3cpZOHMNqQpeiblO4fSG1rtD6WQSpl3y8LpJIRHeyQHuxCgXCjjGYyb
-         MXJjohFI14tPik1Dsktte1HuLAtWXa6sXFl0H60+fOA/h/CLAEs5aGOoT3ZBvIymcJ
-         iBKDaWeNzdky3AyA9oGYXoabpOBm9v2bBV2uqlcuhk79FmcCmxZshayXCwuwXDKMCQ
-         vp6+Q6pyNd/qQ==
+        b=GB/KZ7jg5DLjhVEOyC1ctv3v9Cumof6TcXeDB+UU8xXl9Pfvbv+yUWpJSwxJsNdo4
+         bcekAoh95pVT2MD6VCSOrnuf4XsGbiEMRYhuDEOScD0Wdp1jQrw/ov6mYlc14FF/q0
+         Hc8e4MG2habd0zIABq4neUtOw1h9oRVOoMmvZuYFxlGg1hpGKUjbdmxdZvZkobTGQY
+         9hkUUAQBxbN4yaDc7p5wrGZlfpyIjbcATq/oDeK8B5/5tG37E1t/T5IUYmAalAEbhd
+         l83ffN9FKvECgggA2WSsITETHgUXKn1CFK7+N0me6K2Y4Ex0lFylyA4DbYvPEs4lBy
+         5GAecXdhaT38w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qj1lZ-00Ejx0-VB;
+        id 1qj1la-00Ejx0-6h;
         Wed, 20 Sep 2023 19:17:38 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc:     James Morse <james.morse@arm.com>,
         <shameerali.kolothum.thodi@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 05/11] KVM: arm64: vgic: Use vcpu_idx for the debug information
-Date:   Wed, 20 Sep 2023 19:17:25 +0100
-Message-Id: <20230920181731.2232453-6-maz@kernel.org>
+Subject: [PATCH v2 06/11] KVM: arm64: Use vcpu_idx for invalidation tracking
+Date:   Wed, 20 Sep 2023 19:17:26 +0100
+Message-Id: <20230920181731.2232453-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230920181731.2232453-1-maz@kernel.org>
 References: <20230920181731.2232453-1-maz@kernel.org>
@@ -67,40 +67,25 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-debug.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/arm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index 07aa0437125a..85606a531dc3 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -166,7 +166,7 @@ static void print_header(struct seq_file *s, struct vgic_irq *irq,
- 
- 	if (vcpu) {
- 		hdr = "VCPU";
--		id = vcpu->vcpu_id;
-+		id = vcpu->vcpu_idx;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 872679a0cbd7..23c22dbd1969 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -438,9 +438,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
+ 	 */
+-	if (*last_ran != vcpu->vcpu_id) {
++	if (*last_ran != vcpu->vcpu_idx) {
+ 		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
+-		*last_ran = vcpu->vcpu_id;
++		*last_ran = vcpu->vcpu_idx;
  	}
  
- 	seq_printf(s, "\n");
-@@ -212,7 +212,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 		      "     %2d "
- 		      "\n",
- 			type, irq->intid,
--			(irq->target_vcpu) ? irq->target_vcpu->vcpu_id : -1,
-+			(irq->target_vcpu) ? irq->target_vcpu->vcpu_idx : -1,
- 			pending,
- 			irq->line_level,
- 			irq->active,
-@@ -224,7 +224,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
- 			irq->mpidr,
- 			irq->source,
- 			irq->priority,
--			(irq->vcpu) ? irq->vcpu->vcpu_id : -1);
-+			(irq->vcpu) ? irq->vcpu->vcpu_idx : -1);
- }
- 
- static int vgic_debug_show(struct seq_file *s, void *v)
+ 	vcpu->cpu = cpu;
 -- 
 2.34.1
 
