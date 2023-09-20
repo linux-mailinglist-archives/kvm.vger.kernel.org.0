@@ -2,83 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31A1A7A8E42
-	for <lists+kvm@lfdr.de>; Wed, 20 Sep 2023 23:12:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9F127A8FAD
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 01:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbjITVMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 17:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+        id S229672AbjITXCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 19:02:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbjITVMm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 17:12:42 -0400
-Received: from out-217.mta1.migadu.com (out-217.mta1.migadu.com [IPv6:2001:41d0:203:375::d9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B2F49E
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 14:12:36 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 21:12:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695244354;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EoUJ+vC7dyHc4K1PhRWk1cP4axcoR/iMI8O3D2rH4lY=;
-        b=nRiL2bpy2TvTJglYvs33qdCvn+bntJIqeFLZAQ008Kh+KjusCOOUq6O7scKrO2N6lGZ447
-        wdyM74RKMJ8MiwBGBne8n/vHE2RLBbEhrWTqojIiycJD+VQbnINfiM5f19woTYK0+D1dMX
-        aj0Js4mG+/ntjHCDt8mp6aXb0/VaF9c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        zhukeqian <zhukeqian1@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: Re: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Message-ID: <ZQtgPSsOGgWE4MZ1@linux.dev>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <ZQHxm+L890yTpY91@linux.dev>
- <14eb2648eb594dd9a46a179733cee0df@huawei.com>
- <ZQOm9gUo8un+claf@linux.dev>
- <853b333084c4462a870bb2a37ec65935@huawei.com>
+        with ESMTP id S229486AbjITXCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 19:02:05 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F016FCC
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 16:01:58 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5041cc983f9so614472e87.3
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 16:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google; t=1695250917; x=1695855717; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OVI1kQAYY1H6Rup9yJAb3ULOmSiNWwKwDibucQ/HouI=;
+        b=fwJo3UKZc0m5WSRUUzNViO6C1mzp2o2LOWkb4Me17MDKEx5NHEIHWuY3IhBpqNIGhe
+         VMFbj53NcMmSC3xb7HKoKM1u4SU/PbYs4narHAVAgKPY0dPnvx2aYiec+Fpx1H58kcok
+         6kbE0RckCEd8diItpYzfZMjJta0g7Uk9Z49Bo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695250917; x=1695855717;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OVI1kQAYY1H6Rup9yJAb3ULOmSiNWwKwDibucQ/HouI=;
+        b=AZcFcO7wuyJZCY6KaWzA0iRn0yiJoQQg1HqgCvUPqc1KbrZ+RkCM8cfifhDnqPN7Q1
+         0eqjWfepsAqBrVy2gvB2U1nX1mSJmBfvKX7Y6kJgKr5AD+J3rc4D3v/feGpD2v3H1O6x
+         SGFacBe+uUg7pdtpOR8GrHa/+Tp0yk+A0th6h2fO6ufRTm1HHFKsiTrVGTylFlEMHJrG
+         3t9NFB3wIIykGkEi0PM30FW1kdfPF5zAoRwhITDTneBcXdmqu3R3MoRNEVyfeSxSAuj2
+         JEynraVuPUWh2VrmsXidrPhvPH63et+VbFPXSOLhMjtI35Yb8jrHYp6+9ZhLrX7RqNxD
+         I/6Q==
+X-Gm-Message-State: AOJu0YyD/HY16mivA93gjmHphqQQiZ72qdSiF2ULVEZE5jpSE0VJK1hW
+        sWdr1r6LDdmvDUwcNl3uSexx0CvlP9ceZIXWA4uV
+X-Google-Smtp-Source: AGHT+IFXnWGXW8cB93bXiMz9Jl+KdpDWFEF+9MqDskY1cIxpbbthxUKanZZmg166RPl3Bw0vao3h2/sb983B2DCTplM=
+X-Received: by 2002:a05:6512:398a:b0:502:fff9:64da with SMTP id
+ j10-20020a056512398a00b00502fff964damr4109727lfu.53.1695250916994; Wed, 20
+ Sep 2023 16:01:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <853b333084c4462a870bb2a37ec65935@huawei.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230918180646.1398384-1-apatel@ventanamicro.com>
+ <20230918180646.1398384-4-apatel@ventanamicro.com> <CAOnJCUJYDHtbYS4js7PSAeLqT4sL5zi7DT5xeSww+5Nvs2UhcA@mail.gmail.com>
+ <CAK9=C2UbjOGyxo8oP36Tinjhv1jRpCb+hVbZCOJ70G4-WiHw1g@mail.gmail.com>
+In-Reply-To: <CAK9=C2UbjOGyxo8oP36Tinjhv1jRpCb+hVbZCOJ70G4-WiHw1g@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Wed, 20 Sep 2023 16:01:45 -0700
+Message-ID: <CAOnJCULajHa6H6Rt75rNepYaT-3+Bo=1hQVb_oozPZK13N6yKQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] KVM: riscv: selftests: Fix ISA_EXT register handling
+ in get-reg-list
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 09:55:22AM +0000, Shameerali Kolothum Thodi wrote:
+On Wed, Sep 20, 2023 at 6:56=E2=80=AFAM Anup Patel <apatel@ventanamicro.com=
+> wrote:
+>
+> On Wed, Sep 20, 2023 at 1:24=E2=80=AFAM Atish Patra <atishp@atishpatra.or=
+g> wrote:
+> >
+> > On Mon, Sep 18, 2023 at 11:07=E2=80=AFAM Anup Patel <apatel@ventanamicr=
+o.com> wrote:
+> > >
+> > > Same set of ISA_EXT registers are not present on all host because
+> > > ISA_EXT registers are visible to the KVM user space based on the
+> > > ISA extensions available on the host. Also, disabling an ISA
+> > > extension using corresponding ISA_EXT register does not affect
+> > > the visibility of the ISA_EXT register itself.
+> > >
+> > > Based on the above, we should filter-out all ISA_EXT registers.
+> > >
+> >
+> > In that case, we don't need the switch case any more. Just a
+> > conditional check with KVM_RISCV_ISA_EXT_MAX should be sufficient.
+>
+> If we compare against KVM_RISCV_ISA_EXT_MAX then we will forget
+> adding test configs for newer ISA extensions.
+>
 
-[...]
+I feel it just bloats the code as we may end up in hundreds of
+extensions in the future
+given the state of the extension scheme.
 
-> > Sorry, this was rather nonspecific. I was describing the pre-copy
-> > strategies we're using at Google (out of tree). We're carrying patches
-> > to use EPT D-bit for exitless dirty tracking.
-> 
-> Just curious, how does it handle the overheads associated with scanning for
-> dirty pages and the convergence w.r.t high rate of dirtying in exitless mode? 
+> >
+> > > Fixes: 477069398ed6 ("KVM: riscv: selftests: Add get-reg-list test")
+> > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > > ---
+> > >  .../selftests/kvm/riscv/get-reg-list.c        | 35 +++++++++++------=
+--
+> > >  1 file changed, 21 insertions(+), 14 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools=
+/testing/selftests/kvm/riscv/get-reg-list.c
+> > > index d8ecacd03ecf..76c0ad11e423 100644
+> > > --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> > > @@ -14,17 +14,33 @@
+> > >
+> > >  bool filter_reg(__u64 reg)
+> > >  {
+> > > +       switch (reg & ~REG_MASK) {
+> > >         /*
+> > > -        * Some ISA extensions are optional and not present on all ho=
+st,
+> > > -        * but they can't be disabled through ISA_EXT registers when =
+present.
+> > > -        * So, to make life easy, just filtering out these kind of re=
+gisters.
+> > > +        * Same set of ISA_EXT registers are not present on all host =
+because
+> > > +        * ISA_EXT registers are visible to the KVM user space based =
+on the
+> > > +        * ISA extensions available on the host. Also, disabling an I=
+SA
+> > > +        * extension using corresponding ISA_EXT register does not af=
+fect
+> > > +        * the visibility of the ISA_EXT register itself.
+> > > +        *
+> > > +        * Based on above, we should filter-out all ISA_EXT registers=
+.
+> > >          */
+> > > -       switch (reg & ~REG_MASK) {
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_A:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_C:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_D:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_F:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_H:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_I:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_M:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSTC:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBB:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SSAIA:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_V:
+> > > +       case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVNAPOT:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBA:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBS:
+> > >         case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR:
+> > > @@ -50,12 +66,7 @@ static inline bool vcpu_has_ext(struct kvm_vcpu *v=
+cpu, int ext)
+> > >         unsigned long value;
+> > >
+> > >         ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> > > -       if (ret) {
+> > > -               printf("Failed to get ext %d", ext);
+> > > -               return false;
+> > > -       }
+> > > -
+> > > -       return !!value;
+> > > +       return (ret) ? false : !!value;
+> > >  }
+> > >
+> > >  void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+> > > @@ -506,10 +517,6 @@ static __u64 base_regs[] =3D {
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_=
+REG_RISCV_TIMER_REG(time),
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_=
+REG_RISCV_TIMER_REG(compare),
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_U64 | KVM_REG_RISCV_TIMER | KVM_=
+REG_RISCV_TIMER_REG(state),
+> > > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | =
+KVM_RISCV_ISA_EXT_A,
+> > > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | =
+KVM_RISCV_ISA_EXT_C,
+> > > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | =
+KVM_RISCV_ISA_EXT_I,
+> > > -       KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | =
+KVM_RISCV_ISA_EXT_M,
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | =
+KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_V01,
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | =
+KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_TIME,
+> > >         KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | =
+KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_IPI,
+> > > --
+> > > 2.34.1
+> > >
+> >
+> >
+> > --
+> > Regards,
+> > Atish
+>
+> Regards,
+> Anup
 
-A pool of kthreads, which really isn't a good solution at all. The
-'better' way to do it would be to add some back pressure to the guest
-such that your pre-copy transfer can converge with the guest and use the
-freed up CPU time to manage the dirty state.
 
-But hopefully we can make that a userspace issue.
 
--- 
-Thanks,
-Oliver
+--=20
+Regards,
+Atish
