@@ -2,100 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 801F47AA578
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 01:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB0C57AA552
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:55:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbjIUXKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 19:10:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49248 "EHLO
+        id S231759AbjIUW4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 18:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbjIUXKV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 19:10:21 -0400
-Received: from out-210.mta1.migadu.com (out-210.mta1.migadu.com [IPv6:2001:41d0:203:375::d2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D068CFF17
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 11:20:31 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 18:20:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695320429;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eDVj7vBYL4POoo6A10PvdiayJKcc6WHRQ4O+JZKL8UQ=;
-        b=PUfudyk6ReRH+2s9ORiXaDcNJc1LVPsIdVjHGxtialJrGPv8q0nhuk/Zz2yjSMIP2NuhYt
-        g2PsOwBPZiuEvi/YVVdOIYS3BH9lalo4i7M/KfR11Yk/7yg2TN7/Wp7ZdsKxFpLRN33oDm
-        aoMzv/WbffsVif7m0tpLKUgfICd9A7I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Will Deacon <will@kernel.org>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v10 01/12] KVM: arm64: Allow userspace to get the
- writable masks for feature ID registers
-Message-ID: <ZQyJaUVZZEKHiUMe@linux.dev>
-References: <20230920183310.1163034-1-oliver.upton@linux.dev>
- <20230920183310.1163034-2-oliver.upton@linux.dev>
- <874jjn26oq.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874jjn26oq.fsf@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231604AbjIUWzp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 18:55:45 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9321F6E44D
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:40 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bdac026f7so20896907b3.0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695328420; x=1695933220; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=MoKhLmBudHFsqVub0iZnr0qo3mrdYvg37SqAKaFM83k=;
+        b=wacm37VVEAoOBFG9ghqEMvSqQOsqj2uX+efwm1Kt9mu4xfpI4eBbzRd28dN6+kwnbx
+         gbjMsrKrA/az3kHsFFv75Pnpvq8QZeVN+1hPcWnI8aftMXlfGumWnzs8egptFzpeL6xd
+         6SkuW6gB4bTQJ0laoVIAFd/0TWq5uT4ohszUAQ63ON2mjLUp222i2rIb9wA6X7sqOfwx
+         YPhXb5y9pnZ5l21FdyrmLMZcX6kQAa0zo5Hesdi2jATItiQQG9JTUbTm3Uc0RB7DgQIb
+         WUdsxwgaUGmn+EcCIjRcL6WkWkWN77/Nz3uOuYld23IMCYG+6Pr6WO7aNbbQ8RcYycsm
+         hxAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695328420; x=1695933220;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MoKhLmBudHFsqVub0iZnr0qo3mrdYvg37SqAKaFM83k=;
+        b=ciJyih9G7lb3G17W8IoyeJVe5lxt1IOuSbBI//fxnbjocSMCnx13PiaRCvaQdjI/bG
+         xo6+mAf6Lh+LRVEVw3f8kb5R7sqO1bPiMVWYeJm9PChu961k2u6Ml46454vCT/QtAPXA
+         ZLN2+tS40olLx21dE212dIako83RVqjYvE+Vwya3faZcBbva6yxN/Nbwm0Ro2KjvKxj8
+         2g8u1YycVvx2O/+WkR0e7SwoCxNhuMZM1cK1u0nM43PUKXsKVU5upi/1Hq9KeaQTUPWM
+         qQ4X4VCTURV0WUiy1RKnT/JjZH63hQjkNmHGcIgZKbYGfDINP8YwBVWscFwfImRWUhFN
+         1f/Q==
+X-Gm-Message-State: AOJu0YxfMqmXz6aUxg7/06hQohUVxbe5ZWcug66p2zdJChBE/C5DM8aV
+        jLC8b6IbAK4EIEXZdSHvtLkKslZE2DA=
+X-Google-Smtp-Source: AGHT+IEYG8/hrFY0O/v1dhWCGuKqtsz5qSqkYbmrQr34bAdR9bPEuoVobXgQyPT7lOV22JgARaBCkSNMs4U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b726:0:b0:59b:ccba:124f with SMTP id
+ v38-20020a81b726000000b0059bccba124fmr93086ywh.9.1695328419949; Thu, 21 Sep
+ 2023 13:33:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 21 Sep 2023 13:33:20 -0700
+In-Reply-To: <20230921203331.3746712-1-seanjc@google.com>
+Mime-Version: 1.0
+References: <20230921203331.3746712-1-seanjc@google.com>
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230921203331.3746712-4-seanjc@google.com>
+Subject: [PATCH 03/13] KVM: WARN if *any* MMU invalidation sequence doesn't
+ add a range
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>,
+        Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 11:53:41AM +0200, Cornelia Huck wrote:
-> On Wed, Sep 20 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> > From: Jing Zhang <jingzhangos@google.com>
-> >
-> > While the Feature ID range is well defined and pretty large, it isn't
-> > inconceivable that the architecture will eventually grow some other
-> > ranges that will need to similarly be described to userspace.
-> >
-> > Add a VM ioctl to allow userspace to get writable masks for feature ID
-> > registers in below system register space:
-> > op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
-> > This is used to support mix-and-match userspace and kernels for writable
-> > ID registers, where userspace may want to know upfront whether it can
-> > actually tweak the contents of an idreg or not.
-> >
-> > Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES) that
-> > returns a bitmap of the valid ranges, which can subsequently be
-> > retrieved, one at a time by setting the index of the set bit as the
-> > range identifier.
-> >
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> 
-> <process>I think you need to add your s-o-b here.</process>
+Tweak the assertion in kvm_mmu_invalidate_end() to unconditionally require
+a range to be added between start() and end().  Asserting if and only if
+kvm->mmu_invalidate_in_progress is non-zero makes the assertion all but
+useless as it would fire only when there are multiple invalidations in
+flight, which is not common and would also get a false negative if one or
+more sequences, but not all, added a range.
 
-Whoops, I thought I gave the right mix of flags to b4... clearly not.
+Reported-by: Binbin Wu <binbin.wu@linux.intel.com>
+Fixes: 145725d1542a ("KVM: Use gfn instead of hva for mmu_notifier_retry")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 +
-> >  arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++
-> >  arch/arm64/kvm/arm.c              | 10 +++++
-> >  arch/arm64/kvm/sys_regs.c         | 66 +++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h          |  2 +
-> >  5 files changed, 112 insertions(+)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
-
-Appreciated!
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 30708e460568..54480655bcce 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -873,11 +873,10 @@ void kvm_mmu_invalidate_end(struct kvm *kvm)
+ 	KVM_BUG_ON(kvm->mmu_invalidate_in_progress < 0, kvm);
+ 
+ 	/*
+-	 * Assert that at least one range must be added between start() and
+-	 * end().  Not adding a range isn't fatal, but it is a KVM bug.
++	 * Assert that at least one range was added between start() and end().
++	 * Not adding a range isn't fatal, but it is a KVM bug.
+ 	 */
+-	WARN_ON_ONCE(kvm->mmu_invalidate_in_progress &&
+-		     kvm->mmu_invalidate_range_start == INVALID_GPA);
++	WARN_ON_ONCE(kvm->mmu_invalidate_range_start == INVALID_GPA);
+ }
+ 
+ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
 -- 
-Thanks,
-Oliver
+2.42.0.515.g380fc7ccd1-goog
+
