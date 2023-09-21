@@ -2,206 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9AEA7A98C7
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 120EA7A96FF
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:11:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjIURxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 13:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51398 "EHLO
+        id S229865AbjIURK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 13:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjIURwf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:52:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3FA566D6
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695316681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
-        b=VU2LT1mz5JbntVTGf/ZCuhURAY0yN0iDepEZ/jNpIn2EZzhx9v8drAs6xhHKEbxT0aoojT
-        /PS+WiCetrv8E5/KKCa/elPi8FGVnH6fPlyfjvgFyEb7i+vJlrQIFaySlqxY5A9T/AQqod
-        V1zec4+gT5J7K6KSn8D4Ua2/yTVKJTQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-vG0MN4urNO2JyUjxLM0fOQ-1; Thu, 21 Sep 2023 10:02:36 -0400
-X-MC-Unique: vG0MN4urNO2JyUjxLM0fOQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-315af0252c2so645482f8f.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 07:02:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695304949; x=1695909749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
-        b=OQi1eXR39zsz3dzHLLf/f4q1nxC3NhSg2VTTt2vlVnkkQGMb7Ws+JUGJxauxyfj4ez
-         JZxD7w+QsWZ8qEFeLGYSQy6lxKtxpIk9SFocuHpjnZf6NRP1LIqiYzWszXoikR0tefNW
-         W3ee5awRf1Gf0OU6ENcsgyp0vLxNS47i5AM8P5TQIMDduccgtlYnwNqV3Kz4BrmXvPnY
-         huiqH0ZxB2IQccf7xKCCgpDNylt6ZANCq21Uo61LpZaciyeqEoSihlwFotoxG2HVABpu
-         h8UXP1v8UrtkuTWarMydkUIgwIEDLNTbYY0e4WL1cNFoXZsFTWeMroOsyaDHm20j5255
-         O49w==
-X-Gm-Message-State: AOJu0Yy5nQADBoz+5dgP9+lpF/liczPrR3nNNqY5EAfOGx8ws4l5pmTs
-        NLt9HnImdbBt904GMPs2AseWMnLhrjYXO0dP29gAf92A9UuAS92eXVA3fGDJLA5QSyQB65ILC+s
-        yXX6AAmzJz3V4GT9Y0d4qM/U/7zZ2
-X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id t9-20020a5d6909000000b0031ff1f4ca8emr5334193wru.36.1695304949268;
-        Thu, 21 Sep 2023 07:02:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNTL6nYnReHMxIE2eeSXN3WfDyrQQNkn8rAgYHxF7+Q3qpnqcBEXgV8EV9/Y02we+Lvs9Dzqktaq7bM20Yrgk=
-X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id
- t9-20020a5d6909000000b0031ff1f4ca8emr5334163wru.36.1695304948913; Thu, 21 Sep
- 2023 07:02:28 -0700 (PDT)
+        with ESMTP id S231290AbjIURKU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 13:10:20 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on20610.outbound.protection.outlook.com [IPv6:2a01:111:f400:7ea9::610])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1ED902F
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:05:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RZ6ORCJONLquTpW0EsikzWZVoi4PeFtR7G0oWYpSzCo9zyUBSgxombIBoO8X+BXnILFTqmTJfVGzjIoSVrkOOgNQ1+mqEhTvYdhcDvfCNnSzUarFNNzhaH2GbGo2JUqEZZQUbzMnJ59CoFPAKSACpwOrXx/Bs0z6gFOEHI/MUjEdlJaVyrOQaRye1FokIy41yWJ99+Wx6oB3BylU1oy65Tq9wzcUPDKh+6/DgaKXC/pQFZJlDt7UZTNb6XxTPFoLvrxH+ZHldT1u4Fz3MpRR/Hg04VYM4rV857W8NBwbMHH2WXgVppwXhDhVhN61UObU15b7O34lwAFCziTzjj1tMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gpEZ0Q+tfVGLwS6iO7hgNZpSAM88QoPQVcGjpMVYti8=;
+ b=dZdqAsEU6P29StnEqRt/oEW3cp2274qz/NLEYH01IdNF1IH52yGiYR/vmgLbt8Zenjr+60L9GY1UU1Y0BuJggRm2KliYMkS7sSfXpH8iCX0n6vhOoDM0qJSt5VwBegoEMBuqQZ8Wu0tdvE5vsWjyWciAUJjmejt6fVrwl2a0AmnMgM7l2On802wGY+OaD+RMeyZSoNrwew5Unbd0LVXC0OIUhC16g1wx123qo24T+95rrd3xy9BVUZu2w05TnrHJUlNWGYbGrDLIfiXFl1drtEdXXKWI7FYtmb2/9vdSOMCe8Qma9w8baYz7L8zUjLS2jwr9AF5Nzz5OlAC3d6CY1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gpEZ0Q+tfVGLwS6iO7hgNZpSAM88QoPQVcGjpMVYti8=;
+ b=YzvMSP1ZxGyR1qXmFl6sWCrI/Fn4GG+Gbkplrjm/GZCMVM5WTW4GADtyVGD4kTFKzoLcw1mhlY4F+oRavtj4heXZG07wwP9ebQv2zemsaO6Bz0dw5vf6y1lp5Qs4BMYw0Vg3hJRTaNf/2aJ2jBWIZ1DPdfdnI1eP9SCWSJUWCOuo9EO54z1nMDqBgxdKc2BxlkcnC2GPpxoaeRvQW/x1blVIf4rCKjcz1axQnOGUBWcvtq3ZgxqGLk8JpILSX9alIar8rx2OdUc5+8zHBfXwmB2FtesIq/c5uJtK4+EfJCbvcqDpLb44aQS3T473/v1P8p8NV9FNZEUC+FPzEgYEZQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH2PR12MB4921.namprd12.prod.outlook.com (2603:10b6:610:62::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Thu, 21 Sep
+ 2023 14:11:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Thu, 21 Sep 2023
+ 14:11:26 +0000
+Date:   Thu, 21 Sep 2023 11:11:25 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20230921141125.GM13733@nvidia.com>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-12-yishaih@nvidia.com>
+ <20230921090844-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921090844-mutt-send-email-mst@kernel.org>
+X-ClientProxiedBy: CH0PR07CA0001.namprd07.prod.outlook.com
+ (2603:10b6:610:32::6) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
- <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
-In-Reply-To: <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Thu, 21 Sep 2023 22:01:46 +0800
-Message-ID: <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
-Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
-        xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-        lindbergh.monkeyblade.net
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4921:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76184c52-2c7c-4d66-dc74-08dbbaaca4e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zuaGgVbH8rOrnCjBGcoDkovxISk3IoHtpkrMGMasDoBNW/Dq81TQbQnVBJWilDvHUGTxxYiqTCRkEr1KauMIuH7dHuCPKPigXBFuxKPCLLneUj6Bb/l7t1bat2OUcyDCBlHRF+ObYNTSo73TSjegJLHva2+QmBbLXZ2wtqDP3Mkz2KALgLdokCc6Omz1hX4MhPZ4HAT8SaiNdUjKpQDdSfdhesBWT9yeF5hlxbK8REiaX+IXxJVhE7Nl4l/YhqKCpm9qj+Vq3Irl/dlrNZHVIFvGZkQaVeXpYWuMtGR22fbL1PFYVcvJEoGenUJO1JlvmmNMvAFRH7YKSWKcsoheKPfdn5b5cg/uw54YejzZDx8tKukL+Y+vTWnKp1NYJmakM44tSJAG7pJdn1RP/9h6IFiRqA5u9tDCep7RRtvi2e7LkzFelXXQ4HCkS2NH8Tt8muXHwy/FEIA9gauBscfsauGo/YhrfIqlYzeWuc1yyrMvPzU1jGn0GzfIYHwdoyQ2aoK7FWQSdL/wjhHueWx4zRb7PjOvBiv782W+/x8Bl3odL5biiI83FU5q7KBm79aZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(136003)(396003)(376002)(1800799009)(186009)(451199024)(6512007)(2616005)(6486002)(6506007)(86362001)(33656002)(38100700002)(36756003)(107886003)(26005)(6916009)(66556008)(66476007)(66946007)(316002)(41300700001)(2906002)(5660300002)(8676002)(8936002)(4326008)(1076003)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?clQBUIeEM5f/3Uqx7VsVnUT3FpEC5Gk7knr+LmdZBiT5qYEQ+PKDo8GASiJb?=
+ =?us-ascii?Q?u6yQ9tGsX/K+3ku+HGYgBNBkzz20p9YT+nb07cMKNEBZ2g9VTGj11fyPBsE4?=
+ =?us-ascii?Q?6I4tlISPEWDKQ34Y2Gh+QjaxDqy/iVL9erw5vnYoZRloAlB7RlnASwnmLhUG?=
+ =?us-ascii?Q?Mz5jEW4X+jsKsXe7skoB03jHKQWyLzfxzFtZOdQaDGIjZUoT022R9P81xa0X?=
+ =?us-ascii?Q?dWB8LmSsV+YIjfYdBJ7DnD6PeovasRcHqGObHXGhHhMIQAYoks7KOj8l41XI?=
+ =?us-ascii?Q?ef7tXzlOQALZjgZKdBm475hQkqGaOu+Ti1yM2KQWPIeFjrcMdNw5Nhb0TLq7?=
+ =?us-ascii?Q?LAHQhcR1IbFvTRdsNS2nMlKvKfMUYNMXR2JdJ5xmeTx4LAKzXdiq/g974nIe?=
+ =?us-ascii?Q?E0ISb5J6gThFpTodyPBMKg5CqVLA8qS7IgM3C6iwVomQqav/7TZ406bhcu1w?=
+ =?us-ascii?Q?zdiuiKdALPEsj5NHiF2qZCn3WyvXgzvjhPROMx91qlszwK5eH0zt5rB8yhoX?=
+ =?us-ascii?Q?VzlMa0AKPwF5mzcuJnt1SogjtWIDvXdzOzMcCck1iUhtnbc2AjOLApUt1m72?=
+ =?us-ascii?Q?2SrsTlIafTzt/PslgYLEG3wIwD0ci3I+OIeNxHLbfLIZh97vm8Yvp0Variio?=
+ =?us-ascii?Q?f4SYDFDwQvoMs/HMWdWoglXH/czAJl3evrT2hduwsI8MPUi6Ji9vA2uPLVrY?=
+ =?us-ascii?Q?MraHwV2e75NKrrra1K+mXe4HQNJ9b4Ct8aFCrtObkQrrWGE+ynYD/yUDBZ/t?=
+ =?us-ascii?Q?0l7S3tIXSCOywVAZa1O9PZmuA2dBOegst4nV8KCiNw+hrQRqLRbAAmPO461O?=
+ =?us-ascii?Q?BmqZrv4lsRajdpr1yGDoHEs406wxYVqI0zQUcCpDNFMfpuUcyoj1XTQwR03Y?=
+ =?us-ascii?Q?wxZMlCszcIhl7ZAzt+8g9sn/US1U6zIN6R2bPVuxfJSLOjYLMyT09RgmW/FS?=
+ =?us-ascii?Q?Z2REUHZUAnkj7MWpSC+SKFSZtt0V1SZ9LxTByF5plI2TvVanPCdRnBJ1zgTf?=
+ =?us-ascii?Q?mCFQWTnu3UUIBCgkbXv6+Mx1utPFUTd6v9wD6cCzWItAw+wWUDqi/C0U7+j9?=
+ =?us-ascii?Q?RhiCY810tSTd0fj6Z3t+Sydgys8Ub2TVLYobRXYvYPNKDHPuk4xra87mRG86?=
+ =?us-ascii?Q?OBKnpfoSd4gPy37Wb9HgJg8lc1KAjS5u1hiXx8imZuoysjmTkiR5PUFSNR93?=
+ =?us-ascii?Q?7Z3nSNlVA8V/71QKs1k/Cy1/pqPs3mkzIljeargNlvoVBTa+LPKGwqy5HrhA?=
+ =?us-ascii?Q?XPiV7CyZ8SEZUr/m0C4/kjoF6ZEKeH0Q4g461vfyd6XtO+kHxr2UAQiUeCZR?=
+ =?us-ascii?Q?0IcKm4LBMDbTt/2v4OaJEDeoh+omZ2ylvZuOvuWMwsRcLi+wldE2IP/AQNH9?=
+ =?us-ascii?Q?DI/rvZPE+JFTL+4i4ZaGnpKHDeWrogqzUXfWxt74RycozqAo4KLmXNHNWBP1?=
+ =?us-ascii?Q?N3tdyxT/+imcRBdg8OajCJhQeWQfuopdIG3S526ec9h7d89Lie4KOVtFA11H?=
+ =?us-ascii?Q?sc7Vo0kC7X/Lub8epceuBIO7E9BiC3VObVCJ68XceK2JIFeouiWSN0JkRCLh?=
+ =?us-ascii?Q?dJao3vyBsqvX9N9NrclEpuvN+mv/TFwUOvAVg6uq?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76184c52-2c7c-4d66-dc74-08dbbaaca4e6
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 14:11:26.8265
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aCXP6QZdXKyyUj92r4s18G2IjkGjMW1r5LlJ7f55ElsKY6RPqFD8AsMWg4//RKyK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4921
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote=
-:
-> >
-> > In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
-> > and The number of mapping memory pages from the kernel. The userspace
-> > App can use this information to map the pages.
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
-> >  include/uapi/linux/vduse.h         | 15 +++++++++++++++
-> >  2 files changed, 30 insertions(+)
-> >
-> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
-r/vduse_dev.c
-> > index 680b23dbdde2..c99f99892b5c 100644
-> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *file, u=
-nsigned int cmd,
-> >                 ret =3D 0;
-> >                 break;
-> >         }
-> > +       case VDUSE_GET_RECONNECT_INFO: {
-> > +               struct vduse_reconnect_mmap_info info;
+On Thu, Sep 21, 2023 at 09:16:21AM -0400, Michael S. Tsirkin wrote:
+
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index bf0f54c24f81..5098418c8389 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -22624,6 +22624,12 @@ L:	kvm@vger.kernel.org
+> >  S:	Maintained
+> >  F:	drivers/vfio/pci/mlx5/
+> >  
+> > +VFIO VIRTIO PCI DRIVER
+> > +M:	Yishai Hadas <yishaih@nvidia.com>
+> > +L:	kvm@vger.kernel.org
+> > +S:	Maintained
+> > +F:	drivers/vfio/pci/virtio
 > > +
-> > +               ret =3D -EFAULT;
-> > +               if (copy_from_user(&info, argp, sizeof(info)))
-> > +                       break;
-> > +
-> > +               info.size =3D PAGE_SIZE;
-> > +               info.max_index =3D dev->vq_num + 1;
-> > +
-> > +               if (copy_to_user(argp, &info, sizeof(info)))
-> > +                       break;
-> > +               ret =3D 0;
-> > +               break;
-> > +       }
-> >         default:
-> >                 ret =3D -ENOIOCTLCMD;
-> >                 break;
-> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> > index d585425803fd..ce55e34f63d7 100644
-> > --- a/include/uapi/linux/vduse.h
-> > +++ b/include/uapi/linux/vduse.h
-> > @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
-> >         _Bool avail_wrap_counter;
-> >  };
-> >
-> > +/**
-> > + * struct vduse_reconnect_mmap_info
-> > + * @size: mapping memory size, always page_size here
-> > + * @max_index: the number of pages allocated in kernel,just
-> > + * use for check
-> > + */
-> > +
-> > +struct vduse_reconnect_mmap_info {
-> > +       __u32 size;
-> > +       __u32 max_index;
-> > +};
->
-> One thing I didn't understand is that, aren't the things we used to
-> store connection info belong to uAPI? If not, how can we make sure the
-> connections work across different vendors/implementations. If yes,
-> where?
->
-> Thanks
->
-The process for this reconnecttion  is
-A.The first-time connection
-1> The userland app checks if the device exists
-2>  use the ioctl to create the vduse device
-3> Mapping the kernel page to userland and save the
-App-version/features/other information to this page
-4>  if the Userland app needs to exit, then the Userland app will only
-unmap the page and then exit
+> >  VFIO PCI DEVICE SPECIFIC DRIVERS
+> >  R:	Jason Gunthorpe <jgg@nvidia.com>
+> >  R:	Yishai Hadas <yishaih@nvidia.com>
+> 
+> Tying two subsystems together like this is going to cause pain when
+> merging. God forbid there's something e.g. virtio net specific
+> (and there's going to be for sure) - now we are talking 3
+> subsystems.
 
-B, the re-connection
-1> the userland app finds the device is existing
-2> Mapping the kernel page to userland
-3> check if the information in shared memory is satisfied to
-reconnect,if ok then continue to reconnect
-4> continue working
+Cross subsystem stuff is normal in the kernel. Drivers should be
+placed in their most logical spot - this driver exposes a VFIO
+interface so it belongs here.
 
- For now these information are all from userland,So here the page will
-be maintained by the userland App
-in the previous code we only saved the api-version by uAPI .  if  we
-need to support reconnection maybe we need to add 2 new uAPI for this,
-one of the uAPI is to save the reconnect  information and another is
-to get the information
+Your exact argument works the same from the VFIO perspective, someone
+has to have code that belongs to them outside their little sphere
+here.
 
-maybe something like
+> Case in point all other virtio drivers are nicely grouped, have a common
+> mailing list etc etc.  This one is completely separate to the point
+> where people won't even remember to copy the virtio mailing list.
 
-struct vhost_reconnect_data {
-uint32_t version;
-uint64_t features;
-uint8_t status;
-struct virtio_net_config config;
-uint32_t nr_vrings;
-};
+The virtio mailing list should probably be added to the maintainers
+enry
 
-#define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
-vhost_reconnect_data)
-
-#define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
-vhost_reconnect_data)
-
-Thanks
-Cindy
-
-
-
-
-> > +
-> > +#define VDUSE_GET_RECONNECT_INFO \
-> > +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
-> > +
-> >  #endif /* _UAPI_VDUSE_H_ */
-> > --
-> > 2.34.3
-> >
->
-
+Jason
