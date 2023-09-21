@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB0457A9F9A
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:25:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B02797A9EDD
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:13:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbjIUUZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:25:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38978 "EHLO
+        id S231414AbjIUUNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:13:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231920AbjIUUYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:24:47 -0400
+        with ESMTP id S229708AbjIUUNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:13:21 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 828C4F830
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:23:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B95744B0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:24:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695317016;
+        s=mimecast20190719; t=1695317041;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CXzfBnb6s0TokTe/yNIjNnut/xFJqsbkbtECAXTqWzs=;
-        b=gIG26wtUMDyzclkWnjl8Rl1oWY/COB99sElv2JP4qw3Fy4/TQMzUaL3f9T392vka6GPvEs
-        ZjNEOIXZfbcYtGfmNN7R8SWnhtZAe+i0t2cbVD3zR/m943guMEcXCXZjKEs4JJCMqQ0ELe
-        hVbqZS+yG1cgn54IzeChwEO4F1yw3NE=
+        bh=PQo3cP8ubnIFxn8GyzNBkh6mW/MSQ9HqXpxlK6ZJiTA=;
+        b=X0HqJhnmXHXAcU7s8dvT+c1JhkiLV8h45gzn9thObgWdNWcFTvw1ffuYEJY1Tfh7YPeXwT
+        w3Nr1Woax3H8MpLDceSyFnLE4TEhQ/u+TEymvZGt5C21sP6dc+41hN2rsH5/fCmjDaM4bG
+        9ByM/j9J+INo9w9VNQnZbr36jc/47VE=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-zjqiL_oIM5-uCpSRyXHcbg-1; Thu, 21 Sep 2023 04:55:56 -0400
-X-MC-Unique: zjqiL_oIM5-uCpSRyXHcbg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31f79595669so754797f8f.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 01:55:55 -0700 (PDT)
+ us-mta-548-ol8969O6MTGHiWmyy2_FZw-1; Thu, 21 Sep 2023 04:56:27 -0400
+X-MC-Unique: ol8969O6MTGHiWmyy2_FZw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32006e08483so507899f8f.0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 01:56:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695286555; x=1695891355;
+        d=1e100.net; s=20230601; t=1695286586; x=1695891386;
         h=content-transfer-encoding:in-reply-to:organization:from:references
          :cc:to:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CXzfBnb6s0TokTe/yNIjNnut/xFJqsbkbtECAXTqWzs=;
-        b=mpSYj5ODBZVfQP5O/KwItzd4o5zaSCnqyuXAdXlM1aRmbhLnUY8AibkeZYWOlAhFdD
-         7IZJBksOpPIuyhL0g0FaWpR2Yxbe2pFykkvyK/bX4sHZKc9OIqAcXqaeL4S0ucEKQ9WJ
-         dyAPkxlelblCecobRqAiRkapccHXzCSWm08qDTiko43aRd90Xr2YOvylF+sANT2/lUIZ
-         O2xcotUvVfX3U4Pl/uMxmp16zyZ0STCO3P+txBE/YHPMjFc4kIrACCnntpNA+pzf9ctX
-         jv0efWzVOiKT0+oCSdTkkHHbHUgQ1NpbbcK8aT3QIDYQ8CqJ8RietgzndboeiS62AQDM
-         8a9Q==
-X-Gm-Message-State: AOJu0Yzp7O4ezboigW5jPYvRGb968OJAHgkON0FCQe1FN4lMQs+N4pbE
-        rftQMpAFF2R4x5bnksC44DUutp2/tIcLk9anH42im3FQ1oJu5Vz59UmSAqMzdYF4VwuVa9oYRtU
-        LxCOX8ogEafMn
-X-Received: by 2002:adf:f24d:0:b0:314:c6b:b9a2 with SMTP id b13-20020adff24d000000b003140c6bb9a2mr4283830wrp.13.1695286554887;
-        Thu, 21 Sep 2023 01:55:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFr1B68OlonHq+x2Ayf/NCpEV9vQxh6aDgWzz7JLCnpauVUgrdLv8UXHvYUV8oS8X50orAakw==
-X-Received: by 2002:adf:f24d:0:b0:314:c6b:b9a2 with SMTP id b13-20020adff24d000000b003140c6bb9a2mr4283803wrp.13.1695286554511;
-        Thu, 21 Sep 2023 01:55:54 -0700 (PDT)
+        bh=PQo3cP8ubnIFxn8GyzNBkh6mW/MSQ9HqXpxlK6ZJiTA=;
+        b=MKv95KfBYzueyeZXqc0Xp0Zqpkd0QFWsPIorQ6BPBjF2QDVjfJ35Tr5hkbVBlHRjtg
+         CoDC+EBY+sFjRp3+Vxaadrcadr1hXdc9D3A7sR16niT7rQ9dZZX1cOU2uD6accpqWFdN
+         i7a+/7kpSP78J+LnRSYxbNOOmP88/EomHk9NJJrdqSlglYBI3M23dLSXEp5psyvOm/vR
+         LdsQ4Sldvcp28cjQ8giQ6Pd5WENAgcJ5KaOJfKkd8eyATlHrPWmhalhQUR8WfQzmHLqq
+         BDKKo87uv9Oa+H+Tnd1FPVCrj4T12aYk73ESquxGYr/UP/sVr9K+aJSvcGQNCz7jqNH7
+         ltfw==
+X-Gm-Message-State: AOJu0Yw1xmFGvO2bZ99nKvJOnijj6zWZWwy6hvA0Y/uf1l3tRFZnADTt
+        Ra8UQIGMPm7hkipuf9O3ImD30uYuYXcha412cpuixe+EC/xI4tazsCf0ofKZ9fMWtjcqRqTmeJq
+        J3UkcUWy4LbIj
+X-Received: by 2002:adf:e253:0:b0:31a:dd55:e69c with SMTP id bl19-20020adfe253000000b0031add55e69cmr4279921wrb.60.1695286586214;
+        Thu, 21 Sep 2023 01:56:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4a6zpCosFq3hmujQ4zTcT38YOWqiaKd28jQERYVCmRpaHM+ECvPdd2GHEzhC9vCufTHkxJg==
+X-Received: by 2002:adf:e253:0:b0:31a:dd55:e69c with SMTP id bl19-20020adfe253000000b0031add55e69cmr4279904wrb.60.1695286585929;
+        Thu, 21 Sep 2023 01:56:25 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c70d:3c00:9eab:fce5:e6f3:e626? (p200300cbc70d3c009eabfce5e6f3e626.dip0.t-ipconnect.de. [2003:cb:c70d:3c00:9eab:fce5:e6f3:e626])
-        by smtp.gmail.com with ESMTPSA id x5-20020adfdcc5000000b0031c6581d55esm1150709wrm.91.2023.09.21.01.55.53
+        by smtp.gmail.com with ESMTPSA id z16-20020a056000111000b003176eab8868sm1131747wrw.82.2023.09.21.01.56.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 01:55:54 -0700 (PDT)
-Message-ID: <678bf0bf-57e7-a596-1ddf-6d0b47cd8677@redhat.com>
-Date:   Thu, 21 Sep 2023 10:55:52 +0200
+        Thu, 21 Sep 2023 01:56:25 -0700 (PDT)
+Message-ID: <3f8955f6-c261-d3f3-08a2-54f0bd9caf8e@redhat.com>
+Date:   Thu, 21 Sep 2023 10:56:23 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [RFC PATCH v2 02/21] RAMBlock: Add support of KVM private gmem
+Subject: Re: [RFC PATCH v2 05/21] kvm: Enable KVM_SET_USER_MEMORY_REGION2 for
+ memslot
 Content-Language: en-US
 To:     Xiaoyao Li <xiaoyao.li@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -81,10 +82,10 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>,
         Claudio Fontana <cfontana@suse.de>
 References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
- <20230914035117.3285885-3-xiaoyao.li@intel.com>
+ <20230914035117.3285885-6-xiaoyao.li@intel.com>
 From:   David Hildenbrand <david@redhat.com>
 Organization: Red Hat
-In-Reply-To: <20230914035117.3285885-3-xiaoyao.li@intel.com>
+In-Reply-To: <20230914035117.3285885-6-xiaoyao.li@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -97,19 +98,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.09.23 05:50, Xiaoyao Li wrote:
+On 14.09.23 05:51, Xiaoyao Li wrote:
 > From: Chao Peng <chao.p.peng@linux.intel.com>
 > 
-> Add KVM gmem support to RAMBlock so both normal hva based memory
-> and kvm gmem fd based private memory can be associated in one RAMBlock.
+> Switch to KVM_SET_USER_MEMORY_REGION2 when supported by KVM.
 > 
-> Introduce new flag RAM_KVM_GMEM. It calls KVM ioctl to create private
-> gmem for the RAMBlock when it's set.
+> With KVM_SET_USER_MEMORY_REGION2, QEMU can set up memory region that
+> backend'ed both by hva-based shared memory and gmem fd based private
+> memory.
+> 
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-
-But who sets RAM_KVM_GMEM and when? Don't we simply allocate it for all 
-RAMBlocks under such special VMs? What's the downside of doing that?
-
+"Co-developed-by".
 
 -- 
 Cheers,
