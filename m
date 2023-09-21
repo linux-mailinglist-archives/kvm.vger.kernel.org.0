@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D949B7A9958
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:13:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18EDF7A9C0B
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:05:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbjIUSNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 14:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S231239AbjIUTF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 15:05:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbjIUSMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 14:12:33 -0400
+        with ESMTP id S231618AbjIUTFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 15:05:05 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE3A42C3A
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:49:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 998D5E083
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:49:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695318598; x=1726854598;
+  t=1695318599; x=1726854599;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AJ7TummwzL9HHIztJ90SFhtCF8CM4tWGiNkSK8PMMxc=;
-  b=K8FfkJy8mt9K+Qrl2xcpqBFDWK7jNxLuijg3hCr/mXAZP+dMhAEjymzL
-   Y8+D2q2ycPsidreFjeIO4plujZ9hjhriG66oDOqPMFjfyncd/CDxQULd7
-   vzM8I8RYnigY7r2xTqpP0C455XbkVsBbi31uJvPuZCegOorxbOJugfFmc
-   uxjV92BlhedOq+xKwwMurnjeHPtVMaj7vtGLxxMNDfA/Ak6U9MP1cfzfu
-   Tj+XEAQecvWQRSqKqERiGHVk3XCvpYWGnJ2eVqZPzTXyt5i/DkR411j74
-   77sstxXW6u1/GQgjLx6k+rOsYGmlTzR0nm/qjiQluUJITzFg8ZbV2iX25
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359841333"
+  bh=dovjjs6Cwd613M4DckYtJynCmnyAMU353Nvw3+PCAK4=;
+  b=Pl5+QQfY7dSYvItWfeNxpz7ii5GgpV7YEeSvEYQGZu6RqIsLp6ZYrycK
+   dTyxJPBAazowIoEQZsNnVrBjweBF5Z1gDGMlAQUTfzs9VrPlcTqqqL9ZC
+   2zgpkrlI8BLfHvH2ds9haIXmwuuo/65FaNGOXCJjmONdIfjCcIBLfxj52
+   +WqRG4Fa/LYFS0Vx4ikAIFnGtltiprHLZ6PHMequymsuCH9wNFzVmNSAd
+   nxurrBbG0eBNvZFTxx4NPyVstj49U/FzW5GVR8NrNYcAeLkn0IS4ssUZC
+   MaDjX2xMqyIaik0AQW2zNL0MqcdO20XIz689imvTHaIhfVN8GUAA0R7Mj
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359841347"
 X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="359841333"
+   d="scan'208";a="359841347"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:30:55 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:31:04 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="747001045"
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="747001098"
 X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="747001045"
+   d="scan'208";a="747001098"
 Received: from dorasunx-mobl1.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.255.30.47])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:30:52 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:31:01 -0700
 From:   Xiong Zhang <xiong.y.zhang@intel.com>
 To:     kvm@vger.kernel.org
 Cc:     seanjc@google.com, like.xu.linux@gmail.com,
         dapeng1.mi@linux.intel.com, zhiyuan.lv@intel.com,
         zhenyu.z.wang@intel.com, kan.liang@intel.com,
         Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: [PATCH v2 2/9] KVM: x86/pmu: Don't release vLBR casued by vPMI
-Date:   Thu, 21 Sep 2023 16:29:50 +0800
-Message-Id: <20230921082957.44628-3-xiong.y.zhang@intel.com>
+Subject: [PATCH v2 4/9] KVM: x86/pmu: Add PERF_GLOBAL_STATUS_SET MSR emulation
+Date:   Thu, 21 Sep 2023 16:29:52 +0800
+Message-Id: <20230921082957.44628-5-xiong.y.zhang@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230921082957.44628-1-xiong.y.zhang@intel.com>
 References: <20230921082957.44628-1-xiong.y.zhang@intel.com>
@@ -62,102 +62,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To emulate Freeze_LBR_On_PMI feature, KVM PMU disables guest LBR at PMI
-injection. When guest LBR is disabled, vLBR event may be released at two
-vCPU sched-in later. once vLBR event is released, KVM will create a new
-vLBR event when guest access LBR MSRs again. First this adds overhead
-at vLBR event release and re-creation. Second this may changes guest
-LBR contend as vLBR event creation may cause host LBR drvier reset
-hw LBR facility.
+The IA32_PERF_GLOBAL_STATUS_SET MSR is introduced with arch PMU
+version 4. It allows software to set individual bits in
+IA32_PERF_GLOBAL_STATUS MSR. It can be used by a VMM to virtualize the
+state of IA32_PERF_GLOBAL_STATUS across VMS.
 
-This commit avoids the vLBR release for Freeze_LBR_On_PMI emulation.
-It changes boolean lbr_desc->in_use into enum lbr_desc->state, so
-it could express more LBR states, KVM sets lbr_desc->state as
-FREEZE_ON_PMI at vPMI injection, so that vLBR release function could
-check this state to avoid vLBR release. When guest enables LBR
-at the end of the guest PMI handler, KVM will set lbr_desc->state
-as IN_USE.
+If the running VM owns the whole PMU, different VM will have different
+perf global status, VMM needs to restore IA32_PERF_GLOBAL_STATUS MSR at
+VM switch, but IA32_PERF_GLOBAL_STATUS MSR is read only, so VMM can use
+IA32_PERF_GLOBAL_STATUS_SET MSR to restore PERF_GLOBAL_STATUS MSR.
+
+This commit adds this MSR emulation, so that L1 VMM could use it. As it
+is mainly used by VMM to restore VM's PERF_GLOBAL_STATUS MSR during VM
+switch, it doesn't need to inject PMI or FREEZE_LBR when VMM write it.
 
 Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
----
- arch/x86/kvm/vmx/pmu_intel.c | 8 +++++---
- arch/x86/kvm/vmx/vmx.c       | 2 +-
- arch/x86/kvm/vmx/vmx.h       | 8 +++++++-
- 3 files changed, 13 insertions(+), 5 deletions(-)
 
+---
+Changelog:
+v1-v2: Add it into msrs_to_save_pmu[]
+---
+ arch/x86/include/asm/msr-index.h |  1 +
+ arch/x86/kvm/vmx/pmu_intel.c     | 16 ++++++++++++++++
+ arch/x86/kvm/x86.c               |  1 +
+ 3 files changed, 18 insertions(+)
+
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index badc2f729a8e..50d231f76003 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -1048,6 +1048,7 @@
+ #define MSR_CORE_PERF_GLOBAL_STATUS	0x0000038e
+ #define MSR_CORE_PERF_GLOBAL_CTRL	0x0000038f
+ #define MSR_CORE_PERF_GLOBAL_OVF_CTRL	0x00000390
++#define MSR_CORE_PERF_GLOBAL_STATUS_SET 0x00000391
+ 
+ #define MSR_PERF_METRICS		0x00000329
+ 
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 76d7bd8e4fc6..c8d46c3d1ab6 100644
+index 6e3bbe777bf5..957663b403f2 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -628,7 +628,7 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
- 	lbr_desc->records.nr = 0;
- 	lbr_desc->event = NULL;
- 	lbr_desc->msr_passthrough = false;
--	lbr_desc->in_use = FALSE;
-+	lbr_desc->state = LBR_STATE_PREDICT_FREE;
- }
- 
- static void intel_pmu_reset(struct kvm_vcpu *vcpu)
-@@ -671,6 +671,7 @@ static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
- 	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
- 		data &= ~DEBUGCTLMSR_LBR;
- 		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
-+		vcpu_to_lbr_desc(vcpu)->state = LBR_STATE_FREEZE_ON_PMI;
- 	}
- }
- 
-@@ -765,9 +766,10 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
- 
- 	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)) {
--		if (!lbr_desc->in_use)
-+		if (lbr_desc->state == LBR_STATE_PREDICT_FREE)
- 			intel_pmu_release_guest_lbr_event(vcpu);
--		lbr_desc->in_use = false;
-+		else if (lbr_desc->state == LBR_STATE_IN_USE)
-+			lbr_desc->state = LBR_STATE_PREDICT_FREE;
- 	}
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4056e19266b5..565df8eeb78b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2242,7 +2242,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (intel_pmu_lbr_is_enabled(vcpu) && (data & DEBUGCTLMSR_LBR)) {
- 			struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
- 
--			lbr_desc->in_use = true;
-+			lbr_desc->state = LBR_STATE_IN_USE;
- 			if (!lbr_desc->event)
- 				intel_pmu_create_guest_lbr_event(vcpu);
- 		}
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 547edeb52d09..0cb68a319fc8 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -93,6 +93,12 @@ union vmx_exit_reason {
- 	u32 full;
- };
- 
-+enum lbr_state {
-+	LBR_STATE_PREDICT_FREE = 0,
-+	LBR_STATE_IN_USE = 1,
-+	LBR_STATE_FREEZE_ON_PMI = 2
-+};
+@@ -206,6 +206,8 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+ 	switch (msr) {
+ 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
+ 		return kvm_pmu_has_perf_global_ctrl(pmu);
++	case MSR_CORE_PERF_GLOBAL_STATUS_SET:
++		return vcpu_to_pmu(vcpu)->version >= 4;
+ 	case MSR_IA32_PEBS_ENABLE:
+ 		ret = vcpu_get_perf_capabilities(vcpu) & PERF_CAP_PEBS_FORMAT;
+ 		break;
+@@ -355,6 +357,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
+ 		msr_info->data = pmu->fixed_ctr_ctrl;
+ 		break;
++	case MSR_CORE_PERF_GLOBAL_STATUS_SET:
++		msr_info->data = 0;
++		break;
+ 	case MSR_IA32_PEBS_ENABLE:
+ 		msr_info->data = pmu->pebs_enable;
+ 		break;
+@@ -454,6 +459,17 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (!msr_info->host_initiated)
+ 			pmu->global_status &= ~data;
+ 		break;
++	case MSR_CORE_PERF_GLOBAL_STATUS_SET:
++		/*
++		 * GLOBAL STATUS_SET, sets bits in GLOBAL_STATUS, so the
++		 * set of reserved bits are the same.
++		 */
++		if (data & pmu->global_status_mask)
++			return 1;
 +
- struct lbr_desc {
- 	/* Basic info about guest LBR records. */
- 	struct x86_pmu_lbr records;
-@@ -108,7 +114,7 @@ struct lbr_desc {
- 	/* True if LBRs are marked as not intercepted in the MSR bitmap */
- 	bool msr_passthrough;
++		if (!msr_info->host_initiated)
++			pmu->global_status |= data;
++		break;
+ 	default:
+ 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+ 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6c9c81e82e65..aae60461d0d9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1471,6 +1471,7 @@ static const u32 msrs_to_save_pmu[] = {
+ 	MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
+ 	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
+ 	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++	MSR_CORE_PERF_GLOBAL_STATUS_SET,
+ 	MSR_IA32_PEBS_ENABLE, MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG,
  
--	bool in_use;
-+	enum lbr_state state;
- };
- 
- /*
+ 	/* This part of MSRs should match KVM_INTEL_PMC_MAX_GENERIC. */
 -- 
 2.34.1
 
