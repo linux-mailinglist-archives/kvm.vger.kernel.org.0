@@ -2,115 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31F8C7A9703
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4788D7A9813
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:29:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbjIURLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 13:11:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58304 "EHLO
+        id S229708AbjIUR36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 13:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231420AbjIURK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:10:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1675C72B7
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695315870;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eXLjSJIMRxcWvPfwsAym08vPACVukQQjMlk91zESb4A=;
-        b=XeXVdGlf4eUYycQgI52BY4t1qZjrQ6NU5FFxdLtXCU8iiaKe4GEXPwnkg0iZYAFjuVd+/7
-        cxmoMD5CdfDzxDPkfBbGjdtnfPdZdhTH6i2TBuShkLLziqTJj3x4Ok/J33+kXZdViNXPQd
-        tqk+AM75IE8JiqNG4UJQbl70fF8Qv7w=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-XPO6b55AM_W2mKRaGCQkHg-1; Thu, 21 Sep 2023 13:01:18 -0400
-X-MC-Unique: XPO6b55AM_W2mKRaGCQkHg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3172a94b274so777502f8f.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:01:17 -0700 (PDT)
+        with ESMTP id S230139AbjIUR2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 13:28:55 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D090153650
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:16:44 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c09bcf078so16582727b3.1
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695316604; x=1695921404; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cWVtF+fs1Usi+Rms/xg03923pHwopRJzuckxmMamX6A=;
+        b=n1JDcaLS3QeCXxqU5CrZYcwCXmEFcfnrqvuehEaqvNiQF7jpOB5nLY29f4VmS0PkDj
+         ETajjqf3dD8V6WLGCqG2G2m1I+QuqsMeTXTKE13zrqC/ELYbyXCZvPaWZY1dDRTChBEy
+         lD4cu9ioDYoXZMykyYB2PFN5LNXrupuh1j7sGyysGL8JUDp1FgjIC5F9B1AB0Ldc3udt
+         eRMmRKdwQUsbBdLxrRMAZs3ZjepGksI4XNWVe1VLMukL6RpE3jBnOtdsAHlPwLvm0ra2
+         jxvH9E04zaF0LHE4dGm780j9/uKyLmTinPVelZKDexPiUuPjiBIHl8YCVnJOP6OeERMT
+         lQIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315677; x=1695920477;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eXLjSJIMRxcWvPfwsAym08vPACVukQQjMlk91zESb4A=;
-        b=CPOzP9HQz1xlINSqmwirI8pw74oqNDEiccZ2f75D7da0nUU+hh4x+EwKIQDrMG44+I
-         NTVFNvmot11PN7FzfSNQzIG9p+h3En29IfYgHnqLmeSGg6HvsvhXft+Qg0zRjzRTJAIC
-         Q56C8I7+rzOG5y+Q5x+I2NwRzeNaJ0R0ztoLR06DA+o5KLdZiaknP8Ot6knB0R3GL930
-         C2jjG3Cb62TypXfCDPm9XGJOrGaQJBQ9kMLR1fJ/seijxLroz5bjIUsvPp7xC+/fTCnk
-         KtnxqRKCnS4ixiGZ8sIgu5xWNb+D2zYPOYYFD0QusCbFHXb9Yro7qNYeu1aQEY3MzBac
-         bImA==
-X-Gm-Message-State: AOJu0YwbHX5ik25bFfNR3zP7Y5UEGlegQISwKkG17NGb4W1yt1pc/g+3
-        x0GG0EVNHgT/AKmnCOq9wsqtZSlADSdCNUnEgfJtUwDA8sFU1oUPa3dp/K9Pt8T4yOmKUYm9ImX
-        QkaJTjloqD3jK
-X-Received: by 2002:a5d:4002:0:b0:31f:fa38:425f with SMTP id n2-20020a5d4002000000b0031ffa38425fmr6223637wrp.9.1695315676888;
-        Thu, 21 Sep 2023 10:01:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZwr2zrzHEqGG+dt5nELJ8fK8Zh8B8fa0c6Q4DwZ9VFKGUV6CPz1ZEPZrn4R+cr3pruDWXcQ==
-X-Received: by 2002:a5d:4002:0:b0:31f:fa38:425f with SMTP id n2-20020a5d4002000000b0031ffa38425fmr6223610wrp.9.1695315676542;
-        Thu, 21 Sep 2023 10:01:16 -0700 (PDT)
-Received: from redhat.com ([2.52.150.187])
-        by smtp.gmail.com with ESMTPSA id bg1-20020a170906a04100b009adce1c97ccsm1330409ejb.53.2023.09.21.10.01.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 10:01:15 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 13:01:12 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, jasowang@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230921125348-mutt-send-email-mst@kernel.org>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-12-yishaih@nvidia.com>
- <20230921104350.6bb003ff.alex.williamson@redhat.com>
- <20230921165224.GR13733@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921165224.GR13733@nvidia.com>
+        d=1e100.net; s=20230601; t=1695316604; x=1695921404;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cWVtF+fs1Usi+Rms/xg03923pHwopRJzuckxmMamX6A=;
+        b=XGWDmmRR/2ltr5o75OnN8CaCHiFcnuMyQxD4bycM0B/YZpLVWpUO8/F6VODd8C4Lmw
+         wlDjix8//6hswHx9gdOrOHKIkWlTEIzSXK15fdL1aiYCqVcvAtnKAApf6sQTJpTaxCHo
+         mC/G44c17HbJrhet34W83SxQNqlbooYYlMAhaN2yASyC6f3ARY+t1jWx0CqDW4TRXnYP
+         JV378kz+AgISn1iRjXLUxzbyJwYrpBrBKo/CShIX2o73kkRG04SqkEn65Wy7pX52gIYg
+         WsEekG2Hm7Yn+RnPOmeze0W7XZTsZhZVHX4bIM4Tts7rYPYsWxZbJpkZrr5CoAaa0ZeU
+         8TQA==
+X-Gm-Message-State: AOJu0YzTF7xoIjUPYzenf8EmzpW4c/yLIFPLXlvZdgsH8SSy9FAmXgMC
+        zMnZjZU+R+ju3VH/sTpPBNel5IrHEXg=
+X-Google-Smtp-Source: AGHT+IF7YpypDgLAEH9RbqQ5ZX2J+3/XnO4CKGwOS3uMOFrTbYjpQET5KdjsfemTXZvMtGJwV7V4Ozr3gzc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b709:0:b0:59b:e669:c944 with SMTP id
+ v9-20020a81b709000000b0059be669c944mr90231ywh.3.1695316603960; Thu, 21 Sep
+ 2023 10:16:43 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 21 Sep 2023 10:16:41 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230921171641.3641776-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Treat %llx like %lx when formatting guest printf
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Aaron Lewis <aaronlewis@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 01:52:24PM -0300, Jason Gunthorpe wrote:
-> On Thu, Sep 21, 2023 at 10:43:50AM -0600, Alex Williamson wrote:
-> 
-> > > With that code in place a legacy driver in the guest has the look and
-> > > feel as if having a transitional device with legacy support for both its
-> > > control and data path flows.
-> > 
-> > Why do we need to enable a "legacy" driver in the guest?  The very name
-> > suggests there's an alternative driver that perhaps doesn't require
-> > this I/O BAR.  Why don't we just require the non-legacy driver in the
-> > guest rather than increase our maintenance burden?  Thanks,
-> 
-> It was my reaction also.
-> 
-> Apparently there is a big deployed base of people using old guest VMs
-> with old drivers and they do not want to update their VMs. It is the
-> same basic reason why qemu supports all those weird old machine types
-> and HW emulations. The desire is to support these old devices so that
-> old VMs can work unchanged.
-> 
-> Jason
+Treat %ll* formats the same as %l* formats when processing printfs from
+the guest so that using e.g. %llx instead of %lx generates the expected
+output.  Ideally, unexpected formats would generate compile-time warnings
+or errors, but it's not at all obvious how to actually accomplish that.
 
-And you are saying all these very old VMs use such a large number of
-legacy devices that over-counting of locked memory due to vdpa not
-correctly using iommufd is a problem that urgently needs to be solved
-otherwise the solution has no value?
+Alternatively, guest_vsnprintf() could assert on an unexpected format,
+but since the vast majority of printfs are for failed guest asserts,
+getting *something* printed is better than nothing.
 
-Another question I'm interested in is whether there's actually a
-performance benefit to using this as compared to just software
-vhost. I note there's a VM exit on each IO access, so ... perhaps?
-Would be nice to see some numbers.
+E.g. before
 
+ ==== Test Assertion Failure ====
+  x86_64/private_mem_conversions_test.c:265: mem[i] == 0
+  pid=4286 tid=4290 errno=4 - Interrupted system call
+     1	0x0000000000401c74: __test_mem_conversions at private_mem_conversions_test.c:336
+     2	0x00007f3aae6076da: ?? ??:0
+     3	0x00007f3aae32161e: ?? ??:0
+  Expected 0x0 at offset 0 (gpa 0x%lx), got 0x0
 
+and after
+
+ ==== Test Assertion Failure ====
+  x86_64/private_mem_conversions_test.c:265: mem[i] == 0
+  pid=5664 tid=5668 errno=4 - Interrupted system call
+     1	0x0000000000401c74: __test_mem_conversions at private_mem_conversions_test.c:336
+     2	0x00007fbe180076da: ?? ??:0
+     3	0x00007fbe17d2161e: ?? ??:0
+  Expected 0x0 at offset 0 (gpa 0x100000000), got 0xcc
+
+Fixes: e5119382499c ("KVM: selftests: Add guest_snprintf() to KVM selftests")
+Cc: Aaron Lewis <aaronlewis@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/guest_sprintf.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/lib/guest_sprintf.c b/tools/testing/selftests/kvm/lib/guest_sprintf.c
+index c4a69d8aeb68..74627514c4d4 100644
+--- a/tools/testing/selftests/kvm/lib/guest_sprintf.c
++++ b/tools/testing/selftests/kvm/lib/guest_sprintf.c
+@@ -200,6 +200,13 @@ int guest_vsnprintf(char *buf, int n, const char *fmt, va_list args)
+ 			++fmt;
+ 		}
+ 
++		/*
++		 * Play nice with %llu, %llx, etc.  KVM selftests only support
++		 * 64-bit builds, so just treat %ll* the same as %l*.
++		 */
++		if (qualifier == 'l' && *fmt == 'l')
++			++fmt;
++
+ 		/* default base */
+ 		base = 10;
+ 
+
+base-commit: 7c7cce2cf7ee2ac54851ba1fbcf0e968932e32b9
 -- 
-MST
+2.42.0.515.g380fc7ccd1-goog
 
