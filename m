@@ -2,181 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 380797A9BCC
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:04:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 467DE7A9A20
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbjIUTEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 15:04:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
+        id S229998AbjIUSgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 14:36:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjIUTEG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:04:06 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C8C4E5D8
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:50:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695318601; x=1726854601;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=W9fNFA8xcVEA/iV9+MsAkTcTdm8KC9i+ViXMaeaufNc=;
-  b=Cb0EFyzwgXav3Q2zhKKxuNBmqvZ9nO/upBefVn2yZpQMeTFb0929xvB8
-   x2r6AGgYWuhwYhSgrpsbNhV0HTEVOqtGhyv0TOJnDudvqsySWQqzlXHeC
-   wN8TNMPfE2Et6VmtwB9XzQX2dj62ykRmhkuVV7u4Rg5PFUOtUVFv3/2yV
-   bZoVqnkpm4GWuh0LxEij+jwGPxdudoim1zyryYHBapJ60ToFuS95JMEgS
-   tvGGdo6GDKrw2XbtLSHdNGQKrexkCg/o2LXIW+wKJYbPsOVGV4JAr8RhE
-   XMGsioqPjdBnrVovOAQHgKVKwVBplws8vHqfGu0+LrW0ZxtcANwYRjM5z
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359841386"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="359841386"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:31:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="747001191"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="747001191"
-Received: from dorasunx-mobl1.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.255.30.47])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 01:31:25 -0700
-From:   Xiong Zhang <xiong.y.zhang@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, like.xu.linux@gmail.com,
-        dapeng1.mi@linux.intel.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com,
-        Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: [PATCH v2 9/9] KVM: selftests: Add fixed counters enumeration test case
-Date:   Thu, 21 Sep 2023 16:29:57 +0800
-Message-Id: <20230921082957.44628-10-xiong.y.zhang@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230921082957.44628-1-xiong.y.zhang@intel.com>
-References: <20230921082957.44628-1-xiong.y.zhang@intel.com>
+        with ESMTP id S229675AbjIUSgL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 14:36:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0073F43C88
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:16:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695316562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qT83k5KL55IHPMxMrxHeCEwMFmX72whvKRfXhwzkqs4=;
+        b=SuZl5d9RWu8v12kkPm1EYsAZKy3ct2RSw8bv+e+/Ce5O4TPMxD33BzdPAos3MFqGF6jLla
+        CktXrZo+yxW91xGoxCYx0uNlE8o8LZszhz/y7eQkzzCKb8pLZ3Fx3pPzQEGkOk054miUqz
+        cC+aUf3+5/f866IuiG3JdulSOEGx8bE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-424-ra6RfpOfMFmNgQM2Yt3CTw-1; Thu, 21 Sep 2023 04:46:10 -0400
+X-MC-Unique: ra6RfpOfMFmNgQM2Yt3CTw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-402d63aeea0so5478785e9.2
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 01:46:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695285969; x=1695890769;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qT83k5KL55IHPMxMrxHeCEwMFmX72whvKRfXhwzkqs4=;
+        b=LXFQ0I/HlCwP/0Tg2On9/43T1CgeVxrOXXw3+tIBvSX6hnrwsdnVF+gzoroZBtjw8q
+         PS3pLdTKuzGejCllOR2Qu8RO8tCC76KjKslL2TcFNLEvwnG3V4gVcyryhb9q+m64mpcd
+         2sK7Mm+aGOAviO8s8TOqsegYTFpvOBvxTuB63qRNgdhy+Cyzs+FfjXsh3RScnB8UmMBJ
+         GISFT4270gcRxax0FaYq3+OMkfK+TY8x/HjTSwz5H16V8c4bqKpAPFo8l64WIhi4REie
+         G1LN/1ESfKe4g19iA3iirdMdHej886hzBRyiXAwdue+pyFrd1X/riD0RDeZeztNF6aS/
+         QScA==
+X-Gm-Message-State: AOJu0YzWjb8Zt/OlGmDY8AhOxju7hIXBia9BizIIteJhLp6W9xR5GMaG
+        W2PiW41yUiv+uIyHrgsCuDGp9ffJe/o999ZoMr3AV/DhNuNtsYixFK1q+hXx8o4lH+U2mIWw4ye
+        gtM2rb0GtS5UD
+X-Received: by 2002:a05:600c:290:b0:3fd:3006:410b with SMTP id 16-20020a05600c029000b003fd3006410bmr4635444wmk.34.1695285969270;
+        Thu, 21 Sep 2023 01:46:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHEKqCuAIJwnQJsQZZ8qqBZ0geuqmHsPXvhx9v7opOsIwmZxaAVauR+DFVx/KCsQqfrlHMEpA==
+X-Received: by 2002:a05:600c:290:b0:3fd:3006:410b with SMTP id 16-20020a05600c029000b003fd3006410bmr4635410wmk.34.1695285968901;
+        Thu, 21 Sep 2023 01:46:08 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70d:3c00:9eab:fce5:e6f3:e626? (p200300cbc70d3c009eabfce5e6f3e626.dip0.t-ipconnect.de. [2003:cb:c70d:3c00:9eab:fce5:e6f3:e626])
+        by smtp.gmail.com with ESMTPSA id k1-20020adfe3c1000000b0031ff1ef7dc0sm1123795wrm.66.2023.09.21.01.46.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 01:46:08 -0700 (PDT)
+Message-ID: <f525d4da-0878-b4bc-f9cf-7b824abfef0a@redhat.com>
+Date:   Thu, 21 Sep 2023 10:46:06 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v2 04/21] memory: Introduce
+ memory_region_has_gmem_fd()
+Content-Language: en-US
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+ <20230914035117.3285885-5-xiaoyao.li@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230914035117.3285885-5-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vPMU v5 adds fixed counter enumeration, which allows user space to
-specify which fixed counters are supported through emulated
-CPUID.0Ah.ECX.
+On 14.09.23 05:51, Xiaoyao Li wrote:
+> Introduce memory_region_has_gmem_fd() to query if the MemoryRegion has
+> KVM gmem fd allocated.
 
-This commit adds a test case which specify the max fixed counter
-supported only, so guest can access the max fixed counter only, #GP
-exception will be happen once guest access other fixed counters.
+*probably* best to just squash that into patch #2.
 
-Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
----
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  | 79 +++++++++++++++++++
- 1 file changed, 79 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-index ebbcb0a3f743..c690cb389ae2 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
-@@ -18,6 +18,8 @@
- #include "kvm_util.h"
- #include "vmx.h"
- 
-+uint8_t fixed_counter_num;
-+
- union perf_capabilities {
- 	struct {
- 		u64	lbr_format:6;
-@@ -233,6 +235,81 @@ static void test_lbr_perf_capabilities(union perf_capabilities host_cap)
- 	kvm_vm_free(vm);
- }
- 
-+static void guest_v5_code(void)
-+{
-+	uint8_t  vector, i;
-+	uint64_t val;
-+
-+	for (i = 0; i < fixed_counter_num; i++) {
-+		vector = rdmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, &val);
-+
-+		/*
-+		 * Only the max fixed counter is supported, #GP will be generated
-+		 * when guest access other fixed counters.
-+		 */
-+		if (i == fixed_counter_num - 1)
-+			__GUEST_ASSERT(vector != GP_VECTOR,
-+				       "Max Fixed counter is accessible, but get #GP");
-+		else
-+			__GUEST_ASSERT(vector == GP_VECTOR,
-+				       "Fixed counter isn't accessible, but access is ok");
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+#define PMU_NR_FIXED_COUNTERS_MASK  0x1f
-+
-+static void test_fixed_counter_enumeration(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	int r;
-+	struct kvm_cpuid_entry2 *ent;
-+	struct ucall uc;
-+	uint32_t fixed_counter_bit_mask;
-+
-+	if (kvm_cpu_property(X86_PROPERTY_PMU_VERSION) < 5)
-+		return;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_v5_code);
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	ent = vcpu_get_cpuid_entry(vcpu, 0xa);
-+	fixed_counter_num = ent->edx & PMU_NR_FIXED_COUNTERS_MASK;
-+	TEST_ASSERT(fixed_counter_num > 0, "fixed counter isn't supported");
-+	fixed_counter_bit_mask = (1ul << fixed_counter_num) - 1;
-+	TEST_ASSERT(ent->ecx == fixed_counter_bit_mask,
-+		    "cpuid.0xa.ecx != %x", fixed_counter_bit_mask);
-+
-+	if (fixed_counter_num == 1) {
-+		kvm_vm_free(vm);
-+		return;
-+	}
-+
-+	/* Support the max Fixed Counter only */
-+	ent->ecx = 1UL << (fixed_counter_num - 1);
-+	ent->edx &= ~(u32)PMU_NR_FIXED_COUNTERS_MASK;
-+
-+	r = __vcpu_set_cpuid(vcpu);
-+	TEST_ASSERT(!r, "Setting modified cpuid.0xa.ecx and edx failed");
-+
-+	vcpu_run(vcpu);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	union perf_capabilities host_cap;
-@@ -253,4 +330,6 @@ int main(int argc, char *argv[])
- 	test_immutable_perf_capabilities(host_cap);
- 	test_guest_wrmsr_perf_capabilities(host_cap);
- 	test_lbr_perf_capabilities(host_cap);
-+
-+	test_fixed_counter_enumeration();
- }
 -- 
-2.34.1
+Cheers,
+
+David / dhildenb
 
