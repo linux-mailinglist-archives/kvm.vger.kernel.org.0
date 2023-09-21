@@ -2,100 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1A837AA50B
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:30:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8AB87AA4C8
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:20:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbjIUWaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 18:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37048 "EHLO
+        id S231414AbjIUWU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 18:20:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231916AbjIUWaY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 18:30:24 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E724F7EC0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:05:24 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-656307a52e8so6144456d6.1
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:05:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695315917; x=1695920717; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S9nCvb9CrO2GaZq009DzYQ8CxVOSv0DQu3f44RpIAl4=;
-        b=hD8dTZV55dQw/KKvw6hEheom6xuujJ7tCVwAHIP5Jr2CyxQvTAM9dCRO9wZFehvGz+
-         JUpt9URJGSLFV36Wdmz7tDnfIdm3unrhDtn50bN+BuOTzc3iiqojk3x/aUytTxI1HA3S
-         /fklXnGXUCNvm+9gUWRac53WRtMyrwovGAccgp+6WTKDaKmpiHitYYP+dHMMRW3V6gIY
-         LZHyh8mJTQp8/SzX9bxFM9gg4tvwPOwQF/Mhqf0n58EecDQe7UEtB/U8f/LMHISLN9+g
-         Jk6/uikmu7XmPnR2ONepYjA0fkRabWtuVsrufY6jFkWrH+0R26yQbX/zQoNXQeE8yikd
-         wbZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315917; x=1695920717;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S9nCvb9CrO2GaZq009DzYQ8CxVOSv0DQu3f44RpIAl4=;
-        b=jrWJkSd+gbbm3QN61houIN8fKR91jxEdSTmRFS1oCZ5yk6BT5rNi9Kc1jgJ2bGKtOF
-         VC8iiNBKfkENRBxBNGj2ME8CgnvyVjeS0T153Z4MyPBdPsDUUEGG5NUe6MgkjWC5L5u8
-         SH/ryUHnI1gmZuFiBMxt4m6xU75iCNJSAykIQ3ce/QUC2Ap/abzyUnPMxzHGLW83OPiI
-         RQw8SW3nM8StpnV4Mfd74ulrWkv7h8FiGWVjiOeTsiFlpZBlswaWLJOhNUPhzNslOrEk
-         wxXAnr7vpPA/uKZ7CflvrpRzrju8+vzVIDFan4PbFn1n0kBD6YOciKBD/N+7uykEQ4UX
-         oe+Q==
-X-Gm-Message-State: AOJu0YzS0nRW3lXtOdc5IMY38PEIhvDxJ/mLFw7UVU+GlKe8gMob/1P1
-        kG4EWFpfBngX+s5aAXvP1i231M3Z72ueipdpNDcVP5yJ3TOjgJ+2M0Y=
-X-Google-Smtp-Source: AGHT+IHVPuhFW+sGrMGW2iY7pMa14QvaelEddHySWV/HAgZhZpuV4DDEx4xNG/hsPPFcqiqQeUvbDngd1S9ogJ2JCoI=
-X-Received: by 2002:a17:90a:c08a:b0:268:553f:1938 with SMTP id
- o10-20020a17090ac08a00b00268553f1938mr4569172pjs.4.1695273761830; Wed, 20 Sep
- 2023 22:22:41 -0700 (PDT)
+        with ESMTP id S230479AbjIUWUl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 18:20:41 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D827DB9;
+        Thu, 21 Sep 2023 10:10:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695316241; x=1726852241;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+z5+5JtzJUHTDziH7GhRN2oy4j2s7kOBGRou6Rfz7PQ=;
+  b=clQJTOPRsL93Dn+FImNt/8MPtkrIxdixF8hEXdjzYlIkLGhFQDQWQqzL
+   MLNLKbEIs2qidBgrZ+EFx4k01ikA+w6h1RxFD1mOWddO9LAl+URcaN1lS
+   6n3qzCOIMmwlXq8eULWVoYq9sDmLKuP+BF2EIgX9hdyDNAxX4r8DccBG4
+   blSuJjSFNUmHHncb3GOo3BlHX7QHBCpcfTXVYx6yo+pC1K0jOJanyp2Y6
+   v70f6ASgi5NF6nJPSLz6GjQP+3sCrRcrd+/uw14OGgaZrBMtqMjdaqX54
+   y2O4D9S9eEeWm0L5FLyFSDCtKhegR1oEi+vZVjLA3EdbJhd0Z+QTGNQvt
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="370764372"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="370764372"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 00:54:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="812523013"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="812523013"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Sep 2023 00:54:43 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: [PATCH v5 01/11] iommufd: Add data structure for Intel VT-d stage-1 domain allocation
+Date:   Thu, 21 Sep 2023 00:54:21 -0700
+Message-Id: <20230921075431.125239-2-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230921075431.125239-1-yi.l.liu@intel.com>
+References: <20230921075431.125239-1-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <20230920154608.1447057-1-apatel@ventanamicro.com>
-In-Reply-To: <20230920154608.1447057-1-apatel@ventanamicro.com>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Thu, 21 Sep 2023 10:52:29 +0530
-Message-ID: <CAK9=C2WXtRLTFA5JeWbkyKt+1qyTat0nw7v3-b6oQ-YO_37tdA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] KVM RISC-V fixes for ONE_REG interface
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 20, 2023 at 9:16=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
-> wrote:
->
-> This series includes few assorted fixes for KVM RISC-V ONE_REG interface
-> and KVM_GET_REG_LIST API.
->
-> These patches can also be found in riscv_kvm_onereg_fixes_v2 branch at:
-> https://github.com/avpatel/linux.git
->
-> Changes since v1:
->  - Addressed Drew's comments in PATCH4
->
-> Anup Patel (4):
->   RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
->   RISC-V: KVM: Fix riscv_vcpu_get_isa_ext_single() for missing
->     extensions
->   KVM: riscv: selftests: Fix ISA_EXT register handling in get-reg-list
->   KVM: riscv: selftests: Selectively filter-out AIA registers
+This adds IOMMU_HWPT_TYPE_VTD_S1 for stage-1 hw_pagetable of Intel VT-d
+and the corressponding data structure for userspace specified parameter
+for the domain allocation.
 
-Queued this series for 6.6-rcX fixes
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+ include/uapi/linux/iommufd.h | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-Thanks,
-Anup
+diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+index 2083a0309a9b..18a502e206c3 100644
+--- a/include/uapi/linux/iommufd.h
++++ b/include/uapi/linux/iommufd.h
+@@ -358,12 +358,42 @@ enum iommufd_hwpt_alloc_flags {
+ 	IOMMU_HWPT_ALLOC_NEST_PARENT = 1 << 0,
+ };
+ 
++/**
++ * enum iommu_hwpt_vtd_s1_flags - Intel VT-d stage-1 page table
++ *                                entry attributes
++ * @IOMMU_VTD_S1_SRE: Supervisor request
++ * @IOMMU_VTD_S1_EAFE: Extended access enable
++ * @IOMMU_VTD_S1_WPE: Write protect enable
++ */
++enum iommu_hwpt_vtd_s1_flags {
++	IOMMU_VTD_S1_SRE = 1 << 0,
++	IOMMU_VTD_S1_EAFE = 1 << 1,
++	IOMMU_VTD_S1_WPE = 1 << 2,
++};
++
++/**
++ * struct iommu_hwpt_vtd_s1 - Intel VT-d stage-1 page table
++ *                            info (IOMMU_HWPT_TYPE_VTD_S1)
++ * @flags: Combination of enum iommu_hwpt_vtd_s1_flags
++ * @pgtbl_addr: The base address of the stage-1 page table.
++ * @addr_width: The address width of the stage-1 page table
++ * @__reserved: Must be 0
++ */
++struct iommu_hwpt_vtd_s1 {
++	__aligned_u64 flags;
++	__aligned_u64 pgtbl_addr;
++	__u32 addr_width;
++	__u32 __reserved;
++};
++
+ /**
+  * enum iommu_hwpt_type - IOMMU HWPT Type
+  * @IOMMU_HWPT_TYPE_DEFAULT: default
++ * @IOMMU_HWPT_TYPE_VTD_S1: Intel VT-d stage-1 page table
+  */
+ enum iommu_hwpt_type {
+ 	IOMMU_HWPT_TYPE_DEFAULT,
++	IOMMU_HWPT_TYPE_VTD_S1,
+ };
+ 
+ /**
+-- 
+2.34.1
 
->
->  arch/riscv/kvm/vcpu_onereg.c                  |  7 ++-
->  .../selftests/kvm/riscv/get-reg-list.c        | 58 ++++++++++++++-----
->  2 files changed, 47 insertions(+), 18 deletions(-)
->
-> --
-> 2.34.1
->
