@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22DFE7A914A
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 05:28:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3523B7A914B
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 05:28:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbjIUD2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 23:28:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53720 "EHLO
+        id S229541AbjIUD3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 23:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjIUD2n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 23:28:43 -0400
+        with ESMTP id S229452AbjIUD3B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 23:29:01 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00294ED
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 20:27:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A952F4
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 20:28:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695266866;
+        s=mimecast20190719; t=1695266896;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=s5/sthSUevT7DX5juFR893/1sq1rr4ICjUQIPG0QZ6I=;
-        b=HnqI8l3n40xhheFX3EmOkv/qgozfWOiA3QQpAJAe1BQjXr7tOah3tNVZIuUKi822FdM60L
-        ruqkjSbhr+/cq6YV9alL9vPx/5Kvi/A90yUtaCnPzkOdhPcWbv64UhaRgXoOvkNZEld9Hj
-        l+DwOwkERJudQaeAHql+5PQA6lWpxbE=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0v2JG/s7PIc0vGKodtM+Q59Y9VnGkq0n4Wh8qBqHuOY=;
+        b=Kc26MZ1wPbp8WDtR2ze0PWWJ/5KGrhGs/HkVO+VkgG0s5EyfTVlzG5QmUhkRRf+2LI9apy
+        UuMA+hMA+W9t0XyZJDrRkCFtV/mY0eIHXZtjN+2FOrgirHzdbkUpmTRaBUYeTGc6DgWW8V
+        7YNezBc0lvDXsdzApaXTZw4+HiLnYLk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-CriaruwGMUGEzODhVysQ9w-1; Wed, 20 Sep 2023 23:27:45 -0400
-X-MC-Unique: CriaruwGMUGEzODhVysQ9w-1
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1c5a0d9cf67so4573855ad.0
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 20:27:45 -0700 (PDT)
+ us-mta-39-2h19XlCMOP2Scngs-VCc1w-1; Wed, 20 Sep 2023 23:28:13 -0400
+X-MC-Unique: 2h19XlCMOP2Scngs-VCc1w-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-274bc2cb2dbso330026a91.0
+        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 20:28:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695266864; x=1695871664;
+        d=1e100.net; s=20230601; t=1695266892; x=1695871692;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s5/sthSUevT7DX5juFR893/1sq1rr4ICjUQIPG0QZ6I=;
-        b=ejFhGHZ5JMjM2SpvkeEY44sQtjvSRSwjxMfKwW+R71jDG/+V2/Ew2PGnfLUI7TQeKj
-         BGPoNh4GpceQ65eSHPaAdNhTFOvqODzJL94ZXhmuzSpvxrwvxeddPo6fYfht5Wbq7Bkv
-         RH8+dktkMkP5C9ciEJx8XUFRsXfSAsgaOmMIXNpiu7Sdqcsmuw1ukXp0tHKvDAnqhyG3
-         4VUx8B5MpqmnJuuhPouvVdzrhcOlu0MHtrRXQFSvAxejMcWakcJKhG34HyBpOzUFwGo/
-         /yMkXhWNX1kSlolZwp3mpCk3OZUIrJxPiQ16Owme8feqtbL96VPXv48VpMAImM4OxSfX
-         409w==
-X-Gm-Message-State: AOJu0YxQ62AwSLzWNkgs+d4N0MjFS5Jrc9zidOXm3pobQAgC0shyMYXw
-        G7p/INVtAuq+Rxh7afQDYyZ8GjES0NPEYOfFuR2LM6i3MiQ+1UHAKKtPRiBGS6cy0GbqhERxMN6
-        f8cDejJMDTCE9
-X-Received: by 2002:a17:903:24d:b0:1b8:2c6f:3248 with SMTP id j13-20020a170903024d00b001b82c6f3248mr5215813plh.39.1695266864400;
-        Wed, 20 Sep 2023 20:27:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0sRczFvE5VCVI6nFmcS9nD8GuAx11yzzuDlFnsQwzOPoY+wfQJsSqx7ebYvPWlwrg5RHDEA==
-X-Received: by 2002:a17:903:24d:b0:1b8:2c6f:3248 with SMTP id j13-20020a170903024d00b001b82c6f3248mr5215800plh.39.1695266864123;
-        Wed, 20 Sep 2023 20:27:44 -0700 (PDT)
+        bh=0v2JG/s7PIc0vGKodtM+Q59Y9VnGkq0n4Wh8qBqHuOY=;
+        b=ORchFYs+Z3LwFgszeuhNihfCsixXkDUwp6vYk6VuPtjd3aEuNPSCw9kNeLAyVzHp8b
+         sasueuqNN3AqUN8nT3vF8kaHSazpo9/xr1Wpg3iMSaX49bduQ6OJGHrDBEQNMswcab5D
+         eEjOjJMij77ThOyxlUyt1v82UZ1CKgV4q14WqCsSTEeXdywvtXybOz2q+sd10qXDPVjf
+         1qF7DpAfjhDtaggn8TdiGsN7//vDkG8/Lxu1gmk+2ZsDT9cOfCrS/pQCWHjmu2xaXowO
+         CIv5lvQ2s5khyBqrSig6a0bGxQsz31O/ZVEHiqepXibsbcnnHH7zk+qO3ea5MJcOa9ND
+         8y3w==
+X-Gm-Message-State: AOJu0YxAtPVws8/rtkyW6IzVR7MhhrAsotHkqIaLxaJGBGIS64lJBJTk
+        513SFh24CudHk8E3qQH/c+wgiggSwth00yJDJO0J6uJ/HupS/IHz3/eibyOPN0Jgpd3ZJikjmtr
+        MuLwQbM7mZ+cU
+X-Received: by 2002:a17:90b:60f:b0:271:9237:a07f with SMTP id gb15-20020a17090b060f00b002719237a07fmr4640841pjb.32.1695266892196;
+        Wed, 20 Sep 2023 20:28:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdTGDV/U1WxJZGqkf4/kI8P6PMbKZALx0spzejxrzMvccw2t9wWS0So2gleLrmzMbpuDGdXw==
+X-Received: by 2002:a17:90b:60f:b0:271:9237:a07f with SMTP id gb15-20020a17090b060f00b002719237a07fmr4640832pjb.32.1695266891888;
+        Wed, 20 Sep 2023 20:28:11 -0700 (PDT)
 Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
-        by smtp.gmail.com with ESMTPSA id c24-20020a170902b69800b001bb1f0605b2sm237330pls.214.2023.09.20.20.27.39
+        by smtp.gmail.com with ESMTPSA id j8-20020a17090a31c800b0027360359b70sm287885pjf.48.2023.09.20.20.28.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 20:27:43 -0700 (PDT)
-Message-ID: <3a592951-5dda-258d-56fc-ddb11a00fdf1@redhat.com>
-Date:   Thu, 21 Sep 2023 13:27:37 +1000
+        Wed, 20 Sep 2023 20:28:11 -0700 (PDT)
+Message-ID: <b652ad1e-6d38-3591-7728-487afeb1c9a6@redhat.com>
+Date:   Thu, 21 Sep 2023 13:28:06 +1000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH 1/2] arm64: tlbflush: Rename MAX_TLBI_OPS
+Subject: Re: [PATCH 2/2] KVM: arm64: Avoid soft lockups due to I-cache
+ maintenance
 Content-Language: en-US
 To:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -71,9 +72,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         linux-arm-kernel@lists.infradead.org
 References: <20230920080133.944717-1-oliver.upton@linux.dev>
- <20230920080133.944717-2-oliver.upton@linux.dev>
+ <20230920080133.944717-3-oliver.upton@linux.dev>
 From:   Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20230920080133.944717-2-oliver.upton@linux.dev>
+In-Reply-To: <20230920080133.944717-3-oliver.upton@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -87,58 +88,84 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 9/20/23 18:01, Oliver Upton wrote:
-> Perhaps unsurprisingly, I-cache invalidations suffer from performance
-> issues similar to TLB invalidations on certain systems. TLB and I-cache
-> maintenance all result in DVM on the mesh, which is where the real
-> bottleneck lies.
+> Gavin reports of soft lockups on his Ampere Altra Max machine when
+> backing KVM guests with hugetlb pages. Upon further investigation, it
+> was found that the system is unable to keep up with parallel I-cache
+> invalidations done by KVM's stage-2 fault handler.
 > 
-> Rename the heuristic to point the finger at DVM, such that it may be
-> reused for limiting I-cache invalidations.
+> This is ultimately an implementation problem. I-cache maintenance
+> instructions are available at EL0, so nothing stops a malicious
+> userspace from hammering a system with CMOs and cause it to fall over.
+> "Fixing" this problem in KVM is nothing more than slapping a bandage
+> over a much deeper problem.
 > 
+> Anyway, the kernel already has a heuristic for limiting TLB
+> invalidations to avoid soft lockups. Reuse that logic to limit I-cache
+> CMOs done by KVM to map executable pages on systems without FEAT_DIC.
+> While at it, restructure __invalidate_icache_guest_page() to improve
+> readability and squeeze our new condition into the existing branching
+> structure.
+> 
+> Link: https://lore.kernel.org/kvmarm/20230904072826.1468907-1-gshan@redhat.com/
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->   arch/arm64/include/asm/tlbflush.h | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
+>   arch/arm64/include/asm/kvm_mmu.h | 37 ++++++++++++++++++++++++++------
+>   1 file changed, 31 insertions(+), 6 deletions(-)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Gavin Shan <gshan@redhat.com>
 
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> index b149cf9f91bc..3431d37e5054 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-> @@ -333,7 +333,7 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
->    * This is meant to avoid soft lock-ups on large TLB flushing ranges and not
->    * necessarily a performance improvement.
->    */
-> -#define MAX_TLBI_OPS	PTRS_PER_PTE
-> +#define MAX_DVM_OPS	PTRS_PER_PTE
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 96a80e8f6226..a425ecdd7be0 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -224,16 +224,41 @@ static inline void __clean_dcache_guest_page(void *va, size_t size)
+>   	kvm_flush_dcache_to_poc(va, size);
+>   }
 >   
->   /*
->    * __flush_tlb_range_op - Perform TLBI operation upon a range
-> @@ -413,12 +413,12 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
->   
->   	/*
->   	 * When not uses TLB range ops, we can handle up to
-> -	 * (MAX_TLBI_OPS - 1) pages;
-> +	 * (MAX_DVM_OPS - 1) pages;
->   	 * When uses TLB range ops, we can handle up to
->   	 * (MAX_TLBI_RANGE_PAGES - 1) pages.
->   	 */
->   	if ((!system_supports_tlb_range() &&
-> -	     (end - start) >= (MAX_TLBI_OPS * stride)) ||
-> +	     (end - start) >= (MAX_DVM_OPS * stride)) ||
->   	    pages >= MAX_TLBI_RANGE_PAGES) {
->   		flush_tlb_mm(vma->vm_mm);
->   		return;
-> @@ -451,7 +451,7 @@ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end
+> +static inline size_t __invalidate_icache_max_range(void)
+> +{
+> +	u8 iminline;
+> +	u64 ctr;
+> +
+> +	asm volatile(ALTERNATIVE_CB("movz %0, #0\n"
+> +				    "movk %0, #0, lsl #16\n"
+> +				    "movk %0, #0, lsl #32\n"
+> +				    "movk %0, #0, lsl #48\n",
+> +				    ARM64_ALWAYS_SYSTEM,
+> +				    kvm_compute_final_ctr_el0)
+> +		     : "=r" (ctr));
+> +
+> +	iminline = SYS_FIELD_GET(CTR_EL0, IminLine, ctr) + 2;
+> +	return MAX_DVM_OPS << iminline;
+> +}
+> +
+>   static inline void __invalidate_icache_guest_page(void *va, size_t size)
 >   {
->   	unsigned long addr;
+> -	if (icache_is_aliasing()) {
+> -		/* any kind of VIPT cache */
+> +	/*
+> +	 * VPIPT I-cache maintenance must be done from EL2. See comment in the
+> +	 * nVHE flavor of __kvm_tlb_flush_vmid_ipa().
+> +	 */
+> +	if (icache_is_vpipt() && read_sysreg(CurrentEL) != CurrentEL_EL2)
+> +		return;
+> +
+> +	/*
+> +	 * Blow the whole I-cache if it is aliasing (i.e. VIPT) or the
+> +	 * invalidation range exceeds our arbitrary limit on invadations by
+> +	 * cache line.
+> +	 */
+> +	if (icache_is_aliasing() || size > __invalidate_icache_max_range())
+>   		icache_inval_all_pou();
+> -	} else if (read_sysreg(CurrentEL) != CurrentEL_EL1 ||
+> -		   !icache_is_vpipt()) {
+> -		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+> +	else
+>   		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+> -	}
+>   }
 >   
-> -	if ((end - start) > (MAX_TLBI_OPS * PAGE_SIZE)) {
-> +	if ((end - start) > (MAX_DVM_OPS * PAGE_SIZE)) {
->   		flush_tlb_all();
->   		return;
->   	}
+>   void kvm_set_way_flush(struct kvm_vcpu *vcpu);
 
