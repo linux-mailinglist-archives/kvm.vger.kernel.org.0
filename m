@@ -2,73 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05AC77AA0D1
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:49:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 896C97AA25C
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:16:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232341AbjIUUtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53536 "EHLO
+        id S231760AbjIUVPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 17:15:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232018AbjIUUsb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:48:31 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4EA81FD6
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:36:25 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3adf115ba79so802424b6e.3
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:36:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1695317785; x=1695922585; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/74XBA4XDm+i+o0t1C5ivQvEuNkPqqhN1c6kqQJV2tU=;
-        b=ervVSqDXmVrMj1tg/uDZZAySs0OtldRB8ggGwQRoS60cKxuDaLQ5Tot2rpmDEKXQgj
-         hQSYJx2BJhAbFjh6dJLDy96OyDd+EPMQDu8K7dZKdBI0gqoTHyndu/Ie3kapwcH44G6y
-         +rA2zoZ+sdthWsZJWMCJO99NC8pbPRmiAPPTVONC+SQmyQ7MWvgfOlfdb4gc4eN4StdA
-         8GLDa+R6aWTXliDy58BPTTK41mWH5ttJQYOdwW2ERgJ8voyJoYSEABSk9n9TurpLQVxH
-         zUYympJk0dRDx7/P2b7Sx+PCgobtM/IbqSA4q9i7OwiFoL3j0xAHj45i3Spp/+6UBTlU
-         Ee3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695317785; x=1695922585;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/74XBA4XDm+i+o0t1C5ivQvEuNkPqqhN1c6kqQJV2tU=;
-        b=EtzFAe1onTECmVeHqUlbuJyLuQo1ROyuzQNToBZJYzNHsNsBffFFFFOfuSK23kTqs6
-         c6uO8SkrpC/ATLw3ZbtniXJrT+wT0SDG5MjBuXq8RYxQaPRLW62TVBk6AD7CsOdKtW6r
-         BRLMamJKybsreoyW+XM2cbjkK/54nhO44en339dTqOGHb27ASd6rHyLPMypWnkeSAx1M
-         nMXsKjkPckD6fuJIBztkm222u1Xt2M6Up/nlTDxa1ApCxPZv1tGUUO9ISIYg1CnIXEqQ
-         9jYz0nTrT1E2gFH7Q8siDwQftF3QSk3SU/V3xHvALCuKhenxyC9CkXpe91x6uBlJz66o
-         37lQ==
-X-Gm-Message-State: AOJu0Yy3P3z8OO+ZYHVQynvEWDCvoVe4wP/FWRqqtOtzInMK+48wB6Eo
-        dRZaJ/LhkZmuP03wEhjG8/mPLTvDss5Om8wH2Lc=
-X-Google-Smtp-Source: AGHT+IHL3mhTdrZoBqHBqUOhbYs8XRD3azvm/y/EID/gPJe7YlpAjBMZhSwCCYY0msQJJ4bYCKo7dg==
-X-Received: by 2002:a05:6808:c2:b0:3a7:55f2:552d with SMTP id t2-20020a05680800c200b003a755f2552dmr4524575oic.58.1695281109036;
-        Thu, 21 Sep 2023 00:25:09 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id fe18-20020a056a002f1200b0069102aa1918sm658750pfb.48.2023.09.21.00.25.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 00:25:08 -0700 (PDT)
-Message-ID: <a5cd5a46-7f33-42b6-99eb-b09159af42d7@daynix.com>
-Date:   Thu, 21 Sep 2023 16:25:06 +0900
+        with ESMTP id S233170AbjIUVPX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 17:15:23 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C0A2114;
+        Thu, 21 Sep 2023 10:02:36 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED51C00444;
+        Thu, 21 Sep 2023 07:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695281415;
+        bh=0bQtjj08lQ7hZmIm0vxcQccxzsqdYVfn5uDbCn+u2Wo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=nDXhmIoqswRZf6OZwxkKd+b2w/PZSNX3p73vVn+sIczXPP90Re+yrYaPNGnyYEUdk
+         GDoOYo2r3RaxQdyin23+xfJKFERvWCsLJWfYkK6Nhjwv0bJwUNsxFwk3AK8bOfnEys
+         V+PR7WbCG5Y+7ZkX/NJxleqjbO9XEWz2HFb/0dqj6QPw0OC5B0AdhPjMWqJ2n86hUE
+         WU6xN/Jaey1db+YaDjcwrC/6NCRExhhVzB99aFokesVVSpPEsu6Hg8a3iAUwBBMDQD
+         s8cmzut5E6sk49Jc9+ukLvo0OXcS6XPQvFjI7V8wjNmwnW8IRw3cQPOlNDRpRqQZX2
+         q/cjEartPJD/g==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-532bf1943ebso692519a12.0;
+        Thu, 21 Sep 2023 00:30:15 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzJvgGDsbvzuK7bhlIw5DRwLewIAHKvCQI7xZbalmG8Yzy147cU
+        rl/9elygfRuMSZNw2I+RxXC/sU/uQTHufuak4iU=
+X-Google-Smtp-Source: AGHT+IFJ26dacuxbCaSY19LvtayzyHj7zwflLmuyY/j24DkQ4afyqJ9S4hS8w5NXT67uXj/IC4wkcXjisCEvqkQhJgc=
+X-Received: by 2002:a05:6402:88e:b0:522:2dcc:afb6 with SMTP id
+ e14-20020a056402088e00b005222dccafb6mr4337061edy.7.1695281414022; Thu, 21 Sep
+ 2023 00:30:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] accel/kvm/kvm-all: Handle register access errors
-Content-Language: en-US
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20221201102728.69751-1-akihiko.odaki@daynix.com>
- <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com>
- <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com>
- <ed62645a-ec48-14ff-4b7e-15314a0da30e@daynix.com>
- <CAFEAcA-pOKf1r+1BzURpv5FnFS79D2V=SSeY_a2Wene1wf+P1A@mail.gmail.com>
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAFEAcA-pOKf1r+1BzURpv5FnFS79D2V=SSeY_a2Wene1wf+P1A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
+ <CAAhV-H5fbyoMk9XWsejU0zVg4jPq_t2PT3ODKiAnc1LNARpBzA@mail.gmail.com>
+ <fed0bbb0-9c94-7dac-4956-f6c9b231fc0d@loongson.cn> <CAAhV-H5_KwmkEczws2diHpk5gDUZSAmy_7Zgi=CowhGZN9_d_A@mail.gmail.com>
+ <e53a4428-7533-61cd-81c5-0a65877041fd@loongson.cn> <CAAhV-H7QKBEV_dSfX8nprZ838HRCcDt8cziPip4UdSMuYvERzQ@mail.gmail.com>
+ <CABgObfaWiNYWFhR5528=3_1RBqTwTDqNpBHDRbvkd-9UyrCDpg@mail.gmail.com>
+In-Reply-To: <CABgObfaWiNYWFhR5528=3_1RBqTwTDqNpBHDRbvkd-9UyrCDpg@mail.gmail.com>
+From:   Huacai Chen <chenhuacai@kernel.org>
+Date:   Thu, 21 Sep 2023 15:30:02 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6YormmC7DC4Ar9Rwu16OHKP0G8+=7eShxkWjjQ7kq5mA@mail.gmail.com>
+Message-ID: <CAAhV-H6YormmC7DC4Ar9Rwu16OHKP0G8+=7eShxkWjjQ7kq5mA@mail.gmail.com>
+Subject: Re: [PATCH v21 00/29] Add KVM LoongArch support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     zhaotianrui <zhaotianrui@loongson.cn>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        WANG Xuerui <kernel@xen0n.name>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Mark Brown <broonie@kernel.org>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
+        Xi Ruoyao <xry111@xry111.site>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,66 +68,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/06/19 21:19, Peter Maydell wrote:
-> On Sat, 10 Jun 2023 at 04:51, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2022/12/01 20:00, Akihiko Odaki wrote:
->>> On 2022/12/01 19:40, Peter Maydell wrote:
->>>> On Thu, 1 Dec 2022 at 10:27, Akihiko Odaki <akihiko.odaki@daynix.com>
->>>> wrote:
->>>>>
->>>>> A register access error typically means something seriously wrong
->>>>> happened so that anything bad can happen after that and recovery is
->>>>> impossible.
->>>>> Even failing one register access is catastorophic as
->>>>> architecture-specific code are not written so that it torelates such
->>>>> failures.
->>>>>
->>>>> Make sure the VM stop and nothing worse happens if such an error occurs.
->>>>>
->>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>
->>>> In a similar vein there was also
->>>> https://lore.kernel.org/all/20220617144857.34189-1-peterx@redhat.com/
->>>> back in June, which on the one hand was less comprehensive but on
->>>> the other does the plumbing to pass the error upwards rather than
->>>> reporting it immediately at point of failure.
->>>>
->>>> I'm in principle in favour but suspect we'll run into some corner
->>>> cases where we were happily ignoring not-very-important failures
->>>> (eg if you're running Linux as the host OS on a Mac M1 and your
->>>> host kernel doesn't have this fix:
->>>> https://lore.kernel.org/all/YnHz6Cw5ONR2e+KA@google.com/T/
->>>> then QEMU will go from "works by sheer luck" to "consistently
->>>> hits this error check"). So we should aim to land this extra
->>>> error checking early in the release cycle so we have plenty of
->>>> time to deal with any bug reports we get about it.
-> 
->>> Actually I found this problem when I tried to run QEMU with KVM on M2
->>> MacBook Air and encountered a failure described and fixed at:
->>> https://lore.kernel.org/all/20221201104914.28944-2-akihiko.odaki@daynix.com/
->>>
->>> Although the affected register was not really important, QEMU couldn't
->>> run the guest well enough because kvm_arch_put_registers for ARM64 is
->>> written in a way that it fails early. I guess the situation is not so
->>> different for other architectures as well.
->>>
->>> I still agree that this should be postponed until a new release cycle
->>> starts as register saving/restoring is too important to fail.
-> 
->> Hi,
->>
->> QEMU 8.0 is already released so I think it's time to revisit this.
-> 
-> Two months ago would have been a better time :-) We're heading up
-> towards softfreeze for 8.1 in about three weeks from now.
-> 
-> thanks
-> -- PMM
+Hi, Paolo,
 
-Hi Peter,
+On Wed, Sep 20, 2023 at 11:23=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+>
+> On Sat, Sep 16, 2023 at 5:17=E2=80=AFAM Huacai Chen <chenhuacai@kernel.or=
+g> wrote:
+> > I can test now, during my tests I may ask some other questions about
+> > your patches. You just need to answer my questions and I will adjust
+> > the code myself if needed. After that I will give you a final version
+> > with Tested-by and you can simply send that as V22.
+>
+> Since you are preparing yourself the v22, you could also send it to me
+> as a pull request.
+OK, after Tianrui sends v22 to the maillist, if there are no more
+comments, I will send you a pull request after one or two weeks.
+Thanks.
 
-Please apply this.
+Huacai
 
-Regards,
-Akihiko Odaki
+>
+> Thanks,
+>
+> Paolo
+>
