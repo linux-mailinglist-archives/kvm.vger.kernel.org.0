@@ -2,118 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B02797A9EDD
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:13:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4D057AA1C0
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:06:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231414AbjIUUNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:13:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51880 "EHLO
+        id S232419AbjIUVFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 17:05:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229708AbjIUUNV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:13:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B95744B0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695317041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PQo3cP8ubnIFxn8GyzNBkh6mW/MSQ9HqXpxlK6ZJiTA=;
-        b=X0HqJhnmXHXAcU7s8dvT+c1JhkiLV8h45gzn9thObgWdNWcFTvw1ffuYEJY1Tfh7YPeXwT
-        w3Nr1Woax3H8MpLDceSyFnLE4TEhQ/u+TEymvZGt5C21sP6dc+41hN2rsH5/fCmjDaM4bG
-        9ByM/j9J+INo9w9VNQnZbr36jc/47VE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-548-ol8969O6MTGHiWmyy2_FZw-1; Thu, 21 Sep 2023 04:56:27 -0400
-X-MC-Unique: ol8969O6MTGHiWmyy2_FZw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32006e08483so507899f8f.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 01:56:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695286586; x=1695891386;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PQo3cP8ubnIFxn8GyzNBkh6mW/MSQ9HqXpxlK6ZJiTA=;
-        b=MKv95KfBYzueyeZXqc0Xp0Zqpkd0QFWsPIorQ6BPBjF2QDVjfJ35Tr5hkbVBlHRjtg
-         CoDC+EBY+sFjRp3+Vxaadrcadr1hXdc9D3A7sR16niT7rQ9dZZX1cOU2uD6accpqWFdN
-         i7a+/7kpSP78J+LnRSYxbNOOmP88/EomHk9NJJrdqSlglYBI3M23dLSXEp5psyvOm/vR
-         LdsQ4Sldvcp28cjQ8giQ6Pd5WENAgcJ5KaOJfKkd8eyATlHrPWmhalhQUR8WfQzmHLqq
-         BDKKo87uv9Oa+H+Tnd1FPVCrj4T12aYk73ESquxGYr/UP/sVr9K+aJSvcGQNCz7jqNH7
-         ltfw==
-X-Gm-Message-State: AOJu0Yw1xmFGvO2bZ99nKvJOnijj6zWZWwy6hvA0Y/uf1l3tRFZnADTt
-        Ra8UQIGMPm7hkipuf9O3ImD30uYuYXcha412cpuixe+EC/xI4tazsCf0ofKZ9fMWtjcqRqTmeJq
-        J3UkcUWy4LbIj
-X-Received: by 2002:adf:e253:0:b0:31a:dd55:e69c with SMTP id bl19-20020adfe253000000b0031add55e69cmr4279921wrb.60.1695286586214;
-        Thu, 21 Sep 2023 01:56:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF4a6zpCosFq3hmujQ4zTcT38YOWqiaKd28jQERYVCmRpaHM+ECvPdd2GHEzhC9vCufTHkxJg==
-X-Received: by 2002:adf:e253:0:b0:31a:dd55:e69c with SMTP id bl19-20020adfe253000000b0031add55e69cmr4279904wrb.60.1695286585929;
-        Thu, 21 Sep 2023 01:56:25 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70d:3c00:9eab:fce5:e6f3:e626? (p200300cbc70d3c009eabfce5e6f3e626.dip0.t-ipconnect.de. [2003:cb:c70d:3c00:9eab:fce5:e6f3:e626])
-        by smtp.gmail.com with ESMTPSA id z16-20020a056000111000b003176eab8868sm1131747wrw.82.2023.09.21.01.56.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 01:56:25 -0700 (PDT)
-Message-ID: <3f8955f6-c261-d3f3-08a2-54f0bd9caf8e@redhat.com>
-Date:   Thu, 21 Sep 2023 10:56:23 +0200
+        with ESMTP id S232791AbjIUVE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 17:04:59 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47B7566D8
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:27:11 -0700 (PDT)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RrqMV5BfPzrSwx;
+        Thu, 21 Sep 2023 17:08:54 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 21 Sep 2023 17:11:01 +0800
+Subject: Re: [PATCH v2 01/11] KVM: arm64: vgic: Make kvm_vgic_inject_irq()
+ take a vcpu pointer
+To:     Marc Zyngier <maz@kernel.org>
+CC:     <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+        <kvm@vger.kernel.org>, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Xu Zhao <zhaoxu.35@bytedance.com>,
+        Eric Auger <eric.auger@redhat.com>
+References: <20230920181731.2232453-1-maz@kernel.org>
+ <20230920181731.2232453-2-maz@kernel.org>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <c511ff67-fd8c-6edd-8239-2bacc3ad16f6@huawei.com>
+Date:   Thu, 21 Sep 2023 17:11:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [RFC PATCH v2 05/21] kvm: Enable KVM_SET_USER_MEMORY_REGION2 for
- memslot
+In-Reply-To: <20230920181731.2232453-2-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
-        Sean Christopherson <seanjc@google.com>,
-        Claudio Fontana <cfontana@suse.de>
-References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
- <20230914035117.3285885-6-xiaoyao.li@intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20230914035117.3285885-6-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.09.23 05:51, Xiaoyao Li wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+On 2023/9/21 2:17, Marc Zyngier wrote:
+> Passing a vcpu_id to kvm_vgic_inject_irq() is silly for two reasons:
 > 
-> Switch to KVM_SET_USER_MEMORY_REGION2 when supported by KVM.
+> - we often confuse vcpu_id and vcpu_idx
+> - we eventually have to convert it back to a vcpu
+> - we can't count
 > 
-> With KVM_SET_USER_MEMORY_REGION2, QEMU can set up memory region that
-> backend'ed both by hva-based shared memory and gmem fd based private
-> memory.
+> Instead, pass a vcpu pointer, which is unambiguous. A NULL vcpu
+> is also allowed for interrupts that are not private to a vcpu
+> (such as SPIs).
 > 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/arch_timer.c      |  2 +-
+>  arch/arm64/kvm/arm.c             | 20 ++++++++++----------
+>  arch/arm64/kvm/pmu-emul.c        |  2 +-
+>  arch/arm64/kvm/vgic/vgic-irqfd.c |  2 +-
+>  arch/arm64/kvm/vgic/vgic.c       | 12 +++++-------
+>  include/kvm/arm_vgic.h           |  4 ++--
+>  6 files changed, 20 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 6dcdae4d38cb..1f828f3b854c 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  				   timer_ctx->irq.level);
+>  
+>  	if (!userspace_irqchip(vcpu->kvm)) {
+> -		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> +		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+>  					  timer_irq(timer_ctx),
+>  					  timer_ctx->irq.level,
+>  					  timer_ctx);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4866b3f7b4ea..872679a0cbd7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1134,27 +1134,27 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  			  bool line_status)
+>  {
+>  	u32 irq = irq_level->irq;
+> -	unsigned int irq_type, vcpu_idx, irq_num;
+> +	unsigned int irq_type, vcpu_id, irq_num;
+>  	int nrcpus = atomic_read(&kvm->online_vcpus);
+>  	struct kvm_vcpu *vcpu = NULL;
+>  	bool level = irq_level->level;
+>  
+>  	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
+> -	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
+> -	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+> +	vcpu_id = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
+> +	vcpu_id += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+>  	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
+>  
+> -	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
+> +	trace_kvm_irq_line(irq_type, vcpu_id, irq_num, irq_level->level);
+>  
+>  	switch (irq_type) {
+>  	case KVM_ARM_IRQ_TYPE_CPU:
+>  		if (irqchip_in_kernel(kvm))
+>  			return -ENXIO;
+>  
+> -		if (vcpu_idx >= nrcpus)
+> +		if (vcpu_id >= nrcpus)
+>  			return -EINVAL;
 
-"Co-developed-by".
+What we actually need to check is 'vcpu->vcpu_idx >= nrcpus' and this is
+covered by the 'if (!vcpu)' statement below. Let's just drop this
+_incorrect_ checking?
 
--- 
-Cheers,
+>  
+> -		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
+> +		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
+>  		if (!vcpu)
+>  			return -EINVAL;
+>  
+> @@ -1166,17 +1166,17 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  		if (!irqchip_in_kernel(kvm))
+>  			return -ENXIO;
+>  
+> -		if (vcpu_idx >= nrcpus)
+> +		if (vcpu_id >= nrcpus)
+>  			return -EINVAL;
 
-David / dhildenb
+Same here.
 
+Thanks,
+Zenghui
