@@ -2,112 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EAFA7A964E
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 477697A9800
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbjIURDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 13:03:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44660 "EHLO
+        id S230167AbjIUR3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 13:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjIURCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:02:39 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB587E72
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:01:51 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c137f74b23so3585491fa.3
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:01:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1695315634; x=1695920434; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bnRaCddT87p/KTPHMcCblcFY4CEmmrLQIw4UVRv9/9k=;
-        b=O/tJooNJYYy1bM7iKArceBNuGD9M7iqedXo70cO2zzef5NoQunUUqIlPVj5MaRpcKV
-         PShI0GiPCj08vTaOwbKEAHDdLjVhT1+XyP9YenYvaxyXIWkj5sOikzZw8IvAKRrXvRGn
-         5pGbVOk7Xh50ZR4V2SxffnOL1FAaNxERub/Mbo6FpEYbFwj7Pa99ce1ioANqUOTF4JOL
-         qu2OBBjD8lPstUYGk+4+O7NB9ZqCluhd9Q35iQsR2S5meDYZyUl89CgBjShmW2OzLyHa
-         IvzElydYYasEncL/fm/zt9LBYdo/OdhMB9c+aTl9g3mhNBC3qRzQ4DVYdIlke+dEeSsS
-         x+NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315634; x=1695920434;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bnRaCddT87p/KTPHMcCblcFY4CEmmrLQIw4UVRv9/9k=;
-        b=tdaxYlGNnVMmtoNn6EpkQZznvXS6a7IvmjQbDCqkXPvxRMYsjOPmOiuQPnt787DLUW
-         ylEfiVAXkulYlpJpBzfvzctfCTqg7CMYJYXkj2St9C0EyM//0kCViow6qeh1kU6kQ4xK
-         zCrxAWTT3ylgl4opFDSFxEno57BkZxojZgIggUyr89me0VGdOWHBpBCwKq4sSlkOCDFb
-         jJ/KRHWpKqs0jshvXSkH3JB3w0Axjni20ttCdMiXV3Z62qY5k4Pe+mBREcTaewazt2nc
-         U2QgeYOUl/AqWWrB00lct7Ep6r49lflFPHtarVjSHYlydosdm6QO5xS7dhESlRCN3smQ
-         WWBA==
-X-Gm-Message-State: AOJu0YyasGqq5ELu5UBL3uD789dANwuWgWXDpWP8jPQzNPVuMVDh5ETG
-        u0RB5J5g1vPWJRxYrinXO0uT+s2yxDaFi4CdRQpDREFQxIud5drArZs=
-X-Google-Smtp-Source: AGHT+IHOwtovTmgwsWby+OJoyDY5AP80lEelm3HPPd28DmjZCPyC/5yiOXdj9uKZ7G/HXWgyBFm1cKA1bFemo5pLBa0=
-X-Received: by 2002:a2e:7a18:0:b0:2b9:20fe:4bc4 with SMTP id
- v24-20020a2e7a18000000b002b920fe4bc4mr4081500ljc.40.1695289438673; Thu, 21
- Sep 2023 02:43:58 -0700 (PDT)
+        with ESMTP id S230270AbjIUR2r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 13:28:47 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C2653649;
+        Thu, 21 Sep 2023 10:16:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695316605; x=1726852605;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=C2g69B99mcxWi9Q2D69yxsBnzZaEHHrRxUrs3EY2EDM=;
+  b=L0ejLB3pv5OS8qPgBezhNlZxNQyd0vYTcs4TcTksd18yFwppNgFBsFLR
+   oM16mdfyhu0nDNBBW4dfStLsXVoOks6GsQFX1JAEdlNmvDCRb3mfGbCn6
+   zcNvOU14AktmfvKdX+NA2iNXFJnuAHzy6CvoQ4Fb/g8z7M4ZCa7/YG7qe
+   boEax8Hai7G42yunaJEXVmuEhHiDlV7xfClAJDnIpYxFWflyP2QqoI0v9
+   l6/PK6TBtllsEPVrA/BfYu06JDMYmhcqDWfxR1C5aCu6VLFNCrfxOtZ9/
+   ExfvlJBe6U5bQtRlJMnZOPVNk8tXftWnFAjJ8B7IOSje3JPKiLZ8lB4gw
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="444606275"
+X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
+   d="scan'208";a="444606275"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 05:12:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="920706101"
+X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
+   d="scan'208";a="920706101"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.213.213]) ([10.254.213.213])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 05:12:06 -0700
+Message-ID: <0d37a1b1-e7ef-fa73-d17c-629cd254ae75@linux.intel.com>
+Date:   Thu, 21 Sep 2023 20:12:03 +0800
 MIME-Version: 1.0
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 21 Sep 2023 15:13:47 +0530
-Message-ID: <CAAhSdy3dL1JBSsu3yrQtJKavAkqMva=YotoV_y_+-kt0S0oVNA@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv fixes for 6.6, take #1
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        KVM General <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-        DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
+ domain_alloc_user op
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+References: <20230921075138.124099-1-yi.l.liu@intel.com>
+ <20230921075138.124099-2-yi.l.liu@intel.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230921075138.124099-2-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On 2023/9/21 15:51, Yi Liu wrote:
+> diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> index 4a7c5c8fdbb4..3c8660fe9bb1 100644
+> --- a/include/uapi/linux/iommufd.h
+> +++ b/include/uapi/linux/iommufd.h
+> @@ -357,6 +357,14 @@ enum iommufd_hwpt_alloc_flags {
+>   	IOMMU_HWPT_ALLOC_NEST_PARENT = 1 << 0,
+>   };
+>   
+> +/**
+> + * enum iommu_hwpt_type - IOMMU HWPT Type
+> + * @IOMMU_HWPT_TYPE_DEFAULT: default
 
-We have four ONE_REG related fixes for 6.6. Out of these,
-two are for kernel KVM module and other two are for get-reg-list
-selftest.
+How about s/default/vendor agnostic/ ?
 
-Please pull.
+> + */
+> +enum iommu_hwpt_type {
+> +	IOMMU_HWPT_TYPE_DEFAULT,
+> +};
+> +
+>   /**
+>    * struct iommu_hwpt_alloc - ioctl(IOMMU_HWPT_ALLOC)
+>    * @size: sizeof(struct iommu_hwpt_alloc)
 
-Regards,
-Anup
-
-The following changes since commit ce9ecca0238b140b88f43859b211c9fdfd8e5b70:
-
-  Linux 6.6-rc2 (2023-09-17 14:40:24 -0700)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.6-1
-
-for you to fetch changes up to 071ef070ca77e6dfe33fd78afa293e83422f0411:
-
-  KVM: riscv: selftests: Selectively filter-out AIA registers
-(2023-09-21 15:04:05 +0530)
-
-----------------------------------------------------------------
-KVM/riscv fixes for 6.6, take #1
-
-- Fix KVM_GET_REG_LIST API for ISA_EXT registers
-- Fix reading ISA_EXT register of a missing extension
-- Fix ISA_EXT register handling in get-reg-list test
-- Fix filtering of AIA registers in get-reg-list test
-
-----------------------------------------------------------------
-Anup Patel (4):
-      RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
-      RISC-V: KVM: Fix riscv_vcpu_get_isa_ext_single() for missing extensions
-      KVM: riscv: selftests: Fix ISA_EXT register handling in get-reg-list
-      KVM: riscv: selftests: Selectively filter-out AIA registers
-
- arch/riscv/kvm/vcpu_onereg.c                     |  7 ++-
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 58 +++++++++++++++++-------
- 2 files changed, 47 insertions(+), 18 deletions(-)
+Best regards,
+baolu
