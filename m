@@ -2,193 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07ADF7A9FA3
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 847877AA093
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:41:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbjIUUZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:25:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57036 "EHLO
+        id S232218AbjIUUlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:41:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231594AbjIUUZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:25:28 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DF049E8;
-        Thu, 21 Sep 2023 13:06:37 -0700 (PDT)
-Received: from [192.168.2.59] (109-252-153-31.dynamic.spd-mgts.ru [109.252.153.31])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 2A6DD66072A2;
-        Thu, 21 Sep 2023 21:06:35 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1695326795;
-        bh=HJZj4tL19myGpTxphjexxKcgBooAQOGMkPxijqRLW4k=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=VR42JGadjRAYiveQpgi1ROWyHZVJRToum30ci6EUeexG5WQPL75rWfp1AUwbguY1h
-         4cX3JGs5B/KTytKRbeRMUJ0pOSjK6saByxaxd6vcPaQLLgMspuuqwawOyYQCm0CTQ7
-         bg8wV6ylxVaUbuMQDOiQLUlPV2Qcu6V3U4AXV9d8ro5MgUbAlOIZpjH35xbIBd/UYr
-         +1nSuzUPzFfveko6knVummHMJb3FeKg0HfIgsnz6aFSbt5Cvh8fZohJZ0CUOU8z6yj
-         bl+Yoxt2AGI6YU7+Lk/1oquOvrp5FnMcal/AVr7AGNcs4ChI/spifJ81zaKrddT30L
-         zqpXSpoUEro4A==
-Message-ID: <2126e800-f9db-b3f8-3d1c-454b5b2c169e@collabora.com>
-Date:   Thu, 21 Sep 2023 23:06:32 +0300
+        with ESMTP id S232037AbjIUUlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:41:03 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184B526B6;
+        Thu, 21 Sep 2023 13:14:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695327286; x=1726863286;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uUCSLp/kd/xQmu6AYVH2w6xDmJBkRdaL5zkVvNRUtpE=;
+  b=G0qelphJrhk5QH+VHZuifkUQPKf6mbNVaIZb7Hji7rOaSxFhTUqn57Fq
+   R0JVXDBIeYH/00um5ed92sGVTi9RUkWC8LT7ApAQRUOcTL6bMnzoX+YU4
+   oGksFPFcraqlRMtZtUKi4b0fSJ2lny2Vb8+hhBjD6lwaeIZvbYXQadL+2
+   iVe6FN7cY0ZvQ0H7rRBIYF16YFj2pDTk/lx/quD4X2USUR1hL5enAzG6U
+   78X3IjDo3T9Xk2lI+BkQwpQFroeINLHBCuwSNHCP4k0T63xILOdOYGPWM
+   hUyr7V21yUFlZHNT5r3pKWJ/GGQdX/emx3ZHYuhaiMitvmsDH9OFWOrpK
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="383401581"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="383401581"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 13:14:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="696897775"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="696897775"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 13:14:44 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
+        Fuad Tabba <tabba@google.com>
+Subject: [RFC PATCH v2 0/6] KVM: gmem: Implement test cases for error_remove_page
+Date:   Thu, 21 Sep 2023 13:14:33 -0700
+Message-Id: <cover.1695327124.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
-Content-Language: en-US
-To:     David Stevens <stevensd@chromium.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230911021637.1941096-1-stevensd@google.com>
- <20230911021637.1941096-7-stevensd@google.com>
- <14db8c0b-77de-34ec-c847-d7360025a571@collabora.com>
- <207c8e59-f92a-96c0-bc5e-39b73a840110@collabora.com>
- <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
-From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <CAD=HUj51M9Eh=5Q=XQjPJ7No4i-z0en-1L3s0G8_fBZp0+NUZw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+X-Mailer: git-send-email 2.25.1
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/19/23 05:59, David Stevens wrote:
-> On Mon, Sep 18, 2023 at 8:19 PM Dmitry Osipenko
-> <dmitry.osipenko@collabora.com> wrote:
->>
->> On 9/18/23 12:58, Dmitry Osipenko wrote:
->>> On 9/11/23 05:16, David Stevens wrote:
->>>> From: David Stevens <stevensd@chromium.org>
->>>>
->>>> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
->>>> to map memory into the guest that is backed by non-refcounted struct
->>>> pages - for example, the tail pages of higher order non-compound pages
->>>> allocated by the amdgpu driver via ttm_pool_alloc_page.
->>>>
->>>> The bulk of this change is tracking the is_refcounted_page flag so that
->>>> non-refcounted pages don't trigger page_count() == 0 warnings. This is
->>>> done by storing the flag in an unused bit in the sptes. There are no
->>>> bits available in PAE SPTEs, so non-refcounted pages can only be handled
->>>> on TDP and x86-64.
->>>>
->>>> Signed-off-by: David Stevens <stevensd@chromium.org>
->>>> ---
->>>>  arch/x86/kvm/mmu/mmu.c          | 52 +++++++++++++++++++++++----------
->>>>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->>>>  arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
->>>>  arch/x86/kvm/mmu/spte.c         |  4 ++-
->>>>  arch/x86/kvm/mmu/spte.h         | 12 +++++++-
->>>>  arch/x86/kvm/mmu/tdp_mmu.c      | 22 ++++++++------
->>>>  include/linux/kvm_host.h        |  3 ++
->>>>  virt/kvm/kvm_main.c             |  6 ++--
->>>>  8 files changed, 76 insertions(+), 32 deletions(-)
->>>
->>> Could you please tell which kernel tree you used for the base of this
->>> series? This patch #6 doesn't apply cleanly to stable/mainline/next/kvm
->>>
->>> error: sha1 information is lacking or useless (arch/x86/kvm/mmu/mmu.c).
->>> error: could not build fake ancestor
->>
->> I applied the patch manually to v6.5.2 and tested Venus using Intel TGL iGPU, the intel driver is crashing:
->>
->>    BUG: kernel NULL pointer dereference, address: 0000000000000058
->>    #PF: supervisor read access in kernel mode
->>    #PF: error_code(0x0000) - not-present page
->>    PGD 0 P4D 0
->>    Oops: 0000 [#1] PREEMPT SMP
->>    CPU: 1 PID: 5926 Comm: qemu-system-x86 Not tainted 6.5.2+ #114
->>    Hardware name: LENOVO 20VE/LNVNB161216, BIOS F8CN43WW(V2.06) 08/12/2021
->>    RIP: 0010:gen8_ppgtt_insert+0x50b/0x8f0
->>    Code: 00 00 f7 c2 00 00 20 00 74 15 f7 c3 ff ff 1f 00 75 0d 41 81 fc ff ff 1f 00 0f 87 0e 02 00 00 48 8b 74 24 08 44 89 c0 45 85 ed <48> 8b 4e 58 48 8b 04 c1 0f 85 0b 02 00 00 81 e2 00 00 01 00 0f 84
->>    RSP: 0018:ffffafc085afb820 EFLAGS: 00010246
->>    RAX: 0000000000000000 RBX: 00000000e9604000 RCX: 000000000000001b
->>    RDX: 0000000000211000 RSI: 0000000000000000 RDI: ffff9513d44c1000
->>    RBP: ffff951106f8dfc0 R08: 0000000000000000 R09: 0000000000000003
->>    R10: 0000000000000fff R11: 00000000e9800000 R12: 00000000001fc000
->>    R13: 0000000000000000 R14: 0000000000001000 R15: 0000ffff00000000
->>    FS:  00007f2a5bcced80(0000) GS:ffff951a87a40000(0000) knlGS:0000000000000000
->>    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>    CR2: 0000000000000058 CR3: 0000000116f16006 CR4: 0000000000772ee0
->>    PKRU: 55555554
->>    Call Trace:
->>     <TASK>
->>     ? __die+0x1f/0x60
->>     ? page_fault_oops+0x14d/0x420
->>     ? exc_page_fault+0x3d7/0x880
->>     ? lock_acquire+0xc9/0x290
->>     ? asm_exc_page_fault+0x22/0x30
->>     ? gen8_ppgtt_insert+0x50b/0x8f0
->>     ppgtt_bind_vma+0x4f/0x60
->>     fence_work+0x1b/0x70
->>     fence_notify+0x8f/0x130
->>     __i915_sw_fence_complete+0x58/0x230
->>     i915_vma_pin_ww+0x513/0xa80
->>     eb_validate_vmas+0x17e/0x9e0
->>     ? eb_pin_engine+0x2bb/0x340
->>     i915_gem_do_execbuffer+0xc85/0x2bf0
->>     ? __lock_acquire+0x3b6/0x21c0
->>     i915_gem_execbuffer2_ioctl+0xee/0x240
->>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->>     drm_ioctl_kernel+0x9d/0x140
->>     drm_ioctl+0x1dd/0x410
->>     ? i915_gem_do_execbuffer+0x2bf0/0x2bf0
->>     ? __fget_files+0xc5/0x170
->>     __x64_sys_ioctl+0x8c/0xc0
->>     do_syscall_64+0x34/0x80
->>     entry_SYSCALL_64_after_hwframe+0x46/0xb0
->>    RIP: 0033:0x7f2a60b0c9df
->>
->>
->> $ ./scripts/faddr2line ./vmlinux gen8_ppgtt_insert+0x50b/0x8f0
->> gen8_ppgtt_insert+0x50b/0x8f0:
->> i915_pt_entry at drivers/gpu/drm/i915/gt/intel_gtt.h:557
->> (inlined by) gen8_ppgtt_insert_huge at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:641
->> (inlined by) gen8_ppgtt_insert at drivers/gpu/drm/i915/gt/gen8_ppgtt.c:743
->>
->> It's likely should be the i915 driver issue that is crashes with the NULL deref, but the origin of the bug should be the kvm page fault handling.
->>
->> David, could you please tell what tests you've run and post a link to yours kernel tree? Maybe I made obscure mistake while applied the patch manually.
-> 
-> For tests, I ran the kvm selftests and then various ChromeOS
-> virtualization tests. Two things to note about the ChromeOS
-> virtualization tests are that they use crosvm instead of qemu, and
-> they use virtio-gpu+virgl for graphics in the guest. I tested on an
-> AMD device (since the goal of this series is to fix a compatibility
-> issue with the amdgpu driver), and on a TGL device.
-> 
-> I don't have an easy way to share my kernel tree, but it's based on
-> v6.5-r3. The series I sent out is rebased onto the kvm next branch,
-> but there were only minor conflicts.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-It's good that you mentioned crosvm because I only tested qemu.
-Interestingly, the problem doesn't present using crosvm.
+This patch series is to implement test cases for the KVM gmem error_remove_page
+method.
+- Update punch hole method to truncate pages
+- Add a new ioctl KVM_GUEST_MEMORY_FAILURE to inject memory failure on
+  offset of gmem
 
-I made few more tests using these options:
+TODO:
+- Update TDX KVM to handle it and Add test cases for TDX.
+  This will be done by its own patch series.
 
-  1. yours latest version of the patch based on v6.5.4
-  2. yours latest version of the patch based on the kvm tree
-  3. by forward-porting yours older version of the kvm patchset to v6.5
-that works well based on v6.4 kernel
+Changes:
+v2:
+- rebased to [RFC PATCH v12 00/33] KVM: guest_memfd() and per-page attributes
+  https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.com/
+- introduce new ioctl to inject memory fault on gmem and drop FIBMAP hack
+- Implement test cases
 
-Neither of the options work with qemu and v6.5 kernel, but crosvm works.
+v1:
+https://lore.kernel.org/all/cover.1694599703.git.isaku.yamahata@intel.com/
 
-At first I felt confident that it must be i915 bug of the v6.5 kernel.
-But given that crosvm works, now I'm not sure.
+Isaku Yamahata (6):
+  KVM: gmem: Truncate pages on punch hole
+  KVM: selftests: Add negative test cases for punch hole for
+    guest_memfd()
+  KVM: selftests: Add tests for punch hole on guest_memfd
+  KVM: gmem: Add ioctl to inject memory failure on guest memfd
+  KVM: selftests: Add test cases for KVM_GUEST_MEMORY_FAILURE
+  KVM: guest_memfd: selftest: Add test case for error_remove_page method
 
-Will try to bisect 6.5 kernel, at minimum the i915 driver changes.
+ include/uapi/linux/kvm.h                      |   6 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  |  80 ++++
+ .../kvm/x86_64/private_mem_conversions_test.c |  26 +-
+ .../kvm/x86_64/private_mem_hwpoison_test.c    | 367 ++++++++++++++++++
+ virt/kvm/guest_mem.c                          |  82 +++-
+ 6 files changed, 554 insertions(+), 8 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_hwpoison_test.c
 
+
+base-commit: 42dc814987c1feb6410904e58cfd4c36c4146150
+prerequisite-patch-id: 3c646922da088ceebe447974a90217f377b76e4a
+prerequisite-patch-id: 635c4dca26af8d105a4fd8f603e4a9cf830395c7
+prerequisite-patch-id: eede5382aa76c0602a853fc93a1450995c651345
+prerequisite-patch-id: 5549aad02248eb5a0c2853058dc7c102044c7a9d
+prerequisite-patch-id: ab6557f79edb77246ee1e9955be81a10841e65fd
+prerequisite-patch-id: bf75388851ee37a83b37bfa7cb0084f27301f6bc
+prerequisite-patch-id: cecffe9a2445f2ea01b9fdb1356b1c87eb6b8fe7
+prerequisite-patch-id: e1692d657690f974d836ba3efdd277ea82e675ca
+prerequisite-patch-id: 747debe72334ef0cd12bbb42d1acb281eb59cd98
+prerequisite-patch-id: 2d1df1bad8af51577ec15a37510ea8bf018b0d4f
+prerequisite-patch-id: d05f7429ca893fe0fe3beb460bba1400379cd0d1
+prerequisite-patch-id: 9916b6553a61beb9a5435bc0b1fcacf0a87165ea
+prerequisite-patch-id: 313219882d617e4d4cb226760d1f071f52b3f882
+prerequisite-patch-id: 5412c4037793bc0999377f9732290b9944257b7c
+prerequisite-patch-id: b737a534d8da531f6d030be5e864a3097ca97384
+prerequisite-patch-id: cafe1f6964532d261b950e1879e091dc8c0b4386
+prerequisite-patch-id: 20a5d5b1f853828061ccb07ed08459b9922e5214
+prerequisite-patch-id: 756402fa0914a86ac7db59aa54e36a7bca9d0770
+prerequisite-patch-id: 0e93d19cb59f3a052a377a56ff0a4399046818aa
+prerequisite-patch-id: 8576bf7ec9f786870e72b78299dcab5dd4eb0d23
+prerequisite-patch-id: 0693f3aa65226ff9ffa1f70b6f6da2410ebd0588
+prerequisite-patch-id: 301dbdf8448175ea609664c890a3694750ecf740
+prerequisite-patch-id: 8f67d4366ca5c9875c4ef7f445941e3ad3162c75
+prerequisite-patch-id: 2d62d84b4f9db4148af35495ce1b188c6b46f421
+prerequisite-patch-id: b4526dee5b5a95da0a13116ae0c73d4e69efa3c6
+prerequisite-patch-id: 8a2b4167ea632413ba8f6d39788ddf19eb928ab0
+prerequisite-patch-id: 5618d2414a1ef641b4c247b5e28076f67a765b24
+prerequisite-patch-id: 4415e2df6492fbb64746e3503deba6e991a0e08b
+prerequisite-patch-id: ba50138fe73e9a5f58e19eebaab2c17a2dc231e3
+prerequisite-patch-id: 1225df90aeae430a74354bc5ad0ddf508d0707db
+prerequisite-patch-id: 4c0e6ab89b9a3ed3a2cb236e942b5842926bf868
+prerequisite-patch-id: 59f78d417ca58088e336f8e2a9540d1c95bd2f6c
+prerequisite-patch-id: b6a6a8916fe89e7da1fadefb7d311960732e0faf
 -- 
-Best regards,
-Dmitry
+2.25.1
 
