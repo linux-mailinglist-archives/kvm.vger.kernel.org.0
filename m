@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A0A77AA0F9
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:56:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FFCF7AA383
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:51:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232513AbjIUU4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:56:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54468 "EHLO
+        id S232839AbjIUVvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 17:51:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232389AbjIUU4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:56:08 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90AD38F489
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:34 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5789f2f13fcso1074969a12.3
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:34 -0700 (PDT)
+        with ESMTP id S232933AbjIUVvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 17:51:08 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB164ACD32
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:36 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d77fa2e7771so1798377276.1
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695328414; x=1695933214; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vVkSv5USYfxh1iDKrRIotw/ScBvVaPg/YoEhVNrkyyk=;
-        b=j64uyZccEnShlAdgH+z/yCrEhNjhDPvwwhYoXxMvkQGQdf6M+ByvuT15KHoe3NDF5A
-         EfQgD11auZHJRt3TUKYuF+9SN7tewsr8s3lKv2SIHThBChosMQEQf3kLeT2AI8sQuq2F
-         C2W8NaYsomfUsEobNW/762TT3jgw1SW9bV5UO3NIO8W+aTOHgw+pY3DaoVfEGT1todQi
-         fyJLultWhqhG13EnC5c/eFwCSTbmgmvZVYgnIX8/qCadHg/QHLl6zMgyB5gEUzg+FY13
-         LQY15dn3MXrwtxpKrhUgOulX4zaLZoETz/HMlk9cKgOR6qSCsFSmVM1AbSJ//qBJgg32
-         TJQg==
+        d=google.com; s=20230601; t=1695328416; x=1695933216; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=FGyjwBvsOtsfuIhphBYWtiq/+EdBc6Gwm+3ffP2TVfs=;
+        b=MJ/4lc+cX7TzyAAdalfKhnJV2Qvqe61anNd0ZAc9E3gCp1vGBElc/PE1/LcOl5S/Ys
+         /SosH7LMDdxj1R5b6cRKylf3vp9/cCdCxQy8wiHI8NDdjLFhb2iGCRqXQM9jPcGn0D/y
+         AhXHiCAKC6bjlPMfQ5b1yFC5P7MgeMC1vZjJ72xoQWHG8fCAS9IxY8n3JAstImk4ToCL
+         maNDy7MIwnhjd44s1O8ulnLZf8pdxO5o3POVq/31Pc85VMjVTexR/iuoPj+B2Y1J/eL1
+         ytLBkpBqa7FW85ROdg2r+V+xE/AIOogyD9uIsggayqwP4J3b6rJgaRU20ZV7fqmifiu9
+         KygA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695328414; x=1695933214;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vVkSv5USYfxh1iDKrRIotw/ScBvVaPg/YoEhVNrkyyk=;
-        b=EWHnxBiWFvfOSlLT4f0CGceM57Zr12GYAYnEWpUtT9n7JrQJYsM7yKsYShtptTEob0
-         txjvIoRccCjXCKZ7VHNwMJOYZR0opfxKRIOK6kHyk6Zk2mY314FjkrhsnUTY9lrXm6h2
-         fH+kS67WdJ05AgS2Th/WipQ2NfHA+X6FzF+hlpCvmXzUemh8ugfwFUBRflOJMw6SKOF7
-         coK29eYiH4KsxF8FhvQqvdFm7DJe/jRnyF8lzWWVD6xeafBHlO/9xQslW4BCO2HLjIe+
-         H0CeGMx6o2KnPEnn6aH2DFgvKMThoWPuSZ7ojBHSDB9OkzaTxDDkej1NBLh8MNE+rMcn
-         gz5g==
-X-Gm-Message-State: AOJu0Yz2FDgLg8JQGWxgCP4X2ZWnSbe6ndC47l9el/vKU0myX+qGKev2
-        BJeJdenAfIF2es8aiXPAQHzls3DdpNM=
-X-Google-Smtp-Source: AGHT+IHYFIuc9zqyHxB81MZBEcRhKGKtq8Fpu2bgHAXxJfzHlFxcNfobP06GPEJ6dPoFhdY2/yLVWW0ytIo=
+        d=1e100.net; s=20230601; t=1695328416; x=1695933216;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FGyjwBvsOtsfuIhphBYWtiq/+EdBc6Gwm+3ffP2TVfs=;
+        b=CV2yl6M5rNHNkPu05r9XnSEJVCcrP4qSNZZoyvhyRw14khz9YHbywV1wdA6sN/mA7o
+         30bQaNFptso5jyLw9+ekGR9O23Jj5J1yxGlnd4uz9goxnro4iD5LJ+wqPP2SKc0kgyqA
+         KLLJzM/4FIRGgluN7HnvP0z9r7S+pOzdTxJLJrc3sNSmB3vx4DKAlwJ6hzgPP1zwWWfB
+         4iE2fcfI83X16A27eHpvIwnFuOxrDswmjAxNv1VQbnrVuXE2LdhQxLxrwGLIP83ip07S
+         BJ1Ubvau2T52xpXR23X20Xrav/oxxRwETWAQ0VtPGQ/sCxqbtDSpwRwFj5e8A0zPGKFy
+         WsTQ==
+X-Gm-Message-State: AOJu0Yy1ML5IZq4K5O9mWvVe61bec8wsr5XN/EFriScz6N1GX4sR+LF/
+        C/B7CUjpjvlmXbwdKm2WujefCbdcm1k=
+X-Google-Smtp-Source: AGHT+IHmSxFj/rzaiI2sywRueiP80CEdjOd2hu2Iude5MVmXEp4VG1h2O78o3QM7I+FKA1VxJxlQX6QqLrA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e88b:b0:1b8:80c9:a98e with SMTP id
- w11-20020a170902e88b00b001b880c9a98emr81106plg.13.1695328414013; Thu, 21 Sep
- 2023 13:33:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d849:0:b0:d81:58d3:cc71 with SMTP id
+ p70-20020a25d849000000b00d8158d3cc71mr94599ybg.13.1695328415917; Thu, 21 Sep
+ 2023 13:33:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 21 Sep 2023 13:33:17 -0700
+Date:   Thu, 21 Sep 2023 13:33:18 -0700
+In-Reply-To: <20230921203331.3746712-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230921203331.3746712-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230921203331.3746712-1-seanjc@google.com>
-Subject: [PATCH 00/13] KVM: guest_memfd fixes
+Message-ID: <20230921203331.3746712-2-seanjc@google.com>
+Subject: [PATCH 01/13] KVM: Assert that mmu_invalidate_in_progress *never*
+ goes negative
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -61,60 +65,54 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a variety of bugs in the guest_memfd series, almost all of which are
-my fault, and add assertions and testcases to detect future regressions.
+Move the assertion on the in-progress invalidation count from the primary
+MMU's notifier path to KVM's common notification path, i.e. assert that
+the count doesn't go negative even when the invalidation is coming from
+KVM itself.
 
-The last patch, renaming guest_mem.c to guest_memfd.c, is obviously not a
-bug fix, I included it here so that if we want to go with guest_memfd.c,
-squashing everything will be straightforward.
+Opportunistically convert the assertion to a KVM_BUG_ON(), i.e. kill only
+the affected VM, not the entire kernel.  A corrupted count is fatal to the
+VM, e.g. the non-zero (negative) count will cause mmu_invalidate_retry()
+to block any and all attempts to install new mappings.  But it's far from
+guaranteed that an end() without a start() is fatal or even problematic to
+anything other than the target VM, e.g. the underlying bug could simply be
+a duplicate call to end().  And it's much more likely that a missed
+invalidation, i.e. a potential use-after-free, would manifest as no
+notification whatsoever, not an end() without a start().
 
-Note, the truncate fix and test conflicts with Isaku's series[*].  My
-fix is more correct (knock wood), and my test is slightly more comprehensive
-(though arguably not really all that more interesting).
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Note #2, this is based on kvm-x86/guest_memfd, to which I force-pushed v12.
-
-Note #3, the patches are organized so that they can be squashed with their
-Fixes, i.e. the splits are more than a bit odd in some places.
-
-[*] https://lore.kernel.org/all/cover.1695327124.git.isaku.yamahata@intel.com
-
-Sean Christopherson (13):
-  KVM: Assert that mmu_invalidate_in_progress *never* goes negative
-  KVM: Actually truncate the inode when doing PUNCH_HOLE for guest_memfd
-  KVM: WARN if *any* MMU invalidation sequence doesn't add a range
-  KVM: WARN if there are danging MMU invalidations at VM destruction
-  KVM: Fix MMU invalidation bookkeeping in guest_memfd
-  KVM: Disallow hugepages for incompatible gmem bindings, but let 'em
-    succeed
-  KVM: x86/mmu: Track PRIVATE impact on hugepage mappings for all
-    memslots
-  KVM: x86/mmu: Zap shared-only memslots when private attribute changes
-  KVM: Always add relevant ranges to invalidation set when changing
-    attributes
-  KVM: x86/mmu: Drop repeated add() of to-be-invalidated range
-  KVM: selftests: Refactor private mem conversions to prep for
-    punch_hole test
-  KVM: selftests: Add a "pure" PUNCH_HOLE on guest_memfd testcase
-  KVM: Rename guest_mem.c to guest_memfd.c
-
- arch/x86/kvm/mmu/mmu.c                        |  25 ++--
- .../kvm/x86_64/private_mem_conversions_test.c | 112 ++++++++++++++----
- virt/kvm/Makefile.kvm                         |   2 +-
- virt/kvm/{guest_mem.c => guest_memfd.c}       |  84 +++++++------
- virt/kvm/kvm_main.c                           |  40 +++++--
- 5 files changed, 184 insertions(+), 79 deletions(-)
- rename virt/kvm/{guest_mem.c => guest_memfd.c} (92%)
-
-
-base-commit: 7af66fbd6d89b159acc359895449b5940b6e4fdb
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a83dfef1316e..30708e460568 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -870,6 +870,7 @@ void kvm_mmu_invalidate_end(struct kvm *kvm)
+ 	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
+ 	 */
+ 	kvm->mmu_invalidate_in_progress--;
++	KVM_BUG_ON(kvm->mmu_invalidate_in_progress < 0, kvm);
+ 
+ 	/*
+ 	 * Assert that at least one range must be added between start() and
+@@ -906,8 +907,6 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+ 	 */
+ 	if (wake)
+ 		rcuwait_wake_up(&kvm->mn_memslots_update_rcuwait);
+-
+-	BUG_ON(kvm->mmu_invalidate_in_progress < 0);
+ }
+ 
+ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
