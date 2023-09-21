@@ -2,112 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A647C7AA0A4
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:44:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1361E7AA0F2
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232326AbjIUUoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40082 "EHLO
+        id S231975AbjIUUyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:54:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232018AbjIUUn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:43:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8B424842
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:21:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695327670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1SECl7HHOuHpRqQu6Pg2t83dXUaZvAMYkmKX/gGCDg0=;
-        b=VXsEkmhENBK1tflDQQHSuXgnGFIigF/pd4OHmsXbVbemOfa9GHneMitEeclnbhiBwmB2ms
-        RFU9pVwiogY9fKBRncMaQeGR74M7lyMJBa1izOeWusAOlWOZulfCW+Y4IGL5F80BCjKlss
-        YmEPJJ3AVmfq6PDPfr/kBXhu8dFq+Dc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-lH7O857ZOIqz2fwN1hsf4Q-1; Thu, 21 Sep 2023 16:21:09 -0400
-X-MC-Unique: lH7O857ZOIqz2fwN1hsf4Q-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-993c2d9e496so108614466b.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:21:09 -0700 (PDT)
+        with ESMTP id S232576AbjIUUxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:53:55 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6814902F
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:30:02 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c0eb18f09so19243337b3.2
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695328201; x=1695933001; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0e0ZFX778bRtqensng9uc874c9hN9XH6Wv7cNf/87eM=;
+        b=Lmcr48QZU9B3SGXe0N7Q03b4eFlKEEdSOEPlzaCPNlMBGZRRSf6v2uEJs4IXu2WFZq
+         +Zmore4QALQOyT074OJx4jdA1Cqy+m7DaTDzIqqn9+7TlKVaetoR9hx0PwK6LIPCnXcR
+         eQSQMbsUJBp8kNhdC9tJ/2o0ea5nhg4Kd/yaqMAJWjAuOEE+vOn/kaq9Tg5mouyz/gYd
+         Nq5CgUUNK57s3Bp8jpkHNq42gy8Fy4e7rY6EpnFUa7gXwkLNhmpFyaw5DeS+IR4ovdDz
+         PQ0d+ejU+OzLAM9QQVkoepNq2pD90SOZifiFaLg0yz9GnRefV9TvcTHGZuL9o5WQKo33
+         RAaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695327668; x=1695932468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1SECl7HHOuHpRqQu6Pg2t83dXUaZvAMYkmKX/gGCDg0=;
-        b=f9sqkGU1mxltfCujzpTFVM6x2H+JGrr/DdXzhfLp65kyFK4Q1KM3h1oijnqORW8a7/
-         i57frj1CNdw1eOj+zSA3BnAs6zjeh89NgWEMhc5v6u7p3NYW91LS5ZNBxaJKBL5qYc/Y
-         l5E7m4dTFdzqZnZSEXANUDGJP3XQnwAwNXlVmHgjAeXnGkme9rsXpZxNeRRNcWbdbXbO
-         B07isd3+3D9cc2IHvskn+MOAUwwvnWCnGotDXGaZUGk0mdRkpt/qeq74mUYiW0trTETu
-         9+ZMYPOBsfSX9tHFtv38Gp0RiYHVZaI6GrQToOPFf2FNfRbecweyGdLJjz3Ja0GH+b7Y
-         zi+g==
-X-Gm-Message-State: AOJu0Yy1/D8YaWfHoQRPy8sw7LSCg3i6Zj2fCdfYWs3dMr7zuZPMdwur
-        3Qsja8d/ywEmghQ3X3nIyGTHMVWk2P3Rfaj/B4BmMHtfSkhbSXwtwWOS4FNdSd32GQyM/ECJZJx
-        qp+tiG+XxqN9/
-X-Received: by 2002:a17:907:7755:b0:9a5:d657:47ec with SMTP id kx21-20020a170907775500b009a5d65747ecmr5891140ejc.64.1695327668593;
-        Thu, 21 Sep 2023 13:21:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3QCdXAxYwhPYQqQbPpiWRW9ysxpmHnqzUV7PdQNvEFRE1hFOgf1uBv4E8bUxI9licalfcNg==
-X-Received: by 2002:a17:907:7755:b0:9a5:d657:47ec with SMTP id kx21-20020a170907775500b009a5d65747ecmr5891121ejc.64.1695327668272;
-        Thu, 21 Sep 2023 13:21:08 -0700 (PDT)
-Received: from redhat.com ([2.52.150.187])
-        by smtp.gmail.com with ESMTPSA id t2-20020a17090616c200b0099d45ed589csm1506083ejd.125.2023.09.21.13.21.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 13:21:03 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 16:20:59 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, jasowang@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230921161834-mutt-send-email-mst@kernel.org>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-12-yishaih@nvidia.com>
- <20230921135832.020d102a.alex.williamson@redhat.com>
- <20230921200121.GA13733@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921200121.GA13733@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20230601; t=1695328201; x=1695933001;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0e0ZFX778bRtqensng9uc874c9hN9XH6Wv7cNf/87eM=;
+        b=bePTe4UK4lez0y82mCxdHnwW1eVCn4ir7nQHVjpbt2NsGwoVx1m2/3YBwusqf26bg1
+         LkvTuZEv/L6bSE4TG07NiL9bipW2/ZLxlGm+g9Ojs6WBCVUEL6HuFutxin4pl95KF5Vc
+         bMM371iPeKAQvz68iPVWgXH0wRWUeeQAR6OKEE2K3cqfKw286W4Pk3UMkFJNZA7V66/h
+         g6NeWc8eV3ZGEMPXFYCr+cN9N+3MDJTZxV9EJ/wvuIHSllWMET0H+ukicqRcWwpGLKT6
+         OuS0+62Rs3L20+r8D1+DrYgBX4RWkmsqo6JI97p+5TtAzRXN8JetheilKLuLNIOBW0PY
+         tpkQ==
+X-Gm-Message-State: AOJu0Yyy/SAu+ZjbX9yM56a1wXKhwAUN8wIAgH0IIUJPltlw89nlcfBT
+        PaLa0asjwaoW8R06wM47vPxXh0Pj21M=
+X-Google-Smtp-Source: AGHT+IEUzNA8IyQIMX03s7MMZaciANap7xKc1c5smy0hyixgyh595oKa8SQXXUtwQ8+rycDYPZuRHMWlcrs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ad1f:0:b0:59b:db15:a088 with SMTP id
+ l31-20020a81ad1f000000b0059bdb15a088mr93304ywh.3.1695328201599; Thu, 21 Sep
+ 2023 13:30:01 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 13:29:59 -0700
+In-Reply-To: <cover.1695327124.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+References: <cover.1695327124.git.isaku.yamahata@intel.com>
+Message-ID: <ZQynx5DyP56/HAxV@google.com>
+Subject: Re: [RFC PATCH v2 0/6] KVM: gmem: Implement test cases for error_remove_page
+From:   Sean Christopherson <seanjc@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
+        Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 05:01:21PM -0300, Jason Gunthorpe wrote:
-> On Thu, Sep 21, 2023 at 01:58:32PM -0600, Alex Williamson wrote:
+On Thu, Sep 21, 2023, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> > > +static const struct pci_device_id virtiovf_pci_table[] = {
-> > > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
-> > 
-> > libvirt will blindly use this driver for all devices matching this as
-> > we've discussed how it should make use of modules.alias.  I don't think
-> > this driver should be squatting on devices where it doesn't add value
-> > and it's not clear whether this is adding or subtracting value in all
-> > cases for the one NIC that it modifies.  How should libvirt choose when
-> > and where to use this driver?  What regressions are we going to see
-> > with VMs that previously saw "modern" virtio-net devices and now see a
-> > legacy compatible device?  Thanks,
-> 
-> Maybe this approach needs to use a subsystem ID match?
-> 
-> Jason
+> This patch series is to implement test cases for the KVM gmem error_remove_page
+> method.
+> - Update punch hole method to truncate pages
+> - Add a new ioctl KVM_GUEST_MEMORY_FAILURE to inject memory failure on
+>   offset of gmem
 
-Maybe make users load it manually?
+Doh.  Please try to communicate what you're working on.  I was just about to hit
+SEND on a series to fix the truncation bug, and to add a similar test.  I would
+have happily punted that in your direction, but I had no idea that you were aware
+of the bug[*], let alone working on a fix.  I could have explicitly stated that
+I was going to fix the bug, but I thought that it was implied that I needed to
+clean up my own mess.
 
-Please don't bind to virtio by default, you will break
-all guests.
+Anyways, I'm going to hit SEND anyways, my changes are slightly different to your
+patch 1 (truncate needs to happen between begin() and end()) and patch 3 (I added
+a slightly more comprehensive test).
 
--- 
-MST
-
+[*] https://lore.kernel.org/all/20230918163647.m6bjgwusc7ww5tyu@amd.com
