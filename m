@@ -2,107 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21E447A9BF5
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:05:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 994237A9A21
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:36:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230488AbjIUTFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 15:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42818 "EHLO
+        id S230071AbjIUSgk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 14:36:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbjIUTEu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:04:50 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A3B8333E
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:50:52 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2bff776fe0bso21492641fa.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:50:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695318649; x=1695923449; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SLFyIa4pNfHrRrFVoK4W/7yOB5ezN6IY3vzVujeQWwk=;
-        b=eFntXSh/F4hKdahKgzMe5D0dOIwBNLMarnlFvWooPG3SbMSFfyRWzuDmgLU+AINGYY
-         CC0i8UC3ue9twJ2WZrPiHdEBSj1NbbPAHZJcy9xXAfRxDYClImR6tbe4ArB1YnTWLJbv
-         JaSx6fOvf4UNazVj1W5Z4G/Fa/q0/ZRfo/NYUiW/PxoWcw2boISz85PIS07y3pltVlFV
-         XukkJhyB4wHOVaPfrPsrF46bQnONpR7zKfRvPXcKUZ6deayWVfo5+hR9V0CJts2dxuad
-         f93uK4SLkjiokLRLWG1ZhNtW7Rdr0NSQU/L0+C3DsmFvDrdMs1im4U5d9lqQ0ZNa80LQ
-         S9qA==
+        with ESMTP id S229806AbjIUSgM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 14:36:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E144AD569
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 11:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695319441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pD7tefHLtUrliixxocdkZvjm/zaq4ygqOegWFqR6dIo=;
+        b=fjJsf4AGiAhQAmYTZ6yYMGVoeiU4HW95qFReyLIukQ6v5x2VjifYk4ilI2yjdWMmhOLqbc
+        +/cDnO46t1ZydsbSwv6qkSUTojHp2ionKQOM1A68C/51ikfvEg5WjRMnsXGnDMw5jlvDBE
+        hy+naVyB3a7zsfe/i/imFiATx3Vw2dc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-vPIJuFZjM4iF0oX2Du4Thw-1; Thu, 21 Sep 2023 09:46:27 -0400
+X-MC-Unique: vPIJuFZjM4iF0oX2Du4Thw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9ae0601d689so78804766b.0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 06:46:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695318649; x=1695923449;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SLFyIa4pNfHrRrFVoK4W/7yOB5ezN6IY3vzVujeQWwk=;
-        b=QXx5X4DIkm/480vXzfnGxtAyILhFIrMNXjfvnawqQ2gi+AF1/Nw22MeaLG2v2e3EwM
-         wsQ2xqLGfN9pWyuwNuhnpxd/knmqLbkfW8pGcuvu6PU0bEVOGyRT3TUFLuzeu7MP15Lo
-         gjA2dTCQvBKFGPtuURong8JwrC25IjaQ76jcjGe/Wg4Fd19XQRprWCUcjBXWJtBPc3TR
-         fLS7wOlT69iwPcnLCPr1d22JOsbWZchwMloTpy9XWay0LCMavbqXWevHLyZTEY7SWLhD
-         gDuYK4+3BIlVLiIwL9dS8VrgyijBQGhithis8RFin82nLlE9/BYuqxoPF+arr33PGR7Z
-         +9uA==
-X-Gm-Message-State: AOJu0YzHQPcZ/pc+I3Da4sBxhxDCEeHkr37EodY+5b+zlgforC87KhMC
-        KTrA97hfXGYl5mHuRnhbB68Belxi06FvBMyYpnYUusbsO/dNJGlLVTs=
-X-Google-Smtp-Source: AGHT+IHSkQ8f8dAM1bbBde2nHASKpT8QXWY5hcVmzsVUDmW/7AlposkLeqWQB5YEfDT9yRQHRvNIKem8/RqCHbNikX8=
-X-Received: by 2002:a05:6402:3d7:b0:52c:9f89:4447 with SMTP id
- t23-20020a05640203d700b0052c9f894447mr4590180edw.4.1695303248906; Thu, 21 Sep
- 2023 06:34:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695303986; x=1695908786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pD7tefHLtUrliixxocdkZvjm/zaq4ygqOegWFqR6dIo=;
+        b=p7jIQQzHrmh4J1FJOf6GbIq8ixv07SX3T3K/7spC6SdYoZVDucYCck8reyeZJsvoW1
+         jqXktgyS01LfNj10eOgP0GWLb4+1x7fafQoVzahGnMGnseTYeO9TM2xwhaIsvprlLj46
+         7fuUY1JV9rxRZssPNq8ZEMS6vS19JdUcGT2fuRWpWwyPUoaOySPosUGVqnN1GnYBZdFl
+         BWVTgL1erKMxrLN8uuYiyf5DLUWJwRJybaeCkfQC3z2zxQczCSXd25O0xoMlrdHsm7SP
+         RCamWbX1kGdAM9NdrZbEKwKombapmeaYLFFTzXfnsuS4PjBGv3PJyQZJpDnM0brP+xh+
+         A/fg==
+X-Gm-Message-State: AOJu0YyDD3Fb6li9S+uvJL1Lb3Z2ISvck1uRy3VAlcgZ3Oaspq5tP4F2
+        U0vd1gWEkVXs4URnepnjr3ia+1EhX+tG/H4HSUXzl9zLXkkHtGwQ9YXSR2wL9vhjqzel4/E75Mp
+        xSGBdYzrG8PDj
+X-Received: by 2002:a17:907:3e15:b0:9ad:e403:239f with SMTP id hp21-20020a1709073e1500b009ade403239fmr6211304ejc.16.1695303986553;
+        Thu, 21 Sep 2023 06:46:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHs9L6ehtx6mY/P0YeIfqEguc+IZ+ptSKdD6kk1obNofGgXaLJ5xjpnBXqDpRE/Qvku06L07A==
+X-Received: by 2002:a17:907:3e15:b0:9ad:e403:239f with SMTP id hp21-20020a1709073e1500b009ade403239fmr6211270ejc.16.1695303986151;
+        Thu, 21 Sep 2023 06:46:26 -0700 (PDT)
+Received: from redhat.com ([2.52.150.187])
+        by smtp.gmail.com with ESMTPSA id md1-20020a170906ae8100b009a1be9c29d7sm1083322ejb.179.2023.09.21.06.46.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 06:46:25 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 09:46:21 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     alex.williamson@redhat.com, jasowang@redhat.com, jgg@nvidia.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
+        maorg@nvidia.com
+Subject: Re: [PATCH vfio 01/11] virtio-pci: Use virtio pci device layer vq
+ info instead of generic one
+Message-ID: <20230921093540-mutt-send-email-mst@kernel.org>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-2-yishaih@nvidia.com>
 MIME-Version: 1.0
-References: <20221201102728.69751-1-akihiko.odaki@daynix.com>
- <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com>
- <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com> <ed62645a-ec48-14ff-4b7e-15314a0da30e@daynix.com>
- <CAFEAcA-pOKf1r+1BzURpv5FnFS79D2V=SSeY_a2Wene1wf+P1A@mail.gmail.com> <a5cd5a46-7f33-42b6-99eb-b09159af42d7@daynix.com>
-In-Reply-To: <a5cd5a46-7f33-42b6-99eb-b09159af42d7@daynix.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 21 Sep 2023 14:33:49 +0100
-Message-ID: <CAFEAcA9cfrS4bqUX6G9qL8jNhJw0z2nMbqiHxYOutnqVOyb2yQ@mail.gmail.com>
-Subject: Re: [PATCH] accel/kvm/kvm-all: Handle register access errors
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921124040.145386-2-yishaih@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Sept 2023 at 08:25, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> On 2023/06/19 21:19, Peter Maydell wrote:
-> > On Sat, 10 Jun 2023 at 04:51, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> >> On 2022/12/01 20:00, Akihiko Odaki wrote:
-> >>> On 2022/12/01 19:40, Peter Maydell wrote:
-> >>>> On Thu, 1 Dec 2022 at 10:27, Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>> wrote:
-> >>>>> A register access error typically means something seriously wrong
-> >>>>> happened so that anything bad can happen after that and recovery is
-> >>>>> impossible.
-> >>>>> Even failing one register access is catastorophic as
-> >>>>> architecture-specific code are not written so that it torelates such
-> >>>>> failures.
-> >>>>>
-> >>>>> Make sure the VM stop and nothing worse happens if such an error occurs.
-> >>>>>
-> >>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+On Thu, Sep 21, 2023 at 03:40:30PM +0300, Yishai Hadas wrote:
+> From: Feng Liu <feliu@nvidia.com>
+> 
+> Currently VQ deletion callback vp_del_vqs() processes generic
+> virtio_device level VQ list instead of VQ information available at PCI
+> layer.
+> 
+> To adhere to the layering, use the pci device level VQ information
+> stored in the virtqueues or vqs.
+> 
+> This also prepares the code to handle PCI layer admin vq life cycle to
+> be managed within the pci layer and thereby avoid undesired deletion of
+> admin vq by upper layer drivers (net, console, vfio), in the del_vqs()
+> callback.
 
-> >> QEMU 8.0 is already released so I think it's time to revisit this.
-> >
-> > Two months ago would have been a better time :-) We're heading up
-> > towards softfreeze for 8.1 in about three weeks from now.
+> Signed-off-by: Feng Liu <feliu@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  drivers/virtio/virtio_pci_common.c | 12 +++++++++---
+>  drivers/virtio/virtio_pci_common.h |  1 +
+>  2 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+> index c2524a7207cf..7a3e6edc4dd6 100644
+> --- a/drivers/virtio/virtio_pci_common.c
+> +++ b/drivers/virtio/virtio_pci_common.c
+> @@ -232,12 +232,16 @@ static void vp_del_vq(struct virtqueue *vq)
+>  void vp_del_vqs(struct virtio_device *vdev)
+>  {
+>  	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> -	struct virtqueue *vq, *n;
+> +	struct virtqueue *vq;
+>  	int i;
+>  
+> -	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
+> +	for (i = 0; i < vp_dev->nvqs; i++) {
+> +		if (!vp_dev->vqs[i])
+> +			continue;
+> +
+> +		vq = vp_dev->vqs[i]->vq;
+>  		if (vp_dev->per_vq_vectors) {
+> -			int v = vp_dev->vqs[vq->index]->msix_vector;
+> +			int v = vp_dev->vqs[i]->msix_vector;
+>  
+>  			if (v != VIRTIO_MSI_NO_VECTOR) {
+>  				int irq = pci_irq_vector(vp_dev->pci_dev, v);
+> @@ -294,6 +298,7 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned int nvqs,
+>  	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+>  	if (!vp_dev->vqs)
+>  		return -ENOMEM;
+> +	vp_dev->nvqs = nvqs;
+>  
+>  	if (per_vq_vectors) {
+>  		/* Best option: one for change interrupt, one per vq. */
+> @@ -365,6 +370,7 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned int nvqs,
+>  	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
+>  	if (!vp_dev->vqs)
+>  		return -ENOMEM;
+> +	vp_dev->nvqs = nvqs;
+>  
+>  	err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
+>  			dev_name(&vdev->dev), vp_dev);
+> diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+> index 4b773bd7c58c..602021967aaa 100644
+> --- a/drivers/virtio/virtio_pci_common.h
+> +++ b/drivers/virtio/virtio_pci_common.h
+> @@ -60,6 +60,7 @@ struct virtio_pci_device {
+>  
+>  	/* array of all queues for house-keeping */
+>  	struct virtio_pci_vq_info **vqs;
+> +	u32 nvqs;
 
-> Hi Peter,
->
-> Please apply this.
+I don't much like it that we are adding more duplicated info here.
+In fact, we tried removing the vqs array in
+5c34d002dcc7a6dd665a19d098b4f4cd5501ba1a - there was some bug in that
+patch and the author didn't have the time to debug
+so I reverted but I don't really think we need to add to that.
 
-Looking again at the patch I see it hasn't been reviewed by
-anybody on the KVM side of things. Paolo, does this seem like
-the right way to handle errors from kvm_arch_get_registers()
-and kvm_arch_put_registers() ?
+>  
+>  	/* MSI-X support */
+>  	int msix_enabled;
+> -- 
+> 2.27.0
 
-The original patch is at:
-https://patchew.org/QEMU/20221201102728.69751-1-akihiko.odaki@daynix.com/
-
-thanks
--- PMM
