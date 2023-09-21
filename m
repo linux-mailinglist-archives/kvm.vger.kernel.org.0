@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E91B7A9691
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:11:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06A7E7A97C8
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 19:27:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjIURB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 13:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
+        id S230200AbjIUR1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 13:27:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbjIURBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:01:23 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on20611.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::611])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADDBF10E4
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:00:43 -0700 (PDT)
+        with ESMTP id S229790AbjIUR1K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 13:27:10 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on20625.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::625])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46178CDA
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:01:13 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h0P3gujRrdEg/YgG0J8AAr20h6WlO0eX8hRTgAf/1FI9lg/d4gyowktJNYl0q8W308hfb45LexsE/wUHcNYkPR3OPa0D3kG4btbepg5h0wbkGaz22vCb/y0qLmXO0XHjrjFwcr9EF+4fjfGYRZiVoS9xgcsKL3k8qfKg6YdGXcnQ5CeG+QYBt3SbzBaHLaanoegkMNHpEHoId+PvLDR6nZ4KXiYhQlbleCE5e3mgmLzLr2wdwMGj56XSoecy2OstPIoHuMMdvpwzaW+MP0PeE710ePca4kJ2yLsct93Xby0sQ5P0tTDoLyp5T1lv7jCofJ+J+RTewlNXpOttRxx+8A==
+ b=CskpOzTrBeA3lBGkmgyJG/q3CFBrVvri/t9NCxq9WJLR/a+S9VKY+3G6R9NrPJZoGfyCwEJFOu5harSrwYL26Jo/epBG+WNjvdkNN22LpYTVEMkMbD2wYgfUt7iHKnweaRumZYTEzh9NI9Wr1+jBN53V5C1WAfrZttCuhcko2D07vokqIfolMA4DSeJWWjE5x71uVfwJOzgqOiNeJINhpyIQGz7aCM9PX58VQ+JhmhcRvP+wWlAJ5Oh44w6BUXRDWAiM2z6mVxZtcjbPJpKZBYC3etykA1JvZpZj7aPXaszI2mDpzpXIznhOeR2GVcbXhWbYaIXrlhi6BcW2x1dPSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DoCuwgDC8nSkydt1xw3EhuUYLdSoxtsTl5j142Bf8Z8=;
- b=i6ynx/KFXPdl7CWnHOr0Y+0PdaZfp8Yk2D6L+DL7VwbocTGRjIEsmcbxMreErIOFKopyXPNbWThT397on4t7hrBwIyt7m4XNd97oVWdrAut4YK6SmybG6B4U+4ZqUzOksIN3AUfWxQfgbB0XuVPZfwMtLni2w7cYoEKnyfx/t8xS6f1OUJcMnDs/0g0m4LMT+hLzYWGj/9lAn+aZkTrl+pTFkaCr6lnXKuZ8DbiYy7amXA1E4aPjwKKe9nwwPjil5/HJ0TE9s2eawJyoDeHxvuQ3aVOL2gqhWb+IIpMBVDfvNp/QuCwx5cr93QsknuspvJolZRDCAwlJtXz7Fms+FQ==
+ bh=EJelJnn/JyXTdadjpJZBsKAweBrMvLSpqlwHLntWW68=;
+ b=IfH2bm7lwlS+7YNvsfvxahGPUWAoFI8X3SYVu0UX/qu2cKjpmx5TjcC0awR9ttZLQmyPEWJQvneCimdsvM8jLUvgROym1+PiQps3Q7uILP12CTwIJFne9T+dKf7jMkHvwBCMECAwJXfnViYZLzhbFVDSawi5whoBlvIbsgR7bqBi82zgZKEfl1xHOm7ws4RIvDKiZQmhavuZdCukyvtpsmyHd4PRH87z99SHe7fe7tAUrFfnXC2JGgsB1HyqdTiv/wJRYdhNYTjvHdKpdSm6Lr9KS7k+jgpYAe+5w5xyG8mKJqK3Q/XffYg333nb6ePQQcYFLIoAorL7hK8eyX2/mw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DoCuwgDC8nSkydt1xw3EhuUYLdSoxtsTl5j142Bf8Z8=;
- b=k4CMP9clZ3uKO0MJQ+tZ/i4cQYUsOT8MFxy9R/hi7Xt/QKi3mCS+pL+85tJq4kgWMR/+NQ//JclTzhU3P87+C/QRv76iM86Q2xNwCU2pKgaJcISU7AkRAMuvwimbfoHNc2A8pCR+EHzv26RGNA1gpLCLkArNvSVwhnvBwQpLLP/Y8ZY4HmipCoGCHASnPSxHNQOww5SqTJae9VS2ywdlMzQ9v4ktESKH5zvsUFc3Ur9R6dJYTPFVq7ERBwWAOidEUHBeQL2ZtkSW3nH2FGKAqqTh8f8shYgQMHUOW/T41h4BU9JUXm7GDGRtY+eds/shsNein53QkbH4s+JzXuEP2g==
-Received: from DS7PR05CA0034.namprd05.prod.outlook.com (2603:10b6:8:2f::35) by
- MW6PR12MB7072.namprd12.prod.outlook.com (2603:10b6:303:238::13) with
+ bh=EJelJnn/JyXTdadjpJZBsKAweBrMvLSpqlwHLntWW68=;
+ b=Lt2YkDrBi9OUx8AVqgHl2HHqi0DqV708IYDz5ShUfbAAUSgynR/8gTBIC5aVu+GG04Z+4seZ9uzmItHlMybwgBUUXcT9BxS88Lunhx4d4H+MiGv61x0xrZtxeuu4eNYN09VQf0zudroj7xMYmdNcUEL464/EqK9jwgQqzsXrxDRHdh+8WNurS6zG5/MRwqh5P3q+mSwryb1g1LoMB9NwuD2QvWXCTzFe/tRJjrTk4JQRmWimhYpQ6vwb9/qatHB6/33ASVF4tORov+2llc8hMplB9oZNb2qaWcv8rrUqYaro4abf6Fko58DwB/IVuDhxaUzbK9RjDIyGLRo/9+iRFg==
+Received: from CH0PR03CA0208.namprd03.prod.outlook.com (2603:10b6:610:e4::33)
+ by MN0PR12MB5979.namprd12.prod.outlook.com (2603:10b6:208:37e::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28; Thu, 21 Sep
- 2023 12:42:06 +0000
-Received: from DS1PEPF0001708F.namprd03.prod.outlook.com
- (2603:10b6:8:2f:cafe::5a) by DS7PR05CA0034.outlook.office365.com
- (2603:10b6:8:2f::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.9 via Frontend
- Transport; Thu, 21 Sep 2023 12:42:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.19; Thu, 21 Sep
+ 2023 12:42:11 +0000
+Received: from DS3PEPF000099D9.namprd04.prod.outlook.com
+ (2603:10b6:610:e4:cafe::d3) by CH0PR03CA0208.outlook.office365.com
+ (2603:10b6:610:e4::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.31 via Frontend
+ Transport; Thu, 21 Sep 2023 12:42:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF0001708F.mail.protection.outlook.com (10.167.17.139) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS3PEPF000099D9.mail.protection.outlook.com (10.167.17.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6792.20 via Frontend Transport; Thu, 21 Sep 2023 12:42:06 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6792.19 via Frontend Transport; Thu, 21 Sep 2023 12:42:11 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 21 Sep
- 2023 05:41:55 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 05:41:59 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 21 Sep
- 2023 05:41:54 -0700
+ 2023 05:41:58 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
  with Microsoft SMTP Server id 15.2.986.41 via Frontend Transport; Thu, 21 Sep
- 2023 05:41:51 -0700
+ 2023 05:41:55 -0700
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <mst@redhat.com>,
         <jasowang@redhat.com>, <jgg@nvidia.com>
@@ -68,9 +68,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <parav@nvidia.com>, <feliu@nvidia.com>, <jiri@nvidia.com>,
         <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
         <leonro@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH vfio 08/11] vfio/pci: Expose vfio_pci_core_setup_barmap()
-Date:   Thu, 21 Sep 2023 15:40:37 +0300
-Message-ID: <20230921124040.145386-9-yishaih@nvidia.com>
+Subject: [PATCH vfio 09/11] vfio/pci: Expose vfio_pci_iowrite/read##size()
+Date:   Thu, 21 Sep 2023 15:40:38 +0300
+Message-ID: <20230921124040.145386-10-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20230921124040.145386-1-yishaih@nvidia.com>
 References: <20230921124040.145386-1-yishaih@nvidia.com>
@@ -80,23 +80,23 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001708F:EE_|MW6PR12MB7072:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6fa6021e-cda3-43f0-515f-08dbbaa029d3
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D9:EE_|MN0PR12MB5979:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f24e8f8-d919-44f6-9938-08dbbaa02cda
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PfBSQPeNA8ov5FmvqUU4SxIphmZKKim+Lq1r6rg6ZoyBYrSc8ievKDkWu/0dVtOOLoG0vE8RmsIb+GdKv60KGfHLRFdxvXFJehlSKvmEM3LrJVyJADwUAW0BY1WOhrjlNl3N1mBWeIWf25eaQ+ib6id12sGN00aijhjPUPgocrr0oQuKADG4RJZCpDmNDaIt9OYIqSJiCM+1gMoHyj6LvGcJKu34LBKI5yjsf1PHnvX3x0BzDXXXA/ETpvTQ+UZUQxoSZVVdIqIkb9pOukvaDn4LBD2LgxqmrQCSqN0YWF3zdDchi9y2ai1NLsSmxdNJhLJCqN5/X4jm6rzVhigqZdBb00DXVH8MSWhY3dG9Qg4GRbnbny8ZguQ6qPVj+J8gxkQGyVhB9c+1zcAviV6iqSYCEZk3x1zhCsHik69bT+GfriWSvoWZoToVB6dpHLkmkBgthW9hryZYg6Pe9JgSkIgOjuRTIUZbpBfczHUEcl/vohHgd2cKY8h7L+13906Yeub0OiH/JsBpSsU5SUb0RWARdUxV9h1yTGuGCtTZqEtZxoDb8JceydbBydWPglWNtZZMNQHhC2E6nqkgPTXiw2OpCBAd9dXPVmxWYiTE8HXMk8QxK7+65eS5YkAZOQ9tSQmxqp5ZX1qxSGqD48XFllozFo4N8MIFDatT/TEBGoG3vX/UEVfbcJDiOWUvOiK/l/KRAwJ5iYr3l3/TZWuhweVNJhxpHcxmVrF2A1Em62DfpLUg+uS9vpg3GQyuPMD2DoKAcwVn+IUczUfYzQFKMw==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(136003)(39860400002)(376002)(82310400011)(451199024)(1800799009)(186009)(40470700004)(36840700001)(46966006)(2906002)(5660300002)(4326008)(8676002)(41300700001)(8936002)(6636002)(316002)(54906003)(70206006)(26005)(70586007)(110136005)(336012)(426003)(1076003)(478600001)(7636003)(40460700003)(7696005)(6666004)(2616005)(107886003)(83380400001)(36756003)(356005)(82740400003)(47076005)(36860700001)(40480700001)(86362001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Wz13dtetZ1aRPZGvRfvyGrnaeLodu6N4FZZFSL8v4MDX2woKieMMM8xwjyDkwk4j+7iFnh2PQYTOY9/WvhHpRNLysIL/6BkuQYKsFYFdb3Zs0QgTqFbx882rwdGkphzZULC/CUOUs8onKhYmaXITssx6bprDN52ao3m79ATbMj4jsFouxkYTVkjG7NW/D+Mf9d72NlqG3ZFTEzUkGHxtiPZJvRoVxp091s73FEXBXLGdcs/7JL+Z+Khu36Cbvyo5KETlbCnhJVHhSZOOrbtjp1Y9T9mnFQMb2dAxcZ3Y9QoWYVtNdL/OMOYMIpNZpkoL6j0eagaJ1WY4yhtkeWbrf6z9Wb+7YfSuPQL7NHw+Z9BSAOg7mYFYTrx7grHqc5rzZ0XSfO8DGnUecKIttkWxo3MLaS2oCGy//+6BgbZ+Oo9bnEbMnOJNnRKkAkN9gZue0AIrz5KVErzQz2oZIXJ8EoEfJLm9Feqp4iJFINePKNnY25uAdNS+GQsDAgVJpq5Yl7i/f4Xy536iHD2cqNfUOBCeVfbjo3kmemrTF4evwz50hjpQhH6zLllc2l8WgrTxD2rk6/iGomPXMfosdOBYiqvdjo+CP4OuhAKM1zI+Fg4ZE4V70k0K8LuzTaF3zM5QNOsiGI4SQa/eksknI2l5Fco61DjRoFXwJjUCTGRvenOCLldMw1NKOj8u61HCEwBzsr2husT7LjFg/iKpSfWdcli63vqTQIa/KZIMhik1i/wc/G8Ah8cp3tGtqI2NIASARPsGWlPRgVj2jxPTgXaVIw==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(346002)(376002)(1800799009)(82310400011)(186009)(451199024)(46966006)(36840700001)(40470700004)(478600001)(6666004)(83380400001)(8936002)(8676002)(7696005)(70586007)(70206006)(54906003)(6636002)(316002)(110136005)(5660300002)(40460700003)(107886003)(1076003)(2616005)(36756003)(36860700001)(82740400003)(86362001)(40480700001)(4326008)(336012)(2906002)(47076005)(426003)(26005)(41300700001)(356005)(7636003)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 12:42:06.0899
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 12:42:11.1708
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6fa6021e-cda3-43f0-515f-08dbbaa029d3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f24e8f8-d919-44f6-9938-08dbbaa02cda
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0001708F.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS3PEPF000099D9.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB7072
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5979
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
@@ -107,122 +107,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose vfio_pci_core_setup_barmap() to be used by drivers.
+Expose vfio_pci_iowrite/read##size() to let it be used by drivers.
 
-This will let drivers to mmap a BAR and re-use it from both vfio and the
-driver when it's applicable.
+This functionality is needed to enable direct access to some physical
+BAR of the device with the proper locks/checks in place.
 
-This API will be used in the next patches by the vfio/virtio coming
-driver.
+The next patches from this series will use this functionality on a data
+path flow when a direct access to the BAR is needed.
 
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_core.c | 25 +++++++++++++++++++++++++
- drivers/vfio/pci/vfio_pci_rdwr.c | 28 ++--------------------------
- include/linux/vfio_pci_core.h    |  1 +
- 3 files changed, 28 insertions(+), 26 deletions(-)
+ drivers/vfio/pci/vfio_pci_rdwr.c | 10 ++++++----
+ include/linux/vfio_pci_core.h    | 19 +++++++++++++++++++
+ 2 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 1929103ee59a..b56111ed8a8c 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -684,6 +684,31 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- }
- EXPORT_SYMBOL_GPL(vfio_pci_core_disable);
- 
-+int vfio_pci_core_setup_barmap(struct vfio_pci_core_device *vdev, int bar)
-+{
-+	struct pci_dev *pdev = vdev->pdev;
-+	void __iomem *io;
-+	int ret;
-+
-+	if (vdev->barmap[bar])
-+		return 0;
-+
-+	ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
-+	if (ret)
-+		return ret;
-+
-+	io = pci_iomap(pdev, bar, 0);
-+	if (!io) {
-+		pci_release_selected_regions(pdev, 1 << bar);
-+		return -ENOMEM;
-+	}
-+
-+	vdev->barmap[bar] = io;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(vfio_pci_core_setup_barmap);
-+
- void vfio_pci_core_close_device(struct vfio_device *core_vdev)
- {
- 	struct vfio_pci_core_device *vdev =
 diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index e27de61ac9fe..6f08b3ecbb89 100644
+index 6f08b3ecbb89..5d84bad7d30c 100644
 --- a/drivers/vfio/pci/vfio_pci_rdwr.c
 +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -200,30 +200,6 @@ static ssize_t do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
- 	return done;
- }
+@@ -38,7 +38,7 @@
+ #define vfio_iowrite8	iowrite8
  
--static int vfio_pci_setup_barmap(struct vfio_pci_core_device *vdev, int bar)
--{
--	struct pci_dev *pdev = vdev->pdev;
--	int ret;
--	void __iomem *io;
--
--	if (vdev->barmap[bar])
--		return 0;
--
--	ret = pci_request_selected_regions(pdev, 1 << bar, "vfio");
--	if (ret)
--		return ret;
--
--	io = pci_iomap(pdev, bar, 0);
--	if (!io) {
--		pci_release_selected_regions(pdev, 1 << bar);
--		return -ENOMEM;
--	}
--
--	vdev->barmap[bar] = io;
--
--	return 0;
+ #define VFIO_IOWRITE(size) \
+-static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
++int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+ 			bool test_mem, u##size val, void __iomem *io)	\
+ {									\
+ 	if (test_mem) {							\
+@@ -55,7 +55,8 @@ static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+ 		up_read(&vdev->memory_lock);				\
+ 									\
+ 	return 0;							\
 -}
--
- ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -262,7 +238,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 		}
- 		x_end = end;
- 	} else {
--		int ret = vfio_pci_setup_barmap(vdev, bar);
-+		int ret = vfio_pci_core_setup_barmap(vdev, bar);
- 		if (ret) {
- 			done = ret;
- 			goto out;
-@@ -438,7 +414,7 @@ int vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
- 		return -EINVAL;
++}									\
++EXPORT_SYMBOL(vfio_pci_iowrite##size);
+ 
+ VFIO_IOWRITE(8)
+ VFIO_IOWRITE(16)
+@@ -65,7 +66,7 @@ VFIO_IOWRITE(64)
  #endif
  
--	ret = vfio_pci_setup_barmap(vdev, bar);
-+	ret = vfio_pci_core_setup_barmap(vdev, bar);
- 	if (ret)
- 		return ret;
+ #define VFIO_IOREAD(size) \
+-static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
++int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+ 			bool test_mem, u##size *val, void __iomem *io)	\
+ {									\
+ 	if (test_mem) {							\
+@@ -82,7 +83,8 @@ static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+ 		up_read(&vdev->memory_lock);				\
+ 									\
+ 	return 0;							\
+-}
++}									\
++EXPORT_SYMBOL(vfio_pci_ioread##size);
  
+ VFIO_IOREAD(8)
+ VFIO_IOREAD(16)
 diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 562e8754869d..67ac58e20e1d 100644
+index 67ac58e20e1d..22c915317788 100644
 --- a/include/linux/vfio_pci_core.h
 +++ b/include/linux/vfio_pci_core.h
-@@ -127,6 +127,7 @@ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf);
- int vfio_pci_core_enable(struct vfio_pci_core_device *vdev);
- void vfio_pci_core_disable(struct vfio_pci_core_device *vdev);
- void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev);
-+int vfio_pci_core_setup_barmap(struct vfio_pci_core_device *vdev, int bar);
+@@ -131,4 +131,23 @@ int vfio_pci_core_setup_barmap(struct vfio_pci_core_device *vdev, int bar);
  pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
  						pci_channel_state_t state);
  
++#define VFIO_IOWRITE_DECLATION(size) \
++int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
++			bool test_mem, u##size val, void __iomem *io);
++
++VFIO_IOWRITE_DECLATION(8)
++VFIO_IOWRITE_DECLATION(16)
++VFIO_IOWRITE_DECLATION(32)
++#ifdef iowrite64
++VFIO_IOWRITE_DECLATION(64)
++#endif
++
++#define VFIO_IOREAD_DECLATION(size) \
++int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
++			bool test_mem, u##size *val, void __iomem *io);
++
++VFIO_IOREAD_DECLATION(8)
++VFIO_IOREAD_DECLATION(16)
++VFIO_IOREAD_DECLATION(32)
++
+ #endif /* VFIO_PCI_CORE_H */
 -- 
 2.27.0
 
