@@ -2,121 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC9A97AA41C
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AA8A7AA306
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbjIUWAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 18:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57484 "EHLO
+        id S232695AbjIUVqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 17:46:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233390AbjIUWAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 18:00:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D479044BA
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 14:00:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695330004;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=w92TIdX77sqPjb1fzpSj+HbzxRLdHbB40Saqu1w60+Q=;
-        b=Mm3GvieGt8uD+irbtVMpU1ZRedPiqqDrT3ih0I8dCsbsxyRxSVKQEwpNME0BMn8WdJscW6
-        8GDKKVOLB0Kxi1f8qw9PpF3PF9gRPnofqi0LWfraY1emcUM6jTEK1N6bIaWDJoDYlku5PF
-        YOqwrdi0TK+NR51/5bsMAqzFDWBGZrE=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-CeAUiaMHNsO-PGWfpjB1Xg-1; Thu, 21 Sep 2023 17:00:03 -0400
-X-MC-Unique: CeAUiaMHNsO-PGWfpjB1Xg-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1d66d948417so1971488fac.3
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 14:00:02 -0700 (PDT)
+        with ESMTP id S231717AbjIUVp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 17:45:59 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FCB126B72
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 14:29:23 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8571d5e71aso1869523276.0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 14:29:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695331762; x=1695936562; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kGBnu6VSG+/azby0SuhGoM7WFu5N49MxhGtPLCEYj7Y=;
+        b=W3hFy/vA/TquUU0Uqpb7A5n2npDV2RZ1Auz9VXKfdldU7FF8DjOBmf5kBjUt/qir8D
+         55UKNyK3B8/kkLYRIATr9A1/Hkrz14uVSXQNonasQN88MXidiuHy7cbYX3Rim0Ucu79K
+         U9INd2CYFaG94bJZ7Xbv2Bd0vugXyBlacxYMOfhKr5VjPmAITKSyqULgh/hNr3TN9LXK
+         wZxC7aY8DYBkSvwk5XSpUEogE3NID+kUBAw0tIR2YyckRFC+SglcnTcjpc3e7hCsqErb
+         1cF4QBU0AORnHIzO4FH907QjBiy64/PuYX4iFoqtZtX3Ur2S5ie0QjWvGSXUHV3/hkNw
+         tSjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695330002; x=1695934802;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w92TIdX77sqPjb1fzpSj+HbzxRLdHbB40Saqu1w60+Q=;
-        b=oaMa+XpJ1F/ei2FpOIWxVkR7ADgsfNzPeZ3vdXbmYqEI1MuViTfLUCZHDZMrfOEdu8
-         0m67D/1D1TlmPeO+xA3WTHl3/omjvC/rEZyQDHwY8eewZiykZ+TXG5UPQ/K7l2+oerO0
-         +7mQsU1gJGaCyZ95oblHHlIIZtxB+bduMYop5QOoaOyGqqJ9/5fD+P1Kf/x4OrfvSJgV
-         M0gQv0Fy7vMUFQVIv3ltPNpbDD8uojnzrz3teIj+wCFgsqeuN2V+t6xukKxzkY66z3CM
-         yl8PslKgGBBso+WAhqxOXBTgKQKVJmhl6Y+ZClJrYOa2cDVn1Xv3yyIGwz3RiHYY8gQU
-         +F6w==
-X-Gm-Message-State: AOJu0YygtyKgeE7pURJZUujxoF7J4cM9ZFj8va09GMHwb6/2y0E7826Z
-        1hxkIsUbjtjXv0pk5UjEkZ2RPsTu8mHfjAs9vqyyJ/fejE1+p8xjpYiK04z9A1Y92IlCZA17P3r
-        6PAgREWTH5pfJ
-X-Received: by 2002:a05:6870:304c:b0:1d5:ef9d:5564 with SMTP id u12-20020a056870304c00b001d5ef9d5564mr6571677oau.11.1695330001961;
-        Thu, 21 Sep 2023 14:00:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHp49HT+ZImBpexc/Hl0xUqdHosRzIOsU7V7v6//pfkOGXqA0pJhTnPQVS6l0Y658YpvuzV9Q==
-X-Received: by 2002:a05:6870:304c:b0:1d5:ef9d:5564 with SMTP id u12-20020a056870304c00b001d5ef9d5564mr6571664oau.11.1695330001699;
-        Thu, 21 Sep 2023 14:00:01 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id n21-20020a056870a45500b001d6631fd08fsm686096oal.47.2023.09.21.14.00.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 14:00:01 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 14:59:59 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>, jasowang@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230921145959.7d6b5b95.alex.williamson@redhat.com>
-In-Reply-To: <20230921161834-mutt-send-email-mst@kernel.org>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
-        <20230921124040.145386-12-yishaih@nvidia.com>
-        <20230921135832.020d102a.alex.williamson@redhat.com>
-        <20230921200121.GA13733@nvidia.com>
-        <20230921161834-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1695331762; x=1695936562;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kGBnu6VSG+/azby0SuhGoM7WFu5N49MxhGtPLCEYj7Y=;
+        b=Lrk9CtnbuW2brlKfRRukYWlfFvf/R28fLrzAcTWwA7cVcTsvUymhAYQ12eBin401/+
+         A/PUQP5uKTxNJdv3WhcAIqYan9AyU5hAMy8AIQU4afcFcTUR1YAh62t3nQ8dUdwqdgLy
+         JsjL8hrv3WnJprBQkk2i/5HHK/vhwIJ41sEHYCIEM8GL2REZ9eeARFRqBVzTM5+iLOWK
+         6L1VUlB0nmt2UOSKvbTEjrNusxamUnbDgqauAtkurJc3CPIIeVQXGT5RTUifG6WdHK6h
+         iTshScJdGTuSzJDbBM43mEHfgdFq50cCMr6LkbRoh9SCG6uoWBWl1Exl3605cLurwI44
+         dIkw==
+X-Gm-Message-State: AOJu0YzugE0FXnFt3G8ROV/lS/94kU7YV6HzHbF0bliJ9AWWCqsgMS3/
+        EhRHZJr6ElHm0Q1ESuaysjMzg1rU5cU=
+X-Google-Smtp-Source: AGHT+IHWNByCIxDzTx5QAdD7uR/d2d7gUCrth/qIEPfej09mGplokWZOjT6UEUFRsTTKmehDwV7dGEBrHFk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:420b:0:b0:d0c:c83b:94ed with SMTP id
+ p11-20020a25420b000000b00d0cc83b94edmr88009yba.10.1695331762271; Thu, 21 Sep
+ 2023 14:29:22 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 14:29:20 -0700
+In-Reply-To: <363c4ac28af93aa96a52f897d2fe5c7ec013f746.1695327124.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+References: <cover.1695327124.git.isaku.yamahata@intel.com> <363c4ac28af93aa96a52f897d2fe5c7ec013f746.1695327124.git.isaku.yamahata@intel.com>
+Message-ID: <ZQy1sDOQAxPyZzjW@google.com>
+Subject: Re: [RFC PATCH v2 4/6] KVM: gmem: Add ioctl to inject memory failure
+ on guest memfd
+From:   Sean Christopherson <seanjc@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
+        Fuad Tabba <tabba@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Sep 2023 16:20:59 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Thu, Sep 21, 2023 at 05:01:21PM -0300, Jason Gunthorpe wrote:
-> > On Thu, Sep 21, 2023 at 01:58:32PM -0600, Alex Williamson wrote:
-> >   
-> > > > +static const struct pci_device_id virtiovf_pci_table[] = {
-> > > > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },  
-> > > 
-> > > libvirt will blindly use this driver for all devices matching this as
-> > > we've discussed how it should make use of modules.alias.  I don't think
-> > > this driver should be squatting on devices where it doesn't add value
-> > > and it's not clear whether this is adding or subtracting value in all
-> > > cases for the one NIC that it modifies.  How should libvirt choose when
-> > > and where to use this driver?  What regressions are we going to see
-> > > with VMs that previously saw "modern" virtio-net devices and now see a
-> > > legacy compatible device?  Thanks,  
-> > 
-> > Maybe this approach needs to use a subsystem ID match?
-> > 
-> > Jason  
+On Thu, Sep 21, 2023, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Maybe make users load it manually?
+> To test error_remove_page() method of KVM gmem, add a new ioctl to
+> inject memory failure based on offset of guest memfd.
 > 
-> Please don't bind to virtio by default, you will break
-> all guests.
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  include/uapi/linux/kvm.h |  6 ++++
+>  virt/kvm/guest_mem.c     | 68 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 74 insertions(+)
+> 
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 65fc983af840..4160614bcc0f 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -2323,4 +2323,10 @@ struct kvm_create_guest_memfd {
+>  	__u64 reserved[6];
+>  };
+>  
+> +#define KVM_GUEST_MEMORY_FAILURE	_IOWR(KVMIO,  0xd5, struct kvm_guest_memory_failure)
 
-This would never bind by default, it's only bound as a vfio override
-driver, but if libvirt were trying to determine the correct driver to
-use with vfio for a 0x1af4 device, it'd land on this one.  Thanks,
+If we're going to add a KVM ioctl(), my vote is to make it a generic ioctl(), not
+something that's specific to guest_memfd().  IIUC, all we need is the PFN, so the
+only downside is that it'd require valid memslots.  But the test isn't all that
+interesting unless there are memslots, so I don't see that as a negative.
 
-Alex
+And if we add an ioctl(), it should be conditioned on CONFIG_HWPOISON_INJECT.
 
+An alternative I think we should seriously consider is using the FAULT_INJECTION
+framework to poison pages.  We (Google) have plans to utilize fault injection for
+other things in KVM, e.g. to inject "failures" on CMPXCHG in atomic SPTE updates
+to force KVM down unlikely slow paths.  I don't expect us to get patches posted
+until early next year due to priorities, but hell or high water we will get patches
+posted at some point.
+
+The fault injection framework might be overkill for injecting memory errors, e.g.
+a single ioctl() is definitely simpler to setup, but I suspect it would also be
+much more powerful in the long run..
