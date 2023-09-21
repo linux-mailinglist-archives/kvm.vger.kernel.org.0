@@ -2,109 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A3FB7AA4B6
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:15:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 271C27AA4BF
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231566AbjIUWPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 18:15:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
+        id S232791AbjIUWQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 18:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233174AbjIUWPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 18:15:25 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA878331D
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:37:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D7FC116CA;
-        Thu, 21 Sep 2023 08:31:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695285062;
-        bh=kB4LhEjqLrRHXbvRoCAvnP5iEiWmIRBRjQ+v51+IXkY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UsRlVqGQVju8/qDh03TLqaHEO8aM9FoYk6nyBZGIgwEfoYbvxMR2SzbauwXO6Fm7f
-         9m+Hs2nV+DG8BANdv1V4rQxVPtivVRVjtc5CdzXdSaSO/+18y5jl5LEcH8TRXH2kn2
-         I/KWYdKAS1AkADu8xu5Ua2F8MTt/JLwsH8KBabMQkQCgDGwJY57taq5hS04+5fZoak
-         /OXPlGJagdcoQNNMyPXX6pZBnGK0Jh0dFaHvrxPfP9qK+KpGT3A2QFU8RdEbD/yNio
-         YyOe3ADN6Rzo2jvSFqGnsbOmDSIGdW21ghzCOTUeIioepD+YGMhLMA/8cfmMhEQESX
-         zBkqcWAt6DcIQ==
-Received: from 82-132-232-12.dab.02.net ([82.132.232.12] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qjF5P-00Esfc-SV;
-        Thu, 21 Sep 2023 09:31:00 +0100
-Date:   Thu, 21 Sep 2023 09:30:27 +0100
-Message-ID: <87wmwk2ajg.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        with ESMTP id S232873AbjIUWQb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 18:16:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5BA573D7
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695316714;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oScJ/a+uhztebC1q0641Ww8fqQPACYFLZgqPLc3dXRQ=;
+        b=EQkWOoJgCUBbW/eppFiLLjes4dH/nAGQyzjtgIji0/CxKk95Eb32GrbAEbCqPOP71Styaj
+        ebFcPQ2XnrA1PyugHd5IRHmrbr3V1t01VVGr1tECX+yxdrh13tki7iMzg3jSXDDtnsbj/2
+        sRmBJ0mtYaeOyiurzAQn30r8pOhm42k=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-510-Po7R4gYgN1mHDmaUmTvJ-g-1; Thu, 21 Sep 2023 05:53:44 -0400
+X-MC-Unique: Po7R4gYgN1mHDmaUmTvJ-g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 301683C02545;
+        Thu, 21 Sep 2023 09:53:43 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C84F840C2010;
+        Thu, 21 Sep 2023 09:53:42 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/8] KVM: arm64: Add generic check for system-supported vCPU features
-In-Reply-To: <20230920195036.1169791-2-oliver.upton@linux.dev>
-References: <20230920195036.1169791-1-oliver.upton@linux.dev>
-        <20230920195036.1169791-2-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.232.12
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v10 01/12] KVM: arm64: Allow userspace to get the
+ writable masks for feature ID registers
+In-Reply-To: <20230920183310.1163034-2-oliver.upton@linux.dev>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20230920183310.1163034-1-oliver.upton@linux.dev>
+ <20230920183310.1163034-2-oliver.upton@linux.dev>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Thu, 21 Sep 2023 11:53:41 +0200
+Message-ID: <874jjn26oq.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+        version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Sep 2023 20:50:29 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> To date KVM has relied on kvm_reset_vcpu() failing when the vCPU feature
-> flags are unsupported by the system. This is a bit messy since
-> kvm_reset_vcpu() is called at runtime outside of the KVM_ARM_VCPU_INIT
-> ioctl when it is expected to succeed. Further complicating the matter is
-> that kvm_reset_vcpu() must tolerate be idemptotent to the config_lock,
-> as it isn't consistently called with the lock held.
-> 
-> Prepare to move feature compatibility checks out of kvm_reset_vcpu() with
-> a 'generic' check that compares the user-provided flags with a computed
-> maximum feature set for the system.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Wed, Sep 20 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
+
+> From: Jing Zhang <jingzhangos@google.com>
+>
+> While the Feature ID range is well defined and pretty large, it isn't
+> inconceivable that the architecture will eventually grow some other
+> ranges that will need to similarly be described to userspace.
+>
+> Add a VM ioctl to allow userspace to get writable masks for feature ID
+> registers in below system register space:
+> op0 = 3, op1 = {0, 1, 3}, CRn = 0, CRm = {0 - 7}, op2 = {0 - 7}
+> This is used to support mix-and-match userspace and kernels for writable
+> ID registers, where userspace may want to know upfront whether it can
+> actually tweak the contents of an idreg or not.
+>
+> Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES) that
+> returns a bitmap of the valid ranges, which can subsequently be
+> retrieved, one at a time by setting the index of the set bit as the
+> range identifier.
+>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+
+<process>I think you need to add your s-o-b here.</process>
+
 > ---
->  arch/arm64/kvm/arm.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4866b3f7b4ea..66f3720cdd3a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1190,6 +1190,16 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  	return -EINVAL;
->  }
->  
-> +static unsigned long system_supported_vcpu_features(void)
-> +{
-> +	unsigned long features = KVM_VCPU_VALID_FEATURES;
-> +
-> +	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
+>  arch/arm64/include/asm/kvm_host.h |  2 +
+>  arch/arm64/include/uapi/asm/kvm.h | 32 +++++++++++++++
+>  arch/arm64/kvm/arm.c              | 10 +++++
+>  arch/arm64/kvm/sys_regs.c         | 66 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  2 +
+>  5 files changed, 112 insertions(+)
 
-I think we can now convert this to a cpus_have_final_cap(), as Mark is
-getting rid of the helper altogether, see [1].
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Thanks,
-
-	M.
-	
-[1] https://lore.kernel.org/r/20230919092850.1940729-1-mark.rutland@arm.com
-
-
--- 
-Without deviation from the norm, progress is not possible.
