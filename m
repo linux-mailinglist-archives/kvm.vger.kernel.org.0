@@ -2,113 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F6147A9D80
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:38:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CFE37A9D88
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:39:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjIUTiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 15:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54504 "EHLO
+        id S230422AbjIUTj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 15:39:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjIUTh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:37:57 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4642EBFCF
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:10:39 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59beea5ce93so25729507b3.0
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695323438; x=1695928238; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=msCRqftjzvMka6Rl5V/NvDEz768neF2Qswneru1ptF4=;
-        b=ANIsopKH6FB/YfeeiHhknjvBJ5XAITWb1M/gbs+yBeC/ao6mEHXNiCijAVIw3AUBEu
-         /L10qRlBCqsFUCKjuQ13ougwWzehqWocSM7xFbHiwYegbOYJIt/J8GRTSphAAc/IXNxA
-         o/QR0WmMt3Rr9/Z8RTFG6WRUg72slcENJ91CRvg4tLf3p19skDGjdSesRMqooJ1TxrwN
-         kPhHasmtBgG5lahnT+KGJMN8FxVv+FrAn5x5/Kv9qYOj8nLmDk3goWg8x91Iiv6qr5n8
-         fwxGc9VtkPBY6BwtxtcN575WzcMCKX9wO1T2K3HDKmiEMiuIAhwnOqpeTpRRAHJ8OTQF
-         ea5Q==
+        with ESMTP id S230013AbjIUTjI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 15:39:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA48EFE35D
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695323599;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uIcDHKJ63k2LO686PIhEvmmbJ6INtxlihcpXu8qTVw0=;
+        b=d2SJLEqrAZHGkB9YWoxLgKu0X3sHygQfBXV0w4K8gMYG7jvUJXoCyuMBs08ADobUGNer9F
+        udbDADKpyhXUY3b/96nDuiRjYijdpq5Gu9FG1V8Fa/Y59K7ErfXUHja61h9sQZvnho0CWe
+        VyWwHmRgM0EJufG/pQVHXuRD7dDHzRs=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-zlqsjbj4Nx-Fumj77t5H5Q-1; Thu, 21 Sep 2023 15:13:17 -0400
+X-MC-Unique: zlqsjbj4Nx-Fumj77t5H5Q-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-504319087d9so1015750e87.1
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:13:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695323438; x=1695928238;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=msCRqftjzvMka6Rl5V/NvDEz768neF2Qswneru1ptF4=;
-        b=P25ur8NKGvtTdP9LgWTPesjFQVNoaoyJWk3oEtp2UakQUiLEecoRYzhmv6REN1odUo
-         EN4HqZup6FXp78vCv8KkWPMTPdhVlYhW/oXIUn4gXGnbOSoYs4tLy9QLeMyiIsRnrHlR
-         DM2xzwD104gkSsVfQcwD21A/LVMr6lbZDvkJh12va/EYzi/9LfIJSDZJZvknJGyWt7lr
-         oWJUNN3P/2pl8znqP8wPR3VjwEmfdOv2ZoIBB/6trE7FeauUTN+VEnOCK+bVCXVof5/3
-         jri/MH23HB8Of82fW3kgb6gKVUO3uHKj7yTp41bIyDXj3zwkuIC28bFVwR7jj7GRB74T
-         1Erg==
-X-Gm-Message-State: AOJu0YzrBgIPbzbrfoI6yr7km05LF2erhj9plASJp0vRqA0Uu9TTB004
-        BVThbxej0PDBKoXhdWsig9BIaiPvMgM=
-X-Google-Smtp-Source: AGHT+IHW881nAqFnjABVXUT4908B5v4pAo/onJespz4HnG5MCVd8NLEq9DsMcDxqDXD3hJb4Zo/K0u0JOVE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:70a:b0:58c:e8da:4d1a with SMTP id
- bs10-20020a05690c070a00b0058ce8da4d1amr8361ywb.2.1695323438500; Thu, 21 Sep
- 2023 12:10:38 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 12:10:36 -0700
-In-Reply-To: <20230914015531.1419405-15-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-15-seanjc@google.com>
-Message-ID: <ZQyVLEKXbpJ9Wvud@google.com>
-Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20230601; t=1695323596; x=1695928396;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uIcDHKJ63k2LO686PIhEvmmbJ6INtxlihcpXu8qTVw0=;
+        b=NI1W6IW1hdXWMK1srOo87SyhtWaLT4wOoyvjnKlJ7fp7BU/bLTWAENd5PBbEsC/KRy
+         uD9ixMH8/cLUAD5a6jikzFkq1v3ENQaCZJNMTsh4vcYbY83IThGBNz+abVq889s44Zkb
+         G5/6PL6alv4QcgiIL1/35QtYfbKu1ZXjOvRXQ7+tIXaCXffxEEgt0KrUhQSSz67bsgLy
+         cigEEUPcbwhV/pcdVZkyOXLH+67xrdth2YH2+QiAPKLBeJnDmkRrdfeyvvdA7/7HNxJH
+         Y73tQfigvyssdYKUHvSlMxkQ2CJsr2EwKQ5HHceYCt44iVVxCVUIFw0Nf5QE2NeL3sDm
+         GYUA==
+X-Gm-Message-State: AOJu0YyJpa/CMIZ+g9wpjaXpKAKQNdisdsIEEFYg/WFA5HIg/9Ot4UX8
+        Bwpvlustbon7PM6A/f6LqQbn8/QxjxsNqWWbejYvuCM4mKYGnPSWC9MRzxnB5U195CZaptm/f9w
+        uS8tGtR+JY7tZ
+X-Received: by 2002:ac2:5f73:0:b0:502:ff3b:7671 with SMTP id c19-20020ac25f73000000b00502ff3b7671mr5170706lfc.9.1695323596066;
+        Thu, 21 Sep 2023 12:13:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE8/iz5H5CKhlLgySdYaNA9eyFIKxMAik+l7vKm9bRvB3Re/xSzoPc116NYeijxnqI3CO20Tw==
+X-Received: by 2002:ac2:5f73:0:b0:502:ff3b:7671 with SMTP id c19-20020ac25f73000000b00502ff3b7671mr5170689lfc.9.1695323595666;
+        Thu, 21 Sep 2023 12:13:15 -0700 (PDT)
+Received: from redhat.com ([2.52.150.187])
+        by smtp.gmail.com with ESMTPSA id u11-20020a056402064b00b0053120f313cbsm1213956edx.39.2023.09.21.12.13.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 12:13:14 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 15:13:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20230921150448-mutt-send-email-mst@kernel.org>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-12-yishaih@nvidia.com>
+ <20230921090844-mutt-send-email-mst@kernel.org>
+ <20230921141125.GM13733@nvidia.com>
+ <20230921101509-mutt-send-email-mst@kernel.org>
+ <20230921164139.GP13733@nvidia.com>
+ <20230921124331-mutt-send-email-mst@kernel.org>
+ <20230921183926.GV13733@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921183926.GV13733@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 13, 2023, Sean Christopherson wrote:
->  virt/kvm/guest_mem.c       | 593 +++++++++++++++++++++++++++++++++++++
+On Thu, Sep 21, 2023 at 03:39:26PM -0300, Jason Gunthorpe wrote:
+> On Thu, Sep 21, 2023 at 12:53:04PM -0400, Michael S. Tsirkin wrote:
+> > > vdpa is not vfio, I don't know how you can suggest vdpa is a
+> > > replacement for a vfio driver. They are completely different
+> > > things.
+> > > Each side has its own strengths, and vfio especially is accelerating
+> > > in its capability in way that vpda is not. eg if an iommufd conversion
+> > > had been done by now for vdpa I might be more sympathetic.
+> > 
+> > Yea, I agree iommufd is a big problem with vdpa right now. Cindy was
+> > sick and I didn't know and kept assuming she's working on this. I don't
+> > think it's a huge amount of work though.  I'll take a look.
+> > Is there anything else though? Do tell.
+> 
+> Confidential compute will never work with VDPA's approach.
 
-Getting to the really important stuff...
+I don't see how what this patchset is doing is different
+wrt to Confidential compute - you trap IO accesses and emulate.
+Care to elaborate?
 
-Anyone object to naming the new file guest_memfd.c instead of guest_mem.c?  Just
-the file, i.e. still keep the gmem namespace.
 
-Using guest_memfd.c would make it much more obvious that the file holds more than
-generic "guest memory" APIs, and would provide a stronger conceptual connection
-with memfd.c.
+> > There are a bunch of things that I think are important for virtio
+> > that are completely out of scope for vfio, such as migrating
+> > cross-vendor. 
+> 
+> VFIO supports migration, if you want to have cross-vendor migration
+> then make a standard that describes the VFIO migration data format for
+> virtio devices.
+
+This has nothing to do with data formats - you need two devices to
+behave identically. Which is what VDPA is about really.
+
+> > What is the huge amount of work am I asking to do?
+> 
+> You are asking us to invest in the complexity of VDPA through out
+> (keep it working, keep it secure, invest time in deploying and
+> debugging in the field)
+> 
+> When it doesn't provide *ANY* value to the solution.
+
+There's no "the solution" - this sounds like a vendor only caring about
+solutions that involve that vendor's hardware exclusively, a little.
+
+> The starting point is a completely working vfio PCI function and the
+> end goal is to put that function into a VM. That is VFIO, not VDPA.
+> 
+> VPDA is fine for what it does, but it is not a reasonable replacement
+> for VFIO.
+> 
+> Jason
+
+VDPA basically should be a kind of "VFIO for virtio".
+
+-- 
+MST
+
