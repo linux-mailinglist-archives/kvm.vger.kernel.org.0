@@ -2,94 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 896C97AA25C
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:16:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50F867AA103
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:57:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbjIUVPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 17:15:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45510 "EHLO
+        id S231640AbjIUU4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:56:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233170AbjIUVPX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 17:15:23 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C0A2114;
-        Thu, 21 Sep 2023 10:02:36 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED51C00444;
-        Thu, 21 Sep 2023 07:30:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695281415;
-        bh=0bQtjj08lQ7hZmIm0vxcQccxzsqdYVfn5uDbCn+u2Wo=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=nDXhmIoqswRZf6OZwxkKd+b2w/PZSNX3p73vVn+sIczXPP90Re+yrYaPNGnyYEUdk
-         GDoOYo2r3RaxQdyin23+xfJKFERvWCsLJWfYkK6Nhjwv0bJwUNsxFwk3AK8bOfnEys
-         V+PR7WbCG5Y+7ZkX/NJxleqjbO9XEWz2HFb/0dqj6QPw0OC5B0AdhPjMWqJ2n86hUE
-         WU6xN/Jaey1db+YaDjcwrC/6NCRExhhVzB99aFokesVVSpPEsu6Hg8a3iAUwBBMDQD
-         s8cmzut5E6sk49Jc9+ukLvo0OXcS6XPQvFjI7V8wjNmwnW8IRw3cQPOlNDRpRqQZX2
-         q/cjEartPJD/g==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-532bf1943ebso692519a12.0;
-        Thu, 21 Sep 2023 00:30:15 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzJvgGDsbvzuK7bhlIw5DRwLewIAHKvCQI7xZbalmG8Yzy147cU
-        rl/9elygfRuMSZNw2I+RxXC/sU/uQTHufuak4iU=
-X-Google-Smtp-Source: AGHT+IFJ26dacuxbCaSY19LvtayzyHj7zwflLmuyY/j24DkQ4afyqJ9S4hS8w5NXT67uXj/IC4wkcXjisCEvqkQhJgc=
-X-Received: by 2002:a05:6402:88e:b0:522:2dcc:afb6 with SMTP id
- e14-20020a056402088e00b005222dccafb6mr4337061edy.7.1695281414022; Thu, 21 Sep
- 2023 00:30:14 -0700 (PDT)
+        with ESMTP id S229670AbjIUUtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:49:12 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA2D4CB00;
+        Thu, 21 Sep 2023 10:49:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695318588; x=1726854588;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=fZEXWeTeOBrejODuS6erDuW9xhi+ilN63E3t7GSB+Dc=;
+  b=mYLObWUcd9WTK/8as8BLRXq34hkELQ+jqRWpxcYabdwgQj1hmo3YyPjU
+   K6XUxEbrRgGBFkE1odl1b4Yk0/Wdyd1QWoT0Qop9VQQ/qHEQAJXaL5mph
+   E2xcdYJi5zLclO7jDAskar481WVdWzYHT2AuoI3OhwCRdL2DLNaR9fq6K
+   pG0rjNNOfMGhA0yAthttcVSto8Fc3oKCRajdWVOnDmIEHv9klpnTW+PSr
+   LdxGsuuJnxrKP1AL9XlL4hDVseR70QrauEMQyAa7R0Rp+B5/BTsENVMME
+   kRqUjQ/ESVtEeDzghup16Tvvx2LufPHsE+dd1A4aIJ0tba/KcqBIhcTY3
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359832824"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="359832824"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 00:52:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="723649502"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="723649502"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga006.jf.intel.com with ESMTP; 21 Sep 2023 00:52:09 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: [PATCH v4 03/17] iommufd: Unite all kernel-managed members into a struct
+Date:   Thu, 21 Sep 2023 00:51:24 -0700
+Message-Id: <20230921075138.124099-4-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230921075138.124099-1-yi.l.liu@intel.com>
+References: <20230921075138.124099-1-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <20230915014949.1222777-1-zhaotianrui@loongson.cn>
- <CAAhV-H5fbyoMk9XWsejU0zVg4jPq_t2PT3ODKiAnc1LNARpBzA@mail.gmail.com>
- <fed0bbb0-9c94-7dac-4956-f6c9b231fc0d@loongson.cn> <CAAhV-H5_KwmkEczws2diHpk5gDUZSAmy_7Zgi=CowhGZN9_d_A@mail.gmail.com>
- <e53a4428-7533-61cd-81c5-0a65877041fd@loongson.cn> <CAAhV-H7QKBEV_dSfX8nprZ838HRCcDt8cziPip4UdSMuYvERzQ@mail.gmail.com>
- <CABgObfaWiNYWFhR5528=3_1RBqTwTDqNpBHDRbvkd-9UyrCDpg@mail.gmail.com>
-In-Reply-To: <CABgObfaWiNYWFhR5528=3_1RBqTwTDqNpBHDRbvkd-9UyrCDpg@mail.gmail.com>
-From:   Huacai Chen <chenhuacai@kernel.org>
-Date:   Thu, 21 Sep 2023 15:30:02 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6YormmC7DC4Ar9Rwu16OHKP0G8+=7eShxkWjjQ7kq5mA@mail.gmail.com>
-Message-ID: <CAAhV-H6YormmC7DC4Ar9Rwu16OHKP0G8+=7eShxkWjjQ7kq5mA@mail.gmail.com>
-Subject: Re: [PATCH v21 00/29] Add KVM LoongArch support
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     zhaotianrui <zhaotianrui@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Paolo,
+From: Nicolin Chen <nicolinc@nvidia.com>
 
-On Wed, Sep 20, 2023 at 11:23=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
->
-> On Sat, Sep 16, 2023 at 5:17=E2=80=AFAM Huacai Chen <chenhuacai@kernel.or=
-g> wrote:
-> > I can test now, during my tests I may ask some other questions about
-> > your patches. You just need to answer my questions and I will adjust
-> > the code myself if needed. After that I will give you a final version
-> > with Tested-by and you can simply send that as V22.
->
-> Since you are preparing yourself the v22, you could also send it to me
-> as a pull request.
-OK, after Tianrui sends v22 to the maillist, if there are no more
-comments, I will send you a pull request after one or two weeks.
-Thanks.
+The struct iommufd_hw_pagetable has been representing a kernel-managed
+HWPT, yet soon will be reused to represent a user-managed HWPT. These
+two types of HWPTs has the same IOMMUFD object type and an iommu_domain
+object, but have quite different attributes/members.
 
-Huacai
+Add a union in struct iommufd_hw_pagetable and group all the existing
+kernel-managed members. One of the following patches will add another
+struct for user-managed members.
 
->
-> Thanks,
->
-> Paolo
->
+Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+ drivers/iommu/iommufd/iommufd_private.h | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+index 3064997a0181..947a797536e3 100644
+--- a/drivers/iommu/iommufd/iommufd_private.h
++++ b/drivers/iommu/iommufd/iommufd_private.h
+@@ -231,13 +231,18 @@ int iommufd_vfio_ioas(struct iommufd_ucmd *ucmd);
+  */
+ struct iommufd_hw_pagetable {
+ 	struct iommufd_object obj;
+-	struct iommufd_ioas *ioas;
+ 	struct iommu_domain *domain;
+-	bool auto_domain : 1;
+-	bool enforce_cache_coherency : 1;
+-	bool msi_cookie : 1;
+-	/* Head at iommufd_ioas::hwpt_list */
+-	struct list_head hwpt_item;
++
++	union {
++		struct { /* kernel-managed */
++			struct iommufd_ioas *ioas;
++			bool auto_domain : 1;
++			bool enforce_cache_coherency : 1;
++			bool msi_cookie : 1;
++			/* Head at iommufd_ioas::hwpt_list */
++			struct list_head hwpt_item;
++		};
++	};
+ };
+ 
+ struct iommufd_hw_pagetable *
+-- 
+2.34.1
+
