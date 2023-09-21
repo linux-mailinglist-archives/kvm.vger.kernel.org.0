@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21C167AA37F
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:51:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F2B7AA108
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:57:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232921AbjIUVvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 17:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39984 "EHLO
+        id S231882AbjIUU4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:56:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232894AbjIUVvG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 17:51:06 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32ABC06BE
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:45 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c46ce0c39fso11210595ad.2
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:45 -0700 (PDT)
+        with ESMTP id S232583AbjIUU4M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:56:12 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 547D9C1128
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:47 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c5cfd475fbso10568145ad.1
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 13:33:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695328425; x=1695933225; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695328427; x=1695933227; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TrGawBYlg9dO9+tpkWoFC/Bm9/vroFhKv3wNgQsPHaE=;
-        b=rFUUewuO4GiLk6j9N+4yp4fVjBcvcNNt50CIzAVuZSejDlBuhrCOxxOZhc8+s1TLM8
-         J7VZoW31U63mk8Sr2bA42PCP59D6/UbKYU68Gb988+21XZqO/uiTRQ++zSP9M7VuQdTY
-         fWZHjOXbjbBzOIH5lb8Me7NfER71QI426xW2bVmo6OVkMZN1P3Kf/95+V7SaqbWIvUep
-         S9L8rrrGHAloQASoSFIgpXDbWCOcL0YurN1tRF6PwSf3OY4QSn4i3SuxJKZNG5H0bxkw
-         t/huqM7dO8MESLuMR8p9A9Vg/hr6nzktEEkW4cxkVgBpB7t0tc23FLgGxiLfq0imX7GG
-         L96w==
+        bh=sB11xgPqav8kJOlkOtFOCiG4fm9eEcXZMC+/0AduleA=;
+        b=rkStgMBLtwv1RojQ9/AzrLzoUD6XPX/6Q7zZXlfRVRbzsL+dFVV+XnsNsJUMsIpqPE
+         6z5X6GiM1FbIWRl8AAW6bMjIDFrwQaVRIi59lU3mS++FdnYzD+5Ox7fIrB4l2wYpdWcy
+         BbCNnhkyQPHiVT0yLFOzVvl5eGjZLCm6lh7ZHrvVXcgTHdRGKtbWy3ShYlQQXwWkQKRb
+         fGQJyBLynmBe3tQ4YxNsYHWwLsUjOc4qZAMFelFSaJMgNKZKj8qlbbCnpjrgq3l3XXtZ
+         prxYHqMS8o10bw6IUXUhgtwt30OPzaykWHnMveciKDjcyjCNwK4rBBI1pc1tnAkg8RVw
+         TqYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695328425; x=1695933225;
+        d=1e100.net; s=20230601; t=1695328427; x=1695933227;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TrGawBYlg9dO9+tpkWoFC/Bm9/vroFhKv3wNgQsPHaE=;
-        b=M3ibDPqmlPiuPhhX3bMIJrvX3geJUyDOdtfEAYubnUJwPxhBp5CQHJ9NPFwveAw9Oy
-         8MlsMPf4WG6Cm5zmQM/vrdXilaCsV/ClskFiSHPjFPUf1GGr429RgbPVjPOGguOUyJ9l
-         aKEV23o/PnuF78WUigbGCAAjeJngCayienJgwZ8runKMO2bJA2Gl3OLGtyyj84bB5cpw
-         eCYfXSJRSw8601tpWxuvJBq350ckvSEheMtTIX00iB6o2MMmbPwdQjeNV8eB5HnxmgJo
-         /Q6QtC9aAg/oHDJK498rvq4CZK/Qewi5By8h5Axb8UyKJ1hPHXBNIKoplQZ8xsOvcZcN
-         y7wQ==
-X-Gm-Message-State: AOJu0Yx1dq9MXowxtivGcTpEILRDSLS5d6YI4JTUcSvbsWa/4+GfUvt8
-        rz1CSWOIvK0ZsqAdniPf6OxtkC/HBAs=
-X-Google-Smtp-Source: AGHT+IG+uc2R/SKzIbV4YSj6Mluwpdoxl1dWdFaELq1DVKwkomUBRUUtPG4pltoyI3X4CUGacjj01mPun/o=
+        bh=sB11xgPqav8kJOlkOtFOCiG4fm9eEcXZMC+/0AduleA=;
+        b=LY5ZQCQYnVW1YlC7/DbpkMq/4PxovX8OU7ky1qEimSor+8QNc+Hk6w3F0yNMwzMadL
+         VJ/AIfIcafxwRWursxNHhmYYxuMb2kIEtbOHOLJOxDY4PtBS8FUugRt+w1VeV0NdF8yq
+         Q9sDoL0U3Uf4hNo6iWMSEIXRVwjs8rV/m5CKugvTy9e6DW40V4+ITA1AoBFsNQGoeiau
+         IMz3RXtsevf8IIJ25Utv1EYSoXYsW/7NLzqFJM5rlgjPy4A6omCZpfG8fIAByxt9HbJM
+         LyjH7dGeXZYNrxcz0JSSHg1PcW7xqUVIVwJqi0a7xGzAS9VF0weBu/i/wLOrRJ8z7+qN
+         Vy1w==
+X-Gm-Message-State: AOJu0Yx08+017OcXQLoDbZ2H1zLSEIeyCbl2ckWKQDV9GDX9Y/IaF6YH
+        /wJ+leE4bIjKlcuvyYcbk+KRDwuxV7g=
+X-Google-Smtp-Source: AGHT+IGx7Eb0egTaRgjCjWsoC3+ZOFv+sbP9oLGdFxJ5fYEqfixkRwWHlHwIm7T6uuPwO4ciyM1sX09Mndk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
  (user=seanjc job=sendgmr) by 2002:a17:902:d490:b0:1bc:7c69:925c with SMTP id
- c16-20020a170902d49000b001bc7c69925cmr94805plg.10.1695328425216; Thu, 21 Sep
- 2023 13:33:45 -0700 (PDT)
+ c16-20020a170902d49000b001bc7c69925cmr94808plg.10.1695328426758; Thu, 21 Sep
+ 2023 13:33:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 21 Sep 2023 13:33:23 -0700
+Date:   Thu, 21 Sep 2023 13:33:24 -0700
 In-Reply-To: <20230921203331.3746712-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230921203331.3746712-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230921203331.3746712-7-seanjc@google.com>
-Subject: [PATCH 06/13] KVM: Disallow hugepages for incompatible gmem bindings,
- but let 'em succeed
+Message-ID: <20230921203331.3746712-8-seanjc@google.com>
+Subject: [PATCH 07/13] KVM: x86/mmu: Track PRIVATE impact on hugepage mappings
+ for all memslots
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,133 +65,56 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the restriction that a guest_memfd instance that supports hugepages
-can *only* be bound by memslots that are 100% compatible with hugepage
-mappings, and instead force KVM to use an order-0 mapping if the binding
-isn't compatible with hugepages.
+Track the effects of private attributes on potential hugepage mappings if
+the VM supports private memory, i.e. even if the target memslot can only
+ever be mapped shared.  If userspace configures a chunk of memory as
+private, KVM must not allow that memory to be mapped shared regardless of
+whether or not the *current* memslot can be mapped private.  E.g. if the
+guest accesses a private range using a shared memslot, then KVM must exit
+to userspace.
 
-The intent of the draconian binding restriction was purely to simplify the
-guest_memfd implementation, e.g. to avoid repeatining the existing logic in
-KVM x86ial for precisely tracking which GFNs support hugepages.  But
-checking that the binding's offset and size is compatible is just as easy
-to do when KVM wants to create a mapping.
-
-And on the other hand, completely rejecting bindings that are incompatible
-with hugepages makes it practically impossible for userspace to use a
-single guest_memfd instance for all guest memory, e.g. on x86 it would be
-impossible to skip the legacy VGA hole while still allowing hugepage
-mappings for the rest of guest memory.
-
-Suggested-by: Michael Roth <michael.roth@amd.com>
-Link: https://lore.kernel.org/all/20230918163647.m6bjgwusc7ww5tyu@amd.com
+Fixes: 5bb0b4e162d1 ("KVM: x86: Disallow hugepages when memory attributes are mixed")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/guest_mem.c | 54 ++++++++++++++++++++++----------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index 68528e9cddd7..4f3a313f5532 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -434,20 +434,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 	return err;
- }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 269d4dc47c98..148931cf9dba 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7314,10 +7314,12 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 	lockdep_assert_held(&kvm->slots_lock);
  
--static bool kvm_gmem_is_valid_size(loff_t size, u64 flags)
--{
--	if (size < 0 || !PAGE_ALIGNED(size))
--		return false;
--
--#ifdef CONFIG_TRANSPARENT_HUGEPAGE
--	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
--	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
--		return false;
--#endif
--
--	return true;
--}
--
- int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ 	/*
+-	 * KVM x86 currently only supports KVM_MEMORY_ATTRIBUTE_PRIVATE, skip
+-	 * the slot if the slot will never consume the PRIVATE attribute.
++	 * Calculate which ranges can be mapped with hugepages even if the slot
++	 * can't map memory PRIVATE.  KVM mustn't create a SHARED hugepage over
++	 * a range that has PRIVATE GFNs, and conversely converting a range to
++	 * SHARED may now allow hugepages.
+ 	 */
+-	if (!kvm_slot_can_be_private(slot))
++	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+ 		return false;
+ 
+ 	/*
+@@ -7372,7 +7374,7 @@ void kvm_mmu_init_memslot_memory_attributes(struct kvm *kvm,
  {
- 	loff_t size = args->size;
-@@ -460,9 +446,15 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
- 	if (flags & ~valid_flags)
- 		return -EINVAL;
+ 	int level;
  
--	if (!kvm_gmem_is_valid_size(size, flags))
-+	if (size < 0 || !PAGE_ALIGNED(size))
- 		return -EINVAL;
+-	if (!kvm_slot_can_be_private(slot))
++	if (!kvm_arch_has_private_mem(kvm))
+ 		return;
  
-+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-+	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
-+	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
-+		return -EINVAL;
-+#endif
-+
- 	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
- }
- 
-@@ -470,7 +462,7 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		  unsigned int fd, loff_t offset)
- {
- 	loff_t size = slot->npages << PAGE_SHIFT;
--	unsigned long start, end, flags;
-+	unsigned long start, end;
- 	struct kvm_gmem *gmem;
- 	struct inode *inode;
- 	struct file *file;
-@@ -489,16 +481,9 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		goto err;
- 
- 	inode = file_inode(file);
--	flags = (unsigned long)inode->i_private;
- 
--	/*
--	 * For simplicity, require the offset into the file and the size of the
--	 * memslot to be aligned to the largest possible page size used to back
--	 * the file (same as the size of the file itself).
--	 */
--	if (!kvm_gmem_is_valid_size(offset, flags) ||
--	    !kvm_gmem_is_valid_size(size, flags))
--		goto err;
-+	if (offset < 0 || !PAGE_ALIGNED(offset))
-+		return -EINVAL;
- 
- 	if (offset + size > i_size_read(inode))
- 		goto err;
-@@ -599,8 +584,23 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	page = folio_file_page(folio, index);
- 
- 	*pfn = page_to_pfn(page);
--	if (max_order)
--		*max_order = compound_order(compound_head(page));
-+	if (!max_order)
-+		goto success;
-+
-+	*max_order = compound_order(compound_head(page));
-+	if (!*max_order)
-+		goto success;
-+
-+	/*
-+	 * For simplicity, allow mapping a hugepage if and only if the entire
-+	 * binding is compatible, i.e. don't bother supporting mapping interior
-+	 * sub-ranges with hugepages (unless userspace comes up with a *really*
-+	 * strong use case for needing hugepages within unaligned bindings).
-+	 */
-+	if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
-+	    !IS_ALIGNED(slot->npages, 1ull << *max_order))
-+		*max_order = 0;
-+success:
- 	r = 0;
- 
- out_unlock:
+ 	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
