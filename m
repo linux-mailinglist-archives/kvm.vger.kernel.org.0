@@ -2,91 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C1AA7A993D
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21E447A9BF5
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 21:05:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbjIUSMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 14:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47778 "EHLO
+        id S230488AbjIUTFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 15:05:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjIUSLT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 14:11:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8951389237
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695318721;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ISuC9AVqcaXixUkxtppp8LUjHO6shANtza8stDjTgo8=;
-        b=JtcrUUqjxYv2AcFaBpC5hNm8ReXcuZYgNuIsbgFJ9uHMA9hsSPZhkIBHQ3EdgNrzW9hhy2
-        38a+IpSJ3MGdSgPckZBBFQmD+uQCKjMk4MS0AQ66H2GmNmHmPlnGHAF0bt4sGXEP+7WjUT
-        5csjBH93byiK6aidMlZ+3DvEbzHLmFs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-1tFSs-KlNRKpW9gKxS-I6w-1; Thu, 21 Sep 2023 09:33:17 -0400
-X-MC-Unique: 1tFSs-KlNRKpW9gKxS-I6w-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-532c440db89so657520a12.3
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 06:33:17 -0700 (PDT)
+        with ESMTP id S231411AbjIUTEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 15:04:50 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A3B8333E
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:50:52 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2bff776fe0bso21492641fa.0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1695318649; x=1695923449; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SLFyIa4pNfHrRrFVoK4W/7yOB5ezN6IY3vzVujeQWwk=;
+        b=eFntXSh/F4hKdahKgzMe5D0dOIwBNLMarnlFvWooPG3SbMSFfyRWzuDmgLU+AINGYY
+         CC0i8UC3ue9twJ2WZrPiHdEBSj1NbbPAHZJcy9xXAfRxDYClImR6tbe4ArB1YnTWLJbv
+         JaSx6fOvf4UNazVj1W5Z4G/Fa/q0/ZRfo/NYUiW/PxoWcw2boISz85PIS07y3pltVlFV
+         XukkJhyB4wHOVaPfrPsrF46bQnONpR7zKfRvPXcKUZ6deayWVfo5+hR9V0CJts2dxuad
+         f93uK4SLkjiokLRLWG1ZhNtW7Rdr0NSQU/L0+C3DsmFvDrdMs1im4U5d9lqQ0ZNa80LQ
+         S9qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695303196; x=1695907996;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ISuC9AVqcaXixUkxtppp8LUjHO6shANtza8stDjTgo8=;
-        b=gjf5I1H324UoSrKFyNYLaH/tkYJLBT8DDBeJjIdmQO+TR9AWbM0yqHCsWYX/BJn78n
-         IDi4sph6algxLFsjhOx7NO6pXCnS+zeIda9/tKEs44pbZUAjhIZ24ppOUeXIQgB+BIr5
-         zkOjkgbd0rVAXS+Uz9e+atZ1DB75CPH1b21Z+8zC2LLxSLVVUm8J/SLqZyxhWCtQurgg
-         DWhCyyojnRnXbL/7cr7RH4S0rJEnUCdhTrqqXi8hXFa9iNUXuumlBrVIG0AYEUmR+/sj
-         J6NN4ElYZPyLTHhHXoyIEHTd2+hUwM8l505iME8fosg9oYqU21W0rVu2RnkDqRLVxSkP
-         m4tg==
-X-Gm-Message-State: AOJu0Yxwq+iZiZxRUT+0PSwwkp+vmzKx0frjD9z+Ay13nJA+oAVksJSt
-        zzonZ13M+X8QDTVyTAECGzNCxHptOsm0cEkW2EhXrX+myl1gy6XkothyetSX6tnDrcmkm/Ue/Kb
-        AhJQ2JEF///cl
-X-Received: by 2002:a05:6402:b36:b0:530:9fbc:8df6 with SMTP id bo22-20020a0564020b3600b005309fbc8df6mr4896866edb.2.1695303196383;
-        Thu, 21 Sep 2023 06:33:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHWkySiLdgAdNKnLNCgYei8zh/ZPXT0tiKpgirtwwvkw7Ye5tlhji3W9LqtB9azmo8hjNyCeQ==
-X-Received: by 2002:a05:6402:b36:b0:530:9fbc:8df6 with SMTP id bo22-20020a0564020b3600b005309fbc8df6mr4896841edb.2.1695303196047;
-        Thu, 21 Sep 2023 06:33:16 -0700 (PDT)
-Received: from redhat.com ([2.52.150.187])
-        by smtp.gmail.com with ESMTPSA id u25-20020aa7d0d9000000b0051e1660a34esm843110edo.51.2023.09.21.06.33.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 06:33:15 -0700 (PDT)
-Date:   Thu, 21 Sep 2023 09:33:11 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     alex.williamson@redhat.com, jasowang@redhat.com, jgg@nvidia.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230921091756-mutt-send-email-mst@kernel.org>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-12-yishaih@nvidia.com>
+        d=1e100.net; s=20230601; t=1695318649; x=1695923449;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SLFyIa4pNfHrRrFVoK4W/7yOB5ezN6IY3vzVujeQWwk=;
+        b=QXx5X4DIkm/480vXzfnGxtAyILhFIrMNXjfvnawqQ2gi+AF1/Nw22MeaLG2v2e3EwM
+         wsQ2xqLGfN9pWyuwNuhnpxd/knmqLbkfW8pGcuvu6PU0bEVOGyRT3TUFLuzeu7MP15Lo
+         gjA2dTCQvBKFGPtuURong8JwrC25IjaQ76jcjGe/Wg4Fd19XQRprWCUcjBXWJtBPc3TR
+         fLS7wOlT69iwPcnLCPr1d22JOsbWZchwMloTpy9XWay0LCMavbqXWevHLyZTEY7SWLhD
+         gDuYK4+3BIlVLiIwL9dS8VrgyijBQGhithis8RFin82nLlE9/BYuqxoPF+arr33PGR7Z
+         +9uA==
+X-Gm-Message-State: AOJu0YzHQPcZ/pc+I3Da4sBxhxDCEeHkr37EodY+5b+zlgforC87KhMC
+        KTrA97hfXGYl5mHuRnhbB68Belxi06FvBMyYpnYUusbsO/dNJGlLVTs=
+X-Google-Smtp-Source: AGHT+IHSkQ8f8dAM1bbBde2nHASKpT8QXWY5hcVmzsVUDmW/7AlposkLeqWQB5YEfDT9yRQHRvNIKem8/RqCHbNikX8=
+X-Received: by 2002:a05:6402:3d7:b0:52c:9f89:4447 with SMTP id
+ t23-20020a05640203d700b0052c9f894447mr4590180edw.4.1695303248906; Thu, 21 Sep
+ 2023 06:34:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921124040.145386-12-yishaih@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221201102728.69751-1-akihiko.odaki@daynix.com>
+ <CAFEAcA_ORM9CpDCvPMs1XcZVhh_4fKE2wnaS_tp1s4DzZCHsXQ@mail.gmail.com>
+ <a3cc1116-272d-a8e5-a131-7becf98115e0@daynix.com> <ed62645a-ec48-14ff-4b7e-15314a0da30e@daynix.com>
+ <CAFEAcA-pOKf1r+1BzURpv5FnFS79D2V=SSeY_a2Wene1wf+P1A@mail.gmail.com> <a5cd5a46-7f33-42b6-99eb-b09159af42d7@daynix.com>
+In-Reply-To: <a5cd5a46-7f33-42b6-99eb-b09159af42d7@daynix.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 21 Sep 2023 14:33:49 +0100
+Message-ID: <CAFEAcA9cfrS4bqUX6G9qL8jNhJw0z2nMbqiHxYOutnqVOyb2yQ@mail.gmail.com>
+Subject: Re: [PATCH] accel/kvm/kvm-all: Handle register access errors
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 03:40:40PM +0300, Yishai Hadas wrote:
-> +#define VIRTIO_LEGACY_IO_BAR_HEADER_LEN 20
-> +#define VIRTIO_LEGACY_IO_BAR_MSIX_HEADER_LEN 4
+On Thu, 21 Sept 2023 at 08:25, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> On 2023/06/19 21:19, Peter Maydell wrote:
+> > On Sat, 10 Jun 2023 at 04:51, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >> On 2022/12/01 20:00, Akihiko Odaki wrote:
+> >>> On 2022/12/01 19:40, Peter Maydell wrote:
+> >>>> On Thu, 1 Dec 2022 at 10:27, Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>> wrote:
+> >>>>> A register access error typically means something seriously wrong
+> >>>>> happened so that anything bad can happen after that and recovery is
+> >>>>> impossible.
+> >>>>> Even failing one register access is catastorophic as
+> >>>>> architecture-specific code are not written so that it torelates such
+> >>>>> failures.
+> >>>>>
+> >>>>> Make sure the VM stop and nothing worse happens if such an error occurs.
+> >>>>>
+> >>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-This is exactly part of VIRTIO_PCI_CONFIG_OFF duplicated.
+> >> QEMU 8.0 is already released so I think it's time to revisit this.
+> >
+> > Two months ago would have been a better time :-) We're heading up
+> > towards softfreeze for 8.1 in about three weeks from now.
 
--- 
-MST
+> Hi Peter,
+>
+> Please apply this.
 
+Looking again at the patch I see it hasn't been reviewed by
+anybody on the KVM side of things. Paolo, does this seem like
+the right way to handle errors from kvm_arch_get_registers()
+and kvm_arch_put_registers() ?
+
+The original patch is at:
+https://patchew.org/QEMU/20221201102728.69751-1-akihiko.odaki@daynix.com/
+
+thanks
+-- PMM
