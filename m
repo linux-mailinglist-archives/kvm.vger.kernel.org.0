@@ -2,86 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A4867AA164
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B50877A9F11
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:17:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230391AbjIUVBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 17:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
+        id S231204AbjIUURM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:17:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232411AbjIUVBB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 17:01:01 -0400
-Received: from out-218.mta0.migadu.com (out-218.mta0.migadu.com [IPv6:2001:41d0:1004:224b::da])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A277C837E
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 11:18:43 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695320320;
+        with ESMTP id S230334AbjIUUQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:16:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25E3100E39
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695323853;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ESi6WCBz3OcaqeHi98zUfJuzlX+aJShGsyp1e4x2WAo=;
-        b=nc+IU8ws3v0fKGEvdOjh+9eclrG3oseb4BTozEvJFAu7EQZoT9TP39KHIoK4TxYmEHb5qT
-        uj1EqJaYMzwur6Dmig4qb3MpZTUT+bkK7RD1d7gSUKSVR0fiYw1LSCc/BbalF2oQZxiDSg
-        dBW48jpwPZenKHf8Kwrxe64vw5nX/wA=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Cc:     James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 0/8] KVM: arm64: Cleanup + fix to vCPU reset, feature flags
-Date:   Thu, 21 Sep 2023 18:18:28 +0000
-Message-ID: <169532025748.1287192.9601319237389431113.b4-ty@linux.dev>
-In-Reply-To: <20230920195036.1169791-1-oliver.upton@linux.dev>
-References: <20230920195036.1169791-1-oliver.upton@linux.dev>
+        bh=M4F18HtJIvSpDrNeybXoV/nJvscTALrB3uUN04vezK4=;
+        b=QswvVca7QsTH3I6rOK4VQ0KIx87Qo8xM9dBfN6xx12LfrtSmIGEooZfxNmhEYjYDMfYeEX
+        H/eAbHx371fQhILYeezR3r6XnDx2S7/RTSbl7/spdPM8pUfAxAq/YS3fcZZ2U6zzfaRc7i
+        4ZAdwALwChtFjIah0Nz2n1I3N06C3kk=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56--ZUWTkr9OtGMoH5QG94USA-1; Thu, 21 Sep 2023 15:17:32 -0400
+X-MC-Unique: -ZUWTkr9OtGMoH5QG94USA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2bff8e92054so19150141fa.2
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 12:17:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695323851; x=1695928651;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M4F18HtJIvSpDrNeybXoV/nJvscTALrB3uUN04vezK4=;
+        b=UaL/ORWoTb9iB4pNGoyx6zzccXv4qniL3DvWAX+GAPhlp5AsLedEMjYu3m4Q1YfHzC
+         geNgXC6yKg6P/wL3wAqhpsohoO7+LrJjvXTdwTN7W2QeJ5U+Ujn48OKjt5Kcn9tQhHT4
+         3/MAgMuVaF1B9jI1Zk8e1YntT4sUtXVaWRGUn58HurHZZICoqDDVsaSPr8k7XlrU4H66
+         3wMrOaQ/fVktuNoNnHClphhUJZWfmbtFxsRKlDHjOzoBJuZpklgpACehOCWMfpA0cKCD
+         RFYKOvRMOr/n/5EXmbdweavU9F+DBu9D6522AP9m3OqH3D+pcPNa8KoNwm3cb5Ym43Gs
+         Z9rQ==
+X-Gm-Message-State: AOJu0YzyE0r2Nq2IT7HpJhbScHKwMQ/hX44KsvVSfqmGiDTXERj3Z39q
+        eWGpYN7z1UC7YQRgv09T3Vbtv4dlhoIhPBioPve/tzLZvfTUPjGyubDyxLNprGFnntNUTe31tow
+        eHEVsN3dRVGwd
+X-Received: by 2002:a05:6512:34c9:b0:503:333e:b387 with SMTP id w9-20020a05651234c900b00503333eb387mr5157541lfr.41.1695323850808;
+        Thu, 21 Sep 2023 12:17:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHLO6U0t/NII2ddctv8iFsd2bsjD4CmnkBmvFzO3e8EHefAPfb77ysHKgmXf03wCOOWJP3JWg==
+X-Received: by 2002:a05:6512:34c9:b0:503:333e:b387 with SMTP id w9-20020a05651234c900b00503333eb387mr5157528lfr.41.1695323850453;
+        Thu, 21 Sep 2023 12:17:30 -0700 (PDT)
+Received: from redhat.com ([2.52.150.187])
+        by smtp.gmail.com with ESMTPSA id e23-20020a056402089700b00530bc7cf377sm1218240edy.12.2023.09.21.12.17.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 12:17:29 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 15:17:25 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20230921151325-mutt-send-email-mst@kernel.org>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-12-yishaih@nvidia.com>
+ <20230921090844-mutt-send-email-mst@kernel.org>
+ <20230921141125.GM13733@nvidia.com>
+ <20230921101509-mutt-send-email-mst@kernel.org>
+ <20230921164139.GP13733@nvidia.com>
+ <20230921124331-mutt-send-email-mst@kernel.org>
+ <20230921183926.GV13733@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        TO_EQ_FM_DIRECT_MX,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921183926.GV13733@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Sep 2023 19:50:28 +0000, Oliver Upton wrote:
-> The way we do vCPU feature flag checks is a bit of a scattered mess
-> between the KVM_ARM_VCPU_INIT ioctl handler and kvm_reset_vcpu(). Let's
-> move all the feature flag checks up into the ioctl() handler to
-> eliminate failure paths from kvm_reset_vcpu(), as other usage of this
-> function no not handle returned errors.
+On Thu, Sep 21, 2023 at 03:39:26PM -0300, Jason Gunthorpe wrote:
+> > What is the huge amount of work am I asking to do?
 > 
-> Nobody screamed about the VM-wide feature flag change, so its also a
-> good time to rip out the vestiges of the vCPU-scoped bitmap.
-> 
-> [...]
+> You are asking us to invest in the complexity of VDPA through out
+> (keep it working, keep it secure, invest time in deploying and
+> debugging in the field)
 
-Applied to kvmarm/next, with the change to use cpus_have_final_cap() per
-Marc's suggestion.
+I'm asking you to do nothing of the kind - I am saying that this code
+will have to be duplicated in vdpa, and so I am asking what exactly is
+missing to just keep it all there. So far you said iommufd and
+note I didn't ask you to add iommufd to vdpa though that would be nice ;)
+I just said I'll look into it in the next several days.
 
-[1/8] KVM: arm64: Add generic check for system-supported vCPU features
-      https://git.kernel.org/kvmarm/kvmarm/c/ef150908b6bd
-[2/8] KVM: arm64: Hoist PMUv3 check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/9116db11feb5
-[3/8] KVM: arm64: Hoist SVE check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/be9c0c018389
-[4/8] KVM: arm64: Hoist PAuth checks into KVM_ARM_VCPU_INIT ioctl
-      https://git.kernel.org/kvmarm/kvmarm/c/baa28a53ddbe
-[5/8] KVM: arm64: Prevent NV feature flag on systems w/o nested virt
-      https://git.kernel.org/kvmarm/kvmarm/c/12405b09926f
-[6/8] KVM: arm64: Hoist NV+SVE check into KVM_ARM_VCPU_INIT ioctl handler
-      https://git.kernel.org/kvmarm/kvmarm/c/d99fb82fd35e
-[7/8] KVM: arm64: Remove unused return value from kvm_reset_vcpu()
-      https://git.kernel.org/kvmarm/kvmarm/c/3d4b2a4cddd7
-[8/8] KVM: arm64: Get rid of vCPU-scoped feature bitmap
-      https://git.kernel.org/kvmarm/kvmarm/c/1de10b7d13a9
+-- 
+MST
 
---
-Best,
-Oliver
