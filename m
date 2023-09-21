@@ -2,118 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5429A7A9B37
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:56:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FE167A99A2
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 20:16:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230385AbjIUS4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 14:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59136 "EHLO
+        id S230405AbjIUSQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 14:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbjIUSzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 14:55:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADBD46E5C
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 11:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695321302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tSWZutc0jBg4LRB6lh/PjnElphckaTmoFsFbI4z61RQ=;
-        b=BOruYlQ1AkHaTBAUGrIiqN+2Ft3e8aULApPKMy60xeYc2F3CboRSFqSmsS2lbLwj5KOdc1
-        SEin1+mGkWHxN06AD74Xyjn3ySQFU5pNCD1NRR3D5eCi1TRL7g5zb07bJmjpa0qa71WDov
-        GLebojHw/hgfcrj9lI9JZO3kqL2hBtc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-107-VoiVm3BsPjGwxP3NmzF8Lw-1; Thu, 21 Sep 2023 06:05:17 -0400
-X-MC-Unique: VoiVm3BsPjGwxP3NmzF8Lw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40478e6abd0so6013285e9.1
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 03:05:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695290716; x=1695895516;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tSWZutc0jBg4LRB6lh/PjnElphckaTmoFsFbI4z61RQ=;
-        b=iHaIv7M6FeY1M5JTJVlo78kgcuYwLxwJ/OIE8seElkVxNt8+EY3qohTlBaagvMZ8yM
-         g6Sap5Ak64RU53YOlCt4rp6OSnPDMzMhKT5/SuXOwJ7hjshew04phoOYqf4fWLA1K+0y
-         MpamKWjzm+AqPJuqEhnD3AKjtL9zst5gNfQIvsx9NTMZzrBEoEYVzDPqn30sTpxpyar/
-         +CZrNI+LDrMGQn/e0s6W1IkVzukDKrok4gquamq5KOulplkg2iSz0YE5xeO+L3G+Q2YC
-         pGFPOz320YlpPlSCz1Rkb/Huvr1Jrz8u9OmYyrB1bGp706ooWlTW9qhUTwBJuE3Hl6zF
-         oMww==
-X-Gm-Message-State: AOJu0YyPw3EFSu6+F6XFmA3DCMi0hUMFDglIcCtTPNhBEj2JKwJRmBXL
-        Z0738CAl4ekOFqJlT3VPDeOvmyMIIQNcBtTVDHduVkwEw5A52jx1T2hb2V20n5uBaKTjzIYGdXo
-        tK0P+2cG9HKNB
-X-Received: by 2002:adf:e70b:0:b0:31f:b364:a6ba with SMTP id c11-20020adfe70b000000b0031fb364a6bamr4691483wrm.52.1695290716206;
-        Thu, 21 Sep 2023 03:05:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFb+xpkOukKwFUqxDHZtMEtfwl9qISBYPAa6ay6agAbXJC9Ql0Yok8DkWeufmD4yqy0T55nBg==
-X-Received: by 2002:adf:e70b:0:b0:31f:b364:a6ba with SMTP id c11-20020adfe70b000000b0031fb364a6bamr4691458wrm.52.1695290715836;
-        Thu, 21 Sep 2023 03:05:15 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id i9-20020a5d6309000000b003214fc12a30sm1298462wru.106.2023.09.21.03.05.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 03:05:15 -0700 (PDT)
-Message-ID: <01cf00ad-0461-d72f-4b0d-d2093628049d@redhat.com>
-Date:   Thu, 21 Sep 2023 12:05:14 +0200
+        with ESMTP id S230296AbjIUSQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 14:16:27 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2948D84F12;
+        Thu, 21 Sep 2023 10:37:41 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 65ACAC4AF6E;
+        Thu, 21 Sep 2023 10:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695293423;
+        bh=YtckvwlBrMMC7jLRVjbOvKATSxSXSNmZ/+v9UB3RbkM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=T6v53WU6Yex4FShxB8P+8lFNVSZQLqIPB8bfL8dmLoEfaHGPgoIMNCmEGJ4CGGwxw
+         TfIKOHHRlT712xhw2r31Pv+qaJXoVpT+GMJJiCKFO4mB9bxRkdjJLfOOFfkdnFAs6N
+         M+CJYclZs7ao/FkjOYfP4vvI7fH1sKQH/93Riw/4aUpniwNo+UwFvy9MXN33SNXLy7
+         2CdCG0Vk0XIasyttx8/eWdYcpI/dE/nNAxsqbXD+WCfs6TrvI0sxGaZKg0hn94WiD1
+         HU5DO/XpikEmRoMomRJZuVBi4h4+V7T7Q9dIlKlIpNS9q43z1YuwQtM+/noEP022Ot
+         i8YSRvcM7EajQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4BF9FC43170;
+        Thu, 21 Sep 2023 10:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pattara Teerapong <pteerapong@google.com>,
-        David Stevens <stevensd@google.com>,
-        Yiwei Zhang <zzyiwei@google.com>,
-        Paul Hsia <paulhsia@google.com>
-References: <20230916003916.2545000-1-seanjc@google.com>
- <20230916003916.2545000-2-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: x86/mmu: Open code walking TDP MMU roots for
- mmu_notifier's zap SPTEs
-In-Reply-To: <20230916003916.2545000-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v9 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <169529342330.31237.17425238939443569716.git-patchwork-notify@kernel.org>
+Date:   Thu, 21 Sep 2023 10:50:23 +0000
+References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+In-Reply-To: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+To:     Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        mst@redhat.com, jasowang@redhat.com, bobby.eshleman@bytedance.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/16/23 02:39, Sean Christopherson wrote:
-> Use the "inner" TDP MMU root walker when zapping SPTEs in response to an
-> mmu_notifier invalidation instead of invoking kvm_tdp_mmu_zap_leafs().
-> This will allow reworking for_each_tdp_mmu_root_yield_safe() to do more
-> work, and to also make it usable in more places, without increasing the
-> number of params to the point where it adds no value.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 16 Sep 2023 16:09:14 +0300 you wrote:
+> Hello,
 > 
-> The mmu_notifier path is a bit of a special snowflake, e.g. it zaps only a
-> single address space (because it's per-slot), and can't always yield.
+> this patchset is first of three parts of another big patchset for
+> MSG_ZEROCOPY flag support:
+> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 > 
-> Drop the @can_yield param from tdp_mmu_zap_leafs() as its sole remaining
-> caller unconditionally passes "true".
+> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+> suggested to split it for three parts to simplify review and merging:
+> 
+> [...]
 
-Slightly rewritten commit log:
+Here is the summary with links:
+  - [net-next,v9,1/4] vsock/virtio/vhost: read data from non-linear skb
+    https://git.kernel.org/netdev/net-next/c/0df7cd3c13e4
+  - [net-next,v9,2/4] vsock/virtio: support to send non-linear skb
+    https://git.kernel.org/netdev/net-next/c/64c99d2d6ada
+  - [net-next,v9,3/4] vsock/virtio: non-linear skb handling for tap
+    https://git.kernel.org/netdev/net-next/c/4b0bf10eb077
+  - [net-next,v9,4/4] vsock/virtio: MSG_ZEROCOPY flag support
+    https://git.kernel.org/netdev/net-next/c/581512a6dc93
 
----
-The mmu_notifier path is a bit of a special snowflake, e.g. it zaps only a
-single address space (because it's per-slot), and can't always yield.
-Because of this, it calls kvm_tdp_mmu_zap_leafs() in ways that no one
-else does.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Iterate manually over the leafs in response to an mmu_notifier
-invalidation, instead of invoking kvm_tdp_mmu_zap_leafs().  Drop the
-@can_yield param from kvm_tdp_mmu_zap_leafs() as its sole remaining
-caller unconditionally passes "true".
----
-
-and using the "__" macro can be moved to the second patch.
-
-Paolo
 
