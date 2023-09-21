@@ -2,148 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4D057AA1C0
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:06:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 117A87AA00E
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:31:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232419AbjIUVFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 17:05:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50588 "EHLO
+        id S231874AbjIUUbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 16:31:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232791AbjIUVE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 17:04:59 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47B7566D8
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:27:11 -0700 (PDT)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RrqMV5BfPzrSwx;
-        Thu, 21 Sep 2023 17:08:54 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 21 Sep 2023 17:11:01 +0800
-Subject: Re: [PATCH v2 01/11] KVM: arm64: vgic: Make kvm_vgic_inject_irq()
- take a vcpu pointer
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-        <kvm@vger.kernel.org>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Xu Zhao <zhaoxu.35@bytedance.com>,
-        Eric Auger <eric.auger@redhat.com>
-References: <20230920181731.2232453-1-maz@kernel.org>
- <20230920181731.2232453-2-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <c511ff67-fd8c-6edd-8239-2bacc3ad16f6@huawei.com>
-Date:   Thu, 21 Sep 2023 17:11:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        with ESMTP id S231879AbjIUUbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 16:31:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865AA897DC
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:40:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695318001;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=az+fkq8hztpdEGjaiUXR8BZ89IZXFCcBlHnioJmRZy0=;
+        b=gZdsevXlKwqfmzh7SRY0G4/35hbT1Q2tBhVqGF+gvVJDOy27b/olkQF7AXyH4Vd679gry9
+        d96/eHjKjT3NlTTIEAwOhD9Rm6izrrtvB0GwZd6HzFnabXIouFArzU5qWANkQdQJQ2hoWE
+        N8uNUgz41CjvunHeLBGSomN2v8snKG8=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-DgfooHjWNFifDHz4rBwIzQ-1; Thu, 21 Sep 2023 05:11:09 -0400
+X-MC-Unique: DgfooHjWNFifDHz4rBwIzQ-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5007f3d3255so1027926e87.3
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 02:11:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695287468; x=1695892268;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=az+fkq8hztpdEGjaiUXR8BZ89IZXFCcBlHnioJmRZy0=;
+        b=HFf4FSkBo5yj1WJwckT6ckRga80Pmp8/0Q/mligLjCoJ/isRHEeimKX6mqHlaIFL51
+         hlVUdbvCGdS0t+lrPFua1nkqvhzwnMpdlScFNVwYrWwccCifcK+d0Oc9JBCcbvLjRRwR
+         iC89OpXK4YUDLPvX3BjA7sC4X81IExrUhrDSKNdtN0rLwPDciY1lMo0yJD5m7TPmwzMC
+         Rjy0DpgFf0DG36O4yMK3fcTjB/xUpveanVrIkxfliKcOgF++gyS1AkuGLJT6dhq7pFBW
+         rfGaGaX9lv8gf5C6MpxUTXt0zgYMeuKZpConcL5ynNNG8jiDQgNcv/6DnyApD+qHCiG5
+         tjRw==
+X-Gm-Message-State: AOJu0YyJnDCuweI88bg7FIQNEs1h41snNn+E+zPzJmAYqVKXlGbrDw7f
+        xvWPssOrNbaZ/E882LYDn6+JfRbljkfiBc/SBCTqQXqQQFZnV47wMfDvsnIvay1dG3AftqyeREP
+        VWtMVCj85UNFDBeH0XcwN
+X-Received: by 2002:a05:6512:a8b:b0:502:ff3b:7670 with SMTP id m11-20020a0565120a8b00b00502ff3b7670mr5755816lfu.4.1695287467707;
+        Thu, 21 Sep 2023 02:11:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWmfjgoq5vKLj4RywvmULLa91iZtxpjvElgwPt0f/+WqP0cNm4IOHYLQMqaUKq/fG0fBrmIQ==
+X-Received: by 2002:a05:6512:a8b:b0:502:ff3b:7670 with SMTP id m11-20020a0565120a8b00b00502ff3b7670mr5755797lfu.4.1695287467295;
+        Thu, 21 Sep 2023 02:11:07 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70d:3c00:9eab:fce5:e6f3:e626? (p200300cbc70d3c009eabfce5e6f3e626.dip0.t-ipconnect.de. [2003:cb:c70d:3c00:9eab:fce5:e6f3:e626])
+        by smtp.gmail.com with ESMTPSA id t10-20020adff60a000000b003143c9beeaesm1187087wrp.44.2023.09.21.02.11.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 02:11:06 -0700 (PDT)
+Message-ID: <103096a6-f4b5-d88a-2aac-07dcc86825d6@redhat.com>
+Date:   Thu, 21 Sep 2023 11:11:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20230920181731.2232453-2-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v2 00/21] QEMU gmem implemention
 Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        isaku.yamahata@gmail.com, Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+ <fe9f3d19-df01-01e6-a253-f7fe5bdea41f@redhat.com>
+ <ZQOu+OE8LWtLTyno@google.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <ZQOu+OE8LWtLTyno@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/9/21 2:17, Marc Zyngier wrote:
-> Passing a vcpu_id to kvm_vgic_inject_irq() is silly for two reasons:
+>>> 2. hugepage support.
+>>>
+>>>      KVM gmem can be allocated from hugetlbfs. How does QEMU determine
 > 
-> - we often confuse vcpu_id and vcpu_idx
-> - we eventually have to convert it back to a vcpu
-> - we can't count
+> Not yet it can't.  gmem only supports THP, hugetlbfs is a future thing, if it's
+> ever supported.  I wouldn't be at all surprised if we end up going down a slightly
+> different route and don't use hugetlbfs directly.
+
+Agreed. Certainly future work.
+
 > 
-> Instead, pass a vcpu pointer, which is unambiguous. A NULL vcpu
-> is also allowed for interrupts that are not private to a vcpu
-> (such as SPIs).
+>>>      when to allocate KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE. The
+>>>      easiest solution is create KVM gmem with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
+>>>      only when memory backend is HostMemoryBackendFile of hugetlbfs.
+>>
+>> Good question.
+>>
+>> Probably "if the memory backend uses huge pages, also use huge pages for the
+>> private gmem" makes sense.
+>>
+>> ... but it becomes a mess with preallocation ... which is what people should
+>> actually be using with hugetlb. Andeventual double memory-consumption ...
+>> but maybe that's all been taken care of already?
+>>
+>> Probably it's best to leave hugetlb support as future work and start with
+>> something minimal.
+>>
+>>>
+>>> 3. What is KVM_X86_SW_PROTECTED_VM going to look like? and do we need it?
+>>>
+>>
+>> Why implement it when you have to ask others for a motivation? ;)
+>>
+>> Personally, I'm not sure if it is really useful, especially in this state.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/arch_timer.c      |  2 +-
->  arch/arm64/kvm/arm.c             | 20 ++++++++++----------
->  arch/arm64/kvm/pmu-emul.c        |  2 +-
->  arch/arm64/kvm/vgic/vgic-irqfd.c |  2 +-
->  arch/arm64/kvm/vgic/vgic.c       | 12 +++++-------
->  include/kvm/arm_vgic.h           |  4 ++--
->  6 files changed, 20 insertions(+), 22 deletions(-)
+> Yeah, as of today, KVM_X86_SW_PROTECTED_VM is mainly a development vehicle,
+> e.g. so that testing gmem doesn't require TDX/SNP hardware, debugging gmem guests
+> isn't brutally painful, etc.
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 6dcdae4d38cb..1f828f3b854c 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->  				   timer_ctx->irq.level);
->  
->  	if (!userspace_irqchip(vcpu->kvm)) {
-> -		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> +		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
->  					  timer_irq(timer_ctx),
->  					  timer_ctx->irq.level,
->  					  timer_ctx);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4866b3f7b4ea..872679a0cbd7 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1134,27 +1134,27 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  			  bool line_status)
->  {
->  	u32 irq = irq_level->irq;
-> -	unsigned int irq_type, vcpu_idx, irq_num;
-> +	unsigned int irq_type, vcpu_id, irq_num;
->  	int nrcpus = atomic_read(&kvm->online_vcpus);
->  	struct kvm_vcpu *vcpu = NULL;
->  	bool level = irq_level->level;
->  
->  	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
-> -	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
-> -	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
-> +	vcpu_id = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
-> +	vcpu_id += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
->  	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
->  
-> -	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
-> +	trace_kvm_irq_line(irq_type, vcpu_id, irq_num, irq_level->level);
->  
->  	switch (irq_type) {
->  	case KVM_ARM_IRQ_TYPE_CPU:
->  		if (irqchip_in_kernel(kvm))
->  			return -ENXIO;
->  
-> -		if (vcpu_idx >= nrcpus)
-> +		if (vcpu_id >= nrcpus)
->  			return -EINVAL;
+> Longer term, I have aspirations of being able to back most VMs with gmem, but
+> that's going to require quite a bit more work, e.g. gmem needs to be mappable
+> (when hardware allows it) so that gmem doesn't all but require double mapping,
+> KVM obviously needs to be able to read/write gmem, etc.
+> 
+> The value proposition is that having a guest-first memory type will allow KVM to
+> optimize and harden gmem in ways that wouldn't be feasible for a more generic
+> memory implementation.  E.g. memory isn't mapped into host userspace by default
+> (makes it harder to accidentally corrupt the guest), the guest can have *larger*
+> mappings than host userspace, guest memory can be served from a dedicated pool
+> (similar-ish to hugetlb), the pool can be omitted from the direct map, etc.
+>
+Thanks for that information. Personally, I don't believe "to back most 
+VMs with gmem", but that's a different discussion.
 
-What we actually need to check is 'vcpu->vcpu_idx >= nrcpus' and this is
-covered by the 'if (!vcpu)' statement below. Let's just drop this
-_incorrect_ checking?
+As a development vehicle to get TDX up and running it might be very 
+valuable indeed. But it doesn't necessarily have to be merged in QEMU 
+for that case -- especially in a semi-finished form.
 
->  
-> -		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-> +		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
->  		if (!vcpu)
->  			return -EINVAL;
->  
-> @@ -1166,17 +1166,17 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  		if (!irqchip_in_kernel(kvm))
->  			return -ENXIO;
->  
-> -		if (vcpu_idx >= nrcpus)
-> +		if (vcpu_id >= nrcpus)
->  			return -EINVAL;
+-- 
+Cheers,
 
-Same here.
+David / dhildenb
 
-Thanks,
-Zenghui
