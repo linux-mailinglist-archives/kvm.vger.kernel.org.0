@@ -2,60 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68AFE7A8FF3
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 01:44:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62B757A90AC
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 03:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjITXo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Sep 2023 19:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52242 "EHLO
+        id S229786AbjIUBtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Sep 2023 21:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbjITXo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Sep 2023 19:44:56 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD84CC
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 16:44:49 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-578137b42b7so236386a12.0
-        for <kvm@vger.kernel.org>; Wed, 20 Sep 2023 16:44:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695253489; x=1695858289; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YMbatuEIGrWsTlMlK7Tk6yapZGH8kwO0Z4+wG56Y3PQ=;
-        b=hz/qLqNkPaJwrFs4Bfl+b+D2DMfp7nppSPU1y3a9M5mOOqTEaCTcY1Qb/tbs/vZJ3I
-         0pCFwsgOoCU/5SKXWlWY4gG1/VF9tXAoJ9NyLvdFYKn3YpubFq7yoaFJfPa5G0hxuVIj
-         1wjHcqK/1f1di1Of2NbZnD6XaaYIY9+sfkiVl7uRYef/Ob3p0P2MRcGj16uQSiu+F8co
-         2e/NVdI9W30clWI2J7aTfD8OqTUEQtplGpPRBuMluYGTt+Rd/Kjx/qxgtQJEZdxGSIeT
-         Z9lCU8YVH7CjyVp2P3ZuerKl4vl0jJajuspHr5RdWeLVpD/8UQhic6ZUVt2cLw23Ge28
-         nsEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695253489; x=1695858289;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YMbatuEIGrWsTlMlK7Tk6yapZGH8kwO0Z4+wG56Y3PQ=;
-        b=HHkmDcx4nen47K+y4wyPT7Dz9/ac5Ts481PsJu15odYOiWEbGgvXeVAkWYBhxATka6
-         GuuNCeTfhjYTlwSwq7WgbNXBK7uUARfh4wZ9iU0SmafyAM3jZYBG0p7DuuzCpBD7aXXY
-         NlV4uoZr+Ez6oxWfbZJPhQO6atfVJzuHTU2l1KnksXYlc+6uy5eJAHYbMPaC0ZUHjOax
-         4Be34ACWnRBu5PYd11ibjdcnYYaud02PcM8SZMM+ycfVgFy3xoOhCMtPYa+5Ml1pBBI+
-         54faFHW0s0SjM4xJJAAEMQIWbAYZJf3KvTFqeefAmO7YfSyuWI0OUXLVyQO/juza4d2o
-         w1ww==
-X-Gm-Message-State: AOJu0YwPuHkKKnaGYCINhycu+1eyJIYFJ70E2P/Jnk0X2yxeEu2GIUCw
-        OOTPK1cEOFu2jrmOoMaAvAGlRBrwd3A=
-X-Google-Smtp-Source: AGHT+IHQbG7yFE9jJPEUI1XKEjcd5Hn7eouqEyZetIlWhAmmYx1Ip3XqohOdLN8YNlfaQrxQ5DSfhNksAYI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:22d0:b0:1ae:6895:cb96 with SMTP id
- y16-20020a17090322d000b001ae6895cb96mr56298plg.5.1695253488829; Wed, 20 Sep
- 2023 16:44:48 -0700 (PDT)
-Date:   Wed, 20 Sep 2023 16:44:47 -0700
-In-Reply-To: <20230918163647.m6bjgwusc7ww5tyu@amd.com>
-Mime-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-15-seanjc@google.com>
- <20230918163647.m6bjgwusc7ww5tyu@amd.com>
-Message-ID: <ZQuD77vlBiSU/PE4@google.com>
-Subject: Re: [RFC PATCH v12 14/33] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S229579AbjIUBtb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Sep 2023 21:49:31 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CCDDCF;
+        Wed, 20 Sep 2023 18:49:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695260965; x=1726796965;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=ybsMtUIUFSJoctpzBY42mYJCdPhjUqrVHUheuTnnJAM=;
+  b=NmudNnXXIHMsrQldTM4AvrOzP8MzJlO2D5XHb06QLXMu8Sgyh8BsZO09
+   U3IdUFozBmGU70fXqMZkpKYgBW4gY11zbz7/wrwgZkFlFBxCQ5BekoBLF
+   bvw+vCEMLJC8lsrFqZ3+RdnKRxdRez17FRAbtibXXMG0pHLqQYxhRATk8
+   VP3jqIzFJfBlz/o9qjuFhnYaHHihc4OLXQPRip4YPjuNu2ixG7/gZvv3v
+   mGUsDIh1A8DW0fiERT6FZh6P2QB3icRjkh4j1/eR6Em7fq1CudIzvud9y
+   kfFNxHqXHo/73Aa6zVUNaClQFs4/u1bQLG9AZ9BivNuXuT3MhBQ0wI77p
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="377688672"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="377688672"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 18:49:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="817156551"
+X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
+   d="scan'208";a="817156551"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Sep 2023 18:49:21 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 20 Sep 2023 18:49:21 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 20 Sep 2023 18:49:20 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 20 Sep 2023 18:49:20 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.48) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 20 Sep 2023 18:49:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j2lMf+RO2hmnHO+BX1hxkmC0zEJY+HEZMp1ZDkHQMd1fySEq7fj2KPa2WBo37jb+JeEnTaRvDXVkBsHwbRHg3A8rL7MrFOpyd9h8ILOC49pMfZYFkh/swdikMrJAvsdpKoyMTpmPrcIfpGEWuZh+QiaP0CLwl3zfp7Nd8ekPy0/lBoTGj17KwQHghyyODi9Fx5ygXMzH0fYvjhjR1FWJ/h6rXMwiBGdzWOp0H/L5/MgCw/hbFBCVTJWOq5LHoznsz2GId7gII4Wo/4d+glkYUxkmKCL5oZogSAhP0d7zEjIVVvJIQ/we8Gq08kiyp2dwBcJGpUZOaJQkSunTVsRH8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+3aC1OVXl10q8xdpDYGn6D2IOakpCQbxwk421apnZV0=;
+ b=NXbrtwktsjRY3IZ56Pi4e9LF9RQQAgLBK3Bh6lPFdgBE5Az/YFAxAa9x8neSdq6HmeYhbqVn8+mRzxn4IeDAwYopzqiTfVZB3l7REkkLQce0rKWVuQv0LgCK0CYqfOZg8jYPP+++L/Qn3hRIb7BxRPV2lm1LYQpt58JkSRz7GSEZmFQByQ8lIQ9mAO9qGmEE8IMC9NkCvAi0SqBKowzhrRcL+gfSBAJx2d8Q/KVi+TaGYWrou2zUddamPmfLH0/zoN2EUP27mrRgqwHnNsBAiV5j6uCW7iOA8YdrIucmdCjurtYReMBJqHiY91pY58qFjaQajtHgGVtEzUDtk1ACnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ IA0PR11MB7840.namprd11.prod.outlook.com (2603:10b6:208:403::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28; Thu, 21 Sep
+ 2023 01:49:15 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::5e79:2d52:51e:f602]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::5e79:2d52:51e:f602%6]) with mapi id 15.20.6813.017; Thu, 21 Sep 2023
+ 01:49:15 +0000
+Date:   Thu, 21 Sep 2023 09:21:09 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Huacai Chen <chenhuacai@kernel.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
@@ -67,13 +90,13 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Paul Moore <paul@paul-moore.com>,
         James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        "Serge E. Hallyn" <serge@hallyn.com>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+        <linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+        <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-security-module@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Fuad Tabba <tabba@google.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
@@ -87,213 +110,171 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Maciej Szmigiero <mail@maciej.szmigiero.name>,
         David Hildenbrand <david@redhat.com>,
         Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
         Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
+        "Liam Merwick" <liam.merwick@oracle.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+Message-ID: <ZQuahXpq2fy8rMDV@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230914015531.1419405-1-seanjc@google.com>
+ <20230914015531.1419405-12-seanjc@google.com>
+ <ZQP6ZqXH81V24Lj/@yzhao56-desk.sh.intel.com>
+ <ZQtdZmJ3SekURjiQ@google.com>
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <ZQtdZmJ3SekURjiQ@google.com>
+X-ClientProxiedBy: SG2PR03CA0129.apcprd03.prod.outlook.com
+ (2603:1096:4:91::33) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|IA0PR11MB7840:EE_
+X-MS-Office365-Filtering-Correlation-Id: 886be40f-a1ae-429f-606b-08dbba44f64e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: i7SuU8NLMHtxTaWwwABNnJLctnc6KJQ/PVavIBIMfF9/0Q2/Q2EZnpI4/3H4OCL+bSRc32RjLVUcCRhiDgOHgy8z0Aon8wAqM0Ev6/Hf5wtzdfoo+C38hn7wnru7HRyTk36Isd802beP+fycpVp3EojdmDek5VH0/UZSPczCrdo7BWUUKtK8t+WWkPxl+DSynOduFJ8d1lKXBeG7VuyHzXsAscTmC5FwMyVGX0Tiyh5WDCyItMdQ994vyBHXUrwMmfkek1byMOee8NMBRNyckQW1I/wAI3o6pvGFmh6EktyYYBkWRn8LNvLcTKxKo2rWZAnsr4Ily6XZT3vHOQlxfsjxT2ck3SXNgEY/K1wUGnvzKi9XQYGbyQPTC8SIsJlaoab3GzdFXU1jaPJIsc8+HFnU5Llvc5QxfQcGWbMaxSX/a0ATwrJ4JPQl4wkdrNQhsyV6FOpVbM2sy3H3cUKbxVWMajrmDZM72SmuHhN/CxM67GafQGvC8+Mp9N4jbMlWNsSAampXHV30gXfw8PD0b7rKc1RKpV9ND5YOhVdgCg4zq+mq7AkUBAH8EFLHJoCz
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(136003)(39860400002)(376002)(451199024)(1800799009)(186009)(83380400001)(41300700001)(6666004)(3450700001)(8676002)(4326008)(8936002)(6506007)(6486002)(5660300002)(26005)(86362001)(6512007)(82960400001)(7406005)(38100700002)(478600001)(7416002)(2906002)(66946007)(316002)(6916009)(66476007)(66556008)(54906003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?A1TxF1ewPD0395Uonf+hysQwW8vvr6rM+BME/jcPfIxl2NVZOrIUu21OFpbh?=
+ =?us-ascii?Q?wsDI85nrxHlqDZHS+7VE9ITm9EbgCurIo8OS1qEnRUJ9YDxvzVnkdJz5VHyv?=
+ =?us-ascii?Q?JkJzllwTofUgbSabqMHjjI4XvIPYYi3+vjgIluSM9LIS0pWg6IV9UuTXfxZC?=
+ =?us-ascii?Q?OKf4pGYAw4fUljbUxhDaShwIUP1RPfq87l35e73YE89lO97vom6xlamX1H5y?=
+ =?us-ascii?Q?nHf8F/nkB7kZrwytAtN2l/ju7/pNgw9yhFA8VCF0Hez92GNmJCfjRH2C9rLS?=
+ =?us-ascii?Q?lVUcY6LFdQ74u+Z+42Y7QORcxv6aSALlwTmhJudJgrFq6xO84UmorrhrJONr?=
+ =?us-ascii?Q?lPsnF8yQhT9XgFh1KIsvNKYLCJzBHCNOl4gNFGwnh0Hrmew4476ZHdMDAnuI?=
+ =?us-ascii?Q?Yc51LX7wdtptO/hmH9cG9ZrGDuE5cl+DL5dVWNb/sI/2w3XKgO5O+UT0gaPt?=
+ =?us-ascii?Q?BBdyaKJxDSpd9UdxTSnBVB8fUaVEoj00rtj1ynUlEw/i4cht8nPLBG0BheE3?=
+ =?us-ascii?Q?FAlEvZp6VjaWluDVgza7glPEw9xDalD27Njd1TRcy8OAxTrnaZpby6sJOPOS?=
+ =?us-ascii?Q?KoQyBZW+zggz+1sH7EOLUv7lsME/YoPAYnEXyUKczfpf2/1FSWBZSTfvRdoV?=
+ =?us-ascii?Q?GaGxmmkY/ehqmLjhzebFHhls3H0nQgy7+/9Vh7rmdPq1O4VtWw2dHW0BelQ1?=
+ =?us-ascii?Q?UazMQmR7gxVayimkdNWDvUS8vDK2gLZbvisq5pnXqsn2SSjHmlOy5mT+O5gO?=
+ =?us-ascii?Q?RzCXP5OwcG5k7WN0fEg9ZW77OzJvbwnYvmRhv4+xLAnmyyNdAZXUDeGHj675?=
+ =?us-ascii?Q?yM8tJkDRDL3Y6obxdTYUzr8FJ1j4vQoorVExqjPcccMGepG39Ron/uRILtni?=
+ =?us-ascii?Q?xHUv9iILaNtMYB+OPgeEdkyduuTqofQV4Iv2LEKsTVbUQ5CUHnL3P7u5oE1k?=
+ =?us-ascii?Q?Q+G473hKNGK3DuiaHi9Ipaj44S6wT7jKL766T7HAtxXhhvjuTKeLxmnjtbCQ?=
+ =?us-ascii?Q?AeXzxAuZZL2s96t3Bhmj0e/695Zcb5mQyTjqhKFXDFYN8t9LqhudqGVdlOVj?=
+ =?us-ascii?Q?ijLLlpnBF+X9/LHN4tMrREewDJuc9y/1AOO4UqOmp7YSTtcvcAgoeCn1365I?=
+ =?us-ascii?Q?jyX9bkQHa4UVQy06VUI8NcXCKT/yQyQQnpw+0teD/+16+NwHbWSgO1IzVxrE?=
+ =?us-ascii?Q?Sw2qrBnX8yKSne7TKt9Jt2RrE6BsLxgS6tGH6KBcMj82AW+7vibSaVkLN4F3?=
+ =?us-ascii?Q?dmdt+x5iruTwIPE4OkOfyYH8tfY329xZ7pA6AeEggE6mtyw0rWMSEgWg0z0Y?=
+ =?us-ascii?Q?FUzBbcXDPdUAkgXRxY26olK2Wf5e0Mg+0XM+L1vC94pYzP/nhevkR0V/2dRD?=
+ =?us-ascii?Q?lx7o8s+umk25xuOmD0eAOhXn5bL1N7Z83lkAYZM4ofm4Zmp1LBMGj33eqN7j?=
+ =?us-ascii?Q?LaDxIHlnRHWwdbyJbC5r7tQj3BideY/VAgzinFHQWDyy4I7D3TQ22Wc5E4Gq?=
+ =?us-ascii?Q?xPWmPGC7cmqGTdp18y+lOzgSDPTSpbnYBB5IpYAQcsEEw3tpKxnLwctaa3lU?=
+ =?us-ascii?Q?+msaURG+keUbpCdFDTwzOq4Q4z7blAK3gFQ15d1F?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 886be40f-a1ae-429f-606b-08dbba44f64e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 01:49:15.7430
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JaDD69pDRW021RZZEY4PJ8iJCzQstnBmgg+iOI1fouHssJkHBeheMrtvgVCOrPg7sykZoq8JmuHYJIMhLVJODg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7840
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 18, 2023, Michael Roth wrote:
-> > +static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
-> > +{
-> > +	struct list_head *gmem_list = &inode->i_mapping->private_list;
-> > +	pgoff_t start = offset >> PAGE_SHIFT;
-> > +	pgoff_t end = (offset + len) >> PAGE_SHIFT;
-> > +	struct kvm_gmem *gmem;
-> > +
-> > +	/*
-> > +	 * Bindings must stable across invalidation to ensure the start+end
-> > +	 * are balanced.
-> > +	 */
-> > +	filemap_invalidate_lock(inode->i_mapping);
-> > +
-> > +	list_for_each_entry(gmem, gmem_list, entry) {
-> > +		kvm_gmem_invalidate_begin(gmem, start, end);
+On Wed, Sep 20, 2023 at 02:00:22PM -0700, Sean Christopherson wrote:
+> On Fri, Sep 15, 2023, Yan Zhao wrote:
+> > On Wed, Sep 13, 2023 at 06:55:09PM -0700, Sean Christopherson wrote:
+> > > From: Chao Peng <chao.p.peng@linux.intel.com>
+> > > 
+> > > In confidential computing usages, whether a page is private or shared is
+> > > necessary information for KVM to perform operations like page fault
+> > > handling, page zapping etc. There are other potential use cases for
+> > > per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> > > or exec-only, etc.) without having to modify memslots.
+> > > 
+> > ...
+> > >> +bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> > > +				     unsigned long attrs)
+> > > +{
+> > > +	XA_STATE(xas, &kvm->mem_attr_array, start);
+> > > +	unsigned long index;
+> > > +	bool has_attrs;
+> > > +	void *entry;
+> > > +
+> > > +	rcu_read_lock();
+> > > +
+> > > +	if (!attrs) {
+> > > +		has_attrs = !xas_find(&xas, end);
+> > > +		goto out;
+> > > +	}
+> > > +
+> > > +	has_attrs = true;
+> > > +	for (index = start; index < end; index++) {
+> > > +		do {
+> > > +			entry = xas_next(&xas);
+> > > +		} while (xas_retry(&xas, entry));
+> > > +
+> > > +		if (xas.xa_index != index || xa_to_value(entry) != attrs) {
+> > Should "xa_to_value(entry) != attrs" be "!(xa_to_value(entry) & attrs)" ?
 > 
-> In v11 we used to call truncate_inode_pages_range() here to drop filemap's
-> reference on the folio. AFAICT the folios are only getting free'd upon
-> guest shutdown without this. Was this on purpose?
-
-Nope, I just spotted this too.  And then after scratching my head for a few minutes,
-wondering if I was having an -ENOCOFFEE moment, I finally read your mail.  *sigh*
-
-Looking at my reflog history, I'm pretty sure I deleted the wrong line when
-removing the truncation from kvm_gmem_error_page().
-
-> > +		kvm_gmem_invalidate_end(gmem, start, end);
-> > +	}
-> > +
-> > +	filemap_invalidate_unlock(inode->i_mapping);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
-> > +{
-> > +	struct address_space *mapping = inode->i_mapping;
-> > +	pgoff_t start, index, end;
-> > +	int r;
-> > +
-> > +	/* Dedicated guest is immutable by default. */
-> > +	if (offset + len > i_size_read(inode))
-> > +		return -EINVAL;
-> > +
-> > +	filemap_invalidate_lock_shared(mapping);
+> No, the exact comparsion is deliberate.  The intent of the API is to determine
+> if the entire range already has the desired attributes, not if there is overlap
+> between the two.
 > 
-> We take the filemap lock here, but not for
-> kvm_gmem_get_pfn()->kvm_gmem_get_folio(). Is it needed there as well?
-
-No, we specifically do not want to take a rwsem when faulting in guest memory.
-Callers of kvm_gmem_get_pfn() *must* guard against concurrent invalidations via
-mmu_invalidate_seq and friends.
-
-> > +	/*
-> > +	 * For simplicity, require the offset into the file and the size of the
-> > +	 * memslot to be aligned to the largest possible page size used to back
-> > +	 * the file (same as the size of the file itself).
-> > +	 */
-> > +	if (!kvm_gmem_is_valid_size(offset, flags) ||
-> > +	    !kvm_gmem_is_valid_size(size, flags))
-> > +		goto err;
+> E.g. if/when RWX attributes are supported, the exact comparison is needed to
+> handle a RW => R conversion.
 > 
-> I needed to relax this check for SNP. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE
-> applies to entire gmem inode, so it makes sense for userspace to enable
-> hugepages if start/end are hugepage-aligned, but QEMU will do things
-> like map overlapping regions for ROMs and other things on top of the
-> GPA range that the gmem inode was originally allocated for. For
-> instance:
+> > > +			has_attrs = false;
+> > > +			break;
+> > > +		}
+> > > +	}
+> > > +
+> > > +out:
+> > > +	rcu_read_unlock();
+> > > +	return has_attrs;
+> > > +}
+> > > +
+> > ...
+> > > +/* Set @attributes for the gfn range [@start, @end). */
+> > > +static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> > > +				     unsigned long attributes)
+> > > +{
+> > > +	struct kvm_mmu_notifier_range pre_set_range = {
+> > > +		.start = start,
+> > > +		.end = end,
+> > > +		.handler = kvm_arch_pre_set_memory_attributes,
+> > > +		.on_lock = kvm_mmu_invalidate_begin,
+> > > +		.flush_on_ret = true,
+> > > +		.may_block = true,
+> > > +	};
+> > > +	struct kvm_mmu_notifier_range post_set_range = {
+> > > +		.start = start,
+> > > +		.end = end,
+> > > +		.arg.attributes = attributes,
+> > > +		.handler = kvm_arch_post_set_memory_attributes,
+> > > +		.on_lock = kvm_mmu_invalidate_end,
+> > > +		.may_block = true,
+> > > +	};
+> > > +	unsigned long i;
+> > > +	void *entry;
+> > > +	int r = 0;
+> > > +
+> > > +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> > Also here, do we need to get existing attributes of a GFN first ?
 > 
->   692500@1689108688.696338:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   692500@1689108688.699802:kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0x100000000 size=0x380000000 ua=0x7fbfdbe00000 ret=0 restricted_fd=19 restricted_offset=0x80000000
->   692500@1689108688.795412:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x0 gpa=0x0 size=0x0 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   692500@1689108688.795550:kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0xc0000 ua=0x7fbf5be00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   692500@1689108688.796227:kvm_set_user_memory AddrSpace#0 Slot#6 flags=0x4 gpa=0x100000 size=0x7ff00000 ua=0x7fbf5bf00000 ret=0 restricted_fd=19 restricted_offset=0x100000
-> 
-> Because of that the KVM_SET_USER_MEMORY_REGIONs for non-THP-aligned GPAs
-> will fail. Maybe instead it should be allowed, and kvm_gmem_get_folio()
-> should handle the alignment checks on a case-by-case and simply force 4k
-> for offsets corresponding to unaligned bindings?
+> No?  @entry is the new value that will be set for all entries.  This line doesn't
+> touch the xarray in any way.  Maybe I'm just not understanding your question.
+Hmm, I thought this interface was to allow users to add/remove an attribute to a GFN
+rather than overwrite all attributes of a GFN. Now I think I misunderstood the intention.
 
-Yeah, I wanted to keep the code simple, but disallowing small bindings/memslots
-is probably going to be a deal-breaker.  Even though I'm skeptical that QEMU
-_needs_ to play these games for SNP guests, not playing nice will make it all
-but impossible to use guest_memfd for regular VMs.
-
-And the code isn't really any more complex, so long as we punt on allowing
-hugepages on interior sub-ranges.
-
-Compile-tested only, but this?
-
----
- virt/kvm/guest_mem.c | 54 ++++++++++++++++++++++----------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
-
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index a819367434e9..dc12e38211df 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -426,20 +426,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 	return err;
- }
- 
--static bool kvm_gmem_is_valid_size(loff_t size, u64 flags)
--{
--	if (size < 0 || !PAGE_ALIGNED(size))
--		return false;
--
--#ifdef CONFIG_TRANSPARENT_HUGEPAGE
--	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
--	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
--		return false;
--#endif
--
--	return true;
--}
--
- int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
- {
- 	loff_t size = args->size;
-@@ -452,9 +438,15 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
- 	if (flags & ~valid_flags)
- 		return -EINVAL;
- 
--	if (!kvm_gmem_is_valid_size(size, flags))
-+	if (size < 0 || !PAGE_ALIGNED(size))
- 		return -EINVAL;
- 
-+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-+	if ((flags & KVM_GUEST_MEMFD_ALLOW_HUGEPAGE) &&
-+	    !IS_ALIGNED(size, HPAGE_PMD_SIZE))
-+		return false;
-+#endif
-+
- 	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
- }
- 
-@@ -462,7 +454,7 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		  unsigned int fd, loff_t offset)
- {
- 	loff_t size = slot->npages << PAGE_SHIFT;
--	unsigned long start, end, flags;
-+	unsigned long start, end;
- 	struct kvm_gmem *gmem;
- 	struct inode *inode;
- 	struct file *file;
-@@ -481,16 +473,9 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		goto err;
- 
- 	inode = file_inode(file);
--	flags = (unsigned long)inode->i_private;
- 
--	/*
--	 * For simplicity, require the offset into the file and the size of the
--	 * memslot to be aligned to the largest possible page size used to back
--	 * the file (same as the size of the file itself).
--	 */
--	if (!kvm_gmem_is_valid_size(offset, flags) ||
--	    !kvm_gmem_is_valid_size(size, flags))
--		goto err;
-+	if (offset < 0 || !PAGE_ALIGNED(offset))
-+		return -EINVAL;
- 
- 	if (offset + size > i_size_read(inode))
- 		goto err;
-@@ -591,8 +576,23 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	page = folio_file_page(folio, index);
- 
- 	*pfn = page_to_pfn(page);
--	if (max_order)
--		*max_order = compound_order(compound_head(page));
-+	if (!max_order)
-+		goto success;
-+
-+	*max_order = compound_order(compound_head(page));
-+	if (!*max_order)
-+		goto success;
-+
-+	/*
-+	 * For simplicity, allow mapping a hugepage if and only if the entire
-+	 * binding is compatible, i.e. don't bother supporting mapping interior
-+	 * sub-ranges with hugepages (unless userspace comes up with a *really*
-+	 * strong use case for needing hugepages within unaligned bindings).
-+	 */
-+	if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
-+	    !IS_ALIGNED(slot->npages, 1ull << *max_order))
-+		*max_order = 0;
-+success:
- 	r = 0;
- 
- out_unlock:
-
-base-commit: bc1a54ee393e0574ea422525cf0b2f1e768e38c5
--- 
+But I wonder if there is a way for users to just add one attribute, as I don't find
+ioctl like KVM_GET_MEMORY_ATTRIBUTES for users to get current attributes and then to
+add/remove one based on that. e.g. maybe in future, KVM wants to add one attribute in
+kernel without being told by userspace ?
 
