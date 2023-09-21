@@ -2,128 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8AB87AA4C8
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:20:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A3FB7AA4B6
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 00:15:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231414AbjIUWU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 18:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36070 "EHLO
+        id S231566AbjIUWPu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 18:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjIUWUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 18:20:41 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D827DB9;
-        Thu, 21 Sep 2023 10:10:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695316241; x=1726852241;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+z5+5JtzJUHTDziH7GhRN2oy4j2s7kOBGRou6Rfz7PQ=;
-  b=clQJTOPRsL93Dn+FImNt/8MPtkrIxdixF8hEXdjzYlIkLGhFQDQWQqzL
-   MLNLKbEIs2qidBgrZ+EFx4k01ikA+w6h1RxFD1mOWddO9LAl+URcaN1lS
-   6n3qzCOIMmwlXq8eULWVoYq9sDmLKuP+BF2EIgX9hdyDNAxX4r8DccBG4
-   blSuJjSFNUmHHncb3GOo3BlHX7QHBCpcfTXVYx6yo+pC1K0jOJanyp2Y6
-   v70f6ASgi5NF6nJPSLz6GjQP+3sCrRcrd+/uw14OGgaZrBMtqMjdaqX54
-   y2O4D9S9eEeWm0L5FLyFSDCtKhegR1oEi+vZVjLA3EdbJhd0Z+QTGNQvt
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="370764372"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="370764372"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 00:54:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="812523013"
-X-IronPort-AV: E=Sophos;i="6.03,164,1694761200"; 
-   d="scan'208";a="812523013"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Sep 2023 00:54:43 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: [PATCH v5 01/11] iommufd: Add data structure for Intel VT-d stage-1 domain allocation
-Date:   Thu, 21 Sep 2023 00:54:21 -0700
-Message-Id: <20230921075431.125239-2-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230921075431.125239-1-yi.l.liu@intel.com>
-References: <20230921075431.125239-1-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233174AbjIUWPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 18:15:25 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA878331D
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:37:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D7FC116CA;
+        Thu, 21 Sep 2023 08:31:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695285062;
+        bh=kB4LhEjqLrRHXbvRoCAvnP5iEiWmIRBRjQ+v51+IXkY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UsRlVqGQVju8/qDh03TLqaHEO8aM9FoYk6nyBZGIgwEfoYbvxMR2SzbauwXO6Fm7f
+         9m+Hs2nV+DG8BANdv1V4rQxVPtivVRVjtc5CdzXdSaSO/+18y5jl5LEcH8TRXH2kn2
+         I/KWYdKAS1AkADu8xu5Ua2F8MTt/JLwsH8KBabMQkQCgDGwJY57taq5hS04+5fZoak
+         /OXPlGJagdcoQNNMyPXX6pZBnGK0Jh0dFaHvrxPfP9qK+KpGT3A2QFU8RdEbD/yNio
+         YyOe3ADN6Rzo2jvSFqGnsbOmDSIGdW21ghzCOTUeIioepD+YGMhLMA/8cfmMhEQESX
+         zBkqcWAt6DcIQ==
+Received: from 82-132-232-12.dab.02.net ([82.132.232.12] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qjF5P-00Esfc-SV;
+        Thu, 21 Sep 2023 09:31:00 +0100
+Date:   Thu, 21 Sep 2023 09:30:27 +0100
+Message-ID: <87wmwk2ajg.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/8] KVM: arm64: Add generic check for system-supported vCPU features
+In-Reply-To: <20230920195036.1169791-2-oliver.upton@linux.dev>
+References: <20230920195036.1169791-1-oliver.upton@linux.dev>
+        <20230920195036.1169791-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.232.12
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds IOMMU_HWPT_TYPE_VTD_S1 for stage-1 hw_pagetable of Intel VT-d
-and the corressponding data structure for userspace specified parameter
-for the domain allocation.
+On Wed, 20 Sep 2023 20:50:29 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> To date KVM has relied on kvm_reset_vcpu() failing when the vCPU feature
+> flags are unsupported by the system. This is a bit messy since
+> kvm_reset_vcpu() is called at runtime outside of the KVM_ARM_VCPU_INIT
+> ioctl when it is expected to succeed. Further complicating the matter is
+> that kvm_reset_vcpu() must tolerate be idemptotent to the config_lock,
+> as it isn't consistently called with the lock held.
+> 
+> Prepare to move feature compatibility checks out of kvm_reset_vcpu() with
+> a 'generic' check that compares the user-provided flags with a computed
+> maximum feature set for the system.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/arm.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4866b3f7b4ea..66f3720cdd3a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1190,6 +1190,16 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>  	return -EINVAL;
+>  }
+>  
+> +static unsigned long system_supported_vcpu_features(void)
+> +{
+> +	unsigned long features = KVM_VCPU_VALID_FEATURES;
+> +
+> +	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1))
 
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- include/uapi/linux/iommufd.h | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+I think we can now convert this to a cpus_have_final_cap(), as Mark is
+getting rid of the helper altogether, see [1].
 
-diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index 2083a0309a9b..18a502e206c3 100644
---- a/include/uapi/linux/iommufd.h
-+++ b/include/uapi/linux/iommufd.h
-@@ -358,12 +358,42 @@ enum iommufd_hwpt_alloc_flags {
- 	IOMMU_HWPT_ALLOC_NEST_PARENT = 1 << 0,
- };
- 
-+/**
-+ * enum iommu_hwpt_vtd_s1_flags - Intel VT-d stage-1 page table
-+ *                                entry attributes
-+ * @IOMMU_VTD_S1_SRE: Supervisor request
-+ * @IOMMU_VTD_S1_EAFE: Extended access enable
-+ * @IOMMU_VTD_S1_WPE: Write protect enable
-+ */
-+enum iommu_hwpt_vtd_s1_flags {
-+	IOMMU_VTD_S1_SRE = 1 << 0,
-+	IOMMU_VTD_S1_EAFE = 1 << 1,
-+	IOMMU_VTD_S1_WPE = 1 << 2,
-+};
-+
-+/**
-+ * struct iommu_hwpt_vtd_s1 - Intel VT-d stage-1 page table
-+ *                            info (IOMMU_HWPT_TYPE_VTD_S1)
-+ * @flags: Combination of enum iommu_hwpt_vtd_s1_flags
-+ * @pgtbl_addr: The base address of the stage-1 page table.
-+ * @addr_width: The address width of the stage-1 page table
-+ * @__reserved: Must be 0
-+ */
-+struct iommu_hwpt_vtd_s1 {
-+	__aligned_u64 flags;
-+	__aligned_u64 pgtbl_addr;
-+	__u32 addr_width;
-+	__u32 __reserved;
-+};
-+
- /**
-  * enum iommu_hwpt_type - IOMMU HWPT Type
-  * @IOMMU_HWPT_TYPE_DEFAULT: default
-+ * @IOMMU_HWPT_TYPE_VTD_S1: Intel VT-d stage-1 page table
-  */
- enum iommu_hwpt_type {
- 	IOMMU_HWPT_TYPE_DEFAULT,
-+	IOMMU_HWPT_TYPE_VTD_S1,
- };
- 
- /**
+Thanks,
+
+	M.
+	
+[1] https://lore.kernel.org/r/20230919092850.1940729-1-mark.rutland@arm.com
+
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
