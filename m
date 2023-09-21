@@ -2,63 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42CE47AA077
-	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 22:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A513D7AA262
+	for <lists+kvm@lfdr.de>; Thu, 21 Sep 2023 23:16:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbjIUUh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 16:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48022 "EHLO
+        id S232556AbjIUVQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 17:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232156AbjIUUhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:37:31 -0400
+        with ESMTP id S233285AbjIUVPd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 17:15:33 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667DC84F25
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:37:43 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF4CC4AF73;
-        Thu, 21 Sep 2023 11:13:11 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1AA355AE0
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 10:17:30 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 262DEC4AF70;
+        Thu, 21 Sep 2023 11:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695294791;
-        bh=iw3ke3UbjDTAN2nBHhwP4e/dfZNBea9LZ0dNzqIP5iw=;
+        s=k20201202; t=1695295206;
+        bh=kTT7BVQcKHCD0y3aHHeZIjx0nch8oE5LcRCwCYPxOis=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=oVL3zEiZWx1Ni36n69czmH8Rndi0lBbS0Etby6v6VLdrb/eCFWzGQWOcyjO59CZT2
-         ddokokVjzOBmgBan+iAuFcfs4nHYzcymRO5YV5ArAgGX6r3XCr9Ngdtxza2FsY6oAm
-         CuBGcqIhcCjt1tYjwszkhisv7eUM85hGImAVdBA9WwMbvoZccBPKeJLjXxYh5+haS1
-         fvXoYM2iWqGeJKJ6Oo75Pl5p3HjJ6WliEv1/7V1lwKsxQJrL4MMQOc7y9ioD46sOxH
-         IEgqLfDj/WDhZn1+1RRKuoeEJ71Q3lzPKuwCwhnNL9PIJfcd1NKxetDhrcgEsfJQfr
-         J4lvP+TUI2bhQ==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
+        b=OmKJ8wjjmKTnf8uPmYY1pD5WlKeBuBuuT/c1PUDdxqhZdE6wJ4q70dOyvSAvF95WU
+         4dHw4kh4/HFrPlKQz81xeGuGvLefXOPqNdzkE2x3ANH+oql6SRM23XcqmpXTkipo7t
+         e+3JKiF1O0rG3du3sFlg22btEzc+UNXHLlhZ3vrz03TDZ92KG9HEFJodoJwz8UWkbf
+         fJ43/tAbdZvOKRKtSEiVkkvJ3Wf8yD1G2mMzAuoiNSWO40ji5t1XJIp9deDsuvNyhO
+         TykN3EsMIRuS5f5+0wobf8PWhCr24nvmP2Twwkz2tkhYtGM2u5ORFjOOErj48lqZYL
+         fZziDBLfjra+A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qjHcL-00EuE8-4R;
-        Thu, 21 Sep 2023 12:13:09 +0100
-MIME-Version: 1.0
-Date:   Thu, 21 Sep 2023 12:13:08 +0100
+        id 1qjHj1-00EuJu-Rw;
+        Thu, 21 Sep 2023 12:20:03 +0100
+Date:   Thu, 21 Sep 2023 12:20:02 +0100
+Message-ID: <8634z7pycd.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Joey Gouly <joey.gouly@arm.com>
-Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+        <kvm@vger.kernel.org>, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
+        Joey Gouly <joey.gouly@arm.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 03/11] KVM: arm64: vgic-v3: Refactor GICv3 SGI
- generation
-In-Reply-To: <20230921094225.GA2926762@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v2 01/11] KVM: arm64: vgic: Make kvm_vgic_inject_irq() take a vcpu pointer
+In-Reply-To: <c511ff67-fd8c-6edd-8239-2bacc3ad16f6@huawei.com>
 References: <20230920181731.2232453-1-maz@kernel.org>
- <20230920181731.2232453-4-maz@kernel.org>
- <20230921094225.GA2926762@e124191.cambridge.arm.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <d905e62015f27949c3c08c7579e489ca@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, shameerali.kolothum.thodi@huawei.com, zhaoxu.35@bytedance.com, eric.auger@redhat.com
+        <20230920181731.2232453-2-maz@kernel.org>
+        <c511ff67-fd8c-6edd-8239-2bacc3ad16f6@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, shameerali.kolothum.thodi@huawei.com, zhaoxu.35@bytedance.com, eric.auger@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -71,42 +69,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-09-21 10:42, Joey Gouly wrote:
-> Hi Marc, Oliver,
+On Thu, 21 Sep 2023 10:11:00 +0100,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> On Wed, Sep 20, 2023 at 07:17:23PM +0100, Marc Zyngier wrote:
->> As we're about to change the way SGIs are sent, start by splitting
->> out some of the basic functionnality: instead of intermingling
->> the broadcast and non-broadcast cases with the actual SGI generation,
->> perform the following cleanups:
->> 
->> - move the SGI queuing into its own helper
->> - split the broadcast code from the affinity-driven code
->> - replace the mask/shift combinations with FIELD_GET()
->> 
->> The result is much more readable, and paves the way for further
->> optimisations.
->> 
->> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> On 2023/9/21 2:17, Marc Zyngier wrote:
+> > Passing a vcpu_id to kvm_vgic_inject_irq() is silly for two reasons:
+> > 
+> > - we often confuse vcpu_id and vcpu_idx
+> > - we eventually have to convert it back to a vcpu
+> > - we can't count
+> > 
+> > Instead, pass a vcpu pointer, which is unambiguous. A NULL vcpu
+> > is also allowed for interrupts that are not private to a vcpu
+> > (such as SPIs).
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arch_timer.c      |  2 +-
+> >  arch/arm64/kvm/arm.c             | 20 ++++++++++----------
+> >  arch/arm64/kvm/pmu-emul.c        |  2 +-
+> >  arch/arm64/kvm/vgic/vgic-irqfd.c |  2 +-
+> >  arch/arm64/kvm/vgic/vgic.c       | 12 +++++-------
+> >  include/kvm/arm_vgic.h           |  4 ++--
+> >  6 files changed, 20 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 6dcdae4d38cb..1f828f3b854c 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+> >  				   timer_ctx->irq.level);
+> >   	if (!userspace_irqchip(vcpu->kvm)) {
+> > -		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> > +		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+> >  					  timer_irq(timer_ctx),
+> >  					  timer_ctx->irq.level,
+> >  					  timer_ctx);
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 4866b3f7b4ea..872679a0cbd7 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1134,27 +1134,27 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+> >  			  bool line_status)
+> >  {
+> >  	u32 irq = irq_level->irq;
+> > -	unsigned int irq_type, vcpu_idx, irq_num;
+> > +	unsigned int irq_type, vcpu_id, irq_num;
+> >  	int nrcpus = atomic_read(&kvm->online_vcpus);
+> >  	struct kvm_vcpu *vcpu = NULL;
+> >  	bool level = irq_level->level;
+> >   	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) &
+> > KVM_ARM_IRQ_TYPE_MASK;
+> > -	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
+> > -	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+> > +	vcpu_id = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
+> > +	vcpu_id += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
+> >  	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
+> >  -	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num,
+> > irq_level->level);
+> > +	trace_kvm_irq_line(irq_type, vcpu_id, irq_num, irq_level->level);
+> >   	switch (irq_type) {
+> >  	case KVM_ARM_IRQ_TYPE_CPU:
+> >  		if (irqchip_in_kernel(kvm))
+> >  			return -ENXIO;
+> >  -		if (vcpu_idx >= nrcpus)
+> > +		if (vcpu_id >= nrcpus)
+> >  			return -EINVAL;
 > 
-> Want to point out that I didn't review this code, I only reviewed 
-> patches 1-3
-> from the original series.
+> What we actually need to check is 'vcpu->vcpu_idx >= nrcpus' and this is
+> covered by the 'if (!vcpu)' statement below. Let's just drop this
+> _incorrect_ checking?
 
-Ah crap. I try to make sure I was only tagging the right patches,
-but obviously failed... :-( Really sorry about that.
-
-
-> https://lore.kernel.org/linux-arm-kernel/20230907100931.1186690-1-maz@kernel.org/
-> 
-> Since it seems Oliver is picking it up, can you remove my r-b tag from
-> this patch.
-
-Well, Zenghui has found a couple of issues, so there will be a third
-revision for sure. I'll amend the patch right away.
+Good point. Let me fix this.
 
 Thanks,
 
-          M.
+	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
