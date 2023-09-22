@@ -2,139 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEAA57AB80D
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 19:49:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E7E37AB843
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 19:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233384AbjIVRtX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 13:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43944 "EHLO
+        id S233729AbjIVRwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 13:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233151AbjIVRtU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 13:49:20 -0400
-Received: from out-195.mta0.migadu.com (out-195.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFE2A9
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 10:49:07 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 17:49:00 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695404945;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yWuya+6N9+7BTSlOuj84T8LL44d++YMtdnE2EXlJ65Q=;
-        b=gHYjf5dc1QB8Xn3bItq2aA450TW2y+qAb32zmwoTAMpAjILjlfiu3Ebq97l/ioV1UzZ6Pe
-        gfrRIqsyLqkAkXhCExidjRzzUcPD+GzKtfDlwpuhdxUV0Kok8Z/6CRxoyQomtxDA169KDd
-        P22eWFdau/9obDGPbQGrhbMWT9AFuM4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-        will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-        yuzenghui@huawei.com, zhukeqian1@huawei.com,
-        jonathan.cameron@huawei.com, linuxarm@huawei.com
-Subject: Re: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related pgtable
- interfaces
-Message-ID: <ZQ3TjMcc0FhZCR0r@linux.dev>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <20230825093528.1637-4-shameerali.kolothum.thodi@huawei.com>
- <ZQ2xmzZ0H5v5wDSw@arm.com>
+        with ESMTP id S233100AbjIVRwX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 13:52:23 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D85810FE
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 10:51:24 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c3d6d88231so21238825ad.0
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 10:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1695405084; x=1696009884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eXc3WVm2d9wXGVJuKAtiopcDcMVBwoquCz7AlsYwD+o=;
+        b=nhRAHBCabqS+f19t4DDPSMSTtrRJlhPkHZrAKOo/KyUq5+5zwQiUNJfUV8V5L8sar1
+         ZiB1Vf1cJ6MCQm7WZfN+8Ssm/frqqObMGLM9yKzfuQpqJa72d+E5Lbup4niAcx4ZcDEw
+         mICMjFxWchuOC080S+QLbXcsQq1xIEJRoKrhI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695405084; x=1696009884;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eXc3WVm2d9wXGVJuKAtiopcDcMVBwoquCz7AlsYwD+o=;
+        b=r27LvZRsP8pkR2hOD6atVVbMOlhcAxuuU/865W+Nz9Af88v2d+dWmNMWF9kGos2ang
+         ZtDctTUGBi5wglVbYnG+Y2MPlhCBWsOPG5K5j1itIIgg/fGuCEWglZmUX2QsiH1nOW2n
+         A5e5PYBa7OypQOi6LDMyTZNCgf2TdZ0k5u1C0FPTTBnpjUsrffwcPxfn5AvXX3rWMpMT
+         NPVMVQiutjeuKntOchLPZv6g7SyRS1txjSZCbGbg3y8AUCDK6F4TJhifou1JcGP/nLkn
+         Uz5BHvaxJxyAXq0R7JDgKX1E06LyWed7E8FGHCwwHJ0StcU/5sH4GGyrhtF/4q70fG4R
+         7uig==
+X-Gm-Message-State: AOJu0Yy9SASJ3ppFks7lmRVyvnYZi2zKrcp9Mh94tuy1WUI1QiXufZPQ
+        fYizGWRjPL5vmy2Q69AEPhW+YA==
+X-Google-Smtp-Source: AGHT+IH/Kn1OJkUrFMU9jg+TEckOUQCVzn3MG2/uzWrH8DEVzrtRq6GXOgkadVLCZAFxwqsvTYCVvQ==
+X-Received: by 2002:a17:902:7798:b0:1c0:aca0:8c44 with SMTP id o24-20020a170902779800b001c0aca08c44mr195510pll.19.1695405083834;
+        Fri, 22 Sep 2023 10:51:23 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id b19-20020a170902ed1300b001bde12178b4sm3771970pld.33.2023.09.22.10.51.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 10:51:23 -0700 (PDT)
+From:   Kees Cook <keescook@chromium.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Kees Cook <keescook@chromium.org>, kvm@vger.kernel.org,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, linux-hardening@vger.kernel.org
+Subject: [PATCH] KVM: Annotate struct kvm_irq_routing_table with __counted_by
+Date:   Fri, 22 Sep 2023 10:51:21 -0700
+Message-Id: <20230922175121.work.660-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQ2xmzZ0H5v5wDSw@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1134; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=+kioWiTjqV6jdbFZylWekeUu834dva3bEE4RuM/bKRQ=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlDdQZLetVqJUV8ZSLYv/hoDK79//fc87OG48iZ
+ kOU8Wrigv+JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZQ3UGQAKCRCJcvTf3G3A
+ JqBnD/wN4+TtgPpWSDb0l1F32tdGJLNbEHEnVEr8OVv6j14PQUeCh5nUABKY7BTC2yJIGP4VKbX
+ ousJT6tKEKoNsuwfJp0Z/Pv2ssKKbABc1busJSGB1V081CNDuOKPy/MN3pCqlTLtxk7yrwMkTWl
+ 1G+C2YKMD4fKZU1EII3XT6kYdk2j9t487W/CfBBGmWZKuOEeoR0x22SWdrW2QPufcHf9bQLTj/n
+ 9nygC679juYza9RWkF3u1hGYey8QGjP3SR1pusnTKAHd3oJBBhoLRsbmG9F+PNC3OjXCc5PdK64
+ xD+7Inl2rGuMnRumnfsWJ4kBQgBr+Q/EbflYNsf0Aj/e3LVac/HEheuy8BxWasrtWNZ7IF9UgUf
+ 7IrIqRGQVzygQPskeMPE7NgBtlZdj5C/Mlev/Gh/cuTufDy6RE2lknosD3OI4zzOvD79MZHW8R0
+ qV1/TmW7guNS5XqgK1XfYNZcEqCI8PbL8kaClfUCgLYe52QO85Han1E7cH1wZZJBV3/OVQej3RL
+ sUUTxwb5vl6n8FNbO+mtp7p2khlg2yyNgo3aaAWsGVmU3pWHubzzRGuIFyQUy6z05n5UEEEXXe2
+ kEisjaAvIWB0BwiuIctaz7/4aQuV2TCNVjylB02PM+c77Jzzec7B/M9A+QFaHowdXUCPyiFjaY3
+ QET+wYw MOtez24g==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 04:24:11PM +0100, Catalin Marinas wrote:
-> On Fri, Aug 25, 2023 at 10:35:23AM +0100, Shameer Kolothum wrote:
-> > +static bool stage2_pte_writeable(kvm_pte_t pte)
-> > +{
-> > +	return pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > +}
-> > +
-> > +static void kvm_update_hw_dbm(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			      kvm_pte_t new)
-> > +{
-> > +	kvm_pte_t old_pte, pte = ctx->old;
-> > +
-> > +	/* Only set DBM if page is writeable */
-> > +	if ((new & KVM_PTE_LEAF_ATTR_HI_S2_DBM) && !stage2_pte_writeable(pte))
-> > +		return;
-> > +
-> > +	/* Clear DBM walk is not shared, update */
-> > +	if (!kvm_pgtable_walk_shared(ctx)) {
-> > +		WRITE_ONCE(*ctx->ptep, new);
-> > +		return;
-> > +	}
-> 
-> I was wondering if this interferes with the OS dirty tracking (not the
-> KVM one) but I think that's ok, at least at this point, since the PTE is
-> already writeable and a fault would have marked the underlying page as
-> dirty (user_mem_abort() -> kvm_set_pfn_dirty()).
-> 
-> I'm not particularly fond of relying on this but I need to see how it
-> fits with the rest of the series. IIRC KVM doesn't go around and make
-> Stage 2 PTEs read-only but rather unmaps them when it changes the
-> permission of the corresponding Stage 1 VMM mapping.
-> 
-> My personal preference would be to track dirty/clean properly as we do
-> for stage 1 (e.g. DBM means writeable PTE) but it has some downsides
-> like the try_to_unmap() code having to retrieve the dirty state via
-> notifiers.
+Prepare for the coming implementation by GCC and Clang of the __counted_by
+attribute. Flexible array members annotated with __counted_by can have
+their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+(for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+functions).
 
-KVM's usage of DBM is complicated by the fact that the dirty log
-interface w/ userspace is at PTE granularity. We only want the page
-table walker to relax PTEs, but take faults on hugepages so we can do
-page splitting.
+As found with Coccinelle[1], add __counted_by for struct kvm_irq_routing_table.
 
-> Anyway, assuming this works correctly, it means that live migration via
-> DBM is only tracked for PTEs already made dirty/writeable by some guest
-> write.
+[1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
 
-I'm hoping that we move away from this combined write-protection and DBM
-scheme and only use a single dirty tracking strategy at a time.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ include/linux/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > @@ -952,6 +990,11 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> >  	    stage2_pte_executable(new))
-> >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
-> >  
-> > +	/* Save the possible hardware dirty info */
-> > +	if ((ctx->level == KVM_PGTABLE_MAX_LEVELS - 1) &&
-> > +	    stage2_pte_writeable(ctx->old))
-> > +		mark_page_dirty(kvm_s2_mmu_to_kvm(pgt->mmu), ctx->addr >> PAGE_SHIFT);
-> > +
-> >  	stage2_make_pte(ctx, new);
-> 
-> Isn't this racy and potentially losing the dirty state? Or is the 'new'
-> value guaranteed to have the S2AP[1] bit? For stage 1 we normally make
-> the page genuinely read-only (clearing DBM) in a cmpxchg loop to
-> preserve the dirty state (see ptep_set_wrprotect()).
-
-stage2_try_break_pte() a few lines up does a cmpxchg() and full
-break-before-make, so at this point there shouldn't be a race with
-either software or hardware table walkers.
-
-But I'm still confused by this one. KVM only goes down the map
-walker path (in the context of dirty tracking) if:
-
- - We took a translation fault
-
- - We took a write permission fault on a hugepage and need to split
-
-In both cases the 'old' translation should have DBM cleared. Even if the
-PTE were dirty, this is wasted work since we need to do a final scan of
-the stage-2 when userspace collects the dirty log.
-
-Am I missing something?
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fb6c6109fdca..4944136efaa2 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -664,7 +664,7 @@ struct kvm_irq_routing_table {
+ 	 * Array indexed by gsi. Each entry contains list of irq chips
+ 	 * the gsi is connected to.
+ 	 */
+-	struct hlist_head map[];
++	struct hlist_head map[] __counted_by(nr_rt_entries);
+ };
+ #endif
+ 
 -- 
-Thanks,
-Oliver
+2.34.1
+
