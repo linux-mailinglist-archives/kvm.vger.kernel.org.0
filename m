@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D68A7AB8F4
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 20:16:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA3FC7AB911
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 20:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbjIVSQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 14:16:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48866 "EHLO
+        id S233220AbjIVSW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 14:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230311AbjIVSQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 14:16:03 -0400
+        with ESMTP id S230076AbjIVSWY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 14:22:24 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEAE2A9
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 11:15:57 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c27703cc6so35687437b3.2
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 11:15:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DBD192
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 11:22:16 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59bdb9fe821so36249587b3.0
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 11:22:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695406557; x=1696011357; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rqnOSWLWq6nLAaLKULqsHUaxck1PfZUtsIVWixoYO6g=;
-        b=LCKx91E6fxLm/5sM1fjMlqdHO1B4w/p0sob5JsdSGVJFiDaplkrO412YMUDc22QGXI
-         PgQuBmRkLNZnSa2YEsfpmrqWATWRqvAtr99V7CilSCimhyMYHj78szZYmkzMafrgMovE
-         z/eF+n1G44xry9yoMWWgAd3zyeAUkCLtg7kNtwINMoBv0IXlsuDCHypiqbt7Wb79ttdM
-         7bLrcz8Ym+h3GolXxeZ1o74ERnbvP0LfhDKVLu2ufWjRfbvt9ROwC8p1GGdhlXJPu0IM
-         MGI0N+t6SzkJ8IPvtAbiresaSPuvNKrIpMOq6cOH+/1WpEst9/dO5u45iUSlpl2wqGCX
-         DS4A==
+        d=google.com; s=20230601; t=1695406936; x=1696011736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vptbo8W/PDe0HJnv3CPs5HLi3LMVUvHQdqhEcX5IZeI=;
+        b=MSZ65TJfM4RW4sUwaR5OnxdQIYXvryoX1aEpqXX7FxvOwdt7JwgJaczUvt3hR/JDad
+         KyAd2upmBmocsLNz13ncVncbj09kuA+wBbByp4Rbfnvw0df/RQP5V7YukNU1ROZI1w8G
+         B0H5s5DIfyEmxO7Iz5eUElrPAL9JuGnic9kRfh7rfyg1bkMQc/k37pD0gVjL7IWova+m
+         tCoWsvj7jRaKqVggL3QQE2DO4D9m+BobwDUv1luYZKfjURRL26CU/OlMfABUrpo95/Op
+         Nj5qCMNK2t4ZlaaVREXFr1Qxk2O7coohHOGKtSPZvqg1iTBmuQ2shdxSEAhKCwIHEpQA
+         q3eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695406557; x=1696011357;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rqnOSWLWq6nLAaLKULqsHUaxck1PfZUtsIVWixoYO6g=;
-        b=u8icTIDMDDVtpFefqjKq4Lh65FUVjLAFbyCXBzjY/hpb+NhE3JtbosfmAU1F3FcCxS
-         EVx7jc5kFRGkkTcxKjY8+RujyhaZ/5j0Ot0Vn8ovKWQZWadv0uAza0rv2WCnIIQUabkE
-         sZDtt8H2S5pRtOTOTpVXQy/QoQxO4HJHw9MKHqDrk65Kf1VRRtMVTnKHwk8aOO+xoeXQ
-         dWLaNdKJ73xJ/a2CiVZr2YVmVeI04OMb9suppGRbj9wr/G4Z+hjoa6nd2LPcDCxKSaFb
-         1DEzLDNIp5AoTY4wgGChstrqkK60mELl3z9X7hGcRBYF6HZrr/Sp0c1V7K7WUp6InRE1
-         e6Ow==
-X-Gm-Message-State: AOJu0YxJYOzbtrXxXiLgEJmWXsj8mw+/3bL5KJOVdDmphaY5dlhsaoM3
-        5yzMfVLRpBTa+j7gV7rC3mGYupRdTPE=
-X-Google-Smtp-Source: AGHT+IG7uoTw7xuI0Fl5esEhwDXBz4ndIEsG4fGYCk6UTcXUI7WPVmbji6jpbo4WW3oSahq3yqwiosit3+g=
+        d=1e100.net; s=20230601; t=1695406936; x=1696011736;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vptbo8W/PDe0HJnv3CPs5HLi3LMVUvHQdqhEcX5IZeI=;
+        b=X8QPJkw3dnJAZNIl46l1G1rhxZV5waiQJb5GRuYPzln1eJUV4elHNjEkQ9uS8KoHSt
+         7lvp+BW5zroy0YFIn5shmIbyl/ReoERDNKaHh1v5wb7Cgq0IX9mQEsM1QHSP4BOW3PyL
+         sE/En72/+cLFoRHotESWw6JgLd+Bl/+Y5clRUQIHwl8xiyOXnLLQfPBmZpnY3cIj3fgL
+         lO5ORc4A8aArJZ5NWybtwbSQf4+vNvJ03vILDrJa6Mg+EBsXUVtjQXyRhw4eS7EDt5AG
+         rUE0QtvTZlOR5e6CIuGnhszq5povPUEg47Y3PXpD6HfZqNVYbvoChJZfId9OPV3EEuK0
+         y7UA==
+X-Gm-Message-State: AOJu0Yzh1ASzFWgHZsT/Y6hmKrhH5/svdA5/VOdhVtUtPmuK57QkiHJD
+        onw4WFLnJm2pr7er4qhcmT7EyYmlrZ8=
+X-Google-Smtp-Source: AGHT+IHMwf9584/wxxb8c7vkF3Qkp3sRcIoHW7TrmvVAdqNtYC6HxHCCDSqIU1pPdQo3VbudmM+LXouKywE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:160c:b0:d85:aa2f:5715 with SMTP id
- bw12-20020a056902160c00b00d85aa2f5715mr777ybb.10.1695406556997; Fri, 22 Sep
- 2023 11:15:56 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 11:15:55 -0700
-In-Reply-To: <CALMp9eQKB5mxb=OpvkvZEBLXzekrBYaz9z016A9Xp3-QpMJpUg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a25:ac57:0:b0:d86:5716:b462 with SMTP id
+ r23-20020a25ac57000000b00d865716b462mr834ybd.13.1695406935945; Fri, 22 Sep
+ 2023 11:22:15 -0700 (PDT)
+Date:   Fri, 22 Sep 2023 11:22:14 -0700
+In-Reply-To: <20230901185646.2823254-2-jmattson@google.com>
 Mime-Version: 1.0
-References: <20230922164239.2253604-1-jmattson@google.com> <20230922164239.2253604-2-jmattson@google.com>
- <ZQ3NHv9Yok8Uybzo@google.com> <CALMp9eQKB5mxb=OpvkvZEBLXzekrBYaz9z016A9Xp3-QpMJpUg@mail.gmail.com>
-Message-ID: <ZQ3Z25cu5gnsedqr@google.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Virtualize HWCR.TscFreqSel[bit 24]
+References: <20230901185646.2823254-1-jmattson@google.com> <20230901185646.2823254-2-jmattson@google.com>
+Message-ID: <ZQ3bVkWoUerGufo9@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Mask LVTPC when handling a PMI
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Like Xu <likexu@tencent.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
@@ -69,100 +70,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023, Jim Mattson wrote:
-> On Fri, Sep 22, 2023 at 10:21=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > IMO, we should delete the offending kernel code.  I don't see how it pr=
-ovides any
-> > value these days.
->=20
-> Sure, but that doesn't help legacy guests.
+On Fri, Sep 01, 2023, Jim Mattson wrote:
+> Per the SDM, "When the local APIC handles a performance-monitoring
+> counters interrupt, it automatically sets the mask flag in the LVT
+> performance counter register."
+> 
+> Add this behavior to KVM's local APIC emulation, to reduce the
+> incidence of "dazed and confused" spurious NMI warnings in Linux
+> guests (at least, those that use a PMI handler with "late_ack").
 
-Heh, IMO they don't need help, their owners just need to be placated ;-)
+Hmm, I don't like the "to reduce the incidence" language as that suggests that
+this isn't a hard requirement.  That makes it sound like KVM is doing the guest
+a favor.  This?
 
-> > And *if* we want to change something in KVM so that we stop getting cou=
-stomer
-> > complaints about a useless bit, just let userspace stuff the bit.
->=20
-> We want to make customers happy. That should not even be a question.
+    Per the SDM, "When the local APIC handles a performance-monitoring
+    counters interrupt, it automatically sets the mask flag in the LVT
+    performance counter register."  Add this behavior to KVM's local APIC
+    emulation.
+    
+    Failure to mask the LVTPC entry results in spurious PMIs, e.g. when
+    running Linux as a guest, PMI handlers that do a "late_ack" spew a large
+    number of "dazed and confused" spurious NMI warnings.
 
-Can we really not tell them "this is a benign guest bug, ignore it"?
+> Fixes: 23930f9521c9 ("KVM: x86: Enable NMI Watchdog via in-kernel PIT source")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/lapic.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index a983a16163b1..1a79ec54ae1e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2743,6 +2743,8 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
+>  		vector = reg & APIC_VECTOR_MASK;
+>  		mode = reg & APIC_MODE_MASK;
+>  		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
+> +		if (lvt_type == APIC_LVTPC)
+> +			kvm_lapic_set_reg(apic, lvt_type, reg | APIC_LVT_MASKED);
 
-> > I think we should also raise the issue with AMD (Borislav maybe?) and a=
-sk/demand
-> > that bits in HWCR that KVM allows to be set are architecturally defined=
-.  It's
-> > totally fine if the value of bit 24 is uarch specific, but the behavior=
- needs to
-> > be something that won't change from processor to processor.
-> >
-> > >       kvm_pmu_refresh(vcpu);
-> > >       vcpu->arch.cr4_guest_rsvd_bits =3D
-> > >           __cr4_reserved_bits(guest_cpuid_has, vcpu);
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 3421ed7fcee0..cb02a7c2938b 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -3699,12 +3699,19 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu,=
- struct msr_data *msr_info)
-> > >               data &=3D ~(u64)0x40;     /* ignore flush filter disabl=
-e */
-> > >               data &=3D ~(u64)0x100;    /* ignore ignne emulation ena=
-ble */
-> > >               data &=3D ~(u64)0x8;      /* ignore TLB cache disable *=
-/
-> > > +             data &=3D ~(u64)0x1000000;/* ignore TscFreqSel */
-> > >
-> > >               /* Handle McStatusWrEn */
-> > >               if (data & ~BIT_ULL(18)) {
-> > >                       kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-> > >                       return 1;
-> > >               }
-> > > +
-> > > +             /*
-> > > +              * When set, TscFreqSel is read-only. Attempts to
-> > > +              * clear it are ignored.
-> > > +              */
-> > > +             data |=3D vcpu->arch.msr_hwcr & BIT_ULL(24);
-> >
-> >
-> > The bit is read-only from the guest, but KVM needs to let userspace cle=
-ar the
-> > bit.
->=20
-> Why? We don't let userspace clear bit 1 of EFLAGS, which is also a
-> "reads as one" bit.
+IMO, unconditionally setting the masked bit is wrong.  I'm 99% certain KVM should
+only set the mask bit if an interrupt is actually delivered somehwere.
 
-Because that's architectural behavior, not dependent on FMS, and KVM needs =
-to
-write EFLAGS to have any hope of being useful, i.e. giving ownership of EFL=
-AGS
-to userspace is not a realistic option.
+__apic_accept_irq() "fails" as follows:
 
-As proposed, if userspace sets CPUID to a magic FMS, and then changes the F=
-MS to
-something else, kvm_vcpu_after_set_cpuid() will not clear the bit and KVM w=
-ill
-end up wrongly enumerating the bit.  I doubt userspace would ever do that, =
-but
-it's at least possible.
+  APIC_DM_LOWEST and APIC_DM_FIXED
+	1. Trigger Mode is "level" triggered and level is deasserted.  This can't
+           happen because this code hardcodes the level to '1'.
 
-That could be fixed by actively clearing vcpu->arch.msr_hwcr for other FMS =
-values,
-but then KVM would have to be 100% precise on the FMS matching, which would=
- be a
-maintenance nightmare.
+        2. APIC is disabled (H/W or S/W).  This is a non-issue because the H/W
+           disabled case ignores it entirely, and all masks are defined to be set
+           if the APIC is S/W disabled (per the SDM):
 
-In other words, userspace owns the vCPU model, and for good reasons.  KVM n=
-eeds
-to allow userspace to define a sane model, but with *very* few exceptions, =
-KVM
-should not try to "help" userspace by stuffing bits.
+           The mask bits for all the LVT entries are set. Attempts to reset these
+           bits will be ignored.
 
-Pretty much everytime KVM tries to help, it causes problems.  E.g. initiali=
-zing
-perf_capabilities to kvm_caps.supported_perf_cap seems like a good thing, e=
-xcept
-it presents a bogus model if userspace decides to not enumerate a vPMU to t=
-he
-guest (Aaron was allegedly going to send a patch for this...).
+
+  APIC_DM_SMI
+        1. If SMI injection fails because CONFIG_KVM_SMM=n.
+
+  APIC_DM_INIT
+        1. Trigger Mode is "level" triggered and level is deasserted.  As above,
+           this can't happen.
+
+  APIC_DM_EXTINT
+        1. Unconditionally ignored by KVM.  This is architecturally correct for
+           the LVTPC as the SDM says:
+
+           Not supported for the LVT CMCI register, the LVT thermal monitor
+           register, or the LVT performance counter register.
+
+So basically, failure happens if and only if the guest attempts to send an SMI or
+ExtINT that KVM ignores.  The SDM doesn't explicitly state that mask bit is left
+unset in these cases, but my reading of
+
+  When the local APIC handles a performance-monitoring counters interrupt, it
+  automatically sets the mask flag in the LVT performance counter register.
+
+is that there has to be an actual interrupt.
+
+I highly doubt any software will ever care, e.g. the guest is going to be unhappy
+in CONFIG_KVM_SMM=n case no matter what, but setting the mask bit without actually
+triggering an interrupt seems odd.
+
+This as fixup?
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 71d87b0db0d9..ebfc3d92a266 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2759,15 +2759,17 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
+ {
+        u32 reg = kvm_lapic_get_reg(apic, lvt_type);
+        int vector, mode, trig_mode;
++       int r;
+ 
+        if (kvm_apic_hw_enabled(apic) && !(reg & APIC_LVT_MASKED)) {
+                vector = reg & APIC_VECTOR_MASK;
+                mode = reg & APIC_MODE_MASK;
+                trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
+-               if (lvt_type == APIC_LVTPC)
++
++               r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
++               if (r && lvt_type == APIC_LVTPC)
+                        kvm_lapic_set_reg(apic, lvt_type, reg | APIC_LVT_MASKED);
+-               return __apic_accept_irq(apic, mode, vector, 1, trig_mode,
+-                                       NULL);
++               return r;
+        }
+        return 0;
+ }
+
