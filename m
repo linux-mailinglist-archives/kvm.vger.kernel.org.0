@@ -2,70 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 745FE7AAD48
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 10:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1AA27AAD61
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 11:06:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232813AbjIVI5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 04:57:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40828 "EHLO
+        id S232831AbjIVJGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 05:06:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232820AbjIVI5d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 04:57:33 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9669198
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 01:57:27 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-274b45fa7a2so1275231a91.0
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 01:57:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1695373047; x=1695977847; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vCzI3E8aO188t/F32/cMXTqfHUINrJvH0Tp5qCpKPJc=;
-        b=JDhVh2x3NxpylYsDhJdLsAp3CzW6s5mi8kQj6JB7hm7I5ZawlOyTd7dUlmAmoZHV+K
-         6qc8hCZ3H+4u3PXDPXmTlkWHfaik3rQObfBRKNdcG8V/uKMWSFGNaToVEgVmipfamI4S
-         XFgmFuAJ7JU7JLcXKHs++3Bhl9bAksT+bERZyI2r4XXYXGEfYTueh0zpfYqaSYnSdPOv
-         Z5pRM0YMN58Zklgxyir/q9gsTWQRlBjjmw9Vh8hW7KgtXITMVyrlQK1RUgLVztog21z3
-         MTpo7s+/i6NNzv4vZ7yZBrVipXYSr5W9CiTqV17vvX27a/Y/SMiadvQt89K57qihwGvY
-         idRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695373047; x=1695977847;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCzI3E8aO188t/F32/cMXTqfHUINrJvH0Tp5qCpKPJc=;
-        b=o5/6AsYKh/rW2TotR7CbgygsrUYCfYwjiqn/BMgU6tzyCCBCJLQSRfHbeJ74Enlwby
-         gptX57qyTWbtjdQPpnHxeoBCKF/YU8KTSGyrByGl+ckueZ0ifpZ3vsWS9DkfqDZdIz/f
-         2GZSgG7i0hxTOHXZyEbF+A8YwVu+qmklG8JP3QxxR+xqyoMEXHgRQ5Vvp0iywVn2Svom
-         0Lwuv3dTc9INQj8gFj3flVriz/C1tWuB5pxEkKak0SA48ypOgJWs0vIy/8e2aBrDn0DH
-         FA0rUgMsBK1v+VQ3pndMZd4X92iGMYkros3MW4Yi37SQDstvm3v2THWKVECy9VulnsJi
-         QWHA==
-X-Gm-Message-State: AOJu0Yz5iGMVkNh926rBZjC5U36EmFHGotA9ao8YdI+qx/aHw1fgWc8X
-        iLS3QlNT6WLrdF1dHhWc6qyOuw==
-X-Google-Smtp-Source: AGHT+IGDUKE6sMJpErXb0g3YaZiHZpkET1mM+9eSCn6hTWCw/a2PztVDthPTlrRDuo5MMtmRLuJFaQ==
-X-Received: by 2002:a17:90a:7066:b0:269:3cdb:4edf with SMTP id f93-20020a17090a706600b002693cdb4edfmr7843278pjk.16.1695373047171;
-        Fri, 22 Sep 2023 01:57:27 -0700 (PDT)
-Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id t15-20020a17090a024f00b00256b67208b1sm4815024pje.56.2023.09.22.01.57.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 01:57:26 -0700 (PDT)
-From:   Yong-Xuan Wang <yongxuan.wang@sifive.com>
-To:     linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org
-Cc:     greentime.hu@sifive.com, vincent.chen@sifive.com, tjytimi@163.com,
-        alex@ghiti.fr, Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] RISC-V: KVM: Add Svadu Extension Support for Guest/VM
-Date:   Fri, 22 Sep 2023 08:56:49 +0000
-Message-Id: <20230922085701.3164-4-yongxuan.wang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230922085701.3164-1-yongxuan.wang@sifive.com>
-References: <20230922085701.3164-1-yongxuan.wang@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        with ESMTP id S229576AbjIVJGL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 05:06:11 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A8ACA;
+        Fri, 22 Sep 2023 02:06:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695373565; x=1726909565;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T3FdWmDNR/lv5xeJT/UeFBdFzsKp+DdlUH94ECBPozw=;
+  b=AxGN06kqap5AM27jTn928pGb/SSB4txQfro3LDvMXQszZ6T1DXR2Denp
+   lCben4rH6x4c4hXuaPvK5qs7iSYKVxpB0+WN6sva/NM1unZdV4qoDCoB4
+   qKuHd49K8SSrIuQ6XJtJC1pYPCt2NNNLPrOZTS3eKRFDkL01UB33D5caa
+   QZjVnJ3OWit8nafBl+a+ZXwFu6KGwWEIsKftK/NPQ+J70eUoWzAW+w0xC
+   nO15M9piBRWZqvmEUecjb8bdNmgypqBOYsxC491/y9e9DeBw43qkFRoYq
+   YdrnkM0/z0ofI0U6Xj9fzG7iL2uDhqRd1qLcuU1vKLzTRjXM6H8qXCw8F
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="383528342"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="383528342"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 02:06:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="741026653"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="741026653"
+Received: from bmatwiej-mobl.ger.corp.intel.com (HELO wieczorr-mobl1.intel.com) ([10.213.8.2])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 02:05:58 -0700
+From:   Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+To:     akpm@linux-foundation.org, christian@kellner.me,
+        fenghua.yu@intel.com, keescook@chromium.org,
+        ndesaulniers@google.com, coltonlewis@google.com,
+        dmatlack@google.com, vipinsh@google.com, seanjc@google.com,
+        brauner@kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        hannes@cmpxchg.org, nphamcs@gmail.com, reinette.chatre@intel.com
+Cc:     ilpo.jarvinen@linux.intel.com, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH v3 0/8] Add printf attribute to kselftest functions
+Date:   Fri, 22 Sep 2023 11:05:50 +0200
+Message-ID: <cover.1695373131.git.maciej.wieczor-retman@intel.com>
+X-Mailer: git-send-email 2.42.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,57 +66,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We extend the KVM ISA extension ONE_REG interface to allow VMM
-tools  to detect and enable Svadu extension for Guest/VM.
+Kselftest.h declares many variadic functions that can print some
+formatted message while also executing selftest logic. These
+declarations don't have any compiler mechanism to verify if passed
+arguments are valid in comparison with format specifiers used in
+printf() calls.
 
-Also set the HADE bit in henvcfg CSR if Svadu extension is
-available for Guest/VM.
+Attribute addition can make debugging easier, the code more consistent
+and prevent mismatched or missing variables.
 
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
----
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu.c             | 3 +++
- arch/riscv/kvm/vcpu_onereg.c      | 1 +
- 3 files changed, 5 insertions(+)
+Add a __printf() macro that validates types of variables passed to the
+format string. The macro is similarly used in other tools in the kernel.
 
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 992c5e407104..3c7a6c762d0f 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -131,6 +131,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_ZICSR,
- 	KVM_RISCV_ISA_EXT_ZIFENCEI,
- 	KVM_RISCV_ISA_EXT_ZIHPM,
-+	KVM_RISCV_ISA_EXT_SVADU,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 82229db1ce73..91b92a1f4e33 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -487,6 +487,9 @@ static void kvm_riscv_vcpu_update_config(const unsigned long *isa)
- 	if (riscv_isa_extension_available(isa, ZICBOZ))
- 		henvcfg |= ENVCFG_CBZE;
- 
-+	if (riscv_isa_extension_available(isa, SVADU))
-+		henvcfg |= ENVCFG_HADE;
-+
- 	csr_write(CSR_HENVCFG, henvcfg);
- #ifdef CONFIG_32BIT
- 	csr_write(CSR_HENVCFGH, henvcfg >> 32);
-diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 1b7e9fa265cb..211915dad677 100644
---- a/arch/riscv/kvm/vcpu_onereg.c
-+++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -36,6 +36,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
- 	/* Multi letter extensions (alphabetically sorted) */
- 	KVM_ISA_EXT_ARR(SSAIA),
- 	KVM_ISA_EXT_ARR(SSTC),
-+	KVM_ISA_EXT_ARR(SVADU),
- 	KVM_ISA_EXT_ARR(SVINVAL),
- 	KVM_ISA_EXT_ARR(SVNAPOT),
- 	KVM_ISA_EXT_ARR(SVPBMT),
+Add __printf() attributes to function definitions inside kselftest.h that
+use printing.
+
+Adding the __printf() macro exposes some mismatches in format strings
+across different selftests.
+
+Fix the mismatched format specifiers in multiple tests.
+
+Series is based on kselftests next branch.
+
+Changelog v3:
+- Change git signature from Wieczor-Retman Maciej to Maciej
+  Wieczor-Retman.
+- Add one review tag.
+- Rebase onto updated kselftests next branch and change base commit.
+
+Changelog v2:
+- Add review and fixes tags to patches.
+- Add two patches with mismatch fixes.
+- Fix missed attribute in selftests/kvm. (Andrew)
+- Fix previously missed issues in selftests/mm (Ilpo)
+
+[v2] https://lore.kernel.org/all/cover.1693829810.git.maciej.wieczor-retman@intel.com/
+[v1] https://lore.kernel.org/all/cover.1693216959.git.maciej.wieczor-retman@intel.com/
+
+Maciej Wieczor-Retman (8):
+  selftests: Add printf attribute to ksefltest prints
+  selftests/cachestat: Fix print_cachestat format
+  selftests/openat2: Fix wrong format specifier
+  selftests/pidfd: Fix ksft print formats
+  selftests/sigaltstack: Fix wrong format specifier
+  selftests/kvm: Replace attribute with macro
+  selftests/mm: Substitute attribute with a macro
+  selftests/resctrl: Fix wrong format specifier
+
+ .../selftests/cachestat/test_cachestat.c       |  2 +-
+ tools/testing/selftests/kselftest.h            | 18 ++++++++++--------
+ .../testing/selftests/kvm/include/test_util.h  |  8 ++++----
+ tools/testing/selftests/mm/mremap_test.c       |  2 +-
+ tools/testing/selftests/mm/pkey-helpers.h      |  2 +-
+ tools/testing/selftests/openat2/openat2_test.c |  2 +-
+ .../selftests/pidfd/pidfd_fdinfo_test.c        |  2 +-
+ tools/testing/selftests/pidfd/pidfd_test.c     | 12 ++++++------
+ tools/testing/selftests/resctrl/cache.c        |  2 +-
+ tools/testing/selftests/sigaltstack/sas.c      |  2 +-
+ 10 files changed, 27 insertions(+), 25 deletions(-)
+
+
+base-commit: ce9ecca0238b140b88f43859b211c9fdfd8e5b70
 -- 
-2.17.1
+2.42.0
 
