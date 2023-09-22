@@ -2,288 +2,342 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D94C7AA8B5
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 08:03:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB5AE7AA8E5
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 08:19:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230387AbjIVGDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 02:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52858 "EHLO
+        id S231255AbjIVGTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 02:19:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbjIVGDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 02:03:47 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CBCEFB;
-        Thu, 21 Sep 2023 23:03:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695362620; x=1726898620;
-  h=message-id:date:mime-version:from:subject:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=H0XuqgbqUt5ljQRehQN74Kzg/lYi5jLocq1zdrh6djo=;
-  b=nVcmaxWOc+DfTRPv1Afefivlc239w+CNOH+J8xd+EVvwwfb+rUHwc5ad
-   VDsjd1MtHYYWurnJE8xwFZTyWWWJE4WnWFl5yWaj//lSe3351jTBW4+pB
-   fLPmD4fDZBGcY8hdXK23itF3MtKZPVJm3boz0IoRQGza+/2ktjrZ+Uz67
-   M40lZLD+dMwKjqdVaf4+iSZkLpOBGmJj7yaXs0M5fq6xtDdKE+bAKIPVo
-   WAu4kqmaKwWs3sX1krCMoXC5LfxZ4qAdO5xJI59mVEgU5USoIZB46n9ZA
-   kjwMqnDqblWk0zQ8XdT04OLdnXLD46qJzLEXlYLdJLuHtUZ5Aeph0IykU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="383496364"
-X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="383496364"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 23:03:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="921035819"
-X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="921035819"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.11.250]) ([10.93.11.250])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 23:03:26 -0700
-Message-ID: <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com>
-Date:   Fri, 22 Sep 2023 14:03:23 +0800
+        with ESMTP id S231159AbjIVGTr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 02:19:47 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5266A83;
+        Thu, 21 Sep 2023 23:19:40 -0700 (PDT)
+Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RsMTX5SvCzMljc;
+        Fri, 22 Sep 2023 14:16:00 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 22 Sep 2023 14:19:37 +0800
+Subject: Re: [PATCH v15 1/2] vfio/migration: Add debugfs to live migration
+ driver
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <jonathan.cameron@huawei.com>, <bcreeley@amd.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linuxarm@openeuler.org>
+References: <20230901023606.47587-1-liulongfang@huawei.com>
+ <20230901023606.47587-2-liulongfang@huawei.com>
+ <20230915150026.06bea533.alex.williamson@redhat.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <d541ba02-a8d1-dc8e-a725-4ee82b0c44bb@huawei.com>
+Date:   Fri, 22 Sep 2023 14:19:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
- report faults to userspace
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230914015531.1419405-1-seanjc@google.com>
- <20230914015531.1419405-8-seanjc@google.com>
-Content-Language: en-US
-In-Reply-To: <20230914015531.1419405-8-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20230915150026.06bea533.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Originating-IP: [10.67.121.110]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000005.china.huawei.com (7.193.23.27)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/14/2023 9:55 AM, Sean Christopherson wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+On 2023/9/16 5:00, Alex Williamson wrote:
+> On Fri, 1 Sep 2023 10:36:05 +0800
+> liulongfang <liulongfang@huawei.com> wrote:
 > 
-> Add a new KVM exit type to allow userspace to handle memory faults that
-> KVM cannot resolve, but that userspace *may* be able to handle (without
-> terminating the guest).
+>> From: Longfang Liu <liulongfang@huawei.com>
+>>
+>> There are multiple devices, software and operational steps involved
+>> in the process of live migration. An error occurred on any node may
+>> cause the live migration operation to fail.
+>> This complex process makes it very difficult to locate and analyze
+>> the cause when the function fails.
+>>
+>> In order to quickly locate the cause of the problem when the
+>> live migration fails, I added a set of debugfs to the vfio
+>> live migration driver.
+>>
+>>     +-------------------------------------------+
+>>     |                                           |
+>>     |                                           |
+>>     |                  QEMU                     |
+>>     |                                           |
+>>     |                                           |
+>>     +---+----------------------------+----------+
+>>         |      ^                     |      ^
+>>         |      |                     |      |
+>>         |      |                     |      |
+>>         v      |                     v      |
+>>      +---------+--+               +---------+--+
+>>      |src vfio_dev|               |dst vfio_dev|
+>>      +--+---------+               +--+---------+
+>>         |      ^                     |      ^
+>>         |      |                     |      |
+>>         v      |                     |      |
+>>    +-----------+----+           +-----------+----+
+>>    |src dev debugfs |           |dst dev debugfs |
+>>    +----------------+           +----------------+
+>>
+>> The entire debugfs directory will be based on the definition of
+>> the CONFIG_DEBUG_FS macro. If this macro is not enabled, the
+>> interfaces in vfio.h will be empty definitions, and the creation
+>> and initialization of the debugfs directory will not be executed.
+>>
+>>    vfio
+>>     |
+>>     +---<dev_name1>
+>>     |    +---migration
+>>     |        +--state
+>>     |
+>>     +---<dev_name2>
+>>          +---migration
+>>              +--state
+>>
+>> debugfs will create a public root directory "vfio" file.
+>> then create a dev_name() file for each live migration device.
+>> First, create a unified state acquisition file of "migration"
+>> in this device directory.
+>> Then, create a public live migration state lookup file "state"
+>> Finally, create a directory file based on the device type,
+>> and then create the device's own debugging files under
+>> this directory file.
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  drivers/vfio/Makefile       |  1 +
+>>  drivers/vfio/vfio.h         | 14 +++++++
+>>  drivers/vfio/vfio_debugfs.c | 80 +++++++++++++++++++++++++++++++++++++
+>>  drivers/vfio/vfio_main.c    |  5 ++-
+>>  include/linux/vfio.h        |  7 ++++
+>>  5 files changed, 106 insertions(+), 1 deletion(-)
+>>  create mode 100644 drivers/vfio/vfio_debugfs.c
+>>
+>> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+>> index c82ea032d352..7934ac829989 100644
+>> --- a/drivers/vfio/Makefile
+>> +++ b/drivers/vfio/Makefile
+>> @@ -8,6 +8,7 @@ vfio-$(CONFIG_VFIO_GROUP) += group.o
+>>  vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>>  vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>>  vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+>> +vfio-$(CONFIG_DEBUG_FS) += vfio_debugfs.o
+>>  
+>>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+>> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+>> index 307e3f29b527..09b00757d0bb 100644
+>> --- a/drivers/vfio/vfio.h
+>> +++ b/drivers/vfio/vfio.h
+>> @@ -448,4 +448,18 @@ static inline void vfio_device_put_kvm(struct vfio_device *device)
+>>  }
+>>  #endif
+>>  
+>> +#ifdef CONFIG_DEBUG_FS
+>> +void vfio_debugfs_create_root(void);
+>> +void vfio_debugfs_remove_root(void);
+>> +
+>> +void vfio_device_debugfs_init(struct vfio_device *vdev);
+>> +void vfio_device_debugfs_exit(struct vfio_device *vdev);
+>> +#else
+>> +static inline void vfio_debugfs_create_root(void) { }
+>> +static inline void vfio_debugfs_remove_root(void) { }
+>> +
+>> +static inline void vfio_device_debugfs_init(struct vfio_device *vdev) { }
+>> +static inline void vfio_device_debugfs_exit(struct vfio_device *vdev) { }
+>> +#endif /* CONFIG_DEBUG_FS */
+>> +
+>>  #endif
+>> diff --git a/drivers/vfio/vfio_debugfs.c b/drivers/vfio/vfio_debugfs.c
+>> new file mode 100644
+>> index 000000000000..cd6c01437475
+>> --- /dev/null
+>> +++ b/drivers/vfio/vfio_debugfs.c
+>> @@ -0,0 +1,80 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (c) 2023, HiSilicon Ltd.
+>> + */
+>> +
+>> +#include <linux/device.h>
+>> +#include <linux/debugfs.h>
+>> +#include <linux/seq_file.h>
+>> +#include <linux/vfio.h>
+>> +#include "vfio.h"
+>> +
+>> +static struct dentry *vfio_debugfs_root;
+>> +
+>> +static int vfio_device_state_read(struct seq_file *seq, void *data)
+>> +{
+>> +	struct device *vf_dev = seq->private;
+>> +	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
+>> +	enum vfio_device_mig_state state;
+>> +	int ret;
+>> +
+>> +	ret = vdev->mig_ops->migration_get_state(vdev, &state);
+>> +	if (ret)
+>> +		return -EINVAL;
+>> +
+>> +	switch (state) {
+>> +	case VFIO_DEVICE_STATE_RUNNING:
+>> +		seq_printf(seq, "%s\n", "RUNNING");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_STOP_COPY:
+>> +		seq_printf(seq, "%s\n", "STOP_COPY");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_STOP:
+>> +		seq_printf(seq, "%s\n", "STOP");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_RESUMING:
+>> +		seq_printf(seq, "%s\n", "RESUMING");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+>> +		seq_printf(seq, "%s\n", "RUNNING_P2P");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_ERROR:
+>> +		seq_printf(seq, "%s\n", "ERROR");
 > 
-> KVM will initially use KVM_EXIT_MEMORY_FAULT to report implicit
-> conversions between private and shared memory.  With guest private memory,
-> there will be  two kind of memory conversions:
+> Please order these the same as enum vfio_device_mig_state, we're also
+> missing a couple states, ie. PRE_COPY and PRE_COPY_P2P.  Can we use any
+OK, I'll add them to the next version.
+
+> compiler tricks to create a build error when these are out of sync?
+>When these states are out of range, they should enter "default" processing.
+
+>> +		break;
+>> +	default:
+>> +		seq_printf(seq, "%s\n", "Invalid");
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +void vfio_device_debugfs_init(struct vfio_device *vdev)
+>> +{
+>> +	struct dentry *vfio_dev_migration = NULL;
+>> +	struct device *dev = &vdev->device;
 > 
->    - explicit conversion: happens when the guest explicitly calls into KVM
->      to map a range (as private or shared)
+> Nit, both of these could be defined within the scope of the mig_ops
+> test below.
+>
+
+"vfio_dev_migration" can be placed under mig_ops, but "dev" is public.
+Also, there should be no problem declaring variables like this.
+
+>> +
+>> +	vdev->debug_root = debugfs_create_dir(dev_name(vdev->dev), vfio_debugfs_root);
+>> +
+>> +	if (vdev->mig_ops) {
+>> +		vfio_dev_migration = debugfs_create_dir("migration", vdev->debug_root);
+>> +		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+>> +					  vfio_device_state_read);
+>> +	}
+>> +}
+>> +
+>> +void vfio_device_debugfs_exit(struct vfio_device *vdev)
+>> +{
+>> +	debugfs_remove_recursive(vdev->debug_root);
+>> +}
+>> +
+>> +void vfio_debugfs_create_root(void)
+>> +{
+>> +	vfio_debugfs_root = debugfs_create_dir("vfio", NULL);
+>> +}
+>> +
+>> +void vfio_debugfs_remove_root(void)
+>> +{
+>> +	debugfs_remove_recursive(vfio_debugfs_root);
+>> +	vfio_debugfs_root = NULL;
+>> +}
+>> +
+>> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+>> index cfad824d9aa2..8a7456f89842 100644
+>> --- a/drivers/vfio/vfio_main.c
+>> +++ b/drivers/vfio/vfio_main.c
+>> @@ -309,7 +309,7 @@ static int __vfio_register_dev(struct vfio_device *device,
+>>  
+>>  	/* Refcounting can't start until the driver calls register */
+>>  	refcount_set(&device->refcount, 1);
+>> -
+>> +	vfio_device_debugfs_init(device);
+>>  	vfio_device_group_register(device);
+>>  
+>>  	return 0;
+>> @@ -378,6 +378,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>>  		}
+>>  	}
+>>  
+>> +	vfio_device_debugfs_exit(device);
+>>  	/* Balances vfio_device_set_group in register path */
+>>  	vfio_device_remove_group(device);
+>>  }
 > 
->    - implicit conversion: happens when the guest attempts to access a gfn
->      that is configured in the "wrong" state (private vs. shared)
+> init/exit calls should try to be symmetric, if we call init before
+> vfio_device_group_register() then we should call exit after
+> vfio_device_group_unregister().  In this case, why shouldn't init be
+> the last call in __vfio_register_dev() and exit the first call in
+> vfio_unregister_group_dev()?
 > 
-> On x86 (first architecture to support guest private memory), explicit
-> conversions will be reported via KVM_EXIT_HYPERCALL+KVM_HC_MAP_GPA_RANGE,
 
-side topic.
+OK, I would put vfio_device_debugfs_init() into vfio_device_group_register().
 
-Do we expect to integrate TDVMCALL(MAPGPA) of TDX into KVM_HC_MAP_GPA_RANGE?
-
-> but reporting KVM_EXIT_HYPERCALL for implicit conversions is undesriable
-> as there is (obviously) no hypercall, and there is no guarantee that the
-> guest actually intends to convert between private and shared, i.e. what
-> KVM thinks is an implicit conversion "request" could actually be the
-> result of a guest code bug.
+>> @@ -1662,6 +1663,7 @@ static int __init vfio_init(void)
+>>  	if (ret)
+>>  		goto err_alloc_dev_chrdev;
+>>  
+>> +	vfio_debugfs_create_root();
+>>  	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>>  	return 0;
+>>  
+>> @@ -1684,6 +1686,7 @@ static void __exit vfio_cleanup(void)
+>>  	vfio_virqfd_exit();
+>>  	vfio_group_cleanup();
+>>  	xa_destroy(&vfio_device_set_xa);
+>> +	vfio_debugfs_remove_root();
+>>  }
 > 
-> KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
-> be implicit conversions.
+> Same, if we create it last, let's remove it first.  The above creates
+> it last and removes it last.  Thanks,
+>
+
+OK, I will adjust the order of vfio_debugfs_remove_root() in vfio_cleanup().
+
+Thanks,
+Longfang.
+
+> Alex
 > 
-> Place "struct memory_fault" in a second anonymous union so that filling
-> memory_fault doesn't clobber state from other yet-to-be-fulfilled exits,
-> and to provide additional information if KVM does NOT ultimately exit to
-> userspace with KVM_EXIT_MEMORY_FAULT, e.g. if KVM suppresses (or worse,
-> loses) the exit, as KVM often suppresses exits for memory failures that
-> occur when accessing paravirt data structures.  The initial usage for
-> private memory will be all-or-nothing, but other features such as the
-> proposed "userfault on missing mappings" support will use
-> KVM_EXIT_MEMORY_FAULT for potentially _all_ guest memory accesses, i.e.
-> will run afoul of KVM's various quirks.
-
-So when exit reason is KVM_EXIT_MEMORY_FAULT, how can we tell which 
-field in the first union is valid?
-
-When exit reason is not KVM_EXIT_MEMORY_FAULT, how can we know the info 
-in the second union run.memory is valid without a run.memory.valid field?
-
-> Use bit 3 for flagging private memory so that KVM can use bits 0-2 for
-> capturing RWX behavior if/when userspace needs such information.
+>>  
+>>  module_init(vfio_init);
+>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>> index 454e9295970c..769d7af86225 100644
+>> --- a/include/linux/vfio.h
+>> +++ b/include/linux/vfio.h
+>> @@ -69,6 +69,13 @@ struct vfio_device {
+>>  	u8 iommufd_attached:1;
+>>  #endif
+>>  	u8 cdev_opened:1;
+>> +#ifdef CONFIG_DEBUG_FS
+>> +	/*
+>> +	 * debug_root is a static property of the vfio_device
+>> +	 * which must be set prior to registering the vfio_device.
+>> +	 */
+>> +	struct dentry *debug_root;
+>> +#endif
+>>  };
+>>  
+>>  /**
 > 
-> Note!  To allow for future possibilities where KVM reports
-> KVM_EXIT_MEMORY_FAULT and fills run->memory_fault on _any_ unresolved
-> fault, KVM returns "-EFAULT" (-1 with errno == EFAULT from userspace's
-> perspective), not '0'!  Due to historical baggage within KVM, exiting to
-> userspace with '0' from deep callstacks, e.g. in emulation paths, is
-> infeasible as doing so would require a near-complete overhaul of KVM,
-> whereas KVM already propagates -errno return codes to userspace even when
-> the -errno originated in a low level helper.
+> .
 > 
-> Link: https://lore.kernel.org/all/20230908222905.1321305-5-amoorthy@google.com
-> Cc: Anish Moorthy <amoorthy@google.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   Documentation/virt/kvm/api.rst | 24 ++++++++++++++++++++++++
->   include/linux/kvm_host.h       | 15 +++++++++++++++
->   include/uapi/linux/kvm.h       | 24 ++++++++++++++++++++++++
->   3 files changed, 63 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 21a7578142a1..e28a13439a95 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6702,6 +6702,30 @@ array field represents return values. The userspace should update the return
->   values of SBI call before resuming the VCPU. For more details on RISC-V SBI
->   spec refer, https://github.com/riscv/riscv-sbi-doc.
->   
-> +::
-> +
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory;
-> +
-> +KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault that
-> +could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
-> +guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
-> +describes properties of the faulting access that are likely pertinent:
-> +
-> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault occurred
-> +   on a private memory access.  When clear, indicates the fault occurred on a
-> +   shared access.
-> +
-> +Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in that it
-> +accompanies a return code of '-1', not '0'!  errno will always be set to EFAULT
-> +or EHWPOISON when KVM exits with KVM_EXIT_MEMORY_FAULT, userspace should assume
-> +kvm_run.exit_reason is stale/undefined for all other error numbers.
-> +
-
-Initially, this section is the copy of struct kvm_run and had comments 
-for each field accordingly. Unfortunately, the consistence has not been 
-well maintained during the new filed being added.
-
-Do we expect to fix it?
-
->   ::
->   
->       /* KVM_EXIT_NOTIFY */
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 4e741ff27af3..d8c6ce6c8211 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2327,4 +2327,19 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
->   /* Max number of entries allowed for each kvm dirty ring */
->   #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->   
-> +static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> +						 gpa_t gpa, gpa_t size,
-> +						 bool is_write, bool is_exec,
-> +						 bool is_private)
-> +{
-> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> +	vcpu->run->memory_fault.gpa = gpa;
-> +	vcpu->run->memory_fault.size = size;
-> +
-> +	/* RWX flags are not (yet) defined or communicated to userspace. */
-> +	vcpu->run->memory_fault.flags = 0;
-> +	if (is_private)
-> +		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
-> +}
-> +
->   #endif
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index bd1abe067f28..d2d913acf0df 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -274,6 +274,7 @@ struct kvm_xen_exit {
->   #define KVM_EXIT_RISCV_SBI        35
->   #define KVM_EXIT_RISCV_CSR        36
->   #define KVM_EXIT_NOTIFY           37
-> +#define KVM_EXIT_MEMORY_FAULT     38
->   
->   /* For KVM_EXIT_INTERNAL_ERROR */
->   /* Emulate instruction failed. */
-> @@ -541,6 +542,29 @@ struct kvm_run {
->   		struct kvm_sync_regs regs;
->   		char padding[SYNC_REGS_SIZE_BYTES];
->   	} s;
-> +
-> +	/*
-> +	 * This second exit union holds structs for exit types which may be
-> +	 * triggered after KVM has already initiated a different exit, or which
-> +	 * may be ultimately dropped by KVM.
-> +	 *
-> +	 * For example, because of limitations in KVM's uAPI, KVM x86 can
-> +	 * generate a memory fault exit an MMIO exit is initiated (exit_reason
-> +	 * and kvm_run.mmio are filled).  And conversely, KVM often disables
-> +	 * paravirt features if a memory fault occurs when accessing paravirt
-> +	 * data instead of reporting the error to userspace.
-> +	 */
-> +	union {
-> +		/* KVM_EXIT_MEMORY_FAULT */
-> +		struct {
-> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
-> +			__u64 flags;
-> +			__u64 gpa;
-> +			__u64 size;
-> +		} memory_fault;
-> +		/* Fix the size of the union. */
-> +		char padding2[256];
-> +	};
->   };
->   
->   /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
-
