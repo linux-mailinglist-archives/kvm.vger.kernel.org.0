@@ -2,137 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C060E7AA5AA
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 01:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A59017AA5DD
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 02:00:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230108AbjIUXeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 19:34:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
+        id S229637AbjIVAA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 20:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbjIUXeL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 19:34:11 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAEBF7
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 16:34:04 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-6562330d68dso7998616d6.2
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 16:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1695339243; x=1695944043; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GedEWxpKSzrGPRM6lMkTBIu3LFHKqvL1k9LSqu1VR6k=;
-        b=nymOKQgkXMA6woRCS2H0juZvdrRpL3SW+Hf1u5ftOTpQecml4IebiIRPBVClQsXPed
-         BNFiaS8IXnJIGWImNlm3WRQbQ0SyOTk+GXmdwOXUxgtWo6JhmLZGYYCBj4KN+hkTjuwg
-         ildXGaYheLJ77IQq9L1kRtLhQzT0rT9M+D9pfQpirThrq6zXeLXuquifT3nn1MsD+V9s
-         jRMGUdiu+5VFar6X+EBXMxtyqbkNhNUgYcHDZy19wPQYEK40oOowu68Z60kbhjyQw7vQ
-         Fr99DnK7xfniqJMmiVLOITqDycMPhaJ+nq+jv7uyecRAXuyhzBzXPY81RoMH0v04nOZT
-         NPFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695339243; x=1695944043;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GedEWxpKSzrGPRM6lMkTBIu3LFHKqvL1k9LSqu1VR6k=;
-        b=L8BjePHCCjanTpQoyIhmOy7bfEj41+CdynCHptcywC+3Rws4+KBGgX743xglTaP2LU
-         7WRGtwmdw14ljUNBSO3GvAEuQjiW+hlTrTfZ8QbgerKPPfZQk+epifFTXWKOytUNPVHL
-         +gos1QgKDUDfIoi7OtBVc0iq1P8o2TmKbguL/lMgY0wqsf5LEIXCZ6v+x6BQxkNYmc3R
-         O4xcIfLHwNpuq3qEnGyHNcbVBVtfSu+xM97/rvXv2orAv1oN2a0ZDWA/J0NPu5iblSY0
-         9t+IOboSNyci9PzO5DHgLcynTiOsBVG4m9EvxPdgb2y/SFBR0pM/lRs0QyjTmVhBx0Ot
-         nhKQ==
-X-Gm-Message-State: AOJu0Yw+wBqRGk/MClWOdKUeLflUvRULe54FDThQXkiX6bG4F1wI+6F8
-        XYdMi0Uj8v5j3ol4sth3QN7olQ==
-X-Google-Smtp-Source: AGHT+IGyPvvaH53YFg/+nfLkgh+wJ6GTD1U2RciFZyYgWxuFiG/EgPxEd0ck5941lJVaQIWktR+A+g==
-X-Received: by 2002:a05:6214:4602:b0:658:310c:f6ca with SMTP id oq2-20020a056214460200b00658310cf6camr7598389qvb.42.1695339243709;
-        Thu, 21 Sep 2023 16:34:03 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id o3-20020a0ce403000000b006263a9e7c63sm947595qvl.104.2023.09.21.16.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 16:34:03 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qjTBK-000Uup-Kq;
-        Thu, 21 Sep 2023 20:34:02 -0300
-Date:   Thu, 21 Sep 2023 20:34:02 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Liu, Jingqi" <jingqi.liu@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 09/12] iommu: Make iommu_queue_iopf() more generic
-Message-ID: <20230921233402.GC13795@ziepe.ca>
-References: <20230914085638.17307-1-baolu.lu@linux.intel.com>
- <20230914085638.17307-10-baolu.lu@linux.intel.com>
- <f20b9e78-3a63-ca3e-6c04-1d80ec857898@intel.com>
+        with ESMTP id S229477AbjIVAAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 20:00:55 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298B1F9;
+        Thu, 21 Sep 2023 17:00:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1695340847;
+        bh=R/VgVhr9X0HDtbhByU19PzH3x9CzJFuyVh93BLbm8XY=;
+        h=From:To:Subject:In-Reply-To:References:Date:From;
+        b=EUj1hKtv69g+9+nHaOHHtRLCs4SHBdba41Ptbk8nE0yB2aVWS47UCVmbCiEPRl3OS
+         OOOmwbvjXOGRW4+l+Fl5Db4/dr1OmHm7MrwulVHxJbKTdyEHQ3NTGcdOMdEgeyjp8x
+         Bnhvsybnbj7XLRupXWsVSvlbZl5l0MkRPAmNgCHLopPgDW88Klsc03QWfixcsMp1ds
+         +aTlrZPTdD+D3j3dxUqa8Amstg4Jm6Ls7tDlHjwAmIJRs0+hlsAiHuqOW6oF7u3daV
+         6pJaAyNaWqCjBOraN+K5IIYx7vpYRHJKUfWFE2ALkjnpNdro2udTrbfcUvW8kYfIQr
+         Wz7OBF1jOw3AQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RsC8Y0yCxz4x2b;
+        Fri, 22 Sep 2023 10:00:45 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, x86@kernel.org,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c unless VFIO
+ is selected
+In-Reply-To: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+Date:   Fri, 22 Sep 2023 10:00:44 +1000
+Message-ID: <87leczm5zn.fsf@mail.lhotse>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f20b9e78-3a63-ca3e-6c04-1d80ec857898@intel.com>
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 11:25:56PM +0800, Liu, Jingqi wrote:
-> 
-> On 9/14/2023 4:56 PM, Lu Baolu wrote:
-> > Make iommu_queue_iopf() more generic by making the iopf_group a minimal
-> > set of iopf's that an iopf handler of domain should handle and respond
-> > to. Add domain parameter to struct iopf_group so that the handler can
-> > retrieve and use it directly.
-> > 
-> > Change iommu_queue_iopf() to forward groups of iopf's to the domain's
-> > iopf handler. This is also a necessary step to decouple the sva iopf
-> > handling code from this interface.
-> > 
-> > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> > ---
-> >   include/linux/iommu.h      |  4 ++--
-> >   drivers/iommu/iommu-sva.h  |  6 ++---
-> >   drivers/iommu/io-pgfault.c | 49 ++++++++++++++++++++++++++++----------
-> >   drivers/iommu/iommu-sva.c  |  3 +--
-> >   4 files changed, 42 insertions(+), 20 deletions(-)
-> > 
-> ......
-> 
-> > @@ -112,6 +110,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
-> >   {
-> >   	int ret;
-> >   	struct iopf_group *group;
-> > +	struct iommu_domain *domain;
-> >   	struct iopf_fault *iopf, *next;
-> >   	struct iommu_fault_param *iopf_param;
-> >   	struct dev_iommu *param = dev->iommu;
-> > @@ -143,6 +142,19 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
-> >   		return 0;
-> >   	}
-> > +	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
-> > +		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
-> > +	else
-> > +		domain = iommu_get_domain_for_dev(dev);
-> > +
-> > +	if (!domain || !domain->iopf_handler) {
-> 
-> Does it need to check if 'domain' is error ?  Like below:
-> 
->          if (!domain || IS_ERR(domain) || !domain->iopf_handler)
+Jason Gunthorpe <jgg@nvidia.com> writes:
+> There are a bunch of reported randconfig failures now because of this,
+> something like:
+>
+>>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
+>            fn = symbol_get(vfio_file_iommu_group);
+>                 ^
+>    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+>    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+>
+> It happens because the arch forces KVM_VFIO without knowing if VFIO is
+> even enabled.
+>
+> Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
+> then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com/
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  arch/arm64/kvm/Kconfig   | 2 +-
+>  arch/powerpc/kvm/Kconfig | 2 +-
+>  arch/s390/kvm/Kconfig    | 2 +-
+>  arch/x86/kvm/Kconfig     | 2 +-
+>  virt/kvm/Kconfig         | 7 ++++++-
+>  5 files changed, 10 insertions(+), 5 deletions(-)
+>
+> Sean's large series will also address this:
+>
+> https://lore.kernel.org/kvm/20230916003118.2540661-7-seanjc@google.com/
+>
+> I don't know if it is sever enough to fix in the rc cycle, but here is the
+> patch.
 
-Urk, yes, but not like that
+Thanks for debugging this, I had seen it but hadn't got around to it.
 
-The IF needs to be moved into the else block as each individual
-function has its own return convention.
+I think it's definitely worth fixing now. It's a pretty simple patch and
+it's still early in the rc cycle.
 
-Jason
+Tested-by: Michael Ellerman <mpe@ellerman.id.au>
+
+cheers
+
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 83c1e09be42e5b..7c43eaea51ce05 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -28,7 +28,7 @@ menuconfig KVM
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select KVM_XFER_TO_GUEST_WORK
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+>  	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+> index 902611954200df..b64824e4cbc1eb 100644
+> --- a/arch/powerpc/kvm/Kconfig
+> +++ b/arch/powerpc/kvm/Kconfig
+> @@ -22,7 +22,7 @@ config KVM
+>  	select PREEMPT_NOTIFIERS
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_VCPU_ASYNC_IOCTL
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select IRQ_BYPASS_MANAGER
+>  	select HAVE_KVM_IRQ_BYPASS
+>  	select INTERVAL_TREE
+> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+> index 45fdf2a9b2e326..d206ad3a777d5d 100644
+> --- a/arch/s390/kvm/Kconfig
+> +++ b/arch/s390/kvm/Kconfig
+> @@ -31,7 +31,7 @@ config KVM
+>  	select HAVE_KVM_IRQ_ROUTING
+>  	select HAVE_KVM_INVALID_WAKEUPS
+>  	select HAVE_KVM_NO_POLL
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select INTERVAL_TREE
+>  	select MMU_NOTIFIER
+>  	help
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index ed90f148140dfe..8e70e693f90e30 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -45,7 +45,7 @@ config KVM
+>  	select HAVE_KVM_NO_POLL
+>  	select KVM_XFER_TO_GUEST_WORK
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select INTERVAL_TREE
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 484d0873061ca5..0bf34809e1bbfe 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -59,9 +59,14 @@ config HAVE_KVM_MSI
+>  config HAVE_KVM_CPU_RELAX_INTERCEPT
+>         bool
+>  
+> -config KVM_VFIO
+> +config HAVE_KVM_ARCH_VFIO
+>         bool
+>  
+> +config KVM_VFIO
+> +       def_bool y
+> +       depends on HAVE_KVM_ARCH_VFIO
+> +       depends on VFIO
+> +
+>  config HAVE_KVM_INVALID_WAKEUPS
+>         bool
+>  
+>
+> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+> -- 
+> 2.42.0
