@@ -2,140 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC727AB23E
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 14:37:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDF5E7AB25A
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 14:43:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbjIVMhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 08:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45018 "EHLO
+        id S232760AbjIVMnN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 08:43:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjIVMhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 08:37:18 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E6F8F
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 05:37:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=guvO3EkUbH9C6Hr9Xh9N6nn6X++QwAQJ+O7Ighh+hxqHeRYGTtqsZwLT5nQC0IeUChjPmqapmc7/RVeoazDXyvUw4gCXoqPiFPHfXGa0nsxE+ifNq7P9tEJUoHbX5ZUzEZTh+BIJAgpP9Ritff2gQvgV6Y+EqcgqyekLppX1zRI7BwJCgxOvgN6GbQ33BeYGj7QhHdaiixcNzBtI+WqweY5fRb6tDGOi6R9wDRurKG5grB0oUMyiumet/DgJNV9g7UKNMj0VhZiO5wTjNFMZUCXkYhtR7ALYd9bqPGeyNpmeTLhQZsQ2UHXp7dGHAE6obpgf9ahnaQyrJ9X4uscaew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ooE3xVSVSCt1qbEzD4GyVRCzMCId7ELkbt8jGwVHPVc=;
- b=dpZJNpDhsnn2qHvn0+asoMOr9ysCPQsryKvWP+wYoTiUGDfwRjjw1+nNL9c27FT49CRcccw+C4TbwkzdbzZc9zPjRQKPhLRpEKiwgLzIoDgoLgXEcb6SPKvF+aQws+XE6XIZWsnO8S6BaV4a6mv5GjYHqvE7Xgg9QBBUw7xcwTdXRYfPVZi58XS9+E+59nQcts54wg3QUKIETd9bi+HYZljyTve6zzgS0GT8dhyF0SZWB74GdGeQdwJLmRfumKSj0ZHhVXthb9pc/eZD6GSK3zwouwQ+VBc8blieE8gmSFzTsrAwIOj7mplyL7hp7xx2rQCsSzIBCMhcUswIZc1MWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ooE3xVSVSCt1qbEzD4GyVRCzMCId7ELkbt8jGwVHPVc=;
- b=JJ62Jk7kfkSPy3TkHCj/A1axOyV2EsDk/ecOSpK/H5zYyR9pDVTo5L6IkLMndPSxE1+6IPLH8aQijWHJfKKnjBN986oDY2ZqDw3vzbm4SSCv0861CpYNdfIcRKFlHhhcb6sv9EqQnuT/Nkejd9S0i9BS86bokxRa+rr0BLczcsoUfql8HmV/rNr8bU4DhaimsmmOsNuvJf3A8qnerAhC/sXqf3R80onxuM7vLIWw8H843D3IeVcD71vk/ZidrCV+tGMzkVk6s2IjF+qaewHqTSF66Nn1KwwWY3TsiIhlCxEbv5OkwRzRgaL8ivYKDetDe2t9lO8g/XnQYztyD7cgjA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BY5PR12MB4243.namprd12.prod.outlook.com (2603:10b6:a03:20f::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Fri, 22 Sep
- 2023 12:37:09 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Fri, 22 Sep 2023
- 12:37:09 +0000
-Date:   Fri, 22 Sep 2023 09:37:08 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230922123708.GA130749@nvidia.com>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-12-yishaih@nvidia.com>
- <20230921135832.020d102a.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921135832.020d102a.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR13CA0022.namprd13.prod.outlook.com
- (2603:10b6:208:160::35) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229476AbjIVMnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 08:43:12 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187B28F
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 05:43:06 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77063481352so166491185a.1
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 05:43:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1695386585; x=1695991385; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dJYX5wUywumkDIjBBuCsh0129IAPGx0MBB+MpKbn2U4=;
+        b=S/+WhR0EEnJ8PYQjfLxvP/f8zSmaS2TJz8yqoHYbn5vdHZaiYYf26Ob1MkfvPAyqs8
+         oFSKekKBQ/mU3IC/CGv2bNtSuI0E2q2cIsp9cQMsQ6VMRcQAOibLdgBphE1cx7ezNubB
+         gG5g4o2UxEbb/Rn23c+zj+9JWLw3kA0ubjdblJlIT/+oc+8ECUap29TaOlyzH4Hn59GL
+         qBm58FEiOltgDH71IGtrO3xTlLHtMs1e6vZ4PURnJMPpz11XC+hofEdZzWHlu/vmh3oe
+         2uIsmQr71MkMohuReFCgLi+L+q+hBH+Zxeh/DwVCHDBlPDWizLecyMlkCZYohhU+cYZS
+         K2NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695386585; x=1695991385;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dJYX5wUywumkDIjBBuCsh0129IAPGx0MBB+MpKbn2U4=;
+        b=BhV2xLE91ZRKkEeAxIMgwf4k1bLHMEJk4fsJd5a6glg/ZVZkg4SdE6H7ubTQZom9cu
+         NvxnE7+fx8KxzL/0IwOs3vGSnOhMY3P39MYTSJZe1NcZnmiOOoddrYBgp6v8g+U0ZNuZ
+         a+UA/Mgbj2oz9w53O0pkjfOnpCivIZHz4ElrpsRuDnHbyzivvwkmBr47I5gO2zqCg5EA
+         IiIOfGrwR1VPfvhCqRjOuiXx5M13HQFe14ycq012ePm0WeDOvJlDTcjCkbQfwJiJGq38
+         /9L9cCqOBhKWsNudUup0pEgxHSCUYNXflbWdQSeYaqCuQvMs0a3Jet0UlVkSTMxtS3pK
+         vuyA==
+X-Gm-Message-State: AOJu0YybVR7vSTkXFyMtDoGf6S7LvPiCn+suAwgD0y+R7b7Wr7Nxw3WF
+        AvVKL7IhydnyXQsK1+D8UB7XDA==
+X-Google-Smtp-Source: AGHT+IHm/qwy9v94zwoSSNba4IDdrqDeA5MFzZIlrmmRnzEbwpTUWaYrkAhTSt+q/0yib09m0ubygQ==
+X-Received: by 2002:ad4:5de7:0:b0:656:519c:5a07 with SMTP id jn7-20020ad45de7000000b00656519c5a07mr3118747qvb.25.1695386585198;
+        Fri, 22 Sep 2023 05:43:05 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
+        by smtp.gmail.com with ESMTPSA id t15-20020a0cde0f000000b006588f418323sm1396225qvk.64.2023.09.22.05.43.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 05:43:04 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qjfUt-000Y5A-VB;
+        Fri, 22 Sep 2023 09:43:03 -0300
+Date:   Fri, 22 Sep 2023 09:43:03 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Baolu Lu <baolu.lu@linux.intel.com>
+Cc:     "Liu, Jingqi" <jingqi.liu@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 09/12] iommu: Make iommu_queue_iopf() more generic
+Message-ID: <20230922124303.GE13795@ziepe.ca>
+References: <20230914085638.17307-1-baolu.lu@linux.intel.com>
+ <20230914085638.17307-10-baolu.lu@linux.intel.com>
+ <f20b9e78-3a63-ca3e-6c04-1d80ec857898@intel.com>
+ <20230921233402.GC13795@ziepe.ca>
+ <e7c773f6-969c-0097-1bca-24d276e8a8f6@linux.intel.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4243:EE_
-X-MS-Office365-Filtering-Correlation-Id: b85d7645-c65f-46b5-76a4-08dbbb68a349
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ie7c5Y9hLHGsI9dpEWhfa/BDRj8b819Oa7KUDWsU/hxPveaw80R2FYQY0t73v34YpNUqylWlsqf4oRASr68grXPcRIecQCAm2QzLeMGqk95Tn/KoedtcBAIxjYvEq13cGl2U4u5K5Ohl1za8DofhR/7Q84HDUNJ/wmw8rzDf7IVqMrPRscRURD5I7+8Z+nafK76+JfsVbTmiDZzJHq6tN4cQ7ABSwMScFwLIT5zuf89qXENuBWEK25eUx5kHzrFCC7fytU0Em4+lq1L2DchwH2vYicHF5GzhKPPsBNk9GLlS4ABVLEmVMk1QR8/LczVf8jOQrilmTWwBpnpwRHIYy6G09AeW9oOem/yyL5OqgefQvTDZMX9QGkWHPn2CaTl3b80HMqdqjGqcb8iogOThaN1lEGV/nXRTQHNOvH3EzQ3zp0qkULyhzEh6vE0ByXz4O1JyFyxLAkerqEGIkH+lAP9mOj+wzrzvUCQ+8Qa3G5GNOyeq3LEE7qfZmFjE5tGc/i+uEyzmgxPVFhgx3OGS+qX5rNirPX9/2zNJsqXiugDx8MzAIp7N8He0Tgcz+8S/KUts9Qd1w5Sk6h/vZumxkrshdIX2fK0b/qlZw45WCAk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(366004)(136003)(376002)(39860400002)(1800799009)(186009)(451199024)(6512007)(6486002)(6506007)(38100700002)(1076003)(107886003)(33656002)(66556008)(66476007)(2616005)(478600001)(66946007)(86362001)(83380400001)(26005)(2906002)(36756003)(5660300002)(41300700001)(8936002)(316002)(6916009)(8676002)(4326008)(4744005)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qrmBoDQAtkXurKg05GbqxO4MkeZLKN0FWWZv0QAwaq/ECwjgKgdYGXaap1M4?=
- =?us-ascii?Q?BrG9d06S1PqeZ0x/DHGjZECnb3VYRlns7RI91EUxyLs3CAjtDcqUfLM4fdZT?=
- =?us-ascii?Q?zw0FRvSRCfow+ile4Pgh/rPRrRHA5q5gy4GJQk+8u8pq9L33hEJduQ4IQeet?=
- =?us-ascii?Q?IU7mC+Em0dWH88iqPkjuYLTMjob+IAYLwUdpfNwc9Q4ZDAzMwANYpyPjIBBM?=
- =?us-ascii?Q?7jCB9nND5n8aNXo9pncXWoxpwNavAcEBIjX0Akc69xsRDyp80VP1QmttIyUf?=
- =?us-ascii?Q?87hGm6D553pUvjVjXr19mPSmH0nxbTJNhxTC0Iwz3elYnlhCE4BvTgM+4ioZ?=
- =?us-ascii?Q?rsW0jb2G0DihTEJwYwg0obc8AqO0yUAlOHDHeC0AzNT4CIE3Wh5MVT8wINmX?=
- =?us-ascii?Q?0NQHR7EZZdToC/x9xohSA5RmiH1lotbxntY+Gfpb2H8Z8wQcFGrLBF6CVGHa?=
- =?us-ascii?Q?MVxoSEU4lZo9TwClXsJ80OUM/jCQw1VLLCbtVfSyfFyxIJ7vNc9JISd5QCZ0?=
- =?us-ascii?Q?VrZh+DFQsSXMoxBdwGCNDfv6tU0g0nQmggvKdWC2sTBxeKH/IkIK+LcUiYN2?=
- =?us-ascii?Q?DxynwU3ip28n1BFl7deCg1dsUoBXZv8qCW1u/a0mRRZd8LM2zDetf0PQPbc2?=
- =?us-ascii?Q?ZeEjLtDQLYgUgYIwSumGzK0vwtTJLdjK6eLJQdjxsnk6AX74POx2oLQfqqFg?=
- =?us-ascii?Q?8P/On5eXDxFvxWwz79sg3Vp6k1BQzgMk40wyhDNQL4MCiqXyiyXzQtmhj038?=
- =?us-ascii?Q?f8PVDf9t918+S/mBb7XS15q8cM7jE1wMoKgEfIR6uxJnlt5gGAUg49SEdTTm?=
- =?us-ascii?Q?EpGzWfLyt8/qOa5BLVgZ5rBDH+3Ljwkqt+pilw6NAiv2tdtvENAUfteeQpzM?=
- =?us-ascii?Q?TZvxpuskD/zt52BBaHoXif98OJ2wDfAWkqNMZQot8Esn+JBHkHuJ1ejOd8P4?=
- =?us-ascii?Q?vmvGtYUlL2e1IvRuZPDZoT0ytMQ0dGk1ekDCQTFVzYMw1vzIRh/EEv99bmo3?=
- =?us-ascii?Q?uH0+dbFbFpKEbAIgMdygMIkhOC0vOYdOLM83vsh4Q8bbNV4ljxeJhXt7eizA?=
- =?us-ascii?Q?F9ZeWmqj5JNc7Ug6Y0mm3DLQ8NtoqpQPPFYViy6w9R/8m3fas+k19+chARDf?=
- =?us-ascii?Q?MvLwk5noasBv/aJOyXsMznNur+HrVeDdfZZ0F9hbviUtOJokGs50ry3rj+s7?=
- =?us-ascii?Q?8rM+A2+11npYOoj0OuzZHg7p2pAXnT3KVyF1AjFZjzCmVkvyQq262VMiP4oG?=
- =?us-ascii?Q?IeVKHrh4KsZCZsm4A9sLZqUmrMqwUeHeedlsCOGj4lE1wn4UMEdgipcQoutm?=
- =?us-ascii?Q?X3tFkEreWMGHC2FfMpvMA5NJCiwVsiPcIDyalmcP9NMTPMJIo3jQkCR9hLu7?=
- =?us-ascii?Q?GSdue6VJ604It+3jolEf4d0ZPbODzc/D3BNq4a8szaMPg1e2Rav9+Kre83ps?=
- =?us-ascii?Q?RdSLuRbZhgEbPxGTCrfT9KcA4xSA5eHClgVlXKhpscjAvRkAthdVJq99Wy2Q?=
- =?us-ascii?Q?YmdKNEi/1YEqMzTNjtjJP/NUHeNIUwY5A9CIsmZVFlPSTK/gUWo5vS/CmIvX?=
- =?us-ascii?Q?98t9/y3foB6W8Yo0EyQ87q1Am5MZNnhhNxADR4TT?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b85d7645-c65f-46b5-76a4-08dbbb68a349
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 12:37:09.4778
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: No8Y3ODgq2sKRHZYlQp7ywm3MnHKhFrWkWOcEHv8TvW4vs4YeLgPrLYW+ThlCKWH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4243
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e7c773f6-969c-0097-1bca-24d276e8a8f6@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 01:58:32PM -0600, Alex Williamson wrote:
+On Fri, Sep 22, 2023 at 10:44:45AM +0800, Baolu Lu wrote:
 
-> If the heart of this driver is simply pretending to have an I/O BAR
-> where I/O accesses into that BAR are translated to accesses in the MMIO
-> BAR, why can't this be done in the VMM, ie. QEMU?  
+> > > > @@ -112,6 +110,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
+> > > >    {
+> > > >    	int ret;
+> > > >    	struct iopf_group *group;
+> > > > +	struct iommu_domain *domain;
+> > > >    	struct iopf_fault *iopf, *next;
+> > > >    	struct iommu_fault_param *iopf_param;
+> > > >    	struct dev_iommu *param = dev->iommu;
+> > > > @@ -143,6 +142,19 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
+> > > >    		return 0;
+> > > >    	}
+> > > > +	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
+> > > > +		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
+> > > > +	else
+> > > > +		domain = iommu_get_domain_for_dev(dev);
+> > > > +
+> > > > +	if (!domain || !domain->iopf_handler) {
+> > > 
+> > > Does it need to check if 'domain' is error ?  Like below:
+> > > 
+> > >           if (!domain || IS_ERR(domain) || !domain->iopf_handler)
+> > 
+> > Urk, yes, but not like that
+> > 
+> > The IF needs to be moved into the else block as each individual
+> > function has its own return convention.
+> 
+> iommu_get_domain_for_dev_pasid() returns an ERR_PTR only if the matching
+> domain type is specified (non-zero).
+> 
+> Adding IS_ERR(domain) in the else block will make the code more
+> readable. Alternatively we can put a comment around above code to
+> explain that ERR_PTR is not a case here.
 
-That isn't exactly what it does, the IO bar access is translated into
-an admin queue command on the PF and excuted by the PCI function.
-
-So it would be difficult to do that in qemu without also somehow
-wiring up qemu to access the PF's kernel driver's admin queue.
-
-It would have been nice if it was a trivial 1:1 translation to the
-MMIO bar, but it seems that didn't entirely work with existing VMs. So
-OASIS standardized this approach.
-
-The bigger picture is there is also a live migration standard & driver
-in the works that will re-use all this admin queue infrastructure
-anyhow, so the best course is to keep this in the kernel.
+You should check it because you'll probably get a static tool
+complaint otherwise
 
 Jason
