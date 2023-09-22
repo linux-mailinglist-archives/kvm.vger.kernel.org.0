@@ -2,133 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4801A7AB57C
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:06:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E597AB596
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:10:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbjIVQGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 12:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
+        id S230500AbjIVQKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 12:10:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbjIVQGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 12:06:11 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252BF99
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:06:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=np/vBuLebS0B6ewtZimWvBMUVKzhD73oO4P5ZaG6svEnk2Jn96iP73nZ0h8UyEpe9iaiSa+fMAWTQ+gMe/IATx0+VY579HqCQJXnhZYWtIq1KsWLwyFH8PJJVBxlaTqt8BQYXXOrV3shvSRQMBZfeA8U596ZBYaHodOFpw0rPI9HGHd8G92vg+MyBKtBgeWgzjHTZKmDithb0/kpX1qjM6GqEtn4tBU7foxY2N742215tM2TmsRPNjFdsGZ2Uu563rgjLqJ7/dtJjhJ1v+NGrj6iadVpXB5fuQNS3NnKsKXtoq6m1G5W5uoigIMpbQHFrUX7bf19cA78HSjOeDnICQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cGVBz0LuLqyIQ98NqGaxFeDPnLimx3SHocxOjpcGo4Y=;
- b=lCpOxcy2T4w/fKT5P8j5msO1HJ0r+jAK1nETmJFw4RRPuiescQvc2XIREBUK8sBPfItRCUumo9FJAhy9X5m2h0KbPRZKLEDqk+aGEz4nf6o64cMTC41dQcKD4+CVXZ0RyxxMbO/itzyFORH+VAXx8ofSQtHQKqwRv9r/try6hQJOVCuw9wVoj0yquXaCAHoJ1kJ/ggFp951l5/qQYcFdqzUmhYAiGinA7we7AVmyZm0Xcw6E/SZbBgx3az2+XYLQAFta5atQFaiQU+GpzW48Xfi4ARfX36v2CDZ07+mIJ14Kz7FXc2tg0kUh+L+/NAAO9FrYS1VjiNam67n6AEcRAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cGVBz0LuLqyIQ98NqGaxFeDPnLimx3SHocxOjpcGo4Y=;
- b=JZcux8ckagM3PVXVvYxT+IQJiNkhJdNgMS7xmW91LQIUT9HHE7643BM79sMkBw2NEX6kicpVNfPeGD7WIXKmly73sVWLtR+ZW+/6Sfx3SdtaSNKH9/rPJkmpENktrrmLYJz+xLkhGwtVBQS6E/plQehV+wGiZy2utJzGrYmW7QU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by MW3PR12MB4507.namprd12.prod.outlook.com (2603:10b6:303:2c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Fri, 22 Sep
- 2023 16:06:02 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::fbfe:ec9c:b106:437e]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::fbfe:ec9c:b106:437e%5]) with mapi id 15.20.6813.017; Fri, 22 Sep 2023
- 16:06:02 +0000
-Message-ID: <316dfbed-5b67-4140-8502-d0f32dec5162@amd.com>
-Date:   Fri, 22 Sep 2023 11:05:59 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Reply-To: babu.moger@amd.com
-Subject: Re: [PATCH v4 01/21] i386: Fix comment style in topology.h
-Content-Language: en-US
-To:     Zhao Liu <zhao1.liu@linux.intel.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
+        with ESMTP id S229538AbjIVQKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 12:10:41 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB9499;
+        Fri, 22 Sep 2023 09:10:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SKOqUo1ijvGR/pq32r/RFqZcbDbukue4m0yQR5shFV4=; b=G/RZ+SeDvQOfy2VKc085clrmQ9
+        l1aOteVSyatf6i40Lt+5tdt4mS+GLZA2FYLIldc6KV1IwIHuyZ+x0h88fJ67+CX7Ql4Kqtwq3785R
+        5YVLgQLbNdhyv6BPXJg4Kq7yVniFEKbWX7dkLNWQuX5hlsJ/rObj1HEWELvFnAL9o5Ss6FXeLH2k2
+        JVatnDp/MXBkVEO2W5HVMENbWcVrchkgA8Xeqg6WxzVE6lQnzdZ+8WOjhG1W8BCw8bmD4bAXp+Sy4
+        zj/LM3HDTWYzSiAg1v9+DuT6a+t00ZqPjfzV4sPQ8754hgR5XEmo7befJMIUF3YDqtfxSnIdx7OWE
+        sSvJeIyQ==;
+Received: from [2001:8b0:10b:5:a766:1541:2a7f:69c0] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qjijh-001atm-2p; Fri, 22 Sep 2023 16:10:33 +0000
+Message-ID: <35b590f2c699c4c00533d8414e152fe04e1b89cf.camel@infradead.org>
+Subject: Re: [PATCH v5 07/10] KVM: xen: allow vcpu_info to be mapped by
+ fixed HVA
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Zhenyu Wang <zhenyu.z.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Babu Moger <babu.moger@amd.com>, Zhao Liu <zhao1.liu@intel.com>
-References: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
- <20230914072159.1177582-2-zhao1.liu@linux.intel.com>
-From:   "Moger, Babu" <bmoger@amd.com>
-In-Reply-To: <20230914072159.1177582-2-zhao1.liu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA9PR13CA0033.namprd13.prod.outlook.com
- (2603:10b6:806:22::8) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Date:   Fri, 22 Sep 2023 17:10:32 +0100
+In-Reply-To: <20230922150009.3319-8-paul@xen.org>
+References: <20230922150009.3319-1-paul@xen.org>
+         <20230922150009.3319-8-paul@xen.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-N1WcUYenVmpmQAWgpJyV"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|MW3PR12MB4507:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1cdc5b48-16c2-48c3-4deb-08dbbb85d172
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EvKsy40TH1EY1jkU133Bnoxpgk084ouembTeHNyXSW9Ge1r260Bf8Jja3DFdRNcHjRpCYIOIZdOfqTpqF90kzxl+Yqj0UzZJGVsj6Zy/5w8NfIITDhcc6sDYnen2K91gBVvMzuJ0M2JuAgxZOLhttS8CowMZoIoiBiIKLlrfkQnRODFifYqn/W93yReQs8G8TKsBbEpKsdhZT4M4+ovLsFMojkRmU2qvUuzypGWFXT3atfwua7t6WgswwV8102t7f5ETMEHpsjdsSRK7hzkCwsz/tX6kwGTKP3f0xWK0n+FvJrT/9QUwAO0nfGwT+/MQktXE02mfSMAEKvOQS/+8qIb6mZvmY4gOOAmJ9tCuZTkNRF0XfZNoehyX2sXgvT39iwR1wAoOKlQE7eGyPJHTAlEQbf3XVeutMTMf8EaZV9BxR1ivK2UpbnZwYYn63N8azv6P/uxbO+V26IdDdOtqvz0gaGCZsbgyYy1sSHW4Jq44n46Zi5sEvgUE1uOdNx96I2RrvLFYQh1/ifyI7QA/i+vSo/QEGnQOl1pltrsxkAmwRPeInvxXIVrQEy313OnjYtZe0+PsPabCzSg5PCmAUS63lEQC+/Jepx/7iWAGaiHe5SDLU01KVLSgcIF4u2rYxWLXckbymK/s3zh4Q4Z7Kg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(396003)(39860400002)(136003)(186009)(1800799009)(451199024)(38100700002)(5660300002)(31696002)(36756003)(966005)(2906002)(54906003)(66476007)(66556008)(110136005)(66946007)(478600001)(2616005)(6666004)(6486002)(6506007)(6512007)(53546011)(316002)(8676002)(4326008)(8936002)(7416002)(31686004)(41300700001)(83380400001)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N1E1TzIwNzNKaGhHT3hlVUpiVGM1Y0hJOXkxTUZrbUFNUTUrU05TSytXK1Bt?=
- =?utf-8?B?MWVNOHRLa0pvZ2tqT29tUmhnTlpuNkpuOG5tUC9kRlR4dzRvSWs2M0pRc20y?=
- =?utf-8?B?NGU5SnIxMFo3azU5UjMyL1dZY3FkYnl1a2ZCNTRuMmdJRUREQ081aFdyQXli?=
- =?utf-8?B?MFdOaVRTZU9mU25DR3FmcXlpbHVVOWdhQ0FrRllvb0M3cE0rYU9ZZ2VBaGpE?=
- =?utf-8?B?VU5UcXBHdERRdVNkSUdOTSttTkxKb05aek1LSUM1SXV0SW44Qk5Sa25memRV?=
- =?utf-8?B?VEtaODBxellIS1lzZWRrSUV0Tkc2WlhueGw0bThIeU11TFJOQ3E0VFFhZkVJ?=
- =?utf-8?B?a3lobTEwL2lTOXBkRWlMWVkzZncwb0w4RVRPbVB2czVCOGtrSEsreTNXYnUx?=
- =?utf-8?B?S0tPS0dYK29vOHE0NnRVOUxQNXRmZ3BON1pYZXFwWThtRzdhUCttR2VlQ3lX?=
- =?utf-8?B?cUxmRlJxM0YzQ0ZZdlh2c0ZDZkJ0K091NXVVTlVQZFkzTjVCY2hTN0FaVWhW?=
- =?utf-8?B?N3lFSjlWR01aSkFWUEFDZHJhZ1FjeDJsQUdwdUdpbmpiTjE5YnVkNjNNcUxC?=
- =?utf-8?B?VHhNak9tZ2xDalpVdkRlbVN1enc2bEpDVHhIcG92WU9iNVZsT3dHMGJSS2di?=
- =?utf-8?B?UDBqaVM3RVU5NmhXWXNDbXJVdHExbEc3NUlzVUx3N2JDQUg3Q1o2UFRYVWc5?=
- =?utf-8?B?YWtKanBERzd6OERDSCt6K25WT2QzcWNkOW4vNFVCc2diSi9rdTNySFhXZGR3?=
- =?utf-8?B?aU5uWnpqRm9EV3pYeFY5ZW5DMFpkbVhDY0NrYzIxN2pXOVNOdVN2eG5lM1Iv?=
- =?utf-8?B?U1JObkhNUGRFOHp3aytlVlZwRkExZXFTTnpzVEhQeS9hSGtrNWNtVklTbjQy?=
- =?utf-8?B?QkFBa1JBaWdlZDZ1K0lVbnFkVzNsR3c3VHZ0c3ppQlZKZzZWU2Nqb2YvQ3hR?=
- =?utf-8?B?UkF6ckMza05xc3ppQlpPZ3Q3S0JsWEdoVFl1QlNhR0dVWnRZaXZyQlRwRTJ1?=
- =?utf-8?B?YnVtZ1pDSDJSMzlUQVFBYWZETUtGWG9ESWJtdG4xTVZselF5YmxlSVFSTWQ3?=
- =?utf-8?B?bjRHQ3ErcU0yUWZ6VGtWQjk3eURjNzIxVks5Sm9CQ2FUZU1OQnVvdGtCa1dD?=
- =?utf-8?B?Mkk1b1VkcjdZNCtUcEI1SUhHRS9QV21EYm5rZDFoaE83NjdsWlpVRHArU2Rr?=
- =?utf-8?B?ZEt6NW1IanhEckVBS256WG1reTRwLys5VXhxQnZoeGdIaFJjTVVGQjNLVTFx?=
- =?utf-8?B?Q1NnMWd3NmI4UlRlK0NWUVpsNVU4MGpoVGd0WVluNlhCejBUNEg2YnNSWFhs?=
- =?utf-8?B?RW00N2FHcmJtQUxUZnI2aG1PV3VnVWkzdW0wQ05mMTlWYndVK25DRFJvWWYz?=
- =?utf-8?B?ZVRSNFJuZ3ZWZkwzdTJIdmtaRWsvenR0eWRoZjROUCtKUnROYWNHeStLQmNn?=
- =?utf-8?B?a1VTQ1Z4bjZiamtEMG1lWDNOUWNUMDdrci8yUmY0WGozY05rT2RaYmhSRGJs?=
- =?utf-8?B?T0VpeVRkd1dmQ0dQbEg1dFZtS0FPSDMzSE9SM01waURhclZ4SlRxQklyQnFl?=
- =?utf-8?B?VW14MG9KL1ZXRTlVQVZwLytQNzlHU1ArOWlQbE9hSTRFZFhEWHBvNEZPazFK?=
- =?utf-8?B?SEljOEI5dTNHVU4wQjI5L1Q5ZGQ0Q2tTNGZrTGdCSFNURU16anZHMldMT2Nx?=
- =?utf-8?B?enZLMFI1eEwxb25NQWFQT1pFRE83b1c3Qkl5MmR3L2VlSzcwMWdzVEk1bkZB?=
- =?utf-8?B?S0ZQSS8ya0RKZlpveTRMRFR3QjJ3aklNTXFHZGZuMTRYVU01d3V0cGRJVXdw?=
- =?utf-8?B?SHRoSUdsZ3BLK3FoS1dIUThUZ01lVDFiWHovTWYxdFBlQ0FqVDJLeERBRjFn?=
- =?utf-8?B?TXltYzJFeWtHR1JhamlkcGxiL29ZbHVMbVJUNXVWM0tNcWRhYVBQc2pYZTJV?=
- =?utf-8?B?ckt4SklNdGIzRlAybEYrbU5NK0l0eUxxRk5UWVptN2NEK1VLMkVmMGFGRGRx?=
- =?utf-8?B?Z0s5UUNjK3BuTk00K29qOWg0Z3A2UTB5aXE1UHJ3STI0Qm9SWWhDZ25yZm8x?=
- =?utf-8?B?Qitaa0RVZUlOQlhGMDh3QzJZeEtZNHZpRzNERnJUUXBlRkpYbjZRYnlZWUUw?=
- =?utf-8?Q?6YYw=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1cdc5b48-16c2-48c3-4deb-08dbbb85d172
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 16:06:02.3306
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rhxTEPbPFtoqHfZsQDyJGcqENv+YOPDnFuNLqXtYUpIUCqafJ70hFa7n/W3eYUGM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4507
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -136,140 +60,135 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 9/14/2023 2:21 AM, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
->
-> For function comments in this file, keep the comment style consistent
-> with other files in the directory.
->
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Reviewed-by: Yanan Wang <wangyanan55@huawei.com>
-> Reviewed-by: Xiaoyao Li <xiaoyao.li@Intel.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+--=-N1WcUYenVmpmQAWgpJyV
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Babu Moger <babu.moger@amd.com>
+On Fri, 2023-09-22 at 15:00 +0000, Paul Durrant wrote:
+> From: Paul Durrant <pdurrant@amazon.com>
+>=20
+> If the guest does not explicitly set the GPA of vcpu_info structure in
+> memory then, for guests with 32 vCPUs or fewer, the vcpu_info embedded
+> in the shared_info page may be used. As described in a previous commit,
+> the shared_info page is an overlay at a fixed HVA within the VMM, so in
+> this case it also more optimal to activate the vcpu_info cache with a
+> fixed HVA to avoid unnecessary invalidation if the guest memory layout
+> is modified.
+>=20
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 
-Thanks
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-Babu
+--=-N1WcUYenVmpmQAWgpJyV
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTIyMTYxMDMyWjAvBgkqhkiG9w0BCQQxIgQgRsrVUycT
+fHGpOPshNsgmqN/8sScSoR7mLu5kN1nj6LUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCDTYP2H750ZXAWQXvuRN5tNDWKB2S9eKMz
+kIDeckKmSEZ2EoibeWF6JqCNFuR8PS3EwcnmNKEkjMHv5oZfFVBc0R7X7muHAdFFMt1kRuFIwWPR
+FvPnlq7qU7wz70/OBtIlHMELKr/ey2ajSium4g/IU1EyEYiURJDVoK5+yjG6YHXkbjMeEbVifIiH
+dyawQ286h0m7aLmnHjWoTUBm4WC1e26FckydoDlSr0+X1SNMf2nY/eIBGad2dCVDKfW899mkvWKy
+7e0CSHLDnG4C1YUzqkYkAgNbR9x/gj2BKLyg+bJfoqdjbIgVlp5th2AY6Ltd86c+xTCVJbWhoo+l
+KnSlYg9u/ARp+gxmlSZRyaDaQG/ezz9VOZPjubhorycRpBL7x/laqqJcpI7dB9nadoQXLdaGSp5s
+FWudgpQeT+mW85fPoqOAzH/98leZAdQuRsCsub5dyAguOZAZUavUzbIh6QD8QngJLM8+4yMz7bgp
+78gHiLrMLBxMTSYzRm0YILBUhMtZNSRHc9Tu04kacZTE5AYOS/SybqurOw1uTQxcZLxXRxEL1iwT
+kQS3ZlLBM5ZQZIfc5A4eZI98bl+ch34TYzNkKV2GNfGsBfdx4T9FcLHECRK9PwryJS5a582KAzqX
+8/Kazfikx20Z3M462n2tmsE/JswChY0LqTlIVrbrPwAAAAAAAA==
 
 
-> ---
-> Changes since v3:
->   * Optimized the description in commit message: Change "with other
->     places" to "with other files in the directory". (Babu)
-> ---
->   include/hw/i386/topology.h | 33 +++++++++++++++++----------------
->   1 file changed, 17 insertions(+), 16 deletions(-)
->
-> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-> index 81573f6cfde0..5a19679f618b 100644
-> --- a/include/hw/i386/topology.h
-> +++ b/include/hw/i386/topology.h
-> @@ -24,7 +24,8 @@
->   #ifndef HW_I386_TOPOLOGY_H
->   #define HW_I386_TOPOLOGY_H
->   
-> -/* This file implements the APIC-ID-based CPU topology enumeration logic,
-> +/*
-> + * This file implements the APIC-ID-based CPU topology enumeration logic,
->    * documented at the following document:
->    *   Intel® 64 Architecture Processor Topology Enumeration
->    *   http://software.intel.com/en-us/articles/intel-64-architecture-processor-topology-enumeration/
-> @@ -41,7 +42,8 @@
->   
->   #include "qemu/bitops.h"
->   
-> -/* APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
-> +/*
-> + * APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
->    */
->   typedef uint32_t apic_id_t;
->   
-> @@ -58,8 +60,7 @@ typedef struct X86CPUTopoInfo {
->       unsigned threads_per_core;
->   } X86CPUTopoInfo;
->   
-> -/* Return the bit width needed for 'count' IDs
-> - */
-> +/* Return the bit width needed for 'count' IDs */
->   static unsigned apicid_bitwidth_for_count(unsigned count)
->   {
->       g_assert(count >= 1);
-> @@ -67,15 +68,13 @@ static unsigned apicid_bitwidth_for_count(unsigned count)
->       return count ? 32 - clz32(count) : 0;
->   }
->   
-> -/* Bit width of the SMT_ID (thread ID) field on the APIC ID
-> - */
-> +/* Bit width of the SMT_ID (thread ID) field on the APIC ID */
->   static inline unsigned apicid_smt_width(X86CPUTopoInfo *topo_info)
->   {
->       return apicid_bitwidth_for_count(topo_info->threads_per_core);
->   }
->   
-> -/* Bit width of the Core_ID field
-> - */
-> +/* Bit width of the Core_ID field */
->   static inline unsigned apicid_core_width(X86CPUTopoInfo *topo_info)
->   {
->       return apicid_bitwidth_for_count(topo_info->cores_per_die);
-> @@ -87,8 +86,7 @@ static inline unsigned apicid_die_width(X86CPUTopoInfo *topo_info)
->       return apicid_bitwidth_for_count(topo_info->dies_per_pkg);
->   }
->   
-> -/* Bit offset of the Core_ID field
-> - */
-> +/* Bit offset of the Core_ID field */
->   static inline unsigned apicid_core_offset(X86CPUTopoInfo *topo_info)
->   {
->       return apicid_smt_width(topo_info);
-> @@ -100,14 +98,14 @@ static inline unsigned apicid_die_offset(X86CPUTopoInfo *topo_info)
->       return apicid_core_offset(topo_info) + apicid_core_width(topo_info);
->   }
->   
-> -/* Bit offset of the Pkg_ID (socket ID) field
-> - */
-> +/* Bit offset of the Pkg_ID (socket ID) field */
->   static inline unsigned apicid_pkg_offset(X86CPUTopoInfo *topo_info)
->   {
->       return apicid_die_offset(topo_info) + apicid_die_width(topo_info);
->   }
->   
-> -/* Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
-> +/*
-> + * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
->    *
->    * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
->    */
-> @@ -120,7 +118,8 @@ static inline apic_id_t x86_apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
->              topo_ids->smt_id;
->   }
->   
-> -/* Calculate thread/core/package IDs for a specific topology,
-> +/*
-> + * Calculate thread/core/package IDs for a specific topology,
->    * based on (contiguous) CPU index
->    */
->   static inline void x86_topo_ids_from_idx(X86CPUTopoInfo *topo_info,
-> @@ -137,7 +136,8 @@ static inline void x86_topo_ids_from_idx(X86CPUTopoInfo *topo_info,
->       topo_ids->smt_id = cpu_index % nr_threads;
->   }
->   
-> -/* Calculate thread/core/package IDs for a specific topology,
-> +/*
-> + * Calculate thread/core/package IDs for a specific topology,
->    * based on APIC ID
->    */
->   static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
-> @@ -155,7 +155,8 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
->       topo_ids->pkg_id = apicid >> apicid_pkg_offset(topo_info);
->   }
->   
-> -/* Make APIC ID for the CPU 'cpu_index'
-> +/*
-> + * Make APIC ID for the CPU 'cpu_index'
->    *
->    * 'cpu_index' is a sequential, contiguous ID for the CPU.
->    */
+--=-N1WcUYenVmpmQAWgpJyV--
