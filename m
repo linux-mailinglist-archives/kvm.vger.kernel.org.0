@@ -2,121 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8588A7AB50C
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 17:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B15187AB51D
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 17:49:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231330AbjIVPq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 11:46:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
+        id S230212AbjIVPuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 11:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbjIVPqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 11:46:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D2B100
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 08:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695397531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=24e0MTM9Ea72ehbm0l01A6havDY/UYoKOi3aCHWehJU=;
-        b=U6iHQhI+IDaEi9b1+pt0MJB7ud3ncpZR7k+rFyBdjYH/UPHJWS33pcOUkwIrzFgnbmNq5i
-        uvm6RssvAIY+Yxi4x9omA0WiigCnAzKP68pPlPsiFn63r1falI41dF8ZlDtanMEeIy1B+G
-        sezDDBQx61I7XzFK9WoeULrF2DE3Pi4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-6-y38dCESBOdKa1TKCfw9PRg-1; Fri, 22 Sep 2023 11:45:28 -0400
-X-MC-Unique: y38dCESBOdKa1TKCfw9PRg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3172a94b274so1435832f8f.0
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 08:45:28 -0700 (PDT)
+        with ESMTP id S232735AbjIVPuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 11:50:00 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB59199;
+        Fri, 22 Sep 2023 08:49:52 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-404314388ceso26035905e9.2;
+        Fri, 22 Sep 2023 08:49:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695397791; x=1696002591; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1pk390ChrTCsthcK4uf4cQzmUvgXyIclFIFBle0EOe4=;
+        b=TApFWPOz7fabs3bGMCfGU0A8oMvWDM+ofSqSUcOPdTYhdG/rtTm5dDaxY2GFr7yTNH
+         3VwvRS35hqSZjLHCzocjmYMllZsfTJZ02ts/DbuCfKoGrHzeW7jEGfMWFw/I45UnS96d
+         oVlmXdy+czyAQ8StdMXvXE0w7moTLjFl7W0NYHiB4n0gmzmHXtBAvtJo9aJXmzBNdXJa
+         cSLImh4iPRHANmrUne9ltq79yiqHWOTfsqFi6U9jKt8TRCynrGyVbp9Q8xrTFFdwpY6j
+         DLMXfhQmTLIV5fnBa5EVQyMD3KA/EmAMmLmR+MyNBZtG8HHyj7UQ9egEUij69m5P5AK0
+         QqwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695397527; x=1696002327;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1695397791; x=1696002591;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=24e0MTM9Ea72ehbm0l01A6havDY/UYoKOi3aCHWehJU=;
-        b=ovEq9KCEHk4PCQE4xCIu4C6pKWxXvNQ6M9VWtRr2GCaGhC/BpRTbcsNyzrW9pcvP/t
-         uSZhGi78+s5w6ZHyPLrGO2VTgNZbNaSV5OVChG6Iy4+/hURa5KRVmEx4XpzB5qYp8z0U
-         QScHpJfkq62SN83agB9w1TcxU8bayoAW8maGreQ3m4ACmGpNdu8qNBgcTwL5QPMe09cF
-         WgY2nyYxtu59/vNFzcx7sRfOh/12tw215MAOaoVP5f5+CtHDcY6T6Ni0r98ybNf2JT6C
-         dZMPNL+xeBjq/8mkio/xvCG8JRk2U590CERFNHtxZcSQcJrWmRM8DwwxGzyOG+58tieV
-         2/GQ==
-X-Gm-Message-State: AOJu0YyXWNHCspdDyMXBQVV+gRnfi11rz2zdCwkfWAZoNMVlnHlHul4c
-        McbXR/Q1ABCT70IhRwfPoPM29kTPyLe3pycjEPIqbFccTp3BNBDfPpEqGs1GJ1IFW06bek1ZZab
-        UZPmxLxX+j6K2
-X-Received: by 2002:a5d:404d:0:b0:31f:e534:2d6f with SMTP id w13-20020a5d404d000000b0031fe5342d6fmr58815wrp.11.1695397527121;
-        Fri, 22 Sep 2023 08:45:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHeBusEZRXoLGIDhzmsM8uH+6ZQqUREFrCewPrkgBuuX5Vrg5rtomLqzp/AHoeDKj4EWQLrgA==
-X-Received: by 2002:a5d:404d:0:b0:31f:e534:2d6f with SMTP id w13-20020a5d404d000000b0031fe5342d6fmr58789wrp.11.1695397526760;
-        Fri, 22 Sep 2023 08:45:26 -0700 (PDT)
-Received: from redhat.com ([2.52.150.187])
-        by smtp.gmail.com with ESMTPSA id bl19-20020a170906c25300b0099bc8db97bcsm2854718ejb.131.2023.09.22.08.45.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 08:45:25 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 11:45:21 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, jasowang@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230922114122-mutt-send-email-mst@kernel.org>
-References: <20230921131035-mutt-send-email-mst@kernel.org>
- <20230921174450.GT13733@nvidia.com>
- <20230921135426-mutt-send-email-mst@kernel.org>
- <20230921181637.GU13733@nvidia.com>
- <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <20230921155834-mutt-send-email-mst@kernel.org>
- <20230921224836.GD13733@nvidia.com>
- <20230922011918-mutt-send-email-mst@kernel.org>
- <20230922122328.GO13733@nvidia.com>
+        bh=1pk390ChrTCsthcK4uf4cQzmUvgXyIclFIFBle0EOe4=;
+        b=cjo6K24oY/VwK5HlrK+GjQfskx7U4pkICV2CjIsR/0w18EUqDd3rhqUwZ5bp6evetN
+         MEwyE/X7V6y5i7S+bqnKlfYqmK/HwozdqMIgOCw81yiESjM0pr2I7/ylU/JmYvv+K689
+         OTc1yIwbSCTrGOuAwn7FfLGHt9thazyO6+NENhNeK7qemuVjOPViN0BVEh3TTPocLMTg
+         V/dkVxbieGIlZi3LCgDUtbYPlvsOU3lK1P/XzewDVR0pMhMZAheBMr2QFCzIsIw2IR5y
+         qAav4oK0c5NQ+LELMUG13vuUjrAeDil59koI8blCZ5mOzaQ+sMqOPc4C8is35MFJkV71
+         u+Jg==
+X-Gm-Message-State: AOJu0YzXVHPduXmb9KYgk/l8wHYzosfl+fL/kZE9M5JFmBtFX4I6qgtd
+        +gcH2gCda8ipx0TYrarIp9k=
+X-Google-Smtp-Source: AGHT+IEuwq14+VyVLlOeMo0Q6AHsIoBfhMnHDINTyA9JEZwsgFtgEYSJPl/HnNPHn9wFfubJI/toBw==
+X-Received: by 2002:a05:6000:118a:b0:31f:eed7:2fd9 with SMTP id g10-20020a056000118a00b0031feed72fd9mr43577wrx.57.1695397790991;
+        Fri, 22 Sep 2023 08:49:50 -0700 (PDT)
+Received: from [192.168.4.149] (54-240-197-226.amazon.com. [54.240.197.226])
+        by smtp.gmail.com with ESMTPSA id p2-20020a5d68c2000000b0031431fb40fasm4755076wrw.89.2023.09.22.08.49.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Sep 2023 08:49:50 -0700 (PDT)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <34457a97-516f-4122-a9d7-920eb3b3c2e0@xen.org>
+Date:   Fri, 22 Sep 2023 16:49:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922122328.GO13733@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v5 07/10] KVM: xen: allow vcpu_info to be mapped by fixed
+ HVA
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+References: <20230922150009.3319-1-paul@xen.org>
+ <20230922150009.3319-8-paul@xen.org>
+ <8f61e1618f23e975f30e552c09787c5f82ee89f3.camel@infradead.org>
+Organization: Xen Project
+In-Reply-To: <8f61e1618f23e975f30e552c09787c5f82ee89f3.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 09:23:28AM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 22, 2023 at 05:47:23AM -0400, Michael S. Tsirkin wrote:
+On 22/09/2023 16:44, David Woodhouse wrote:
+> On Fri, 2023-09-22 at 15:00 +0000, Paul Durrant wrote:
+>> From: Paul Durrant <pdurrant@amazon.com>
+>>
+>> If the guest does not explicitly set the GPA of vcpu_info structure in
+>> memory then, for guests with 32 vCPUs or fewer, the vcpu_info embedded
+>> in the shared_info page may be used. As described in a previous commit,
+>> the shared_info page is an overlay at a fixed HVA within the VMM, so in
+>> this case it also more optimal to activate the vcpu_info cache with a
+>> fixed HVA to avoid unnecessary invalidation if the guest memory layout
+>> is modified.
+>>
+>> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 > 
-> > it will require maintainance effort when virtio changes are made.  For
-> > example it pokes at the device state - I don't see specific races right
-> > now but in the past we did e.g. reset the device to recover from errors
-> > and we might start doing it again.
-> > 
-> > If more of the logic is under virtio directory where we'll remember
-> > to keep it in loop, and will be able to reuse it from vdpa
-> > down the road, I would be more sympathetic.
+> But it should *only* be defined as an HVA in the case where it's the
+> one in the shinfo. Otherwise, it's defined by its GPA.
 > 
-> This is inevitable, the VFIO live migration driver will need all this
-> infrastructure too.
+> Which almost makes me want to see a sanity check that it precisely
+> equals &shinfo->vcpu_info[vcpu->arch.xen.vcpu_id].
 > 
-> Jason
->  
+> Which brings me back around the circle again to wonder why we don't
+> just *default* to it.... you hate me, don't you?
+> 
+> Your previous set of patches did that, and it did end requiring that
+> the VMM restore both VCPU_INFO and VCPU_ID for each vCPU *before*
+> restoring the SHARED_INFO_HVA on resume, but wasn't that OK?
+> 
 
-I am not sure what you are saying and what is inevitable.
-VDPA for sure will want live migration support.  I am not at all
-sympathetic to efforts that want to duplicate that support for virtio
-under VFIO. Put it in a library under the virtio directory,
-with a sane will documented interface.
-I don't maintain VFIO and Alex can merge what he wants,
-but I won't merge patches that export virtio internals in a way
-that will make virtio maintainance harder.
+No. It was painful and overly complex, with too many corner cases that 
+were making my brain hurt. Given the pain of the last week, leaving the 
+default handling in the VMM is preferable. It means I don't need to
+impose rules about attribute ordering and hence get caught by needing
+one thread to wait for another inside the VMM. It's better and more 
+robust this way.
 
--- 
-MST
+   Paul
 
