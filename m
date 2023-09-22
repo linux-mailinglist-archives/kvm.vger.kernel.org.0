@@ -2,187 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDEA7AA6AF
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 03:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9712F7AA716
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 04:48:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbjIVBvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 21:51:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        id S230253AbjIVCsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 22:48:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjIVBvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 21:51:16 -0400
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D50F1;
-        Thu, 21 Sep 2023 18:51:06 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0Vsa-hC4_1695347462;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vsa-hC4_1695347462)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Sep 2023 09:51:04 +0800
-Message-ID: <1695347358.2770545-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue reset
-Date:   Fri, 22 Sep 2023 09:49:18 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Vadim Pasternak <vadimp@nvidia.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, bpf@vger.kernel.org,
-        kangjie.xu@linux.alibaba.com
-References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
- <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
- <20230921100112-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230921100112-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229497AbjIVCsG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 22:48:06 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11CB19E;
+        Thu, 21 Sep 2023 19:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695350879; x=1726886879;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WjtJKQb906FAD2/Ch7XLbjda8s1yVinX4tQX05erhW4=;
+  b=bNlOXjdRXt783nJXQb+YGuXZeDsxC900HQtzdeHtzEX4iNsXFtu0sZP/
+   vcsu7ps1XcyoQ7E3jl3I/wC+P6V2MkQGT9QeJs10jLimtQL86hzV6h92o
+   /I77QZvSTNnI/r/5tEwMz0LNlyYo49smcxxj8cfg5/PTcL+LvnJex+GBX
+   EwDBSswRkc1bdIninUBmatkELqdSKy+gooc/QRxSpbLcgmP/DXDMxOeiP
+   p7fSQx7yUw7/oyDifynbsS2mXWCPa7beRJFipKtK20npoVtHa7Tp1JfAL
+   RGre0C5ZHQQfhw0rhSHIl4reBnYcjF86I584mOrneSbbHSVqxkeTgPrKo
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="360974368"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="360974368"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 19:47:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="920986298"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="920986298"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by orsmga005.jf.intel.com with ESMTP; 21 Sep 2023 19:47:55 -0700
+Message-ID: <e7c773f6-969c-0097-1bca-24d276e8a8f6@linux.intel.com>
+Date:   Fri, 22 Sep 2023 10:44:45 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 09/12] iommu: Make iommu_queue_iopf() more generic
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        "Liu, Jingqi" <jingqi.liu@intel.com>
+References: <20230914085638.17307-1-baolu.lu@linux.intel.com>
+ <20230914085638.17307-10-baolu.lu@linux.intel.com>
+ <f20b9e78-3a63-ca3e-6c04-1d80ec857898@intel.com>
+ <20230921233402.GC13795@ziepe.ca>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230921233402.GC13795@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Sep 2023 10:02:53 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
-> > Introduce new helpers to implement queue reset and get queue reset
-> > status.
-> >
-> >  https://github.com/oasis-tcs/virtio-spec/issues/124
-> >  https://github.com/oasis-tcs/virtio-spec/issues/139
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> >  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
-> >  include/linux/virtio_pci_modern.h      |  2 ++
-> >  2 files changed, 41 insertions(+)
-> >
-> > diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-> > index fa2a9445bb18..869cb46bef96 100644
-> > --- a/drivers/virtio/virtio_pci_modern_dev.c
-> > +++ b/drivers/virtio/virtio_pci_modern_dev.c
-> > @@ -3,6 +3,7 @@
-> >  #include <linux/virtio_pci_modern.h>
-> >  #include <linux/module.h>
-> >  #include <linux/pci.h>
-> > +#include <linux/delay.h>
-> >
-> >  /*
-> >   * vp_modern_map_capability - map a part of virtio pci capability
-> > @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
-> >  }
-> >  EXPORT_SYMBOL_GPL(vp_modern_set_status);
-> >
-> > +/*
-> > + * vp_modern_get_queue_reset - get the queue reset status
-> > + * @mdev: the modern virtio-pci device
-> > + * @index: queue index
-> > + */
-> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > +{
-> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > +
-> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > +
-> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > +	return vp_ioread16(&cfg->queue_reset);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
-> > +
->
-> Actually, this does not validate that the config structure is big
-> enough. So it can access some unrelated memory. Don't know whether
-> that's exploitable e.g. for CoCo but not nice, anyway.
-> Need to validate the size and disable reset if it's too small.
 
 
-static int vp_modern_disable_vq_and_reset(struct virtqueue *vq)
-{
-	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-	struct virtio_pci_vq_info *info;
-	unsigned long flags;
+On 9/22/23 7:34 AM, Jason Gunthorpe wrote:
+> On Thu, Sep 21, 2023 at 11:25:56PM +0800, Liu, Jingqi wrote:
+>>
+>> On 9/14/2023 4:56 PM, Lu Baolu wrote:
+>>> Make iommu_queue_iopf() more generic by making the iopf_group a minimal
+>>> set of iopf's that an iopf handler of domain should handle and respond
+>>> to. Add domain parameter to struct iopf_group so that the handler can
+>>> retrieve and use it directly.
+>>>
+>>> Change iommu_queue_iopf() to forward groups of iopf's to the domain's
+>>> iopf handler. This is also a necessary step to decouple the sva iopf
+>>> handling code from this interface.
+>>>
+>>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>>> ---
+>>>    include/linux/iommu.h      |  4 ++--
+>>>    drivers/iommu/iommu-sva.h  |  6 ++---
+>>>    drivers/iommu/io-pgfault.c | 49 ++++++++++++++++++++++++++++----------
+>>>    drivers/iommu/iommu-sva.c  |  3 +--
+>>>    4 files changed, 42 insertions(+), 20 deletions(-)
+>>>
+>> ......
+>>
+>>> @@ -112,6 +110,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
+>>>    {
+>>>    	int ret;
+>>>    	struct iopf_group *group;
+>>> +	struct iommu_domain *domain;
+>>>    	struct iopf_fault *iopf, *next;
+>>>    	struct iommu_fault_param *iopf_param;
+>>>    	struct dev_iommu *param = dev->iommu;
+>>> @@ -143,6 +142,19 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
+>>>    		return 0;
+>>>    	}
+>>> +	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
+>>> +		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
+>>> +	else
+>>> +		domain = iommu_get_domain_for_dev(dev);
+>>> +
+>>> +	if (!domain || !domain->iopf_handler) {
+>>
+>> Does it need to check if 'domain' is error ?  Like below:
+>>
+>>           if (!domain || IS_ERR(domain) || !domain->iopf_handler)
+> 
+> Urk, yes, but not like that
+> 
+> The IF needs to be moved into the else block as each individual
+> function has its own return convention.
 
-->	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-		return -ENOENT;
+iommu_get_domain_for_dev_pasid() returns an ERR_PTR only if the matching
+domain type is specified (non-zero).
 
-	vp_modern_set_queue_reset(mdev, vq->index);
+Adding IS_ERR(domain) in the else block will make the code more
+readable. Alternatively we can put a comment around above code to
+explain that ERR_PTR is not a case here.
 
-
-I checked VIRTIO_F_RING_RESET before call this.
-
-Do you mean, we should put the check to this function.
-
-
-Thanks.
-
-
-
->
->
-> > +/*
-> > + * vp_modern_set_queue_reset - reset the queue
-> > + * @mdev: the modern virtio-pci device
-> > + * @index: queue index
-> > + */
-> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > +{
-> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > +
-> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > +
-> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > +	vp_iowrite16(1, &cfg->queue_reset);
-> > +
-> > +	while (vp_ioread16(&cfg->queue_reset))
-> > +		msleep(1);
-> > +
-> > +	while (vp_ioread16(&cfg->cfg.queue_enable))
-> > +		msleep(1);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > +
-> >  /*
-> >   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
-> >   * @mdev: the modern virtio-pci device
-> > diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> > index 05123b9a606f..c4eeb79b0139 100644
-> > --- a/include/linux/virtio_pci_modern.h
-> > +++ b/include/linux/virtio_pci_modern.h
-> > @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
-> >  				       u16 index, resource_size_t *pa);
-> >  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
-> >  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
-> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> >  #endif
-> > --
-> > 2.31.0
->
+Best regards,
+baolu
