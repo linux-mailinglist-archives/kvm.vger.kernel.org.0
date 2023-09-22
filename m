@@ -2,71 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A59017AA5DD
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 02:00:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75F9D7AA601
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 02:22:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjIVAA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 20:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33256 "EHLO
+        id S229542AbjIVAWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 20:22:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjIVAAz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 20:00:55 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298B1F9;
-        Thu, 21 Sep 2023 17:00:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1695340847;
-        bh=R/VgVhr9X0HDtbhByU19PzH3x9CzJFuyVh93BLbm8XY=;
-        h=From:To:Subject:In-Reply-To:References:Date:From;
-        b=EUj1hKtv69g+9+nHaOHHtRLCs4SHBdba41Ptbk8nE0yB2aVWS47UCVmbCiEPRl3OS
-         OOOmwbvjXOGRW4+l+Fl5Db4/dr1OmHm7MrwulVHxJbKTdyEHQ3NTGcdOMdEgeyjp8x
-         Bnhvsybnbj7XLRupXWsVSvlbZl5l0MkRPAmNgCHLopPgDW88Klsc03QWfixcsMp1ds
-         +aTlrZPTdD+D3j3dxUqa8Amstg4Jm6Ls7tDlHjwAmIJRs0+hlsAiHuqOW6oF7u3daV
-         6pJaAyNaWqCjBOraN+K5IIYx7vpYRHJKUfWFE2ALkjnpNdro2udTrbfcUvW8kYfIQr
-         Wz7OBF1jOw3AQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RsC8Y0yCxz4x2b;
-        Fri, 22 Sep 2023 10:00:45 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>, x86@kernel.org,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c unless VFIO
- is selected
-In-Reply-To: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
-References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
-Date:   Fri, 22 Sep 2023 10:00:44 +1000
-Message-ID: <87leczm5zn.fsf@mail.lhotse>
+        with ESMTP id S229458AbjIVAWb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 20:22:31 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6ACB102
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 17:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695342145; x=1726878145;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FogeaomQX2VVcu9AEHsQgloDflBQsHSa+RD1u+C6qTc=;
+  b=ePzk56AdudhIEnDVndwhszQzVw1RCHzweQxS+EB0OZm9opXSiftHM/o7
+   1dEqgEYYIuChLzRmSef8YkKTz613Ali8PSZ6TN+tsI0QMVy2BqH57GSNN
+   Y56/Oio6ekbwrs4SDu1zQOxx9fwyFMUfO+yPI3zVWrSA3973733bjIqls
+   0qMi3KTqbSe69qYHin57TLyK6iCwshsOuBkyipptfT592/1X/EorzQhDg
+   34edoqqW6d7f7wppCvQt1vwxG4+X/M2dggMIv27jBwl8HM74ZauG3sIIZ
+   u8JE5IS7EfUaJMqdU8TgpcgCF+Iu2og2VgDnP/W2sa1MLsQkOZCdfabrl
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="360088254"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="360088254"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 17:22:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="747341164"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="747341164"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.11.250]) ([10.93.11.250])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 17:22:20 -0700
+Message-ID: <6eeb5568-2faa-85c3-8f42-ed6317ea376c@intel.com>
+Date:   Fri, 22 Sep 2023 08:22:17 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.15.1
+Subject: Re: [RFC PATCH v2 02/21] RAMBlock: Add support of KVM private gmem
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        Sean Christopherson <seanjc@google.com>,
+        Claudio Fontana <cfontana@suse.de>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+ <20230914035117.3285885-3-xiaoyao.li@intel.com>
+ <678bf0bf-57e7-a596-1ddf-6d0b47cd8677@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <678bf0bf-57e7-a596-1ddf-6d0b47cd8677@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,126 +79,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jason Gunthorpe <jgg@nvidia.com> writes:
-> There are a bunch of reported randconfig failures now because of this,
-> something like:
->
->>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
->            fn = symbol_get(vfio_file_iommu_group);
->                 ^
->    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
->    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
->
-> It happens because the arch forces KVM_VFIO without knowing if VFIO is
-> even enabled.
->
-> Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
-> then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
->
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com/
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com/
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  arch/arm64/kvm/Kconfig   | 2 +-
->  arch/powerpc/kvm/Kconfig | 2 +-
->  arch/s390/kvm/Kconfig    | 2 +-
->  arch/x86/kvm/Kconfig     | 2 +-
->  virt/kvm/Kconfig         | 7 ++++++-
->  5 files changed, 10 insertions(+), 5 deletions(-)
->
-> Sean's large series will also address this:
->
-> https://lore.kernel.org/kvm/20230916003118.2540661-7-seanjc@google.com/
->
-> I don't know if it is sever enough to fix in the rc cycle, but here is the
-> patch.
+On 9/21/2023 4:55 PM, David Hildenbrand wrote:
+> On 14.09.23 05:50, Xiaoyao Li wrote:
+>> From: Chao Peng <chao.p.peng@linux.intel.com>
+>>
+>> Add KVM gmem support to RAMBlock so both normal hva based memory
+>> and kvm gmem fd based private memory can be associated in one RAMBlock.
+>>
+>> Introduce new flag RAM_KVM_GMEM. It calls KVM ioctl to create private
+>> gmem for the RAMBlock when it's set.
+> 
+> 
+> But who sets RAM_KVM_GMEM and when? 
 
-Thanks for debugging this, I had seen it but hadn't got around to it.
+The answer is in the next patch. When `private` property of memory 
+backend is set to true, it will pass RAM_KVM_GMEM flag to 
+memory_region_init_ram_*()
 
-I think it's definitely worth fixing now. It's a pretty simple patch and
-it's still early in the rc cycle.
+> Don't we simply allocate it for all 
+> RAMBlocks under such special VMs? 
 
-Tested-by: Michael Ellerman <mpe@ellerman.id.au>
+yes, this is the direction after your comments.
 
-cheers
+I'll try to figure out how to achieve it.
 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 83c1e09be42e5b..7c43eaea51ce05 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -28,7 +28,7 @@ menuconfig KVM
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->  	select KVM_XFER_TO_GUEST_WORK
-> -	select KVM_VFIO
-> +	select HAVE_KVM_ARCH_VFIO
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_IRQFD
->  	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-> index 902611954200df..b64824e4cbc1eb 100644
-> --- a/arch/powerpc/kvm/Kconfig
-> +++ b/arch/powerpc/kvm/Kconfig
-> @@ -22,7 +22,7 @@ config KVM
->  	select PREEMPT_NOTIFIERS
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_VCPU_ASYNC_IOCTL
-> -	select KVM_VFIO
-> +	select HAVE_KVM_ARCH_VFIO
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select INTERVAL_TREE
-> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-> index 45fdf2a9b2e326..d206ad3a777d5d 100644
-> --- a/arch/s390/kvm/Kconfig
-> +++ b/arch/s390/kvm/Kconfig
-> @@ -31,7 +31,7 @@ config KVM
->  	select HAVE_KVM_IRQ_ROUTING
->  	select HAVE_KVM_INVALID_WAKEUPS
->  	select HAVE_KVM_NO_POLL
-> -	select KVM_VFIO
-> +	select HAVE_KVM_ARCH_VFIO
->  	select INTERVAL_TREE
->  	select MMU_NOTIFIER
->  	help
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index ed90f148140dfe..8e70e693f90e30 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -45,7 +45,7 @@ config KVM
->  	select HAVE_KVM_NO_POLL
->  	select KVM_XFER_TO_GUEST_WORK
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> -	select KVM_VFIO
-> +	select HAVE_KVM_ARCH_VFIO
->  	select INTERVAL_TREE
->  	select HAVE_KVM_PM_NOTIFIER if PM
->  	select KVM_GENERIC_HARDWARE_ENABLING
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 484d0873061ca5..0bf34809e1bbfe 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -59,9 +59,14 @@ config HAVE_KVM_MSI
->  config HAVE_KVM_CPU_RELAX_INTERCEPT
->         bool
->  
-> -config KVM_VFIO
-> +config HAVE_KVM_ARCH_VFIO
->         bool
->  
-> +config KVM_VFIO
-> +       def_bool y
-> +       depends on HAVE_KVM_ARCH_VFIO
-> +       depends on VFIO
-> +
->  config HAVE_KVM_INVALID_WAKEUPS
->         bool
->  
->
-> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-> -- 
-> 2.42.0
+> What's the downside of doing that?
+
+As far as I see, for TDX, no downside.
+
