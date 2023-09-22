@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62F7F7ABBF2
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 00:44:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 622B37ABC0E
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 01:00:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbjIVWos (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 18:44:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36096 "EHLO
+        id S230203AbjIVXAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 19:00:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230082AbjIVWoq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 18:44:46 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC8D1A6
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 15:44:40 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c43cd8b6cbso27041605ad.0
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 15:44:40 -0700 (PDT)
+        with ESMTP id S230142AbjIVXAb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 19:00:31 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15D019A
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 16:00:25 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59e8ebc0376so44093457b3.2
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 16:00:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695422680; x=1696027480; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695423625; x=1696028425; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYbmeLhvjO0E562QDesBCa77gZtCW37F3RApV88htL4=;
-        b=ddpo8XIiIDJx2V8rDkXl/ZAQ8HtNPR7tHW9wp3rNBZ98l8VUNNhq9hLf4nLyjX8Tn2
-         8dZTAepgVK+HPPH+V/2lbmdJ79uVmFogVdpxG86laGLWYp9Zx517lKlKtn9FyjOvr4Sk
-         yW+BOlBmPcA0VZON+CjaC+kf2qpethVZxEPAis3SQ+BYtrXFVTsZW+fFDL3e7+2R+hxG
-         861RRPsieORPytnHCgCVAUp37aCdXWvyO1SVnCG09QT+L20ai+k7Kp7MJ323ElOmwyan
-         fyaOIwHvB5uhEskGJt93If40C5ubL7CGOOr1fqVufKmO2ohIdu138gAQ7hKKjPO2kPdN
-         aq8A==
+        bh=GE2XXcB9Z66Z/+jmtr3Nreygo5a18psEdddNC3jXP6Y=;
+        b=xPMxAbEcBMGfshrovAJk3fnjGGGtpnCdd29BDX1YBo/dUj4xgQIanjgWB0cPILaQMU
+         thTAhP3UWk2L+ndkbkxXXzwy1By4H6QaqDw19xK5ze6UgEk2uu5lZ9udl2Q0iD4DTY1x
+         jV8bYHIUR3gkFelVhRtv7dZFsj3be8bf++/kozwTKFNWvKaLtehlCUkshOhnkzHnxKDx
+         Kym6S+o+DFEwH5nGZ9xehdXT2+anAzjXJgm46qTtKm9ITCLUdzuE0nsmsXWarRQzq2Bd
+         oIPMaNjfqt2D2tgl9ilRG1R0T5ttBSSOg5Hbbu+VG6yV9FSK9m8HOPybKumXYIWkQNly
+         IoVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695422680; x=1696027480;
+        d=1e100.net; s=20230601; t=1695423625; x=1696028425;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYbmeLhvjO0E562QDesBCa77gZtCW37F3RApV88htL4=;
-        b=qr0l4saX7h1HOPjpzKyd71srTNBFJYkS0D/umMzPnoGOd8ZiMaQff76FT57jZ8QWmW
-         7Ae3oos3pp2lxMpI82J4nGM8g9bDEmPiy8KYQUnSj7eURDTJUV3i5uy5M5UtDtysHfpi
-         rvyyrV1IDz1X6WjckxCfDNrr2+KvR9ImMofDQadxYiALP+Zeq9ZKXLa6xYLsh1Itxezb
-         ht+V1WVfbrag791rDNzvWunU60f8JNl3PQPp79/YeGI74yosG0nNhs8Nv7/6DXzDN1Pq
-         lr/Nwk7qvgvYRzyAm1/nK5yYFxiY9H4IMtVsJ0Xly5p5hZJ/7fj6OfJzsvMPUb3oqy03
-         lryQ==
-X-Gm-Message-State: AOJu0YzwEit90pcSotbO1ZhcFhOALm2YMo2omNIK2Ttqlx64IsNj+CpK
-        bYsHEBvbr0yF4DT7lza682/YE8HxpIM=
-X-Google-Smtp-Source: AGHT+IEg3hi56dVcZv7snZdQYFvKZU1d5RdKevfc97ZMHOOXPop2V0S6Kldc7lnC8b/HKvrT/b7UVQ1TdK8=
+        bh=GE2XXcB9Z66Z/+jmtr3Nreygo5a18psEdddNC3jXP6Y=;
+        b=GBMAgJfMk7WPkwJzN7islLSn1vVYdabxWrWFvMDiIB2MRze1orfhdox20tpcDicrTk
+         hxQ1cu/XIcekoHgsTir7vB+ja1td/ENy/eHM4SD6KcMrknd2Bcgd/Eb7PW0h7scSKLoC
+         Kfv4fHt4eicPxFqaU2EOSvBwJ0iBcEAH+8JKeUZGz21a8KFgRvi2L9okcy2nJaIKt4hH
+         AGrM4SUY+YnbpuR4KsBQ0tbJKt6AVOwJKvl+MP3i08GKzzeaCAahX90fGwl77ZJWnmCu
+         Mtr8njqosWNFms4DETL62aW3Pds0+zLNIeqNsWc7X3k1yRfm0lzLxADunhfPP8dOXXUu
+         pv1Q==
+X-Gm-Message-State: AOJu0Yy0d+EpHJP1/A2Jo6+kjilM1CVOwTJpX2tMVSLe1Ar3bpqs9cgq
+        V837lyDfomAKJmYqnwFDz0xNfczd6hY=
+X-Google-Smtp-Source: AGHT+IG2ZVlmsIIglpXuyb4CgEnWQeWJGH+b3kmXiZVTDWBfzw2cJO69TjNv1VyjQiXXkd3aiJHhtKFhM4U=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ecc8:b0:1bc:5182:1de2 with SMTP id
- a8-20020a170902ecc800b001bc51821de2mr9549plh.1.1695422680052; Fri, 22 Sep
- 2023 15:44:40 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 15:44:38 -0700
-In-Reply-To: <ZQ4A4KaSyygKHDUI@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:b285:0:b0:59b:d33b:5de0 with SMTP id
+ q127-20020a81b285000000b0059bd33b5de0mr15233ywh.1.1695423624871; Fri, 22 Sep
+ 2023 16:00:24 -0700 (PDT)
+Date:   Fri, 22 Sep 2023 16:00:23 -0700
+In-Reply-To: <CAL715WLuqxN5JvcrZ7vcFpmTwuAi_EqKERtvj9BLoT9QVM0Ekw@mail.gmail.com>
 Mime-Version: 1.0
 References: <20230901185646.2823254-1-jmattson@google.com> <ZQ3hD+zBCkZxZclS@google.com>
  <CALMp9eRQKUy7+AXWepsuJ=KguVMTTcgimeEjd3zMnEP-3LEDKg@mail.gmail.com>
  <ZQ3pQfu6Zw3MMvKx@google.com> <CAL715WKguAT_K_eUTxk8XEQ5rQ=e5WhEFdwOx8VpkpTHJWgRFw@mail.gmail.com>
  <ZQ36bxFOZM0s5+uk@google.com> <CAL715WL8KN1fceDhKxCfeGjbctx=vz2pAbw607pFYP6bw9N0_w@mail.gmail.com>
- <ZQ4A4KaSyygKHDUI@google.com>
-Message-ID: <ZQ4Y1u40/Qml6IaE@google.com>
+ <ZQ4BvCsFjLmnSxhd@google.com> <CAL715WLuqxN5JvcrZ7vcFpmTwuAi_EqKERtvj9BLoT9QVM0Ekw@mail.gmail.com>
+Message-ID: <ZQ4ch3GqM7WH34qv@google.com>
 Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
 From:   Sean Christopherson <seanjc@google.com>
 To:     Mingwei Zhang <mizhang@google.com>
@@ -64,9 +64,9 @@ Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Dapeng1 Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,71 +74,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Sep 22, 2023, Mingwei Zhang wrote:
-> On Fri, Sep 22, 2023, Mingwei Zhang wrote:
-> My initial testing on both QEMU and our GCP testing environment shows no
-> "Uhhuh..." dmesg in guest.
-> 
-> Please take a look...
+> So yes, they could be put together and they could be put separately.
+> But I don't see why they _cannot_ be together or cause confusion.
 
-And now I'm extra confused, I thought the plan was for me to post a proper series
-for the emulated_counter idea[*], get the code base healthy/functional, and then
-build on top, e.g. improve performance and whatnot.
+Because they don't need to be put together.  Roman's patch kinda sorta overlaps
+with the prev_counter mess, but Jim's fixes are entirely orthogonal.
 
-The below is just a stripped down version of that, and doesn't look quite right.
-Specifically, pmc_write_counter() needs to purge emulated_count (my pseudo-patch
-subtly handled that by pausing the counter).
+If one person initially posted such a series with everything together I probably
+wouldn't care *too* much, but combining patches and/or series that aren't tightly
+coupled or dependent in some way usually does more harm than good.  E.g. if a
+maintainer has complaints against only one or two patches in series of unrelated
+patches, then grabbing the "good" patches is unnecessarily difficult.  It's not
+truly hard on the maintainer's end, but little bits of avoidable friction in the
+process adds up across hundreds and thousands of patches.
 
-I totally realize I'm moving sloooow, but I pinky swear I'm getting there.  My
-compile-tested-only branch can be found at
+FWIW, my plan is to apply Roman's patch pretty much as-is, grab v2 from Jim, and
+post my cleanups as a separate series on top (maybe two series, really haven't
+thought about it yet).  The only reason I have them all in a single branch is
+because there are code conflicts and I know I will apply the patches from Roman
+and Jim first, i.e. I didn't want to develop on a base that I knew would become
+stale.
 
-  https://github.com/sean-jc/linux x86/pmu_refactor
+> So, I would like to put them together in the same context with a cover letter
+> fully describing the details.
 
-There's a lot more in there, e.g. it has fixes from Roman and Jim, along with
-some other found-by-inspection cleanups.
-
-I dropped the "pause on WRMSR" proposal.  I still don't love the offset approach,
-but I agree that pausing and reprogramming counters on writes could introduce an
-entirely new set of problems.
-
-I'm logging off for the weekend, but I'll pick this back up next (it's at the
-top of my priority list, assuming guest_memfd doesn't somehow catch fire.
-
-[*] https://lore.kernel.org/all/ZJ9IaskpbIK9q4rt@google.com
-
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index edb89b51b383..47acf3a2b077 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -240,12 +240,13 @@ static void pmc_pause_counter(struct kvm_pmc *pmc)
->  {
->  	u64 counter = pmc->counter;
-> 
-> -	if (!pmc->perf_event || pmc->is_paused)
-> -		return;
-> -
->  	/* update counter, reset event value to avoid redundant accumulation */
-> -	counter += perf_event_pause(pmc->perf_event, true);
-> -	pmc->counter = counter & pmc_bitmask(pmc);
-> +	if (pmc->perf_event && !pmc->is_paused)
-> +		counter += perf_event_pause(pmc->perf_event, true);
-> +
-> +	pmc->prev_counter = counter & pmc_bitmask(pmc);
-
-Honest question, is it actually correct/necessary to mask the counter at the
-intermediate steps?  Conceptually, the hardware count and the emulated count are
-the same thing, just tracked separately.
-
-> +	pmc->counter = (counter + pmc->emulated_counter) & pmc_bitmask(pmc);
-> +	pmc->emulated_counter = 0;
->  	pmc->is_paused = true;
->  }
-> 
-> @@ -452,6 +453,7 @@ static void reprogram_counter(struct kvm_pmc *pmc)
->  reprogram_complete:
->  	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
->  	pmc->prev_counter = 0;
-
-I don't see any reason to keep kvm_pmc.prev_counter.  reprogram_counter() is the
-only caller of pmc_pause_counter(), and so is effectively the only writer and the
-only reader.  I.e. prev_counter can just be a local variable in reprogram_counter(),
-no?
+I certainly won't object to a thorough bug report/analysis, but I'd prefer that
+Jim's series be posted separately (though I don't care if it's you or Jim that
+posts it).
