@@ -2,81 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B62FD7AA738
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 05:03:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E2CD7AA739
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 05:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbjIVDDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 23:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42578 "EHLO
+        id S230156AbjIVDD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 23:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjIVDDv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 23:03:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6326194
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 20:02:59 -0700 (PDT)
+        with ESMTP id S229476AbjIVDDy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 23:03:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F304E192
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 20:03:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695351779;
+        s=mimecast20190719; t=1695351784;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=C4/7HVPf6uamIbhGmRjVc4ZotzNyCXQbQd4oze32eow=;
-        b=Ft3ZTzsg6P26MA6HrlDIW01aczWBehfslJqMIKZEtyhqd+6YbnFPAyC+7eK9p5MQyqvm7b
-        R8vjnAzxPSoKvFVMJUXCPnunrfp7E105pP18h3iJ6M3zNjpTCUK5Lj/F4aVNpiTSifMu7l
-        P2fAV400Ud4ziyB0uTLID2uqFBMtAWA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=dW4RnVlw5/tVnpAaLSeim6/pCr4y6tZ4UO2FXXjy4VI=;
+        b=VcvC4/p6W25r3aCvvfkiagAUgtOAEUEGdzpsrosM9KImIxyP6KeXKX5M5+QCe8oi63su2m
+        mpDEQ6um+DrJL3e6vY1cQOWlurItqYeOLf8X0eqzffTzEMRmL3FCL9x3VNPOI+058ft6wF
+        2tR1DN6NxOylq1KDiWBrgoV4B0wChpE=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-151-EjB6KDc3P9iuZ-sOo_QG0w-1; Thu, 21 Sep 2023 23:02:57 -0400
-X-MC-Unique: EjB6KDc3P9iuZ-sOo_QG0w-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2bff8e92054so22788561fa.2
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 20:02:57 -0700 (PDT)
+ us-mta-658-sQgOUXh7PIepLCs06BxKtA-1; Thu, 21 Sep 2023 23:03:03 -0400
+X-MC-Unique: sQgOUXh7PIepLCs06BxKtA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5042bc93273so1644570e87.1
+        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 20:03:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695351776; x=1695956576;
+        d=1e100.net; s=20230601; t=1695351782; x=1695956582;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C4/7HVPf6uamIbhGmRjVc4ZotzNyCXQbQd4oze32eow=;
-        b=jW1yVQXwCQLy0FaDBlR2unqCPh+bJrSeTYFNX8FTdjzHznpoLz1kr/WfkYxONgNq8d
-         qp/q2pj0lPEWSe9D9d7UkMTXT/+aUgF91JZY1lYjIYJZzhB2gTJC0ELjILgGUfOwYwcB
-         quJpc0r6Cmv4uNelIDaiOHYCnhRW2lb+iwU7AqsvNBruYxPI0n0imf6XuDlVsBJjcPRj
-         c0JaO443Vo+39hATG4Sa5+uiVXuhWQRr1y9rLYhWLVdVQGVQMJIXKB+ZMElYzZs1niyD
-         Y7iOfkS+EJzQLo6nOU2AQ9Wph6QjbJqGWC1Zlsg0/WHk/Aj5Lbnz4QkBKRp7n6+Bclj4
-         Mdhw==
-X-Gm-Message-State: AOJu0YxHB8aqrWHsIlhdGx2hcXbIEI9IhTzADU2lF8u5CbpcNmm77XLr
-        Fa0kpSBCKn3dM1+coZPg/6DrzD6vV+dR568Wq9n7y6mMhiILIbLo9akExmBByRmTiyl6q3u/AbO
-        robYGmpPt+yeGmRBgehWHa5B3r3PQ
-X-Received: by 2002:a05:6512:3e17:b0:501:bf37:1fc0 with SMTP id i23-20020a0565123e1700b00501bf371fc0mr7518463lfv.33.1695351775885;
-        Thu, 21 Sep 2023 20:02:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEK0VNN1CQqjxfBqcyZruxzFlh3gm1m468Kkmtaqhcvh89ukdHWFMbXLOQnTSo1SwuQSl9L8ShMnn3mbZgUoL8=
-X-Received: by 2002:a05:6512:3e17:b0:501:bf37:1fc0 with SMTP id
- i23-20020a0565123e1700b00501bf371fc0mr7518442lfv.33.1695351775543; Thu, 21
- Sep 2023 20:02:55 -0700 (PDT)
+        bh=dW4RnVlw5/tVnpAaLSeim6/pCr4y6tZ4UO2FXXjy4VI=;
+        b=N/v1k7NuGw8KvTlKEKnDt+9vsTUoSdzfKoRtWc9bpAPp7maZu1spLlke/JmwlED6PS
+         5Br5Nqh+FERUv6X/qpSmwbpwbL+qNpc3WHugtZG6rXZGyc2UFI14X7y+HZoh2hsr4GzT
+         Rd19SnIwe2G4IzhKepyJpBme3QpuuMdrTx2E78h525CjfZhkoKxfLusRjB+l6n3ivQIk
+         BrHSij3FwKSK8UqaJS0u252uOvJe4u9KhhAKVxACZYPE6ZEDbkeyLDFbmW3LxuC28AT5
+         8TwZvwvduydyIbUFNHO/aD7sEI+mJlR/7IuuFBGgpz/puVOpRH6Jz9Rcr0L0uuR+YF3E
+         /FhA==
+X-Gm-Message-State: AOJu0Yy8hzXMKVPfEkCwmzN9Tg1kL/9eYQmHpQbs+nHU18qbzcs9M9k9
+        O0/XhZkErrZ7VZl6IjOoKTCpfETYg1ee1G0RFqN/oLbV2z55BniMIj1ZNjiPLT08TRXPQqCo77E
+        ii2TzkT6XhFkJGJfX12VwUz90j46c
+X-Received: by 2002:a05:6512:45c:b0:500:a408:dbd with SMTP id y28-20020a056512045c00b00500a4080dbdmr5634787lfk.55.1695351781962;
+        Thu, 21 Sep 2023 20:03:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGCe0kdx/yNUkFl1DpNMRt90Uw3lvxFNhgSGLq2OYqjLwjpt60Uo7KV1kgg6YBPqqu6tDxOYe7G+arq74CtToQ=
+X-Received: by 2002:a05:6512:45c:b0:500:a408:dbd with SMTP id
+ y28-20020a056512045c00b00500a4080dbdmr5634777lfk.55.1695351781806; Thu, 21
+ Sep 2023 20:03:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230921124040.145386-12-yishaih@nvidia.com> <20230921090844-mutt-send-email-mst@kernel.org>
- <20230921141125.GM13733@nvidia.com> <20230921101509-mutt-send-email-mst@kernel.org>
- <20230921164139.GP13733@nvidia.com> <20230921124331-mutt-send-email-mst@kernel.org>
- <20230921183926.GV13733@nvidia.com> <20230921150448-mutt-send-email-mst@kernel.org>
- <20230921194946.GX13733@nvidia.com> <20230921163421-mutt-send-email-mst@kernel.org>
- <20230921225526.GE13733@nvidia.com>
-In-Reply-To: <20230921225526.GE13733@nvidia.com>
+References: <20230921124040.145386-12-yishaih@nvidia.com> <20230921104350.6bb003ff.alex.williamson@redhat.com>
+ <20230921165224.GR13733@nvidia.com> <20230921125348-mutt-send-email-mst@kernel.org>
+ <20230921170709.GS13733@nvidia.com> <20230921131035-mutt-send-email-mst@kernel.org>
+ <20230921174450.GT13733@nvidia.com> <20230921135426-mutt-send-email-mst@kernel.org>
+ <20230921181637.GU13733@nvidia.com> <20230921152802-mutt-send-email-mst@kernel.org>
+ <20230921195345.GZ13733@nvidia.com>
+In-Reply-To: <20230921195345.GZ13733@nvidia.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 22 Sep 2023 11:02:44 +0800
-Message-ID: <CACGkMEtNZ1FdUb_xG5862nve565Oh-=o8ZUjfR_Gr7JPCbJ_Kw@mail.gmail.com>
+Date:   Fri, 22 Sep 2023 11:02:50 +0800
+Message-ID: <CACGkMEt=dxhJP4mUUWh+x-TSxA5JQcvmhJbkLJMWdN8oXV6ojg@mail.gmail.com>
 Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
  virtio devices
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,83 +84,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 6:55=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
+On Fri, Sep 22, 2023 at 3:53=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
 ote:
 >
-> On Thu, Sep 21, 2023 at 04:45:45PM -0400, Michael S. Tsirkin wrote:
-> > On Thu, Sep 21, 2023 at 04:49:46PM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Sep 21, 2023 at 03:13:10PM -0400, Michael S. Tsirkin wrote:
-> > > > On Thu, Sep 21, 2023 at 03:39:26PM -0300, Jason Gunthorpe wrote:
-> > > > > On Thu, Sep 21, 2023 at 12:53:04PM -0400, Michael S. Tsirkin wrot=
-e:
-> > > > > > > vdpa is not vfio, I don't know how you can suggest vdpa is a
-> > > > > > > replacement for a vfio driver. They are completely different
-> > > > > > > things.
-> > > > > > > Each side has its own strengths, and vfio especially is accel=
-erating
-> > > > > > > in its capability in way that vpda is not. eg if an iommufd c=
-onversion
-> > > > > > > had been done by now for vdpa I might be more sympathetic.
-> > > > > >
-> > > > > > Yea, I agree iommufd is a big problem with vdpa right now. Cind=
-y was
-> > > > > > sick and I didn't know and kept assuming she's working on this.=
- I don't
-> > > > > > think it's a huge amount of work though.  I'll take a look.
-> > > > > > Is there anything else though? Do tell.
-> > > > >
-> > > > > Confidential compute will never work with VDPA's approach.
-> > > >
-> > > > I don't see how what this patchset is doing is different
-> > > > wrt to Confidential compute - you trap IO accesses and emulate.
-> > > > Care to elaborate?
-> > >
-> > > This patch series isn't about confidential compute, you asked about
-> > > the future. VFIO will support confidential compute in the future, VDP=
-A
-> > > will not.
-
-What blocks vDPA from supporting that?
-
-> >
-> > Nonsense it already works.
+> On Thu, Sep 21, 2023 at 03:34:03PM -0400, Michael S. Tsirkin wrote:
 >
-> That isn't what I'm talking about. With a real PCI function and TDISP
-> we can actually DMA directly from the guest's memory without needing
-> the ugly bounce buffer hack. Then you can get decent performance.
-
-This series requires the trapping in the legacy I/O BAR in VFIO. Why
-can TDISP work when trapping in VFIO but not vDPA? If neither, how can
-TDISP affect here?
-
+> > that's easy/practical.  If instead VDPA gives the same speed with just
+> > shadow vq then keeping this hack in vfio seems like less of a problem.
+> > Finally if VDPA is faster then maybe you will reconsider using it ;)
 >
-> > But I did not ask about the future since I do not believe it
-> > can be confidently predicted. I asked what is missing in VDPA
-> > now for you to add this feature there and not in VFIO.
+> It is not all about the speed.
 >
-> I don't see that VDPA needs this, VDPA should process the IO BAR on
-> its own with its own logic, just like everything else it does.
->
-> This is specifically about avoiding mediation by relaying directly the
-> IO BAR operations to the device itself.
+> VDPA presents another large and complex software stack in the
+> hypervisor that can be eliminated by simply using VFIO.
 
-So we had:
+vDPA supports standard virtio devices so how did you define complexity?
 
-1) a new virtio specific driver for VFIO
-2) the existing vp_vdpa driver
+From the view of the application, what it wants is a simple virtio
+device but not virtio-pci devices. That is what vDPA tries to present.
 
-How much differences between them in the context of the mediation or
-relaying? Or is it hard to introduce admin commands in the vDPA bus?
-
-> That is the entire irony, this whole scheme was designed and
-> standardized *specifically* to avoid complex mediation and here you
-> are saying we should just use mediation.
-
-No, using "simple VFIO passthrough" is just fine.
+By simply counting LOCs: vdpa + vhost + vp_vdpa is much less code than
+what VFIO had. It's not hard to expect, it will still be much less
+even if iommufd is done.
 
 Thanks
 
+
+
+> VFIO is
+> already required for other scenarios.
+>
+> This is about reducing complexity, reducing attack surface and
+> increasing maintainability of the hypervisor environment.
 >
 > Jason
+>
 >
 
