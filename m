@@ -2,160 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC2557AB636
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:42:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E49FA7AB69F
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:59:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbjIVQm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 12:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41580 "EHLO
+        id S230242AbjIVQ7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 12:59:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbjIVQm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 12:42:56 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2A9196
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:50 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d85bdcbec9cso2939689276.2
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695400969; x=1696005769; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pc4LqSwL0IDo380jbAAxuI0kvYidIGTCgI8AUTd2CyM=;
-        b=qOfhfQp0ANKBzgKid+Nhix7dG39QMfxDAa+7FNxOluNmIInHyyDRtHxhWTZ6bb6Yxs
-         YrBgB1XHztGfvrYdUsdGapSo/8Iw6lcRr7Kf+67VQA4qW/zcFi6UmranMSziy7fWS4t7
-         4Ce8r3tVHM924179JzwovsLoAExteJLfXxDPe1HWhZjSP9b15BGOVzPrBGngqHN/zr9F
-         yQ2s5KSUzmg+Fh+5G9JhIQxYANgpE0rViqQPsvT1QtT+DEuCvCX0bbRxf1+ckgE4wvwh
-         PBugG1R4fhJy1kvZ/x2IhV78SWahXfg0jFEitLHM2twjQV9k0B3UZUNrdfdtP3ykao/8
-         ogUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695400969; x=1696005769;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pc4LqSwL0IDo380jbAAxuI0kvYidIGTCgI8AUTd2CyM=;
-        b=cBiQBtouq6m14MjEUrYG+hcKLHgc+5WaKO6FXxSMJdMo/aaNyJwV7Aj7UDPAlF9TH6
-         rTGUsEW64lPLcF9qPFeaNCFz9IlC8nxoHToO2h597yS4uYZsar+73759BcA9HZnuoKmU
-         KGsyjqiJSxO3eeyaMP95hzQ0h4RN9wIh79xtgWbryQsuG3jf5+MNPFSByJ71HLlp3waX
-         vIRhCmz31SPC2QnQgYWQOro48O29buCzAvcBEoMOaF5gViXHT6vWMknehHIKB29qew0P
-         E9PgylBWg/9WR14AxEq98DYZ/GQXY8QokwNSYlqOmncOT0eRbkJXqdJDHBqMyvwW0qos
-         EkUQ==
-X-Gm-Message-State: AOJu0Yz6H2zbcxia7cGxQiogUC6st81pynAxsHTtSjSVYPcCzkeyn/yD
-        QDFrbiyihH0A4X0DnX3aCirkqUeRZxmda5fWRTjzduRHgWHYb5hUFMDQ9ODYhPA89gj1BFTl7sH
-        dJaY7R2Hbes1efFf2cbXAv53UHb0kd6zMMbLqPzt5HVA0uSSTbOaVUV5VazvpNoA=
-X-Google-Smtp-Source: AGHT+IEMbgnlLMKIqfr7cBi7ACEzPLm4tshaqqkOifdjjyv9NnX5ucP3Z8kc/5FKauwQ0W+3GP16gLJqvg8c6Q==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a25:abe4:0:b0:d7f:809a:9787 with SMTP id
- v91-20020a25abe4000000b00d7f809a9787mr128693ybi.1.1695400969197; Fri, 22 Sep
- 2023 09:42:49 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 09:42:39 -0700
-In-Reply-To: <20230922164239.2253604-1-jmattson@google.com>
-Mime-Version: 1.0
-References: <20230922164239.2253604-1-jmattson@google.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922164239.2253604-3-jmattson@google.com>
-Subject: [PATCH 3/3] KVM: selftests: Test behavior of HWCR
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, "'Sean Christopherson '" <seanjc@google.com>,
-        "'Paolo Bonzini '" <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231173AbjIVQ7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 12:59:23 -0400
+Received: from out-198.mta0.migadu.com (out-198.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E47198
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:59:15 -0700 (PDT)
+Date:   Fri, 22 Sep 2023 16:59:08 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1695401954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=y6/hQEMPVHQkW+VGeoG3f+C/qAx++wI6UHGjk2uuU5Q=;
+        b=PKtkMDQtsJGBrPV3WbBf4dphx8J+NtrxPNNLjB6ssrYvNm6jqVgfH/aiga5EoTAXARCkWU
+        8N2mYGpI8ms+vfz5Sw349w/Fe85OH20Qy8UdurnX8iOd9YD7Czm3pBbpIYFFEaqHakIQzd
+        jAEIhbt4CP2AZuvrHMlsXMwZcmggyOs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+        will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+        yuzenghui@huawei.com, zhukeqian1@huawei.com,
+        jonathan.cameron@huawei.com, linuxarm@huawei.com
+Subject: Re: [RFC PATCH v2 6/8] KVM: arm64: Only write protect selected PTE
+Message-ID: <ZQ3H3JZHnxIVCIF6@linux.dev>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+ <20230825093528.1637-7-shameerali.kolothum.thodi@huawei.com>
+ <ZQ26KE2bzEFYUpMc@arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZQ26KE2bzEFYUpMc@arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify the following:
-* Any bits that read as one cannot be cleared
-* Attempts to set bits 3, 6, 8, or 24 are ignored
-* Bit 18 is the only bit that can be set
-* Any bit that can be set can also be cleared
+On Fri, Sep 22, 2023 at 05:00:40PM +0100, Catalin Marinas wrote:
+> On Fri, Aug 25, 2023 at 10:35:26AM +0100, Shameer Kolothum wrote:
+> > From: Keqian Zhu <zhukeqian1@huawei.com>
+> > 
+> > This function write protects all PTEs between the ffs and fls of mask.
+> > There may be unset bits between this range. It works well under pure
+> > software dirty log, as software dirty log is not working during this
+> > process.
+> > 
+> > But it will unexpectly clear dirty status of PTE when hardware dirty
+> > log is enabled. So change it to only write protect selected PTE.
+> 
+> Ah, I did wonder about losing the dirty status. The equivalent to S1
+> would be for kvm_pgtable_stage2_wrprotect() to set a software dirty bit.
+> 
+> I'm only superficially familiar with how KVM does dirty tracking for
+> live migration. Does it need to first write-protect the pages and
+> disable DBM? Is DBM re-enabled later? Or does stage2_wp_range() with
+> your patches leave the DBM on? If the latter, the 'wp' aspect is a bit
+> confusing since DBM basically means writeable (and maybe clean). So
+> better to have something like stage2_clean_range().
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../selftests/kvm/x86_64/hwcr_msr_test.c      | 57 +++++++++++++++++++
- 2 files changed, 58 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
+KVM has never enabled DBM and we solely rely on write-protection faults
+for dirty tracking. IOW, we do not have a writable-clean state for
+stage-2 PTEs (yet).
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a3bb36fb3cfc..6b0219ca65eb 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -135,6 +135,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- TEST_GEN_PROGS_x86_64 += system_counter_offset_test
-+TEST_GEN_PROGS_x86_64 += x86_64/hwcr_msr_test
- 
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-diff --git a/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c b/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
-new file mode 100644
-index 000000000000..123267b44daf
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
-@@ -0,0 +1,57 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2023, Google LLC.
-+ *
-+ * Tests for the K7_HWCR MSR.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "vmx.h"
-+
-+void test_hwcr_bit(struct kvm_vcpu *vcpu, unsigned int bit)
-+{
-+	const unsigned long long ignored =
-+		BIT_ULL(3) | BIT_ULL(6) | BIT_ULL(8) | BIT_ULL(24);
-+	const unsigned long long legal = ignored | BIT_ULL(18);
-+	uint64_t orig = vcpu_get_msr(vcpu, MSR_K7_HWCR);
-+	uint64_t val = BIT_ULL(bit);
-+	uint64_t check;
-+	int r;
-+
-+	r = _vcpu_set_msr(vcpu, MSR_K7_HWCR, val);
-+	TEST_ASSERT((r == 1 && (val & legal)) || (r == 0 && !(val & legal)),
-+		    "Unexpected result (%d) when setting HWCR[bit %u]", r, bit);
-+	check =	vcpu_get_msr(vcpu, MSR_K7_HWCR);
-+	if (val & (legal & ~ignored)) {
-+		TEST_ASSERT(check == (orig | val),
-+			    "Bit %u: unexpected HWCR %lx; expected %lx", bit,
-+			    check, orig | val);
-+		_vcpu_set_msr(vcpu, MSR_K7_HWCR, 0);
-+		check =	vcpu_get_msr(vcpu, MSR_K7_HWCR);
-+		TEST_ASSERT(check == orig,
-+			    "Bit %u: unexpected HWCR %lx; expected %lx", bit,
-+			    check, orig);
-+	} else {
-+		TEST_ASSERT(check == orig,
-+			    "Bit %u: unexpected HWCR %lx; expected %lx", bit,
-+			    check, orig);
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	unsigned int bit;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+
-+	for (bit = 0; bit < BITS_PER_LONG; bit++)
-+		test_hwcr_bit(vcpu, bit);
-+
-+	kvm_vm_free(vm);
-+}
 -- 
-2.42.0.515.g380fc7ccd1-goog
-
+Thanks,
+Oliver
