@@ -2,108 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FC417AA61F
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 02:36:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BDEA7AA6AF
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 03:51:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbjIVAgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Sep 2023 20:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50196 "EHLO
+        id S230137AbjIVBvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Sep 2023 21:51:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbjIVAgD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Sep 2023 20:36:03 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58A318F
-        for <kvm@vger.kernel.org>; Thu, 21 Sep 2023 17:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695342957; x=1726878957;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Yz/UzV6kHqKGL5M88pH/K0nRDaCXriDTqQPkONdxErU=;
-  b=FBaqPYkdQl6yK2rBdX6zH/UoOLwqgkvMoCPotVQLdeWNnor4GjlkKRlv
-   G8lNUN0NzpRNel9dd5V9heFlYrrXi3B3RgG+74ty8f2zwZ46OcamdjeEH
-   yKXDply6MNOG6NpWGitwSr8ktjUj6Wxbm2kJgsd893kMjim1ospSPl+xF
-   A11zaTrdm1H9fb332SWq1msnJMAIXJzyij8fzuh+kd42lAN5JSyt00JnC
-   WGUeAlFyGgfv14D3lFHCNlvuz3dxB0/+fAfNpy06KYwSRs3mFzQyxo5ce
-   JHX7hRmTlHFuZWS9rXvE+nleXD98ZUQNGA+lABewjMiADdaktgAjABlGf
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="365764651"
-X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
-   d="scan'208";a="365764651"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 17:24:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="862721080"
-X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
-   d="scan'208";a="862721080"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.11.250]) ([10.93.11.250])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 17:24:20 -0700
-Message-ID: <11ada91d-4054-2ce9-9a3b-4d182106e860@intel.com>
-Date:   Fri, 22 Sep 2023 08:24:18 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-Subject: Re: [RFC PATCH v2 07/21] i386/pc: Drop pc_machine_kvm_type()
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        with ESMTP id S229458AbjIVBvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Sep 2023 21:51:16 -0400
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D50F1;
+        Thu, 21 Sep 2023 18:51:06 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0Vsa-hC4_1695347462;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vsa-hC4_1695347462)
+          by smtp.aliyun-inc.com;
+          Fri, 22 Sep 2023 09:51:04 +0800
+Message-ID: <1695347358.2770545-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue reset
+Date:   Fri, 22 Sep 2023 09:49:18 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Vadim Pasternak <vadimp@nvidia.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
         Cornelia Huck <cohuck@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
-        Sean Christopherson <seanjc@google.com>,
-        Claudio Fontana <cfontana@suse.de>
-References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
- <20230914035117.3285885-8-xiaoyao.li@intel.com>
- <b5ebeeac-9f0f-eb57-b5e2-4c03698e5ee4@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <b5ebeeac-9f0f-eb57-b5e2-4c03698e5ee4@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        Halil Pasic <pasic@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, bpf@vger.kernel.org,
+        kangjie.xu@linux.alibaba.com
+References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
+ <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
+ <20230921100112-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230921100112-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/2023 4:51 PM, David Hildenbrand wrote:
-> On 14.09.23 05:51, Xiaoyao Li wrote:
->> pc_machine_kvm_type() was introduced by commit e21be724eaf5 ("i386/xen:
->> add pc_machine_kvm_type to initialize XEN_EMULATE mode") to do Xen
->> specific initialization by utilizing kvm_type method.
->>
->> commit eeedfe6c6316 ("hw/xen: Simplify emulated Xen platform init")
->> moves the Xen specific initialization to pc_basic_device_init().
->>
->> There is no need to keep the PC specific kvm_type() implementation
->> anymore.
-> 
-> So we'll fallback to kvm_arch_get_default_type(), which simply returns 0.
-> 
->> On the other hand, later patch will implement kvm_type()
->> method for all x86/i386 machines to support KVM_X86_SW_PROTECTED_VM.
->>
-> 
-> ^ I suggest dropping that and merging that patch ahead-of-time as a 
-> simple cleanup.
+On Thu, 21 Sep 2023 10:02:53 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
+> > Introduce new helpers to implement queue reset and get queue reset
+> > status.
+> >
+> >  https://github.com/oasis-tcs/virtio-spec/issues/124
+> >  https://github.com/oasis-tcs/virtio-spec/issues/139
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
+> >  include/linux/virtio_pci_modern.h      |  2 ++
+> >  2 files changed, 41 insertions(+)
+> >
+> > diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
+> > index fa2a9445bb18..869cb46bef96 100644
+> > --- a/drivers/virtio/virtio_pci_modern_dev.c
+> > +++ b/drivers/virtio/virtio_pci_modern_dev.c
+> > @@ -3,6 +3,7 @@
+> >  #include <linux/virtio_pci_modern.h>
+> >  #include <linux/module.h>
+> >  #include <linux/pci.h>
+> > +#include <linux/delay.h>
+> >
+> >  /*
+> >   * vp_modern_map_capability - map a part of virtio pci capability
+> > @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
+> >  }
+> >  EXPORT_SYMBOL_GPL(vp_modern_set_status);
+> >
+> > +/*
+> > + * vp_modern_get_queue_reset - get the queue reset status
+> > + * @mdev: the modern virtio-pci device
+> > + * @index: queue index
+> > + */
+> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
+> > +{
+> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
+> > +
+> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+> > +
+> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
+> > +	return vp_ioread16(&cfg->queue_reset);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
+> > +
+>
+> Actually, this does not validate that the config structure is big
+> enough. So it can access some unrelated memory. Don't know whether
+> that's exploitable e.g. for CoCo but not nice, anyway.
+> Need to validate the size and disable reset if it's too small.
 
-I suppose the "that" here means "this patch", right?
 
-If so, I can submit this patch separately.
+static int vp_modern_disable_vq_and_reset(struct virtqueue *vq)
+{
+	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
+	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+	struct virtio_pci_vq_info *info;
+	unsigned long flags;
 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> 
+->	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
+		return -ENOENT;
 
+	vp_modern_set_queue_reset(mdev, vq->index);
+
+
+I checked VIRTIO_F_RING_RESET before call this.
+
+Do you mean, we should put the check to this function.
+
+
+Thanks.
+
+
+
+>
+>
+> > +/*
+> > + * vp_modern_set_queue_reset - reset the queue
+> > + * @mdev: the modern virtio-pci device
+> > + * @index: queue index
+> > + */
+> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
+> > +{
+> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
+> > +
+> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+> > +
+> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
+> > +	vp_iowrite16(1, &cfg->queue_reset);
+> > +
+> > +	while (vp_ioread16(&cfg->queue_reset))
+> > +		msleep(1);
+> > +
+> > +	while (vp_ioread16(&cfg->cfg.queue_enable))
+> > +		msleep(1);
+> > +}
+> > +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
+> > +
+> >  /*
+> >   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
+> >   * @mdev: the modern virtio-pci device
+> > diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
+> > index 05123b9a606f..c4eeb79b0139 100644
+> > --- a/include/linux/virtio_pci_modern.h
+> > +++ b/include/linux/virtio_pci_modern.h
+> > @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
+> >  				       u16 index, resource_size_t *pa);
+> >  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
+> >  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
+> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
+> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
+> >  #endif
+> > --
+> > 2.31.0
+>
