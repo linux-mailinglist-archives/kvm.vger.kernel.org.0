@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59B777AB634
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:42:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEEAA7AB635
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:42:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjIVQmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 12:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56570 "EHLO
+        id S230443AbjIVQm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 12:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229989AbjIVQmt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 12:42:49 -0400
+        with ESMTP id S229983AbjIVQmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 12:42:55 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B310AA1
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:43 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59e758d6236so34412077b3.1
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FE7122
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:47 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f1be93bd4so22572797b3.1
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695400963; x=1696005763; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=H4eLjsCfwu3fm0a4rgJ9szHKh6uo1UIVw8FcAqngMH0=;
-        b=kZ8eH83IO4M5e3pweqO6tDq4MHvmE3rO8xJvQuNNRbDMXBCH7xWcW1h+SL6klByHoZ
-         5r14VBuLtyIl4WoW8xjSPxs9J9LSVcGxi6ItybssbcDzmqe+xes/o8RA28g6GQ3bsk1H
-         iLHNEI2hXkU8CXjpZivs/rKKGpXm9FCrEgAu9AiPgrS7GIXrEsaynkGcHa+D0bLac1rk
-         thpucRfaMzSi3ngXrN0U2I9a5oz7tmXw544SOQE6euOhX3/nOGgFv8Yu0ZZnXSfkIbXd
-         6Mhs8DWgA5rCcQ46zrqKvDwHzATYWNYQ3nkMg3QPcXZwycfuwJXcQ7xPbX9LBPOgc9f5
-         JHhA==
+        d=google.com; s=20230601; t=1695400966; x=1696005766; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gS/EQHYi/KQyzYHqX4dTpWj9wynOrPY51BidveykKDI=;
+        b=ZDfrko/qlPaFPByPuWJuhdfyYYJopvM4dl0N8WYwCtEBnRdyLk211dv+qufZ7IKfZV
+         xjdl/Q2H2wdu2LCH4MAPf71Ehtj88w+s0sgWyxvsGeNdGDvsUSSrdF2vE4K3ErB8b7rJ
+         +LzDR6VJpcbVxXa6NU7ZrKNSvg2GkQGz6+qUKT3PMhkyfJK6aX9AGdtKsA1iidD7guj5
+         SCGgLwCyU8HQQjtfG/IlgDdlhbChbfDno0p6fby1sjtgW9weiHIlxqw9XSAGRilGgPMJ
+         yGBhJeFAqkk3EHstMIrNvdQd2xuvrRtyfADrob9vN8nA4AH/7WeuT1dx2GPHKHVvc+K/
+         lGPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695400963; x=1696005763;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H4eLjsCfwu3fm0a4rgJ9szHKh6uo1UIVw8FcAqngMH0=;
-        b=onIbQQ1g9aATJlHF06pv0ej249lq7M3yhv9TkIKwSQnLYmbqyVrZ1Ts6kbuSHu3cDS
-         sJnRM0P5X7BW/Xto09SBWlHc1daS6P6NwFFu02S0p9EObeRIbW40ipFUudxLBT+FoKBI
-         UwHdg/B6UUKr/QYP83o82DqULLlkH6VooZ2vBcUhorPjqFHuUiTyx4UYcN3n/8406fgu
-         Z+vG21K9g0UTWO6BY0cOFiUSIlYCAo2Bb75KMuPsxu4IwFFI9QMGTbSanWhc9lPwXSgl
-         lc6B5uXiWjBWtqVh1My8lxHIMzD6iBBGpOsLZlzb2UKXJljzxViQBNvu4knmfEGdlH18
-         XyAg==
-X-Gm-Message-State: AOJu0YyZwKnALqXpwB2ihaXt2jja4IMz1iZ2/RTrJ4aSdpRoWD1oO0jc
-        nwxPNbAcFT/xtrE5xi/Dh3016Z/IjvChsnl3SXBKxzqjvHzxQiyDLMOArJ/LUEthUKq7EM1hf5K
-        m+GH7LtFqwMf1FWrvjOdHu5mekICX+JJtg2pxlyI/83aiP4dKYy1AYhrIw6ieYdg=
-X-Google-Smtp-Source: AGHT+IHH85cz4KOc3dKsHsW7LZdUEe3sxzS8ZQ4Kiumre7k+tlzAWNpAu/D8XOaxBL3n4jlIQ2QGVS7DAl4fKw==
+        d=1e100.net; s=20230601; t=1695400966; x=1696005766;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gS/EQHYi/KQyzYHqX4dTpWj9wynOrPY51BidveykKDI=;
+        b=CKGIhVy5NaqzPGTRi7zv8EuIUfXtzmygfLANsq4jxylb/NPND9Nb4mWIncA6/p7Ewp
+         D22SMTc3fshmtbl3xtOX6QK4LpYRnoEJmQTdAp9lfDnuTgNLfpxDgzkGuHQn48oBZ0e9
+         cFaTobahhQhtNoL4xM1CBUOpvfvKy+4b86JiDAyLngakMBjYHX+tqZKCi2Q38ixW099j
+         cImKfkZETCBzG220H3fqV1CLOvXCAzkuUyKllPWNQ1aRVRK5ixdmYXDi8u+xZV0Q+h4v
+         QVrQqKu/W0q1oYWn2/znopsKXgA2CY6lZ2XRSvE4EpZTukNbl/JqiE8wTVJ36xgrbEvv
+         n9fw==
+X-Gm-Message-State: AOJu0YxMgsr0RcLKyM6gxhdeFEf05qhjg+IXig9UW3QDTLTnr9utapVW
+        OY1+UciR0MXsbdyfbxaaDCrhv3R5vNm5+VHsnNMlUYfqRVz/X5N4LsuMnuBkytnJcTKIRuEBL6m
+        /Z7pI7sBOqAyKAAsgwKunbOmjog953lWIKhAhuCN51jXhivYkWqjUWaYpN+XmViY=
+X-Google-Smtp-Source: AGHT+IHwrJwHgk5OOWHGMByRAntOMRr0FoHbgHj6vlHWJyoSGD/rVZXIv7s7YAOYiVhj6dgCIDqLYFpkFiWWGA==
 X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a81:ac21:0:b0:584:41a6:6cd8 with SMTP id
- k33-20020a81ac21000000b0058441a66cd8mr2983ywh.8.1695400962906; Fri, 22 Sep
- 2023 09:42:42 -0700 (PDT)
-Date:   Fri, 22 Sep 2023 09:42:37 -0700
+ (user=jmattson job=sendgmr) by 2002:a81:e30d:0:b0:59b:fe3b:411 with SMTP id
+ q13-20020a81e30d000000b0059bfe3b0411mr4242ywl.2.1695400966353; Fri, 22 Sep
+ 2023 09:42:46 -0700 (PDT)
+Date:   Fri, 22 Sep 2023 09:42:38 -0700
+In-Reply-To: <20230922164239.2253604-1-jmattson@google.com>
 Mime-Version: 1.0
+References: <20230922164239.2253604-1-jmattson@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922164239.2253604-1-jmattson@google.com>
-Subject: [PATCH 1/3] KVM: x86: Allow HWCR.McStatusWrEn to be cleared once set
+Message-ID: <20230922164239.2253604-2-jmattson@google.com>
+Subject: [PATCH 2/3] KVM: x86: Virtualize HWCR.TscFreqSel[bit 24]
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, "'Sean Christopherson '" <seanjc@google.com>,
         "'Paolo Bonzini '" <pbonzini@redhat.com>
@@ -66,33 +68,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When HWCR is set to 0, store 0 in vcpu->arch.msr_hwcr.
+On certain CPUs, Linux guests expect HWCR.TscFreqSel[bit 24] to be
+set. If it isn't set, they complain:
+	[Firmware Bug]: TSC doesn't count with P0 frequency!
 
-Fixes: 191c8137a939 ("x86/kvm: Implement HWCR support")
+Eliminate this complaint by setting the bit on virtual processors for
+which Linux guests expect it to be set.
+
+Note that this bit is read-only on said processors.
+
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/x86.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kvm/cpuid.c | 10 ++++++++++
+ arch/x86/kvm/x86.c   |  7 +++++++
+ 2 files changed, 17 insertions(+)
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 0544e30b4946..2d7dcd13dcc3 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -373,6 +373,16 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+ 
++	/*
++	 * HWCR.TscFreqSel[bit 24] has a reset value of 1 on some processors.
++	 */
++	if (guest_cpuid_is_amd_or_hygon(vcpu) &&
++	    guest_cpuid_has(vcpu, X86_FEATURE_CONSTANT_TSC) &&
++	    (guest_cpuid_family(vcpu) > 0x10 ||
++	     (guest_cpuid_family(vcpu) == 0x10 &&
++	      guest_cpuid_model(vcpu) >= 2)))
++		vcpu->arch.msr_hwcr |= BIT(24);
++
+ 	kvm_pmu_refresh(vcpu);
+ 	vcpu->arch.cr4_guest_rsvd_bits =
+ 	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6c9c81e82e65..3421ed7fcee0 100644
+index 3421ed7fcee0..cb02a7c2938b 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3701,12 +3701,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -3699,12 +3699,19 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		data &= ~(u64)0x40;	/* ignore flush filter disable */
+ 		data &= ~(u64)0x100;	/* ignore ignne emulation enable */
  		data &= ~(u64)0x8;	/* ignore TLB cache disable */
++		data &= ~(u64)0x1000000;/* ignore TscFreqSel */
  
  		/* Handle McStatusWrEn */
--		if (data == BIT_ULL(18)) {
--			vcpu->arch.msr_hwcr = data;
--		} else if (data != 0) {
-+		if (data & ~BIT_ULL(18)) {
+ 		if (data & ~BIT_ULL(18)) {
  			kvm_pr_unimpl_wrmsr(vcpu, msr, data);
  			return 1;
  		}
-+		vcpu->arch.msr_hwcr = data;
++
++		/*
++		 * When set, TscFreqSel is read-only. Attempts to
++		 * clear it are ignored.
++		 */
++		data |= vcpu->arch.msr_hwcr & BIT_ULL(24);
+ 		vcpu->arch.msr_hwcr = data;
  		break;
  	case MSR_FAM10H_MMIO_CONF_BASE:
- 		if (data != 0) {
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
