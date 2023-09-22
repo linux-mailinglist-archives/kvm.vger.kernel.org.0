@@ -2,130 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09ED57AB5B7
-	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:19:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB657AB5C8
+	for <lists+kvm@lfdr.de>; Fri, 22 Sep 2023 18:22:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbjIVQTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Sep 2023 12:19:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32790 "EHLO
+        id S229972AbjIVQWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Sep 2023 12:22:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbjIVQTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Sep 2023 12:19:37 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2064.outbound.protection.outlook.com [40.107.244.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C9E499
-        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:19:31 -0700 (PDT)
+        with ESMTP id S229579AbjIVQWs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Sep 2023 12:22:48 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA2A9114
+        for <kvm@vger.kernel.org>; Fri, 22 Sep 2023 09:22:39 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RXX3558aixpS2aP3ki1CJC3PGKKUqO+oS9a1rWLrDCXPcdFNosGRFPbyr51wcoQTMZF3bUKXhCUJvsNIXqdPZquaXxw/xG5cqGuY6IBLFQSpYMiDAakiMMZ9dhB0VrtHGGhz1OR5RrfeMpm7nop8EyYyCGoxvYq2rBSTn+u2F1nKFRmYXYlA6JI3DJXVaLR9u7bCfxnuD88ae6vxyMIWchXftF+ZjNd+vbXv9CmnA5lzwgJq+heoh5MUNNrNQf53hlysgjiFamTzZ9YYtssGmavMXqfbEPMETZ9EaMo27BnO0KXS8n+TSpFRjL5oamOMknicrPwIBQzUl4BRwktN5Q==
+ b=ALstByxS7UsyBlBMxpZnti+qa88Mn78l1lFvJyd1wQ3qBuKRuEtYf1NMdmYAF521aSVniE0bWTHXPM22DbQaFpeKiS0ZpXD3nwu4XXQvEMhUW81iyOD6aTrylWEwQWnpyiEy3TaVQGXaAUolhv/h9ozLN2s1xyiB+28pGw6MpAaBALNEiFkMLPesyXyaWZvi8+KiKAXnVajcBqRdcE+qHCTyqutoVRgv+vkIzB3ehcMVB1o4l/J0N1mD/wJN+F6C3XUyeY7p+UyTAXwzUfjSjWQi9KiG1tK4YiDPb3b6uNVUBahKHbsSoQN0kQsedZRSzKC7Q7UB4BOZglGR+NNYGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3YExzqT9CjhizrZryTQztiT/02VD7WuEQ0zXMfesPK8=;
- b=dRs5VITSeGwCeI5juSy8F0j5motJHfMu631wuWhz1S97csoM7RyPs45zQ15blJN0i5dKg5JIUw//bEgQ+crj9Tf0ssaT3+xoFaW7CZhSgfkKgoaBMUPMiOUO0LUT7ZUpME+JXB9tAU9MUCiO/4fboyZgBX0qE3JLR1lA9Ct+vaq9VvnPX0q3/BnSavE7gJ0/p5nMlxb6S13NkxoLJQFpew8wMXVhndeNx+yk8X6EUGHyvahuDUIUnAXvqrbbUFRyN+JL/ZRo6DrdJRQbif0/4kjia82R4ng/t+ho+erhR/u2d6dgo0fdK1nF5ApGMzIYPUabGoOJtb+sxE3l+VC2dA==
+ bh=dMp33R6g9v5AMh0JnrCxrQKi+jbfW5Fo6Q4kueao+2E=;
+ b=I0/mzJulBOqBsbDb8+ATJeqaq91lLU+bspesrf2CdXkU9ZhO2MdKWJoi5En51sAS5YkB7SQmo0acHTZrnyGBYsjlKOEZHqO+iO2zk8vWFTqJn6+l8UxPaQetlDJSE9Tn1ma/TSClfwBbRvutRtumGFKpiLbpWEoQxlJyCspXVNOO3GwMA2o1WpLHE0JeA+i4+fOiXFaMmr2b3Cwk7SX9T5S8O6awltKOnpWd1wVe2lV4mhA8UI1R9UpqNpFHar2aVrddNB71V3lqdRexOhlCXdEv13uhxgUfXzeUNrYkCar4d6ERu9j/r4AaLGHy0B4E3ugf0i5zD3JlBRPqZ/Mi7g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3YExzqT9CjhizrZryTQztiT/02VD7WuEQ0zXMfesPK8=;
- b=WBj/i45uNUxkpNEcNePjKFIJe3K5aB5x9jWASrHOTONwgPXnDOZK26ONPaOWqSTG7hD6Rf4qjRUUMyVwiXM4a9fXElZ/gGGz0ruQg8GIa2QC0W+LCUABKz3FmrMNgQlszaghO2rf9dCgpwJa24V4spCFlQa7PZRq3d72NB5KK0bsK8Cu6zmcz7ipDZ/iAyJz4bOYOrYF3p7H+XnBVZOD2qjtUWa11RZ2+wjTKbmSEhJdmdK7zneyoDe0WkEuiUAnub18d3TBWpteekadFPHCrV/Yj2/EavVarTDLHfxTexQ0MMqKsybloiVNsh6h3Dtds5CwxwLdMGBYp0k3IVZh0Q==
+ bh=dMp33R6g9v5AMh0JnrCxrQKi+jbfW5Fo6Q4kueao+2E=;
+ b=HCTv6+6DTnuB3pE2np/hZqSpzuynYKQ3imZ5Hg3proN1rJ8nYqmL703oN+tjjPVRJBnhlJQKMvlIUwMveD+pHJIL3Rjolp2ygiJ+gEV1Fq5naKS4Yu7x8vWLWVjm/X6X5ZyCje73sN6wrWdhwPqpw9bT8E0pcI36+qXJACD2d5/7oKN25gRHEkP2X+xCsjhHJ0Pa8L7YMNzfVH7sP804T34nt1HTIx0/9UkyV6rg8dp1cB4VtzURVziT+KDUclvWIfGHX519ehDetcSyDcgolJ+4pYAsRltBh+czS0k7eqSEFrzgQIZ96cF2IhYEjqf5LSA9EaXaBg8RJ8Mc3AHdog==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV2PR12MB5871.namprd12.prod.outlook.com (2603:10b6:408:174::13) with
+ by DM4PR12MB5915.namprd12.prod.outlook.com (2603:10b6:8:68::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Fri, 22 Sep
- 2023 16:19:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Fri, 22 Sep
+ 2023 16:22:35 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::faf:4cd0:ae27:1073]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::faf:4cd0:ae27:1073%6]) with mapi id 15.20.6792.026; Fri, 22 Sep 2023
- 16:19:29 +0000
-Date:   Fri, 22 Sep 2023 13:19:28 -0300
+ 16:22:35 +0000
+Date:   Fri, 22 Sep 2023 13:22:33 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
+Cc:     Parav Pandit <parav@nvidia.com>, Jason Wang <jasowang@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+        Yishai Hadas <yishaih@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Maor Gottlieb <maorg@nvidia.com>
 Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
  virtio devices
-Message-ID: <20230922161928.GS13733@nvidia.com>
-References: <20230921170709.GS13733@nvidia.com>
- <20230921131035-mutt-send-email-mst@kernel.org>
- <20230921174450.GT13733@nvidia.com>
- <20230921135426-mutt-send-email-mst@kernel.org>
- <20230921181637.GU13733@nvidia.com>
+Message-ID: <20230922162233.GT13733@nvidia.com>
+References: <20230921181637.GU13733@nvidia.com>
  <20230921152802-mutt-send-email-mst@kernel.org>
  <20230921195345.GZ13733@nvidia.com>
- <CACGkMEt=dxhJP4mUUWh+x-TSxA5JQcvmhJbkLJMWdN8oXV6ojg@mail.gmail.com>
- <20230922122501.GP13733@nvidia.com>
- <20230922111342-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+ <20230921155834-mutt-send-email-mst@kernel.org>
+ <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
+ <20230922122246.GN13733@nvidia.com>
+ <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20230922111132-mutt-send-email-mst@kernel.org>
+ <20230922151534.GR13733@nvidia.com>
+ <20230922113941-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230922111342-mutt-send-email-mst@kernel.org>
-X-ClientProxiedBy: MN2PR10CA0010.namprd10.prod.outlook.com
- (2603:10b6:208:120::23) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <20230922113941-mutt-send-email-mst@kernel.org>
+X-ClientProxiedBy: BL1PR13CA0269.namprd13.prod.outlook.com
+ (2603:10b6:208:2ba::34) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV2PR12MB5871:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11f5fb64-1a78-4009-6859-08dbbb87b240
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5915:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1bf7c40d-c973-4ebe-7dd2-08dbbb882132
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xCX2IyFgA47mber5fXIQxfAiy3TUDdFQJe1vJMlUJNvaBWHwM5id+/dIJfmrfPM6W24NlCH5CCrl5SpZuE9xUKkLoBoXxAebyT/mE/2IVB9ajb0k9ijqj2cyEsup+394Q51rmbS3iSPju28F8PG0e7IpEpiHnIFAaEU+CSXJwuiQck07g/c0okaz94L9U8AmFI9hFVkbl1ptUFBB2zzOtdb+g4t++QgEmipPwoqZaEYxoKNs0FVSRfgF7XeaXrBMLdeMTc/rvbAj5LerjoHfEWOjVCENZC/YcR8V+qWHb2twQrXfgDhxtiSey80AWaNWOSF2/FN51d4i6eyN/0s99GtgrVEqWeSD0xEZGWsUyJEjgUpZIOo2+Ll+g/chnCgfQNwqiyTOs4auA8TFxrDHAVhBIANLCi1+Vg53nA4Nn/haPVj6sP3PWuy8Je0Jefzc+saJ8JLhYShXhHW9P1zu/EmKqx2mZLpTlcHs31xg6JGmwJ0l/ziwYyLxHajUj1E4yaqGWRJKemfznXYD/xGL/CFZeWeSd3Z/fGnoq5DUJEz1LvtkynicNLu6ukPcmh/W
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(136003)(366004)(376002)(451199024)(1800799009)(186009)(83380400001)(6486002)(53546011)(6506007)(6512007)(36756003)(38100700002)(41300700001)(33656002)(86362001)(6916009)(1076003)(26005)(5660300002)(2906002)(2616005)(478600001)(8936002)(8676002)(4326008)(107886003)(66946007)(66556008)(54906003)(66476007)(316002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: oR2XhzVz/Z/YzZ0Zs5ub6jJqwUkPVSaLZqlLKRXUC/yvnKBvzEwc0TxICIfDyOJHzKzCjZZGICTkNQ98iVGNPauzhhLbU8ulJ8U6EPUs7b5QqNBmns4dSyRsCMmfvK9zghj1tY/++643AOa2xna826rElC6yHO+eS18P3g0wvSqNd05G4tIsZpX9VDmCktY8qb6bC2FKcQ7usmkfe75f3wqktndoDceF1gYU74CWUnaL+FLp6rruwj2BTFed9E1KCbxpR2HEPJTWwFlFFnubNfZGb1kRnCeFlGCiY+gU3v1EOjdkSfJe6rnzOrYm9QMB0QZffuRkIHZkqhPAD4L+K6A1TsqMAmGSBMAKMmOOoWEfsngEQFiDHAQ4uO1qOYolEoBtFZHeCv5MsBYcO0t0b2Q6WldET6arN0JbLIXP8DVX5SBIOAobZa4emPk5egr1k6Tf9RPI67Is/EtYhJWBJ918Qssj0cx/FiWrZAnOIjHjBMEXDgBwZfwj/FPKdgKj9xWhGK2MYUUPGqGc5+FxuTICQMb86AbmZKjbA8d99oveF2H1WpvLhqUoOQw+MUpJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(39860400002)(366004)(346002)(136003)(451199024)(186009)(1800799009)(6486002)(86362001)(6506007)(66946007)(41300700001)(6512007)(54906003)(66476007)(38100700002)(66556008)(5660300002)(478600001)(6916009)(316002)(2616005)(8936002)(83380400001)(26005)(8676002)(107886003)(2906002)(36756003)(4326008)(1076003)(33656002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eWVNZ0VEZ2lsL3AzY1R6dnJuRjNtOW01SzFtcXZvcTdrelFxaWtkNkxsbHFN?=
- =?utf-8?B?K3JjRHVkcGVvWGZ1MkdEVzgvdmlXbElDZlF1UEVwZ1QvT2VQWklSeDhWcXN2?=
- =?utf-8?B?QXAvZzA1MzFvaS9naVNsSmtUQ2h2enBycHNOUllGc25IQjRCSWhYWGFxVzZu?=
- =?utf-8?B?cXVYTzV0L3pQUTJkbUUvcmI0ZXJnQVhiT2FINjVMTDA5S3haMXduQ0ZHalVR?=
- =?utf-8?B?b3FjM2QzV05XVEwrNmtlM1p4WTdZeVRaTHdiTnRRZzluM2s2cm1vd24rVUF4?=
- =?utf-8?B?cHBYN01RSkJJSmpjUHc3Z25WU1FieFJocHFHWFNhN0cyUHdzaUtGLzZIdTVW?=
- =?utf-8?B?UDhYQng5RVRTM1B6c3ZMYXUxWHo2TmVQL1lyV3dtZGRmQkNObXBEUWp5TkNk?=
- =?utf-8?B?dVBZblB6VDRXZFQzcTBVTUM4UUtnZm5XdXdFZ0pYa2czN0VwWnpqeEdINVF3?=
- =?utf-8?B?Qk92cVBYVFRnUHNWVCtXQXozTzlCd3o4SGNlWVBXWnM0akVmQmNwU3FXWlha?=
- =?utf-8?B?Qys4MC94WEFMaFd1ZmhZbFRsODNRdEk1akN4cTdzN1BBQ2NRcXhjRUMvSXVJ?=
- =?utf-8?B?R0JNY1hNM3kvM2JtT3ZOa2pQdytUZC9qNDlFTE56SmxvbStYMVUzRnNZV0lX?=
- =?utf-8?B?M0Q5eUcxZEIwR0JrZytiTVpQYkpFYXBRMFBxUERndHhFcTRGZExGRFFkajgv?=
- =?utf-8?B?NE5BTzk5eitQYW0vR2VGUjV6eCsyUk01SmsvRkNaTjhndFoxZUZGV1EyUy9y?=
- =?utf-8?B?YXlhc0dGTDV5VFU4b083THhIcVlIMkpjQ0h0MzhXakpjbHlncEdmd2tQMFlx?=
- =?utf-8?B?UzdpcmdOUDNqY2JDU0RUTHM1OEJNL2xEVmNOQmo4Z2lUcTVwNEgwWHB6c3k0?=
- =?utf-8?B?ZWxtamJPQXllWHZKTU0wUjVSeDhzT3JvVnlNS0ppdHVVTzdMRjFtZXFZZVBi?=
- =?utf-8?B?MUJXL0lSQTJLZU8vVzFuOVEvMUw3alRZREduNWRzUkt3OXFleHhOMlhnaUZN?=
- =?utf-8?B?eWpaN3dEWm94VndJNzg1ckpxOUYrcTFEWFRxdmRyTUppdkdCeUJCUXp6T3h6?=
- =?utf-8?B?TXRMenIxTFlZVUlneURCNVBmQmx2UEllU3ZSVWFHWTZRVkdUN0lTQjJ0K3Vo?=
- =?utf-8?B?Wm9mWU85b0RhU004ZjJOQy9MYVdGMkpXb0liMTUzZDFEd0hITmlEb0hBOVJq?=
- =?utf-8?B?QkZNZENXRXhLWGtoME4vQVpGamJoRnhRSUxEeHpnNks2OWVtNGlsRE1OZGZU?=
- =?utf-8?B?WFM5QWI1M2FQNnlGc2k0V3JqcVBKR3l1TEFTclNvK01lUTVJK0JSQWZvaTBx?=
- =?utf-8?B?amkxVkc0a1I4bUxmNG40bjlkZFNCOUw2M0swaVBOSG5YczFPNkREMnY5eUQx?=
- =?utf-8?B?cU1ybEJMVEdESStCV0RXTXhhZjFlSUdPTlpBYnJURVViRmhyMU00My91OFVu?=
- =?utf-8?B?dnpkTUZtUGtWUnl0M0N3SndUOG5LUWpITE1sMHAwQUhQSlIzYlVRKzU3aThY?=
- =?utf-8?B?SmpVN2x0U3gzbFBuQkMrVGdQdWZEcmxpTEpma1VZL1N5dmE5RjZFb3hDa1c4?=
- =?utf-8?B?YnBxdmE0K2EwbDBGOFdWS2tsTWVIY1J4T2RQRTVuMFdHOFJpc3FkRHJuaFpE?=
- =?utf-8?B?MDRGMW1abFM2SXpMRjhLUXFXQjlVN09QU3o4eDMra0h4Q2MrUFBvWDNKTlFF?=
- =?utf-8?B?VzE3aG85cWFVYjVwZjVOVUZNY2psdkxlTHErcjR2WG8rNERKOHNVVkIwZXpa?=
- =?utf-8?B?cXVkZ1NwSXRFZi9tSy9acXlHZnFVK054TlZuTXpYUi9IUU5ZQTFwK3BBbjhL?=
- =?utf-8?B?RGJvMHZ6WnBYMFFjcE9sZVl3SWlrb0NPd25kcFNBcWJ2N2t5WjNuRUpXTWY4?=
- =?utf-8?B?QXZ3eERWcU02YVlnVDBCc0hiTHc4VEwwcjhDTzBUMCs1QmdSUGVobVhMS0Q2?=
- =?utf-8?B?VkVwanBHMWZ2WmVTb1BOODBpOFdxUjBVdWprQ0E4dEhneG1GZWxHQ2g1YlhD?=
- =?utf-8?B?ZWdCY1p4WTFiazZTUGhFdVZpempvQTJzZktxOVppZUpxL3dIQU9VV3ZoZnJn?=
- =?utf-8?B?UGxOKzVwdERDTlBuRERGbkFEejZCa2c5cHh0eisvS1BnM1IwZWNkWkhKQzVM?=
- =?utf-8?Q?I8grLbGJtQvNA1VpNZMYAGSjh?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?611Uf/OldxlAQ437vaOp1FuElY1nYyUEYMdWZ1MYgVepVKBXvJxr5gWoiTzn?=
+ =?us-ascii?Q?XVrXMd37mfBp4Ab+PADO1USd3Fzrz7A7/eocb1I0Qmz+1MLNY2WXzsWoKV6G?=
+ =?us-ascii?Q?2oyytXJE2ZY5Rxtek6KgjIioWDQAlOu/bGoXU3Xhd/+onm/+VrCZzwrOdLNj?=
+ =?us-ascii?Q?Q9AdTp8y+bQchEStM+GbJIOJBXduqz6l3WBP0oQARD47jcSEThtGeygYCb5s?=
+ =?us-ascii?Q?rR7igQeGq6/kf1F6ORsEpFp0PjnJLSwK9WGhaQa9J+Sl5ocKDRL7MNp+o2Ph?=
+ =?us-ascii?Q?2fqKBNPPMm1D394lPmJP32U0Bs02I7W80TcPB1TtPCI8Xf83+GofUVTd6OYK?=
+ =?us-ascii?Q?jxyuPUWoBaTpZFG763b8awIrtFhk+3s3CBJ5EPFD6fH04sJEcOLjmBm0Qskd?=
+ =?us-ascii?Q?dL08PGPbyJGd8SBl0ovaWdiXxygzuVmgH26XKP+ljaDNr2hGOrRaNX+abbC2?=
+ =?us-ascii?Q?Yw6nQekUELoLfTLM4PsBMG8F/cc0LFidZG9DZxcVtE7H6+e9iMfvYRLavg1E?=
+ =?us-ascii?Q?xWeDtfUOzECgmO6nFVywb1WmRh4cOaJf1XAbLreCNd2sEg/aRRxwMagWfJBW?=
+ =?us-ascii?Q?hb0DKODKqLj4Lf0TpTVn1MrB95NzhIpOSUu2rp5mNfS5OTOKpjZ4uid7W4Gf?=
+ =?us-ascii?Q?TYSxJKLwM7T3AlKjwg5ECrLD0asiiDfXznadzipCiJFAZ1mx5+X/lipULIT7?=
+ =?us-ascii?Q?CXq9mo8xMkMHySq3UwHF0QF62Cj4vXrh371MUHYhktkQV0McNkTZQm4/xrOS?=
+ =?us-ascii?Q?v+wB1DJYg1LBCH65o7aa5FrTwXoeNZJnlnBobIIcsDUG22RS3YdNhEXEtikP?=
+ =?us-ascii?Q?ZKNvtPaDEHl8ObfYpejvsJiZVVg2rpSQG3JjE2ogpiLYWkrK2mpqBzIIk5nB?=
+ =?us-ascii?Q?WNU+l1xEOO8dKt1cqOhHtlMzBqVG4T+8At46ctPbwPXHfPEqwCpKudxsOHJB?=
+ =?us-ascii?Q?boX9mrz+V2nJuu2uTxkW+Ydqd5bPwQLPwMy6eCcqBE8CLX7ZbjHXe9OK/ugC?=
+ =?us-ascii?Q?H+9GhRPRzf4U31V3QXCFRbGFGZEmf4Wldqo4eslxBoQpNtr6woak6mMblzVt?=
+ =?us-ascii?Q?sc/ojiqnEmCqHAdk/esv7hlBoxq73AkP/QBY890N8vu1F7HvX+wTXEIOgJCO?=
+ =?us-ascii?Q?q4Ratgp55tzFBIxgYsJwrKn2OGKzISl5RgN4xnAfcZlkTqa8ZciqhURqJf33?=
+ =?us-ascii?Q?dRrQEOfDHgZ/SaD8Gueo0BWnHaqs8h7NEc98O4zdn0XeqYySeQOFJuI4/4tR?=
+ =?us-ascii?Q?pwfrEj1yXiDaiP9rx5yN5e6Y3HqArTqF9l43S7v/q+N8tWIUqlJGkrDXYVT4?=
+ =?us-ascii?Q?KVipZ+/+3EIRHFpHPB/z+oVuUHbBo4n4TAP4SL4o7Lqq0hRp56G5FGCFNCcA?=
+ =?us-ascii?Q?HkxmcY91AWNkcgXSx9JwpEE998MS+mrVD1WJt1I2B1baOQM5D/O3+zXlkmYL?=
+ =?us-ascii?Q?5sKNpQGQX1wY8UOZQKMpqX1xNfpk/CONuSUoA767y+QqmtWJxMii4WIdTZjv?=
+ =?us-ascii?Q?FnihOH5C5WxHUpEAzeQKXiteHuf5IW2X22XXzfKj2yt/J4ntvY/xmpJNA/dZ?=
+ =?us-ascii?Q?BSHHnEiv42T+xP3FaEB6CvKZu0swHuEDPCMVcTJr?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11f5fb64-1a78-4009-6859-08dbbb87b240
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bf7c40d-c973-4ebe-7dd2-08dbbb882132
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 16:19:29.0303
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 16:22:35.1427
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DX2dresCbp1UynNbdGsBwIJNEW9Qk0UYn43QAeumWfhq7ThDmWdCJbyeSKo8r8Py
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5871
+X-MS-Exchange-CrossTenant-UserPrincipalName: zuYmg16LUm8JdX8a5mq+DgcNO44J19FjToUeTHILYEx+h6Q1R/CdSp2oaV+3d6ZT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5915
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -136,66 +131,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 11:39:19AM -0400, Michael S. Tsirkin wrote:
-> On Fri, Sep 22, 2023 at 09:25:01AM -0300, Jason Gunthorpe wrote:
-> > On Fri, Sep 22, 2023 at 11:02:50AM +0800, Jason Wang wrote:
-> > > On Fri, Sep 22, 2023 at 3:53 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > > >
-> > > > On Thu, Sep 21, 2023 at 03:34:03PM -0400, Michael S. Tsirkin wrote:
-> > > >
-> > > > > that's easy/practical.  If instead VDPA gives the same speed with just
-> > > > > shadow vq then keeping this hack in vfio seems like less of a problem.
-> > > > > Finally if VDPA is faster then maybe you will reconsider using it ;)
-> > > >
-> > > > It is not all about the speed.
-> > > >
-> > > > VDPA presents another large and complex software stack in the
-> > > > hypervisor that can be eliminated by simply using VFIO.
+On Fri, Sep 22, 2023 at 11:40:58AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Sep 22, 2023 at 12:15:34PM -0300, Jason Gunthorpe wrote:
+> > On Fri, Sep 22, 2023 at 11:13:18AM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Sep 22, 2023 at 12:25:06PM +0000, Parav Pandit wrote:
+> > > > 
+> > > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > > Sent: Friday, September 22, 2023 5:53 PM
+> > > > 
+> > > > 
+> > > > > > And what's more, using MMIO BAR0 then it can work for legacy.
+> > > > > 
+> > > > > Oh? How? Our team didn't think so.
+> > > > 
+> > > > It does not. It was already discussed.
+> > > > The device reset in legacy is not synchronous.
+> > > > The drivers do not wait for reset to complete; it was written for the sw backend.
+> > > > Hence MMIO BAR0 is not the best option in real implementations.
 > > > 
-> > > vDPA supports standard virtio devices so how did you define
-> > > complexity?
+> > > Or maybe they made it synchronous in hardware, that's all.
+> > > After all same is true for the IO BAR0 e.g. for the PF: IO writes
+> > > are posted anyway.
 > > 
-> > As I said, VFIO is already required for other devices in these VMs. So
-> > anything incremental over base-line vfio-pci is complexity to
-> > minimize.
-> > 
-> > Everything vdpa does is either redundant or unnecessary compared to
-> > VFIO in these environments.
-> > 
-> > Jason
+> > IO writes are not posted in PCI.
 > 
-> Yes but you know. There are all kind of environments.  I guess you
-> consider yours the most mainstream and important, and are sure it will
-> always stay like this.  But if there's a driver that does what you need
-> then you use that.
+> Aha, I was confused. Thanks for the correction. I guess you just buffer
+> subsequent transactions while reset is going on and reset quickly enough
+> for it to be seemless then?
 
-Come on, you are the one saying we cannot do things in the best way
-possible because you want your way of doing things to be the only way
-allowed. Which of us thinks "yours the most mainstream and important" ??
+From a hardware perspective the CPU issues an non-posted IO write and
+then it stops processing until the far side returns an IO completion.
 
-I'm not telling you to throw away VPDA, I'm saying there are
-legimitate real world use cases where VFIO is the appropriate
-interface, not VDPA.
+Using that you can emulate what the SW virtio model did and delay the
+CPU from restarting until the reset is completed.
 
-I want choice, not dogmatic exclusion that there is Only One True Way.
+Since MMIO is always posted, this is not possible to emulate directly
+using MMIO.
 
-> You really should be explaining what vdpa *does not* do that you
-> need.
-
-I think I've done that enough, but if you have been following my
-explanation you should see that the entire point of this design is to
-allow a virtio device to be created inside a DPU to a specific
-detailed specification (eg an AWS virtio-net device, for instance)
-
-The implementation is in the DPU, and only the DPU.
-
-At the end of the day VDPA uses mediation and creates some
-RedHat/VDPA/Qemu virtio-net device in the guest. It is emphatically
-NOT a perfect recreation of the "AWS virtio-net" we started out with.
-
-It entirely fails to achieve the most important thing it needs to do!
-
-Yishai will rework the series with your remarks, we can look again on
-v2, thanks for all the input!
+Converting IO into non-posted admin commands is a fairly close
+recreation to what actual HW would do.
 
 Jason
