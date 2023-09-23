@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C7E97ABE3B
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 09:07:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 036B07ABE55
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 09:23:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbjIWHHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 03:07:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
+        id S230146AbjIWHWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Sep 2023 03:22:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjIWHHl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 03:07:41 -0400
+        with ESMTP id S229980AbjIWHWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Sep 2023 03:22:39 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75492199;
-        Sat, 23 Sep 2023 00:07:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435E3199;
+        Sat, 23 Sep 2023 00:22:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Vgx9t2PJeIXG7zfdSCU5vcjB1/K84DM+pM8rohPyWbQ=; b=ZgR6OUaVnsAjYhm8gCUNQoZz1d
-        FCm324avg3rW6YjHMSf4K7oY1cNQ51hdu9eTHcpHMu5EPhwYHg62O+BdcPv8ykeHUkMKV+0w/KOxc
-        xWq4OMlxcvwvs8WeWyM5xYMZ0Q/oj7IDwMH65RtP2pQCB50cE784e0L1wf43X+JU85cfIR8LqNaGU
-        vPCc+9SvLDka+ZUcrpNkWMa90DAXbL+RqYYkOgGeUNY9Q754BP/7xHH6XlsA8TZcTZc1fLM1f7SdF
-        iqNmo9hcceWxZ86EIIyLXyEs5MZKmit+IzH2PG7KkwpTmpvjvVUnSXd8J4V3fK2g/eQhInT2ekR15
-        +45Gs8pw==;
+        bh=s1U7bYZM9RSpdxm3UC8NKAgYL593oRAWEjarujw6UsM=; b=BbflizpONEoQy6us6m5AzUn5ke
+        cwqDVL6O1ICaoHFTTzhEi2E7S2gZGgojQXEbr/4XCny3b3k4NmKTXfIBvwoxAEx3LqLfQwHsrRiun
+        UWdpSj0nvbNit0HfydvzDR38U9Cmh6TRNnA4vwve505LRWDlRlt8/0LvXf2ecPKPsj+kv0gv1+TUZ
+        r2242K+u5Qn8BpdY+btbafgbTzG/thtD3cRMidjx4yyMfoHcA67S5pwkr1XooWheV9xEANlNQKGZ9
+        XV4IVYzp+hPZSiNQ81hVbLU+uzV7u2w6GDrBuf8LxC86WPYkQib4thbQXXoz9v9lOa+MODEjjJL5y
+        czuPS2zg==;
 Received: from [2001:8b0:10b:5:114:553c:a48f:b7ec] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qjwji-005Y8H-Fy; Sat, 23 Sep 2023 07:07:30 +0000
-Message-ID: <0bd42244f232ecc24cbbd2750196758bf7944293.camel@infradead.org>
-Subject: Re: [PATCH v5 06/10] KVM: xen: allow shared_info to be mapped by
- fixed HVA
+        id 1qjwy4-005dBH-KX; Sat, 23 Sep 2023 07:22:20 +0000
+Message-ID: <faec494b6df5ebee5644017c9415e747bd34952b.camel@infradead.org>
+Subject: Re: [RFC] KVM: x86: Allow userspace exit on HLT and MWAIT, else
+ yield on MWAIT
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Date:   Sat, 23 Sep 2023 08:07:27 +0100
-In-Reply-To: <20230922150009.3319-7-paul@xen.org>
-References: <20230922150009.3319-1-paul@xen.org>
-         <20230922150009.3319-7-paul@xen.org>
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        graf@amazon.de, Nicolas Saenz Julienne <nsaenz@amazon.es>,
+        "Griffoul, Fred" <fgriffo@amazon.com>
+Date:   Sat, 23 Sep 2023 08:22:20 +0100
+In-Reply-To: <CABgObfZgYXaXqP=6s53=+mYWvOnbgYJiCRct-0ob444sK9SvGw@mail.gmail.com>
+References: <1b52b557beb6606007f7ec5672eab0adf1606a34.camel@infradead.org>
+         <CABgObfZgYXaXqP=6s53=+mYWvOnbgYJiCRct-0ob444sK9SvGw@mail.gmail.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-I2+0A2otDabZDqrhk8pF"
+        boundary="=-QW7xpGr20+TDBiyntFRV"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,31 +59,97 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-I2+0A2otDabZDqrhk8pF
+--=-QW7xpGr20+TDBiyntFRV
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-09-22 at 15:00 +0000, Paul Durrant wrote:
-> From: Paul Durrant <pdurrant@amazon.com>
+On Fri, 2023-09-22 at 14:00 +0200, Paolo Bonzini wrote:
+> On Mon, Sep 18, 2023 at 11:30=E2=80=AFAM David Woodhouse <dwmw2@infradead=
+.org> wrote:
+> >=20
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > The VMM may have work to do on behalf of the guest, and it's often
+> > desirable to use the cycles when the vCPUS are idle.
+> >=20
+> > When the vCPU uses HLT this works out OK because the VMM can run its
+> > tasks in a separate thread which gets scheduled when the in-kernel
+> > emulation of HLT schedules away. It isn't perfect, because it doesn't
+> > easily allow for handling both low-priority maintenance tasks when the
+> > VMM wants to wait until the vCPU is idle, and also for higher priority
+> > tasks where the VMM does want to preempt the vCPU. It can also lead to
+> > noisy neighbour effects, when a host has isn't necessarily sized to
+> > expect any given VMM to suddenly be contending for many *more* pCPUs
+> > than it has vCPUs.
+> >=20
+> > In addition, there are times when we need to expose MWAIT to a guest
+> > for compatibility with a previous environment. And MWAIT is much harder
+> > because it's very hard to emulate properly.
 >=20
-> The shared_info page is not guest memory as such. It is a dedicated page
-> allocated by the VMM and overlaid onto guest memory in a GFN chosen by th=
-e
-> guest. The guest may even request that shared_info be moved from one GFN
-> to another, but the HVA is never going to change. Thus it makes much more
-> sense to map the shared_info page in kernel once using this fixed HVA.
+> I don't dislike giving userspace more flexibility in deciding when to
+> exit on HLT and MWAIT (or even PAUSE), and kvm_run is a good place to
+> do this. It's an extension of request_interrupt_window and
+> immediate_exit. I'm not sure how it would interact with
+> KVM_CAP_X86_DISABLE_EXITS.
 
-The words "makes much more sense" are doing a *lot* of work there. :)
+Yeah, right now it doesn't interact at all. The use case is that you
+*always* allow vmexits to KVM for the offending instructions, and then
+it's just a question of what KVM does when that happens.
 
-When heckling the cover letter in
-https://lore.kernel.org/kvm/d13e459e221f28fb1865eedea023e583a2277ab1.camel@=
-infradead.org/
-I suggested that the explanation probably wants to make it into a
-commit message rather than just the cover letter which tends not to be
-preserved in the commit history. It's *this* commit which needs it, I
-think.
+> Perhaps KVM_ENABLE_CAP(KVM_X86_DISABLE_EXITS) could be changed to do
+> nothing except writing to a new kvm_run field? All the kvm-
+> >arch.*_in_guest field would change into a kvm-
+> >arch.saved_request_userspace_exit, and every vmentry would do
+> something like
+>=20
+> =C2=A0 if (kvm->arch.saved_request_userspace_exit !=3D kvm_run->request_u=
+serspace_exit) {
+> =C2=A0=C2=A0=C2=A0=C2=A0 /* tweak intercepts */
+> =C2=A0 }
+>=20
+> To avoid races you need two flags though; there needs to be also a
+> kernel->userspace communication of whether the vCPU is currently in
+> HLT or MWAIT, using the "flags" field for example. If it was HLT only,
+> moving the mp_state in kvm_run would seem like a good idea; but not if
+> MWAIT or PAUSE are also included.
 
---=-I2+0A2otDabZDqrhk8pF
+Right. When work is added to an empty workqueue, the VMM will want to
+hunt for a vCPU which is currently idle and then signal it to exit.
+
+As you say, for HLT it's simple enough to look at the mp_state, and we
+can move that into kvm_run so it doesn't need an ioctl... although it
+would also be nice to get an *event* on an eventfd when the vCPU
+becomes runnable (as noted, we want that for VSM anyway). Or perhaps
+even to be able to poll() on the vCPU fd.
+
+But MWAIT (as currently not-really-emulated) and PAUSE are both just
+transient states with nothing you can really *wait* for, which is why
+they're such fun to deal with.
+
+> To set a kvm_run flag during MWAIT, you could reenter MWAIT with the
+> MWAIT-exiting bit cleared and the monitor trap flag bit (or just
+> EFLAGS.TF) set. On the subsequent singlestep exit, clear the flag in
+> kvm_run and set again the MWAIT-exiting bit. The MWAIT handler would
+> also check kvm_run->request_userspace_exit before reentering.
+
+Yeah, we've pondered that one. Perhaps coupled with setting the scheduling
+priority as low as possible while it's actually on the MWAIT, and
+putting it back again afterwards.=C2=A0Something along the lines of 'do not
+schedule me unless you literally have *nothing* else to do on this
+pCPU, for the next N =C2=B5s'.
+
+Not pretty, but *nothing* you do with MWAIT is going to be pretty.
+Unless we can tolerate 4KiB granularity and actually get the read-only
+and minor fault trick working.
+
+Anyway, I knocked this up just for Fred to play with and see what
+actually performs reasonably and what doesn't, because I never want to
+post even random proof-of-concept kernel patches in private. So we'll
+play with it and see what we get out of it.
+
+
+
+--=-QW7xpGr20+TDBiyntFRV
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -175,24 +241,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTIzMDcwNzI3WjAvBgkqhkiG9w0BCQQxIgQg27SzGVRa
-1BTvZ9yqG6kSzVQu2q0kQGS0+bIwYxtxFKgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTIzMDcyMjIwWjAvBgkqhkiG9w0BCQQxIgQg4C2pvsPF
+6gP/COjvHY51wrgoDYMIEplJsAWDYVdSTbYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBGdEBeeoS2ep5+mqiZzkqF5winn8h5tjOV
-1VJUTlk5wMkcA/AowyAZJRu9NUvKkbZWTew/IEdzB5VMRmuuJ14Q6tk+/L/lrm9OGl4pqqxcSuBJ
-/QXH5VTjnNEUCuRNMU18Wg41yJKwEtbNomYpGMWS+lkeEwhxvox+IUxCuThCoFoi3DYhfcw5Zs9s
-ZAb9ik0zkCg3nAeJ1g1tpRcFkYZRA25E2tuRoF6xX19YBz3fitOfeB0wpU2Z5kQWyAkNf6wdiaAb
-nB9DoS7q4yJlWu5Tgx1iB03ch+pCEQ6BPgILcSbCDkIQQAchFY6WhCBFgWSqS3CFoJ8Fd5e5AXeL
-+/vwRZ7TxxvGfwdiYySzJrYDRDhx62IVeOguaPpizbeDv+QB4yIZKiFNlsxpfTdI2wbV4mjD3nzg
-3YJxc9MwTX5UulnVDXHjOqa+DtqO++0u1aLL+JlRssRU5FvpxHy8gji+PVHDskZU4G1u0j7zHkq+
-tCV3NeufyGvbhcILif7r/U8nMtPFbUU22MuQBOUzq364t4PD2nLDJyyBmUNNXQQj6j090ZvS4z1q
-fhfcKtOt6lWQwWafbkFeUA0P3hnVOakJk24NKX218W1xq8XjS5U9j/rcQESDYUUFZ6hUdZkujjoY
-uxSiAmXPiGcsUuii8H0cw9IzPbtapIx5vfIJVrWPQgAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB+slSMDtt5vLbl5pjPqVCY0fqe9/SmnZOL
+eHtuvAzia1nYsyiHs61GXTRQe13ipTm3SeX5C0mMSvorlBv61736XkntTcEyZ4S4zvfej4hID36t
+OzHvDuhi9B9bc7Jk1LIXIsZtI67ZmlyQwQQKYqvmhYZ+9iP5VhPKZqeURkYSTK9le4vUAj9eEZ6O
+0XYA7IQ9QINTiHSH3KC6fjOhkC437OeVobaAlMfFN2ppiBV+1LcCiphoc/fq3VntxxNDjuFZiBEW
+UMWzNfI9MRB6pDPXYkhqxq1MXPhlw3ZQJpRKLl9oPRE2m/7ic6V5vBhcsiPa6KrTHnTWHWXXW3wZ
+DScPN+QJNT5NjaYCQaiGPqZ6YUunbjRcxyQ2bYZP6FZwp3+obEfirjiSzfF8/JuiGg7xby+B+BXH
+MqUc4lMztKMd+0xfCRbmNhSIf5eUvgJ8T1WvmJDn/P/HfsM+fndcRg2K/mRqDBqSA4Ll9qcAzt2q
+GLgMMgufhdO6g3vcGTbIGlNt9Jx99yzvPD1SYUMou7hG3e/+pe3Z5WQulhuPm/3E/vYZYHYcVAI5
+16pFdnafcX/HKR8aPf681DUYDAIslGLtmBmCNFEUSq2m+5kxYuGNnHzh7QaGuu//L2cfP0Xmn7gW
+LhhJHWEdeJZ4skHae4Ve1yNEjiQi7+ynXHZ8IRit4QAAAAAAAA==
 
 
---=-I2+0A2otDabZDqrhk8pF--
+--=-QW7xpGr20+TDBiyntFRV--
