@@ -2,188 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C960A7AC001
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 12:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C6107AC074
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 12:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231411AbjIWKOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 06:14:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44842 "EHLO
+        id S231158AbjIWK1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Sep 2023 06:27:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231158AbjIWKOQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 06:14:16 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2451733;
-        Sat, 23 Sep 2023 03:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695463929; x=1726999929;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dp4g3U5j1+mHLqLShoixZI9RDsoukyKAu6bCdytj8jk=;
-  b=bLQY4bdOT3wjV8b2BfFCfeFJAJYzr06hcUl+W+MNXreUSv7xKotPnT3V
-   oGFvx0CUpZk5ZnwPwKmhYImXjRQ8oSrMyUEp8bYo8Z2KZf3R99aS4uNeI
-   I6zuyIPKZNH9H1rlZTbAwFuAm2PinZfoxtDtGPgjgs5EgEfV6MtOK8jXm
-   K1DYJO/AuuCSNQSvb8BX3RqwhqyKMJBnLnhaivhr6Oe11IpUnI2RcdUma
-   YNhTADBguUMwKW3uHGo8PaddYILIkQFk+woxHOAImGIfuaBCu1N6j0nOn
-   9XdM4GE1AkKSCqRUkvPKQ0wQhZy5GrUQGAltI3Bcz25g2re3VZ+ss0sNz
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="447492537"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="447492537"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 03:11:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="813388252"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="813388252"
-Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga008.fm.intel.com with ESMTP; 23 Sep 2023 03:11:54 -0700
-From:   Xin Li <xin3.li@intel.com>
-To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
-        mhiramat@kernel.org, andrew.cooper3@citrix.com,
-        jiangshanlai@gmail.com, nik.borisov@suse.com
-Subject: [PATCH v11 37/37] x86/fred: Invoke FRED initialization code to enable FRED
-Date:   Sat, 23 Sep 2023 02:42:12 -0700
-Message-Id: <20230923094212.26520-38-xin3.li@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230923094212.26520-1-xin3.li@intel.com>
-References: <20230923094212.26520-1-xin3.li@intel.com>
+        with ESMTP id S231381AbjIWK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Sep 2023 06:27:12 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C15A0CC2
+        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 03:20:38 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso5583114e87.1
+        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 03:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philjordan-eu.20230601.gappssmtp.com; s=20230601; t=1695464437; x=1696069237; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=beqPlsrep7tGPBGi9Y6AF8G8DeZpnuf0Z6TGNso5/5E=;
+        b=yHKmSziefvYU9p+Q9lT0VfE8LBLKCo69WsReKD0MCteT3qHZOiqicDHprvYik+72aA
+         cgR9cB6bOrAUMmcKVCRjPR9sKGQttcnWPZmbxQs0iR5kIcmXULg6bLcxxLrvzkQQ7n8s
+         iMLoDTEKVGS43ujXKo7AcxxM1cTuwmVsdG6/CLNYQ0XySFcQP9QkjicoLvLJcpaWxzcz
+         VPaQP+43G8/YMk+fCCszK/PHqcFC9tmpiAarR7qLnOvVuOqrs1M/mMpiWRGh92G46YRn
+         KHkLRNdfKHmUS1yxvSsFka0bVu1CMuE8UXVVLsP+kt85awWaT/DOg4esTRJnE+Iv2wA9
+         aVKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695464437; x=1696069237;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=beqPlsrep7tGPBGi9Y6AF8G8DeZpnuf0Z6TGNso5/5E=;
+        b=ltDgOsqN1CSoi+26fT6hhQ2ATB6H/evYLchToC3LF2kvGATwhGeVAu2dmLOxxmwCtS
+         Om4l06+0d1Xp1UVr8USds2GAWy0Q6Q2/H4OQ7jETw9H1zJyrcNxY+LUjtNdK0d/aEBkK
+         oHtP2JJfomZy3Da+LtYjckbqLDBxGGW950HcgFZT6s96Z8OnTBq8mTM1hM+QWdT3fbAG
+         mQVjIjb3TsWz4Ao3DvbDVdmGHtXA6i4hQWDAtByvxWfD8zPiZ4CGJv6Z0mMAf4Zlrdai
+         Gk8BC3vUv+TLoms+VCHKbkwdGjebKpC0irAaluX5MCfiJ0MX5a3OYDVR8+53QOHPTA74
+         u23w==
+X-Gm-Message-State: AOJu0YzXxnBpgX+VH7RsR7gf9oA4jkuh+AuRHLAFbqgDb6NUdihXrRCs
+        OKJNVy2HYKA4jJUUIytNGAKZmBKNZJ75pjR1qvc=
+X-Google-Smtp-Source: AGHT+IEY5eQrLes5cwu48PovxAT7BJkS+xd3OcfLrqC1y6EBaKadlTUSDy6OZjEIgdSgCiZ8xwNBEw==
+X-Received: by 2002:a05:6512:3454:b0:4fe:711:2931 with SMTP id j20-20020a056512345400b004fe07112931mr1374392lfr.22.1695464436597;
+        Sat, 23 Sep 2023 03:20:36 -0700 (PDT)
+Received: from localhost.localdomain (89-104-8-249.customer.bnet.at. [89.104.8.249])
+        by smtp.gmail.com with ESMTPSA id v22-20020a056402185600b0052a3aa50d72sm3223833edy.40.2023.09.23.03.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Sep 2023 03:20:35 -0700 (PDT)
+From:   Phil Dennis-Jordan <phil@philjordan.eu>
+To:     kvm@vger.kernel.org
+Cc:     lists@philjordan.eu, Phil Dennis-Jordan <phil@philjordan.eu>
+Subject: [kvm-unit-tests PATCH] x86/apic: Gates test_pv_ipi on KVM cpuid, not test device
+Date:   Sat, 23 Sep 2023 12:20:19 +0200
+Message-Id: <20230923102019.29444-1-phil@philjordan.eu>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,T_SPF_TEMPERROR
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+This changes the test for the KVM IPI hypercall API to be skipped if the
+relevant cpuid feature bit is not set or if the KVM cpuid leaf is
+missing, rather than the presence of the test device. The latter is an
+unreliable inference on non-KVM platforms.
 
-Let cpu_init_exception_handling() call cpu_init_fred_exceptions() to
-initialize FRED. However if FRED is unavailable or disabled, it falls
-back to set up TSS IST and initialize IDT.
+It also adds a skip report when these tests are skipped.
 
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Co-developed-by: Xin Li <xin3.li@intel.com>
-Tested-by: Shan Kang <shan.kang@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
+Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
 ---
+ lib/x86/processor.h | 19 +++++++++++++++++++
+ x86/apic.c          |  9 ++++++++-
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-Changes since v10:
-* No need to invalidate SYSCALL and SYSENTER MSRs (Thomas Gleixner).
-
-Changes since v8:
-* Move this patch after all required changes are in place (Thomas
-  Gleixner).
----
- arch/x86/kernel/cpu/common.c | 22 +++++++++++++++++-----
- arch/x86/kernel/irqinit.c    |  7 ++++++-
- arch/x86/kernel/traps.c      |  5 ++++-
- 3 files changed, 27 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 2ee4e7b597a3..e7a5b9831252 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -61,6 +61,7 @@
- #include <asm/microcode.h>
- #include <asm/intel-family.h>
- #include <asm/cpu_device_id.h>
-+#include <asm/fred.h>
- #include <asm/uv/uv.h>
- #include <asm/ia32.h>
- #include <asm/set_memory.h>
-@@ -2112,7 +2113,15 @@ void syscall_init(void)
- 	/* The default user and kernel segments */
- 	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 44f4fd1e..9a4c0d26 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -284,6 +284,13 @@ static inline bool is_intel(void)
+ #define X86_FEATURE_VNMI		(CPUID(0x8000000A, 0, EDX, 25))
+ #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
  
--	idt_syscall_init();
-+	/*
-+	 * Except the IA32_STAR MSR, there is NO need to setup SYSCALL and
-+	 * SYSENTER MSRs for FRED, because FRED uses the ring 3 FRED
-+	 * entrypoint for SYSCALL and SYSENTER, and ERETU is the only legit
-+	 * instruction to return to ring 3 (both sysexit and sysret cause
-+	 * #UD when FRED is enabled).
-+	 */
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED))
-+		idt_syscall_init();
++/*
++ * Hypervisor specific leaves (KVM, ...)
++ * See:
++ * https://kernel.org/doc/html/latest/virt/kvm/x86/cpuid.html
++ */
++#define	X86_KVM_FEATURE_PV_SEND_IPI  (CPUID(0x40000001, 0, EAX, 11))
++
+ static inline bool this_cpu_has(u64 feature)
+ {
+ 	u32 input_eax = feature >> 32;
+@@ -299,6 +306,18 @@ static inline bool this_cpu_has(u64 feature)
+ 	return ((*(tmp + (output_reg % 32))) & (1 << bit));
  }
  
- #else	/* CONFIG_X86_64 */
-@@ -2228,8 +2237,9 @@ void cpu_init_exception_handling(void)
- 	/* paranoid_entry() gets the CPU number from the GDT */
- 	setup_getcpu(cpu);
- 
--	/* IST vectors need TSS to be set up. */
--	tss_setup_ist(tss);
-+	/* For IDT mode, IST vectors need to be set in TSS. */
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED))
-+		tss_setup_ist(tss);
- 	tss_setup_io_bitmap(tss);
- 	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
- 
-@@ -2238,8 +2248,10 @@ void cpu_init_exception_handling(void)
- 	/* GHCB needs to be setup to handle #VC. */
- 	setup_ghcb();
- 
--	/* Finally load the IDT */
--	load_current_idt();
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		cpu_init_fred_exceptions();
-+	else
-+		load_current_idt();
++static inline bool kvm_feature_flags_supported(void)
++{
++	struct cpuid c;
++
++	c = cpuid_indexed(0x40000000, 0);
++	return
++		c.b == 0x4b4d564b
++		&& c.c == 0x564b4d56
++		&& c.d == 0x4d
++		&& (c.a >= 0x40000001 || c.a == 0);
++}
++
+ struct far_pointer32 {
+ 	u32 offset;
+ 	u16 selector;
+diff --git a/x86/apic.c b/x86/apic.c
+index dd7e7834..525e08fd 100644
+--- a/x86/apic.c
++++ b/x86/apic.c
+@@ -30,6 +30,11 @@ static bool is_xapic_enabled(void)
+ 	return (rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN;
  }
  
- /*
-diff --git a/arch/x86/kernel/irqinit.c b/arch/x86/kernel/irqinit.c
-index c683666876f1..f79c5edc0b89 100644
---- a/arch/x86/kernel/irqinit.c
-+++ b/arch/x86/kernel/irqinit.c
-@@ -28,6 +28,7 @@
- #include <asm/setup.h>
- #include <asm/i8259.h>
- #include <asm/traps.h>
-+#include <asm/fred.h>
- #include <asm/prom.h>
- 
- /*
-@@ -96,7 +97,11 @@ void __init native_init_IRQ(void)
- 	/* Execute any quirks before the call gates are initialised: */
- 	x86_init.irqs.pre_vector_init();
- 
--	idt_setup_apic_and_irq_gates();
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		fred_complete_exception_setup();
-+	else
-+		idt_setup_apic_and_irq_gates();
++static bool is_kvm_ipi_hypercall_supported(void)
++{
++	return kvm_feature_flags_supported() && this_cpu_has(X86_KVM_FEATURE_PV_SEND_IPI);
++}
 +
- 	lapic_assign_system_vectors();
+ static void test_lapic_existence(void)
+ {
+ 	u8 version;
+@@ -658,8 +663,10 @@ static void test_pv_ipi(void)
+ 	int ret;
+ 	unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
  
- 	if (!acpi_ioapic && !of_ioapic && nr_legacy_irqs()) {
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 848c85208a57..0ee78a30e14a 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -1411,7 +1411,10 @@ void __init trap_init(void)
+-	if (!test_device_enabled())
++	if (!is_kvm_ipi_hypercall_supported()) {
++		report_skip("PV IPIs testing (No KVM IPI hypercall flag in cpuid)");
+ 		return;
++	}
  
- 	/* Initialize TSS before setting up traps so ISTs work */
- 	cpu_init_exception_handling();
-+
- 	/* Setup traps as cpu_init() might #GP */
--	idt_setup_traps();
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED))
-+		idt_setup_traps();
-+
- 	cpu_init();
- }
+ 	asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
+ 	report(!ret, "PV IPIs testing");
 -- 
-2.34.1
+2.36.1
 
