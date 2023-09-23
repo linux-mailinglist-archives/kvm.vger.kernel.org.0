@@ -2,63 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C6107AC074
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 12:27:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B297AC420
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 19:42:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231158AbjIWK1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 06:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44514 "EHLO
+        id S232226AbjIWRmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Sep 2023 13:42:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231381AbjIWK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 06:27:12 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C15A0CC2
-        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 03:20:38 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso5583114e87.1
-        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 03:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philjordan-eu.20230601.gappssmtp.com; s=20230601; t=1695464437; x=1696069237; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=beqPlsrep7tGPBGi9Y6AF8G8DeZpnuf0Z6TGNso5/5E=;
-        b=yHKmSziefvYU9p+Q9lT0VfE8LBLKCo69WsReKD0MCteT3qHZOiqicDHprvYik+72aA
-         cgR9cB6bOrAUMmcKVCRjPR9sKGQttcnWPZmbxQs0iR5kIcmXULg6bLcxxLrvzkQQ7n8s
-         iMLoDTEKVGS43ujXKo7AcxxM1cTuwmVsdG6/CLNYQ0XySFcQP9QkjicoLvLJcpaWxzcz
-         VPaQP+43G8/YMk+fCCszK/PHqcFC9tmpiAarR7qLnOvVuOqrs1M/mMpiWRGh92G46YRn
-         KHkLRNdfKHmUS1yxvSsFka0bVu1CMuE8UXVVLsP+kt85awWaT/DOg4esTRJnE+Iv2wA9
-         aVKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695464437; x=1696069237;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=beqPlsrep7tGPBGi9Y6AF8G8DeZpnuf0Z6TGNso5/5E=;
-        b=ltDgOsqN1CSoi+26fT6hhQ2ATB6H/evYLchToC3LF2kvGATwhGeVAu2dmLOxxmwCtS
-         Om4l06+0d1Xp1UVr8USds2GAWy0Q6Q2/H4OQ7jETw9H1zJyrcNxY+LUjtNdK0d/aEBkK
-         oHtP2JJfomZy3Da+LtYjckbqLDBxGGW950HcgFZT6s96Z8OnTBq8mTM1hM+QWdT3fbAG
-         mQVjIjb3TsWz4Ao3DvbDVdmGHtXA6i4hQWDAtByvxWfD8zPiZ4CGJv6Z0mMAf4Zlrdai
-         Gk8BC3vUv+TLoms+VCHKbkwdGjebKpC0irAaluX5MCfiJ0MX5a3OYDVR8+53QOHPTA74
-         u23w==
-X-Gm-Message-State: AOJu0YzXxnBpgX+VH7RsR7gf9oA4jkuh+AuRHLAFbqgDb6NUdihXrRCs
-        OKJNVy2HYKA4jJUUIytNGAKZmBKNZJ75pjR1qvc=
-X-Google-Smtp-Source: AGHT+IEY5eQrLes5cwu48PovxAT7BJkS+xd3OcfLrqC1y6EBaKadlTUSDy6OZjEIgdSgCiZ8xwNBEw==
-X-Received: by 2002:a05:6512:3454:b0:4fe:711:2931 with SMTP id j20-20020a056512345400b004fe07112931mr1374392lfr.22.1695464436597;
-        Sat, 23 Sep 2023 03:20:36 -0700 (PDT)
-Received: from localhost.localdomain (89-104-8-249.customer.bnet.at. [89.104.8.249])
-        by smtp.gmail.com with ESMTPSA id v22-20020a056402185600b0052a3aa50d72sm3223833edy.40.2023.09.23.03.20.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Sep 2023 03:20:35 -0700 (PDT)
-From:   Phil Dennis-Jordan <phil@philjordan.eu>
-To:     kvm@vger.kernel.org
-Cc:     lists@philjordan.eu, Phil Dennis-Jordan <phil@philjordan.eu>
-Subject: [kvm-unit-tests PATCH] x86/apic: Gates test_pv_ipi on KVM cpuid, not test device
-Date:   Sat, 23 Sep 2023 12:20:19 +0200
-Message-Id: <20230923102019.29444-1-phil@philjordan.eu>
-X-Mailer: git-send-email 2.36.1
+        with ESMTP id S232147AbjIWRmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Sep 2023 13:42:09 -0400
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7770E41;
+        Sat, 23 Sep 2023 10:41:55 -0700 (PDT)
+Received: from eig-obgw-5004a.ext.cloudfilter.net ([10.0.29.221])
+        by cmsmtp with ESMTP
+        id jjWTqGVdqbK1Vk6deqmNLZ; Sat, 23 Sep 2023 17:41:55 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with ESMTPS
+        id k6ddqpBMluHtrk6deqaNhR; Sat, 23 Sep 2023 17:41:54 +0000
+X-Authority-Analysis: v=2.4 cv=B8eqbchM c=1 sm=1 tr=0 ts=650f2362
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=P7XfKmiOJ4/qXqHZrN7ymg==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=zNV7Rl7Rt7sA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
+ a=20KFwNOVAAAA:8 a=VwQbUJbxAAAA:8 a=cm27Pg_UAAAA:8 a=HvF037n1xESchLcPDVoA:9
+ a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22 a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=H4JREhYHBOAGWkRiGPUdzLOI0Q+X9gKq6OB7uMuTe1I=; b=MFwqU9oovIy23L0FWzwPeiuZaF
+        pOuzFavWPqSrM6dWy7o1Y102OD/SxZHV2NguGty0Zdk6ijy/u5VxQm3mOLdd4jZfMpBsSgXGc1/TG
+        3uh1l09NQKqRtbVd55eU/2Xb8O0FSKR3drSQGF9JjMOXFNEZBuIMZ/sigDM1kbxCCmqcXmVBmqJHb
+        Hi5j6CMi2zHOOISwg/FevzUW2Mu+X9u2WYbKSu3NCLuy6TNzt/RmQzpheTpQuCR+/oIvyG/QBB+up
+        iXgHha4UIzczUEeiCGMK0HdlhPVDJXdfKf9/WrGUM5uHzaG0JMSf7ns8Hfjl8c9bgiTpjMYc+H/S2
+        0v72OciQ==;
+Received: from [94.239.20.48] (port=47370 helo=[192.168.1.98])
+        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.96)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1qjy33-003ahi-1V;
+        Sat, 23 Sep 2023 03:31:33 -0500
+Message-ID: <e8ff2426-66dc-3357-da9f-af818720b2a0@embeddedor.com>
+Date:   Sat, 23 Sep 2023 10:32:36 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,T_SPF_TEMPERROR
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] KVM: Annotate struct kvm_irq_routing_table with
+ __counted_by
+Content-Language: en-US
+To:     Kees Cook <keescook@chromium.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, linux-hardening@vger.kernel.org
+References: <20230922175121.work.660-kees@kernel.org>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20230922175121.work.660-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 94.239.20.48
+X-Source-L: No
+X-Exim-ID: 1qjy33-003ahi-1V
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.98]) [94.239.20.48]:47370
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 0
+X-Org:  HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfGF3kEVF/oyazSLptLeNrd1xq+LRv8hO1SPGnakzayri52Nx7j0OVhQg/hWDNf4DGIle5O5+KUsCMtaRPEynMucx7ZgZ6hWmo7IRAzuV911/YZX+15r7
+ IwbaoonIg5JQsnx7dl0lp4tf635Wo2PnjnhESuaeO3fw726wYotE4g5sKj4w7TMmNyGsq/JqahA4MLHLGoK+FWCM4GYqjitRAu32Mwp32MO9t+7ZIpBDhKqI
+ KvPBHGcqsOuSHrfZ8LHqRripAi6YRNHHeA7/sp+zkNxnAv9xYd7MHKHkyLQAUaew
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,84 +94,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This changes the test for the KVM IPI hypercall API to be skipped if the
-relevant cpuid feature bit is not set or if the KVM cpuid leaf is
-missing, rather than the presence of the test device. The latter is an
-unreliable inference on non-KVM platforms.
 
-It also adds a skip report when these tests are skipped.
 
-Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
----
- lib/x86/processor.h | 19 +++++++++++++++++++
- x86/apic.c          |  9 ++++++++-
- 2 files changed, 27 insertions(+), 1 deletion(-)
+On 9/22/23 11:51, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct kvm_irq_routing_table.
+> 
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 44f4fd1e..9a4c0d26 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -284,6 +284,13 @@ static inline bool is_intel(void)
- #define X86_FEATURE_VNMI		(CPUID(0x8000000A, 0, EDX, 25))
- #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
- 
-+/*
-+ * Hypervisor specific leaves (KVM, ...)
-+ * See:
-+ * https://kernel.org/doc/html/latest/virt/kvm/x86/cpuid.html
-+ */
-+#define	X86_KVM_FEATURE_PV_SEND_IPI  (CPUID(0x40000001, 0, EAX, 11))
-+
- static inline bool this_cpu_has(u64 feature)
- {
- 	u32 input_eax = feature >> 32;
-@@ -299,6 +306,18 @@ static inline bool this_cpu_has(u64 feature)
- 	return ((*(tmp + (output_reg % 32))) & (1 << bit));
- }
- 
-+static inline bool kvm_feature_flags_supported(void)
-+{
-+	struct cpuid c;
-+
-+	c = cpuid_indexed(0x40000000, 0);
-+	return
-+		c.b == 0x4b4d564b
-+		&& c.c == 0x564b4d56
-+		&& c.d == 0x4d
-+		&& (c.a >= 0x40000001 || c.a == 0);
-+}
-+
- struct far_pointer32 {
- 	u32 offset;
- 	u16 selector;
-diff --git a/x86/apic.c b/x86/apic.c
-index dd7e7834..525e08fd 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -30,6 +30,11 @@ static bool is_xapic_enabled(void)
- 	return (rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN;
- }
- 
-+static bool is_kvm_ipi_hypercall_supported(void)
-+{
-+	return kvm_feature_flags_supported() && this_cpu_has(X86_KVM_FEATURE_PV_SEND_IPI);
-+}
-+
- static void test_lapic_existence(void)
- {
- 	u8 version;
-@@ -658,8 +663,10 @@ static void test_pv_ipi(void)
- 	int ret;
- 	unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
- 
--	if (!test_device_enabled())
-+	if (!is_kvm_ipi_hypercall_supported()) {
-+		report_skip("PV IPIs testing (No KVM IPI hypercall flag in cpuid)");
- 		return;
-+	}
- 
- 	asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
- 	report(!ret, "PV IPIs testing");
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks
 -- 
-2.36.1
+Gustavo
 
+> ---
+>   include/linux/kvm_host.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index fb6c6109fdca..4944136efaa2 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -664,7 +664,7 @@ struct kvm_irq_routing_table {
+>   	 * Array indexed by gsi. Each entry contains list of irq chips
+>   	 * the gsi is connected to.
+>   	 */
+> -	struct hlist_head map[];
+> +	struct hlist_head map[] __counted_by(nr_rt_entries);
+>   };
+>   #endif
+>   
