@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6E8E7AC004
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 12:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C960A7AC001
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 12:16:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbjIWKPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 06:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60438 "EHLO
+        id S231411AbjIWKOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Sep 2023 06:14:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231276AbjIWKPY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 06:15:24 -0400
+        with ESMTP id S231158AbjIWKOQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Sep 2023 06:14:16 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5E4CDA;
-        Sat, 23 Sep 2023 03:12:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2451733;
+        Sat, 23 Sep 2023 03:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695463922; x=1726999922;
+  t=1695463929; x=1726999929;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Sp0+AV8Wk0Fbo8OC2qcHvn3gACkXfZEMeDhitLz3FOw=;
-  b=DIGC24SSzEW2sW+ejx4Q39no2XvditXym88PPscxE6uLGsHaZkOcnOS5
-   RAyXVKX9p9rL4W+hr5A5GHxA8q/Tn2H+vjKAWJoMxSP995pRhO3xg/FOI
-   +icD5dNckGjU3tA+QfjueBc7ZMKdjirHl8/fk416xMDR86d+cNB4FhGXW
-   /DyGnzEqfl1zTdxDS7yqi92v827hwT3yohQDmOdelX2Le+H2Ap89qcU7R
-   ZL6Ig3/+ayMkradUFJDiGJsmsDI8H8zzXPbNhud+R5WHkPXfgxLa9KEdt
-   /nmnvrPo6ynZQ7BW4PPxxJdAFFQlZLmmZTJ/pIZPfvPGGdr8LSKDxmm0y
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="447492509"
+  bh=dp4g3U5j1+mHLqLShoixZI9RDsoukyKAu6bCdytj8jk=;
+  b=bLQY4bdOT3wjV8b2BfFCfeFJAJYzr06hcUl+W+MNXreUSv7xKotPnT3V
+   oGFvx0CUpZk5ZnwPwKmhYImXjRQ8oSrMyUEp8bYo8Z2KZf3R99aS4uNeI
+   I6zuyIPKZNH9H1rlZTbAwFuAm2PinZfoxtDtGPgjgs5EgEfV6MtOK8jXm
+   K1DYJO/AuuCSNQSvb8BX3RqwhqyKMJBnLnhaivhr6Oe11IpUnI2RcdUma
+   YNhTADBguUMwKW3uHGo8PaddYILIkQFk+woxHOAImGIfuaBCu1N6j0nOn
+   9XdM4GE1AkKSCqRUkvPKQ0wQhZy5GrUQGAltI3Bcz25g2re3VZ+ss0sNz
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="447492537"
 X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="447492509"
+   d="scan'208";a="447492537"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 03:11:54 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 03:11:56 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="813388245"
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="813388252"
 X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="813388245"
+   d="scan'208";a="813388252"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga008.fm.intel.com with ESMTP; 23 Sep 2023 03:11:53 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 23 Sep 2023 03:11:54 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com, nik.borisov@suse.com
-Subject: [PATCH v11 36/37] x86/fred: Add FRED initialization functions
-Date:   Sat, 23 Sep 2023 02:42:11 -0700
-Message-Id: <20230923094212.26520-37-xin3.li@intel.com>
+Subject: [PATCH v11 37/37] x86/fred: Invoke FRED initialization code to enable FRED
+Date:   Sat, 23 Sep 2023 02:42:12 -0700
+Message-Id: <20230923094212.26520-38-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230923094212.26520-1-xin3.li@intel.com>
 References: <20230923094212.26520-1-xin3.li@intel.com>
@@ -67,16 +67,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add cpu_init_fred_exceptions() to:
-  - Set FRED entrypoints for events happening in ring 0 and 3.
-  - Specify the stack level for IRQs occurred ring 0.
-  - Specify dedicated event stacks for #DB/NMI/#MCE/#DF.
-  - Enable FRED and invalidtes IDT.
-  - Force 32-bit system calls to use "int $0x80" only.
-
-Add fred_complete_exception_setup() to:
-  - Initialize system_vectors as done for IDT systems.
-  - Set unused sysvec_table entries to fred_handle_spurious_interrupt().
+Let cpu_init_exception_handling() call cpu_init_fred_exceptions() to
+initialize FRED. However if FRED is unavailable or disabled, it falls
+back to set up TSS IST and initialize IDT.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Co-developed-by: Xin Li <xin3.li@intel.com>
@@ -84,148 +77,113 @@ Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
 
-Changes since v9:
-* Set unused sysvec table entries to fred_handle_spurious_interrupt()
-  in fred_complete_exception_setup() (Thomas Gleixner).
+Changes since v10:
+* No need to invalidate SYSCALL and SYSENTER MSRs (Thomas Gleixner).
 
-Changes since v5:
-* Add a comment for FRED stack level settings (Lai Jiangshan).
-* Define NMI/#DB/#MCE/#DF stack levels using macros.
+Changes since v8:
+* Move this patch after all required changes are in place (Thomas
+  Gleixner).
 ---
- arch/x86/entry/entry_fred.c | 21 +++++++++++++
- arch/x86/include/asm/fred.h |  5 ++++
- arch/x86/kernel/Makefile    |  1 +
- arch/x86/kernel/fred.c      | 59 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 86 insertions(+)
- create mode 100644 arch/x86/kernel/fred.c
+ arch/x86/kernel/cpu/common.c | 22 +++++++++++++++++-----
+ arch/x86/kernel/irqinit.c    |  7 ++++++-
+ arch/x86/kernel/traps.c      |  5 ++++-
+ 3 files changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/entry/entry_fred.c b/arch/x86/entry/entry_fred.c
-index 4c0398010e04..e77429683240 100644
---- a/arch/x86/entry/entry_fred.c
-+++ b/arch/x86/entry/entry_fred.c
-@@ -140,6 +140,27 @@ void __init fred_install_sysvec(unsigned int sysvec, idtentry_t handler)
- 		 sysvec_table[sysvec - FIRST_SYSTEM_VECTOR] = handler;
- }
- 
-+static noinstr void fred_handle_spurious_interrupt(struct pt_regs *regs)
-+{
-+	spurious_interrupt(regs, regs->fred_ss.vector);
-+}
-+
-+void __init fred_complete_exception_setup(void)
-+{
-+	unsigned int vector;
-+
-+	for (vector = 0; vector < FIRST_EXTERNAL_VECTOR; vector++)
-+		set_bit(vector, system_vectors);
-+
-+	for (vector = 0; vector < NR_SYSTEM_VECTORS; vector++) {
-+		if (sysvec_table[vector])
-+			set_bit(vector + FIRST_SYSTEM_VECTOR, system_vectors);
-+		else
-+			sysvec_table[vector] = fred_handle_spurious_interrupt;
-+	}
-+	fred_setup_done = true;
-+}
-+
- static noinstr void fred_extint(struct pt_regs *regs)
- {
- 	unsigned int vector = regs->fred_ss.vector;
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index 2fa9f34e5c95..e86c7ba32435 100644
---- a/arch/x86/include/asm/fred.h
-+++ b/arch/x86/include/asm/fred.h
-@@ -83,8 +83,13 @@ static __always_inline void fred_entry_from_kvm(unsigned int type, unsigned int
- 	asm_fred_entry_from_kvm(ss);
- }
- 
-+void cpu_init_fred_exceptions(void);
-+void fred_complete_exception_setup(void);
-+
- #else /* CONFIG_X86_FRED */
- static __always_inline unsigned long fred_event_data(struct pt_regs *regs) { return 0; }
-+static inline void cpu_init_fred_exceptions(void) { }
-+static inline void fred_complete_exception_setup(void) { }
- static __always_inline void fred_entry_from_kvm(unsigned int type, unsigned int vector) { }
- #endif /* CONFIG_X86_FRED */
- #endif /* !__ASSEMBLY__ */
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 3269a0e23d3a..8dfdae4111bb 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -47,6 +47,7 @@ obj-y			+= platform-quirks.o
- obj-y			+= process_$(BITS).o signal.o signal_$(BITS).o
- obj-y			+= traps.o idt.o irq.o irq_$(BITS).o dumpstack_$(BITS).o
- obj-y			+= time.o ioport.o dumpstack.o nmi.o
-+obj-$(CONFIG_X86_FRED)	+= fred.o
- obj-$(CONFIG_MODIFY_LDT_SYSCALL)	+= ldt.o
- obj-$(CONFIG_X86_KERNEL_IBT)		+= ibt_selftest.o
- obj-y			+= setup.o x86_init.o i8259.o irqinit.o
-diff --git a/arch/x86/kernel/fred.c b/arch/x86/kernel/fred.c
-new file mode 100644
-index 000000000000..4bcd8791ad96
---- /dev/null
-+++ b/arch/x86/kernel/fred.c
-@@ -0,0 +1,59 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#include <linux/kernel.h>
-+
-+#include <asm/desc.h>
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 2ee4e7b597a3..e7a5b9831252 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -61,6 +61,7 @@
+ #include <asm/microcode.h>
+ #include <asm/intel-family.h>
+ #include <asm/cpu_device_id.h>
 +#include <asm/fred.h>
-+#include <asm/tlbflush.h>
-+#include <asm/traps.h>
-+
-+/* #DB in the kernel would imply the use of a kernel debugger. */
-+#define FRED_DB_STACK_LEVEL		1UL
-+#define FRED_NMI_STACK_LEVEL		2UL
-+#define FRED_MC_STACK_LEVEL		2UL
-+/*
-+ * #DF is the highest level because a #DF means "something went wrong
-+ * *while delivering an exception*." The number of cases for which that
-+ * can happen with FRED is drastically reduced and basically amounts to
-+ * "the stack you pointed me to is broken." Thus, always change stacks
-+ * on #DF, which means it should be at the highest level.
-+ */
-+#define FRED_DF_STACK_LEVEL		3UL
-+
-+#define FRED_STKLVL(vector, lvl)	((lvl) << (2 * (vector)))
-+
-+void cpu_init_fred_exceptions(void)
-+{
-+	/* When FRED is enabled by default, remove this log message */
-+	pr_info("Initialize FRED on CPU%d\n", smp_processor_id());
-+
-+	wrmsrl(MSR_IA32_FRED_CONFIG,
-+	       /* Reserve for CALL emulation */
-+	       FRED_CONFIG_REDZONE |
-+	       FRED_CONFIG_INT_STKLVL(0) |
-+	       FRED_CONFIG_ENTRYPOINT(asm_fred_entrypoint_user));
-+
+ #include <asm/uv/uv.h>
+ #include <asm/ia32.h>
+ #include <asm/set_memory.h>
+@@ -2112,7 +2113,15 @@ void syscall_init(void)
+ 	/* The default user and kernel segments */
+ 	wrmsr(MSR_STAR, 0, (__USER32_CS << 16) | __KERNEL_CS);
+ 
+-	idt_syscall_init();
 +	/*
-+	 * The purpose of separate stacks for NMI, #DB and #MC *in the kernel*
-+	 * (remember that user space faults are always taken on stack level 0)
-+	 * is to avoid overflowing the kernel stack.
++	 * Except the IA32_STAR MSR, there is NO need to setup SYSCALL and
++	 * SYSENTER MSRs for FRED, because FRED uses the ring 3 FRED
++	 * entrypoint for SYSCALL and SYSENTER, and ERETU is the only legit
++	 * instruction to return to ring 3 (both sysexit and sysret cause
++	 * #UD when FRED is enabled).
 +	 */
-+	wrmsrl(MSR_IA32_FRED_STKLVLS,
-+	       FRED_STKLVL(X86_TRAP_DB,  FRED_DB_STACK_LEVEL) |
-+	       FRED_STKLVL(X86_TRAP_NMI, FRED_NMI_STACK_LEVEL) |
-+	       FRED_STKLVL(X86_TRAP_MC,  FRED_MC_STACK_LEVEL) |
-+	       FRED_STKLVL(X86_TRAP_DF,  FRED_DF_STACK_LEVEL));
++	if (!cpu_feature_enabled(X86_FEATURE_FRED))
++		idt_syscall_init();
+ }
+ 
+ #else	/* CONFIG_X86_64 */
+@@ -2228,8 +2237,9 @@ void cpu_init_exception_handling(void)
+ 	/* paranoid_entry() gets the CPU number from the GDT */
+ 	setup_getcpu(cpu);
+ 
+-	/* IST vectors need TSS to be set up. */
+-	tss_setup_ist(tss);
++	/* For IDT mode, IST vectors need to be set in TSS. */
++	if (!cpu_feature_enabled(X86_FEATURE_FRED))
++		tss_setup_ist(tss);
+ 	tss_setup_io_bitmap(tss);
+ 	set_tss_desc(cpu, &get_cpu_entry_area(cpu)->tss.x86_tss);
+ 
+@@ -2238,8 +2248,10 @@ void cpu_init_exception_handling(void)
+ 	/* GHCB needs to be setup to handle #VC. */
+ 	setup_ghcb();
+ 
+-	/* Finally load the IDT */
+-	load_current_idt();
++	if (cpu_feature_enabled(X86_FEATURE_FRED))
++		cpu_init_fred_exceptions();
++	else
++		load_current_idt();
+ }
+ 
+ /*
+diff --git a/arch/x86/kernel/irqinit.c b/arch/x86/kernel/irqinit.c
+index c683666876f1..f79c5edc0b89 100644
+--- a/arch/x86/kernel/irqinit.c
++++ b/arch/x86/kernel/irqinit.c
+@@ -28,6 +28,7 @@
+ #include <asm/setup.h>
+ #include <asm/i8259.h>
+ #include <asm/traps.h>
++#include <asm/fred.h>
+ #include <asm/prom.h>
+ 
+ /*
+@@ -96,7 +97,11 @@ void __init native_init_IRQ(void)
+ 	/* Execute any quirks before the call gates are initialised: */
+ 	x86_init.irqs.pre_vector_init();
+ 
+-	idt_setup_apic_and_irq_gates();
++	if (cpu_feature_enabled(X86_FEATURE_FRED))
++		fred_complete_exception_setup();
++	else
++		idt_setup_apic_and_irq_gates();
 +
-+	/* The FRED equivalents to IST stacks... */
-+	wrmsrl(MSR_IA32_FRED_RSP1, __this_cpu_ist_top_va(DB));
-+	wrmsrl(MSR_IA32_FRED_RSP2, __this_cpu_ist_top_va(NMI));
-+	wrmsrl(MSR_IA32_FRED_RSP3, __this_cpu_ist_top_va(DF));
+ 	lapic_assign_system_vectors();
+ 
+ 	if (!acpi_ioapic && !of_ioapic && nr_legacy_irqs()) {
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index 848c85208a57..0ee78a30e14a 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1411,7 +1411,10 @@ void __init trap_init(void)
+ 
+ 	/* Initialize TSS before setting up traps so ISTs work */
+ 	cpu_init_exception_handling();
 +
-+	/* Enable FRED */
-+	cr4_set_bits(X86_CR4_FRED);
-+	/* Any further IDT use is a bug */
-+	idt_invalidate();
+ 	/* Setup traps as cpu_init() might #GP */
+-	idt_setup_traps();
++	if (!cpu_feature_enabled(X86_FEATURE_FRED))
++		idt_setup_traps();
 +
-+	/* Use int $0x80 for 32-bit system calls in FRED mode */
-+	setup_clear_cpu_cap(X86_FEATURE_SYSENTER32);
-+	setup_clear_cpu_cap(X86_FEATURE_SYSCALL32);
-+}
+ 	cpu_init();
+ }
 -- 
 2.34.1
 
