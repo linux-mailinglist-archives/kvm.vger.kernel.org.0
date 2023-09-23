@@ -2,50 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 036B07ABE55
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 09:23:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C842C7ABE5E
+	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 09:33:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbjIWHWl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 03:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34872 "EHLO
+        id S230114AbjIWHdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Sep 2023 03:33:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229980AbjIWHWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 03:22:39 -0400
+        with ESMTP id S229808AbjIWHdO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Sep 2023 03:33:14 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435E3199;
-        Sat, 23 Sep 2023 00:22:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F7F136
+        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 00:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=s1U7bYZM9RSpdxm3UC8NKAgYL593oRAWEjarujw6UsM=; b=BbflizpONEoQy6us6m5AzUn5ke
-        cwqDVL6O1ICaoHFTTzhEi2E7S2gZGgojQXEbr/4XCny3b3k4NmKTXfIBvwoxAEx3LqLfQwHsrRiun
-        UWdpSj0nvbNit0HfydvzDR38U9Cmh6TRNnA4vwve505LRWDlRlt8/0LvXf2ecPKPsj+kv0gv1+TUZ
-        r2242K+u5Qn8BpdY+btbafgbTzG/thtD3cRMidjx4yyMfoHcA67S5pwkr1XooWheV9xEANlNQKGZ9
-        XV4IVYzp+hPZSiNQ81hVbLU+uzV7u2w6GDrBuf8LxC86WPYkQib4thbQXXoz9v9lOa+MODEjjJL5y
-        czuPS2zg==;
+        bh=xBJZuMV+F2XahPc7YF/aCIz3Hq4JHHO+vEpdmO4hNQY=; b=a8pAxDRJ1ZxFg2oi+BD4YaNHKi
+        w0ZSuxSnOCFzOHNl5xV0pr3S07YWn5skccTxdu/cJInl+f7V7khu4qBqu/mKPDODTFKHTMXJqKb+8
+        YskcUqdB83iKJv/VnpBGIb+kZxvHcOCez67xkTIYtKA4UWm0qO0NoUJbCB7YyyzlA1Ggu+qNoF00/
+        cDymiQj0l7kKdDsBp6LIn6f8YRPMO41Tazn/U5nErPZQpf03Brhsu+/RH84BQ0R8k8aVTfFNJV8A+
+        UMb0plnKGPEyV/9wv8hC9Iy+mSSqkObOxon/C32MX+eQuSa9/1MtOj0JGErNWOt75p+i2VxFZ0TUZ
+        EHAvi0AA==;
 Received: from [2001:8b0:10b:5:114:553c:a48f:b7ec] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qjwy4-005dBH-KX; Sat, 23 Sep 2023 07:22:20 +0000
-Message-ID: <faec494b6df5ebee5644017c9415e747bd34952b.camel@infradead.org>
-Subject: Re: [RFC] KVM: x86: Allow userspace exit on HLT and MWAIT, else
- yield on MWAIT
+        id 1qjx8B-005foK-L1; Sat, 23 Sep 2023 07:32:47 +0000
+Message-ID: <61ee7baa277d69aa9c4a56df4aace9aa00bd0919.camel@infradead.org>
+Subject: Re: [RFC PATCH v2 07/21] i386/pc: Drop pc_machine_kvm_type()
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        graf@amazon.de, Nicolas Saenz Julienne <nsaenz@amazon.es>,
-        "Griffoul, Fred" <fgriffo@amazon.com>
-Date:   Sat, 23 Sep 2023 08:22:20 +0100
-In-Reply-To: <CABgObfZgYXaXqP=6s53=+mYWvOnbgYJiCRct-0ob444sK9SvGw@mail.gmail.com>
-References: <1b52b557beb6606007f7ec5672eab0adf1606a34.camel@infradead.org>
-         <CABgObfZgYXaXqP=6s53=+mYWvOnbgYJiCRct-0ob444sK9SvGw@mail.gmail.com>
+        Claudio Fontana <cfontana@suse.de>
+Date:   Sat, 23 Sep 2023 08:32:46 +0100
+In-Reply-To: <20230914035117.3285885-8-xiaoyao.li@intel.com>
+References: <20230914035117.3285885-1-xiaoyao.li@intel.com>
+         <20230914035117.3285885-8-xiaoyao.li@intel.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-QW7xpGr20+TDBiyntFRV"
+        boundary="=-CDq5aI6X81AmpLz2bfTy"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -59,97 +67,33 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-QW7xpGr20+TDBiyntFRV
+--=-CDq5aI6X81AmpLz2bfTy
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-09-22 at 14:00 +0200, Paolo Bonzini wrote:
-> On Mon, Sep 18, 2023 at 11:30=E2=80=AFAM David Woodhouse <dwmw2@infradead=
-.org> wrote:
-> >=20
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > The VMM may have work to do on behalf of the guest, and it's often
-> > desirable to use the cycles when the vCPUS are idle.
-> >=20
-> > When the vCPU uses HLT this works out OK because the VMM can run its
-> > tasks in a separate thread which gets scheduled when the in-kernel
-> > emulation of HLT schedules away. It isn't perfect, because it doesn't
-> > easily allow for handling both low-priority maintenance tasks when the
-> > VMM wants to wait until the vCPU is idle, and also for higher priority
-> > tasks where the VMM does want to preempt the vCPU. It can also lead to
-> > noisy neighbour effects, when a host has isn't necessarily sized to
-> > expect any given VMM to suddenly be contending for many *more* pCPUs
-> > than it has vCPUs.
-> >=20
-> > In addition, there are times when we need to expose MWAIT to a guest
-> > for compatibility with a previous environment. And MWAIT is much harder
-> > because it's very hard to emulate properly.
+On Wed, 2023-09-13 at 23:51 -0400, Xiaoyao Li wrote:
+> pc_machine_kvm_type() was introduced by commit e21be724eaf5
+> ("i386/xen:
+> add pc_machine_kvm_type to initialize XEN_EMULATE mode") to do Xen
+> specific initialization by utilizing kvm_type method.
 >=20
-> I don't dislike giving userspace more flexibility in deciding when to
-> exit on HLT and MWAIT (or even PAUSE), and kvm_run is a good place to
-> do this. It's an extension of request_interrupt_window and
-> immediate_exit. I'm not sure how it would interact with
-> KVM_CAP_X86_DISABLE_EXITS.
-
-Yeah, right now it doesn't interact at all. The use case is that you
-*always* allow vmexits to KVM for the offending instructions, and then
-it's just a question of what KVM does when that happens.
-
-> Perhaps KVM_ENABLE_CAP(KVM_X86_DISABLE_EXITS) could be changed to do
-> nothing except writing to a new kvm_run field? All the kvm-
-> >arch.*_in_guest field would change into a kvm-
-> >arch.saved_request_userspace_exit, and every vmentry would do
-> something like
+> commit eeedfe6c6316 ("hw/xen: Simplify emulated Xen platform init")
+> moves the Xen specific initialization to pc_basic_device_init().
 >=20
-> =C2=A0 if (kvm->arch.saved_request_userspace_exit !=3D kvm_run->request_u=
-serspace_exit) {
-> =C2=A0=C2=A0=C2=A0=C2=A0 /* tweak intercepts */
-> =C2=A0 }
+> There is no need to keep the PC specific kvm_type() implementation
+> anymore. On the other hand, later patch will implement kvm_type()
+> method for all x86/i386 machines to support KVM_X86_SW_PROTECTED_VM.
 >=20
-> To avoid races you need two flags though; there needs to be also a
-> kernel->userspace communication of whether the vCPU is currently in
-> HLT or MWAIT, using the "flags" field for example. If it was HLT only,
-> moving the mp_state in kvm_run would seem like a good idea; but not if
-> MWAIT or PAUSE are also included.
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Right. When work is added to an empty workqueue, the VMM will want to
-hunt for a vCPU which is currently idle and then signal it to exit.
+Indeed, I added it and then later ripped everything out of it and left
+it empty, as you nicely describe (thanks) in your commit message. I
+have no designs on using it again, so
 
-As you say, for HLT it's simple enough to look at the mp_state, and we
-can move that into kvm_run so it doesn't need an ioctl... although it
-would also be nice to get an *event* on an eventfd when the vCPU
-becomes runnable (as noted, we want that for VSM anyway). Or perhaps
-even to be able to poll() on the vCPU fd.
+Acked-by: David Woodhouse <dwmw@amazon.co.uk>
 
-But MWAIT (as currently not-really-emulated) and PAUSE are both just
-transient states with nothing you can really *wait* for, which is why
-they're such fun to deal with.
-
-> To set a kvm_run flag during MWAIT, you could reenter MWAIT with the
-> MWAIT-exiting bit cleared and the monitor trap flag bit (or just
-> EFLAGS.TF) set. On the subsequent singlestep exit, clear the flag in
-> kvm_run and set again the MWAIT-exiting bit. The MWAIT handler would
-> also check kvm_run->request_userspace_exit before reentering.
-
-Yeah, we've pondered that one. Perhaps coupled with setting the scheduling
-priority as low as possible while it's actually on the MWAIT, and
-putting it back again afterwards.=C2=A0Something along the lines of 'do not
-schedule me unless you literally have *nothing* else to do on this
-pCPU, for the next N =C2=B5s'.
-
-Not pretty, but *nothing* you do with MWAIT is going to be pretty.
-Unless we can tolerate 4KiB granularity and actually get the read-only
-and minor fault trick working.
-
-Anyway, I knocked this up just for Fred to play with and see what
-actually performs reasonably and what doesn't, because I never want to
-post even random proof-of-concept kernel patches in private. So we'll
-play with it and see what we get out of it.
-
-
-
---=-QW7xpGr20+TDBiyntFRV
+--=-CDq5aI6X81AmpLz2bfTy
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -241,24 +185,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTIzMDcyMjIwWjAvBgkqhkiG9w0BCQQxIgQg4C2pvsPF
-6gP/COjvHY51wrgoDYMIEplJsAWDYVdSTbYwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTIzMDczMjQ2WjAvBgkqhkiG9w0BCQQxIgQgLYz62S7q
+EDCJaBrUMSSrxAgYxNUwoPK4O2FZFxoNeCkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB+slSMDtt5vLbl5pjPqVCY0fqe9/SmnZOL
-eHtuvAzia1nYsyiHs61GXTRQe13ipTm3SeX5C0mMSvorlBv61736XkntTcEyZ4S4zvfej4hID36t
-OzHvDuhi9B9bc7Jk1LIXIsZtI67ZmlyQwQQKYqvmhYZ+9iP5VhPKZqeURkYSTK9le4vUAj9eEZ6O
-0XYA7IQ9QINTiHSH3KC6fjOhkC437OeVobaAlMfFN2ppiBV+1LcCiphoc/fq3VntxxNDjuFZiBEW
-UMWzNfI9MRB6pDPXYkhqxq1MXPhlw3ZQJpRKLl9oPRE2m/7ic6V5vBhcsiPa6KrTHnTWHWXXW3wZ
-DScPN+QJNT5NjaYCQaiGPqZ6YUunbjRcxyQ2bYZP6FZwp3+obEfirjiSzfF8/JuiGg7xby+B+BXH
-MqUc4lMztKMd+0xfCRbmNhSIf5eUvgJ8T1WvmJDn/P/HfsM+fndcRg2K/mRqDBqSA4Ll9qcAzt2q
-GLgMMgufhdO6g3vcGTbIGlNt9Jx99yzvPD1SYUMou7hG3e/+pe3Z5WQulhuPm/3E/vYZYHYcVAI5
-16pFdnafcX/HKR8aPf681DUYDAIslGLtmBmCNFEUSq2m+5kxYuGNnHzh7QaGuu//L2cfP0Xmn7gW
-LhhJHWEdeJZ4skHae4Ve1yNEjiQi7+ynXHZ8IRit4QAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAv8BUPqoHqOyCrBNerxlpXeNA8tf5IIibj
+F+NRXG3ciCTsD7F4mYybSCGpUpqI79dRBVn6W85nfM93/1/jN4/fjlxozenVc332XVSd46HlQvqO
+lQ1RiAx9nYc/k6VWK3lk9P9wOOFvMDkjhGXaa+tPKXB858EzqJDdGkhy8I+aJKaCjGK/lmpj7UeP
+04oMNd3jiu7HQeGcFhy/D1yPXgT07ipncBIeg811zwoIYtErP6v6ExGe8nTTpQoshQnfhXo1ad7N
+K4qNAOEl01ocL8BcZNDcRaDwA4rLln0BndFD/ljcMJIMNSxFcVnhGWOlGJuV9m9aWN8ZpG4syh5A
+Zkff6RskWrzWggkjGok8WBQRcsnbN9ApmcOAiy4W5nT8NUOEqMekcNEGie3p7B3drdi3+4Ic8A1j
+CwHX+9tVx/5AtQbLRJzay5dMsbSUNBHPhBGZqMojT1WaYUKX/1ycn5TvUQfepMQgBX9pNI81AZm5
+SnlkeFe+uIs0luB2hP6rewnUAToW+xPuf/z1BGmLb0/5glrQz82UVRo0axxr0qdzE74vrCls3J0g
+AdFiKok2zHdXJ9JpvLDduTX0wYmaplM3ZfDHSMJfqhjIzokC/N5t8SWF9xXEGZxoR8xbNtmXtj29
++rQNhe/YeR/pli0cp2vGypQwAc13XgJF6Q+HU9EisAAAAAAAAA==
 
 
---=-QW7xpGr20+TDBiyntFRV--
+--=-CDq5aI6X81AmpLz2bfTy--
