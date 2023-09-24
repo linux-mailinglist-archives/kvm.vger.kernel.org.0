@@ -2,126 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C9AE7AC3C9
-	for <lists+kvm@lfdr.de>; Sat, 23 Sep 2023 18:44:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C50D17AC6A3
+	for <lists+kvm@lfdr.de>; Sun, 24 Sep 2023 07:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232003AbjIWQoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Sep 2023 12:44:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56080 "EHLO
+        id S229513AbjIXFT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Sep 2023 01:19:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229965AbjIWQo3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Sep 2023 12:44:29 -0400
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15668139;
-        Sat, 23 Sep 2023 09:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1695487458; x=1727023458;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2xx3LLBKBr2Twnx9PDcMEphhMOW9wkJNY6OBiL1LK0c=;
-  b=eovHWO/qP3zZBHv7nsDMk9sNiZdHRp7KsQ10W2JEoFS+Kllo9p6HC7FI
-   dSADKeXtrOuhZ51ElOELu2ctFLfdSK8P//rAWX0XVCl+HpSM2Cwzym2MC
-   eT1HV32fdPDniZpaiNwe1IQrY8+Oe2n1T1H7e3URDn2f2wMLQB4nvoHwF
-   A=;
-X-IronPort-AV: E=Sophos;i="6.03,171,1694736000"; 
-   d="scan'208";a="305729342"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-9694bb9e.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 16:44:12 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-m6i4x-9694bb9e.us-east-1.amazon.com (Postfix) with ESMTPS id 36B84805FB;
-        Sat, 23 Sep 2023 16:43:36 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Sat, 23 Sep 2023 16:43:34 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Sat, 23 Sep
- 2023 16:43:31 +0000
-Message-ID: <d3e0c3e9-4994-4808-a8df-3d23487ff9c4@amazon.de>
-Date:   Sat, 23 Sep 2023 18:43:29 +0200
+        with ESMTP id S229437AbjIXFT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Sep 2023 01:19:27 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E384511D
+        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 22:19:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695532760; x=1727068760;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZVGxuFAQWceZXoSUYCCW5E1Bk3FBdhz5SySROx/a4mw=;
+  b=lz6WDdDcutgevGKroOc3L1uuislwKGiZ5RKetncl4XfYzZszUZ0XXHDE
+   RMCVy1BW69q8ccIHlNnD4kMAwy0NSmSxmopwE6FMB7YZk7AqPyq17HDrd
+   WPjCyQE7lkVQfPJFDTuvZNn4hn/1N09UZ7CNysmKVKWtw7Gyaxddf0deG
+   YK36pwN/CZFAuxmm/beg/CEA3cHgeHJqFxs3IdZ/pJR/+dhF2W996j2iX
+   J4a1lYj9pm8528bwiqCtkJl4/9MHcd5OQySViPohN0Z2Sc7xB1REQSZnD
+   az8bbRJ5dgiNBjyqqvRaOzIzpyVA1z7YbB5/KEJHehcqtJQl5x/QpE+Sg
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="445181100"
+X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
+   d="scan'208";a="445181100"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 22:19:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="891279479"
+X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
+   d="scan'208";a="891279479"
+Received: from lkp-server02.sh.intel.com (HELO 493f6c7fed5d) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 23 Sep 2023 22:18:18 -0700
+Received: from kbuild by 493f6c7fed5d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qkHWU-0003Fd-38;
+        Sun, 24 Sep 2023 05:19:14 +0000
+Date:   Sun, 24 Sep 2023 13:18:21 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        mst@redhat.com, jasowang@redhat.com, jgg@nvidia.com
+Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
+        maorg@nvidia.com
+Subject: Re: [PATCH vfio 07/11] virtio-pci: Introduce admin commands
+Message-ID: <202309241353.ykr3cC2K-lkp@intel.com>
+References: <20230921124040.145386-8-yishaih@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] KVM: x86: Allow userspace exit on HLT and MWAIT, else yield
- on MWAIT
-Content-Language: en-GB
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-CC:     <kvm@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>,
-        "Sean Christopherson" <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, <linux-kernel@vger.kernel.org>,
-        Nicolas Saenz Julienne <nsaenz@amazon.es>,
-        "Griffoul, Fred" <fgriffo@amazon.com>
-References: <1b52b557beb6606007f7ec5672eab0adf1606a34.camel@infradead.org>
- <CABgObfZgYXaXqP=6s53=+mYWvOnbgYJiCRct-0ob444sK9SvGw@mail.gmail.com>
- <faec494b6df5ebee5644017c9415e747bd34952b.camel@infradead.org>
- <3dc66987-49c7-abda-eb70-1898181ef3fe@redhat.com>
-From:   Alexander Graf <graf@amazon.de>
-In-Reply-To: <3dc66987-49c7-abda-eb70-1898181ef3fe@redhat.com>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,T_SPF_TEMPERROR autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921124040.145386-8-yishaih@nvidia.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDIzLjA5LjIzIDExOjI0LCBQYW9sbyBCb256aW5pIHdyb3RlOgo+Cj4gT24gOS8yMy8yMyAw
-OToyMiwgRGF2aWQgV29vZGhvdXNlIHdyb3RlOgo+PiBPbiBGcmksIDIwMjMtMDktMjIgYXQgMTQ6
-MDAgKzAyMDAsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4+PiBUbyBhdm9pZCByYWNlcyB5b3UgbmVl
-ZCB0d28gZmxhZ3MgdGhvdWdoOyB0aGVyZSBuZWVkcyB0byBiZSBhbHNvIGEKPj4+IGtlcm5lbC0+
-dXNlcnNwYWNlIGNvbW11bmljYXRpb24gb2Ygd2hldGhlciB0aGUgdkNQVSBpcyBjdXJyZW50bHkg
-aW4KPj4+IEhMVCBvciBNV0FJVCwgdXNpbmcgdGhlICJmbGFncyIgZmllbGQgZm9yIGV4YW1wbGUu
-IElmIGl0IHdhcyBITFQgb25seSwKPj4+IG1vdmluZyB0aGUgbXBfc3RhdGUgaW4ga3ZtX3J1biB3
-b3VsZCBzZWVtIGxpa2UgYSBnb29kIGlkZWE7IGJ1dCBub3QgaWYKPj4+IE1XQUlUIG9yIFBBVVNF
-IGFyZSBhbHNvIGluY2x1ZGVkLgo+Pgo+PiBSaWdodC4gV2hlbiB3b3JrIGlzIGFkZGVkIHRvIGFu
-IGVtcHR5IHdvcmtxdWV1ZSwgdGhlIFZNTSB3aWxsIHdhbnQgdG8KPj4gaHVudCBmb3IgYSB2Q1BV
-IHdoaWNoIGlzIGN1cnJlbnRseSBpZGxlIGFuZCB0aGVuIHNpZ25hbCBpdCB0byBleGl0Lgo+Pgo+
-PiBBcyB5b3Ugc2F5LCBmb3IgSExUIGl0J3Mgc2ltcGxlIGVub3VnaCB0byBsb29rIGF0IHRoZSBt
-cF9zdGF0ZSwgYW5kIHdlCj4+IGNhbiBtb3ZlIHRoYXQgaW50byBrdm1fcnVuIHNvIGl0IGRvZXNu
-J3QgbmVlZCBhbiBpb2N0bC4uLgo+Cj4gTG9va2luZyBhdCBpdCBhZ2Fpbjogbm90IHNvIGVhc3kg
-YmVjYXVzZSB0aGUgbXBzdGF0ZSBpcyBjaGFuZ2VkIGluIHRoZQo+IHZDUFUgdGhyZWFkIGJ5IHZj
-cHVfYmxvY2soKSBpdHNlbGYuCj4KPj4gYWx0aG91Z2ggaXQKPj4gd291bGQgYWxzbyBiZSBuaWNl
-IHRvIGdldCBhbiAqZXZlbnQqIG9uIGFuIGV2ZW50ZmQgd2hlbiB0aGUgdkNQVQo+PiBiZWNvbWVz
-IHJ1bm5hYmxlIChhcyBub3RlZCwgd2Ugd2FudCB0aGF0IGZvciBWU00gYW55d2F5KS4gT3IgcGVy
-aGFwcwo+PiBldmVuIHRvIGJlIGFibGUgdG8gcG9sbCgpIG9uIHRoZSB2Q1BVIGZkLgo+Cj4gV2h5
-IGRvIHlvdSBuZWVkIGl0P8KgIFlvdSBjYW4ganVzdCB1c2UgS1ZNX1JVTiB0byBnbyB0byBzbGVl
-cCwgYW5kIGlmIHlvdQo+IGdldCBhbm90aGVyIGpvYiB5b3Uga2ljayBvdXQgdGhlIHZDUFUgd2l0
-aCBwdGhyZWFkX2tpbGwuwqAgKEkgYWxzbyBkaWRuJ3QKPiBnZXQgdGhlIFZTTSByZWZlcmVuY2Up
-LgoKCldpdGggdGhlIG9yaWdpbmFsIFZTTSBwYXRjaGVzLCB3ZSB1c2VkIHRvIG1ha2UgYSB2Q1BV
-IGF3YXJlIG9mIHRoZSBmYWN0IAp0aGF0IGl0IGNhbiBtb3JwaCBpbnRvIG9uZSBvZiBtYW55IFZU
-THMuIFRoYXQgYXBwcm9hY2ggdHVybmVkIG91dCB0byBiZSAKaW5zYW5lbHkgaW50cnVzaXZlIGFu
-ZCBmcmFnaWxlIGFuZCBzbyB3ZSdyZSBjdXJyZW50bHkgcmVpbXBsZW1lbnRpbmcgCmV2ZXJ5dGhp
-bmcgYXMgVlRMcyBhcyB2Q1BVcy4gVGhhdCBhbGxvd3MgdXMgdG8gbW92ZSB0aGUgbWFqb3JpdHkg
-b2YgVlNNIApmdW5jdGlvbmFsaXR5IHRvIHVzZXIgc3BhY2UuIEV2ZXJ5dGhpbmcgd2UndmUgc2Vl
-biBzbyBmYXIgbG9va3MgYXMgaWYgCnRoZXJlIGlzIG5vIHJlYWwgcGVyZm9ybWFuY2UgbG9zcyB3
-aXRoIHRoYXQgYXBwcm9hY2guCgpPbmUgc21hbGwgcHJvYmxlbSB3aXRoIHRoYXQgaXMgdGhhdCBu
-b3cgdXNlciBzcGFjZSBpcyByZXNwb25zaWJsZSBmb3IgCnN3aXRjaGluZyBiZXR3ZWVuIFZUTHM6
-IEl0IGRldGVybWluZXMgd2hpY2ggVlRMIGlzIGN1cnJlbnRseSBydW5uaW5nIGFuZCAKbGVhdmVz
-IGFsbCBvdGhlcnMgKHJlYWQ6IGFsbCBvdGhlciB2Q1BVcykgYXMgc3RvcHBlZC4gVGhhdCBtZWFu
-cyBpZiB5b3UgCmFyZSBydW5uaW5nIGhhcHBpbHkgaW4gS1ZNX1JVTiBpbiBWVEwwIGFuZCBWVEwx
-IGdldHMgYW4gaW50ZXJydXB0LCB1c2VyIApzcGFjZSBuZWVkcyB0byBzdG9wIFZUTDAgYW5kIHVu
-cGF1c2UgVlRMMSB1bnRpbCBpdCB0cmlnZ2VycyBWVExfUkVUVVJOIAphdCB3aGljaCBwb2ludCBW
-VEwxIHN0b3BzIGV4ZWN1dGlvbiBhbmQgVlRMMCBydW5zIGFnYWluLgoKTmljb2xhcyBidWlsdCBh
-IHBhdGNoIHRoYXQgZXhwb3NlcyAiaW50ZXJydXB0IG9uIHZDUFUgaXMgcGVuZGluZyIgYXMgYW4g
-CmlvZXZlbnRmZCB1c2VyIHNwYWNlIGNhbiByZXF1ZXN0LiBUaGF0IHdheSwgdXNlciBzcGFjZSBj
-YW4ga25vdyB3aGVuZXZlciAKYSBjdXJyZW50bHkgcGF1c2VkIHZDUFUgaGFzIGEgcGVuZGluZyBp
-bnRlcnJ1cHQgYW5kIGNhbiBhY3QgYWNjb3JkaW5nbHkuIApZb3UgY291bGQgdXNlIHRoZSBzYW1l
-IG1lY2hhbmlzbSBpZiB5b3Ugd2FudGVkIHRvIGltcGxlbWVudCBITFQgaW4gdXNlciAKc3BhY2Us
-IGJ1dCBzdGlsbCB1c2UgYW4gaW4ta2VybmVsIExBUElDLgoKCkFsZXgKCgoKCkFtYXpvbiBEZXZl
-bG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpH
-ZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVp
-bmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMg
-QgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
+Hi Yishai,
 
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on awilliam-vfio/for-linus]
+[also build test ERROR on mst-vhost/linux-next linus/master v6.6-rc2 next-20230921]
+[cannot apply to awilliam-vfio/next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/virtio-pci-Use-virtio-pci-device-layer-vq-info-instead-of-generic-one/20230922-062611
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/20230921124040.145386-8-yishaih%40nvidia.com
+patch subject: [PATCH vfio 07/11] virtio-pci: Introduce admin commands
+config: i386-randconfig-012-20230924 (https://download.01.org/0day-ci/archive/20230924/202309241353.ykr3cC2K-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230924/202309241353.ykr3cC2K-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309241353.ykr3cC2K-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+>> ./usr/include/linux/virtio_pci.h:250:9: error: unknown type name 'u8'
+     250 |         u8 offset; /* Starting offset of the register(s) to write. */
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:251:9: error: unknown type name 'u8'
+     251 |         u8 reserved[7];
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:252:9: error: unknown type name 'u8'
+     252 |         u8 registers[];
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:256:9: error: unknown type name 'u8'
+     256 |         u8 offset; /* Starting offset of the register(s) to read. */
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:266:9: error: unknown type name 'u8'
+     266 |         u8 flags; /* 0 = end of list, 1 = owner device, 2 = member device */
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:267:9: error: unknown type name 'u8'
+     267 |         u8 bar; /* BAR of the member or the owner device */
+         |         ^~
+   ./usr/include/linux/virtio_pci.h:268:9: error: unknown type name 'u8'
+     268 |         u8 padding[6];
+         |         ^~
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
