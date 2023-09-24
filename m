@@ -2,120 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C50D17AC6A3
-	for <lists+kvm@lfdr.de>; Sun, 24 Sep 2023 07:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F0537AC74D
+	for <lists+kvm@lfdr.de>; Sun, 24 Sep 2023 11:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbjIXFT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Sep 2023 01:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
+        id S229509AbjIXJ14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Sep 2023 05:27:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjIXFT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Sep 2023 01:19:27 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E384511D
-        for <kvm@vger.kernel.org>; Sat, 23 Sep 2023 22:19:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695532760; x=1727068760;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZVGxuFAQWceZXoSUYCCW5E1Bk3FBdhz5SySROx/a4mw=;
-  b=lz6WDdDcutgevGKroOc3L1uuislwKGiZ5RKetncl4XfYzZszUZ0XXHDE
-   RMCVy1BW69q8ccIHlNnD4kMAwy0NSmSxmopwE6FMB7YZk7AqPyq17HDrd
-   WPjCyQE7lkVQfPJFDTuvZNn4hn/1N09UZ7CNysmKVKWtw7Gyaxddf0deG
-   YK36pwN/CZFAuxmm/beg/CEA3cHgeHJqFxs3IdZ/pJR/+dhF2W996j2iX
-   J4a1lYj9pm8528bwiqCtkJl4/9MHcd5OQySViPohN0Z2Sc7xB1REQSZnD
-   az8bbRJ5dgiNBjyqqvRaOzIzpyVA1z7YbB5/KEJHehcqtJQl5x/QpE+Sg
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="445181100"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="445181100"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 22:19:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="891279479"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="891279479"
-Received: from lkp-server02.sh.intel.com (HELO 493f6c7fed5d) ([10.239.97.151])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Sep 2023 22:18:18 -0700
-Received: from kbuild by 493f6c7fed5d with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qkHWU-0003Fd-38;
-        Sun, 24 Sep 2023 05:19:14 +0000
-Date:   Sun, 24 Sep 2023 13:18:21 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        mst@redhat.com, jasowang@redhat.com, jgg@nvidia.com
-Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 07/11] virtio-pci: Introduce admin commands
-Message-ID: <202309241353.ykr3cC2K-lkp@intel.com>
-References: <20230921124040.145386-8-yishaih@nvidia.com>
+        with ESMTP id S229437AbjIXJ1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Sep 2023 05:27:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E7AF1
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 02:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695547622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zHKWyHfacqVewjndjBS85PHaoQHVa8lSR8E5aIAAdmQ=;
+        b=T0c2VVGDpchjyBYBB3WQIfsIhMt1ZNteXHa6vE1VzNu1cq0q0p6JiDDsYXgYaUtvWzWD8N
+        +qCwoY58ffEZ9E7XAlp8yfenjAw8lzmRyaCeSikWeIyblEEssZUSMjO+QlIi6/zo+Q0hfb
+        QXi8x899SLQBdsGvsYSxztUXL7th4VM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-680-dWYrLDX-NRu4iiNPZAxlbQ-1; Sun, 24 Sep 2023 05:27:01 -0400
+X-MC-Unique: dWYrLDX-NRu4iiNPZAxlbQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B6B55380673E;
+        Sun, 24 Sep 2023 09:27:00 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 96A27711291;
+        Sun, 24 Sep 2023 09:27:00 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.6-rc3
+Date:   Sun, 24 Sep 2023 05:27:00 -0400
+Message-Id: <20230924092700.1192123-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921124040.145386-8-yishaih@nvidia.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+        version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yishai,
+Linus,
 
-kernel test robot noticed the following build errors:
+The following changes since commit ce9ecca0238b140b88f43859b211c9fdfd8e5b70:
 
-[auto build test ERROR on awilliam-vfio/for-linus]
-[also build test ERROR on mst-vhost/linux-next linus/master v6.6-rc2 next-20230921]
-[cannot apply to awilliam-vfio/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  Linux 6.6-rc2 (2023-09-17 14:40:24 -0700)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/virtio-pci-Use-virtio-pci-device-layer-vq-info-instead-of-generic-one/20230922-062611
-base:   https://github.com/awilliam/linux-vfio.git for-linus
-patch link:    https://lore.kernel.org/r/20230921124040.145386-8-yishaih%40nvidia.com
-patch subject: [PATCH vfio 07/11] virtio-pci: Introduce admin commands
-config: i386-randconfig-012-20230924 (https://download.01.org/0day-ci/archive/20230924/202309241353.ykr3cC2K-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230924/202309241353.ykr3cC2K-lkp@intel.com/reproduce)
+are available in the Git repository at:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309241353.ykr3cC2K-lkp@intel.com/
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-All errors (new ones prefixed by >>):
+for you to fetch changes up to 5804c19b80bf625c6a9925317f845e497434d6d3:
 
-   In file included from <command-line>:
->> ./usr/include/linux/virtio_pci.h:250:9: error: unknown type name 'u8'
-     250 |         u8 offset; /* Starting offset of the register(s) to write. */
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:251:9: error: unknown type name 'u8'
-     251 |         u8 reserved[7];
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:252:9: error: unknown type name 'u8'
-     252 |         u8 registers[];
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:256:9: error: unknown type name 'u8'
-     256 |         u8 offset; /* Starting offset of the register(s) to read. */
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:266:9: error: unknown type name 'u8'
-     266 |         u8 flags; /* 0 = end of list, 1 = owner device, 2 = member device */
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:267:9: error: unknown type name 'u8'
-     267 |         u8 bar; /* BAR of the member or the owner device */
-         |         ^~
-   ./usr/include/linux/virtio_pci.h:268:9: error: unknown type name 'u8'
-     268 |         u8 padding[6];
-         |         ^~
+  Merge tag 'kvm-riscv-fixes-6.6-1' of https://github.com/kvm-riscv/linux into HEAD (2023-09-23 05:35:55 -0400)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+----------------------------------------------------------------
+ARM:
+
+* Fix an UV boot crash
+
+* Skip spurious ENDBR generation on _THIS_IP_
+
+* Fix ENDBR use in putuser() asm methods
+
+* Fix corner case boot crashes on 5-level paging
+
+* and fix a false positive WARNING on LTO kernels"
+
+RISC-V:
+
+* Fix KVM_GET_REG_LIST API for ISA_EXT registers
+
+* Fix reading ISA_EXT register of a missing extension
+
+* Fix ISA_EXT register handling in get-reg-list test
+
+* Fix filtering of AIA registers in get-reg-list test
+
+x86:
+
+* Fixes for TSC_AUX virtualization
+
+* Stop zapping page tables asynchronously, since we don't
+  zap them as often as before
+
+----------------------------------------------------------------
+Anup Patel (4):
+      RISC-V: KVM: Fix KVM_GET_REG_LIST API for ISA_EXT registers
+      RISC-V: KVM: Fix riscv_vcpu_get_isa_ext_single() for missing extensions
+      KVM: riscv: selftests: Fix ISA_EXT register handling in get-reg-list
+      KVM: riscv: selftests: Selectively filter-out AIA registers
+
+Jean-Philippe Brucker (1):
+      KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID
+
+Marc Zyngier (1):
+      KVM: arm64: Properly return allocated EL2 VA from hyp_alloc_private_va_range()
+
+Paolo Bonzini (4):
+      Merge tag 'kvmarm-fixes-6.6-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      KVM: x86/mmu: Do not filter address spaces in for_each_tdp_mmu_root_yield_safe()
+      KVM: SVM: INTERCEPT_RDTSCP is never intercepted anyway
+      Merge tag 'kvm-riscv-fixes-6.6-1' of https://github.com/kvm-riscv/linux into HEAD
+
+Sean Christopherson (3):
+      KVM: selftests: Assert that vasprintf() is successful
+      KVM: x86/mmu: Open code leaf invalidation from mmu_notifier
+      KVM: x86/mmu: Stop zapping invalidated TDP MMU roots asynchronously
+
+Tom Lendacky (2):
+      KVM: SVM: Fix TSC_AUX virtualization setup
+      KVM: SVM: Do not use user return MSR support for virtualized TSC_AUX
+
+ arch/arm64/include/asm/kvm_hyp.h                 |   2 +-
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h            |   2 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c                    |   3 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S               |   1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c               |   8 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c             |   3 +-
+ arch/arm64/kvm/mmu.c                             |   3 +
+ arch/riscv/kvm/vcpu_onereg.c                     |   7 +-
+ arch/x86/include/asm/kvm_host.h                  |   3 +-
+ arch/x86/kvm/mmu/mmu.c                           |  21 +---
+ arch/x86/kvm/mmu/mmu_internal.h                  |  15 ++-
+ arch/x86/kvm/mmu/tdp_mmu.c                       | 152 ++++++++++-------------
+ arch/x86/kvm/mmu/tdp_mmu.h                       |   5 +-
+ arch/x86/kvm/svm/sev.c                           |  34 +++--
+ arch/x86/kvm/svm/svm.c                           |  43 +++++--
+ arch/x86/kvm/svm/svm.h                           |   1 +
+ arch/x86/kvm/x86.c                               |   5 +-
+ include/linux/arm-smccc.h                        |   2 +
+ tools/testing/selftests/kvm/lib/test_util.c      |   2 +-
+ tools/testing/selftests/kvm/riscv/get-reg-list.c |  60 ++++++---
+ 20 files changed, 210 insertions(+), 162 deletions(-)
+
