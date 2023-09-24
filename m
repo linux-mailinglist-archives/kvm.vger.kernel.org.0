@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50D027AC81C
-	for <lists+kvm@lfdr.de>; Sun, 24 Sep 2023 14:45:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D4D77AC81F
+	for <lists+kvm@lfdr.de>; Sun, 24 Sep 2023 14:46:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbjIXMp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Sep 2023 08:45:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52688 "EHLO
+        id S229509AbjIXMqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Sep 2023 08:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjIXMp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Sep 2023 08:45:58 -0400
+        with ESMTP id S229644AbjIXMp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Sep 2023 08:45:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A120610C
-        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 05:44:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0120E10B
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 05:44:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1695559468;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=woWU04N+glUzD420ymk+4+G9vxtbf/gGrQWI0ejKWmM=;
-        b=KnRbdZc3/qOH85KZW2wYDptW8TEKhbacmIRGUBkICZfQFuOGa3esmK7JNrsVl51BMAZkPn
-        r4L4STxsgY00E3thcoUZZxKTrN02RrRZ7QoOh9/8iGABzcfXgh2c++TG5F6/AlQBPiXp9w
-        F19ddJB40ogrlZ9JJ+AD31O+7gO9tsM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-RcpmpXc_Nr6f4ntLhMcivQ-1; Sun, 24 Sep 2023 08:44:23 -0400
-X-MC-Unique: RcpmpXc_Nr6f4ntLhMcivQ-1
+        bh=RG2dgZRGZETUP2WAWYwTl0IqdCaYPeuaDthozK2XncQ=;
+        b=Xk/G1cVLXqVzRxhl93XYi69Etl8QtcoKrPkmbWeawXA2n3ZODf0gZkb26Ie5TkyjieUSBF
+        NBBE7lZsMNmNNeE34q+JLIc3G6TlEWpc8Sp2bvDdJwvn826YBmSABjd+3HlpK2VnJTtRh4
+        epipDrMIARzJYluPVoOHwHmJSZE0Mek=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-461-GejbuHlGNWefbidFW3DvAQ-1; Sun, 24 Sep 2023 08:44:25 -0400
+X-MC-Unique: GejbuHlGNWefbidFW3DvAQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C1EBA85A5A8;
-        Sun, 24 Sep 2023 12:44:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 680DC29AA2C5;
+        Sun, 24 Sep 2023 12:44:25 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.45.226.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 777B740C6EA8;
-        Sun, 24 Sep 2023 12:44:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EFA340C6EA8;
+        Sun, 24 Sep 2023 12:44:22 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
@@ -47,76 +47,290 @@ Cc:     Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 3/4] KVM: x86: add more information to kvm_exit tracepoint
-Date:   Sun, 24 Sep 2023 15:44:09 +0300
-Message-Id: <20230924124410.897646-4-mlevitsk@redhat.com>
+Subject: [PATCH v2 4/4] KVM: x86: add new nested vmexit tracepoints
+Date:   Sun, 24 Sep 2023 15:44:10 +0300
+Message-Id: <20230924124410.897646-5-mlevitsk@redhat.com>
 In-Reply-To: <20230924124410.897646-1-mlevitsk@redhat.com>
 References: <20230924124410.897646-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+        version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add:
-  - Flag that shows that the VM is in guest mode
-  - Bitmap of pending kvm requests.
-  - Flag showing that this VM exit is due to request to have
-    an immediate VM exit.
+Add 3 new tracepoints for nested VM exits which are intended
+to capture extra information to gain insights about the nested guest
+behavior.
+
+The new tracepoints are:
+
+- kvm_nested_msr
+- kvm_nested_hypercall
+
+These tracepoints capture extra register state to be able to know
+which MSR or which hypercall was done.
+
+- kvm_nested_page_fault
+
+This tracepoint allows to capture extra info about which host pagefault
+error code caused the nested page fault.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/trace.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/svm/nested.c       | 22 +++++++++
+ arch/x86/kvm/trace.h            | 82 +++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/nested.c       | 21 +++++++++
+ arch/x86/kvm/vmx/vmx.c          |  1 +
+ arch/x86/kvm/x86.c              |  3 ++
+ 6 files changed, 127 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 321721813474f7..64c195fb8789f7 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -966,6 +966,7 @@ struct kvm_vcpu_arch {
+ 
+ 	/* set at EPT violation at this point */
+ 	unsigned long exit_qualification;
++	u32 ept_fault_error_code;
+ 
+ 	/* pv related host specific info */
+ 	struct {
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index dd496c9e5f91f2..1cd9c3ab60ab3a 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -38,6 +38,8 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct vmcb *vmcb = svm->vmcb;
++	u64 host_error_code = vmcb->control.exit_info_1;
++
+ 
+ 	if (vmcb->control.exit_code != SVM_EXIT_NPF) {
+ 		/*
+@@ -48,11 +50,15 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+ 		vmcb->control.exit_code_hi = 0;
+ 		vmcb->control.exit_info_1 = (1ULL << 32);
+ 		vmcb->control.exit_info_2 = fault->address;
++		host_error_code = 0;
+ 	}
+ 
+ 	vmcb->control.exit_info_1 &= ~0xffffffffULL;
+ 	vmcb->control.exit_info_1 |= fault->error_code;
+ 
++	trace_kvm_nested_page_fault(fault->address, host_error_code,
++				    fault->error_code);
++
+ 	nested_svm_vmexit(svm);
+ }
+ 
+@@ -1139,6 +1145,22 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 				       vmcb12->control.exit_int_info_err,
+ 				       KVM_ISA_SVM);
+ 
++	/* Collect some info about nested VM exits */
++	switch (vmcb12->control.exit_code) {
++	case SVM_EXIT_MSR:
++		trace_kvm_nested_msr(vmcb12->control.exit_info_1 == 1,
++				     kvm_rcx_read(vcpu),
++				     (vmcb12->save.rax & -1u) |
++				     (((u64)(kvm_rdx_read(vcpu) & -1u) << 32)));
++		break;
++	case SVM_EXIT_VMMCALL:
++		trace_kvm_nested_hypercall(vmcb12->save.rax,
++					   kvm_rbx_read(vcpu),
++					   kvm_rcx_read(vcpu),
++					   kvm_rdx_read(vcpu));
++		break;
++	}
++
+ 	kvm_vcpu_unmap(vcpu, &map, true);
+ 
+ 	nested_svm_transition_tlb_flush(vcpu);
 diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index f4c56f59f5c11b..0657a3a348b4ae 100644
+index 0657a3a348b4ae..d08ae87c536324 100644
 --- a/arch/x86/kvm/trace.h
 +++ b/arch/x86/kvm/trace.h
-@@ -320,12 +320,18 @@ TRACE_EVENT(name,							     \
- 		__field(	u32,	        intr_info	)	     \
- 		__field(	u32,	        error_code	)	     \
- 		__field(	unsigned int,	vcpu_id         )	     \
-+		__field(	bool,		guest_mode      )	     \
-+		__field(	u64,		requests        )	     \
-+		__field(	bool,		req_imm_exit	)	     \
- 	),								     \
- 									     \
- 	TP_fast_assign(							     \
- 		__entry->guest_rip	= kvm_rip_read(vcpu);		     \
- 		__entry->isa            = isa;				     \
- 		__entry->vcpu_id        = vcpu->vcpu_id;		     \
-+		__entry->guest_mode     = is_guest_mode(vcpu);		     \
-+		__entry->requests       = READ_ONCE(vcpu->requests);	     \
-+		__entry->req_imm_exit   = vcpu->arch.req_immediate_exit;     \
- 		static_call(kvm_x86_get_exit_info)(vcpu,		     \
- 					  &__entry->exit_reason,	     \
- 					  &__entry->info1,		     \
-@@ -335,11 +341,15 @@ TRACE_EVENT(name,							     \
- 	),								     \
- 									     \
- 	TP_printk("vcpu %u reason %s%s%s rip 0x%lx info1 0x%016llx "	     \
--		  "info2 0x%016llx intr_info 0x%08x error_code 0x%08x",	     \
-+		  "info2 0x%016llx intr_info 0x%08x error_code 0x%08x "      \
-+		  "requests 0x%016llx%s%s",				     \
- 		  __entry->vcpu_id,					     \
- 		  kvm_print_exit_reason(__entry->exit_reason, __entry->isa), \
- 		  __entry->guest_rip, __entry->info1, __entry->info2,	     \
--		  __entry->intr_info, __entry->error_code)		     \
-+		  __entry->intr_info, __entry->error_code, 		     \
-+		  __entry->requests,					     \
-+		  __entry->guest_mode ? " [guest]" : "",		     \
-+		  __entry->req_imm_exit ? " [imm exit]" : "")		     \
- )
+@@ -620,7 +620,7 @@ TRACE_EVENT(kvm_pv_eoi,
+ );
  
  /*
+- * Tracepoint for nested VMRUN
++ * Tracepoint for nested VMRUN/VMENTER
+  */
+ TRACE_EVENT(kvm_nested_vmenter,
+ 	    TP_PROTO(__u64 rip, __u64 vmcb, __u64 nested_rip, __u32 int_ctl,
+@@ -753,8 +753,84 @@ TRACE_EVENT(kvm_nested_intr_vmexit,
+ 	TP_printk("rip: 0x%016llx", __entry->rip)
+ );
+ 
++
+ /*
+- * Tracepoint for nested #vmexit because of interrupt pending
++ * Tracepoint for nested guest MSR access.
++ */
++TRACE_EVENT(kvm_nested_msr,
++	TP_PROTO(bool write, u32 ecx, u64 data),
++	TP_ARGS(write, ecx, data),
++
++	TP_STRUCT__entry(
++		__field(	bool,		write		)
++		__field(	u32,		ecx		)
++		__field(	u64,		data		)
++	),
++
++	TP_fast_assign(
++		__entry->write		= write;
++		__entry->ecx		= ecx;
++		__entry->data		= data;
++	),
++
++	TP_printk("msr_%s %x = 0x%llx",
++		  __entry->write ? "write" : "read",
++		  __entry->ecx, __entry->data)
++);
++
++/*
++ * Tracepoint for nested hypercalls, capturing generic info about the
++ * hypercall
++ */
++
++TRACE_EVENT(kvm_nested_hypercall,
++	TP_PROTO(u64 rax, u64 rbx, u64 rcx, u64 rdx),
++	TP_ARGS(rax, rbx, rcx, rdx),
++
++	TP_STRUCT__entry(
++		__field(	u64, 	rax	)
++		__field(	u64,	rbx	)
++		__field(	u64,	rcx	)
++		__field(	u64,	rdx	)
++	),
++
++	TP_fast_assign(
++		__entry->rax		= rax;
++		__entry->rbx		= rbx;
++		__entry->rcx		= rcx;
++		__entry->rdx		= rdx;
++	),
++
++	TP_printk("rax 0x%llx rbx 0x%llx rcx 0x%llx rdx 0x%llx",
++		 __entry->rax, __entry->rbx, __entry->rcx,  __entry->rdx)
++);
++
++
++TRACE_EVENT(kvm_nested_page_fault,
++	TP_PROTO(u64 gpa, u64 host_error_code, u64 guest_error_code),
++	TP_ARGS(gpa, host_error_code, guest_error_code),
++
++	TP_STRUCT__entry(
++			__field(	u64,		gpa	)
++		__field(	u64,		host_error_code		)
++		__field(	u64,		guest_errror_code	)
++	),
++
++	TP_fast_assign(
++		__entry->gpa			= gpa;
++		__entry->host_error_code	= host_error_code;
++		__entry->guest_errror_code	= guest_error_code;
++	),
++
++	TP_printk("gpa 0x%llx host err 0x%llx guest err 0x%llx",
++		  __entry->gpa,
++		  __entry->host_error_code,
++		  __entry->guest_errror_code)
++);
++
++
++/*
++ * Tracepoint for invlpga
+  */
+ TRACE_EVENT(kvm_invlpga,
+ 	    TP_PROTO(__u64 rip, int asid, u64 address),
+@@ -777,7 +853,7 @@ TRACE_EVENT(kvm_invlpga,
+ );
+ 
+ /*
+- * Tracepoint for nested #vmexit because of interrupt pending
++ * Tracepoint for skinit
+  */
+ TRACE_EVENT(kvm_skinit,
+ 	    TP_PROTO(__u64 rip, __u32 slb),
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index c5ec0ef51ff78f..b3b89d5152cd39 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -402,6 +402,10 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
+ 		 */
+ 		nested_ept_invalidate_addr(vcpu, vmcs12->ept_pointer,
+ 					   fault->address);
++
++		trace_kvm_nested_page_fault(fault->address,
++				vcpu->arch.ept_fault_error_code,
++				fault->error_code);
+ 	}
+ 
+ 	nested_vmx_vmexit(vcpu, vm_exit_reason, 0, exit_qualification);
+@@ -4877,6 +4881,23 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 						       vmcs12->vm_exit_intr_error_code,
+ 						       KVM_ISA_VMX);
+ 
++		switch ((u16)vmcs12->vm_exit_reason) {
++		case EXIT_REASON_MSR_READ:
++		case EXIT_REASON_MSR_WRITE:
++			trace_kvm_nested_msr(vmcs12->vm_exit_reason == EXIT_REASON_MSR_WRITE,
++					     kvm_rcx_read(vcpu),
++					     (kvm_rax_read(vcpu) & -1u) |
++					     (((u64)(kvm_rdx_read(vcpu) & -1u) << 32)));
++			break;
++		case EXIT_REASON_VMCALL:
++			trace_kvm_nested_hypercall(kvm_rax_read(vcpu),
++						   kvm_rbx_read(vcpu),
++						   kvm_rcx_read(vcpu),
++						   kvm_rdx_read(vcpu));
++			break;
++
++		}
++
+ 		load_vmcs12_host_state(vcpu, vmcs12);
+ 
+ 		return;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9dd13f52d4999c..05fadcd38fde75 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5773,6 +5773,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+ 
+ 	vcpu->arch.exit_qualification = exit_qualification;
++	vcpu->arch.ept_fault_error_code = error_code;
+ 
+ 	/*
+ 	 * Check that the GPA doesn't exceed physical memory limits, as that is
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index dfb7d25ed94f26..766d0dc333eac3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13637,6 +13637,9 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmenter);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit_inject);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_intr_vmexit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_hypercall);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_page_fault);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_msr);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmenter_failed);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_invlpga);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_skinit);
 -- 
 2.26.3
 
