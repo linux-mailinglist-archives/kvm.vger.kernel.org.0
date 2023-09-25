@@ -2,66 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF0BF7ADF75
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 21:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C341A7ADF9C
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 21:35:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233278AbjIYTQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 15:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59018 "EHLO
+        id S233279AbjIYTen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 15:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231730AbjIYTQl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 15:16:41 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96BCFC
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 12:16:34 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f7d109926so48007847b3.2
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 12:16:34 -0700 (PDT)
+        with ESMTP id S229970AbjIYTek (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 15:34:40 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00068101
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 12:34:23 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-65b0557ec77so20163426d6.0
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 12:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695669394; x=1696274194; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MBb7/o1IRk0JElBFa4klbTWLM6mKvJph/LCCzFiKFTQ=;
-        b=bdCxsRsuc6E/4uG33ZbF7h9ni1HZOQM67sMu51HAfAAS4zlgo0HSPBU3eLq6NvdHpf
-         yjN0QQGHskEmGy+HP27CJ/F/tGOWGfsy9UMQIoIZXmzw/ERJC46aAxPQgQLo9QtAdu8I
-         uH36WitWtQ56nNGynkpDOORRFY0pJ/jd/80aCC2oStQUk7tSKM3pIdGZmrj17B7t+g0U
-         d3Xt9YTEPFoH9cjWZ7uw9WCS5CJJmfeNad75bUq5PCntCq2auPuftVKV0ocyTzrwNFeH
-         P6whpXQkW7rOz5QRmyXtO65yxc3GxX9M6ctx+OJ1RgVDIikob2tve+p9hBGwtMdzDleJ
-         gKsg==
+        d=google.com; s=20230601; t=1695670463; x=1696275263; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7fmgf2gQ/swm4Nxw1H65fys4tXrr/aZSzb+qRx0CMW0=;
+        b=Msr0c0tPb26iAavkBmsWxmIgflapT8QmH8VFR1U5eUtXKZUJ/5Qn9A96wbOv0jmJXK
+         FzxTnUKdHbG9/gJDZsRXRD3tcLFtHRCq7TPJ+3rqsMfCnp+jKbBKzGSOCtyrQAtc8CSr
+         VDImr/PBkxuMty5lgzLyx/oMUQbVcm+4IRTW0ynEg/WmDx4V5447bIpygwPjW3SqRojK
+         YHjG+dCK/FTSbvkz47L0xSjucGR67nbsyuUMVqdv+tbFXDfOAmvzPKoH6ufwegyvJpyN
+         0l0heGnaLhpGPuvJjBdL5EdLM9qmKBQN6A5zh062JnLWyYHTClYGPTathVAHS3oC192E
+         ONlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695669394; x=1696274194;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MBb7/o1IRk0JElBFa4klbTWLM6mKvJph/LCCzFiKFTQ=;
-        b=R/Rv8Iw+jkKkutqqpJE5pbaJRO4W32nDv9RhFbguJbtQyN6KClrBIBvac1Xxd++9PJ
-         sXr19F1T/ryjY/7RR3C1FQdafGDuFAggMqlKtC3mPM5Mp06KK2mji9l70ZfXA3muhMDl
-         Z0iSwWwt5hV4QIvTXzB0fliQmwWy/lXiMgRHhUMsTDttsqslAHrcJHPxwmjEkQQ5ezxt
-         289PkSpcT8AyJZru0kzjt16j1U6GY6LDtXRSc5x2zMdUQhpkpw04yXlI6zmvtSXyK/Wc
-         bOu4SmBHjTJ73HDwSQb9llhJG5dO/ErrKbAdR95QNds2IPjL4qqkef1pe2E9N77sNmca
-         BpAQ==
-X-Gm-Message-State: AOJu0YzveWFK0NHGfLqTJnyHRyxdoramQ+CIPhZH2Q9cXWZhs/Y/9Pqd
-        WZLlYbJcayN7psUA2KsKvJ0BEvlv/1s=
-X-Google-Smtp-Source: AGHT+IHwqJPElF/D6RnFeZcgh5HTfyZNmRDOTT6D2UxYulQBeoscMRWpl5d03Kc5Cj4wlAC1nyC02Ad7ufI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ec12:0:b0:589:a5c6:4a8e with SMTP id
- j18-20020a81ec12000000b00589a5c64a8emr88716ywm.1.1695669394067; Mon, 25 Sep
- 2023 12:16:34 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 12:16:32 -0700
-In-Reply-To: <8c6a1fc8-2ac5-4767-8b02-9ef56434724e@maciej.szmigiero.name>
-Mime-Version: 1.0
-References: <0ffde769702c6cdf6b6c18e1dcb28b25309af7f7.1695659717.git.maciej.szmigiero@oracle.com>
- <ZRHRsgjhOmIrxo0W@google.com> <8c6a1fc8-2ac5-4767-8b02-9ef56434724e@maciej.szmigiero.name>
-Message-ID: <ZRHckCMwOv3jfSs7@google.com>
-Subject: Re: [PATCH] KVM: x86: Ignore MSR_AMD64_BU_CFG access
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+        d=1e100.net; s=20230601; t=1695670463; x=1696275263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7fmgf2gQ/swm4Nxw1H65fys4tXrr/aZSzb+qRx0CMW0=;
+        b=JIqv+JT1KrEdCE4NvDXGd48eveUro30b0LnrcZNGuU0/h5mgsRO1zY7c6PTD67lQK4
+         vZoxD3+skALK46HQw3Oc5mkjcxEmRHkQCmsN7oqVtCfDc+XLVgcYpp4aWWsgpAAA5w8z
+         +H5Ofw31DAE0Ee1bYkhyfWcogV7r3x6Vi9T7394VZzgOS9/0PJw4K4Mr7U8tQiWQZrAl
+         XRgjYpAOeep0p3UiW+s80unbuzU87MLMySizeqOvxHPBk4rTySf+8wP8/kB60znsprCm
+         5Cy7NDsvgSx1qsey57ujkZkUWSFWxeRzoq0bbsWzIS85SvdF2AXxiiJJxmhIhizl66O8
+         Aa1A==
+X-Gm-Message-State: AOJu0Yx/yHyL9e5RjirZrt20ut15bPiDUX8d0SaN7tU8fg1kPhukSJse
+        8hj8eOIM/RdoiFISXU3n0y9VioV0pTudhU6UbjnwHy8LRlpz+sy3cP0=
+X-Google-Smtp-Source: AGHT+IFy77IozmuzoIETfXqPTevBy12STCpp81ZoYY5O0nwBH+8t6d4No22oMNKw4YFBbp6qBgZcO4peb4w3MQLO1lo=
+X-Received: by 2002:a0c:cc03:0:b0:65b:21f2:5573 with SMTP id
+ r3-20020a0ccc03000000b0065b21f25573mr746644qvk.58.1695670462945; Mon, 25 Sep
+ 2023 12:34:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230925173448.3518223-1-mizhang@google.com> <20230925173448.3518223-2-mizhang@google.com>
+ <ZRHKcW6hvujNIYS5@google.com>
+In-Reply-To: <ZRHKcW6hvujNIYS5@google.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 25 Sep 2023 12:33:47 -0700
+Message-ID: <CAL715WJgFg=c0-nT6n8Gy=wxh39MyKa7r04oDi-bwHCiNy=9JQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,63 +75,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Tom
-
-On Mon, Sep 25, 2023, Maciej S. Szmigiero wrote:
-> On 25.09.2023 20:30, Sean Christopherson wrote:
-> >>
-> >> Hyper-V enabled Windows Server 2022 KVM VM cannot be started on Zen1 Ryzen
-> >> since it crashes at boot with SYSTEM_THREAD_EXCEPTION_NOT_HANDLED +
-> >> STATUS_PRIVILEGED_INSTRUCTION (in other words, because of an unexpected #GP
-> >> in the guest kernel).
-> >>
-> >> This is because Windows tries to set bit 8 in MSR_AMD64_BU_CFG and can't
-> >> handle receiving a #GP when doing so.
+On Mon, Sep 25, 2023 at 10:59=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Mon, Sep 25, 2023, Mingwei Zhang wrote:
+> > From: Jim Mattson <jmattson@google.com>
 > >
-> > Any idea why?
+> > When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
+> > VM-exit that also invokes __kvm_perf_overflow() as a result of
+> > instruction emulation, kvm_pmu_deliver_pmi() will be called twice
+> > before the next VM-entry.
+> >
+> > That shouldn't be a problem. The local APIC is supposed to
+> > automatically set the mask flag in LVTPC when it handles a PMI, so the
+> > second PMI should be inhibited. However, KVM's local APIC emulation
+> > fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
+> > are delivered via the local APIC. In the common case, where LVTPC is
+> > configured to deliver an NMI, the first NMI is vectored through the
+> > guest IDT, and the second one is held pending. When the NMI handler
+> > returns, the second NMI is vectored through the IDT. For Linux guests,
+> > this results in the "dazed and confused" spurious NMI message.
+> >
+> > Though the obvious fix is to set the mask flag in LVTPC when handling
+> > a PMI, KVM's logic around synthesizing a PMI is unnecessarily
+> > convoluted.
 >
-> I guess it is trying to set some chicken bit?
+> Unless Jim outright objects, I strongly prefer placing this patch second,=
+ with
+> the above two paragraphs replaced with my suggestion (or something simila=
+r):
 >
-> By the way, I tested Windows Server 2019 now - it has the same problem.
+>   Calling kvm_pmu_deliver_pmi() twice is unlikely to be problematic now t=
+hat
+>   KVM sets the LVTPC mask bit when delivering a PMI.  But using IRQ work =
+to
+>   trigger the PMI is still broken, albeit very theoretically.
 >
-> So likely Windows 11 and newer version of Windows 10 have it, too.
+>   E.g. if the self-IPI to trigger IRQ work is be delayed long enough for =
+the
+>   vCPU to be migrated to a different pCPU, then it's possible for
+>   kvm_pmi_trigger_fn() to race with the kvm_pmu_deliver_pmi() from
+>   KVM_REQ_PMI and still generate two PMIs.
+>
+>   KVM could set the mask bit using an atomic operation, but that'd just b=
+e
+>   piling on unnecessary code to workaround what is effectively a hack.  T=
+he
+>   *only* reason KVM uses IRQ work is to ensure the PMI is treated as a wa=
+ke
+>   event, e.g. if the vCPU just executed HLT.
+>
+> I understand Jim's desire for the patch to be more obviously valuable, bu=
+t the
+> people that need convincing are already convinced that the patch is worth=
+ taking.
+>
+> > Remove the irq_work callback for synthesizing a PMI, and all of the
+> > logic for invoking it. Instead, to prevent a vcpu from leaving C0 with
+> > a PMI pending, add a check for KVM_REQ_PMI to kvm_vcpu_has_events().
+> >
+> > Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions=
+")
+> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Tested-by: Mingwei Zhang <mizhang@google.com>
+> > Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>
+> Needs your SoB
 
-...
-
-> > > diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> > > index 1d111350197f..c80a5cea80c4 100644
-> > > --- a/arch/x86/include/asm/msr-index.h
-> > > +++ b/arch/x86/include/asm/msr-index.h
-> > > @@ -553,6 +553,7 @@
-> > >   #define MSR_AMD64_CPUID_FN_1		0xc0011004
-> > >   #define MSR_AMD64_LS_CFG		0xc0011020
-> > >   #define MSR_AMD64_DC_CFG		0xc0011022
-> > > +#define MSR_AMD64_BU_CFG		0xc0011023
-> > 
-> > What document actually defines this MSR?  All of the PPRs I can find for Family 17h
-> > list it as:
-> > 
-> >     MSRC001_1023 [Table Walker Configuration] (Core::X86::Msr::TW_CFG)
-> 
-> It's partially documented in various AMD BKDGs, however I couldn't find
-> any definition for this particular bit (8) - other than that it is reserved.
-
-I found it as MSR_AMD64_BU_CFG for Model 16h, but that's Jaguar/Puma, not Zen1.
-My guess is that Windows is trying to write this thing:
-
-  MSRC001_1023 [Table Walker Configuration] (Core::X86::Msr::TW_CFG)
-  Read-write. Reset: 0000_0000_0000_0000h.
-  _lthree0_core[3,1]; MSRC001_1023
-
-  Bits   Description
-  63:50  Reserved.
-  49     TwCfgCombineCr0Cd: combine CR0_CD for both threads of a core. Read-write. Reset: 0. Init: BIOS,1.
-         1=The host Cr0_Cd values from the two threads are OR'd together and used by both threads.
-  48:0   Reserved.
-
-Though that still doesn't explain bit 8...  Perhaps a chicken-bit related to yet
-another speculation bug?
-
-Boris or Tom, any idea what Windows is doing?  I doubt it changes our options in
-terms of "fixing" this in KVM, but having a somewhat accurate/helpful changelog
-would be nice.
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
