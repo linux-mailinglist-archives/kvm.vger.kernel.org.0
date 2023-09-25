@@ -2,123 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A6857AD29D
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 10:02:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BFFA7AD2A3
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 10:04:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232573AbjIYICP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 04:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60804 "EHLO
+        id S232594AbjIYIEV convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 25 Sep 2023 04:04:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232548AbjIYICO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 04:02:14 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031BBE3;
-        Mon, 25 Sep 2023 01:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695628927; x=1727164927;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2BzDBwKAVGWZW5bjYPETPn/FpFO36BDHugTlU76Wjg0=;
-  b=EESii5ZLB9D//wcnDipV2Xw7g/FPEQIEgw78h8f1O+lDd840RPZEfkhW
-   kCxQnh98wZagLfFDohwhOcwYknHfhV4rrRF4Etpgo1DTlYSWJLdpBrden
-   u3ffB9EY3k0HS6s7yLXYXvBnzd54i36qoFJV0Zi6JNkfD04Cj5SB76Ucs
-   HKdjeiW5ucYBmKqchH1Nq3T/9vTbK8prPzXdCao2jHCXD4QBw7WARvxgx
-   IVlkAaalMa0RyqzmQw3H0Gfzg1Wv+MR71tKRmteuS5mgfHMBDDPKcLnV2
-   nmjZngZYb0MWdXVOfIIMq2sT/z/X7Uy/L0g2gUyQei/5OEcRjkxW6NtLo
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="383956260"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="383956260"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 01:02:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="783388156"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="783388156"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.249.168.76]) ([10.249.168.76])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 01:01:58 -0700
-Message-ID: <473d4050-2f2a-f9a2-6c40-3efd5b582b4e@linux.intel.com>
-Date:   Mon, 25 Sep 2023 16:01:55 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: Re: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
- domain_alloc_user op
-To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
-        robin.murphy@arm.com
-References: <20230921075138.124099-1-yi.l.liu@intel.com>
- <20230921075138.124099-2-yi.l.liu@intel.com>
- <4b17d331-957b-44d3-8a19-0b2ccc59150b@linux.intel.com>
- <15831871-cace-f954-6af1-328039ffda16@intel.com>
+        with ESMTP id S232590AbjIYIET (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 04:04:19 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768D8B3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 01:04:12 -0700 (PDT)
+Received: from lhrpeml500003.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RvFhH0y0tz6HKDJ;
+        Mon, 25 Sep 2023 16:01:51 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 25 Sep 2023 09:04:07 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
+ Mon, 25 Sep 2023 09:04:07 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+CC:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        zhukeqian <zhukeqian1@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously writeable
+ pages
+Thread-Topic: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously writeable
+ pages
+Thread-Index: AQHZ1zeuYuzeI01Cc0itfn6DpxzudLAnFvmAgAQ/2cA=
+Date:   Mon, 25 Sep 2023 08:04:06 +0000
+Message-ID: <0149ecd0a88c4938b21169182e706fb9@huawei.com>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+        <20230825093528.1637-5-shameerali.kolothum.thodi@huawei.com>
+ <ZQ21YYGqcAhOq/UO@arm.com>
+In-Reply-To: <ZQ21YYGqcAhOq/UO@arm.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <15831871-cace-f954-6af1-328039ffda16@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.48.145.190]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/9/25 14:22, Yi Liu wrote:
-> On 2023/9/21 20:10, Baolu Lu wrote:
->> On 2023/9/21 15:51, Yi Liu wrote:
->>> +/**
->>> + * iommu_copy_user_data - Copy iommu driver specific user space data
->>> + * @dst_data: Pointer to an iommu driver specific user data that is 
->>> defined in
->>> + *            include/uapi/linux/iommufd.h
->>> + * @src_data: Pointer to a struct iommu_user_data for user space 
->>> data info
->>> + * @data_len: Length of current user data structure, i.e. 
->>> sizeof(struct _dst)
->>> + * @min_len: Initial length of user data structure for backward 
->>> compatibility.
->>> + *           This should be offsetofend using the last member in the 
->>> user data
->>> + *           struct that was initially added to 
->>> include/uapi/linux/iommufd.h
->>> + */
->>> +static inline int iommu_copy_user_data(void *dst_data,
->>> +                       const struct iommu_user_data *src_data,
->>> +                       size_t data_len, size_t min_len)
->>> +{
->>> +    if (WARN_ON(!dst_data || !src_data))
->>> +        return -EINVAL;
->>> +    if (src_data->len < min_len || data_len < src_data->len)
->>> +        return -EINVAL;
->>> +    return copy_struct_from_user(dst_data, data_len,
->>> +                     src_data->uptr, src_data->len);
->>> +}
->>
->> I am not sure that I understand the purpose of "min_len" correctly. It
->> seems like it would always be equal to data_len?
-> 
-> no, it will not be equal to data_len once there is extension in the
-> uAPI structure.
-> 
->> Or, it means the minimal data length that the iommu driver requires?
-> 
-> it is the minimal data length the uAPI requires. min_len is finalized
-> per the upstream of the first version of the uAPI.
 
-So, it looks like a constant. Perhaps we should document it in the
-uapi/iommuf.h and avoid using it as a parameter of a helper function?
 
-Best regards,
-baolu
+> -----Original Message-----
+> From: Catalin Marinas [mailto:catalin.marinas@arm.com]
+> Sent: 22 September 2023 16:40
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org;
+> linux-arm-kernel@lists.infradead.org; maz@kernel.org; will@kernel.org;
+> oliver.upton@linux.dev; james.morse@arm.com; suzuki.poulose@arm.com;
+> yuzenghui <yuzenghui@huawei.com>; zhukeqian
+> <zhukeqian1@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
+> Subject: Re: [RFC PATCH v2 4/8] KVM: arm64: Set DBM for previously
+> writeable pages
+> 
+> On Fri, Aug 25, 2023 at 10:35:24AM +0100, Shameer Kolothum wrote:
+> > We only set DBM if the page is writeable (S2AP[1] == 1).�But once
+> migration
+> > starts, CLEAR_LOG path will write protect the pages (S2AP[1] = 0) and
+> there
+> > isn't�an easy way to differentiate the writeable pages that gets write
+> > protected from read-only pages as we only have S2AP[1] bit to check.
+> 
+> Don't we have enough bits without an additional one?
+> 
+> writeable: DBM == 1 || S2AP[1] == 1
+>   clean: S2AP[1] == 0
+>   dirty: S2AP[1] == 1 (irrespective of DBM)
+> 
+> read-only: DBM == 0 && S2AP[1] == 0
+> 
+> For S1 we use a software dirty bit as well to track read-only dirty
+> mappings but I don't think it is necessary for S2 since KVM unmaps the
+> PTE when changing the VMM permission.
+> 
+
+We don't set the DBM for all the memory. In order to reduce the overhead
+associated with scanning PTEs, this series sets the DBM for the nearby pages
+on page fault during the migration phase.
+
+See patch #8,
+  user_mem_abort()
+     kvm_arm_enable_nearby_hwdbm()
+
+But once migration starts, on CLEAR_LOG path,
+   kvm_arch_mmu_enable_log_dirty_pt_masked()
+    stage2_wp_range()  --> set the page read only
+    kvm_mmu_split_huge_pages() --> split huge pages and pages are read only.
+
+This in effect means there are no writeable-clean near-by pages to set the DBM on
+kvm_arm_enable_nearby_hwdbm().
+
+To identify the pages that can be set DBM, we provide a hint to
+stage2_wp_range( ) --> kvm_pgtable_stage2_wrprotect() table walker and make
+use of a new software bit to mark the PTE as writeable-clean.
+
+Hope, I am clear.
+
+Thanks,
+Shameer
+ 
+
+
+   
+
+
+
