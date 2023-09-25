@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE5747ADDD6
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:34:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99D3F7ADDD8
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:35:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232970AbjIYRfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 13:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60694 "EHLO
+        id S233087AbjIYRfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 13:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjIYRfC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 13:35:02 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FE810D
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:55 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-692ad939c8cso6564538b3a.0
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:55 -0700 (PDT)
+        with ESMTP id S233062AbjIYRfE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 13:35:04 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D1310E
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:57 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c12d31d04so130067437b3.1
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695663294; x=1696268094; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+fRgk1GXWHwlF4dpNW6mrZozuiwZl1grW/0QNwyM28U=;
-        b=uF0CS2nx+a+rOpH2PJzzRfPj1Pia8oYK53zE0F57AY/Jcx7tmMXs5uLsXem+x0YWyn
-         loU0oq1orpFDvTN2IV4f2ykJaNYm1U/KXHrYc9NDzPO01lm9RnXnVvZ0cpGZUdr8A+fs
-         l3T7h1D6Y/iP1YQq93MwunIdXRI2LZDiH/KXKAn6OvsE6KADv7iKxIQTRtgUd37kWxev
-         2fCmgMrgHHUr0KRRFh56/wUwAEVr3Wlbghe1OPfvX1KZ3fb2NCPx3h7/Ujk8FAc/2AWH
-         Qg1rrj79In1nargCzXGr1CvGwtYVF43s8BvWsVJL28GWdY+G4Cydc0semJQwsRbRv/Gv
-         Pm9A==
+        d=google.com; s=20230601; t=1695663296; x=1696268096; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3mybIXWXmxE94oHFn/stJfySL7s2PMrxYppKn/7o5E=;
+        b=l0fgHK/tYNmZCoIFnp1u4GvzMn7MgmKgs5nOMB3MmccHqjSaqHWNLifvBUHB2HkP5G
+         Cwg1jYsQ0A6KaBUrNEljJFvPilIDVizpCoxwsOs1pr/jCqQy/Y2ed9BE7Qo18KkFK1q6
+         1yc16MNM0qrsVAcwERqCi31kgrzr1sJW/o50OfMtO4H31yHnCfzx3Bf9BZg2m+HJUBix
+         8iepH2LOryPebM4GT/Ncx5s285FB5aECVxjqhDg2aSmVmYYi6T37XzHl8zlotEq5jaNR
+         WR1e07AGxzoRzshTPoF8yOewo8YPbtadgqlVveMSntpz5LpIuf4tCg964F7u9IPzmCIh
+         vqbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695663294; x=1696268094;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+fRgk1GXWHwlF4dpNW6mrZozuiwZl1grW/0QNwyM28U=;
-        b=VvQ3FCr6UbuKhJ8grRdGpuVjpaV5SrXH63sVifq+Dpp4hhJbssJgQ7AWCW09eR+qPN
-         bIGoenKJSdyr8Uk7G+AyHKkUQxWy3gPKUSXhnw1Q3bvb9jQdYDDPy+8slHY1AP3lSTl3
-         937UNhq15X7YudKfrkGNKUYZySo8uz9CS5ZOjzm1Vpt7FsVUjEKIUJZrfmFfC89Ubmim
-         b9wL3oEVjZtD9/x4IylGaAaUgQNUKkviqGE1HK00ZlA4avkBROroO+dchAYy54xfOvpm
-         0cJVaiLWHJGfMBSaZQPxMzTf1sMQA2udJaavMRBLikOhncS9bRJgbV70ECTACLqXajXN
-         L/bQ==
-X-Gm-Message-State: AOJu0YwJLoLYpFSGskcDSxEPiK7Kp10/ZpOO1cGsPqKQLAU/zFSyH+Fh
-        fttJNtN69T4gtNbPbZsHAZ3Rtcv/6LWr
-X-Google-Smtp-Source: AGHT+IEIa67JHm4iGq6IbgmEn/O9A05ePGGUAl+33vpiM8knnCja047dfXJXmwFR+tsyhsegkC0w5pFB6gU4
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a05:6a00:3a27:b0:690:29c0:ef51 with SMTP id
- fj39-20020a056a003a2700b0069029c0ef51mr6884pfb.1.1695663294680; Mon, 25 Sep
- 2023 10:34:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695663296; x=1696268096;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N3mybIXWXmxE94oHFn/stJfySL7s2PMrxYppKn/7o5E=;
+        b=l2jdhftpoL8jyMpMsNAqiB2S0ikIWy4TF4gPtVPVuh271u9JMrUsNqFKqW5REnZ6n7
+         MqVUGcrprBjgwoU3qHfIzRFfnyCQRwFVjVnVEH9/jgSA9k66MkQRnB+zI0hPu53zeZNh
+         oKajZdFSCz0SEOHK26t5UuH4RVtp+cv8jnVALEO+CnMoBXQ9aZIN6oxGytgS2icsA/2P
+         ccKBmVkqBnqTRZ7ozTtwbvJxp1q0/Rr54SQsCd3L9M+AoxNh5ruPr9M6Gkh4YX4aI6dH
+         Wer+I6vyggqpPC4kf5hE7225i98UYAXgiRWqF4BPlfUe0H5tAvq+7s9AjSI3Bay1qaHm
+         hg6Q==
+X-Gm-Message-State: AOJu0YwOa5G9qgEvTJsGIBcnHZ1xJS1yWmBuPtBlLb6+RqZkKwqqhL4G
+        KgP+WuDOjeSl9Oo4cU/PrM7UoqsoNov8
+X-Google-Smtp-Source: AGHT+IHTdPAbOtwbBgEp9hepQIswdjpp8KG/4U+ekKeqn+bsXsD9154D6JJa9O9ixd1/G9KRNKfYk3myvjMQ
+X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
+ job=sendgmr) by 2002:a81:ac20:0:b0:59e:ee51:52a1 with SMTP id
+ k32-20020a81ac20000000b0059eee5152a1mr93922ywh.10.1695663296760; Mon, 25 Sep
+ 2023 10:34:56 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 25 Sep 2023 17:34:45 +0000
+Date:   Mon, 25 Sep 2023 17:34:46 +0000
+In-Reply-To: <20230925173448.3518223-1-mizhang@google.com>
 Mime-Version: 1.0
+References: <20230925173448.3518223-1-mizhang@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230925173448.3518223-1-mizhang@google.com>
-Subject: [PATCH 0/2] Fix the duplicate PMI injections in vPMU
+Message-ID: <20230925173448.3518223-2-mizhang@google.com>
+Subject: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,107 +65,136 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
         Kan Liang <kan.liang@intel.com>,
         Dapeng1 Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we do stress test on KVM vPMU using Intel vtune, we find the following
-warning kernel message in the guest VM:
+From: Jim Mattson <jmattson@google.com>
 
-[ 1437.487320] Uhhuh. NMI received for unknown reason 20 on CPU 3.
-[ 1437.487330] Dazed and confused, but trying to continue
+When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
+VM-exit that also invokes __kvm_perf_overflow() as a result of
+instruction emulation, kvm_pmu_deliver_pmi() will be called twice
+before the next VM-entry.
 
-The Problem
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+That shouldn't be a problem. The local APIC is supposed to
+automatically set the mask flag in LVTPC when it handles a PMI, so the
+second PMI should be inhibited. However, KVM's local APIC emulation
+fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
+are delivered via the local APIC. In the common case, where LVTPC is
+configured to deliver an NMI, the first NMI is vectored through the
+guest IDT, and the second one is held pending. When the NMI handler
+returns, the second NMI is vectored through the IDT. For Linux guests,
+this results in the "dazed and confused" spurious NMI message.
 
-The above issue indicates that there are more NMIs injected than guest
-could recognize. After a month of investigation, we discovered that the
-bug happened due to minor glitches in two separate parts of the KVM: 1)
-KVM vPMU mistakenly fires a PMI due to emulated counter overflow even
-though the overflow has already been fired by the PMI handler on the
-host [1]. 2) KVM APIC allows multiple injections of PMI at one VM entry
-which violates Intel SDM. Both glitches contributes to extra injection
-of PMIs and thus confuses PMI handler in guest VM and causes the above
-warning messages.
+Though the obvious fix is to set the mask flag in LVTPC when handling
+a PMI, KVM's logic around synthesizing a PMI is unnecessarily
+convoluted.
 
-The Fixes
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Remove the irq_work callback for synthesizing a PMI, and all of the
+logic for invoking it. Instead, to prevent a vcpu from leaving C0 with
+a PMI pending, add a check for KVM_REQ_PMI to kvm_vcpu_has_events().
 
-The patches disallow the multi-PMI injection fundamentally at APIC
-level. In addition, they also simplify the PMI injection process by
-removing irq_work and only use KVM_REQ_PMI.
-
-The Testing
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-With the series applied, we do not see the above warning messages when
-stress testing VM with Intel vtune. In addition, we add some kernel
-printing, all emulated counter overflow happens when hardware counter
-value is 0 and emulated counter value is 1 (prev_counter is -1). We
-never observed unexpected prev_counter values we saw in [2].
-
-Note that this series does break the upstream kvm-unit-tests/pmu with the
-following error:
-
-FAIL: Intel: emulated instruction: instruction counter overflow
-FAIL: Intel: full-width writes: emulated instruction: instruction counter o=
-verflow
-
-This is a test bug and apply the following diff should fix the issue:
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 0def2869..667e6233 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -68,6 +68,7 @@ volatile uint64_t irq_received;
- static void cnt_overflow(isr_regs_t *regs)
- {
- =C2=BB......irq_received++;
-+=C2=BB......apic_write(APIC_LVTPC, apic_read(APIC_LVTPC) & ~APIC_LVT_MASKE=
-D);
- =C2=BB......apic_write(APIC_EOI, 0);
- }
-
-We will post the above change soon.
-
-[1] commit 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions=
-")
-[2] https://lore.kernel.org/all/CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfp=
-x1aYZnog@mail.gmail.com/
-
-Versioning
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-The series is in v1. We made some changes:
- - drop Dapeng's reviewed-by, since code changes.
- - applies fix up in kvm_apic_local_deliver(). [seanjc]
- - remove pmc->prev_counter. [seanjc]
-
-Previous version (v0) shown as follows:
- - [APIC patches v0]: https://lore.kernel.org/all/20230901185646.2823254-1-=
-jmattson@google.com/
- - [vPMU patch v0]: https://lore.kernel.org/all/ZQ4A4KaSyygKHDUI@google.com=
-/
-
-Jim Mattson (2):
-  KVM: x86: Synthesize at most one PMI per VM-exit
-  KVM: x86: Mask LVTPC when handling a PMI
-
+Fixes: 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Tested-by: Mingwei Zhang <mizhang@google.com>
+Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+---
  arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/lapic.c            |  8 ++++++--
  arch/x86/kvm/pmu.c              | 27 +--------------------------
  arch/x86/kvm/x86.c              |  3 +++
- 4 files changed, 10 insertions(+), 29 deletions(-)
+ 3 files changed, 4 insertions(+), 27 deletions(-)
 
-
-base-commit: 6de2ccc169683bf81feba163834dae7cdebdd826
---=20
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 28bd38303d70..de951d6aa9a8 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -528,7 +528,6 @@ struct kvm_pmu {
+ 	u64 raw_event_mask;
+ 	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
+ 	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
+-	struct irq_work irq_work;
+ 
+ 	/*
+ 	 * Overlay the bitmap with a 64-bit atomic so that all bits can be
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index edb89b51b383..9ae07db6f0f6 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -93,14 +93,6 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
+ #undef __KVM_X86_PMU_OP
+ }
+ 
+-static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
+-{
+-	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+-	struct kvm_vcpu *vcpu = pmu_to_vcpu(pmu);
+-
+-	kvm_pmu_deliver_pmi(vcpu);
+-}
+-
+ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+ {
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+@@ -124,20 +116,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+ 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+ 	}
+ 
+-	if (!pmc->intr || skip_pmi)
+-		return;
+-
+-	/*
+-	 * Inject PMI. If vcpu was in a guest mode during NMI PMI
+-	 * can be ejected on a guest mode re-entry. Otherwise we can't
+-	 * be sure that vcpu wasn't executing hlt instruction at the
+-	 * time of vmexit and is not going to re-enter guest mode until
+-	 * woken up. So we should wake it, but this is impossible from
+-	 * NMI context. Do it from irq work instead.
+-	 */
+-	if (in_pmi && !kvm_handling_nmi_from_guest(pmc->vcpu))
+-		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
+-	else
++	if (pmc->intr && !skip_pmi)
+ 		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
+ }
+ 
+@@ -675,9 +654,6 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+ 
+ void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+-
+-	irq_work_sync(&pmu->irq_work);
+ 	static_call(kvm_x86_pmu_reset)(vcpu);
+ }
+ 
+@@ -687,7 +663,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+ 
+ 	memset(pmu, 0, sizeof(*pmu));
+ 	static_call(kvm_x86_pmu_init)(vcpu);
+-	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
+ 	pmu->event_count = 0;
+ 	pmu->need_cleanup = false;
+ 	kvm_pmu_refresh(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a6b9bea62fb8..6f24a8c1e136 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12820,6 +12820,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ 		return true;
+ #endif
+ 
++	if (kvm_test_request(KVM_REQ_PMI, vcpu))
++		return true;
++
+ 	if (kvm_arch_interrupt_allowed(vcpu) &&
+ 	    (kvm_cpu_has_interrupt(vcpu) ||
+ 	    kvm_guest_apic_has_interrupt(vcpu)))
+-- 
 2.42.0.515.g380fc7ccd1-goog
 
