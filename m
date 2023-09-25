@@ -2,211 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 923F87ADB2E
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 17:18:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 930497ADB48
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 17:23:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbjIYPSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 11:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53948 "EHLO
+        id S232594AbjIYPXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 11:23:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232719AbjIYPSK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 11:18:10 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330DA11B
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 08:18:03 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c61aafab45so24296555ad.3
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 08:18:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695655082; x=1696259882; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5rKaY95Owlsxg41SeH4L0kjYxBc5VrcPYRfBkmtEvRA=;
-        b=gNf2Oj0eQSng3iAwlVAzS6GsBgqZYw+YA5j2Xr0z0m4vQL6u2mL17bb8mXDBesiIoc
-         O/D6KTOBjNgH05hzU19YNX6Q0qVVTzzNf3IhSh64nuo1kvEH9HGvXYkCNBvIGpx7QSRD
-         QBajdg/1+8OWd2TQAxJfkCJFgkspJMBq/BJF9bcYNwLIYA+00D5H0/AwwH2wkOY5YXAj
-         PM+3bxhuosSnaIfU0Ch3yc1jeEdR64B5WCydukb3gfUxV0sO0tKVgLz0/KOnYCDIsUFL
-         P6gzGMdHwwk7JZCdWUFWX2+OnbIxiWPmEiruv0QqOGN+X5Dl5cyT+K/of5Dtx17CcwVt
-         caBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695655082; x=1696259882;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5rKaY95Owlsxg41SeH4L0kjYxBc5VrcPYRfBkmtEvRA=;
-        b=vjD97uC0GiYkeYzjkTKeIf9QlmRCaFX5v/6kFlvi6ETvDMn3M6AZTsukjdCn67ASCP
-         4XfGHGq3YW9SERz78G9dMmhjmExr5qRgdGW7ZFGZa6sjcs5dCGZR0JheXbPy8NPjhNeR
-         HLg1YplZFdL+Vhcnuw76TNzVLis+MQxjQvErmf0aS4rjrku3etq55l1A4d8aMqDBw2G4
-         7e38m02HQTxTNrVPycBTA2pATEuf/49WMfwQDdVUS7A0qda6yjKcxc+McA/sAaN8yi3s
-         qw0JF1UbVaRh8O6SkYqwjeUDjRG1CBq88aRk0BG7qVPhZguA6f71OfnODW9QAyrSP/1A
-         BftQ==
-X-Gm-Message-State: AOJu0Yx98B4YrKQOez3W4JOCZP10FJxxZzgTDS3AE+k3An3xxnV+xNhl
-        LCwEXGVJIQJFxv61VPvqZ8EI3VH1CgM=
-X-Google-Smtp-Source: AGHT+IEpSuLxns1zW49+7WfQ9DVzb4gkEUn0iiTlI4VNGZbATiaszAUr6UmRitBbKCLPHJQvVabd6SLL7PU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:181:b0:1b8:3c5e:2289 with SMTP id
- z1-20020a170903018100b001b83c5e2289mr63915plg.2.1695655082556; Mon, 25 Sep
- 2023 08:18:02 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 08:18:01 -0700
-In-Reply-To: <20230923102019.29444-1-phil@philjordan.eu>
-Mime-Version: 1.0
-References: <20230923102019.29444-1-phil@philjordan.eu>
-Message-ID: <ZRGkqY+2QQgt2cVq@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/apic: Gates test_pv_ipi on KVM cpuid,
- not test device
-From:   Sean Christopherson <seanjc@google.com>
-To:     Phil Dennis-Jordan <phil@philjordan.eu>
-Cc:     kvm@vger.kernel.org, lists@philjordan.eu
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230076AbjIYPXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 11:23:53 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2078.outbound.protection.outlook.com [40.107.220.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02549C;
+        Mon, 25 Sep 2023 08:23:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lAzv208Fkb2r4SXkuN+HqyIqw5MDURpdlE5IK9FZ7rdfffTkZH6lZsNO+PfbD1o6JLreYBl8bVWdGjU0LXn8U0moSslJcOX3pqu136mmndrfmIP5zChCKvE996RAu0f+YrIFWc+ahXZlcGa2TeufjPV3qcNjp51fhuispkSVG70sFaCWAfpbtUdiekxsswuAIgz0bhoceMYUzkw9aVpIrJyDTyhdpADEA+X31GClIcMHxKjJ3z++5L7fHVoEFP0sXczN7GNN5pzRnhykVcZ20HjAxUhQOVC7TdQ2KZDA3JbjuXAgw27l/K7MDENMRdk/ovfTb9HJfpVRTdveHlu40A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3jm+4hziJFwHwqmJx1+lk8AlDdnwBU/NiGDpVvPivYQ=;
+ b=De4G7tXQNfY+3hKCO80c/bnu7Ee8GTkLMR7QhZ/idglOdQ58CxZT0Nncn5CY12zY9uvQ5E5ItcOzDJAyYfgZS2Wh80Md0cKomxugqAwEeE08RBT5HUq8O6fVNnGJmrJkmbEZQriONqFrYs0++DkoTaXoRXVyNQh6UqZ8kq1FdsdWKZ1Q8Et1KYEYR6GwcW33oc4ZWlHqpH6LVgVDte0aOpBUBc03sP3Zmw8wZ4g6emsmdnqfy2NKfwsYde0B0aOlo/HaROcSjzX0PDBPGF1uDDufHZPXIITFxGuRNUYIxvtwxLmh5H14NeWMxLZg+/WVh3MRzlsUqchMe7bds1C6hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3jm+4hziJFwHwqmJx1+lk8AlDdnwBU/NiGDpVvPivYQ=;
+ b=mpiDrDx4t1TO1ORk1Qos67FRcYoznhYqyKahPyu2OhFFSomfWa1iv0nU5oihLV81QQd1HMd1P0oc1FFjDjEVyA3FgKRTeNxu5ySkQldavqhuluxvUaY5dGetzdCSdPFOo3ZkpBhATGal1OnhrWpVX0nS0GIzHlP1d8Df/Ajfp7M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5221.namprd12.prod.outlook.com (2603:10b6:208:30b::9)
+ by DS0PR12MB8561.namprd12.prod.outlook.com (2603:10b6:8:166::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Mon, 25 Sep
+ 2023 15:23:44 +0000
+Received: from BL1PR12MB5221.namprd12.prod.outlook.com
+ ([fe80::29d3:8fd9:55f0:aee9]) by BL1PR12MB5221.namprd12.prod.outlook.com
+ ([fe80::29d3:8fd9:55f0:aee9%6]) with mapi id 15.20.6813.017; Mon, 25 Sep 2023
+ 15:23:44 +0000
+Message-ID: <e1fb2e84-4fd8-3c28-b3ac-519f5b9173ba@amd.com>
+Date:   Mon, 25 Sep 2023 10:23:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 0/3] SEV-ES TSC_AUX virtualization fix and optimization
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Babu Moger <babu.moger@amd.com>
+References: <20230922212453.1115016-1-pbonzini@redhat.com>
+Content-Language: en-US
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20230922212453.1115016-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0042.namprd05.prod.outlook.com
+ (2603:10b6:803:41::19) To BL1PR12MB5221.namprd12.prod.outlook.com
+ (2603:10b6:208:30b::9)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5221:EE_|DS0PR12MB8561:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f88860d-6385-4cb0-b7c3-08dbbddb67f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tRjXl6ZgcwVHosYBr7BUfMdbfsh+cg6vpIuFROVernUcWBkVtVTXDn+OL081mSOPMITXKK/BD00SVdFsZ4W8muWIxrsqvpFkQ7xtydRoMeAGsAwRjU4/mf/MEc6mHqPAJJPZOTgiF2mt2ztkNNF+AfNX7upDeubmpBHEqPLjID3nxJCuwd9kDf574eYX4CpuW2NrkBPQA1XoRv92huWOxeoGAZv8dyZmtcIbXblYulJxKtNBIur2U+VdAG+ybKf35Xvsocli9Cvxn0vOAAQKQxfLsYfuZTDDp9oH/9xuk5eiGePn25MZPpzx5Yt6xRExMH8ParTTAeWyb0BMO599Ob1v2si70FsR3WnYIQk94ptxzAVtxEPkhpx028PK+6Qz/jAY5j8R96by2VAV3LHkQth60+9/HHAcKGOh/rqNEjCZIAPt9v/3a63W1sg3CBHeEVjuojVqWy1tkC1It5Yn8AKpcbX4rK2gpFpBV0Kw6+f+DiTQZvWRkn2qR9rgG12FD8AAVp0BSjP4Mk6RMNJyf8EhbqPXYtnDSUVz3UIn8K7tLejljR0pDyZCxkSCLbMyCshgxU/ExZPe+PkPfmNU9QKSxEIGRxpbZrCLOmIDNexCu5+MPVwtp+u3JO3COE86ZJ1Xk5PAXdRBI9ZwDqgVkg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5221.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(39860400002)(376002)(366004)(230922051799003)(451199024)(1800799009)(186009)(2616005)(6486002)(6506007)(53546011)(4326008)(5660300002)(8676002)(2906002)(66946007)(26005)(478600001)(4744005)(66476007)(316002)(66556008)(54906003)(6916009)(8936002)(41300700001)(36756003)(6512007)(31696002)(86362001)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZCtPUXc0d0doZHVGQTJuVll5OGJScFNhVUh1NnZvT0kyTk9Rai85M21vSUJ6?=
+ =?utf-8?B?a1AzTjlQbVdXR0VWeWFRV08xUkhXWHA3VW5FYlhGemlUSkwxQkxzNlZFNi91?=
+ =?utf-8?B?OWVFOER2QzFNbkQ2ekk1THREbnR0QUFkU1JNQ2RCVHY4Wlh4TXJScXpEY1FM?=
+ =?utf-8?B?U3BaRndPL3pZY25laXpTdnJHTVh3TVFidHZLUmdGL3RQQmM3SWprSFQyRWJp?=
+ =?utf-8?B?aU9NNUJGRzdXZHJwbVhkYXdBb0JIUGNna3FSYk0rM0dMMVgxU3VQeHpMZlpx?=
+ =?utf-8?B?Wi9xR3krT1RHVDRXMEJDWGFKV3pBd09IK1FmVDNDKy9iMFk3NDVSVXJlenBr?=
+ =?utf-8?B?K0JEc3NvR1d5c0xZRUptY0hUaFUzM2d1NmhQZ09XNEpxRnY1K2ZJdjV5cEpS?=
+ =?utf-8?B?Y21Fa21TNmZGa2M1WTRWREdxMHJYN2phNFZJWVQwVHcrd1lrUjQyMGZIVWxh?=
+ =?utf-8?B?WjZkSVlJWUhOWWhwMkNwS25YQno1WExzc2FXTmw4dDZTQzR3Nmx4UnppaGxv?=
+ =?utf-8?B?WEFVKzlwc1M0ZzJaM1pqSkdGWFhkOVNObjh0NkZXaHN4SGN4OE85WlFHWWFM?=
+ =?utf-8?B?TUtDT1JFWjcrL2lEZUFOUWdLaXQ2ZWd3K2cwMEFTM3hTOURMeVp1RWozcGNL?=
+ =?utf-8?B?Y2NCby9ZUjJhcW1meHpmQlh5SVkveVE4VHhpTGZoM3ZJYUx1QWlCcUlLeDRI?=
+ =?utf-8?B?TWEwTlpnVnNFcnY0RHpMeGk5UHFiRjNJRkVDNHNUL2Y2QUVpdGpqM3cxbTR3?=
+ =?utf-8?B?cUdoNVlXSUtNVXRKRWplZGxOTEJKbjJBU0NnaklCcXFuMjVHU0FlYldwdTc1?=
+ =?utf-8?B?L1ZLZWFMWEROTFdJWW5xQ2crZ2h5cUNlTFlwZEkzaE1zWjRTeFdqWFhnL0oy?=
+ =?utf-8?B?M0FLZmJQcyt5VFpiZWJVVDNtTjhsK0tKczlJalZRaXNpcEhXRTJnTUU4VG5K?=
+ =?utf-8?B?RHJBMGFhWlBSMGE2Yi8yaXBRREloeTg2UVpyQk80cVdOeEJ1L1pZYUYzL0JY?=
+ =?utf-8?B?WWVHMnZ5ejNCSjZ1M1p2QkRpelF5NSs2K3dFdFhjWUJrenY4WjhHb05NZDlM?=
+ =?utf-8?B?czMyanc5Y0cyV0RJUGQvS3dmNGN2QnM1eEg0OTQ3YmJGa3VnaFpINWxDb21o?=
+ =?utf-8?B?ZWlVZzBlZkFWTVMwc1VWYXJqS0V3a2R2UzdDVVliZVpRNkdpNVljSDBvaUJS?=
+ =?utf-8?B?aG9VTWFxbUxsS0M1bFlNQno0bHJBVWRseWFZR0NZWmprY2Nhd3NqMzFyazhL?=
+ =?utf-8?B?dEJqUkhUbmdOMXhlTmZ3UWZSOU9Vd0tEMGtHeTdsNkVPV25INjFIVldKTlVP?=
+ =?utf-8?B?UTk1MmlNQXlHME01NlFSV1VpdWV1c0RpQkF5TmJSZ2VmTGZGZVZnSml6ZVJQ?=
+ =?utf-8?B?Y1lxcVg1RjZoODNtd0c5SUk0KzNJR2h0K01rYmcrbXlmTDNHbi93c1BGK3dn?=
+ =?utf-8?B?Q3hZbTkzdW83TU90dG1sYmlOWXUxK20zQW5ZU2QrRE9NL3dBOUVTK2hPcXBw?=
+ =?utf-8?B?VjJvZ1UvVjFobjYyd0l2WE9aSjVKK0dNWS8xenErY3FVN2FUYUNGRU42UVBt?=
+ =?utf-8?B?TGFkenNLbTBQV0J0Q3pZbjZuWTNxWFN0WEc5K0tKUjc5ekU2SmFVSzF5Zzly?=
+ =?utf-8?B?KzdjdHhKd1loUVJmT2hmL05Nd2pjR0c2aG1yRjcxT3RmZUZRTGRiMS9keEhO?=
+ =?utf-8?B?di9VQVFCSHBmTHkxL3JFTnMrMitWbWNZZ1NueC9SQTh3STNJaEt4ZnQreXFt?=
+ =?utf-8?B?SmVvS1hLcGJ5aW9KMzlLM1RtYzh3UzBwaGNJMG82OGtyM01yam9WeGhBb0tG?=
+ =?utf-8?B?b0JoOGR4QVBGalMyVnVmeG5FclpwWitPNDNTQ0Z1VS9tNTdFbDc5SWxWTm9Q?=
+ =?utf-8?B?TWh1Y1E3bXVZY3ZTMEdwQUJGeDdpcnFVcUlJaDQxOXN5bXNSQSsrenhnWjBq?=
+ =?utf-8?B?S25udFphcGNZcnBKWHF6MmhoZnZiQnBQVjlLbU0zSllIMWdGRGhiTklqcW53?=
+ =?utf-8?B?U2FJSmV5ZWlJMXNBbGVERUlUbWphK2Z5ZXdad2FTTjZhZXpSOTJJS1RFZVJE?=
+ =?utf-8?B?SGVBVFVNbmdZNy95cjBDWTFKMGxUbGtPZTkxbUJ3VnhaekFqNnowdTBKc1cv?=
+ =?utf-8?Q?AIffKTlntlF5sJSFU3WpKUvbf?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f88860d-6385-4cb0-b7c3-08dbbddb67f5
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5221.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 15:23:44.4125
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K9xpkZDz8QY6SDcJV5ahvRr8cEfyacvkVYk3wWlj7IOjguF3i+ACYlInDxugF4feUtVH1pZA7CVfIItNocn8nw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8561
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 23, 2023, Phil Dennis-Jordan wrote:
-> This changes the test for the KVM IPI hypercall API to be skipped if the
-> relevant cpuid feature bit is not set or if the KVM cpuid leaf is
-> missing, rather than the presence of the test device. The latter is an
-> unreliable inference on non-KVM platforms.
+On 9/22/23 16:24, Paolo Bonzini wrote:
+> Queued, thanks.  The part that stood out in patch 2 is the removal of
+> svm_clr_intercept(), which also applies when the initialization is done
+> in the wrong place.  Either way, svm_clr_intercept() is always going
+> to be called by svm_recalc_instruction_intercepts() if guest has the
+> RDTSC bit in its CPUID.
 > 
-> It also adds a skip report when these tests are skipped.
+> So I extracted that into a separate patch and squashed the rest of
+> patch 2 into patch 1.
+
+Works for me. Thanks, Paolo!
+
 > 
-> Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
-> ---
->  lib/x86/processor.h | 19 +++++++++++++++++++
->  x86/apic.c          |  9 ++++++++-
->  2 files changed, 27 insertions(+), 1 deletion(-)
+> Paolo
 > 
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 44f4fd1e..9a4c0d26 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -284,6 +284,13 @@ static inline bool is_intel(void)
->  #define X86_FEATURE_VNMI		(CPUID(0x8000000A, 0, EDX, 25))
->  #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
->  
-> +/*
-> + * Hypervisor specific leaves (KVM, ...)
-> + * See:
-> + * https://kernel.org/doc/html/latest/virt/kvm/x86/cpuid.html
-> + */
-> +#define	X86_KVM_FEATURE_PV_SEND_IPI  (CPUID(0x40000001, 0, EAX, 11))
-
-We could actually define this using the uapi headers, then there's no need to
-reference the kernel docs, e.g.
-
-#define		X86_FEATURE_KVM_PV_SEND_IPI (CPUID(KVM_CPUID_FEATURES, 0, EAX, KVM_FEATURE_PV_SEND_IPI)
-
-> +
->  static inline bool this_cpu_has(u64 feature)
->  {
->  	u32 input_eax = feature >> 32;
-> @@ -299,6 +306,18 @@ static inline bool this_cpu_has(u64 feature)
->  	return ((*(tmp + (output_reg % 32))) & (1 << bit));
->  }
->  
-> +static inline bool kvm_feature_flags_supported(void)
-> +{
-> +	struct cpuid c;
-> +
-> +	c = cpuid_indexed(0x40000000, 0);
-> +	return
-> +		c.b == 0x4b4d564b
-> +		&& c.c == 0x564b4d56
-> +		&& c.d == 0x4d
-
-I would much prefer to provide something similar to the kernel's hypervisor_cpuid_base(),
-and then use KVM_SIGNATURE to match the signature.  And assert that KVM is placed
-at its default base for tests that require KVM paravirt features, i.e. disallow
-relocating KVM to e.g. 0x40000100 to make room for Hyper-V.
-
-Something like this (completely untested)
-
-static inline u32 get_hypervisor_cpuid_base(const char *sig)
-{
-	u32 base, signature[3];
-
-	if (!this_cpu_has(X86_FEATURE_HYPERVISOR))
-		return 0;
-
-	for (base = 0x40000000; base < 0x40010000; base += 0x100) {
-		cpuid(base, &eax, &signature[0], &signature[1], &signature[2]);
-
-		if (!memcmp(sig, signature, 12))
-			return base;
-	}
-
-	return 0;
-}
-
-static inline bool is_hypervisor_kvm(void)
-{
-	u32 base = get_hypervisor_cpuid_base(KVM_SIGNATURE);
-
-	if (!base)
-		return 0;
-
-	/*
-	 * Require that KVM be placed at its default base so that macros can be
-	 * used to query individual KVM feature bits.
-	 */
-	TEST_ASSERT(base == KVM_CPUID_SIGNATURE);
-	return true;
-}
-
-> +		&& (c.a >= 0x40000001 || c.a == 0);
-
-Why allow 0?  Though I think we probably forego this check entirely.
-
-> +}
-> +
->  struct far_pointer32 {
->  	u32 offset;
->  	u16 selector;
-> diff --git a/x86/apic.c b/x86/apic.c
-> index dd7e7834..525e08fd 100644
-> --- a/x86/apic.c
-> +++ b/x86/apic.c
-> @@ -30,6 +30,11 @@ static bool is_xapic_enabled(void)
->  	return (rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN;
->  }
->  
-> +static bool is_kvm_ipi_hypercall_supported(void)
-> +{
-> +	return kvm_feature_flags_supported() && this_cpu_has(X86_KVM_FEATURE_PV_SEND_IPI);
-> +}
-> +
->  static void test_lapic_existence(void)
->  {
->  	u8 version;
-> @@ -658,8 +663,10 @@ static void test_pv_ipi(void)
->  	int ret;
->  	unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
->  
-> -	if (!test_device_enabled())
-> +	if (!is_kvm_ipi_hypercall_supported()) {
-
-I would rather open code the two independent checks, e.g.
-
-	if (!is_hypervisor_kvm() || !this_cpu_has(X86_FEATURE_KVM_PV_SEND_IPI))
-
-Or alternatively, provide a generic helper in processor.h to handle the hypervisor
-check, e.g.
-
-  static inline this_cpu_has_kvm_feature(...)
-
-Though if we go that route it probably makes sense to play nice with relocating
-the base since it would be quite easy to do so.
-
-> +		report_skip("PV IPIs testing (No KVM IPI hypercall flag in cpuid)");
->  		return;
-> +	}
->  
->  	asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
->  	report(!ret, "PV IPIs testing");
-> -- 
-> 2.36.1
 > 
