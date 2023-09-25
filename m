@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00F327ACEAC
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 05:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8EA7ACF0B
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 06:16:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbjIYDVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Sep 2023 23:21:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59804 "EHLO
+        id S231638AbjIYEQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 00:16:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230304AbjIYDVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Sep 2023 23:21:22 -0400
+        with ESMTP id S229900AbjIYEQm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 00:16:42 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42684C2
-        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 20:20:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CF2EE
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 21:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695612029;
+        s=mimecast20190719; t=1695615348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TrR3zPpsYfW5fFIFy5P2/fVt+bsSu1JVw5qNlGgU7cU=;
-        b=P5IYo/Xa0+SOXGyY2JBDwd+bjGXCCEO6UQ+ivTnm/8vLvGKY7xiAvv8sgkGKZ1yURfcjeU
-        YAvP2xFiygBmJZH8VycddCTVkHz13HGTmeGzPlyZFG0ddkH/sLa1ZXqXwuP0UjQAPoNt2p
-        Dg+AEtQzjz2F0MzMeIDLRe+XlZgZyvk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ruu6yd/F7PRRg3zU9933sMPG2y+61a3R2Ou0YGttbMk=;
+        b=BzyL8BnvDMZM3MwXeVufFBXbkJPyO0gztoOXDezQbU6Ots6F6fULVGojr/8Zf+ESbo+8cp
+        6vZiaRUmgNS0JetbRb3EBsehFp6PVRQDBCF8tIfY3ewXWXu9YRmkoFoW1FnTMXxbgkn4aQ
+        2CuPqgv0qcGkXNYHu9XD10YSdShoyns=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-168-ngw_srV9M_2mUjKlsnLIJg-1; Sun, 24 Sep 2023 23:20:28 -0400
-X-MC-Unique: ngw_srV9M_2mUjKlsnLIJg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-31dc8f0733dso4459084f8f.3
-        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 20:20:27 -0700 (PDT)
+ us-mta-440-p9ikma5vMMCO_7cmoekaRg-1; Mon, 25 Sep 2023 00:15:47 -0400
+X-MC-Unique: p9ikma5vMMCO_7cmoekaRg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31fd49d8f2aso4515487f8f.1
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 21:15:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695612026; x=1696216826;
+        d=1e100.net; s=20230601; t=1695615346; x=1696220146;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TrR3zPpsYfW5fFIFy5P2/fVt+bsSu1JVw5qNlGgU7cU=;
-        b=uuSsmmOTTjFsVfQao8krnmLfHO3KKuRRBwbJk9qsDAMekrwMIKd94ZoFrU7pG95RBE
-         /pX/GaB/0w+hoB7HMKZ4KYTdDADKPuIMeEzTQ53xwkSbsqGDsNKl+nAMHvDncEgNS5P+
-         czQ1HIeJsV4/eT+HFnj1hzZ/awNu3fcU8l6Bb9WO7s7NYpvhxnp3UP1a2B5gU0TBuYbj
-         /uwGIkqWrUtQV5AdY1V8q+CLMA1uzjhT19Ffq3wjTQMzyUu8LQNPTiUdh4fglDYy8/xP
-         L1G9I7I8XfEojFbGhHcykraj8F/zuKaWSfoBRND5A5V1bvAFkQDyZpgpn92Jpcss+des
-         5jkA==
-X-Gm-Message-State: AOJu0YynfKsR3p40WO1HpbpYZzbuveQf9JH4jWt0hGcrmwi2SGlOkbky
-        RzsjGaI0dEY+KlU2o1gvj077QA5iVOhYZsmvWkHmrwzsce7UhbljMxMNtwlVssGgbZ487cfU1GO
-        GILXCvrj6/83P09mwkNiLP9Bskb/B2bf05EpH
-X-Received: by 2002:a5d:46d2:0:b0:321:5211:8e20 with SMTP id g18-20020a5d46d2000000b0032152118e20mr4758437wrs.59.1695612026261;
-        Sun, 24 Sep 2023 20:20:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEbXDBE4JRcEE3biGXQuHAfiqMbcwu40ARqWUHJUoOs6GS1iq/4wyEprZ6iOJlEp6+YDnDyEiJj72z74/YU8Os=
-X-Received: by 2002:a5d:46d2:0:b0:321:5211:8e20 with SMTP id
- g18-20020a5d46d2000000b0032152118e20mr4758423wrs.59.1695612025955; Sun, 24
- Sep 2023 20:20:25 -0700 (PDT)
+        bh=ruu6yd/F7PRRg3zU9933sMPG2y+61a3R2Ou0YGttbMk=;
+        b=LghCjqMrAl+QQxktZIRTsoeydpGIQfAIYIEFCMNfy4AV2jcMqE71DwzMxjcy/HoSQU
+         Ij0aF1T3Hqi6u0yWDnY8Q5LzHXZ8Ix4dfpXxMhZXCIRP0W8G2/caDTnu6ZEUgZEePI37
+         FfZ6TnLOtp5yRX8QbqYAVipKLWlA5jZYaegq32vVB7l9t9BFTqZOHUcO3dGKD3CCqsjr
+         7NOKtEPpFLgZY3/cWECE+ttN1t96hZs5AXScv7R5LhYTlMFLjYaINleYQ3M/ouLcrrKD
+         +4aqTUKqIM6Ou4GVpLYA2GtvvfYjwJ/iZYuvnjzaBegqhOs0wkShmv6YgjZOlhNn5CDi
+         q1CA==
+X-Gm-Message-State: AOJu0Yyez7r6c8W1R3Y0X7zgokBRtz6+HwcaK3rYhyaD8jXDF+B9LAiA
+        ei4b7B+pUwsWPkayzEnJqlhX3/T6e1t4hpfa75HursjPN+g0feyj+BNFpmBDpCbqboaZRQ0m0OZ
+        bIRPkWEp9bWivJ6dl27OOFjJd1ofI
+X-Received: by 2002:adf:e508:0:b0:321:64a6:e417 with SMTP id j8-20020adfe508000000b0032164a6e417mr5651726wrm.1.1695615345913;
+        Sun, 24 Sep 2023 21:15:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFnA4ZFQjTUBgTF/yRHLzrWbDlET+Op3hd/JEQz2wnKypNLgRCsF6S3FP3xbZGRGT0UII1pqjFKnSqeq1FS/AQ=
+X-Received: by 2002:adf:e508:0:b0:321:64a6:e417 with SMTP id
+ j8-20020adfe508000000b0032164a6e417mr5651717wrm.1.1695615345660; Sun, 24 Sep
+ 2023 21:15:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
- <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
- <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com> <CACGkMEt-m9bOh9YnqLw0So5wqbZ69D0XRVBbfG73Oh7Q8qTJsQ@mail.gmail.com>
-In-Reply-To: <CACGkMEt-m9bOh9YnqLw0So5wqbZ69D0XRVBbfG73Oh7Q8qTJsQ@mail.gmail.com>
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-4-lulu@redhat.com>
+ <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
+In-Reply-To: <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
 From:   Cindy Lu <lulu@redhat.com>
-Date:   Mon, 25 Sep 2023 11:19:47 +0800
-Message-ID: <CACLfguWQ=-M1f2QLH-_Y44xd7-AWtWg=v89W_u83NTGjRmAkqg@mail.gmail.com>
-Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
+Date:   Mon, 25 Sep 2023 12:15:08 +0800
+Message-ID: <CACLfguVRPV_8HOy3mQbKvpWRGpM_tnjmC=oQqrEbvEz6YkMi0w@mail.gmail.com>
+Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
         xieyongji@bytedance.com, kvm@vger.kernel.org,
@@ -70,167 +69,103 @@ Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023 at 10:58=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
+On Tue, Sep 12, 2023 at 3:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
 >
-> On Thu, Sep 21, 2023 at 10:07=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote=
+> On Tue, Sep 12, 2023 at 11:00=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote=
 :
 > >
-> > On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.com=
-> wrote:
-> > >
-> > > On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> w=
-rote:
-> > > >
-> > > > In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
-> > > > and The number of mapping memory pages from the kernel. The userspa=
-ce
-> > > > App can use this information to map the pages.
-> > > >
-> > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > > ---
-> > > >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
-> > > >  include/uapi/linux/vduse.h         | 15 +++++++++++++++
-> > > >  2 files changed, 30 insertions(+)
-> > > >
-> > > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa=
-_user/vduse_dev.c
-> > > > index 680b23dbdde2..c99f99892b5c 100644
-> > > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > > > @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *fil=
-e, unsigned int cmd,
-> > > >                 ret =3D 0;
-> > > >                 break;
-> > > >         }
-> > > > +       case VDUSE_GET_RECONNECT_INFO: {
-> > > > +               struct vduse_reconnect_mmap_info info;
-> > > > +
-> > > > +               ret =3D -EFAULT;
-> > > > +               if (copy_from_user(&info, argp, sizeof(info)))
-> > > > +                       break;
-> > > > +
-> > > > +               info.size =3D PAGE_SIZE;
-> > > > +               info.max_index =3D dev->vq_num + 1;
-> > > > +
-> > > > +               if (copy_to_user(argp, &info, sizeof(info)))
-> > > > +                       break;
-> > > > +               ret =3D 0;
-> > > > +               break;
-> > > > +       }
-> > > >         default:
-> > > >                 ret =3D -ENOIOCTLCMD;
-> > > >                 break;
-> > > > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.=
-h
-> > > > index d585425803fd..ce55e34f63d7 100644
-> > > > --- a/include/uapi/linux/vduse.h
-> > > > +++ b/include/uapi/linux/vduse.h
-> > > > @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
-> > > >         _Bool avail_wrap_counter;
-> > > >  };
-> > > >
-> > > > +/**
-> > > > + * struct vduse_reconnect_mmap_info
-> > > > + * @size: mapping memory size, always page_size here
-> > > > + * @max_index: the number of pages allocated in kernel,just
-> > > > + * use for check
-> > > > + */
-> > > > +
-> > > > +struct vduse_reconnect_mmap_info {
-> > > > +       __u32 size;
-> > > > +       __u32 max_index;
-> > > > +};
-> > >
-> > > One thing I didn't understand is that, aren't the things we used to
-> > > store connection info belong to uAPI? If not, how can we make sure th=
-e
-> > > connections work across different vendors/implementations. If yes,
-> > > where?
-> > >
-> > > Thanks
-> > >
-> > The process for this reconnecttion  is
-> > A.The first-time connection
-> > 1> The userland app checks if the device exists
-> > 2>  use the ioctl to create the vduse device
-> > 3> Mapping the kernel page to userland and save the
-> > App-version/features/other information to this page
-> > 4>  if the Userland app needs to exit, then the Userland app will only
-> > unmap the page and then exit
+> > In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
+> > with reconnect info, After mapping the reconnect pages to userspace
+> > The userspace App will update the reconnect_time in
+> > struct vhost_reconnect_vring, If this is not 0 then it means this
+> > vq is reconnected and will update the last_avail_idx
 > >
-> > B, the re-connection
-> > 1> the userland app finds the device is existing
-> > 2> Mapping the kernel page to userland
-> > 3> check if the information in shared memory is satisfied to
-> > reconnect,if ok then continue to reconnect
-> > 4> continue working
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
+> >  include/uapi/linux/vduse.h         |  6 ++++++
+> >  2 files changed, 19 insertions(+)
 > >
-> >  For now these information are all from userland,So here the page will
-> > be maintained by the userland App
-> > in the previous code we only saved the api-version by uAPI .  if  we
-> > need to support reconnection maybe we need to add 2 new uAPI for this,
-> > one of the uAPI is to save the reconnect  information and another is
-> > to get the information
+> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
+r/vduse_dev.c
+> > index 2c69f4004a6e..680b23dbdde2 100644
+> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, un=
+signed int cmd,
+> >                 struct vduse_vq_info vq_info;
+> >                 struct vduse_virtqueue *vq;
+> >                 u32 index;
+> > +               struct vdpa_reconnect_info *area;
+> > +               struct vhost_reconnect_vring *vq_reconnect;
 > >
-> > maybe something like
+> >                 ret =3D -EFAULT;
+> >                 if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
+> > @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, u=
+nsigned int cmd,
 > >
-> > struct vhost_reconnect_data {
-> > uint32_t version;
-> > uint64_t features;
-> > uint8_t status;
-> > struct virtio_net_config config;
-> > uint32_t nr_vrings;
-> > };
+> >                 vq_info.ready =3D vq->ready;
+> >
+> > +               area =3D &vq->reconnect_info;
+> > +
+> > +               vq_reconnect =3D (struct vhost_reconnect_vring *)area->=
+vaddr;
+> > +               /*check if the vq is reconnect, if yes then update the =
+last_avail_idx*/
+> > +               if ((vq_reconnect->last_avail_idx !=3D
+> > +                    vq_info.split.avail_index) &&
+> > +                   (vq_reconnect->reconnect_time !=3D 0)) {
+> > +                       vq_info.split.avail_index =3D
+> > +                               vq_reconnect->last_avail_idx;
+> > +               }
+> > +
+> >                 ret =3D -EFAULT;
+> >                 if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
+> >                         break;
+> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+> > index 11bd48c72c6c..d585425803fd 100644
+> > --- a/include/uapi/linux/vduse.h
+> > +++ b/include/uapi/linux/vduse.h
+> > @@ -350,4 +350,10 @@ struct vduse_dev_response {
+> >         };
+> >  };
+> >
+> > +struct vhost_reconnect_vring {
+> > +       __u16 reconnect_time;
+> > +       __u16 last_avail_idx;
+> > +       _Bool avail_wrap_counter;
 >
-> Probably, then we can make sure the re-connection works across
-> different vduse-daemon implementations.
+> Please add a comment for each field.
 >
-> >
-> > #define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
-> > vhost_reconnect_data)
-> >
-> > #define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
-> > vhost_reconnect_data)
+Sure will do
+
+> And I never saw _Bool is used in uapi before, maybe it's better to
+> pack it with last_avail_idx into a __u32.
 >
-> Not sure I get this, but the idea is to map those pages to user space,
-> any reason we need this uAPI?
+Thanks will fix this
+> Btw, do we need to track inflight descriptors as well?
 >
+I will check this
+Thanks
+
+cindy
 > Thanks
 >
-Sorry=EF=BC=8C I didn't write it clearly, I mean if I we don't want to use =
-the
-mmap to sync/check the vduse status, we need to add these 2 new uAPIs,
- these 2 methods are all ok for me.
-For the vq related information still need to use the mmap to sync
-Thanks
-cindy
-> >
-> > Thanks
-> > Cindy
-> >
-> >
-> >
-> >
-> > > > +
-> > > > +#define VDUSE_GET_RECONNECT_INFO \
-> > > > +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
-> > > > +
-> > > >  #endif /* _UAPI_VDUSE_H_ */
-> > > > --
-> > > > 2.34.3
-> > > >
-> > >
+> > +};
+> > +
+> >  #endif /* _UAPI_VDUSE_H_ */
+> > --
+> > 2.34.3
 > >
 >
 
