@@ -2,149 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2510B7ACE2C
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 04:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A20B87ACE8C
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 04:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231776AbjIYCgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Sep 2023 22:36:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38052 "EHLO
+        id S229846AbjIYC6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Sep 2023 22:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbjIYCgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Sep 2023 22:36:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE930C2
-        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 19:35:09 -0700 (PDT)
+        with ESMTP id S229603AbjIYC6y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Sep 2023 22:58:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967C4A7
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 19:58:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695609308;
+        s=mimecast20190719; t=1695610681;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DJDDBFzzf0f976aKgGjgkxn+o0F4gwbckCrIwzls0H4=;
-        b=AZ91qfREELBQ86AncrzAKl6tl12RjZvMFgUDY8FuRcBrK+RSqzCY36aV0a4i0htejawzQY
-        QNjCJ3tzmwRmvVi+0vMocq6xY77DK+/xLm5+5i0yarKF9NJgJLLvP4A1JQSdYLayZpHAfI
-        DeatChOo2sXfF8IotVmSBwn8GbAdtNk=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=03qSg2yEAIVwRPqjjQs4G4M60zsU0m+0zE8R/M2ccL4=;
+        b=Gx7p+WNaMcz41qn7JSOpljDkAZ+m4EuctKM8tD7FgNW2+zGr5N6AZQhGGJ0Qd9i7wLf/Ja
+        EDdTrRU19+BIvyt/bQ+iseTcH0qGhY9lDo31XnNdM95O75qLAWC+RYPkJEnecBhHmmkWOK
+        JYfR8ElawbhwEAXoXoniewbgcVYuVx4=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657--AvrP8YfOaGA3AnKXc2JFQ-1; Sun, 24 Sep 2023 22:35:07 -0400
-X-MC-Unique: -AvrP8YfOaGA3AnKXc2JFQ-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-503c774fd61so6853707e87.3
-        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 19:35:07 -0700 (PDT)
+ us-mta-52-KlZFdN9DP8SBbJUvhJJGyg-1; Sun, 24 Sep 2023 22:58:00 -0400
+X-MC-Unique: KlZFdN9DP8SBbJUvhJJGyg-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-503555a717fso7553682e87.3
+        for <kvm@vger.kernel.org>; Sun, 24 Sep 2023 19:57:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695609306; x=1696214106;
+        d=1e100.net; s=20230601; t=1695610678; x=1696215478;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DJDDBFzzf0f976aKgGjgkxn+o0F4gwbckCrIwzls0H4=;
-        b=Jylzcls/e7QQrP2/K72Y9R1e5oq5Bg+P48rMIITgTrRV1TQlRF7/SsrKSQoXDHL8Nu
-         /RS0i3bRJCM+duiXlqG6IKF2iY8kT3IpWgp8ZWblNmpU81sXSb5qdfo25dR0LjWoSZH2
-         9aQ2x4C6g7o+n4ieG43jndAsLfRzlDFYCaJfFAuERuRImwrxonGuRCPZJBIX3uCeL2Rp
-         Ce8MUVjvU9Q4YeI5Qefwxkga1QYfZBF2Pc9mCB18nnmde6oC8DTsmPb8OQKWsmsh9MAH
-         3nELYcUcGoZPFezqmtZS/6uVUQLnvfJ3Xo1De/0RxA1Ez678FFj9rQ4vSizekBJgKjVy
-         61NA==
-X-Gm-Message-State: AOJu0YyaPFBBmo3XortD1roWdtc4jMDsUXOmVaayCDgWYHOdR5SMWTsz
-        hCNzZsGW0OrV+Cnsycv+tApwe9RHjJ7GxoiBcgWRUwEEYcSkhsdilQ9b76fQE6nIUZ9Gjkgjoml
-        By5dh1XoMiZprj+b9f8oHELWyVIR0
-X-Received: by 2002:a05:6512:78f:b0:4f9:5519:78b8 with SMTP id x15-20020a056512078f00b004f9551978b8mr4313433lfr.63.1695609306082;
-        Sun, 24 Sep 2023 19:35:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG7ePPnscYK9n57PETbG37KL/UR7SLgpvhXvkhZD4U2cOFzvg7U2Z7qqf18PhQy9Ne5wwUAakW+Lil2KUHmN5U=
-X-Received: by 2002:a05:6512:78f:b0:4f9:5519:78b8 with SMTP id
- x15-20020a056512078f00b004f9551978b8mr4313419lfr.63.1695609305728; Sun, 24
- Sep 2023 19:35:05 -0700 (PDT)
+        bh=03qSg2yEAIVwRPqjjQs4G4M60zsU0m+0zE8R/M2ccL4=;
+        b=ec7LBwMRdDPyHyJ3SgG/3mQ01t/czpfWWrppV7Xe/iiT9oY413cEk4shOehbMP2GIu
+         mr+yiMd316SPzwCa+PYZPNQ6rM/IhJJ6RRaT+Rclh+qeQ2k5zddODAqw6MoKUvTpHQGR
+         6kK40Q4nAyZ0qeyHnLM2P1TollU1NtH6avxJTJ8Z+Sfki41G3LHZfp5mSs/5Gcerypap
+         4oHR3ePvErrtOppEVhVRPkzwvW6bhOdqG0Cfb12YbAREFxVL3xLMOIrxdUdGl0yXpU7z
+         E/JuunfLzpFv2OcwH9z7ah3au8m2dlU4J10PtSG7K/71kS6r7XZrGMrZ8lpTqOu5ZwI6
+         pyDA==
+X-Gm-Message-State: AOJu0YzSvKfwXFG+WLscqBH6s50rSFzTNdUxZUvY1cuhMsw0wLw0f2+c
+        xiccZDlsaxl2Kfkk7dzGAN2faXXXLY4wXnioz6LWj516arGHJyv7KMwq9pQfhsAnj75n/yi0w6E
+        +oeICI8DTyO8JplFdux3Qwakz9JGC4vBVBnmv
+X-Received: by 2002:a05:6512:12c5:b0:4fb:8948:2b28 with SMTP id p5-20020a05651212c500b004fb89482b28mr5070664lfg.63.1695610678367;
+        Sun, 24 Sep 2023 19:57:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEHF2qhzIv6Pe7cJCbr0RrCTBfYBL4roCVlrTfhCiGgKQygDz63GyQyQzV/OUarEVYJNkAsC1zhXb8toENTH6k=
+X-Received: by 2002:a05:6512:12c5:b0:4fb:8948:2b28 with SMTP id
+ p5-20020a05651212c500b004fb89482b28mr5070657lfg.63.1695610678004; Sun, 24 Sep
+ 2023 19:57:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230921124040.145386-12-yishaih@nvidia.com> <20230921090844-mutt-send-email-mst@kernel.org>
- <20230921141125.GM13733@nvidia.com> <20230921101509-mutt-send-email-mst@kernel.org>
- <20230921164139.GP13733@nvidia.com> <20230921124331-mutt-send-email-mst@kernel.org>
- <20230921183926.GV13733@nvidia.com> <20230921150448-mutt-send-email-mst@kernel.org>
- <20230921194946.GX13733@nvidia.com> <CACGkMEvMP05yTNGE5dBA2-M0qX-GXFcdGho7_T5NR6kAEq9FNg@mail.gmail.com>
- <20230922121132.GK13733@nvidia.com>
-In-Reply-To: <20230922121132.GK13733@nvidia.com>
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
+ <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com> <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
+In-Reply-To: <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 25 Sep 2023 10:34:54 +0800
-Message-ID: <CACGkMEsxgYERbyOPU33jTQuPDLUur5jv033CQgK9oJLW+ueG8w@mail.gmail.com>
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
+Date:   Mon, 25 Sep 2023 10:57:47 +0800
+Message-ID: <CACGkMEt-m9bOh9YnqLw0So5wqbZ69D0XRVBbfG73Oh7Q8qTJsQ@mail.gmail.com>
+Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
+To:     Cindy Lu <lulu@redhat.com>
+Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
+        xieyongji@bytedance.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 8:11=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
+On Thu, Sep 21, 2023 at 10:07=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
 >
-> On Fri, Sep 22, 2023 at 11:01:23AM +0800, Jason Wang wrote:
->
-> > > Even when it does, there is no real use case to live migrate a
-> > > virtio-net function from, say, AWS to GCP.
+> On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.com> =
+wrote:
 > >
-> > It can happen inside a single cloud vendor. For some reasons, DPU must
-> > be purchased from different vendors. And vDPA has been used in that
-> > case.
+> > On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> wro=
+te:
+> > >
+> > > In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
+> > > and The number of mapping memory pages from the kernel. The userspace
+> > > App can use this information to map the pages.
+> > >
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
+> > >  include/uapi/linux/vduse.h         | 15 +++++++++++++++
+> > >  2 files changed, 30 insertions(+)
+> > >
+> > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_u=
+ser/vduse_dev.c
+> > > index 680b23dbdde2..c99f99892b5c 100644
+> > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > > @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *file,=
+ unsigned int cmd,
+> > >                 ret =3D 0;
+> > >                 break;
+> > >         }
+> > > +       case VDUSE_GET_RECONNECT_INFO: {
+> > > +               struct vduse_reconnect_mmap_info info;
+> > > +
+> > > +               ret =3D -EFAULT;
+> > > +               if (copy_from_user(&info, argp, sizeof(info)))
+> > > +                       break;
+> > > +
+> > > +               info.size =3D PAGE_SIZE;
+> > > +               info.max_index =3D dev->vq_num + 1;
+> > > +
+> > > +               if (copy_to_user(argp, &info, sizeof(info)))
+> > > +                       break;
+> > > +               ret =3D 0;
+> > > +               break;
+> > > +       }
+> > >         default:
+> > >                 ret =3D -ENOIOCTLCMD;
+> > >                 break;
+> > > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+> > > index d585425803fd..ce55e34f63d7 100644
+> > > --- a/include/uapi/linux/vduse.h
+> > > +++ b/include/uapi/linux/vduse.h
+> > > @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
+> > >         _Bool avail_wrap_counter;
+> > >  };
+> > >
+> > > +/**
+> > > + * struct vduse_reconnect_mmap_info
+> > > + * @size: mapping memory size, always page_size here
+> > > + * @max_index: the number of pages allocated in kernel,just
+> > > + * use for check
+> > > + */
+> > > +
+> > > +struct vduse_reconnect_mmap_info {
+> > > +       __u32 size;
+> > > +       __u32 max_index;
+> > > +};
+> >
+> > One thing I didn't understand is that, aren't the things we used to
+> > store connection info belong to uAPI? If not, how can we make sure the
+> > connections work across different vendors/implementations. If yes,
+> > where?
+> >
+> > Thanks
+> >
+> The process for this reconnecttion  is
+> A.The first-time connection
+> 1> The userland app checks if the device exists
+> 2>  use the ioctl to create the vduse device
+> 3> Mapping the kernel page to userland and save the
+> App-version/features/other information to this page
+> 4>  if the Userland app needs to exit, then the Userland app will only
+> unmap the page and then exit
 >
-> Nope, you misunderstand the DPU scenario.
+> B, the re-connection
+> 1> the userland app finds the device is existing
+> 2> Mapping the kernel page to userland
+> 3> check if the information in shared memory is satisfied to
+> reconnect,if ok then continue to reconnect
+> 4> continue working
 >
-> Look at something like vmware DPU enablement. vmware runs the software
-> side of the DPU and all their supported DPU HW, from every vendor,
-> generates the same PCI functions on the x86. They are the same because
-> the same software on the DPU side is creating them.
+>  For now these information are all from userland,So here the page will
+> be maintained by the userland App
+> in the previous code we only saved the api-version by uAPI .  if  we
+> need to support reconnection maybe we need to add 2 new uAPI for this,
+> one of the uAPI is to save the reconnect  information and another is
+> to get the information
 >
-> There is no reason to put a mediation layer in the x86 if you also
-> control the DPU.
+> maybe something like
 >
-> Cloud vendors will similarly use DPUs to create a PCI functions that
-> meet the cloud vendor's internal specification.
+> struct vhost_reconnect_data {
+> uint32_t version;
+> uint64_t features;
+> uint8_t status;
+> struct virtio_net_config config;
+> uint32_t nr_vrings;
+> };
 
-This can only work if:
+Probably, then we can make sure the re-connection works across
+different vduse-daemon implementations.
 
-1) the internal specification has finer garin than virtio spec
-2) so it can define what is not implemented in the virtio spec (like
-migration and compatibility)
-
-All of the above doesn't seem to be possible or realistic now, and it
-actually has a risk to be not compatible with virtio spec. In the
-future when virtio has live migration supported, they want to be able
-to migrate between virtio and vDPA.
-
-As I said, vDPA has been used for cross vendor live migration for a while.
-
-> Regardless of DPU
-> vendor.
 >
-> Fundamentally if you control the DPU SW and the hypervisor software
-> you do not need hypervisor meditation because everything you could do
-> in hypervisor mediation can just be done in the DPU. Putting it in the
-> DPU is better in every regard.
+> #define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
+> vhost_reconnect_data)
 >
-> So, as I keep saying, in this scenario the goal is no mediation in the
-> hypervisor.
+> #define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
+> vhost_reconnect_data)
 
-That's pretty fine, but I don't think trapping + relying is not
-mediation. Does it really matter what happens after trapping?
-
-> It is pointless, everything you think you need to do there
-> is actually already being done in the DPU.
-
-Well, migration or even Qemu could be offloaded to DPU as well. If
-that's the direction that's pretty fine.
+Not sure I get this, but the idea is to map those pages to user space,
+any reason we need this uAPI?
 
 Thanks
 
 >
-> Jason
+> Thanks
+> Cindy
+>
+>
+>
+>
+> > > +
+> > > +#define VDUSE_GET_RECONNECT_INFO \
+> > > +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
+> > > +
+> > >  #endif /* _UAPI_VDUSE_H_ */
+> > > --
+> > > 2.34.3
+> > >
+> >
 >
 
