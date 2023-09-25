@@ -2,209 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F4BB7AD965
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 15:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD8197AD998
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 15:53:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231967AbjIYNkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 09:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
+        id S231905AbjIYNxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 09:53:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232313AbjIYNkV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 09:40:21 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD86CDA
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 06:40:13 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c453379020so44259235ad.1
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 06:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695649213; x=1696254013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4s1mdQKNja8rRVRNvpznVdJduDgGmg/7wDSFseU/UmI=;
-        b=LrsLJ8qOr/6RMNQ8sKJV8ZVjL21ftj8GjZsA4COF5lrjbX1jCcGCCYRSzIsbXbKEVH
-         Sm+N674AIfxi2JkgNTBnkeaU8RwZ1/1CqcDsBNlht45RxJau/ZWambmKD0Q4xUgAsrOa
-         Oi548MQJUlGtcAMUi6bM7XdYWRKUQJjnpk5lBOYrqX368X8oMcM5yDoMBP+yl7RECoRa
-         eEK0TSnbV6GeWWfZ1q2NFb9eVg7oXldnpkmqGsC3wWMx0d+R0LtUT0/XfFpTmi7fUAmR
-         5KOaDTYcwHq7IAFnx/0L2bXHdWNeOeVxweW709ZpNjmrlywT74EcNyGzNiFbPTc9YXMd
-         tMLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695649213; x=1696254013;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4s1mdQKNja8rRVRNvpznVdJduDgGmg/7wDSFseU/UmI=;
-        b=M7RtoSIahqhSBPHzSPzv2UeaW0TXwohiO0bThAhHc3z0LzzQ9mlNXPGqcWBbdSuuZd
-         KHKPdjfJ/pML+g6SaXqt7vJsdFWwo8v/aVvY222GYDnaPWfnNQTF1tRfW6/A1VgOOXpd
-         L3Ngk34sx8BgBOSDOzBxBD5qIKndU2MuZzHQw6D2Zi5c/H2V7ettPQBjS315FoGvZhtK
-         eGNVoG3pCyqFvKLI4ch0mO7Eud2snWlBjO7isXbzuwewXYGWduaBI3K4T2NzgDFXs6Pi
-         cDY26opQA2WmorW1hVWHdlJkG2z4g9aiujd6Tyyi1L6XG154AqsQYjIMuLSTbR2ShjMU
-         6haQ==
-X-Gm-Message-State: AOJu0YwVwWUY+6YCyk8r+XYP1ljaeYl1fzpYLmqNcDuTpsthHObQkOQx
-        dRRGM2lzGeyB7IJl1fVtR2dl7A==
-X-Google-Smtp-Source: AGHT+IHwYx5uxjulfoXkoeURKGAldzLHqGYkvOLbEpGq9sn4ycnd7NcTYbii8mDYFgDlQkGlqzyNeA==
-X-Received: by 2002:a17:903:444:b0:1b6:6c32:59a8 with SMTP id iw4-20020a170903044400b001b66c3259a8mr4289356plb.36.1695649212949;
-        Mon, 25 Sep 2023 06:40:12 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id p11-20020a170902eacb00b001c625d6ffccsm969433pld.129.2023.09.25.06.40.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 06:40:12 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 9/9] KVM: riscv: selftests: Add condops extensions to get-reg-list test
-Date:   Mon, 25 Sep 2023 19:08:59 +0530
-Message-Id: <20230925133859.1735879-10-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230925133859.1735879-1-apatel@ventanamicro.com>
-References: <20230925133859.1735879-1-apatel@ventanamicro.com>
+        with ESMTP id S229647AbjIYNxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 09:53:10 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7BBFF;
+        Mon, 25 Sep 2023 06:53:04 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PDeeDL012703;
+        Mon, 25 Sep 2023 13:53:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=J9WZJYXPUauxzYA/GO7frAt10HjVFen+/MhZgK96Rl8=;
+ b=R4vKjkJ7pQpvCCU0cT9Afe/QzphZcDufs3MHk9f8nchV/3kmbcJHAqVRbwm/A/hXXo3+
+ LE/3wGvoadfOBKyfcP3DCrI//xkCmnn3XgAbeKaKxdB2/c/sSuMhzZsBvo1g1uHmO4dQ
+ rbaRqf0Tq1fp8XsbTY9hBV0HgsIsG9e9vHBW4RnLizUBWzc1CuMrJVvKEIqpkv6RQoJ/
+ pGL5jx69wbkFE3LrwGQeK0RzviOrcrET56U2PX8TLAMoOgi2ovq/6Fnge4Vh/XqQyg1N
+ MMu8Dlk2ZJZ2LN6vub1CYUoDlS+Mb2S3eM66nJDFYzuOSBwF+GW7q5zDnOcwROG7VvTQ Xw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbakthkab-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Sep 2023 13:53:03 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38PD5vhW009488;
+        Mon, 25 Sep 2023 13:53:03 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbakthka0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Sep 2023 13:53:03 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38PCaR7X030719;
+        Mon, 25 Sep 2023 13:53:02 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjj5a9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Sep 2023 13:53:02 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38PDqxBu18416242
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Sep 2023 13:52:59 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5544320040;
+        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 34E3F20043;
+        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        nsg@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] s390x: run PV guests with confidential guest enabled
+Date:   Mon, 25 Sep 2023 15:52:45 +0200
+Message-ID: <20230925135259.1685540-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=no autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jsGE5wAHHrYnRpF35IMzED89tSATN-HB
+X-Proofpoint-ORIG-GUID: 3vvH0qZrqnOTN3uuTvXNxwkndQwlHCWI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_11,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0
+ adultscore=0 clxscore=1011 bulkscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309250102
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have a new conditional operations related ISA extensions so let us
-add these extensions to get-reg-list test.
+PV can only handle one page of SCLP read info, hence it can only support
+a maximum of 247 CPUs.
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+To make sure we respect these limitations under PV, add a confidential
+guest device to QEMU when launching a PV guest.
+
+This fixes the topology-2 test failing under PV.
+
+Also refactor the run script a bit to reduce code duplication by moving
+the check whether we're running a PV guest to a function.
+
+Suggested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- .../selftests/kvm/riscv/get-reg-list.c        | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ s390x/run | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-index 625118d53b74..cb1bb95b5df2 100644
---- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-@@ -42,12 +42,14 @@ bool filter_reg(__u64 reg)
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVINVAL:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVNAPOT:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_SVPBMT:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_XVENTANACONDOPS:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBA:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBB:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZBS:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOM:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICBOZ:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICOND:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICSR:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIFENCEI:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
-@@ -355,12 +357,14 @@ static const char *isa_ext_id_to_str(__u64 id)
- 		KVM_ISA_EXT_ARR(SVINVAL),
- 		KVM_ISA_EXT_ARR(SVNAPOT),
- 		KVM_ISA_EXT_ARR(SVPBMT),
-+		KVM_ISA_EXT_ARR(XVENTANACONDOPS),
- 		KVM_ISA_EXT_ARR(ZBA),
- 		KVM_ISA_EXT_ARR(ZBB),
- 		KVM_ISA_EXT_ARR(ZBS),
- 		KVM_ISA_EXT_ARR(ZICBOM),
- 		KVM_ISA_EXT_ARR(ZICBOZ),
- 		KVM_ISA_EXT_ARR(ZICNTR),
-+		KVM_ISA_EXT_ARR(ZICOND),
- 		KVM_ISA_EXT_ARR(ZICSR),
- 		KVM_ISA_EXT_ARR(ZIFENCEI),
- 		KVM_ISA_EXT_ARR(ZIHINTPAUSE),
-@@ -632,6 +636,10 @@ static __u64 zicntr_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICNTR,
- };
+diff --git a/s390x/run b/s390x/run
+index dcbf3f036415..e58fa4af9f23 100755
+--- a/s390x/run
++++ b/s390x/run
+@@ -14,19 +14,34 @@ set_qemu_accelerator || exit $?
+ qemu=$(search_qemu_binary) ||
+ 	exit $?
  
-+static __u64 zicond_regs[] = {
-+	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICOND,
-+};
+-if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$ACCEL" = "tcg" ]; then
++is_pv() {
++	if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ]; then
++		return 0
++	fi
++	return 1
++}
 +
- static __u64 zicsr_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZICSR,
- };
-@@ -644,6 +652,10 @@ static __u64 zihpm_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_ZIHPM,
- };
++if is_pv && [ "$ACCEL" = "tcg" ]; then
+ 	echo "Protected Virtualization isn't supported under TCG"
+ 	exit 2
+ fi
  
-+static __u64 xventanacondops_regs[] = {
-+	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_ISA_EXT | KVM_RISCV_ISA_EXT_XVENTANACONDOPS,
-+};
-+
- static __u64 aia_regs[] = {
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(siselect),
- 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_CSR | KVM_REG_RISCV_CSR_AIA | KVM_REG_RISCV_CSR_AIA_REG(iprio1),
-@@ -759,12 +771,16 @@ static __u64 fp_d_regs[] = {
- 	{"zbs", .feature = KVM_RISCV_ISA_EXT_ZBS, .regs = zbs_regs, .regs_n = ARRAY_SIZE(zbs_regs),}
- #define ZICNTR_REGS_SUBLIST \
- 	{"zicntr", .feature = KVM_RISCV_ISA_EXT_ZICNTR, .regs = zicntr_regs, .regs_n = ARRAY_SIZE(zicntr_regs),}
-+#define ZICOND_REGS_SUBLIST \
-+	{"zicond", .feature = KVM_RISCV_ISA_EXT_ZICOND, .regs = zicond_regs, .regs_n = ARRAY_SIZE(zicond_regs),}
- #define ZICSR_REGS_SUBLIST \
- 	{"zicsr", .feature = KVM_RISCV_ISA_EXT_ZICSR, .regs = zicsr_regs, .regs_n = ARRAY_SIZE(zicsr_regs),}
- #define ZIFENCEI_REGS_SUBLIST \
- 	{"zifencei", .feature = KVM_RISCV_ISA_EXT_ZIFENCEI, .regs = zifencei_regs, .regs_n = ARRAY_SIZE(zifencei_regs),}
- #define ZIHPM_REGS_SUBLIST \
- 	{"zihpm", .feature = KVM_RISCV_ISA_EXT_ZIHPM, .regs = zihpm_regs, .regs_n = ARRAY_SIZE(zihpm_regs),}
-+#define XVENTANACONDOPS_REGS_SUBLIST \
-+	{"xventanacondops", .feature = KVM_RISCV_ISA_EXT_XVENTANACONDOPS, .regs = xventanacondops_regs, .regs_n = ARRAY_SIZE(xventanacondops_regs),}
- #define AIA_REGS_SUBLIST \
- 	{"aia", .feature = KVM_RISCV_ISA_EXT_SSAIA, .regs = aia_regs, .regs_n = ARRAY_SIZE(aia_regs),}
- #define SMSTATEEN_REGS_SUBLIST \
-@@ -864,6 +880,14 @@ static struct vcpu_reg_list zicntr_config = {
- 	},
- };
+-if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION" = "yes" ]; then
++if is_pv && [ "$MIGRATION" = "yes" ]; then
+ 	echo "Migration isn't supported under Protected Virtualization"
+ 	exit 2
+ fi
  
-+static struct vcpu_reg_list zicond_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	ZICOND_REGS_SUBLIST,
-+	{0},
-+	},
-+};
+ M='-machine s390-ccw-virtio'
+ M+=",accel=$ACCEL$ACCEL_PROPS"
 +
- static struct vcpu_reg_list zicsr_config = {
- 	.sublists = {
- 	BASE_SUBLIST,
-@@ -888,6 +912,14 @@ static struct vcpu_reg_list zihpm_config = {
- 	},
- };
- 
-+static struct vcpu_reg_list xventanacondops_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	XVENTANACONDOPS_REGS_SUBLIST,
-+	{0},
-+	},
-+};
++if is_pv; then
++	M+=",confidential-guest-support=pv0"
++fi
 +
- static struct vcpu_reg_list aia_config = {
- 	.sublists = {
- 	BASE_SUBLIST,
-@@ -932,9 +964,11 @@ struct vcpu_reg_list *vcpu_configs[] = {
- 	&zbb_config,
- 	&zbs_config,
- 	&zicntr_config,
-+	&zicond_config,
- 	&zicsr_config,
- 	&zifencei_config,
- 	&zihpm_config,
-+	&xventanacondops_config,
- 	&aia_config,
- 	&smstateen_config,
- 	&fp_f_config,
+ command="$qemu -nodefaults -nographic $M"
++if is_pv; then
++	command+=" -object s390-pv-guest,id=pv0"
++fi
+ command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
+ command+=" -kernel"
+ command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
 -- 
-2.34.1
+2.41.0
 
