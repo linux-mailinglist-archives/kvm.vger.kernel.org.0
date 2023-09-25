@@ -2,120 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D75917ADDDA
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A490B7ADDDD
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:37:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233065AbjIYRfK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 13:35:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60798 "EHLO
+        id S232462AbjIYRhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 13:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233101AbjIYRfG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 13:35:06 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7198410F
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:59 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c0e161e18fso89426755ad.1
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695663299; x=1696268099; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=/SyWpsTveCt8sOgUzwdLFOIMv03DArAYAXRCSsRfzC8=;
-        b=fclNOGWqTOH/DVBvx0pK874VLTc62EHr9aEgkwpmpf+gwX+k1Ue8BnCnpnDAzdf519
-         7wBCIk5gD/QgQbfdsMyHQG16DvEGagsQjLlIhamu/YelP8dmrUnVDDjn1nQ52poL0uj9
-         mxSun8vztCj2KHvlK9+er8EmMqIDmMHlsJEK0p1KpLhi/NUjDqxFPLFIdFVUSDGEXkS2
-         yyFuPNtNT+/8Co1juZKqHz3cPNbtm5kgaj5uaKQuh8J5PLjKiAiUorIhsj/Cn5EFf8pG
-         tDY6HGInO2Gok+nrILJJFA9mPlGST54/Yr/7Bqb5d/SnwV4A5QbO4I7YarMr4akmob0q
-         PAsQ==
+        with ESMTP id S229584AbjIYRhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 13:37:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54735101
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:36:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695663376;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zjs4lEvHaDiAhNxtP1F5A4HCNq/ZOZBqE/yPfKd9nJ0=;
+        b=gKlkiFaFzw5X0O+/iuY3B3ET7iV6ujjj/wOyQoiHpxhgkTJwI1jW8PkzFgPopnNA5pzUew
+        gjPkFswyFPHF/Ov058UHDKsFbLO/LeKy4nF7XU+FeQWgqCVRtLU8o3gGXr4DcMNZC1Km/T
+        WTrEgMsYLDZIo6bU6budkxwnYgiN9h8=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-Ek7gIpTJPF2qgPTXY1IuDg-1; Mon, 25 Sep 2023 13:36:15 -0400
+X-MC-Unique: Ek7gIpTJPF2qgPTXY1IuDg-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7740517a478so1263301085a.3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:36:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695663299; x=1696268099;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/SyWpsTveCt8sOgUzwdLFOIMv03DArAYAXRCSsRfzC8=;
-        b=k9rZyEp/84znOIPIHmAtijDWKpnY69s6moUMSI+iyrDz4pLXJ5nLM3S8RCJU7XFPnm
-         7YRkeZQvxNCcjIaBpkmNbp0sJv3P5y26JNxTirnsLsclyHLiaPjdzMWE8DL/USyaxv9a
-         vrVOatA6OE2oaisYby6QG4MzjtztJGCdHH7h2xs1RiSz4/5HlpZAYPwhtSDJtM5C+E+4
-         UWur+UW9hMak9pClsfWgIWYg8Z/Nlv8Lod7+iFtq8lWZAQiHLzfn+QpdgcjJ7pAONgmd
-         2UEm5/AO33avH+luRhP82pQtbegyrnVA28acUtWzydGJQaTJoPQnrwIw5eqGJCZhA1wX
-         HFjg==
-X-Gm-Message-State: AOJu0YwBNUTRaDbMkKxQdXwY7V8p6W+mhvczojPOB+9wW2cnBCmrWdR5
-        RA8OZAuxS5KEN/Di6wR3J+omKx4JolF+
-X-Google-Smtp-Source: AGHT+IHHVPx4CEHMOcu9Vydd13YKljJMjj1+Oz4IRzG/afBOf9et7oMDDEm1qZycCqGjcUCSCMt9IBaHj9WE
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a17:902:cf52:b0:1c4:5e07:6d87 with SMTP id
- e18-20020a170902cf5200b001c45e076d87mr3367plg.4.1695663298881; Mon, 25 Sep
- 2023 10:34:58 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 25 Sep 2023 17:34:47 +0000
-In-Reply-To: <20230925173448.3518223-1-mizhang@google.com>
-Mime-Version: 1.0
-References: <20230925173448.3518223-1-mizhang@google.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230925173448.3518223-3-mizhang@google.com>
-Subject: [PATCH 2/2] KVM: x86: Mask LVTPC when handling a PMI
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
-        Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20230601; t=1695663374; x=1696268174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zjs4lEvHaDiAhNxtP1F5A4HCNq/ZOZBqE/yPfKd9nJ0=;
+        b=lIqY29zmebNZxJrNBD6NVRqLTRr9TQRIowyVdRdqBlozZoLBpGzNj4mpueyxankGCU
+         TfUa8cPShfqdPLMzMcPe026IlfO3/tyH3m4dwGlrlsWDCRqgCfp0y7KlPU/P3NFhpQt7
+         ABCp4vEmQzalVaqhiMNobXGaFllNSMsf0ZQvXiXbuhfpuUveYvyPbPNcjYFS0mqxIKLo
+         UhcSXjmL5e/D2owWmEAqF0imYumoeZjgLspFpN/m/5VjeSljtraf6RQGUIuGX1ypwHhi
+         QbgUXft3WqvGQIxh1qz2vxnTTHKwMKDdXo8YQXwcOhvfSLMOx7iI6haZ7mRAkXNnR2sz
+         r8ag==
+X-Gm-Message-State: AOJu0YywcVBjLsXcbTBsKqnL5HYLnQ7fAPlGGHN1yr6aPn069xMCz4AK
+        Fyk1jmWd1RzuV+hVdENBszdZkbVLriPRNbgBzjw/96QS5w8H831lWac/j+uyDt7lD+J2hX4bdbW
+        3hv72hzwHkKAw
+X-Received: by 2002:a05:620a:4105:b0:774:244c:8b2c with SMTP id j5-20020a05620a410500b00774244c8b2cmr7602764qko.14.1695663374573;
+        Mon, 25 Sep 2023 10:36:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFmpiRCu+wzFPOCrZC1PqOEIb9d+Hn3KxIh66IaQJaLnetrbMNgTOFvL9gDfrNhGFU6c7tCrA==
+X-Received: by 2002:a05:620a:4105:b0:774:244c:8b2c with SMTP id j5-20020a05620a410500b00774244c8b2cmr7602741qko.14.1695663374271;
+        Mon, 25 Sep 2023 10:36:14 -0700 (PDT)
+Received: from redhat.com ([185.184.228.174])
+        by smtp.gmail.com with ESMTPSA id i15-20020a05620a144f00b00772662b77fesm1268315qkl.99.2023.09.25.10.36.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 10:36:13 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 13:36:06 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Parav Pandit <parav@nvidia.com>, Jason Wang <jasowang@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20230925060510-mutt-send-email-mst@kernel.org>
+References: <20230921152802-mutt-send-email-mst@kernel.org>
+ <20230921195345.GZ13733@nvidia.com>
+ <20230921155834-mutt-send-email-mst@kernel.org>
+ <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
+ <20230922122246.GN13733@nvidia.com>
+ <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20230922111132-mutt-send-email-mst@kernel.org>
+ <20230922151534.GR13733@nvidia.com>
+ <20230922113941-mutt-send-email-mst@kernel.org>
+ <20230922162233.GT13733@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922162233.GT13733@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jim Mattson <jmattson@google.com>
+On Fri, Sep 22, 2023 at 01:22:33PM -0300, Jason Gunthorpe wrote:
+> On Fri, Sep 22, 2023 at 11:40:58AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Sep 22, 2023 at 12:15:34PM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Sep 22, 2023 at 11:13:18AM -0400, Michael S. Tsirkin wrote:
+> > > > On Fri, Sep 22, 2023 at 12:25:06PM +0000, Parav Pandit wrote:
+> > > > > 
+> > > > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > > > Sent: Friday, September 22, 2023 5:53 PM
+> > > > > 
+> > > > > 
+> > > > > > > And what's more, using MMIO BAR0 then it can work for legacy.
+> > > > > > 
+> > > > > > Oh? How? Our team didn't think so.
+> > > > > 
+> > > > > It does not. It was already discussed.
+> > > > > The device reset in legacy is not synchronous.
+> > > > > The drivers do not wait for reset to complete; it was written for the sw backend.
+> > > > > Hence MMIO BAR0 is not the best option in real implementations.
+> > > > 
+> > > > Or maybe they made it synchronous in hardware, that's all.
+> > > > After all same is true for the IO BAR0 e.g. for the PF: IO writes
+> > > > are posted anyway.
+> > > 
+> > > IO writes are not posted in PCI.
+> > 
+> > Aha, I was confused. Thanks for the correction. I guess you just buffer
+> > subsequent transactions while reset is going on and reset quickly enough
+> > for it to be seemless then?
+> 
+> >From a hardware perspective the CPU issues an non-posted IO write and
+> then it stops processing until the far side returns an IO completion.
+> 
+> Using that you can emulate what the SW virtio model did and delay the
+> CPU from restarting until the reset is completed.
+> 
+> Since MMIO is always posted, this is not possible to emulate directly
+> using MMIO.
+> 
+> Converting IO into non-posted admin commands is a fairly close
+> recreation to what actual HW would do.
+> 
+> Jason
 
-Per the SDM, "When the local APIC handles a performance-monitoring
-counters interrupt, it automatically sets the mask flag in the LVT
-performance counter register."
+I thought you asked how it is possible for hardware to support reset if
+all it does is replace IO BAR with memory BAR. The answer is that since
+2011 the reset is followed by read of the status field (which isn't much
+older than MSIX support from 2009 - which this code assumes).  If one
+uses a Linux driver from 2011 and on then all you need to do is defer
+response to this read until after the reset is complete.
 
-Add this behavior to KVM's local APIC emulation, to reduce the
-incidence of "dazed and confused" spurious NMI warnings in Linux
-guests (at least, those that use a PMI handler with "late_ack").
+If you are using older drivers or other OSes then reset using a posted
+write after device has operated for a while might not be safe, so e.g.
+you might trigger races if you remove drivers from system or
+trigger hot unplug.  For example: 
 
-Fixes: 23930f9521c9 ("KVM: x86: Enable NMI Watchdog via in-kernel PIT source")
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Tested-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/lapic.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+	static void virtio_pci_remove(struct pci_dev *pci_dev)
+	{
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 113ca9661ab2..1f3d56a1f45f 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2729,13 +2729,17 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
- {
- 	u32 reg = kvm_lapic_get_reg(apic, lvt_type);
- 	int vector, mode, trig_mode;
-+	int r;
- 
- 	if (kvm_apic_hw_enabled(apic) && !(reg & APIC_LVT_MASKED)) {
- 		vector = reg & APIC_VECTOR_MASK;
- 		mode = reg & APIC_MODE_MASK;
- 		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
--		return __apic_accept_irq(apic, mode, vector, 1, trig_mode,
--					NULL);
-+
-+		r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
-+		if (r && lvt_type == APIC_LVTPC)
-+			kvm_lapic_set_reg(apic, lvt_type, reg | APIC_LVT_MASKED);
-+		return r;
- 	}
- 	return 0;
- }
+	....
+
+		unregister_virtio_device(&vp_dev->vdev);
+
+	^^^^ triggers reset, then releases memory
+
+	....
+
+		pci_disable_device(pci_dev);
+
+	^^^ blocks DMA by clearing bus master
+
+	}
+
+here you could see some DMA into memory that has just been released.
+
+
+As Jason mentions hardware exists that is used under one of these two
+restrictions on the guest (Linux since 2011 or no resets while DMA is
+going on), and it works fine with these existing guests.
+
+Given the restrictions, virtio TC didn't elect to standardize this
+approach and instead opted for the heavier approach of
+converting IO into non-posted admin commands in software.
+
+
 -- 
-2.42.0.515.g380fc7ccd1-goog
+MST
 
