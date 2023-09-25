@@ -2,100 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B98D7ADE4F
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 20:00:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25B207ADE62
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 20:12:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbjIYSAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 14:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52692 "EHLO
+        id S229584AbjIYSM4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 14:12:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjIYSAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 14:00:50 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7674F112
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:00:44 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c615224e02so25718355ad.3
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:00:44 -0700 (PDT)
+        with ESMTP id S229966AbjIYSMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 14:12:55 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF17112
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:12:46 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-578b4981526so4185852a12.0
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695664844; x=1696269644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OavTTzOL6q1dcYXXMBZ+vp1pvr+8P33EslFWiRhI8Yw=;
-        b=jqmoAXuXJDlL/gEh7OECOBZGf7I+m5X4SObdg9uQCLXzaI/mTplw5WOVrBpzD3zIUS
-         0/l3VGAd5sVx/D3PtMpLnwSGWVW1/Y7Lu+7fJIhyaNkuPsz837ruwqRvHkOhKAuaj9Hi
-         RVtvCbb6+uVvUpMbSJqOhFYIlV07/rHKX35OI1RgJWtGqDDkx/kzfnw6y0/c0Q2v3a4K
-         nFvIiTMx/vVs6S7MDdrIYZ6FkTql0o0b9CKFgvk5ggcBh/8/dJ41/06AcDyrcN1mOmW3
-         /iB0IVMQPZlbwtMvWFvMamR9l9mXgsy32xKLIzDxOj25lQNXfTvBDgqymJTmazRYHnDl
-         7Q8w==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1695665566; x=1696270366; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KsRIBM7dOdcj87tvwe4EQo8GqJ5cXnTOsGKKYnAPAk4=;
+        b=p+wkVPXVac2IdmsmXQNOMTyp2QGxdpZV3v/ms7JJKanYUFUYLKgISa5R1YS+SEeIIS
+         18CeoB5wYm/sXkounIH9X9nPLVJnJ//R6FcgQTUUZAz81tTZF4aJWTqRaOO4yBhLJNo4
+         VR8FNMHCD1A7CH4kYo7DDFXZMYwjcOosINnUgCrFlHY3CFqe1ROXIQ+0gjBdZ3er4D49
+         eAw29SCzpnniBEQ9JSC5ykrydO+XY9ouTjHyVakOPsB5IQGH1Nio39p9sBHNlv12qwtg
+         ef13lc71Tba9GoFQuOkwgHMcJ3MqjnfOx6CiGbhufL/4XMuXqc9EhOpw0uvzfrXKs/WS
+         qeHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695664844; x=1696269644;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OavTTzOL6q1dcYXXMBZ+vp1pvr+8P33EslFWiRhI8Yw=;
-        b=D/aWhldjiNuGngbRA4hR1YonoQL+G5sY3TRYxRY9Yz/ksHK0RQGnLS5bjyIl0quckG
-         FFYuP3flwB6G0gjUMKHjT9WOYTdBlCbJeosCV9rO8yjoPII4SWECmw7DUD97rFQUo3xd
-         qN4wtH0it9YTSgoK9TDBBNq45GrAIfVG5K3C1Rn5BXYJ87k4QKwvlRVYvZf9bG64Io3P
-         Hov8fEU2JxBUuZG60fccXSZ9NupvwPiGJrE2GA5HzTFeRiDGXJyC4mwrcuVjemxWlVqd
-         6z1UUbnUIKnmXumlO+kj9dfmlYs4hre1B2hwL3ARdx7tEiHBWbt2m0Y30X2EQtn0xRSj
-         uBSg==
-X-Gm-Message-State: AOJu0YyUMHfUHm1iXw+i5YfHP8CCD3EsrspRMlkCX1ea6qlRNqG17pLJ
-        rrqhMXCzsHRIrZNAENNVAl6rCbdsdzE=
-X-Google-Smtp-Source: AGHT+IGSCIhiwk+hP5zR2qLtVS823QXJ/VIZVV7XvnuoUwjCkBqMD9Xin0erMlWfe1279dit8BhDhxAaLHw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4d2:b0:1bc:7c69:925c with SMTP id
- o18-20020a170902d4d200b001bc7c69925cmr76067plg.10.1695664843961; Mon, 25 Sep
- 2023 11:00:43 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 11:00:42 -0700
-In-Reply-To: <CALMp9eRBH=MKGeXxy+a-OWRCPJEw4hYtrB_V60AAbWk8Eg--VA@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230901185646.2823254-1-jmattson@google.com> <20230901185646.2823254-2-jmattson@google.com>
- <ZQ3bVkWoUerGufo9@google.com> <CALMp9eRBH=MKGeXxy+a-OWRCPJEw4hYtrB_V60AAbWk8Eg--VA@mail.gmail.com>
-Message-ID: <ZRHKynolEOlbJszo@google.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Mask LVTPC when handling a PMI
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <likexu@tencent.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Roman Kagan <rkagan@amazon.de>,
-        Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20230601; t=1695665566; x=1696270366;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KsRIBM7dOdcj87tvwe4EQo8GqJ5cXnTOsGKKYnAPAk4=;
+        b=lJaQWZdFailkEggpgM7kSQOCpa3LjDDsFpIZIagxeR1JAJUbQzKdk7uihzKLx3OsdF
+         qdQfGAlRlp1biKqHZXny1zxzj0hSklEjUzTeLcZC0HtwOQFBA0FzdqeAaEF3+CeNZHUH
+         Yx5ig2UgebwQDLIxO6W/9VfdQHIPnEEtxEIaVqQILIRdU7HDx15zPH/NsWHUV+WZy/tp
+         8KAPTSKBzOiDra+1ZFxngeBSSAO/YhYCUmy1cRDNng2s35X+ydjZ7w5S8W3nC8g7gM+E
+         +GBoeZ5UCQ7p6OVuWfIKs1h40BQZQ9NDmEJZUzXQh8Fczm1u2eMF91j5K7xckccf7Wj0
+         Mltg==
+X-Gm-Message-State: AOJu0YxdGn6AtK8hk/IfyhHWcvNiOd81HLCa086RCAFOvD4CA8qpK43g
+        ADjBY8TzwLe3FLBsZrh++NRTNg==
+X-Google-Smtp-Source: AGHT+IEITTnOWUqqZd2QQfvnjuWHs46rWx0fKoZhZxeSiyP6OtQJWAzOWXHuNzwpn4hPs7lDCludXw==
+X-Received: by 2002:a17:90b:2386:b0:267:faba:705 with SMTP id mr6-20020a17090b238600b00267faba0705mr3779807pjb.10.1695665565853;
+        Mon, 25 Sep 2023 11:12:45 -0700 (PDT)
+Received: from ghost ([50.221.140.188])
+        by smtp.gmail.com with ESMTPSA id az14-20020a17090b028e00b002777001ee76sm949619pjb.18.2023.09.25.11.12.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 11:12:45 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 11:12:42 -0700
+From:   Charlie Jenkins <charlie@rivosinc.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Conor Dooley <conor@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 2/9] RISC-V: Detect XVentanaCondOps from ISA string
+Message-ID: <ZRHNmuv8KzUU7u0r@ghost>
+References: <20230925133859.1735879-1-apatel@ventanamicro.com>
+ <20230925133859.1735879-3-apatel@ventanamicro.com>
+ <ZRHH25IyJJLWSolC@ghost>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRHH25IyJJLWSolC@ghost>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023, Jim Mattson wrote:
-> On Fri, Sep 22, 2023 at 11:22=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >The SDM doesn't explicitly state that mask bit is left
-> > unset in these cases, but my reading of
-> >
-> >   When the local APIC handles a performance-monitoring counters interru=
-pt, it
-> >   automatically sets the mask flag in the LVT performance counter regis=
-ter.
-> >
-> > is that there has to be an actual interrupt.
->=20
-> I assume you mean an actual interrupt from the APIC, not an actual PMI
-> to the APIC.
+On Mon, Sep 25, 2023 at 10:48:11AM -0700, Charlie Jenkins wrote:
+> On Mon, Sep 25, 2023 at 07:08:52PM +0530, Anup Patel wrote:
+> > The Veyron-V1 CPU supports custom conditional arithmetic and
+> > conditional-select/move operations referred to as XVentanaCondOps
+> > extension. In fact, QEMU RISC-V also has support for emulating
+> > XVentanaCondOps extension.
+> > 
+> > Let us detect XVentanaCondOps extension from ISA string available
+> > through DT or ACPI.
+> > 
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/asm/hwcap.h | 1 +
+> >  arch/riscv/kernel/cpufeature.c | 1 +
+> >  2 files changed, 2 insertions(+)
+> > 
+> > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> > index 0f520f7d058a..b7efe9e2fa89 100644
+> > --- a/arch/riscv/include/asm/hwcap.h
+> > +++ b/arch/riscv/include/asm/hwcap.h
+> > @@ -59,6 +59,7 @@
+> >  #define RISCV_ISA_EXT_ZIFENCEI		41
+> >  #define RISCV_ISA_EXT_ZIHPM		42
+> >  #define RISCV_ISA_EXT_SMSTATEEN		43
+> > +#define RISCV_ISA_EXT_XVENTANACONDOPS	44
+> >  
+> >  #define RISCV_ISA_EXT_MAX		64
+> >  
+> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > index 3755a8c2a9de..3a31d34fe709 100644
+> > --- a/arch/riscv/kernel/cpufeature.c
+> > +++ b/arch/riscv/kernel/cpufeature.c
+> > @@ -182,6 +182,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+> >  	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+> >  	__RISCV_ISA_EXT_DATA(svnapot, RISCV_ISA_EXT_SVNAPOT),
+> >  	__RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
+> > +	__RISCV_ISA_EXT_DATA(xventanacondops, RISCV_ISA_EXT_XVENTANACONDOPS),
+> >  };
+> >  
+> >  const size_t riscv_isa_ext_count = ARRAY_SIZE(riscv_isa_ext);
+> > -- 
+> > 2.34.1
+> > 
+> > 
+> > _______________________________________________
+> > linux-riscv mailing list
+> > linux-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+> 
+> I worry about storing vendor extensions in this file. Because vendor
+> extensions are not standardized, they can only be expected to have the
+> desired behavior on hardware with the appropriate vendor id. A couple
+> months ago I sent a patch to address this by handling vector extensions
+> independently for each vendor [1]. I dropped the patch because it
+> relied upon Heiko's T-Head vector extension support that he stopped
+> working on. However, I can revive this patch so you can build off of it.
+> 
+> This scheme has the added benefit that vendors do not have to worry
+> about conficting extensions, and the kernel does not have to act as a
+> key registry for vendors.
+> 
+> What are your thoughts?
+> 
+> - Charlie
+> 
+> [1] https://lore.kernel.org/lkml/20230705-thead_vendor_extensions-v1-2-ad6915349c4d@rivosinc.com/
+> 
 
-Yeah.
+I guess I don't need to revive the patch, you could just take the code
+and update it for xventanacondops.
 
-> I would argue that one way of "handling" a performance-monitoring
-> counters interrupt is to do nothing with it, but apparently I'm wrong.
-> At least, if I set the delivery mode in LVTPC to the illegal value of
-> 6, I never see the LVTPC.MASK bit get set.
-
-Heh, you could complain to Intel and see if they'll change "handles" to "de=
-livers" :-)
+- Charlie
