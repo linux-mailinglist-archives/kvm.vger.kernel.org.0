@@ -2,149 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEE647ADDFC
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:48:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C35A7ADE09
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbjIYRsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 13:48:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
+        id S231226AbjIYRwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 13:52:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230230AbjIYRsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 13:48:22 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD77101
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:48:15 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c0c6d4d650so61706925ad.0
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:48:15 -0700 (PDT)
+        with ESMTP id S229777AbjIYRwR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 13:52:17 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746E89B
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:52:11 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f8439a250so33420827b3.3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:52:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1695664095; x=1696268895; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V3tuJIIS1l1SOVzZtlVmqa55J+BZPRUyU2VUwqVvswg=;
-        b=mWLJe+X2mp6TIEqIacDBG3NvBPzUhYGh+J3cGWEmK/YufkcCNHyWbFHEojC12NKRnP
-         HdraPi3WjUYsDoWpM3/ONzuD3jxhs39lQAYlPfntg0ft85J9LpmsQdiuqnWwOvIjzySM
-         A6a3gqvDTYbr9WgMWeO6NVHUf11NlkqQOyGXMbka36B0J/bUyK3Y6NK1eB0mLiyuJEDr
-         Pkh9RJgrLEDiWmzdD69VAk7/LRmbV+YD+9o9ua2u/l6gCSNuGhaYzp0s1QZE5/Ii7iID
-         95r7BTF2T+fkV8D5ZnlmnX2BdmdMzlZi/tBXMKk7CnRck7ybC9eIRuubezDMX1hTsE/t
-         UhPA==
+        d=google.com; s=20230601; t=1695664330; x=1696269130; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xwtabOILnRbm1S1bansxkRjSqy6X1y7X1zW3DO+l2dQ=;
+        b=uKDRSiXW9WTM2I+lNJmv/zcE8ux7VzL0hmLgGO2ZpaWwWxj/jR+gkulY+lG7fMuuPD
+         Led3euO9hHRvjF06YsdGr+uB0G55ZIn0E5CxdYxuqmOw49e41wboHSGUaps3GT/qJpzo
+         S598GOj07VhBFm4TuM9ZLtIATvpwitZVOcWnng/onr9PUZZGJIIEWH1BEVMPfr3tdqxK
+         wDOxukCspQjPTPXp3rRRlU/uHD+o/UidVjsC60Ykns7srxb0VqRzB7yDv57ABW6xKxZp
+         t+LGUcl6+XDy+lsgzZnd19N1zCmyLGfA2XDFVl3FQbsb8FPJQNH6uGCTK6Fyl9xvlwFa
+         7drw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695664095; x=1696268895;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V3tuJIIS1l1SOVzZtlVmqa55J+BZPRUyU2VUwqVvswg=;
-        b=u7HEbKiWq43CvoV6gdhxjzKDd1MjqMSZyGFW724sZU6GBAnwctB9JT4YEUlCdIzuhu
-         cbggVxERLWlGdUudfKtzNDEvyDUartJWamTUhys2ulVp6fQgVtKKAEhvR+az4kFqulgG
-         nGF1Sv0GSibSNIvzxYgzUaNAAIqLMV01Wj513/ueJdMO3gH+/2UIZtDYHxJ4odHaaEN5
-         xOzqjfqxCO5536cn0aQIGhctSbBJxq6aQ6CmoUZFwcvqm06G8YjbZo/s6ab/BuVtH+VQ
-         qFYeNTa4cnKnRg+QAQTXZufZE54cJgxcfJAR7Hay0uTfGzLnmJm1ES2O983cWIhJc3fO
-         cOYw==
-X-Gm-Message-State: AOJu0YyUpxzV0v2yLlY+yQpgzsTfUo48WGLD+8y5bXNPXkqqp36rgmHy
-        6yO19XJct/bWu52c070jiqSRtg==
-X-Google-Smtp-Source: AGHT+IGvqV00K1g0/ZodkrKU5PL2uuUghZiRtw/5AJYE/blsphF6S3mDHOM5cs0FDHZM3+gOY2KwWg==
-X-Received: by 2002:a17:902:f548:b0:1c5:d354:93b6 with SMTP id h8-20020a170902f54800b001c5d35493b6mr8832777plf.67.1695664094936;
-        Mon, 25 Sep 2023 10:48:14 -0700 (PDT)
-Received: from ghost ([50.221.140.188])
-        by smtp.gmail.com with ESMTPSA id s23-20020a170902989700b001c5de2f1686sm8260228plp.99.2023.09.25.10.48.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 10:48:14 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 10:48:11 -0700
-From:   Charlie Jenkins <charlie@rivosinc.com>
-To:     Anup Patel <apatel@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1695664330; x=1696269130;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xwtabOILnRbm1S1bansxkRjSqy6X1y7X1zW3DO+l2dQ=;
+        b=jRKfNN/gg9XR0fdtmA97X4ElkPLSTsG18taaShhSZ1yfBac7wgfPz/ool6ngTW0y3i
+         I+FWbIwn3ZiD/y0RdPmXKbz3aQxQjvIcYSI9o32B0PlMFc/1mNDxBmSO5hPsGr4xIL2v
+         eAJyEqwOR1kQOssMCN8cPkyzDtqrw5GHt31g+xzq3BixMNkyOV6+J/bW/Vrc2e8wbgWm
+         YJw9jR8dfyCOes2YHUpzfzHXVpKkNs/AzXY6eHSxKUf3wGazOq8UDa5MXTouqk8Fg9w5
+         ZDCDXJtzK0nqYM6rM8GTFYn7g9epKox2RhQs2tPjFnpBw1sIX3HZHdo6Iuhq4372YKXT
+         +iCQ==
+X-Gm-Message-State: AOJu0YymzadiANPa7HO2v9HxG7WN/YhG+wuwfvOJmByyfNOTlfZ9rAuZ
+        uKlmgNz0SSLVIMEpIezoi2p3PmID43U=
+X-Google-Smtp-Source: AGHT+IGMCxoYYjlsby/3TkrnKyNMbXZVi8P2B3hrc+nEK9RGzqOsug/VxBijCqfw+gGQ7bIh7lZuWGjl/Rc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:d003:0:b0:59b:ccba:1249 with SMTP id
+ v3-20020a81d003000000b0059bccba1249mr100541ywi.10.1695664330689; Mon, 25 Sep
+ 2023 10:52:10 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 10:52:09 -0700
+In-Reply-To: <20230925173448.3518223-3-mizhang@google.com>
+Mime-Version: 1.0
+References: <20230925173448.3518223-1-mizhang@google.com> <20230925173448.3518223-3-mizhang@google.com>
+Message-ID: <ZRHIyUEUeXnw7hii@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Mask LVTPC when handling a PMI
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 2/9] RISC-V: Detect XVentanaCondOps from ISA string
-Message-ID: <ZRHH25IyJJLWSolC@ghost>
-References: <20230925133859.1735879-1-apatel@ventanamicro.com>
- <20230925133859.1735879-3-apatel@ventanamicro.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230925133859.1735879-3-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023 at 07:08:52PM +0530, Anup Patel wrote:
-> The Veyron-V1 CPU supports custom conditional arithmetic and
-> conditional-select/move operations referred to as XVentanaCondOps
-> extension. In fact, QEMU RISC-V also has support for emulating
-> XVentanaCondOps extension.
+On Mon, Sep 25, 2023, Mingwei Zhang wrote:
+> From: Jim Mattson <jmattson@google.com>
 > 
-> Let us detect XVentanaCondOps extension from ISA string available
-> through DT or ACPI.
+> Per the SDM, "When the local APIC handles a performance-monitoring
+> counters interrupt, it automatically sets the mask flag in the LVT
+> performance counter register."
 > 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> Add this behavior to KVM's local APIC emulation, to reduce the
+> incidence of "dazed and confused" spurious NMI warnings in Linux
+> guests (at least, those that use a PMI handler with "late_ack").
+> 
+> Fixes: 23930f9521c9 ("KVM: x86: Enable NMI Watchdog via in-kernel PIT source")
+
+This Fixes is wrong.  Prior to commit f5132b01386b ("KVM: Expose a version 2
+architectural PMU to a guests"), KVM didn't ever deliver interrupts via the LVTPC
+entry.  E.g. prior to that commit, the only reference to APIC_LVTPC is in
+kvm_lapic_reg_write:
+
+  arch/x86/kvm $ git grep APIC_LVTPC f5132b01386b^
+  f5132b01386b^:lapic.c:  case APIC_LVTPC:
+
+Commit 23930f9521c9 definitely set the PMU support up to fail, but the bug would
+never have existed if kvm_deliver_pmi() had been written as:
+
+void kvm_deliver_pmi(struct kvm_vcpu *vcpu)
+{
+	struct kvm_lapic *apic = vcpu->arch.apic;
+
+	if (apic && kvm_apic_local_deliver(apic, APIC_LVTPC))
+		kvm_lapic_set_reg(apic, APIC_LVTPC,
+				  kvm_lapic_get_reg(apic, LVTPC) | APIC_LVT_MASKED);
+}
+
+And this needs an explicit Cc: to stable because KVM opts out of AUTOSEL.
+
+So
+
+  Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
+  Cc: stable@vger.kernel.org
+
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Tested-by: Mingwei Zhang <mizhang@google.com>
+
+When posting patches on behalf of others, you need to provide your SoB.
+
 > ---
->  arch/riscv/include/asm/hwcap.h | 1 +
->  arch/riscv/kernel/cpufeature.c | 1 +
->  2 files changed, 2 insertions(+)
+>  arch/x86/kvm/lapic.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 0f520f7d058a..b7efe9e2fa89 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -59,6 +59,7 @@
->  #define RISCV_ISA_EXT_ZIFENCEI		41
->  #define RISCV_ISA_EXT_ZIHPM		42
->  #define RISCV_ISA_EXT_SMSTATEEN		43
-> +#define RISCV_ISA_EXT_XVENTANACONDOPS	44
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 113ca9661ab2..1f3d56a1f45f 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2729,13 +2729,17 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
+>  {
+>  	u32 reg = kvm_lapic_get_reg(apic, lvt_type);
+>  	int vector, mode, trig_mode;
+> +	int r;
 >  
->  #define RISCV_ISA_EXT_MAX		64
->  
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 3755a8c2a9de..3a31d34fe709 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -182,6 +182,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
->  	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
->  	__RISCV_ISA_EXT_DATA(svnapot, RISCV_ISA_EXT_SVNAPOT),
->  	__RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
-> +	__RISCV_ISA_EXT_DATA(xventanacondops, RISCV_ISA_EXT_XVENTANACONDOPS),
->  };
->  
->  const size_t riscv_isa_ext_count = ARRAY_SIZE(riscv_isa_ext);
+>  	if (kvm_apic_hw_enabled(apic) && !(reg & APIC_LVT_MASKED)) {
+>  		vector = reg & APIC_VECTOR_MASK;
+>  		mode = reg & APIC_MODE_MASK;
+>  		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
+> -		return __apic_accept_irq(apic, mode, vector, 1, trig_mode,
+> -					NULL);
+> +
+> +		r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
+> +		if (r && lvt_type == APIC_LVTPC)
+> +			kvm_lapic_set_reg(apic, lvt_type, reg | APIC_LVT_MASKED);
+
+Belated feedback, I think I'd prefer to write this as
+
+			kvm_lapic_set_reg(apic, APIC_LVTPC, reg | APIC_LVT_MASKED);
+
+so that this code will show up when searching for APIC_LVTPC.
+
+> +		return r;
+>  	}
+>  	return 0;
+>  }
 > -- 
-> 2.34.1
+> 2.42.0.515.g380fc7ccd1-goog
 > 
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
-
-I worry about storing vendor extensions in this file. Because vendor
-extensions are not standardized, they can only be expected to have the
-desired behavior on hardware with the appropriate vendor id. A couple
-months ago I sent a patch to address this by handling vector extensions
-independently for each vendor [1]. I dropped the patch because it
-relied upon Heiko's T-Head vector extension support that he stopped
-working on. However, I can revive this patch so you can build off of it.
-
-This scheme has the added benefit that vendors do not have to worry
-about conficting extensions, and the kernel does not have to act as a
-key registry for vendors.
-
-What are your thoughts?
-
-- Charlie
-
-[1] https://lore.kernel.org/lkml/20230705-thead_vendor_extensions-v1-2-ad6915349c4d@rivosinc.com/
-
