@@ -2,183 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A490B7ADDDD
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:37:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 161B37ADDE2
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232462AbjIYRhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 13:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
+        id S233073AbjIYRhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 13:37:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbjIYRhH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 13:37:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54735101
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:36:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695663376;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zjs4lEvHaDiAhNxtP1F5A4HCNq/ZOZBqE/yPfKd9nJ0=;
-        b=gKlkiFaFzw5X0O+/iuY3B3ET7iV6ujjj/wOyQoiHpxhgkTJwI1jW8PkzFgPopnNA5pzUew
-        gjPkFswyFPHF/Ov058UHDKsFbLO/LeKy4nF7XU+FeQWgqCVRtLU8o3gGXr4DcMNZC1Km/T
-        WTrEgMsYLDZIo6bU6budkxwnYgiN9h8=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-Ek7gIpTJPF2qgPTXY1IuDg-1; Mon, 25 Sep 2023 13:36:15 -0400
-X-MC-Unique: Ek7gIpTJPF2qgPTXY1IuDg-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7740517a478so1263301085a.3
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:36:15 -0700 (PDT)
+        with ESMTP id S233097AbjIYRhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 13:37:51 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14FD115
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:37:44 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-594e1154756so134246197b3.2
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:37:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695663464; x=1696268264; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4OSNJSuzGEyn2eFVxut8UHIn8mk8UoHB1vJTBDeWUjg=;
+        b=vHOkqRox53qWWq1w+Y3R/aBAcsqP2f0/LNwJwmzxBUBvbELxtAJ6WQLQ4COw481jWg
+         5XpcRTOL103TSrAzZNlnTMG1Cf+eOC0WZxF+FCAwmbRRdVNuLepHIOBdWyDB08n5YCSe
+         jlJtH2FuqegQqHwVchEEPTST2X8ZE5G4nYrRSKwHxa5x5HM0vMXNJ87VZ0aQtzsS9kdv
+         jAQqIus3+oLXkGka3TY1JEsJ79dwBXNI8OvA2hAUtIPbElxcF8AXME0DcJe+DbcurUGr
+         L+0oTtRH3YdccuVR3DF+3bqDuzvatC7Ug4oeHYoRIb1aOoKvXGwV8mY7IhxF6UXG9hwd
+         1UMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695663374; x=1696268174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zjs4lEvHaDiAhNxtP1F5A4HCNq/ZOZBqE/yPfKd9nJ0=;
-        b=lIqY29zmebNZxJrNBD6NVRqLTRr9TQRIowyVdRdqBlozZoLBpGzNj4mpueyxankGCU
-         TfUa8cPShfqdPLMzMcPe026IlfO3/tyH3m4dwGlrlsWDCRqgCfp0y7KlPU/P3NFhpQt7
-         ABCp4vEmQzalVaqhiMNobXGaFllNSMsf0ZQvXiXbuhfpuUveYvyPbPNcjYFS0mqxIKLo
-         UhcSXjmL5e/D2owWmEAqF0imYumoeZjgLspFpN/m/5VjeSljtraf6RQGUIuGX1ypwHhi
-         QbgUXft3WqvGQIxh1qz2vxnTTHKwMKDdXo8YQXwcOhvfSLMOx7iI6haZ7mRAkXNnR2sz
-         r8ag==
-X-Gm-Message-State: AOJu0YywcVBjLsXcbTBsKqnL5HYLnQ7fAPlGGHN1yr6aPn069xMCz4AK
-        Fyk1jmWd1RzuV+hVdENBszdZkbVLriPRNbgBzjw/96QS5w8H831lWac/j+uyDt7lD+J2hX4bdbW
-        3hv72hzwHkKAw
-X-Received: by 2002:a05:620a:4105:b0:774:244c:8b2c with SMTP id j5-20020a05620a410500b00774244c8b2cmr7602764qko.14.1695663374573;
-        Mon, 25 Sep 2023 10:36:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFmpiRCu+wzFPOCrZC1PqOEIb9d+Hn3KxIh66IaQJaLnetrbMNgTOFvL9gDfrNhGFU6c7tCrA==
-X-Received: by 2002:a05:620a:4105:b0:774:244c:8b2c with SMTP id j5-20020a05620a410500b00774244c8b2cmr7602741qko.14.1695663374271;
-        Mon, 25 Sep 2023 10:36:14 -0700 (PDT)
-Received: from redhat.com ([185.184.228.174])
-        by smtp.gmail.com with ESMTPSA id i15-20020a05620a144f00b00772662b77fesm1268315qkl.99.2023.09.25.10.36.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 10:36:13 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 13:36:06 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Parav Pandit <parav@nvidia.com>, Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230925060510-mutt-send-email-mst@kernel.org>
-References: <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <20230921155834-mutt-send-email-mst@kernel.org>
- <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
- <20230922122246.GN13733@nvidia.com>
- <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20230922111132-mutt-send-email-mst@kernel.org>
- <20230922151534.GR13733@nvidia.com>
- <20230922113941-mutt-send-email-mst@kernel.org>
- <20230922162233.GT13733@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922162233.GT13733@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1695663464; x=1696268264;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4OSNJSuzGEyn2eFVxut8UHIn8mk8UoHB1vJTBDeWUjg=;
+        b=sVksilMMnUsxD70z7LkfcOYHBmZ+xgqjNI85bNpjN9INOOed3QgL+2EMJGkFyJPwgo
+         AMFHPJ/4PD8YkQBv+3pSljzQyJl+aYEIECsJctQzHuFCT+0hXQ24U4mR/9/ywcqs56Xp
+         +X4mwk0KRaaBltj9nU3cRtcO3OuIvWmOrQvhsuIs35FICmUgZUnQ2z5Z94NOzbwFp/6n
+         nTU+Hh3Cxoxc30HkwpbKZOvfBDJJKyvQ9WPg0aixfcTbE6PhnOjCpl0AKLceBnWcb9/U
+         XgXHpxUi/HRMilEgzzUbVXd4Z77zPnwO3ATXEtc+cwOWnjWFxyg2eST9hCg7mxZOGeeq
+         /TVg==
+X-Gm-Message-State: AOJu0YwxP298Qp6hq12/5uoOhjeoj1uq2ZGAlQXj5FSvDE+Lu6JMl+dn
+        QvQ3sh28cyJndnDgBhbbNgYOYT8uZGU=
+X-Google-Smtp-Source: AGHT+IFbdNqdQBINXaKsxLFNsbPAlNsb64v79jTXlms6OpZDsyyWIMsDvfLKOISLOkUltg3c0KbHgHQxQwM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:abac:0:b0:d81:fc08:29ea with SMTP id
+ v41-20020a25abac000000b00d81fc0829eamr67094ybi.2.1695663463860; Mon, 25 Sep
+ 2023 10:37:43 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 10:37:42 -0700
+In-Reply-To: <ZQuahXpq2fy8rMDV@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <ZQP6ZqXH81V24Lj/@yzhao56-desk.sh.intel.com> <ZQtdZmJ3SekURjiQ@google.com> <ZQuahXpq2fy8rMDV@yzhao56-desk.sh.intel.com>
+Message-ID: <ZRHFZmaa/6HQnZD1@google.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 01:22:33PM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 22, 2023 at 11:40:58AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Sep 22, 2023 at 12:15:34PM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Sep 22, 2023 at 11:13:18AM -0400, Michael S. Tsirkin wrote:
-> > > > On Fri, Sep 22, 2023 at 12:25:06PM +0000, Parav Pandit wrote:
-> > > > > 
-> > > > > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > > > > Sent: Friday, September 22, 2023 5:53 PM
-> > > > > 
-> > > > > 
-> > > > > > > And what's more, using MMIO BAR0 then it can work for legacy.
-> > > > > > 
-> > > > > > Oh? How? Our team didn't think so.
-> > > > > 
-> > > > > It does not. It was already discussed.
-> > > > > The device reset in legacy is not synchronous.
-> > > > > The drivers do not wait for reset to complete; it was written for the sw backend.
-> > > > > Hence MMIO BAR0 is not the best option in real implementations.
-> > > > 
-> > > > Or maybe they made it synchronous in hardware, that's all.
-> > > > After all same is true for the IO BAR0 e.g. for the PF: IO writes
-> > > > are posted anyway.
-> > > 
-> > > IO writes are not posted in PCI.
+On Thu, Sep 21, 2023, Yan Zhao wrote:
+> On Wed, Sep 20, 2023 at 02:00:22PM -0700, Sean Christopherson wrote:
+> > On Fri, Sep 15, 2023, Yan Zhao wrote:
+> > > On Wed, Sep 13, 2023 at 06:55:09PM -0700, Sean Christopherson wrote:
+> > > > +/* Set @attributes for the gfn range [@start, @end). */
+> > > > +static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+> > > > +				     unsigned long attributes)
+> > > > +{
+> > > > +	struct kvm_mmu_notifier_range pre_set_range = {
+> > > > +		.start = start,
+> > > > +		.end = end,
+> > > > +		.handler = kvm_arch_pre_set_memory_attributes,
+> > > > +		.on_lock = kvm_mmu_invalidate_begin,
+> > > > +		.flush_on_ret = true,
+> > > > +		.may_block = true,
+> > > > +	};
+> > > > +	struct kvm_mmu_notifier_range post_set_range = {
+> > > > +		.start = start,
+> > > > +		.end = end,
+> > > > +		.arg.attributes = attributes,
+> > > > +		.handler = kvm_arch_post_set_memory_attributes,
+> > > > +		.on_lock = kvm_mmu_invalidate_end,
+> > > > +		.may_block = true,
+> > > > +	};
+> > > > +	unsigned long i;
+> > > > +	void *entry;
+> > > > +	int r = 0;
+> > > > +
+> > > > +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> > > Also here, do we need to get existing attributes of a GFN first ?
 > > 
-> > Aha, I was confused. Thanks for the correction. I guess you just buffer
-> > subsequent transactions while reset is going on and reset quickly enough
-> > for it to be seemless then?
+> > No?  @entry is the new value that will be set for all entries.  This line doesn't
+> > touch the xarray in any way.  Maybe I'm just not understanding your question.
+> Hmm, I thought this interface was to allow users to add/remove an attribute to a GFN
+> rather than overwrite all attributes of a GFN. Now I think I misunderstood the intention.
 > 
-> >From a hardware perspective the CPU issues an non-posted IO write and
-> then it stops processing until the far side returns an IO completion.
-> 
-> Using that you can emulate what the SW virtio model did and delay the
-> CPU from restarting until the reset is completed.
-> 
-> Since MMIO is always posted, this is not possible to emulate directly
-> using MMIO.
-> 
-> Converting IO into non-posted admin commands is a fairly close
-> recreation to what actual HW would do.
-> 
-> Jason
+> But I wonder if there is a way for users to just add one attribute, as I don't find
+> ioctl like KVM_GET_MEMORY_ATTRIBUTES for users to get current attributes and then to
+> add/remove one based on that. e.g. maybe in future, KVM wants to add one attribute in
+> kernel without being told by userspace ?
 
-I thought you asked how it is possible for hardware to support reset if
-all it does is replace IO BAR with memory BAR. The answer is that since
-2011 the reset is followed by read of the status field (which isn't much
-older than MSIX support from 2009 - which this code assumes).  If one
-uses a Linux driver from 2011 and on then all you need to do is defer
-response to this read until after the reset is complete.
+The plan is that memory attributes will be 100% userspace driven, i.e. that KVM
+will never add its own attributes.  That's why there is (currently) no
+KVM_GET_MEMORY_ATTRIBUTES, the intended usage model is that userspace is fully
+responsible for managing attributes, and so should never need to query information
+that it already knows.  If there's a compelling case for getting attributes then
+we could certainly add such an ioctl(), but I hope we never need to add a GET
+because that likely means we've made mistakes along the way.
 
-If you are using older drivers or other OSes then reset using a posted
-write after device has operated for a while might not be safe, so e.g.
-you might trigger races if you remove drivers from system or
-trigger hot unplug.  For example: 
-
-	static void virtio_pci_remove(struct pci_dev *pci_dev)
-	{
-
-	....
-
-		unregister_virtio_device(&vp_dev->vdev);
-
-	^^^^ triggers reset, then releases memory
-
-	....
-
-		pci_disable_device(pci_dev);
-
-	^^^ blocks DMA by clearing bus master
-
-	}
-
-here you could see some DMA into memory that has just been released.
-
-
-As Jason mentions hardware exists that is used under one of these two
-restrictions on the guest (Linux since 2011 or no resets while DMA is
-going on), and it works fine with these existing guests.
-
-Given the restrictions, virtio TC didn't elect to standardize this
-approach and instead opted for the heavier approach of
-converting IO into non-posted admin commands in software.
-
-
--- 
-MST
-
+Giving userspace full control of attributes allows for a simpler uAPI, e.g. if
+userspace doesn't have full control, then setting or clearing bits requires a RMW
+operation, which means creating a more complex ioctl().  That's why its a straight
+SET operation and not an OR type operation.
