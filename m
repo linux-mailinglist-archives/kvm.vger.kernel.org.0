@@ -2,252 +2,292 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19AF87AD3D3
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 10:52:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C491A7AD43B
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 11:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233097AbjIYIwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 04:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60688 "EHLO
+        id S232521AbjIYJJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 05:09:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233030AbjIYIwk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 04:52:40 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED14E107
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 01:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695631951; x=1727167951;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5w31NDHjoiiue0y05l8HuGUxH9CVJ95KTkTPBavuEt0=;
-  b=UcTIWOermDf7ST42WcG2iACRNYVcSw4P0nc2YaDeuW5+gCJCIlFK6Zpd
-   Ch0tDCX8bh0iUV5YRcOuzQhujMbVfuGmNght283B2bm0+/FdSDgtQ55gY
-   CWDx3pasOP9YDTmhuf25nIEEnkYFCPtAwT+DOVZ9plKU7aRLNc5zvQ+34
-   6C2UPVYze3rWOrs+n37YtB2X00VvpmWppAQV6U59xwbu+7ySEo9y1Fu5g
-   lOapfAoAiYcbx6ZY0kzp3TmGuEYdNBY3cygzYaKHVhxU74Zvzl688KoeU
-   Mx7xlQSwSEUi3B0dLxxHl5iG3wnd5HzmXEQ/cNLRMXI3++nNZm7tg46Io
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="447692386"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="447692386"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 01:52:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="921903518"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="921903518"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.5.53]) ([10.93.5.53])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 01:52:29 -0700
-Message-ID: <26b661fb-da18-4a71-8eee-1688cdf59325@linux.intel.com>
-Date:   Mon, 25 Sep 2023 16:52:26 +0800
-MIME-Version: 1.0
+        with ESMTP id S231571AbjIYJJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 05:09:29 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B071A9B
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 02:09:22 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38P8xSDq019884;
+        Mon, 25 Sep 2023 09:08:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=vQo2owD1s4OaHUnb9FVSwgDYlYEUIHCz5mHGBuV31es=;
+ b=WegITx94iehA2ggMnwzDvdRonli93Ak9YF89rnPl6dQdrZh5wOLmIN/O+pm7TXTkzxRt
+ HQv9Df+cYYW/gViXc+OjEEYCyuIRObs1me/nNIPrT7TqD/FOJcaXzXF023NNk+OWbrhZ
+ DeIpfsEohW5htzCN59eNLdMyUOKmAIXDn75MjifNbOrEjbMtEAIBto3Lue8YwaphDQPE
+ uTt9aUWW0ImUpp/M/beO0OZZgHkRxagMSMtL19V4yU25F6gpIVeaqIR/I8MHnjxMjN2c
+ ik2LkJJSjfkty1eQv7B8iTT13+Q8nWJTeg4J8ZhVDyw2Q6c4dZMoEWeHSVVTPGneGvzD Og== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3t9rjub5jq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Sep 2023 09:08:53 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 38P845gO034972;
+        Mon, 25 Sep 2023 09:08:52 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2049.outbound.protection.outlook.com [104.47.73.49])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3t9pf4eqe2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Sep 2023 09:08:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a6K4hlRj1UkmoZHHipC/UOmIqYB1jr63kv++yAHj689ddbiwZk/UDhlrFbAbfDmD2PZIV3TSNrp8cCgdIW3N3Be6Qx/Iyd6Ae8ZjH9e08HAPCwfkAYvUZIDrp2zthbylvcyor7gdgoMgT/XMo1xY98f/H0ssVRwwL/EervK2pchS6aKJuID04Xl4lvYccODMQXoHQU6Pa4UY3xKwoAm3LXDEb+ia7KRzRzwywS6dplhSMOzFCJSrsczLx8WxJiXIczhJhvC+cVROE2+F+tH4C2vnfkgjEi49RaYc9HRZ9v3fdu7s2CC9fbGShlfg0W+T8ZRLrpNNzQ+cpSAXAjwG6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vQo2owD1s4OaHUnb9FVSwgDYlYEUIHCz5mHGBuV31es=;
+ b=I+aELDJueQLZTOjpYfm/bh8OyI9AqkXQAVpxnePlsOkKXXdzsqJMT2eB8aOj3NpwwRzlzyQEW90f+k69wTIKf7RWaQw2Py0QRSr8jhlObszla7CeRE0D8XPKwVqvTEyiNZZknY6lmbEwPUEh9p3YRkQvVlXqceZ3jmM1JBcZBB7A52sDWOW1G9FwwBn/2Xy+u4VhRooV0a5mm9JFWOQqp4tJ5BdieXnBqg20tu4pjCbl4g+HyBQJJsvH1+n/UzDqCTxbon1dmbSe4Eo8Odx2MJsvuE3mRJfvk/CuNNbeOxndO19Ke0KXhOxeM/wI6mZZW8DuRmgHaQ6Oy1OEzW7gXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vQo2owD1s4OaHUnb9FVSwgDYlYEUIHCz5mHGBuV31es=;
+ b=jLKzoKsqbhnElmXkwKKDU8qgjX+DVpWxwTsDi4C3i/zehv+8Z4qWWVTaX5OddiXVJAKMidqA6PV2nNemJmxYbPPpSvnSETGBw0mXeicYKpJwd7btV6TU8GYPMWVDVbIKXpNur8JAwRefusbZQ8a5nUIfYt0P1FIfsmaI5pwabmY=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by MW4PR10MB5811.namprd10.prod.outlook.com (2603:10b6:303:18d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Mon, 25 Sep
+ 2023 09:08:46 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::8adc:498c:8369:f518]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::8adc:498c:8369:f518%3]) with mapi id 15.20.6813.027; Mon, 25 Sep 2023
+ 09:08:46 +0000
+Message-ID: <d5e35a74-f44e-41aa-8599-059af888b9b9@oracle.com>
+Date:   Mon, 25 Sep 2023 10:08:40 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/9] KVM: x85/pmu: Add Streamlined FREEZE_LBR_ON_PMI
- for vPMU v4
+Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
+ domains
 Content-Language: en-US
-To:     Xiong Zhang <xiong.y.zhang@intel.com>, kvm@vger.kernel.org
-Cc:     seanjc@google.com, like.xu.linux@gmail.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com
-References: <20230921082957.44628-1-xiong.y.zhang@intel.com>
- <20230921082957.44628-4-xiong.y.zhang@intel.com>
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20230921082957.44628-4-xiong.y.zhang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+To:     Baolu Lu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org
+References: <20230923012511.10379-1-joao.m.martins@oracle.com>
+ <20230923012511.10379-20-joao.m.martins@oracle.com>
+ <32ad48e2-0aa5-2c26-4e75-16e7b1460b37@linux.intel.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+In-Reply-To: <32ad48e2-0aa5-2c26-4e75-16e7b1460b37@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4P192CA0047.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:658::19) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|MW4PR10MB5811:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6fc806c-99da-486c-a0a3-08dbbda70613
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /QEAKs0Q2FAO0SnFDEb2R8gmKld5hVPD/6FuyVeYQDDbbN0vEoeMl61plzELxl8qaVM7v+eVJ8NoE3jtO+yyjoYwB8mFAky+fwYa3j/CyNbGPLU3YxdNFuGNJlvPmRE4Jz00fcjf6QAVpsmMnt7YxHx20NAdi1aQLKaz2Jo+fxQRqvZizDJnC4jVgAYlRwQaKG3JtYjJfiUXhYURbcP2xXTLDKjD8JRGm37qB5+5ZVtBWvaX4Rq9vWH0cXEDpjYyoPgvHpPQIlezZJTSR2mBDHbfNKJUKAKbeS/tf8C6Ccj7bdTSksoacj62LvkdCZKzN1BJdf+1M92UzSd3ouyYRm5FKkdELvqrs2J0Rl8b+ZgNk4zzCldYLJ0TuEgKo7NjyFl0g3/UqyMrXN2b5eGOWP2OzFbWG9e+phVQbUR0yhJZABtPwvrurBhcyoJElelJMzUCvvDIXk0o83eLgooRWkve3mCLrt2H7qHMcRCGNCFzbZd/DYNnN5PgTvhYOv1u/2jPNL7NBhe3Glan71iUFxIlLILcY7cd5l6iJ83jcHYNk/AnAY0Z0g/r1RRE2BdHES6F/sg/G5/TRtcAAjx5w8q4J/kDKItcDlx7xlHSF3oNU0adSagDjq7GzcYGOljjXD4AQv2lCwf7glPsIvUUi3t4rJ9nMRventjU86/WAoo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(39860400002)(376002)(346002)(230922051799003)(451199024)(186009)(1800799009)(83380400001)(6666004)(2906002)(7416002)(4326008)(8936002)(8676002)(5660300002)(86362001)(31686004)(31696002)(26005)(38100700002)(316002)(66946007)(6512007)(478600001)(53546011)(6506007)(6486002)(54906003)(66556008)(41300700001)(36756003)(66476007)(2616005)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YUdkUTdzWUNvWFRtbG9hNDVxdlFqSnBlakZDM0dwU2VCTXdpWlRpQnUxbzJL?=
+ =?utf-8?B?RVNIeVB0cGY2RFpSTHdGVXZDajZkbG8ydDVKRGZoQUd6eGlNV1MrT3VvOEFm?=
+ =?utf-8?B?SlYxaWZib1pZbjhCUm5pMUJWNHFROVdPUkxKZG55a0xxTXIxQkdWK0lMOG42?=
+ =?utf-8?B?dWJrVGpiNUwyZzVYcnRTMlowL09YWitYcWx0L2gxYmVkU3pxQUFTWVZBaUk5?=
+ =?utf-8?B?Y0tNcFU0T2lsNC9ZdFpkVTJRdzZmbTErOGFpUS9JRWNaR0JaS2ROSFM1YkV5?=
+ =?utf-8?B?Z3VXZm83NWxQR05CeEk0VVJaR2pGc3JPR0R3VjVJMVpyZ3doMUFxd0hnZFBY?=
+ =?utf-8?B?dCtzbVlpOWFFRGlXdXdXMU5rM0szZXIwQXM0amJJdnh1OGNhUk0zbUhQQkt2?=
+ =?utf-8?B?eGdKWWV0eVkybHE5TkFVVW5aNUNxSzJXeklyMnBycDlXY3RvRFdrNFdSODNx?=
+ =?utf-8?B?aEtXRW5qU1RpVnZqamNhZW9JbUdEbCtZdmhoZlFrRC9rMm9nNUZqcisxejE1?=
+ =?utf-8?B?QWZXVzdCM3NHcERLZDk1ajU4b0VNMkpRM3RoMUs3a3RyQVZGYVo4NVMxYlM2?=
+ =?utf-8?B?bW9VbVRaUmRxZWdqem5tTDd2Y3lFTkpmYkt1OUVYT1U3bTB6a3B5cm14VGpr?=
+ =?utf-8?B?YVBDVFdVSG5mbHNkUTE3bm5pYW5rRHpNT1NuSmU2b1ZVR1Ayd0pnamVLTGh2?=
+ =?utf-8?B?cmJKUitGOFh2WmhXa2g0dk9YWkpPQlh0M3ltWmxURERvKy9DV0VqcjVyWHJi?=
+ =?utf-8?B?NEdIekVjcmlubVc4RTUvdjBxZXQ5Yi9kcXl3U2pzVFd3blhReG1iSmFNbkhV?=
+ =?utf-8?B?bENiS3FTWDlDYm52T3E1eXpsQ0tMcmsyYXdJdkU1MkRwOFl2aFA3OEFhcWJW?=
+ =?utf-8?B?VVpHY2NTTlhIZFpnTGQvZFVQVXk1cjRUTnduOWY5eXRYeXM3NFVMRHk5dWhx?=
+ =?utf-8?B?L2h5N2RxTnI1N016MHFuQmpvYk9ZaE9JanA1OStNSU9ZNFRXYmd0YklURlpX?=
+ =?utf-8?B?VWtUQWFhQjQwSEsxSjd1WEFLMVlHUE1ZZEJiTHFXdHVnRjc3elZ1RjhwUGsw?=
+ =?utf-8?B?KzZWQlRmakJIRDhvZjlSUmRPNndlYTFGRkxKZ29QanpxVVh2dFdBV0R1U0lB?=
+ =?utf-8?B?ZUVUZW9YZm9Hdjk3SG5hWnhPcnVtQXBtdVJCMnZkRnFpVDkrWVdwZW44cDRm?=
+ =?utf-8?B?SGQ2Zmd0KzIyUWQvNURyeHBuTE16d2d0czFuLythRjEwVFEvNGEvZmJQck9z?=
+ =?utf-8?B?TDZIUFpMR0poQlA5bS9KcGxKTW1vSW9LaGxuZkgzUHRURzdZWHF3R0tMSWht?=
+ =?utf-8?B?Y2pTVzc1SVZSK0phTlJEckdaeXZhQ3RkR0dud3BtNlZlUEFia0o1Skt4a3Vr?=
+ =?utf-8?B?bmhoUTRPaWl5ZXRaZ3NOeDE4V0pDQU1FR2hoNm1mdlk2L2NKWUZlZXp0VGtq?=
+ =?utf-8?B?Lzc4dmNQWFMwT2drbDdLNGYzQXA2YVROd01SdDdKb3NLSmw3VlpUSTdINndM?=
+ =?utf-8?B?LytBQ3p0QWplQjRXSzNJTTFwdjhEenR5NC84Y1dValg4UnhWckNhM1lrZEtq?=
+ =?utf-8?B?cklyQXM3OVBsd0pnaWhpcXQzdDZqS1NEQkpVOUZydXA4ZXRNVUJzS1dLYU9Q?=
+ =?utf-8?B?bkIxUzlUUm5QdUxHeEdnT0c2SHlobWgvOHhCSmhwcWJGbGdBbSs5ckdmakhh?=
+ =?utf-8?B?RXQ2ZHFxWXJHU09oSmZCeDBLNHFDUU11Nitha2lIRXdPeUJQbWd0Qlo1eVg4?=
+ =?utf-8?B?eE9yMnpldHhDYnEyTXp6RWhsbGRnWW1xSFhMUjNWM3lWOFFnYXoxMUxhK3Rl?=
+ =?utf-8?B?R1YxYTlWdlczNW4vb0hKM3VHZ3N2QzBDWXF6ekU0bDhxQjhNOFNiM1dRUWJN?=
+ =?utf-8?B?VkVjN09CZzhCL3J5aEt1UXM5RlZCSXViY3Y5VVJJV2pOTStYT0VGWDNHZ0g1?=
+ =?utf-8?B?WmxvU0h5SE5oays5aUthOGdwK0RtVk9Vb3NYVzlzZDNQSUxVRGo5ZnJGL3Np?=
+ =?utf-8?B?alZEbVpmQWFHdUZVUEh4YnNTZ2ZDbGJ2M3BQUzdRSkoyQURjZDJIMnBaSWhp?=
+ =?utf-8?B?RVV0L0JVWlNoK0pTY1lmeHk4YVpUVWJidWtaVFBhSDZqRC9TNlpxV3o3L1BY?=
+ =?utf-8?B?emEzbVNHUnBpeU5FbG5vVDNqYkh6R3drN1pUU0E0Vnc5S0FReVBKMWZwN2xk?=
+ =?utf-8?B?Wnc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?cVV1ZGhiZ2hFQXNSV1hXNTlpN28vS3h0Z3RsU2JwcEdmelZyZitlMWJMRi8x?=
+ =?utf-8?B?S1VHYkFKNEhEUzRaeUMzV25uRFJBQXZwS09VZ3MzTzkyNk5JQTg5Z0pxK2lw?=
+ =?utf-8?B?NENKZUxRd0FDb1g5eWh1aTN4dkxseU9DS01leUZDKy9ZejgrUTlKakdEUXBR?=
+ =?utf-8?B?REJINi93S3lKQ3NZNHhmVWV6b1ZxbzlDYmFBaUZhaUtHUTROanRRVWRha2lz?=
+ =?utf-8?B?elVua2VRaWxxSk56NzBzNWNZMEJCblhIdnQ1akZraFdrbmdDd1Arell1MDN6?=
+ =?utf-8?B?aWg5bnhXSFdseGdybGpaSjlHQTFReE5GRjlvZnJIUzUvelV4SjB3ZndUMnBs?=
+ =?utf-8?B?WGltQWhDZ0VES2pjWmdBMTdlb1VEUzFaQWdFUnM5TndBSlVjZG1sMThOMHNS?=
+ =?utf-8?B?YzVhRmZGa1BhQXVMUXFmL3FSY01HWitra2kwWnp1OW00MzJzN2pCMXU3TXVP?=
+ =?utf-8?B?RWZMVVBrTlo1d09mS3dYK0VUUjhseHVBK0RZanFZSlp2OFV1M3pTRTNMc2NB?=
+ =?utf-8?B?QWFpaTg0S3JPbG4vZGJLSHVvNERqaHhGenJHS3VTZHdyZWI4ekE2U3BLL0J4?=
+ =?utf-8?B?WHFUaWU5bFcya3lXeEFCNEZmbVZTckg2REd5b3VwdmZwUmluUGNoMlZ5clJI?=
+ =?utf-8?B?OVlGWmI0WWdjOVNiZnJvNVNXVjUwYytnLzRuY1pOZ0VkUTdnd3l2RFZDOVZZ?=
+ =?utf-8?B?MjRhNmUxblQ3aHZVOUgxWC9QRlQ0RkF0SWduR2NmVjFOU1l3MG9MOW9QMEgx?=
+ =?utf-8?B?Q0ZRTGVEdXFtQ0xiZnI1VWxLZk1Eelp5RzNWV3pRMitySEpUSFI0ZENYME1w?=
+ =?utf-8?B?bW8wY3BDUmRTdW9SWkY2OTFqKzdVMWo2ZUoyNVluOWd2SjNaOWZINFB2aDdp?=
+ =?utf-8?B?WG1VdGVFWkVzVlJ5d1I4amF3YTkrVTBwRGZ2RFVvSFcrS3BmZmIyNnY4di9j?=
+ =?utf-8?B?cTJydkJXOExScjFCalJMK2NYS1Y5K2NGaUZTWThVdFlpeWJSM2E2SnNjYjlU?=
+ =?utf-8?B?Qi9McVVPSEZrSkFsK0IxYlEwTXhUd3VFR1lqeVVTT1d4enlGcm5zR3B4RVZK?=
+ =?utf-8?B?MFlLR1cvc2ZtZGc1ejU2dnVMQmhTQ2RKZ0t5M1h4RTFmbXZBS2ZvZU1XSXlF?=
+ =?utf-8?B?QUt0Q29KYUQ0SndSWEdkSTNpMWdNWWhtd1JEYzY3aWpjdDN6OFhRSElRZDFz?=
+ =?utf-8?B?bUtWZ2JxK1E1Y3RzallJNlY3M3BVUlFVeCt3ekV6R3ZoUU9zQ0pIazE1bm9r?=
+ =?utf-8?B?K2tDV21wU0JMNjdYZDdTLy9lQUlSR3Bkb1Byc1pYdEZoSWZQVVdQemdpVGNK?=
+ =?utf-8?B?Z3FzNG1GNlp1QUFtRGVZcHAyUjk1VGM4RittM2thRDNlUEt6NEhod2dmaHVx?=
+ =?utf-8?B?U2hxV2tnRGRMM2dHQ3ZEZ0l0S3NDdTJ3S1IzMmdKSkhWOHpPS3hFRFlHNlRu?=
+ =?utf-8?Q?rgZ8o7B2?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6fc806c-99da-486c-a0a3-08dbbda70613
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 09:08:46.4006
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uuL4ed0Vd/p1tzeupG34aAIK5H4BN61TCZK0zQX1N4juinpU7EB56xue1U83ShbzUDS2DI8e5uPEVp/fho1sQ1Hk2/y8aaYVJ6OaYuGCDhE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB5811
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_04,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2309250066
+X-Proofpoint-ORIG-GUID: QMVYfU-lu5mF5NBgxCSab9lC6zS0ila5
+X-Proofpoint-GUID: QMVYfU-lu5mF5NBgxCSab9lC6zS0ila5
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/2023 4:29 PM, Xiong Zhang wrote:
-> Arch PMU version 4 adds a streamlined FREEZE_LBR_ON_PMI feature, this
-> feature adds LBR_FRZ[bit 58] into IA32_PERF_GLOBAL_STATUS, this bit is
-> set due to the following conditions:
-> -- IA32_DEBUGCTL.FREEZE_LBR_ON_PMI has been set
-> -- A performance counter, configured to generate PMI, has overflowed to
-> signal a PMI. Consequently the LBR stack is frozen.
-> Effectively, this bit also serves as a control to enabled capturing
-> data in the LBR stack. When this bit is set, LBR stack is frozen, and
-> new LBR records won't be filled.
->
-> The sequence of streamlined freeze LBR is:
-> 1. Profiling agent set IA32_DEBUGCTL.FREEZE_LBR_ON_PMI, and enable
-> a performance counter to generate PMI on overflow.
-> 2. Processor generates PMI and sets IA32_PERF_GLOBAL_STATUS.LBR_FRZ,
-> then LBR stack is forzen.
-> 3. Profiling agent PMI handler handles overflow, and clears
-> IA32_PERF_GLOBAL_STATUS.
-> 4. When IA32_PERF_GLOBAL_STATUS.LBR_FRZ is cleared in step 3,
-> processor resume LBR stack, and new LBR records can be filled
-> again.
->
-> In order to emulate this behavior, LBR stack must be frozen on guest
-> vPMI. KVM has two choice to do this:
-> 1. KVM stops vLBR event through perf_event_pause(), and put vLBR
-> event into off state, then vLBR lose LBR hw resource, finally guest
-> couldn't read LBR records in guest PMI handler. This choice couldn't
-> be used.
-> 2. KVM clears guest DEBUGCTLMSR_LBR bit in VMCS on PMI, so when guest
-> is running, LBR HW stack is disabled, while vLBR event is still active
-> and own LBR HW, so guest could still read LBR records in guest PMI
-> handler. But the sequence of streamlined freeze LBR doesn't clear
-> DEBUGCTLMSR_LBR bit, so when guest read guest DEBUGCTL_MSR, KVM will
-> return a value with DEBUGCTLMSR_LBR bit set during LBR freezing. Once
-> guest clears IA32_PERF_GLOBAL_STATUS.LBR_FRZ in step 4, KVM will
-> re-enable guest LBR through setting guest DEBUGCTL_LBR bit in VMCS.
->
-> As KVM needs re-enable guest LBR when guest clears global status, the
-> handling of GLOBAL_OVF_CTRL MSR is moved from common pmu.c into
-> vmx/pmu_intel.c.
->
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->   arch/x86/include/asm/msr-index.h |  1 +
->   arch/x86/kvm/pmu.c               |  8 ------
->   arch/x86/kvm/vmx/pmu_intel.c     | 49 ++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/vmx.c           |  7 +++++
->   4 files changed, 57 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 1d111350197f..badc2f729a8e 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -1054,6 +1054,7 @@
->   /* PERF_GLOBAL_OVF_CTL bits */
->   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT	55
->   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI		(1ULL << MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT)
-> +#define MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE		BIT_ULL(58)
->   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF_BIT		62
->   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF			(1ULL <<  MSR_CORE_PERF_GLOBAL_OVF_CTRL_OVF_BUF_BIT)
->   #define MSR_CORE_PERF_GLOBAL_OVF_CTRL_COND_CHGD_BIT		63
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index edb89b51b383..4b6a508f3f0b 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -640,14 +640,6 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			reprogram_counters(pmu, diff);
->   		}
->   		break;
-> -	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> -		/*
-> -		 * GLOBAL_OVF_CTRL, a.k.a. GLOBAL STATUS_RESET, clears bits in
-> -		 * GLOBAL_STATUS, and so the set of reserved bits is the same.
-> -		 */
-> -		if (data & pmu->global_status_mask)
-> -			return 1;
-> -		fallthrough;
->   	case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
->   		if (!msr_info->host_initiated)
->   			pmu->global_status &= ~data;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index c8d46c3d1ab6..6e3bbe777bf5 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -426,6 +426,34 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   
->   		pmu->pebs_data_cfg = data;
->   		break;
-> +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +		/*
-> +		 * GLOBAL_OVF_CTRL, a.k.a. GLOBAL STATUS_RESET, clears bits in
-> +		 * GLOBAL_STATUS, and so the set of reserved bits is the same.
-> +		 */
-> +		if (data & pmu->global_status_mask)
-> +			return 1;
-> +
-> +		/*
-> +		 * Guest clears GLOBAL_STATUS_LBR_FREEZE bit, KVM re-enable
-> +		 * Guset LBR which is disabled at vPMI injection for streamlined
-> +		 * Freeze_LBR_On_PMI.
-> +		 */
-> +		if (pmu->version >= 4 && !msr_info->host_initiated &&
-> +		    (data & MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE) &&
-> +		    (pmu->global_status & MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE)) {
-> +			u64 debug_ctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +
-> +			if (!(debug_ctl & DEBUGCTLMSR_LBR)) {
-> +				debug_ctl |= DEBUGCTLMSR_LBR;
-> +				vmcs_write64(GUEST_IA32_DEBUGCTL, debug_ctl);
-> +			}
 
 
-I'm thinking if we can enable guest LBR directly here. I'm afraid that 
-some guest handlers may not follow the SDM strictly and they may disable 
-LBR before writing GLOBAL_OVF_CTRL in guest PMI handler, then we should 
-not enable LBR directly here.
+On 25/09/2023 08:01, Baolu Lu wrote:
+> On 9/23/23 9:25 AM, Joao Martins wrote:
+>> IOMMU advertises Access/Dirty bits for second-stage page table if the
+>> extended capability DMAR register reports it (ECAP, mnemonic ECAP.SSADS).
+>> The first stage table is compatible with CPU page table thus A/D bits are
+>> implicitly supported. Relevant Intel IOMMU SDM ref for first stage table
+>> "3.6.2 Accessed, Extended Accessed, and Dirty Flags" and second stage table
+>> "3.7.2 Accessed and Dirty Flags".
+>>
+>> First stage page table is enabled by default so it's allowed to set dirty
+>> tracking and no control bits needed, it just returns 0. To use SSADS, set
+>> bit 9 (SSADE) in the scalable-mode PASID table entry and flush the IOTLB
+>> via pasid_flush_caches() following the manual. Relevant SDM refs:
+>>
+>> "3.7.2 Accessed and Dirty Flags"
+>> "6.5.3.3 Guidance to Software for Invalidations,
+>>   Table 23. Guidance to Software for Invalidations"
+>>
+>> PTE dirty bit is located in bit 9 and it's cached in the IOTLB so flush
+>> IOTLB to make sure IOMMU attempts to set the dirty bit again. Note that
+>> iommu_dirty_bitmap_record() will add the IOVA to iotlb_gather and thus
+>> the caller of the iommu op will flush the IOTLB. Relevant manuals over
+>> the hardware translation is chapter 6 with some special mention to:
+>>
+>> "6.2.3.1 Scalable-Mode PASID-Table Entry Programming Considerations"
+>> "6.2.4 IOTLB"
+>>
+>> Signed-off-by: Joao Martins<joao.m.martins@oracle.com>
+>> ---
+>> The IOPTE walker is still a bit inneficient. Making sure the UAPI/IOMMUFD is
+>> solid and agreed upon.
+>> ---
+>>   drivers/iommu/intel/iommu.c | 94 +++++++++++++++++++++++++++++++++++++
+>>   drivers/iommu/intel/iommu.h | 15 ++++++
+>>   drivers/iommu/intel/pasid.c | 94 +++++++++++++++++++++++++++++++++++++
+>>   drivers/iommu/intel/pasid.h |  4 ++
+>>   4 files changed, 207 insertions(+)
+> 
+> The code is probably incomplete. When attaching a domain to a device,
+> check the domain's dirty tracking capability against the device's
+> capabilities. If the domain's dirty tracking capability is set but the
+> device does not support it, the attach callback should return -EINVAL.
+> 
+Yeap, I did that for AMD, but it seems in the mix of changes I may have deleted
+and then forgot to include it here.
 
+Here's what I added (together with consolidated cap checking):
 
-> +			vcpu_to_lbr_desc(vcpu)->state = LBR_STATE_IN_USE;
-> +		}
-> +
-> +		if (!msr_info->host_initiated)
-> +			pmu->global_status &= ~data;
-> +		break;
->   	default:
->   		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->   		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> @@ -565,6 +593,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->   	if (vmx_pt_mode_is_host_guest())
->   		pmu->global_status_mask &=
->   				~MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI;
-> +	if (pmu->version >= 4)
-> +		pmu->global_status_mask &=
-> +				~MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE;
->   
->   	entry = kvm_find_cpuid_entry_index(vcpu, 7, 0);
->   	if (entry &&
-> @@ -675,6 +706,22 @@ static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
->   	}
->   }
->   
-> +static void intel_pmu_streamlined_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +
-> +	/*
-> +	 * Even if streamlined freezing LBR won't clear LBR_EN like legacy
-> +	 * freezing LBR, here legacy freezing LBR is called to freeze LBR HW
-> +	 * for streamlined freezing LBR when guest run. But guest VM will
-> +	 * see a fake guest DEBUGCTL MSR with LBR_EN bit set.
-> +	 */
-> +	intel_pmu_legacy_freezing_lbrs_on_pmi(vcpu);
-> +	if ((data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) && (data & DEBUGCTLMSR_LBR))
-> +		pmu->global_status |= MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE;
-> +}
-> +
->   static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
->   {
->   	u8 version = vcpu_to_pmu(vcpu)->version;
-> @@ -684,6 +731,8 @@ static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
->   
->   	if (version > 1 && version < 4)
->   		intel_pmu_legacy_freezing_lbrs_on_pmi(vcpu);
-> +	else if (version >= 4)
-> +		intel_pmu_streamlined_freezing_lbrs_on_pmi(vcpu);
->   }
->   
->   static void vmx_update_intercept_for_lbr_msrs(struct kvm_vcpu *vcpu, bool set)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 565df8eeb78b..66e4cf714dbd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2113,6 +2113,13 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		break;
->   	case MSR_IA32_DEBUGCTLMSR:
->   		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +		/*
-> +		 * In streamlined Freeze_LBR_On_PMI, guest should see LBR_EN.
-> +		 */
-> +		if ((vcpu_to_pmu(vcpu)->global_status &
-> +		     MSR_CORE_PERF_GLOBAL_OVF_CTRL_LBR_FREEZE) &&
-> +		    vcpu_to_pmu(vcpu)->version >= 4)
-> +			msr_info->data |= DEBUGCTLMSR_LBR;
->   		break;
->   	default:
->   	find_uret_msr:
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index 7d5a8f5283a7..fabfe363f1f9 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -4075,6 +4075,11 @@ static struct iommu_domain
+*intel_iommu_domain_alloc(unsigned type)
+        return NULL;
+ }
+
++static bool intel_iommu_slads_supported(struct intel_iommu *iommu)
++{
++       return sm_supported(iommu) && ecap_slads(iommu->ecap);
++}
++
+ static struct iommu_domain *
+ intel_iommu_domain_alloc_user(struct device *dev, u32 flags)
+ {
+@@ -4090,7 +4095,7 @@ intel_iommu_domain_alloc_user(struct device *dev, u32 flags)
+                return ERR_PTR(-EOPNOTSUPP);
+
+        if (enforce_dirty &&
+-           !device_iommu_capable(dev, IOMMU_CAP_DIRTY))
++           !intel_iommu_slads_supported(iommu))
+                return ERR_PTR(-EOPNOTSUPP);
+
+        domain = iommu_domain_alloc(dev->bus);
+@@ -4121,6 +4126,9 @@ static int prepare_domain_attach_device(struct
+iommu_domain *domain,
+        if (dmar_domain->force_snooping && !ecap_sc_support(iommu->ecap))
+                return -EINVAL;
+
++       if (domain->dirty_ops && !intel_iommu_slads_supported(iommu))
++               return -EINVAL;
++
+        /* check if this iommu agaw is sufficient for max mapped address */
+        addr_width = agaw_to_width(iommu->agaw);
+        if (addr_width > cap_mgaw(iommu->cap))
+@@ -4376,8 +4384,7 @@ static bool intel_iommu_capable(struct device *dev, enum
+iommu_cap cap)
+        case IOMMU_CAP_ENFORCE_CACHE_COHERENCY:
+                return ecap_sc_support(info->iommu->ecap);
+        case IOMMU_CAP_DIRTY:
+-               return sm_supported(info->iommu) &&
+-                       ecap_slads(info->iommu->ecap);
++               return intel_iommu_slads_supported(info->iommu);
+        default:
+                return false;
+        }
