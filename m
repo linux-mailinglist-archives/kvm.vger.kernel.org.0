@@ -2,61 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05D937AD137
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 09:15:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E94F7AD1CA
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 09:34:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbjIYHPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 03:15:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
+        id S231816AbjIYHeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 03:34:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjIYHPF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 03:15:05 -0400
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24DD0B8
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 00:14:58 -0700 (PDT)
-X-ASG-Debug-ID: 1695626094-1eb14e75133b550001-HEqcsx
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id MSxhqgC9b91u0ZgS (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 25 Sep 2023 15:14:54 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Sep
- 2023 15:14:54 +0800
-Received: from ewan-server.zhaoxin.com (10.28.66.44) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Sep
- 2023 15:14:53 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-From:   EwanHai <ewanhai-oc@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.163
-To:     <pbonzini@redhat.com>, <mtosatti@redhat.com>, <kvm@vger.kernel.org>
-CC:     <qemu-devel@nongnu.org>
-Subject: [PATCH] target/i386/kvm: Refine VMX controls setting for backward compatibility
-Date:   Mon, 25 Sep 2023 03:14:53 -0400
-X-ASG-Orig-Subj: [PATCH] target/i386/kvm: Refine VMX controls setting for backward compatibility
-Message-ID: <20230925071453.14908-1-ewanhai-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S231666AbjIYHeF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 03:34:05 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38337E3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 00:33:59 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c1ff5b741cso52762325ad.2
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 00:33:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695627238; x=1696232038; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xoq9tonJDF7O8TjeJt+gs97EwKEgJk3CGCFSg15mnDg=;
+        b=Y0UekZAb1L7fMJoQ6Tiv1sCbk/QvfX2nGIvPfLznKebV1WCoY45/A0rjQMQkNmshf0
+         3LTm8TRnyoXVOVJ6zx9LmK9C9tlJ03Aa/wI7PMWuEtnfvOLKHNJ+JEHQoNPi+MENClOf
+         iytpZBJ2kWdECufkmAbOA6lHr9dMFwqlq4zTqrubKRK94WRVOvpAdmPJoq3jqYNHoY8l
+         mkaCJChXbHYyPdokBKqfx3PSmn3qvjXe3+Ho4yRBevqr3QaKnY9eKx5LhoEcDPPcVaZv
+         IEG5yt1F0StPG4J8elofUNf7wM7EhfKh6Sg1dMIPfJ7wQM6kVmKET2ph+L8buMp03gUt
+         fL7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695627238; x=1696232038;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xoq9tonJDF7O8TjeJt+gs97EwKEgJk3CGCFSg15mnDg=;
+        b=vL6nkrAdq//eW3tvNmJrHZMQd5I0+0XRN/VgmkOROfLhWV9pUCdyj0tYoAfLCKCJxX
+         iD/gmxp5aMcSYc3RCmkRL6hwPdN90Whn8FKk6UjcODwROBWHWcZ2d4/3KKKTK725NQGT
+         szb8yCO6X/1aR4WNWiQEerD8g5a+EF8gQqzUVVRR4IyBctoy5CMZ2TWRwd2n3H6ouHWM
+         IZjv1DkqJ/J9qCwGkg3eWkQxJseTJoSDppmW+UhZ1WhlpwO/9qjOBdGYOx9n+OZ8gLZ2
+         YJMfeIVVBO8bmXHFe4fStuoEUON2y8rPBSfhkJ5LEexYY8Fa8wihlLo45avS1G7uDMvq
+         P71w==
+X-Gm-Message-State: AOJu0Yzo8bSwonYNIvEuhhuUJvbLLgePYHrX48gAriWBbptOn3Qh4GoO
+        XnKyIvYb/OfuFioi19DttQY=
+X-Google-Smtp-Source: AGHT+IHzk/vqDuwR904ckgo3sge4s+85ATpkmiKMm2s9v1tdkrJTMUR51nik+ek3lgbYRQlnnc8cUw==
+X-Received: by 2002:a17:902:e888:b0:1c5:ba50:2b28 with SMTP id w8-20020a170902e88800b001c5ba502b28mr8160737plg.25.1695627238632;
+        Mon, 25 Sep 2023 00:33:58 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id ay6-20020a1709028b8600b001b53c8659fesm8036805plb.30.2023.09.25.00.33.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Sep 2023 00:33:57 -0700 (PDT)
+Message-ID: <555b7c91-4fbb-b18d-d425-7f5259fce5db@gmail.com>
+Date:   Mon, 25 Sep 2023 15:33:51 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+References: <20230901185646.2823254-1-jmattson@google.com>
+ <ZQ3hD+zBCkZxZclS@google.com>
+ <CALMp9eRQKUy7+AXWepsuJ=KguVMTTcgimeEjd3zMnEP-3LEDKg@mail.gmail.com>
+ <ZQ3pQfu6Zw3MMvKx@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZQ3pQfu6Zw3MMvKx@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.28.66.44]
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1695626094
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 1962
-X-Barracuda-BRTS-Status: 0
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.114571
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,55 +81,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 4a910e1 ("target/i386: do not set unsupported VMX secondary
-execution controls") implemented a workaround for hosts that have
-specific CPUID features but do not support the corresponding VMX
-controls, e.g., hosts support RDSEED but do not support RDSEED-Exiting.
+On 23/9/2023 3:21 am, Sean Christopherson wrote:
+> On Fri, Sep 22, 2023, Jim Mattson wrote:
+>> On Fri, Sep 22, 2023 at 11:46 AM Sean Christopherson <seanjc@google.com> wrote:
+>>>
+>>> On Fri, Sep 01, 2023, Jim Mattson wrote:
+>>>> When the irq_work callback, kvm_pmi_trigger_fn(), is invoked during a
+>>>> VM-exit that also invokes __kvm_perf_overflow() as a result of
+>>>> instruction emulation, kvm_pmu_deliver_pmi() will be called twice
+>>>> before the next VM-entry.
+>>>>
+>>>> That shouldn't be a problem. The local APIC is supposed to
+>>>> automatically set the mask flag in LVTPC when it handles a PMI, so the
+>>>> second PMI should be inhibited. However, KVM's local APIC emulation
+>>>> fails to set the mask flag in LVTPC when it handles a PMI, so two PMIs
+>>>> are delivered via the local APIC. In the common case, where LVTPC is
+>>>> configured to deliver an NMI, the first NMI is vectored through the
+>>>> guest IDT, and the second one is held pending. When the NMI handler
+>>>> returns, the second NMI is vectored through the IDT. For Linux guests,
+>>>> this results in the "dazed and confused" spurious NMI message.
+>>>>
+>>>> Though the obvious fix is to set the mask flag in LVTPC when handling
+>>>> a PMI, KVM's logic around synthesizing a PMI is unnecessarily
+>>>> convoluted.
+>>>
+>>> To address Like's question about whether not this is necessary, I think we should
+>>> rephrase this to explicitly state this is a bug irrespective of the whole LVTPC
+>>> masking thing.
+>>>
+>>> And I think it makes sense to swap the order of the two patches.  The LVTPC masking
+>>> fix is a clearcut architectural violation.  This is a bit more of a grey area,
+>>> though still blatantly buggy.
+>>
+>> The reason I ordered the patches as I did is that when this patch
+>> comes first, it actually fixes the problem that was introduced in
+>> commit 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring
+>> instructions"). If this patch comes second, it's less clear that it
+>> fixes a bug, since the other patch renders this one essentially moot.
+> 
+> Yeah, but as Like pointed out, the way the changelog is worded just raises the
+> question of why this change is necessary.
+> 
+> I think we should tag them both for stable.  They're both bug fixes, regardless
+> of the ordering.
+> 
 
-In detail, commit 4a910e1 introduced a flag `has_msr_vmx_procbased_clts2`.
-If KVM has `MSR_IA32_VMX_PROCBASED_CTLS2` in its msr list, QEMU would
-use KVM's settings, avoiding any modifications to this MSR.
-
-However, this commit (4a910e1) didn’t account for cases in older Linux
-kernels(e.g., linux-4.19.90) where `MSR_IA32_VMX_PROCBASED_CTLS2` is
-in `kvm_feature_msrs`—obtained by ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST),
-but not in `kvm_msr_list`—obtained by ioctl(KVM_GET_MSR_INDEX_LIST).
-As a result,it did not set the `has_msr_vmx_procbased_clts2` flag based
-on `kvm_msr_list` alone, even though KVM maintains the value of this MSR.
-
-This patch supplements the above logic, ensuring that
-`has_msr_vmx_procbased_clts2` is correctly set by checking both MSR
-lists, thus maintaining compatibility with older kernels.
-
-Signed-off-by: EwanHai <ewanhai-oc@zhaoxin.com>
----
- target/i386/kvm/kvm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index af101fcdf6..6299284de4 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2343,6 +2343,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
- static int kvm_get_supported_feature_msrs(KVMState *s)
- {
-     int ret = 0;
-+    int i;
- 
-     if (kvm_feature_msrs != NULL) {
-         return 0;
-@@ -2377,6 +2378,11 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
-         return ret;
-     }
- 
-+    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
-+        if (kvm_feature_msrs->indices[i] == MSR_IA32_VMX_PROCBASED_CTLS2) {
-+            has_msr_vmx_procbased_ctls2 = true;
-+        }
-+    }
-     return 0;
- }
- 
--- 
-2.34.1
-
+In the semantics of "at most one PMI per VM exit", what if the PMI-caused
+vm-exit itself triggers a guest counter overflow and triggers vPMI (for
+example, at this time the L1 guest is counting the number of vm-exit events
+from the L2 guest), will the latter interrupt be swallowed by L0 KVM ? What
+is the correct expectation ? It may be different on Intel and AMD.
