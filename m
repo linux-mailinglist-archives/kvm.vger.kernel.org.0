@@ -2,201 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB89D7ADE72
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 20:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B7A07ADE86
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 20:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbjIYSRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 14:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45728 "EHLO
+        id S233157AbjIYSSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 14:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbjIYSRg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 14:17:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 730208E
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695665801;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NFY8KO7exZJuGoSNda4VqGBb8Equ+XlWtrdZ2h/i9EE=;
-        b=S29OvmRBJCjtA6wWvHsAJ8aECx7oTqE8EF+TBn4g2qlmLuQN+HIaLKdK7LOnSc592WxqoO
-        mbLc493KrzeRwPtcR+8DlYcLeY+Aj0gRHnZ52WbZc1fBtSW531yISF9auJl0BsMmceEzzM
-        NLJkKS1yVHNPj83JOrimUXZH21o5XL0=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-184-pmWyiFMUNhy_ZkbuE1RWHQ-1; Mon, 25 Sep 2023 14:16:39 -0400
-X-MC-Unique: pmWyiFMUNhy_ZkbuE1RWHQ-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-1dcf9fda747so9652301fac.1
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 11:16:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695665798; x=1696270598;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NFY8KO7exZJuGoSNda4VqGBb8Equ+XlWtrdZ2h/i9EE=;
-        b=Vn06n4DrCQaYfvsdyiweSazWnKout9lhpTDp8KCGWwQjQ8EgKpkizraHEPQp40qSCB
-         orDqvQHfBvP/eQhJDZA3eugYcah0uBxqMS+nxAMSDGTZyVVKHQIBOPz5g7DYctfP8wWp
-         EUii7H2fiJIllTUr2PNhxvpGCJxx56nSW3nCFzigCqnJ9h5cJk4Xnpxo1uvIe4v9e/Hq
-         A269EkSMPM7g+Ak9aCMYs7EeewJO4KqLVBDOfNts7T3j06PZc8svh+WXNyoPnnxLO06H
-         2zPC8xYgUU10JgNDfOYyXHVfm6MDFdU0gMOapFPsolgItLSd17yLpFjK0lP8ThV8KdJL
-         jSmA==
-X-Gm-Message-State: AOJu0YzNIcaFdgdwFD5CCzkKDiXu0mQ+ZURv0qdX7CKbfOHOBviq/+UY
-        nwVp2Ql9ahmDRgwEb+xqZnzUQ9rmpqfr1oJgxMigh/MVVRjK+69TV7HVlHegLeHUxBfQg/wXIds
-        hzo8XFeXnAIdV
-X-Received: by 2002:a05:6870:41c7:b0:1c0:2e8f:17fd with SMTP id z7-20020a05687041c700b001c02e8f17fdmr10557340oac.40.1695665798584;
-        Mon, 25 Sep 2023 11:16:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFwXE1LPmfUYbPthMNSP0cmJcMi8DExG+rfbujPW1+QPh8DQXLcBnujK+Md9C5G0HWt8tsanw==
-X-Received: by 2002:a05:6870:41c7:b0:1c0:2e8f:17fd with SMTP id z7-20020a05687041c700b001c02e8f17fdmr10557305oac.40.1695665798203;
-        Mon, 25 Sep 2023 11:16:38 -0700 (PDT)
-Received: from redhat.com ([185.184.228.174])
-        by smtp.gmail.com with ESMTPSA id cx4-20020a05620a51c400b007743382121esm941451qkb.84.2023.09.25.11.16.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 11:16:37 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 14:16:30 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
+        with ESMTP id S233267AbjIYSS2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 14:18:28 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2055.outbound.protection.outlook.com [40.107.223.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C3EE58;
+        Mon, 25 Sep 2023 11:18:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oJTD/OlVsTF3+RJxAu31mjT5KsZ0yyTGWzwhfAYvuFxk+0Z9rnRZZBcBjATcvK5eEiBxTQ9Z5HRr9NEn3MJFlVJBkYZ5sIMQp7y+/liV5fp10czA0elG5EUc0N878xkvGEmOyxm9aj0nc8cQKcJH3BkAPAXJ9Eb8leZjuRV1KHJvi6x/YEqqrZiQC5u5RyhnmjGnMJ3mBeiG3gFg9CySoatRwXPwbbYQld0DEd1/+QajwTYZuBhqTsYpCPlwWl3BObPoeLu+6M5LuaVh6Dqi0y5wSF+rUfyzvSAZxLdOKerDiXKjc57Mq2avYNNQo0sNnFN16Xae8IESmxmT2IOE5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/NchV+bYWyhxLSi9oE1VoshpekonTOldxtuUD6Wbpvo=;
+ b=MpDcJgfBr6DOsK6MR4qreyIqcIFP7n9eTiJZ2Vxq08pddnH4pSZO7UVSZw1L9UM1R4P9yL0tsUc5GETG4Z/5/rZkrz3yRKwE+eQ+8H00FD54xoTp+zP/ip5CKH6hCZjlnGLvebt5qy0Z++sB8VvpaSXaxjTjd2pGCkgZ+kQKQm11oLQKlD8QwaScdFPF7uf4k7ovCQWzJtlY77U3ay+k4ktC0dMQTR/8BVVCT42QUHVtdgnHbMwQtmwYwqCwU/QGrkK7tHbLUuY7rCNqgYF1Fh8nq9jMQpp6o+49UR7EVqn5sdzfI+Bmsldq4UsT/EbQhUKtNikc0Q4c2O5hDZo2zQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/NchV+bYWyhxLSi9oE1VoshpekonTOldxtuUD6Wbpvo=;
+ b=PJW+bc1sKvf7RFS3tTQQCY/fOHYI1IiSCTqIe/tlVi/A2k6LI3PP4xqTyg1aeMLIPEUX799jXPydpWMSaeBc/LBaFfcf3cidVP6qF2ManCELBLf75zqvhz1E43PffbTA4bTJ70WvpBW79xVi9s68bLtpnBS44DCKR1tU6e46IMdZPL2rPxU85/WHr4up5lySQxEGTndTD/fpKW+Gzp7mxPnTf8evcWrrDmdw2nUBGuX4vtB09iSnix74rssN55ET/kRcTaRqkahqpdgPWxNNcnBUPgUxpyxxEigaLZ88tvitYaQ6Bl/ZxbrAwNFy6ESdi2ZcbmA+a2xBGMGHHBcEog==
+Received: from DS7PR03CA0049.namprd03.prod.outlook.com (2603:10b6:5:3b5::24)
+ by BL1PR12MB5876.namprd12.prod.outlook.com (2603:10b6:208:398::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Mon, 25 Sep
+ 2023 18:18:06 +0000
+Received: from DS1PEPF00017099.namprd05.prod.outlook.com
+ (2603:10b6:5:3b5:cafe::81) by DS7PR03CA0049.outlook.office365.com
+ (2603:10b6:5:3b5::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
+ Transport; Mon, 25 Sep 2023 18:18:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS1PEPF00017099.mail.protection.outlook.com (10.167.18.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.14 via Frontend Transport; Mon, 25 Sep 2023 18:18:06 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Sep
+ 2023 11:17:54 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Mon, 25 Sep 2023 11:17:53 -0700
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Mon, 25 Sep 2023 11:17:52 -0700
+Date:   Mon, 25 Sep 2023 11:17:51 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230925133637-mutt-send-email-mst@kernel.org>
-References: <20230921131035-mutt-send-email-mst@kernel.org>
- <20230921174450.GT13733@nvidia.com>
- <20230921135426-mutt-send-email-mst@kernel.org>
- <20230921181637.GU13733@nvidia.com>
- <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <CACGkMEt=dxhJP4mUUWh+x-TSxA5JQcvmhJbkLJMWdN8oXV6ojg@mail.gmail.com>
- <20230922122501.GP13733@nvidia.com>
- <20230922111342-mutt-send-email-mst@kernel.org>
- <20230922161928.GS13733@nvidia.com>
+CC:     Baolu Lu <baolu.lu@linux.intel.com>, Yi Liu <yi.l.liu@intel.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>,
+        <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+        <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>
+Subject: Re: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
+ domain_alloc_user op
+Message-ID: <ZRHOz+uuJ9gGE2ZF@Asurada-Nvidia>
+References: <20230921075138.124099-1-yi.l.liu@intel.com>
+ <20230921075138.124099-2-yi.l.liu@intel.com>
+ <4b17d331-957b-44d3-8a19-0b2ccc59150b@linux.intel.com>
+ <ZQyuIQbyVk9p8C8o@Asurada-Nvidia>
+ <20230925130506.GA13733@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230922161928.GS13733@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230925130506.GA13733@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|BL1PR12MB5876:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98ffef03-393d-4dc6-62d1-08dbbdf3c3db
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: z0IpDxQWYHYWSeCjvhzAZzNZ6ztRjORw2ObdhBPK60Pq9tBxFSexAVRBKA1oWuxVFaRTPYyfaLiyzw0aUUEGD3gJQvGfz6q7EQT4ijuKSq9HZiM1ptegCCEgsDtOWdi3vViwOebtRwGcrOteUI+iLL3UOdLsJzvEgnhzDb21NYbQ1z0e3dSguxsZElvz+hlK925kmndTvw9nfdAC0lLHbVhKaiXjO/S4ywemeC5VPjcYSdtNW/BJ+fn4R5kPoTox5IFJyw0+6n0X94efbSn0+JHhWuVpLhi3KaaYTsNsH+i8z5pU/cueGYq8wWntyoEBEBp+j/Qbj3vdxAiqtFkLsG9bVqeS3UHRFZ6HjZMVbAj+hQmCmfX/ruPOJBS4tNi4no6fX3UWcjsVU/84u7jTvsrqfdO1SCJIJLW/Wy249dlHexwGci9TKLmcAINxkJO/RHzWWF8JXIt6KS2H9rFf6h+xac09EimHTk8oqQVGXvf3S+9Kw+PaSdKsMjONDTFHt/MkXcpXNcfW4LLTq06NNSKYCinsbYkyhqeuwn9UBTEwslo6rY+vt2w28X+b/agLXL7VfWvJv5ta41P5hv131ximplP8YmZANmlTkf+hzVRFrFgjbnXubpqXlbOleSHqZUNkeGw/8GL8oXXrPcgTRUPm8k2Kqg9SStiLG1kLO3PViJmqh3ik9QXo3fonX9LSwqpKFemQTMUhM9R8WSNFvjutPFhoni7q0x7SBhyw2i8ZodvCpVRvpTSJ/ypAk2+BlJk4YS5eghbxRnAMa9/cyA==
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(376002)(39860400002)(346002)(230922051799003)(82310400011)(1800799009)(451199024)(186009)(36840700001)(40470700004)(46966006)(70586007)(54906003)(4744005)(316002)(86362001)(70206006)(2906002)(82740400003)(33716001)(7636003)(41300700001)(6636002)(356005)(36860700001)(5660300002)(7416002)(47076005)(478600001)(55016003)(8936002)(6862004)(66899024)(4326008)(83380400001)(9686003)(26005)(40480700001)(40460700003)(8676002)(426003)(336012)(67856001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 18:18:06.2288
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98ffef03-393d-4dc6-62d1-08dbbdf3c3db
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017099.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5876
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 01:19:28PM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 22, 2023 at 11:39:19AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Sep 22, 2023 at 09:25:01AM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Sep 22, 2023 at 11:02:50AM +0800, Jason Wang wrote:
-> > > > On Fri, Sep 22, 2023 at 3:53 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > > > >
-> > > > > On Thu, Sep 21, 2023 at 03:34:03PM -0400, Michael S. Tsirkin wrote:
-> > > > >
-> > > > > > that's easy/practical.  If instead VDPA gives the same speed with just
-> > > > > > shadow vq then keeping this hack in vfio seems like less of a problem.
-> > > > > > Finally if VDPA is faster then maybe you will reconsider using it ;)
-> > > > >
-> > > > > It is not all about the speed.
-> > > > >
-> > > > > VDPA presents another large and complex software stack in the
-> > > > > hypervisor that can be eliminated by simply using VFIO.
-> > > > 
-> > > > vDPA supports standard virtio devices so how did you define
-> > > > complexity?
-> > > 
-> > > As I said, VFIO is already required for other devices in these VMs. So
-> > > anything incremental over base-line vfio-pci is complexity to
-> > > minimize.
-> > > 
-> > > Everything vdpa does is either redundant or unnecessary compared to
-> > > VFIO in these environments.
-> > > 
-> > > Jason
-> > 
-> > Yes but you know. There are all kind of environments.  I guess you
-> > consider yours the most mainstream and important, and are sure it will
-> > always stay like this.  But if there's a driver that does what you need
-> > then you use that.
+On Mon, Sep 25, 2023 at 10:05:06AM -0300, Jason Gunthorpe wrote:
+> On Thu, Sep 21, 2023 at 01:58:19PM -0700, Nicolin Chen wrote:
 > 
-> Come on, you are the one saying we cannot do things in the best way
-> possible because you want your way of doing things to be the only way
-> allowed. Which of us thinks "yours the most mainstream and important" ??
+> > Perhaps we could put all min_len defines in uAPI header, like:
+> > include/uapi/linux/gfs2_ondisk.h:442:#define LH_V1_SIZE (offsetofend(struct gfs2_log_header, lh_hash))
+> > In this way, drivers won't need to deal with that nor have risks
+> > of breaking ABI by changing a min_len.
 > 
-> I'm not telling you to throw away VPDA, I'm saying there are
-> legimitate real world use cases where VFIO is the appropriate
-> interface, not VDPA.
+> I don't think we need constants, just be sure that every call to 
+> iommu_copy_user_data() has an offsetof() as the last parameter.
 > 
-> I want choice, not dogmatic exclusion that there is Only One True Way.
-
-I don't particularly think there's only one way, vfio is already there.
-I am specifically thinking about this patch, for example it
-muddies the waters a bit: normally I think vfio exposed device
-with the same ID, suddenly it changes the ID as visible to the guest.
-But again, whether doing this kind of thing is OK is more up to Alex than me.
-
-I do want to understand if there's a use-case that vdpa does not address
-simply because it might be worth while to extend it to do so, and a
-bunch of people working on it are at Red Hat and I might have some input
-into how that labor is allocated. But if the use-case is simply "has to
-be vfio and not vdpa" then I guess not.
-
-
-
-
-> > You really should be explaining what vdpa *does not* do that you
-> > need.
+> Indeed perhaps you should put it in a macro and force this to happen eg:
 > 
-> I think I've done that enough, but if you have been following my
-> explanation you should see that the entire point of this design is to
-> allow a virtio device to be created inside a DPU to a specific
-> detailed specification (eg an AWS virtio-net device, for instance)
+>  #define iommu_copy_user_data(user_data, from, min_size_member) \
+>   __iommu_copy_user_data(user_data, from, offsetofend(typeof(*from), min_size_member))
 > 
-> The implementation is in the DPU, and only the DPU.
-> 
-> At the end of the day VDPA uses mediation and creates some
-> RedHat/VDPA/Qemu virtio-net device in the guest. It is emphatically
-> NOT a perfect recreation of the "AWS virtio-net" we started out with.
-> 
-> It entirely fails to achieve the most important thing it needs to do!
+>  iommu_copy_user_data(user_data, &data, iotlb);
 
-It could be that we are using mediation differently - in my world it's
-when there's some host software on the path between guest and hardware,
-and this qualifies.  The difference between what this patch does and
-what vdpa does seems quantitative, not qualitative. Which might be
-enough to motivate this work, I don't mind. But you seem to feel
-it is qualitative and I am genuinely curious about it, because
-if yes then it might lead e.g. the virtio standard in new directions.
+OK. And always use sizeof(typeof(*from)) in the mcaro for the
+current data_len, I assume?
 
-I can *imagine* all kind of reasons to want to use vfio as compared to vdpa;
-here are some examples I came up with, quickly:
-- maybe you have drivers that poke at registers not in virtio spec:
-  vfio allows that, vdpa by design does not
-- maybe you are using vfio with a lot of devices already and don't want
-  to special-case handling for virtio devices on the host
-do any of the above motivations ring the bell? Some of the things you
-said seem to hint at that. If yes maybe include this in the cover
-letter.
-
-There is also a question of capability. Specifically iommufd support
-is lacking in vdpa (though there are finally some RFC patches to
-address that). All this is fine, could be enough to motivate
-a work like this one. But I am very curious to know if there
-is any other capability lacking in vdpa. I asked already and you
-didn't answer so I guess not?
-
-
-
-
-> Yishai will rework the series with your remarks, we can look again on
-> v2, thanks for all the input!
-> 
-> Jason
-
+Thanks
+Nic
