@@ -2,148 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD8197AD998
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 15:53:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4561F7AD9C5
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 16:11:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231905AbjIYNxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 09:53:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
+        id S229788AbjIYOLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 10:11:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjIYNxK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 09:53:10 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7BBFF;
-        Mon, 25 Sep 2023 06:53:04 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PDeeDL012703;
-        Mon, 25 Sep 2023 13:53:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=J9WZJYXPUauxzYA/GO7frAt10HjVFen+/MhZgK96Rl8=;
- b=R4vKjkJ7pQpvCCU0cT9Afe/QzphZcDufs3MHk9f8nchV/3kmbcJHAqVRbwm/A/hXXo3+
- LE/3wGvoadfOBKyfcP3DCrI//xkCmnn3XgAbeKaKxdB2/c/sSuMhzZsBvo1g1uHmO4dQ
- rbaRqf0Tq1fp8XsbTY9hBV0HgsIsG9e9vHBW4RnLizUBWzc1CuMrJVvKEIqpkv6RQoJ/
- pGL5jx69wbkFE3LrwGQeK0RzviOrcrET56U2PX8TLAMoOgi2ovq/6Fnge4Vh/XqQyg1N
- MMu8Dlk2ZJZ2LN6vub1CYUoDlS+Mb2S3eM66nJDFYzuOSBwF+GW7q5zDnOcwROG7VvTQ Xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbakthkab-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 13:53:03 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38PD5vhW009488;
-        Mon, 25 Sep 2023 13:53:03 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbakthka0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 13:53:03 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38PCaR7X030719;
-        Mon, 25 Sep 2023 13:53:02 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjj5a9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 13:53:02 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38PDqxBu18416242
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Sep 2023 13:52:59 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5544320040;
-        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34E3F20043;
-        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 25 Sep 2023 13:52:59 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
-        nsg@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1] s390x: run PV guests with confidential guest enabled
-Date:   Mon, 25 Sep 2023 15:52:45 +0200
-Message-ID: <20230925135259.1685540-1-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
+        with ESMTP id S229537AbjIYOLv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 10:11:51 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3976E107
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 07:11:44 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50300cb4776so10641017e87.3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 07:11:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1695651102; x=1696255902; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lBOvC0K9KP7qMsTGJs/XlB/BY83dr7+2ydlkGk5mVEI=;
+        b=A1ReN1v/MyjTJISpXYZWQ0/P03lWqOwjc+hhpHnHuj1o0MUac2KzSwQPdKUj2EfW6w
+         gKZeSHTk47h6yo4YCkIk7KZc9b+jSdf8wLKFIaMuvgP/vMR+/PKtGi0t7+Yh366X+ahs
+         NCHlUYF6CqmwiWkUiYU9hXkkovqC4O2ocupYorzUmmkQcFScZxgPY857dfo+8rRP/jsG
+         D4k67Ke/fRtNtZ0VrMImhpcuZWr18cSl/tmZomXEakdEJsWIwVu14UZOl8BI1zcD2g28
+         1xWdE0Gers5nImse9ZBC0BZvefwRpE4ID1VNWMIB0Tx+847Mw35mina4xPBVg5Ae/+Sv
+         zSAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695651102; x=1696255902;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lBOvC0K9KP7qMsTGJs/XlB/BY83dr7+2ydlkGk5mVEI=;
+        b=qEknq3SJOQRFpfbd8u5bSoKc/e+Ecb5C4b/EQJop4f7mpmEcEkyUHN7Ym/3srag6wU
+         4NM2NA5Dh4TXZ2NjT2qnVIiMtKDpq2jV/96rIO5/qvf3bWXIYXHfmViXa7neN4jSa1Gg
+         gicKWBd9gJBAi4cpUwsarWKjPAwHm7DZPoq9s3HEjkrwSLwQGNMpvqVzlDJcYyPIS5yw
+         CLHMP8/ktP+5aNfyI5K3BSZL1vrOF5N5OqLRGV/gPLi5i53NHY4VbU4nFvynssBTbPnY
+         z5Hk9kwAZ4ESobYPQDHRIA30HD9dow/Qh5bKt8+jA/qwx6C71k0Q6PFQ1KEnKe4Aavw6
+         qbgQ==
+X-Gm-Message-State: AOJu0YyvnZocdL3hLsOkndi1Sx8hRjFhC1F49q2BDEjhDjqBdBddXKjV
+        el5/ynxORO+9aCDGpEiZVpaW2A==
+X-Google-Smtp-Source: AGHT+IH/enSkU0B+xx17RFHSrcUfQKwrTeyF3VIzAeMXRjn8t4tSgmAPSe37mpYZRA3+eXRrZXDAYg==
+X-Received: by 2002:a05:6512:2089:b0:500:9d6c:913e with SMTP id t9-20020a056512208900b005009d6c913emr4888703lfr.52.1695651102197;
+        Mon, 25 Sep 2023 07:11:42 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id x13-20020aa7d38d000000b0052fe12a864esm5562105edq.57.2023.09.25.07.11.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 07:11:41 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 16:11:39 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Conor Dooley <conor@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 1/9] dt-bindings: riscv: Add XVentanaCondOps extension
+ entry
+Message-ID: <20230925-e2aee59a5ea91fa14fab12ed@orel>
+References: <20230925133859.1735879-1-apatel@ventanamicro.com>
+ <20230925133859.1735879-2-apatel@ventanamicro.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jsGE5wAHHrYnRpF35IMzED89tSATN-HB
-X-Proofpoint-ORIG-GUID: 3vvH0qZrqnOTN3uuTvXNxwkndQwlHCWI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-25_11,2023-09-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0
- adultscore=0 clxscore=1011 bulkscore=0 priorityscore=1501 suspectscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309250102
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230925133859.1735879-2-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PV can only handle one page of SCLP read info, hence it can only support
-a maximum of 247 CPUs.
+On Mon, Sep 25, 2023 at 07:08:51PM +0530, Anup Patel wrote:
+> Add an entry for the XVentanaCondOps extension to the
+> riscv,isa-extensions property.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  Documentation/devicetree/bindings/riscv/extensions.yaml | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> index 36ff6749fbba..cad8ef68eca7 100644
+> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> @@ -171,6 +171,13 @@ properties:
+>              memory types as ratified in the 20191213 version of the privileged
+>              ISA specification.
+>  
+> +        - const: xventanacondops
+> +          description: |
+> +            The Ventana specific XVentanaCondOps extension for conditional
+> +            arithmetic and conditional-select/move operations defined by the
+> +            Ventana custom extensions specification v1.0.1 (or higher) at
+> +            https://github.com/ventanamicro/ventana-custom-extensions/releases.
+> +
+>          - const: zba
+>            description: |
+>              The standard Zba bit-manipulation extension for address generation
+> -- 
+> 2.34.1
+>
 
-To make sure we respect these limitations under PV, add a confidential
-guest device to QEMU when launching a PV guest.
-
-This fixes the topology-2 test failing under PV.
-
-Also refactor the run script a bit to reduce code duplication by moving
-the check whether we're running a PV guest to a function.
-
-Suggested-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/run | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/s390x/run b/s390x/run
-index dcbf3f036415..e58fa4af9f23 100755
---- a/s390x/run
-+++ b/s390x/run
-@@ -14,19 +14,34 @@ set_qemu_accelerator || exit $?
- qemu=$(search_qemu_binary) ||
- 	exit $?
- 
--if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$ACCEL" = "tcg" ]; then
-+is_pv() {
-+	if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ]; then
-+		return 0
-+	fi
-+	return 1
-+}
-+
-+if is_pv && [ "$ACCEL" = "tcg" ]; then
- 	echo "Protected Virtualization isn't supported under TCG"
- 	exit 2
- fi
- 
--if [ "${1: -7}" = ".pv.bin" ] || [ "${TESTNAME: -3}" = "_PV" ] && [ "$MIGRATION" = "yes" ]; then
-+if is_pv && [ "$MIGRATION" = "yes" ]; then
- 	echo "Migration isn't supported under Protected Virtualization"
- 	exit 2
- fi
- 
- M='-machine s390-ccw-virtio'
- M+=",accel=$ACCEL$ACCEL_PROPS"
-+
-+if is_pv; then
-+	M+=",confidential-guest-support=pv0"
-+fi
-+
- command="$qemu -nodefaults -nographic $M"
-+if is_pv; then
-+	command+=" -object s390-pv-guest,id=pv0"
-+fi
- command+=" -chardev stdio,id=con0 -device sclpconsole,chardev=con0"
- command+=" -kernel"
- command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
--- 
-2.41.0
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
