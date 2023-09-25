@@ -2,70 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 355757ADD95
-	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE5747ADDD6
+	for <lists+kvm@lfdr.de>; Mon, 25 Sep 2023 19:34:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232592AbjIYRGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 13:06:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49542 "EHLO
+        id S232970AbjIYRfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 13:35:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230292AbjIYRGv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 13:06:51 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAECE95
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:06:44 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81486a0382so10820016276.0
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:06:44 -0700 (PDT)
+        with ESMTP id S229595AbjIYRfC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 13:35:02 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FE810D
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:55 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-692ad939c8cso6564538b3a.0
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 10:34:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695661604; x=1696266404; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1695663294; x=1696268094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cNtjze0gX8Y/0E7U9UY0etBu59zzt6jnmb4RdRh2IwY=;
-        b=LSdj3DUURZiN05s6z9NCttwGd3uf0VaDc1UcyLAzAuWDMKCGLTx2O/nUlx3X9QCR50
-         ovSy4U5H8Hb9DAlfLqOMwd3Q3Cx14DyiMGLAoovTDj9Of7n9jrdCjrIU5QhIir3dL5OR
-         CY9gQGRx6/KQqftM0bM9XGyzj8YpdBV+bzbwHO38q5d19iLkUvhLjIbBabBtf3zCzIjm
-         bxNMtioMTeEiVsQXVUySdkKGfR/FSD/dk77TsghC52LEjHG6wadrhAx+fI+hbxtw3lZh
-         iVAlLzSuNpzT5knZwYSgyzMIOjcR0BRHTAA2S1HN7g/OGjnvl2xj0yJbpN4vzcrcdTfk
-         /jng==
+        bh=+fRgk1GXWHwlF4dpNW6mrZozuiwZl1grW/0QNwyM28U=;
+        b=uF0CS2nx+a+rOpH2PJzzRfPj1Pia8oYK53zE0F57AY/Jcx7tmMXs5uLsXem+x0YWyn
+         loU0oq1orpFDvTN2IV4f2ykJaNYm1U/KXHrYc9NDzPO01lm9RnXnVvZ0cpGZUdr8A+fs
+         l3T7h1D6Y/iP1YQq93MwunIdXRI2LZDiH/KXKAn6OvsE6KADv7iKxIQTRtgUd37kWxev
+         2fCmgMrgHHUr0KRRFh56/wUwAEVr3Wlbghe1OPfvX1KZ3fb2NCPx3h7/Ujk8FAc/2AWH
+         Qg1rrj79In1nargCzXGr1CvGwtYVF43s8BvWsVJL28GWdY+G4Cydc0semJQwsRbRv/Gv
+         Pm9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695661604; x=1696266404;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=1e100.net; s=20230601; t=1695663294; x=1696268094;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=cNtjze0gX8Y/0E7U9UY0etBu59zzt6jnmb4RdRh2IwY=;
-        b=kQtx9FpVY1D6/aLdgDOytEmuLCG2vzzTPD5ls6CLqJSF61mstoT1D3hyuC/fUdxSSO
-         UE2QgFE5K5gXW3PjMGKp0XiNLgen2DLXC8NbjWAgDV1Hz5mhodn/0Zsd/JjxD1GnuoIx
-         r3jHv4a713IZnOnaoHfPrTWMAq31i/P+K0tbFdJpW9mpokBNDocId+DbQ0RhAP7TbGko
-         DRvnLmnscojts9y/onsou2VTp6SnuFv/6S+cCwsLwKGRm5OcuNe0mkbT9UQuiHJ9YcR9
-         pUzyOCcV2VzFK8KK9fLSbFFOp02GqoZF0wmsfTdgQmLYza+cClNACM+oXVHxIM+biM+7
-         Kkrg==
-X-Gm-Message-State: AOJu0YwpOdk1avXAy/ONY6CYc4p2i6UxzFD1G3m7rtnrPrqoAjpIh8SS
-        y5CpZbB6RkgysIE4xoD3D5R6DCJzapc=
-X-Google-Smtp-Source: AGHT+IGCqTaWPsbSXukc0DM41GdSfo8XFoAs4WxuMCM3MiZSBSHUaZfAcjvO9Mk/vSVzkBkQuqpVPYfyTFQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ec0c:0:b0:d7e:b82a:ef68 with SMTP id
- j12-20020a25ec0c000000b00d7eb82aef68mr72940ybh.3.1695661603914; Mon, 25 Sep
- 2023 10:06:43 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 10:06:42 -0700
-In-Reply-To: <CAL715WKjYP0tq1Ls5G0v2Myfhp6SAhqsZhfLZUbSue3mJv2byA@mail.gmail.com>
+        bh=+fRgk1GXWHwlF4dpNW6mrZozuiwZl1grW/0QNwyM28U=;
+        b=VvQ3FCr6UbuKhJ8grRdGpuVjpaV5SrXH63sVifq+Dpp4hhJbssJgQ7AWCW09eR+qPN
+         bIGoenKJSdyr8Uk7G+AyHKkUQxWy3gPKUSXhnw1Q3bvb9jQdYDDPy+8slHY1AP3lSTl3
+         937UNhq15X7YudKfrkGNKUYZySo8uz9CS5ZOjzm1Vpt7FsVUjEKIUJZrfmFfC89Ubmim
+         b9wL3oEVjZtD9/x4IylGaAaUgQNUKkviqGE1HK00ZlA4avkBROroO+dchAYy54xfOvpm
+         0cJVaiLWHJGfMBSaZQPxMzTf1sMQA2udJaavMRBLikOhncS9bRJgbV70ECTACLqXajXN
+         L/bQ==
+X-Gm-Message-State: AOJu0YwJLoLYpFSGskcDSxEPiK7Kp10/ZpOO1cGsPqKQLAU/zFSyH+Fh
+        fttJNtN69T4gtNbPbZsHAZ3Rtcv/6LWr
+X-Google-Smtp-Source: AGHT+IEIa67JHm4iGq6IbgmEn/O9A05ePGGUAl+33vpiM8knnCja047dfXJXmwFR+tsyhsegkC0w5pFB6gU4
+X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
+ job=sendgmr) by 2002:a05:6a00:3a27:b0:690:29c0:ef51 with SMTP id
+ fj39-20020a056a003a2700b0069029c0ef51mr6884pfb.1.1695663294680; Mon, 25 Sep
+ 2023 10:34:54 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 25 Sep 2023 17:34:45 +0000
 Mime-Version: 1.0
-References: <CALMp9eRQKUy7+AXWepsuJ=KguVMTTcgimeEjd3zMnEP-3LEDKg@mail.gmail.com>
- <ZQ3pQfu6Zw3MMvKx@google.com> <CAL715WKguAT_K_eUTxk8XEQ5rQ=e5WhEFdwOx8VpkpTHJWgRFw@mail.gmail.com>
- <ZQ36bxFOZM0s5+uk@google.com> <CAL715WL8KN1fceDhKxCfeGjbctx=vz2pAbw607pFYP6bw9N0_w@mail.gmail.com>
- <ZQ4BvCsFjLmnSxhd@google.com> <CAL715WLuqxN5JvcrZ7vcFpmTwuAi_EqKERtvj9BLoT9QVM0Ekw@mail.gmail.com>
- <ZQ4ch3GqM7WH34qv@google.com> <CAL715WLB-3iRrCOxuVNa=NJvGkVaY7K=+i3J7RnxAta81jef0Q@mail.gmail.com>
- <CAL715WKjYP0tq1Ls5G0v2Myfhp6SAhqsZhfLZUbSue3mJv2byA@mail.gmail.com>
-Message-ID: <ZRG+Ioc9ndCTHOlh@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Synthesize at most one PMI per VM-exit
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230925173448.3518223-1-mizhang@google.com>
+Subject: [PATCH 0/2] Fix the duplicate PMI injections in vPMU
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
         Like Xu <likexu@tencent.com>, Roman Kagan <rkagan@amazon.de>,
         Kan Liang <kan.liang@intel.com>,
         Dapeng1 Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -77,112 +75,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023, Mingwei Zhang wrote:
-> On Sun, Sep 24, 2023 at 11:09=E2=80=AFPM Mingwei Zhang <mizhang@google.co=
-m> wrote:
-> >
-> > Hi Sean,
-> >
-> > On Fri, Sep 22, 2023 at 4:00=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Fri, Sep 22, 2023, Mingwei Zhang wrote:
-> > > > So yes, they could be put together and they could be put separately=
-.
-> > > > But I don't see why they _cannot_ be together or cause confusion.
-> > >
-> > > Because they don't need to be put together.  Roman's patch kinda sort=
-a overlaps
-> > > with the prev_counter mess, but Jim's fixes are entirely orthogonal.
-> > >
-> > > If one person initially posted such a series with everything together=
- I probably
-> > > wouldn't care *too* much, but combining patches and/or series that ar=
-en't tightly
-> > > coupled or dependent in some way usually does more harm than good.  E=
-.g. if a
-> > > maintainer has complaints against only one or two patches in series o=
-f unrelated
-> > > patches, then grabbing the "good" patches is unnecessarily difficult.=
-  It's not
-> > > truly hard on the maintainer's end, but little bits of avoidable fric=
-tion in the
-> > > process adds up across hundreds and thousands of patches.
-> > >
-> > > FWIW, my plan is to apply Roman's patch pretty much as-is, grab v2 fr=
-om Jim, and
-> > > post my cleanups as a separate series on top (maybe two series, reall=
-y haven't
-> > > thought about it yet).  The only reason I have them all in a single b=
-ranch is
-> > > because there are code conflicts and I know I will apply the patches =
-from Roman
-> > > and Jim first, i.e. I didn't want to develop on a base that I knew wo=
-uld become
-> > > stale.
-> > >
-> > > > So, I would like to put them together in the same context with a co=
-ver letter
-> > > > fully describing the details.
-> > >
-> > > I certainly won't object to a thorough bug report/analysis, but I'd p=
-refer that
-> > > Jim's series be posted separately (though I don't care if it's you or=
- Jim that
-> > > posts it).
-> >
-> > Thanks for agreeing to put things together. In fact, everything
-> > together means all relevant fix patches for the same bug need to be
-> > together. But I will put my patch explicitly as _optional_ mentioned
-> > in the cover letter.
+When we do stress test on KVM vPMU using Intel vtune, we find the following
+warning kernel message in the guest VM:
 
-No, please do not post your version of the emulated_counter patch.  I am mo=
-re
-than happy to give you primary author credit (though I need your SoB), all =
-I care
-about is minimizing the amount of effort and overhead on my end.  At this p=
-oint,
-posting your version at this time will only generate more noise and make my=
- job
-harder.  To tie everything together in the cover letter, just include lore =
-links
-to the relevant pseudo-patches.
+[ 1437.487320] Uhhuh. NMI received for unknown reason 20 on CPU 3.
+[ 1437.487330] Dazed and confused, but trying to continue
 
-Assuming you are taking over Jim's series, please post v2 asap.  I want to =
-get
-the critical fixes applied sooner than later.
+The Problem
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-> > If the series causes inconvenience, please accept my apology. For the
-> > sense of responsibility, I think I could just use this opportunity to
-> > send my updated version with your comment fixed. I will also use this
-> > chance to update your fix to Jim's patches.
-> >
-> > One last thing, breaking the kvm-unit-test/pmu still surprises me.
-> > Please test it again when you have a chance. Maybe adding more fixes
-> > on top. With the series sent, I will hand it over to you.
-> >
->=20
-> Never, this is a test failure that we already solved internally.
-> Applying the following fix to kvm-unit-tests/pmu remove the failures:
->=20
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 0def2869..667e6233 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -68,6 +68,7 @@ volatile uint64_t irq_received;
->  static void cnt_overflow(isr_regs_t *regs)
->  {
->         irq_received++;
-> +       apic_write(APIC_LVTPC, apic_read(APIC_LVTPC) & ~APIC_LVT_MASKED);
->         apic_write(APIC_EOI, 0);
->  }
->=20
-> Since KVM vPMU adds a mask when injecting the PMI, it is the
-> responsibility of the guest PMI handler to remove the mask and allow
-> subsequent PMIs delivered.
->=20
-> We should upstream the above fix some time.
+The above issue indicates that there are more NMIs injected than guest
+could recognize. After a month of investigation, we discovered that the
+bug happened due to minor glitches in two separate parts of the KVM: 1)
+KVM vPMU mistakenly fires a PMI due to emulated counter overflow even
+though the overflow has already been fired by the PMI handler on the
+host [1]. 2) KVM APIC allows multiple injections of PMI at one VM entry
+which violates Intel SDM. Both glitches contributes to extra injection
+of PMIs and thus confuses PMI handler in guest VM and causes the above
+warning messages.
 
-Please post the above asap.  And give pmu_pebs.c's cnt_overflow() the same
-treatment when you do.  Or just give my your SoB and I'll write the changel=
-og.
+The Fixes
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The patches disallow the multi-PMI injection fundamentally at APIC
+level. In addition, they also simplify the PMI injection process by
+removing irq_work and only use KVM_REQ_PMI.
+
+The Testing
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+With the series applied, we do not see the above warning messages when
+stress testing VM with Intel vtune. In addition, we add some kernel
+printing, all emulated counter overflow happens when hardware counter
+value is 0 and emulated counter value is 1 (prev_counter is -1). We
+never observed unexpected prev_counter values we saw in [2].
+
+Note that this series does break the upstream kvm-unit-tests/pmu with the
+following error:
+
+FAIL: Intel: emulated instruction: instruction counter overflow
+FAIL: Intel: full-width writes: emulated instruction: instruction counter o=
+verflow
+
+This is a test bug and apply the following diff should fix the issue:
+
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 0def2869..667e6233 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -68,6 +68,7 @@ volatile uint64_t irq_received;
+ static void cnt_overflow(isr_regs_t *regs)
+ {
+ =C2=BB......irq_received++;
++=C2=BB......apic_write(APIC_LVTPC, apic_read(APIC_LVTPC) & ~APIC_LVT_MASKE=
+D);
+ =C2=BB......apic_write(APIC_EOI, 0);
+ }
+
+We will post the above change soon.
+
+[1] commit 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions=
+")
+[2] https://lore.kernel.org/all/CAL715WL9T8Ucnj_1AygwMgDjOJrttNZHRP9o-KUNfp=
+x1aYZnog@mail.gmail.com/
+
+Versioning
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The series is in v1. We made some changes:
+ - drop Dapeng's reviewed-by, since code changes.
+ - applies fix up in kvm_apic_local_deliver(). [seanjc]
+ - remove pmc->prev_counter. [seanjc]
+
+Previous version (v0) shown as follows:
+ - [APIC patches v0]: https://lore.kernel.org/all/20230901185646.2823254-1-=
+jmattson@google.com/
+ - [vPMU patch v0]: https://lore.kernel.org/all/ZQ4A4KaSyygKHDUI@google.com=
+/
+
+Jim Mattson (2):
+  KVM: x86: Synthesize at most one PMI per VM-exit
+  KVM: x86: Mask LVTPC when handling a PMI
+
+ arch/x86/include/asm/kvm_host.h |  1 -
+ arch/x86/kvm/lapic.c            |  8 ++++++--
+ arch/x86/kvm/pmu.c              | 27 +--------------------------
+ arch/x86/kvm/x86.c              |  3 +++
+ 4 files changed, 10 insertions(+), 29 deletions(-)
+
+
+base-commit: 6de2ccc169683bf81feba163834dae7cdebdd826
+--=20
+2.42.0.515.g380fc7ccd1-goog
+
