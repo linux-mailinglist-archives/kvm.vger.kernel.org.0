@@ -2,161 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C23267AE443
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 05:46:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F51E7AE448
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 05:50:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229990AbjIZDpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 23:45:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36228 "EHLO
+        id S231782AbjIZDt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 23:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbjIZDpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 23:45:50 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2064.outbound.protection.outlook.com [40.107.244.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517BBD7
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 20:45:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VFnr2zY+LOjFQ1LfIOnjUqEpGvlm7Dkm9VwOCHU+5Wt7IfvjBiQ5XSWfRI2As/qwj6xK681rDVuYS6hcAocHpM1p8DAdy6PXc0uHNfNjQ50vzKSNxHhWmK8ARhGmtVWnYTSbdbWLBzwnrH3viJWuoCD/k0zsaGY2pjzeemZwGIu0zgLMKRIEndpMCLcQn0X/wYQWaAIP7KOseZn9eUxSeigkUIxVTsGNYAirB+DZ25i0gPMMLrZjJyfzbNxAzpVTCk8Un1k2Gx294P4ttFwMcQ56B5lqDwyTbucaAjIiaahOkOC4cUXTwbnnkYpm87oaHiuq+3IyzneXT47bELC7nA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y8ieXpLBMY58OGLCCji12eyBvHZXz5gcdk2pRc1O5EY=;
- b=obkZnDtIS10eSuL0PHGCphuXSBrbttODyEUdPFb/fTVUK+8Q568tRBh6L6g04U5T2+l9IkdZKfbZupSdixCenozRM7kL5pUjcISQQ2W0zOC/HPtIQRcdoRrWTlIvCz0h3QDX2Py33Naz2dzMTgkRd81R1wWqH0PPgJeFHIUN7HOs6Hh6XYiIBCJdcVvehRb8kgJKQQwjiB7qSfTMzW/6L7Lb3cXlR/vgvrKWgUuayFHeCLQemmGAFJj1BUFcl4WSCK+SB3zcit+2u/R1zrO8SdKNBzTWVsIflFKSQIM7amjLMCeruZPDd1vWKcUbq9a1Lk56wevhtSrJ6+jEmsSchQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y8ieXpLBMY58OGLCCji12eyBvHZXz5gcdk2pRc1O5EY=;
- b=L0vvYNTZCHp6QCPlW3gCN+6xBgBtIRh4o0eJzh6BZ79IuhHROOodIETJbAkwoGxNyRwDl5joaDAlsZ9jLdw8v5AH8XTa2xyTgFUbmX/ntYdPdbhc+ER9NsqMcqexzxhVN0PoJIaMTffvAKuiY6IMdjgaVuNhPQP5HTqjRFcj0oIXvN888sg2upnjBeV9u5heGj5QmoiOIitKMTJToGIjZHjWSnfgtSOTzZysdd4Wd+1R3Ryc2RH+dvonzr97TZp8AMPrxNVhiBsCMJjfRkzUbICES8NtNZIu6EHqeTNkqX6icZ21/rrr1SBTAsM3zRWlHNC24q5tH1QARl55R0VJsg==
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
- by LV3PR12MB9165.namprd12.prod.outlook.com (2603:10b6:408:19f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Tue, 26 Sep
- 2023 03:45:37 +0000
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::4002:4762:330c:a199]) by PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::4002:4762:330c:a199%7]) with mapi id 15.20.6813.017; Tue, 26 Sep 2023
- 03:45:36 +0000
-From:   Parav Pandit <parav@nvidia.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Jason Wang <jasowang@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: RE: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Topic: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Thread-Index: AQHZ7IkPl5ENqOgMC0yEzkOHANq/CLAlfIYAgAACZQCAAAJ1AIAAAaqAgAAD/QCAAAaKAIAAAwkAgAAF2ICAABWjgIAABYGAgAAGVYCAAHFrgIAAnJQAgAAAJ7CABBFQgIAAYeqAgACr64CAAJhp4A==
-Date:   Tue, 26 Sep 2023 03:45:36 +0000
-Message-ID: <PH0PR12MB5481AF4B2F61E96794D7ABC7DCC3A@PH0PR12MB5481.namprd12.prod.outlook.com>
-References: <20230921135426-mutt-send-email-mst@kernel.org>
- <20230921181637.GU13733@nvidia.com>
- <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <20230921155834-mutt-send-email-mst@kernel.org>
- <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
- <20230922122246.GN13733@nvidia.com>
- <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com>
- <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20230925141713-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230925141713-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|LV3PR12MB9165:EE_
-x-ms-office365-filtering-correlation-id: 0c9c9134-d381-4203-1456-08dbbe430b93
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Lr+IFZ5YZSx/M2/bDsByHcH7GgMJGIhZqLkiJkifZiqh9cYND4CMZkLIclXZhK2ACTHVxnRIqbP7A5nKzbMOAYQUnc+0ETbdjVpjvjoqYKZasTBJdUwg2i/p3NzHGnrtWNq3cV6ifCiubT4zRUg60ajAssoPmdJweQf4rQu6WWGbK1/wAXbvePEjx0Drvd5y3//K8OMyqPWey1VlNZOLEymuA3Bu7PaaW0MbrTbXRx2ezWkbm7fquH1YghLdNoBSXIwZ3aG/KXA7PsNVsEco4JI5Dl5QsT8u0p309+y1Z7R42yjKC4DqDMio8tobyWSKELV5DJ+e8AOnnHnmLSNDkeMt8XHBW7+4bi7MBshF6xAsotOKJekBJpubeElRVQuAQG3658psBYZqWEYeDP51rYuC3Nvy6HkFUjqAndpzn7m8OnLqAJB8+uF4kOTm4TdwfHMj+ka64urvRgMg3yLQeM9T1eYiz6//aPHF++3Ir17/yFJNipDttiIuafm/0zEeub6CFXpHRnbJ0cfItkVJrNI15FPwDwEw8MiQD3rPemIRhOnqTbY4L0mZcxEwEpl5Kqni4i5hXtL5PEDasMLrQ0n7vuLix3Q3XL9FYDPtaKDh+UtlB9XKfBpt/LSXpiL7
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(39860400002)(346002)(136003)(230922051799003)(186009)(1800799009)(451199024)(55016003)(2906002)(38070700005)(83380400001)(38100700002)(4744005)(122000001)(55236004)(9686003)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(76116006)(71200400001)(6506007)(52536014)(26005)(5660300002)(316002)(41300700001)(6916009)(478600001)(7696005)(8936002)(8676002)(4326008)(107886003)(86362001)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TDFGVFh2Qzl3U0NrakNuYUFlR2RjUnU5ajN3eGZRbFVzdEdiV2ZBOWZqaWFH?=
- =?utf-8?B?aVE4OWF0bG8yUit4Y1ZaTUhyek52Y1VDU1o0alJvd2VnNnYyOVg3dUN0M3hR?=
- =?utf-8?B?VitSYUZIeGt2VjhmSFpJbHJmdjZIdTduQVpvbmExcmh3SlpjanpEREtSdXJK?=
- =?utf-8?B?RXFZK2k2V0NEY24vdHN0U1lKZGt1aXFUZk9tdTNXcjExc1JEanhlTlQ1U25K?=
- =?utf-8?B?Q1NEMXhjWWVvd3FKUzR5MTJzamRBbHN0SXpRZEhwckNheEhaWjE4UGEzYVlK?=
- =?utf-8?B?bG1heDRCMGQrdkQvcEduQmNJQ2diR0E4TE5lUFB1Z0JrQXZIUkRqVlYvQ2Yr?=
- =?utf-8?B?RHZOdGlYTi9VYmlLSlM3Mk1YRlpaMGU2SEFIbW1ENHNyM0dEdEdjY0ptNWgw?=
- =?utf-8?B?Q3VEOWhvT1R6QlJETkU5ZFVTWGRGc0F3V3FPYXhNRC9FUEtSSXU1WkFSZEVI?=
- =?utf-8?B?UElCaTZYSzg0eTNTNnIyTVRpS2NjckQ3am1Fa080WmNoZnlWUm1HUmV4VzFQ?=
- =?utf-8?B?aVVWcmpGTm10UmFuWWJLZHNKYU1oZE02WndpdTBGY0tZQmRza09sNkVCSWJa?=
- =?utf-8?B?MmdEK0k1bUJ3QUl5NnZwMWoyTWd6RmxNMURZcUEva0tZUTBQQUxJV1VINHd2?=
- =?utf-8?B?NnFTV0hVZWdvdGpwRk1YaVhyc3FscXc0dm93ZG9HMWRxTnJyMHZVM1ByK0hw?=
- =?utf-8?B?WkliTDNmU3RPV3Uycm5sOWIyTHNLWDJncCthUUVrNmhtQi9qMnpPTUhyTzIz?=
- =?utf-8?B?YXZHY1pEM0R5L1BEUUsreDZlQ09LRDdOM0Mwcld2UXV3blpRQ2F2TE9OMnRZ?=
- =?utf-8?B?SUNucENkMi93eEZIbDFLWDJNVlBDOFB6Z04zSkcyREwyNjJkbGxPaGZWcm9E?=
- =?utf-8?B?OUgvdjZTSEUyVVRKQjJReHRZOHVSZzNJZkh5Q2VDOUkvNlBKd0dpSVFnU2t4?=
- =?utf-8?B?L1o2UWEwV0NBYWh4VlBRK004dnIxTlcycE9FTVNzb1hiSDdJcUx5enhyZ0o1?=
- =?utf-8?B?VmdoMjBJSlFHVjY0TVArVnNBZGRKSlZyTld6YnR2eHMwektsNzduZ1NJWW5Z?=
- =?utf-8?B?YzRBcGZ2ZTA3d25MWTQ1dEsxcGZ0RjBHMVQ2NnBPQVVRV3NNMndXaDFYMXpU?=
- =?utf-8?B?aUwyT0c4SWt2RndjVXBTRE9IdEwwS3VobGFhU3M0b2djOWJWeFRFUktla082?=
- =?utf-8?B?ZEdsTEI3STE5OURBRW1yWWpSRTBsZkVYRDdnOUNnWGd5ZkN0a0NZZndwcUZF?=
- =?utf-8?B?YVVVQkZWMnVkaEdLbktzUTZlWk9kQlBVT0ZmTG5oeU5ZMGJrazU2UFV6Zzhu?=
- =?utf-8?B?MXhsY1JkMG1wZktNanhPaVlMTnV6TEU1RGdVRk1pT252QkV1bGp4WHcrVm5t?=
- =?utf-8?B?VU5vREtzMHpmTkxBZllVY2lINXBKQjRScGx6YW93RUZsaTlrUWpWRzQvdGNF?=
- =?utf-8?B?cGFZazBibkcrbmhyNU1wQnNBREVQaDN5WWRvZjd2aVE0L0FoU1Z5WFNqZ3pB?=
- =?utf-8?B?ekRyTllZb21sdGU5VzZ1RDhaa0s5UmxONFY0dU0zTnFJN002ZDhIMjVoMXdH?=
- =?utf-8?B?bDRXaEd3MFNmSVlra3FGcE9OM0lyT0xIcmRGY1I2L2IrVm1tVE5QVEhRbFFm?=
- =?utf-8?B?S21XK2ZsRWNqWGM5dW9McUVhYnFmYjNqcnRzVEdVNlQ4MU9OMHV4RDJxT3d6?=
- =?utf-8?B?U0gyZExOU2RHK0VuTEt6OGJXejY4Nmx0cjI5LzI0WDlzVXI4RkFRZWNvVWRp?=
- =?utf-8?B?eVVSMGVzT0FtS3hTSzhWa3FDTmlQNjhNZ2xkMWlYT0dyS0toamVoeU5lZWtT?=
- =?utf-8?B?cStCQlRTNHorK3JTbGx0MVpZUCt5TmpmMmJJUDdDRjg3VmZTV3IvcUp3dlB1?=
- =?utf-8?B?enFoWVdYc3BrNTBkanN2RWRzYVZWZ1lBQTlIN3duNmZFUm5yVmIyVENQQnRE?=
- =?utf-8?B?V0ZGUnI5ZFNEUmgyTFpoaTlaTGNQWkw0NW9YZEh0WWwrZnAwekhjZnB2YWw0?=
- =?utf-8?B?aEQwTUQ3dkV1R3NpaENwNUZZU2JMdXkrMk9rYkpMdFNwNmFMQ3RmcC9mckNt?=
- =?utf-8?B?aUY0dzg3RS81eGxjK2RSS05OOW91aHZ5RlhOZ3NDcmNhZFRwUXdmZVZEL050?=
- =?utf-8?Q?Dymo=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229472AbjIZDt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 23:49:58 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB26DC;
+        Mon, 25 Sep 2023 20:49:51 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c61bde0b4bso26918165ad.3;
+        Mon, 25 Sep 2023 20:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695700191; x=1696304991; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DEJeOj8lKjC24vEMGtxXTPjkSZb1cMn22NpZwCntJfk=;
+        b=fFac9oY464XPhMHqFPRygsyzvitGlbxt0VHsRE1ZN0Ur3p0blA6jWq9A7N/zS/Fs90
+         xmzqntdPbhIehP3j9QEMYPgkCybxWfcaDNzBuzfJhdzl7+5MsxoQeYoYW64hG5086uxC
+         ejkZOwSUfPjUfxIEssp8XAK+wlnXgYfZLaTO20IkH+naA2ZbRD/FgRhQJXIwZkOdFRhQ
+         MsWRMI/q9jhFPdzqXF0NyOva7XfMdpNvjlEm2Cvmm3JsMpO7NMDcwKyOMRED6c9gF0Xa
+         yDqzKg4rcdruxghAzMTG5nSy8v25m3DsHKCRV/UO+O0EyNeEgaPJcnMZ5S+EUIhl0Kb/
+         02Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695700191; x=1696304991;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DEJeOj8lKjC24vEMGtxXTPjkSZb1cMn22NpZwCntJfk=;
+        b=K3X3/Np58+1JwIXSNz5YNFvP1oI37Ue5LDt3xuh9Lbn+1nxu4yXdY/n1xrp4yWj5sx
+         PSK/NBEhNu/En24ENixn2XL1aqF1nFxZaAzIQciN6lqzAVojfD3RsD4phxzRIQTk1b8F
+         EQ80K468WWmCEkqaV1JLGdERWZ69o6wxMZ+RqKYX2wdxXdU7zTp7ciwAKJdtuPoRjm1A
+         MBjq3h3KJZCzsjKCXqhQgRtse6xZGmXmr6aBbDVcrbVNFDkpMFOQlDHNjLoxYtyqh+UH
+         ZR3Q+Mhxa6Uej9W7dtiis2JcfTTCJJ9FPkZGluyv6uI1LoMP5E43K6bsud07CsjtO8Nl
+         g0pA==
+X-Gm-Message-State: AOJu0Yx+bmgrfwyABY7lQvr8lkDb8ulFSdpRaJN0jKK7WvHO9313A6un
+        56Fs3GmXF1FzblKcx/TdpHU=
+X-Google-Smtp-Source: AGHT+IGkFMC4W+VruRHn+9YMP3Msz2kB5rnKpUAeN7n2f2Aty8bXz9HXWAe0sM149yP9SikRLZ6Uqg==
+X-Received: by 2002:a17:903:190:b0:1c6:15fc:999 with SMTP id z16-20020a170903019000b001c615fc0999mr5710128plg.45.1695700191016;
+        Mon, 25 Sep 2023 20:49:51 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id v24-20020a17090331d800b001c3267ae314sm9785441ple.156.2023.09.25.20.49.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Sep 2023 20:49:50 -0700 (PDT)
+Message-ID: <90dd2e2e-71ae-d8c4-5d3b-9628e7710337@gmail.com>
+Date:   Tue, 26 Sep 2023 11:49:44 +0800
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c9c9134-d381-4203-1456-08dbbe430b93
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2023 03:45:36.9006
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lEBKLBjrFsfbRz23W8XUw+B3O0eYHsM7BjZzEBbRC+uh3ER82Eowt+z2lP67ahDT4J/PL6UCzQmWi1EgM+mMmA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9165
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH V2] KVM: x86/pmu: Disable vPMU if EVENTSEL_GUESTONLY bit
+ doesn't exist
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Ravi Bangoria <ravi.bangoria@amd.com>,
+        Manali Shukla <manali.shukla@amd.com>
+References: <20230407085646.24809-1-likexu@tencent.com>
+ <ZDA4nsyAku9B2/58@google.com>
+ <6ee140c9-ccd5-9569-db17-a542a7e28d5c@gmail.com>
+ <ZRIYbu4wSVW9a+8i@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZRIYbu4wSVW9a+8i@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gRnJvbTogTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gU2VudDog
-VHVlc2RheSwgU2VwdGVtYmVyIDI2LCAyMDIzIDEyOjA2IEFNDQoNCj4gT25lIGNhbiB0aGlua2Fi
-bHkgZG8gdGhhdCB3YWl0IGluIGhhcmR3YXJlLCB0aG91Z2guIEp1c3QgZGVmZXIgY29tcGxldGlv
-biB1bnRpbA0KPiByZWFkIGlzIGRvbmUuDQo+DQpPbmNlIE9BU0lTIGRvZXMgc3VjaCBuZXcgaW50
-ZXJmYWNlIGFuZCBpZiBzb21lIGh3IHZlbmRvciBfYWN0dWFsbHlfIHdhbnRzIHRvIGRvIHN1Y2gg
-Y29tcGxleCBodywgbWF5IGJlIHZmaW8gZHJpdmVyIGNhbiBhZG9wdCB0byBpdC4NCldoZW4gd2Ug
-d29ya2VkIHdpdGggeW91LCB3ZSBkaXNjdXNzZWQgdGhhdCB0aGVyZSBzdWNoIGh3IGRvZXMgbm90
-IGhhdmUgZW5vdWdoIHJldHVybnMgYW5kIGhlbmNlIHRlY2huaWNhbCBjb21taXR0ZWUgY2hvb3Nl
-IHRvIHByb2NlZWQgd2l0aCBhZG1pbiBjb21tYW5kcy4NCkkgd2lsbCBza2lwIHJlLWRpc2N1c3Np
-bmcgYWxsIG92ZXIgaXQgYWdhaW4gaGVyZS4NCg0KVGhlIGN1cnJlbnQgdmlydG8gc3BlYyBpcyBk
-ZWxpdmVyaW5nIHRoZSBiZXN0IHRyYWRlLW9mZnMgb2YgZnVuY3Rpb25hbGl0eSwgcGVyZm9ybWFu
-Y2UgYW5kIGxpZ2h0IHdlaWdodCBpbXBsZW1lbnRhdGlvbiB3aXRoIGZ1dHVyZSBmb3J3YXJkIHBh
-dGggdG93YXJkcyBtb3JlIGZlYXR1cmVzIGFzIEphc29uIGV4cGxhaW5lZCBzdWNoIGFzIG1pZ3Jh
-dGlvbi4NCkFsbCB3aXRoIG5lYXIgemVybyBkcml2ZXIsIHFlbXUgYW5kIHN3IGludm9sdmVtZW50
-IGZvciByYXBpZGx5IGdyb3dpbmcgZmVhdHVyZSBzZXQuLi4NCg==
+On 26/9/2023 7:31 am, Sean Christopherson wrote:
+> On Thu, Sep 14, 2023, Like Xu wrote:
+>> On 7/4/2023 11:37 pm, Sean Christopherson wrote:
+>>> On Fri, Apr 07, 2023, Like Xu wrote:
+>> /*
+>>   * The guest vPMU counter emulation depends on the EVENTSEL_GUESTONLY bit.
+>>   * If this bit is present on the host, the host needs to support at least
+>> the PERFCTR_CORE.
+>>   */
+> 
+> ...
+> 
+>>> 	/*
+>>> 	 * KVM requires guest-only event support in order to isolate guest PMCs
+>>> 	 * from host PMCs.  SVM doesn't provide a way to atomically load MSRs
+>>> 	 * on VMRUN, and manually adjusting counts before/after VMRUN is not
+>>> 	 * accurate enough to properly virtualize a PMU.
+>>> 	 */
+>>>
+>>> But now I'm really confused, because if I'm reading the code correctly, perf
+>>> invokes amd_core_hw_config() for legacy PMUs, i.e. even if PERFCTR_CORE isn't
+>>> supported.  And the APM documents the host/guest bits only for "Core Performance
+>>> Event-Select Registers".
+>>>
+>>> So either (a) GUESTONLY isn't supported on legacy CPUs and perf is relying on AMD
+>>> CPUs ignoring reserved bits or (b) GUESTONLY _is_ supported on legacy PMUs and
+>>> pmu_has_guestonly_mode() is checking the wrong MSR when running on older CPUs.
+>>>
+>>> And if (a) is true, then how on earth does KVM support vPMU when running on a
+>>> legacy PMU?  Is vPMU on AMD just wildly broken?  Am I missing something?
+>>>
+>>
+>> (a) It's true and AMD guest vPMU have only been implemented accurately with
+>> the help of this GUESTONLY bit.
+>>
+>> There are two other scenarios worth discussing here: one is support L2 vPMU
+>> on the PERFCTR_CORE+ host and this proposal is disabling it; and the other
+>> case is to support AMD legacy vPMU on the PERFCTR_CORE+ host.
+> 
+> Oooh, so the really problematic case is when PERFCTR_CORE+ is supported but
+> GUESTONLY is not, in which case KVM+perf *think* they can use GUESTONLY (and
+> HOSTONLY).
+> 
+> That's a straight up KVM (as L0) bug, no?  I don't see anything in the APM that
+> suggests those bits are optional, i.e. KVM is blatantly violating AMD's architecture
+> by ignoring those bits.
+
+For L2 guest, it often doesn't see all the cpu features corresponding to the
+cpu model because KVM and VMM filter some of the capabilities. We can't say
+that the absence of these features violates spec, can we ?
+
+I treat it as a KVM flaw or a lack of emulation capability.
+
+> 
+> I would rather fix KVM (as L0).  It doesn't seem _that_ hard to support, e.g.
+> modify reprogram_counter() to disable the counter if it's supposed to be silent
+> for the current mode, and reprogram all counters if EFER.SVME is toggled, and on
+> all nested transitions.
+
+I thought about that too, setting up EFER.SVME and VMRUN is still a little
+bit far away, and more micro-testing is needed to correct the behavior
+of the emulation here, considering KVM also has to support emulated ins.
+
+It's safe to say that there are no real user scenarios using vPMU in a nested
+guest, so I'm more inclined to disable it provisionally (for the sake of more
+stable tree users), enabling this feature is honestly at the end of my to-do list.
