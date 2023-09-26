@@ -2,98 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CD857AE290
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 01:43:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FDD87AE2BD
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 02:03:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbjIYXne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 19:43:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42002 "EHLO
+        id S230449AbjIZADo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 20:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjIYXne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 19:43:34 -0400
-Received: from out-201.mta1.migadu.com (out-201.mta1.migadu.com [IPv6:2001:41d0:203:375::c9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D86F10A
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 16:43:27 -0700 (PDT)
-Date:   Mon, 25 Sep 2023 23:43:21 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1695685405;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NrzQOH1Ox8XxW6NlDhLwmmwu2aR6fzGDNpeuN200bvE=;
-        b=PmAfTnh4xkBzPeUzbcb68rsxMXjIr4FaUqQKKc7y0Ux1UaxXGt4Bb7wJ1BmBuCDSI/mLo9
-        lUAMJLVj22ChFQjL9DklPGAsqD5eFsb1yAIpoSN+V8lKVkNcXL35aDMsxqEKYcqsCfseR5
-        gUbXX5lXL0QlnYfkCcTMgZQmcPl0ReQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Jing Zhang <jingzhangos@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Always invalidate TLB for stage-2 permission
- faults
-Message-ID: <ZRIbGe1hvf6kbu4s@linux.dev>
-References: <20230922223229.1608155-1-oliver.upton@linux.dev>
- <ZQ4eZcWRO/nHnGc4@linux.dev>
- <87ttrj5181.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ttrj5181.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229495AbjIZADm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 20:03:42 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C1DFC
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 17:03:35 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81503de9c9so11815638276.3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 17:03:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695686614; x=1696291414; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5YTmwARNMOrdL0eY6PvUVfzk6lroU7KMzCpG5updMAI=;
+        b=AQQRUSkViezKihFy3fWNfoGQEEUOwvy9p7Mk/oZoT8f2N7jqkml9velSThK2chQJo7
+         l1v4oG6Ek0TSXECzmfook1Q/pIGKsoSOsccrVsT2tMVj7NTYvrkRr/nqHShW7z7Mihr4
+         loluEL+QO6hhHVBbHjQYGSClbQ2lKnDt4A4Kc9BW9QgnXfKo4SBi/tDmQnPeIVM9/4gd
+         cHP3rUboBkvs3bZOHZ97dWja5UXkPWmw/buorojUBBCbEHvTYAt95YpEsIfkdJcWkWSF
+         VzKSLtVp23Fuu5D4MBid8Zf5jWGVK61sxjhKxzzs/e09i4PNpbUruLPw5Xnrvj7RvsCQ
+         7wVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695686614; x=1696291414;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5YTmwARNMOrdL0eY6PvUVfzk6lroU7KMzCpG5updMAI=;
+        b=Sm/HDpRpCTVkCjY531wReU8HDD+2ZJNkDzYdAKZdbuNz52IyVOuZqOpkQHwOWPhsgg
+         Ql2G3YdU8tDVtlyhpcg7TNQfl1BW0fVwPCSOk4HrNWG42vG5HitAgO7VSNMjgb0jKAss
+         V94Z1itILF5GM0But44JzHUCRaf0ucTePrTV0v9n5ao+OIZAoklHD2SPK0Yr42TVwxyN
+         pdMenoj2k2m5rBTX8sFBvb1d1icKBTSY1hWrQCUMX5MEz8PJr7WPgdbzAaZbOvnJDzdF
+         17NNOG/kOWArDLmZUAl2hObAJBm9/4R9RgnFvk8PR39YvyBLWtlYGsFMujdpld6VZOVQ
+         hmFQ==
+X-Gm-Message-State: AOJu0YziVjWZdPZBTGQqvt1wog01ycRLgRjtOwbxwN1f5bNv2nmI+vZb
+        JF5h2s0vY2W9tf9gGvaZ7818UxHxFFI=
+X-Google-Smtp-Source: AGHT+IFjtBd5I0scOusAJ1S2VeqlSo5J7SdEiPZyy00x6t7yvgHWHk1UFsAAVu290oHDscIwGC6Us6oDYvo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:161c:b0:d0e:e780:81b3 with SMTP id
+ bw28-20020a056902161c00b00d0ee78081b3mr82351ybb.2.1695686614668; Mon, 25 Sep
+ 2023 17:03:34 -0700 (PDT)
+Date:   Mon, 25 Sep 2023 17:03:32 -0700
+In-Reply-To: <20230924124410.897646-1-mlevitsk@redhat.com>
+Mime-Version: 1.0
+References: <20230924124410.897646-1-mlevitsk@redhat.com>
+Message-ID: <ZRIf1OPjKV66Y17/@google.com>
+Subject: Re: [PATCH v2 0/4] KVM: x86: tracepoint updates
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 24, 2023 at 11:12:30AM +0100, Marc Zyngier wrote:
-> On Sat, 23 Sep 2023 00:08:21 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Fri, Sep 22, 2023 at 10:32:29PM +0000, Oliver Upton wrote:
-> > > It is possible for multiple vCPUs to fault on the same IPA and attempt
-> > > to resolve the fault. One of the page table walks will actually update
-> > > the PTE and the rest will return -EAGAIN per our race detection scheme.
-> > > KVM elides the TLB invalidation on the racing threads as the return
-> > > value is nonzero.
-> > > 
-> > > Before commit a12ab1378a88 ("KVM: arm64: Use local TLBI on permission
-> > > relaxation") KVM always used broadcast TLB invalidations when handling
-> > > permission faults, which had the convenient property of making the
-> > > stage-2 updates visible to all CPUs in the system. However now we do a
-> > > local invalidation, and TLBI elision leads to vCPUs getting stuck in a
-> > > permission fault loop. Remember that the architecture permits the TLB to
-> > > cache translations that precipitate a permission fault.
-> > 
-> > The effects of this are slightly overstated (got ahead of myself).
-> > EAGAIN only crops up if the cmpxchg() fails, we return 0 if the PTE
-> > didn't need to be updated.
-> > 
-> > On the subsequent permission fault we'll do the right thing and
-> > invalidate the TLB, so this change is purely an optimization rather than
-> > a correctness issue.
+On Sun, Sep 24, 2023, Maxim Levitsky wrote:
+> This patch series is intended to add some selected information
+> to the kvm tracepoints to make it easier to gather insights about
+> running nested guests.
 > 
-> Can you measure the actual effect of this change? In my (limited)
-> experience, I had to actually trick the guest into doing this, and
-> opportunistically invalidating TLBs didn't have any significant
-> benefit.
+> This patch series was developed together with a new x86 performance analysis tool
+> that I developed recently (https://gitlab.com/maximlevitsky/kvmon)
+> which aims to be a better kvm_stat, and allows you at glance
+> to see what is happening in a VM, including nesting.
 
-Sure. We were debugging some issues of vCPU hangs during post-copy
-migration but that's more likely to be an issue with our VMM + out of
-tree code.
+Rather than add more and more tracepoints, I think we should be more thoughtful
+about (a) where we place KVM's tracepoints and (b) giving userspace the necessary
+hooks to write BPF programs to extract whatever data is needed at any give time.
 
-Marginal improvements be damned, I'm still somewhat keen on doing the
-TLB invalidation upon race detection anyway. Going back to the guest is
-pointless, since in all likelihood we will hit the TLB entry that led to
-the permission fault in the first place.
+There's simply no way we can iterate fast enough in KVM tracepoints to adapt to
+userspace's debug/monitoring needs.  E.g. if it turns out someone wants detailed
+info on hypercalls that use memory or registers beyond ABCD, the new tracepoints
+won't help them.
 
--- 
-Thanks,
-Oliver
+If all KVM tracepoints grab "struct kvm_vcpu" and force VMCS "registers" to be
+cached (or decached depending on one's viewpoint), then I think that'll serve 99%
+of usecases.  E.g. the vCPU gives a BPF program kvm_vcpu, vcpu_{vmx,svm}, kvm, etc.
+
+trace_kvm_exit is good example, where despite all of the information that is captured
+by KVM, it's borderline worthless for CPUID and MSR exits because their interesting
+information is held in registers and not captured in the VMCS or VMCB.
+
+There are some on BTF type info issues that I've encountered, but I suspect that's
+as much a PEBKAC problem as anything.
