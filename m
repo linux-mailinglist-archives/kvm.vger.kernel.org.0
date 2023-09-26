@@ -2,68 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C47747AEFDF
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 17:44:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F91B7AEFFE
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 17:52:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234692AbjIZPon (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 11:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35624 "EHLO
+        id S235167AbjIZPwf convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 26 Sep 2023 11:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbjIZPol (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 11:44:41 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213CF116
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 08:44:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d848694462aso13712251276.3
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 08:44:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695743073; x=1696347873; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dUqxLY2nTBwa9TznKkTTvHje90znBvp6KBryn5bkyvU=;
-        b=zrnFlS6O3Q/Uf1lgaA7OEby+ESk7FU/X4I2aqgg6RW384xfQNSiF/q0b4VFU9axZfu
-         WYcyY8OO3ee2HZ9VDCq1JUHrl3iUqXZvUOBVm6McNzCIK4/jjtrQJRLFgY/BkL80ejZw
-         YFVCqzf+72WbpSQDg6pnjSyxbkM3aiyD3TxLZWQZzf7h75jk5Cc8SVCxZpLtmP4nWlxE
-         ssFzE8OuD9lIzFHqwvX9YAmtd4UnJsgfkuMy3ns+S7egO19Tl4jCdINCWfVzgbEz++KM
-         50szg3qBkspaXBrGUbgttOTToHfYps2x4su4lDAaxOxBIsAy7nitpaJ/xWGO4ua6IGCP
-         z56g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695743073; x=1696347873;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dUqxLY2nTBwa9TznKkTTvHje90znBvp6KBryn5bkyvU=;
-        b=sU6OIzzi1xH2+5cfsoYx91aqQr29nvPbGTwWNZKXsdte9RomF++ZaBRXjFAWxLOMAN
-         dXQGnyWKKdh9nBmkY8h5gK3+smGDvzXaOLZZPxBHtLd88VO+wVIGYAw4hsXlcH/yFzUX
-         5zoR8U8tE0nnSMvNmlPs7bXxRiLc+nUxrXRvVCEmTqsQYAcUxzyauVqEyJ/WLxUOf3nv
-         KXW8s9VxopjJC+CwGx4ovRZQi7YJAmB/g/mzGaEFg2nIOCv7wtXPxMa7Vdfbtq2l+OcO
-         SpYPRtuU+TALopNhbYfPTpTH8hhGTa3ZzUJ2puzo5HSaoI7S4UfZVR7xJ0zZF1GmLY29
-         voEw==
-X-Gm-Message-State: AOJu0Yyl+SOF++GHoyW2mv2/SBUdCo5E2TOOy9Ppi0jEqbNvRBA4kQjl
-        qAE8e7sXZHl38b2wXtwRYHL+9Dr7I8g=
-X-Google-Smtp-Source: AGHT+IGme/vBiUuM/J3y+xMji41rNGS2G4ms8AQla0qKpMBJJt6otcitWzAieqjeVbUWwrD7XMmD/9I+6No=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8c02:0:b0:d81:43c7:61ed with SMTP id
- k2-20020a258c02000000b00d8143c761edmr104033ybl.5.1695743073295; Tue, 26 Sep
- 2023 08:44:33 -0700 (PDT)
-Date:   Tue, 26 Sep 2023 08:44:31 -0700
-In-Reply-To: <90dd2e2e-71ae-d8c4-5d3b-9628e7710337@gmail.com>
-Mime-Version: 1.0
-References: <20230407085646.24809-1-likexu@tencent.com> <ZDA4nsyAku9B2/58@google.com>
- <6ee140c9-ccd5-9569-db17-a542a7e28d5c@gmail.com> <ZRIYbu4wSVW9a+8i@google.com>
- <90dd2e2e-71ae-d8c4-5d3b-9628e7710337@gmail.com>
-Message-ID: <ZRL8X74x2jnD2Mue@google.com>
-Subject: Re: [PATCH V2] KVM: x86/pmu: Disable vPMU if EVENTSEL_GUESTONLY bit
- doesn't exist
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Ravi Bangoria <ravi.bangoria@amd.com>,
-        Manali Shukla <manali.shukla@amd.com>
+        with ESMTP id S231300AbjIZPwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 11:52:34 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1CEEB
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 08:52:22 -0700 (PDT)
+Received: from lhrpeml500006.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rw3yx0L2lz6J7Xw;
+        Tue, 26 Sep 2023 23:47:21 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 26 Sep 2023 16:52:19 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
+ Tue, 26 Sep 2023 16:52:19 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+CC:     Oliver Upton <oliver.upton@linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        zhukeqian <zhukeqian1@huawei.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related pgtable
+ interfaces
+Thread-Topic: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related pgtable
+ interfaces
+Thread-Index: AQHZ1zeo1TAqj48yIUy5dQTN13GTvLAnEnmAgAAodgCABBhqIIACB0yAgAAW0pA=
+Date:   Tue, 26 Sep 2023 15:52:19 +0000
+Message-ID: <eeaa28549e22499cae2e23021832a28b@huawei.com>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+        <20230825093528.1637-4-shameerali.kolothum.thodi@huawei.com>
+        <ZQ2xmzZ0H5v5wDSw@arm.com> <ZQ3TjMcc0FhZCR0r@linux.dev>
+        <c4e12638b4874dc4809d24ce131d7b07@huawei.com> <ZRL2owYDvKF6gnlb@arm.com>
+In-Reply-To: <ZRL2owYDvKF6gnlb@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.195.247.239]
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,78 +69,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023, Like Xu wrote:
-> On 26/9/2023 7:31 am, Sean Christopherson wrote:
-> > On Thu, Sep 14, 2023, Like Xu wrote:
-> > > On 7/4/2023 11:37 pm, Sean Christopherson wrote:
-> > > > On Fri, Apr 07, 2023, Like Xu wrote:
-> > > /*
-> > >   * The guest vPMU counter emulation depends on the EVENTSEL_GUESTONLY bit.
-> > >   * If this bit is present on the host, the host needs to support at least
-> > > the PERFCTR_CORE.
-> > >   */
-> > 
-> > ...
-> > 
-> > > > 	/*
-> > > > 	 * KVM requires guest-only event support in order to isolate guest PMCs
-> > > > 	 * from host PMCs.  SVM doesn't provide a way to atomically load MSRs
-> > > > 	 * on VMRUN, and manually adjusting counts before/after VMRUN is not
-> > > > 	 * accurate enough to properly virtualize a PMU.
-> > > > 	 */
-> > > > 
-> > > > But now I'm really confused, because if I'm reading the code correctly, perf
-> > > > invokes amd_core_hw_config() for legacy PMUs, i.e. even if PERFCTR_CORE isn't
-> > > > supported.  And the APM documents the host/guest bits only for "Core Performance
-> > > > Event-Select Registers".
-> > > > 
-> > > > So either (a) GUESTONLY isn't supported on legacy CPUs and perf is relying on AMD
-> > > > CPUs ignoring reserved bits or (b) GUESTONLY _is_ supported on legacy PMUs and
-> > > > pmu_has_guestonly_mode() is checking the wrong MSR when running on older CPUs.
-> > > > 
-> > > > And if (a) is true, then how on earth does KVM support vPMU when running on a
-> > > > legacy PMU?  Is vPMU on AMD just wildly broken?  Am I missing something?
-> > > > 
-> > > 
-> > > (a) It's true and AMD guest vPMU have only been implemented accurately with
-> > > the help of this GUESTONLY bit.
-> > > 
-> > > There are two other scenarios worth discussing here: one is support L2 vPMU
-> > > on the PERFCTR_CORE+ host and this proposal is disabling it; and the other
-> > > case is to support AMD legacy vPMU on the PERFCTR_CORE+ host.
-> > 
-> > Oooh, so the really problematic case is when PERFCTR_CORE+ is supported but
-> > GUESTONLY is not, in which case KVM+perf *think* they can use GUESTONLY (and
-> > HOSTONLY).
-> > 
-> > That's a straight up KVM (as L0) bug, no?  I don't see anything in the APM that
-> > suggests those bits are optional, i.e. KVM is blatantly violating AMD's architecture
-> > by ignoring those bits.
+
+
+> -----Original Message-----
+> From: Catalin Marinas [mailto:catalin.marinas@arm.com]
+> Sent: 26 September 2023 16:20
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>; kvmarm@lists.linux.dev;
+> kvm@vger.kernel.org; linux-arm-kernel@lists.infradead.org; maz@kernel.org;
+> will@kernel.org; james.morse@arm.com; suzuki.poulose@arm.com;
+> yuzenghui <yuzenghui@huawei.com>; zhukeqian
+> <zhukeqian1@huawei.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
+> Subject: Re: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related
+> pgtable interfaces
 > 
-> For L2 guest, it often doesn't see all the cpu features corresponding to the
-> cpu model because KVM and VMM filter some of the capabilities. We can't say
-> that the absence of these features violates spec, can we ?
-
-Yes, KVM hides features via architectural means.  This is enumerating a feature,
-PERFCTR_CORE, and not providing all its functionalality.  The two things are
-distinctly different.
-
-> I treat it as a KVM flaw or a lack of emulation capability.
-
-A.k.a. a bug.
-
-> > I would rather fix KVM (as L0).  It doesn't seem _that_ hard to support, e.g.
-> > modify reprogram_counter() to disable the counter if it's supposed to be silent
-> > for the current mode, and reprogram all counters if EFER.SVME is toggled, and on
-> > all nested transitions.
+> On Mon, Sep 25, 2023 at 08:04:39AM +0000, Shameerali Kolothum Thodi
+> wrote:
+> > From: Oliver Upton [mailto:oliver.upton@linux.dev]
+> > > On Fri, Sep 22, 2023 at 04:24:11PM +0100, Catalin Marinas wrote:
+> > > > I was wondering if this interferes with the OS dirty tracking (not the
+> > > > KVM one) but I think that's ok, at least at this point, since the PTE is
+> > > > already writeable and a fault would have marked the underlying page
+> as
+> > > > dirty (user_mem_abort() -> kvm_set_pfn_dirty()).
+> > > >
+> > > > I'm not particularly fond of relying on this but I need to see how it
+> > > > fits with the rest of the series. IIRC KVM doesn't go around and make
+> > > > Stage 2 PTEs read-only but rather unmaps them when it changes the
+> > > > permission of the corresponding Stage 1 VMM mapping.
+> > > >
+> > > > My personal preference would be to track dirty/clean properly as we do
+> > > > for stage 1 (e.g. DBM means writeable PTE) but it has some downsides
+> > > > like the try_to_unmap() code having to retrieve the dirty state via
+> > > > notifiers.
+> > >
+> > > KVM's usage of DBM is complicated by the fact that the dirty log
+> > > interface w/ userspace is at PTE granularity. We only want the page
+> > > table walker to relax PTEs, but take faults on hugepages so we can do
+> > > page splitting.
 > 
-> I thought about that too, setting up EFER.SVME and VMRUN is still a little
-> bit far away, and more micro-testing is needed to correct the behavior
-> of the emulation here, considering KVM also has to support emulated ins.
+> Thanks for the clarification.
 > 
-> It's safe to say that there are no real user scenarios using vPMU in a nested
-> guest, so I'm more inclined to disable it provisionally (for the sake of more
-> stable tree users), enabling this feature is honestly at the end of my to-do list.
+> > > > > @@ -952,6 +990,11 @@ static int stage2_map_walker_try_leaf(const
+> struct kvm_pgtable_visit_ctx *ctx,
+> > > > >  	    stage2_pte_executable(new))
+> > > > >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops),
+> granule);
+> > > > >
+> > > > > +	/* Save the possible hardware dirty info */
+> > > > > +	if ((ctx->level == KVM_PGTABLE_MAX_LEVELS - 1) &&
+> > > > > +	    stage2_pte_writeable(ctx->old))
+> > > > > +		mark_page_dirty(kvm_s2_mmu_to_kvm(pgt->mmu),
+> ctx->addr >> PAGE_SHIFT);
+> > > > > +
+> > > > >  	stage2_make_pte(ctx, new);
+> > > >
+> > > > Isn't this racy and potentially losing the dirty state? Or is the 'new'
+> > > > value guaranteed to have the S2AP[1] bit? For stage 1 we normally
+> make
+> > > > the page genuinely read-only (clearing DBM) in a cmpxchg loop to
+> > > > preserve the dirty state (see ptep_set_wrprotect()).
+> > >
+> > > stage2_try_break_pte() a few lines up does a cmpxchg() and full
+> > > break-before-make, so at this point there shouldn't be a race with
+> > > either software or hardware table walkers.
+> 
+> Ah, I missed this. Also it was unrelated to this patch (or rather not
+> introduced by this patch).
+> 
+> > > In both cases the 'old' translation should have DBM cleared. Even if the
+> > > PTE were dirty, this is wasted work since we need to do a final scan of
+> > > the stage-2 when userspace collects the dirty log.
+> > >
+> > > Am I missing something?
+> >
+> > I think we can get rid of the above mark_page_dirty(). I will test it to
+> confirm
+> > we are not missing anything here.
+> 
+> Is this the case for the other places of mark_page_dirty() in your
+> patches? If stage2_pte_writeable() is true, it must have been made
+> writeable earlier by a fault and the underlying page marked as dirty.
+> 
 
-I don't see a way to do that without violating AMD's architecture while still
-exposing the PMU to L1.
+One of the other place we have mark_page_dirty() is in the stage2_unmap_walker().
+And during the testing of this series, I have tried to remove that and
+found out that it actually causes memory corruption during VM migration.
+
+From my old debug logs:
+
+[  399.288076]  stage2_unmap_walker+0x270/0x284
+[  399.288078]  __kvm_pgtable_walk+0x1ec/0x2cc
+[  399.288081]  __kvm_pgtable_walk+0xec/0x2cc
+[  399.288084]  __kvm_pgtable_walk+0xec/0x2cc
+[  399.288086]  kvm_pgtable_walk+0xcc/0x160
+[  399.288088]  kvm_pgtable_stage2_unmap+0x4c/0xbc
+[  399.288091]  stage2_apply_range+0xd0/0xec
+[  399.288094]  __unmap_stage2_range+0x2c/0x60
+[  399.288096]  kvm_unmap_gfn_range+0x30/0x48
+[  399.288099]  kvm_mmu_notifier_invalidate_range_start+0xe0/0x264
+[  399.288103]  __mmu_notifier_invalidate_range_start+0xa4/0x23c
+[  399.288106]  change_protection+0x638/0x900
+[  399.288109]  change_prot_numa+0x64/0xfc
+[  399.288113]  task_numa_work+0x2ac/0x450
+[  399.288117]  task_work_run+0x78/0xd0
+
+It looks like that the unmap path gets triggered from Numa page migration code
+path, so we may need it there.
+
+Thanks,
+Shameer
