@@ -2,110 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48AF07AE8DA
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 11:22:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 951F37AE903
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 11:26:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234114AbjIZJWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 05:22:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33604 "EHLO
+        id S234177AbjIZJ0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 05:26:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234015AbjIZJWR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 05:22:17 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C86E6;
-        Tue, 26 Sep 2023 02:22:10 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5046bf37ec1so3863704e87.1;
-        Tue, 26 Sep 2023 02:22:10 -0700 (PDT)
+        with ESMTP id S234175AbjIZJ0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 05:26:42 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3738A116
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 02:26:34 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4053cb57f02so71714385e9.1
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 02:26:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695720129; x=1696324929; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pEubR82kKhu3tOa9yAY875CpIFzn8tiEB3Lg50u4kRo=;
-        b=eeN1aOY0+Mwz5Mx6wDa8s2yN9ICKYCLWEKUd6e8eO2JI/Wih9h4MsWwab3H1s8Pt7E
-         gGFYExHJR/dERCh3t/wTbVhDTsVWYollnf5v8k1nKbKBLH4J1PZpcr87ysnV4GUOwIK1
-         bDu+hmk5NzZf72AenjwH/t1W4tY0DWXmZOacHgJi1EcMKmnNrkVGRRKrTC8PID/Dbdoh
-         z45OauqwBfZwDOFW7FHYiKIqE6npiakU2hYXttFpAxrvXmR9ISbrwsDTYkfuA1gJ3hte
-         G2+KLbmBjdMyxYW1yqYMS/VPUPEHcu9Dv68zj89k5HWebqGsDIuWFoJ08zJyP79enS69
-         Etwg==
+        d=citrix.com; s=google; t=1695720392; x=1696325192; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to
+         :content-language:subject:from:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kmbdPGVs/W/K0GplugB5QvWG9QUiEtGu9P+FlblHW9s=;
+        b=omASNCkvQh8ogDycK6NS67DjKJ9uzDzUSm5qj2PQ42ShbFSp0GjTT1kFT9G8h/y/NP
+         CmD6FuqIQ10+Z9raam3r4/NqUsq7eXuiu9uvf3msORuxNCoxvZ96rhuaJz3VgwGB4Vth
+         vUHV0Rs+bmjfVjEuTYRdZ6Py8lkOBcJCj+6iQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695720129; x=1696324929;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pEubR82kKhu3tOa9yAY875CpIFzn8tiEB3Lg50u4kRo=;
-        b=HYw14TyQ7ZxST/UvnRdepuhGyAQeBnoCL6cSww5yCADaopBYeeUpyNv+RXq3ksYhjg
-         OHntToi/IMIllVqoZVil9MAQfFtIVbfNjq4bcRRqsqklgIRrRYXeZpPMaNJB53G9ePMZ
-         wc3x0OQqDgL/VfIsIgjDeEm8si5mWqfzaD3YbDOBystCrj5LsYM0O00addw1ykBYd8xl
-         ucA+Wwtrl+6Rx/UWq8DUbmiQbIXd5ie4XtlYN+4/qgnxN1PbrUSLTPxHZjl9Lsa6BTKh
-         OLhJbKLSN2PLjRYIz+qkxiBlGygpMRISkwhkIjWA7i5exuO6RsRhGImMKHEmaiVc3JnX
-         l4OQ==
-X-Gm-Message-State: AOJu0YzYmcUgfxkLrrEaJjTgtEJMfyGPJsQRQVUoGWgrzzMfShFXIse4
-        Pc7ReyFY1WVxTse2OYLEBi4=
-X-Google-Smtp-Source: AGHT+IF+KtP3QcLKBXveBnhJaxi5zjPIyU/ScF+ivp5PYEBpi8ScyCKmc3UCDNoNWo9VHPKwrhwFng==
-X-Received: by 2002:a05:6512:308f:b0:503:985:92c4 with SMTP id z15-20020a056512308f00b00503098592c4mr8747988lfd.52.1695720128822;
-        Tue, 26 Sep 2023 02:22:08 -0700 (PDT)
-Received: from [192.168.8.182] (54-240-197-236.amazon.com. [54.240.197.236])
-        by smtp.gmail.com with ESMTPSA id t1-20020a1c7701000000b003fe23b10fdfsm17442193wmi.36.2023.09.26.02.22.07
+        d=1e100.net; s=20230601; t=1695720392; x=1696325192;
+        h=content-transfer-encoding:in-reply-to:references:cc:to
+         :content-language:subject:from:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kmbdPGVs/W/K0GplugB5QvWG9QUiEtGu9P+FlblHW9s=;
+        b=k+slP4iUqLbLBJRUm1E7JvXLElOxES3iN8wKofHCUdWt20TpO4du1NGuS9xSr6e+rI
+         YLqP8qibJPHP9HAEgCY86llf6rFQ4vNkljNjLEdVEiQBRekrihONXQfcr8Yt3pNsjDh7
+         VjTBh6Ear3vWHMiEbvAJik45F14N+oXJR6/958yMF+yyWksyG4vrtSD980aArfaHoJWo
+         Q+wW2o4o5cNuc7PYz+cZvu05jqQ+dP0Qvm9HEcM/xwxrwJmUcrzhsSxtAhdm5gr9SFTx
+         bBQAkjx8ye3rWg5dqUNL6owuy1DqjOb+KksFRaVmp0dJqOZP/Snpd4i6BxH6oNLdl1uN
+         5UFg==
+X-Gm-Message-State: AOJu0YwlKHoCwieRnlVA0uBLZkoTCK1gmQp7WN2Qkpmr65KinINqtiik
+        pOivvHjl1O1Gvamy0fj9f3oc9g==
+X-Google-Smtp-Source: AGHT+IGgfHuuM6+TDVmgDCR6/9jB/xVFtYMos7qI/oRqScsqgBiOvBrkuPDQ8QUbO3jvp1Bf0T5msA==
+X-Received: by 2002:a5d:44ca:0:b0:31f:fdd8:7d56 with SMTP id z10-20020a5d44ca000000b0031ffdd87d56mr8037098wrr.12.1695720392647;
+        Tue, 26 Sep 2023 02:26:32 -0700 (PDT)
+Received: from [10.80.67.28] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
+        by smtp.gmail.com with ESMTPSA id o5-20020adfeac5000000b0031984b370f2sm14100219wrn.47.2023.09.26.02.26.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Sep 2023 02:22:08 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <5b448307-19f3-4d69-b7f4-3ebedcff030a@xen.org>
-Date:   Tue, 26 Sep 2023 10:22:07 +0100
+        Tue, 26 Sep 2023 02:26:32 -0700 (PDT)
+Message-ID: <6e0064bc-65c1-24f5-c29d-c1d1c027e2d3@citrix.com>
+Date:   Tue, 26 Sep 2023 10:26:31 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v5 06/10] KVM: xen: allow shared_info to be mapped by
- fixed HVA
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-References: <20230922150009.3319-1-paul@xen.org>
- <20230922150009.3319-7-paul@xen.org>
- <0bd42244f232ecc24cbbd2750196758bf7944293.camel@infradead.org>
-Organization: Xen Project
-In-Reply-To: <0bd42244f232ecc24cbbd2750196758bf7944293.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+From:   andrew.cooper3@citrix.com
+Subject: Re: [PATCH v11 05/37] x86/trapnr: Add event type macros to
+ <asm/trapnr.h>
+Content-Language: en-GB
+To:     Nikolay Borisov <nik.borisov@suse.com>, Xin Li <xin3.li@intel.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
+        mhiramat@kernel.org, jiangshanlai@gmail.com
+References: <20230923094212.26520-1-xin3.li@intel.com>
+ <20230923094212.26520-6-xin3.li@intel.com>
+ <7acd7bb3-0406-4fd9-8396-835bfd951d87@suse.com>
+In-Reply-To: <7acd7bb3-0406-4fd9-8396-835bfd951d87@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/09/2023 08:07, David Woodhouse wrote:
-> On Fri, 2023-09-22 at 15:00 +0000, Paul Durrant wrote:
->> From: Paul Durrant <pdurrant@amazon.com>
->>
->> The shared_info page is not guest memory as such. It is a dedicated page
->> allocated by the VMM and overlaid onto guest memory in a GFN chosen by the
->> guest. The guest may even request that shared_info be moved from one GFN
->> to another, but the HVA is never going to change. Thus it makes much more
->> sense to map the shared_info page in kernel once using this fixed HVA.
-> 
-> The words "makes much more sense" are doing a *lot* of work there. :)
-> 
-> When heckling the cover letter in
-> https://lore.kernel.org/kvm/d13e459e221f28fb1865eedea023e583a2277ab1.camel@infradead.org/
-> I suggested that the explanation probably wants to make it into a
-> commit message rather than just the cover letter which tends not to be
-> preserved in the commit history. It's *this* commit which needs it, I
-> think.
+On 26/09/2023 9:10 am, Nikolay Borisov wrote:
+> On 23.09.23 г. 12:41 ч., Xin Li wrote:
+>> diff --git a/arch/x86/include/asm/trapnr.h
+>> b/arch/x86/include/asm/trapnr.h
+>> index f5d2325aa0b7..8d1154cdf787 100644
+>> --- a/arch/x86/include/asm/trapnr.h
+>> +++ b/arch/x86/include/asm/trapnr.h
+>> @@ -2,6 +2,18 @@
+>>   #ifndef _ASM_X86_TRAPNR_H
+>>   #define _ASM_X86_TRAPNR_H
+>>   +/*
+>> + * Event type codes used by FRED, Intel VT-x and AMD SVM
+>> + */
+>> +#define EVENT_TYPE_EXTINT    0    // External interrupt
+>> +#define EVENT_TYPE_RESERVED    1
+>> +#define EVENT_TYPE_NMI        2    // NMI
+>> +#define EVENT_TYPE_HWEXC    3    // Hardware originated traps,
+>> exceptions
+>> +#define EVENT_TYPE_SWINT    4    // INT n
+>> +#define EVENT_TYPE_PRIV_SWEXC    5    // INT1
+>> +#define EVENT_TYPE_SWEXC    6    // INTO, INT3
+>
+> nit: This turned into INTO (Oh) rather than INT0( zero) in v11
 
-Ok, I'll try to come up with some concise wording.
+Yes, v11 corrected a bug in v10.
 
-   Paul
+The INTO instruction is "INT on Overflow".  No zero involved.
 
+INT3 is thusly named because it generates vector 3.  Similarly for INT1
+although it had the unofficial name ICEBP long before INT1 got documented.
+
+If INTO were to have a number, it would need to be 4, but it's behaviour
+is conditional on the overflow flag, unlike INT3/1 which are
+unconditional exceptions.
+
+~Andrew
