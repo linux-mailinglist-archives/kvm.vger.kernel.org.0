@@ -2,101 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0777AEF06
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 16:58:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8246F7AEF80
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 17:20:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234862AbjIZOuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 10:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
+        id S233309AbjIZPUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 11:20:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234692AbjIZOuL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 10:50:11 -0400
-X-Greylist: delayed 68922 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 26 Sep 2023 07:50:01 PDT
-Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [IPv6:2a02:6b8:c03:500:1:45:d181:df01])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374D7116
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 07:50:01 -0700 (PDT)
-Received: from mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:5429:0:640:6285:0])
-        by forwardcorp1c.mail.yandex.net (Yandex) with ESMTP id 415FF613D7;
-        Tue, 26 Sep 2023 17:49:54 +0300 (MSK)
-Received: from [IPV6:2a02:6b8:b081:b41d::1:39] (unknown [2a02:6b8:b081:b41d::1:39])
-        by mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id rnQImn0Oca60-StuCL6yV;
-        Tue, 26 Sep 2023 17:49:53 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-        s=default; t=1695739793;
-        bh=52P7ivRmreoIBrospgFGRtv2ATCZjDAvi7vkNLxLgx8=;
-        h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-        b=ITbSJkEGeoFb2fVYWQNALUQ2twPUqDf3ILK/EiwDduVBiqbvwo0kt8Kz8mbLuouGL
-         SPuAHW/qkLK07mQPYxNKlbK3hwQnLCZ5HJTmYNdEj8MFGZMHWsXVe50OeuKiIHiaxy
-         dZ8AeHAiCmGfIzy5+eJXo1HqkRQwI9C7O4SitF4Y=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-26.myt.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Message-ID: <ca305dae-9e1d-bb76-36e6-fd007a817d0c@yandex-team.ru>
-Date:   Tue, 26 Sep 2023 17:49:53 +0300
+        with ESMTP id S229732AbjIZPUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 11:20:15 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE31410A
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 08:20:08 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117E9C433C8;
+        Tue, 26 Sep 2023 15:20:05 +0000 (UTC)
+Date:   Tue, 26 Sep 2023 16:20:03 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        zhukeqian <zhukeqian1@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: Re: [RFC PATCH v2 3/8] KVM: arm64: Add some HW_DBM related pgtable
+ interfaces
+Message-ID: <ZRL2owYDvKF6gnlb@arm.com>
+References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
+ <20230825093528.1637-4-shameerali.kolothum.thodi@huawei.com>
+ <ZQ2xmzZ0H5v5wDSw@arm.com>
+ <ZQ3TjMcc0FhZCR0r@linux.dev>
+ <c4e12638b4874dc4809d24ce131d7b07@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 09/12] kvm-all: introduce limits for name_size and
- num_desc
-Content-Language: en-US
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com,
-        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
-References: <20230925194040.68592-1-vsementsov@yandex-team.ru>
- <20230925194040.68592-10-vsementsov@yandex-team.ru>
- <CAFEAcA8CXa1fyyGtZRwbyPch9wwmgMrg8wbWEPZ3pL3GW6n1dg@mail.gmail.com>
-From:   Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>
-In-Reply-To: <CAFEAcA8CXa1fyyGtZRwbyPch9wwmgMrg8wbWEPZ3pL3GW6n1dg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c4e12638b4874dc4809d24ce131d7b07@huawei.com>
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.09.23 14:05, Peter Maydell wrote:
-> On Mon, 25 Sept 2023 at 20:43, Vladimir Sementsov-Ogievskiy
-> <vsementsov@yandex-team.ru> wrote:
->>
->> Coverity doesn't like when the value with unchecked bounds that comes
->> from fd is used as length for IO or allocation. And really, that's not
->> a good practice. Let's introduce at least an empirical limits for these
->> values.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>
->> ---
->>   accel/kvm/kvm-all.c | 15 +++++++++++++++
->>   1 file changed, 15 insertions(+)
->>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index ff1578bb32..6d0ba7d900 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -3988,6 +3988,9 @@ typedef struct StatsDescriptors {
->>   static QTAILQ_HEAD(, StatsDescriptors) stats_descriptors =
->>       QTAILQ_HEAD_INITIALIZER(stats_descriptors);
->>
->> +
->> +#define KVM_STATS_QEMU_MAX_NAME_SIZE (1024 * 1024)
->> +#define KVM_STATS_QEMU_MAX_NUM_DESC (1024)
+On Mon, Sep 25, 2023 at 08:04:39AM +0000, Shameerali Kolothum Thodi wrote:
+> From: Oliver Upton [mailto:oliver.upton@linux.dev]
+> > On Fri, Sep 22, 2023 at 04:24:11PM +0100, Catalin Marinas wrote:
+> > > I was wondering if this interferes with the OS dirty tracking (not the
+> > > KVM one) but I think that's ok, at least at this point, since the PTE is
+> > > already writeable and a fault would have marked the underlying page as
+> > > dirty (user_mem_abort() -> kvm_set_pfn_dirty()).
+> > >
+> > > I'm not particularly fond of relying on this but I need to see how it
+> > > fits with the rest of the series. IIRC KVM doesn't go around and make
+> > > Stage 2 PTEs read-only but rather unmaps them when it changes the
+> > > permission of the corresponding Stage 1 VMM mapping.
+> > >
+> > > My personal preference would be to track dirty/clean properly as we do
+> > > for stage 1 (e.g. DBM means writeable PTE) but it has some downsides
+> > > like the try_to_unmap() code having to retrieve the dirty state via
+> > > notifiers.
+> > 
+> > KVM's usage of DBM is complicated by the fact that the dirty log
+> > interface w/ userspace is at PTE granularity. We only want the page
+> > table walker to relax PTEs, but take faults on hugepages so we can do
+> > page splitting.
+
+Thanks for the clarification.
+
+> > > > @@ -952,6 +990,11 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> > > >  	    stage2_pte_executable(new))
+> > > >  		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+> > > >
+> > > > +	/* Save the possible hardware dirty info */
+> > > > +	if ((ctx->level == KVM_PGTABLE_MAX_LEVELS - 1) &&
+> > > > +	    stage2_pte_writeable(ctx->old))
+> > > > +		mark_page_dirty(kvm_s2_mmu_to_kvm(pgt->mmu), ctx->addr >> PAGE_SHIFT);
+> > > > +
+> > > >  	stage2_make_pte(ctx, new);
+> > >
+> > > Isn't this racy and potentially losing the dirty state? Or is the 'new'
+> > > value guaranteed to have the S2AP[1] bit? For stage 1 we normally make
+> > > the page genuinely read-only (clearing DBM) in a cmpxchg loop to
+> > > preserve the dirty state (see ptep_set_wrprotect()).
+> > 
+> > stage2_try_break_pte() a few lines up does a cmpxchg() and full
+> > break-before-make, so at this point there shouldn't be a race with
+> > either software or hardware table walkers.
+
+Ah, I missed this. Also it was unrelated to this patch (or rather not
+introduced by this patch).
+
+> > In both cases the 'old' translation should have DBM cleared. Even if the
+> > PTE were dirty, this is wasted work since we need to do a final scan of
+> > the stage-2 when userspace collects the dirty log.
+> > 
+> > Am I missing something?
 > 
-> These seem arbitrary. Why these values in particular?
-> Does the kernel have any limitation on the values it passes us?
+> I think we can get rid of the above mark_page_dirty(). I will test it to confirm
+> we are not missing anything here.
 
-Documentation doesn't say about limits
-
-> Do we have any particular limit on what we can handle?
-> 
-
-Hmm. At least, we don't arithmetic operations with these values to overflow. But in this case g_malloc0_n should crash anyway.
-
-So we may rely on g_malloc0_n as on assertion that the values are good enough and further doubts are false-positives. Will drop this patch.
+Is this the case for the other places of mark_page_dirty() in your
+patches? If stage2_pte_writeable() is true, it must have been made
+writeable earlier by a fault and the underlying page marked as dirty.
 
 -- 
-Best regards,
-Vladimir
-
+Catalin
