@@ -2,43 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E00117AEC6F
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 14:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C0FE7AECD6
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 14:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234613AbjIZMUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 08:20:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57748 "EHLO
+        id S234637AbjIZMa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 08:30:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234608AbjIZMUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 08:20:41 -0400
+        with ESMTP id S234560AbjIZMaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 08:30:25 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B423126;
-        Tue, 26 Sep 2023 05:20:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F176B101;
+        Tue, 26 Sep 2023 05:30:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
         s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
         In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=GVRP7ZhX9y66fV8la0Z0phq4YOuv61LMjBgGZkw2zl4=; b=rj2urSvrvK6H++zO04aJR9h+9T
-        EkFDrmH3fH6pu6WNr9oi0CobGOYQzl/7mmqEXBu83s1Cj+i728wbadosNbhxm8jKHMsRmK7R83k9v
-        xoi03HNc3qOMIf3rxRJmbX+d92Tu7TV6zGanD5irxQLUyPE51H5zSe1CKp5tvY+1jz3c=;
+        bh=Yx86vZBs7HZcWBbvoo5tY2OVXe5f+cPwzpmsB3avRzM=; b=NO7VsyOvfTAlIh7GHthnujdm5L
+        kAaFkMTmDsbbRC5gG1IjKjfcVFfdEu/eUQwXJFXHJff4s6Jxtpf4dgw85LtH+lpFVkYI/vDiW9+JJ
+        9CEBMibnM6ymFBUgwZJLY85TjVikhVHJLRNRv78vd+AAmUikAM9lmmIpyYpnXcsfhHE8=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1ql73I-0000Hm-HE; Tue, 26 Sep 2023 12:20:32 +0000
+        id 1ql7Ci-0000Tr-GG; Tue, 26 Sep 2023 12:30:16 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1ql73I-0001mF-9r; Tue, 26 Sep 2023 12:20:32 +0000
+        id 1ql73J-0001mF-Ud; Tue, 26 Sep 2023 12:20:34 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
         David Woodhouse <dwmw@amazon.co.uk>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH v6 09/11] KVM: selftests / xen: re-map vcpu_info using HVA rather than GPA
-Date:   Tue, 26 Sep 2023 12:20:11 +0000
-Message-Id: <20230926122013.867391-10-paul@xen.org>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
+Subject: [PATCH v6 10/11] KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
+Date:   Tue, 26 Sep 2023 12:20:12 +0000
+Message-Id: <20230926122013.867391-11-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230926122013.867391-1-paul@xen.org>
 References: <20230926122013.867391-1-paul@xen.org>
@@ -55,63 +59,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-If the relevant capability (KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA) is present
-then re-map vcpu_info using the HVA part way through the tests to make sure
-then there is no functional change.
+Now that all relevant kernel changes and selftests are in place, enable the
+new capability.
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: x86@kernel.org
 
-v5:
+v2:
  - New in this version.
 ---
- .../selftests/kvm/x86_64/xen_shinfo_test.c        | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index e6672ae1d9de..a5d3aea8fd95 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -66,6 +66,7 @@ enum {
- 	TEST_POLL_TIMEOUT,
- 	TEST_POLL_MASKED,
- 	TEST_POLL_WAKE,
-+	SET_VCPU_INFO,
- 	TEST_TIMER_PAST,
- 	TEST_LOCKING_SEND_RACE,
- 	TEST_LOCKING_POLL_RACE,
-@@ -325,6 +326,10 @@ static void guest_code(void)
- 
- 	GUEST_SYNC(TEST_POLL_WAKE);
- 
-+	/* Set the vcpu_info to point at exactly the place it already is to
-+	 * make sure the attribute is functional. */
-+	GUEST_SYNC(SET_VCPU_INFO);
-+
- 	/* A timer wake an *unmasked* port which should wake us with an
- 	 * actual interrupt, while we're polling on a different port. */
- 	ports[0]++;
-@@ -892,6 +897,16 @@ int main(int argc, char *argv[])
- 				alarm(1);
- 				break;
- 
-+			case SET_VCPU_INFO:
-+				if (has_shinfo_hva) {
-+					struct kvm_xen_vcpu_attr vih = {
-+						.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO_HVA,
-+						.u.hva = (unsigned long)vinfo
-+					};
-+					vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &vih);
-+				}
-+				break;
-+
- 			case TEST_TIMER_PAST:
- 				TEST_ASSERT(!evtchn_irq_expected,
- 					    "Expected event channel IRQ but it didn't happen");
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index eee252a0afef..1487b679ae45 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4531,7 +4531,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+ 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
+ 		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
+-		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
++		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
++		    KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA;
+ 		if (sched_info_on())
+ 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
+ 			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
 -- 
 2.39.2
 
