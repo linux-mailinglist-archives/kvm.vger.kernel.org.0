@@ -2,181 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1EC17AE3AE
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 04:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E13CF7AE3D5
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 04:58:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233529AbjIZCfM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 22:35:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
+        id S230120AbjIZC6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 22:58:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233356AbjIZCfL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 22:35:11 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49299103
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:35:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695695704; x=1727231704;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RQkJIbou+c0hSTlcipeunSEpz6AISxc5qlOk5hk+jP4=;
-  b=KYTtPh8p0iBN0kT6L+79vhba/IIajuO7Vu28Y/SLgvk9zI9fWIRcSjI3
-   D5DzfusTtYbMSyFyDOkZrFue01ZXtDtVSUR6tMqT2zoI1obKIJ8gixZVc
-   fqzRFW+A1wALSqr5qCSqxxGxPhms9g22I81IV1ToCgxGrPxE1sPvCIJJa
-   dBxi/26GlBxb6/+XhrhCqHckjCiNccuWK/0Y8rjgLkmoLwKKTE0j1ennM
-   9txc4NzDl/yiNvQG3u/nENyZ7vuW6BkHFJyBhjJ7S0lHSYIm651cpEFn8
-   q7/6afA+o9YnGVA1/ncEyYGgtlQXhMP4YiqWetDl/iY+KaIX2EkJPp4ZG
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="385314246"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="385314246"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 19:35:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="995638790"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="995638790"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.93.21.134]) ([10.93.21.134])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 19:35:01 -0700
-Message-ID: <ce58ea54-5fdb-00c5-0cbe-e1d93fd881f4@intel.com>
-Date:   Tue, 26 Sep 2023 10:34:58 +0800
+        with ESMTP id S229934AbjIZC6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 22:58:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F2C8A3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695697064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n8rCoPOuaYDCIDe0rlK/tHfmdP2Iqj9+uLvJ1lMY8pc=;
+        b=fDeFD6gQ3r8Ft5jxz9JY7/SdB/7SDrOa6ighst+ZZyCyFA+c+aanZg81WEQX4fo9LQPkit
+        UZGbcN/O5GQtEatHWuQWYRWLCZ4osgBA930UcbO1cd5HykQ2upJqpKHpuydKbWLxa1zmYy
+        LzSiAUFkAI5SeDBJCBg45tM2/GVk4fE=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-p6iR5798NlWVfuOTTt9few-1; Mon, 25 Sep 2023 22:57:41 -0400
+X-MC-Unique: p6iR5798NlWVfuOTTt9few-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50467783718so4190951e87.2
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:57:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695697060; x=1696301860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n8rCoPOuaYDCIDe0rlK/tHfmdP2Iqj9+uLvJ1lMY8pc=;
+        b=j00hHTYAELdKU8wfcIgIAxR2RYz34+DWxzajIC74NAMRkRKywHHLzL3bi4wGyhtHnO
+         QhdOfj348UGYz9mHEfLi1TMFxrD1/T5I10l4O+0j0UVmnjnoc+XtalzKnsKlzl7lfmJO
+         dBSuanb6NPuZ3W3AqPmm6fhcvIeWldECxV2EYichHDUqrMtckQAhIWG+K1fjQIinWuBu
+         AdzMaXsT7G9JNhV7KaDlKQEjPP6X1qlFwh6haPkM4IydWnXvwYd2925ILRa6NnlsssZ2
+         5mCiTL4GSh5Wa2gwjKlgCfiouZreALYWBKXl9ZcTIcKGD0swgTiqcfo+FWzbYYB7j7CM
+         UvoA==
+X-Gm-Message-State: AOJu0YxWhECZUu13Utaxag0MDyQ7qnUxrq9v4T09bAxQevMfQUV3TExp
+        E/pqpYRV28josIMn0QrlnmbiPKdHFSk4eRsUURlvtUdjj/s0elqTwwIzuJ1nVMFrjKt1KMfnx4T
+        PrLaQGzhYIKXXaJylGcOM76S5aTZa
+X-Received: by 2002:ac2:48ac:0:b0:503:a76:4eeb with SMTP id u12-20020ac248ac000000b005030a764eebmr5830375lfg.16.1695697060330;
+        Mon, 25 Sep 2023 19:57:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF3RwYqaYdD2D197Rxxx50AyfpQufQFfgo1/JwgJGy62/rNkyDXHkQuYdQhZ6f74/Yi67MydQBhjJAzFfg+eVI=
+X-Received: by 2002:ac2:48ac:0:b0:503:a76:4eeb with SMTP id
+ u12-20020ac248ac000000b005030a764eebmr5830366lfg.16.1695697060053; Mon, 25
+ Sep 2023 19:57:40 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Parav Pandit <parav@nvidia.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Maor Gottlieb <maorg@nvidia.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>
-References: <20230921135426-mutt-send-email-mst@kernel.org>
- <20230921181637.GU13733@nvidia.com>
- <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <20230921155834-mutt-send-email-mst@kernel.org>
- <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
- <20230922122246.GN13733@nvidia.com>
- <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com>
- <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20230925141713-mutt-send-email-mst@kernel.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <20230925141713-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230925103057.104541-1-sgarzare@redhat.com>
+In-Reply-To: <20230925103057.104541-1-sgarzare@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 26 Sep 2023 10:57:29 +0800
+Message-ID: <CACGkMEvWKCoB+u2GO2mRroZDmmxcvd8+ytUjpu6wNcBOAu5RYQ@mail.gmail.com>
+Subject: Re: [PATCH] vringh: don't use vringh_kiov_advance() in vringh_iov_xfer()
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 25, 2023 at 6:31=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
+>
+> In the while loop of vringh_iov_xfer(), `partlen` could be 0 if one of
+> the `iov` has 0 lenght.
+> In this case, we should skip the iov and go to the next one.
+> But calling vringh_kiov_advance() with 0 lenght does not cause the
+> advancement, since it returns immediately if asked to advance by 0 bytes.
+>
+> Let's restore the code that was there before commit b8c06ad4d67d
+> ("vringh: implement vringh_kiov_advance()"), avoiding using
+> vringh_kiov_advance().
+>
+> Fixes: b8c06ad4d67d ("vringh: implement vringh_kiov_advance()")
+> Cc: stable@vger.kernel.org
+> Reported-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-
-On 9/26/2023 2:36 AM, Michael S. Tsirkin wrote:
-> On Mon, Sep 25, 2023 at 08:26:33AM +0000, Parav Pandit wrote:
->>
->>> From: Jason Wang <jasowang@redhat.com>
->>> Sent: Monday, September 25, 2023 8:00 AM
->>>
->>> On Fri, Sep 22, 2023 at 8:25 PM Parav Pandit <parav@nvidia.com> wrote:
->>>>
->>>>> From: Jason Gunthorpe <jgg@nvidia.com>
->>>>> Sent: Friday, September 22, 2023 5:53 PM
->>>>
->>>>>> And what's more, using MMIO BAR0 then it can work for legacy.
->>>>> Oh? How? Our team didn't think so.
->>>> It does not. It was already discussed.
->>>> The device reset in legacy is not synchronous.
->>> How do you know this?
->>>
->> Not sure the motivation of same discussion done in the OASIS with you and others in past.
->>
->> Anyways, please find the answer below.
->>
->> About reset,
->> The legacy device specification has not enforced below cited 1.0 driver requirement of 1.0.
->>
->> "The driver SHOULD consider a driver-initiated reset complete when it reads device status as 0."
->>   
->> [1] https://ozlabs.org/~rusty/virtio-spec/virtio-0.9.5.pdf
-> Basically, I think any drivers that did not read status (linux pre 2011)
-> before freeing memory under DMA have a reset path that is racy wrt DMA, since
-> memory writes are posted and IO writes while not posted have completion
-> that does not order posted transactions, e.g. from pci express spec:
->          D2b
->          An I/O or Configuration Write Completion 37 is permitted to pass a Posted Request.
-> having said that there were a ton of driver races discovered on this
-> path in the years since, I suspect if one cares about this then
-> just avoiding stress on reset is wise.
->
->
->
->>>> The drivers do not wait for reset to complete; it was written for the sw
->>> backend.
->>>
->>> Do you see there's a flush after reset in the legacy driver?
->>>
->> Yes. it only flushes the write by reading it. The driver does not get _wait_ for the reset to complete within the device like above.
-> One can thinkably do that wait in hardware, though. Just defer completion until
-> read is done.
-I agree with MST. At least Intel devices work fine with vfio-pci and 
-legacy driver without any changes.
-So far so good.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
-Zhu Lingshan
+
+> ---
+>  drivers/vhost/vringh.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 >
->> Please see the reset flow of 1.x device as below.
->> In fact the comment of the 1.x device also needs to be updated to indicate that driver need to wait for the device to finish the reset.
->> I will send separate patch for improving this comment of vp_reset() to match the spec.
->>
->> static void vp_reset(struct virtio_device *vdev)
->> {
->>          struct virtio_pci_device *vp_dev = to_vp_device(vdev);
->>          struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
->>
->>          /* 0 status means a reset. */
->>          vp_modern_set_status(mdev, 0);
->>          /* After writing 0 to device_status, the driver MUST wait for a read of
->>           * device_status to return 0 before reinitializing the device.
->>           * This will flush out the status write, and flush in device writes,
->>           * including MSI-X interrupts, if any.
->>           */
->>          while (vp_modern_get_status(mdev))
->>                  msleep(1);
->>          /* Flush pending VQ/configuration callbacks. */
->>          vp_synchronize_vectors(vdev);
->> }
->>
->>
->>> static void vp_reset(struct virtio_device *vdev) {
->>>          struct virtio_pci_device *vp_dev = to_vp_device(vdev);
->>>          /* 0 status means a reset. */
->>>          vp_legacy_set_status(&vp_dev->ldev, 0);
->>>          /* Flush out the status write, and flush in device writes,
->>>           * including MSi-X interrupts, if any. */
->>>          vp_legacy_get_status(&vp_dev->ldev);
->>>          /* Flush pending VQ/configuration callbacks. */
->>>          vp_synchronize_vectors(vdev);
->>> }
->>>
->>> Thanks
->>>
->>>
->>>
->>>> Hence MMIO BAR0 is not the best option in real implementations.
->>>>
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 955d938eb663..7b8fd977f71c 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -123,8 +123,18 @@ static inline ssize_t vringh_iov_xfer(struct vringh =
+*vrh,
+>                 done +=3D partlen;
+>                 len -=3D partlen;
+>                 ptr +=3D partlen;
+> +               iov->consumed +=3D partlen;
+> +               iov->iov[iov->i].iov_len -=3D partlen;
+> +               iov->iov[iov->i].iov_base +=3D partlen;
+>
+> -               vringh_kiov_advance(iov, partlen);
+> +               if (!iov->iov[iov->i].iov_len) {
+> +                       /* Fix up old iov element then increment. */
+> +                       iov->iov[iov->i].iov_len =3D iov->consumed;
+> +                       iov->iov[iov->i].iov_base -=3D iov->consumed;
+> +
+> +                       iov->consumed =3D 0;
+> +                       iov->i++;
+> +               }
+>         }
+>         return done;
+>  }
+> --
+> 2.41.0
+>
 
