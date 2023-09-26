@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25E5C7AF7D3
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 03:52:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A5397AF766
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 02:27:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234168AbjI0Bwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 21:52:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57836 "EHLO
+        id S229990AbjI0A1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 20:27:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234110AbjI0Buo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 21:50:44 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0381660F
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:12 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d868842eda1so11016018276.0
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:12 -0700 (PDT)
+        with ESMTP id S232607AbjI0ATG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 20:19:06 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE52318EA4
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:13 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81646fcf3eso15441247276.0
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695771611; x=1696376411; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DBZz03nR6vXHP7+mhK+zZem9sUDVZQM80l4Hk2l9+oM=;
-        b=3i0PcMdS9aCbrPPQEQHqjwIu1LaPspIkkkn/lKQDNmskMy8HtbJG3UuGwdDVI3rfXb
-         wCgcPY8D7wFsRojoFBQySMHr2QNJSTFs/RHioJksL/KNvLxcGtX8EXndh1NkDkfFMTrT
-         KGatNw2gDSuyGSUcL5NYEEOXgrKv1rDDX22Q8FgQiTx3oKNLmvXkxbLBUtzKBq8abMmq
-         JdmurmVgEh0pCtQ6sRnJtQ7H5QOgkC44ZFl684cs+ybF5Hg+VP3N0Z3L07aHYC4DBTCl
-         4gRdEDEHlDFGRTFhEV27BBaX4scwiEb2MKWhruha+gOGWi7DL5IdI75b84eq3/aV4kIq
-         T2dg==
+        d=google.com; s=20230601; t=1695771612; x=1696376412; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5wBvgde8NqXXedlUolMxmuLFm0wZFB1ciTVf7h91dh0=;
+        b=ckHSCfSdzm1jCMOZ3g2CRPCiDw7uxVOtBclevf32YyJl54MDseQwjUITYRMVlb0rLu
+         4hR/RhQqOOgE59af2WOtJbZSsy5moCcAAzUuy4cVBNAxzLfcwvb+pjXVPwaFA9HMx18V
+         cAqYTL7zcLwpC8/3KJKl/FpAys2/3JQ8sYTb++Kr1Syg6sfwd8Mr2kUf9NRLufpR7HlP
+         IHh+SAYdr49X1lVuD4qWlZpSF6kIRziGfbPrpyGfQ74Y52c21UpQIpzO2bejA1myEakj
+         LotqnE1HJqL+O11zSkXje+xpVwpxB6l1KJyDg3hbKMxJtuI/dXFpQ+vPbhY0VuGdgli/
+         9MQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695771611; x=1696376411;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DBZz03nR6vXHP7+mhK+zZem9sUDVZQM80l4Hk2l9+oM=;
-        b=PTMjEKrwjb6rhktH2kTWQkP26dPaDK4X/jYeIZAMFDBJB59ARUDgopk6dQMHZ2i7h0
-         XqVXecEzjzeLi+Z3onX3j70ozsP4ErCIi6QOcwLVJeD8SqSW/VIEcoEBq6hQhxmdlO5U
-         CnQrd+yiNJJ0u1oZJsyHMyU8Br8yxyfAERN1CIJyW3lAVHyOM+YDJ4xNeSqOgf9b0NF7
-         I0dd/VEl5miBInAYlTITLDW3TSa67tBbQaIq52ht6BcH0GbzIEkv3QNv3PYTuj86iA08
-         gCEacVa+b0Yz6hZITv9IUjgNKopDMRa9jGspsOLGXJE4JBfZRqekXIKaZxxKUOOtvkC2
-         ZXbA==
-X-Gm-Message-State: AOJu0YxDZwCizZO2UzQ5MnmLMXcQhTffUaSXBMKAM4tB4rIMC+VopDtx
-        fkQXRlLGq3Q3Ap+572oP+sth6CC9MnMv
-X-Google-Smtp-Source: AGHT+IH+SqAHAb/x2o7VLSGDQEey3HjL5K5XEMJ7sW/4mrbG9+wfDWdp+8z1rmq6Ubznn1Ur71amL8i04drG
+        d=1e100.net; s=20230601; t=1695771612; x=1696376412;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5wBvgde8NqXXedlUolMxmuLFm0wZFB1ciTVf7h91dh0=;
+        b=e7L+1cGuyrLUt/2pdDtNRmarRPm/4A/rYcz2dejw+Ai4zBYWdLHkO+Vfljr/FsPP8E
+         H+kjf3Y10LqaVtVCnov8t6y97BFgH+vEgL1Vy+vPrGlM68CG9ljZL4Tt7His2j1v+P78
+         M6UJKM1VjNZrsCTGSrFvDhvwU0uXbsj/7SzL4dwb7Z1R0A+fB0Z2eXVrN6CTslB8gJZK
+         PD6m1YBS0MQMSa026gDSYT/gKMsYk5/hys/kiCHylyftf6GZzqLKRQ0vxqMSnkZAtv5R
+         0Jm1ggZD10qdBKoQtgC0JopfP180gBkde8yDNZylhCphl/T+d13hF7fljeIZ8jGulp8H
+         LTLg==
+X-Gm-Message-State: AOJu0YyW9od6MQctz6u9bF0nvvsImarIYcuM/x8zPUrhJ4k899LPL33M
+        tqCC5C97mE25uob66uFTpDFVl6mFe8rQ
+X-Google-Smtp-Source: AGHT+IGQ/Bhiz9+l+ftp30n3Q3sAQclow99O2nr45tC++G2Qcf6D0tuF4DRExCh4Bp6rFs3g73lmp3qip+2k
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a05:6902:541:b0:d0c:c83b:94ed with SMTP id
- z1-20020a056902054100b00d0cc83b94edmr4524ybs.10.1695771611520; Tue, 26 Sep
- 2023 16:40:11 -0700 (PDT)
-Date:   Tue, 26 Sep 2023 23:39:57 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6902:1682:b0:d81:78ec:c403 with SMTP
+ id bx2-20020a056902168200b00d8178ecc403mr4790ybb.12.1695771612735; Tue, 26
+ Sep 2023 16:40:12 -0700 (PDT)
+Date:   Tue, 26 Sep 2023 23:39:58 +0000
+In-Reply-To: <20230926234008.2348607-1-rananta@google.com>
 Mime-Version: 1.0
+References: <20230926234008.2348607-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20230926234008.2348607-1-rananta@google.com>
-Subject: [PATCH v6 00/11] KVM: arm64: PMU: Allow userspace to limit the number
- of PMCs on vCPU
+Message-ID: <20230926234008.2348607-2-rananta@google.com>
+Subject: [PATCH v6 01/11] KVM: arm64: PMU: Introduce helpers to set the
+ guest's PMU
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>
@@ -77,165 +79,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+From: Reiji Watanabe <reijiw@google.com>
 
-With permission from Reiji Watanabe <reijiw@google.com>, the original
-author of the series, I'm posting the v6 with necessary alterations.
+Introduce new helper functions to set the guest's PMU
+(kvm->arch.arm_pmu) either to a default probed instance or to a
+caller requested one, and use it when the guest's PMU needs to
+be set. These helpers will make it easier for the following
+patches to modify the relevant code.
 
-The goal of this series is to allow userspace to limit the number
-of PMU event counters on the vCPU.  We need this to support migration
-across systems that implement different numbers of counters.
+No functional change intended.
 
-The number of PMU event counters is indicated in PMCR_EL0.N.
-For a vCPU with PMUv3 configured, its value will be the same as
-the current PE by default.  Userspace can set PMCR_EL0.N for the
-vCPU to any value even with the current KVM using KVM_SET_ONE_REG.
-However, it is practically unsupported, as KVM resets PMCR_EL0.N
-to the host value on vCPU reset and some KVM code uses the host
-value to identify (un)implemented event counters on the vCPU.
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ arch/arm64/kvm/pmu-emul.c | 50 +++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 15 deletions(-)
 
-This series will ensure that the PMCR_EL0.N value is preserved
-on vCPU reset and that KVM doesn't use the host value
-to identify (un)implemented event counters on the vCPU.
-This allows userspace to limit the number of the PMU event
-counters on the vCPU.
-
-The series is based on v6.6-rc3.
-
-Patch 1 adds helper functions to set a PMU for the guest. This
-helper will make it easier for the following patches to add
-modify codes for that process.
-
-Patch 2 makes the default PMU for the guest set on the first
-vCPU reset.
-
-Patch 3 fixes reset_pmu_reg() to ensure that (RAZ) bits of
-PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
-PMOVS{SET,CLR}_EL1 corresponding to unimplemented event
-counters on the vCPU are reset to zero.
-
-Patch 4 is a minor refactoring to use the default PMU register reset
-function for PMUSERENR_EL0 and PMCCFILTR_EL0.
-
-Patch 5 adds a helper to read vCPU's PMCR_EL0.
-
-Patch 6 changes the code to use the guest's PMCR_EL0.N, instead
-of the PE's PMCR_EL0.N.
-
-Patch 7 adds support userspace modifying PMCR_EL0.N.
-
-Patch 8-11 adds a selftest to verify reading and writing PMU registers
-for implemented or unimplemented PMU event counters on the vCPU.
-
-v6: Thanks, Oliver and Shaoqin for the suggestions
-- Split the previously defined kvm_arm_set_vm_pmu() into separate
-  functions: default arm_pmu and a caller requested arm_pmu.
-- Send -EINVAL from kvm_reset_vcpu(), instead of -ENODEV for the
-  case where KVM fails to set a default arm_pmu, to remain consistent
-  with the existing behavior.
-- Drop the v5 patch-5/12 that removes ARMV8_PMU_PMCR_N_MASK and adds
-  ARMV8_PMU_PMCR_N. Make corresponding changes to v5 patch-6/12.
-- Disregard introducing 'pmcr_n_limit' in kvm->arch as a member to
-  be accessed later in 'set_pmcr()'. Instead, directly obtain the
-  value by accessing the saved 'arm_pmu'.
-- 'set_pmcr()' ignores the error when userspace tries to set PMCR.N
-  greater than the hardware limit to keep the existing API behavior.
-- 'set_pmcr()' ignores modifications to the register after the VM has
-  started and returns a success to userspace.
-- Introduce [get|set]_pmcr_n() helpers in the selftest to make
-  modifications to the field easier.
-- Define the 'vpmu_vm' globally in the selftest, instead of allocating
-  it every time a VM is created.
-- Use the new printf style __GUEST_ASSERT()s in the selftest. 
-
-v5:
-https://lore.kernel.org/all/20230817003029.3073210-1-rananta@google.com/
- - Drop the patches (v4 3,4) related to PMU version fixes as it's
-   now being handled in a separate series [1].
- - Switch to config_lock, instead of kvm->lock, while configuring
-   the guest PMU.
- - Instead of continuing after a WARN_ON() for the return value of
-   kvm_arm_set_vm_pmu() in kvm_arm_pmu_v3_set_pmu(), patch-1 now
-   returns from the function immediately with the error code.
- - Fix WARN_ON() logic in kvm_host_pmu_init() (patch v4 9/14).
- - Instead of returning 0, return -ENODEV from the
-   kvm_arm_set_vm_pmu() stub function.
- - Do not define the PMEVN_CASE() and PMEVN_SWITCH() macros in
-   the selftest code as they are now included in the imported
-   arm_pmuv3.h header.
- - Since the (initial) purpose of the selftest is to test the
-   accessibility of the counter registers, remove the functional
-   test at the end of test_access_pmc_regs(). It'll be added
-   later in a separate series.
- - Introduce additional helper functions (destroy_vpmu_vm(),
-   PMC_ACC_TO_IDX()) in the selftest for ease of maintenance
-   and debugging.
-   
-v4:
-https://lore.kernel.org/all/20230211031506.4159098-1-reijiw@google.com/
- - Fix the selftest bug in patch 13 (Have test_access_pmc_regs() to
-   specify pmc index for test_bitmap_pmu_regs() instead of bit-shifted
-   value (Thank you Raghavendra for the reporting the issue!).
-
-v3:
-https://lore.kernel.org/all/20230203040242.1792453-1-reijiw@google.com/
- - Remove reset_pmu_reg(), and use reset_val() instead. [Marc]
- - Fixed the initial value of PMCR_EL0.N on heterogeneous
-   PMU systems. [Oliver]
- - Fixed PMUVer issues on heterogeneous PMU systems.
- - Fixed typos [Shaoqin]
-
-v2:
-https://lore.kernel.org/all/20230117013542.371944-1-reijiw@google.com/
- - Added the sys_reg's set_user() handler for the PMCR_EL0 to
-   disallow userspace to set PMCR_EL0.N for the vCPU to a value
-   that is greater than the host value (and added a new test
-   case for this behavior). [Oliver]
- - Added to the commit log of the patch 2 that PMUSERENR_EL0 and
-   PMCCFILTR_EL0 have UNKNOWN reset values.
-
-v1:
-https://lore.kernel.org/all/20221230035928.3423990-1-reijiw@google.com/
-
-Thank you.
-Raghavendra
-
-[1]:
-https://lore.kernel.org/all/20230728181907.1759513-1-reijiw@google.com/
-
-Raghavendra Rao Ananta (1):
-  tools: Import arm_pmuv3.h
-
-Reiji Watanabe (10):
-  KVM: arm64: PMU: Introduce helpers to set the guest's PMU
-  KVM: arm64: PMU: Set the default PMU for the guest on vCPU reset
-  KVM: arm64: PMU: Clear PM{C,I}NTEN{SET,CLR} and PMOVS{SET,CLR} on vCPU
-    reset
-  KVM: arm64: PMU: Don't define the sysreg reset() for
-    PM{USERENR,CCFILTR}_EL0
-  KVM: arm64: PMU: Add a helper to read a vCPU's PMCR_EL0
-  KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based on the associated PMU
-  KVM: arm64: PMU: Allow userspace to limit PMCR_EL0.N for the guest
-  KVM: selftests: aarch64: Introduce vpmu_counter_access test
-  KVM: selftests: aarch64: vPMU register test for implemented counters
-  KVM: selftests: aarch64: vPMU register test for unimplemented counters
-
- arch/arm64/include/asm/kvm_host.h             |   3 +
- arch/arm64/kvm/arm.c                          |   3 +-
- arch/arm64/kvm/pmu-emul.c                     |  91 ++-
- arch/arm64/kvm/reset.c                        |  18 +-
- arch/arm64/kvm/sys_regs.c                     | 102 ++-
- include/kvm/arm_pmu.h                         |  12 +
- tools/include/perf/arm_pmuv3.h                | 308 +++++++++
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/vpmu_counter_access.c         | 590 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   1 +
- 10 files changed, 1064 insertions(+), 65 deletions(-)
- create mode 100644 tools/include/perf/arm_pmuv3.h
- create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-
-
-base-commit: 6465e260f48790807eef06b583b38ca9789b6072
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 6b066e04dc5df..fb9817bdfeb57 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -874,6 +874,36 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ 	return true;
+ }
+ 
++static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
++{
++	lockdep_assert_held(&kvm->arch.config_lock);
++
++	kvm->arch.arm_pmu = arm_pmu;
++}
++
++/**
++ * kvm_arm_set_default_pmu - No PMU set, get the default one.
++ * @kvm: The kvm pointer
++ *
++ * The observant among you will notice that the supported_cpus
++ * mask does not get updated for the default PMU even though it
++ * is quite possible the selected instance supports only a
++ * subset of cores in the system. This is intentional, and
++ * upholds the preexisting behavior on heterogeneous systems
++ * where vCPUs can be scheduled on any core but the guest
++ * counters could stop working.
++ */
++static int kvm_arm_set_default_pmu(struct kvm *kvm)
++{
++	struct arm_pmu *arm_pmu = kvm_pmu_probe_armpmu();
++
++	if (!arm_pmu)
++		return -ENODEV;
++
++	kvm_arm_set_pmu(kvm, arm_pmu);
++	return 0;
++}
++
+ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -893,7 +923,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+ 				break;
+ 			}
+ 
+-			kvm->arch.arm_pmu = arm_pmu;
++			kvm_arm_set_pmu(kvm, arm_pmu);
+ 			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
+ 			ret = 0;
+ 			break;
+@@ -917,20 +947,10 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		return -EBUSY;
+ 
+ 	if (!kvm->arch.arm_pmu) {
+-		/*
+-		 * No PMU set, get the default one.
+-		 *
+-		 * The observant among you will notice that the supported_cpus
+-		 * mask does not get updated for the default PMU even though it
+-		 * is quite possible the selected instance supports only a
+-		 * subset of cores in the system. This is intentional, and
+-		 * upholds the preexisting behavior on heterogeneous systems
+-		 * where vCPUs can be scheduled on any core but the guest
+-		 * counters could stop working.
+-		 */
+-		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
+-		if (!kvm->arch.arm_pmu)
+-			return -ENODEV;
++		int ret = kvm_arm_set_default_pmu(kvm);
++
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	switch (attr->attr) {
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
