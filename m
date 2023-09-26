@@ -2,348 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AD2A7AE3DC
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 05:00:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36A067AE3F8
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 05:12:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjIZDAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 23:00:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50794 "EHLO
+        id S229934AbjIZDMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 23:12:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjIZDAP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 23:00:15 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC249F
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 20:00:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695697208; x=1727233208;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=se8fltrtqgnSfB8ampwOqpEfyOWLVVFMp0tXhaP4m5c=;
-  b=JH/yR7JbT+UyXdzWS/I5MnzxpSpPSTvbOR22cNvRE5ifZ+4WicOOdCXg
-   hUkkDzBz3gwkO9nulMIku/tnd8uRQTvzDAnTJ861cDtEn28OgKpFfKHh/
-   qysKIoSI3fRWbb9HHoLZRvU8kQDoMEfNjY7c6+fhR+VHz3/s49W9MICn+
-   wdO4aYzjYlXM2swdt8cjomHOG+rx9MUF3/cNBV1IkisRzkkwAzrPPorMj
-   WhUUUuIH/rHqLGK/bxJWFayQyNKcx/ijeTZ2ddG0DGmsgPZeCPXWdA2zk
-   RnoA0peWceDE9vWmKo/ZVsPCGqIzxfYk6/OQK2c2v4ZxBkhQ/5QWvRaqM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="380334228"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="380334228"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 20:00:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="892020621"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="892020621"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Sep 2023 19:59:00 -0700
-Date:   Tue, 26 Sep 2023 11:11:11 +0800
-From:   Zhao Liu <zhao1.liu@linux.intel.com>
-To:     babu.moger@amd.com
-Cc:     Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v4 00/21] Support smp.clusters for x86 in QEMU
-Message-ID: <ZRJLz6KZfQ1nvXe2@liuzhao-OptiPlex-7080>
-References: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
- <a82a9b64-9b24-c592-96d9-2248b8a10acb@amd.com>
+        with ESMTP id S229811AbjIZDMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 23:12:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65965AD
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 20:11:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695697903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DBsDTuplom88hCQIlxCCgcKGJXWlSC24YB3TjkgTh+4=;
+        b=QuIccK88k+2p64xuS184vIdcsPDqLRoROypnu8fde7myDv3yzRockP8eMHOjYBwb+P6D9D
+        EnZFLdstOcycIx9mvj8KLz01RzObxONgmCVHxO+N6QHwPYQIRJYk+6zUAg1nGNcMAPsDGg
+        D4vamTgitVsJxVhjEdhU7kF1D/OxuAo=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-Pg-8-41-NhGiDMlw0PXc6g-1; Mon, 25 Sep 2023 23:11:40 -0400
+X-MC-Unique: Pg-8-41-NhGiDMlw0PXc6g-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-502fff967ccso10551551e87.1
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 20:11:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695697899; x=1696302699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DBsDTuplom88hCQIlxCCgcKGJXWlSC24YB3TjkgTh+4=;
+        b=iKC8RR0a7aN7S+dWGH3lhsCvL2DlDOKBGHyQdK+HDHMA+4eW/CFjcZSVVOvJ6itm99
+         s1agTu0+xIpYvSj+UqHxDL0oEAPrjvfZCQd6pMxVur72xQ3PUYlpoQEHPaets565DTu7
+         nxqbugQnLBdOfRArwl2LtChurKtmHOwj2dm8I5ZDXyu9pj/mOReVVkOWJ8954n1BvSOl
+         yqs5v5OyShLGmaRKkMXv+I8sPuZMglXqzLQhHHkQPtlwazKggsDtIpG1WwYMLMmxV1ix
+         QLjoemr2Xk0cVG8x08CsSxeHxWx0mcV1jPuK6V1dAr4hX4y3MaMIYCAWckf425fBEMgN
+         3phQ==
+X-Gm-Message-State: AOJu0YyPvlmkBYKjvZBjX/swuobBcmUnVQ/o6xrnvd3FSx+NX72Hx2FR
+        gQDCu1PbO9JsjINYcApXA/QljleeR2YpERzHYXxXeQCKBzotjnGKmcqOCbsmGcmxklk4bKMO91R
+        lKgaALictrj+6JYmsMfmp/CJw8/XR
+X-Received: by 2002:a05:6512:3e05:b0:504:2730:40cc with SMTP id i5-20020a0565123e0500b00504273040ccmr8911187lfv.49.1695697899479;
+        Mon, 25 Sep 2023 20:11:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHGBQbSSgxiCAy9e7onyFmLeQjkVxkYaQmAu8X+NVidEWYPOjlAADezTJxFA+1jgzt9fmsEBXQrsZci7djKN2A=
+X-Received: by 2002:a05:6512:3e05:b0:504:2730:40cc with SMTP id
+ i5-20020a0565123e0500b00504273040ccmr8911175lfv.49.1695697899185; Mon, 25 Sep
+ 2023 20:11:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a82a9b64-9b24-c592-96d9-2248b8a10acb@amd.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230912130132.561193-1-dtatulea@nvidia.com> <20230912130132.561193-5-dtatulea@nvidia.com>
+In-Reply-To: <20230912130132.561193-5-dtatulea@nvidia.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 26 Sep 2023 11:11:28 +0800
+Message-ID: <CACGkMEsbCwBuES7G+Gam4gpLEbJJZinp8ZhAQkLLBrtLMBbbxQ@mail.gmail.com>
+Subject: Re: [PATCH 04/16] vdpa/mlx5: Create helper function for dma mappings
+To:     Dragos Tatulea <dtatulea@nvidia.com>
+Cc:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        Si-Wei Liu <si-wei.liu@oracle.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, Parav Pandit <parav@nvidia.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 11:03:55AM -0500, Moger, Babu wrote:
-> Date: Fri, 22 Sep 2023 11:03:55 -0500
-> From: "Moger, Babu" <bmoger@amd.com>
-> Subject: Re: [PATCH v4 00/21] Support smp.clusters for x86 in QEMU
-> 
-> Tested the series on AMD system. Created a VM and ran some basic commands.
-> 
-> Everything looks good.
-> 
-> Tested-by: Babu Moger <babu.moger@amd.com>
-> 
+On Tue, Sep 12, 2023 at 9:02=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> Necessary for upcoming cvq separation from mr allocation.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 
-Many thanks!
+Acked-by: Jason Wang <jasowang@redhat.com>
 
--Zhao
+Thanks
 
-> 
-> On 9/14/2023 2:21 AM, Zhao Liu wrote:
-> > From: Zhao Liu <zhao1.liu@intel.com>
-> > 
-> > Hi list,
-> > 
-> > (CC kvm@vger.kernel.org for better browsing.)
-> > 
-> > This is the our v4 patch series, rebased on the master branch at the
-> > commit 9ef497755afc2 ("Merge tag 'pull-vfio-20230911' of
-> > https://github.com/legoater/qemu into staging").
-> > 
-> > Comparing with v3 [1], v4 mainly refactors the CPUID[0x1F] encoding and
-> > exposes module level in CPUID[0x1F] with these new patches:
-> > 
-> > * [PATCH v4 08/21] i386: Split topology types of CPUID[0x1F] from the
-> > definitions of CPUID[0xB]
-> > * [PATCH v4 09/21] i386: Decouple CPUID[0x1F] subleaf with specific
-> > topology level
-> > * [PATCH v4 12/21] i386: Expose module level in CPUID[0x1F]
-> > 
-> > v4 also fixes compile warnings and fixes cache topology uninitialization
-> > bugs for some AMD CPUs.
-> > 
-> > Welcome your comments!
-> > 
-> > 
-> > # Introduction
-> > 
-> > This series add the cluster support for x86 PC machine, which allows
-> > x86 can use smp.clusters to configure the module level CPU topology
-> > of x86.
-> > 
-> > And since the compatibility issue (see section: ## Why not share L2
-> > cache in cluster directly), this series also introduce a new command
-> > to adjust the topology of the x86 L2 cache.
-> > 
-> > Welcome your comments!
-> > 
-> > 
-> > # Background
-> > 
-> > The "clusters" parameter in "smp" is introduced by ARM [2], but x86
-> > hasn't supported it.
-> > 
-> > At present, x86 defaults L2 cache is shared in one core, but this is
-> > not enough. There're some platforms that multiple cores share the
-> > same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
-> > Atom cores [3], that is, every four Atom cores shares one L2 cache.
-> > Therefore, we need the new CPU topology level (cluster/module).
-> > 
-> > Another reason is for hybrid architecture. cluster support not only
-> > provides another level of topology definition in x86, but would also
-> > provide required code change for future our hybrid topology support.
-> > 
-> > 
-> > # Overview
-> > 
-> > ## Introduction of module level for x86
-> > 
-> > "cluster" in smp is the CPU topology level which is between "core" and
-> > die.
-> > 
-> > For x86, the "cluster" in smp is corresponding to the module level [4],
-> > which is above the core level. So use the "module" other than "cluster"
-> > in x86 code.
-> > 
-> > And please note that x86 already has a cpu topology level also named
-> > "cluster" [4], this level is at the upper level of the package. Here,
-> > the cluster in x86 cpu topology is completely different from the
-> > "clusters" as the smp parameter. After the module level is introduced,
-> > the cluster as the smp parameter will actually refer to the module level
-> > of x86.
-> > 
-> > 
-> > ## Why not share L2 cache in cluster directly
-> > 
-> > Though "clusters" was introduced to help define L2 cache topology
-> > [2], using cluster to define x86's L2 cache topology will cause the
-> > compatibility problem:
-> > 
-> > Currently, x86 defaults that the L2 cache is shared in one core, which
-> > actually implies a default setting "cores per L2 cache is 1" and
-> > therefore implicitly defaults to having as many L2 caches as cores.
-> > 
-> > For example (i386 PC machine):
-> > -smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
-> > 
-> > Considering the topology of the L2 cache, this (*) implicitly means "1
-> > core per L2 cache" and "2 L2 caches per die".
-> > 
-> > If we use cluster to configure L2 cache topology with the new default
-> > setting "clusters per L2 cache is 1", the above semantics will change
-> > to "2 cores per cluster" and "1 cluster per L2 cache", that is, "2
-> > cores per L2 cache".
-> > 
-> > So the same command (*) will cause changes in the L2 cache topology,
-> > further affecting the performance of the virtual machine.
-> > 
-> > Therefore, x86 should only treat cluster as a cpu topology level and
-> > avoid using it to change L2 cache by default for compatibility.
-> > 
-> > 
-> > ## module level in CPUID
-> > 
-> > Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
-> > erroneous smp_num_siblings on Intel Hybrid platforms") is able to
-> > handle platforms with Module level enumerated via CPUID.1F.
-> > 
-> > Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
-> > has more than 1 modules since v3.
-> > 
-> > We can configure CPUID.04H.02H (L2 cache topology) with module level by
-> > a new command:
-> > 
-> >          "-cpu,x-l2-cache-topo=cluster"
-> > 
-> > More information about this command, please see the section: "## New
-> > property: x-l2-cache-topo".
-> > 
-> > 
-> > ## New cache topology info in CPUCacheInfo
-> > 
-> > Currently, by default, the cache topology is encoded as:
-> > 1. i/d cache is shared in one core.
-> > 2. L2 cache is shared in one core.
-> > 3. L3 cache is shared in one die.
-> > 
-> > This default general setting has caused a misunderstanding, that is, the
-> > cache topology is completely equated with a specific cpu topology, such
-> > as the connection between L2 cache and core level, and the connection
-> > between L3 cache and die level.
-> > 
-> > In fact, the settings of these topologies depend on the specific
-> > platform and are not static. For example, on Alder Lake-P, every
-> > four Atom cores share the same L2 cache [2].
-> > 
-> > Thus, in this patch set, we explicitly define the corresponding cache
-> > topology for different cpu models and this has two benefits:
-> > 1. Easy to expand to new CPU models in the future, which has different
-> >     cache topology.
-> > 2. It can easily support custom cache topology by some command (e.g.,
-> >     x-l2-cache-topo).
-> > 
-> > 
-> > ## New property: x-l2-cache-topo
-> > 
-> > The property x-l2-cache-topo will be used to change the L2 cache
-> > topology in CPUID.04H.
-> > 
-> > Now it allows user to set the L2 cache is shared in core level or
-> > cluster level.
-> > 
-> > If user passes "-cpu x-l2-cache-topo=[core|cluster]" then older L2 cache
-> > topology will be overrode by the new topology setting.
-> > 
-> > Since CPUID.04H is used by Intel CPUs, this property is available on
-> > Intel CPUs as for now.
-> > 
-> > When necessary, it can be extended to CPUID[0x8000001D] for AMD CPUs.
-> > 
-> > 
-> > # Patch description
-> > 
-> > patch 1-2 Cleanups about coding style and test name.
-> > 
-> > patch 3-5 Fixes about x86 topology and Intel l1 cache topology.
-> > 
-> > patch 6-7 Cleanups about topology related CPUID encoding and QEMU
-> >            topology variables.
-> > 
-> > patch 8-9 Refactor CPUID[0x1F] encoding to prepare to introduce module
-> >            level.
-> > 
-> > patch 10-16 Add the module as the new CPU topology level in x86, and it
-> >              is corresponding to the cluster level in generic code.
-> > 
-> > patch 17,18,20 Add cache topology information in cache models.
-> > 
-> > patch 19 Update AMD CPUs' cache topology encoding.
-> > 
-> > patch 21 Introduce a new command to configure L2 cache topology.
-> > 
-> > 
-> > [1]: https://lists.gnu.org/archive/html/qemu-devel/2023-08/msg00022.html
-> > [2]: https://patchew.org/QEMU/20211228092221.21068-1-wangyanan55@huawei.com/
-> > [3]: https://www.intel.com/content/www/us/en/products/platforms/details/alder-lake-p.html
-> > [4]: SDM, vol.3, ch.9, 9.9.1 Hierarchical Mapping of Shared Resources.
-> > 
-> > Best Regards,
-> > Zhao
-> > ---
-> > Changelog:
-> > 
-> > Changes since v3 (main changes):
-> >   * Expose module level in CPUID[0x1F].
-> >   * Fix compile warnings. (Babu)
-> >   * Fixes cache topology uninitialization bugs for some AMD CPUs. (Babu)
-> > 
-> > Changes since v2:
-> >   * Add "Tested-by", "Reviewed-by" and "ACKed-by" tags.
-> >   * Use newly added wrapped helper to get cores per socket in
-> >     qemu_init_vcpu().
-> > 
-> > Changes since v1:
-> >   * Reordered patches. (Yanan)
-> >   * Deprecated the patch to fix comment of machine_parse_smp_config().
-> >     (Yanan)
-> >   * Rename test-x86-cpuid.c to test-x86-topo.c. (Yanan)
-> >   * Split the intel's l1 cache topology fix into a new separate patch.
-> >     (Yanan)
-> >   * Combined module_id and APIC ID for module level support into one
-> >     patch. (Yanan)
-> >   * Make cache_into_passthrough case of cpuid 0x04 leaf in
-> >   * cpu_x86_cpuid() use max_processor_ids_for_cache() and
-> >     max_core_ids_in_package() to encode CPUID[4]. (Yanan)
-> >   * Add the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
-> >     (Yanan)
-> > ---
-> > Zhao Liu (14):
-> >    i386: Fix comment style in topology.h
-> >    tests: Rename test-x86-cpuid.c to test-x86-topo.c
-> >    hw/cpu: Update the comments of nr_cores and nr_dies
-> >    i386/cpu: Fix i/d-cache topology to core level for Intel CPU
-> >    i386/cpu: Use APIC ID offset to encode cache topo in CPUID[4]
-> >    i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
-> >    i386: Split topology types of CPUID[0x1F] from the definitions of
-> >      CPUID[0xB]
-> >    i386: Decouple CPUID[0x1F] subleaf with specific topology level
-> >    i386: Expose module level in CPUID[0x1F]
-> >    i386: Add cache topology info in CPUCacheInfo
-> >    i386: Use CPUCacheInfo.share_level to encode CPUID[4]
-> >    i386: Use offsets get NumSharingCache for CPUID[0x8000001D].EAX[bits
-> >      25:14]
-> >    i386: Use CPUCacheInfo.share_level to encode
-> >      CPUID[0x8000001D].EAX[bits 25:14]
-> >    i386: Add new property to control L2 cache topo in CPUID.04H
-> > 
-> > Zhuocheng Ding (7):
-> >    softmmu: Fix CPUSTATE.nr_cores' calculation
-> >    i386: Introduce module-level cpu topology to CPUX86State
-> >    i386: Support modules_per_die in X86CPUTopoInfo
-> >    i386: Support module_id in X86CPUTopoIDs
-> >    i386/cpu: Introduce cluster-id to X86CPU
-> >    tests: Add test case of APIC ID for module level parsing
-> >    hw/i386/pc: Support smp.clusters for x86 PC machine
-> > 
-> >   MAINTAINERS                                   |   2 +-
-> >   hw/i386/pc.c                                  |   1 +
-> >   hw/i386/x86.c                                 |  49 ++-
-> >   include/hw/core/cpu.h                         |   2 +-
-> >   include/hw/i386/topology.h                    |  68 ++--
-> >   qemu-options.hx                               |  10 +-
-> >   softmmu/cpus.c                                |   2 +-
-> >   target/i386/cpu.c                             | 322 ++++++++++++++----
-> >   target/i386/cpu.h                             |  46 ++-
-> >   target/i386/kvm/kvm.c                         |   2 +-
-> >   tests/unit/meson.build                        |   4 +-
-> >   .../{test-x86-cpuid.c => test-x86-topo.c}     |  58 ++--
-> >   12 files changed, 437 insertions(+), 129 deletions(-)
-> >   rename tests/unit/{test-x86-cpuid.c => test-x86-topo.c} (73%)
-> > 
+
+> ---
+>  drivers/vdpa/mlx5/core/mlx5_vdpa.h | 1 +
+>  drivers/vdpa/mlx5/core/mr.c        | 5 +++++
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 4 ++--
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/core/mlx5_vdpa.h b/drivers/vdpa/mlx5/core/=
+mlx5_vdpa.h
+> index ca56242972b3..3748f027cfe9 100644
+> --- a/drivers/vdpa/mlx5/core/mlx5_vdpa.h
+> +++ b/drivers/vdpa/mlx5/core/mlx5_vdpa.h
+> @@ -120,6 +120,7 @@ int mlx5_vdpa_create_mr(struct mlx5_vdpa_dev *mvdev, =
+struct vhost_iotlb *iotlb,
+>                         unsigned int asid);
+>  void mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev);
+>  void mlx5_vdpa_destroy_mr_asid(struct mlx5_vdpa_dev *mvdev, unsigned int=
+ asid);
+> +int mlx5_vdpa_create_dma_mr(struct mlx5_vdpa_dev *mvdev);
+>
+>  #define mlx5_vdpa_warn(__dev, format, ...)                              =
+                           \
+>         dev_warn((__dev)->mdev->device, "%s:%d:(pid %d) warning: " format=
+, __func__, __LINE__,     \
+> diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
+> index 5a1971fcd87b..7bd0883b8b25 100644
+> --- a/drivers/vdpa/mlx5/core/mr.c
+> +++ b/drivers/vdpa/mlx5/core/mr.c
+> @@ -619,3 +619,8 @@ int mlx5_vdpa_handle_set_map(struct mlx5_vdpa_dev *mv=
+dev, struct vhost_iotlb *io
+>
+>         return err;
+>  }
+> +
+> +int mlx5_vdpa_create_dma_mr(struct mlx5_vdpa_dev *mvdev)
+> +{
+> +       return mlx5_vdpa_create_mr(mvdev, NULL, 0);
+> +}
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index 37be945a0230..d34c19b4e139 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -2836,7 +2836,7 @@ static int mlx5_vdpa_reset(struct vdpa_device *vdev=
+)
+>         ++mvdev->generation;
+>
+>         if (MLX5_CAP_GEN(mvdev->mdev, umem_uid_0)) {
+> -               if (mlx5_vdpa_create_mr(mvdev, NULL, 0))
+> +               if (mlx5_vdpa_create_dma_mr(mvdev))
+>                         mlx5_vdpa_warn(mvdev, "create MR failed\n");
+>         }
+>         up_write(&ndev->reslock);
+> @@ -3441,7 +3441,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *=
+v_mdev, const char *name,
+>                 goto err_mpfs;
+>
+>         if (MLX5_CAP_GEN(mvdev->mdev, umem_uid_0)) {
+> -               err =3D mlx5_vdpa_create_mr(mvdev, NULL, 0);
+> +               err =3D mlx5_vdpa_create_dma_mr(mvdev);
+>                 if (err)
+>                         goto err_res;
+>         }
+> --
+> 2.41.0
+>
+
