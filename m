@@ -2,131 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30E197AE3A6
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 04:22:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04BB37AE3AA
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 04:33:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233449AbjIZCWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Sep 2023 22:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
+        id S231936AbjIZCdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Sep 2023 22:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233132AbjIZCWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Sep 2023 22:22:07 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA14811F
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:22:00 -0700 (PDT)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rvk236Y3yzVjP7;
-        Tue, 26 Sep 2023 10:18:51 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 26 Sep 2023 10:21:57 +0800
-Subject: Re: Question: In a certain scenario, enabling GICv4/v4.1 may cause
- Guest hang when restarting the Guest
-To:     Marc Zyngier <maz@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-CC:     <kvm@vger.kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        <chenxiang66@hisilicon.com>
-References: <2bcd2a8a-673a-237f-8491-30db260fcf37@huawei.com>
-From:   Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <0d9fdf42-76b1-afc6-85a9-159c5490bbd4@huawei.com>
-Date:   Tue, 26 Sep 2023 10:21:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        with ESMTP id S229934AbjIZCdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Sep 2023 22:33:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EBB5BF
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695695575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x0JluPBGhmVM8tVgilHr9/e0vzuVc6qwOToBxrpulzw=;
+        b=XkjQzBQkQQe9LqJNfWtMiRCMddyWu3j8MaubNDNgP7J0vIO3dLG9fUVL4q++i94wGvMHbz
+        paozykxSJEDMIKwBdsGDqHQz+H2wcm74VC+G3xEb/BLDf2oId2B3IvUO2/CiceNW6A+oq8
+        VC0T4HUhiZbrDK5w9fd4K8NDlBds75k=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74-G9IpJhmvOoiUVpcSWhGJQw-1; Mon, 25 Sep 2023 22:32:53 -0400
+X-MC-Unique: G9IpJhmvOoiUVpcSWhGJQw-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-500a9156daaso10906722e87.0
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 19:32:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695695572; x=1696300372;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x0JluPBGhmVM8tVgilHr9/e0vzuVc6qwOToBxrpulzw=;
+        b=wwbQf2oklUrVArIzD0Osv5XNNHXG4NzWBR6WzIaf1eiv+2JGxDSuFbZccSGAEQOymM
+         nFu/OQ1Wnj22b0wL4uzc92JyaZHJuVLIapfXA7JCwNFVLkcWOwdbLlVa2Ym7jVlzT+Vr
+         3M24eD7OT2x7d6uCjB0FhgW0gNEpj6839PgEloA1A43KpMVND2ma+E1j3tuOIJy//N65
+         0X1ne5PJDfEIDTaxCoWnv/DLO59ivj/0DQXE08uwHAWX3Sd2b/beaM4COsvDRJtwHrQ/
+         ryVUVERvt9dmMqehAQm4tb36DNgsAmkFLMUZo7p27KBsRAzBF4e26UFz/QLRRUrdD5b6
+         z2qA==
+X-Gm-Message-State: AOJu0YyaDvXIdCBbRvgkHY2NosoTklFTBLZ8K1tZHgqNT+Rcqw0wkWmI
+        S3QrUmaAJjSX1UKGFilibYKCuLSAXQsjvfWOEe3/sDzh8f5AV9muK2jRbySjXMIWBg2JOwh15Wy
+        pr7T/22d4SMm8AvNErdwRkbPPUvN1
+X-Received: by 2002:a19:8c13:0:b0:503:9eb:d277 with SMTP id o19-20020a198c13000000b0050309ebd277mr6080318lfd.49.1695695571771;
+        Mon, 25 Sep 2023 19:32:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE98wMaflBrXS+gHoxgs9l/TJJU2TyupUMywrdMyEJRf1bCQcDZI9jAcScVJR/3wSInoaBGHXT/cPoSMhPJERc=
+X-Received: by 2002:a19:8c13:0:b0:503:9eb:d277 with SMTP id
+ o19-20020a198c13000000b0050309ebd277mr6080308lfd.49.1695695571442; Mon, 25
+ Sep 2023 19:32:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2bcd2a8a-673a-237f-8491-30db260fcf37@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230921125348-mutt-send-email-mst@kernel.org>
+ <20230921170709.GS13733@nvidia.com> <20230921131035-mutt-send-email-mst@kernel.org>
+ <20230921174450.GT13733@nvidia.com> <20230921135426-mutt-send-email-mst@kernel.org>
+ <20230921181637.GU13733@nvidia.com> <20230921152802-mutt-send-email-mst@kernel.org>
+ <20230921195345.GZ13733@nvidia.com> <20230921155834-mutt-send-email-mst@kernel.org>
+ <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
+ <20230922122246.GN13733@nvidia.com> <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com> <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 26 Sep 2023 10:32:39 +0800
+Message-ID: <CACGkMEv9_+6sYp1JZpCZr19csg0jO-jLVhuygWqm+s9mWr3Lew@mail.gmail.com>
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Maor Gottlieb <maorg@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi everyone,
+On Mon, Sep 25, 2023 at 4:26=E2=80=AFPM Parav Pandit <parav@nvidia.com> wro=
+te:
+>
+>
+>
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Monday, September 25, 2023 8:00 AM
+> >
+> > On Fri, Sep 22, 2023 at 8:25=E2=80=AFPM Parav Pandit <parav@nvidia.com>=
+ wrote:
+> > >
+> > >
+> > > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > > Sent: Friday, September 22, 2023 5:53 PM
+> > >
+> > >
+> > > > > And what's more, using MMIO BAR0 then it can work for legacy.
+> > > >
+> > > > Oh? How? Our team didn't think so.
+> > >
+> > > It does not. It was already discussed.
+> > > The device reset in legacy is not synchronous.
+> >
+> > How do you know this?
+> >
+> Not sure the motivation of same discussion done in the OASIS with you and=
+ others in past.
 
-Sorry, yesterday's email was garbled. Please see this version.
+That is exactly the same point.
 
-Here is a very valuable question about the direct injection of vLPI.
-Environment configuration:
-1)A virtio_SCSI device is pass through to a small-scale VM,1U
-2)Guest Kernel 4.19,Host Kernel 5.10
-3)Enable GICv4/v4.1
-The Guest will hang in the BIOS phase when it is restarted, and
-report"Synchronous Exception at 0x280004654FF40".
+It's too late to define the legacy behaviour accurately in the spec so
+people will be lost in the legacy maze easily.
 
-Here's the analysis:
-The virtio_SCSI device has six queues. The virtio driver may apply for
-a vector for each queue of the device. It may also apply for one vector
-for all queues. These queues share the vector.
-In the problem scenario:
-1.The host driver(vDPA or VFIO) applies for six vectors(LPI) for the device.
-2.The virtio driver applies for only one vector(vLPI) in the guest.
-3.Only one vgic_irq is allocated by the vigic driver.In the current vgic 
-driver
-  implemention, when MAPTI/MAPI is executed in the Guest, it will be trapped
-  to KVM. Therefore, the vgic driver allocates the same number of vgic_irq
-  to record these vectors which applied by device drivers in VM.
-4.The kvm_vgic_v4_set_forwarding and its_map_vlpi is executed six times.
-  vgic_irq->host_irq equals the last linux interrupt ID(virq). The result is
-  that six LPIs are mapped to one vLPI. The six LPIs of the device can
-  send interrupts. These interrupts will be injected into the guest
-  through the same vLPI.
-5.When the Guest is restarted.The kvm_vgic_v4_unset_forwarding will also be
-  executed six times. However, multiple call traces are generated. Since
-  there is only one vgic_irq, its_unmap_vlpi is executed only once.
+>
+> Anyways, please find the answer below.
+>
+> About reset,
+> The legacy device specification has not enforced below cited 1.0 driver r=
+equirement of 1.0.
+>
+> "The driver SHOULD consider a driver-initiated reset complete when it rea=
+ds device status as 0."
 
-> WARN_ON(!(irq->hw && irq->host_irq == virq));
-> if (irq->hw) {
-> atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
->          irq->hw = false;
->          ret = its_unmap_vlpi(virq);
-> } 
+We are talking about how to make devices work for legacy drivers. So
+it has nothing related to 1.0.
 
-6.In the BIOS phase after the Guest restarted, the other five vectors 
-continue
-  to send interrupts. BIOS cannot handle these interrupts, so the Guest 
-hang.
+>
+> [1] https://ozlabs.org/~rusty/virtio-spec/virtio-0.9.5.pdf
+>
+> > > The drivers do not wait for reset to complete; it was written for the=
+ sw
+> > backend.
+> >
+> > Do you see there's a flush after reset in the legacy driver?
+> >
+> Yes. it only flushes the write by reading it. The driver does not get _wa=
+it_ for the reset to complete within the device like above.
 
-This problem does not occur when the guest kernel is version 5.10, because
-this patch is incorporated.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c66d4bd110a1f
+It's the implementation details in legacy. The device needs to make
+sure (reset) the driver can work (is done before get_status return).
 
-I think there are other scenarios where the virtual machine will apply 
-for an
-vector, and the host will apply for multiple vectors. There is still 
-value in
-fixing this problem at the hypervisor layer. I think there are two 
-modification
-methods here, but not sure if it is possible:
-1)The vDPA or VFIO driver is aware of the behavior within the Guest and only
-apply for the same number of vectors.
-2)Modify the vgic driver so that one vgic_irq can be bound to multiple LPIs.
-But I understand that the semantics of vigc_irq->host_irq is that vgic_irq
-is bound 1:1 to the host-side LPI hwintid.
+That's all.
 
-If you have other ideas, we can discuss them together.
-
-Looking forwarding to your reply.
-Thanks,
-Kunkun Jiang
