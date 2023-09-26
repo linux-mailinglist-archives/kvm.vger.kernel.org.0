@@ -2,102 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A21E27AF052
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 18:10:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0C9A7AF059
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 18:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234935AbjIZQKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 12:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46748 "EHLO
+        id S234936AbjIZQMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 12:12:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234998AbjIZQKR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 12:10:17 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A9911D
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 09:10:10 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8D0DC433C7;
-        Tue, 26 Sep 2023 16:10:07 +0000 (UTC)
-Date:   Tue, 26 Sep 2023 17:10:05 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, maz@kernel.org,
-        will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-        yuzenghui@huawei.com, zhukeqian1@huawei.com,
-        jonathan.cameron@huawei.com, linuxarm@huawei.com
-Subject: Re: [RFC PATCH v2 6/8] KVM: arm64: Only write protect selected PTE
-Message-ID: <ZRMCXcf+RoHBEpLS@arm.com>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <20230825093528.1637-7-shameerali.kolothum.thodi@huawei.com>
- <ZQ26KE2bzEFYUpMc@arm.com>
- <ZQ3H3JZHnxIVCIF6@linux.dev>
- <ZRL/izqkzWy/lKXM@arm.com>
+        with ESMTP id S229513AbjIZQML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 12:12:11 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED1711D
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 09:12:05 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id d2e1a72fcca58-68cc1b70e05so2152185b3a.1
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 09:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695744725; x=1696349525; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ng7mcmr4QJ6ZL7X9dSXkz6scbTE1whqwn58ZUV1v7fU=;
+        b=Mo4P8Osi/0yV0ZmGD2FZgl2XXaQxhBVeiMgXNDNqk0U6wlqKl6zqUdaAScXx/k7wpQ
+         0d3aBkEX3Rg4Yx/5M0KmOuMtJ9zZSSUjvuKNo9maQAO+HqHtyjBv19F3vHKiyDUuoUhI
+         /9daoF96baapxx7FipLB84jNvVZapiwOSP3Oi27iSoZPE+64+w+OyK2URnid4pp7AZf+
+         gF9uDcl6iEN/JMCu18gIHVInA2saliDu+L+yYUWQ7csM86qMOe10MNsgVsuS1WLEMk5p
+         N4F0lhVFwdF2r8kHeJVmIx1xj2v/LlEBEDX58HfYH8j0Z1xfVKDQtjqolgaljv4ljuVc
+         tAKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695744725; x=1696349525;
+        h=content-transfer-encoding:to:subject:message-id:date:from:reply-to
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ng7mcmr4QJ6ZL7X9dSXkz6scbTE1whqwn58ZUV1v7fU=;
+        b=ueaiPtSZ6+hNEDzy+ymCM//JD8jS06+CTr3WKsnTgkS96/wAbKPVBNSM230ieGN2yA
+         ZZB/O/Nwg+Ge6yOZgBj73YL1cQGygeKeI7hUEcSWRb3M6lhlFce7goOiFAMmaTQ9qquz
+         fXDV1/vC5PGRS5vYbD4+gM3o03+A7xkAO18WjvK97jqL7YBeKP5rqDnv4owtL61uAybC
+         UGWeQ9FyBCzuPN3Pp8ce1c96V4UKLWRue8sbJ4TE1EbyT0YF8+YS1PG4D+Cvj8oFoB76
+         wtthoiy1LzGtKDtovDEAOS6CSpUQtfndtSlGJcvj6OKCEp7TmbeMUHK1PwzkAgMZW/pU
+         jYZQ==
+X-Gm-Message-State: AOJu0YycuN5IaWYL6GZzsFjZjr5MtAvvtjLycZpeuinmeWZsIwvOqEe3
+        O2F09CAPHbnijdLbiBJJ6vTVyvU20skG5dG706E=
+X-Google-Smtp-Source: AGHT+IHqgdOOsr/X14qiOubFS86n52Wa2MyyA8YGLjLKmhJYsA7M+z603MZvQUFHVeU+aezcjq6xm9VBGOZWjVWHVRs=
+X-Received: by 2002:a05:6a20:5481:b0:15a:4634:e4c with SMTP id
+ i1-20020a056a20548100b0015a46340e4cmr13807106pzk.5.1695744725120; Tue, 26 Sep
+ 2023 09:12:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRL/izqkzWy/lKXM@arm.com>
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a05:6a11:3a9:b0:4da:425a:267e with HTTP; Tue, 26 Sep 2023
+ 09:12:04 -0700 (PDT)
+Reply-To: stephenbord61@yahoo.com
+From:   Stephen Bordeaux <samu7582369@gmail.com>
+Date:   Tue, 26 Sep 2023 16:12:04 +0000
+Message-ID: <CAGykCHpt_EJaazTwXnYfNhWygvEkakmvzp2nOhz8AfDj1M2=ug@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 04:58:03PM +0100, Catalin Marinas wrote:
-> On Fri, Sep 22, 2023 at 04:59:08PM +0000, Oliver Upton wrote:
-> > On Fri, Sep 22, 2023 at 05:00:40PM +0100, Catalin Marinas wrote:
-> > > On Fri, Aug 25, 2023 at 10:35:26AM +0100, Shameer Kolothum wrote:
-> > > > From: Keqian Zhu <zhukeqian1@huawei.com>
-> > > > 
-> > > > This function write protects all PTEs between the ffs and fls of mask.
-> > > > There may be unset bits between this range. It works well under pure
-> > > > software dirty log, as software dirty log is not working during this
-> > > > process.
-> > > > 
-> > > > But it will unexpectly clear dirty status of PTE when hardware dirty
-> > > > log is enabled. So change it to only write protect selected PTE.
-> > > 
-> > > Ah, I did wonder about losing the dirty status. The equivalent to S1
-> > > would be for kvm_pgtable_stage2_wrprotect() to set a software dirty bit.
-> > > 
-> > > I'm only superficially familiar with how KVM does dirty tracking for
-> > > live migration. Does it need to first write-protect the pages and
-> > > disable DBM? Is DBM re-enabled later? Or does stage2_wp_range() with
-> > > your patches leave the DBM on? If the latter, the 'wp' aspect is a bit
-> > > confusing since DBM basically means writeable (and maybe clean). So
-> > > better to have something like stage2_clean_range().
-> > 
-> > KVM has never enabled DBM and we solely rely on write-protection faults
-> > for dirty tracking. IOW, we do not have a writable-clean state for
-> > stage-2 PTEs (yet).
-> 
-> When I did the stage 2 AF support I left out DBM as it was unlikely
-> to be of any use in the real world. Now with dirty tracking for
-> migration, we may have a better use for this feature.
-> 
-> What I find confusing with these patches is that stage2_wp_range() is
-> supposed to make a stage 2 pte read-only, as the name implies. However,
-> if the pte was writeable, it leaves it writeable, clean with DBM
-> enabled. Doesn't the change to kvm_pgtable_stage2_wrprotect() in patch 4
-> break other uses of stage2_wp_range()? E.g. kvm_mmu_wp_memory_region()?
+Dobr=C3=BD den
 
-Ah, that's also used for dirty tracking, so maybe it's ok.
+Jsem Stephen Bordeaux, pr=C3=A1vn=C3=AD z=C3=A1stupce z advok=C3=A1tn=C3=AD=
+ kancel=C3=A1=C5=99e Bordeaux.
+Kontaktoval jsem v=C3=A1s ohledn=C4=9B poz=C5=AFstalosti fondu zesnul=C3=A9=
+ho Dr. Edwin ve
+v=C3=BD=C5=A1i 8,5 milionu dolar=C5=AF, kter=C3=A9 maj=C3=AD b=C3=BDt repat=
+riov=C3=A1ny na v=C3=A1=C5=A1 =C3=BA=C4=8Det.
+Nav=C3=ADc v t=C3=A9to transakci chci, abyste odpov=C4=9Bd=C4=9Bli d=C5=AFv=
+=C4=9Brn=C4=9B.
 
-AFAICT KVM doesn't do any form of stage 2 pte change from writeable to
-read-only other than dirty tracking (all other cases triggered via MMU
-notifier end up unmapping at stage 2).
-
-> Unless I misunderstood, I'd rather change
-> kvm_arch_mmu_enable_log_dirty_pt_masked() to call a new function,
-> stage2_clean_range(), which clears S2AP[1] together with setting DBM if
-> previously writeable. But we should not confuse this with
-> write-protecting or change the write-protecting functions to mark a pte
-> writeable+clean.
-
-I think it's still good to rename stage2_wp_range() to make it clear
-that it's about clean ptes rather than read-only.
-
--- 
-Catalin
+Stephen Bordeaux
