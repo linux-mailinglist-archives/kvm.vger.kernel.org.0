@@ -2,181 +2,290 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A5537AF0B0
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 18:29:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E25D7AF0C3
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 18:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235208AbjIZQ3b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 12:29:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58160 "EHLO
+        id S233309AbjIZQbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 12:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbjIZQ3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 12:29:30 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2A2B3;
-        Tue, 26 Sep 2023 09:29:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ch2PmERPkgVFPxO9G9eEJW4NQGqjxYX2vxeAbyd2S7IhyvBYJ0N5eTw+CmzmfWIk3GUfIMYBygbrwL1Jtzks9YhNZxeq4HIFIYsE8F/t35UEuG6e72WHn2f/mtksKTpNomKCq+vfX9ykPCdQlBCpXUjPgNWKO++Afc13xk0xGsV43CS1PLTLIjfir+759aEYsTwejm2W8EM1DYQ589k19A/sa+krHb+fhWRbhYWymbvKEKazW5cr7NjUvMle9RmLmPnflT8dLPLydszqukIeCCJaJQUMCVwmNDd6/TVxC4RZGryjLnx++YjQK+PD239CC66vDrUQSAhFYNMGpPUbfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zSm7SlJrPg1mL1tUxO8WpSf35tOqbovoZrphaO39JQ4=;
- b=SVgqCaGGNuNNE4T0cHHJR6EIZ83hwavRBNf7R37RTRWBMfcfYX6Aa3M5I23sOAAQJZoxGLmqWlIbQ3qy7tWdS+3GfOcKGtcdiGNkDFzMAXFo+FtVWd3aWoBy5Uda8bOQufREkzlc56D1w9T2mLVFaQ9PPWcZHeVhgST/Q4t+uwAOKGren3R3BAUvsSTiMxB74byMTr8/opjTjQ6Rbq36A1Q+/yARZ/MBItW8HM7ZWYimebMXpWmGIGOZCDLCECAPB0A9qEDIRCO47mKw7Kz5kbiFm7ty7HRQFpx6r0kPCy3SpzSzzYkTreIkwZpyZGs6xGU++gUq7L5/HYghOMC+Ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zSm7SlJrPg1mL1tUxO8WpSf35tOqbovoZrphaO39JQ4=;
- b=YIPlAA5jz794dPezFqGZ29A8Xj16Cj0yoOxFVXA1l4DbT8D2gHzvArLIzVfl85DgqeQzlziUjySVw7AOlihrUHQu9DOG8eblvXElhnVfKAwfln9oQwDslZB3B+3UZuYn5l1tdD60TuZymsGbjrU9OJr2leBV8U+oMGFKejqBpCUVZN67g5VshsvX31ev5uKkU/9oNugN4qh/HiXLCCUdd+OEWE+hiasM68BHswA9r9u6S67a70SH7ISS907oW0MOZvmNOGH29hX5gQfoP9ga3SNCukDmTpRgwVTMPc34u0Vf61XSMwTetwO2vRWwu3n6ssDLx/ZDzJVl3/EgEjafdQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5369.namprd12.prod.outlook.com (2603:10b6:610:d4::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Tue, 26 Sep
- 2023 16:29:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%5]) with mapi id 15.20.6838.016; Tue, 26 Sep 2023
- 16:29:21 +0000
-Date:   Tue, 26 Sep 2023 13:29:20 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
- domain_alloc_user op
-Message-ID: <20230926162920.GQ13733@nvidia.com>
-References: <20230921075138.124099-1-yi.l.liu@intel.com>
- <20230921075138.124099-2-yi.l.liu@intel.com>
- <0d37a1b1-e7ef-fa73-d17c-629cd254ae75@linux.intel.com>
- <20230921164447.GQ13733@nvidia.com>
- <dcde6757-8d14-6460-c75e-c30d69219e4b@arm.com>
- <BN9PR11MB52765B3F127EE04E4A79C7778CC3A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52765B3F127EE04E4A79C7778CC3A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL1PR13CA0230.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::25) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5369:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e5e7933-ab80-4249-0d92-08dbbeadbcd0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WRTN9nTps73dgWaJwvR7N7CsG9TGIaSlvWfUl+Lvu3eHrvE4FSX9gD+ODg0tQTiWNR2JHRe5PZgz0yna6ZPTUB/gevhfyKH9TQoeER2iUs7P+/Izl9kCCYPRJNntIxvkyQa/fVkJAcyemt/ozKGayaUKz7SOK3yRUzt4dYtm+z1cloVPNKEExbr2Tzf8BT05pBEBXlTydMB9uodrwwg1eIh44mkvKYUwGVPUewzbXAmOdgio+PWvNgrp4cs7QTVQtKDMUKaD0ERDYmMnGomjHkPV/ma5eOZUt1BdzNXyXjKnjm1VXgWYKfbuIz5r7j6tq6x+uLE0lFLdAfDNMnAdS36YiI6cJT8QgvkafMM28zmiSgHrSLQNQfaCGZEb/J9GHDMLXqsrO8nlD4gaD+/4mDG62ASnJ1kKd47pts5ICXHhX4i8nC7pCt7GhWCiS2Vu6ExJqcxN41ca/XTjPX+gOozqsvjvwylvYR4qIGvdIZXuikHfsRX2BwgEmEqKG76tfQw8gdAbq9JE2seGU/vNgXKnkScosoaK9CpAAgrIgieDy06+8ky/0Nuvxk1BND8O
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(396003)(376002)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(6506007)(1076003)(26005)(83380400001)(6512007)(33656002)(86362001)(66946007)(2616005)(478600001)(38100700002)(316002)(5660300002)(66476007)(6486002)(4326008)(41300700001)(8676002)(8936002)(66556008)(54906003)(6916009)(36756003)(2906002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jVlEflHhPcVV8eihy8SrU6I0V7NCqVFSEe98VoKrtfMOXzd23oyly1iWQq8H?=
- =?us-ascii?Q?ept4pxa3uX2wbnCEtsXICDbrPrd10kEI0GArE8z/7w7RxgpxUipoqaDC4nEh?=
- =?us-ascii?Q?4DhMciPVZiSsCPbnGkB4NLMNCwEi6uHLauMgtozwM6VXk18glt09YZQbmO0h?=
- =?us-ascii?Q?0v0h8fM2AOSS1s6+E6jAlnDIb454nigRRb0S9Ky1m/y5LJE/HWJ62dmoCBff?=
- =?us-ascii?Q?+7p1qpsjZ+tNt5gOkJ5XA8em2AUUNapGu93o+589QRNmurUodBIXsROxvNKq?=
- =?us-ascii?Q?rUHu22aiR/Ks/wtg6f/s1feoIT1bx3xJC9C/BRHTsNpZmqB+3P8iDLVRmMP7?=
- =?us-ascii?Q?mQWUN8QpK47rMs0Vkc9pmb55z+nd4UY2EqXmYzw5NzCL0WyQWIu/GDc+zMG6?=
- =?us-ascii?Q?RAiVS0rjh++sLJRPfmqD9GtikqxAQBEIjxVNFQYn1tFgi6i+2r0dyo27zcq4?=
- =?us-ascii?Q?tEdlD32hJz6Ng5NiXQ3NBq0xb8957Ia6qhzNEyLkBKh0/WwzK1AMv9JcDGAa?=
- =?us-ascii?Q?sCsmD04vq+gUFNMo4pDSyOcS1QnwUC8VEadVg28OIYtqCRqiiJ4/BTunEgHU?=
- =?us-ascii?Q?cnIhNu4fypFNQjlqOQ4o5zHobJ0cHjxaEwjetxRJ8IfGx7KbbjM9RJWlwHPS?=
- =?us-ascii?Q?MnBnGDYqGO0aOQ7cI4WAEVDA+Bkm4IJLwwbf7zCgEq/QdDOEpsRQYmNmbmjq?=
- =?us-ascii?Q?S+8K44vgU0Yvr0e/p3Bty/qkDTXzhfEx/lzmj/MdsOu0q8fJmY4qCH49/hnG?=
- =?us-ascii?Q?b8AlOy7jLXoDp7SVaCURvTZhY48HV6WQ1hjsZqC/Kqd3WT103K2Shki40645?=
- =?us-ascii?Q?MfbHEsFIQSjssvzwauYdhYwKS3MAqSi6/P3qUVMsBTA9bzFEi0QBJgrpyzBW?=
- =?us-ascii?Q?C5A4foLXWkm+gwSZ61k812SGq5nVXWynu3wlD6OlBWq+wkpEVlkNXkD/pkqJ?=
- =?us-ascii?Q?EBgF8otf3rKuiIbMxnYDQlt4qf4Ozeoc28P3qfiLc/dEPw0TePFOex1u2zVr?=
- =?us-ascii?Q?u8j6H2XUoBvVlhjAVTKgEQQKjuEjQYC57RFKr6IrRsvZTB8qUrrf+BPjGIVH?=
- =?us-ascii?Q?sn5BvWVeWsQP8patnYstzvXoAK+WBwoqWAm6wmDiJXERPeLD4/MRWaqPHuF7?=
- =?us-ascii?Q?OWfmd1fXDWXW9g/jY2wGPAutG84MV8/af7beYTWwMT5tQOxWLH6AR7fx5EWL?=
- =?us-ascii?Q?+jMo3s9EdA4qFn8+LrSJNppUcdPquRzHSCC8KB4xTb5nXDIrHgv8oKSjlYDu?=
- =?us-ascii?Q?iCCUiNP1686F5ZkgI07Yo+DkirNPrZbTdK3ALwoePB0nY5RtcTPcCePpkLkm?=
- =?us-ascii?Q?pDPmOFHxtI9GfCNccB1D07DyKBAwHrvx3d8wRAB4Ru88V1JtHn6J0qolX1n6?=
- =?us-ascii?Q?swwRwzxd+9mtwfkg8MRmcVz9zVW+m0M0hSnnsD+KW9ylVf6uWkvTx26+MXH9?=
- =?us-ascii?Q?0OHEu4ob7A1mlUlcm/tDS6rU7/HHJj2sPjvfwSUNNKrAEdZJhBMfBrG9jU3H?=
- =?us-ascii?Q?ZMChC1rzFCjMqv0eTp+u5I8LvPBNO+HATroRu8dMiuJwsfZOxpGmRm/GkjMM?=
- =?us-ascii?Q?hs/lcIOPpFfBZ4JOxwyz+XKkDiHBWq5IJUpMVoaf?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e5e7933-ab80-4249-0d92-08dbbeadbcd0
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2023 16:29:21.1288
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aSiqyPE3midtuK9TwP54pNLYZWdWancUMQiaYwFf9KtBNY0e64vAf2UW4Vbm7QIP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5369
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229629AbjIZQbl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 12:31:41 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1512911F
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 09:31:34 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f2c7a4f24so159434567b3.0
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 09:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695745893; x=1696350693; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Wn5yFNxr/QwexNXkJRJPUudUF7GWFSc9e/F1NDlPqM=;
+        b=Dmtakn5WVRiTCsMCuel7+bwNBmXtnueOiK9nR+UJz8t6c9/SjKdEvg6vUEQVN8WYAc
+         5VNjVWJDx70ryjAQ6KkFsKU0t81Ogf+HdtL3MWL5P4H8n7WzIzN9oX/oOsKEwuN6Y3Xh
+         Nyd661JLvEBLocSkiFj+4bOjXhY7OqdWID10FA5iUvFOAqOc7XafPgLisEeP7X5IsCvi
+         /JgNtfuych9Bc1nKWXOIrDbBHW3q/dQHb2cqLvPfdXjX0g6Wz40sBYEebwl+bHrtva3Z
+         DTSLe5Y6dKQI4e5XCsoBNTy2kl0WfzUgiB5jvspiEqsEY1wKDpfrdG1CKsebyChDJmLV
+         SMEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695745893; x=1696350693;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Wn5yFNxr/QwexNXkJRJPUudUF7GWFSc9e/F1NDlPqM=;
+        b=k6k4T7mVkPl7IP5A9IxMbqVeXbSW3xeOJRWFy43Fh1aExPYRLl9VRaHHPuhYZ9kBes
+         5q+vRcySB/3HRsRUIxyzZYrSpbrqU2qk/A6FZQntffMVi+Dk9wpKE4ap1ZSBB2M5n/b0
+         H4WDlAxjb/QnSx9Wnc/v870Z6kALtxU+h1dJDJCzQjKzi5+KJBG2UxdkyJIHxlG5cKnr
+         hbm3le2AtrDHYhydRNWKUrJuP0bJBzjbdJsY7qKujbB/hmNR7uamt3Upuf85u8JxaiwV
+         KTRmdqLCDuXubkGoEkkdezpgjmfYCXfVTqDD3x1o9syoE7O3s7MZcBGLusJQEJzytLB9
+         j+1Q==
+X-Gm-Message-State: AOJu0YzNETQC8uqb1IDx+tE3FqN5hOAxbCnSjid3vkZCFnSK9GU7wOSu
+        5Ms2o/bTfGuavk7a9vHFKQ+OI/i/HtY=
+X-Google-Smtp-Source: AGHT+IEMtG1bvpmDHaWgoy2YPiL/ktACTEiywvlo11emnKWTOSojCRxl+cDTtN+21WlLssxuTUokcMizTdk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:7607:0:b0:59b:ee27:bbe9 with SMTP id
+ r7-20020a817607000000b0059bee27bbe9mr133240ywc.9.1695745893302; Tue, 26 Sep
+ 2023 09:31:33 -0700 (PDT)
+Date:   Tue, 26 Sep 2023 09:31:31 -0700
+In-Reply-To: <ZRJJtWC4ch0RhY/Y@luigi.stachecki.net>
+Mime-Version: 1.0
+References: <20230914010003.358162-1-tstachecki@bloomberg.net>
+ <ZQKzKkDEsY1n9dB1@redhat.com> <ZQLOVjLtFnGESG0S@luigi.stachecki.net>
+ <93592292-ab7e-71ac-dd72-74cc76e97c74@oracle.com> <ZQOsQjsa4bEfB28H@luigi.stachecki.net>
+ <ZQQKoIEgFki0KzxB@redhat.com> <ZQRNmsWcOM1xbNsZ@luigi.stachecki.net>
+ <ZRH7F3SlHZEBf1I2@google.com> <ZRJJtWC4ch0RhY/Y@luigi.stachecki.net>
+Message-ID: <ZRMHY83W/VPjYyhy@google.com>
+Subject: Re: [PATCH] x86/kvm: Account for fpstate->user_xfeatures changes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tyler Stachecki <stachecki.tyler@gmail.com>
+Cc:     Leonardo Bras <leobras@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, dgilbert@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, dave.hansen@linux.intel.com, bp@alien8.de,
+        Tyler Stachecki <tstachecki@bloomberg.net>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 06:37:55AM +0000, Tian, Kevin wrote:
-> > From: Robin Murphy <robin.murphy@arm.com>
-> > Sent: Friday, September 22, 2023 5:48 PM
+On Mon, Sep 25, 2023, Tyler Stachecki wrote:
+> On Mon, Sep 25, 2023 at 02:26:47PM -0700, Sean Christopherson wrote:
+> > On Fri, Sep 15, 2023, Tyler Stachecki wrote:
+> > > OK - if there's no interest in the below, I will not push for including this
+> > > patch in the kernel tree any longer. I do think the specific case below is what
+> > > a vast majority of KVM users will struggle with in the near future, though:
+> > >
+> > > I have a test environment with Broadwell-based (have only AVX-256) guests
+> > > running under Skylake (PKRU, AVX512, ...) hypervisors.
 > > 
-> > I could go on enjoying myself, but basically yeah, "default" can't be a
-> > type in itself (at best it would be a meta-type which could be
-> > requested, such that it resolves to some real type to actually
-> > allocate), so a good name should reflect what the type functionally
-> > *means* to the user. IIUC the important distinction is that it's an
-> > abstract kernel-owned pagetable for the user to indirectly control via
-> > the API, rather than one it owns and writes directly (and thus has to be
-> > in a specific agreed format).
+> > I definitely don't want to take the proposed patch.  As Leo pointed out, silently
+> > dropping features that userspace explicitly requests is a recipe for disaster.
 > > 
+> > However, I do agree with Tyler that is an egregious kernel/KVM bug, as essentially
+> > requiring KVM_SET_XSAVE to be a subset of guest supported XCR0, i.e. guest CPUID,
+> > is a clearcut breakage of userspace.  KVM_SET_XSAVE worked on kernel X and failed
+> > on kernel X+1, there's really no wiggle room there.
+> > 
+> > Luckily, I'm pretty sure there's no need to take features away from the guest in
+> > order to fix the bug Tyler is experiencing.  Prior to commit ad856280ddea, KVM's
+> > ABI was that KVM_SET_SAVE just needs a subset of the *host* features, i.e. this
+> > chunk from the changelog simply needs to be undone:
+> > 
+> >     As a bonus, it will also fail if userspace tries to set fpu features
+> >     (with the KVM_SET_XSAVE ioctl) that are not compatible to the guest
+> >     configuration.  Such features will never be returned by KVM_GET_XSAVE
+> >     or KVM_GET_XSAVE2.
+> > 
+> > That can be done by applying guest_supported_xcr0 to *only* the KVM_GET_XSAVE{2}
+> > path.  It's not ideal since it means that KVM_GET_XSAVE{2} won't be consistent
+> > with the guest model if userspace does KVM_GET_XSAVE{2} before KVM_SET_CPUID, but
+> > practically speaking I don't think there's a real world userspace VMM that does
+> > that.
+> > 
+> > Compile tested only, and it needs a changelog, but I think this will do the trick:
+
+...
+
+> > @@ -1059,7 +1060,8 @@ static void copy_feature(bool from_xstate, struct membuf *to, void *xstate,
+> >   * It supports partial copy but @to.pos always starts from zero.
+> >   */
+> >  void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
+> > -			       u32 pkru_val, enum xstate_copy_mode copy_mode)
+> > +			       u64 xfeatures, u32 pkru_val,
+> > +			       enum xstate_copy_mode copy_mode)
+> >  {
+> >  	const unsigned int off_mxcsr = offsetof(struct fxregs_state, mxcsr);
+> >  	struct xregs_state *xinit = &init_fpstate.regs.xsave;
+> > @@ -1083,7 +1085,7 @@ void __copy_xstate_to_uabi_buf(struct membuf to, struct fpstate *fpstate,
+> >  		break;
+> >  
+> >  	case XSTATE_COPY_XSAVE:
+> > -		header.xfeatures &= fpstate->user_xfeatures;
+> > +		header.xfeatures &= fpstate->user_xfeatures & xfeatures;
+> >  		break;
 > 
-> IOMMU_HWPT_TYPE_KERNEL then?
+> This changes the consideration of the xfeatures copied *into* the uabi buffer
+> with respect to the guest xfeatures IIUC (approx guest XCR0, less FP/SSE only).
 > 
-> IOMMU_HWPT_TYPE_GENERIC also doesn't sound a straight word.
+> IOW: we are still trimming guest xfeatures, just at the source...?
 
-At the end of the day this enum is the type tag for:
+KVM *must* "trim" features when servicing KVM_GET_SAVE{2}, because that's been KVM's
+ABI for a very long time, and userspace absolutely relies on that functionality
+to ensure that a VM can be migrated within a pool of heterogenous systems so long
+as the features that are *exposed* to the guest are supported on all platforms.
 
- struct iommu_hwpt_alloc {
- 	__u32 size;
- 	__u32 pt_id;
- 	__u32 out_hwpt_id;
- 	__u32 __reserved;
-+	__u32 hwpt_type;
-+	__u32 data_len;
-+	__aligned_u64 data_uptr;
- };
+Before the big FPU rework, KVM manually filled xregs_state and directly "trimmed"
+based on the guest supported XCR0 (see fill_xsave() below).
 
-That pointer.
+The major difference between my proposed patch and the current code is that KVM
+trims *only* at KVM_GET_XSAVE{2}, which in addition to being KVM's historical ABI,
+(see load_xsave() below), ensures that the *destination* can load state irrespective
+of the possibly-not-yet-defined guest CPUID model.
 
-IOMMU_HWPT_ALLOC_DATA_NONE = 0
-IOMMU_HWPT_ALLOC_DATA_INTEL_VTD
-IOMMU_HWPT_ALLOC_DATA_ARM_SMMUV3
+Masking fpstate->user_xfeatures is buggy for another reason: it's destructive if
+userspace calls KVM_SET_CPUID multiple times.  No real world userspace actually
+calls KVM_SET_CPUID to "expand" features, but it's technically possible and KVM
+is supposed to allow it.
 
-etc?
+static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
+{
+        struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+        u64 xstate_bv = xsave->header.xfeatures;
+        u64 valid;
 
-DATA_NONE requires data_len == 0
+        /*
+         * Copy legacy XSAVE area, to avoid complications with CPUID
+         * leaves 0 and 1 in the loop below.
+         */
+        memcpy(dest, xsave, XSAVE_HDR_OFFSET);
 
-Jason
+        /* Set XSTATE_BV */
+        xstate_bv &= vcpu->arch.guest_supported_xcr0 | XFEATURE_MASK_FPSSE;  <= here lies the trimming
+        *(u64 *)(dest + XSAVE_HDR_OFFSET) = xstate_bv;
+
+        /*
+         * Copy each region from the possibly compacted offset to the
+         * non-compacted offset.
+         */
+        valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
+        while (valid) {
+                u64 feature = valid & -valid;
+                int index = fls64(feature) - 1;
+                void *src = get_xsave_addr(xsave, feature);
+
+                if (src) {
+                        u32 size, offset, ecx, edx;
+                        cpuid_count(XSTATE_CPUID, index,
+                                    &size, &offset, &ecx, &edx);
+                        if (feature == XFEATURE_MASK_PKRU)
+                                memcpy(dest + offset, &vcpu->arch.pkru,
+                                       sizeof(vcpu->arch.pkru));
+                        else
+                                memcpy(dest + offset, src, size);
+
+                }
+
+                valid -= feature;
+        }
+}
+
+static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
+{
+        struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+        u64 xstate_bv = *(u64 *)(src + XSAVE_HDR_OFFSET);
+        u64 valid;
+
+        /*
+         * Copy legacy XSAVE area, to avoid complications with CPUID
+         * leaves 0 and 1 in the loop below.
+         */
+        memcpy(xsave, src, XSAVE_HDR_OFFSET);
+
+        /* Set XSTATE_BV and possibly XCOMP_BV.  */
+        xsave->header.xfeatures = xstate_bv;                <= features NOT limited to guest support
+        if (boot_cpu_has(X86_FEATURE_XSAVES))
+                xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
+
+        /*
+         * Copy each region from the non-compacted offset to the
+         * possibly compacted offset.
+         */
+        valid = xstate_bv & ~XFEATURE_MASK_FPSSE;
+        while (valid) {
+                u64 feature = valid & -valid;
+                int index = fls64(feature) - 1;
+                void *dest = get_xsave_addr(xsave, feature);
+
+                if (dest) {
+                        u32 size, offset, ecx, edx;
+                        cpuid_count(XSTATE_CPUID, index,
+                                    &size, &offset, &ecx, &edx);
+                        if (feature == XFEATURE_MASK_PKRU)
+                                memcpy(&vcpu->arch.pkru, src + offset,
+                                       sizeof(vcpu->arch.pkru));
+                        else
+                                memcpy(dest, src + offset, size);
+                }
+
+                valid -= feature;
+        }
+}
+
+static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
+                                        struct kvm_xsave *guest_xsave)
+{
+        u64 xstate_bv =
+                *(u64 *)&guest_xsave->region[XSAVE_HDR_OFFSET / sizeof(u32)];
+        u32 mxcsr = *(u32 *)&guest_xsave->region[XSAVE_MXCSR_OFFSET / sizeof(u32)];
+
+        if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+                /*
+                 * Here we allow setting states that are not present in
+                 * CPUID leaf 0xD, index 0, EDX:EAX.  This is for compatibility
+                 * with old userspace.
+                 */
+                if (xstate_bv & ~kvm_supported_xcr0() ||  <= loading more than KVM supports is disallowed
+                        mxcsr & ~mxcsr_feature_mask)
+                        return -EINVAL;
+                load_xsave(vcpu, (u8 *)guest_xsave->region);
+        } else {
+                if (xstate_bv & ~XFEATURE_MASK_FPSSE ||
+                        mxcsr & ~mxcsr_feature_mask)
+                        return -EINVAL;
+                memcpy(&vcpu->arch.guest_fpu->state.fxsave,
+                        guest_xsave->region, sizeof(struct fxregs_state));
+        }
+        return 0;
+}
+
+
+> That being said: the patch that I gave siliently allows unacceptable things to
+> be accepted at the destination, whereas this maintains status-quo and signals
+> an error when the destination cannot wholly process the uabi buffer (i.e.,
+> asked to restore more state than the destination processor has present).
+> 
+> The downside of my approach is above -- the flip side, though is that this
+> approach requires a patch to be applied on the source. However, we cannot
+> apply a patch at the source until it is evacuated of VMs -- chicken and egg
+> problem...
+> 
+> Unless I am grossly misunderstanding things here -- forgive me... :-)
+
+I suspect you're overlooking the impact on the destination.  Trimming features
+only when saving XSAVE state into the userspace buffer means that the destination
+will play nice with the "bad" snapshot.  It won't help setups where a VM is being
+migrated from a host with more XSAVE features to a host with fewer XSAVE features,
+but I don't see a sane way to retroactively fix that situation.  And IIUC, that's
+not the situation you're in (unless the Skylake host vs. Broadwell guests is only
+the test environment).
+
+Silently dropping features would break KVM's ABI (see kvm_vcpu_ioctl_x86_set_xsave()
+above).  Giving userspace a flag to opt-in is pointless because that requires a
+userspace update, and if userspace needs to be modified then it's simpler to just
+have userspace sanitize the xfeatures field.
