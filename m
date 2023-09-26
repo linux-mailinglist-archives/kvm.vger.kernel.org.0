@@ -2,47 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C0FE7AECD6
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 14:30:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E596B7AECD5
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 14:30:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234637AbjIZMa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 08:30:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35546 "EHLO
+        id S234612AbjIZMa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 08:30:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234560AbjIZMaZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 08:30:25 -0400
+        with ESMTP id S231171AbjIZMaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 08:30:24 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F176B101;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB06FC;
         Tue, 26 Sep 2023 05:30:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
         s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
         In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=Yx86vZBs7HZcWBbvoo5tY2OVXe5f+cPwzpmsB3avRzM=; b=NO7VsyOvfTAlIh7GHthnujdm5L
-        kAaFkMTmDsbbRC5gG1IjKjfcVFfdEu/eUQwXJFXHJff4s6Jxtpf4dgw85LtH+lpFVkYI/vDiW9+JJ
-        9CEBMibnM6ymFBUgwZJLY85TjVikhVHJLRNRv78vd+AAmUikAM9lmmIpyYpnXcsfhHE8=;
+        bh=H9Vf5tNbaPBn7S/4TkOBeeLYEKwDTjy+c/p0HEaHmSw=; b=PT/68OFF/DwJr72jWQ2Mq9AXwR
+        wDseuJ9PdYMDnk1akKKtRNMMjXYvuDNYqj4yitauozHEk6hDhx2+lN1ZO46+J0fb2aWFgqhp6H+uP
+        CBApzJ8WEymmuOJwAD9yjBK+2nellIXm/yT5GhOquwJEH3P885JV1c277OCA8S7/ehcw=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1ql7Ci-0000Tr-GG; Tue, 26 Sep 2023 12:30:16 +0000
+        id 1ql7Ci-0000Tp-Dv; Tue, 26 Sep 2023 12:30:16 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1ql73J-0001mF-Ud; Tue, 26 Sep 2023 12:20:34 +0000
+        id 1ql73L-0001mF-Fy; Tue, 26 Sep 2023 12:20:35 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
+        David Woodhouse <dwmw2@infradead.org>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        David Woodhouse <dwmw2@infradead.org>, x86@kernel.org
-Subject: [PATCH v6 10/11] KVM: xen: advertize the KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA capability
-Date:   Tue, 26 Sep 2023 12:20:12 +0000
-Message-Id: <20230926122013.867391-11-paul@xen.org>
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Subject: [PATCH v6 11/11] KVM: xen: allow vcpu_info content to be 'safely' copied
+Date:   Tue, 26 Sep 2023 12:20:13 +0000
+Message-Id: <20230926122013.867391-12-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230926122013.867391-1-paul@xen.org>
 References: <20230926122013.867391-1-paul@xen.org>
@@ -59,12 +58,24 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-Now that all relevant kernel changes and selftests are in place, enable the
-new capability.
+If the guest sets an explicit vcpu_info GPA then, for any of the first 32
+vCPUs, the content of the default vcpu_info in the shared_info page must be
+copied into the new location. Because this copy may race with event
+delivery (which updates the 'evtchn_pending_sel' field in vcpu_info) we
+need a way to defer that until the copy is complete.
+Happily there is already a shadow of 'evtchn_pending_sel' in kvm_vcpu_xen
+that is used in atomic context if the vcpu_info PFN cache has been
+invalidated so that the update of vcpu_info can be deferred until the
+cache can be refreshed (on vCPU thread's the way back into guest context).
+So let's also use this shadow if the vcpu_info cache has been
+*deactivated*, so that the VMM can safely copy the vcpu_info content and
+then re-activate the cache with the new GPA. To do this, all we need to do
+is stop considering an inactive vcpu_info cache as a hard error in
+kvm_xen_set_evtchn_fast().
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
+Cc: David Woodhouse <dwmw2@infradead.org>
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
@@ -72,29 +83,28 @@ Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
 Cc: x86@kernel.org
 
-v2:
+v6:
  - New in this version.
 ---
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/xen.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index eee252a0afef..1487b679ae45 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4531,7 +4531,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
- 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
- 		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
--		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
-+		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
-+		    KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA;
- 		if (sched_info_on())
- 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
- 			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index aafc794940e4..e645066217bb 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -1606,9 +1606,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 		WRITE_ONCE(xe->vcpu_idx, vcpu->vcpu_idx);
+ 	}
+ 
+-	if (!vcpu->arch.xen.vcpu_info_cache.active)
+-		return -EINVAL;
+-
+ 	if (xe->port >= max_evtchn_port(kvm))
+ 		return -EINVAL;
+ 
 -- 
 2.39.2
 
