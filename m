@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B52D7AF38A
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 21:00:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E32F7AF389
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 21:00:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235709AbjIZTA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 15:00:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42106 "EHLO
+        id S235706AbjIZTA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 15:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235675AbjIZTAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235679AbjIZTAY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 26 Sep 2023 15:00:24 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8882D180
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 11:59:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1674139
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 11:59:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695754767;
+        s=mimecast20190719; t=1695754774;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aTbdvO7UZM5OCNU5gIZTIqcO3Wj+jsd902L61o+vwPE=;
-        b=HnAG+DrgHGo9og69hs7u7A9nAZPUGhHF8EyTWSS/vLN+cdDh3J1//9RXS2Z0zLIL/Y38T+
-        B7gPHppWEbKJUCaVMyFiPoXZGRsGxGKUbAduemXkrsGoXtFCfuprsgglV++f9hSKRfkEaD
-        iT5GpiM5ODfi2tYbN8aV+NYqNbOsVfA=
+        bh=lIfRMUCd48IhDe7JraPd1zdi82ZXxhpWgPA7X+aEIzE=;
+        b=iGHVjAqSIlfHTArOPYytpXj3Hs/tDT8GA9jW4MEfpqRs7eUAG6KokQQiYaG3qEupCHM3PI
+        kXjFsHt3UzRJJP1MRr70bCRNRWsmMNXc2epIztrFUg7VYsZuMOVCY/0xwl4ANW4ll3gSGW
+        UC/b8i1InAuMXSrpyXNXJa114RE6eMM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-620-VocOJCasP5W_kOLm8aZTjw-1; Tue, 26 Sep 2023 14:59:23 -0400
-X-MC-Unique: VocOJCasP5W_kOLm8aZTjw-1
+ us-mta-326-akunlqBOMquWrlqJztU1Ug-1; Tue, 26 Sep 2023 14:59:29 -0400
+X-MC-Unique: akunlqBOMquWrlqJztU1Ug-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CA99185A79B;
-        Tue, 26 Sep 2023 18:59:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C3557800962;
+        Tue, 26 Sep 2023 18:59:28 +0000 (UTC)
 Received: from t14s.fritz.box (unknown [10.39.192.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 99AEC2026D4B;
-        Tue, 26 Sep 2023 18:59:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F33B92026D4B;
+        Tue, 26 Sep 2023 18:59:22 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     David Hildenbrand <david@redhat.com>,
@@ -57,9 +57,9 @@ Cc:     David Hildenbrand <david@redhat.com>,
         "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
         kvm@vger.kernel.org,
         "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: [PATCH v4 10/18] kvm: Add stub for kvm_get_max_memslots()
-Date:   Tue, 26 Sep 2023 20:57:30 +0200
-Message-ID: <20230926185738.277351-11-david@redhat.com>
+Subject: [PATCH v4 11/18] vhost: Add vhost_get_max_memslots()
+Date:   Tue, 26 Sep 2023 20:57:31 +0200
+Message-ID: <20230926185738.277351-12-david@redhat.com>
 In-Reply-To: <20230926185738.277351-1-david@redhat.com>
 References: <20230926185738.277351-1-david@redhat.com>
 MIME-Version: 1.0
@@ -75,68 +75,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We'll need the stub soon from memory device context.
-
-While at it, use "unsigned int" as return value and place the
-declaration next to kvm_get_free_memslots().
+Let's add vhost_get_max_memslots().
 
 Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c    | 2 +-
- accel/stubs/kvm-stub.c | 5 +++++
- include/sysemu/kvm.h   | 2 +-
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ hw/virtio/vhost-stub.c    |  5 +++++
+ hw/virtio/vhost.c         | 11 +++++++++++
+ include/hw/virtio/vhost.h |  1 +
+ 3 files changed, 17 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9d4c5a4c51..628076bdd8 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -174,7 +174,7 @@ void kvm_resample_fd_notify(int gsi)
-     }
- }
+diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
+index d53dd9d288..52d42adab2 100644
+--- a/hw/virtio/vhost-stub.c
++++ b/hw/virtio/vhost-stub.c
+@@ -2,6 +2,11 @@
+ #include "hw/virtio/vhost.h"
+ #include "hw/virtio/vhost-user.h"
  
--int kvm_get_max_memslots(void)
-+unsigned int kvm_get_max_memslots(void)
- {
-     KVMState *s = KVM_STATE(current_accel());
- 
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index a5d4442d8f..51f522e52e 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -109,6 +109,11 @@ int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-     return -ENOSYS;
- }
- 
-+unsigned int kvm_get_max_memslots(void)
++unsigned int vhost_get_max_memslots(void)
 +{
-+    return 0;
++    return UINT_MAX;
 +}
 +
- unsigned int kvm_get_free_memslots(void)
+ unsigned int vhost_get_free_memslots(void)
  {
-     return 0;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index c3d831baef..97a8a4f201 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -215,6 +215,7 @@ typedef struct KVMRouteChange {
+     return UINT_MAX;
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index f7e1ac12a8..ee193b07c7 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -55,6 +55,17 @@ static unsigned int used_shared_memslots;
+ static QLIST_HEAD(, vhost_dev) vhost_devices =
+     QLIST_HEAD_INITIALIZER(vhost_devices);
  
- /* external API */
- 
-+unsigned int kvm_get_max_memslots(void);
- unsigned int kvm_get_free_memslots(void);
- bool kvm_has_sync_mmu(void);
- int kvm_has_vcpu_events(void);
-@@ -552,7 +553,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *source);
++unsigned int vhost_get_max_memslots(void)
++{
++    unsigned int max = UINT_MAX;
++    struct vhost_dev *hdev;
++
++    QLIST_FOREACH(hdev, &vhost_devices, entry) {
++        max = MIN(max, hdev->vhost_ops->vhost_backend_memslots_limit(hdev));
++    }
++    return max;
++}
++
+ unsigned int vhost_get_free_memslots(void)
+ {
+     unsigned int free = UINT_MAX;
+diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
+index 603bf834be..c7e5467693 100644
+--- a/include/hw/virtio/vhost.h
++++ b/include/hw/virtio/vhost.h
+@@ -315,6 +315,7 @@ uint64_t vhost_get_features(struct vhost_dev *hdev, const int *feature_bits,
   */
- int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
- struct ppc_radix_page_info *kvm_get_radix_page_info(void);
--int kvm_get_max_memslots(void);
+ void vhost_ack_features(struct vhost_dev *hdev, const int *feature_bits,
+                         uint64_t features);
++unsigned int vhost_get_max_memslots(void);
+ unsigned int vhost_get_free_memslots(void);
  
- /* Notify resamplefd for EOI of specific interrupts. */
- void kvm_resample_fd_notify(int gsi);
+ int vhost_net_set_backend(struct vhost_dev *hdev,
 -- 
 2.41.0
 
