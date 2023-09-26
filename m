@@ -2,248 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 285117AF268
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 20:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4D2A7AF36B
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 20:58:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235548AbjIZSEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 14:04:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
+        id S235610AbjIZS6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 14:58:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235544AbjIZSEj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 14:04:39 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8ABD10A;
-        Tue, 26 Sep 2023 11:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695751472; x=1727287472;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BPSD5WhvXpBO3lsIdE4c7syBr8J6jYNl4IAaRzob9YA=;
-  b=D1OgvBNMHp1u53zOf1OONKlkZPkSEWYBGODnyQ/MKWso71k3HYY+KHMM
-   0AZKHUYau1kTDKXkyZFNk2g/Wv5IfBLKulqnArmJWpggLQHLyL83pOfAr
-   BxBLbT9ghi9I3vi9zSfDs/IpH2ChXa69saEiAIj0eDMmOslR0p1ka83dp
-   qg4K0ekduysrG4Hjp+j+4OCOyITmjAcKavn4Ig4N4XoXhm44X60lmKi6V
-   kqsgdN7VaC4EbzN0pzSQGhZO+7YOyEFCsWeUuj8/VYiDHnMcvZXvDck6A
-   piLYEy0RE7nCV0RAQULhOJ9BTtQknat67Z8Rl40NshMo1dWUhtbNlmu/O
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="371967682"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="371967682"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 11:04:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="725514679"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="725514679"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 11:04:28 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Michael Roth <michael.roth@amd.com>,
+        with ESMTP id S235438AbjIZS6w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 14:58:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9295E10A
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 11:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695754676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TxpnUmsp7CDpOyOE4uRuAfPS1CYsQJrUqeNJWaRyC9g=;
+        b=bFfraCmYyjfs2C4caPcH/xuvuum04D5TDZ24/ZQOWcG5ToyvQ54e++2CbNMIHRHKxSRW5s
+        6LinGtOtWtfZ2q/0jrLemNSg3ybST+0R2hYlZlvD1Zjjoe+ZdyU2xeTttvB6qWFZ4appPB
+        UShJOjjpc9/vhLUFb/ZKx9Tp1HExuZo=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-471-g2fGDUOgNzKF-jPxEwneLg-1; Tue, 26 Sep 2023 14:57:55 -0400
+X-MC-Unique: g2fGDUOgNzKF-jPxEwneLg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BFCA638116F9;
+        Tue, 26 Sep 2023 18:57:54 +0000 (UTC)
+Received: from t14s.fritz.box (unknown [10.39.192.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 92F022026D4B;
+        Tue, 26 Sep 2023 18:57:40 +0000 (UTC)
+From:   David Hildenbrand <david@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     David Hildenbrand <david@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH] KVM: guest_memfd: Refactor kvm_gmem into inode->i_private
-Date:   Tue, 26 Sep 2023 11:03:46 -0700
-Message-Id: <8e57c347d6c461431e84ef4354dc076f363f3c01.1695751312.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
+        Igor Mammedov <imammedo@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Michal Privoznik <mprivozn@redhat.com>,
+        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        kvm@vger.kernel.org
+Subject: [PATCH v4 00/18] virtio-mem: Expose device memory through multiple memslots
+Date:   Tue, 26 Sep 2023 20:57:20 +0200
+Message-ID: <20230926185738.277351-1-david@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Quoting from patch #16:
 
-Refactor guest_memfd to use inode->i_private to store info about kvm_gmem.
-Currently it is stored in the following way.
-- flags in inode->i_private
-- struct kvm_gmem in file->private_data
-- struct kvm_gmem in linked linst in inode->i_mapping->private_list
-  And this list has single entry.
+    Having large virtio-mem devices that only expose little memory to a VM
+    is currently a problem: we map the whole sparse memory region into the
+    guest using a single memslot, resulting in one gigantic memslot in KVM.
+    KVM allocates metadata for the whole memslot, which can result in quite
+    some memory waste.
 
-The relationship between struct file, struct inode and struct kvm_gmem is
-1:1, not 1:many. Consolidate related info in one place.
-- Move flags into struct kvm_gmem
-- Store struct kvm_gmem in inode->i_private
-- Don't use file->private_data
-- Don't use inode->i_mapping_private_list
-- Introduce a helper conversion function from inode to kvm_gmem
+    Assuming we have a 1 TiB virtio-mem device and only expose little (e.g.,
+    1 GiB) memory, we would create a single 1 TiB memslot and KVM has to
+    allocate metadata for that 1 TiB memslot: on x86, this implies allocating
+    a significant amount of memory for metadata:
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/guest_memfd.c | 53 ++++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 30 deletions(-)
+    (1) RMAP: 8 bytes per 4 KiB, 8 bytes per 2 MiB, 8 bytes per 1 GiB
+        -> For 1 TiB: 2147483648 + 4194304 + 8192 = ~ 2 GiB (0.2 %)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 4f3a313f5532..66dd9b55e85c 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -14,14 +14,19 @@ static struct vfsmount *kvm_gmem_mnt;
- struct kvm_gmem {
- 	struct kvm *kvm;
- 	struct xarray bindings;
--	struct list_head entry;
-+	unsigned long flags;
- };
- 
-+static struct kvm_gmem *to_gmem(struct inode *inode)
-+{
-+	return inode->i_private;
-+}
-+
- static struct folio *kvm_gmem_get_huge_folio(struct inode *inode, pgoff_t index)
- {
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
- 	unsigned long huge_index = round_down(index, HPAGE_PMD_NR);
--	unsigned long flags = (unsigned long)inode->i_private;
-+	unsigned long flags = to_gmem(inode)->flags;
- 	struct address_space *mapping  = inode->i_mapping;
- 	gfp_t gfp = mapping_gfp_mask(mapping);
- 	struct folio *folio;
-@@ -134,26 +139,22 @@ static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
- 
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- {
--	struct list_head *gmem_list = &inode->i_mapping->private_list;
-+	struct address_space *mapping = inode->i_mapping;
-+	struct kvm_gmem *gmem = to_gmem(inode);
- 	pgoff_t start = offset >> PAGE_SHIFT;
- 	pgoff_t end = (offset + len) >> PAGE_SHIFT;
--	struct kvm_gmem *gmem;
- 
- 	/*
- 	 * Bindings must stable across invalidation to ensure the start+end
- 	 * are balanced.
- 	 */
--	filemap_invalidate_lock(inode->i_mapping);
--
--	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_begin(gmem, start, end);
-+	filemap_invalidate_lock(mapping);
-+	kvm_gmem_invalidate_begin(gmem, start, end);
- 
- 	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
- 
--	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_end(gmem, start, end);
--
--	filemap_invalidate_unlock(inode->i_mapping);
-+	kvm_gmem_invalidate_end(gmem, start, end);
-+	filemap_invalidate_unlock(mapping);
- 
- 	return 0;
- }
-@@ -231,7 +232,7 @@ static long kvm_gmem_fallocate(struct file *file, int mode, loff_t offset,
- 
- static int kvm_gmem_release(struct inode *inode, struct file *file)
- {
--	struct kvm_gmem *gmem = file->private_data;
-+	struct kvm_gmem *gmem = to_gmem(inode);
- 	struct kvm_memory_slot *slot;
- 	struct kvm *kvm = gmem->kvm;
- 	unsigned long index;
-@@ -260,8 +261,6 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
- 	kvm_gmem_invalidate_end(gmem, 0, -1ul);
- 
--	list_del(&gmem->entry);
--
- 	filemap_invalidate_unlock(inode->i_mapping);
- 
- 	mutex_unlock(&kvm->slots_lock);
-@@ -305,8 +304,7 @@ static int kvm_gmem_migrate_folio(struct address_space *mapping,
- 
- static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
- {
--	struct list_head *gmem_list = &mapping->private_list;
--	struct kvm_gmem *gmem;
-+	struct kvm_gmem *gmem = to_gmem(mapping->host);
- 	pgoff_t start, end;
- 
- 	filemap_invalidate_lock_shared(mapping);
-@@ -314,8 +312,7 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
- 	start = page->index;
- 	end = start + thp_nr_pages(page);
- 
--	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_begin(gmem, start, end);
-+	kvm_gmem_invalidate_begin(gmem, start, end);
- 
- 	/*
- 	 * Do not truncate the range, what action is taken in response to the
-@@ -326,8 +323,7 @@ static int kvm_gmem_error_page(struct address_space *mapping, struct page *page)
- 	 * error to userspace.
- 	 */
- 
--	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_end(gmem, start, end);
-+	kvm_gmem_invalidate_end(gmem, start, end);
- 
- 	filemap_invalidate_unlock_shared(mapping);
- 
-@@ -382,7 +378,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 	if (err)
- 		goto err_inode;
- 
--	inode->i_private = (void *)(unsigned long)flags;
- 	inode->i_op = &kvm_gmem_iops;
- 	inode->i_mapping->a_ops = &kvm_gmem_aops;
- 	inode->i_mode |= S_IFREG;
-@@ -417,10 +412,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 	kvm_get_kvm(kvm);
- 	gmem->kvm = kvm;
- 	xa_init(&gmem->bindings);
-+	gmem->flags = flags;
- 
--	file->private_data = gmem;
--
--	list_add(&gmem->entry, &inode->i_mapping->private_list);
-+	inode->i_private = gmem;
- 
- 	fd_install(fd, file);
- 	return fd;
-@@ -476,12 +470,11 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	if (file->f_op != &kvm_gmem_fops)
- 		goto err;
- 
--	gmem = file->private_data;
-+	inode = file_inode(file);
-+	gmem = to_gmem(inode);
- 	if (gmem->kvm != kvm)
- 		goto err;
- 
--	inode = file_inode(file);
--
- 	if (offset < 0 || !PAGE_ALIGNED(offset))
- 		return -EINVAL;
- 
-@@ -538,7 +531,7 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
- 	if (!file)
- 		return;
- 
--	gmem = file->private_data;
-+	gmem = to_gmem(file_inode(file));
- 
- 	filemap_invalidate_lock(file->f_mapping);
- 	xa_store_range(&gmem->bindings, start, end - 1, NULL, GFP_KERNEL);
-@@ -563,7 +556,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	if (!file)
- 		return -EFAULT;
- 
--	gmem = file->private_data;
-+	gmem = to_gmem(file_inode(file));
- 
- 	if (WARN_ON_ONCE(xa_load(&gmem->bindings, index) != slot)) {
- 		r = -EIO;
+        With the TDP MMU (cat /sys/module/kvm/parameters/tdp_mmu) this gets
+        allocated lazily when required for nested VMs
+    (2) gfn_track: 2 bytes per 4 KiB
+        -> For 1 TiB: 536870912 = ~512 MiB (0.05 %)
+    (3) lpage_info: 4 bytes per 2 MiB, 4 bytes per 1 GiB
+        -> For 1 TiB: 2097152 + 4096 = ~2 MiB (0.0002 %)
+    (4) 2x dirty bitmaps for tracking: 2x 1 bit per 4 KiB page
+        -> For 1 TiB: 536870912 = 64 MiB (0.006 %)
+
+    So we primarily care about (1) and (2). The bad thing is, that the
+    memory consumption doubles once SMM is enabled, because we create the
+    memslot once for !SMM and once for SMM.
+
+    Having a 1 TiB memslot without the TDP MMU consumes around:
+    * With SMM: 5 GiB
+    * Without SMM: 2.5 GiB
+    Having a 1 TiB memslot with the TDP MMU consumes around:
+    * With SMM: 1 GiB
+    * Without SMM: 512 MiB
+
+    ... and that's really something we want to optimize, to be able to just
+    start a VM with small boot memory (e.g., 4 GiB) and a virtio-mem device
+    that can grow very large (e.g., 1 TiB).
+
+    Consequently, using multiple memslots and only mapping the memslots we
+    really need can significantly reduce memory waste and speed up
+    memslot-related operations. Let's expose the sparse RAM memory region using
+    multiple memslots, mapping only the memslots we currently need into our
+    device memory region container.
+
+The hyper-v balloon driver has similar demands [1].
+
+For virtio-mem, this has to be turned manually on ("dynamic-memslots=on"),
+due to the interaction with vhost (below).
+
+If we have less than 509 memslots available, we always default to a single
+memslot. Otherwise, we automatically decide how many memslots to use
+based on a simple heuristic (see patch #12), and try not to use more than
+256 memslots across all memory devices: our historical DIMM limit.
+
+As soon as any memory devices automatically decided on using more than
+one memslot, vhost devices that support less than 509 memslots (e.g.,
+currently most vhost-user devices like with virtiofsd) can no longer be
+plugged as a precaution.
+
+Quoting from patch #12:
+
+    Plugging vhost devices with less than 509 memslots available while we
+    have memory devices plugged that consume multiple memslots due to
+    automatic decisions can be problematic. Most configurations might just fail
+    due to "limit < used + reserved", however, it can also happen that these
+    memory devices would suddenly consume memslots that would actually be
+    required by other memslot consumers (boot, PCI BARs) later. Note that this
+    has always been sketchy with vhost devices that support only a small number
+    of memslots; but we don't want to make it any worse.So let's keep it simple
+    and simply reject plugging such vhost devices in such a configuration.
+
+    Eventually, all vhost devices that want to be fully compatible with such
+    memory devices should support a decent number of memslots (>= 509).
+
+
+The recommendation is to plug such vhost devices before the virtio-mem
+decides, or to not set "dynamic-memslots=on". As soon as these devices
+support a reasonable number of memslots (>= 509), this will start working
+automatically.
+
+I run some tests on x86_64, now also including vfio and migration tests.
+Seems to work as expected, even when multiple memslots are used.
+
+
+Patch #1 -- #3 are from [2] that were not picked up yet.
+
+Patch #4 -- #12 add handling of multiple memslots to memory devices
+
+Patch #13 -- #16 add "dynamic-memslots=on" support to virtio-mem
+
+Patch #15 -- #16 make sure that virtio-mem memslots can be enabled/disable
+             atomically
+
+v3 -> v4:
+* "virtio-mem: Pass non-const VirtIOMEM via virtio_mem_range_cb"
+ -> Cleanup patch added
+* "virtio-mem: Update state to match bitmap as soon as it's been migrated"
+ -> Cleanup patch added
+* "virtio-mem: Expose device memory dynamically via multiple memslots if
+   enabled"
+ -> Parameter now called "dynamic-memslots"
+ -> With "dynamic-memslots=off", don't use a memory region container and
+    just use the old handling: always map the RAM memory region [thus the
+    new parameter name]
+ -> Require "unplugged-inaccessible=on" (default) with
+    "dynamic-memslots=on" for simplicity
+ -> Take care of proper migration handling
+ -> Remove accidential additional busy check in virtio_mem_unplug_all()
+ -> Minor comment cleanups
+ -> Dropped RB because of changes
+
+v2 -> v3:
+* "kvm: Return number of free memslots"
+ -> Return 0 in stub
+* "kvm: Add stub for kvm_get_max_memslots()"
+ -> Return 0 in stub
+* Adjust other patches to check for kvm_enabled() before calling
+  kvm_get_free_memslots()/kvm_get_max_memslots()
+* Add RBs
+
+v1 -> v2:
+* Include patches from [1]
+* A lot of code simplification and reorganization, too many to spell out
+* don't add a general soft-limit on memslots, to avoid warning in sane
+  setups
+* Simplify handling of vhost devices with a small number of memslots:
+  simply fail plugging them
+* "virtio-mem: Expose device memory via multiple memslots if enabled"
+ -> Fix one "is this the last memslot" check
+* Much more testing
+
+
+[1] https://lkml.kernel.org/r/cover.1689786474.git.maciej.szmigiero@oracle.com
+[2] https://lkml.kernel.org/r/20230523185915.540373-1-david@redhat.com
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: "Philippe Mathieu-Daudé" <philmd@linaro.org>
+Cc: Eduardo Habkost <eduardo@habkost.net>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Yanan Wang <wangyanan55@huawei.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>
+Cc: Daniel P. Berrangé <berrange@redhat.com>
+Cc: Gavin Shan <gshan@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Cc: kvm@vger.kernel.org
+
+David Hildenbrand (18):
+  vhost: Rework memslot filtering and fix "used_memslot" tracking
+  vhost: Remove vhost_backend_can_merge() callback
+  softmmu/physmem: Fixup qemu_ram_block_from_host() documentation
+  kvm: Return number of free memslots
+  vhost: Return number of free memslots
+  memory-device: Support memory devices with multiple memslots
+  stubs: Rename qmp_memory_device.c to memory_device.c
+  memory-device: Track required and actually used memslots in
+    DeviceMemoryState
+  memory-device,vhost: Support memory devices that dynamically consume
+    memslots
+  kvm: Add stub for kvm_get_max_memslots()
+  vhost: Add vhost_get_max_memslots()
+  memory-device,vhost: Support automatic decision on the number of
+    memslots
+  memory: Clarify mapping requirements for RamDiscardManager
+  virtio-mem: Pass non-const VirtIOMEM via virtio_mem_range_cb
+  virtio-mem: Update state to match bitmap as soon as it's been migrated
+  virtio-mem: Expose device memory dynamically via multiple memslots if
+    enabled
+  memory,vhost: Allow for marking memory device memory regions
+    unmergeable
+  virtio-mem: Mark memslot alias memory regions unmergeable
+
+ MAINTAINERS                                   |   1 +
+ accel/kvm/kvm-all.c                           |  35 +-
+ accel/stubs/kvm-stub.c                        |   9 +-
+ hw/mem/memory-device.c                        | 196 ++++++++++-
+ hw/virtio/vhost-stub.c                        |   9 +-
+ hw/virtio/vhost-user.c                        |  21 +-
+ hw/virtio/vhost-vdpa.c                        |   1 -
+ hw/virtio/vhost.c                             | 103 +++++-
+ hw/virtio/virtio-mem-pci.c                    |  21 ++
+ hw/virtio/virtio-mem.c                        | 330 +++++++++++++++++-
+ include/exec/cpu-common.h                     |  15 +
+ include/exec/memory.h                         |  27 +-
+ include/hw/boards.h                           |  14 +-
+ include/hw/mem/memory-device.h                |  57 +++
+ include/hw/virtio/vhost-backend.h             |   9 +-
+ include/hw/virtio/vhost.h                     |   3 +-
+ include/hw/virtio/virtio-mem.h                |  32 +-
+ include/sysemu/kvm.h                          |   4 +-
+ include/sysemu/kvm_int.h                      |   1 +
+ softmmu/memory.c                              |  35 +-
+ softmmu/physmem.c                             |  17 -
+ .../{qmp_memory_device.c => memory_device.c}  |  10 +
+ stubs/meson.build                             |   2 +-
+ 23 files changed, 839 insertions(+), 113 deletions(-)
+ rename stubs/{qmp_memory_device.c => memory_device.c} (56%)
+
 -- 
-2.25.1
+2.41.0
 
