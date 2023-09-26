@@ -2,113 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90EE37AEBD2
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 13:50:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F39657AEC25
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 14:08:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbjIZLuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 07:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49924 "EHLO
+        id S234434AbjIZMIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 08:08:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231289AbjIZLuN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 07:50:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCCAE4
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 04:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695728962;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rn26GZx7iEMFes15hPD/QXW1aPy6SBHdulzAjklMMFQ=;
-        b=Twqc8CbuSbVQZvv5ACt1mTsGKJ8JjXoAiDkrxNW33yT5+O5Oac9Dx+ZyBLBtIhmaAvZYHX
-        QreSg7dheLZ8obdY4gIcL+EkNRmHgeNHgugfZJjZr4eHKA9DWvAD6Jpzszd0SQvGgAhYUv
-        Z0A5SO7m4A0+1551F51A7TdPeWo6nnk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-XtLNgyZdPFitzDr6Dg0ltQ-1; Tue, 26 Sep 2023 07:49:21 -0400
-X-MC-Unique: XtLNgyZdPFitzDr6Dg0ltQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9b274cc9636so419765166b.0
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 04:49:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695728959; x=1696333759;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rn26GZx7iEMFes15hPD/QXW1aPy6SBHdulzAjklMMFQ=;
-        b=KyANoqpNWIKU1OzqMR0vBzXDgG2izMeNCV4CkXszUr7CwxEbp7aamc/tkxWN9LHTAr
-         KaXs6eSBn6qjeYWseTMJKdGXnD7FXRHcN9uP9R4SK6smVEz2krGPe2DXRhoNJcl9ShIw
-         WwkTHJF5drBvd/3uiCzG6E4Z6siMLwftRSMHQIXkC0upmFhdTX9qo4ZLqmRatunT7EBX
-         yRdv7HzsO+2AKVetObvJXHpTxyMnxYvka7emO4C7SFNLZMXsdFoTBZZIBe12VfumVWsp
-         v7e/VO4Bd26A7/2q/meTnO6nCwffIqy2bbcAQyJmGcbQ7Bj87YX/CthiDeMPxx3OWtmX
-         FYcA==
-X-Gm-Message-State: AOJu0YwNVtysBMvdSB9KQj14xTj0XTdQ3mQ3Xj6gENTEClSVh2dFh3bi
-        +5e28Pa1UdizdMLV5rUV4YkGOeOkHesRrJuKZ5vlQuvdSU3oI85aD8IADgPlyQwuCiHfgglFVHG
-        zjK1HHyl5mmMKhCHzbMdfz84=
-X-Received: by 2002:a17:906:1bb1:b0:9ae:3d17:d5d0 with SMTP id r17-20020a1709061bb100b009ae3d17d5d0mr8592498ejg.31.1695728959735;
-        Tue, 26 Sep 2023 04:49:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGh6wPENW7EVBACR9Vb/Wc56um6GyOBGTE8QTlhaORLYVTFCoMGcZFTrxB//pXG2+0p0JOmIg==
-X-Received: by 2002:a17:906:1bb1:b0:9ae:3d17:d5d0 with SMTP id r17-20020a1709061bb100b009ae3d17d5d0mr8592474ejg.31.1695728959330;
-        Tue, 26 Sep 2023 04:49:19 -0700 (PDT)
-Received: from redhat.com ([2.52.31.177])
-        by smtp.gmail.com with ESMTPSA id l5-20020a170906a40500b009ae4ead6c01sm7633080ejz.163.2023.09.26.04.49.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 04:49:18 -0700 (PDT)
-Date:   Tue, 26 Sep 2023 07:49:14 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Parav Pandit <parav@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230926074520-mutt-send-email-mst@kernel.org>
-References: <20230921181637.GU13733@nvidia.com>
- <20230921152802-mutt-send-email-mst@kernel.org>
- <20230921195345.GZ13733@nvidia.com>
- <20230921155834-mutt-send-email-mst@kernel.org>
- <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
- <20230922122246.GN13733@nvidia.com>
- <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com>
- <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACGkMEv9_+6sYp1JZpCZr19csg0jO-jLVhuygWqm+s9mWr3Lew@mail.gmail.com>
+        with ESMTP id S230231AbjIZMIs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 08:08:48 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B277E6;
+        Tue, 26 Sep 2023 05:08:42 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QBiPGr028118;
+        Tue, 26 Sep 2023 12:08:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=1gJpuwdVqRAqlnTtVV631/kgV+qLy2bqFt2x6eyTQb8=;
+ b=DEBWZv1jcCHhPGYbyaEHPBZJA8PEB9j4S6EgtEPaW1PQ7du0OqQbCf4KDJxMgccouSpQ
+ xF0KIhiR+2XIZXTIRMyEEeOgep2d2h8Pk+5SfMV1ic+SEDUAAyPE1K2abH3cYeWptF4t
+ NvYGXf9jrDaZYfdQvzLZP9KRLpgvU9G9Pvamyc/VPwrGABHtC6ekNOIFwCildkAMxfxB
+ ZNUbFUDO4FfSsMIk/s/t2mu4WT43XmiETUeL4kzlzRpxkCJ5QBPesZIpXrJp8UU7nQMQ
+ 6beQgu97WJ8mPGC1AwCQFZh1kwRbGqgSfS/TP9fHfTPo3HhVBhiNwM55jWyOB2LKWdlx FA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbwk8tahk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Sep 2023 12:08:33 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38QC6b7Y015419;
+        Tue, 26 Sep 2023 12:08:33 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbwk8tah5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Sep 2023 12:08:32 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38QBJo4f008143;
+        Tue, 26 Sep 2023 12:08:32 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqybgpr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Sep 2023 12:08:32 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38QC8SMc45810398
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Sep 2023 12:08:29 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E180820043;
+        Tue, 26 Sep 2023 12:08:28 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B7DAE20040;
+        Tue, 26 Sep 2023 12:08:28 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 26 Sep 2023 12:08:28 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com, andrew.jones@linux.dev
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1] arch-run: migration: properly handle crashing outgoing QEMU
+Date:   Tue, 26 Sep 2023 14:08:23 +0200
+Message-ID: <20230926120828.1830840-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACGkMEv9_+6sYp1JZpCZr19csg0jO-jLVhuygWqm+s9mWr3Lew@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: S4Kg005CW5jlplTrnNAp5iWhV9dIu93M
+X-Proofpoint-ORIG-GUID: SdO8uUsa6Vc_CnwDokNRXewpIrx2lwHG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_08,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ mlxlogscore=680 suspectscore=0 spamscore=0 bulkscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 clxscore=1011 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309260104
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 10:32:39AM +0800, Jason Wang wrote:
-> It's the implementation details in legacy. The device needs to make
-> sure (reset) the driver can work (is done before get_status return).
+When outgoing (live) QEMU crashes or times out during migration, we
+currently hang forever.
 
-I think that there's no way to make it reliably work for all legacy drivers.
+This is because we don't exit the loop querying migration state when QMP
+communication fails.
 
-They just assumed a software backend and did not bother with DMA
-ordering. You can try to avoid resets, they are not that common so
-things will tend to mostly work if you don't stress them to much with
-things like hot plug/unplug in a loop.  Or you can try to use a driver
-after 2011 which is more aware of hardware ordering and flushes the
-reset write with a read.  One of these two tricks, I think, is the magic
-behind the device exposing memory bar 0 that you mention.
+Add proper error handling to the loop and exit when QMP communication
+fails for whatever reason.
 
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+Sorry I accidentally sent this only to s390x maintainers and forgot
+Paolo and Andrew, hence resending.
+
+ scripts/arch-run.bash | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index 518607f4b75d..de9890408e24 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -162,8 +162,14 @@ run_migration ()
+ 	migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
+ 	while ! grep -q '"completed"' <<<"$migstatus" ; do
+ 		sleep 1
+-		migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
+-		if grep -q '"failed"' <<<"$migstatus" ; then
++		if ! migstatus=`qmp ${qmp1} '"query-migrate"'`; then
++			echo "ERROR: Querying migration state failed." >&2
++			echo > ${fifo}
++			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
++			return 2
++		fi
++		migstatus=`grep return <<<"$migstatus"`
++		if grep -q '"failed"' <<<"$migstatus"; then
+ 			echo "ERROR: Migration failed." >&2
+ 			echo > ${fifo}
+ 			qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
 -- 
-MST
+2.41.0
 
