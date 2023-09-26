@@ -2,196 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A81B17AE476
-	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 06:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2C607AE49F
+	for <lists+kvm@lfdr.de>; Tue, 26 Sep 2023 06:38:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233356AbjIZEO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 00:14:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
+        id S233555AbjIZEiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 00:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbjIZEO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 00:14:57 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D7FBE9
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 21:14:50 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-69101022969so7024867b3a.3
-        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 21:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695701690; x=1696306490; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D0Uz9m0Lpyj2Up3M7ljAj872e7YEcYxbkjr4aA3fxoM=;
-        b=BIA5itrFYbRSfcwBtv6qT97Aph65YufArhdmkwRx98crNms3XpdOn4VlcnQ9vMxVE3
-         f1NlRmv8u3zDOn0J/amHvwmiNQFK9OxpzV+WNg6spVsUXTeoUQ2nkXWg/pR1Tw94Jg4h
-         CZHBBySlEsHnuai08b8HsQFGS+j8KLnECC4l6DoJ/2RLnNYzjpCT5N5vukhHO4x/XLjW
-         L/XGI9xdY5AUo3NeKr2gh2FcGjJIhMbb/jb0yCYog1xYuAX0ZOBgcocozO/8eT183NKj
-         TLYHSf6IAkgFRbrhozKuFaaGG5iAR3KEmBuhlZwNwdPpuCVpity/ZOMIY5gFKu83KY2y
-         mWcw==
+        with ESMTP id S230184AbjIZEiP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 00:38:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D407E9
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 21:37:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695703040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OlxCYW4gvs6NcetxUbOuJzhkEzIekaCZ3GVBq7mXcyw=;
+        b=G82Tof8ARAMaHS7vMJYpBXoQihjU8F8KCF9J0ku0j16h3gW33aHybaJ04byFn2+dTN54XJ
+        dBPW7BTBHiiZWFwE43dQFI+IYZyzHwu8YNExrFfFoEENb9276dnyv/U4BPa14pJTdVoNvq
+        vlDnca447rYdhczN/juOH8XKjE39Wmc=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-272-9A9Fc-FWMCW76jSJdTnqLw-1; Tue, 26 Sep 2023 00:37:18 -0400
+X-MC-Unique: 9A9Fc-FWMCW76jSJdTnqLw-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-503343a850aso11610493e87.3
+        for <kvm@vger.kernel.org>; Mon, 25 Sep 2023 21:37:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695701690; x=1696306490;
+        d=1e100.net; s=20230601; t=1695703037; x=1696307837;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D0Uz9m0Lpyj2Up3M7ljAj872e7YEcYxbkjr4aA3fxoM=;
-        b=ejUPfC3JPBdbGrR9hjM+L1IJlcNwfrRn3Yqc6rZI4CQ6zO/954nR18YmUI9Y2vlwJm
-         mXBUGufpZTo4La4iz4DUMQDER2EK5j2aK+JdcMHw92MVvXnjKOGHLG2ONBwE0y679MHZ
-         hgL6v0q+demEm6lxDZoaxkHAvL6dJCQP4dc1r4hdbL2IbyI4KorRNpvJrR561j1SftRW
-         uQN8yq9HWNT/B1iIYl8hMAn1WJemMGJpC+XoapPaYMa7CPMoodHASrvZS0zTrRtK1m5G
-         F7ARSqKtkklQNSSM6FvrLRwzgNqMwX8qI7uJVqOhcyh9ozvIYbWOKh0cd9MmsAUMWIw8
-         pe0Q==
-X-Gm-Message-State: AOJu0YyaY0PpA5iMEViXrlbsMXXbchBsUZatvYFdXVfm6We2XnLSYRVk
-        D+AJVWiGS7FgBOj8pVna02NyhDplb+vb3tKvtfpQsg==
-X-Google-Smtp-Source: AGHT+IGlrqzBQynTQ2ZOIqd8C6kbA5Z3vGoWbVXr0mUzMrb0AxrCfYzkhQU9qD+Ac1FboN94cMy4dyuKkXku+Op/CWc=
-X-Received: by 2002:a05:6a20:a11e:b0:153:5832:b31b with SMTP id
- q30-20020a056a20a11e00b001535832b31bmr9309947pzk.53.1695701689540; Mon, 25
- Sep 2023 21:14:49 -0700 (PDT)
+        bh=OlxCYW4gvs6NcetxUbOuJzhkEzIekaCZ3GVBq7mXcyw=;
+        b=Rr8hl3Eh3aK+VP9nbW0GFJpbczOHnAJdDbrj8/KbQu1sVmq8WlWWSjhkpP/heucoQP
+         85TwbcubQHvqPZUVuR71Plpy8Au0d6GJU+Gtjs0w7WWd2rVeMRTHkU8oQtuG1/+AEifs
+         1XJHNU1yd8UYS7S4lk3Su+ma3mFP6FqwqMrRX2GXB+8iGtzcs+QYWqlS0hIy1UckU/2O
+         PRLr1su9aavy/kpcYk8OdYxcZMUEj6uzhNbYSCn8IPT+ANuQRQjvI66pS+1REgJGyKLb
+         ss1g37WNOpoeMTwhJD8t9ZLqK+mFWzPT+7YlqQ8YtQHJJ8hEs8tW3XNOxmW2pnCW4aFW
+         mINQ==
+X-Gm-Message-State: AOJu0Yyof47Aus3oDlAan3/HFNKMoLNWTVmwjhICER5jOCQSgn/huR/I
+        ZfU0DMCANljLUE5w6dK++idZfXWJbEkoI1thRrvjU1ZXe7qWWv6SsBX8jqClO7PaLvpK6FLxEyB
+        Hi/IDv7PlLLXZCEnUFoSEDekOYilc
+X-Received: by 2002:a05:6512:ea0:b0:4fb:740a:81ae with SMTP id bi32-20020a0565120ea000b004fb740a81aemr8556506lfb.16.1695703037414;
+        Mon, 25 Sep 2023 21:37:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGNkpmgxSfocjjuW7aLgAyK6C+0u3te928OI7LJMt7eR6OZwrgABZeepiaMfe8FTOCLRsWIJA+ptKT1xgYbLi0=
+X-Received: by 2002:a05:6512:ea0:b0:4fb:740a:81ae with SMTP id
+ bi32-20020a0565120ea000b004fb740a81aemr8556492lfb.16.1695703037131; Mon, 25
+ Sep 2023 21:37:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230925133859.1735879-1-apatel@ventanamicro.com>
- <20230925133859.1735879-3-apatel@ventanamicro.com> <ZRHH25IyJJLWSolC@ghost> <CAK9=C2UoKxM+wknB4n8=okyXCCE6t0Vvz4jU_tBW6DMm6Vb3DA@mail.gmail.com>
-In-Reply-To: <CAK9=C2UoKxM+wknB4n8=okyXCCE6t0Vvz4jU_tBW6DMm6Vb3DA@mail.gmail.com>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Tue, 26 Sep 2023 09:44:38 +0530
-Message-ID: <CAK9=C2X9FpLTW4mDTNUWkoRLAXZonPzhrsOD5xrCfrqKSbaLhg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/9] RISC-V: Detect XVentanaCondOps from ISA string
-To:     Charlie Jenkins <charlie@rivosinc.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230921125348-mutt-send-email-mst@kernel.org>
+ <20230921170709.GS13733@nvidia.com> <20230921131035-mutt-send-email-mst@kernel.org>
+ <20230921174450.GT13733@nvidia.com> <20230921135426-mutt-send-email-mst@kernel.org>
+ <20230921181637.GU13733@nvidia.com> <20230921152802-mutt-send-email-mst@kernel.org>
+ <20230921195345.GZ13733@nvidia.com> <20230921155834-mutt-send-email-mst@kernel.org>
+ <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
+ <20230922122246.GN13733@nvidia.com> <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com>
+ <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEv9_+6sYp1JZpCZr19csg0jO-jLVhuygWqm+s9mWr3Lew@mail.gmail.com> <PH0PR12MB5481304AA75B517A327C5690DCC3A@PH0PR12MB5481.namprd12.prod.outlook.com>
+In-Reply-To: <PH0PR12MB5481304AA75B517A327C5690DCC3A@PH0PR12MB5481.namprd12.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 26 Sep 2023 12:37:05 +0800
+Message-ID: <CACGkMEtfYu5zO1Dn7ErKid15DaDd3nm3yyt9kWsE-FVv-U8D0w@mail.gmail.com>
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Maor Gottlieb <maorg@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 9:38=E2=80=AFAM Anup Patel <apatel@ventanamicro.com=
-> wrote:
+On Tue, Sep 26, 2023 at 12:01=E2=80=AFPM Parav Pandit <parav@nvidia.com> wr=
+ote:
 >
-> On Mon, Sep 25, 2023 at 11:18=E2=80=AFPM Charlie Jenkins <charlie@rivosin=
-c.com> wrote:
-> >
-> > On Mon, Sep 25, 2023 at 07:08:52PM +0530, Anup Patel wrote:
-> > > The Veyron-V1 CPU supports custom conditional arithmetic and
-> > > conditional-select/move operations referred to as XVentanaCondOps
-> > > extension. In fact, QEMU RISC-V also has support for emulating
-> > > XVentanaCondOps extension.
-> > >
-> > > Let us detect XVentanaCondOps extension from ISA string available
-> > > through DT or ACPI.
-> > >
-> > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > > ---
-> > >  arch/riscv/include/asm/hwcap.h | 1 +
-> > >  arch/riscv/kernel/cpufeature.c | 1 +
-> > >  2 files changed, 2 insertions(+)
-> > >
-> > > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/=
-hwcap.h
-> > > index 0f520f7d058a..b7efe9e2fa89 100644
-> > > --- a/arch/riscv/include/asm/hwcap.h
-> > > +++ b/arch/riscv/include/asm/hwcap.h
-> > > @@ -59,6 +59,7 @@
-> > >  #define RISCV_ISA_EXT_ZIFENCEI               41
-> > >  #define RISCV_ISA_EXT_ZIHPM          42
-> > >  #define RISCV_ISA_EXT_SMSTATEEN              43
-> > > +#define RISCV_ISA_EXT_XVENTANACONDOPS        44
-> > >
-> > >  #define RISCV_ISA_EXT_MAX            64
-> > >
-> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
-ature.c
-> > > index 3755a8c2a9de..3a31d34fe709 100644
-> > > --- a/arch/riscv/kernel/cpufeature.c
-> > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > @@ -182,6 +182,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =
-=3D {
-> > >       __RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
-> > >       __RISCV_ISA_EXT_DATA(svnapot, RISCV_ISA_EXT_SVNAPOT),
-> > >       __RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
-> > > +     __RISCV_ISA_EXT_DATA(xventanacondops, RISCV_ISA_EXT_XVENTANACON=
-DOPS),
-> > >  };
-> > >
-> > >  const size_t riscv_isa_ext_count =3D ARRAY_SIZE(riscv_isa_ext);
-> > > --
-> > > 2.34.1
-> > >
-> > >
-> > > _______________________________________________
-> > > linux-riscv mailing list
-> > > linux-riscv@lists.infradead.org
-> > > http://lists.infradead.org/mailman/listinfo/linux-riscv
-> >
-> > I worry about storing vendor extensions in this file. Because vendor
-> > extensions are not standardized, they can only be expected to have the
-> > desired behavior on hardware with the appropriate vendor id. A couple
 >
-> Assuming that a vendor extension is only available on hardware with
-> appropriate vendor id is not correct because:
-> 1) vendor A can allow vendor B to implement a custom extension
->     defined by vendor B
+>
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Tuesday, September 26, 2023 8:03 AM
+> >
+> > It's the implementation details in legacy. The device needs to make sur=
+e (reset)
+> > the driver can work (is done before get_status return).
+> It is part of the 0.9.5 and 1.x specification as I quoted those text abov=
+e.
 
-Typo correction: "vendor A can allow vendor B to implement a custom
-extension defined by vendor A"
+What I meant is: legacy devices need to find their way to make legacy
+drivers work. That's how legacy works.
 
-> 2) vendor A and vendor B can jointly develop a RISC-V CPU where
->     both vendors integrate their custom extensions.
->
-> It is best to identify a vendor extension independently with a
-> "X<vendor_name><extension_name>" string to keep it simple
-> and scalable.
->
-> Along these lines, each T-Head custom extension should have a
-> "XThead<xyz>" name associated with it.
->
-> > months ago I sent a patch to address this by handling vector extensions
-> > independently for each vendor [1]. I dropped the patch because it
-> > relied upon Heiko's T-Head vector extension support that he stopped
-> > working on. However, I can revive this patch so you can build off of it=
-.
->
-> At least, the conditional operations don't need a hwprobe interface
-> because an application is either compiled with or without conditional
-> operations. In other words, effective use of conditional operation is
-> only possible if compiler generates these instructions based on
-> code patterns.
->
-> >
-> > This scheme has the added benefit that vendors do not have to worry
-> > about conficting extensions, and the kernel does not have to act as a
-> > key registry for vendors.
->
-> How can vendor extensions conflict if they all follow the
-> "X<vendor_name><extension_name>" naming scheme ?
->
-> >
-> > What are your thoughts?
-> >
-> > - Charlie
-> >
-> > [1] https://lore.kernel.org/lkml/20230705-thead_vendor_extensions-v1-2-=
-ad6915349c4d@rivosinc.com/
-> >
->
-> Regards,
-> Anup
+It's too late to add any normative to the 0.95 spec. So the device
+behaviour is actually defined by the legacy drivers. That is why it is
+tricky.
 
-Regards,
-Anup
+If you can't find a way to make legacy drivers work, use modern.
+
+That's it.
+
+Thanks
+
