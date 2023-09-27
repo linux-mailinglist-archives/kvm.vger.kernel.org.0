@@ -2,230 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 209967AF81C
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 04:30:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 057197AF840
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 04:42:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233429AbjI0Car (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 22:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47690 "EHLO
+        id S231246AbjI0CmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 22:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235972AbjI0CWp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 22:22:45 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71AE4EDC;
-        Tue, 26 Sep 2023 18:50:01 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsyF-Ei_1695779398;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsyF-Ei_1695779398)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Sep 2023 09:49:58 +0800
-Message-ID: <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [GIT PULL] virtio: features
-Date:   Wed, 27 Sep 2023 09:47:39 +0800
-From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <eperezma@redhat.com>, <jasowang@redhat.com>,
-        <shannon.nelson@amd.com>, <xuanzhuo@linux.alibaba.com>,
-        <yuanyaogoog@chromium.org>, <yuehaibing@huawei.com>,
-        Thomas Lendacky <thomas.lendacky@amd.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <20230926130451.axgodaa6tvwqs3ut@amd.com>
-In-Reply-To: <20230926130451.axgodaa6tvwqs3ut@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S235498AbjI0CkS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 22:40:18 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6DD1BC1;
+        Tue, 26 Sep 2023 19:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695780492; x=1727316492;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jiTLn3Vg5DjW5KMS+3IRSYx4PUzUN/fR9h6uUPmnC/8=;
+  b=AZrw6dH8U7x4Wo5ICcGz9XsZq8MRYfi2eCZxpRcFunSZou8NgiaJ9wIT
+   eWBY/vvmEJ/QupUWNm8oam9zC1d8iNdAX8CvdqIZp2BM/D5z7nrWH5Lrw
+   onLk2e4NzX/36ctYz62ScIDa3l5TUXKpYUoLwmeoSFOteCroRpRh2z5QX
+   yZVMuCTJ2r1fxTbo60aU8HuOTGeplDlYk4+XOe7SYSqQiu60REF7VqJLJ
+   9PTe1K0GLcwPEfBmbSJIKl7682pUHpm0pcV33Lg1prVvjsuHlq9yZMVa3
+   euFLEFv3Sz48nJX8G3DqUGhRF90PJI0efPI6Fx/JjDpE9Ipk64lms4zLi
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="361963137"
+X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
+   d="scan'208";a="361963137"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 19:08:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
+   d="scan'208";a="373163"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by orviesa001.jf.intel.com with ESMTP; 26 Sep 2023 19:07:35 -0700
+Message-ID: <a5e18b46-cccc-a2f7-91ae-aa5c942cd887@linux.intel.com>
+Date:   Wed, 27 Sep 2023 10:04:51 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [RFC 1/8] iommu: Introduce a replace API for device pasid
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+References: <20230926092651.17041-1-yi.l.liu@intel.com>
+ <20230926092651.17041-2-yi.l.liu@intel.com>
+Content-Language: en-US
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230926092651.17041-2-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Sep 2023 08:04:51 -0500, Michael Roth <michael.roth@amd.com> wro=
-te:
-> On Sun, Sep 03, 2023 at 06:13:38PM -0400, Michael S. Tsirkin wrote:
-> > The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0=
-bc2c:
-> >
-> >   Linux 6.5 (2023-08-27 14:49:51 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/fo=
-r_linus
-> >
-> > for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
-> >
-> >   virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-=
-03 18:10:24 -0400)
-> >
-> > ----------------------------------------------------------------
-> > virtio: features
-> >
-> > a small pull request this time around, mostly because the
-> > vduse network got postponed to next relase so we can be sure
-> > we got the security store right.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > ----------------------------------------------------------------
-> > Eugenio P=E9=96=9Eez (4):
-> >       vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
-> >       vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend featu=
-re
-> >       vdpa: add get_backend_features vdpa operation
-> >       vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-> >
-> > Jason Wang (1):
-> >       virtio_vdpa: build affinity masks conditionally
-> >
-> > Xuan Zhuo (12):
-> >       virtio_ring: check use_dma_api before unmap desc for indirect
-> >       virtio_ring: put mapping error check in vring_map_one_sg
-> >       virtio_ring: introduce virtqueue_set_dma_premapped()
-> >       virtio_ring: support add premapped buf
-> >       virtio_ring: introduce virtqueue_dma_dev()
-> >       virtio_ring: skip unmap for premapped
-> >       virtio_ring: correct the expression of the description of virtque=
-ue_resize()
-> >       virtio_ring: separate the logic of reset/enable from virtqueue_re=
-size
-> >       virtio_ring: introduce virtqueue_reset()
-> >       virtio_ring: introduce dma map api for virtqueue
-> >       virtio_ring: introduce dma sync api for virtqueue
-> >       virtio_net: merge dma operations when filling mergeable buffers
->
-> This ^ patch (upstream commit 295525e29a) seems to cause a
-> network-related regression when using SWIOTLB in the guest. I noticed
-> this initially testing SEV guests, which use SWIOTLB by default, but
-> it can also be seen with normal guests when forcing SWIOTLB via
-> swiotlb=3Dforce kernel cmdline option. I see it with both 6.6-rc1 and
-> 6.6-rc2 (haven't tried rc3 yet, but don't see any related changes
-> there), and reverting 714073495f seems to avoid the issue.
->
-> Steps to reproduce:
->
-> 1) Boot QEMU/KVM guest with 6.6-rc2 with swiotlb=3Dforce via something li=
-ke the following cmdline:
->
->    qemu-system-x86_64 \
->    -machine q35 -smp 4,maxcpus=3D255 -cpu EPYC-Milan-v2 \
->    -enable-kvm -m 16G,slots=3D5,maxmem=3D256G -vga none \
->    -device virtio-scsi-pci,id=3Dscsi0,disable-legacy=3Don,iommu_platform=
-=3Dtrue \
->    -drive file=3D/home/mroth/storage/ubuntu-18.04-seves2.qcow2,if=3Dnone,=
-id=3Ddrive0,snapshot=3Doff \
->    -device scsi-hd,id=3Dhd0,drive=3Ddrive0,bus=3Dscsi0.0 \
->    -device virtio-net-pci,netdev=3Dnetdev0,id=3Dnet0,disable-legacy=3Don,=
-iommu_platform=3Dtrue,romfile=3D \
->    -netdev tap,script=3D/home/mroth/qemu-ifup,id=3Dnetdev0 \
->    -L /home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/=
-qemu \
->    -drive if=3Dpflash,format=3Draw,unit=3D0,file=3D/home/mroth/storage/AM=
-DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_CODE.fd,readonly \
->    -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D/home/mroth/storage/AM=
-DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_VARS.fd \
->    -debugcon file:debug.log -global isa-debugcon.iobase=3D0x402 -msg time=
-stamp=3Don \
->    -kernel /boot/vmlinuz-6.6.0-rc2-vanilla0+ \
->    -initrd /boot/initrd.img-6.6.0-rc2-vanilla0+ \
->    -append "root=3DUUID=3Dd72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=
-=3DttyS0,115200n8 earlyprintk=3Dserial,ttyS0,115200 debug=3D1 sev=3Ddebug p=
-age_poison=3D0 spec_rstack_overflow=3Doff swiotlb=3Dforce"
->
-> 2) scp a small file from the host to the guest IP via its virtio-net devi=
-ce.
->    Smaller file sizes succeed, but the larger the file the more likely
->    it will fail. e.g.:
->
->    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D19
->    19+0 records in
->    19+0 records out
->    19456 bytes (19 kB, 19 KiB) copied, 0.000940134 s, 20.7 MB/s
->    mroth@host:~$ scp test vm0:
->    test                                                                  =
-  100%   19KB  10.1MB/s   00:00
->    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D20
->    20+0 records in
->    20+0 records out
->    20480 bytes (20 kB, 20 KiB) copied, 0.00093774 s, 21.8 MB/s
->    mroth@host:~$ scp test vm0:
->    test                                                                  =
-    0%    0     0.0KB/s   --:-- ETA
->    client_loop: send disconnect: Broken pipe
->    lost connection
->    mroth@host:~$
+On 9/26/23 5:26 PM, Yi Liu wrote:
+> From: Lu Baolu <baolu.lu@linux.intel.com>
+> 
+> Provide a high-level API to allow replacements of one domain with
+> another for specific pasid of a device. This is similar to
+> iommu_group_replace_domain() and it is also expected to be used
+> only by IOMMUFD.
+> 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>   drivers/iommu/iommu-priv.h |  2 ++
+>   drivers/iommu/iommu.c      | 73 ++++++++++++++++++++++++++++++--------
+>   2 files changed, 60 insertions(+), 15 deletions(-)
+> 
 
+[...]
 
-Hi Michael,
+> @@ -3433,8 +3443,8 @@ EXPORT_SYMBOL_GPL(iommu_attach_device_pasid);
+>    * The @domain must have been attached to @pasid of the @dev with
+>    * iommu_attach_device_pasid().
+>    */
+> -void iommu_detach_device_pasid(struct iommu_domain *domain, struct device *dev,
+> -			       ioasid_t pasid)
+> +void iommu_detach_device_pasid(struct iommu_domain *domain,
+> +			       struct device *dev, ioasid_t pasid)
 
-Thanks for the report.
+Above change is irrelevant.
 
-Cloud you try this fix?  I reproduce this issue, and that works for me.
+>   {
+>   	struct iommu_group *group = iommu_group_get(dev);
+>   
+> @@ -3447,6 +3457,39 @@ void iommu_detach_device_pasid(struct iommu_domain *domain, struct device *dev,
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_detach_device_pasid);
+>   
+> +/**
+> + * iommu_replace_device_pasid - replace the domain that a pasid is attached to
+> + * @domain: new IOMMU domain to replace with
+> + * @dev: the physical device
+> + * @pasid: pasid that will be attached to the new domain
+> + *
+> + * This API allows the pasid to switch domains. Return 0 on success, or an
+> + * error. The pasid will roll back to use the old domain if failure. The
+> + * caller could call iommu_detach_device_pasid() before free the old domain
+> + * in order to avoid use-after-free case.
 
-Thanks.
+The comment does not match the actual behavior of the code. We need to
+discuss and agree on which state the PASID should park in if replacing
+the domain fails.
 
+> + */
+> +int iommu_replace_device_pasid(struct iommu_domain *domain,
+> +			       struct device *dev, ioasid_t pasid)
+> +{
+> +	struct iommu_group *group = dev->iommu_group;
+> +	int ret;
+> +
+> +	if (!domain)
+> +		return -EINVAL;
+> +
+> +	if (!group)
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&group->mutex);
+> +	__iommu_remove_group_pasid(group, pasid);
+> +	xa_erase(&group->pasid_array, pasid);
+> +	ret = __iommu_group_attach_pasid(domain, group, pasid);
+> +	mutex_unlock(&group->mutex);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommu_replace_device_pasid, IOMMUFD_INTERNAL);
+> +
+>   /*
+>    * iommu_get_domain_for_dev_pasid() - Retrieve domain for @pasid of @dev
+>    * @dev: the queried device
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 98dc9b49d56b..9ece27dc5144 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *rq=
-, void *buf, u32 len)
-
-        --dma->ref;
-
--       if (dma->ref) {
--               if (dma->need_sync && len) {
--                       offset =3D buf - (head + sizeof(*dma));
-+       if (dma->need_sync && len) {
-+               offset =3D buf - (head + sizeof(*dma));
-
--                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma=
-->addr, offset,
--                                                               len, DMA_FR=
-OM_DEVICE);
--               }
-+               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr,
-+                                                       offset, len,
-+                                                       DMA_FROM_DEVICE);
-+       }
-
-+       if (dma->ref)
-                return;
--       }
-
-        virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
-                                         DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU=
-_SYNC);
-
-
->
-> Thanks,
->
-> Mike
->
-> >
-> > Yuan Yao (1):
-> >       virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
-> >
-> > Yue Haibing (1):
-> >       vdpa/mlx5: Remove unused function declarations
-> >
-> >  drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
-> >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
-> >  drivers/vhost/vdpa.c               |  15 +-
-> >  drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++++++=
-+++-----
-> >  drivers/virtio/virtio_vdpa.c       |  17 +-
-> >  include/linux/vdpa.h               |   4 +
-> >  include/linux/virtio.h             |  22 ++
-> >  include/uapi/linux/vhost_types.h   |   4 +
-> >  9 files changed, 625 insertions(+), 90 deletions(-)
-> >
+Best regards,
+baolu
