@@ -2,259 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AE5B7B0BE1
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 20:24:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 310EC7B0C38
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 20:53:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbjI0SYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 14:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57534 "EHLO
+        id S229542AbjI0SxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 14:53:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjI0SYS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 14:24:18 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB7368F
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:24:16 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-65b2463d651so24961206d6.3
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695839056; x=1696443856; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qWpsRjwmUIn37reupPi+utPeMXSOLSGyvQ+OBrd+Mx8=;
-        b=I5oavEoBnIiboxie1Zt6K9sZiTMIvkSwudD4A85sCapnx1Esj3z95PHJ4FhXAe4ujn
-         TRIS8EbVAnp79AkGBkU5J0JBFXs+6c9CVRLd+BZZFtEsVX0N7oCDs5pUYHJqxWzg1BcN
-         aMRWYo/FSBq1WaDu10Adkm+J92N+031WtengHkYvx4haNQhBjgm4JCT1YDGKSYK5GY6P
-         Pm3xTXYebguK1NG/7V6ufn9zKtCC0sw/e2lZnCbWDUiTAULs1T+kxEaHZINxybFE9lDd
-         J0IYm5g8X4AckiuLYq8MQIq/P/zvMndBWnrr3He7g/NUjrlDEsgai5XyuPSyyN5MzYIN
-         MWrQ==
+        with ESMTP id S229592AbjI0SxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 14:53:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3421A19F
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:52:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695840757;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Kq5Qg2bQQlEqkI6mgl+PBDF3TD7HEyYrhhIx1gLZrcg=;
+        b=eDWnEDa08UjIOp072Z8kURuihNsmqYZ8UqlfdWSQ29/LgaLhrWmOcC1me+u8LjgM3iSqbo
+        uuutoHa32iKKhuRHTf5Ack4SZiFk4Uv27WNJZoAoGKKj5+L8PO0NZQnrxQPUhp4m3s0RbM
+        2SKJfthpPr0WNoowvK3N8HAXug4ym/w=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-14-UNGMjQaRNgiJpyETNouQvg-1; Wed, 27 Sep 2023 14:52:35 -0400
+X-MC-Unique: UNGMjQaRNgiJpyETNouQvg-1
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-57b8079db51so21196678eaf.3
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:52:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695839056; x=1696443856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695840755; x=1696445555;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qWpsRjwmUIn37reupPi+utPeMXSOLSGyvQ+OBrd+Mx8=;
-        b=CTQTjEPzl8kZJ5TlWn1dut11NvjuEIdt6aOWsSs7XTTjHQF66HqZzUwrV/l3vcfHKl
-         cqaswVu1eKpepRNUullkfq/i77/v/9UtphmirsqRmzZ3Jb0S8VaTzsmb2EjRZ8qujTe8
-         XvOvzxfYzgdCeGTy8w44hhRSG8gSj3+ok4aQoslxiCIyIkEclA1LpfjUiwZNhrXzWJfv
-         hJzBuSClbFyD1lZe8TPwftV+pzZ+9lwoFE8sBwG66+DsLYUEw1c45CyCw/OwKoM+duO5
-         prONaHH4Lu5+wZGbBMESv2wZo61syfBnfmGuxNpNfCxQ0AzLhU4AkU2sIoV20CvqIEWN
-         0ZBg==
-X-Gm-Message-State: AOJu0YzN1fZqFG7nz9k4QpIQBtzZvddnoLTq58LFbFusdG8HXswKQ/eJ
-        bSeb6WyyjKIWEctpetcYKB6vEUB5m+TqWpV9znmpJAZWOWVEjtswNoQ=
-X-Google-Smtp-Source: AGHT+IGhWGRmm8dUh/cNFf9vDCIt/TP02tK4GmYi2a3Wv5AszHwFSzVOwvN7DhycV7sCeV+X7NZt8SA7Hj1jotnQqeo=
-X-Received: by 2002:a05:6214:b2b:b0:65c:fec5:6f0 with SMTP id
- w11-20020a0562140b2b00b0065cfec506f0mr2355028qvj.45.1695839055820; Wed, 27
- Sep 2023 11:24:15 -0700 (PDT)
+        bh=Kq5Qg2bQQlEqkI6mgl+PBDF3TD7HEyYrhhIx1gLZrcg=;
+        b=JsHE2FotrATnmECwqGwiagjH0pThcECqAOSuH3Bsmus6gpqgPEVVsqonpBHzFIvecw
+         PIiYgOFlDPfKhATqza4cN0YqMDWirGchkT5fjoy++jRf5bTtL3t3lNtgQCF08kVctaQK
+         P20qMaNDhqAMKjExb0cZ/2gDmZJrINw7M/FEoT995qAIrykV3jBtOmfFmFO0QsHBRs59
+         R+t7qGakwatSIVZuXKYbZfJrkvSp35WRDDktY8vjsLGbXMZAmohGLp14+6/7yqLYxdWt
+         +86ylrbS0EA6mgTnjn3mkwRQfNfRyttaHDmORhZBYhvXo1DQy218ysGcOImeeOAWwV2A
+         r++g==
+X-Gm-Message-State: AOJu0YzKrTcT8kK2/Gdh8P82sXRXSITvj0ASm6wJyDRHNj1jOe/shGQW
+        nage6w8WxxkWNq46D4GqbNIh5S+vKebt/1X5drc7fgFvguyIpScqt5s0jHuWLfHA0jWZ/3gE3dP
+        vLoa2VyROLoqK
+X-Received: by 2002:a4a:6246:0:b0:57b:6a40:8a9e with SMTP id y6-20020a4a6246000000b0057b6a408a9emr3241156oog.7.1695840755197;
+        Wed, 27 Sep 2023 11:52:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3cPePjgR+735wrJbNOWlgYYeVheIM5ALo2dqBObMKFrQpCrxuu4qqIaRtOinyevyLL0/Zfw==
+X-Received: by 2002:a4a:6246:0:b0:57b:6a40:8a9e with SMTP id y6-20020a4a6246000000b0057b6a408a9emr3241122oog.7.1695840754919;
+        Wed, 27 Sep 2023 11:52:34 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id p187-20020a4a48c4000000b0054f85f67f31sm2878334ooa.46.2023.09.27.11.52.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 11:52:34 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 12:52:31 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>
+Subject: Re: [RFC 3/3] vfio/pci: Expose PCIe PASID capability to userspace
+Message-ID: <20230927125231.3aacde62.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276375C4BE33AC0632321A68CC2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230926093121.18676-1-yi.l.liu@intel.com>
+        <20230926093121.18676-4-yi.l.liu@intel.com>
+        <BN9PR11MB5276375C4BE33AC0632321A68CC2A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230927040939.342643-1-mizhang@google.com> <CAL715WJM2hMyMvNYZAcd4cSpDQ6XPFsNhtR2dsi7W=ySfy=CFw@mail.gmail.com>
- <2c79115e-e16d-49cc-8f5b-2363d7910269@zytor.com> <ZRRT8zUfekA1QrQL@google.com>
-In-Reply-To: <ZRRT8zUfekA1QrQL@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 27 Sep 2023 11:23:39 -0700
-Message-ID: <CAL715WKn1RPiY23x3WAi7BASyLDSZuEO7CJ6FObCxOmRpBwh7Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ_NMI)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Xin Li <xin@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Like Xu <likexu@tencent.com>, Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 27, 2023 at 9:10=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Sep 26, 2023, Xin Li wrote:
-> > On 9/26/2023 9:15 PM, Mingwei Zhang wrote:
-> > > ah, typo in the subject: The 2nd KVM_REQ_NMI should be KVM_REQ_PMI.
-> > > Sorry about that.
-> > >
-> > > On Tue, Sep 26, 2023 at 9:09=E2=80=AFPM Mingwei Zhang <mizhang@google=
-.com> wrote:
-> > > >
-> > > > Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ=
-_NMI).
-> >
-> > Please remove it, no need to repeat the subject.
->
-> Heh, from Documentation/process/maintainer-kvm-x86.rst:
->
->   Changelog
->   ~~~~~~~~~
->   Most importantly, write changelogs using imperative mood and avoid pron=
-ouns.
->
->   See :ref:`describe_changes` for more information, with one amendment: l=
-ead with
->   a short blurb on the actual changes, and then follow up with the contex=
-t and
->   background.  Note!  This order directly conflicts with the tip tree's p=
-referred
->   approach!  Please follow the tip tree's preferred style when sending pa=
-tches
->   that primarily target arch/x86 code that is _NOT_ KVM code.
->
-> That said, I do prefer that the changelog intro isn't just a copy+paste o=
-f the
-> shortlog, and the shortlog and changelog should use conversational langua=
-ge instead
-> of describing the literal code movement.
->
-> > > > When vPMU is active use, processing each KVM_REQ_PMI will generate =
-a
->
-> This is not guaranteed.
->
-> > > > KVM_REQ_NMI. Existing control flow after KVM_REQ_PMI finished will =
-fail the
-> > > > guest enter, jump to kvm_x86_cancel_injection(), and re-enter
-> > > > vcpu_enter_guest(), this wasted lot of cycles and increase the over=
-head for
-> > > > vPMU as well as the virtualization.
->
-> As above, use conversational language, the changelog isn't meant to be a =
-play-by-play.
->
-> E.g.
->
->   KVM: x86: Service NMI requests *after* PMI requests in VM-Enter path
->
->   Move the handling of NMI requests after PMI requests in the VM-Enter pa=
-th
->   so that KVM doesn't need to cancel and redo VM-Enter in the likely
->   scenario that the vCPU has configured its LVPTC entry to generate an NM=
-I.
->
->   Because APIC emulation "injects" NMIs via KVM_REQ_NMI, handling PMI
->   requests after NMI requests means KVM won't detect the pending NMI requ=
-est
->   until the final check for outstanding requests.  Detecting requests at =
-the
->   final stage is costly as KVM has already loaded guest state, potentiall=
-y
->   queued events for injection, disabled IRQs, dropped SRCU, etc., most of
->   which needs to be unwound.
->
-> > Optimization is after correctness, so please explain if this is correct
-> > first!
->
-> Not first.  Leading with an in-depth description of KVM requests and NMI =
-handling
-> is not going to help understand *why* this change is being first.  But I =
-do agree
-> that this should provide an analysis of why it's ok to swap the order, sp=
-ecificially
-> why it's architecturally ok if KVM drops an NMI due to the swapped orderi=
-ng, e.g.
-> if the PMI is coincident with two other NMIs (or one other NMI and NMIs a=
-re blocked).
->
-> > > > So move the code snippet of kvm_check_request(KVM_REQ_NMI) to make =
-KVM
-> > > > runloop more efficient with vPMU.
-> > > >
-> > > > To evaluate the effectiveness of this change, we launch a 8-vcpu QE=
-MU VM on
->
-> Avoid pronouns.  There's no need for all the "fluff", just state the setu=
-p, the
-> test, and the results.
->
-> Really getting into the nits, but the whole "8-vcpu QEMU VM" versus
-> "the setup of using single core, single thread" is confusing IMO.  If the=
-re were
-> potential performance downsides and/or tradeoffs, then getting the gory d=
-etails
-> might be necessary, but that's not the case here, and if it were really n=
-ecessary
-> to drill down that deep, then I would want to better quantify the impact,=
- e.g. in
-> terms latency.
->
->   E.g. on Intel SPR running SPEC2017 benchmark and Intel vtune in the gue=
-st,
->   handling PMI requests before NMI requests reduces the number of cancele=
-d
->   runs by ~1500 per second, per vCPU (counted by probing calls to
->   vmx_cancel_injection()).
->
-> > > > an Intel SPR CPU. In the VM, we run perf with all 48 events Intel v=
-tune
-> > > > uses. In addition, we use SPEC2017 benchmark programs as the worklo=
-ad with
-> > > > the setup of using single core, single thread.
-> > > >
-> > > > At the host level, we probe the invocations to vmx_cancel_injection=
-() with
-> > > > the following command:
-> > > >
-> > > >      $ perf probe -a vmx_cancel_injection
-> > > >      $ perf stat -a -e probe:vmx_cancel_injection -I 10000 # per 10=
- seconds
-> > > >
-> > > > The following is the result that we collected at beginning of the s=
-pec2017
-> > > > benchmark run (so mostly for 500.perlbench_r in spec2017). Kindly f=
-orgive
-> > > > the incompleteness.
-> > > >
-> > > > On kernel without the change:
-> > > >      10.010018010              14254      probe:vmx_cancel_injectio=
-n
-> > > >      20.037646388              15207      probe:vmx_cancel_injectio=
-n
-> > > >      30.078739816              15261      probe:vmx_cancel_injectio=
-n
-> > > >      40.114033258              15085      probe:vmx_cancel_injectio=
-n
-> > > >      50.149297460              15112      probe:vmx_cancel_injectio=
-n
-> > > >      60.185103088              15104      probe:vmx_cancel_injectio=
-n
-> > > >
-> > > > On kernel with the change:
-> > > >      10.003595390                 40      probe:vmx_cancel_injectio=
-n
-> > > >      20.017855682                 31      probe:vmx_cancel_injectio=
-n
-> > > >      30.028355883                 34      probe:vmx_cancel_injectio=
-n
-> > > >      40.038686298                 31      probe:vmx_cancel_injectio=
-n
-> > > >      50.048795162                 20      probe:vmx_cancel_injectio=
-n
-> > > >      60.069057747                 19      probe:vmx_cancel_injectio=
-n
-> > > >
-> > > >  From the above, it is clear that we save 1500 invocations per vcpu=
- per
-> > > > second to vmx_cancel_injection() for workloads like perlbench.
->
-> Nit, this really should have:
->
->   Suggested-by: Sean Christopherson <seanjc@google.com>
->
-> I personally don't care about the attribution, but (a) others often do ca=
-re and
-> (b) the added context is helpful.  E.g. for bad/questionable suggestsions=
-/ideas,
-> knowing that person X was also involved helps direct and/or curate questi=
-ons/comments
-> accordingly.
+On Wed, 27 Sep 2023 08:07:54 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-For sure! I will also pay more attention to that in the future.
+> > From: Liu, Yi L <yi.l.liu@intel.com>
+> > Sent: Tuesday, September 26, 2023 5:31 PM
+> > 
+> > This exposes PCIe PASID capability to userspace and where to emulate this
+> > capability if wants to further expose it to VM.
+> > 
+> > And this only exposes PASID capability for devices which has PCIe PASID
+> > extended struture in its configuration space. While for VFs, userspace
+> > is still unable to see this capability as SR-IOV spec forbides VF to
+> > implement PASID capability extended structure. It is a TODO in future.
+> > Related discussion can be found in below links:
+> > 
+> > https://lore.kernel.org/kvm/20200407095801.648b1371@w520.home/
+> > https://lore.kernel.org/kvm/BL1PR11MB5271A60035EF591A5BE8AC878C01A
+> > @BL1PR11MB5271.namprd11.prod.outlook.com/
+> >   
+> 
+> Yes, we need a decision for VF case.
+> 
+> If the consensus is to continue exposing the PASID capability in vfio-pci
+> config space by developing a kernel quirk mechanism to find offset for
+> VF, then this patch for PF is orthogonal to that VF work and can go as it is.
+> 
+> But if the decision is to have a device feature for the user to enumerate
+> the vPASID capability and let the VMM take care of finding the vPASID
+> cap offset, then better we start doing that for PF too since it's not good
+> to have two enumeration interfaces for PF/VF respectively.
 
-Thanks.
--Mingwei
+Note also that QEMU implements a lazy algorithm for exposing
+capabilities, the default is to expose them, so we need to consider
+existing VMs seeing a new read-only PASID capability on an assigned PF.
+
+That might support an alternate means to expose the capability.
+
+> My preference is via device feature given Qemu already includes lots of
+> quirks for vfio-pci devices. Another reason is that when supporting vPASID
+> with SIOV there are some arch constraints which the driver needs to
+> report to the user to follow (e.g.  don't assign ENQCMD-capable sibling
+> vdev's to a same guest, etc.).
+
+?!
+
+> A device feature interface can better
+> encapsulate everything related to vPASID in one place.
+
+Sorry if I don't remember, have you posted a proposal for the device
+feature interface?  Thanks,
+
+Alex
+
