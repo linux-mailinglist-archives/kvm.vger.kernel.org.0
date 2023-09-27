@@ -2,366 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E946E7AF869
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 05:04:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 209967AF81C
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 04:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbjI0DEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Sep 2023 23:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
+        id S233429AbjI0Car (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Sep 2023 22:30:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235590AbjI0DCk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Sep 2023 23:02:40 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC4E1F9F2
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:21 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d815354ea7fso14536566276.1
-        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 16:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695771621; x=1696376421; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MuKSECeQuKi175742s9uh7VFG/wCzaFS4MqeZa0mpJA=;
-        b=1mfUkQVLnX0y6l616vwcvyBnAG9X0piS9JNECfI6Qgpn6QN8fr7QM/XfYH1i0ROTLm
-         9qx9cwCyg1/8VsJakyrJ6sUYEC2XwD3YT4L0+OTyHxaRrJ/KKEsfm3yqkEUlFi8l4MQI
-         sJMempJHIaiDAINMa/ROZKNLekijcAhoGWHL0g+TZuOjVHYYvut+UFL2LC6v6wEhZlXT
-         b+nZeB4WSbQXJPNUoV0E5BjeFI123/Bm0CHxK3a6xeswpsQWEBBXlYaz6DJvROM/fmLz
-         r+nKOvqI8luNlDLUW7EpLybuD/Nk1bsFqw9g93NOFGU4ef/3abBwRwVGwwWI9fLEjK32
-         4mFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695771621; x=1696376421;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MuKSECeQuKi175742s9uh7VFG/wCzaFS4MqeZa0mpJA=;
-        b=lpvPjp3Rt/svQtryP0V/iVHfOUBiwl0nySDKGDAWxLW173HU3HVn9bDRa5bpXbU3/C
-         43JvEnRWxlu8/1iTwvsU5QkAz/AC7oRoYeNFnUrOl0yJEeya0Enj8x9UkDaPgf/seCSz
-         /Gd5NHuA2XWR+/o2lP3iVVPfUlckN5KSkx1Y0rbOl/fAAZai6bsx552p7Ev/eld3rMym
-         A4mXmVFCXKHQPi+PjrA8yWbf3Y59ZqRsK7ZYAOQefxTPwxexnOHXuCxyBm2KOHB95BhT
-         zxSfaYzh0ayKSe6mB5LxP4ove3dHMWG2NPYiRkfW01VHBtadlWpaOYX8XZvujWAo8jlp
-         hFkA==
-X-Gm-Message-State: AOJu0Ywv0DNXt/gxeYonsqq8Zdu12gHHMzlFzVsEsLs+Wa2PJJPyiDHM
-        Gcka8t252wlAXjTIAoROOJEVDMiudgBa
-X-Google-Smtp-Source: AGHT+IGzTRdXxZrmL87Id5wDoiitKuWuDxqzGzHYpXEJMmT1f9pEm1uUUhhCSOmmqeh6QKMkyFr2lWaXf1oy
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a25:ab66:0:b0:d80:12bd:f042 with SMTP id
- u93-20020a25ab66000000b00d8012bdf042mr4167ybi.1.1695771620626; Tue, 26 Sep
- 2023 16:40:20 -0700 (PDT)
-Date:   Tue, 26 Sep 2023 23:40:06 +0000
-In-Reply-To: <20230926234008.2348607-1-rananta@google.com>
-Mime-Version: 1.0
-References: <20230926234008.2348607-1-rananta@google.com>
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20230926234008.2348607-10-rananta@google.com>
-Subject: [PATCH v6 09/11] KVM: selftests: aarch64: Introduce
- vpmu_counter_access test
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        with ESMTP id S235972AbjI0CWp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Sep 2023 22:22:45 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71AE4EDC;
+        Tue, 26 Sep 2023 18:50:01 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsyF-Ei_1695779398;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsyF-Ei_1695779398)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Sep 2023 09:49:58 +0800
+Message-ID: <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [GIT PULL] virtio: features
+Date:   Wed, 27 Sep 2023 09:47:39 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <eperezma@redhat.com>, <jasowang@redhat.com>,
+        <shannon.nelson@amd.com>, <xuanzhuo@linux.alibaba.com>,
+        <yuanyaogoog@chromium.org>, <yuehaibing@huawei.com>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <20230926130451.axgodaa6tvwqs3ut@amd.com>
+In-Reply-To: <20230926130451.axgodaa6tvwqs3ut@amd.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Reiji Watanabe <reijiw@google.com>
+On Tue, 26 Sep 2023 08:04:51 -0500, Michael Roth <michael.roth@amd.com> wro=
+te:
+> On Sun, Sep 03, 2023 at 06:13:38PM -0400, Michael S. Tsirkin wrote:
+> > The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0=
+bc2c:
+> >
+> >   Linux 6.5 (2023-08-27 14:49:51 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/fo=
+r_linus
+> >
+> > for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> >
+> >   virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-=
+03 18:10:24 -0400)
+> >
+> > ----------------------------------------------------------------
+> > virtio: features
+> >
+> > a small pull request this time around, mostly because the
+> > vduse network got postponed to next relase so we can be sure
+> > we got the security store right.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> > ----------------------------------------------------------------
+> > Eugenio P=E9=96=9Eez (4):
+> >       vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+> >       vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend featu=
+re
+> >       vdpa: add get_backend_features vdpa operation
+> >       vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> >
+> > Jason Wang (1):
+> >       virtio_vdpa: build affinity masks conditionally
+> >
+> > Xuan Zhuo (12):
+> >       virtio_ring: check use_dma_api before unmap desc for indirect
+> >       virtio_ring: put mapping error check in vring_map_one_sg
+> >       virtio_ring: introduce virtqueue_set_dma_premapped()
+> >       virtio_ring: support add premapped buf
+> >       virtio_ring: introduce virtqueue_dma_dev()
+> >       virtio_ring: skip unmap for premapped
+> >       virtio_ring: correct the expression of the description of virtque=
+ue_resize()
+> >       virtio_ring: separate the logic of reset/enable from virtqueue_re=
+size
+> >       virtio_ring: introduce virtqueue_reset()
+> >       virtio_ring: introduce dma map api for virtqueue
+> >       virtio_ring: introduce dma sync api for virtqueue
+> >       virtio_net: merge dma operations when filling mergeable buffers
+>
+> This ^ patch (upstream commit 295525e29a) seems to cause a
+> network-related regression when using SWIOTLB in the guest. I noticed
+> this initially testing SEV guests, which use SWIOTLB by default, but
+> it can also be seen with normal guests when forcing SWIOTLB via
+> swiotlb=3Dforce kernel cmdline option. I see it with both 6.6-rc1 and
+> 6.6-rc2 (haven't tried rc3 yet, but don't see any related changes
+> there), and reverting 714073495f seems to avoid the issue.
+>
+> Steps to reproduce:
+>
+> 1) Boot QEMU/KVM guest with 6.6-rc2 with swiotlb=3Dforce via something li=
+ke the following cmdline:
+>
+>    qemu-system-x86_64 \
+>    -machine q35 -smp 4,maxcpus=3D255 -cpu EPYC-Milan-v2 \
+>    -enable-kvm -m 16G,slots=3D5,maxmem=3D256G -vga none \
+>    -device virtio-scsi-pci,id=3Dscsi0,disable-legacy=3Don,iommu_platform=
+=3Dtrue \
+>    -drive file=3D/home/mroth/storage/ubuntu-18.04-seves2.qcow2,if=3Dnone,=
+id=3Ddrive0,snapshot=3Doff \
+>    -device scsi-hd,id=3Dhd0,drive=3Ddrive0,bus=3Dscsi0.0 \
+>    -device virtio-net-pci,netdev=3Dnetdev0,id=3Dnet0,disable-legacy=3Don,=
+iommu_platform=3Dtrue,romfile=3D \
+>    -netdev tap,script=3D/home/mroth/qemu-ifup,id=3Dnetdev0 \
+>    -L /home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/=
+qemu \
+>    -drive if=3Dpflash,format=3Draw,unit=3D0,file=3D/home/mroth/storage/AM=
+DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_CODE.fd,readonly \
+>    -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D/home/mroth/storage/AM=
+DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_VARS.fd \
+>    -debugcon file:debug.log -global isa-debugcon.iobase=3D0x402 -msg time=
+stamp=3Don \
+>    -kernel /boot/vmlinuz-6.6.0-rc2-vanilla0+ \
+>    -initrd /boot/initrd.img-6.6.0-rc2-vanilla0+ \
+>    -append "root=3DUUID=3Dd72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=
+=3DttyS0,115200n8 earlyprintk=3Dserial,ttyS0,115200 debug=3D1 sev=3Ddebug p=
+age_poison=3D0 spec_rstack_overflow=3Doff swiotlb=3Dforce"
+>
+> 2) scp a small file from the host to the guest IP via its virtio-net devi=
+ce.
+>    Smaller file sizes succeed, but the larger the file the more likely
+>    it will fail. e.g.:
+>
+>    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D19
+>    19+0 records in
+>    19+0 records out
+>    19456 bytes (19 kB, 19 KiB) copied, 0.000940134 s, 20.7 MB/s
+>    mroth@host:~$ scp test vm0:
+>    test                                                                  =
+  100%   19KB  10.1MB/s   00:00
+>    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D20
+>    20+0 records in
+>    20+0 records out
+>    20480 bytes (20 kB, 20 KiB) copied, 0.00093774 s, 21.8 MB/s
+>    mroth@host:~$ scp test vm0:
+>    test                                                                  =
+    0%    0     0.0KB/s   --:-- ETA
+>    client_loop: send disconnect: Broken pipe
+>    lost connection
+>    mroth@host:~$
 
-Introduce vpmu_counter_access test for arm64 platforms.
-The test configures PMUv3 for a vCPU, sets PMCR_EL0.N for the vCPU,
-and check if the guest can consistently see the same number of the
-PMU event counters (PMCR_EL0.N) that userspace sets.
-This test case is done with each of the PMCR_EL0.N values from
-0 to 31 (With the PMCR_EL0.N values greater than the host value,
-the test expects KVM_SET_ONE_REG for the PMCR_EL0 to fail).
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/vpmu_counter_access.c         | 247 ++++++++++++++++++
- 2 files changed, 248 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+Hi Michael,
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a3bb36fb3cfc5..416700aa196ca 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -149,6 +149,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
- TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-new file mode 100644
-index 0000000000000..58949b17d76e5
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -0,0 +1,247 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vpmu_counter_access - Test vPMU event counter access
-+ *
-+ * Copyright (c) 2022 Google LLC.
-+ *
-+ * This test checks if the guest can see the same number of the PMU event
-+ * counters (PMCR_EL0.N) that userspace sets.
-+ * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-+ */
-+#include <kvm_util.h>
-+#include <processor.h>
-+#include <test_util.h>
-+#include <vgic.h>
-+#include <perf/arm_pmuv3.h>
-+#include <linux/bitfield.h>
-+
-+/* The max number of the PMU event counters (excluding the cycle counter) */
-+#define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
-+
-+struct vpmu_vm {
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	int gic_fd;
-+};
-+
-+static struct vpmu_vm vpmu_vm;
-+
-+static uint64_t get_pmcr_n(uint64_t pmcr)
-+{
-+	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
-+}
-+
-+static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-+{
-+	*pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
-+	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
-+}
-+
-+static void guest_sync_handler(struct ex_regs *regs)
-+{
-+	uint64_t esr, ec;
-+
-+	esr = read_sysreg(esr_el1);
-+	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	__GUEST_ASSERT(0, "PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx", regs->pc, esr, ec);
-+}
-+
-+/*
-+ * The guest is configured with PMUv3 with @expected_pmcr_n number of
-+ * event counters.
-+ * Check if @expected_pmcr_n is consistent with PMCR_EL0.N.
-+ */
-+static void guest_code(uint64_t expected_pmcr_n)
-+{
-+	uint64_t pmcr, pmcr_n;
-+
-+	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
-+			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%lx",
-+			expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-+
-+	pmcr = read_sysreg(pmcr_el0);
-+	pmcr_n = get_pmcr_n(pmcr);
-+
-+	/* Make sure that PMCR_EL0.N indicates the value userspace set */
-+	__GUEST_ASSERT(pmcr_n == expected_pmcr_n,
-+			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
-+			pmcr_n, expected_pmcr_n);
-+
-+	GUEST_DONE();
-+}
-+
-+#define GICD_BASE_GPA	0x8000000ULL
-+#define GICR_BASE_GPA	0x80A0000ULL
-+
-+/* Create a VM that has one vCPU with PMUv3 configured. */
-+static void create_vpmu_vm(void *guest_code)
-+{
-+	struct kvm_vcpu_init init;
-+	uint8_t pmuver, ec;
-+	uint64_t dfr0, irq = 23;
-+	struct kvm_device_attr irq_attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-+		.addr = (uint64_t)&irq,
-+	};
-+	struct kvm_device_attr init_attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-+	};
-+
-+	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vm_init_descriptor_tables(vpmu_vm.vm);
-+	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
-+					guest_sync_handler);
-+	}
-+
-+	/* Create vCPU with PMUv3 */
-+	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-+	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
-+	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-+					GICD_BASE_GPA, GICR_BASE_GPA);
-+
-+	/* Make sure that PMUv3 support is indicated in the ID register */
-+	vcpu_get_reg(vpmu_vm.vcpu,
-+		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-+	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), dfr0);
-+	TEST_ASSERT(pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
-+		    pmuver >= ID_AA64DFR0_PMUVER_8_0,
-+		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-+
-+	/* Initialize vPMU */
-+	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-+	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-+}
-+
-+static void destroy_vpmu_vm(void)
-+{
-+	close(vpmu_vm.gic_fd);
-+	kvm_vm_free(vpmu_vm.vm);
-+}
-+
-+static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
-+{
-+	struct ucall uc;
-+
-+	vcpu_args_set(vcpu, 1, pmcr_n);
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		break;
-+	}
-+}
-+
-+/*
-+ * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
-+ * and run the test.
-+ */
-+static void run_test(uint64_t pmcr_n)
-+{
-+	struct kvm_vcpu *vcpu;
-+	uint64_t sp, pmcr;
-+	struct kvm_vcpu_init init;
-+
-+	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
-+	create_vpmu_vm(guest_code);
-+
-+	vcpu = vpmu_vm.vcpu;
-+
-+	/* Save the initial sp to restore them later to run the guest again */
-+	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
-+
-+	/* Update the PMCR_EL0.N with @pmcr_n */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	set_pmcr_n(&pmcr, pmcr_n);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-+
-+	run_vcpu(vcpu, pmcr_n);
-+
-+	/*
-+	 * Reset and re-initialize the vCPU, and run the guest code again to
-+	 * check if PMCR_EL0.N is preserved.
-+	 */
-+	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-+	aarch64_vcpu_setup(vcpu, &init);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
-+	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-+
-+	run_vcpu(vcpu, pmcr_n);
-+
-+	destroy_vpmu_vm();
-+}
-+
-+/*
-+ * Create a guest with one vCPU, and attempt to set the PMCR_EL0.N for
-+ * the vCPU to @pmcr_n, which is larger than the host value.
-+ * The attempt should fail as @pmcr_n is too big to set for the vCPU.
-+ */
-+static void run_error_test(uint64_t pmcr_n)
-+{
-+	struct kvm_vcpu *vcpu;
-+	uint64_t pmcr, pmcr_orig;
-+
-+	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
-+	create_vpmu_vm(guest_code);
-+	vcpu = vpmu_vm.vcpu;
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
-+	pmcr = pmcr_orig;
-+
-+	/*
-+	 * Setting a larger value of PMCR.N should not modify the field, and
-+	 * return a success.
-+	 */
-+	set_pmcr_n(&pmcr, pmcr_n);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	TEST_ASSERT(pmcr_orig == pmcr,
-+		    "PMCR.N modified by KVM to a larger value (PMCR: 0x%lx) for pmcr_n: 0x%lx\n",
-+		    pmcr, pmcr_n);
-+
-+	destroy_vpmu_vm();
-+}
-+
-+/*
-+ * Return the default number of implemented PMU event counters excluding
-+ * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
-+ */
-+static uint64_t get_pmcr_n_limit(void)
-+{
-+	uint64_t pmcr;
-+
-+	create_vpmu_vm(guest_code);
-+	vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	destroy_vpmu_vm();
-+	return get_pmcr_n(pmcr);
-+}
-+
-+int main(void)
-+{
-+	uint64_t i, pmcr_n;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-+
-+	pmcr_n = get_pmcr_n_limit();
-+	for (i = 0; i <= pmcr_n; i++)
-+		run_test(i);
-+
-+	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
-+		run_error_test(i);
-+
-+	return 0;
-+}
--- 
-2.42.0.582.g8ccd20d70d-goog
+Thanks for the report.
 
+Cloud you try this fix?  I reproduce this issue, and that works for me.
+
+Thanks.
+
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 98dc9b49d56b..9ece27dc5144 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *rq=
+, void *buf, u32 len)
+
+        --dma->ref;
+
+-       if (dma->ref) {
+-               if (dma->need_sync && len) {
+-                       offset =3D buf - (head + sizeof(*dma));
++       if (dma->need_sync && len) {
++               offset =3D buf - (head + sizeof(*dma));
+
+-                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma=
+->addr, offset,
+-                                                               len, DMA_FR=
+OM_DEVICE);
+-               }
++               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr,
++                                                       offset, len,
++                                                       DMA_FROM_DEVICE);
++       }
+
++       if (dma->ref)
+                return;
+-       }
+
+        virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+                                         DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU=
+_SYNC);
+
+
+>
+> Thanks,
+>
+> Mike
+>
+> >
+> > Yuan Yao (1):
+> >       virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+> >
+> > Yue Haibing (1):
+> >       vdpa/mlx5: Remove unused function declarations
+> >
+> >  drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+> >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+> >  drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+> >  drivers/vhost/vdpa.c               |  15 +-
+> >  drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++++++=
++++-----
+> >  drivers/virtio/virtio_vdpa.c       |  17 +-
+> >  include/linux/vdpa.h               |   4 +
+> >  include/linux/virtio.h             |  22 ++
+> >  include/uapi/linux/vhost_types.h   |   4 +
+> >  9 files changed, 625 insertions(+), 90 deletions(-)
+> >
