@@ -2,146 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D30707B06AB
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 16:25:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5C27B06AF
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 16:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbjI0OZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 10:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33070 "EHLO
+        id S232105AbjI0OZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 10:25:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232045AbjI0OZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 10:25:05 -0400
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5640112A
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 07:25:02 -0700 (PDT)
-Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-4525cfe255bso8105507137.1
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 07:25:02 -0700 (PDT)
+        with ESMTP id S232045AbjI0OZY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 10:25:24 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 467B8139
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 07:25:23 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d858d1bdf0aso17117461276.1
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 07:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1695824701; x=1696429501; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9zBtvWgKmM9zJhcy404AwOZ/qden8YZEKEMkYgmkSGM=;
-        b=GK05OGmBn9NauqSyZ/dBElRXNYu+qYfbBeP+LcSD3l0URYLmzbf+t4duZRs8f2ijwW
-         N6ZPesGjhfIBzI67k1ypnpEzGOWAPDI3l9NHDF8hpigyH0HgAp5YgTFx67bVd66X1Vqq
-         9uCevoPL2nkGEYuNSRL+IUE71vdocQ2zaEhGKjPLaIzHszKZFmUk07Yi2GJI4NMuZI1j
-         h8S/2Xa7ZYNCBVpQPojhdLJ1mzizCeqWjmFA0FDbkiNbvh/9sfmTlHAJYi/oR72m1bhO
-         yBTK0503QD6kzMMC0KuNqW4Bu3HvojHpDe37uwtcTfEi+5Ep4Ox/2UW9hCGEDZCPoV7M
-         yCCg==
+        d=google.com; s=20230601; t=1695824722; x=1696429522; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DqAxbQV9ra/o+abZK/vXaA4SUDewuk6D2ce8STXbtvU=;
+        b=gEOaL0Vs4YogqAoEZ5IXf+8QmxNbryq9ea4Ux4iBu3Gj2ixWmPmSY/n6SWQJLdRzIw
+         GUoRFFf1rxcmF9hAoFeRCrYEvDrbqvDwanpaKNBWdNHLixGrtx9Zt3Hj5eDu+SFsFCBc
+         QQGBsJUDY4x1bFvyLj0WTI4duZAIurru7nKdo/ak/0F36ko9sZMwYUPR7pXhvr/86WPF
+         hrFd9+HCnzs+FCwG1VITSS3jgTPe8ke2MPQMm1EK9Mnuyoy7dGlvzEcXlftGYVKB89m8
+         Be3Nzc9CGV+REbti1AzvFHQn3+GM9z3v9eNcyC0XwCkv7wjRYDvm5bt1csb2LoLZjPRs
+         DnBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695824701; x=1696429501;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9zBtvWgKmM9zJhcy404AwOZ/qden8YZEKEMkYgmkSGM=;
-        b=Z2w+RmUuyxfO+xRmKR7RkRdh+ngvCCjcQn59HWlKkuMm7ht0FplDOw1fHvyYILsXON
-         Ii6aeRV5EazqzSijELz4y0xL5wkH7KExAKQ+Kq/HYNm4vdPAvpXG7MFgugEP9Vx2cyMe
-         votFp6mZXahfe/UyC1c0DCqEmdeIcWc3sTuNodZxWt/ewNjPSM85G0MOE4tNupv8b6ct
-         zHvTV2Vr4qx5mYUn4yxPTWZd1Q84Sh+XgpriXK4lD3y67H1ydMLSi7UsNYmfSt5xVhxb
-         9zBoxAvkDwKV7Fs8+V5g6AAOkxPZago4bOSfzIQPqKdBKS6U89j1x79wDwdt4i0gGa7Q
-         ggcA==
-X-Gm-Message-State: AOJu0YydAEgfsIfRydMCifZ09tUlGshQyEn0dw2RHeA2BYqRBjO2RnwX
-        V0AgBQalP/GuEWp3EEWRky3hf/KvrmRgdgCoKSC8Kg==
-X-Google-Smtp-Source: AGHT+IEupaxxfC2vLKvvjDNkNI5Xiaf744yeHqsHZNxC5INiulcJS9XScdmDGlNcxeJW5zjArMSL/morCgR2JHbUOjc=
-X-Received: by 2002:a05:6102:3f05:b0:452:79da:94a with SMTP id
- k5-20020a0561023f0500b0045279da094amr3772881vsv.4.1695824701267; Wed, 27 Sep
- 2023 07:25:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230925133859.1735879-1-apatel@ventanamicro.com>
- <20230925-gorged-boxer-3804735e2d18@spud> <20230925-reappear-unkind-7f31acdd82de@spud>
-In-Reply-To: <20230925-reappear-unkind-7f31acdd82de@spud>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Wed, 27 Sep 2023 19:54:49 +0530
-Message-ID: <CAK9=C2UBgNWFTdQKt29+bNnWDgHZGd5fU+oP1bqsarkqc5+jgg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] KVM RISC-V Conditional Operations
-To:     Conor Dooley <conor@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20230601; t=1695824722; x=1696429522;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DqAxbQV9ra/o+abZK/vXaA4SUDewuk6D2ce8STXbtvU=;
+        b=B4P9a3K5Bqrnmgx0sfvgpzQ8KJVwyZlE3qYZjBxS4szK6x2xOoI3aKPENOfM4WELFu
+         RsRIo9RaRlIxd2FTk1g3iZoRZEMZXt2yB2LU8eEljlyZapbZP8AdTaO6wfLdYffnw81T
+         +dRPypoRs56CvSicUJYgyP0ZgIwHn9BdN/MFs/36dSjB25ybFWs5vxZpmOOymGwwEW72
+         usxByiEdu5jgO0Y9JEwMiQi1rKwOlWr+RZ20tGfx5QDwBT3u87guY+8Nx+BAHNPRZDBe
+         2ucjGn5G+bFNpNdfvkKQeaNKtS4NUGO//lOKdk7wvKFH7/67yJ3H5+9eCifQrwqX7QBE
+         BzNA==
+X-Gm-Message-State: AOJu0Yy/NQ+xseMdxPR5TqrorhG2nXb6YsIRXUPUls8eMXs/OeuE9rC6
+        EEZPSOkmARqPRdo+b9chk5y0j0G5Mxg=
+X-Google-Smtp-Source: AGHT+IECviyK2mWw7YEH/ELrmynpu1LCdY1pd2TucuzEdK/OXrDiGIiGPSa1RKhlW0+0ZPBNklQubZOh/Lc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1821:b0:d81:43c7:61ed with SMTP id
+ cf33-20020a056902182100b00d8143c761edmr28872ybb.5.1695824722347; Wed, 27 Sep
+ 2023 07:25:22 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 07:25:21 -0700
+In-Reply-To: <303a3382-32e7-6afd-bdfa-1cefdbdfb41e@linux.intel.com>
+Mime-Version: 1.0
+References: <20230921203331.3746712-1-seanjc@google.com> <20230921203331.3746712-8-seanjc@google.com>
+ <303a3382-32e7-6afd-bdfa-1cefdbdfb41e@linux.intel.com>
+Message-ID: <ZRQ7USnIybRXx-GR@google.com>
+Subject: Re: [PATCH 07/13] KVM: x86/mmu: Track PRIVATE impact on hugepage
+ mappings for all memslots
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 25, 2023 at 9:07=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Mon, Sep 25, 2023 at 04:33:15PM +0100, Conor Dooley wrote:
-> > On Mon, Sep 25, 2023 at 07:08:50PM +0530, Anup Patel wrote:
-> > > This series extends KVM RISC-V to allow Guest/VM discover and use
-> > > conditional operations related ISA extensions (namely XVentanaCondOps
-> > > and Zicond).
-> > >
-> > > To try these patches, use KVMTOOL from riscv_zbx_zicntr_smstateen_con=
-dops_v1
-> > > branch at: https://github.com/avpatel/kvmtool.git
-> > >
-> > > These patches are based upon the latest riscv_kvm_queue and can also =
-be
-> > > found in the riscv_kvm_condops_v2 branch at:
-> > > https://github.com/avpatel/linux.git
-> > >
-> > > Changes since v1:
-> > >  - Rebased the series on riscv_kvm_queue
-> > >  - Split PATCH1 and PATCH2 of v1 series into two patches
-> > >  - Added separate test configs for XVentanaCondOps and Zicond in PATC=
-H7
-> > >    of v1 series.
-> > >
-> > > Anup Patel (9):
-> > >   dt-bindings: riscv: Add XVentanaCondOps extension entry
-> > >   RISC-V: Detect XVentanaCondOps from ISA string
-> > >   dt-bindings: riscv: Add Zicond extension entry
-> > >   RISC-V: Detect Zicond from ISA string
-> >
-> > For these 4:
-> > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->
-> Actually, now that I think of it, I'm going to temporarily un-review this=
-.
-> From patch-acceptance.rst:
-> | Additionally, the RISC-V specification allows implementers to create
-> | their own custom extensions.  These custom extensions aren't required
-> | to go through any review or ratification process by the RISC-V
-> | Foundation.  To avoid the maintenance complexity and potential
-> | performance impact of adding kernel code for implementor-specific
-> | RISC-V extensions, we'll only consider patches for extensions that eith=
-er:
-> |
-> | - Have been officially frozen or ratified by the RISC-V Foundation, or
-> | - Have been implemented in hardware that is widely available, per stand=
-ard
-> |   Linux practice.
->
-> The xventanacondops bits don't qualify under the first entry, and I
-> don't think they qualify under the second yet. Am I wrong?
+On Wed, Sep 27, 2023, Binbin Wu wrote:
+> 
+> On 9/22/2023 4:33 AM, Sean Christopherson wrote:
+> > Track the effects of private attributes on potential hugepage mappings if
+> > the VM supports private memory, i.e. even if the target memslot can only
+> > ever be mapped shared.  If userspace configures a chunk of memory as
+> > private, KVM must not allow that memory to be mapped shared regardless of
+> > whether or not the *current* memslot can be mapped private.  E.g. if the
+> > guest accesses a private range using a shared memslot, then KVM must exit
+> > to userspace.
+> How does usersapce handle this case?
+> IIRC, in gmem v12 patch set, it says a memslot can not be convert to private
+> from shared.
+> So, userspace should delete the old memslot and and a new one?
 
-The Ventana Veyron V1 was announced in Dec 2022 at RISC-V summit
-followed by press releases:
-https://www.ventanamicro.com/ventana-introduces-veyron-worlds-first-data-ce=
-nter-class-risc-v-cpu-product-family/
-https://www.embedded.com/ventana-reveals-risc-v-cpu-compute-chiplet-for-dat=
-a-center/
-https://www.prnewswire.com/news-releases/ventana-introduces-veyron-worlds-f=
-irst-data-center-class-risc-v-cpu-product-family-301700985.html
+That depends on the contract between userspace and the VM, e.g. if the access is
+to a range that the VMM and the guest have agreed is shared-only, then the VMM
+could also "resolve" the access by injecting an error or killing the VM.
 
-@Palmer if the above looks good to you then please ack PATCH1-to-4
-
-Thanks,
-Anup
+But yes, deleting the memslot and creating a new one is the only approach that
+will work if userspace wants to map the gfn as private.  I don't actually expect
+any real world VMMs to actually do anything like this, the purpose of this change
+is mainly to ensure KVM has robust, consistent behavior.
