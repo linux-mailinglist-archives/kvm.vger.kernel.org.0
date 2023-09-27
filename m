@@ -2,73 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 074447B077F
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 17:01:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A274A7B0809
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 17:21:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232248AbjI0PBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 11:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S230274AbjI0PVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 11:21:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbjI0PBg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 11:01:36 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D41180
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:01:32 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-690d8fb3b7eso10181866b3a.1
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1695826892; x=1696431692; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yTY333uB+lnx85QRK4UhGRcNGGIw7L3jD83kYOSz/mk=;
-        b=Isgr6KgaqmmexAKyGkB8Hpoivf3+H2r2oB1yNE2ZON1oXyA7UU/kXuh8qBYeFFaeQU
-         4br+w0ziVpC8/buC3NCHU4jla3zb0Dhmzgi2aadrLxO9cOCAIMMgxairPzXDVv8La+Aw
-         PQbtq9qXMYNwa0lcaekQHg76pP8zhHGTU7hc2QSxEdY9BtlJmdRIu8tcp3JNrjMsRYjh
-         RMMV326M1bgXSr7JUTlTdiD4C+irrVVBANvCGdkifTM/2rwyHviNhDI0k+vZpCJbn3Z+
-         ONUVPDltKaqw2CpKPAzGu7ol35YSZkHUE/VcXzYEhG9IuB+Vtyu4SL0bEy0ltItn47qM
-         YdhQ==
+        with ESMTP id S232322AbjI0PVG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 11:21:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF9913A
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:20:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695828016;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/EIbBjpy9O83n9qhTihg7QeV6q2TpAQGQwYAPKsUVIA=;
+        b=QO89LwHhSWpEQ4Gz3cRzfuyNbnv5oYIy+zCXT8xrhhL+LU5tJvomGXdovRlAaEhmFAxr8y
+        FtXHI6lt7v7HWZCpOVYh5zbudijqZOWtzX1/TfdUw12+C9CKXSaVWGliIH64QVjzhxenuc
+        OACWAlHx349touXCJ2q+iYci/S7xBVE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47-D8s8bm-iPii3P-hhu-vnow-1; Wed, 27 Sep 2023 11:20:14 -0400
+X-MC-Unique: D8s8bm-iPii3P-hhu-vnow-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-315af0252c2so9267051f8f.0
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:20:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695826892; x=1696431692;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1695828011; x=1696432811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yTY333uB+lnx85QRK4UhGRcNGGIw7L3jD83kYOSz/mk=;
-        b=a79SdFvGr9X7DHmOXFHU0AuyjRC9wbSIPVjFx9wei35Z4QgNUMab3k0GNzjeTDnGxG
-         fnzzS9iFpcqD38H46ZMtFek3nUeIl/fPYGXv1SXYfU4zTZfuooXW/QzaqA6u/hhyKh9/
-         zspPUUn8IX7qvbNUEhou6yiD19ReMD2/F82bcW6mGXy8LmGuqvUO+k/xB23yD3y7ftVq
-         OPx2Gm53J/fXPtBglvKDK/iRnLcPijVRPykHTNtGpUkfIvAGWzpgP4jnrV5hXb3wdE6h
-         e3z4RIsdGWlw2myAntf2g68hz/tA90sRa/Y0gH3UVrSvnCnfk1TXg8IhawoZOPKrshDT
-         9NHg==
-X-Gm-Message-State: AOJu0Yw3jxoQop1Xb33fVLI5N2SrPVbTuAdImarH/292HaH7F0fDJHY2
-        3lbCZxEKb+sCgz8wFIoNYyx12g==
-X-Google-Smtp-Source: AGHT+IGS9wTm9vyVcNuS0LVmu2jhxPRdEUlru4/3+hbsDAoZiukfMAFderu5eKF3apag2JrFxYUQQQ==
-X-Received: by 2002:a05:6a20:3d0b:b0:134:4f86:7966 with SMTP id y11-20020a056a203d0b00b001344f867966mr2743151pzi.9.1695826891666;
-        Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
-Received: from localhost ([135.180.227.0])
-        by smtp.gmail.com with ESMTPSA id b19-20020aa78113000000b0069302c3c054sm4003815pfi.207.2023.09.27.08.01.31
+        bh=/EIbBjpy9O83n9qhTihg7QeV6q2TpAQGQwYAPKsUVIA=;
+        b=Xt0kNnYjSxJbu/Q4XrzpUJ1ae+F8acBRpzPVdR1LMERmxpM9p1R5Sxu4mMw82uS0FB
+         RpNfXT3vRquQw0i5D3TtJQRB+lPWzAhIgC7sATQFQY8iOfSpKI9OLD6WCRxJYMBVnlrC
+         1sGsgqcQXFFB1v2kphLOUinqULw5S9aomTct+sRg8xWS0tqTdq9e2a2vG+4jqfsxh5u+
+         9cs0IjxPuYbHIRJKypi2i2Yh6wOvyQunS4GvtLoE86ZnH/xNJdJOen2e/7tQglB4p4ey
+         QLpZVCbHP2S1O2N887k8FHJvmnDCib2qcC7XDyynFYd6o9E3Oo6RdmpDG1ioEm9E5QI0
+         BULQ==
+X-Gm-Message-State: AOJu0YzPqEo6vDUFXmPWIBfK7Pyp0RUW7oGavKoplLWcFm/cWwa7kWCl
+        8t8hjNbycAgrxnszkxIz7M4DaI0KZG3213cLdoPEauBv0vEkICAbfOdQXOn9wCVywUMLeZQLvMM
+        gRfi5dE4wIfZOO0Ur6zVW
+X-Received: by 2002:a5d:4cc7:0:b0:314:a3f:9c08 with SMTP id c7-20020a5d4cc7000000b003140a3f9c08mr1876011wrt.39.1695828011766;
+        Wed, 27 Sep 2023 08:20:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdjsQhdmBlcldN4VQo0/wB1Ma3pLJGSeiqWpRsH5/5aS/zWnrBptxpvSLI02eGQaomR+j8gQ==
+X-Received: by 2002:a5d:4cc7:0:b0:314:a3f:9c08 with SMTP id c7-20020a5d4cc7000000b003140a3f9c08mr1875993wrt.39.1695828011418;
+        Wed, 27 Sep 2023 08:20:11 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:16e:b9f6:556e:c001:fe18:7e0a])
+        by smtp.gmail.com with ESMTPSA id x17-20020a5d6511000000b0031fd849e797sm17324370wru.105.2023.09.27.08.20.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
-X-Google-Original-Date: Wed, 27 Sep 2023 08:01:29 PDT (-0700)
-Subject:     Re: [PATCH v2 0/9] KVM RISC-V Conditional Operations
-In-Reply-To: <20230927-snowcap-stadium-2f6aeffac59e@spud>
-CC:     apatel@ventanamicro.com, pbonzini@redhat.com,
-        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        shuah@kernel.org, ajones@ventanamicro.com,
-        mchitale@ventanamicro.com, devicetree@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     Conor Dooley <conor@kernel.org>
-Message-ID: <mhng-ed1b5d0a-469c-43e3-a0fe-b8e498cde538@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+        Wed, 27 Sep 2023 08:20:10 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 11:20:05 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     liming.wu@jaguarmicro.com
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, 398776277@qq.com
+Subject: Re: [PATCH 2/2] tools/virtio: Add hints when module is not installed
+Message-ID: <20230927111904-mutt-send-email-mst@kernel.org>
+References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
+ <20230926050021.717-2-liming.wu@jaguarmicro.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230926050021.717-2-liming.wu@jaguarmicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,84 +78,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Sep 2023 07:45:28 PDT (-0700), Conor Dooley wrote:
-> On Wed, Sep 27, 2023 at 07:54:49PM +0530, Anup Patel wrote:
->> On Mon, Sep 25, 2023 at 9:07 PM Conor Dooley <conor@kernel.org> wrote:
->> >
->> > On Mon, Sep 25, 2023 at 04:33:15PM +0100, Conor Dooley wrote:
->> > > On Mon, Sep 25, 2023 at 07:08:50PM +0530, Anup Patel wrote:
->> > > > This series extends KVM RISC-V to allow Guest/VM discover and use
->> > > > conditional operations related ISA extensions (namely XVentanaCondOps
->> > > > and Zicond).
->> > > >
->> > > > To try these patches, use KVMTOOL from riscv_zbx_zicntr_smstateen_condops_v1
->> > > > branch at: https://github.com/avpatel/kvmtool.git
->> > > >
->> > > > These patches are based upon the latest riscv_kvm_queue and can also be
->> > > > found in the riscv_kvm_condops_v2 branch at:
->> > > > https://github.com/avpatel/linux.git
->> > > >
->> > > > Changes since v1:
->> > > >  - Rebased the series on riscv_kvm_queue
->> > > >  - Split PATCH1 and PATCH2 of v1 series into two patches
->> > > >  - Added separate test configs for XVentanaCondOps and Zicond in PATCH7
->> > > >    of v1 series.
->> > > >
->> > > > Anup Patel (9):
->> > > >   dt-bindings: riscv: Add XVentanaCondOps extension entry
->> > > >   RISC-V: Detect XVentanaCondOps from ISA string
->> > > >   dt-bindings: riscv: Add Zicond extension entry
->> > > >   RISC-V: Detect Zicond from ISA string
->> > >
->> > > For these 4:
->> > > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->> >
->> > Actually, now that I think of it, I'm going to temporarily un-review this.
->> > From patch-acceptance.rst:
->> > | Additionally, the RISC-V specification allows implementers to create
->> > | their own custom extensions.  These custom extensions aren't required
->> > | to go through any review or ratification process by the RISC-V
->> > | Foundation.  To avoid the maintenance complexity and potential
->> > | performance impact of adding kernel code for implementor-specific
->> > | RISC-V extensions, we'll only consider patches for extensions that either:
->> > |
->> > | - Have been officially frozen or ratified by the RISC-V Foundation, or
->> > | - Have been implemented in hardware that is widely available, per standard
->> > |   Linux practice.
->> >
->> > The xventanacondops bits don't qualify under the first entry, and I
->> > don't think they qualify under the second yet. Am I wrong?
->> 
->> The Ventana Veyron V1 was announced in Dec 2022 at RISC-V summit
->> followed by press releases:
->> https://www.ventanamicro.com/ventana-introduces-veyron-worlds-first-data-center-class-risc-v-cpu-product-family/
->> https://www.embedded.com/ventana-reveals-risc-v-cpu-compute-chiplet-for-data-center/
->> https://www.prnewswire.com/news-releases/ventana-introduces-veyron-worlds-first-data-center-class-risc-v-cpu-product-family-301700985.html
->> 
->> @Palmer if the above looks good to you then please ack PATCH1-to-4
->
-> These are announcements AFAICT & not an indication of "being implemented
-> in hardware that is widely available".
+On Tue, Sep 26, 2023 at 01:00:20PM +0800, liming.wu@jaguarmicro.com wrote:
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+> 
+> Need to insmod vhost_test.ko before run virtio_test.
+> Give some hints to users.
+> 
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> ---
+>  tools/virtio/virtio_test.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
+> index 028f54e6854a..ce2c4d93d735 100644
+> --- a/tools/virtio/virtio_test.c
+> +++ b/tools/virtio/virtio_test.c
+> @@ -135,6 +135,10 @@ static void vdev_info_init(struct vdev_info* dev, unsigned long long features)
+>  	dev->buf = malloc(dev->buf_size);
+>  	assert(dev->buf);
+>  	dev->control = open("/dev/vhost-test", O_RDWR);
+> +
+> +	if (dev->control < 0)
+> +		fprintf(stderr, "Install vhost_test module" \
+> +		"(./vhost_test/vhost_test.ko) firstly\n");
 
-The second two look to just be news articles quoting the first without 
-any real new information, at least just from skimming them -- sorry if I 
-missed something, though.
+Thanks!
 
-The article says "SDK released with necessary software already ported to 
-Veyron" and "Veyron V1 Development Platform available", but aside from 
-quotes of the press release I can't find information on either of those 
-(or anything VT1 related, as there were some naming ambiguities).
+things to improve:
 
-Anup said during the call that they're still bringing up the chip and 
-haven't started sampling yet, which usually means things are far from 
-publicly availiable.  I thought I heard him say that these press 
-releases would say the chip is sampling 2H23, but I can't find anything 
-in them about sampling.
+firstly -> first
+add space before (
+End sentence with a dot
+align "" on the two lines
 
-Anup also said it's availiable as IP and I remember something at Hot 
-Chips talking about an example place and route for a VT1, which also 
-sounds very much like a chip that's not availiable yet -- usually if 
-there's a chip folks are a lot more concrete about that sort of thing.
+>  	assert(dev->control >= 0);
+>  	r = ioctl(dev->control, VHOST_SET_OWNER, NULL);
+>  	assert(r >= 0);
+> -- 
+> 2.34.1
 
-So is there you can point to about this chip actually being publicly 
-availiable?
