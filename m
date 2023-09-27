@@ -2,149 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30BA77B0B07
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 19:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38D917B0B28
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 19:36:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229539AbjI0R1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 13:27:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45644 "EHLO
+        id S229517AbjI0Rgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 13:36:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjI0R1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 13:27:11 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35ABBA1
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 10:27:10 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56c2d67da6aso10947245a12.2
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 10:27:10 -0700 (PDT)
+        with ESMTP id S229464AbjI0Rgn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 13:36:43 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7020FE5
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 10:36:42 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c6193d6bb4so17255ad.0
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 10:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695835629; x=1696440429; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=45/FQrKeL8Udcs0UjyYMLebUZXfqqT6VPGukdHqASBY=;
-        b=pxkIsUL/CYKNNtXcZ54jqEaRWNI1bRSTOtQ6roFCrUvxWV9z+gRVpfk81GbCzvJNUH
-         gUqzv6OJdS1w6EKg5cP8ZnFGhFoU7A0uvR3Ok/cnerZmRjIwkJb58MY+qAbUZvjzPB9q
-         ha5MUQUXsSfXOdj/dt9aoAUtuEuPCxxrnxBlj62vaq6X+W46VbEaQ1nE7AXyaTAN6+P+
-         m7gD3ZK/P4XZsF71AgkhcU1DjgEzLC6Eq9Y3teJ7l2fOvaH7TKFJbSZEnEhc1lxhOeQc
-         zdIPFIGEM0fm5UMD93MU6o2kBdyIv5klLMPtsXBxYP8OQVZ1i+Rc9MjcXOEnA0yaXDr6
-         MiJw==
+        d=google.com; s=20230601; t=1695836202; x=1696441002; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qCVNsJJaiR6CMnhGVjseVngepymRi6tNcmHrCszc8zo=;
+        b=1XJ1zIQeinDaZJV2XOS+9NXgpofXhIExDxbIFglZsotc8+0im3Nk9o2rDzpcCMO0h0
+         rP8Vg6kU4ARl2gOUor47tpObJXZG4uzLfnwDepNqq3LyTZ7sEDypGS2hw985CBWjc0ot
+         KNOJfjiUwqqHSMXLO7hj4DVCfMuein6N3eAgo0+kxvWvQ7FvHm9278D/WtIqXzPNfkr+
+         FXMHgaDZzrPjfZBYWeiK/iYUOQjTq9yJQNTKUqcccb6ZsqS+mWGW/Mjq0rARbOl26Ja0
+         68/G0aXl5TDoktIBASFEz9oz/rHe4RcqXdCXc+/kxkqeO4Z7apiMBAxexMzdSkvEcQAG
+         /5xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695835629; x=1696440429;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=45/FQrKeL8Udcs0UjyYMLebUZXfqqT6VPGukdHqASBY=;
-        b=K+9LzNsAAsytwrXN5B8bkj9JYfjnEZeAeHJQKTAlKa387nYaj9yV5qvbRo1QPXChJm
-         myaXPNDEj2OR0nNcWNsIYvUcHFst6SyVA7MeTQPSoqocqFYqamQWb+hcJToO9YLZV+w/
-         HR3ujVhr6KZen7xHobAxsG7dKUMPzTwY/ZSz44ogpmJNknx9+HFzMT+T/Q+Z1Ovg8M6O
-         mJ1vFaITYGYO+Bqqa9uLrhSj+AqFwrSGcPod22U9/xzdF9icNjVtV0cyKNeE9jFOp6hy
-         wzbsIAGi+723ReX9DTDrhHDmEXHAbg4Qmdj8OjCJQbFxaGMJHA77AncRyEx0jNcFM6At
-         0n+g==
-X-Gm-Message-State: AOJu0YzIcuriwApMHz/iexIftmxkEowUZIY69PWUgfCHPm+x37hlqxt0
-        VWbRnqcpsRrRNCPvnREVMELs5w4xjds=
-X-Google-Smtp-Source: AGHT+IEo/l8kLAGFPglCwVwc5Xc6q19FVQ0XSzm/QsHADwvKgtDSKq0Zssqfo5n0svX+VvLt6XNOBeajUM0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d501:b0:1c7:217c:3e4b with SMTP id
- b1-20020a170902d50100b001c7217c3e4bmr37979plg.5.1695835629656; Wed, 27 Sep
- 2023 10:27:09 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 10:27:07 -0700
-In-Reply-To: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
-Mime-Version: 1.0
-References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
- <20230927033124.1226509-8-dapeng1.mi@linux.intel.com> <20230927113312.GD21810@noisy.programming.kicks-ass.net>
-Message-ID: <ZRRl6y1GL-7RM63x@google.com>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        d=1e100.net; s=20230601; t=1695836202; x=1696441002;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qCVNsJJaiR6CMnhGVjseVngepymRi6tNcmHrCszc8zo=;
+        b=Rf4MKueYgr8ThrhZ4wEm0bCwvbxWjTJrmCDziC/NhWOJY+aEwV5vN+SURsh+8panP/
+         XsCGEwvoS8TRczm/wjsfK3/2wLdF86sMPYFuMxm0TP1THxC0tatDFEAymgfIuCCcMXz8
+         zHVUL108+9tZjFjar/aOBCbhAchI0vFlJ4njeEE4b+6BfwPajZm5/jfba1HiGsYPrL5f
+         M0smhNhSGuMA20qRarYKg4WEoubVIa938SqDiZ6vMR0p1FJBI9z19OpUyoW4pW4ZGIi0
+         Wfk28lCJQly6EFIdtalUB0X4eky/i/RErGb1y0QwVuA1qRSThuorSmGkZfceo85TZHov
+         h6cA==
+X-Gm-Message-State: AOJu0YxwGSDjt2MU5loJEdZ1qZtfUQoj5GLsfE73ji5W1k98yx1a48gn
+        lG6K1462UoVf3wdPrdKECigOqIfyu7b61Fe/awBEpA==
+X-Google-Smtp-Source: AGHT+IEVnwRkoJxc9UMrhf/mKiCwfxKglFuJfMCXqjV+dVaug9XIC4yr0Lkz6SA1D9Le6iCxPsNM2IAH3FHBtUiQxHg=
+X-Received: by 2002:a17:903:2447:b0:1bc:66f2:4bb with SMTP id
+ l7-20020a170903244700b001bc66f204bbmr542482pls.8.1695836201617; Wed, 27 Sep
+ 2023 10:36:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230926234008.2348607-1-rananta@google.com> <20230926234008.2348607-3-rananta@google.com>
+ <ZRPhoExoiU3_Jvxy@linux.dev>
+In-Reply-To: <ZRPhoExoiU3_Jvxy@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Wed, 27 Sep 2023 10:36:29 -0700
+Message-ID: <CAJHc60wRuqo3d=7J0jkoKehsrDWbZkwy2ADrPQpqaF-YYpH6DA@mail.gmail.com>
+Subject: Re: [PATCH v6 02/11] KVM: arm64: PMU: Set the default PMU for the
+ guest on vCPU reset
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Jim, David, and Mingwei
+Hi Oliver,
 
-On Wed, Sep 27, 2023, Peter Zijlstra wrote:
-> On Wed, Sep 27, 2023 at 11:31:18AM +0800, Dapeng Mi wrote:
-> > When guest wants to use PERF_METRICS MSR, a virtual metrics event needs
-> > to be created in the perf subsystem so that the guest can have exclusive
-> > ownership of the PERF_METRICS MSR.
-> 
-> Urgh, can someone please remind me how all that is supposed to work
-> again? The guest is just a task that wants the event. If the
-> host creates a CPU event, then that gets scheduled with higher priority
-> and the task looses out, no joy.
-> 
-> So you cannot guarantee the guest gets anything.
-> 
-> That is, I remember we've had this exact problem before, but I keep
-> forgetting how this all is supposed to work. I don't use this virt stuff
-> (and every time I try qemu arguments defeat me and I give up in
-> disgust).
+On Wed, Sep 27, 2023 at 1:02=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> Hi Raghu,
+>
+> On Tue, Sep 26, 2023 at 11:39:59PM +0000, Raghavendra Rao Ananta wrote:
+> > From: Reiji Watanabe <reijiw@google.com>
+> >
+> > The following patches will use the number of counters information
+> > from the arm_pmu and use this to set the PMCR.N for the guest
+> > during vCPU reset. However, since the guest is not associated
+> > with any arm_pmu until userspace configures the vPMU device
+> > attributes, and a reset can happen before this event, call
+> > kvm_arm_support_pmu_v3() just before doing the reset.
+> >
+> > No functional change intended.
+>
+> I would argue there still is a functional change here, as PMU
+> initialization failure now shows up on a completely different ioctl for
+> userspace.
+>
+> > @@ -216,6 +217,18 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >       vcpu->arch.reset_state.reset =3D false;
+> >       spin_unlock(&vcpu->arch.mp_state_lock);
+> >
+> > +     if (kvm_vcpu_has_pmu(vcpu)) {
+> > +             if (!kvm_arm_support_pmu_v3())
+> > +                     return -EINVAL;
+> > +
+> > +             /*
+> > +              * When the vCPU has a PMU, but no PMU is set for the gue=
+st
+> > +              * yet, set the default one.
+> > +              */
+> > +             if (unlikely(!kvm->arch.arm_pmu) && kvm_arm_set_default_p=
+mu(kvm))
+> > +                     return -EINVAL;
+> > +     }
+> > +
+>
+> Ah, this probably will not mix well with my recent change to get rid of
+> the return value altogether from kvm_reset_vcpu() [*]. I see two ways to
+> handle this:
+>
+>  - Add a separate helper responsible for one-time setup of the vCPU
+>    called from KVM_ARM_VCPU_INIT which may fail.
+>
+>  - Add a check for !kvm->arch.arm_pmu to kvm_arm_pmu_v3_init().
+>
+> No strong preference, though.
+>
+Thanks for the pointer. I think adding it in kvm_arm_pmu_v3_init() may
+not be feasible as the reset (reset_pmcr()) may happen before this
+init and we may end up setting 0 as PMCR.N for the guest. I'll explore
+the other option though.
 
-I don't think it does work, at least not without a very, very carefully crafted
-setup and a host userspace that knows it must not use certain aspects of perf.
-E.g. for PEBS, if the guest virtual counters don't map 1:1 to the "real" counters
-in hardware, KVM+perf simply disables the counter.
-
-And for top-down slots, getting anything remotely accurate requires pinning vCPUs
-1:1 with pCPUs and enumerating an accurate toplogy to the guest:
-
-  The count is distributed among unhalted logical processors (hyper-threads) who
-  share the same physical core, in processors that support Intel Hyper-Threading
-  Technology.
-
-Jumping the gun a bit (we're in the *super* early stages of scraping together a
-rough PoC), but I think we should effectively put KVM's current vPMU support into
-maintenance-only mode, i.e. stop adding new features unless they are *very* simple
-to enable, and instead pursue an implementation that (a) lets userspace (and/or
-the kernel builder) completely disable host perf (or possibly just host perf usage
-of the hardware PMU) and (b) let KVM passthrough the entire hardware PMU when it
-has been turned off in the host.
-
-I.e. keep KVM's existing best-offset vPMU support, e.g. for setups where the
-platform owner is also the VM ueer (running a Windows VM on a Linux box, hosting
-a Linux VM in ChromeOS, etc...).  But for anything advanced and for hard guarantees,
-e.g. cloud providers that want to expose fully featured vPMU to customers, force
-the platform owner to choose between using perf (or again, perf with hardware PMU)
-in the host, and exposing the hardware PMU to the guest.
-
-Hardware vendors are pushing us in the direction whether we like it or not, e.g.
-SNP and TDX want to disallow profiling the guest from the host, ARM has an
-upcoming PMU model where (IIUC) it can't be virtualized without a passthrough
-approach, Intel's hybrid CPUs are a complete trainwreck unless vCPUs are pinned,
-and virtualizing things like top-down slots, PEBS, and LBRs in the shared model
-requires an absurd amount of complexity throughout the kernel and userspace.
-
-Note, a similar idea was floated and rejected in the past[*], but that failed
-proposal tried to retain host perf+PMU functionality by making the behavior dynamic,
-which I agree would create an awful ABI for the host.  If we make the "knob" a
-Kconfig or kernel param, i.e. require the platform owner to opt-out of using perf
-no later than at boot time, then I think we can provide a sane ABI, keep the
-implementation simple, all without breaking existing users that utilize perf in
-the host to profile guests.
-
-[*] https://lore.kernel.org/all/CALMp9eRBOmwz=mspp0m5Q093K3rMUeAsF3vEL39MGV5Br9wEQQ@mail.gmail.com
+Thank you.
+Raghavendra
+> [*]: https://lore.kernel.org/r/20230920195036.1169791-8-oliver.upton@linu=
+x.dev
+>
+> --
+> Thanks,
+> Oliver
