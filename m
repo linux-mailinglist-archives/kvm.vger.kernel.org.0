@@ -2,81 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C527B0E04
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 23:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86C607B0E06
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 23:28:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbjI0VZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 17:25:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37648 "EHLO
+        id S229746AbjI0V2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 17:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjI0VZw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 17:25:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60FBC11D
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:25:06 -0700 (PDT)
+        with ESMTP id S229458AbjI0V2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 17:28:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10FA3D6
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695849905;
+        s=mimecast20190719; t=1695850074;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VmntjQFEBP4zxkSKza823gqYagc7cqE2Mw3qK1poHGA=;
-        b=EYUSoADqjfs6Do1kcNdeuMa/cUjWYKYc6hPJXMxJIJi1GN++iIBNTQ4go/b+AoXTNGsQZs
-        xHuq33UgmXVWkUErlyT+iHZOzFXEchZtFO8f22WmoUF/RY4V0J2LUlXv7QKcwIV+bTsLb2
-        QGoEbYqOaaCGZdDKZxnHXvF20YND2+M=
+        bh=NVhXHBHOJiNE7AFztQWpCxUca0e80DXZadzWQuxdrFs=;
+        b=YY0aW4tukM9aIk6bYnDcp/3xhw0i6AMh3UllRxilCwizAtZczvjHp/jfoQ4tSVlRx1TKF9
+        Td20JZqU0JSaAT+48oQRYr2tFNL0qHwl9QDguk9xI/fsVpoHmHlAN74UvXOrMvfI13Agsi
+        BMdgWDYu6ttP+u/caRgzcnjfjm9cIYw=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-267-iP7XbKaaOGiOKK3QI9MEgw-1; Wed, 27 Sep 2023 17:25:03 -0400
-X-MC-Unique: iP7XbKaaOGiOKK3QI9MEgw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4059475c174so71780995e9.0
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:25:03 -0700 (PDT)
+ us-mta-372-4EZbUO5xNBacD4nMFaOOwA-1; Wed, 27 Sep 2023 17:27:52 -0400
+X-MC-Unique: 4EZbUO5xNBacD4nMFaOOwA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40590e6bd67so71481825e9.2
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:27:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695849902; x=1696454702;
+        d=1e100.net; s=20230601; t=1695850071; x=1696454871;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VmntjQFEBP4zxkSKza823gqYagc7cqE2Mw3qK1poHGA=;
-        b=JfokRq3ZnXP+W9tLxkJXyRkXos0oudnlE5qruhUMygwCG/AVxMMZUFDP9chGwMVHHW
-         UzbWPdQf4VcngP4yTwIBobK+SKCtHjNcl3elznC0J0Q10irjJAJsrIpLR7PmKKNWbTHY
-         c83BJPkvKKyjyqUXBOBlkeWe1tUjv07tvKd9z7prR/5l+U1ApWyXX4Fkl1r/KBaCdUeU
-         s7UsN0tXZ/XkOq+evJC8QKI9v+j7nxQztV9wdAasCeG7RIwDCbeb99o744RVIO5wAW/t
-         k80E1dTj+Km5qTFK3BMIMQ53wf7wf9aQF7NIHmZegWMax8ze+sLcK62Badaj+x+hPIt/
-         F8HQ==
-X-Gm-Message-State: AOJu0YzWFh8wfCXv5l0OYh+JtOaijJLIq/kGGjcZynq6FWkoRR279Y/4
-        wSd8JYWoO/IQJ7tIuAzHG0K2pU9Rxo7dhH8DDPHDOPag4ZNXcSapAjRoU5Lrf4K0co7Rf91HhjL
-        bmyY0gfkJqG3f
-X-Received: by 2002:a7b:c4cb:0:b0:405:40c6:2b96 with SMTP id g11-20020a7bc4cb000000b0040540c62b96mr3252748wmk.3.1695849902520;
-        Wed, 27 Sep 2023 14:25:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGoSKe8qGtIAhaENH1IBp/4qm/cttWihUV2n1Xw4IXG2ADxskYunHMDBRVoizr7wIOq+D70bQ==
-X-Received: by 2002:a7b:c4cb:0:b0:405:40c6:2b96 with SMTP id g11-20020a7bc4cb000000b0040540c62b96mr3252738wmk.3.1695849902136;
-        Wed, 27 Sep 2023 14:25:02 -0700 (PDT)
+        bh=NVhXHBHOJiNE7AFztQWpCxUca0e80DXZadzWQuxdrFs=;
+        b=vdEPHBIlpnU3pT6jyaN7Jv3NoIiPVQEq9rw4ocSqnpzI94sm7f1WB/J0UxquravlfQ
+         jG9IpqtAPrnfgpxtdU+i9aQxYCABGYA6GezQlsuacwBsxNB/syQZjWmL/zYEdRzohB0A
+         S8o8iKt5WiGwWrF+LkpYSYzB5LfBczlq1afnl98fR4J2nvibCDPkATwvK5WOrGAQndVj
+         VDN5sCI960ixktLM3E+6nQa5F6oqdl91STGq2VAd7PUeS4D3D6E59202yl9boRjogyoe
+         31bp+pMlR6kWDZ6tQoBnXn1drvXk1Qlx60uAwKv2d2rKJHrN9LkPvuqo8cxuhmlFZcyA
+         JTcw==
+X-Gm-Message-State: AOJu0YxKO3uIqByYUATIxkO2QnOOKIic1CUk8m2ERUnRER9NNQpkKc4y
+        1oU/zO4dImK5NSQiI0w+C+P4lZmUpZgphdrc+pGNmQDlEtZp9yYYAFHIc0hFYR1kB3iK9nmNfjK
+        9dlkJFEvA541Q
+X-Received: by 2002:a05:600c:d5:b0:404:f9c1:d5d7 with SMTP id u21-20020a05600c00d500b00404f9c1d5d7mr2989073wmm.25.1695850071732;
+        Wed, 27 Sep 2023 14:27:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFIcUJn90U5HWXMApV7/w5orCfurEE6KfmvMEkl/mryjB+2TvyKWxY5JcqbSZmIYrL/4XWi2g==
+X-Received: by 2002:a05:600c:d5:b0:404:f9c1:d5d7 with SMTP id u21-20020a05600c00d500b00404f9c1d5d7mr2989057wmm.25.1695850071378;
+        Wed, 27 Sep 2023 14:27:51 -0700 (PDT)
 Received: from redhat.com ([2.52.19.249])
-        by smtp.gmail.com with ESMTPSA id f2-20020a7bc8c2000000b003fefaf299b6sm7026620wml.38.2023.09.27.14.24.59
+        by smtp.gmail.com with ESMTPSA id q12-20020a05600c040c00b0040586360a36sm10244285wmb.17.2023.09.27.14.27.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 14:25:01 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 17:24:57 -0400
+        Wed, 27 Sep 2023 14:27:50 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 17:27:47 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Feng Liu <feliu@nvidia.com>
 Cc:     Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
         maorg@nvidia.com, virtualization@lists.linux-foundation.org,
         jgg@nvidia.com, jiri@nvidia.com, leonro@nvidia.com
-Subject: Re: [PATCH vfio 01/11] virtio-pci: Use virtio pci device layer vq
- info instead of generic one
-Message-ID: <20230927171859-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH vfio 03/11] virtio-pci: Introduce admin virtqueue
+Message-ID: <20230927172553-mutt-send-email-mst@kernel.org>
 References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-2-yishaih@nvidia.com>
- <20230921093540-mutt-send-email-mst@kernel.org>
- <6eb92b47-cefe-8b00-d3d2-f15ce4aa9959@nvidia.com>
- <39d8a0a5-4365-4ced-cac1-bef2bc8d6367@nvidia.com>
+ <20230921124040.145386-4-yishaih@nvidia.com>
+ <20230921095216-mutt-send-email-mst@kernel.org>
+ <62df07ea-ddb6-f4ee-f7c3-1400dbe3f0a9@nvidia.com>
+ <40f53b6f-f220-af35-0797-e3c60c8c1294@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <39d8a0a5-4365-4ced-cac1-bef2bc8d6367@nvidia.com>
+In-Reply-To: <40f53b6f-f220-af35-0797-e3c60c8c1294@nvidia.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,108 +83,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 27, 2023 at 02:09:43PM -0400, Feng Liu wrote:
+On Wed, Sep 27, 2023 at 02:12:24PM -0400, Feng Liu wrote:
 > 
 > 
-> On 2023-09-26 p.m.3:13, Feng Liu via Virtualization wrote:
+> On 2023-09-26 p.m.3:23, Feng Liu via Virtualization wrote:
 > > External email: Use caution opening links or attachments
 > > 
 > > 
-> > On 2023-09-21 a.m.9:46, Michael S. Tsirkin wrote:
+> > On 2023-09-21 a.m.9:57, Michael S. Tsirkin wrote:
 > > > External email: Use caution opening links or attachments
 > > > 
 > > > 
-> > > On Thu, Sep 21, 2023 at 03:40:30PM +0300, Yishai Hadas wrote:
+> > > On Thu, Sep 21, 2023 at 03:40:32PM +0300, Yishai Hadas wrote:
 > > > > From: Feng Liu <feliu@nvidia.com>
-> > > > 
 > 
-> > > > pci_irq_vector(vp_dev->pci_dev, v);
-> > > > @@ -294,6 +298,7 @@ static int vp_find_vqs_msix(struct
-> > > > virtio_device *vdev, unsigned int nvqs,
-> > > >        vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-> > > >        if (!vp_dev->vqs)
-> > > >                return -ENOMEM;
-> > > > +     vp_dev->nvqs = nvqs;
-> > > > 
-> > > >        if (per_vq_vectors) {
-> > > >                /* Best option: one for change interrupt, one per vq. */
-> > > > @@ -365,6 +370,7 @@ static int vp_find_vqs_intx(struct
-> > > > virtio_device *vdev, unsigned int nvqs,
-> > > >        vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-> > > >        if (!vp_dev->vqs)
-> > > >                return -ENOMEM;
-> > > > +     vp_dev->nvqs = nvqs;
-> > > > 
-> > > >        err = request_irq(vp_dev->pci_dev->irq, vp_interrupt,
-> > > > IRQF_SHARED,
-> > > >                        dev_name(&vdev->dev), vp_dev);
-> > > > diff --git a/drivers/virtio/virtio_pci_common.h
-> > > > b/drivers/virtio/virtio_pci_common.h
-> > > > index 4b773bd7c58c..602021967aaa 100644
-> > > > --- a/drivers/virtio/virtio_pci_common.h
-> > > > +++ b/drivers/virtio/virtio_pci_common.h
-> > > > @@ -60,6 +60,7 @@ struct virtio_pci_device {
-> > > > 
-> > > >        /* array of all queues for house-keeping */
-> > > >        struct virtio_pci_vq_info **vqs;
-> > > > +     u32 nvqs;
+> 
+> > > > Â  drivers/virtio/virtio_pci_modern_avq.c | 65 ++++++++++++++++++++++++++
 > > > 
-> > > I don't much like it that we are adding more duplicated info here.
-> > > In fact, we tried removing the vqs array in
-> > > 5c34d002dcc7a6dd665a19d098b4f4cd5501ba1a - there was some bug in that
-> > > patch and the author didn't have the time to debug
-> > > so I reverted but I don't really think we need to add to that.
+> > > if you have a .c file without a .h file you know there's something
+> > > fishy. Just add this inside drivers/virtio/virtio_pci_modern.c ?
+> > > 
+> > Will do.
+> > 
+> 
+> > > > +struct virtio_avq {
+> > > 
+> > > admin_vq would be better. and this is pci specific yes? so virtio_pci_
 > > > 
 > > 
+> > Will do.
+> > 
+> 
+> > > > 
+> > > > +Â Â Â Â  struct virtio_avq *admin;
+> > > 
+> > > and this could be thinkably admin_vq.
+> > > 
+> > Will do.
+> > 
+> 
+> > > > 
+> > > > Â  /* If driver didn't advertise the feature, it will never appear. */
+> > > > diff --git a/include/linux/virtio_pci_modern.h
+> > > > b/include/linux/virtio_pci_modern.h
+> > > > index 067ac1d789bc..f6cb13d858fd 100644
+> > > > --- a/include/linux/virtio_pci_modern.h
+> > > > +++ b/include/linux/virtio_pci_modern.h
+> > > > @@ -10,6 +10,9 @@ struct virtio_pci_modern_common_cfg {
+> > > > 
+> > > > Â Â Â Â Â Â  __le16 queue_notify_data;Â Â Â Â Â Â  /* read-write */
+> > > > Â Â Â Â Â Â  __le16 queue_reset;Â Â Â Â Â Â Â Â Â Â Â Â  /* read-write */
+> > > > +
+> > > > +Â Â Â Â  __le16 admin_queue_index;Â Â Â Â Â Â  /* read-only */
+> > > > +Â Â Â Â  __le16 admin_queue_num;Â Â Â Â Â Â Â Â  /* read-only */
+> > > > Â  };
+> > > 
+> > > 
+> > > ouch.
+> > > actually there's a problem
+> > > 
+> > > Â Â Â Â Â Â Â Â  mdev->common = vp_modern_map_capability(mdev, common,
+> > > Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  sizeof(struct
+> > > virtio_pci_common_cfg), 4,
+> > > Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  0, sizeof(struct
+> > > virtio_pci_common_cfg),
+> > > Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  NULL, NULL);
+> > > 
+> > > extending this structure means some calls will start failing on
+> > > existing devices.
+> > > 
+> > > even more of an ouch, when we added queue_notify_data and queue_reset we
+> > > also possibly broke some devices. well hopefully not since no one
+> > > reported failures but we really need to fix that.
+> > > 
+> > > 
 > > Hi Michael
 > > 
-> > As explained in commit message, this patch is mainly to prepare for the
-> > subsequent admin vq patches.
+> > I didnâ€™t see the fail in vp_modern_map_capability(), and
+> > vp_modern_map_capability() only read and map pci memory. The length of
+> > the memory mapping will increase as the struct virtio_pci_common_cfg
+> > increases. No errors are seen.
 > > 
-> > The admin vq is also established using the common mechanism of vring,
-> > and is added to vdev->vqs in __vring_new_virtqueue(). So vdev->vqs
-> > contains all virtqueues, including rxq, txq, ctrlvq and admin vq.
+> > And according to the existing code, new pci configuration space members
+> > can only be added in struct virtio_pci_modern_common_cfg.
 > > 
-> > admin vq should be managed by the virito_pci layer and should not be
-> > created or deleted by upper driver (net, blk);
-> > When the upper driver was unloaded, it will call del_vqs() interface,
-> > which wll call vp_del_vqs(), and vp_del_vqs() should not delete the
-> > admin vq, but only delete the virtqueues created by the upper driver
-> > such as rxq, txq, and ctrlq.
+> > Every single entry added here is protected by feature bit, there is no
+> > bug AFAIK.
 > > 
-> > 
-> > vp_dev->vqs[] array only contains virtqueues created by upper driver
-> > such as rxq, txq, ctrlq. Traversing vp_dev->vqs array can only delete
-> > the upper virtqueues, without the admin vq. Use the vdev->vqs linked
-> > list cannot meet the needs.
+> > Could you help to explain it more detail?Â  Where and why it will fall if
+> > we add new member in struct virtio_pci_modern_common_cfg.
 > > 
 > > 
-> > Can such an explanation be explained clearly? Or do you have any other
-> > alternative methods?
-> > 
-> 
 > Hi, Michael
-> 	Is the above explanations OK to you?
-> 
+> 	Any comments about this?
 > Thanks
 > Feng
 
-First, the patch only addresses pci. Second, yes driver unload calls
-del_vqs but doesn't it also reset the device? If this happens while
-vfio tries to send commands to it then you have other problems.
-And, for the baroque need of admin vq which
-most devices don't have you are duplicating logic and wasting memory for
-everyone.
+If an existing device exposes a small
+capability matching old size, then you change size then
+the check will fail on the existing device and driver won't load.
 
-What is a sane solution? virtio core was never designed to
-allow two drivers accessing the same device. So don't try, add the logic
-of device access in virtio core.  I feel the problem won't even exist if
-instead of just exposing the device pointer you expose a sane interface.
+All this happens way before feature bit checks.
 
 
 > > > > 
-> > > >        /* MSI-X support */
-> > > >        int msix_enabled;
+> > > > Â  struct virtio_pci_modern_device {
 > > > > -- 
 > > > > 2.27.0
 > > > 
