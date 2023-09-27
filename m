@@ -2,73 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D04847AF909
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 06:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E0E87AF9A5
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 06:46:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjI0EKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 00:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39588 "EHLO
+        id S229844AbjI0Eq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 00:46:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbjI0EJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 00:09:27 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B664140D7;
-        Tue, 26 Sep 2023 20:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695785118; x=1727321118;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MqAR84HcFnlcSI6e30scf9vscDeb/onORUUaIdDgZzU=;
-  b=nv2XGAy8QEDl5vq/pQwk+seeTCzQAk18MO4wt74uD1I2kw3AMUsBH6QL
-   rykZYZNqbRpS7mpwPWjhz91P8bNdiVrV/7rn/dg80tFFJ1qVLI7n1TiEZ
-   Fm7TyCcWnDbPbFXozGJ6jfBnyjg6bcndTvkM1vZ3uGsfVJE4oWXY0wk8v
-   /0+suvZBljCGCdZDfQWyhQdciPjdE6j8nWlSawuh6hYltJDTDfZDplYDJ
-   kD0kP5sUxIM0Xcdp6QxboeixNd5UJv7EoEN8lrY7C5hSxdYYZf5QEWmt+
-   J58Wdqn388aodBqBs+7PzuO2l9ic0Ecujjh+EyMzQABlRp8wjuK/nykOT
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="366780898"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="366780898"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 20:25:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="864637335"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="864637335"
-Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga002.fm.intel.com with ESMTP; 26 Sep 2023 20:25:12 -0700
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
+        with ESMTP id S229786AbjI0EqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 00:46:07 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E5E55A1
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 21:09:43 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-56f75e70190so10379832a12.3
+        for <kvm@vger.kernel.org>; Tue, 26 Sep 2023 21:09:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695787782; x=1696392582; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ql59ZozAfruWu53p0E9BV+7cxW/ZoWb0OlAlk4/Vjw=;
+        b=UM/GOjCpoo8qNFNaAEdIRqNSP8oxkwyg8CSIMlQEktQ1SzaIbNW2OGCoIKcMw4yvs9
+         MUzxsfh9FVdBYex84euDLepmXWYJG/N9SRsKd7CpE4HncOxFikLNWKN3qw3MraOHaxsj
+         WdxfkTWwkhXxWtUPidRIqd8wiCttQWyfygU5Zb47uTUT9HHnmbVnb2BjbkUj9pxDWg2Y
+         U2EC+9Gi57RS+xy/3SBOyYHLEshOQ5M/qbLw/IyGbV1hHM6mFMV1l9FB4MNnWrs6MdNI
+         xyz1naUaEvcHlko2sc/bvYkhXFdPriJjJQ/okOPSNt6dqezBBSerPYyBJdtxc54akx8+
+         M3/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695787782; x=1696392582;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ql59ZozAfruWu53p0E9BV+7cxW/ZoWb0OlAlk4/Vjw=;
+        b=aaEZZk8LWESMFW3JymSXx9dgXH1Ml4+U4r/U468ABtkXHzVInL92O9YOhP79Yf3HOM
+         MjTkWf7NbqVcJUNsPHwdygpwoQUs0FRUKcaY1SilZ3fozHuxsoFfYJNgYf167Graw79B
+         yOEXdZkNnyi8I3MPa7rm75BeZhqGEBhU41JvouAjqVLrbxoYJAkHc7g4U4n1nz4t1pEK
+         Wn/z3V/TxsPqzcpXdM8ps2YgVmDmB5bjCUceNEypi3ayc9DLmHhXi6O/0od6Gl28kcA2
+         Gjg2xjBa9p2+Qb4ruXji/tYIEWpSJv1w/8Mnqi4RB0nPCm+JhtxjhlxoFvT9bluw4Bed
+         l1+g==
+X-Gm-Message-State: AOJu0YxQz2RzHAI37Y8kX1JEgYCMCNNeo/MXFvspwUid57OgIKepuSMC
+        /AdpIsSUEBWGFnsXbgCskWclTjOTiPrC
+X-Google-Smtp-Source: AGHT+IEmkcTNFiQOlPL5NwYJupyVhxFbA7jHApnSwyGleZLx9KVfWy152cd4H41ikrjuq2D2emu/i912bnN1
+X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
+ job=sendgmr) by 2002:a63:7e5c:0:b0:57c:856a:5010 with SMTP id
+ o28-20020a637e5c000000b0057c856a5010mr7844pgn.10.1695787782528; Tue, 26 Sep
+ 2023 21:09:42 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Wed, 27 Sep 2023 04:09:39 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230927040939.342643-1-mizhang@google.com>
+Subject: [PATCH] KVM: x86: Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ_NMI)
+From:   Mingwei Zhang <mizhang@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>
-Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [Patch v4 13/13] KVM: x86/pmu: Expose Topdown in MSR_IA32_PERF_CAPABILITIES
-Date:   Wed, 27 Sep 2023 11:31:24 +0800
-Message-Id: <20230927033124.1226509-14-dapeng1.mi@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
-References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <likexu@tencent.com>, Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,44 +70,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Topdown support is enumerated via IA32_PERF_CAPABILITIES[bit 15]. Enable
-this bit for guest when the feature is available on host.
+Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ_NMI).
+When vPMU is active use, processing each KVM_REQ_PMI will generate a
+KVM_REQ_NMI. Existing control flow after KVM_REQ_PMI finished will fail the
+guest enter, jump to kvm_x86_cancel_injection(), and re-enter
+vcpu_enter_guest(), this wasted lot of cycles and increase the overhead for
+vPMU as well as the virtualization.
 
-Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+So move the code snippet of kvm_check_request(KVM_REQ_NMI) to make KVM
+runloop more efficient with vPMU.
+
+To evaluate the effectiveness of this change, we launch a 8-vcpu QEMU VM on
+an Intel SPR CPU. In the VM, we run perf with all 48 events Intel vtune
+uses. In addition, we use SPEC2017 benchmark programs as the workload with
+the setup of using single core, single thread.
+
+At the host level, we probe the invocations to vmx_cancel_injection() with
+the following command:
+
+    $ perf probe -a vmx_cancel_injection
+    $ perf stat -a -e probe:vmx_cancel_injection -I 10000 # per 10 seconds
+
+The following is the result that we collected at beginning of the spec2017
+benchmark run (so mostly for 500.perlbench_r in spec2017). Kindly forgive
+the incompleteness.
+
+On kernel without the change:
+    10.010018010              14254      probe:vmx_cancel_injection
+    20.037646388              15207      probe:vmx_cancel_injection
+    30.078739816              15261      probe:vmx_cancel_injection
+    40.114033258              15085      probe:vmx_cancel_injection
+    50.149297460              15112      probe:vmx_cancel_injection
+    60.185103088              15104      probe:vmx_cancel_injection
+
+On kernel with the change:
+    10.003595390                 40      probe:vmx_cancel_injection
+    20.017855682                 31      probe:vmx_cancel_injection
+    30.028355883                 34      probe:vmx_cancel_injection
+    40.038686298                 31      probe:vmx_cancel_injection
+    50.048795162                 20      probe:vmx_cancel_injection
+    60.069057747                 19      probe:vmx_cancel_injection
+
+From the above, it is clear that we save 1500 invocations per vcpu per
+second to vmx_cancel_injection() for workloads like perlbench.
+
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 3 +++
- arch/x86/kvm/vmx/vmx.c       | 2 ++
- 2 files changed, 5 insertions(+)
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 04ccb8c6f7e4..5783cde00054 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -614,6 +614,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
- 	pmu->global_ctrl_mask = counter_mask;
- 
-+	if (intel_pmu_metrics_is_enabled(vcpu))
-+		pmu->global_ctrl_mask &= ~(1ULL << GLOBAL_CTRL_EN_PERF_METRICS);
-+
- 	/*
- 	 * GLOBAL_STATUS and GLOBAL_OVF_CONTROL (a.k.a. GLOBAL_STATUS_RESET)
- 	 * share reserved bit definitions.  The kernel just happens to use
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 72e3943f3693..5686a74c14bb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7850,6 +7850,8 @@ static u64 vmx_get_perf_capabilities(void)
- 			perf_cap &= ~PERF_CAP_PEBS_BASELINE;
- 	}
- 
-+	perf_cap |= host_perf_cap & PMU_CAP_PERF_METRICS;
-+
- 	return perf_cap;
- }
- 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 42a4e8f5e89a..302b6f8ddfb1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10580,12 +10580,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_SMI, vcpu))
+ 			process_smi(vcpu);
+ #endif
+-		if (kvm_check_request(KVM_REQ_NMI, vcpu))
+-			process_nmi(vcpu);
+ 		if (kvm_check_request(KVM_REQ_PMU, vcpu))
+ 			kvm_pmu_handle_event(vcpu);
+ 		if (kvm_check_request(KVM_REQ_PMI, vcpu))
+ 			kvm_pmu_deliver_pmi(vcpu);
++		if (kvm_check_request(KVM_REQ_NMI, vcpu))
++			process_nmi(vcpu);
+ 		if (kvm_check_request(KVM_REQ_IOAPIC_EOI_EXIT, vcpu)) {
+ 			BUG_ON(vcpu->arch.pending_ioapic_eoi > 255);
+ 			if (test_bit(vcpu->arch.pending_ioapic_eoi,
+
+base-commit: 73554b29bd70546c1a9efc9c160641ef1b849358
 -- 
-2.34.1
+2.42.0.515.g380fc7ccd1-goog
 
