@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 799007AFF79
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AF377AFF7A
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230314AbjI0JJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 05:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55712 "EHLO
+        id S230329AbjI0JJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 05:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230123AbjI0JJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230190AbjI0JJV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 27 Sep 2023 05:09:21 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D358A3
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53768BF
         for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 02:09:19 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAC9C433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3E9C433CA;
         Wed, 27 Sep 2023 09:09:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695805758;
-        bh=LTQi+VhjCvaNyF/flLPnk65Agr514936jHAtuCoD7+g=;
+        s=k20201202; t=1695805759;
+        bh=k1vK2l5uy6QPUr7z0mkBh4JWQyKPl6kf9ryuSnEUE1w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=J9gbOmqzW9rcYZa6yQp9gUcYY+916trg5iK8CuI00QUcfS98oVa//4I1e3bvSO04w
-         1gImU724til9ZshCiwtOSfTUhwx68+8YhHd5FSHybbS04FdEFQbV2F6HCYhtf+VopZ
-         UZ2khhNokSKtGdkrQ1UfJk0qXxgDlQS4S2zM3dp0X/UcV0zrlPe4otQy5HueCKPGPZ
-         Ip5yrkfwlfr6x4GOnA7Am8OD3iYYyb6xa/q6+BY41ria91bHlLaAszNG6Mk+flP3Je
-         xbhcZt1ufuYrInNP4Bz/q42e6jGpF/rLtY/8U5p4cwKFGzsoNSiuTFnS/qLzcFOig7
-         6GXF6xcdtbrig==
+        b=WEX7ydZjwIxb2aNA3/a/s2swNoambupqWeHQks9eVlPtHOnGpr9mYz/jPYnQZuznG
+         fcAn93oqQY/yueClV9yZdOTePaZ8mD8caJbN2/sbdipnG4UmdrAGrMh4OXzwQDfJ0Q
+         uAUl1f2r9O2UdUrAr6jOOCXUIxfyxcOWkL03AZU1Fc0nI7UMDn1N9TwKQJiww2qoHA
+         Hh4Z5aTyAlSbogzIUYxGaO7Mj65aV0IVJsj6DZAKyATgcDiLAdIP2WpEVM1UlLL1aB
+         s7WMEyEaiTGLYi4XtE+wPUXaPwwSsMQUXNOMzYdotkKJNf1pq1aoAVJxIca+XdOYfm
+         /g3LqtFbXX5Bg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qlQXk-00GaLb-DD;
+        id 1qlQXk-00GaLb-JP;
         Wed, 27 Sep 2023 10:09:16 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc:     James Morse <james.morse@arm.com>,
         <shameerali.kolothum.thodi@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 01/11] KVM: arm64: vgic: Make kvm_vgic_inject_irq() take a vcpu pointer
-Date:   Wed, 27 Sep 2023 10:09:01 +0100
-Message-Id: <20230927090911.3355209-2-maz@kernel.org>
+Subject: [PATCH v3 02/11] KVM: arm64: vgic-its: Treat the collection target address as a vcpu_id
+Date:   Wed, 27 Sep 2023 10:09:02 +0100
+Message-Id: <20230927090911.3355209-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
 References: <20230927090911.3355209-1-maz@kernel.org>
@@ -65,189 +65,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Passing a vcpu_id to kvm_vgic_inject_irq() is silly for two reasons:
+Since our emulated ITS advertises GITS_TYPER.PTA=0, the target
+address associated to a collection is a PE number and not
+an address. So far, so good. However, the PE number is what userspace
+has provided given us (aka the vcpu_id), and not the internal vcpu
+index.
 
-- we often confuse vcpu_id and vcpu_idx
-- we eventually have to convert it back to a vcpu
-- we can't count
+Make sure we consistently retrieve the vcpu by ID rather than
+by index, adding a helper that deals with most of the cases.
 
-Instead, pass a vcpu pointer, which is unambiguous. A NULL vcpu
-is also allowed for interrupts that are not private to a vcpu
-(such as SPIs).
+We also get rid of the pointless (and bogus) comparisons to
+online_vcpus, which don't really make sense.
 
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c      |  2 +-
- arch/arm64/kvm/arm.c             | 23 ++++++++---------------
- arch/arm64/kvm/pmu-emul.c        |  2 +-
- arch/arm64/kvm/vgic/vgic-irqfd.c |  2 +-
- arch/arm64/kvm/vgic/vgic.c       | 12 +++++-------
- include/kvm/arm_vgic.h           |  4 ++--
- 6 files changed, 18 insertions(+), 27 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 49 +++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 6dcdae4d38cb..1f828f3b854c 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -458,7 +458,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				   timer_ctx->irq.level);
- 
- 	if (!userspace_irqchip(vcpu->kvm)) {
--		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+		ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
- 					  timer_irq(timer_ctx),
- 					  timer_ctx->irq.level,
- 					  timer_ctx);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4866b3f7b4ea..fa21fb15e927 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1134,27 +1134,23 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 			  bool line_status)
- {
- 	u32 irq = irq_level->irq;
--	unsigned int irq_type, vcpu_idx, irq_num;
--	int nrcpus = atomic_read(&kvm->online_vcpus);
-+	unsigned int irq_type, vcpu_id, irq_num;
- 	struct kvm_vcpu *vcpu = NULL;
- 	bool level = irq_level->level;
- 
- 	irq_type = (irq >> KVM_ARM_IRQ_TYPE_SHIFT) & KVM_ARM_IRQ_TYPE_MASK;
--	vcpu_idx = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
--	vcpu_idx += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
-+	vcpu_id = (irq >> KVM_ARM_IRQ_VCPU_SHIFT) & KVM_ARM_IRQ_VCPU_MASK;
-+	vcpu_id += ((irq >> KVM_ARM_IRQ_VCPU2_SHIFT) & KVM_ARM_IRQ_VCPU2_MASK) * (KVM_ARM_IRQ_VCPU_MASK + 1);
- 	irq_num = (irq >> KVM_ARM_IRQ_NUM_SHIFT) & KVM_ARM_IRQ_NUM_MASK;
- 
--	trace_kvm_irq_line(irq_type, vcpu_idx, irq_num, irq_level->level);
-+	trace_kvm_irq_line(irq_type, vcpu_id, irq_num, irq_level->level);
- 
- 	switch (irq_type) {
- 	case KVM_ARM_IRQ_TYPE_CPU:
- 		if (irqchip_in_kernel(kvm))
- 			return -ENXIO;
- 
--		if (vcpu_idx >= nrcpus)
--			return -EINVAL;
--
--		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-+		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
- 		if (!vcpu)
- 			return -EINVAL;
- 
-@@ -1166,17 +1162,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (!irqchip_in_kernel(kvm))
- 			return -ENXIO;
- 
--		if (vcpu_idx >= nrcpus)
--			return -EINVAL;
--
--		vcpu = kvm_get_vcpu(kvm, vcpu_idx);
-+		vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
- 		if (!vcpu)
- 			return -EINVAL;
- 
- 		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
- 			return -EINVAL;
- 
--		return kvm_vgic_inject_irq(kvm, vcpu->vcpu_id, irq_num, level, NULL);
-+		return kvm_vgic_inject_irq(kvm, vcpu, irq_num, level, NULL);
- 	case KVM_ARM_IRQ_TYPE_SPI:
- 		if (!irqchip_in_kernel(kvm))
- 			return -ENXIO;
-@@ -1184,7 +1177,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
- 		if (irq_num < VGIC_NR_PRIVATE_IRQS)
- 			return -EINVAL;
- 
--		return kvm_vgic_inject_irq(kvm, 0, irq_num, level, NULL);
-+		return kvm_vgic_inject_irq(kvm, NULL, irq_num, level, NULL);
- 	}
- 
- 	return -EINVAL;
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 6b066e04dc5d..3afb281ed8d2 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -348,7 +348,7 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
- 	pmu->irq_level = overflow;
- 
- 	if (likely(irqchip_in_kernel(vcpu->kvm))) {
--		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+		int ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu,
- 					      pmu->irq_num, overflow, pmu);
- 		WARN_ON(ret);
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 475059bacedf..8c711deb25aa 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -23,7 +23,7 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
- 
- 	if (!vgic_valid_spi(kvm, spi_id))
- 		return -EINVAL;
--	return kvm_vgic_inject_irq(kvm, 0, spi_id, level, NULL);
-+	return kvm_vgic_inject_irq(kvm, NULL, spi_id, level, NULL);
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 5fe2365a629f..2dad2d095160 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -378,6 +378,12 @@ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ 	return ret;
  }
  
- /**
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 8be4c1ebdec2..db2a95762b1b 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -422,7 +422,7 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- /**
-  * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-  * @kvm:     The VM structure pointer
-- * @cpuid:   The CPU for PPIs
-+ * @vcpu:    The CPU for PPIs or NULL for global interrupts
-  * @intid:   The INTID to inject a new state to.
-  * @level:   Edge-triggered:  true:  to trigger the interrupt
-  *			      false: to ignore the call
-@@ -436,24 +436,22 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
-  * level-sensitive interrupts.  You can think of the level parameter as 1
-  * being HIGH and 0 being LOW and all devices being active-HIGH.
-  */
--int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			bool level, void *owner)
-+int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+			unsigned int intid, bool level, void *owner)
- {
--	struct kvm_vcpu *vcpu;
- 	struct vgic_irq *irq;
- 	unsigned long flags;
- 	int ret;
- 
--	trace_vgic_update_irq_pending(cpuid, intid, level);
--
- 	ret = vgic_lazy_init(kvm);
- 	if (ret)
- 		return ret;
- 
--	vcpu = kvm_get_vcpu(kvm, cpuid);
- 	if (!vcpu && intid < VGIC_NR_PRIVATE_IRQS)
- 		return -EINVAL;
- 
-+	trace_vgic_update_irq_pending(vcpu ? vcpu->vcpu_idx : 0, intid, level);
++static struct kvm_vcpu *collection_to_vcpu(struct kvm *kvm,
++					   struct its_collection *col)
++{
++	return kvm_get_vcpu_by_id(kvm, col->target_addr);
++}
 +
- 	irq = vgic_get_irq(kvm, vcpu, intid);
- 	if (!irq)
- 		return -EINVAL;
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 5b27f94d4fad..8cc38e836f54 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -375,8 +375,8 @@ int kvm_vgic_map_resources(struct kvm *kvm);
- int kvm_vgic_hyp_init(void);
- void kvm_vgic_init_cpu_hardware(void);
+ /*
+  * Promotes the ITS view of affinity of an ITTE (which redistributor this LPI
+  * is targeting) to the VGIC's view, which deals with target VCPUs.
+@@ -391,7 +397,7 @@ static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
+ 	if (!its_is_collection_mapped(ite->collection))
+ 		return;
  
--int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
--			bool level, void *owner);
-+int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+			unsigned int intid, bool level, void *owner);
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 			  u32 vintid, struct irq_ops *ops);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
+-	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
++	vcpu = collection_to_vcpu(kvm, ite->collection);
+ 	update_affinity(ite->irq, vcpu);
+ }
+ 
+@@ -679,7 +685,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 	if (!ite || !its_is_collection_mapped(ite->collection))
+ 		return E_ITS_INT_UNMAPPED_INTERRUPT;
+ 
+-	vcpu = kvm_get_vcpu(kvm, ite->collection->target_addr);
++	vcpu = collection_to_vcpu(kvm, ite->collection);
+ 	if (!vcpu)
+ 		return E_ITS_INT_UNMAPPED_INTERRUPT;
+ 
+@@ -887,7 +893,7 @@ static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
+ 		return E_ITS_MOVI_UNMAPPED_COLLECTION;
+ 
+ 	ite->collection = collection;
+-	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++	vcpu = collection_to_vcpu(kvm, collection);
+ 
+ 	vgic_its_invalidate_cache(kvm);
+ 
+@@ -1121,7 +1127,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	}
+ 
+ 	if (its_is_collection_mapped(collection))
+-		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++		vcpu = collection_to_vcpu(kvm, collection);
+ 
+ 	irq = vgic_add_lpi(kvm, lpi_nr, vcpu);
+ 	if (IS_ERR(irq)) {
+@@ -1242,21 +1248,22 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
+ 				    u64 *its_cmd)
+ {
+ 	u16 coll_id;
+-	u32 target_addr;
+ 	struct its_collection *collection;
+ 	bool valid;
+ 
+ 	valid = its_cmd_get_validbit(its_cmd);
+ 	coll_id = its_cmd_get_collection(its_cmd);
+-	target_addr = its_cmd_get_target_addr(its_cmd);
+-
+-	if (target_addr >= atomic_read(&kvm->online_vcpus))
+-		return E_ITS_MAPC_PROCNUM_OOR;
+ 
+ 	if (!valid) {
+ 		vgic_its_free_collection(its, coll_id);
+ 		vgic_its_invalidate_cache(kvm);
+ 	} else {
++		struct kvm_vcpu *vcpu;
++
++		vcpu = kvm_get_vcpu_by_id(kvm, its_cmd_get_target_addr(its_cmd));
++		if (!vcpu)
++			return E_ITS_MAPC_PROCNUM_OOR;
++
+ 		collection = find_collection(its, coll_id);
+ 
+ 		if (!collection) {
+@@ -1270,9 +1277,9 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
+ 							coll_id);
+ 			if (ret)
+ 				return ret;
+-			collection->target_addr = target_addr;
++			collection->target_addr = vcpu->vcpu_id;
+ 		} else {
+-			collection->target_addr = target_addr;
++			collection->target_addr = vcpu->vcpu_id;
+ 			update_affinity_collection(kvm, its, collection);
+ 		}
+ 	}
+@@ -1382,7 +1389,7 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ 	if (!its_is_collection_mapped(collection))
+ 		return E_ITS_INVALL_UNMAPPED_COLLECTION;
+ 
+-	vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++	vcpu = collection_to_vcpu(kvm, collection);
+ 	vgic_its_invall(vcpu);
+ 
+ 	return 0;
+@@ -1399,23 +1406,21 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
+ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
+ 				      u64 *its_cmd)
+ {
+-	u32 target1_addr = its_cmd_get_target_addr(its_cmd);
+-	u32 target2_addr = its_cmd_mask_field(its_cmd, 3, 16, 32);
+ 	struct kvm_vcpu *vcpu1, *vcpu2;
+ 	struct vgic_irq *irq;
+ 	u32 *intids;
+ 	int irq_count, i;
+ 
+-	if (target1_addr >= atomic_read(&kvm->online_vcpus) ||
+-	    target2_addr >= atomic_read(&kvm->online_vcpus))
++	/* We advertise GITS_TYPER.PTA==0, making the address the vcpu ID */
++	vcpu1 = kvm_get_vcpu_by_id(kvm, its_cmd_get_target_addr(its_cmd));
++	vcpu2 = kvm_get_vcpu_by_id(kvm, its_cmd_mask_field(its_cmd, 3, 16, 32));
++
++	if (!vcpu1 || !vcpu2)
+ 		return E_ITS_MOVALL_PROCNUM_OOR;
+ 
+-	if (target1_addr == target2_addr)
++	if (vcpu1 == vcpu2)
+ 		return 0;
+ 
+-	vcpu1 = kvm_get_vcpu(kvm, target1_addr);
+-	vcpu2 = kvm_get_vcpu(kvm, target2_addr);
+-
+ 	irq_count = vgic_copy_lpi_list(kvm, vcpu1, &intids);
+ 	if (irq_count < 0)
+ 		return irq_count;
+@@ -2258,7 +2263,7 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+ 		return PTR_ERR(ite);
+ 
+ 	if (its_is_collection_mapped(collection))
+-		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
++		vcpu = kvm_get_vcpu_by_id(kvm, collection->target_addr);
+ 
+ 	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
+ 	if (IS_ERR(irq)) {
+@@ -2573,7 +2578,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa, int esz)
+ 	coll_id = val & KVM_ITS_CTE_ICID_MASK;
+ 
+ 	if (target_addr != COLLECTION_NOT_MAPPED &&
+-	    target_addr >= atomic_read(&kvm->online_vcpus))
++	    !kvm_get_vcpu_by_id(kvm, target_addr))
+ 		return -EINVAL;
+ 
+ 	collection = find_collection(its, coll_id);
 -- 
 2.34.1
 
