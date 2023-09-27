@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AF477AFF78
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93DC77AFF7D
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230109AbjI0JJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 05:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55722 "EHLO
+        id S230383AbjI0JJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 05:09:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbjI0JJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230196AbjI0JJV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 27 Sep 2023 05:09:21 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50337D6
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 02:09:20 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B578BC433D9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F7CB3
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 02:09:21 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBD11C43391;
         Wed, 27 Sep 2023 09:09:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695805759;
-        bh=kU23CEv+nBYaQuElLBiPmIVf/MmSLfglEUFHhMry2OE=;
+        s=k20201202; t=1695805760;
+        bh=e79+/EAHtMsV+a8mcXU8ZVifInguWMi+6TWA76xpJlY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZZ+qf0JaaWsBigV0QttbNQRLOaGqMly2id3+fWaRZhxx5e+dJfpnpAOUtK9FZKB2Q
-         adNiindodX1FgdVLvCFCL+ROsssQtqwjmLiIr4ViEGh6zE3BX2L6CBPMGxbGCWU4EQ
-         GFNkp42WOGLK36QRtqMk9F0ANUAsU8ChvzRmtSPXwje3yTg3fdmtLuI1ArsNtIxwp2
-         fCj77hr0N1hsMdX7HDE4qEqrd5rIRr5m4nSzr1yB41UkGegn2f1x4MzMeo2REa/Uyi
-         7jqmsuWT9FEjGxHfS8RD2g79vy1RRGoU85bq3ABHK1il6IASjW+lT/+tBKhQw/+TVL
-         twhW9LiC+vXaA==
+        b=FHd/igxwSimZUGt4Xr4/oyS1TZkatemT9pp66wOV0Y5xSOAVT9hvU/vzdCJxkbxf9
+         n16Js+V42T37Cd/GFsM7gB1cq7cB0DuPZ69gXSpTM9DAKXRBNI3A0cbb/oUxRmmoJ6
+         rNd1Xy6mWWtBU5hUIZN42BtcR2e5MJrJif9RU3kExXVEsiPFhua8qaZdgEfP0aMkRU
+         OgISdcB98I5vuYCPiVxF/tTZX+IAcyNjLtBS2HDx/QlJi+0FKJRUKDOCQGnqqNJpIG
+         lr6XGoox+jVrKlvwH75UyApVOUh6Xiic8+JtGC3i/jYfDebpzXu8VT0dNxzhBH7yJm
+         QQNPM6oKfJEcA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qlQXl-00GaLb-KP;
+        id 1qlQXl-00GaLb-SB;
         Wed, 27 Sep 2023 10:09:17 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc:     James Morse <james.morse@arm.com>,
         <shameerali.kolothum.thodi@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 06/11] KVM: arm64: Use vcpu_idx for invalidation tracking
-Date:   Wed, 27 Sep 2023 10:09:06 +0100
-Message-Id: <20230927090911.3355209-7-maz@kernel.org>
+Subject: [PATCH v3 07/11] KVM: arm64: Simplify kvm_vcpu_get_mpidr_aff()
+Date:   Wed, 27 Sep 2023 10:09:07 +0100
+Message-Id: <20230927090911.3355209-8-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
 References: <20230927090911.3355209-1-maz@kernel.org>
@@ -65,35 +65,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-While vcpu_id isn't necessarily a bad choice as an identifier for
-the currently running vcpu, it is provided by userspace, and there
-is close to no guarantee that it would be unique.
+By definition, MPIDR_EL1 cannot be modified by the guest. This
+means it is pointless to check whether this is loaded on the CPU.
 
-Switch it to vcpu_idx instead, for which we have much stronger
-guarantees.
+Simplify the kvm_vcpu_get_mpidr_aff() helper to directly access
+the in-memory value.
 
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Tested-by: Joey Gouly <joey.gouly@arm.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fa21fb15e927..9379a1227501 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -438,9 +438,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * We might get preempted before the vCPU actually runs, but
- 	 * over-invalidation doesn't affect correctness.
- 	 */
--	if (*last_ran != vcpu->vcpu_id) {
-+	if (*last_ran != vcpu->vcpu_idx) {
- 		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
--		*last_ran = vcpu->vcpu_id;
-+		*last_ran = vcpu->vcpu_idx;
- 	}
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 3d6725ff0bf6..b66ef77cf49e 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -465,7 +465,7 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
  
- 	vcpu->cpu = cpu;
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+-	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
++	return __vcpu_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+ }
+ 
+ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
