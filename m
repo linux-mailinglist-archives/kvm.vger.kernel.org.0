@@ -2,161 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD93E7B0EC9
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 00:11:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85FB27B0EEA
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 00:31:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbjI0WLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 18:11:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60752 "EHLO
+        id S229500AbjI0Wba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 18:31:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjI0WLW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 18:11:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2434FB
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:10:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695852629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R9iI6aitaK8wnBwec9NLhgPYuNdDj2OC/qEBurzsj6w=;
-        b=bFmJt3Yy6c0YudPUt1XTrPRLAkbvnvpU4cCA1nwbK/X00sabOYyGvcZeT3djg3Wjb5W7nz
-        Ifly9PkfqDFNMIYqgu+n4TOMJlKkv/K41y47Fbsuj+HK/T1Ebzl+mRu2c2wRwUIzmq3eee
-        uk9TQnY+F8nDngG+u9NrExoLCr7tWX0=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-rrkXZ0AWOVCDkcdVaWQLJg-1; Wed, 27 Sep 2023 18:10:27 -0400
-X-MC-Unique: rrkXZ0AWOVCDkcdVaWQLJg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-79fb8c243adso1258935239f.3
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:10:26 -0700 (PDT)
+        with ESMTP id S229639AbjI0Wb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 18:31:28 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA71102
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:31:26 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f4f2b6de8so198209497b3.1
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:31:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695853885; x=1696458685; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yPFPSld1QoxNNv2eOiTPtaeDc/jtQaoLteL64zdeiXU=;
+        b=kZ4XSwqVrMmKuD8FA7L0Wj44EDWvr11JwzdxaVcNe1IgX7jFd5gmKu4N4pgBYweuiC
+         OKrcoe5QNWVrnwdqJ6mnfNr2X5nUXWH/m0TdEP1f+mGdgEIXMgpV48e9bSJijmjQ14O4
+         Teo+a4oUm80LZz3uo90XmohNkPdtS/8dPBaXYA76b+IsP+iaV0+vepyFnCyIjI1Nk+Lb
+         jKcOVg22xhp7VuXQjYEmmgH4iaZAFvWfQRYrY19R3GGBOnPcGKmu7Q9jk83AxpJ8jf19
+         1lBcM/tux1Rmn4Un+Ssl80mfh02FxatpUEaBJQ+9hQbevKsu8cM7wWKphJKf1WLtgICK
+         uEJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695852626; x=1696457426;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R9iI6aitaK8wnBwec9NLhgPYuNdDj2OC/qEBurzsj6w=;
-        b=EcCSXbmRne3lLKlYFJeyyOPVwQCsZItlDeRs8P6p+Y+aPqb2TyGhidG9/XD5Tz3tnV
-         uNN5YmaJRuBdYtCJsq1LwSRLlLdk77Uq0DaPo8JBWCwSdbcxUmXPfumhxuzWHsZmrQyF
-         f1fXEcS3NkOTyvtxTsAQgBxMtR/xGdmFDjDSG9cuZEXDA9srxePgVINdW2iCaftOSqGk
-         dKhzslAnDiyHNTangGo91GaKQFsJgIR60kt9z/m+2LUdkFkIfU6yM5p/l6ddghMseRkL
-         xDjQPhpowPezwqI7oaAG2fsSd67T0RdabEk8ronJUDyfhBGbiTdZJVP6BIF5fTRpbiPf
-         vgDg==
-X-Gm-Message-State: AOJu0YwGzX/h0aNVlLoaRJ2xTl4UQPMiMrftKfHc7btz5foz7+xD5cBH
-        SsOY2LyusHc0VnPb8sqAVC+FAyb28c9Ip/4uZTm4caTcmLGjqPF56Q1r6QMUoRC+Ob3d799mKlB
-        qTi7Wj77JM/+8GfirZ5jW
-X-Received: by 2002:a6b:d002:0:b0:792:9ace:f7ba with SMTP id x2-20020a6bd002000000b007929acef7bamr2980329ioa.11.1695852626074;
-        Wed, 27 Sep 2023 15:10:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpnr6YUXldGOLp6Xuco2aiCp6CDkPaeC613WVlNhKuMjB6qyecrW6rljhtDAG4m2s53cg58Q==
-X-Received: by 2002:a6b:d002:0:b0:792:9ace:f7ba with SMTP id x2-20020a6bd002000000b007929acef7bamr2980317ioa.11.1695852625812;
-        Wed, 27 Sep 2023 15:10:25 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id f13-20020a056638022d00b0042b2959e6dcsm4263427jaq.87.2023.09.27.15.10.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 15:10:24 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 16:10:23 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
-        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
-        <leonro@nvidia.com>, <maorg@nvidia.com>
-Subject: Re: [PATCH vfio 0/9] Add chunk mode support for mlx5 driver
-Message-ID: <20230927161023.7e13c06f.alex.williamson@redhat.com>
-In-Reply-To: <78298eea-b264-1739-9ded-7d8fa9c7208e@nvidia.com>
-References: <20230911093856.81910-1-yishaih@nvidia.com>
-        <20230920183123.GJ13733@nvidia.com>
-        <78298eea-b264-1739-9ded-7d8fa9c7208e@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1695853885; x=1696458685;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yPFPSld1QoxNNv2eOiTPtaeDc/jtQaoLteL64zdeiXU=;
+        b=Ezjb+nPGNY8I3JdU45/6wkRR4QEV2RQdAE7Oy99jGfLgAzVVG+74UTrSXhcRKcjyyc
+         mXyi0+FupV2a1a+LoTGZpIMr+2icM3KaIHCvVnk61O3du0fKTVMvN0TrvPOLGOfv0J2c
+         LAeWkNaQu3ryRWN6sgXf+O8VmE2w7jXd4C/l02qIR/6uxWMasu+TUkckpbN+ErfPU2lL
+         AeW4nqy2rP4edU/PhBULyFX+Wj2BYbUHpscfxUZJlij1fJZp+ECzk497oiKYW8rla+d/
+         EdaAkZadoO+lhP9Z5L4vPVy20dL+OlaQWXutkviyEpVezip/x9dEda+rwG1k0atlFf2u
+         z4dw==
+X-Gm-Message-State: AOJu0YzREEai5hVoMeeIO+L1g1zWR4xYMMk8UQbG7cacIUQx2lIHkRkI
+        k/52UITF8DZRcRBxh8AaNkzB8rysAR8=
+X-Google-Smtp-Source: AGHT+IHzMWTwaEgO6mf9o8MaJUtvk19Egxe0QVczeyRnzbzsBUsGOjmR+c7nEst3ug6Uxjox+Nt5NLKNrf4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ad25:0:b0:59f:3cde:b33a with SMTP id
+ l37-20020a81ad25000000b0059f3cdeb33amr50816ywh.6.1695853885399; Wed, 27 Sep
+ 2023 15:31:25 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 15:31:23 -0700
+In-Reply-To: <20230824215244.3897419-1-kyle.meyer@hpe.com>
+Mime-Version: 1.0
+References: <20230824215244.3897419-1-kyle.meyer@hpe.com>
+Message-ID: <ZRStOxiGwvDwGlNq@google.com>
+Subject: Re: [PATCH v3] KVM: x86: Add CONFIG_KVM_MAX_NR_VCPUS
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kyle Meyer <kyle.meyer@hpe.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@intel.com, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        vkuznets@redhat.com, dmatlack@google.com, russ.anderson@hpe.com,
+        dimitri.sivanich@hpe.com, steve.wahl@hpe.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Sep 2023 13:59:06 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Thu, Aug 24, 2023, Kyle Meyer wrote:
+> Add a Kconfig entry to set the maximum number of vCPUs per KVM guest and
+> set the default value to 4096 when MAXSMP is enabled.
 
-> On 20/09/2023 21:31, Jason Gunthorpe wrote:
-> > On Mon, Sep 11, 2023 at 12:38:47PM +0300, Yishai Hadas wrote:  
-> >> This series adds 'chunk mode' support for mlx5 driver upon the migration
-> >> flow.
-> >>
-> >> Before this series, we were limited to 4GB state size, as of the 4 bytes
-> >> max value based on the device specification for the query/save/load
-> >> commands.
-> >>
-> >> Once the device supports 'chunk mode' the driver can support state size
-> >> which is larger than 4GB.
-> >>
-> >> In that case, the device has the capability to split a single image to
-> >> multiple chunks as long as the software provides a buffer in the minimum
-> >> size reported by the device.
-> >>
-> >> The driver should query for the minimum buffer size required using
-> >> QUERY_VHCA_MIGRATION_STATE command with the 'chunk' bit set in its
-> >> input, in that case, the output will include both the minimum buffer
-> >> size and also the remaining total size to be reported/used where it will
-> >> be applicable.
-> >>
-> >> Upon chunk mode, there may be multiple images that will be read from the
-> >> device upon STOP_COPY. The driver will read ahead from the firmware the
-> >> full state in small/optimized chunks while letting QEMU/user space read
-> >> in parallel the available data.
-> >>
-> >> The chunk buffer size is picked up based on the minimum size that
-> >> firmware requires, the total full size and some max value in the driver
-> >> code which was set to 8MB to achieve some optimized downtime in the
-> >> general case.
-> >>
-> >> With that series in place, we could migrate successfully a device state
-> >> with a larger size than 4GB, while even improving the downtime in some
-> >> scenarios.
-> >>
-> >> Note:
-> >> As the first patch should go to net/mlx5 we may need to send it as a
-> >> pull request format to VFIO to avoid conflicts before acceptance.
-> >>
-> >> Yishai
-> >>
-> >> Yishai Hadas (9):
-> >>    net/mlx5: Introduce ifc bits for migration in a chunk mode
-> >>    vfio/mlx5: Wake up the reader post of disabling the SAVING migration
-> >>      file
-> >>    vfio/mlx5: Refactor the SAVE callback to activate a work only upon an
-> >>      error
-> >>    vfio/mlx5: Enable querying state size which is > 4GB
-> >>    vfio/mlx5: Rename some stuff to match chunk mode
-> >>    vfio/mlx5: Pre-allocate chunks for the STOP_COPY phase
-> >>    vfio/mlx5: Add support for SAVING in chunk mode
-> >>    vfio/mlx5: Add support for READING in chunk mode
-> >>    vfio/mlx5: Activate the chunk mode functionality  
-> > I didn't check in great depth but this looks OK to me
-> >
-> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>  
-> 
-> Thanks Jason
-> 
-> >
-> > I think this is a good design to start motivating more qmeu
-> > improvements, eg using io_uring as we could go further in the driver
-> > to optimize with that kind of support.
-> >
-> > Jason  
-> 
-> Alex,
-> 
-> Can we move forward with the series and send a PR for the first patch 
-> that needs to go also to net/mlx5 ?
+I'd like to capture why the max is set to 4096, both the justification and why
+we don't want to go further at this point.
 
-Yeah, I don't spot any issues with it either.  Thanks,
+If you've no objection, I'll massage the changelog to this when applying:
 
-Alex
+  Add a Kconfig entry to set the maximum number of vCPUs per KVM guest and
+  set the default value to 4096 when MAXSMP is enabled, as there are use
+  cases that want to create more than the currently allow 1024 vCPUs and
+  are more than happy to eat the memory overhead.
 
+  The Hyper-V TLFS doesn't allow more than 64 sparse banks, i.e. allows a
+  maximum of 4096 virtual CPUs. Cap KVM's maximum number of virtual CPUs
+  to 4096 to avoid exceeding Hyper-V's limit as KVM support for Hyper-V is
+  unconditional, and alternatives like dynamically disabling Hyper-V
+  enlightenments that rely on sparse banks would require non-trivial code
+  changes.
+
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Kyle Meyer <kyle.meyer@hpe.com>
+> ---
+> v2 -> v3: Default KVM_MAX_VCPUS to 1024 when CONFIG_KVM_MAX_NR_VCPUS is not
+> defined. This prevents build failures in arch/x86/events/intel/core.c and
+> drivers/vfio/vfio_main.c when KVM is disabled.
+> 
+>  arch/x86/include/asm/kvm_host.h |  4 ++++
+>  arch/x86/kvm/Kconfig            | 11 +++++++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3bc146dfd38d..cd27e0a00765 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -39,7 +39,11 @@
+>  
+>  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>  
+
+And another thing I'll add if you don't object is a comment to explain that this
+is purely to play nice with CONFIG_KVM=n.  And FWIW, I hope to make this go away
+entirely: https://lore.kernel.org/all/20230916003118.2540661-27-seanjc@google.com
+
+/*
+ * CONFIG_KVM_MAX_NR_VCPUS is defined iff CONFIG_KVM!=n, provide a dummy max if
+ * KVM is disabled (arbitrarily use default from CONFIG_KVM_MAX_NR_VCPUS).
+ */ 
+
+> +#ifdef CONFIG_KVM_MAX_NR_VCPUS
+> +#define KVM_MAX_VCPUS CONFIG_KVM_MAX_NR_VCPUS
+> +#else
+>  #define KVM_MAX_VCPUS 1024
+> +#endif
+>  
+>  /*
+>   * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 89ca7f4c1464..e730e8255e22 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -141,4 +141,15 @@ config KVM_XEN
+>  config KVM_EXTERNAL_WRITE_TRACKING
+>  	bool
+>  
+> +config KVM_MAX_NR_VCPUS
+> +	int "Maximum number of vCPUs per KVM guest"
+> +	depends on KVM
+> +	range 1024 4096
+> +	default 4096 if MAXSMP
+> +	default 1024
+> +	help
+> +	  Set the maximum number of vCPUs per KVM guest. Larger values will increase
+> +	  the memory footprint of each KVM guest, regardless of how many vCPUs are
+> +	  configured.
+
+Last nit, I think the last linke should be like so:
+
+       the memory footprint of each KVM guest, regardless of how many vCPUs are
+       created for a given VM.
+
+No need for a v4 unless you object to any of the above, I'm happt to fixup when
+applying.
