@@ -2,109 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFE877B0757
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 16:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 074447B077F
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 17:01:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232252AbjI0Ow5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 10:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        id S232248AbjI0PBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 11:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232243AbjI0Owy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 10:52:54 -0400
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F7BF5;
-        Wed, 27 Sep 2023 07:52:52 -0700 (PDT)
-Received: from [127.0.0.1] ([98.35.210.218])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 38REpsBI2813248
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Wed, 27 Sep 2023 07:51:55 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 38REpsBI2813248
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023091101; t=1695826316;
-        bh=MhJAHO9v2jzk2PvwqyNGETAyG1UpCoLntbh2yXQZUBo=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=aMHkj4DOv6DVKNQ2jE/JqTDv2qBKCKxAShqmzZ7y7C+Zw/OitN+OuLKpupSaDjwJz
-         vTeT5e4dp5j+0WoGrSNvIE+EYfKhq/Gbny4pLZzhEX0Z9E48d2Uo8zrv3W/biN0xWK
-         3nyBImm5pKOvKWPV+Qe000I/N5m43n7LNsOG2JUPA3iYHFO+sLliz82f5g/4SakiEz
-         OQR2CAx3IaHTxan5Pu6I1KGdyw27lHWo8cyikgm37DNdsPcruVzwRsapJKcnsJk9JW
-         I+g+vN1DXdpNzgIPOIV7Eu/zalBGDTREa5xWlPpQbACtoARZonM7Lecng3qmQMWZzr
-         eWmUR/REs6aOg==
-Date:   Wed, 27 Sep 2023 07:51:52 -0700
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Nikolay Borisov <nik.borisov@suse.com>, Xin Li <xin3.li@intel.com>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
-CC:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, luto@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, peterz@infradead.org,
-        jgross@suse.com, ravi.v.shankar@intel.com, mhiramat@kernel.org,
-        andrew.cooper3@citrix.com, jiangshanlai@gmail.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v11_05/37=5D_x86/trapnr=3A_Ad?= =?US-ASCII?Q?d_event_type_macros_to_=3Casm/trapnr=2Eh=3E?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <7acd7bb3-0406-4fd9-8396-835bfd951d87@suse.com>
-References: <20230923094212.26520-1-xin3.li@intel.com> <20230923094212.26520-6-xin3.li@intel.com> <7acd7bb3-0406-4fd9-8396-835bfd951d87@suse.com>
-Message-ID: <22A5EA90-8B57-4376-BAE2-0FE982DF4E90@zytor.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232258AbjI0PBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 11:01:36 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D41180
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:01:32 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-690d8fb3b7eso10181866b3a.1
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 08:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1695826892; x=1696431692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yTY333uB+lnx85QRK4UhGRcNGGIw7L3jD83kYOSz/mk=;
+        b=Isgr6KgaqmmexAKyGkB8Hpoivf3+H2r2oB1yNE2ZON1oXyA7UU/kXuh8qBYeFFaeQU
+         4br+w0ziVpC8/buC3NCHU4jla3zb0Dhmzgi2aadrLxO9cOCAIMMgxairPzXDVv8La+Aw
+         PQbtq9qXMYNwa0lcaekQHg76pP8zhHGTU7hc2QSxEdY9BtlJmdRIu8tcp3JNrjMsRYjh
+         RMMV326M1bgXSr7JUTlTdiD4C+irrVVBANvCGdkifTM/2rwyHviNhDI0k+vZpCJbn3Z+
+         ONUVPDltKaqw2CpKPAzGu7ol35YSZkHUE/VcXzYEhG9IuB+Vtyu4SL0bEy0ltItn47qM
+         YdhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695826892; x=1696431692;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yTY333uB+lnx85QRK4UhGRcNGGIw7L3jD83kYOSz/mk=;
+        b=a79SdFvGr9X7DHmOXFHU0AuyjRC9wbSIPVjFx9wei35Z4QgNUMab3k0GNzjeTDnGxG
+         fnzzS9iFpcqD38H46ZMtFek3nUeIl/fPYGXv1SXYfU4zTZfuooXW/QzaqA6u/hhyKh9/
+         zspPUUn8IX7qvbNUEhou6yiD19ReMD2/F82bcW6mGXy8LmGuqvUO+k/xB23yD3y7ftVq
+         OPx2Gm53J/fXPtBglvKDK/iRnLcPijVRPykHTNtGpUkfIvAGWzpgP4jnrV5hXb3wdE6h
+         e3z4RIsdGWlw2myAntf2g68hz/tA90sRa/Y0gH3UVrSvnCnfk1TXg8IhawoZOPKrshDT
+         9NHg==
+X-Gm-Message-State: AOJu0Yw3jxoQop1Xb33fVLI5N2SrPVbTuAdImarH/292HaH7F0fDJHY2
+        3lbCZxEKb+sCgz8wFIoNYyx12g==
+X-Google-Smtp-Source: AGHT+IGS9wTm9vyVcNuS0LVmu2jhxPRdEUlru4/3+hbsDAoZiukfMAFderu5eKF3apag2JrFxYUQQQ==
+X-Received: by 2002:a05:6a20:3d0b:b0:134:4f86:7966 with SMTP id y11-20020a056a203d0b00b001344f867966mr2743151pzi.9.1695826891666;
+        Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
+Received: from localhost ([135.180.227.0])
+        by smtp.gmail.com with ESMTPSA id b19-20020aa78113000000b0069302c3c054sm4003815pfi.207.2023.09.27.08.01.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 08:01:31 -0700 (PDT)
+X-Google-Original-Date: Wed, 27 Sep 2023 08:01:29 PDT (-0700)
+Subject:     Re: [PATCH v2 0/9] KVM RISC-V Conditional Operations
+In-Reply-To: <20230927-snowcap-stadium-2f6aeffac59e@spud>
+CC:     apatel@ventanamicro.com, pbonzini@redhat.com,
+        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        shuah@kernel.org, ajones@ventanamicro.com,
+        mchitale@ventanamicro.com, devicetree@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     Conor Dooley <conor@kernel.org>
+Message-ID: <mhng-ed1b5d0a-469c-43e3-a0fe-b8e498cde538@palmer-ri-x1c9>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On September 26, 2023 1:10:51 AM PDT, Nikolay Borisov <nik=2Eborisov@suse=
-=2Ecom> wrote:
+On Wed, 27 Sep 2023 07:45:28 PDT (-0700), Conor Dooley wrote:
+> On Wed, Sep 27, 2023 at 07:54:49PM +0530, Anup Patel wrote:
+>> On Mon, Sep 25, 2023 at 9:07 PM Conor Dooley <conor@kernel.org> wrote:
+>> >
+>> > On Mon, Sep 25, 2023 at 04:33:15PM +0100, Conor Dooley wrote:
+>> > > On Mon, Sep 25, 2023 at 07:08:50PM +0530, Anup Patel wrote:
+>> > > > This series extends KVM RISC-V to allow Guest/VM discover and use
+>> > > > conditional operations related ISA extensions (namely XVentanaCondOps
+>> > > > and Zicond).
+>> > > >
+>> > > > To try these patches, use KVMTOOL from riscv_zbx_zicntr_smstateen_condops_v1
+>> > > > branch at: https://github.com/avpatel/kvmtool.git
+>> > > >
+>> > > > These patches are based upon the latest riscv_kvm_queue and can also be
+>> > > > found in the riscv_kvm_condops_v2 branch at:
+>> > > > https://github.com/avpatel/linux.git
+>> > > >
+>> > > > Changes since v1:
+>> > > >  - Rebased the series on riscv_kvm_queue
+>> > > >  - Split PATCH1 and PATCH2 of v1 series into two patches
+>> > > >  - Added separate test configs for XVentanaCondOps and Zicond in PATCH7
+>> > > >    of v1 series.
+>> > > >
+>> > > > Anup Patel (9):
+>> > > >   dt-bindings: riscv: Add XVentanaCondOps extension entry
+>> > > >   RISC-V: Detect XVentanaCondOps from ISA string
+>> > > >   dt-bindings: riscv: Add Zicond extension entry
+>> > > >   RISC-V: Detect Zicond from ISA string
+>> > >
+>> > > For these 4:
+>> > > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>> >
+>> > Actually, now that I think of it, I'm going to temporarily un-review this.
+>> > From patch-acceptance.rst:
+>> > | Additionally, the RISC-V specification allows implementers to create
+>> > | their own custom extensions.  These custom extensions aren't required
+>> > | to go through any review or ratification process by the RISC-V
+>> > | Foundation.  To avoid the maintenance complexity and potential
+>> > | performance impact of adding kernel code for implementor-specific
+>> > | RISC-V extensions, we'll only consider patches for extensions that either:
+>> > |
+>> > | - Have been officially frozen or ratified by the RISC-V Foundation, or
+>> > | - Have been implemented in hardware that is widely available, per standard
+>> > |   Linux practice.
+>> >
+>> > The xventanacondops bits don't qualify under the first entry, and I
+>> > don't think they qualify under the second yet. Am I wrong?
+>> 
+>> The Ventana Veyron V1 was announced in Dec 2022 at RISC-V summit
+>> followed by press releases:
+>> https://www.ventanamicro.com/ventana-introduces-veyron-worlds-first-data-center-class-risc-v-cpu-product-family/
+>> https://www.embedded.com/ventana-reveals-risc-v-cpu-compute-chiplet-for-data-center/
+>> https://www.prnewswire.com/news-releases/ventana-introduces-veyron-worlds-first-data-center-class-risc-v-cpu-product-family-301700985.html
+>> 
+>> @Palmer if the above looks good to you then please ack PATCH1-to-4
 >
->
->On 23=2E09=2E23 =D0=B3=2E 12:41 =D1=87=2E, Xin Li wrote:
->> Intel VT-x classifies events into eight different types, which is
->> inherited by FRED for event identification=2E As such, event type
->> becomes a common x86 concept, and should be defined in a common x86
->> header=2E
->>=20
->> Add event type macros to <asm/trapnr=2Eh>, and use it in <asm/vmx=2Eh>=
-=2E
->>=20
->> Suggested-by: H=2E Peter Anvin (Intel) <hpa@zytor=2Ecom>
->> Tested-by: Shan Kang <shan=2Ekang@intel=2Ecom>
->> Signed-off-by: Xin Li <xin3=2Eli@intel=2Ecom>
->> ---
->>=20
->> Changes since v10:
->> * A few comment fixes and improvements (Andrew Cooper)=2E
->> ---
->>   arch/x86/include/asm/trapnr=2Eh | 12 ++++++++++++
->>   arch/x86/include/asm/vmx=2Eh    | 17 +++++++++--------
->>   2 files changed, 21 insertions(+), 8 deletions(-)
->>=20
->> diff --git a/arch/x86/include/asm/trapnr=2Eh b/arch/x86/include/asm/tra=
-pnr=2Eh
->> index f5d2325aa0b7=2E=2E8d1154cdf787 100644
->> --- a/arch/x86/include/asm/trapnr=2Eh
->> +++ b/arch/x86/include/asm/trapnr=2Eh
->> @@ -2,6 +2,18 @@
->>   #ifndef _ASM_X86_TRAPNR_H
->>   #define _ASM_X86_TRAPNR_H
->>   +/*
->> + * Event type codes used by FRED, Intel VT-x and AMD SVM
->> + */
->> +#define EVENT_TYPE_EXTINT	0	// External interrupt
->> +#define EVENT_TYPE_RESERVED	1
->> +#define EVENT_TYPE_NMI		2	// NMI
->> +#define EVENT_TYPE_HWEXC	3	// Hardware originated traps, exceptions
->> +#define EVENT_TYPE_SWINT	4	// INT n
->> +#define EVENT_TYPE_PRIV_SWEXC	5	// INT1
->> +#define EVENT_TYPE_SWEXC	6	// INTO, INT3
->
->nit: This turned into INTO (Oh) rather than INT0( zero) in v11
->
-><nit>
+> These are announcements AFAICT & not an indication of "being implemented
+> in hardware that is widely available".
 
-INTO (letter) is correct=2E
+The second two look to just be news articles quoting the first without 
+any real new information, at least just from skimming them -- sorry if I 
+missed something, though.
+
+The article says "SDK released with necessary software already ported to 
+Veyron" and "Veyron V1 Development Platform available", but aside from 
+quotes of the press release I can't find information on either of those 
+(or anything VT1 related, as there were some naming ambiguities).
+
+Anup said during the call that they're still bringing up the chip and 
+haven't started sampling yet, which usually means things are far from 
+publicly availiable.  I thought I heard him say that these press 
+releases would say the chip is sampling 2H23, but I can't find anything 
+in them about sampling.
+
+Anup also said it's availiable as IP and I remember something at Hot 
+Chips talking about an example place and route for a VT1, which also 
+sounds very much like a chip that's not availiable yet -- usually if 
+there's a chip folks are a lot more concrete about that sort of thing.
+
+So is there you can point to about this chip actually being publicly 
+availiable?
