@@ -2,96 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E9217B0432
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 14:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD7107B0508
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 15:15:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbjI0Mb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 08:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
+        id S231864AbjI0NPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 09:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbjI0Mb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 08:31:56 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 395E812A
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 05:31:54 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-405459d9a96so99765e9.0
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 05:31:54 -0700 (PDT)
+        with ESMTP id S231760AbjI0NPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 09:15:07 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC63126
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 06:15:01 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2bff936e10fso143559891fa.1
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 06:15:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695817912; x=1696422712; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gwbl0iLwHz3I+kTOQpC9LO2gOmIgGycm8pp63oFZIuQ=;
-        b=m4rFIJr0/USAx9QvRrge2ZK62Oij4zkxQWGXMifNXe9vpL2v6NyWk3gFmMyKiLLyRe
-         VmN9YbR37Hwj7hqdZrVY5db/tYg0NutAuwiSACA/RD/vYC8oEbR+Gc0WH1KHTuEiiwak
-         uCmzMFpwwzprYOcrCXB/f9TH5DmY6EGjLHTF07hUKNPakcnPHIJ63rX7S7dxhnKPhUcf
-         I+Hxes/XFftQPRYf+n3v4ezybgN4tLnU2Uu6I5Ccc1X/cSZlb5wVoDH8jAsGagozlMJN
-         ZJWKBGNsYYLSOjZfSrgFi2QQch8TmQEys/MfzZQAUz6K342OgS25YCg7394SbAbpGpOw
-         l0Sg==
+        d=philjordan-eu.20230601.gappssmtp.com; s=20230601; t=1695820499; x=1696425299; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TfHtIia8TvUSRs9fX/JN3HAzhknYINPmi4s/e9AkBss=;
+        b=3Wg16tlunSDxcYwgydDm6Q+ntJfOp0FT4iDpID0hEhU/Xc23f+25qo1cdhG0Dc0l0e
+         yS5iqrPRXsvchPrJ9jctn1rDjHCF+CbqGUZkXbNHxrED6RKulCBOt6ivx+J52UwKBmtn
+         /ZytLtzBe3aB8nJFGs6VrJ2/bo6XEJDvgw2grXxI7GbRToF4mTJ0B+yiBktSA4EUE/zP
+         w2mxLzImqXBwsewx7yFe6aEcn2QaC8P1zdhAdtDV4gaTDMq2nLkRBb6mN/cAdbR3Fhqd
+         ByQ5zRFJPflCOdc9HqFAvdwi/UkuOtRfBZ8+iTXzkPl4XAkWxSfDc2bSoW3/n9HjUBDy
+         Yegw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695817912; x=1696422712;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gwbl0iLwHz3I+kTOQpC9LO2gOmIgGycm8pp63oFZIuQ=;
-        b=QQVmzjc+fR2SJlNcCk9SDVSeChRTBqSEOEK8IAaa5ge+xQgHD5r/Qtjt0OGsnEUs55
-         6ZeIXTQFS1T6Rpt9C/Wr29lP/uyV+KOb+SJR3YdG5igIV1G4zghkbON2snD96LwPKkcU
-         nBTgJW4068+KyB8JLiM+ZGZiIqfrz0AwwAOqCplw0rmgG64SFhxFj0rBPQF7yWUIst8q
-         aUSyzyuqLGqrJuU3a+7Xj4n1/luBCzpz2qf5Y3COabbU09ZqPifTJr2lNjcKMGz34m6f
-         Tb9ztdbRbTbunXYRgn2qhkUkg2K64S4nOLbRhTiuD6jdiLN1Gul2+CgRY5+myc1wSMpy
-         UDDw==
-X-Gm-Message-State: AOJu0Yzn2xIoEWfOrmLnHxVlQQPPzObs0tgtauEg8k36NzJ3JNvkUUDv
-        VpBG6SdzkXOu7rB0F54iOvi/Xg==
-X-Google-Smtp-Source: AGHT+IEsM1qpqrNdx8nJvRZ2nWWGAhqp/8kTCJYF+oYMEqweh28KzH9Tig7ntSRsLUHF3Pn/2YHAEw==
-X-Received: by 2002:a05:600c:3b8c:b0:3fe:f32f:c57f with SMTP id n12-20020a05600c3b8c00b003fef32fc57fmr220093wms.0.1695817912479;
-        Wed, 27 Sep 2023 05:31:52 -0700 (PDT)
-Received: from google.com (203.75.199.104.bc.googleusercontent.com. [104.199.75.203])
-        by smtp.gmail.com with ESMTPSA id 21-20020a05600c029500b004063ea92492sm3262251wmk.22.2023.09.27.05.31.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 05:31:51 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 12:31:47 +0000
-From:   Mostafa Saleh <smostafa@google.com>
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool] arm: Initialize target in kvm_cpu__arch_init
-Message-ID: <ZRQgs_jGXe8ASQGU@google.com>
-References: <20230927112117.3935537-1-smostafa@google.com>
- <14f6ab95-7de0-9c4d-3d90-5c98923dbd77@huawei.com>
+        d=1e100.net; s=20230601; t=1695820499; x=1696425299;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TfHtIia8TvUSRs9fX/JN3HAzhknYINPmi4s/e9AkBss=;
+        b=E4TGcvSwKkY4/kccwCii2R8voCv0Ym4j4YymqRfWZTcchCBTMAEhvLa1xudqay9dit
+         JSVjnIPkt+Ivf+rSirL3oIUJBy4E/48tnYDz9WOpVsPdL79DF1F6gocyMgt0+fyAT9na
+         8LyuuS8E0f+AKBGyDF+q0HxNKKAqwPBQueq1v29DVdxZs59ZZYSqJfNa8xvgQyfCSpvL
+         04ff6d3fy9wxpkBcvCcGQrQ+3/vgAzdRbaK84eEJCe8MoV979XEqedyzYt8fjGa9DlPu
+         bWh3dvmk2iEdIPgJtXokkS4MiFIZfW/tMwjhBtMG76+AUYiFU2RxfsNsESRnn9U3iuA5
+         s7zA==
+X-Gm-Message-State: AOJu0YwvQ9CMnshA8xblCcxasIFkERUMTO8xyCQc+opSbJyLJPYXBnbx
+        oynfu2MUDxrQ8y7fKSFr2lSuTssMQre2KYNWMLBiyA==
+X-Google-Smtp-Source: AGHT+IE0bE7QOCCSF1WSvFO+r5wC/hxIlJA/w7j6+Q97GyHp/Sxp7xrx65KfssDktcn7U4hDLWFTvd79xzAHi7L3uYw=
+X-Received: by 2002:a05:651c:3cc:b0:2c1:5607:d5ac with SMTP id
+ f12-20020a05651c03cc00b002c15607d5acmr2292057ljp.20.1695820499328; Wed, 27
+ Sep 2023 06:14:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <14f6ab95-7de0-9c4d-3d90-5c98923dbd77@huawei.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230923102019.29444-1-phil@philjordan.eu> <ZRGkqY+2QQgt2cVq@google.com>
+ <CAGCz3vve7RJ+HE8sHOvq1p5-Wc4RpgZwqp0DiCXiSWq0vUpEVw@mail.gmail.com> <ZRMB9HUIBcWWHtwK@google.com>
+In-Reply-To: <ZRMB9HUIBcWWHtwK@google.com>
+From:   Phil Dennis-Jordan <lists@philjordan.eu>
+Date:   Wed, 27 Sep 2023 15:14:48 +0200
+Message-ID: <CAGCz3vuieUoD0UombFzxKYygm8uS4Gr=qkUAKR7oR0Tg+mEnYQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86/apic: Gates test_pv_ipi on KVM cpuid,
+ not test device
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NEUTRAL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+On Tue, Sep 26, 2023 at 6:08=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> Please keep the mailing list Cc'd so that other can participate in the co=
+nversation,
+> and so that the mails are archived.
 
-On Wed, Sep 27, 2023 at 08:21:47PM +0800, Zenghui Yu wrote:
-> On 2023/9/27 19:21, Mostafa Saleh wrote:
-> > arm/kvm-cpu.c: In function ‘kvm_cpu__arch_init’:
-> > arm/kvm-cpu.c:119:41: error: ‘target’ may be used uninitialized [-Werror=maybe-uninitialized]
-> >   119 |         vcpu->cpu_compatible    = target->compatible;
-> >       |                                   ~~~~~~^~~~~~~~~~~~
-> > arm/kvm-cpu.c:40:32: note: ‘target’ was declared here
-> >    40 |         struct kvm_arm_target *target;
-> >       |                                ^~~~~~
-> 
-> Already addressed by 426e875213d3 ("arm/kvm-cpu: Fix new build
-> warning").
+Sorry! I've now enabled reply-to-all by default so I can't forget again.
 
-Oh, I see that now, I was on the wrong branch, thanks for pointing
-this!
+> > 2. Bring a copy of the necessary KVM uapi header file(s) into the
+> > repo, slightly hacked up to cut down on transitive dependencies. It
+> > looks like lib/linux/*.h might already be similar instances for other
+> > Linux bits. Qemu also does this.
+>
+> This has my vote, though I'd strongly prefer not to strip out anything un=
+less it's
+> absolutely necessary to get KUT to compile.  Grabbing entire files should=
+ make it
+> easier to maintain the copy+pasted code as future updates to re-sync will=
+ hopefully
+> add just the new features.
 
-> Zenghui
+Yup, makes sense.
+
+> The attached half-baked patch adds everything except the base "is this KV=
+M?"
+> check and has only been compile tested on x86, feel free to use it as a s=
+tarting
+> point (I wanted to get the basic gist compiling to make sure I wasn't lea=
+ding you
+> completely astray)
+
+The attachment doesn't seem to have made it, would you mind trying
+again? Then I'll put together a v2 of the patch based on that.
 
 Thanks,
-Mostafa
+Phil
