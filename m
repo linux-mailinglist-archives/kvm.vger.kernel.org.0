@@ -2,155 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310EC7B0C38
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 20:53:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C77D77B0D2A
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 22:10:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbjI0SxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 14:53:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46780 "EHLO
+        id S229771AbjI0UKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 16:10:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbjI0SxY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 14:53:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3421A19F
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:52:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695840757;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kq5Qg2bQQlEqkI6mgl+PBDF3TD7HEyYrhhIx1gLZrcg=;
-        b=eDWnEDa08UjIOp072Z8kURuihNsmqYZ8UqlfdWSQ29/LgaLhrWmOcC1me+u8LjgM3iSqbo
-        uuutoHa32iKKhuRHTf5Ack4SZiFk4Uv27WNJZoAoGKKj5+L8PO0NZQnrxQPUhp4m3s0RbM
-        2SKJfthpPr0WNoowvK3N8HAXug4ym/w=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-UNGMjQaRNgiJpyETNouQvg-1; Wed, 27 Sep 2023 14:52:35 -0400
-X-MC-Unique: UNGMjQaRNgiJpyETNouQvg-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-57b8079db51so21196678eaf.3
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 11:52:35 -0700 (PDT)
+        with ESMTP id S229664AbjI0UKH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 16:10:07 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FABCC
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 13:10:04 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f8134eb83so143793687b3.2
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 13:10:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695845403; x=1696450203; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=psOShRUSEQe8zIonthIGZttrDfLL/2gSo0mpPuWUP7c=;
+        b=Hxnd+Za138b8fb4G2r7r4tiL2O5XlTBcWH/Rp89IzT16+WRNDi0dHQNM9NCRcBOvgh
+         t4CJvMsulE9S6507KkFS0agWtvYQAHVxqJV+lOdrYJf8eVdTcDdwvRpE7EG+26M4r6j3
+         g+yC8uYzMF8EDtufU9294jrWFpB9axtbL1d8S5yjagIUcH1ugavMrJkvVWQwyOHVbkrI
+         IRYu7VRu9MfT9KeHzdRS58DV24xlnI7zxAC9vkZ46zIUB53Gm/xdgEUOIBmJDORCOP4x
+         G1sDm+Jj+KnAOSyKXVMOeCi4OpyeoVDl99eV0O7qA1m61em0zu6IXm1ZlcCoihznFcDO
+         mbhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695840755; x=1696445555;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kq5Qg2bQQlEqkI6mgl+PBDF3TD7HEyYrhhIx1gLZrcg=;
-        b=JsHE2FotrATnmECwqGwiagjH0pThcECqAOSuH3Bsmus6gpqgPEVVsqonpBHzFIvecw
-         PIiYgOFlDPfKhATqza4cN0YqMDWirGchkT5fjoy++jRf5bTtL3t3lNtgQCF08kVctaQK
-         P20qMaNDhqAMKjExb0cZ/2gDmZJrINw7M/FEoT995qAIrykV3jBtOmfFmFO0QsHBRs59
-         R+t7qGakwatSIVZuXKYbZfJrkvSp35WRDDktY8vjsLGbXMZAmohGLp14+6/7yqLYxdWt
-         +86ylrbS0EA6mgTnjn3mkwRQfNfRyttaHDmORhZBYhvXo1DQy218ysGcOImeeOAWwV2A
-         r++g==
-X-Gm-Message-State: AOJu0YzKrTcT8kK2/Gdh8P82sXRXSITvj0ASm6wJyDRHNj1jOe/shGQW
-        nage6w8WxxkWNq46D4GqbNIh5S+vKebt/1X5drc7fgFvguyIpScqt5s0jHuWLfHA0jWZ/3gE3dP
-        vLoa2VyROLoqK
-X-Received: by 2002:a4a:6246:0:b0:57b:6a40:8a9e with SMTP id y6-20020a4a6246000000b0057b6a408a9emr3241156oog.7.1695840755197;
-        Wed, 27 Sep 2023 11:52:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3cPePjgR+735wrJbNOWlgYYeVheIM5ALo2dqBObMKFrQpCrxuu4qqIaRtOinyevyLL0/Zfw==
-X-Received: by 2002:a4a:6246:0:b0:57b:6a40:8a9e with SMTP id y6-20020a4a6246000000b0057b6a408a9emr3241122oog.7.1695840754919;
-        Wed, 27 Sep 2023 11:52:34 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id p187-20020a4a48c4000000b0054f85f67f31sm2878334ooa.46.2023.09.27.11.52.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 11:52:34 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 12:52:31 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: Re: [RFC 3/3] vfio/pci: Expose PCIe PASID capability to userspace
-Message-ID: <20230927125231.3aacde62.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276375C4BE33AC0632321A68CC2A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230926093121.18676-1-yi.l.liu@intel.com>
-        <20230926093121.18676-4-yi.l.liu@intel.com>
-        <BN9PR11MB5276375C4BE33AC0632321A68CC2A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1695845403; x=1696450203;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=psOShRUSEQe8zIonthIGZttrDfLL/2gSo0mpPuWUP7c=;
+        b=BGx2PhGYiDt+O4i6F74MBWXmZ9jZyClpHsM3RnQygEP64ZR8xfAvhA2Mmklovu0Rp1
+         +5qXZ0F6r/lv2pRjqRBIgI1OIyds4XtHTSOSGp6o2UMm2oWtQdH9JE91UjgUl+PEbQiw
+         GgD5ipVDVrzrkTMrNaI4+o5K0k7Lh5c6LNvFsmhe97G9eluD6tgeNd5BC6PO5lH/LE5m
+         z2tonLh/6EYyZY6CVRJTmNY3UBFKYzAcVd0TTRnEDJM9t/lsDQQ6N1gKjHEZqIe9MPB6
+         FnA6BpDpBs1sVBTcaX8639rM4TsL2NyeS4+9AShs1QeXJdIYzuWMSazV4OPKdVUgWprn
+         gCnQ==
+X-Gm-Message-State: AOJu0YwO2sTHgZgi3omnASyUaf9A+hVWYRb7XNG4j3JPX8f/oUqsmKYJ
+        r0itY2xTVQadhjrihC7X/X/ujKkcI2I=
+X-Google-Smtp-Source: AGHT+IG5w7DmAJaClZiOjkmowcDJR/iiFdPB8zaGrAi3UXJB6RD28SM4z2s4iW9X1FeipKfBl6KyfDrABpQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b65e:0:b0:586:a58d:2e24 with SMTP id
+ h30-20020a81b65e000000b00586a58d2e24mr53326ywk.5.1695845403609; Wed, 27 Sep
+ 2023 13:10:03 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 13:10:01 -0700
+In-Reply-To: <13480bef-2646-4c01-ba81-3020a2ef2ce1@rbox.co>
+Mime-Version: 1.0
+References: <20230814222358.707877-1-mhal@rbox.co> <20230814222358.707877-4-mhal@rbox.co>
+ <13480bef-2646-4c01-ba81-3020a2ef2ce1@rbox.co>
+Message-ID: <ZRSMGdxk2X-cXr6z@google.com>
+Subject: Re: [PATCH 3/3] KVM: Correct kvm_vcpu_event(s) typo in KVM API documentation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Sep 2023 08:07:54 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Tue, Aug 15, 2023, Michal Luczaj wrote:
+> On 8/15/23 00:08, Michal Luczaj wrote:
+> > I understand that typo fixes are not always welcomed, but this
+> > kvm_vcpu_event(s) did actually bit me, causing minor irritation.
+>                                  ^^^
 
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Tuesday, September 26, 2023 5:31 PM
-> > 
-> > This exposes PCIe PASID capability to userspace and where to emulate this
-> > capability if wants to further expose it to VM.
-> > 
-> > And this only exposes PASID capability for devices which has PCIe PASID
-> > extended struture in its configuration space. While for VFs, userspace
-> > is still unable to see this capability as SR-IOV spec forbides VF to
-> > implement PASID capability extended structure. It is a TODO in future.
-> > Related discussion can be found in below links:
-> > 
-> > https://lore.kernel.org/kvm/20200407095801.648b1371@w520.home/
-> > https://lore.kernel.org/kvm/BL1PR11MB5271A60035EF591A5BE8AC878C01A
-> > @BL1PR11MB5271.namprd11.prod.outlook.com/
-> >   
-> 
-> Yes, we need a decision for VF case.
-> 
-> If the consensus is to continue exposing the PASID capability in vfio-pci
-> config space by developing a kernel quirk mechanism to find offset for
-> VF, then this patch for PF is orthogonal to that VF work and can go as it is.
-> 
-> But if the decision is to have a device feature for the user to enumerate
-> the vPASID capability and let the VMM take care of finding the vPASID
-> cap offset, then better we start doing that for PF too since it's not good
-> to have two enumeration interfaces for PF/VF respectively.
+FWIW, my bar for fixing typos is if the typo causes any amount of confusion or
+wasted time.  If it causes one person pain, odds are good it'll cause others pain
+in the future.
 
-Note also that QEMU implements a lazy algorithm for exposing
-capabilities, the default is to expose them, so we need to consider
-existing VMs seeing a new read-only PASID capability on an assigned PF.
+> Oh, I do feel silly for sending typo fixes with typos...
 
-That might support an alternate means to expose the capability.
-
-> My preference is via device feature given Qemu already includes lots of
-> quirks for vfio-pci devices. Another reason is that when supporting vPASID
-> with SIOV there are some arch constraints which the driver needs to
-> report to the user to follow (e.g.  don't assign ENQCMD-capable sibling
-> vdev's to a same guest, etc.).
-
-?!
-
-> A device feature interface can better
-> encapsulate everything related to vPASID in one place.
-
-Sorry if I don't remember, have you posted a proposal for the device
-feature interface?  Thanks,
-
-Alex
-
+LOL, I'm just disappointed your typo isn't in the changelog proper, because I was
+absolutely planning on leaving it in there for my own amusement :-)
