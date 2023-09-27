@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C9F57AFF7C
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6D857AFF77
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 11:09:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbjI0JJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 05:09:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55728 "EHLO
+        id S230270AbjI0JJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 05:09:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230175AbjI0JJV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 05:09:21 -0400
+        with ESMTP id S230109AbjI0JJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 05:09:20 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846AECC
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84101C0
         for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 02:09:19 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13F36C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 145D5C433CB;
         Wed, 27 Sep 2023 09:09:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1695805759;
-        bh=K+tFfLelIwox1keoN0XKV44DfzHUWb6y5oJTZXZ0HsM=;
+        bh=PNIfqUPI0AsOj+2xhVTNUahDYUrMKnXrOYsL7+Ia8Kw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NfZwNgNtyXwGkBUhaFeS33Vfok8E+Gs8AqUG1xNqdzq0xwE4nLhepHf4tGA57HJ7f
-         U3QcmIKLqgZr3DaF6fUQNwuC3cuZtLt1BX/MwJMQFksIMU2n/MhFqVjOsFOVymoyck
-         Q1imQaDlpgu1t/FRftxWhKlDYyBSr8Xjzql3mx/dbTTsN31Pr2GebiBkQjWLOC7mAE
-         swbeEBmbdIVcmSalTFrP4Zz3lEqzw1jugkm14wAnH4x74Q/iozmuo+rOlAOreA3VkN
-         24DU0henqZmBnBZ+Q2oNqIo40FQGtqFmzEZVl5z4s0yZFj20k86iQRLtm9sZkMt7/7
-         5DPyCR9CHCv/w==
+        b=TIAOBL7+yFx9V0R42QjK7XCG5c9iCXFHFR1/slB/Knv+mfL4O2NLqoKhBd/JfCDT7
+         kmtuvJGA5cJTz5Y/ecQ98Y/vd9GHQxepbkhU+z3OaLSvOdHiOCjlq0Acg1Lunlg5sQ
+         pnSOpNJZ/voV7LvGlmd6eOn11frFZPxJqtiMqfa6iKHcI38/ux3Zb3k0b9vZO7WVSI
+         +y8Mj/tThe7yZ/pyhk4D1Y+RSNXhYCnRNmrVW+kkY5UQXafQN1OjIumkIWOhTq3QYi
+         AHX1FNJarGccSvQ8Y2LUMgwnibyKqfocOnaknudLMnZPIO5+qLBdAbgZDCr+pclBc6
+         RttiEnyVCftuA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qlQXk-00GaLb-QV;
+        id 1qlQXl-00GaLb-5U;
         Wed, 27 Sep 2023 10:09:17 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -44,9 +44,9 @@ Cc:     James Morse <james.morse@arm.com>,
         <shameerali.kolothum.thodi@huawei.com>,
         Xu Zhao <zhaoxu.35@bytedance.com>,
         Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 03/11] KVM: arm64: vgic-v3: Refactor GICv3 SGI generation
-Date:   Wed, 27 Sep 2023 10:09:03 +0100
-Message-Id: <20230927090911.3355209-4-maz@kernel.org>
+Subject: [PATCH v3 04/11] KVM: arm64: vgic-v2: Use cpuid from userspace as vcpu_id
+Date:   Wed, 27 Sep 2023 10:09:04 +0100
+Message-Id: <20230927090911.3355209-5-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230927090911.3355209-1-maz@kernel.org>
 References: <20230927090911.3355209-1-maz@kernel.org>
@@ -65,173 +65,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're about to change the way SGIs are sent, start by splitting
-out some of the basic functionnality: instead of intermingling
-the broadcast and non-broadcast cases with the actual SGI generation,
-perform the following cleanups:
+When parsing a GICv2 attribute that contains a cpuid, handle this
+as the vcpu_id, not a vcpu_idx, as userspace cannot really know
+the mapping between the two. For this, use kvm_get_vcpu_by_id()
+instead of kvm_get_vcpu().
 
-- move the SGI queuing into its own helper
-- split the broadcast code from the affinity-driven code
-- replace the mask/shift combinations with FIELD_GET()
-- fix the confusion between vcpu_id and vcpu when handling
-  the broadcast case
+Take this opportunity to get rid of the pointless check against
+online_vcpus, which doesn't make much sense either, and switch
+to FIELD_GET as a way to extract the vcpu_id.
 
-The result is much more readable, and paves the way for further
-optimisations.
-
-Tested-by: Joey Gouly <joey.gouly@arm.com>
-Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 110 ++++++++++++++++-------------
- 1 file changed, 59 insertions(+), 51 deletions(-)
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 188d2187eede..88b8d4524854 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -1052,6 +1052,38 @@ static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
- 	((((reg) & ICC_SGI1R_AFFINITY_## level ##_MASK) \
- 	>> ICC_SGI1R_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
- 
-+static void vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, u32 sgi, bool allow_group1)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
-+	unsigned long flags;
-+
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+
-+	/*
-+	 * An access targeting Group0 SGIs can only generate
-+	 * those, while an access targeting Group1 SGIs can
-+	 * generate interrupts of either group.
-+	 */
-+	if (!irq->group || allow_group1) {
-+		if (!irq->hw) {
-+			irq->pending_latch = true;
-+			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-+		} else {
-+			/* HW SGI? Ask the GIC to inject it */
-+			int err;
-+			err = irq_set_irqchip_state(irq->host_irq,
-+						    IRQCHIP_STATE_PENDING,
-+						    true);
-+			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-+			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+		}
-+	} else {
-+		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	}
-+
-+	vgic_put_irq(vcpu->kvm, irq);
-+}
-+
- /**
-  * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
-  * @vcpu: The VCPU requesting a SGI
-@@ -1070,19 +1102,30 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index 212b73a715c1..c11962f901e0 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -339,13 +339,9 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
  {
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_vcpu *c_vcpu;
--	u16 target_cpus;
-+	unsigned long target_cpus;
- 	u64 mpidr;
--	int sgi;
--	int vcpu_id = vcpu->vcpu_id;
--	bool broadcast;
--	unsigned long c, flags;
--
--	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
--	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
--	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
-+	u32 sgi;
-+	unsigned long c;
-+
-+	sgi = FIELD_GET(ICC_SGI1R_SGI_ID_MASK, reg);
-+
-+	/* Broadcast */
-+	if (unlikely(reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT))) {
-+		kvm_for_each_vcpu(c, c_vcpu, kvm) {
-+			/* Don't signal the calling VCPU */
-+			if (c_vcpu == vcpu)
-+				continue;
-+
-+			vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
-+		}
-+
-+		return;
-+	}
-+
- 	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
- 	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
- 	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
-+	target_cpus = FIELD_GET(ICC_SGI1R_TARGET_LIST_MASK, reg);
+ 	int cpuid;
  
- 	/*
- 	 * We iterate over all VCPUs to find the MPIDRs matching the request.
-@@ -1091,54 +1134,19 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
- 	 * VCPUs when most of the times we just signal a single VCPU.
- 	 */
- 	kvm_for_each_vcpu(c, c_vcpu, kvm) {
--		struct vgic_irq *irq;
-+		int level0;
+-	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+-		 KVM_DEV_ARM_VGIC_CPUID_SHIFT;
++	cpuid = FIELD_GET(KVM_DEV_ARM_VGIC_CPUID_MASK, attr->attr);
  
- 		/* Exit early if we have dealt with all requested CPUs */
--		if (!broadcast && target_cpus == 0)
-+		if (target_cpus == 0)
- 			break;
+-	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
+-		return -EINVAL;
 -
--		/* Don't signal the calling VCPU */
--		if (broadcast && c == vcpu_id)
-+		level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
-+		if (level0 == -1)
- 			continue;
+-	reg_attr->vcpu = kvm_get_vcpu(dev->kvm, cpuid);
++	reg_attr->vcpu = kvm_get_vcpu_by_id(dev->kvm, cpuid);
+ 	reg_attr->addr = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
  
--		if (!broadcast) {
--			int level0;
--
--			level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
--			if (level0 == -1)
--				continue;
--
--			/* remove this matching VCPU from the mask */
--			target_cpus &= ~BIT(level0);
--		}
-+		/* remove this matching VCPU from the mask */
-+		target_cpus &= ~BIT(level0);
- 
--		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
--
--		raw_spin_lock_irqsave(&irq->irq_lock, flags);
--
--		/*
--		 * An access targeting Group0 SGIs can only generate
--		 * those, while an access targeting Group1 SGIs can
--		 * generate interrupts of either group.
--		 */
--		if (!irq->group || allow_group1) {
--			if (!irq->hw) {
--				irq->pending_latch = true;
--				vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
--			} else {
--				/* HW SGI? Ask the GIC to inject it */
--				int err;
--				err = irq_set_irqchip_state(irq->host_irq,
--							    IRQCHIP_STATE_PENDING,
--							    true);
--				WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
--				raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
--			}
--		} else {
--			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
--		}
--
--		vgic_put_irq(vcpu->kvm, irq);
-+		vgic_v3_queue_sgi(c_vcpu, sgi, allow_group1);
- 	}
- }
- 
+ 	return 0;
 -- 
 2.34.1
 
