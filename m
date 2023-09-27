@@ -2,150 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B3177B0952
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 17:51:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BA147B09AE
+	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 18:10:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232706AbjI0PvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 11:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
+        id S231442AbjI0QKe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 12:10:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232650AbjI0Pul (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 11:50:41 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A0D2728C;
-        Wed, 27 Sep 2023 08:44:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QWMMvEN0TATzS0drA1Q2hvMe7PBGCz2DjGQjM+RhYBHIpMVjZjsm/2PUBiIie8np03PigNq7sVDq9p7FPo4bChC4rYqD2AXW/HNlwnrCgpQ4nkNhMKLxRHmWc/XJ5tGCJ8KuX6Rr0k1T2TRT2AeDgZL/96OuNNylZmywdE5ezonpsi8wfT4lMpF1RUUwLuy0xR+kxvKvpjpjREXCIlCVBN5xvJB15ElheaVsvDOQ1jZSjYSDkVPYe3pXEfWNiIkDMcJu7sgzzH/GBWfGiF9FMxBaFZIz8lbjS6Tq5M8/QRfszBz+WNbqQacP7pRdeyIxn/IAaqFcG5HR1s3MV2Qvdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i0oHtPCbD1zp6wtFL/bzCcLwZqL7mn3v/WaUNKgEpAk=;
- b=kHX/6I1yHjSdlguP+JQmgbw7bBS+tdJDyigeN+vZYWWC7OZoU9CQFh2avVHCQ8fj+Or8qCA/zq6AX4w/+7NskGuWPD7Ho5Yeg2Ut+AMSW6mjq3i7Mg6u/LGf4fgwS5UUMdNgin2i1ybnIyunMl70Vv20jmlVgvH5wL4duHZff/SHduS+P+MUjQnK/yMaRwyl/aL/IoV4F9ShOmEsotlVFAJNxJ3lFcKQjEytESyC1f9oUVNFWzyvZWtU1m+am0V/Jxmm7mirKt79heKlfAVb8A7AFEiWfv5BBf3jSvvugKM9r2rkTyGxZVivWXuOJjexZ+Tt2r/6K5ZNEKFselv/9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i0oHtPCbD1zp6wtFL/bzCcLwZqL7mn3v/WaUNKgEpAk=;
- b=kMmgi04M9s7l++7idZowoYlsI/fbDe/+bNaMs+99zS1mR94VyapZKZ8Jzl7AGNtSvwklBJfKTzIM2G6FV7yTiPeUZ2cvsWPCsPArF1n2b8LzVCQKacP41N1+rj2qhZl3pEgJ63VNzTMPo/z5ZXGlOz+Q524AlqIZunnFqvXPh/0wmj+B6lO3mYk9Pp4LMwzgPGUbeU8gpzyOFQ/nULU23N1gEPpl9rVrFwIyICBj+y2gZMNU2BRaHrGkSXZasyPGJVba25nG5wexAGSTX0iLBWS4mI8/UpKLWggE3dCkJZE8DYRwf6oIOc+kDyni3ZvyEsrXatPjyue1hnhilXbYFQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB9250.namprd12.prod.outlook.com (2603:10b6:610:1ae::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Wed, 27 Sep
- 2023 15:44:25 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%5]) with mapi id 15.20.6838.016; Wed, 27 Sep 2023
- 15:44:25 +0000
-Date:   Wed, 27 Sep 2023 12:44:24 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: Re: [RFC 3/8] iommufd: Support attach/replace hwpt per pasid
-Message-ID: <20230927154424.GC339126@nvidia.com>
-References: <20230926092651.17041-1-yi.l.liu@intel.com>
- <20230926092651.17041-4-yi.l.liu@intel.com>
- <cd258ee3-52ca-f944-7553-6a1cd01c5f7a@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd258ee3-52ca-f944-7553-6a1cd01c5f7a@linux.intel.com>
-X-ClientProxiedBy: MN2PR19CA0014.namprd19.prod.outlook.com
- (2603:10b6:208:178::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB9250:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d7dd0dd-5f51-462c-a8e6-08dbbf70a0ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CZhDl6P2vCmQlSVT0Rh4hN6PaPa3EVQ8apIgIdolerQRkkxDItPvaO526v3IC1r2ITgVoLlnQt0Bmhg5xoAijAhHJEPPrHs6tBCYYXdMeq+12o46/r86M8dTgoaGQexq4a2tJQMjqZMdZgRd+OE7ZBm4Ge/ujPXXddyl+sY9ckJai8ExgXOC5I6qa3FCE9dcBGmdQkwl8UQXGl3wgcj6sAdZ0U+IFjjiLNg10b57HxpR9nPRuFz+spMajYM5MshxZJMmo7q4Em7r8DChuNxCsHoM3VRZgQ0GewvBqfZv3aWjZF+ETaZK5CQQY2mHHzZiigQTfs9XRIxwBe9+nt+koAqwxTo9RzB5CRLzSNBKewlF/ORzVMsSZpmrZGBfyFlqtKxCZUMA8/0PenrxYVcgkCFW22ugbC8lVTNR6a/FbAfTNeAq+7G4Br84EMeF+FLFUaNAVxuCUjXq9ZYdnXVQj4v66VGJgq4tjaXHApoxWBzHONS+i+rf08YLbeaXo1G32CIjlZo95knSIGDoJc5zeaM2gedgOT1baE6B9tF8O55aF4oYs8F7m6rI/bBFaV/jZYHD9+5GCsJac9kmvi3dqwUd4M8D67cZ4OUxjSv6GCr3Z76MqA5zn78mTGKKYgeJ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(376002)(39860400002)(366004)(230922051799003)(451199024)(186009)(1800799009)(8676002)(8936002)(4326008)(53546011)(6486002)(6506007)(6512007)(478600001)(6916009)(66556008)(86362001)(2616005)(38100700002)(26005)(2906002)(41300700001)(1076003)(7416002)(66476007)(5660300002)(66946007)(33656002)(316002)(36756003)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bKeQmKMmNw2DohAqhzbM+DCUbgq2NBhiVhRmvAQXkgh/bkwMZn7luExNjSdx?=
- =?us-ascii?Q?3DC2Hch5CbiYJFrIcS/AMjGht3FZbLigQE4s66bULZr8WXeJI4WE5pRs1t07?=
- =?us-ascii?Q?hkxhwviBWpf+RR1SAXOFu1xQpiju5WVAIsF/+uyKXZTdYB47y/JsaQDSc7wq?=
- =?us-ascii?Q?DCnv5Fd8Av22Kei/X7ppiLOhColkZuX/bdWBCwwEhYnkAwaxDhifZedow35R?=
- =?us-ascii?Q?WOJKXJ/2ZXS341jFpldC7W3Cs004ClEo0X1oPPOFqkC4Od9MOSNbleiOZZCJ?=
- =?us-ascii?Q?IwmvOVe4iUgqMj7opSfEmZ8Rhn1FBB6DRss/OoJ0atHw5WF7Z0MyqcPdEge2?=
- =?us-ascii?Q?PeMBPWpxnrgZzVa1x+C68mapXcmrLSeGmivUxoFh1RTuM84pxc/gky9IYG5I?=
- =?us-ascii?Q?w1/Zmx8eyu2DzBRXHzzHnI9UqrXOXhbsL6oQq9fbMitpno8SaNvPKrKgYdbQ?=
- =?us-ascii?Q?PYr67IZ1S1Mvn0QKoqmZnUe0heLb/BlThPud80S8VYMzzQETqaNKNLksPg8x?=
- =?us-ascii?Q?j0OqX2GaWP1nIMJkMPr7jdMn9UVteOWMfeZbSW0W749rhFYRYmCVZE0/Bl1x?=
- =?us-ascii?Q?c9k7aITsXSgM4oPndyktedXCelJ1s77weudM00Km12LIfVDKtOVvtE0DuKFa?=
- =?us-ascii?Q?67nPJPc5nYUWS1fet9NMn50Qt7WIn8p8anW6u/HNALOGZ4lx1MCsw5pqerAg?=
- =?us-ascii?Q?i1Z+J0Ycazp8GMjeA44MNFc1AAdHlUSH0POBzpK+mQ2hy0e+j3zYpIdML8TO?=
- =?us-ascii?Q?qg0liyc6dzPJi54y83FCV9HvosFSMmVqRqu8UUIBYqrVW8boAHyEl56ds1KD?=
- =?us-ascii?Q?FdW9kGFOPmy57Pfw/Y47DsJgogdHHxrnZO8w3uaqr3MJ0MzHXTU15p1XLIDR?=
- =?us-ascii?Q?ctZOSbzLNqRkrNbsCFwmL5k2I7p6ygzp8DaOVcxSncek0KjJfc3fABDusDtu?=
- =?us-ascii?Q?xsJEeQIX4mZmB8LHwDt6erSMTbkomWLi776yoYPRKq39UmjT8m6o3M2Rg5jB?=
- =?us-ascii?Q?cBNFX/80ABzB8nwBZTiOn3u3HmfYaS2gr/qBtRbExF6UyY9oZUAyjVUFabcd?=
- =?us-ascii?Q?L50RjpLbGtceEQVqkjxFqCZ/OUsznN0wb2Ns0OCQq1ngk2TgFub5RBbygMVY?=
- =?us-ascii?Q?m2Vis0FVXGObnsjqFnUS68HBsk6YB1kBh3xvFcsdLeAmM69DK9zWrMCrw7Ov?=
- =?us-ascii?Q?v76nWTIZizHKzvwy3GsNLFBi0d2OZqa/Zj4JMfiM2HOpm7qd4Yq3t6jVx9Oy?=
- =?us-ascii?Q?Vz8S2SKhQAJ19xfilk+DmXKe7pv9tAIls5GYLh0C+pUOda+WF/n56zSp/V1y?=
- =?us-ascii?Q?8ryo+eBOicAVOp7sb1v7DhTP4RnK63nzy0hQ3uTKaD3NObCpgzg/2wlaQrwJ?=
- =?us-ascii?Q?Pdg2+8aB8tGcfIsWsiM6yWte+hzxC+t4ttXlDpbA+D5CWaapIuXGbfgVPFz+?=
- =?us-ascii?Q?4HY3jsBo3d6Y3Wgd6lN1zlysJ8aAhPQFoHp1NsXoxBocrV2W1PI8kGQ53G2W?=
- =?us-ascii?Q?kXayqY9W9L+x/ctTQEvojHgNB49eKLL+rnE3OYIkleGlBaJRsu0YbNFX7lgs?=
- =?us-ascii?Q?J3rRcPadpYbn6TWTqxMj7ktIJDQBZTD8OfCRChJB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d7dd0dd-5f51-462c-a8e6-08dbbf70a0ac
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 15:44:25.7950
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9eBDkdylksr4CvV9sxJ1lNjbZz7MNAJrDIClKpgYx9B6PKB8t8ok/wEF03suy/h3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9250
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229527AbjI0QKc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 12:10:32 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC5E196
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 09:10:29 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-56c306471ccso10778419a12.3
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 09:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695831029; x=1696435829; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VjR/OUxnEHg50NT9HcYxI5Bi85H8/C7qbzkbq7YZT9o=;
+        b=lPvEZIbBP40aOV3jk3EixgnxYab3aqg9ETiazkHqc6+FcNytxaD2m++K6dcWRRmoyk
+         BXqwXQ9zsaDNCBafDnidF8xS/569MDtkZXgiVoM7Xb+QdpKEvwi1wOGJbD0li4DcXB8i
+         DfvxndOsvK9PlHl4ztMAF5EH69Bv9jPZ/pGhG/TtY+62/yJlDSJJO3q0H4aNOzZ+U1O4
+         eNOyOAqrYSOzIuFAI20+IcBm1RMLr7V0DcmRX/+Op4iON6jhAu/f5Wi4p9T70HPFfeYf
+         W08lNRPkZEPJcmOFeWE45Vy/zzkbKgfDqJgwCicqnE2NT73T4nvp/78IpZFQCpDetr6j
+         EtMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695831029; x=1696435829;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VjR/OUxnEHg50NT9HcYxI5Bi85H8/C7qbzkbq7YZT9o=;
+        b=Kzqivlgul0GGu7JpEexsxCWaaP79SOsE8F5c0FMfZYEZtIT7qoOJ+Dbxs3FtQF3KT6
+         hIbDdfSzFt5Wn4HsJimrYLOFvBofD8KcB4lbraF8NQIIBUSNQ+jy+7690NSfFv3et7z0
+         ejAFtMNlA6Y50lhLligE+cx1yCPMntJX/GMq/4yeOhIFxk4afB07TWHmq1VDd3xz/R6U
+         Wa7vg4QeNnGT5W+mbop8y2IrhCjidT2I0f0LwpJPeziIAi2So0cQaNZ1K8dIPVlAXsA9
+         cnI2fPlo9aaUhT14bwXXnxB/gpF2pLBeW/JAJte9ZC2bSMOenH4uRXNDSsXS5qJGkhqj
+         Pilg==
+X-Gm-Message-State: AOJu0YwjxVie7SjEy7zlw5gg3e3+om7QXhR4oK/c7x1g3TQw/6bp30zh
+        Wn8qAu2lXp0qnvGfAbQ99z88Gp2SgrE=
+X-Google-Smtp-Source: AGHT+IEiZO/2KVpTzKd45Y4lPezPcxhhNBzB1Qhy2IdwNVbLPwbxI9nWCzs94jYGwnXDZXo78Of8yCNff1s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:1ca:b0:1bc:5182:1de2 with SMTP id
+ e10-20020a17090301ca00b001bc51821de2mr35706plh.1.1695831029192; Wed, 27 Sep
+ 2023 09:10:29 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 09:10:27 -0700
+In-Reply-To: <2c79115e-e16d-49cc-8f5b-2363d7910269@zytor.com>
+Mime-Version: 1.0
+References: <20230927040939.342643-1-mizhang@google.com> <CAL715WJM2hMyMvNYZAcd4cSpDQ6XPFsNhtR2dsi7W=ySfy=CFw@mail.gmail.com>
+ <2c79115e-e16d-49cc-8f5b-2363d7910269@zytor.com>
+Message-ID: <ZRRT8zUfekA1QrQL@google.com>
+Subject: Re: [PATCH] KVM: x86: Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ_NMI)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xin Li <xin@zytor.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Like Xu <likexu@tencent.com>, Kan Liang <kan.liang@intel.com>,
+        Dapeng1 Mi <dapeng1.mi@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 27, 2023 at 10:49:29AM +0800, Baolu Lu wrote:
-> On 9/26/23 5:26 PM, Yi Liu wrote:
-> > From: Kevin Tian<kevin.tian@intel.com>
-> > 
-> > This introduces three APIs for device drivers to manage pasid attach/
-> > replace/detach.
-> > 
-> >      int iommufd_device_pasid_attach(struct iommufd_device *idev,
-> > 				    u32 pasid, u32 *pt_id);
-> >      int iommufd_device_pasid_replace(struct iommufd_device *idev,
-> > 				     u32 pasid, u32 *pt_id);
-> >      void iommufd_device_pasid_detach(struct iommufd_device *idev,
-> > 				     u32 pasid);
-> 
-> I am a bit puzzled. Do we really need both attach and replace interfaces
-> to install a hwpt onto a pasid on device? The IOMMUFD already tracks the
-> connections between hwpt and {device, pasid}, so it could easily call
-> the right iommu interfaces (attach vs. replace). Perhaps I overlooked
-> previous discussion on this.
+On Tue, Sep 26, 2023, Xin Li wrote:
+> On 9/26/2023 9:15 PM, Mingwei Zhang wrote:
+> > ah, typo in the subject: The 2nd KVM_REQ_NMI should be KVM_REQ_PMI.
+> > Sorry about that.
+> >=20
+> > On Tue, Sep 26, 2023 at 9:09=E2=80=AFPM Mingwei Zhang <mizhang@google.c=
+om> wrote:
+> > >=20
+> > > Move kvm_check_request(KVM_REQ_NMI) after kvm_check_request(KVM_REQ_N=
+MI).
+>=20
+> Please remove it, no need to repeat the subject.
 
-It was a decision that attach will fail if something is already
-attached..
+Heh, from Documentation/process/maintainer-kvm-x86.rst:
 
-But for this API we could go the way of the iommu code and have only
-'set' and 'unset' as the two operations.
+  Changelog
+  ~~~~~~~~~
+  Most importantly, write changelogs using imperative mood and avoid pronou=
+ns.
 
-Jason
+  See :ref:`describe_changes` for more information, with one amendment: lea=
+d with
+  a short blurb on the actual changes, and then follow up with the context =
+and
+  background.  Note!  This order directly conflicts with the tip tree's pre=
+ferred
+  approach!  Please follow the tip tree's preferred style when sending patc=
+hes
+  that primarily target arch/x86 code that is _NOT_ KVM code.
+
+That said, I do prefer that the changelog intro isn't just a copy+paste of =
+the
+shortlog, and the shortlog and changelog should use conversational language=
+ instead
+of describing the literal code movement.
+
+> > > When vPMU is active use, processing each KVM_REQ_PMI will generate a
+
+This is not guaranteed.
+
+> > > KVM_REQ_NMI. Existing control flow after KVM_REQ_PMI finished will fa=
+il the
+> > > guest enter, jump to kvm_x86_cancel_injection(), and re-enter
+> > > vcpu_enter_guest(), this wasted lot of cycles and increase the overhe=
+ad for
+> > > vPMU as well as the virtualization.
+
+As above, use conversational language, the changelog isn't meant to be a pl=
+ay-by-play.
+
+E.g.
+
+  KVM: x86: Service NMI requests *after* PMI requests in VM-Enter path
+
+  Move the handling of NMI requests after PMI requests in the VM-Enter path
+  so that KVM doesn't need to cancel and redo VM-Enter in the likely
+  scenario that the vCPU has configured its LVPTC entry to generate an NMI.
+
+  Because APIC emulation "injects" NMIs via KVM_REQ_NMI, handling PMI
+  requests after NMI requests means KVM won't detect the pending NMI reques=
+t
+  until the final check for outstanding requests.  Detecting requests at th=
+e
+  final stage is costly as KVM has already loaded guest state, potentially
+  queued events for injection, disabled IRQs, dropped SRCU, etc., most of
+  which needs to be unwound.
+
+> Optimization is after correctness, so please explain if this is correct
+> first!
+
+Not first.  Leading with an in-depth description of KVM requests and NMI ha=
+ndling
+is not going to help understand *why* this change is being first.  But I do=
+ agree
+that this should provide an analysis of why it's ok to swap the order, spec=
+ificially
+why it's architecturally ok if KVM drops an NMI due to the swapped ordering=
+, e.g.
+if the PMI is coincident with two other NMIs (or one other NMI and NMIs are=
+ blocked).
+
+> > > So move the code snippet of kvm_check_request(KVM_REQ_NMI) to make KV=
+M
+> > > runloop more efficient with vPMU.
+> > >=20
+> > > To evaluate the effectiveness of this change, we launch a 8-vcpu QEMU=
+ VM on
+
+Avoid pronouns.  There's no need for all the "fluff", just state the setup,=
+ the
+test, and the results.
+
+Really getting into the nits, but the whole "8-vcpu QEMU VM" versus
+"the setup of using single core, single thread" is confusing IMO.  If there=
+ were
+potential performance downsides and/or tradeoffs, then getting the gory det=
+ails
+might be necessary, but that's not the case here, and if it were really nec=
+essary
+to drill down that deep, then I would want to better quantify the impact, e=
+.g. in
+terms latency.
+
+  E.g. on Intel SPR running SPEC2017 benchmark and Intel vtune in the guest=
+,
+  handling PMI requests before NMI requests reduces the number of canceled
+  runs by ~1500 per second, per vCPU (counted by probing calls to
+  vmx_cancel_injection()).
+
+> > > an Intel SPR CPU. In the VM, we run perf with all 48 events Intel vtu=
+ne
+> > > uses. In addition, we use SPEC2017 benchmark programs as the workload=
+ with
+> > > the setup of using single core, single thread.
+> > >=20
+> > > At the host level, we probe the invocations to vmx_cancel_injection()=
+ with
+> > > the following command:
+> > >=20
+> > >      $ perf probe -a vmx_cancel_injection
+> > >      $ perf stat -a -e probe:vmx_cancel_injection -I 10000 # per 10 s=
+econds
+> > >=20
+> > > The following is the result that we collected at beginning of the spe=
+c2017
+> > > benchmark run (so mostly for 500.perlbench_r in spec2017). Kindly for=
+give
+> > > the incompleteness.
+> > >=20
+> > > On kernel without the change:
+> > >      10.010018010              14254      probe:vmx_cancel_injection
+> > >      20.037646388              15207      probe:vmx_cancel_injection
+> > >      30.078739816              15261      probe:vmx_cancel_injection
+> > >      40.114033258              15085      probe:vmx_cancel_injection
+> > >      50.149297460              15112      probe:vmx_cancel_injection
+> > >      60.185103088              15104      probe:vmx_cancel_injection
+> > >=20
+> > > On kernel with the change:
+> > >      10.003595390                 40      probe:vmx_cancel_injection
+> > >      20.017855682                 31      probe:vmx_cancel_injection
+> > >      30.028355883                 34      probe:vmx_cancel_injection
+> > >      40.038686298                 31      probe:vmx_cancel_injection
+> > >      50.048795162                 20      probe:vmx_cancel_injection
+> > >      60.069057747                 19      probe:vmx_cancel_injection
+> > >=20
+> > >  From the above, it is clear that we save 1500 invocations per vcpu p=
+er
+> > > second to vmx_cancel_injection() for workloads like perlbench.
+
+Nit, this really should have:
+
+  Suggested-by: Sean Christopherson <seanjc@google.com>
+
+I personally don't care about the attribution, but (a) others often do care=
+ and
+(b) the added context is helpful.  E.g. for bad/questionable suggestsions/i=
+deas,
+knowing that person X was also involved helps direct and/or curate question=
+s/comments
+accordingly.
