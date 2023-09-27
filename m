@@ -2,87 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4C7A7B0E33
-	for <lists+kvm@lfdr.de>; Wed, 27 Sep 2023 23:39:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 093537B0EBA
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 00:02:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbjI0Vjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 17:39:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
+        id S229672AbjI0WB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 18:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229988AbjI0Vjp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 17:39:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED39CD6
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:39:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695850743;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TeQmh1TPxqqmIxxq+JQLJxEowOzljS/niMYQZ8guqHI=;
-        b=J+MlzvwaWeokwv8dJant096xhV3+Wfldvp9fzG34pDBSSWMf7noUTBGyrW8UtxBpjbFpX5
-        hWM3TnvC7XODqXUX7VC6eFD5Nvn/nD1u/wyUpDhu9gkGxpdb2Rr+CKI8/l/thc/CmbYCsy
-        jG1h7I/ObmIYT7S6LYiDlz4sCclVl8E=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-o2ufElesM-OgeX5VX_5a0Q-1; Wed, 27 Sep 2023 17:39:02 -0400
-X-MC-Unique: o2ufElesM-OgeX5VX_5a0Q-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3231d7d4ac4so7110932f8f.0
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 14:39:01 -0700 (PDT)
+        with ESMTP id S229459AbjI0WB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 18:01:59 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B107C136
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:01:56 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d815354ea7fso17908648276.1
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 15:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695852116; x=1696456916; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Tjhh5Z60sBXZkZCQa4W5opzjeZcwWV5KKmWVUroTRY=;
+        b=3lxbvlq5yy5xoM8h/F6x/xEysK6niJ4xs//1f/77SyQA1p7eSBtx5G1/2qbHQE7Dme
+         Ry/KBqQdnxlM+QMoFASaBCHaPb+Obw6BYl+rbPcC5eXoJzIgw7YCMGgqWD7kYeCuIICe
+         TQgN2OeFpBTPRO7tRMUFRRmOPiTTIhoDoAyOK4eHElk+CzYHvI4SeZKM9BonqxhS1Jb6
+         X6VsLse49UcWhUfqxgoDj3aaArMB3ANzCDal2lXBmY5VKgzOff9GxtHUlXC+XosE1qA3
+         09pljx/N7hH+mSo+yzwtdDTEJ7e5DulrTDBy7O32w0RDBe09kfOLbCz5OBcV8sK+egQs
+         +TJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695850740; x=1696455540;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TeQmh1TPxqqmIxxq+JQLJxEowOzljS/niMYQZ8guqHI=;
-        b=WQC/H0u8AtfK41V/T0I+8EsqLDcdNXIhY+hLF71z57NTM2BBR25PbyZXS1hT+bytR/
-         vqNxCXXwylYUwucJ5jHgZLtMJok0+SZJOwDj4OaqpDCfba2POU98ILIjTBfAZX8RmR/s
-         cebtLhwGFSDVm9QyChiS+l9PZ3DSrLLsCWOnuRyWZXbH76HtfktvIkh60q2JgKvs1zz+
-         fin6Vpw0CpEBzQUv2csM90Ed8PkJ8Z7Ju23UUVHYSUp+Ex3h5mm2C2z/TYnHWgAvlaFd
-         eAYZufaMK8ceoLFfh2zeD/SU6ga5sBOJNcZFmup3wscNXtEZ21TaN0l5W2vSRu3wqoth
-         grhQ==
-X-Gm-Message-State: AOJu0YyE8ZL/KCEZ5d50TZiwvzP40HmCIQ4RBvsom2auJlWJpPYOpJfz
-        K1RFpjOU3Nx83bDi5+ACJjwpMyoln4eSrRw6pKz5U7wJ5Hhqf7Zgvh17XR2QDaO+6fkfiSxgMLl
-        JzxP/DzjAlex4w+Rq+Rn0
-X-Received: by 2002:a05:6000:1378:b0:317:6fff:c32b with SMTP id q24-20020a056000137800b003176fffc32bmr2744986wrz.53.1695850740498;
-        Wed, 27 Sep 2023 14:39:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8Tvll3jDgau/XxrTFtu96/pFlsjFV1jgG7sTH056j2F5OzR7W6vwud805oRB7Yim04PiBCw==
-X-Received: by 2002:a05:6000:1378:b0:317:6fff:c32b with SMTP id q24-20020a056000137800b003176fffc32bmr2744966wrz.53.1695850740180;
-        Wed, 27 Sep 2023 14:39:00 -0700 (PDT)
-Received: from redhat.com ([2.52.19.249])
-        by smtp.gmail.com with ESMTPSA id n14-20020a5d400e000000b00321773bb933sm18000857wrp.77.2023.09.27.14.38.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 14:38:59 -0700 (PDT)
-Date:   Wed, 27 Sep 2023 17:38:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
- virtio devices
-Message-ID: <20230927173221-mutt-send-email-mst@kernel.org>
-References: <20230921150448-mutt-send-email-mst@kernel.org>
- <20230921194946.GX13733@nvidia.com>
- <CACGkMEvMP05yTNGE5dBA2-M0qX-GXFcdGho7_T5NR6kAEq9FNg@mail.gmail.com>
- <20230922121132.GK13733@nvidia.com>
- <CACGkMEsxgYERbyOPU33jTQuPDLUur5jv033CQgK9oJLW+ueG8w@mail.gmail.com>
- <20230925122607.GW13733@nvidia.com>
- <20230925143708-mutt-send-email-mst@kernel.org>
- <20230926004059.GM13733@nvidia.com>
- <20230926014005-mutt-send-email-mst@kernel.org>
- <20230926135057.GO13733@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230926135057.GO13733@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        d=1e100.net; s=20230601; t=1695852116; x=1696456916;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Tjhh5Z60sBXZkZCQa4W5opzjeZcwWV5KKmWVUroTRY=;
+        b=ZaVAQZ1IYtl6E2QTig6+9sykcRcW4oVChVk1EQlms7xjbR0GVwmflf72Wez3IlcAjS
+         SdJ/QOBzWFyqXUPvwC9nOuDBVe1dkutaWydzQsTp2xLIX9jJLTciBFFTLOAIXinzU9Jt
+         DuzjiLZK3w/Dbg5kd9NTg3EPp9yXpuOjyhGb///kpHQZokPGuNbt9i4pyXtrD67Nh80d
+         ZHUtolhMqzFjJijkU7ntFtgGIuESeZ3dTQBzGRq8C/2KL45uudz7Ma32IvghpDqBtERj
+         5DyNtlsAdQ0cj5tEtKcE99iPUGYykVQ9EJmHL7Eb8KskcdRy13X/96Nvbr2ojOnCog4/
+         8BQQ==
+X-Gm-Message-State: AOJu0YwQI2hLnxMmRox+ot8F7ZnbDeWwYIti3VhR5Sw8U7TRhxLC8zz1
+        np5IvlHAOXPzyRpAaB3GBtCm63u2LzQ=
+X-Google-Smtp-Source: AGHT+IGAXp0/kXHF79ZNkKu7ySNzCT/ClnUoV1NMtkK+Uu+ADh+tss5Z+HUTwRF4ch9OjD6YLoXwLYU0QX8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1613:b0:d80:ff9:d19e with SMTP id
+ bw19-20020a056902161300b00d800ff9d19emr50415ybb.9.1695852115824; Wed, 27 Sep
+ 2023 15:01:55 -0700 (PDT)
+Date:   Wed, 27 Sep 2023 15:01:54 -0700
+In-Reply-To: <SYYP282MB108686A73C0F896D90D246569DE5A@SYYP282MB1086.AUSP282.PROD.OUTLOOK.COM>
+Mime-Version: 1.0
+References: <SYYP282MB108686A73C0F896D90D246569DE5A@SYYP282MB1086.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <ZRSmUnenmHPX9HOW@google.com>
+Subject: Re: [PATCH] Add kvm_arch helper functions for guests' callchains
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tianyi Liu <i.pear@outlook.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,35 +65,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 10:50:57AM -0300, Jason Gunthorpe wrote:
-> On Tue, Sep 26, 2023 at 01:42:52AM -0400, Michael S. Tsirkin wrote:
-> > On Mon, Sep 25, 2023 at 09:40:59PM -0300, Jason Gunthorpe wrote:
-> > > On Mon, Sep 25, 2023 at 03:44:11PM -0400, Michael S. Tsirkin wrote:
-> > > > > VDPA is very different from this. You might call them both mediation,
-> > > > > sure, but then you need another word to describe the additional
-> > > > > changes VPDA is doing.
-> > > > 
-> > > > Sorry about hijacking the thread a little bit, but could you
-> > > > call out some of the changes that are the most problematic
-> > > > for you?
-> > > 
-> > > I don't really know these details.
-> > 
-> > Maybe, you then should desist from saying things like "It entirely fails
-> > to achieve the most important thing it needs to do!" You are not making
-> > any new friends with saying this about a piece of software without
-> > knowing the details.
+Apologies for the belated feedback, I remember seeing this fly by and could have
+sworn I responded, but obviously did not.
+
+On Thu, Aug 31, 2023, Tianyi Liu wrote:
+> Hi Sean and Paolo,
 > 
-> I can't tell you what cloud operators are doing, but I can say with
-> confidence that it is not the same as VDPA. As I said, if you want to
-> know more details you need to ask a cloud operator.
+> This patch serves as the foundation for enabling callchains for guests,
+> (used by `perf kvm`). This functionality is useful for me, and I
+> noticed it holds the top spot on the perf wiki TODO list [1], so I'd like
+> to implement it. This patch introduces several arch-related kvm helper
+> functions, which will be later used for guest stack frame profiling.
+> This also contains the implementation for x86 platform, while arm64 will
+> be implemented later.
 > 
-> Jason
+> This is part of a series of patches. Since these patches are spread across
+> various modules like perf, kvm, arch/*, I plan to first submit some
+> foundational patches and gradually submit the complete implementation.
+> The full implementation can be found at [2], and it has been tested on
+> an x86_64 machine.
 
-So it's not the changes that are problematic, it's that you have
-customers who are not using vdpa. The "most important thing" that vdpa
-fails at is simply converting your customers from vfio to vdpa.
+Please post the whole thing, or at least enough to actually show the end-to-end
+usage.  I suspect the main reason you heard crickets for almost two months is
+that's there's nothing actionable to do with this.  This certainly can't be
+applied as-is since there is no usage, and it's almost impossible to review
+something when only a small sliver is visibible.
 
--- 
-MST
+> Sean, I noticed you've previously done some refactoring on this code [3],
+> do you think there are any issues with the way it was done?
 
+I'd have to look at the whole thing, and to be honest I don't want to pull down
+from github to do that.
+
+> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+> index 75eae9c4998a..c73acecc7ef9 100644
+> --- a/arch/x86/kvm/kvm_cache_regs.h
+> +++ b/arch/x86/kvm/kvm_cache_regs.h
+> @@ -133,6 +133,11 @@ static inline void kvm_rsp_write(struct kvm_vcpu *vcpu, unsigned long val)
+>  	kvm_register_write_raw(vcpu, VCPU_REGS_RSP, val);
+>  }
+>  
+> +static inline unsigned long kvm_fp_read(struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_register_read_raw(vcpu, VCPU_REGS_RBP);
+> +}
+> +
+>  static inline u64 kvm_pdptr_read(struct kvm_vcpu *vcpu, int index)
+>  {
+>  	might_sleep();  /* on svm */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c381770bcbf1..2fd3850b1673 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12902,6 +12902,24 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+>  	return kvm_rip_read(vcpu);
+>  }
+>  
+> +unsigned long kvm_arch_vcpu_get_fp(struct kvm_vcpu *vcpu)
+
+Take this with a grain of salt this I can't see the big picture, but I recommend
+spelling out frame_pointer.  At first glance I read this as "kvm_arch_vcpu_get_fpu()"
+and was all kinds of confused.
+
+This and kvm_arch_vcpu_is_64bit() can also be inlined functions.
+
+> +{
+> +	return kvm_fp_read(vcpu);
+
+No need for a dedicated kvm_fp_read(), just open code the read of RBP here.
+
+> +}
+> +
+> +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, void *addr, void *dest, unsigned int length)
+
+This should needn't an arch hook, though again I can't see the big picture.
+
+> +{
+> +	struct x86_exception e;
+> +
+> +	/* Return true on success */
+> +	return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
+> +}
+> +
+> +bool kvm_arch_vcpu_is_64bit(struct kvm_vcpu *vcpu)
+> +{
+> +	return is_64_bit_mode(vcpu);
+> +}
+> +
+>  int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
