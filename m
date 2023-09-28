@@ -2,89 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0157D7B1FD0
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 16:37:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D8E7B2062
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 17:05:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbjI1OhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 10:37:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
+        id S231450AbjI1PFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 11:05:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230201AbjI1OhW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 10:37:22 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCE2136
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 07:37:20 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c73fb50da6so1882485ad.0
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 07:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695911839; x=1696516639; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QxaDNo/28khXZb4Aj1sVc9pIXz3hTbsT3xVR2UV8m8=;
-        b=rknJhIbokgH0zbGE2DpHc7rvxjhI0qDOwPETMBTKXBj5ZrWZctMUe3PYldU/Uz4eMY
-         piDcpdEf5e45m6PRCXYf3IZmVIsnbcMzOTYHw60xa75cxCwc4irYb0ngABf1pPhQ2nt6
-         cpFYxiEqwu35c8EzPQQ4+oMEH1M4boShG6855KHXGH9K1Cx0zhyG+RVVBEfv/dENM/gH
-         nbP4odRaqR6cWmGp7xQJrKdbl4Ns3EhyvwFV+l8UFmEGnhKA1t9s62/TiAqZMBVa4eKS
-         BlwFoLwbpAx5lFCZPIXGbVNF49VzPN13od7Sr0IWxpkVYOjA1scNIe1L7LugvIxapZm1
-         A6tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695911839; x=1696516639;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QxaDNo/28khXZb4Aj1sVc9pIXz3hTbsT3xVR2UV8m8=;
-        b=xMjlkBOmW2HGGo1tdp3qObLb+Ow8jr8BSrh1C1QYOJHhof/HWj9hO58zuvb+RBOE+b
-         grZ40+CVo0ao6jSl1l+JR+tHKkbXgHNasiJseDkMxhEls0YIyLoozbTGg1NCpjxU9puc
-         1/qWwHKfk84iWiL2Rigro1OBWjMO6mkCc/TF47WQnpnlk5RXXofl0WmoQamGZLAwxhjF
-         lp/FACU2ZBYPGuB4gxf9sKlCM6VpJdZpYgwwOYALSWxdMawhu89WEV+559HEHf8eC5aB
-         FbFGkGcskPH6qZbjFqwn8YviPCzfiRa8HavsKHIsMBY2SuiSvWoNi/3KDCI+HuJ+UF8L
-         Mctg==
-X-Gm-Message-State: AOJu0Yw1CIaiacWXV3PCukIB+w/HK4M0ZMRUPhLFyFTu1+kvbRCHRaHt
-        ABDfV8VpWgECXJM3i23cbi5toXcDpp0=
-X-Google-Smtp-Source: AGHT+IFjf4/4kxY62aGAWySYok0JrBMvXVo3onhQW53llL5R1mbFzYHYE6agELo+DEZDG1+PprgDhHr6p74=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f543:b0:1c7:2763:9ed7 with SMTP id
- h3-20020a170902f54300b001c727639ed7mr23179plf.9.1695911839637; Thu, 28 Sep
- 2023 07:37:19 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 07:37:17 -0700
-In-Reply-To: <e2a0d2cb-bc93-4d36-bf42-6963095b207f@rbox.co>
-Mime-Version: 1.0
-References: <20230814222358.707877-1-mhal@rbox.co> <20230814222358.707877-4-mhal@rbox.co>
- <13480bef-2646-4c01-ba81-3020a2ef2ce1@rbox.co> <ZRSMGdxk2X-cXr6z@google.com> <e2a0d2cb-bc93-4d36-bf42-6963095b207f@rbox.co>
-Message-ID: <ZRWPbAW29aGePPNA@google.com>
-Subject: Re: [PATCH 3/3] KVM: Correct kvm_vcpu_event(s) typo in KVM API documentation
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        with ESMTP id S231445AbjI1PF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 11:05:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA77D1AE
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 08:04:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695913475;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=loADJkQmm3NMp2euPIHq0njfjxsbikdzpGiKHJE7uMw=;
+        b=eStoFu/QRPkzv0Tg7gTRAAzOFrUWH29Kp+k9okBX6cz0ySA0uH10BY05nWi6akdCJpODEs
+        dcx/MVu5W3XVu9NV4JhbNlHYmBncabYtxWU2C8w3RsyfoSv+vH/Rd0+rl8y5znSFFBlTdf
+        poGMS7qvMTVKQyTGSCYXAvhrJY9lfp8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-362-4mc4vLxuPUmwvAq12kDf1A-1; Thu, 28 Sep 2023 11:04:33 -0400
+X-MC-Unique: 4mc4vLxuPUmwvAq12kDf1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AE131811E7E;
+        Thu, 28 Sep 2023 15:04:32 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.226.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2726240C6E76;
+        Thu, 28 Sep 2023 15:04:28 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Will Deacon <will@kernel.org>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/5] AVIC bugfixes and workarounds
+Date:   Thu, 28 Sep 2023 18:04:23 +0300
+Message-Id: <20230928150428.199929-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 28, 2023, Michal Luczaj wrote:
-> On 9/27/23 22:10, Sean Christopherson wrote:
-> > On Tue, Aug 15, 2023, Michal Luczaj wrote:
-> >> On 8/15/23 00:08, Michal Luczaj wrote:
-> >>> I understand that typo fixes are not always welcomed, but this
-> >>> kvm_vcpu_event(s) did actually bit me, causing minor irritation.
-> >>                                  ^^^
-> > 
-> > FWIW, my bar for fixing typos is if the typo causes any amount of confusion or
-> > wasted time.  If it causes one person pain, odds are good it'll cause others pain
-> > in the future.
-> 
-> OK, do you want me to resend just the kvm_vcpu_event(s) fix?
-> (and, empathetically, introduce a typo in the changelog proper :P)
+Hi!=0D
+=0D
+This patch series includes several fixes to AVIC I found while working=0D
+on a new version of nested AVIC code.=0D
+=0D
+Also while developing it I realized that a very simple workaround for=0D
+AVIC's errata #1235 exists and included it in this patch series as well.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (5):=0D
+  x86: KVM: SVM: fix for x2avic CVE-2023-5090=0D
+  x86: KVM: SVM: add support for Invalid IPI Vector interception=0D
+  x86: KVM: SVM: refresh AVIC inhibition in svm_leave_nested()=0D
+  iommu/amd: skip updating the IRTE entry when is_run is already false=0D
+  x86: KVM: SVM: workaround for AVIC's errata #1235=0D
+=0D
+ arch/x86/include/asm/svm.h |  1 +=0D
+ arch/x86/kvm/svm/avic.c    | 55 +++++++++++++++++++++++++++-----------=0D
+ arch/x86/kvm/svm/nested.c  |  3 +++=0D
+ arch/x86/kvm/svm/svm.c     |  3 +--=0D
+ drivers/iommu/amd/iommu.c  |  9 +++++++=0D
+ 5 files changed, 54 insertions(+), 17 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-Oh, no, sorry.  I'll take this as-is.  Opportunistically fixing misspellings like
-you did it totally fine, especially since this is documentation.
-
-What I was trying to say is that if a patch fixes a real issue for someone, I'll
-definitely take the time to get it applied.  I didn't mean to say I wouldn't take
-other typo fixes (though I am inclined to leave code/comments alone if a typo is
-benign, in order to reduce the churn in git history).
