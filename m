@@ -2,122 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABC527B186E
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 12:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E63A7B1AA6
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 13:21:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbjI1KnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 06:43:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50830 "EHLO
+        id S231905AbjI1LVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 07:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231582AbjI1KnA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 06:43:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA1119B
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:42:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695897731;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OsIQH2esLZ9lBTU+WR+vp4IagfZKRYGyDAIQyBrRQDE=;
-        b=RdeTU1uwtuxmaE67sYwO/zmVOuUPL0qr1ogN7ijbFvUk3Sca2kYPX1Azn+SGQS7jpLimp/
-        TPjYD6jka4ai5yYmLlW7V533Qh5RnO//Z6MG3Wn+pyASiNJZ6zPxkM9fXkmnySc7pxj8v1
-        T/96yQ2qf23KO8eH8lTQbo+CODyLNXs=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-MeQ5dllKNCiXqmxhOm5nxQ-1; Thu, 28 Sep 2023 06:42:10 -0400
-X-MC-Unique: MeQ5dllKNCiXqmxhOm5nxQ-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5042bc93273so18245529e87.1
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:42:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695897729; x=1696502529;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OsIQH2esLZ9lBTU+WR+vp4IagfZKRYGyDAIQyBrRQDE=;
-        b=MQ/A+1/r+31emW7jbVY1AAmqloUfWlr6s6YrlRE+V384YEmLzD7wJ5GyBTQxeCASzC
-         Wi+r5nyZ8i8qsSrJ3bsh3r6x5Bx2FFoMFa5js3C4CHtoMuCDrCRHBNCIxM9pBlYv+3JO
-         umgc9C9SxRA8mAy1iMAn9k6K5itvUkHjOcXit6EHUhScs1pacG7cooLOGdn2+R3iEmni
-         qnkItEkkMUQBVNySwQj1862BKtmofwUV8glDqvBndTp1kJ9bxD54N2JlaV5ni1b4M43m
-         hk+U3/hg/DTvjzRucrTC+lL4rIPhbBCkXYu+tmsejcIhfKUkDkNgUAxhhuAssZpJbtH/
-         /r/w==
-X-Gm-Message-State: AOJu0YzYZLKiwpZlhRUT2LJOPiKnQoiJBEiD2XfPJ1fvFlbYdu29B2v0
-        uJpvVXYWlZ83hWTsmj6yCBBkHfGxmDb3PBaK5qo3u6f2gHvrOg8toMJ8UW06RZQnEitHPbc76+T
-        UOk/gnEZG0K4Y
-X-Received: by 2002:a05:6512:2386:b0:500:7f71:e46b with SMTP id c6-20020a056512238600b005007f71e46bmr995989lfv.1.1695897728911;
-        Thu, 28 Sep 2023 03:42:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFLLgFKQbMJAduzEZl1evB3HNBUyq53sir7xQOrQUBJRpJm8Gc0M8Q2mW2g7oe4Vbltc4zlgw==
-X-Received: by 2002:a05:6512:2386:b0:500:7f71:e46b with SMTP id c6-20020a056512238600b005007f71e46bmr995971lfv.1.1695897728708;
-        Thu, 28 Sep 2023 03:42:08 -0700 (PDT)
-Received: from starship ([89.237.96.178])
-        by smtp.gmail.com with ESMTPSA id 22-20020a05600c22d600b0040648217f4fsm2891898wmg.39.2023.09.28.03.42.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 03:42:08 -0700 (PDT)
-Message-ID: <7d6bdd4fca0dfdd6528e416510877c3bfd0cbfac.camel@redhat.com>
-Subject: Re: [PATCH v2 4/4] KVM: x86: add new nested vmexit tracepoints
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>
-Date:   Thu, 28 Sep 2023 13:42:06 +0300
-In-Reply-To: <0db86d5f-50d0-db25-e9ee-d92f2f463faf@redhat.com>
-References: <20230924124410.897646-1-mlevitsk@redhat.com>
-         <20230924124410.897646-5-mlevitsk@redhat.com>
-         <0db86d5f-50d0-db25-e9ee-d92f2f463faf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S232215AbjI1LVP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 07:21:15 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8790119B1
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 04:08:53 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAD93C433C7;
+        Thu, 28 Sep 2023 11:08:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695899293;
+        bh=zhiOLfJ0JfjTtUCV6Hrzae3FSoWZJkYgnCXqiKK7JR8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cLWXulnI5czMfaumpqZWI+eUFdOlXpPAuHG0uktDdCpvvZrSm4TgrGr/jmfn1EkK3
+         R6OEMsqDmfN1f+F558cH/7at/dFmLNsdSFGHuSGW/LiMpYG2W23CJu4fYEkrzjkOw/
+         JEOLcda2Lt7VfyyvL5HW6dpphmmv1fKva7BIVPiNTv6QjHf8GZXhvCe9FlSChEEQMp
+         unysT3j4UKWS6w10FajruE3brygmGriP0iilfJurNuC2cD1V6/dB6zc0U4+vev52k4
+         y08IsGqmW2aJFuzT/LZljA6Jvdb0EGXCxzRYtEGEEX0Ah/D6aCFUAQwy663KYN21Pz
+         Jq17ZyqdMPReA==
+Date:   Thu, 28 Sep 2023 14:08:08 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 0/9] Add chunk mode support for mlx5 driver
+Message-ID: <20230928110808.GT1642130@unreal>
+References: <20230911093856.81910-1-yishaih@nvidia.com>
+ <20230920183123.GJ13733@nvidia.com>
+ <78298eea-b264-1739-9ded-7d8fa9c7208e@nvidia.com>
+ <20230927161023.7e13c06f.alex.williamson@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230927161023.7e13c06f.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On, 2023-09-26 у 18:50 +0200, Paolo Bonzini writes:
-> On 9/24/23 14:44, Maxim Levitsky wrote:
-> > +		trace_kvm_nested_page_fault(fault->address,
-> > +				vcpu->arch.ept_fault_error_code,
+On Wed, Sep 27, 2023 at 04:10:23PM -0600, Alex Williamson wrote:
+> On Wed, 27 Sep 2023 13:59:06 +0300
+> Yishai Hadas <yishaih@nvidia.com> wrote:
 > 
-> Any reason to include vcpu->arch.ept_fault_error_code rather than the 
-> injected exit qualification?
+> > On 20/09/2023 21:31, Jason Gunthorpe wrote:
+> > > On Mon, Sep 11, 2023 at 12:38:47PM +0300, Yishai Hadas wrote:  
+> > >> This series adds 'chunk mode' support for mlx5 driver upon the migration
+> > >> flow.
+> > >>
+> > >> Before this series, we were limited to 4GB state size, as of the 4 bytes
+> > >> max value based on the device specification for the query/save/load
+> > >> commands.
+> > >>
+> > >> Once the device supports 'chunk mode' the driver can support state size
+> > >> which is larger than 4GB.
+> > >>
+> > >> In that case, the device has the capability to split a single image to
+> > >> multiple chunks as long as the software provides a buffer in the minimum
+> > >> size reported by the device.
+> > >>
+> > >> The driver should query for the minimum buffer size required using
+> > >> QUERY_VHCA_MIGRATION_STATE command with the 'chunk' bit set in its
+> > >> input, in that case, the output will include both the minimum buffer
+> > >> size and also the remaining total size to be reported/used where it will
+> > >> be applicable.
+> > >>
+> > >> Upon chunk mode, there may be multiple images that will be read from the
+> > >> device upon STOP_COPY. The driver will read ahead from the firmware the
+> > >> full state in small/optimized chunks while letting QEMU/user space read
+> > >> in parallel the available data.
+> > >>
+> > >> The chunk buffer size is picked up based on the minimum size that
+> > >> firmware requires, the total full size and some max value in the driver
+> > >> code which was set to 8MB to achieve some optimized downtime in the
+> > >> general case.
+> > >>
+> > >> With that series in place, we could migrate successfully a device state
+> > >> with a larger size than 4GB, while even improving the downtime in some
+> > >> scenarios.
+> > >>
+> > >> Note:
+> > >> As the first patch should go to net/mlx5 we may need to send it as a
+> > >> pull request format to VFIO to avoid conflicts before acceptance.
+> > >>
+> > >> Yishai
+> > >>
+> > >> Yishai Hadas (9):
+> > >>    net/mlx5: Introduce ifc bits for migration in a chunk mode
+> > >>    vfio/mlx5: Wake up the reader post of disabling the SAVING migration
+> > >>      file
+> > >>    vfio/mlx5: Refactor the SAVE callback to activate a work only upon an
+> > >>      error
+> > >>    vfio/mlx5: Enable querying state size which is > 4GB
+> > >>    vfio/mlx5: Rename some stuff to match chunk mode
+> > >>    vfio/mlx5: Pre-allocate chunks for the STOP_COPY phase
+> > >>    vfio/mlx5: Add support for SAVING in chunk mode
+> > >>    vfio/mlx5: Add support for READING in chunk mode
+> > >>    vfio/mlx5: Activate the chunk mode functionality  
+> > > I didn't check in great depth but this looks OK to me
+> > >
+> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>  
+> > 
+> > Thanks Jason
+> > 
+> > >
+> > > I think this is a good design to start motivating more qmeu
+> > > improvements, eg using io_uring as we could go further in the driver
+> > > to optimize with that kind of support.
+> > >
+> > > Jason  
+> > 
+> > Alex,
+> > 
+> > Can we move forward with the series and send a PR for the first patch 
+> > that needs to go also to net/mlx5 ?
+> 
+> Yeah, I don't spot any issues with it either.  Thanks,
 
+Hi Alex,
 
-The vcpu->arch.ept_fault_error_code is the original exit qualification
-which I want to trace as the host error code
-captured on ept fault to a new field, but I see new that I can use vmx_get_exit_qual()
-to retrieve it again, thus avoiding the overhead.
+I uploaded the first patch to shared branch, can you please pull it?
+https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/log/?h=mlx5-vfio
 
-Also for the injected error code I can use the 'exit_qualification' instead, I think
-that I intended to so so but forgot to update the patch.
-
-So something like that works fine for me:
-
-		trace_kvm_nested_page_fault(fault->address,
-				vmx_get_exit_qual(vcpu),
-				exit_qualification);
-
-
-
-
-Best regards,
-	Maxim Levitsky
+Thanks
 
 > 
-> Paolo
+> Alex
 > 
-> > +				fault->error_code);
-
-
-
-
+> 
