@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 326F07B0FDF
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 02:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBE9F7B0FE4
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 02:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229966AbjI1AUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 20:20:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33058 "EHLO
+        id S229899AbjI1AUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Sep 2023 20:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbjI1AUJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 20:20:09 -0400
+        with ESMTP id S229906AbjI1AUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Sep 2023 20:20:11 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0C6198
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 17:20:08 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f7d109926so149337297b3.2
-        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 17:20:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A1D121
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 17:20:10 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bdb9fe821so241330477b3.0
+        for <kvm@vger.kernel.org>; Wed, 27 Sep 2023 17:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695860407; x=1696465207; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695860409; x=1696465209; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TVfUpdVb4H8djihj2XvGyhzWBuel7qP+7Sh6W+PqBNQ=;
-        b=QfVgvl64c9mB0oYD9auDZK0joTr4LN9z9qsgMRTS7qJ0IC2VsIPjYeAgFMTE01lJY/
-         DxpA8VZAHOwZ9JOjXpQ/YT5jeTrG1M0fSuteVmJ4qdpmMk4qP6qALPkj9wzGkl2K6xsQ
-         pxS38FE0eQLZXb4yWwyA7lDxje892UwNW69m9XO+0uWhRkK73QCJ5e3GC/JYqQocz83W
-         s+m6uPz/z2O7ySSS6PFoTcBCMjZEfr1mRVm5mDz/U+MkNJ7C9ZW0zDCuybGuPKOh0qge
-         7PbNWxMWccE9/TywCKwoteEZktK20LESCqNlXLhZ361Fom+rbhC4Gyl9UmzyiFU+75+Q
-         SgHw==
+        bh=apwOiyl24ZAzh9ksVSTWSskudG0FdMibqgJzxKGTzAQ=;
+        b=Zze5OchnMhY/xpYjX8HB/FriVX6nu+cRHKXB4vZY7gxJR3iPIPmqih7gNJ4BXITsmA
+         ceEJtB+pIiM2mmIU6ErKSr65I4vDLO1zY7uxe0vE9L2YMttnem4Ib3Jo3z2M7Ju+pPz8
+         YD6Zq2x56OMgXe/GKQfXOsNEFXWgMjVxZD5xz5DLZs7liJIKDUY8Uas7E8OguTdZRLLW
+         SWptk3wTbS1K/mmQwdQb9iMOAytZ5Cnjak5CQu/CgZ9MDf0JiO+I+zrMCYBYyucb1XLM
+         vA+715O0al/OePUImkKVPLPJULnRZj1WbmYUuiPAU88J8LG9CvfXiJ53yrymyuObbysT
+         BAQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695860407; x=1696465207;
+        d=1e100.net; s=20230601; t=1695860409; x=1696465209;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TVfUpdVb4H8djihj2XvGyhzWBuel7qP+7Sh6W+PqBNQ=;
-        b=scUtbsoyRsTj+urVugvoP5L+OOzd9X4bzeLPOpnDF01qgZUa5IuRvTt4yh6qOxnlxr
-         aJv/L/BCNvNoPiXgUu+1hKbQYjr0AUz1RfS3jvBEOl4LomR35l6UFPe8WQj4ekEsmE1M
-         mfwKmxk+SM+T76fK3qsgrQLEjDUdElRtFt2RO7hf9afLizAPwH8uILSyu4Mmyl/PgxA/
-         MHo6qIFwEgILHFX6Fi79o9eFjM5cuVmUNJEiQ8Zz2QDwiaT/u8T3ZOAFtY/vO/REI6Xu
-         z7a3S4d84vmEmQLR4MQsPSZctdiQBpx8sG4samChOmIDeXeJb+mhidlmkaErIEAdplE2
-         jH6w==
-X-Gm-Message-State: AOJu0YwCP3SV8cVaeSa51DokZ8AWr3No5ozm3wXxvs6Zf9Fs8b8PdKIy
-        /zTcoVaQj2Yox0Igk2p7aNy/Fk4usAg=
-X-Google-Smtp-Source: AGHT+IFhAUt+8/byCgo6N2PCf+dvWKMyFGUjD1tcqW/1QA0MnF0S/CYub5vkgi5QAlFkH9KMWwwIy4ogT3A=
+        bh=apwOiyl24ZAzh9ksVSTWSskudG0FdMibqgJzxKGTzAQ=;
+        b=Lx6xXxtZ+hQKxF+4ALnNoUpHHNsDqN11ePPrOtihJIh8V+tMa3gXb9qSoQi9Nt2aNS
+         ylnvYsgUMMUMFd6u4vGh778C6FDJWRB250s1NP4tkXSsSVkN2VZuRULKJ1eRaHVoM3As
+         doJUDSKyXUenr8ykPj7bfzKl4iImJ4qn1erltnZ86kZxAZ58avfkKTb9clIJT19HI5Fs
+         EtEIcmXGftXS+k/wHHfC9fnGL2uOXvxYWLaq7UckMaiYgV/QLyj4/943bsF7d9K/yGeb
+         B9y7nL1o6h4eb8oRwbiIwmoRxvM2gP429Ig7B/tmsk8c+7YtKuAdIVaTfh21CPsnGYrl
+         lj8g==
+X-Gm-Message-State: AOJu0YxcjV09hJVm1mg7J563j8+YAFVn2PLKhdCUJfGaJaVEY9xSkF5u
+        rfqeD830BP+sPulIeF3E5dIBKhCg66Q=
+X-Google-Smtp-Source: AGHT+IFjrvJ2npDBahfPzbZd3vwTKZ6Cm9AffU0wGAefuUEwJ5h8tV0U/szmpVbKu6qLaPMbte7BjNX86SI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:541:b0:d0c:c83b:94ed with SMTP id
- z1-20020a056902054100b00d0cc83b94edmr49229ybs.10.1695860407456; Wed, 27 Sep
- 2023 17:20:07 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:b65e:0:b0:586:a58d:2e24 with SMTP id
+ h30-20020a81b65e000000b00586a58d2e24mr63304ywk.5.1695860409338; Wed, 27 Sep
+ 2023 17:20:09 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 27 Sep 2023 17:19:55 -0700
+Date:   Wed, 27 Sep 2023 17:19:56 -0700
 In-Reply-To: <20230928001956.924301-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230928001956.924301-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20230928001956.924301-5-seanjc@google.com>
-Subject: [PATCH 4/5] KVM: selftests: Load XSAVE state into untouched vCPU
- during state test
+Message-ID: <20230928001956.924301-6-seanjc@google.com>
+Subject: [PATCH 5/5] KVM: selftests: Force load all supported XSAVE state in
+ state test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -79,57 +79,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expand x86's state test to load XSAVE state into a "dummy" vCPU prior to
-KVM_SET_CPUID2, and again with an empty guest CPUID model.  Except for
-off-by-default features, i.e. AMX, KVM's ABI for KVM_SET_XSAVE is that
-userspace is allowed to load xfeatures so long as they are supported by
-the host.  This is a regression test for a combination of KVM bugs where
-the state saved by KVM_GET_XSAVE{2} could not be loaded via KVM_SET_XSAVE
-if the saved xstate_bv would load guest-unsupported xfeatures.
+Extend x86's state to forcefully load *all* host-supported xfeatures by
+modifying xstate_bv in the saved state.  Stuffing xstate_bv ensures that
+the selftest is verifying KVM's full ABI regardless of whether or not the
+guest code is successful in getting various xfeatures out of their INIT
+state, e.g. see the disaster that is/was MPX.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/x86_64/state_test.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h       |  9 +++++++++
+ tools/testing/selftests/kvm/x86_64/state_test.c    | 14 ++++++++++++++
+ 2 files changed, 23 insertions(+)
 
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 6f66861175ad..25bc61dac5fb 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -922,6 +922,15 @@ static inline bool kvm_pmu_has(struct kvm_x86_pmu_feature feature)
+ 	       !kvm_cpu_has(feature.anti_feature);
+ }
+ 
++static __always_inline uint64_t kvm_cpu_supported_xcr0(void)
++{
++	if (!kvm_cpu_has_p(X86_PROPERTY_SUPPORTED_XCR0_LO))
++		return 0;
++
++	return kvm_cpu_property(X86_PROPERTY_SUPPORTED_XCR0_LO) |
++	       ((uint64_t)kvm_cpu_property(X86_PROPERTY_SUPPORTED_XCR0_HI) << 32);
++}
++
+ static inline size_t kvm_cpuid2_size(int nr_entries)
+ {
+ 	return sizeof(struct kvm_cpuid2) +
 diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-index df3e93df4343..115b2cdf9279 100644
+index 115b2cdf9279..88b58aab7207 100644
 --- a/tools/testing/selftests/kvm/x86_64/state_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-@@ -231,9 +231,9 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
+@@ -230,6 +230,7 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
+ 
  int main(int argc, char *argv[])
  {
++	uint64_t *xstate_bv, saved_xstate_bv;
  	vm_vaddr_t nested_gva = 0;
--
-+	struct kvm_cpuid2 empty_cpuid = {};
+ 	struct kvm_cpuid2 empty_cpuid = {};
  	struct kvm_regs regs1, regs2;
--	struct kvm_vcpu *vcpu;
-+	struct kvm_vcpu *vcpu, *vcpuN;
- 	struct kvm_vm *vm;
- 	struct kvm_x86_state *state;
- 	struct ucall uc;
-@@ -286,6 +286,21 @@ int main(int argc, char *argv[])
- 		/* Restore state in a new VM.  */
- 		vcpu = vm_recreate_with_one_vcpu(vm);
- 		vcpu_load_state(vcpu, state);
+@@ -294,12 +295,25 @@ int main(int argc, char *argv[])
+ 		 * allow KVM_SET_XSAVE regardless of guest CPUID.  Manually
+ 		 * load only XSAVE state, MSRs in particular have a much more
+ 		 * convoluted ABI.
++		 *
++		 * Load two versions of XSAVE state: one with the actual guest
++		 * XSAVE state, and one with all supported features forced "on"
++		 * in xstate_bv, e.g. to ensure that KVM allows loading all
++		 * supported features, even if something goes awry in saving
++		 * the original snapshot.
+ 		 */
++		xstate_bv = (void *)&((uint8_t *)state->xsave->region)[512];
++		saved_xstate_bv = *xstate_bv;
 +
-+		/*
-+		 * Restore XSAVE state in a dummy vCPU, first without doing
-+		 * KVM_SET_CPUID2, and then with an empty guest CPUID.  Except
-+		 * for off-by-default xfeatures, e.g. AMX, KVM is supposed to
-+		 * allow KVM_SET_XSAVE regardless of guest CPUID.  Manually
-+		 * load only XSAVE state, MSRs in particular have a much more
-+		 * convoluted ABI.
-+		 */
-+		vcpuN = __vm_vcpu_add(vm, vcpu->id + 1);
+ 		vcpuN = __vm_vcpu_add(vm, vcpu->id + 1);
+ 		vcpu_xsave_set(vcpuN, state->xsave);
++		*xstate_bv = kvm_cpu_supported_xcr0();
 +		vcpu_xsave_set(vcpuN, state->xsave);
-+
-+		vcpu_init_cpuid(vcpuN, &empty_cpuid);
+ 
+ 		vcpu_init_cpuid(vcpuN, &empty_cpuid);
+ 		vcpu_xsave_set(vcpuN, state->xsave);
++		*xstate_bv = saved_xstate_bv;
 +		vcpu_xsave_set(vcpuN, state->xsave);
-+
+ 
  		kvm_x86_state_cleanup(state);
  
- 		memset(&regs2, 0, sizeof(regs2));
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
