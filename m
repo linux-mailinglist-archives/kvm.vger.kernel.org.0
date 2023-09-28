@@ -2,107 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E17C77B1F3B
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 16:09:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0157D7B1FD0
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 16:37:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232570AbjI1OJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 10:09:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
+        id S230306AbjI1OhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 10:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbjI1OJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 10:09:55 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2A011F;
-        Thu, 28 Sep 2023 07:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695910194; x=1727446194;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rWPUuNNdKXgrAPoDqjutOvUZaBIRMfIRRc8S+g1NzQo=;
-  b=GFONEdUMERB3qHISMNyvF3/crvK2eLR+bKH6XHzoOQiTkkhiHwBjgWVb
-   dUgBtslOjGSWhoc/A9/jkZHpQlc7//KeJUlESxr2E1t+0k5quTVW+2r1x
-   C0CQDI/KdBv9KoN7XaIHuRcKdNhRfI6GDuNeLgvpaj8ZUHYeCQDNtd5M8
-   c24VXqwZj0PN9mmQPcFsweKqx+rKVXP4Wq9mGlhmPKRNYMHeFBfcrn4hQ
-   EOCvKvQtTruPf/yzZ2YXloEMlWCd6p/HOgL5BMqm/ZSj3u7YF7IJVtPDs
-   AoOitApO8NbCVAAXxzVszfizsfbHRkCl11tsX7tzPcznwHWHjJZVJIsGN
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="468356756"
-X-IronPort-AV: E=Sophos;i="6.03,184,1694761200"; 
-   d="scan'208";a="468356756"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 07:09:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="815243277"
-X-IronPort-AV: E=Sophos;i="6.03,184,1694761200"; 
-   d="scan'208";a="815243277"
-Received: from jveerasa-mobl.amr.corp.intel.com (HELO [10.255.231.134]) ([10.255.231.134])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 07:09:52 -0700
-Message-ID: <b22a3863-cf11-14b7-23f3-4b8971f44580@intel.com>
-Date:   Thu, 28 Sep 2023 07:09:52 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 2/5] KVM: x86: Constrain guest-supported xfeatures only at
- KVM_GET_XSAVE{2}
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Tyler Stachecki <stachecki.tyler@gmail.com>,
-        Leonardo Bras <leobras@redhat.com>
-References: <20230928001956.924301-1-seanjc@google.com>
- <20230928001956.924301-3-seanjc@google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230928001956.924301-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230201AbjI1OhW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 10:37:22 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCE2136
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 07:37:20 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c73fb50da6so1882485ad.0
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 07:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695911839; x=1696516639; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1QxaDNo/28khXZb4Aj1sVc9pIXz3hTbsT3xVR2UV8m8=;
+        b=rknJhIbokgH0zbGE2DpHc7rvxjhI0qDOwPETMBTKXBj5ZrWZctMUe3PYldU/Uz4eMY
+         piDcpdEf5e45m6PRCXYf3IZmVIsnbcMzOTYHw60xa75cxCwc4irYb0ngABf1pPhQ2nt6
+         cpFYxiEqwu35c8EzPQQ4+oMEH1M4boShG6855KHXGH9K1Cx0zhyG+RVVBEfv/dENM/gH
+         nbP4odRaqR6cWmGp7xQJrKdbl4Ns3EhyvwFV+l8UFmEGnhKA1t9s62/TiAqZMBVa4eKS
+         BlwFoLwbpAx5lFCZPIXGbVNF49VzPN13od7Sr0IWxpkVYOjA1scNIe1L7LugvIxapZm1
+         A6tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695911839; x=1696516639;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1QxaDNo/28khXZb4Aj1sVc9pIXz3hTbsT3xVR2UV8m8=;
+        b=xMjlkBOmW2HGGo1tdp3qObLb+Ow8jr8BSrh1C1QYOJHhof/HWj9hO58zuvb+RBOE+b
+         grZ40+CVo0ao6jSl1l+JR+tHKkbXgHNasiJseDkMxhEls0YIyLoozbTGg1NCpjxU9puc
+         1/qWwHKfk84iWiL2Rigro1OBWjMO6mkCc/TF47WQnpnlk5RXXofl0WmoQamGZLAwxhjF
+         lp/FACU2ZBYPGuB4gxf9sKlCM6VpJdZpYgwwOYALSWxdMawhu89WEV+559HEHf8eC5aB
+         FbFGkGcskPH6qZbjFqwn8YviPCzfiRa8HavsKHIsMBY2SuiSvWoNi/3KDCI+HuJ+UF8L
+         Mctg==
+X-Gm-Message-State: AOJu0Yw1CIaiacWXV3PCukIB+w/HK4M0ZMRUPhLFyFTu1+kvbRCHRaHt
+        ABDfV8VpWgECXJM3i23cbi5toXcDpp0=
+X-Google-Smtp-Source: AGHT+IFjf4/4kxY62aGAWySYok0JrBMvXVo3onhQW53llL5R1mbFzYHYE6agELo+DEZDG1+PprgDhHr6p74=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:f543:b0:1c7:2763:9ed7 with SMTP id
+ h3-20020a170902f54300b001c727639ed7mr23179plf.9.1695911839637; Thu, 28 Sep
+ 2023 07:37:19 -0700 (PDT)
+Date:   Thu, 28 Sep 2023 07:37:17 -0700
+In-Reply-To: <e2a0d2cb-bc93-4d36-bf42-6963095b207f@rbox.co>
+Mime-Version: 1.0
+References: <20230814222358.707877-1-mhal@rbox.co> <20230814222358.707877-4-mhal@rbox.co>
+ <13480bef-2646-4c01-ba81-3020a2ef2ce1@rbox.co> <ZRSMGdxk2X-cXr6z@google.com> <e2a0d2cb-bc93-4d36-bf42-6963095b207f@rbox.co>
+Message-ID: <ZRWPbAW29aGePPNA@google.com>
+Subject: Re: [PATCH 3/3] KVM: Correct kvm_vcpu_event(s) typo in KVM API documentation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/27/23 17:19, Sean Christopherson wrote:
-> Mask off xfeatures that aren't exposed to the guest only when saving guest
-> state via KVM_GET_XSAVE{2} instead of modifying user_xfeatures directly.
-> Preserving the maximal set of xfeatures in user_xfeatures restores KVM's
-> ABI for KVM_SET_XSAVE, which prior to commit ad856280ddea ("x86/kvm/fpu:
-> Limit guest user_xfeatures to supported bits of XCR0") allowed userspace
-> to load xfeatures that are supported by the host, irrespective of what
-> xfeatures are exposed to the guest.
+On Thu, Sep 28, 2023, Michal Luczaj wrote:
+> On 9/27/23 22:10, Sean Christopherson wrote:
+> > On Tue, Aug 15, 2023, Michal Luczaj wrote:
+> >> On 8/15/23 00:08, Michal Luczaj wrote:
+> >>> I understand that typo fixes are not always welcomed, but this
+> >>> kvm_vcpu_event(s) did actually bit me, causing minor irritation.
+> >>                                  ^^^
+> > 
+> > FWIW, my bar for fixing typos is if the typo causes any amount of confusion or
+> > wasted time.  If it causes one person pain, odds are good it'll cause others pain
+> > in the future.
 > 
-> There is no known use case where userspace *intentionally* loads xfeatures
-> that aren't exposed to the guest, but the bug fixed by commit ad856280ddea
-> was specifically that KVM_GET_SAVE{2} would save xfeatures that weren't
-> exposed to the guest, e.g. would lead to userspace unintentionally loading
-> guest-unsupported xfeatures when live migrating a VM.
-> 
-> Restricting KVM_SET_XSAVE to guest-supported xfeatures is especially
-> problematic for QEMU-based setups, as QEMU has a bug where instead of
-> terminating the VM if KVM_SET_XSAVE fails, QEMU instead simply stops
-> loading guest state, i.e. resumes the guest after live migration with
-> incomplete guest state, and ultimately results in guest data corruption.
-> 
-> Note, letting userspace restore all host-supported xfeatures does not fix
-> setups where a VM is migrated from a host *without* commit ad856280ddea,
-> to a target with a subset of host-supported xfeatures.  However there is
-> no way to safely address that scenario, e.g. KVM could silently drop the
-> unsupported features, but that would be a clear violation of KVM's ABI and
-> so would require userspace to opt-in, at which point userspace could
-> simply be updated to sanitize the to-be-loaded XSAVE state.
-Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+> OK, do you want me to resend just the kvm_vcpu_event(s) fix?
+> (and, empathetically, introduce a typo in the changelog proper :P)
 
-It's surprising (and nice) that this takes eliminates the !guest check
-in fpstate_realloc().
+Oh, no, sorry.  I'll take this as-is.  Opportunistically fixing misspellings like
+you did it totally fine, especially since this is documentation.
+
+What I was trying to say is that if a patch fixes a real issue for someone, I'll
+definitely take the time to get it applied.  I didn't mean to say I wouldn't take
+other typo fixes (though I am inclined to leave code/comments alone if a typo is
+benign, in order to reduce the churn in git history).
