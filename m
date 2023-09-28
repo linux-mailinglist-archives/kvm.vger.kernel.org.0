@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 032077B24F2
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 20:10:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D715D7B2508
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 20:13:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231952AbjI1SKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 14:10:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59220 "EHLO
+        id S232102AbjI1SNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 14:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbjI1SKx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 14:10:53 -0400
+        with ESMTP id S231965AbjI1SNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 14:13:51 -0400
 Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [IPv6:2a01:37:3000::53df:4ee9:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21B819E;
-        Thu, 28 Sep 2023 11:10:50 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8E398;
+        Thu, 28 Sep 2023 11:13:47 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
          client-signature RSA-PSS (4096 bits) client-digest SHA256)
         (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by mailout2.hostsharing.net (Postfix) with ESMTPS id 06A2210189DFC;
-        Thu, 28 Sep 2023 20:10:49 +0200 (CEST)
+        by mailout2.hostsharing.net (Postfix) with ESMTPS id A8EA11018978B;
+        Thu, 28 Sep 2023 20:13:45 +0200 (CEST)
 Received: from localhost (unknown [89.246.108.87])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by h08.hostsharing.net (Postfix) with ESMTPSA id D3CBF60DFEBD;
-        Thu, 28 Sep 2023 20:10:48 +0200 (CEST)
-X-Mailbox-Line: From e71af6b0bf695694d4a6de2c44356fe4fda97fea Mon Sep 17 00:00:00 2001
-Message-Id: <e71af6b0bf695694d4a6de2c44356fe4fda97fea.1695921657.git.lukas@wunner.de>
+        by h08.hostsharing.net (Postfix) with ESMTPSA id 7BE1F60DFEBD;
+        Thu, 28 Sep 2023 20:13:45 +0200 (CEST)
+X-Mailbox-Line: From 821682573e57e0384162f365652171e5ee1e6611 Mon Sep 17 00:00:00 2001
+Message-Id: <821682573e57e0384162f365652171e5ee1e6611.1695921657.git.lukas@wunner.de>
 In-Reply-To: <cover.1695921656.git.lukas@wunner.de>
 References: <cover.1695921656.git.lukas@wunner.de>
 From:   Lukas Wunner <lukas@wunner.de>
-Date:   Thu, 28 Sep 2023 19:32:40 +0200
-Subject: [PATCH 10/12] PCI/CMA: Reauthenticate devices on reset and resume
+Date:   Thu, 28 Sep 2023 19:32:41 +0200
+Subject: [PATCH 11/12] PCI/CMA: Expose in sysfs whether devices are
+ authenticated
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -62,147 +63,264 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CMA-SPDM state is lost when a device undergoes a Conventional Reset.
-(But not a Function Level Reset, PCIe r6.1 sec 6.6.2.)  A D3cold to D0
-transition implies a Conventional Reset (PCIe r6.1 sec 5.8).
+The PCI core has just been amended to authenticate CMA-capable devices
+on enumeration and store the result in an "authenticated" bit in struct
+pci_dev->spdm_state.
 
-Thus, reauthenticate devices on resume from D3cold and on recovery from
-a Secondary Bus Reset or DPC-induced Hot Reset.
+Expose the bit to user space through an eponymous sysfs attribute.
 
-The requirement to reauthenticate devices on resume from system sleep
-(and in the future reestablish IDE encryption) is the reason why SPDM
-needs to be in-kernel:  During ->resume_noirq, which is the first phase
-after system sleep, the PCI core walks down the hierarchy, puts each
-device in D0, restores its config space and invokes the driver's
-->resume_noirq callback.  The driver is afforded the right to access the
-device already during this phase.
+Allow user space to trigger reauthentication (e.g. after it has updated
+the CMA keyring) by writing to the sysfs attribute.
 
-To retain this usage model in the face of authentication and encryption,
-CMA-SPDM reauthentication and IDE reestablishment must happen during the
-->resume_noirq phase, before the driver's first access to the device.
-The driver is thus afforded seamless authenticated and encrypted access
-until the last moment before suspend and from the first moment after
-resume.
+Subject to further discussion, a future commit might add a user-defined
+policy to forbid driver binding to devices which failed authentication,
+similar to the "authorized" attribute for USB.
 
-During the ->resume_noirq phase, device interrupts are not yet enabled.
-It is thus impossible to defer CMA-SPDM reauthentication to a user space
-component on an attached disk or on the network, making an in-kernel
-SPDM implementation mandatory.
+Alternatively, authentication success might be signaled to user space
+through a uevent, whereupon it may bind a (blacklisted) driver.
+A uevent signaling authentication failure might similarly cause user
+space to unbind or outright remove the potentially malicious device.
 
-The same catch-22 exists on recovery from a Conventional Reset:  A user
-space SPDM implementation might live on a device which underwent reset,
-rendering its execution impossible.
+Traffic from devices which failed authentication could also be filtered
+through ACS I/O Request Blocking Enable (PCIe r6.1 sec 7.7.11.3) or
+through Link Disable (PCIe r6.1 sec 7.5.3.7).  Unlike an IOMMU, that
+will not only protect the host, but also prevent malicious peer-to-peer
+traffic to other devices.
 
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/pci/cma.c        | 10 ++++++++++
- drivers/pci/pci-driver.c |  1 +
- drivers/pci/pci.c        | 12 ++++++++++--
- drivers/pci/pci.h        |  5 +++++
- drivers/pci/pcie/err.c   |  3 +++
- include/linux/pci.h      |  1 +
- 6 files changed, 30 insertions(+), 2 deletions(-)
+ Documentation/ABI/testing/sysfs-bus-pci | 27 +++++++++
+ drivers/pci/Kconfig                     |  3 +
+ drivers/pci/Makefile                    |  1 +
+ drivers/pci/cma-sysfs.c                 | 73 +++++++++++++++++++++++++
+ drivers/pci/cma.c                       |  2 +
+ drivers/pci/doe.c                       |  2 +
+ drivers/pci/pci-sysfs.c                 |  3 +
+ drivers/pci/pci.h                       |  1 +
+ include/linux/pci.h                     |  2 +
+ 9 files changed, 114 insertions(+)
+ create mode 100644 drivers/pci/cma-sysfs.c
 
-diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
-index 012190c54ab6..89d23fdc37ec 100644
---- a/drivers/pci/cma.c
-+++ b/drivers/pci/cma.c
-@@ -71,6 +71,16 @@ void pci_cma_init(struct pci_dev *pdev)
- 	}
- 
- 	rc = spdm_authenticate(pdev->spdm_state);
-+	if (rc != -EPROTONOSUPPORT)
-+		pdev->cma_capable = true;
-+}
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index ecf47559f495..2ea9b8deffcc 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -500,3 +500,30 @@ Description:
+ 		console drivers from the device.  Raw users of pci-sysfs
+ 		resourceN attributes must be terminated prior to resizing.
+ 		Success of the resizing operation is not guaranteed.
 +
-+int pci_cma_reauthenticate(struct pci_dev *pdev)
++What:		/sys/bus/pci/devices/.../authenticated
++Date:		September 2023
++Contact:	Lukas Wunner <lukas@wunner.de>
++Description:
++		This file contains 1 if the device authenticated successfully
++		with CMA-SPDM (PCIe r6.1 sec 6.31).  It contains 0 if the
++		device failed authentication (and may thus be malicious).
++
++		Writing anything to this file causes reauthentication.
++		That may be opportune after updating the .cma keyring.
++
++		The file is not visible if authentication is unsupported
++		by the device.
++
++		If the kernel could not determine whether authentication is
++		supported because memory was low or DOE communication with
++		the device was not working, the file is visible but accessing
++		it fails with error code ENOTTY.
++
++		This prevents downgrade attacks where an attacker consumes
++		memory or disturbs DOE communication in order to create the
++		appearance that a device does not support authentication.
++
++		The reason why authentication support could not be determined
++		is apparent from "dmesg".  To probe for authentication support
++		again, exercise the "remove" and "rescan" attributes.
+diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+index c9aa5253ac1f..51df3be3438e 100644
+--- a/drivers/pci/Kconfig
++++ b/drivers/pci/Kconfig
+@@ -129,6 +129,9 @@ config PCI_CMA
+ 	  A PCI DOE mailbox is used as transport for DMTF SPDM based
+ 	  attestation, measurement and secure channel establishment.
+ 
++config PCI_CMA_SYSFS
++	def_bool PCI_CMA && SYSFS
++
+ config PCI_DOE
+ 	bool
+ 
+diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+index a18812b8832b..612ae724cd2d 100644
+--- a/drivers/pci/Makefile
++++ b/drivers/pci/Makefile
+@@ -35,6 +35,7 @@ obj-$(CONFIG_PCI_DOE)		+= doe.o
+ obj-$(CONFIG_PCI_DYNAMIC_OF_NODES) += of_property.o
+ 
+ obj-$(CONFIG_PCI_CMA)		+= cma.o cma-x509.o cma.asn1.o
++obj-$(CONFIG_PCI_CMA_SYSFS)	+= cma-sysfs.o
+ $(obj)/cma-x509.o:		$(obj)/cma.asn1.h
+ $(obj)/cma.asn1.o:		$(obj)/cma.asn1.c $(obj)/cma.asn1.h
+ 
+diff --git a/drivers/pci/cma-sysfs.c b/drivers/pci/cma-sysfs.c
+new file mode 100644
+index 000000000000..b2d45f96601a
+--- /dev/null
++++ b/drivers/pci/cma-sysfs.c
+@@ -0,0 +1,73 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Component Measurement and Authentication (CMA-SPDM, PCIe r6.1 sec 6.31)
++ *
++ * Copyright (C) 2023 Intel Corporation
++ */
++
++#include <linux/pci.h>
++#include <linux/spdm.h>
++#include <linux/sysfs.h>
++
++#include "pci.h"
++
++static ssize_t authenticated_store(struct device *dev,
++				   struct device_attribute *attr,
++				   const char *buf, size_t count)
 +{
-+	if (!pdev->cma_capable)
++	struct pci_dev *pdev = to_pci_dev(dev);
++	ssize_t rc;
++
++	if (!pdev->cma_capable &&
++	    (pdev->cma_init_failed || pdev->doe_init_failed))
 +		return -ENOTTY;
 +
-+	return spdm_authenticate(pdev->spdm_state);
- }
- 
- void pci_cma_destroy(struct pci_dev *pdev)
-diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-index a79c110c7e51..b5d47eefe8df 100644
---- a/drivers/pci/pci-driver.c
-+++ b/drivers/pci/pci-driver.c
-@@ -568,6 +568,7 @@ static void pci_pm_default_resume_early(struct pci_dev *pci_dev)
- 	pci_pm_power_up_and_verify_state(pci_dev);
- 	pci_restore_state(pci_dev);
- 	pci_pme_restore(pci_dev);
-+	pci_cma_reauthenticate(pci_dev);
- }
- 
- static void pci_pm_bridge_power_up_actions(struct pci_dev *pci_dev)
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index 59c01d68c6d5..0f36e6082579 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -5248,8 +5248,16 @@ static int pci_reset_bus_function(struct pci_dev *dev, bool probe)
- 
- 	rc = pci_dev_reset_slot_function(dev, probe);
- 	if (rc != -ENOTTY)
--		return rc;
--	return pci_parent_bus_reset(dev, probe);
-+		goto done;
++	rc = pci_cma_reauthenticate(pdev);
++	if (rc)
++		return rc;
 +
-+	rc = pci_parent_bus_reset(dev, probe);
++	return count;
++}
 +
-+done:
-+	/* CMA-SPDM state is lost upon a Conventional Reset */
-+	if (!probe)
-+		pci_cma_reauthenticate(dev);
++static ssize_t authenticated_show(struct device *dev,
++				  struct device_attribute *attr, char *buf)
++{
++	struct pci_dev *pdev = to_pci_dev(dev);
 +
-+	return rc;
- }
++	if (!pdev->cma_capable &&
++	    (pdev->cma_init_failed || pdev->doe_init_failed))
++		return -ENOTTY;
++
++	return sysfs_emit(buf, "%u\n", spdm_authenticated(pdev->spdm_state));
++}
++static DEVICE_ATTR_RW(authenticated);
++
++static struct attribute *pci_cma_attrs[] = {
++	&dev_attr_authenticated.attr,
++	NULL
++};
++
++static umode_t pci_cma_attrs_are_visible(struct kobject *kobj,
++					 struct attribute *a, int n)
++{
++	struct device *dev = kobj_to_dev(kobj);
++	struct pci_dev *pdev = to_pci_dev(dev);
++
++	/*
++	 * If CMA or DOE initialization failed, CMA attributes must be visible
++	 * and return an error on access.  This prevents downgrade attacks
++	 * where an attacker disturbs memory allocation or DOE communication
++	 * in order to create the appearance that CMA is unsupported.
++	 * The attacker may achieve that by simply hogging memory.
++	 */
++	if (!pdev->cma_capable &&
++	    !pdev->cma_init_failed && !pdev->doe_init_failed)
++		return 0;
++
++	return a->mode;
++}
++
++const struct attribute_group pci_cma_attr_group = {
++	.attrs  = pci_cma_attrs,
++	.is_visible = pci_cma_attrs_are_visible,
++};
+diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
+index 89d23fdc37ec..c539ad85a28f 100644
+--- a/drivers/pci/cma.c
++++ b/drivers/pci/cma.c
+@@ -52,6 +52,7 @@ void pci_cma_init(struct pci_dev *pdev)
+ 	int rc;
  
- void pci_dev_lock(struct pci_dev *dev)
+ 	if (!pci_cma_keyring) {
++		pdev->cma_init_failed = true;
+ 		return;
+ 	}
+ 
+@@ -67,6 +68,7 @@ void pci_cma_init(struct pci_dev *pdev)
+ 				       PCI_DOE_MAX_PAYLOAD, pci_cma_keyring,
+ 				       pci_cma_validate);
+ 	if (!pdev->spdm_state) {
++		pdev->cma_init_failed = true;
+ 		return;
+ 	}
+ 
+diff --git a/drivers/pci/doe.c b/drivers/pci/doe.c
+index 79f0336eb0c3..fabbda68edac 100644
+--- a/drivers/pci/doe.c
++++ b/drivers/pci/doe.c
+@@ -686,6 +686,7 @@ void pci_doe_init(struct pci_dev *pdev)
+ 						      PCI_EXT_CAP_ID_DOE))) {
+ 		doe_mb = pci_doe_create_mb(pdev, offset);
+ 		if (IS_ERR(doe_mb)) {
++			pdev->doe_init_failed = true;
+ 			pci_err(pdev, "[%x] failed to create mailbox: %ld\n",
+ 				offset, PTR_ERR(doe_mb));
+ 			continue;
+@@ -693,6 +694,7 @@ void pci_doe_init(struct pci_dev *pdev)
+ 
+ 		rc = xa_insert(&pdev->doe_mbs, offset, doe_mb, GFP_KERNEL);
+ 		if (rc) {
++			pdev->doe_init_failed = true;
+ 			pci_err(pdev, "[%x] failed to insert mailbox: %d\n",
+ 				offset, rc);
+ 			pci_doe_destroy_mb(doe_mb);
+diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+index d9eede2dbc0e..7024e08e1b9a 100644
+--- a/drivers/pci/pci-sysfs.c
++++ b/drivers/pci/pci-sysfs.c
+@@ -1655,6 +1655,9 @@ static const struct attribute_group *pci_dev_attr_groups[] = {
+ #endif
+ #ifdef CONFIG_PCIEASPM
+ 	&aspm_ctrl_attr_group,
++#endif
++#ifdef CONFIG_PCI_CMA_SYSFS
++	&pci_cma_attr_group,
+ #endif
+ 	NULL,
+ };
 diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
-index 6c4755a2c91c..71092ccf4fbd 100644
+index 71092ccf4fbd..d80cc06be0cc 100644
 --- a/drivers/pci/pci.h
 +++ b/drivers/pci/pci.h
-@@ -325,11 +325,16 @@ static inline void pci_doe_disconnected(struct pci_dev *pdev) { }
- #ifdef CONFIG_PCI_CMA
- void pci_cma_init(struct pci_dev *pdev);
- void pci_cma_destroy(struct pci_dev *pdev);
-+int pci_cma_reauthenticate(struct pci_dev *pdev);
+@@ -328,6 +328,7 @@ void pci_cma_destroy(struct pci_dev *pdev);
+ int pci_cma_reauthenticate(struct pci_dev *pdev);
  struct x509_certificate;
  int pci_cma_validate(struct device *dev, struct x509_certificate *leaf_cert);
++extern const struct attribute_group pci_cma_attr_group;
  #else
  static inline void pci_cma_init(struct pci_dev *pdev) { }
  static inline void pci_cma_destroy(struct pci_dev *pdev) { }
-+static inline int pci_cma_reauthenticate(struct pci_dev *pdev)
-+{
-+	return -ENOTTY;
-+}
- #endif
- 
- /**
-diff --git a/drivers/pci/pcie/err.c b/drivers/pci/pcie/err.c
-index 59c90d04a609..4783bd907b54 100644
---- a/drivers/pci/pcie/err.c
-+++ b/drivers/pci/pcie/err.c
-@@ -122,6 +122,9 @@ static int report_slot_reset(struct pci_dev *dev, void *data)
- 	pci_ers_result_t vote, *result = data;
- 	const struct pci_error_handlers *err_handler;
- 
-+	/* CMA-SPDM state is lost upon a Conventional Reset */
-+	pci_cma_reauthenticate(dev);
-+
- 	device_lock(&dev->dev);
- 	pdrv = dev->driver;
- 	if (!pdrv ||
 diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 0c0123317df6..2bc11d8b567e 100644
+index 2bc11d8b567e..2c5fde81bb85 100644
 --- a/include/linux/pci.h
 +++ b/include/linux/pci.h
-@@ -519,6 +519,7 @@ struct pci_dev {
+@@ -516,10 +516,12 @@ struct pci_dev {
+ #endif
+ #ifdef CONFIG_PCI_DOE
+ 	struct xarray	doe_mbs;	/* Data Object Exchange mailboxes */
++	unsigned int	doe_init_failed:1;
  #endif
  #ifdef CONFIG_PCI_CMA
  	struct spdm_state *spdm_state;	/* Security Protocol and Data Model */
-+	unsigned int	cma_capable:1;	/* Authentication supported */
+ 	unsigned int	cma_capable:1;	/* Authentication supported */
++	unsigned int	cma_init_failed:1;
  #endif
  	u16		acs_cap;	/* ACS Capability offset */
  	phys_addr_t	rom;		/* Physical address if not from BAR */
