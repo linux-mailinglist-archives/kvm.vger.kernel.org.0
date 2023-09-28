@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C7CA7B22B4
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 18:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 848917B2306
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 18:56:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbjI1Qra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 12:47:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47184 "EHLO
+        id S231614AbjI1Q4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 12:56:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231368AbjI1Qr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 12:47:29 -0400
+        with ESMTP id S231322AbjI1Q4P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 12:56:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CEE99
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 09:46:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D460A99
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 09:55:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695919601;
+        s=mimecast20190719; t=1695920136;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e1nG43NAk1FHCA+ImOZ9oNANJUjy6sdGqu8LxM+SXvk=;
-        b=XIph5LStl6kywqC+OoKB5cHogt++WQhtdwDTOgzAHJf3pcyj3C2aQ/G9GLM0tTraHPFSo+
-        z5G7YxJMAxbRXblbJ54WHFM/MF6W2yf1VuxEChSugvGowArmRtbvuaH+12sKSLo0syabfg
-        jVNDanMx3kUrhaqhVyZbW2gKbVfZsfk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=db4LuX+cyuFVDjWljKNDIps/ix54Zu0j3S8rKzmKS9g=;
+        b=isNtNe82o30t3rkjgM4WsY1FVsN66zUEMY3h3ppYDiELRrY1QUCAjvhjJbvBc/8QovRkfn
+        td677vIvBV+Xei1plJVirvNcpVdLAUIhpX6s+0O/SBmp5CiOJOOjNFchx1Fgcd8ISzGVlm
+        sqo/PD96M8izY3RgeUTn6YfL/tU15xM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-577-jxuNIuZJOc-JWH2TBCOxIA-1; Thu, 28 Sep 2023 12:46:38 -0400
-X-MC-Unique: jxuNIuZJOc-JWH2TBCOxIA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4063f0af359so44224545e9.1
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 09:46:38 -0700 (PDT)
+ us-mta-329-Yt2IUYMEO2uy4W8P7aEJqg-1; Thu, 28 Sep 2023 12:55:32 -0400
+X-MC-Unique: Yt2IUYMEO2uy4W8P7aEJqg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4064b38dc63so9606735e9.1
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 09:55:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695919598; x=1696524398;
+        d=1e100.net; s=20230601; t=1695920131; x=1696524931;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=e1nG43NAk1FHCA+ImOZ9oNANJUjy6sdGqu8LxM+SXvk=;
-        b=DE4AGM03AlYFs9TGVckIDO0ynBq9oqwuHwOB5X5TlNB7oiwjeh82qibfEz1bBYTPlt
-         yyW9xgMGX+puXsyGPP6pBMgGGCzembqsBUD4NEhOnArBPsRzxEoxl3f/EJ7KnfgIWFkk
-         3D8h8AZhXU9Ssib4in0althBeeuVSSC60NueKpnkMZC+M/LQD2bhpIGk1jKxg8ihetsg
-         SzzXEgDnCAAeaomzGSQF+TF/Xe8aIxe41iraJLCa6X6pSWaVZugYqrUopR6NYwM1KP0t
-         X20GCT0a+mj0AUXrNXywspJLDK1DZVK42jr4OKZXjD7qXrtiW7Lo0r7DvyXrGTrc+8vw
-         8WgQ==
-X-Gm-Message-State: AOJu0YwADLzVtsdQ8W/pdKIxYAPSqErdBQXVwcxPWd61LGaQQJBz9pAb
-        /0qLs/84ZWkBwmCVDQ9rOm9xE8s86hekroNaZVUd3RB8zJ1dqicQzf7RiA8vm++e9ru5P/9gLIc
-        Ybnj5+E0ilR9I
-X-Received: by 2002:a5d:5151:0:b0:31f:eb88:e3c8 with SMTP id u17-20020a5d5151000000b0031feb88e3c8mr1641087wrt.32.1695919597788;
-        Thu, 28 Sep 2023 09:46:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECAhLGbnen61UUw8FpaxsVW7uCtdSfU9iZ7QE8TtuL/KJb16ImOsM03QIoWXomHtErupETRg==
-X-Received: by 2002:a5d:5151:0:b0:31f:eb88:e3c8 with SMTP id u17-20020a5d5151000000b0031feb88e3c8mr1641070wrt.32.1695919597459;
-        Thu, 28 Sep 2023 09:46:37 -0700 (PDT)
+        bh=db4LuX+cyuFVDjWljKNDIps/ix54Zu0j3S8rKzmKS9g=;
+        b=Nl/xpur9JJivvwz/e9yIBIUA02xP0QMtA8isFX4+lwFvfFBlszUw2BoZ4GJQd5VSF0
+         FBHiTmv4OXb0Vnh/Yd8gGSPiPKelRXIXN7npllYPrWxZi0FhEUXVz8vmmARQWHtWFoWS
+         QQZ9XsIno83BlSfpsxakN3uTgiNrinzzo/1cvf3JJw23VboNLgkTiPvU96DeKzhDMGiV
+         5TwlL2q3fbd0vIV8tsIrrlnj9zlcgScEieDfFk5nlkUyFIUM2RMzMgKi2xqEW7/NQhGV
+         H2nhOXXy4wjuTPQpeF2m662Akp6tYdqFy42wlyfWSOt60f6zgnlodAUdJz4A1s5nSpLd
+         IEvw==
+X-Gm-Message-State: AOJu0YyE0Zzu+KVB743x4NUcaAVEXUmPdGvpMdiGA+ElEf6sq827yDTk
+        t6PPiCMQ2CJd4Ic2TWfBokeKmXh4CWtVn9Rg0gYjI5hnfeCQxNPuKunoigPFcur+H2yfOseG4in
+        BihZtMSyq1fObX+jpTOIN
+X-Received: by 2002:a7b:cbc6:0:b0:401:b307:7ba8 with SMTP id n6-20020a7bcbc6000000b00401b3077ba8mr1739813wmi.13.1695920131330;
+        Thu, 28 Sep 2023 09:55:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIh6DPgfjKsJwbVKkFhgslwFjC0g1VAZsEHPUuFPkQ1hV8Yizc8jo5QvaABlkfrvTNdEruPw==
+X-Received: by 2002:a7b:cbc6:0:b0:401:b307:7ba8 with SMTP id n6-20020a7bcbc6000000b00401b3077ba8mr1739797wmi.13.1695920130954;
+        Thu, 28 Sep 2023 09:55:30 -0700 (PDT)
 Received: from starship ([89.237.96.178])
-        by smtp.gmail.com with ESMTPSA id ba6-20020a0560001c0600b003248a490e3asm1383100wrb.39.2023.09.28.09.46.36
+        by smtp.gmail.com with ESMTPSA id u8-20020a7bc048000000b003fe2b081661sm23214122wmc.30.2023.09.28.09.55.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 09:46:36 -0700 (PDT)
-Message-ID: <0b5e476cd0a31376fbda4be62fb650a1caf004dd.camel@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: x86/mmu: remove unnecessary "bool shared"
- argument from functions
+        Thu, 28 Sep 2023 09:55:30 -0700 (PDT)
+Message-ID: <6bc63f82495501f9664b7d19bd8c7ba64329d37b.camel@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: x86/mmu: remove unnecessary "bool shared"
+ argument from iterators
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Date:   Thu, 28 Sep 2023 19:46:35 +0300
-In-Reply-To: <20230928162959.1514661-2-pbonzini@redhat.com>
+Date:   Thu, 28 Sep 2023 19:55:28 +0300
+In-Reply-To: <20230928162959.1514661-3-pbonzini@redhat.com>
 References: <20230928162959.1514661-1-pbonzini@redhat.com>
-         <20230928162959.1514661-2-pbonzini@redhat.com>
+         <20230928162959.1514661-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
@@ -80,135 +80,160 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 У чт, 2023-09-28 у 12:29 -0400, Paolo Bonzini пише:
-> Neither tdp_mmu_next_root nor kvm_tdp_mmu_put_root need to know
-> if the lock is taken for read or write.  Either way, protection
-> is achieved via RCU and tdp_mmu_pages_lock.  Remove the argument
-> and just assert that the lock is taken.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c     |  2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c | 34 +++++++++++++++++++++-------------
->  arch/x86/kvm/mmu/tdp_mmu.h |  3 +--
->  3 files changed, 23 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index f7901cb4d2fa..64b1bdba943e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3548,7 +3548,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
->  		return;
->  
->  	if (is_tdp_mmu_page(sp))
-> -		kvm_tdp_mmu_put_root(kvm, sp, false);
-> +		kvm_tdp_mmu_put_root(kvm, sp);
->  	else if (!--sp->root_count && sp->role.invalid)
->  		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
->  
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 6cd4dd631a2f..ab0876015be7 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -73,10 +73,13 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
->  	tdp_mmu_free_sp(sp);
->  }
->  
-> -void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> -			  bool shared)
-> +void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
->  {
-> -	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> +	/*
-> +	 * Either read or write is okay, but the lock is needed because
-> +	 * writers might not take tdp_mmu_pages_lock.
-> +	 */
-> +	lockdep_assert_held(&kvm->mmu_lock);
+> The "bool shared" argument is more or less unnecessary in the
+> for_each_*_tdp_mmu_root_yield_safe() macros.  Many users check for
+> the lock before calling it; all of them either call small functions
+> that do the check, or end up calling tdp_mmu_set_spte_atomic() and
+> tdp_mmu_iter_set_spte().  Add a few assertions to make up for the
+> lost check in for_each_*_tdp_mmu_root_yield_safe(), but even this
+> is probably overkill and mostly for documentation reasons.
 
-I double checked all callers and indeed at least the read lock is held.
-
->  
->  	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
->  		return;
-> @@ -106,10 +109,16 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->   */
->  static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  					      struct kvm_mmu_page *prev_root,
-> -					      bool shared, bool only_valid)
-> +					      bool only_valid)
->  {
->  	struct kvm_mmu_page *next_root;
->  
-> +	/*
-> +	 * While the roots themselves are RCU-protected, fields such as
-> +	 * role.invalid are protected by mmu_lock.
-> +	 */
-> +	lockdep_assert_held(&kvm->mmu_lock);
-> +
->  	rcu_read_lock();
->  
->  	if (prev_root)
-> @@ -132,7 +141,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  	rcu_read_unlock();
->  
->  	if (prev_root)
-> -		kvm_tdp_mmu_put_root(kvm, prev_root, shared);
-> +		kvm_tdp_mmu_put_root(kvm, prev_root);
->  
->  	return next_root;
->  }
-> @@ -144,13 +153,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->   * recent root. (Unless keeping a live reference is desirable.)
->   *
->   * If shared is set, this function is operating under the MMU lock in read
-> - * mode. In the unlikely event that this thread must free a root, the lock
-> - * will be temporarily dropped and reacquired in write mode.
-> + * mode.
->   */
->  #define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _only_valid)\
-> -	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, _only_valid);	\
-> -	     _root;								\
-> -	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _only_valid))	\
-> +	for (_root = tdp_mmu_next_root(_kvm, NULL, _only_valid);	\
-> +	     _root;							\
-> +	     _root = tdp_mmu_next_root(_kvm, _root, _only_valid))	\
->  		if (kvm_lockdep_assert_mmu_lock_held(_kvm, _shared) &&		\
->  		    kvm_mmu_page_as_id(_root) != _as_id) {			\
->  		} else
-> @@ -159,9 +167,9 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
->  	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, true)
->  
->  #define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _shared)			\
-> -	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, false);		\
-> -	     _root;								\
-> -	     _root = tdp_mmu_next_root(_kvm, _root, _shared, false))		\
-> +	for (_root = tdp_mmu_next_root(_kvm, NULL, false);		\
-> +	     _root;							\
-> +	     _root = tdp_mmu_next_root(_kvm, _root, false))
->  		if (!kvm_lockdep_assert_mmu_lock_held(_kvm, _shared)) {		\
->  		} else
->  
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 733a3aef3a96..20d97aa46c49 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -17,8 +17,7 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
->  	return refcount_inc_not_zero(&root->tdp_mmu_root_count);
->  }
->  
-> -void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> -			  bool shared);
-> +void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root);
->  
->  bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush);
->  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
-
-
-I don't know all of the details of the kvm mmu, so I might have missed something,
-but still I need to get back to reviewing....
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
+Why not to leave the 'kvm_lockdep_assert_mmu_lock_held' but drop the shared argument from it?
+and then use lockdep_assert_held. If I am not mistaken, lockdep_assert_held should assert
+if the lock is held for read or write.
 
 Best regards,
 	Maxim Levitsky
+
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 42 +++++++++++++++++++-------------------
+>  1 file changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index ab0876015be7..b9abfa78808a 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -155,23 +155,20 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>   * If shared is set, this function is operating under the MMU lock in read
+>   * mode.
+>   */
+> -#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _only_valid)\
+> +#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _only_valid)\
+>  	for (_root = tdp_mmu_next_root(_kvm, NULL, _only_valid);	\
+>  	     _root;							\
+>  	     _root = tdp_mmu_next_root(_kvm, _root, _only_valid))	\
+> -		if (kvm_lockdep_assert_mmu_lock_held(_kvm, _shared) &&		\
+> -		    kvm_mmu_page_as_id(_root) != _as_id) {			\
+> +		if (kvm_mmu_page_as_id(_root) != _as_id) {		\
+>  		} else
+>  
+> -#define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)	\
+> -	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, true)
+> +#define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id)	\
+> +	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, true)
+>  
+> -#define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _shared)			\
+> +#define for_each_tdp_mmu_root_yield_safe(_kvm, _root)			\
+>  	for (_root = tdp_mmu_next_root(_kvm, NULL, false);		\
+>  	     _root;							\
+>  	     _root = tdp_mmu_next_root(_kvm, _root, false))
+> -		if (!kvm_lockdep_assert_mmu_lock_held(_kvm, _shared)) {		\
+> -		} else
+>  
+>  /*
+>   * Iterate over all TDP MMU roots.  Requires that mmu_lock be held for write,
+> @@ -840,7 +837,8 @@ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush)
+>  {
+>  	struct kvm_mmu_page *root;
+>  
+> -	for_each_tdp_mmu_root_yield_safe(kvm, root, false)
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +	for_each_tdp_mmu_root_yield_safe(kvm, root)
+>  		flush = tdp_mmu_zap_leafs(kvm, root, start, end, true, flush);
+>  
+>  	return flush;
+> @@ -862,7 +860,8 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
+>  	 * is being destroyed or the userspace VMM has exited.  In both cases,
+>  	 * KVM_RUN is unreachable, i.e. no vCPUs will ever service the request.
+>  	 */
+> -	for_each_tdp_mmu_root_yield_safe(kvm, root, false)
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +	for_each_tdp_mmu_root_yield_safe(kvm, root)
+>  		tdp_mmu_zap_root(kvm, root, false);
+>  }
+>  
+> @@ -876,7 +875,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+>  
+>  	read_lock(&kvm->mmu_lock);
+>  
+> -	for_each_tdp_mmu_root_yield_safe(kvm, root, true) {
+> +	for_each_tdp_mmu_root_yield_safe(kvm, root) {
+>  		if (!root->tdp_mmu_scheduled_root_to_zap)
+>  			continue;
+>  
+> @@ -899,7 +898,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
+>  		 * the root must be reachable by mmu_notifiers while it's being
+>  		 * zapped
+>  		 */
+> -		kvm_tdp_mmu_put_root(kvm, root, true);
+> +		kvm_tdp_mmu_put_root(kvm, root);
+>  	}
+>  
+>  	read_unlock(&kvm->mmu_lock);
+> @@ -1133,7 +1132,9 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+>  {
+>  	struct kvm_mmu_page *root;
+>  
+> -	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false, false)
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
+>  		flush = tdp_mmu_zap_leafs(kvm, root, range->start, range->end,
+>  					  range->may_block, flush);
+>  
+> @@ -1322,7 +1323,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+>  
+>  	lockdep_assert_held_read(&kvm->mmu_lock);
+>  
+> -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
+> +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id)
+>  		spte_set |= wrprot_gfn_range(kvm, root, slot->base_gfn,
+>  			     slot->base_gfn + slot->npages, min_level);
+>  
+> @@ -1354,6 +1355,8 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+>  {
+>  	struct kvm_mmu_page *sp;
+>  
+> +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+> +
+>  	/*
+>  	 * Since we are allocating while under the MMU lock we have to be
+>  	 * careful about GFP flags. Use GFP_NOWAIT to avoid blocking on direct
+> @@ -1504,11 +1507,10 @@ void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
+>  	int r = 0;
+>  
+>  	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+> -
+> -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, shared) {
+> +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id) {
+>  		r = tdp_mmu_split_huge_pages_root(kvm, root, start, end, target_level, shared);
+>  		if (r) {
+> -			kvm_tdp_mmu_put_root(kvm, root, shared);
+> +			kvm_tdp_mmu_put_root(kvm, root);
+>  			break;
+>  		}
+>  	}
+> @@ -1568,8 +1570,7 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
+>  	bool spte_set = false;
+>  
+>  	lockdep_assert_held_read(&kvm->mmu_lock);
+> -
+> -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
+> +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id)
+>  		spte_set |= clear_dirty_gfn_range(kvm, root, slot->base_gfn,
+>  				slot->base_gfn + slot->npages);
+>  
+> @@ -1703,8 +1704,7 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>  	struct kvm_mmu_page *root;
+>  
+>  	lockdep_assert_held_read(&kvm->mmu_lock);
+> -
+> -	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
+> +	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id)
+>  		zap_collapsible_spte_range(kvm, root, slot);
+>  }
+>  
+
 
