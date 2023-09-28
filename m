@@ -2,232 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E2CF17B2855
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 00:23:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F967B28A5
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 01:08:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232547AbjI1WXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 18:23:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
+        id S231387AbjI1XIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 19:08:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231446AbjI1WXB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 18:23:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3C31A3
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 15:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695939695;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=29G1BYuCds6xnt+aRDjOqp1d8b71T59JlT2+VGIavIo=;
-        b=VtHY83YRmhVYJfigUO/Yw+X1+yesbEsa0dwl24ZDIXq1DsTC1r+YwG55pkVg3DMidjRfmz
-        D5Sp9w8xrnvNE5k3e4weDjb1IBMuLqDW8NUcD7xioX9yZZbqG6eHTbUuf1idEUG/OucnV9
-        xedNY8w3vacX6rbuLmvbSenXH2hfCkQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-208--sd_TGwhMNG5mdkI-Eg8jw-1; Thu, 28 Sep 2023 18:21:34 -0400
-X-MC-Unique: -sd_TGwhMNG5mdkI-Eg8jw-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7a2632be370so58441939f.1
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 15:21:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695939693; x=1696544493;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=29G1BYuCds6xnt+aRDjOqp1d8b71T59JlT2+VGIavIo=;
-        b=Zn22gfONPolLakYbG1jtuyW7xMUbgLEpLpzusfw4fRuvZzdvjPq9ErwvVVAf5+L44D
-         Np0VpSVB8rRGXVinJkJ3B2rSZOeEmHeuuaskRep/CdyF7WNdWSp9/i4qFd+Pu+qsN+VB
-         oDRYeZiHndszqR/xsVXQlBM337YBHrEAFgHse5hPugOc1ntk4OrMrDxMtVdVbLy8nJW8
-         RJMwgoN5ZOHZ1wHHA/9yCsdi1oj3l4yzc3okObc6/Qa92wzVCj3HMs5hU1OZhVkvbLoY
-         StYURvZCMUHQDha2mGQ27tafn/ZxrERI1F5SfwD8JxdAO4kM0HGochi1qRLrqtrPRfUg
-         FpTQ==
-X-Gm-Message-State: AOJu0YzXoeonn5emqTIb1DessmgcrGIrV9mkZr1aiQ0DbNE5kJnIzIcz
-        b30mLMiWuvS4flljL/OcEq+j0JkwEVggnDun1vrSSY5ifo4rQA/Krvh4n/nh9spYjDjrNrCwBZJ
-        tBan/QiTRQxxY
-X-Received: by 2002:a5e:a907:0:b0:790:ab53:ed16 with SMTP id c7-20020a5ea907000000b00790ab53ed16mr2491916iod.21.1695939693567;
-        Thu, 28 Sep 2023 15:21:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEM9rzDoRunyOXP5133v1Lo+cjXO3E6zwL+8+g1e4+R6wKyGcuEKXEoPgEET4hcDTu/MP0tQg==
-X-Received: by 2002:a5e:a907:0:b0:790:ab53:ed16 with SMTP id c7-20020a5ea907000000b00790ab53ed16mr2491880iod.21.1695939693228;
-        Thu, 28 Sep 2023 15:21:33 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id t23-20020a02c497000000b0042b10d42c90sm4610172jam.113.2023.09.28.15.21.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 15:21:31 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 16:21:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        with ESMTP id S229541AbjI1XIq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 19:08:46 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D13CAC;
+        Thu, 28 Sep 2023 16:08:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695942524; x=1727478524;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bsdaHx5i6d0dQbRebscdJjGlFmzP3UXXQapI7gY5p/8=;
+  b=BZtgA3se+Ka89fvUu2cqJoGTzaF/DrIg3bIz4mCg0Zsk0POI6V/wHojH
+   Q67L6+XX/C+MU+nz6uIi767z1rB6bmaT0hXUT6G5fL6zsNdTcu62Re1SS
+   rNGBtsIsrt5fZ6+FAkjdjrf0Xwy0jmKwXEpN7V7lfXiPFuoAL7LJeFIJe
+   4mFa5HBz0zgm8GMhEFBiVfUvEDCPvPOacUwjR9jstL/OZPOBSL0GRI4IY
+   ZhNJSDYkz3dGmxSQRQItMZX06QO8HrS0TqiwxIqFwnJWtGCzkeD78Db4R
+   Rs0tiCbtatYtOfbDZWKODHmgRisx9g5dNjlXreiIIf3cpMqcl+WkBqZIZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="446357861"
+X-IronPort-AV: E=Sophos;i="6.03,185,1694761200"; 
+   d="scan'208";a="446357861"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 16:08:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="749776304"
+X-IronPort-AV: E=Sophos;i="6.03,185,1694761200"; 
+   d="scan'208";a="749776304"
+Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 28 Sep 2023 16:08:39 -0700
+Received: from kbuild by c3b01524d57c with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qm07Y-00027h-33;
+        Thu, 28 Sep 2023 23:08:36 +0000
+Date:   Fri, 29 Sep 2023 07:08:29 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Raghavendra Rao Ananta <rananta@google.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        Anish Ghulati <aghulati@google.com>,
-        Venkatesh Srinivas <venkateshs@chromium.org>,
-        Andrew Thornton <andrewth@google.com>
-Subject: Re: [PATCH 06/26] KVM: Drop CONFIG_KVM_VFIO and just look at
- KVM+VFIO
-Message-ID: <20230928162111.09820688.alex.williamson@redhat.com>
-In-Reply-To: <20230916003118.2540661-7-seanjc@google.com>
-References: <20230916003118.2540661-1-seanjc@google.com>
-        <20230916003118.2540661-7-seanjc@google.com>
-Organization: Red Hat
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v6 07/11] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+Message-ID: <202309290607.Qgg05wKw-lkp@intel.com>
+References: <20230926234008.2348607-8-rananta@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230926234008.2348607-8-rananta@google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 15 Sep 2023 17:30:58 -0700
-Sean Christopherson <seanjc@google.com> wrote:
+Hi Raghavendra,
 
-> Drop KVM's KVM_VFIO Kconfig, and instead compile in VFIO support if
-> and only if VFIO itself is enabled.  Similar to the recent change to have
-> VFIO stop looking at HAVE_KVM, compiling in support for talking to VFIO
-> just because the architecture supports VFIO is nonsensical.
-> 
-> This fixes a bug where RISC-V doesn't select KVM_VFIO, i.e. would silently
-> fail to do connect KVM and VFIO, even though RISC-V supports VFIO.  The
-> bug is benign as the only driver in all of Linux that actually uses the
-> KVM reference provided by VFIO is KVM-GT, which is x86/Intel specific.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/kvm/Kconfig   | 1 -
->  arch/powerpc/kvm/Kconfig | 1 -
->  arch/s390/kvm/Kconfig    | 1 -
->  arch/x86/kvm/Kconfig     | 1 -
->  virt/kvm/Kconfig         | 3 ---
->  virt/kvm/Makefile.kvm    | 4 +++-
->  virt/kvm/vfio.h          | 2 +-
->  7 files changed, 4 insertions(+), 9 deletions(-)
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on 6465e260f48790807eef06b583b38ca9789b6072]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Raghavendra-Rao-Ananta/KVM-arm64-PMU-Introduce-helpers-to-set-the-guest-s-PMU/20230927-095821
+base:   6465e260f48790807eef06b583b38ca9789b6072
+patch link:    https://lore.kernel.org/r/20230926234008.2348607-8-rananta%40google.com
+patch subject: [PATCH v6 07/11] KVM: arm64: PMU: Allow userspace to limit PMCR_EL0.N for the guest
+config: arm64-randconfig-003-20230928 (https://download.01.org/0day-ci/archive/20230929/202309290607.Qgg05wKw-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230929/202309290607.Qgg05wKw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309290607.Qgg05wKw-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arch/arm64/kvm/sys_regs.c: In function 'set_pmcr':
+>> arch/arm64/kvm/sys_regs.c:1110:52: error: invalid use of undefined type 'struct arm_pmu'
+    1110 |                 u8 pmcr_n_limit = kvm->arch.arm_pmu->num_events - 1;
+         |                                                    ^~
+   arch/arm64/kvm/sys_regs.c: At top level:
+   arch/arm64/kvm/sys_regs.c:2207:66: warning: initialized field overwritten [-Woverride-init]
+    2207 |         { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+         |                                                                  ^~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:2207:66: note: (near initialization for 'sys_reg_descs[233].reset')
+   In file included from include/uapi/linux/posix_types.h:5,
+                    from include/uapi/linux/types.h:14,
+                    from include/linux/types.h:6,
+                    from include/linux/kasan-checks.h:5,
+                    from include/asm-generic/rwonce.h:26,
+                    from arch/arm64/include/asm/rwonce.h:71,
+                    from include/linux/compiler.h:246,
+                    from include/linux/build_bug.h:5,
+                    from include/linux/bitfield.h:10,
+                    from arch/arm64/kvm/sys_regs.c:12:
+   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2221:46: note: in expansion of macro 'NULL'
+    2221 |           .access = access_pmswinc, .reset = NULL },
+         |                                              ^~~~
+   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[237].reset')
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2221:46: note: in expansion of macro 'NULL'
+    2221 |           .access = access_pmswinc, .reset = NULL },
+         |                                              ^~~~
+   arch/arm64/kvm/sys_regs.c:2223:45: warning: initialized field overwritten [-Woverride-init]
+    2223 |           .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
+         |                                             ^~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:2223:45: note: (near initialization for 'sys_reg_descs[238].reset')
+   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2225:45: note: in expansion of macro 'NULL'
+    2225 |           .access = access_pmceid, .reset = NULL },
+         |                                             ^~~~
+   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[239].reset')
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2225:45: note: in expansion of macro 'NULL'
+    2225 |           .access = access_pmceid, .reset = NULL },
+         |                                             ^~~~
+   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2227:45: note: in expansion of macro 'NULL'
+    2227 |           .access = access_pmceid, .reset = NULL },
+         |                                             ^~~~
+   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[240].reset')
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2227:45: note: in expansion of macro 'NULL'
+    2227 |           .access = access_pmceid, .reset = NULL },
+         |                                             ^~~~
+   arch/arm64/kvm/sys_regs.c:2229:49: warning: initialized field overwritten [-Woverride-init]
+    2229 |           .access = access_pmu_evcntr, .reset = reset_unknown,
+         |                                                 ^~~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:2229:49: note: (near initialization for 'sys_reg_descs[241].reset')
+   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2232:50: note: in expansion of macro 'NULL'
+    2232 |           .access = access_pmu_evtyper, .reset = NULL },
+         |                                                  ^~~~
+   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[242].reset')
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2232:50: note: in expansion of macro 'NULL'
+    2232 |           .access = access_pmu_evtyper, .reset = NULL },
+         |                                                  ^~~~
+   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2234:49: note: in expansion of macro 'NULL'
+    2234 |           .access = access_pmu_evcntr, .reset = NULL },
+         |                                                 ^~~~
+   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[243].reset')
+       8 | #define NULL ((void *)0)
+         |              ^
+   arch/arm64/kvm/sys_regs.c:2234:49: note: in expansion of macro 'NULL'
+    2234 |           .access = access_pmu_evcntr, .reset = NULL },
+         |                                                 ^~~~
+   arch/arm64/kvm/sys_regs.c:1162:20: warning: initialized field overwritten [-Woverride-init]
+    1162 |           .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,          \
+         |                    ^~~~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:2330:9: note: in expansion of macro 'PMU_PMEVCNTR_EL0'
+    2330 |         PMU_PMEVCNTR_EL0(0),
+         |         ^~~~~~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:1162:20: note: (near initialization for 'sys_reg_descs[327].reset')
+    1162 |           .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,          \
+         |                    ^~~~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:2330:9: note: in expansion of macro 'PMU_PMEVCNTR_EL0'
+    2330 |         PMU_PMEVCNTR_EL0(0),
+         |         ^~~~~~~~~~~~~~~~
+   arch/arm64/kvm/sys_regs.c:1162:20: warning: initialized field overwritten [-Woverride-init]
+    1162 |           .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,          \
+         |                    ^~~~~~~~~~~~~~
 
 
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+vim +1110 arch/arm64/kvm/sys_regs.c
 
+  1090	
+  1091	static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+  1092			    u64 val)
+  1093	{
+  1094		struct kvm *kvm = vcpu->kvm;
+  1095		u64 new_n, mutable_mask;
+  1096	
+  1097		mutex_lock(&kvm->arch.config_lock);
+  1098	
+  1099		/*
+  1100		 * Make PMCR immutable once the VM has started running, but do
+  1101		 * not return an error (-EBUSY) to meet the existing expectations.
+  1102		 */
+  1103		if (kvm_vm_has_ran_once(vcpu->kvm)) {
+  1104			mutex_unlock(&kvm->arch.config_lock);
+  1105			return 0;
+  1106		}
+  1107	
+  1108		new_n = (val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+  1109		if (new_n != kvm->arch.pmcr_n) {
+> 1110			u8 pmcr_n_limit = kvm->arch.arm_pmu->num_events - 1;
+  1111	
+  1112			/*
+  1113			 * The vCPU can't have more counters than the PMU hardware
+  1114			 * implements. Ignore this error to maintain compatibility
+  1115			 * with the existing KVM behavior.
+  1116			 */
+  1117			if (new_n <= pmcr_n_limit)
+  1118				kvm->arch.pmcr_n = new_n;
+  1119		}
+  1120		mutex_unlock(&kvm->arch.config_lock);
+  1121	
+  1122		/*
+  1123		 * Ignore writes to RES0 bits, read only bits that are cleared on
+  1124		 * vCPU reset, and writable bits that KVM doesn't support yet.
+  1125		 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
+  1126		 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
+  1127		 * But, we leave the bit as it is here, as the vCPU's PMUver might
+  1128		 * be changed later (NOTE: the bit will be cleared on first vCPU run
+  1129		 * if necessary).
+  1130		 */
+  1131		mutable_mask = (ARMV8_PMU_PMCR_MASK |
+  1132				(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT));
+  1133		val &= mutable_mask;
+  1134		val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
+  1135	
+  1136		/* The LC bit is RES1 when AArch32 is not supported */
+  1137		if (!kvm_supports_32bit_el0())
+  1138			val |= ARMV8_PMU_PMCR_LC;
+  1139	
+  1140		__vcpu_sys_reg(vcpu, r->reg) = val;
+  1141		return 0;
+  1142	}
+  1143	
 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 83c1e09be42e..2b5c332f157d 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -28,7 +28,6 @@ menuconfig KVM
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->  	select KVM_XFER_TO_GUEST_WORK
-> -	select KVM_VFIO
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_IRQFD
->  	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-> index 902611954200..c4beb49c0eb2 100644
-> --- a/arch/powerpc/kvm/Kconfig
-> +++ b/arch/powerpc/kvm/Kconfig
-> @@ -22,7 +22,6 @@ config KVM
->  	select PREEMPT_NOTIFIERS
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_VCPU_ASYNC_IOCTL
-> -	select KVM_VFIO
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select INTERVAL_TREE
-> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-> index 45fdf2a9b2e3..459d536116a6 100644
-> --- a/arch/s390/kvm/Kconfig
-> +++ b/arch/s390/kvm/Kconfig
-> @@ -31,7 +31,6 @@ config KVM
->  	select HAVE_KVM_IRQ_ROUTING
->  	select HAVE_KVM_INVALID_WAKEUPS
->  	select HAVE_KVM_NO_POLL
-> -	select KVM_VFIO
->  	select INTERVAL_TREE
->  	select MMU_NOTIFIER
->  	help
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index ed90f148140d..0f01e5600b5f 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -45,7 +45,6 @@ config KVM
->  	select HAVE_KVM_NO_POLL
->  	select KVM_XFER_TO_GUEST_WORK
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> -	select KVM_VFIO
->  	select INTERVAL_TREE
->  	select HAVE_KVM_PM_NOTIFIER if PM
->  	select KVM_GENERIC_HARDWARE_ENABLING
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 484d0873061c..f0be3b55cea6 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -59,9 +59,6 @@ config HAVE_KVM_MSI
->  config HAVE_KVM_CPU_RELAX_INTERCEPT
->         bool
->  
-> -config KVM_VFIO
-> -       bool
-> -
->  config HAVE_KVM_INVALID_WAKEUPS
->         bool
->  
-> diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-> index 2c27d5d0c367..29373b59d89a 100644
-> --- a/virt/kvm/Makefile.kvm
-> +++ b/virt/kvm/Makefile.kvm
-> @@ -6,7 +6,9 @@
->  KVM ?= ../../../virt/kvm
->  
->  kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-> -kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
-> +ifdef CONFIG_VFIO
-> +kvm-y += $(KVM)/vfio.o
-> +endif
->  kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
->  kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
->  kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
-> diff --git a/virt/kvm/vfio.h b/virt/kvm/vfio.h
-> index e130a4a03530..af475a323965 100644
-> --- a/virt/kvm/vfio.h
-> +++ b/virt/kvm/vfio.h
-> @@ -2,7 +2,7 @@
->  #ifndef __KVM_VFIO_H
->  #define __KVM_VFIO_H
->  
-> -#ifdef CONFIG_KVM_VFIO
-> +#if IS_ENABLED(CONFIG_KVM) && IS_ENABLED(CONFIG_VFIO)
->  int kvm_vfio_ops_init(void);
->  void kvm_vfio_ops_exit(void);
->  #else
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
