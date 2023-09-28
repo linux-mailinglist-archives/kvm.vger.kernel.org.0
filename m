@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF0237B1869
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 12:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE3E27B186A
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 12:42:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231532AbjI1KmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 06:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57184 "EHLO
+        id S231584AbjI1KmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 06:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230511AbjI1KmH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 06:42:07 -0400
+        with ESMTP id S231545AbjI1KmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 06:42:23 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB0C12A
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:41:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF433195
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:41:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695897675;
+        s=mimecast20190719; t=1695897696;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZIL/aLxSaBTwOd49hOiCBXEkh8RfyyP05npLoIlrk4w=;
-        b=JSsrrb9DDqLozWxy23DA6FikMNv4MSJJoeSjv0sDJpyAaKvJ5m9Ymx+HdFqvjyK8xtQaiZ
-        aFOQyJAjsNTW+3+K+7lA1TgiEj5CBmkYUqY2XaPmq47Ecul9zfol6sNGu+H9I3lQeEYf89
-        19BzVgUyjy68+0tkTrJyNCi09U6T05I=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ujY5ssiz00Acvp8rMGRHNHWIqC+q9jsSl4olj7QYH/0=;
+        b=eRB8u8/mdOiF0R/MHDZCYNJIsOYIQC8mJAm6Pf4QCEpJOgmBkkSBPJhK9LNKvlNgGyxOuB
+        5b1Eckk9T8o9DDPYT+ZLoISbkud+Vof9a8bcK8WWVY5uBpJyKM3DmSab1Qlou8fEGrED0L
+        LwnTuZIcdotCoGBjFcBP2Bfmq1uqhNY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-434-zvteAjWeMS-6wjcF4v6GdA-1; Thu, 28 Sep 2023 06:41:13 -0400
-X-MC-Unique: zvteAjWeMS-6wjcF4v6GdA-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-50433961a36so17589393e87.3
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:41:13 -0700 (PDT)
+ us-mta-654-aC0GQM7gNua3agP1FA5VqA-1; Thu, 28 Sep 2023 06:41:34 -0400
+X-MC-Unique: aC0GQM7gNua3agP1FA5VqA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-313c930ee0eso9788125f8f.0
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 03:41:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695897672; x=1696502472;
+        d=1e100.net; s=20230601; t=1695897693; x=1696502493;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIL/aLxSaBTwOd49hOiCBXEkh8RfyyP05npLoIlrk4w=;
-        b=t6gW19T8RAtDtBiHYnoE5Zdmth97j3xVqBF+UsMEjx/BtAwazrYJnFbxViAZWEbvOb
-         QHhmLP0FxlovRxEZSEMg8PVgoG4t2wky82PpEHQbYVonZYkE/Ysc1ERrYXkap+ZMHEPg
-         Nuk/ssAC4OOOATW/vnJl6XlOcYDNsoeONHmjViD+BX6nQrY7mCr/PbttYiT4xFYmPguB
-         UxrW1NZwlqW4IwTw6+VZGSNGcNMWMbFcx5jnABKpWwhRcoAVJLAKsR1yj0vi9ErTPA1j
-         /u8Etr+YEfJcCfPmoMeWzgEbIN0M0u4fC26HGkUT9dVuQNL6T9dudmspyZ3kTTFMYI36
-         sb7A==
-X-Gm-Message-State: AOJu0Yz86qEHGXk6ngewq4rRcQczj1P7/9Jy52YH3CpQNp0GSMD9Ju5r
-        SCb38gsc9uh1jUSdA74v8WlKtUkDcbbXbaC0DhBIMCwG57cSjicfgQRpC4sctVNPCPEcfqGNKA+
-        btNbSY2qT9YYf
-X-Received: by 2002:a19:7110:0:b0:502:9fce:b6da with SMTP id m16-20020a197110000000b005029fceb6damr693709lfc.21.1695897672218;
-        Thu, 28 Sep 2023 03:41:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZnGFQao4JKubYwjZ1ImNhZcdEbjf0t/69AWlyueHN/65GfbbBPeP3rAa54U13dQaswEUQqg==
-X-Received: by 2002:a19:7110:0:b0:502:9fce:b6da with SMTP id m16-20020a197110000000b005029fceb6damr693694lfc.21.1695897671830;
-        Thu, 28 Sep 2023 03:41:11 -0700 (PDT)
+        bh=ujY5ssiz00Acvp8rMGRHNHWIqC+q9jsSl4olj7QYH/0=;
+        b=s4sA7qLguIrZf2VxqESlmw5ZYEvR7oZyy9db7tDsXYdF/Lq4/FO8OwoN/4+eOMTxdj
+         kX7m+ab0W7ZeknW3aZhfzmsxaYUux+/hB7v87c7unhY6/tXVljn/QSri66FWFkWZmTnN
+         oPjUmMjZqWSXLARdcT6+4EFbMrBKY/7IMwDhUmGulcqd3z1Cr9+jwobIWDuc5py7pf4D
+         pev2FhegOqF83BBVAmnzrVCB6KGBCzwkCG7wBH6FiPNdJC60kNFvvUapeCq5GwkazvOi
+         12Cq3TNFuU387XqKhR0FRaXfbrN93IwYlZyh3JuKrmiyUDcCyvM5xJ9LZWr/9fICA/0j
+         3QfQ==
+X-Gm-Message-State: AOJu0YxLw9Buna3kCLWtOt7Cjgq4ou+8qFvvKQWvP1a1Q4CQNpvhqpdD
+        F1Fz40DKtQNPsQTiSyg68BB1tsK1+hshziyfX1zi+Q58e22yCmuxRt49TRbtO4nKXOis66YApTD
+        7q/RW+kOZlbF7iberh/0F
+X-Received: by 2002:adf:d4c2:0:b0:31f:fafe:a741 with SMTP id w2-20020adfd4c2000000b0031ffafea741mr805287wrk.67.1695897693341;
+        Thu, 28 Sep 2023 03:41:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8wQqJcLWfnLgcx3NFwWByEI5vHLz4X4Dd/wyS5mYLcYBquvQCsnqouz8WVv4GxVhZ3/cOTg==
+X-Received: by 2002:adf:d4c2:0:b0:31f:fafe:a741 with SMTP id w2-20020adfd4c2000000b0031ffafea741mr805266wrk.67.1695897692989;
+        Thu, 28 Sep 2023 03:41:32 -0700 (PDT)
 Received: from starship ([89.237.96.178])
-        by smtp.gmail.com with ESMTPSA id u8-20020a7bc048000000b003fe2b081661sm22518733wmc.30.2023.09.28.03.41.10
+        by smtp.gmail.com with ESMTPSA id o11-20020a5d4a8b000000b0031fc4c31d77sm19261478wrq.88.2023.09.28.03.41.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 03:41:11 -0700 (PDT)
-Message-ID: <c6939a0d710438c4b3d3d98fb7b81030e9d01a0f.camel@redhat.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: refactor req_immediate_exit logic
+        Thu, 28 Sep 2023 03:41:32 -0700 (PDT)
+Message-ID: <43a47609b43641bd74f96d86783f984295e3d87d.camel@redhat.com>
+Subject: Re: [PATCH v2 2/4] KVM: x86: add more information to the kvm_entry
+ tracepoint
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Cc:     Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
@@ -65,15 +66,15 @@ Cc:     Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>
-Date:   Thu, 28 Sep 2023 13:41:09 +0300
-In-Reply-To: <93396a36-30fe-74d6-d812-a93dafa771cb@redhat.com>
+Date:   Thu, 28 Sep 2023 13:41:30 +0300
+In-Reply-To: <27053c89-e11c-e16d-ef88-89b3cd99c487@redhat.com>
 References: <20230924124410.897646-1-mlevitsk@redhat.com>
-         <20230924124410.897646-2-mlevitsk@redhat.com>
-         <93396a36-30fe-74d6-d812-a93dafa771cb@redhat.com>
+         <20230924124410.897646-3-mlevitsk@redhat.com>
+         <27053c89-e11c-e16d-ef88-89b3cd99c487@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
@@ -85,22 +86,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+У вт, 2023-09-26 у 18:39 +0200, Paolo Bonzini пише:
 > On 9/24/23 14:44, Maxim Levitsky wrote:
-> > +	if (vcpu->arch.req_immediate_exit)
-> >   		kvm_make_request(KVM_REQ_EVENT, vcpu);
-> > -		static_call(kvm_x86_request_immediate_exit)(vcpu);
-> > -	}
+> > +		__field(	u32,		inj_info	)
+> > +		__field(	u32,		inj_info_err	)
+> > +		__field(	bool,		guest_mode	)
+> > +		__field(	bool,		req_imm_exit	)
+> > +		),
 > 
-> Is it enough for your use case to add a new tracepoint here, instead of 
-> adding req_immediate_exit to both entry and exit?
+> As anticipated in patch 1 I'm not so sure about adding req_imm_exit here 
+> but also (especially) in kvm_exit.  I do believe it should be traced, 
+> I'm not sure it's needed in kvm_entry+kvm_exit as opposed to just a 
+> separate tracepoint.
 
 
-I prefer if possible to keep the req_immediate_exit field on entry only,
-as it is pretty much an extension to the injected event data which I also
-added to kvm_entry() tracepoint.
+I will drop guest_mode.
 
 Best regards,
 	Maxim Levitsky
+
 
 > 
 > Paolo
