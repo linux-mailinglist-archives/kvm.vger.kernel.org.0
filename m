@@ -2,364 +2,1263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FFC57B2613
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 21:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CDC27B26F3
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 23:02:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231958AbjI1Tqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 15:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
+        id S232313AbjI1VCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 17:02:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231971AbjI1Tqt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 15:46:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72CC81A5
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 12:46:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695930360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=60E5WNNxgSCl+tFz6iAjN5CoPA2wZHwA5yijdmM+h1U=;
-        b=ZXxgfRVAugtyXWHUUKdEMrfzeNE7OBHk3oBM5DfFs2lNIwu6ccas79//76nrOTSRkKwoGy
-        OpZrunhCUk6ycUg8neSQojzOfcQ5581BbvELNg44IkpXTG+gSdk7S/mRAgmrmrh/t5q7LO
-        daYo4NPRBqsRtVAINJSAUYoUAG4qp0g=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-daSk9N5eNrSs18Y9J9tjSw-1; Thu, 28 Sep 2023 15:45:59 -0400
-X-MC-Unique: daSk9N5eNrSs18Y9J9tjSw-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-79fd91b8494so929712539f.3
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 12:45:59 -0700 (PDT)
+        with ESMTP id S232180AbjI1VCP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 17:02:15 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC45180
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 14:02:11 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a234ffeb90so9972157b3.3
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 14:02:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695934931; x=1696539731; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Fs7Re5yYgSYMM6OzeECo9VL6RcxUOlvvkh4xluBmBJA=;
+        b=HZMkXjeYt5w6711Pi7uYFp1v8pHsrREx8NfRAZK5NPQSDwdVIq6gXJIUfRjb3GH2fC
+         9Q32FxMSEBZv2ssGSWuUkJ2MU1P12zDftVSmCWwFmZsV+DzP9WRAS2mXx0mmytjHvhl9
+         8IsxSlQyNb8lSVBpQhjfyQgEo8iSJG6tAgRv6nClupDXfVwidq1vPbbSG3u2D6RtojNH
+         cQiEHZD0dkKK2QRuWJ8B932lfPgoB5ZLyHAhuUc8jjqlmw8C3XNTOJWPf24L++0/X+Gx
+         YBDEYU8ujxJkH6BND9fcp/UPcQHQB/G5L4RcrRBr8B6ETUHOlPHTQJuMRfT29tcDLQJY
+         UR9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695930358; x=1696535158;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1695934931; x=1696539731;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=60E5WNNxgSCl+tFz6iAjN5CoPA2wZHwA5yijdmM+h1U=;
-        b=bfE9XyWzBECaZPYHMoBQk7WaLeqsQq7rmswIJeZWLLSR7PZtYJ6AuzwfGGDRPzEJmf
-         VM7wCYQofCUJUm6YcKLQneiOpHER9JRYzy63C2xdKeFDCjO/5VQ/G0SagwsaoyYcCj1I
-         374hM/GhCYQaMZo5SC5OF0dv0OXYOt+S7QyyD6nsARr57DqvflKetxqRbbD0e/it58Sc
-         x35slTrE/5nIK9bsnZOkTmA0kBXWTm1rVT4OPMa8T/9uVjorOI9tadSD1atzHVa5SP8G
-         jXeosxrenyUkveDJxF5ETedl9rbIXF/A0Wt2Ghw1gv2/wNOGa2joli8PZr1zd1CvEZo0
-         4c+w==
-X-Gm-Message-State: AOJu0Yz3ouAUW1Jd0ygW9YTFTt2tGLOiV3l/4Zphg6Txi9TR3VkjiXlc
-        ztdGrdqBIoVUfQHb/g+dQz2uRTFCjumS0nsg2oHo7PEVrEWX8r181Uw2x0u7eL7kal6JWDFzoFw
-        83qo+y+3gc/Zr
-X-Received: by 2002:a5e:c908:0:b0:794:d833:4a8a with SMTP id z8-20020a5ec908000000b00794d8334a8amr2118404iol.0.1695930358344;
-        Thu, 28 Sep 2023 12:45:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTIpcOxqtSjd2ba/myuh51/GOw731q/iLcMd6z1TSsoqJRnI+GIsSKs1QDQUKIYUTiWxiRog==
-X-Received: by 2002:a5e:c908:0:b0:794:d833:4a8a with SMTP id z8-20020a5ec908000000b00794d8334a8amr2118389iol.0.1695930358047;
-        Thu, 28 Sep 2023 12:45:58 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id z12-20020a6b5c0c000000b007864c26fd35sm4678742ioh.13.2023.09.28.12.45.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 12:45:57 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 13:45:50 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     <ankita@nvidia.com>
-Cc:     <jgg@nvidia.com>, <akpm@linux-foundation.org>,
-        <tony.luck@intel.com>, <bp@alien8.de>, <naoya.horiguchi@nec.com>,
-        <linmiaohe@huawei.com>, <aniketa@nvidia.com>, <cjia@nvidia.com>,
-        <kwankhede@nvidia.com>, <targupta@nvidia.com>, <vsethi@nvidia.com>,
-        <acurrid@nvidia.com>, <anuaggarwal@nvidia.com>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-edac@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v1 4/4] vfio/nvgpu: register device memory for poison
- handling
-Message-ID: <20230928134550.55fd9d8b.alex.williamson@redhat.com>
-In-Reply-To: <20230920140210.12663-5-ankita@nvidia.com>
-References: <20230920140210.12663-1-ankita@nvidia.com>
-        <20230920140210.12663-5-ankita@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        bh=Fs7Re5yYgSYMM6OzeECo9VL6RcxUOlvvkh4xluBmBJA=;
+        b=GVpiks/DsezHti5s7lAFhvL++LH3Wn594zlS+K3beNR/qg0JcTUW4fBVI+pvk8pfMc
+         H4d3+svnlcO/239kHFeeSf+i3g8nB3Gnw0VyVgzeSiB5jcCgXclDCMvS1rEZxnPYcTAt
+         1uBAAcRhWmqnh15CtpQaYOLJTxxPTydUkg5+fxd8uMaCWQCz6sWdw3QC2rHcsnF+TlXH
+         wXWx/8BUxMb9TTmKTqaaVxWCV6ZktJKTWHcrbw4AP3zFhtmnUk9Nu0R6ZRaATL9uquXv
+         q0iV/7VTUYtDexkt5VP2cPdifpB4qZ4+UIlp7/xLU4gZzA6hURxKw/QvRU84RIgtFfvl
+         mfiQ==
+X-Gm-Message-State: AOJu0YxZ0gfc75Jx3e5VPUggB51D4ZRJkO07kQSFe5ANo784uJK5QmNJ
+        gH9H9i6LQBWlbnD4Nrb3bGidJbWttIqks3aHP0MDt8lydflfyZqEpRTxljYRIwosOlO2uVjwcbP
+        BNBa0gjvqGCqgIV+zvlM8oUEff70xvPEkYnl2rcUdSTg0bFiujLUP4M7NN6zjRJy70LeMO9U=
+X-Google-Smtp-Source: AGHT+IGZNvCFIf+qpcHMcNMvw8Ru+O8MwDqwpuhUo+bpLUfCgC96c4cotRTTZs9tGm7d1QqrJiaAesEIG3uZnF8y0A==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a81:d80b:0:b0:59b:df68:8294 with SMTP
+ id d11-20020a81d80b000000b0059bdf688294mr39855ywj.3.1695934930628; Thu, 28
+ Sep 2023 14:02:10 -0700 (PDT)
+Date:   Thu, 28 Sep 2023 21:02:01 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
+Message-ID: <20230928210201.1310536-1-coltonlewis@google.com>
+Subject: [PATCH v2] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
+From:   Colton Lewis <coltonlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev,
+        Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Sep 2023 19:32:10 +0530
-<ankita@nvidia.com> wrote:
+Add a new arch_timer_edge_cases selftests that validates:
 
-> From: Ankit Agrawal <ankita@nvidia.com>
->=20
-> The nvgrace-gpu-vfio-pci module [1] maps the device memory to the user VA
-> (Qemu) using remap_pfn_range() without adding the memory to the kernel.
-> The device memory pages are not backed by struct page. Patches 1-3
-> implements the mechanism to handle ECC/poison on memory page without
-> struct page and expose a registration function. This new mechanism is
-> leveraged here.
-> =C2=A0
-> The module registers its memory region with the kernel MM for ECC handling
-> using the register_pfn_address_space() registration API exposed by the
-> kernel. It also defines a failure callback function pfn_memory_failure()
-> to get the poisoned PFN from the MM.
-> =C2=A0
-> The module track poisoned PFN as a bitmap with a bit per PFN. The PFN is
-> communicated by the kernel MM to the module through the failure function,
-> which sets the appropriate bit in the bitmap.
-> =C2=A0
-> The module also defines a VMA fault ops for the module. It returns
-> VM_FAULT_HWPOISON in case the bit for the PFN is set in the bitmap.
->=20
-> [1] https://lore.kernel.org/all/20230915025415.6762-1-ankita@nvidia.com/
->=20
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c | 107 +++++++++++++++++++++++++++-
->  drivers/vfio/vfio.h                 |  11 ---
->  drivers/vfio/vfio_main.c            |   3 +-
->  include/linux/vfio.h                |  15 ++++
->  4 files changed, 123 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
-ce-gpu/main.c
-> index ba323f2d8ea1..1c89ce0cc1cc 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -6,6 +6,10 @@
->  #include <linux/pci.h>
->  #include <linux/vfio_pci_core.h>
->  #include <linux/vfio.h>
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +#include <linux/bitmap.h>
-> +#include <linux/memory-failure.h>
-> +#endif
-> =20
->  struct nvgrace_gpu_vfio_pci_core_device {
->  	struct vfio_pci_core_device core_device;
-> @@ -13,8 +17,85 @@ struct nvgrace_gpu_vfio_pci_core_device {
->  	size_t memlength;
->  	void *memmap;
->  	struct mutex memmap_lock;
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +	struct pfn_address_space pfn_address_space;
-> +	unsigned long *pfn_bitmap;
-> +#endif
->  };
-> =20
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +void nvgrace_gpu_vfio_pci_pfn_memory_failure(struct pfn_address_space *p=
-fn_space,
-> +		unsigned long pfn)
-> +{
-> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev =3D container_of(
-> +		pfn_space, struct nvgrace_gpu_vfio_pci_core_device, pfn_address_space);
-> +	unsigned long mem_offset =3D pfn - pfn_space->node.start;
-> +
-> +	if (mem_offset >=3D nvdev->memlength)
-> +		return;
-> +
-> +	/*
-> +	 * MM has called to notify a poisoned page. Track that in the bitmap.
-> +	 */
-> +	__set_bit(mem_offset, nvdev->pfn_bitmap);
-> +}
-> +
-> +struct pfn_address_space_ops nvgrace_gpu_vfio_pci_pas_ops =3D {
-> +	.failure =3D nvgrace_gpu_vfio_pci_pfn_memory_failure,
-> +};
-> +
-> +static int
-> +nvgrace_gpu_vfio_pci_register_pfn_range(struct nvgrace_gpu_vfio_pci_core=
-_device *nvdev,
-> +					struct vm_area_struct *vma)
-> +{
-> +	unsigned long nr_pages;
-> +	int ret =3D 0;
-> +
-> +	nr_pages =3D nvdev->memlength >> PAGE_SHIFT;
-> +
-> +	nvdev->pfn_address_space.node.start =3D vma->vm_pgoff;
-> +	nvdev->pfn_address_space.node.last =3D vma->vm_pgoff + nr_pages - 1;
-> +	nvdev->pfn_address_space.ops =3D &nvgrace_gpu_vfio_pci_pas_ops;
-> +	nvdev->pfn_address_space.mapping =3D vma->vm_file->f_mapping;
-> +
-> +	ret =3D register_pfn_address_space(&(nvdev->pfn_address_space));
-> +
-> +	return ret;
-> +}
-> +
-> +static vm_fault_t nvgrace_gpu_vfio_pci_fault(struct vm_fault *vmf)
-> +{
-> +	unsigned long mem_offset =3D vmf->pgoff - vmf->vma->vm_pgoff;
-> +	struct vfio_device *core_vdev;
-> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev;
-> +
-> +	if (!(vmf->vma->vm_file))
-> +		goto error_exit;
-> +
-> +	core_vdev =3D vfio_device_from_file(vmf->vma->vm_file);
-> +
-> +	if (!core_vdev)
-> +		goto error_exit;
-> +
-> +	nvdev =3D container_of(core_vdev,
-> +			struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
-> +
-> +	/*
-> +	 * Check if the page is poisoned.
-> +	 */
-> +	if (mem_offset < (nvdev->memlength >> PAGE_SHIFT) &&
-> +		test_bit(mem_offset, nvdev->pfn_bitmap))
-> +		return VM_FAULT_HWPOISON;
-> +
-> +error_exit:
-> +	return VM_FAULT_ERROR;
-> +}
-> +
-> +static const struct vm_operations_struct nvgrace_gpu_vfio_pci_mmap_ops =
-=3D {
-> +	.fault =3D nvgrace_gpu_vfio_pci_fault,
-> +};
-> +#endif
-> +
->  static int nvgrace_gpu_vfio_pci_open_device(struct vfio_device *core_vde=
-v)
->  {
->  	struct vfio_pci_core_device *vdev =3D
-> @@ -46,6 +127,9 @@ static void nvgrace_gpu_vfio_pci_close_device(struct v=
-fio_device *core_vdev)
-> =20
->  	mutex_destroy(&nvdev->memmap_lock);
-> =20
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +	unregister_pfn_address_space(&(nvdev->pfn_address_space));
-> +#endif
->  	vfio_pci_core_close_device(core_vdev);
->  }
-> =20
-> @@ -104,8 +188,12 @@ static int nvgrace_gpu_vfio_pci_mmap(struct vfio_dev=
-ice *core_vdev,
->  		return ret;
-> =20
->  	vma->vm_pgoff =3D start_pfn;
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +	vma->vm_ops =3D &nvgrace_gpu_vfio_pci_mmap_ops;
-> =20
-> -	return 0;
-> +	ret =3D nvgrace_gpu_vfio_pci_register_pfn_range(nvdev, vma);
-> +#endif
-> +	return ret;
->  }
-> =20
->  static long
-> @@ -406,6 +494,19 @@ nvgrace_gpu_vfio_pci_fetch_memory_property(struct pc=
-i_dev *pdev,
-> =20
->  	nvdev->memlength =3D memlength;
-> =20
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +	/*
-> +	 * A bitmap is maintained to track the pages that are poisoned. Each
-> +	 * page is represented by a bit. Allocation size in bytes is
-> +	 * determined by shifting the device memory size by PAGE_SHIFT to
-> +	 * determine the number of pages; and further shifted by 3 as each
-> +	 * byte could track 8 pages.
-> +	 */
-> +	nvdev->pfn_bitmap
-> +		=3D vzalloc((nvdev->memlength >> PAGE_SHIFT)/BITS_PER_TYPE(char));
-> +	if (!nvdev->pfn_bitmap)
-> +		ret =3D -ENOMEM;
-> +#endif
->  	return ret;
->  }
-> =20
-> @@ -442,6 +543,10 @@ static void nvgrace_gpu_vfio_pci_remove(struct pci_d=
-ev *pdev)
->  	struct nvgrace_gpu_vfio_pci_core_device *nvdev =3D nvgrace_gpu_drvdata(=
-pdev);
->  	struct vfio_pci_core_device *vdev =3D &nvdev->core_device;
-> =20
-> +#ifdef CONFIG_MEMORY_FAILURE
-> +	vfree(nvdev->pfn_bitmap);
-> +#endif
-> +
->  	vfio_pci_core_unregister_device(vdev);
->  	vfio_put_device(&vdev->vdev);
->  }
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 307e3f29b527..747094503909 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -16,17 +16,6 @@ struct iommufd_ctx;
->  struct iommu_group;
->  struct vfio_container;
-> =20
-> -struct vfio_device_file {
-> -	struct vfio_device *device;
-> -	struct vfio_group *group;
-> -
-> -	u8 access_granted;
-> -	u32 devid; /* only valid when iommufd is valid */
-> -	spinlock_t kvm_ref_lock; /* protect kvm field */
-> -	struct kvm *kvm;
-> -	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lo=
-ck */
-> -};
-> -
->  void vfio_device_put_registration(struct vfio_device *device);
->  bool vfio_device_try_get_registration(struct vfio_device *device);
->  int vfio_df_open(struct vfio_device_file *df);
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 40732e8ed4c6..a7dafd7c64a6 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1309,7 +1309,7 @@ const struct file_operations vfio_device_fops =3D {
->  	.mmap		=3D vfio_device_fops_mmap,
->  };
-> =20
-> -static struct vfio_device *vfio_device_from_file(struct file *file)
-> +struct vfio_device *vfio_device_from_file(struct file *file)
->  {
->  	struct vfio_device_file *df =3D file->private_data;
-> =20
-> @@ -1317,6 +1317,7 @@ static struct vfio_device *vfio_device_from_file(st=
-ruct file *file)
->  		return NULL;
->  	return df->device;
->  }
-> +EXPORT_SYMBOL_GPL(vfio_device_from_file);
-> =20
->  /**
->   * vfio_file_is_valid - True if the file is valid vfio file
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 454e9295970c..d88af251e931 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -361,4 +361,19 @@ int vfio_virqfd_enable(void *opaque, int (*handler)(=
-void *, void *),
->  		       struct virqfd **pvirqfd, int fd);
->  void vfio_virqfd_disable(struct virqfd **pvirqfd);
-> =20
-> +/*
-> + * VFIO device file.
-> + */
-> +struct vfio_device_file {
-> +	struct vfio_device *device;
-> +	struct vfio_group *group;
-> +	u8 access_granted;
-> +	u32 devid; /* only valid when iommufd is valid */
-> +	spinlock_t kvm_ref_lock; /* protect kvm field */
-> +	struct kvm *kvm;
-> +	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lo=
-ck */
-> +};
+* timers above the max TVAL value
+* timers in the past
+* moving counters ahead and behind pending timers
+* reprograming timers
+* timers fired multiple times
+* masking/unmasking using the timer control mask
 
-What here necessitates moving this to the more public header?  Thanks,
+These are intentionally unusual scenarios to stress compliance with
+the arm architecture.
 
-Alex
+Co-developed-by: Ricardo Koller <ricarkol@google.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
 
-> +
-> +struct vfio_device *vfio_device_from_file(struct file *file);
-> +
->  #endif /* VFIO_H */
+v2:
+* Rebase to v6.6-rc3
+* Use new GUEST_ASSERT macros
+* Remove spinlock in favor of atomic operations
 
+v1: https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
+
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../kvm/aarch64/arch_timer_edge_cases.c       | 1105 +++++++++++++++++
+ .../kvm/include/aarch64/arch_timer.h          |   18 +-
+ 3 files changed, 1123 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index a3bb36fb3cfc..e940b7c6b818 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -141,6 +141,7 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+
+ TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
+ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
++TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+ TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+new file mode 100644
+index 000000000000..a3761a361de9
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+@@ -0,0 +1,1105 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
++ *
++ * The test validates some edge cases related to the arch-timer:
++ * - timers above the max TVAL value.
++ * - timers in the past
++ * - moving counters ahead and behind pending timers.
++ * - reprograming timers.
++ * - timers fired multiple times.
++ * - masking/unmasking using the timer control mask.
++ *
++ * Copyright (c) 2021, Google LLC.
++ */
++
++#define _GNU_SOURCE
++
++#include <stdlib.h>
++#include <pthread.h>
++#include <linux/kvm.h>
++#include <linux/atomic.h>
++#include <linux/bitmap.h>
++#include <linux/sizes.h>
++#include <sched.h>
++#include <sys/sysinfo.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "delay.h"
++#include "arch_timer.h"
++#include "gic.h"
++#include "vgic.h"
++
++#define msecs_to_usecs(msec)		((msec) * 1000LL)
++
++#define CVAL_MAX			~0ULL
++/* tval is a signed 32-bit int. */
++#define TVAL_MAX			INT_MAX
++#define TVAL_MIN			INT_MIN
++
++#define GICD_BASE_GPA			0x8000000ULL
++#define GICR_BASE_GPA			0x80A0000ULL
++
++/* After how much time we say there is no IRQ. */
++#define TIMEOUT_NO_IRQ_US		msecs_to_usecs(50)
++
++#define TEST_MARGIN_US			1000ULL
++
++/* A nice counter value to use as the starting one for most tests. */
++#define DEF_CNT				(CVAL_MAX / 2)
++
++/* Number of runs. */
++#define NR_TEST_ITERS_DEF		5
++
++/* Default wait test time in ms. */
++#define WAIT_TEST_MS			10
++
++/* Default "long" wait test time in ms. */
++#define LONG_WAIT_TEST_MS		100
++
++/* Shared with IRQ handler. */
++struct test_vcpu_shared_data {
++	atomic_t handled;
++	atomic_t spurious;
++} shared_data;
++
++struct test_args {
++	/* Virtual or physical timer and counter tests. */
++	enum arch_timer timer;
++	/* Delay used for most timer tests. */
++	uint64_t wait_ms;
++	/* Delay used in the test_long_timer_delays test. */
++	uint64_t long_wait_ms;
++	/* Number of iterations. */
++	int iterations;
++	/* Whether to test the physical timer. */
++	bool test_physical;
++	/* Whether to test the virtual timer. */
++	bool test_virtual;
++};
++
++struct test_args test_args = {
++	.wait_ms = WAIT_TEST_MS,
++	.long_wait_ms = LONG_WAIT_TEST_MS,
++	.iterations = NR_TEST_ITERS_DEF,
++	.test_physical = true,
++	.test_virtual = true,
++};
++
++static int vtimer_irq, ptimer_irq;
++
++enum sync_cmd {
++	SET_REG_KVM_REG_ARM_TIMER_CNT = 100001,
++	USERSPACE_USLEEP,
++	USERSPACE_SCHED_YIELD,
++	USERSPACE_MIGRATE_SELF,
++};
++
++typedef void (*sleep_method_t)(enum arch_timer timer, uint64_t usec);
++
++static void sleep_poll(enum arch_timer timer, uint64_t usec);
++static void sleep_sched_poll(enum arch_timer timer, uint64_t usec);
++static void sleep_in_userspace(enum arch_timer timer, uint64_t usec);
++static void sleep_migrate(enum arch_timer timer, uint64_t usec);
++
++sleep_method_t sleep_method[] = {
++	sleep_poll,
++	sleep_sched_poll,
++	sleep_migrate,
++	sleep_in_userspace,
++};
++
++typedef void (*wfi_method_t)(void);
++
++static void wait_for_non_spurious_irq(void);
++static void wait_poll_for_irq(void);
++static void wait_sched_poll_for_irq(void);
++static void wait_migrate_poll_for_irq(void);
++
++wfi_method_t wfi_method[] = {
++	wait_for_non_spurious_irq,
++	wait_poll_for_irq,
++	wait_sched_poll_for_irq,
++	wait_migrate_poll_for_irq,
++};
++
++#define for_each_wfi_method(i)							\
++	for ((i) = 0; (i) < ARRAY_SIZE(wfi_method); (i)++)
++
++#define for_each_sleep_method(i)						\
++	for ((i) = 0; (i) < ARRAY_SIZE(sleep_method); (i)++)
++
++enum timer_view {
++	TIMER_CVAL = 1,
++	TIMER_TVAL,
++};
++
++#define ASSERT_IRQS_HANDLED(_nr, _args...) do {				\
++		int _h = atomic_read(&shared_data.handled);		\
++		__GUEST_ASSERT(_h == (_nr), "Handled %d IRQS but expected %d", _h, _nr, ##_args); \
++	} while (0)
++
++#define GUEST_SYNC_CLOCK(__cmd, __val)						\
++	GUEST_SYNC_ARGS(__cmd, __val, 0, 0, 0)
++
++#define USERSPACE_CMD(__cmd)							\
++	GUEST_SYNC_ARGS(__cmd, 0, 0, 0, 0)
++
++#define USERSPACE_SCHEDULE()							\
++	USERSPACE_CMD(USERSPACE_SCHED_YIELD)
++
++#define USERSPACE_MIGRATE_VCPU()						\
++	USERSPACE_CMD(USERSPACE_MIGRATE_SELF)
++
++#define SLEEP_IN_USERSPACE(__usecs)						\
++	GUEST_SYNC_ARGS(USERSPACE_USLEEP, (__usecs), 0, 0, 0)
++
++#define IAR_SPURIOUS		1023
++
++static void set_counter(enum arch_timer timer, uint64_t counter)
++{
++	GUEST_SYNC_ARGS(SET_REG_KVM_REG_ARM_TIMER_CNT, counter, timer, 0, 0);
++}
++
++static uint32_t next_pcpu(void)
++{
++	uint32_t max = get_nprocs();
++	uint32_t cur = sched_getcpu();
++	uint32_t next = cur;
++	cpu_set_t cpuset;
++
++	TEST_ASSERT(max > 1, "Need at least two physical cpus");
++
++	sched_getaffinity(getpid(), sizeof(cpuset), &cpuset);
++
++	do {
++		next = (next + 1) % CPU_SETSIZE;
++	} while (!CPU_ISSET(next, &cpuset));
++
++	return next;
++}
++
++static void guest_irq_handler(struct ex_regs *regs)
++{
++	unsigned int intid = gic_get_and_ack_irq();
++	enum arch_timer timer;
++	uint64_t cnt, cval;
++	uint32_t ctl;
++	bool timer_condition, istatus;
++
++	if (intid == IAR_SPURIOUS) {
++		atomic_inc(&shared_data.spurious);
++		goto out;
++	}
++
++	if (intid == ptimer_irq)
++		timer = PHYSICAL;
++	else if (intid == vtimer_irq)
++		timer = VIRTUAL;
++	else
++		goto out;
++
++	ctl = timer_get_ctl(timer);
++	cval = timer_get_cval(timer);
++	cnt = timer_get_cntct(timer);
++	timer_condition = cnt >= cval;
++	istatus = (ctl & CTL_ISTATUS) && (ctl & CTL_ENABLE);
++	GUEST_ASSERT_EQ(timer_condition, istatus);
++
++	/* Disable and mask the timer. */
++	timer_set_ctl(timer, CTL_IMASK);
++
++	atomic_inc(&shared_data.handled);
++
++out:
++	gic_set_eoi(intid);
++}
++
++static void set_cval_irq(enum arch_timer timer, uint64_t cval_cycles,
++			 uint32_t ctl)
++{
++	atomic_set(&shared_data.handled, 0);
++	atomic_set(&shared_data.spurious, 0);
++	timer_set_cval(timer, cval_cycles);
++	timer_set_ctl(timer, ctl);
++}
++
++static void set_tval_irq(enum arch_timer timer, uint64_t tval_cycles,
++			 uint32_t ctl)
++{
++	atomic_set(&shared_data.handled, 0);
++	atomic_set(&shared_data.spurious, 0);
++	timer_set_tval(timer, tval_cycles);
++	timer_set_ctl(timer, ctl);
++}
++
++static void set_xval_irq(enum arch_timer timer, uint64_t xval, uint32_t ctl,
++			 enum timer_view tv)
++{
++	switch (tv) {
++	case TIMER_CVAL:
++		set_cval_irq(timer, xval, ctl);
++		break;
++	case TIMER_TVAL:
++		set_tval_irq(timer, xval, ctl);
++		break;
++	default:
++		GUEST_FAIL("Could not get timer %d", timer);
++	}
++}
++
++/*
++ * Should be called with IRQs masked.
++ *
++ * Note that this can theoretically hang forever, so we rely on having
++ * a timeout mechanism in the "runner", like:
++ * tools/testing/selftests/kselftest/runner.sh.
++ */
++static void wait_for_non_spurious_irq(void)
++{
++	int h;
++
++	for (h = atomic_read(&shared_data.handled); h == atomic_read(&shared_data.handled);) {
++		asm volatile ("wfi\n"
++			      "msr daifclr, #2\n"
++			      /* handle IRQ */
++			      "msr daifset, #2\n":::"memory");
++	}
++}
++
++/*
++ * Wait for an non-spurious IRQ by polling in the guest (userspace=0) or in
++ * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHED_YIELD).
++ *
++ * Should be called with IRQs masked. Not really needed like the wfi above, but
++ * it should match the others.
++ *
++ * Note that this can theoretically hang forever, so we rely on having
++ * a timeout mechanism in the "runner", like:
++ * tools/testing/selftests/kselftest/runner.sh.
++ */
++static void poll_for_non_spurious_irq(bool userspace, enum sync_cmd userspace_cmd)
++{
++	int h;
++
++	h = atomic_read(&shared_data.handled);
++
++	local_irq_enable();
++	while (h == atomic_read(&shared_data.handled)) {
++		if (userspace)
++			USERSPACE_CMD(userspace_cmd);
++		else
++			cpu_relax();
++	}
++	local_irq_disable();
++}
++
++static void wait_poll_for_irq(void)
++{
++	poll_for_non_spurious_irq(false, -1);
++}
++
++static void wait_sched_poll_for_irq(void)
++{
++	poll_for_non_spurious_irq(true, USERSPACE_SCHED_YIELD);
++}
++
++static void wait_migrate_poll_for_irq(void)
++{
++	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
++}
++
++/*
++ * Sleep for usec microseconds by polling in the guest (userspace=0) or in
++ * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHEDULE).
++ */
++static void guest_poll(enum arch_timer test_timer, uint64_t usec,
++		       bool userspace, enum sync_cmd userspace_cmd)
++{
++	uint64_t cycles = usec_to_cycles(usec);
++	/* Whichever timer we are testing with, sleep with the other. */
++	enum arch_timer sleep_timer = 1 - test_timer;
++	uint64_t start = timer_get_cntct(sleep_timer);
++
++	while ((timer_get_cntct(sleep_timer) - start) < cycles) {
++		if (userspace)
++			USERSPACE_CMD(userspace_cmd);
++		else
++			cpu_relax();
++	}
++}
++
++static void sleep_poll(enum arch_timer timer, uint64_t usec)
++{
++	guest_poll(timer, usec, false, -1);
++}
++
++static void sleep_sched_poll(enum arch_timer timer, uint64_t usec)
++{
++	guest_poll(timer, usec, true, USERSPACE_SCHED_YIELD);
++}
++
++static void sleep_migrate(enum arch_timer timer, uint64_t usec)
++{
++	guest_poll(timer, usec, true, USERSPACE_MIGRATE_SELF);
++}
++
++static void sleep_in_userspace(enum arch_timer timer, uint64_t usec)
++{
++	SLEEP_IN_USERSPACE(usec);
++}
++
++/*
++ * Reset the timer state to some nice values like the counter not being close
++ * to the edge, and the control register masked and disabled.
++ */
++static void reset_timer_state(enum arch_timer timer, uint64_t cnt)
++{
++	set_counter(timer, cnt);
++	timer_set_ctl(timer, CTL_IMASK);
++}
++
++static void test_timer_xval(enum arch_timer timer, uint64_t xval,
++			    enum timer_view tv, wfi_method_t wm, bool reset_state,
++			    uint64_t reset_cnt)
++{
++	local_irq_disable();
++
++	if (reset_state)
++		reset_timer_state(timer, reset_cnt);
++
++	set_xval_irq(timer, xval, CTL_ENABLE, tv);
++	wm();
++
++	ASSERT_IRQS_HANDLED(1, tv, wm);
++	local_irq_enable();
++}
++
++/*
++ * The test_timer_* functions will program the timer, wait for it, and assert
++ * the firing of the correct IRQ.
++ *
++ * These functions don't have a timeout and return as soon as they receive an
++ * IRQ. They can hang (forever), so we rely on having a timeout mechanism in
++ * the "runner", like: tools/testing/selftests/kselftest/runner.sh.
++ */
++
++static void test_timer_cval(enum arch_timer timer, uint64_t cval,
++			    wfi_method_t wm, bool reset_state,
++			    uint64_t reset_cnt)
++{
++	test_timer_xval(timer, cval, TIMER_CVAL, wm, reset_state, reset_cnt);
++}
++
++static void test_timer_tval(enum arch_timer timer, int32_t tval,
++			    wfi_method_t wm, bool reset_state,
++			    uint64_t reset_cnt)
++{
++	test_timer_xval(timer, (uint64_t) tval, TIMER_TVAL, wm, reset_state,
++			reset_cnt);
++}
++
++static void test_xval_check_no_irq(enum arch_timer timer, uint64_t xval,
++				   uint64_t usec, enum timer_view timer_view,
++				   sleep_method_t guest_sleep)
++{
++	local_irq_disable();
++
++	set_xval_irq(timer, xval, CTL_ENABLE | CTL_IMASK, timer_view);
++	guest_sleep(timer, usec);
++
++	local_irq_enable();
++	isb();
++
++	/* Assume success (no IRQ) after waiting usec microseconds */
++	ASSERT_IRQS_HANDLED(0);
++}
++
++static void test_cval_no_irq(enum arch_timer timer, uint64_t cval,
++			     uint64_t usec, sleep_method_t wm)
++{
++	test_xval_check_no_irq(timer, cval, usec, TIMER_CVAL, wm);
++}
++
++static void test_tval_no_irq(enum arch_timer timer, int32_t tval, uint64_t usec,
++			     sleep_method_t wm)
++{
++	/* tval will be cast to an int32_t in test_xval_check_no_irq */
++	test_xval_check_no_irq(timer, (uint64_t) tval, usec, TIMER_TVAL, wm);
++}
++
++/* Test masking/unmasking a timer using the timer mask (not the IRQ mask). */
++static void test_timer_control_mask_then_unmask(enum arch_timer timer)
++{
++	reset_timer_state(timer, DEF_CNT);
++	set_tval_irq(timer, -1, CTL_ENABLE | CTL_IMASK);
++
++	/* No IRQs because the timer is still masked. */
++	ASSERT_IRQS_HANDLED(0);
++
++	/* Unmask the timer, and then get an IRQ. */
++	local_irq_disable();
++	timer_set_ctl(timer, CTL_ENABLE);
++	wait_for_non_spurious_irq();
++
++	ASSERT_IRQS_HANDLED(1);
++	local_irq_enable();
++}
++
++/* Check that timer control masks actually mask a timer being fired. */
++static void test_timer_control_masks(enum arch_timer timer)
++{
++	reset_timer_state(timer, DEF_CNT);
++
++	/* Local IRQs are not masked at this point. */
++
++	set_tval_irq(timer, -1, CTL_ENABLE | CTL_IMASK);
++
++	/* Assume no IRQ after waiting TIMEOUT_NO_IRQ_US microseconds */
++	sleep_poll(timer, TIMEOUT_NO_IRQ_US);
++
++	ASSERT_IRQS_HANDLED(0);
++	timer_set_ctl(timer, CTL_IMASK);
++}
++
++static void test_fire_a_timer_multiple_times(enum arch_timer timer,
++					     wfi_method_t wm, int num)
++{
++	int i;
++
++	local_irq_disable();
++	reset_timer_state(timer, DEF_CNT);
++
++	set_tval_irq(timer, 0, CTL_ENABLE);
++
++	for (i = 1; i <= num; i++) {
++		wm();
++
++		/* The IRQ handler masked and disabled the timer.
++		 * Enable and unmmask it again.
++		 */
++		timer_set_ctl(timer, CTL_ENABLE);
++
++		ASSERT_IRQS_HANDLED(i);
++	}
++
++	local_irq_enable();
++}
++
++static void test_timers_fired_multiple_times(enum arch_timer timer)
++{
++	int i;
++
++	for_each_wfi_method(i)
++		test_fire_a_timer_multiple_times(timer, wfi_method[i], 10);
++}
++
++/*
++ * Set a timer for tval=d_1_ms then reprogram it to tval=d_2_ms. Check that we
++ * get the timer fired. There is no timeout for the wait: we use the wfi
++ * instruction.
++ */
++static void test_reprogramming_timer(enum arch_timer timer, wfi_method_t wm,
++				     int32_t d_1_ms, int32_t d_2_ms)
++{
++	local_irq_disable();
++	reset_timer_state(timer, DEF_CNT);
++
++	/* Program the timer to DEF_CNT + d_1_ms. */
++	set_tval_irq(timer, msec_to_cycles(d_1_ms), CTL_ENABLE);
++
++	/* Reprogram the timer to DEF_CNT + d_2_ms. */
++	timer_set_tval(timer, msec_to_cycles(d_2_ms));
++
++	wm();
++
++	/* The IRQ should arrive at DEF_CNT + d_2_ms (or after). */
++	GUEST_ASSERT(timer_get_cntct(timer) >=
++		     DEF_CNT + msec_to_cycles(d_2_ms));
++
++	local_irq_enable();
++	ASSERT_IRQS_HANDLED(1, wm);
++};
++
++/*
++ * Set a timer for tval=d_1_ms then reprogram it to tval=d_2_ms. Check
++ * that we get the timer fired in d_2_ms.
++ */
++static void test_reprogramming_timer_with_timeout(enum arch_timer timer,
++						  sleep_method_t guest_sleep,
++						  int32_t d_1_ms,
++						  int32_t d_2_ms)
++{
++	local_irq_disable();
++	reset_timer_state(timer, DEF_CNT);
++
++	set_tval_irq(timer, msec_to_cycles(d_1_ms), CTL_ENABLE);
++
++	/* Reprogram the timer. */
++	timer_set_tval(timer, msec_to_cycles(d_2_ms));
++
++	guest_sleep(timer, msecs_to_usecs(d_2_ms) + TEST_MARGIN_US);
++
++	local_irq_enable();
++	isb();
++	ASSERT_IRQS_HANDLED(1);
++};
++
++static void test_reprogram_timers(enum arch_timer timer)
++{
++	int i;
++	uint64_t base_wait = test_args.wait_ms;
++
++	for_each_wfi_method(i) {
++		test_reprogramming_timer(timer, wfi_method[i], 2 * base_wait,
++					 base_wait);
++		test_reprogramming_timer(timer, wfi_method[i], base_wait,
++					 2 * base_wait);
++	}
++
++	for_each_sleep_method(i) {
++		test_reprogramming_timer_with_timeout(timer, sleep_method[i],
++						      2 * base_wait, base_wait);
++		test_reprogramming_timer_with_timeout(timer, sleep_method[i],
++						      base_wait, 2 * base_wait);
++	}
++}
++
++static void test_basic_functionality(enum arch_timer timer)
++{
++	int32_t tval = (int32_t) msec_to_cycles(test_args.wait_ms);
++	uint64_t cval;
++	int i;
++
++	for_each_wfi_method(i) {
++		wfi_method_t wm = wfi_method[i];
++
++		cval = DEF_CNT + msec_to_cycles(test_args.wait_ms);
++
++		test_timer_cval(timer, cval, wm, true, DEF_CNT);
++		test_timer_tval(timer, tval, wm, true, DEF_CNT);
++	}
++}
++
++/*
++ * This test checks basic timer behavior without actually firing timers, things
++ * like: the relationship between cval and tval, tval down-counting.
++ */
++static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
++{
++	reset_timer_state(timer, DEF_CNT);
++
++	local_irq_disable();
++
++	/* cval in the past */
++	timer_set_cval(timer,
++		       timer_get_cntct(timer) -
++		       msec_to_cycles(test_args.wait_ms));
++	if (use_sched)
++		USERSPACE_MIGRATE_VCPU();
++	GUEST_ASSERT(timer_get_tval(timer) < 0);
++
++	/* tval in the past */
++	timer_set_tval(timer, -1);
++	if (use_sched)
++		USERSPACE_MIGRATE_VCPU();
++	GUEST_ASSERT(timer_get_cval(timer) < timer_get_cntct(timer));
++
++	/* tval larger than TVAL_MAX. */
++	timer_set_cval(timer,
++		       timer_get_cntct(timer) + TVAL_MAX +
++		       msec_to_cycles(test_args.wait_ms));
++	if (use_sched)
++		USERSPACE_MIGRATE_VCPU();
++	GUEST_ASSERT(timer_get_tval(timer) <= 0);
++
++	/*
++	 * tval larger than 2 * TVAL_MAX.
++	 * Twice the TVAL_MAX completely loops around the TVAL.
++	 */
++	timer_set_cval(timer,
++		       timer_get_cntct(timer) + 2ULL * TVAL_MAX +
++		       msec_to_cycles(test_args.wait_ms));
++	if (use_sched)
++		USERSPACE_MIGRATE_VCPU();
++	GUEST_ASSERT(timer_get_tval(timer) <=
++		       msec_to_cycles(test_args.wait_ms));
++
++	/* negative tval that rollovers from 0. */
++	set_counter(timer, msec_to_cycles(1));
++	timer_set_tval(timer, -1 * msec_to_cycles(test_args.wait_ms));
++	if (use_sched)
++		USERSPACE_MIGRATE_VCPU();
++	GUEST_ASSERT(timer_get_cval(timer) >= (CVAL_MAX - msec_to_cycles(9)));
++
++	/* tval should keep down-counting from 0 to -1. */
++	timer_set_tval(timer, 0);
++	sleep_poll(timer, 1);
++	GUEST_ASSERT(timer_get_tval(timer) < 0);
++
++	local_irq_enable();
++
++	/* Mask and disable any pending timer. */
++	timer_set_ctl(timer, CTL_IMASK);
++}
++
++static void test_timers_sanity_checks(enum arch_timer timer)
++{
++	timers_sanity_checks(timer, false);
++	/* Check how KVM saves/restores these edge-case values. */
++	timers_sanity_checks(timer, true);
++}
++
++static void test_set_cnt_after_tval_max(enum arch_timer timer, wfi_method_t wm)
++{
++	local_irq_disable();
++	reset_timer_state(timer, DEF_CNT);
++
++	set_cval_irq(timer,
++		     (uint64_t) TVAL_MAX +
++		     msec_to_cycles(test_args.wait_ms) / 2, CTL_ENABLE);
++
++	set_counter(timer, TVAL_MAX);
++	wm();
++
++	ASSERT_IRQS_HANDLED(1, wm);
++	local_irq_enable();
++}
++
++/* Test timers set for: cval = now + TVAL_MAX + wait_ms / 2*/
++static void test_timers_above_tval_max(enum arch_timer timer)
++{
++	uint64_t cval;
++	int i;
++
++	/*
++	 * Test that the system is not implementing cval in terms of
++	 * tval.  If that was the case, setting a cval to "cval = now
++	 * + TVAL_MAX + wait_ms" would wrap to "cval = now +
++	 * wait_ms / 2", and the timer would fire immediately. Test that it
++	 * doesn't.
++	 */
++	for_each_sleep_method(i) {
++		reset_timer_state(timer, DEF_CNT);
++		cval =
++		    timer_get_cntct(timer) + TVAL_MAX +
++		    msec_to_cycles(test_args.wait_ms) / 2;
++		test_cval_no_irq(timer, cval,
++				 msecs_to_usecs(test_args.wait_ms) / 2 +
++				 TEST_MARGIN_US, sleep_method[i]);
++	}
++
++	for_each_wfi_method(i) {
++		/* Get the IRQ by moving the counter forward. */
++		test_set_cnt_after_tval_max(timer, wfi_method[i]);
++	}
++}
++
++/*
++ * Template function to be used by the test_move_counter_ahead_* tests.  It
++ * sets the counter to cnt_1, the [c|t]val, the counter to cnt_2, and
++ * then waits for an IRQ.
++ */
++static void test_set_cnt_after_xval(enum arch_timer timer, uint64_t cnt_1,
++				    uint64_t xval, uint64_t cnt_2,
++				    wfi_method_t wm, enum timer_view tv)
++{
++	local_irq_disable();
++
++	set_counter(timer, cnt_1);
++	timer_set_ctl(timer, CTL_IMASK);
++
++	set_xval_irq(timer, xval, CTL_ENABLE, tv);
++	set_counter(timer, cnt_2);
++	wm();
++
++	ASSERT_IRQS_HANDLED(1);
++	local_irq_enable();
++}
++
++/*
++ * Template function to be used by the test_move_counter_ahead_* tests.  It
++ * sets the counter to cnt_1, the [c|t]val, the counter to cnt_2, and
++ * then waits for an IRQ.
++ */
++static void test_set_cnt_after_xval_no_irq(enum arch_timer timer,
++					   uint64_t cnt_1, uint64_t xval,
++					   uint64_t cnt_2,
++					   sleep_method_t guest_sleep,
++					   enum timer_view tv)
++{
++	local_irq_disable();
++
++	set_counter(timer, cnt_1);
++	timer_set_ctl(timer, CTL_IMASK);
++
++	set_xval_irq(timer, xval, CTL_ENABLE, tv);
++	set_counter(timer, cnt_2);
++	guest_sleep(timer, TIMEOUT_NO_IRQ_US);
++
++	local_irq_enable();
++	isb();
++
++	/* Assume no IRQ after waiting TIMEOUT_NO_IRQ_US microseconds */
++	ASSERT_IRQS_HANDLED(0);
++	timer_set_ctl(timer, CTL_IMASK);
++}
++
++static void test_set_cnt_after_tval(enum arch_timer timer, uint64_t cnt_1,
++				    int32_t tval, uint64_t cnt_2,
++				    wfi_method_t wm)
++{
++	test_set_cnt_after_xval(timer, cnt_1, tval, cnt_2, wm, TIMER_TVAL);
++}
++
++static void test_set_cnt_after_cval(enum arch_timer timer, uint64_t cnt_1,
++				    uint64_t cval, uint64_t cnt_2,
++				    wfi_method_t wm)
++{
++	test_set_cnt_after_xval(timer, cnt_1, cval, cnt_2, wm, TIMER_CVAL);
++}
++
++static void test_set_cnt_after_tval_no_irq(enum arch_timer timer,
++					   uint64_t cnt_1, int32_t tval,
++					   uint64_t cnt_2, sleep_method_t wm)
++{
++	test_set_cnt_after_xval_no_irq(timer, cnt_1, tval, cnt_2, wm,
++				       TIMER_TVAL);
++}
++
++static void test_set_cnt_after_cval_no_irq(enum arch_timer timer,
++					   uint64_t cnt_1, uint64_t cval,
++					   uint64_t cnt_2, sleep_method_t wm)
++{
++	test_set_cnt_after_xval_no_irq(timer, cnt_1, cval, cnt_2, wm,
++				       TIMER_CVAL);
++}
++
++/* Set a timer and then move the counter ahead of it. */
++static void test_move_counters_ahead_of_timers(enum arch_timer timer)
++{
++	int i;
++	int32_t tval;
++
++	for_each_wfi_method(i) {
++		wfi_method_t wm = wfi_method[i];
++
++		test_set_cnt_after_cval(timer, 0, DEF_CNT, DEF_CNT + 1, wm);
++		test_set_cnt_after_cval(timer, CVAL_MAX, 1, 2, wm);
++
++		/* Move counter ahead of negative tval. */
++		test_set_cnt_after_tval(timer, 0, -1, DEF_CNT + 1, wm);
++		test_set_cnt_after_tval(timer, 0, -1, TVAL_MAX, wm);
++		tval = TVAL_MAX;
++		test_set_cnt_after_tval(timer, 0, tval, (uint64_t) tval + 1,
++					wm);
++	}
++
++	for_each_sleep_method(i) {
++		sleep_method_t sm = sleep_method[i];
++
++		test_set_cnt_after_cval_no_irq(timer, 0, DEF_CNT, CVAL_MAX, sm);
++	}
++}
++
++/*
++ * Program a timer, mask it, and then change the tval or counter to cancel it.
++ * Unmask it and check that nothing fires.
++ */
++static void test_move_counters_behind_timers(enum arch_timer timer)
++{
++	int i;
++
++	for_each_sleep_method(i) {
++		sleep_method_t sm = sleep_method[i];
++
++		test_set_cnt_after_cval_no_irq(timer, DEF_CNT, DEF_CNT - 1, 0,
++					       sm);
++		test_set_cnt_after_tval_no_irq(timer, DEF_CNT, -1, 0, sm);
++	}
++}
++
++static void test_timers_in_the_past(enum arch_timer timer)
++{
++	int32_t tval = -1 * (int32_t) msec_to_cycles(test_args.wait_ms);
++	uint64_t cval;
++	int i;
++
++	for_each_wfi_method(i) {
++		wfi_method_t wm = wfi_method[i];
++
++		/* set a timer wait_ms the past. */
++		cval = DEF_CNT - msec_to_cycles(test_args.wait_ms);
++		test_timer_cval(timer, cval, wm, true, DEF_CNT);
++		test_timer_tval(timer, tval, wm, true, DEF_CNT);
++
++		/* Set a timer to counter=0 (in the past) */
++		test_timer_cval(timer, 0, wm, true, DEF_CNT);
++
++		/* Set a time for tval=0 (now) */
++		test_timer_tval(timer, 0, wm, true, DEF_CNT);
++
++		/* Set a timer to as far in the past as possible */
++		test_timer_tval(timer, TVAL_MIN, wm, true, DEF_CNT);
++	}
++
++	/*
++	 * Set the counter to wait_ms, and a tval to -wait_ms. There should be no
++	 * timer as that tval means cval=CVAL_MAX-wait_ms.
++	 */
++	for_each_sleep_method(i) {
++		sleep_method_t sm = sleep_method[i];
++
++		set_counter(timer, msec_to_cycles(test_args.wait_ms));
++		test_tval_no_irq(timer, tval, TIMEOUT_NO_IRQ_US, sm);
++	}
++}
++
++static void test_long_timer_delays(enum arch_timer timer)
++{
++	int32_t tval = (int32_t) msec_to_cycles(test_args.long_wait_ms);
++	uint64_t cval;
++	int i;
++
++	for_each_wfi_method(i) {
++		wfi_method_t wm = wfi_method[i];
++
++		cval = DEF_CNT + msec_to_cycles(test_args.long_wait_ms);
++		test_timer_cval(timer, cval, wm, true, DEF_CNT);
++		test_timer_tval(timer, tval, wm, true, DEF_CNT);
++	}
++}
++
++static void guest_run_iteration(enum arch_timer timer)
++{
++	test_basic_functionality(timer);
++	test_timers_sanity_checks(timer);
++
++	test_timers_above_tval_max(timer);
++	test_timers_in_the_past(timer);
++
++	test_move_counters_ahead_of_timers(timer);
++	test_move_counters_behind_timers(timer);
++	test_reprogram_timers(timer);
++
++	test_timers_fired_multiple_times(timer);
++
++	test_timer_control_mask_then_unmask(timer);
++	test_timer_control_masks(timer);
++}
++
++static void guest_code(enum arch_timer timer)
++{
++	int i;
++
++	local_irq_disable();
++
++	gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
++
++	timer_set_ctl(VIRTUAL, CTL_IMASK);
++	timer_set_ctl(PHYSICAL, CTL_IMASK);
++
++	gic_irq_enable(vtimer_irq);
++	gic_irq_enable(ptimer_irq);
++	local_irq_enable();
++
++	for (i = 0; i < test_args.iterations; i++) {
++		GUEST_SYNC(i);
++		guest_run_iteration(timer);
++	}
++
++	test_long_timer_delays(timer);
++	GUEST_DONE();
++}
++
++static void migrate_self(uint32_t new_pcpu)
++{
++	int ret;
++	cpu_set_t cpuset;
++	pthread_t thread;
++
++	thread = pthread_self();
++
++	CPU_ZERO(&cpuset);
++	CPU_SET(new_pcpu, &cpuset);
++
++	pr_debug("Migrating from %u to %u\n", sched_getcpu(), new_pcpu);
++
++	ret = pthread_setaffinity_np(thread, sizeof(cpuset), &cpuset);
++
++	TEST_ASSERT(ret == 0, "Failed to migrate to pCPU: %u; ret: %d\n",
++		    new_pcpu, ret);
++}
++
++static void kvm_set_cntxct(struct kvm_vcpu *vcpu, uint64_t cnt,
++			   enum arch_timer timer)
++{
++	if (timer == PHYSICAL)
++		vcpu_set_reg(vcpu, KVM_REG_ARM_PTIMER_CNT, cnt);
++	else
++		vcpu_set_reg(vcpu, KVM_REG_ARM_TIMER_CNT, cnt);
++}
++
++static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
++{
++	enum sync_cmd cmd = uc->args[1];
++	uint64_t val = uc->args[2];
++	enum arch_timer timer = uc->args[3];
++
++	switch (cmd) {
++	case SET_REG_KVM_REG_ARM_TIMER_CNT:
++		kvm_set_cntxct(vcpu, val, timer);
++		break;
++	case USERSPACE_USLEEP:
++		usleep(val);
++		break;
++	case USERSPACE_SCHED_YIELD:
++		sched_yield();
++		break;
++	case USERSPACE_MIGRATE_SELF:
++		migrate_self(next_pcpu());
++		break;
++	default:
++		break;
++	}
++}
++
++static void test_run(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	while (true) {
++		vcpu_run(vcpu);
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			handle_sync(vcpu, &uc);
++			break;
++		case UCALL_DONE:
++			goto out;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			goto out;
++		default:
++			TEST_FAIL("Unexpected guest exit\n");
++		}
++	}
++
++ out:
++	return;
++}
++
++static void test_init_timer_irq(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL,
++			     KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq);
++	vcpu_device_attr_get(vcpu, KVM_ARM_VCPU_TIMER_CTRL,
++			     KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq);
++
++	sync_global_to_guest(vm, ptimer_irq);
++	sync_global_to_guest(vm, vtimer_irq);
++
++	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
++}
++
++static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
++			   enum arch_timer timer)
++{
++	*vm = vm_create_with_one_vcpu(vcpu, guest_code);
++	TEST_ASSERT(*vm, "Failed to create the test VM\n");
++
++	vm_init_descriptor_tables(*vm);
++	vm_install_exception_handler(*vm, VECTOR_IRQ_CURRENT,
++				     guest_irq_handler);
++
++	vcpu_init_descriptor_tables(*vcpu);
++	vcpu_args_set(*vcpu, 1, timer);
++
++	test_init_timer_irq(*vm, *vcpu);
++	vgic_v3_setup(*vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	sync_global_to_guest(*vm, test_args);
++}
++
++static void test_print_help(char *name)
++{
++	pr_info("Usage: %s [-h] [-b] [-i iterations] [-l long_wait_ms] [-p] [-v]\n"
++		, name);
++	pr_info("\t-i: Number of iterations (default: %u)\n",
++		NR_TEST_ITERS_DEF);
++	pr_info("\t-b: Test both physical and virtual timers (default: true)\n");
++	pr_info("\t-l: Delta (in ms) used for long wait time test (default: %u)\n",
++	     LONG_WAIT_TEST_MS);
++	pr_info("\t-l: Delta (in ms) used for wait times (default: %u)\n",
++		WAIT_TEST_MS);
++	pr_info("\t-p: Test physical timer (default: true)\n");
++	pr_info("\t-v: Test virtual timer (default: true)\n");
++	pr_info("\t-h: Print this help message\n");
++}
++
++static bool parse_args(int argc, char *argv[])
++{
++	int opt;
++
++	while ((opt = getopt(argc, argv, "bhi:l:pvw:")) != -1) {
++		switch (opt) {
++		case 'b':
++			test_args.test_physical = true;
++			test_args.test_virtual = true;
++			break;
++		case 'i':
++			test_args.iterations =
++			    atoi_positive("Number of iterations", optarg);
++			break;
++		case 'l':
++			test_args.long_wait_ms =
++			    atoi_positive("Long wait time", optarg);
++			break;
++		case 'p':
++			test_args.test_physical = true;
++			test_args.test_virtual = false;
++			break;
++		case 'v':
++			test_args.test_virtual = true;
++			test_args.test_physical = false;
++			break;
++		case 'w':
++			test_args.wait_ms = atoi_positive("Wait time", optarg);
++			break;
++		case 'h':
++		default:
++			goto err;
++		}
++	}
++
++	return true;
++
++ err:
++	test_print_help(argv[0]);
++	return false;
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	/* Tell stdout not to buffer its content */
++	setbuf(stdout, NULL);
++
++	if (!parse_args(argc, argv))
++		exit(KSFT_SKIP);
++
++	if (test_args.test_virtual) {
++		test_vm_create(&vm, &vcpu, VIRTUAL);
++		test_run(vm, vcpu);
++		kvm_vm_free(vm);
++	}
++
++	if (test_args.test_physical) {
++		test_vm_create(&vm, &vcpu, PHYSICAL);
++		test_run(vm, vcpu);
++		kvm_vm_free(vm);
++	}
++
++	return 0;
++}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+index b3e97525cb55..bf461de34785 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
++++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+@@ -79,7 +79,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
+ 	return 0;
+ }
+
+-static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
++static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
+ {
+ 	switch (timer) {
+ 	case VIRTUAL:
+@@ -95,6 +95,22 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
+ 	isb();
+ }
+
++static inline int32_t timer_get_tval(enum arch_timer timer)
++{
++	isb();
++	switch (timer) {
++	case VIRTUAL:
++		return read_sysreg(cntv_tval_el0);
++	case PHYSICAL:
++		return read_sysreg(cntp_tval_el0);
++	default:
++		GUEST_FAIL("Could not get timer %d\n", timer);
++	}
++
++	/* We should not reach here */
++	return 0;
++}
++
+ static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
+ {
+ 	switch (timer) {
+--
+2.42.0.582.g8ccd20d70d-goog
