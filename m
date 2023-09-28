@@ -2,211 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F85E7B107D
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 03:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A63417B1163
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 06:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229854AbjI1Byo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Sep 2023 21:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
+        id S230083AbjI1EEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 00:04:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjI1Byn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Sep 2023 21:54:43 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B4AAC;
-        Wed, 27 Sep 2023 18:54:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695866082; x=1727402082;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=VJc/QysescemoKOW+DykoXe9W/F3IUNeJe2VXQW9jbM=;
-  b=W960fF2Wzdg+/nXLuz87te7ULM2xlSM0F1NyEPZ3wDCpYKENtmmHP9Jy
-   01TrAVKJ3zvbBjePjoc4AOGrfWSPyXUqREpJlpUSGY2VYVF/gKzUBDUJi
-   Uj3jwQFi7WUEF4KhKdVSfWOU+ivysLuHudzYSCHfwK0JEFx8s/5u9HwHK
-   tUHGf33Kz41MIfNtkqEJ4Q1kJku6v8xq6ScIHe/su/s2NjIwfTsBUYkbc
-   T863seIwDPJd56LWpBVeLVqyDUPna/f73iwVJZdGuJKvxwQ7PDXTcXzI0
-   anLQzyaP3uLsQRgxw8VmLy7TfI3wz213oTx1BQUtDaAYEz15eWBrP+ZEL
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="384766265"
-X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
-   d="scan'208";a="384766265"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 18:54:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="752797537"
-X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
-   d="scan'208";a="752797537"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Sep 2023 18:54:41 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 27 Sep 2023 18:54:40 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 27 Sep 2023 18:54:40 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 27 Sep 2023 18:54:40 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.108)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 27 Sep 2023 18:54:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LYHTBf0HOveVlmiKy2pFbSIcYfh5YW3FGJ9hhWWHhajb1VkIQo/VlaWS9tQKPHwNds74vs8b3xZfA2d1FQWhsDDMQ+EjfK4R9CxTCz0uYuTjsncPZHGd1OsTfse8NJpOhzr1riYPgg25jaQTa5wEXdRNyCeivWwSvnHC4C0MmwBUAoYk2bhQnDNd41lbGXKiHUzmPTgU5u3qLIu1lV0dw2noBX2ysH6f8JgDWV/b6wyCiPn6VrJhvaxiaFk4GhlbAISuz1U6NXBbx+WzMMEQa9FNZx1QJW+ShdamKjLl/WxrRcX0Thj2ZwvRFFYYECx1ZfeX7KsxAG0h6fYsaGfKvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0aK28ax+ZXowixrapZriDFI3M1A1DKVT6AqPWpW7sKo=;
- b=HQa//sF2kn8sDOmgofmXoPoR7QnelzkTopJY8ElTkQOIe2LGq4VEUgxPOnjoWIEv45lJ0I/F311O6MriZOMZvfi5RYdq8nnzjJ4OyIaDFGWP3wOz2UWHRm1n6TEbjMwDk9apGCQwM0sCalKWBwBrN6OeklZi3X+cyU3RHnD5YqGx8pUiU41eVB3gKMZ9wbqF6jD6IZXAnNUCNXtpKreMzJ2S9LOoKeFJ9GJitrNCLGIZyKjXBEeESVN9TOWZlgTYuU4CEyAcdtdszgqQbMF0VWTWi3jTu7Un5wFAY4L3fV2MXhPlVboD4Pnm6PsV5ExUvY9pYK5s9w2VORQshn2+bQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN9PR11MB5467.namprd11.prod.outlook.com (2603:10b6:408:100::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21; Thu, 28 Sep
- 2023 01:54:36 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1bfc:7af0:dc68:839d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::1bfc:7af0:dc68:839d%4]) with mapi id 15.20.6813.017; Thu, 28 Sep 2023
- 01:54:36 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Baolu Lu <baolu.lu@linux.intel.com>
-CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: RE: [RFC 3/8] iommufd: Support attach/replace hwpt per pasid
-Thread-Topic: [RFC 3/8] iommufd: Support attach/replace hwpt per pasid
-Thread-Index: AQHZ8Fuji0mclsZAxEygwByYUuBlHLAt+cCAgADYgwCAAKoZwA==
-Date:   Thu, 28 Sep 2023 01:54:36 +0000
-Message-ID: <BN9PR11MB5276FE438034E96DE3FC61988CC1A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230926092651.17041-1-yi.l.liu@intel.com>
- <20230926092651.17041-4-yi.l.liu@intel.com>
- <cd258ee3-52ca-f944-7553-6a1cd01c5f7a@linux.intel.com>
- <20230927154424.GC339126@nvidia.com>
-In-Reply-To: <20230927154424.GC339126@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BN9PR11MB5467:EE_
-x-ms-office365-filtering-correlation-id: 2271ce48-dda3-4476-536c-08dbbfc5de45
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HIzss2ddhvB5BAHhcXTXVjFe6kg6nlbpakBzCZwyIHjiqekrg6/P+KcWfoL72RjKwC/4kvciS2P/Csx4aa1xryapUCuBEOHxxeUBLX8NjR1i+9AaaRrbN61KBNOHCUTC4t4GXnf8OyuZSwF7kAl/YI1ElNHEHAYB3CuzrVBJFTtuo4vDTBL3LSrG5oU7VHjln4DoEUrp0aI7+K5Tyb/XfWIYavhQc5XgMYkuSwUdp0QsMAfPpz9NFmlTpP2Wciapo94H3TMyXpnIBksZSDsYaH/hLFdTvDyCMyXyKUGCPM3b82apjNXlhrZwZUrhiWBPhuMkT7iZ/1tren6pHxLWlCKPTsfWYZU9N7FIA1STOZfN1pTlvBrSxLNLVvoPRlVO/8R6YriVpxSIhOwKOEOSCwTCzod58Dwoh5larf3yB9V1eHK7RaAK7RrkbPsOmENnfKC5MXFzTEdpbqvg3+6iM/PyFB+jmaSY9c13bSbP1I49wU5KvoaRfZFThyDd/B0SR2fxiKFYhKx7TXR81lAcS4R3vJyMM4jVgZZBN2UEZWfataD4I0vozSJO09KIeOeNkI+f1ulQ9heJCTsJip5YX8vzwhGB+v/CC08Y4sBCZceYK/yV4ZlDTTGEg0Okbvgg
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(136003)(39860400002)(376002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(2906002)(7416002)(66476007)(41300700001)(4326008)(8676002)(52536014)(66446008)(5660300002)(8936002)(66556008)(54906003)(66946007)(316002)(64756008)(76116006)(110136005)(478600001)(71200400001)(6506007)(7696005)(53546011)(9686003)(26005)(55016003)(122000001)(38070700005)(38100700002)(33656002)(82960400001)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TDawYCPh6e5DVxIvKSL15CFVgYYEzHKoRc8HGN8AtgAYckGB4PB4k6obYxIg?=
- =?us-ascii?Q?pCZUvRQJy3aQvlzB/2psPf7IOj9kREQU9t5pzBnPfqKpehKZEN0cK5RVVbso?=
- =?us-ascii?Q?81gnlEwoEJZSFl53M5O6uNyb0VUgk9g+GfkRGcr2Wla1l0kC+rwtVyUH9fYT?=
- =?us-ascii?Q?XkCutSvGVm+XWobVPwMyC3NEkNacdgaGr7U05lbbk7KMqiaEHHO8fA2DI7Gw?=
- =?us-ascii?Q?n3lyJtnE6bENLRSab2qXEmXNShwHDrGwfWrUBpkzmlf063m8Z5qGHoH5KO0U?=
- =?us-ascii?Q?chYjz3hekKbOqLEWSPUIzmCus5YGF9CKQNu/9aMwAIEkGABv9obl4/f9pkjS?=
- =?us-ascii?Q?Mava5e9X4NrBVfcGOMVAItj6vWYxNPzSoTqTZ0mnptr4oJ/e/aniCU/7oh/E?=
- =?us-ascii?Q?3gLNXM7DE9D4U7AZ7RrRcp8symwNri2cKEnWdJgcFl5+F1D16Ux7902xJEE8?=
- =?us-ascii?Q?Kt6cvk73Xxrrh6Run29tpEtOIwEcCpmzZoqkQNR3guZ3Oo9Q/bcFs6fV/21v?=
- =?us-ascii?Q?TNzDl4tjDKB/Kr+UOEY6yN019VEKQ8xZ+NA7cszqRQV/XphAKvmoOzWZ4f77?=
- =?us-ascii?Q?M8ng0L1kZE4nzvALG4gCuEShuZ8bDsuMWXzSZbAVoLpS8XTVX96X7f27aGwN?=
- =?us-ascii?Q?IJQ388JXROpdKQ0RZ2AaFPmREd2MLxlVTG/DPaYh8FDr6WLJubPw4WYSuiMF?=
- =?us-ascii?Q?b4cuHoqulfgttxMnYr+ItPqnbtKigKN/U/4ucjYGJhEgDaS6vwZgU9EmtFn1?=
- =?us-ascii?Q?khiieMvY+2EWjt++U72hbIzKyoivnnm6wTK5iqnvX+p5sSYen+2qi27sJ61Z?=
- =?us-ascii?Q?BR002Ll4lP5ssUUwIp7NIzthV9B7CyqKGTIwcJyTWIBTVBTUiKfQcw7+Xr7E?=
- =?us-ascii?Q?ndP4JTGzXd1jHzIkh8ezSx8OpQ+BhefQkU1EFV9oWlHJHIkqYWpMdfcsifaQ?=
- =?us-ascii?Q?b6f2u30m3hnpPopxytJjwvM7WhfE4cqM+hw4pbRWvcpFziPTphXZbAhJ9BD8?=
- =?us-ascii?Q?l7802RWfzbKLZjcgCNXgKvFvWTG4R7oNsETQaS2Fp3Y00NiPuw/JICFCjeBv?=
- =?us-ascii?Q?g0qp9aNZ0rSEvXdqnWFcbi2rYXFnDW3M3aJiHHFjfumYMlvrWw51nam6+a2/?=
- =?us-ascii?Q?omstdhunOtWNpqwDusii+Kna5v8eL0Hb2P2wsw0oHpPlaK3qNL8bICosKj97?=
- =?us-ascii?Q?7W/5B/aod46InLACVIWlys2doTj+pxrNCdKe7/Pirm4GHub+fJJfVkvwB1tK?=
- =?us-ascii?Q?VvzvBFmEmRSGTtLWsx7CEvEkrtULLz/5Xq3DCdBCxESqlDu7/c6Px7GQBAS1?=
- =?us-ascii?Q?aPOugK2mJOkvsdJEKe+r7WgosbUf5hcdhl81/13vVQKcG+2lco/QqB2HdOd7?=
- =?us-ascii?Q?58ADmkWehTbcZ2dO7X3YhMp/aBEaF4HM4fVKISwb2zbQQK//vV4cat1C/tZN?=
- =?us-ascii?Q?huwgsWygoFPEVidZJbKaHZW6je2W8+HcTYZBJdffA0fxp3YlfPkNCCfSa4L/?=
- =?us-ascii?Q?dD6/XEF1x5yVHxLcC2Bp/NgK/9Yf8mvqaqJscIbNbGqnRZWApmvEIIEVKHl6?=
- =?us-ascii?Q?gmvFM5AOin6BC8rGIbdtIIiJd3ZvzOv4AF4xq+MD?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229445AbjI1EEd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 00:04:33 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 568E110A;
+        Wed, 27 Sep 2023 21:04:30 -0700 (PDT)
+Received: from loongson.cn (unknown [10.40.46.158])
+        by gateway (Coremail) with SMTP id _____8Cx77tM+xRljawtAA--.28291S3;
+        Thu, 28 Sep 2023 12:04:28 +0800 (CST)
+Received: from [192.168.124.126] (unknown [10.40.46.158])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxvi9K+xRlXwEVAA--.43483S3;
+        Thu, 28 Sep 2023 12:04:28 +0800 (CST)
+Subject: Re: [PATCH v2 3/4] KVM: selftests: Add ucall test support for
+ LoongArch
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
+References: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
+ <20230807065137.3408970-4-zhaotianrui@loongson.cn>
+ <ZRSWlqS3zQBSLFVK@google.com>
+From:   zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <8ac800d7-144d-22f4-fe2c-206aecc9a5dd@loongson.cn>
+Date:   Thu, 28 Sep 2023 12:04:25 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2271ce48-dda3-4476-536c-08dbbfc5de45
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2023 01:54:36.1406
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dn68Rc+V/L48SJVt5gqEZ8YfZC5ubjDM/710eo4zsZssej7p53i7M2BXZJ7SrfUPquSToAb5ps7EIjZYDhomBA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5467
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZRSWlqS3zQBSLFVK@google.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: AQAAf8Dxvi9K+xRlXwEVAA--.43483S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxurW7Kw4Uur43uF1ktF4UZFc_yoW5Jw4kpa
+        4kC3W5Kr4rKry7AasxXw1vq3WSyrZ7KF4rZr1ayryF9wsFyr1fAr1fKF1jkFy5ua4vgr1k
+        ZFn2gwnIkF1qk3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+        xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+        XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
+        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+        v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jOa93UUU
+        UU=
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, September 27, 2023 11:44 PM
->=20
-> On Wed, Sep 27, 2023 at 10:49:29AM +0800, Baolu Lu wrote:
-> > On 9/26/23 5:26 PM, Yi Liu wrote:
-> > > From: Kevin Tian<kevin.tian@intel.com>
-> > >
-> > > This introduces three APIs for device drivers to manage pasid attach/
-> > > replace/detach.
-> > >
-> > >      int iommufd_device_pasid_attach(struct iommufd_device *idev,
-> > > 				    u32 pasid, u32 *pt_id);
-> > >      int iommufd_device_pasid_replace(struct iommufd_device *idev,
-> > > 				     u32 pasid, u32 *pt_id);
-> > >      void iommufd_device_pasid_detach(struct iommufd_device *idev,
-> > > 				     u32 pasid);
-> >
-> > I am a bit puzzled. Do we really need both attach and replace interface=
-s
-> > to install a hwpt onto a pasid on device? The IOMMUFD already tracks th=
-e
-> > connections between hwpt and {device, pasid}, so it could easily call
-> > the right iommu interfaces (attach vs. replace). Perhaps I overlooked
-> > previous discussion on this.
->=20
-> It was a decision that attach will fail if something is already
-> attached..
->=20
-> But for this API we could go the way of the iommu code and have only
-> 'set' and 'unset' as the two operations.
->=20
 
-I'm not sure the benefit of doing so. Instead it makes the caller side
-vfio more confusing by using attach/replace/detach for device vs.
-using set/unset for pasid?
+ÔÚ 2023/9/28 ÉÏÎç4:54, Sean Christopherson Ð´µÀ:
+> On Mon, Aug 07, 2023, Tianrui Zhao wrote:
+>> Add ucall test support for LoongArch. A ucall is a "hypercall to
+>> userspace".
+> Nit, can you explain why LoongArch uses MMIO to trigger ucall, and what alternatives
+> were considred (if any)?  The main reason for the ask is because we've tossed
+> around the idea of converting all architectures (except s390) to MMIO-based ucall
+> in order to reduce the number of "flavors" of ucall we have to worry about it.
+> If MMIO is the only reasonable choice for LoongArch, that's another reason to
+> double down on MMIO as the primary choice for ucall.
+Thanks for your reminding about ucall, and our guest can also use 
+hypercall instruction to trigger ucall, so this change will not affect us.
+
+Thanks
+Tianrui Zhao
+>
+>> Based-on: <20230803022138.2736430-1-zhaotianrui@loongson.cn>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   .../selftests/kvm/lib/loongarch/ucall.c       | 43 +++++++++++++++++++
+>>   1 file changed, 43 insertions(+)
+>>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/lib/loongarch/ucall.c b/tools/testing/selftests/kvm/lib/loongarch/ucall.c
+>> new file mode 100644
+>> index 000000000000..72868ddec313
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/lib/loongarch/ucall.c
+>> @@ -0,0 +1,43 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * ucall support. A ucall is a "hypercall to userspace".
+>> + *
+>> + */
+>> +#include "kvm_util.h"
+>> +
+>> +/*
+>> + * ucall_exit_mmio_addr holds per-VM values (global data is duplicated by each
+>> + * VM), it must not be accessed from host code.
+>> + */
+>> +static vm_vaddr_t *ucall_exit_mmio_addr;
+>> +
+>> +void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+>> +{
+>> +	vm_vaddr_t mmio_gva = vm_vaddr_unused_gap(vm, vm->page_size, KVM_UTIL_MIN_VADDR);
+>> +
+>> +	virt_map(vm, mmio_gva, mmio_gpa, 1);
+>> +
+>> +	vm->ucall_mmio_addr = mmio_gpa;
+>> +
+>> +	write_guest_global(vm, ucall_exit_mmio_addr, (vm_vaddr_t *)mmio_gva);
+>> +}
+>> +
+>> +void ucall_arch_do_ucall(vm_vaddr_t uc)
+>> +{
+>> +	WRITE_ONCE(*ucall_exit_mmio_addr, uc);
+> Another uber nit, you might want to put this in the header as a static inline to
+> avoid function calls.  I doubt it'll actually matter, but we've had enough weird,
+> hard-to-debug issues with ucall that minimizing the amount of generated code might
+> save some future pain.
+
