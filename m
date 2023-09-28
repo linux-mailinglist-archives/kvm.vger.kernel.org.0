@@ -2,134 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A63417B1163
-	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 06:04:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 807AB7B1185
+	for <lists+kvm@lfdr.de>; Thu, 28 Sep 2023 06:31:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbjI1EEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 00:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
+        id S230125AbjI1EbA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 00:31:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjI1EEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 00:04:33 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 568E110A;
-        Wed, 27 Sep 2023 21:04:30 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8Cx77tM+xRljawtAA--.28291S3;
-        Thu, 28 Sep 2023 12:04:28 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxvi9K+xRlXwEVAA--.43483S3;
-        Thu, 28 Sep 2023 12:04:28 +0800 (CST)
-Subject: Re: [PATCH v2 3/4] KVM: selftests: Add ucall test support for
- LoongArch
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vishal Annapurve <vannapurve@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
-        Peter Xu <peterx@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
-References: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
- <20230807065137.3408970-4-zhaotianrui@loongson.cn>
- <ZRSWlqS3zQBSLFVK@google.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <8ac800d7-144d-22f4-fe2c-206aecc9a5dd@loongson.cn>
-Date:   Thu, 28 Sep 2023 12:04:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S229445AbjI1Ea7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 00:30:59 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A90114;
+        Wed, 27 Sep 2023 21:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695875458; x=1727411458;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9SQFTIQ/FnSMSc+UreG/DWp7PRkgI3/7gRiMz9PpUJA=;
+  b=EIPXUP3swygLXa3WpiA7kPZAAZ+PYO87WFVygXOtCGgU02uA/ATXYoEz
+   ssCRLfdXM19VdqHCCMsR0SClgQvnNlEKGxdshZgnrqnXKc0Fs/X259uak
+   aLkNQ2fGivD9vs8k7ZRROm6wsNssFyyzE/3EUiwogGdsmsJ7xGIzIwHL+
+   TBh0N9X8xdlVm8ztODU2c4tqo3BhZ1yHdo5TxX+82JCrOnDo1LMVYVkJs
+   QtfnT9fW9Io0JlPrGNKH0yxaF219qwHp9IVZCzV3SGk4oCAnxR5jgpqN6
+   86C+V5lOQeYaWuqjNv+RWQj9nKcJTBwyhfNFcDXX8aOWjhyv1gb1ylRCA
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="379260397"
+X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
+   d="scan'208";a="379260397"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 21:30:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="923068746"
+X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
+   d="scan'208";a="923068746"
+Received: from allen-box.sh.intel.com ([10.239.159.127])
+  by orsmga005.jf.intel.com with ESMTP; 27 Sep 2023 21:30:53 -0700
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v6 00/12] iommu: Prepare to deliver page faults to user space
+Date:   Thu, 28 Sep 2023 12:27:22 +0800
+Message-Id: <20230928042734.16134-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <ZRSWlqS3zQBSLFVK@google.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID: AQAAf8Dxvi9K+xRlXwEVAA--.43483S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxurW7Kw4Uur43uF1ktF4UZFc_yoW5Jw4kpa
-        4kC3W5Kr4rKry7AasxXw1vq3WSyrZ7KF4rZr1ayryF9wsFyr1fAr1fKF1jkFy5ua4vgr1k
-        ZFn2gwnIkF1qk3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jOa93UUU
-        UU=
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+When a user-managed page table is attached to an IOMMU, it is necessary
+to deliver IO page faults to user space so that they can be handled
+appropriately. One use case for this is nested translation, which is
+currently being discussed in the mailing list.
 
-ÔÚ 2023/9/28 ÉÏÎç4:54, Sean Christopherson Ð´µÀ:
-> On Mon, Aug 07, 2023, Tianrui Zhao wrote:
->> Add ucall test support for LoongArch. A ucall is a "hypercall to
->> userspace".
-> Nit, can you explain why LoongArch uses MMIO to trigger ucall, and what alternatives
-> were considred (if any)?  The main reason for the ask is because we've tossed
-> around the idea of converting all architectures (except s390) to MMIO-based ucall
-> in order to reduce the number of "flavors" of ucall we have to worry about it.
-> If MMIO is the only reasonable choice for LoongArch, that's another reason to
-> double down on MMIO as the primary choice for ucall.
-Thanks for your reminding about ucall, and our guest can also use 
-hypercall instruction to trigger ucall, so this change will not affect us.
+I have posted a RFC series [1] that describes the implementation of
+delivering page faults to user space through IOMMUFD. This series has
+received several comments on the IOMMU refactoring, which I am trying to
+address in this series.
 
-Thanks
-Tianrui Zhao
->
->> Based-on: <20230803022138.2736430-1-zhaotianrui@loongson.cn>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   .../selftests/kvm/lib/loongarch/ucall.c       | 43 +++++++++++++++++++
->>   1 file changed, 43 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
->>
->> diff --git a/tools/testing/selftests/kvm/lib/loongarch/ucall.c b/tools/testing/selftests/kvm/lib/loongarch/ucall.c
->> new file mode 100644
->> index 000000000000..72868ddec313
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/lib/loongarch/ucall.c
->> @@ -0,0 +1,43 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * ucall support. A ucall is a "hypercall to userspace".
->> + *
->> + */
->> +#include "kvm_util.h"
->> +
->> +/*
->> + * ucall_exit_mmio_addr holds per-VM values (global data is duplicated by each
->> + * VM), it must not be accessed from host code.
->> + */
->> +static vm_vaddr_t *ucall_exit_mmio_addr;
->> +
->> +void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
->> +{
->> +	vm_vaddr_t mmio_gva = vm_vaddr_unused_gap(vm, vm->page_size, KVM_UTIL_MIN_VADDR);
->> +
->> +	virt_map(vm, mmio_gva, mmio_gpa, 1);
->> +
->> +	vm->ucall_mmio_addr = mmio_gpa;
->> +
->> +	write_guest_global(vm, ucall_exit_mmio_addr, (vm_vaddr_t *)mmio_gva);
->> +}
->> +
->> +void ucall_arch_do_ucall(vm_vaddr_t uc)
->> +{
->> +	WRITE_ONCE(*ucall_exit_mmio_addr, uc);
-> Another uber nit, you might want to put this in the header as a static inline to
-> avoid function calls.  I doubt it'll actually matter, but we've had enough weird,
-> hard-to-debug issues with ucall that minimizing the amount of generated code might
-> save some future pain.
+The major refactoring includes:
+
+- [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
+  include/linux/iommu.h. Remove the unrecoverable fault data definition.
+- [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
+- [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
+  handling framework.
+- [PATCH 11 ~ 12] Improve iopf framework for iommufd use.
+
+This is also available at github [2].
+
+[1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
+[2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v6
+
+Change log:
+v6:
+ - [PATCH 09/12] Check IS_ERR() against the iommu domain. [Jingqi/Jason]
+ - [PATCH 12/12] Rename the comments and name of iopf_queue_flush_dev(),
+   no functionality changes. [Kevin]
+ - All patches rebased on the latest iommu/core branch.
+
+v5: https://lore.kernel.org/linux-iommu/20230914085638.17307-1-baolu.lu@linux.intel.com/
+ - Consolidate per-device fault data management. (New patch 11)
+ - Improve iopf_queue_flush_dev(). (New patch 12)
+
+v4: https://lore.kernel.org/linux-iommu/20230825023026.132919-1-baolu.lu@linux.intel.com/
+ - Merge iommu_fault_event and iopf_fault. They are duplicate.
+ - Move iommu_report_device_fault() and iommu_page_response() to
+   io-pgfault.c.
+ - Move iommu_sva_domain_alloc() to iommu-sva.c.
+ - Add group->domain and use it directly in sva fault handler.
+ - Misc code refactoring and refining.
+
+v3: https://lore.kernel.org/linux-iommu/20230817234047.195194-1-baolu.lu@linux.intel.com/
+ - Convert the fault data structures from uAPI to kAPI.
+ - Merge iopf_device_param into iommu_fault_param.
+ - Add debugging on domain lifetime for iopf.
+ - Remove patch "iommu: Change the return value of dev_iommu_get()".
+ - Remove patch "iommu: Add helper to set iopf handler for domain".
+ - Misc code refactoring and refining.
+
+v2: https://lore.kernel.org/linux-iommu/20230727054837.147050-1-baolu.lu@linux.intel.com/
+ - Remove unrecoverable fault data definition as suggested by Kevin.
+ - Drop the per-device fault cookie code considering that doesn't make
+   much sense for SVA.
+ - Make the IOMMU page fault handling framework generic. So that it can
+   available for use cases other than SVA.
+
+v1: https://lore.kernel.org/linux-iommu/20230711010642.19707-1-baolu.lu@linux.intel.com/
+
+Lu Baolu (12):
+  iommu: Move iommu fault data to linux/iommu.h
+  iommu/arm-smmu-v3: Remove unrecoverable faults reporting
+  iommu: Remove unrecoverable fault data
+  iommu: Cleanup iopf data structure definitions
+  iommu: Merge iopf_device_param into iommu_fault_param
+  iommu: Remove iommu_[un]register_device_fault_handler()
+  iommu: Merge iommu_fault_event and iopf_fault
+  iommu: Prepare for separating SVA and IOPF
+  iommu: Make iommu_queue_iopf() more generic
+  iommu: Separate SVA and IOPF
+  iommu: Consolidate per-device fault data management
+  iommu: Improve iopf_queue_flush_dev()
+
+ include/linux/iommu.h                         | 258 ++++++++---
+ drivers/iommu/intel/iommu.h                   |   2 +-
+ drivers/iommu/iommu-sva.h                     |  71 ---
+ include/uapi/linux/iommu.h                    | 161 -------
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  14 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  51 +-
+ drivers/iommu/intel/iommu.c                   |  25 +-
+ drivers/iommu/intel/svm.c                     |   8 +-
+ drivers/iommu/io-pgfault.c                    | 438 +++++++++++-------
+ drivers/iommu/iommu-sva.c                     |  82 +++-
+ drivers/iommu/iommu.c                         | 232 ----------
+ MAINTAINERS                                   |   1 -
+ drivers/iommu/Kconfig                         |   4 +
+ drivers/iommu/Makefile                        |   3 +-
+ drivers/iommu/intel/Kconfig                   |   1 +
+ 15 files changed, 578 insertions(+), 773 deletions(-)
+ delete mode 100644 drivers/iommu/iommu-sva.h
+ delete mode 100644 include/uapi/linux/iommu.h
+
+-- 
+2.34.1
 
