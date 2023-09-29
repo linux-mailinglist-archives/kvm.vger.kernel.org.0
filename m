@@ -2,65 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D80AA7B2A47
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 04:20:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B01327B2A48
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 04:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbjI2CUL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 22:20:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44414 "EHLO
+        id S230320AbjI2CVQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 22:21:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbjI2CUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 22:20:10 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCE4199
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:20:08 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f61a639b9so196349907b3.1
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:20:08 -0700 (PDT)
+        with ESMTP id S229654AbjI2CVP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 22:21:15 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9AA2199
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:21:13 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c6147ea811so99545295ad.2
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:21:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695954008; x=1696558808; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695954073; x=1696558873; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K0+exT2Vigr26I9k2jO7yGhZG3qMq/s7Ri07pEtuZwI=;
-        b=ZsD7T4KgZsC20XieTIjf159uwQdTTbELh9ugPBhiAx0nrSnvgoiYem00h1OHitzYm/
-         nEBE1HHnccquKx2E37P/h/fcAqZHZLV3H66/58d4KjJHQAQJ+KnFClxjmiz7ZPeyKjsT
-         J6LE+I5zX4FKSFtNhsrLBEfFtXK8R66DeR+7ddWvjq5S5wGofgq5X8VzFLf3bV4C/TIN
-         kc8ta96IcJJku+gQfl2W27oldzdczFHSJTBSWnzKxiJKatUrfD00yLobqEJqopJMxE7Q
-         j73mxyBcZ1Lt6iHrdgW51YOiY9v4zRJ8kXd4xmlWMauviCz3wCeoCYZJYgn4iMAi28GA
-         tnhA==
+        bh=KqB2vwg4zMsQYk4N0zMQ9SP3zDU9LWqIZau5o5KZ8lM=;
+        b=GmIWYl3DR7f3RDzE4GiE8fPjT9+vl98BLrwD9h8AqXck98ysqiSntqcdSpzgNJpexl
+         T+nmKa8e6YdfZSVP67niVgZ6sTEfd4SGgwWDRO7N2ZOXqY0242L2/f5F2FsvQqsdI3ca
+         kPs1yR03JDxSMNFF+fepT5xbot+/LSIXH++TiUIxh2qvX9dAweAdXFlQCHpHifQxYiZc
+         lJhAe17cZ0qeo2nsQPPld6jaUpc7Y26aUx9CYkABSff+RzwfMlFey/KT74olpMyD1m7q
+         lQqn349hLbtIsgdnW63FadmWSX9R8uwxh7zuA2n4HhKLgWq4uXFYVHSlxV8DjlrIlfUE
+         ml9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695954008; x=1696558808;
+        d=1e100.net; s=20230601; t=1695954073; x=1696558873;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K0+exT2Vigr26I9k2jO7yGhZG3qMq/s7Ri07pEtuZwI=;
-        b=MrTdDjrk3f3BIX4F4kec/SN8Md5Bw05qxGJ/zikhAOBSluEEJtzfiC4mx+6TPpRT4m
-         5PnttIXpxethworFKZy7GC78imdXgMw00qQq5UA3/dXwYuO3A5Xijz05IoPDNUc4RraW
-         vlTJ8fBikxZnnNm37hb+5BprjN/q7ypQmuH73RDe5XAieafTwyXqIEGi+1HgI7Wd8CwG
-         GCYZGLZrQ87VYY2LHO8kLo2bNlGrDDIuizcM7IeOwTq6h8ydaGWEKylXKnqETAIUUKgv
-         I+C1JBCH+Q4s+35N1y+sJZRzNngtvUkz/5ced9Mn9GdUawauITlCofH/Je68RCM93NV0
-         ZvLA==
-X-Gm-Message-State: AOJu0YybrfCRFvvVJBvc/En19xIQyuPyJebXQn7/3Ve/oTJ0BMssOmrr
-        8KcSv02KUat6LhJzGENgaBppb8R1EZY=
-X-Google-Smtp-Source: AGHT+IFZ3z8GazvOmhxU8dpXuC24cIstyReKmh5R2PFxeModk3iRSNi4k5IHowWukNy4M+lp6WTZMMQP7hE=
+        bh=KqB2vwg4zMsQYk4N0zMQ9SP3zDU9LWqIZau5o5KZ8lM=;
+        b=qe0wIrU99nuL43H3jura2tt42Q9c08H7RRf/07P20QUuvdgIdnxy1MN1TLhQMiORhX
+         YCg/ktwrS59+zrnALM6NN7udU3Y8T9ibaIAxcpKTgC9TGasB01Eo6LWt+OyGPLhkz5BY
+         rUSQnhircSpvJaITPvl1azWdel8WGmGBktV0BPnRATI/GfkUCcn6XLPTJxo7bCQCm21y
+         s857xCpF6MVwTVsMV6AAMnO2aC9NtAsllRDl0Rdvp7JZzOUhVBFAI1q9EZrfDM8vCxEI
+         9FwQc3cZliELqoI8TVtHY2mBkfP/9B20+yZQZs0RNY5j+LAgJJMooCt/d+fI2qMraut3
+         xAWg==
+X-Gm-Message-State: AOJu0Yx/jwcAPPwZMLYw8K2fWC0jpGLT3OohoXN+whrvUX6hkr8D946q
+        NHT5X6s5zrrEJJD5o6w21hMQ4JncqV0=
+X-Google-Smtp-Source: AGHT+IEUl6xKMpm91wNEYp7KZx/XSzOQdDgdqEDqEY0DOKH3NZPNBy1EMHj+cD61B8bTospZFZi02jtctb0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af47:0:b0:59b:c811:a702 with SMTP id
- x7-20020a81af47000000b0059bc811a702mr41223ywj.6.1695954007753; Thu, 28 Sep
- 2023 19:20:07 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 19:20:01 -0700
-In-Reply-To: <20230913000215.478387-1-hshan@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:cec7:b0:1c5:a121:f1b1 with SMTP id
+ d7-20020a170902cec700b001c5a121f1b1mr39188plg.4.1695954073372; Thu, 28 Sep
+ 2023 19:21:13 -0700 (PDT)
+Date:   Thu, 28 Sep 2023 19:20:03 -0700
+In-Reply-To: <20230914055504.151365-1-tao1.su@linux.intel.com>
 Mime-Version: 1.0
-References: <20230913000215.478387-1-hshan@google.com>
+References: <20230914055504.151365-1-tao1.su@linux.intel.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <169592156740.1035449.1039175365762233349.b4-ty@google.com>
-Subject: Re: [PATCH v3] KVM: x86: Fix lapic timer interrupt lost after loading
- a snapshot.
+Message-ID: <169592345828.1074579.492958226763917510.b4-ty@google.com>
+Subject: Re: [PATCH v3] KVM: x86: Clear bit12 of ICR after APIC-write VM-exit
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Haitao Shan <hshan@google.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Tao Su <tao1.su@linux.intel.com>
+Cc:     pbonzini@redhat.com, chao.gao@intel.com, guang.zeng@intel.com,
+        yi1.lai@intel.com
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -72,20 +68,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Sep 2023 16:55:45 -0700, Haitao Shan wrote:
-> When running android emulator (which is based on QEMU 2.12) on
-> certain Intel hosts with kernel version 6.3-rc1 or above, guest
-> will freeze after loading a snapshot. This is almost 100%
-> reproducible. By default, the android emulator will use snapshot
-> to speed up the next launching of the same android guest. So
-> this breaks the android emulator badly.
+On Thu, 14 Sep 2023 13:55:04 +0800, Tao Su wrote:
+> When IPI virtualization is enabled, a WARN is triggered if bit12 of ICR
+> MSR is set after APIC-write VM-exit. The reason is kvm_apic_send_ipi()
+> thinks the APIC_ICR_BUSY bit should be cleared because KVM has no delay,
+> but kvm_apic_write_nodecode() doesn't clear the APIC_ICR_BUSY bit.
+> 
+> Under the x2APIC section, regarding ICR, the SDM says:
 > 
 > [...]
 
-Applied to kvm-x86 apic, thanks!
+Applied to kvm-x86 vmx.  I dropped the TODO and replaced with an explanation of
+why the "extra" write is necessary, and why trying to avoid it isn't worth
+"fixing".
 
-[1/1] KVM: x86: Fix lapic timer interrupt lost after loading a snapshot.
-      https://github.com/kvm-x86/linux/commit/9cfec6d097c6
+Thanks!
+
+[1/1] KVM: x86: Clear bit12 of ICR after APIC-write VM-exit
+      https://github.com/kvm-x86/linux/commit/629d3698f695
 
 --
 https://github.com/kvm-x86/linux/tree/next
