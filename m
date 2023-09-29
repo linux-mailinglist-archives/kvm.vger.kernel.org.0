@@ -2,66 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C0C07B2A51
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 04:22:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80BED7B2A9F
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 05:37:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbjI2CW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 22:22:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43276 "EHLO
+        id S232426AbjI2DhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 23:37:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232583AbjI2CWz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 22:22:55 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020691A2
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:22:52 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f6902dc8bso197246847b3.0
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 19:22:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695954169; x=1696558969; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCQmLrHNj6hBYxVHzs+GYHSoiBb3xQHe+uxIQTYV62w=;
-        b=sXYphqcT8VcsIanol7GM82yrfDBPv3mMcuMOlcml1bgCGnXROOAroGv1RjDg6gKCWz
-         C/gCVRdy0EXiYX5P2bYJ0N994H508wAqlD0sLmDD1yXmOrKbp7SbELd8keWFNRNR61Rz
-         FjhWZ5cT3f9TvgmOlHhxfhfkR3JeYGUCqVTi3KuRaJre7TbMs4RtcLRgLDhq/7V5ssqP
-         qfCkSMF13j2CbaUvEj1mba/T4Up1+Uwex6YzZjQkNtzx3vbdHsj8kylOBsBH1NQRXyDS
-         EbvN4CU0iQ54JqGEGJWWFL0DDWSgYZYyZ4feq+kfm5maihX+4H8BiNN3V2dsgfPzqsNT
-         jyxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695954169; x=1696558969;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCQmLrHNj6hBYxVHzs+GYHSoiBb3xQHe+uxIQTYV62w=;
-        b=lcyOo3J46wMUIyVLzlUntiEXfRpNnxe0/a1smwLaqFJCdblCSQxBaT1vCqX8oocWfI
-         DUBsk3xVJjGjHrFdTnER54i81/WCwbOgPgfg7BffHVPKMJ7n5kjELLxeXEv0xpWIQhcs
-         HUN5CCza4RzwnM3n9OlZlTntErrfSXRVzsFHfVEqxnIcU2jsEFaGtbLjIJCnmr8qhmEN
-         IyOZL4fkM5z+OZ2wOJqoq0k9h0kya8oqcdrR8ThO+kNLRz0HLAUKcPZ12riYNhLRMaRx
-         yQusGs8Z/YjHRsxX+1b8fIkoFsaw/8ijqfThWlERuLddzuvM/29G7Lm2kqOxN4Oku47x
-         z2FA==
-X-Gm-Message-State: AOJu0YwOEGbsKy0UWk7oFyBG4ZbPDer8LEZ6gjKfGywCLPf/pjLHBdP9
-        6qOai57Z1df0zKToFUzJ8L6pENu4xko=
-X-Google-Smtp-Source: AGHT+IEn1MTrZUTmzEwrrKm3Q2AHVsC4LZZBSFJ1rZfvxsZDnhNyQF36TYNYkaShIUmZ8FrkKwQb6H6e29Q=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7606:0:b0:d84:2619:56df with SMTP id
- r6-20020a257606000000b00d84261956dfmr45410ybc.13.1695954169592; Thu, 28 Sep
- 2023 19:22:49 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 19:22:18 -0700
-In-Reply-To: <20230921203331.3746712-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230921203331.3746712-1-seanjc@google.com>
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <169595360540.1385318.4400894421413326576.b4-ty@google.com>
-Subject: Re: [PATCH 00/13] KVM: guest_memfd fixes
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michael Roth <michael.roth@amd.com>,
-        Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S229745AbjI2Dg7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 23:36:59 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104AC19C;
+        Thu, 28 Sep 2023 20:36:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695958617; x=1727494617;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xjoLJw3bXTsWO1tn8Vf7R8FlDJcSY5uHYNKpTGwJjiI=;
+  b=WBqgc4zVpi274pGnb0QpXk8x5eq+40MsoWhh18ShelTD6IuR7XcxC8fy
+   1ihtr9UomMa/z7iIxBIe7YaR61NGKvDr9hFps6av6nqf6mx36FN/Z6Jdz
+   Gcj128erNRcmseyDohSio3RoBJPEPOl7nqnlbT577I8MFTXTATl9BqD40
+   xlfLcmEbFHsLGzBKNWho/ruxhWMDz/oVWf6UIoQnzBzTaWUng2LqFOx8/
+   ganvDqqqnHzaJ5T9LCxXCcqWDDwXQckg+MyWt/yxn4QOA9L2jqMdkiJ/3
+   gl5L0/yeQ6JAJqhmbjlPjxwYvnWrHgqqsxG1qjxbqJoSYN+A76O8G7Q+U
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="361602551"
+X-IronPort-AV: E=Sophos;i="6.03,186,1694761200"; 
+   d="scan'208";a="361602551"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 20:36:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="893279800"
+X-IronPort-AV: E=Sophos;i="6.03,186,1694761200"; 
+   d="scan'208";a="893279800"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmsmga001.fm.intel.com with ESMTP; 28 Sep 2023 20:35:39 -0700
+Message-ID: <8faa388d-fe64-aa73-fe12-a402d24888a7@linux.intel.com>
+Date:   Fri, 29 Sep 2023 11:33:33 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc:     baolu.lu@linux.intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH v2 3/6] iommufd/hw_pagetable: Accepts user flags for
+ domain allocation
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com,
+        robin.murphy@arm.com
+References: <20230928071528.26258-1-yi.l.liu@intel.com>
+ <20230928071528.26258-4-yi.l.liu@intel.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20230928071528.26258-4-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,46 +73,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Sep 2023 13:33:17 -0700, Sean Christopherson wrote:
-> Fix a variety of bugs in the guest_memfd series, almost all of which are
-> my fault, and add assertions and testcases to detect future regressions.
+On 9/28/23 3:15 PM, Yi Liu wrote:
+> This extends iommufd_hw_pagetable_alloc() to accepts user flags.
 > 
-> The last patch, renaming guest_mem.c to guest_memfd.c, is obviously not a
-> bug fix, I included it here so that if we want to go with guest_memfd.c,
-> squashing everything will be straightforward.
-> 
-> [...]
+> Reviewed-by: Kevin Tian<kevin.tian@intel.com>
+> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
+> ---
+>   drivers/iommu/iommufd/device.c          | 2 +-
+>   drivers/iommu/iommufd/hw_pagetable.c    | 9 ++++++---
+>   drivers/iommu/iommufd/iommufd_private.h | 3 ++-
+>   3 files changed, 9 insertions(+), 5 deletions(-)
 
-Applied to kvm-x86 guest_memfd.  I'll apply Mike's hugepage fix on top (when it
-arrives), will send out a patch to fix the off-by-one reported by Binbin, and
-will post a miniseries to clean up KVM_EXIT_MEMORY_FAULT.
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
-[01/13] KVM: Assert that mmu_invalidate_in_progress *never* goes negative
-        https://github.com/kvm-x86/linux/commit/46c10adeda81
-[02/13] KVM: Actually truncate the inode when doing PUNCH_HOLE for guest_memfd
-        https://github.com/kvm-x86/linux/commit/936144404469
-[03/13] KVM: WARN if *any* MMU invalidation sequence doesn't add a range
-        https://github.com/kvm-x86/linux/commit/1912c5dff3ac
-[04/13] KVM: WARN if there are danging MMU invalidations at VM destruction
-        https://github.com/kvm-x86/linux/commit/37bbf72db864
-[05/13] KVM: Fix MMU invalidation bookkeeping in guest_memfd
-        https://github.com/kvm-x86/linux/commit/b25ab9cae30f
-[06/13] KVM: Disallow hugepages for incompatible gmem bindings, but let 'em succeed
-        https://github.com/kvm-x86/linux/commit/1c297b84f3a4
-[07/13] KVM: x86/mmu: Track PRIVATE impact on hugepage mappings for all memslots
-        https://github.com/kvm-x86/linux/commit/26cf4453d2d9
-[08/13] KVM: x86/mmu: Zap shared-only memslots when private attribute changes
-        https://github.com/kvm-x86/linux/commit/fb6f779719ca
-[09/13] KVM: Always add relevant ranges to invalidation set when changing attributes
-        https://github.com/kvm-x86/linux/commit/69c7916df569
-[10/13] KVM: x86/mmu: Drop repeated add() of to-be-invalidated range
-        https://github.com/kvm-x86/linux/commit/e6b1a6922470
-[11/13] KVM: selftests: Refactor private mem conversions to prep for punch_hole test
-        https://github.com/kvm-x86/linux/commit/5782107f5d2b
-[12/13] KVM: selftests: Add a "pure" PUNCH_HOLE on guest_memfd testcase
-        https://github.com/kvm-x86/linux/commit/848d5faa2099
-[13/13] KVM: Rename guest_mem.c to guest_memfd.c
-        https://github.com/kvm-x86/linux/commit/6a92dc57b0e6
-
---
-https://github.com/kvm-x86/linux/tree/next
+Best regards,
+baolu
