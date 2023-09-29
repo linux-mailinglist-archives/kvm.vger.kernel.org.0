@@ -2,47 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 915697B3BEB
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 23:25:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 565B47B3BF1
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 23:27:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233634AbjI2VZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Sep 2023 17:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41358 "EHLO
+        id S233516AbjI2V1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Sep 2023 17:27:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjI2VZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Sep 2023 17:25:29 -0400
+        with ESMTP id S229508AbjI2V1H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Sep 2023 17:27:07 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C85B1AB;
-        Fri, 29 Sep 2023 14:25:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5D31AB
+        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 14:27:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lUINZUiuL2j0GNMbCl2BNRZagyWLVJrsgpBTlTMvAow=; b=e/s77vjRAtxl/bz1Iw+XZZI7a1
-        RRk9x9yn5cRkvFe7aSm2LhJ95sR6X9drP5UV2tddO5P1/5G37zgw8vCV1zzK+UNp4+WeiHr0b405d
-        /ruZDJ4bOQlggZYz8yUnEfbBNPJ3dL9oEogf6wKEPLksrwk4NKonMIk0DI9pvQco0hiF7mwSlIwct
-        QpjTIV2QmJObvKQCeEyXJV6WDTM770m/q2+5L5I3GBBWGOjqhNFcwy079m/jhefIXeIMyvYr0GHUw
-        PG+IHwlsGklPgP8EBZLIqbsHdzITQZB4z1IDZMDa+TIbwmhEkfPzZeo9fPwQ9YkGuoH8+K68QCIi1
-        QGnSe0SQ==;
-Received: from 54-240-197-230.amazon.com ([54.240.197.230] helo=edge-m3-r3-174.e-iad51.amazon.com)
+        bh=lVMjgLjQhYpKya4c6TSpoZDOZtaZrO5QnL9kMVYqIbg=; b=rD2t0kn5W/hVp/ef68rysB3drt
+        5QoXtH1Mstm3JG8Lzj8m1JWw/HysZeXl7kWIiotppOQxXA4+Pvj6sLTtZfWp6UickyXAes/cywH9n
+        RrARzjZUqrVEZCtF4i6EAVl5ruwKmVQArDyzkfhpJQh8vrJglijP+sXgng7a+cDGajhJ+2QzYwdnk
+        rdzt1yf6BL9Dx4hyTCQG7n7iPK4l39BQZUOpme/q3uHBcuw39cem/sdWbunwGBAAv0plkc9UPGudT
+        iI+mQ9KCnTc3CvAfuwZfcWqs595ex2iXZ3UAe3Zh09mTXXn910n9giwwK0eIYAnEXcNY34rbhcf0z
+        4xNeB1fA==;
+Received: from 54-240-197-238.amazon.com ([54.240.197.238] helo=edge-m3-r3-174.e-iad51.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qmKz9-00B2rL-Pm; Fri, 29 Sep 2023 21:25:20 +0000
-Message-ID: <ee679de20e3a53772f9d233b9653fdc642781577.camel@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86: Use fast path for Xen timer delivery
+        id 1qmL0p-00B2xk-F2; Fri, 29 Sep 2023 21:27:03 +0000
+Message-ID: <a911da63e6b67668cf225514934c16764c16af40.camel@infradead.org>
+Subject: Re:  [RFC PATCH] KVM: x86: Generate guest PV wall clock info from a
+ single TSC read
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Date:   Fri, 29 Sep 2023 22:25:18 +0100
-In-Reply-To: <ZRbolEa6RI3IegyF@google.com>
-References: <a3989e7ff9cca77f680f9bdfbaee52b707693221.camel@infradead.org>
-         <ZRbolEa6RI3IegyF@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "paul@xen.org" <paul@xen.org>
+Date:   Fri, 29 Sep 2023 22:27:02 +0100
+In-Reply-To: <ZRbqyCXSClhkLttk@google.com>
+References: <2f1a1bf1b359ff6164b91a06a6f9ed03f2d6204d.camel@amazon.co.uk>
+         <ZRbqyCXSClhkLttk@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-+tdzy/ZsRFcuRbtmXrPN"
+        boundary="=-ANPaQ2YfgL3oQRpZbffr"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -56,414 +60,22 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-+tdzy/ZsRFcuRbtmXrPN
+--=-ANPaQ2YfgL3oQRpZbffr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-09-29 at 08:16 -0700, Sean Christopherson wrote:
-> On Fri, Sep 29, 2023, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > Most of the time there's no need to kick the vCPU and deliver the timer
-> > event through kvm_xen_inject_timer_irqs(). Use kvm_xen_set_evtchn_fast(=
-)
-> > directly from the timer callback, and only fall back to the slow path
-> > when it's necessary to do so.
+On Fri, 2023-09-29 at 15:25 +0000, Sean Christopherson wrote:
 >=20
-> It'd be helpful for non-Xen folks to explain "when it's necessary".=C2=A0=
- IIUC, the
-> only time it's necessary is if the gfn=3D>pfn cache isn't valid/fresh.
+> Possibly silly question: why can't preemption simply be disabled for the =
+duration
+> of the sensitive calculation?
 
-That's an implementation detail. Like all of the fast path functions
-that can be called from kvm_arch_set_irq_inatomic(), it has its own
-criteria for why it might return -EWOULDBLOCK or not. Those are *its*
-business. And in fact one of Paul's current patches is tweaking them
-subtly, but that isn't relevant here. (But yes, you are broadly correct
-in your understanding.)
+I suppose it can, but you should still be doing all this from a
+*single* TSC read. You might get an interrupt, you might have time
+stolen by SMM, or you might be an L1 guest hosting an L2 with nested
+virt...
 
-> > This gives a significant improvement in timer latency testing (using
-> > nanosleep() for various periods and then measuring the actual time
-> > elapsed).
-> >=20
-> > However, there was a reason=C2=B9 the fast path was dropped when this s=
-upport
->=20
-> Heh, please use [1] or [*] like everyone else.=C2=A0 I can barely see tha=
-t tiny little =C2=B9.
-
-Isn't that the *point*? The reference to the footnote isn't supposed to
-detract from the flow of the main text. It's exactly how you'll see it
-when typeset properly. I've always assumed the people using [1] or [*]
-just haven't yet realised that it's the 21st century and we are no
-longer limited to 7-bit ASCII. Or haven't worked out how to type
-anything but ASCII.
-
-> > was first added. The current code holds vcpu->mutex for all operations =
-on
-> > the kvm->arch.timer_expires field, and the fast path introduces potenti=
-al
-> > race conditions. So... ensure the hrtimer is *cancelled* before making
-> > changes in kvm_xen_start_timer(), and also when reading the values out
-> > for KVM_XEN_VCPU_ATTR_TYPE_TIMER.
-> >=20
-> > Add some sanity checks to ensure the truth of the claim that all the
-> > other code paths are run with the vcpu loaded.=C2=A0 And use hrtimer_ca=
-ncel()
-> > directly from kvm_xen_destroy_vcpu() to avoid a false positive from the
-> > check in kvm_xen_stop_timer().
->=20
-> This should really be at least 2 patches, probably 3:
->=20
-> =C2=A0 1. add the assertions and the destroy_vcpu() change
-> =C2=A0 2. cancel the timer before starting a new one or reading the value=
- from userspace
-> =C2=A0 3. use the fastpath delivery from the timer callback
-
-Hm, I think that's borderline. I pondered it and came to the opposite
-conclusion. Cancelling the timer wasn't needed without the fastpath
-delivery; it isn't a separate fix. You could consider it a preparatory
-patch I suppose... but I didn't. It's not like adding the fast path in
-itself is complex enough that the other parts need to be broken out.=20
-
-> > =C2=B9 https://lore.kernel.org/kvm/846caa99-2e42-4443-1070-84e49d2f11d2=
-@redhat.com/
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> >=20
-> > =C2=A0=E2=80=A2 v2: Remember, and deal with, those races.
-> >=20
-> > =C2=A0arch/x86/kvm/xen.c | 64 +++++++++++++++++++++++++++++++++++++++++=
------
-> > =C2=A01 file changed, 58 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> > index fb1110b2385a..9d0d602a2466 100644
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -117,6 +117,8 @@ static int kvm_xen_shared_info_init(struct kvm *kvm=
-, gfn_t gfn)
-> > =C2=A0
-> > =C2=A0void kvm_xen_inject_timer_irqs(struct kvm_vcpu *vcpu)
-> > =C2=A0{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
-et_running_vcpu());
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (atomic_read(&vcpu->=
-arch.xen.timer_pending) > 0) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_xen_evtchn e;
-> > =C2=A0
-> > @@ -136,18 +138,41 @@ static enum hrtimer_restart xen_timer_callback(st=
-ruct hrtimer *timer)
-> > =C2=A0{
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_vcpu *vcpu =
-=3D container_of(timer, struct kvm_vcpu,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arch.xen.timer);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_xen_evtchn e;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int rc;
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (atomic_read(&vcpu->=
-arch.xen.timer_pending))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0return HRTIMER_NORESTART;
-> > =C2=A0
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_inc(&vcpu->arch.xen.t=
-imer_pending);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_UNB=
-LOCK, vcpu);
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_vcpu_kick(vcpu);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.vcpu_id =3D vcpu->vcpu_id;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.vcpu_idx =3D vcpu->vcpu_id=
-x;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.port =3D vcpu->arch.xen.ti=
-mer_virq;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.priority =3D KVM_IRQ_ROUTI=
-NG_XEN_EVTCHN_PRIO_2LEVEL;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rc =3D kvm_xen_set_evtchn_fa=
-st(&e, vcpu->kvm);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (rc =3D=3D -EWOULDBLOCK) =
-{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0atomic_inc(&vcpu->arch.xen.timer_pending);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_vcpu_kick(vcpu);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_expires =3D 0;
->=20
-> Eww.=C2=A0 IIUC, timer_expires isn't cleared so that the pending IRQ is c=
-aptured by
-> kvm_xen_vcpu_get_attr(), i.e. because xen.timer_pending itself isn't migr=
-ated.
-
--EPARSE. Er... yes?
-
-The timer_expires field is non-zero when there's a pending timer. When
-the timer interrupt has fired, the time is no longer pending and the
-timer_expires field is set to zero.
-
-The xen.timer_pending field is indeed not migrated. We *flush* it in
-kvm_xen_vcpu_get_attr(). It's now only used for the *deferral* to the
-slow path.
-
-So... yes, timer_expires *wasn't* previously cleared, because the timer
-IRQ hadn't been delivered yet, and yes that was to avoid races with
-kvm_xen_vcpu_get_attr(). Partly because the timer_pending field was
-internal and not migrated. As far as userspace is concerned, the timer
-has either fired, or it has not. Implementation details of the
-timer_pending field =E2=80=94 and the per-vcpu evtchn_pending_sel =E2=80=94=
- are not
-exposed.
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return HRTIMER_NORESTAR=
-T;
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_=
-abs, s64 delta_ns)
-> > =C2=A0{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
-et_running_vcpu());
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Avoid races with the old =
-timer firing. Checking timer_expires
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * to avoid calling hrtimer_=
-cancel() will only have false positives
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * so is fine.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_exp=
-ires)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_set(&vcpu->arch.=
-xen.timer_pending, 0);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_ex=
-pires =3D guest_abs;
-> > =C2=A0
-> > @@ -163,6 +188,8 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vc=
-pu, u64 guest_abs, s64 delta_
-> > =C2=A0
-> > =C2=A0static void kvm_xen_stop_timer(struct kvm_vcpu *vcpu)
-> > =C2=A0{
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
-et_running_vcpu());
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->a=
-rch.xen.timer);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_ex=
-pires =3D 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_set(&vcpu->arch.=
-xen.timer_pending, 0);
-> > @@ -1019,13 +1046,38 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu=
-, struct kvm_xen_vcpu_attr *data)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > =C2=A0
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_TYPE_=
-TIMER:
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_TYPE_=
-TIMER: {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0bool pending =3D false;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * Ensure a consistent snapshot of state is captures, =
-with a
->=20
-> s/captures/captured
-
-Ack.
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * timer either being pending, or fully delivered. Not=
- still
->=20
-> Kind of a nit, but IMO "fully delivered" isn't accurate, at least not wit=
-hout
-> more clarification.=C2=A0 I would considered "fully delivered" to mean th=
-at the IRQ
-> has caused the guest to start executing its IRQ handler.=C2=A0 Maybe "ful=
-ly queued in
-> the event channel"?
-
-OK, I'll reword.
-
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * lurking in the timer_pending flag for deferred deli=
-very.
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_expires) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pendin=
-g =3D hrtimer_cancel(&vcpu->arch.xen.timer);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_xe=
-n_inject_timer_irqs(vcpu);
->=20
-> If the goal is to not have pending timers, then kvm_xen_inject_timer_irqs=
-()
-> should be called unconditionally after canceling the hrtimer, no?
-
-It *is* called unconditionally after cancelling the hrtimer.
-
-Or did you mean unconditionally whether we cancel the hrtimer or not?
-The comment explains the logic for not needing that. If *either* the
-timer is still active, *or* it's already fired and has taken the slow
-path and set the timer_pending flag, then timer_expires won't have been
-zeroed yet. So the race conditions inherent in doing this conditional
-on vcpu->arch.xen.timer_expires are fine because there are only false
-positives (which cause us to cancel a timer, and try to inject a
-pending IRQ, which wasn't running and wasn't pending respectively).
-
-Sounds like I need to expand that comment?=20
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.port =3D vcpu->arch.xen.timer_virq=
-;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.priority =3D KVM_IRQ_ROUTING_XEN_E=
-VTCHN_PRIO_2LEVEL;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.expires_ns =3D vcpu->arch.xen.time=
-r_expires;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0/*
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * The timer may be delivered immediately, while the r=
-eturned
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * state causes it to be set up and delivered again on=
- the
->=20
-> Similar to the "fully delivered" stuff above, maybe s/timer/hrtimer to ma=
-ke it
-> a bit more clear that the host hrtimer can fire twice, but it won't ever =
-result
-> in two timer IRQs being delivered from the guest's perspective.
-
-Ack.
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * destination system after migration. That's fine, as=
- the
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * guest will not even have had a chance to run and pr=
-ocess
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * the interrupt by that point, so it won't even notic=
-e the
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * duplicate IRQ.
->=20
-> Rather than say "so it won't even notice the duplicate IRQ", maybe be mor=
-e explicit
-> and say "so the queued IRQ is guaranteed to be coalesced in the event cha=
-nnel
-> and/or guest local APIC".=C2=A0 Because I read the whole "delivered IRQ" =
-stuff as there
-> really being two injected IRQs into the guest.
->=20
-> FWIW, this is all really gross, but I agree that even if the queued IRQ m=
-akes it
-> all the way to the guest's APIC, the IRQs will still be coalesced in the =
-end.
->=20
-
-As discussed before, we *could* have made fetching the timer attr also
-*pause* the timer. It just seemed like extra complexity for no good
-reason. The shared info page containing the event channel bitmap has to
-be migrated after the vCPU state anyway.
-
-
->=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (pending)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hrtime=
-r_start_expires(&vcpu->arch.xen.timer,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HRTIMER_MODE_ABS_HARD);
-> > +
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
-> > -
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_=
-TYPE_UPCALL_VECTOR:
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.vector =3D vcpu->arch.xen.upcall_vector;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
-> > @@ -2085,7 +2137,7 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
-> > =C2=A0void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
-> > =C2=A0{
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (kvm_xen_timer_enabl=
-ed(vcpu))
->=20
-> IIUC, this can more precisely be:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_=
-expires)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
->=20
-> at which point it might make sense to add a small helper
->=20
-> =C2=A0 static void kvm_xen_cancel_timer(struct kvm_vcpu *vcpu)
-> =C2=A0 {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_=
-expires)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
-> =C2=A0 }
->=20
-> to share code with=20
->=20
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0kvm_xen_stop_timer(vcpu);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_deactivate(&vcp=
-u->arch.xen.runstate_cache);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_deactivate(&vcp=
-u->arch.xen.runstate2_cache);
-
-In fact if I make the helper return a bool, I think I can use it
-*three* times. At a cost of having a third function
-kvm_xen_cancel_timer() alongside the existing kvm_xen_start_timer() and
-kvm_xen_stop_timer(), and those *three* now make for a slightly
-confusing set. I'll take a look and see how it makes me feel.=20
-
---=-+tdzy/ZsRFcuRbtmXrPN
+--=-ANPaQ2YfgL3oQRpZbffr
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -555,24 +167,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTI5MjEyNTE4WjAvBgkqhkiG9w0BCQQxIgQg3+bqqXx5
-SvfJt2V47/UtgTqjF4TOf7ViAl57O/hBMTIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTI5MjEyNzAyWjAvBgkqhkiG9w0BCQQxIgQg00crnZLV
+qseX4DfqAcYGovABs35jbkse1hEPxHt4yKwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAFF55rqEd//oiqAQS2yIQAPEAOf0ieBt7X
-yjQ1Alk7hpaGwc7V9RIRA7xxFF4ABc9sreLp7cyfEs3jV8MifBMZn+2ZgKjZI9Om5Ly2niFluE+3
-36TiEtVBEBxjiNcWBtDBiTVl8zVIEh8n8Ww+ppkmgJ6AdIFe4pc/+/kq6EJVpRCKs7ZediB+7ok9
-g/cE8WvCyQ1uLyHfYz+5+HbkYNNbulsIgSg0afmlai6KgPaySljH9AlX8h/BEMPRK97186gIJp4i
-VE3IGFgX4R8X8hxhsz5MzI1XdQj9W0JOH0BYlH2mmPoBuEev6ePOHqy3aSQUJFozhh7JQXW/+Nhj
-UA/dLuNmYojEuC55b4aCtpkWk3SA0PeVvRB06N1Zo1km80UdBdFxOf0ZfEg1ptpHxzb0W5sAOytB
-gekHL+YBevIFEAAQPPM80XgiaosRgvdzWGFv34R+fR8KgtvlOdxeqkK1n1MOkF4oB7I8XtyrJMNa
-h26jADgFGPqL/jEwo6JGpN2pAa7dhrjkY1hTtK++ag+9QLYXIwAr1cdlTb2SqqJkMvQ9bjAZ2E90
-OpU6vFqpByAB6PepJWStz6/D1Yl4fk0vtR+bE3Vhjw6oKxTBwzh7o88X96UbfXPh8SgvKs9P7C+2
-gef2WSjXCcB4ylg8+EZeIXn8k4PrNk5OV2iNv73f1QAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAiOnRq9fszZpEQgIaYIxb9peweB4Cdw8QC
+3mEweEHX2rn45/3zoTzTP5+ND8yqxwYZxw4bbLY0rU71Udq/7zPORdEH47ApANDbqky4TmLDrfQs
+g79R3bGR3yZrJYai3CZfe5nDW+iqYvsNoGqJshDDJuyFki1eMYm2B/oF5nSkdl6Iv8W01Q/aUX2f
+5QgY43szQiA3WsdqgBLxq4Nr62nrs0qFpAKmzSdb192Lm/hALQ2w5x+8MTV9K2yT8e9/FdmZ0T6T
+iIBUDO6goWAgWvp/kM9sJT9t0LiJCwplIstIg2+lBmF1CyMnBfWE4NCpTxB9dmOblIenHqWR7kay
+eLK9yom7iET0DTtg0MY+6Kn28PXbcimpOhhBJDU9ay0/CE/txfJZuKF0kfQOK4LZe7YRr1e2fg03
+OGpGVTcWKeHdsS5FITOXckmBGPvxu5q8SWBpKp5rV7kIaUaQyUrEjOHdfKP2HuhtkRImrQ7rsdEA
+JdMhf/o9HttnnfH+Sd88IczAqGseqHKL1oyp97IwP0ExHddL3DAVlJKiPbs4El5R3ow9o43Qsjc2
+A7l56wCSXE560WhZ5c4OVd80NkR/oeLyMaU0PLBDXbErmyW1jJTNDZw2f7Fl3n50ofVLWWpsA6ml
+a5xyzd56jEbtsmnY7cyclZWt920mZPZrjQXlfHukxQAAAAAAAA==
 
 
---=-+tdzy/ZsRFcuRbtmXrPN--
+--=-ANPaQ2YfgL3oQRpZbffr--
