@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B3D07B297A
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 02:24:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5D917B29E0
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 02:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjI2AYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Sep 2023 20:24:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57790 "EHLO
+        id S232464AbjI2Am2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Sep 2023 20:42:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjI2AYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Sep 2023 20:24:23 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D4B180
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 17:24:21 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c0dd156e5so271453877b3.3
-        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 17:24:21 -0700 (PDT)
+        with ESMTP id S231880AbjI2Am0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Sep 2023 20:42:26 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60100199
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 17:42:23 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c61aafab45so102500175ad.3
+        for <kvm@vger.kernel.org>; Thu, 28 Sep 2023 17:42:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695947060; x=1696551860; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695948143; x=1696552943; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VK3yYTqUyZzwJjWPYCCiURL3L8OGDHEDjPYeZ/hC2E0=;
-        b=mmMNIUSIK9ogmfEqekMJsGEmHumJpq1reG39BeRVF5vPjn0eTx3ucj/LfHsP1mU5DT
-         UFQ2XFiH37eJhfzvQnOSrhMBy7DapVdFU2P+MdNnEFZj/+SVeLT3nzA6YksxOFvBSdgX
-         5o7oEXIKdyCyIxjgPn4zleFl+j61MuSlTUQvxidpnpgxKxqHgVxHbf0B+Iz5xsPx71F2
-         4LWB7urMmXiO2Ke1n4vPBfzy7rmxMSSEonfuX7XY4E4y1C9aKg7PyuBeoPyuPilnY3SR
-         xCMZEv9au89TxAWrGYUIvNnTXmlcsqE5XCFHpa0wOvPYNgH14C3hsXd8UGynKT+vHHCk
-         uUTQ==
+        bh=LHnl2CsLxrfQz4bzbwJAj223y7XyxSn5JpaUfYsfSDE=;
+        b=rC1/WGQGD7SZLSycCz9NRY4e71edtsK2IX3bbn6OuMS8KtS3xBBxX+YbzEBoQx+WWI
+         yR1GtfF2TV8Lam5xWApyMqRy4O2Nec4K0Fyj+wWl5C3UcAaK7UtYRVvQBgInXGaHIon3
+         LMcwIF99+jHB/C1fChwXUfLb6EGQ3KC15/SI1hSs1X+T+tUYLVzY4DIk1JHnghsNlSts
+         qEL+AMNKgEe0iXvO9BKE3NR/in/dEvc8r1Zeof3kNcgyTLV1Ivi6w+RrCiIGOdZ9uKhu
+         4TSH/YkeswaD1yWzlmgZGIghpoW58KEC2rJKv6ye9+OcLcvCVNuEHFjTan+/Y8jNUHHs
+         PTfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695947060; x=1696551860;
+        d=1e100.net; s=20230601; t=1695948143; x=1696552943;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VK3yYTqUyZzwJjWPYCCiURL3L8OGDHEDjPYeZ/hC2E0=;
-        b=VAOs7FmWLX2msPKJYqVGI1902zVLrF/zqGsEOi8LyYhSULTLtY+vrZ1ccH8hH28O6o
-         2NePUULzO7DszSWSIb0WeoPNfpjXtY7Vb2ukE3S54e8CKG4hwGjpfcpC5ibXJEj+lOBT
-         dDjsud6tCtVWDprSvA6L7Zj7tRJG6GH5jEyd1oWQx1bZZFYcE/SSQx/dTbG85EeQDsnI
-         /z4N4uh62yVFDY7QKG8Bb7HoSebAguihglIhnSKriwyoZRsbg2uB+VyzRV/kAsovUroE
-         kLv0cfUGTDUrhJzsSMp4pACJ/km7xCEdTjZ8O6teOex99ZA3u+sJuYTR1UVYf4FTAG80
-         +nIg==
-X-Gm-Message-State: AOJu0Yz0cBd1z5PHcREjWNWlkd8wj1KgUo75MADkxRD3eI6OExw3Qqp6
-        lsZVsVJY/nJii+kn/qGQHtcfgcVw5sE=
-X-Google-Smtp-Source: AGHT+IEOayytUoGF6yiau9EKJIk7fPZSTKse/XCvu4K9plygAETxpWB9IOofC6SPGiHL7SAKxLP/YXrGXcc=
+        bh=LHnl2CsLxrfQz4bzbwJAj223y7XyxSn5JpaUfYsfSDE=;
+        b=VE8Bp9s/iQMFsAj3AGPilpYmj26osWUllvoYPJZb6y7NPr4a89j/i2aYuIsf8Z07mf
+         NrecnvvnMWrBv/FppcGas6iLC57CDBxnWC1gJIxIplHpdac5lCY95cEMvgU309KGDVMP
+         A3muPMY3Pi6NlVyZfKl+m29O+Fv3qzMBOrzL57tC/7OR5O0bLLHEvOqUBPg+j5V4ayzS
+         JC0xvcfAWxScIQi7rnE43cROi7cjXmkMRPVp+FN6pFFpCYvGZC0O9A/FsoXWbLWkanX2
+         fPjkTow1bQh/3Z+G9ig7FbJ/IlBcoZcyxF8XQec3axPeUkFmK/Tf5bWnzCxsSUoVto9y
+         i3LQ==
+X-Gm-Message-State: AOJu0YycJyCFij4mkbZGMnaLPvXDKqotiQ4MYV2v86fLDKRjtxnzFj9w
+        WMjG2AkxcfJX+dN5cjCK+OSDAKlpINc=
+X-Google-Smtp-Source: AGHT+IHUEPW3H4eE8hL9x01DrF8EV6/qXIdYZHJV+3Ch6SWg/Ia5upLk5S9Kq+TjsAHT50edQJbCK+giAKY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:aa48:0:b0:59b:f493:813c with SMTP id
- z8-20020a81aa48000000b0059bf493813cmr44356ywk.9.1695947060234; Thu, 28 Sep
- 2023 17:24:20 -0700 (PDT)
-Date:   Thu, 28 Sep 2023 17:24:18 -0700
-In-Reply-To: <20230928173354.217464-2-mlevitsk@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e851:b0:1c6:2b9d:570b with SMTP id
+ t17-20020a170902e85100b001c62b9d570bmr34467plg.7.1695948142799; Thu, 28 Sep
+ 2023 17:42:22 -0700 (PDT)
+Date:   Thu, 28 Sep 2023 17:42:20 -0700
+In-Reply-To: <20230928173354.217464-3-mlevitsk@redhat.com>
 Mime-Version: 1.0
-References: <20230928173354.217464-1-mlevitsk@redhat.com> <20230928173354.217464-2-mlevitsk@redhat.com>
-Message-ID: <ZRYZMr4fuaywW7fP@google.com>
-Subject: Re: [PATCH v2 1/4] x86: KVM: SVM: always update the x2avic msr interception
+References: <20230928173354.217464-1-mlevitsk@redhat.com> <20230928173354.217464-3-mlevitsk@redhat.com>
+Message-ID: <ZRYdbJNY3ldYKgEk@google.com>
+Subject: Re: [PATCH v2 2/4] x86: KVM: SVM: add support for Invalid IPI Vector interception
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     kvm@vger.kernel.org, iommu@lists.linux.dev,
@@ -76,34 +76,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Sep 28, 2023, Maxim Levitsky wrote:
-> The following problem exists since x2avic was enabled in the KVM:
+> In later revisions of AMD's APM, there is a new 'incomplete IPI' exit code:
 > 
-> svm_set_x2apic_msr_interception is called to enable the interception of
-
-Nit, svm_set_x2apic_msr_interception().
-
-Definitely not worth another version though.
-
-> the x2apic msrs.
+> "Invalid IPI Vector - The vector for the specified IPI was set to an
+> illegal value (VEC < 16)"
 > 
-> In particular it is called at the moment the guest resets its apic.
+> Note that tests on Zen2 machine show that this VM exit doesn't happen and
+> instead AVIC just does nothing.
 > 
-> Assuming that the guest's apic was in x2apic mode, the reset will bring
-> it back to the xapic mode.
+> Add support for this exit code by doing nothing, instead of filling
+> the kernel log with errors.
 > 
-> The svm_set_x2apic_msr_interception however has an erroneous check for
-> '!apic_x2apic_mode()' which prevents it from doing anything in this case.
+> Also replace an unthrottled 'pr_err()' if another unknown incomplete
+> IPI exit happens with vcpu_unimpl()
 > 
-> As a result of this, all x2apic msrs are left unintercepted, and that
-> exposes the bare metal x2apic (if enabled) to the guest.
-> Oops.
+> (e.g in case AMD adds yet another 'Invalid IPI' exit reason)
 > 
-> Remove the erroneous '!apic_x2apic_mode()' check to fix that.
-> 
-> This fixes CVE-2023-5090
-> 
-> Fixes: 4d1d7942e36a ("KVM: SVM: Introduce logic to (de)activate x2AVIC mode")
-> Cc: stable@vger.kernel.org
+> Cc: <stable@vger.kernel.org>
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
 
