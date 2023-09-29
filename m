@@ -2,152 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CB137B2EFB
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 11:13:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD2327B2F0A
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 11:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232911AbjI2JNW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Sep 2023 05:13:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38094 "EHLO
+        id S232819AbjI2JRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Sep 2023 05:17:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232932AbjI2JNT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Sep 2023 05:13:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790DA1A5
-        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 02:12:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695978750;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mWGhTxhB3dGkyUJd+ZvB0A+li+V3clasR5rFEOBuS5Q=;
-        b=Tdmb2AJVuF61seamvHtpJ3Cnovby7yS0sNI3INEi3glYyMoC2OgOuxbh9tNH4qrJzzWPmh
-        g8jix0OuKEmcFzOZmdPBDw96ZPZ6c+B7coCCoGcJHn+ObALX2AFKZSBwg2SLa6X7cxxKJO
-        XiW0oKCGhfNHUYmr4TbWVWWHRak/YYY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-464-zINCMx0OMu-lnzv0G8nixg-1; Fri, 29 Sep 2023 05:12:29 -0400
-X-MC-Unique: zINCMx0OMu-lnzv0G8nixg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDC473C1ACEE;
-        Fri, 29 Sep 2023 09:12:28 +0000 (UTC)
-Received: from [10.39.208.41] (unknown [10.39.208.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E46AD14171B6;
-        Fri, 29 Sep 2023 09:12:26 +0000 (UTC)
-Message-ID: <db93d5aa-64c4-42a4-73dc-ae25e9e3833e@redhat.com>
-Date:   Fri, 29 Sep 2023 11:12:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
-Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>
-Cc:     mst@redhat.com, xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20230912030008.3599514-1-lulu@redhat.com>
- <20230912030008.3599514-4-lulu@redhat.com>
- <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-From:   Maxime Coquelin <maxime.coquelin@redhat.com>
-In-Reply-To: <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231774AbjI2JRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Sep 2023 05:17:47 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82FA180;
+        Fri, 29 Sep 2023 02:17:45 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70E5DC433C7;
+        Fri, 29 Sep 2023 09:17:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695979065;
+        bh=8DbphEmZd2h1m2uHAVTUOzw0cvjdxCl6crQ1p98OncM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KzyUyXLp6Zqsl3HMYd/fky8xlvENzMKFiVhjkUcOIS20nOaDojKYrOSmfByrj7iJc
+         raHPprponGw7Iv6avsZRJ6jJyJEclMh9ZUbKj1dRVa+UamS2PuuN32hVlPrdPlTxiE
+         tDJHuNSZDly8sR+XnwF1raL9HZQiHDQdcvQxesuT3EOLU+4ZKMM+yVYXedO4Hl4VJd
+         +bOUph2VyocPA2ylHv6XIYPtY+nnRGIhuR+/kjkyLY2/tqtjuIw/KmWQltNgS9cntq
+         9ti+aIioAaQhEJXxhpVwAMY5Ce7O3+VtwQUeY8QS+57SMdWxaF4nBx/dWLBZ1W36xK
+         nOb6zbQZXUVlQ==
+Received: from [85.255.233.37] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qm9d0-00HCXE-VT;
+        Fri, 29 Sep 2023 10:17:43 +0100
+Date:   Fri, 29 Sep 2023 10:17:41 +0100
+Message-ID: <87il7tmj7u.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Jing Zhang <jingzhangos@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Always invalidate TLB for stage-2 permission faults
+In-Reply-To: <ZRIbGe1hvf6kbu4s@linux.dev>
+References: <20230922223229.1608155-1-oliver.upton@linux.dev>
+        <ZQ4eZcWRO/nHnGc4@linux.dev>
+        <87ttrj5181.wl-maz@kernel.org>
+        <ZRIbGe1hvf6kbu4s@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 85.255.233.37
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, vipinsh@google.com, jingzhangos@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/12/23 09:39, Jason Wang wrote:
-> On Tue, Sep 12, 2023 at 11:00 AM Cindy Lu <lulu@redhat.com> wrote:
->>
->> In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
->> with reconnect info, After mapping the reconnect pages to userspace
->> The userspace App will update the reconnect_time in
->> struct vhost_reconnect_vring, If this is not 0 then it means this
->> vq is reconnected and will update the last_avail_idx
->>
->> Signed-off-by: Cindy Lu <lulu@redhat.com>
->> ---
->>   drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
->>   include/uapi/linux/vduse.h         |  6 ++++++
->>   2 files changed, 19 insertions(+)
->>
->> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
->> index 2c69f4004a6e..680b23dbdde2 100644
->> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
->> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
->> @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->>                  struct vduse_vq_info vq_info;
->>                  struct vduse_virtqueue *vq;
->>                  u32 index;
->> +               struct vdpa_reconnect_info *area;
->> +               struct vhost_reconnect_vring *vq_reconnect;
->>
->>                  ret = -EFAULT;
->>                  if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
->> @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->>
->>                  vq_info.ready = vq->ready;
->>
->> +               area = &vq->reconnect_info;
->> +
->> +               vq_reconnect = (struct vhost_reconnect_vring *)area->vaddr;
->> +               /*check if the vq is reconnect, if yes then update the last_avail_idx*/
->> +               if ((vq_reconnect->last_avail_idx !=
->> +                    vq_info.split.avail_index) &&
->> +                   (vq_reconnect->reconnect_time != 0)) {
->> +                       vq_info.split.avail_index =
->> +                               vq_reconnect->last_avail_idx;
->> +               }
->> +
->>                  ret = -EFAULT;
->>                  if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
->>                          break;
->> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
->> index 11bd48c72c6c..d585425803fd 100644
->> --- a/include/uapi/linux/vduse.h
->> +++ b/include/uapi/linux/vduse.h
->> @@ -350,4 +350,10 @@ struct vduse_dev_response {
->>          };
->>   };
->>
->> +struct vhost_reconnect_vring {
->> +       __u16 reconnect_time;
->> +       __u16 last_avail_idx;
->> +       _Bool avail_wrap_counter;
+On Tue, 26 Sep 2023 00:43:21 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Please add a comment for each field.
+> On Sun, Sep 24, 2023 at 11:12:30AM +0100, Marc Zyngier wrote:
+> > On Sat, 23 Sep 2023 00:08:21 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > On Fri, Sep 22, 2023 at 10:32:29PM +0000, Oliver Upton wrote:
+> > > > It is possible for multiple vCPUs to fault on the same IPA and attempt
+> > > > to resolve the fault. One of the page table walks will actually update
+> > > > the PTE and the rest will return -EAGAIN per our race detection scheme.
+> > > > KVM elides the TLB invalidation on the racing threads as the return
+> > > > value is nonzero.
+> > > > 
+> > > > Before commit a12ab1378a88 ("KVM: arm64: Use local TLBI on permission
+> > > > relaxation") KVM always used broadcast TLB invalidations when handling
+> > > > permission faults, which had the convenient property of making the
+> > > > stage-2 updates visible to all CPUs in the system. However now we do a
+> > > > local invalidation, and TLBI elision leads to vCPUs getting stuck in a
+> > > > permission fault loop. Remember that the architecture permits the TLB to
+> > > > cache translations that precipitate a permission fault.
+> > > 
+> > > The effects of this are slightly overstated (got ahead of myself).
+> > > EAGAIN only crops up if the cmpxchg() fails, we return 0 if the PTE
+> > > didn't need to be updated.
+> > > 
+> > > On the subsequent permission fault we'll do the right thing and
+> > > invalidate the TLB, so this change is purely an optimization rather than
+> > > a correctness issue.
+> > 
+> > Can you measure the actual effect of this change? In my (limited)
+> > experience, I had to actually trick the guest into doing this, and
+> > opportunistically invalidating TLBs didn't have any significant
+> > benefit.
 > 
-> And I never saw _Bool is used in uapi before, maybe it's better to
-> pack it with last_avail_idx into a __u32.
+> Sure. We were debugging some issues of vCPU hangs during post-copy
+> migration but that's more likely to be an issue with our VMM + out of
+> tree code.
+> 
+> Marginal improvements be damned, I'm still somewhat keen on doing the
+> TLB invalidation upon race detection anyway. Going back to the guest is
+> pointless, since in all likelihood we will hit the TLB entry that led to
+> the permission fault in the first place.
 
-Better as two distincts __u16 IMHO.
+I guess it completely depends on the size of the TLB. The machines I
+deal with have a relatively small number of entries, and it doesn't
+take much to fully evict them.
 
-Thanks,
-Maxime
+Now, all of that is probably irrelevant as there should be little
+impact in performing the invalidation as long as it is local (unless
+you trap, but that's another problem).
 
-> 
-> Btw, do we need to track inflight descriptors as well?
-> 
-> Thanks
-> 
->> +};
->> +
->>   #endif /* _UAPI_VDUSE_H_ */
->> --
->> 2.34.3
->>
-> 
+FWIW:
 
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
