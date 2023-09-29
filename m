@@ -2,196 +2,577 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F151F7B3BDF
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 23:19:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 915697B3BEB
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 23:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232878AbjI2VTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Sep 2023 17:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49324 "EHLO
+        id S233634AbjI2VZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Sep 2023 17:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjI2VTo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Sep 2023 17:19:44 -0400
-Received: from DEU01-BE0-obe.outbound.protection.outlook.com (mail-be0deu01on2132.outbound.protection.outlook.com [40.107.127.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB831AA
-        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 14:19:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EvKMKMNWS4wKJummH4Bih42R4t1xl8LiDD2aJZfHPSxgkdhWc4MOAShAQiy7jpLUdCEX/84x2kpb8fjKO+WsJhCEqnqdydmj/jm8Eu/gKM4yTwuiuNAn8OKMfFEBpyyMhCSwYlw65w/Q783HYwCBxg69Q/XEeCfnRRda2y4hYuAKCJNEc0oGHoUo6m1PyRZ3XO8Oyx7fNXTcKR2fOmUYSyDkoHbV3M5R3xBvQrUsU3r7UuUxr33vhJhOXIxp4fuJgqKzr/vG9Hyn5wpIwpC4gdevvWtiULfOn9WF6sBeYZ8UzAjIhg0s7TYiEljsaVkHBNqB1Dc9M2b8T4Ecu/UL6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6LxTdjSlEbDwwjskGJVqCxNncT1WUECWiSHS133JlVo=;
- b=cns/tbawY6oD7yw0JZNuzSG1f51JxKqEqkYwXHReEpsrnN39b9bVM/DW86CI+LyTbFJ3i6ihpHkeXhnmmx2m0883V9ri88y43p4iwtScBKtSUqkNg68MZ24+xFkOGU+bWT7HSulp4zZhQe6oyqlI189QFgbRbPcuYPC87/R+d9055bVchKwuwe53U7jW0QUXN0AE8mhwxXfcEriq/jqszeL1nVJN6wvibVYjhj4pYyqNMPoLoKodh3Dkxqw73FqLh+MsUHgBznSBQ3FtpVlYaM5MENRehA9+tOYCb+UqPIH/IV3GKZrOHCSyTgr+IXbTM//hAoiPAvS1mdrAkuDDeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nio.io; dmarc=pass action=none header.from=nio.io; dkim=pass
- header.d=nio.io; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nio.io; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6LxTdjSlEbDwwjskGJVqCxNncT1WUECWiSHS133JlVo=;
- b=MiNq9YZOQqzQtyKMP3mU1X9zKUD56DbHhx1Pdee0d/wIZSpzadJFamF1unyskC0rrqdpMQR2fFNk1EYFnGA/e/J3ujGVnXddcQvj89YEY+k1P7YC1n/oZPwUuglgnJzFP8bHYo9pdeG5oow2GKGH8g1rodl1aQon1PdwEkUHH+s=
-Received: from FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:73::12)
- by BEVP281MB3473.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:97::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.27; Fri, 29 Sep
- 2023 21:19:38 +0000
-Received: from FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
- ([fe80::f456:c24:7c9b:d966]) by FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
- ([fe80::f456:c24:7c9b:d966%5]) with mapi id 15.20.6838.028; Fri, 29 Sep 2023
- 21:19:38 +0000
-From:   Matthias Rosenfelder <matthias.rosenfelder@nio.io>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     Andrew Jones <andrew.jones@linux.dev>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
-Thread-Topic: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
-Thread-Index: AQHZ8xUpYeZOzJqeV0mvBZBYrVbSDQ==
-Date:   Fri, 29 Sep 2023 21:19:37 +0000
-Message-ID: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_Enabled=True;MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_SiteId=ea1b2f97-423f-4ab3-bf6d-45a36c09ce34;MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_SetDate=2023-09-29T21:19:37.129Z;MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_Name=NIO
- Public
- (L1);MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_ContentBits=0;MSIP_Label_82b19b76-e224-40c8-9ee1-78f1a6cbd1b3_Method=Privileged;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nio.io;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: FRYP281MB3146:EE_|BEVP281MB3473:EE_
-x-ms-office365-filtering-correlation-id: cdc85167-bf19-424c-ded3-08dbc131c94f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: f9ixdXOjYpD9BqffsZgrTbcK8scUL9QWMb/NzgBQuSQ0vK58/lrM8pqMF1FlNLOHHzgFuVD/Xl/vVaCANSS2/i9JzIGYMbZwZecXM9DymLEn85HdI0mt7lv4naspeyBULiY5y2swpD/bIgfu7Eaqc06JnxlZSyVmoUaHWXR8xzfDVKAjtQzNhJZJr7o7ivbETtSrV3XlevAeyogE6qSmjrmPqY7hY5T7xroIZSQDId8M9WIJc6PL/T0HWXwEzdI7ySbDXroYD9KYMCSpX/ighCB+bTroLRXbi2MRo6rrlE1nCRLMjYmAEmdQVlNvMSc9PLBThZ/MMim9qvIun0e6kZjW83YuvPLi4Hmp6yH5AV96mzYjiA+uV622nwn8JKN6EGJbD+LSiloJCbZpINcwX9A69ncA0mfTQo7Pr3QhceDvj+Rc4oezcjgjftlcycuklQCrfDpW7RVni0x02gpeYTbpL1c1oTE7R3jTQyC7ruy6fLirHDi14UE9hY3sNrMPM5ZuW2+hu4IsKyo4w7tBB7OYSLSnzdgvsS508Fp/z0PYhutRbazHogPx8PwXIeSXRYHYKbZroQN+/7Dt4MDzSQ8tiMTpvJXf7Y452Ki9CmP0IfdPKH6EoqxMRrDbSw/wjw2AAk3Pf+gRCrlAgjAX8UBdL8GYg4ZFr3Hzqn1w1Ag=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(376002)(39850400004)(366004)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(5660300002)(52536014)(44832011)(2906002)(8676002)(4326008)(8936002)(41300700001)(54906003)(64756008)(316002)(6916009)(66556008)(66946007)(66476007)(76116006)(55016003)(66446008)(66574015)(33656002)(71200400001)(83380400001)(9686003)(99936003)(122000001)(38070700005)(7696005)(6506007)(86362001)(38100700002)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SFhPRFhGUU95YUkrR3BuNUg3cnBCTGUzZ2o1UUFZeUxHL1RZZWJ2TDlrWWlJ?=
- =?utf-8?B?ZVA0YkVKYVZWb3BQalhDcHhQalpTcE1hOWJJdFdMVGZhMnZxMnB2dnE1RHB4?=
- =?utf-8?B?RWtTOHpGRHUzY3FnUVc4eTREVitUUE83YXdSSTdxVU5SV2ZzT3NUWWhNeDRT?=
- =?utf-8?B?MXcxRWVWL1huVE43QzNRTjRYQkZVZXB3QStCQUt4cXdOdmRSK2V5MmloMnhS?=
- =?utf-8?B?d2hKWlZhejRtREhLUUxaZmxtWlQ1RTN0M3F6anpBd2dNU2ErRTBiNjhXZDVx?=
- =?utf-8?B?dEZFem95ajJRWUVzcElheTNaWWdPWFR0NUNId2tKWXJRWEtUOUxtMmhoZHFi?=
- =?utf-8?B?ZXNTZmxIdnJnMVYrSkphdmk5S0w1SXk1UEV3N3RJcEVQa0x2QWxrSCtFUEFI?=
- =?utf-8?B?TEoyay9yOHA5YmQrcHoxU21JbTUxY1ZWb2NlcmZ3Qm8xREV1NkZpTHBIRVd0?=
- =?utf-8?B?eWJQV2tDUGgwVFpDYUZ3eTYwMTNMdUVoRisrRnJoS3pPVWIrSVVWY2JXNFhl?=
- =?utf-8?B?bFBOK3M0N1NZOWcxUHoyc1RTNjRhT2JXSVE0aTZmVUpkQURxQjZpS1phTks1?=
- =?utf-8?B?d2pEM3FUZWZ5bGNTQXRCZVNpdnlhOFlMbWRjdC9JYjMxTjV2UDg4dEtxSUlt?=
- =?utf-8?B?TUtaQVo2TkhUTHVnMFZxNTNzQlFOd0k5aTRaa3BiTWQ4ajVNTVZIZUkyak5O?=
- =?utf-8?B?VkoyMWFZN2NGOTh0c3BmaHlBbkxldXdKK0RUTUpzbUJQaG4yR1FxNEYxWWFM?=
- =?utf-8?B?czdVMWhSWFZDYXlLOS9XRGJqVFAwMC83cDIxMDBDYmw5bDRBWFRHQjluenNz?=
- =?utf-8?B?bmFvZVc2RW5pQ0NMNG9xK0I2a0lBNWRhVWRuR3pCcW1nVEoxWE1ZSEFkYkJH?=
- =?utf-8?B?bGhxSVZ0N05sbjgxRURFemk2MlpBN3kzZmk5enF6UkpodTR0V3ZyQzRJQXg2?=
- =?utf-8?B?dXRuYmY3bkNUTGQvT2xlc3RRd1ZpNm1FOTI2ME5OT2ZYVkhLM0VwZDNheTVG?=
- =?utf-8?B?NFZzdmFNZVFIbTJoSnpGemJCYUx5VFQrTGs5cjhOblJ1SmI0N21HbVUzQjVI?=
- =?utf-8?B?ZU1lbWJpdHZjY0FuOEpGZlRpUWVISGZRWmptd3AwejlsYzNuQUVTQ3lFWFhO?=
- =?utf-8?B?MytLa2N5dm5DZzZValdwVUIxV0pzSTc0MzJVdWp6UzVzMG1QQUYxMHNaMzZo?=
- =?utf-8?B?SHBHYXUrQjJrZnJKWVRhVEk0UDZpZFQ5dk11UHoxU3kyakE4ekxCM3VaR2JD?=
- =?utf-8?B?bUNnVDFvT2kyWnlQcnVveUVjSFdQY1oxNXJxY20wM1piYnk4SmRtSS9pZk1T?=
- =?utf-8?B?UE1WZlhhUnBHVGFWNHBkblcreW5rRS9qM1IvZUVHSG1adVNFR0llK2JUVlM2?=
- =?utf-8?B?NkdzbFBmekd4NW5NTzR3WWxkVWRQTlJYT3c0b3ZIVDI2S2dyVlQrQ1BlcTZ0?=
- =?utf-8?B?QkgyOUdXcFdHbVdMN1hPTjErcFljeURqdFRRenpvb1p1WnphSy92aU9mZ2Qw?=
- =?utf-8?B?Y0toU2ZaSDRRbTFPRkJ0Z2w1aTA2dEk1QzdqN292V20yVWExS2dDRkRBTSs2?=
- =?utf-8?B?WmtjdGV5WmgyRnJ2ZkxncDNMOGVkL0RsQmNubTVNc3gvNVp3STlWUUVwTEtm?=
- =?utf-8?B?a2xpRGdlOERPRkZCME1pNFhhcXpZeStHelRtbkx4ZHBtcXlKR1czcFE5TkVR?=
- =?utf-8?B?TUh0WDVwc0xCVVFvY1Viamx4YUFLdHhRZ0Qwa29INmlFaGJBRFl3RnpKY25Z?=
- =?utf-8?B?eDRFb2VRamdSRnZPZ0ZSRTB3MUFoODE2bmV4NUsxZ3V3ejBVcWpEU0N1MEhh?=
- =?utf-8?B?blhPb2pNd1RZUzlkRGNNK1VhRElHeHk3WWZMUGRwVkJ3TlFmTUlieENCMmV1?=
- =?utf-8?B?aWNyK3Z0L3RKVHBLQmFyT01QcStPbjhnVkVyaDZHS0thOFdOTjByNk9hL1Va?=
- =?utf-8?B?dlVrVlNpc09pYkRTZUpYbjd5UzByVkJTcUQ1QSsxYmRWWVE0ZStIZ3ZrdVN6?=
- =?utf-8?B?RXFPcEtHeTZHYnlNTFIzUjFXWndNSGtlN3NmdUx5Y3ozQmdpS3U1MnpPUnR0?=
- =?utf-8?B?RjFsSFRJNUFtZUx1c3BQUzhHdkhuM1JiUEN1RWNTNEc2TjRWL1NkU1hLcENs?=
- =?utf-8?B?bHNwei9MRXhBb1NMT2k5YXBxTURieDREanRIQnM1Q09Ea0JqSGtZK1N6endV?=
- =?utf-8?Q?e0DGiTYeQHOTNcWcWRllzzdWoD4XIZluovBSDXA4Rqm0?=
-Content-Type: multipart/mixed;
-        boundary="_002_FRYP281MB31463EC1486883DDA477393DF2C0AFRYP281MB3146DEUP_"
+        with ESMTP id S229545AbjI2VZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Sep 2023 17:25:29 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C85B1AB;
+        Fri, 29 Sep 2023 14:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=lUINZUiuL2j0GNMbCl2BNRZagyWLVJrsgpBTlTMvAow=; b=e/s77vjRAtxl/bz1Iw+XZZI7a1
+        RRk9x9yn5cRkvFe7aSm2LhJ95sR6X9drP5UV2tddO5P1/5G37zgw8vCV1zzK+UNp4+WeiHr0b405d
+        /ruZDJ4bOQlggZYz8yUnEfbBNPJ3dL9oEogf6wKEPLksrwk4NKonMIk0DI9pvQco0hiF7mwSlIwct
+        QpjTIV2QmJObvKQCeEyXJV6WDTM770m/q2+5L5I3GBBWGOjqhNFcwy079m/jhefIXeIMyvYr0GHUw
+        PG+IHwlsGklPgP8EBZLIqbsHdzITQZB4z1IDZMDa+TIbwmhEkfPzZeo9fPwQ9YkGuoH8+K68QCIi1
+        QGnSe0SQ==;
+Received: from 54-240-197-230.amazon.com ([54.240.197.230] helo=edge-m3-r3-174.e-iad51.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qmKz9-00B2rL-Pm; Fri, 29 Sep 2023 21:25:20 +0000
+Message-ID: <ee679de20e3a53772f9d233b9653fdc642781577.camel@infradead.org>
+Subject: Re: [PATCH v2] KVM: x86: Use fast path for Xen timer delivery
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Date:   Fri, 29 Sep 2023 22:25:18 +0100
+In-Reply-To: <ZRbolEa6RI3IegyF@google.com>
+References: <a3989e7ff9cca77f680f9bdfbaee52b707693221.camel@infradead.org>
+         <ZRbolEa6RI3IegyF@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-+tdzy/ZsRFcuRbtmXrPN"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-X-OriginatorOrg: nio.io
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: cdc85167-bf19-424c-ded3-08dbc131c94f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2023 21:19:37.7751
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ea1b2f97-423f-4ab3-bf6d-45a36c09ce34
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JE7zGC8rxcu3b84uVJm2D66VplwFlNDajHYtBqVHmr7D8f8Cq064doxlCbP+v7RX+XSZWhAADHV+kmnpbKLnbz73Zf/0OYNZLf/1rrrYiSM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEVP281MB3473
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---_002_FRYP281MB31463EC1486883DDA477393DF2C0AFRYP281MB3146DEUP_
-Content-Type: text/plain; charset="utf-8"
+
+--=-+tdzy/ZsRFcuRbtmXrPN
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 2023-09-29 at 08:16 -0700, Sean Christopherson wrote:
+> On Fri, Sep 29, 2023, David Woodhouse wrote:
+> > From: David Woodhouse <dwmw@amazon.co.uk>
+> >=20
+> > Most of the time there's no need to kick the vCPU and deliver the timer
+> > event through kvm_xen_inject_timer_irqs(). Use kvm_xen_set_evtchn_fast(=
+)
+> > directly from the timer callback, and only fall back to the slow path
+> > when it's necessary to do so.
+>=20
+> It'd be helpful for non-Xen folks to explain "when it's necessary".=C2=A0=
+ IIUC, the
+> only time it's necessary is if the gfn=3D>pfn cache isn't valid/fresh.
+
+That's an implementation detail. Like all of the fast path functions
+that can be called from kvm_arch_set_irq_inatomic(), it has its own
+criteria for why it might return -EWOULDBLOCK or not. Those are *its*
+business. And in fact one of Paul's current patches is tweaking them
+subtly, but that isn't relevant here. (But yes, you are broadly correct
+in your understanding.)
+
+> > This gives a significant improvement in timer latency testing (using
+> > nanosleep() for various periods and then measuring the actual time
+> > elapsed).
+> >=20
+> > However, there was a reason=C2=B9 the fast path was dropped when this s=
+upport
+>=20
+> Heh, please use [1] or [*] like everyone else.=C2=A0 I can barely see tha=
+t tiny little =C2=B9.
+
+Isn't that the *point*? The reference to the footnote isn't supposed to
+detract from the flow of the main text. It's exactly how you'll see it
+when typeset properly. I've always assumed the people using [1] or [*]
+just haven't yet realised that it's the 21st century and we are no
+longer limited to 7-bit ASCII. Or haven't worked out how to type
+anything but ASCII.
+
+> > was first added. The current code holds vcpu->mutex for all operations =
+on
+> > the kvm->arch.timer_expires field, and the fast path introduces potenti=
+al
+> > race conditions. So... ensure the hrtimer is *cancelled* before making
+> > changes in kvm_xen_start_timer(), and also when reading the values out
+> > for KVM_XEN_VCPU_ATTR_TYPE_TIMER.
+> >=20
+> > Add some sanity checks to ensure the truth of the claim that all the
+> > other code paths are run with the vcpu loaded.=C2=A0 And use hrtimer_ca=
+ncel()
+> > directly from kvm_xen_destroy_vcpu() to avoid a false positive from the
+> > check in kvm_xen_stop_timer().
+>=20
+> This should really be at least 2 patches, probably 3:
+>=20
+> =C2=A0 1. add the assertions and the destroy_vcpu() change
+> =C2=A0 2. cancel the timer before starting a new one or reading the value=
+ from userspace
+> =C2=A0 3. use the fastpath delivery from the timer callback
+
+Hm, I think that's borderline. I pondered it and came to the opposite
+conclusion. Cancelling the timer wasn't needed without the fastpath
+delivery; it isn't a separate fix. You could consider it a preparatory
+patch I suppose... but I didn't. It's not like adding the fast path in
+itself is complex enough that the other parts need to be broken out.=20
+
+> > =C2=B9 https://lore.kernel.org/kvm/846caa99-2e42-4443-1070-84e49d2f11d2=
+@redhat.com/
+> >=20
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > ---
+> >=20
+> > =C2=A0=E2=80=A2 v2: Remember, and deal with, those races.
+> >=20
+> > =C2=A0arch/x86/kvm/xen.c | 64 +++++++++++++++++++++++++++++++++++++++++=
+-----
+> > =C2=A01 file changed, 58 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> > index fb1110b2385a..9d0d602a2466 100644
+> > --- a/arch/x86/kvm/xen.c
+> > +++ b/arch/x86/kvm/xen.c
+> > @@ -117,6 +117,8 @@ static int kvm_xen_shared_info_init(struct kvm *kvm=
+, gfn_t gfn)
+> > =C2=A0
+> > =C2=A0void kvm_xen_inject_timer_irqs(struct kvm_vcpu *vcpu)
+> > =C2=A0{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
+et_running_vcpu());
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (atomic_read(&vcpu->=
+arch.xen.timer_pending) > 0) {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_xen_evtchn e;
+> > =C2=A0
+> > @@ -136,18 +138,41 @@ static enum hrtimer_restart xen_timer_callback(st=
+ruct hrtimer *timer)
+> > =C2=A0{
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_vcpu *vcpu =
+=3D container_of(timer, struct kvm_vcpu,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arch.xen.timer);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_xen_evtchn e;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int rc;
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (atomic_read(&vcpu->=
+arch.xen.timer_pending))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return HRTIMER_NORESTART;
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_inc(&vcpu->arch.xen.t=
+imer_pending);
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_UNB=
+LOCK, vcpu);
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_vcpu_kick(vcpu);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.vcpu_id =3D vcpu->vcpu_id;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.vcpu_idx =3D vcpu->vcpu_id=
+x;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.port =3D vcpu->arch.xen.ti=
+mer_virq;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0e.priority =3D KVM_IRQ_ROUTI=
+NG_XEN_EVTCHN_PRIO_2LEVEL;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rc =3D kvm_xen_set_evtchn_fa=
+st(&e, vcpu->kvm);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (rc =3D=3D -EWOULDBLOCK) =
+{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0atomic_inc(&vcpu->arch.xen.timer_pending);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_vcpu_kick(vcpu);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_expires =3D 0;
+>=20
+> Eww.=C2=A0 IIUC, timer_expires isn't cleared so that the pending IRQ is c=
+aptured by
+> kvm_xen_vcpu_get_attr(), i.e. because xen.timer_pending itself isn't migr=
+ated.
+
+-EPARSE. Er... yes?
+
+The timer_expires field is non-zero when there's a pending timer. When
+the timer interrupt has fired, the time is no longer pending and the
+timer_expires field is set to zero.
+
+The xen.timer_pending field is indeed not migrated. We *flush* it in
+kvm_xen_vcpu_get_attr(). It's now only used for the *deferral* to the
+slow path.
+
+So... yes, timer_expires *wasn't* previously cleared, because the timer
+IRQ hadn't been delivered yet, and yes that was to avoid races with
+kvm_xen_vcpu_get_attr(). Partly because the timer_pending field was
+internal and not migrated. As far as userspace is concerned, the timer
+has either fired, or it has not. Implementation details of the
+timer_pending field =E2=80=94 and the per-vcpu evtchn_pending_sel =E2=80=94=
+ are not
+exposed.
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return HRTIMER_NORESTAR=
+T;
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_=
+abs, s64 delta_ns)
+> > =C2=A0{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
+et_running_vcpu());
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Avoid races with the old =
+timer firing. Checking timer_expires
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * to avoid calling hrtimer_=
+cancel() will only have false positives
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * so is fine.
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_exp=
+ires)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_set(&vcpu->arch.=
+xen.timer_pending, 0);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_ex=
+pires =3D guest_abs;
+> > =C2=A0
+> > @@ -163,6 +188,8 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vc=
+pu, u64 guest_abs, s64 delta_
+> > =C2=A0
+> > =C2=A0static void kvm_xen_stop_timer(struct kvm_vcpu *vcpu)
+> > =C2=A0{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(vcpu !=3D kvm_g=
+et_running_vcpu());
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->a=
+rch.xen.timer);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->arch.xen.timer_ex=
+pires =3D 0;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0atomic_set(&vcpu->arch.=
+xen.timer_pending, 0);
+> > @@ -1019,13 +1046,38 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu=
+, struct kvm_xen_vcpu_attr *data)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_TYPE_=
+TIMER:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_TYPE_=
+TIMER: {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0bool pending =3D false;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0/*
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * Ensure a consistent snapshot of state is captures, =
+with a
+>=20
+> s/captures/captured
+
+Ack.
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * timer either being pending, or fully delivered. Not=
+ still
+>=20
+> Kind of a nit, but IMO "fully delivered" isn't accurate, at least not wit=
+hout
+> more clarification.=C2=A0 I would considered "fully delivered" to mean th=
+at the IRQ
+> has caused the guest to start executing its IRQ handler.=C2=A0 Maybe "ful=
+ly queued in
+> the event channel"?
+
+OK, I'll reword.
+
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * lurking in the timer_pending flag for deferred deli=
+very.
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_expires) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pendin=
+g =3D hrtimer_cancel(&vcpu->arch.xen.timer);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_xe=
+n_inject_timer_irqs(vcpu);
+>=20
+> If the goal is to not have pending timers, then kvm_xen_inject_timer_irqs=
+()
+> should be called unconditionally after canceling the hrtimer, no?
+
+It *is* called unconditionally after cancelling the hrtimer.
+
+Or did you mean unconditionally whether we cancel the hrtimer or not?
+The comment explains the logic for not needing that. If *either* the
+timer is still active, *or* it's already fired and has taken the slow
+path and set the timer_pending flag, then timer_expires won't have been
+zeroed yet. So the race conditions inherent in doing this conditional
+on vcpu->arch.xen.timer_expires are fine because there are only false
+positives (which cause us to cancel a timer, and try to inject a
+pending IRQ, which wasn't running and wasn't pending respectively).
+
+Sounds like I need to expand that comment?=20
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.port =3D vcpu->arch.xen.timer_virq=
+;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.priority =3D KVM_IRQ_ROUTING_XEN_E=
+VTCHN_PRIO_2LEVEL;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.timer.expires_ns =3D vcpu->arch.xen.time=
+r_expires;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0/*
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * The timer may be delivered immediately, while the r=
+eturned
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * state causes it to be set up and delivered again on=
+ the
+>=20
+> Similar to the "fully delivered" stuff above, maybe s/timer/hrtimer to ma=
+ke it
+> a bit more clear that the host hrtimer can fire twice, but it won't ever =
+result
+> in two timer IRQs being delivered from the guest's perspective.
+
+Ack.
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * destination system after migration. That's fine, as=
+ the
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * guest will not even have had a chance to run and pr=
+ocess
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * the interrupt by that point, so it won't even notic=
+e the
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 * duplicate IRQ.
+>=20
+> Rather than say "so it won't even notice the duplicate IRQ", maybe be mor=
+e explicit
+> and say "so the queued IRQ is guaranteed to be coalesced in the event cha=
+nnel
+> and/or guest local APIC".=C2=A0 Because I read the whole "delivered IRQ" =
+stuff as there
+> really being two injected IRQs into the guest.
+>=20
+> FWIW, this is all really gross, but I agree that even if the queued IRQ m=
+akes it
+> all the way to the guest's APIC, the IRQs will still be coalesced in the =
+end.
+>=20
+
+As discussed before, we *could* have made fetching the timer attr also
+*pause* the timer. It just seemed like extra complexity for no good
+reason. The shared info page containing the event channel bitmap has to
+be migrated after the vCPU state anyway.
+
+
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (pending)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0hrtime=
+r_start_expires(&vcpu->arch.xen.timer,
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HRTIMER_MODE_ABS_HARD);
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0break;
+> > -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0case KVM_XEN_VCPU_ATTR_=
+TYPE_UPCALL_VECTOR:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0data->u.vector =3D vcpu->arch.xen.upcall_vector;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0r =3D 0;
+> > @@ -2085,7 +2137,7 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
+> > =C2=A0void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+> > =C2=A0{
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (kvm_xen_timer_enabl=
+ed(vcpu))
+>=20
+> IIUC, this can more precisely be:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_=
+expires)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
+>=20
+> at which point it might make sense to add a small helper
+>=20
+> =C2=A0 static void kvm_xen_cancel_timer(struct kvm_vcpu *vcpu)
+> =C2=A0 {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (vcpu->arch.xen.timer_=
+expires)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
+> =C2=A0 }
+>=20
+> to share code with=20
+>=20
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0kvm_xen_stop_timer(vcpu);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0hrtimer_cancel(&vcpu->arch.xen.timer);
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_deactivate(&vcp=
+u->arch.xen.runstate_cache);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_gpc_deactivate(&vcp=
+u->arch.xen.runstate2_cache);
+
+In fact if I make the helper return a bool, I think I can use it
+*three* times. At a cost of having a third function
+kvm_xen_cancel_timer() alongside the existing kvm_xen_start_timer() and
+kvm_xen_stop_timer(), and those *three* now make for a slightly
+confusing set. I'll take a look and see how it makes me feel.=20
+
+--=-+tdzy/ZsRFcuRbtmXrPN
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
 
-SGVsbG8sDQoNCkkgdGhpbmsgb25lIG9mIHRoZSB0ZXN0IGNvbmRpdGlvbnMgZm9yIHRoZSBLVk0g
-UE1VIHVuaXQgdGVzdCAiYmFzaWNfZXZlbnRfY291bnQiIGlzIG5vdCBzdHJvbmcgZW5vdWdoLiBJ
-dCBvbmx5IGNoZWNrcyB3aGV0aGVyIGFuIG92ZXJmbG93IG9jY3VycmVkIGZvciBjb3VudGVyICMw
-LCBidXQgaXQgc2hvdWxkIGFsc28gY2hlY2sgdGhhdCBub25lIGhhcHBlbmVkIGZvciB0aGUgb3Ro
-ZXIgY291bnRlcihzKToNCg0KcmVwb3J0KHJlYWRfc3lzcmVnKHBtb3ZzY2xyX2VsMCkgJiAweDEs
-DQrigILigILigILigILigILigIIiY2hlY2sgb3ZlcmZsb3cgaGFwcGVuZWQgb24gIzAgb25seSIp
-Ow0KDQpUaGlzIHNob3VsZCBiZSAiPT0iIGluc3RlYWQgb2YgIiYiLg0KDQpOb3RlIHRoYXQgdGhp
-cyB0ZXN0IHVzZXMgb25lIG1vcmUgY291bnRlciAoIzEpLCB3aGljaCBtdXN0IG5vdCBvdmVyZmxv
-dy4gVGhpcyBzaG91bGQgYWxzbyBiZSBjaGVja2VkLCBldmVuIHRob3VnaCB0aGlzIHdvdWxkIGJl
-IHZpc2libGUgdGhyb3VnaCB0aGUgInJlcG9ydF9pbmZvKCkiIGEgZmV3IGxpbmVzIGFib3ZlLiBC
-dXQgdGhlIGxhdHRlciBkb2VzIG5vdCBtYXJrIHRoZSB0ZXN0IGZhaWxpbmcgLSBpdCBpcyBwdXJl
-bHkgaW5mb3JtYXRpb25hbCwgc28gYW55IHRlc3QgYXV0b21hdGlvbiB3aWxsIG5vdCBub3RpY2Uu
-DQoNCg0KSSBhcG9sb2dpemUgaW4gYWR2YW5jZSBpZiBteSBlbWFpbCBwcm9ncmFtIGF0IHdvcmsg
-bWVzc2VzIHVwIGFueSBmb3JtYXR0aW5nLiBQbGVhc2UgbGV0IG1lIGtub3cgYW5kIEkgd2lsbCB0
-cnkgdG8gcmVjb25maWd1cmUgYW5kIHJlc2VuZCBpZiBuZWNlc3NhcnkuIFRoYW5rIHlvdS4NCg0K
-QmVzdCBSZWdhcmRzLA0KDQpNYXR0aGlhcw0KW0Jhbm5lcl08aHR0cDovL3d3dy5uaW8uaW8+DQpU
-aGlzIGVtYWlsIGFuZCBhbnkgZmlsZXMgdHJhbnNtaXR0ZWQgd2l0aCBpdCBhcmUgY29uZmlkZW50
-aWFsIGFuZCBpbnRlbmRlZCBzb2xlbHkgZm9yIHRoZSB1c2Ugb2YgdGhlIGluZGl2aWR1YWwgb3Ig
-ZW50aXR5IHRvIHdob20gdGhleSBhcmUgYWRkcmVzc2VkLiBZb3UgbWF5IE5PVCB1c2UsIGRpc2Ns
-b3NlLCBjb3B5IG9yIGRpc3NlbWluYXRlIHRoaXMgaW5mb3JtYXRpb24uIElmIHlvdSBoYXZlIHJl
-Y2VpdmVkIHRoaXMgZW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlciBhbmQg
-ZGVzdHJveSBhbGwgY29waWVzIG9mIHRoZSBvcmlnaW5hbCBtZXNzYWdlIGFuZCBhbGwgYXR0YWNo
-bWVudHMuIFBsZWFzZSBub3RlIHRoYXQgYW55IHZpZXdzIG9yIG9waW5pb25zIHByZXNlbnRlZCBp
-biB0aGlzIGVtYWlsIGFyZSBzb2xlbHkgdGhvc2Ugb2YgdGhlIGF1dGhvciBhbmQgZG8gbm90IG5l
-Y2Vzc2FyaWx5IHJlcHJlc2VudCB0aG9zZSBvZiB0aGUgY29tcGFueS4gRmluYWxseSwgdGhlIHJl
-Y2lwaWVudCBzaG91bGQgY2hlY2sgdGhpcyBlbWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGZvciB0
-aGUgcHJlc2VuY2Ugb2YgdmlydXNlcy4gVGhlIGNvbXBhbnkgYWNjZXB0cyBubyBsaWFiaWxpdHkg
-Zm9yIGFueSBkYW1hZ2UgY2F1c2VkIGJ5IGFueSB2aXJ1cyB0cmFuc21pdHRlZCBieSB0aGlzIGVt
-YWlsLg0K
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwOTI5MjEyNTE4WjAvBgkqhkiG9w0BCQQxIgQg3+bqqXx5
+SvfJt2V47/UtgTqjF4TOf7ViAl57O/hBMTIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAFF55rqEd//oiqAQS2yIQAPEAOf0ieBt7X
+yjQ1Alk7hpaGwc7V9RIRA7xxFF4ABc9sreLp7cyfEs3jV8MifBMZn+2ZgKjZI9Om5Ly2niFluE+3
+36TiEtVBEBxjiNcWBtDBiTVl8zVIEh8n8Ww+ppkmgJ6AdIFe4pc/+/kq6EJVpRCKs7ZediB+7ok9
+g/cE8WvCyQ1uLyHfYz+5+HbkYNNbulsIgSg0afmlai6KgPaySljH9AlX8h/BEMPRK97186gIJp4i
+VE3IGFgX4R8X8hxhsz5MzI1XdQj9W0JOH0BYlH2mmPoBuEev6ePOHqy3aSQUJFozhh7JQXW/+Nhj
+UA/dLuNmYojEuC55b4aCtpkWk3SA0PeVvRB06N1Zo1km80UdBdFxOf0ZfEg1ptpHxzb0W5sAOytB
+gekHL+YBevIFEAAQPPM80XgiaosRgvdzWGFv34R+fR8KgtvlOdxeqkK1n1MOkF4oB7I8XtyrJMNa
+h26jADgFGPqL/jEwo6JGpN2pAa7dhrjkY1hTtK++ag+9QLYXIwAr1cdlTb2SqqJkMvQ9bjAZ2E90
+OpU6vFqpByAB6PepJWStz6/D1Yl4fk0vtR+bE3Vhjw6oKxTBwzh7o88X96UbfXPh8SgvKs9P7C+2
+gef2WSjXCcB4ylg8+EZeIXn8k4PrNk5OV2iNv73f1QAAAAAAAA==
 
---_002_FRYP281MB31463EC1486883DDA477393DF2C0AFRYP281MB3146DEUP_
-Content-Type: text/x-patch;
-	name="0001-kvm-unit-test-pmu-Fix-test-condition.patch"
-Content-Description: 0001-kvm-unit-test-pmu-Fix-test-condition.patch
-Content-Disposition: attachment;
-	filename="0001-kvm-unit-test-pmu-Fix-test-condition.patch"; size=1171;
-	creation-date="Fri, 29 Sep 2023 21:15:01 GMT";
-	modification-date="Fri, 29 Sep 2023 21:15:01 GMT"
-Content-Transfer-Encoding: base64
 
-RnJvbSAwYTNjYTRjODg4MThlNzUyY2E2M2RlZTNkNTA5NDVhMjZhMTZkMjliIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXR0aGlhcyBSb3NlbmZlbGRlciA8bWF0dGhpYXMucm9zZW5m
-ZWxkZXJAbmlvLmlvPgpEYXRlOiBUdWUsIDI2IFNlcCAyMDIzIDE5OjA3OjE4ICswMjAwClN1Ympl
-Y3Q6IFtrdm0tdW5pdC10ZXN0cyBQQVRDSF0gYXJtOiBQTVU6IEZpeCB0ZXN0IGNvbmRpdGlvbgoK
-VGhlIHRlc3QgZGVzY3JpcHRpb24gc2F5czogImNoZWNrIG92ZXJmbG93IGhhcHBlbmVkIG9uICMw
-IG9ubHkiLApidXQgdGhlIHRlc3QgY29uZGl0aW9uIGFjdHVhbGx5IHRlc3RzOiAiY2hlY2sgb3Zl
-cmZsb3cgaGFwcGVuZWQKQVQgTEVBU1Qgb2YgIzAsIG1heWJlIG9mIHNvbWUgb3RoZXIgY291bnRl
-cnMgYXMgd2VsbC4iClRoaXMgYmFzaWNhbGx5IGRpc3JlZ2FyZHMgYW55IG92ZXJmbG93IG9mIG90
-aGVyIGNvdW50ZXJzLCBidXQgaXQKc2hvdWxkIGVuc3VyZSB0aGF0IHRoZXJlIGFyZSBub25lLgoK
-V2l0aCB0aGUgdXBkYXRlZCB0ZXN0IGNvbmRpdGlvbiB0aGUgdGVzdCB3aWxsIGZhaWwgaWYgdGhl
-cmUgd2FzIGFuCm92ZXJmbG93IG9mIGNvdW50ZXIgIzEsIHRvby4KClNpZ25lZC1vZmYtYnk6IE1h
-dHRoaWFzIFJvc2VuZmVsZGVyIDxtYXR0aGlhcy5yb3NlbmZlbGRlckBuaW8uaW8+Ci0tLQogYXJt
-L3BtdS5jIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9u
-KC0pCgpkaWZmIC0tZ2l0IGEvYXJtL3BtdS5jIGIvYXJtL3BtdS5jCmluZGV4IGIxNjRmMjEuLjE5
-NTZiNDIgMTAwNjQ0Ci0tLSBhL2FybS9wbXUuYworKysgYi9hcm0vcG11LmMKQEAgLTUzMiw3ICs1
-MzIsNyBAQCBzdGF0aWMgdm9pZCB0ZXN0X2Jhc2ljX2V2ZW50X2NvdW50KGJvb2wgb3ZlcmZsb3df
-YXRfNjRiaXRzKQogCQkgICAgcmVhZF9yZWduX2VsMChwbWV2Y250ciwgMSkpOwogCiAJcmVwb3J0
-X2luZm8oIm92ZXJmbG93IHJlZyA9IDB4JWx4IiwgcmVhZF9zeXNyZWcocG1vdnNjbHJfZWwwKSk7
-Ci0JcmVwb3J0KHJlYWRfc3lzcmVnKHBtb3ZzY2xyX2VsMCkgJiAweDEsCisJcmVwb3J0KHJlYWRf
-c3lzcmVnKHBtb3ZzY2xyX2VsMCkgPT0gMHgxLAogCQkiY2hlY2sgb3ZlcmZsb3cgaGFwcGVuZWQg
-b24gIzAgb25seSIpOwogfQogCi0tIAoyLjM0LjEKCg==
-
---_002_FRYP281MB31463EC1486883DDA477393DF2C0AFRYP281MB3146DEUP_--
+--=-+tdzy/ZsRFcuRbtmXrPN--
