@@ -2,125 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09A557B2DB1
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 10:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A6677B2EE3
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 11:08:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232838AbjI2IUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Sep 2023 04:20:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41092 "EHLO
+        id S232859AbjI2JIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Sep 2023 05:08:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232490AbjI2IUe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Sep 2023 04:20:34 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA2511AC;
-        Fri, 29 Sep 2023 01:20:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695975631; x=1727511631;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3Sbjr4bWWU8vPLpeQtrtcmY71cQMw2ZI0PYPYGnshE8=;
-  b=BgTuBBQ7ikRnMPf7yJ4997Xb0F+SNknoCqL6m2GOkmyH+MugKpahyNj0
-   VVLpBlm9NNA24gM99tJmcUFYfMe2/cCQCJk3Orz0dmOfCWtxHCbRi1FX1
-   I4IPBmZiU+3rmiAg2rBLSXRI8qNzZuCaTwpLdVXqF31c7oic8iXeGhhE9
-   Vl1TIcG/2pezD6Z9CGGTvEPzgVDjUMXu4R7dO5iqk/YeuwrkQwqfsYEgg
-   zoyEZ9aHR5PfMTedNFNXE2YydY173ygq7mIUZt8eIoKGdVVKsoqjN0Sv9
-   ai5cKLm7XoxTYghZdUcjvptR6G1C7cVS59nxkDS7+bI53rJ0GsO+x5ILI
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="379521645"
-X-IronPort-AV: E=Sophos;i="6.03,186,1694761200"; 
-   d="scan'208";a="379521645"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2023 00:30:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="840199144"
-X-IronPort-AV: E=Sophos;i="6.03,186,1694761200"; 
-   d="scan'208";a="840199144"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 29 Sep 2023 00:30:38 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qm7xM-0002aX-17;
-        Fri, 29 Sep 2023 07:30:36 +0000
-Date:   Fri, 29 Sep 2023 15:30:21 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 3/3] KVM: x86/mmu: always take tdp_mmu_pages_lock
-Message-ID: <202309291557.Eq3JDvT6-lkp@intel.com>
-References: <20230928162959.1514661-4-pbonzini@redhat.com>
+        with ESMTP id S232841AbjI2JIv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Sep 2023 05:08:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89E9A1AB
+        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 02:08:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1695978490;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a/1qYpfgB/Cr65fTbE/peTu216y26U+TzDcRaWm5JW8=;
+        b=gXnB88Q4RahPgEfzi9Ae/DUatC+nac5HmZj0hcIb5pnG29AH6BnR1uGfDEVgJRA6wha8Qo
+        +c8QhbcVp1YErmSdrxOnpKSHTYIU4G3SpscWaCi+7YuhIutlyLora/5OED+Nu1GDhzsbOS
+        k8JiW0HOntyE1ozUXsUJs/vm7UyqxXs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-f7TvbMDWMxSPff7skgH1QQ-1; Fri, 29 Sep 2023 05:08:06 -0400
+X-MC-Unique: f7TvbMDWMxSPff7skgH1QQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69881101A53B;
+        Fri, 29 Sep 2023 09:08:05 +0000 (UTC)
+Received: from [10.39.208.41] (unknown [10.39.208.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B84340C6EBF;
+        Fri, 29 Sep 2023 09:08:03 +0000 (UTC)
+Message-ID: <0af14066-6cc9-bfc6-2a4c-0503f9dd4a5c@redhat.com>
+Date:   Fri, 29 Sep 2023 11:08:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230928162959.1514661-4-pbonzini@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
+Content-Language: en-US
+To:     Cindy Lu <lulu@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, xieyongji@bytedance.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20230912030008.3599514-1-lulu@redhat.com>
+ <20230912030008.3599514-4-lulu@redhat.com>
+ <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
+ <CACLfguVRPV_8HOy3mQbKvpWRGpM_tnjmC=oQqrEbvEz6YkMi0w@mail.gmail.com>
+From:   Maxime Coquelin <maxime.coquelin@redhat.com>
+In-Reply-To: <CACLfguVRPV_8HOy3mQbKvpWRGpM_tnjmC=oQqrEbvEz6YkMi0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on linus/master v6.6-rc3 next-20230929]
-[cannot apply to mst-vhost/linux-next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Bonzini/KVM-x86-mmu-remove-unnecessary-bool-shared-argument-from-functions/20230929-003259
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20230928162959.1514661-4-pbonzini%40redhat.com
-patch subject: [PATCH 3/3] KVM: x86/mmu: always take tdp_mmu_pages_lock
-config: x86_64-buildonly-randconfig-004-20230929 (https://download.01.org/0day-ci/archive/20230929/202309291557.Eq3JDvT6-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230929/202309291557.Eq3JDvT6-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309291557.Eq3JDvT6-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> arch/x86/kvm/mmu/tdp_mmu.c:289: warning: Excess function parameter 'shared' description in 'tdp_mmu_unlink_sp'
 
 
-vim +289 arch/x86/kvm/mmu/tdp_mmu.c
+On 9/25/23 06:15, Cindy Lu wrote:
+> On Tue, Sep 12, 2023 at 3:39 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On Tue, Sep 12, 2023 at 11:00 AM Cindy Lu <lulu@redhat.com> wrote:
+>>>
+>>> In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
+>>> with reconnect info, After mapping the reconnect pages to userspace
+>>> The userspace App will update the reconnect_time in
+>>> struct vhost_reconnect_vring, If this is not 0 then it means this
+>>> vq is reconnected and will update the last_avail_idx
+>>>
+>>> Signed-off-by: Cindy Lu <lulu@redhat.com>
+>>> ---
+>>>   drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
+>>>   include/uapi/linux/vduse.h         |  6 ++++++
+>>>   2 files changed, 19 insertions(+)
+>>>
+>>> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
+>>> index 2c69f4004a6e..680b23dbdde2 100644
+>>> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+>>> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+>>> @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
+>>>                  struct vduse_vq_info vq_info;
+>>>                  struct vduse_virtqueue *vq;
+>>>                  u32 index;
+>>> +               struct vdpa_reconnect_info *area;
+>>> +               struct vhost_reconnect_vring *vq_reconnect;
+>>>
+>>>                  ret = -EFAULT;
+>>>                  if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
+>>> @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
+>>>
+>>>                  vq_info.ready = vq->ready;
+>>>
+>>> +               area = &vq->reconnect_info;
+>>> +
+>>> +               vq_reconnect = (struct vhost_reconnect_vring *)area->vaddr;
+>>> +               /*check if the vq is reconnect, if yes then update the last_avail_idx*/
+>>> +               if ((vq_reconnect->last_avail_idx !=
+>>> +                    vq_info.split.avail_index) &&
+>>> +                   (vq_reconnect->reconnect_time != 0)) {
+>>> +                       vq_info.split.avail_index =
+>>> +                               vq_reconnect->last_avail_idx;
+>>> +               }
+>>> +
+>>>                  ret = -EFAULT;
+>>>                  if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
+>>>                          break;
+>>> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+>>> index 11bd48c72c6c..d585425803fd 100644
+>>> --- a/include/uapi/linux/vduse.h
+>>> +++ b/include/uapi/linux/vduse.h
+>>> @@ -350,4 +350,10 @@ struct vduse_dev_response {
+>>>          };
+>>>   };
+>>>
+>>> +struct vhost_reconnect_vring {
+>>> +       __u16 reconnect_time;
+>>> +       __u16 last_avail_idx;
+>>> +       _Bool avail_wrap_counter;
+>>
+>> Please add a comment for each field.
+>>
+> Sure will do
+> 
+>> And I never saw _Bool is used in uapi before, maybe it's better to
+>> pack it with last_avail_idx into a __u32.
+>>
+> Thanks will fix this
+>> Btw, do we need to track inflight descriptors as well?
+>>
+> I will check this
 
-43a063cab325ee7 Yosry Ahmed         2022-08-23  278  
-a9442f594147f95 Ben Gardon          2021-02-02  279  /**
-c298a30c2821cb0 David Matlack       2022-01-19  280   * tdp_mmu_unlink_sp() - Remove a shadow page from the list of used pages
-a9442f594147f95 Ben Gardon          2021-02-02  281   *
-a9442f594147f95 Ben Gardon          2021-02-02  282   * @kvm: kvm instance
-a9442f594147f95 Ben Gardon          2021-02-02  283   * @sp: the page to be removed
-9a77daacc87dee9 Ben Gardon          2021-02-02  284   * @shared: This operation may not be running under the exclusive use of
-9a77daacc87dee9 Ben Gardon          2021-02-02  285   *	    the MMU lock and the operation must synchronize with other
-9a77daacc87dee9 Ben Gardon          2021-02-02  286   *	    threads that might be adding or removing pages.
-a9442f594147f95 Ben Gardon          2021-02-02  287   */
-44f1ce87ebc1ca1 Paolo Bonzini       2023-09-28  288  static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-a9442f594147f95 Ben Gardon          2021-02-02 @289  {
-44f1ce87ebc1ca1 Paolo Bonzini       2023-09-28  290  	lockdep_assert_held(&kvm->mmu_lock);
-44f1ce87ebc1ca1 Paolo Bonzini       2023-09-28  291  
-43a063cab325ee7 Yosry Ahmed         2022-08-23  292  	tdp_unaccount_mmu_page(kvm, sp);
-d25ceb9264364dc Sean Christopherson 2022-10-19  293  
-d25ceb9264364dc Sean Christopherson 2022-10-19  294  	if (!sp->nx_huge_page_disallowed)
-d25ceb9264364dc Sean Christopherson 2022-10-19  295  		return;
-d25ceb9264364dc Sean Christopherson 2022-10-19  296  
-9a77daacc87dee9 Ben Gardon          2021-02-02  297  	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-61f94478547bb4f Sean Christopherson 2022-10-19  298  	sp->nx_huge_page_disallowed = false;
-61f94478547bb4f Sean Christopherson 2022-10-19  299  	untrack_possible_nx_huge_page(kvm, sp);
-9a77daacc87dee9 Ben Gardon          2021-02-02  300  	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-a9442f594147f95 Ben Gardon          2021-02-02  301  }
-a9442f594147f95 Ben Gardon          2021-02-02  302  
+For existing networking implemenation, this is not necessary.
+But it should be for block devices.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Maxime
+
+> Thanks
+> 
+> cindy
+>> Thanks
+>>
+>>> +};
+>>> +
+>>>   #endif /* _UAPI_VDUSE_H_ */
+>>> --
+>>> 2.34.3
+>>>
+>>
+> 
+
