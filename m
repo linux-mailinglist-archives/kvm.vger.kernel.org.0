@@ -2,313 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0797A7B3677
-	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 17:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F03D97B368B
+	for <lists+kvm@lfdr.de>; Fri, 29 Sep 2023 17:20:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233517AbjI2PQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Sep 2023 11:16:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
+        id S233588AbjI2PU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Sep 2023 11:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbjI2PQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Sep 2023 11:16:23 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B2ED6
-        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 08:16:21 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-56c306471ccso13122291a12.3
-        for <kvm@vger.kernel.org>; Fri, 29 Sep 2023 08:16:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696000581; x=1696605381; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GpbTwXug+C5ZcOAyaCOQRA6rIp0O6yfKpgYXnFKXyl4=;
-        b=NGiYodD6WL/60ddOkemIJkODWE/FgvqX+qAwi/Fu3FmsG9OT+xzAMScFEMIIQFQxL4
-         G123in16KUfiUcQcMGhdmtMo6/JRcSZy2svN1OpppkeX1dqRCzhQTVDK0XoFwzMcmMVy
-         eOMOTvfXHjTmgyO7J5Adt+APi3c8+SpKFZFUuE1q6/F67IeJXaIZKcau+ti3E2JvJaay
-         qu+eecONURl7Q5aszM3sWFjEtqfbtUf2ovaAevavrqwnb4xLlRL9aO5UqBO4IBRp920O
-         u2n6HV1budmUaGGaP9cPXSOLYNrSXg8a4tKQxb+xoYu7FSMlt+S+k7IiP0nQowx+/uO4
-         aOlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696000581; x=1696605381;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GpbTwXug+C5ZcOAyaCOQRA6rIp0O6yfKpgYXnFKXyl4=;
-        b=PwENzLZoD7x9wR3gv8HaBBz2GFYRtqxxJJbs7HHmqC1FhLR4Tn6my1Hax30t/Scujd
-         3IKkPaHiJrfWcbLJWy+7+ep8Kwkn1GBwKoXa+S1XaJq6EE+wd3cZdpZKxkChR/wBS9cI
-         kY8avMvVMPNk4yMLp2Us85XSYynlv0QlJjfl+IvSV51sqvbA+IYhr2um6shD+XUCDdMN
-         nmxLzxZOZVae3gqbyVZy+CzvrBaVXIFEOv8iRGq9dqnoMR5eJ8XGyo42ssP3hCsFBzWC
-         vobxwhxMBZagFiqEgcpMYyuc4OWYfOH1G5EvB6wapDfJxEH6BXqTiW7fR5K8fYjSwGVM
-         4v1A==
-X-Gm-Message-State: AOJu0Yz/McrOXAWpZy4L1GKrbdRK8Zb8Az7smr9oflN+YE/ctjUYQOC4
-        HEZUwkQJxfQf4DGmB3d3HspNxE7o9CA=
-X-Google-Smtp-Source: AGHT+IGKQx3q812yLaAKd8tO7xYWmySUUuugEo2juRUdTZeXxIzvRvUGCDjefKBX27/fhApzLken+D1OUUs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c1:b0:1c6:1ad4:d1e6 with SMTP id
- u1-20020a17090341c100b001c61ad4d1e6mr72265ple.4.1696000581164; Fri, 29 Sep
- 2023 08:16:21 -0700 (PDT)
-Date:   Fri, 29 Sep 2023 08:16:19 -0700
-In-Reply-To: <a3989e7ff9cca77f680f9bdfbaee52b707693221.camel@infradead.org>
-Mime-Version: 1.0
-References: <a3989e7ff9cca77f680f9bdfbaee52b707693221.camel@infradead.org>
-Message-ID: <ZRbolEa6RI3IegyF@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Use fast path for Xen timer delivery
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+        with ESMTP id S233488AbjI2PUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Sep 2023 11:20:25 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E30BF;
+        Fri, 29 Sep 2023 08:20:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T9GKxQcD3ru7w7lu+4/CEv1khup779AF2cA6kjZA3KIfGnoH8Wx4Xe6WY+2uij8TUQXSQPEmOgZyvGP43/evm9BhA2jTFZWCJHof2IOqbQUcl86pBXmOj4zTUiYIhIxHF//fZaNsKfinbQ7hdMQcyDt1UuVPeBA/+C6RHftzvw5w2KxWoSyjLVGM5MOjJGgT13lqWQqfqvxlZuedF/xz97TAw3iRq+/EZuz+dHX4UDFEx/q9C4ebz2kPWAUuzULQPSHQsgoNjItGYy0c3a6tNu6U6cCkKOMw03J9DLCvo8cAFh4+mXRVqD4kjFMlN75dD4LEC51uIhB7rPx52ohaUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jgPGfeBA26AOK1p/cUqj6SE2f1ZpErc9+DbTahbj0d4=;
+ b=n9ihLJnpdxN1QKFA4yktVuHkmL7uN6YkJQp9LkBYhW8tekGkIt+ePzAC6ORm8pJRtDgUdYcydUivvv+jQOxPVMrAHFmSbEekkL7qejA0wUyqP0nM0vj9/S51ZbEtGmGg22qpkI3Ui7fiQblPeqj5Qap8KeeaVQE8m53j8hsmINBpdIjZmZfySIdNfK8tnFh9BSbfUnWoSvkFkzrCMnUKIr6es+0MeLNPahCGMi38Mt3SFTL9q6UkcHyFZpq3vvaFUE8BdDrwKoU84eqW2fuGeiLbqiEhHPsbHhufds42At8Ax5ufXIIazsHdbKGQQUBPeGQ/MklhTgiN3i4LhFA9oA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jgPGfeBA26AOK1p/cUqj6SE2f1ZpErc9+DbTahbj0d4=;
+ b=F1DuA4dTt98M3MI3CPUz+UFXNoxI2Jm5gU9WJf/kYrTOUOordNpW8pU3IJLmxSPZ4ZL83jyVnZxK1rx/6u2YRPsVO5tXUJFLQJljiC4Kn1CjTGhd6G3Epj9nYfoyrVxHtPg0XI/mxSxTa5sEl48tRZbw31StUvW8R9L11t0pkx0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB6588.namprd12.prod.outlook.com (2603:10b6:510:210::10)
+ by PH7PR12MB9104.namprd12.prod.outlook.com (2603:10b6:510:2f3::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.27; Fri, 29 Sep
+ 2023 15:20:20 +0000
+Received: from PH7PR12MB6588.namprd12.prod.outlook.com
+ ([fe80::a4ed:10a6:876a:10d7]) by PH7PR12MB6588.namprd12.prod.outlook.com
+ ([fe80::a4ed:10a6:876a:10d7%3]) with mapi id 15.20.6838.024; Fri, 29 Sep 2023
+ 15:20:19 +0000
+Message-ID: <957d37c8-c833-e1d3-2afb-45e5ef695b22@amd.com>
+Date:   Fri, 29 Sep 2023 20:50:07 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
+ event
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Dapeng Mi <dapeng1.mi@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        Ingo Molnar <mingo@kernel.org>,
+        Ravi Bangoria <ravi.bangoria@amd.com>,
+        Manali Shukla <manali.shukla@amd.com>
+References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
+ <20230927033124.1226509-8-dapeng1.mi@linux.intel.com>
+ <20230927113312.GD21810@noisy.programming.kicks-ass.net>
+ <ZRRl6y1GL-7RM63x@google.com>
+ <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From:   Ravi Bangoria <ravi.bangoria@amd.com>
+In-Reply-To: <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0209.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e9::20) To PH7PR12MB6588.namprd12.prod.outlook.com
+ (2603:10b6:510:210::10)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6588:EE_|PH7PR12MB9104:EE_
+X-MS-Office365-Filtering-Correlation-Id: b49d64bb-8b3a-4867-7ef1-08dbc0ff9786
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JDap6XSMPVq4YXDZT6n7kXqOHUQwZoAdgHhSfJVub8h7dZAWqze2YUusqxWQ7D43jK/VeDbFeu29NYiy+zzOoLgSHvU7YagRj3BI179hdkZ0qolLd5whZJoebqp1tZujpWO0f+SB4+dNNhBkHUy96+SKOl8pCh63xb4PEvHnYNHxMqx98HLMhSF3o9OQR+orR54XPQRLRCp47mw0n0rQm3Y2Da2EyrDT/wzb3xsIWbUX2ZcjvnXNmyZh3xRv58Q8/wCfpiaAzfZH1xnaRMgzrHIkApp2qOhvqwel6YwliqvB1NLPI/YeHfUrHQhlE88VOcUrtcNhMFEHgiz5wIq6kJf78Z6JEeppHK/c7eJCivmrYPfNH+HHjEyb8088PJLqtrukeGt4Ay9hzjMQlO8AGgiLbwUQtXazoPcHBRyyUfXA2dKdzY2DNmSzwwzhfASaH7UN8r6v3aVHTIb6b6UI9q4uO6wwClH/bd3wx7qWokdv1j7HWRRekJRe50lN309VQo/HO5rMIg1HZOGNnVYrFC/BHu3ADsIgLkaIqh3EETWv/Bgpb8Jhhv07U8AyYxsegmsO8PJ2B8G2J+kSrjrqIW9I49NxRtHld8TBIhCBdVQzIN1P1iOknp6dt8ZBgwTxTpSgHg/QU2FNFlqfmg7HJQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6588.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(396003)(39860400002)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(31686004)(66899024)(83380400001)(38100700002)(4326008)(54906003)(7416002)(86362001)(31696002)(36756003)(966005)(478600001)(66556008)(66476007)(110136005)(66946007)(44832011)(5660300002)(41300700001)(8676002)(8936002)(2906002)(53546011)(26005)(2616005)(6486002)(316002)(6506007)(6512007)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NWVGcVhXYXZUR01CTk9yVzRuMU03Y2s1RWtVQzg2ek5IVnV2MG1jT3QzSU9Q?=
+ =?utf-8?B?QkFrUDRJWVVrWW1jRWVTRVcySUZWRXk3M0M1SG5EMzhOTE52NGVESW1mM0ha?=
+ =?utf-8?B?TWg3RUVrYWFKUXJEa0xtb1NlU01nbC96SnNWVmJKVVFCS3V2VzZWcWM1L3pX?=
+ =?utf-8?B?UGN2TkZudWVqelB5SmlvY252OWZiME4rQjB0bFdEY0g2SDNxRGtPTUxSQWto?=
+ =?utf-8?B?TDdMd01xcC9tVzg3RERidUdnMm1laExpMmVBWVFkSFNDdUgzbUlBQmdCSFFJ?=
+ =?utf-8?B?NnZqUHBXTTltZmhZb3ZpMzM2ZWdrazZtZFZDTEZxcWpsMFJXampXVWl4aUdW?=
+ =?utf-8?B?d3RtN29tQ1pSVnRYbzZmbUNlTG9kbjJlOU1QYVhuTm5tLzJRWEZMTGxNQ002?=
+ =?utf-8?B?UDdraS9RRndvOEkyT0FzV0kxNHpYOWZqZjEyZmN5RS81eFY5L0RTRkdRdjhk?=
+ =?utf-8?B?bUJnaUlUNE1ZMEdUVjhXK3c5TjVaYzVNcmtCdHFzQ3cvTFdXaUwwbktoSTBu?=
+ =?utf-8?B?UnJzSXVNazFGdnpobUZXdGQ2ZGl6bTZYdzhpcXorS3gzTlR0L2pWUWNEaCt5?=
+ =?utf-8?B?LzRZWngvUTVNdit4VHBYcDZ0N292VjVyTTh6N0dKZXc4ZWdHVXZ1cnczMkhl?=
+ =?utf-8?B?dTZBaEkyZHhRZGtueDdhRy9DVC9hZi9POXpVQ0FoVHNmbHc5cTMvK2RGZ0tm?=
+ =?utf-8?B?Q2dCYUQ2dmZkdVFTSEJFclpkNkdEb08rcGZoRXFRSlhqZVlqSE8zaW5MRzlP?=
+ =?utf-8?B?RkxHSHRSZkM4TFRMUUMyUmx1azVRNzk5TUZ2OTF1Nk96aUVnNkJUdDh0bmhy?=
+ =?utf-8?B?Y2t1TVVwQjNFZktJK0QrWUluU3pyMEl2TlVsOW9rNkErRHVMWUMxUlByL0RW?=
+ =?utf-8?B?QVFZdVFZY2NQSG5FVmE5STA3Wi9kMkZWbFBLTU51T2xmZlNzMXNnczZOOEUx?=
+ =?utf-8?B?UVczOW10WVR2N1JUZmRReXNSNVB0K0pycmoyd3lSRGEvUUFCNTMzemFnSm9q?=
+ =?utf-8?B?SkdGSmVvdGJXZGpSTWZtdUhNNWxBcVFLV1laZklyZ2NNRWhsVE9tT0RCR1Rt?=
+ =?utf-8?B?T2pIL0Qwa2RweVBscjB5OXJuRXNjaUVwYTRtd1F5VXdXaUc5WHNUNVVKeHRW?=
+ =?utf-8?B?YTVQL3dDL1hRZHJueGIwTUpLKzl6Q1I5Tjl2cHN1UnpHbmkxMEpQOFNqdUZS?=
+ =?utf-8?B?RG9KN2p1V2R5c3lDZ0pYZ09nNUtkZDhNazlyZlZTNU15cDVPWmNFMlo0ZFky?=
+ =?utf-8?B?WUxpTVFXU1p2dzVxQ3V3c3hXTVlTV2QzbExnT0I2MXFJYWw3b0NJdk9Ed29F?=
+ =?utf-8?B?NWdMY21FNUxPYU1tcmM5c2JxQ0N5M2NKS0Zzbm9Lc1l6Y0FGb0t3RWpRQ2ZZ?=
+ =?utf-8?B?WHhHenhpRy9mZzRtWFNxVGRhd3FjNlV4RUFIa1VnY3lZeFk1eTlMeWZvc0lE?=
+ =?utf-8?B?ZWtvZTJreXgwK1ZTMDg4YmI0TEx5eFY1WU5RTHNXd096ZnArZzVRbXFsVy8z?=
+ =?utf-8?B?blRYUDFJeHYrWHFRVWpYZmo4bXlsRHFCeHNoZGNpdUphN3FleXV6c0h6OTJu?=
+ =?utf-8?B?UHhQQU5nMEluZFVLdUsrK1M5RGE0NG92RlpqenNkODVVNjlHbUVsNVZmN2Vz?=
+ =?utf-8?B?ZkpjOGdDWENld1pzTThJY1lORmlhUjN5ckRZVXh4ZUdFZG82N2NCVzZkQWZJ?=
+ =?utf-8?B?bDNCTkZraC9vY1ZXeGhubkxBMXJneWRyNEdTd0xIaDlrRW5GTWNlVlBsVzNH?=
+ =?utf-8?B?aFIyZkw5cHVGcDU2ZUFqL3pXdkFHVHdSWGZ1cE9Cc0R5bFczR1FTbWdreTZY?=
+ =?utf-8?B?MjFOSmYyMWlQWE9rMFB3WnhCUnplcWJRUC9aWjdqdlB1UDBycWJRS201cEJE?=
+ =?utf-8?B?K2RJNFRkTjROM01KMVRvTkc3Tkd1cGlOcnpUZ1lvL0o1QWdmV3VMcHFNSlVz?=
+ =?utf-8?B?QnpyQU1ZUm42NWhXcnM2M3J2OXBLWUI5aFg5VTAwUnZFMXJjU0lRbmxkSDBG?=
+ =?utf-8?B?aXBZVGFNZmRINnA5L1R6QTBnanpmbHc2T2VCY0Y5d2wzWUtTSGQ0ZjZ3bkhk?=
+ =?utf-8?B?T2FJcHVESW9HNmtRcThPb29tOGR0aFFINWl6aTJRdTNMUnI5dW54OVhNbUxl?=
+ =?utf-8?Q?1Ww9Xy3/B+XUz5biRdNOKYQD5?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b49d64bb-8b3a-4867-7ef1-08dbc0ff9786
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6588.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2023 15:20:19.8158
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: awIQZK6hHMZx6o4IuGy8LDi4myTffgAEYx/QYXTHw6DOGseWKKeGJKDIAU2JygrmOqoWw4sSM/4QPf9EOvPLzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9104
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 29, 2023, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
->=20
-> Most of the time there's no need to kick the vCPU and deliver the timer
-> event through kvm_xen_inject_timer_irqs(). Use kvm_xen_set_evtchn_fast()
-> directly from the timer callback, and only fall back to the slow path
-> when it's necessary to do so.
+On 29-Sep-23 5:23 PM, Peter Zijlstra wrote:
+> On Wed, Sep 27, 2023 at 10:27:07AM -0700, Sean Christopherson wrote:
+> 
+>> I don't think it does work, at least not without a very, very carefully crafted
+>> setup and a host userspace that knows it must not use certain aspects of perf.
+>> E.g. for PEBS, if the guest virtual counters don't map 1:1 to the "real" counters
+>> in hardware, KVM+perf simply disables the counter.
+> 
+> I have distinct memories of there being patches to rewrite the PEBS
+> buffer, but I really can't remember what we ended up doing. Like I said,
+> I can't operate KVM in any meaningful way -- it's a monster :-(
+> 
+>> And for top-down slots, getting anything remotely accurate requires pinning vCPUs
+>> 1:1 with pCPUs and enumerating an accurate toplogy to the guest:
+>>
+>>   The count is distributed among unhalted logical processors (hyper-threads) who
+>>   share the same physical core, in processors that support Intel Hyper-Threading
+>>   Technology.
+> 
+> So IIRC slots is per logical CPU, it counts the actual pipeline stages
+> going towards that logical CPU, this is required to make it work on SMT
+> at all -- even for native.
+> 
+> But it's been a long while since that was explained -- and because it
+> was a call, I can't very well read it back, god how I hate calls :-(
+> 
+>> Jumping the gun a bit (we're in the *super* early stages of scraping together a
+>> rough PoC), but I think we should effectively put KVM's current vPMU support into
+>> maintenance-only mode, i.e. stop adding new features unless they are *very* simple
+>> to enable, and instead pursue an implementation that (a) lets userspace (and/or
+>> the kernel builder) completely disable host perf (or possibly just host perf usage
+>> of the hardware PMU) and (b) let KVM passthrough the entire hardware PMU when it
+>> has been turned off in the host.
+> 
+> I don't think you need to go that far, host can use PMU just fine as
+> long as it doesn't overlap with a vCPU. Basically, if you force
+> perf_attr::exclude_guest on everything your vCPU can haz the full thing.
+> 
+>> Hardware vendors are pushing us in the direction whether we like it or not, e.g.
+>> SNP and TDX want to disallow profiling the guest from the host, 
+> 
+> Yeah, sekjoerity model etc.. bah.
+> 
+>> ARM has an upcoming PMU model where (IIUC) it can't be virtualized
+>> without a passthrough approach,
+> 
+> :-(
+> 
+>> Intel's hybrid CPUs are a complete trainwreck unless vCPUs are pinned,
+> 
+> Anybodies hybrid things are a clusterfuck, hybrid vs virt doesn't work
+> sanely on ARM either AFAIU.
+> 
+> I intensely dislike hybrid (and virt ofc), but alas we get to live with
+> that mess :/ And it's only going to get worse I fear..
+> 
+> At least (for now) AMD hybrid is committed to identical ISA, including
+> PMUs with their Zen4+Zen4c things. We'll have to wait and see how
+> that'll end up.
+> 
+>> and virtualizing things like top-down slots, PEBS, and LBRs in the shared model
+>> requires an absurd amount of complexity throughout the kernel and userspace.
+> 
+> I'm not sure about top-down, the other two, for sure.
+> 
+> My main beef with top-down is the ludicrously bad hardware interface we
+> have on big cores, I like the atom interface a *ton* better.
+> 
+>> Note, a similar idea was floated and rejected in the past[*], but that failed
+>> proposal tried to retain host perf+PMU functionality by making the behavior dynamic,
+>> which I agree would create an awful ABI for the host.  If we make the "knob" a
+>> Kconfig 
+> 
+> Must not be Kconfig, distros would have no sane choice.
+> 
+>> or kernel param, i.e. require the platform owner to opt-out of using perf
+>> no later than at boot time, then I think we can provide a sane ABI, keep the
+>> implementation simple, all without breaking existing users that utilize perf in
+>> the host to profile guests.
+> 
+> It's a shit choice to have to make. At the same time I'm not sure I have
+> a better proposal.
 
-It'd be helpful for non-Xen folks to explain "when it's necessary".  IIUC, =
-the
-only time it's necessary is if the gfn=3D>pfn cache isn't valid/fresh.
+How about keying off based on PMU specific KVM module parameter? Something
+like what Manali has proposed for AMD VIBS? Please see solution 1.1:
 
-> This gives a significant improvement in timer latency testing (using
-> nanosleep() for various periods and then measuring the actual time
-> elapsed).
->=20
-> However, there was a reason=C2=B9 the fast path was dropped when this sup=
-port
+https://lore.kernel.org/r/3a6c693e-1ef4-6542-bc90-d4468773b97d@amd.com
 
-Heh, please use [1] or [*] like everyone else.  I can barely see that tiny =
-little =C2=B9.
+> It does mean a host cannot profile one guest and have pass-through on the
+> other. Eg. have a development and production guest on the same box. This
+> is pretty crap.
+> 
+> Making it a guest-boot-option would allow that, but then the host gets
+> complicated again. I think I can make it trivially work for per-task
+> events, simply error the creation of events without exclude_guest for
+> affected vCPU tasks. But the CPU events are tricky.
+> 
+> 
+> I will firmly reject anything that takes the PMU away from the host
+> entirely through.
+> 
+> Also, NMI watchdog needs a solution.. Ideally hardware grows a second
+> per-CPU timer we can program to NMI.
 
-> was first added. The current code holds vcpu->mutex for all operations on
-> the kvm->arch.timer_expires field, and the fast path introduces potential
-> race conditions. So... ensure the hrtimer is *cancelled* before making
-> changes in kvm_xen_start_timer(), and also when reading the values out
-> for KVM_XEN_VCPU_ATTR_TYPE_TIMER.
->=20
-> Add some sanity checks to ensure the truth of the claim that all the
-> other code paths are run with the vcpu loaded.  And use hrtimer_cancel()
-> directly from kvm_xen_destroy_vcpu() to avoid a false positive from the
-> check in kvm_xen_stop_timer().
-
-This should really be at least 2 patches, probably 3:
-
-  1. add the assertions and the destroy_vcpu() change
-  2. cancel the timer before starting a new one or reading the value from u=
-serspace
-  3. use the fastpath delivery from the timer callback
-
-> =C2=B9 https://lore.kernel.org/kvm/846caa99-2e42-4443-1070-84e49d2f11d2@r=
-edhat.com/
->=20
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->=20
->  =E2=80=A2 v2: Remember, and deal with, those races.
->=20
->  arch/x86/kvm/xen.c | 64 +++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 58 insertions(+), 6 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index fb1110b2385a..9d0d602a2466 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -117,6 +117,8 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, =
-gfn_t gfn)
-> =20
->  void kvm_xen_inject_timer_irqs(struct kvm_vcpu *vcpu)
->  {
-> +	WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu());
-> +
->  	if (atomic_read(&vcpu->arch.xen.timer_pending) > 0) {
->  		struct kvm_xen_evtchn e;
-> =20
-> @@ -136,18 +138,41 @@ static enum hrtimer_restart xen_timer_callback(stru=
-ct hrtimer *timer)
->  {
->  	struct kvm_vcpu *vcpu =3D container_of(timer, struct kvm_vcpu,
->  					     arch.xen.timer);
-> +	struct kvm_xen_evtchn e;
-> +	int rc;
-> +
->  	if (atomic_read(&vcpu->arch.xen.timer_pending))
->  		return HRTIMER_NORESTART;
-> =20
-> -	atomic_inc(&vcpu->arch.xen.timer_pending);
-> -	kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
-> -	kvm_vcpu_kick(vcpu);
-> +	e.vcpu_id =3D vcpu->vcpu_id;
-> +	e.vcpu_idx =3D vcpu->vcpu_idx;
-> +	e.port =3D vcpu->arch.xen.timer_virq;
-> +	e.priority =3D KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
-> +
-> +	rc =3D kvm_xen_set_evtchn_fast(&e, vcpu->kvm);
-> +	if (rc =3D=3D -EWOULDBLOCK) {
-> +		atomic_inc(&vcpu->arch.xen.timer_pending);
-> +		kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
-> +		kvm_vcpu_kick(vcpu);
-> +	} else {
-> +		vcpu->arch.xen.timer_expires =3D 0;
-
-Eww.  IIUC, timer_expires isn't cleared so that the pending IRQ is captured=
- by
-kvm_xen_vcpu_get_attr(), i.e. because xen.timer_pending itself isn't migrat=
-ed.
-
-> +	}
-> =20
->  	return HRTIMER_NORESTART;
->  }
-> =20
->  static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs, s6=
-4 delta_ns)
->  {
-> +	WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu());
-> +
-> +	/*
-> +	 * Avoid races with the old timer firing. Checking timer_expires
-> +	 * to avoid calling hrtimer_cancel() will only have false positives
-> +	 * so is fine.
-> +	 */
-> +	if (vcpu->arch.xen.timer_expires)
-> +		hrtimer_cancel(&vcpu->arch.xen.timer);
-> +
->  	atomic_set(&vcpu->arch.xen.timer_pending, 0);
->  	vcpu->arch.xen.timer_expires =3D guest_abs;
-> =20
-> @@ -163,6 +188,8 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu=
-, u64 guest_abs, s64 delta_
-> =20
->  static void kvm_xen_stop_timer(struct kvm_vcpu *vcpu)
->  {
-> +	WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu());
-> +
->  	hrtimer_cancel(&vcpu->arch.xen.timer);
->  	vcpu->arch.xen.timer_expires =3D 0;
->  	atomic_set(&vcpu->arch.xen.timer_pending, 0);
-> @@ -1019,13 +1046,38 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, =
-struct kvm_xen_vcpu_attr *data)
->  		r =3D 0;
->  		break;
-> =20
-> -	case KVM_XEN_VCPU_ATTR_TYPE_TIMER:
-> +	case KVM_XEN_VCPU_ATTR_TYPE_TIMER: {
-> +		bool pending =3D false;
-> +
-> +		/*
-> +		 * Ensure a consistent snapshot of state is captures, with a
-
-s/captures/captured
-
-> +		 * timer either being pending, or fully delivered. Not still
-
-Kind of a nit, but IMO "fully delivered" isn't accurate, at least not witho=
-ut
-more clarification.  I would considered "fully delivered" to mean that the =
-IRQ
-has caused the guest to start executing its IRQ handler.  Maybe "fully queu=
-ed in
-the event channel"?
-
-> +		 * lurking in the timer_pending flag for deferred delivery.
-> +		 */
-> +		if (vcpu->arch.xen.timer_expires) {
-> +			pending =3D hrtimer_cancel(&vcpu->arch.xen.timer);
-> +			kvm_xen_inject_timer_irqs(vcpu);
-
-If the goal is to not have pending timers, then kvm_xen_inject_timer_irqs()
-should be called unconditionally after canceling the hrtimer, no?
-
-> +		}
-> +
->  		data->u.timer.port =3D vcpu->arch.xen.timer_virq;
->  		data->u.timer.priority =3D KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL;
->  		data->u.timer.expires_ns =3D vcpu->arch.xen.timer_expires;
-> +
-> +		/*
-> +		 * The timer may be delivered immediately, while the returned
-> +		 * state causes it to be set up and delivered again on the
-
-Similar to the "fully delivered" stuff above, maybe s/timer/hrtimer to make=
- it
-a bit more clear that the host hrtimer can fire twice, but it won't ever re=
-sult
-in two timer IRQs being delivered from the guest's perspective.
-
-> +		 * destination system after migration. That's fine, as the
-> +		 * guest will not even have had a chance to run and process
-> +		 * the interrupt by that point, so it won't even notice the
-> +		 * duplicate IRQ.
-
-Rather than say "so it won't even notice the duplicate IRQ", maybe be more =
-explicit
-and say "so the queued IRQ is guaranteed to be coalesced in the event chann=
-el
-and/or guest local APIC".  Because I read the whole "delivered IRQ" stuff a=
-s there
-really being two injected IRQs into the guest.
-
-FWIW, this is all really gross, but I agree that even if the queued IRQ mak=
-es it
-all the way to the guest's APIC, the IRQs will still be coalesced in the en=
-d.
-
-
-> +		 */
-> +		if (pending)
-> +			hrtimer_start_expires(&vcpu->arch.xen.timer,
-> +					      HRTIMER_MODE_ABS_HARD);
-> +
->  		r =3D 0;
->  		break;
-> -
-> +	}
->  	case KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR:
->  		data->u.vector =3D vcpu->arch.xen.upcall_vector;
->  		r =3D 0;
-> @@ -2085,7 +2137,7 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
->  void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	if (kvm_xen_timer_enabled(vcpu))
-
-IIUC, this can more precisely be:
-
-	if (vcpu->arch.xen.timer_expires)
-		hrtimer_cancel(&vcpu->arch.xen.timer);
-
-at which point it might make sense to add a small helper
-
-  static void kvm_xen_cancel_timer(struct kvm_vcpu *vcpu)
-  {
-	if (vcpu->arch.xen.timer_expires)
-		hrtimer_cancel(&vcpu->arch.xen.timer);
-  }
-
-to share code with=20
-
-> -		kvm_xen_stop_timer(vcpu);
-> +		hrtimer_cancel(&vcpu->arch.xen.timer);
-> =20
->  	kvm_gpc_deactivate(&vcpu->arch.xen.runstate_cache);
->  	kvm_gpc_deactivate(&vcpu->arch.xen.runstate2_cache);
-> --=20
-> 2.40.1
->=20
->=20
-
-
+Thanks,
+Ravi
