@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADC277B43BB
-	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 23:10:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14C037B43CF
+	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 23:10:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234049AbjI3VKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Sep 2023 17:10:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52076 "EHLO
+        id S234191AbjI3VKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Sep 2023 17:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233956AbjI3VKf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Sep 2023 17:10:35 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECCF0E6;
-        Sat, 30 Sep 2023 14:10:31 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 2AD8A120008;
+        with ESMTP id S234053AbjI3VKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Sep 2023 17:10:39 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E49CDFD;
+        Sat, 30 Sep 2023 14:10:36 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 72AC6100011;
         Sun,  1 Oct 2023 00:10:30 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 2AD8A120008
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 72AC6100011
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
         s=mail; t=1696108230;
-        bh=fEJQti7ceoE6AyBEhx+DKLgL95M2rOp2QmrRdlL9YHI=;
+        bh=CktksrXKWHAUK0ss1s0u5ALV+yrBkLy7yfkxRxJlaTM=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=iw+5ABCRQUf2C0CsGwjO356cs/40j/4RF4HNTe1VYGPR4yqU9XjeRgIE+Lisylce4
-         20PR48IHalSe4J14e7CbR0C2VQYdiGCoL9ASCQ09uUoyW3GRkKxmm3yLtHa9acjmIo
-         Oq16rhaIomA3V9gwlkdK1j65+KPRVMRenN4AfWrGs7Jj0v+b3luzDwjVvMH0o+UTBZ
-         s6l2csM1dkiWfL+hIX8Rkugt/SH6Z5srgORmAT6GA1zLdgH17AQoQfym7Fwbldj/gG
-         fMMNHpiJd0kM+O6mPwbbRc+7GRriH8Km7sOXV6dx/XXoACb6aQUZRnLAhWPrrdqQWo
-         6tiXIoYJrZPHA==
+        b=q3aq9F1N5o5hEe0BWwSDEWZL15KFYpPzqE1R2WbMGJ9Q/mgXGnwiP/qcrWCy83aV/
+         dskCHdUjlMWcYy0sa8nilRs/R6SdIt+IsW45E8ngsaEzM8fqwq0PeegXroJ4Xwp6OG
+         zjC1bMAx2XRUHV5hZBm0P/ND4NKtQ2tURxRO7vvJ4IzK3768clQPSHGs32zHclDKBE
+         Su/Tp+1x9Dy/8KVnuPw+mHIUSw/B/seWsuyfj5+kjFDnK2HH28KapJ6V+sYc5jrvG9
+         YIGcfB8tu4bnfeUrJdeXg1pTtDvjxlgb5cJcGgpsktNulrYhoJmh5hjp1vu4/LSbso
+         urfKXUICk7hOg==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Sun,  1 Oct 2023 00:10:29 +0300 (MSK)
+        Sun,  1 Oct 2023 00:10:30 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -51,9 +51,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v2 11/12] test/vsock: MSG_ZEROCOPY support for vsock_perf
-Date:   Sun, 1 Oct 2023 00:03:07 +0300
-Message-ID: <20230930210308.2394919-12-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v2 12/12] test/vsock: io_uring rx/tx tests
+Date:   Sun, 1 Oct 2023 00:03:08 +0300
+Message-ID: <20230930210308.2394919-13-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
 References: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
@@ -72,7 +72,7 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiPhishing: Clean
@@ -88,248 +88,372 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To use this option pass '--zc' parameter:
-
-./vsock_perf --zc --sender <cid> --port <port> --bytes <bytes to send>
-
-With this option MSG_ZEROCOPY flag will be passed to the 'send()' call.
+This adds set of tests which use io_uring for rx/tx. This test suite is
+implemented as separated util like 'vsock_test' and has the same set of
+input arguments as 'vsock_test'. These tests only cover cases of data
+transmission (no connect/bind/accept etc).
 
 Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 ---
- tools/testing/vsock/vsock_perf.c | 143 +++++++++++++++++++++++++++++--
- 1 file changed, 134 insertions(+), 9 deletions(-)
+ Changelog:
+ v1 -> v2:
+  * Add 'LDLIBS = -luring' to the target 'vsock_uring_test'.
+  * Add 'vsock_uring_test' to the target 'test'.
 
-diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
-index a72520338f84..f0f183f3f9e8 100644
---- a/tools/testing/vsock/vsock_perf.c
-+++ b/tools/testing/vsock/vsock_perf.c
-@@ -18,6 +18,8 @@
- #include <poll.h>
- #include <sys/socket.h>
- #include <linux/vm_sockets.h>
+ tools/testing/vsock/Makefile           |   7 +-
+ tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
+ 2 files changed, 326 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/vsock/vsock_uring_test.c
+
+diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
+index 1a26f60a596c..b80e7c7def1e 100644
+--- a/tools/testing/vsock/Makefile
++++ b/tools/testing/vsock/Makefile
+@@ -1,12 +1,15 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ all: test vsock_perf
+-test: vsock_test vsock_diag_test
++test: vsock_test vsock_diag_test vsock_uring_test
+ vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+ vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+ vsock_perf: vsock_perf.o
+ 
++vsock_uring_test: LDLIBS = -luring
++vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
++
+ CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
+ .PHONY: all test clean
+ clean:
+-	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf
++	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf vsock_uring_test
+ -include *.d
+diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
+new file mode 100644
+index 000000000000..725895350697
+--- /dev/null
++++ b/tools/testing/vsock/vsock_uring_test.c
+@@ -0,0 +1,321 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* io_uring tests for vsock
++ *
++ * Copyright (C) 2023 SberDevices.
++ *
++ * Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
++ */
++
++#include <getopt.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <liburing.h>
++#include <unistd.h>
 +#include <sys/mman.h>
-+#include <linux/errqueue.h>
- 
- #define DEFAULT_BUF_SIZE_BYTES	(128 * 1024)
- #define DEFAULT_TO_SEND_BYTES	(64 * 1024)
-@@ -28,9 +30,18 @@
- #define BYTES_PER_GB		(1024 * 1024 * 1024ULL)
- #define NSEC_PER_SEC		(1000000000ULL)
- 
-+#ifndef SOL_VSOCK
-+#define SOL_VSOCK	287
-+#endif
++#include <linux/kernel.h>
++#include <error.h>
 +
-+#ifndef VSOCK_RECVERR
-+#define VSOCK_RECVERR	1
-+#endif
++#include "util.h"
++#include "control.h"
 +
- static unsigned int port = DEFAULT_PORT;
- static unsigned long buf_size_bytes = DEFAULT_BUF_SIZE_BYTES;
- static unsigned long vsock_buf_bytes = DEFAULT_VSOCK_BUF_BYTES;
-+static bool zerocopy;
- 
- static void error(const char *s)
- {
-@@ -247,15 +258,76 @@ static void run_receiver(unsigned long rcvlowat_bytes)
- 	close(fd);
- }
- 
-+static void recv_completion(int fd)
-+{
-+	struct sock_extended_err *serr;
-+	char cmsg_data[128];
-+	struct cmsghdr *cm;
-+	struct msghdr msg = { 0 };
-+	ssize_t ret;
++#define PAGE_SIZE		4096
++#define RING_ENTRIES_NUM	4
 +
-+	msg.msg_control = cmsg_data;
-+	msg.msg_controllen = sizeof(cmsg_data);
-+
-+	ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
-+	if (ret) {
-+		fprintf(stderr, "recvmsg: failed to read err: %zi\n", ret);
-+		return;
-+	}
-+
-+	cm = CMSG_FIRSTHDR(&msg);
-+	if (!cm) {
-+		fprintf(stderr, "cmsg: no cmsg\n");
-+		return;
-+	}
-+
-+	if (cm->cmsg_level != SOL_VSOCK) {
-+		fprintf(stderr, "cmsg: unexpected 'cmsg_level'\n");
-+		return;
-+	}
-+
-+	if (cm->cmsg_type != VSOCK_RECVERR) {
-+		fprintf(stderr, "cmsg: unexpected 'cmsg_type'\n");
-+		return;
-+	}
-+
-+	serr = (void *)CMSG_DATA(cm);
-+	if (serr->ee_origin != SO_EE_ORIGIN_ZEROCOPY) {
-+		fprintf(stderr, "serr: wrong origin\n");
-+		return;
-+	}
-+
-+	if (serr->ee_errno) {
-+		fprintf(stderr, "serr: wrong error code\n");
-+		return;
-+	}
-+
-+	if (zerocopy && (serr->ee_code & SO_EE_CODE_ZEROCOPY_COPIED))
-+		fprintf(stderr, "warning: copy instead of zerocopy\n");
-+}
-+
-+static void enable_so_zerocopy(int fd)
-+{
-+	int val = 1;
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_ZEROCOPY, &val, sizeof(val)))
-+		error("setsockopt(SO_ZEROCOPY)");
-+}
-+
- static void run_sender(int peer_cid, unsigned long to_send_bytes)
- {
- 	time_t tx_begin_ns;
- 	time_t tx_total_ns;
- 	size_t total_send;
-+	time_t time_in_send;
- 	void *data;
- 	int fd;
- 
--	printf("Run as sender\n");
-+	if (zerocopy)
-+		printf("Run as sender MSG_ZEROCOPY\n");
-+	else
-+		printf("Run as sender\n");
-+
- 	printf("Connect to %i:%u\n", peer_cid, port);
- 	printf("Send %lu bytes\n", to_send_bytes);
- 	printf("TX buffer %lu bytes\n", buf_size_bytes);
-@@ -265,38 +337,82 @@ static void run_sender(int peer_cid, unsigned long to_send_bytes)
- 	if (fd < 0)
- 		exit(EXIT_FAILURE);
- 
--	data = malloc(buf_size_bytes);
-+	if (zerocopy) {
-+		enable_so_zerocopy(fd);
- 
--	if (!data) {
--		fprintf(stderr, "'malloc()' failed\n");
--		exit(EXIT_FAILURE);
-+		data = mmap(NULL, buf_size_bytes, PROT_READ | PROT_WRITE,
-+			    MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+		if (data == MAP_FAILED) {
-+			perror("mmap");
-+			exit(EXIT_FAILURE);
-+		}
-+	} else {
-+		data = malloc(buf_size_bytes);
-+
-+		if (!data) {
-+			fprintf(stderr, "'malloc()' failed\n");
-+			exit(EXIT_FAILURE);
-+		}
- 	}
- 
- 	memset(data, 0, buf_size_bytes);
- 	total_send = 0;
-+	time_in_send = 0;
- 	tx_begin_ns = current_nsec();
- 
- 	while (total_send < to_send_bytes) {
- 		ssize_t sent;
-+		size_t rest_bytes;
-+		time_t before;
- 
--		sent = write(fd, data, buf_size_bytes);
-+		rest_bytes = to_send_bytes - total_send;
-+
-+		before = current_nsec();
-+		sent = send(fd, data, (rest_bytes > buf_size_bytes) ?
-+			    buf_size_bytes : rest_bytes,
-+			    zerocopy ? MSG_ZEROCOPY : 0);
-+		time_in_send += (current_nsec() - before);
- 
- 		if (sent <= 0)
- 			error("write");
- 
- 		total_send += sent;
-+
-+		if (zerocopy) {
-+			struct pollfd fds = { 0 };
-+
-+			fds.fd = fd;
-+
-+			if (poll(&fds, 1, -1) < 0) {
-+				perror("poll");
-+				exit(EXIT_FAILURE);
-+			}
-+
-+			if (!(fds.revents & POLLERR)) {
-+				fprintf(stderr, "POLLERR expected\n");
-+				exit(EXIT_FAILURE);
-+			}
-+
-+			recv_completion(fd);
-+		}
- 	}
- 
- 	tx_total_ns = current_nsec() - tx_begin_ns;
- 
- 	printf("total bytes sent: %zu\n", total_send);
- 	printf("tx performance: %f Gbits/s\n",
--	       get_gbps(total_send * 8, tx_total_ns));
--	printf("total time in 'write()': %f sec\n",
-+	       get_gbps(total_send * 8, time_in_send));
-+	printf("total time in tx loop: %f sec\n",
- 	       (float)tx_total_ns / NSEC_PER_SEC);
-+	printf("time in 'send()': %f sec\n",
-+	       (float)time_in_send / NSEC_PER_SEC);
- 
- 	close(fd);
--	free(data);
-+
-+	if (zerocopy)
-+		munmap(data, buf_size_bytes);
-+	else
-+		free(data);
- }
- 
- static const char optstring[] = "";
-@@ -336,6 +452,11 @@ static const struct option longopts[] = {
- 		.has_arg = required_argument,
- 		.val = 'R',
- 	},
++static struct vsock_test_data test_data_array[] = {
++	/* All elements have page aligned base and size. */
 +	{
-+		.name = "zc",
-+		.has_arg = no_argument,
-+		.val = 'Z',
++		.vecs_cnt = 3,
++		{
++			{ NULL, PAGE_SIZE },
++			{ NULL, 2 * PAGE_SIZE },
++			{ NULL, 3 * PAGE_SIZE },
++		}
 +	},
- 	{},
- };
- 
-@@ -351,6 +472,7 @@ static void usage(void)
- 	       "  --help			This message\n"
- 	       "  --sender   <cid>		Sender mode (receiver default)\n"
- 	       "                                <cid> of the receiver to connect to\n"
-+	       "  --zc				Enable zerocopy\n"
- 	       "  --port     <port>		Port (default %d)\n"
- 	       "  --bytes    <bytes>KMG		Bytes to send (default %d)\n"
- 	       "  --buf-size <bytes>KMG		Data buffer size (default %d). In sender mode\n"
-@@ -413,6 +535,9 @@ int main(int argc, char **argv)
- 		case 'H': /* Help. */
- 			usage();
- 			break;
-+		case 'Z': /* Zerocopy. */
-+			zerocopy = true;
++	/* Middle element has both non-page aligned base and size. */
++	{
++		.vecs_cnt = 3,
++		{
++			{ NULL, PAGE_SIZE },
++			{ (void *)1, 200  },
++			{ NULL, 3 * PAGE_SIZE },
++		}
++	}
++};
++
++static void vsock_io_uring_client(const struct test_opts *opts,
++				  const struct vsock_test_data *test_data,
++				  bool msg_zerocopy)
++{
++	struct io_uring_sqe *sqe;
++	struct io_uring_cqe *cqe;
++	struct io_uring ring;
++	struct iovec *iovec;
++	struct msghdr msg;
++	int fd;
++
++	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	if (fd < 0) {
++		perror("connect");
++		exit(EXIT_FAILURE);
++	}
++
++	if (msg_zerocopy)
++		enable_so_zerocopy(fd);
++
++	iovec = iovec_from_test_data(test_data);
++
++	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
++		error(1, errno, "io_uring_queue_init");
++
++	if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
++		error(1, errno, "io_uring_register_buffers");
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = iovec;
++	msg.msg_iovlen = test_data->vecs_cnt;
++	sqe = io_uring_get_sqe(&ring);
++
++	if (msg_zerocopy)
++		io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
++	else
++		io_uring_prep_sendmsg(sqe, fd, &msg, 0);
++
++	if (io_uring_submit(&ring) != 1)
++		error(1, errno, "io_uring_submit");
++
++	if (io_uring_wait_cqe(&ring, &cqe))
++		error(1, errno, "io_uring_wait_cqe");
++
++	io_uring_cqe_seen(&ring, cqe);
++
++	control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
++
++	control_writeln("DONE");
++	io_uring_queue_exit(&ring);
++	free_iovec_test_data(test_data, iovec);
++	close(fd);
++}
++
++static void vsock_io_uring_server(const struct test_opts *opts,
++				  const struct vsock_test_data *test_data)
++{
++	unsigned long remote_hash;
++	unsigned long local_hash;
++	struct io_uring_sqe *sqe;
++	struct io_uring_cqe *cqe;
++	struct io_uring ring;
++	struct iovec iovec;
++	size_t data_len;
++	void *data;
++	int fd;
++
++	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	if (fd < 0) {
++		perror("accept");
++		exit(EXIT_FAILURE);
++	}
++
++	data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
++
++	data = malloc(data_len);
++	if (!data) {
++		perror("malloc");
++		exit(EXIT_FAILURE);
++	}
++
++	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
++		error(1, errno, "io_uring_queue_init");
++
++	sqe = io_uring_get_sqe(&ring);
++	iovec.iov_base = data;
++	iovec.iov_len = data_len;
++
++	io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
++
++	if (io_uring_submit(&ring) != 1)
++		error(1, errno, "io_uring_submit");
++
++	if (io_uring_wait_cqe(&ring, &cqe))
++		error(1, errno, "io_uring_wait_cqe");
++
++	if (cqe->res != data_len) {
++		fprintf(stderr, "expected %zu, got %u\n", data_len,
++			cqe->res);
++		exit(EXIT_FAILURE);
++	}
++
++	local_hash = hash_djb2(data, data_len);
++
++	remote_hash = control_readulong();
++	if (remote_hash != local_hash) {
++		fprintf(stderr, "hash mismatch\n");
++		exit(EXIT_FAILURE);
++	}
++
++	control_expectln("DONE");
++	io_uring_queue_exit(&ring);
++	free(data);
++}
++
++void test_stream_uring_server(const struct test_opts *opts)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
++		vsock_io_uring_server(opts, &test_data_array[i]);
++}
++
++void test_stream_uring_client(const struct test_opts *opts)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
++		vsock_io_uring_client(opts, &test_data_array[i], false);
++}
++
++void test_stream_uring_msg_zc_server(const struct test_opts *opts)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
++		vsock_io_uring_server(opts, &test_data_array[i]);
++}
++
++void test_stream_uring_msg_zc_client(const struct test_opts *opts)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
++		vsock_io_uring_client(opts, &test_data_array[i], true);
++}
++
++static struct test_case test_cases[] = {
++	{
++		.name = "SOCK_STREAM io_uring test",
++		.run_server = test_stream_uring_server,
++		.run_client = test_stream_uring_client,
++	},
++	{
++		.name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
++		.run_server = test_stream_uring_msg_zc_server,
++		.run_client = test_stream_uring_msg_zc_client,
++	},
++	{},
++};
++
++static const char optstring[] = "";
++static const struct option longopts[] = {
++	{
++		.name = "control-host",
++		.has_arg = required_argument,
++		.val = 'H',
++	},
++	{
++		.name = "control-port",
++		.has_arg = required_argument,
++		.val = 'P',
++	},
++	{
++		.name = "mode",
++		.has_arg = required_argument,
++		.val = 'm',
++	},
++	{
++		.name = "peer-cid",
++		.has_arg = required_argument,
++		.val = 'p',
++	},
++	{
++		.name = "help",
++		.has_arg = no_argument,
++		.val = '?',
++	},
++	{},
++};
++
++static void usage(void)
++{
++	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
++		"\n"
++		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
++		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
++		"\n"
++		"Run transmission tests using io_uring. Usage is the same as\n"
++		"in ./vsock_test\n"
++		"\n"
++		"Options:\n"
++		"  --help                 This help message\n"
++		"  --control-host <host>  Server IP address to connect to\n"
++		"  --control-port <port>  Server port to listen on/connect to\n"
++		"  --mode client|server   Server or client mode\n"
++		"  --peer-cid <cid>       CID of the other side\n"
++		);
++	exit(EXIT_FAILURE);
++}
++
++int main(int argc, char **argv)
++{
++	const char *control_host = NULL;
++	const char *control_port = NULL;
++	struct test_opts opts = {
++		.mode = TEST_MODE_UNSET,
++		.peer_cid = VMADDR_CID_ANY,
++	};
++
++	init_signals();
++
++	for (;;) {
++		int opt = getopt_long(argc, argv, optstring, longopts, NULL);
++
++		if (opt == -1)
 +			break;
- 		default:
- 			usage();
- 		}
++
++		switch (opt) {
++		case 'H':
++			control_host = optarg;
++			break;
++		case 'm':
++			if (strcmp(optarg, "client") == 0) {
++				opts.mode = TEST_MODE_CLIENT;
++			} else if (strcmp(optarg, "server") == 0) {
++				opts.mode = TEST_MODE_SERVER;
++			} else {
++				fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'p':
++			opts.peer_cid = parse_cid(optarg);
++			break;
++		case 'P':
++			control_port = optarg;
++			break;
++		case '?':
++		default:
++			usage();
++		}
++	}
++
++	if (!control_port)
++		usage();
++	if (opts.mode == TEST_MODE_UNSET)
++		usage();
++	if (opts.peer_cid == VMADDR_CID_ANY)
++		usage();
++
++	if (!control_host) {
++		if (opts.mode != TEST_MODE_SERVER)
++			usage();
++		control_host = "0.0.0.0";
++	}
++
++	control_init(control_host, control_port,
++		     opts.mode == TEST_MODE_SERVER);
++
++	run_tests(test_cases, &opts);
++
++	control_cleanup();
++
++	return 0;
++}
 -- 
 2.25.1
 
