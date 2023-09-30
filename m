@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 996887B43D3
-	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 23:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 689F37B43CD
+	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 23:10:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234189AbjI3VKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Sep 2023 17:10:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50250 "EHLO
+        id S234028AbjI3VKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Sep 2023 17:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234036AbjI3VKi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234030AbjI3VKi (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 30 Sep 2023 17:10:38 -0400
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A718F9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFA6FA;
         Sat, 30 Sep 2023 14:10:35 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 7BA7910000E;
+        by mx1.sberdevices.ru (Postfix) with ESMTP id ABDC210000F;
         Sun,  1 Oct 2023 00:10:29 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7BA7910000E
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru ABDC210000F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
         s=mail; t=1696108229;
-        bh=n0+6JFJdHIxCPS2RMgfbz1r2mOTVd0SebyW4nxVs89s=;
+        bh=BiqLBy+GeHAKEkX+QWwiL0iGOfdT2Xov/wQ3RqaiBNw=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=WNKc6de527O6halcmg/j7JgwoDhaCWrJxv4FgnNPpOFsHOKiPbtJkeFkbplHHIY57
-         BQv7yWFIFdS52Q3pLo42hSoOjLAoMQLRx0K1xLtJEXk8Ar3+DZCMheE43yOa9YzW1o
-         zCB+aFEEDtmoniUh0T8TkxCMRX9aJTNYWfs0ghav9BxB4AjnED976LnLSZuHJlR0vS
-         xUSlHtcvahDupGaT7LApbg0QnAcxn3uHFNgXvJse63K/Oow2fkjjYbevQmlpW+Qywh
-         jGZbHTFqUERNOHc0xuv0dn6qkXJQYYmF5RkrCx1sjcAVc4B14tKdmOe+wGwJIge/6W
-         sYOi658y3QubQ==
+        b=YwQj2A1CPOsXfCdbOLAnuiRkNO+qo6hydTWfnWGvW+T8CfJx3l1JIrWJAs4TVcOU4
+         NvvuhqygVFcepgWWp/h9Lfb0usYxggpJJOClrGHUS0HZFdVQeeYkXuB8hUaOnTQK3q
+         vpVBXwZd0pADoF6f5jc8OvHIK7c/VLUXnlkHkZ5hg6aXsoQtmLewgzgELd0WZDqqGF
+         o7s75rHm6PQfhHramDwlPWDOqGy2ZdQxJS7JRSl6Jgcb+E4JMSkj0G6lBvNzZdm83J
+         ZEZgELnn97EqyByo/nkXNPLJoTyOlXc82HW4RX2RYCEOKdUG36xHbfbCA9yWXrIxIS
+         u8oQebf2fGgBQ==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
@@ -36,7 +36,7 @@ Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [1
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sun, 1 Oct 2023 00:10:28 +0300
+ 15.2.1118.30; Sun, 1 Oct 2023 00:10:29 +0300
 From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -51,9 +51,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v2 08/12] vsock: enable setting SO_ZEROCOPY
-Date:   Sun, 1 Oct 2023 00:03:04 +0300
-Message-ID: <20230930210308.2394919-9-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v2 09/12] docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+Date:   Sun, 1 Oct 2023 00:03:05 +0300
+Message-ID: <20230930210308.2394919-10-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
 References: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
@@ -88,104 +88,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
-be set in AF_VSOCK implementation where transport is accessible (if
-transport is not set during setting SO_ZEROCOPY: for example socket is
-not connected, then SO_ZEROCOPY will be enabled, but once transport will
-be assigned, support of this type of transmission will be checked).
-
-To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
-bit, thus handling SOL_SOCKET option operations, but all of them except
-SO_ZEROCOPY will be forwarded to the generic handler by calling
-'sock_setsockopt()'.
+This adds description of MSG_ZEROCOPY flag support for AF_VSOCK type of
+socket.
 
 Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 ---
- Changelog:
- v1 -> v2:
-  * Place 'sock_valbool_flag()' in a single line.
+ Documentation/networking/msg_zerocopy.rst | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
- net/vmw_vsock/af_vsock.c | 45 ++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 43 insertions(+), 2 deletions(-)
-
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index ff44bab05191..a84f242466cf 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1406,8 +1406,16 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
- 			goto out;
- 		}
+diff --git a/Documentation/networking/msg_zerocopy.rst b/Documentation/networking/msg_zerocopy.rst
+index b3ea96af9b49..78fb70e748b7 100644
+--- a/Documentation/networking/msg_zerocopy.rst
++++ b/Documentation/networking/msg_zerocopy.rst
+@@ -7,7 +7,8 @@ Intro
+ =====
  
--		if (vsock_msgzerocopy_allow(transport))
-+		if (vsock_msgzerocopy_allow(transport)) {
- 			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
-+		} else if (sock_flag(sk, SOCK_ZEROCOPY)) {
-+			/* If this option was set before 'connect()',
-+			 * when transport was unknown, check that this
-+			 * feature is supported here.
-+			 */
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
+ The MSG_ZEROCOPY flag enables copy avoidance for socket send calls.
+-The feature is currently implemented for TCP and UDP sockets.
++The feature is currently implemented for TCP, UDP and VSOCK (with
++virtio transport) sockets.
  
- 		err = vsock_auto_bind(vsk);
- 		if (err)
-@@ -1643,7 +1651,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
- 	const struct vsock_transport *transport;
- 	u64 val;
  
--	if (level != AF_VSOCK)
-+	if (level != AF_VSOCK && level != SOL_SOCKET)
- 		return -ENOPROTOOPT;
+ Opportunity and Caveats
+@@ -174,7 +175,9 @@ read_notification() call in the previous snippet. A notification
+ is encoded in the standard error format, sock_extended_err.
  
- #define COPY_IN(_v)                                       \
-@@ -1666,6 +1674,33 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+ The level and type fields in the control data are protocol family
+-specific, IP_RECVERR or IPV6_RECVERR.
++specific, IP_RECVERR or IPV6_RECVERR (for TCP or UDP socket).
++For VSOCK socket, cmsg_level will be SOL_VSOCK and cmsg_type will be
++VSOCK_RECVERR.
  
- 	transport = vsk->transport;
+ Error origin is the new type SO_EE_ORIGIN_ZEROCOPY. ee_errno is zero,
+ as explained before, to avoid blocking read and write system calls on
+@@ -235,12 +238,15 @@ Implementation
+ Loopback
+ --------
  
-+	if (level == SOL_SOCKET) {
-+		int zerocopy;
++For TCP and UDP:
+ Data sent to local sockets can be queued indefinitely if the receive
+ process does not read its socket. Unbound notification latency is not
+ acceptable. For this reason all packets generated with MSG_ZEROCOPY
+ that are looped to a local socket will incur a deferred copy. This
+ includes looping onto packet sockets (e.g., tcpdump) and tun devices.
+ 
++For VSOCK:
++Data path sent to local sockets is the same as for non-local sockets.
+ 
+ Testing
+ =======
+@@ -254,3 +260,6 @@ instance when run with msg_zerocopy.sh between a veth pair across
+ namespaces, the test will not show any improvement. For testing, the
+ loopback restriction can be temporarily relaxed by making
+ skb_orphan_frags_rx identical to skb_orphan_frags.
 +
-+		if (optname != SO_ZEROCOPY) {
-+			release_sock(sk);
-+			return sock_setsockopt(sock, level, optname, optval, optlen);
-+		}
-+
-+		/* Use 'int' type here, because variable to
-+		 * set this option usually has this type.
-+		 */
-+		COPY_IN(zerocopy);
-+
-+		if (zerocopy < 0 || zerocopy > 1) {
-+			err = -EINVAL;
-+			goto exit;
-+		}
-+
-+		if (transport && !vsock_msgzerocopy_allow(transport)) {
-+			err = -EOPNOTSUPP;
-+			goto exit;
-+		}
-+
-+		sock_valbool_flag(sk, SOCK_ZEROCOPY, zerocopy);
-+		goto exit;
-+	}
-+
- 	switch (optname) {
- 	case SO_VM_SOCKETS_BUFFER_SIZE:
- 		COPY_IN(val);
-@@ -2322,6 +2357,12 @@ static int vsock_create(struct net *net, struct socket *sock,
- 		}
- 	}
- 
-+	/* SOCK_DGRAM doesn't have 'setsockopt' callback set in its
-+	 * proto_ops, so there is no handler for custom logic.
-+	 */
-+	if (sock_type_connectible(sock->type))
-+		set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
-+
- 	vsock_insert_unbound(vsk);
- 
- 	return 0;
++For VSOCK type of socket example can be found in
++tools/testing/vsock/vsock_test_zerocopy.c.
 -- 
 2.25.1
 
