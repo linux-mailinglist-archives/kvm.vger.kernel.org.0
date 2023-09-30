@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97FC57B41DB
-	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 17:50:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E36587B42C2
+	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 19:32:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234428AbjI3Pu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Sep 2023 11:50:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37638 "EHLO
+        id S234678AbjI3RcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Sep 2023 13:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232709AbjI3Pu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Sep 2023 11:50:57 -0400
+        with ESMTP id S233050AbjI3Rb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Sep 2023 13:31:59 -0400
 Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 663029C
-        for <kvm@vger.kernel.org>; Sat, 30 Sep 2023 08:50:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 005D9E1
+        for <kvm@vger.kernel.org>; Sat, 30 Sep 2023 10:31:56 -0700 (PDT)
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1qmcEr-00086K-WD; Sat, 30 Sep 2023 17:50:42 +0200
-Message-ID: <239fecd6-c184-4187-85bb-2826ae2ce0d0@maciej.szmigiero.name>
-Date:   Sat, 30 Sep 2023 17:50:36 +0200
+        id 1qmdog-0008Pz-Nr; Sat, 30 Sep 2023 19:31:46 +0200
+Message-ID: <11c6efbd-b794-4a05-9c51-4928fb545db4@maciej.szmigiero.name>
+Date:   Sat, 30 Sep 2023 19:31:40 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 15/18] virtio-mem: Update state to match bitmap as soon
- as it's been migrated
+Subject: Re: [PATCH v4 16/18] virtio-mem: Expose device memory dynamically via
+ multiple memslots if enabled
 Content-Language: en-US, pl-PL
 To:     David Hildenbrand <david@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -43,7 +43,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
         qemu-devel@nongnu.org
 References: <20230926185738.277351-1-david@redhat.com>
- <20230926185738.277351-16-david@redhat.com>
+ <20230926185738.277351-17-david@redhat.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  xsFNBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
@@ -86,12 +86,11 @@ Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  H5/qn1uUAhP1Oz+jKLUECbPS2ll73rFXUr+U3AKyLpx4T+/Wy1ajKn7rOB7udmTmYb8nnlQb
  0fpPzYGBzK7zWIzFotuS5x1PzLYhZQFkfegyAaxys2joryhI6YNFo+BHYTfamOVfFi8QFQL5
  5ZSOo27q/Ox95rwuC/n+PoJxBfqU36XBi886VV4LxuGZ8kfy0qDpL5neYtkC9w==
-In-Reply-To: <20230926185738.277351-16-david@redhat.com>
+In-Reply-To: <20230926185738.277351-17-david@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -99,85 +98,75 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 26.09.2023 20:57, David Hildenbrand wrote:
-> It's cleaner and future-proof to just have other state that depends on the
-> bitmap state to be updated as soon as possible when restoring the bitmap.
+> Having large virtio-mem devices that only expose little memory to a VM
+> is currently a problem: we map the whole sparse memory region into the
+> guest using a single memslot, resulting in one gigantic memslot in KVM.
+> KVM allocates metadata for the whole memslot, which can result in quite
+> some memory waste.
 > 
-> So factor out informing RamDiscardListener into a functon and call it in
-> case of early migration right after we restored the bitmap.
+> Assuming we have a 1 TiB virtio-mem device and only expose little (e.g.,
+> 1 GiB) memory, we would create a single 1 TiB memslot and KVM has to
+> allocate metadata for that 1 TiB memslot: on x86, this implies allocating
+> a significant amount of memory for metadata:
+> 
+> (1) RMAP: 8 bytes per 4 KiB, 8 bytes per 2 MiB, 8 bytes per 1 GiB
+>      -> For 1 TiB: 2147483648 + 4194304 + 8192 = ~ 2 GiB (0.2 %)
+> 
+>      With the TDP MMU (cat /sys/module/kvm/parameters/tdp_mmu) this gets
+>      allocated lazily when required for nested VMs
+> (2) gfn_track: 2 bytes per 4 KiB
+>      -> For 1 TiB: 536870912 = ~512 MiB (0.05 %)
+> (3) lpage_info: 4 bytes per 2 MiB, 4 bytes per 1 GiB
+>      -> For 1 TiB: 2097152 + 4096 = ~2 MiB (0.0002 %)
+> (4) 2x dirty bitmaps for tracking: 2x 1 bit per 4 KiB page
+>      -> For 1 TiB: 536870912 = 64 MiB (0.006 %)
+> 
+> So we primarily care about (1) and (2). The bad thing is, that the
+> memory consumption *doubles* once SMM is enabled, because we create the
+> memslot once for !SMM and once for SMM.
+> 
+> Having a 1 TiB memslot without the TDP MMU consumes around:
+> * With SMM: 5 GiB
+> * Without SMM: 2.5 GiB
+> Having a 1 TiB memslot with the TDP MMU consumes around:
+> * With SMM: 1 GiB
+> * Without SMM: 512 MiB
+> 
+> ... and that's really something we want to optimize, to be able to just
+> start a VM with small boot memory (e.g., 4 GiB) and a virtio-mem device
+> that can grow very large (e.g., 1 TiB).
+> 
+> Consequently, using multiple memslots and only mapping the memslots we
+> really need can significantly reduce memory waste and speed up
+> memslot-related operations. Let's expose the sparse RAM memory region using
+> multiple memslots, mapping only the memslots we currently need into our
+> device memory region container.
+> 
+> The feature can be enabled using "dynamic-memslots=on" and requires
+> "unplugged-inaccessible=on", which is nowadays the default.
+> 
+> Once enabled, we'll auto-detect the number of memslots to use based on the
+> memslot limit provided by the core. We'll use at most 1 memslot per
+> gigabyte. Note that our global limit of memslots accross all memory devices
+> is currently set to 256: even with multiple large virtio-mem devices,
+> we'd still have a sane limit on the number of memslots used.
+> 
+> The default is to not dynamically map memslot for now
+> ("dynamic-memslots=off"). The optimization must be enabled manually,
+> because some vhost setups (e.g., hotplug of vhost-user devices) might be
+> problematic until we support more memslots especially in vhost-user backends.
+> 
+> Note that "dynamic-memslots=on" is just a hint that multiple memslots
+> *may* be used for internal optimizations, not that multiple memslots
+> *must* be used. The actual number of memslots that are used is an
+> internal detail: for example, once memslot metadata is no longer an
+> issue, we could simply stop optimizing for that. Migration source and
+> destination can differ on the setting of "dynamic-memslots".
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->   hw/virtio/virtio-mem.c | 26 +++++++++++++++++++++-----
->   1 file changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> index 0b0e6c5090..0cf47df9cf 100644
-> --- a/hw/virtio/virtio-mem.c
-> +++ b/hw/virtio/virtio-mem.c
-> @@ -984,9 +984,8 @@ static int virtio_mem_restore_unplugged(VirtIOMEM *vmem)
->                                                  virtio_mem_discard_range_cb);
->   }
->   
-> -static int virtio_mem_post_load(void *opaque, int version_id)
-> +static int virtio_mem_post_load_bitmap(VirtIOMEM *vmem)
->   {
-> -    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
->       RamDiscardListener *rdl;
->       int ret;
->   
-> @@ -1001,6 +1000,20 @@ static int virtio_mem_post_load(void *opaque, int version_id)
->               return ret;
->           }
->       }
-> +    return 0;
-> +}
-> +
-> +static int virtio_mem_post_load(void *opaque, int version_id)
-> +{
-> +    VirtIOMEM *vmem = VIRTIO_MEM(opaque);
-> +    int ret;
-> +
-> +    if (!vmem->early_migration) {
-> +        ret = virtio_mem_post_load_bitmap(vmem);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +    }
->   
->       /*
->        * If shared RAM is migrated using the file content and not using QEMU,
-> @@ -1043,7 +1056,7 @@ static int virtio_mem_post_load_early(void *opaque, int version_id)
->       int ret;
->   
->       if (!vmem->prealloc) {
-> -        return 0;
-> +        goto post_load_bitmap;
->       }
->   
->       /*
-> @@ -1051,7 +1064,7 @@ static int virtio_mem_post_load_early(void *opaque, int version_id)
->        * don't mess with preallocation and postcopy.
->        */
->       if (migrate_ram_is_ignored(rb)) {
-> -        return 0;
-> +        goto post_load_bitmap;
->       }
->   
->       /*
-> @@ -1084,7 +1097,10 @@ static int virtio_mem_post_load_early(void *opaque, int version_id)
->               return -EBUSY;
->           }
->       }
-> -    return 0;
-> +
-> +post_load_bitmap:
-> +    /* Finally, update any other state to be consistent with the new bitmap. */
-> +    return virtio_mem_post_load_bitmap(vmem);
->   }
->   
->   typedef struct VirtIOMEMMigSanityChecks {
 
-
+The changes seem reasonable, so:
 Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
 Thanks,
