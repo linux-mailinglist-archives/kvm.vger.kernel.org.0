@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50DD77B43C1
+	by mail.lfdr.de (Postfix) with ESMTP id F00A77B43C3
 	for <lists+kvm@lfdr.de>; Sat, 30 Sep 2023 23:10:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234118AbjI3VKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Sep 2023 17:10:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52092 "EHLO
+        id S234157AbjI3VKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Sep 2023 17:10:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234009AbjI3VKg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234013AbjI3VKg (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 30 Sep 2023 17:10:36 -0400
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC66EB;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B1CEE;
         Sat, 30 Sep 2023 14:10:34 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id E3EC610000B;
-        Sun,  1 Oct 2023 00:10:28 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru E3EC610000B
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 1B15610000C;
+        Sun,  1 Oct 2023 00:10:29 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 1B15610000C
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1696108228;
-        bh=3EZqTPtuxFGmvEgTrKtTokMxFFsO4LUHGPete/15D7A=;
+        s=mail; t=1696108229;
+        bh=7O61lqPregE+HlMhdM4ZTCsUGvDnSuOsext9GfPBTSQ=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=AWWnMIGMgLg5MY9aQ91SfHM1C9YPXGJFNt154btweo803G9bZY8GU4C8i1UGf6EaS
-         pEbdXYSWlR2dIhbTyT3HoC6OQoPynOfz+5IZKMEnyCJqcxx5dCh6IXqZ92X3EPmyEA
-         vndH1vvVTBUGGLWaNDptfVS68XbEjivZMgKbG7XB1sKgM2HQPWf+07bsuLIRrithRU
-         WpvBT9swRXmK5UMY0MpJ5Cf3dEXLbDsRKHM119f2CVBLcD8/5V3s3jjn9et/xbPRiB
-         eXW3bgYY5vZFjF2kxvbRujRgUfWz5OYYATyZKq9u9B0+MNnPYD1h7O5mumnJ4Dwt6/
-         wBTFTEc1fEykw==
+        b=esgv/ZUriLoMRSxX/yWbxCii4B5IcMIpxMnBBPztWb+U7ld92bKH+ddCG5Wu+rfGm
+         WwSM3+GIICMTcEiweMaYmYmvvdxDI5ak9WJrOQKcLWk+gKR8YELpuKK/zm+WXxOpVk
+         fzjUy1lc+LnfNvgl65mXwMxhSTe9n4mQowE1ksP9cHMS06eyZmsRo0oYOiPhVbb0Rs
+         0AOkwOhWWam7GWFbUN6Pv/hyvo2ekTqc5J1suzkY+XKOC4tXFuULfeFpOgom3eQOyk
+         O1srhXxdpb6pTtTzd7V1zOi7FTXSLhimiDVgn2U8q7nOlF0B5ZJNMjxvSb8ubKJqoH
+         46UTE8Cu7MT0Q==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
@@ -51,9 +51,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v2 05/12] vhost/vsock: support MSG_ZEROCOPY for transport
-Date:   Sun, 1 Oct 2023 00:03:01 +0300
-Message-ID: <20230930210308.2394919-6-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v2 06/12] vsock/virtio: support MSG_ZEROCOPY for transport
+Date:   Sun, 1 Oct 2023 00:03:02 +0300
+Message-ID: <20230930210308.2394919-7-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
 References: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
@@ -88,35 +88,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add 'msgzerocopy_allow()' callback for vhost transport.
+Add 'msgzerocopy_allow()' callback for virtio transport.
 
 Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- drivers/vhost/vsock.c | 7 +++++++
+ net/vmw_vsock/virtio_transport.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 83711aad855c..f75731396b7e 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -398,6 +398,11 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
- 	return val < vq->num;
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 09ba3128e759..d324ae13e2f5 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -486,6 +486,11 @@ static bool virtio_transport_can_msgzerocopy(int bufs_num)
+ 	return res;
  }
  
-+static bool vhost_transport_msgzerocopy_allow(void)
++static bool virtio_transport_msgzerocopy_allow(void)
 +{
 +	return true;
 +}
 +
- static bool vhost_transport_seqpacket_allow(u32 remote_cid);
+ static bool virtio_transport_seqpacket_allow(u32 remote_cid);
  
- static struct virtio_transport vhost_transport = {
-@@ -431,6 +436,8 @@ static struct virtio_transport vhost_transport = {
- 		.seqpacket_allow          = vhost_transport_seqpacket_allow,
+ static struct virtio_transport virtio_transport = {
+@@ -519,6 +524,8 @@ static struct virtio_transport virtio_transport = {
+ 		.seqpacket_allow          = virtio_transport_seqpacket_allow,
  		.seqpacket_has_data       = virtio_transport_seqpacket_has_data,
  
-+		.msgzerocopy_allow        = vhost_transport_msgzerocopy_allow,
++		.msgzerocopy_allow        = virtio_transport_msgzerocopy_allow,
 +
  		.notify_poll_in           = virtio_transport_notify_poll_in,
  		.notify_poll_out          = virtio_transport_notify_poll_out,
