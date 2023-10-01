@@ -2,339 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 316E37B48FC
-	for <lists+kvm@lfdr.de>; Sun,  1 Oct 2023 19:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F8B7B49C5
+	for <lists+kvm@lfdr.de>; Sun,  1 Oct 2023 23:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235267AbjJARy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Oct 2023 13:54:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34240 "EHLO
+        id S235409AbjJAVkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Oct 2023 17:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233932AbjJARyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 Oct 2023 13:54:25 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D01A7;
-        Sun,  1 Oct 2023 10:54:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=fgC78h+iS4mzDakS0xyY7EGKjinZxb9su59hNHGZ2Xg=; b=GTewsJDE85KagLi/skFFKy4D3y
-        1jEEdrfVeYZdijKYF8IuRivODwgdUUluA7pwRnUPU2l4ZGI7tnm5HjAq6M06ShM2EGK0H5o3nYJxo
-        +oAwWZn223hvI68Ffx9CD+S0arywX1PThzKMm6rR2jMxio4R5BWfwDaLcyRw0hlreOxPz5XPa3x54
-        1pQ57XASDDFto0fMWDvWf6gYZZLaipa7ssSC685fydhjPqIF6iLyzoasQRrnnYwxOf7m3MaCeHtxj
-        avhjX6KmkAuPTHAo1IJu2/ejFCZM7HtLRo1klhYwQdsd1rye4WaG5rKR8uAivPnhNpKiTutsgOsZS
-        WQa3o+DQ==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qn0e1-004YLN-3r; Sun, 01 Oct 2023 17:54:17 +0000
-Message-ID: <ee446c823002dc92c8ea525f21d00a9f5d27de59.camel@infradead.org>
-Subject: [PATCH] KVM: x86: Refine calculation of guest wall clock to use a
- single TSC read
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org, sveith@amazon.de
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>,
-        inux-kernel@vger.kernel.org
-Date:   Sun, 01 Oct 2023 18:54:16 +0100
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-yGt/cGcobzebLM+1F5oq"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S229739AbjJAVkh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 Oct 2023 17:40:37 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3623C9;
+        Sun,  1 Oct 2023 14:40:34 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 391LYEkQ021871;
+        Sun, 1 Oct 2023 21:39:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2023-03-30;
+ bh=2RlcX5xRoWECOjQUyLtUtoGf9mD0ijduDwCw45zUdJM=;
+ b=v6qJ3BuindB91l0q9vWJ0IfsojNaC6thF8prF8lhX4z+Xc0eeW0sGNNF4fXMTnKxrHNO
+ F0zIGogwqanmUswAKd4/c6KP5UhLAdrsl94qEJtkcYqqoXjGPTsaYVA5XMtl/O0lQ22x
+ Dwj+iOglwRZATRfv1+esQgWtknr6F8Vql94EYz0HB6urSVdnc8o5k5zsy89g/nrtHnES
+ 1MNp5aixf0hZ9GpYsV7M7Mq/1TipfyIj3ud7ZW6iHByLV5hUprKQ4FO+7xEfpxAGN3/A
+ 5HEFnzkV4sqg6UrKH31g7wMFuhKzRN0nE7Z6foWt5g+wGExLTD1QX1hjo0OQfbkakJhJ 0A== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3teaf41jea-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 01 Oct 2023 21:39:59 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 391JfC34001409;
+        Sun, 1 Oct 2023 21:39:58 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3tea43vwku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 01 Oct 2023 21:39:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kjxtpZvE1hNOpmCKyVEtIlup9ZB1jjMvJ7CyCSIlvYr/FQu1fiDDQ3NsRylooJ88AjTBtR8vH7T6P5lIp2vks/vWtZo2RcRPrK15m+Ezz3SBdM1h0xkOuD5no0Mc3NludBUg9TovAH4wtU0ofRGDv4vFrgvqCsf9nfQjulETWZ+/icIgHk1b+eX0rcunZ0B1tHVyHUPFJGzr+S/mSt9cbQ8s4C05dLzjOQ8PmNRkCvBJVX2b1wR8RajaAmiHF6Y4nQcYgKGV1Qb+j1ctpEq9wzUKx93C4eP9mpXc6Kdy8TK/effBAFRC9D52JxQIe5bS9ZoW5LY18AxYsoZbSuwrZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2RlcX5xRoWECOjQUyLtUtoGf9mD0ijduDwCw45zUdJM=;
+ b=jlaqnjkL5c5JQMjS3RlGlytg3/Q3s3k6yAzk2oxOVcCjalBdaA1biPJ647pG4NAeA0Wgi0qnRHkJDkx5pHnVS5m4nzW6Ip8B3tvr4WWmWZSeTvpKXmH2VTBoHMViRkZ2bzUEDgWqxVqPz5MhQcWnH/UMf0LuFz45lbpPOuyT3g6RKk4papL59tyTwX5dfeyiDZt0edwrjnxUizlk6/RWCRJz/AlWi4sQjFiKKtQIATz8skEMH2oQF6cbRpcb6judEVkYF2/tZ9w3R8q1ehgs+A7hhzXtzWloqs4M5xTwdCJ1mZzd6v1rxDQFo8QCk0CH1fnTdZh4kb28HXjdFUTSpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2RlcX5xRoWECOjQUyLtUtoGf9mD0ijduDwCw45zUdJM=;
+ b=CSVD+kiQHPRZjwn5khX737WNIgakhqkQybZG3/QXm+By7uavn/Z7iX5pY0xrQyoSu91qwesZhbO2nfeO5zjv7mCsKFj746HnfBOxsfIyxtK8UoBMu/n17qT+UgXw3MGc11yDoB38sndUcXicEMi2eZESVmGqvt+5w4lIKX3GAmI=
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
+ by PH0PR10MB4613.namprd10.prod.outlook.com (2603:10b6:510:33::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.26; Sun, 1 Oct
+ 2023 21:39:56 +0000
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::7e3d:f3b3:7964:87c3]) by BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::7e3d:f3b3:7964:87c3%7]) with mapi id 15.20.6838.028; Sun, 1 Oct 2023
+ 21:39:55 +0000
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     kvm@vger.kernel.org, x86@kernel.org
+Cc:     linux-kernel@vger.kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com
+Subject: [PATCH 1/1] KVM: x86: remove always-false condition in kvmclock_sync_fn
+Date:   Sun,  1 Oct 2023 14:36:37 -0700
+Message-Id: <20231001213637.76686-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BL1P222CA0021.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::26) To BYAPR10MB2663.namprd10.prod.outlook.com
+ (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|PH0PR10MB4613:EE_
+X-MS-Office365-Filtering-Correlation-Id: 30c633ce-1145-4d14-66e6-08dbc2c6f3f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r/ZwTSB7RVVsix8Nvqz3AAcOz8NbO1J+P+OtXOj2/1E2aiWWURzFdioLxFE4+cjnWdQWelP1vNPo1RYD3hWgdMxMSXJR4+sZPydlhuy2qZ+PMjPdxGpVkww/z95EVoJXqvDqBRwUHF4FT6hp/ialDDmjOizDn3CakhP4fm/rRKPsaxV6c7/SWaUQowKJ+vMHCmUZfl0I4wQFiZv0AXUub1hDL40Y3+guPd0NlYZ0FYHdIy8bgpX+YBbv9KBJ3Ub5h522MZfQgfd1QT3j6K8k/THfuSL4kreWKmzNX68Gt3ki3J/kSEFV/BsYOEN/uWdBDZQiAvjcKyLYaJFtL4OlCN7N9rG6O8K2duLvHCLnFzhd1ZhcTsS/dOVXCtxz4LRWDA+N64IO4MQn4lxjaikCdblNvqxZCA0mMPx+6ocOmQhehRqhUW0Clp2sr+h1y6JtBOH8Dto5D3n/mBcFrKYM3r4hF52S7BGGI2D6H0RDBgRj3eSKHxpcqLKBSbtCuEshsot64KtjRmoJvKAIJleLS9Afud/+t/nJpw9cK8eaPMo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(39860400002)(376002)(366004)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(966005)(478600001)(41300700001)(2616005)(1076003)(26005)(2906002)(316002)(5660300002)(6486002)(6506007)(66946007)(66556008)(66476007)(6512007)(8676002)(6666004)(8936002)(4326008)(44832011)(86362001)(36756003)(83380400001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jpBFl8gLSCNo/jH9EWLf7PDyZsbv9cQn6Elp54c/kLyxStgPveiWjPbQq7SD?=
+ =?us-ascii?Q?TKUmKOUplLUtht72FSYXQ4b/vH6HMbvN2D6JKGoALAil9xaClGp8Um1Pv7DC?=
+ =?us-ascii?Q?KmN8AbxS3ey91I50kYeKWa7XyVAwnRtt4hWKlP6sVtxYsS9n/PU8p11Jy6Ha?=
+ =?us-ascii?Q?EKOYbRo+NIstjlGYeuCERpIU/cs4qqPhisuP9hP3QKpaRsGCruo3VpbyADCm?=
+ =?us-ascii?Q?RDx22WCG5ZNnDwGejid1dLHwRUZm1mDdaBv5iX/JKez8Nr3nZloSvvI5x0/0?=
+ =?us-ascii?Q?1NafIKETlCRfFkQJsCIHZO6V8E3YRoi14DSdjsx4ZsFszSOHpeYTJO8ZlRBk?=
+ =?us-ascii?Q?YhrqlCJH8+itWPIQtPOzQ9X180nUzV/0IgDbZLYrxJO/yBQx/T87/lnXOKtY?=
+ =?us-ascii?Q?hH0+X9mGr+rmhZrXy1HX4pom69hC0wY9igZmTXY9a/NA3oJaVUfmSTMDqjDt?=
+ =?us-ascii?Q?Iv0Zr1A0Mp3ZX1evZPRDVY0cWXSK8JQ73BP0XGzEFmv/S8wtENhe5XAbOqDR?=
+ =?us-ascii?Q?Zrhzdr1tQN1fW8kF1FFgot/NVAsCSkOfkvkEp/RxipiGOkoGqCvq3Gf9euUs?=
+ =?us-ascii?Q?ZJVgbqd0gfYp6acvGLyrq7XZg5xJ3E9A2tI3uDFRpbcqmrIMn7r5EIjg6JN8?=
+ =?us-ascii?Q?Cdwwo3sOQWO/X0QMNj4Q72lt5Y6f1rZe/MOyT/MgNn+A3fxZ6uZ4FxwNhOwA?=
+ =?us-ascii?Q?7L8SSZ7cZH7ytd31fBKH9scb9nq3o1T4fNrvUD/gyiNB3mOxox29pc3ZSCHo?=
+ =?us-ascii?Q?enbX21wSXUr9CJ0enLQHSFFYdb0dXQu+OpawnuOH5ZwAjmunDD6d82Lp3ZWA?=
+ =?us-ascii?Q?GCfu95jTARne015+5u3wvOrDNu4FxFvCJmTUUk8YxyBBPaxdFeLuah2cGoEi?=
+ =?us-ascii?Q?/LxmuonWPZodFwDwH+awm5XdmdhBgdCTpo0QUyGcHwyfR7dInnKBfh3Jxm0c?=
+ =?us-ascii?Q?LlOB+VxcO0TZEemwTY2f67YLvYvpL1mUoEuZBVFdHiKn46jBcgwkTY5V3qSD?=
+ =?us-ascii?Q?sEEOwOmEFO8ojMpFcO95Ei26QD01I+4edlG/EbYyhtotNNUiVce/038IqQhG?=
+ =?us-ascii?Q?Dw85n982B0nNgv1isuaa9/d405PIO2kHibwbQn2Th45881Fw+5tG+1y08OvF?=
+ =?us-ascii?Q?45mzYBBQeGMSLLB1ZEQ8PL74/9cpD4CAdxOeqzWVWxSOpQTGwICewOUY+u8i?=
+ =?us-ascii?Q?F8V6pFl0Dm7c8/diNEzHOyh4zIeKnGc+LixLLhipzoH5vuVAStKzzRTfWTns?=
+ =?us-ascii?Q?mUqG9YAP/sifP11lLJeG7wQn9jzmnOn6Cq7l52jjvDfiY2z1WsFxN1j2d66S?=
+ =?us-ascii?Q?ljeQYWI/hrZ3mHMgG/bL42tpRAxBBa+K9VA1KV812Ozntw21Rua2kIHzXy6z?=
+ =?us-ascii?Q?XvZND8xSbUSHUMqKP6sDDXwb9rpKUxGXHIaWPzUy9EREKkL3X5tOCETM3rWi?=
+ =?us-ascii?Q?tCvIBNfdK6JbSahxtPACedNZyTcmwpUnck80aJ43TsTqLzhtyUSr1ZacKRbM?=
+ =?us-ascii?Q?JoWu2Rr1Jc8OJq25d3ORlMUDEmvl9ukJnlWtIBp4PdG+zCDUrxbVHhEuVt0L?=
+ =?us-ascii?Q?nlroQRt/8sg9csd5E4FJ/ffMglOS88arteXVnXuz?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?DgBhDAevOrSr+6CgS60bUXs421N/CZfeIVLljtb7X8mwAM1XcUhr02DB/h3M?=
+ =?us-ascii?Q?DKmgn3GDOQ9gVOC6ffrGZgWzYpbMRqI6kPxP9WZVD7YlgqlZwQjSjvzE7k0G?=
+ =?us-ascii?Q?aXQ5rVq1FvIKredsmQNG/HySLyfiDopiDvfXBQ2oK2EKnHuTYIdDMLgDsYdK?=
+ =?us-ascii?Q?uMI8rH/B159hx1wg9o1ytk0SEb9nsKgQ6ZnMjZ0o11RUJ2kKBo73KI0cEwkV?=
+ =?us-ascii?Q?2mrCfAkeWe0CgZnT2O0XMRY8LEr3szz1y1L7w5dqJiiD59bTQ6ggqnzEF+P4?=
+ =?us-ascii?Q?FKj7HB88WKSiwKj2emogWMP/uK6jo4m7ZoD6SERs7NfecWoSoH0653ZS2vZd?=
+ =?us-ascii?Q?7Gmz3ib48ss+GYM7VowqRmAMC4ehI6Z7m3owh4w7BYxy1JMb/63D2ek+hW1i?=
+ =?us-ascii?Q?qvF3zLFThvjoQJnnLt1mWCbHbgnUGGl2QRotY5JbIvCWn+DiD2Ti8KzLHlQt?=
+ =?us-ascii?Q?CjW5tD08IJiXBdKEpGjUK0Te8LpQp1PN7dqdgZNfC5obyNB8o+T7DcOhMxJV?=
+ =?us-ascii?Q?NH4+33cnqHMbOn2ZtCS6pcyfyoC7Na+9wEjrH6Pf/8TiTOytEnQSTtMxPHu5?=
+ =?us-ascii?Q?fwQBhqaoqlxsW1K8Sfw//v549j7hML2e5P0JTiof3KgtnDobbsF0XgzoZImW?=
+ =?us-ascii?Q?6WhlxScV4JLUwO1pSw3v2ViM5Hx1YcFweS7NBI/sV7LM1l7zBeZfBbmVKBz1?=
+ =?us-ascii?Q?kpAXlIQdp4Ld9R9gu2ETojOIImD2LO1TzXGdX7z7eoxh23AxUxu7evr925RS?=
+ =?us-ascii?Q?1rqOl6PxeuxdsX748UxUOsHMScHh+Esj5rTMHaNutuchEtb+ho213na94dQq?=
+ =?us-ascii?Q?RPmLU+1RoORJBP/FIWb3GK0nhcq+fJZRmLXrHhDbErZiiuLurXmqh07+19rj?=
+ =?us-ascii?Q?6vtbCizDk8EZpMMTa4HPupBL8NA3aqGoG2LU+RHVMIeFVZZ/Lr5sTLHZb6cp?=
+ =?us-ascii?Q?u7pS+fTAIKZ479SgeawocQ=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30c633ce-1145-4d14-66e6-08dbc2c6f3f6
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2023 21:39:55.7958
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FYOiOTKlcpEIvVzDG+LjuBkSmhtmXGWrkwGGsm1vC72f9csyCByu096W8CZxNqDN+yXaYOjM+BV+6OvPEefcNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4613
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-01_18,2023-09-28_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 spamscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310010174
+X-Proofpoint-GUID: a7yzKAR8WWfZFUx_4J9ZqcsqEUsXzF07
+X-Proofpoint-ORIG-GUID: a7yzKAR8WWfZFUx_4J9ZqcsqEUsXzF07
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The 'kvmclock_periodic_sync' is a readonly param that cannot change after
+bootup.
 
---=-yGt/cGcobzebLM+1F5oq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The kvm_arch_vcpu_postcreate() is not going to schedule the
+kvmclock_sync_work if kvmclock_periodic_sync == false.
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+As a result, the "if (!kvmclock_periodic_sync)" can never be true if the
+kvmclock_sync_work = kvmclock_sync_fn() is scheduled.
 
-When populating the guest's PV wall clock information, KVM currently does
-a simple 'kvm_get_real_ns() - get_kvmclock_ns(kvm)'. This is an antipattern
-which should be avoided; when working with the relationship between two
-clocks, it's never correct to obtain one of them "now" and then the other
-at a slightly different "now" after an unspecified period of preemption
-(which might not even be under the control of the kernel, if this is an
-L1 hosting an L2 guest under nested virtualization).
-
-Add a kvm_get_wall_clock_epoch() function to return the guest wall clock
-epoch in nanoseconds using the same method as __get_kvmclock() =E2=80=94 by=
- using
-kvm_get_walltime_and_clockread() to calculate both the wall clock and KVM
-clock time from a *single* TSC reading.
-
-The condition using get_cpu_tsc_khz() is equivalent to the version in
-__get_kvmclock() which separately checks for the CONSTANT_TSC feature or
-the per-CPU cpu_tsc_khz. Which is what get_cpu_tsc_khz() does anyway.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Inspired by: https://lore.kernel.org/kvm/a461bf3f-c17e-9c3f-56aa-726225e8391d@oracle.com/
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 ---
-Tested by sticking a printk into it and comparing the values calculated
-by the old and new methods, while running the xen_shinfo_test which
-keeps relocating the shared info and thus rewriting the PV wall clock
-information to it.
-
-They look sane enough but there's still skew over time (in both of
-them) as the KVM values get adjusted in presumably similarly sloppy
-ways. But we'll get to this. This patch is just the first low hanging
-fruit in a quest to eliminate such sloppiness and get to the point
-where we can do live update (pause guests, kexec and resume them again)
-with a *single* cycle of skew. After all, the host TSC is still just as
-trustworthy so there's no excuse for *anything* changing over the
-kexec. Every other clock in the guest should have precisely the *same*
-relationship to the host TSC as it did before the kexec.
-
- arch/x86/kvm/x86.c | 60 ++++++++++++++++++++++++++++++++++++++++------
- arch/x86/kvm/x86.h |  2 ++
- arch/x86/kvm/xen.c |  4 ++--
- 3 files changed, 57 insertions(+), 9 deletions(-)
+ arch/x86/kvm/x86.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04b57a336b34..625ec4d9281b 100644
+index 9f18b06bbda6..38fd04a286c7 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2317,14 +2317,9 @@ static void kvm_write_wall_clock(struct kvm *kvm, gp=
-a_t wall_clock, int sec_hi_o
- 	if (kvm_write_guest(kvm, wall_clock, &version, sizeof(version)))
- 		return;
-=20
--	/*
--	 * The guest calculates current wall clock time by adding
--	 * system time (updated by kvm_guest_time_update below) to the
--	 * wall clock specified here.  We do the reverse here.
--	 */
--	wall_nsec =3D ktime_get_real_ns() - get_kvmclock_ns(kvm);
-+	wall_nsec =3D kvm_get_wall_clock_epoch(kvm);
-=20
--	wc.nsec =3D do_div(wall_nsec, 1000000000);
-+	wc.nsec =3D do_div(wall_nsec, NSEC_PER_SEC);
- 	wc.sec =3D (u32)wall_nsec; /* overflow in 2106 guest time */
- 	wc.version =3D version;
-=20
-@@ -3229,6 +3224,57 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 	return 0;
- }
-=20
-+uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
-+{
-+	/*
-+	 * The guest calculates current wall clock time by adding
-+	 * system time (updated by kvm_guest_time_update below) to the
-+	 * wall clock specified here.  We do the reverse here.
-+	 */
-+#ifdef CONFIG_X86_64
-+	struct pvclock_vcpu_time_info hv_clock;
-+	struct kvm_arch *ka =3D &kvm->arch;
-+	unsigned long seq, local_tsc_khz =3D 0;
-+	struct timespec64 ts;
-+	uint64_t host_tsc;
-+
-+	do {
-+		seq =3D read_seqcount_begin(&ka->pvclock_sc);
-+
-+		if (!ka->use_master_clock)
-+			break;
-+
-+		/* It all has to happen on the same CPU */
-+		get_cpu();
-+
-+		local_tsc_khz =3D get_cpu_tsc_khz();
-+
-+		if (local_tsc_khz &&
-+		    !kvm_get_walltime_and_clockread(&ts, &host_tsc))
-+			local_tsc_khz =3D 0; /* Fall back to old method */
-+
-+		hv_clock.tsc_timestamp =3D ka->master_cycle_now;
-+		hv_clock.system_time =3D ka->master_kernel_ns + ka->kvmclock_offset;
-+
-+		put_cpu();
-+	} while (read_seqcount_retry(&ka->pvclock_sc, seq));
-+
-+	/*
-+	 * If the conditions were right, and obtaining the wallclock+TSC was
-+	 * successful, calculate the KVM clock at the corresponding time and
-+	 * subtract one from the other to get the epoch in nanoseconds.
-+	 */
-+	if (local_tsc_khz) {
-+		kvm_get_time_scale(NSEC_PER_SEC, local_tsc_khz * 1000LL,
-+				   &hv_clock.tsc_shift,
-+				   &hv_clock.tsc_to_system_mul);
-+		return ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec -
-+			__pvclock_read_cycles(&hv_clock, host_tsc);
-+	}
-+#endif
-+	return ktime_get_real_ns() - get_kvmclock_ns(kvm);
-+}
-+
- /*
-  * kvmclock updates which are isolated to a given vcpu, such as
-  * vcpu->cpu migration, should not allow system_timestamp from
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index c544602d07a3..b21743526011 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -290,6 +290,8 @@ static inline bool kvm_check_has_quirk(struct kvm *kvm,=
- u64 quirk)
- 	return !(kvm->arch.disabled_quirks & quirk);
- }
-=20
-+uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm);
-+
- void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc=
-_eip);
-=20
- u64 get_kvmclock_ns(struct kvm *kvm);
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 75586da134b3..6bab715be428 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -59,7 +59,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_=
-t gfn)
- 		 * This code mirrors kvm_write_wall_clock() except that it writes
- 		 * directly through the pfn cache and doesn't mark the page dirty.
- 		 */
--		wall_nsec =3D ktime_get_real_ns() - get_kvmclock_ns(kvm);
-+		wall_nsec =3D kvm_get_wall_clock_epoch(kvm);
-=20
- 		/* It could be invalid again already, so we need to check */
- 		read_lock_irq(&gpc->lock);
-@@ -98,7 +98,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_=
-t gfn)
- 	wc_version =3D wc->version =3D (wc->version + 1) | 1;
- 	smp_wmb();
-=20
--	wc->nsec =3D do_div(wall_nsec,  1000000000);
-+	wc->nsec =3D do_div(wall_nsec, NSEC_PER_SEC);
- 	wc->sec =3D (u32)wall_nsec;
- 	*wc_sec_hi =3D wall_nsec >> 32;
- 	smp_wmb();
---=20
-2.40.1
+@@ -3290,9 +3290,6 @@ static void kvmclock_sync_fn(struct work_struct *work)
+ 					   kvmclock_sync_work);
+ 	struct kvm *kvm = container_of(ka, struct kvm, arch);
+ 
+-	if (!kvmclock_periodic_sync)
+-		return;
+-
+ 	schedule_delayed_work(&kvm->arch.kvmclock_update_work, 0);
+ 	schedule_delayed_work(&kvm->arch.kvmclock_sync_work,
+ 					KVMCLOCK_SYNC_PERIOD);
+-- 
+2.34.1
 
-
-
---=-yGt/cGcobzebLM+1F5oq
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDAxMTc1NDE2WjAvBgkqhkiG9w0BCQQxIgQgB7DQXU39
-WTC0uiWG3fec4/0vlN5pqcRvMSMhKbJigOMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAqfxyPxsHlnGBKj3tWZL5OZqeirPZ/SGJV
-I5s/Lvs9lXsaQZPFlaxXsg5R9lcgXLk160plDicCnkL7+XbAzHHc/JaC5j9cG9dkXIKsfMxHUNYS
-WA4agFn6hf9SGXEAeRJDcmXPL3yQ3NojWHSMARWCP2/TdchWe3NMW509lHs7ISQHEG+Wt9yoktTf
-togVpZYWF8gM31Vq0XFClT/EiEo96zHBZxBs2eAiM8yWH3zdwXOG7msv8y4BthMTBx4BUQXr07ZW
-b4YyMFKt1s7gUg2y9CNnqy+bOjbhKxqPFmxiKwnpELBztpzxfU5eCJOimphahemycnt2wNGVYb9Z
-+9fuUYg6HKKQAIMsWXHrPnbdSlwluD8Jz8aBqScnOVkAMkLhB3P1j+QodpeOK7Q5xHEWPJR295hg
-HAKordKgBt6AK/YCk4aQpRqiF7+Bi+I65Fy8+fTURv0zV4fDpZ33JzuM+4O05+EsNHqRGiIb4cXM
-F1rYe1Cl64SjCorbOKrwAhm00+CQt1mKHJpToY+xFiDsle8Xr386shN+yPsA9AJu+Mse01gXVllj
-fx/RzHW7WSexqpFzDTQURa/mNwzWlHWKXh1BAebwqTKjm9s99l7aIbi0lgcMJ9oXdvHpZf8fO6lP
-z0JJ3qxhBDBdxtpATDgUaRlyzSnXBBQWYl8Iq5ruSwAAAAAAAA==
-
-
---=-yGt/cGcobzebLM+1F5oq--
