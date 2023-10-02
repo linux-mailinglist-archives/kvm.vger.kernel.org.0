@@ -2,98 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3BB27B5A8E
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 20:55:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ED6F7B5AC8
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 21:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbjJBSz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 14:55:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
+        id S238511AbjJBTBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 15:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbjJBSz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 14:55:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8577B3
-        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 11:54:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696272876;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dmM5ZNDegeZhf5s/Nz9vdWgDVovgTarUhb8l/wE2St4=;
-        b=D6EtpInv3Uq0zrKQjjic7ta+Fe46Eujr51FcGNfpf63EUa9tzOOrqgW9cMBnDawAU6qMGR
-        BeOhfAPeGaHTAbqr27TR3BMr+NidPe9NflU8qt6sXFzRKrkN/AJIjoMkta0jzwhlXdb4J/
-        E6gtxKOBRXEIGzoI3Bjo5Yau374PjZI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-584-W4uLBja-N5WWgJ9pUCQOhA-1; Mon, 02 Oct 2023 14:54:22 -0400
-X-MC-Unique: W4uLBja-N5WWgJ9pUCQOhA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24FD3101A59B;
-        Mon,  2 Oct 2023 18:54:22 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A0BD310EE402;
-        Mon,  2 Oct 2023 18:54:21 +0000 (UTC)
-Date:   Mon, 2 Oct 2023 14:54:20 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
+        with ESMTP id S229502AbjJBTBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 15:01:17 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D392BC6
+        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 12:01:13 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59b5a586da6so336137b3.1
+        for <kvm@vger.kernel.org>; Mon, 02 Oct 2023 12:01:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696273273; x=1696878073; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ckwzzbSxH95zbV9Ph3aAP9Fp5FbPi93+Tiiv+0bzk7M=;
+        b=dWkherERAXJwUbcB4LVAVI1asYxXGO6aXixpYhOyv9kIuSGUTcEjwh4BLaWTgxTXzG
+         7K75V63eR7A9o2tbKD9nu3ZUi6DCeuqdVU46vGgMHiVcsE7jyOrIIRC2Dd45vyIhwQD8
+         52XgV67+fPs2zds8XPK82H1yn3qWhe2Spt9tYu3s8ojXckAEtHGQ8zuIDyJ9UmRPpnUm
+         nO1+y0hjz5Cn/WLMQiq9x+AFz0CHu1mcIKMPgkAo1L4Toou4V5CTnOJLtm7xJJgG1keC
+         xT/3VtMtPu+S9SeTzmV3HEeYnN+D3NvCIS6yYJtY6Isn/07bXyW3PiKNOzTBvWTNemd7
+         hNsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696273273; x=1696878073;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ckwzzbSxH95zbV9Ph3aAP9Fp5FbPi93+Tiiv+0bzk7M=;
+        b=sm/iO8PlukUrrFgLeB0Jm88w1sQNXUp46skReOSbFxB9HpEAqo0ZNPhzbsDKdKQjKc
+         9GENdgRK6egEivzVNya35sXv8+QSQBrHjyqUTQ1YqcBTNaudzcddhZDDQDKKwbHLv4uO
+         VmSAbEW1PygT922AgmYK2K+7uDgX8E5Q5MJmzuBDRgG9Z5R4qsYN2zZEFHe+Hdk4MqtY
+         d6G46b84W7Iq141OKH/zyuAjyU1ip0I4P9hCqQaI8eV76I/RuJts4ujQksyPsNSVUAA8
+         mTAClswTrm+x1HK+RyoAOYpsL3CQv1zTOtzrDh3ScX23mXiKrM0Qe9ZpnQ0pwL2qvsoS
+         FZZw==
+X-Gm-Message-State: AOJu0Yzz+NId64MGuSgVahDQfFCtQN++ZfiZGC2Egke4wAskrvykuggj
+        QHqIE+SZ4Q4S8ycEBOi6QLxveA5Jg1s=
+X-Google-Smtp-Source: AGHT+IFYEOOv4UwLqviXbR+k+OW+wIzCw/xJ4qlPUj28o767UlOg6AdRosVhdf5F+RckQFM18g4YOtNNMdw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ac07:0:b0:59b:eb4b:2cad with SMTP id
+ k7-20020a81ac07000000b0059beb4b2cadmr9775ywh.5.1696273272964; Mon, 02 Oct
+ 2023 12:01:12 -0700 (PDT)
+Date:   Mon, 2 Oct 2023 12:01:11 -0700
+In-Reply-To: <0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com>
+Mime-Version: 1.0
+References: <0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com>
+Message-ID: <ZRsTd9FEIvgERrte@google.com>
+Subject: Re: [PATCH] KVM: SVM: Fix build error when using -Werror=unused-but-set-variable
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-scsi: Spelling s/preceeding/preceding/g
-Message-ID: <20231002185420.GB1059748@fedora>
-References: <b57b882675809f1f9dacbf42cf6b920b2bea9cba.1695903476.git.geert+renesas@glider.be>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="fuzmqqeB7+mI12HN"
-Content-Disposition: inline
-In-Reply-To: <b57b882675809f1f9dacbf42cf6b920b2bea9cba.1695903476.git.geert+renesas@glider.be>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---fuzmqqeB7+mI12HN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Sep 28, 2023 at 02:18:33PM +0200, Geert Uytterhoeven wrote:
-> Fix a misspelling of "preceding".
->=20
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On Mon, Oct 02, 2023, Tom Lendacky wrote:
+> Commit 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support for
+> virtualized TSC_AUX") introduced a local variable used for the rdmsr()
+> function for the high 32-bits of the MSR value. This variable is not used
+> after being set and triggers a warning or error, when treating warnings
+> as errors, when the unused-but-set-variable flag is set. Mark this
+> variable as __maybe_unused to fix this.
+> 
+> Fixes: 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support for virtualized TSC_AUX")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  drivers/vhost/scsi.c | 2 +-
+>  arch/x86/kvm/svm/svm.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 9507df93f410..4c917c74a4d3 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -691,7 +691,7 @@ static int svm_hardware_enable(void)
+>  	 */
+>  	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX)) {
+>  		struct sev_es_save_area *hostsa;
+> -		u32 msr_hi;
+> +		u32 __maybe_unused msr_hi;
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Argh, the abomination that is rdmsrl() strikes again :-/  We really should be able
+to do:
 
---fuzmqqeB7+mI12HN
-Content-Type: application/pgp-signature; name="signature.asc"
+		hostsa->tsc_aux = (u32)rdmsrl(MSR_TSC_AUX);
 
------BEGIN PGP SIGNATURE-----
+I don't see a better quick fix than __maybe_unused though.
 
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmUbEdwACgkQnKSrs4Gr
-c8jm3wf3SybCVag7HhsRlbQBB2qCWSsI12mkvW0sXMAwLbLvfBANqEWmTzmywolz
-wzPqtLEJrTAScwq8jHk8r9R+V8Sq+thDzpNdI08PCGDVriCt8LBEgDIjvs0EvSNP
-rAhQxFxP5ciDKCRnnVq3cdXdzwPdkKNifj02HiaXQknBCE99vXD71LTwYLY4MBXI
-fIfva8/FlebeJYdBU91I9alORHAnlmgE7xZWh3j9QN8b+hT6TQKbcVKan2Z+/Zj+
-uEsjUWce8P3nTF8jd1AkjFDTegRXSmc9TKX2iqiglCBRZPUT8Ya2pSacmGdk2Lm/
-mNLVJfYcDmicuRAkTrTsok4iECvw
-=P1kz
------END PGP SIGNATURE-----
-
---fuzmqqeB7+mI12HN--
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
