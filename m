@@ -2,87 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C937B5785
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 18:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D2B27B587A
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 18:57:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238121AbjJBP46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 11:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43710 "EHLO
+        id S238202AbjJBQdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 12:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238273AbjJBP45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 11:56:57 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B85BC9
-        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 08:56:53 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d852a6749baso24116785276.0
-        for <kvm@vger.kernel.org>; Mon, 02 Oct 2023 08:56:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696262212; x=1696867012; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpsMPjbR1WNgJ/uUktgfbNndpX69oDvkpl70xKylEH8=;
-        b=QDU9RwJW0u50FcNZZxExPPEv4dK3Fr1p/MZuwCn1Awwcr6dwkCmF0GzdiDn6X1Ls1a
-         9FrOsfkXc/UMWpC7ayqGFvQnaS8UDsjnVVwkOGcf1alqLj78ib1LLFC2o5xA//oQWnbi
-         teMNTWoAuEveJJfFz9WD49zQ7krILJAHmJFFwxLp30zoy5rSScSyJe7OUnSsUhAfYm20
-         ktMpYDPOWmB+xkNZ7zs4ZiCGEFTthxIijuehMK3QCAMgBiqpUdK+4s2c1Pfj4kLUeMOR
-         RvOpZvC46JEkr590M7niku2AG8CEn/Pcp7jf/SzqgpDmgEEjRUtKCy8kmmI4qzwXGyC5
-         stiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696262212; x=1696867012;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpsMPjbR1WNgJ/uUktgfbNndpX69oDvkpl70xKylEH8=;
-        b=SFHGM+bjHso9+i5cmKjwTX7+51snIASNuwY/KmNpTXVguilgK/HwdkfOYL5mCLsPQt
-         ldfLUwP6HTED7orfOod2fsXalFPZT7L5H2sXmnfA1ooQkUr54yZNHTe39VrK1AXZs3Jt
-         gfhzj7/gdr+Ro5HlWR6hKAkdhq6jhzdVdVrCVLNLfOVmiNlGgGxkcN352gSFk5w5Lg9L
-         QiDHEV/FHx6r3b/kikHFhMQ9i/2M6eQAHkShfwgU6f7hy4S/639PZIeDVdDuVK/vaR1d
-         l32FCItAFj5Ypb+XTL2Xrul8tiuLCDQg92UpsOEyo3+ZfpO0hq4fFeQq4Cf/hRYfSJoi
-         ltYw==
-X-Gm-Message-State: AOJu0Yyascn2lAiDrsaCnXwaJscKufI4DCJQXLLzXRJaFeiwSS2m0gWE
-        ceOX4EaBuwt1uE2X72secEL25f5ytpo=
-X-Google-Smtp-Source: AGHT+IFU0Rp0ypciSYbq9+jHt9tXgKHuu0bXBd5z/jIOuiXJuVh5Iwgc1+UaORfJnN9j0OiqnnlHuGl3o/U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:abe9:0:b0:d80:19e5:76c8 with SMTP id
- v96-20020a25abe9000000b00d8019e576c8mr178348ybi.12.1696262212083; Mon, 02 Oct
- 2023 08:56:52 -0700 (PDT)
-Date:   Mon, 2 Oct 2023 08:56:50 -0700
-In-Reply-To: <ZRrF38RGllA04R8o@gmail.com>
-Mime-Version: 1.0
-References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
- <20230927033124.1226509-8-dapeng1.mi@linux.intel.com> <20230927113312.GD21810@noisy.programming.kicks-ass.net>
- <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
- <ZRrF38RGllA04R8o@gmail.com>
-Message-ID: <ZRroQg6flyGBtZTG@google.com>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        with ESMTP id S230137AbjJBQdR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 12:33:17 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54B19B;
+        Mon,  2 Oct 2023 09:33:11 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1qnLqu-0003gY-Cc; Mon, 02 Oct 2023 18:33:00 +0200
+Message-ID: <e8993457-9e28-434a-b4e8-25ffcbee6517@maciej.szmigiero.name>
+Date:   Mon, 2 Oct 2023 18:32:54 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: Ignore MSR_AMD64_BU_CFG access
+Content-Language: en-US, pl-PL
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <0ffde769702c6cdf6b6c18e1dcb28b25309af7f7.1695659717.git.maciej.szmigiero@oracle.com>
+ <ZRHRsgjhOmIrxo0W@google.com>
+ <8c6a1fc8-2ac5-4767-8b02-9ef56434724e@maciej.szmigiero.name>
+ <ZRHckCMwOv3jfSs7@google.com> <ac402dd4-8bf3-87a8-7ade-50d62997ce97@amd.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+In-Reply-To: <ac402dd4-8bf3-87a8-7ade-50d62997ce97@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,87 +88,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 02, 2023, Ingo Molnar wrote:
+On 26.09.2023 00:25, Tom Lendacky wrote:
+> On 9/25/23 14:16, Sean Christopherson wrote:
+>> +Tom
+>>
+>> On Mon, Sep 25, 2023, Maciej S. Szmigiero wrote:
+>>> On 25.09.2023 20:30, Sean Christopherson wrote:
+>>>>>
+>>>>> Hyper-V enabled Windows Server 2022 KVM VM cannot be started on Zen1 Ryzen
+>>>>> since it crashes at boot with SYSTEM_THREAD_EXCEPTION_NOT_HANDLED +
+>>>>> STATUS_PRIVILEGED_INSTRUCTION (in other words, because of an unexpected #GP
+>>>>> in the guest kernel).
+>>>>>
+>>>>> This is because Windows tries to set bit 8 in MSR_AMD64_BU_CFG and can't
+>>>>> handle receiving a #GP when doing so.
+>>>>
+>>>> Any idea why?
+>>>
+>>> I guess it is trying to set some chicken bit?
+>>>
+>>> By the way, I tested Windows Server 2019 now - it has the same problem.
+>>>
+>>> So likely Windows 11 and newer version of Windows 10 have it, too.
+>>
+>> ...
+>>
+>>>>> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+>>>>> index 1d111350197f..c80a5cea80c4 100644
+>>>>> --- a/arch/x86/include/asm/msr-index.h
+>>>>> +++ b/arch/x86/include/asm/msr-index.h
+>>>>> @@ -553,6 +553,7 @@
+>>>>>    #define MSR_AMD64_CPUID_FN_1        0xc0011004
+>>>>>    #define MSR_AMD64_LS_CFG        0xc0011020
+>>>>>    #define MSR_AMD64_DC_CFG        0xc0011022
+>>>>> +#define MSR_AMD64_BU_CFG        0xc0011023
+>>>>
+>>>> What document actually defines this MSR?  All of the PPRs I can find for Family 17h
+>>>> list it as:
+>>>>
+>>>>      MSRC001_1023 [Table Walker Configuration] (Core::X86::Msr::TW_CFG)
+>>>
+>>> It's partially documented in various AMD BKDGs, however I couldn't find
+>>> any definition for this particular bit (8) - other than that it is reserved.
+>>
+>> I found it as MSR_AMD64_BU_CFG for Model 16h, but that's Jaguar/Puma, not Zen1.
+>> My guess is that Windows is trying to write this thing:
+>>
+>>    MSRC001_1023 [Table Walker Configuration] (Core::X86::Msr::TW_CFG)
+>>    Read-write. Reset: 0000_0000_0000_0000h.
+>>    _lthree0_core[3,1]; MSRC001_1023
+>>
+>>    Bits   Description
+>>    63:50  Reserved.
+>>    49     TwCfgCombineCr0Cd: combine CR0_CD for both threads of a core. Read-write. Reset: 0. Init: BIOS,1.
+>>           1=The host Cr0_Cd values from the two threads are OR'd together and used by both threads.
+>>    48:0   Reserved.
+>>
+>> Though that still doesn't explain bit 8...  Perhaps a chicken-bit related to yet
+>> another speculation bug?
+>>
+>> Boris or Tom, any idea what Windows is doing?  I doubt it changes our options in
+>> terms of "fixing" this in KVM, but having a somewhat accurate/helpful changelog
+>> would be nice.
 > 
-> * Peter Zijlstra <peterz@infradead.org> wrote:
+> It's definitely not related to a speculation bug, but I'm unsure what was told to Microsoft that has them performing that WRMSR. The patch does the proper thing, though, as a guest shouldn't be updating that setting.
 > 
-> > On Fri, Sep 29, 2023 at 03:46:55PM +0000, Sean Christopherson wrote:
-> > 
-> > > > I will firmly reject anything that takes the PMU away from the host
-> > > > entirely through.
-> > > 
-> > > Why?  What is so wrong with supporting use cases where the platform owner *wants*
-> > > to give up host PMU and NMI watchdog functionality?  If disabling host PMU usage
-> > > were complex, highly invasive, and/or difficult to maintain, then I can understand
-> > > the pushback.  
-> > 
-> > Because it sucks.
->
-> > You're forcing people to choose between no host PMU or a slow guest PMU.
+> And TW_CFG is the proper name of that MSR for Zen.
 
-Nowhere did I say that we wouldn't take patches to improve the existing vPMU
-support.  But that's largely a moot point because I don't think it's possible to
-improve the current approach to the point where it would provide a performant,
-functional guest PMU.
 
-> > And that's simply not a sane choice for most people --
+So, should I prepare v2 with MSR_AMD64_BU_CFG -> MSR_AMD64_TW_CFG change?
 
-It's better than the status quo, which is that no one gets to choose, everyone
-gets a slow guest PMU.
+Thanks,
+Maciej
 
-> > worse it's not a choice based in technical reality.
-
-The technical reality is that context switching the PMU between host and guest
-requires reading and writing far too many MSRs for KVM to be able to context
-switch at every VM-Enter and every VM-Exit.  And PMIs skidding past VM-Exit adds
-another layer of complexity to deal with.
-
-> > It's a choice out of lazyness, disabling host PMU is not a requirement
-> > for pass-through.
-
-The requirement isn't passthrough access, the requirements are that the guest's
-PMU has accuracy that is on par with bare metal, and that exposing a PMU to the
-guest doesn't have a meaningful impact on guest performance.
-
-> Not just a choice of laziness, but it will clearly be forced upon users
-> by external entities:
-> 
->    "Pass ownership of the PMU to the guest and have no host PMU, or you
->     won't have sane guest PMU support at all. If you disagree, please open
->     a support ticket, which we'll ignore."
-
-We don't have sane guest PMU support today.  In the 12+ years since commit
-f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests"), KVM has
-never provided anything remotely close to a sane vPMU.  It *mostly* works if host
-perf is quiesced, but that "good enough" approach doesn't suffice for any form of
-PMU usage that requires a high level of accuracy and precision.
-
-> The host OS shouldn't offer facilities that severely limit its own capabilities,
-> when there's a better solution. We don't give the FPU to apps exclusively either,
-> it would be insanely stupid for a platform to do that.
-
-The FPU can be effeciently context switched, guest state remains resident in
-hardware so long as the vCPU task is scheduled in (ignoring infrequrent FPU usage
-from IRQ context), and guest usage of the FPU doesn't require trap-and-emulate
-behavior in KVM.
-
-As David said, ceding the hardware PMU for all of kvm_arch_vcpu_ioctl_run()
-(module the vCPU task being scheduled out) is likely a viable alternative.
-
- : But it does mean that when entering the KVM run loop, the host perf system 
- : needs to context switch away the host PMU state and allow KVM to load the guest
- : PMU state.  And much like the FPU situation, the portion of the host kernel
- : that runs between the context switch to the KVM thread and VMENTER to the guest
- : cannot use the PMU.
-
-If y'all are willing to let KVM redefined exclude_guest to be KVM's outer run
-loop, then I'm all for exploring that option.  But that idea got shot down over
-a year ago[*].  Or at least, that was my reading of things.  Maybe it was just a
-misunderstanding because we didn't do a good job of defining the behavior.
-
-I am completely ok with either approach, but I am not ok with being nak'd on both.
-Because unless there's a magical third option lurking, those two options are the
-only ways for KVM to provide a vPMU that meets the requirements for slice-of-hardware
-use cases.
-
-[*] https://lore.kernel.org/all/YgPCm1WIt9dHuoEo@hirez.programming.kicks-ass.net
