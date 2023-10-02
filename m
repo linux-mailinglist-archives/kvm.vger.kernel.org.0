@@ -2,49 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 371AA7B59C8
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 20:11:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB67C7B5A34
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 20:34:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232711AbjJBSJ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 14:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48466 "EHLO
+        id S236420AbjJBSQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 14:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjJBSJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 14:09:27 -0400
+        with ESMTP id S229604AbjJBSQd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 14:16:33 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B839E;
-        Mon,  2 Oct 2023 11:09:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 996A59B;
+        Mon,  2 Oct 2023 11:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xRxV8h6rdz6K6cFZgLZZ6o8bxTWhdijjWkOntbWqQCM=; b=h+7JSw+JYEH90+ILDXh+0kyRAB
-        9BEvky5UQXJeECAOmx0sHeXjH7gRhjDlAAmypWlUWCWy4DrAKZxXuqYeWiaw2RRQaDIE9Snl/VNK/
-        qtqkeeOeqshq14P/6BoWSv5svfNNSETIaKS1Kzq3qKHf12D0EI8RoYLUUcP2PhNidTXRMjXkiCF3f
-        LrArseTYRl12WPMBw5h1bGqKy43n7iXn4i75YegcN+YgK9ANUwr/XIMsSFF75pVFs9D8GxbaBWXRJ
-        4RUOZ15/5yNx6DrMRgG1j059B8pRmToDDQlXcduywOJvD4fwwg+SP3XyNgJnZ684KA2bKmKhwWiKJ
-        V6rk45wA==;
+        bh=DTs4MCkWa4O51zLZooaCLs2DXs4Y4+zbpbqGLpSf0ao=; b=NTkcXD38zZT5iyrKmARaSEk1ZH
+        udqqr9czl7TilAW6BKUVMWISXoI5H3cBIfDOOdpZyyGvhNwSdm+hADLXjXNBJnx2mca8JLitq/aF5
+        Q74WXczLPfNt5Ih4JoCMEXE8YOly4/lVJcqn3ljX3xAlljAkeo168V4aGxz/yAOTKzJt8+t8o7i19
+        9tR1SfYeLYFlM/VRkvJ4OdPATX3U1bq4R6BbNwyWz/IstUGQolOC+bQuTeb67hUc9InvnlVCcWFfm
+        KTPb8zIc4cUoboj7JEaWSbcF+meUUrgHEaoJEyDoLsqrDKoIT/jtxFIcdpVVd9NvnJ5RTUFJcZ7WI
+        9KQQ7l6Q==;
 Received: from [2001:8b0:10b:5:5205:71fd:de0:52fd] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qnNM7-00AQuS-Cj; Mon, 02 Oct 2023 18:09:19 +0000
-Message-ID: <ac097a26e96ded73e19200066b9063354096a8fd.camel@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86: Use fast path for Xen timer delivery
+        id 1qnNSw-00ATMV-Mj; Mon, 02 Oct 2023 18:16:23 +0000
+Message-ID: <52a3cea2084482fc67e35a0bf37453f84dcd6297.camel@infradead.org>
+Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock
+ periodically
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>, Paul Durrant <paul@xen.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Date:   Mon, 02 Oct 2023 19:09:18 +0100
-In-Reply-To: <ZRsAvYecCOpeHvPY@google.com>
-References: <a3989e7ff9cca77f680f9bdfbaee52b707693221.camel@infradead.org>
-         <ZRbolEa6RI3IegyF@google.com>
-         <ee679de20e3a53772f9d233b9653fdc642781577.camel@infradead.org>
-         <ZRsAvYecCOpeHvPY@google.com>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com
+Date:   Mon, 02 Oct 2023 19:16:22 +0100
+In-Reply-To: <ZRrxtagy7vJO5tgU@google.com>
+References: <20230926230649.67852-1-dongli.zhang@oracle.com>
+         <377d9706-cc10-dfb8-5326-96c83c47338d@oracle.com>
+         <36f3dbb1-61d7-e90a-02cf-9f151a1a3d35@oracle.com>
+         <ZRWnVDMKNezAzr2m@google.com>
+         <a461bf3f-c17e-9c3f-56aa-726225e8391d@oracle.com>
+         <884aa233ef46d5209b2d1c92ce992f50a76bd656.camel@infradead.org>
+         <ZRrxtagy7vJO5tgU@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-NQeMivtfMykEP/nMeozY"
+        boundary="=-CgKoueqD1RfYvRdpZlra"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -58,138 +61,71 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-NQeMivtfMykEP/nMeozY
+--=-CgKoueqD1RfYvRdpZlra
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2023-10-02 at 10:41 -0700, Sean Christopherson wrote:
-> On Fri, Sep 29, 2023, David Woodhouse wrote:
-> > On Fri, 2023-09-29 at 08:16 -0700, Sean Christopherson wrote:
-> > > On Fri, Sep 29, 2023, David Woodhouse wrote:
-> > > > From: David Woodhouse <dwmw@amazon.co.uk>
-> > > >=20
-> > > > Most of the time there's no need to kick the vCPU and deliver the t=
-imer
-> > > > event through kvm_xen_inject_timer_irqs(). Use kvm_xen_set_evtchn_f=
-ast()
-> > > > directly from the timer callback, and only fall back to the slow pa=
-th
-> > > > when it's necessary to do so.
+On Mon, 2023-10-02 at 09:37 -0700, Sean Christopherson wrote:
+> On Mon, Oct 02, 2023, David Woodhouse wrote:
+> > On Fri, 2023-09-29 at 13:15 -0700, Dongli Zhang wrote:
 > > >=20
-> > > It'd be helpful for non-Xen folks to explain "when it's necessary".=
-=C2=A0 IIUC, the
-> > > only time it's necessary is if the gfn=3D>pfn cache isn't valid/fresh=
-.
-> >=20
-> > That's an implementation detail.
->=20
-> And?=C2=A0 The target audience of changelogs are almost always people tha=
-t care about
-> the implementation.
->
-> > Like all of the fast path functions that can be called from
-> > kvm_arch_set_irq_inatomic(), it has its own criteria for why it might r=
-eturn
-> > -EWOULDBLOCK or not. Those are *its* business.
->=20
-> And all of the KVM code is the business of the people who contribute to t=
-he kernel,
-> now and in the future.=C2=A0 Yeah, there's a small chance that a detailed=
- changelog can
-> become stale if the patch races with some other in-flight change, but eve=
-n *that*
-> is a useful data point.=C2=A0 E.g. if Paul's patches somehow broke/degrad=
-ed this code,
-> then knowing that what the author (you) intended/observed didn't match re=
-ality when
-> the patch was applied would be extremely useful information for whoever e=
-ncountered
-> the hypothetical breakage.
-
-Fair enough, but on this occasion it truly doesn't matter. It has
-nothing to do with the implementation of *this* patch. This code makes
-no assumptions and has no dependency on *when* that fast path might
-return -EWOULDBLOCK. Sometimes it does, sometimes it doesn't. This code
-just doesn't care one iota.
-
-If this code had *dependencies* on the precise behaviour of
-kvm_xen_set_evtchn_fast() that we needed to reason about, then sure,
-I'd have written those explicitly into the commit comment *and* tried
-to find some way of enforcing them with runtime warnings etc.
-
-But it doesn't. So I am no more inclined to document the precise
-behaviour of kvm_xen_set_evtchn_fast() in a patch which just happens to
-call it, than I am inclined to document hrtimer_cancel() or any other
-function called from the new code :)
-
-> > And in fact one of Paul's current patches is tweaking them subtly, but =
-that
-> > isn't relevant here. (But yes, you are broadly correct in your
-> > understanding.)
-> >=20
-> > > > This gives a significant improvement in timer latency testing (usin=
-g
-> > > > nanosleep() for various periods and then measuring the actual time
-> > > > elapsed).
-> > > >=20
-> > > > However, there was a reason=C2=B9 the fast path was dropped when th=
-is support
+> > > 1. The vcpu->hv_clock (kvmclock) is based on its own mult/shift/equat=
+ion.
 > > >=20
-> > > Heh, please use [1] or [*] like everyone else.=C2=A0 I can barely see=
- that tiny little =C2=B9.
+> > > 2. The raw monotonic (tsc_clocksource) uses different mult/shift/equa=
+tion.
+> > >=20
 > >=20
-> > Isn't that the *point*? The reference to the footnote isn't supposed to
-> > detract from the flow of the main text. It's exactly how you'll see it
-> > when typeset properly.
-> =C2=A0
-> Footnotes that are "typeset properly" have the entire footnote in a diffe=
-rent
-> font+size.=C2=A0 A tiny number next to normal sized text just looks weird=
- to me.
+> > That just seems wrong. I don't mean that you're incorrect; it seems
+> > *morally* wrong.
+> >=20
+> > In a system with X86_FEATURE_CONSTANT_TSC, why would KVM choose to use
+> > a *different* mult/shift/equation (your #1) to convert TSC ticks to
+> > nanoseconds than the host CLOCK_MONOTONIC_RAW does (your #2).
+> >=20
+> > I understand that KVM can't track the host's CLOCK_MONOTONIC, as it's
+> > adjusted by NTP. But CLOCK_MONOTONIC_RAW is supposed to be consistent.
+> >=20
+> > Fix that, and the whole problem goes away, doesn't it?
+> >=20
+> > What am I missing here, that means we can't do that?
 >=20
-> And I often do a "reverse lookup" when I get to footnotes that are links,=
- e.g. to
-> gauge whether or not it's worth my time to follow the link.=C2=A0 Trying =
-to find the
-> tiny =C2=B9 via a quick visual scan is an exercise in frustration, at lea=
-st for the
-> monospace font I use for reading mail, e.g. it's much more readable on my=
- end in
-> an editor using a different font.
+> I believe the answer is that "struct pvclock_vcpu_time_info" and its math=
+ are
+> ABI between KVM and KVM guests.
 >=20
-> Which is a big benefit to sticking to the old and kludgly ASCII: it provi=
-des a
-> fairly consistent experience regardless of what client/font/etc each read=
-er is
-> using.=C2=A0 I'm not completely against using unicode characters, e.g. fo=
-r names with
-> characters not found in the Latin alphabet, but for code and things like =
-this,
-> IMO simpler is better.
->=20
-> > I've always assumed the people using [1] or [*] just haven't yet realis=
-ed
-> > that it's the 21st century and we are no longer limited to 7-bit ASCII.=
- Or
-> > haven't worked out how to type anything but ASCII.
->=20
-> Please don't devolve into ad hominem attacks against other reviews and co=
-ntributors.
-> If you want to argue that using footnote notation unicode is superior in =
-some way,
-> then by all means, present your arguments.
+> Like many of the older bits of KVM, my guess is that KVM's behavior is th=
+e product
+> of making things kinda sorta work with old hardware, i.e. was probably th=
+e least
+> awful solution in the days before constant TSCs, but is completely nonsen=
+sical on
+> modern hardware.
 
-Hey, you started the logical fallacies with the ad populum when you
-said "everyone else" :)
+I still don't understand. The ABI and its math are fine. The ABI is just
+ "at time X the TSC was Y, and the TSC frequency is Z"
 
-Not that that was true; there are examples of =C2=B9 being used in the
-kernel changelog going back decades.
+I understand why on older hardware, those values needed to *change*
+occasionally when TSC stupidity happened.=20
 
-I can just drop the footnote; there's not a huge amount of benefit in
-referring back to the old mail thread anyway. The gist of it was
-covered in the commit comment.
+But on newer hardware, surely we can set them precisely *once* when the
+VM starts, and never ever have to change them again? Theoretically not
+even when we pause the VM, kexec into a new kernel, and resume the VM!
 
---=-NQeMivtfMykEP/nMeozY
+But we *are* having to change it, because apparently
+CLOCK_MONOTONIC_RAW is doing something *other* than incrementing at
+precisely the frequency of the known and constant TSC.
+
+But *why* is CLOCK_MONOTONIC_RAW doing that? I thought that the whole
+point of CLOCK_MONOTONIC_RAW was to be consistent and not adjusted by
+NTP etc.? Shouldn't it run at precisely the same rate as the kvmclock,
+with no skew at all?
+
+And if CLOCK_MONOTONIC_RAW is not what I thought it was... do we really
+have to keep resetting the kvmclock to it at all? On modern hardware
+can't the kvmclock be defined by the TSC alone?
+
+--=-CgKoueqD1RfYvRdpZlra
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -281,24 +217,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDAyMTgwOTE4WjAvBgkqhkiG9w0BCQQxIgQg+5t8hYlC
-jOw3JqInKJfKrtvvZZ/VNxoWGNSn8n22OrQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDAyMTgxNjIyWjAvBgkqhkiG9w0BCQQxIgQggfn74aOV
+cWbUUAN6LJfVjv5SaS0LQnCYAz2xyb5qTyAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBVeruOd4QTpSFj9ynMsh44xo6A8nku2TFw
-G1fKLwuOvWaxB6kTFfpapf+GJ7Y/hP5dp8lXddCkyD445QuuDwr2ceIFxMtEoYbB31gZgxmMoHGF
-mPXSAoZ/teANcXfN01HTJzX2ovY38noyskW+d+Qweil4q6W+MqNz0JL0QTx09KVmw2a9m0qAUYkK
-dwDb3sdbuA2lakM4QtZDcxf5qsMFgLn7clbNkPtgJwF8pYD3pmTZ7EDJQMTo7qVCVHQwnqrRIMMk
-DJ9T795M6gpZnOqZ23d/bflcnO5MLQ0JnNFMq+tqHv9S6r38G32uP9udjXXOOnxOwcFqX2BVr6B2
-hiLeFCtfMl0Uk4E9E1qflLkeiUQLoAKmJcHFZzRlHR5wORT7oUcsUhcj+297EI613Sjk/5R6Aay2
-yFm+SfgZ88EWrfpeFfZpnQMp6Y0wEzT5EzYtlHtm9xU2PUphUW7fs9x8+b3Ws1IdIdfNA9meJ5pz
-+o0QiEhfs+is4AdnYhSr6DVi3K0YjDWrE9Ep9SK49TipmeXivUwRKJBR+tiZmeAS3IZQbqPNyPfU
-Zv6BAEYjyrzybdbEjF7AE36jiZdNfY1dE/dlXq3VY4lWaQDDeGlQucPDFHgrPeUedb4p4OSGM5g8
-jC3OpzQ9TLMjc+EhTZX9FUt5K28O6mNi2RQbZsWBvQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgByD/3C5KuUY0+j6eS+44CZIT8spQgZ1n2p
+PSx5k1D8xgPzJ5LLT6VHH6SmssdxzWDVN7ubhNtnWhj1kZt1NjSg1e60h/emcqH1cRb5I2wc70cb
+a/rsahD3JX/DBaPJhi6BhHgnJFc6EhFZhiLBJBp8F10ROb/lou+Su+/sADSXB5Km4MovNAFsoTg9
+QCKetZK8Q91NIc4ioFuD2UzNwR0pFssS7JxHv3x/SbHlxeCtN7+5wizoOpNTzNiKBp0Ya4PiR23O
+Fc8JSmhROOOAa/X2FYg+42++8BFesS14p1xAO/MrccXstoYsG62ObKx0gaQjLc+BR743oWqifzwq
+/QW36QBa9COK1Qqm9Cn80dZ6tdk7jcRIaISTL7cCj9aonzYyIlAUu5gLKiT7cl0biG97AYt3E7VM
+bRZ394j3zr/ZiuqjmmxkVJN50SQEVrOlNQ7+G8ufZc/IzPJX2ODshZ+fXLx7LH4jqBmo530pcTTs
+IloKSU5mkqlZzu3i1aDAkRVoeTUJkMo5Yv1b9xxGz4hbXRPlaYW98nNM1IPwyu/Vif/AAXeZ1Ahx
+w1R5e1Nkqg3FUfDQAZN74QI6EjDgqHnRtETfz8kpkG37Qv2wA/rzd+M5bPJVFCMS8ETQauInEctV
+PCaJeFtti0PJNxukXZz9VanDA61y3kwxpyT9tyLFZwAAAAAAAA==
 
 
---=-NQeMivtfMykEP/nMeozY--
+--=-CgKoueqD1RfYvRdpZlra--
