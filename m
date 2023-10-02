@@ -2,175 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B29837B5A27
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 20:34:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 921CB7B5A3A
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 20:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238769AbjJBSTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 14:19:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38476 "EHLO
+        id S238725AbjJBS3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 14:29:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238760AbjJBSS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 14:18:57 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1493FAD
-        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 11:18:53 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d8153284d6eso37286276.3
-        for <kvm@vger.kernel.org>; Mon, 02 Oct 2023 11:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696270732; x=1696875532; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IiAsR0Ba9+p25e+G6xW6VNHUT7Mv8K0srKGN2fQeRBE=;
-        b=CnVuIaX3D2J3q8zR3Ebf44tsagA0ZszhHVk1mp6tb2+h+oA2V44bf+lYlFAEnNr2VA
-         2aOh8dL9tBtLIqStpvOOHAVQV6k8KM/FExG4rQxR+VHMJ6+57yTPZNnww8lZAbQd4n85
-         9JisomqPvYp7Y5ngWyfBtdFlWjRT19ZjmrxdXJVWjM5Kc1S9VQnUQtnV30I7ng5oIjin
-         xqK2RqbOytqOmki9nWMZn21ITd6fUZ89cv2JmkxJrTilYNStX4qGYLLp2qrQBHDwpFiU
-         t4WWZ+8q2E1kzkGzvxT53PiI+BngZqb4mOCWR0pms2khCfrneRZC6m0DQj9DqZefgS18
-         jWZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696270732; x=1696875532;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IiAsR0Ba9+p25e+G6xW6VNHUT7Mv8K0srKGN2fQeRBE=;
-        b=SswLN91VcKazrE/ATe9dc5vaE1ZVAi3Kp3EQvMNaiTe9kQh7d+0NjlIPioszYUZjXB
-         BmPQkIDJE8Q+n9ProsU+DpkdKj8ZYCP1ej9+J4g1CWSG/RnwiYKdrj/f1sSfW6vP+dyB
-         5eFyk45EMK07Ew4svHrOULQqyjSB25ZqXKiJEx42Drg4ol7sZxXG7PwDOa+rfHm4E5h3
-         VjNT/I+F/ocol+5OITfL6dfQDXUN5Xq3d5l4TpbNjXORqxQyzat8qLZrlYmPp73Agfgb
-         Gry6Y1zCtUNh0P6kzdkr6iPSR8j/9dgMNdVwSv18EfaP2bmtjn20HKQKTvmcGdEgCe3F
-         Bqig==
-X-Gm-Message-State: AOJu0YxvoqXbZ02fW1nMQByJ1DgEA3CrKYFTFV0UaiwZkW8oGfwI/FP7
-        gy+K1DKxMClY7CWrR7PuuIHk5yIV3XU=
-X-Google-Smtp-Source: AGHT+IEgvFF9yJCrECX3HLAx/OWKfbYCCREDqciGbhtnUEZXPkLAdYNj04uJpbW0b6R/TeGRCwN5vMEpoHg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ad1e:0:b0:d7e:752f:baee with SMTP id
- y30-20020a25ad1e000000b00d7e752fbaeemr170399ybi.10.1696270732253; Mon, 02 Oct
- 2023 11:18:52 -0700 (PDT)
-Date:   Mon, 2 Oct 2023 11:18:50 -0700
-In-Reply-To: <a8479764-34a1-334f-3865-c01325d772d9@oracle.com>
-Mime-Version: 1.0
-References: <20230926230649.67852-1-dongli.zhang@oracle.com>
- <377d9706-cc10-dfb8-5326-96c83c47338d@oracle.com> <36f3dbb1-61d7-e90a-02cf-9f151a1a3d35@oracle.com>
- <ZRWnVDMKNezAzr2m@google.com> <a461bf3f-c17e-9c3f-56aa-726225e8391d@oracle.com>
- <884aa233ef46d5209b2d1c92ce992f50a76bd656.camel@infradead.org>
- <ZRrxtagy7vJO5tgU@google.com> <a8479764-34a1-334f-3865-c01325d772d9@oracle.com>
-Message-ID: <ZRsJiuKdXtWos_Xh@google.com>
-Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com,
-        Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229538AbjJBS3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 14:29:18 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2043.outbound.protection.outlook.com [40.107.244.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF511AB;
+        Mon,  2 Oct 2023 11:29:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UnzoT0lpK/hgHiYt4AWTlDAE3TillHek6XzKgHNGHjYg8h0tlRI/powPz/dmvRNTwuoYt9htK9Q4ORZYx5S97WMFCu22l8v18YyKN1c3DVIpVPD1icfBxaNS8GIpunv4MSsvGUK0DA+lx3Om2xy0+yLfM/PdBR5M3eVpPGvWYs+zRnGmFf6n/QC+h19vIkKOrmQV2Vp2FQ6xopWW3kFHHeBvwSBuuQLioQkjCqCI+ABnt9RoO/6s30/QnOJK+ISgmHK4TaBPjluiPRvN64fBcAPAriVt7KjVuwq+jbPlfHta38ntC8MLr9UJTq6m3X4HTQl8l5Sr69ppZq15W9dHgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3QS1TYuvO7jMxlCBmhMisG6uAYoxhO8OElCqBDKdW08=;
+ b=eXPiacC0MFISqWTk0oit7BkfK6/Hea/0omefw5YBIPZwJ7BXeu/WsUESAj45Fd1RHCKciArPSZpBSkAfUXmc71W0tX4Trl9DU5LvfKRCNsB24uDF1hgx5fAyZlmW+vC/ZpUKbJPOAJGtL5U8VGJ4d6/xOrYX4PhOgb9whGJFSJyyPwS2noHTooUoVOnNdL7APvrmug2WmjZquvxWXTP1vU6nOdtHGp+ypu8OBXk+qjYs4YudQEB5NLmZEp7PZ9woTKs7LnGfELM5hHPGNuGGjXBikTX9AC5yxd2h3zXnxnrvQQCHRmIL65VyC/qlZpzP9pGHUCnZwVu+Fd+20i8+Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3QS1TYuvO7jMxlCBmhMisG6uAYoxhO8OElCqBDKdW08=;
+ b=D9jnXHLxshEpwIYfn6jACNUjccIiO98WRadKmSU3iPWfvFz5v9NButgecSE2SRn7QSMYR1MQe2LxP57YEX5VOt3xBJyAeq9ETVvQPcutkLguep6ULY/42DDWQvagWaTJYdbW60PyYAm6UQqvlIz7Jv1IZuQIOu6vrn5WRMULakQ=
+Received: from BL1PR13CA0350.namprd13.prod.outlook.com (2603:10b6:208:2c6::25)
+ by SJ0PR12MB7458.namprd12.prod.outlook.com (2603:10b6:a03:48d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.29; Mon, 2 Oct
+ 2023 18:29:08 +0000
+Received: from MN1PEPF0000ECDA.namprd02.prod.outlook.com
+ (2603:10b6:208:2c6:cafe::71) by BL1PR13CA0350.outlook.office365.com
+ (2603:10b6:208:2c6::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.21 via Frontend
+ Transport; Mon, 2 Oct 2023 18:29:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECDA.mail.protection.outlook.com (10.167.242.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.14 via Frontend Transport; Mon, 2 Oct 2023 18:29:07 +0000
+Received: from tlendack-t1.amdoffice.net (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 2 Oct 2023 13:29:06 -0500
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <x86@kernel.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH] KVM: SVM: Fix build error when using -Werror=unused-but-set-variable
+Date:   Mon, 2 Oct 2023 13:28:54 -0500
+Message-ID: <0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDA:EE_|SJ0PR12MB7458:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5fa65c8e-5421-4adc-2c07-08dbc375771f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e8hTOSoF7/WjE3W2jDQU4yIlR9b6c2jzxMVA5Gl7Fs3KxANnXNWL0GpBXHv+hqsPY/5BXIJHzzsZBAfY+OQQQzmQaHJIevJ72GCOxtIcySMgJN2wPUyhB1KResNc+GvkaibQOba2FUqBAK02+0C/iT1n326H14CrPt1x0hF5Gz9W+8OGK8iicfvyvIpoRjs77jW1t4z64M2a9RVx9TpyBoRlriEAiLrBPs15s4ERTMvpkTnT89fy0jLc8sn4cSMPStlPKqL5T8utDfcEsTJsvqPXF4CMULjtNSXQTkRtDwlnBbDRlpV506Q8daU1ujO81U/VM4iyUr/zS73BYbeUjRwJLdTWTxtbc0+hnAySeKM3N9KmbNKTHvQ6PppvXUYVfj6Efoxor8t7e+FdQhFf5DLMixSAdx9th74pI6Tb5CGPWg0zGctsExbN2+izEzVYI3Q0kTKlRH400kV9KqCql4/UqaUAARW5viW08LxNWEZM2nIZ195Nd4eyOwuQ+1N1lXC2guPtdSNLKR67DhzXI6r7W1k/nGEarF1XXP80l8mPC2Vf+QFOE9FMGh9T88GPTTMnD/dW5VI1wRiCFyoisObPBm7lDfpu8+H0ZIvNWZr38DV2R/cOeT3FhnrKncWPu5Oxx0rt1vXc5dYuM7A8K9I8ufzVjhHn7sQ0+5KLN5wNb6xOcu5mBubVXqfVWp9NZfhuvyW5IcrQCUBvSMiCidmqYobDcfxAzxoZ+9Bypl4jYVonSWV86wY/gzFoZXYaVICGNYufRhALDY2SzWvGxA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(136003)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(82310400011)(36840700001)(40470700004)(46966006)(86362001)(2906002)(5660300002)(36860700001)(8936002)(83380400001)(8676002)(4326008)(47076005)(110136005)(41300700001)(36756003)(336012)(26005)(16526019)(70206006)(2616005)(426003)(81166007)(40480700001)(356005)(82740400003)(70586007)(316002)(54906003)(40460700003)(478600001)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 18:29:07.7678
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fa65c8e-5421-4adc-2c07-08dbc375771f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: MN1PEPF0000ECDA.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7458
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+PeterZ
+Commit 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support for
+virtualized TSC_AUX") introduced a local variable used for the rdmsr()
+function for the high 32-bits of the MSR value. This variable is not used
+after being set and triggers a warning or error, when treating warnings
+as errors, when the unused-but-set-variable flag is set. Mark this
+variable as __maybe_unused to fix this.
 
-Thomas and Peter,
+Fixes: 916e3e5f26ab ("KVM: SVM: Do not use user return MSR support for virtualized TSC_AUX")
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ arch/x86/kvm/svm/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-We're trying to address an issue where KVM's paravirt kvmclock drifts from the
-host's TSC-based monotonic raw clock because of historical reasons (at least, AFAICT),
-even when the TSC is constant.  Due to some dubious KVM behavior, KVM may sometimes
-re-sync kvmclock against the host's monotonic raw clock, which causes non-trivial
-jumps in time from the guest's perspective.
-
-Linux-as-a-guest demotes all paravirt clock sources when the TSC is constant and
-nonstop, and so the goofy KVM behavior isn't likely to affect the guest's clocksource,
-but the guest's sched_clock() implementation keeps using the paravirt clock.
-
-Irrespective of if/how we fix the KVM host-side mess, using a paravirt clock for
-the scheduler when using a constant, nonstop TSC for the clocksource seems at best
-inefficient, and at worst unnecessarily complex and risky.
-
-Is there any reason not to prefer native_sched_clock() over whatever paravirt
-clock is present when the TSC is the preferred clocksource?  Assuming the desirable
-thing to do is to use native_sched_clock() in this scenario, do we need a separate
-rating system, or can we simply tie the sched clock selection to the clocksource
-selection, e.g. override the paravirt stuff if the TSC clock has higher priority
-and is chosen?
-
-Some more details below (and in the rest of the thread).
-
-Thanks!
-
-On Mon, Oct 02, 2023, Dongli Zhang wrote:
-> Hi Sean and David,
-> 
-> On 10/2/23 09:37, Sean Christopherson wrote:
-> > However, why does any of this matter if the host has a constant TSC?  If that's
-> > the case, a sane setup will expose a constant TSC to the guest and the guest will
-> > use the TSC instead of kvmclock for the guest clocksource.
-> > 
-> > Dongli, is this for long-lived "legacy" guests that were created on hosts without
-> > a constant TSC?  If not, then why is kvmclock being used?  Or heaven forbid, are
-> > you running on hardware without a constant TSC? :-)
-> 
-> This is for test guests, and the host has all of below:
-> 
-> tsc, rdtscp, constant_tsc, nonstop_tsc, tsc_deadline_timer, tsc_adjust
-> 
-> A clocksource is used for two things.
-> 
-> 
-> 1. current_clocksource. Yes, I agree we should always use tsc on modern hardware.
-> 
-> Do we need to update the documentation to always suggest TSC when it is
-> constant, as I believe many users still prefer pv clock than tsc?
-> 
-> Thanks to tsc ratio scaling, the live migration will not impact tsc.
-> 
-> >From the source code, the rating of kvm-clock is still higher than tsc.
-> 
-> BTW., how about to decrease the rating if guest detects constant tsc?
-> 
-> 166 struct clocksource kvm_clock = {
-> 167         .name   = "kvm-clock",
-> 168         .read   = kvm_clock_get_cycles,
-> 169         .rating = 400,
-> 170         .mask   = CLOCKSOURCE_MASK(64),
-> 171         .flags  = CLOCK_SOURCE_IS_CONTINUOUS,
-> 172         .enable = kvm_cs_enable,
-> 173 };
-> 
-> 1196 static struct clocksource clocksource_tsc = {
-> 1197         .name                   = "tsc",
-> 1198         .rating                 = 300,
-> 1199         .read                   = read_tsc,
-
-That's already done in kvmclock_init().
-
-	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
-	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
-	    !check_tsc_unstable())
-		kvm_clock.rating = 299;
-
-See also: https://lore.kernel.org/all/ZOjF2DMBgW%2FzVvL3@google.com
-
-> 2. The sched_clock.
-> 
-> The scheduling is impacted if there is big drift.
-
-...
-
-> Unfortunately, the "no-kvmclock" kernel parameter disables all pv clock
-> operations (not only sched_clock), e.g., after line 300.
-
-...
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9507df93f410..4c917c74a4d3 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -691,7 +691,7 @@ static int svm_hardware_enable(void)
+ 	 */
+ 	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX)) {
+ 		struct sev_es_save_area *hostsa;
+-		u32 msr_hi;
++		u32 __maybe_unused msr_hi;
  
-> Should I introduce a new param to disable no-kvm-sched-clock only, or to
-> introduce a new param to allow the selection of sched_clock?
+ 		hostsa = (struct sev_es_save_area *)(page_address(sd->save_area) + 0x400);
+ 
+-- 
+2.41.0
 
-I don't think we want a KVM-specific knob, because every flavor of paravirt guest
-would need to do the same thing.  And unless there's a good reason to use a
-paravirt clock, this really shouldn't be something the guest admin needs to opt
-into using.
