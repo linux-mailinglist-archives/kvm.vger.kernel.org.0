@@ -2,109 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D490D7B51D9
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 13:57:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F09A7B51DE
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 13:58:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236802AbjJBL5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 07:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37994 "EHLO
+        id S236806AbjJBL6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 07:58:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231338AbjJBL5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 07:57:53 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C97DA;
-        Mon,  2 Oct 2023 04:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Wkp4ZFR4A8eDeB5jRNcWvSfEDmCQBh31225KsSq0CIM=; b=dc8WAugVpShhXR3MSKlvXjPHOC
-        eheG5oU/xn3vn+bQm2fXAvqK7cp+YhZ93zD7SsmprJn6xaPL/61Rau/z2DJcWEFUbDpfbdRH2TF4p
-        LGhPJsMhTui3n7wsD/T4iGkQ2kDa/1yKOMvoijNNVhFdfciB216+i3HkB6rwbtAVKu8uL8r6v+4zA
-        2a9A1z9HllqaPqJYb4O0oLGuKdqSDyTCxVsT0DLOScob8VEG1a3em2llnoVDDrlaUa8JS6BWmqR5m
-        4K4sVByJ879c6JOzej3Fdm+Xgsj8Oz/k1ct9Nli8w49ZkHa2ejxXZ8uGATKfWDYvNqfNCDQrmaak0
-        KpxeuWOA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qnHY5-0090Er-0H;
-        Mon, 02 Oct 2023 11:57:19 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 347FC300410; Mon,  2 Oct 2023 13:57:18 +0200 (CEST)
-Date:   Mon, 2 Oct 2023 13:57:18 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
+        with ESMTP id S236604AbjJBL6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 07:58:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9BC94
+        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 04:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696247852;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xdEi4vgKgEG2jRiO+4XFkFqhlYVyHnR0EylKCN1L2xM=;
+        b=W6km0XumYe2srix6tXm7OhkwOKFFd2P1Q8M/4VAAn6GJGbytAxMMEnvCmt8A8SK0cOL1Le
+        3V6cnCrVoRvoo2h+92aGTknITa2L1paVj1UjhWBQQARxzJwOvYh3Wg+E77VWDglYyXV617
+        qzycGXd4S1cacfrYYU2xiOJxc2WmsfE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-134-PTuM0XbWONejxasCbmtAbA-1; Mon, 02 Oct 2023 07:57:29 -0400
+X-MC-Unique: PTuM0XbWONejxasCbmtAbA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B339197E40A;
+        Mon,  2 Oct 2023 11:57:28 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.224.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 056A3140E950;
+        Mon,  2 Oct 2023 11:57:24 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
- event
-Message-ID: <20231002115718.GB13957@noisy.programming.kicks-ass.net>
-References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
- <20230927033124.1226509-8-dapeng1.mi@linux.intel.com>
- <20230927113312.GD21810@noisy.programming.kicks-ass.net>
- <ZRRl6y1GL-7RM63x@google.com>
- <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v3 0/4] Allow AVIC's IPI virtualization to be optional
+Date:   Mon,  2 Oct 2023 14:57:19 +0300
+Message-Id: <20231002115723.175344-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRbxb15Opa2_AusF@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 29, 2023 at 03:46:55PM +0000, Sean Christopherson wrote:
-
-> > I will firmly reject anything that takes the PMU away from the host
-> > entirely through.
-> 
-> Why?  What is so wrong with supporting use cases where the platform owner *wants*
-> to give up host PMU and NMI watchdog functionality?  If disabling host PMU usage
-> were complex, highly invasive, and/or difficult to maintain, then I can understand
-> the pushback.  
-
-Because it sucks.
-
-You're forcing people to choose between no host PMU or a slow guest PMU.
-And that's simply not a sane choice for most people -- worse it's not a
-choice based in technical reality.
-
-It's a choice out of lazyness, disabling host PMU is not a requirement
-for pass-through. 
-
-Like I wrote, all we need to do is ensure vCPU tasks will never have a
-perf-event scheduled that covers guest mode. Currently this would be
-achievable by having event creation for both:
-
- - CPU events without attr::exclude_guest=1, and
- - task events for vCPU task of interest without attr::exclude_guest=1
-
-error with -EBUSY or something.
-
-This ensures there are no events active for those vCPU tasks at VMENTER
-time and you can haz pass-through.
+Hi!=0D
+=0D
+This patch allows AVIC's ICR emulation to be optional and thus allows=0D
+to workaround AVIC's errata #1235 by disabling this portion of the feature.=
+=0D
+=0D
+This is v3 of my patch series 'AVIC bugfixes and workarounds' including=0D
+review feedback.=0D
+=0D
+Best regards,=0D
+    Maxim Levitsky=0D
+=0D
+Maxim Levitsky (4):=0D
+  KVM: Add per vCPU flag specifying that a vCPU is loaded=0D
+  x86: KVM: AVIC: stop using 'is_running' bit in avic_vcpu_put()=0D
+  x86: KVM: don't read physical ID table entry in avic_pi_update_irte()=0D
+  x86: KVM: SVM: allow optionally to disable AVIC's IPI virtualization=0D
+=0D
+ arch/x86/kvm/svm/avic.c  | 72 ++++++++++++++++++++++++++--------------=0D
+ include/linux/kvm_host.h |  1 +=0D
+ virt/kvm/kvm_main.c      | 10 ++++++=0D
+ 3 files changed, 59 insertions(+), 24 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
