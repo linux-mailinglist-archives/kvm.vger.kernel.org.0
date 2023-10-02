@@ -2,126 +2,292 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8B2A7B585F
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 18:57:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 768247B5934
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 19:42:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238360AbjJBQt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 12:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37064 "EHLO
+        id S238557AbjJBQ6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 12:58:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238506AbjJBQtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 12:49:51 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70600DC
-        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 09:49:48 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8153284d6eso23841680276.3
-        for <kvm@vger.kernel.org>; Mon, 02 Oct 2023 09:49:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696265387; x=1696870187; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/NStGJqIAfzxqmZKJo1jqWKDF2/XWhgoYCwHuSutwVs=;
-        b=SKvht2WuY5SteMoxDMaP1lKFglc/q4FJUKgzvElPO8pbAKi2pOsA0W3V4p6/6wXfxN
-         rYFrKZbFQHbim0AlMTbPeHlbKR0eWFaTcMxfMoe4Wmj6khJOh3oZCyfL0UO2IZjQhP6X
-         BEuVM13PU8YPBI8stFAktdt8DCfGg0e4GIjq6vahnWs3GehXuZvhUppTFs1FhDFzwpB4
-         Qpbk4XVBrwhFp5U4yKF9QoHM0JGX5OKKc2rc/jX6WKlyl+ZHz3jXlP3qDeYOEAGEyJ3D
-         e4fKddGpJevJyIGad6Qx9zS0yEhymqjvpElBJaGfa4Fi63qPOe8S3XS6hsahBWZt28AC
-         cBtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696265387; x=1696870187;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/NStGJqIAfzxqmZKJo1jqWKDF2/XWhgoYCwHuSutwVs=;
-        b=xKOxVBpDeuIvyMmr7zm9eRvf5EZHiEIBYvIk8CThGs0giRD5x8/Md7yqcGi8DzMcBr
-         Xz9HzTbEg57N/mxfTYt4t91Swm+5nTp/TtjM2dh2Sb346gLXcll40tLDoDtJ0jtwpsja
-         waFDMaWlcrLV95FEuTQNrNsi42XpB+Gqpnh/39hXsxV0u/MPZxODKO8bSJktLBnqBDTD
-         rk91xwZlRrFvs3FWWeGPh4lKnIjLL38ozMNsBxCBpFSrQLW9DTqDfkMC759fZXYb4VbV
-         JZr7Q4YfWk70zwV2KEIdAFwPjTindyBLWNn/ZgIE2UUA7jxal9ArTiP/0A5aW8Qf2x98
-         ttFw==
-X-Gm-Message-State: AOJu0Yxzvsg1aaBWe75oWI5pZ0ooRicz5KWr1Bx96LdI7S70LyR6KdK/
-        2Jg0Y9ZISS1tmMLfek+ipeplMZ5y3nY=
-X-Google-Smtp-Source: AGHT+IEsB5LCDJg4oleh71+UlutWTjEVI8m3tSshlzhn1JD6VtpE5PMMw65GMVMmiSbNHEOFxZtC45ZXJJk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aa8a:0:b0:d80:eb4:9ca with SMTP id
- t10-20020a25aa8a000000b00d800eb409camr200372ybi.0.1696265387716; Mon, 02 Oct
- 2023 09:49:47 -0700 (PDT)
-Date:   Mon, 2 Oct 2023 09:49:45 -0700
-In-Reply-To: <20231002155330.lguyhqgy64rhko4p@amd.com>
-Mime-Version: 1.0
-References: <20230921203331.3746712-1-seanjc@google.com> <20230921203331.3746712-7-seanjc@google.com>
- <20230922224210.6klwbphnsk5j2wft@amd.com> <ZRXGl44g8oD-FtNy@google.com> <20231002155330.lguyhqgy64rhko4p@amd.com>
-Message-ID: <ZRr0qUeSVxZfK-w2@google.com>
-Subject: Re: [PATCH 06/13] KVM: Disallow hugepages for incompatible gmem
- bindings, but let 'em succeed
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S238576AbjJBQ6I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 12:58:08 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77451C4;
+        Mon,  2 Oct 2023 09:58:04 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RznFY4SKmz6K7FC;
+        Tue,  3 Oct 2023 00:57:53 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 2 Oct
+ 2023 17:58:00 +0100
+Date:   Mon, 2 Oct 2023 17:57:59 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Lukas Wunner <lukas@wunner.de>
+CC:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 06/12] crypto: ecdsa - Support P1363 signature encoding
+Message-ID: <20231002175759.00000e93@Huawei.com>
+In-Reply-To: <4f98bb7ee2e660a8b4513a94ed79f4f29d1ff379.1695921657.git.lukas@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <4f98bb7ee2e660a8b4513a94ed79f4f29d1ff379.1695921657.git.lukas@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 02, 2023, Michael Roth wrote:
-> On Thu, Sep 28, 2023 at 11:31:51AM -0700, Sean Christopherson wrote:
-> > On Fri, Sep 22, 2023, Michael Roth wrote:
-> > > On Thu, Sep 21, 2023 at 01:33:23PM -0700, Sean Christopherson wrote:
-> > > > +	/*
-> > > > +	 * For simplicity, allow mapping a hugepage if and only if the entire
-> > > > +	 * binding is compatible, i.e. don't bother supporting mapping interior
-> > > > +	 * sub-ranges with hugepages (unless userspace comes up with a *really*
-> > > > +	 * strong use case for needing hugepages within unaligned bindings).
-> > > > +	 */
-> > > > +	if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
-> > > > +	    !IS_ALIGNED(slot->npages, 1ull << *max_order))
-> > > > +		*max_order = 0;
-> > > 
-> > > Thanks for working this in. Unfortunately on x86 the bulk of guest memory
-> > > ends up getting slotted directly above legacy regions at GFN 0x100, 
-> > 
-> > Can you provide an example?  I'm struggling to understand what the layout actually
-> > is.  I don't think it changes the story for the kernel, but it sounds like there
-> > might be room for optimization in QEMU?  Or more likely, I just don't understand
-> > what you're saying :-)
-> 
-> Here's one example, which seems to be fairly normal for an x86 boot:
-> 
->   kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   ^ QEMU creates Slot 0 for all of main guest RAM
->   kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x0 gpa=0x0 size=0x0 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0xc0000 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
->   kvm_set_user_memory AddrSpace#0 Slot#3 flags=0x6 gpa=0xc0000 size=0x20000 ua=0x7f2575000000 ret=0 restricted_fd=33 restricted_offset=0x0
->   kvm_set_user_memory AddrSpace#0 Slot#4 flags=0x6 gpa=0xe0000 size=0x20000 ua=0x7f2575400000 ret=0 restricted_fd=31 restricted_offset=0x0
->   ^ legacy regions are created and mapped on top of GPA ranges [0xc0000:0xe0000) and [0xe0000:0x100000)
->   kvm_set_user_memory AddrSpace#0 Slot#5 flags=0x4 gpa=0x100000 size=0x7ff00000 ua=0x7f24afd00000 ret=0 restricted_fd=19 restricted_offset=0x100000
->   ^ QEMU divides Slot 0 into Slot 0 at [0x0:0xc0000) and Slot 5 at [0x100000:0x80000000)
->     Both Slots still share the same backing memory allocation, so same gmem
->     fd 19 is used,but Slot 5 is assigned to offset 0x100000, whih is not
->     2M-aligned
-> 
-> I tried messing with QEMU handling to pad out guest_memfd offsets to 2MB
-> boundaries but then the inode size needs to be enlarged to account for it
-> and things get a bit messy. Not sure if there are alternative approaches
-> that can be taken from userspace, but with normal malloc()'d or mmap()'d
-> backing memory the kernel can still allocate a 2MB backing page for the
-> [0x0:0x200000) range and I think KVM still handles that when setting up
-> NPT of sub-ranges so there might not be much room for further optimization
-> there.
+On Thu, 28 Sep 2023 19:32:36 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
-Oooh, duh.  QEMU intentionally creates a gap for the VGA and/or BIOS holes, and
-so the lower DRAM chunk that goes from the end of the system reserved chunk to
-to TOLUD is started at an unaligned offset, even though 99% of the slot is properly
-aligned.
+> Alternatively to the X9.62 encoding of ecdsa signatures, which uses
+> ASN.1 and is already supported by the kernel, there's another common
+> encoding called P1363.  It stores r and s as the concatenation of two
+> big endian, unsigned integers.  The name originates from IEEE P1363.
+> 
+> The Security Protocol and Data Model (SPDM) specification prescribes
+> that ecdsa signatures are encoded according to P1363:
+> 
+>    "For ECDSA signatures, excluding SM2, in SPDM, the signature shall be
+>     the concatenation of r and s.  The size of r shall be the size of
+>     the selected curve.  Likewise, the size of s shall be the size of
+>     the selected curve.  See BaseAsymAlgo in NEGOTIATE_ALGORITHMS for
+>     the size of r and s.  The byte order for r and s shall be in big
+>     endian order.  When placing ECDSA signatures into an SPDM signature
+>     field, r shall come first followed by s."
+> 
+>     (SPDM 1.2.1 margin no 44,
+>     https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.2.1.pdf)
+> 
+> A subsequent commit introduces an SPDM library to enable PCI device
+> authentication, so add support for P1363 ecdsa signature verification.
 
-Yeah, KVM definitely needs to support that.  Requiring userspace to align based
-on the hugepage size could work, e.g. QEMU could divide slot 5 into N slots, to
-end up with a series of slots to get from 4KiB aligned => 2MiB aligned => 1GiB
-aligned.  But pushing for that would be beyond stubborn.
+Ah good. The spec got updated. I remember playing guess with the format
+against libspdm which wasn't fun :)
 
-Thanks for being patient :-)
+One trivial formatting note inline.
+
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+
+> ---
+>  crypto/asymmetric_keys/public_key.c |  8 ++++++--
+>  crypto/ecdsa.c                      | 16 +++++++++++++---
+>  crypto/testmgr.h                    | 15 +++++++++++++++
+>  3 files changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 7f96e8e501db..84c4ed02a270 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -105,7 +105,8 @@ software_key_determine_akcipher(const struct public_key *pkey,
+>  			return -EINVAL;
+>  		*sig = false;
+>  	} else if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
+> -		if (strcmp(encoding, "x962") != 0)
+> +		if (strcmp(encoding, "x962") != 0 &&
+> +		    strcmp(encoding, "p1363") != 0)
+>  			return -EINVAL;
+>  		/*
+>  		 * ECDSA signatures are taken over a raw hash, so they don't
+> @@ -246,7 +247,10 @@ static int software_key_query(const struct kernel_pkey_params *params,
+>  		 * which is actually 2 'key_size'-bit integers encoded in
+>  		 * ASN.1.  Account for the ASN.1 encoding overhead here.
+>  		 */
+> -		info->max_sig_size = 2 * (len + 3) + 2;
+> +		if (strcmp(params->encoding, "x962") == 0)
+> +			info->max_sig_size = 2 * (len + 3) + 2;
+> +		else if (strcmp(params->encoding, "p1363") == 0)
+> +			info->max_sig_size = 2 * len;
+>  	} else {
+>  		info->max_data_size = len;
+>  		info->max_sig_size = len;
+> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+> index fbd76498aba8..cc3082c6f67d 100644
+> --- a/crypto/ecdsa.c
+> +++ b/crypto/ecdsa.c
+> @@ -159,10 +159,20 @@ static int ecdsa_verify(struct akcipher_request *req)
+>  		sg_nents_for_len(req->src, req->src_len + req->dst_len),
+>  		buffer, req->src_len + req->dst_len, 0);
+>  
+> -	ret = asn1_ber_decoder(&ecdsasignature_decoder, &sig_ctx,
+> -			       buffer, req->src_len);
+> -	if (ret < 0)
+> +	if (strcmp(req->enc, "x962") == 0) {
+> +		ret = asn1_ber_decoder(&ecdsasignature_decoder, &sig_ctx,
+> +				       buffer, req->src_len);
+> +		if (ret < 0)
+> +			goto error;
+> +	} else if (strcmp(req->enc, "p1363") == 0 &&
+> +		   req->src_len == 2 * keylen) {
+> +		ecc_swap_digits(buffer, sig_ctx.r, ctx->curve->g.ndigits);
+> +		ecc_swap_digits(buffer + keylen,
+> +					sig_ctx.s, ctx->curve->g.ndigits);
+
+Indent looks a little odd.
+
+
+> +	} else {
+> +		ret = -EINVAL;
+>  		goto error;
+> +	}
+>  
+>  	/* if the hash is shorter then we will add leading zeros to fit to ndigits */
+>  	diff = keylen - req->dst_len;
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index ad57e7af2e14..f12f70818147 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -674,6 +674,7 @@ static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
+>  	"\x68\x01\x9d\xba\xce\x83\x08\xef\x95\x52\x7b\xa0\x0f\xe4\x18\x86"
+>  	"\x80\x6f\xa5\x79\x77\xda\xd0",
+>  	.c_size = 55,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -698,6 +699,7 @@ static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
+>  	"\x4f\x53\x75\xc8\x02\x48\xeb\xc3\x92\x0f\x1e\x72\xee\xc4\xa3\xe3"
+>  	"\x5c\x99\xdb\x92\x5b\x36",
+>  	.c_size = 54,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -722,6 +724,7 @@ static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
+>  	"\x69\x43\xfd\x48\x19\x86\xcf\x32\xdd\x41\x74\x6a\x51\xc7\xd9\x7d"
+>  	"\x3a\x97\xd9\xcd\x1a\x6a\x49",
+>  	.c_size = 55,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -747,6 +750,7 @@ static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
+>  	"\xbc\x5a\x1f\x82\x96\x61\xd7\xd1\x01\x77\x44\x5d\x53\xa4\x7c\x93"
+>  	"\x12\x3b\x3b\x28\xfb\x6d\xe1",
+>  	.c_size = 55,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -773,6 +777,7 @@ static const struct akcipher_testvec ecdsa_nist_p192_tv_template[] = {
+>  	"\xb4\x22\x9a\x98\x73\x3c\x83\xa9\x14\x2a\x5e\xf5\xe5\xfb\x72\x28"
+>  	"\x6a\xdf\x97\xfd\x82\x76\x24",
+>  	.c_size = 55,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	},
+> @@ -803,6 +808,7 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+>  	"\x8a\xfa\x54\x93\x29\xa7\x70\x86\xf1\x03\x03\xf3\x3b\xe2\x73\xf7"
+>  	"\xfb\x9d\x8b\xde\xd4\x8d\x6f\xad",
+>  	.c_size = 72,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -829,6 +835,7 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+>  	"\x4a\x77\x22\xec\xc8\x66\xbf\x50\x05\x58\x39\x0e\x26\x92\xce\xd5"
+>  	"\x2e\x8b\xde\x5a\x04\x0e",
+>  	.c_size = 70,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -855,6 +862,7 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+>  	"\xa9\x81\xac\x4a\x50\xd0\x91\x0a\x6e\x1b\xc4\xaf\xe1\x83\xc3\x4f"
+>  	"\x2a\x65\x35\x23\xe3\x1d\xfa",
+>  	.c_size = 71,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -882,6 +890,7 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+>  	"\x19\xfb\x5f\x92\xf4\xc9\x23\x37\x69\xf4\x3b\x4f\x47\xcf\x9b\x16"
+>  	"\xc0\x60\x11\x92\xdc\x17\x89\x12",
+>  	.c_size = 72,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -910,6 +919,7 @@ static const struct akcipher_testvec ecdsa_nist_p256_tv_template[] = {
+>  	"\x00\xdd\xab\xd4\xc0\x2b\xe6\x5c\xad\xc3\x78\x1c\xc2\xc1\x19\x76"
+>  	"\x31\x79\x4a\xe9\x81\x6a\xee",
+>  	.c_size = 71,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	},
+> @@ -944,6 +954,7 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
+>  	"\x74\xa0\x0f\xbf\xaf\xc3\x36\x76\x4a\xa1\x59\xf1\x1c\xa4\x58\x26"
+>  	"\x79\x12\x2a\xb7\xc5\x15\x92\xc5",
+>  	.c_size = 104,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -974,6 +985,7 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
+>  	"\x4d\xd0\xc6\x6e\xb0\xe9\xfc\x14\x9f\x19\xd0\x42\x8b\x93\xc2\x11"
+>  	"\x88\x2b\x82\x26\x5e\x1c\xda\xfb",
+>  	.c_size = 104,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -1004,6 +1016,7 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
+>  	"\xc0\x75\x3e\x23\x5e\x36\x4f\x8d\xde\x1e\x93\x8d\x95\xbb\x10\x0e"
+>  	"\xf4\x1f\x39\xca\x4d\x43",
+>  	.c_size = 102,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -1035,6 +1048,7 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
+>  	"\x44\x92\x8c\x86\x99\x65\xb3\x97\x96\x17\x04\xc9\x05\x77\xf1\x8e"
+>  	"\xab\x8d\x4e\xde\xe6\x6d\x9b\x66",
+>  	.c_size = 104,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	}, {
+> @@ -1067,6 +1081,7 @@ static const struct akcipher_testvec ecdsa_nist_p384_tv_template[] = {
+>  	"\x5f\x8d\x7a\xf9\xfb\x34\xe4\x8b\x80\xa5\xb6\xda\x2c\x4e\x45\xcf"
+>  	"\x3c\x93\xff\x50\x5d",
+>  	.c_size = 101,
+> +	.enc = "x962",
+>  	.public_key_vec = true,
+>  	.siggen_sigver_test = true,
+>  	},
+
