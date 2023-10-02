@@ -2,218 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06DEA7B577E
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 18:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C937B5785
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 18:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232711AbjJBPx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 11:53:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        id S238121AbjJBP46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 11:56:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237798AbjJBPxy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 11:53:54 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2067.outbound.protection.outlook.com [40.107.101.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 515EF93;
-        Mon,  2 Oct 2023 08:53:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OEns1QkFzKtXApRmiAG2Gkj4nKCQTLfnCyQLoQs3lfC0xNJJqBcsnh8B9txjX4caInnXbQC7ihNstMwyd36DnSDmodJM1A4nHCVztTbm6w3f20KoSx6ls2lHrHYpwVLBEWngy/qov3MbL8BnvRQigq2SomF8pgwINvm+LeAHXg23EKY7ee4O0X6TF5QluAfPvalMdaB8Wl3OW99sJZpPlpGIaRZwL+1dKyr6e/SQjHPmDepK6+wnJPgFdX8GpJ9Y02gHWDCBZmw4bueUP+SFor4oQVlFN1Ikr66BCLoJjx2TUlTjn6UFsnAlN7ColAg/hEwIgEj08THK7Oqvc/2L1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KNnmgDc8c3pehj6mUput3+lQtGE340T2lQ2UflUBSAc=;
- b=fm9YLIBKE0UG/dCUhnz6rU50dUit6c5e5lSbFDQDYBHzu3k8+7WAnBseqsmpRvT0/bPhD2lRfN5rukgujpiSYesW3JjJxB7K9SO9pkHhUu1EfUXjIVY1X4e9SQcxviVoQotc0ENU+bUao/vMmscI8pzvXKcQrQIH/WIo2PYG4e6aCCrTcZCD7EXBp9CtjBMckmOc6/Pohie6lCDgIgqGKRLHZgWZX7AjpIHVIWQWUCoke/8rEhY9dhW2LwMBqZ4N4DaaI3bi1AiSk1oyOUU+vkImq+sbNp/Z954iVdQOC3PwIWNx44ULZpJFI455NSlFFc/0Ri9yHfUiekct8KNPeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KNnmgDc8c3pehj6mUput3+lQtGE340T2lQ2UflUBSAc=;
- b=KUCO643+3ZzieUPLgF7+IvBZdMPbQla1sqUkvuxIQVpN+ozxmV44tr5C4UPXl8uhDLzTZwPdOM5vQHnmFFYQo4F17BffQd21ioLv+sg5Ap7APEPzvNRWST154bPZ7ntLYSfNQb8VOMup8be+pijBcYM70vETzXzYfiELwB/6i1A=
-Received: from PH7PR13CA0001.namprd13.prod.outlook.com (2603:10b6:510:174::7)
- by BN9PR12MB5193.namprd12.prod.outlook.com (2603:10b6:408:11a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Mon, 2 Oct
- 2023 15:53:48 +0000
-Received: from SN1PEPF000252A4.namprd05.prod.outlook.com
- (2603:10b6:510:174:cafe::6f) by PH7PR13CA0001.outlook.office365.com
- (2603:10b6:510:174::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.23 via Frontend
- Transport; Mon, 2 Oct 2023 15:53:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A4.mail.protection.outlook.com (10.167.242.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.21 via Frontend Transport; Mon, 2 Oct 2023 15:53:48 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 2 Oct
- 2023 10:53:47 -0500
-Date:   Mon, 2 Oct 2023 10:53:30 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Binbin Wu <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH 06/13] KVM: Disallow hugepages for incompatible gmem
- bindings, but let 'em succeed
-Message-ID: <20231002155330.lguyhqgy64rhko4p@amd.com>
-References: <20230921203331.3746712-1-seanjc@google.com>
- <20230921203331.3746712-7-seanjc@google.com>
- <20230922224210.6klwbphnsk5j2wft@amd.com>
- <ZRXGl44g8oD-FtNy@google.com>
-MIME-Version: 1.0
+        with ESMTP id S238273AbjJBP45 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 11:56:57 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B85BC9
+        for <kvm@vger.kernel.org>; Mon,  2 Oct 2023 08:56:53 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d852a6749baso24116785276.0
+        for <kvm@vger.kernel.org>; Mon, 02 Oct 2023 08:56:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696262212; x=1696867012; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpsMPjbR1WNgJ/uUktgfbNndpX69oDvkpl70xKylEH8=;
+        b=QDU9RwJW0u50FcNZZxExPPEv4dK3Fr1p/MZuwCn1Awwcr6dwkCmF0GzdiDn6X1Ls1a
+         9FrOsfkXc/UMWpC7ayqGFvQnaS8UDsjnVVwkOGcf1alqLj78ib1LLFC2o5xA//oQWnbi
+         teMNTWoAuEveJJfFz9WD49zQ7krILJAHmJFFwxLp30zoy5rSScSyJe7OUnSsUhAfYm20
+         ktMpYDPOWmB+xkNZ7zs4ZiCGEFTthxIijuehMK3QCAMgBiqpUdK+4s2c1Pfj4kLUeMOR
+         RvOpZvC46JEkr590M7niku2AG8CEn/Pcp7jf/SzqgpDmgEEjRUtKCy8kmmI4qzwXGyC5
+         stiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696262212; x=1696867012;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpsMPjbR1WNgJ/uUktgfbNndpX69oDvkpl70xKylEH8=;
+        b=SFHGM+bjHso9+i5cmKjwTX7+51snIASNuwY/KmNpTXVguilgK/HwdkfOYL5mCLsPQt
+         ldfLUwP6HTED7orfOod2fsXalFPZT7L5H2sXmnfA1ooQkUr54yZNHTe39VrK1AXZs3Jt
+         gfhzj7/gdr+Ro5HlWR6hKAkdhq6jhzdVdVrCVLNLfOVmiNlGgGxkcN352gSFk5w5Lg9L
+         QiDHEV/FHx6r3b/kikHFhMQ9i/2M6eQAHkShfwgU6f7hy4S/639PZIeDVdDuVK/vaR1d
+         l32FCItAFj5Ypb+XTL2Xrul8tiuLCDQg92UpsOEyo3+ZfpO0hq4fFeQq4Cf/hRYfSJoi
+         ltYw==
+X-Gm-Message-State: AOJu0Yyascn2lAiDrsaCnXwaJscKufI4DCJQXLLzXRJaFeiwSS2m0gWE
+        ceOX4EaBuwt1uE2X72secEL25f5ytpo=
+X-Google-Smtp-Source: AGHT+IFU0Rp0ypciSYbq9+jHt9tXgKHuu0bXBd5z/jIOuiXJuVh5Iwgc1+UaORfJnN9j0OiqnnlHuGl3o/U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:abe9:0:b0:d80:19e5:76c8 with SMTP id
+ v96-20020a25abe9000000b00d8019e576c8mr178348ybi.12.1696262212083; Mon, 02 Oct
+ 2023 08:56:52 -0700 (PDT)
+Date:   Mon, 2 Oct 2023 08:56:50 -0700
+In-Reply-To: <ZRrF38RGllA04R8o@gmail.com>
+Mime-Version: 1.0
+References: <20230927033124.1226509-1-dapeng1.mi@linux.intel.com>
+ <20230927033124.1226509-8-dapeng1.mi@linux.intel.com> <20230927113312.GD21810@noisy.programming.kicks-ass.net>
+ <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+ <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com>
+Message-ID: <ZRroQg6flyGBtZTG@google.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ingo Molnar <mingo@kernel.org>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZRXGl44g8oD-FtNy@google.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|BN9PR12MB5193:EE_
-X-MS-Office365-Filtering-Correlation-Id: c7b5e37a-de24-4b91-99b7-08dbc35fc403
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ePe2vVegm3ALouVmXbC0OuP2kQ3DtC5v+XTsTJpf29E6Jbh5p/U4vvdA6hThHdk1I6k1jvTyKjldCct35a1rNWqZHMeI3KUhmCsDIvp3KizgafP1fLUlul1uB4/gfS8/3+My3IMlfvKy1H+731NCW7F2C574SCAbqFjfwMI9N8oHk1gE/JlHMF/OVk+9mJczjuUT/P/+eeYRgN11nL8IxEhz0ZSt+etjoR35U7GJN6FDkAHslOIrarzD1abEAo3xE5a9Oysh9aPbq6PkU/JLjgyQZgSa55DxrXr8r0nNQcK64N5soD5EvJ3Ud6BoNyrRBjkqZbM1w1zUItjCDq18KckCd+pa50mrRkbn9f+p2q3vo/kRBRxxCayc2MQNHVbGkvvFgK+Hn8y7+KZPqN8q/exN6bYhUaiVuHWtl/8HuwvvpGHR6yGvNV7fg8tTAsMVrsD/tXjNYclYDjYm4EWVjzQw3loHCpTEvYyYwfmd28aOXQcJPkf8Bk9oJk5NzwfK8TNZ0XAgIHCY0uS0eXsP/ziyNYpGVSF4u8PHo107/tLJ6crV/Fn7GiW1bikvmKYbbGlt1vYvn2WFvcdR3QPvOBWTM9VGMWFRr7b3xjLTWuXqYuGdwVe5L+skpbmVmip3+KQqVXLY90ovnYK84dH7hpdD0xZMjKxYgLDeKR7MthIw8vnCVk0wf3JcbkDD53mRmyR3W6o2e9MbuSJQgmxFpJbfwkOTjNkRHUjt3seiXLgvRdf1OWfkLdu+/2wizR9/IQdA4WdtnxvkowHYThew4aUoof/4d7hwe0ghQQbilXs=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(396003)(39860400002)(230922051799003)(186009)(1800799009)(82310400011)(64100799003)(451199024)(36840700001)(46966006)(40470700004)(40460700003)(2906002)(426003)(1076003)(2616005)(6666004)(356005)(6916009)(41300700001)(86362001)(54906003)(82740400003)(36860700001)(16526019)(478600001)(81166007)(83380400001)(966005)(26005)(47076005)(336012)(40480700001)(70586007)(316002)(44832011)(4326008)(8676002)(70206006)(5660300002)(36756003)(8936002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 15:53:48.0311
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7b5e37a-de24-4b91-99b7-08dbc35fc403
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF000252A4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5193
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 28, 2023 at 11:31:51AM -0700, Sean Christopherson wrote:
-> On Fri, Sep 22, 2023, Michael Roth wrote:
-> > On Thu, Sep 21, 2023 at 01:33:23PM -0700, Sean Christopherson wrote:
-> > > +	/*
-> > > +	 * For simplicity, allow mapping a hugepage if and only if the entire
-> > > +	 * binding is compatible, i.e. don't bother supporting mapping interior
-> > > +	 * sub-ranges with hugepages (unless userspace comes up with a *really*
-> > > +	 * strong use case for needing hugepages within unaligned bindings).
-> > > +	 */
-> > > +	if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
-> > > +	    !IS_ALIGNED(slot->npages, 1ull << *max_order))
-> > > +		*max_order = 0;
+On Mon, Oct 02, 2023, Ingo Molnar wrote:
+> 
+> * Peter Zijlstra <peterz@infradead.org> wrote:
+> 
+> > On Fri, Sep 29, 2023 at 03:46:55PM +0000, Sean Christopherson wrote:
 > > 
-> > Thanks for working this in. Unfortunately on x86 the bulk of guest memory
-> > ends up getting slotted directly above legacy regions at GFN 0x100, 
-> 
-> Can you provide an example?  I'm struggling to understand what the layout actually
-> is.  I don't think it changes the story for the kernel, but it sounds like there
-> might be room for optimization in QEMU?  Or more likely, I just don't understand
-> what you're saying :-)
-
-Here's one example, which seems to be fairly normal for an x86 boot:
-
-  kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
-  ^ QEMU creates Slot 0 for all of main guest RAM
-  kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x0 gpa=0x0 size=0x0 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
-  kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0xc0000 ua=0x7f24afc00000 ret=0 restricted_fd=19 restricted_offset=0x0
-  kvm_set_user_memory AddrSpace#0 Slot#3 flags=0x6 gpa=0xc0000 size=0x20000 ua=0x7f2575000000 ret=0 restricted_fd=33 restricted_offset=0x0
-  kvm_set_user_memory AddrSpace#0 Slot#4 flags=0x6 gpa=0xe0000 size=0x20000 ua=0x7f2575400000 ret=0 restricted_fd=31 restricted_offset=0x0
-  ^ legacy regions are created and mapped on top of GPA ranges [0xc0000:0xe0000) and [0xe0000:0x100000)
-  kvm_set_user_memory AddrSpace#0 Slot#5 flags=0x4 gpa=0x100000 size=0x7ff00000 ua=0x7f24afd00000 ret=0 restricted_fd=19 restricted_offset=0x100000
-  ^ QEMU divides Slot 0 into Slot 0 at [0x0:0xc0000) and Slot 5 at [0x100000:0x80000000)
-    Both Slots still share the same backing memory allocation, so same gmem
-    fd 19 is used,but Slot 5 is assigned to offset 0x100000, whih is not
-    2M-aligned
-
-I tried messing with QEMU handling to pad out guest_memfd offsets to 2MB
-boundaries but then the inode size needs to be enlarged to account for it
-and things get a bit messy. Not sure if there are alternative approaches
-that can be taken from userspace, but with normal malloc()'d or mmap()'d
-backing memory the kernel can still allocate a 2MB backing page for the
-[0x0:0x200000) range and I think KVM still handles that when setting up
-NPT of sub-ranges so there might not be much room for further optimization
-there.
-
-> 
-> > so the associated slot still ends failing these alignment checks if it tries
-> > to match the gmemfd offsets up with the shared RAM/memfd offsets.
+> > > > I will firmly reject anything that takes the PMU away from the host
+> > > > entirely through.
+> > > 
+> > > Why?  What is so wrong with supporting use cases where the platform owner *wants*
+> > > to give up host PMU and NMI watchdog functionality?  If disabling host PMU usage
+> > > were complex, highly invasive, and/or difficult to maintain, then I can understand
+> > > the pushback.  
 > > 
-> > I tried to work around it in userspace by padding the gmemfd offset of
-> > each slot to the next 2M boundary, but that also requires dynamically
-> > growing the gmemfd inode to account for the padding of each new slot and
-> > it gets ugly enough that I'm not sure it's any better than your
-> > suggested alternative of using a unique gmemfd for each slot.
-> > 
-> > But what if we relax the check to simply make sure that any large folio
-> > must is fully-contained by the range of the slot is bound to? It *seems*
-> > like that would still avoid stuff like mapping 2M pages in the NPT (or
-> > setting up 2M RMP table entries) that aren't fully contained by a slot
-> > while still allowing the bulk of guest memory to get mapped as 2M. Are
-> > there other edge cases to consider?
-> > 
-> > The following seems to work for a basic 16GB SNP guest at least:
-> > 
-> > diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-> > index 9109bf5751ee..e73128d4ebc2 100644
-> > --- a/virt/kvm/guest_mem.c
-> > +++ b/virt/kvm/guest_mem.c
-> > @@ -618,6 +618,7 @@ int __kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
-> >                        gfn_t gfn, kvm_pfn_t *pfn, int *max_order, bool prep)
-> >  {
-> >         pgoff_t index = gfn - slot->base_gfn + slot->gmem.pgoff;
-> > +       pgoff_t huge_index;
-> >         struct kvm_gmem *gmem;
-> >         struct folio *folio;
-> >         struct page *page;
-> > @@ -662,9 +663,12 @@ int __kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
-> >          * sub-ranges with hugepages (unless userspace comes up with a *really*
-> >          * strong use case for needing hugepages within unaligned bindings).
-> >          */
-> > -       if (!IS_ALIGNED(slot->gmem.pgoff, 1ull << *max_order) ||
-> > -           !IS_ALIGNED(slot->npages, 1ull << *max_order))
-> > +       huge_index = round_down(index, 1ull << *max_order);
+> > Because it sucks.
+>
+> > You're forcing people to choose between no host PMU or a slow guest PMU.
+
+Nowhere did I say that we wouldn't take patches to improve the existing vPMU
+support.  But that's largely a moot point because I don't think it's possible to
+improve the current approach to the point where it would provide a performant,
+functional guest PMU.
+
+> > And that's simply not a sane choice for most people --
+
+It's better than the status quo, which is that no one gets to choose, everyone
+gets a slow guest PMU.
+
+> > worse it's not a choice based in technical reality.
+
+The technical reality is that context switching the PMU between host and guest
+requires reading and writing far too many MSRs for KVM to be able to context
+switch at every VM-Enter and every VM-Exit.  And PMIs skidding past VM-Exit adds
+another layer of complexity to deal with.
+
+> > It's a choice out of lazyness, disabling host PMU is not a requirement
+> > for pass-through.
+
+The requirement isn't passthrough access, the requirements are that the guest's
+PMU has accuracy that is on par with bare metal, and that exposing a PMU to the
+guest doesn't have a meaningful impact on guest performance.
+
+> Not just a choice of laziness, but it will clearly be forced upon users
+> by external entities:
 > 
-> Why not use ALIGN() here?  The size is obviously a power-of-2.  Or is my math
-> even worse than I thought?
+>    "Pass ownership of the PMU to the guest and have no host PMU, or you
+>     won't have sane guest PMU support at all. If you disagree, please open
+>     a support ticket, which we'll ignore."
 
-I actually only originally used round_down() because kvm_gmem_get_huge_folio()
-was taking that approach, but I still ended up using ALIGN() below so sorry
-if the inconsistency caused any confusion. I switched to using ALIGN() above
-and it works fine.
+We don't have sane guest PMU support today.  In the 12+ years since commit
+f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests"), KVM has
+never provided anything remotely close to a sane vPMU.  It *mostly* works if host
+perf is quiesced, but that "good enough" approach doesn't suffice for any form of
+PMU usage that requires a high level of accuracy and precision.
 
-> 
-> > +       if (huge_index < ALIGN(slot->gmem.pgoff, 1ull << *max_order) ||
-> > +           huge_index + (1ull << *max_order) > slot->gmem.pgoff + slot->npages) {
-> 
-> Argh, I keep forgetting that the MMU is responsible for handling misaligned gfns.
-> Yeah, this looks right.
-> 
-> Can you post this as a proper patch, on top of my fixes?  And without the pr_debug().
-> That'll be the easiest for me to apply+squash when the time comes.
+> The host OS shouldn't offer facilities that severely limit its own capabilities,
+> when there's a better solution. We don't give the FPU to apps exclusively either,
+> it would be insanely stupid for a platform to do that.
 
-Sure, I submitted a revised patch on top of kvm-x86:
+The FPU can be effeciently context switched, guest state remains resident in
+hardware so long as the vCPU task is scheduled in (ignoring infrequrent FPU usage
+from IRQ context), and guest usage of the FPU doesn't require trap-and-emulate
+behavior in KVM.
 
-  https://lore.kernel.org/lkml/20231002133342.195882-1-michael.roth@amd.com/T/#u
+As David said, ceding the hardware PMU for all of kvm_arch_vcpu_ioctl_run()
+(module the vCPU task being scheduled out) is likely a viable alternative.
 
-I ran into a separate issue trying to test it and submitted a patch for that
-here:
+ : But it does mean that when entering the KVM run loop, the host perf system 
+ : needs to context switch away the host PMU state and allow KVM to load the guest
+ : PMU state.  And much like the FPU situation, the portion of the host kernel
+ : that runs between the context switch to the KVM thread and VMENTER to the guest
+ : cannot use the PMU.
 
-  https://lore.kernel.org/lkml/20231002133230.195738-1-michael.roth@amd.com/T/#u
+If y'all are willing to let KVM redefined exclude_guest to be KVM's outer run
+loop, then I'm all for exploring that option.  But that idea got shot down over
+a year ago[*].  Or at least, that was my reading of things.  Maybe it was just a
+misunderstanding because we didn't do a good job of defining the behavior.
 
--Mike
+I am completely ok with either approach, but I am not ok with being nak'd on both.
+Because unless there's a magical third option lurking, those two options are the
+only ways for KVM to provide a vPMU that meets the requirements for slice-of-hardware
+use cases.
 
-> 
-> Thanks much!
+[*] https://lore.kernel.org/all/YgPCm1WIt9dHuoEo@hirez.programming.kicks-ass.net
