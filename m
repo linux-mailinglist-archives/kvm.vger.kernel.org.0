@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA0347B4FB6
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 11:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9D867B4FBA
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 11:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236420AbjJBJ6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 05:58:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47014 "EHLO
+        id S236424AbjJBJ6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 05:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236333AbjJBJ6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236352AbjJBJ6F (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 2 Oct 2023 05:58:05 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D04BD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E67C4;
         Mon,  2 Oct 2023 02:58:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
         s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
         In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=kUR93LtEabvdWOBCjvrvvT9F7wNuAiZe4sASBA03DEM=; b=HSr0gBjYviTZNCAukOXnyCfe15
-        AlvKGUNpRUhVlpSm9kyBhsdfi1CPuQJbw6kl86SHo7nTFUWABFnJKyXmhk3YjRTvMCuoDAOSQLSbj
-        /Wity/0sLFBvaz7MpefyWtcYyhApmjItCt02sA4b0opYtbPKbHK7QkVd+CIL1UjJVDSU=;
+        bh=GVRP7ZhX9y66fV8la0Z0phq4YOuv61LMjBgGZkw2zl4=; b=MYIyM3RcvwaRbDjAKvQUPqHPe/
+        Kd8oc2UrJTmvAwD+3Wpo+MPjaVZUzMiCqO8h9YAsOk1WGNkzLlv1MdtrUhbrFhs0QAUU4FcrVT7uA
+        wULosAIqVySsd/JKEL6DW49cwlpyRvGRyH8t3r/hlBADE+j3KiA7kqCpWXoErqm+C5Ew=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qnFgd-0000wp-Mr; Mon, 02 Oct 2023 09:57:59 +0000
+        id 1qnFge-0000ww-PZ; Mon, 02 Oct 2023 09:58:00 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qnFgd-0000Ft-FM; Mon, 02 Oct 2023 09:57:59 +0000
+        id 1qnFge-0000Ft-I8; Mon, 02 Oct 2023 09:58:00 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
@@ -36,9 +36,9 @@ Cc:     Paul Durrant <pdurrant@amazon.com>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>
-Subject: [PATCH v7 08/11] KVM: selftests / xen: map shared_info using HVA rather than GFN
-Date:   Mon,  2 Oct 2023 09:57:37 +0000
-Message-Id: <20231002095740.1472907-9-paul@xen.org>
+Subject: [PATCH v7 09/11] KVM: selftests / xen: re-map vcpu_info using HVA rather than GPA
+Date:   Mon,  2 Oct 2023 09:57:38 +0000
+Message-Id: <20231002095740.1472907-10-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231002095740.1472907-1-paul@xen.org>
 References: <20231002095740.1472907-1-paul@xen.org>
@@ -55,12 +55,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-Using the HVA of the shared_info page is more efficient, so if the
-capability (KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA) is present use that method
-to do the mapping.
-
-NOTE: Have the juggle_shinfo_state() thread map and unmap using both
-      GFN and HVA, to make sure the older mechanism is not broken.
+If the relevant capability (KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA) is present
+then re-map vcpu_info using the HVA part way through the tests to make sure
+then there is no functional change.
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
@@ -69,108 +66,52 @@ Cc: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: David Woodhouse <dwmw2@infradead.org>
 
-v3:
- - Re-work the juggle_shinfo_state() thread
-
-v2:
+v5:
  - New in this version.
 ---
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 44 +++++++++++++++----
- 1 file changed, 35 insertions(+), 9 deletions(-)
+ .../selftests/kvm/x86_64/xen_shinfo_test.c        | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 05898ad9f4d9..e6672ae1d9de 100644
+index e6672ae1d9de..a5d3aea8fd95 100644
 --- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -393,6 +393,7 @@ static int cmp_timespec(struct timespec *a, struct timespec *b)
- 		return 0;
- }
+@@ -66,6 +66,7 @@ enum {
+ 	TEST_POLL_TIMEOUT,
+ 	TEST_POLL_MASKED,
+ 	TEST_POLL_WAKE,
++	SET_VCPU_INFO,
+ 	TEST_TIMER_PAST,
+ 	TEST_LOCKING_SEND_RACE,
+ 	TEST_LOCKING_POLL_RACE,
+@@ -325,6 +326,10 @@ static void guest_code(void)
  
-+static struct shared_info *shinfo;
- static struct vcpu_info *vinfo;
- static struct kvm_vcpu *vcpu;
+ 	GUEST_SYNC(TEST_POLL_WAKE);
  
-@@ -408,20 +409,38 @@ static void *juggle_shinfo_state(void *arg)
- {
- 	struct kvm_vm *vm = (struct kvm_vm *)arg;
- 
--	struct kvm_xen_hvm_attr cache_activate = {
-+	struct kvm_xen_hvm_attr cache_activate_gfn = {
- 		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
- 		.u.shared_info.gfn = SHINFO_REGION_GPA / PAGE_SIZE
- 	};
- 
--	struct kvm_xen_hvm_attr cache_deactivate = {
-+	struct kvm_xen_hvm_attr cache_deactivate_gfn = {
- 		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
- 		.u.shared_info.gfn = KVM_XEN_INVALID_GFN
- 	};
- 
-+	struct kvm_xen_hvm_attr cache_activate_hva = {
-+		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA,
-+		.u.shared_info.hva = (unsigned long)shinfo
-+	};
++	/* Set the vcpu_info to point at exactly the place it already is to
++	 * make sure the attribute is functional. */
++	GUEST_SYNC(SET_VCPU_INFO);
 +
-+	struct kvm_xen_hvm_attr cache_deactivate_hva = {
-+		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
-+		.u.shared_info.hva = 0
-+	};
+ 	/* A timer wake an *unmasked* port which should wake us with an
+ 	 * actual interrupt, while we're polling on a different port. */
+ 	ports[0]++;
+@@ -892,6 +897,16 @@ int main(int argc, char *argv[])
+ 				alarm(1);
+ 				break;
+ 
++			case SET_VCPU_INFO:
++				if (has_shinfo_hva) {
++					struct kvm_xen_vcpu_attr vih = {
++						.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO_HVA,
++						.u.hva = (unsigned long)vinfo
++					};
++					vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &vih);
++				}
++				break;
 +
-+	int xen_caps = kvm_check_cap(KVM_CAP_XEN_HVM);
-+
- 	for (;;) {
--		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_activate);
--		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_deactivate);
-+		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_activate_gfn);
- 		pthread_testcancel();
-+		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_deactivate_gfn);
-+
-+		if (xen_caps & KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA) {
-+			__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_activate_hva);
-+			pthread_testcancel();
-+			__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_deactivate_hva);
-+		}
- 	}
- 
- 	return NULL;
-@@ -446,6 +465,7 @@ int main(int argc, char *argv[])
- 	bool do_runstate_flag = !!(xen_caps & KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG);
- 	bool do_eventfd_tests = !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL);
- 	bool do_evtchn_tests = do_eventfd_tests && !!(xen_caps & KVM_XEN_HVM_CONFIG_EVTCHN_SEND);
-+	bool has_shinfo_hva = !!(xen_caps & KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA);
- 
- 	clock_gettime(CLOCK_REALTIME, &min_ts);
- 
-@@ -456,7 +476,7 @@ int main(int argc, char *argv[])
- 				    SHINFO_REGION_GPA, SHINFO_REGION_SLOT, 3, 0);
- 	virt_map(vm, SHINFO_REGION_GVA, SHINFO_REGION_GPA, 3);
- 
--	struct shared_info *shinfo = addr_gpa2hva(vm, SHINFO_VADDR);
-+	shinfo = addr_gpa2hva(vm, SHINFO_VADDR);
- 
- 	int zero_fd = open("/dev/zero", O_RDONLY);
- 	TEST_ASSERT(zero_fd != -1, "Failed to open /dev/zero");
-@@ -492,10 +512,16 @@ int main(int argc, char *argv[])
- 			    "Failed to read back RUNSTATE_UPDATE_FLAG attr");
- 	}
- 
--	struct kvm_xen_hvm_attr ha = {
--		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
--		.u.shared_info.gfn = SHINFO_REGION_GPA / PAGE_SIZE,
--	};
-+	struct kvm_xen_hvm_attr ha = {};
-+
-+	if (has_shinfo_hva) {
-+		ha.type = KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA;
-+		ha.u.shared_info.hva = (unsigned long)shinfo;
-+	} else {
-+		ha.type = KVM_XEN_ATTR_TYPE_SHARED_INFO;
-+		ha.u.shared_info.gfn = SHINFO_ADDR / PAGE_SIZE;
-+	}
-+
- 	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &ha);
- 
- 	/*
+ 			case TEST_TIMER_PAST:
+ 				TEST_ASSERT(!evtchn_irq_expected,
+ 					    "Expected event channel IRQ but it didn't happen");
 -- 
 2.39.2
 
