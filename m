@@ -2,55 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFCFA7B4B70
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 08:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E85667B4B73
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 08:28:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235501AbjJBG1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 02:27:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47814 "EHLO
+        id S235489AbjJBG2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 02:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbjJBG1J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 02:27:09 -0400
+        with ESMTP id S229832AbjJBG2e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 02:28:34 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC2129B;
-        Sun,  1 Oct 2023 23:27:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9AE9B
+        for <kvm@vger.kernel.org>; Sun,  1 Oct 2023 23:28:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wz66aWzy7ltR/JylZNab7tf8I/FP0nizkFj8gOWJ4hc=; b=zltt0bq5ZEdb+StJO71/6Z42v3
-        VYuq9boHn14wtkez8j+etYlkbEP2YSSSAFIZ3dwUfpwXamWwZRmrpo/vdWSQqm5PpLLvWR3KdOayH
-        exT0zgBNxCu6rwKAtVZMlD0GGxw2Fcn/o5Lnrptol7v/mAOLZiaYeP+GvOU8Tw6iSDYH6i1VnYVEc
-        5Xn/MwZrcegs+EDLr9MgMSLJ1zp/Z512ZtkPLaxMa3MD5c4ZrdvGCtE7rwPftPiYd5dS+BqrJHerQ
-        7UeAFXalRYd3AMto94AS7vrmpdY1LFAUM3u+CH2VKc8dEt1PZnj70kqfJzPsqjmkZtxJTbJl3T0ZT
-        OTWgAb5A==;
+        bh=ZMdkpPxBqBuLB1qTmV7JqN4JNT6W1zFmaXJs7hkvDC4=; b=wZl9gSkXIHzF800cPVU/NDbl4d
+        rWXNsjMEV+yc+M+QKLnRBUOpj/2ud75qGUqt9y6OlThQ67l40Qfr1Yw8n05jkIJrmJuFvfbhFTS/1
+        +4O4JPJyxQsIaS9TDIOeMo0u9xWqpmc780gXm37GGmgZUIc0CKzSnfPgNzJZG4LX2uz3T3qHKWrBP
+        SIAslog9M0/b+lVXVWQGein+9hjmI47HK47/Lkhp6zn7rDxkH+QosjzCiSChSkH2pEvpVom1bjCgL
+        9CUt/NM5HP0qI4HUyGn0zWynG93dsho5DshFKnUvIKUF7B1SDV7MVk37+e07Pds+XH6BmyzK4cz5g
+        tEhvxt8Q==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qnCOS-00C1bK-1Q;
-        Mon, 02 Oct 2023 06:27:00 +0000
-Date:   Sun, 1 Oct 2023 23:27:00 -0700
+        id 1qnCPq-00C1hQ-31;
+        Mon, 02 Oct 2023 06:28:26 +0000
+Date:   Sun, 1 Oct 2023 23:28:26 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 1/7] RISC-V: Detect XVentanaCondOps from ISA string
-Message-ID: <ZRpitP5y1yhzKwbE@infradead.org>
-References: <20230919035343.1399389-1-apatel@ventanamicro.com>
- <20230919035343.1399389-2-apatel@ventanamicro.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, jgg@nvidia.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
+ virtio device
+Message-ID: <ZRpjClKM5mwY2NI0@infradead.org>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-11-yishaih@nvidia.com>
+ <20230922055336-mutt-send-email-mst@kernel.org>
+ <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
+ <20230926072538-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230919035343.1399389-2-apatel@ventanamicro.com>
+In-Reply-To: <20230926072538-mutt-send-email-mst@kernel.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
@@ -61,15 +57,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 19, 2023 at 09:23:37AM +0530, Anup Patel wrote:
-> The Veyron-V1 CPU supports custom conditional arithmetic and
-> conditional-select/move operations referred to as XVentanaCondOps
-> extension. In fact, QEMU RISC-V also has support for emulating
-> XVentanaCondOps extension.
+On Tue, Sep 26, 2023 at 07:41:44AM -0400, Michael S. Tsirkin wrote:
 > 
-> Let us detect XVentanaCondOps extension from ISA string available
-> through DT or ACPI.
+> Except, there's no reasonable way for virtio to know what is done with
+> the device then. You are not using just 2 symbols at all, instead you
+> are using the rich vq API which was explicitly designed for the driver
+> running the device being responsible for serializing accesses. Which is
+> actually loaded and running. And I *think* your use won't conflict ATM
+> mostly by luck. Witness the hack in patch 01 as exhibit 1 - nothing
+> at all even hints at the fact that the reason for the complicated
+> dance is because another driver pokes at some of the vqs.
 
-Umm, I though Linux/riscv would never support vendor specific
-extensions?
+Fully agreed.  The smart nic vendors are trying to do the same mess
+in nvme, and we really need to stop them and agree on proper standarized
+live migration features implemented in the core virtio/nvme code.
 
