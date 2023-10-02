@@ -2,43 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B10107B4FA9
-	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 11:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 620497B4FB1
+	for <lists+kvm@lfdr.de>; Mon,  2 Oct 2023 11:58:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236288AbjJBJ56 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Oct 2023 05:57:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37034 "EHLO
+        id S236339AbjJBJ6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Oct 2023 05:58:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236298AbjJBJ55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Oct 2023 05:57:57 -0400
+        with ESMTP id S236318AbjJBJ57 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Oct 2023 05:57:59 -0400
 Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A74B0;
-        Mon,  2 Oct 2023 02:57:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F376A7;
+        Mon,  2 Oct 2023 02:57:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
         s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:References:
         In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
-        bh=cQ02ZWi3OXJZ36oKzuEnX4ff/ZDsG5TQqSf2+fKM4a0=; b=HktkN30axQojx0wotuTnOunyDm
-        Y1xDKecGGk/+oX9k0SJo22r+q4XAISbQl2Bp/rjKt385sqQtXE5apQbl7D57aD+dxIjO9PRnSjNCL
-        v+IIvQlm1V7YsZzU0g4OAGXnbC1l9/ZYT/quiL8Af1UUuEeuGuV2Rj+VmYFNqz7q7v5A=;
+        bh=Td5ruHo6Q2QX376Io/aSuBJ2RV4JnjFu8kAGXdrnyqU=; b=rFPIpTf0P8/DtHlYZG6sxNYKwn
+        WbvSCwFqUvWqKhTGNdM7dkDl69RhaY7o/MuNKDz3QB98uyMyzcS1J4bBOeocj1w5n15WK+nGXKByM
+        imf0Y1b9W4dQFKVyBzcPJBZ/C/uANbaWyAqjAM8n5L+DezOZp8g+84txl7CXe91QQOwg=;
 Received: from xenbits.xenproject.org ([104.239.192.120])
         by mail.xenproject.org with esmtp (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qnFgT-0000v6-O5; Mon, 02 Oct 2023 09:57:49 +0000
+        id 1qnFgV-0000vB-Jw; Mon, 02 Oct 2023 09:57:51 +0000
 Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
         by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <paul@xen.org>)
-        id 1qnFgT-0000Ft-GD; Mon, 02 Oct 2023 09:57:49 +0000
+        id 1qnFgV-0000Ft-5q; Mon, 02 Oct 2023 09:57:51 +0000
 From:   Paul Durrant <paul@xen.org>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paul Durrant <pdurrant@amazon.com>,
         David Woodhouse <dwmw@amazon.co.uk>,
-        Sean Christopherson <seanjc@google.com>,
         David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v7 01/11] KVM: pfncache: add a map helper function
-Date:   Mon,  2 Oct 2023 09:57:30 +0000
-Message-Id: <20231002095740.1472907-2-paul@xen.org>
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Subject: [PATCH v7 02/11] KVM: pfncache: add a mark-dirty helper
+Date:   Mon,  2 Oct 2023 09:57:31 +0000
+Message-Id: <20231002095740.1472907-3-paul@xen.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231002095740.1472907-1-paul@xen.org>
 References: <20231002095740.1472907-1-paul@xen.org>
@@ -55,109 +59,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Paul Durrant <pdurrant@amazon.com>
 
-We have an unmap helper but mapping is open-coded. Arguably this is fine
-because mapping is done in only one place, hva_to_pfn_retry(), but adding
-the helper does make that function more readable.
+At the moment pages are marked dirty by open-coded calls to
+mark_page_dirty_in_slot(), directly deferefencing the gpa and memslot
+from the cache. After a subsequent patch these may not always be set
+so add a helper now so that caller will protected from the need to know
+about this detail.
 
-No functional change intended.
+NOTE: Pages are now marked dirty while the cache lock is held. This is
+      to ensure that gpa and memslot are mutually consistent.
 
 Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
-Cc: Sean Christopherson <seanjc@google.com>
 Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org
 ---
- virt/kvm/pfncache.c | 43 +++++++++++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 18 deletions(-)
+ arch/x86/kvm/x86.c       |  2 +-
+ arch/x86/kvm/xen.c       | 13 ++++++-------
+ include/linux/kvm_host.h |  7 +++++++
+ virt/kvm/pfncache.c      |  6 ++++++
+ 4 files changed, 20 insertions(+), 8 deletions(-)
 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9f18b06bbda6..eee252a0afef 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3137,7 +3137,7 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+ 
+ 	guest_hv_clock->version = ++vcpu->hv_clock.version;
+ 
+-	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
++	kvm_gpc_mark_dirty(gpc);
+ 	read_unlock_irqrestore(&gpc->lock, flags);
+ 
+ 	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 40edf4d1974c..33fddd29824b 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -430,14 +430,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
+ 		smp_wmb();
+ 	}
+ 
+-	if (user_len2)
++	if (user_len2) {
++		kvm_gpc_mark_dirty(gpc2);
+ 		read_unlock(&gpc2->lock);
++	}
+ 
++	kvm_gpc_mark_dirty(gpc1);
+ 	read_unlock_irqrestore(&gpc1->lock, flags);
+-
+-	mark_page_dirty_in_slot(v->kvm, gpc1->memslot, gpc1->gpa >> PAGE_SHIFT);
+-	if (user_len2)
+-		mark_page_dirty_in_slot(v->kvm, gpc2->memslot, gpc2->gpa >> PAGE_SHIFT);
+ }
+ 
+ void kvm_xen_update_runstate(struct kvm_vcpu *v, int state)
+@@ -543,13 +542,13 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 			     : "0" (evtchn_pending_sel32));
+ 		WRITE_ONCE(vi->evtchn_upcall_pending, 1);
+ 	}
++
++	kvm_gpc_mark_dirty(gpc);
+ 	read_unlock_irqrestore(&gpc->lock, flags);
+ 
+ 	/* For the per-vCPU lapic vector, deliver it as MSI. */
+ 	if (v->arch.xen.upcall_vector)
+ 		kvm_xen_inject_vcpu_vector(v);
+-
+-	mark_page_dirty_in_slot(v->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
+ }
+ 
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index fb6c6109fdca..c71e8fbccaaf 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1367,6 +1367,13 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len);
+  */
+ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc);
+ 
++/**
++ * kvm_gpc_mark_dirty - mark a cached page as dirty.
++ *
++ * @gpc:	   struct gfn_to_pfn_cache object.
++ */
++void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc);
++
+ void kvm_sigset_activate(struct kvm_vcpu *vcpu);
+ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
+ 
 diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 2d6aba677830..0f36acdf577f 100644
+index 0f36acdf577f..b68ed7fa56a2 100644
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
-@@ -96,17 +96,28 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+@@ -386,6 +386,12 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
  }
- EXPORT_SYMBOL_GPL(kvm_gpc_check);
+ EXPORT_SYMBOL_GPL(kvm_gpc_activate);
  
--static void gpc_unmap_khva(kvm_pfn_t pfn, void *khva)
-+static void *gpc_map(kvm_pfn_t pfn)
++void kvm_gpc_mark_dirty(struct gfn_to_pfn_cache *gpc)
 +{
-+	if (pfn_valid(pfn))
-+		return kmap(pfn_to_page(pfn));
-+#ifdef CONFIG_HAS_IOMEM
-+	else
-+		return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
-+#endif
++	mark_page_dirty_in_slot(gpc->kvm, gpc->memslot, gpc->gpa >> PAGE_SHIFT);
 +}
++EXPORT_SYMBOL_GPL(kvm_gpc_mark_dirty);
 +
-+static void gpc_unmap(kvm_pfn_t pfn, void *khva)
+ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
  {
- 	/* Unmap the old pfn/page if it was mapped before. */
--	if (!is_error_noslot_pfn(pfn) && khva) {
--		if (pfn_valid(pfn))
--			kunmap(pfn_to_page(pfn));
-+	if (is_error_noslot_pfn(pfn) || !khva)
-+		return;
-+
-+	if (pfn_valid(pfn))
-+		kunmap(pfn_to_page(pfn));
- #ifdef CONFIG_HAS_IOMEM
--		else
--			memunmap(khva);
-+	else
-+		memunmap(khva);
- #endif
--	}
- }
- 
- static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_seq)
-@@ -175,7 +186,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
- 			 * the existing mapping and didn't create a new one.
- 			 */
- 			if (new_khva != old_khva)
--				gpc_unmap_khva(new_pfn, new_khva);
-+				gpc_unmap(new_pfn, new_khva);
- 
- 			kvm_release_pfn_clean(new_pfn);
- 
-@@ -193,15 +204,11 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
- 		 * too must be done outside of gpc->lock!
- 		 */
- 		if (gpc->usage & KVM_HOST_USES_PFN) {
--			if (new_pfn == gpc->pfn) {
-+			if (new_pfn == gpc->pfn)
- 				new_khva = old_khva;
--			} else if (pfn_valid(new_pfn)) {
--				new_khva = kmap(pfn_to_page(new_pfn));
--#ifdef CONFIG_HAS_IOMEM
--			} else {
--				new_khva = memremap(pfn_to_hpa(new_pfn), PAGE_SIZE, MEMREMAP_WB);
--#endif
--			}
-+			else
-+				new_khva = gpc_map(new_pfn);
-+
- 			if (!new_khva) {
- 				kvm_release_pfn_clean(new_pfn);
- 				goto out_error;
-@@ -326,7 +333,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa,
- 	mutex_unlock(&gpc->refresh_lock);
- 
- 	if (unmap_old)
--		gpc_unmap_khva(old_pfn, old_khva);
-+		gpc_unmap(old_pfn, old_khva);
- 
- 	return ret;
- }
-@@ -412,7 +419,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
- 		list_del(&gpc->list);
- 		spin_unlock(&kvm->gpc_lock);
- 
--		gpc_unmap_khva(old_pfn, old_khva);
-+		gpc_unmap(old_pfn, old_khva);
- 	}
- }
- EXPORT_SYMBOL_GPL(kvm_gpc_deactivate);
+ 	struct kvm *kvm = gpc->kvm;
 -- 
 2.39.2
 
