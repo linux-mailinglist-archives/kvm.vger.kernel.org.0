@@ -2,79 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B476A7B6DE9
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 18:02:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A9317B6DFB
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 18:05:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239189AbjJCQCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 12:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52980 "EHLO
+        id S231464AbjJCQFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 12:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240191AbjJCQCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 12:02:42 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E63B0
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 09:02:38 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c5db4925f9so8310015ad.1
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 09:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696348958; x=1696953758; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sVV/60md6UTA8bNGRck53WOsmLRvjYk6hRbd3CAsgEY=;
-        b=VvLBz8/+Y3LixYid6WO8FS/idABzAG2OHk2SCd2/CvLguYkLyP49kUahjrphKib4ya
-         i2iAPSFkG74oZw9oCxPlBwB7SG7bXjzxOFtO4WTe2K/cRcjr2WYrTcQN9ks08vC3cc64
-         nWKPlWX/cdkoGhvH5XMSyTo6OaMOZv4mhPHT82MoS/9tEwCjgMd4Cnz+TGqzyRjDeEj7
-         Ng2tsd1LjFTMb75r+pd4Nle9qvrZRqRJwR87VnIihqp9kFyX4d1JmxX/Ec6eHZ2A2Sk+
-         3oBcMh4Y5JLkwN4uNHss8svU/8j5CgYRVNPQXY8ADSvNsmdOhTkj2x2lCw1y/26Inots
-         MGGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696348958; x=1696953758;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sVV/60md6UTA8bNGRck53WOsmLRvjYk6hRbd3CAsgEY=;
-        b=M0xIUGqXO5WyzisCmEywkx+PN5mo7/XscTOkOuqHNgOCmWU9BA8U/cN42mieIor1/c
-         fhILgim7UA2q3uWqq6/cpJ+hxcPWGOk0+40C5HbtIZgcjpbJXm9jRqhOUA/64/s8kqc/
-         oBR3KDKS4MwIKoeha+Xbc/X5wtcEoxxCgp3jjwXghlfvhk72Tr2Av/mpIw3mVM9EPo6n
-         gq0FFubgiTpyEvVI3mG9SBbjnS7a/WZbhtFiWBH6ldpHwYr3IKRcBM/n2Df6F+6tygiJ
-         xM9lS/9G0D4fTbbsx9/VXNyJ/X2mtstedw9YMBZ8BWOTW9QVrLv+8bolMU1OJovK5oJF
-         O1Cg==
-X-Gm-Message-State: AOJu0YymCneVAv2V5wy11vLuW2hDnQqmlXVuPoANi5qXA2Drl+2/QtQw
-        KoiFP3MWYP+A6PapWMz8gVqhYg==
-X-Google-Smtp-Source: AGHT+IEvEqPZQ+DR0k8LUG1+eyMFnzgqbxZG1B9bkAcJEpckkAYgHokRYwzGgVprr6o/5kivsqv0sA==
-X-Received: by 2002:a17:903:41d1:b0:1c3:9928:7b28 with SMTP id u17-20020a17090341d100b001c399287b28mr4308533ple.6.1696348958050;
-        Tue, 03 Oct 2023 09:02:38 -0700 (PDT)
-Received: from [192.168.0.4] ([71.212.149.95])
-        by smtp.gmail.com with ESMTPSA id jb17-20020a170903259100b001bbdd44bbb6sm1742609plb.136.2023.10.03.09.02.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Oct 2023 09:02:37 -0700 (PDT)
-Message-ID: <e6476524-a8bc-0071-eef8-1ee9e1dcba37@linaro.org>
-Date:   Tue, 3 Oct 2023 09:02:35 -0700
+        with ESMTP id S232066AbjJCQFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 12:05:53 -0400
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B817A9;
+        Tue,  3 Oct 2023 09:05:50 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 922B1381;
+        Tue,  3 Oct 2023 16:05:49 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 922B1381
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1696349149; bh=FJ0ABpqZ404qDATR9ZjzfiRpFdQTFHY4H48kFkpDdqE=;
+        h=From:To:Subject:In-Reply-To:References:Date:From;
+        b=ByBmQehZ9ZDltSjH06Xz6yT1qgZkCx/jKFQq5vGQMNYnUNAsWw5VRiHo0PzccGksa
+         gqlixKWWEgNhp6Y5PHM0QnX8YDksC0utj3gRWXz7g24l5PqHLfDgZqX1bgpuQjlTd/
+         0eAlHSE25aHwkynWubyn7prY+ca8QdG0XmJEXgCE5hVajN3um9Jk3zfan25A4Svpqm
+         e6bckqM5chLcb6+taKdlZEhJgBgiFn1No0MF6iM38yUXkNKfuKtdbd4GWNnuTS/+dC
+         hPSI6U9PcqlFTty4GZa5eG+hfY0iUEGivaGcfpmBY2ezucGrZ5aDp10a6JQXeFMVL0
+         pgpGyDfqQB/2g==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Costa Shulyupin <costa.shul@redhat.com>,
+        Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        Linas Vepstas <linasvepstas@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        "Manoj N. Kumar" <manoj@linux.ibm.com>,
+        "Matthew R. Ochs" <mrochs@linux.ibm.com>,
+        Uma Krishnan <ukrishn@linux.ibm.com>,
+        Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Costa Shulyupin <costa.shul@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Yanteng Si <siyanteng@loongson.cn>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Nicholas Miehlbradt <nicholas@linux.ibm.com>,
+        Benjamin Gray <bgray@linux.ibm.com>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Segher Boessenkool <segher@kernel.crashing.org>,
+        Rohan McLure <rmclure@linux.ibm.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>,
+        Sathvika Vasireddy <sv@linux.ibm.com>,
+        Laurent Dufour <laurent.dufour@fr.ibm.com>,
+        Nathan Lynch <nathanl@linux.ibm.com>,
+        Brian King <brking@linux.vnet.ibm.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH] docs: move powerpc under arch
+In-Reply-To: <20230826165737.2101199-1-costa.shul@redhat.com>
+References: <169052340516.4355.10339828466636149348@legolas.ozlabs.org>
+ <20230826165737.2101199-1-costa.shul@redhat.com>
+Date:   Tue, 03 Oct 2023 10:05:48 -0600
+Message-ID: <87cyxvelnn.fsf@meer.lwn.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 0/7] accel: Restrict tcg_exec_[un]realizefn() to TCG
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <eduardo@habkost.net>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Claudio Fontana <cfontana@suse.de>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Roman Bolshakov <rbolshakov@ddn.com>,
-        Fabiano Rosas <farosas@suse.de>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cameron Esfahani <dirty@apple.com>
-References: <20231003123026.99229-1-philmd@linaro.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20231003123026.99229-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,17 +86,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/3/23 05:30, Philippe Mathieu-Daudé wrote:
-> Since v1:
-> - Use 'target'/'common' in function names (Claudio)
-> - Added Claudio R-b tags
-> 
->  From v1:
-> - Add missing accel_cpu_common_unrealize()
-> - Add AccelClass::cpu_common_[un]realize handlers
-> - Use tcg_exec_[un]realizefn as AccelClass handlers
+Costa Shulyupin <costa.shul@redhat.com> writes:
 
-Thanks, queued to tcg-next, replacing v1 that I queued before my holiday.  :-)
+> and fix all in-tree references.
+>
+> Architecture-specific documentation is being moved into Documentation/arch/
+> as a way of cleaning up the top-level documentation directory and making
+> the docs hierarchy more closely match the source hierarchy.
+>
+> Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
 
+So this patch appears to have not been picked up, and to have received
+no comments.  I'll happily carry it in docs-next, but it would be nice
+to have an ack from the powerpc folks...?
 
-r~
+Thanks,
+
+jon
