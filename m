@@ -2,135 +2,294 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 835487B7079
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:02:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFBAF7B70B8
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:22:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240706AbjJCSCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 14:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
+        id S240774AbjJCSWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 14:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231598AbjJCSCw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 14:02:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82272B8
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 11:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696356118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1O1P5RRCZO3I2Cb3ZB5a7k3rWZWIpd5L49t63w6uEck=;
-        b=COBCzydrWgPhPtn/T1lEz2S3hllh6MBaw+h3mZhbeI4s5c7PKP7ptPknVPLZQ2fzogP9+T
-        JJSk6vF74Pk+bIGDzUEnqpzSsNQqFkU28djQaHzqqFNXwtuD1gz2BjewqCVDf51P1U0sBG
-        TdcGZ/6G1OlaNEld6CcV4FsnRBSEats=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-9-AIUeISoeMBywSvYAFxsX0w-1; Tue, 03 Oct 2023 14:01:52 -0400
-X-MC-Unique: AIUeISoeMBywSvYAFxsX0w-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-797f3f27badso75460839f.2
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 11:01:52 -0700 (PDT)
+        with ESMTP id S230501AbjJCSWH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 14:22:07 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4B7E1
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 11:22:04 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-536ef8a7dcdso1887a12.0
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 11:22:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696357322; x=1696962122; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZzDVAIPhXLJ6H1shwPpB3BGM89tyFHmwziem7st5rSo=;
+        b=TgVhFHcFAduEbhIum9Mp4yAbeKnTaqN4to1/9vWoiU85/AG++ekR/SqCACPdYBZZBe
+         304e98qF99dBS6pdFjycQVlnqHUP5i5cQgxQ5h0UfzrM233mUwSC8NCvdgCTEB/OsQE4
+         bn1xgaG+ocl7/0nb9Y8+oWfVd4oeEcTzoMMClpI9SRGp/myD5SWvPMpJzpBJM7vVSBid
+         mXiQWAlBpPxBvhfbcHIv1X7XiukZI/9zgz4CmhA6wm0CY3yWh0fFUHG0DvK28ly8GbXl
+         CHIpmfb98TEboBicU1UYQBNMFxgfCSeKZD+NCSFYujjqea1Bo3rvikmodXSe81w9yPd9
+         LU/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696356111; x=1696960911;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1696357322; x=1696962122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1O1P5RRCZO3I2Cb3ZB5a7k3rWZWIpd5L49t63w6uEck=;
-        b=XzvQ6x7NtohYuYubRiN3qtXP0BmFDvQHG23QZ78P9O/TGIxl6JFS/v7hYNoPk35vSM
-         uCpj9W0pMXk4zqQjjoFTl+zuWv/UB/Jxl1TiJOYfRIuxgViAT9mnUXp7ernfyzDsB4zo
-         90r8d3I1ZXk19rN4X1MIZi9FxPz+1Ddt96u9hyafBDWecXm3HDeqz48YO/hADtWKjO93
-         1oupBFR0Ago1TklSUTruvNud+oFYI5ZqW+Q27zq+DZUINsC8owGjzip9O7uj4Xlaj3TQ
-         uQfE+ItXQCap4M3BTo6kd2TjFZqtMnlIUPOanSFQyWE9LWX2enqS/XPE57PMTZdVaUQ5
-         m+SQ==
-X-Gm-Message-State: AOJu0YyPhRv9ctv34Cc96xFK5B3dtiiM7e99ugb+xqcC2daF2/z6vl0O
-        ZMZqM+7sYdgQb0SQ3LD0mFrHJbR+EUEBE0ghZ+IuNDdn4POEkzFa3QEXUG3pX7M/1GUvdo0rVKz
-        TKBkp8xFaVk8b
-X-Received: by 2002:a5e:a915:0:b0:794:eddf:daae with SMTP id c21-20020a5ea915000000b00794eddfdaaemr178009iod.12.1696356111549;
-        Tue, 03 Oct 2023 11:01:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH4yTp9WE3Q/12Yk/wXuK2OODFz+pJdNL9fInAXp4IHhkyJn89d6aKAzKcOPfaMvL+GsZni7A==
-X-Received: by 2002:a5e:a915:0:b0:794:eddf:daae with SMTP id c21-20020a5ea915000000b00794eddfdaaemr177988iod.12.1696356111291;
-        Tue, 03 Oct 2023 11:01:51 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id fn12-20020a056638640c00b00439e3c9f958sm480243jab.129.2023.10.03.11.01.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 11:01:50 -0700 (PDT)
-Date:   Tue, 3 Oct 2023 12:01:49 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     nipun.gupta@amd.com, nikhil.agarwal@amd.com,
-        ndesaulniers@google.com, trix@redhat.com, shubham.rohila@amd.com,
-        kvm@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH] vfio/cdx: Add parentheses between bitwise AND
- expression and logical NOT
-Message-ID: <20231003120149.11c89206.alex.williamson@redhat.com>
-In-Reply-To: <20231002-vfio-cdx-logical-not-parentheses-v1-1-a8846c7adfb6@kernel.org>
-References: <20231002-vfio-cdx-logical-not-parentheses-v1-1-a8846c7adfb6@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        bh=ZzDVAIPhXLJ6H1shwPpB3BGM89tyFHmwziem7st5rSo=;
+        b=bGXcbB8KpTZu44RXENPXo7HQyehsD54ijQ0CV0tHjFYgsswQJnrEhPxA27tndMrrYa
+         64H5wcNyW63OrYllotCBiVRcc4bggfZLmq6WAsmA9+tk//Hjrt3vGbE2p4q396khQKmp
+         98Y5VuhD7rh5NGupltJjEiOElY32OeznModMs0pM+GBHfrebh6WK2PhSVPjGrLd3B9Db
+         J8A43bgWKklUNn9YAaao8qUmtVk4xZflIhnW8YgRb+WRLgCT5SqQ1tRXbdmQQQ1xKN1b
+         biaCi6KfDjg2mtI03F3UafW/iuE+QNZIzY72fh2PAXXwsucBWo7r7pOGS8B6USfHF/Rl
+         1KIw==
+X-Gm-Message-State: AOJu0YyByMXcSUzDAWtdcy9TMsKI6txir5S1B7o5DAjgaFUtr9MNXa4s
+        R09SL401SsdHVPIL+YJKAhC7LwVf7PwUGe9TyKVlcw==
+X-Google-Smtp-Source: AGHT+IGb9CYZGu8cbBF7awQbfHN/Mx0+nZAGWzRoDR4sTfbQfyrrJAptct4IAx1conqsVl07uBYIRMys1qmt5L/H62U=
+X-Received: by 2002:a50:d61e:0:b0:519:7d2:e256 with SMTP id
+ x30-20020a50d61e000000b0051907d2e256mr10452edi.0.1696357322423; Tue, 03 Oct
+ 2023 11:22:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
+ <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+ <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net> <ZRwx7gcY7x1x3a5y@google.com>
+In-Reply-To: <ZRwx7gcY7x1x3a5y@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 3 Oct 2023 11:21:46 -0700
+Message-ID: <CALMp9eRew1+-gDy36m3qWy9D9TQP+mkzPQg=xowKcaG+NpbX0w@mail.gmail.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        David Dunn <daviddunn@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 02 Oct 2023 10:53:13 -0700
-Nathan Chancellor <nathan@kernel.org> wrote:
+On Tue, Oct 3, 2023 at 8:23=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, Oct 03, 2023, Peter Zijlstra wrote:
+> > On Mon, Oct 02, 2023 at 05:56:28PM -0700, Sean Christopherson wrote:
+> > > On Mon, Oct 02, 2023, Peter Zijlstra wrote:
+> >
+> > > > I'm not sure what you're suggesting here. It will have to save/rest=
+ore
+> > > > all those MSRs anyway. Suppose it switches between vCPUs.
+> > >
+> > > The "when" is what's important.   If KVM took a literal interpretatio=
+n of
+> > > "exclude guest" for pass-through MSRs, then KVM would context switch =
+all those
+> > > MSRs twice for every VM-Exit=3D>VM-Enter roundtrip, even when the VM-=
+Exit isn't a
+> > > reschedule IRQ to schedule in a different task (or vCPU).  The overhe=
+ad to save
+> > > all the host/guest MSRs and load all of the guest/host MSRs *twice* f=
+or every
+> > > VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely =
+handled in
+> > > <1500 cycles, and "fastpath" exits are something like half that.  Swi=
+tching all
+> > > the MSRs is likely 1000+ cycles, if not double that.
+> >
+> > See, you're the virt-nerd and I'm sure you know what you're talking
+> > about, but I have no clue :-) I didn't know there were different levels
+> > of vm-exit.
+>
+> An exit is essentially a fancy exception/event.  The hardware transition =
+from
+> guest=3D>host is the exception itself (VM-Exit), and the transition back =
+to guest
+> is analagous to the IRET (VM-Enter).
+>
+> In between, software will do some amount of work, and the amount of work =
+that is
+> done can vary quite significantly depending on what caused the exit.
+>
+> > > FWIW, the primary use case we care about is for slice-of-hardware VMs=
+, where each
+> > > vCPU is pinned 1:1 with a host pCPU.
+> >
+> > I've been given to understand that vm-exit is a bad word in this
+> > scenario, any exit is a fail. They get MWAIT and all the other crap and
+> > more or less pretend to be real hardware.
+> >
+> > So why do you care about those MSRs so much? That should 'never' happen
+> > in this scenario.
+>
+> It's not feasible to completely avoid exits, as current/upcoming hardware=
+ doesn't
+> (yet) virtualize a few important things.  Off the top of my head, the two=
+ most
+> relevant flows are:
+>
+>   - APIC_LVTPC entry and PMU counters.  If a PMU counter overflows, the N=
+MI that
+>     is generated will trigger a hardware level NMI and cause an exit.  An=
+d sadly,
+>     the guest's NMI handler (assuming the guest is also using NMIs for PM=
+Is) will
+>     trigger another exit when it clears the mask bit in its LVTPC entry.
 
-> When building with clang, there is a warning (or error with
-> CONFIG_WERROR=y) due to a bitwise AND and logical NOT in
-> vfio_cdx_bm_ctrl():
-> 
->   drivers/vfio/cdx/main.c:77:6: error: logical not is only applied to the left hand side of this bitwise operator [-Werror,-Wlogical-not-parentheses]
->      77 |         if (!vdev->flags & BME_SUPPORT)
->         |             ^            ~
->   drivers/vfio/cdx/main.c:77:6: note: add parentheses after the '!' to evaluate the bitwise operator first
->      77 |         if (!vdev->flags & BME_SUPPORT)
->         |             ^
->         |              (                        )
->   drivers/vfio/cdx/main.c:77:6: note: add parentheses around left hand side expression to silence this warning
->      77 |         if (!vdev->flags & BME_SUPPORT)
->         |             ^
->         |             (           )
->   1 error generated.
-> 
-> Add the parentheses as suggested in the first note, which is clearly
-> what was intended here.
-> 
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/1939
-> Fixes: 8a97ab9b8b31 ("vfio-cdx: add bus mastering device feature support")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  drivers/vfio/cdx/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/cdx/main.c b/drivers/vfio/cdx/main.c
-> index a437630be354..a63744302b5e 100644
-> --- a/drivers/vfio/cdx/main.c
-> +++ b/drivers/vfio/cdx/main.c
-> @@ -74,7 +74,7 @@ static int vfio_cdx_bm_ctrl(struct vfio_device *core_vdev, u32 flags,
->  	struct vfio_device_feature_bus_master ops;
->  	int ret;
->  
-> -	if (!vdev->flags & BME_SUPPORT)
-> +	if (!(vdev->flags & BME_SUPPORT))
->  		return -ENOTTY;
->  
->  	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET,
-> 
-> ---
-> base-commit: fcb2f2ed4a80cfe383d87da75caba958516507e9
-> change-id: 20231002-vfio-cdx-logical-not-parentheses-aca8fbd6b278
-> 
-> Best regards,
+In addition, when the guest PMI handler writes to
+IA32_PERF_GLOBAL_CTRL to disable all counters (and again later to
+re-enable the counters), KVM has to intercept that as well, with
+today's implementation. Similarly, on each guest timer tick, when
+guest perf is multiplexing PMCs, KVM has to intercept writes to
+IA32_PERF_GLOBAL _CTRL.
 
-Applied to vfio next branch for v6.7.  Thanks!
+Furthermore, in some cases, Linux perf seems to double-disable
+counters, using both the individual enable bits in each PerfEvtSel, as
+well as the bits in PERF_GLOBAL_CTRL.  KVM has to intercept writes to
+the PerfEvtSels as well. Off-topic, but I'd like to request that Linux
+perf *only* use the enable  bits in IA32_PERF_GLOBAL_CTRL on
+architectures where that is supported. Just leave the enable bits set
+in the PrfEvtSels, to avoid unnecessary VM-exits. :)
 
-Alex
+>   - Timer related IRQs, both in the guest and host.  These are the bigges=
+t source
+>     of exits on modern hardware.  Neither AMD nor Intel provide a virtual=
+ APIC
+>     timer, and so KVM must trap and emulate writes to TSC_DEADLINE (or to=
+ APIC_TMICT),
+>     and the subsequent IRQ will also cause an exit.
+>
+> The cumulative cost of all exits is important, but the latency of each in=
+dividual
+> exit is even more critical, especially for PMU related stuff.  E.g. if th=
+e guest
+> is trying to use perf/PMU to profile a workload, adding a few thousand cy=
+cles to
+> each exit will introduce too much noise into the results.
+>
+> > > > > Or at least, that was my reading of things.  Maybe it was just a
+> > > > > misunderstanding because we didn't do a good job of defining the =
+behavior.
+> > > >
+> > > > This might be the case. I don't particularly care where the guest
+> > > > boundary lies -- somewhere in the vCPU thread. Once the thread is g=
+one,
+> > > > PMU is usable again etc..
+> > >
+> > > Well drat, that there would have saved a wee bit of frustration.  Bet=
+ter late
+> > > than never though, that's for sure.
+> > >
+> > > Just to double confirm: keeping guest PMU state loaded until the vCPU=
+ is scheduled
+> > > out or KVM exits to userspace, would mean that host perf events won't=
+ be active
+> > > for potentially large swaths of non-KVM code.  Any function calls or =
+event/exception
+> > > handlers that occur within the context of ioctl(KVM_RUN) would run wi=
+th host
+> > > perf events disabled.
+> >
+> > Hurmph, that sounds sub-optimal, earlier you said <1500 cycles, this al=
+l
+> > sounds like a ton more.
+> >
+> > /me frobs around the kvm code some...
+> >
+> > Are we talking about exit_fastpath loop in vcpu_enter_guest() ? That
+> > seems to run with IRQs disabled, so at most you can trigger a #PF or
+> > something, which will then trip an exception fixup because you can't ru=
+n
+> > #PF with IRQs disabled etc..
+> >
+> > That seems fine. That is, a theoretical kvm_x86_handle_enter_irqoff()
+> > coupled with the existing kvm_x86_handle_exit_irqoff() seems like
+> > reasonable solution from where I'm sitting. That also more or less
+> > matches the FPU state save/restore AFAICT.
+> >
+> > Or are you talking about the whole of vcpu_run() ? That seems like a
+> > massive amount of code, and doesn't look like anything I'd call a
+> > fast-path. Also, much of that loop has preemption enabled...
+>
+> The whole of vcpu_run().  And yes, much of it runs with preemption enable=
+d.  KVM
+> uses preempt notifiers to context switch state if the vCPU task is schedu=
+led
+> out/in, we'd use those hooks to swap PMU state.
+>
+> Jumping back to the exception analogy, not all exits are equal.  For "sim=
+ple" exits
+> that KVM can handle internally, the roundtrip is <1500.   The exit_fastpa=
+th loop is
+> roughly half that.
+>
+> But for exits that are more complex, e.g. if the guest hits the equivalen=
+t of a
+> page fault, the cost of handling the page fault can vary significantly.  =
+It might
+> be <1500, but it might also be 10x that if handling the page fault requir=
+es faulting
+> in a new page in the host.
+>
+> We don't want to get too aggressive with moving stuff into the exit_fastp=
+ath loop,
+> because doing too much work with IRQs disabled can cause latency problems=
+ for the
+> host.  This isn't much of a concern for slice-of-hardware setups, but wou=
+ld be
+> quite problematic for other use cases.
+>
+> And except for obviously slow paths (from the guest's perspective), extra=
+ latency
+> on any exit can be problematic.  E.g. even if we got to the point where K=
+VM handles
+> 99% of exits the fastpath (may or may not be feasible), a not-fastpath ex=
+it at an
+> inopportune time could throw off the guest's profiling results, introduce=
+ unacceptable
+> jitter, etc.
+>
+> > > Are you ok with that approach?  Assuming we don't completely botch th=
+ings, the
+> > > interfaces are sane, we can come up with a clean solution for handlin=
+g NMIs, etc.
+> >
+> > Since you steal the whole PMU, can't you re-route the PMI to something
+> > that's virt friendly too?
+>
+> Hmm, actually, we probably could.  It would require modifying the host's =
+APIC_LVTPC
+> entry when context switching the PMU, e.g. to replace the NMI with a dedi=
+cated IRQ
+> vector.  As gross as that sounds, it might actually be cleaner overall th=
+an
+> deciphering whether an NMI belongs to the host or guest, and it would alm=
+ost
+> certainly yield lower latency for guest PMIs.
 
+Ugh.  Can't KVM just install its own NMI handler? Either way, it's
+possible for late PMIs to arrive in the wrong context.
