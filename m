@@ -2,119 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F3077B6AEB
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 15:52:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D5317B6AFE
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 16:04:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237689AbjJCNwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 09:52:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
+        id S232381AbjJCOEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 10:04:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232068AbjJCNwu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 09:52:50 -0400
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F555A9;
-        Tue,  3 Oct 2023 06:52:43 -0700 (PDT)
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so1607257a12.1;
-        Tue, 03 Oct 2023 06:52:43 -0700 (PDT)
+        with ESMTP id S230468AbjJCOEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 10:04:06 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BDF0A3
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 07:04:04 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-690bc3f82a7so790361b3a.0
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 07:04:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696341843; x=1696946643; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PGhYHTVvUZAkku9032I5Cj12kC+c5Sm175YoL6Kui2A=;
+        b=xh1jvNV6oN/chVKFGT327HjPDURIVgNWxJooiwPzl5IORlth40xk/KqaOIlzxR2xUE
+         eH0Xg09DgA+u5YIB165ThM6zyTOjFVtCddDQYp9atKlInT602hclg5vLcgUSnN10QQ0v
+         JOpSku4N0UFz1ytb7BSF7X9LTJJ5haz5JkbzkIhf7FzRcq5ZGdZQu03xMeQ+iaD274My
+         O1veFKfmzRjtKTdSuQ13TcCRfsD8yyWM2YwoYzCuCgyNwxAg6Ajuu+llw74y/kupn0Vb
+         g41cVEXHpByMYX/IRxZK0Y50VSUcxolN+G9xZcpK5YrMcKaY4qm1B5PmFdW2KjdqlvLn
+         uTMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696341161; x=1696945961;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1696341843; x=1696946643;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qbhD19S6zLeOtT2FNUeshWF95fV8Y1/bPKyfIl12gP0=;
-        b=YT0XI35Z4m+v3MsnQ+bYMJfWA8a9DJJw56nZcLT23qRV0p1ldrx7nAap67AvoZCGQt
-         sun3MVpvWCCnVAOSrYZu0af0Jsoq92WT4QQJle692N+1YAjvUoJ+EoyNjw0HdddlfBSp
-         +yjQwdex+RmhMg9cu/dp6oADfa4sjNsT+IU7a2QIBZOreU1hv4iMVgj7BNq5eXBgY62+
-         bJVRcaf2YRRUCcTKc6J1/kvgfNFbYKZ7n0/UBHYaAjt16qNEuUrZxzrZ0RL6UWCfj9b2
-         sgVQsAYPGXBNLArENQiWgX+jH/2NDfiXdt2kbXlwwTkCo7xOqVCzywGTVJT4SqHuKfH5
-         WS9w==
-X-Gm-Message-State: AOJu0YyxQp7Wp+7bKIOwk4Dq9giyYzp34n9jQQZ8zplwTcxieKldO0Q9
-        B1JhdYwAtisJei1KT21uGvhOEWg9VTU=
-X-Google-Smtp-Source: AGHT+IFAGpUa7LltnP297SnJgjG9wRsCbtvps1bDOeBiWN2XiNo4p9pu/ruLocu0YnYfIcTd2D2GJg==
-X-Received: by 2002:a17:906:5393:b0:9ae:3fdd:4dd with SMTP id g19-20020a170906539300b009ae3fdd04ddmr12445147ejo.24.1696341160973;
-        Tue, 03 Oct 2023 06:52:40 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-120.fbsv.net. [2a03:2880:31ff:78::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d10-20020a170906344a00b00992b71d8f19sm1100772ejb.133.2023.10.03.06.52.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 06:52:40 -0700 (PDT)
-Date:   Tue, 3 Oct 2023 06:52:38 -0700
-From:   Breno Leitao <leitao@debian.org>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org
-Cc:     rcu@vger.kernel.org, rbc@meta.com
-Subject: kvm/x86: perf: Softlockup issue
-Message-ID: <ZRwcpki67uhpAUKi@gmail.com>
+        bh=PGhYHTVvUZAkku9032I5Cj12kC+c5Sm175YoL6Kui2A=;
+        b=EZ0vJw2KXJw2y12XBR3YXQtdWicYF9GaDgbDnzkP2noZmSr5o5j24AQST5xHtGQ5Og
+         jvu0vmtW1W0oD+yMrCF9runCnfzICn6L4pNz+4CSHeyZqRsbupBi40h69MM1QK6Jt3FH
+         LgM4geWtpv5bEVO4YvjUm9QO7VNLP1pDdyloDQQWISC5ZAaM8pqd7u6vo8dvWMPAhoJI
+         MWPWabppCa3lOriMz1pCue++cF8T5ShpBx1uI7+242a/k1WM7/9xXAHd3p0X2Vx8VOsT
+         F/IwP1/K9sfp8diAdou4gIKuwKHk2YGBI6Wm4pmnltfmS7DpH9KPvapO0B03yyMmMYX1
+         VEFw==
+X-Gm-Message-State: AOJu0YzPPYYrZwy962fGqC9oLgRy8ErfVAvrurreLdekMEoknz2njkEb
+        +CFT83lSjfoRjMT9PwVJjHQbJqUG/lRl8EGgO+A=
+X-Google-Smtp-Source: AGHT+IHbsC8bIzjKyXDvYfAdfaCcEVwebd0JAM2/o3vR3hGxDCXzAkhavBCserikXogG1mN2b9A0xA==
+X-Received: by 2002:a05:6a00:130b:b0:690:d620:7801 with SMTP id j11-20020a056a00130b00b00690d6207801mr12959180pfu.11.1696341843634;
+        Tue, 03 Oct 2023 07:04:03 -0700 (PDT)
+Received: from [192.168.0.4] ([71.212.149.95])
+        by smtp.gmail.com with ESMTPSA id c13-20020aa7880d000000b0068e4c5a4f3esm1389122pfo.71.2023.10.03.07.04.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 07:04:03 -0700 (PDT)
+Message-ID: <96a726c8-186c-3f09-9d9b-d17d7f5289e2@linaro.org>
+Date:   Tue, 3 Oct 2023 07:04:00 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 0/5] accel: Restrict tcg_exec_[un]realizefn() to TCG
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     Fabiano Rosas <farosas@suse.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Claudio Fontana <cfontana@suse.de>,
+        Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20230915190009.68404-1-philmd@linaro.org>
+ <87e1be19-c1c6-73fb-3569-7dbf186662f7@linaro.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <87e1be19-c1c6-73fb-3569-7dbf186662f7@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I've been pursuing a bug in a virtual machine (KVM) that I would like to share
-in here. The VM gets stuck when running perf in a VM and getting soft lockups.
+On 10/2/23 23:44, Philippe Mathieu-Daudé wrote:
+> On 15/9/23 21:00, Philippe Mathieu-Daudé wrote:
+>> - Add missing accel_cpu_unrealize()
+>> - Add AccelClass::[un]realize_cpu handlers
+>> - Use tcg_exec_[un]realizefn as AccelClass handlers
+>>
+>> Philippe Mathieu-Daudé (5):
+>>    accel: Rename accel_cpu_realizefn() ->  accel_cpu_realize()
+>>    accel: Introduce accel_cpu_unrealize() stub
+>>    accel: Declare AccelClass::[un]realize_cpu() handlers
+>>    accel/tcg: Have tcg_exec_realizefn() return a boolean
+>>    accel/tcg: Restrict tcg_exec_[un]realizefn() to TCG
+> 
+> Ping?
+> 
 
-The bug happens upstream (Linux 6.6-rc4 - 8a749fd1a8720d461). The same kernel
-is being used in the host and in the guest.
+I have this series queued for the next tcg pull.
 
-The problem only happens in a very specific circumstances:
-
-1) PMU needs to be enabled in the guest
-
-2) Libvirt/QEMU needs to use a custom CPU:
-	* Here is the qemu line:
-		-cpu Skylake-Server,kvm-pv-eoi=on,pmu=on
-	* Any other CPU seems to hit the problem
-		* Even using Skylake-Server on a Skylake server
-	* Using CPU passthrough workaround the problem
-
-3) You need to use 6 or more events in perf.
-	* This is a line that reproduces the problem:
-	  # perf stat -e cpu-clock -e context-switches -e cpu-migrations  -e page-faults -e cycles -e instructions  -e branches ls
-	* Removing any of these events (totaling 5 events) makes `perf` work again
-
-4) This problem happens on upstream, 6.4 and 5.19
-	* This problem doesn't seem to happen on 5.12
-
-Problem
-========
-
-When running perf in the circumstances above, the VM is stuck, with a lot of
-stack traces. This is some messages:
-
-	 kernel:[  400.314381] watchdog: BUG: soft lockup - CPU#3 stuck for 26s! [kworker/u68:11:6853]
-	 kernel:[  400.324380] watchdog: BUG: soft lockup - CPU#8 stuck for 26s! [dynoKernelMon:9781]
-	 kernel:[  404.368380] watchdog: BUG: soft lockup - CPU#30 stuck for 22s! [kworker/30:2:1326]
-
-Here is part of the stack. The full stack is in the pastebin below:
-
-	 nmi_cpu_backtrace (lib/nmi_backtrace.c:115)
-	 nmi_cpu_backtrace_handler (arch/x86/kernel/apic/hw_nmi.c:47)
-	 nmi_handle (arch/x86/kernel/nmi.c:149)
-	 __intel_pmu_enable_all (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 arch/x86/include/asm/msr.h:147 arch/x86/include/asm/msr.h:262 arch/x86/events/intel/core.c:2239)
-	 __intel_pmu_enable_all (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 arch/x86/include/asm/msr.h:147 arch/x86/include/asm/msr.h:262 arch/x86/events/intel/core.c:2239)
-	 default_do_nmi (arch/x86/kernel/nmi.c:347)
-	 exc_nmi (arch/x86/kernel/nmi.c:543)
-	 end_repeat_nmi (arch/x86/entry/entry_64.S:1471)
-	 __intel_pmu_enable_all (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 arch/x86/include/asm/msr.h:147 arch/x86/include/asm/msr.h:262 arch/x86/events/intel/core.c:2239)
-	 __intel_pmu_enable_all (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 arch/x86/include/asm/msr.h:147 arch/x86/include/asm/msr.h:262 arch/x86/events/intel/core.c:2239)
-	 __intel_pmu_enable_all (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 arch/x86/include/asm/msr.h:147 arch/x86/include/asm/msr.h:262 arch/x86/events/intel/core.c:2239)
-
-
-
-More info
-=========
-
-Soft lockup messages in the guest:
-	https://paste.debian.net/1293888/
-Full log from the guest:
-	https://paste.debian.net/1293891/
-vCPU stacks dumped from the host (cat /proc/<vcpu>/stack):
-	https://paste.debian.net/1293887/
-Qemu (version 7.1.0) command line
-	https://paste.debian.net/1293894/
+r~
