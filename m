@@ -2,136 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D0477B6465
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:38:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAF327B64B0
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:51:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239188AbjJCIiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 04:38:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
+        id S231501AbjJCIvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 04:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230439AbjJCIiG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 04:38:06 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6DCA4;
-        Tue,  3 Oct 2023 01:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696322283; x=1727858283;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=380/oSJwz+ChU1zJ9C8pcG2L+2mNW4PSQa0Sq/ZkMl0=;
-  b=BSU5bmHJe4xG1Y3CLEtPhVI8J6pR/EnfYPTzxqjUV+d+Ac3lN4H067mk
-   PgojpqIO00C7CfMVQ18MeFnBEuktx3rPmsBi3hrbdKK/87nVHMGLSbkrX
-   cVXsNg1vChr027gek/ZjHM+pLR8nsZhXZuol3Y2SnTnDDeHlcpgxHfLQk
-   cFBy5ISi0tX9xkP8Ng9RPltciJcAancBSW0jY1LkBTYJbwW38Zv3B/8MU
-   JkH0dz4wSTntEnY0LSzeS5zEHr8qrfO73K1E9IJ44OgUuslhSi0eDNXXl
-   DVG/AkjlTTPZmzrhH2EB+8ODCpDtGSu2nEO6XRzkXCVAKjgzxxyUOrJ1k
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="362193143"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="362193143"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:38:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="786023424"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="786023424"
-Received: from tciutacu-mobl.ger.corp.intel.com ([10.252.40.114])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:37:55 -0700
-Date:   Tue, 3 Oct 2023 11:37:53 +0300 (EEST)
-From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     Lukas Wunner <lukas@wunner.de>
-cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 04/12] certs: Create blacklist keyring earlier
-In-Reply-To: <3db7a8856833dfcbc4b122301f233828379d67db.1695921657.git.lukas@wunner.de>
-Message-ID: <7e98a953-a4b-70e8-caeb-a94237e593f8@linux.intel.com>
-References: <cover.1695921656.git.lukas@wunner.de> <3db7a8856833dfcbc4b122301f233828379d67db.1695921657.git.lukas@wunner.de>
+        with ESMTP id S229894AbjJCIvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 04:51:13 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D44A9
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 01:51:09 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 54B4C1F38C;
+        Tue,  3 Oct 2023 08:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1696323068; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+e7xFM+HvvIW13K9+Rbko6Whp4xEt979IdWxH8bR46g=;
+        b=1wWIT2RnhxDk8FmqK/qcanywIE6w2mnLE4FlmdYRYmRPgdrqnV7TOVMqcQB9r3laDbUGqo
+        mQ37j1Q3wYDOOPOWfjCG8gf0xDjg6aZBeD5ucBYLrBi7Qby9BeEFFbAcTTFCn69PNTMRKL
+        z5c21t6f9CTogb6mDxGHeyYqgwecoNw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1696323068;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+e7xFM+HvvIW13K9+Rbko6Whp4xEt979IdWxH8bR46g=;
+        b=A0hNpdIWf8CJzf7rS+Wt+brmkrDX5u7+WfzR18/xoybPYPH0JQZSsfIhW/zu737ox12s5A
+        YmF+TzEotyy/+JAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2A64139F9;
+        Tue,  3 Oct 2023 08:51:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KWGtOfvVG2VwPAAAMHmgww
+        (envelope-from <cfontana@suse.de>); Tue, 03 Oct 2023 08:51:07 +0000
+Message-ID: <411e5aa7-5433-9c06-4571-bfcad565abec@suse.de>
+Date:   Tue, 3 Oct 2023 10:51:07 +0200
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-242978425-1696322281=:2030"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH 1/5] accel: Rename accel_cpu_realizefn() ->
+ accel_cpu_realize()
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        Fabiano Rosas <farosas@suse.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+References: <20230915190009.68404-1-philmd@linaro.org>
+ <20230915190009.68404-2-philmd@linaro.org>
+From:   Claudio Fontana <cfontana@suse.de>
+In-Reply-To: <20230915190009.68404-2-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Reviewed-by: Claudio Fontana <cfontana@suse.de>
 
---8323329-242978425-1696322281=:2030
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-
-On Thu, 28 Sep 2023, Lukas Wunner wrote:
-
-> The upcoming support for PCI device authentication with CMA-SPDM
-> (PCIe r6.1 sec 6.31) requires parsing X.509 certificates upon
-> device enumeration, which happens in a subsys_initcall().
+On 9/15/23 21:00, Philippe Mathieu-Daudé wrote:
+> We use the '*fn' suffix for handlers, this is a public method.
+> Drop the suffix.
 > 
-> Parsing X.509 certificates accesses the blacklist keyring:
-> x509_cert_parse()
->   x509_get_sig_params()
->     is_hash_blacklisted()
->       keyring_search()
-> 
-> So far the keyring is created much later in a device_initcall().  Avoid
-> a NULL pointer dereference on access to the keyring by creating it one
-> initcall level earlier than PCI device enumeration, i.e. in an
-> arch_initcall().
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->  certs/blacklist.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  include/qemu/accel.h      | 4 ++--
+>  accel/accel-common.c      | 2 +-
+>  cpu.c                     | 2 +-
+>  target/i386/kvm/kvm-cpu.c | 2 +-
+>  4 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/certs/blacklist.c b/certs/blacklist.c
-> index 675dd7a8f07a..34185415d451 100644
-> --- a/certs/blacklist.c
-> +++ b/certs/blacklist.c
-> @@ -311,7 +311,7 @@ static int restrict_link_for_blacklist(struct key *dest_keyring,
->   * Initialise the blacklist
->   *
->   * The blacklist_init() function is registered as an initcall via
-> - * device_initcall().  As a result if the blacklist_init() function fails for
-> + * arch_initcall().  As a result if the blacklist_init() function fails for
->   * any reason the kernel continues to execute.  While cleanly returning -ENODEV
->   * could be acceptable for some non-critical kernel parts, if the blacklist
->   * keyring fails to load it defeats the certificate/key based deny list for
-> @@ -356,7 +356,7 @@ static int __init blacklist_init(void)
->  /*
->   * Must be initialised before we try and load the keys into the keyring.
->   */
-> -device_initcall(blacklist_init);
-> +arch_initcall(blacklist_init);
+> diff --git a/include/qemu/accel.h b/include/qemu/accel.h
+> index e84db2e3e5..cb64a07b84 100644
+> --- a/include/qemu/accel.h
+> +++ b/include/qemu/accel.h
+> @@ -90,11 +90,11 @@ void accel_setup_post(MachineState *ms);
+>  void accel_cpu_instance_init(CPUState *cpu);
 >  
->  #ifdef CONFIG_SYSTEM_REVOCATION_LIST
->  /*
-> 
+>  /**
+> - * accel_cpu_realizefn:
+> + * accel_cpu_realize:
+>   * @cpu: The CPU that needs to call accel-specific cpu realization.
+>   * @errp: currently unused.
+>   */
+> -bool accel_cpu_realizefn(CPUState *cpu, Error **errp);
+> +bool accel_cpu_realize(CPUState *cpu, Error **errp);
+>  
+>  /**
+>   * accel_supported_gdbstub_sstep_flags:
+> diff --git a/accel/accel-common.c b/accel/accel-common.c
+> index df72cc989a..b953855e8b 100644
+> --- a/accel/accel-common.c
+> +++ b/accel/accel-common.c
+> @@ -119,7 +119,7 @@ void accel_cpu_instance_init(CPUState *cpu)
+>      }
+>  }
+>  
+> -bool accel_cpu_realizefn(CPUState *cpu, Error **errp)
+> +bool accel_cpu_realize(CPUState *cpu, Error **errp)
+>  {
+>      CPUClass *cc = CPU_GET_CLASS(cpu);
+>  
+> diff --git a/cpu.c b/cpu.c
+> index 0769b0b153..61c9760e62 100644
+> --- a/cpu.c
+> +++ b/cpu.c
+> @@ -136,7 +136,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+>      /* cache the cpu class for the hotpath */
+>      cpu->cc = CPU_GET_CLASS(cpu);
+>  
+> -    if (!accel_cpu_realizefn(cpu, errp)) {
+> +    if (!accel_cpu_realize(cpu, errp)) {
+>          return;
+>      }
+>  
+> diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+> index 7237378a7d..4474689f81 100644
+> --- a/target/i386/kvm/kvm-cpu.c
+> +++ b/target/i386/kvm/kvm-cpu.c
+> @@ -35,7 +35,7 @@ static bool kvm_cpu_realizefn(CPUState *cs, Error **errp)
+>       * x86_cpu_realize():
+>       *  -> x86_cpu_expand_features()
+>       *  -> cpu_exec_realizefn():
+> -     *            -> accel_cpu_realizefn()
+> +     *            -> accel_cpu_realize()
+>       *               kvm_cpu_realizefn() -> host_cpu_realizefn()
+>       *  -> check/update ucode_rev, phys_bits, mwait
+>       */
 
-Reviewed-by: Ilpo J�rvinen <ilpo.jarvinen@linux.intel.com>
-
--- 
- i.
-
---8323329-242978425-1696322281=:2030--
