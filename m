@@ -2,283 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB3FF7B6D53
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 17:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A79527B6DAF
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 17:59:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237251AbjJCPk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 11:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40114 "EHLO
+        id S240190AbjJCP7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 11:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231691AbjJCPk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 11:40:58 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F3DEA6;
-        Tue,  3 Oct 2023 08:40:53 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0MR60mWpz67Ct8;
-        Tue,  3 Oct 2023 23:38:10 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 3 Oct
- 2023 16:40:50 +0100
-Date:   Tue, 3 Oct 2023 16:40:48 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Lukas Wunner <lukas@wunner.de>
-CC:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <20231003164048.0000148c@Huawei.com>
-In-Reply-To: <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S239407AbjJCP7g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 11:59:36 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A6E8E5
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 08:59:30 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a1df5b7830so15135267b3.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 08:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696348769; x=1696953569; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xP89tk8jeFUDqiHwgtcyinENLLmFDFAo+sp2wFgmRBw=;
+        b=3VHfewwIV0zOljG/ol2pjU+0vBAWkOLQRPOSIDg5brqaS+50EHIiCl+ps7d84LasCC
+         jz7EfaUe1TP4lksfzPRXjmqvTy2qhmWi6rE0bUp0X2soN22L9f7Tpzv33HVo7nNh1DpK
+         xVGLumlTXW1AIwOdhs8KaR033H4JRtK7qJDnzZJbOZVOAIuVgRgMfBtgHnv9p3YdnuwS
+         poxsb3AIswlAkEV08xxGKdQ+PCQ4u8RqOWnx7mo22z94u7AEoRP+Ocm9CDkjVMbyosWx
+         CaUYYlWPcDj5t6s+bBhCEmtwG+DQmiZ1F93IWvadR9nnbUGaPS4AG69AHcpqDEFwXAXk
+         PMAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696348769; x=1696953569;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xP89tk8jeFUDqiHwgtcyinENLLmFDFAo+sp2wFgmRBw=;
+        b=fwOAwdeHTIGyNzzzGZbtEnldl2X2kGEGFxzREgZejqFweosz+qu+wVxR1QbDtJHWhO
+         QSBV1tebEMSLBhO0zgPaP27S9iUpwhTMPAf5aBfBX0+9ALme2tiEm4ZYLJkT+up0k1ji
+         1XC+LNznT97kdF/cB7ZJhse641fQWWEiGuT1x+rqQ6KNaRibCxbuFsYIdMKrNKroTRRv
+         h/muQ+GKweQ/IHhSzrSXZSHyC7G5Ufwr+jXVpYQBR8yBHhwYvJmZI47/2MPAIlNplvYG
+         PJyOrWAe/nvS0EIGOaj5yfqpHkgHyCWurTopJQVxuhUq9e3V2EgeSfiwCnHO8iEQaJpl
+         7oXA==
+X-Gm-Message-State: AOJu0Yy6r3dWrv1yu4ZdNyKUhdxRL8pwRNKwjBvhS8R2oL1FGJK4MHS3
+        DzF5UkgRnosct1PMx5rrZUtF2sqm8+c=
+X-Google-Smtp-Source: AGHT+IHlsTPxnmIroL8cntBugIBpa7VGBcPZjKPldlj/dItcEWdxSvIkKSkj76hPSiTFqWvviFkle9Hc81s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:3604:0:b0:d7a:c85c:725b with SMTP id
+ d4-20020a253604000000b00d7ac85c725bmr227114yba.7.1696348768967; Tue, 03 Oct
+ 2023 08:59:28 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 08:59:27 -0700
+In-Reply-To: <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com>
+Message-ID: <ZRw6X2BptZnRPNK7@google.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Sep 2023 19:32:42 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
-
-> At any given time, only a single entity in a physical system may have
-> an SPDM connection to a device.  That's because the GET_VERSION request
-> (which begins an authentication sequence) resets "the connection and all
-> context associated with that connection" (SPDM 1.3.0 margin no 158).
+On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> Hi,
 > 
-> Thus, when a device is passed through to a guest and the guest has
-> authenticated it, a subsequent authentication by the host would reset
-> the device's CMA-SPDM session behind the guest's back.
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index d2d913acf0df..f8642ff2eb9d 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+> >  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> >  #define KVM_CAP_USER_MEMORY2 230
+> > +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+> >
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >
+> > @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
+> >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> >
+> > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
+> > +
+> > +struct kvm_memory_attributes {
+> > +       __u64 address;
+> > +       __u64 size;
+> > +       __u64 attributes;
+> > +       __u64 flags;
+> > +};
+> > +
+> > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > +
 > 
-> Prevent by letting the guest claim exclusive CMA ownership of the device
-> during passthrough.  Refuse CMA reauthentication on the host as long.
-> After passthrough has concluded, reauthenticate the device on the host.
+> In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SHARED
+> attributes from userspace.
+
+Why not?  The whole thing falls apart if userspace doesn't *know* the state of a
+page, and the only way for userspace to know the state of a page at a given moment
+in time is if userspace controls the attributes.  E.g. even if KVM were to provide
+a way for userspace to query attributes, the attributes exposed to usrspace would
+become stale the instant KVM drops slots_lock (or whatever lock protects the attributes)
+since userspace couldn't prevent future changes.
+
+Why does pKVM need to prevent userspace from stating *its* view of attributes?
+
+If the goal is to reduce memory overhead, that can be solved by using an internal,
+non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  If the guest
+attempts to access memory where pKVM and userspace don't agree on the state,
+generate an exit to userspace.  Or kill the guest.  Or do something else entirely.
+
+> However, we'd like to use the attributes xarray to track the sharing state of
+> guest pages at the host kernel.
 > 
-> Store the flag indicating guest ownership in struct pci_dev's priv_flags
-> to avoid the concurrency issues observed by commit 44bda4b7d26e ("PCI:
-> Fix is_added/is_busmaster race condition").
+> Moreover, we'd rather the default guest page state be PRIVATE, and
+> only specify which pages are shared. All pKVM guest pages start off as
+> private, and the majority will remain so.
+
+I would rather optimize kvm_vm_set_mem_attributes() to generate range-based
+xarray entries, at which point it shouldn't matter all that much whether PRIVATE
+or SHARED is the default "empty" state.  We opted not to do that for the initial
+merge purely to keep the code as simple as possible (which is obviously still not
+exactly simple).
+
+With range-based xarray entries, the cost of tagging huge chunks of memory as
+PRIVATE should be a non-issue.  And if that's not enough for whatever reason, I
+would rather define the polarity of PRIVATE on a per-VM basis, but only for internal
+storage.
+ 
+> I'm not sure if this is the best way to do this: One idea would be to move
+> the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
+> arch/*/include/asm/kvm_host.h, which is where kvm_arch_supported_attributes()
+> lives as well. This would allow different architectures to specify their own
+> attributes (i.e., instead we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for pKVM).
+> This wouldn't help in terms of preventing userspace from clearing attributes
+> (i.e., setting a 0 attribute) though.
 > 
-> Side note:  The Data Object Exchange r1.1 ECN (published Oct 11 2022)
-> retrofits DOE with Connection IDs.  In theory these allow simultaneous
-> CMA-SPDM connections by multiple entities to the same device.  But the
-> first hardware generation capable of CMA-SPDM only supports DOE r1.0.
-> The specification also neglects to reserve unique Connection IDs for
-> hosts and guests, which further limits its usefulness.
-> 
-> In general, forcing the transport to compensate for SPDM's lack of a
-> connection identifier feels like a questionable layering violation.
+> The other thing, which we need for pKVM anyway, is to make
+> kvm_vm_set_mem_attributes() global, so that it can be called from outside of
+> kvm_main.c (already have a local patch for this that declares it in
+> kvm_host.h),
 
-Is there anything stopping a PF presenting multiple CMA capable DOE
-instances?  I'd expect them to have their own contexts if they do..
+That's no problem, but I am definitely opposed to KVM modifying attributes that
+are owned by userspace.
 
-Something for the future if such a device shows up perhaps.
+> and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
 
-Otherwise this looks superficially fine to me, but I'll leave
-giving tags to those more familiar with the VFIO side of things
-and potential use cases etc.
-
-Jonathan
-
-
-
-
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/pci/cma.c                | 41 ++++++++++++++++++++++++++++++++
->  drivers/pci/pci.h                |  1 +
->  drivers/vfio/pci/vfio_pci_core.c |  9 +++++--
->  include/linux/pci.h              |  8 +++++++
->  include/linux/spdm.h             |  2 ++
->  lib/spdm_requester.c             | 11 +++++++++
->  6 files changed, 70 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
-> index c539ad85a28f..b3eee137ffe2 100644
-> --- a/drivers/pci/cma.c
-> +++ b/drivers/pci/cma.c
-> @@ -82,9 +82,50 @@ int pci_cma_reauthenticate(struct pci_dev *pdev)
->  	if (!pdev->cma_capable)
->  		return -ENOTTY;
->  
-> +	if (test_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags))
-> +		return -EPERM;
-> +
->  	return spdm_authenticate(pdev->spdm_state);
->  }
->  
-> +#if IS_ENABLED(CONFIG_VFIO_PCI_CORE)
-> +/**
-> + * pci_cma_claim_ownership() - Claim exclusive CMA-SPDM control for guest VM
-> + * @pdev: PCI device
-> + *
-> + * Claim exclusive CMA-SPDM control for a guest virtual machine before
-> + * passthrough of @pdev.  The host refrains from performing CMA-SPDM
-> + * authentication of the device until passthrough has concluded.
-> + *
-> + * Necessary because the GET_VERSION request resets the SPDM connection
-> + * and DOE r1.0 allows only a single SPDM connection for the entire system.
-> + * So the host could reset the guest's SPDM connection behind the guest's back.
-> + */
-> +void pci_cma_claim_ownership(struct pci_dev *pdev)
-> +{
-> +	set_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
-> +
-> +	if (pdev->cma_capable)
-> +		spdm_await(pdev->spdm_state);
-> +}
-> +EXPORT_SYMBOL(pci_cma_claim_ownership);
-> +
-> +/**
-> + * pci_cma_return_ownership() - Relinquish CMA-SPDM control to the host
-> + * @pdev: PCI device
-> + *
-> + * Relinquish CMA-SPDM control to the host after passthrough of @pdev to a
-> + * guest virtual machine has concluded.
-> + */
-> +void pci_cma_return_ownership(struct pci_dev *pdev)
-> +{
-> +	clear_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
-> +
-> +	pci_cma_reauthenticate(pdev);
-> +}
-> +EXPORT_SYMBOL(pci_cma_return_ownership);
-> +#endif
-> +
->  void pci_cma_destroy(struct pci_dev *pdev)
->  {
->  	if (pdev->spdm_state)
-> diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
-> index d80cc06be0cc..05ae6359b152 100644
-> --- a/drivers/pci/pci.h
-> +++ b/drivers/pci/pci.h
-> @@ -388,6 +388,7 @@ static inline bool pci_dev_is_disconnected(const struct pci_dev *dev)
->  #define PCI_DEV_ADDED 0
->  #define PCI_DPC_RECOVERED 1
->  #define PCI_DPC_RECOVERING 2
-> +#define PCI_CMA_OWNED_BY_GUEST 3
->  
->  static inline void pci_dev_assign_added(struct pci_dev *dev, bool added)
->  {
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 1929103ee59a..6f300664a342 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -487,10 +487,12 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  	if (ret)
->  		goto out_power;
->  
-> +	pci_cma_claim_ownership(pdev);
-> +
->  	/* If reset fails because of the device lock, fail this path entirely */
->  	ret = pci_try_reset_function(pdev);
->  	if (ret == -EAGAIN)
-> -		goto out_disable_device;
-> +		goto out_cma_return;
->  
->  	vdev->reset_works = !ret;
->  	pci_save_state(pdev);
-> @@ -549,7 +551,8 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  out_free_state:
->  	kfree(vdev->pci_saved_state);
->  	vdev->pci_saved_state = NULL;
-> -out_disable_device:
-> +out_cma_return:
-> +	pci_cma_return_ownership(pdev);
->  	pci_disable_device(pdev);
->  out_power:
->  	if (!disable_idle_d3)
-> @@ -678,6 +681,8 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  
->  	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
->  
-> +	pci_cma_return_ownership(pdev);
-> +
->  	/* Put the pm-runtime usage counter acquired during enable */
->  	if (!disable_idle_d3)
->  		pm_runtime_put(&pdev->dev);
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 2c5fde81bb85..c14ea0e74fc4 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -2386,6 +2386,14 @@ static inline resource_size_t pci_iov_resource_size(struct pci_dev *dev, int res
->  static inline void pci_vf_drivers_autoprobe(struct pci_dev *dev, bool probe) { }
->  #endif
->  
-> +#ifdef CONFIG_PCI_CMA
-> +void pci_cma_claim_ownership(struct pci_dev *pdev);
-> +void pci_cma_return_ownership(struct pci_dev *pdev);
-> +#else
-> +static inline void pci_cma_claim_ownership(struct pci_dev *pdev) { }
-> +static inline void pci_cma_return_ownership(struct pci_dev *pdev) { }
-> +#endif
-> +
->  #if defined(CONFIG_HOTPLUG_PCI) || defined(CONFIG_HOTPLUG_PCI_MODULE)
->  void pci_hp_create_module_link(struct pci_slot *pci_slot);
->  void pci_hp_remove_module_link(struct pci_slot *pci_slot);
-> diff --git a/include/linux/spdm.h b/include/linux/spdm.h
-> index 69a83bc2eb41..d796127fbe9a 100644
-> --- a/include/linux/spdm.h
-> +++ b/include/linux/spdm.h
-> @@ -34,6 +34,8 @@ int spdm_authenticate(struct spdm_state *spdm_state);
->  
->  bool spdm_authenticated(struct spdm_state *spdm_state);
->  
-> +void spdm_await(struct spdm_state *spdm_state);
-> +
->  void spdm_destroy(struct spdm_state *spdm_state);
->  
->  #endif
-> diff --git a/lib/spdm_requester.c b/lib/spdm_requester.c
-> index b2af2074ba6f..99424d6aebf5 100644
-> --- a/lib/spdm_requester.c
-> +++ b/lib/spdm_requester.c
-> @@ -1483,6 +1483,17 @@ struct spdm_state *spdm_create(struct device *dev, spdm_transport *transport,
->  }
->  EXPORT_SYMBOL_GPL(spdm_create);
->  
-> +/**
-> + * spdm_await() - Wait for ongoing spdm_authenticate() to finish
-> + *
-> + * @spdm_state: SPDM session state
-> + */
-> +void spdm_await(struct spdm_state *spdm_state)
-> +{
-> +	mutex_lock(&spdm_state->lock);
-> +	mutex_unlock(&spdm_state->lock);
-> +}
-> +
->  /**
->   * spdm_destroy() - Destroy SPDM session
->   *
-
+As above, I am opposed to pKVM having a completely different ABI for managing
+PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flags in the
+attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES doesn't work
+for pKVM, then we've failed miserably and should revist the uAPI.
