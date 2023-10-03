@@ -2,566 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 860677B747C
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 01:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 653487B7571
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 01:46:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233320AbjJCXE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 19:04:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60200 "EHLO
+        id S238279AbjJCXqc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 19:46:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234157AbjJCXEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 19:04:52 -0400
-Received: from out-195.mta0.migadu.com (out-195.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CB65C9
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 16:04:43 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1696374282;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4s+S4qHPw3Nmb/o4v7oMKHqlPjYyHuOOOxKxbnioqio=;
-        b=Q8hI01qcHJ+NWZcg3PhB+B7/CtuWXoeYMch9Zm9bJs4dNe5tlM80gqZ9A+qp7Jg7Lx1liF
-        wA2fOO4WrfgpKJlDYRxa6um5x8bpW4NJjsbrQE+B4TiEqU6GhfjuUlgb/Ft6HuQzIb+buM
-        HDihEORYozDx+CIMPKABQQcxNGk+fbo=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v11 12/12] KVM: arm64: selftests: Test for setting ID register from usersapce
-Date:   Tue,  3 Oct 2023 23:04:08 +0000
-Message-ID: <20231003230408.3405722-13-oliver.upton@linux.dev>
-In-Reply-To: <20231003230408.3405722-1-oliver.upton@linux.dev>
-References: <20231003230408.3405722-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S237474AbjJCXqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 19:46:31 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6229EAF
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 16:46:28 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-27731a63481so1297493a91.2
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 16:46:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696376788; x=1696981588; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gaHRh+iyoB6/OttqFX2Q86pGvl0bhGVCVyqFTvtoGcw=;
+        b=zeSJ/jk87sZLLQE3qHWB5Onl/GnOQfZiDOraNhrrCtssbqZAA1MS1ukg7TKv596X2v
+         r9dBnSAFnEYzXw1YhYt+pLvoCa0omHCo/CDL9PWdgws7U+/nf6DLhti/pVo6DBZisBJq
+         6pAtIkBTtcSU4yGLlSew038ojTMHlLqRqzPj6wzUoO1WJvYJlWDQ2/x4Mm8CUAUYD6k9
+         6yOdRPNNieeXwa2j8xrRZUw1YvmPYXilCWLgoMQ497c7mVsWMp7f9rPgHAc/OBm47B3g
+         YAmu8QrG9A2PvbfMF94kbzWWt2mpHDgC5yMHMnSxYTb+gReZXWk51QzfPLS9JefE8ZcU
+         Zvdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696376788; x=1696981588;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gaHRh+iyoB6/OttqFX2Q86pGvl0bhGVCVyqFTvtoGcw=;
+        b=mxhwuBfWyyTTQjqO6dd7aeJHgPb+UOFjEo/FvubSEXyTlauqMaS4o9OWne2vlXZkOk
+         xZhtdjVibxZhEcKBfHMRg1qaX14urakaM7Wfwj4yR7TiRN8X4sGPajCs2bSKrv2Vx67n
+         kEF5Ne8YaRivUD2MpONEHW9A3PkskKRY4eHQ5mZGvoM4zuP3RcorzrTMrfmC2MxvwIZi
+         1YmKtRIz01jdswVXrU5ffc0Q9Rk583kA6bgvjkzsPpu2yCF2x28RaB1+XFbGm8+q0qaY
+         fXQmb0FsehgJsdvP4QhXfMITo7RVAENNRRE0+iI4BCN8DZciGm+kEh6BvfAhLq8Cx7P4
+         IzgQ==
+X-Gm-Message-State: AOJu0Yxf8LryzxEEHY+1w4L/ZZicLa6nj9hzOILRu7SvQWqzwMjWazlv
+        Y4sPd3cGqmlhmnuD3Zkq06RKezDkKWU=
+X-Google-Smtp-Source: AGHT+IE1XHpyO3fF4751nYD6L1cufL1XUM2b3xSCMQMb58rp5yQSCvcWy8YfsNAskAty/E/22t80Ux7giMw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:8186:b0:274:6af0:d75b with SMTP id
+ e6-20020a17090a818600b002746af0d75bmr12051pjn.7.1696376787828; Tue, 03 Oct
+ 2023 16:46:27 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 16:46:26 -0700
+In-Reply-To: <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-8-seanjc@google.com>
+ <117db856-9aec-e91c-b1d4-db2b90ae563d@intel.com> <ZQ3AmLO2SYv3DszH@google.com>
+ <CAF7b7mrf-y9DNdsreOAedGJueOThnYE=ascFd4=rvW0Z4rhTQg@mail.gmail.com>
+ <ZRtxoaJdVF1C2Mvy@google.com> <CAF7b7mqyU059YpBBVYjTMNXf9VHSc6tbKrQ8avFXYtP6LWMh8Q@mail.gmail.com>
+Message-ID: <ZRyn0nPQpbVpz8ah@google.com>
+Subject: Re: [RFC PATCH v12 07/33] KVM: Add KVM_EXIT_MEMORY_FAULT exit to
+ report faults to userspace
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jing Zhang <jingzhangos@google.com>
+On Tue, Oct 03, 2023, Anish Moorthy wrote:
+> On Mon, Oct 2, 2023 at 6:43=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > > - I should go drop the patches annotating kvm_vcpu_read/write_page
+> > > from my series
+> >
+> > Hold up on that.  I'd prefer to keep them as there's still value in giv=
+ing userspace
+> > debug information.  All I'm proposing is that we would firmly state in =
+the
+> > documentation that those paths must be treated as informational-only.
+>=20
+> Userspace would then need to know whether annotations were performed
+> from reliable/unreliable paths though, right? That'd imply another
+> flag bit beyond the current R/W/E bits.
 
-Add tests to verify setting ID registers from userspace is handled
-correctly by KVM. Also add a test case to use ioctl
-KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
+No, what's missing is a guarantee in KVM that every attempt to exit will ac=
+tually
+make it to userspace.  E.g. if a different exit, including another memory_f=
+ault
+exit, clobbers an attempt to exit, the "unreliable" annotation will never b=
+e seen
+by userspace.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++++++++++
- 2 files changed, 480 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+The only way a KVM_EXIT_MEMORY_FAULT that actually reaches userspace could =
+be
+"unreliable" is if something other than a memory_fault exit clobbered the u=
+nion,
+but didn't signal its KVM_EXIT_* reason.  And that would be an egregious bu=
+g that
+isn't unique to KVM_EXIT_MEMORY_FAULT, i.e. the same data corruption would =
+affect
+each and every other KVM_EXIT_* reason.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1cdefbbc728c..fdeb1abfdc8b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -145,6 +145,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
-+TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
- TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-new file mode 100644
-index 000000000000..5c0718fd1705
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -0,0 +1,479 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * set_id_regs - Test for setting ID register from usersapce.
-+ *
-+ * Copyright (c) 2023 Google LLC.
-+ *
-+ *
-+ * Test that KVM supports setting ID registers from userspace and handles the
-+ * feature set correctly.
-+ */
-+
-+#include <stdint.h>
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include <linux/bitfield.h>
-+
-+enum ftr_type {
-+	FTR_EXACT,			/* Use a predefined safe value */
-+	FTR_LOWER_SAFE,			/* Smaller value is safe */
-+	FTR_HIGHER_SAFE,		/* Bigger value is safe */
-+	FTR_HIGHER_OR_ZERO_SAFE,	/* Bigger value is safe, but 0 is biggest */
-+	FTR_END,			/* Mark the last ftr bits */
-+};
-+
-+#define FTR_SIGNED	true	/* Value should be treated as signed */
-+#define FTR_UNSIGNED	false	/* Value should be treated as unsigned */
-+
-+struct reg_ftr_bits {
-+	char *name;
-+	bool sign;
-+	enum ftr_type type;
-+	uint8_t shift;
-+	uint64_t mask;
-+	int64_t safe_val;
-+};
-+
-+struct test_feature_reg {
-+	uint32_t reg;
-+	const struct reg_ftr_bits *ftr_bits;
-+};
-+
-+#define __REG_FTR_BITS(NAME, SIGNED, TYPE, SHIFT, MASK, SAFE_VAL)	\
-+	{								\
-+		.name = #NAME,						\
-+		.sign = SIGNED,						\
-+		.type = TYPE,						\
-+		.shift = SHIFT,						\
-+		.mask = MASK,						\
-+		.safe_val = SAFE_VAL,					\
-+	}
-+
-+#define REG_FTR_BITS(type, reg, field, safe_val) \
-+	__REG_FTR_BITS(reg##_##field, FTR_UNSIGNED, type, reg##_##field##_SHIFT, \
-+		       reg##_##field##_MASK, safe_val)
-+
-+#define S_REG_FTR_BITS(type, reg, field, safe_val) \
-+	__REG_FTR_BITS(reg##_##field, FTR_SIGNED, type, reg##_##field##_SHIFT, \
-+		       reg##_##field##_MASK, safe_val)
-+
-+#define REG_FTR_END					\
-+	{						\
-+		.type = FTR_END,			\
-+	}
-+
-+static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_dfr0_el1[] = {
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, PerfMon, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_DFR0_EL1, CopDbg, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64isar0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, RNDR, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, TLB, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, TS, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, FHM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, DP, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SM4, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SM3, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA3, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, RDM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, TME, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, ATOMIC, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, CRC32, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA1, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, AES, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64isar1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, LS64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, XS, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, I8MM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, DGH, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, BF16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, SPECRES, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, SB, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, FRINTTS, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, LRCPC, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, FCMA, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, JSCVT, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR1_EL1, DPB, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64isar2_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR2_EL1, BC, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR2_EL1, RPRES, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR2_EL1, WFxT, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV3, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, CSV2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL0, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN4, 0),
-+	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN64, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, TGRAN16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGENDEL0, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, SNSMEM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, BIGEND, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ASIDBITS, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, PARANGE, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64mmfr1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, TIDCP1, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, AFP, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, ETS, 0),
-+	REG_FTR_BITS(FTR_HIGHER_SAFE, ID_AA64MMFR1_EL1, SpecSEI, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, PAN, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, LO, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, HPDS, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR1_EL1, HAFDBS, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64mmfr2_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, E0PD, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, BBM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, TTL, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, AT, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, ST, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, VARange, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, IESB, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, LSM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, UAO, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR2_EL1, CnP, 0),
-+	REG_FTR_END,
-+};
-+
-+static const struct reg_ftr_bits ftr_id_aa64zfr0_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F64MM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, F32MM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, I8MM, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, SM4, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, SHA3, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, BF16, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, BitPerm, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, AES, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ZFR0_EL1, SVEver, 0),
-+	REG_FTR_END,
-+};
-+
-+#define TEST_REG(id, table)			\
-+	{					\
-+		.reg = id,			\
-+		.ftr_bits = &((table)[0]),	\
-+	}
-+
-+static struct test_feature_reg test_regs[] = {
-+	TEST_REG(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0_el1),
-+	TEST_REG(SYS_ID_DFR0_EL1, ftr_id_dfr0_el1),
-+	TEST_REG(SYS_ID_AA64ISAR0_EL1, ftr_id_aa64isar0_el1),
-+	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
-+	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
-+	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
-+	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
-+	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
-+	TEST_REG(SYS_ID_AA64ZFR0_EL1, ftr_id_aa64zfr0_el1),
-+};
-+
-+#define GUEST_REG_SYNC(id) GUEST_SYNC_ARGS(0, id, read_sysreg_s(id), 0, 0);
-+
-+static void guest_code(void)
-+{
-+	GUEST_REG_SYNC(SYS_ID_AA64DFR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_DFR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64ISAR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64ISAR1_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64ISAR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64PFR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64MMFR0_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64MMFR1_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64MMFR2_EL1);
-+	GUEST_REG_SYNC(SYS_ID_AA64ZFR0_EL1);
-+
-+	GUEST_DONE();
-+}
-+
-+/* Return a safe value to a given ftr_bits an ftr value */
-+uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
-+{
-+	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
-+
-+	if (ftr_bits->type == FTR_UNSIGNED) {
-+		switch (ftr_bits->type) {
-+		case FTR_EXACT:
-+			ftr = ftr_bits->safe_val;
-+			break;
-+		case FTR_LOWER_SAFE:
-+			if (ftr > 0)
-+				ftr--;
-+			break;
-+		case FTR_HIGHER_SAFE:
-+			if (ftr < ftr_max)
-+				ftr++;
-+			break;
-+		case FTR_HIGHER_OR_ZERO_SAFE:
-+			if (ftr == ftr_max)
-+				ftr = 0;
-+			else if (ftr != 0)
-+				ftr++;
-+			break;
-+		default:
-+			break;
-+		}
-+	} else if (ftr != ftr_max) {
-+		switch (ftr_bits->type) {
-+		case FTR_EXACT:
-+			ftr = ftr_bits->safe_val;
-+			break;
-+		case FTR_LOWER_SAFE:
-+			if (ftr > 0)
-+				ftr--;
-+			break;
-+		case FTR_HIGHER_SAFE:
-+			if (ftr < ftr_max - 1)
-+				ftr++;
-+			break;
-+		case FTR_HIGHER_OR_ZERO_SAFE:
-+			if (ftr != 0 && ftr != ftr_max - 1)
-+				ftr++;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	return ftr;
-+}
-+
-+/* Return an invalid value to a given ftr_bits an ftr value */
-+uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
-+{
-+	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
-+
-+	if (ftr_bits->type == FTR_UNSIGNED) {
-+		switch (ftr_bits->type) {
-+		case FTR_EXACT:
-+			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-+			break;
-+		case FTR_LOWER_SAFE:
-+			ftr++;
-+			break;
-+		case FTR_HIGHER_SAFE:
-+			ftr--;
-+			break;
-+		case FTR_HIGHER_OR_ZERO_SAFE:
-+			if (ftr == 0)
-+				ftr = ftr_max;
-+			else
-+				ftr--;
-+			break;
-+		default:
-+			break;
-+		}
-+	} else if (ftr != ftr_max) {
-+		switch (ftr_bits->type) {
-+		case FTR_EXACT:
-+			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-+			break;
-+		case FTR_LOWER_SAFE:
-+			ftr++;
-+			break;
-+		case FTR_HIGHER_SAFE:
-+			ftr--;
-+			break;
-+		case FTR_HIGHER_OR_ZERO_SAFE:
-+			if (ftr == 0)
-+				ftr = ftr_max - 1;
-+			else
-+				ftr--;
-+			break;
-+		default:
-+			break;
-+		}
-+	} else {
-+		ftr = 0;
-+	}
-+
-+	return ftr;
-+}
-+
-+static void test_reg_set_success(struct kvm_vcpu *vcpu, uint64_t reg,
-+				 const struct reg_ftr_bits *ftr_bits)
-+{
-+	uint8_t shift = ftr_bits->shift;
-+	uint64_t mask = ftr_bits->mask;
-+	uint64_t val, new_val, ftr;
-+
-+	vcpu_get_reg(vcpu, reg, &val);
-+	ftr = (val & mask) >> shift;
-+
-+	ftr = get_safe_value(ftr_bits, ftr);
-+
-+	ftr <<= shift;
-+	val &= ~mask;
-+	val |= ftr;
-+
-+	vcpu_set_reg(vcpu, reg, val);
-+	vcpu_get_reg(vcpu, reg, &new_val);
-+	TEST_ASSERT_EQ(new_val, val);
-+}
-+
-+static void test_reg_set_fail(struct kvm_vcpu *vcpu, uint64_t reg,
-+			      const struct reg_ftr_bits *ftr_bits)
-+{
-+	uint8_t shift = ftr_bits->shift;
-+	uint64_t mask = ftr_bits->mask;
-+	uint64_t val, old_val, ftr;
-+	int r;
-+
-+	vcpu_get_reg(vcpu, reg, &val);
-+	ftr = (val & mask) >> shift;
-+
-+	ftr = get_invalid_value(ftr_bits, ftr);
-+
-+	old_val = val;
-+	ftr <<= shift;
-+	val &= ~mask;
-+	val |= ftr;
-+
-+	r = __vcpu_set_reg(vcpu, reg, val);
-+	TEST_ASSERT(r < 0 && errno == EINVAL,
-+		    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
-+
-+	vcpu_get_reg(vcpu, reg, &val);
-+	TEST_ASSERT_EQ(val, old_val);
-+}
-+
-+static void test_user_set_reg(struct kvm_vcpu *vcpu, bool aarch64_only)
-+{
-+	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-+	struct reg_mask_range range = {
-+		.addr = (__u64)masks,
-+	};
-+	int ret;
-+
-+	/* KVM should return error when reserved field is not zero */
-+	range.reserved[0] = 1;
-+	ret = __vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-+	TEST_ASSERT(ret, "KVM doesn't check invalid parameters.");
-+
-+	/* Get writable masks for feature ID registers */
-+	memset(range.reserved, 0, sizeof(range.reserved));
-+	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-+
-+	for (int i = 0; i < ARRAY_SIZE(test_regs); i++) {
-+		const struct reg_ftr_bits *ftr_bits = test_regs[i].ftr_bits;
-+		uint32_t reg_id = test_regs[i].reg;
-+		uint64_t reg = KVM_ARM64_SYS_REG(reg_id);
-+		int idx;
-+
-+		/* Get the index to masks array for the idreg */
-+		idx = KVM_ARM_FEATURE_ID_RANGE_IDX(sys_reg_Op0(reg_id), sys_reg_Op1(reg_id),
-+						   sys_reg_CRn(reg_id), sys_reg_CRm(reg_id),
-+						   sys_reg_Op2(reg_id));
-+
-+		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
-+			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
-+			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
-+				ksft_test_result_skip("%s on AARCH64 only system\n",
-+						      ftr_bits[j].name);
-+				continue;
-+			}
-+
-+			/* Make sure the feature field is writable */
-+			TEST_ASSERT_EQ(masks[idx] & ftr_bits[j].mask, ftr_bits[j].mask);
-+
-+			test_reg_set_fail(vcpu, reg, &ftr_bits[j]);
-+			test_reg_set_success(vcpu, reg, &ftr_bits[j]);
-+
-+			ksft_test_result_pass("%s\n", ftr_bits[j].name);
-+		}
-+	}
-+}
-+
-+static void test_guest_reg_read(struct kvm_vcpu *vcpu)
-+{
-+	bool done = false;
-+	struct ucall uc;
-+	uint64_t val;
-+
-+	while (!done) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC:
-+			/* Make sure the written values are seen by guest */
-+			vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(uc.args[2]), &val);
-+			TEST_ASSERT_EQ(val, uc.args[3]);
-+			break;
-+		case UCALL_DONE:
-+			done = true;
-+			break;
-+		default:
-+			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	bool aarch64_only;
-+	uint64_t val, el0;
-+	int ftr_cnt;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	/* Check for AARCH64 only system */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-+	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
-+	aarch64_only = (el0 == ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-+
-+	ksft_print_header();
-+
-+	ftr_cnt = ARRAY_SIZE(ftr_id_aa64dfr0_el1) + ARRAY_SIZE(ftr_id_dfr0_el1) +
-+		  ARRAY_SIZE(ftr_id_aa64isar0_el1) + ARRAY_SIZE(ftr_id_aa64isar1_el1) +
-+		  ARRAY_SIZE(ftr_id_aa64isar2_el1) + ARRAY_SIZE(ftr_id_aa64pfr0_el1) +
-+		  ARRAY_SIZE(ftr_id_aa64mmfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) +
-+		  ARRAY_SIZE(ftr_id_aa64mmfr2_el1) + ARRAY_SIZE(ftr_id_aa64zfr0_el1) -
-+		  ARRAY_SIZE(test_regs);
-+
-+	ksft_set_plan(ftr_cnt);
-+
-+	test_user_set_reg(vcpu, aarch64_only);
-+	test_guest_reg_read(vcpu);
-+
-+	kvm_vm_free(vm);
-+
-+	ksft_finished();
-+}
--- 
-2.42.0.609.gbb76f46606-goog
+The "informational only" part is that userspace can't develop features that
+*require* KVM to exit.
 
+> > > - The helper function [a] for filling the memory_fault field
+> > > (downgraded back into the current union) can drop the "has the field
+> > > already been filled?" check/WARN.
+> >
+> > That would need to be dropped regardless because it's user-triggered (s=
+adly).
+>=20
+> Well the current v5 of the series uses a non-userspace visible canary-
+> it seems like there'd still be value in that if we were to keep the
+> annotations in potentially unreliable spots. Although perhaps that
+> test failure you noticed [1] is a good counter-argument, since it
+> shows a known case where a current flow does multiple writes to the
+> memory_fault member.
+
+The problem is that anything but a WARN will go unnoticed, and we can't hav=
+e any
+WARNs that are user-triggerable, at least not in upstream.  Internally, we =
+can
+and probably should add a canary, and an aggressive one at that, but I can'=
+t think
+of a sane way to add a canary in upstream while avoiding the known offender=
+s. :-(
+
+> [1] https://lore.kernel.org/all/202309141107.30863e9d-oliver.sang@intel.c=
+om
+>=20
+> > Anyways, don't do anything just yet.
+>=20
+> :salutes:
+
+LOL
