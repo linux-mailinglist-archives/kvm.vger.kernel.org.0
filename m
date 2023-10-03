@@ -2,217 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9CB77B65F5
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 12:00:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 780B97B6665
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 12:28:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239835AbjJCKAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 06:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46812 "EHLO
+        id S231252AbjJCK2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 06:28:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239782AbjJCKAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 06:00:01 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A319A91;
-        Tue,  3 Oct 2023 02:59:58 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c3bd829b86so5451065ad.0;
-        Tue, 03 Oct 2023 02:59:58 -0700 (PDT)
+        with ESMTP id S231613AbjJCK2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 06:28:51 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB59A3
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 03:28:46 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9a645e54806so127831466b.0
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 03:28:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696327198; x=1696931998; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1696328924; x=1696933724; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7mfj166RZXa6+OGlC23mV90s8HoMj5oVIl7zgyFgTFU=;
-        b=H5pXYzVKJ1cluuOdb6AzUVrEXCvkaWBzOpmca0uk5N55iZ4vdfEjt5Pqg3U4hUXfUh
-         k0BE9clJEXJclFb6rs0iBJk3Lfm+mxF1wQYieUdwZNxaa/c7sF1p70UvDDOPCS4KeUbu
-         mEhSLN6plucjtGDRvTRmRTpTKkFbq7fhkEXmXf9ios1Z/kS1iTy4G6/FPuIJRVDpJkIK
-         3IgcFyyY3Vd/qgW9teFdF9q3SC2PPAFqZgWTxUTAt8Wg09/bG6RawnmlmOHQVlNVUq1t
-         VUxEJrkvdfDXxW4zXcKKKq/z8+Qr0pWZt/q1ys0Yv0ndqdBP+BFDu09h7w/ZR8ddArqL
-         4A8w==
+        bh=XsdqrdEkDSj8N1JGo8GS+Y+t1N9Ffxo49rjL66LLWiU=;
+        b=AnijDntiuPAlvazd2otnRUr/eS5Rx8+nCMfjIoN2pNGVEWpMW1eIaGTuNPQo5lMZcY
+         3uDN84z7/CxAU2z0vhjs22weuKICOxhF7xp229U53IqDKWoljoj2qysJwphNIyc1dUip
+         EQhBPjIvyAFkiDpbDvopG0HFcJht+Mkh95OYUfUJtdLFVY3ZRZC+hEPZN4wLFPoQEicF
+         FQTo/Dhc9a/ySVVpF5z95os3QmtNrQYeTQl/M37TRvTPDO4luKYY1KzP+cweByzw3neE
+         uCrfdZNfm20LZiVUhLVDdFuY1IGh030qyzoWbnhkBxe56jlSBKaJHIIAOZ4piJs37Zzp
+         UTWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696327198; x=1696931998;
+        d=1e100.net; s=20230601; t=1696328924; x=1696933724;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7mfj166RZXa6+OGlC23mV90s8HoMj5oVIl7zgyFgTFU=;
-        b=NXjpIHWUwIMVFX0NqvhwrNBbVHFjVwtzz6ijJcIvnt5K0dE7q7loW3vOTjhXFqnQKc
-         zLP8y+W3fEPXKL7FUi1/hcHzUVJ482q6vMZaQqE7FJOwWDw0ZYerGAjWW9L2c842hIIj
-         Nn7Wk/y4ZZy08h4HAmzOc/Dqu8buv26P24MKq2W0er+RI7G4sCvyCbbwgsoTDGmBFnWI
-         d+/D07qZrlcmNelPEthdDnxjlntYgTu5Y50K2B7TsMy97+gP4sGSUmSiEqurfahbTqjx
-         Gb9yhqC3LCsfrlguBHNFITzog2UnVg9wm0As9+BbqKQe9Gr6CACn9q3H7jgc8Gx4owVm
-         Da5g==
-X-Gm-Message-State: AOJu0YyKJuNf7c3avwY2A7GEHiUBRKvGWOVaMThIh9mSFJbsZM5q/+6v
-        oNz69SvU3kju2P2hvd1F5GI=
-X-Google-Smtp-Source: AGHT+IEcFB0/Nf7z2acAywtjf22FDYWrA9IDkrD58mbuzHGOwLkPwm0grCEuAMx9zkt09wQq3hfj/Q==
-X-Received: by 2002:a17:902:d2cb:b0:1c4:fae:bf28 with SMTP id n11-20020a170902d2cb00b001c40faebf28mr14401254plc.32.1696327197979;
-        Tue, 03 Oct 2023 02:59:57 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id u9-20020a17090341c900b001c1f161949fsm1088243ple.96.2023.10.03.02.59.57
+        bh=XsdqrdEkDSj8N1JGo8GS+Y+t1N9Ffxo49rjL66LLWiU=;
+        b=jOM1dPIOK3Fx2FJSS8DRokCkIGpabyR/LqgNaeCZY1bgz4XP63FcKUeJE+jf5LvPTb
+         KKaqbgutWBR46LcdQdV5KVHVi1ktor4D5JJaQ734UF9hlRur5f2CJ1s5jXhNjfbXqgbg
+         WC+R0elZqR+1IEW+jOJRrJLnYnKM7/etvS9dgOqCmZJWUHyC2tmFOnJf32eEzeODepxk
+         j7yiHBbOTf4+HCtd3ljS/F83qqw803cavT9HxnL3QZlPfnZGwAcGGcXpKIKqn5OaeySP
+         DrAR+zoW14+gcadXhGNb0z3xfH343aU02B/CzfTEHLBEIIWIZlRlAAuhh+AXdkNJMVCT
+         kEcA==
+X-Gm-Message-State: AOJu0YwDdnPpRqTsZQ1kxqiKtCLT8n7wG1Y+qG8Kogn/Tmr03AXEHAc6
+        R2uQBq1PIbj8C0UtH3rSUWEc4A==
+X-Google-Smtp-Source: AGHT+IG9ar/of5h3vBdRHdNrUbHgfPXCJHKRmFUO92+SzwFtgCwBykQiZdbI9ipIbOFvP0+0VOSg1w==
+X-Received: by 2002:a17:906:109e:b0:9ae:6d0:84f7 with SMTP id u30-20020a170906109e00b009ae06d084f7mr11197111eju.32.1696328924382;
+        Tue, 03 Oct 2023 03:28:44 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id op19-20020a170906bcf300b009adc743340fsm822007ejb.197.2023.10.03.03.28.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 02:59:57 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id CEF7581193F1; Tue,  3 Oct 2023 16:59:52 +0700 (WIB)
-Date:   Tue, 3 Oct 2023 16:59:52 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
-        mhiramat@kernel.org, andrew.cooper3@citrix.com,
-        jiangshanlai@gmail.com, nik.borisov@suse.com
-Subject: Re: [PATCH v12 06/37] Documentation/x86/64: Add a documentation for
- FRED
-Message-ID: <ZRvmGNRZ4IvmguAY@debian.me>
-References: <20231003062458.23552-1-xin3.li@intel.com>
- <20231003062458.23552-7-xin3.li@intel.com>
+        Tue, 03 Oct 2023 03:28:43 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 12:28:42 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 2/9] KVM: selftests: Unify the makefile rule for split
+ targets
+Message-ID: <20231003-d44206f71d0b22e539833697@orel>
+References: <cover.1694421911.git.haibo1.xu@intel.com>
+ <cda6cc71c9bdde87fe87f6c2dec4f03ca249dd62.1694421911.git.haibo1.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="LN8xCBDRRuLQePIA"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003062458.23552-7-xin3.li@intel.com>
+In-Reply-To: <cda6cc71c9bdde87fe87f6c2dec4f03ca249dd62.1694421911.git.haibo1.xu@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Sep 14, 2023 at 09:36:56AM +0800, Haibo Xu wrote:
+> A separate makefile rule was used for split targets which was added
+> in patch(KVM: arm64: selftests: Split get-reg-list test code). This
+> could be avoided by minor changes to the recipes of current rule.
+> 
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a3bb36fb3cfc..7972269e8c5f 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -249,13 +249,10 @@ TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
+>  -include $(TEST_DEP_FILES)
+>  
+>  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> -	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
+> +	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+>  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+>  
+> -$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+> -	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+> -
+>  EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
+>  
+>  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> @@ -274,6 +271,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+>  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+> +$(SPLIT_TESTS_TARGETS): $(OUTPUT)/%: $(ARCH_DIR)/%.o
+>  
+>  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+>  cscope:
+> -- 
+> 2.34.1
+>
 
---LN8xCBDRRuLQePIA
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I just noticed that with and without this patch we're building the
+arch-specific part in tools/testing/selftests/kvm/riscv even when we have
+an $(OUTPUT) directory (e.g. O=build). Those build artifacts should be in
+build/kselftest/kvm/riscv instead.
 
-On Mon, Oct 02, 2023 at 11:24:27PM -0700, Xin Li wrote:
-> diff --git a/Documentation/arch/x86/x86_64/fred.rst b/Documentation/arch/=
-x86/x86_64/fred.rst
-> new file mode 100644
-> index 000000000000..9f57e7b91f7e
-> --- /dev/null
-> +++ b/Documentation/arch/x86/x86_64/fred.rst
-> @@ -0,0 +1,96 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +Flexible Return and Event Delivery (FRED)
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Overview
-> +=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The FRED architecture defines simple new transitions that change
-> +privilege level (ring transitions). The FRED architecture was
-> +designed with the following goals:
-> +
-> +1) Improve overall performance and response time by replacing event
-> +   delivery through the interrupt descriptor table (IDT event
-> +   delivery) and event return by the IRET instruction with lower
-> +   latency transitions.
-> +
-> +2) Improve software robustness by ensuring that event delivery
-> +   establishes the full supervisor context and that event return
-> +   establishes the full user context.
-> +
-> +The new transitions defined by the FRED architecture are FRED event
-> +delivery and, for returning from events, two FRED return instructions.
-> +FRED event delivery can effect a transition from ring 3 to ring 0, but
-> +it is used also to deliver events incident to ring 0. One FRED
-> +instruction (ERETU) effects a return from ring 0 to ring 3, while the
-> +other (ERETS) returns while remaining in ring 0. Collectively, FRED
-> +event delivery and the FRED return instructions are FRED transitions.
-> +
-> +In addition to these transitions, the FRED architecture defines a new
-> +instruction (LKGS) for managing the state of the GS segment register.
-> +The LKGS instruction can be used by 64-bit operating systems that do
-> +not use the new FRED transitions.
-> +
-> +Furthermore, the FRED architecture is easy to extend for future CPU
-> +architectures.
-> +
-> +Software based event dispatching
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +FRED operates differently from IDT in terms of event handling. Instead
-> +of directly dispatching an event to its handler based on the event
-> +vector, FRED requires the software to dispatch an event to its handler
-> +based on both the event's type and vector. Therefore, an event dispatch
-> +framework must be implemented to facilitate the event-to-handler
-> +dispatch process. The FRED event dispatch framework takes control
-> +once an event is delivered, and employs a two-level dispatch.
-> +
-> +The first level dispatching is event type based, and the second level
-> +dispatching is event vector based.
-> +
-> +Full supervisor/user context
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> +
-> +FRED event delivery atomically save and restore full supervisor/user
-> +context upon event delivery and return. Thus it avoids the problem of
-> +transient states due to %cr2 and/or %dr6, and it is no longer needed
-> +to handle all the ugly corner cases caused by half baked entry states.
-> +
-> +FRED allows explicit unblock of NMI with new event return instructions
-> +ERETS/ERETU, avoiding the mess caused by IRET which unconditionally
-> +unblocks NMI, e.g., when an exception happens during NMI handling.
-> +
-> +FRED always restores the full value of %rsp, thus ESPFIX is no longer
-> +needed when FRED is enabled.
-> +
-> +LKGS
-> +=3D=3D=3D=3D
-> +
-> +LKGS behaves like the MOV to GS instruction except that it loads the
-> +base address into the IA32_KERNEL_GS_BASE MSR instead of the GS
-> +segment=E2=80=99s descriptor cache. With LKGS, it ends up with avoiding
-> +mucking with kernel GS, i.e., an operating system can always operate
-> +with its own GS base address.
-> +
-> +Because FRED event delivery from ring 3 and ERETU both swap the value
-> +of the GS base address and that of the IA32_KERNEL_GS_BASE MSR, plus
-> +the introduction of LKGS instruction, the SWAPGS instruction is no
-> +longer needed when FRED is enabled, thus is disallowed (#UD).
-> +
-> +Stack levels
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +4 stack levels 0~3 are introduced to replace the nonreentrant IST for
-> +event handling, and each stack level should be configured to use a
-> +dedicated stack.
-> +
-> +The current stack level could be unchanged or go higher upon FRED
-> +event delivery. If unchanged, the CPU keeps using the current event
-> +stack. If higher, the CPU switches to a new event stack specified by
-> +the MSR of the new stack level, i.e., MSR_IA32_FRED_RSP[123].
-> +
-> +Only execution of a FRED return instruction ERET[US], could lower the
-> +current stack level, causing the CPU to switch back to the stack it was
-> +on before a previous event delivery that promoted the stack level.
-
-LGTM, thanks!
-
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---LN8xCBDRRuLQePIA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZRvmEwAKCRD2uYlJVVFO
-o5qOAQDw8M+2297q5X5j+JlTjJmKURsOh0vN4+TkT6xGTw1/oAEA7lexKTaNoRJm
-dwxTvxrQ6FWCfYMKDNZLsLpxSIwB3AQ=
-=e3m/
------END PGP SIGNATURE-----
-
---LN8xCBDRRuLQePIA--
+Thanks,
+drew
