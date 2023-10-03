@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B3217B620A
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 09:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 101847B620B
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 09:05:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbjJCHE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 03:04:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50664 "EHLO
+        id S230518AbjJCHFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 03:05:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230323AbjJCHE5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 03:04:57 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38C590
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 00:04:53 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31f71b25a99so614742f8f.2
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 00:04:53 -0700 (PDT)
+        with ESMTP id S239159AbjJCHFD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 03:05:03 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE69C9
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 00:05:00 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-3248aa5cf4eso622738f8f.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 00:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696316692; x=1696921492; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1696316699; x=1696921499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sQzhyHwmNDSDi5pTVRLTrtcYFBIcSrpF9DmpQnEWx1k=;
-        b=ZHmCl1vJfVDmxCrjCfeOs5OyW4vG1ypmWZzYeeaKM+vpAlMdYyalqmFbuqGve4OZPj
-         zo14KBvVxM1LHEZaD7rIFBcsUDX0Urvf5b9pTEny0u3WZdOs4YwIw8VtSVoWyrJNG2x+
-         W04zHEsXtUNcq1413ssU26DulVzFJTH39dk1YJHURk7BgzuOB3KJHeDDsjes5ARTlbJx
-         rvLRVVwJCm2JN4M4sRi5nVH4oTuCRJjTGiQmpHrLuBbt8GxyPoI/p7fdCS67bfXSRdnA
-         w7lraoWml50ZQ4+6VsJsyQXEs8wg43lP2SO/AP2o/+xAo0Tjcz5QveqPgkuWuHV1CSB3
-         Xq6Q==
+        bh=4dGNWXL4bt/YZVly7d1oK3PqrthsZjp41Sj7J9uNPxE=;
+        b=FdxXa3K2TOM32wk7GV/mfDxBxfYPOKilYY36yNu+4OAQMK0nLnbFxlLQJxIDDaIIo2
+         scsK+d6DKDQwnESPVRgbH7uPMMVWElQ56Sfijm9XlCHQMCUIKDcc55JGF8C5gHbuGIfx
+         wERNvhOkhkjv13Jw/5SzCf6IXbNMzSYXiM7ukDALG5fyTrGbxoW6+KkLfNUtzLcNqMvV
+         qetCal3vfk4m9UfJZ4vy3DYGG1pbnalJwgUf9ZLntz2ZgHciOqYZ3sph7GzwSRFbWEif
+         EP+Ih3rFvpVpJgygCUhSQU55zxO38Fjk7y3NeisXcf/ENiyH8gqhnx9e94dR3lOT9K8X
+         sjPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696316692; x=1696921492;
+        d=1e100.net; s=20230601; t=1696316699; x=1696921499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sQzhyHwmNDSDi5pTVRLTrtcYFBIcSrpF9DmpQnEWx1k=;
-        b=vzvVARelmRKosCHOBVrrVXCSMGr6uvOwYnsT4orsvxhtzfdcJOLJv7ygwQ5EbgvvtR
-         u94tyGBQTPULBGsikX+auI1QEPzKSy7SrkfLkE0Xhxptet6iQLa3YOqeF6W4tz/GkuNc
-         GIPT0w22Yrvugus2JfldiG/VSHuptummtUMBWbrhiwLUJRKAl1Up91kAxtl4zC5nw71M
-         6roPS8NNzBGbmUHh1bE5B9JoiMMsiONbYkSPQpLGGN9seyCvVfJNKE0LJtzOR/DUpjMU
-         Tq0YE/8iqFCrDH+ZH1yfSFQJv9+SFnWacncC1aFuIJfuweL+4yrrlxa/NchkNMhqxAF3
-         OErw==
-X-Gm-Message-State: AOJu0YxxfmNlfAOEA3cj/0nx5iPAfdkU9C//DsWx4N7CV3PunR1m6fAX
-        uG2A4YXeQvYsD2qydm//4CLlTA==
-X-Google-Smtp-Source: AGHT+IH5gi/VEas+l3NNvHvsWgSkQlY/4YqInldrRsPk6XIBCqPemE3++yzm1NzvbAR+ZF3pEplFwg==
-X-Received: by 2002:a5d:618c:0:b0:31f:eb6a:c824 with SMTP id j12-20020a5d618c000000b0031feb6ac824mr10944176wru.10.1696316692435;
-        Tue, 03 Oct 2023 00:04:52 -0700 (PDT)
+        bh=4dGNWXL4bt/YZVly7d1oK3PqrthsZjp41Sj7J9uNPxE=;
+        b=OPSDWUGHq0rtqMPhUhvN/2we9WJZrmIeCWZGdyYulGYmbq7ro+4sScqZY0xsltjnLp
+         nKa/k96vxtq/58VrzTEXY3ihFj60HDLg/qymO4RrNrbglytc7PMLpe/iqoGKHorjYL7X
+         AxbtyS7j9YtjEgLGQ9FubJEccVtyyv6VuveguiwGOn2vmPyo5n79/rcWmy5pfSdKlMDl
+         kaLAY2yK/CRYRCF/DCFp/aRc3FCN5s/si9uI3aJNtGKjp8Cu7npP7+jPp2ekJSLdFJ4n
+         23VE9C8JrYGIbOP9Ar2y8IETwyyjsCyskKRD4pCW0rcBNsLukut4a+1vyDmJBT+kQgeE
+         FzxA==
+X-Gm-Message-State: AOJu0YxBfJHqTOY+GXNa3Un5w6WRraLNejlg3W1K41ZnFaVAZWHOgwBf
+        osx9hHGKWC6Ls89W6CoyZa0PeA==
+X-Google-Smtp-Source: AGHT+IEtMLpY0vDY8IiNQlnwRAuBYlQaQaB3YsnFQvO7ycOaQmgl/yRWmUy1V6VmkwiBs0q8c2c4lw==
+X-Received: by 2002:a5d:58c2:0:b0:321:f74d:ade6 with SMTP id o2-20020a5d58c2000000b00321f74dade6mr11933643wrf.40.1696316699144;
+        Tue, 03 Oct 2023 00:04:59 -0700 (PDT)
 Received: from m1x-phil.lan (176-131-222-246.abo.bbox.fr. [176.131.222.246])
-        by smtp.gmail.com with ESMTPSA id f5-20020a5d50c5000000b003200c918c81sm813270wrt.112.2023.10.03.00.04.50
+        by smtp.gmail.com with ESMTPSA id d18-20020a056000115200b00326c952716esm818614wrx.61.2023.10.03.00.04.57
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 03 Oct 2023 00:04:52 -0700 (PDT)
+        Tue, 03 Oct 2023 00:04:58 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
@@ -61,9 +61,9 @@ Cc:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
         Michael Tokarev <mjt@tls.msk.ru>, Greg Kurz <groug@kaod.org>,
         Nicholas Piggin <npiggin@gmail.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 3/4] target/ppc: Restrict KVM objects to system emulation
-Date:   Tue,  3 Oct 2023 09:04:25 +0200
-Message-ID: <20231003070427.69621-4-philmd@linaro.org>
+Subject: [PATCH v2 4/4] target/ppc: Prohibit target specific KVM prototypes on user emulation
+Date:   Tue,  3 Oct 2023 09:04:26 +0200
+Message-ID: <20231003070427.69621-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231003070427.69621-1-philmd@linaro.org>
 References: <20231003070427.69621-1-philmd@linaro.org>
@@ -79,36 +79,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CONFIG_KVM is always FALSE on user emulation, so 'kvm.c'
-won't be added to ppc_ss[] source set; direcly use the system
-specific ppc_system_ss[] source set.
+None of these target-specific prototypes should be used
+by user emulation. Remove their declaration there, so we
+get a compile failure if ever used (instead of having to
+deal with linker and its possible optimizations, such
+dead code removal).
 
-Reviewed-by: Michael Tokarev <mjt@tls.msk.ru>
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- target/ppc/meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/ppc/kvm_ppc.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/ppc/meson.build b/target/ppc/meson.build
-index 0bff3e39e5..44462f95cd 100644
---- a/target/ppc/meson.build
-+++ b/target/ppc/meson.build
-@@ -30,7 +30,6 @@ gen = [
- ]
- ppc_ss.add(when: 'CONFIG_TCG', if_true: gen)
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 6a4dd9c560..1975fb5ee6 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -13,6 +13,10 @@
+ #include "exec/hwaddr.h"
+ #include "cpu.h"
  
--ppc_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
- ppc_ss.add(when: 'CONFIG_USER_ONLY', if_true: files('user_only_helper.c'))
++#ifdef CONFIG_USER_ONLY
++#error Cannot include kvm_ppc.h from user emulation
++#endif
++
+ #ifdef CONFIG_KVM
  
- ppc_system_ss = ss.source_set()
-@@ -46,6 +45,7 @@ ppc_system_ss.add(when: 'CONFIG_TCG', if_true: files(
- ), if_false: files(
-   'tcg-stub.c',
- ))
-+ppc_system_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
- 
- ppc_system_ss.add(when: 'TARGET_PPC64', if_true: files(
-   'compat.c',
+ uint32_t kvmppc_get_tbfreq(void);
 -- 
 2.41.0
 
