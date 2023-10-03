@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 098C37B613C
+	by mail.lfdr.de (Postfix) with ESMTP id 620C87B613D
 	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 08:54:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239201AbjJCGyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 02:54:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37600 "EHLO
+        id S239195AbjJCGyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 02:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbjJCGyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 02:54:41 -0400
+        with ESMTP id S230493AbjJCGym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 02:54:42 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CB8BD;
-        Mon,  2 Oct 2023 23:54:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DCDC6;
+        Mon,  2 Oct 2023 23:54:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696316078; x=1727852078;
+  t=1696316079; x=1727852079;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IaxeoNWuhGDXlIm0wMB8nNslGvpF2+LIDATl0KgTQLA=;
-  b=ec4QYHFK1qDLdwGykgsn+IpRBDuEfHgaL/mEVGzp249u8UG7WZWUCKF8
-   u0SSJIS+s/8ffX+/OumM6wdTa3obUpzB/U9QigXORmy75Bh9LZVMsQBi7
-   MBPmug/tnm7BYBGFrnAUUuQ7rH85JXdQNhVB3pKtix+G1MyBGobN3CD0e
-   3YZRgPLQNGGg3hVg8arJyL1kqioy3ZOImOfvQZ1CMsJTcdAifQYkO0kXu
-   Lsnlfi2XKFWBneBjFtgNRfrJeVO+ojSoZlzfa4UU0giV4rzOp+5buVzQQ
-   9TjHSJ9oWd6VBIhzmO5YsriBlC1GZwePskARDLdV28B8QbN1vITgQ+kBA
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="367857938"
+  bh=peVjyb58aU5czBXdVg55hBuRdCD6fg7woOPGVcAZ2Yw=;
+  b=UIULJJQxydyE0KknC/tregLv6MahhMflEfNPytigX72Ak6iTQ35hTjVv
+   0sFyl5WT5YPGfAdBpJC10bsVlFNRfFH3jFx+aPtgOz8wlH76HEk5W3n8F
+   kHo6b96uUmU93o3MamB2VabG8y4aAG6+2DpPfb0UV8bSqEXdp3vNsEerx
+   4M9bYdpXHB+2Ziy7/tSd89yFfTu9AISBSbCc5OJ2MOPyrR4oQH2yaSN02
+   Oav/SXZB+DN0FT2QQ30vHUgAvrqV6yFcqD68OC/3I1rs37+x+IoXvJbzW
+   NJAtIY0X6F39FjZlv7ebeIzLNLNDFYSp/FDXobkTgpoVKdqG8oLf6mVtB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="367857954"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="367857938"
+   d="scan'208";a="367857954"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 23:54:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081900906"
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081900910"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="1081900906"
+   d="scan'208";a="1081900910"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga005.fm.intel.com with ESMTP; 02 Oct 2023 23:54:36 -0700
 From:   Xin Li <xin3.li@intel.com>
@@ -48,9 +48,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com, nik.borisov@suse.com
-Subject: [PATCH v12 04/37] x86/entry: Remove idtentry_sysvec from entry_{32,64}.S
-Date:   Mon,  2 Oct 2023 23:24:25 -0700
-Message-Id: <20231003062458.23552-5-xin3.li@intel.com>
+Subject: [PATCH v12 05/37] x86/trapnr: Add event type macros to <asm/trapnr.h>
+Date:   Mon,  2 Oct 2023 23:24:26 -0700
+Message-Id: <20231003062458.23552-6-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231003062458.23552-1-xin3.li@intel.com>
 References: <20231003062458.23552-1-xin3.li@intel.com>
@@ -66,64 +66,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-idtentry_sysvec is really just DECLARE_IDTENTRY defined in
-<asm/idtentry.h>, no need to define it separately.
+Intel VT-x classifies events into eight different types, which is
+inherited by FRED for event identification. As such, event type
+becomes a common x86 concept, and should be defined in a common x86
+header.
 
+Add event type macros to <asm/trapnr.h>, and use it in <asm/vmx.h>.
+
+Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/entry_32.S       | 4 ----
- arch/x86/entry/entry_64.S       | 8 --------
- arch/x86/include/asm/idtentry.h | 2 +-
- 3 files changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
-index 6e6af42e044a..e0f22ad8ff7e 100644
---- a/arch/x86/entry/entry_32.S
-+++ b/arch/x86/entry/entry_32.S
-@@ -649,10 +649,6 @@ SYM_CODE_START_LOCAL(asm_\cfunc)
- SYM_CODE_END(asm_\cfunc)
- .endm
+Changes since v10:
+* A few comment fixes and improvements (Andrew Cooper).
+---
+ arch/x86/include/asm/trapnr.h | 12 ++++++++++++
+ arch/x86/include/asm/vmx.h    | 17 +++++++++--------
+ 2 files changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/include/asm/trapnr.h b/arch/x86/include/asm/trapnr.h
+index f5d2325aa0b7..8d1154cdf787 100644
+--- a/arch/x86/include/asm/trapnr.h
++++ b/arch/x86/include/asm/trapnr.h
+@@ -2,6 +2,18 @@
+ #ifndef _ASM_X86_TRAPNR_H
+ #define _ASM_X86_TRAPNR_H
  
--.macro idtentry_sysvec vector cfunc
--	idtentry \vector asm_\cfunc \cfunc has_error_code=0
--.endm
--
- /*
-  * Include the defines which emit the idt entries which are shared
-  * shared between 32 and 64 bit and emit the __irqentry_text_* markers
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 9b4b512f2a75..aa4214703091 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -432,14 +432,6 @@ SYM_CODE_END(\asmsym)
- 	idtentry \vector asm_\cfunc \cfunc has_error_code=1
- .endm
++/*
++ * Event type codes used by FRED, Intel VT-x and AMD SVM
++ */
++#define EVENT_TYPE_EXTINT	0	// External interrupt
++#define EVENT_TYPE_RESERVED	1
++#define EVENT_TYPE_NMI		2	// NMI
++#define EVENT_TYPE_HWEXC	3	// Hardware originated traps, exceptions
++#define EVENT_TYPE_SWINT	4	// INT n
++#define EVENT_TYPE_PRIV_SWEXC	5	// INT1
++#define EVENT_TYPE_SWEXC	6	// INTO, INT3
++#define EVENT_TYPE_OTHER	7	// FRED SYSCALL/SYSENTER, VT-x MTF
++
+ /* Interrupts/Exceptions */
  
--/*
-- * System vectors which invoke their handlers directly and are not
-- * going through the regular common device interrupt handling code.
-- */
--.macro idtentry_sysvec vector cfunc
--	idtentry \vector asm_\cfunc \cfunc has_error_code=0
--.endm
--
- /**
-  * idtentry_mce_db - Macro to generate entry stubs for #MC and #DB
-  * @vector:		Vector number
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index 05fd175cec7d..cfca68f6cb84 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -447,7 +447,7 @@ __visible noinstr void func(struct pt_regs *regs,			\
+ #define X86_TRAP_DE		 0	/* Divide-by-zero */
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index 0e73616b82f3..4dba17363008 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -17,6 +17,7 @@
+ #include <linux/types.h>
  
- /* System vector entries */
- #define DECLARE_IDTENTRY_SYSVEC(vector, func)				\
--	idtentry_sysvec vector func
-+	DECLARE_IDTENTRY(vector, func)
+ #include <uapi/asm/vmx.h>
++#include <asm/trapnr.h>
+ #include <asm/vmxfeatures.h>
  
- #ifdef CONFIG_X86_64
- # define DECLARE_IDTENTRY_MCE(vector, func)				\
+ #define VMCS_CONTROL_BIT(x)	BIT(VMX_FEATURE_##x & 0x1f)
+@@ -374,14 +375,14 @@ enum vmcs_field {
+ #define VECTORING_INFO_DELIVER_CODE_MASK    	INTR_INFO_DELIVER_CODE_MASK
+ #define VECTORING_INFO_VALID_MASK       	INTR_INFO_VALID_MASK
+ 
+-#define INTR_TYPE_EXT_INTR              (0 << 8) /* external interrupt */
+-#define INTR_TYPE_RESERVED              (1 << 8) /* reserved */
+-#define INTR_TYPE_NMI_INTR		(2 << 8) /* NMI */
+-#define INTR_TYPE_HARD_EXCEPTION	(3 << 8) /* processor exception */
+-#define INTR_TYPE_SOFT_INTR             (4 << 8) /* software interrupt */
+-#define INTR_TYPE_PRIV_SW_EXCEPTION	(5 << 8) /* ICE breakpoint - undocumented */
+-#define INTR_TYPE_SOFT_EXCEPTION	(6 << 8) /* software exception */
+-#define INTR_TYPE_OTHER_EVENT           (7 << 8) /* other event */
++#define INTR_TYPE_EXT_INTR		(EVENT_TYPE_EXTINT << 8)	/* external interrupt */
++#define INTR_TYPE_RESERVED		(EVENT_TYPE_RESERVED << 8)	/* reserved */
++#define INTR_TYPE_NMI_INTR		(EVENT_TYPE_NMI << 8)		/* NMI */
++#define INTR_TYPE_HARD_EXCEPTION	(EVENT_TYPE_HWEXC << 8)		/* processor exception */
++#define INTR_TYPE_SOFT_INTR		(EVENT_TYPE_SWINT << 8)		/* software interrupt */
++#define INTR_TYPE_PRIV_SW_EXCEPTION	(EVENT_TYPE_PRIV_SWEXC << 8)	/* ICE breakpoint */
++#define INTR_TYPE_SOFT_EXCEPTION	(EVENT_TYPE_SWEXC << 8)		/* software exception */
++#define INTR_TYPE_OTHER_EVENT		(EVENT_TYPE_OTHER << 8)		/* other event */
+ 
+ /* GUEST_INTERRUPTIBILITY_INFO flags. */
+ #define GUEST_INTR_STATE_STI		0x00000001
 -- 
 2.34.1
 
