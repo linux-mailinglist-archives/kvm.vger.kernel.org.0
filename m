@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2677B6432
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D0477B6465
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:38:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231192AbjJCIcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 04:32:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44862 "EHLO
+        id S239188AbjJCIiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 04:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbjJCIb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 04:31:59 -0400
+        with ESMTP id S230439AbjJCIiG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 04:38:06 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BD897;
-        Tue,  3 Oct 2023 01:31:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6DCA4;
+        Tue,  3 Oct 2023 01:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696321916; x=1727857916;
+  t=1696322283; x=1727858283;
   h=date:from:to:cc:subject:in-reply-to:message-id:
    references:mime-version;
-  bh=v3fgOooQ9HUZPXlIPgbbTivNdfJyGl6aZBvlfN9Whmc=;
-  b=BQ0mz7hAZ/SS+BnyFlorSe3F8utizmSup4dkIg1BklxFUA5GMAJ5Bo8R
-   tfQvgHsrdQEGtUNPPW8QjHWDfTXbls/W1N9e2/iyTXagKjEHfYetxZQOH
-   GpJ3PulxsWUoHokKQfLuMwnfjMp/m6C9ZxrnBKWDMKxXuj8ThzIO1HjBs
-   9vZ7DWuyUTkwQkN3zVPkdLDAW7tBXh9qr2XExYKv59XIJDhmLUmx9fJk2
-   H+67hasFnwah6wCUkfnjiu3sXf+eFJQ5qRGcPiRrxLv83BlO34nLwQDtj
-   niSysMBo2Uue/79tqFca3Th6SBkdSy1PvYzVKEANUMCLgxjhJKVJTGUeP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="362192310"
+  bh=380/oSJwz+ChU1zJ9C8pcG2L+2mNW4PSQa0Sq/ZkMl0=;
+  b=BSU5bmHJe4xG1Y3CLEtPhVI8J6pR/EnfYPTzxqjUV+d+Ac3lN4H067mk
+   PgojpqIO00C7CfMVQ18MeFnBEuktx3rPmsBi3hrbdKK/87nVHMGLSbkrX
+   cVXsNg1vChr027gek/ZjHM+pLR8nsZhXZuol3Y2SnTnDDeHlcpgxHfLQk
+   cFBy5ISi0tX9xkP8Ng9RPltciJcAancBSW0jY1LkBTYJbwW38Zv3B/8MU
+   JkH0dz4wSTntEnY0LSzeS5zEHr8qrfO73K1E9IJ44OgUuslhSi0eDNXXl
+   DVG/AkjlTTPZmzrhH2EB+8ODCpDtGSu2nEO6XRzkXCVAKjgzxxyUOrJ1k
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="362193143"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="362192310"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:55 -0700
+   d="scan'208";a="362193143"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:38:02 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="924565188"
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="786023424"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="924565188"
+   d="scan'208";a="786023424"
 Received: from tciutacu-mobl.ger.corp.intel.com ([10.252.40.114])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:49 -0700
-Date:   Tue, 3 Oct 2023 11:31:46 +0300 (EEST)
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:37:55 -0700
+Date:   Tue, 3 Oct 2023 11:37:53 +0300 (EEST)
 From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
 To:     Lukas Wunner <lukas@wunner.de>
 cc:     Bjorn Helgaas <helgaas@kernel.org>,
@@ -61,13 +61,12 @@ cc:     Bjorn Helgaas <helgaas@kernel.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Sean Christopherson <seanjc@google.com>,
         Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 02/12] X.509: Parse Subject Alternative Name in
- certificates
-In-Reply-To: <704291cbc90ca3aaaaa56b191017c1400963cf12.1695921657.git.lukas@wunner.de>
-Message-ID: <1d44be7b-c078-4b3c-50c1-61e15325fe5@linux.intel.com>
-References: <cover.1695921656.git.lukas@wunner.de> <704291cbc90ca3aaaaa56b191017c1400963cf12.1695921657.git.lukas@wunner.de>
+Subject: Re: [PATCH 04/12] certs: Create blacklist keyring earlier
+In-Reply-To: <3db7a8856833dfcbc4b122301f233828379d67db.1695921657.git.lukas@wunner.de>
+Message-ID: <7e98a953-a4b-70e8-caeb-a94237e593f8@linux.intel.com>
+References: <cover.1695921656.git.lukas@wunner.de> <3db7a8856833dfcbc4b122301f233828379d67db.1695921657.git.lukas@wunner.de>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-470040028-1696321915=:2030"
+Content-Type: multipart/mixed; boundary="8323329-242978425-1696322281=:2030"
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -80,64 +79,54 @@ X-Mailing-List: kvm@vger.kernel.org
   This message is in MIME format.  The first part should be readable text,
   while the remaining parts are likely unreadable without MIME-aware tools.
 
---8323329-470040028-1696321915=:2030
+--8323329-242978425-1696322281=:2030
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 8BIT
 
 On Thu, 28 Sep 2023, Lukas Wunner wrote:
 
 > The upcoming support for PCI device authentication with CMA-SPDM
-> (PCIe r6.1 sec 6.31) requires validating the Subject Alternative Name
-> in X.509 certificates.
+> (PCIe r6.1 sec 6.31) requires parsing X.509 certificates upon
+> device enumeration, which happens in a subsys_initcall().
 > 
-> Store a pointer to the Subject Alternative Name upon parsing for
-> consumption by CMA-SPDM.
+> Parsing X.509 certificates accesses the blacklist keyring:
+> x509_cert_parse()
+>   x509_get_sig_params()
+>     is_hash_blacklisted()
+>       keyring_search()
+> 
+> So far the keyring is created much later in a device_initcall().  Avoid
+> a NULL pointer dereference on access to the keyring by creating it one
+> initcall level earlier than PCI device enumeration, i.e. in an
+> arch_initcall().
 > 
 > Signed-off-by: Lukas Wunner <lukas@wunner.de>
 > ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 15 +++++++++++++++
->  include/keys/x509-parser.h                |  2 ++
->  2 files changed, 17 insertions(+)
+>  certs/blacklist.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 0a7049b470c1..18dfd564740b 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -579,6 +579,21 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
+> diff --git a/certs/blacklist.c b/certs/blacklist.c
+> index 675dd7a8f07a..34185415d451 100644
+> --- a/certs/blacklist.c
+> +++ b/certs/blacklist.c
+> @@ -311,7 +311,7 @@ static int restrict_link_for_blacklist(struct key *dest_keyring,
+>   * Initialise the blacklist
+>   *
+>   * The blacklist_init() function is registered as an initcall via
+> - * device_initcall().  As a result if the blacklist_init() function fails for
+> + * arch_initcall().  As a result if the blacklist_init() function fails for
+>   * any reason the kernel continues to execute.  While cleanly returning -ENODEV
+>   * could be acceptable for some non-critical kernel parts, if the blacklist
+>   * keyring fails to load it defeats the certificate/key based deny list for
+> @@ -356,7 +356,7 @@ static int __init blacklist_init(void)
+>  /*
+>   * Must be initialised before we try and load the keys into the keyring.
+>   */
+> -device_initcall(blacklist_init);
+> +arch_initcall(blacklist_init);
 >  
-> +	if (ctx->last_oid == OID_subjectAltName) {
-> +		/*
-> +		 * A certificate MUST NOT include more than one instance
-> +		 * of a particular extension (RFC 5280 sec 4.2).
-> +		 */
-> +		if (ctx->cert->raw_san) {
-> +			pr_err("Duplicate Subject Alternative Name\n");
-> +			return -EINVAL;
-> +		}
-> +
-> +		ctx->cert->raw_san = v;
-> +		ctx->cert->raw_san_size = vlen;
-> +		return 0;
-> +	}
-> +
->  	if (ctx->last_oid == OID_keyUsage) {
->  		/*
->  		 * Get hold of the keyUsage bit string
-> diff --git a/include/keys/x509-parser.h b/include/keys/x509-parser.h
-> index 7c2ebc84791f..9c6e7cdf4870 100644
-> --- a/include/keys/x509-parser.h
-> +++ b/include/keys/x509-parser.h
-> @@ -32,6 +32,8 @@ struct x509_certificate {
->  	unsigned	raw_subject_size;
->  	unsigned	raw_skid_size;
->  	const void	*raw_skid;		/* Raw subjectKeyId in ASN.1 */
-> +	const void	*raw_san;		/* Raw subjectAltName in ASN.1 */
-> +	unsigned	raw_san_size;
->  	unsigned	index;
->  	bool		seen;			/* Infinite recursion prevention */
->  	bool		verified;
+>  #ifdef CONFIG_SYSTEM_REVOCATION_LIST
+>  /*
 > 
 
 Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
@@ -145,4 +134,4 @@ Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 -- 
  i.
 
---8323329-470040028-1696321915=:2030--
+--8323329-242978425-1696322281=:2030--
