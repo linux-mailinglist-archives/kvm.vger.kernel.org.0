@@ -2,127 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB2E97B6CC1
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 17:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FD307B6CFD
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 17:23:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240285AbjJCPOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 11:14:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35622 "EHLO
+        id S231590AbjJCPXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 11:23:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239475AbjJCPOR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 11:14:17 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9BA0A1;
-        Tue,  3 Oct 2023 08:14:14 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0LvG41k7z6K7KY;
-        Tue,  3 Oct 2023 23:14:02 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 3 Oct
- 2023 16:14:11 +0100
-Date:   Tue, 3 Oct 2023 16:14:10 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Lukas Wunner <lukas@wunner.de>
-CC:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 02/12] X.509: Parse Subject Alternative Name in
- certificates
-Message-ID: <20231003161410.00000d2c@Huawei.com>
-In-Reply-To: <704291cbc90ca3aaaaa56b191017c1400963cf12.1695921657.git.lukas@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <704291cbc90ca3aaaaa56b191017c1400963cf12.1695921657.git.lukas@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230511AbjJCPXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 11:23:32 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29DEA7
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 08:23:28 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a23fed55d7so15730367b3.2
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 08:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696346608; x=1696951408; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ku2k6bqYSfGKotdN8kSOIqtcNeqWaahv/pJN4kCskfw=;
+        b=IUKDQJmRYENZ/cCXAB8BiDftKArU2nPWsYzL0CZRMsY/+hlkITOygQ2FL6atvuhkEO
+         fD+A3bHMrZhC2QAkNs0SBIKeD8bY4/WpsISZUSsd8hYhbCLXeV7Uwq6jj0VXDjmL2QeO
+         bCg+LuPBynBZZdauIzRhWE342AnDY8Z6nZMF0jnjPzNqMV/Z1nm94Cm0bfMm0DFPHndB
+         wpWLSoN3aTvRfxA2QGRseYdbz8ybazA+D1ucZMiLQ7Fs7bcV+RgPq8lUzxkMy0RStood
+         BIQclJJLpmaYuApJ8sMfFaIoDIywhA1CSLQsiORrvGTTjifVO04h66/dpAdushkG7LNf
+         pHJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696346608; x=1696951408;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ku2k6bqYSfGKotdN8kSOIqtcNeqWaahv/pJN4kCskfw=;
+        b=YMwsa+62088Xdzx0efvQp2b79QJ6zCMdVtPAUdiNovLDgJddY5aoGNQL9VH3D1j580
+         DylfwrKjJ8XCc36BcdSkzi8cDAG9DZSuLToJLJQ5cCtmtNyX4U7hkVWqPND4u/TkAbBY
+         VWM1ESObPSzMBQqV43d92RSxEB/eGet+Fw5QDEOJn60ycI1//4jDdV0jxXPZFMPXFsP7
+         PqW6nk8jo/vZDYinxJffYvpMFhmH8ASoiOfRy1Z2hbPP10cshHXcDAEkxx1JZgFjFsnL
+         vjQ0ykLz6rF4ao8s23V0H1ENpBnQZrlYlxU7RxiImxQ/eaBixfx9YBdPbaCDmPKm0c1c
+         6Llg==
+X-Gm-Message-State: AOJu0YzDrtDwg0im+T8cn1qrzjWTLLer666VKBbP+AWyTdTuE/Gncdp8
+        lHJrU6zw9CJP1LAYhAGmwTBOTcb8Ukk=
+X-Google-Smtp-Source: AGHT+IEe60Ge08ChrKLbAE0AlUc3VERw2JR0sIjUUMnBW+5Ur0r4M/iclZyvuLfd5L/IwSVnwfIxDoiIqMQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:6901:0:b0:d7e:dff4:b0fe with SMTP id
+ e1-20020a256901000000b00d7edff4b0femr221605ybc.7.1696346607959; Tue, 03 Oct
+ 2023 08:23:27 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 08:23:26 -0700
+In-Reply-To: <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+Mime-Version: 1.0
+References: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
+ <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+ <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+Message-ID: <ZRwx7gcY7x1x3a5y@google.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Sep 2023 19:32:32 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
-
-> The upcoming support for PCI device authentication with CMA-SPDM
-> (PCIe r6.1 sec 6.31) requires validating the Subject Alternative Name
-> in X.509 certificates.
+On Tue, Oct 03, 2023, Peter Zijlstra wrote:
+> On Mon, Oct 02, 2023 at 05:56:28PM -0700, Sean Christopherson wrote:
+> > On Mon, Oct 02, 2023, Peter Zijlstra wrote:
 > 
-> Store a pointer to the Subject Alternative Name upon parsing for
-> consumption by CMA-SPDM.
+> > > I'm not sure what you're suggesting here. It will have to save/restore
+> > > all those MSRs anyway. Suppose it switches between vCPUs.
+> > 
+> > The "when" is what's important.   If KVM took a literal interpretation of
+> > "exclude guest" for pass-through MSRs, then KVM would context switch all those
+> > MSRs twice for every VM-Exit=>VM-Enter roundtrip, even when the VM-Exit isn't a
+> > reschedule IRQ to schedule in a different task (or vCPU).  The overhead to save
+> > all the host/guest MSRs and load all of the guest/host MSRs *twice* for every
+> > VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely handled in
+> > <1500 cycles, and "fastpath" exits are something like half that.  Switching all
+> > the MSRs is likely 1000+ cycles, if not double that.
 > 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> See, you're the virt-nerd and I'm sure you know what you're talking
+> about, but I have no clue :-) I didn't know there were different levels
+> of vm-exit.
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+An exit is essentially a fancy exception/event.  The hardware transition from
+guest=>host is the exception itself (VM-Exit), and the transition back to guest
+is analagous to the IRET (VM-Enter).
 
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 15 +++++++++++++++
->  include/keys/x509-parser.h                |  2 ++
->  2 files changed, 17 insertions(+)
+In between, software will do some amount of work, and the amount of work that is
+done can vary quite significantly depending on what caused the exit.
+
+> > FWIW, the primary use case we care about is for slice-of-hardware VMs, where each
+> > vCPU is pinned 1:1 with a host pCPU.
 > 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 0a7049b470c1..18dfd564740b 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -579,6 +579,21 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
->  
-> +	if (ctx->last_oid == OID_subjectAltName) {
-> +		/*
-> +		 * A certificate MUST NOT include more than one instance
-> +		 * of a particular extension (RFC 5280 sec 4.2).
-> +		 */
-> +		if (ctx->cert->raw_san) {
-> +			pr_err("Duplicate Subject Alternative Name\n");
-> +			return -EINVAL;
-> +		}
-> +
-> +		ctx->cert->raw_san = v;
-> +		ctx->cert->raw_san_size = vlen;
-> +		return 0;
-> +	}
-> +
->  	if (ctx->last_oid == OID_keyUsage) {
->  		/*
->  		 * Get hold of the keyUsage bit string
-> diff --git a/include/keys/x509-parser.h b/include/keys/x509-parser.h
-> index 7c2ebc84791f..9c6e7cdf4870 100644
-> --- a/include/keys/x509-parser.h
-> +++ b/include/keys/x509-parser.h
-> @@ -32,6 +32,8 @@ struct x509_certificate {
->  	unsigned	raw_subject_size;
->  	unsigned	raw_skid_size;
->  	const void	*raw_skid;		/* Raw subjectKeyId in ASN.1 */
-> +	const void	*raw_san;		/* Raw subjectAltName in ASN.1 */
-> +	unsigned	raw_san_size;
->  	unsigned	index;
->  	bool		seen;			/* Infinite recursion prevention */
->  	bool		verified;
+> I've been given to understand that vm-exit is a bad word in this
+> scenario, any exit is a fail. They get MWAIT and all the other crap and
+> more or less pretend to be real hardware.
+> 
+> So why do you care about those MSRs so much? That should 'never' happen
+> in this scenario.
 
+It's not feasible to completely avoid exits, as current/upcoming hardware doesn't
+(yet) virtualize a few important things.  Off the top of my head, the two most
+relevant flows are:
+
+  - APIC_LVTPC entry and PMU counters.  If a PMU counter overflows, the NMI that
+    is generated will trigger a hardware level NMI and cause an exit.  And sadly,
+    the guest's NMI handler (assuming the guest is also using NMIs for PMIs) will
+    trigger another exit when it clears the mask bit in its LVTPC entry.
+
+  - Timer related IRQs, both in the guest and host.  These are the biggest source
+    of exits on modern hardware.  Neither AMD nor Intel provide a virtual APIC
+    timer, and so KVM must trap and emulate writes to TSC_DEADLINE (or to APIC_TMICT),
+    and the subsequent IRQ will also cause an exit.
+
+The cumulative cost of all exits is important, but the latency of each individual
+exit is even more critical, especially for PMU related stuff.  E.g. if the guest
+is trying to use perf/PMU to profile a workload, adding a few thousand cycles to
+each exit will introduce too much noise into the results.
+
+> > > > Or at least, that was my reading of things.  Maybe it was just a
+> > > > misunderstanding because we didn't do a good job of defining the behavior.
+> > > 
+> > > This might be the case. I don't particularly care where the guest
+> > > boundary lies -- somewhere in the vCPU thread. Once the thread is gone,
+> > > PMU is usable again etc..
+> > 
+> > Well drat, that there would have saved a wee bit of frustration.  Better late
+> > than never though, that's for sure.
+> > 
+> > Just to double confirm: keeping guest PMU state loaded until the vCPU is scheduled
+> > out or KVM exits to userspace, would mean that host perf events won't be active
+> > for potentially large swaths of non-KVM code.  Any function calls or event/exception
+> > handlers that occur within the context of ioctl(KVM_RUN) would run with host
+> > perf events disabled.
+> 
+> Hurmph, that sounds sub-optimal, earlier you said <1500 cycles, this all
+> sounds like a ton more.
+> 
+> /me frobs around the kvm code some...
+> 
+> Are we talking about exit_fastpath loop in vcpu_enter_guest() ? That
+> seems to run with IRQs disabled, so at most you can trigger a #PF or
+> something, which will then trip an exception fixup because you can't run
+> #PF with IRQs disabled etc..
+>
+> That seems fine. That is, a theoretical kvm_x86_handle_enter_irqoff()
+> coupled with the existing kvm_x86_handle_exit_irqoff() seems like
+> reasonable solution from where I'm sitting. That also more or less
+> matches the FPU state save/restore AFAICT.
+> 
+> Or are you talking about the whole of vcpu_run() ? That seems like a
+> massive amount of code, and doesn't look like anything I'd call a
+> fast-path. Also, much of that loop has preemption enabled...
+
+The whole of vcpu_run().  And yes, much of it runs with preemption enabled.  KVM
+uses preempt notifiers to context switch state if the vCPU task is scheduled
+out/in, we'd use those hooks to swap PMU state.
+
+Jumping back to the exception analogy, not all exits are equal.  For "simple" exits
+that KVM can handle internally, the roundtrip is <1500.   The exit_fastpath loop is
+roughly half that.
+
+But for exits that are more complex, e.g. if the guest hits the equivalent of a
+page fault, the cost of handling the page fault can vary significantly.  It might
+be <1500, but it might also be 10x that if handling the page fault requires faulting
+in a new page in the host.
+
+We don't want to get too aggressive with moving stuff into the exit_fastpath loop,
+because doing too much work with IRQs disabled can cause latency problems for the
+host.  This isn't much of a concern for slice-of-hardware setups, but would be
+quite problematic for other use cases.
+
+And except for obviously slow paths (from the guest's perspective), extra latency
+on any exit can be problematic.  E.g. even if we got to the point where KVM handles
+99% of exits the fastpath (may or may not be feasible), a not-fastpath exit at an
+inopportune time could throw off the guest's profiling results, introduce unacceptable
+jitter, etc.
+
+> > Are you ok with that approach?  Assuming we don't completely botch things, the
+> > interfaces are sane, we can come up with a clean solution for handling NMIs, etc.
+> 
+> Since you steal the whole PMU, can't you re-route the PMI to something
+> that's virt friendly too?
+
+Hmm, actually, we probably could.  It would require modifying the host's APIC_LVTPC
+entry when context switching the PMU, e.g. to replace the NMI with a dedicated IRQ
+vector.  As gross as that sounds, it might actually be cleaner overall than
+deciphering whether an NMI belongs to the host or guest, and it would almost
+certainly yield lower latency for guest PMIs.
