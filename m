@@ -2,294 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFBAF7B70B8
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:22:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 783867B70CB
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240774AbjJCSWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 14:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46320 "EHLO
+        id S240780AbjJCS1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 14:27:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230501AbjJCSWH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 14:22:07 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4B7E1
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 11:22:04 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-536ef8a7dcdso1887a12.0
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 11:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696357322; x=1696962122; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZzDVAIPhXLJ6H1shwPpB3BGM89tyFHmwziem7st5rSo=;
-        b=TgVhFHcFAduEbhIum9Mp4yAbeKnTaqN4to1/9vWoiU85/AG++ekR/SqCACPdYBZZBe
-         304e98qF99dBS6pdFjycQVlnqHUP5i5cQgxQ5h0UfzrM233mUwSC8NCvdgCTEB/OsQE4
-         bn1xgaG+ocl7/0nb9Y8+oWfVd4oeEcTzoMMClpI9SRGp/myD5SWvPMpJzpBJM7vVSBid
-         mXiQWAlBpPxBvhfbcHIv1X7XiukZI/9zgz4CmhA6wm0CY3yWh0fFUHG0DvK28ly8GbXl
-         CHIpmfb98TEboBicU1UYQBNMFxgfCSeKZD+NCSFYujjqea1Bo3rvikmodXSe81w9yPd9
-         LU/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696357322; x=1696962122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZzDVAIPhXLJ6H1shwPpB3BGM89tyFHmwziem7st5rSo=;
-        b=bGXcbB8KpTZu44RXENPXo7HQyehsD54ijQ0CV0tHjFYgsswQJnrEhPxA27tndMrrYa
-         64H5wcNyW63OrYllotCBiVRcc4bggfZLmq6WAsmA9+tk//Hjrt3vGbE2p4q396khQKmp
-         98Y5VuhD7rh5NGupltJjEiOElY32OeznModMs0pM+GBHfrebh6WK2PhSVPjGrLd3B9Db
-         J8A43bgWKklUNn9YAaao8qUmtVk4xZflIhnW8YgRb+WRLgCT5SqQ1tRXbdmQQQ1xKN1b
-         biaCi6KfDjg2mtI03F3UafW/iuE+QNZIzY72fh2PAXXwsucBWo7r7pOGS8B6USfHF/Rl
-         1KIw==
-X-Gm-Message-State: AOJu0YyByMXcSUzDAWtdcy9TMsKI6txir5S1B7o5DAjgaFUtr9MNXa4s
-        R09SL401SsdHVPIL+YJKAhC7LwVf7PwUGe9TyKVlcw==
-X-Google-Smtp-Source: AGHT+IGb9CYZGu8cbBF7awQbfHN/Mx0+nZAGWzRoDR4sTfbQfyrrJAptct4IAx1conqsVl07uBYIRMys1qmt5L/H62U=
-X-Received: by 2002:a50:d61e:0:b0:519:7d2:e256 with SMTP id
- x30-20020a50d61e000000b0051907d2e256mr10452edi.0.1696357322423; Tue, 03 Oct
- 2023 11:22:02 -0700 (PDT)
+        with ESMTP id S240779AbjJCS1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 14:27:36 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20612BB;
+        Tue,  3 Oct 2023 11:27:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CTCHEqSu3RPfv9mstYrkBQIoGjd/kxJOjTgIMe2nDEJb15MBPBGw1sQjytLx12+p7qwmgr2Uynd7kZGw14SJNVM1+a0ysDeFkUxjLfgmP3HZkD1b7PrnZFTBIEZ6x7Crij6XR2OoVCIMU8TuPZNTd1FnBMOsQm/5DMU/LCdNkWDHkFtMpyr6BTzqN5aW14++c5YG7+ail7F7btV25JPWHAgwYqMhrFeKdT7/VmYtIPIO/Cw2dDMAf23v3Lu2Sm5SApuAzLJ5rmaLzzJ7Y4v88kX4TmyERvQ5IprvmD9o84LVDA1ircTTafvwNlSzxQ+Pt+P9XZarHIYxR1cdGQcVng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Nl3/eyEKlta8WpveTOZZmzYEJsusCJI1gqdrxd7kOlE=;
+ b=IRqOSQzpCHT/7KWVo5Tt8QQCF7RV6qlb3JaA9M4MNl8qDhODrZwUXxb7FJToi5CUE2f2hY0aMrXXHe0lwNapeoZpjnBD/kWEE7hPFW713lfkfFwfbvA8SIyGkyCw1kswzfc5Q1EJsHeJ9+bjJY3KwyVERckmvDZwGVRmbmqiqUPY+f5Il4ZDMJ+QpjLzjRxivZbcvQ6w9TL1Zq0tC/zFH7YNGbduMhhaY+WxrK5gaVNgLxbiXgi6iuJAynNfoTdHRKDAPOVNtarDyoa4EC6P6JHY/+8FVssz5nUPvk0KPf3tPv4mq4NKG3oKYCM5WIIQQGlQyKOlqamWz9RHqBNiqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Nl3/eyEKlta8WpveTOZZmzYEJsusCJI1gqdrxd7kOlE=;
+ b=QmrKBvLzHFnzCe46Mql0V0GRA/0Aqkh2vJchYRMB1RK7CbfGDIsVwQi0GGa+PIQ1qyUeAd1kFfUrBxT3k2OFZXJPGgYT0dIu9ODRrsCM0IP96G/fRWJOZnkr7lxaQ4PHjrC9R/S6KEWqfElAXS+zuZIYtXQ/xlw3FvwYmp3TjJY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by SJ0PR12MB6928.namprd12.prod.outlook.com (2603:10b6:a03:47a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Tue, 3 Oct
+ 2023 18:27:27 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2b54:7ddf:9e2e:751c]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2b54:7ddf:9e2e:751c%3]) with mapi id 15.20.6838.033; Tue, 3 Oct 2023
+ 18:27:24 +0000
+Message-ID: <a16814ee-28e8-d240-d672-8f9511b832cb@amd.com>
+Date:   Tue, 3 Oct 2023 13:27:22 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] arch/x86: Set XSS while handling #VC intercept for CPUID
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Jinank Jain <jinankjain@linux.microsoft.com>,
+        seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, jinankjain@microsoft.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     wei.liu@kernel.org, tiala@microsoft.com
+References: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
+ <e7ae2b89-f2c4-e95f-342b-fcf92a2e0ae3@intel.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <e7ae2b89-f2c4-e95f-342b-fcf92a2e0ae3@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0036.namprd13.prod.outlook.com
+ (2603:10b6:806:22::11) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-References: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
- <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
- <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
- <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
- <20231003081616.GE27267@noisy.programming.kicks-ass.net> <ZRwx7gcY7x1x3a5y@google.com>
-In-Reply-To: <ZRwx7gcY7x1x3a5y@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 3 Oct 2023 11:21:46 -0700
-Message-ID: <CALMp9eRew1+-gDy36m3qWy9D9TQP+mkzPQg=xowKcaG+NpbX0w@mail.gmail.com>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SJ0PR12MB6928:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87553730-b2a5-4a8b-61f5-08dbc43e63dc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6fntcTkXwntc5pIBKaVwKcC4QESgZhK31pFX+aNUU5KqoARwomD/Kl8/1OILJf1SaIZWT3SAZjfqWx4c82jlXbgRGyP7PxquVWAcnFOMkacUSGLMov+b/XGngXqVsIC0UaaawSJj69Phqs9/OqA0Smnc/usiulZqcmVcR14SvTr0TnbVOMgxZf8Qpgy7Q85MO9XopR/TH33J0Oj0Lj4dblZcYhHZNYrdiRbym+aLJ54pcxthO5hfezfl/pOcP/GOrBpg/jFwfEfAm+hGjUDVuAqvt8fQ13dG4VktlNhceo84Y3CW9qBAuEWc/gXkeAc9hWIM4qpb3dBzcG6yM2y1lGlOevMGL1ZZd865BLsjzDdMam0eQitJXVMO/sKoNH3ncQ+vwUxCOLOTulXIFACkiB6C1PxIQ+47y7oa4kHfM7QcEJ3+Kb/oXcbUjoXBaJoPMYqzADB9gvAeygul314WiSS06GLOj1DGfDqpGQ4/4qjPQI15vC0IzKucKBBLar01c+2cLSKjvuJ88CUnY17iPgfRS5iY+Gc3QJMS3D1YOiVKbg8Wsu5JfY4MTF2lYJha0upivd3JjF39alERCo+SXhCIhEz9eHbPwCq1KeizIN8LdPeg8V77ThzRHYb+d6B9pTZ0VZoKDGS1Mw/R/0B5QZEynP7UIFCmNboHWzfjsU0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(346002)(376002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(2906002)(83380400001)(66899024)(7416002)(31696002)(86362001)(36756003)(921005)(38100700002)(316002)(53546011)(66946007)(66476007)(66556008)(6512007)(6506007)(110136005)(41300700001)(2616005)(6486002)(478600001)(31686004)(4326008)(8676002)(5660300002)(26005)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THR1d3k5UlBVUWNOWDZ3T04wa1JkbmNLZDdWaFNQdFlmM1dIQzFUOG0zQ1RD?=
+ =?utf-8?B?eklyYXlPQ3ZhQ1lPQkZhNUxHbjgzVVR0dThTNmpTS2tQa251K0piUGsyYzUv?=
+ =?utf-8?B?RGo4NVcyMEdPa2I4T2RsY3JWemtabHh1UTlTaVprcjlMYUI2K3YwWDhuWjli?=
+ =?utf-8?B?Y25uRFRDVUY2NkxTY2RseGZOMFNUdEZRVjA4LzVqVWlFdnp0ckI3OW85bkhT?=
+ =?utf-8?B?S1N5N2MwNDdjQUdGZXNrUFFRQVhURzlzTDJvNFJEY29hS3hDUmlnL0lWZ3l3?=
+ =?utf-8?B?TzAxYzVrQU12ZTRPQ1RKK0tnMzhJcUpIeTJVSFpsNis1ZDloWFlTQUcyL2d5?=
+ =?utf-8?B?ZVBiTGxKcGoyOUNxUW5CWlNtbCt5eTk4dlBMSVNPZERNcWVyaVN5U2RaS2pG?=
+ =?utf-8?B?cXNxR2RySXh2V045SDNHdUkwMUQyQ2xid0VHa2tLbzRodmlIRllkRmdHbWMx?=
+ =?utf-8?B?NFppOW9IY0RNUmxTclFjclAxaTBhWUI0b2FUZ2lMK3BOYlIxbkZWcis2a1Bu?=
+ =?utf-8?B?NUU5OTBuR01yazR4WnhicFN2d2Y3cVZJOGVNUi8wK2FMSHB5R1dBczBSSktZ?=
+ =?utf-8?B?R0xYOXRROUZtbGFNOTJ1SytWYU5SMWcwYnM5dWRheUhSQytsS2pDRDVSY0l2?=
+ =?utf-8?B?bU5mUDhDcUF3Q3pZbGpQNVFFVXJwYzdMbVNPNWZKQW8wSlZKRmh0dVArWEI3?=
+ =?utf-8?B?UFNTVXJjSnYzZm9ua0djUzN3VmpIVnJrSjVUWEw2TUpCZHFSTzV6ZExkQXhL?=
+ =?utf-8?B?SHN3c3BLdGtGeWh0clUrWWVRRzhjcEtxWmhZWUFUdHVlWGkyQUZhWU5CR1Zm?=
+ =?utf-8?B?SmNwcGxqL3pidkYxeEVHK2h3bDlMQnJDMjBib1BMTFVYYi9uNWZHOEZHclpS?=
+ =?utf-8?B?eW02U0lxZnR1VFlTZ3RCcHZTTExPWTNDbGdOQXBJOXF5dkVWMjMyc0tKbDRi?=
+ =?utf-8?B?MGdFME45RVRoeGg1UXhERnhkWGxiODM2R21VVnVpWExSd3EwbTRlMERKTXhB?=
+ =?utf-8?B?QkpwUWlNUGtWN0Y4UnRJMGpDTkloRmJmR1ZVcjNXY3UvOFBheElDVExWM3Bw?=
+ =?utf-8?B?Tk8vZ1F3a21qRERuekdKVXo5SXkzcGh6QzVXaGt6MzhXbjl2TU52Ny8rcTc2?=
+ =?utf-8?B?QkxsamNJeHU4Z2JZSnlvaXBSZnVKWWt2QmYrSTVOVzI3eFM4Mm81Q01HWnhw?=
+ =?utf-8?B?emc2a1o5ZXI3aVpIcG5FT0ZiYjNSREZzNWtzcnZaQUUwbVd6NkE5RFNQUTJn?=
+ =?utf-8?B?bytNYTJydDNHUDVLZkRlTlFaOHlSZUVua0ZZaGVVbyswb1hiMGZFUHhlMWRK?=
+ =?utf-8?B?MlRyMUhtUVdrZDhkcjJIK0hQazBiRGZvcGRJTWdMOXcwOEE3V0dYZkFXQzJ5?=
+ =?utf-8?B?bElxUkcxeEV4UHkvM3N2NllVV3N0WkRFTFhZM2lVVUpzMm9IQ21pSlQvREFu?=
+ =?utf-8?B?bndyNnVDbHFQRVJ6ZWwyV0FWWUJSc3FKYklBaE5TcHBtVWZhVldEaFRLSW1V?=
+ =?utf-8?B?VUNpTHFEOXlzVmRKT3VrTkFtZW04akYxSkdLeEZWbjJVckRlQXlaK3NvWncy?=
+ =?utf-8?B?bis0Q0FrN3NCb0lpaWNYZ0ZILy82Q3paV3BXU0NCazUvOC9RRDhxcjU4ZU51?=
+ =?utf-8?B?NElDdHprbGE0OFN6ZWZoS2pUcUppeGp6NzJRNVlVUVdIL2R3aWtzSnhDeUx4?=
+ =?utf-8?B?dnZ3UTd3NWtsYVVkRTg5Ylh6RTFWSW0zMlUzSldvZ0lhMXBGd3YyTWxrVWZ6?=
+ =?utf-8?B?RFdYcHJkVmNDK0RicmlYY3Q5NEVyWjRoRU51aE4rbEpVdEpXQWZUOU9IdHU3?=
+ =?utf-8?B?Y3pGclBuSGYxTjE3cGtyT2huTS9SK3ZMbGRUMG1Uc1d3cGV0aC95dkpnU1hm?=
+ =?utf-8?B?ZTJaalFMNnJsb1NFVjhMOG5UejZ5UytyWjVMQ2E3Q2dka2VMbU9pWGw3Y1Ew?=
+ =?utf-8?B?RFFQUURjV1ZWcW12OWJOZTMxT1QyR1AzaXhhS2lVS0k3S2ZpeVAvbHppN294?=
+ =?utf-8?B?dHRUTDd3UitUYlRCOFQ4RlN3bkgwK3FueUw2cjE3Z2ZlMTVENkYyK2Y1OWVp?=
+ =?utf-8?B?blBObUJYWEFpUzFVTnl4QksrMllsTmYrWElnMHRXcFdFR3Z2cUFtNW5ReURr?=
+ =?utf-8?Q?j3WMpCcEI3YvPro9IGhUxSPly?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87553730-b2a5-4a8b-61f5-08dbc43e63dc
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 18:27:24.8177
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jzr40/IetPwI3962pWcQSFz2Y92suFZeMEkjkGHNQD9HmRYge61hdM/AmxqlKj94Q5KCgoufJpk0P3EZTKfiQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6928
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 3, 2023 at 8:23=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Tue, Oct 03, 2023, Peter Zijlstra wrote:
-> > On Mon, Oct 02, 2023 at 05:56:28PM -0700, Sean Christopherson wrote:
-> > > On Mon, Oct 02, 2023, Peter Zijlstra wrote:
-> >
-> > > > I'm not sure what you're suggesting here. It will have to save/rest=
-ore
-> > > > all those MSRs anyway. Suppose it switches between vCPUs.
-> > >
-> > > The "when" is what's important.   If KVM took a literal interpretatio=
-n of
-> > > "exclude guest" for pass-through MSRs, then KVM would context switch =
-all those
-> > > MSRs twice for every VM-Exit=3D>VM-Enter roundtrip, even when the VM-=
-Exit isn't a
-> > > reschedule IRQ to schedule in a different task (or vCPU).  The overhe=
-ad to save
-> > > all the host/guest MSRs and load all of the guest/host MSRs *twice* f=
-or every
-> > > VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely =
-handled in
-> > > <1500 cycles, and "fastpath" exits are something like half that.  Swi=
-tching all
-> > > the MSRs is likely 1000+ cycles, if not double that.
-> >
-> > See, you're the virt-nerd and I'm sure you know what you're talking
-> > about, but I have no clue :-) I didn't know there were different levels
-> > of vm-exit.
->
-> An exit is essentially a fancy exception/event.  The hardware transition =
-from
-> guest=3D>host is the exception itself (VM-Exit), and the transition back =
-to guest
-> is analagous to the IRET (VM-Enter).
->
-> In between, software will do some amount of work, and the amount of work =
-that is
-> done can vary quite significantly depending on what caused the exit.
->
-> > > FWIW, the primary use case we care about is for slice-of-hardware VMs=
-, where each
-> > > vCPU is pinned 1:1 with a host pCPU.
-> >
-> > I've been given to understand that vm-exit is a bad word in this
-> > scenario, any exit is a fail. They get MWAIT and all the other crap and
-> > more or less pretend to be real hardware.
-> >
-> > So why do you care about those MSRs so much? That should 'never' happen
-> > in this scenario.
->
-> It's not feasible to completely avoid exits, as current/upcoming hardware=
- doesn't
-> (yet) virtualize a few important things.  Off the top of my head, the two=
- most
-> relevant flows are:
->
->   - APIC_LVTPC entry and PMU counters.  If a PMU counter overflows, the N=
-MI that
->     is generated will trigger a hardware level NMI and cause an exit.  An=
-d sadly,
->     the guest's NMI handler (assuming the guest is also using NMIs for PM=
-Is) will
->     trigger another exit when it clears the mask bit in its LVTPC entry.
+On 10/3/23 11:07, Dave Hansen wrote:
+> On 10/3/23 02:28, Jinank Jain wrote:
+> ...
+>> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
+>> index 2eabccde94fb..92350a24848c 100644
+>> --- a/arch/x86/kernel/sev-shared.c
+>> +++ b/arch/x86/kernel/sev-shared.c
+>> @@ -880,6 +880,9 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
+>>   	if (snp_cpuid_ret != -EOPNOTSUPP)
+>>   		return ES_VMM_ERROR;
+>>   
+>> +	if (regs->ax == 0xD && regs->cx == 0x1)
+>> +		ghcb_set_xss(ghcb, 0);
+> 
+> The spec talks about leaf 0xD, but not the subleaf:
+> 
+>> XSS is only required to besupplied when a request forCPUID 0000_000D
+>> is made andthe guest supports the XSS MSR(0x0000_0DA0).
+> Why restrict this to subleaf (regx->cx) 1?
 
-In addition, when the guest PMI handler writes to
-IA32_PERF_GLOBAL_CTRL to disable all counters (and again later to
-re-enable the counters), KVM has to intercept that as well, with
-today's implementation. Similarly, on each guest timer tick, when
-guest perf is multiplexing PMCs, KVM has to intercept writes to
-IA32_PERF_GLOBAL _CTRL.
+Today, only subleaf 1 deals with XSS, but we could do just what you say 
+and set it for any 0xD subleaf to be safe.
 
-Furthermore, in some cases, Linux perf seems to double-disable
-counters, using both the individual enable bits in each PerfEvtSel, as
-well as the bits in PERF_GLOBAL_CTRL.  KVM has to intercept writes to
-the PerfEvtSels as well. Off-topic, but I'd like to request that Linux
-perf *only* use the enable  bits in IA32_PERF_GLOBAL_CTRL on
-architectures where that is supported. Just leave the enable bits set
-in the PrfEvtSels, to avoid unnecessary VM-exits. :)
+> 
+> Second, XCR0 is being supplied regardless of the CPUID leaf.  Why should
+> XSS be restricted to 0xD while XCR0 is universally supplied?
 
->   - Timer related IRQs, both in the guest and host.  These are the bigges=
-t source
->     of exits on modern hardware.  Neither AMD nor Intel provide a virtual=
- APIC
->     timer, and so KVM must trap and emulate writes to TSC_DEADLINE (or to=
- APIC_TMICT),
->     and the subsequent IRQ will also cause an exit.
->
-> The cumulative cost of all exits is important, but the latency of each in=
-dividual
-> exit is even more critical, especially for PMU related stuff.  E.g. if th=
-e guest
-> is trying to use perf/PMU to profile a workload, adding a few thousand cy=
-cles to
-> each exit will introduce too much noise into the results.
->
-> > > > > Or at least, that was my reading of things.  Maybe it was just a
-> > > > > misunderstanding because we didn't do a good job of defining the =
-behavior.
-> > > >
-> > > > This might be the case. I don't particularly care where the guest
-> > > > boundary lies -- somewhere in the vCPU thread. Once the thread is g=
-one,
-> > > > PMU is usable again etc..
-> > >
-> > > Well drat, that there would have saved a wee bit of frustration.  Bet=
-ter late
-> > > than never though, that's for sure.
-> > >
-> > > Just to double confirm: keeping guest PMU state loaded until the vCPU=
- is scheduled
-> > > out or KVM exits to userspace, would mean that host perf events won't=
- be active
-> > > for potentially large swaths of non-KVM code.  Any function calls or =
-event/exception
-> > > handlers that occur within the context of ioctl(KVM_RUN) would run wi=
-th host
-> > > perf events disabled.
-> >
-> > Hurmph, that sounds sub-optimal, earlier you said <1500 cycles, this al=
-l
-> > sounds like a ton more.
-> >
-> > /me frobs around the kvm code some...
-> >
-> > Are we talking about exit_fastpath loop in vcpu_enter_guest() ? That
-> > seems to run with IRQs disabled, so at most you can trigger a #PF or
-> > something, which will then trip an exception fixup because you can't ru=
-n
-> > #PF with IRQs disabled etc..
-> >
-> > That seems fine. That is, a theoretical kvm_x86_handle_enter_irqoff()
-> > coupled with the existing kvm_x86_handle_exit_irqoff() seems like
-> > reasonable solution from where I'm sitting. That also more or less
-> > matches the FPU state save/restore AFAICT.
-> >
-> > Or are you talking about the whole of vcpu_run() ? That seems like a
-> > massive amount of code, and doesn't look like anything I'd call a
-> > fast-path. Also, much of that loop has preemption enabled...
->
-> The whole of vcpu_run().  And yes, much of it runs with preemption enable=
-d.  KVM
-> uses preempt notifiers to context switch state if the vCPU task is schedu=
-led
-> out/in, we'd use those hooks to swap PMU state.
->
-> Jumping back to the exception analogy, not all exits are equal.  For "sim=
-ple" exits
-> that KVM can handle internally, the roundtrip is <1500.   The exit_fastpa=
-th loop is
-> roughly half that.
->
-> But for exits that are more complex, e.g. if the guest hits the equivalen=
-t of a
-> page fault, the cost of handling the page fault can vary significantly.  =
-It might
-> be <1500, but it might also be 10x that if handling the page fault requir=
-es faulting
-> in a new page in the host.
->
-> We don't want to get too aggressive with moving stuff into the exit_fastp=
-ath loop,
-> because doing too much work with IRQs disabled can cause latency problems=
- for the
-> host.  This isn't much of a concern for slice-of-hardware setups, but wou=
-ld be
-> quite problematic for other use cases.
->
-> And except for obviously slow paths (from the guest's perspective), extra=
- latency
-> on any exit can be problematic.  E.g. even if we got to the point where K=
-VM handles
-> 99% of exits the fastpath (may or may not be feasible), a not-fastpath ex=
-it at an
-> inopportune time could throw off the guest's profiling results, introduce=
- unacceptable
-> jitter, etc.
->
-> > > Are you ok with that approach?  Assuming we don't completely botch th=
-ings, the
-> > > interfaces are sane, we can come up with a clean solution for handlin=
-g NMIs, etc.
-> >
-> > Since you steal the whole PMU, can't you re-route the PMI to something
-> > that's virt friendly too?
->
-> Hmm, actually, we probably could.  It would require modifying the host's =
-APIC_LVTPC
-> entry when context switching the PMU, e.g. to replace the NMI with a dedi=
-cated IRQ
-> vector.  As gross as that sounds, it might actually be cleaner overall th=
-an
-> deciphering whether an NMI belongs to the host or guest, and it would alm=
-ost
-> certainly yield lower latency for guest PMIs.
+XCR0 is really only required for 0xD, I'm not sure why it is being setting 
+all the time (unless similar to above, it becomes required for some other 
+CPUID leaf in the future?)
 
-Ugh.  Can't KVM just install its own NMI handler? Either way, it's
-possible for late PMIs to arrive in the wrong context.
+> 
+> Third, why is it OK to supply a garbage (0) value?  If the GHCB field is
+> required it's surely because the host *NEEDS* the value to do something.
+>   Won't a garbage value potentially confuse the host?
+
+Ideally, the guest should be checking if XSAVES is enabled, which requires 
+checking CPUID leaf 0xD, subleaf 1. So a bit of a chicken and egg thing 
+going on the very first time. And then the guest should read MSR_IA32_XSS 
+to get the actual value. This MSR is virtualized, so the hypervisor needs 
+to not intercept access in order for the guest to actually set/get a 
+value. Today, KVM/SVM doesn't support that since XSS is used (mainly/only) 
+for shadow stack and KVM shadow stack support is only getting looked at now.
+
+So the guest support for XSS and ES/SNP guests needs to be thought out a 
+bit more.
+
+Thanks,
+Tom
+
+> 
