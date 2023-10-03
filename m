@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B437B694F
+	by mail.lfdr.de (Postfix) with ESMTP id F02427B6950
 	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 14:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231127AbjJCMq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231193AbjJCMq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 3 Oct 2023 08:46:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44588 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240058AbjJCMbO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 08:31:14 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA15ECE
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 05:31:09 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40666aa674fso8377175e9.0
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 05:31:09 -0700 (PDT)
+        with ESMTP id S231655AbjJCMbT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 08:31:19 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA33EB4
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 05:31:15 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-32157c8e4c7so913896f8f.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 05:31:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696336268; x=1696941068; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1696336274; x=1696941074; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0sreXSXDLh+LVLoU4Gk2cAKXN1sJ3KmjKke0mZhMO3w=;
-        b=WJxD/L/lO3OUZEdKUZ7r2LTbXjn43HZrk96PibPFvedQMDktHgD+5zHwEUYrRuf+8Z
-         Num7RYByAg1Gy5GVKTSEBoao/JK+UJfLNl9hWeaac24tkcb6OLILVN/Jq3TpjBuxzBHM
-         lWCX8vSIr/TNms+eXeIAxb7B2xl51MW3qFWsRjgRYrYF7FGLbtRTTlpIUek8EW9JII6D
-         mBfYBKbPRTgibID9NWBHap6qxuP8D9wqqsvnOtmqHaKiIO8UycJg7F/+xhJrc/SDJxZi
-         mbZODn6oGUYJuBFtyVjQ7JOHRTgFHLjLLhrrthiVCA41H9HW17OPCAFNCJeKruSxvU30
-         Mq7g==
+        bh=YCJq244pl4+8992N+SUfSZJnXy6q+2iGjPbprJxjpgU=;
+        b=zW23qhqzX08s2zqM8IC3UiIo4DZiI8VBF7IR4Y5C3jUraRcCOx9JwrFZ4mJa2ShNpO
+         dFu06Nr/PRPEeOvCAovsflillWkcqhiV21xu4K2uJdVDwd5bdyRYF1IAd388N43kN+ZS
+         IZI5kCrH6TV858MtO+viJsMtv3mDllpc6HzqoFE3sRFcVv7QbnfRLzlhAt13ODvzI3Q8
+         IqjCM9epWEY5/XyEofwdYLO5RRIBqzsBd6dYxbAoybTFi4DoXw/JjLQUlRWpOQ/HhPgp
+         SqpJwnsw68aNzGBr2D1Ryygs1vYp7aC16Dv/bfHrF9OWiihGavnlTtBBS6iLPUHr7ZgJ
+         +3Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696336268; x=1696941068;
+        d=1e100.net; s=20230601; t=1696336274; x=1696941074;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0sreXSXDLh+LVLoU4Gk2cAKXN1sJ3KmjKke0mZhMO3w=;
-        b=V8gZiVNNGFDRm3tD4crLvSDz3C0rNB13acvx7d/DPH6DATKnDyI6IkBiWbARno20sZ
-         AEcbbyLItC443Wz4k4d1ym8kT3/Gqmh+wue2iDYgJruPK0x+5z7CT2cGXuUVNzS0M1Gu
-         aGCBLthNjUHwwooCur6JTkuZtQVpWSXVtJX+1tSmO+qhLKfjWfepK7iumO298RvxVQkB
-         IUSALXo8O4+7rB/14BiEFToEDDAVbx1rWS8NbIJMtGbM0x56DwIzYEHw5IDFBaWFOjCa
-         yr4HfqNOXEy68rdkMaSwHwVHTWPXo8VfbqcIHJRANsv+vSmjugp++Bl6tymHc7OJlhIq
-         vICg==
-X-Gm-Message-State: AOJu0Yynz0hduQEoy+QJHmOETjmk0odqOB0NWKInUuCYOHnPdbwLAcD7
-        4n2t+xs/IBTsmk4mz/e6gY2GPQ==
-X-Google-Smtp-Source: AGHT+IGgHu14QLaTZHtaqcvyhvqRXWFUFqZQ+U9E3BYtwlGQ+0F6OAn0a/YOhlJcZqr8dsHhPOyqvg==
-X-Received: by 2002:a7b:c858:0:b0:405:40c6:2ba4 with SMTP id c24-20020a7bc858000000b0040540c62ba4mr12060645wml.5.1696336268240;
-        Tue, 03 Oct 2023 05:31:08 -0700 (PDT)
+        bh=YCJq244pl4+8992N+SUfSZJnXy6q+2iGjPbprJxjpgU=;
+        b=WvqCfLSarzGXgG/GkbN2MQh9OtmkND7n7AkofZVdFU8OODbbgdamruS/qO3u47EzJ4
+         jfEwYs+g5deIuzuwic+YObJgsidcFUrzmx02b3Wnr+fMHyaNChCQSR243xCQdNHQMdAt
+         LzknF3ypIsQQf9BikMshARAaWyv805xeLs7W+A187wpjsQoGA9KYrQqp/zqPQJeqTfFd
+         lFomT+hGej13cKYyAf5BgcGVyNshvzxI7fLxlnBP5I5I4bXAlYAUJd22BAn4SDd6EmFk
+         KxwIcEnJtA2mSoh2Gs9kggCIVvVGey9z0PrGWY7PlnPEd9HiGOoPWyG55etoUu/gNZsb
+         DYtQ==
+X-Gm-Message-State: AOJu0Yy+qk46DDTr621KcXnHHlGyjLE7oFSMMfTzpLeLxe3r3Hz3zLpH
+        Ss0rmoB9tZlEQw6Lo3bRf+MWPA==
+X-Google-Smtp-Source: AGHT+IFOv9460imGFEIgqRm0UvkQ7r6CSfyL7aih3gY5LLipvr1UBoZ7dIbBHQMj6JPYXiQgRbHH4Q==
+X-Received: by 2002:adf:e852:0:b0:323:2038:944 with SMTP id d18-20020adfe852000000b0032320380944mr13304917wrn.58.1696336274319;
+        Tue, 03 Oct 2023 05:31:14 -0700 (PDT)
 Received: from m1x-phil.lan (176-131-222-246.abo.bbox.fr. [176.131.222.246])
-        by smtp.gmail.com with ESMTPSA id f20-20020a7bcd14000000b003fc16ee2864sm1183607wmj.48.2023.10.03.05.31.05
+        by smtp.gmail.com with ESMTPSA id j14-20020a5d464e000000b0031f8a59dbeasm1478930wrs.62.2023.10.03.05.31.12
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 03 Oct 2023 05:31:07 -0700 (PDT)
+        Tue, 03 Oct 2023 05:31:13 -0700 (PDT)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <eduardo@habkost.net>,
@@ -63,9 +63,9 @@ Cc:     Eduardo Habkost <eduardo@habkost.net>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Cameron Esfahani <dirty@apple.com>
-Subject: [PATCH v2 6/7] accel/tcg: Have tcg_exec_realizefn() return a boolean
-Date:   Tue,  3 Oct 2023 14:30:24 +0200
-Message-ID: <20231003123026.99229-7-philmd@linaro.org>
+Subject: [PATCH v2 7/7] accel/tcg: Restrict tcg_exec_[un]realizefn() to TCG
+Date:   Tue,  3 Oct 2023 14:30:25 +0200
+Message-ID: <20231003123026.99229-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231003123026.99229-1-philmd@linaro.org>
 References: <20231003123026.99229-1-philmd@linaro.org>
@@ -81,52 +81,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Following the example documented since commit e3fe3988d7 ("error:
-Document Error API usage rules"), have tcg_exec_realizefn() return
-a boolean indicating whether an error is set or not.
+We don't need to expose these TCG-specific methods to the
+whole code base. Register them as AccelClass handlers, they
+will be called by the generic accel_cpu_[un]realize() methods.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Claudio Fontana <cfontana@suse.de>
 ---
- include/exec/cpu-all.h | 2 +-
- accel/tcg/cpu-exec.c   | 4 +++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ accel/tcg/internal.h   | 3 +++
+ include/exec/cpu-all.h | 2 --
+ accel/tcg/tcg-all.c    | 2 ++
+ cpu.c                  | 9 ---------
+ 4 files changed, 5 insertions(+), 11 deletions(-)
 
+diff --git a/accel/tcg/internal.h b/accel/tcg/internal.h
+index e8cbbde581..57ab397df1 100644
+--- a/accel/tcg/internal.h
++++ b/accel/tcg/internal.h
+@@ -80,6 +80,9 @@ bool tb_invalidate_phys_page_unwind(tb_page_addr_t addr, uintptr_t pc);
+ void cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
+                                uintptr_t host_pc);
+ 
++bool tcg_exec_realizefn(CPUState *cpu, Error **errp);
++void tcg_exec_unrealizefn(CPUState *cpu);
++
+ /* Return the current PC from CPU, which may be cached in TB. */
+ static inline vaddr log_pc(CPUState *cpu, const TranslationBlock *tb)
+ {
 diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index c2c62160c6..1e5c530ee1 100644
+index 1e5c530ee1..230525ebf7 100644
 --- a/include/exec/cpu-all.h
 +++ b/include/exec/cpu-all.h
-@@ -422,7 +422,7 @@ void dump_exec_info(GString *buf);
+@@ -422,8 +422,6 @@ void dump_exec_info(GString *buf);
  
  /* accel/tcg/cpu-exec.c */
  int cpu_exec(CPUState *cpu);
--void tcg_exec_realizefn(CPUState *cpu, Error **errp);
-+bool tcg_exec_realizefn(CPUState *cpu, Error **errp);
- void tcg_exec_unrealizefn(CPUState *cpu);
+-bool tcg_exec_realizefn(CPUState *cpu, Error **errp);
+-void tcg_exec_unrealizefn(CPUState *cpu);
  
  /**
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index c724e8b6f1..60f1986b85 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -1088,7 +1088,7 @@ int cpu_exec(CPUState *cpu)
-     return ret;
+  * cpu_set_cpustate_pointers(cpu)
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 03dfd67e9e..8ab873a5ab 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -227,6 +227,8 @@ static void tcg_accel_class_init(ObjectClass *oc, void *data)
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "tcg";
+     ac->init_machine = tcg_init_machine;
++    ac->cpu_common_realize = tcg_exec_realizefn;
++    ac->cpu_common_unrealize = tcg_exec_unrealizefn;
+     ac->allowed = &tcg_allowed;
+     ac->gdbstub_supported_sstep_flags = tcg_gdbstub_supported_sstep_flags;
+ 
+diff --git a/cpu.c b/cpu.c
+index 2a1eff948b..658d179582 100644
+--- a/cpu.c
++++ b/cpu.c
+@@ -140,11 +140,6 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+         return;
+     }
+ 
+-    /* NB: errp parameter is unused currently */
+-    if (tcg_enabled()) {
+-        tcg_exec_realizefn(cpu, errp);
+-    }
+-
+     /* Wait until cpu initialization complete before exposing cpu. */
+     cpu_list_add(cpu);
+ 
+@@ -187,13 +182,9 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+     cpu_list_remove(cpu);
+     /*
+      * Now that the vCPU has been removed from the RCU list, we can call
+-     * tcg_exec_unrealizefn and
+      * accel_cpu_common_unrealize, which may free fields using call_rcu.
+      */
+     accel_cpu_common_unrealize(cpu);
+-    if (tcg_enabled()) {
+-        tcg_exec_unrealizefn(cpu);
+-    }
  }
  
--void tcg_exec_realizefn(CPUState *cpu, Error **errp)
-+bool tcg_exec_realizefn(CPUState *cpu, Error **errp)
- {
-     static bool tcg_target_initialized;
-     CPUClass *cc = CPU_GET_CLASS(cpu);
-@@ -1104,6 +1104,8 @@ void tcg_exec_realizefn(CPUState *cpu, Error **errp)
-     tcg_iommu_init_notifier_list(cpu);
- #endif /* !CONFIG_USER_ONLY */
-     /* qemu_plugin_vcpu_init_hook delayed until cpu_index assigned. */
-+
-+    return true;
- }
- 
- /* undo the initializations in reverse order */
+ /*
 -- 
 2.41.0
 
