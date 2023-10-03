@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFF977B6C0C
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 16:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 902657B6C98
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 17:05:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240158AbjJCOsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 10:48:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49058 "EHLO
+        id S240176AbjJCPFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 11:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjJCOr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 10:47:59 -0400
+        with ESMTP id S230270AbjJCPFE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 11:05:04 -0400
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCDCAC;
-        Tue,  3 Oct 2023 07:47:56 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0LG135ykz6HJbr;
-        Tue,  3 Oct 2023 22:45:13 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A15A7;
+        Tue,  3 Oct 2023 08:05:01 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0Ldj6N6Bz6HJcm;
+        Tue,  3 Oct 2023 23:02:17 +0800 (CST)
 Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
  (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 3 Oct
- 2023 15:47:53 +0100
-Date:   Tue, 3 Oct 2023 15:47:51 +0100
+ 2023 16:04:56 +0100
+Date:   Tue, 3 Oct 2023 16:04:55 +0100
 From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To:     Lukas Wunner <lukas@wunner.de>
 CC:     Bjorn Helgaas <helgaas@kernel.org>,
@@ -43,11 +43,12 @@ CC:     Bjorn Helgaas <helgaas@kernel.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Sean Christopherson <seanjc@google.com>,
         Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 08/12] PCI/CMA: Authenticate devices on enumeration
-Message-ID: <20231003154751.00004de7@Huawei.com>
-In-Reply-To: <7721bfa3b4f8a99a111f7808ad8890c3c13df56d.1695921657.git.lukas@wunner.de>
+Subject: Re: [PATCH 09/12] PCI/CMA: Validate Subject Alternative Name in
+ certificates
+Message-ID: <20231003160455.00001a4f@Huawei.com>
+In-Reply-To: <bc1efd945f5d76587787f8351199e1ea45eaf2ef.1695921657.git.lukas@wunner.de>
 References: <cover.1695921656.git.lukas@wunner.de>
-        <7721bfa3b4f8a99a111f7808ad8890c3c13df56d.1695921657.git.lukas@wunner.de>
+        <bc1efd945f5d76587787f8351199e1ea45eaf2ef.1695921657.git.lukas@wunner.de>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
@@ -66,105 +67,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Sep 2023 19:32:38 +0200
+On Thu, 28 Sep 2023 19:32:39 +0200
 Lukas Wunner <lukas@wunner.de> wrote:
 
-> From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> PCIe r6.1 sec 6.31.3 stipulates requirements for X.509 Leaf Certificates
+> presented by devices, in particular the presence of a Subject Alternative
+> Name extension with a name that encodes the Vendor ID, Device ID, Device
+> Serial Number, etc.
+
+Lets you do any of
+* What you have here
+* Reference Integrity Manifest, e.g. see Trusted Computing Group
+* A pointer to a location where such a Reference Integrity Manifest can be
+  obtained.
+
+So this text feels a little strong though I'm fine with only support the
+Subject Alternative Name bit for now. Whoever has one of the other options
+can add that support :)
+
 > 
-> Component Measurement and Authentication (CMA, PCIe r6.1 sec 6.31)
-> allows for measurement and authentication of PCIe devices.  It is
-> based on the Security Protocol and Data Model specification (SPDM,
-> https://www.dmtf.org/dsp/DSP0274).
+> This prevents a mismatch between the device identity in Config Space and
+> the certificate.  A device cannot misappropriate a certificate from a
+> different device without also spoofing Config Space.  As a corollary,
+> it cannot dupe an arbitrary driver into binding to it.  (Only those
+> which bind to the device identity in the Subject Alternative Name work.)
 > 
-> CMA-SPDM in turn forms the basis for Integrity and Data Encryption
-> (IDE, PCIe r6.1 sec 6.33) because the key material used by IDE is
-> exchanged over a CMA-SPDM session.
+> Parse the Subject Alternative Name using a small ASN.1 module and
+> validate its contents.  The theory of operation is explained in a code
+> comment at the top of the newly added cma-x509.c.
 > 
-> As a first step, authenticate CMA-capable devices on enumeration.
-> A subsequent commit will expose the result in sysfs.
+> This functionality is introduced in a separate commit on top of basic
+> CMA-SPDM support to split the code into digestible, reviewable chunks.
 > 
-> When allocating SPDM session state with spdm_create(), the maximum SPDM
-> message length needs to be passed.  Make the PCI_DOE_MAX_LENGTH macro
-> public and calculate the maximum payload length from it.
+> The CMA OID added here is taken from the official OID Repository
+> (it's not documented in the PCIe Base Spec):
+> https://oid-rep.orange-labs.fr/get/2.23.147
 > 
-> Credits:  Jonathan wrote a proof-of-concept of this CMA implementation.
-> Lukas reworked it for upstream.  Wilfred contributed fixes for issues
-> discovered during testing.
-> 
-> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Wilfred Mallawa <wilfred.mallawa@wdc.com>
 > Signed-off-by: Lukas Wunner <lukas@wunner.de>
-Hi Lukas,
 
-A few things inline. Biggest of which is making this one build
-warning free by pulling forward the cma_capable flag from
-patch 10.
-
->  
-> diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
-> new file mode 100644
-> index 000000000000..06e5846325e3
-> --- /dev/null
-> +++ b/drivers/pci/cma.c
-
-
-> +void pci_cma_init(struct pci_dev *pdev)
-> +{
-> +	struct pci_doe_mb *doe;
-> +	int rc;
-> +
-> +	if (!pci_cma_keyring) {
-> +		return;
-> +	}
-> +
-> +	if (!pci_is_pcie(pdev))
-> +		return;
-> +
-> +	doe = pci_find_doe_mailbox(pdev, PCI_VENDOR_ID_PCI_SIG,
-> +				   PCI_DOE_PROTOCOL_CMA);
-> +	if (!doe)
-> +		return;
-> +
-> +	pdev->spdm_state = spdm_create(&pdev->dev, pci_doe_transport, doe,
-> +				       PCI_DOE_MAX_PAYLOAD, pci_cma_keyring);
-> +	if (!pdev->spdm_state) {
-> +		return;
-> +	}
-
-Brackets not needed.
-
-> +
-> +	rc = spdm_authenticate(pdev->spdm_state);
-
-Hanging rc?  There is a blob in patch 10 that uses it, but odd to keep it around
-in meantime.  Perhaps just add the flag in this patch and set it even
-though no one cares about it yet.
-
-
-> +}
-> +
-> +void pci_cma_destroy(struct pci_dev *pdev)
-> +{
-> +	if (pdev->spdm_state)
-> +		spdm_destroy(pdev->spdm_state);
-> +}
-> +
-> +__init static int pci_cma_keyring_init(void)
-> +{
-> +	pci_cma_keyring = keyring_alloc(".cma", KUIDT_INIT(0), KGIDT_INIT(0),
-> +					current_cred(),
-> +					(KEY_POS_ALL & ~KEY_POS_SETATTR) |
-> +					KEY_USR_VIEW | KEY_USR_READ |
-> +					KEY_USR_WRITE | KEY_USR_SEARCH,
-> +					KEY_ALLOC_NOT_IN_QUOTA |
-> +					KEY_ALLOC_SET_KEEP, NULL, NULL);
-> +	if (IS_ERR(pci_cma_keyring)) {
-> +		pr_err("Could not allocate keyring\n");
-> +		return PTR_ERR(pci_cma_keyring);
-> +	}
-> +
-> +	return 0;
-> +}
-> +arch_initcall(pci_cma_keyring_init);
+I haven't looked asn.1 recently enough to have any confidence on
+a review of that bit...
+So, for everything except the asn.1
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
 
