@@ -2,104 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A9317B6DFB
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 18:05:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FA897B6E00
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 18:07:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbjJCQFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 12:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58520 "EHLO
+        id S240272AbjJCQHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 12:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232066AbjJCQFx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 12:05:53 -0400
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B817A9;
-        Tue,  3 Oct 2023 09:05:50 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 922B1381;
-        Tue,  3 Oct 2023 16:05:49 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 922B1381
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1696349149; bh=FJ0ABpqZ404qDATR9ZjzfiRpFdQTFHY4H48kFkpDdqE=;
-        h=From:To:Subject:In-Reply-To:References:Date:From;
-        b=ByBmQehZ9ZDltSjH06Xz6yT1qgZkCx/jKFQq5vGQMNYnUNAsWw5VRiHo0PzccGksa
-         gqlixKWWEgNhp6Y5PHM0QnX8YDksC0utj3gRWXz7g24l5PqHLfDgZqX1bgpuQjlTd/
-         0eAlHSE25aHwkynWubyn7prY+ca8QdG0XmJEXgCE5hVajN3um9Jk3zfan25A4Svpqm
-         e6bckqM5chLcb6+taKdlZEhJgBgiFn1No0MF6iM38yUXkNKfuKtdbd4GWNnuTS/+dC
-         hPSI6U9PcqlFTty4GZa5eG+hfY0iUEGivaGcfpmBY2ezucGrZ5aDp10a6JQXeFMVL0
-         pgpGyDfqQB/2g==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Costa Shulyupin <costa.shul@redhat.com>,
-        Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
-        Oliver O'Halloran <oohall@gmail.com>,
-        Linas Vepstas <linasvepstas@gmail.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        "Manoj N. Kumar" <manoj@linux.ibm.com>,
-        "Matthew R. Ochs" <mrochs@linux.ibm.com>,
-        Uma Krishnan <ukrishn@linux.ibm.com>,
-        Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Costa Shulyupin <costa.shul@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Yanteng Si <siyanteng@loongson.cn>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Nicholas Miehlbradt <nicholas@linux.ibm.com>,
-        Benjamin Gray <bgray@linux.ibm.com>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Segher Boessenkool <segher@kernel.crashing.org>,
-        Rohan McLure <rmclure@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>,
-        Sathvika Vasireddy <sv@linux.ibm.com>,
-        Laurent Dufour <laurent.dufour@fr.ibm.com>,
-        Nathan Lynch <nathanl@linux.ibm.com>,
-        Brian King <brking@linux.vnet.ibm.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-serial@vger.kernel.org
-Subject: Re: [PATCH] docs: move powerpc under arch
-In-Reply-To: <20230826165737.2101199-1-costa.shul@redhat.com>
-References: <169052340516.4355.10339828466636149348@legolas.ozlabs.org>
- <20230826165737.2101199-1-costa.shul@redhat.com>
-Date:   Tue, 03 Oct 2023 10:05:48 -0600
-Message-ID: <87cyxvelnn.fsf@meer.lwn.net>
+        with ESMTP id S239239AbjJCQHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 12:07:16 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3409FAB;
+        Tue,  3 Oct 2023 09:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696349233; x=1727885233;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wymdIEl8VVVgMijc78DcYYzoGVblxaV2STsFsGMfpf0=;
+  b=WD70Xu6mpjkvjxwRuh3sdyOcRYLY0dCZ/UxXUP2mkil5cmMDy1D3aKL4
+   2JRkvCGeeAdRqWvj6CvXL4stU9w/XGUir7wXAggW/mUhCo/IQupyoxMj2
+   Y6dyWPHgWsUT8ZeREieu6TgHr8FXvYvqxwPd603kVFOkJ6PeXc4gLPPWo
+   873iI3OC+587oDMZactzBPnEyE5iW8yBcIiM9pdQbT9E75kyMx/e5n9pv
+   WIReMUpLcHSiJtuCm4MxYE4bC3vdcGJvTvlOt+JtW44xubDgEHgdBFf9I
+   bnp+HYMFKjLuDi3xhaZs5/cqSH7vtJb4J+WcHvtH1gdrfJeekDFiflLKm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="449406312"
+X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
+   d="scan'208";a="449406312"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:07:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="700760945"
+X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
+   d="scan'208";a="700760945"
+Received: from ddiaz-mobl4.amr.corp.intel.com (HELO [10.209.57.36]) ([10.209.57.36])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 09:07:07 -0700
+Message-ID: <e7ae2b89-f2c4-e95f-342b-fcf92a2e0ae3@intel.com>
+Date:   Tue, 3 Oct 2023 09:07:06 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] arch/x86: Set XSS while handling #VC intercept for CPUID
+Content-Language: en-US
+To:     Jinank Jain <jinankjain@linux.microsoft.com>, seanjc@google.com,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, jinankjain@microsoft.com, thomas.lendacky@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     wei.liu@kernel.org, tiala@microsoft.com
+References: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Costa Shulyupin <costa.shul@redhat.com> writes:
+On 10/3/23 02:28, Jinank Jain wrote:
+...
+> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
+> index 2eabccde94fb..92350a24848c 100644
+> --- a/arch/x86/kernel/sev-shared.c
+> +++ b/arch/x86/kernel/sev-shared.c
+> @@ -880,6 +880,9 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
+>  	if (snp_cpuid_ret != -EOPNOTSUPP)
+>  		return ES_VMM_ERROR;
+>  
+> +	if (regs->ax == 0xD && regs->cx == 0x1)
+> +		ghcb_set_xss(ghcb, 0);
 
-> and fix all in-tree references.
->
-> Architecture-specific documentation is being moved into Documentation/arch/
-> as a way of cleaning up the top-level documentation directory and making
-> the docs hierarchy more closely match the source hierarchy.
->
-> Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
+The spec talks about leaf 0xD, but not the subleaf:
 
-So this patch appears to have not been picked up, and to have received
-no comments.  I'll happily carry it in docs-next, but it would be nice
-to have an ack from the powerpc folks...?
+> XSS is only required to besupplied when a request forCPUID 0000_000D
+> is made andthe guest supports the XSS MSR(0x0000_0DA0).
+Why restrict this to subleaf (regx->cx) 1?
 
-Thanks,
+Second, XCR0 is being supplied regardless of the CPUID leaf.  Why should
+XSS be restricted to 0xD while XCR0 is universally supplied?
 
-jon
+Third, why is it OK to supply a garbage (0) value?  If the GHCB field is
+required it's surely because the host *NEEDS* the value to do something.
+ Won't a garbage value potentially confuse the host?
+
