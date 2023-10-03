@@ -2,107 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CFFE7B71E6
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 21:41:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4167B71DD
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 21:37:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240947AbjJCTlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 15:41:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36422 "EHLO
+        id S240895AbjJCTh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 15:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbjJCTlR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 15:41:17 -0400
-X-Greylist: delayed 613 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 03 Oct 2023 12:41:13 PDT
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD25293;
-        Tue,  3 Oct 2023 12:41:13 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id 820FB100D9414;
-        Tue,  3 Oct 2023 21:30:58 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 2DF8042A4F9; Tue,  3 Oct 2023 21:30:58 +0200 (CEST)
-Date:   Tue, 3 Oct 2023 21:30:58 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <20231003193058.GA16417@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
- <20231003164048.0000148c@Huawei.com>
+        with ESMTP id S240785AbjJCTh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 15:37:57 -0400
+Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A522AF
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 12:37:52 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 19:37:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1696361870;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YtXaNvHngFX0IzJjRWG18vIM/JoRqgDDYQKMe9T+5DM=;
+        b=iyACOp9wXrqlmaJgyYpxZku3S64gdoFa3AQZON6MwlcUh4giHAMLkJWkwc4d0/4/xDeyY8
+        ctsx/M45mK9XfRHdMHRZiIeOXw4UkvrIo8aUjf8NaFhgD/+VqkbvCyWqZx0Y3FaibNpdLF
+        s0t20gZh9R5Vfdg1SCxuU5KbGc86Gpc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kernel test robot <lkp@intel.com>
+Cc:     kvmarm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v10 10/12] KVM: arm64: Document vCPU feature selection
+ UAPIs
+Message-ID: <ZRxtiKlKHiCBBlZE@linux.dev>
+References: <20230920183310.1163034-11-oliver.upton@linux.dev>
+ <202309271037.rM4DMYYZ-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003164048.0000148c@Huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <202309271037.rM4DMYYZ-lkp@intel.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
-> On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:
-> > At any given time, only a single entity in a physical system may have
-> > an SPDM connection to a device.  That's because the GET_VERSION request
-> > (which begins an authentication sequence) resets "the connection and all
-> > context associated with that connection" (SPDM 1.3.0 margin no 158).
-> > 
-> > Thus, when a device is passed through to a guest and the guest has
-> > authenticated it, a subsequent authentication by the host would reset
-> > the device's CMA-SPDM session behind the guest's back.
-> > 
-> > Prevent by letting the guest claim exclusive CMA ownership of the device
-> > during passthrough.  Refuse CMA reauthentication on the host as long.
-> > After passthrough has concluded, reauthenticate the device on the host.
+On Wed, Sep 27, 2023 at 10:45:34AM +0800, kernel test robot wrote:
+> Hi Oliver,
 > 
-> Is there anything stopping a PF presenting multiple CMA capable DOE
-> instances?  I'd expect them to have their own contexts if they do..
+> kernel test robot noticed the following build warnings:
 
-The spec does not seem to *explicitly* forbid a PF having multiple
-CMA-capable DOE instances, but PCIe r6.1 sec 6.31.3 says:
-"The instance of DOE used for CMA-SPDM must support ..."
+Looks like I failed to include the diff that adds the labels I'm
+referencing, which is addressed with the following:
 
-Note the singular ("The instance").  It seems to suggest that the
-spec authors assumed there's only a single DOE instance for CMA-SPDM.
 
-Could you (as an English native speaker) comment on the clarity of the
-two sentences "Prevent ... as long." above, as Ilpo objected to them?
-
-The antecedent of "Prevent" is the undesirable behaviour in the preceding
-sentence (host resets guest's SPDM connection).
-
-The antecedent of "as long" is "during passthrough" in the preceding
-sentence.
-
-Is that clear and understandable for an English native speaker or
-should I rephrase?
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 8cd91bc550bc..6068b711cdb0 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3370,6 +3370,8 @@ return indicates the attribute is implemented.  It does not necessarily
+ indicate that the attribute can be read or written in the device's
+ current state.  "addr" is ignored.
+ 
++.. _KVM_ARM_VCPU_INIT:
++
+ 4.82 KVM_ARM_VCPU_INIT
+ ----------------------
+ 
+@@ -6070,6 +6072,8 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+ interface. No error will be returned, but the resulting offset will not be
+ applied.
+ 
++.. _KVM_ARM_GET_REG_WRITABLE_MASKS:
++
+ 4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+ -------------------------------------------
+ 
+-- 
 Thanks,
-
-Lukas
+Oliver
