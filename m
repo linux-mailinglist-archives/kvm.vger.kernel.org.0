@@ -2,162 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 617C27B6420
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00B5F7B642D
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 10:31:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231266AbjJCIa1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 04:30:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58930 "EHLO
+        id S239313AbjJCIbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 04:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240591AbjJCIRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 04:17:06 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E62B1DC;
-        Tue,  3 Oct 2023 01:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=P9UQwUtX+gLOqFK5NmarCgjIZeBtBENgaGmXHWLN+/Q=; b=kLgLvz3Khu87+ZceWZ8FFN4txS
-        RZriYnGghADsEKmQVDdO5wuSbE3UDmFwNjGjVML7auiE4PgMpFCDqwrswslt8kXbwGcQZO6o7KD74
-        AAp5q95TyffMx9+kyLv6L+SX9VD2TKSRgzv2YrPqF2Q3TOa+fdb0x1uYCIp7e/kFoGeRMEHLZqSFs
-        eXgVGzmPV0aYmdMq2MoEZChFg2M8AyB/WX11JBS9prB+q84nsxsJL/4wUInOLl3NnkmAUO0lj/j+y
-        OdYV5gbCbutq5trM5xwmMrwfj77Pyd5e3H02zZ5ZDS90inOHvJLG6fJlBZK1kipKFEhRMRoUlVEgM
-        /8vI1bUg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qnaZl-00Dwrv-8l; Tue, 03 Oct 2023 08:16:17 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id E854330036C; Tue,  3 Oct 2023 10:16:16 +0200 (CEST)
-Date:   Tue, 3 Oct 2023 10:16:16 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ingo Molnar <mingo@kernel.org>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
- event
-Message-ID: <20231003081616.GE27267@noisy.programming.kicks-ass.net>
-References: <20230927033124.1226509-8-dapeng1.mi@linux.intel.com>
- <20230927113312.GD21810@noisy.programming.kicks-ass.net>
- <ZRRl6y1GL-7RM63x@google.com>
- <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com>
- <20231002115718.GB13957@noisy.programming.kicks-ass.net>
- <ZRrF38RGllA04R8o@gmail.com>
- <ZRroQg6flyGBtZTG@google.com>
- <20231002204017.GB27267@noisy.programming.kicks-ass.net>
- <ZRtmvLJFGfjcusQW@google.com>
+        with ESMTP id S239298AbjJCIbj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 04:31:39 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CB6AD;
+        Tue,  3 Oct 2023 01:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696321891; x=1727857891;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=xvRTEJgiLM4R8J7f3Dw6MhEmiMJyQfp7liKkGIGPBHQ=;
+  b=T6uvfCTCZvES4Eaz0/0jVBpbBZaJ/m8GAvwFHXlZ+TWNPCo1PI0D9Rw0
+   2vzKUfccromOazCcTIHb1c1JswynfKwYP6yozSiDWYvbOeJCiIJr91IPm
+   oOoacJaSmsZY9+r1CBp+3xbUYKkGLzy10BZT0CmzInWnMthVDzUxqRrTJ
+   /XPpnFb9TNRe7n6Db/KgAyDvA6fzIpL2jjYTlFMQvMb18YNcbmGlvLN9c
+   SY6YNqdLKLYR51p7dLWMYs87QMnTjimDLRz14x9yhGA4f0zRQVGBdnRtq
+   c1W2YoNZZZccixaOvPlBWkfugDR8L3QFOKE9L63NAgPjVt6MUEWuWLAtm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1413573"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="1413573"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="874639937"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="874639937"
+Received: from tciutacu-mobl.ger.corp.intel.com (HELO rrabie-mobl.amr.corp.intel.com) ([10.252.40.114])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:22 -0700
+Date:   Tue, 3 Oct 2023 11:31:20 +0300 (EEST)
+From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     Lukas Wunner <lukas@wunner.de>
+cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 03/12] X.509: Move certificate length retrieval into new
+ helper
+In-Reply-To: <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
+Message-ID: <76259143-d07e-e042-73a1-677094211361@linux.intel.com>
+References: <cover.1695921656.git.lukas@wunner.de> <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRtmvLJFGfjcusQW@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 02, 2023 at 05:56:28PM -0700, Sean Christopherson wrote:
-> On Mon, Oct 02, 2023, Peter Zijlstra wrote:
+On Thu, 28 Sep 2023, Lukas Wunner wrote:
 
-> > I'm not sure what you're suggesting here. It will have to save/restore
-> > all those MSRs anyway. Suppose it switches between vCPUs.
+> The upcoming in-kernel SPDM library (Security Protocol and Data Model,
+> https://www.dmtf.org/dsp/DSP0274) needs to retrieve the length from
+> ASN.1 DER-encoded X.509 certificates.
 > 
-> The "when" is what's important.   If KVM took a literal interpretation of
-> "exclude guest" for pass-through MSRs, then KVM would context switch all those
-> MSRs twice for every VM-Exit=>VM-Enter roundtrip, even when the VM-Exit isn't a
-> reschedule IRQ to schedule in a different task (or vCPU).  The overhead to save
-> all the host/guest MSRs and load all of the guest/host MSRs *twice* for every
-> VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely handled in
-> <1500 cycles, and "fastpath" exits are something like half that.  Switching all
-> the MSRs is likely 1000+ cycles, if not double that.
-
-See, you're the virt-nerd and I'm sure you know what you're talking
-about, but I have no clue :-) I didn't know there were different levels
-of vm-exit.
-
-> FWIW, the primary use case we care about is for slice-of-hardware VMs, where each
-> vCPU is pinned 1:1 with a host pCPU.
-
-I've been given to understand that vm-exit is a bad word in this
-scenario, any exit is a fail. They get MWAIT and all the other crap and
-more or less pretend to be real hardware.
-
-So why do you care about those MSRs so much? That should 'never' happen
-in this scenario.
-
-> > > Or at least, that was my reading of things.  Maybe it was just a
-> > > misunderstanding because we didn't do a good job of defining the behavior.
-> > 
-> > This might be the case. I don't particularly care where the guest
-> > boundary lies -- somewhere in the vCPU thread. Once the thread is gone,
-> > PMU is usable again etc..
+> Such code already exists in x509_load_certificate_list(), so move it
+> into a new helper for reuse by SPDM.
 > 
-> Well drat, that there would have saved a wee bit of frustration.  Better late
-> than never though, that's for sure.
+> No functional change intended.
 > 
-> Just to double confirm: keeping guest PMU state loaded until the vCPU is scheduled
-> out or KVM exits to userspace, would mean that host perf events won't be active
-> for potentially large swaths of non-KVM code.  Any function calls or event/exception
-> handlers that occur within the context of ioctl(KVM_RUN) would run with host
-> perf events disabled.
-
-Hurmph, that sounds sub-optimal, earlier you said <1500 cycles, this all
-sounds like a ton more.
-
-/me frobs around the kvm code some...
-
-Are we talking about exit_fastpath loop in vcpu_enter_guest() ? That
-seems to run with IRQs disabled, so at most you can trigger a #PF or
-something, which will then trip an exception fixup because you can't run
-#PF with IRQs disabled etc..
-
-That seems fine. That is, a theoretical kvm_x86_handle_enter_irqoff()
-coupled with the existing kvm_x86_handle_exit_irqoff() seems like
-reasonable solution from where I'm sitting. That also more or less
-matches the FPU state save/restore AFAICT.
-
-Or are you talking about the whole of vcpu_run() ? That seems like a
-massive amount of code, and doesn't look like anything I'd call a
-fast-path. Also, much of that loop has preemption enabled...
-
-> Are you ok with that approach?  Assuming we don't completely botch things, the
-> interfaces are sane, we can come up with a clean solution for handling NMIs, etc.
-
-Since you steal the whole PMU, can't you re-route the PMI to something
-that's virt friendly too?
-
-> > It also means ::exclude_guest should actually work -- it often does not
-> > today -- the IBS thing for example totally ignores it.
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  crypto/asymmetric_keys/x509_loader.c | 38 +++++++++++++++++++---------
+>  include/keys/asymmetric-type.h       |  2 ++
+>  2 files changed, 28 insertions(+), 12 deletions(-)
 > 
-> Is that already an in-tree, or are you talking about Manali's proposed series to
-> support virtualizing IBS?
+> diff --git a/crypto/asymmetric_keys/x509_loader.c b/crypto/asymmetric_keys/x509_loader.c
+> index a41741326998..121460a0de46 100644
+> --- a/crypto/asymmetric_keys/x509_loader.c
+> +++ b/crypto/asymmetric_keys/x509_loader.c
+> @@ -4,28 +4,42 @@
+>  #include <linux/key.h>
+>  #include <keys/asymmetric-type.h>
+>  
+> +int x509_get_certificate_length(const u8 *p, unsigned long buflen)
 
-The IBS code as is, it totally ignores ::exclude_guest. Manali was going
-to add some of it. But I'm not at all sure about the state of the other
-PMU drivers we have.
+Make the return type ssize_t.
 
-Just for giggles, P4 has VMX support... /me runs like crazy
+unsigned long -> size_t buflen (or perhaps ssize_t if you want to compare 
+below to have the same signedness).
+
+> +{
+> +	int plen;
+
+ssize_t
+
+> +
+> +	/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
+> +	 * than 256 bytes in size.
+> +	 */
+> +	if (buflen < 4)
+> +		return -EINVAL;
+> +
+> +	if (p[0] != 0x30 &&
+> +	    p[1] != 0x82)
+> +		return -EINVAL;
+> +
+> +	plen = (p[2] << 8) | p[3];
+> +	plen += 4;
+> +	if (plen > buflen)
+> +		return -EINVAL;
+> +
+> +	return plen;
+> +}
+> +EXPORT_SYMBOL_GPL(x509_get_certificate_length);
+> +
+>  int x509_load_certificate_list(const u8 cert_list[],
+>  			       const unsigned long list_size,
+>  			       const struct key *keyring)
+>  {
+>  	key_ref_t key;
+>  	const u8 *p, *end;
+> -	size_t plen;
+> +	int plen;
+
+ssize_t plen.
+
+-- 
+ i.
+
+>  
+>  	p = cert_list;
+>  	end = p + list_size;
+>  	while (p < end) {
+> -		/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
+> -		 * than 256 bytes in size.
+> -		 */
+> -		if (end - p < 4)
+> -			goto dodgy_cert;
+> -		if (p[0] != 0x30 &&
+> -		    p[1] != 0x82)
+> -			goto dodgy_cert;
+> -		plen = (p[2] << 8) | p[3];
+> -		plen += 4;
+> -		if (plen > end - p)
+> +		plen = x509_get_certificate_length(p, end - p);
+> +		if (plen < 0)
+>  			goto dodgy_cert;
+>  
+>  		key = key_create_or_update(make_key_ref(keyring, 1),
+> diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
+> index 69a13e1e5b2e..6705cfde25b9 100644
+> --- a/include/keys/asymmetric-type.h
+> +++ b/include/keys/asymmetric-type.h
+> @@ -84,6 +84,8 @@ extern struct key *find_asymmetric_key(struct key *keyring,
+>  				       const struct asymmetric_key_id *id_2,
+>  				       bool partial);
+>  
+> +int x509_get_certificate_length(const u8 *p, unsigned long buflen);
+> +
+>  int x509_load_certificate_list(const u8 cert_list[], const unsigned long list_size,
+>  			       const struct key *keyring);
+>  
+> 
