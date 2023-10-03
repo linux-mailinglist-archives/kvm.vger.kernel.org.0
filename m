@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14E2E7B61B3
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 08:56:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A5C47B61D5
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 08:58:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239435AbjJCG4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 02:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57034 "EHLO
+        id S239303AbjJCG5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 02:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239464AbjJCG40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 02:56:26 -0400
+        with ESMTP id S239522AbjJCG5l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 02:57:41 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCF21B2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19132AD;
         Mon,  2 Oct 2023 23:55:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1696316129; x=1727852129;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=FcZc1QeKj2isPTwOBVaGNTy+si5WeOaciLFU4yv7EQo=;
-  b=YabQmiE2rUx4dErSR37M2EqgFHIHXiG0Ka0awdSpRllK5SHyst4X/ti6
-   H5w7T0rGchpemXK3ghfDnpqkC364Jcb/62rEpV0c8Qn7O2I2+InHUarSe
-   JwcT3UJpFWUf9BPTip1QdrjfRDE7dcTi4V3W5WBDeP8SylO/k6Dm0Pwyi
-   ldBIyZdbNfIWDhLZq3Z/8QaS6bN+2gfUdiMJbxlHSZmGhV+I1e0FeyzHM
-   Uenc3iNyS/5EZ/QB8xVlaPWrYIWb5wdO09lyY73WvBWo0fwn+UMnXkU4m
-   rsNBGqzpI3MRSIXskDnvlpnIBGV8NwJ1tDhk2Uo7hgUW3wdHTmMVIW1LS
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="367858229"
+  bh=bNtEfhEic2/4eI6U3F6LZD3GtdQN7TZ08d/4AOd+L9I=;
+  b=Yi/z7nBMIQmwh6m0Mc7MSjp6xVnaZzSN2N9HdApVBXN7+GJYt5tOUB1f
+   892EA2jb/fEAdRe/MrP2c+p606IPGKwZ0jD8RP2AC728YzjtAr+3HFG71
+   WMhKimaz7a7SOfxqwpxKzmhUtfWnVVLcN5N4YD77O0uG6yfOS2VcXUQTW
+   tZ+reDa8CcAzMd/uy2DNOPEZIKehddWSu+vPi4alm7jXoQlOyJ3iZ+Wje
+   diFANd6wKgix7mtr/5gXIusL8zvrRTJcP2GWroiBqneKUoH8Wsl0/ySDJ
+   Enp8uMrVpr6aJcrE66No58N5OzebtdnA7X68swasH3WI1gDCydZTIY/Ej
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="367858241"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="367858229"
+   d="scan'208";a="367858241"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 23:54:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081900982"
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081900986"
 X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="1081900982"
+   d="scan'208";a="1081900986"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga005.fm.intel.com with ESMTP; 02 Oct 2023 23:54:47 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 02 Oct 2023 23:54:48 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
         mhiramat@kernel.org, andrew.cooper3@citrix.com,
         jiangshanlai@gmail.com, nik.borisov@suse.com
-Subject: [PATCH v12 26/37] x86/fred: Add a NMI entry stub for FRED
-Date:   Mon,  2 Oct 2023 23:24:47 -0700
-Message-Id: <20231003062458.23552-27-xin3.li@intel.com>
+Subject: [PATCH v12 27/37] x86/fred: Add a machine check entry stub for FRED
+Date:   Mon,  2 Oct 2023 23:24:48 -0700
+Message-Id: <20231003062458.23552-28-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231003062458.23552-1-xin3.li@intel.com>
 References: <20231003062458.23552-1-xin3.li@intel.com>
@@ -66,67 +66,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+Like #DB, when occurred on different ring level, i.e., from user or kernel
+context, #MCE needs to be handled on different stack: User #MCE on current
+task stack, while kernel #MCE on a dedicated stack.
 
-On a FRED system, NMIs nest both with themselves and faults, transient
-information is saved into the stack frame, and NMI unblocking only
-happens when the stack frame indicates that so should happen.
+This is exactly how FRED event delivery invokes an exception handler: ring
+3 event on level 0 stack, i.e., current task stack; ring 0 event on the
+#MCE dedicated stack specified in the IA32_FRED_STKLVLS MSR. So unlike IDT,
+the FRED machine check entry stub doesn't do stack switch.
 
-Thus, the NMI entry stub for FRED is really quite small...
-
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/nmi.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
 
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index a0c551846b35..58843fdf5cd0 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -34,6 +34,7 @@
- #include <asm/cache.h>
- #include <asm/nospec-branch.h>
- #include <asm/sev.h>
+Changes since v5:
+* Disallow #DB inside #MCE for robustness sake (Peter Zijlstra).
+---
+ arch/x86/kernel/cpu/mce/core.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/arch/x86/kernel/cpu/mce/core.c b/arch/x86/kernel/cpu/mce/core.c
+index 6f35f724cc14..da0a4a102afe 100644
+--- a/arch/x86/kernel/cpu/mce/core.c
++++ b/arch/x86/kernel/cpu/mce/core.c
+@@ -52,6 +52,7 @@
+ #include <asm/mce.h>
+ #include <asm/msr.h>
+ #include <asm/reboot.h>
 +#include <asm/fred.h>
  
- #define CREATE_TRACE_POINTS
- #include <trace/events/nmi.h>
-@@ -643,6 +644,33 @@ void nmi_backtrace_stall_check(const struct cpumask *btp)
+ #include "internal.h"
  
- #endif
- 
+@@ -2144,6 +2145,31 @@ DEFINE_IDTENTRY_MCE_USER(exc_machine_check)
+ 	exc_machine_check_user(regs);
+ 	local_db_restore(dr7);
+ }
++
 +#ifdef CONFIG_X86_FRED
 +/*
-+ * With FRED, CR2/DR6 is pushed to #PF/#DB stack frame during FRED
-+ * event delivery, i.e., there is no problem of transient states.
-+ * And NMI unblocking only happens when the stack frame indicates
-+ * that so should happen.
++ * When occurred on different ring level, i.e., from user or kernel
++ * context, #MCE needs to be handled on different stack: User #MCE
++ * on current task stack, while kernel #MCE on a dedicated stack.
 + *
-+ * Thus, the NMI entry stub for FRED is really straightforward and
-+ * as simple as most exception handlers. As such, #DB is allowed
-+ * during NMI handling.
++ * This is exactly how FRED event delivery invokes an exception
++ * handler: ring 3 event on level 0 stack, i.e., current task stack;
++ * ring 0 event on the #MCE dedicated stack specified in the
++ * IA32_FRED_STKLVLS MSR. So unlike IDT, the FRED machine check entry
++ * stub doesn't do stack switch.
 + */
-+DEFINE_FREDENTRY_NMI(exc_nmi)
++DEFINE_FREDENTRY_MCE(exc_machine_check)
 +{
-+	irqentry_state_t irq_state;
++	unsigned long dr7;
 +
-+	if (IS_ENABLED(CONFIG_SMP) && arch_cpu_is_offline(smp_processor_id()))
-+		return;
-+
-+	irq_state = irqentry_nmi_enter(regs);
-+
-+	inc_irq_stat(__nmi_count);
-+	default_do_nmi(regs);
-+
-+	irqentry_nmi_exit(regs, irq_state);
++	dr7 = local_db_save();
++	if (user_mode(regs))
++		exc_machine_check_user(regs);
++	else
++		exc_machine_check_kernel(regs);
++	local_db_restore(dr7);
 +}
 +#endif
-+
- void stop_nmi(void)
- {
- 	ignore_nmis++;
+ #else
+ /* 32bit unified entry point */
+ DEFINE_IDTENTRY_RAW(exc_machine_check)
 -- 
 2.34.1
 
