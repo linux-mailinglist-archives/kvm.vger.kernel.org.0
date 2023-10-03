@@ -2,265 +2,409 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F0EF7B70F8
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:33:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 034377B71B7
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 21:27:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240800AbjJCSdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 14:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
+        id S232045AbjJCT1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 15:27:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240790AbjJCSdw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 14:33:52 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45594B4
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 11:33:48 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-65b0e623189so7123996d6.1
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 11:33:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696358027; x=1696962827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
-        b=eRtKp9K05iEcq6czK8WWvk3WTZ++XgFDyLqcu6+1oX0ugzs8SjqUerdeOsn8Jn+S+a
-         Rpy8LEd552jIM6/9NM7DAXHJHLHqrqEU9NkfUoEkAJsUCI4BBoOpbhMm2G1dEj63V9fv
-         /GYqc7rk7Ox2I814AlsLCgXMhhIGZ3uN5dkK/9Njfh/kuHoBPue1SCkb//S7UQQjvIwm
-         3dkBcWU5wQzUGxI2n4IsVN3KFkCvOu5/a7L0L1DgESfayIvlDgdBurP8CVKwG/KPWgtd
-         vToJJ9OFs+FK9KcJByAuVo/wM10OAXozd8GmN+xOsbcI+ovtuuCBE965+d1yFEMfZ+LE
-         LSFw==
+        with ESMTP id S230239AbjJCT1U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 15:27:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B35593
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 12:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696361195;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zmvac0+nCBspSOw72OLLM3jxa5W06zS7d4a2x39A/5Y=;
+        b=ciQP45hiZ//wI88Tl5j9Gbx7UVJ9I/IuyZAVUP5DtspBgROqucetorLItyumm8bejbPwTs
+        AiTZbAInm5nRrN7zbkHqq5h3Qpj39qNR9erfxEWqNyryTwlPfShScX6Ucizf4PoQgC5huE
+        Ax7fxda98orUmiR40atPQzDIKrpu/sw=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583-7Qq0jnv6NtSqe5uUBVaNRA-1; Tue, 03 Oct 2023 15:26:34 -0400
+X-MC-Unique: 7Qq0jnv6NtSqe5uUBVaNRA-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3516579e7f7so8462705ab.3
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 12:26:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696358027; x=1696962827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1696361193; x=1696965993;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
-        b=QEDPOoVtTqZEcL+sX//JXPCOwcpEyggoMFi5c1hc5mVG9fO/Q9FetetIrzQn2ZlHWE
-         Z1GS9QQyrN5bCdQDFzeW3qcSQ2P18pHdu+/F+IYjP6C7y0+3RE8QcfOGle766SJPXluV
-         UmiXyZJdMeu06LyGeVHNWFujJXNdkL093Xsj2akkz6s+8kUoejR8F085befnl0QWdcT/
-         L+0Tga2HkgnB75LzowFIAfpu1pYtZOzSqjD4rFZM8I4gBz5IZ4DL1y7/o3IzxQkkYmqQ
-         GbK97C+k5PKvP9EheOYvean+CYTPfeH/dKuYFe/s6pOzq2jmLxxQ8s1hKDfsjDBeAMxh
-         YtSA==
-X-Gm-Message-State: AOJu0YzYDqsngXPNv1zJrwAMNfPpFQksj3qedhyO/44JZXz91xxucfp1
-        6XJun8iFavPNTSCSbZ3ZsKwmu+BL/17TDa7Lg77W0w==
-X-Google-Smtp-Source: AGHT+IFD9MiWpIrPl+X1KG+mF8SaIxZsGnEuN1WGAxrVYz5JoBkTLtzwKfCvY0TUsCLlDtWXvgqIVLrhKrhnAnrWPa0=
-X-Received: by 2002:a0c:c409:0:b0:64f:3699:90cd with SMTP id
- r9-20020a0cc409000000b0064f369990cdmr170157qvi.42.1696358027177; Tue, 03 Oct
- 2023 11:33:47 -0700 (PDT)
+        bh=zmvac0+nCBspSOw72OLLM3jxa5W06zS7d4a2x39A/5Y=;
+        b=SGNLDAAlk3cJj0mbXNUHpi0LYvJhTctD/YwCQ3uNC0sAJp/QScaU8S20frjUWC3DTI
+         F52fhutLZtgT9QeQ2mPj5qqFFT2iw1Sa1MdtZytrIcXpaA9zwfuidtg5KrOc80ur7tdD
+         cXcLUxa1qm84Hc3enw1xOse1H6dr8Awaqg541V9i9MHbIo4Edwe7PXrcwoZc74hFuOT4
+         If/4TWfLSN6N/FrqSH5nOvVwHRpcAp0Bl26F+zTLKlSs0qbVssukEc6VJPkbSo3fzmDP
+         wYiCv3coTREH8xzh654whUzyCoWZRZhP765Zkz018krCj7Cy61djta7G0vMACj294/NX
+         5ENQ==
+X-Gm-Message-State: AOJu0YycyccelD9DwvdSOZcv/tPdq2q6p/+PUiYkRqqsv6dVl3Ig/R5d
+        bq73lxHtwnBuJtZNy4Lee2L6/gr2eoTZPbK3yZ0tomvaCG9VyNv6so0wg+7jNkgD5xyuSmsnV9/
+        Bh32o/H43B1L+
+X-Received: by 2002:a6b:7841:0:b0:79f:e99b:474a with SMTP id h1-20020a6b7841000000b0079fe99b474amr374158iop.18.1696361193570;
+        Tue, 03 Oct 2023 12:26:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFw5GOJ9DdPDIPQA+j2UtS4Rl3tEFK+LobJ6u7UTXBKHUJ0p795hvu0/5xmKkl6+KoH9oNqng==
+X-Received: by 2002:a6b:7841:0:b0:79f:e99b:474a with SMTP id h1-20020a6b7841000000b0079fe99b474amr374144iop.18.1696361193234;
+        Tue, 03 Oct 2023 12:26:33 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id g5-20020a0566380bc500b0042b6f103e62sm494092jad.133.2023.10.03.12.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 12:26:32 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 13:26:30 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     liulongfang <liulongfang@huawei.com>
+Cc:     <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <jonathan.cameron@huawei.com>, <bcreeley@amd.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linuxarm@openeuler.org>
+Subject: Re: [PATCH v16 1/2] vfio/migration: Add debugfs to live migration
+ driver
+Message-ID: <20231003132630.764d9488.alex.williamson@redhat.com>
+In-Reply-To: <20230926093356.56014-2-liulongfang@huawei.com>
+References: <20230926093356.56014-1-liulongfang@huawei.com>
+        <20230926093356.56014-2-liulongfang@huawei.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
- <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com> <ZRw6X2BptZnRPNK7@google.com>
-In-Reply-To: <ZRw6X2BptZnRPNK7@google.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Tue, 3 Oct 2023 19:33:09 +0100
-Message-ID: <CA+EHjTzx+0pxh7DYONZUeJsm1GCiC6L8Vg_Tm9MLVEae-FKuQg@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Tue, 26 Sep 2023 17:33:55 +0800
+liulongfang <liulongfang@huawei.com> wrote:
+
+> From: Longfang Liu <liulongfang@huawei.com>
+> 
+> There are multiple devices, software and operational steps involved
+> in the process of live migration. An error occurred on any node may
+> cause the live migration operation to fail.
+> This complex process makes it very difficult to locate and analyze
+> the cause when the function fails.
+> 
+> In order to quickly locate the cause of the problem when the
+> live migration fails, I added a set of debugfs to the vfio
+> live migration driver.
+> 
+>     +-------------------------------------------+
+>     |                                           |
+>     |                                           |
+>     |                  QEMU                     |
+>     |                                           |
+>     |                                           |
+>     +---+----------------------------+----------+
+>         |      ^                     |      ^
+>         |      |                     |      |
+>         |      |                     |      |
+>         v      |                     v      |
+>      +---------+--+               +---------+--+
+>      |src vfio_dev|               |dst vfio_dev|
+>      +--+---------+               +--+---------+
+>         |      ^                     |      ^
+>         |      |                     |      |
+>         v      |                     |      |
+>    +-----------+----+           +-----------+----+
+>    |src dev debugfs |           |dst dev debugfs |
+>    +----------------+           +----------------+
+> 
+> The entire debugfs directory will be based on the definition of
+> the CONFIG_DEBUG_FS macro. If this macro is not enabled, the
+> interfaces in vfio.h will be empty definitions, and the creation
+> and initialization of the debugfs directory will not be executed.
+> 
+>    vfio
+>     |
+>     +---<dev_name1>
+>     |    +---migration
+>     |        +--state
+>     |
+>     +---<dev_name2>
+>          +---migration
+>              +--state
+> 
+> debugfs will create a public root directory "vfio" file.
+> then create a dev_name() file for each live migration device.
+> First, create a unified state acquisition file of "migration"
+> in this device directory.
+> Then, create a public live migration state lookup file "state"
+> Finally, create a directory file based on the device type,
+> and then create the device's own debugging files under
+> this directory file.
+
+We don't actually do the thing claimed in this last statement.
+ 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>  drivers/vfio/Makefile       |  1 +
+>  drivers/vfio/vfio.h         | 14 ++++++
+>  drivers/vfio/vfio_debugfs.c | 87 +++++++++++++++++++++++++++++++++++++
+>  drivers/vfio/vfio_main.c    | 14 +++++-
+>  include/linux/vfio.h        |  7 +++
+>  5 files changed, 121 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/vfio/vfio_debugfs.c
+> 
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index c82ea032d352..7934ac829989 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -8,6 +8,7 @@ vfio-$(CONFIG_VFIO_GROUP) += group.o
+>  vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>  vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>  vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+> +vfio-$(CONFIG_DEBUG_FS) += vfio_debugfs.o
+
+I see that other subsystems create Kconfig entries allowing more fine
+grained control of DEBUGFS support.  Wouldn't it make sense to have a
+VFIO_DEBUGFS config option, similar to IOMMU_DEBUGFS?
+
+Also, with our trend towards less redundant file naming, this could
+just be debugfs.[co].
+
+>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 307e3f29b527..09b00757d0bb 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -448,4 +448,18 @@ static inline void vfio_device_put_kvm(struct vfio_device *device)
+>  }
+>  #endif
+>  
+> +#ifdef CONFIG_DEBUG_FS
+> +void vfio_debugfs_create_root(void);
+> +void vfio_debugfs_remove_root(void);
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev);
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev);
+> +#else
+> +static inline void vfio_debugfs_create_root(void) { }
+> +static inline void vfio_debugfs_remove_root(void) { }
+> +
+> +static inline void vfio_device_debugfs_init(struct vfio_device *vdev) { }
+> +static inline void vfio_device_debugfs_exit(struct vfio_device *vdev) { }
+> +#endif /* CONFIG_DEBUG_FS */
+> +
+>  #endif
+> diff --git a/drivers/vfio/vfio_debugfs.c b/drivers/vfio/vfio_debugfs.c
+> new file mode 100644
+> index 000000000000..b79bdef08357
+> --- /dev/null
+> +++ b/drivers/vfio/vfio_debugfs.c
+> @@ -0,0 +1,87 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023, HiSilicon Ltd.
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <linux/debugfs.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/vfio.h>
+> +#include "vfio.h"
+> +
+> +static struct dentry *vfio_debugfs_root;
+> +
+> +static int vfio_device_state_read(struct seq_file *seq, void *data)
+> +{
+> +	struct device *vf_dev = seq->private;
+> +	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
+> +	enum vfio_device_mig_state state;
+> +	int ret;
+> +
+> +	ret = vdev->mig_ops->migration_get_state(vdev, &state);
+> +	if (ret)
+> +		return -EINVAL;
+> +
+> +	switch (state) {
+> +	case VFIO_DEVICE_STATE_STOP:
+> +		seq_printf(seq, "%s\n", "STOP");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING:
+> +		seq_printf(seq, "%s\n", "RUNNING");
+> +		break;
+> +	case VFIO_DEVICE_STATE_STOP_COPY:
+> +		seq_printf(seq, "%s\n", "STOP_COPY");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RESUMING:
+> +		seq_printf(seq, "%s\n", "RESUMING");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+> +		seq_printf(seq, "%s\n", "RUNNING_P2P");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY:
+> +		seq_printf(seq, "%s\n", "PRE_COPY");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY_P2P:
+> +		seq_printf(seq, "%s\n", "PRE_COPY_P2P");
+> +		break;
+> +	case VFIO_DEVICE_STATE_ERROR:
+             ^^^^^^^^^^^^^^^^^^^^^^^
+
+> +		seq_printf(seq, "%s\n", "ERROR");
+> +		break;
+> +	default:
+> +		seq_printf(seq, "%s\n", "Invalid");
+> +	}
+
+Not exactly in the order they're defined:
+
+enum vfio_device_mig_state {
+        VFIO_DEVICE_STATE_ERROR = 0,
+        ^^^^^^^^^^^^^^^^^^^^^^^
+        VFIO_DEVICE_STATE_STOP = 1,
+        VFIO_DEVICE_STATE_RUNNING = 2,
+	...
+
+I also suggested last time some means to keep this in sync with the set
+of states defined.  Maybe there are better suggestions, but one way to
+do that could be:
+
+diff --git a/drivers/vfio/vfio_debugfs.c b/drivers/vfio/vfio_debugfs.c
+index ee6b1831b3e5..1ec90b90d150 100644
+--- a/drivers/vfio/vfio_debugfs.c
++++ b/drivers/vfio/vfio_debugfs.c
+@@ -18,6 +18,9 @@ static int vfio_device_state_read(struct seq_file *seq, void *data)
+        enum vfio_device_mig_state state;
+        int ret;
+ 
++       BUILD_BUG_ON(VFIO_DEVICE_STATE_NR !=
++                    VFIO_DEVICE_STATE_PRE_COPY_P2P + 1);
++
+        ret = vdev->mig_ops->migration_get_state(vdev, &state);
+        if (ret)
+                return -EINVAL;
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 7f5fb010226d..2b68e6cdf190 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -1219,6 +1219,7 @@ enum vfio_device_mig_state {
+        VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+        VFIO_DEVICE_STATE_PRE_COPY = 6,
+        VFIO_DEVICE_STATE_PRE_COPY_P2P = 7,
++       VFIO_DEVICE_STATE_NR,
+ };
+ 
+ /**
+
+Thanks,
+Alex
 
 
-On Tue, Oct 3, 2023 at 4:59=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Tue, Oct 03, 2023, Fuad Tabba wrote:
-> > Hi,
-> >
-> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > index d2d913acf0df..f8642ff2eb9d 100644
-> > > --- a/include/uapi/linux/kvm.h
-> > > +++ b/include/uapi/linux/kvm.h
-> > > @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
-> > >  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
-> > >  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
-> > >  #define KVM_CAP_USER_MEMORY2 230
-> > > +#define KVM_CAP_MEMORY_ATTRIBUTES 231
-> > >
-> > >  #ifdef KVM_CAP_IRQ_ROUTING
-> > >
-> > > @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
-> > >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
-> > >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
-> > >
-> > > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-> > > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __=
-u64)
-> > > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, st=
-ruct kvm_memory_attributes)
-> > > +
-> > > +struct kvm_memory_attributes {
-> > > +       __u64 address;
-> > > +       __u64 size;
-> > > +       __u64 attributes;
-> > > +       __u64 flags;
-> > > +};
-> > > +
-> > > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> > > +
-> >
-> > In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SHARED
-> > attributes from userspace.
->
-> Why not?  The whole thing falls apart if userspace doesn't *know* the sta=
-te of a
-> page, and the only way for userspace to know the state of a page at a giv=
-en moment
-> in time is if userspace controls the attributes.  E.g. even if KVM were t=
-o provide
-> a way for userspace to query attributes, the attributes exposed to usrspa=
-ce would
-> become stale the instant KVM drops slots_lock (or whatever lock protects =
-the attributes)
-> since userspace couldn't prevent future changes.
+> +
+> +	return 0;
+> +}
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev)
+> +{
+> +	struct device *dev = &vdev->device;
+> +
+> +	vdev->debug_root = debugfs_create_dir(dev_name(vdev->dev), vfio_debugfs_root);
+> +
+> +	if (vdev->mig_ops) {
+> +		struct dentry *vfio_dev_migration = NULL;
+> +
+> +		vfio_dev_migration = debugfs_create_dir("migration", vdev->debug_root);
+> +		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+> +					  vfio_device_state_read);
+> +	}
+> +}
+> +
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev)
+> +{
+> +	debugfs_remove_recursive(vdev->debug_root);
+> +}
+> +
+> +void vfio_debugfs_create_root(void)
+> +{
+> +	vfio_debugfs_root = debugfs_create_dir("vfio", NULL);
+> +}
+> +
+> +void vfio_debugfs_remove_root(void)
+> +{
+> +	debugfs_remove_recursive(vfio_debugfs_root);
+> +	vfio_debugfs_root = NULL;
+> +}
+> +
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index cfad824d9aa2..4e3ced20d2d1 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -309,7 +309,6 @@ static int __vfio_register_dev(struct vfio_device *device,
+>  
+>  	/* Refcounting can't start until the driver calls register */
+>  	refcount_set(&device->refcount, 1);
+> -
+>  	vfio_device_group_register(device);
+>  
+>  	return 0;
+> @@ -320,7 +319,15 @@ static int __vfio_register_dev(struct vfio_device *device,
+>  
+>  int vfio_register_group_dev(struct vfio_device *device)
+>  {
+> -	return __vfio_register_dev(device, VFIO_IOMMU);
+> +	int ret;
+> +
+> +	ret = __vfio_register_dev(device, VFIO_IOMMU);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vfio_device_debugfs_init(device);
+> +
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_register_group_dev);
+>  
+> @@ -378,6 +385,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>  		}
+>  	}
+>  
+> +	vfio_device_debugfs_exit(device);
+>  	/* Balances vfio_device_set_group in register path */
+>  	vfio_device_remove_group(device);
+>  }
+> @@ -1662,6 +1670,7 @@ static int __init vfio_init(void)
+>  	if (ret)
+>  		goto err_alloc_dev_chrdev;
+>  
+> +	vfio_debugfs_create_root();
+>  	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>  	return 0;
+>  
+> @@ -1677,6 +1686,7 @@ static int __init vfio_init(void)
+>  
+>  static void __exit vfio_cleanup(void)
+>  {
+> +	vfio_debugfs_remove_root();
+>  	ida_destroy(&vfio.device_ida);
+>  	vfio_cdev_cleanup();
+>  	class_destroy(vfio.device_class);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 454e9295970c..769d7af86225 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -69,6 +69,13 @@ struct vfio_device {
+>  	u8 iommufd_attached:1;
+>  #endif
+>  	u8 cdev_opened:1;
+> +#ifdef CONFIG_DEBUG_FS
+> +	/*
+> +	 * debug_root is a static property of the vfio_device
+> +	 * which must be set prior to registering the vfio_device.
+> +	 */
+> +	struct dentry *debug_root;
+> +#endif
+>  };
+>  
+>  /**
 
-I think I might not quite understand the purpose of the
-KVM_SET_MEMORY_ATTRIBUTES ABI. In pKVM, all of a protected guest's
-memory is private by default, until the guest shares it with the host
-(via a hypercall), or another guest (future work). When the guest
-shares it, userspace is notified via KVM_EXIT_HYPERCALL. In many use
-cases, userspace doesn't need to keep track directly of all of this,
-but can reactively un/map the memory being un/shared.
-
-> Why does pKVM need to prevent userspace from stating *its* view of attrib=
-utes?
->
-> If the goal is to reduce memory overhead, that can be solved by using an =
-internal,
-> non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  If t=
-he guest
-> attempts to access memory where pKVM and userspace don't agree on the sta=
-te,
-> generate an exit to userspace.  Or kill the guest.  Or do something else =
-entirely.
-
-For the pKVM hypervisor the guest's view of the attributes doesn't
-matter. The hypervisor at the end of the day is the ultimate arbiter
-for what is shared and with how. For pKVM (at least in my port of
-guestmem), we use the memory attributes from guestmem essentially to
-control which memory can be mapped by the host.
-
-One difference between pKVM and TDX (as I understand it), is that TDX
-uses the msb of the guest's IPA to indicate whether memory is shared
-or private, and that can generate a mismatch on guest memory access
-between what it thinks the state is, and what the sharing state in
-reality is. pKVM doesn't have that. Memory is private by default, and
-can be shared in-place, both in the guest's IPA space as well as the
-underlying physical page.
-
-> > However, we'd like to use the attributes xarray to track the sharing st=
-ate of
-> > guest pages at the host kernel.
-> >
-> > Moreover, we'd rather the default guest page state be PRIVATE, and
-> > only specify which pages are shared. All pKVM guest pages start off as
-> > private, and the majority will remain so.
->
-> I would rather optimize kvm_vm_set_mem_attributes() to generate range-bas=
-ed
-> xarray entries, at which point it shouldn't matter all that much whether =
-PRIVATE
-> or SHARED is the default "empty" state.  We opted not to do that for the =
-initial
-> merge purely to keep the code as simple as possible (which is obviously s=
-till not
-> exactly simple).
->
-> With range-based xarray entries, the cost of tagging huge chunks of memor=
-y as
-> PRIVATE should be a non-issue.  And if that's not enough for whatever rea=
-son, I
-> would rather define the polarity of PRIVATE on a per-VM basis, but only f=
-or internal
-> storage.
-
-Sounds good.
-
-> > I'm not sure if this is the best way to do this: One idea would be to m=
-ove
-> > the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
-> > arch/*/include/asm/kvm_host.h, which is where kvm_arch_supported_attrib=
-utes()
-> > lives as well. This would allow different architectures to specify thei=
-r own
-> > attributes (i.e., instead we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for p=
-KVM).
-> > This wouldn't help in terms of preventing userspace from clearing attri=
-butes
-> > (i.e., setting a 0 attribute) though.
-> >
-> > The other thing, which we need for pKVM anyway, is to make
-> > kvm_vm_set_mem_attributes() global, so that it can be called from outsi=
-de of
-> > kvm_main.c (already have a local patch for this that declares it in
-> > kvm_host.h),
->
-> That's no problem, but I am definitely opposed to KVM modifying attribute=
-s that
-> are owned by userspace.
->
-> > and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
->
-> As above, I am opposed to pKVM having a completely different ABI for mana=
-ging
-> PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flags in=
- the
-> attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES does=
-n't work
-> for pKVM, then we've failed miserably and should revist the uAPI.
-
-Like I said, pKVM doesn't need a userspace ABI for managing
-PRIVATE/SHARED, just a way of tracking in the host kernel of what is
-shared (as opposed to the hypervisor, which already has the
-knowledge). The solution could simply be that pKVM does not enable
-KVM_GENERIC_MEMORY_ATTRIBUTES, has its own tracking of the status of
-the guest pages, and only selects KVM_PRIVATE_MEM.
-
-Thanks!
-/fuad
