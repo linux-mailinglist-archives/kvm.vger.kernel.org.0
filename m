@@ -2,180 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 783867B70CB
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F0EF7B70F8
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 20:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240780AbjJCS1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 14:27:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
+        id S240800AbjJCSdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 14:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240779AbjJCS1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 14:27:36 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20612BB;
-        Tue,  3 Oct 2023 11:27:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CTCHEqSu3RPfv9mstYrkBQIoGjd/kxJOjTgIMe2nDEJb15MBPBGw1sQjytLx12+p7qwmgr2Uynd7kZGw14SJNVM1+a0ysDeFkUxjLfgmP3HZkD1b7PrnZFTBIEZ6x7Crij6XR2OoVCIMU8TuPZNTd1FnBMOsQm/5DMU/LCdNkWDHkFtMpyr6BTzqN5aW14++c5YG7+ail7F7btV25JPWHAgwYqMhrFeKdT7/VmYtIPIO/Cw2dDMAf23v3Lu2Sm5SApuAzLJ5rmaLzzJ7Y4v88kX4TmyERvQ5IprvmD9o84LVDA1ircTTafvwNlSzxQ+Pt+P9XZarHIYxR1cdGQcVng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nl3/eyEKlta8WpveTOZZmzYEJsusCJI1gqdrxd7kOlE=;
- b=IRqOSQzpCHT/7KWVo5Tt8QQCF7RV6qlb3JaA9M4MNl8qDhODrZwUXxb7FJToi5CUE2f2hY0aMrXXHe0lwNapeoZpjnBD/kWEE7hPFW713lfkfFwfbvA8SIyGkyCw1kswzfc5Q1EJsHeJ9+bjJY3KwyVERckmvDZwGVRmbmqiqUPY+f5Il4ZDMJ+QpjLzjRxivZbcvQ6w9TL1Zq0tC/zFH7YNGbduMhhaY+WxrK5gaVNgLxbiXgi6iuJAynNfoTdHRKDAPOVNtarDyoa4EC6P6JHY/+8FVssz5nUPvk0KPf3tPv4mq4NKG3oKYCM5WIIQQGlQyKOlqamWz9RHqBNiqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nl3/eyEKlta8WpveTOZZmzYEJsusCJI1gqdrxd7kOlE=;
- b=QmrKBvLzHFnzCe46Mql0V0GRA/0Aqkh2vJchYRMB1RK7CbfGDIsVwQi0GGa+PIQ1qyUeAd1kFfUrBxT3k2OFZXJPGgYT0dIu9ODRrsCM0IP96G/fRWJOZnkr7lxaQ4PHjrC9R/S6KEWqfElAXS+zuZIYtXQ/xlw3FvwYmp3TjJY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by SJ0PR12MB6928.namprd12.prod.outlook.com (2603:10b6:a03:47a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Tue, 3 Oct
- 2023 18:27:27 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::2b54:7ddf:9e2e:751c]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::2b54:7ddf:9e2e:751c%3]) with mapi id 15.20.6838.033; Tue, 3 Oct 2023
- 18:27:24 +0000
-Message-ID: <a16814ee-28e8-d240-d672-8f9511b832cb@amd.com>
-Date:   Tue, 3 Oct 2023 13:27:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] arch/x86: Set XSS while handling #VC intercept for CPUID
-Content-Language: en-US
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Jinank Jain <jinankjain@linux.microsoft.com>,
-        seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, jinankjain@microsoft.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     wei.liu@kernel.org, tiala@microsoft.com
-References: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
- <e7ae2b89-f2c4-e95f-342b-fcf92a2e0ae3@intel.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <e7ae2b89-f2c4-e95f-342b-fcf92a2e0ae3@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0036.namprd13.prod.outlook.com
- (2603:10b6:806:22::11) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S240790AbjJCSdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 14:33:52 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45594B4
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 11:33:48 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-65b0e623189so7123996d6.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 11:33:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696358027; x=1696962827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
+        b=eRtKp9K05iEcq6czK8WWvk3WTZ++XgFDyLqcu6+1oX0ugzs8SjqUerdeOsn8Jn+S+a
+         Rpy8LEd552jIM6/9NM7DAXHJHLHqrqEU9NkfUoEkAJsUCI4BBoOpbhMm2G1dEj63V9fv
+         /GYqc7rk7Ox2I814AlsLCgXMhhIGZ3uN5dkK/9Njfh/kuHoBPue1SCkb//S7UQQjvIwm
+         3dkBcWU5wQzUGxI2n4IsVN3KFkCvOu5/a7L0L1DgESfayIvlDgdBurP8CVKwG/KPWgtd
+         vToJJ9OFs+FK9KcJByAuVo/wM10OAXozd8GmN+xOsbcI+ovtuuCBE965+d1yFEMfZ+LE
+         LSFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696358027; x=1696962827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R9RZg3twPdN7SJarZ/3IsJk/93o/jgnrY3ylxDmEVWY=;
+        b=QEDPOoVtTqZEcL+sX//JXPCOwcpEyggoMFi5c1hc5mVG9fO/Q9FetetIrzQn2ZlHWE
+         Z1GS9QQyrN5bCdQDFzeW3qcSQ2P18pHdu+/F+IYjP6C7y0+3RE8QcfOGle766SJPXluV
+         UmiXyZJdMeu06LyGeVHNWFujJXNdkL093Xsj2akkz6s+8kUoejR8F085befnl0QWdcT/
+         L+0Tga2HkgnB75LzowFIAfpu1pYtZOzSqjD4rFZM8I4gBz5IZ4DL1y7/o3IzxQkkYmqQ
+         GbK97C+k5PKvP9EheOYvean+CYTPfeH/dKuYFe/s6pOzq2jmLxxQ8s1hKDfsjDBeAMxh
+         YtSA==
+X-Gm-Message-State: AOJu0YzYDqsngXPNv1zJrwAMNfPpFQksj3qedhyO/44JZXz91xxucfp1
+        6XJun8iFavPNTSCSbZ3ZsKwmu+BL/17TDa7Lg77W0w==
+X-Google-Smtp-Source: AGHT+IFD9MiWpIrPl+X1KG+mF8SaIxZsGnEuN1WGAxrVYz5JoBkTLtzwKfCvY0TUsCLlDtWXvgqIVLrhKrhnAnrWPa0=
+X-Received: by 2002:a0c:c409:0:b0:64f:3699:90cd with SMTP id
+ r9-20020a0cc409000000b0064f369990cdmr170157qvi.42.1696358027177; Tue, 03 Oct
+ 2023 11:33:47 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SJ0PR12MB6928:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87553730-b2a5-4a8b-61f5-08dbc43e63dc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6fntcTkXwntc5pIBKaVwKcC4QESgZhK31pFX+aNUU5KqoARwomD/Kl8/1OILJf1SaIZWT3SAZjfqWx4c82jlXbgRGyP7PxquVWAcnFOMkacUSGLMov+b/XGngXqVsIC0UaaawSJj69Phqs9/OqA0Smnc/usiulZqcmVcR14SvTr0TnbVOMgxZf8Qpgy7Q85MO9XopR/TH33J0Oj0Lj4dblZcYhHZNYrdiRbym+aLJ54pcxthO5hfezfl/pOcP/GOrBpg/jFwfEfAm+hGjUDVuAqvt8fQ13dG4VktlNhceo84Y3CW9qBAuEWc/gXkeAc9hWIM4qpb3dBzcG6yM2y1lGlOevMGL1ZZd865BLsjzDdMam0eQitJXVMO/sKoNH3ncQ+vwUxCOLOTulXIFACkiB6C1PxIQ+47y7oa4kHfM7QcEJ3+Kb/oXcbUjoXBaJoPMYqzADB9gvAeygul314WiSS06GLOj1DGfDqpGQ4/4qjPQI15vC0IzKucKBBLar01c+2cLSKjvuJ88CUnY17iPgfRS5iY+Gc3QJMS3D1YOiVKbg8Wsu5JfY4MTF2lYJha0upivd3JjF39alERCo+SXhCIhEz9eHbPwCq1KeizIN8LdPeg8V77ThzRHYb+d6B9pTZ0VZoKDGS1Mw/R/0B5QZEynP7UIFCmNboHWzfjsU0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(39860400002)(346002)(376002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(2906002)(83380400001)(66899024)(7416002)(31696002)(86362001)(36756003)(921005)(38100700002)(316002)(53546011)(66946007)(66476007)(66556008)(6512007)(6506007)(110136005)(41300700001)(2616005)(6486002)(478600001)(31686004)(4326008)(8676002)(5660300002)(26005)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THR1d3k5UlBVUWNOWDZ3T04wa1JkbmNLZDdWaFNQdFlmM1dIQzFUOG0zQ1RD?=
- =?utf-8?B?eklyYXlPQ3ZhQ1lPQkZhNUxHbjgzVVR0dThTNmpTS2tQa251K0piUGsyYzUv?=
- =?utf-8?B?RGo4NVcyMEdPa2I4T2RsY3JWemtabHh1UTlTaVprcjlMYUI2K3YwWDhuWjli?=
- =?utf-8?B?Y25uRFRDVUY2NkxTY2RseGZOMFNUdEZRVjA4LzVqVWlFdnp0ckI3OW85bkhT?=
- =?utf-8?B?S1N5N2MwNDdjQUdGZXNrUFFRQVhURzlzTDJvNFJEY29hS3hDUmlnL0lWZ3l3?=
- =?utf-8?B?TzAxYzVrQU12ZTRPQ1RKK0tnMzhJcUpIeTJVSFpsNis1ZDloWFlTQUcyL2d5?=
- =?utf-8?B?ZVBiTGxKcGoyOUNxUW5CWlNtbCt5eTk4dlBMSVNPZERNcWVyaVN5U2RaS2pG?=
- =?utf-8?B?cXNxR2RySXh2V045SDNHdUkwMUQyQ2xid0VHa2tLbzRodmlIRllkRmdHbWMx?=
- =?utf-8?B?NFppOW9IY0RNUmxTclFjclAxaTBhWUI0b2FUZ2lMK3BOYlIxbkZWcis2a1Bu?=
- =?utf-8?B?NUU5OTBuR01yazR4WnhicFN2d2Y3cVZJOGVNUi8wK2FMSHB5R1dBczBSSktZ?=
- =?utf-8?B?R0xYOXRROUZtbGFNOTJ1SytWYU5SMWcwYnM5dWRheUhSQytsS2pDRDVSY0l2?=
- =?utf-8?B?bU5mUDhDcUF3Q3pZbGpQNVFFVXJwYzdMbVNPNWZKQW8wSlZKRmh0dVArWEI3?=
- =?utf-8?B?UFNTVXJjSnYzZm9ua0djUzN3VmpIVnJrSjVUWEw2TUpCZHFSTzV6ZExkQXhL?=
- =?utf-8?B?SHN3c3BLdGtGeWh0clUrWWVRRzhjcEtxWmhZWUFUdHVlWGkyQUZhWU5CR1Zm?=
- =?utf-8?B?SmNwcGxqL3pidkYxeEVHK2h3bDlMQnJDMjBib1BMTFVYYi9uNWZHOEZHclpS?=
- =?utf-8?B?eW02U0lxZnR1VFlTZ3RCcHZTTExPWTNDbGdOQXBJOXF5dkVWMjMyc0tKbDRi?=
- =?utf-8?B?MGdFME45RVRoeGg1UXhERnhkWGxiODM2R21VVnVpWExSd3EwbTRlMERKTXhB?=
- =?utf-8?B?QkpwUWlNUGtWN0Y4UnRJMGpDTkloRmJmR1ZVcjNXY3UvOFBheElDVExWM3Bw?=
- =?utf-8?B?Tk8vZ1F3a21qRERuekdKVXo5SXkzcGh6QzVXaGt6MzhXbjl2TU52Ny8rcTc2?=
- =?utf-8?B?QkxsamNJeHU4Z2JZSnlvaXBSZnVKWWt2QmYrSTVOVzI3eFM4Mm81Q01HWnhw?=
- =?utf-8?B?emc2a1o5ZXI3aVpIcG5FT0ZiYjNSREZzNWtzcnZaQUUwbVd6NkE5RFNQUTJn?=
- =?utf-8?B?bytNYTJydDNHUDVLZkRlTlFaOHlSZUVua0ZZaGVVbyswb1hiMGZFUHhlMWRK?=
- =?utf-8?B?MlRyMUhtUVdrZDhkcjJIK0hQazBiRGZvcGRJTWdMOXcwOEE3V0dYZkFXQzJ5?=
- =?utf-8?B?bElxUkcxeEV4UHkvM3N2NllVV3N0WkRFTFhZM2lVVUpzMm9IQ21pSlQvREFu?=
- =?utf-8?B?bndyNnVDbHFQRVJ6ZWwyV0FWWUJSc3FKYklBaE5TcHBtVWZhVldEaFRLSW1V?=
- =?utf-8?B?VUNpTHFEOXlzVmRKT3VrTkFtZW04akYxSkdLeEZWbjJVckRlQXlaK3NvWncy?=
- =?utf-8?B?bis0Q0FrN3NCb0lpaWNYZ0ZILy82Q3paV3BXU0NCazUvOC9RRDhxcjU4ZU51?=
- =?utf-8?B?NElDdHprbGE0OFN6ZWZoS2pUcUppeGp6NzJRNVlVUVdIL2R3aWtzSnhDeUx4?=
- =?utf-8?B?dnZ3UTd3NWtsYVVkRTg5Ylh6RTFWSW0zMlUzSldvZ0lhMXBGd3YyTWxrVWZ6?=
- =?utf-8?B?RFdYcHJkVmNDK0RicmlYY3Q5NEVyWjRoRU51aE4rbEpVdEpXQWZUOU9IdHU3?=
- =?utf-8?B?Y3pGclBuSGYxTjE3cGtyT2huTS9SK3ZMbGRUMG1Uc1d3cGV0aC95dkpnU1hm?=
- =?utf-8?B?ZTJaalFMNnJsb1NFVjhMOG5UejZ5UytyWjVMQ2E3Q2dka2VMbU9pWGw3Y1Ew?=
- =?utf-8?B?RFFQUURjV1ZWcW12OWJOZTMxT1QyR1AzaXhhS2lVS0k3S2ZpeVAvbHppN294?=
- =?utf-8?B?dHRUTDd3UitUYlRCOFQ4RlN3bkgwK3FueUw2cjE3Z2ZlMTVENkYyK2Y1OWVp?=
- =?utf-8?B?blBObUJYWEFpUzFVTnl4QksrMllsTmYrWElnMHRXcFdFR3Z2cUFtNW5ReURr?=
- =?utf-8?Q?j3WMpCcEI3YvPro9IGhUxSPly?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87553730-b2a5-4a8b-61f5-08dbc43e63dc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 18:27:24.8177
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jzr40/IetPwI3962pWcQSFz2Y92suFZeMEkjkGHNQD9HmRYge61hdM/AmxqlKj94Q5KCgoufJpk0P3EZTKfiQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6928
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230914015531.1419405-1-seanjc@google.com> <20230914015531.1419405-12-seanjc@google.com>
+ <CA+EHjTzSUXx8P9gWmUERg4owxH6r6yNPm1_RL-BzS_2CNPtRKw@mail.gmail.com> <ZRw6X2BptZnRPNK7@google.com>
+In-Reply-To: <ZRw6X2BptZnRPNK7@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 3 Oct 2023 19:33:09 +0100
+Message-ID: <CA+EHjTzx+0pxh7DYONZUeJsm1GCiC6L8Vg_Tm9MLVEae-FKuQg@mail.gmail.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/3/23 11:07, Dave Hansen wrote:
-> On 10/3/23 02:28, Jinank Jain wrote:
-> ...
->> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
->> index 2eabccde94fb..92350a24848c 100644
->> --- a/arch/x86/kernel/sev-shared.c
->> +++ b/arch/x86/kernel/sev-shared.c
->> @@ -880,6 +880,9 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
->>   	if (snp_cpuid_ret != -EOPNOTSUPP)
->>   		return ES_VMM_ERROR;
->>   
->> +	if (regs->ax == 0xD && regs->cx == 0x1)
->> +		ghcb_set_xss(ghcb, 0);
-> 
-> The spec talks about leaf 0xD, but not the subleaf:
-> 
->> XSS is only required to besupplied when a request forCPUID 0000_000D
->> is made andthe guest supports the XSS MSR(0x0000_0DA0).
-> Why restrict this to subleaf (regx->cx) 1?
+Hi Sean,
 
-Today, only subleaf 1 deals with XSS, but we could do just what you say 
-and set it for any 0xD subleaf to be safe.
 
-> 
-> Second, XCR0 is being supplied regardless of the CPUID leaf.  Why should
-> XSS be restricted to 0xD while XCR0 is universally supplied?
+On Tue, Oct 3, 2023 at 4:59=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> > Hi,
+> >
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index d2d913acf0df..f8642ff2eb9d 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -1227,6 +1227,7 @@ struct kvm_ppc_resize_hpt {
+> > >  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+> > >  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> > >  #define KVM_CAP_USER_MEMORY2 230
+> > > +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+> > >
+> > >  #ifdef KVM_CAP_IRQ_ROUTING
+> > >
+> > > @@ -2293,4 +2294,17 @@ struct kvm_s390_zpci_op {
+> > >  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+> > >  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+> > >
+> > > +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> > > +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __=
+u64)
+> > > +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, st=
+ruct kvm_memory_attributes)
+> > > +
+> > > +struct kvm_memory_attributes {
+> > > +       __u64 address;
+> > > +       __u64 size;
+> > > +       __u64 attributes;
+> > > +       __u64 flags;
+> > > +};
+> > > +
+> > > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > > +
+> >
+> > In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SHARED
+> > attributes from userspace.
+>
+> Why not?  The whole thing falls apart if userspace doesn't *know* the sta=
+te of a
+> page, and the only way for userspace to know the state of a page at a giv=
+en moment
+> in time is if userspace controls the attributes.  E.g. even if KVM were t=
+o provide
+> a way for userspace to query attributes, the attributes exposed to usrspa=
+ce would
+> become stale the instant KVM drops slots_lock (or whatever lock protects =
+the attributes)
+> since userspace couldn't prevent future changes.
 
-XCR0 is really only required for 0xD, I'm not sure why it is being setting 
-all the time (unless similar to above, it becomes required for some other 
-CPUID leaf in the future?)
+I think I might not quite understand the purpose of the
+KVM_SET_MEMORY_ATTRIBUTES ABI. In pKVM, all of a protected guest's
+memory is private by default, until the guest shares it with the host
+(via a hypercall), or another guest (future work). When the guest
+shares it, userspace is notified via KVM_EXIT_HYPERCALL. In many use
+cases, userspace doesn't need to keep track directly of all of this,
+but can reactively un/map the memory being un/shared.
 
-> 
-> Third, why is it OK to supply a garbage (0) value?  If the GHCB field is
-> required it's surely because the host *NEEDS* the value to do something.
->   Won't a garbage value potentially confuse the host?
+> Why does pKVM need to prevent userspace from stating *its* view of attrib=
+utes?
+>
+> If the goal is to reduce memory overhead, that can be solved by using an =
+internal,
+> non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  If t=
+he guest
+> attempts to access memory where pKVM and userspace don't agree on the sta=
+te,
+> generate an exit to userspace.  Or kill the guest.  Or do something else =
+entirely.
 
-Ideally, the guest should be checking if XSAVES is enabled, which requires 
-checking CPUID leaf 0xD, subleaf 1. So a bit of a chicken and egg thing 
-going on the very first time. And then the guest should read MSR_IA32_XSS 
-to get the actual value. This MSR is virtualized, so the hypervisor needs 
-to not intercept access in order for the guest to actually set/get a 
-value. Today, KVM/SVM doesn't support that since XSS is used (mainly/only) 
-for shadow stack and KVM shadow stack support is only getting looked at now.
+For the pKVM hypervisor the guest's view of the attributes doesn't
+matter. The hypervisor at the end of the day is the ultimate arbiter
+for what is shared and with how. For pKVM (at least in my port of
+guestmem), we use the memory attributes from guestmem essentially to
+control which memory can be mapped by the host.
 
-So the guest support for XSS and ES/SNP guests needs to be thought out a 
-bit more.
+One difference between pKVM and TDX (as I understand it), is that TDX
+uses the msb of the guest's IPA to indicate whether memory is shared
+or private, and that can generate a mismatch on guest memory access
+between what it thinks the state is, and what the sharing state in
+reality is. pKVM doesn't have that. Memory is private by default, and
+can be shared in-place, both in the guest's IPA space as well as the
+underlying physical page.
 
-Thanks,
-Tom
+> > However, we'd like to use the attributes xarray to track the sharing st=
+ate of
+> > guest pages at the host kernel.
+> >
+> > Moreover, we'd rather the default guest page state be PRIVATE, and
+> > only specify which pages are shared. All pKVM guest pages start off as
+> > private, and the majority will remain so.
+>
+> I would rather optimize kvm_vm_set_mem_attributes() to generate range-bas=
+ed
+> xarray entries, at which point it shouldn't matter all that much whether =
+PRIVATE
+> or SHARED is the default "empty" state.  We opted not to do that for the =
+initial
+> merge purely to keep the code as simple as possible (which is obviously s=
+till not
+> exactly simple).
+>
+> With range-based xarray entries, the cost of tagging huge chunks of memor=
+y as
+> PRIVATE should be a non-issue.  And if that's not enough for whatever rea=
+son, I
+> would rather define the polarity of PRIVATE on a per-VM basis, but only f=
+or internal
+> storage.
 
-> 
+Sounds good.
+
+> > I'm not sure if this is the best way to do this: One idea would be to m=
+ove
+> > the definition of KVM_MEMORY_ATTRIBUTE_PRIVATE to
+> > arch/*/include/asm/kvm_host.h, which is where kvm_arch_supported_attrib=
+utes()
+> > lives as well. This would allow different architectures to specify thei=
+r own
+> > attributes (i.e., instead we'd have a KVM_MEMORY_ATTRIBUTE_SHARED for p=
+KVM).
+> > This wouldn't help in terms of preventing userspace from clearing attri=
+butes
+> > (i.e., setting a 0 attribute) though.
+> >
+> > The other thing, which we need for pKVM anyway, is to make
+> > kvm_vm_set_mem_attributes() global, so that it can be called from outsi=
+de of
+> > kvm_main.c (already have a local patch for this that declares it in
+> > kvm_host.h),
+>
+> That's no problem, but I am definitely opposed to KVM modifying attribute=
+s that
+> are owned by userspace.
+>
+> > and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
+>
+> As above, I am opposed to pKVM having a completely different ABI for mana=
+ging
+> PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flags in=
+ the
+> attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES does=
+n't work
+> for pKVM, then we've failed miserably and should revist the uAPI.
+
+Like I said, pKVM doesn't need a userspace ABI for managing
+PRIVATE/SHARED, just a way of tracking in the host kernel of what is
+shared (as opposed to the hypervisor, which already has the
+knowledge). The solution could simply be that pKVM does not enable
+KVM_GENERIC_MEMORY_ATTRIBUTES, has its own tracking of the status of
+the guest pages, and only selects KVM_PRIVATE_MEM.
+
+Thanks!
+/fuad
