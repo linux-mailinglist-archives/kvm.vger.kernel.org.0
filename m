@@ -2,92 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF0CB7B65B4
-	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 11:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC2E7B65C3
+	for <lists+kvm@lfdr.de>; Tue,  3 Oct 2023 11:44:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239693AbjJCJkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 05:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48060 "EHLO
+        id S239681AbjJCJod (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 05:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239685AbjJCJki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 05:40:38 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F3BAB;
-        Tue,  3 Oct 2023 02:40:33 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9adb9fa7200so146734466b.0;
-        Tue, 03 Oct 2023 02:40:33 -0700 (PDT)
+        with ESMTP id S239649AbjJCJoc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 05:44:32 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82C2EB0
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 02:44:27 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so7177535e9.0
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 02:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696326032; x=1696930832; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7CyRh4kQaOdknBgWyMmgJve4C/+MYGcjkmbGU4vHGSk=;
-        b=kAfxjOXRzPLD6U/MqWsJxEV75CpMQ2EeQL/sgjpAp7oXcijS2KRX0bxfNhjpn8YI3o
-         DUcJ7hFQO3USCu1f4V+q3I3RHSDR1GozmzP6V+sa8Jyybz75Rv80ZwPx372bDPAYlgNS
-         otvCQ8GBjGT+JDOdqYI/OjsGGK+80zjq0YKobOMREw204NwUwicLuorEWXm3ELjuxlNT
-         kG8N355kzRXTUmegxjQhchAOfNGtcIXsify0tr0DOPeMv7TRSmzyAN/7jH9ddqI3zg7r
-         BFogMdMAhSNvvHV+uz7nRvlM3fxc1RZjHQjcFuKqB3rNxU1ScjNHsTbhVDkGI1HAlbHz
-         ueGQ==
+        d=linaro.org; s=google; t=1696326266; x=1696931066; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8SiphgAucNQGHkryF9frgBMe7PR/MSSiUUKJotN2TEg=;
+        b=Bx1omZ+RuPTkkJvsAnbvQztWAxTmYeY/mOxjvJ0euqSYCvNvFiP50dIHPFp0IOg6eC
+         FB+4pDPdkI97K+t1e6MuaEKg4u9CE+DSbtuh31yw8EgRN0TNwdIAeM+Oi7aMr5KudiNO
+         9e233cjB/UDHMSLQjKED2RW23oqOUJkb+8RuhlyX9igZGzbyC/4jsHSjT1WWgijQcrlX
+         lM/E1Sgjdpi6tT+xkar1gTpNy+QKbxvN/qNvJ6nwet75AgCR6BheJRQQ5qj8A/baChbg
+         chtO6bGED4MjvoTRUWOpO5lUUYCyyXI1sI4sInakBYbz5zNppMFNPmnJwn1+FHa2GxwB
+         RO5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696326032; x=1696930832;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7CyRh4kQaOdknBgWyMmgJve4C/+MYGcjkmbGU4vHGSk=;
-        b=gF7BUGI+2bA/s6OR6bNsR+dF6jA2RMsarGpJVyITzwHKg09ln4EACcGu0+9DGKA0AH
-         na8caODF3jEBQiKKliPQsypqBciM/nnC3ZyVKpeQZd9u9ZPNDEfAOv1VYH3C2OcKeEzR
-         qW3i26XIO1Lsv15FwH8+Hw5C0Nz+f0Gtn15GMgIHvtEtsjhHKafQ6X5LnGq6iC3/Wnb/
-         glIOF1ZBbZu+lsWNV4J66ay5wBPMltteOjDukmqzGUAJeEjPuXG+rPCxuohwyWTRvNh8
-         fG0MpJfk30K9GUJ2/223HI0y+cPD/bGVkKX/RAbxOtkUF3ZKhcIfgg03xzjPWNGSFWhh
-         J+0g==
-X-Gm-Message-State: AOJu0Yyzo3Z1RcWuC1RrXBhBo+H8QTIwS6ADsFc5/zROAt9opDqVPX5N
-        FsYTMCKycnxGZgrsEFREq8g=
-X-Google-Smtp-Source: AGHT+IEn38FV2RHMM1HqKtteE6m3acfP4+wNwDoKg0nQehp6GxiyBRTrcI2FUoRcydg3Xdprf5qxBQ==
-X-Received: by 2002:a17:906:6a10:b0:9ad:8641:e91b with SMTP id qw16-20020a1709066a1000b009ad8641e91bmr1730320ejc.11.1696326031915;
-        Tue, 03 Oct 2023 02:40:31 -0700 (PDT)
-Received: from gmail.com (1F2EF530.nat.pool.telekom.hu. [31.46.245.48])
-        by smtp.gmail.com with ESMTPSA id h14-20020a170906590e00b00992b2c55c67sm760112ejq.156.2023.10.03.02.40.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 02:40:31 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date:   Tue, 3 Oct 2023 11:40:29 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Jinank Jain <jinankjain@linux.microsoft.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, jinankjain@microsoft.com,
-        thomas.lendacky@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wei.liu@kernel.org,
-        tiala@microsoft.com
-Subject: Re: [PATCH] arch/x86: Set XSS while handling #VC intercept for CPUID
-Message-ID: <ZRvhjd48oHq2gXB2@gmail.com>
-References: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1696326266; x=1696931066;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8SiphgAucNQGHkryF9frgBMe7PR/MSSiUUKJotN2TEg=;
+        b=H+e54j9KQE8/BLv+zQ+RDg4I6S34ntPpksJGrL6+dO6Qe8kCtaXyDY42gwftgw9nSw
+         oFE0LDRQTXxSydA1L/Kw0hoXZB2rcrF4TYfUoYqYsUuQRbC8RD9llRZZkJk3+DPLMkQW
+         urWM1PGiPG9Mj+YUBzb6C1LREtmDvwW5Ckm+sNgS82xX1Z/nIJhnzYu7Yetb66N4bjgy
+         if0LGppuDxM4PsEw2HgY8Vw+dcYe+XAK/fH7/tNK4XtxSs1VhcyG4tVPaXqzOte770WT
+         5Wc5bPqcP6VSA+pPQuTvDUP/Kcxsneh+9kUPBQp/WkGcrRjzvglntZu/giOfrauazpw8
+         57Zw==
+X-Gm-Message-State: AOJu0YwLdAlI28ZowjIuORExIojwzxeW/2m4DV+H/jMrutLAbP1LCa5i
+        4WZxoUaRP90FoqJ+8lkGSAZ79g==
+X-Google-Smtp-Source: AGHT+IGCM3/s1kXMoc0VE92CwctV0Hho3NjC09QRAkR719GNUddg3X21PBuO4Q5zhOifZ+nAKkpCjw==
+X-Received: by 2002:a05:600c:1c1a:b0:406:53c0:3c71 with SMTP id j26-20020a05600c1c1a00b0040653c03c71mr11663731wms.37.1696326265861;
+        Tue, 03 Oct 2023 02:44:25 -0700 (PDT)
+Received: from [192.168.69.115] (176-131-222-246.abo.bbox.fr. [176.131.222.246])
+        by smtp.gmail.com with ESMTPSA id w6-20020a5d6806000000b003196b1bb528sm1153901wru.64.2023.10.03.02.44.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 02:44:25 -0700 (PDT)
+Message-ID: <213c8a98-5025-6fc1-2926-8f6f15180835@linaro.org>
+Date:   Tue, 3 Oct 2023 11:44:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231003092835.18974-1-jinankjain@linux.microsoft.com>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH 3/5] accel: Declare AccelClass::[un]realize_cpu() handlers
+Content-Language: en-US
+To:     Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        Fabiano Rosas <farosas@suse.de>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>, kvm@vger.kernel.org,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+References: <20230915190009.68404-1-philmd@linaro.org>
+ <20230915190009.68404-4-philmd@linaro.org>
+ <39bac54e-be9f-f425-81be-62395633ad13@suse.de>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <39bac54e-be9f-f425-81be-62395633ad13@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-* Jinank Jain <jinankjain@linux.microsoft.com> wrote:
-
-> According to [1], while handling the #VC intercept for CPUID leaf
-> 0x0000_000D, we need to supply the value of XSS in the GHCB page. If
-> this value is not provided then a spec compliant hypervisor can fail the
-> GHCB request and kill the guest.
+On 3/10/23 10:55, Claudio Fontana wrote:
+> On 9/15/23 21:00, Philippe Mathieu-Daudé wrote:
+>> Currently accel_cpu_realize() only performs target-specific
+>> realization. Introduce the [un]realize_cpu fields in the
+>> base AccelClass to be able to perform target-agnostic
+>> [un]realization of vCPUs.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > 
-> [1] https://www.amd.com/system/files/TechDocs/56421-guest-hypervisor-communication-block-standardization.pdf
+> Just thinking, for the benefit of the reader trying to understand the code later on,
+> maybe putting in a "target_" in there somewhere in the function name?
+> like "realize_cpu_target", vs "realize_cpu_generic" ?
 
-URL doesn't seem to exist, I get redirected to AMD's 404 page.
+Good idea, I like it, thanks!
 
-Thanks,
-
-	Ingo
