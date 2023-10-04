@@ -2,61 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 455667B759F
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 02:04:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2C5C7B75A1
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 02:07:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238433AbjJDAEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 20:04:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35068 "EHLO
+        id S238126AbjJDAH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Oct 2023 20:07:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231171AbjJDAEp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 20:04:45 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABF99B
-        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 17:04:42 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-27763c2c27dso1195690a91.2
-        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 17:04:42 -0700 (PDT)
+        with ESMTP id S230503AbjJDAH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Oct 2023 20:07:28 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9348E
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 17:07:25 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c09bcf078so24519097b3.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 17:07:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696377882; x=1696982682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I6lu9ryrsr8Moak960ZZ9AGY/M//ntgV58bCer0QLBQ=;
-        b=ShHzTr2rZ5163hXr7SezhX3n+DIzpaaG6f/5X3hJyeYwQPW3CFLdOzmOHHO9jVPAny
-         5igOyRExNRfX7qS69pPyPMxPzGdHQmQdqi4SLIRLuVXrRntySFKMhSWZZEBznGm8o8Z+
-         8I/Kdqs4uqfwEf205Ar777Lj8yZsIIHgwa1BKjwczH9ukWlGTAUrExbyYxSk6OmcNIn3
-         EFhcmmBzFiPVAt7cwtwVYORVxtDqktz+leK/yXtM0G+wj9sYW2lXB5DtC4WYgZDgHdoE
-         NrudWtV03YmBjV5E1KlCJKOYTQM/2Dt0AVaRJO48oDHQZgSd/MOfq4Q72e+n63qbXGA3
-         lyhg==
+        d=google.com; s=20230601; t=1696378044; x=1696982844; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SCChu475pVfip1pDwbHdwIY6LAU4+An6h8yh5xS6rAg=;
+        b=VVNP/7yZCsM/EykEitOpJlpp+N5Ini1lWSwWuwk15sX3mRnxDwEA26zA7dtE3TXZ9o
+         nCTK3RkO4YF80P0qsGKnUVBYyvDJEBjuraQeeNx6JyN1MHqJkhs/e2kRarX6jDD+XKzQ
+         4+R9ZpGsRi51BEKgbe1q07bFno+RH8eNZzdMKSf70eS6JAWMnUKW1q9z75UpnYbztDju
+         8kMMjoeS+CDhbNJy36AoSfKXMFbT0XgR7+EBmpSQto8BGuQfhAmSDjTNnT+2fbhC7KSo
+         kyCiGkUuOK9Y1h8glyNpDUUs1u0wU03mPBP6fAyYdaWQYvI0AvgveKgtEzG/ynsCIHLK
+         xNHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696377882; x=1696982682;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=I6lu9ryrsr8Moak960ZZ9AGY/M//ntgV58bCer0QLBQ=;
-        b=bguBD8hxxG2hscqnTe/O3rlLRAqWapMMzCHNMN21X4zaRJyGCeyEpFWiVZ3qJ/iCTE
-         oIg3sRlRz7uFe+kaU1f+t9I3O6OOw7SzG667DCUue90PyL68TLVZi1EyUdx3vfX7Z4kx
-         +/xlUrvU6bBEqb8yVXZo+WJUk00RkYCz5QzqPfODNy82Up1xecpzvBf2gF/lazzUe5Qt
-         QrH334aGi5deJk04FJ7aBPhQIJluv0MiJWkE0nKo2otJW1zBHW7gaplox2kNFCLXVp6Z
-         nrsplaB8XEBzcZIHmG0qoPFRqJBpmVuASNXZaqBKAnoIt+89v5+EpZ2EU9DYfkkT1zvj
-         ud2A==
-X-Gm-Message-State: AOJu0YzAgEAtaRfdbxlPu1FKZq7C1NDDDtHV3CNVjO+rIVyOMz+oaDSW
-        MTc6rkEqPZd00rz9g7I7jAj2RaHsMT4=
-X-Google-Smtp-Source: AGHT+IGwfQdgydEfqcPxox0VvjWXWW479tAIdyyr9BYEWCUwp9fRRSTjD0DFk5jsrAndRDgeT6+Sxl2w1XM=
+        d=1e100.net; s=20230601; t=1696378044; x=1696982844;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SCChu475pVfip1pDwbHdwIY6LAU4+An6h8yh5xS6rAg=;
+        b=TFH2iJU3/iYwKu7xemGQ1YHa5wKFtIHNDwYeCdNUzPFRzdUTMS+zyG9U+JnxW8ZuO4
+         1F/wVJXIsSlo5M0iuhBnlz2U/J4YtszW6/CeqtxcT+NTuNiSz4Gn1TudSq7uhrlNG+eu
+         8i75c0I77fAhOqtpkX7trVj7WQm25KdxcEzJYIWrt7rL7hQcI6oWIbXonlzSLubin8Nu
+         Vzo45Dt6Hn6dSna6Wh6a6Jgostu28iOUhu5wTG0MmTKQOgjn2rCz3EJbGf4gvjB49okP
+         OTdR9CozYYk/1ASu3W9RouJVLTgyd5i5krlu/xDCMzKicR2xKNe77EzTPNmuiterFNL/
+         5C/A==
+X-Gm-Message-State: AOJu0Yyp8bKLlUjZW1kOY1ui7P0ZpMDB55JpviwGadCQk442Y/O71qy8
+        /cCuaNJ1X39F2llq8RjwkrEZSmtkksE=
+X-Google-Smtp-Source: AGHT+IHWqwohiZzAYIiaKuBWJwJPUegXuR0C9YUMouuDN4wbx3kmV3iNhJdEzxVPEMO2JlX2mIfMnQsEbu0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:8501:b0:274:8e74:2607 with SMTP id
- l1-20020a17090a850100b002748e742607mr13630pjn.3.1696377881881; Tue, 03 Oct
- 2023 17:04:41 -0700 (PDT)
-Date:   Tue, 3 Oct 2023 17:04:40 -0700
-In-Reply-To: <9975969725a64c2ba2b398244dba3437bff5154e.camel@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:13cc:b0:d91:8876:2040 with SMTP id
+ y12-20020a05690213cc00b00d9188762040mr11869ybu.5.1696378044229; Tue, 03 Oct
+ 2023 17:07:24 -0700 (PDT)
+Date:   Tue, 3 Oct 2023 17:07:22 -0700
+In-Reply-To: <20EAA3C4-A9F4-4EC1-AE0C-D540CC2E024A@infradead.org>
 Mime-Version: 1.0
 References: <20230926230649.67852-1-dongli.zhang@oracle.com>
  <377d9706-cc10-dfb8-5326-96c83c47338d@oracle.com> <36f3dbb1-61d7-e90a-02cf-9f151a1a3d35@oracle.com>
  <ZRWnVDMKNezAzr2m@google.com> <a461bf3f-c17e-9c3f-56aa-726225e8391d@oracle.com>
  <884aa233ef46d5209b2d1c92ce992f50a76bd656.camel@infradead.org>
  <ZRrxtagy7vJO5tgU@google.com> <52a3cea2084482fc67e35a0bf37453f84dcd6297.camel@infradead.org>
- <ZRtl94_rIif3GRpu@google.com> <9975969725a64c2ba2b398244dba3437bff5154e.camel@infradead.org>
-Message-ID: <ZRysGAgk6W1bpXdl@google.com>
+ <ZRtl94_rIif3GRpu@google.com> <20EAA3C4-A9F4-4EC1-AE0C-D540CC2E024A@infradead.org>
+Message-ID: <ZRysuu8YJg0cLCt4@google.com>
 Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
 From:   Sean Christopherson <seanjc@google.com>
 To:     David Woodhouse <dwmw2@infradead.org>
@@ -65,12 +63,11 @@ Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
         bp@alien8.de, dave.hansen@linux.intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -78,100 +75,48 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Oct 03, 2023, David Woodhouse wrote:
-> On Mon, 2023-10-02 at 17:53 -0700, Sean Christopherson wrote:
-> >=20
-> > The two domains use the same "clock" (constant TSC), but different math=
- to compute
-> > nanoseconds from a given TSC value.=C2=A0 For decently large TSC values=
-, this results
-> > in CLOCK_MONOTONIC_RAW and kvmclock computing two different times in na=
-noseconds.
->=20
-> This is the bit I'm still confused about, and it seems to be the root
-> of all the other problems.
->=20
-> Both CLOCK_MONOTONIC_RAW and kvmclock have *one* job: to convert a
-> number of ticks of the TSC running at a constant known frequency, to a
-> number of nanoseconds.
->=20
-> So how in the name of all that is holy do they manage to get
-> *different* answers?
->=20
-> I get that the mult/shift thing carries some imprecision, but is that
-> all it is?=20
+> 
+> 
+> On 3 October 2023 01:53:11 BST, Sean Christopherson <seanjc@google.com> wrote:
+> >I think there is still use for synchronizing with the host's view of time, e.g.
+> >to deal with lost time across host suspend+resume.
+> >
+> >So I don't think we can completely sever KVM's paravirt clocks from host time,
+> >at least not without harming use cases that rely on the host's view to keep
+> >accurate time.  And honestly at that point, the right answer would be to stop
+> >advertising paravirt clocks entirely.
+> >
+> >But I do think we can address the issues that Dongli and David are obversing
+> >where guest time drifts even though the host kernel's base time hasn't changed.
+> >If I've pieced everything together correctly, the drift can be eliminated simply
+> >by using the paravirt clock algorithm when converting the delta from the raw TSC
+> >to nanoseconds.
+> >
+> >This is *very* lightly tested, as in it compiles and doesn't explode, but that's
+> >about all I've tested.
+> 
+> Hm, I don't think I like this.
 
-Yep, pretty sure that's it.  It's like the plot from Office Space / Superma=
-n III.
-Those little rounding errors add up over time.
+Yeah, I don't like it either.  I'll respond to your other mail with details, but
+this is a dead end anything.
 
-PV clock:
+> You're making get_monotonic_raw() not *actually* return the monotonic_raw
+> clock, but basically return the kvmclock instead? And why? So that when KVM
+> attempts to synchronize the kvmclock to the monotonic_raw clock, it gets
+> tricked into actually synchronizing the kvmclock to *itself*?
+> 
+> If you get this right, don't we have a fairly complex piece of code that has
+> precisely *no* effect? 
+> 
+> Can't we just *refrain* from synchronizing the kvmclock to *anything*, in the
+> CONSTANT_TSC case? Why do we do that anyway?
+> 
+> (Suspend/resume, live update and live migration are different. In *those*
+> cases we may need to preserve both the guest TSC and kvmclock based on either
+> the host TSC or CLOCK_TAI. But that's different.)
 
-  nanoseconds =3D ((TSC >> shift) * mult) >> 32
-
-or=20
-
-  nanoseconds =3D ((TSC << shift) * mult) >> 32
-
-versus timekeeping (mostly)
-
-  nanoseconds =3D (TSC * mult) >> shift
-
-The more I look at the PV clock stuff, the more I agree with Peter: it's ga=
-rbage.
-Shifting before multiplying is guaranteed to introduce error.  Shifting rig=
-ht drops
-data, and shifting left introduces zeros.
-
-> Can't we ensure that the kvmclock uses the *same* algorithm,
-> precisely, as CLOCK_MONOTONIC_RAW?
-
-Yes?  At least for sane hardware, after much staring, I think it's possible=
-.
-
-It's tricky because the two algorithms are wierdly different, the PV clock =
-algorithm
-is ABI and thus immutable, and Thomas and the timekeeping folks would right=
-ly laugh
-at us for suggesting that we try to shove the pvclock algorithm into the ke=
-rnel.
-
-The hardcoded shift right 32 in PV clock is annoying, but not the end of th=
-e world.
-
-Compile tested only, but I believe this math is correct.  And I'm guessing =
-we'd
-want some safeguards against overflow, e.g. due to a multiplier that is too=
- big.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6573c89c35a9..ae9275c3d580 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3212,9 +3212,19 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
-                                            v->arch.l1_tsc_scaling_ratio);
-=20
-        if (unlikely(vcpu->hw_tsc_khz !=3D tgt_tsc_khz)) {
--               kvm_get_time_scale(NSEC_PER_SEC, tgt_tsc_khz * 1000LL,
--                                  &vcpu->hv_clock.tsc_shift,
--                                  &vcpu->hv_clock.tsc_to_system_mul);
-+               u32 shift, mult;
-+
-+               clocks_calc_mult_shift(&mult, &shift, tgt_tsc_khz, NSEC_PER=
-_MSEC, 600);
-+
-+               if (shift <=3D 32) {
-+                       vcpu->hv_clock.tsc_shift =3D 0;
-+                       vcpu->hv_clock.tsc_to_system_mul =3D mult * BIT(32 =
-- shift);
-+               } else {
-+                       kvm_get_time_scale(NSEC_PER_SEC, tgt_tsc_khz * 1000=
-LL,
-+                                          &vcpu->hv_clock.tsc_shift,
-+                                          &vcpu->hv_clock.tsc_to_system_mu=
-l);
-+               }
-+
-                vcpu->hw_tsc_khz =3D tgt_tsc_khz;
-                kvm_xen_update_tsc_info(v);
-        }
-
+The issue is that the timekeeping code doesn't provide a notification mechanism
+to *just* get updates for things like suspend/reume.  We could maybe do something
+in KVM like unregister the notifier if the TSC is constant, and manually refresh
+on suspend/resume.  But that's pretty gross too, and I'd definitely be concerned
+that we missed something.
