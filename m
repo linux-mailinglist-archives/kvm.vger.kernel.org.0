@@ -2,85 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 751D77B85C8
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 18:53:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 414717B85E9
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 18:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243547AbjJDQxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 12:53:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56576 "EHLO
+        id S243550AbjJDQzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 12:55:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243508AbjJDQxb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 12:53:31 -0400
-Received: from out-190.mta0.migadu.com (out-190.mta0.migadu.com [91.218.175.190])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E787CE5
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 09:53:22 -0700 (PDT)
-Date:   Wed, 4 Oct 2023 16:53:16 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1696438400;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3x/C3uN5n0ecJ753anGN387LclKbafyhiu3iWfcPQOk=;
-        b=qv2CfXgUqzzcISXuh8De8e2oB88njrk6/igWX7smSRtFN+QKjjH3Bzc+hHdVmug+0EP/qQ
-        8P0Q0iia1COY0c2Rr41HVVOy6Ia/8cjKDQzh8d/PMA6y9JTaxPJEmXxuuq/qGKm/GTCgch
-        D0IYfpzU/pcWAkJcQe9rlZyJ3NwjjnA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
-Message-ID: <ZR2YfAixZgbCFnb8@linux.dev>
-References: <20231003230408.3405722-1-oliver.upton@linux.dev>
- <86mswyohcy.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86mswyohcy.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S243540AbjJDQzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 12:55:00 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD49C0
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 09:54:57 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a234ffeb90so33298427b3.3
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 09:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696438497; x=1697043297; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v1SpCSVBVkGWfR+UVpLKMyMdKYaLIo/4ycal5KL0JmU=;
+        b=BQCb8ij3zdhky/1vgEEKMhtBMsgfFAo6jps8xVr3wBICqOF/kjqhXaqdElAK2xI1bS
+         U3cgOrlMvtFG5ECDU0wbJX7io9/m+60G84oEVcyPXvW5l+c99C+nkhMcjqMG06lAs64J
+         JcsUd5KjOhbY3t9S2KlFc2Lqnf54zyOA4NMnRme9qoOxHc56ihSYzPgiCfXS1KTOHRLQ
+         7vqXSS9ZrMAqfViGVSYkaeO1rOdjaapK3UjLBKajtx9Ig7L9WIYQPNjuJczk7iHBYs5+
+         7Bb3NbuRQ1K4k+rGFvupZ64bfmUnyG8EH0+/Tr4Rp2z2ywod6gN4uoG6+3Y42syQheqN
+         al7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696438497; x=1697043297;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v1SpCSVBVkGWfR+UVpLKMyMdKYaLIo/4ycal5KL0JmU=;
+        b=LLyT9hfOhc9F07q+MD1JlVE484nhGscM8YWZ6lQlPRik8fy0wGE4ma0RBc22v3eerK
+         t+nQDFEY0295hk0P+Z/8CaZ49wgcrXxGBmTJz5AAgHlx81PhA45VW8dP/lxT++se9Rhp
+         pUBgv74UdTR5hpffQnj3oBhT6m/ip+TaWqNli8L+ECaJkR1Wh4RwdaaQMTpkzm1rTtfP
+         v8n0xyc88Gu696Ngh5hF2JypQWzz80UQic3K/TcQ2IbwfpVjhGIUjdEq17brOy93uqlA
+         3kenQsZ3tPILjCc/LlsSs3xus88TJYmgwgitArJMuOMVbrnGpeYk7CzIcQHmhGkX4H4f
+         Xj7w==
+X-Gm-Message-State: AOJu0Yy0uSBO3r+nquRLTbJqodKuR3vDB9Z1BGk+Ir5pZHS19uIakl6U
+        shaKlgWwo4OhVxuCfRxQEZ/MnCGrN6g=
+X-Google-Smtp-Source: AGHT+IF4i+oQKJd8u1V+TB1VPIOAogrhPtMWZdEvSZy8rU+jM1S65yQ94jKQ9NyvjRiXgJ/MLji9dcyTwZ4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:a909:0:b0:59b:e97e:f7e3 with SMTP id
+ g9-20020a81a909000000b0059be97ef7e3mr53564ywh.2.1696438496733; Wed, 04 Oct
+ 2023 09:54:56 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 09:54:55 -0700
+In-Reply-To: <ZR2EyUULbRpXW8wK@luigi.stachecki.net>
+Mime-Version: 1.0
+References: <20230928001956.924301-1-seanjc@google.com> <ZR0QOGo5DftkRWsr@redhat.com>
+ <ZR1Yt6Z+dhMbn/FJ@luigi.stachecki.net> <ZR175enUCh3KkAU6@google.com> <ZR2EyUULbRpXW8wK@luigi.stachecki.net>
+Message-ID: <ZR2Y34hFpLmCYsUr@google.com>
+Subject: Re: [PATCH 0/5] KVM: x86: Fix breakage in KVM_SET_XSAVE's ABI
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tyler Stachecki <stachecki.tyler@gmail.com>
+Cc:     Leonardo Bras <leobras@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 04, 2023 at 10:40:45AM +0100, Marc Zyngier wrote:
-> On Wed, 04 Oct 2023 00:03:56 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Few more fixes that I threw on top:
-> > 
-> > v10 -> v11:
-> >  - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
-> >    side (Kristina)
-> >  - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
-> >    namespace
-> >  - Apply more bikeshedding to the ioctl documentation, spinning off
-> >    separate blocks for the 'generic' description and the Feature ID
-> >    documentation
-> >  - Fix referencing in the vCPU features doc
-> >  - Fix use of uninitialized data in selftest
+On Wed, Oct 04, 2023, Tyler Stachecki wrote:
+> On Wed, Oct 04, 2023 at 07:51:17AM -0700, Sean Christopherson wrote:
+ 
+> > It's not about removing features.  The change you're asking for is to have KVM
+> > *silently* drop data.  Aside from the fact that such a change would break KVM's
+> > ABI, silently ignoring data that userspace has explicitly requested be loaded for
+> > a vCPU is incredibly dangerous.
 > 
-> We'll probably need another bit on top to deal with Kirstina's
-> FEAT_MOPS series and make that field writable.
+> Sorry if it came off that way
 
-Yep, I was planning on a one-liner to unmask MOPS once I get Kristina's
-patches applied.
+No need to apologise, you got bit by a nasty kernel bug and are trying to find a
+solution.  There's nothing wrong with that.
 
-> The minor nitpicks I had notwithstanding:
-> 
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> I fully understand and am resigned to the "you
+> break it, you keep both halves" nature of what I had initially proposed and
+> that it is not a generally tractable solution.
 
-Appreciated!
-
--- 
-Thanks,
-Oliver
+Yeah, the crux of the matter is that we have no control or even knowledge of who
+all is using KVM, with what userspace VMM, on what hardware, etc.  E.g. if this
+bug were affecting our fleet and for some reason we couldn't address the problem
+in userspace, carrying a hack in KVM in our internal kernel would probably be a
+viable option because we can do a proper risk assessment.  E.g. we know and control
+exactly what userspace we're running, the underlying hardware in affected pools,
+what features are exposed to the guest, etc.  And we could revert the hack once
+all affected VMs had been sanitized.
