@@ -2,58 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 745ED7B8E54
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 22:50:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C627B96AF
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 23:54:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243899AbjJDUuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 16:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
+        id S244141AbjJDVuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 17:50:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233626AbjJDUuC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 16:50:02 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD501B8
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 13:49:58 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so3242041fa.3
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 13:49:58 -0700 (PDT)
+        with ESMTP id S244099AbjJDVux (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 17:50:53 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 428FDC6
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 14:50:48 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-27731a5b94dso216249a91.1
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 14:50:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696452597; x=1697057397; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iE/T50N1RTGEjOsShbKS0aPE1LGFh1pOgBPCSvdPSqo=;
-        b=jZ2WeYwLQIzWgd+yPiFhWrv4K04W3mWz7nn+A3k4VNM9xFFimk5vtRwSmPzTMbIK6J
-         IFcw+qJWHzjTUL/4Kkro9gxkfty22uynP0QI271ZNQA6q3iwzLoj3hKs4dHxUkJUGRHX
-         UVGEcssl4qokTKkodvjXkz4kMbmS3nauDwrHEhrKOyX+JYgTr7UzU6FlYy79fmCc9/xB
-         kUp+FI1uQngRS7xjG899OJirU9nGPOOFySDT+jntJ18uyHMv9834jVZsSZepDbw1zCC5
-         ZQgy7niYjJnHYOHKcXZGOTIIJAMyUN3dME1qCpdSnP7Q69lf6Ui9fVtk9OYugIMMid9a
-         0wzA==
+        d=google.com; s=20230601; t=1696456247; x=1697061047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kiSgfZM7ECGdOQlszNQDUnAmB/N1bBj0T6OcTzs1AbE=;
+        b=rCkLhUPDkLNBdANwdb7ts4sZCV+YYhPq4xEDFcDYK9DiAWLG8XZI2fv9av19JKXoUQ
+         2TcUTqsqZ2reaYtXaf7h6hX2iGQY1/xrsjMof0cElbubv+T9wgiESlvlV82IG1VXyeFN
+         vUVoGupTdOiHQhTL9CD/mcdWiuqFw8yphrkx34E92qi6l3pf4qgZMeDzbMqkTIwlp2DR
+         VXYuC1Ypp08F/eLDrpPbFBwpH0v42OP05m8Dh5c/79950fpx6DhQ48y6iOVElyOPdB0U
+         VY2n5mA5nUOHGVzyp9OzAOu8ym3/2pv3Amnivtvx5M+kAr+HH5DE/AT/xLMiWLXF6Qjn
+         6M+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696452597; x=1697057397;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iE/T50N1RTGEjOsShbKS0aPE1LGFh1pOgBPCSvdPSqo=;
-        b=GIEQEw97JlwX3zub0mjEjRXweqlkmSDUIcwe3VS9B+l2DuLFZmX1NNEwWqcjrc5vJw
-         zZ8WZA9vjLVc4/l8+7MX2vNnzxToml75tw2XcirCJdhIFdQQ44ZFCnl9MQIgMDAmpk+A
-         n57Whr0ZEd/4Pk1qiNHepjj9zcf5OhnASbnuMw0MIT4leQFpEXKJ6UYGQ5xQ1vhMthGi
-         8A8Yt3m3Atu8/tCBvAf/gBt/k40xp7+6J0i/IDHzw/Df+HejU88BaVn2RtdEbqvwdQlp
-         K6zT5M7rMv1wIyGBC0bCAdmZNeXgJrHCCkLBndX8ZMVKjPvCnQWQ0hSKR6qqJHXGyLJ+
-         11/Q==
-X-Gm-Message-State: AOJu0Ywz5qwBeUWBGPuXLsPXwkL5WUm1k2YlgJkUSJVApjvv/T9nxXRL
-        6jD0SHnUIl36Xv2ttlwyIak2sg8bnoBYLXHEzHU7v7qsTdc85A==
-X-Google-Smtp-Source: AGHT+IEknAno0ykvqWfUBuIiGhXxj78RXuKsZbcUpFsZgm6b2jNcC33hJS+72flAet2tTUGfUxDNvyo9heDs9LVQK5E=
-X-Received: by 2002:ac2:5f08:0:b0:503:383c:996d with SMTP id
- 8-20020ac25f08000000b00503383c996dmr2644039lfq.12.1696452596655; Wed, 04 Oct
- 2023 13:49:56 -0700 (PDT)
-MIME-Version: 1.0
-From:   Eduardo Bart <edub4rt@gmail.com>
-Date:   Wed, 4 Oct 2023 17:49:45 -0300
-Message-ID: <CABqCASLWAZ5aq27GuQftWsXSf7yLFCKwrJxWMUF-fiV7Bc4LUA@mail.gmail.com>
-Subject: [PATCH kvmtool] virtio: Cancel and join threads when exiting devices
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        d=1e100.net; s=20230601; t=1696456247; x=1697061047;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kiSgfZM7ECGdOQlszNQDUnAmB/N1bBj0T6OcTzs1AbE=;
+        b=JjnCE1HE6J0ma9f4e9bhPdYaQ+xo6InM6zPsvw0UI+jUjvoypthLD0digMJ1bifAUR
+         EpM1c5fniGznuC1xkShGToZkLNY1siwREpCjszohz58Lo+LaWVcF7kBKopKFFXPoW3Dp
+         LWDKcbeH6v+II1Uz78lzCWwL+yt6TpB3hxuB/eEfRhAL/s+i7XOIW+T9yNET5wxYSIe9
+         csRng9U93J2xlZdfGcB6L2kv0DIY/OmCM6UlR8WWyDQDc/Z76vxwqVpnIjSqbdh0HiqN
+         fT9gF1pFgzkkWEKC9HzHx8yVS5m84HRmobiovtk/FZsNpqiv6+3JR9EBxQg6jin2gEHc
+         X20A==
+X-Gm-Message-State: AOJu0Yy4o6EsrBcgfle0/V8ERQffO1pLmfC3K8Ne5PBxN/Yrb2yuuXsi
+        7/BvWMr/W4qw+ngn12OkybqGR3xc1CM=
+X-Google-Smtp-Source: AGHT+IHvX+GcIWTwOfpy+LfFgXqBWlgRQ102fPNel0QDAdjIf8o+RQzBWAS9/U++GVyXjfT6IAXRlyalq8k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:894:b0:277:78c:ae8c with SMTP id
+ bj20-20020a17090b089400b00277078cae8cmr57505pjb.6.1696456247624; Wed, 04 Oct
+ 2023 14:50:47 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 14:50:46 -0700
+In-Reply-To: <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+Mime-Version: 1.0
+References: <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net> <ZRwx7gcY7x1x3a5y@google.com>
+ <20231004112152.GA5947@noisy.programming.kicks-ass.net> <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+Message-ID: <ZR3eNtP5IVAHeFNC@google.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,187 +93,255 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I'm experiencing a segmentation fault in lkvm where it may crash after
-powering off a guest machine that uses a virtio network device.
-The crash is hard to reproduce, because looks like it only happens
-when the guest machine is powering off while extra virtio threads is
-doing some work,
-when it happens lkvm crashes in the function virtio_net_rx_thread
-while attempting to read invalid guest physical memory,
-because guest physical memory was unmapped.
+On Wed, Oct 04, 2023, Mingwei Zhang wrote:
+> On Wed, Oct 4, 2023 at 4:22=E2=80=AFAM Peter Zijlstra <peterz@infradead.o=
+rg> wrote:
+> > > > Or are you talking about the whole of vcpu_run() ? That seems like =
+a
+> > > > massive amount of code, and doesn't look like anything I'd call a
+> > > > fast-path. Also, much of that loop has preemption enabled...
+> > >
+> > > The whole of vcpu_run().  And yes, much of it runs with preemption en=
+abled.  KVM
+> > > uses preempt notifiers to context switch state if the vCPU task is sc=
+heduled
+> > > out/in, we'd use those hooks to swap PMU state.
+> > >
+> > > Jumping back to the exception analogy, not all exits are equal.  For =
+"simple" exits
+> > > that KVM can handle internally, the roundtrip is <1500.   The exit_fa=
+stpath loop is
+> > > roughly half that.
+> > >
+> > > But for exits that are more complex, e.g. if the guest hits the equiv=
+alent of a
+> > > page fault, the cost of handling the page fault can vary significantl=
+y.  It might
+> > > be <1500, but it might also be 10x that if handling the page fault re=
+quires faulting
+> > > in a new page in the host.
+> > >
+> > > We don't want to get too aggressive with moving stuff into the exit_f=
+astpath loop,
+> > > because doing too much work with IRQs disabled can cause latency prob=
+lems for the
+> > > host.  This isn't much of a concern for slice-of-hardware setups, but=
+ would be
+> > > quite problematic for other use cases.
+> > >
+> > > And except for obviously slow paths (from the guest's perspective), e=
+xtra latency
+> > > on any exit can be problematic.  E.g. even if we got to the point whe=
+re KVM handles
+> > > 99% of exits the fastpath (may or may not be feasible), a not-fastpat=
+h exit at an
+> > > inopportune time could throw off the guest's profiling results, intro=
+duce unacceptable
+> > > jitter, etc.
+> >
+> > I'm confused... the PMU must not be running after vm-exit. It must not
+> > be able to profile the host. So what jitter are you talking about?
+> >
+> > Even if we persist the MSR contents, the PMU itself must be disabled on
+> > vm-exit and enabled on vm-enter. If not by hardware then by software
+> > poking at the global ctrl msr.
+> >
+> > I also don't buy the latency argument, we already do full and complete
+> > PMU rewrites with IRQs disabled in the context switch path. And as
+> > mentioned elsewhere, the whole AMX thing has an 8k copy stuck in the FP=
+U
+> > save/restore.
+> >
+> > I would much prefer we keep the PMU swizzle inside the IRQ disabled
+> > region of vcpu_enter_guest(). That's already a ton better than you have
+> > today.
 
-I've isolated the problem and looks like when lkvm exits it unmaps the
-guest memory while virtio device extra threads may still be executing.
-I noticed most virtio devices are not executing pthread_cancel +
-pthread_join to synchronize extra threads when exiting,
-to make sure this happens I added explicit calls to the virtio device
-exit function to all virtio devices,
-which should cancel and join all threads before unmapping guest
-physical memory, fixing the crash for me.
+...
 
-Below I'm attaching a patch to fix the issue, feel free to apply or
-fix the issue some other way.
+> Peter, that latency argument in pass-through implementation is
+> something that we hope you could buy. This should be relatively easy
+> to prove. I can provide some data if you need.
 
-Signed-off-by: Eduardo Bart <edub4rt@gmail.com>
+You and Peter are talking about is two different latencies.  Or rather, how=
+ the
+latency impacts two different things.
 
----
- include/kvm/virtio-9p.h |  1 +
- virtio/9p.c             | 14 ++++++++++++++
- virtio/balloon.c        | 11 +++++++++++
- virtio/blk.c            |  1 +
- virtio/console.c        |  3 +++
- virtio/net.c            |  4 ++++
- virtio/rng.c            |  8 ++++++++
- 7 files changed, 42 insertions(+)
+Peter is talking about is the latency impact on the host, specifically how =
+much
+work is done with IRQs disabled.
 
-diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
-index 1dffc95..09f7e46 100644
---- a/include/kvm/virtio-9p.h
-+++ b/include/kvm/virtio-9p.h
-@@ -70,6 +70,7 @@ int virtio_9p_rootdir_parser(const struct option
-*opt, const char *arg, int unse
- int virtio_9p_img_name_parser(const struct option *opt, const char
-*arg, int unset);
- int virtio_9p__register(struct kvm *kvm, const char *root, const char
-*tag_name);
- int virtio_9p__init(struct kvm *kvm);
-+int virtio_9p__exit(struct kvm *kvm);
- int virtio_p9_pdu_readf(struct p9_pdu *pdu, const char *fmt, ...);
- int virtio_p9_pdu_writef(struct p9_pdu *pdu, const char *fmt, ...);
+You are talking about is the latency impact on the guest, i.e. how much gue=
+st
+performance is affected if KVM swaps MSRs on every exit.=20
 
-diff --git a/virtio/9p.c b/virtio/9p.c
-index 513164e..f536d9e 100644
---- a/virtio/9p.c
-+++ b/virtio/9p.c
-@@ -1562,6 +1562,20 @@ int virtio_9p__init(struct kvm *kvm)
- }
- virtio_dev_init(virtio_9p__init);
+Peter is contending that swapping PMU MSRs with IRQs disabled isn't a big d=
+eal,
+because the kernel already does as much during a context switch.  I agree, =
+*if*
+we're talking about only adding the PMU MSRs.
 
-+int virtio_9p__exit(struct kvm *kvm)
+You (and I) are contending that the latency impact on the guest will be too=
+ high
+if KVM swaps in the inner VM-Exit loop.  This is not analogous to host cont=
+ext
+switches, as VM-Exits can occur at a much higher frequency than context swi=
+tches,
+and can be triggered by events that have nothing to do with the guest.
+
+There's some confusion here though because of what I said earlier:
+
+  We don't want to get too aggressive with moving stuff into the exit_fastp=
+ath
+  loop, because doing too much work with IRQs disabled can cause latency pr=
+oblems
+  for the host.=20
+
+By "stuff" I wasn't talking about PMU MSRs, I was referring to all exit han=
+dling
+that KVM *could* move into the IRQs disabled section in order to mitigate t=
+he
+concerns that we have about the latency impacts on the guest.  E.g. if most=
+ exits
+are handled in the IRQs disabled section, then KVM could handle most exits =
+without
+swapping PMU state and thus limit the impact on guest performance, and not =
+cause
+to much host perf "downtime" that I mentioned in the other thread[*].
+
+However, my concern is that handling most exits with IRQs disabled would re=
+sult
+in KVM doing too much work with IRQs disabled, i.e. would impact the host l=
+atency
+that Peter is talking about.  And I'm more than a bit terrified of calling =
+into
+code that doesn't expect to be called with IRQs disabled.
+
+Thinking about this more, what if we do a blend of KVM's FPU swapping and d=
+ebug
+register swapping?
+
+  A. Load guest PMU state in vcpu_enter_guest() after IRQs are disabled
+  B. Put guest PMU state (and load host state) in vcpu_enter_guest() before=
+ IRQs
+     are enabled, *if and only if* the current CPU has one or perf events t=
+hat
+     wants to use the hardware PMU
+  C. Put guest PMU state at vcpu_put()
+  D. Add a perf callback that is invoked from IRQ context when perf wants t=
+o
+     configure a new PMU-based events, *before* actually programming the MS=
+Rs,
+     and have KVM's callback put the guest PMU state
+
+If there are host perf events that want to use the PMU, then KVM will swap =
+fairly
+aggressively and the "downtime" of the host perf events will be limited to =
+the
+small window around VM-Enter/VM-Exit.
+
+If there are no such host events, KVM will swap on the first entry to the g=
+uest,
+and keep the guest PMU loaded until the vCPU is put.
+
+The perf callback in (D) would allow perf to program system-wide events on =
+all
+CPUs without clobbering guest PMU state.
+
+I think that would make everyone happy.  As long as our hosts don't create =
+perf
+events, then we get the "swap as little as possible" behavior without signi=
+ficantly
+impacting the host's ability to utilize perf.  If our host screws up and cr=
+eates
+perf events on CPUs that are running vCPUs, then the degraded vCPU performa=
+nce is
+on us.
+
+Rough sketch below, minus the perf callback or any of actual swapping logic=
+.
+
+[*] https://lore.kernel.org/all/ZR3Ohk50rSofAnSL@google.com
+
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 7d9ba301c090..86699d310224 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -41,6 +41,30 @@ struct kvm_pmu_ops {
+=20
+ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
+=20
++static inline void kvm_load_guest_pmu(struct kvm_vcpu *vcpu)
 +{
-+ struct p9_dev *p9dev, *tmp;
++       struct kvm_pmu *pmu =3D vcpu_to_pmu(vcpu);
 +
-+ list_for_each_entry_safe(p9dev, tmp, &devs, list) {
-+ list_del(&p9dev->list);
-+ p9dev->vdev.ops->exit(kvm, &p9dev->vdev);
-+ free(p9dev);
-+ }
++       lockdep_assert_irqs_disabled();
 +
-+ return 0;
++       if (vcpu->pmu->guest_state_loaded)
++               return;
++
++       <swap state>
++       vcpu->pmu->guest_state_loaded =3D true;
 +}
-+virtio_dev_exit(virtio_9p__exit);
 +
- int virtio_9p__register(struct kvm *kvm, const char *root, const char
-*tag_name)
- {
-  struct p9_dev *p9dev;
-diff --git a/virtio/balloon.c b/virtio/balloon.c
-index 01d1982..a36e50e 100644
---- a/virtio/balloon.c
-+++ b/virtio/balloon.c
-@@ -221,6 +221,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
-  return 0;
- }
-
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
++static inline void kvm_put_guest_pmu(struct kvm_vcpu *vcpu)
 +{
-+ struct bln_dev *bdev = dev;
++       lockdep_assert_irqs_disabled();
 +
-+ thread_pool__cancel_job(&bdev->jobs[vq]);
++       if (!vcpu->pmu->guest_state_loaded)
++               return;
++
++       <swap state>
++       vcpu->pmu->guest_state_loaded =3D false;
 +}
 +
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ static inline bool kvm_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
  {
-  struct bln_dev *bdev = dev;
-@@ -258,6 +265,7 @@ struct virtio_ops bln_dev_virtio_ops = {
-  .get_config_size = get_config_size,
-  .get_host_features = get_host_features,
-  .init_vq = init_vq,
-+ .exit_vq = exit_vq,
-  .notify_vq = notify_vq,
-  .get_vq = get_vq,
-  .get_size_vq = get_size_vq,
-@@ -293,6 +301,9 @@ virtio_dev_init(virtio_bln__init);
-
- int virtio_bln__exit(struct kvm *kvm)
+        /*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1e645f5b1e2c..93a8f268c37b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4903,8 +4903,20 @@ static void kvm_steal_time_set_preempted(struct kvm_=
+vcpu *vcpu)
+=20
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
  {
-+ if (bdev.vdev.ops)
-+ bdev.vdev.ops->exit(kvm, &bdev.vdev);
++       unsigned long flags;
+        int idx;
+=20
++       /*
++        * This can get false positives, but not false negatives, i.e. KVM =
+will
++        * never fail to put the PMU, but may unnecessarily disable IRQs to
++        * safely check if the PMU is still loaded.
++        */
++       if (kvm_is_guest_pmu_loaded(vcpu)) {
++               local_irq_save(flags);
++               kvm_put_guest_pmu(vcpu);
++               local_irq_restore(flags);
++       }
 +
-  return 0;
- }
- virtio_dev_exit(virtio_bln__exit);
-diff --git a/virtio/blk.c b/virtio/blk.c
-index a58c745..e34723a 100644
---- a/virtio/blk.c
-+++ b/virtio/blk.c
-@@ -345,6 +345,7 @@ static int virtio_blk__init_one(struct kvm *kvm,
-struct disk_image *disk)
- static int virtio_blk__exit_one(struct kvm *kvm, struct blk_dev *bdev)
- {
-  list_del(&bdev->list);
-+ bdev->vdev.ops->exit(kvm, &bdev->vdev);
-  free(bdev);
+        if (vcpu->preempted) {
+                if (!vcpu->arch.guest_state_protected)
+                        vcpu->arch.preempted_in_kernel =3D !static_call(kvm=
+_x86_get_cpl)(vcpu);
+@@ -10759,6 +10771,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+                set_debugreg(0, 7);
+        }
+=20
++       kvm_load_guest_pmu(vcpu);
++
+        guest_timing_enter_irqoff();
+=20
+        for (;;) {
+@@ -10810,6 +10824,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+        if (hw_breakpoint_active())
+                hw_breakpoint_restore();
+=20
++       if (perf_has_hw_events())
++               kvm_put_guest_pmu(vcpu);
++
+        vcpu->arch.last_vmentry_cpu =3D vcpu->cpu;
+        vcpu->arch.last_guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
+=20
 
-  return 0;
-diff --git a/virtio/console.c b/virtio/console.c
-index ebfbaf0..5a71bbc 100644
---- a/virtio/console.c
-+++ b/virtio/console.c
-@@ -243,6 +243,9 @@ virtio_dev_init(virtio_console__init);
-
- int virtio_console__exit(struct kvm *kvm)
- {
-+ if (cdev.vdev.ops)
-+ cdev.vdev.ops->exit(kvm, &cdev.vdev);
-+
-  return 0;
- }
- virtio_dev_exit(virtio_console__exit);
-diff --git a/virtio/net.c b/virtio/net.c
-index f09dd0a..dc6d89d 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -969,10 +969,14 @@ int virtio_net__exit(struct kvm *kvm)
-  if (ndev->mode == NET_MODE_TAP &&
-      strcmp(params->downscript, "none"))
-  virtio_net_exec_script(params->downscript, ndev->tap_name);
-+ if (ndev->mode != NET_MODE_TAP)
-+ uip_exit(&ndev->info);
-
-  list_del(&ndev->list);
-+ ndev->vdev.ops->exit(kvm, &ndev->vdev);
-  free(ndev);
-  }
-+
-  return 0;
- }
- virtio_dev_exit(virtio_net__exit);
-diff --git a/virtio/rng.c b/virtio/rng.c
-index 6b36655..ebdb455 100644
---- a/virtio/rng.c
-+++ b/virtio/rng.c
-@@ -122,6 +122,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
-  return 0;
- }
-
-+static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
-+{
-+ struct rng_dev *rdev = dev;
-+
-+ thread_pool__cancel_job(&rdev->jobs[vq].job_id);
-+}
-+
- static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
- {
-  struct rng_dev *rdev = dev;
-@@ -159,6 +166,7 @@ static struct virtio_ops rng_dev_virtio_ops = {
-  .get_config_size = get_config_size,
-  .get_host_features = get_host_features,
-  .init_vq = init_vq,
-+ .exit_vq = exit_vq,
-  .notify_vq = notify_vq,
-  .get_vq = get_vq,
-  .get_size_vq = get_size_vq,
--- 
-2.42.0
