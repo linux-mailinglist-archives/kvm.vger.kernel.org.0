@@ -2,91 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCC557B8E42
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 22:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 745ED7B8E54
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 22:50:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233904AbjJDUn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 16:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
+        id S243899AbjJDUuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 16:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233605AbjJDUn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 16:43:57 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2111DC0
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 13:43:53 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f67676065so3755507b3.0
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 13:43:53 -0700 (PDT)
+        with ESMTP id S233626AbjJDUuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 16:50:02 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD501B8
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 13:49:58 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9d07a8d84so3242041fa.3
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 13:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696452232; x=1697057032; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wlxMyVNfjSoRd0rBi0mcIrA81XFNXKxdXgwPCPKKi+c=;
-        b=H3oNnDSb1ptmSWlR1eGP4UzY4jKXo+IhvD8pqUNFPMBByPe825qdI2i05focHY1HCk
-         9YNkeCO6VtciiEAzWZ+peisMwXCu3jUWThy8DExH6SWBzRMp8SBXFI36LDjvJL04Ux6P
-         efXOsdwcfN4WhgeLvvZVmBqMGZFHqrp5cu2YlWn9lh3b3GxfRxvRHRNucaD9AcyhqvrC
-         F2zzubenazDDfJfdi3sPi4NtFZQdYFEYvMKjPNAN5T+uGqOXgeyu5ssEH8/mssUPEftM
-         O78pk3a8gXvcrKmrwX9KAetSYBk3JknJakBY55EAXzHBhIG9jc1bPX9unQxSvsfQmdQ6
-         WfmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696452232; x=1697057032;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1696452597; x=1697057397; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=wlxMyVNfjSoRd0rBi0mcIrA81XFNXKxdXgwPCPKKi+c=;
-        b=uqajYofZrrz2A0dXluRMjQ8RymEVEeWOKTQ3sKqAoI6NbNG+3RQlyVhNASV9qGsCMQ
-         eoa0Uuqq7MUVaLScbvdV1fGyzcnRNYo/GDD1HDHCachsqMLG4t6m+QgeMaxnFVFTVPMR
-         /tyADSxv5HWLm+kX1RHsSwPP3hpbNbAbYidfb49lSLruSTciX9qcZOb3ShftIIRt15TZ
-         etvdaNDQnlIkTFliURqtx/7PHHBgPmfIeS7ANdqMZYN1lSvewqDksPGo1pU16a0912tb
-         Pn/CH/v1LO35t7FYmp6+Gc6xn87AuZjh9AP7nfH+XU9PNHrbRMn3+N3YfOoI1vGDAvfV
-         PPhg==
-X-Gm-Message-State: AOJu0YwneI8czfs97IwENGwesAEU20qXlhuR3fz/ZPUHcXWH2tzqNWa9
-        UdFIfa/b8+S6iInn2E6Sze6NRxlrfxE=
-X-Google-Smtp-Source: AGHT+IG2BxIFzc18lhT+t5otGKsS7OX2vGezvKCEpmxGtv1UbKYti1bZa4/a2NuIvrXiOGhPcEgq5gnEBhw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:a909:0:b0:59b:e97e:f7e3 with SMTP id
- g9-20020a81a909000000b0059be97ef7e3mr63909ywh.2.1696452232294; Wed, 04 Oct
- 2023 13:43:52 -0700 (PDT)
-Date:   Wed, 4 Oct 2023 13:43:50 -0700
-In-Reply-To: <CAL715WLbAnnGUiTdHPO0L7v2FHGa5qmTnWJDi8k9qVkGry5GGQ@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
- <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
- <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
- <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
- <CAL715WLbAnnGUiTdHPO0L7v2FHGa5qmTnWJDi8k9qVkGry5GGQ@mail.gmail.com>
-Message-ID: <ZR3Ohk50rSofAnSL@google.com>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Dunn <daviddunn@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        bh=iE/T50N1RTGEjOsShbKS0aPE1LGFh1pOgBPCSvdPSqo=;
+        b=jZ2WeYwLQIzWgd+yPiFhWrv4K04W3mWz7nn+A3k4VNM9xFFimk5vtRwSmPzTMbIK6J
+         IFcw+qJWHzjTUL/4Kkro9gxkfty22uynP0QI271ZNQA6q3iwzLoj3hKs4dHxUkJUGRHX
+         UVGEcssl4qokTKkodvjXkz4kMbmS3nauDwrHEhrKOyX+JYgTr7UzU6FlYy79fmCc9/xB
+         kUp+FI1uQngRS7xjG899OJirU9nGPOOFySDT+jntJ18uyHMv9834jVZsSZepDbw1zCC5
+         ZQgy7niYjJnHYOHKcXZGOTIIJAMyUN3dME1qCpdSnP7Q69lf6Ui9fVtk9OYugIMMid9a
+         0wzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696452597; x=1697057397;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iE/T50N1RTGEjOsShbKS0aPE1LGFh1pOgBPCSvdPSqo=;
+        b=GIEQEw97JlwX3zub0mjEjRXweqlkmSDUIcwe3VS9B+l2DuLFZmX1NNEwWqcjrc5vJw
+         zZ8WZA9vjLVc4/l8+7MX2vNnzxToml75tw2XcirCJdhIFdQQ44ZFCnl9MQIgMDAmpk+A
+         n57Whr0ZEd/4Pk1qiNHepjj9zcf5OhnASbnuMw0MIT4leQFpEXKJ6UYGQ5xQ1vhMthGi
+         8A8Yt3m3Atu8/tCBvAf/gBt/k40xp7+6J0i/IDHzw/Df+HejU88BaVn2RtdEbqvwdQlp
+         K6zT5M7rMv1wIyGBC0bCAdmZNeXgJrHCCkLBndX8ZMVKjPvCnQWQ0hSKR6qqJHXGyLJ+
+         11/Q==
+X-Gm-Message-State: AOJu0Ywz5qwBeUWBGPuXLsPXwkL5WUm1k2YlgJkUSJVApjvv/T9nxXRL
+        6jD0SHnUIl36Xv2ttlwyIak2sg8bnoBYLXHEzHU7v7qsTdc85A==
+X-Google-Smtp-Source: AGHT+IEknAno0ykvqWfUBuIiGhXxj78RXuKsZbcUpFsZgm6b2jNcC33hJS+72flAet2tTUGfUxDNvyo9heDs9LVQK5E=
+X-Received: by 2002:ac2:5f08:0:b0:503:383c:996d with SMTP id
+ 8-20020ac25f08000000b00503383c996dmr2644039lfq.12.1696452596655; Wed, 04 Oct
+ 2023 13:49:56 -0700 (PDT)
+MIME-Version: 1.0
+From:   Eduardo Bart <edub4rt@gmail.com>
+Date:   Wed, 4 Oct 2023 17:49:45 -0300
+Message-ID: <CABqCASLWAZ5aq27GuQftWsXSf7yLFCKwrJxWMUF-fiV7Bc4LUA@mail.gmail.com>
+Subject: [PATCH kvmtool] virtio: Cancel and join threads when exiting devices
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,76 +61,187 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 03, 2023, Mingwei Zhang wrote:
-> On Mon, Oct 2, 2023 at 5:56=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > The "when" is what's important.   If KVM took a literal interpretation =
-of
-> > "exclude guest" for pass-through MSRs, then KVM would context switch al=
-l those
-> > MSRs twice for every VM-Exit=3D>VM-Enter roundtrip, even when the VM-Ex=
-it isn't a
-> > reschedule IRQ to schedule in a different task (or vCPU).  The overhead=
- to save
-> > all the host/guest MSRs and load all of the guest/host MSRs *twice* for=
- every
-> > VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely ha=
-ndled in
-> > <1500 cycles, and "fastpath" exits are something like half that.  Switc=
-hing all
-> > the MSRs is likely 1000+ cycles, if not double that.
->=20
-> Hi Sean,
->=20
-> Sorry, I have no intention to interrupt the conversation, but this is
-> slightly confusing to me.
->=20
-> I remember when doing AMX, we added gigantic 8KB memory in the FPU
-> context switch. That works well in Linux today. Why can't we do the
-> same for PMU? Assuming we context switch all counters, selectors and
-> global stuff there?
+I'm experiencing a segmentation fault in lkvm where it may crash after
+powering off a guest machine that uses a virtio network device.
+The crash is hard to reproduce, because looks like it only happens
+when the guest machine is powering off while extra virtio threads is
+doing some work,
+when it happens lkvm crashes in the function virtio_net_rx_thread
+while attempting to read invalid guest physical memory,
+because guest physical memory was unmapped.
 
-That's what we (Google folks) are proposing.  However, there are significan=
-t
-side effects if KVM context switches PMU outside of vcpu_run(), whereas the=
- FPU
-doesn't suffer the same problems.
+I've isolated the problem and looks like when lkvm exits it unmaps the
+guest memory while virtio device extra threads may still be executing.
+I noticed most virtio devices are not executing pthread_cancel +
+pthread_join to synchronize extra threads when exiting,
+to make sure this happens I added explicit calls to the virtio device
+exit function to all virtio devices,
+which should cancel and join all threads before unmapping guest
+physical memory, fixing the crash for me.
 
-Keeping the guest FPU resident for the duration of vcpu_run() is, in terms =
-of
-functionality, completely transparent to the rest of the kernel.  From the =
-kernel's
-perspective, the guest FPU is just a variation of a userspace FPU, and the =
-kernel
-is already designed to save/restore userspace/guest FPU state when the kern=
-el wants
-to use the FPU for whatever reason.  And crucially, kernel FPU usage is exp=
-licit
-and contained, e.g. see kernel_fpu_{begin,end}(), and comes with mechanisms=
- for
-KVM to detect when the guest FPU needs to be reloaded (see TIF_NEED_FPU_LOA=
-D).
+Below I'm attaching a patch to fix the issue, feel free to apply or
+fix the issue some other way.
 
-The PMU is a completely different story.  PMU usage, a.k.a. perf, by design=
- is
-"always running".  KVM can't transparently stop host usage of the PMU, as d=
-isabling
-host PMU usage stops perf events from counting/profiling whatever it is the=
-y're
-supposed to profile.
+Signed-off-by: Eduardo Bart <edub4rt@gmail.com>
 
-Today, KVM minimizes the "downtime" of host PMU usage by context switching =
-PMU
-state at VM-Enter and VM-Exit, or at least as close as possible, e.g. for L=
-BRs
-and Intel PT.
+---
+ include/kvm/virtio-9p.h |  1 +
+ virtio/9p.c             | 14 ++++++++++++++
+ virtio/balloon.c        | 11 +++++++++++
+ virtio/blk.c            |  1 +
+ virtio/console.c        |  3 +++
+ virtio/net.c            |  4 ++++
+ virtio/rng.c            |  8 ++++++++
+ 7 files changed, 42 insertions(+)
 
-What we are proposing would *significantly* increase the downtime, to the p=
-oint
-where it would almost be unbounded in some paths, e.g. if KVM faults in a p=
-age,
-gup() could go swap in memory from disk, install PTEs, and so on and so for=
-th.
-If the host is trying to profile something related to swap or memory manage=
-ment,
-they're out of luck.
+diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
+index 1dffc95..09f7e46 100644
+--- a/include/kvm/virtio-9p.h
++++ b/include/kvm/virtio-9p.h
+@@ -70,6 +70,7 @@ int virtio_9p_rootdir_parser(const struct option
+*opt, const char *arg, int unse
+ int virtio_9p_img_name_parser(const struct option *opt, const char
+*arg, int unset);
+ int virtio_9p__register(struct kvm *kvm, const char *root, const char
+*tag_name);
+ int virtio_9p__init(struct kvm *kvm);
++int virtio_9p__exit(struct kvm *kvm);
+ int virtio_p9_pdu_readf(struct p9_pdu *pdu, const char *fmt, ...);
+ int virtio_p9_pdu_writef(struct p9_pdu *pdu, const char *fmt, ...);
+
+diff --git a/virtio/9p.c b/virtio/9p.c
+index 513164e..f536d9e 100644
+--- a/virtio/9p.c
++++ b/virtio/9p.c
+@@ -1562,6 +1562,20 @@ int virtio_9p__init(struct kvm *kvm)
+ }
+ virtio_dev_init(virtio_9p__init);
+
++int virtio_9p__exit(struct kvm *kvm)
++{
++ struct p9_dev *p9dev, *tmp;
++
++ list_for_each_entry_safe(p9dev, tmp, &devs, list) {
++ list_del(&p9dev->list);
++ p9dev->vdev.ops->exit(kvm, &p9dev->vdev);
++ free(p9dev);
++ }
++
++ return 0;
++}
++virtio_dev_exit(virtio_9p__exit);
++
+ int virtio_9p__register(struct kvm *kvm, const char *root, const char
+*tag_name)
+ {
+  struct p9_dev *p9dev;
+diff --git a/virtio/balloon.c b/virtio/balloon.c
+index 01d1982..a36e50e 100644
+--- a/virtio/balloon.c
++++ b/virtio/balloon.c
+@@ -221,6 +221,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+  return 0;
+ }
+
++static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
++{
++ struct bln_dev *bdev = dev;
++
++ thread_pool__cancel_job(&bdev->jobs[vq]);
++}
++
+ static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ {
+  struct bln_dev *bdev = dev;
+@@ -258,6 +265,7 @@ struct virtio_ops bln_dev_virtio_ops = {
+  .get_config_size = get_config_size,
+  .get_host_features = get_host_features,
+  .init_vq = init_vq,
++ .exit_vq = exit_vq,
+  .notify_vq = notify_vq,
+  .get_vq = get_vq,
+  .get_size_vq = get_size_vq,
+@@ -293,6 +301,9 @@ virtio_dev_init(virtio_bln__init);
+
+ int virtio_bln__exit(struct kvm *kvm)
+ {
++ if (bdev.vdev.ops)
++ bdev.vdev.ops->exit(kvm, &bdev.vdev);
++
+  return 0;
+ }
+ virtio_dev_exit(virtio_bln__exit);
+diff --git a/virtio/blk.c b/virtio/blk.c
+index a58c745..e34723a 100644
+--- a/virtio/blk.c
++++ b/virtio/blk.c
+@@ -345,6 +345,7 @@ static int virtio_blk__init_one(struct kvm *kvm,
+struct disk_image *disk)
+ static int virtio_blk__exit_one(struct kvm *kvm, struct blk_dev *bdev)
+ {
+  list_del(&bdev->list);
++ bdev->vdev.ops->exit(kvm, &bdev->vdev);
+  free(bdev);
+
+  return 0;
+diff --git a/virtio/console.c b/virtio/console.c
+index ebfbaf0..5a71bbc 100644
+--- a/virtio/console.c
++++ b/virtio/console.c
+@@ -243,6 +243,9 @@ virtio_dev_init(virtio_console__init);
+
+ int virtio_console__exit(struct kvm *kvm)
+ {
++ if (cdev.vdev.ops)
++ cdev.vdev.ops->exit(kvm, &cdev.vdev);
++
+  return 0;
+ }
+ virtio_dev_exit(virtio_console__exit);
+diff --git a/virtio/net.c b/virtio/net.c
+index f09dd0a..dc6d89d 100644
+--- a/virtio/net.c
++++ b/virtio/net.c
+@@ -969,10 +969,14 @@ int virtio_net__exit(struct kvm *kvm)
+  if (ndev->mode == NET_MODE_TAP &&
+      strcmp(params->downscript, "none"))
+  virtio_net_exec_script(params->downscript, ndev->tap_name);
++ if (ndev->mode != NET_MODE_TAP)
++ uip_exit(&ndev->info);
+
+  list_del(&ndev->list);
++ ndev->vdev.ops->exit(kvm, &ndev->vdev);
+  free(ndev);
+  }
++
+  return 0;
+ }
+ virtio_dev_exit(virtio_net__exit);
+diff --git a/virtio/rng.c b/virtio/rng.c
+index 6b36655..ebdb455 100644
+--- a/virtio/rng.c
++++ b/virtio/rng.c
+@@ -122,6 +122,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+  return 0;
+ }
+
++static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
++{
++ struct rng_dev *rdev = dev;
++
++ thread_pool__cancel_job(&rdev->jobs[vq].job_id);
++}
++
+ static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+ {
+  struct rng_dev *rdev = dev;
+@@ -159,6 +166,7 @@ static struct virtio_ops rng_dev_virtio_ops = {
+  .get_config_size = get_config_size,
+  .get_host_features = get_host_features,
+  .init_vq = init_vq,
++ .exit_vq = exit_vq,
+  .notify_vq = notify_vq,
+  .get_vq = get_vq,
+  .get_size_vq = get_size_vq,
+-- 
+2.42.0
