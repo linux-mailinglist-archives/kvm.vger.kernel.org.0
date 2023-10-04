@@ -2,51 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EB9B7B76DB
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 05:27:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F1497B7715
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 06:24:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232115AbjJDD1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Oct 2023 23:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53096 "EHLO
+        id S232628AbjJDEYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 00:24:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjJDD1n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Oct 2023 23:27:43 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94D0A7;
-        Tue,  3 Oct 2023 20:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696390059; x=1727926059;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XRzc40yKm8KEkXCsgor32yVzEZ5IsO0oazi7M7ukS0Y=;
-  b=LR8H/OfurWuYvo9dBLe8CcgL/14OO1qa+77ZyhPEmZKLM/YhZAG9riU5
-   n3sGSbXvn9vLtdziOYv7Bn6DV5v3I0Cxh/U8tOFDoweIpyu3Pd1AAw09C
-   ylrFaLpoVCeP9O35Swls7a4iktxd14YjuAZA/V1G6hz+Q+hyM/ma29aym
-   etssJT5i9yRTysOa8DiCwiA5/nJpxc7ZEsRqdlXM5z8jjAhOm3V+BlvXG
-   PwkQ8Rl+LBcmN5enJiLPcZEKDqJuGoJAKK4ze6O2QrEhBauIEzP/Ai4dY
-   BOUEDQeikSui/NqPtzj0d2ZTsX2USoIy/o/JmgzUUdhjOXHR5lvZk+vS5
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="373383521"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="373383521"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 20:27:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="894762988"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="894762988"
-Received: from ddiaz-mobl4.amr.corp.intel.com (HELO [10.209.57.36]) ([10.209.57.36])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 20:26:12 -0700
-Message-ID: <dfdba4e2-371c-db18-6989-541f802a0783@intel.com>
-Date:   Tue, 3 Oct 2023 20:27:37 -0700
+        with ESMTP id S232117AbjJDEYc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 00:24:32 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A12B0
+        for <kvm@vger.kernel.org>; Tue,  3 Oct 2023 21:24:29 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-537f07dfe8eso4824a12.1
+        for <kvm@vger.kernel.org>; Tue, 03 Oct 2023 21:24:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696393468; x=1696998268; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gb48+9J6OzaJRq8+aduPuwzJE/KK9ZXSagOdlOkmQoE=;
+        b=JZXGPSEepYM5LW1PaUnGslbIMZFFAl1vrmv3bx2/S+TIHQpJM2wZDnLK3EJLlmEWQw
+         xU3G61T7zfaBB1CD3PQpiqYNMgtKN5ul3YayQgDa4K06KFzeZ3B5vKstAFnB3qTYIlNk
+         cw9bCrUoHZ2nqJPvSYLc2A5U//44zGutN+v0mnvdCS9Unoue2FG3etwEZ8WYXB+BId6i
+         vU49XQkyOePSggWanEYnS4AXgyl/foAg1wFHqfT/jo2BrT91z7xfQxDl/fWTvfgckGTc
+         +EPfNxgwzv/IYnJVfRAfORD0PVyiu1yi3jch8AfvW/zoLPsFwvog3zDAMZZYeiYI6/8G
+         jOug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696393468; x=1696998268;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gb48+9J6OzaJRq8+aduPuwzJE/KK9ZXSagOdlOkmQoE=;
+        b=mAsN4cT7WFxaJ+mjsx0lXYtWzDVDMsvGrcb/HaNGttrjptr795KUncc17Hj9Nq3Sf1
+         YqyXU57AzlPqIsU8Hg0xGpMRaRehL+/8fdyCtEpJs2rwEzJsMbWL0GW+NVKKd+4o67s/
+         0dhGypZ/U66MTQKHFxTOSubCeP3sWqkXEzAawL6kY6QoR0btQJ+RRzGlVzHARJe2W89O
+         YWApun3NiKnbeIg3qmNg5YxHM2YQ8Ke8EbDVslzwtmDVY3/mRSOUlb+vhPDDpJHacOfk
+         gphlvCpHEvNjZFNUJAvpwkmdfH8h3AkFsacndJRpYOI2AtjAL4vYW4f7vQFT21z0z9hB
+         u96Q==
+X-Gm-Message-State: AOJu0YwFLCqsoFYrYk8ac+ChKChE2Oaw3SzjMuX9/EuMxO4wZ2Ri2F3c
+        rT7lyDa/8Q2To9lH8XgjnKllxl8L+juiVk4UB6KL+A==
+X-Google-Smtp-Source: AGHT+IFStvjOlkx2OAzXk89YBDYZTwvQWvQXoabu6dir1CR300tiisxAPYth1mtiFIG6xx8IO8NNzGJkZ1wsvuZRoMM=
+X-Received: by 2002:a50:9fa4:0:b0:538:1d3b:172f with SMTP id
+ c33-20020a509fa4000000b005381d3b172fmr43527edf.3.1696393467921; Tue, 03 Oct
+ 2023 21:24:27 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] x86: KVM: Add feature flag for AMD's
- FsGsKernelGsBaseNonSerializing
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
+References: <20231004002038.907778-1-jmattson@google.com> <01009a2a-929e-ce16-6f44-1d314e6bcba5@intel.com>
+ <CALMp9eR+Qudg++J_dmY_SGbM_kr=GQcRRcjuUxtm9rfaC_qeXQ@mail.gmail.com> <dfdba4e2-371c-db18-6989-541f802a0783@intel.com>
+In-Reply-To: <dfdba4e2-371c-db18-6989-541f802a0783@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 3 Oct 2023 21:24:12 -0700
+Message-ID: <CALMp9eRGrwYzmDxJmhNi1v-1dDgjoC0PUc-RfGiw6JVcMBnpqg@mail.gmail.com>
+Subject: Re: [PATCH] x86: KVM: Add feature flag for AMD's FsGsKernelGsBaseNonSerializing
+To:     Dave Hansen <dave.hansen@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Jiaxi Chen <jiaxi.chen@linux.intel.com>,
@@ -57,28 +65,32 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>
-References: <20231004002038.907778-1-jmattson@google.com>
- <01009a2a-929e-ce16-6f44-1d314e6bcba5@intel.com>
- <CALMp9eR+Qudg++J_dmY_SGbM_kr=GQcRRcjuUxtm9rfaC_qeXQ@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <CALMp9eR+Qudg++J_dmY_SGbM_kr=GQcRRcjuUxtm9rfaC_qeXQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/3/23 19:44, Jim Mattson wrote:
-> I'm a little surprised at the pushback, TBH. Are you implying that
-> there is some advantage to *not* passing this bit through?
+On Tue, Oct 3, 2023 at 8:27=E2=80=AFPM Dave Hansen <dave.hansen@intel.com> =
+wrote:
+>
+> On 10/3/23 19:44, Jim Mattson wrote:
+> > I'm a little surprised at the pushback, TBH. Are you implying that
+> > there is some advantage to *not* passing this bit through?
+>
+> I'm not really trying to push back.  I'm honestly just curious.  Linux
+> obviously doesn't cat about the bit.  So is this for some future Linux
+> or some other OS?
 
-I'm not really trying to push back.  I'm honestly just curious.  Linux
-obviously doesn't cat about the bit.  So is this for some future Linux
-or some other OS?
+It's not for any particular guest OS. It's just for correctness of the
+virtual CPU. Pedantically, hardware that enumerates this bit cannot
+run a guest that doesn't. Pragmatically, it almost certainly doesn't
+matter. Getting it right is trivial and has no impact on performance
+or code size, so why not just do it?
