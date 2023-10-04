@@ -2,112 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 332347B7B24
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 11:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 945C27B7C41
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 11:36:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241908AbjJDJHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 05:07:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41700 "EHLO
+        id S242006AbjJDJg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 05:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232881AbjJDJHb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 05:07:31 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE207BF
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 02:07:27 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3231dff4343so395980f8f.0
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 02:07:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696410446; x=1697015246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vfazF5twtKQ3eFwn5to3we5c0wVkZ7UGB4/AdEoPOtw=;
-        b=k1KoiLYPHm/cXwHDFd5JMP7vHjcaZpJW1FhYRO0vD1zqIqhUq5iWHZmd4cxGopAFcV
-         I2DJgKHfc2KytqpYBNxC2twt+jMZ0CsOkgVOYsXd7MhmHGF6lFYQ/DD9WBTKPbbqBl9y
-         +cInuWGev8gZsq7KnCkysfwdPD7nbtziTtJUfjnYbepq+p/e5Yfg7U3KJqK0wMFTZK3q
-         EBEHCFv41jK4auCZG1IsIRmapARdtYyITtZtmJ2Gy+lXv8+IkC/Lur3hT7etmJ4pgSb9
-         wiU0OM91ZaPG8WWpMXcs0OuSsp+KlbetAER+fwMFTJAWzlP9X63xjkCTWb5MO7T8C5Zt
-         V7zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696410446; x=1697015246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vfazF5twtKQ3eFwn5to3we5c0wVkZ7UGB4/AdEoPOtw=;
-        b=YWQFywPYY/rHAHZzJ0jbc/kbUYNhGzLhN2vIrEm/xMOuk0hvQyaOOq/uDKGb4eA55C
-         s0310QSAwtjK0jGlpgBCl2ZzN5Hvkcbnq9EaIDN0V4zcjEkkU2gLGVwC/2aHy4ZqmGZP
-         GPMdtKiMj/xjsucLxcIG5k+DGyugmgejU/IolGSRDwzZFoV7S28nT8BiO7F+7ZLib61Q
-         gwEBBwRONNXDNpgUFFLmCJ1LeqLkGXZISM58yJBa9/lwD2Yqo5/RGgr/if/BYJdxcMo+
-         2d8Text20uqmz7IRFKryuKOcjhzsK6j5oWURTUjCYN0El2HaSVbyB6njs42DRkDpQirM
-         Wh8w==
-X-Gm-Message-State: AOJu0Ywyz3jdtH4ofxWIxwv5M1M1CA2DVskE7hvCkw/c8D89xFpXJzG0
-        4fE0Ga3bnZub1ASfcnU+muwnpQ==
-X-Google-Smtp-Source: AGHT+IE4drWVEEXxin2eDRdKvls8Mlsox53e9be3+0/F2daDs3Lh3TcinCAi2Uyjq1caMQn0aDupuA==
-X-Received: by 2002:adf:fe0e:0:b0:319:7ec8:53ba with SMTP id n14-20020adffe0e000000b003197ec853bamr1273272wrr.14.1696410446239;
-        Wed, 04 Oct 2023 02:07:26 -0700 (PDT)
-Received: from m1x-phil.lan (5ep85-h01-176-173-163-52.dslam.bbox.fr. [176.173.163.52])
-        by smtp.gmail.com with ESMTPSA id f14-20020adff44e000000b0032318649b21sm3511716wrp.31.2023.10.04.02.07.24
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 04 Oct 2023 02:07:25 -0700 (PDT)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-riscv@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH 09/13] target/i386: Rename i386_softmmu_kvm_ss -> i386_kvm_ss
-Date:   Wed,  4 Oct 2023 11:06:24 +0200
-Message-ID: <20231004090629.37473-10-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231004090629.37473-1-philmd@linaro.org>
-References: <20231004090629.37473-1-philmd@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S232952AbjJDJg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 05:36:57 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B05A7
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 02:36:53 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3557DC433CA;
+        Wed,  4 Oct 2023 09:36:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696412213;
+        bh=nhBCsDpwNVLWHwfW6eG2neTZ8vbY5dFCKwdiEzjew6g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=H2yxlXhzPlYIHLltoKDNRWONtpESL2yyvO3vQ0xXK7cLaJT+NwID7qhDnLh3T2Jix
+         2MHuGV3NxRjIpRdLAHuMxrqL/NB56Y0aRWwYxw8dumjGBbEzLtMjSOEKucgyWpAEsp
+         RtOvZheSDjgunwaZoHU1tmrGy8Ash02uOUoALjeS75bon9pkck3uiZ3FpuJ4BXB9PX
+         lgsv5kYTF+0vvdNrWUl4uijsCyNaiMkyw4sp7dF0PGQUNfBQVJEwFMtrqoUdjKcpNk
+         1OET2bo0werD9FitDGaGc6jxNJvh5VCslDn/lrX3IDTlTrdhyEFU9joyMx1C/4pKX8
+         0q1GnLroq+DgA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qnyJG-0010OJ-Q7;
+        Wed, 04 Oct 2023 10:36:50 +0100
+Date:   Wed, 04 Oct 2023 10:36:50 +0100
+Message-ID: <86o7heohjh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v11 10/12] KVM: arm64: Document vCPU feature selection UAPIs
+In-Reply-To: <20231003230408.3405722-11-oliver.upton@linux.dev>
+References: <20231003230408.3405722-1-oliver.upton@linux.dev>
+        <20231003230408.3405722-11-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, cohuck@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Software MMU is TCG specific. Here 'softmmu' is misused
-for system emulation. Anyhow, since KVM is system emulation
-specific, just rename as 'i386_kvm_ss'.
+On Wed, 04 Oct 2023 00:04:06 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> KVM/arm64 has a couple schemes for handling vCPU feature selection now,
+> which is a lot to put on userspace. Add some documentation about how
+> these interact and provide some recommendations for how to use the
+> writable ID register scheme.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  Documentation/virt/kvm/api.rst               |  4 ++
+>  Documentation/virt/kvm/arm/index.rst         |  1 +
+>  Documentation/virt/kvm/arm/vcpu-features.rst | 48 ++++++++++++++++++++
+>  3 files changed, 53 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/vcpu-features.rst
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index d55c2b68c0a9..8d4050eedb26 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3370,6 +3370,8 @@ return indicates the attribute is implemented.  It does not necessarily
+>  indicate that the attribute can be read or written in the device's
+>  current state.  "addr" is ignored.
+>  
+> +.. _KVM_ARM_VCPU_INIT:
+> +
+>  4.82 KVM_ARM_VCPU_INIT
+>  ----------------------
+>  
+> @@ -6070,6 +6072,8 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+>  interface. No error will be returned, but the resulting offset will not be
+>  applied.
+>  
+> +.. _KVM_ARM_GET_REG_WRITABLE_MASKS:
+> +
+>  4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+>  -------------------------------------------
+>  
+> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+> index e84848432158..7f231c724e16 100644
+> --- a/Documentation/virt/kvm/arm/index.rst
+> +++ b/Documentation/virt/kvm/arm/index.rst
+> @@ -11,3 +11,4 @@ ARM
+>     hypercalls
+>     pvtime
+>     ptp_kvm
+> +   vcpu-features
+> diff --git a/Documentation/virt/kvm/arm/vcpu-features.rst b/Documentation/virt/kvm/arm/vcpu-features.rst
+> new file mode 100644
+> index 000000000000..2d2f89c5781f
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/vcpu-features.rst
+> @@ -0,0 +1,48 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +===============================
+> +vCPU feature selection on arm64
+> +===============================
+> +
+> +KVM/arm64 provides two mechanisms that allow userspace to configure
+> +the CPU features presented to the guest.
+> +
+> +KVM_ARM_VCPU_INIT
+> +=================
+> +
+> +The ``KVM_ARM_VCPU_INIT`` ioctl accepts a bitmap of feature flags
+> +(``struct kvm_vcpu_init::features``). Features enabled by this interface are
+> +*opt-in* and may change/extend UAPI. See :ref:`KVM_ARM_VCPU_INIT` for complete
+> +documentation of the features controlled by the ioctl.
+> +
+> +Otherwise, all CPU features supported by KVM are described by the architected
+> +ID registers.
+> +
+> +The ID Registers
+> +================
+> +
+> +The Arm architecture specifies a range of *ID Registers* that describe the set
+> +of architectural features supported by the CPU implementation. KVM initializes
+> +the guest's ID registers to the maximum set of CPU features supported by the
+> +system. The ID register values are VM-scoped in KVM, meaning that the values
+> +are identical for all vCPUs in a VM.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
----
- target/i386/kvm/meson.build | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+I'm a bit reluctant to give this guarantee. Case in point: MPIDR_EL1
+is part of the Feature ID space, and is definitely *not* a register
+that we can make global, even on a fully homogeneous system.
 
-diff --git a/target/i386/kvm/meson.build b/target/i386/kvm/meson.build
-index 5d9174bbb5..84d9143e60 100644
---- a/target/i386/kvm/meson.build
-+++ b/target/i386/kvm/meson.build
-@@ -1,14 +1,14 @@
--i386_softmmu_kvm_ss = ss.source_set()
-+i386_kvm_ss = ss.source_set()
- 
--i386_softmmu_kvm_ss.add(files(
-+i386_kvm_ss.add(files(
-   'kvm.c',
-   'kvm-cpu.c',
- ))
- 
--i386_softmmu_kvm_ss.add(when: 'CONFIG_XEN_EMU', if_true: files('xen-emu.c'))
-+i386_kvm_ss.add(when: 'CONFIG_XEN_EMU', if_true: files('xen-emu.c'))
- 
--i386_softmmu_kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
-+i386_kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
- 
- i386_system_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'), if_false: files('hyperv-stub.c'))
- 
--i386_system_ss.add_all(when: 'CONFIG_KVM', if_true: i386_softmmu_kvm_ss)
-+i386_system_ss.add_all(when: 'CONFIG_KVM', if_true: i386_kvm_ss)
+I'd also like to give us more flexibility to change the implementation
+in the future without having to change the API again. IMO, the fact
+that we make our life simpler by only tracking a single copy is an
+implementation detail, not something that userspace should rely on.
+
+I would simply turn the "The ID register values are VM-scoped" into
+"The ID register values may be VM-scoped", which gives us that
+flexibility.
+
+> +
+> +KVM allows userspace to *opt-out* of certain CPU features described by the ID
+> +registers by writing values to them via the ``KVM_SET_ONE_REG`` ioctl. The ID
+> +registers are mutable until the VM has started, i.e. userspace has called
+> +``KVM_RUN`` on at least one vCPU in the VM. Userspace can discover what fields
+> +are mutable in the ID registers using the ``KVM_ARM_GET_REG_WRITABLE_MASKS``.
+> +See the :ref:`ioctl documentation <KVM_ARM_GET_REG_WRITABLE_MASKS>` for more
+> +details.
+> +
+> +Userspace is allowed to *limit* or *mask* CPU features according to the rules
+> +outlined by the architecture in DDI0487J 'D19.1.3 Principles of the ID scheme
+
+nit: consider spelling out the *full* version of the ARM ARM (DDI
+0487J.a), just in case we get a J.b this side of Xmas and that this
+reference is renumbered...
+
+> +for fields in ID register'. KVM does not allow ID register values that exceed
+> +the capabilities of the system.
+> +
+> +.. warning::
+> +   It is **strongly recommended** that userspace modify the ID register values
+> +   before accessing the rest of the vCPU's CPU register state. KVM may use the
+> +   ID register values to control feature emulation. Interleaving ID register
+> +   modification with other system register accesses may lead to unpredictable
+> +   behavior.
+
+Thanks,
+
+	M.
+
 -- 
-2.41.0
-
+Without deviation from the norm, progress is not possible.
