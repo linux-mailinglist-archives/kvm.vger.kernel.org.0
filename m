@@ -2,99 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A7A67B86E6
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC8047B86E7
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:46:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233938AbjJDRqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 13:46:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53876 "EHLO
+        id S233953AbjJDRqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 13:46:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbjJDRqi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 13:46:38 -0400
-Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [IPv6:2001:41d0:203:375::cb])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A1CFA7
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 10:46:34 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1696441592;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FkXfxAF8p4JcZ7Pgy7Z1Q9RH1IQGdPoaImpvpiU5zcw=;
-        b=U4zjpIP83Uxl+7rjo0sTildgwacnqciJTm6QY/T3AeDFIuqjNRTfKwzbypYgy1si7Exq0O
-        8YaE6RzMZhL5G8SofpSyVd0oTepEW7InblkabJTkS2QwlIlWLzC+TI8ZCkIjvjOZjHn47T
-        DTm85bDbtssLEoIANq63HHfifD/tlg4=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
-Date:   Wed,  4 Oct 2023 17:46:21 +0000
-Message-ID: <169644154288.3677537.15121340860793882283.b4-ty@linux.dev>
-In-Reply-To: <20231003230408.3405722-1-oliver.upton@linux.dev>
-References: <20231003230408.3405722-1-oliver.upton@linux.dev>
+        with ESMTP id S233497AbjJDRqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 13:46:44 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889BF9E;
+        Wed,  4 Oct 2023 10:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+        Subject:Cc:To:From; bh=9gqPmyTqMnaI5p/Yo2lWX8v6irfTkiQJyeLI3Y/+zIE=; b=THUEtc
+        unQCDvOdaaGMv//tZS+KnFKrjVgqVmY1Oz4phjWFwdFVFTpf8/tgOSvx7ptevmVImLFQv6sMrm5+l
+        gx/dQCoi+DH2YtY2UJQK54HKlLwcwKTOa9ZiDNfX5WiksD2v6bdmeuKtfwrCnGAlUAPqDLNbP+pB2
+        Gvs2CZjh53Y=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qo5xA-0001tA-NQ; Wed, 04 Oct 2023 17:46:32 +0000
+Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qo5xA-0003xm-CC; Wed, 04 Oct 2023 17:46:32 +0000
+From:   Paul Durrant <paul@xen.org>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Subject: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
+Date:   Wed,  4 Oct 2023 17:46:28 +0000
+Message-Id: <20231004174628.2073263-1-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        TO_EQ_FM_DIRECT_MX,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 3 Oct 2023 23:03:56 +0000, Oliver Upton wrote:
-> Few more fixes that I threw on top:
-> 
-> v10 -> v11:
->  - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
->    side (Kristina)
->  - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
->    namespace
->  - Apply more bikeshedding to the ioctl documentation, spinning off
->    separate blocks for the 'generic' description and the Feature ID
->    documentation
->  - Fix referencing in the vCPU features doc
->  - Fix use of uninitialized data in selftest
-> 
-> [...]
+From: Paul Durrant <pdurrant@amazon.com>
 
-Applied to kvmarm/next, thanks!
+Upstream Xen now ignores this flag [1], since the only guest kernel ever to
+use it was buggy. By ignoring the flag the guest will always get a callback
+if it sets a negative timeout which upstream Xen has determined not to
+cause problems for any guest setting the flag.
 
-[01/12] KVM: arm64: Allow userspace to get the writable masks for feature ID registers
-        https://git.kernel.org/kvmarm/kvmarm/c/3f9cd0ca8484
-[02/12] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
-        https://git.kernel.org/kvmarm/kvmarm/c/6656cda0f3b2
-[03/12] KVM: arm64: Use guest ID register values for the sake of emulation
-        https://git.kernel.org/kvmarm/kvmarm/c/8b6958d6ace1
-[04/12] KVM: arm64: Reject attempts to set invalid debug arch version
-        https://git.kernel.org/kvmarm/kvmarm/c/a9bc4a1c1e0c
-[05/12] KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
-        https://git.kernel.org/kvmarm/kvmarm/c/9f9917bc71b0
-[06/12] KVM: arm64: Allow userspace to change ID_AA64ISAR{0-2}_EL1
-        https://git.kernel.org/kvmarm/kvmarm/c/56d77aa8bdf5
-[07/12] KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1
-        https://git.kernel.org/kvmarm/kvmarm/c/d5a32b60dc18
-[08/12] KVM: arm64: Allow userspace to change ID_AA64PFR0_EL1
-        https://git.kernel.org/kvmarm/kvmarm/c/8cfd5be88ebe
-[09/12] KVM: arm64: Allow userspace to change ID_AA64ZFR0_EL1
-        https://git.kernel.org/kvmarm/kvmarm/c/f89fbb350dd7
-[10/12] KVM: arm64: Document vCPU feature selection UAPIs
-        https://git.kernel.org/kvmarm/kvmarm/c/dafa493dd01d
-[11/12] KVM: arm64: selftests: Import automatic generation of sysreg defs
-        https://git.kernel.org/kvmarm/kvmarm/c/6a4c6c6a56c1
-[12/12] KVM: arm64: selftests: Test for setting ID register from usersapce
-        https://git.kernel.org/kvmarm/kvmarm/c/3b44c2008bf0
+[1] https://xenbits.xen.org/gitweb/?p=xen.git;a=commitdiff;h=19c6cbd909
 
---
-Best,
-Oliver
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org
+
+v2:
+ - Amend the patch subject line
+---
+ arch/x86/kvm/xen.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 40edf4d1974c..8f1d46df0f3b 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -1374,12 +1374,8 @@ static bool kvm_xen_hcall_vcpu_op(struct kvm_vcpu *vcpu, bool longmode, int cmd,
+ 			return true;
+ 		}
+ 
++		/* A delta <= 0 results in an immediate callback, which is what we want */
+ 		delta = oneshot.timeout_abs_ns - get_kvmclock_ns(vcpu->kvm);
+-		if ((oneshot.flags & VCPU_SSHOTTMR_future) && delta < 0) {
+-			*r = -ETIME;
+-			return true;
+-		}
+-
+ 		kvm_xen_start_timer(vcpu, oneshot.timeout_abs_ns, delta);
+ 		*r = 0;
+ 		return true;
+-- 
+2.39.2
+
