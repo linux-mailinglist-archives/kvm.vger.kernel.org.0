@@ -2,71 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5E4B7B8218
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 16:18:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 388327B8269
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 16:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbjJDOS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 10:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37390 "EHLO
+        id S233466AbjJDOeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 10:34:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242826AbjJDOHS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 10:07:18 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6017CC
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 07:07:14 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-692b2bdfce9so1683970b3a.3
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 07:07:14 -0700 (PDT)
+        with ESMTP id S233111AbjJDOet (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 10:34:49 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6752CC4
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 07:34:45 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-406553f6976so4960765e9.1
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 07:34:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1696428434; x=1697033234; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0z/r1d+J5gtLqP5W7ywKcBZnz9e1tR93kK5cuzURK+U=;
-        b=cL7TMIHvZGILyvQKlG8/69OWPtzvqfwMYHT6bhdpd0Xiot1qkWGebg+HONm1NJG2T1
-         FXl8d6+z6Vp+L6nK1TfmMDLmwFgbnxEdG55WthmMNNUaBqS9t6Znn9UhaW5jUb30CgzU
-         c7NEhpH9UYLE3ds2I61eoIMWuYcekbZbxlylI3faAyahjtr4B3uX8IWjYJlgyvtefOpa
-         kJ6LgbtfM6AMJxux3ptSYePlndpQIsfEJwPwvJITYfUfRyw9SV/QyTNuci2tyzVws7UW
-         CsVx+DMQtR2H0XQrTIGOjGA4j4odKJM/nTThLTYyH9KUUsyHv3Py9Kt5pFEwdozlN6LJ
-         Mi6Q==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1696430084; x=1697034884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CM1tzOwYIRfBowwMaDOZ0YTv6DSHjRM1ieV3JngoGb0=;
+        b=zEip87a0BH1j92Z/jps+EGC6DV3MxeNx5LtX4FBEpISjNNEYsJg4mbdQGHLOHSdLHy
+         xFbG7KASGIupi44Jia+cpHBuRqQsy5dzriC6VLao+g8Lc7CtUIEtnGyTp77u+dzSuozk
+         AfMZWpToKPycdJjYhyOwSvf5hNTXtpAMROuH20kp64XvBxRqL74v1Dyn9p7ONQbX1wxg
+         b+0COpHsMLnzJ2qWwnfmVWGnZIkRZyKLxzCxjdaF3X0zljQ57WdRkjDdrsDdycU1Pngu
+         9GfPuT6IdQ4ZaxUvtdogEsCm3eQPtgmPjSb8JTUhUZbho6HztewR37Ogt/4DXdjIyBlC
+         Us/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696428434; x=1697033234;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0z/r1d+J5gtLqP5W7ywKcBZnz9e1tR93kK5cuzURK+U=;
-        b=eUYxTPrS8cfJvI+3tFYSkvAxJdtagSNpLt0AMpJP0WrMLHsXA69PN928+4Xy6XlwvE
-         LveQUJ/c5dUZmwbADXy3KRf9h8EJ5EH40PDqDBkz7ISonL/zUh09ObnwG4y7E5qWtuQj
-         fczjlOfj3xyfCFvTJ36NnfcMYr7CsPDHGOLdXLN5p2UJLKmSSbO6vQ+tIPkfzUjGUoh3
-         RlqAIGK1ka4Sp33X9hFaVNQriFpArIj+JfhRJxVZLlZrxG15Y/MezacRKoOwaKCKoARN
-         1LbCE2sdm2ENQORa+ITKIvCu/vH6l4oVK8qEwO5lrmc9Hqy7LrqL0UlnEeKR4c3suG+n
-         C9ww==
-X-Gm-Message-State: AOJu0YzNwMz1x06rWhYfv5z0OR5T8/TFMj73a7bL+/wCf6vIvHxGDqaV
-        Dfx2X/6VggjuCH2ifBGfI+Kd/w==
-X-Google-Smtp-Source: AGHT+IF0Ml8pf6AjMo5zAtun1w9ROsE0vABhFnVNgCEYK5oMomt4HYMJTvQ3YEhZmBv+2hEuxsmApA==
-X-Received: by 2002:a05:6a00:b8b:b0:68f:d1a7:1a3a with SMTP id g11-20020a056a000b8b00b0068fd1a71a3amr2957250pfj.8.1696428432808;
-        Wed, 04 Oct 2023 07:07:12 -0700 (PDT)
-Received: from localhost ([192.184.165.199])
-        by smtp.gmail.com with ESMTPSA id bm2-20020a056a00320200b0068a13b0b300sm3384998pfb.11.2023.10.04.07.07.11
+        d=1e100.net; s=20230601; t=1696430084; x=1697034884;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CM1tzOwYIRfBowwMaDOZ0YTv6DSHjRM1ieV3JngoGb0=;
+        b=qFfHDOpUvb9m4ZYFmnUpJFgh774qdkuSSLQkiJ4PBGC0mQGvqpWuHyD/aCUHQJONSf
+         JqIXQXJlHMujszBJxrcEx2JqpqingqZoU2/BDAAeudqHY59wKS+zDJGKjErxErQj3v4i
+         6JB3CMaoLhoDOMXwK9+EcE+HrqziFG3isjt961y2XSH/yYFsIg0kzcABo+wDk5/vZSpO
+         faul8O0CuzauVmHc/JhQvcOayzIazdIXL7LA6tOnhyCrJTEIF9sWcxAr7fFmM4FqRhR4
+         tzDQplDQ22MZbv0xxeI8ponACNkr3PaSaYtUZ5RU1qiAXLwZnN1p234nRHI2iyDJCCYO
+         zf/g==
+X-Gm-Message-State: AOJu0YzmjTHcgeDxcfRsT9Fe7SVRTmzTDuv+NpTzpARXqT1JiVD8q80Z
+        V8VCZXC8NK+aVbtTiH0ml7jXqNJ8v5Bg+fl2ShjNEA==
+X-Google-Smtp-Source: AGHT+IEcQotQCjgDXMBBO6ccwZ9igg2/BW1u3BEgiE/Ihu0ulcuIV203Up+Cur0jM4vJZJIKO6KgBA==
+X-Received: by 2002:a05:600c:5114:b0:405:4127:f471 with SMTP id o20-20020a05600c511400b004054127f471mr2532705wms.1.1696430083756;
+        Wed, 04 Oct 2023 07:34:43 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:999:a3a0:9474:8d75:5115:42cb])
+        by smtp.gmail.com with ESMTPSA id t20-20020a1c7714000000b00401e32b25adsm1686205wmi.4.2023.10.04.07.34.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Oct 2023 07:07:11 -0700 (PDT)
-Date:   Wed, 04 Oct 2023 07:07:11 -0700 (PDT)
-X-Google-Original-Date: Wed, 04 Oct 2023 07:07:09 PDT (-0700)
-Subject:     Re: [PATCH v3 2/6] RISC-V: Detect Zicond from ISA string
-In-Reply-To: <20231003035226.1945725-3-apatel@ventanamicro.com>
-CC:     pbonzini@redhat.com, atishp@atishpatra.org,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, shuah@kernel.org,
-        ajones@ventanamicro.com, mchitale@ventanamicro.com,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        apatel@ventanamicro.com, Conor Dooley <conor.dooley@microchip.com>
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     apatel@ventanamicro.com
-Message-ID: <mhng-4ec1093a-4542-429e-a9f0-8a976cff9ac4@palmer-ri-x1c9>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Wed, 04 Oct 2023 07:34:43 -0700 (PDT)
+From:   =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: [PATCH 0/5] riscv: cleanup assembly usage of ENTRY()/END() and use local labels
+Date:   Wed,  4 Oct 2023 16:30:49 +0200
+Message-ID: <20231004143054.482091-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.42.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -77,48 +73,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 02 Oct 2023 20:52:22 PDT (-0700), apatel@ventanamicro.com wrote:
-> The RISC-V integer conditional (Zicond) operation extension defines
-> standard conditional arithmetic and conditional-select/move operations
-> which are inspired from the XVentanaCondOps extension. In fact, QEMU
-> RISC-V also has support for emulating Zicond extension.
->
-> Let us detect Zicond extension from ISA string available through
-> DT or ACPI.
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  arch/riscv/include/asm/hwcap.h | 1 +
->  arch/riscv/kernel/cpufeature.c | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 0f520f7d058a..6fc51c1b34cf 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -59,6 +59,7 @@
->  #define RISCV_ISA_EXT_ZIFENCEI		41
->  #define RISCV_ISA_EXT_ZIHPM		42
->  #define RISCV_ISA_EXT_SMSTATEEN		43
-> +#define RISCV_ISA_EXT_ZICOND		44
->
->  #define RISCV_ISA_EXT_MAX		64
->
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 3755a8c2a9de..e3803822ab5a 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -167,6 +167,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
->  	__RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
->  	__RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
->  	__RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
-> +	__RISCV_ISA_EXT_DATA(zicond, RISCV_ISA_EXT_ZICOND),
->  	__RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
->  	__RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
->  	__RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
+This series does a cleanup of all ENTRY()/END() macros that are used in
+arch/riscv/ as well as use of local labels. This allows to remove the
+use of the now deprecated ENTRY()/END()/WEAK() macros as well as using
+the new SYM_*() ones which provide a better understanding of what is
+meant to be annotated. Some wrong usage of SYM_FUNC_START() are also
+fixed in this series by using the correct annotations. Finally a few
+labels that were meant to be local have been renamed to use the .L
+suffix and thus not to be emitted as visible symbols.
 
-Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+Note: the patches have been split between arch/riscv/ and
+arch/riscv/kvm/ due to having different maintainers.
 
-Can we do a shared tag, though?  These will conflict.
+Clément Léger (5):
+  riscv: use ".L" local labels in assembly when applicable
+  riscv: Use SYM_*() assembly macros instead of deprecated ones
+  riscv: kernel: Use correct SYM_DATA_*() macro for data
+  riscv: kvm: Use SYM_*() assembly macros instead of deprecated ones
+  riscv: kvm: use ".L" local labels in assembly when applicable
+
+ arch/riscv/kernel/copy-unaligned.S            |  8 +--
+ arch/riscv/kernel/entry.S                     | 19 +++----
+ arch/riscv/kernel/fpu.S                       |  8 +--
+ arch/riscv/kernel/head.S                      | 30 +++++-----
+ arch/riscv/kernel/hibernate-asm.S             | 12 ++--
+ arch/riscv/kernel/mcount-dyn.S                | 20 +++----
+ arch/riscv/kernel/mcount.S                    | 18 +++---
+ arch/riscv/kernel/probes/rethook_trampoline.S |  4 +-
+ arch/riscv/kernel/suspend_entry.S             |  4 +-
+ arch/riscv/kernel/vdso/flush_icache.S         |  4 +-
+ arch/riscv/kernel/vdso/getcpu.S               |  4 +-
+ arch/riscv/kernel/vdso/rt_sigreturn.S         |  4 +-
+ arch/riscv/kernel/vdso/sys_hwprobe.S          |  4 +-
+ arch/riscv/kvm/vcpu_switch.S                  | 32 +++++------
+ arch/riscv/lib/memcpy.S                       |  6 +-
+ arch/riscv/lib/memmove.S                      | 56 +++++++++----------
+ arch/riscv/lib/memset.S                       |  6 +-
+ arch/riscv/lib/uaccess.S                      | 11 ++--
+ arch/riscv/purgatory/entry.S                  | 16 ++----
+ 19 files changed, 125 insertions(+), 141 deletions(-)
+
+-- 
+2.42.0
+
