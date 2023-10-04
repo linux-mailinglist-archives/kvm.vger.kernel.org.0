@@ -2,76 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE1F57B8E10
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 22:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCC557B8E42
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 22:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244753AbjJDU3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 16:29:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40236 "EHLO
+        id S233904AbjJDUn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 16:43:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244701AbjJDU3h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 16:29:37 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4CCAD
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 13:29:32 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-502f29ed596so1579e87.0
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 13:29:32 -0700 (PDT)
+        with ESMTP id S233605AbjJDUn5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 16:43:57 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2111DC0
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 13:43:53 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f67676065so3755507b3.0
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 13:43:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696451370; x=1697056170; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ULcbPeVXF1YZ+PSpdpBI4ln4bPTinWz7u+G6K/2zwK0=;
-        b=26GqU3ytQmiEs5cmGlgk5+IGkzW5jTio9t5V3W2QwVWIL3wDelSHGnKAvus1APDTfw
-         rv5CFTO7UDLd5umIndG7ATXGbKy/VVueysmZdjaOjfef/5smNCLUHJggzGNxjebg4vwE
-         2mYNXv3/pZtaIkU6QGXyQxdhjgVZkN+tOToWrOUHXSje24+KmiSiG/uYhggr17l/rGrz
-         z1gYOmW+qsB9/y6E80jc+HMu/W3mCDm4G58hTp2h3jdtPJc5W22Q+l2nU9/LU9fdw0bC
-         4iNtnE42xCZoEtIHsT/JV8FTGM1tJaCKOfNnzdzSOhBz1OLQWicqM9YeKY6+sHJ7Q6BT
-         EDlQ==
+        d=google.com; s=20230601; t=1696452232; x=1697057032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wlxMyVNfjSoRd0rBi0mcIrA81XFNXKxdXgwPCPKKi+c=;
+        b=H3oNnDSb1ptmSWlR1eGP4UzY4jKXo+IhvD8pqUNFPMBByPe825qdI2i05focHY1HCk
+         9YNkeCO6VtciiEAzWZ+peisMwXCu3jUWThy8DExH6SWBzRMp8SBXFI36LDjvJL04Ux6P
+         efXOsdwcfN4WhgeLvvZVmBqMGZFHqrp5cu2YlWn9lh3b3GxfRxvRHRNucaD9AcyhqvrC
+         F2zzubenazDDfJfdi3sPi4NtFZQdYFEYvMKjPNAN5T+uGqOXgeyu5ssEH8/mssUPEftM
+         O78pk3a8gXvcrKmrwX9KAetSYBk3JknJakBY55EAXzHBhIG9jc1bPX9unQxSvsfQmdQ6
+         WfmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696451370; x=1697056170;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ULcbPeVXF1YZ+PSpdpBI4ln4bPTinWz7u+G6K/2zwK0=;
-        b=GEXI4F3NX4GQnFwpN9NZS1HhiyFmXvjNjLBVsrBPrczffiXs7KgvMP/WuqY42JeOEB
-         9iswM1mExigxTfRhADgBGW2YFOmkmsptgdrkD17UsB97eKIVSPHKXTcOKFobU7eY+ezi
-         U1g13BJ26Y/uSWLzCPhlKDuGzygXehx0MqZE775oHzYpjbX26QCPXGIqeiCVQE+cE71R
-         7OuIUrvvx4K/oaeHjVeKiA5T19dmpRE6UQWi+YI6bwORVyckeLnrUbhBlbnK0IIWc0ni
-         XSbei2wLzW6ivj3V8/bMI3iO/Jn22wBYE3g17grD1csndTyKLAnRMiN5UDKE8YlOMvL6
-         Iw5A==
-X-Gm-Message-State: AOJu0YwRGf5sfZX2/Yemt/wdS3v1FaAePSwK10nQKQ6IlOgdzk8YdscZ
-        8bzkOQEfSPfJi2Pj5Ii1vtjR59F5Ql3hCSDgF3Azog==
-X-Google-Smtp-Source: AGHT+IHzJtM7k+kUTGyXAWVzPEzSaQ1kE5vqmOg+cGd45iBE1Lgxpx9c3I5fBCW0FMS138wNvOmmuyOL9idRGF7p4uk=
-X-Received: by 2002:ac2:5142:0:b0:502:dc15:7fb with SMTP id
- q2-20020ac25142000000b00502dc1507fbmr100lfd.5.1696451369919; Wed, 04 Oct 2023
- 13:29:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20231004002038.907778-1-jmattson@google.com> <01009a2a-929e-ce16-6f44-1d314e6bcba5@intel.com>
- <CALMp9eR+Qudg++J_dmY_SGbM_kr=GQcRRcjuUxtm9rfaC_qeXQ@mail.gmail.com> <20231004075836.GBZR0bLC/Y09sSSYWw@fat_crate.local>
-In-Reply-To: <20231004075836.GBZR0bLC/Y09sSSYWw@fat_crate.local>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 4 Oct 2023 13:29:15 -0700
-Message-ID: <CALMp9eQN9_OK6oE9tEz_DW4ZBwWEB_JJJdjKsQoLyh9tGWNfYw@mail.gmail.com>
-Subject: Re: [PATCH] x86: KVM: Add feature flag for AMD's FsGsKernelGsBaseNonSerializing
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
+        d=1e100.net; s=20230601; t=1696452232; x=1697057032;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wlxMyVNfjSoRd0rBi0mcIrA81XFNXKxdXgwPCPKKi+c=;
+        b=uqajYofZrrz2A0dXluRMjQ8RymEVEeWOKTQ3sKqAoI6NbNG+3RQlyVhNASV9qGsCMQ
+         eoa0Uuqq7MUVaLScbvdV1fGyzcnRNYo/GDD1HDHCachsqMLG4t6m+QgeMaxnFVFTVPMR
+         /tyADSxv5HWLm+kX1RHsSwPP3hpbNbAbYidfb49lSLruSTciX9qcZOb3ShftIIRt15TZ
+         etvdaNDQnlIkTFliURqtx/7PHHBgPmfIeS7ANdqMZYN1lSvewqDksPGo1pU16a0912tb
+         Pn/CH/v1LO35t7FYmp6+Gc6xn87AuZjh9AP7nfH+XU9PNHrbRMn3+N3YfOoI1vGDAvfV
+         PPhg==
+X-Gm-Message-State: AOJu0YwneI8czfs97IwENGwesAEU20qXlhuR3fz/ZPUHcXWH2tzqNWa9
+        UdFIfa/b8+S6iInn2E6Sze6NRxlrfxE=
+X-Google-Smtp-Source: AGHT+IG2BxIFzc18lhT+t5otGKsS7OX2vGezvKCEpmxGtv1UbKYti1bZa4/a2NuIvrXiOGhPcEgq5gnEBhw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:a909:0:b0:59b:e97e:f7e3 with SMTP id
+ g9-20020a81a909000000b0059be97ef7e3mr63909ywh.2.1696452232294; Wed, 04 Oct
+ 2023 13:43:52 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 13:43:50 -0700
+In-Reply-To: <CAL715WLbAnnGUiTdHPO0L7v2FHGa5qmTnWJDi8k9qVkGry5GGQ@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230927113312.GD21810@noisy.programming.kicks-ass.net>
+ <ZRRl6y1GL-7RM63x@google.com> <20230929115344.GE6282@noisy.programming.kicks-ass.net>
+ <ZRbxb15Opa2_AusF@google.com> <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net> <ZRtmvLJFGfjcusQW@google.com>
+ <CAL715WLbAnnGUiTdHPO0L7v2FHGa5qmTnWJDi8k9qVkGry5GGQ@mail.gmail.com>
+Message-ID: <ZR3Ohk50rSofAnSL@google.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,53 +94,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 4, 2023 at 12:59=E2=80=AFAM Borislav Petkov <bp@alien8.de> wrot=
-e:
->
-> On Tue, Oct 03, 2023 at 07:44:51PM -0700, Jim Mattson wrote:
-> > The business of declaring breaking changes to the architectural
-> > specification in a CPUID bit has never made much sense to me.
->
-> How else should they be expressed then?
->
-> In some flaky PDF which changes URLs whenever the new corporate CMS gets
-> installed?
->
-> Or we should do f/m/s matching which doesn't make any sense for VMs?
->
-> When you think about it, CPUID is the best thing we have.
->
-> > No one is likely to query CPUID.80000021H.EAX[bit 21] today, but if
-> > someone does query the bit in the future, they can reasonably expect
-> > that WRMSR({FS,GS,KERNELGS}_BASE) is a serializing operation whenever
-> > this bit is clear. Therefore, any hypervisor that doesn't pass the bit
-> > through is broken. Sadly, this also means that for a heterogenous
-> > migration pool, the hypervisor must set this bit in the guest CPUID if
-> > it is set on any host in the pool. Yes, that means that the legacy
-> > behavior may sometimes be present in a VM that enumerates the CPUID
-> > bit, but that's the best we can do.
->
-> Yes, add this to your commit message.
->
-> > I'm a little surprised at the pushback, TBH. Are you implying that
-> > there is some advantage to *not* passing this bit through?
->
-> We don't add stuff which is not worth adding. There has to be *at*
-> *least* some justification for it.
+On Tue, Oct 03, 2023, Mingwei Zhang wrote:
+> On Mon, Oct 2, 2023 at 5:56=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > The "when" is what's important.   If KVM took a literal interpretation =
+of
+> > "exclude guest" for pass-through MSRs, then KVM would context switch al=
+l those
+> > MSRs twice for every VM-Exit=3D>VM-Enter roundtrip, even when the VM-Ex=
+it isn't a
+> > reschedule IRQ to schedule in a different task (or vCPU).  The overhead=
+ to save
+> > all the host/guest MSRs and load all of the guest/host MSRs *twice* for=
+ every
+> > VM-Exit would be a non-starter.  E.g. simple VM-Exits are completely ha=
+ndled in
+> > <1500 cycles, and "fastpath" exits are something like half that.  Switc=
+hing all
+> > the MSRs is likely 1000+ cycles, if not double that.
+>=20
+> Hi Sean,
+>=20
+> Sorry, I have no intention to interrupt the conversation, but this is
+> slightly confusing to me.
+>=20
+> I remember when doing AMX, we added gigantic 8KB memory in the FPU
+> context switch. That works well in Linux today. Why can't we do the
+> same for PMU? Assuming we context switch all counters, selectors and
+> global stuff there?
 
-Let me propose the following axiom as justification:
+That's what we (Google folks) are proposing.  However, there are significan=
+t
+side effects if KVM context switches PMU outside of vcpu_run(), whereas the=
+ FPU
+doesn't suffer the same problems.
 
-KVM_GET_SUPPORTED_CPUID must pass through any defeature bits that are
-set on the host, unless KVM is prepared to emulate the missing
-feature.
+Keeping the guest FPU resident for the duration of vcpu_run() is, in terms =
+of
+functionality, completely transparent to the rest of the kernel.  From the =
+kernel's
+perspective, the guest FPU is just a variation of a userspace FPU, and the =
+kernel
+is already designed to save/restore userspace/guest FPU state when the kern=
+el wants
+to use the FPU for whatever reason.  And crucially, kernel FPU usage is exp=
+licit
+and contained, e.g. see kernel_fpu_{begin,end}(), and comes with mechanisms=
+ for
+KVM to detect when the guest FPU needs to be reloaded (see TIF_NEED_FPU_LOA=
+D).
 
-Here, a defeature bit is any CPUID bit where a value of '1' indicates
-the absence of a feature.
+The PMU is a completely different story.  PMU usage, a.k.a. perf, by design=
+ is
+"always running".  KVM can't transparently stop host usage of the PMU, as d=
+isabling
+host PMU usage stops perf events from counting/profiling whatever it is the=
+y're
+supposed to profile.
 
-> Thx.
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> https://people.kernel.org/tglx/notes-about-netiquette
+Today, KVM minimizes the "downtime" of host PMU usage by context switching =
+PMU
+state at VM-Enter and VM-Exit, or at least as close as possible, e.g. for L=
+BRs
+and Intel PT.
+
+What we are proposing would *significantly* increase the downtime, to the p=
+oint
+where it would almost be unbounded in some paths, e.g. if KVM faults in a p=
+age,
+gup() could go swap in memory from disk, install PTEs, and so on and so for=
+th.
+If the host is trying to profile something related to swap or memory manage=
+ment,
+they're out of luck.
