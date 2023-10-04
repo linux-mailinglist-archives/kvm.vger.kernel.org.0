@@ -2,109 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55D367B7E3D
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 13:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3308D7B7EF0
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 14:21:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242218AbjJDLdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 07:33:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
+        id S242337AbjJDMV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 08:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232919AbjJDLdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 07:33:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47ED2A7;
-        Wed,  4 Oct 2023 04:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=LgTiEbkbWU/3dLeZ3ndl5aQ62XZwVSgJEp3sPp3BvRc=; b=IRxNn1UqLy+vTJM/bW1VgjMao3
-        NvMCUspVk2mwGp0Ab0bQosB3DQJivBzggsXhKjIaiH871I0oHLkonKlLszjs14ZxPliBceljl4Z42
-        xeb1Qyka3GIacctWSZmYGdK5PaCP94P2P2xFfatjLAeOAv8v8du001Uu1u8za51Fm/6BvEVUarV7p
-        JtYfXvEwkTjvYnGPpOLM/bt9B68DXWSgVZqZUNGf83+Tfv6/hfwS4OiHlP7vY3S8tiJOL6WLLll70
-        l0fwyN3Wrs5xttrnqrH0z3t/J95bWKm0x6G8GbrjxjMhDLdrvgLpCAy60o76REIr5uaM8Z0kPIRqS
-        +4hI4UYA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qo07W-0037n5-SQ; Wed, 04 Oct 2023 11:32:50 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 5CE08300392; Wed,  4 Oct 2023 13:32:50 +0200 (CEST)
-Date:   Wed, 4 Oct 2023 13:32:50 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Jim Mattson <jmattson@google.com>
+        with ESMTP id S242347AbjJDMV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 08:21:27 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98BE893;
+        Wed,  4 Oct 2023 05:21:22 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-65d0da28fa8so12140906d6.0;
+        Wed, 04 Oct 2023 05:21:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696422081; x=1697026881; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AM7m7vaSmmMYAyEADAXdMx0sZwgXiamITxRXtutrqys=;
+        b=Pb+59J6I4x7+S1oGKFk1bJMbVv3b4vAtsPo9ZvzEQrPxPUEt118fT/c0bA6E3lI2Vr
+         8QbP3NeVw0TmB+2bwIhSTZk6TUmsMkCO+yVjo2apx00C5dX3KwiJYq1iZ8grhXEEtLiz
+         ROejw1hldDFLIr84u12nRTpcZG+TvBl6KTh9MPSYjydXkU5T+r8hoVOSoqjNt9MvcjOj
+         UzPMcmAKWiET2vOQsD4pINRw6dsJdN+SuPDO9mXrF5q486brTs8zYJ+rWZJ6RD/fleGl
+         BRROJR27EAOsWtmyf1DTsFp2CwoibXohcAstP+feccQkr6qzrfVzvkd4sjthqcS8AI0w
+         q+1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696422081; x=1697026881;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AM7m7vaSmmMYAyEADAXdMx0sZwgXiamITxRXtutrqys=;
+        b=nP5SQUN2FWoa38WSwYhu0vD0SixUzH/34wWpkyjmqJ3LM3zUn+sui9H/Jf0lqDUf20
+         FWh4CUUj5MXeSyhbuAssMJYCHQLD+daUCwkMJ1WQV4DzraavEFOH5qDNZPU7rU3D/t2Z
+         bcyvDa5g+Xs/D90V1q/HvtDaC/jarGQRPulMA/nkB4jZEZoRBayx7CeYgocVxvmIXh8s
+         CBVUZfG5b6R9jmNW5AeOz1Vi5AMVRJD/GSldY8mStvWmLX4zX/Hz3XIGArzagm3IW/PZ
+         xcrs48PJSBuED0a4sHS9pGQ/fVf06/D2Wmo5ccTZKMARQiKhOiTZ1zXvIR7oyCtW1lO6
+         JNAg==
+X-Gm-Message-State: AOJu0YzawUDef7HgXoQgZEdn8VvUOARrGgkN1z+uiOwayX3QqxsroGxT
+        jGHcsnceewFIWyx+vffIQ5s=
+X-Google-Smtp-Source: AGHT+IH6JR0icKV87wR6aK9vYjlSTqVEiUxLPDe63ZwohLb+GJ8E9PGNFpX9Dg+q4xR/zsjTXO5W9A==
+X-Received: by 2002:a0c:e18f:0:b0:656:4ba4:f8b6 with SMTP id p15-20020a0ce18f000000b006564ba4f8b6mr2113572qvl.54.1696422081606;
+        Wed, 04 Oct 2023 05:21:21 -0700 (PDT)
+Received: from luigi.stachecki.net ([2607:fb90:fe4a:a54:f3b3:2ab7:a445:b3f2])
+        by smtp.gmail.com with ESMTPSA id z15-20020a0cf00f000000b0065b12c7a48dsm1277228qvk.133.2023.10.04.05.21.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 05:21:21 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 08:21:11 -0400
+From:   Tyler Stachecki <stachecki.tyler@gmail.com>
+To:     Leonardo Bras <leobras@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        David Dunn <daviddunn@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
- event
-Message-ID: <20231004113250.GB5947@noisy.programming.kicks-ass.net>
-References: <20230929115344.GE6282@noisy.programming.kicks-ass.net>
- <ZRbxb15Opa2_AusF@google.com>
- <20231002115718.GB13957@noisy.programming.kicks-ass.net>
- <ZRrF38RGllA04R8o@gmail.com>
- <ZRroQg6flyGBtZTG@google.com>
- <20231002204017.GB27267@noisy.programming.kicks-ass.net>
- <ZRtmvLJFGfjcusQW@google.com>
- <20231003081616.GE27267@noisy.programming.kicks-ass.net>
- <ZRwx7gcY7x1x3a5y@google.com>
- <CALMp9eRew1+-gDy36m3qWy9D9TQP+mkzPQg=xowKcaG+NpbX0w@mail.gmail.com>
+        Shuah Khan <shuah@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH 0/5] KVM: x86: Fix breakage in KVM_SET_XSAVE's ABI
+Message-ID: <ZR1Yt6Z+dhMbn/FJ@luigi.stachecki.net>
+References: <20230928001956.924301-1-seanjc@google.com>
+ <ZR0QOGo5DftkRWsr@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eRew1+-gDy36m3qWy9D9TQP+mkzPQg=xowKcaG+NpbX0w@mail.gmail.com>
+In-Reply-To: <ZR0QOGo5DftkRWsr@redhat.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 11:21:46AM -0700, Jim Mattson wrote:
-> On Tue, Oct 3, 2023 at 8:23 AM Sean Christopherson <seanjc@google.com> wrote:
-
-> > > Since you steal the whole PMU, can't you re-route the PMI to something
-> > > that's virt friendly too?
-> >
-> > Hmm, actually, we probably could.  It would require modifying the host's APIC_LVTPC
-> > entry when context switching the PMU, e.g. to replace the NMI with a dedicated IRQ
-> > vector.  As gross as that sounds, it might actually be cleaner overall than
-> > deciphering whether an NMI belongs to the host or guest, and it would almost
-> > certainly yield lower latency for guest PMIs.
+On Wed, Oct 04, 2023 at 04:11:52AM -0300, Leonardo Bras wrote:
+> So this patch is supposed to fix migration of VM from a host with
+> pre-ad856280ddea (OLD) kernel to a host with ad856280ddea + your set(NEW).
+> Right?
 > 
-> Ugh.  Can't KVM just install its own NMI handler? Either way, it's
-> possible for late PMIs to arrive in the wrong context.
+> Let's get the scenario here, where all machines are the same:
+> 1 - VM created on OLD kernel with a host-supported xfeature F, which is not
+>     guest supported.
+> 2 - VM is migrated to a NEW kernel/host, and KVM_SET_XSAVE xfeature F.
+> 3 - VM will be migrated to another host, qemu requests KVM_GET_XSAVE, which
+>     returns only guest-supported xfeatures, and this is passed to next host
+> 4 - VM will be started on 3rd host with guest-supported xfeatures, meaning
+>     xfeature F is filtered-out, which is not good, because the VM will have
+>     less features compared to boot.
 
-I don't think you realize what a horrible trainwreck the NMI handler is.
-Every handler has to be able to determine if the NMI is theirs to
-handle.
+This is what I was (trying) to convey earlier...
 
-If we go do this whole swizzle thing we must find a sequence of PMU
-'instructions' that syncs against the PMI, because otherwise we're going
-to loose PMIs and that's going to be a *TON* of pain.
+See Sean's response here:
+https://lore.kernel.org/all/ZRMHY83W%2FVPjYyhy@google.com/
 
-I'll put it on the agenda for the next time I talk with the hardware
-folks. But IIRC the AMD thing is *much* worse in this regards than the
-Intel one.
+I'll copy the pertinent part of his very detailed response inline:
+> KVM *must* "trim" features when servicing KVM_GET_SAVE{2}, because that's been
+> KVM's ABI for a very long time, and userspace absolutely relies on that
+> functionality to ensure that a VM can be migrated within a pool of heterogenous
+> systems so long as the features that are *exposed* to the guest are supported
+> on all platforms.
+
+My 2 cents: as an outsider with less familiarity of the KVM code, it is hard
+to understand the contract here with the guest/userspace. It seems there is a
+fundamental question of whether or not "superfluous" features, those being
+host-supported features which extend that which the guest is actually capable
+of, can be removed between the time that the guest boots and when it
+terminates, through however many live-migrations that may be.
+
+Ultimately, this problem is not really fixable if said features cannot be
+removed.
+
+Is there an RFC or document which captures expectations of this form?
