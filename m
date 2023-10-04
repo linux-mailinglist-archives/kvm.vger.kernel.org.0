@@ -2,105 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC8047B86E7
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B6F07B86F0
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:48:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbjJDRqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 13:46:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53976 "EHLO
+        id S243502AbjJDRsr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 13:48:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbjJDRqo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 13:46:44 -0400
-Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889BF9E;
-        Wed,  4 Oct 2023 10:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
-        Subject:Cc:To:From; bh=9gqPmyTqMnaI5p/Yo2lWX8v6irfTkiQJyeLI3Y/+zIE=; b=THUEtc
-        unQCDvOdaaGMv//tZS+KnFKrjVgqVmY1Oz4phjWFwdFVFTpf8/tgOSvx7ptevmVImLFQv6sMrm5+l
-        gx/dQCoi+DH2YtY2UJQK54HKlLwcwKTOa9ZiDNfX5WiksD2v6bdmeuKtfwrCnGAlUAPqDLNbP+pB2
-        Gvs2CZjh53Y=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qo5xA-0001tA-NQ; Wed, 04 Oct 2023 17:46:32 +0000
-Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1qo5xA-0003xm-CC; Wed, 04 Oct 2023 17:46:32 +0000
-From:   Paul Durrant <paul@xen.org>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Subject: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
-Date:   Wed,  4 Oct 2023 17:46:28 +0000
-Message-Id: <20231004174628.2073263-1-paul@xen.org>
-X-Mailer: git-send-email 2.39.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233239AbjJDRsq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 13:48:46 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B078D9E
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 10:48:42 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581F4C433C8;
+        Wed,  4 Oct 2023 17:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696441722;
+        bh=EZOLoYCmDWEQ7sfMyWL89qK2JKi3r9x1fsbt4TT3AFY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZNCz6vYVOwqSKFLbWCoRZdjUEFu8haUoBnTzcvpqZAekcU6ddBdY7202hlgvo2xII
+         cd7VE4n5VyPyH0s7c13/knNz1T/KBog5dO9FzKEqwU+ZQUAbDIz5GQxWtQuCXp1Z+p
+         OvZY2SVZxkpuKebx3EdpKKTuqs7kRX66WaHHpmtqpxPCZVyEqGHLdm2RR4z6d4zd+f
+         zsIvMIsFDC3K1i5qfvCKU+RFheKM+/Uf2rb9xWV3PfDVx9isfWz6yeukrN8lOX75L5
+         pzV3peigKKEsHuFhKq6AvLn7+bbiJtAHhOWsL8Tv93hu2M+Efsmbdfwm87QgJVxYWn
+         Xs6kg5qNAGlkQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qo5zD-0019Kp-PL;
+        Wed, 04 Oct 2023 18:48:39 +0100
+Date:   Wed, 04 Oct 2023 18:48:38 +0100
+Message-ID: <86a5synurt.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v11 10/12] KVM: arm64: Document vCPU feature selection UAPIs
+In-Reply-To: <ZR2YOF1lMGLraR1Q@linux.dev>
+References: <20231003230408.3405722-1-oliver.upton@linux.dev>
+        <20231003230408.3405722-11-oliver.upton@linux.dev>
+        <86o7heohjh.wl-maz@kernel.org>
+        <ZR2YOF1lMGLraR1Q@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, cohuck@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paul Durrant <pdurrant@amazon.com>
+On Wed, 04 Oct 2023 17:52:08 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Oct 04, 2023 at 10:36:50AM +0100, Marc Zyngier wrote:
+> > On Wed, 04 Oct 2023 00:04:06 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> [...]
+> 
+> > > +The ID Registers
+> > > +================
+> > > +
+> > > +The Arm architecture specifies a range of *ID Registers* that describe the set
+> > > +of architectural features supported by the CPU implementation. KVM initializes
+> > > +the guest's ID registers to the maximum set of CPU features supported by the
+> > > +system. The ID register values are VM-scoped in KVM, meaning that the values
+> > > +are identical for all vCPUs in a VM.
+> > 
+> > I'm a bit reluctant to give this guarantee. Case in point: MPIDR_EL1
+> > is part of the Feature ID space, and is definitely *not* a register
+> > that we can make global, even on a fully homogeneous system.
+> 
+> Oh, very good point.
+> 
+> > I'd also like to give us more flexibility to change the implementation
+> > in the future without having to change the API again. IMO, the fact
+> > that we make our life simpler by only tracking a single copy is an
+> > implementation detail, not something that userspace should rely on.
+> > 
+> > I would simply turn the "The ID register values are VM-scoped" into
+> > "The ID register values may be VM-scoped", which gives us that
+> > flexibility.
+> 
+> Agreed, I'm happy to duck behind some vague language here :)
+> 
+> > > +
+> > > +KVM allows userspace to *opt-out* of certain CPU features described by the ID
+> > > +registers by writing values to them via the ``KVM_SET_ONE_REG`` ioctl. The ID
+> > > +registers are mutable until the VM has started, i.e. userspace has called
+> > > +``KVM_RUN`` on at least one vCPU in the VM. Userspace can discover what fields
+> > > +are mutable in the ID registers using the ``KVM_ARM_GET_REG_WRITABLE_MASKS``.
+> > > +See the :ref:`ioctl documentation <KVM_ARM_GET_REG_WRITABLE_MASKS>` for more
+> > > +details.
+> > > +
+> > > +Userspace is allowed to *limit* or *mask* CPU features according to the rules
+> > > +outlined by the architecture in DDI0487J 'D19.1.3 Principles of the ID scheme
+> > 
+> > nit: consider spelling out the *full* version of the ARM ARM (DDI
+> > 0487J.a), just in case we get a J.b this side of Xmas and that this
+> > reference is renumbered...
+> 
+> Going to fix both of these with the following diff:
+> 
+> diff --git a/Documentation/virt/kvm/arm/vcpu-features.rst b/Documentation/virt/kvm/arm/vcpu-features.rst
+> index 2d2f89c5781f..f7cc6d8d8b74 100644
+> --- a/Documentation/virt/kvm/arm/vcpu-features.rst
+> +++ b/Documentation/virt/kvm/arm/vcpu-features.rst
+> @@ -24,8 +24,8 @@ The ID Registers
+>  The Arm architecture specifies a range of *ID Registers* that describe the set
+>  of architectural features supported by the CPU implementation. KVM initializes
+>  the guest's ID registers to the maximum set of CPU features supported by the
+> -system. The ID register values are VM-scoped in KVM, meaning that the values
+> -are identical for all vCPUs in a VM.
+> +system. The ID register values may be VM-scoped in KVM, meaning that the
+> +values could be shared for all vCPUs in a VM.
+>  
+>  KVM allows userspace to *opt-out* of certain CPU features described by the ID
+>  registers by writing values to them via the ``KVM_SET_ONE_REG`` ioctl. The ID
+> @@ -36,9 +36,9 @@ See the :ref:`ioctl documentation <KVM_ARM_GET_REG_WRITABLE_MASKS>` for more
+>  details.
+>  
+>  Userspace is allowed to *limit* or *mask* CPU features according to the rules
+> -outlined by the architecture in DDI0487J 'D19.1.3 Principles of the ID scheme
+> -for fields in ID register'. KVM does not allow ID register values that exceed
+> -the capabilities of the system.
+> +outlined by the architecture in DDI0487J.a D19.1.3 'Principles of the ID
+> +scheme for fields in ID register'. KVM does not allow ID register values that
+> +exceed the capabilities of the system.
+>  
+>  .. warning::
+>     It is **strongly recommended** that userspace modify the ID register values
+> 
 
-Upstream Xen now ignores this flag [1], since the only guest kernel ever to
-use it was buggy. By ignoring the flag the guest will always get a callback
-if it sets a negative timeout which upstream Xen has determined not to
-cause problems for any guest setting the flag.
+Yup, looks good.
 
-[1] https://xenbits.xen.org/gitweb/?p=xen.git;a=commitdiff;h=19c6cbd909
+	M.
 
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
----
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
-
-v2:
- - Amend the patch subject line
----
- arch/x86/kvm/xen.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 40edf4d1974c..8f1d46df0f3b 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1374,12 +1374,8 @@ static bool kvm_xen_hcall_vcpu_op(struct kvm_vcpu *vcpu, bool longmode, int cmd,
- 			return true;
- 		}
- 
-+		/* A delta <= 0 results in an immediate callback, which is what we want */
- 		delta = oneshot.timeout_abs_ns - get_kvmclock_ns(vcpu->kvm);
--		if ((oneshot.flags & VCPU_SSHOTTMR_future) && delta < 0) {
--			*r = -ETIME;
--			return true;
--		}
--
- 		kvm_xen_start_timer(vcpu, oneshot.timeout_abs_ns, delta);
- 		*r = 0;
- 		return true;
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
