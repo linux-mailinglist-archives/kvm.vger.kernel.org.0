@@ -2,139 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 500157B86E3
-	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A7A67B86E6
+	for <lists+kvm@lfdr.de>; Wed,  4 Oct 2023 19:46:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233386AbjJDRqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 13:46:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46610 "EHLO
+        id S233938AbjJDRqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 13:46:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbjJDRqV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 13:46:21 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4404D9E
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 10:46:18 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D68ECC433C7;
-        Wed,  4 Oct 2023 17:46:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696441577;
-        bh=S513Ne6NcQHwCGIuqmrMSD1LeBkTcaYaXLRBEA41udo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fY//19IGB4yMG+SxppmX23Ftz7Sa1x5Oz+pXf6lM5MiGj3t6y/0KJQsMkGHeeFium
-         jgq72WsAgLgg10tndQmDfI/sfU9ow5NjX7JrWZAIZA8/cZJ3DS6kJm1i+GNawRc/n9
-         FIY2tFCzTkIhOmB48FVdPhwGVFYnoIbquiIkdsktYwnEBFE48324feeNhjMGZGSO1u
-         8UdadUhLH/OYZoXEEzmbbMAPphIFIoCyF4aAqmZ23NxLiH78xmGaZPFSlf4NO0oZtN
-         AvQ1F0x/oRgO/9RADS0QA/mTVx3ieTyGcWCOW1G1yROHGiZcWZ1uYVvHoXUpsl4ilG
-         GFukdxrcO0eeA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qo5wt-0019H3-Ao;
-        Wed, 04 Oct 2023 18:46:15 +0100
-Date:   Wed, 04 Oct 2023 18:46:14 +0100
-Message-ID: <86bkdenuvt.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        with ESMTP id S233497AbjJDRqi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 13:46:38 -0400
+Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [IPv6:2001:41d0:203:375::cb])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A1CFA7
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 10:46:34 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1696441592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FkXfxAF8p4JcZ7Pgy7Z1Q9RH1IQGdPoaImpvpiU5zcw=;
+        b=U4zjpIP83Uxl+7rjo0sTildgwacnqciJTm6QY/T3AeDFIuqjNRTfKwzbypYgy1si7Exq0O
+        8YaE6RzMZhL5G8SofpSyVd0oTepEW7InblkabJTkS2QwlIlWLzC+TI8ZCkIjvjOZjHn47T
+        DTm85bDbtssLEoIANq63HHfifD/tlg4=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v11 05/12] KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
-In-Reply-To: <ZR2cEYQLrPCStcgy@linux.dev>
+        kvm@vger.kernel.org, Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v11 00/12] KVM: arm64: Enable 'writable' ID registers
+Date:   Wed,  4 Oct 2023 17:46:21 +0000
+Message-ID: <169644154288.3677537.15121340860793882283.b4-ty@linux.dev>
+In-Reply-To: <20231003230408.3405722-1-oliver.upton@linux.dev>
 References: <20231003230408.3405722-1-oliver.upton@linux.dev>
-        <20231003230408.3405722-6-oliver.upton@linux.dev>
-        <86pm1uojcn.wl-maz@kernel.org>
-        <ZR2cEYQLrPCStcgy@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, cohuck@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        TO_EQ_FM_DIRECT_MX,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 04 Oct 2023 18:08:33 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, 3 Oct 2023 23:03:56 +0000, Oliver Upton wrote:
+> Few more fixes that I threw on top:
 > 
-> On Wed, Oct 04, 2023 at 09:57:44AM +0100, Marc Zyngier wrote:
-> > On Wed, 04 Oct 2023 00:04:01 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
-> > > it is safe to bump up the default KVM sanitised debug version to v8p8.
-> > > 
-> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > 
-> > The SoB sequence looks odd. Either you're the author, and Jing's SoB
-> > shouldn't be there without a Co-DB tag, or you've lost Jing's
-> > attribution (which sometimes happens when rebasing and squashing
-> > patches together).
+> v10 -> v11:
+>  - Drop the custom handling of FEAT_BC as it is now fixed on the arm64
+>    side (Kristina)
+>  - Bikeshed on the naming of the masks ioctl to keep things in the KVM_
+>    namespace
+>  - Apply more bikeshedding to the ioctl documentation, spinning off
+>    separate blocks for the 'generic' description and the Feature ID
+>    documentation
+>  - Fix referencing in the vCPU features doc
+>  - Fix use of uninitialized data in selftest
 > 
-> This is an artifact of me applying Jing's version of the series and
-> hacking on top of it.
-> 
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 11 +++++++----
-> > >  1 file changed, 7 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 8fbfe61fe7bc..b342c96e08f4 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -1496,8 +1496,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> > >  {
-> > >  	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > >  
-> > > -	/* Limit debug to ARMv8.0 */
-> > > -	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
-> > > +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
-> > >  
-> > >  	/*
-> > >  	 * Only initialize the PMU version if the vCPU was configured with one.
-> > > @@ -1557,6 +1556,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> > >  	if (kvm_vcpu_has_pmu(vcpu))
-> > >  		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
-> > >  
-> > > +	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
-> > > +
-> > 
-> > For consistency, you should also repaint DBGDIDR, which has a
-> > hardcoded '6' (ARMv8) as the supported debug version.
-> 
-> Ah, good point. I'll extract the value from the ID register much like we
-> do for other fields in DBGDIDR:
-> 
-> commit b92565ca433f611ea0901a6098d72f91be84cdb0
-> Author: Oliver Upton <oliver.upton@linux.dev>
-> Date:   Wed Oct 4 17:03:17 2023 +0000
-> 
->     KVM: arm64: Advertise selected DebugVer in DBGDIDR.Version
->     
->     Much like we do for other fields, extract the Debug architecture version
->     from the ID register to populate the corresponding field in DBGDIDR.
->     Rewrite the existing sysreg field extractors to use SYS_FIELD_GET() for
->     consistency.
->     
->     Suggested-by: Marc Zyngier <maz@kernel.org>
->     Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> [...]
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Applied to kvmarm/next, thanks!
 
-	M.
+[01/12] KVM: arm64: Allow userspace to get the writable masks for feature ID registers
+        https://git.kernel.org/kvmarm/kvmarm/c/3f9cd0ca8484
+[02/12] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+        https://git.kernel.org/kvmarm/kvmarm/c/6656cda0f3b2
+[03/12] KVM: arm64: Use guest ID register values for the sake of emulation
+        https://git.kernel.org/kvmarm/kvmarm/c/8b6958d6ace1
+[04/12] KVM: arm64: Reject attempts to set invalid debug arch version
+        https://git.kernel.org/kvmarm/kvmarm/c/a9bc4a1c1e0c
+[05/12] KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
+        https://git.kernel.org/kvmarm/kvmarm/c/9f9917bc71b0
+[06/12] KVM: arm64: Allow userspace to change ID_AA64ISAR{0-2}_EL1
+        https://git.kernel.org/kvmarm/kvmarm/c/56d77aa8bdf5
+[07/12] KVM: arm64: Allow userspace to change ID_AA64MMFR{0-2}_EL1
+        https://git.kernel.org/kvmarm/kvmarm/c/d5a32b60dc18
+[08/12] KVM: arm64: Allow userspace to change ID_AA64PFR0_EL1
+        https://git.kernel.org/kvmarm/kvmarm/c/8cfd5be88ebe
+[09/12] KVM: arm64: Allow userspace to change ID_AA64ZFR0_EL1
+        https://git.kernel.org/kvmarm/kvmarm/c/f89fbb350dd7
+[10/12] KVM: arm64: Document vCPU feature selection UAPIs
+        https://git.kernel.org/kvmarm/kvmarm/c/dafa493dd01d
+[11/12] KVM: arm64: selftests: Import automatic generation of sysreg defs
+        https://git.kernel.org/kvmarm/kvmarm/c/6a4c6c6a56c1
+[12/12] KVM: arm64: selftests: Test for setting ID register from usersapce
+        https://git.kernel.org/kvmarm/kvmarm/c/3b44c2008bf0
 
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
