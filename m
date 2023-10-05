@@ -2,35 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B20817BA136
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:53:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AAD37BA119
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238674AbjJEOnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 10:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33484 "EHLO
+        id S238773AbjJEOnu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 10:43:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239009AbjJEOlc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 10:41:32 -0400
+        with ESMTP id S239084AbjJEOlo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 10:41:44 -0400
 Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE982A5C5;
-        Thu,  5 Oct 2023 07:16:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C6E810D;
+        Thu,  5 Oct 2023 07:16:44 -0700 (PDT)
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1qoLqs-0005vd-4Z; Thu, 05 Oct 2023 12:45:06 +0200
-Message-ID: <71d4d583-9afa-4c21-8684-0285bc2b8b19@maciej.szmigiero.name>
-Date:   Thu, 5 Oct 2023 12:45:00 +0200
+        id 1qoLw6-0005y4-Dj; Thu, 05 Oct 2023 12:50:30 +0200
+Message-ID: <04cae79f-cd04-4cfe-b6ca-8b02d96350f9@maciej.szmigiero.name>
+Date:   Thu, 5 Oct 2023 12:50:24 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: selftests: Zero-initialize entire test_result in
- memslot perf test
+Subject: Re: [PATCH] KVM: x86: Ignore MSR_AMD64_BU_CFG access
 Content-Language: en-US, pl-PL
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-References: <20231005002954.2887098-1-seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <0ffde769702c6cdf6b6c18e1dcb28b25309af7f7.1695659717.git.maciej.szmigiero@oracle.com>
+ <ZRHRsgjhOmIrxo0W@google.com>
+ <8c6a1fc8-2ac5-4767-8b02-9ef56434724e@maciej.szmigiero.name>
+ <ZRHckCMwOv3jfSs7@google.com> <ac402dd4-8bf3-87a8-7ade-50d62997ce97@amd.com>
+ <e8993457-9e28-434a-b4e8-25ffcbee6517@maciej.szmigiero.name>
+ <ZR3-90IQqb3mSV-b@google.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  xsFNBFpGusUBEADXUMM2t7y9sHhI79+2QUnDdpauIBjZDukPZArwD+sDlx5P+jxaZ13XjUQc
@@ -73,7 +78,7 @@ Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
  H5/qn1uUAhP1Oz+jKLUECbPS2ll73rFXUr+U3AKyLpx4T+/Wy1ajKn7rOB7udmTmYb8nnlQb
  0fpPzYGBzK7zWIzFotuS5x1PzLYhZQFkfegyAaxys2joryhI6YNFo+BHYTfamOVfFi8QFQL5
  5ZSOo27q/Ox95rwuC/n+PoJxBfqU36XBi886VV4LxuGZ8kfy0qDpL5neYtkC9w==
-In-Reply-To: <20231005002954.2887098-1-seanjc@google.com>
+In-Reply-To: <ZR3-90IQqb3mSV-b@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
@@ -85,66 +90,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5.10.2023 02:29, Sean Christopherson wrote:
-> Zero-initialize the entire test_result structure used by memslot_perf_test
-> instead of zeroing only the fields used to guard the pr_info() calls.
+On 5.10.2023 02:10, Sean Christopherson wrote:
+> On Mon, Oct 02, 2023, Maciej S. Szmigiero wrote:
+>> On 26.09.2023 00:25, Tom Lendacky wrote:
+>>>>> It's partially documented in various AMD BKDGs, however I couldn't find
+>>>>> any definition for this particular bit (8) - other than that it is reserved.
+>>>>
+>>>> I found it as MSR_AMD64_BU_CFG for Model 16h, but that's Jaguar/Puma, not Zen1.
+>>>> My guess is that Windows is trying to write this thing:
+>>>>
+>>>>     MSRC001_1023 [Table Walker Configuration] (Core::X86::Msr::TW_CFG)
+>>>>     Read-write. Reset: 0000_0000_0000_0000h.
+>>>>     _lthree0_core[3,1]; MSRC001_1023
+>>>>
+>>>>     Bits   Description
+>>>>     63:50  Reserved.
+>>>>     49     TwCfgCombineCr0Cd: combine CR0_CD for both threads of a core. Read-write. Reset: 0. Init: BIOS,1.
+>>>>            1=The host Cr0_Cd values from the two threads are OR'd together and used by both threads.
+>>>>     48:0   Reserved.
+>>>>
+>>>> Though that still doesn't explain bit 8...  Perhaps a chicken-bit related to yet
+>>>> another speculation bug?
+>>>>
+>>>> Boris or Tom, any idea what Windows is doing?  I doubt it changes our options in
+>>>> terms of "fixing" this in KVM, but having a somewhat accurate/helpful changelog
+>>>> would be nice.
+>>>
+>>> It's definitely not related to a speculation bug, but I'm unsure what was
+>>> told to Microsoft that has them performing that WRMSR. The patch does the
+>>> proper thing, though, as a guest shouldn't be updating that setting.
+>>>
+>>> And TW_CFG is the proper name of that MSR for Zen.
+>>
+>> So, should I prepare v2 with MSR_AMD64_BU_CFG -> MSR_AMD64_TW_CFG change?
 > 
-> gcc 13.2.0 is a bit overzealous and incorrectly thinks that rbestslottim's
-> slot_runtime may be used uninitialized.
-> 
->    In file included from memslot_perf_test.c:25:
->    memslot_perf_test.c: In function ‘main’:
->    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_nsec’ may be used uninitialized [-Werror=maybe-uninitialized]
->       31 | #define pr_info(...) printf(__VA_ARGS__)
->          |                      ^~~~~~~~~~~~~~~~~~~
->    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
->     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
->          |                 ^~~~~~~
->    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_nsec’ was declared here
->     1092 |         struct test_result rbestslottime;
->          |                            ^~~~~~~~~~~~~
->    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_sec’ may be used uninitialized [-Werror=maybe-uninitialized]
->       31 | #define pr_info(...) printf(__VA_ARGS__)
->          |                      ^~~~~~~~~~~~~~~~~~~
->    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
->     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
->          |                 ^~~~~~~
->    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_sec’ was declared here
->     1092 |         struct test_result rbestslottime;
->          |                            ^~~~~~~~~~~~~
-> 
-> That can't actually happen, at least not without the "result" structure in
-> test_loop() also being used uninitialized, which gcc doesn't complain
-> about, as writes to rbestslottime are all-or-nothing, i.e. slottimens can't
-> be non-zero without slot_runtime being written.
-> 
-> 	if (!data->mem_size &&
-> 	    (!rbestslottime->slottimens ||
-> 	     result.slottimens < rbestslottime->slottimens))
-> 		*rbestslottime = result;
-> 
-> Zero-initialize the structures to make gcc happy even though this is
-> likely a compiler bug.  The cost to do so is negligible, both in terms of
-> code and runtime overhead.  The only downside is that the compiler won't
-> warn about legitimate usage of "uninitialized" data, e.g. the test could
-> end up consuming zeros instead of useful data.  However, given that the
-> test is quite mature and unlikely to see substantial changes, the odds of
-> introducing such bugs are relatively low, whereas being able to compile
-> KVM selftests with -Werror detects issues on a regular basis.
-> 
-> Cc: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> I don't like papering over compiler bugs, but this is causing me quite a bit of
-> pain, and IMO the long-term downsides are quite minimal.  And I already spent
-> way too much time trying to figure out if there is some bizarre edge case that
-> gcc is detecting :-/
-> 
+> If we can get Paolo's attention, I'd like to get his thoughts on punting this
+> to QEMU/userspace.  I'm worried that "handling" uarch specific MSRs in KVM is
+> going to paint us into a corner and force KVM to check guest F/M/S someday, which
+> I want to avoid at pretty much all costs.
 
-Weird, but as you say, the downsides of papering over this (probable) compiler
-issue are small, so:
-Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+We already do similar ignoring in KVM for MSR_AMD64_BU_CFG2, MSR_AMD64_DC_CFG
+and MSR_F15H_EX_CFG, so doing this {BU_CFG2,TW_CFG} MSR filtering in QEMU would
+be inconsistent with these.
+
+But let's wait for Paolo's opinion then.
 
 Thanks,
 Maciej
