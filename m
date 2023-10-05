@@ -2,92 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69A1B7B999F
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 03:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 998E17B99C4
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 03:44:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244261AbjJEBbo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 21:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50526 "EHLO
+        id S233847AbjJEBol (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 21:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244482AbjJEBbl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 21:31:41 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C775FF2
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 18:31:36 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8943298013so612107276.2
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 18:31:36 -0700 (PDT)
+        with ESMTP id S231650AbjJEBok (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 21:44:40 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42852C1
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 18:44:33 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a4f656f751so7294747b3.0
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 18:44:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696469496; x=1697074296; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696470270; x=1697075070; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xda1ecjjiZbKdQWHkJnno+SGBsr2H774i+dBsqhxAuM=;
-        b=09BG38DVeLWEjNHuaZ+fb4rLdAQgUd+QVXF0SILiXaHAIQuiTqRb7C6dXbNpFkrUvv
-         E+2mZAdf70uH2F+4CCOhRWHzp0E6MLp6J3aqDYnSgrEO1T7q05Fib33ejRv9kXoceOb9
-         UanpQDi2mRWiBadvuHFHZCr9X80i3r2XEzwbRY26HJmU3B/CDWwAg6gaW8VyGQDSIpaP
-         os9enJmVwTnlOARbP/PjHxBSgkAuuQuJNgwRvfGwY0goCRMZscp8ZLQTxWRY/Wh6KAU4
-         QabK73HaGz66jVLxKAdGV3TnESAIgSQ4X1tD18cwHt0yB2umSZBXuqGuQFbUa3GNlp+p
-         1ahw==
+        bh=brblM1cgPenAQfqP7iVYjJGMX2iIkPxCWUe6XyphfiA=;
+        b=unmTgSGRQd5WUElWeEy/LJKed4c+nZRtfnW3sZP/mMdblW0n8WUMg1Tea+DGCIbwok
+         ZD2MEjqOgO7bgTdBkg7k8fABT76MKzq3kYk513NpZs+s+EUZJzEVZv2jLkwXEhYh2GNM
+         yXIvZenI2RgXVQjq5FoUl76LD+GatQkVZosSugVrCEb509AmTUZPVl0Fcgjwcp14ciJW
+         TCo8Kl+JI55FWQEA/PEBLN+cyARIvj4XGz2m93rd6SAI3ezhj0e0skxjoQSjpwQDPDZ0
+         yISJbT2EXz7h7/uyzcM0LitcWnKSCzQzvw6nWwhvlStJ/4naQ//sO00fuAmxn1qGckKW
+         i4cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696469496; x=1697074296;
+        d=1e100.net; s=20230601; t=1696470270; x=1697075070;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xda1ecjjiZbKdQWHkJnno+SGBsr2H774i+dBsqhxAuM=;
-        b=akw1ghWxj0CKY9HsRB/GP8Hx/HzoSGv7GyaOCiT4oGN6zYR8ml6snBa7jgfY0ciWc2
-         +4wNJlYwqr9YfWgnrGBbvMOZhK9tx8BYrhQ0YBsL2tsrvFs5+DTh8nJ8EYq24IwhP+y2
-         kfzszycx6k6m3Sr7RDNolnzeCEK5HI0l8NbbbsJRvIKFCYnr8RSPv1sDnoQhfSktgsQm
-         jdztHW+YtypaHPpcANVRPdlbdnhwh9ukM4tyt9xoHr/BO3ncL5ZP7JCv4jw/SJHp3JNT
-         Y3NYSW+e1rWim1ZGbRIUXMcI6MAp30BDnE8JwWPLJeq+YjbQ7dRRuPbGBmeDc7fo8ULm
-         xq2g==
-X-Gm-Message-State: AOJu0Ywccl+PpmusbonZX+MjTAxNkv2GetHnH6jKASg2825ZLt+UHqll
-        owxK6uvyShBWsj+axuFi+wnQ6haZksI=
-X-Google-Smtp-Source: AGHT+IG2aHVyPg3d16ztOsdHyjEi6jHqc3esaJjLX34jL1vQcS5VxBAA/jrDErtGK3O7Nln4DyQKobwzaB8=
+        bh=brblM1cgPenAQfqP7iVYjJGMX2iIkPxCWUe6XyphfiA=;
+        b=AT8EopBIIafdHfYlyF+/WcnIUh75naXbEvNLxuq5WIAxI90TeJVoUXxrZ3XZeN/D1/
+         +L/3xD8bVTaXsxiytkmuMCMztKeBMcz6bsBOtIoEts/MolarHS1A+1Zoo7mLlL9nggHk
+         vD0CoYNg5fSJnYq6n2y0zYMEBk6gyyL1QOFnkXRJ9z80QmR8u9ldmEpPIDBsYFgJAjUq
+         Zz/LgfWgTeob8NQisZMsEgchRCe+RDGFjRQFSQJ8ibqp3ZHanXxGo33u+Jvjd40yqUd7
+         ipPflPeX9MmafozrKOnHO05mBq4TQaamH56sZ8idfobWuvOn8fvyAelTiavfL1SMqL98
+         IIgw==
+X-Gm-Message-State: AOJu0YyIovptvBGWQ7pwt4w6JoNqxuTMwTzykjEbM8t8lhKst0wyaVFC
+        4urgoMvh1nRqmvAMKACKDrOa8me0ybU=
+X-Google-Smtp-Source: AGHT+IFS+qnZ1QlDJ/CSV8U3hLt+JuAx5JZDqupY2JuMBGE0zT3Mhw/S/rlbAo3YBzz7Lh9UPHdd4OtkY7c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:9a04:0:b0:d74:93a1:70a2 with SMTP id
- x4-20020a259a04000000b00d7493a170a2mr62326ybn.5.1696469495720; Wed, 04 Oct
- 2023 18:31:35 -0700 (PDT)
-Date:   Wed,  4 Oct 2023 18:29:37 -0700
-In-Reply-To: <20231004174628.2073263-1-paul@xen.org>
+ (user=seanjc job=sendgmr) by 2002:a5b:741:0:b0:d81:bb31:d2fa with SMTP id
+ s1-20020a5b0741000000b00d81bb31d2famr61515ybq.3.1696470270584; Wed, 04 Oct
+ 2023 18:44:30 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 18:44:29 -0700
+In-Reply-To: <20230908222905.1321305-11-amoorthy@google.com>
 Mime-Version: 1.0
-References: <20231004174628.2073263-1-paul@xen.org>
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <169645826229.2822648.14767470474793635064.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-11-amoorthy@google.com>
+Message-ID: <ZR4U_czGstnDrVxo@google.com>
+Subject: Re: [PATCH v5 10/17] KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by
+ atomizing __gfn_to_pfn_memslot() calls
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paul Durrant <paul@xen.org>
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
+        nadav.amit@gmail.com, isaku.yamahata@gmail.com,
+        kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 04 Oct 2023 17:46:28 +0000, Paul Durrant wrote:
-> Upstream Xen now ignores this flag [1], since the only guest kernel ever to
-> use it was buggy. By ignoring the flag the guest will always get a callback
-> if it sets a negative timeout which upstream Xen has determined not to
-> cause problems for any guest setting the flag.
-> 
-> [1] https://xenbits.xen.org/gitweb/?p=xen.git;a=commitdiff;h=19c6cbd909
-> 
-> [...]
+Eh, the shortlog basically says "do work" with a lot of fancy words.  It really
+just boils down to:
 
-Applied to kvm-x86 xen, thanks!
+  KVM: Let callers of __gfn_to_pfn_memslot() opt-out of USERFAULT_ON_MISSING
 
-[1/1] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
-      https://github.com/kvm-x86/linux/commit/409f2e92a27a
+On Fri, Sep 08, 2023, Anish Moorthy wrote:
+> Change the "atomic" parameter of __gfn_to_pfn_memslot() to an enum which
 
---
-https://github.com/kvm-x86/linux/tree/next
+I've pushed back on more booleans multiple times, but IMO this is even worse.
+E.g. what does an "upgrade" to atomic even mean?
+
+Since we have line of sight to getting out of boolean hell via David's series,
+just bite the bullet for now.  Deciphering the callers will suck, but not really
+anymore than it already sucks.
+
+kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+			       bool atomic, bool interruptible, bool *async,
+			       bool write_fault, bool *writable,
+			       bool can_do_userfault, hva_t *hva)
+{
+	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+
+	if (hva)
+		*hva = addr;
+
+	if (kvm_is_error_hva(addr)) {
+		if (writable)
+			*writable = false;
+
+		if (addr == KVM_HVA_ERR_RO_BAD)
+			return KVM_PFN_ERR_RO_FAULT;
+
+		return KVM_PFN_NOSLOT;
+	}
+
+	if (!atomic && can_do_userfault &&
+	    kvm_is_slot_userfault_on_missing(slot)) {
+		atomic = true;
+		if (async) {
+			*async = false;
+			async = NULL;
+		}
+	}
+
+	/* Do not map writable pfn in the readonly memslot. */
+	if (writable && memslot_is_readonly(slot)) {
+		*writable = false;
+		writable = NULL;
+	}
+
+	return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+			  writable);
+}
