@@ -2,140 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D26767BA512
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:14:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C757F7BA528
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241077AbjJEQNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 12:13:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
+        id S240419AbjJEQOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 12:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234753AbjJEQMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 12:12:23 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB0B59FF
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 22:51:00 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-2774874c3daso430823a91.1
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 22:51:00 -0700 (PDT)
+        with ESMTP id S240509AbjJEQNF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 12:13:05 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA7836EA9
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 23:41:41 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40537481094so5408935e9.0
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 23:41:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1696485060; x=1697089860; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IAn7kTF76MX4baCsjz/DD87LgbEJOFPnszS1gD87MLo=;
-        b=ZXubW7/QRu9lfTWrHyJPGHvyKFEbmAjEGsA43lpb7Aa1B5q0XjQmR8aY6/JMLTFW6d
-         LPSWr2Ds4/22GFtcQ/9KzR28OoFbFkzZuaf/Cr1iE7cPrQre79m0GookUWiIvChHBIyD
-         nwi6+MkCNAcKtTcb18oWw9GtyZ4cxW2Or03HqHrNSE3OY4b777U/GoD/PFu5kxxK0VQi
-         bFuyj6U47r4kUsPOlP4MYPFSubLZEb0fCnFgIByCYMoXS79N9lpdNH5AftJZuOuRPM3l
-         bpY9o14EBhXWKmB5o1ri0uEmRyy+3BYQPNVsmgKJoz2UgwcKGHU96ndyPlbaFh5YHpaU
-         ge2w==
+        d=linaro.org; s=google; t=1696488100; x=1697092900; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+vdqveFoqTC4kTMjULrJM/pFuxAH0pZ83O2NiJo6o6s=;
+        b=u36YCd/sGIJoSFSh+280Jj7t+31EiOJylJmuP9BM2OQURFLvRGDj8inwgmZzHidOYk
+         iBo2/l/eki3uSq2O3HeOVE1/frG9LB+i3Gq6pc8CfNg87AVASXn9XK1OT2znqVtI3mgK
+         WTQ8fG1u0AOY6Zh9f1yhhj9o8cK/QEwWP+l2+mOOyJ1dgJWcXmXp/eDfbIJWpz+LxIo8
+         H2R0kBFS2SOUEuvvnfU2DWPM4JmuM2LAbWaW2YaZ9ZOK0MPqgJZuH0CBVg9+6Y548gaj
+         Pwq0RgtpmMNVq8GtCLrD/Rq/EDunT+Xms9FWSfpt6TM8nH7Jwk6/apaf0PehJyuxZXfg
+         o7FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696485060; x=1697089860;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IAn7kTF76MX4baCsjz/DD87LgbEJOFPnszS1gD87MLo=;
-        b=MHjVP3fFQ56Qlei0wwFM5uBGnKIVisexoGtZLcKmtl5hSrCBSaixv38QFNm1ZGUwgf
-         tiox231YBQ2QFH2oAWPXzyzS1iPC0UzeN6egBtOiKEej5aA8EqjvXoCBmQZp4qbael0m
-         ZZw/hNrW3KZEWuCWLMsJQ3j0yD7aR4BHgsZOVJ6sbVAKLr8W2FGkNqiTqqGQJNBwSbSi
-         a3WSutc/rf30enlSSm8ly0mnYk2JdKUdpiv9AtDFEuPIGngb1/XAdUGCGGapiN/122Pt
-         nUzV47ahAWmKLOtqtWRVTWUk5OjVVlTHDwUIjEMbrUdDm+tqtiZzQy9D971ZbaGt1hOm
-         XsWg==
-X-Gm-Message-State: AOJu0Yy3cN4/XKqHJGGz7jj+6K2YeXHjW9NJyaTU1GQQyo/7zzLs+WlB
-        +9dURwrtFDnXnkH2wv91K+vy2O37dqA5qHFyYwZOQg==
-X-Google-Smtp-Source: AGHT+IEtGbIHdTfL2yZTTDLPgQj3me/hsvVuKvB4XaXv1nNxUCov3SGcpN7sdI1I388p/AKgKTr/0lfdATge9YktJw8=
-X-Received: by 2002:a17:90b:a04:b0:26d:416a:b027 with SMTP id
- gg4-20020a17090b0a0400b0026d416ab027mr4208863pjb.31.1696485059836; Wed, 04
- Oct 2023 22:50:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696488100; x=1697092900;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+vdqveFoqTC4kTMjULrJM/pFuxAH0pZ83O2NiJo6o6s=;
+        b=bvlKM7YckUiI7c35kYczELcwQgz+88ZT9Lc/RkytyP+4fFi/B/rY6inAoVXe6Ry2su
+         9IDx+Azbm1qYmA12bbxSMWqgkhVPUNwNnEzHZ7OgWIhBWISzegez7XEeq7PrWzPHn4YK
+         nbVr+3Du2Yk3n135tb4m4jGR/HauwkzUihqRLTOCQjFp/Y20qd1cahhW+MoJWHOtvh6M
+         s0vlpfAVbUuWtTPBMUtYlOedBenk3c2HzK1dv7f9ufrfAgTVgHNoBsQ1TT3lfvqGpZ7d
+         W5gkVYTxmSZ6B/ZpjuFrN+8if3RVLFaodd9+sRK5wOJxh5BDNT6Uro3c/5kxSHO2VIeF
+         MpqQ==
+X-Gm-Message-State: AOJu0YyMBTOX+KmdXJwfZ58hxMRsUy7gSmoxPSw3jl8zCzgTgctLGINp
+        NxbhmqJoXGeiuQnenOlBP2p0Tw==
+X-Google-Smtp-Source: AGHT+IHNUBZ6VZpnWD/fhUNGLtXjR6FAs+pOJe4wa66hFEyLksfC+l3y866skRAcnPsjdJ4dQW60QQ==
+X-Received: by 2002:a7b:c851:0:b0:405:3252:fe2 with SMTP id c17-20020a7bc851000000b0040532520fe2mr4050578wml.14.1696488100310;
+        Wed, 04 Oct 2023 23:41:40 -0700 (PDT)
+Received: from [192.168.69.115] (tbo33-h01-176-171-211-120.dsl.sta.abo.bbox.fr. [176.171.211.120])
+        by smtp.gmail.com with ESMTPSA id w21-20020a05600c015500b0040652e8ca13sm3011556wmm.43.2023.10.04.23.41.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Oct 2023 23:41:39 -0700 (PDT)
+Message-ID: <631a4966-982b-8d7c-1ad5-e9358f98fcf4@linaro.org>
+Date:   Thu, 5 Oct 2023 08:41:38 +0200
 MIME-Version: 1.0
-References: <20231003035226.1945725-3-apatel@ventanamicro.com> <mhng-4ec1093a-4542-429e-a9f0-8a976cff9ac4@palmer-ri-x1c9>
-In-Reply-To: <mhng-4ec1093a-4542-429e-a9f0-8a976cff9ac4@palmer-ri-x1c9>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 5 Oct 2023 11:20:48 +0530
-Message-ID: <CAAhSdy2CxWw9ny7vdBoEzsXkm_J882NGKTDQ7BfykrjuB1QR+w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] RISC-V: Detect Zicond from ISA string
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     apatel@ventanamicro.com, pbonzini@redhat.com,
-        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, shuah@kernel.org,
-        ajones@ventanamicro.com, mchitale@ventanamicro.com,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Conor Dooley <conor.dooley@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH] KVM: selftests: Zero-initialize entire test_result in
+ memslot perf test
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+References: <20231005002954.2887098-1-seanjc@google.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20231005002954.2887098-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 4, 2023 at 7:37=E2=80=AFPM Palmer Dabbelt <palmer@dabbelt.com> =
-wrote:
->
-> On Mon, 02 Oct 2023 20:52:22 PDT (-0700), apatel@ventanamicro.com wrote:
-> > The RISC-V integer conditional (Zicond) operation extension defines
-> > standard conditional arithmetic and conditional-select/move operations
-> > which are inspired from the XVentanaCondOps extension. In fact, QEMU
-> > RISC-V also has support for emulating Zicond extension.
-> >
-> > Let us detect Zicond extension from ISA string available through
-> > DT or ACPI.
-> >
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> > ---
-> >  arch/riscv/include/asm/hwcap.h | 1 +
-> >  arch/riscv/kernel/cpufeature.c | 1 +
-> >  2 files changed, 2 insertions(+)
-> >
-> > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hw=
-cap.h
-> > index 0f520f7d058a..6fc51c1b34cf 100644
-> > --- a/arch/riscv/include/asm/hwcap.h
-> > +++ b/arch/riscv/include/asm/hwcap.h
-> > @@ -59,6 +59,7 @@
-> >  #define RISCV_ISA_EXT_ZIFENCEI               41
-> >  #define RISCV_ISA_EXT_ZIHPM          42
-> >  #define RISCV_ISA_EXT_SMSTATEEN              43
-> > +#define RISCV_ISA_EXT_ZICOND         44
-> >
-> >  #define RISCV_ISA_EXT_MAX            64
-> >
-> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeat=
-ure.c
-> > index 3755a8c2a9de..e3803822ab5a 100644
-> > --- a/arch/riscv/kernel/cpufeature.c
-> > +++ b/arch/riscv/kernel/cpufeature.c
-> > @@ -167,6 +167,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D=
- {
-> >       __RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
-> >       __RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
-> >       __RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
-> > +     __RISCV_ISA_EXT_DATA(zicond, RISCV_ISA_EXT_ZICOND),
-> >       __RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
-> >       __RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
-> >       __RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
->
-> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
->
-> Can we do a shared tag, though?  These will conflict.
+On 5/10/23 02:29, Sean Christopherson wrote:
+> Zero-initialize the entire test_result structure used by memslot_perf_test
+> instead of zeroing only the fields used to guard the pr_info() calls.
+> 
+> gcc 13.2.0 is a bit overzealous and incorrectly thinks that rbestslottim's
+> slot_runtime may be used uninitialized.
+> 
+>    In file included from memslot_perf_test.c:25:
+>    memslot_perf_test.c: In function ‘main’:
+>    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_nsec’ may be used uninitialized [-Werror=maybe-uninitialized]
+>       31 | #define pr_info(...) printf(__VA_ARGS__)
+>          |                      ^~~~~~~~~~~~~~~~~~~
+>    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
+>     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
+>          |                 ^~~~~~~
+>    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_nsec’ was declared here
+>     1092 |         struct test_result rbestslottime;
+>          |                            ^~~~~~~~~~~~~
+>    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_sec’ may be used uninitialized [-Werror=maybe-uninitialized]
+>       31 | #define pr_info(...) printf(__VA_ARGS__)
+>          |                      ^~~~~~~~~~~~~~~~~~~
+>    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
+>     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
+>          |                 ^~~~~~~
+>    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_sec’ was declared here
+>     1092 |         struct test_result rbestslottime;
+>          |                            ^~~~~~~~~~~~~
+> 
+> That can't actually happen, at least not without the "result" structure in
+> test_loop() also being used uninitialized, which gcc doesn't complain
+> about, as writes to rbestslottime are all-or-nothing, i.e. slottimens can't
+> be non-zero without slot_runtime being written.
+> 
+> 	if (!data->mem_size &&
+> 	    (!rbestslottime->slottimens ||
+> 	     result.slottimens < rbestslottime->slottimens))
+> 		*rbestslottime = result;
+> 
+> Zero-initialize the structures to make gcc happy even though this is
+> likely a compiler bug.  The cost to do so is negligible, both in terms of
+> code and runtime overhead.  The only downside is that the compiler won't
+> warn about legitimate usage of "uninitialized" data, e.g. the test could
+> end up consuming zeros instead of useful data.  However, given that the
+> test is quite mature and unlikely to see substantial changes, the odds of
+> introducing such bugs are relatively low, whereas being able to compile
+> KVM selftests with -Werror detects issues on a regular basis.
+> 
+> Cc: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> I don't like papering over compiler bugs, but this is causing me quite a bit of
+> pain, and IMO the long-term downsides are quite minimal.  And I already spent
+> way too much time trying to figure out if there is some bizarre edge case that
+> gcc is detecting :-/
+> 
+>   tools/testing/selftests/kvm/memslot_perf_test.c | 9 +++------
+>   1 file changed, 3 insertions(+), 6 deletions(-)
 
-Thanks Palmer.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-I will provide a shared tag based on 6.6-rc5 sometime
-next week. I hope this is okay for you.
-
-Regards,
-Anup
-
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
