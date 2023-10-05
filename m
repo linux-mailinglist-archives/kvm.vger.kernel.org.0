@@ -2,145 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 052FA7BA18E
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B20817BA136
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:53:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239428AbjJEOn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 10:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
+        id S238674AbjJEOnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 10:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237447AbjJEOjR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 10:39:17 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B4A76AD;
-        Thu,  5 Oct 2023 07:07:32 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC1B4C116B9;
-        Thu,  5 Oct 2023 09:18:52 +0000 (UTC)
-From:   Huacai Chen <chenhuacai@loongson.cn>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>
-Cc:     kvm@vger.kernel.org, loongarch@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Huacai Chen <chenhuacai@loongson.cn>
-Subject: [GIT PULL] LoongArch KVM changes for v6.7
-Date:   Thu,  5 Oct 2023 17:18:25 +0800
-Message-Id: <20231005091825.3207300-1-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.39.3
+        with ESMTP id S239009AbjJEOlc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 10:41:32 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE982A5C5;
+        Thu,  5 Oct 2023 07:16:18 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1qoLqs-0005vd-4Z; Thu, 05 Oct 2023 12:45:06 +0200
+Message-ID: <71d4d583-9afa-4c21-8684-0285bc2b8b19@maciej.szmigiero.name>
+Date:   Thu, 5 Oct 2023 12:45:00 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: selftests: Zero-initialize entire test_result in
+ memslot perf test
+Content-Language: en-US, pl-PL
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+References: <20231005002954.2887098-1-seanjc@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+In-Reply-To: <20231005002954.2887098-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 8a749fd1a8720d4619c91c8b6e7528c0a355c0aa:
+On 5.10.2023 02:29, Sean Christopherson wrote:
+> Zero-initialize the entire test_result structure used by memslot_perf_test
+> instead of zeroing only the fields used to guard the pr_info() calls.
+> 
+> gcc 13.2.0 is a bit overzealous and incorrectly thinks that rbestslottim's
+> slot_runtime may be used uninitialized.
+> 
+>    In file included from memslot_perf_test.c:25:
+>    memslot_perf_test.c: In function ‘main’:
+>    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_nsec’ may be used uninitialized [-Werror=maybe-uninitialized]
+>       31 | #define pr_info(...) printf(__VA_ARGS__)
+>          |                      ^~~~~~~~~~~~~~~~~~~
+>    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
+>     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
+>          |                 ^~~~~~~
+>    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_nsec’ was declared here
+>     1092 |         struct test_result rbestslottime;
+>          |                            ^~~~~~~~~~~~~
+>    include/test_util.h:31:22: error: ‘rbestslottime.slot_runtime.tv_sec’ may be used uninitialized [-Werror=maybe-uninitialized]
+>       31 | #define pr_info(...) printf(__VA_ARGS__)
+>          |                      ^~~~~~~~~~~~~~~~~~~
+>    memslot_perf_test.c:1127:17: note: in expansion of macro ‘pr_info’
+>     1127 |                 pr_info("Best slot setup time for the whole test area was %ld.%.9lds\n",
+>          |                 ^~~~~~~
+>    memslot_perf_test.c:1092:28: note: ‘rbestslottime.slot_runtime.tv_sec’ was declared here
+>     1092 |         struct test_result rbestslottime;
+>          |                            ^~~~~~~~~~~~~
+> 
+> That can't actually happen, at least not without the "result" structure in
+> test_loop() also being used uninitialized, which gcc doesn't complain
+> about, as writes to rbestslottime are all-or-nothing, i.e. slottimens can't
+> be non-zero without slot_runtime being written.
+> 
+> 	if (!data->mem_size &&
+> 	    (!rbestslottime->slottimens ||
+> 	     result.slottimens < rbestslottime->slottimens))
+> 		*rbestslottime = result;
+> 
+> Zero-initialize the structures to make gcc happy even though this is
+> likely a compiler bug.  The cost to do so is negligible, both in terms of
+> code and runtime overhead.  The only downside is that the compiler won't
+> warn about legitimate usage of "uninitialized" data, e.g. the test could
+> end up consuming zeros instead of useful data.  However, given that the
+> test is quite mature and unlikely to see substantial changes, the odds of
+> introducing such bugs are relatively low, whereas being able to compile
+> KVM selftests with -Werror detects issues on a regular basis.
+> 
+> Cc: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> I don't like papering over compiler bugs, but this is causing me quite a bit of
+> pain, and IMO the long-term downsides are quite minimal.  And I already spent
+> way too much time trying to figure out if there is some bizarre edge case that
+> gcc is detecting :-/
+> 
 
-  Linux 6.6-rc4 (2023-10-01 14:15:13 -0700)
+Weird, but as you say, the downsides of papering over this (probable) compiler
+issue are small, so:
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
-are available in the Git repository at:
+Thanks,
+Maciej
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.7
-
-for you to fetch changes up to 2c10cda4b777be4be9d9e69e4f70c818dbb15e21:
-
-  LoongArch: KVM: Add maintainers for LoongArch KVM (2023-10-02 10:01:29 +0800)
-
-----------------------------------------------------------------
-LoongArch KVM changes for v6.7
-
-Add LoongArch's KVM support. Loongson 3A5000/3A6000 supports hardware
-assisted virtualization. With cpu virtualization, there are separate
-hw-supported user mode and kernel mode in guest mode. With memory
-virtualization, there are two-level hw mmu table for guest mode and host
-mode. Also there is separate hw cpu timer with consant frequency in
-guest mode, so that vm can migrate between hosts with different freq.
-Currently, we are able to boot LoongArch Linux guests.
-
-Few key aspects of KVM LoongArch added by this series are:
-1. Enable kvm hardware features when kvm module is loaded.
-2. Implement VM and vcpu related ioctl interface such as vcpu create,
-   vcpu run etc. GET_ONE_REG/SET_ONE_REG ioctl commands are use to
-   get general registers one by one.
-3. Hardware access about MMU, timer and csr are emulated in kernel.
-4. Hardwares such as mmio and iocsr device are emulated in user space
-   such as IPI, irqchips, pci devices etc.
-
-----------------------------------------------------------------
-Tianrui Zhao (25):
-      LoongArch: KVM: Add kvm related header files
-      LoongArch: KVM: Implement kvm module related interface
-      LoongArch: KVM: Implement kvm hardware enable, disable interface
-      LoongArch: KVM: Implement VM related functions
-      LoongArch: KVM: Add vcpu related header files
-      LoongArch: KVM: Implement basic vcpu interfaces
-      LoongArch: KVM: Implement basic vcpu ioctl interfaces
-      LoongArch: KVM: Implement fpu operations for vcpu
-      LoongArch: KVM: Implement vcpu interrupt operations
-      LoongArch: KVM: Implement vcpu load and vcpu put operations
-      LoongArch: KVM: Implement misc vcpu related interfaces
-      LoongArch: KVM: Implement vcpu timer operations
-      LoongArch: KVM: Implement virtual machine tlb operations
-      LoongArch: KVM: Implement kvm mmu operations
-      LoongArch: KVM: Implement handle csr exception
-      LoongArch: KVM: Implement handle iocsr exception
-      LoongArch: KVM: Implement handle idle exception
-      LoongArch: KVM: Implement handle gspr exception
-      LoongArch: KVM: Implement handle mmio exception
-      LoongArch: KVM: Implement handle fpu exception
-      LoongArch: KVM: Implement kvm exception vectors
-      LoongArch: KVM: Implement vcpu world switch
-      LoongArch: KVM: Enable kvm config and add the makefile
-      LoongArch: KVM: Supplement kvm document about LoongArch-specific part
-      LoongArch: KVM: Add maintainers for LoongArch KVM
-
- Documentation/virt/kvm/api.rst             |  70 ++-
- MAINTAINERS                                |  12 +
- arch/loongarch/Kbuild                      |   2 +
- arch/loongarch/Kconfig                     |   6 +
- arch/loongarch/configs/loongson3_defconfig |   2 +
- arch/loongarch/include/asm/inst.h          |  16 +
- arch/loongarch/include/asm/kvm_csr.h       | 211 +++++++
- arch/loongarch/include/asm/kvm_host.h      | 237 ++++++++
- arch/loongarch/include/asm/kvm_mmu.h       | 139 +++++
- arch/loongarch/include/asm/kvm_types.h     |  11 +
- arch/loongarch/include/asm/kvm_vcpu.h      |  93 +++
- arch/loongarch/include/asm/loongarch.h     |  19 +-
- arch/loongarch/include/uapi/asm/kvm.h      | 108 ++++
- arch/loongarch/kernel/asm-offsets.c        |  32 +
- arch/loongarch/kvm/Kconfig                 |  40 ++
- arch/loongarch/kvm/Makefile                |  22 +
- arch/loongarch/kvm/exit.c                  | 696 +++++++++++++++++++++
- arch/loongarch/kvm/interrupt.c             | 183 ++++++
- arch/loongarch/kvm/main.c                  | 420 +++++++++++++
- arch/loongarch/kvm/mmu.c                   | 914 ++++++++++++++++++++++++++++
- arch/loongarch/kvm/switch.S                | 250 ++++++++
- arch/loongarch/kvm/timer.c                 | 197 ++++++
- arch/loongarch/kvm/tlb.c                   |  32 +
- arch/loongarch/kvm/trace.h                 | 162 +++++
- arch/loongarch/kvm/vcpu.c                  | 939 +++++++++++++++++++++++++++++
- arch/loongarch/kvm/vm.c                    |  94 +++
- include/uapi/linux/kvm.h                   |   9 +
- 27 files changed, 4902 insertions(+), 14 deletions(-)
- create mode 100644 arch/loongarch/include/asm/kvm_csr.h
- create mode 100644 arch/loongarch/include/asm/kvm_host.h
- create mode 100644 arch/loongarch/include/asm/kvm_mmu.h
- create mode 100644 arch/loongarch/include/asm/kvm_types.h
- create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
- create mode 100644 arch/loongarch/include/uapi/asm/kvm.h
- create mode 100644 arch/loongarch/kvm/Kconfig
- create mode 100644 arch/loongarch/kvm/Makefile
- create mode 100644 arch/loongarch/kvm/exit.c
- create mode 100644 arch/loongarch/kvm/interrupt.c
- create mode 100644 arch/loongarch/kvm/main.c
- create mode 100644 arch/loongarch/kvm/mmu.c
- create mode 100644 arch/loongarch/kvm/switch.S
- create mode 100644 arch/loongarch/kvm/timer.c
- create mode 100644 arch/loongarch/kvm/tlb.c
- create mode 100644 arch/loongarch/kvm/trace.h
- create mode 100644 arch/loongarch/kvm/vcpu.c
- create mode 100644 arch/loongarch/kvm/vm.c
