@@ -2,116 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30FC67BA69A
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 396AE7BA67E
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:35:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230337AbjJEQjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 12:39:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
+        id S234812AbjJEQfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 12:35:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233634AbjJEQia (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 12:38:30 -0400
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04191712BB;
-        Thu,  5 Oct 2023 08:50:55 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DB66C40E019C;
-        Thu,  5 Oct 2023 15:50:52 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id ErWHnuS91E4b; Thu,  5 Oct 2023 15:50:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1696521050; bh=j8N8Mna4YY+PMvlM4sYoaRgYzR+IgHczIxpklyEfbE0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aY8surf7pQyW/bMIHoiYFLnzyCp/jiCMSEHSF+/x41KMguZx8DxJmL4e4KDu+oSk9
-         M10OJxd19diSDp1lxKH8Q5lR0CNlL1PfKnkMP0K0BUl+ZxCA6jA+lyCU2aFNkkgDxA
-         bzk1nQzAe4+M9bIlUjSqW4B0TX7FUTdWnRlShDblS+NhJr3IgkKXTiRCwEOVP/1TGK
-         o1vIJhIsVNkGE7OGV0TMD5AxWd2sylaM7tG6+d2SGWW9+q1zcCk+ksKzy9Hd6jYKQ0
-         9Nw0Xl6WGiCa77Ju1biSUW/WEdVz4mBhsHxrNOVMROy/9oMise29DKbcMzJa1NF312
-         S99pdCs2MQK+EPRYQA2GAp/AC7fGWSAm1PgdpPBnS8MoVCJ1oEvwidiVu/DwexJqPB
-         BAmsm3jqHNLaj2ZF3rKUbiqg1ZPne1YBjY8BW3NHUuU/FNXTDRekDoh6WYKzMNg8SU
-         vZ4lw8dk4nKrrCK/hT6eWvXWv/vV/GxLD0CoWOLPlyCOx+2Eb4z0PM7HCc5QvhODW2
-         JG4d2IeRQt8/Qf/RnqmWC1ARcWSt8ENvj0ZkAM4xGBcPo3e7yTXMFL3mmfGLAgOYpZ
-         6LSqLED+iQ+imeZY1wx8pZcPvxeVkYov/l8YYePWopgtUdBkFV0JvxMvlFVLBCiUHJ
-         HOkvu90srVdVyycUYiBSuDgM=
-Received: from zn.tnic (pd953036a.dip0.t-ipconnect.de [217.83.3.106])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-        (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F1A6E40E014B;
-        Thu,  5 Oct 2023 15:50:36 +0000 (UTC)
-Date:   Thu, 5 Oct 2023 17:50:32 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2] x86: KVM: Add feature flag for
- CPUID.80000021H:EAX[bit 1]
-Message-ID: <20231005155032.GEZR7bSFlZwxRR37Gc@fat_crate.local>
-References: <20231005031237.1652871-1-jmattson@google.com>
+        with ESMTP id S232524AbjJEQdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 12:33:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB0519AA
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 09:15:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696522509;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xgTSYvwD64rrKsF1XVIJOmlwzW/iji6FtMxmxAcVjHg=;
+        b=IgZJisMeWKGhRZl63aRMQ3HTgnk2p822J16lS8wBVmA9SUz/ZYzl21jFKifC4baMlU+K5f
+        e7CpkZAZuxdIHCa1M/eKPkmhWiJeqdi/FqAvwzd2x7BYl9eTNQkRDCoVh1w8kj6/+ttgQQ
+        Ln5LqgVXIwNJtVXGdNZYVNrhdie/B7E=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-tHfbG02XMZuliXkPH1pNwQ-1; Thu, 05 Oct 2023 12:15:08 -0400
+X-MC-Unique: tHfbG02XMZuliXkPH1pNwQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9ae0bf9c0a9so90390066b.3
+        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 09:15:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696522507; x=1697127307;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xgTSYvwD64rrKsF1XVIJOmlwzW/iji6FtMxmxAcVjHg=;
+        b=LjgWe3VWjY0HgmATJQAt45NYkVUqPBNuoq0umR72zL4Kriux4f6rYKV5rJBpoycMOv
+         mKvt0yGjVH559pgL3TKAZ/FzsdhoyYjmxemH3vtsFtCkmG1y7zooia7BP2zJzQ2K61ho
+         Xk7w6U4tkJqI/loqakQWsTxXOdOXO9/fG6tOlMHQn9gAAmsnWphGfRIL6LIGATRr3n7x
+         oOnb14Gpz+EZflQzFRfU42MqnD1yQhDqr1b50HVIrwXA2Peu5zGBJEvEe2JWDriOSLQ4
+         BYafvyIBXu0o+tv+GQbpzcuRCUw++RGNU3CbDrrVu2bAmftTOO4UBy8By58b/wqdK1vl
+         frZA==
+X-Gm-Message-State: AOJu0Yyv8FR19ft7MpwP4qT4yYLU7qx8XJIb5ClkQeA8W73gGRcLC5Ko
+        mCcXSF/KhrrTyjJv6rMne89/qDO4LeIDc4Ki681urEiuo/1cKLBcSCU5GJTV42Pg5x6k6K5cqiI
+        z+O/tDX7XfPVT
+X-Received: by 2002:a17:906:2253:b0:9a1:debe:6b9b with SMTP id 19-20020a170906225300b009a1debe6b9bmr5105423ejr.35.1696522506883;
+        Thu, 05 Oct 2023 09:15:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFcfUv5fTrG6MXf9M+oBt4Emd8GtKHsED+SgB8EkyegVBvHzKPW5E4hVWEpIzriQi7HM9VGw==
+X-Received: by 2002:a17:906:2253:b0:9a1:debe:6b9b with SMTP id 19-20020a170906225300b009a1debe6b9bmr5105406ejr.35.1696522506501;
+        Thu, 05 Oct 2023 09:15:06 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id n2-20020a1709061d0200b009a0955a7ad0sm1399088ejh.128.2023.10.05.09.15.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Oct 2023 09:15:05 -0700 (PDT)
+Message-ID: <ce8984c3-fd68-ae38-4eb6-4b4d3571b142@redhat.com>
+Date:   Thu, 5 Oct 2023 18:15:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231005031237.1652871-1-jmattson@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To:     "Mancini, Riccardo" <mancio@amazon.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "Teragni, Matias" <mteragni@amazon.com>,
+        "Batalov, Eugene" <bataloe@amazon.com>
+References: <9d5ddfbe407940afa02567262a22fa4c@amazon.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
+In-Reply-To: <9d5ddfbe407940afa02567262a22fa4c@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 04, 2023 at 08:12:37PM -0700, Jim Mattson wrote:
-> Define an X86_FEATURE_* flag for CPUID.80000021H:EAX.[bit 1], and
-> advertise the feature to userspace via KVM_GET_SUPPORTED_CPUID.
+On 10/5/23 17:08, Mancini, Riccardo wrote:
+> Hi,
 > 
-> Per AMD's "Processor Programming Reference (PPR) for AMD Family 19h
-> Model 61h, Revision B1 Processors (56713-B1-PUB)," this CPUID bit
-> indicates that a WRMSR to MSR_FS_BASE, MSR_GS_BASE, or
-> MSR_KERNEL_GS_BASE is non-serializing. This is a change in previously
-> architected behavior.
-> 
-> Effectively, this CPUID bit is a "defeature" bit, or a reverse
-> polarity feature bit. When this CPUID bit is clear, the feature
-> (serialization on WRMSR to any of these three MSRs) is available. When
-> this CPUID bit is set, the feature is not available.
-> 
-> KVM_GET_SUPPORTED_CPUID must pass this bit through from the underlying
-> hardware, if it is set. Leaving the bit clear claims that WRMSR to
-> these three MSRs will be serializing in a guest running under
-> KVM. That isn't true. Though KVM could emulate the feature by
-> intercepting writes to the specified MSRs, it does not do so
-> today. The guest is allowed direct read/write access to these MSRs
-> without interception, so the innate hardware behavior is preserved
-> under KVM.
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
-> 
-> v1 -> v2: Added justification for this change to the commit message,
->           tweaked the macro name and comment in cpufeatures.h for
-> 	  improved clarity.
-> 
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  arch/x86/kvm/cpuid.c               | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> when a 4.14 guest runs on a 5.10 host (and later), it cannot use APF (despite
+> CPUID advertising KVM_FEATURE_ASYNC_PF) due to the new interrupt-based
+> mechanism 2635b5c4a0 (KVM: x86: interrupt based APF 'page ready' event delivery).
+> Kernels after 5.9 won't satisfy the guest request to enable APF through
+> KVM_ASYNC_PF_ENABLED, requiring also KVM_ASYNC_PF_DELIVERY_AS_INT to be set.
+> Furthermore, the patch set seems to be dropping parts of the legacy #PF handling
+> as well.
+> I consider this as a bug as it breaks APF compatibility for older guests running
+> on newer kernels, by breaking the underlying ABI.
+> What do you think? Was this a deliberate decision?
 
-Reviewed-by: Borislav Petkov (AMD) <bp@alien8.de>
+Yes, this is intentional.  It is not a breakage because the APF 
+interface only tells how asynchronous page faults are delivered; it 
+doesn't promise that they are actually delivered.  However, I admit that 
+the change was unfortunate.
 
--- 
-Regards/Gruss,
-    Boris.
+Apart from the concerns about reentrancy, there were two more issues 
+with the old API:
 
-https://people.kernel.org/tglx/notes-about-netiquette
+- the page-ready notification lacked an acknowledge mechanism if many 
+pages became ready at the same time (see commit 557a961abbe0, "KVM: x86: 
+acknowledgment mechanism for async pf page ready notifications").  This 
+delayed the notifications of pages after the first.  The new API uses 
+MSR_KVM_ASYNC_PF_ACK to fix the problem.
+
+- the old API confused synchronous events (exceptions) with asynchronous 
+events (interrupts); this created a unique case where a page fault was 
+generated on a page that is not accessed by the instruction.  (The new 
+API only fixes half of this, because it also has a bogus CR2, but it's a 
+bit better).  It also meant that page-ready events were suppressed by 
+disabled interrupts---but they were not necessarily injected when IF 
+became 1, because KVM did not enable the interrupt window.  This is 
+solved automatically by just injecting an interrupt.  On the theoretical 
+side, it's also just ugly that page-ready events could only be 
+enabled/disabled with CLI/STI and not APIC (TPR).
+
+> Was this already reported in the past (I couldn't find anything in the mailing list
+> but I might have missed it!)?
+> Would it be much effort to support the legacy #PF based mechanism for older
+> guests that choose to only set KVM_ASYNC_PF_ENABLED?
+
+It is not hard.  However, I don't think we should accept such a patch 
+upstream.
+
+I do have a question for you.  Can you describe the context in which you 
+are using APF, and would you be interested in ARM support?  We (Red Hat, 
+not me the maintainer :)) have been trying to understand for a long time 
+if cloud providers use or need APF.
+
+Paolo
+
+> The reason this is an issue for us now is that not having APF for older guests
+> introduces a significant performance regression on 4.14 guests when paired to
+> uffd handling of "remote" page-faults (similar to a live migration scenario)
+> when we update from a 4.14 host kernel to a 5.10 host kernel.
+
