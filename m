@@ -2,48 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29D9F7BA1CA
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B4FF7BA1CF
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:59:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjJEO7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 10:59:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44306 "EHLO
+        id S233701AbjJEO7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 10:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234233AbjJEO4i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 10:56:38 -0400
+        with ESMTP id S234498AbjJEO5R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 10:57:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34424261B1
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 07:38:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B721C26A68
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 07:38:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696516726;
+        s=mimecast20190719; t=1696516731;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Dv/Tj9QdaUN/Br120dwAsxWiHl/rp7FzLwgEPtUXlX4=;
-        b=Xbafz0v0wTrf2GldfY8ciILeWNoOtZ35zZoo6/f1z2PCnpAaK5stPktlLRQDiRuaZ0GIfQ
-        xS2qcJNSJZgJ/KMX0+094ew3FB21oS+8DrB/LqPrh01F/5hdEBrQmHPjx4Ar5tPXfPAj7Y
-        FxSZAGTPXA7TRdz8EIb8/wRiNOv6lCo=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nomghUslg4Iyvv3Vz3Tvghec7CwG436Cn/tuDQA6cKI=;
+        b=abefH1oJKbA2vsvhPpEgTX1JmmZT9WkYiDytb3Y75cxWLwkG7COuht7Q12VvJDSNWqIB2A
+        obj+B8DnmDO1Pk6M7YEd77iC+DXNyVaZr4BzuG63aZBtbHWKVRWBr1bV6ERnhuviNFQV7Q
+        AcGSqAi1waZuHYbjvE/W7IcvDrrQkxU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-487-JabyE1AROsuedgPQHMod8A-1; Thu, 05 Oct 2023 10:38:42 -0400
-X-MC-Unique: JabyE1AROsuedgPQHMod8A-1
+ us-mta-199-_87W7J7TNkGAVM6VMBmiFw-1; Thu, 05 Oct 2023 10:38:46 -0400
+X-MC-Unique: _87W7J7TNkGAVM6VMBmiFw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DDC8803498;
-        Thu,  5 Oct 2023 14:38:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45FF118172C2;
+        Thu,  5 Oct 2023 14:38:45 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.39.192.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C9F940C6EA8;
-        Thu,  5 Oct 2023 14:38:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 13F8540C6EA8;
+        Thu,  5 Oct 2023 14:38:43 +0000 (UTC)
 From:   Thomas Huth <thuth@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Cc:     Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 0/7] Use TAP in some more x86 KVM selftests
-Date:   Thu,  5 Oct 2023 16:38:32 +0200
-Message-ID: <20231005143839.365297-1-thuth@redhat.com>
+Subject: [PATCH v2 2/7] KVM: selftests: x86: sync_regs_test: Get regs structure before modifying it
+Date:   Thu,  5 Oct 2023 16:38:34 +0200
+Message-ID: <20231005143839.365297-3-thuth@redhat.com>
+In-Reply-To: <20231005143839.365297-1-thuth@redhat.com>
+References: <20231005143839.365297-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
@@ -58,46 +61,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Here's a follow-up from my RFC series last year:
+The regs structure just accidentially contains the right values
+from the previous test in the spot where we want to change rbx.
+It's cleaner if we properly initialize the structure here before
+using it.
 
- https://lore.kernel.org/lkml/20221004093131.40392-1-thuth@redhat.com/T/
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ tools/testing/selftests/kvm/x86_64/sync_regs_test.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-and from v1 earlier this year:
-
- https://lore.kernel.org/kvm/20230712075910.22480-1-thuth@redhat.com/
-
-Basic idea of this series is now to use the kselftest_harness.h
-framework to get TAP output in the tests, so that it is easier
-for the user to see what is going on, and e.g. to be able to
-detect whether a certain test is part of the test binary or not
-(which is useful when tests get extended in the course of time).
-
-v2:
-- Dropped the "Rename the ASSERT_EQ macro" patch (already merged)
-- Split the fixes in the sync_regs_test into separate patches
-  (see the first two patches)
-- Introduce the KVM_ONE_VCPU_TEST_SUITE() macro as suggested
-  by Sean (see third patch) and use it in the following patches
-- Add a new patch to convert vmx_pmu_caps_test.c, too
-
-Thomas Huth (7):
-  KVM: selftests: x86: sync_regs_test: Use vcpu_run() where appropriate
-  KVM: selftests: x86: sync_regs_test: Get regs structure before
-    modifying it
-  KVM: selftests: Add a macro to define a test with one vcpu
-  KVM: selftests: x86: Use TAP interface in the sync_regs test
-  KVM: selftests: x86: Use TAP interface in the fix_hypercall test
-  KVM: selftests: x86: Use TAP interface in the vmx_pmu_caps test
-  KVM: selftests: x86: Use TAP interface in the userspace_msr_exit test
-
- .../selftests/kvm/include/kvm_test_harness.h  |  35 +++++
- .../selftests/kvm/x86_64/fix_hypercall_test.c |  27 ++--
- .../selftests/kvm/x86_64/sync_regs_test.c     | 121 +++++++++++++-----
- .../kvm/x86_64/userspace_msr_exit_test.c      |  19 +--
- .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |  50 ++------
- 5 files changed, 160 insertions(+), 92 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/kvm_test_harness.h
-
+diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+index 8c3898cf79b31..1cd19dfa0046c 100644
+--- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+@@ -315,6 +315,7 @@ int main(int argc, char *argv[])
+ 	run->kvm_valid_regs = 0;
+ 	run->kvm_dirty_regs = 0;
+ 	run->s.regs.regs.rbx = 0xAAAA;
++	vcpu_regs_get(vcpu, &regs);
+ 	regs.rbx = 0xBAC0;
+ 	vcpu_regs_set(vcpu, &regs);
+ 	vcpu_run(vcpu);
 -- 
 2.41.0
 
