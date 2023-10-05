@@ -2,129 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF58D7BA073
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 381927BA011
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:33:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234116AbjJEOiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 10:38:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48686 "EHLO
+        id S234613AbjJEOcy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 10:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234734AbjJEOfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 10:35:16 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 375B16182
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 23:06:01 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c735473d1aso4351925ad.1
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 23:06:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1696485960; x=1697090760; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i+OzM9WN1Dh21ubOEAVeEY0lIe+PfmIXwuMmmkct6SM=;
-        b=3epmckszdy4PjWzn5YVDphkhm9OrhQM7y7LAUm4eew3ZWJ6bwKrZlEq+Umbmmz5raV
-         vQm8MSbe6MN5MA4J4DVh5+RVZp+a4R5+/kLoMdCJVRupOLMQI4sxF65IdguQAMN/+ubT
-         BbonGFbERKH/jLvTjtE0H+chxQRxMlYOremQIcjTNpU56P0tNbIyZyLlYrDWMB+xvcT9
-         pioobganbB3Ey9jmXZRFQlnj3K3WZzE6PKBgdJYbHqTgHsB6R+GjNEh1NKaK8ohq77x0
-         saCP6CEtk4x5f6BIWhgmGAnbJtOwe4mFIGW7ayR1mZ165u7hQQdUzViADIkKXqcP1Eyj
-         uOAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696485960; x=1697090760;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i+OzM9WN1Dh21ubOEAVeEY0lIe+PfmIXwuMmmkct6SM=;
-        b=TzulJaHA3CPvTudbiSv3Eda+p3/4x85ytYnpkQ+zcFnlt6EAHTULLSt5fd5QuGhRfi
-         Fb/wEblv94NkpkKdxvQ+36BNUUahqGGsaCJPtMl/+8B92wIewE6t4nGX//aoJx77fCVa
-         djQmNWq89FF/AKeahq9ymWZ0ag67nQSZwji0y4a69TYFsZwrdbyP4/Ud9s5w7dCoW//e
-         lfLIEx0wC8acYWYgCci2nywQUYxA5pBFFScvy7f/qS8h1EJGpPwmHfbarW+pVn45oXw0
-         jCDy8Ck/ox4qvrMa6rrXevMby0RxGeFd8AEAQX1AKkaNEkh4IcLNtgNOQd0/trwk97xq
-         lvzg==
-X-Gm-Message-State: AOJu0YzljOPTEHHpULVBBtJ3O+yIt0WJpIZtmOXFj5TS51YYfGRtLkU2
-        wRtCfzkjmi+bBPDLSlXymADiP5GuQ8cAWwn7fYLroQ==
-X-Google-Smtp-Source: AGHT+IG1fxwb2v6SLkh4Fkaz8cqMSdUWu3blXiCEco3U0En8uebQJpE7wswsbpc3LD+Oi31mdQhRZwbY+N7+m1uQ3rk=
-X-Received: by 2002:a17:90b:84:b0:268:15dd:c5c7 with SMTP id
- bb4-20020a17090b008400b0026815ddc5c7mr3855515pjb.40.1696485960557; Wed, 04
- Oct 2023 23:06:00 -0700 (PDT)
+        with ESMTP id S235115AbjJEOba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 10:31:30 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on20626.outbound.protection.outlook.com [IPv6:2a01:111:f400:7d00::626])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E72C65AA;
+        Wed,  4 Oct 2023 23:19:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yv/kNufZmXcZxTGxRgZqNtctQV8VUPcVdEoY68FGu38JUA6BunUPcFTaaFFzBDhTctDpoS0J6byl/ymRN3TtrjyA71mCnROEP0LGvrCScz937jsq/g3+AIUTwcP4LpPo9UymGyTXdv837j4qP05fMC4kb8+uxB0TwDydb+cvpS4thDZtH1IrXCXV54vjDvhr8+runXsZw1HeACEcfT9l3G6XeB2CBqGKpDxSSV0YFftI/5BBOhRpYqv+FZW1FcgFhG73OdtkVvCSlGe+kKSd0NmGuJL3Lm290iBwND24aBDonL/tEva9UN8eMBMdZFnqWvJxN29WiyM5mwcCH+LZQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HLEQAnAtybvz4qYKw9pECyyfbHtkWTR7swM9+unnb8w=;
+ b=VGFWtWbgE4Ei8POy1/17zNWjfnHrMypEktUnT0587W77c6/T6PrjiyiEG/h1iXHddIxFlW85zSLzIjqyKyQkZgTHlDrmRIaaDdypVdc03n5uZHjiDzdxtvuraUPcR+GcfYSbwOJALlh6EapNW4hITO9EC2RfO7245Nf7xhh7tyHlqvJ1uRa2OhnZKpMG7dnku1o3fVpJjcWDdviflUFN751pTZ/+ClSaDA6S6sg3yaGIhiDfiR8CAWgfJMfIoTuMBWXW964hF8TxoVR0P0BbLunbguQ59+qSxWjz2ZUnKAgT6TN2eqWCiN1qg2/+G6b5cUrBMhL4Pi7L1G7ForO14w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HLEQAnAtybvz4qYKw9pECyyfbHtkWTR7swM9+unnb8w=;
+ b=W4MevTZ6YtluTwu+3auGo2SsmSLEaIEaTYJQtfgJTIfixytiH6jAuVZsaZ0fFqDqNxPBIisINJu12Dj7d5aZoYj6IxCCjRwjmJHk7BzVx8V6mQtEJ4BPKYEpE3NApWAAJA8u+HMCSjtVxQ/U6xE7SJ5h55BLoA5s38Nuh60Bk/C6vz6weAYiumimpZ+7qVdJ7oym4wNuNyPf0c1+FRivk/8qfnoEf2NqR8qyasUdI4qhUNBygZX3m5yfmLIJwfEj21OLTdpTuvKxDXVz8Tixcr1GmX/DHeLzWE9oYIJFWnvVYM21zn0cThHYzUROxTd+IT6rSwj37JNKe4Ygqy5tBA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
+ by DUZPR04MB9728.eurprd04.prod.outlook.com (2603:10a6:10:4e3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.26; Thu, 5 Oct
+ 2023 06:19:03 +0000
+Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::edd3:f00:3088:6e61]) by PA4PR04MB7790.eurprd04.prod.outlook.com
+ ([fe80::edd3:f00:3088:6e61%4]) with mapi id 15.20.6838.033; Thu, 5 Oct 2023
+ 06:19:03 +0000
+Message-ID: <9b5ddb4e-12f1-4058-bcce-119d6ac4817c@suse.com>
+Date:   Thu, 5 Oct 2023 09:18:56 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 00/37] x86: enable FRED for x86-64
+To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        peterz@infradead.org, jgross@suse.com, ravi.v.shankar@intel.com,
+        mhiramat@kernel.org, andrew.cooper3@citrix.com,
+        jiangshanlai@gmail.com
+References: <20231003062458.23552-1-xin3.li@intel.com>
+Content-Language: en-US
+From:   Nikolay Borisov <nik.borisov@suse.com>
+In-Reply-To: <20231003062458.23552-1-xin3.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR0102CA0028.eurprd01.prod.exchangelabs.com
+ (2603:10a6:802::41) To PA4PR04MB7790.eurprd04.prod.outlook.com
+ (2603:10a6:102:cc::8)
 MIME-Version: 1.0
-References: <20231003035226.1945725-1-apatel@ventanamicro.com>
-In-Reply-To: <20231003035226.1945725-1-apatel@ventanamicro.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 5 Oct 2023 11:35:50 +0530
-Message-ID: <CAAhSdy0P=5WiFfFyMHjkd63JKCcjsTsvhLTNgUB+LOCd8A9iOQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/6] KVM RISC-V Conditional Operations
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|DUZPR04MB9728:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0fb8d531-04d1-43b5-d333-08dbc56af851
+X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TvB56ZyTvgf3qztSKR5fDlSPBaloYgo5RI0rfaw+srmCP8hiAlkGG82acncIGIA2Bw77GHMulFpENlNqV5QhkQ+k1Jb2e1WOXJm0X3KiF2dIgpqvX22/GnISdp0/HWvj6dBU0rKcAuAggiPwMtEw5ENwfR/i0vFuZYv4EkYyy/Bnqo5X37wC1Dvaa/J2amlwlLLpC9zZGpTXteyW/1l/rTyFgu+HRxrxjNWWtHZ0pfDgAEIlg44hdFw3PN0U+KwXHJuuAL9r2hClfBFwHe9+F6n5K4kCH4FwcKTzkGyJkjjOIBZmzPkwq5reiydc1rnPPlReS1Cs9D/zYnaOkqvrWJfLgtMO/DXS6T3Nu87JjZG0hOTyw9qG5tN1PaY/wdPixBMX2zFFb9IwmUVPtMqCQ9IPerWVBKpK3L9t/vPbnc20aVo6nZlHOn1AoHWPY8lQgD12oid3gkb4juX6WsnIblJP/fVnF/5tr4pdu0SyJNGnq51ZkpUJIwBRIJOQ9QGnTRUPVLiC4z6np4G5JwZGN48/XJ7gDll7R7bUyZJIEwrDHwPgbkNBALLIRKIQ2a1AF2FZk0ie36LX1KSgXGr1L+jmqTb4MJWSPftayfBR2rlSDF/qZ5VXyNOBWC6p9g9BZJfWJPnna/ALb14dN/bD3Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(39860400002)(366004)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(4744005)(7416002)(2906002)(4326008)(5660300002)(8936002)(8676002)(31686004)(41300700001)(316002)(66946007)(31696002)(66476007)(38100700002)(66556008)(6512007)(478600001)(86362001)(6486002)(6666004)(2616005)(36756003)(6506007)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eDJrWFNINWVqY2xhSVhPSGpRZlczSjdUdTZFclI0ZlYwZ3VUcWdGcmQ3RTIw?=
+ =?utf-8?B?azM4OSsxVXlyZnZkTDZBMktkWjVaQUwxZFY3dlI5dmFOSHU3RzFQbURYZCt1?=
+ =?utf-8?B?WTBJNno4QmtpQ3BDbmdmandHbmdSZFpvNVN4eWxTVEdud0k4dnpHcVJER1dv?=
+ =?utf-8?B?aW5jZU1PNWNjSmFtdktweW50dktkT1Zna2dyem1pYUV6c291aGVBYmJQVUNX?=
+ =?utf-8?B?bm9FeE92THF1WTF1aWFENWJTb0lSYStpOG5JVmcramNKZHFJUkc3VzVnT0Ni?=
+ =?utf-8?B?K3Bpd3ovelptOXZUTmM3RDFXanZSbDIvREtpRXVFRnRkcU9HZitZK0JJQ2hz?=
+ =?utf-8?B?VjQ4cFgvbUVROWhZZWVZNEFqNnpMWjYxUTdWMUdnbDJFU3p4VVVweTg2b3pE?=
+ =?utf-8?B?NWdmemNwWkhtMGlBQkxYeDlXeWdLK1pCVmJhaHg1ZlVDNmx2eEpkMHZlWjRu?=
+ =?utf-8?B?cC9kZjBTcHRvT2VWSFRBTm9xcE5POW9HMEJLTnRncEkrWnBaTGkwWGE2R3VY?=
+ =?utf-8?B?clc2N2ZibEpmL0dXcWoyR1hWb3k3aEkxOU92eDhjY3pIbnpkUWgwTVlGa2Vl?=
+ =?utf-8?B?QlBreEhIVDFKa0l3UFBUZkVnK2tmVitaRXN6eGprVHlOeDYvWVhqYjVvaXZ4?=
+ =?utf-8?B?a2NqRFJxUzZiaTU0ZUdtZjk0RnJJR1hEZEtmMGl5Z3NuYjBRNXdQeUhkMUdw?=
+ =?utf-8?B?aCt2eHNYam51RmZqRTBDTlZnSDhRYU1MVVVrT3BFVWJvNFRWelduREVWRE0z?=
+ =?utf-8?B?ckNGZGVMTEpLUWFxaU5qeE1aekQ4aWlXQ25IR3hrRjZzVHVPNkVxV1o5bzVM?=
+ =?utf-8?B?a2tkb2EycDhXQ0FnYUsxOHBOYWxXUlRoS0F1NWRhSi9LS1VnNE1wa1NkYllo?=
+ =?utf-8?B?VHcvdHltVCtYY0NiL3l5a2pHNjI2d3BsYW5GSlhnQWJ2c0dFNzR1clJtUXh5?=
+ =?utf-8?B?RUlhVDJOMW9JbGtnOUg3YitqRFkzZ1BiRFhxZVRmbmZwSXRqYTErdzQxcEdR?=
+ =?utf-8?B?UUN3amU1ZzMxY3Z0VmMzWEN1M3lzWURiY0FCNjd2cWNTZENTNHRMeXFscjJ6?=
+ =?utf-8?B?eTNybW00eE5pY0duOTJJaEtUUTBzZGlXZUJyUUVaQXl1dTErNXg5RlhZOEFH?=
+ =?utf-8?B?R1o1U3U4R0U4WTN0TlhIckp3dk9VVkh5bTRNa2J6NlZvVXYyN2x0djRUVVlo?=
+ =?utf-8?B?VFBjQm9QRDBhZlVFU0krUThtSXVobndJUDlIWnJDcGFFRm1jT2NtTmloa3VK?=
+ =?utf-8?B?YXpkRUZvNEI5aE1RNkJESzc0WEEwbjJzQXJKTU11cUdOdFROaGt4VmRwazBr?=
+ =?utf-8?B?OEtGZ0J6dmtSYUVSdVFuZnJPNDRaL3ArckkvRFhCVkFmMnQ2eGtaQlNNLzVI?=
+ =?utf-8?B?aVNHN2poR2tBeGZGZnpWQWZ0Vm01UnV5YXc2ZC9mYWkvS1Nad3NJRmlEMUpI?=
+ =?utf-8?B?RmdqSGwweDdyTC94UGM5MEVxUUw4elRDTjIvaGMrUnMyT2VtTzNVdTJkdW82?=
+ =?utf-8?B?MWZQL09vR0FRSE5HRHZXdTVNWG9lWFZUblk1ZkthN2dsNzJ3N0ZWRndqUmZt?=
+ =?utf-8?B?WjA3Rkl2MFRuSEdVNlFEU0U0RUZodlJwM2R1VGVnL25PZUFDcTNPek1heXY1?=
+ =?utf-8?B?a09UclVHTjl6SFY4ZHJTTnBMVlo5aVEvWHVNOU1SUFcwdkNoUUJWQTB6U3Fl?=
+ =?utf-8?B?WmF3cXYvQVBqQWptQ0hqWksrdU1zS1ZMemxNUmo5U1YraFNXZUxVMmFVUElI?=
+ =?utf-8?B?TVNKdzJ2QnduWm9hUE9CNU1UMHc2ZFhaTDdSeWJvRVZwQ2tEVnlDYnVTaHRp?=
+ =?utf-8?B?VzVLaXpoenlaUXN2V0hwSUoxOWl1aitaVlQwN2w4WUVpY3Zwc0JsNXdMZEZY?=
+ =?utf-8?B?dUkrbVFsSktKem9oNTRkQk9xU0pxdVZpdTJ6SHgvSkNLRTVqR3hmUUoxYWgw?=
+ =?utf-8?B?MW8wNk1FNkgxMkFHdkNTb3pVRHRkcXRzR013VWErTitRSU81VHZaZmZrN1pp?=
+ =?utf-8?B?L0hBZmg5amhYei9DUTZidWxhOEVZeDRDRVFQUzkzcUw5LzV4cy9QWkVaUFB3?=
+ =?utf-8?B?bXlSSzYyRVROa1NxVTZuMGlZZUdIcTRjbXNuTFNVV1dOVHdsL3NKTjNHZ0NH?=
+ =?utf-8?B?YURKaVVpYlJlOFM2TlZaaHdXMzRuQXFGekRhbGh4QW42aW85UXpRMVIxK095?=
+ =?utf-8?Q?0NgYcp/tjTFnH8wgk1jSYgXnGMKfIocAe2efW+ncX81R?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0fb8d531-04d1-43b5-d333-08dbc56af851
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2023 06:19:03.4302
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NXcrgj4Wqi52/Gbs4JfTUBil1/wtGIPsCTvlqrdhrAqMjBDjJW1xND9HCJ9NS/CFpUzXhU633QGmKjtzzxs3rg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9728
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 3, 2023 at 9:22=E2=80=AFAM Anup Patel <apatel@ventanamicro.com>=
- wrote:
->
-> This series extends KVM RISC-V to allow Guest/VM discover and use
-> conditional operations related ISA extensions (namely XVentanaCondOps
-> and Zicond).
->
-> To try these patches, use KVMTOOL from riscv_zbx_zicntr_smstateen_condops=
-_v1
-> branch at: https://github.com/avpatel/kvmtool.git
->
-> These patches are based upon the latest riscv_kvm_queue and can also be
-> found in the riscv_kvm_condops_v3 branch at:
-> https://github.com/avpatel/linux.git
->
-> Changes since v2:
->  - Dropped patch1, patch2, and patch5 since these patches don't meet
->    the requirements of patch acceptance policy.
->
-> Changes since v1:
->  - Rebased the series on riscv_kvm_queue
->  - Split PATCH1 and PATCH2 of v1 series into two patches
->  - Added separate test configs for XVentanaCondOps and Zicond in PATCH7
->    of v1 series.
->
-> Anup Patel (6):
->   dt-bindings: riscv: Add Zicond extension entry
->   RISC-V: Detect Zicond from ISA string
->   RISC-V: KVM: Allow Zicond extension for Guest/VM
->   KVM: riscv: selftests: Add senvcfg register to get-reg-list test
->   KVM: riscv: selftests: Add smstateen registers to get-reg-list test
->   KVM: riscv: selftests: Add condops extensions to get-reg-list test
 
-Queued this series for Linux-6.7
 
-Thanks,
-Anup
+On 3.10.23 г. 9:24 ч., Xin Li wrote:
+> This patch set enables the Intel flexible return and event delivery
+> (FRED) architecture for x86-64.
+> 
 
->
->  .../devicetree/bindings/riscv/extensions.yaml |  6 +++
->  arch/riscv/include/asm/hwcap.h                |  1 +
->  arch/riscv/include/uapi/asm/kvm.h             |  1 +
->  arch/riscv/kernel/cpufeature.c                |  1 +
->  arch/riscv/kvm/vcpu_onereg.c                  |  2 +
->  .../selftests/kvm/riscv/get-reg-list.c        | 54 +++++++++++++++++++
->  6 files changed, 65 insertions(+)
->
-> --
-> 2.34.1
->
+
+Which tree is this based on now? I tried running 'b4 diff' but it 
+complains it can't find some context around arch/x86/kernel/cpu/common.c 
+. I have the tip tree updated.
+
+
+> 
