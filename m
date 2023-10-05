@@ -2,103 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF7DC7BA6BB
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBCFF7BA63B
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:33:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232277AbjJEQlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 12:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53028 "EHLO
+        id S230491AbjJEQce (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 12:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjJEQj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 12:39:56 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B651536A6
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 09:23:02 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-4063bfc6c03so105895e9.0
-        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 09:23:02 -0700 (PDT)
+        with ESMTP id S235633AbjJEQaz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 12:30:55 -0400
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8502660F;
+        Thu,  5 Oct 2023 09:28:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696522981; x=1697127781; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pzyAiWhvPRkAaSX04taWxyRaF35/7oPd53VXghDgNwg=;
-        b=GVagLX8V3wo4J8tN9/raqI5+A44kv2gtYr/noRXWFtzp0Juowt0R+n+xThn+7cu65h
-         Cr/GYr1Xb8J60TX4ZLhtQmxaFOpZDkRAAShAV9L1SUxZTe8goRQy/YmjFBBJ9eXtDVoS
-         OTWIFCTqE0odBSHEzQS4uG0RXNCducYzGqQRe78mcMhBVDNii/RdWa9StUH7f3prWfnA
-         Flu2Hke6yWaYOPA7PMPt03G+KS4FHC9cnB351khpoybUe3HQKDlYkiTCRX078G3U8AQ5
-         CmO+9Ojr5mVYlrXq5EsX3Ia6zTljK9kB679RokhD1DyYD9Va34Wd/exOZQjP3VIrpn0D
-         IOxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696522981; x=1697127781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pzyAiWhvPRkAaSX04taWxyRaF35/7oPd53VXghDgNwg=;
-        b=bx2HnPSNpMHC2ytO2TQci540Zqz1sgas05oED6rFYXrEX5M4Qn3+ldY1eWYtwCZfRa
-         e9EMWIyXX95Ike4VLlQ0GSGq+ifa2NyXLCjcA//fcqTovRl892oY3AHveooGQ+8DOrNB
-         b5bA+SjgTxVcbp2xUfIR85h/Ws7DE/5FZy9mBX6Dnj0M7xqJpEcqCkTthQRCpmcjGxcg
-         SjJ3F0YPrP5wZNjzN3BUyycrtTpWPrHVrTS90aOPv5+MjrCd6BglpshHnSsp2IG0p68h
-         nutysvi/0bBU5nhErlL5sWchrABJN+hN/OT4Zr77IxdKIWpFFyOp6N7lP7cT9QboTbbi
-         qbDw==
-X-Gm-Message-State: AOJu0YzoUAUokxso+MgBKUPku+8O1ga1eq2dfKzcI+8T6fZhVGF3aDj1
-        obwJZzsmlqbzpi89isRK1muaBSAXPAF0WoF25/YpIA==
-X-Google-Smtp-Source: AGHT+IFNO9qGrQUgXzJ/X1z/NsSmH5wKOMIFOjmbUOxeOunMIpw7ug3LlS+y1sx2UukRlZboK4+RxhX2g+VL0uIbgWg=
-X-Received: by 2002:a05:600c:3414:b0:3f4:fb7:48d4 with SMTP id
- y20-20020a05600c341400b003f40fb748d4mr66710wmp.3.1696522981030; Thu, 05 Oct
- 2023 09:23:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20231004002038.907778-1-jmattson@google.com> <01009a2a-929e-ce16-6f44-1d314e6bcba5@intel.com>
- <CALMp9eR+Qudg++J_dmY_SGbM_kr=GQcRRcjuUxtm9rfaC_qeXQ@mail.gmail.com> <20231004075836.GBZR0bLC/Y09sSSYWw@fat_crate.local>
-In-Reply-To: <20231004075836.GBZR0bLC/Y09sSSYWw@fat_crate.local>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 5 Oct 2023 09:22:44 -0700
-Message-ID: <CALMp9eT2qHSig-ptP461GbLSfg86aCRjoxzK9Q7dc6yXSpPn7A@mail.gmail.com>
-Subject: Re: [PATCH] x86: KVM: Add feature flag for AMD's FsGsKernelGsBaseNonSerializing
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1696523292; x=1728059292;
+  h=date:message-id:cc:subject:from:to:mime-version:
+   content-transfer-encoding:references:in-reply-to;
+  bh=s/3kePokIc8Scb81vfgX7JZyGS6TBG9a+EGPzfosJzQ=;
+  b=CkU0HpTTO8n3nFji1wcF7wYaa5po8BU0BxiIk41lcwWQXrrBPyyIbr3E
+   h0jSeX50P9rkjCAIVS/luOr2xeNK6979Y9b2q3uykNUppqe16YQ6B+Eue
+   x0aQcbYA0svBqEOuzkBpNpP1+veIFY7tZxZApHR9NBcVypBzMr3txFAub
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.03,203,1694736000"; 
+   d="scan'208";a="368009614"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d23e07e8.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 16:28:04 +0000
+Received: from EX19D004EUC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-iad-1d-m6i4x-d23e07e8.us-east-1.amazon.com (Postfix) with ESMTPS id 9862B808BA;
+        Thu,  5 Oct 2023 16:28:01 +0000 (UTC)
+Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
+ (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Thu, 5 Oct
+ 2023 16:27:58 +0000
 Content-Type: text/plain; charset="UTF-8"
+Date:   Thu, 5 Oct 2023 16:27:54 +0000
+Message-ID: <CW0NB512KP2E.2ZZD07F49LND3@amazon.com>
+CC:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <graf@amazon.de>,
+        <dwmw2@infradead.org>, <fgriffo@amazon.com>, <anelkz@amazon.de>,
+        <peterz@infradead.org>
+Subject: Re: [RFC] KVM: Allow polling vCPUs for events
+From:   Nicolas Saenz Julienne <nsaenz@amazon.com>
+To:     Sean Christopherson <seanjc@google.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Mailer: aerc 0.15.2-21-g30c1a30168df-dirty
+References: <20231001111313.77586-1-nsaenz@amazon.com>
+ <ZR35gq1NICwhOUAS@google.com>
+In-Reply-To: <ZR35gq1NICwhOUAS@google.com>
+X-Originating-IP: [10.13.235.138]
+X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 4, 2023 at 12:59=E2=80=AFAM Borislav Petkov <bp@alien8.de> wrot=
-e:
->
-> On Tue, Oct 03, 2023 at 07:44:51PM -0700, Jim Mattson wrote:
-> > The business of declaring breaking changes to the architectural
-> > specification in a CPUID bit has never made much sense to me.
->
-> How else should they be expressed then?
->
-> In some flaky PDF which changes URLs whenever the new corporate CMS gets
-> installed?
->
-> Or we should do f/m/s matching which doesn't make any sense for VMs?
->
-> When you think about it, CPUID is the best thing we have.
+Hi Sean,
+Thanks for taking the time to look at this.
 
-Every time a new defeature bit is introduced, it breaks existing
-hypervisors, because no one can predict ahead of time that these bits
-have to be passed through.
+On Wed Oct 4, 2023 at 11:47 PM UTC, Sean Christopherson wrote:
+[...]
+> > @@ -3996,6 +4002,39 @@ static int kvm_vcpu_mmap(struct file *file, stru=
+ct vm_area_struct *vma)
+> >       return 0;
+> >  }
+> >
+> > +static __poll_t kvm_vcpu_poll(struct file *file, poll_table *wait)
+> > +{
+> > +     struct kvm_vcpu *vcpu =3D file->private_data;
+> > +
+> > +     if (!vcpu->poll_mask)
+> > +             return EPOLLERR;
+> > +
+> > +     switch (READ_ONCE(vcpu->mode)) {
+> > +     case OUTSIDE_GUEST_MODE:
+> > +             /*
+> > +              * Make sure writes to vcpu->request are visible before t=
+he
+> > +              * mode changes.
+> > +              */
+>
+> Huh?  There are no writes to vcpu->request anywhere in here.
 
-I wonder if we could convince x86 CPU vendors to put all defeature
-bits under a single leaf, so that we can just set the entire leaf to
-all 1's in KVM_GET_SUPPORTED_CPUID.
+My thinking was the vcpu->requests load below could've been speculated
+ahead of vcpu->mode's store, this will miss events when first entering
+poll().
+
+Since you pointed this out, I thought about it further. There is still
+room for a race with the code as is, we need read vcpu->requests only
+after poll_wait() returns, so as to make sure concurrent
+kvm_make_request()/kvm_vcpu_kick() either wake up poll, or are visible
+through the vcpu->requests check that precedes sleeping.
+
+[...]
+
+> > +             WRITE_ONCE(vcpu->mode, OUTSIDE_GUEST_MODE);
+>
+> This does not look remotely safe on multiple fronts.  For starters, I don=
+'t see
+> anything in the .poll() infrastructure that provides serialization, e.g. =
+if there
+> are multiple tasks polling then this will be "interesting".
+
+Would allowing only one poller be acceptable?
+
+> And there is zero chance this is race-free, e.g. nothing prevents the vCP=
+U task
+> itself from changing vcpu->mode from POLLING_FOR_EVENTS to something else=
+.
+>
+> Why on earth is this mucking with vcpu->mode?  Ignoring for the moment th=
+at using
+> vcpu->requests as the poll source is never going to happen, there's zero =
+reason
+
+IIUC accessing vcpu->requests in the kvm_vcpu_poll() is out of the
+question? Aren't we're forced to do so in order to avoid the race I
+mention above.
+
+> to write vcpu->mode.  From a correctness perspective, AFAICT there's no n=
+eed for
+> any shenanigans at all, i.e. kvm_make_vcpu_request() could blindly and un=
+conditionally
+> call wake_up_interruptible().
+
+I was fixated with the halt/vtl_return use-cases, where we're either
+running the vCPU or polling, and it seemed a decent way to policy
+whether calling wake_up_interruptible() is needed. Clearly not the case,
+I'll get rid of all the vcpu->mode mucking. :)
+
+> I suspect what you want is a fast way to track if there *may* be pollers.=
+  Keying
+> off and *writing* vcpu->mode makes no sense to me.
+>
+> I think what you want is something like this, where kvm_vcpu_poll() could=
+ use
+> atomic_fetch_or() and atomic_fetch_andnot() to manipulate vcpu->poll_mask=
+.
+> Or if we only want to support a single poller at a time, it could be a va=
+nilla
+> u64.  I suspect getting the poll_mask manipulation correct for multiple p=
+ollers
+> would be tricky, e.g. to avoid false negatives and leave a poller hanging=
+.
+
+I'll have a go at the multiple poller approach.
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 486800a7024b..5a260fb3b248 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -259,6 +259,14 @@ static inline bool kvm_kick_many_cpus(struct cpumask=
+ *cpus, bool wait)
+>         return true;
+>  }
+>
+> +static inline bool kvm_request_is_being_polled(struct kvm_vcpu *vcpu,
+> +                                              unsigned int req)
+> +{
+> +       u32 poll_mask =3D kvm_request_to_poll_mask(req);
+> +
+> +       return (atomic_read(vcpu->poll_mask) & poll_mask)
+> +}
+> +
+>  static void kvm_make_vcpu_request(struct kvm_vcpu *vcpu, unsigned int re=
+q,
+>                                   struct cpumask *tmp, int current_cpu)
+>  {
+> @@ -285,6 +293,9 @@ static void kvm_make_vcpu_request(struct kvm_vcpu *vc=
+pu, unsigned int req,
+>                 if (cpu !=3D -1 && cpu !=3D current_cpu)
+>                         __cpumask_set_cpu(cpu, tmp);
+>         }
+> +
+> +       if (kvm_request_is_being_polled(vcpu, req))
+> +               wake_up_interruptible(...);
+>  }
+>
+>  bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
+
+I'll use this approach.
+
+So since we have to provide a proper uAPI, do you have anything against
+having user-space set the polling mask through an ioctl? Also any
+suggestions on how kvm_request_to_poll_mask() should look like. For ex.
+VSM mostly cares for regular interrupts/timers, so mapping
+
+  KVM_REQ_UNBLOCK, KVM_REQ_HV_STIMER, KVM_REQ_EVENT, KVM_REQ_SMI,
+  KVM_REQ_NMI
+
+to a KVM_POLL_INTERRUPTS_FLAG would work. We can then have ad-hoc flags
+for async-pf, kvmclock updates, dirty logging, etc...
+
+Nicolas
