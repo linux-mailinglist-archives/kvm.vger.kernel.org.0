@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2057B998E
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 03:26:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 111A17B998F
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 03:26:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244279AbjJEB0O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Oct 2023 21:26:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59382 "EHLO
+        id S244294AbjJEB0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Oct 2023 21:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231650AbjJEB0N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Oct 2023 21:26:13 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B947C6
-        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 18:26:09 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2774c52c8f2so379931a91.3
-        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 18:26:09 -0700 (PDT)
+        with ESMTP id S231650AbjJEB0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Oct 2023 21:26:39 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11EDEC6
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 18:26:36 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a23ad271d7so6068767b3.1
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 18:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696469169; x=1697073969; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696469195; x=1697073995; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TYfhcgTqo5ZRyy5fcNvbHFZ7+EudMa0DogQVaLExeg=;
-        b=o3/qPHNBuHPo/kZKtTbSLjbV8YOJaFX2eKpVfwaDX53xLMVb7cywA0YScLkTFa7jpe
-         v+9GjRdPZPu5GvjuTTjCtgxA2CSxBeCeIqMsSibaNHQOIqnIgjr3sZPEy8ofX3tIK4gz
-         BUt+Uqd16SWY072KI8oc1CUa80l7iXiHf9vIyiMfeL4xSvzVyDEh+bSRjoxaxSqeRnS8
-         lzRCL1RTIvrjL04vYPhO1URRDY7rHP+2Dg2Gpf8sFdrq/Q6+YLHvS1Ym6HGQlqRC6I99
-         kllb+zJ+TAREZEs7gS10XKBRD5UUJel3HAMP4XM8oPnjTn8mukU1bXm2gcwNwPafJ1q9
-         8Dww==
+        bh=pAYXXZZrtq6qVtd9bBLCof1AkK8uP0CzKodj/aevUuM=;
+        b=eVCIoHkSct9yfXuYgoVEA6jqm6lWjFYEtrYjZcMuXSH3mhYnqshJQt47/ynlu4g70C
+         4FELsE4uVk6lG5x2S8+9hzodZu31O2KuRxFTDWMkriCHGPCseCk18w1wpUjELNiKGkxT
+         ztA2ozCASs3UL7i/ra2mMfkWJm8HDyYu2fKolR2xOgN7HnlGxPvl4HIVP//6p8E74LFP
+         6n51EOLeya7oYDfkLMWFCvAOmtuMHXXDVNySAcPjxZDYfjF/uCP7P+/uR/jjwIYgNKOe
+         Nf/hpliR1zkjiAgj+wc/nALWa6dQO8/cmE7zCUkO+RTjgnZ6dLq8Ik8d7JGACb4g0Ts2
+         Z4+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696469169; x=1697073969;
+        d=1e100.net; s=20230601; t=1696469195; x=1697073995;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TYfhcgTqo5ZRyy5fcNvbHFZ7+EudMa0DogQVaLExeg=;
-        b=poQAS29wqFH5r01oDuVTRPwt1YVk4HED/5oco9URE7vt56kIggd304AAdlV5FfCnNh
-         wXQV1/IfzIEphfZkYt0Y9gEXASQtuwPMpg2iVd2YbDKIOLokLR7T6qbgCXmF5yx0NyzC
-         i8VU8L6Fmd+GqIsVgN+XIqFLl3ds0wmBCTr/62R7yjYQJL7AnnpbcF4cwfzlhcLHQu7z
-         VdgpuzxuZyWo2cOVByjX7+OafZOjxZ4uQsIcN0rb7IQf3PMs/tw2c8SMj0oNx9DJtA+/
-         WAhh8G0aumRPJeZ9F8SIFgDB2yIAP4x5c175fUNcrY29dGg2lN85FX7xOuy3DzjNhQUK
-         DqSg==
-X-Gm-Message-State: AOJu0YzZ6Db6QwHFzYMRqg9jGQcelE8423pAs/2Okr8/jgKUjQLMrXfR
-        kBNICK6z3NI2YO8jARBQzyyakO/vT78=
-X-Google-Smtp-Source: AGHT+IEfh6PZmAexjHN3igsJGvIKhGoBOSIMHSS/3bzuKrRlDIj+2RI1Fh55kTfxzztFM3zd3m2gy0y4R7A=
+        bh=pAYXXZZrtq6qVtd9bBLCof1AkK8uP0CzKodj/aevUuM=;
+        b=R0Az1uwtrx2M/ey3H4VZCiCIR4H/WPH+sU72ySk4YV1BxY2HAGPPB6ghFkKI0d4tpj
+         PF6j6pQLHc9wvOa/XkCfxinRm4njYpobb2uRJwD6ckgKaXNCiD2NwGwe0SiVB048z3rl
+         rrNz12bT2kg6AIR/4jix9YvFik8sm+NGPVt7HbV+LRdpnciMryuPWKFl9kb6ISmiAyJs
+         zhBrc/ou1rOCy/FtmNHwnrqzryANun6+49KRt7feKkKbQmKRYf/lo+hymUN4nPGHLZkp
+         AzQDuK4gEsxQ1h5RPcv4FDvzSm5GXre1F2n/mQP7R++FxOitik3j4WQSuyLFeFcI/5ud
+         0uJQ==
+X-Gm-Message-State: AOJu0Yzt+fwRfJUlvSApm0h+mjq7xWiu4Z83Jw4Q/DjbjpkJ3KOKev18
+        1njAFnLpwAWmxWuFUzvzaYEA3+sNXIQ=
+X-Google-Smtp-Source: AGHT+IE4tvEFWYdA+2STjnyOz4sD7+XQagXBrtdo4DeeBBCeS2cJcL9Ogqq1easuFZmclPalNjWAGSxhH6g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:b790:b0:269:4850:5411 with SMTP id
- m16-20020a17090ab79000b0026948505411mr61401pjr.4.1696469169119; Wed, 04 Oct
- 2023 18:26:09 -0700 (PDT)
-Date:   Wed, 4 Oct 2023 18:26:07 -0700
-In-Reply-To: <20230908222905.1321305-7-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:b2c6:0:b0:586:a58d:2e24 with SMTP id
+ q189-20020a81b2c6000000b00586a58d2e24mr79019ywh.5.1696469195294; Wed, 04 Oct
+ 2023 18:26:35 -0700 (PDT)
+Date:   Wed, 4 Oct 2023 18:26:34 -0700
+In-Reply-To: <20230908222905.1321305-8-amoorthy@google.com>
 Mime-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-7-amoorthy@google.com>
-Message-ID: <ZR4Qr4Yzj7nUNIT3@google.com>
-Subject: Re: [PATCH v5 06/17] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-8-amoorthy@google.com>
+Message-ID: <ZR4QyijDUsMX40U8@google.com>
+Subject: Re: [PATCH v5 07/17] KVM: arm64: Annotate -EFAULT from user_mem_abort()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Anish Moorthy <amoorthy@google.com>
 Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
         kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -71,11 +71,7 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Sep 08, 2023, Anish Moorthy wrote:
-> Implement KVM_CAP_MEMORY_FAULT_INFO for efaults generated by
-> kvm_handle_error_pfn().
+> Implement KVM_CAP_MEMORY_FAULT_INFO for guest access failure in
+> user_mem_abort().
 
-Rewrite with --verbose please.  And avoid function names if possible.  Sometimes
-it's better/useful/necessary to reference a function by name, but in this case,
-just saying kvm_handle_error_pfn() isn't helpful because it doesn't provide any
-insight into the actual impact of the change, i.e. requires the reader to already
-know exactly how and when kvm_handle_error_pfn() is used.
+Same comments as the x86 patch, this is way too terse.
