@@ -2,140 +2,328 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57FF17BA1C5
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 16:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 877AF7BA224
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 17:15:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233528AbjJEO6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 10:58:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49202 "EHLO
+        id S230345AbjJEPP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 11:15:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233909AbjJEO41 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 10:56:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F2727B00
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 07:39:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696516747;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WtdGx+OPUYNJ/AOWymXa/bx8UKj2Lj0Mpvrei971DGA=;
-        b=WKYstOuXTSIC+BU9W837M0n5C73IY9F1n359up6GEFXoWUuO9yRUXKvH/mXvTxOiwAeUTr
-        Ww6ZJLixVtuKwAlS7ZkH267ICbmrU/jahNJtcVPkMBpNou0OanqqnjJuyJ3KvV8KApvc0T
-        2ftV+023rOHBxhUpA/tnP0FPfidsKF4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-149-NqYKoLAoM822Sr1SzOzEGQ-1; Thu, 05 Oct 2023 10:38:54 -0400
-X-MC-Unique: NqYKoLAoM822Sr1SzOzEGQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEA673C1E9D1;
-        Thu,  5 Oct 2023 14:38:52 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.39.192.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F5C340C6EA8;
-        Thu,  5 Oct 2023 14:38:51 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 7/7] KVM: selftests: x86: Use TAP interface in the userspace_msr_exit test
-Date:   Thu,  5 Oct 2023 16:38:39 +0200
-Message-ID: <20231005143839.365297-8-thuth@redhat.com>
-In-Reply-To: <20231005143839.365297-1-thuth@redhat.com>
-References: <20231005143839.365297-1-thuth@redhat.com>
+        with ESMTP id S233743AbjJEPOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 11:14:42 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B716992
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 07:43:19 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d865854ef96so1124613276.2
+        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 07:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696516999; x=1697121799; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EE8iPYu9LpRlrA3P5svRFO6CzOzjvPUAMSGvj485Oxk=;
+        b=inptMAmDcUZ1iBCTY/rT4ZJ75tNZgRwaf6/zv4O44QzEe+ZBaFB053c+VOj3C4QipE
+         zMd3KGrBNxPCRXwqq1eVQpP9HB/gPjmGNvFGD/oshJzSOEdaCYIrYk80LOKEJGLs6wzF
+         IzrmKnbTd8vJPVU4VxrBBFi1dwoGbLrnE+ePMOrSam8Z3FyJiYZRJOyaw7Gc6ehQdczz
+         kuadF+lYJQ6jNTREZqwL7fMtvowk4Lg/LP8kG4CiqDg5BDXkY4OEB5cCttwxjLvLAtJH
+         c1vJ5f88oeq9RNFpgmcs5T/k9u5AUAMp4qdytFz3UEGHD+Z+7oNCmB0arvYqa1lVa+AN
+         J2gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696516999; x=1697121799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EE8iPYu9LpRlrA3P5svRFO6CzOzjvPUAMSGvj485Oxk=;
+        b=rgE26/tbUsEP4fKkfQyJc43a9z4/v00lDm7yFqF9tLXtvmXh0A0dKVB/UYYZAzLVce
+         YN0EnUUXNcERhiQslaguXc7fDgUzaKh3qKVuuSMWDP1qqq6RMe1lDD7Bzail+vkmRr9C
+         DBo/9BFiTfkr+FgDScluxLLnTJxRB7WvTkU1cJLDNfEZXlhn/eD008ZRYmO2IXtgra1b
+         aqAVUGT8zrXXpIUZZ4zyIs+4EmjpVgvJbN0fHdvGVMzJ3Uw5mISYgHOYYmjmo0CaXelD
+         roCZohhItKijXXeWFqMVCXWQcI6aKzeLJCmQYW//lSYre6buzTaZOYAt5t3A17NQ0h6w
+         hIhA==
+X-Gm-Message-State: AOJu0YwXQC2rCu27FVJjLOvV8/U9qOXcu9KCYPVn1sqTG8hLarDE0W2e
+        fHeVTgdn+1cYd3B362XB1n57hVaSUvB+igWQ+6QN3w==
+X-Google-Smtp-Source: AGHT+IGOqTvtxfqWgNnMMFc4737tOPznDx2Ec+u1Qc6vg6Ytf9IAjo7xOI8HjQPL083wFsBnlWD0qahO/3mYB56VT9A=
+X-Received: by 2002:a25:23ce:0:b0:d91:5a1b:eea with SMTP id
+ j197-20020a2523ce000000b00d915a1b0eeamr4876224ybj.50.1696516998560; Thu, 05
+ Oct 2023 07:43:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+From:   Fuad Tabba <tabba@google.com>
+Date:   Thu, 5 Oct 2023 15:42:42 +0100
+Message-ID: <CA+EHjTwTgEVtea7wgef5G6EEgFa0so_GbNXTMZNKyFE=ucyV0g@mail.gmail.com>
+Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, KVM <kvm@vger.kernel.org>,
+        "moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Anish Moorthy <amoorthy@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the kselftest_harness.h interface in this test to get TAP
-output, so that it is easier for the user to see what the test
-is doing.
+Hi Sean,
 
-Note: We're not using the KVM_ONE_VCPU_TEST() macro here (but the
-generic TEST() macro from kselftest_harness.h) since each of the
-tests needs a different guest code function.
+On Tue, Oct 3, 2023 at 9:51=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> > On Tue, Oct 3, 2023 at 4:59=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > On Tue, Oct 03, 2023, Fuad Tabba wrote:
+> > > > > +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> > > > > +
+> > > >
+> > > > In pKVM, we don't want to allow setting (or clearing) of PRIVATE/SH=
+ARED
+> > > > attributes from userspace.
+> > >
+> > > Why not?  The whole thing falls apart if userspace doesn't *know* the=
+ state of a
+> > > page, and the only way for userspace to know the state of a page at a=
+ given moment
+> > > in time is if userspace controls the attributes.  E.g. even if KVM we=
+re to provide
+> > > a way for userspace to query attributes, the attributes exposed to us=
+rspace would
+> > > become stale the instant KVM drops slots_lock (or whatever lock prote=
+cts the attributes)
+> > > since userspace couldn't prevent future changes.
+> >
+> > I think I might not quite understand the purpose of the
+> > KVM_SET_MEMORY_ATTRIBUTES ABI. In pKVM, all of a protected guest's memo=
+ry is
+> > private by default, until the guest shares it with the host (via a
+> > hypercall), or another guest (future work). When the guest shares it,
+> > userspace is notified via KVM_EXIT_HYPERCALL. In many use cases, usersp=
+ace
+> > doesn't need to keep track directly of all of this, but can reactively =
+un/map
+> > the memory being un/shared.
+>
+> Yes, and then userspace needs to tell KVM, via KVM_SET_MEMORY_ATTRIBUTES,=
+ that
+> userspace has agreed to change the state of the page.  Userspace may not =
+need/want
+> to explicitly track the state of pages, but userspace still needs to tell=
+ KVM what
+> userspace wants.
+>
+> KVM is primarily an accelerator, e.g. KVM's role is to make things go fas=
+t (relative
+> to doing things in userspace) and provide access to resources/instruction=
+s that
+> require elevated privileges.  As a general rule, we try to avoid defining=
+ the vCPU
+> model, security policies, etc. in KVM, because hardcoding policy into KVM=
+ (and the
+> kernel as a whole) eventually limits the utility of KVM.
+>
+> As it pertains to PRIVATE vs. SHARED, KVM's role is to define and enforce=
+ the basic
+> rules, but KVM shouldn't do things like define when it is (il)legal to co=
+nvert
+> memory to/from SHARED, what pages can be converted, what happens if the g=
+uest and
+> userspace disagree, etc.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .../kvm/x86_64/userspace_msr_exit_test.c      | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+Thanks for clarifying that. My initial understanding of the purpose of
+KVM_SET_MEMORY_ATTRIBUTES wasn't clear. Now I see how having the
+userspace view in KVM would avoid the need to hardcore many policies,
+and I can see how this could come in handy in the future when we start
+going into multi-sharing, for example.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-index 3533dc2fbfeeb..9843528bba0c6 100644
---- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
-@@ -8,6 +8,7 @@
- #define _GNU_SOURCE /* for program_invocation_short_name */
- #include <sys/ioctl.h>
- 
-+#include "kselftest_harness.h"
- #include "test_util.h"
- #include "kvm_util.h"
- #include "vmx.h"
-@@ -527,7 +528,7 @@ static void run_guest_then_process_ucall_done(struct kvm_vcpu *vcpu)
- 	process_ucall_done(vcpu);
- }
- 
--static void test_msr_filter_allow(void)
-+TEST(msr_filter_allow)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
-@@ -646,7 +647,7 @@ static void handle_wrmsr(struct kvm_run *run)
- 	}
- }
- 
--static void test_msr_filter_deny(void)
-+TEST(msr_filter_deny)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
-@@ -693,7 +694,7 @@ static void test_msr_filter_deny(void)
- 	kvm_vm_free(vm);
- }
- 
--static void test_msr_permission_bitmap(void)
-+TEST(msr_permission_bitmap)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
-@@ -786,7 +787,7 @@ static void run_msr_filter_flag_test(struct kvm_vm *vm)
- }
- 
- /* Test that attempts to write to the unused bits in a flag fails. */
--static void test_user_exit_msr_flags(void)
-+TEST(user_exit_msr_flags)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
-@@ -804,13 +805,5 @@ static void test_user_exit_msr_flags(void)
- 
- int main(int argc, char *argv[])
- {
--	test_msr_filter_allow();
--
--	test_msr_filter_deny();
--
--	test_msr_permission_bitmap();
--
--	test_user_exit_msr_flags();
--
--	return 0;
-+	return test_harness_run(argc, argv);
- }
--- 
-2.41.0
+> > > Why does pKVM need to prevent userspace from stating *its* view of at=
+tributes?
+> > >
+> > > If the goal is to reduce memory overhead, that can be solved by using=
+ an internal,
+> > > non-ABI attributes flag to track pKVM's view of SHARED vs. PRIVATE.  =
+If the guest
+> > > attempts to access memory where pKVM and userspace don't agree on the=
+ state,
+> > > generate an exit to userspace.  Or kill the guest.  Or do something e=
+lse entirely.
+> >
+> > For the pKVM hypervisor the guest's view of the attributes doesn't
+> > matter. The hypervisor at the end of the day is the ultimate arbiter
+> > for what is shared and with how. For pKVM (at least in my port of
+> > guestmem), we use the memory attributes from guestmem essentially to
+> > control which memory can be mapped by the host.
+>
+> The guest's view absolutely matters.  The guest's view may not be express=
+ed at
+> access time, e.g. as you note below, pKVM and other software-protected VM=
+s don't
+> have a dedicated shared vs. private bit like TDX and SNP.  But the view i=
+s still
+> there, e.g. in the pKVM model, the guest expresses its desire for shared =
+vs.
+> private via hypercall, and IIRC, the guest's view is tracked by the hyper=
+visor
+> in the stage-2 PTEs.  pKVM itself may track the guest's view on things, b=
+ut the
+> view is still the guest's.
 
+This was poorly worded on my part. You're right that in practice the
+pKVM hypervisor is the one tracking the guest's view, based on the
+hypercalls from the guest.
+
+> E.g. if the guest thinks a page is private, but in reality KVM and host u=
+serspace
+> have it as shared, then the guest may unintentionally leak data to the un=
+trusted
+> world.
+>
+> IIUC, you have implemented guest_memfd support in pKVM by changing the at=
+tributes
+> when the guest makes the hypercall.  This can work, but only so long as t=
+he guest
+> and userspace are well-behaved, and it will likely paint pKVM into a corn=
+er in
+> the long run.
+>
+> E.g. if the guest makes a hypercall to convert memory to PRIVATE, but the=
+re is
+> no memslot or the memslot doesn't support private memory, then unless the=
+re is
+> policy baked into KVM, or an ABI for the guest<=3D>host hypercall interfa=
+ce that
+> allows unwinding the program counter, you're stuck.  Returning an error f=
+or the
+> hypercall straight from KVM is undesirable as that would put policy into =
+KVM that
+> doesn't need to be there, e.g. that would prevent userspace from manipula=
+ting
+> memslots in response to (un)share requests from the guest.  It's a simila=
+r story
+> if KVM marks the page as PRIVATE, as that would prevent userspace from re=
+turning
+> an error for the hypercall, i.e. would prevent usersepace from denying th=
+e request
+> to convert to PRIVATE.
+
+Ack.
+
+> > One difference between pKVM and TDX (as I understand it), is that TDX
+> > uses the msb of the guest's IPA to indicate whether memory is shared
+> > or private, and that can generate a mismatch on guest memory access
+> > between what it thinks the state is, and what the sharing state in
+> > reality is. pKVM doesn't have that. Memory is private by default, and
+> > can be shared in-place, both in the guest's IPA space as well as the
+> > underlying physical page.
+>
+> TDX's shared bit and SNP's encryption bit are just a means of hardware en=
+forcement.
+> pKVM does have a hardware bit because hardware doesn't provide any enforc=
+ement.
+> But as above, pKVM does have an equivalent *somewhere*.
+>
+> > > > The other thing, which we need for pKVM anyway, is to make
+> > > > kvm_vm_set_mem_attributes() global, so that it can be called from o=
+utside of
+> > > > kvm_main.c (already have a local patch for this that declares it in
+> > > > kvm_host.h),
+> > >
+> > > That's no problem, but I am definitely opposed to KVM modifying attri=
+butes that
+> > > are owned by userspace.
+> > >
+> > > > and not gate this function by KVM_GENERIC_MEMORY_ATTRIBUTES.
+> > >
+> > > As above, I am opposed to pKVM having a completely different ABI for =
+managing
+> > > PRIVATE vs. SHARED.  I have no objection to pKVM using unclaimed flag=
+s in the
+> > > attributes to store extra metadata, but if KVM_SET_MEMORY_ATTRIBUTES =
+doesn't work
+> > > for pKVM, then we've failed miserably and should revist the uAPI.
+> >
+> > Like I said, pKVM doesn't need a userspace ABI for managing PRIVATE/SHA=
+RED,
+> > just a way of tracking in the host kernel of what is shared (as opposed=
+ to
+> > the hypervisor, which already has the knowledge). The solution could si=
+mply
+> > be that pKVM does not enable KVM_GENERIC_MEMORY_ATTRIBUTES, has its own
+> > tracking of the status of the guest pages, and only selects KVM_PRIVATE=
+_MEM.
+>
+> At the risk of overstepping my bounds, I think that effectively giving th=
+e guest
+> full control over what is shared vs. private is a mistake.  It more or le=
+ss locks
+> pKVM into a single model, and even within that model, dealing with errors=
+ and/or
+> misbehaving guests becomes unnecessarily problematic.
+>
+> Using KVM_SET_MEMORY_ATTRIBUTES may not provide value *today*, e.g. the u=
+serspace
+> side of pKVM could simply "reflect" all conversion hypercalls, and termin=
+ate the
+> VM on errors.  But the cost is very minimal, e.g. a single extra ioctl() =
+per
+> converion, and the upside is that pKVM won't be stuck if a use case comes=
+ along
+> that wants to go beyond "all conversion requests either immediately succe=
+ed or
+> terminate the guest".
+
+Now that I understand the purpose of KVM_SET_MEMORY_ATTRIBUTES, I
+agree. However, pKVM needs to track at the host kernel (i.e., EL1)
+whether guest memory is shared or private.
+
+One approach would be to add another flag to the attributes that
+tracks the host kernel view. The way KVM_SET_MEMORY_ATTRIBUTES is
+implemented now, userspace can zero it, so in that case, that
+operation would need to be masked to avoid that.
+
+Another approach would be to have a pKVM-specific xarray (or similar)
+to do the tracking, but since there is a structure that's already
+doing something similar (i.e.,the attributes array), it seems like it
+would be unnecessary overhead.
+
+Do you have any ideas or preferences?
+
+Cheers,
+/fuad
