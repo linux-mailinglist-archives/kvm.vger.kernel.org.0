@@ -2,110 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A54117BA2F9
-	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 17:50:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D26767BA512
+	for <lists+kvm@lfdr.de>; Thu,  5 Oct 2023 18:14:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234198AbjJEPuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 11:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38950 "EHLO
+        id S241077AbjJEQNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 12:13:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233558AbjJEPtI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 11:49:08 -0400
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71986A3B0
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 08:08:25 -0700 (PDT)
+        with ESMTP id S234753AbjJEQMX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 12:12:23 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB0B59FF
+        for <kvm@vger.kernel.org>; Wed,  4 Oct 2023 22:51:00 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-2774874c3daso430823a91.1
+        for <kvm@vger.kernel.org>; Wed, 04 Oct 2023 22:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696518506; x=1728054506;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=NRJkIYREiRN6DDp/h9F1KVXYksGJMDPWo0HtS5yLaHc=;
-  b=YfdUXY0UHhJtPcofGZTg6k77F/m1cRPn2eE1haXvFZQ9qhF8lh5JYUjz
-   z07DbajyEEGneU0LEcYN34fQHCv5QZ2CQ4k1lxB35dw2KNFHan3F14rUa
-   L3ZVFG6qBKeblWaknqPd5qBfCyqvlAAkGeoVT1gmUKuRmKx6fgum3i4yi
-   M=;
-X-IronPort-AV: E=Sophos;i="6.03,203,1694736000"; 
-   d="scan'208";a="355134685"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 15:08:23 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-        by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id 61E7F80581;
-        Thu,  5 Oct 2023 15:08:22 +0000 (UTC)
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:2407]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.6.59:2525] with esmtp (Farcaster)
- id 77fc0a34-7c6c-4ef6-a167-0a5183ffb41d; Thu, 5 Oct 2023 15:08:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 77fc0a34-7c6c-4ef6-a167-0a5183ffb41d
-Received: from EX19D026EUB003.ant.amazon.com (10.252.61.39) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Thu, 5 Oct 2023 15:08:20 +0000
-Received: from EX19D047EUB002.ant.amazon.com (10.252.61.57) by
- EX19D026EUB003.ant.amazon.com (10.252.61.39) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Thu, 5 Oct 2023 15:08:20 +0000
-Received: from EX19D047EUB002.ant.amazon.com ([fe80::a00c:a6ac:280e:2ca7]) by
- EX19D047EUB002.ant.amazon.com ([fe80::a00c:a6ac:280e:2ca7%3]) with mapi id
- 15.02.1118.037; Thu, 5 Oct 2023 15:08:20 +0000
-From:   "Mancini, Riccardo" <mancio@amazon.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Teragni, Matias" <mteragni@amazon.com>,
-        "Batalov, Eugene" <bataloe@amazon.com>
-Subject: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
-Thread-Topic: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
-Thread-Index: Adn3nVldZ3tGzH5GSXezpqAV5T2/pw==
-Date:   Thu, 5 Oct 2023 15:08:20 +0000
-Message-ID: <9d5ddfbe407940afa02567262a22fa4c@amazon.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.252.50.216]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1696485060; x=1697089860; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IAn7kTF76MX4baCsjz/DD87LgbEJOFPnszS1gD87MLo=;
+        b=ZXubW7/QRu9lfTWrHyJPGHvyKFEbmAjEGsA43lpb7Aa1B5q0XjQmR8aY6/JMLTFW6d
+         LPSWr2Ds4/22GFtcQ/9KzR28OoFbFkzZuaf/Cr1iE7cPrQre79m0GookUWiIvChHBIyD
+         nwi6+MkCNAcKtTcb18oWw9GtyZ4cxW2Or03HqHrNSE3OY4b777U/GoD/PFu5kxxK0VQi
+         bFuyj6U47r4kUsPOlP4MYPFSubLZEb0fCnFgIByCYMoXS79N9lpdNH5AftJZuOuRPM3l
+         bpY9o14EBhXWKmB5o1ri0uEmRyy+3BYQPNVsmgKJoz2UgwcKGHU96ndyPlbaFh5YHpaU
+         ge2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696485060; x=1697089860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IAn7kTF76MX4baCsjz/DD87LgbEJOFPnszS1gD87MLo=;
+        b=MHjVP3fFQ56Qlei0wwFM5uBGnKIVisexoGtZLcKmtl5hSrCBSaixv38QFNm1ZGUwgf
+         tiox231YBQ2QFH2oAWPXzyzS1iPC0UzeN6egBtOiKEej5aA8EqjvXoCBmQZp4qbael0m
+         ZZw/hNrW3KZEWuCWLMsJQ3j0yD7aR4BHgsZOVJ6sbVAKLr8W2FGkNqiTqqGQJNBwSbSi
+         a3WSutc/rf30enlSSm8ly0mnYk2JdKUdpiv9AtDFEuPIGngb1/XAdUGCGGapiN/122Pt
+         nUzV47ahAWmKLOtqtWRVTWUk5OjVVlTHDwUIjEMbrUdDm+tqtiZzQy9D971ZbaGt1hOm
+         XsWg==
+X-Gm-Message-State: AOJu0Yy3cN4/XKqHJGGz7jj+6K2YeXHjW9NJyaTU1GQQyo/7zzLs+WlB
+        +9dURwrtFDnXnkH2wv91K+vy2O37dqA5qHFyYwZOQg==
+X-Google-Smtp-Source: AGHT+IEtGbIHdTfL2yZTTDLPgQj3me/hsvVuKvB4XaXv1nNxUCov3SGcpN7sdI1I388p/AKgKTr/0lfdATge9YktJw8=
+X-Received: by 2002:a17:90b:a04:b0:26d:416a:b027 with SMTP id
+ gg4-20020a17090b0a0400b0026d416ab027mr4208863pjb.31.1696485059836; Wed, 04
+ Oct 2023 22:50:59 -0700 (PDT)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.6
+References: <20231003035226.1945725-3-apatel@ventanamicro.com> <mhng-4ec1093a-4542-429e-a9f0-8a976cff9ac4@palmer-ri-x1c9>
+In-Reply-To: <mhng-4ec1093a-4542-429e-a9f0-8a976cff9ac4@palmer-ri-x1c9>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Thu, 5 Oct 2023 11:20:48 +0530
+Message-ID: <CAAhSdy2CxWw9ny7vdBoEzsXkm_J882NGKTDQ7BfykrjuB1QR+w@mail.gmail.com>
+Subject: Re: [PATCH v3 2/6] RISC-V: Detect Zicond from ISA string
+To:     Palmer Dabbelt <palmer@dabbelt.com>
+Cc:     apatel@ventanamicro.com, pbonzini@redhat.com,
+        atishp@atishpatra.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        Conor Dooley <conor@kernel.org>, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, shuah@kernel.org,
+        ajones@ventanamicro.com, mchitale@ventanamicro.com,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Conor Dooley <conor.dooley@microchip.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, Oct 4, 2023 at 7:37=E2=80=AFPM Palmer Dabbelt <palmer@dabbelt.com> =
+wrote:
+>
+> On Mon, 02 Oct 2023 20:52:22 PDT (-0700), apatel@ventanamicro.com wrote:
+> > The RISC-V integer conditional (Zicond) operation extension defines
+> > standard conditional arithmetic and conditional-select/move operations
+> > which are inspired from the XVentanaCondOps extension. In fact, QEMU
+> > RISC-V also has support for emulating Zicond extension.
+> >
+> > Let us detect Zicond extension from ISA string available through
+> > DT or ACPI.
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> > ---
+> >  arch/riscv/include/asm/hwcap.h | 1 +
+> >  arch/riscv/kernel/cpufeature.c | 1 +
+> >  2 files changed, 2 insertions(+)
+> >
+> > diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hw=
+cap.h
+> > index 0f520f7d058a..6fc51c1b34cf 100644
+> > --- a/arch/riscv/include/asm/hwcap.h
+> > +++ b/arch/riscv/include/asm/hwcap.h
+> > @@ -59,6 +59,7 @@
+> >  #define RISCV_ISA_EXT_ZIFENCEI               41
+> >  #define RISCV_ISA_EXT_ZIHPM          42
+> >  #define RISCV_ISA_EXT_SMSTATEEN              43
+> > +#define RISCV_ISA_EXT_ZICOND         44
+> >
+> >  #define RISCV_ISA_EXT_MAX            64
+> >
+> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeat=
+ure.c
+> > index 3755a8c2a9de..e3803822ab5a 100644
+> > --- a/arch/riscv/kernel/cpufeature.c
+> > +++ b/arch/riscv/kernel/cpufeature.c
+> > @@ -167,6 +167,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D=
+ {
+> >       __RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+> >       __RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
+> >       __RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+> > +     __RISCV_ISA_EXT_DATA(zicond, RISCV_ISA_EXT_ZICOND),
+> >       __RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+> >       __RISCV_ISA_EXT_DATA(zifencei, RISCV_ISA_EXT_ZIFENCEI),
+> >       __RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
+>
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+>
+> Can we do a shared tag, though?  These will conflict.
 
-when a 4.14 guest runs on a 5.10 host (and later), it cannot use APF (despi=
-te
-CPUID advertising KVM_FEATURE_ASYNC_PF) due to the new interrupt-based
-mechanism 2635b5c4a0 (KVM: x86: interrupt based APF 'page ready' event deli=
-very).
-Kernels after 5.9 won't satisfy the guest request to enable APF through
-KVM_ASYNC_PF_ENABLED, requiring also KVM_ASYNC_PF_DELIVERY_AS_INT to be set=
-.
-Furthermore, the patch set seems to be dropping parts of the legacy #PF han=
-dling
-as well.
-I consider this as a bug as it breaks APF compatibility for older guests ru=
-nning
-on newer kernels, by breaking the underlying ABI.
-What do you think? Was this a deliberate decision?
-Was this already reported in the past (I couldn't find anything in the mail=
-ing list
-but I might have missed it!)?
-Would it be much effort to support the legacy #PF based mechanism for older
-guests that choose to only set KVM_ASYNC_PF_ENABLED?
+Thanks Palmer.
 
-The reason this is an issue for us now is that not having APF for older gue=
-sts
-introduces a significant performance regression on 4.14 guests when paired =
-to
-uffd handling of "remote" page-faults (similar to a live migration scenario=
-)
-when we update from a 4.14 host kernel to a 5.10 host kernel.
+I will provide a shared tag based on 6.6-rc5 sometime
+next week. I hope this is okay for you.
 
-Thanks,
-Riccardo
+Regards,
+Anup
+
+>
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
