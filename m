@@ -2,121 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 683367BB8A0
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 15:09:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28BCA7BB920
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 15:33:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232172AbjJFNJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 09:09:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
+        id S232397AbjJFNdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 09:33:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232288AbjJFNJU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 09:09:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B6EA6
-        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 06:09:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nQuVCtW6i+MOZrhvdH0VD4e/PHzoa/qwLMLD+xBePTg=; b=hfHda9fMner1U01YZgxu0tFTff
-        ++34fcfWnKoqgalYk58hQhlCfc8FpRY//5ef6Yp/vwUQubJntGepMQ4ytZqVUzoz6hUYrsg/1FafW
-        tZp4ymOuCY5DoAvkVnMFV4TmG8aueT02whS7Lppl72ZzX9XTkq5b20j8aheR28nUVhT3DpY4b3iYx
-        de7NKsStt/BUliMsMWiQGm7DvPTe2sUY/oA+2SXXYfTQiI8rOE4lkXrKqCnxggBRiHTAiyB+7PNzx
-        FKmKHRhlaI8ACi/nv1GcUJbfYsNuaiJY9XvmkY2kJSCEsOriHSsDNk6xLhg8PQtw0FNt+jYCTsqSP
-        wWA+QmxQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qokZp-005rGD-2R;
-        Fri, 06 Oct 2023 13:09:09 +0000
-Date:   Fri, 6 Oct 2023 06:09:09 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <ZSAG9cedvh+B0c0E@infradead.org>
-References: <20230921124040.145386-1-yishaih@nvidia.com>
- <20230921124040.145386-11-yishaih@nvidia.com>
- <20230922055336-mutt-send-email-mst@kernel.org>
- <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
- <20230926072538-mutt-send-email-mst@kernel.org>
- <ZRpjClKM5mwY2NI0@infradead.org>
- <20231002151320.GA650762@nvidia.com>
- <ZR54shUxqgfIjg/p@infradead.org>
- <20231005111004.GK682044@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231005111004.GK682044@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232388AbjJFNdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 09:33:09 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B518495
+        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 06:33:07 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F77C433CA;
+        Fri,  6 Oct 2023 13:33:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696599187;
+        bh=zM9U6OE2wsu5l+eoLqm1nLAA0FmuNcoDectJceqzya4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VWvYqsuswcyUpaopuhu/HDRF4GakesEOiRaWKel+kPfAABpGn8I32oDbWQW3ygY9s
+         odswpBsewZqhF41o031Cm6K7+SZ5PFmsH54FVtsCtEjZ4jSOFwMUD6H6VChQYbwei+
+         RDnTtURR4/XbGHKbS3Yg/17MwTPL18cA7Kf/U8R3cTWV1mxnRd4HcnjPtgXBYw9avB
+         s6uOvzEJRGjf7AP2+8xrH45mFIDiw13u+gsMCetAhMzCzYk+I2elgAAj0KoYQm4pIX
+         GZJJe+h/LDVozcT7MphOKIuz5xw+Ph/NJKF6jwxvvSnzyURxra9vd63qt/MCqfkTjk
+         /dYv55ZWsIUKg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qokwy-001jZ2-Mv;
+        Fri, 06 Oct 2023 14:33:05 +0100
+Date:   Fri, 06 Oct 2023 14:33:04 +0100
+Message-ID: <86zg0vnaen.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Load the stage-2 MMU from vcpu_load() for VHE
+In-Reply-To: <861qe8nd45.wl-maz@kernel.org>
+References: <20231006093600.1250986-1-oliver.upton@linux.dev>
+        <8634yongw3.wl-maz@kernel.org>
+        <861qe8nd45.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 05, 2023 at 08:10:04AM -0300, Jason Gunthorpe wrote:
-> > But for all the augmented vfio use cases it doesn't, for them the
-> > augmented vfio functionality is an integral part of the core driver.
-> > That is true for nvme, virtio and I'd argue mlx5 as well.
+On Fri, 06 Oct 2023 13:34:34 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> I don't agree with this. I see the extra functionality as being an
-> integral part of the VF and VFIO. The PF driver is only providing a
-> proxied communication channel.
+> On Fri, 06 Oct 2023 12:13:00 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > On Fri, 06 Oct 2023 10:35:57 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Unlike nVHE, there is no need to switch the stage-2 MMU around on guest
+> > > entry/exit in VHE mode as the host is running at EL2. Despite this KVM
+> > > reloads the stage-2 on every guest entry, which is needless.
+> > > 
+> > > This series moves the setup of the stage-2 MMU context to vcpu_load()
+> > > when running in VHE mode. This is likely to be a win across the board,
+> > > but also allows us to remove an ISB on the guest entry path for systems
+> > > with one of the speculative AT errata.
+> > > 
+> > > None of my machines affected by the AT errata are VHE-capable, so it'd
+> > > be appreciated if someone could give this series a go and make sure I
+> > > haven't wrecked anything.
+> > 
+> > It totally breaks on my A55 board. Running a single guest seems OK,
+> > but running a number of the concurrently makes them explode early on
+> > (faults in EFI...)
+> > 
+> > I guess we end-up running with the wrong VTTBR at times, which would
+> > be interesting...
 > 
-> It is a limitation of PCI that the PF must act as a proxy.
-
-For anything live migration it very fundamentally is not, as a function
-that is visible to a guest by definition can't drive the migration
-itself.  That isn't really a limitation in PCI, but follows form the
-fact that something else must control a live migration that is
-transparent to the guest.
-
+> Fun fact:
 > 
-> > So we need to stop registering separate pci_drivers for this kind
-> > of functionality, and instead have an interface to the driver to
-> > switch to certain functionalities.
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index b0cafd7c5f8f..40c84db5884a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -195,6 +195,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> +	WARN_ONCE(kvm_get_vttbr(vcpu->arch.hw_mmu) != read_sysreg(vttbr_el2),
+> +		  "Oh crap %llx vs %llx\n",
+> +		  kvm_get_vttbr(vcpu->arch.hw_mmu),
+> +		  read_sysreg(vttbr_el2));
+> +
+>  	if (is_hyp_ctxt(vcpu))
+>  		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+>  	else
 > 
-> ?? We must bind something to the VF's pci_driver, what do you imagine
-> that is?
-
-The driver that knows this hardware.  In this case the virtio subsystem,
-in case of nvme the nvme driver, and in case of mlx5 the mlx5 driver.
-
-> > E.g. for this case there should be no new vfio-virtio device, but
-> > instead you should be able to switch the virtio device to an
-> > fake-legacy vfio mode.
+> [   36.190355] Oh crap 10000057a6001 vs 57a6001
 > 
-> Are you aruging about how we reach to vfio_register_XX() and what
-> directory the file lives?
+> My bet is that the VMID isn't allocated on first load, and everything
+> goes downhill from there.
 
-No.  That layout logically follows from what codebase the functionality
-is part of, though.
+So I was correct that the VMID isn't allocated on the first run, and
+the following patch should address that particular problem:
 
-> I don't know what "fake-legacy" even means, VFIO is not legacy.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e2d38c7d6555..759adee42018 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1025,7 +1025,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ extern unsigned int __ro_after_init kvm_arm_vmid_bits;
+ int __init kvm_arm_vmid_alloc_init(void);
+ void __init kvm_arm_vmid_alloc_free(void);
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+ void kvm_arm_vmid_clear_active(void);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 39c969c05990..584be562b1d4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -950,7 +950,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * making a thread's VMID inactive. So we need to call
+ 		 * kvm_arm_vmid_update() in non-premptible context.
+ 		 */
+-		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
++		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
++		    has_vhe())
++			__load_stage2(vcpu->arch.hw_mmu,
++				      vcpu->arch.hw_mmu->arch);
+ 
+ 		kvm_pmu_flush_hwstate(vcpu);
+ 
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index 7fe8ba1a2851..281e4f86d9a2 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -135,10 +135,11 @@ void kvm_arm_vmid_clear_active(void)
+ 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
+ }
+ 
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ {
+ 	unsigned long flags;
+ 	u64 vmid, old_active_vmid;
++	bool updated = false;
+ 
+ 	vmid = atomic64_read(&kvm_vmid->id);
+ 
+@@ -156,17 +157,21 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
+ 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
+ 					  old_active_vmid, vmid))
+-		return;
++		return false;
+ 
+ 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
+ 
+ 	/* Check that our VMID belongs to the current generation. */
+ 	vmid = atomic64_read(&kvm_vmid->id);
+-	if (!vmid_gen_match(vmid))
++	if (!vmid_gen_match(vmid)) {
+ 		vmid = new_vmid(kvm_vmid);
++		updated = true;
++	}
+ 
+ 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
+ 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
++
++	return updated;
+ }
+ 
+ /*
 
-The driver we're talking about in this thread fakes up a virtio_pci
-legacy devie to the guest on top of a "modern" virtio_pci device.
+However, this isn't enough.
 
-> There is alot of code in VFIO and the VMM side to take a VF and turn
-> it into a vPCI function. You can't just trivially duplicate VFIO in a
-> dozen drivers without creating a giant mess.
+[   63.450113] Oh crap 400000435c001 vs 3000004430001
 
-I do not advocate for duplicating it.  But the code that calls this
-functionality belongs into the driver that deals with the compound
-device that we're doing this work for.
+So there are situations where we end-up with the wrong VTTBR, rather
+than the wrong VMID, which is even worse. Haven't worked out the
+scenario yet, but it apparently involves being preempted by a vcpu
+from a different VM and not doing the right thing.
 
-> Further, userspace wants consistent ways to operate this stuff. If we
-> need a dozen ways to activate VFIO for every kind of driver that is
-> not a positive direction.
+	M.
 
-We don't need a dozen ways.  We just need a single attribute on the
-pci (or $OTHERBUS) devide that switches it to vfio mode.
+-- 
+Without deviation from the norm, progress is not possible.
