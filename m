@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ADDB7BC0C4
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 22:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 595107BC204
+	for <lists+kvm@lfdr.de>; Sat,  7 Oct 2023 00:07:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbjJFUyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 16:54:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45802 "EHLO
+        id S233651AbjJFWHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 18:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbjJFUyW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 16:54:22 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E42C5;
-        Fri,  6 Oct 2023 13:54:21 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 627F1C433C8;
-        Fri,  6 Oct 2023 20:54:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696625661;
-        bh=77r2KlFSGk08tldlnpzfUf4EEwr9qqvQObU5pu1mnrk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Ie2I9q4KGZOQto+yPy3NESQH0JBbLtjMYIBZAUiqQdnvk/pUCXfGUCf1Ar/XJcuKx
-         cEMfcFvCNf3TYZ6zHh7IKg4fG4/zf4mtFFTgswyyUdrn1zzxcJNQyJHuqKYfL07aA1
-         F80pJZEOYyW5DoeJb1jBg6UjC1WTk7gBnPxv2Q/2ogfQ8fr1d7TxVlvIMTUMPUT5Iu
-         T8A/8IYtsJMjWjjixGqC8ihuT2Ny7gxUMRwx8JI+oyEsprv9B1ODteKGFQ+DQ0tO/l
-         P7y6s80Q+uTwwjE40APs4KceuL2rzXtlwsJd9b2xYbzjWvlKpQuZaKth86QFexk3MQ
-         6uLvW81I/jbSg==
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, workflows@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH] KVM: deprecate KVM_WERROR in favor of general WERROR
-Date:   Fri,  6 Oct 2023 13:54:15 -0700
-Message-ID: <20231006205415.3501535-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+        with ESMTP id S233545AbjJFWHh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 18:07:37 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EC2BF
+        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 15:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696630056; x=1728166056;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=t1x24j0lHrp8WyR8NHLzBBuT0ffgppJLPGy2F6ORmiE=;
+  b=f1FHg4voiBBXgds/0OZxDuBwRfjSBMVEaGrPEMiX6DI9PUz9qjTzmExr
+   pBcR1ha4T+X18nGC3khVq7CnLhNQpdA4nfX5zmPCj72sz7wGHIz6RLhfL
+   6eqtaYKKG+l7hPbjPwV98Xr5RCmR43E0qENX5Q9lqjvQbj7SO7D6LwYrH
+   XrCWA1CB+Y7IemPRlzfNvkXIeD6BUqhNnYDdc3ABBWnjyKYZRgv4vO8l5
+   8K+YjpHcclx6zNiVdWb/kO555+FKAJ2vDf0Qv/g4fVmPhPj1Urlj77z86
+   +Lf9uxQmeBfXtRdJF/q0TM/iLIJG1rs1wFEu7RIC4t9cxm8AT9PAwva8b
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="448037905"
+X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
+   d="scan'208";a="448037905"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 15:07:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="781789537"
+X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
+   d="scan'208";a="781789537"
+Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 06 Oct 2023 15:07:34 -0700
+Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qosyp-0003gj-36;
+        Fri, 06 Oct 2023 22:07:31 +0000
+Date:   Sat, 7 Oct 2023 06:06:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 2/3] KVM: arm64: Rename helpers for VHE vCPU load/put
+Message-ID: <202310070514.3iAWEi1d-lkp@intel.com>
+References: <20231006093600.1250986-3-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006093600.1250986-3-oliver.upton@linux.dev>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Setting WERROR for random subsystems make life really hard
-for subsystems which want to build-test their stuff with W=1.
-WERROR for the entire kernel now exists and can be used
-instead. W=1 people probably know how to deal with the global
-W=1 already, tracking all per-subsystem WERRORs is too much...
+Hi Oliver,
 
-Link: https://lore.kernel.org/all/0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- Documentation/process/maintainer-kvm-x86.rst |  2 +-
- arch/x86/kvm/Kconfig                         | 14 --------------
- arch/x86/kvm/Makefile                        |  1 -
- 3 files changed, 1 insertion(+), 16 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/Documentation/process/maintainer-kvm-x86.rst b/Documentation/process/maintainer-kvm-x86.rst
-index 9183bd449762..cd70c0351108 100644
---- a/Documentation/process/maintainer-kvm-x86.rst
-+++ b/Documentation/process/maintainer-kvm-x86.rst
-@@ -243,7 +243,7 @@ context and disambiguate the reference.
- Testing
- -------
- At a bare minimum, *all* patches in a series must build cleanly for KVM_INTEL=m
--KVM_AMD=m, and KVM_WERROR=y.  Building every possible combination of Kconfigs
-+KVM_AMD=m, and WERROR=y.  Building every possible combination of Kconfigs
- isn't feasible, but the more the merrier.  KVM_SMM, KVM_XEN, PROVE_LOCKING, and
- X86_64 are particularly interesting knobs to turn.
- 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ed90f148140d..12929324ac3e 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -63,20 +63,6 @@ config KVM
- 
- 	  If unsure, say N.
- 
--config KVM_WERROR
--	bool "Compile KVM with -Werror"
--	# KASAN may cause the build to fail due to larger frames
--	default y if X86_64 && !KASAN
--	# We use the dependency on !COMPILE_TEST to not be enabled
--	# blindly in allmodconfig or allyesconfig configurations
--	depends on KVM
--	depends on (X86_64 && !KASAN) || !COMPILE_TEST
--	depends on EXPERT
--	help
--	  Add -Werror to the build flags for KVM.
--
--	  If in doubt, say "N".
--
- config KVM_INTEL
- 	tristate "KVM for Intel (and compatible) processors support"
- 	depends on KVM && IA32_FEAT_CTL
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 80e3fe184d17..8e6afde7c680 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- ccflags-y += -I $(srctree)/arch/x86/kvm
--ccflags-$(CONFIG_KVM_WERROR) += -Werror
- 
- ifeq ($(CONFIG_FRAME_POINTER),y)
- OBJECT_FILES_NON_STANDARD_vmenter.o := y
+[auto build test WARNING on 6465e260f48790807eef06b583b38ca9789b6072]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-Don-t-zero-VTTBR-in-__tlb_switch_to_host/20231006-173738
+base:   6465e260f48790807eef06b583b38ca9789b6072
+patch link:    https://lore.kernel.org/r/20231006093600.1250986-3-oliver.upton%40linux.dev
+patch subject: [PATCH 2/3] KVM: arm64: Rename helpers for VHE vCPU load/put
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20231007/202310070514.3iAWEi1d-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231007/202310070514.3iAWEi1d-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310070514.3iAWEi1d-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/arm64/kvm/hyp/vhe/sysreg-sr.c:109: warning: expecting prototype for __vcpu_put_switch_syregs(). Prototype was for __vcpu_put_switch_sysregs() instead
+
+
+vim +109 arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+
+13aeb9b400c5d7 David Brazdil 2020-06-25   96  
+13aeb9b400c5d7 David Brazdil 2020-06-25   97  /**
+129fe154f5bca6 Oliver Upton  2023-10-06   98   * __vcpu_put_switch_syregs - Restore host system registers to the physical CPU
+13aeb9b400c5d7 David Brazdil 2020-06-25   99   *
+13aeb9b400c5d7 David Brazdil 2020-06-25  100   * @vcpu: The VCPU pointer
+13aeb9b400c5d7 David Brazdil 2020-06-25  101   *
+13aeb9b400c5d7 David Brazdil 2020-06-25  102   * Save guest system registers that do not affect the host's execution, for
+13aeb9b400c5d7 David Brazdil 2020-06-25  103   * example EL1 system registers on a VHE system where the host kernel
+13aeb9b400c5d7 David Brazdil 2020-06-25  104   * runs at EL2.  This function is called from KVM's vcpu_put() function
+13aeb9b400c5d7 David Brazdil 2020-06-25  105   * and deferring saving system register state until we're no longer running the
+13aeb9b400c5d7 David Brazdil 2020-06-25  106   * VCPU avoids having to save them on every exit from the VM.
+13aeb9b400c5d7 David Brazdil 2020-06-25  107   */
+129fe154f5bca6 Oliver Upton  2023-10-06  108  void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+13aeb9b400c5d7 David Brazdil 2020-06-25 @109  {
+
 -- 
-2.41.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
