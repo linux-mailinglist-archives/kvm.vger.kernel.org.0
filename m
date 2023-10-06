@@ -2,194 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 948317BB80A
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 14:47:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 683367BB8A0
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 15:09:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232156AbjJFMrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 08:47:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56756 "EHLO
+        id S232172AbjJFNJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 09:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbjJFMrl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 08:47:41 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B3BCA
-        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 05:47:39 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-d868d8363e6so2389670276.2
-        for <kvm@vger.kernel.org>; Fri, 06 Oct 2023 05:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696596459; x=1697201259; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kE5lcMpcuRWxeOB9S6L9Si7YaWv5hLYl1VeNlBZzT/8=;
-        b=wXitWH63YyQNrPPne4or1YDsmFgI2V8pRMPSMT6yXVEdd/leOukdoJiEdLKrL+7aag
-         zoga0bm8D+JRbO8cZmC9DSGJSgd/fFZSGCQJApcWPuHk2kA9MES1gm2V8pdNW7h6g651
-         vmxjn7YuHleZhMefL4xVonsLKfAlMhXpOuUmzj4OvRdDoqiglD6jSVEtAPZ7rSn9fM41
-         T0/Iq2DJZ1x8sI/PwN7cFQQfSyDzOXGCs/lFBcDIURojuB+25CxbAyYS2oZfhdxXnOrL
-         XZUhW1H4GpAboykPvZxM6DGZytw7ITTziMMurbnnOX7V2/FMNAvDXc1zioGobpuap4qK
-         v47A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696596459; x=1697201259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kE5lcMpcuRWxeOB9S6L9Si7YaWv5hLYl1VeNlBZzT/8=;
-        b=hXNJ45RMv81k4X9LDPKzCyc5YaGwQ5U7ISATcJR3EjWCZqaHT/CzAPKpb/H11M/HqX
-         hGkg7X9gQIvO7ZZAka6g3CchcvAfmfD393u7UsaVKoOhmVbDVl0OzhwHaD/qQHT6upfD
-         okHpkb4IRbrfDJU/HoBxSHPU1JADTAnVYKNTi2GftCbzUtjnBVLTGZI1mNBlCExHjLwz
-         2ylaPJ0oAjluZEiuoLVb/KEEO1poKCbWT1dQyjgHBy72Ap4jateoUekC4Tx/2P6lppKD
-         Govg2VoxDQl+TjkqfgzJVgGSiGc5jX6m6XfrLPaxNLFGMUZ3SMwJ3qWBqbBCOe7So4Xa
-         xk0w==
-X-Gm-Message-State: AOJu0YwsePg9ACfAfuBZkUGjrtEdYKSASCfkrwuOHLtBu8lxWFY1TLTd
-        RDxmVe27mX+veP8AizF+P0mdVG/aGrNihcmEixKsUQ==
-X-Google-Smtp-Source: AGHT+IGILgsJf+f8eayHVHqX0rISrGr9tP06v0nLvKR1oTcr5riaw9zUWCGoAJpDUWeKMDK50UY6pLVZ+E+8O7Aw+dY=
-X-Received: by 2002:a5b:807:0:b0:d47:8db3:8bcf with SMTP id
- x7-20020a5b0807000000b00d478db38bcfmr7283393ybp.49.1696596458614; Fri, 06 Oct
- 2023 05:47:38 -0700 (PDT)
+        with ESMTP id S232288AbjJFNJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 09:09:20 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B6EA6
+        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 06:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nQuVCtW6i+MOZrhvdH0VD4e/PHzoa/qwLMLD+xBePTg=; b=hfHda9fMner1U01YZgxu0tFTff
+        ++34fcfWnKoqgalYk58hQhlCfc8FpRY//5ef6Yp/vwUQubJntGepMQ4ytZqVUzoz6hUYrsg/1FafW
+        tZp4ymOuCY5DoAvkVnMFV4TmG8aueT02whS7Lppl72ZzX9XTkq5b20j8aheR28nUVhT3DpY4b3iYx
+        de7NKsStt/BUliMsMWiQGm7DvPTe2sUY/oA+2SXXYfTQiI8rOE4lkXrKqCnxggBRiHTAiyB+7PNzx
+        FKmKHRhlaI8ACi/nv1GcUJbfYsNuaiJY9XvmkY2kJSCEsOriHSsDNk6xLhg8PQtw0FNt+jYCTsqSP
+        wWA+QmxQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qokZp-005rGD-2R;
+        Fri, 06 Oct 2023 13:09:09 +0000
+Date:   Fri, 6 Oct 2023 06:09:09 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
+ virtio device
+Message-ID: <ZSAG9cedvh+B0c0E@infradead.org>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-11-yishaih@nvidia.com>
+ <20230922055336-mutt-send-email-mst@kernel.org>
+ <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
+ <20230926072538-mutt-send-email-mst@kernel.org>
+ <ZRpjClKM5mwY2NI0@infradead.org>
+ <20231002151320.GA650762@nvidia.com>
+ <ZR54shUxqgfIjg/p@infradead.org>
+ <20231005111004.GK682044@nvidia.com>
 MIME-Version: 1.0
-References: <CA+EHjTwTgEVtea7wgef5G6EEgFa0so_GbNXTMZNKyFE=ucyV0g@mail.gmail.com>
- <ZR99K_ZuWXEtfDuR@google.com>
-In-Reply-To: <ZR99K_ZuWXEtfDuR@google.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Fri, 6 Oct 2023 13:47:01 +0100
-Message-ID: <CA+EHjTyDPEY7B_a8GC7RS8gzfoT2q9kJqJPuHB58ZXQ_61NGkQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, KVM <kvm@vger.kernel.org>,
-        "moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" 
-        <linux-arm-kernel@lists.infradead.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Anish Moorthy <amoorthy@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231005111004.GK682044@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Thu, Oct 05, 2023 at 08:10:04AM -0300, Jason Gunthorpe wrote:
+> > But for all the augmented vfio use cases it doesn't, for them the
+> > augmented vfio functionality is an integral part of the core driver.
+> > That is true for nvme, virtio and I'd argue mlx5 as well.
+> 
+> I don't agree with this. I see the extra functionality as being an
+> integral part of the VF and VFIO. The PF driver is only providing a
+> proxied communication channel.
+> 
+> It is a limitation of PCI that the PF must act as a proxy.
 
-On Fri, Oct 6, 2023 at 4:21=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Oct 05, 2023, Fuad Tabba wrote:
-> > Hi Sean,
-> >
-> > On Tue, Oct 3, 2023 at 9:51=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > > Like I said, pKVM doesn't need a userspace ABI for managing PRIVATE=
-/SHARED,
-> > > > just a way of tracking in the host kernel of what is shared (as opp=
-osed to
-> > > > the hypervisor, which already has the knowledge). The solution coul=
-d simply
-> > > > be that pKVM does not enable KVM_GENERIC_MEMORY_ATTRIBUTES, has its=
- own
-> > > > tracking of the status of the guest pages, and only selects KVM_PRI=
-VATE_MEM.
-> > >
-> > > At the risk of overstepping my bounds, I think that effectively givin=
-g the guest
-> > > full control over what is shared vs. private is a mistake.  It more o=
-r less locks
-> > > pKVM into a single model, and even within that model, dealing with er=
-rors and/or
-> > > misbehaving guests becomes unnecessarily problematic.
-> > >
-> > > Using KVM_SET_MEMORY_ATTRIBUTES may not provide value *today*, e.g. t=
-he userspace
-> > > side of pKVM could simply "reflect" all conversion hypercalls, and te=
-rminate the
-> > > VM on errors.  But the cost is very minimal, e.g. a single extra ioct=
-l() per
-> > > converion, and the upside is that pKVM won't be stuck if a use case c=
-omes along
-> > > that wants to go beyond "all conversion requests either immediately s=
-ucceed or
-> > > terminate the guest".
-> >
-> > Now that I understand the purpose of KVM_SET_MEMORY_ATTRIBUTES, I
-> > agree. However, pKVM needs to track at the host kernel (i.e., EL1)
-> > whether guest memory is shared or private.
->
-> Why does EL1 need it's own view/opinion?  E.g. is it to avoid a accessing=
- data
-> that is still private according to EL2 (on behalf of the guest)?
->
-> Assuming that's the case, why can't EL1 wait until it gets confirmation f=
-rom EL2
-> that the data is fully shared before doing whatever it is that needs to b=
-e done?
->
-> Ah, is the problem that whether or not .mmap() is allowed keys off of the=
- state
-> of the memory attributes?  If that's so, then yeah, an internal flag in a=
-ttributes
-> is probably the way to go.  It doesn't need to be a "host kernel private"=
- flag
-> though, e.g. an IN_FLUX flag to capture that the attributes aren't fully =
-realized
-> might be more intuitive for readers, and might have utility for other att=
-ributes
-> in the future too.
+For anything live migration it very fundamentally is not, as a function
+that is visible to a guest by definition can't drive the migration
+itself.  That isn't really a limitation in PCI, but follows form the
+fact that something else must control a live migration that is
+transparent to the guest.
 
-Yes, it's because of mmap. I think that an IN_FLUX flag might work
-here. I'll have a go at it and see how it turns out.
+> 
+> > So we need to stop registering separate pci_drivers for this kind
+> > of functionality, and instead have an interface to the driver to
+> > switch to certain functionalities.
+> 
+> ?? We must bind something to the VF's pci_driver, what do you imagine
+> that is?
 
-Thanks,
-/fuad
+The driver that knows this hardware.  In this case the virtio subsystem,
+in case of nvme the nvme driver, and in case of mlx5 the mlx5 driver.
 
->
-> > One approach would be to add another flag to the attributes that
-> > tracks the host kernel view. The way KVM_SET_MEMORY_ATTRIBUTES is
-> > implemented now, userspace can zero it, so in that case, that
-> > operation would need to be masked to avoid that.
-> >
-> > Another approach would be to have a pKVM-specific xarray (or similar)
-> > to do the tracking, but since there is a structure that's already
-> > doing something similar (i.e.,the attributes array), it seems like it
-> > would be unnecessary overhead.
-> >
-> > Do you have any ideas or preferences?
-> >
-> > Cheers,
-> > /fuad
+> > E.g. for this case there should be no new vfio-virtio device, but
+> > instead you should be able to switch the virtio device to an
+> > fake-legacy vfio mode.
+> 
+> Are you aruging about how we reach to vfio_register_XX() and what
+> directory the file lives?
+
+No.  That layout logically follows from what codebase the functionality
+is part of, though.
+
+> I don't know what "fake-legacy" even means, VFIO is not legacy.
+
+The driver we're talking about in this thread fakes up a virtio_pci
+legacy devie to the guest on top of a "modern" virtio_pci device.
+
+> There is alot of code in VFIO and the VMM side to take a VF and turn
+> it into a vPCI function. You can't just trivially duplicate VFIO in a
+> dozen drivers without creating a giant mess.
+
+I do not advocate for duplicating it.  But the code that calls this
+functionality belongs into the driver that deals with the compound
+device that we're doing this work for.
+
+> Further, userspace wants consistent ways to operate this stuff. If we
+> need a dozen ways to activate VFIO for every kind of driver that is
+> not a positive direction.
+
+We don't need a dozen ways.  We just need a single attribute on the
+pci (or $OTHERBUS) devide that switches it to vfio mode.
