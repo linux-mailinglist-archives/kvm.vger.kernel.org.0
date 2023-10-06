@@ -2,147 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D18C47BB01D
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 03:40:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BF9F7BB028
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 03:48:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbjJFBkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 21:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50684 "EHLO
+        id S229761AbjJFBsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 21:48:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbjJFBkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 21:40:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA132DE
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 18:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696556382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8wz8kyE+dZb18cqkHb1ZRrmOPbvMpW72hRxdClXtNac=;
-        b=fn9Ww1I0LbjO3ul6eWsla1fkL2nG3rZdknript7E0aLYKXmwKzZ/kDV5QdTPX/AFxaZeZY
-        /nj2w1nmRBRPpITU+69Lik9n2R5nne8jbyyUD7Yztz7xIsQukFUGiTcNpmk1XVLprvu4L7
-        EE1aAOGVRCyMRhBTIUCdXO3tCMdYUwY=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-vieuiJopP_GvuJTEU3pjDQ-1; Thu, 05 Oct 2023 21:39:41 -0400
-X-MC-Unique: vieuiJopP_GvuJTEU3pjDQ-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-690bbc5fabaso1572742b3a.1
-        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 18:39:41 -0700 (PDT)
+        with ESMTP id S229666AbjJFBsX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 21:48:23 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139CED8
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 18:48:22 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d817775453dso2121946276.2
+        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 18:48:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696556901; x=1697161701; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pXc2O/7sCaxNCrmG6skLU9Fi8ZAb+bkQu9XTdeJPITM=;
+        b=Id1JyKTE+DXe1zXADSJhMkgJCISFAetC0ZgprPpbixwdbVAHvTW2DZX+QEuizCEE63
+         NCsq12r4rPcHxYzTd3xfdnNrBWpBxaAUF4/ifkRs/eLZ9mFZMmUQQ4KH4ZfsXl8zOi2X
+         HXELmdYhtOxeqEAuM46HzRpt5jq+BzOTK9jx3USTt4tbnYsqLmpqRCnGxb1gldIOpCnV
+         NfBUsW6MZURpD45b1/ZNqux+CMV4BgoY+C9N1oJzeTHvSG9vlCO1U16pI3yOJ1SAitWR
+         LK/qvppVra3/3Uf7vhFg4fnowzPZ4QveTtDL/t6DdBmRTQnCwwbOSofUAO076cksFG2q
+         z16A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696556380; x=1697161180;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8wz8kyE+dZb18cqkHb1ZRrmOPbvMpW72hRxdClXtNac=;
-        b=qQUOQvvMB+JMxvcV4Vyd+8L4897+PVv5FeLYFRUuUJbqn/jV9R3W5vG3IdzwFChwXy
-         CXCsDSNCnl35UN62BkwXkwRkM6mWElJgBIZn1w0njoQnR1aZ10iBGH61AqstREpzEnfB
-         afXovNHxvm+Zfw8RocIroxCvPIcxzIleHBP+ccMq2X69ZiFo40UYcC9u/yPL3OgUmWD2
-         2wWCsQKLO0cg1MrlHogjfDgoo8NcD/OQAG74W3Rum4MpJrez1MV7Z9mRyGx3Kg47b6ob
-         oXYFeE1sVb//bvCeW4hlC3FLZcG8FfjafiKzf0rai92kyS8rvygq9JOI5pChpaGownfb
-         mGUQ==
-X-Gm-Message-State: AOJu0YyduxqyzBj3ymutkJ0rUSVMmoKwO+1fVjnUvMTZuvWwHUNaROmb
-        ViU0giG8QBEJCOkjjtEQXAV/R7L1ClhdOGliizGj96IX660R3BGA1VNLE86vACNw2SxKhNGyt6h
-        Y0TP6B+EUWzo7
-X-Received: by 2002:a05:6a20:1455:b0:10f:be0:4dce with SMTP id a21-20020a056a20145500b0010f0be04dcemr8321706pzi.8.1696556380226;
-        Thu, 05 Oct 2023 18:39:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEA7151Q6nRzeKdZh2rrFpLyYJxoDegYR3wOdaUSEEbvgikqYlYmQ9MTmsmlNBDRgM5eTii5Q==
-X-Received: by 2002:a05:6a20:1455:b0:10f:be0:4dce with SMTP id a21-20020a056a20145500b0010f0be04dcemr8321687pzi.8.1696556379918;
-        Thu, 05 Oct 2023 18:39:39 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:b890:3e54:96bb:2a15? ([2001:8003:e5b0:9f00:b890:3e54:96bb:2a15])
-        by smtp.gmail.com with ESMTPSA id c26-20020aa781da000000b0068be3489b0dsm243540pfn.172.2023.10.05.18.39.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 18:39:39 -0700 (PDT)
-Message-ID: <131babfc-3450-68bd-f35b-d126a36acb0c@redhat.com>
-Date:   Fri, 6 Oct 2023 11:39:34 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
-Content-Language: en-US
-To:     "Mancini, Riccardo" <mancio@amazon.com>,
+        d=1e100.net; s=20230601; t=1696556901; x=1697161701;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pXc2O/7sCaxNCrmG6skLU9Fi8ZAb+bkQu9XTdeJPITM=;
+        b=buDjJCBkQe6G+tVjJ1MIZPrjA16+23wKOTaCFdfW9z1d6zazbPXQDHCLX++pI/lPU1
+         kAznOZXygFHltRvakrZiFEmAwQLw5uTNZXRROvBgBpYfyTb8ooUGlxPdIRv9mxw6uZMR
+         EozC3S/mW9GP2LlQOv60ldc1E1TXEDudXgEP3MJjrSHLmTNG+7+hr3k9Ov9X8pIrJ4EC
+         d4L/xH1LLToCwiMXJJuQkMDMM0N+BNeMu65MfM4uacurdTFV1S+D3jkSLsUC3TJXzAof
+         l/j/71Ir1wpMRGTF1CxKh4SgyDqZ7cbhdiUEXjkCxersqGL0Qca9LXsCMR4QjaMt+Y+O
+         tuAA==
+X-Gm-Message-State: AOJu0YyxraYYGOv8mVUEecgJVnA+6RugBAmYAhU4f7ofzhcsUl4c/EiM
+        GU+PMhxtM8vLTWV5KhwDB4F0OAaKO/w=
+X-Google-Smtp-Source: AGHT+IG5kNlkia9mNVTpbkW4qVJ+ISAXuag8oe/q6O2fyloXPP+UYEYfKbsxwZ6+HCaMsJtpRYwGXiuE5ss=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:500c:0:b0:d81:fc08:29ea with SMTP id
+ e12-20020a25500c000000b00d81fc0829eamr89926ybb.2.1696556901326; Thu, 05 Oct
+ 2023 18:48:21 -0700 (PDT)
+Date:   Thu, 5 Oct 2023 18:48:19 -0700
+In-Reply-To: <5fc0fbfe-72e8-44bf-bad2-92513f299832@xen.org>
+Mime-Version: 1.0
+References: <20231004174628.2073263-1-paul@xen.org> <ZR2vTN618U0UgtIA@google.com>
+ <5fc0fbfe-72e8-44bf-bad2-92513f299832@xen.org>
+Message-ID: <ZR9nYw53O21y0VYM@google.com>
+Subject: Re: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
+From:   Sean Christopherson <seanjc@google.com>
+To:     paul@xen.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paul Durrant <pdurrant@amazon.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        David Woodhouse <dwmw2@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Graf (AWS), Alexander" <graf@amazon.de>,
-        "Teragni, Matias" <mteragni@amazon.com>,
-        "Batalov, Eugene" <bataloe@amazon.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-References: <1a68941c7abc4968a1e98627743256f3@amazon.com>
-From:   Gavin Shan <gshan@redhat.com>
-In-Reply-To: <1a68941c7abc4968a1e98627743256f3@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 10/6/23 03:24, Mancini, Riccardo wrote:
->> From: Paolo Bonzini <pbonzini@redhat.com>
->> Sent: 05 October 2023 17:15
-
-[...]
-
->> I do have a question for you.  Can you describe the context in which you
->> are using APF, and would you be interested in ARM support?  We (Red Hat,
->> not me the maintainer :)) have been trying to understand for a long time
->> if cloud providers use or need APF.
+On Thu, Oct 05, 2023, Paul Durrant wrote:
+> On 04/10/2023 19:30, Sean Christopherson wrote:
+> > On Wed, Oct 04, 2023, Paul Durrant wrote:
+> > > ---
+> > > Cc: David Woodhouse <dwmw2@infradead.org>
+> > > Cc: Sean Christopherson <seanjc@google.com>
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > > Cc: Ingo Molnar <mingo@redhat.com>
+> > > Cc: Borislav Petkov <bp@alien8.de>
+> > > Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> > > Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > > Cc: x86@kernel.org
+> > 
+> > If you're going to manually Cc folks, put the Cc's in the changelog proper so that
+> > there's a record of who was Cc'd on the patch.
+> > 
 > 
-> Keeping it short, we resume "remote" VM snapshots so page faults might
-> be very expensive on local cache misses. We have a few optimizations to work
-> around some of the issues, but even on local hits there are still a lot
-> of expensive page faults compared to a normal VM use-case, I believe.
-> To be fair, I didn't even realise the benefits we were getting from APF
-> until it actually broke :)
-> It indeed plays a big role in keeping the resumption quick and efficient
-> in our use-case.
-> I didn't know that it wasn't available for ARM, as we don't use it at
-> the moment, but that would be interesting for the future.
+> FTR, the basic list was generated:
 > 
+> ./scripts/get_maintainer.pl --no-rolestats
+> 0001-KVM-xen-ignore-the-VCPU_SSHOTTMR_future-flag.patch | while read line;
+> do echo Cc: $line; done
+> 
+> and then lightly hacked put x86 at the end and remove my own name... so not
+> really manual.
+> Also not entirely sure why you'd want the Cc list making it into the actual
+> commit.
 
-Adding Marc, Oliver and kvmarm@lists.linux.dev
+It's useful for Cc's that *don't* come from get_maintainers, as it provides a
+record in the commit of who was Cc'd on a patch. 
 
-I tried to make the feature available to ARM64 long time ago, but the efforts
-were discontinued as the significant concern was no users demanding for it [1].
-It's definitely exciting news to know it's a important feature to AWS. I guess
-it's probably another chance to re-evaluate the feature for ARM64?
+E.g. if someone encounters an issue with a commit, the Cc records provide additional
+contacts that might be able to help sort things out.
 
-[1] https://lore.kernel.org/kvmarm/87iloq2oke.wl-maz@kernel.org/
+Or if a maintainer further up the stream has questions or concerns about a pull
+request, they can use the Cc list to grab the right audience for a discussion,
+or be more confident in merging the request because the maintainer knows that the
+"right" people at least saw the patch.
 
-Async PF needs two signals sent from host to guest, SDEI (Software Delegated
-Exception Interface) is leveraged for that. So there were two series to support
-SDEI virtualization [1] and Async PF on ARM64 [2].
+Lore links provide much of that functionality, but following a link is almost
+always slower, and some maintainers are allergic to web browsers :-)
 
-[1] https://lore.kernel.org/kvmarm/20220527080253.1562538-1-gshan@redhat.com/
-[2] https://lore.kernel.org/kvmarm/20210815005947.83699-1-gshan@redhat.com/
+> > Or even better, just use scripts/get_maintainers.pl and only manually Cc people
+> > when necessary.
+> 
+> I guess this must be some other way of using get_maintainers.pl that you are
+> expecting?
 
-I got several questions for Mancini to answer, helpful understand the situation
-better.
+Ah, I was just assuming that you were handcoding the Cc "list", but it sounds
+like you're piping the results into each patch.  That's fine, just a bit noisy
+and uncommon.
 
-- VM shapshot is stored somewhere remotely. It means the page fault on
-   instruction fetch becomes expensive. Do we have benchmarks how much
-   benefits brought by Async PF on x86 in AWS environment?
+FWIW, my scripts gather the To/Cc for all patches in a series, and then use the
+results for the entire series, e.g.
 
-- I'm wandering if the data can be fetched from somewhere remotely in AWS
-   environment?
+  git send-email --confirm=always --suppress-cc=all $to $bcc $cc ...
 
-- The data can be stored in local DRAM or swapping space, the page fault
-   to fetch data becomes expensive if the data is stored in swapping space.
-   I'm not sure if it's possible the data resides in the swapping space in
-   AWS environment? Note that the swapping space, corresponding to disk,
-   could be somewhere remotely seated.
-
-Thanks,
-Gavin
-
-
+That way everyone that gets sent mail gets all patches in a series.  Most
+contributors, myself included, don't like to receive bits and pieces of a series,
+e.g. it makes doing quick triage/reviews annoying, especially if the patches I
+didn't receive weren't sent to any of the mailing list to which I'm subscribed.
