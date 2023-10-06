@@ -2,81 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3F927BB098
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 05:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED2B77BB0A2
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 06:00:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbjJFDuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 23:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47694 "EHLO
+        id S229815AbjJFEAS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 00:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229995AbjJFDuC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 23:50:02 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146EFEA
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 20:50:01 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2777d237229so1449407a91.2
-        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 20:50:01 -0700 (PDT)
+        with ESMTP id S229379AbjJFEAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 00:00:17 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CACFDB
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 21:00:15 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so8039a12.0
+        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 21:00:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696564200; x=1697169000; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t2G7odMMkPTde6ooevhbuWblep4YjCVrOlqJpRqgObg=;
-        b=u4aaRuqaxiEVX7+fgxXP3JAqmgAGNCkhTNBvcjzdXtH3ZzClBJqoEhSyvLh6ntegqz
-         lVgJqb1noh8GVJyNGTny+yLOyMKurVkBo++aIU+lYLN2Rj0DxPOy36ptbc7u64V4xUrn
-         OUWjZuXt7dJSlijzMyfz1cQo8MsYpoc2kMmLwnYO9odpzN7afgjF1ohmyNgNbOMUWOiD
-         i1tKNpxIjVWe8IrF1N0/gQ4/AzPAmV6Dx7C2wKYB4wizAjy9jqGfsrsiqkdSLkkbqYWe
-         ukjK+w/Pn0U1Qa0AT98shCgdesRO3zS89xTLZ2EMEPphWWiNOJgSDgtkoNYJC+OBWWuM
-         nLLw==
+        d=google.com; s=20230601; t=1696564814; x=1697169614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZW7wLLeLb34Qnv/J0ZlasDNqG3WN41dPobi0oQZ7xM=;
+        b=IlLCFigEm9H15bedunvsQ2BcQv5dQCgGWHBsUPeyrhGKHR6gywuUvM+XRsME34YGjJ
+         WS8sgyBqtCQLh1w7A8yK6g8fN4ZNkCmAYb3LqrJTqfQRHs4kqOnwugME8ZxY6rQlAK55
+         lcPLdGqqiWUczlMuwDUoqxdWHQxOtVleeFJXfZZVu0c/0ZjNw5LSXP1OSelJuevtmsOL
+         ej4NjJskvwNlXT/+EYtPwji6PDKeY8WmP+Beuhw71bvefgBKJhOGApQ8PjJKQO1G6Vcx
+         ZZhO6voc051lAqVBRMlLTXVtJKCUJUvbfYAGkuaiTEInRejt6Ai3Rbi0MJmAkHALH+ji
+         IWGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696564200; x=1697169000;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t2G7odMMkPTde6ooevhbuWblep4YjCVrOlqJpRqgObg=;
-        b=Gqn2j3lESFprspGHfv1ghugkKeYK/ORcMi57rTj8ldICmbamP3YMDGPnK5crEAf8tr
-         Vt9W/LuO2fGJSjz4xa1uH34IN/m2M5xmsS8XbZBA8sbzNIT4FIdCmQdEY1ZjICVLP1np
-         ZbxsndVp78cnWWhPRdKazQTtu2bPIKBNEBZelXScuDzBLlhG535uG84A2voDVo/6fqme
-         UbyaTyei+k3l1Lqya26Y9u6+v3dXgCoknL7icDwOiCjBQikSEk98DWh16MVYpGSKpT3B
-         n24HLgZtIx1cEAM4xx3kzdegc5OZ1nknyE1ATaow6JkgyTwvb3lfK2PKpN2AeOrAXPih
-         l9ng==
-X-Gm-Message-State: AOJu0YzU8AFQJhiJUH/jJ+/VuWO78CDOETKgsZuuoAusfpcAvVEMcP20
-        i9O1g9+PZm4Ps5pIOfBodjFKCcblWFI=
-X-Google-Smtp-Source: AGHT+IHJw+5gT02f8H3V0ZCldxQSI2F+UC9hQf1f7PEAGRtWd0XB6YuIcXo2+LzVUVQz1YEHyEKidHpzLLw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:cb8b:b0:268:8e93:6459 with SMTP id
- a11-20020a17090acb8b00b002688e936459mr110389pju.8.1696564200585; Thu, 05 Oct
- 2023 20:50:00 -0700 (PDT)
-Date:   Thu,  5 Oct 2023 20:48:47 -0700
-In-Reply-To: <20231005002954.2887098-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20231005002954.2887098-1-seanjc@google.com>
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-Message-ID: <169655906345.3551422.1856629391041106669.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: Zero-initialize entire test_result in
- memslot perf test
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20230601; t=1696564814; x=1697169614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZZW7wLLeLb34Qnv/J0ZlasDNqG3WN41dPobi0oQZ7xM=;
+        b=C+FGyhVj+nGlzJfDj91NvA6KVqh+UiF9UwAiAvesGMRXqohAKLyV7zI/jjQAfeo3GP
+         ut/63PnIcLkq198GOibGjgrt5BtfPbPfflmAAKoFcayHVO/eTT4iecKRsoicVjk8dbpl
+         m6kV36IC3Jjh6txMybA8TiEx7HJnhTC4RWfmyobunNcuYNN28hS2G1dHwg7kdzg3BWnw
+         uEnyD/tZkiwY1nOi+94EOfDrG4gY+/1rB4ukj6BU909JKpXPYhJoLHELKByILUhfHbs6
+         sa0LDL4v9//7DKHNcWFFAJ4N+vcXh27Z60kBvzoOvCMOxAJRxgrNfHudWpidhciuGOBO
+         6Zjw==
+X-Gm-Message-State: AOJu0YyXpK5t+eIlvHbSL2TQCUTh5/BKmzmqr9/JsxuFHvAA5/g8epXP
+        mww09m106fcnvzpQvMByJWJDttVDLWvECUq4ZM/XRA==
+X-Google-Smtp-Source: AGHT+IH4SIUVGI3KGt7mwMvudtStJhhMpYlc7E1m92+OpTa+leCV+NMXVWk40ravIkYX8f2EdbDqmfyMUvWN/CQNx64=
+X-Received: by 2002:a05:6402:d4b:b0:53a:ff83:6123 with SMTP id
+ ec11-20020a0564020d4b00b0053aff836123mr25351edb.3.1696564813804; Thu, 05 Oct
+ 2023 21:00:13 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230929230246.1954854-1-jmattson@google.com> <20230929230246.1954854-4-jmattson@google.com>
+ <ZR-CmoacxFxkqZ6Z@google.com>
+In-Reply-To: <ZR-CmoacxFxkqZ6Z@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 5 Oct 2023 20:59:57 -0700
+Message-ID: <CALMp9eRdMagNuJEPcqoUTDCuoN6xDpqLa+DA=oOZd6EjdQbgLQ@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] KVM: selftests: Test behavior of HWCR
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 04 Oct 2023 17:29:54 -0700, Sean Christopherson wrote:
-> Zero-initialize the entire test_result structure used by memslot_perf_test
-> instead of zeroing only the fields used to guard the pr_info() calls.
+On Thu, Oct 5, 2023 at 8:44=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
 
-Applied to kvm-x86 selftests, thanks much for the quick reviews!
-
-[1/1] KVM: selftests: Zero-initialize entire test_result in memslot perf test
-      https://github.com/kvm-x86/linux/commit/6313e096dbfa
-
---
-https://github.com/kvm-x86/linux/tree/next
+> If you've no objections, I'll apply the changes as below:
+Go for it.
