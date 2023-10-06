@@ -2,68 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BF9F7BB028
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 03:48:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D7427BB03E
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 04:21:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbjJFBsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Oct 2023 21:48:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
+        id S229761AbjJFCVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Oct 2023 22:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbjJFBsX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Oct 2023 21:48:23 -0400
+        with ESMTP id S229615AbjJFCVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Oct 2023 22:21:44 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139CED8
-        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 18:48:22 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d817775453dso2121946276.2
-        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 18:48:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E3ED8
+        for <kvm@vger.kernel.org>; Thu,  5 Oct 2023 19:21:44 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d85fc108f0eso2355121276.2
+        for <kvm@vger.kernel.org>; Thu, 05 Oct 2023 19:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696556901; x=1697161701; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696558903; x=1697163703; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pXc2O/7sCaxNCrmG6skLU9Fi8ZAb+bkQu9XTdeJPITM=;
-        b=Id1JyKTE+DXe1zXADSJhMkgJCISFAetC0ZgprPpbixwdbVAHvTW2DZX+QEuizCEE63
-         NCsq12r4rPcHxYzTd3xfdnNrBWpBxaAUF4/ifkRs/eLZ9mFZMmUQQ4KH4ZfsXl8zOi2X
-         HXELmdYhtOxeqEAuM46HzRpt5jq+BzOTK9jx3USTt4tbnYsqLmpqRCnGxb1gldIOpCnV
-         NfBUsW6MZURpD45b1/ZNqux+CMV4BgoY+C9N1oJzeTHvSG9vlCO1U16pI3yOJ1SAitWR
-         LK/qvppVra3/3Uf7vhFg4fnowzPZ4QveTtDL/t6DdBmRTQnCwwbOSofUAO076cksFG2q
-         z16A==
+        bh=YA+Cq8KKd5SLVssX1l4RlCcP9aKEvDTuHwUHfnMy3sQ=;
+        b=Z+L4E3oUhFAGSLgAywc0kpzZzAgpzgvZMI4XgpBJxtGUnyKLGO7UWCEbB0mkbmips/
+         0qElMp2EAZ5e7E0U7nE/yZLpN1MOCiwZ/bSygH9HleqIr1+yeuGYd0WDq0WU2fIQ/KL5
+         ssQwhMeWQwQTyruEbcLI+haJ2ZIe/mYcKuMLmbkvoD+RLnufyyLMV/N0/W6cZMdjVzo2
+         U+UNEe28hvG6yxrO4OwYJWEPtSOFgfgvoadCsrIEXZqXElfCCndmQOdE2cpm2T+7+NcC
+         3OQeLjEhioAqTNGNliX6v6yLHuNPyJNgdlXsqM7VhQ7GnMjqVMO+aulKNZXKQ47Ha5ou
+         NGlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696556901; x=1697161701;
+        d=1e100.net; s=20230601; t=1696558903; x=1697163703;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pXc2O/7sCaxNCrmG6skLU9Fi8ZAb+bkQu9XTdeJPITM=;
-        b=buDjJCBkQe6G+tVjJ1MIZPrjA16+23wKOTaCFdfW9z1d6zazbPXQDHCLX++pI/lPU1
-         kAznOZXygFHltRvakrZiFEmAwQLw5uTNZXRROvBgBpYfyTb8ooUGlxPdIRv9mxw6uZMR
-         EozC3S/mW9GP2LlQOv60ldc1E1TXEDudXgEP3MJjrSHLmTNG+7+hr3k9Ov9X8pIrJ4EC
-         d4L/xH1LLToCwiMXJJuQkMDMM0N+BNeMu65MfM4uacurdTFV1S+D3jkSLsUC3TJXzAof
-         l/j/71Ir1wpMRGTF1CxKh4SgyDqZ7cbhdiUEXjkCxersqGL0Qca9LXsCMR4QjaMt+Y+O
-         tuAA==
-X-Gm-Message-State: AOJu0YyxraYYGOv8mVUEecgJVnA+6RugBAmYAhU4f7ofzhcsUl4c/EiM
-        GU+PMhxtM8vLTWV5KhwDB4F0OAaKO/w=
-X-Google-Smtp-Source: AGHT+IG5kNlkia9mNVTpbkW4qVJ+ISAXuag8oe/q6O2fyloXPP+UYEYfKbsxwZ6+HCaMsJtpRYwGXiuE5ss=
+        bh=YA+Cq8KKd5SLVssX1l4RlCcP9aKEvDTuHwUHfnMy3sQ=;
+        b=Dt66JX+U5FwkA4CjjCN9EgsAIcmehB1xd5uW6gW4YkRhtdkhwkjUqaD3N5hJbb+/z/
+         1FhKjNhlgQC7H22R3/K4V6LzdqFwgfEz16v90MwahkWsQ9UnH5Xla3J9HyXWJO4kZHs1
+         Ike6Vm7s3uVbp1CKdgwx6L6PqDcnw8Xu48vUTbemRDrGzHVntZyXPqHxjzfWxN9FBh5Q
+         YE2v5ie0M5UG5Vwx9GnUOF0fDTKfCJQrgRZlyFKYqfmw1rIk/X5gktO3/XATOGtb1L2v
+         EtkvAqU5wvQKXVOTmFns7HdoRrMoyYVzoHS1VZCy9sPzxYgGnGMiIbcl7HP4fY5++XCy
+         5sfA==
+X-Gm-Message-State: AOJu0YwepoaIGUBgwWTXp90j/J+HVO/F/msuqBQ6NwPUw/qKB5grUigq
+        zJcSgt8tqY7frrzosaxgzArlWX4okuU=
+X-Google-Smtp-Source: AGHT+IEmt68AoxtPnWuyaCCn+Zj/+0mc6WtKkThbxJBKMz7krdJA8UcNiwqpDXmY1FKyQxnWztdJZhkmuPw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:500c:0:b0:d81:fc08:29ea with SMTP id
- e12-20020a25500c000000b00d81fc0829eamr89926ybb.2.1696556901326; Thu, 05 Oct
- 2023 18:48:21 -0700 (PDT)
-Date:   Thu, 5 Oct 2023 18:48:19 -0700
-In-Reply-To: <5fc0fbfe-72e8-44bf-bad2-92513f299832@xen.org>
+ (user=seanjc job=sendgmr) by 2002:a25:8a0d:0:b0:d81:7617:a397 with SMTP id
+ g13-20020a258a0d000000b00d817617a397mr114628ybl.9.1696558903249; Thu, 05 Oct
+ 2023 19:21:43 -0700 (PDT)
+Date:   Thu,  5 Oct 2023 19:20:07 -0700
+In-Reply-To: <20231002133230.195738-1-michael.roth@amd.com>
 Mime-Version: 1.0
-References: <20231004174628.2073263-1-paul@xen.org> <ZR2vTN618U0UgtIA@google.com>
- <5fc0fbfe-72e8-44bf-bad2-92513f299832@xen.org>
-Message-ID: <ZR9nYw53O21y0VYM@google.com>
-Subject: Re: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
+References: <20231002133230.195738-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
+Message-ID: <169655697465.3534024.7746001565902273346.b4-ty@google.com>
+Subject: Re: [PATCH gmem FIXUP] KVM: Don't re-use inodes when creating
+ guest_memfd files
 From:   Sean Christopherson <seanjc@google.com>
-To:     paul@xen.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -74,65 +68,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 05, 2023, Paul Durrant wrote:
-> On 04/10/2023 19:30, Sean Christopherson wrote:
-> > On Wed, Oct 04, 2023, Paul Durrant wrote:
-> > > ---
-> > > Cc: David Woodhouse <dwmw2@infradead.org>
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > > Cc: Ingo Molnar <mingo@redhat.com>
-> > > Cc: Borislav Petkov <bp@alien8.de>
-> > > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > > Cc: x86@kernel.org
-> > 
-> > If you're going to manually Cc folks, put the Cc's in the changelog proper so that
-> > there's a record of who was Cc'd on the patch.
-> > 
+On Mon, 02 Oct 2023 08:32:30 -0500, Michael Roth wrote:
+> anon_inode_getfile() uses a singleton inode, which results in the inode
+> size changing based with each new KVM_CREATE_GUEST_MEMFD call, which
+> can later lead to previously-created guest_memfd files failing bounds
+> checks that are later performed when memslots are bound to them. More
+> generally, the inode may be associated with other state that cannot be
+> shared across multiple guest_memfd instances.
 > 
-> FTR, the basic list was generated:
-> 
-> ./scripts/get_maintainer.pl --no-rolestats
-> 0001-KVM-xen-ignore-the-VCPU_SSHOTTMR_future-flag.patch | while read line;
-> do echo Cc: $line; done
-> 
-> and then lightly hacked put x86 at the end and remove my own name... so not
-> really manual.
-> Also not entirely sure why you'd want the Cc list making it into the actual
-> commit.
+> [...]
 
-It's useful for Cc's that *don't* come from get_maintainers, as it provides a
-record in the commit of who was Cc'd on a patch. 
+Applied to kvm-x86 guest_memfd, thanks!  I added a comment to explain the use
+of the "secure" API, there's a non-zero chance we'll forget that wrinkle again
+in the future.
 
-E.g. if someone encounters an issue with a commit, the Cc records provide additional
-contacts that might be able to help sort things out.
+[1/1] KVM: Don't re-use inodes when creating guest_memfd files
+      https://github.com/kvm-x86/linux/commit/b3bf68b66062
 
-Or if a maintainer further up the stream has questions or concerns about a pull
-request, they can use the Cc list to grab the right audience for a discussion,
-or be more confident in merging the request because the maintainer knows that the
-"right" people at least saw the patch.
-
-Lore links provide much of that functionality, but following a link is almost
-always slower, and some maintainers are allergic to web browsers :-)
-
-> > Or even better, just use scripts/get_maintainers.pl and only manually Cc people
-> > when necessary.
-> 
-> I guess this must be some other way of using get_maintainers.pl that you are
-> expecting?
-
-Ah, I was just assuming that you were handcoding the Cc "list", but it sounds
-like you're piping the results into each patch.  That's fine, just a bit noisy
-and uncommon.
-
-FWIW, my scripts gather the To/Cc for all patches in a series, and then use the
-results for the entire series, e.g.
-
-  git send-email --confirm=always --suppress-cc=all $to $bcc $cc ...
-
-That way everyone that gets sent mail gets all patches in a series.  Most
-contributors, myself included, don't like to receive bits and pieces of a series,
-e.g. it makes doing quick triage/reviews annoying, especially if the patches I
-didn't receive weren't sent to any of the mailing list to which I'm subscribed.
+--
+https://github.com/kvm-x86/linux/tree/next
