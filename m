@@ -2,83 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C75107BB363
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 10:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1E7B7BB3C5
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 11:05:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231262AbjJFIkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 04:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
+        id S231352AbjJFJE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 05:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231228AbjJFIki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 04:40:38 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 454E693;
-        Fri,  6 Oct 2023 01:40:37 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3226cc3e324so1808804f8f.3;
-        Fri, 06 Oct 2023 01:40:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696581635; x=1697186435; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kZ4MK+LkUJUvJ9sOD+5swyDMzW1yvSnPTDNFzgSqerQ=;
-        b=VOwHGX7+VmXLASn6+Ex7rQJODbc+9axJvBOtqbkRjWfafDSS0O+XR9tQgirHb0sPjy
-         j9WCw49OmfX1TxvWMUfvimuM52aaGX2XDRcZqdIk2zvpLQSwUfJaymQtHJ4c0j9Bu3i3
-         nco8GDQ3eUSLLFWM3pM6MItS9DQvi9kq1752r4PzgkHjwWuZz7iSG5LH2X8rdfciC1xR
-         Dcl12ZBIScv6wk1RBJbOS/PxKoV0WNFUE8mVpeWX+nN9aCIOVFgmse1CAmRlqvP2+vMu
-         GfrGRlrNwTJ6PLeZ9UybI1uOI+Zc/P+/fipnv37H9CsaWb8VNpesuqpkgfGfT9NNbDfG
-         3Aqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696581635; x=1697186435;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kZ4MK+LkUJUvJ9sOD+5swyDMzW1yvSnPTDNFzgSqerQ=;
-        b=VvAaA6C5iKMDtB3DUkNVOwoCSoxlyEOf6j9007Q1epYafQ8e6++GiIL4Dq4JFBmBiE
-         OCQNuFjyHCjbLLSpGQaTuh+mucEE2F62HqOUSXzq9q1bnGF5YDB4GjWteDZITuljyQEA
-         LA2kH4q+vZbHZK0Fi/GE9dOC516Y37zucZZFa+O0fl2Zswdu9xnnyf8yfvoB4EMWgpbQ
-         qmn8sKRiTunXP0AwKT5L7oMofEglqhcKoy0PnEA6qXzz9BMoBgjhdeYojTtQ6I1rrU/m
-         TPrYbEtRH17bgLjBG2mjJ9Dnh37I5+OxihThqTjRtv1FCZDLA0DftbIRwBjEWiZpbbQW
-         JfVg==
-X-Gm-Message-State: AOJu0Ywz2nZZvaPJ5+eTotbiSwoz+B7GPyiKGcue7iRjy7UrWSpa2YFf
-        kndoe90IWKfVg5I5/XXoBtA=
-X-Google-Smtp-Source: AGHT+IHKzg/RutaGqFE7+lnwGxtMzQuPBBi4dTMFMTwM0BnvULCnVlPxXKi/8i2gxoXBWGxxo5an0w==
-X-Received: by 2002:a05:6000:14e:b0:320:a19:7f87 with SMTP id r14-20020a056000014e00b003200a197f87mr6404855wrx.18.1696581635415;
-        Fri, 06 Oct 2023 01:40:35 -0700 (PDT)
-Received: from [192.168.11.19] (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id a9-20020adfe5c9000000b003142e438e8csm1121559wrn.26.2023.10.06.01.40.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Oct 2023 01:40:35 -0700 (PDT)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <f0524bd4-11a1-415e-b2f8-645241a63afe@xen.org>
-Date:   Fri, 6 Oct 2023 09:40:30 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2] KVM: x86/xen: ignore the VCPU_SSHOTTMR_future flag
+        with ESMTP id S230238AbjJFJE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 05:04:58 -0400
+Received: from DEU01-FR2-obe.outbound.protection.outlook.com (mail-fr2deu01on2060.outbound.protection.outlook.com [40.107.135.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C9A83;
+        Fri,  6 Oct 2023 02:04:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jQPPonGXjivErNsWbjqGNUlSTMpa8fb3dTCM/6miL+pUdSI3m0CQyqtcqQxVeta7ZGQ+/HQ8IABbxET3N2+tzfV1zjHg0wBycONSREI7E3HRweZ78r/zD4Z2LxY77Wsna4ryCVs15GaNeDsD7p2sZ8g1O+2RUrOoRmJxEUsvAztp43CAbp3BDXTdI4RG6UOlzvTMjE33zQXzsqHlC7rl6WMDfBVkQ6eNZnQWerUGLBWGv5TY4miZ9RfHKXzsE2i43D9gYUyuXCXrVbSn2600gB2rJPngdjkgYkmwAjL+H+ym9j9gKot4PzI8H53U1OoFeNm7qMYAbk0W8HUSuE4icw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QlziEtzvNdV1O83ATNqeYqcWQPgBlUh67XlU/ew6AnI=;
+ b=AdhF+dnG6BWwKNq4MSNmN3E84e5w/chJFyXWjtJPD1BhnE9WcZlbWEMqwjShTr8yPEtMhMYxRfu43lpdP+wCj8h2R/Vqg0pM0aaaasImwhlUM9nOluzdS+N292iD7Bp4mSjhMXdWq+Y5oYfZ/sTjBGhy6zvDrIThzC4dxGVfI+2sATx/V4jm3UAijhrdc/ift+ItJMeh4NqHK66FMbxahrCywq7AmtMxW3Cm4VEhQM+aezXzVvn8unC0Ve2/qa+M2G/cgo2WEuGwcZf7vE9YcKClN/LuC9BkZHgylTUkxBwZQSOh0WV73sqXOgNzuQJkkMmyWblDFGaKhXbv81zrLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
+ header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QlziEtzvNdV1O83ATNqeYqcWQPgBlUh67XlU/ew6AnI=;
+ b=H8++4EsOuNq8flH0pWUNOZLzROTEmtI4zERn0Loh1KN+CaqB9ur9YbQ35pVTEDxZag6/+fhg9wUa31J8p/fkJGTrZW+QsjlbYIsG6jEnjggPxVGlmfSSoSEJBuBRUAcc95wvWELr3t1JZ7HMswVeXA2rRjkihfqPTjW9sd6drpdLl/zlHpx0rV7xROQVnpuj9thV6wI8nfpKGSsSHqkFReaIVAu0aqzic3Miu00jFLcnMLurzSBJNxH4ZSzLP41nv+DPF5kZcy4BP01nCwMYbmKyDR5xYjRO2NKodkgpjVl/Sk0j5Ox8/DL0y0iy7sZxXT5sc2ckyzBbMah2seToaw==
+Received: from FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:7a::10)
+ by BEZP281MB1846.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:5a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.38; Fri, 6 Oct
+ 2023 09:04:53 +0000
+Received: from FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::739c:5a5b:9c94:e5ec]) by FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::739c:5a5b:9c94:e5ec%7]) with mapi id 15.20.6838.033; Fri, 6 Oct 2023
+ 09:04:53 +0000
+From:   Julian Stecklina <julian.stecklina@cyberus-technology.de>
+To:     "seanjc@google.com" <seanjc@google.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] KVM: x86: Fix partially uninitialized integer in
+ emulate_pop
+Thread-Topic: [PATCH 1/2] KVM: x86: Fix partially uninitialized integer in
+ emulate_pop
+Thread-Index: AQHZ9sgUMiwno/GkWkCKUcl7BrM7o7A5u0sAgAF8YoCAALrGAIAAiFCA
+Date:   Fri, 6 Oct 2023 09:04:53 +0000
+Message-ID: <9362077ac7f24ec684d338543e269e83aee7c897.camel@cyberus-technology.de>
+References: <20231004133827.107-1-julian.stecklina@cyberus-technology.de>
+         <ZR1_lizQd14pbXbg@google.com>
+         <1b0252b29c19cc08c41e1b58b26fbcf1f3fb06e4.camel@cyberus-technology.de>
+         <ZR9bWv_Fogzx1zwv@google.com>
+In-Reply-To: <ZR9bWv_Fogzx1zwv@google.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paul Durrant <pdurrant@amazon.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
-References: <20231004174628.2073263-1-paul@xen.org>
- <ZR2vTN618U0UgtIA@google.com> <5fc0fbfe-72e8-44bf-bad2-92513f299832@xen.org>
- <ZR9nYw53O21y0VYM@google.com>
-Organization: Xen Project
-In-Reply-To: <ZR9nYw53O21y0VYM@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: FR3P281MB1567:EE_|BEZP281MB1846:EE_
+x-ms-office365-filtering-correlation-id: 653ae8a9-4898-4bca-3d59-08dbc64b4dc4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: YQWlvEL9B+yIwtgr1nOe3W7gVuqqVcMPO38yF7K/W1b8nnmhYLDNfKgZPz4EJ+VbNUTJi7ixQ9i7edxF5hyxAQBiuyKP7C8Ome9i5T+gDz6Nbo2EXrqODNJybfvwqIgVhMIxuRBZXZMY82i33hOcb21tJplExYrPkKOpNRgk8ziZJUpRSMf5eKTj3k9m0TMx2Zry8sY+2wzX+7gzYT2HE1qJUTXfGf4Xa+b+IUHzKKDy+ztESfarY8TQepWgnkft2f1kofyTjZeboqO8MSpnKJVw78u+hDInwEtjEpLsVnOlv7pPxmndMHPlDx+zLhvoifijCQPC+Ytds82iChdIr4B4tXx5q8neh43iy8k1DcsnwOTvBFU0uOS31UtfHVE4kLvRg7wQVaBUrCwlQ6CGMWeJU+4KGH1l0JnkdatGkOfkL9SIKxSXugyG4S/xJVHC352QvF2nufmrYZkhuM6gNr3hbV0ydx2HecIekRVnsWjNfUF9SFg2N79MtjobuEXYlph1OyCQ9p/Kg37f9RVEMzyij3OT1p093uyLBGQYamIRDSW1lY/xvdPopTtkdC9jtzZ+N4uvYrMRyBhpEydB9Nv6fBgIsc6/+VdRhikaEalMZMmOxiZu/+izqjBdLy/W6DwM/CwpTN5jfLSXMpTPYj+gRMsfdLXM2WQGfjewTRw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(376002)(346002)(39830400003)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(2906002)(38100700002)(38070700005)(44832011)(5660300002)(7416002)(122000001)(86362001)(36756003)(83380400001)(71200400001)(6506007)(6512007)(26005)(6486002)(478600001)(6916009)(316002)(41300700001)(8936002)(8676002)(4326008)(2616005)(66946007)(66556008)(91956017)(66446008)(66476007)(76116006)(64756008)(54906003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UzhoQ1c5VnZ6dmxpNkRwUG5lOGdQR2lpcllrb1JKMUdJVEZ4a3VGWVN2eXVV?=
+ =?utf-8?B?SFJIdDRhMU9qRXFDUGU1bnQvNnJEOEJsZkNZQ0Z0SnlEOG5WRVNqcnUzU2Nj?=
+ =?utf-8?B?SnVNTStTUnBqMVJXdlBJSDdrUEx4bnIzcTBhdkZKVmM4M3dZTDlHN2poSUtw?=
+ =?utf-8?B?aVZTYk51RUNLTnEwQldYeFk0V2dCOGZEMEtQTU9ZWlYvakVySldHd0UyRDBZ?=
+ =?utf-8?B?UlFPL2JkYlpwOStTOGZwV2YwdDYvdk5RMVZ2ZXpkUjBMWTFiSkpHTVliN3Vq?=
+ =?utf-8?B?cnlPbjhkZ3JMamdhSEVXSDFHcUdRV20yc3ZoM0phMjJIWnBNZ0hhd05WanI1?=
+ =?utf-8?B?OTlGMU42YUJHd2NYaFFoLy9tT1FXMlVPaVBCNFdlNWoySUdtWVVIVEJMZHZl?=
+ =?utf-8?B?NkU5VXVxcHRXNjJFSXFGNFI0NWZuSWN2d29LbS92RWYza0QzdEl0VFlXRWFC?=
+ =?utf-8?B?eTMxMUZiMmVWa3ovenJLNTdFS2orSUhBQWIzRk1XeDRyUngydGpseTZqbHdI?=
+ =?utf-8?B?b0hKNUp1c2pVZlJXMzhGNlhVVW1QSXFLaVFuaDUrcFk0QkNIZ0gvcE9BV3Rz?=
+ =?utf-8?B?d014V2ZuY1BSL2ZPOVNLb21PZzJuTk43SGp3TzJ4bklVVkxpREcvVGVJTFF0?=
+ =?utf-8?B?aUxBU244blZYUzYwL0ZvWHBaVyt1bnAyamp1YWVjdmViWW5RazF2dlNwUHRt?=
+ =?utf-8?B?RS9yd0U2Y2dhcWd4WVFaT1JlOFFkVlVDbUliUGF3bUdIVmZ1NWdSb2ZOUTlO?=
+ =?utf-8?B?b0JySjZZZDUzdWN3VkU4cCtLNDI1WDBBdTRBeW1KQTlrQ3JOWkcxU2RmQ016?=
+ =?utf-8?B?d1owcm92VThDeDNXVmd2SzhPRDRzdjdvSEZKZ1JqenNTL05zM3FEK20vUEh5?=
+ =?utf-8?B?VHdLMkFVMjBrcFMrZnlRQlBIdURndTRRRDBwNmNwbXV0c2Z6dENDVHJLOU53?=
+ =?utf-8?B?dEoxcDdCbWM3eTNPMmhEK1FJUlZNNXFoQTNBa05WTDB6S2ZsdFIxNmJqUW9h?=
+ =?utf-8?B?T2ExTTBlUGhlQ3ArMVF1U2dXcjloRGhIMHZWWkswS25veFJXaTN3amNxUjVo?=
+ =?utf-8?B?K01aVSt2TDl5c053a0d6czRSR0ZEcnRPWGlnVDVUeXpxRGpjRlhIeGxxbEJV?=
+ =?utf-8?B?NUpHOWRFWS9hZVRYbkh0T2taRGY2TnZ5Y2JmL29xYzJ0RkVGU1dpMGZFQW9Q?=
+ =?utf-8?B?bkwrUDVzMHE4SmVLT3J2NVkzQ2dIL3ZocnRNZ09mUlJPRlNtbmRtU3Iva0pp?=
+ =?utf-8?B?Qjh0VFNtUWxwVW5RRGE1S0FQWmV5RU0xN3MrMHUrYVMxeUNjUHdjYzRxRFBp?=
+ =?utf-8?B?VWp0aklvR1dPZjNRY1k0a1ltVlR0aTFIS21uU1NNcThpN1lTK0NUb1dWdmlS?=
+ =?utf-8?B?SmY2cG40d1IxWWp1TzhCa2pFMytkY3hTYktWUFV3QmtZT1JsNHFkd21uR2Fz?=
+ =?utf-8?B?YklSSTlnZWYwblZkQ2ZsM0pxS3EwM2RQYXU3dFZNclc3Ulc0aERHNXBtS1dF?=
+ =?utf-8?B?bHJwMVJWYjdwcXM2bFh2bzJMQ08yUUlqQUFhamdtZW4zSFI0M0Yyd01KMmlY?=
+ =?utf-8?B?bk9rT2FlK0M1elpySTVEd2RoTU9rY0hIc0xiMzdLV2gxZFoyN0ZNb2hiUm1h?=
+ =?utf-8?B?Y0p2N3luREJSZjNhMjVMWGZWWW0rTG9rUGMzSjV5RkJMamp0YnBBbGMxd0lT?=
+ =?utf-8?B?WEJ4blJTeUFlQnI1ZTl2Z245bE1vdWNybEtUTWRnOXl6R041Wm51NGc5bzhu?=
+ =?utf-8?B?bythRElQN0lHWC81WEtSTEpYYWxtUnFveW9lN280OEJ1ZjJoNHYzekFoKzlV?=
+ =?utf-8?B?SkhNeGlCSUk4SThYclpaQ01DNmN5TlRzOGpFMEJ1WEZHMUJqTWFPdHFVUTBo?=
+ =?utf-8?B?QURBR1FIcERPNzJyMWlBUk00ZDNON1kxZ3EzVmVFN3htb0cvUE4zMnpOd2I3?=
+ =?utf-8?B?cVVGL1JRbnZxQnNqMGozT2hCd1czWkJFUGlsRklPd1ZVcHhORy9CeEh3THV5?=
+ =?utf-8?B?SFE4akVVRGNGYTFiZFQvZVcrRlRjVnJlVWMyY0FUUW0waEJzNHh5NWI2eVhW?=
+ =?utf-8?B?TEx3cm8zQXIxaHZWODMydmdSVmIzMmd2SXBYTUZwNW9HOXF2QUtsbWFCcUdq?=
+ =?utf-8?B?WFhncGhXK0xTdmpxVDlEWmhYOGJ2b2FlMnR4UGNOd0pUOTZyblh4ZUNaSVBF?=
+ =?utf-8?Q?sG8l5S06Tjkaguhv/j3QHZU=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AB8D186B0D2B814EB575EE94D65481DB@DEUP281.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: cyberus-technology.de
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: FR3P281MB1567.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 653ae8a9-4898-4bca-3d59-08dbc64b4dc4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Oct 2023 09:04:53.2007
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UJIX8b2xts6c3e/OAp97xPfIdiKcWhVMHmLZStTMiKpD8isKALkJjsEW/7LguGKL9DdcMoPsPSp3fMMSyp55FTTx6e9C0QrQzy45+3Kt0veozuMWm9p4ldf0MYMd/K3/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEZP281MB1846
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,74 +139,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/10/2023 02:48, Sean Christopherson wrote:
-> On Thu, Oct 05, 2023, Paul Durrant wrote:
->> On 04/10/2023 19:30, Sean Christopherson wrote:
->>> On Wed, Oct 04, 2023, Paul Durrant wrote:
->>>> ---
->>>> Cc: David Woodhouse <dwmw2@infradead.org>
->>>> Cc: Sean Christopherson <seanjc@google.com>
->>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>> Cc: Thomas Gleixner <tglx@linutronix.de>
->>>> Cc: Ingo Molnar <mingo@redhat.com>
->>>> Cc: Borislav Petkov <bp@alien8.de>
->>>> Cc: Dave Hansen <dave.hansen@linux.intel.com>
->>>> Cc: "H. Peter Anvin" <hpa@zytor.com>
->>>> Cc: x86@kernel.org
->>>
->>> If you're going to manually Cc folks, put the Cc's in the changelog proper so that
->>> there's a record of who was Cc'd on the patch.
->>>
->>
->> FTR, the basic list was generated:
->>
->> ./scripts/get_maintainer.pl --no-rolestats
->> 0001-KVM-xen-ignore-the-VCPU_SSHOTTMR_future-flag.patch | while read line;
->> do echo Cc: $line; done
->>
->> and then lightly hacked put x86 at the end and remove my own name... so not
->> really manual.
->> Also not entirely sure why you'd want the Cc list making it into the actual
->> commit.
-> 
-> It's useful for Cc's that *don't* come from get_maintainers, as it provides a
-> record in the commit of who was Cc'd on a patch.
-> 
-> E.g. if someone encounters an issue with a commit, the Cc records provide additional
-> contacts that might be able to help sort things out.
-> 
-> Or if a maintainer further up the stream has questions or concerns about a pull
-> request, they can use the Cc list to grab the right audience for a discussion,
-> or be more confident in merging the request because the maintainer knows that the
-> "right" people at least saw the patch.
-> 
-> Lore links provide much of that functionality, but following a link is almost
-> always slower, and some maintainers are allergic to web browsers :-)
-> 
-
-Ok... makes sense.
-
->>> Or even better, just use scripts/get_maintainers.pl and only manually Cc people
->>> when necessary.
->>
->> I guess this must be some other way of using get_maintainers.pl that you are
->> expecting?
-> 
-> Ah, I was just assuming that you were handcoding the Cc "list", but it sounds
-> like you're piping the results into each patch.  That's fine, just a bit noisy
-> and uncommon.
-> 
-> FWIW, my scripts gather the To/Cc for all patches in a series, and then use the
-> results for the entire series, e.g.
-> 
->    git send-email --confirm=always --suppress-cc=all $to $bcc $cc ...
-> 
-> That way everyone that gets sent mail gets all patches in a series.  Most
-> contributors, myself included, don't like to receive bits and pieces of a series,
-> e.g. it makes doing quick triage/reviews annoying, especially if the patches I
-> didn't receive weren't sent to any of the mailing list to which I'm subscribed.
-
-Ok, I'll send stuff that way in future. Thanks,
-
-   Paul
-
+T24gRnJpLCAyMDIzLTEwLTA2IGF0IDAwOjU2ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBUaHUsIE9jdCAwNSwgMjAyMywgSnVsaWFuIFN0ZWNrbGluYSB3cm90ZToNCj4g
+PiBPbiBXZWQsIDIwMjMtMTAtMDQgYXQgMDg6MDcgLTA3MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24g
+d3JvdGU6DQo+ID4gPiANCj4gPiA+IE5BSywgdGhpcyB3aWxsIGJyZWFrIGVtX2xlYXZlKCkgYXMg
+aXQgd2lsbCB6ZXJvIFJCUCByZWdhcmRsZXNzIG9mIGhvdyBtYW55DQo+ID4gPiBieXRlcw0KPiA+
+ID4gYXJlIGFjdHVhbGx5IHN1cHBvc2VkIHRvIGJlIHdyaXR0ZW4uwqAgU3BlY2lmaWNhbGx5LCBL
+Vk0gd291bGQgaW5jb3JyZWN0bHkNCj4gPiA+IGNsb2JiZXINCj4gPiA+IFJCUFszMToxNl0gaWYg
+TEVBVkUgaXMgZXhlY3V0ZWQgd2l0aCBhIDE2LWJpdCBzdGFjay4NCj4gPiANCj4gPiBUaGFua3Ms
+IFNlYW4hIEdyZWF0IGNhdGNoLiBJIGRpZG4ndCBzZWUgdGhpcy4gSXMgdGhlcmUgYWxyZWFkeSBh
+IHRlc3Qgc3VpdGUNCj4gPiBmb3INCj4gPiB0aGlzPw0KPiANCj4gTm8sIEknbSBqdXN0IGV4Y2Vz
+c2l2ZWx5IHBhcmFub2lkIHdoZW4gaXQgY29tZXMgdG8gdGhlIGVtdWxhdG9yIDotKQ0KDQpJJ2xs
+IGxvb2sgaW50byB3aGV0aGVyIHNvbWUgdGVzdGluZyBjYW4gYmUgYWRkZWQgdG8ga3ZtLXVuaXQt
+dGVzdHMgb3IgbWF5YmUgc29tZQ0Kb3RoZXIgdGVzdCBoYXJuZXNzLg0KDQo+IEl0IHBhaW5zIG1l
+IGEgYml0IHRvIHNheSB0aGlzLCBidXQgSSB0aGluayB3ZSdyZSBiZXN0IG9mZiBsZWF2aW5nIHRo
+ZSBlbXVsYXRvcg0KPiBhcy1pcywgYW5kIHJlbHlpbmcgb24gdGhpbmdzIGxpa2UgZmFuY3kgY29t
+cGlsZXIgZmVhdHVyZXMsIFVCU0FOLCBhbmQgZnV6emVycw0KPiB0bw0KPiBkZXRlY3QgYW55IGx1
+cmtpbmcgYnVncy4NCg0KSSdtIGhhdmUgYSBmdXp6aW5nIHNldHVwIGZvciB0aGUgZW11bGF0b3Ig
+aW4gdXNlcnNwYWNlLiBUaGlzIGlzc3VlIHdhcyBkZXRlY3RlZA0KYnkgTVNBTi4gOikgSSdsbCBt
+YWtlIHRoaXMgYXZhaWxhYmxlIHdoZW4gaXQncyBpbiBhIGJldHRlciBzaGFwZS4NCg0KU28gaWYg
+eW91IGRvbid0IHN0cm9uZ2x5IG1pbmQgLCBJIHdvdWxkIHN0aWxsIGluaXRpYWxpemUgdGhlIHBs
+YWNlcyB3aGVyZSB0aGUNCmZ1enplciBjYW4gc2hvdyB0aGF0IHRoZSBjb2RlIGhhbmRzIHVuaW5p
+YWxpemVkIGRhdGEgYXJvdW5kLiBBdCB0aGUgbGVhc3QsIGl0DQp3aWxsIG1ha2Ugb3RoZXIgZnV6
+emluZyBlZmZvcnRzIGEgYml0IGVhc2llci4gQnV0IEkgZG8gdW5kZXJzdGFuZCB0aGF0IGNoYW5n
+ZXMNCm5lZWQgdG8gYmUgY29uc2VydmF0aXZlLg0KDQpCdHcsIHdoYXQgYXJlIHRoZSBjYXNlcyB3
+aGVyZSByZXQgZmFyLCBpcmV0IGV0YyAoYmFzaWNhbGx5IGFueXRoaW5nIHlvdSB3b3VsZG4ndA0K
+ZXhwZWN0IGZvciBNTUlPKSBhcmUgaGFuZGxlZCBieSB0aGUgS1ZNIGVtdWxhdG9yIHdpdGhvdXQg
+dGhlIGd1ZXN0IGRvaW5nDQphbnl0aGluZyBmaXNoeT8gDQoNCkp1bGlhbg0K
