@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28BCA7BB920
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 15:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3B87BBB26
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 17:03:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbjJFNdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 09:33:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47408 "EHLO
+        id S232654AbjJFPDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 11:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232388AbjJFNdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 09:33:09 -0400
+        with ESMTP id S230158AbjJFPDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 11:03:37 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B518495
-        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 06:33:07 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F77C433CA;
-        Fri,  6 Oct 2023 13:33:07 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3527C8F
+        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 08:03:35 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9C40C433C7;
+        Fri,  6 Oct 2023 15:03:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696599187;
-        bh=zM9U6OE2wsu5l+eoLqm1nLAA0FmuNcoDectJceqzya4=;
+        s=k20201202; t=1696604614;
+        bh=BKIdAxdeWU/zqJ86I9pvFdS2SCbqZLPB/JhlrgGrCKw=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VWvYqsuswcyUpaopuhu/HDRF4GakesEOiRaWKel+kPfAABpGn8I32oDbWQW3ygY9s
-         odswpBsewZqhF41o031Cm6K7+SZ5PFmsH54FVtsCtEjZ4jSOFwMUD6H6VChQYbwei+
-         RDnTtURR4/XbGHKbS3Yg/17MwTPL18cA7Kf/U8R3cTWV1mxnRd4HcnjPtgXBYw9avB
-         s6uOvzEJRGjf7AP2+8xrH45mFIDiw13u+gsMCetAhMzCzYk+I2elgAAj0KoYQm4pIX
-         GZJJe+h/LDVozcT7MphOKIuz5xw+Ph/NJKF6jwxvvSnzyURxra9vd63qt/MCqfkTjk
-         /dYv55ZWsIUKg==
+        b=jaN73s2GEyUNpSqTgloD+ODJcwYHPnv5LhQCPFLmtjmQP7tgpFRkBmDnDW9AFqcZK
+         3z5hfD8iEnuynBo/2g1SOS4pEn3CrB7AqJcaMPwCpL+hh17KdAUoNVyZB9B6scPMW1
+         kM42JhBIKc//u1C8fIlEgAN4SyxpsdxrJoEi9Vog8pWvIxTeRQfXF1eYsKDkZu+ZXA
+         M1w8M4zyo8uVEzHSfgE2eMp73YLLfT+9EkS2dpheNJioyukgsXl5vS3v7CZuOweWPJ
+         2VZGhy4hMO1NTHZG5e39hlldYNsWrQc2Cm5NGptQUiHRl0lyYf381PkAJXLUDXMjty
+         WYs9i+Fdn8khA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qokwy-001jZ2-Mv;
-        Fri, 06 Oct 2023 14:33:05 +0100
-Date:   Fri, 06 Oct 2023 14:33:04 +0100
-Message-ID: <86zg0vnaen.wl-maz@kernel.org>
+        id 1qomMW-001kxQ-EF;
+        Fri, 06 Oct 2023 16:03:32 +0100
+Date:   Fri, 06 Oct 2023 16:03:32 +0100
+Message-ID: <86y1gfn67v.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -41,10 +41,11 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH 0/3] KVM: arm64: Load the stage-2 MMU from vcpu_load() for VHE
-In-Reply-To: <861qe8nd45.wl-maz@kernel.org>
+In-Reply-To: <86zg0vnaen.wl-maz@kernel.org>
 References: <20231006093600.1250986-1-oliver.upton@linux.dev>
         <8634yongw3.wl-maz@kernel.org>
         <861qe8nd45.wl-maz@kernel.org>
+        <86zg0vnaen.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,71 +55,107 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 06 Oct 2023 13:34:34 +0100,
+On Fri, 06 Oct 2023 14:33:04 +0100,
 Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Fri, 06 Oct 2023 12:13:00 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > On Fri, 06 Oct 2023 10:35:57 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > Unlike nVHE, there is no need to switch the stage-2 MMU around on guest
-> > > entry/exit in VHE mode as the host is running at EL2. Despite this KVM
-> > > reloads the stage-2 on every guest entry, which is needless.
-> > > 
-> > > This series moves the setup of the stage-2 MMU context to vcpu_load()
-> > > when running in VHE mode. This is likely to be a win across the board,
-> > > but also allows us to remove an ISB on the guest entry path for systems
-> > > with one of the speculative AT errata.
-> > > 
-> > > None of my machines affected by the AT errata are VHE-capable, so it'd
-> > > be appreciated if someone could give this series a go and make sure I
-> > > haven't wrecked anything.
-> > 
-> > It totally breaks on my A55 board. Running a single guest seems OK,
-> > but running a number of the concurrently makes them explode early on
-> > (faults in EFI...)
-> > 
-> > I guess we end-up running with the wrong VTTBR at times, which would
-> > be interesting...
-> 
-> Fun fact:
-> 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index b0cafd7c5f8f..40c84db5884a 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -195,6 +195,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->  	sysreg_restore_guest_state_vhe(guest_ctxt);
->  	__debug_switch_to_guest(vcpu);
->  
-> +	WARN_ONCE(kvm_get_vttbr(vcpu->arch.hw_mmu) != read_sysreg(vttbr_el2),
-> +		  "Oh crap %llx vs %llx\n",
-> +		  kvm_get_vttbr(vcpu->arch.hw_mmu),
-> +		  read_sysreg(vttbr_el2));
-> +
->  	if (is_hyp_ctxt(vcpu))
->  		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
->  	else
-> 
-> [   36.190355] Oh crap 10000057a6001 vs 57a6001
-> 
-> My bet is that the VMID isn't allocated on first load, and everything
-> goes downhill from there.
 
-So I was correct that the VMID isn't allocated on the first run, and
-the following patch should address that particular problem:
+Still talking to myself! :D
+
+[...]
+
+>
+> However, this isn't enough.
+> 
+> [   63.450113] Oh crap 400000435c001 vs 3000004430001
+> 
+> So there are situations where we end-up with the wrong VTTBR, rather
+> than the wrong VMID, which is even worse. Haven't worked out the
+> scenario yet, but it apparently involves being preempted by a vcpu
+> from a different VM and not doing the right thing.
+
+Actually, no. It is the MMU notifiers kicking in and performing TLB
+invalidation for a guest while we're in the context of another. The
+joy of running 4 large VMs on a box with 2GB of RAM, basically running
+from swap.
+
+The trace looks like this:
+
+[   66.147484] Call trace:
+[   66.149899]  dump_backtrace+0xa0/0x128
+[   66.153607]  show_stack+0x20/0x38
+[   66.156884]  dump_stack_lvl+0x78/0xc8
+[   66.160507]  dump_stack+0x18/0x28
+[   66.163784]  __tlb_switch_to_guest+0x50/0x148
+[   66.168097]  __kvm_tlb_flush_vmid_ipa+0x3c/0xc8
+[   66.172582]  stage2_unmap_put_pte+0xd0/0xe8
+[   66.176722]  stage2_unmap_walker+0x160/0x1c0
+[   66.180948]  __kvm_pgtable_visit+0x170/0x1f8
+[   66.185174]  __kvm_pgtable_walk+0x94/0xc8
+[   66.189142]  __kvm_pgtable_visit+0xd8/0x1f8
+[   66.193282]  __kvm_pgtable_walk+0x94/0xc8
+[   66.197249]  __kvm_pgtable_visit+0xd8/0x1f8
+[   66.201389]  __kvm_pgtable_walk+0x94/0xc8
+[   66.205357]  kvm_pgtable_walk+0xd4/0x170
+[   66.209238]  kvm_pgtable_stage2_unmap+0x54/0xd0
+[   66.213723]  stage2_apply_range+0x9c/0x108
+[   66.217777]  __unmap_stage2_range+0x34/0x70
+[   66.221917]  kvm_unmap_gfn_range+0x38/0x58
+[   66.225970]  kvm_mmu_notifier_invalidate_range_start+0xe8/0x310
+[   66.231835]  mn_hlist_invalidate_range_start+0x80/0x158
+[   66.237010]  __mmu_notifier_invalidate_range_start+0x40/0x78
+[   66.242617]  try_to_migrate_one+0x8b0/0xa10
+[   66.246757]  rmap_walk_anon+0xec/0x268
+[   66.250465]  try_to_migrate+0xc8/0x120
+[   66.254174]  migrate_folio_unmap+0x180/0x438
+[   66.258401]  migrate_pages_batch+0x14c/0x798
+[   66.262627]  migrate_pages_sync+0x8c/0x258
+[   66.266680]  migrate_pages+0x4f0/0x690
+[   66.270389]  compact_zone+0x1d8/0x6b8
+[   66.274012]  compact_zone_order+0xa0/0xf0
+[   66.277979]  try_to_compact_pages+0xfc/0x378
+[   66.282205]  __alloc_pages_direct_compact+0x80/0x398
+[   66.287122]  __alloc_pages_slowpath.constprop.0+0x328/0x868
+[   66.292642]  __alloc_pages+0x2cc/0x358
+[   66.296350]  __folio_alloc+0x24/0x68
+[   66.299887]  vma_alloc_folio+0x2ac/0x340
+[   66.303768]  do_huge_pmd_anonymous_page+0xb0/0x3b8
+[   66.308512]  __handle_mm_fault+0x31c/0x358
+[   66.312566]  handle_mm_fault+0x64/0x270
+[   66.316360]  faultin_page+0x74/0x130
+[   66.319897]  __get_user_pages+0xc8/0x340
+[   66.323778]  get_user_pages_unlocked+0xc8/0x3b8
+[   66.328263]  hva_to_pfn+0xfc/0x338
+[   66.331627]  __gfn_to_pfn_memslot+0xa8/0x100
+[   66.335853]  user_mem_abort+0x17c/0x7c0
+[   66.339648]  kvm_handle_guest_abort+0x2f4/0x3d8
+[   66.344133]  handle_trap_exceptions+0x44/0xb8
+[   66.348445]  handle_exit+0x4c/0x118
+[   66.351895]  kvm_arch_vcpu_ioctl_run+0x24c/0x5e0
+[   66.356467]  kvm_vcpu_ioctl+0x28c/0x9e0
+[   66.360262]  __arm64_sys_ioctl+0xc0/0xe8
+[   66.364143]  invoke_syscall+0x50/0x128
+[   66.367852]  el0_svc_common.constprop.0+0x48/0xf0
+[   66.372509]  do_el0_svc+0x24/0x38
+[   66.375787]  el0_svc+0x3c/0xe0
+[   66.378805]  el0t_64_sync_handler+0xc0/0xc8
+[   66.382945]  el0t_64_sync+0x1a4/0x1a8
+
+Which says it all: we're reclaiming pages from a guest while faulting
+on another, resulting in the wrong MMU setup being left behind. Damn!
+
+There's the sum of my hacks, which keeps the box alive.
+
+Thanks,
+
+	M.
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
 index e2d38c7d6555..759adee42018 100644
@@ -149,8 +186,49 @@ index 39c969c05990..584be562b1d4 100644
  
  		kvm_pmu_flush_hwstate(vcpu);
  
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index f3f2e142e4f4..bc510c7e53f1 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -12,6 +12,7 @@
+ 
+ struct tlb_inv_context {
+ 	unsigned long	flags;
++	struct kvm_s2_mmu *mmu;
+ 	u64		tcr;
+ 	u64		sctlr;
+ };
+@@ -19,10 +20,16 @@ struct tlb_inv_context {
+ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ 				  struct tlb_inv_context *cxt)
+ {
++	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 	u64 val;
+ 
+ 	local_irq_save(cxt->flags);
+ 
++	if (vcpu && mmu != vcpu->arch.hw_mmu)
++		cxt->mmu = vcpu->arch.hw_mmu;
++	else
++		cxt->mmu = NULL;
++
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		/*
+ 		 * For CPUs that are affected by ARM errata 1165522 or 1530923,
+@@ -64,8 +71,10 @@ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
+ {
+ 	/*
+ 	 * We're done with the TLB operation, let's restore the host's
+-	 * view of HCR_EL2.
++	 * view of HCR_EL2 and current S2 MMU context.
+ 	 */
++	if (cxt->mmu)
++		__load_stage2(cxt->mmu, cxt->mmu->arch);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+ 	isb();
+ 
 diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
-index 7fe8ba1a2851..281e4f86d9a2 100644
+index 7fe8ba1a2851..806223b7022a 100644
 --- a/arch/arm64/kvm/vmid.c
 +++ b/arch/arm64/kvm/vmid.c
 @@ -135,10 +135,11 @@ void kvm_arm_vmid_clear_active(void)
@@ -190,17 +268,6 @@ index 7fe8ba1a2851..281e4f86d9a2 100644
  }
  
  /*
-
-However, this isn't enough.
-
-[   63.450113] Oh crap 400000435c001 vs 3000004430001
-
-So there are situations where we end-up with the wrong VTTBR, rather
-than the wrong VMID, which is even worse. Haven't worked out the
-scenario yet, but it apparently involves being preempted by a vcpu
-from a different VM and not doing the right thing.
-
-	M.
 
 -- 
 Without deviation from the norm, progress is not possible.
