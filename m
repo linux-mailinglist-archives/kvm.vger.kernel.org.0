@@ -2,94 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 215417BC086
-	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 22:41:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F02377BC0C2
+	for <lists+kvm@lfdr.de>; Fri,  6 Oct 2023 22:52:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233561AbjJFUl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Oct 2023 16:41:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50712 "EHLO
+        id S233561AbjJFUwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Oct 2023 16:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233540AbjJFUlY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Oct 2023 16:41:24 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69994C6
-        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 13:41:23 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c6219307b2so19033275ad.1
-        for <kvm@vger.kernel.org>; Fri, 06 Oct 2023 13:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696624883; x=1697229683; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GURnAZx4gtWmv3AO8Lj9TIfuZbs5tNuLiF2FqF49VSs=;
-        b=krRBrzE6RdWQLS1Kr2aqyhkC3AsH3Du0XzkaTXACJWr6DDhf0z7dPQuuCAG5qopxdw
-         fF7IYr1QE1Cw9KyxgV6lpIAaam8d5YUE/tXUkAXfB2b4gjz1VNiRAVinKFMcuhD81dfI
-         FQNnpKUHPCN8BcI3tbSNALRW0jIWUSfMoXODY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696624883; x=1697229683;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GURnAZx4gtWmv3AO8Lj9TIfuZbs5tNuLiF2FqF49VSs=;
-        b=pwZbE4MJnnkSVTvkjIUcPZfmtjLdeK7Hx9qaYS5Xq4xFOqppkn2TTiASFeZgl/vpaB
-         jSD8QSu5frzXCdzAuhTTXUPPBQklZP403cRmL58ezlBRZZn+dxfelwXr+HKgxaCoA038
-         /pxX9Z4846xre3zwcxAUiBIP6HtV5zKKncOKjeRObpggRbePbK2wusQ5SNKbhPTX5l/y
-         VRyeCi6XNCjiKJiyMOobwaciog2XQQ1+/excbTYpWAwJCNDr4HRbusYx6tZ6AYiYHw2h
-         UUiBMtIHhia0Yaen8eG2iDiJImxklPWU+pxdQsFf3AZfb9NT5PbVruhiJZ6ZaIZ6Y4I0
-         QDZQ==
-X-Gm-Message-State: AOJu0YyXVaA5sBJSIXra+6iIwPzhSIRZc6eixrflUIZBm0tjP/Hd0dtJ
-        pMzSlY7M+G5rrlmt2O6erS6ayw==
-X-Google-Smtp-Source: AGHT+IGYMji8WWmS2cMJoZ5nClhJOhH5qp5E4dC5W/5rnEY2qlLb77bHw85K9B2xCd+v5N5AN6yVWQ==
-X-Received: by 2002:a17:903:25c3:b0:1c5:76b6:d4f7 with SMTP id jc3-20020a17090325c300b001c576b6d4f7mr8158493plb.36.1696624882955;
-        Fri, 06 Oct 2023 13:41:22 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id t17-20020a170902e85100b001b9c5e07bc3sm4348373plg.238.2023.10.06.13.41.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 13:41:20 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Kees Cook <keescook@chromium.org>
-Cc:     kvm@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] KVM: Annotate struct kvm_irq_routing_table with __counted_by
-Date:   Fri,  6 Oct 2023 13:41:11 -0700
-Message-Id: <169662486908.2156024.3248243280882819249.b4-ty@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230922175121.work.660-kees@kernel.org>
-References: <20230922175121.work.660-kees@kernel.org>
+        with ESMTP id S233525AbjJFUwu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Oct 2023 16:52:50 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D430BD
+        for <kvm@vger.kernel.org>; Fri,  6 Oct 2023 13:52:49 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0520EC433C8;
+        Fri,  6 Oct 2023 20:52:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696625568;
+        bh=6gw26i5UhuMp+O8gF4WbUk+QbWnjoZs1jIoNHPWeyuE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PloiUE+//+LxK7DVbsW95KlChVfo/QmHu4+vku+HKoImR94uIqaXp+7q55BWbpphm
+         ZFxkyJBRozeMt4tJKu9Or9GGVPfdQiRW47qzHaZFOO8jpu4VmpBkWURcKg+AOBxNEZ
+         l2a566VrJrwhfEHpWZyKGhYaza5G39tt01r9pdrRXmdP87cKRDKpf0JCBmM606vKFm
+         O4wVoi0ssBrnb2lyeqtBaNoXlXtS+ws22syB9tstKNkP7JdhYcOlMiafxWblFG90w1
+         SiZnaCOcii7J5AJSe5J/2+SvevekU9NLpy5z7KoDuUHGy9jil8ZT8iI+fcB64k7wr4
+         1D8sQza//fnvQ==
+Date:   Fri, 6 Oct 2023 21:52:43 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 1/2] tools: arm64: Add a copy of sysreg-defs.h generated
+ from the kernel
+Message-ID: <ca6bf3c6-230c-4645-bfc0-2ebe2e680032@sirena.org.uk>
+References: <20231005180325.525236-1-oliver.upton@linux.dev>
+ <20231005180325.525236-2-oliver.upton@linux.dev>
+ <66914631-c2fe-4a20-bfd6-561657cfe8e8@sirena.org.uk>
+ <ZR_SLyTfkhmdZoXI@linux.dev>
+ <ec96d303-f0c4-470c-b23c-e59054c52008@sirena.org.uk>
+ <ZSBjAWlPUBjiU7Vj@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="2Ho6O1gZ03A33tqs"
+Content-Disposition: inline
+In-Reply-To: <ZSBjAWlPUBjiU7Vj@linux.dev>
+X-Cookie: Rome wasn't burnt in a day.
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Sep 2023 10:51:21 -0700, Kees Cook wrote:
-> Prepare for the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by for struct kvm_irq_routing_table.
-> 
-> [...]
 
-Applied to for-next/hardening, thanks!
+--2Ho6O1gZ03A33tqs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-[1/1] KVM: Annotate struct kvm_irq_routing_table with __counted_by
-      https://git.kernel.org/kees/c/bbf75528039a
+On Fri, Oct 06, 2023 at 07:41:53PM +0000, Oliver Upton wrote:
+> On Fri, Oct 06, 2023 at 12:33:48PM +0100, Mark Brown wrote:
+> > On Fri, Oct 06, 2023 at 09:23:59AM +0000, Oliver Upton wrote:
+> > > On Fri, Oct 06, 2023 at 01:23:08AM +0100, Mark Brown wrote:
 
-Take care,
+> > > incidental user of this via cputype.h, KVM selftests is what's taking
+> > > the direct dependency.
 
--- 
-Kees Cook
+> > If perf doesn't care perhaps just restructure things so it doesn't pull
+> > it in and do whatever you were doing originally then?
 
+> The only option would be to use yet another set of headers that are
+> specific to KVM selftests, which I feel would only complicate things
+> further.
+
+I don't see that it needs to be a different copy?  It'd just be perf
+skipping the generation part of things which AIUI it doesn't actually
+need.
+
+> > | In file included from util/../../arch/arm64/include/asm/cputype.h:201,
+> > |                  from util/arm-spe.c:37:
+> > | tools/arch/arm64/include/asm/sysreg.h:132:10: fatal error: asm/sysreg-defs.h: No such file or directory
+
+> > so that's already happening - see perf's arm-spe.c.  You could also fix
+> > perf by avoiding spelunking in the main kernel source like it's
+> > currently doing.
+
+> My interpretation of that relative path is tools/arch/arm64/include/asm/cputype.h
+
+Ugh, right - that directory of fun :(  It's not exactly copies of the
+kernel internal headers, it's separate thing that happens to look at lot
+like them but isn't always the same - most of the files are straight
+copies but there's also some independent implementations in there.
+
+> perf + KVM selftests aren't directly using kernel headers, and I'd rather
+> not revisit that just for handling the sysreg definitions. So then if we
+> must periodically copy things out of the kernel tree anyway, what value
+> do we derive from copying the script as opposed to just lifting the
+> generated output?
+
+The original code was generating things during the build so I'm really
+confused as to why that's now completely off the table?  It does seem
+like the obvious approach, it feels like I'm missing some of the
+analysis here.  Doing generation makes keeping things in sync marginally
+easier (you don't have to do do an arch specific build) and the source
+smaller, and makes it clear that this is actually duplication.
+
+> We must do _something_ about this, as updates to sysreg.h are blocked
+> until the handling of generated headers gets worked out.
+
+So then the original code seems like the obvious thing surely, it just
+put the Makefile fragment doing the generation in the wrong place (or
+perhaps should have duplicated it in the perf Makefile given that
+there's no obviously sensible shared place already, it's just a couple
+of lines)?  Or like I said previously tweaked things so that perf isn't
+pulling in the generated file in the first place and doesn't need to
+worry about it.
+
+TBH when doing generation I'm not sure I see the value in doing a copy
+in the first place, I'm not sure people ever actually pull the tools
+directory out of the kernel source and build it independently so we can
+just skip the effort of keeping a copy in sync entirely.  With copying
+the headers we gain control of exactly which headers tools are looking
+at, plus there's the cases where the headers diverge.  If we need
+explicit rules to generate and don't expect to ever diverge then we get
+both properties as part of the generation process with just the
+duplication of the rules.  There might be use cases where tools/ needs
+to be actually free standing though.
+
+In any case I don't think we should just check a raw copy of the
+generated file in with nothing to automate the drift detection and sync
+parts of things which is what the current patch does.
+
+--2Ho6O1gZ03A33tqs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUgc5oACgkQJNaLcl1U
+h9Cz0Af/XdtHoZ9OcgWhEjzkT/D/sQPYsTBsiLszyetAgTjM4yOft1FXRgb9vgqm
+s/UTcDoZY4I3KjrHMhYxP/D/arj6Nh9/5Q2J9Ihbit14Q2vigpFqBH7o8Hws0ZFM
+w121TzyhG8dsKmqkmn8AAfqQUQWF5mNL8+STvzQrdtwSu1MrW/9QirGLE+pSH/kz
+2GbmBA6gPIc2Xp7crqzYJwVKgfPGFbr8ijVa+0wsd49moFx+rpxZW/VY/wN+WSgG
+kKehjejPlTuq3BTh5q6726In6gnm5pW8dVh0Pw51J01Ia5FtnjWUuYPh4ooe3D+3
+vl+ekCyGBp1ObS35s2uhy0FfjwHbuw==
+=KvNx
+-----END PGP SIGNATURE-----
+
+--2Ho6O1gZ03A33tqs--
