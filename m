@@ -2,148 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53BBE7BCFE9
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 21:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8D817BCFF9
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 22:04:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344476AbjJHT6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 15:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38016 "EHLO
+        id S1344551AbjJHUEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 16:04:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbjJHT6a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 15:58:30 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E5DAC;
-        Sun,  8 Oct 2023 12:58:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696795109; x=1728331109;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cKwxlSWZrewmQgKrJB6brf7XXi0sqVpTNLHHsR9nXbk=;
-  b=iKzYpjOTzqKhKXQMSN+eojWZ8S0Fnupg6Lm05Jfs3CG2UNx84ZjYaKeA
-   Y0f5n6vzTdRCRv/5BSTp0p20dnnXNEUR7qw0GbKUn6oZmgSA0EoOggYWl
-   /RlP4M4ih8h7AeEWkC+iDMlGmgl9L2uNc9KhOKhQDIK1W5Zg48aqkObH2
-   xK3i5oQDR83q9LKAncTBseRj/QzuugSED/Bci97xo79vnkbGrq8ruFdWb
-   esWW4xjNEfEykbdf2fthyoDNaLet92EtNer0O6S/B01TvfFYmk+yAFbYA
-   26gPG2UnV9SmW/HHOr1UvAFZI5+N7idEKA6fY5m+YnRahylb6pClIsbaj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="415019063"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="415019063"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 12:58:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="869002523"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="869002523"
-Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Oct 2023 12:58:13 -0700
-Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qpZul-0005hz-1T;
-        Sun, 08 Oct 2023 19:58:11 +0000
-Date:   Mon, 9 Oct 2023 03:57:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Tianyi Liu <i.pear@outlook.com>, seanjc@google.com,
-        pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com,
-        acme@kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-        Tianyi Liu <i.pear@outlook.com>
-Subject: Re: [PATCH v2 4/5] perf kvm: Support sampling guest callchains
-Message-ID: <202310090338.4PmYjmBS-lkp@intel.com>
-References: <SY4P282MB108433024762F1F292D47C2A9DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+        with ESMTP id S1344421AbjJHUEY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 16:04:24 -0400
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0AC99
+        for <kvm@vger.kernel.org>; Sun,  8 Oct 2023 13:04:22 -0700 (PDT)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1dd54aca17cso2919325fac.3
+        for <kvm@vger.kernel.org>; Sun, 08 Oct 2023 13:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696795462; x=1697400262; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wk4ID+9Y2woSlIo9KG7KQPxOKMdKteazTwjUAl7uvHc=;
+        b=xWuhtOwHbOEuuqEvdG/xCV9PaV7GlwXKl8ia80sSCWwIR1eQ8nEa8acaC37fDPVm3P
+         xBlVBOGV5fvR4EQlP3XoZODoJxOQkACGgoXekrFGGi+a6n17NW+H7VUM+6wjgyxWtl9I
+         q01PcPZFYO1IOzF0nC3KcPq62/J6zskijRWk020awePtmHjWGfXP0VafiMdqySdp7kpI
+         nXuCuVheylTP5Muv+Kyc+rPrYwcG2zE2SFgf+cArebc/FqYL8YAVnotyO9bzvTcnBxWq
+         ThxaXHyblTU23DtHjQ9n7Tw2Zw5Fh3KqRJd4/rZ8fYZ/vOZ+usMzF4QQo5RQv6e08v3k
+         FQSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696795462; x=1697400262;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wk4ID+9Y2woSlIo9KG7KQPxOKMdKteazTwjUAl7uvHc=;
+        b=F8NbDWkH0YCrfNcxZ7CyIOxgTRa3jZOhNNscJsgxctswnZINKYn1af8mGj/Am5Lv21
+         5isX+lMkWgtdGugTUr7w87mhdf20xArc4Y6F4c45yhsIcVvoPCy2R8e9+waRTRBww1/0
+         EnSTyEWbBXCuzOA5yu+qagxQw0i5VDF0wwtsPS2yWhGrGNx0OX6ofgJ+gVNZr5VI1cjv
+         EiWk2yVWkp+1mEVj00cZfVzefDBHkzM0ze7x1SBV6RTZM3AEBA26ZCWfzri/i+5il74V
+         O2GsLX8bSWFG01QfxNgaeDdPwFWmtphKzjnE4nhgQRQajXOQJsJMG6d/t8LyXq3kVDYQ
+         jbKw==
+X-Gm-Message-State: AOJu0YxGTjhNzVqKqUDhh4bxCWuBXiZVxJDtAKqY7GB64wVLcFnq/Neb
+        y8UjNJVzrcjzNJvobYIcu/jJcQ==
+X-Google-Smtp-Source: AGHT+IFvrlaD3FcoyeoteZn8QYo3hLgQzaE/npYrh01teNLQxeArDL4tW+jIm7E9x3F4Eq/sg5G4MA==
+X-Received: by 2002:a05:6870:d606:b0:1d6:5649:a88e with SMTP id a6-20020a056870d60600b001d65649a88emr17607839oaq.37.1696795461716;
+        Sun, 08 Oct 2023 13:04:21 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
+        by smtp.gmail.com with ESMTPSA id c16-20020aa78810000000b00690d1269691sm4895954pfo.22.2023.10.08.13.04.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Oct 2023 13:04:21 -0700 (PDT)
+Message-ID: <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
+Date:   Mon, 9 Oct 2023 05:04:14 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SY4P282MB108433024762F1F292D47C2A9DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+Content-Language: en-US
+To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
+        gustavoars@kernel.org, herbert@gondor.apana.org.au,
+        steffen.klassert@secunet.com, nogikh@google.com,
+        pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com,
+        elver@google.com, pabeni@redhat.com,
+        Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com>
+ <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+From:   Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tianyi,
+On 2023/10/09 4:07, Willem de Bruijn wrote:
+> On Sun, Oct 8, 2023 at 7:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> virtio-net have two usage of hashes: one is RSS and another is hash
+>> reporting. Conventionally the hash calculation was done by the VMM.
+>> However, computing the hash after the queue was chosen defeats the
+>> purpose of RSS.
+>>
+>> Another approach is to use eBPF steering program. This approach has
+>> another downside: it cannot report the calculated hash due to the
+>> restrictive nature of eBPF.
+>>
+>> Introduce the code to compute hashes to the kernel in order to overcome
+>> thse challenges. An alternative solution is to extend the eBPF steering
+>> program so that it will be able to report to the userspace, but it makes
+>> little sense to allow to implement different hashing algorithms with
+>> eBPF since the hash value reported by virtio-net is strictly defined by
+>> the specification.
+>>
+>> The hash value already stored in sk_buff is not used and computed
+>> independently since it may have been computed in a way not conformant
+>> with the specification.
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> ---
+> 
+>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap = {
+>> +       .max_indirection_table_length =
+>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+>> +
+>> +       .types = VIRTIO_NET_SUPPORTED_HASH_TYPES
+>> +};
+> 
+> No need to have explicit capabilities exchange like this? Tun either
+> supports all or none.
 
-kernel test robot noticed the following build warnings:
+tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX, 
+VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
 
-[auto build test WARNING on 8a749fd1a8720d4619c91c8b6e7528c0a355c0aa]
+It is because the flow dissector does not support IPv6 extensions. The 
+specification is also vague, and does not tell how many TLVs should be 
+consumed at most when interpreting destination option header so I chose 
+to avoid adding code for these hash types to the flow dissector. I doubt 
+anyone will complain about it since nobody complains for Linux.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tianyi-Liu/KVM-Add-arch-specific-interfaces-for-sampling-guest-callchains/20231008-230042
-base:   8a749fd1a8720d4619c91c8b6e7528c0a355c0aa
-patch link:    https://lore.kernel.org/r/SY4P282MB108433024762F1F292D47C2A9DCFA%40SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-patch subject: [PATCH v2 4/5] perf kvm: Support sampling guest callchains
-config: i386-tinyconfig (https://download.01.org/0day-ci/archive/20231009/202310090338.4PmYjmBS-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231009/202310090338.4PmYjmBS-lkp@intel.com/reproduce)
+I'm also adding this so that we can extend it later. 
+max_indirection_table_length may grow for systems with 128+ CPUs, or 
+types may have other bits for new protocols in the future.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310090338.4PmYjmBS-lkp@intel.com/
+> 
+>>          case TUNSETSTEERINGEBPF:
+>> -               ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>> +               bpf_ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>> +               if (IS_ERR(bpf_ret))
+>> +                       ret = PTR_ERR(bpf_ret);
+>> +               else if (bpf_ret)
+>> +                       tun->vnet_hash.flags &= ~TUN_VNET_HASH_RSS;
+> 
+> Don't make one feature disable another.
+> 
+> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+> functions. If one is enabled the other call should fail, with EBUSY
+> for instance.
+> 
+>> +       case TUNSETVNETHASH:
+>> +               len = sizeof(vnet_hash);
+>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+>> +                       ret = -EFAULT;
+>> +                       break;
+>> +               }
+>> +
+>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
+>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hdr_v1_hash) ||
+>> +                     !tun_is_little_endian(tun))) ||
+>> +                    vnet_hash.indirection_table_mask >=
+>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
+>> +                       ret = -EINVAL;
+>> +                       break;
+>> +               }
+>> +
+>> +               argp = (u8 __user *)argp + len;
+>> +               len = (vnet_hash.indirection_table_mask + 1) * 2;
+>> +               if (copy_from_user(vnet_hash_indirection_table, argp, len)) {
+>> +                       ret = -EFAULT;
+>> +                       break;
+>> +               }
+>> +
+>> +               argp = (u8 __user *)argp + len;
+>> +               len = virtio_net_hash_key_length(vnet_hash.types);
+>> +
+>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
+>> +                       ret = -EFAULT;
+>> +                       break;
+>> +               }
+> 
+> Probably easier and less error-prone to define a fixed size control
+> struct with the max indirection table size.
 
-All warnings (new ones prefixed by >>):
+I made its size variable because the indirection table and key may grow 
+in the future as I wrote above.
 
-   arch/x86/events/core.c: In function 'perf_callchain_guest32':
->> arch/x86/events/core.c:2784:43: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2784 |                 if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
-         |                                           ^~~~~~~~~~~~~~~
-   In file included from arch/x86/events/core.c:15:
-   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const u32 *' {aka 'const unsigned int *'}
-    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
-         |                                         ^~~~~
-   arch/x86/events/core.c:2787:43: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2787 |                 if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
-         |                                           ^~~~~~~~~~~~~~~~~~~
-   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const u32 *' {aka 'const unsigned int *'}
-    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
-         |                                         ^~~~~
-   arch/x86/events/core.c: In function 'perf_callchain_guest':
-   arch/x86/events/core.c:2808:51: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2808 |                         if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
-         |                                                   ^~~~~~~~~~~~~~~
-   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'struct stack_frame * const*'
-    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
-         |                                         ^~~~~
-   arch/x86/events/core.c:2811:51: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2811 |                         if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
-         |                                                   ^~~~~~~~~~~~~~~~~~~
-   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const long unsigned int *'
-    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
-         |                                         ^~~~~
+> 
+> Btw: please trim the CC: list considerably on future patches.
 
-
-vim +2784 arch/x86/events/core.c
-
-  2775	
-  2776	static inline void
-  2777	perf_callchain_guest32(struct perf_callchain_entry_ctx *entry)
-  2778	{
-  2779		struct stack_frame_ia32 frame;
-  2780		const struct stack_frame_ia32 *fp;
-  2781	
-  2782		fp = (void *)perf_guest_get_frame_pointer();
-  2783		while (fp && entry->nr < entry->max_stack) {
-> 2784			if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
-  2785				sizeof(frame.next_frame)))
-  2786				break;
-  2787			if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
-  2788				sizeof(frame.return_address)))
-  2789				break;
-  2790			perf_callchain_store(entry, frame.return_address);
-  2791			fp = (void *)frame.next_frame;
-  2792		}
-  2793	}
-  2794	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I'll do so in the next version with the TUNSETSTEERINGEBPF change you 
+proposed.
