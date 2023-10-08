@@ -2,128 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A38D77BCC1C
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 06:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA48A7BCC40
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 07:18:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344368AbjJHEh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 00:37:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46036 "EHLO
+        id S1344346AbjJHFSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 01:18:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344307AbjJHEh5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 00:37:57 -0400
+        with ESMTP id S1344375AbjJHFSf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 01:18:35 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52D4B9
-        for <kvm@vger.kernel.org>; Sat,  7 Oct 2023 21:37:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3AC3BF
+        for <kvm@vger.kernel.org>; Sat,  7 Oct 2023 22:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696739834;
+        s=mimecast20190719; t=1696742267;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dvtyRRz+nwNRt7FvkUoa8BCNkTJILEam9tMkM/HCha0=;
-        b=BNp+d5EqNYpP2bZAE9k8JgQFg9k2NPo392NQY4GPdPgXbcnHr6Wgd5F1d3V8kZkTWazBE/
-        Yw72ho08HFq6EA5W4GUZ6sFhPwwct7ZDi999e8FSWPl7BuGSfYt9yJPcXlONiWOkrd6TzQ
-        57SKfb0Sajkw7nCAwbBpGRClDNDz7i8=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=XIBFYES1oNSbgdg44IpiRY5MDLveYfd/44xts2VnIss=;
+        b=QC4Mm8ZFz02yIcA1EwbMIypdoElK6XV33KqM1d1f8xjM/lvE8HU0P9D4Es3Bucnl86NimW
+        B1mXW4+o2aQx8NicVXkC2CDKcTI/SrxH0Rah/IdVW+8++LOvjsfIF4vcq6eGPnldMzSNrH
+        iAthzHx0bqhJmt5BkcSOZDtIJ18+kNc=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-iix0WzX2M-iED_qDZR7udw-1; Sun, 08 Oct 2023 00:37:13 -0400
-X-MC-Unique: iix0WzX2M-iED_qDZR7udw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50433961a36so3017110e87.3
-        for <kvm@vger.kernel.org>; Sat, 07 Oct 2023 21:37:13 -0700 (PDT)
+ us-mta-589-sm56jJFCNKqQ3F0q4gVTFA-1; Sun, 08 Oct 2023 01:17:36 -0400
+X-MC-Unique: sm56jJFCNKqQ3F0q4gVTFA-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5068bf0b425so1403888e87.0
+        for <kvm@vger.kernel.org>; Sat, 07 Oct 2023 22:17:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696739832; x=1697344632;
+        d=1e100.net; s=20230601; t=1696742254; x=1697347054;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dvtyRRz+nwNRt7FvkUoa8BCNkTJILEam9tMkM/HCha0=;
-        b=T1RHEPKFhorq5X3UAImcs7DdU39AA2aY5PyAjXF7tnGtpDUahkIHvMr2r+W7kUTsl4
-         Lyxbb2YrW2NxMlKYCw6k+Gvepj4K8g9kLZJtJhBP8V8edg0Q5LR6SF6ly8nbtYyaVTPm
-         wXJHD890auR8g0dAlT6NEGjzbX4yaU//elKxjYMek+zqtRtKDuYNzoRpAhIss+vAUqpL
-         XdBrj2qoU/UIIghoTRXttDTdzwv2hOCncYOGMm9KC5qlP9dVf3JL3OznFYUwab5Hap+S
-         KOofk633B8uiEOCesS7nkl6aJWNVOyuZt19P1OxcgxwV9rlzdYYpmRZKxOrtYunPm1e6
-         EYbQ==
-X-Gm-Message-State: AOJu0Yw2cQu3jeuNDEHmoqq6lr2BsRL8XTI3onxBcCJmQl974XAv7TWI
-        qe7MOSw3f/rTwe7vygCmGuuAP9zp66R7cHD2duRk7PGTevAFcz/VnCT68ms83zXaxYkUQHX2aMQ
-        03Og3XoZVpPt0ZS7mQ8uHpLgyinhY
-X-Received: by 2002:ac2:4c9b:0:b0:500:9a15:9054 with SMTP id d27-20020ac24c9b000000b005009a159054mr8820044lfl.20.1696739831934;
-        Sat, 07 Oct 2023 21:37:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGbwdFniTDysoOdy55vJ9mvDY2iLbB22GYbgOhSxJ2xBXcK3O2G6gfgJld3IG0br8gYtQV4XFjb14Blx0X7c18=
-X-Received: by 2002:ac2:4c9b:0:b0:500:9a15:9054 with SMTP id
- d27-20020ac24c9b000000b005009a159054mr8820036lfl.20.1696739831548; Sat, 07
- Oct 2023 21:37:11 -0700 (PDT)
+        bh=XIBFYES1oNSbgdg44IpiRY5MDLveYfd/44xts2VnIss=;
+        b=EPxs5ocj88Vf/rn2NLBNqdJsug5AHrMH9WKaX2PNCAN1wDJoLbaMeRHzEnrPrQPdBZ
+         ZQsl++Cg8feaGCiMAd5DK4y2AeZWUfc6FO4TwMJ5JOwn++Eb1P9iEFOcI4MV43M6asix
+         w+WFuykjcPC2tPvjwB3tXH0CYJH5sfRKCI6GW6zxLDT0LvraAo0Xe8jc4XFDDneicio1
+         zEU0UTc6Pre10vuCcQRmumACxTMbwdIPRMigf0ixrvrODwbwO1q2ClO4feKSySnh6baS
+         cKgYb9/pvHn7lJ9DPP7OzC013HPGvAN+n6a+v7lSStgYM1yZAX59muAjBNJp7ptgT+8X
+         tlSA==
+X-Gm-Message-State: AOJu0YyazuLbKIscBwhS4sf12YMyZW776l6XGZFbJtdAQXnYik0RaxNP
+        qs4izHfTwu+z769NqydvivDAyJChuXVdqqoLasqG3nNTOZpCXlnLt1UvtWElLoXuWL4RtX8GxUq
+        9iXra/c8gd4b2ybngq3c1T7RBG9SN
+X-Received: by 2002:a05:6512:31d2:b0:500:acf1:b432 with SMTP id j18-20020a05651231d200b00500acf1b432mr12100670lfe.63.1696742254620;
+        Sat, 07 Oct 2023 22:17:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHih9jNBj+mm3gln1ZCsXonlccj1/oAiZNJ1d8VXWVWaywkwRq06DB7RjMZgwJPLinVPauKckcWGYfUL6bhA9o=
+X-Received: by 2002:a05:6512:31d2:b0:500:acf1:b432 with SMTP id
+ j18-20020a05651231d200b00500acf1b432mr12100655lfe.63.1696742254306; Sat, 07
+ Oct 2023 22:17:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
-In-Reply-To: <20230926050021.717-1-liming.wu@jaguarmicro.com>
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-4-lulu@redhat.com>
+ <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com> <db93d5aa-64c4-42a4-73dc-ae25e9e3833e@redhat.com>
+In-Reply-To: <db93d5aa-64c4-42a4-73dc-ae25e9e3833e@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Sun, 8 Oct 2023 12:37:00 +0800
-Message-ID: <CACGkMEtF7hZ8kGYi8rF68SzZqdYJ6i1SeuVU2hiBTY-FLapSBw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] tools/virtio: Add dma sync api for virtio test
-To:     liming.wu@jaguarmicro.com
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+Date:   Sun, 8 Oct 2023 13:17:23 +0800
+Message-ID: <CACGkMEsNfLOQkmnWUH53iTptAmhELs_U8B4D-CfO49rs=+HfLw@mail.gmail.com>
+Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
+To:     Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc:     Cindy Lu <lulu@redhat.com>, mst@redhat.com,
+        xieyongji@bytedance.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, 398776277@qq.com
+        stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 1:00=E2=80=AFPM <liming.wu@jaguarmicro.com> wrote:
+On Fri, Sep 29, 2023 at 5:12=E2=80=AFPM Maxime Coquelin
+<maxime.coquelin@redhat.com> wrote:
 >
-> From: Liming Wu <liming.wu@jaguarmicro.com>
 >
-> Fixes: 8bd2f71054bd ("virtio_ring: introduce dma sync api for virtqueue")
-> also add dma sync api for virtio test.
 >
-> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> On 9/12/23 09:39, Jason Wang wrote:
+> > On Tue, Sep 12, 2023 at 11:00=E2=80=AFAM Cindy Lu <lulu@redhat.com> wro=
+te:
+> >>
+> >> In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
+> >> with reconnect info, After mapping the reconnect pages to userspace
+> >> The userspace App will update the reconnect_time in
+> >> struct vhost_reconnect_vring, If this is not 0 then it means this
+> >> vq is reconnected and will update the last_avail_idx
+> >>
+> >> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> >> ---
+> >>   drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
+> >>   include/uapi/linux/vduse.h         |  6 ++++++
+> >>   2 files changed, 19 insertions(+)
+> >>
+> >> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_us=
+er/vduse_dev.c
+> >> index 2c69f4004a6e..680b23dbdde2 100644
+> >> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> >> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> >> @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, u=
+nsigned int cmd,
+> >>                  struct vduse_vq_info vq_info;
+> >>                  struct vduse_virtqueue *vq;
+> >>                  u32 index;
+> >> +               struct vdpa_reconnect_info *area;
+> >> +               struct vhost_reconnect_vring *vq_reconnect;
+> >>
+> >>                  ret =3D -EFAULT;
+> >>                  if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
+> >> @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, =
+unsigned int cmd,
+> >>
+> >>                  vq_info.ready =3D vq->ready;
+> >>
+> >> +               area =3D &vq->reconnect_info;
+> >> +
+> >> +               vq_reconnect =3D (struct vhost_reconnect_vring *)area-=
+>vaddr;
+> >> +               /*check if the vq is reconnect, if yes then update the=
+ last_avail_idx*/
+> >> +               if ((vq_reconnect->last_avail_idx !=3D
+> >> +                    vq_info.split.avail_index) &&
+> >> +                   (vq_reconnect->reconnect_time !=3D 0)) {
+> >> +                       vq_info.split.avail_index =3D
+> >> +                               vq_reconnect->last_avail_idx;
+> >> +               }
+> >> +
+> >>                  ret =3D -EFAULT;
+> >>                  if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
+> >>                          break;
+> >> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+> >> index 11bd48c72c6c..d585425803fd 100644
+> >> --- a/include/uapi/linux/vduse.h
+> >> +++ b/include/uapi/linux/vduse.h
+> >> @@ -350,4 +350,10 @@ struct vduse_dev_response {
+> >>          };
+> >>   };
+> >>
+> >> +struct vhost_reconnect_vring {
+> >> +       __u16 reconnect_time;
+> >> +       __u16 last_avail_idx;
+> >> +       _Bool avail_wrap_counter;
+> >
+> > Please add a comment for each field.
+> >
+> > And I never saw _Bool is used in uapi before, maybe it's better to
+> > pack it with last_avail_idx into a __u32.
+>
+> Better as two distincts __u16 IMHO.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Fine with me.
 
 Thanks
 
-> ---
->  tools/virtio/linux/dma-mapping.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
 >
-> diff --git a/tools/virtio/linux/dma-mapping.h b/tools/virtio/linux/dma-ma=
-pping.h
-> index 834a90bd3270..822ecaa8e4df 100644
-> --- a/tools/virtio/linux/dma-mapping.h
-> +++ b/tools/virtio/linux/dma-mapping.h
-> @@ -24,11 +24,23 @@ enum dma_data_direction {
->  #define dma_map_page(d, p, o, s, dir) (page_to_phys(p) + (o))
+> Thanks,
+> Maxime
 >
->  #define dma_map_single(d, p, s, dir) (virt_to_phys(p))
-> +#define dma_map_single_attrs(d, p, s, dir, a) (virt_to_phys(p))
->  #define dma_mapping_error(...) (0)
->
->  #define dma_unmap_single(d, a, s, r) do { (void)(d); (void)(a); (void)(s=
-); (void)(r); } while (0)
->  #define dma_unmap_page(d, a, s, r) do { (void)(d); (void)(a); (void)(s);=
- (void)(r); } while (0)
->
-> +#define sg_dma_address(sg) (0)
-> +#define dma_need_sync(v, a) (0)
-> +#define dma_unmap_single_attrs(d, a, s, r, t) do { \
-> +       (void)(d); (void)(a); (void)(s); (void)(r); (void)(t); \
-> +} while (0)
-> +#define dma_sync_single_range_for_cpu(d, a, o, s, r) do { \
-> +       (void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
-> +} while (0)
-> +#define dma_sync_single_range_for_device(d, a, o, s, r) do { \
-> +       (void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
-> +} while (0)
->  #define dma_max_mapping_size(...) SIZE_MAX
->
->  #endif
-> --
-> 2.34.1
+> >
+> > Btw, do we need to track inflight descriptors as well?
+> >
+> > Thanks
+> >
+> >> +};
+> >> +
+> >>   #endif /* _UAPI_VDUSE_H_ */
+> >> --
+> >> 2.34.3
+> >>
+> >
 >
 
