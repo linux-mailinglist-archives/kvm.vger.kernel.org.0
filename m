@@ -2,180 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F617BCF01
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 16:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 688717BCF3E
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 18:23:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344847AbjJHO6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 10:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
+        id S1344924AbjJHQXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 12:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230303AbjJHO6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 10:58:15 -0400
-Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2159.outbound.protection.outlook.com [40.92.63.159])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FD6A4;
-        Sun,  8 Oct 2023 07:58:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nYHA7nfuRuhvLMy72MpWJ4mK3Jm0xZBoL4TvC3AZpUGkObu3MqIGpPAdNq6CRxINikHisMUbFuSjGEW38COSqRnkdr0BS1DGvEQ9QHfyr/27lCyP6i6gPKQCOluAdUv1ijgPUhEDqzJLAC9iKs1IDbr2WB3w8TnEsncomocLtFx6xqk/qr1o+fQK5rVVpDVRLH/96fyWeprLL0SJ3+tT9CwDGbCS/lUcdfEAfR/vWTU+poS2FW3bG7UUM+j+xYxfelQ8Pgdnj2uWlolyIOXOqLALv9jxTtvHsmiwl++kzpAkfHeTjwFAW3ihnqKl6P9flpSLpTT5fbWlYXEbut82pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
- b=TkGgw0cIwiupQksITQIn8jAh0E54fPLFY/XgrbEEwAiUI20Z6gsXfFk7YK+4wEdrVZL72hlU/UR232OEju1DszJGkUVQmkunHFUzz7KkntaX8a5aoUEO7zqby4cLCxW+HXdRO7Pad/Gvn0M+4ZuYe8LCLJhk+YC+Q6U6Eyaif01HL7FGbG2fsohqqdku4QU/1SLpVNOudvIvZgyIfhyZACRmNICa/tpfk7Rkgl72RDr4aJxRXNEuCWpwDQb73ydN6FaOPweVXebbg3OZCKHk+wXt0raryqspNrob9XxJxEfXA0nd/9/FmjLgXLq+Pw5NZiLUg4DDTgfLYnbGR2cpxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
- b=FKhXYTsr2zTk/gvEePAaOzVmVfxlx3K2gXV4OWq4nlAeFmALWbAbOAA+tZ04CR1hcUeHcLj2mdGbmmqAreDA2dE+618R5jU2bbzf+QoxyJWx/66qtESsEu4rOyaKQFhwq/GXSqOHTkLpRHGQmVn4rD1N9hxla2jYhKfWdfHh2pUqVRoeydGjQnsEiQXYu2dP+RIP+P6c1wlRX5GU0442yW46ciOBVvrk1u7BRUW2swZmARqXG8E6k88WTItcfFuvjUyTkaXmxX/SSdLtB3nV3WJxiLTGxZgH0tNiWTISUgmt/o11x+nVcftwMJxEEYfgtu9MQcOdZRBR+HAMAu127Q==
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- SYYP282MB1101.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:bf::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6863.36; Sun, 8 Oct 2023 14:58:06 +0000
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Sun, 8 Oct 2023
- 14:58:06 +0000
-From:   Tianyi Liu <i.pear@outlook.com>
-To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        mingo@redhat.com, acme@kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-        Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v2 5/5] perf tools: Support PERF_CONTEXT_GUEST_* flags
-Date:   Sun,  8 Oct 2023 22:57:29 +0800
-Message-ID: <SY4P282MB108462B1895A79A8920DD6849DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-References: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [brT8iFehEOwCNXRw/nHup347yUJJMi8XhYPK+wacExEAGNvB18G62w==]
-X-ClientProxiedBy: SG2PR06CA0235.apcprd06.prod.outlook.com
- (2603:1096:4:ac::19) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231008145729.7886-1-i.pear@outlook.com>
+        with ESMTP id S1344915AbjJHQXm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 12:23:42 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B848F
+        for <kvm@vger.kernel.org>; Sun,  8 Oct 2023 09:23:40 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c012232792so45340301fa.0
+        for <kvm@vger.kernel.org>; Sun, 08 Oct 2023 09:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1696782218; x=1697387018; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ll1xFIKgthVBkbIQ18l2VWC32SrBNao63uADKYJp67g=;
+        b=aiZbyoMMC5+6fFmuHSOAb3i2JBjUjGr9SnsoA8S1vXuWC+TpxsmFRrLMM3jGVKPOea
+         2xZMuDqFhI8uw5fuGbH5CLT4ILvTB6kAXIJgJ0N+3QxKwf4ITNBTeT1kVsaqjDCg8qhI
+         W9VPQmhMf4g/gLtN54fVaEqs7dcqD8p2bWzdv+LQFN36TjMw2QfQfHnTa+3Nv/R3EqtO
+         TEiDfgka3+/S6en82PYYHgppHJ5v28FzBjrFa/N+lucejpmhKI2KzmnSKs+BjA1KTbLL
+         bCR5JJBlFTAJq1c3O44ZD/XzU34QZwd8c4zbehnyca8iH70anDiq49wL2/5sCjWx0KGc
+         IfCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696782218; x=1697387018;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ll1xFIKgthVBkbIQ18l2VWC32SrBNao63uADKYJp67g=;
+        b=CA0Vebfw4GMLEBWbZVKDMEad76E4+KBuP+YCR8MQyNwPXd6PTZ83Ge+aN797JIuaj/
+         DeO/6We5dhIhNal8J1M/WmROjLd7fMjVV8z3dR7JTK+rkFG0bbNRSR+lhI28fMQEH6Z1
+         XSMUb2z0TkvknnO031EIWVfQXpJ0OELt4s3eXdh1liq9ukQdqZDv4eLuZ0TB9biVt7o7
+         JX4+KQ+zSkeePxu2Pym7EqmcCfZmr0aoeubqKJO8OAsymKEGBbchyNxFHJSfVNxNqmM6
+         kw/Od7mxB9AXt3H+KDz3I4ziMq16VwyZEdfmyUWf65Sh58kjrd1rCnHDpW3OviM6MlJD
+         Z20g==
+X-Gm-Message-State: AOJu0YzqGCAYYHiLNB1mFx4aKZRgDVkPDC/K6Ii6az6jUEpn3nY+DH6R
+        ExP7NwPsV3J5cwWAkUJQwd3Eclaq4+UmnMrrI6rNgA==
+X-Google-Smtp-Source: AGHT+IEDiW/72+1fHjRwjd2QHLfwn12GJk+UvsKaCmV8jsLIrAy42uLdoJcDdY4vYIHGAMER6GtYTjOmBCv8mj+EReI=
+X-Received: by 2002:a2e:828b:0:b0:2be:54b4:ff90 with SMTP id
+ y11-20020a2e828b000000b002be54b4ff90mr10069767ljg.53.1696782218295; Sun, 08
+ Oct 2023 09:23:38 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYYP282MB1101:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KHeHlcHDe59T0Nksh3RMSTCkhCHOh9vZsPg/95V2XqN0q2P2+7r29qRIwKl/SpRRUHFpxFWeQA2OWsl3JMvr98XswCt7ZZkNa0XhTUQ0576IDW9Op3WoUzC1o/mJyyyK0W/deJGGZPVKkVhCwNjrOqE3jGe6gSyG8LX2bDNDTjs0QzFexZvY5uR1Lkbm+Wsh6edF8mdkMeLkoCKC5X6ApUHQWFRB1KAr07rKdcQhVsZA8Kgahnj67XsmXCYq0BU7gTDm+AyCnG5SZtR6kxNaDTt1GGFW5xjcIu2ytfgs1OJ1vlHfHdE8pDgMpQUdsYERkTBpoJEr+I0ytXrwWQEOF3edIAvJdN7d1zfhwYxBJE6dyVgJQV7qEjE+9EZHflohxX2T59pgd3BYjKndmKiapv4okGjGKGgoCOdUoVRI/k0zerPYAyUuSwfa1z4zk4pqg/QFYVjN8YVEuSiAM2/F4UE0dc0sNQrrrP3c7d74zR8RkJAXfdzh5l5ntC6BlckEUA1z8MAob0rqQQQllxVmqMfM49i4BFAOix4tPTz/GNCWgWJsnDeOaBA1PXUaHzQlmmGyZIaA9oHGSjsW5FrZPg5jUtubzil3k5ZOXMbuZ3SJkvfFPOMe4BWGcQIE9vbG
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+73wY44Qoc4JgWLeOlFDx2MdotZXzfNBpG1vDLXXeAS77wHJ6rAV8Em7MIWp?=
- =?us-ascii?Q?4wS4b5KEJOVr+TqtGtc/EnWLH8bxZwm2ECFoG2HC0eEFiMogpDhqWln19jDu?=
- =?us-ascii?Q?7DCU52FlF8JD56pMvo8wj+j5XW163sn/Rex5gMh02odQ73H4z5OgQEcd1Icn?=
- =?us-ascii?Q?RyysmTxC1JtdfBWtWWq4x9Ll+t60vEOldCa1nbBGo0GESV61Z4t1/Pa3G3JM?=
- =?us-ascii?Q?aZ9V+A7GudImH0WLGD6EJvIkb2YtfuV0TTmQUlpy/TZEqSQxx0yOIK1bOSh0?=
- =?us-ascii?Q?2B/YGdvfdqGg+zU5iSBVNH6y65uAjOhpdbGBpM86ItMjiX9FejVmXs2ZaENk?=
- =?us-ascii?Q?RzkdETbvS1gja0OyRrQde6NjtWt4SHForgSk9LrJfdaEvCj8toDta6c4Y3+1?=
- =?us-ascii?Q?8xagzTKQgVyac69M6OJNLGXa7dVkTHpGaRh429liIsTCuXxFSd4AxfFDIRbX?=
- =?us-ascii?Q?NXnlcZeVevGsSsq+9sPmq+FvC9pLquk9iGfA28GAnMD/UyE1A2tHah+2juKb?=
- =?us-ascii?Q?Jb+Jd38huKeBTYIJU5iiJRpjdiEDMPYkGxuedoUH+ib6xc76qzgoGIrLEeCC?=
- =?us-ascii?Q?3Us8pXXBBDh2eOZXkRKuuiGcgE7liaK06uWaV8Uh3lGQOfQF6sqFi7f/1y7e?=
- =?us-ascii?Q?cTALLew/HFHuEufTjA0X5DitkzNY5EugXM3DGYIhJrl67F9f4w0yy+rzctiJ?=
- =?us-ascii?Q?lsjhR8JOrjp3YAqBlIdj0lu9YgmD0zP8UP4XUwJ8kOZ4P6tV+/SOBvos71Is?=
- =?us-ascii?Q?Coc5BBBtp47OkJZlrTlD3eSn5BGmrUlo1iKY4uPvpBtt+taQfQqHpvGPMVGP?=
- =?us-ascii?Q?ElPpKRnhs659Ua7G06vzhgzfA4ziHq1UIO6/dIgyDuAf4mIglFR/e5vg4Zp1?=
- =?us-ascii?Q?MwmPtfRzaDZlEH3reuXRct0sdxvdREyDmGtprQ8YFA6xeSuvw1GuH+uL+6x7?=
- =?us-ascii?Q?nvgNly33F8TyuzOhQXJHWYBr+u0BLnwTK3drNG2NUf8VIWEmY1t/ZfYWI4GM?=
- =?us-ascii?Q?mQgKEhK8RpH8aQu1bC5PnPDj2cXxlfkbv4H4H8h+Y269AjDIqW4dwmeF9p/0?=
- =?us-ascii?Q?H18ww4F7DhumaM6X6lnDZT3+sGinTM6yBftC7QT0c9opy7MCMjqOTOBjRA85?=
- =?us-ascii?Q?9svMAQXHsL0bJa7vzN1GL38k25Cp9rDCTkRbWgcnJwCpry4uN9SLhXcryuOM?=
- =?us-ascii?Q?X1h+vqDd9hDe5Ib1e6vpd+PN14ksHpSALXVjGLmUNrRnp3/cq1dBMb4dQD8y?=
- =?us-ascii?Q?BYPSUKcM2EC49AWARdg7?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
-X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:58:06.4846
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYYP282MB1101
+References: <20230605110724.21391-1-andy.chiu@sifive.com> <20230605110724.21391-15-andy.chiu@sifive.com>
+ <ZSJ0K5JFrglyJY8o@aurel32.net>
+In-Reply-To: <ZSJ0K5JFrglyJY8o@aurel32.net>
+From:   Andy Chiu <andy.chiu@sifive.com>
+Date:   Mon, 9 Oct 2023 01:23:26 +0900
+Message-ID: <CABgGipVQ3j+Njw1CDkD9cuDwTwR2-WqF7Y_yZt3NPipAedK_2Q@mail.gmail.com>
+Subject: Re: [PATCH -next v21 14/27] riscv: signal: Add sigcontext
+ save/restore for vector
+To:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Alexandre Ghiti <alexghiti@rivosinc.com>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Rob Herring <robh@kernel.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Wenting Zhang <zephray@outlook.com>,
+        Guo Ren <guoren@kernel.org>,
+        Andrew Bresticker <abrestic@rivosinc.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The `perf` util currently has a incomplete implementation for the
-following event flags, that events with these flags will be dropped or
-be identified as unknown types:
+On Sun, Oct 8, 2023 at 6:19=E2=80=AFPM Aurelien Jarno <aurelien@aurel32.net=
+> wrote:
+>
+> Hi,
+>
+> On 2023-06-05 11:07, Andy Chiu wrote:
+> > From: Greentime Hu <greentime.hu@sifive.com>
+> >
+> > This patch facilitates the existing fp-reserved words for placement of
+> > the first extension's context header on the user's sigframe. A context
+> > header consists of a distinct magic word and the size, including the
+> > header itself, of an extension on the stack. Then, the frame is followe=
+d
+> > by the context of that extension, and then a header + context body for
+> > another extension if exists. If there is no more extension to come, the=
+n
+> > the frame must be ended with a null context header. A special case is
+> > rv64gc, where the kernel support no extensions requiring to expose
+> > additional regfile to the user. In such case the kernel would place the
+> > null context header right after the first reserved word of
+> > __riscv_q_ext_state when saving sigframe. And the kernel would check if
+> > all reserved words are zeros when a signal handler returns.
+> >
+> > __riscv_q_ext_state---->|     |<-__riscv_extra_ext_header
+> >                       ~       ~
+> >       .reserved[0]--->|0      |<-     .reserved
+> >               <-------|magic  |<-     .hdr
+> >               |       |size   |_______ end of sc_fpregs
+> >               |       |ext-bdy|
+> >               |       ~       ~
+> >       +)size  ------->|magic  |<- another context header
+> >                       |size   |
+> >                       |ext-bdy|
+> >                       ~       ~
+> >                       |magic:0|<- null context header
+> >                       |size:0 |
+> >
+> > The vector registers will be saved in datap pointer. The datap pointer
+> > will be allocated dynamically when the task needs in kernel space. On
+> > the other hand, datap pointer on the sigframe will be set right after
+> > the __riscv_v_ext_state data structure.
+>
+> It appears that this patch somehow breaks userland, at least the rust
+> compiler. This can be observed for instance by building the rust-lsd
+> package in Debian, but many other rust packages are also affected:
 
-`PERF_CONTEXT_GUEST_KERNEL`
-`PERF_CONTEXT_GUEST_USER`
+Sorry for the time spent on pinpointing the issue. Yes, this is a bug
+and we had a fix [1]. This fix was accidently not getting into the
+-fixes branch, but it will. And it should be going into linux stable
+as well, though I am not certain about the timing. Otherwise, this bug
+may potentially break any processes which allocate a sigaltstack at an
+address higher than their stack.
 
-This patch makes `perf script`, `perf timechart` and `perf data`
-to correctly identify these flags.
+>
+> * Failed build with kernel 6.5.3:
+>   https://buildd.debian.org/status/fetch.php?pkg=3Drust-lsd&arch=3Driscv6=
+4&ver=3D0.23.1-7%2Bb1&stamp=3D1696475386&raw=3D0
+>
+> * Successful build with kernel 6.4.13:
+>   https://buildd.debian.org/status/fetch.php?pkg=3Drust-lsd&arch=3Driscv6=
+4&ver=3D0.23.1-7%2Bb1&stamp=3D1696491025&raw=3D0
+>
+> It happens on hardware which does not have the V extension (in the above
+> case on a Hifive Unmatched board). This can also be reproduced in a QEMU
+> VM. Unfortunately disabling CONFIG_RISCV_ISA_V does not workaround the
+> issue.
+>
+> It is not clear to me if it is a kernel issue or a wrong assumption on
+> the rust side. Any hint on how to continue investigating?
+>
+> Regards
+> Aurelien
+>
+> --
+> Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+> aurelien@aurel32.net                     http://aurel32.net
 
-Signed-off-by: Tianyi Liu <i.pear@outlook.com>
----
- tools/perf/builtin-timechart.c      | 6 ++++++
- tools/perf/util/data-convert-json.c | 6 ++++++
- tools/perf/util/machine.c           | 6 ++++++
- 3 files changed, 18 insertions(+)
-
-diff --git a/tools/perf/builtin-timechart.c b/tools/perf/builtin-timechart.c
-index 19d4542ea..6a368b6a3 100644
---- a/tools/perf/builtin-timechart.c
-+++ b/tools/perf/builtin-timechart.c
-@@ -536,6 +536,12 @@ static const char *cat_backtrace(union perf_event *event,
- 			case PERF_CONTEXT_USER:
- 				cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
-diff --git a/tools/perf/util/data-convert-json.c b/tools/perf/util/data-convert-json.c
-index 5bb3c2ba9..62686f78d 100644
---- a/tools/perf/util/data-convert-json.c
-+++ b/tools/perf/util/data-convert-json.c
-@@ -205,6 +205,12 @@ static int process_sample_event(struct perf_tool *tool,
- 				case PERF_CONTEXT_USER:
- 					cpumode = PERF_RECORD_MISC_USER;
- 					break;
-+				case PERF_CONTEXT_GUEST_KERNEL:
-+					cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+					break;
-+				case PERF_CONTEXT_GUEST_USER:
-+					cpumode = PERF_RECORD_MISC_GUEST_USER;
-+					break;
- 				default:
- 					pr_debug("invalid callchain context: %"
- 							PRId64 "\n", (s64) ip);
-diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
-index 88f31b3a6..d88458c3b 100644
---- a/tools/perf/util/machine.c
-+++ b/tools/perf/util/machine.c
-@@ -2346,6 +2346,12 @@ static int add_callchain_ip(struct thread *thread,
- 			case PERF_CONTEXT_USER:
- 				*cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				*cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				*cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
--- 
-2.42.0
-
+[1]: https://yhbt.net/lore/all/mhng-7799d3a1-c12a-48e9-bb5f-e0a596892d78@pa=
+lmer-ri-x1c9/
