@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D62B7BCEF8
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 16:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 461277BCEFA
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 16:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344898AbjJHOxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 10:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36778 "EHLO
+        id S1344890AbjJHOy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 10:54:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230303AbjJHOxL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 10:53:11 -0400
-Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2156.outbound.protection.outlook.com [40.92.63.156])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD52A4;
-        Sun,  8 Oct 2023 07:53:10 -0700 (PDT)
+        with ESMTP id S230303AbjJHOy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 10:54:28 -0400
+Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2159.outbound.protection.outlook.com [40.92.63.159])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C935A4;
+        Sun,  8 Oct 2023 07:54:27 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hcPenzeoMVj3NWwKD1fZPwzFKRph1JZMs+VeDteEKOU8RFEcq4Kf+G7W6+OSNTC+oYUWzSPs6tU98ObLY7fpYqEB32HS5MFSlWUOrZwdB6aDuqyGSheLK6Mw9E7G6mlbxGeQQ1YvBa3Nf25wVg2o2OLr/FsWm0q6+3NwintCdxwdyV7n9PGcFtFdIPjEn3LG06FJUPynRM7rcAtdOyzag/PiL13sD4osXi+vc44uYcMWaw4mQwhRR7cdAwrbvDBGGKi8JSxBIH5gFweuxI3v5z2x9jRXHSuI7lsGGI/UhM0nnQMOYYEyRFBeZxhK92tAh8sT/j8cwcOY4UvttxiiIg==
+ b=WMmJa60OL51BurQg+847fy5d+UwpqF8hHYXORAKjergNrx9iIH+btJ3YEp964hBfk+El3hpE6gD66QDs1ESHRlZ7MYomIoc6dOBY+aIqWJ/Z9+kzx/ogR10w1aW2asghTwhShggwIELA4DtE8BlMf4ImbFEHilOhx/214hR2+7EqrHQ+rP/LoSKcsrquh8jQ5E36JBVi++aDkOaJ424L6ICU7cPojB7M6Zv11xXOOehZudETj/TClqYp+XehiqHEcx6duz1lFHmdruVPXEX2S68+8DMxHuYwilvO2LbyyNJunE487Tzw9TqWzskuklF70iAL1fH+SLtUQeBDBdbI2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4CxXtiQ9USb3dDRkpn0l1+Exe6nY1VWP5IqNPZ/uctk=;
- b=AIJYr3qWjzF1xcgbrXosLf0wgDHyuUF9waj1jZcKAp3ug3mbwLD0J1v07PKkcWjWfdH4cnu/3Jy7TBWSuFODMiD2BAwjPgqs+WfQFbptkfzg8Syr09JN7CQnAGfl9DOa7PywSt8Y+DF+u1mc+5tSPOY0YV639P0CRxXY5TtpHuOKNIvLT1kKEYxadDzApj/GemhNjUcofI09yyZdmiqq4u8wPlH8VYQ8WRFK7OKqQbChU8HDlKDe5U6X/oqL51sAu48j7PsPEFbNQYS3Xa+hYUMU69EeruPoFVvebhoXoS7vbOD8L5aG/c4Wz7IIWuinEdvV4Vqw8TN9oRGLmVibSg==
+ bh=V4dan7kHVeyvxdy/3lD+tO9lH46m373g697XhVl5n5o=;
+ b=CvF8ss5hxHSZ2RFGh5rCoBTg3lL9UnWhZsnN6Hs3Zj+aGGDzTaDxX957O8SxkqcTwiLQmCmWyu+ZrOKJW/1Yd02/Z0t2CdLI3H7ii/LZjos14lDGGnn2VbrqXirx5SiHQLJ1ldSEP5/pwcaxjCIeHP5N9G/mXCD+7XDeQX2ZqBL8Rjt9r56NP9lF5d3c37ny/pNu8uCPKCxh4TaoooIQKNZxs70ZZtNCqtq9msO8cWguWpCpSQgFHHHEhyaN+r/h89TsiTI/nIqjKNTzH3pBd0dTvU/J/K7nnRy0GBa96hsDv7RnbGK8IZkwDCrLC18s0VZpv8ffh++ombsO/cKYAg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4CxXtiQ9USb3dDRkpn0l1+Exe6nY1VWP5IqNPZ/uctk=;
- b=BxxLcwRr7Brk6iKa9EjdbueLfhB//Q8NlEiihSA9vVZOP0R7+BOQY6/wYQOBtpdFPTnjgUGMjCFRPlwS5SxLeoiiWChMaV3MuJBR4OVjYbUK52hSMjOhG4Cc2WURTgGbOtSWCR5GFjR7zW/Msz8SQtWJR1s2lkSHXORsq33/zdXu5wgCW7nbMkOMYbHhQbu0anR03B7Gy/zznE1KcDsDAcCX88gXTqp1emlnZ7epigy0F1TVcsArou7ym1MMJxBGmXEFzCL+RP5WFtbBHqAyXPEC4jTvlmQ/EbZDFkNwRUOrOzh0WZe5WYi6/BJLoiN/uhxl6UReaNdHT6Frt+LIjA==
+ bh=V4dan7kHVeyvxdy/3lD+tO9lH46m373g697XhVl5n5o=;
+ b=rStEOiy+g2M3KYn0YHg6AG7GWqNO1I50nkUH5LbNIrlFbiglzFZOnswMfP9vy3NJzQC7o8oCfm/vZjSuI66fovGjn7h4rpNnwdd4evx+rAhmZCURhMH2sJzolZmFTN0t18Qfal/2Dup5BaJZGeQrtcT7kJHF4D5hzndObqU5erkvmktfdGufMWgIpEcOfm+sOHAEWH7jtUaGU9lDjuuXoa0n+oJRJgSvxv/V90skvyjBBCCdC6gKb6OgzI93zu69bFWjKN5VBlhtDODdaTyEjozKPY/G38eLmZeWE8tQqu7y46zyVmV0A9VUc7NHP0XgxLSWEHMQoiYtY+DIpPZX5A==
 Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
  SY4P282MB1371.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:a2::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6813.21; Sun, 8 Oct 2023 14:53:03 +0000
+ 15.20.6813.21; Sun, 8 Oct 2023 14:54:20 +0000
 Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
  ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
  ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Sun, 8 Oct 2023
- 14:53:03 +0000
+ 14:54:20 +0000
 From:   Tianyi Liu <i.pear@outlook.com>
 To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         mingo@redhat.com, acme@kernel.org
@@ -45,53 +45,54 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         alexander.shishkin@linux.intel.com, jolsa@kernel.org,
         namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
         Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling guest callchains
-Date:   Sun,  8 Oct 2023 22:52:20 +0800
-Message-ID: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+Subject: [PATCH v2 2/5] perf kvm: Introduce guest interfaces for sampling callchains
+Date:   Sun,  8 Oct 2023 22:53:59 +0800
+Message-ID: <SY4P282MB10842B9353422CD2C86DCB929DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 References: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN:  [dT35Yg0Ztuvx/B/C13xQirvyaWVIvY1Jsoj0E78mW46eB3Mbm3wgrw==]
-X-ClientProxiedBy: SGAP274CA0024.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::36)
- To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231008145220.7220-1-i.pear@outlook.com>
+X-TMN:  [iekiAmTYnBBVvcmUmOfpwm9LbawksJQ1ZghS3+UOfjPumANR7m9DTQ==]
+X-ClientProxiedBy: PS2PR02CA0047.apcprd02.prod.outlook.com
+ (2603:1096:300:59::35) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20231008145359.7269-1-i.pear@outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SY4P282MB1371:EE_
-X-MS-Office365-Filtering-Correlation-Id: b93ee731-1a71-405c-4f7c-08dbc80e459a
+X-MS-Office365-Filtering-Correlation-Id: 57133fc6-dd08-4e97-d9d1-08dbc80e738b
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aGsZAKOkUwNp2fXgX9x9kENhiCrK6+zipDPILE6muw/KvTn1Lny2mgsh9Wd/U0coAImxUPPcpENoYHlc+eMcWzLX0mZGoPe95/rNrg/MSe0Bn8JKxfQoFZ0NzuTP6McF1SncJkyYYodDnb3sRrIkSCj8iQaFXbAG7UU2TcCcTTvb7+a1yd2FyCpgKofvEWpnFWBORZhgZw/fe+UpMvhgBBNcLpKfKqmXc2l0QgtlI7pA6/Z4DJEbxagaQbe/vbCszzgprMFZJKE4HpXqvOuO4tVXxZmtI4IN1ACUeK+9Rw1QpPQWozXgBe4nRWBcJsieJoLxLXdjgl0YPJ+15awtbNladcU3eiK2+9jGWG9qR5Io/vdNemyq+NxtCUwmghlAOj7Kwc8puEN5K6rHVANWwJy7VtE4jwBfUSzjXoMwVCCxRnTzK3abCLOHSpr/4DzL3Jx1h5LqMcNykS94AzsUuqBwWrHV78+WGqv7G0DwALulXdAVQRGa/kasnLMKXX4aUVny84jPdYIxZx/TTXdH54lNQIdgvjq1JID0E+vIvwZc0ZWHfa5j7Abv4XdVMXn1K4tTvKRngBoC79LzoNIoF2QyisR1Mh+xAezNnQ/ALvMjsWXCOqIuFFnM0Od/4o2K
+X-Microsoft-Antispam-Message-Info: qf6odUHCy1AankStOFkVtSxY9m0Sq9VLW7IJw5hiqxXsrzkt7PL1Scln628kVsZSSXHO/iqBQQZ907wnHf2JgBr6KjcgOvxgVhK428UtgZAtuQa0b5ZdzckRixvRLR3RURwgMskQH88qIHFh11tV+V0OOhJMGcF5+UulU69Z9BliO7HkrzrCQQepOkazsylX29sfhDnrfrgvFs4rGkxMPC/qPbukOOjk9ohyaCd9r92Fb1pmLiifBz+VYvWKllwQ8az5fbLf+S0d2KqzWo6bFn5yfyPbX4LNyhXgYgiHfRYv58Ai6gIKNOpPENmInHfHiyQuGwOe7lDn/nyTdbRuH43Y3NIS5l4Q2pbQGrvtxmE/2CItK0WKTT9BTEEI2IsevjslxL+QMg2jC39zwXuo4gQhg3OnzMkQVt2RR6iKXUIT9zv87FMkQUngCINGsDGX3ec/6Td1/a4aWm40aIXeUxg179H4KbRxsBJ0ns8kacIDHQh/JMyS4w0vOwMlh4NiC6xnDQOQb3z1CyseuLWHde0ARb6TnImii5eioXXulTTGP2U57tZc0vDn+FmZJsycRyXoHbmkIQL+qkLGGblmEEVQ6w/LV+wenJ3BUqfQpdTrwQBrP6PXkE0FeMge9hpj
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4l2IwV3BplunpSkqMvgynTu/CBdmRU3be8ph6Jxf9L29TYc9c2nQdMcp2bWR?=
- =?us-ascii?Q?GTqIaCBdhA32nMiCNUqlZ8S0QwBivtxV7m1vLPgMFJ6bS5WgavG0NZy5dw08?=
- =?us-ascii?Q?0l+MdrpBLgcMS83TD9zsqfFRFp3UffCF4vkVq5FVUDAiE6Nt5hvE1DpUQZly?=
- =?us-ascii?Q?zpjUJeKcjOA9R/WpHYobCEI/snhzsgqGIukKXyHAfkEeHvYiISIY/8DC2HcG?=
- =?us-ascii?Q?vP/aHz+6qNYcRkol/ExpnCvbmZ+mo2eM48ulTKYKJvBTN8m2+g9z4EA9y2Ue?=
- =?us-ascii?Q?eQ5JO+90Mit0Bcap5UWKKreIopUTz9k9aUOyp6zyciIM1QXZbeDyNQkD7TCu?=
- =?us-ascii?Q?hKKPI2RMB5l4EJeT0R/iWQCTGS/yhXgGGCpR0fd8V1ljGcP1LwuV0aan0zZj?=
- =?us-ascii?Q?013yv/yZb9yvXYs49MAMEGqIDagkmwLPyDQ89Dgl5x8h0GjP3igm5J5GPYzH?=
- =?us-ascii?Q?HGNKrR23HJ5OJ4e+9IEfyg9Fgzr+tu1FQNIr2j2Vfnpz/AwnTS0t6ZRh1kxj?=
- =?us-ascii?Q?OWGna1J+GByUvTd6x9GvZ7ucoaDZjMcJuulQgtGFy1vX+SX1wHMZLoU5Q1Fd?=
- =?us-ascii?Q?M4UIDDgFtYiYpnieshiyiot2qFlJzZNV8+5f8IV3dLfakto77wIdIesqqLIB?=
- =?us-ascii?Q?vhGY6FQEw9mrvBj59T3jvMnSebU41WQTNCh9B2dB1fXUQ9Z9YxUCRBBLK3zK?=
- =?us-ascii?Q?w9EStrMV7WQq2u4YyXzPmzeM3UGr6f3tfJI4a/iJrPJ+mZn7jACIj4WBhflY?=
- =?us-ascii?Q?5v27n6zXgO5rHNCWB1o+V5W7pOVIBZVRfCpDMRTbyWnnt2vbjcNl1XbUpE1H?=
- =?us-ascii?Q?OmM1O2PJi3+hmPen4lkIg0x2rOfJDvZrTykc9wZRbSF/EZ5p7uhfciFrIL5e?=
- =?us-ascii?Q?SKMmnLANBdKKXM4sdjJJDvhVwi90lVljMRjeOpa8vg/f89VoqS6Qr/6pr1EQ?=
- =?us-ascii?Q?udsriEf1nkzSMXdWVa/Ms12m3S4bcU8GVJb+DGjHAR/EXtJafjAUlh2gffZN?=
- =?us-ascii?Q?Ps/IPNWrxb4FE8Hziw965Pf5UGIWB0A9xxUQCxQcMijYQlOuHLhTSFsOkIkk?=
- =?us-ascii?Q?H1KpQ5CFKs+QK6CjV+ij6vWvmKIVImPQ7ui1EJHbTMLqHEuHtdxwhypVxPwM?=
- =?us-ascii?Q?jQFvtp4SZ3wM5hOgbLvmgpCDCfbQXKbzKTEdIWYof7mBrEK01T28HQGt9dyr?=
- =?us-ascii?Q?/DrTYM1uKMxs1ZS19UtVxv2zEx0GWmsYAAN800fwPGFmYh6pw6alYX1c11ze?=
- =?us-ascii?Q?CkxMj3aMtpwZNbpJI431?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rTl+zseYA3aMpBGUHatuh9UjG5ma3O9e1XER06oDU98fC5s5nD+97kSfEGs6?=
+ =?us-ascii?Q?+tR5msYzlqKLpz/3BpD3RuvcdW2ntbbHyWPRFVJJCF4BfBj5YyA59gzHzZ9y?=
+ =?us-ascii?Q?9Po6Is5b8m1L8fTSnDVWpEcJkWGls4nSTRLj7rG1Ug4t7UP7OzkjSWAaYMwR?=
+ =?us-ascii?Q?Mx48L7rtnXQ2FsramireeQBxenv4nfuupLbMqXCJ2Vpz5Je4tLtjqu1k51vH?=
+ =?us-ascii?Q?q2i7lLyHNlJQwpSRIJsiFGIdgHSJcC8RKGVrUnIbYL4Vn42dHwQUOTCl7oI7?=
+ =?us-ascii?Q?gcKvnvdsRYGyiCCMtqmOnyRuUEJ5zWcdkOpFVg0ogM20rXMDoetQ5PnzapaP?=
+ =?us-ascii?Q?ZEZE0XK24hr100WOSQydLV0XLxyftT4KWT5nC6bkGC2YQ6nmQB8TbuhUWwf4?=
+ =?us-ascii?Q?qh7YMbbuXK5QMlPK4VjnYV44AZzIWnvcaPebNimwwx8rxgp44WSI5XZ1McNQ?=
+ =?us-ascii?Q?ByOes8YiuOIj1+PTSTdne4ECiLDv06fZUoS9xA8sgEMdMQZPxaXMr/Ws+JpV?=
+ =?us-ascii?Q?O6jvSxd1AVIQF3bjAFD61C1Or9wfVE7Dqt7CYoUukY3Ad/lo3ts0MA6LZc+2?=
+ =?us-ascii?Q?y4a53AA1nMfnPz69osfn1uqZS4WJijOstNwU8/KUiztAsYf5hcJpyJ9UIEIq?=
+ =?us-ascii?Q?3L27+G0mU5IlVcGIjyYi8dnCbR5IQcnWAFGOnKyy8CzXYoonjCr1sunnBE7m?=
+ =?us-ascii?Q?XnJ36mttjDHJiBE2q5mjeGcGNKhdsVSP+thLeW4xp97AGuCbZhXNQjWQmTr8?=
+ =?us-ascii?Q?efodif3Ee3Rzhg0IGJsh1dDEJyMrzsQl8vtDLBEERSMRld9m5Rkg0p9hilVn?=
+ =?us-ascii?Q?XXMDD+yM5oe1xZvaBNqVgxIRgDve4hNZZJ175w8heD73g6Fhczp/s/DEjG8G?=
+ =?us-ascii?Q?brUBXvTP4+SWOR6Y29P2c6BKnNqukmhjO6uP+Syo0tzooIN6VTGt81LIn7R1?=
+ =?us-ascii?Q?r55XFjA7Hob7sCRL8ncf1av1p9z5xQu2L1036Y4dyn+figMZWe3ofvi0gQKt?=
+ =?us-ascii?Q?aHVbkqRr+p2a0/b63Y1hpiYVxBU0vUT4vDSUKSIFkzRu+2lOsZcNzQfvrMeD?=
+ =?us-ascii?Q?nVAwChEkwoUptCi9nF1LX9R5R14fDAO2sZU8jbWzuGWDd2cURsyE2h5bVgvu?=
+ =?us-ascii?Q?Xhu7V6WzGeSRz9Y7j88/1loyk0gMagYOtdtrN8bmDPuvheXphxi03sOKujb+?=
+ =?us-ascii?Q?HVCMaJAEnJTMesOKhber8BpAzsAI/kKlwc8EZRre3li2eCJcAekEHx1H3cW/?=
+ =?us-ascii?Q?I+/uNRekbXb5OtAD8ggw?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b93ee731-1a71-405c-4f7c-08dbc80e459a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 57133fc6-dd08-4e97-d9d1-08dbc80e738b
 X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:53:03.7523
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:54:20.8541
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -99,108 +100,117 @@ X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-0000
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY4P282MB1371
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds three architecture specific interfaces and x86
-implementations used by `perf kvm`:
+This patch introduces two callback interfaces used between perf and KVM:
 
-- kvm_arch_vcpu_get_frame_pointer: Return the frame pointer of vcpu,
-  for x86 it's RBP, and for arm64 it's x29.
+- get_frame_pointer: Return the frame pointer of the running vm.
 
-- kvm_arch_vcpu_read_virt: Read data from a virtual address
-  of the given guest vm.
+- read_virt: Read data from a virtual address of the running vm,
+  used for reading the stack frames from the guest.
 
-- kvm_arch_vcpu_is_64bit: Return whether the vcpu is working in 64-bit
-  mode. It's used for determining the size of a stack frame.
-
-Since arm64 hasn't provided some foundational infrastructure,
-stub the arm64 implementation for now because it's a bit complex.
+This also introduces a new flag, `PERF_GUEST_64BIT`, to the `.state`
+callback interface, which indicates whether the vm is running in
+64-bit mode.
 
 Signed-off-by: Tianyi Liu <i.pear@outlook.com>
 ---
- arch/arm64/kvm/arm.c     | 17 +++++++++++++++++
- arch/x86/kvm/x86.c       | 18 ++++++++++++++++++
- include/linux/kvm_host.h |  4 ++++
- 3 files changed, 39 insertions(+)
+ include/linux/perf_event.h | 15 +++++++++++++++
+ kernel/events/core.c       | 10 ++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4866b3f7b..b57b88c58 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -571,6 +571,23 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index e85cd1c0e..d0f937a62 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -28,10 +28,13 @@
+ 
+ #define PERF_GUEST_ACTIVE	0x01
+ #define PERF_GUEST_USER	0x02
++#define PERF_GUEST_64BIT 0x04
+ 
+ struct perf_guest_info_callbacks {
+ 	unsigned int			(*state)(void);
+ 	unsigned long			(*get_ip)(void);
++	unsigned long			(*get_frame_pointer)(void);
++	bool				(*read_virt)(void *addr, void *dest, unsigned int len);
+ 	unsigned int			(*handle_intel_pt_intr)(void);
+ };
+ 
+@@ -1495,6 +1498,8 @@ extern struct perf_guest_info_callbacks __rcu *perf_guest_cbs;
+ 
+ DECLARE_STATIC_CALL(__perf_guest_state, *perf_guest_cbs->state);
+ DECLARE_STATIC_CALL(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
++DECLARE_STATIC_CALL(__perf_guest_get_frame_pointer, *perf_guest_cbs->get_frame_pointer);
++DECLARE_STATIC_CALL(__perf_guest_read_virt, *perf_guest_cbs->read_virt);
+ DECLARE_STATIC_CALL(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+ 
+ static inline unsigned int perf_guest_state(void)
+@@ -1505,6 +1510,14 @@ static inline unsigned long perf_guest_get_ip(void)
  {
- 	return *vcpu_pc(vcpu);
+ 	return static_call(__perf_guest_get_ip)();
  }
-+
-+unsigned long kvm_arch_vcpu_get_frame_pointer(struct kvm_vcpu *vcpu)
++static inline unsigned long perf_guest_get_frame_pointer(void)
 +{
-+	/* TODO: implement */
-+	return NULL;
++	return static_call(__perf_guest_get_frame_pointer)();
 +}
-+
-+bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, void *addr, void *dest, unsigned int length)
++static inline bool perf_guest_read_virt(void *addr, void *dest, unsigned int length)
 +{
-+	/* TODO: implement */
-+	return false;
++	return static_call(__perf_guest_read_virt)(addr, dest, length);
 +}
-+
-+bool kvm_arch_vcpu_is_64bit(struct kvm_vcpu *vcpu)
-+{
-+	return !vcpu_mode_is_32bit(vcpu);
-+}
- #endif
- 
- static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9f18b06bb..17dea02b7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12904,6 +12904,24 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
- 	return kvm_rip_read(vcpu);
- }
- 
-+unsigned long kvm_arch_vcpu_get_frame_pointer(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_register_read_raw(vcpu, VCPU_REGS_RBP);
-+}
-+
-+bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, void *addr, void *dest, unsigned int length)
-+{
-+	struct x86_exception e;
-+
-+	/* Return true on success */
-+	return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
-+}
-+
-+bool kvm_arch_vcpu_is_64bit(struct kvm_vcpu *vcpu)
-+{
-+	return is_64_bit_mode(vcpu);
-+}
-+
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+ static inline unsigned int perf_guest_handle_intel_pt_intr(void)
  {
- 	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index fb6c6109f..f92f1a9c8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1595,6 +1595,10 @@ static inline bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return static_call(__perf_guest_handle_intel_pt_intr)();
+@@ -1514,6 +1527,8 @@ extern void perf_unregister_guest_info_callbacks(struct perf_guest_info_callback
+ #else
+ static inline unsigned int perf_guest_state(void)		 { return 0; }
+ static inline unsigned long perf_guest_get_ip(void)		 { return 0; }
++static inline unsigned long perf_guest_get_frame_pointer(void)	{ return 0; }
++static inline bool perf_guest_read_virt(void*, void*, unsigned int)	{ return 0; }
+ static inline unsigned int perf_guest_handle_intel_pt_intr(void) { return 0; }
+ #endif /* CONFIG_GUEST_PERF_EVENTS */
  
- #ifdef CONFIG_GUEST_PERF_EVENTS
- unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu);
-+unsigned long kvm_arch_vcpu_get_frame_pointer(struct kvm_vcpu *vcpu);
-+bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, void *addr, void *dest,
-+			     unsigned int length);
-+bool kvm_arch_vcpu_is_64bit(struct kvm_vcpu *vcpu);
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 4c72a41f1..eaba00ec2 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6759,6 +6759,8 @@ struct perf_guest_info_callbacks __rcu *perf_guest_cbs;
  
- void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void));
- void kvm_unregister_perf_callbacks(void);
+ DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
+ DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
++DEFINE_STATIC_CALL_RET0(__perf_guest_get_frame_pointer, *perf_guest_cbs->get_frame_pointer);
++DEFINE_STATIC_CALL_RET0(__perf_guest_read_virt, *perf_guest_cbs->read_virt);
+ DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+ 
+ void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+@@ -6770,6 +6772,12 @@ void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+ 	static_call_update(__perf_guest_state, cbs->state);
+ 	static_call_update(__perf_guest_get_ip, cbs->get_ip);
+ 
++	if (cbs->get_frame_pointer)
++		static_call_update(__perf_guest_get_frame_pointer, cbs->get_frame_pointer);
++
++	if (cbs->read_virt)
++		static_call_update(__perf_guest_read_virt, cbs->read_virt);
++
+ 	/* Implementing ->handle_intel_pt_intr is optional. */
+ 	if (cbs->handle_intel_pt_intr)
+ 		static_call_update(__perf_guest_handle_intel_pt_intr,
+@@ -6785,6 +6793,8 @@ void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+ 	rcu_assign_pointer(perf_guest_cbs, NULL);
+ 	static_call_update(__perf_guest_state, (void *)&__static_call_return0);
+ 	static_call_update(__perf_guest_get_ip, (void *)&__static_call_return0);
++	static_call_update(__perf_guest_get_frame_pointer, (void *)&__static_call_return0);
++	static_call_update(__perf_guest_read_virt, (void *)&__static_call_return0);
+ 	static_call_update(__perf_guest_handle_intel_pt_intr,
+ 			   (void *)&__static_call_return0);
+ 	synchronize_rcu();
 -- 
 2.42.0
 
