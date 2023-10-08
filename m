@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21F0C7BCEFF
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 16:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F617BCF01
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 16:58:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344838AbjJHO5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 10:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49238 "EHLO
+        id S1344847AbjJHO6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 10:58:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234339AbjJHO5a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 10:57:30 -0400
-Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2140.outbound.protection.outlook.com [40.92.63.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F11EB6;
-        Sun,  8 Oct 2023 07:57:27 -0700 (PDT)
+        with ESMTP id S230303AbjJHO6P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 10:58:15 -0400
+Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2159.outbound.protection.outlook.com [40.92.63.159])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FD6A4;
+        Sun,  8 Oct 2023 07:58:12 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R2aHIwtqVtzsC3fIgp/rS6PKTqWp+BTjtAOOgH9G+lpZhq0W4COHrYAg2Tp1jMonhbuvguwOhKcCuNcQzkYyEVtrCAcccX5aj1sYWc4LW+m16ToJFk2BtwtuwMxQoOIA8faXO2R126DDPEGLMlITyVw+J+hudQXzhm97sXfL4i7f+uQQjH0Y0lgv+ev0sP8fkcoj3ieU7k7mjLSyRxNUUbtujfoFx4Tg+UnK51iyWawqGkvJ//5x7r2eDmZbuGzXSey3Sy8GbBPxS7PM/YdlLDhed7PYpuApU3FRAlAxcjpSt2pp9GIqF1nKXmfqHfAtXx/6CkRlLrByyoAq8DK+XQ==
+ b=nYHA7nfuRuhvLMy72MpWJ4mK3Jm0xZBoL4TvC3AZpUGkObu3MqIGpPAdNq6CRxINikHisMUbFuSjGEW38COSqRnkdr0BS1DGvEQ9QHfyr/27lCyP6i6gPKQCOluAdUv1ijgPUhEDqzJLAC9iKs1IDbr2WB3w8TnEsncomocLtFx6xqk/qr1o+fQK5rVVpDVRLH/96fyWeprLL0SJ3+tT9CwDGbCS/lUcdfEAfR/vWTU+poS2FW3bG7UUM+j+xYxfelQ8Pgdnj2uWlolyIOXOqLALv9jxTtvHsmiwl++kzpAkfHeTjwFAW3ihnqKl6P9flpSLpTT5fbWlYXEbut82pg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xaVtEI2qhZS1oaf1GD6pfFXb2t0VmkXD8ySWzedGCOg=;
- b=DD3LT+211aRgc/xu82MIVPJjxxRhS9lpm6BmYQra15ASapkmoNScC7KoPAuNFUEiRq+aXZD7fshPI+YZIloIwAZDfRmZdPZrq8Ff2N3icRtyovuhngzWEOoqg5hqInv29EcAENsefldGLE0qfNNq78VWiP6BGKdasLMEk3A4qtb9yt8RG981SzHx6/PO9N1cbPF4vFirHiWgsmMRWhVc+N0yVtCbD2gmrGDV6qwJCmVkImZXc2GMSBeiUN7QAJyWFwBeV2FRPBv0wlhRixnxNu13U7x4KXx64UoMHLv8kd8ZlJtCOrADuNh6NNAiMb4cPicdN67oHxzBc9zAiZ5Slg==
+ bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
+ b=TkGgw0cIwiupQksITQIn8jAh0E54fPLFY/XgrbEEwAiUI20Z6gsXfFk7YK+4wEdrVZL72hlU/UR232OEju1DszJGkUVQmkunHFUzz7KkntaX8a5aoUEO7zqby4cLCxW+HXdRO7Pad/Gvn0M+4ZuYe8LCLJhk+YC+Q6U6Eyaif01HL7FGbG2fsohqqdku4QU/1SLpVNOudvIvZgyIfhyZACRmNICa/tpfk7Rkgl72RDr4aJxRXNEuCWpwDQb73ydN6FaOPweVXebbg3OZCKHk+wXt0raryqspNrob9XxJxEfXA0nd/9/FmjLgXLq+Pw5NZiLUg4DDTgfLYnbGR2cpxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xaVtEI2qhZS1oaf1GD6pfFXb2t0VmkXD8ySWzedGCOg=;
- b=q8ZOJ0nG9CezlFn/JA62IxEMYlsQ89/guLRN2hzSwLUR/jJr6Y86oRdzIaPfDj4EWbOcfydyrJ4BISs8oAt8q1zB67SiHR5TmqwxauvTHavqUT3EI4RfTlWu2MLcezScZNSUQ6etumDj27h62QA7vsyT+r3H2JYilFSUgZAlCzocfUbyXj/e3ofn+EUkWk3NH06iz458294Ie3xVgz2eiqdAUhULq57amQQALw1X0AVBczK2M3pK6D01kM3BbP7XS4F+ezHUChN1k+NTS9jmwJ5hCXpJWjjl9fA4eg+b1j1XNuylTtPKjC95r5/C4CHzi3nnIP4ZMo0G2spFdfGXyA==
+ bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
+ b=FKhXYTsr2zTk/gvEePAaOzVmVfxlx3K2gXV4OWq4nlAeFmALWbAbOAA+tZ04CR1hcUeHcLj2mdGbmmqAreDA2dE+618R5jU2bbzf+QoxyJWx/66qtESsEu4rOyaKQFhwq/GXSqOHTkLpRHGQmVn4rD1N9hxla2jYhKfWdfHh2pUqVRoeydGjQnsEiQXYu2dP+RIP+P6c1wlRX5GU0442yW46ciOBVvrk1u7BRUW2swZmARqXG8E6k88WTItcfFuvjUyTkaXmxX/SSdLtB3nV3WJxiLTGxZgH0tNiWTISUgmt/o11x+nVcftwMJxEEYfgtu9MQcOdZRBR+HAMAu127Q==
 Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- SY4P282MB1371.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:a2::16) with Microsoft
+ SYYP282MB1101.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:bf::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6813.21; Sun, 8 Oct 2023 14:57:21 +0000
+ 15.20.6863.36; Sun, 8 Oct 2023 14:58:06 +0000
 Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
  ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
  ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Sun, 8 Oct 2023
- 14:57:21 +0000
+ 14:58:06 +0000
 From:   Tianyi Liu <i.pear@outlook.com>
 To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         mingo@redhat.com, acme@kernel.org
@@ -45,295 +45,137 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         alexander.shishkin@linux.intel.com, jolsa@kernel.org,
         namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
         Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v2 4/5] perf kvm: Support sampling guest callchains
-Date:   Sun,  8 Oct 2023 22:57:06 +0800
-Message-ID: <SY4P282MB108433024762F1F292D47C2A9DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+Subject: [PATCH v2 5/5] perf tools: Support PERF_CONTEXT_GUEST_* flags
+Date:   Sun,  8 Oct 2023 22:57:29 +0800
+Message-ID: <SY4P282MB108462B1895A79A8920DD6849DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 References: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN:  [mxPKa+D4OVm2IXQpeo58T38hSdmEF4oisq/ZqhpUqUk8kXqnb4yeoA==]
-X-ClientProxiedBy: SG2PR01CA0169.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::25) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-TMN:  [brT8iFehEOwCNXRw/nHup347yUJJMi8XhYPK+wacExEAGNvB18G62w==]
+X-ClientProxiedBy: SG2PR06CA0235.apcprd06.prod.outlook.com
+ (2603:1096:4:ac::19) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
  (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231008145706.7852-1-i.pear@outlook.com>
+X-Microsoft-Original-Message-ID: <20231008145729.7886-1-i.pear@outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SY4P282MB1371:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22d375be-0d9b-4a9c-5446-08dbc80edf01
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYYP282MB1101:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: S5HEydAcY269XC9TGJCQosaOfFgGHtCzYOydt41s6i3F6LHW06308AEma2GJO4qfscm3oEydZ7A7+J7RfQGV5Xv4q60kkyADqATVPggKRl3y4OVpIXAw05sH1eyeQ8Wu0245/47k4wR9+mdJ+Glyie1P8ZQ3n56TEt8IDzUdY4i562jGuELGLCnc6xyoYMD989cyuWOf13TNTpTF/M5ZoS5kYho9D1HYHOmmM7v09pHahdqdW+BQrJ/psq93wbjyNFBG8NDF1t2jW7rynGG3WvGMjOjqWkPRLmKFxZlHQBf0phPm/XGEzrg/Kp7PELB43zx9He0vFhKw9cA8p19CN4gH6+BP1fqsnlOAK/Erdyou57Aq7nh5pmmojUZSXRvcKec96rW2EBasiplQ7ZXCjZRXZYmIbvaeVzDkZSRfXIp438Z5r4mRg2NisRAgp+my3h5qt9u0GOzKxrdYj4PlhbE/GeDs9alTxbfcNBytFjIts9MaIQ7yZwIpghJKpgpz4OLiHemk8HvAZYCCgr4HSVQzPzHkPiJ5oDd54dPyKbkSCMepiSckSbAvw5qa0DAypvwVFAS2mPc9Rf5s91N4MU5x6/Frg3O2P/w8ozIsLTiU/s3zQ+dVoJAUfC6y2uQE
+X-Microsoft-Antispam-Message-Info: KHeHlcHDe59T0Nksh3RMSTCkhCHOh9vZsPg/95V2XqN0q2P2+7r29qRIwKl/SpRRUHFpxFWeQA2OWsl3JMvr98XswCt7ZZkNa0XhTUQ0576IDW9Op3WoUzC1o/mJyyyK0W/deJGGZPVKkVhCwNjrOqE3jGe6gSyG8LX2bDNDTjs0QzFexZvY5uR1Lkbm+Wsh6edF8mdkMeLkoCKC5X6ApUHQWFRB1KAr07rKdcQhVsZA8Kgahnj67XsmXCYq0BU7gTDm+AyCnG5SZtR6kxNaDTt1GGFW5xjcIu2ytfgs1OJ1vlHfHdE8pDgMpQUdsYERkTBpoJEr+I0ytXrwWQEOF3edIAvJdN7d1zfhwYxBJE6dyVgJQV7qEjE+9EZHflohxX2T59pgd3BYjKndmKiapv4okGjGKGgoCOdUoVRI/k0zerPYAyUuSwfa1z4zk4pqg/QFYVjN8YVEuSiAM2/F4UE0dc0sNQrrrP3c7d74zR8RkJAXfdzh5l5ntC6BlckEUA1z8MAob0rqQQQllxVmqMfM49i4BFAOix4tPTz/GNCWgWJsnDeOaBA1PXUaHzQlmmGyZIaA9oHGSjsW5FrZPg5jUtubzil3k5ZOXMbuZ3SJkvfFPOMe4BWGcQIE9vbG
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UCxwr112mtbwbZKYgG+RF54xsB4PtQeS4trJk0rYIx4YJL53vGetv+qrOB9b?=
- =?us-ascii?Q?SdHqyZVUe4ofdWK+EZiblOJvh4wzSY57Fj/L2cdxIp7jZqgg98b7uqiCsL5w?=
- =?us-ascii?Q?I1WiLu/nmPFUEwNC0SdOml/tikRrotX9qpHhxvqZqSypXhuwu/eniyM4G5lg?=
- =?us-ascii?Q?u7o1keCWgQQ36XQ65rtaw2I3bQo4ugGGDZjWRCJTQp354kgdMaOaU20V2Guy?=
- =?us-ascii?Q?fwmsQx9Ifs1XlKejJ0I8vJ2Az/4AfFnoWYNDdSsTD40ATgrSrMFvMGie7jsa?=
- =?us-ascii?Q?hBaeFo+3tU9pVuhZeOmP0ZqO4xYScxoMT71LlJABHUSqt5wDOG3HJcpHb23b?=
- =?us-ascii?Q?FU+70YnGEF9MN0+tlvNvL6SPgqEnBSWQdiXeWlvzMiVa/qa7qU5N82liQlMV?=
- =?us-ascii?Q?3i4yJU6EEqEeqnaZN/EsSL/ycXurKrxtBDsdRGFrtdHoLh6LkBW8eP2WddiZ?=
- =?us-ascii?Q?fKZCK2TIAsU7kKB3gNMMR8l8RJ0PNcpfq51s6bWf0coYQvhebM9GAb+JqV/O?=
- =?us-ascii?Q?FXR6VpD6I2hyv3Na+Agz0ihadT4ndhgFgQ4MfLjqhV4HxPNW/YSRLZFNCewS?=
- =?us-ascii?Q?9VDaSxiVeMWF6tYCpmxP5FAS0wlegv9fV5hNUFWi9WZSyYB/G0jewyPfdkZR?=
- =?us-ascii?Q?Y0dCPnf0w2ZJ6MhXix4ydhRIuZdbDBak1oTowqu0g3f7MverxtzMIA7e8s2p?=
- =?us-ascii?Q?x3sIr4IpnwzzwuhSweW79VKvg4WGb1Vwre/rVFkxX+NHj/Zzh1+QXX95TrBX?=
- =?us-ascii?Q?Ad182Rjt2rtjqAfg/Hvxg6drEaybd9+aFcMVW8c45+TKknMYYbv+SsoFXIO+?=
- =?us-ascii?Q?jS+ALgj3qgkc4MJ1s5M/nOOReRfsILq3g5lV8JE9ozOC0JWVSzJB21kfDIMt?=
- =?us-ascii?Q?+dZmvKU5KMKOaUw3X7fcmeidGZ+piM48VPqfaoOpOKrPD1fk3CGlDkCe2bYt?=
- =?us-ascii?Q?ICoNdHy6SVnCjh8pkkveTLAAAfc47pqBeaBUeAmgnTpgrGelooDJYeLXp8ID?=
- =?us-ascii?Q?I9QtmdpGVcXtVoE/eN9Ybbh6TqRk7JoALy3prVASWrLuDFP0pQxsU8/cXk+J?=
- =?us-ascii?Q?Sfwhnc+J1QfZ3I24E5kGbt/9yse/SxJwiibC+ZEQOYXLUKFMWmwxoGtAWiyi?=
- =?us-ascii?Q?yOx9zKDaXWEsk8F4B6kyVkRq/G+2ya7x4iFLXwxfCvspn2BQMp71aR5K8QPV?=
- =?us-ascii?Q?9lD5mvkqiJEuWhsjkKScGlqoNMK4BeYmMKAe2KyDrd8r0MX8UvWEMKnKkpGQ?=
- =?us-ascii?Q?r93zJTxHjSAq3aEX3Di2?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+73wY44Qoc4JgWLeOlFDx2MdotZXzfNBpG1vDLXXeAS77wHJ6rAV8Em7MIWp?=
+ =?us-ascii?Q?4wS4b5KEJOVr+TqtGtc/EnWLH8bxZwm2ECFoG2HC0eEFiMogpDhqWln19jDu?=
+ =?us-ascii?Q?7DCU52FlF8JD56pMvo8wj+j5XW163sn/Rex5gMh02odQ73H4z5OgQEcd1Icn?=
+ =?us-ascii?Q?RyysmTxC1JtdfBWtWWq4x9Ll+t60vEOldCa1nbBGo0GESV61Z4t1/Pa3G3JM?=
+ =?us-ascii?Q?aZ9V+A7GudImH0WLGD6EJvIkb2YtfuV0TTmQUlpy/TZEqSQxx0yOIK1bOSh0?=
+ =?us-ascii?Q?2B/YGdvfdqGg+zU5iSBVNH6y65uAjOhpdbGBpM86ItMjiX9FejVmXs2ZaENk?=
+ =?us-ascii?Q?RzkdETbvS1gja0OyRrQde6NjtWt4SHForgSk9LrJfdaEvCj8toDta6c4Y3+1?=
+ =?us-ascii?Q?8xagzTKQgVyac69M6OJNLGXa7dVkTHpGaRh429liIsTCuXxFSd4AxfFDIRbX?=
+ =?us-ascii?Q?NXnlcZeVevGsSsq+9sPmq+FvC9pLquk9iGfA28GAnMD/UyE1A2tHah+2juKb?=
+ =?us-ascii?Q?Jb+Jd38huKeBTYIJU5iiJRpjdiEDMPYkGxuedoUH+ib6xc76qzgoGIrLEeCC?=
+ =?us-ascii?Q?3Us8pXXBBDh2eOZXkRKuuiGcgE7liaK06uWaV8Uh3lGQOfQF6sqFi7f/1y7e?=
+ =?us-ascii?Q?cTALLew/HFHuEufTjA0X5DitkzNY5EugXM3DGYIhJrl67F9f4w0yy+rzctiJ?=
+ =?us-ascii?Q?lsjhR8JOrjp3YAqBlIdj0lu9YgmD0zP8UP4XUwJ8kOZ4P6tV+/SOBvos71Is?=
+ =?us-ascii?Q?Coc5BBBtp47OkJZlrTlD3eSn5BGmrUlo1iKY4uPvpBtt+taQfQqHpvGPMVGP?=
+ =?us-ascii?Q?ElPpKRnhs659Ua7G06vzhgzfA4ziHq1UIO6/dIgyDuAf4mIglFR/e5vg4Zp1?=
+ =?us-ascii?Q?MwmPtfRzaDZlEH3reuXRct0sdxvdREyDmGtprQ8YFA6xeSuvw1GuH+uL+6x7?=
+ =?us-ascii?Q?nvgNly33F8TyuzOhQXJHWYBr+u0BLnwTK3drNG2NUf8VIWEmY1t/ZfYWI4GM?=
+ =?us-ascii?Q?mQgKEhK8RpH8aQu1bC5PnPDj2cXxlfkbv4H4H8h+Y269AjDIqW4dwmeF9p/0?=
+ =?us-ascii?Q?H18ww4F7DhumaM6X6lnDZT3+sGinTM6yBftC7QT0c9opy7MCMjqOTOBjRA85?=
+ =?us-ascii?Q?9svMAQXHsL0bJa7vzN1GL38k25Cp9rDCTkRbWgcnJwCpry4uN9SLhXcryuOM?=
+ =?us-ascii?Q?X1h+vqDd9hDe5Ib1e6vpd+PN14ksHpSALXVjGLmUNrRnp3/cq1dBMb4dQD8y?=
+ =?us-ascii?Q?BYPSUKcM2EC49AWARdg7?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22d375be-0d9b-4a9c-5446-08dbc80edf01
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
 X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:57:21.1465
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:58:06.4846
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY4P282MB1371
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYYP282MB1101
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch provides support for sampling guests' callchains.
+The `perf` util currently has a incomplete implementation for the
+following event flags, that events with these flags will be dropped or
+be identified as unknown types:
 
-The signature of `get_perf_callchain` has been modified to explicitly
-specify whether it needs to sample the host or guest callchain.
-Based on the context, it will distribute the sampling request to one of
-`perf_callchain_user`, `perf_callchain_kernel`, or `perf_callchain_guest`.
+`PERF_CONTEXT_GUEST_KERNEL`
+`PERF_CONTEXT_GUEST_USER`
 
-The reason for separately implementing `perf_callchain_user` and
-`perf_callchain_kernel` is that the kernel may utilize special unwinders
-such as `ORC`. However, for the guest, we only support stackframe-based
-unwinding, so the implementation is generic and only needs to be
-separately implemented for 32-bit and 64-bit.
+This patch makes `perf script`, `perf timechart` and `perf data`
+to correctly identify these flags.
 
 Signed-off-by: Tianyi Liu <i.pear@outlook.com>
 ---
- arch/x86/events/core.c     | 56 +++++++++++++++++++++++++++++++-------
- include/linux/perf_event.h |  3 +-
- kernel/bpf/stackmap.c      |  8 +++---
- kernel/events/callchain.c  | 27 +++++++++++++++++-
- kernel/events/core.c       |  7 ++++-
- 5 files changed, 84 insertions(+), 17 deletions(-)
+ tools/perf/builtin-timechart.c      | 6 ++++++
+ tools/perf/util/data-convert-json.c | 6 ++++++
+ tools/perf/util/machine.c           | 6 ++++++
+ 3 files changed, 18 insertions(+)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 185f902e5..ea4c86175 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2758,11 +2758,6 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
- 	struct unwind_state state;
- 	unsigned long addr;
- 
--	if (perf_guest_state()) {
--		/* TODO: We don't support guest os callchain now */
--		return;
--	}
--
- 	if (perf_callchain_store(entry, regs->ip))
- 		return;
- 
-@@ -2778,6 +2773,52 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
- 	}
- }
- 
-+static inline void
-+perf_callchain_guest32(struct perf_callchain_entry_ctx *entry)
-+{
-+	struct stack_frame_ia32 frame;
-+	const struct stack_frame_ia32 *fp;
-+
-+	fp = (void *)perf_guest_get_frame_pointer();
-+	while (fp && entry->nr < entry->max_stack) {
-+		if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
-+			sizeof(frame.next_frame)))
-+			break;
-+		if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
-+			sizeof(frame.return_address)))
-+			break;
-+		perf_callchain_store(entry, frame.return_address);
-+		fp = (void *)frame.next_frame;
-+	}
-+}
-+
-+void
-+perf_callchain_guest(struct perf_callchain_entry_ctx *entry)
-+{
-+	struct stack_frame frame;
-+	const struct stack_frame *fp;
-+	unsigned int guest_state;
-+
-+	guest_state = perf_guest_state();
-+	perf_callchain_store(entry, perf_guest_get_ip());
-+
-+	if (guest_state & PERF_GUEST_64BIT) {
-+		fp = (void *)perf_guest_get_frame_pointer();
-+		while (fp && entry->nr < entry->max_stack) {
-+			if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
-+				sizeof(frame.next_frame)))
+diff --git a/tools/perf/builtin-timechart.c b/tools/perf/builtin-timechart.c
+index 19d4542ea..6a368b6a3 100644
+--- a/tools/perf/builtin-timechart.c
++++ b/tools/perf/builtin-timechart.c
+@@ -536,6 +536,12 @@ static const char *cat_backtrace(union perf_event *event,
+ 			case PERF_CONTEXT_USER:
+ 				cpumode = PERF_RECORD_MISC_USER;
+ 				break;
++			case PERF_CONTEXT_GUEST_KERNEL:
++				cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
 +				break;
-+			if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
-+				sizeof(frame.return_address)))
++			case PERF_CONTEXT_GUEST_USER:
++				cpumode = PERF_RECORD_MISC_GUEST_USER;
 +				break;
-+			perf_callchain_store(entry, frame.return_address);
-+			fp = (void *)frame.next_frame;
-+		}
-+	} else {
-+		perf_callchain_guest32(entry);
-+	}
-+}
-+
- static inline int
- valid_user_frame(const void __user *fp, unsigned long size)
- {
-@@ -2861,11 +2902,6 @@ perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs
- 	struct stack_frame frame;
- 	const struct stack_frame __user *fp;
- 
--	if (perf_guest_state()) {
--		/* TODO: We don't support guest os callchain now */
--		return;
--	}
--
- 	/*
- 	 * We don't know what to do with VM86 stacks.. ignore them for now.
- 	 */
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index d0f937a62..a2baf4856 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -1545,9 +1545,10 @@ DECLARE_PER_CPU(struct perf_callchain_entry, perf_callchain_entry);
- 
- extern void perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs);
- extern void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs);
-+extern void perf_callchain_guest(struct perf_callchain_entry_ctx *entry);
- extern struct perf_callchain_entry *
- get_perf_callchain(struct pt_regs *regs, u32 init_nr, bool kernel, bool user,
--		   u32 max_stack, bool crosstask, bool add_mark);
-+		   bool host, bool guest, u32 max_stack, bool crosstask, bool add_mark);
- extern int get_callchain_buffers(int max_stack);
- extern void put_callchain_buffers(void);
- extern struct perf_callchain_entry *get_callchain_entry(int *rctx);
-diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
-index 458bb80b1..2e88d4639 100644
---- a/kernel/bpf/stackmap.c
-+++ b/kernel/bpf/stackmap.c
-@@ -294,8 +294,8 @@ BPF_CALL_3(bpf_get_stackid, struct pt_regs *, regs, struct bpf_map *, map,
- 	if (max_depth > sysctl_perf_event_max_stack)
- 		max_depth = sysctl_perf_event_max_stack;
- 
--	trace = get_perf_callchain(regs, 0, kernel, user, max_depth,
--				   false, false);
-+	trace = get_perf_callchain(regs, 0, kernel, user, true, false,
-+				   max_depth, false, false);
- 
- 	if (unlikely(!trace))
- 		/* couldn't fetch the stack trace */
-@@ -420,8 +420,8 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
- 	else if (kernel && task)
- 		trace = get_callchain_entry_for_task(task, max_depth);
- 	else
--		trace = get_perf_callchain(regs, 0, kernel, user, max_depth,
--					   false, false);
-+		trace = get_perf_callchain(regs, 0, kernel, user, true, false,
-+					   max_depth, false, false);
- 	if (unlikely(!trace))
- 		goto err_fault;
- 
-diff --git a/kernel/events/callchain.c b/kernel/events/callchain.c
-index 1273be843..7e80729e9 100644
---- a/kernel/events/callchain.c
-+++ b/kernel/events/callchain.c
-@@ -45,6 +45,10 @@ __weak void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
- {
- }
- 
-+__weak void perf_callchain_guest(struct perf_callchain_entry_ctx *entry)
-+{
-+}
-+
- static void release_callchain_buffers_rcu(struct rcu_head *head)
- {
- 	struct callchain_cpus_entries *entries;
-@@ -178,11 +182,12 @@ put_callchain_entry(int rctx)
- 
- struct perf_callchain_entry *
- get_perf_callchain(struct pt_regs *regs, u32 init_nr, bool kernel, bool user,
--		   u32 max_stack, bool crosstask, bool add_mark)
-+		   bool host, bool guest, u32 max_stack, bool crosstask, bool add_mark)
- {
- 	struct perf_callchain_entry *entry;
- 	struct perf_callchain_entry_ctx ctx;
- 	int rctx;
-+	unsigned int guest_state;
- 
- 	entry = get_callchain_entry(&rctx);
- 	if (!entry)
-@@ -194,6 +199,26 @@ get_perf_callchain(struct pt_regs *regs, u32 init_nr, bool kernel, bool user,
- 	ctx.contexts       = 0;
- 	ctx.contexts_maxed = false;
- 
-+	guest_state = perf_guest_state();
-+	if (guest_state) {
-+		if (!guest)
-+			goto exit_put;
-+		if (user && (guest_state & PERF_GUEST_USER)) {
-+			if (add_mark)
-+				perf_callchain_store_context(&ctx, PERF_CONTEXT_GUEST_USER);
-+			perf_callchain_guest(&ctx);
-+		}
-+		if (kernel && !(guest_state & PERF_GUEST_USER)) {
-+			if (add_mark)
-+				perf_callchain_store_context(&ctx, PERF_CONTEXT_GUEST_KERNEL);
-+			perf_callchain_guest(&ctx);
-+		}
-+		goto exit_put;
-+	}
-+
-+	if (unlikely(!host))
-+		goto exit_put;
-+
- 	if (kernel && !user_mode(regs)) {
- 		if (add_mark)
- 			perf_callchain_store_context(&ctx, PERF_CONTEXT_KERNEL);
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index eaba00ec2..b3401f403 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -7559,6 +7559,8 @@ perf_callchain(struct perf_event *event, struct pt_regs *regs)
- {
- 	bool kernel = !event->attr.exclude_callchain_kernel;
- 	bool user   = !event->attr.exclude_callchain_user;
-+	bool host   = !event->attr.exclude_host;
-+	bool guest  = !event->attr.exclude_guest;
- 	/* Disallow cross-task user callchains. */
- 	bool crosstask = event->ctx->task && event->ctx->task != current;
- 	const u32 max_stack = event->attr.sample_max_stack;
-@@ -7567,7 +7569,10 @@ perf_callchain(struct perf_event *event, struct pt_regs *regs)
- 	if (!kernel && !user)
- 		return &__empty_callchain;
- 
--	callchain = get_perf_callchain(regs, 0, kernel, user,
-+	if (!host && !guest)
-+		return &__empty_callchain;
-+
-+	callchain = get_perf_callchain(regs, 0, kernel, user, host, guest,
- 				       max_stack, crosstask, true);
- 	return callchain ?: &__empty_callchain;
- }
+ 			default:
+ 				pr_debug("invalid callchain context: "
+ 					 "%"PRId64"\n", (s64) ip);
+diff --git a/tools/perf/util/data-convert-json.c b/tools/perf/util/data-convert-json.c
+index 5bb3c2ba9..62686f78d 100644
+--- a/tools/perf/util/data-convert-json.c
++++ b/tools/perf/util/data-convert-json.c
+@@ -205,6 +205,12 @@ static int process_sample_event(struct perf_tool *tool,
+ 				case PERF_CONTEXT_USER:
+ 					cpumode = PERF_RECORD_MISC_USER;
+ 					break;
++				case PERF_CONTEXT_GUEST_KERNEL:
++					cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
++					break;
++				case PERF_CONTEXT_GUEST_USER:
++					cpumode = PERF_RECORD_MISC_GUEST_USER;
++					break;
+ 				default:
+ 					pr_debug("invalid callchain context: %"
+ 							PRId64 "\n", (s64) ip);
+diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
+index 88f31b3a6..d88458c3b 100644
+--- a/tools/perf/util/machine.c
++++ b/tools/perf/util/machine.c
+@@ -2346,6 +2346,12 @@ static int add_callchain_ip(struct thread *thread,
+ 			case PERF_CONTEXT_USER:
+ 				*cpumode = PERF_RECORD_MISC_USER;
+ 				break;
++			case PERF_CONTEXT_GUEST_KERNEL:
++				*cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
++				break;
++			case PERF_CONTEXT_GUEST_USER:
++				*cpumode = PERF_RECORD_MISC_GUEST_USER;
++				break;
+ 			default:
+ 				pr_debug("invalid callchain context: "
+ 					 "%"PRId64"\n", (s64) ip);
 -- 
 2.42.0
 
