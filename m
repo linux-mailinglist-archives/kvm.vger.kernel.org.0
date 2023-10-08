@@ -2,65 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C0A7BCBC6
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 04:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC647BCBC9
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 04:59:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344300AbjJHCx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Oct 2023 22:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33014 "EHLO
+        id S1344326AbjJHC7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Oct 2023 22:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbjJHCx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Oct 2023 22:53:56 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59260BA;
-        Sat,  7 Oct 2023 19:53:55 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c60778a3bfso28726575ad.1;
-        Sat, 07 Oct 2023 19:53:55 -0700 (PDT)
+        with ESMTP id S229793AbjJHC7M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Oct 2023 22:59:12 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F8EBC;
+        Sat,  7 Oct 2023 19:59:10 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50433d8385cso4576979e87.0;
+        Sat, 07 Oct 2023 19:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696733635; x=1697338435; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IOZ0izDUQq2XHlRLxr0WYfVNec458EhRnc7Qad7kB7k=;
-        b=iz7EmdzHnd68e9J+fcME7K7K+K+YsC2uvbJgIc1mAhfX9yanpjDGiX65FR9IERnQPt
-         kmcehoiMKubOOSpmJh2UDjpSsbDL4HCQJFBtLPN2q4g2iBkLyjVF4DC8G4sXBavnCHoT
-         rVc+KXj7kZ6VBHuWk+5aIATudfNjfuR1uOhAs6fjpnfmjx0/cW5n7KEQg9tDsmIOVlPm
-         q5xlFOmT9KAdgRLLH+GykcMCulSyPyRCmwx2U7PrXbKfN+ENc2K+lSIyC20jj6jRLO3w
-         k8sUE+zwVZ4rYyucs5/fSo6vkvupzsJaRhhKtvgg1PGizUuD0kvRfd5128tHPMOqkUUx
-         rQNg==
+        d=gmail.com; s=20230601; t=1696733949; x=1697338749; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScEsw5kRuBSyCrQaTmCBYUka5dQTvwb6RwilZml22rc=;
+        b=hVVbDEWLLxEn0JCbIiru9h3H94b7ftOGKPB4SA/lFZcxADytR2YlVdOwCs5qRQ+qHS
+         LLHHf6XKzMeHIxuW35mielGI2OzqBYirS3nIZvTkrnnFia5gMxG+xxSV/5PvCMARl6N5
+         IGegdjwnd1Q2oQ0J8D1tbwH/QsALrSoFU4YQ/jOAUFgdM+pcgEm2IuTkmIMKNjSAWqDn
+         TYd3l8eOHaD5UKxBgaOHDqUeolzjonvbfl7cA6UshfULvZOZ5SE4OXKBAiGgypRmbJVo
+         khyfus8VKzusezhY9lctlRu7VsJXEURO1nfPi4NtTAxxdqv8B/8i50IIM751mUyVRJ2L
+         1rIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696733635; x=1697338435;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IOZ0izDUQq2XHlRLxr0WYfVNec458EhRnc7Qad7kB7k=;
-        b=R9eVaTDiTaPumYs8+GZFdKl3xg4Ybqg7pOxiJn5UrZuTsF94yvQXOw7LQG9KY8o/k5
-         BWaKrfEAa2IBuM15Cq4xXt2RiNW5JW22g+bTmTxAzchVklpdpY6xDPQQZCXWOki3SMIY
-         A1L5Bvst7vHoLA5q6jp9NBvPPbjRgh+fxwAVqv5EIJQ8Ub/+ipxH0LUg4lGZoeJ9jNyO
-         GvwQZTpOqdU9Vf3WlmT9DHoxGR15DtxjfGi0ZtgOVIo6lBMvY/5Ze0vJ+1VT9+AHweOj
-         6PEGzVaalJf/HUd/DY65boWOCsRUsFRk7+wj4F1qRt12jAcR1Gj4ReDk1K947QEpyZVL
-         egIg==
-X-Gm-Message-State: AOJu0Yz/E/ITsbzKaWoGh0yjMOlNDghKozPkOp7IjtXDDyuOIBekhEdh
-        TsHg0m/feGwpx9QEwoVZuTU=
-X-Google-Smtp-Source: AGHT+IFqHllGcgY99+doWW3ny+cZRDsD+x6Xv4s28BgC/qLCdFiulZopC/PLDJ5DS2IcPw4qwYpDnw==
-X-Received: by 2002:a17:903:2791:b0:1c6:c8d:6b4b with SMTP id jw17-20020a170903279100b001c60c8d6b4bmr10603527plb.59.1696733634655;
-        Sat, 07 Oct 2023 19:53:54 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ix21-20020a170902f81500b001c877f27d1fsm6628090plb.11.2023.10.07.19.53.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 19:53:53 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v7] KVM: x86/tsc: Don't sync user-written TSC against startup values
-Date:   Sun,  8 Oct 2023 10:53:35 +0800
-Message-ID: <20231008025335.7419-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.42.0
+        d=1e100.net; s=20230601; t=1696733949; x=1697338749;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ScEsw5kRuBSyCrQaTmCBYUka5dQTvwb6RwilZml22rc=;
+        b=MnZvIkjwONI0yUy4cIGOzv92xwv0zof9A3bZLnTtfXJr0O0PB1G89opAm0MS870OOH
+         wTI5UkUCpJienes0sRzj2Aqgl5lsDwY+YKzoBkLqoLtCOSPI/ek3Ceb8OgDpX9JQBB5z
+         PorDqQH9lUkcoNUHSZ60lMou7/R83Vb09k42Ay14iNdiEVe9c01d60W3ZWiFCkMy9l76
+         Dp6gUJqHleK4SlWODHmizb4tQS3dQfwKU25Re/JG77oTn5SkMZDExW7IG1JtYBfYQVYd
+         fOp+HYidOvyLcAE6njqG3CuZryTYoop48B5632Z20AOe7n/BayXaYfDvZhsUaxaB+q6D
+         WdnQ==
+X-Gm-Message-State: AOJu0Yyzf44wFoMr3WtG9fO4bMW6/QidFLD8tUDMMJ0vRQMsj8MefL+r
+        4QNhHX7tg4yrpJz4ueZHQOh39XZTwrJbegd3GKE=
+X-Google-Smtp-Source: AGHT+IEpb2yeFTzMhQ8mODQ9bJzzgKP4xcGT3Fdr1mnHynSEwgLk6lyxwCFHJcwsd6qGQGzx5r8I8XmeCKBxhv85QXI=
+X-Received: by 2002:a05:6512:1154:b0:501:bd43:3b9c with SMTP id
+ m20-20020a056512115400b00501bd433b9cmr11192604lfg.23.1696733948681; Sat, 07
+ Oct 2023 19:59:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1694421911.git.haibo1.xu@intel.com> <cda6cc71c9bdde87fe87f6c2dec4f03ca249dd62.1694421911.git.haibo1.xu@intel.com>
+ <20231003-d44206f71d0b22e539833697@orel>
+In-Reply-To: <20231003-d44206f71d0b22e539833697@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Sun, 8 Oct 2023 10:58:57 +0800
+Message-ID: <CAJve8o=Q74U0Z3PayrzY7heNc0qeTw5VYS+tdkpm=aJdefQEbQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/9] KVM: selftests: Unify the makefile rule for split targets
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -71,164 +91,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Tue, Oct 3, 2023 at 6:28=E2=80=AFPM Andrew Jones <ajones@ventanamicro.co=
+m> wrote:
+>
+> On Thu, Sep 14, 2023 at 09:36:56AM +0800, Haibo Xu wrote:
+> > A separate makefile rule was used for split targets which was added
+> > in patch(KVM: arm64: selftests: Split get-reg-list test code). This
+> > could be avoided by minor changes to the recipes of current rule.
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile | 6 ++----
+> >  1 file changed, 2 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index a3bb36fb3cfc..7972269e8c5f 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -249,13 +249,10 @@ TEST_DEP_FILES +=3D $(patsubst %.o, %.d, $(SPLIT_=
+TESTS_OBJS))
+> >  -include $(TEST_DEP_FILES)
+> >
+> >  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> > -     $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM=
+_OBJS) $(LDLIBS) -o $@
+> > +     $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS=
+) -o $@
+> >  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+> >       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> >
+> > -$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+> > -     $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS=
+) -o $@
+> > -
+> >  EXTRA_CLEAN +=3D $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SP=
+LIT_TESTS_OBJS) cscope.*
+> >
+> >  x :=3D $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ)))=
+)
+> > @@ -274,6 +271,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+> >  x :=3D $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+> >  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+> >  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+> > +$(SPLIT_TESTS_TARGETS): $(OUTPUT)/%: $(ARCH_DIR)/%.o
+> >
+> >  cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) incl=
+ude lib ..
+> >  cscope:
+> > --
+> > 2.34.1
+> >
+>
+> I just noticed that with and without this patch we're building the
+> arch-specific part in tools/testing/selftests/kvm/riscv even when we have
+> an $(OUTPUT) directory (e.g. O=3Dbuild). Those build artifacts should be =
+in
+> build/kselftest/kvm/riscv instead.
+>
 
-The legacy API for setting the TSC is fundamentally broken, and only
-allows userspace to set a TSC "now", without any way to account for
-time lost to preemption between the calculation of the value, and the
-kernel eventually handling the ioctl.
+Thanks for pointing it out. I will have a look in next week!
 
-To work around this we have had a hack which, if a TSC is set with a
-value which is within a second's worth of a previous vCPU, assumes that
-userspace actually intended them to be in sync and adjusts the newly-
-written TSC value accordingly.
-
-Thus, when a VMM restores a guest after suspend or migration using the
-legacy API, the TSCs aren't necessarily *right*, but at least they're
-in sync.
-
-This trick falls down when restoring a guest which genuinely has been
-running for less time than the 1 second of imprecision which we allow
-for in the legacy API. On *creation* the first vCPU starts its TSC
-counting from zero, and the subsequent vCPUs synchronize to that. But
-then when the VMM tries to set the intended TSC value, because that's
-within a second of what the last TSC synced to, KVM just adjusts it
-to match that.
-
-But we can pile further hacks onto our existing hackish ABI, and
-declare that the *first* value written by userspace (on any vCPU)
-should not be subject to this 'correction' to make it sync up with
-values that only come from the kernel's default vCPU creation.
-
-To that end: Add a flag in kvm->arch.user_set_tsc, protected by
-kvm->arch.tsc_write_lock, to record that a TSC for at least one vCPU in
-this KVM *has* been set by userspace. Make the 1-second slop hack only
-trigger if that flag is already set.
-
-Note that userspace can explicitly request a *synchronization* of the
-TSC by writing zero. For the purpose of this patch, this counts as
-"setting" the TSC. If userspace then subsequently writes an explicit
-non-zero value which happens to be within 1 second of the previous
-value, it will be 'corrected'. For that case, this preserves the prior
-behaviour of KVM (which always applied the 1-second 'correction'
-regardless of user vs. kernel).
-
-Reported-by: Yong He <alexyonghe@tencent.com>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217423
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Original-by: Oliver Upton <oliver.upton@linux.dev>
-Original-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
-Tested-by: Yong He <alexyonghe@tencent.com>
----
-V6 -> V7 Changelog:
-- Refine commit message and comments to make more sense; (David & Sean)
-- A @user_value of '0' would still force synchronization; (Sean)
-V6: https://lore.kernel.org/kvm/20230913103729.51194-1-likexu@tencent.com/
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              | 34 +++++++++++++++++++++++----------
- 2 files changed, 25 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 41558d13a9a6..7c228ae05df0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1334,6 +1334,7 @@ struct kvm_arch {
- 	int nr_vcpus_matched_tsc;
- 
- 	u32 default_tsc_khz;
-+	bool user_set_tsc;
- 
- 	seqcount_raw_spinlock_t pvclock_sc;
- 	bool use_master_clock;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fdb2b0e61c43..776506a77e1b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2709,8 +2709,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
- 	kvm_track_tsc_matching(vcpu);
- }
- 
--static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
-+static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
- {
-+	u64 data = user_value ? *user_value : 0;
- 	struct kvm *kvm = vcpu->kvm;
- 	u64 offset, ns, elapsed;
- 	unsigned long flags;
-@@ -2725,25 +2726,37 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
- 	if (vcpu->arch.virtual_tsc_khz) {
- 		if (data == 0) {
- 			/*
--			 * detection of vcpu initialization -- need to sync
--			 * with other vCPUs. This particularly helps to keep
--			 * kvm_clock stable after CPU hotplug
-+			 * Force synchronization when creating a vCPU, or when
-+			 * userspace explicitly writes a zero value.
- 			 */
- 			synchronizing = true;
--		} else {
-+		} else if (kvm->arch.user_set_tsc) {
- 			u64 tsc_exp = kvm->arch.last_tsc_write +
- 						nsec_to_cycles(vcpu, elapsed);
- 			u64 tsc_hz = vcpu->arch.virtual_tsc_khz * 1000LL;
- 			/*
--			 * Special case: TSC write with a small delta (1 second)
--			 * of virtual cycle time against real time is
--			 * interpreted as an attempt to synchronize the CPU.
-+			 * Here lies UAPI baggage: when a user-initiated TSC write has
-+			 * a small delta (1 second) of virtual cycle time against the
-+			 * previously set vCPU, we assume that they were intended to be
-+			 * in sync and the delta was only due to the racy nature of the
-+			 * legacy API.
-+			 *
-+			 * This trick falls down when restoring a guest which genuinely
-+			 * has been running for less time than the 1 second of imprecision
-+			 * which we allow for in the legacy API. In this case, the first
-+			 * value written by userspace (on any vCPU) should not be subject
-+			 * to this 'correction' to make it sync up with values that only
-+			 * come from the kernel's default vCPU creation. Make the 1-second
-+			 * slop hack only trigger if the user_set_tsc flag is already set.
- 			 */
- 			synchronizing = data < tsc_exp + tsc_hz &&
- 					data + tsc_hz > tsc_exp;
- 		}
- 	}
- 
-+	if (user_value)
-+		kvm->arch.user_set_tsc = true;
-+
- 	/*
- 	 * For a reliable TSC, we can match TSC offsets, and for an unstable
- 	 * TSC, we add elapsed time in this computation.  We could let the
-@@ -3869,7 +3882,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_TSC:
- 		if (msr_info->host_initiated) {
--			kvm_synchronize_tsc(vcpu, data);
-+			kvm_synchronize_tsc(vcpu, &data);
- 		} else {
- 			u64 adj = kvm_compute_l1_tsc_offset(vcpu, data) - vcpu->arch.l1_tsc_offset;
- 			adjust_tsc_offset_guest(vcpu, adj);
-@@ -5639,6 +5652,7 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
- 		tsc = kvm_scale_tsc(rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
- 		ns = get_kvmclock_base_ns();
- 
-+		kvm->arch.user_set_tsc = true;
- 		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
- 		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
- 
-@@ -12073,7 +12087,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 	if (mutex_lock_killable(&vcpu->mutex))
- 		return;
- 	vcpu_load(vcpu);
--	kvm_synchronize_tsc(vcpu, 0);
-+	kvm_synchronize_tsc(vcpu, NULL);
- 	vcpu_put(vcpu);
- 
- 	/* poll control enabled by default */
-
-base-commit: 86701e115030e020a052216baa942e8547e0b487
--- 
-2.42.0
-
+> Thanks,
+> drew
