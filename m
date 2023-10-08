@@ -2,61 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8799C7BCD8F
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 11:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6EBB7BCDBA
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 12:04:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344568AbjJHJhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 05:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39800 "EHLO
+        id S1344595AbjJHKEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 06:04:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbjJHJht (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 05:37:49 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21144B6;
-        Sun,  8 Oct 2023 02:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696757867; x=1728293867;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pZl858y3jcWEECXn8DCK3d9ymq7qvurpMSIhAHEG+Ws=;
-  b=Hul6q5fIpFVoCdtSOGj6LhsGsY027gVvz5kgWWDI1z45uRBaRhw6aAGa
-   Lr9EADwAFweZfvqIt91+7NvhJFGo8a2fqRIdMn0yB8MXZ31NOQejg/nKQ
-   pG8xqlSIsvwR168xEPJM8U3xwxhwWv7hfUSZ/Gvih7paL/9iaYDmmahti
-   Ua2qDLLZl+upToNWKzwKuv4Q1TScfCqRK8Q/3Pqi43oRiIea7p5b/3zIh
-   Dn8vPejBuoLW5MzjSR5lawsGky6ZInQOWMn5SXOzNT7R1V1QNOv7Lb7Ex
-   oZ4USezCUx2uX0ieBHU4UG9P/9WjFCRiG95gSTY6Wjojrk9n1OX5F3Far
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10856"; a="2591576"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="2591576"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 02:37:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10856"; a="823023975"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="823023975"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.93.2.44]) ([10.93.2.44])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 02:37:44 -0700
-Message-ID: <46b73aa3-4776-8d95-b3f4-c2ddf4f0696c@linux.intel.com>
-Date:   Sun, 8 Oct 2023 17:37:42 +0800
+        with ESMTP id S230412AbjJHKEq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 06:04:46 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538DBB6;
+        Sun,  8 Oct 2023 03:04:41 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-69101022969so3224747b3a.3;
+        Sun, 08 Oct 2023 03:04:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696759481; x=1697364281; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xIhkUz9q8zzhIbVUqPN76xFOBMPbkwp5QCawaSSPdnM=;
+        b=Z7P1ZN3W6DFUN2upBkSrXW71iDrimOU+fYqipUAq+pQ/ZpnV8y/+jGbejQHoC2iIxy
+         4BelL81jcjIzkXSgqs8ZVLsFW+yQ3ajbutNXqbBVl3A+w2DHV0l7V08+qlIq0nbWF/aZ
+         LYanqjWx8qr07j2pzLi5q+3ArVHGsQ7IyTM5vhXaw7A8VE4jUYgzvhg7VhtYqIMfIK1G
+         WYBCieZbFgkWbDbn5sSDKejOiuHYjl7tgZZUKdV93FwMa5qAygH6gQ4L80GBGuQtRn1d
+         b9NQclR2VOA5kLWhTPxkxSnVydBgY03AMs+0LYnxphiLUq5Gvrh8FXrOEsjTDX48IR4E
+         /zDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696759481; x=1697364281;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xIhkUz9q8zzhIbVUqPN76xFOBMPbkwp5QCawaSSPdnM=;
+        b=gvGtmLySfiY6JjbmFocm8E/EINiSjvQDdJ60PY5UHeZX6B28HspxkyIBdoIwu46hhI
+         fPWpApvoN5MI+YAsEZdyJU/V628j64I1t6qh6B+uhCiupa0pkwmx6t5yeD+3HVoYT9eH
+         M8cpIFXtkjmg3d+ueG8n0gkH752PQIAlXYLcIZ0YmXaDm2o7ypGwObn4ZM/bHAqMa24F
+         ft/AZdO7qbwjjudCrFwd9EG0pT2JF/1HB05PvoQIbVM/rks+AGJ+e6wdEH0LxOrVChh3
+         3wduAT/Zclp0jbWCzV9hyqgb2o/yTt9soEDCl8W7yENkQPxCf+G2HQKeJsegOzsKv4Mc
+         Db1g==
+X-Gm-Message-State: AOJu0Yyq58MiT84SKGFCyfvMiIrovtwWuXWl20RX6lgxCqCpcQW754l6
+        ENu+O7HXVkd+CPmuAusJ30A=
+X-Google-Smtp-Source: AGHT+IEYr65hoJ/ii5X3srhLclDzVhqNmnkpWRJVUOQb/j0vk0xMn5Ed610TTy2GLDpCBFbIzVek1g==
+X-Received: by 2002:a05:6a20:6a1a:b0:154:fb34:5f09 with SMTP id p26-20020a056a206a1a00b00154fb345f09mr15453017pzk.15.1696759480632;
+        Sun, 08 Oct 2023 03:04:40 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id e9-20020aa78249000000b00690f622d3cdsm4265817pfn.126.2023.10.08.03.04.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Oct 2023 03:04:39 -0700 (PDT)
+Message-ID: <c69a1eb1-e07a-8270-ca63-54949ded433d@gmail.com>
+Date:   Sun, 8 Oct 2023 18:04:28 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v11 00/16] LAM and LASS KVM Enabling
-To:     seanjc@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        David.Laight@ACULAB.COM, robert.hu@linux.intel.com,
-        guang.zeng@intel.com
-References: <20230913124227.12574-1-binbin.wu@linux.intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230913124227.12574-1-binbin.wu@linux.intel.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
+ event
+To:     Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        David Dunn <daviddunn@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com> <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net>
+ <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+ <ZRwx7gcY7x1x3a5y@google.com>
+ <20231004112152.GA5947@noisy.programming.kicks-ass.net>
+ <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+ <ZR3eNtP5IVAHeFNC@google.com> <ZR3hx9s1yJBR0WRJ@google.com>
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZR3hx9s1yJBR0WRJ@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,173 +104,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+Hi all,
 
-Does this version of LAM patch set have the chance to be pulled for 6.7?
+On 5/10/2023 6:05 am, Sean Christopherson wrote:
+> So I'll add a self-NAK to the idea of completely disabling the host PMU, I think
+> that would burn us quite badly at some point.
 
+I seem to have missed a party, so allow me to add a few more comments
+to better facilitate future discussions in this direction:
 
-On 9/13/2023 8:42 PM, Binbin Wu wrote:
-> This patch series includes KVM enabling patches for Linear-address masking
-> (LAM) v11 and Linear Address Space Separation (LASS) v3 since the two features
-> have overlapping prep work and concepts. Sent as a single series to reduce the
-> probability of conflicts.
->
-> The patch series is organized as follows:
-> - Patch 1-4: Common prep work for both LAM and LASS.
-> - Patch 5-13: LAM part.
-> - Patch 14-16: LASS part.
->
-> Dependency:
-> - LAM has no other dependency.
-> - LASS patches depends on LASS kernel enabling patches, which are not merged yet.
->    https://lore.kernel.org/all/20230609183632.48706-1-alexander.shishkin@linux.intel.com/
->
->
-> ==== LAM v11 ====
->
-> Linear-address masking (LAM) [1], modifies the checking that is applied to
-> *64-bit* linear addresses, allowing software to use of the untranslated
-> address bits for metadata and masks the metadata bits before using them as
-> linear addresses to access memory.
->
-> When the feature is virtualized and exposed to guest, it can be used for
-> efficient address sanitizers (ASAN) implementation and for optimizations in
-> JITs and virtual machines.
->
-> The patch series brings LAM virtualization support in KVM.
->
-> Please review and consider applying.
->
-> LAM QEMU patch:
-> https://lists.gnu.org/archive/html/qemu-devel/2023-07/msg04160.html
->
-> LAM kvm-unit-tests patch:
-> https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
->
-> --- Test ---
-> 1. Add test cases in kvm-unit-test for LAM [2], including LAM_SUP and LAM_{U57,U48}.
->     For supervisor pointers, the test covers CR4 LAM_SUP bits toggle, Memory/MMIO
->     access with tagged pointer, and some special instructions (INVLPG, INVPCID,
->     INVVPID), INVVPID cases also used to cover VMX instruction VMExit path.
->     For user pointers, the test covers CR3 LAM bits toggle, Memory/MMIO access with
->     tagged pointer.
->     MMIO cases are used to trigger instruction emulation path.
->     Run the unit test with both LAM feature on/off (i.e. including negative cases).
->     Run the unit test in L1 guest with both LAM feature on/off.
-> 2. Run Kernel LAM kselftests in guest, with both EPT=Y/N.
-> 3. Launch a nested guest and run tests listed in 1 & 2.
->
-> All tests have passed on real machine supporting LAM.
->
-> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
->      Chapter Linear Address Masking (LAM)
-> [2] https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
->
-> ----------
-> Changelog
->
-> v11:
-> - A separate patch to drop non-PA bits when getting GFN for guest's PGD [Sean]
-> - Add a patch to remove kvm_vcpu_is_illegal_gpa() [Isaku]
-> - Squash CR4 LAM bit handling with the address untag for supervisor pointers. [Sean]
-> - Squash CR3 LAM bits handling with the address untag for user pointers. [Sean]
-> - Adopt KVM-governed feature framework to track "LAM enabled" as a separate
->    optimization patch, and add the reason in patch change log. [Sean, Kai]
-> - Some comment modifications/additions according to reviews [Sean]
->
-> v10:
-> https://lore.kernel.org/kvm/20230719144131.29052-1-binbin.wu@linux.intel.com/
->
->
-> ==== LASS v3 ====
->
-> Linear Address Space Separation (LASS)[1] is a new mechanism that
-> enforces the same mode-based protections as paging, i.e. SMAP/SMEP
-> but without traversing the paging structures. Because the protections
-> enforced by LASS are applied before paging, "probes" by malicious
-> software will provide no paging-based timing information.
->
-> This patch series provide a LASS KVM solution and depends on kernel
-> enabling that can be found at [2].
->
-> --- Test ---
-> 1. Test the basic function of LASS virtualization including LASS
-> enumeration and enabling in guest and nested environment.
-> 2. Run selftest with following cases:
->    - data access to user address space in supervisor mode
->    - data access to supervisor address space in user mode
->    - data access to linear address across space boundary
->    - Using KVM FEP mechanism to run test cases above
->    - VMX instruction execution with VMCS structure in user
->      address space
->    - instruction fetch from user address space in supervisor mode
->    - instruction fetch from supervisor address space in user mode
->
-> All tests have passed on real machine supporting LASS.
->
-> [1] Intel ISE spec https://cdrdv2.intel.com/v1/dl/getContent/671368
-> Chapter Linear Address Space Separation (LASS)
->
-> [2] LASS kernel patch series
-> https://lore.kernel.org/all/20230609183632.48706-1-alexander.shishkin@linux.intel.com/
->
-> ----------
-> Change log
->
-> v3:
-> 1. Refine commit message [Sean/Chao Gao]
-> 2. Enhance the implementation of LASS violation check [Sean]
-> 3. Re-organize patch as Sean's suggestion [Sean]
->
-> v2:
->     https://lore.kernel.org/all/20230719024558.8539-1-guang.zeng@intel.com/
->
->
-> Binbin Wu (10):
->    KVM: x86: Consolidate flags for __linearize()
->    KVM: x86: Use a new flag for branch targets
->    KVM: x86: Add an emulation flag for implicit system access
->    KVM: x86: Add X86EMUL_F_INVLPG and pass it in em_invlpg()
->    KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
->    KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
->    KVM: x86: Remove kvm_vcpu_is_illegal_gpa()
->    KVM: x86: Introduce get_untagged_addr() in kvm_x86_ops and call it in
->      emulator
->    KVM: x86: Untag address for vmexit handlers when LAM applicable
->    KVM: x86: Use KVM-governed feature framework to track "LAM enabled"
->
-> Robert Hoo (3):
->    KVM: x86: Virtualize LAM for supervisor pointer
->    KVM: x86: Virtualize LAM for user pointer
->    KVM: x86: Advertise and enable LAM (user and supervisor)
->
-> Zeng Guang (3):
->    KVM: emulator: Add emulation of LASS violation checks on linear
->      address
->    KVM: VMX: Virtualize LASS
->    KVM: x86: Advertise LASS CPUID to user space
->
->   arch/x86/include/asm/kvm-x86-ops.h |   4 +-
->   arch/x86/include/asm/kvm_host.h    |   8 ++-
->   arch/x86/kvm/cpuid.c               |   4 +-
->   arch/x86/kvm/cpuid.h               |  13 ++--
->   arch/x86/kvm/emulate.c             |  39 +++++++----
->   arch/x86/kvm/governed_features.h   |   1 +
->   arch/x86/kvm/kvm_emulate.h         |  13 ++++
->   arch/x86/kvm/mmu.h                 |   8 +++
->   arch/x86/kvm/mmu/mmu.c             |   2 +-
->   arch/x86/kvm/mmu/mmu_internal.h    |   1 +
->   arch/x86/kvm/mmu/paging_tmpl.h     |   2 +-
->   arch/x86/kvm/svm/nested.c          |   4 +-
->   arch/x86/kvm/vmx/nested.c          |  14 ++--
->   arch/x86/kvm/vmx/sgx.c             |   4 +-
->   arch/x86/kvm/vmx/vmx.c             | 106 ++++++++++++++++++++++++++++-
->   arch/x86/kvm/vmx/vmx.h             |   5 ++
->   arch/x86/kvm/x86.c                 |  28 +++++++-
->   arch/x86/kvm/x86.h                 |   4 ++
->   18 files changed, 226 insertions(+), 34 deletions(-)
->
->
-> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-> prerequisite-patch-id: 51db36ad7156234d05f8c4004ec6a31ef609b81a
+(1) PMU counters on TEE
 
+The SGX/SEV is already part of the upstream, but what kind of performance
+data will be obtained by sampling enclaves or sev-guest with hardware pmu
+counters on host (will the perf-report show these data missing holes or
+pure encrypted data), we don't have a clear idea nor have we established
+the right expectations. But on AMD profiling a SEV-SNP guest is supported:
+
+"Fingerprinting attack protection is also not supported in the current
+generation of these technologies. Fingerprinting attacks attempt to
+determine what code the VM is running by monitoring its access patterns,
+performance counter information, etc." (AMD SEV-SNP White Paper, 2020)
+
+(2) PMU Guest/Host Co-existence Development
+
+The introduction of pt_mode in the KVM was misleading, leading subsequent
+developers to believe that static slicing of pmu facility usage was allowed.
+
+On user scenarios, the host/perf should treat pmu resource requests from
+vCPUs with regularity (which can be unequal under the host's authority IMO)
+while allowing the host to be able to profile any software entity (including
+hypervisor and guest-code, including TEE code in debug mode). Functionality
+takes precedence over performance.
+
+The semantics of exclude_guest/host should be tied to the hw-event isolation
+settings on the hardware interfaces, not to the human-defined sw-context.
+The perf subsystem is the arbiter of pmu resource allocation on the host,
+and any attempt to change the status quo (or maintenance scope) will not
+succeed. Therefore, vPMU developers are required to be familiar with the
+implementation details of both perf and kvm, and try not to add perf APIs
+dedicated to serving KVM blindly.
+
+Getting host and guests to share limited PMU resources harmoniously is not
+particularly difficult compared to real rocket science in the kernel, so
+please don't be intimidated.
+
+(3) Performance Concern in Co-existence
+
+I wonder if it would be possible to add a knob to turn off the perf counter
+multiplexing mechanism on the host, so that in coexistence scenarios, the
+number of VM exits on the vCPU would not be increased by counter rotations
+due to timer expiration.
+
+For normal counters shared between guest and host, the number of counter
+msr switches requiring a vm-entry level will be relatively small.
+(The number of counters is growing; for LBR, it is possible to share LBR
+select values to avoid frequent switching, but of course this requires the
+implementation of a software filtering mechanism when the host/guest read
+the LBR records, and some additional PMI; for DS-based PEBS, host and guest
+PEBS buffers are automatically segregated based on linear address).
+
+There is a lot of room for optimisation here, and in real scenarios where
+triggering a large number of register switches in the host/guest PMU is
+to be expected and observed easily (accompanied by a large number of pmi
+appearances).
+
+If we are really worried about the virtualisation overhead of vPMU, then
+virtio-pmu might be an option. In this technology direction, the back-end
+pmu can add more performance events of interest to the VM (including host
+un-core and off-core events, host-side software events, etc.) In terms of
+implementation, the semantics of the MSRLIST instruction can be re-used,
+along with compatibility with the different PMU hardware interfaces on ARM
+and Risc-v, which is also very friendly to production environments based on
+its virtio nature.
+
+(4) New vPMU Feature Development
+
+We should not put KVM's current vPMU support into maintenance-only mode.
+Users want more PMU features in the guest, like AMD vIBS, Intel pmu higher
+versions, Intel topdown and Arch lbr, more on the way. The maturity of
+different features' patch sets aren't the same, but we can't ignore these
+real needs because of available time for key maintainers, apathy towards
+contributors, mindset avoidance and laziness, and preference for certain
+technology stacks. These technical challenges will attract an influx of
+open source heroes to push the technology forward, which is good in the
+long run.
+
+(5) More to think about
+
+Similar to the guest PMU feature, the debugging feature may face the same
+state. For example, what happens when you debug code inside the host and
+guest at the same time (host debugs hypevisor/guest code and guest debugs
+guest code only) ?
+
+Forgive my ignorance and offence, but we don't want to see a KVM subsystem
+controlled and driven by Google's demands.
+
+Please feel free to share comments to move forward.
+
+Thanks,
+Like Xu
