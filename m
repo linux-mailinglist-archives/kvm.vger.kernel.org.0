@@ -2,118 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C529A7BCBD1
-	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 05:04:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA0CE7BCBDA
+	for <lists+kvm@lfdr.de>; Sun,  8 Oct 2023 05:18:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234220AbjJHDD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Oct 2023 23:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41070 "EHLO
+        id S1344331AbjJHDSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Oct 2023 23:18:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234218AbjJHDDy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Oct 2023 23:03:54 -0400
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2044.outbound.protection.outlook.com [40.107.255.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18127C5;
-        Sat,  7 Oct 2023 20:03:49 -0700 (PDT)
+        with ESMTP id S234218AbjJHDSA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Oct 2023 23:18:00 -0400
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2079.outbound.protection.outlook.com [40.107.215.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EA27BF;
+        Sat,  7 Oct 2023 20:17:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gou6BxWAYaBM0Ne4+fQMfvtNBaF45iMgQg/PTeJg5Rjua62bTg4Ym7lfkLT6EOAiEb2fzsH0qNPKqFu7gE6StcCivZyKfYOf/MKTPSIMO/aDkVH/9S3GhkuQufA89aJyhKKmqiqiVCevMlUJgUUzoYjMG6INXh/cwBxXAgiDLbbknACQ1pxmaEaIwj/RrI9vSZR/9czP8BxMJ2r3mWnw4Ycc3eTnwooodobCOMjz1a0VTYTwcmqNDuqXPxunXDQQ5IsN1gM6V+inyCJILoJHnOCa18HU+BtqN3ouX8HvBnug2tbzero0Vau97Ym3q2CQ3msNtbAE41ksC4ItfB3MSQ==
+ b=OLbsNRIMq26TQYoedyoYH83d/Jl3qMB1lsgtD1qJYjxRbgn1MLAMCoNFAkIgHCfwTL2ig8wQTSRm81QhCu67PhvXkPDXr0+2nYua9hz8gf8WYHReYjLS7zsb9c/UoOIaqUXhdWescIGDpSe5BD2Z9PL2KAVm3Dt+Je/0tNGpLJhyC2qK70ItmHG/O0KH82m9kPEuBYRgSyY8mmHlCF/kcKylRxTlT8e9d2znJho2WEAeS9p0Iwibf0z3Zdd4r4klltifK+gCAonBGDxWmXVPxt7BPUiAaVUPCgNMFms2VWJ6U6DPXVj0xBjArpAqFbGve5C1OmfyoQ9bW+I/g2ZK5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LcJs31P+aC95oQM4lgXf5nX5SVirrycQMTygAjP8S1Y=;
- b=O81RD0UYIsO5SiAH96JSaTGg/RC5n1Po7yiHs861aowlDIfAsLdp/F9qqcalPfojgfD6mJ6+WqG7BMKUdoYQbKmM4wNv80AaP2XXPO4hx+Zlyk9wRvHoeVwsCe9Tzn2lOOeKPnM1LlAdhCWuAyz0mGtp8kfA1b3bNYsEZExyYvc2fsIkBVrC/SFntB3NwNqd+3B7G/lEScWnDpBw+v7/sv+0aV9z0j+QUIb/V2J/sM50a/TZnIdNlnAh7k+A8IUu84D0eek4oAV0pTYqt2z4kBROjgbmJauQRtO7vyN6Gi/7sPCbABDgvzWW/CfxchadSgnBEGLlUG1OEbZELqAV+w==
+ bh=BmAQQl8A0PCsUojiB3YSOfAuymoeUEitnUHJzywMjMY=;
+ b=im2EoKIQ8KYAGJvuRKhFnpahAsqN5d/2t0mpgyl9dLZjk3NMuJN+3/liE6K32T9t1CkImW1ejqpzuNr2VdV2ICSrIFrHVXpdoLvLX1b+M/H+LA1hVHhCSgsEWcd55a+Rg0y+GwkfrHYvYIgKuDI4x6dshVnBGMdu4Sv3yYWTtuLgmIQdDFIViYCDOa9nq2QLuykIJnWgIJx5HxNE8NOuoJ5TvZxS6fztSD6EUvQqY/eyL97+Oj/4f13W14Ih5IS4D6ZL8UzXDJaWOBAXofwNusM1lDsQQsKawKLuXq7XurwpXppqJMckmonVIdb+ILMf8qgN787iTSdICjpNB1T/Kw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
  header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LcJs31P+aC95oQM4lgXf5nX5SVirrycQMTygAjP8S1Y=;
- b=cbgLEu1uZDGZSCE+e7t0AY/5Xaiju78JWUzgLqqbCbSFq3ATu3FnZKSdHXOK/g0eHJCwaZqJF8QTfiTWIWjSBKjRvkmmBzcysDaISwOgjSCLrPqQUd84fYKZKgKe6g3TOLf6HFjS0WwXz+0mvhBXQrPCPnoEdity3mgwEWj84TPax+9reRWuneBpczBHuWpoT/VeOOFaCdc65QROEMTOOaOFX2r/dDaWm0IeWme8h6G1a4AhO+/UqJt0lWVm5zd4mPu9KnmCQ9AsYdo1OaWWOUpgeqiOic/mYX6hMytGxADvGiaLEAsFowI1/9hE02dbB6kDc/YB7ZlUgN9u4g20hg==
+ bh=BmAQQl8A0PCsUojiB3YSOfAuymoeUEitnUHJzywMjMY=;
+ b=JuT9CDWYYRv+I/4PyMezFl+iR3tTpD/dEbqRaC1UnqweBhyXJQUQir5cDzm2F/4ttlo+U+awTCG+dlCVzoSf/IrsQtO6nxLqgb3NuBdOXc9B/0mEFXWwt3gPEb4zHA+p9il6OVA5Lz70bS/DPiS853pFEW0/1mdCpiwoaonjBQxMKfDRs2GmD3AcT3rNT9pC6TmxQTruxwnV0VR6dsdJpTpZWG+jnteQ595IbzcCZQoHYRoUtzjFVKxjM1oosQbyPCiCRZ5R4J5r+9Z3+PbSpp8ZaLyW5iiiWXAiLlLTdA94Ola48/pGg6TU879jP3jAn26qt3x4+ZO4Ielm/Jp/1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
 Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
- by KL1PR0601MB4177.apcprd06.prod.outlook.com (2603:1096:820:2c::12) with
+ by TYZPR06MB6514.apcprd06.prod.outlook.com (2603:1096:400:454::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.41; Sun, 8 Oct
- 2023 03:03:43 +0000
+ 2023 03:17:54 +0000
 Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
  ([fe80::e5ee:587c:9e8e:1dbd]) by PSAPR06MB3942.apcprd06.prod.outlook.com
  ([fe80::e5ee:587c:9e8e:1dbd%4]) with mapi id 15.20.6863.032; Sun, 8 Oct 2023
- 03:03:43 +0000
-From:   Liming Wu <liming.wu@jaguarmicro.com>
-To:     Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
+ 03:17:54 +0000
+From:   liming.wu@jaguarmicro.com
+To:     "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>
-Subject: RE: [PATCH v2 1/2] tools/virtio: Add dma sync api for virtio test
-Thread-Topic: [PATCH v2 1/2] tools/virtio: Add dma sync api for virtio test
-Thread-Index: AQHZ+OtW793w5h9+jkK1diJSHXBDBLA/KdaAgAAMP7A=
-Date:   Sun, 8 Oct 2023 03:03:43 +0000
-Message-ID: <PSAPR06MB3942DE121AD46C46D8728942E1CFA@PSAPR06MB3942.apcprd06.prod.outlook.com>
-References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
- <20230926050021.717-2-liming.wu@jaguarmicro.com>
- <20230927111904-mutt-send-email-mst@kernel.org>
- <20231007065547.1028-1-liming.wu@jaguarmicro.com>
- <1696731557.4612653-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1696731557.4612653-1-xuanzhuo@linux.alibaba.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PSAPR06MB3942:EE_|KL1PR0601MB4177:EE_
-x-ms-office365-filtering-correlation-id: 462573c9-2839-4c9b-8315-08dbc7ab2e5d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: keIxB51VUH0l4IoxqTBMQablVFHiIvrI4MdPpb0LoaFP13WW2uCj9SWpOStzzebXYaqfRL3Jq51Fo3BhWPWXooIT6ldmnWjw42Q9DuQ4jm0sy9T9BkoLt7VYPO4g6OdwuFw2iM5/4AYPEohn3lOegsDktj30tKsPMR1F4wh3zfad6Q3s1s1QSsd9ZkArf1yGWnaE2UnrWKippluEVKx9q5paHukbKzNb9zKqqph6Ad9ih3or/ejGFPujUj94+ylqUSeokcbT4h175XhEVZAi74NXpo7NEjDQnGwWjo1NXVp8mbb+Clsu+oZnSM4iHFWcjlVElOvOoIlDIQAQoX10l8+jo6c9HrUeERcQ954b35M82muq0OApHJ0BaqwdAjC+QV1B3nyMWrj/f3v6tlh3PA01m9QSJ+QijCSHvzIpVusF0vt2bnNoc0nlTgJonNOj/wdS/Wwd435RX2B21FSd80vXCFgo6Xvii2ZFUBgQs1wOz+ijfiS8K/4O87RR5s2mcR+aKR0STK/TDeOXdQghhph1a0IVYwZRchGQt9NeTzkSsDwFR6f/WgTQA7xfHb/7ZrEZPSdfv9aLQkIClFg470bo9zIznE34tRFK7MDoRzLOcbV0C8wA7PZhvhSwTC4q
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(396003)(39830400003)(346002)(136003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(55016003)(83380400001)(26005)(66946007)(66476007)(66556008)(316002)(66446008)(54906003)(76116006)(6916009)(64756008)(8936002)(8676002)(4326008)(5660300002)(52536014)(41300700001)(44832011)(7696005)(6506007)(53546011)(71200400001)(9686003)(2906002)(4744005)(478600001)(33656002)(38070700005)(38100700002)(122000001)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Fm4MJEpMPBCSS3iGcwNFGYwkFF1C/Ax8GtKSstYxzre1fmiOsHS68KcGmUtE?=
- =?us-ascii?Q?wke5MDX5girHGbYqK7GJabsgGkjO4c5yjImVbZKTY5mapH+k3pSU7cRBUXBz?=
- =?us-ascii?Q?kLGM2iWyZmAv+Lpy3/zkU4alV6aHonuf9aCW9idf6qkqDd2b1JbroWY1vbtn?=
- =?us-ascii?Q?/Mon6kYtFIkcn2lxkPYot/SBjPRQwRzgmZ4Ljlye4ivlV86FnWs5YhoZZ/Aj?=
- =?us-ascii?Q?WEii1l2nkQ18WEGn6iLwC/BIBwq3Txjm57VHtBzpprjlicevMaUHV6ai6F/q?=
- =?us-ascii?Q?ZrZcRkPXraB7JGi5yTNAUIPYiYR7eoV9yyTdD8qhkoxGV8AAEBRi85cKdeWT?=
- =?us-ascii?Q?gekDix1WJEiARmYSCahjJlE4Ip8zNPwPnFGyxwHIuedttJTHRqfmH737ZxjV?=
- =?us-ascii?Q?TEIWLGQAHKZesvX9p1j02q2mlM37D/3uVAiFUZIYxebtAtH2bhKigalct6PV?=
- =?us-ascii?Q?K4v7tEJzW/rCNTKQ28d5+ezVIXO5gfNtcmXbDEeHgWO0l2VIif9s7sWSaER7?=
- =?us-ascii?Q?Mlq4UcdVJNg/HuDWUlTKxGlS4W7JC0lvb/jIbcweEvCbHzDzLud7CdgTitbD?=
- =?us-ascii?Q?YcupEBYF0rU71gCfxwghGkYsoFi6wjufjtRHhu/WSKC1W+q1uZPns9vZRZJ+?=
- =?us-ascii?Q?F/3WLyLO6MXpu86MYz4EMYNmNobbNsuCKEr+KiiEHhKJKwG0qzGQFZq7Dnyc?=
- =?us-ascii?Q?dxDXtZKS6dEFDpdOkCZe/UlPeBshuh1YrGR7vWH6qh+EUvwjGAYDjj/ASI0Y?=
- =?us-ascii?Q?8TRCqebZmLAM58uc7FIOkXOXCf3BNQui57QCPIqaJRON17t6wIAyyedSFIiV?=
- =?us-ascii?Q?aLIAi/fnAURHN9sDKb9hzkeub+1tumSn7dG9cD6mXd/0yWwfuR8L393vtEOG?=
- =?us-ascii?Q?ymjY6sPCrYZYFUbcVhmInGG7UHKHeHcypQeiyDNjGa2EpnWv/hBVos/IV3LH?=
- =?us-ascii?Q?vii2a+2FO2IIlGBuqBbENAuV8NBkcwVPGy3u7jAF+vVwclVfuR5e9P8TN+G4?=
- =?us-ascii?Q?iPLx2sG5ghsMUOsnZvPlKFsjauS6TjJU8WOL1C5P6Y5X6h2pSihCFTfyv75d?=
- =?us-ascii?Q?fpGjKYoH8eeKmt4cCV44sJpAt0mX1PDC1b4lvpriCdItW/iQtPg6E8w6D9qz?=
- =?us-ascii?Q?BmCkxrycJPTrcl0HATEopCNL0T9fAfBGdfFFWyphuzCO7pDeeYf1EvRJP9HZ?=
- =?us-ascii?Q?+jJYuNSBeUl91ddKeAl7o/BdaKXay2WG0E1K176muNdI5FaCxr7ea66VhXRW?=
- =?us-ascii?Q?Sm9AeB8znKSoHb2lC7pg14ifvJPIHP0yZC6X3g+TGOJEijvvvk3vEqc+CT52?=
- =?us-ascii?Q?GONmjeglUSRWP+bhxchrdsGFw4N+1iar6eyfbVF/NmISVae6LHTZOQdbfNpd?=
- =?us-ascii?Q?sflMgLBxIhqDs0OiVVUeEEXUDCnFVa+tybiegBVGhABNJM4rbU6Pi7GbWWC8?=
- =?us-ascii?Q?glzgKdulVKCqy3xMIVsnqxmkuHj2VfB2R4HhmnDN0EQdiTxCTQGIGi2GHR3h?=
- =?us-ascii?Q?tw/CDRTiBDsfdjm/0ZU1HULJy6FWkdIMd8QDTy+ndStjj7fzbjqTq6SCZ24A?=
- =?us-ascii?Q?DIOLOWPiEaaRSM2k9KdKm3v/k2om5KqQ6vhQ486J?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Liming Wu <liming.wu@jaguarmicro.com>
+Subject: [PATCH v2 1/2] tools/virtio: Add dma sync api for virtio test
+Date:   Sun,  8 Oct 2023 11:17:33 +0800
+Message-Id: <20231008031734.1095-1-liming.wu@jaguarmicro.com>
+X-Mailer: git-send-email 2.34.0.windows.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYAPR01CA0053.jpnprd01.prod.outlook.com
+ (2603:1096:404:2b::17) To PSAPR06MB3942.apcprd06.prod.outlook.com
+ (2603:1096:301:2b::5)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PSAPR06MB3942:EE_|TYZPR06MB6514:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b7873b4-fe76-4f89-619c-08dbc7ad2942
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BZpiVRySAxrpOELbK2TL6Q2neFcAWJTPTp32LrLD6qns+LN1XrrpQxSlmg9LR//p1GLVXbpkTIpm9TDbR+tjsJEIb77P7AYMJ4xVsr7Guw+GMCfDXH9zPKgG65DkGw8WHAHmkhJwOKP4DkL9WBFgt14TO5/abFLUkB1qga9xSSf8rwodjDNnzG4nlGtxu7xEX78ddccjpm/JE5kGuQr8IKnPxg5eHSVSfEY7ZhcLTcKpfMnYnzRczPSuRlmXTu4O+1SBWSWPPj9J67k6kH8VV+lpd0Py04HSqwM32+23TGt8EyUAAHuUXOPVxmv7YrLQGLklok2HM6dWyf9zhLfU+Z/ixGQSePO6ag2wxxpetre3+VTpCd77oq1ySRu8pZNAv8uNNxvYUScb0W7XKiGrz1OedluAArG+KeJ3ktziz96cRjzY+uvHnSVWpdyKqYz+xLPzre5V+3BA3u//N3O9vzIEe/C3WMHcRe3ITy2LSvGLIVekTI6MSvhFDl3aO9LVUE9GskuhLFSIhmUNL3JW0sWG7KetjlJQeLzQcc216uExu+/HVDt8vJKAuw8OHYnL2L4LRYwNIeWs5sl9EtvACDBSVdNetD0oIaZSqLwM/VcoVc/WycpuUdqjHdv4pQn5
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(39830400003)(396003)(346002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(478600001)(66946007)(110136005)(66476007)(66556008)(6636002)(6486002)(316002)(38350700002)(6506007)(2616005)(6666004)(38100700002)(9686003)(26005)(1076003)(107886003)(52116002)(6512007)(36756003)(41300700001)(4326008)(5660300002)(8936002)(8676002)(2906002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LOEOmlp1k57CfPJsvCNqUG9tXTKcuKiMdzS5yViuSpv34TAuxrhA1SGBdiFm?=
+ =?us-ascii?Q?b6eh66qr86kBo9CGL1Us1RUF4u2KgJYHeYi6n7B3C2Zh7rjcI5/QoZhQo6Xp?=
+ =?us-ascii?Q?VQ6PgmxHTgAnaWprotU1hwb/glOCfqwiGfXcm2n01NrmQatx9FL14OGTvf9N?=
+ =?us-ascii?Q?9Rt7qcJB6axrHk84Ump/nd5t/cjt7nyedQOxPrxJ4xDf2hNDsVVzKXkJdm9T?=
+ =?us-ascii?Q?yPa1wJFWqMv0yGPH8oCeX9184cJnc1V1dY4LtudLzpDVsdkgNLSW0lbwokCh?=
+ =?us-ascii?Q?Ozpx95LBnG37J6MuqwrfngCX9DPhTwCb2tmMhw3wgvL5ptGzS9GWivzFM/I4?=
+ =?us-ascii?Q?Unlzz0rtjViRijKShP0f+T8uKUkNMfwd8PiTgdlxwJ73pBSophmTvOL38zzR?=
+ =?us-ascii?Q?PDnUyXlOrQvxtfTBYv2OdZlZfO+zmPj+mpZMLInnNhx03a0juAmyoEYOmXuN?=
+ =?us-ascii?Q?/Q3wrceiUiBqDjfe8bokckgjez/Fw/jrQM+yoyyiTyAfHz0UYpMOPMhPrzER?=
+ =?us-ascii?Q?2anQ8dqgiMeua4A2V2trsvuhElYtgkyC/BF0PjbbQLp5d6h+B/WbYOaxPfEl?=
+ =?us-ascii?Q?XVGLowsBZF8lP3kjiK63dLx73l8aTQeoPxsQNwsmL+IucB45CxtsILDykHBN?=
+ =?us-ascii?Q?XTVyHTtpqpLMrcmIme2vdp9rjHRpWV9pmtqBMRIN7NtyccZvXmaTtIBHVs16?=
+ =?us-ascii?Q?kAswyq5/vaac0e0ZnVe5KdttdSBEAjn1LBFQEh3vZZ8HHKiNF73XfWv2sVU6?=
+ =?us-ascii?Q?K8YA6fnSYDbtkv2sSmknUJx6r4x1+boxkl1E6zZZUgw2oPy0qwoZzUIYZb27?=
+ =?us-ascii?Q?IwOXUCSUyEYbsVce9R/HeoIpZPKHQn2eA+d28zpUaqlRM8tu9m+agJp4Q4UB?=
+ =?us-ascii?Q?FsO0Mcpbn0njOJT8YfnWsXoTh8ymKMsw0ql4o0eoXSCaaOWV0TTRmiB2wiW9?=
+ =?us-ascii?Q?JyUrCfMpTYGcpRL51T3ynBP6DSbzN//md+76rs538ErG84dvawfZjKiW90ze?=
+ =?us-ascii?Q?rlYhBF05Pv31VN/47T5R/FOTUHztqhbV6rEi98P1tNW8N2OcuPSg8APEg759?=
+ =?us-ascii?Q?9gxrv00kjaJKjLP97OyZTkzRc28e6bRKI5ASTXhp1S61rROX9IPvUsYkSMQq?=
+ =?us-ascii?Q?ecmD3UhPtoQMD/qfZlWdQr+cYW3dnn3+1sAE+NNeQe8DmIX7HzhGbe1ONwM/?=
+ =?us-ascii?Q?madbnp7M8FbPiRlnuh3//jmZ8bTb70CtuY2XtLxy0FqXhY0YJ1i93p9VCX+m?=
+ =?us-ascii?Q?i067MsUTmmL1b5V7KtUbf5+MsvWGe11Q7p6DYBKk/2VzBdqvRDbMeOYKe8TY?=
+ =?us-ascii?Q?3BESrZ/0ZnaGTR365cd4QvAo7BhW6KTJ++hed/AmFTuz17pb0LoAJT/cuyoF?=
+ =?us-ascii?Q?mn4nccvGgyBeZnuJCPjFeaJlh4k/lcS/ExLzpOoWb7kFihzcV6ddtbRvSyXH?=
+ =?us-ascii?Q?wjTrX6MjkbpLfsBTT1ZXsc+uUjLAs9FklnOxTL9FpWeie3IkfVTLZhXDC7NC?=
+ =?us-ascii?Q?JWU+vbZ/UER9pgn3ZF1Nf+XLJvt9Ib6pBy/KYsw/yctn54JHv7hiwLgNf/Os?=
+ =?us-ascii?Q?WqqFw0o1JfI2wRZotRZXF/pl99QSHunC0GsCq7+8n/A6zd7DKwjU7e79eeLQ?=
+ =?us-ascii?Q?oA=3D=3D?=
 X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b7873b4-fe76-4f89-619c-08dbc7ad2942
 X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 462573c9-2839-4c9b-8315-08dbc7ab2e5d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Oct 2023 03:03:43.4138
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 03:17:54.0880
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zohhMopvtEX+z7Ssg3vKjDEgysZfW5pK5jGmLYSM7PTo1HGJdRpmfrELaAPX+6e04UDB88ew8zr8SrU5by1ddPbMDHq++cPp761DH2OPtjg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR0601MB4177
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SDvbADrDZ0nQhg2JBWOnNsJpHOJSfLvEXzteuTn6xM4sABD87aENqfRI55a1o4FFWq8Rttb//xd1l+dBDX/hEzkD2dulvVsstPCPyJJEuXA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6514
 X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -124,33 +114,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Liming Wu <liming.wu@jaguarmicro.com>
 
+Fixes: 8bd2f71054bd ("virtio_ring: introduce dma sync api for virtqueue")
+also add dma sync api for virtio test.
 
-> -----Original Message-----
-> From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Sent: Sunday, October 8, 2023 10:19 AM
-> To: Liming Wu <liming.wu@jaguarmicro.com>
-> Cc: kvm@vger.kernel.org; virtualization@lists.linux-foundation.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Liming Wu
-> <liming.wu@jaguarmicro.com>; Michael S . Tsirkin <mst@redhat.com>;
-> Jason Wang <jasowang@redhat.com>
-> Subject: Re: [PATCH v2 1/2] tools/virtio: Add dma sync api for virtio tes=
-t
->=20
-> On Sat,  7 Oct 2023 14:55:46 +0800, liming.wu@jaguarmicro.com wrote:
-> > From: Liming Wu <liming.wu@jaguarmicro.com>
-> >
-> > Fixes: 8bd2f71054bd ("virtio_ring: introduce dma sync api for
-> > virtqueue") also add dma sync api for virtio test.
-> >
-> > Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
->=20
-> You should post a new thread.
+Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+---
+ tools/virtio/linux/dma-mapping.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-OK,  Thanks.
->=20
-> Thanks.
->=20
->=20
-> > ---
-> >
+diff --git a/tools/virtio/linux/dma-mapping.h b/tools/virtio/linux/dma-mapping.h
+index 834a90bd3270..822ecaa8e4df 100644
+--- a/tools/virtio/linux/dma-mapping.h
++++ b/tools/virtio/linux/dma-mapping.h
+@@ -24,11 +24,23 @@ enum dma_data_direction {
+ #define dma_map_page(d, p, o, s, dir) (page_to_phys(p) + (o))
+ 
+ #define dma_map_single(d, p, s, dir) (virt_to_phys(p))
++#define dma_map_single_attrs(d, p, s, dir, a) (virt_to_phys(p))
+ #define dma_mapping_error(...) (0)
+ 
+ #define dma_unmap_single(d, a, s, r) do { (void)(d); (void)(a); (void)(s); (void)(r); } while (0)
+ #define dma_unmap_page(d, a, s, r) do { (void)(d); (void)(a); (void)(s); (void)(r); } while (0)
+ 
++#define sg_dma_address(sg) (0)
++#define dma_need_sync(v, a) (0)
++#define dma_unmap_single_attrs(d, a, s, r, t) do { \
++	(void)(d); (void)(a); (void)(s); (void)(r); (void)(t); \
++} while (0)
++#define dma_sync_single_range_for_cpu(d, a, o, s, r) do { \
++	(void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
++} while (0)
++#define dma_sync_single_range_for_device(d, a, o, s, r) do { \
++	(void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
++} while (0)
+ #define dma_max_mapping_size(...) SIZE_MAX
+ 
+ #endif
+-- 
+2.34.1
+
