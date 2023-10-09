@@ -2,245 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 274037BD24A
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 05:02:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 828C67BD255
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 05:20:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233613AbjJIDCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 23:02:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
+        id S1345027AbjJIDUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 23:20:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234142AbjJIDCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 23:02:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B0DAC
-        for <kvm@vger.kernel.org>; Sun,  8 Oct 2023 20:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696820506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HfPpj/NYnLhR9rt7gcQcCsZvzAr7nC8MCFto+fdVExs=;
-        b=QliwqHdK1LtPeLvAaCl6pEOjaHL9Lpmaq7D8DUDorYlx/7SIeABTHwDcKjiPLCRIKfRu7e
-        t2lc4ClQvwyjzUXEhhaTKndQoRgTWbMwNWXlKSuLekwg5raO51N212rO0NCfhTHRM+WXQW
-        eiXwdZn9aZ/oGTE81wy2nGcpjXmg5fY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-bX6M_xjQNcGcvTnIOpH3BQ-1; Sun, 08 Oct 2023 23:01:40 -0400
-X-MC-Unique: bX6M_xjQNcGcvTnIOpH3BQ-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-538c5748a50so3104018a12.3
-        for <kvm@vger.kernel.org>; Sun, 08 Oct 2023 20:01:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696820499; x=1697425299;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HfPpj/NYnLhR9rt7gcQcCsZvzAr7nC8MCFto+fdVExs=;
-        b=Krut2J42BZzk9MA76c9YNup7TOB8KN3oHMEK+OeGHFZadJbu9gAygnRYeY7o/CaIcE
-         W8lfW/oHeR+wtCKmQgsN1KkM2VVNdaHGGacFXkpnBqjzDBda2YJA1i3O8o9X1Crp7uOe
-         YOVUs+dhXVgi5RhARwsP0UfiLG/Ya+UOOhfhHREKafqxqSUDsw/AMArPIwvqRMSsovxA
-         S9EVDtIIBIqtXWS5/z2eQoqDGRSYYl8lRLSj9fYfC6jWgdIj6+/6TXN2WO2Pu7umwQQp
-         I9PsBlrjX7Y5uSnlatJGqp1EH+PMF9MIjkixX4nokwf1uHU7HwUqgFNj5Tdw/Y0uM6pv
-         COnw==
-X-Gm-Message-State: AOJu0YxR4aJng0pJp3rvOPy7jkNleXsbYEFINPg/Pf++UXwNOnafjYTm
-        4jZsaL5B2SOiJjGPFMO03KwmMIsQ3iqmHxrGlEWZNddW05mCrpL0x3WKA4scLuO7+cCnosTL5VP
-        2nZnQ9o2rw5N0FLtKBLPcDIdHw9mx
-X-Received: by 2002:aa7:da83:0:b0:533:d81b:36d5 with SMTP id q3-20020aa7da83000000b00533d81b36d5mr11984923eds.15.1696820498956;
-        Sun, 08 Oct 2023 20:01:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHg4sPgUHGxpJD5KhVuPwe4H/WIDtwx1mSl/00KPjO0l64EypHEQ5kVl/x8SOlNYipG4eXQiG5yboehI1B3TtU=
-X-Received: by 2002:aa7:da83:0:b0:533:d81b:36d5 with SMTP id
- q3-20020aa7da83000000b00533d81b36d5mr11984907eds.15.1696820498625; Sun, 08
- Oct 2023 20:01:38 -0700 (PDT)
+        with ESMTP id S232250AbjJIDUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 23:20:37 -0400
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2162.outbound.protection.outlook.com [40.92.62.162])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618BAA6;
+        Sun,  8 Oct 2023 20:20:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YxK1le7cgBP8DclGA3FYVd7NwvcAjQmQ1PXoFQ4S/H7oKay6CVZN5Vpvvlxj/lwX/YpF7xEPggEPgFbETEuFKPBb43HojwOeetRZwVrY0M1aqWmnZRkwPvm5EZFLietWUzqbrFV+X3GYyb/ym62vn1gaHLO9seYuNUQ+ixNvFKKZxheatUD51o372tz8H72uBkmKMZIlGCXPMee2r+5XP6+QA4Vc6+pAuo5Ey+AK0LoX1mOYYpe9KeUv5UdDX93VLsgKqFMhAKk2LaafJV4pmBDQaXQVWmTRVgODuDwUy9Z8M5YxHNu8q3Z9vgI0zgZJ9v4CQPeVRjijouae6NlUGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
+ b=WLLqT4eenT8Yt44K9GgyjlWEWJVOkCvPXglhKznqGnWuT8fwhDTUQ57T/5PHI68uYYxNo0hPgg6p4BadsixqXIneIpfpsXv78NadW+iCi+YsFzcwCdn18l3ZOwve97RAUDpv1Lh9VS+n7q0a9uSxFG0imJW2trGyqnBRhOW3aBWeW3bTHHIWZe7Ue+GP8djU6sHIFn5Hv8oAB7FkIl4ygEci4C4N9PcgBt9N+2Y5G3UnA0DRA+8P0hlpO3wQD0gPuBjdNTGoKjhrF6P8dKmYFe70/UpgFn4moAOBRxZ1FdFWn5pmLVYhvtT3eGgRscZbz2rJ14ZLIZS9hkHY2tRj4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
+ b=OK1uwD50vcpH2qvyyHwBwBHC83rz4e1NOKFLsVrOP4wTrZ4CTC+9xBbw3Lymo3Z4QtgNmY01qpcj5oVzoo6QY9kFfVPrTjo+K2jqXgjeUFeXT3fcpPnpmEDvIECZd9uvJyi1oLyeR+h0PZKft3+USjuAgdMK1VJObmIbNACnue22Li2fXRZSn21et4FDH7aHo8hERUSlMT/XJBqEg/xHV2oMaFsckctIe2EFkh/OD0kZXltGufE80mMVMYdlG0L4ebHj7p9wBTzwJ2dpU0WIaGG8aCm/UgAYBY8DvuJpwOlIp9ysJZxxoOLsYuc8cHySXjqohC7ip2XxokAD+og8og==
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
+ SYZP282MB3332.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:16d::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.43; Mon, 9 Oct 2023 03:20:29 +0000
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
+ 03:20:29 +0000
+From:   Tianyi Liu <i.pear@outlook.com>
+To:     i.pear@outlook.com
+Cc:     acme@kernel.org, adrian.hunter@intel.com,
+        alexander.shishkin@linux.intel.com, irogers@google.com,
+        jolsa@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
+        mingo@redhat.com, namhyung@kernel.org, pbonzini@redhat.com,
+        peterz@infradead.org, seanjc@google.com, x86@kernel.org
+Subject: Re: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling guest callchains
+Date:   Mon,  9 Oct 2023 11:17:51 +0800
+Message-ID: <SY4P282MB1084FD036E733BBBE4D476FF9DCEA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+References: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [fZ6jKpMVpMREBgPTFIRAkP8nV6804dbjmsKjbX/fT2pASNeEM7lkDQ==]
+X-ClientProxiedBy: SG2PR04CA0155.apcprd04.prod.outlook.com (2603:1096:4::17)
+ To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20231009031751.15378-1-i.pear@outlook.com>
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
- <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
- <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
- <CACGkMEt-m9bOh9YnqLw0So5wqbZ69D0XRVBbfG73Oh7Q8qTJsQ@mail.gmail.com> <6c4cd924-0d44-582e-13a4-791f38d10fe8@redhat.com>
-In-Reply-To: <6c4cd924-0d44-582e-13a4-791f38d10fe8@redhat.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Mon, 9 Oct 2023 11:00:30 +0800
-Message-ID: <CACLfguVTxZR2U-CFhkFWYFcgvB-6TLcQjUaEvtm+oka2XstVqw@mail.gmail.com>
-Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
-To:     Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYZP282MB3332:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61188962-8834-4754-09c2-08dbc876af6b
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yRRkY5fZ0TK9tsijbxuha8+MdE1FGYHZoK4OWDO2uxLAQi6FGnMVkE488bLSOgkD2Sh+zkmzPmuNHxVMqGSWtChJvvi3U/R2ui1+WHIq1pYKxfGcQNnXA9blGK0mkkjA5VSvUXRf1wU2ZhYn/dSbygWwj6YoDVa6QIrELmrADH+Tied/9NzotbnOmQP2VMBREqGBF8Ei+7+wxfhdfOKLTsebGuUNXugA3hKKSTv54agec4Qud6G4MFIcQFceUFi/D9JdT2/YWOpHDbLgNOyf9kyc3TrGGP80DLlHnBF5uFSykHQ+vcrrq3VwC9tg1e/fpGqn39vVw/zBMwPYuOh+CLMDaLEiwSZ/iFfAiSu4tmM+ICYWINXKdBypmUa7tGumGWye5qgbA8Y0RQRdRIaO9rn99TVXIKzHJYsc999YBzZsc71lno5Jn2C2cWDE8OrJ2J5z5GRUTSlUlW/jrMqLB9zsZotiU3xLlQFDNos6ZWMF5XaY580S7ajkG+7dtwiD3oo21YED8PoqcClo8qjoG6xAaAQgWmNFKhN5g+CKE0immFF8M6i8awZl06UDd7tvyJ3q3c9GzlwvTCNBXE6C1+Wr4qNyVdco859bsTTcxV4=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZSJNkYO58PcKPWcUlqFU80uRG9NLIYVoEz5Q9DJUo60FMx7t8akE0aN35xdr?=
+ =?us-ascii?Q?JLH/LbrKcUs6sVFLRsJQgJzIf3EkWqK46tOHxZE0SFjomJ0jdmyvCGYOJbZy?=
+ =?us-ascii?Q?BvlHvM+rsGFS73O921dknJribiz1Zax0fon9XkRKR9bTG+j2WJQHjQMPOX16?=
+ =?us-ascii?Q?NVR+ns4jp0iiotH2hahdHe8C6IA7BTx1s/JLPP0Ncn2ku/NuYtkiw3SEzeN7?=
+ =?us-ascii?Q?0/Vynu601MI5tyMlQSixpplT7LbuUXzc5pTsUWOiZTsUX5Dn/dZ+2jNuXxiz?=
+ =?us-ascii?Q?OAmQsUpxcArkHf0lfe+dNuSg6jFJSYlX/R/1u2bVbuD+hPfUECfL3KfwAmX7?=
+ =?us-ascii?Q?nRITXQd7/v2SKbRs3be69YnQ+kW4uCshc6QHtaYPanCFl7K3HiS1ZTeruEIJ?=
+ =?us-ascii?Q?/DCO92+giGOqnt1z1SHd2ZFPNrfqOPQ17iMcpsmC4eyF7Nb0gZXAXxF/nj78?=
+ =?us-ascii?Q?SWKaG/KOOTW3yJbny5ClcKVXTxecetqEJ+2+N563m0CY/M6y6Hd0M/VyeYj4?=
+ =?us-ascii?Q?okNae/hQCdCH7Ri5y50tGkq/3QuC9lCwoj4TwUOxpqjrl/Wq+WaO9afDuGDB?=
+ =?us-ascii?Q?oEXZWFr7hIyY8+8tE9URfy3Wzs/FASYTeoJuB1iOrccBuwjfIkADbRV7xdOB?=
+ =?us-ascii?Q?4rqDiuRxrTH6T7RtY6mYqzLWeN9j0RV8JqG2WQUR9o+k5AYo2UDABz0j4KNW?=
+ =?us-ascii?Q?1zt+ZBHbID/UAa5Pj6uSwYR7ls/luaMWqhq7r2tap6xyxsP96uqBjpqaZwiZ?=
+ =?us-ascii?Q?5So3zFJn+GQM3kDf7Zdg00l3eMiiTLmUOrPz8hKglWBAcyjDdSkeMZ9lFMN0?=
+ =?us-ascii?Q?bfzLpfVFY18+qmum9iBuwkychPwXLW9zoqbSXz5nYs+hr4yzRY11GTYrhkyv?=
+ =?us-ascii?Q?gATF76Bz4JTkApcyTQo93u/CE0bwEeGEw51UcZPoIz0IECR00W33fAqxJYTs?=
+ =?us-ascii?Q?mtxq7msyJkoCcQcUzv4P0JBYh9GkAZpSQ4Vm/DWmRRnK6MHKvnDC40dD3iRS?=
+ =?us-ascii?Q?ZP/zHKo3mz6wdwQO+FwgmKBPW9mReBXGE51yMpO2kEpbeL5sdp5KgGQy1N2W?=
+ =?us-ascii?Q?O0a7vRD8Sh3flkcErVsLsGytZG4rLYN41TzVxhzg3Qn6eU7eOguz9G7y63H4?=
+ =?us-ascii?Q?dF8Io80kYaiqsaEaeoum61SrXOXtT56KMH1Mu62XGubunER18yJyMkh7wBun?=
+ =?us-ascii?Q?g2ZRsvUcCyHtgHxO0HlJ3iLeEXVZflHiGJGG9O2ZlQnA2VAcbnsx64dIL+FO?=
+ =?us-ascii?Q?M/Om2+9DyYuTDD0SIzg9?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61188962-8834-4754-09c2-08dbc876af6b
+X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 03:20:29.1280
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYZP282MB3332
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 29, 2023 at 5:08=E2=80=AFPM Maxime Coquelin
-<maxime.coquelin@redhat.com> wrote:
->
->
->
-> On 9/25/23 04:57, Jason Wang wrote:
-> > On Thu, Sep 21, 2023 at 10:07=E2=80=AFPM Cindy Lu <lulu@redhat.com> wro=
-te:
-> >>
-> >> On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> >>>
-> >>> On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> w=
-rote:
-> >>>>
-> >>>> In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
-> >>>> and The number of mapping memory pages from the kernel. The userspac=
-e
-> >>>> App can use this information to map the pages.
-> >>>>
-> >>>> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> >>>> ---
-> >>>>   drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
-> >>>>   include/uapi/linux/vduse.h         | 15 +++++++++++++++
-> >>>>   2 files changed, 30 insertions(+)
-> >>>>
-> >>>> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_=
-user/vduse_dev.c
-> >>>> index 680b23dbdde2..c99f99892b5c 100644
-> >>>> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> >>>> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> >>>> @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *file=
-, unsigned int cmd,
-> >>>>                  ret =3D 0;
-> >>>>                  break;
-> >>>>          }
-> >>>> +       case VDUSE_GET_RECONNECT_INFO: {
-> >>>> +               struct vduse_reconnect_mmap_info info;
-> >>>> +
-> >>>> +               ret =3D -EFAULT;
-> >>>> +               if (copy_from_user(&info, argp, sizeof(info)))
-> >>>> +                       break;
-> >>>> +
-> >>>> +               info.size =3D PAGE_SIZE;
-> >>>> +               info.max_index =3D dev->vq_num + 1;
-> >>>> +
-> >>>> +               if (copy_to_user(argp, &info, sizeof(info)))
-> >>>> +                       break;
-> >>>> +               ret =3D 0;
-> >>>> +               break;
-> >>>> +       }
-> >>>>          default:
-> >>>>                  ret =3D -ENOIOCTLCMD;
-> >>>>                  break;
-> >>>> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> >>>> index d585425803fd..ce55e34f63d7 100644
-> >>>> --- a/include/uapi/linux/vduse.h
-> >>>> +++ b/include/uapi/linux/vduse.h
-> >>>> @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
-> >>>>          _Bool avail_wrap_counter;
-> >>>>   };
-> >>>>
-> >>>> +/**
-> >>>> + * struct vduse_reconnect_mmap_info
-> >>>> + * @size: mapping memory size, always page_size here
-> >>>> + * @max_index: the number of pages allocated in kernel,just
-> >>>> + * use for check
-> >>>> + */
-> >>>> +
-> >>>> +struct vduse_reconnect_mmap_info {
-> >>>> +       __u32 size;
-> >>>> +       __u32 max_index;
-> >>>> +};
-> >>>
-> >>> One thing I didn't understand is that, aren't the things we used to
-> >>> store connection info belong to uAPI? If not, how can we make sure th=
-e
-> >>> connections work across different vendors/implementations. If yes,
-> >>> where?
-> >>>
-> >>> Thanks
-> >>>
-> >> The process for this reconnecttion  is
-> >> A.The first-time connection
-> >> 1> The userland app checks if the device exists
-> >> 2>  use the ioctl to create the vduse device
-> >> 3> Mapping the kernel page to userland and save the
-> >> App-version/features/other information to this page
-> >> 4>  if the Userland app needs to exit, then the Userland app will only
-> >> unmap the page and then exit
-> >>
-> >> B, the re-connection
-> >> 1> the userland app finds the device is existing
-> >> 2> Mapping the kernel page to userland
-> >> 3> check if the information in shared memory is satisfied to
-> >> reconnect,if ok then continue to reconnect
-> >> 4> continue working
-> >>
-> >>   For now these information are all from userland,So here the page wil=
-l
-> >> be maintained by the userland App
-> >> in the previous code we only saved the api-version by uAPI .  if  we
-> >> need to support reconnection maybe we need to add 2 new uAPI for this,
-> >> one of the uAPI is to save the reconnect  information and another is
-> >> to get the information
-> >>
-> >> maybe something like
-> >>
-> >> struct vhost_reconnect_data {
-> >> uint32_t version;
-> >> uint64_t features;
-> >> uint8_t status;
-> >> struct virtio_net_config config;
-> >> uint32_t nr_vrings;
-> >> };
-> >
-> > Probably, then we can make sure the re-connection works across
-> > different vduse-daemon implementations.
->
-> +1, we need to have this defined in the uAPI to support interoperability
-> across different VDUSE userspace implementations.
->
-> >
-> >>
-> >> #define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
-> >> vhost_reconnect_data)
-> >>
-> >> #define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
-> >> vhost_reconnect_data)
-> >
-> > Not sure I get this, but the idea is to map those pages to user space,
-> > any reason we need this uAPI?
->
-> It should not be necessary if the mmapped layout is properly defined.
->
-> Thanks,
-> Maxime
->
-Sure , I will use mmap to sync the reconnect status
-Thanks
-cindy
-> > Thanks
-> >
-> >>
-> >> Thanks
-> >> Cindy
-> >>
-> >>
-> >>
-> >>
-> >>>> +
-> >>>> +#define VDUSE_GET_RECONNECT_INFO \
-> >>>> +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
-> >>>> +
-> >>>>   #endif /* _UAPI_VDUSE_H_ */
-> >>>> --
-> >>>> 2.34.3
-> >>>>
-> >>>
-> >>
-> >
->
+> All warnings (new ones prefixed by >>):
+> 
+>    arch/x86/kvm/x86.c: In function 'kvm_arch_vcpu_read_virt':
+> >> arch/x86/kvm/x86.c:12917:42: warning: passing argument 2 of 'kvm_read_guest_virt' makes integer from pointer without a cast [-Wint-conversion]
+>    12917 |         return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
+>          |                                          ^~~~
+>          |                                          |
+>          |                                          void *
+>    arch/x86/kvm/x86.c:7388:38: note: expected 'gva_t' {aka 'long unsigned int'} but argument is of type 'void *'
+>     7388 |                                gva_t addr, void *val, unsigned int bytes,
+>          |                                ~~~~~~^~~~
+> 
 
+Terribly sorry for the build warnings, which is caused by type casting.
+Will be fixed in the next version.
