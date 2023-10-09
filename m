@@ -2,257 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FBC27BD5EE
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 10:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57BE77BD608
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 11:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345547AbjJII5Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 04:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53616 "EHLO
+        id S1345632AbjJIJCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 05:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345578AbjJII5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 04:57:23 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5775CCA
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 01:57:21 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-690d8c05784so3184802b3a.2
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 01:57:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696841841; x=1697446641; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qTcM0xcnqzX0/3woxb6tTcg7NoVALSOa9BhpL9CMrlo=;
-        b=Z+ogddNy1oLi5QYZEiTLSGIHQkJGKrC+L/zFMK6dPzre2orIr8ucNFhxX18aIQ1EI0
-         oZAQdYOr2bWA0XY5EVg/VTcxRBZdDJzhwgXV0f6D2DUr+fZVT7Ti/wZ8BqEPCWsEu2mg
-         UxC8MaJLlbe+hoD0aWYVaRuM9WrAUCSvuUEUi2ggTaLlg0B+YPp5vr0P2qYVU0XlsHG3
-         3lGI6hW+r5km6UBwLuIvFEzmjnjxwbfX+oOB/n7vUW0d00e3Wp9/Jz7F9vexuCrjwV2Z
-         akYCwE0Lx4FVY/uNNh6t0bVjPLul47yzIMYZn2zE/JRazcZbfVds2keyTDaHZea9wma4
-         zTqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696841841; x=1697446641;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qTcM0xcnqzX0/3woxb6tTcg7NoVALSOa9BhpL9CMrlo=;
-        b=r7E64u14ispuG0Dgbo+CH6pz2tkar1TUD71Z9ct0vTWfLYzLKr1Pqiyf0JLWXPsM4m
-         MCbrYpfhTEbxuWDrdBh1w8VHJDTDkypBSlZHDUaBt5p8YdE/r/97R4LRaa1AImtVYRSE
-         Q0izU+XbQo65O7ia86sXi7gN9e1/g0LXCwve/B9dmqErstaJBquCaFTYOeC9qJlJNmx6
-         Zp2pXPabLzXX5ZXBbVR7+QaK4hC6lX/IFBz172u15JuwxdIutqmzo/CPIAqNM3XwcGD/
-         5IgjMwxw4w7QIA8r6lj7urIJZ3/vNyk/uNlPT5XGobUVmCllrTwTGmw155PTMDZMx/Vz
-         d9Fg==
-X-Gm-Message-State: AOJu0YwnTfBEJDkD9/ErmPExluDy8kvejmWS5v3eUC+XTmKuCBGSX7YV
-        fy9lRtWtkmp8kzbM1IfG/UOwVw==
-X-Google-Smtp-Source: AGHT+IHdXx05lOeV3pAmShrLPGrJesbcKz5V9RDyAje5d/pM/CaqvYGDA3qoJcTZm/tYHCpVYzcn7A==
-X-Received: by 2002:a05:6a20:258d:b0:135:4df7:f165 with SMTP id k13-20020a056a20258d00b001354df7f165mr14424270pzd.21.1696841840709;
-        Mon, 09 Oct 2023 01:57:20 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id iz2-20020a170902ef8200b001c771740da4sm9012312plb.195.2023.10.09.01.57.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 01:57:20 -0700 (PDT)
-Message-ID: <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com>
-Date:   Mon, 9 Oct 2023 17:57:13 +0900
+        with ESMTP id S1345623AbjJIJCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 05:02:19 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16742B9
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 02:02:14 -0700 (PDT)
+Received: from loongson.cn (unknown [10.2.5.185])
+        by gateway (Coremail) with SMTP id _____8AxDOuVwSNlij0wAA--.21909S3;
+        Mon, 09 Oct 2023 17:02:13 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx_y+TwSNlDW4cAA--.59991S2;
+        Mon, 09 Oct 2023 17:02:11 +0800 (CST)
+From:   xianglai li <lixianglai@loongson.cn>
+To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Bibo Mao <maobibo@loongson.cn>, Song Gao <gaosong@loongson.cn>,
+        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>
+Subject: [PATCH RFC v4 0/9] Add loongarch kvm accel support
+Date:   Mon,  9 Oct 2023 17:01:28 +0800
+Message-Id: <cover.1696841645.git.lixianglai@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-Content-Language: en-US
-To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
-        gustavoars@kernel.org, herbert@gondor.apana.org.au,
-        steffen.klassert@secunet.com, nogikh@google.com,
-        pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com,
-        elver@google.com, pabeni@redhat.com,
-        Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com>
- <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
- <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
- <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
- <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com>
- <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-CM-TRANSID: AQAAf8Dx_y+TwSNlDW4cAA--.59991S2
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+        nUUI43ZEXa7xR_UUUUUUUUU==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/10/09 17:04, Willem de Bruijn wrote:
-> On Sun, Oct 8, 2023 at 3:46 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2023/10/09 5:08, Willem de Bruijn wrote:
->>> On Sun, Oct 8, 2023 at 10:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
->>>>> On Sun, Oct 8, 2023 at 7:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> virtio-net have two usage of hashes: one is RSS and another is hash
->>>>>> reporting. Conventionally the hash calculation was done by the VMM.
->>>>>> However, computing the hash after the queue was chosen defeats the
->>>>>> purpose of RSS.
->>>>>>
->>>>>> Another approach is to use eBPF steering program. This approach has
->>>>>> another downside: it cannot report the calculated hash due to the
->>>>>> restrictive nature of eBPF.
->>>>>>
->>>>>> Introduce the code to compute hashes to the kernel in order to overcome
->>>>>> thse challenges. An alternative solution is to extend the eBPF steering
->>>>>> program so that it will be able to report to the userspace, but it makes
->>>>>> little sense to allow to implement different hashing algorithms with
->>>>>> eBPF since the hash value reported by virtio-net is strictly defined by
->>>>>> the specification.
->>>>>>
->>>>>> The hash value already stored in sk_buff is not used and computed
->>>>>> independently since it may have been computed in a way not conformant
->>>>>> with the specification.
->>>>>>
->>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>>> ---
->>>>>
->>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap = {
->>>>>> +       .max_indirection_table_length =
->>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
->>>>>> +
->>>>>> +       .types = VIRTIO_NET_SUPPORTED_HASH_TYPES
->>>>>> +};
->>>>>
->>>>> No need to have explicit capabilities exchange like this? Tun either
->>>>> supports all or none.
->>>>
->>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
->>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
->>>>
->>>> It is because the flow dissector does not support IPv6 extensions. The
->>>> specification is also vague, and does not tell how many TLVs should be
->>>> consumed at most when interpreting destination option header so I chose
->>>> to avoid adding code for these hash types to the flow dissector. I doubt
->>>> anyone will complain about it since nobody complains for Linux.
->>>>
->>>> I'm also adding this so that we can extend it later.
->>>> max_indirection_table_length may grow for systems with 128+ CPUs, or
->>>> types may have other bits for new protocols in the future.
->>>>
->>>>>
->>>>>>            case TUNSETSTEERINGEBPF:
->>>>>> -               ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
->>>>>> +               bpf_ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
->>>>>> +               if (IS_ERR(bpf_ret))
->>>>>> +                       ret = PTR_ERR(bpf_ret);
->>>>>> +               else if (bpf_ret)
->>>>>> +                       tun->vnet_hash.flags &= ~TUN_VNET_HASH_RSS;
->>>>>
->>>>> Don't make one feature disable another.
->>>>>
->>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
->>>>> functions. If one is enabled the other call should fail, with EBUSY
->>>>> for instance.
->>>>>
->>>>>> +       case TUNSETVNETHASH:
->>>>>> +               len = sizeof(vnet_hash);
->>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
->>>>>> +                       ret = -EFAULT;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +
->>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
->>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hdr_v1_hash) ||
->>>>>> +                     !tun_is_little_endian(tun))) ||
->>>>>> +                    vnet_hash.indirection_table_mask >=
->>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
->>>>>> +                       ret = -EINVAL;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +
->>>>>> +               argp = (u8 __user *)argp + len;
->>>>>> +               len = (vnet_hash.indirection_table_mask + 1) * 2;
->>>>>> +               if (copy_from_user(vnet_hash_indirection_table, argp, len)) {
->>>>>> +                       ret = -EFAULT;
->>>>>> +                       break;
->>>>>> +               }
->>>>>> +
->>>>>> +               argp = (u8 __user *)argp + len;
->>>>>> +               len = virtio_net_hash_key_length(vnet_hash.types);
->>>>>> +
->>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
->>>>>> +                       ret = -EFAULT;
->>>>>> +                       break;
->>>>>> +               }
->>>>>
->>>>> Probably easier and less error-prone to define a fixed size control
->>>>> struct with the max indirection table size.
->>>>
->>>> I made its size variable because the indirection table and key may grow
->>>> in the future as I wrote above.
->>>>
->>>>>
->>>>> Btw: please trim the CC: list considerably on future patches.
->>>>
->>>> I'll do so in the next version with the TUNSETSTEERINGEBPF change you
->>>> proposed.
->>>
->>> To be clear: please don't just resubmit with that one change.
->>>
->>> The skb and cb issues are quite fundamental issues that need to be resolved.
->>>
->>> I'd like to understand why adjusting the existing BPF feature for this
->>> exact purpose cannot be amended to return the key it produced.
->>
->> eBPF steering program is not designed for this particular problem in my
->> understanding. It was introduced to derive hash values with an
->> understanding of application-specific semantics of packets instead of
->> generic IP/TCP/UDP semantics.
->>
->> This problem is rather different in terms that the hash derivation is
->> strictly defined by virtio-net. I don't think it makes sense to
->> introduce the complexity of BPF when you always run the same code.
->>
->> It can utilize the existing flow dissector and also make it easier to
->> use for the userspace by implementing this in the kernel.
-> 
-> Ok. There does appear to be overlap in functionality. But it might be
-> easier to deploy to just have standard Toeplitz available without
-> having to compile and load an eBPF program.
-> 
-> As for the sk_buff and cb[] changes. The first is really not needed.
-> sk_buff simply would not scale if every edge case needs a few bits.
+This series add loongarch kvm support, mainly implement
+some interfaces used by kvm such as kvm_arch_get/set_regs,
+kvm_arch_handle_exit, kvm_loongarch_set_interrupt, etc.
 
-An alternative is to move the bit to cb[] and clear it for every code 
-paths that lead to ndo_start_xmit(), but I'm worried that it is error-prone.
+Currently, we are able to boot LoongArch KVM Linux Guests.
+In loongarch VM, mmio devices and iocsr devices are emulated
+in user space such as APIC, IPI, pci devices, etc, other
+hardwares such as MMU, timer and csr are emulated in kernel.
 
-I think we can put the bit in sk_buff for now. We can implement the 
-alternative when we are short of bits.
+It is based on temporarily unaccepted linux kvm:
+https://github.com/loongson/linux-loongarch-kvm
+And We will remove the RFC flag until the linux kvm patches
+are merged.
 
-> 
-> For the control block, generally it is not safe to use that across
-> layers. In this case, between qdisc enqueue of a given device and
-> ndo_start_xmit of that device, I suppose it is. Though uncommon. I
-> wonder if there is any precedent.
+The running environment of LoongArch virt machine:
+1. Get the linux source by the above mentioned link.
+   git checkout kvm-loongarch
+   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
+   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
+2. Get the qemu source: https://github.com/loongson/qemu
+   git checkout kvm-loongarch
+   ./configure --target-list="loongarch64-softmmu"  --enable-kvm
+   make
+3. Get uefi bios of LoongArch virt machine:
+   Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
+4. Also you can access the binary files we have already build:
+   https://github.com/yangxiaojuan-loongson/qemu-binary
 
-That's one of the reasons modifying qdisc_skb_cb instead of creating 
-another struct embedding it as bpf_skb_data_end and tc_skb_cb do. This 
-clarifies that it is qdisc's responsibility to keep these data intact.
+The command to boot loongarch virt machine:
+   $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
+   -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
+   -serial stdio   -monitor telnet:localhost:4495,server,nowait \
+   -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
+   --nographic
 
-> 
-> The data will have to be stored in the skb somewhere. A simpler option
-> is just skb->hash? This code would use skb_get_hash, if it would
-> always produce a Toeplitz hash, anyway.
+Changes for RFC v4:
+1. Added function interfaces kvm_loongarch_get_cpucfg and
+kvm_loongarch_put_cpucfg for passing the value of vcpu cfg to kvm.
+Move the macro definition KVM_IOC_CSRID from kvm.c to kvm.h.
+2.Delete the duplicate CSR_CPUID field in CPUArchState.
+3.Add kvm_arch_get_default_type function in kvm.c.
+4.Disable LSX,LASX in cpucfg2 in KVM. And disable LBT in cpucfg2 in KVM.
 
-We still need tun_vnet_hash_report to identify hash type.
+Changes for RFC v3:
+1. Move the init mp_state to KVM_MP_STATE_RUNNABLE function into kvm.c.
+2. Fix some unstandard code problems in kvm_get/set_regs_ioctl, such as
+sort loongarch to keep alphabetic ordering in meson.build, gpr[0] should
+be always 0, remove unnecessary inline statement, etc.
+3. Rename the counter_value variable to kvm_state_counter in cpu_env,
+and add comments for it to explain the meaning.
 
-skb_get_hash() uses Siphash instead of Toeplitz, and the configuration 
-of Toeplitz relies on tun's internal state. It is still possible to 
-store a hash calculated with tun's own logic to skb->hash, but someone 
-may later overwrite it with __skb_get_hash() though it's unlikely.
+Changes for RFC v2:
+1. Mark the "Add KVM headers for loongarch" patch as a placeholder,
+as we will use the update-linux-headers.sh to generate the kvm headers
+when the linux loongarch KVM patch series are accepted.
+2. Remove the DPRINTF macro in kvm.c and use trace events to replace
+it, we add some trace functions such as trace_kvm_handle_exit,
+trace_kvm_set_intr, trace_kvm_failed_get_csr, etc.
+3. Remove the unused functions in kvm_stub.c and move stub function into
+the suitable patch.
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: "Philippe Mathieu-Daudé" <philmd@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Bibo Mao <maobibo@loongson.cn>
+Cc: Song Gao <gaosong@loongson.cn>
+Cc: Xiaojuan Yang <yangxiaojuan@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+
+Tianrui Zhao (9):
+  linux-headers: Add KVM headers for loongarch
+  target/loongarch: Define some kvm_arch interfaces
+  target/loongarch: Supplement vcpu env initial when vcpu reset
+  target/loongarch: Implement kvm get/set registers
+  target/loongarch: Implement kvm_arch_init function
+  target/loongarch: Implement kvm_arch_init_vcpu
+  target/loongarch: Implement kvm_arch_handle_exit
+  target/loongarch: Implement set vcpu intr for kvm
+  target/loongarch: Add loongarch kvm into meson build
+
+ linux-headers/asm-loongarch/kvm.h | 100 +++++
+ linux-headers/linux/kvm.h         |   9 +
+ meson.build                       |   3 +
+ target/loongarch/cpu.c            |  23 +-
+ target/loongarch/cpu.h            |   6 +-
+ target/loongarch/kvm-stub.c       |  11 +
+ target/loongarch/kvm.c            | 594 ++++++++++++++++++++++++++++++
+ target/loongarch/kvm_loongarch.h  |  13 +
+ target/loongarch/meson.build      |   1 +
+ target/loongarch/trace-events     |  17 +
+ target/loongarch/trace.h          |   1 +
+ 11 files changed, 772 insertions(+), 6 deletions(-)
+ create mode 100644 linux-headers/asm-loongarch/kvm.h
+ create mode 100644 target/loongarch/kvm-stub.c
+ create mode 100644 target/loongarch/kvm.c
+ create mode 100644 target/loongarch/kvm_loongarch.h
+ create mode 100644 target/loongarch/trace-events
+ create mode 100644 target/loongarch/trace.h
+
+-- 
+2.39.1
+
