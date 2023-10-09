@@ -2,115 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 593417BEAAD
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 21:34:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AF0A7BEAB7
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 21:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378456AbjJITeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 15:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41572 "EHLO
+        id S1378397AbjJIThM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 15:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378450AbjJITd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 15:33:58 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E060894
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 12:33:55 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-2775a7f3803so4812238a91.1
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 12:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696880035; x=1697484835; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIAr8DPfh+qMIaRmwoAlJ+K4B6ZX16dNQ2a3o/4VJ9I=;
-        b=XALda4cKKkaYprWGEkpE21aEPAUwgqx52xipa4+ankXckFsHspZjrMmutDqT6M0s9N
-         VDy3C4SXxcDjAZMYmRP3eqCCTn04mj3ceBzf1/6dLKnCdf3wbOQAB5+2z5jxE821+drT
-         pqVUltva8tUguLuzEYynhQQleeNwVkxueV6vxD7YErx9almeNHcVBMWkm3hCa8b9uCCD
-         E4eDpAU8BcqemnmCEMR6eYYzoGujz5j4R2CWkAM16wLuXFv2fdZX+ddWemJ544pg85C0
-         v1RV4iZtcvRItTXVdF9zm3Cx7yfDvaLsBKqZWRmxduHhjJeCxXtY7Q2h6npiSG2QE3vt
-         oCJQ==
+        with ESMTP id S1346671AbjJIThL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 15:37:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE46593
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 12:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696880183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TVDFHMjJ/ycKLdZo/7Qo28nzsm1D+pqkl3FWIOZKqxE=;
+        b=DDd5LU86nLTGy7dFRnCWzXq07OTJmSbvwLv61Rafnxuc2EuNCVYq21jVMTE4FrmIdKZ7Fr
+        sqSN5r1vdBJM/ES+98GENckODWVtwfgOpjwf9FkPv+oUVxTep5Egcbql+uvFYzs76H26FG
+        8K6mfL95SQuVAifT7aDjulfaWaLTGSs=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-132-xyJE_MLYN9qTGPuTtoXiiA-1; Mon, 09 Oct 2023 15:36:15 -0400
+X-MC-Unique: xyJE_MLYN9qTGPuTtoXiiA-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-780addd7382so413734039f.1
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 12:36:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696880035; x=1697484835;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIAr8DPfh+qMIaRmwoAlJ+K4B6ZX16dNQ2a3o/4VJ9I=;
-        b=tkKA4CZIT7MxksuJ33M45qIY038LlJAnCyRgAZYvLL2sHm7tpkOeCc5sqb4E5+1uq1
-         edyHRPz+Qo+7nqYZyyRo6XU8TKGUvgrjRao+tAqeGAf5ZfIx+DdO4aoKFyCzwoRja2gb
-         q08lA35P3eScnuQ88QEqEpfVmq0yhbDLs8m4Pr22LYWk/hym85rUOOjscBLtLNW6+YFa
-         hHH4jlVu+O/aVQXmt1d3eMSJ+iWtXE30F53+CpY/ncyW4SuRNZ79oBWI5NMvHl+jpSqX
-         gb1VoJS/XMGataMMT9/3/i/ztPOYNNOuYRD/9TP8ebr2xclVYJeg7OlIlHOn1Qreo6VD
-         A7Vg==
-X-Gm-Message-State: AOJu0Yxl1wNwaBls2XWiH73Br6AxIQTjo7k/Y2UTwvltnUebUWS6Wuql
-        3Hifky0pMkbUyISNUa6pYyN8Z+9LkGc=
-X-Google-Smtp-Source: AGHT+IE+bCR4ihgMmpiXgbNhSP5Vgu2CEPjeNQ9Yi6y1+8EM0hWz4Lu0bXeDtqwwTuiBXuOI0tlfBWMKDWg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:aa84:b0:279:84c3:4ab4 with SMTP id
- l4-20020a17090aaa8400b0027984c34ab4mr279179pjq.9.1696880035378; Mon, 09 Oct
- 2023 12:33:55 -0700 (PDT)
-Date:   Mon, 9 Oct 2023 12:33:53 -0700
-In-Reply-To: <20231009110613.2405ff47@kernel.org>
-Mime-Version: 1.0
-References: <20231006205415.3501535-1-kuba@kernel.org> <ZSQ7z8gqIemJQXI6@google.com>
- <20231009110613.2405ff47@kernel.org>
-Message-ID: <ZSRVoYbCuDXc7aR7@google.com>
-Subject: Re: [PATCH] KVM: deprecate KVM_WERROR in favor of general WERROR
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     pbonzini@redhat.com, workflows@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20230601; t=1696880175; x=1697484975;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TVDFHMjJ/ycKLdZo/7Qo28nzsm1D+pqkl3FWIOZKqxE=;
+        b=r9k8a4BniwHv5MIeNU8ZaohRYrzLpL45rlrOnhp0KFjfdwXhIFrycAtp1Q2IAcxv92
+         UpFMRXFetFdTjo6grmkVITwiIhV5bEHpkrgLPBv7KCb9RU0125cStx/50ciAMH1lvGXn
+         2vwqct+k6mmLNwfecaX3zJlTcSj5fuYkoFfjLKRlQRKDH7QHGG0EbJqI+VrB/9ROLaXY
+         qVoQaXYHlu3x74gcF/8aONRKxeYESNm40RjhCPR8VYIBJrP0xvybJQjxAidt30s1ysRK
+         snwQN0EKi3dUZCeRU5xPEKOWg17pPlqbgKnItstD8VWzE3RdK/fMf/iwYo7m/7OLOqXu
+         fD1w==
+X-Gm-Message-State: AOJu0YzilPvd5Tv52GGfu5F2zZl5VOlUUD+Phsw75rjs3+E/lN02SToO
+        lKBwpwBEBn+cG07cRdCMRzvniy7h4EK7Fv5FxzTCoQsQ4VADsLLDkDHx/LyQJm+3DNqQ5l8sJd7
+        SojJhApaGh636
+X-Received: by 2002:a05:6e02:1a0e:b0:352:6f88:9818 with SMTP id s14-20020a056e021a0e00b003526f889818mr19798125ild.11.1696880174980;
+        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEZrmoohFj1abftp9cjL5O3tHcNh5viE77dWrcuBTn9TZna5ISvd95pVTk16QjIDbjIm0ia6Q==
+X-Received: by 2002:a05:6e02:1a0e:b0:352:6f88:9818 with SMTP id s14-20020a056e021a0e00b003526f889818mr19798109ild.11.1696880174711;
+        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id t2-20020a056e02010200b003513535c69dsm3154672ilm.5.2023.10.09.12.36.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
+Date:   Mon, 9 Oct 2023 13:36:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     <ankita@nvidia.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+        <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+        <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+        <anuaggarwal@nvidia.com>, <dnigam@nvidia.com>, <udhoke@nvidia.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v11 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20231009133612.3fdd86a9.alex.williamson@redhat.com>
+In-Reply-To: <ZSHykZ2GgSn0fE_x@debian.me>
+References: <20231007202254.30385-1-ankita@nvidia.com>
+        <ZSHykZ2GgSn0fE_x@debian.me>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 09, 2023, Jakub Kicinski wrote:
-> On Mon, 9 Oct 2023 10:43:43 -0700 Sean Christopherson wrote:
-> > On Fri, Oct 06, 2023, Jakub Kicinski wrote:
-> > On a related topic, this is comically stale as WERROR is on by default for both
-> > allmodconfig and allyesconfig, which work because they trigger 64-bit builds.
-> > And KASAN on x86 is 64-bit only.
-> > 
-> > Rather than yank out KVM_WERROR entirely, what if we make default=n and trim the
-> > depends down to "KVM && EXPERT && !KASAN"?  E.g.
+On Sun, 8 Oct 2023 07:06:41 +0700
+Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+
+> On Sun, Oct 08, 2023 at 01:52:54AM +0530, ankita@nvidia.com wrote:
+> > PCI BAR are aligned to the power-of-2, but the actual memory on the
+> > device may not. A read or write access to the physical address from the
+> > last device PFN up to the next power-of-2 aligned physical address
+> > results in reading ~0 and dropped writes.
+> >   
 > 
-> IMO setting WERROR is a bit perverse. The way I see it WERROR is a
-> crutch for people who don't have the time / infra to properly build
-> test changes they send to Linus. Or wait for build bots to do their job.
-
-KVM_WERROR reduces the probability of issues in patches being sent to *me*.  The
-reality is that most contributors do not have the knowledge and/or resources to
-"properly" build test changes without specific guidance on what/how to test, or
-what configs to prioritize.
-
-Nor is it realistic to expect that build bots will detect every issue in every
-possible configuration in every patch that's posted.
-
-Call -Werror a crutch if you will, but for me it's a crutch that I'm more than
-willing to lean on in order to increase the overall quality of KVM x86 submissions.
-
-> We do have sympathy for these folks, we are mostly volunteers after
-> all. At the same time someone's under-investment should not be causing
-> pain to those of us who _do_ build test stuff carefully.
-
-This is a bit over the top.  Yeah, I need to add W=1 to my build scripts, but that's
-not a lack of investment, just an oversight.  Though in this case it likely wouldn't
-have made any difference since Paolo grabbed the patches directly and might have
-even bypassed linux-next.  But again I would argue that's bad process, not a lack
-of investment.
-
-> Rather than tweak stuff I'd prefer if we could agree that local -Werror
-> is anti-social :(
+> Reading garbage or padding in that case?
 > 
-> The global WERROR seems to be a good compromise.
+> Confused...
 
-I disagree.  WERROR simply doesn't provide the same coverage.  E.g. it can't be
-enabled for i386 without tuning FRAME_WARN, which (a) won't be at all obvious to
-the average contributor and (b) increasing FRAME_WARN effectively reduces the
-test coverage of KVM i386.
+The coherent memory size is rounded to a power-of-2 to be compliant with
+PCI BAR semantics, but reading beyond the implemented size fills the
+return buffer with -1 data, as is common on many platforms when reading
+from an unimplemented section of the address space.  Thanks,
 
-For KVM x86, I want the rules for contributing to be clearly documented, and as
-simple as possible.  I don't see a sane way to achieve that with WERROR=y.
+Alex
+
