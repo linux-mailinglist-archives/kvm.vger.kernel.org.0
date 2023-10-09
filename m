@@ -2,118 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C19B37BED61
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 23:29:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9727BED6E
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 23:36:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378717AbjJIV30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 17:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58316 "EHLO
+        id S1378653AbjJIVga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 17:36:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378727AbjJIV3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 17:29:24 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC165A9
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 14:29:22 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c62ce4b431so40871015ad.2
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 14:29:22 -0700 (PDT)
+        with ESMTP id S1377082AbjJIVg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 17:36:29 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97509C
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 14:36:27 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-27756e0e4d8so4888446a91.3
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 14:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696886962; x=1697491762; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bYkvhBthhHqIlQG5LO3kogv7cSVxxNevxV9LcQnZMPA=;
-        b=rFYxNkk9qBXjJBvBs+kYp2Ta1CjsEtXbIyjVgdqBaXOpgQc4NN/J98TdGfl2jD0/un
-         nAVwwYtR4y5Tv0HZPi7ns1azUjlRkdA4ZdxRD+MzaPsN+kPGiBg1ZY9vgw+dOF5G8F5+
-         4hrAMG749yzkGYpBDW1PwrowN4SRJDrL+EWigl+FU//7GnfXDRBXO2BpNYBWEYCBlVjT
-         fBPIubJ4WUqbfWRlE95SxuqBb76FmfHHVOt8MIomSEuHt0Dc6/KRKEkne5rS38TH0fOp
-         H7YzYlPhMk8E9Kr8YQ9VcIK9kferNJeItfXK0EOJx+Uq1cIOZhu3Uyne8V7ujeu5jwxy
-         dIeA==
+        d=google.com; s=20230601; t=1696887387; x=1697492187; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CeiLuszUQzm1dE5vxA8gfNKXniFYODS3y9KHytRWFpM=;
+        b=DS0pyVOSgJn+2cY+lenjN3nIPtGMAAwB7k12PM5aOtfo64vgPgPjUApWcD9l54GZJo
+         ZQsSUZREQdCs95eFYRv+CoN/tgNCrKuOEMZsk9Hx7X3b3r/R/PC/y+XIf9drXdqneDUo
+         fiNCv7f594wHPeQ06bELorTMs1bj/H68GkKjIlJK121d33Kvjg3vQ/CmDTKkgPdqqC0Z
+         gwXm8nMXKh4n79ciTYlf1IDYy8cbNqNYXGH8Hr/IX1rE3GWqQf190pKZzXVnk7zTC9CI
+         MIdI0ArO5VroGsxc8bXrokQ0CcwEpGbYTBU34H7COid2q1kj4NauxUGPYi/2y2KeqaCH
+         UK0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696886962; x=1697491762;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bYkvhBthhHqIlQG5LO3kogv7cSVxxNevxV9LcQnZMPA=;
-        b=GDxA3lrQGj+GE/Y2es4R0rerxIjK6NJjzyXl62NSoqJ+HmSocEc6+mJIe5tU5wPsE9
-         yAd6GWLHYGS4zC+gUQEGEVyIFNT5KMNJ4ovul4lb3qBIB4EriVhoKZqgmJB3w9YjRrhA
-         jMAZod8VqQnzUL1oQFvZ+Fi58CgNBkyohKv3ykuyyr8wlnfE1EKcUGy8T3eFR32AAiqQ
-         CeNhIeqmMAJo2Cj6WehAGiIH5S93SFJ5JsLfFAzKpaQAjWHEI2VaXjeb2Lhul689yInc
-         czzoOZsp2j49fHueGh13aBi+LuBXX4DJlGlv9ubwcVC9nJCJDL/T+SsqnS28hBGp9K7f
-         L8wQ==
-X-Gm-Message-State: AOJu0Yw92GYjLQoNEWLUYcSQhoQN/78RY2ufOMbRiElxHTyMeEMOL3X9
-        SKoh4csMmkxIhYzFvITVoAzLLwpBI0I=
-X-Google-Smtp-Source: AGHT+IGZpWvOoc8BX66UE4VBkl6KxlHJlAQkh6Xvg8C6hwcONGyuAe8Zf6gbKb/YTmJVDrE6kAnwwxYGlLo=
+        d=1e100.net; s=20230601; t=1696887387; x=1697492187;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CeiLuszUQzm1dE5vxA8gfNKXniFYODS3y9KHytRWFpM=;
+        b=gvSEpb5rrBITNt7qKIl/QszNsNyKdd7+SDr6egvJpWysM4iIxeRRdnmzTv91p1PNgo
+         Hdra0Gjr302q74uYGM1I3+32FNhWm54C6DVu6Yg5Sb4lLZrHbQJM/G2cStpr19xvDKg7
+         AszqnOhGggKWiRCDqkUeLqG7SyhRgUlKP1nop6WtpnNXT16XYyfi6IAES0E5CDFzkYGV
+         vXlrxnNQz9nt3/kp25JvQKKGDkQFDg4+//OAnMoIg47vRVNEzGbl1jVOzqNHv4y5sWEj
+         CAzW/rEXTAQKc09QTHMQtJPWURPA2ZJdPRaSx+lG+d2aJ3Rp+aW+0vGK1AfREXBaQa2U
+         Q5+g==
+X-Gm-Message-State: AOJu0Yxh4HEdvUb0olwEUlJiUUmtrRUdm8o8SqFEVdmkohpqOh+csl/R
+        zwdP7Ecn+gm7/i35HAyhV/30bNXNyKI=
+X-Google-Smtp-Source: AGHT+IH8GWGnwoLTEqdBmVnAXJqCsoSI7/uTXTXbteBLWdYRa84UsZFE39P2qq7akQ3npr7ZQiqyYJ/tw74=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4c8:b0:1c1:fc5c:b32e with SMTP id
- o8-20020a170902d4c800b001c1fc5cb32emr276837plg.10.1696886962172; Mon, 09 Oct
- 2023 14:29:22 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  9 Oct 2023 14:29:19 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:90a:a393:b0:274:90a4:f29 with SMTP id
+ x19-20020a17090aa39300b0027490a40f29mr280600pjp.1.1696887387251; Mon, 09 Oct
+ 2023 14:36:27 -0700 (PDT)
+Date:   Mon, 9 Oct 2023 14:36:25 -0700
+In-Reply-To: <ZSRwNO4xWU6Dx1ne@google.com>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-Message-ID: <20231009212919.221810-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Don't intercept IRET when injecting NMI and vNMI is enabled
+References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065006.20201-1-yan.y.zhao@intel.com>
+ <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com> <ZSRZ_y64UPXBG6lA@google.com>
+ <ZSRwNO4xWU6Dx1ne@google.com>
+Message-ID: <ZSRyWYZBYur-cKYS@google.com>
+Subject: Re: [PATCH v4 01/12] KVM: x86/mmu: helpers to return if KVM honors
+ guest MTRRs
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Santosh Shukla <santosh.shukla@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
+        chao.gao@intel.com, kai.huang@intel.com,
+        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When vNMI is enabled, rely entirely on hardware to correctly handle NMI
-blocking, i.e. don't intercept IRET to detect when NMIs are no longer
-blocked.  KVM already correctly ignores svm->nmi_masked when vNMI is
-enabled, so the effect of the bug is essentially an unnecessary VM-Exit.
+On Mon, Oct 09, 2023, Sean Christopherson wrote:
+> On Mon, Oct 09, 2023, Sean Christopherson wrote:
+> > On Sat, Oct 07, 2023, Like Xu wrote:
+> > > On 14/7/2023 2:50=E2=80=AFpm, Yan Zhao wrote:
+> > > > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > > > index 92d5a1924fc1..38bd449226f6 100644
+> > > > --- a/arch/x86/kvm/mmu.h
+> > > > +++ b/arch/x86/kvm/mmu.h
+> > > > @@ -235,6 +235,13 @@ static inline u8 permission_fault(struct kvm_v=
+cpu *vcpu, struct kvm_mmu *mmu,
+> > > >   	return -(u32)fault & errcode;
+> > > >   }
+> > > > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_non=
+coherent_dma);
+> > > > +
+> > > > +static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
+> > > > +{
+> > > > +	return __kvm_mmu_honors_guest_mtrrs(kvm, kvm_arch_has_noncoherent=
+_dma(kvm));
+> > > > +}
+> > > > +
+> > > >   void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gf=
+n_end);
+> > > >   int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index 1e5db621241f..b4f89f015c37 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -4516,6 +4516,21 @@ static int kvm_tdp_mmu_page_fault(struct kvm=
+_vcpu *vcpu,
+> > > >   }
+> > > >   #endif
+> > > > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_non=
+coherent_dma)
+> > >=20
+> > > According to the motivation provided in the comment, the function wil=
+l no
+> > > longer need to be passed the parameter "struct kvm *kvm" but will rel=
+y on
+> > > the global parameters (plus vm_has_noncoherent_dma), removing "*kvm" =
+?
+> >=20
+> > Yeah, I'll fixup the commit to drop @kvm from the inner helper.  Thanks=
+!
+>=20
+> Gah, and I gave more bad advice when I suggested this idea.  There's no n=
+eed to
+> explicitly check tdp_enabled, as shadow_memtype_mask is set to zero if TD=
+P is
+> disabled.  And that must be the case, e.g. make_spte() would generate a c=
+orrupt
+> shadow_memtype_mask were non-zero on Intel with shadow paging.
+>=20
+> Yan, can you take a look at what I ended up with (see below) to make sure=
+ it
+> looks sane/acceptable to you?
+>=20
+> New hashes (assuming I didn't botch things and need even more fixup).
 
-Note, per the APM, hardware sets the BLOCKING flag when software directly
-directly injects an NMI:
+Oof, today is not my day.  I forgot to fix the missing "check" in the chang=
+elog
+that Yan reported.  So *these* are the new hashes, barring yet another goof=
+ on
+my end.
 
-  If Event Injection is used to inject an NMI when NMI Virtualization is
-  enabled, VMRUN sets V_NMI_MASK in the guest state.
-
-Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
-Link: https://lore.kernel.org/all/ZOdnuDZUd4mevCqe@google.como
-Cc: Santosh Shukla <santosh.shukla@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-Santosh, can you verify that I didn't break vNMI?  I don't have access to the
-right hardware.  Thanks!
-
- arch/x86/kvm/svm/svm.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b7472ad183b9..4f22d12b5d60 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3569,8 +3569,15 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
- 	if (svm->nmi_l1_to_l2)
- 		return;
- 
--	svm->nmi_masked = true;
--	svm_set_iret_intercept(svm);
-+	/*
-+	 * No need to manually track NMI masking when vNMI is enabled, hardware
-+	 * automatically sets V_NMI_BLOCKING_MASK as appropriate, including the
-+	 * case where software directly injects an NMI.
-+	 */
-+	if (!is_vnmi_enabled(svm)) {
-+		svm->nmi_masked = true;
-+		svm_set_iret_intercept(svm);
-+	}
- 	++vcpu->stat.nmi_injections;
- }
- 
-
-base-commit: 86701e115030e020a052216baa942e8547e0b487
--- 
-2.42.0.609.gbb76f46606-goog
-
+[1/5] KVM: x86/mmu: Add helpers to return if KVM honors guest MTRRs
+      https://github.com/kvm-x86/linux/commit/1affe455d66d
+[2/5] KVM: x86/mmu: Zap SPTEs when CR0.CD is toggled iff guest MTRRs are ho=
+nored
+      https://github.com/kvm-x86/linux/commit/7a18c7c2b69a
+[3/5] KVM: x86/mmu: Zap SPTEs on MTRR update iff guest MTRRs are honored
+      https://github.com/kvm-x86/linux/commit/9a3768191d95
+[4/5] KVM: x86/mmu: Zap KVM TDP when noncoherent DMA assignment starts/stop=
+s
+      https://github.com/kvm-x86/linux/commit/68c320298404
+[5/5] KVM: VMX: drop IPAT in memtype when CD=3D1 for KVM_X86_QUIRK_CD_NW_CL=
+EARED
+      https://github.com/kvm-x86/linux/commit/8925b3194512
