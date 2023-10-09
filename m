@@ -2,27 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57BE77BD608
+	by mail.lfdr.de (Postfix) with ESMTP id C2F8D7BD609
 	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 11:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345632AbjJIJCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 05:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48734 "EHLO
+        id S1345636AbjJIJCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 05:02:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345623AbjJIJCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1345612AbjJIJCT (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 9 Oct 2023 05:02:19 -0400
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16742B9
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 02:02:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 643BDCF
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 02:02:16 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8AxDOuVwSNlij0wAA--.21909S3;
+        by gateway (Coremail) with SMTP id _____8DxRvGVwSNlkj0wAA--.27115S3;
         Mon, 09 Oct 2023 17:02:13 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx_y+TwSNlDW4cAA--.59991S2;
-        Mon, 09 Oct 2023 17:02:11 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx_y+TwSNlDW4cAA--.59991S3;
+        Mon, 09 Oct 2023 17:02:12 +0800 (CST)
 From:   xianglai li <lixianglai@loongson.cn>
 To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+Cc:     Tianrui Zhao <zhaotianrui@loongson.cn>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
@@ -32,16 +33,17 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         Peter Maydell <peter.maydell@linaro.org>,
         Bibo Mao <maobibo@loongson.cn>, Song Gao <gaosong@loongson.cn>,
-        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-Subject: [PATCH RFC v4 0/9] Add loongarch kvm accel support
-Date:   Mon,  9 Oct 2023 17:01:28 +0800
-Message-Id: <cover.1696841645.git.lixianglai@loongson.cn>
+        Xiaojuan Yang <yangxiaojuan@loongson.cn>
+Subject: [PATCH RFC v4 1/9] linux-headers: Add KVM headers for loongarch
+Date:   Mon,  9 Oct 2023 17:01:29 +0800
+Message-Id: <b7163ff1c8c0003c4060120995ea814dde11c312.1696841645.git.lixianglai@loongson.cn>
 X-Mailer: git-send-email 2.39.1
+In-Reply-To: <cover.1696841645.git.lixianglai@loongson.cn>
+References: <cover.1696841645.git.lixianglai@loongson.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8Dx_y+TwSNlDW4cAA--.59991S2
+X-CM-TRANSID: AQAAf8Dx_y+TwSNlDW4cAA--.59991S3
 X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
         ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
@@ -55,66 +57,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series add loongarch kvm support, mainly implement
-some interfaces used by kvm such as kvm_arch_get/set_regs,
-kvm_arch_handle_exit, kvm_loongarch_set_interrupt, etc.
+From: Tianrui Zhao <zhaotianrui@loongson.cn>
 
-Currently, we are able to boot LoongArch KVM Linux Guests.
-In loongarch VM, mmio devices and iocsr devices are emulated
-in user space such as APIC, IPI, pci devices, etc, other
-hardwares such as MMU, timer and csr are emulated in kernel.
-
-It is based on temporarily unaccepted linux kvm:
-https://github.com/loongson/linux-loongarch-kvm
-And We will remove the RFC flag until the linux kvm patches
-are merged.
-
-The running environment of LoongArch virt machine:
-1. Get the linux source by the above mentioned link.
-   git checkout kvm-loongarch
-   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
-   make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
-2. Get the qemu source: https://github.com/loongson/qemu
-   git checkout kvm-loongarch
-   ./configure --target-list="loongarch64-softmmu"  --enable-kvm
-   make
-3. Get uefi bios of LoongArch virt machine:
-   Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
-4. Also you can access the binary files we have already build:
-   https://github.com/yangxiaojuan-loongson/qemu-binary
-
-The command to boot loongarch virt machine:
-   $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
-   -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
-   -serial stdio   -monitor telnet:localhost:4495,server,nowait \
-   -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
-   --nographic
-
-Changes for RFC v4:
-1. Added function interfaces kvm_loongarch_get_cpucfg and
-kvm_loongarch_put_cpucfg for passing the value of vcpu cfg to kvm.
-Move the macro definition KVM_IOC_CSRID from kvm.c to kvm.h.
-2.Delete the duplicate CSR_CPUID field in CPUArchState.
-3.Add kvm_arch_get_default_type function in kvm.c.
-4.Disable LSX,LASX in cpucfg2 in KVM. And disable LBT in cpucfg2 in KVM.
-
-Changes for RFC v3:
-1. Move the init mp_state to KVM_MP_STATE_RUNNABLE function into kvm.c.
-2. Fix some unstandard code problems in kvm_get/set_regs_ioctl, such as
-sort loongarch to keep alphabetic ordering in meson.build, gpr[0] should
-be always 0, remove unnecessary inline statement, etc.
-3. Rename the counter_value variable to kvm_state_counter in cpu_env,
-and add comments for it to explain the meaning.
-
-Changes for RFC v2:
-1. Mark the "Add KVM headers for loongarch" patch as a placeholder,
-as we will use the update-linux-headers.sh to generate the kvm headers
-when the linux loongarch KVM patch series are accepted.
-2. Remove the DPRINTF macro in kvm.c and use trace events to replace
-it, we add some trace functions such as trace_kvm_handle_exit,
-trace_kvm_set_intr, trace_kvm_failed_get_csr, etc.
-3. Remove the unused functions in kvm_stub.c and move stub function into
-the suitable patch.
+This patch is only a placeholder now, which is used to
+show some kvm structures and macros for reviewers.
+And it will be replaced by using update-linux-headers.sh
+when the linux loongarch kvm patches are accepted.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Cornelia Huck <cohuck@redhat.com>
@@ -130,36 +78,154 @@ Cc: Song Gao <gaosong@loongson.cn>
 Cc: Xiaojuan Yang <yangxiaojuan@loongson.cn>
 Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
 
-Tianrui Zhao (9):
-  linux-headers: Add KVM headers for loongarch
-  target/loongarch: Define some kvm_arch interfaces
-  target/loongarch: Supplement vcpu env initial when vcpu reset
-  target/loongarch: Implement kvm get/set registers
-  target/loongarch: Implement kvm_arch_init function
-  target/loongarch: Implement kvm_arch_init_vcpu
-  target/loongarch: Implement kvm_arch_handle_exit
-  target/loongarch: Implement set vcpu intr for kvm
-  target/loongarch: Add loongarch kvm into meson build
-
- linux-headers/asm-loongarch/kvm.h | 100 +++++
- linux-headers/linux/kvm.h         |   9 +
- meson.build                       |   3 +
- target/loongarch/cpu.c            |  23 +-
- target/loongarch/cpu.h            |   6 +-
- target/loongarch/kvm-stub.c       |  11 +
- target/loongarch/kvm.c            | 594 ++++++++++++++++++++++++++++++
- target/loongarch/kvm_loongarch.h  |  13 +
- target/loongarch/meson.build      |   1 +
- target/loongarch/trace-events     |  17 +
- target/loongarch/trace.h          |   1 +
- 11 files changed, 772 insertions(+), 6 deletions(-)
+Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+Signed-off-by: xianglai li <lixianglai@loongson.cn>
+---
+ linux-headers/asm-loongarch/kvm.h | 100 ++++++++++++++++++++++++++++++
+ linux-headers/linux/kvm.h         |   9 +++
+ 2 files changed, 109 insertions(+)
  create mode 100644 linux-headers/asm-loongarch/kvm.h
- create mode 100644 target/loongarch/kvm-stub.c
- create mode 100644 target/loongarch/kvm.c
- create mode 100644 target/loongarch/kvm_loongarch.h
- create mode 100644 target/loongarch/trace-events
- create mode 100644 target/loongarch/trace.h
 
+diff --git a/linux-headers/asm-loongarch/kvm.h b/linux-headers/asm-loongarch/kvm.h
+new file mode 100644
+index 0000000000..5e72b83372
+--- /dev/null
++++ b/linux-headers/asm-loongarch/kvm.h
+@@ -0,0 +1,100 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * Copyright (C) 2023 Loongson Technology Corporation Limited
++ */
++
++#ifndef __UAPI_ASM_LOONGARCH_KVM_H
++#define __UAPI_ASM_LOONGARCH_KVM_H
++
++#include <linux/types.h>
++
++/*
++ * KVM Loongarch specific structures and definitions.
++ */
++
++#define __KVM_HAVE_READONLY_MEM
++
++#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
++
++/*
++ * for KVM_GET_REGS and KVM_SET_REGS
++ */
++struct kvm_regs {
++	/* out (KVM_GET_REGS) / in (KVM_SET_REGS) */
++	__u64 gpr[32];
++	__u64 pc;
++};
++
++/*
++ * for KVM_GET_FPU and KVM_SET_FPU
++ */
++struct kvm_fpu {
++	__u32 fcsr;
++	__u32 none;
++	__u64 fcc;    /* 8x8 */
++	struct kvm_fpureg {
++		__u64 val64[4];
++	} fpr[32];
++};
++
++/*
++ * For LoongArch, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access various
++ * registers.  The id field is broken down as follows:
++ *
++ *  bits[63..52] - As per linux/kvm.h
++ *  bits[51..32] - Must be zero.
++ *  bits[31..16] - Register set.
++ *
++ * Register set = 0: GP registers from kvm_regs (see definitions below).
++ *
++ * Register set = 1: CSR registers.
++ *
++ * Register set = 2: KVM specific registers (see definitions below).
++ *
++ * Register set = 3: FPU / SIMD registers (see definitions below).
++ *
++ * Other sets registers may be added in the future.  Each set would
++ * have its own identifier in bits[31..16].
++ */
++
++#define KVM_REG_LOONGARCH_GP		(KVM_REG_LOONGARCH | 0x00000ULL)
++#define KVM_REG_LOONGARCH_CSR		(KVM_REG_LOONGARCH | 0x10000ULL)
++#define KVM_REG_LOONGARCH_KVM		(KVM_REG_LOONGARCH | 0x20000ULL)
++#define KVM_REG_LOONGARCH_FPU		(KVM_REG_LOONGARCH | 0x30000ULL)
++#define KVM_REG_LOONGARCH_CPUCFG	(KVM_REG_LOONGARCH | 0x40000ULL)
++#define KVM_REG_LOONGARCH_MASK		(KVM_REG_LOONGARCH | 0x70000ULL)
++#define KVM_CSR_IDX_MASK		0x7fff
++#define KVM_CPUCFG_IDX_MASK		0x7fff
++
++/*
++ * KVM_REG_LOONGARCH_KVM - KVM specific control registers.
++ */
++
++#define KVM_REG_LOONGARCH_COUNTER	(KVM_REG_LOONGARCH_KVM | KVM_REG_SIZE_U64 | 3)
++#define KVM_REG_LOONGARCH_VCPU_RESET	(KVM_REG_LOONGARCH_KVM | KVM_REG_SIZE_U64 | 4)
++
++#define LOONGARCH_REG_SHIFT		3
++#define LOONGARCH_REG_64(TYPE, REG)	(TYPE | KVM_REG_SIZE_U64 | (REG << LOONGARCH_REG_SHIFT))
++#define KVM_IOC_CSRID(REG)		LOONGARCH_REG_64(KVM_REG_LOONGARCH_CSR, REG)
++#define KVM_IOC_CPUCFG(REG)		LOONGARCH_REG_64(KVM_REG_LOONGARCH_CPUCFG, REG)
++
++struct kvm_debug_exit_arch {
++};
++
++/* for KVM_SET_GUEST_DEBUG */
++struct kvm_guest_debug_arch {
++};
++
++/* definition of registers in kvm_run */
++struct kvm_sync_regs {
++};
++
++/* dummy definition */
++struct kvm_sregs {
++};
++
++#define KVM_NR_IRQCHIPS		1
++#define KVM_IRQCHIP_NUM_PINS	64
++#define KVM_MAX_CORES		256
++
++#endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 0d74ee999a..0e378bbcbf 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -264,6 +264,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_RISCV_SBI        35
+ #define KVM_EXIT_RISCV_CSR        36
+ #define KVM_EXIT_NOTIFY           37
++#define KVM_EXIT_LOONGARCH_IOCSR  38
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -336,6 +337,13 @@ struct kvm_run {
+ 			__u32 len;
+ 			__u8  is_write;
+ 		} mmio;
++		/* KVM_EXIT_LOONGARCH_IOCSR */
++		struct {
++			__u64 phys_addr;
++			__u8  data[8];
++			__u32 len;
++			__u8  is_write;
++		} iocsr_io;
+ 		/* KVM_EXIT_HYPERCALL */
+ 		struct {
+ 			__u64 nr;
+@@ -1358,6 +1366,7 @@ struct kvm_dirty_tlb {
+ #define KVM_REG_ARM64		0x6000000000000000ULL
+ #define KVM_REG_MIPS		0x7000000000000000ULL
+ #define KVM_REG_RISCV		0x8000000000000000ULL
++#define KVM_REG_LOONGARCH	0x9000000000000000ULL
+ 
+ #define KVM_REG_SIZE_SHIFT	52
+ #define KVM_REG_SIZE_MASK	0x00f0000000000000ULL
 -- 
 2.39.1
 
