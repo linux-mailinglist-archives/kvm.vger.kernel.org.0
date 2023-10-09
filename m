@@ -2,153 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8C087BD71F
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 11:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22CEF7BD7B8
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 11:55:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345758AbjJIJdQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 05:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
+        id S1345975AbjJIJzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 05:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345796AbjJIJdM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 05:33:12 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F338CF;
-        Mon,  9 Oct 2023 02:33:10 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3999WPPC004164;
-        Mon, 9 Oct 2023 09:33:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=MIIxPCCWfpPmbj2qaEwjC2LszalGS6yonNVNcKHMRZ0=;
- b=HPIl/9Ad3iCr1qLrb598p1tY03nrLl3KnKG+1JW9ur6QEJHr/FPbUEiG8CMbNlQu7jZD
- QV2Xoqf1FWavLOxPrAQ+wGrTO1Q2qBnzYpkbFKJ+DletBER2v9+ee8P7Tm5bdHzKMsVL
- /lXKTIQTZLdae3EVIqYl+xZiAWpuW+f211xEU/ho2j0KbD/+YLelpkwNZAHOTcVGBBG6
- 1DMAYi4mwfStJHQS+kJy1cuOmcIJLJ4cAcaUQAIV4bIr/Br+cIPseXgZ9XhwK18bq33m
- 0eWpI8zSJWr/saeDgnEDOFRnsgvLQueZIot4K3gDg3UDH/qpgtH00vMhgBNWpYj/dQyd Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tmeyq00fc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Oct 2023 09:33:10 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3999X9Ql007118;
-        Mon, 9 Oct 2023 09:33:09 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tmeyq00eg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Oct 2023 09:33:09 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3998Mp7v024439;
-        Mon, 9 Oct 2023 09:33:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkhns89sy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Oct 2023 09:33:08 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3999X5pt12911210
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Oct 2023 09:33:05 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43A3B20040;
-        Mon,  9 Oct 2023 09:33:05 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1077E2004B;
-        Mon,  9 Oct 2023 09:33:05 +0000 (GMT)
-Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Oct 2023 09:33:05 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH v4 2/2] KVM: s390: add tracepoint in gmap notifier
-Date:   Mon,  9 Oct 2023 11:32:53 +0200
-Message-ID: <20231009093304.2555344-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231009093304.2555344-1-nrb@linux.ibm.com>
-References: <20231009093304.2555344-1-nrb@linux.ibm.com>
+        with ESMTP id S1345608AbjJIJzf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 05:55:35 -0400
+Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDA297;
+        Mon,  9 Oct 2023 02:55:34 -0700 (PDT)
+Received: by mail-vk1-xa34.google.com with SMTP id 71dfb90a1353d-4a06fb5331bso609678e0c.0;
+        Mon, 09 Oct 2023 02:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696845333; x=1697450133; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
+        b=IAmcXbBygL+PxCxXp4KzQD86973j00dsrHlNxupCd2IOMxPSuAc1E2AET9A7JlAqEH
+         tRlE+6BTYXzg7mXZsHv78dbiY4EpasjFQjzT8du9oc2KRg2vtVvBWYgiDrw2D6Nq2xub
+         M7n+I2hgUaVszuErZWWECuyr49UPs0oJg/rPe8fcZAIDsk/ro7brfl3uBpZShX1xznvx
+         R5FJlfEw6orJ9trF8LPPyfXYYsFyJ9Wefk0WrhyKpoeDmcRrWAh0M8T1glePPVCIabsT
+         Pka+mKOJX1dUuBdDANDtlrT15aufPtFZ0DvdVmkJ2CsLzdLXiF+SRFV4YQN2AmdK6epv
+         nVbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696845333; x=1697450133;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
+        b=tQedT06intOKGnRD/HPXz+Xw1Bdr2Hh0aZ+YVImhSXSerAfDRQtXSMtJtDVZTr/7Hn
+         SCGJoE/gWjBwiDleN9Yd6lAD+vN+5r6NHElyUlo5R5a5qMaEGxwRhjgDrR40dJIWRvr+
+         hiXomPgx1FbiyFkqN8P2KfK5Z0WY5W85AQwrIL11UDqDl3y2oGRv6pbehpQTF++COZx5
+         6EmNlG267MTPcXJD/N8UyaPA11Cc0QzWEsrfvGyi3LsV9KE7LTfZga1TGFtYHsFIrFE0
+         g4vBaCUQrqPz9KMhcvGaUaNz4OQlPx7KAp67gBYWZF4NwQVNJd6q02jczaCwhndUp3hK
+         aFxA==
+X-Gm-Message-State: AOJu0Yzl2CZC4bWGRKeFQEagGbGd2og3l7k4b2Qvck/Cxq5Pg3Bh9Fgc
+        NbjhrDVaHK6XBUcksJ8Z2gYhWdzdkmtweeUEfME=
+X-Google-Smtp-Source: AGHT+IEreKMizCCNFcpEhH5iXSdei2Vqfm7cxxdu5FLzU7oTPyhiYyKY1JIs9eh8s4CbyXRR0j34a2PGChoyRSIntTA=
+X-Received: by 2002:a1f:4f86:0:b0:495:c10c:ec39 with SMTP id
+ d128-20020a1f4f86000000b00495c10cec39mr10736648vkb.2.1696845333308; Mon, 09
+ Oct 2023 02:55:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3hWL12800w8jfsjdKOvHLN8oQmujlQ-Y
-X-Proofpoint-ORIG-GUID: 9IDC1caccdzj98aHUUGMzeh7oBlaRA2Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-09_07,2023-10-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- suspectscore=0 malwarescore=0 clxscore=1015 mlxscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310090078
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
+ <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
+In-Reply-To: <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date:   Mon, 9 Oct 2023 04:54:56 -0500
+Message-ID: <CAF=yD-K4bCBpUVtDR_cv=bagRL+vM4Rusez+uHFTb4_kR8XkpA@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
+        gustavoars@kernel.org, herbert@gondor.apana.org.au,
+        steffen.klassert@secunet.com, nogikh@google.com,
+        pablo@netfilter.org, decui@microsoft.com, cai@lca.pw,
+        jakub@cloudflare.com, elver@google.com, pabeni@redhat.com,
+        Yuri Benditovich <yuri.benditovich@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The gmap notifier is called for changes in table entries with the
-notifier bit set. To diagnose performance issues, it can be useful to
-see what causes certain changes in the gmap.
+On Mon, Oct 9, 2023 at 3:44=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> On 2023/10/09 17:13, Willem de Bruijn wrote:
+> > On Sun, Oct 8, 2023 at 12:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@da=
+ynix.com> wrote:
+> >>
+> >> virtio-net have two usage of hashes: one is RSS and another is hash
+> >> reporting. Conventionally the hash calculation was done by the VMM.
+> >> However, computing the hash after the queue was chosen defeats the
+> >> purpose of RSS.
+> >>
+> >> Another approach is to use eBPF steering program. This approach has
+> >> another downside: it cannot report the calculated hash due to the
+> >> restrictive nature of eBPF.
+> >>
+> >> Introduce the code to compute hashes to the kernel in order to overcom=
+e
+> >> thse challenges. An alternative solution is to extend the eBPF steerin=
+g
+> >> program so that it will be able to report to the userspace, but it mak=
+es
+> >> little sense to allow to implement different hashing algorithms with
+> >> eBPF since the hash value reported by virtio-net is strictly defined b=
+y
+> >> the specification.
+> >>
+> >> The hash value already stored in sk_buff is not used and computed
+> >> independently since it may have been computed in a way not conformant
+> >> with the specification.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >
+> >> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct =
+*tun,
+> >>          }
+> >>
+> >>          if (vnet_hdr_sz) {
+> >> -               struct virtio_net_hdr gso;
+> >> +               union {
+> >> +                       struct virtio_net_hdr hdr;
+> >> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
+> >> +               } hdr;
+> >> +               int ret;
+> >>
+> >>                  if (iov_iter_count(iter) < vnet_hdr_sz)
+> >>                          return -EINVAL;
+> >>
+> >> -               if (virtio_net_hdr_from_skb(skb, &gso,
+> >> -                                           tun_is_little_endian(tun),=
+ true,
+> >> -                                           vlan_hlen)) {
+> >> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_R=
+EPORT) &&
+> >> +                   vnet_hdr_sz >=3D sizeof(hdr.v1_hash_hdr) &&
+> >> +                   skb->tun_vnet_hash) {
+> >
+> > Isn't vnet_hdr_sz guaranteed to be >=3D hdr.v1_hash_hdr, by virtue of
+> > the set hash ioctl failing otherwise?
+> >
+> > Such checks should be limited to control path where possible
+>
+> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz are
+> not read at once.
 
-Hence, add a tracepoint in the gmap notifier.
-
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Acked-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/kvm/kvm-s390.c   |  2 ++
- arch/s390/kvm/trace-s390.h | 23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b42493110d76..11676b81e6bf 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4060,6 +4060,8 @@ static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
- 	unsigned long prefix;
- 	unsigned long i;
- 
-+	trace_kvm_s390_gmap_notifier(start, end, gmap_is_shadow(gmap));
-+
- 	if (gmap_is_shadow(gmap))
- 		return;
- 	if (start >= 1UL << 31)
-diff --git a/arch/s390/kvm/trace-s390.h b/arch/s390/kvm/trace-s390.h
-index 6f0209d45164..9ac92dbf680d 100644
---- a/arch/s390/kvm/trace-s390.h
-+++ b/arch/s390/kvm/trace-s390.h
-@@ -333,6 +333,29 @@ TRACE_EVENT(kvm_s390_airq_suppressed,
- 		      __entry->id, __entry->isc)
- 	);
- 
-+/*
-+ * Trace point for gmap notifier calls.
-+ */
-+TRACE_EVENT(kvm_s390_gmap_notifier,
-+	    TP_PROTO(unsigned long start, unsigned long end, unsigned int shadow),
-+	    TP_ARGS(start, end, shadow),
-+
-+	    TP_STRUCT__entry(
-+		    __field(unsigned long, start)
-+		    __field(unsigned long, end)
-+		    __field(unsigned int, shadow)
-+		    ),
-+
-+	    TP_fast_assign(
-+		    __entry->start = start;
-+		    __entry->end = end;
-+		    __entry->shadow = shadow;
-+		    ),
-+
-+	    TP_printk("gmap notified (start:0x%lx end:0x%lx shadow:%d)",
-+		      __entry->start, __entry->end, __entry->shadow)
-+	);
-+
- 
- #endif /* _TRACE_KVMS390_H */
- 
--- 
-2.41.0
-
+It should not be possible to downgrade the hdr_sz once v1 is selected.
