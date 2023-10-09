@@ -2,154 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C9727BED6E
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 23:36:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69E547BED93
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 23:49:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378653AbjJIVga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 17:36:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
+        id S1378826AbjJIVts (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 17:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377082AbjJIVg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 17:36:29 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97509C
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 14:36:27 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-27756e0e4d8so4888446a91.3
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 14:36:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696887387; x=1697492187; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CeiLuszUQzm1dE5vxA8gfNKXniFYODS3y9KHytRWFpM=;
-        b=DS0pyVOSgJn+2cY+lenjN3nIPtGMAAwB7k12PM5aOtfo64vgPgPjUApWcD9l54GZJo
-         ZQsSUZREQdCs95eFYRv+CoN/tgNCrKuOEMZsk9Hx7X3b3r/R/PC/y+XIf9drXdqneDUo
-         fiNCv7f594wHPeQ06bELorTMs1bj/H68GkKjIlJK121d33Kvjg3vQ/CmDTKkgPdqqC0Z
-         gwXm8nMXKh4n79ciTYlf1IDYy8cbNqNYXGH8Hr/IX1rE3GWqQf190pKZzXVnk7zTC9CI
-         MIdI0ArO5VroGsxc8bXrokQ0CcwEpGbYTBU34H7COid2q1kj4NauxUGPYi/2y2KeqaCH
-         UK0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696887387; x=1697492187;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CeiLuszUQzm1dE5vxA8gfNKXniFYODS3y9KHytRWFpM=;
-        b=gvSEpb5rrBITNt7qKIl/QszNsNyKdd7+SDr6egvJpWysM4iIxeRRdnmzTv91p1PNgo
-         Hdra0Gjr302q74uYGM1I3+32FNhWm54C6DVu6Yg5Sb4lLZrHbQJM/G2cStpr19xvDKg7
-         AszqnOhGggKWiRCDqkUeLqG7SyhRgUlKP1nop6WtpnNXT16XYyfi6IAES0E5CDFzkYGV
-         vXlrxnNQz9nt3/kp25JvQKKGDkQFDg4+//OAnMoIg47vRVNEzGbl1jVOzqNHv4y5sWEj
-         CAzW/rEXTAQKc09QTHMQtJPWURPA2ZJdPRaSx+lG+d2aJ3Rp+aW+0vGK1AfREXBaQa2U
-         Q5+g==
-X-Gm-Message-State: AOJu0Yxh4HEdvUb0olwEUlJiUUmtrRUdm8o8SqFEVdmkohpqOh+csl/R
-        zwdP7Ecn+gm7/i35HAyhV/30bNXNyKI=
-X-Google-Smtp-Source: AGHT+IH8GWGnwoLTEqdBmVnAXJqCsoSI7/uTXTXbteBLWdYRa84UsZFE39P2qq7akQ3npr7ZQiqyYJ/tw74=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a393:b0:274:90a4:f29 with SMTP id
- x19-20020a17090aa39300b0027490a40f29mr280600pjp.1.1696887387251; Mon, 09 Oct
- 2023 14:36:27 -0700 (PDT)
-Date:   Mon, 9 Oct 2023 14:36:25 -0700
-In-Reply-To: <ZSRwNO4xWU6Dx1ne@google.com>
-Mime-Version: 1.0
-References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065006.20201-1-yan.y.zhao@intel.com>
- <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com> <ZSRZ_y64UPXBG6lA@google.com>
- <ZSRwNO4xWU6Dx1ne@google.com>
-Message-ID: <ZSRyWYZBYur-cKYS@google.com>
-Subject: Re: [PATCH v4 01/12] KVM: x86/mmu: helpers to return if KVM honors
- guest MTRRs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
-        chao.gao@intel.com, kai.huang@intel.com,
-        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S1377858AbjJIVts (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 17:49:48 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 857DD9D;
+        Mon,  9 Oct 2023 14:49:46 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2D3AC433C8;
+        Mon,  9 Oct 2023 21:49:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696888186;
+        bh=/02JJBzcVaX1DU3waWXi0+UAJ2uTJXrVNatI5QxJLOI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=F/Xs7FkBE1RhCI+yrZYDvbixH88IPAMRZuA5C5fHFjtdn6wM+kN3H5iHzyXLt5tlY
+         RcpQYCPVhMiyUhYkik8kF4FdX14XbCdk8OL2JPKdPBiwWNwKAusqydF1Fj/CV/RzwX
+         F+CmAH2GKYl3s0dh6iy/6zpPfvctGccx6P41mdC8glBfMPEzb7h91+REyXxUpjQTN/
+         0Nnqs6Te0Fhxvfq1KKg13OnLJ+LShGJQPkCjB1TLfgyrT1rVioW43ZN/nYf75BGp+k
+         1avQBEtuCuA779PEPre7yuWs8DS5povIYfG9MToRHA4i+rL++p0I3u1+l8wLR0agsm
+         0PiNbzP+m4baw==
+Date:   Mon, 9 Oct 2023 14:49:44 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     pbonzini@redhat.com, workflows@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: deprecate KVM_WERROR in favor of general WERROR
+Message-ID: <20231009144944.17c8eba3@kernel.org>
+In-Reply-To: <ZSRVoYbCuDXc7aR7@google.com>
+References: <20231006205415.3501535-1-kuba@kernel.org>
+        <ZSQ7z8gqIemJQXI6@google.com>
+        <20231009110613.2405ff47@kernel.org>
+        <ZSRVoYbCuDXc7aR7@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 09, 2023, Sean Christopherson wrote:
-> On Mon, Oct 09, 2023, Sean Christopherson wrote:
-> > On Sat, Oct 07, 2023, Like Xu wrote:
-> > > On 14/7/2023 2:50=E2=80=AFpm, Yan Zhao wrote:
-> > > > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > > > index 92d5a1924fc1..38bd449226f6 100644
-> > > > --- a/arch/x86/kvm/mmu.h
-> > > > +++ b/arch/x86/kvm/mmu.h
-> > > > @@ -235,6 +235,13 @@ static inline u8 permission_fault(struct kvm_v=
-cpu *vcpu, struct kvm_mmu *mmu,
-> > > >   	return -(u32)fault & errcode;
-> > > >   }
-> > > > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_non=
-coherent_dma);
-> > > > +
-> > > > +static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
-> > > > +{
-> > > > +	return __kvm_mmu_honors_guest_mtrrs(kvm, kvm_arch_has_noncoherent=
-_dma(kvm));
-> > > > +}
-> > > > +
-> > > >   void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gf=
-n_end);
-> > > >   int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
-> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > index 1e5db621241f..b4f89f015c37 100644
-> > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > @@ -4516,6 +4516,21 @@ static int kvm_tdp_mmu_page_fault(struct kvm=
-_vcpu *vcpu,
-> > > >   }
-> > > >   #endif
-> > > > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_non=
-coherent_dma)
-> > >=20
-> > > According to the motivation provided in the comment, the function wil=
-l no
-> > > longer need to be passed the parameter "struct kvm *kvm" but will rel=
-y on
-> > > the global parameters (plus vm_has_noncoherent_dma), removing "*kvm" =
-?
-> >=20
-> > Yeah, I'll fixup the commit to drop @kvm from the inner helper.  Thanks=
-!
->=20
-> Gah, and I gave more bad advice when I suggested this idea.  There's no n=
-eed to
-> explicitly check tdp_enabled, as shadow_memtype_mask is set to zero if TD=
-P is
-> disabled.  And that must be the case, e.g. make_spte() would generate a c=
-orrupt
-> shadow_memtype_mask were non-zero on Intel with shadow paging.
->=20
-> Yan, can you take a look at what I ended up with (see below) to make sure=
- it
-> looks sane/acceptable to you?
->=20
-> New hashes (assuming I didn't botch things and need even more fixup).
+On Mon, 9 Oct 2023 12:33:53 -0700 Sean Christopherson wrote:
+> > We do have sympathy for these folks, we are mostly volunteers after
+> > all. At the same time someone's under-investment should not be causing
+> > pain to those of us who _do_ build test stuff carefully.  
+> 
+> This is a bit over the top.  Yeah, I need to add W=1 to my build scripts, but that's
+> not a lack of investment, just an oversight.  Though in this case it likely wouldn't
+> have made any difference since Paolo grabbed the patches directly and might have
+> even bypassed linux-next.  But again I would argue that's bad process, not a lack
+> of investment.
 
-Oof, today is not my day.  I forgot to fix the missing "check" in the chang=
-elog
-that Yan reported.  So *these* are the new hashes, barring yet another goof=
- on
-my end.
+If you do invest in build testing automation, why can't your automation
+count warnings rather than depend on WERROR? I don't understand.
 
-[1/5] KVM: x86/mmu: Add helpers to return if KVM honors guest MTRRs
-      https://github.com/kvm-x86/linux/commit/1affe455d66d
-[2/5] KVM: x86/mmu: Zap SPTEs when CR0.CD is toggled iff guest MTRRs are ho=
-nored
-      https://github.com/kvm-x86/linux/commit/7a18c7c2b69a
-[3/5] KVM: x86/mmu: Zap SPTEs on MTRR update iff guest MTRRs are honored
-      https://github.com/kvm-x86/linux/commit/9a3768191d95
-[4/5] KVM: x86/mmu: Zap KVM TDP when noncoherent DMA assignment starts/stop=
-s
-      https://github.com/kvm-x86/linux/commit/68c320298404
-[5/5] KVM: VMX: drop IPAT in memtype when CD=3D1 for KVM_X86_QUIRK_CD_NW_CL=
-EARED
-      https://github.com/kvm-x86/linux/commit/8925b3194512
+> > Rather than tweak stuff I'd prefer if we could agree that local -Werror
+> > is anti-social :(
+> > 
+> > The global WERROR seems to be a good compromise.  
+> 
+> I disagree.  WERROR simply doesn't provide the same coverage.  E.g. it can't be
+> enabled for i386 without tuning FRAME_WARN, which (a) won't be at all obvious to
+> the average contributor and (b) increasing FRAME_WARN effectively reduces the
+> test coverage of KVM i386.
+> 
+> For KVM x86, I want the rules for contributing to be clearly documented, and as
+> simple as possible.  I don't see a sane way to achieve that with WERROR=y.
+
+Linus, you created the global WERROR option. Do you have an opinion
+on whether random subsystems should create their own WERROR flags?
+W=1 warning got in thru KVM and since they have a KVM_WERROR which
+defaults to enabled it broke build testing in networking.
+Randomly sprinkled -Werrors are fragile. Can we ask people to stop
+using them now that the global ERROR exists?
