@@ -2,76 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C868D7BEEEF
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 01:10:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 132DD7BEF20
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 01:33:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234601AbjJIXKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 19:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50564 "EHLO
+        id S1379043AbjJIXdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 19:33:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234617AbjJIXKK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 19:10:10 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84380DE
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 16:09:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c647150c254so4481957276.1
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 16:09:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696892956; x=1697497756; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YnaZ+HwT0CqGHphe+RXzr+4BdI3+Wxoy/2h4yWVjWqk=;
-        b=XYiy411LA8tZViU1AzmySXHq9zlzeu0YetPWnF2J3Mm/soQ4R9hUh6e9bgTXNS+tU8
-         MQD40+aFgPdtr/VCrGje1T+8AVuLvjbknpYYiz1zTO7zHwxfn+SMS39fDNobfJ1ipTHv
-         e0H3gnLDoSPZkgYC04f4pVRbwtDKsi9v60s0nsou1YRkgHIAEmPf6XQh69LNd8xUKieI
-         UBHM5/hm4HDSWjqVhk6V/ahLd86xwO2I2zYpdVLlriWGSHjM4UItzogJav0cyET9ZfE6
-         TX6ljzoZiOGunBse7AqtfVwNQNzoEszNTrsyFJew4h8wZIxOo6403pIAXVKWK28P8rKx
-         KsBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696892956; x=1697497756;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YnaZ+HwT0CqGHphe+RXzr+4BdI3+Wxoy/2h4yWVjWqk=;
-        b=QpSxUvDrfjvn6ZVccT2zJDg/j900W0WDdWV3+JNzfeNjA64esUkT1bPs70AcF0yZBS
-         3o5QR1x3NiiWX8GHlLYRNiE3uvRmwH9iphuKmlU9Dx4bBeiK3nl3mnw4hPniH9H5BWjE
-         mkiycCot9rQ09UTKZ9HQ2Z70QtaxocJPxwTEkMqIDBjZbK1a6SRVsiVnwCGjrGL3lJ2P
-         ZdymNjBABmDJk4pYoEn3HV2LFWdOINqX6EOREB5w07lnrB8q9nMwUhhCk+bXWUFMZa6X
-         p+qtEs3aoSef/7uNl73IYRLkqjvdOYeRK2+/m4wK/2RhK5ZXCqOlNsBaY02hMGQfq8aN
-         8DVg==
-X-Gm-Message-State: AOJu0Yw853N6wiF0kC+OifkvVAs4Kzwtl6Q1t86w0qEGA0YDzJe1pSoI
-        oEpMDuqS/t6SXxZJfTRU0mkaK8hTeRyM
-X-Google-Smtp-Source: AGHT+IH1FjsEh0LooC7Dv3FFBpESan9OVAH7g70S+Mf8O6PjhBewcaz+ezN3g+mcbaXqTeognYK/Mgxj9zy3
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a25:d64f:0:b0:d9a:4cc1:b59a with SMTP id
- n76-20020a25d64f000000b00d9a4cc1b59amr23035ybg.1.1696892956142; Mon, 09 Oct
- 2023 16:09:16 -0700 (PDT)
-Date:   Mon,  9 Oct 2023 23:08:58 +0000
-In-Reply-To: <20231009230858.3444834-1-rananta@google.com>
-Mime-Version: 1.0
-References: <20231009230858.3444834-1-rananta@google.com>
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-Message-ID: <20231009230858.3444834-13-rananta@google.com>
-Subject: [PATCH v7 12/12] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S234610AbjJIXdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 19:33:52 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DE2B4;
+        Mon,  9 Oct 2023 16:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696894430; x=1728430430;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LBFBe4wSRIRKO5P0QX9Hw3klraLnxEdNgZzz/M2ttuA=;
+  b=fn7rqCdGslqi+Z7dVGaDlV0SMZ0zCzx9DANGD+k3Rr3eZqjmktuD4fxw
+   YY5RwJ9VmM5ntTRBAtN30bzSz1qgKRNHYq7VMlcNIKnsIF04C395YJQiJ
+   EXb6fl5TXRfQDbdwKvXewi8C3uMMdaq2LVxTszYp2/icc1j860WyUbM9I
+   anTqU4aTUoOZ5D4uPQiqy18n83BhkBfqWGa6jdPftWCw2OVggx+/oGRLC
+   zke82tO2iOHppfcML0mbvb5LvAJZbxbZC35c7GLh+o3Mx0fAlyQZVKk8y
+   oenqPQ8VBHDRmC/c46EMmYbcBdz4nRsCI1IHGwFrr+XubLE2dGj+L4QIb
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363623568"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="363623568"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 16:33:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="819003348"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="819003348"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Oct 2023 16:33:49 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 9 Oct 2023 16:33:48 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 9 Oct 2023 16:33:48 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 9 Oct 2023 16:33:48 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 9 Oct 2023 16:33:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lGn57lQRk6CKGMGkBvcyg6Y/MMEbp5s9aOOGFGZwZQaP6/zIUX7cbt2qQStxPoqC8GFjN1hLIBtcqDR+YOuP9VAzDZMuxv8ZViUc12uZKUwzKI46mUwqApG+untTHe9ymYN8cw4FLmBiVRnWfUsuYj0uTyYlxdulc/WV8LOnm/v+joPFlZm3iwCyan+R9NETe4ajuAy10kdUEcv3ld0ZJvp3DuCiBlamZ3NQTBD2IYdA7GqaHgPYttMbvvL/elDphFjPrDUSXmmqs51qXMr0tjKe7q05V8uVpFHf+1q87KpTZCfRxd1sLJH6Afxg4BcaRTXfqwvjogZUokJBrzvKMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LBFBe4wSRIRKO5P0QX9Hw3klraLnxEdNgZzz/M2ttuA=;
+ b=Xx3z/j30Znph4e/zQ6Cfr6pyzD23dhPIRTXyD38AqHJG9sjX4EIkWdDcWu+i4WlmgYbqdoa1bbVhsokaltiW9MGRQVjN99fudX/I716nLzFGXndbkszzExEaT+vJ85D9WP72Xb49OeAbyuHgKPoUMDi/cXjrcQOKp59LgxdVQtvh+ZL/tqCfeACVjJXFZQerA4OwQ2AsjOhqpfywdOc1xtrNyfv9YtxRWzch3g5fjHqzKSqjFkaJt0q2FpKDL6k09Z58JV8xDzpdK+aGlm9cYg0ykRc9+fVN6IMyKTJKRN5pofkxMBxfYZ/OqE5a+NGuibtEUH1tDWK5f+OYhlJg1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by MN0PR11MB6058.namprd11.prod.outlook.com (2603:10b6:208:376::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Mon, 9 Oct
+ 2023 23:33:44 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::7116:9866:8367:95b4]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::7116:9866:8367:95b4%3]) with mapi id 15.20.6863.032; Mon, 9 Oct 2023
+ 23:33:44 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>
+Subject: RE: [RFC 0/7] Add SIOV virtual device support
+Thread-Topic: [RFC 0/7] Add SIOV virtual device support
+Thread-Index: AQHZ+o3OMaCbtqkNIEu5l1gzwLPcX7BBcdmAgACn7HA=
+Date:   Mon, 9 Oct 2023 23:33:43 +0000
+Message-ID: <BN9PR11MB5276A19AC2CA9DA2B528822F8CCEA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231009085123.463179-1-yi.l.liu@intel.com>
+ <20231009132115.GA3952@nvidia.com>
+In-Reply-To: <20231009132115.GA3952@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|MN0PR11MB6058:EE_
+x-ms-office365-filtering-correlation-id: b1096b94-0d0d-40a6-0a66-08dbc9202d5c
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZvfKMfF+O2Kjh+XckE/FZ1V9KuJs1AaozjrsObF/7MAqhDhhU9mG4Au7PUeGvb7FjceoLBlL+bp17n2BjleAgpqBeG5rJEV3aNSr8EXGCDXgrBPMVXrle/rPsQw7GxS+htMhUGvtUdBdgtU3OXSsNyKKgyawht6NX+2zzbJGqekuo6eA7k6HcfQdtehWreMagPDdqsxP7M5zvjr5fcZ2DxNs2T5az61GNeLADKliQxTA3FkJlHfNnFDzw+GFmwSXwYOospzVx6FXteLCtQwoOMEnLpOJ4dmiZ7fTR/IOwCW1I/4ayKXXGvus3oHjppIgtt7NnZ5JQXIPQFl/j09Cu0ixY1iQLgAOlO7IqHoFqvq2xfOAuyWUByjRZevk+v7SMybLb0aL+13YN0TVfvh0w6nP/XUi+T8E2lt7Nau5HsK4SgTp85nRo7lKBNfVI/qS33WJD5ukMoaSjXA+SI/8ZvoQly9XyqnjuqjbY+lR/YQ9g/gG8ikYXOpzHIoKiVjytVTjILUNKc1fluO7kjyaD4P1z4rpeGMEGhVmVmPIGqUwijl9QTk/jErLRUB32s7w+Hcd4OB1C8vM1GjnhEfYo8vdufhAFuEtLrnW+fL2yRQ20DMq1RIHIXsOtAnv4mRV
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(366004)(346002)(396003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(9686003)(26005)(71200400001)(55016003)(82960400001)(33656002)(38070700005)(86362001)(38100700002)(122000001)(8936002)(6506007)(7416002)(4326008)(4744005)(8676002)(2906002)(478600001)(7696005)(66556008)(52536014)(41300700001)(316002)(6636002)(5660300002)(66446008)(110136005)(54906003)(64756008)(76116006)(66476007)(66946007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NWJoN2NyRGY1MmllUGdzRXY0aHdEdWxTVlVHaXZZamdRdENzTVl0L09JMndI?=
+ =?utf-8?B?RHZTcHJpTENiNnozOG05OFJUYTlpRjhUNDg4QmlFUGVLaGNzQTJyTDljbDVT?=
+ =?utf-8?B?R3dBV2ZSRmZnMS8zR3lnZHFXak9WSERvMlFPL25RVXFpQU5ya3MzbGN4dnZH?=
+ =?utf-8?B?b1E1NThDMmJ2c1o1S3ZkNFNSN3lHbTJRWjJndG1sd0ovUERBN04rN1huTkhU?=
+ =?utf-8?B?K2JuSmVUN0pGVHp2R21sNEVyL091dmV0LzJOWUxwOHJnRGY2QXFXRmdWTkN2?=
+ =?utf-8?B?RDVBcS9OcWo1RFZNVFM0M3p6Nm4vVVNqTkdnaDlyb3ZMWjhmaGU4RTVyemJB?=
+ =?utf-8?B?WW1icTgrYnNSdGFsTDlJOThyK01lTG9nUUFKbkgxemJEN25yc2pacmJQbk9R?=
+ =?utf-8?B?Y2pZYXRObkVrMyszSFBCQW5kbG5YdkFDMzExc1ZZN2lmeGR6QnY5TzlIUE96?=
+ =?utf-8?B?Z3p6cE1RWEdyNVZ6TzZFazlLNDhmNGl6WnFhandMVkVjbVphL2daT0Z0eEx4?=
+ =?utf-8?B?VWhlSnBqMFFvRXhwRk9zbStzbmNlUEt6OVZRb3BZK3ZxNXJhOWM1YlBneHhR?=
+ =?utf-8?B?SVNXdkpLR24zZjhxSTZodWxJOHVHdFp0NzR2VFBVSUs3Y0pycnpoY25yKzA4?=
+ =?utf-8?B?NGZmTENzQ2VKT2V2UWJNN0NLemM2SStGOGFBQkpkUlRzQlVjZHhkSjFYMEdv?=
+ =?utf-8?B?ZXAxRGI4UTM1cTV3bWtocThzYWoxcEZkZEdCemZ0dnRUU2Jxb3B1M2t6bVp0?=
+ =?utf-8?B?ZEtuRWhsd2hzbDh1MXJFZnF6Z3RqMGU2SjllQmVsSlczeXB4TzVrQ1dVQ2NT?=
+ =?utf-8?B?T1M0VDY5N2dPekc1eFhsRWRVTURqejdnMHdkbG1GNmNZTlBnNWd6Y1JsdlJQ?=
+ =?utf-8?B?RkNWMk1JT3crVkd0c2IxRER3OTd1Q1RmUklYMzJMZWlyMkpOZ3BRMldJbTVu?=
+ =?utf-8?B?aTFjdktIZWViRFJ0bDZRZ3dEa2xZL001NGtkeVJhbWx2RTBlb0pRM3diY296?=
+ =?utf-8?B?QXBWMFVZNjdXQlJhN2M3Y0lneWZnaHo5MDFUbTZQeHR2QTluemJqZE9BWWM5?=
+ =?utf-8?B?Uno5ZWF0N0E1MjJ6REMvM29rdUZlR29NT0FkdjhmS2FPVmVzamJEOUtDbzFE?=
+ =?utf-8?B?NlF0MEZQUC9IZk4zL3RvTlZSRW43VXhKODhhTEMwZUZnNWo3TmFXbHlTSkNp?=
+ =?utf-8?B?WHhORDJTbm5ZTWVBSzRjN3k5cDIzYW1OQTA2YnBrNXZOR3JOUllwa2tKUXhy?=
+ =?utf-8?B?WE1mMFJ4SEUwTnFqZlhPeUJMQjRSa3BOZU44a3p5ZGdBa3BPbXlCclowY2dM?=
+ =?utf-8?B?YVFEaVM2UThmb3NXYSs1NGd5VnBlQlBYQmRhODBjbU1hc3gvVFpXQmQvT2dk?=
+ =?utf-8?B?ZGJBUlN6UWxxMWlzNFhFdW9OdC9ja1ErUkVCb3UzMzBnMFV5T1JHQjZTOU10?=
+ =?utf-8?B?ZDZFSU1vYXN3MTdyZTlkNmw5WmNYSDh2QkNNOFNYWlAyRXo4VytSVm4zc1R4?=
+ =?utf-8?B?NVZiN203a2NJb3F6aVNidFhWL2RyemRFZmhDUVg3QW9JRERFYUxQYmx3ekE1?=
+ =?utf-8?B?b0JDR1NTbzJhYkJBK3grNUttTEpkNWhVbVdPZkE3VlhEMHk4Mld4ZWRPNXdw?=
+ =?utf-8?B?eHJiRjBQTnlXUVpyNEsrOERJU0pBdks1cExWUVZQdnQ2aHpqSEM2VzZHeTBl?=
+ =?utf-8?B?ajNsT3ZESHYyWEhqVXN3cjZPanJsN01NT3dCRzJKTk1FK0RqS3huUmdJR3N3?=
+ =?utf-8?B?UC9sQzMwZzVqbkJycGVVUEZFL1JneEdGUWxSYk9CY21kSUVlM3crSW1PSHdY?=
+ =?utf-8?B?Q1J3dkdaN3JpblZPWFJKeVpvMEs4NS9aZXZqbmVhdTdRTWxEbTBsVzlGclRY?=
+ =?utf-8?B?dVBaVjJxMDUrV0tZcTJVeUVpZXM4R0t3NzRIZjRPL24rdzVpL3AxUjhOZnNV?=
+ =?utf-8?B?VlJWRHJjWnBVMUhRMk1ockpha084R1UrSTRQMTU1em1QMnRjQzg4TTJySmd5?=
+ =?utf-8?B?K2lJVnRjdlIwUGxidFZORnNhMzFxSjBHTktVVzRBS09ncEs2amV5TnRCcHha?=
+ =?utf-8?B?QURBZFZiZ25CMnlxbGZqWEYyU2psdWRRT2xBaWpNNjNMZ29PcGVEZStpUTJq?=
+ =?utf-8?Q?rZ6QjQRHWJd8y3pq7C0FBFlpV?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1096b94-0d0d-40a6-0a66-08dbc9202d5c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2023 23:33:44.0056
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ojzoTM9SbUDfFtd/9s43t60he7sqbdM6Mk+KQhglZClAS28458V4r7DkHFsu1NKikWCRr9lRnJhCUIl1mMEswQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6058
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,182 +181,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Reiji Watanabe <reijiw@google.com>
-
-Add a new test case to the vpmu_counter_access test to check
-if PMU registers or their bits for unimplemented counters are not
-accessible or are RAZ, as expected.
-
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- .../kvm/aarch64/vpmu_counter_access.c         | 95 +++++++++++++++++--
- .../selftests/kvm/include/aarch64/processor.h |  1 +
- 2 files changed, 87 insertions(+), 9 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index e92af3c0db03..788386ac0894 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -5,8 +5,8 @@
-  * Copyright (c) 2022 Google LLC.
-  *
-  * This test checks if the guest can see the same number of the PMU event
-- * counters (PMCR_EL0.N) that userspace sets, and if the guest can access
-- * those counters.
-+ * counters (PMCR_EL0.N) that userspace sets, if the guest can access
-+ * those counters, and if the guest cannot access any other counters.
-  * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-  */
- #include <kvm_util.h>
-@@ -131,9 +131,9 @@ static void write_pmevtypern(int n, unsigned long val)
- }
- 
- /*
-- * The pmc_accessor structure has pointers to PMEVT{CNTR,TYPER}<n>_EL0
-+ * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
-  * accessors that test cases will use. Each of the accessors will
-- * either directly reads/writes PMEVT{CNTR,TYPER}<n>_EL0
-+ * either directly reads/writes PMEV{CNTR,TYPER}<n>_EL0
-  * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
-  * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
-  *
-@@ -291,25 +291,85 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
- }
- 
-+#define INVALID_EC	(-1ul)
-+uint64_t expected_ec = INVALID_EC;
-+uint64_t op_end_addr;
-+
- static void guest_sync_handler(struct ex_regs *regs)
- {
- 	uint64_t esr, ec;
- 
- 	esr = read_sysreg(esr_el1);
- 	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
--	__GUEST_ASSERT(0, "PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx", regs->pc, esr, ec);
-+
-+	__GUEST_ASSERT(op_end_addr && (expected_ec == ec),
-+			"PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx; EC expected: 0x%lx",
-+			regs->pc, esr, ec, expected_ec);
-+
-+	/* Will go back to op_end_addr after the handler exits */
-+	regs->pc = op_end_addr;
-+
-+	/*
-+	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
-+	 * as a sign that an exception has occurred.
-+	 */
-+	op_end_addr = 0;
-+	expected_ec = INVALID_EC;
-+}
-+
-+/*
-+ * Run the given operation that should trigger an exception with the
-+ * given exception class. The exception handler (guest_sync_handler)
-+ * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-+ * will come back to the instruction at the @done_label.
-+ * The @done_label must be a unique label in this test program.
-+ */
-+#define TEST_EXCEPTION(ec, ops, done_label)		\
-+{							\
-+	extern int done_label;				\
-+							\
-+	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
-+	GUEST_ASSERT(ec != INVALID_EC);			\
-+	WRITE_ONCE(expected_ec, ec);			\
-+	dsb(ish);					\
-+	ops;						\
-+	asm volatile(#done_label":");			\
-+	GUEST_ASSERT(!op_end_addr);			\
-+	GUEST_ASSERT(expected_ec == INVALID_EC);	\
-+}
-+
-+/*
-+ * Tests for reading/writing registers for the unimplemented event counter
-+ * specified by @pmc_idx (>= PMCR_EL0.N).
-+ */
-+static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-+{
-+	/*
-+	 * Reading/writing the event count/type registers should cause
-+	 * an UNDEFINED exception.
-+	 */
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-+	/*
-+	 * The bit corresponding to the (unimplemented) counter in
-+	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-+	 */
-+	test_bitmap_pmu_regs(pmc_idx, 1);
-+	test_bitmap_pmu_regs(pmc_idx, 0);
- }
- 
- /*
-  * The guest is configured with PMUv3 with @expected_pmcr_n number of
-  * event counters.
-  * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-- * if reading/writing PMU registers for implemented counters can work
-- * as expected.
-+ * if reading/writing PMU registers for implemented or unimplemented
-+ * counters can work as expected.
-  */
- static void guest_code(uint64_t expected_pmcr_n)
- {
--	uint64_t pmcr, pmcr_n;
-+	uint64_t pmcr, pmcr_n, unimp_mask;
- 	int i, pmc;
- 
- 	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
-@@ -324,15 +384,32 @@ static void guest_code(uint64_t expected_pmcr_n)
- 			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
- 			pmcr_n, expected_pmcr_n);
- 
-+	/*
-+	 * Make sure that (RAZ) bits corresponding to unimplemented event
-+	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-+	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-+	 */
-+	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-+	check_bitmap_pmu_regs(unimp_mask, false);
-+
- 	/*
- 	 * Tests for reading/writing PMU registers for implemented counters.
--	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
- 	 */
- 	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
- 		for (pmc = 0; pmc < pmcr_n; pmc++)
- 			test_access_pmc_regs(&pmc_accessors[i], pmc);
- 	}
- 
-+	/*
-+	 * Tests for reading/writing PMU registers for unimplemented counters.
-+	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-+		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
-+			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
-+	}
-+
- 	GUEST_DONE();
- }
- 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index cb537253a6b9..c42d683102c7 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,6 +104,7 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x0
- #define ESR_EC_SVC64		0x15
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
--- 
-2.42.0.609.gbb76f46606-goog
-
+PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBNb25kYXks
+IE9jdG9iZXIgOSwgMjAyMyA5OjIxIFBNDQo+IA0KPiBPbiBNb24sIE9jdCAwOSwgMjAyMyBhdCAw
+MTo1MToxNkFNIC0wNzAwLCBZaSBMaXUgd3JvdGU6DQo+ID4gSW50ZWwgU0lPViBhbGxvd3MgY3Jl
+YXRpbmcgdmlydHVhbCBkZXZpY2VzIG9mIHdoaWNoIHRoZSB2UklEIGlzDQo+ID4gcmVwcmVzZW50
+ZWQgYnkgYSBwYXNpZCBvZiBhIHBoeXNpY2FsIGRldmljZS4gSXQgaXMgY2FsbGVkIGFzIFNJT1YN
+Cj4gPiB2aXJ0dWFsIGRldmljZSBpbiB0aGlzIHNlcmllcy4gU3VjaCBkZXZpY2VzIGNhbiBiZSBi
+b3VuZCB0byBhbiBpb21tdWZkDQo+ID4gYXMgcGh5c2ljYWwgZGV2aWNlIGRvZXMgYW5kIHRoZW4g
+bGF0ZXIgYmUgYXR0YWNoZWQgdG8gYW4gSU9BUy9od3B0DQo+ID4gdXNpbmcgdGhhdCBwYXNpZC4g
+U3VjaCBQQVNJRHMgYXJlIGNhbGxlZCBhcyBkZWZhdWx0IHBhc2lkLg0KPiANCj4gSSB3b3VsZCB3
+YW50IHRvIHNlZSB0aGUgaWR4ZCBpbXBsZW1lbnRhdGlvbiB0b28uLg0KPiANCg0KSXQgc3RpbGwg
+bmVlZHMgc29tZSB0aW1lIChhbmQgdW5mb3J0dW5hdGVseSB0aGUgZ3V5IHdvcmtpbmcgb24gaWR4
+ZA0KaXMgY3VycmVudGx5IG9uIGEgbG9uZyB2YWNhdGlvbikuDQoNCkluc3RlYWQgb2Ygd2FpdGlu
+ZyB3ZSB3YW50IHRvIHNlZWsgZWFybHkgY29tbWVudHMgb24gdGhlIGlvbW11ZmQNCmNoYW5nZXMg
+Z2l2ZW4gdGhhdCBwYXJ0IGlzIHJlbGF0aXZlbHkgc2VsZi1jb250YWluZWQuIFNhbWUgYXMgd2hh
+dA0KUmVpbmV0dGUgaXMgZG9pbmcgZm9yIElNUy4NCg0KQ2VydGFpbmx5IHRoaXMgaXMgbm90IGZv
+ciBtZXJnaW5nIHcvbyBoYXZpbmcgYSBkcml2ZXIgdXNlci4g8J+Yig0K
