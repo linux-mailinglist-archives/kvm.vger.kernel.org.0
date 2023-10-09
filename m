@@ -2,125 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19CF97BEAE5
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 21:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA8867BEB30
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 22:06:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378490AbjJITwg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 15:52:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50926 "EHLO
+        id S1378529AbjJIUGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 16:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378488AbjJITwf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 15:52:35 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D29A4
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 12:52:33 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a23fed55d7so78320567b3.2
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 12:52:33 -0700 (PDT)
+        with ESMTP id S1378515AbjJIUGC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 16:06:02 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D18A3
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 13:06:00 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8997e79faeso5267697276.1
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 13:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696881152; x=1697485952; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yNj1pprsRAKwETqq5Ekq2GPnFYfA7vwnbMFCvxBPbc0=;
-        b=1sbG001vaerjQQ/CZsG0w33uTE7wrlhr/E0yGWhKqegVgD2TnWeEdn2qapOH+XuFa6
-         t36RH+nI9dtQSMt8JCvh3HGd6YxiLVMx8XCus80CvJL/8U60DoHx8D8d1w8uDhxDFUNl
-         sEl4jYVl429eWrYSahmXo/kTzR7RDkri0eoRRASZ42BM3rmztYUsrn4GgZbemgWwDf70
-         wCmJu1SAUOQRM7JzMdrftBEKb4SzwMzm6S8c6SgGXHwDhXOU6AWBUfm/XdqfUEV2sRaU
-         PQ00duczqjjxCpj4wzJ6ISV80Q/zHVd4AiCWdLJPps2W/9bcT2LAaPVFyLYHRddPimQ8
-         BU4Q==
+        d=google.com; s=20230601; t=1696881960; x=1697486760; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mgUM1zPjlumMD3VBLFlCnfcUq27pdayX7zRx8uSu+k8=;
+        b=Oo/wRl0cvbko3s18LCvBc21xY2UTkHKXhwcGApsSiHR8BKie02pQLd8yqOgPilh48R
+         XYd16fTOecmH5PubyopcEKfjWSHCBrAC9LjLPhOQBzsJ6zkwIs6SK4IyeSBFhFfpNNdR
+         +izzoWM9xRiM5MQObkSlmsbt+LFLSUEuzF3Jvnr0wveLrsTTG6/cgOmV+00BEnlI6tYP
+         ly/EYNmiP/NRMGqo6JKQc709rD2FU2Sx6BRpfKEF7BH6p0sahx5DFkv1uxOInpp8dW9c
+         x8LdT+93zyeNaMfbdvVgwycnlgVLIw+OzH63F+ZcE2sCLo5RMoNKYpxjunIxpOuQWOW8
+         zfZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696881152; x=1697485952;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yNj1pprsRAKwETqq5Ekq2GPnFYfA7vwnbMFCvxBPbc0=;
-        b=VnCw32c9OIj1uqdMtbPL/gDpBe/hOKy/6hOFhM3NXOLzYXmdOPa0nKTO7VryravzNC
-         e12SbmgX0qFIrLjUqwHnjQ+UcGrhhf8vI7J0fFLWj+Z7O+8syE3Ybk0yii+y/3CBx4qo
-         dLTAZAwjgj6X89ur1taZTlIXwyqj7TTGgYx212XFJqFN0ACsIczoPvpMUYl8KQSUijao
-         lKTipgWNnjf6PkFnZrDWdsmOED/enwNaROVTYsB975gt8Ao45YAFb7xixsawftuGsS4N
-         wObCYIyF0feGadG6DQUw7OOw0+rAwugmS6mv4VYji+XlF1Tk4y+ATO3+I5U+GCMx+rz8
-         piBA==
-X-Gm-Message-State: AOJu0YxD2WNsh+a1xzz9orwN1QWlxsHg5dj6uf0Uva0TcRcI0Gniw4n3
-        goAZO6OPAvmcIn+vtsBB/pL5yQKnw+Y=
-X-Google-Smtp-Source: AGHT+IHRpOvdov34HiTmmE1Yu2fxzpAk3cUCxPQBKUgx1kHzcRi7yR+du7TFlfF3MJl6qAY9vFHc+wgMWkA=
+        d=1e100.net; s=20230601; t=1696881960; x=1697486760;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mgUM1zPjlumMD3VBLFlCnfcUq27pdayX7zRx8uSu+k8=;
+        b=O+yKRWuMS/XiAqDMs+Hz2RJqDU3AkTU8fPFPtAT25wSaGYIJeSH+NOdQBdCpr4D98g
+         oZjoA/Jyc7cj0G2KC71MGMGzLwd+eNU+neM3xTgLRzrPTPOB3RPufC7C75okKdA98pOA
+         Lyb68hw5yKksd1CfZSkNZtv2SPXJNgcd3j05NdRFNvrt0VnK9vxFsdU4Tmpf/pSa/UUD
+         o7jyLgZ5riaEM4TwhJjPOnuhu2wAcwr+PFYjrmSOU9Dg+1mcrmVEQuaoCkbd5L10Xd6v
+         vcnsMXEDriI6kcdXUJKCUqoXm+Pf4aA2jObnMVGOjvfHQqpA4HE0/hJFSnHV2FJv3h9c
+         tc1w==
+X-Gm-Message-State: AOJu0YzdKjtcu2jH46kvzwdCTSq7NftAAmJ/Bhv+/i6hRoGf+FxHRDPx
+        ZQ8Bz3mL7JUIeCXt3PWO89GgWstLUIw=
+X-Google-Smtp-Source: AGHT+IFswUFYv+E1JAh0jUKucqfmy80VgTB8wOboFE+TaISabbXxXdFibYColR2QXqUnGv9EmScJfBNcrnY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c746:0:b0:59f:77f6:6d12 with SMTP id
- i6-20020a81c746000000b0059f77f66d12mr308643ywl.0.1696881152581; Mon, 09 Oct
- 2023 12:52:32 -0700 (PDT)
-Date:   Mon, 9 Oct 2023 12:52:31 -0700
-In-Reply-To: <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a25:6a04:0:b0:d89:42d7:e72d with SMTP id
+ f4-20020a256a04000000b00d8942d7e72dmr276988ybc.3.1696881959859; Mon, 09 Oct
+ 2023 13:05:59 -0700 (PDT)
+Date:   Mon,  9 Oct 2023 13:05:36 -0700
+In-Reply-To: <20230929230246.1954854-1-jmattson@google.com>
 Mime-Version: 1.0
-References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065006.20201-1-yan.y.zhao@intel.com>
- <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com>
-Message-ID: <ZSRZ_y64UPXBG6lA@google.com>
-Subject: Re: [PATCH v4 01/12] KVM: x86/mmu: helpers to return if KVM honors
- guest MTRRs
+References: <20230929230246.1954854-1-jmattson@google.com>
+X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
+Message-ID: <169688028046.124915.12822717049960972546.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/3] KVM: x86: Update HWCR virtualization
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
-        chao.gao@intel.com, kai.huang@intel.com,
-        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        "'Paolo Bonzini '" <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 07, 2023, Like Xu wrote:
-> On 14/7/2023 2:50=E2=80=AFpm, Yan Zhao wrote:
-> > Added helpers to check if KVM honors guest MTRRs.
-> > The inner helper __kvm_mmu_honors_guest_mtrrs() is also provided to
-> > outside callers for the purpose of checking if guest MTRRs were honored
-> > before stopping non-coherent DMA.
-> >=20
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >   arch/x86/kvm/mmu.h     |  7 +++++++
-> >   arch/x86/kvm/mmu/mmu.c | 15 +++++++++++++++
-> >   2 files changed, 22 insertions(+)
-> >=20
-> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > index 92d5a1924fc1..38bd449226f6 100644
-> > --- a/arch/x86/kvm/mmu.h
-> > +++ b/arch/x86/kvm/mmu.h
-> > @@ -235,6 +235,13 @@ static inline u8 permission_fault(struct kvm_vcpu =
-*vcpu, struct kvm_mmu *mmu,
-> >   	return -(u32)fault & errcode;
-> >   }
-> > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_noncohe=
-rent_dma);
-> > +
-> > +static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
-> > +{
-> > +	return __kvm_mmu_honors_guest_mtrrs(kvm, kvm_arch_has_noncoherent_dma=
-(kvm));
-> > +}
-> > +
-> >   void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_en=
-d);
-> >   int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 1e5db621241f..b4f89f015c37 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4516,6 +4516,21 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcp=
-u *vcpu,
-> >   }
-> >   #endif
-> > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_noncohe=
-rent_dma)
->=20
-> According to the motivation provided in the comment, the function will no
-> longer need to be passed the parameter "struct kvm *kvm" but will rely on
-> the global parameters (plus vm_has_noncoherent_dma), removing "*kvm" ?
+On Fri, 29 Sep 2023 16:02:43 -0700, Jim Mattson wrote:
+> Allow HWCR.McStatusWrEn to be cleared once set, and allow
+> HWCR.TscFreqSel to be set as well.
+> 
+> v1 -> v2: KVM no longer sets HWCR.TscFreqSel
+>           HWCR.TscFreqSel can be cleared from userspace
+>           Selftest modified accordingly
+> v2 -> v3: kvm_set_msr_common() changes simplified
+> v3 -> v4: kvm_set_msr_common() changes further simplified
+>           HWCR.TscFreqSel can be modified from the guest
+> 	  Targets reordered in selftest Makefile
+> 
+> [...]
 
-Yeah, I'll fixup the commit to drop @kvm from the inner helper.  Thanks!
+Applied to kvm-x86 misc, thanks!
+
+[1/3] KVM: x86: Allow HWCR.McStatusWrEn to be cleared once set
+      https://github.com/kvm-x86/linux/commit/598a790fc20f
+[2/3] KVM: x86: Virtualize HWCR.TscFreqSel[bit 24]
+      https://github.com/kvm-x86/linux/commit/8b0e00fba934
+[3/3] KVM: selftests: Test behavior of HWCR
+      https://github.com/kvm-x86/linux/commit/591455325a79
+
+--
+https://github.com/kvm-x86/linux/tree/next
