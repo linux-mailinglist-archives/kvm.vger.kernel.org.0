@@ -2,130 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C4D07BDEA2
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 15:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B187BDF9E
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 15:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376377AbjJINV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 09:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49486 "EHLO
+        id S1377103AbjJINcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 09:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376370AbjJINVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 09:21:20 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2067.outbound.protection.outlook.com [40.107.102.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE7EBA;
-        Mon,  9 Oct 2023 06:21:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AeSDHuk8+vJuJ4d935eHTgSUppQSgOTQ5+OAFh9JIrVZtxuLeLq3vywlcD5LwIUaYGVcpHU7kya7Q5+zVMrWt+OUtFyZWGWmxKWuXldIwMHZdcnC2CO8pbafB9s1XKWjcnCxf3lGljoRzH1ccGdVjJuiVJmxyeYBxrc72qVGLzil0+YRD17nrQK0YwV9S5q/rqsO6zQDNDDkytD7HAH4u/t5fVHV8tMERhFKr/R60QGmt7nFiKRKue9iXIJNQ4zU5xawbEieJdz51gvfY0z5Z3elKZI3lYcl5b1yVcoLmg17PUxB4oWv77hDWdYId/ah35FTfbWJAOHUSwAyzCEBbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JKxVD0Oeo2gn+zQfqubTHtydjMUVSEnmEbyxxzmTP3U=;
- b=hTAsMqmdxImIUNIyBkwOvA/1ELvfHQZpZE9SW+7d4NlOZMdkU86jjnVfScGLYeQrCAIKuVYO0IHvewxDUe5HEz9ztbwEHqlXm4NWyZcCtwuLUJXfjtDzuu+iuAJIm1k+GHf6WE9hHaAzbKNc/pOmWY1tMmHCzmiQZ0sAmuLz19wYt6YpyULClpLPs8VSFDN1qzV35JUV1OSl/DDdLITlds3X5Wm5AKnCs6OfZNRsZBw1TGORepyWWTSpIKBppHTPvF/C7KY4kWFDQwIKJDVZnadyOs5RpkXGXOCFSBN6mkIJO8p9xof4VCh39Z5tRmZy3AreeTfJAZWhVkLVJ0z2tw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JKxVD0Oeo2gn+zQfqubTHtydjMUVSEnmEbyxxzmTP3U=;
- b=eERgRIi1ehZola8VkoIvDz1+UAMpqQjFhUavlSV1hNMLmadnwtei3XTYpX1VYX9t181yrCCcugDpBNDdliMfELHOP7qvYPkzU0wJEyyyjDTVfCPV9EBRDFUErwGeBInaIwYdB5FgUhsuWLCChQyaCCrin46HZuknci5g1SXWpchJjITR2EDbetHJRljqmZwP1XtdZkxjrPJfEoVE4VC0WkAGLW6/lS0JpRRWtY0pxMPEkeSwHhzBJiv7PllU1h4/6/MnQeL5+l2d3fK2WG4Go4mBKfoEqz4upOWCbMwgVLkS0ZVHz9ceu6GBLMO7yq0M4fF5RjIERw8KYem6Ma8IsA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV8PR12MB9418.namprd12.prod.outlook.com (2603:10b6:408:202::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.41; Mon, 9 Oct
- 2023 13:21:16 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
- 13:21:16 +0000
-Date:   Mon, 9 Oct 2023 10:21:15 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
-Subject: Re: [RFC 0/7] Add SIOV virtual device support
-Message-ID: <20231009132115.GA3952@nvidia.com>
-References: <20231009085123.463179-1-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009085123.463179-1-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR10CA0016.namprd10.prod.outlook.com
- (2603:10b6:208:120::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S1377086AbjJINb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 09:31:58 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87978A3;
+        Mon,  9 Oct 2023 06:31:56 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 399DNkT6007377;
+        Mon, 9 Oct 2023 13:31:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jhkpuwHDG8pBouseIPSDQ3Du5VYP7xsF5Tr5cCZLulw=;
+ b=RwZnCTVP6GdFLTmT5NTOy7Xw0lYQ1r+pRtS119mqCx9zSa+ICAhb/FHmmpSTTZdKNHnY
+ p8hYj3ZpUlKztR+Zz2Ef4NBJH/U+mZcZCJbnvlubzMawKE00Q3Dh/N0i4AeVc8Y+H5Cj
+ ixGyR2xMLNAeTV4mnLJn35wJIeM39cvqciaKPcPIEf2noUf+PA+wkTFA2S7fj5imxL4v
+ IoqwmwgT2PN8HJv0T/CQ8T3irCgxpVtm99IqmvfaR0U0slkQ60lkqrQTlZGES5HP0sRe
+ cDbuhI7zx1gIJPpmoyp06CZ4KJEGVWnNk1x5i40dkgn+GV0KKvuZrXswZrkUzAIDO5PG fA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tmj628t5a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Oct 2023 13:31:55 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 399DO7uZ011219;
+        Mon, 9 Oct 2023 13:31:54 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tmj628t53-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Oct 2023 13:31:54 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 399CW489025883;
+        Mon, 9 Oct 2023 13:31:54 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkjnn16b4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Oct 2023 13:31:54 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 399DVpuo42009156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 Oct 2023 13:31:51 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DE272004D;
+        Mon,  9 Oct 2023 13:31:51 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 992042004B;
+        Mon,  9 Oct 2023 13:31:50 +0000 (GMT)
+Received: from [9.179.29.36] (unknown [9.179.29.36])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  9 Oct 2023 13:31:50 +0000 (GMT)
+Message-ID: <c881a0d9-4a9d-4c2a-9e37-496308674b24@linux.ibm.com>
+Date:   Mon, 9 Oct 2023 15:31:50 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9418:EE_
-X-MS-Office365-Filtering-Correlation-Id: e5144cd5-c480-40dc-21ff-08dbc8ca9e19
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: A0ys9j73n/ZfEuLVf9udvm5NK8t81x5tvUneAnZOhrda1ahmx7l9v9pGZ7oUUtEJ7TAz5NcI8fFwqOT+JPQW+xwtOGP9U0k/GmWw1VHSTSCePxkM0IIoJBJMRiX8uQgsO+mOMv3AH65QuAFZzrinYRjQRbb3e1uyYbsJUGSNb/wTPADkyFuVuUURhLbTdQgeYalrE8nEuCdfo39jmP1wBwRRzjn3IobkZ4AIiPvDoZwXRrOFNSCQTtkLeFhY441wjMKpYai6MEcjYiHO9UKbJoDXYbYfZb+KzYEDQsqnhuK8sL6w42BIYY09PlvYHR7xyG2adjUzNv2qnbAjgLTrMxBmBxb28SYOOn1hvxMdCdu/R7bSwfDKkRkuoWUHJ0f71KwCqqLAtmZJAcx8T/w8invl6yHoKvX9OXDgZ3d60lD6c3DsyHAEl5XhFk4+gwtYez17LpzyYXn3e6v3PXOuYsLjXDkw+pQ0U2SRvaw93Kb03V+i1kTH0aedQUuyKvT3DkRiy1mLU0kv84APapnoc5zSPNtd9eiOkOdsbed5nZNbub+c5e6aRTxujPvv7iZw
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(366004)(39860400002)(346002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(38100700002)(86362001)(33656002)(36756003)(316002)(6512007)(2906002)(478600001)(8936002)(6486002)(4744005)(41300700001)(4326008)(5660300002)(8676002)(6506007)(1076003)(2616005)(66476007)(66556008)(66946007)(7416002)(6916009)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tkK0roaCW3OT1p5/2wD/qVUigdzRd+oUb7QBKa2dswTszqhPmrVNGEx/CYV3?=
- =?us-ascii?Q?7b9mAS0eoGThNNlZrIP34vLzsDdpSsWGk+0SzAd7cPLd8ODeLDKA0uTomDXm?=
- =?us-ascii?Q?JnoAfGH5if4t8fw+B6u5gLlvmfNXcHp+Su9b9hijUiJG4KKw6yqfbpafKces?=
- =?us-ascii?Q?KB5c0aRva6mqsByH3GEuyJr+y6mNxhV7DsP0L4fzQxQbQsL/I6l7tP4y20+B?=
- =?us-ascii?Q?AIxh7GYvNK8d9R462WFBH9rB0YYwIBcLsJQ03BD9R7Iy6F77z0yR3+k4qHoG?=
- =?us-ascii?Q?81K4T84OQEVJSoCuq6u9cyMSSO3K4Ti5SBVZSE8TRLB3d+FAqUJ5pIpmCMLa?=
- =?us-ascii?Q?HTwKDWAqVOK6KTanDqYi2BDYdOfnx91WdQFt8ufLzlV0yjfuATxihBaRIEiM?=
- =?us-ascii?Q?s1lvvZ9w1VJPKxgFt3O9EKVsam7MouCmOvZWYPjZ19F7+qPuW8NThe+NQM2N?=
- =?us-ascii?Q?VscBbocNw8vbJ+oSC0GGhjKdBdAD2XlKjxg/tHucisdBEUi2g/OG6liXQLP8?=
- =?us-ascii?Q?n1TF0UVqolnkaQfl/ESoPaVccDpv4OW/pIRsVXe+53XywDNfGDicGcK9FFKs?=
- =?us-ascii?Q?na2bOPSgWk7Eu0BnuspT+YXyHpx/XD2RsQY0mS4czTICrTulKMXv2L/HKnru?=
- =?us-ascii?Q?bq+9rqDfm13DIujhmSTLS2waqIPoX7H3+x0gnMGoh2KroPiLjTreIvQCzMuZ?=
- =?us-ascii?Q?VLH7SQ2mhK1jSPjrtlzXqqKWHbn91/bEDfaAlyXrGpcUNIarU0ZcknYkEJpR?=
- =?us-ascii?Q?16KWU7Xg4YFhz+0Pxb4SCwfcAwwxZX4HLGTkliELXI4qXCZu1jRwYJmNJa54?=
- =?us-ascii?Q?qc8b+MKPSWK0Ibo4kTtcB2gYdyisDwK15IEta4sfPoTJtbxvwz9BbHgFIEaK?=
- =?us-ascii?Q?p7w43EZjVOZJaKiC7emZqkNt/4bZEXQrOOP6N9Ul/JVIQH6Rkdbg6YkMlfoF?=
- =?us-ascii?Q?IsaVVSq9+cYGN7Mg+t75zqza0IMHTVdLaRCx/UGLmXym8FDyXwNb2p9CjrFx?=
- =?us-ascii?Q?Zc2RnrwOigPayJKGCCvlcRVT3eDiDIwuWTF5LCZsPUu/yADBOCG5OEUztAHJ?=
- =?us-ascii?Q?AeWocXHT4DrTESIn6h2j1a5QpiIYzMuqFWEyZvBUzVx7mzUbkX5dsSnpfvR7?=
- =?us-ascii?Q?MAMDSz9kk+vsGkFezybOmSoH1/vLweQMb1HFYXmADN/e+XhXBjw756Y/EIqO?=
- =?us-ascii?Q?iUmz2D2E1xf5hyk26s/vZZGHA8BYFU5IL01tKh792Mrxuy1n0LucFWu00TlN?=
- =?us-ascii?Q?50lZG0aB1Ez+ld/c4i6og5nEz/CQGaoGSf3mTW0SPDjEsKyGt5ylzSVqKbxT?=
- =?us-ascii?Q?FQ5o/03b6DE8OCL6ZOF9autW+TI9SHob2+UlY3bG8oUluRskWVemuXEDTHij?=
- =?us-ascii?Q?EmmZ5XCtD1WBKvgNMSNwrNdY8wQ6vOm+mki105WIm7rHWL3K1jbfH9xsOIcC?=
- =?us-ascii?Q?WcMeyHg7qXnrlVCUOVDrVwyRhUXtvGT5IDdqpwZDzgw9posInGgDsUF3YFMX?=
- =?us-ascii?Q?EApaE56+1IY7h7jfknh44IgOGyukEUZa0RbDCed+waGsJNhOtDUwhVXtu5mJ?=
- =?us-ascii?Q?YYfCCUkeGoMnZX4/Wng=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5144cd5-c480-40dc-21ff-08dbc8ca9e19
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 13:21:16.7174
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6nZjHgjgA+51ubJsUNqEbhkzFnLTYuZGx0hYoXGPqSgUMulKc32S0KpE4bp9gX/f
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9418
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] KVM: s390: add stat counter for shadow gmap events
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20231009093304.2555344-1-nrb@linux.ibm.com>
+ <20231009093304.2555344-2-nrb@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
+ qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
+ 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
+ zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
+ lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
+ Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
+ 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
+ cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
+ Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
+ HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
+ YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
+ CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
+ AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
+ bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
+ eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
+ CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
+ EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
+ rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
+ UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
+ RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
+ dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
+ jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
+ cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
+ JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
+ iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
+ tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
+ 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
+ v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
+ HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
+ 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
+ gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
+ BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
+ 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
+ jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
+ IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
+ katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
+ dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
+ FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
+ DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
+ Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
+ phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
+In-Reply-To: <20231009093304.2555344-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: VYYogdIEe-JQ3LX40xHamicqpIeaYE6l
+X-Proofpoint-GUID: sMjkTfBfot7fmRwOhgpkvZcTZwN2cEBE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-09_11,2023-10-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ impostorscore=0 mlxlogscore=999 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 clxscore=1011 mlxscore=0 malwarescore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310090110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 09, 2023 at 01:51:16AM -0700, Yi Liu wrote:
-> Intel SIOV allows creating virtual devices of which the vRID is
-> represented by a pasid of a physical device. It is called as SIOV
-> virtual device in this series. Such devices can be bound to an iommufd
-> as physical device does and then later be attached to an IOAS/hwpt
-> using that pasid. Such PASIDs are called as default pasid.
+On 10/9/23 11:32, Nico Boehr wrote:
+> The shadow gmap tracks memory of nested guests (guest-3). In certain
+> scenarios, the shadow gmap needs to be rebuilt, which is a costly operation
+> since it involves a SIE exit into guest-1 for every entry in the respective
+> shadow level.
+> 
+> Add kvm stat counters when new shadow structures are created at various
+> levels. Also add a counter gmap_shadow_create when a completely fresh
+> shadow gmap is created as well as a counter gmap_shadow_reuse when an
+> existing gmap is being reused.
+> 
+> Note that when several levels are shadowed at once, counters on all
+> affected levels will be increased.
+> 
+> Also note that not all page table levels need to be present and a ASCE
+> can directly point to e.g. a segment table. In this case, a new segment
+> table will always be equivalent to a new shadow gmap and hence will be
+> counted as gmap_shadow_create and not as gmap_shadow_segment.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I would want to see the idxd implementation too..
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-Jason
