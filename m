@@ -2,128 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A543F7BD20A
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 04:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 447287BD234
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 04:55:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345004AbjJICpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Oct 2023 22:45:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45686 "EHLO
+        id S1345044AbjJICzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Oct 2023 22:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232250AbjJICpB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Oct 2023 22:45:01 -0400
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2065.outbound.protection.outlook.com [40.107.117.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5264EAB;
-        Sun,  8 Oct 2023 19:44:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pf+ICbrFp+sM9FslOOqMZgWAKy6vdutV3cmvS0EZioVz3p9VTmSDIIVJCXdOK0OkVrgPWsQUkV8Mx8s3UuvToVs/tUgtloQtLEICFkwbUck6KMqLsZjUdgc4dh493fRGX/yo+44EtJ719Lmqvhx0tsYD+VYdho554x6HxFzePFiLDk1tUMKmW88NU33ULJn0lGU/NsXCE1V9cmEbzeebEn5R3aKCpWcgQ52Dyv4tmgkrLp1xz8isxoU9tLXXRYdrocz2FsdqpWAbyJsQMueflI8OzRd9wOFs0AnIIKatzeVyD7YQsadqRMRBYGk1GR6cy7AiR9u6+DxA1TTWOrZ/WA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=etuuW4P4mTwK+bdxnpOgFnFGgmrjKgri1BI3zFeuYBc=;
- b=Ita93t6nsronEzq7ga4ElAu6tqSSIIYb2re9nf7XHdG3ht9YUvroFKBrVRXziifoLEdOBuO+qqU12u9YzDVMFAoDvbPsh3aP/u0yC24Y2Hg4etL00++xnSvcRZtDodOVT6aFzgestKU/TIlFZJmZFVLwNlhK1xi1lfiGl7z2Us6fGvM3mB9ezFpi4pfdU6oyThNjgKVJj6cnU33J6PVlo0oM9WxsUueVK/ePKZsrMgt5KA67YqUD4+5nACIeAn/oAv3xzY5uw10RriJX8qgKK74I4l8tLTCBh85jTMIvlY0BflZkJ3Qhl6atS9KqRzjtDD4D9NtZo2viFLXbhgzmcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=etuuW4P4mTwK+bdxnpOgFnFGgmrjKgri1BI3zFeuYBc=;
- b=jY0RrilTWFQ+hulv6PqwUj3vhe2jW7OUBMAU6G+OMdQpAZetRfu4MBPkKEDTDCXrXwmocwpvhHe2O5o/imil25uXjLW1OjLe8Eo00hWU08XFw/8J+V35K0Dw4QorVH8bQVXIBG5UAuCCWTQin8CQ3BPClxhwa5yvkHYvnCG2HkM/Sz+oqx5uEqmD2I2Kqkx/kT2LMrn0I+TVacLZXH42etsQ2FPNWn28gXCIp3GXA6JeW4jHofbO/YL3ivZbcFACnNoj+vZ6AuEBzkuuLNzxemF9GA/vvLmBirzE4DVn1k46KDj2wlvmEMWuyaiUGU/kNaZXB/Br4FFo+m97D5wCCw==
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
- by TYZPR06MB5370.apcprd06.prod.outlook.com (2603:1096:400:1f1::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Mon, 9 Oct
- 2023 02:44:56 +0000
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::e5ee:587c:9e8e:1dbd]) by PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::e5ee:587c:9e8e:1dbd%4]) with mapi id 15.20.6863.032; Mon, 9 Oct 2023
- 02:44:55 +0000
-From:   Liming Wu <liming.wu@jaguarmicro.com>
-To:     Jason Wang <jasowang@redhat.com>
-CC:     "Michael S . Tsirkin" <mst@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "398776277@qq.com" <398776277@qq.com>
-Subject: RE: [PATCH 2/2] tools/virtio: Add hints when module is not installed
-Thread-Topic: [PATCH 2/2] tools/virtio: Add hints when module is not installed
-Thread-Index: AQHZ8DZkHxOeTkT7QUeUsqhNEqlG57A/YU8AgAFyauA=
-Date:   Mon, 9 Oct 2023 02:44:55 +0000
-Message-ID: <PSAPR06MB3942238B1D7218934A2BB8B4E1CEA@PSAPR06MB3942.apcprd06.prod.outlook.com>
-References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
- <20230926050021.717-2-liming.wu@jaguarmicro.com>
- <CACGkMEujvBtAx=1eTqSrzyjBde=0xpC9D0sRVC7wHHf_aqfqwg@mail.gmail.com>
-In-Reply-To: <CACGkMEujvBtAx=1eTqSrzyjBde=0xpC9D0sRVC7wHHf_aqfqwg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PSAPR06MB3942:EE_|TYZPR06MB5370:EE_
-x-ms-office365-filtering-correlation-id: f77448a6-f59c-4e8b-0cc0-08dbc871b8b2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cTBazXIjpWZ/WpNWG9wUVYXT/gdUZS++VUm5KrZD3Lcbz75z6QI0fwGERhLAWs1csjeFDBKDKHBxpyloMysz263DhcbPoisUGrsYoQiJgqzZcyE19FKWzdQIm3jFW0vOVL2yunR7tRso0AxPBOHMaFSjiBnfgYtglt1fOPb2DIvxF9kZKs84hgN0j7Jh4Z/ec3uxgS8NXO/TynDHRvOQcLuiLhaEs8GU6P+o2eynHexIkeSzpmupFU6l8tsg7hbj1nKzl1QaVcuulQztu2CqvW2KiSC6mpzHvlavehXkwXIx+MAJrl2dg4ptxYjRbKEhnW8m1RBsBw8xx+x0gP2G7pP7riZo6MiEZQzlInGhnvDiVD1i3xrJZ+k2PjGRrS4BpgimNIvEfkxpzNsThOIiU2gbGmd+GDbyn4kVpwaEoeOf9BClHlSHDEiiLuTcfSwPWljVDv67iP8MDaC0lGig41FIS7dG8otiXCxKnYGE84tWv77fQO0Eke0YxY7Y+yaQFqOyyeOX9HW8LrI7pRDf7nt/M5ret8pohd/LZIH+3p4QLa3Ub+ckAvF7FmVUJEpcGsbSJIyicbJeR0qgoLIEL3FkKhO+j31J85jBCv0R5X3SmojT2m9GpDNVXVbs2WKT
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39830400003)(376002)(136003)(366004)(346002)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(55016003)(83380400001)(66946007)(26005)(316002)(66476007)(66556008)(66446008)(54906003)(76116006)(6916009)(64756008)(8936002)(8676002)(4326008)(5660300002)(52536014)(41300700001)(44832011)(7696005)(53546011)(6506007)(71200400001)(9686003)(2906002)(478600001)(33656002)(38070700005)(38100700002)(122000001)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WTJkeXhlVDM1a042ZEdjSm9HZnZVN1ZvR2FidURCK2pUNkluUGd1YjMwRld2?=
- =?utf-8?B?WXJsYWlhVVBwTitpSEZOQlNnb0dkbjNxUWxXQzk0a0F1RXhTKzJRaGp4R0Rn?=
- =?utf-8?B?bzJHKysxMUdDQ1FLZlJBdE1FM1AzN3h4RXpXR3lzd1ROUWxsY2daTk43V0Ja?=
- =?utf-8?B?Wm03MkhvbUp0eVVCdUVBdTlwcUZjRU1zbEdzamJFbVY2MldGQk0yQUFFU3hm?=
- =?utf-8?B?U21DK0hoQlg4S3E1MUdoNEpJcGxZNUkrdmsrZGZ6V1RUTXkrMzBpaVFEcU5u?=
- =?utf-8?B?aFE1VVIwVlJlL2l0RlRSZnlHVlpRazdGWUZqb0FieUszZ0VUU3JsWmszNDl4?=
- =?utf-8?B?UnpCVWVSRzRLMVJ3SllGY1U5VDdZSDZyc3FDNG1aUHI0cU9lT2l1ckxqdkNm?=
- =?utf-8?B?MmlnODNoay9Qck9zVjJFVlpVUTNuUTg2K1FUdU5XcW5Fd2NxZzdtRXMzNFor?=
- =?utf-8?B?N0JlY0VIM1F0QjhlakNQWUV2RGIyeWNoN1hiRldVUXRFem5NUUhjdVE2b25u?=
- =?utf-8?B?TExHSXg2VEhuenZ1dWh4aG9DaUtrU1pxWVAvOEpYR3dJOWsrV2lwMVNEV0li?=
- =?utf-8?B?S2piWm8zb01EY0RRdkQyNE5hd1JVdGxGSVgxWHBteWlYalFBOWhzK0pDcW9C?=
- =?utf-8?B?S09IK0hNaFFVRHVlK3czeXV4VFQxUlduVE1oR29TV1FZbks3YVptM21ISllF?=
- =?utf-8?B?eFRqSzhoQlNSNzZIcTVJN2Y0bENlREpBSWRLOFlGSlR0cGN3TzhYR0diaWNp?=
- =?utf-8?B?Tk9EVlFFZC9KQ05vTzNnckI5cU9lSXFQZFUwTTBlTm9Lemg1ckdoMGJNY2dJ?=
- =?utf-8?B?c0ZnVm1teXVVZGFTanduRS9jbXV3UTBqdG9nNXdWWGhlZ3Fzdng2T1NUalYr?=
- =?utf-8?B?SWlMY1UrcmFrdUd1a0JHYllISHZjbFlPRU9qYjFIQUUzdndCK1FKOWRnM2Qr?=
- =?utf-8?B?R1ZBTHlLTk5GaVFMYmxaaFRnbmI4SFJXblFhUXRJcGN0WGFsQU9yTEcyQkZG?=
- =?utf-8?B?K1FOT21mY0w0Y0IxRWJrK3p2ZmJIZmNUeHcxTE9IZkFXcUQzMWJCOHdDSEhk?=
- =?utf-8?B?WndRSG9NTWNINWZIbXJIVk5raDY0T2dWcEROd1VSdmlubkc1RU9ydHRPYklX?=
- =?utf-8?B?TUFzTXVHUVhYSXJHOHZ1eDhGU2NNNFlndmhrNUZ5dmJxZWx5TjlLTzBaNjBj?=
- =?utf-8?B?WXNUa3dSL1hHVjl3aUloTzcxeFlxY1BMUysra3cyLzlTd2xEd3JDc0dCblNZ?=
- =?utf-8?B?VjdKMGdmMzJHU05DOFhwcFJ1Qm1acytzUStNQUpSZVBWYVQrZ2JZRkNJYzBn?=
- =?utf-8?B?cVJoYXpQQ015N1d4a05WRzNZQjhwREppcW12TFJzUjFJRmFwcnYxNGVoUEY3?=
- =?utf-8?B?VE1LMTVjV2VXUDF5RVZ4SHlTdGUxcWpqNW52NTZoT2lZa0w1WmhoRk0zUUZW?=
- =?utf-8?B?SkNxcXBaUkI3bmtYQXJnNTZiL0ZoMzJQZndkVjlPdFdTV2pTdkM2YmFqSlN2?=
- =?utf-8?B?NTROUkRiamRkSDc3dUNweGhzMW5ORk90aVhaMFg5TU1aUVdIZDVGNUtlZnJL?=
- =?utf-8?B?aEhKcjUrTitnWVphSVpBT2xnK280UUgveHNZZS85eDRrTkRhMmtPdEw4ak12?=
- =?utf-8?B?bUdwREkrTGVsMXBRNkV0WXBjTzRCWnBvWjlzcSszY1Vlbms5aDAzOSt2b1R3?=
- =?utf-8?B?NjBNU0pFeW9VT09kVk1kNGFEQjAyL01BaVNobGRadlJzNFU3enlTcTBVa3Ix?=
- =?utf-8?B?UTNpbnVqSXRpcmFTOUFERERhS3FzS3F1YXdycUQzYXhkMzI5TmQxNWE2blgz?=
- =?utf-8?B?TnAyVUtmQ2tpTSs0b2R1RVUrZ1MyZGxqY3h3N1Z5TnA2azJ3QnF3bUF2M3Jt?=
- =?utf-8?B?eFkwY3ZLdnBTTHVZbDBhcFRGN3I1OWJhdHd2UmtsNC9hLzBtZCs2TVZyekRL?=
- =?utf-8?B?LzZtOHhER3RrUXJwRlFqUEVJMG9oaDhmbWZTRHFrSjZ6YjN5RHlwakFXeVVz?=
- =?utf-8?B?NytiK3dFaGlHcUUzMUpMWEJjUDk1anRTTTJZT2ovU3l6cUh2V0VLSmJMVGcy?=
- =?utf-8?B?bGZycU0vMlpycVZlaWpUY244M1FnZ1pGa05Pa3hBVjh1OFQxZnNIdmdxc2lR?=
- =?utf-8?Q?/LwUxAbEchsh9NLRj3Zusak0k?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S232267AbjJICzP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Oct 2023 22:55:15 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CEAA4AC;
+        Sun,  8 Oct 2023 19:55:12 -0700 (PDT)
+Received: from loongson.cn (unknown [10.2.5.185])
+        by gateway (Coremail) with SMTP id _____8AxueqOayNlAC4wAA--.16943S3;
+        Mon, 09 Oct 2023 10:55:10 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx7y+NayNlRvEbAA--.58139S2;
+        Mon, 09 Oct 2023 10:55:09 +0800 (CST)
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+To:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn,
+        zhaotianrui@loongson.cn
+Subject: [PATCH v3 0/4] KVM: selftests: Add LoongArch support
+Date:   Mon,  9 Oct 2023 10:55:06 +0800
+Message-Id: <20231009025510.342681-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f77448a6-f59c-4e8b-0cc0-08dbc871b8b2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2023 02:44:55.8158
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r9uSokWAcx14mW1l3Wuwkp0UKIHhTzZssJxOANRtm0EYZtzrbmAjjkua4zVO/Nd6M1Wv1NOxZ2DXT9IjLAy4noKq7Gc18+/PM7fHhtPObNo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5370
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Cx7y+NayNlRvEbAA--.58139S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+        nUUI43ZEXa7xR_UUUUUUUUU==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -131,42 +50,217 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
-b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogU3VuZGF5LCBPY3RvYmVyIDgsIDIwMjMgMTI6MzYg
-UE0NCj4gVG86IExpbWluZyBXdSA8bGltaW5nLnd1QGphZ3Vhcm1pY3JvLmNvbT4NCj4gQ2M6IE1p
-Y2hhZWwgUyAuIFRzaXJraW4gPG1zdEByZWRoYXQuY29tPjsga3ZtQHZnZXIua2VybmVsLm9yZzsN
-Cj4gdmlydHVhbGl6YXRpb25AbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7IG5ldGRldkB2Z2Vy
-Lmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnOyAzOTg3NzYyNzdA
-cXEuY29tDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMi8yXSB0b29scy92aXJ0aW86IEFkZCBoaW50
-cyB3aGVuIG1vZHVsZSBpcyBub3QgaW5zdGFsbGVkDQo+IA0KPiBPbiBUdWUsIFNlcCAyNiwgMjAy
-MyBhdCAxOjAw4oCvUE0gPGxpbWluZy53dUBqYWd1YXJtaWNyby5jb20+IHdyb3RlOg0KPiA+DQo+
-ID4gRnJvbTogTGltaW5nIFd1IDxsaW1pbmcud3VAamFndWFybWljcm8uY29tPg0KPiA+DQo+ID4g
-TmVlZCB0byBpbnNtb2Qgdmhvc3RfdGVzdC5rbyBiZWZvcmUgcnVuIHZpcnRpb190ZXN0Lg0KPiA+
-IEdpdmUgc29tZSBoaW50cyB0byB1c2Vycy4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpbWlu
-ZyBXdSA8bGltaW5nLnd1QGphZ3Vhcm1pY3JvLmNvbT4NCj4gPiAtLS0NCj4gPiAgdG9vbHMvdmly
-dGlvL3ZpcnRpb190ZXN0LmMgfCA0ICsrKysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0
-aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3Rvb2xzL3ZpcnRpby92aXJ0aW9fdGVzdC5j
-IGIvdG9vbHMvdmlydGlvL3ZpcnRpb190ZXN0LmMNCj4gPiBpbmRleCAwMjhmNTRlNjg1NGEuLmNl
-MmM0ZDkzZDczNSAxMDA2NDQNCj4gPiAtLS0gYS90b29scy92aXJ0aW8vdmlydGlvX3Rlc3QuYw0K
-PiA+ICsrKyBiL3Rvb2xzL3ZpcnRpby92aXJ0aW9fdGVzdC5jDQo+ID4gQEAgLTEzNSw2ICsxMzUs
-MTAgQEAgc3RhdGljIHZvaWQgdmRldl9pbmZvX2luaXQoc3RydWN0IHZkZXZfaW5mbyogZGV2LA0K
-PiB1bnNpZ25lZCBsb25nIGxvbmcgZmVhdHVyZXMpDQo+ID4gICAgICAgICBkZXYtPmJ1ZiA9IG1h
-bGxvYyhkZXYtPmJ1Zl9zaXplKTsNCj4gPiAgICAgICAgIGFzc2VydChkZXYtPmJ1Zik7DQo+ID4g
-ICAgICAgICBkZXYtPmNvbnRyb2wgPSBvcGVuKCIvZGV2L3Zob3N0LXRlc3QiLCBPX1JEV1IpOw0K
-PiA+ICsNCj4gPiArICAgICAgIGlmIChkZXYtPmNvbnRyb2wgPCAwKQ0KPiA+ICsgICAgICAgICAg
-ICAgICBmcHJpbnRmKHN0ZGVyciwgIkluc3RhbGwgdmhvc3RfdGVzdCBtb2R1bGUiIFwNCj4gPiAr
-ICAgICAgICAgICAgICAgIiguL3Zob3N0X3Rlc3Qvdmhvc3RfdGVzdC5rbykgZmlyc3RseVxuIik7
-DQo+IA0KPiBUaGVyZSBzaG91bGQgYmUgbWFueSBvdGhlciByZWFzb25zIHRvIGZhaWwgZm9yIG9w
-ZW4oKS4NCj4gDQo+IExldCdzIHVzZSBzdHJlcnJvcigpPw0KWWVzLCAgVGhhbmtzIGZvciB0aGUg
-cmV2aWV3LiANClBsZWFzZSByZWNoZWNrZWQgdGhlIGNvZGUgYXMgZm9sbG93Og0KLS0tIGEvdG9v
-bHMvdmlydGlvL3ZpcnRpb190ZXN0LmMNCisrKyBiL3Rvb2xzL3ZpcnRpby92aXJ0aW9fdGVzdC5j
-DQpAQCAtMTM1LDYgKzEzNSwxMSBAQCBzdGF0aWMgdm9pZCB2ZGV2X2luZm9faW5pdChzdHJ1Y3Qg
-dmRldl9pbmZvKiBkZXYsIHVuc2lnbmVkIGxvbmcgbG9uZyBmZWF0dXJlcykNCiAgICAgICAgZGV2
-LT5idWYgPSBtYWxsb2MoZGV2LT5idWZfc2l6ZSk7DQogICAgICAgIGFzc2VydChkZXYtPmJ1Zik7
-DQogICAgICAgIGRldi0+Y29udHJvbCA9IG9wZW4oIi9kZXYvdmhvc3QtdGVzdCIsIE9fUkRXUik7
-DQorDQorICAgICAgIGlmIChkZXYtPmNvbnRyb2wgPT0gTlVMTCkNCisgICAgICAgICAgICAgICBm
-cHJpbnRmKHN0ZGVyciwNCisgICAgICAgICAgICAgICAgICAgICAgICIlczogQ2hlY2sgd2hldGhl
-ciB2aG9zdF90ZXN0LmtvIGlzIGluc3RhbGxlZC5cbiIsDQorICAgICAgICAgICAgICAgICAgICAg
-ICBzdHJlcnJvcihlcnJubykpOw0KICAgICAgICBhc3NlcnQoZGV2LT5jb250cm9sID49IDApOw0K
-ICAgICAgICByID0gaW9jdGwoZGV2LT5jb250cm9sLCBWSE9TVF9TRVRfT1dORVIsIE5VTEwpOw0K
-ICAgICAgICBhc3NlcnQociA+PSAwKTsNCiANClRoYW5rcw0KDQo=
+This patch series base on the Linux LoongArch KVM patch:
+Based-on: <20230927030959.3629941-1-zhaotianrui@loongson.cn> 
+
+We add LoongArch support into KVM selftests and there are some KVM
+test cases we have passed:
+	demand_paging_test
+	dirty_log_perf_test
+	dirty_log_test
+	guest_print_test
+	kvm_binary_stats_test
+	kvm_create_max_vcpus
+	kvm_page_table_test
+	memslot_modification_stress_test
+	memslot_perf_test
+	set_memory_region_test
+
+Changes for v3:
+1. Improve implementation of LoongArch VM page walk.
+2. Add exception handler for LoongArch.
+3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+test cases for LoongArch.
+4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+5. Move ucall_arch_do_ucall to the header file and make it as
+static inline to avoid function calls.
+6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
+
+Changes for v2:
+1. We should use ".balign 4096" to align the assemble code with 4K in
+exception.S instead of "align 12".
+2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+hanlders for 2-levels page table.
+3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+4. Reorganize the test cases supported by LoongArch.
+5. Fix some code comments.
+6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+
+changes for v1:
+1. Add kvm selftests header files for LoongArch.
+2. Add processor tests for LoongArch KVM.
+3. Add ucall tests for LoongArch KVM.
+4. Add LoongArch tests into makefile.
+
+All of the test cases results:
+1..10
+# timeout set to 120
+# selftests: kvm: demand_paging_test
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# guest physical test memory: [0xfbfffc000, 0xfffffc000)
+# Finished creating vCPUs and starting uffd threads
+# Started all vCPUs
+# All vCPU threads joined
+# Total guest execution time: 0.200804700s
+# Overall demand paging rate: 326366.862927 pgs/sec
+ok 1 selftests: kvm: demand_paging_test
+# timeout set to 120
+# selftests: kvm: dirty_log_perf_test
+# Test iterations: 2
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# guest physical test memory: [0xfbfffc000, 0xfffffc000)
+# Random seed: 1
+# Populate memory time: 0.201452560s
+# Enabling dirty logging time: 0.000451670s
+# 
+# Iteration 1 dirty memory time: 0.051582140s
+# Iteration 1 get dirty log time: 0.000010510s
+# Iteration 1 clear dirty log time: 0.000421730s
+# Iteration 2 dirty memory time: 0.046593760s
+# Iteration 2 get dirty log time: 0.000002110s
+# Iteration 2 clear dirty log time: 0.000418020s
+# Disabling dirty logging time: 0.002948490s
+# Get dirty log over 2 iterations took 0.000012620s. (Avg 0.000006310s/iteration)
+# Clear dirty log over 2 iterations took 0.000839750s. (Avg 0.000419875s/iteration)
+ok 2 selftests: kvm: dirty_log_perf_test
+# timeout set to 120
+# selftests: kvm: dirty_log_test
+# Test iterations: 32, interval: 10 (ms)
+# Testing Log Mode 'dirty-log'
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# guest physical test memory offset: 0xfbfff0000
+# Dirtied 453632 pages
+# Total bits checked: dirty (436564), clear (1595145), track_next (70002)
+# Testing Log Mode 'clear-log'
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# guest physical test memory offset: 0xfbfff0000
+# Dirtied 425984 pages
+# Total bits checked: dirty (414397), clear (1617312), track_next (68152)
+# Testing Log Mode 'dirty-ring'
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# dirty ring count: 0x10000
+# guest physical test memory offset: 0xfbfff0000
+# vcpu stops because vcpu is kicked out...
+# Notifying vcpu to continue
+# vcpu continues now.
+# Iteration 1 collected 3201 pages
+# vcpu stops because dirty ring is full...
+# vcpu continues now.
+# vcpu stops because dirty ring is full...
+# Notifying vcpu to continue
+# Iteration 2 collected 65472 pages
+# ......
+# vcpu continues now.
+# vcpu stops because vcpu is kicked out...
+# vcpu continues now.
+# vcpu stops because vcpu is kicked out...
+# Notifying vcpu to continue
+# vcpu continues now.
+# Iteration 31 collected 12642 pages
+# vcpu stops because dirty ring is full...
+# vcpu continues now.
+# Dirtied 7275520 pages
+# Total bits checked: dirty (1165675), clear (866034), track_next (811358)
+ok 3 selftests: kvm: dirty_log_test
+# timeout set to 120
+# selftests: kvm: guest_print_test
+ok 4 selftests: kvm: guest_print_test
+# timeout set to 120
+# selftests: kvm: kvm_binary_stats_test
+# TAP version 13
+# 1..4
+# ok 1 vm0
+# ok 2 vm1
+# ok 3 vm2
+# ok 4 vm3
+# # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+ok 5 selftests: kvm: kvm_binary_stats_test
+# timeout set to 120
+# selftests: kvm: kvm_create_max_vcpus
+# KVM_CAP_MAX_VCPU_ID: 256
+# KVM_CAP_MAX_VCPUS: 256
+# Testing creating 256 vCPUs, with IDs 0...255.
+ok 6 selftests: kvm: kvm_create_max_vcpus
+# timeout set to 120
+# selftests: kvm: kvm_page_table_test
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# Testing memory backing src type: anonymous
+# Testing memory backing src granularity: 0x4000
+# Testing memory size(aligned): 0x40000000
+# Guest physical test memory offset: 0xfbfffc000
+# Host  virtual  test memory offset: 0x7fffb0860000
+# Number of testing vCPUs: 1
+# Started all vCPUs successfully
+# KVM_CREATE_MAPPINGS: total execution time: 0.200919330s
+# 
+# KVM_UPDATE_MAPPINGS: total execution time: 0.051182930s
+# 
+# KVM_ADJUST_MAPPINGS: total execution time: 0.010083590s
+# 
+ok 7 selftests: kvm: kvm_page_table_test
+# timeout set to 120
+# selftests: kvm: memslot_modification_stress_test
+# Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+# guest physical test memory: [0xfbfffc000, 0xfffffc000)
+# Finished creating vCPUs
+# Started all vCPUs
+# All vCPU threads joined
+ok 8 selftests: kvm: memslot_modification_stress_test
+# timeout set to 120
+# selftests: kvm: memslot_perf_test
+# Testing map performance with 1 runs, 5 seconds each
+# Memslot count too high for this test, decrease the cap (max is 2053)
+# 
+# Testing unmap performance with 1 runs, 5 seconds each
+# Memslot count too high for this test, decrease the cap (max is 8197)
+# 
+# Testing unmap chunked performance with 1 runs, 5 seconds each
+# Memslot count too high for this test, decrease the cap (max is 8197)
+# 
+# Testing move active area performance with 1 runs, 5 seconds each
+# Test took 0.761678900s for slot setup + 5.000014460s all iterations
+# Done 120167 iterations, avg 0.000041608s each
+# Best runtime result was 0.000041608s per iteration (with 120167 iterations)
+# 
+# Testing move inactive area performance with 1 runs, 5 seconds each
+# Test took 0.771796550s for slot setup + 5.000018520s all iterations
+# Done 136354 iterations, avg 0.000036669s each
+# Best runtime result was 0.000036669s per iteration (with 136354 iterations)
+# 
+# Testing RW performance with 1 runs, 5 seconds each
+# Test took 0.763568840s for slot setup + 5.002233800s all iterations
+# Done 649 iterations, avg 0.007707602s each
+# Best runtime result was 0.007707602s per iteration (with 649 iterations)
+# Best slot setup time for the whole test area was 0.761678900s
+ok 9 selftests: kvm: memslot_perf_test
+# timeout set to 120
+# selftests: kvm: set_memory_region_test
+# Allowed number of memory slots: 32767
+# Adding slots 0..32766, each memory region with 2048K size
+ok 10 selftests: kvm: set_memory_region_test
+
+Tianrui Zhao (4):
+  KVM: selftests: Add KVM selftests header files for LoongArch
+  KVM: selftests: Add core KVM selftests support for LoongArch
+  KVM: selftests: Add ucall test support for LoongArch
+  KVM: selftests: Add test cases for LoongArch
+
+ tools/testing/selftests/kvm/Makefile          |  15 +
+ .../selftests/kvm/include/kvm_util_base.h     |   5 +
+ .../kvm/include/loongarch/processor.h         | 133 +++++++
+ .../selftests/kvm/include/loongarch/ucall.h   |  20 ++
+ .../testing/selftests/kvm/include/memstress.h |  10 +
+ .../selftests/kvm/lib/loongarch/exception.S   |  59 ++++
+ .../selftests/kvm/lib/loongarch/processor.c   | 333 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+ 8 files changed, 613 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+
+-- 
+2.39.1
+
