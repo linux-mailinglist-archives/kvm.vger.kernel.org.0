@@ -2,107 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AF0A7BEAB7
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 21:37:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19CF97BEAE5
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 21:52:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378397AbjJIThM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 15:37:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53500 "EHLO
+        id S1378490AbjJITwg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 15:52:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346671AbjJIThL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 15:37:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE46593
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 12:36:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696880183;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TVDFHMjJ/ycKLdZo/7Qo28nzsm1D+pqkl3FWIOZKqxE=;
-        b=DDd5LU86nLTGy7dFRnCWzXq07OTJmSbvwLv61Rafnxuc2EuNCVYq21jVMTE4FrmIdKZ7Fr
-        sqSN5r1vdBJM/ES+98GENckODWVtwfgOpjwf9FkPv+oUVxTep5Egcbql+uvFYzs76H26FG
-        8K6mfL95SQuVAifT7aDjulfaWaLTGSs=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-132-xyJE_MLYN9qTGPuTtoXiiA-1; Mon, 09 Oct 2023 15:36:15 -0400
-X-MC-Unique: xyJE_MLYN9qTGPuTtoXiiA-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-780addd7382so413734039f.1
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 12:36:15 -0700 (PDT)
+        with ESMTP id S1378488AbjJITwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 15:52:35 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D29A4
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 12:52:33 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a23fed55d7so78320567b3.2
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 12:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696881152; x=1697485952; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yNj1pprsRAKwETqq5Ekq2GPnFYfA7vwnbMFCvxBPbc0=;
+        b=1sbG001vaerjQQ/CZsG0w33uTE7wrlhr/E0yGWhKqegVgD2TnWeEdn2qapOH+XuFa6
+         t36RH+nI9dtQSMt8JCvh3HGd6YxiLVMx8XCus80CvJL/8U60DoHx8D8d1w8uDhxDFUNl
+         sEl4jYVl429eWrYSahmXo/kTzR7RDkri0eoRRASZ42BM3rmztYUsrn4GgZbemgWwDf70
+         wCmJu1SAUOQRM7JzMdrftBEKb4SzwMzm6S8c6SgGXHwDhXOU6AWBUfm/XdqfUEV2sRaU
+         PQ00duczqjjxCpj4wzJ6ISV80Q/zHVd4AiCWdLJPps2W/9bcT2LAaPVFyLYHRddPimQ8
+         BU4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696880175; x=1697484975;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TVDFHMjJ/ycKLdZo/7Qo28nzsm1D+pqkl3FWIOZKqxE=;
-        b=r9k8a4BniwHv5MIeNU8ZaohRYrzLpL45rlrOnhp0KFjfdwXhIFrycAtp1Q2IAcxv92
-         UpFMRXFetFdTjo6grmkVITwiIhV5bEHpkrgLPBv7KCb9RU0125cStx/50ciAMH1lvGXn
-         2vwqct+k6mmLNwfecaX3zJlTcSj5fuYkoFfjLKRlQRKDH7QHGG0EbJqI+VrB/9ROLaXY
-         qVoQaXYHlu3x74gcF/8aONRKxeYESNm40RjhCPR8VYIBJrP0xvybJQjxAidt30s1ysRK
-         snwQN0EKi3dUZCeRU5xPEKOWg17pPlqbgKnItstD8VWzE3RdK/fMf/iwYo7m/7OLOqXu
-         fD1w==
-X-Gm-Message-State: AOJu0YzilPvd5Tv52GGfu5F2zZl5VOlUUD+Phsw75rjs3+E/lN02SToO
-        lKBwpwBEBn+cG07cRdCMRzvniy7h4EK7Fv5FxzTCoQsQ4VADsLLDkDHx/LyQJm+3DNqQ5l8sJd7
-        SojJhApaGh636
-X-Received: by 2002:a05:6e02:1a0e:b0:352:6f88:9818 with SMTP id s14-20020a056e021a0e00b003526f889818mr19798125ild.11.1696880174980;
-        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZrmoohFj1abftp9cjL5O3tHcNh5viE77dWrcuBTn9TZna5ISvd95pVTk16QjIDbjIm0ia6Q==
-X-Received: by 2002:a05:6e02:1a0e:b0:352:6f88:9818 with SMTP id s14-20020a056e021a0e00b003526f889818mr19798109ild.11.1696880174711;
-        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id t2-20020a056e02010200b003513535c69dsm3154672ilm.5.2023.10.09.12.36.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 12:36:14 -0700 (PDT)
-Date:   Mon, 9 Oct 2023 13:36:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     <ankita@nvidia.com>, <jgg@nvidia.com>, <yishaih@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
-        <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
-        <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
-        <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
-        <anuaggarwal@nvidia.com>, <dnigam@nvidia.com>, <udhoke@nvidia.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v11 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20231009133612.3fdd86a9.alex.williamson@redhat.com>
-In-Reply-To: <ZSHykZ2GgSn0fE_x@debian.me>
-References: <20231007202254.30385-1-ankita@nvidia.com>
-        <ZSHykZ2GgSn0fE_x@debian.me>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20230601; t=1696881152; x=1697485952;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yNj1pprsRAKwETqq5Ekq2GPnFYfA7vwnbMFCvxBPbc0=;
+        b=VnCw32c9OIj1uqdMtbPL/gDpBe/hOKy/6hOFhM3NXOLzYXmdOPa0nKTO7VryravzNC
+         e12SbmgX0qFIrLjUqwHnjQ+UcGrhhf8vI7J0fFLWj+Z7O+8syE3Ybk0yii+y/3CBx4qo
+         dLTAZAwjgj6X89ur1taZTlIXwyqj7TTGgYx212XFJqFN0ACsIczoPvpMUYl8KQSUijao
+         lKTipgWNnjf6PkFnZrDWdsmOED/enwNaROVTYsB975gt8Ao45YAFb7xixsawftuGsS4N
+         wObCYIyF0feGadG6DQUw7OOw0+rAwugmS6mv4VYji+XlF1Tk4y+ATO3+I5U+GCMx+rz8
+         piBA==
+X-Gm-Message-State: AOJu0YxD2WNsh+a1xzz9orwN1QWlxsHg5dj6uf0Uva0TcRcI0Gniw4n3
+        goAZO6OPAvmcIn+vtsBB/pL5yQKnw+Y=
+X-Google-Smtp-Source: AGHT+IHRpOvdov34HiTmmE1Yu2fxzpAk3cUCxPQBKUgx1kHzcRi7yR+du7TFlfF3MJl6qAY9vFHc+wgMWkA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:c746:0:b0:59f:77f6:6d12 with SMTP id
+ i6-20020a81c746000000b0059f77f66d12mr308643ywl.0.1696881152581; Mon, 09 Oct
+ 2023 12:52:32 -0700 (PDT)
+Date:   Mon, 9 Oct 2023 12:52:31 -0700
+In-Reply-To: <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com>
+Mime-Version: 1.0
+References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065006.20201-1-yan.y.zhao@intel.com>
+ <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com>
+Message-ID: <ZSRZ_y64UPXBG6lA@google.com>
+Subject: Re: [PATCH v4 01/12] KVM: x86/mmu: helpers to return if KVM honors
+ guest MTRRs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
+        chao.gao@intel.com, kai.huang@intel.com,
+        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 8 Oct 2023 07:06:41 +0700
-Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+On Sat, Oct 07, 2023, Like Xu wrote:
+> On 14/7/2023 2:50=E2=80=AFpm, Yan Zhao wrote:
+> > Added helpers to check if KVM honors guest MTRRs.
+> > The inner helper __kvm_mmu_honors_guest_mtrrs() is also provided to
+> > outside callers for the purpose of checking if guest MTRRs were honored
+> > before stopping non-coherent DMA.
+> >=20
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >   arch/x86/kvm/mmu.h     |  7 +++++++
+> >   arch/x86/kvm/mmu/mmu.c | 15 +++++++++++++++
+> >   2 files changed, 22 insertions(+)
+> >=20
+> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > index 92d5a1924fc1..38bd449226f6 100644
+> > --- a/arch/x86/kvm/mmu.h
+> > +++ b/arch/x86/kvm/mmu.h
+> > @@ -235,6 +235,13 @@ static inline u8 permission_fault(struct kvm_vcpu =
+*vcpu, struct kvm_mmu *mmu,
+> >   	return -(u32)fault & errcode;
+> >   }
+> > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_noncohe=
+rent_dma);
+> > +
+> > +static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
+> > +{
+> > +	return __kvm_mmu_honors_guest_mtrrs(kvm, kvm_arch_has_noncoherent_dma=
+(kvm));
+> > +}
+> > +
+> >   void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_en=
+d);
+> >   int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 1e5db621241f..b4f89f015c37 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4516,6 +4516,21 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcp=
+u *vcpu,
+> >   }
+> >   #endif
+> > +bool __kvm_mmu_honors_guest_mtrrs(struct kvm *kvm, bool vm_has_noncohe=
+rent_dma)
+>=20
+> According to the motivation provided in the comment, the function will no
+> longer need to be passed the parameter "struct kvm *kvm" but will rely on
+> the global parameters (plus vm_has_noncoherent_dma), removing "*kvm" ?
 
-> On Sun, Oct 08, 2023 at 01:52:54AM +0530, ankita@nvidia.com wrote:
-> > PCI BAR are aligned to the power-of-2, but the actual memory on the
-> > device may not. A read or write access to the physical address from the
-> > last device PFN up to the next power-of-2 aligned physical address
-> > results in reading ~0 and dropped writes.
-> >   
-> 
-> Reading garbage or padding in that case?
-> 
-> Confused...
-
-The coherent memory size is rounded to a power-of-2 to be compliant with
-PCI BAR semantics, but reading beyond the implemented size fills the
-return buffer with -1 data, as is common on many platforms when reading
-from an unimplemented section of the address space.  Thanks,
-
-Alex
-
+Yeah, I'll fixup the commit to drop @kvm from the inner helper.  Thanks!
