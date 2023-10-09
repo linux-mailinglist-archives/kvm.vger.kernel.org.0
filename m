@@ -2,49 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A45C7BEB3D
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 22:06:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E86B7BEB79
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 22:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378545AbjJIUGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 16:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38408 "EHLO
+        id S1378580AbjJIUUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 16:20:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378534AbjJIUGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 16:06:12 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AEAB7;
-        Mon,  9 Oct 2023 13:06:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=yQilcMatqexoOCdrHBdsAR2o8PEeqyJV2iNf9DeNghw=; b=adV1xt/ZK6Bqtj0LQ/bha3U9GI
-        aEsZoJqrWulQeOakzRc648pAdDzxO2D3pda+G91WAeqESU4ENOJZcu2kkdeDO945Geu4/DXImhrzE
-        MmFw2iDYkG0vXDds3RQ+K8/Tan9cNSQSETLIcIicMvk+4vvBhAHUMqCxYLm1pO7tz8aNnp12fBEAP
-        144QMOZVgaiWgQNKizg2m5RjiUi8/OWB2qlGsk212S/4/w0imByL7VEu9EfuOtAJlLp5xzsuY8gp1
-        Wlplj+iFstLG3W7fnjVNMFxFYsyVA+HEdFmVCJTsTKpW+8uMfy3VQwJ4obMLvuG0/fB6xeaMuEJjz
-        J7UjZJfw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qpwW0-00HIQZ-1P;
-        Mon, 09 Oct 2023 20:06:08 +0000
-Date:   Mon, 9 Oct 2023 21:06:08 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Sean Christopherson <seanjc@google.com>
+        with ESMTP id S232645AbjJIUUK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 16:20:10 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44966A3
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 13:20:09 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a4a89ab5fso414881276.3
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 13:20:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696882808; x=1697487608; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X6+GJ5cI4z2TlJw5nJFvkv7FETWY362gjhrvcMB9XFc=;
+        b=LYMPNRYaGtJ0B7jCpzJLOeAOt4N5rEjxApu3zMBe7oeVCCTl5ExTQEGkDjkQ2VquMi
+         5JzYk5VrNtmkSZEbCJr7LuTLXgPgdswazaskUq4r/nb2MwvQlY/7bin9K4mSEOb1nh23
+         aQGNHQR5OCxv8ouCA5FnKE6fg5l2yOVe8wE0MnBeOdtEv7qlv4UWIW+YwoP7fCYOmhM7
+         IcxngCv54vmqWR2K7rpaTfwzdEBwnwv880xHoxJbZg5AP9sNmeXJ1XIbmh7dlza/cfMf
+         uAMOiB3KSGkQK0ZsaI/eD8AuVIIoMseYxZAZliaW6DQNB32qGbBHGpSYxiTQAKR6ts1H
+         BB/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696882808; x=1697487608;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X6+GJ5cI4z2TlJw5nJFvkv7FETWY362gjhrvcMB9XFc=;
+        b=kdARCbZyVA4ymuNB7nDE6X98q/IrP7RSQcJvdc3EhR5mDS9V1hGmYnIC3mvdOUSy9k
+         1Uk/0sDAnzUdyFA7jGebRUJ6BWePv8bu6ClJ0y2UrSJx6chvLRZ/Pt9RkaCkvEwwb28X
+         Rho1WAkWXngzrSSaDzsTkRATPrvf3xADxi7qmdBQRGTv9bIN9JvNDgQjiMJVyAYl535j
+         yuGU1UINbUQgySevS5cE9mPmQS+8s6rRofmsJVepyToV9emnUfpve9ekcH5NNqJnTjkI
+         7PJTbeQmT0UvTfeawR/6mnSQfNchUMDP2Cde3WwaOvT5K9O5D1MQyCT+X/fkwnySyIHd
+         Ylcw==
+X-Gm-Message-State: AOJu0Yw+p5OtuOVXeonV8OMIroiejLiG0TFuIr1LSaI2o292TsJcS4Q7
+        TlZ+qGFERG/bkxmap9X9nB3mNGXtf3c=
+X-Google-Smtp-Source: AGHT+IFY1JX42tQvUiQbHjxHOd20j5m7plZ8L4JheDy574ZvKTNtyQEZK75VDZPRx5P3o6rzL4rbdqXGQyM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:b50:0:b0:d80:904d:c211 with SMTP id
+ b16-20020a5b0b50000000b00d80904dc211mr241176ybr.7.1696882808446; Mon, 09 Oct
+ 2023 13:20:08 -0700 (PDT)
+Date:   Mon, 9 Oct 2023 13:20:06 -0700
+In-Reply-To: <20231009200608.GJ800259@ZenIV>
+Mime-Version: 1.0
+References: <20230928180651.1525674-1-pbonzini@redhat.com> <169595365500.1386813.6579237770749312873.b4-ty@google.com>
+ <20231009022248.GD800259@ZenIV> <ZSQO4fHaAxDkbGyz@google.com> <20231009200608.GJ800259@ZenIV>
+Message-ID: <ZSRgdgQe3fseEQpf@google.com>
+Subject: Re: [PATCH gmem FIXUP] kvm: guestmem: do not use a file system
+From:   Sean Christopherson <seanjc@google.com>
+To:     Al Viro <viro@zeniv.linux.org.uk>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH gmem FIXUP] kvm: guestmem: do not use a file system
-Message-ID: <20231009200608.GJ800259@ZenIV>
-References: <20230928180651.1525674-1-pbonzini@redhat.com>
- <169595365500.1386813.6579237770749312873.b4-ty@google.com>
- <20231009022248.GD800259@ZenIV>
- <ZSQO4fHaAxDkbGyz@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSQO4fHaAxDkbGyz@google.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,20 +67,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 09, 2023 at 07:32:48AM -0700, Sean Christopherson wrote:
-
-> Yeah, we found that out the hard way.  Is using the "secure" variant to get a
-> per-file inode a sane approach, or is that abuse that's going to bite us too?
+On Mon, Oct 09, 2023, Al Viro wrote:
+> On Mon, Oct 09, 2023 at 07:32:48AM -0700, Sean Christopherson wrote:
 > 
-> 	/*
-> 	 * Use the so called "secure" variant, which creates a unique inode
-> 	 * instead of reusing a single inode.  Each guest_memfd instance needs
-> 	 * its own inode to track the size, flags, etc.
-> 	 */
-> 	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
-> 					 O_RDWR, NULL);
+> > Yeah, we found that out the hard way.  Is using the "secure" variant to get a
+> > per-file inode a sane approach, or is that abuse that's going to bite us too?
+> > 
+> > 	/*
+> > 	 * Use the so called "secure" variant, which creates a unique inode
+> > 	 * instead of reusing a single inode.  Each guest_memfd instance needs
+> > 	 * its own inode to track the size, flags, etc.
+> > 	 */
+> > 	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
+> > 					 O_RDWR, NULL);
+> 
+> Umm...  Is there any chance that your call site will ever be in a module?
+> If not, you are probably OK with that variant.
 
-Umm...  Is there any chance that your call site will ever be in a module?
-If not, you are probably OK with that variant.  I don't like the details
-of that interface (anon_inode_getfile_secure(), that is), but that's
-a separate story and your use wouldn't make things harder to clean up.
+Yes, this code can be compiled as a module.  I assume there issues with the inode
+outliving the module?
