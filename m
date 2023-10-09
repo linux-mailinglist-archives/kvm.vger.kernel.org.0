@@ -2,126 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D44307BD9D9
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 13:31:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDB0C7BD9F6
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 13:33:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346237AbjJILbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 07:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33582 "EHLO
+        id S1346315AbjJILdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 07:33:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234563AbjJILa6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 07:30:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC52FD56
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 04:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696850983;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N7mGg0R3DrljgvJw1y1ejeFG5groXtawWx848a8zT7M=;
-        b=XrdL4O1bM3fHXf5ZCBTfkAijxacW6JuzW3PWOUCsyOzmWJuGSZYFlPXsUR+fEEz6lhg16J
-        vc16hOFYRsUJafqu/XrQmWh6hMk09SA6gk0L7Pi81+YCOacsv5qRdcGYi0MzIUGjc1rUyZ
-        Udg/7dBIU55c3K+jaamy0tFmzKp89VM=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-EKZ6g-q_O6aau7yVobq1jQ-1; Mon, 09 Oct 2023 07:29:41 -0400
-X-MC-Unique: EKZ6g-q_O6aau7yVobq1jQ-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-418225fb5d6so53364121cf.3
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 04:29:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696850981; x=1697455781;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N7mGg0R3DrljgvJw1y1ejeFG5groXtawWx848a8zT7M=;
-        b=YwFRwKkz7sQtO/LTyGmU0B4xMKyYJdMfOGsS+nYXVKtdcmkCpwsIfGjKpcB6nDx9Ou
-         F/8qotaUa+8pUUQkCJpyiMhZXCQJ/x7MQ2SLt7C4x4Jhzm2XbHjY76UNl9Sx8RyM40Wg
-         YRNnVes0fq8I3pk5g9GBc55xC15mg6oR5TW9H0PmTOB4nt910gcB9yccritPOmBxIWaB
-         41JkIQ1CQYG1Hshpd9R62JUebsZzgCbCYKAs65UaOLowqzWA+nUUgWXCULuwRf/BsHhJ
-         Zuw4ra5+BScjaN+iHFhpvg7v9i73taNSOO6zKTOnA0I5ysXCZSnM5Ngxb4djH9u+ad9J
-         xeAg==
-X-Gm-Message-State: AOJu0Yzi5kPPnfSYamnw2ogAHJubaWAsthzGCPrHKx6jwh9VOWuUxofi
-        W4Upn9FwEAW085NALTAyXUx/2ooDX2E9qXWIvQ2JZDX9ayf279WQPqqJlSjnBHx6fw+twWKALVY
-        1Nmoa4hriZ2J2
-X-Received: by 2002:a05:6214:5ece:b0:65c:fec4:30a1 with SMTP id mn14-20020a0562145ece00b0065cfec430a1mr16083507qvb.55.1696850981409;
-        Mon, 09 Oct 2023 04:29:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGqNXr7WTdcy5s+sDGx50As8M2XI8LIkeXeM5nKPCfmHcAFZLWCxvpJzCcvYF/o5/ZKNSoq2A==
-X-Received: by 2002:a05:6214:5ece:b0:65c:fec4:30a1 with SMTP id mn14-20020a0562145ece00b0065cfec430a1mr16083496qvb.55.1696850981156;
-        Mon, 09 Oct 2023 04:29:41 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-176-27.web.vodafone.de. [109.43.176.27])
-        by smtp.gmail.com with ESMTPSA id l19-20020a0ce513000000b006616fbcc077sm3811795qvm.129.2023.10.09.04.29.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 04:29:40 -0700 (PDT)
-Message-ID: <082a6b8b-6138-bf42-3f5e-0c2995bfe382@redhat.com>
-Date:   Mon, 9 Oct 2023 13:29:38 +0200
+        with ESMTP id S1346227AbjJILdl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 07:33:41 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4848594;
+        Mon,  9 Oct 2023 04:33:40 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S3xjq4l38z6K918;
+        Mon,  9 Oct 2023 19:33:19 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 9 Oct
+ 2023 12:33:36 +0100
+Date:   Mon, 9 Oct 2023 12:33:35 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Lukas Wunner <lukas@wunner.de>
+CC:     Dan Williams <dan.j.williams@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 00/12] PCI device authentication
+Message-ID: <20231009123335.00006d3d@Huawei.com>
+In-Reply-To: <20231007100433.GA7596@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+        <20231007100433.GA7596@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests PATCH v1] arch-run: migration: properly handle
- crashing outgoing QEMU
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, pbonzini@redhat.com, andrew.jones@linux.dev
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230926120828.1830840-1-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230926120828.1830840-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/09/2023 14.08, Nico Boehr wrote:
-> When outgoing (live) QEMU crashes or times out during migration, we
-> currently hang forever.
-> 
-> This is because we don't exit the loop querying migration state when QMP
-> communication fails.
-> 
-> Add proper error handling to the loop and exit when QMP communication
-> fails for whatever reason.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
-> Sorry I accidentally sent this only to s390x maintainers and forgot
-> Paolo and Andrew, hence resending.
-> 
->   scripts/arch-run.bash | 10 ++++++++--
->   1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 518607f4b75d..de9890408e24 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -162,8 +162,14 @@ run_migration ()
->   	migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
->   	while ! grep -q '"completed"' <<<"$migstatus" ; do
->   		sleep 1
-> -		migstatus=`qmp ${qmp1} '"query-migrate"' | grep return`
-> -		if grep -q '"failed"' <<<"$migstatus" ; then
-> +		if ! migstatus=`qmp ${qmp1} '"query-migrate"'`; then
-> +			echo "ERROR: Querying migration state failed." >&2
-> +			echo > ${fifo}
-> +			qmp ${qmp2} '"quit"'> ${qmpout2} 2>/dev/null
-> +			return 2
-> +		fi
-> +		migstatus=`grep return <<<"$migstatus"`
-> +		if grep -q '"failed"' <<<"$migstatus"; then
->   			echo "ERROR: Migration failed." >&2
->   			echo > ${fifo}
->   			qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
+On Sat, 7 Oct 2023 12:04:33 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Fri, Oct 06, 2023 at 09:06:13AM -0700, Dan Williams wrote:
+> > Lukas Wunner wrote:  
+> > > The root of trust is initially an in-kernel key ring of certificates.
+> > > We can discuss linking the system key ring into it, thereby allowing
+> > > EFI to pass trusted certificates to the kernel for CMA.  Alternatively,
+> > > a bundle of trusted certificates could be loaded from the initrd.
+> > > I envision that we'll add TPMs or remote attestation services such as
+> > > https://keylime.dev/ to create an ecosystem of various trust sources.  
+> > 
+> > Linux also has an interest in accommodating opt-in to using platform
+> > managed keys, so the design requires that key management and session
+> > ownership is a system owner policy choice.  
+> 
+> You're pointing out a gap in the specification:
+> 
+> There's an existing mechanism to negotiate which PCI features are
+> handled natively by the OS and which by platform firmware and that's
+> the _OSC Control Field (PCI Firmware Spec r3.3 table 4-5 and 4-6).
+> 
+> There are currently 10 features whose ownership is negotiated with _OSC,
+> examples are Hotplug control and DPC configuration control.
+> 
+> I propose adding an 11th bit to negotiate ownership of the CMA-SPDM
+> session.
+> 
+> Once that's added to the PCI Firmware Spec, amending the implementation
+> to honor it is trivial:  Just check for platform ownership at the top
+> of pci_cma_init() and return.
 
-and pushed to the repository.
+This might want to be a control over the specific DOE instance instead
+of a general purpose CMA control (or maybe we want both).
+
+There is no safe way to access a DOE to find out if it supports CMA
+that doesn't potentially break another entity using the mailbox.
+Given the DOE instances might be for something entirely different we
+can't just decide not to use them at all based on a global control.
+
+Any such control becomes messy when hotplug is taken into account.
+I suppose we could do a _DSM based on BDF / path to device (to remain
+stable across reenumeration) and config space offset to allow the OS
+to say 'Hi other entity / firmware are you using this DOE instance?"
+Kind of an OSC with parameters.  Also includes the other way around that
+the question tells the firmware that if it says "no you can't" the OS
+will leave it alone until a reboot or similar - that potentially avoids
+the problem that we access DOE instances already without taking care
+about this (I dropped ball on this having raised it way back near start
+of us adding DOE support.)
+
+If we do want to do any of these, which spec is appropriate?  Link it to PCI
+and propose a PCI firmware spec update? (not sure they have a code
+first process available) or make it somewhat generic and propose an
+ACPI Code first change?
+
+Jonathan
+
+> 
+> Thanks,
+> 
+> Lukas
+> 
+> 
 
