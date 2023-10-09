@@ -2,61 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 466D17BE79A
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 19:18:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA0307BE7EB
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 19:28:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377419AbjJIRS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 13:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33516 "EHLO
+        id S1377888AbjJIR2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 13:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377398AbjJIRSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 13:18:25 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5A39D
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 10:18:22 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-690bc3f82a7so3487766b3a.0
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 10:18:22 -0700 (PDT)
+        with ESMTP id S1377921AbjJIR2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 13:28:36 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04D1DA
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 10:28:32 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id ca18e2360f4ac-7a24c86aae3so60185839f.0
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 10:28:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696871902; x=1697476702; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HLGHt6Q8Th/XvNk9b1wnpnqK6x+L6c4E1vcH97tDF4g=;
-        b=NzXv/IHvwSfzgiJnuYb1Q5Zivv5ScCpE0Qk6BhNylLGX0diT4IKSxvuA7JwKD/2n70
-         Pmad4WIpcEfpuNyg3EGM0NSl5jQ/4OYGZJsoMn2e6HLAWRwIjxsxU1JVe6PCqow5z8eZ
-         xfyPpIsK7sICJmMTiofqKXCbCgcLR6P2oSooI=
+        d=linuxfoundation.org; s=google; t=1696872512; x=1697477312; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7BjVxNp/YRM5k6f5csMN7Rbql0PbCwEA0Qhwm+7n1+k=;
+        b=bOrp4xGQwrJaWsN9JAdBG7oklwSij9849M7r9DSH53jcRI89G95hha3jv1+oHgTQTt
+         aVyQB3L3tyuO/ZuCtKZBSIPi6tHxaDJQIjI9A7dK8n+wwFtx7d6ZP+MhKFP4rgFhhO7E
+         80HIR8M8J2ITd8NNj+wQ0DDDXmk8kgrPBIH6k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696871902; x=1697476702;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HLGHt6Q8Th/XvNk9b1wnpnqK6x+L6c4E1vcH97tDF4g=;
-        b=eZutgWuKYapHTEn4LsT24G7RLs259ptLcp6lsNsjiMdwrrOdRwRTir6Rhy2xpvLBio
-         0DFedpGUucm1yYB8ZS3OIOaLidFUqAfG/GGYirA/i/ZNGxnXEU/iZEeOJyHI0Fx+9Yle
-         YE4bIAh6rvV/Ow5krvsmos+vzMBicL4JRRZMhVD7HL/1qjbAj9K3pLMvwyWgw7Fj3iS/
-         QMK/RXlft1nhIrSmGxxSasJJZyUpkQaOEF5kOrsCmmCXvxoAzCxjNIjQaEt4P4Vz34iH
-         /f7cz57H6Tbtbme+jQguP3R2XbJzpTG/DepnTHHAebGZJjxGxSJhLbpdyDQPooASnPhe
-         WCNg==
-X-Gm-Message-State: AOJu0Yw8UcKbJmpplAN8XmZ2gphAEKxnddjH1lK+rs5ztdJ/aquQpuFv
-        UnOvzSUg8fhy7XFLxjExrlxBxw==
-X-Google-Smtp-Source: AGHT+IFwYFTVqxNmfhc2OYaSUDkCoyTLymXaYFmNx5RLf7MP7TuKSnLnGIauNGwix7285gniHNuKdg==
-X-Received: by 2002:a05:6a00:b84:b0:68f:ccea:8e14 with SMTP id g4-20020a056a000b8400b0068fccea8e14mr16264330pfj.32.1696871902030;
-        Mon, 09 Oct 2023 10:18:22 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id z9-20020aa785c9000000b006926e3dc2besm6674235pfn.108.2023.10.09.10.18.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 10:18:21 -0700 (PDT)
-Date:   Mon, 9 Oct 2023 10:18:19 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     pbonzini@redhat.com, seanjc@google.com, workflows@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: deprecate KVM_WERROR in favor of general WERROR
-Message-ID: <202310091018.85576DC@keescook>
-References: <20231006205415.3501535-1-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1696872512; x=1697477312;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7BjVxNp/YRM5k6f5csMN7Rbql0PbCwEA0Qhwm+7n1+k=;
+        b=FV9gpEDmVJK2w8vbfa0b+FVgclFC+Kfh4VHSoCDRkzuTlT7Q0u4AvhjMcOYjNNY4Yn
+         rhq5gdB0HjN2o0IsE+sFGs80kxQ+bUa6yDmCirqhjTl+p4sxS0ge5SWrtU5YL53B3N+G
+         +9fqTLDepHfmXBfzk4F31ZTdhwRsNjYKocE6UMYrgYNhBeWgwswmdQ057gCKjfARHZcL
+         gqzHavjENBj48fDn7lhPWG+b3wcyq43ZVF7qtw1qo8F8qtntCB6a0zgORas3cfJrJnuu
+         dI/zkVo0yNIMdSxTpR+CiOs9GoZeWmTKUN0lxIsayGuZCPo+I2OT059z+3p1Y/LvlYA8
+         lvjA==
+X-Gm-Message-State: AOJu0YxlG6/EFjAhBiSYAdwKMaGYjkqa+wSLmQJ6Q7l7f5ext0d26fab
+        vytNmOh5Pr1bkt04c7MLhqBMhw==
+X-Google-Smtp-Source: AGHT+IG524RLm2iNS7rGqigma7E7MkPPDCMafw1IlVfCC2AnEpocWiOhD+/3WH5nhUw39rAm0J1f0A==
+X-Received: by 2002:a6b:5a0a:0:b0:790:958e:a667 with SMTP id o10-20020a6b5a0a000000b00790958ea667mr15344414iob.2.1696872512138;
+        Mon, 09 Oct 2023 10:28:32 -0700 (PDT)
+Received: from [192.168.1.128] ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id fx23-20020a0566381e1700b0042b47e8869bsm2242289jab.49.2023.10.09.10.28.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Oct 2023 10:28:31 -0700 (PDT)
+Message-ID: <cb1dfcc1-e03e-4517-8f77-d08f10aa507c@linuxfoundation.org>
+Date:   Mon, 9 Oct 2023 11:28:30 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006205415.3501535-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/8] Add printf attribute to kselftest functions
+Content-Language: en-US
+To:     Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+        akpm@linux-foundation.org, christian@kellner.me,
+        fenghua.yu@intel.com, keescook@chromium.org,
+        ndesaulniers@google.com, coltonlewis@google.com,
+        dmatlack@google.com, vipinsh@google.com, seanjc@google.com,
+        brauner@kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        hannes@cmpxchg.org, nphamcs@gmail.com, reinette.chatre@intel.com
+Cc:     ilpo.jarvinen@linux.intel.com, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <cover.1696846568.git.maciej.wieczor-retman@intel.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <cover.1696846568.git.maciej.wieczor-retman@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
@@ -67,19 +77,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 01:54:15PM -0700, Jakub Kicinski wrote:
-> Setting WERROR for random subsystems make life really hard
-> for subsystems which want to build-test their stuff with W=1.
-> WERROR for the entire kernel now exists and can be used
-> instead. W=1 people probably know how to deal with the global
-> W=1 already, tracking all per-subsystem WERRORs is too much...
+On 10/9/23 04:28, Maciej Wieczor-Retman wrote:
+> Kselftest.h declares many variadic functions that can print some
+> formatted message while also executing selftest logic. These
+> declarations don't have any compiler mechanism to verify if passed
+> arguments are valid in comparison with format specifiers used in
+> printf() calls.
 > 
-> Link: https://lore.kernel.org/all/0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Attribute addition can make debugging easier, the code more consistent
+> and prevent mismatched or missing variables.
+> 
+> Add a __printf() macro that validates types of variables passed to the
+> format string. The macro is similarly used in other tools in the kernel.
+> 
+> Add __printf() attributes to function definitions inside kselftest.h that
+> use printing.
+> 
+> Adding the __printf() macro exposes some mismatches in format strings
+> across different selftests.
+> 
+> Fix the mismatched format specifiers in multiple tests.
+> 
+> Series is based on kselftests next branch.
 
-Yeah, best to have just the global option.
+How did you find these problems? I don't see any information
+how these problems are found in the commit logs.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
-
--- 
-Kees Cook
+thanks,
+-- Shuah
