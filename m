@@ -2,313 +2,360 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 554B67BD8E7
-	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 12:44:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 053D07BD8FF
+	for <lists+kvm@lfdr.de>; Mon,  9 Oct 2023 12:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345877AbjJIKoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 06:44:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33252 "EHLO
+        id S1346015AbjJIKwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 06:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345755AbjJIKon (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 06:44:43 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA00A99;
-        Mon,  9 Oct 2023 03:44:40 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-457819ae142so184285137.2;
-        Mon, 09 Oct 2023 03:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696848280; x=1697453080; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tZfDDDyR3J4c0sRpvZrHdEKwScc/uj3otb8uW8DACqc=;
-        b=ezdtJst2/PeL+Qw1xL8mNbgvhLzLgn+3COw1rbrNJD1c0Q1TWTCr+9Qshx1CbdS8jA
-         v9zj75ZzxE4EU229jpU7cMbveiJoBjOsbjI38ZKv5+guqZvP5vOp54s1w0TzxC7GhmIX
-         XdePex6MMutnSCmm6G2jxMZqjXFHXgYZKOtS9+EXW9+iQo5bU4/GYVcKZ3QWDYciCdt5
-         Z0p11XShJlcyP3pEXa251c9du05SCD9xCUGNr2vLdCB1i9Gfth5noHnU1keA+gMrIDIb
-         5/B8YW9NGuzUSgUYpq7K5Ibhv5TM+eTgeqR5oj7thMJixt6z3y04IESZMDLQ2xLIz+T9
-         joPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696848280; x=1697453080;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tZfDDDyR3J4c0sRpvZrHdEKwScc/uj3otb8uW8DACqc=;
-        b=pmmIoBbShy5coduMZ48SY2NkOePvIja/KohpMwZKqPWTOTwgQK/7whcWvGioh+3m4C
-         HsArrCRhswbseLKaEOJ9mvhJggkLsE+U76l/r4PotjxH3fCq4kBYtSL3CXwSqnsOER5/
-         JbyMYJzzHNyRnSSJkK7lQPN4vnOuCec1rLOQiXS1Cj/kmoOy9kkgBmFil4FaCqT+VZZJ
-         p5yCxSEsfcv3pXo3cKoljKDb5qHY+zhOKbNy6xzS4HV1o7CjjPrkWotrpkc58bBCrF/p
-         ErlqvGK7rjYOM4+i672mRr5dKvTIp49wLqCWwhPKRlfMAXVKm5FjL9RDtLx8FkGhPffS
-         9BPA==
-X-Gm-Message-State: AOJu0YyMZ/rCfHDQO+uUovEbM3VwuaUhat5X3QcCrml11ktHZpL41K30
-        sb2FHIV3mR4HHEcYOxLk5ggUHnFhtQAiV4epkEA=
-X-Google-Smtp-Source: AGHT+IHdVSLqpm5a7q+FPq0bViPBRQxnxSBBt7yXnKtf0gbG7NjRdo6eAfOzEB6RN85TxmaRlRS5dgKuQuNOEQCU+XA=
-X-Received: by 2002:a67:f141:0:b0:44d:4d5f:79a4 with SMTP id
- t1-20020a67f141000000b0044d4d5f79a4mr11681355vsm.20.1696848279804; Mon, 09
- Oct 2023 03:44:39 -0700 (PDT)
+        with ESMTP id S232713AbjJIKwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 06:52:21 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2070.outbound.protection.outlook.com [40.107.100.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE888E;
+        Mon,  9 Oct 2023 03:52:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VhqK6kMAB7QlK4WUNzre/YS0depJzBRkpvswKviE4GVYrsFiiTY/j+ARWgfV45iqd1qO7Do7JA9pEBYkyaIDiRttzhkg/UQjmho1jhPjbfWsVBoTaas26f3HjJku9fSWynV8+3/uOlHKDRAZwnByKDPh4I1/hnLNojiOWlYA85O8fBf3WyrZwueVJDvD67yv/3NOCKxFRygoXBfO2H3uQVFcjg/CyY1pafIzYgQwqyPdrVsDLnAdAUK0wQtTg2FZPm+FIFjz67QCDPG4Dm52hGiDVTjiO01oqplJqCV6Dq3Yq+yncovms/HgBzQgfsDWzr1XZP8uoZc8DBTNp7aQsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n2AIJap9D02Bsf8hkAhNA6A9dk0BI2+3qtG77o4WtaQ=;
+ b=UqClIPWkt08EmP/HEtAT+IkjkrmZURSjlbtgHhily896jXi/NMQ8VB1OyK3WuybC3NTlfaUS0+Nz3w6fkHv0oL6piqAeDm0dgSwnpMFZchbjXfcNBtvhCzatNtFyODAK8S3+vHpT8Lcy16+fTM82K5wr9HgCrf7hETnyMOU0QjPHMjuiH1HimSM49eYfDQdy5it7MPa3JCGc6xjMPRfCkSxwk/sf0eWguChRbn3lJuNzGSqcKuXjOMn5Hldmmpl6Ciy3+l+zg7rQBDGUrRsrP55C7pPAmVq6Ulo/TAwkniZRtwcOK08R5NPGSFQrR1kQb3nPUMOV7wBjXq5DvLj8dA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n2AIJap9D02Bsf8hkAhNA6A9dk0BI2+3qtG77o4WtaQ=;
+ b=s67hKoxgtlRHmr7kW2guG4noed0vWJcnDGypdHplLHQxa3PlV+h9PCymQuYzRQ/KGrYiunH8rfAHEsEU4xp4EsKa0vQfnulJ0KTrUKabnNgCWlsgHOZr7dzydz1q6p0jPDbUf95OUvXHSgFGG8hZqfQW5h79SGLcqiLuWoNFOzs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by CH3PR12MB8657.namprd12.prod.outlook.com (2603:10b6:610:172::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.37; Mon, 9 Oct
+ 2023 10:52:17 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::16da:8b28:d454:ad5a]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::16da:8b28:d454:ad5a%3]) with mapi id 15.20.6863.032; Mon, 9 Oct 2023
+ 10:52:16 +0000
+Message-ID: <de5450a7-1395-490c-9767-7feee43e156a@amd.com>
+Date:   Mon, 9 Oct 2023 21:52:00 +1100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
+ authentication
+Content-Language: en-US
+To:     Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0085.namprd13.prod.outlook.com
+ (2603:10b6:806:23::30) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
- <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
- <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com> <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
- <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com> <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
- <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com> <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
- <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com>
-In-Reply-To: <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com>
-From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date:   Mon, 9 Oct 2023 03:44:01 -0700
-Message-ID: <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
-        gustavoars@kernel.org, herbert@gondor.apana.org.au,
-        steffen.klassert@secunet.com, nogikh@google.com,
-        pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com,
-        elver@google.com, pabeni@redhat.com,
-        Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|CH3PR12MB8657:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82ed6d59-edab-4731-c05c-08dbc8b5cd29
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zTbelLFFYlIVdNakAcy7sON5s9k1/NsnhijuJNvcm2deJg8eF1skyk96WLrjnGDJL4EkOi5LORbf2bNfzql2yk2e8UKS/D0AXnl0MtBRet6tNhdKEVCRGxmKAkpXxi3qDNgnsybSlMI2dc1a3scMMHERzi7DWPs5Chbmx7VQ4wwyjyjV3Va194ZDbeyggtzFxj+HVAR5LFiIlCXIfDas9KloDO8a0FJvmjuwJVKr2xgJ/YF19S9cpe+y9EiS4WzdhzaYRd95uT+ZqTnOy3Aydrr2OTYtqYkwvuOv+UZBW8Djp44rdImADnSVcX4LvN2IEiXcG9YGc0C7BywkshY87wYj0kJFveDi9yCwA0MTH2992jONpzc+CEWp4e1SwrNfH5SzwZIOByJACA+J6orfOdJWPlqmSlnHBxWWlH3KAyjS9iYqj8EmyFn+LTKfOuXfnyOYh476TRLgQ72cOvFDhguYTflPFZIGpi47Myb0ylGAwWAmUbk7C6YU/pM+CC4syPKMB3YK3PwnarJlrQHmZbDqKyzbF6c3i2l1sWdTWEYTQJQ1QXYASb3HV7HX207XTScWRBKHYlCKywNMnQwl2lLiwVHMg8pCr+clbH9tj4WlR//+gcWm5CwYcv9MV9YmEybV3r98n8KMXhe4pRpLGxIGYh3puBdkCzTghe+vFWk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(366004)(376002)(346002)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(6512007)(53546011)(6506007)(2616005)(478600001)(6486002)(41300700001)(26005)(83380400001)(7416002)(2906002)(5660300002)(66476007)(110136005)(66556008)(54906003)(66946007)(4326008)(8676002)(316002)(8936002)(38100700002)(921005)(36756003)(31696002)(6666004)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T0RsenkvU0JWQVJMM0EycVJxUytQYnJXTVAvZ0JHdktYTU1mMGxMdVNUZXlM?=
+ =?utf-8?B?VEVjRzlxamdaVS9HeW5IOGFVVGpWSXpKbVR3K2J3a0lLVnhIOUlldklocCti?=
+ =?utf-8?B?QytLdkppVTZhVHE3Y0lOZmFNc1hrZiszUHJ2TFZKZHNnUUlwQ21jM1dsQjhQ?=
+ =?utf-8?B?T3ViVjNEL0JGaTAvREtwMGZ3Q2NlUnM5S2F3bWQzZW5sblpodHZrUWNLaEJW?=
+ =?utf-8?B?R0U1UHVBL0tid1NRSkd4MVJaQmduNmw3V2hCR3MxMDBjMDhoa09KYUF0TUNt?=
+ =?utf-8?B?MEZLNzgwQ3ZpQzZzOXB6MVUvZ2xuQ2FTOGZqdUpmMnVYajFQd29HLzcyejlx?=
+ =?utf-8?B?Wjh5blVqdEpjZG5rbklsOFJaVzBDZzJ2WVhyY3JOYTd2Ull1cUpJcDU4Unlp?=
+ =?utf-8?B?RE1jVGhhWUN6SWtubGlOTDdodEFveUY3aHJlRTBQcmVLbjVlRUVZbGFYVm5v?=
+ =?utf-8?B?S2czbFVqeldTM2xqMHYzemdlOWZPSXZ6Y2VlVVkzTGhURXcwNmY4RHgrRjhK?=
+ =?utf-8?B?VHN5bW1NWlJCRmxZKzBQdE9hTkVlcWl1TTlPa2p4QWt5azVLUUovMSs5WGVr?=
+ =?utf-8?B?Y1c4YWhVNDV4ZjJ3Vy83S0RFOUY1czEra2VCOGJlZmFjMG5vSDBaNiswbEtD?=
+ =?utf-8?B?Zkxob1JtbkVUY0c0MzNYcFJSaFpydkFvTUdhZVJ3MVVrVmZXN21hWTNZanNp?=
+ =?utf-8?B?ajJJRld5Rit4L0dIMTM0b1lQVEZEYXd0TWpMSGJ2ZFRvdkNkUUhTOUs3eWFp?=
+ =?utf-8?B?eXdYM09jczBHRzd4YWc3L1VrTVBzSVZMWERGVndmM2JBZlpFSmY3SndkTURm?=
+ =?utf-8?B?MGVEVVo3QTNpbFFmSzRBS0cvanFrek93a1h4Rng0VFlUdWc1UWdJVjVaTkdU?=
+ =?utf-8?B?YnNyWUNER1cxYUg2YklRRitSQk8yeHQwU21aSXFNb0JuRG1uM2FBTS9idkFQ?=
+ =?utf-8?B?cFJhbDFNSEd3am5ER0dWblovZFMrcVJLR05rZ2liakk0SGZaSEhkcEQ5cDZD?=
+ =?utf-8?B?cFh0RFNSTkFqakJzeEpTVE9OdkRSRC93akFvUGR0RWtiZ1RxK2ZRSUNQeHk3?=
+ =?utf-8?B?YmwzSFdGdFRTczROV0dFRUs0bjBZblBqcDVxM0dWSlRpSTBWd3Z2T3pDTE5H?=
+ =?utf-8?B?bXZ6N0pmNWhZMjRCY0xVeGVZWkxiRWh4NzZVL0lRelVNSHh1WjZxR1RrZXVt?=
+ =?utf-8?B?RWUwbm9lREhvcGpuMTlRYjNMQ3NsOUp1NUM2Z0NOM2dLL0h5Znk1cGJTd0VU?=
+ =?utf-8?B?ek9GdnEycWx1Q3UxMGdtdUVrdVlCWGFWTUhSYXlzQjhQRTBhdE5aWkRSTEYy?=
+ =?utf-8?B?MWtmQWpWeGJubHpNMngrb2Flb2xna0hScTB2cFRkR3FlbytGcllPOTFxc2Er?=
+ =?utf-8?B?TXZwRDNGaGxqVTZ6UXNxeE9kVHNUK2ljSzZSZDUyZldQZFBRS1RPcUxtb3hX?=
+ =?utf-8?B?d3JvdWJVa01rUFRrSHNkVmRQd3NIMnZiUnFjWmRicDVIOTRYQmJXUkdxazNZ?=
+ =?utf-8?B?YmZiS0JTOWVIM0RUUERaZU9vOEdkMnZqTXZoVG5PdHQvNng1blEwQWdlQ0h5?=
+ =?utf-8?B?V0ZCWkpOdFdRMGJnUDk3c2REMkxNRCt6V3RmQWw5S3UzRHdoTkZQemFndVpx?=
+ =?utf-8?B?WE1lbS95cTlMTmZkaDJzRzR0M1FzcGFsQTBVZllhaUQ2b01WVFd1TmU3cmFk?=
+ =?utf-8?B?UzMxTnk5enFNdFpvSHdIdXduNktFZnlxSnZyY0ZWZUxNWVFheUpmQkszL1Nw?=
+ =?utf-8?B?djlvZWtWaFowODVCc29aMDZDVVd5a3crNzljeld3YjZXSUVCdlFIUCsxL2k0?=
+ =?utf-8?B?U3R4cTFaVjJrZVBXbGdOSDZWc1Z6T3hka1VsRkY5WXp0cU5uWFpyNzZRcXFS?=
+ =?utf-8?B?K1g4b2RWdUpsSFQyQ05ObWlDN3djL2FmYmYrazV5TElhaTlXME1tTzdUV05K?=
+ =?utf-8?B?bE9mSS95OExPa0lMYTB5V0ZyMmpDYW95cG5vZDNQM0xENFZJVDV2RXJDZTV2?=
+ =?utf-8?B?QVYxeTNLMXlyVEtnb0VVYVVHbktubjlVeWhpZWpIck9NSmxSU0lreHVjZXpn?=
+ =?utf-8?B?ZWdUQ0l4VzV1TUp3MjNTZGFRV0hyQzBvbTVlcGJrbmNUeGhuaXlJQmlFR0pp?=
+ =?utf-8?Q?m4FHCs3zFTLTx913/YRXMS8ik?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82ed6d59-edab-4731-c05c-08dbc8b5cd29
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 10:52:16.2404
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yKu6+DcgOPU2Voe+OE/wR0nMWDvKkiAjcowuEUiIBxKn7NMluG3yA2eTyV+//XVjGkD2zitY0MD9gfWXutF0sg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8657
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 9, 2023 at 3:12=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> On 2023/10/09 19:06, Willem de Bruijn wrote:
-> > On Mon, Oct 9, 2023 at 3:02=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
-nix.com> wrote:
-> >>
-> >> On 2023/10/09 18:57, Willem de Bruijn wrote:
-> >>> On Mon, Oct 9, 2023 at 3:57=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
-aynix.com> wrote:
-> >>>>
-> >>>> On 2023/10/09 17:04, Willem de Bruijn wrote:
-> >>>>> On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko.odaki=
-@daynix.com> wrote:
-> >>>>>>
-> >>>>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
-> >>>>>>> On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.od=
-aki@daynix.com> wrote:
-> >>>>>>>>
-> >>>>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
-> >>>>>>>>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko.o=
-daki@daynix.com> wrote:
-> >>>>>>>>>>
-> >>>>>>>>>> virtio-net have two usage of hashes: one is RSS and another is=
- hash
-> >>>>>>>>>> reporting. Conventionally the hash calculation was done by the=
- VMM.
-> >>>>>>>>>> However, computing the hash after the queue was chosen defeats=
- the
-> >>>>>>>>>> purpose of RSS.
-> >>>>>>>>>>
-> >>>>>>>>>> Another approach is to use eBPF steering program. This approac=
-h has
-> >>>>>>>>>> another downside: it cannot report the calculated hash due to =
-the
-> >>>>>>>>>> restrictive nature of eBPF.
-> >>>>>>>>>>
-> >>>>>>>>>> Introduce the code to compute hashes to the kernel in order to=
- overcome
-> >>>>>>>>>> thse challenges. An alternative solution is to extend the eBPF=
- steering
-> >>>>>>>>>> program so that it will be able to report to the userspace, bu=
-t it makes
-> >>>>>>>>>> little sense to allow to implement different hashing algorithm=
-s with
-> >>>>>>>>>> eBPF since the hash value reported by virtio-net is strictly d=
-efined by
-> >>>>>>>>>> the specification.
-> >>>>>>>>>>
-> >>>>>>>>>> The hash value already stored in sk_buff is not used and compu=
-ted
-> >>>>>>>>>> independently since it may have been computed in a way not con=
-formant
-> >>>>>>>>>> with the specification.
-> >>>>>>>>>>
-> >>>>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>>>>>>>> ---
-> >>>>>>>>>
-> >>>>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D {
-> >>>>>>>>>> +       .max_indirection_table_length =3D
-> >>>>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
-> >>>>>>>>>> +
-> >>>>>>>>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
-> >>>>>>>>>> +};
-> >>>>>>>>>
-> >>>>>>>>> No need to have explicit capabilities exchange like this? Tun e=
-ither
-> >>>>>>>>> supports all or none.
-> >>>>>>>>
-> >>>>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
-> >>>>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UD=
-P_EX.
-> >>>>>>>>
-> >>>>>>>> It is because the flow dissector does not support IPv6 extension=
-s. The
-> >>>>>>>> specification is also vague, and does not tell how many TLVs sho=
-uld be
-> >>>>>>>> consumed at most when interpreting destination option header so =
-I chose
-> >>>>>>>> to avoid adding code for these hash types to the flow dissector.=
- I doubt
-> >>>>>>>> anyone will complain about it since nobody complains for Linux.
-> >>>>>>>>
-> >>>>>>>> I'm also adding this so that we can extend it later.
-> >>>>>>>> max_indirection_table_length may grow for systems with 128+ CPUs=
-, or
-> >>>>>>>> types may have other bits for new protocols in the future.
-> >>>>>>>>
-> >>>>>>>>>
-> >>>>>>>>>>              case TUNSETSTEERINGEBPF:
-> >>>>>>>>>> -               ret =3D tun_set_ebpf(tun, &tun->steering_prog,=
- argp);
-> >>>>>>>>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering_p=
-rog, argp);
-> >>>>>>>>>> +               if (IS_ERR(bpf_ret))
-> >>>>>>>>>> +                       ret =3D PTR_ERR(bpf_ret);
-> >>>>>>>>>> +               else if (bpf_ret)
-> >>>>>>>>>> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_HA=
-SH_RSS;
-> >>>>>>>>>
-> >>>>>>>>> Don't make one feature disable another.
-> >>>>>>>>>
-> >>>>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
-> >>>>>>>>> functions. If one is enabled the other call should fail, with E=
-BUSY
-> >>>>>>>>> for instance.
-> >>>>>>>>>
-> >>>>>>>>>> +       case TUNSETVNETHASH:
-> >>>>>>>>>> +               len =3D sizeof(vnet_hash);
-> >>>>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
-> >>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>> +                       break;
-> >>>>>>>>>> +               }
-> >>>>>>>>>> +
-> >>>>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) =
-&&
-> >>>>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_=
-net_hdr_v1_hash) ||
-> >>>>>>>>>> +                     !tun_is_little_endian(tun))) ||
-> >>>>>>>>>> +                    vnet_hash.indirection_table_mask >=3D
-> >>>>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGT=
-H) {
-> >>>>>>>>>> +                       ret =3D -EINVAL;
-> >>>>>>>>>> +                       break;
-> >>>>>>>>>> +               }
-> >>>>>>>>>> +
-> >>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
-> >>>>>>>>>> +               len =3D (vnet_hash.indirection_table_mask + 1)=
- * 2;
-> >>>>>>>>>> +               if (copy_from_user(vnet_hash_indirection_table=
-, argp, len)) {
-> >>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>> +                       break;
-> >>>>>>>>>> +               }
-> >>>>>>>>>> +
-> >>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
-> >>>>>>>>>> +               len =3D virtio_net_hash_key_length(vnet_hash.t=
-ypes);
-> >>>>>>>>>> +
-> >>>>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)) =
-{
-> >>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>> +                       break;
-> >>>>>>>>>> +               }
-> >>>>>>>>>
-> >>>>>>>>> Probably easier and less error-prone to define a fixed size con=
-trol
-> >>>>>>>>> struct with the max indirection table size.
-> >>>>>>>>
-> >>>>>>>> I made its size variable because the indirection table and key m=
-ay grow
-> >>>>>>>> in the future as I wrote above.
-> >>>>>>>>
-> >>>>>>>>>
-> >>>>>>>>> Btw: please trim the CC: list considerably on future patches.
-> >>>>>>>>
-> >>>>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF chang=
-e you
-> >>>>>>>> proposed.
-> >>>>>>>
-> >>>>>>> To be clear: please don't just resubmit with that one change.
-> >>>>>>>
-> >>>>>>> The skb and cb issues are quite fundamental issues that need to b=
-e resolved.
-> >>>>>>>
-> >>>>>>> I'd like to understand why adjusting the existing BPF feature for=
- this
-> >>>>>>> exact purpose cannot be amended to return the key it produced.
-> >>>>>>
-> >>>>>> eBPF steering program is not designed for this particular problem =
-in my
-> >>>>>> understanding. It was introduced to derive hash values with an
-> >>>>>> understanding of application-specific semantics of packets instead=
- of
-> >>>>>> generic IP/TCP/UDP semantics.
-> >>>>>>
-> >>>>>> This problem is rather different in terms that the hash derivation=
- is
-> >>>>>> strictly defined by virtio-net. I don't think it makes sense to
-> >>>>>> introduce the complexity of BPF when you always run the same code.
-> >>>>>>
-> >>>>>> It can utilize the existing flow dissector and also make it easier=
- to
-> >>>>>> use for the userspace by implementing this in the kernel.
-> >>>>>
-> >>>>> Ok. There does appear to be overlap in functionality. But it might =
-be
-> >>>>> easier to deploy to just have standard Toeplitz available without
-> >>>>> having to compile and load an eBPF program.
-> >>>>>
-> >>>>> As for the sk_buff and cb[] changes. The first is really not needed=
-.
-> >>>>> sk_buff simply would not scale if every edge case needs a few bits.
-> >>>>
-> >>>> An alternative is to move the bit to cb[] and clear it for every cod=
-e
-> >>>> paths that lead to ndo_start_xmit(), but I'm worried that it is erro=
-r-prone.
-> >>>>
-> >>>> I think we can put the bit in sk_buff for now. We can implement the
-> >>>> alternative when we are short of bits.
-> >>>
-> >>> I disagree. sk_buff fields add a cost to every code path. They cannot
-> >>> be added for every edge case.
-> >>
-> >> It only takes an unused bit and does not grow the sk_buff size so I
-> >> think it has practically no cost for now.
-> >
-> > The problem is that that thinking leads to death by a thousand cuts.
-> >
-> > "for now" forces the cost of having to think hard how to avoid growing
-> > sk_buff onto the next person. Let's do it right from the start.
->
-> I see. I described an alternative to move the bit to cb[] and clear it
-> in all code paths that leads to ndo_start_xmit() earlier. Does that
-> sound good to you?
 
-If you use the control block to pass information between
-__dev_queue_xmit on the tun device and tun_net_xmit, using gso_skb_cb,
-the field can be left undefined in all non-tun paths. tun_select_queue
-can initialize.
+On 29/9/23 03:32, Lukas Wunner wrote:
+> At any given time, only a single entity in a physical system may have
+> an SPDM connection to a device.  That's because the GET_VERSION request
+> (which begins an authentication sequence) resets "the connection and all
+> context associated with that connection" (SPDM 1.3.0 margin no 158).
+> 
+> Thus, when a device is passed through to a guest and the guest has
+> authenticated it, a subsequent authentication by the host would reset
+> the device's CMA-SPDM session behind the guest's back.
+> 
+> Prevent by letting the guest claim exclusive CMA ownership of the device
+> during passthrough.  Refuse CMA reauthentication on the host as long.
+> After passthrough has concluded, reauthenticate the device on the host.
+> 
+> Store the flag indicating guest ownership in struct pci_dev's priv_flags
+> to avoid the concurrency issues observed by commit 44bda4b7d26e ("PCI:
+> Fix is_added/is_busmaster race condition").
+> 
+> Side note:  The Data Object Exchange r1.1 ECN (published Oct 11 2022)
+> retrofits DOE with Connection IDs.  In theory these allow simultaneous
+> CMA-SPDM connections by multiple entities to the same device.  But the
+> first hardware generation capable of CMA-SPDM only supports DOE r1.0.
+> The specification also neglects to reserve unique Connection IDs for
+> hosts and guests, which further limits its usefulness.
+> 
+> In general, forcing the transport to compensate for SPDM's lack of a
+> connection identifier feels like a questionable layering violation.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>   drivers/pci/cma.c                | 41 ++++++++++++++++++++++++++++++++
+>   drivers/pci/pci.h                |  1 +
+>   drivers/vfio/pci/vfio_pci_core.c |  9 +++++--
+>   include/linux/pci.h              |  8 +++++++
+>   include/linux/spdm.h             |  2 ++
+>   lib/spdm_requester.c             | 11 +++++++++
+>   6 files changed, 70 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
+> index c539ad85a28f..b3eee137ffe2 100644
+> --- a/drivers/pci/cma.c
+> +++ b/drivers/pci/cma.c
+> @@ -82,9 +82,50 @@ int pci_cma_reauthenticate(struct pci_dev *pdev)
+>   	if (!pdev->cma_capable)
+>   		return -ENOTTY;
+>   
+> +	if (test_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags))
+> +		return -EPERM;
+> +
+>   	return spdm_authenticate(pdev->spdm_state);
+>   }
+>   
+> +#if IS_ENABLED(CONFIG_VFIO_PCI_CORE)
+> +/**
+> + * pci_cma_claim_ownership() - Claim exclusive CMA-SPDM control for guest VM
+> + * @pdev: PCI device
+> + *
+> + * Claim exclusive CMA-SPDM control for a guest virtual machine before
+> + * passthrough of @pdev.  The host refrains from performing CMA-SPDM
+> + * authentication of the device until passthrough has concluded.
+> + *
+> + * Necessary because the GET_VERSION request resets the SPDM connection
+> + * and DOE r1.0 allows only a single SPDM connection for the entire system.
+> + * So the host could reset the guest's SPDM connection behind the guest's back.
+> + */
+> +void pci_cma_claim_ownership(struct pci_dev *pdev)
+> +{
+> +	set_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
+> +
+> +	if (pdev->cma_capable)
+> +		spdm_await(pdev->spdm_state);
+> +}
+> +EXPORT_SYMBOL(pci_cma_claim_ownership);
+> +
+> +/**
+> + * pci_cma_return_ownership() - Relinquish CMA-SPDM control to the host
+> + * @pdev: PCI device
+> + *
+> + * Relinquish CMA-SPDM control to the host after passthrough of @pdev to a
+> + * guest virtual machine has concluded.
+> + */
+> +void pci_cma_return_ownership(struct pci_dev *pdev)
+> +{
+> +	clear_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
+> +
+> +	pci_cma_reauthenticate(pdev);
+> +}
+> +EXPORT_SYMBOL(pci_cma_return_ownership);
+> +#endif
+> +
+>   void pci_cma_destroy(struct pci_dev *pdev)
+>   {
+>   	if (pdev->spdm_state)
+> diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
+> index d80cc06be0cc..05ae6359b152 100644
+> --- a/drivers/pci/pci.h
+> +++ b/drivers/pci/pci.h
+> @@ -388,6 +388,7 @@ static inline bool pci_dev_is_disconnected(const struct pci_dev *dev)
+>   #define PCI_DEV_ADDED 0
+>   #define PCI_DPC_RECOVERED 1
+>   #define PCI_DPC_RECOVERING 2
+> +#define PCI_CMA_OWNED_BY_GUEST 3
 
-I would still use skb->hash to encode the hash. That hash type of that
-field is not strictly defined. It can be siphash from ___skb_get_hash
-or a device hash, which most likely also uses Toeplitz. Then you also
-don't run into the problem of growing the struct size.
+
+In AMD SEV TIO, the PSP firmware creates an SPDM connection. What is the 
+expected way of managing such ownership, a new priv_flags bit + api for it?
+
+
+>   
+>   static inline void pci_dev_assign_added(struct pci_dev *dev, bool added)
+>   {
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1929103ee59a..6f300664a342 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -487,10 +487,12 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+>   	if (ret)
+>   		goto out_power;
+>   
+> +	pci_cma_claim_ownership(pdev);
+
+
+and this one too - in our design the SPDM session ownership stays in the 
+PSP firmware. I understand that you are implementing a different thing 
+but this patch triggers SPDM setup and expects it to not disappear (for 
+example, in reset) so the PSP's SPDM needs to synchronize with this, 
+clear pdev->cma_capable, or a new flag, or add a blocking list to the 
+CMA driver. Thanks,
+
+
+> +
+>   	/* If reset fails because of the device lock, fail this path entirely */
+>   	ret = pci_try_reset_function(pdev);
+>   	if (ret == -EAGAIN)
+> -		goto out_disable_device;
+> +		goto out_cma_return;
+>   
+>   	vdev->reset_works = !ret;
+>   	pci_save_state(pdev);
+> @@ -549,7 +551,8 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+>   out_free_state:
+>   	kfree(vdev->pci_saved_state);
+>   	vdev->pci_saved_state = NULL;
+> -out_disable_device:
+> +out_cma_return:
+> +	pci_cma_return_ownership(pdev);
+>   	pci_disable_device(pdev);
+>   out_power:
+>   	if (!disable_idle_d3)
+> @@ -678,6 +681,8 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+>   
+>   	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
+>   
+> +	pci_cma_return_ownership(pdev);
+> +
+>   	/* Put the pm-runtime usage counter acquired during enable */
+>   	if (!disable_idle_d3)
+>   		pm_runtime_put(&pdev->dev);
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 2c5fde81bb85..c14ea0e74fc4 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -2386,6 +2386,14 @@ static inline resource_size_t pci_iov_resource_size(struct pci_dev *dev, int res
+>   static inline void pci_vf_drivers_autoprobe(struct pci_dev *dev, bool probe) { }
+>   #endif
+>   
+> +#ifdef CONFIG_PCI_CMA
+> +void pci_cma_claim_ownership(struct pci_dev *pdev);
+> +void pci_cma_return_ownership(struct pci_dev *pdev);
+> +#else
+> +static inline void pci_cma_claim_ownership(struct pci_dev *pdev) { }
+> +static inline void pci_cma_return_ownership(struct pci_dev *pdev) { }
+> +#endif
+> +
+>   #if defined(CONFIG_HOTPLUG_PCI) || defined(CONFIG_HOTPLUG_PCI_MODULE)
+>   void pci_hp_create_module_link(struct pci_slot *pci_slot);
+>   void pci_hp_remove_module_link(struct pci_slot *pci_slot);
+> diff --git a/include/linux/spdm.h b/include/linux/spdm.h
+> index 69a83bc2eb41..d796127fbe9a 100644
+> --- a/include/linux/spdm.h
+> +++ b/include/linux/spdm.h
+> @@ -34,6 +34,8 @@ int spdm_authenticate(struct spdm_state *spdm_state);
+>   
+>   bool spdm_authenticated(struct spdm_state *spdm_state);
+>   
+> +void spdm_await(struct spdm_state *spdm_state);
+> +
+>   void spdm_destroy(struct spdm_state *spdm_state);
+>   
+>   #endif
+> diff --git a/lib/spdm_requester.c b/lib/spdm_requester.c
+> index b2af2074ba6f..99424d6aebf5 100644
+> --- a/lib/spdm_requester.c
+> +++ b/lib/spdm_requester.c
+> @@ -1483,6 +1483,17 @@ struct spdm_state *spdm_create(struct device *dev, spdm_transport *transport,
+>   }
+>   EXPORT_SYMBOL_GPL(spdm_create);
+>   
+> +/**
+> + * spdm_await() - Wait for ongoing spdm_authenticate() to finish
+> + *
+> + * @spdm_state: SPDM session state
+> + */
+> +void spdm_await(struct spdm_state *spdm_state)
+> +{
+> +	mutex_lock(&spdm_state->lock);
+> +	mutex_unlock(&spdm_state->lock);
+> +}
+> +
+>   /**
+>    * spdm_destroy() - Destroy SPDM session
+>    *
+
+-- 
+Alexey
+
+
