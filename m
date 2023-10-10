@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDB5C7BF2F4
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 08:26:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06E487BF313
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 08:31:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442217AbjJJG06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 02:26:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40456 "EHLO
+        id S1442295AbjJJGa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 02:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442156AbjJJG04 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 02:26:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A2597
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 23:26:09 -0700 (PDT)
+        with ESMTP id S1442340AbjJJGax (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 02:30:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FDE9A3
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 23:30:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696919169;
+        s=mimecast20190719; t=1696919402;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZXgJjAltwNNXgE6CpFrMVez2TIFFxTWTGd+YncZ0BYc=;
-        b=ecNRZ8R6iyfKD4qhUtqknGJhf+55GYgJoVcgxqfbO5BPp0wLSFLZX5QVxGsCVGOajEdGmM
-        I9Ne6hvJ6GVK0sP8slcyeciGGSy0nS3T8omdG8i0RZakC4hB1/KCjr+quK7NOze9tlAiOh
-        a1NjK5QxyxGjL+fUaQSgsjRrLd1tlcQ=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Gkyhygrn0LjKBs+Gy+HOQR/ROK9i9+TCjbjoKrbTIPI=;
+        b=Fv/+1kMIc6OwI1a9QpbPa8eFL1Db4c9p/JfOiYHnbrqeqjzZT6R1B9eU5W9cw1nD90l6Q4
+        dG4e3Zt8gn1TjeewT649P1ftfdyH1qi1tsYvqJ57wKcTDviVUnIA/njCaJtTGNUg9OPM9f
+        TTIl9DV/DCenQulGhwHsAWNDN41vTcs=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-4eu6OcHuMfC-v3c5NynZxA-1; Tue, 10 Oct 2023 02:26:07 -0400
-X-MC-Unique: 4eu6OcHuMfC-v3c5NynZxA-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5041a779c75so4600133e87.2
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 23:26:06 -0700 (PDT)
+ us-mta-596-seQYaigsNzazunq2gi8beA-1; Tue, 10 Oct 2023 02:30:01 -0400
+X-MC-Unique: seQYaigsNzazunq2gi8beA-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-503343a850aso4486990e87.3
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 23:30:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696919165; x=1697523965;
+        d=1e100.net; s=20230601; t=1696919400; x=1697524200;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZXgJjAltwNNXgE6CpFrMVez2TIFFxTWTGd+YncZ0BYc=;
-        b=tlvM3XX7Il3z4suzutS1dhe+dsnnq45knHpIzoQ0PWL7KPRyqcnvPhWXdByqTHLxtv
-         hCCpf2io/16ktNvXa2lm36y38cwlXZPMjo+3X33IRSaAPCkZU+B8VK/wUxhP4rm7r5m6
-         oEQjQK1yc+W5Hq0TCGueznQ+xEmBqrzCRqSxflheATiAKPykzo7SqV9gDYD+wur33t+7
-         1s0esKud52mKVVYBSh+EfhP7ZCkag4W5Tm7QxnDsfN5Z2OtvgfSiFV4CagyPUSNmMYcc
-         JcYZVSYLAQT8O2llQFYfhf56eclnQt5gomXCFQu/Zon1kAglHK2Lgqxj/svfX6t1a8eX
-         hyTw==
-X-Gm-Message-State: AOJu0YyNL3+fotNF1Qsu0pRvpXez8kcdaKfSQuho/tUNBOhA0DVmU9Ov
-        TXppVL8Lx3VCrmfHF4blV/fQM5KqiT9BOBNcbV6tZi9OMTsq/Mxj4PqzZWt5cffVWDfbTE20Wkw
-        339XwhuIhjrynmzQz4UpZheiXYR7/
-X-Received: by 2002:ac2:5e2c:0:b0:500:9524:f733 with SMTP id o12-20020ac25e2c000000b005009524f733mr11638591lfg.20.1696919165639;
-        Mon, 09 Oct 2023 23:26:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHTRfSc/Dwktp9YhC8aXUxGnki2o7zlWGkxqIyChOD0GhfDblxBz/lw7GvevY0oxSJY788QjGmeYKUsCUmt5sc=
-X-Received: by 2002:ac2:5e2c:0:b0:500:9524:f733 with SMTP id
- o12-20020ac25e2c000000b005009524f733mr11638574lfg.20.1696919165315; Mon, 09
- Oct 2023 23:26:05 -0700 (PDT)
+        bh=Gkyhygrn0LjKBs+Gy+HOQR/ROK9i9+TCjbjoKrbTIPI=;
+        b=FsEGRpkc7F8MB5+PPA9w/2oELjMh3nuATL93FNVpvi7XtfYJPzcqUu5qd5YfnedN8X
+         51qd5GhdYNDx1rIM4vpA8JcDpzqI9s8kLrZ6vYqDxm4YZ/joyTWLqXJIFXyGfyYzVU6o
+         B8lKUIVCDhg52PccJDFfE8eKuu9HUs1gSbuWofLPB+4Lef+kux6aojpItIowjODBSeo0
+         bEgyeGYSXhjKTLKBYxnHtd+Wnq5JN+2X90DwrFS0IK9K82lZ8FTqvL9CR8uxwH3EfTI3
+         kvtLu3qBpAi5ckcERpgOF72pfBWcKYtxLztAoWJW/8+P2qKsalXbrus4JgGHcu6e+CA2
+         6/VA==
+X-Gm-Message-State: AOJu0YyFWmkxvcyysix933o616qVESUyaLL6hJ1thmiIo67yWnV88w/f
+        /YIt+n1xF2Js52Pff+Hr/RZOp34Tk+TWg+6iE8cRehzxBY/wu0tsyIKald5JWfaiqJ3IKofvZBi
+        BAdK4JQJP1gNVHRMKAvPwze2C6aEa
+X-Received: by 2002:a05:6512:3444:b0:504:7cc6:1ad7 with SMTP id j4-20020a056512344400b005047cc61ad7mr14922271lfr.1.1696919399898;
+        Mon, 09 Oct 2023 23:29:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhwDe3FDKZFhiwrOl5KVXL4P0qXDeJGMy+/g0KGSF4lR/hfI+JvoID/birDGa8k73PyhD9Jc/VWYdZ2/MiwBc=
+X-Received: by 2002:a05:6512:3444:b0:504:7cc6:1ad7 with SMTP id
+ j4-20020a056512344400b005047cc61ad7mr14922251lfr.1.1696919399537; Mon, 09 Oct
+ 2023 23:29:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231009112401.1060447-1-dtatulea@nvidia.com> <20231009112401.1060447-12-dtatulea@nvidia.com>
-In-Reply-To: <20231009112401.1060447-12-dtatulea@nvidia.com>
+References: <20231009112401.1060447-1-dtatulea@nvidia.com> <20231009112401.1060447-13-dtatulea@nvidia.com>
+In-Reply-To: <20231009112401.1060447-13-dtatulea@nvidia.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 10 Oct 2023 14:25:54 +0800
-Message-ID: <CACGkMEt6gQCBJNZzc-tia6YkY7z7-zF4Qc2njixVaCZMfohvpw@mail.gmail.com>
-Subject: Re: [PATCH vhost v3 11/16] vdpa/mlx5: Move mr mutex out of mr struct
+Date:   Tue, 10 Oct 2023 14:29:48 +0800
+Message-ID: <CACGkMEseT3P6s6XC4+=7LMrBtP_uG5q6oXDjTtkX_N8u2D0SVQ@mail.gmail.com>
+Subject: Re: [PATCH vhost v3 12/16] vdpa/mlx5: Improve mr update flow
 To:     Dragos Tatulea <dtatulea@nvidia.com>
 Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
         Eugenio Perez Martin <eperezma@redhat.com>,
@@ -72,7 +72,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,14 +83,21 @@ X-Mailing-List: kvm@vger.kernel.org
 On Mon, Oct 9, 2023 at 7:25=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com>=
  wrote:
 >
-> The mutex is named like it is supposed to protect only the mkey but in
-> reality it is a global lock for all mr resources.
+> The current flow for updating an mr works directly on mvdev->mr which
+> makes it cumbersome to handle multiple new mr structs.
 >
-> Shift the mutex to it's rightful location (struct mlx5_vdpa_dev) and
-> give it a more appropriate name.
+> This patch makes the flow more straightforward by having
+> mlx5_vdpa_create_mr return a new mr which will update the old mr (if
+> any). The old mr will be deleted and unlinked from mvdev.
 >
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> This change paves the way for adding mrs for different ASIDs.
+>
+> The initialized bool is no longer needed as mr is now a pointer in the
+> mlx5_vdpa_dev struct which will be NULL when not initialized.
+>
 > Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
