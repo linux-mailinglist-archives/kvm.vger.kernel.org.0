@@ -2,156 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A610A7C017D
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 18:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E19837C01A4
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 18:31:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232892AbjJJQVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 12:21:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38406 "EHLO
+        id S233320AbjJJQbc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 12:31:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231226AbjJJQVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 12:21:20 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD81D97
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 09:21:19 -0700 (PDT)
+        with ESMTP id S232508AbjJJQba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 12:31:30 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5418D94;
+        Tue, 10 Oct 2023 09:31:28 -0700 (PDT)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39AG1JOi028383;
+        Tue, 10 Oct 2023 16:31:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=TvPJyMniIkZVs/NvYlerDsv6apreSWCSxZSBXPW5F9w=;
+ b=e7O9QVddvN4JXTYCckDYIAhwBUN6E0abEq4Jd2c6qF1AcnFhj/TQHhtB+9FQSy8gZEfN
+ LctZ62XwPUK5km4C0S3MJZzEYWrKHkCAESl8PSBIjAK8uGzvQDP01ZRYhjd4D7LlmeRI
+ h//UXv1oFiizlpVFCl09R7m9cqvpKaVsSSBR4Hq5yTrBiLBnHPbJMD1KrPdOp1Z8zviI
+ 6+k2DY707MQczf1hWvR0oYrAimeNZloTmxLJgwgqO1yYKpa3BdVPTzuHBreFGK6bSdXc
+ 2Ksx+9ny/6XnGDzhyywLBGi2HrPUFWRSsgBv6hfkmCjuMObN/mtJ/1O+wmbC9gzulekV Mw== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tmh90u287-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Oct 2023 16:31:02 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39AGDc3a013616;
+        Tue, 10 Oct 2023 16:31:02 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3tjws6wd27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Oct 2023 16:31:01 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dp47dtKaWqbgZ5fMCF6q2CSf9LVERCO7heE3Qk+fnSNJWwQde7FNqzQXIHk1ufMYkLtXpiTLRbH/F2VmXMa5aiav+Z2PNmK6XguFYsAYrfV9QmJacasKSKlNHFhgYEaVqvL0fhOaboAgagN/mNE/UPCa23EfdafHCnU9cixrMmh+qm2WRtpp7I1scHbi9UhjYWPYDG+gv+Qy5MFur0p70KYmVxHugpaJnyIEFWPrjB57T0XDlNfAKxSrxvfITyghjbS6/Kp0lgrMaVaRijieN3M3GSJMhUBrXdjaXEHRegX/XJ3+TWUAnQuTsZ3u42T/lQp2pwYhLnbBYqpzhhUi3A==
+ b=IZr6S0taDl1Zvx8TRlHuDAMPdTVGpFBVgotcuwtEhrTgoVhsHkuosRi2rfmsezaoQwFpU8NXIMLcOxzQpIKVRkB9fmzroetGHGmWASyJ6HyiDm66afu3mUX2WZ80tEWhTeimZXksu6HhYitrOkGdv2J8Zv2c3spW7GjjwJsi70k62EbLGBIF9wrcZWDwkGii4M40ZNOPVMBCwOlJamA5aqvQCKXsZmExNIMqV5mzuIRYrsDNu4mQvNnjIEsar66vu7pVpsvWIxtFBsVi399xTslv4Z0k/HMlyCLIWt551isMASdOio4MqZP5QS4K2RcTSjkmnFYuzfzF4C9SxsOaPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zrnRLimrexd6ti1zrbIGE+YKX4J3LyluLcC3h2ihY9g=;
- b=VRhSh+SwSVVUv+nkNhRS1HhSHQBnYS8A0RHZ2LnMh6uWMqpg+8LiIP27B8IOpfL6tSygvBH+FlLd1d1rnFp5C5K9dLW8xHccKIPqCQLcqoJOXeSEtnNsijsuL4hvq5qNLmQiIxeylYV9ZIvoszXDTVfxUgwi6Oo2VZaeeZCbIsHWuQQHK2MCj1C6UD986VI61b0IpaxItvQrYRuPL1QhBQHCK/yfGkzJOTc/vngVxwjsy6S3LqLaTUy0HFChdQxAofUzWhQGL9OAJ3M3IN5ADYzFL8vT7jmfgW/LDyJq4P0xIqpIe7AYmZ8wJsPOJ/RFjn3UkWZ+7T4IpAqgsw8+rQ==
+ bh=TvPJyMniIkZVs/NvYlerDsv6apreSWCSxZSBXPW5F9w=;
+ b=TtOPqtfxAd5YnI7QvYDvCHv2yST/X1pxD+LHHhmxP/H6EN09xsk9lScfJHFWwNwa3vSj79AuUnuwPo1LiVK80GKXTIHV5h46PyexJciZ2v4b76Z07LmYnYldCwg13WbSJbLaXh0E3JpajJ+ki6P4r7bc/GLlTdm7diox7VtgS4hCUKvj7SHcNlCAmEd0SPwfaJx8N/nXOMfHVvj2RJIj90v+WV47essxZqDHpemXCpi0m+j5B473sYHqwB9MpZbjvVWERJBqgkhjbTbaFmjrkx+IT3aT2f0omfvaAfrxyWpSkg8dZdom27FBWFpgDCT3p1dk1dchPNiXHmJUANqghw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zrnRLimrexd6ti1zrbIGE+YKX4J3LyluLcC3h2ihY9g=;
- b=DKtOVbzwdP0gGWadIkH5DDPRphHO4f8px1LGptRJIctnsGGfUQuIXyQPvXe105M3O42LDobMPFxBbi9lMWNotjNsYSFwJ5ISXR9QFtnv9JK/tlTONlTXuOoE9kYUuMeq1nNxDJo5d9V8lB68kigpN02DZmfqb6KjQZ3zmUDGl98d3cJqeOQzYu9yhqGfRaQ7xUYDNhMoMvkEHYdwcKkPNT+YkPmB7ZN+Ib7ULqp8zwgxm4/stOpkeT54alfElDFOgddPPpAidpeYN821CJImq1KNY3xB4wXs86wg51Qj+SWo6zuceLLev3wnYkWp8Pjn1TXQkqKtXZXxoCCdYYAQiw==
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com (2603:10b6:510:d4::15)
- by DM4PR12MB5770.namprd12.prod.outlook.com (2603:10b6:8:61::16) with
+ bh=TvPJyMniIkZVs/NvYlerDsv6apreSWCSxZSBXPW5F9w=;
+ b=T6ck1l1WXaycWAGciWlzOT6YKzW/QXy9FeBnocYjT4BtbTJJvz07UDpdDJqii8isCJ83wn9DwejGYdJ9teZA+RPXTNAVXIhBc7ZhiylPNernQI7w8F/QEcCCAcQdoB+rG2ToQ4zTHL8VWUHh1xKbqvGQa86O7odQFXF/BcLA5bs=
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
+ by CH3PR10MB7805.namprd10.prod.outlook.com (2603:10b6:610:1bc::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.37; Tue, 10 Oct
- 2023 16:21:16 +0000
-Received: from PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::23d0:62e3:4a4a:78b5]) by PH0PR12MB5481.namprd12.prod.outlook.com
- ([fe80::23d0:62e3:4a4a:78b5%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 16:21:15 +0000
-From:   Parav Pandit <parav@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Yishai Hadas <yishaih@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: RE: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over virtio
- device
-Thread-Topic: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Thread-Index: AQHZ7IkOMX5QOSCSWUux5r7dl0LIwLAmnGSAgAZfpICAAAe+AIAJFnQAgACSqACABEvdAIAAJyoAgAGzmoCABkm1gIAADLUAgAADlYCAAAy8AIAABEkAgAABdACAAAx8gIAAARWAgAABCQCAAACMIA==
-Date:   Tue, 10 Oct 2023 16:21:15 +0000
-Message-ID: <PH0PR12MB548172E68035F25C47918D92DCCDA@PH0PR12MB5481.namprd12.prod.outlook.com>
-References: <20231005111004.GK682044@nvidia.com>
- <ZSAG9cedvh+B0c0E@infradead.org> <20231010131031.GJ3952@nvidia.com>
- <20231010094756-mutt-send-email-mst@kernel.org>
- <20231010140849.GL3952@nvidia.com>
- <20231010105339-mutt-send-email-mst@kernel.org>
- <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
- <20231010111339-mutt-send-email-mst@kernel.org>
- <20231010155937.GN3952@nvidia.com>
- <20231010120158-mutt-send-email-mst@kernel.org>
- <20231010160712.GO3952@nvidia.com>
-In-Reply-To: <20231010160712.GO3952@nvidia.com>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Tue, 10 Oct
+ 2023 16:30:59 +0000
+Received: from BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::8e27:f49:9cc3:b5af]) by BYAPR10MB2663.namprd10.prod.outlook.com
+ ([fe80::8e27:f49:9cc3:b5af%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
+ 16:30:59 +0000
+Message-ID: <2604fa79-b114-60d9-c28d-0d53cd0dc5c7@oracle.com>
+Date:   Tue, 10 Oct 2023 09:31:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 1/1] selftests: KVM: add test to print boottime wallclock
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, seanjc@google.com, dwmw2@infradead.org,
+        joe.jin@oracle.com
+References: <20231006175715.105517-1-dongli.zhang@oracle.com>
+ <7c2a77bb3ec9f85f684218eb80654adcdfefd60d.camel@redhat.com>
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR12MB5481:EE_|DM4PR12MB5770:EE_
-x-ms-office365-filtering-correlation-id: 9bf9b790-d47b-4df4-24c6-08dbc9aced79
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wIHcNCQ1XIK0rZx3t4d5P82sKgTPLgavPUdK2WZHahRzedwA2+pITpJzKQrRRnbcjfXOXzvFPYjHLhlAfW4Ce4HhhocZjDfvDgmfN6tyEC+QFuJlGsDJJ8dQZi2e/seES6412oZu5CBedEjP5a9ZDp4aSutCigoFkHhVZpF26jJkxqFa5CfsXFjVP3UfToKuCweHQ33h2f8D4a8whdyoXTrRvRJjJlFjFY31pxiEZTBwIF5RdCB0VpM4JSPy9zVJO4WY+pmS38Eiu1Q9qSSV491M7Wbrg0nYSk8GMlpYO0KgkB4QivnGGqhf5w5m9EWVpjGBvbiZJPLiJRPSFkDcJRQTbPmU4pEgS8zI+dNyKUudCoCH9YLXF4Jm68aL73MPHXn5RwPD/4gQlpq53kftpggDFkjt7UNZhA7HRz/p+MI+eHiNF5w3uET0MChNBDuWaxconaNdwXGZAqM1JgUxbs3Gb3t+9/g9+pViipggOuwpPv2A7G2WJOlEvRqxHvs8b5L2kRiMt8jRqn+bC1Yxehsviu/c10ibT0RpTql6bgXF42KzkbpsINbuu+2TI4P4Q7me2TweCRBMjKB3IuxwrYV+bm+yF+WtChtYP4XVb2QDGpogGTFXVRErLM4+GwMZ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB5481.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(396003)(346002)(39860400002)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(76116006)(110136005)(8936002)(8676002)(5660300002)(41300700001)(4326008)(316002)(66946007)(54906003)(66556008)(64756008)(66446008)(66476007)(52536014)(4744005)(2906002)(83380400001)(38070700005)(38100700002)(122000001)(55016003)(107886003)(86362001)(9686003)(26005)(71200400001)(33656002)(7696005)(478600001)(6506007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6168cArFl/VYepYNJsL69G0WCPrFFfVqh7BTlQRagzADbd6wfEqhx2Mern7t?=
- =?us-ascii?Q?QSsDc26qoXB0FguyZ2E8gK5w6yjgPxzIfzYjWUYBMjRCC0GoMrCGo4N1+ME9?=
- =?us-ascii?Q?k/iuhY19eWbvMsYDTk9w8gMa0g5zxEgUCfO1LabwEUWMoCymaSLp5G5njU1j?=
- =?us-ascii?Q?B3jPeNh1mqtUU1bA/6+5lYyDbmJbtZETb4iOg8TploJJ0ax1x7Q24m69oY8K?=
- =?us-ascii?Q?q2BiAyFWyoaVFY+QUsA8X1TyDWNo/aFsQFaJD2IIiavjj+re5ZzZuUjz1Zai?=
- =?us-ascii?Q?Et+nTwb9tq7ET3hnbFtOCam+ag7fwKvXoEtyOKf9m4i6MxNpJ7cNkGg4Bs7+?=
- =?us-ascii?Q?ySPS7kspWvtfdVRMPFGSgjg0F5LRrve3Oiv81fDkhQqJV3SMGK6396m2unuK?=
- =?us-ascii?Q?xq28aWPQz9grE7fBOO3L7QN3w7uTaR2Hj/fNUM6ye3w3faIak4ZwF8sMaCr9?=
- =?us-ascii?Q?twr6XhjZiYE4FQXgaesHkSFlQxo0Po6yzP/E03e9SerXWlri8GDwVFoYoSIG?=
- =?us-ascii?Q?fZuaMvokFOFWnS//aWpBDjZ/0CJcGl5ebCLAkDBgi9fPdkJQorZLfmcsLlFI?=
- =?us-ascii?Q?xV0OL9C1eyZb4YDy8UYm1dzutPXTmifEE+IQdfejckA9JlQuK5ldQeMzqEC3?=
- =?us-ascii?Q?MUPxOxOmTwaDLRWg/0VocP48i4lLMVdmK2iLpxtpLBHcJYU4P/Ys1qgCQt2t?=
- =?us-ascii?Q?ji6rkGAUZt0WBpYQyfgqbisl423vJ9hsAqHy1WIZgw3B4phrOfv9JNjqQVYE?=
- =?us-ascii?Q?ajt991hL40KLNlrTpgZhIs1ap5AvHrUGr4v7O/3SIUmyesW/J2TMUDtz8CTV?=
- =?us-ascii?Q?8cR/YpfcZyd5p7t/WDxkZdanFUmkw7sZLDxUCMNT5x40lPHAqXQ5CDcrDbK7?=
- =?us-ascii?Q?M8DQxw3NwA5sK6b/WR1apOrofRtABoxVKuHIzNp2qJ+BSBPUjlUyEIFylLjp?=
- =?us-ascii?Q?HVvYlIA8h30EInh8CQnn8mOKfDTVoX+ADrYNqdPE1Mfkhb2JVO8b6h+nSXK5?=
- =?us-ascii?Q?ziS53PvU5uT8hOefBoPI6rtwGiduJi6lsIEbbJoNGZm1sfDeYBEhvNs8NAVe?=
- =?us-ascii?Q?aPjulilbp9jFFY9GyfxF+X7FsQBqYn7iWXsIpjWiT1iD2nKasfOTTpyrMdgl?=
- =?us-ascii?Q?jIJkdH8E8hr7wvxaUmWKJQ2dyRuGgA7FL19RAT3+MAI1czF+QYpKfzn5p56u?=
- =?us-ascii?Q?RICq/hq/hsSkbmSy+BDFznO0dqplD3uhQY0F6XrErfySxQbmzar1eMNwl8ki?=
- =?us-ascii?Q?+6B38U3KgjXErVut7s1vC0n2N4KQ26SleLgsYa2ZvBfNRaIDM6tcdVRzZ7Od?=
- =?us-ascii?Q?hm54Z9JSv876krkcQaFPP4j6j0E7gpr8gaxaIbQe+Sf6Es0kssabYndA1SRB?=
- =?us-ascii?Q?hqT6zPpjR0Ph9nVHkZd6Y118OCmSGwffCVUvki5HYfaB9fEUJxyGrMoHXLS9?=
- =?us-ascii?Q?kGTYrw2I8n3O5ij6DGaKYHOLpPU7rk6O0hC1xWzwILRP+IG8BXMSWN18kDua?=
- =?us-ascii?Q?wnan2Lj3/hQduGlZpFW3Dvobqde10fG+sqKmNdeBo8YY+UM5Bk+FP5QsNo9y?=
- =?us-ascii?Q?X/mhvAKq4CzfBkE/r1I=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+In-Reply-To: <7c2a77bb3ec9f85f684218eb80654adcdfefd60d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAPR03CA0048.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::23) To BYAPR10MB2663.namprd10.prod.outlook.com
+ (2603:10b6:a02:a9::20)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR10MB2663:EE_|CH3PR10MB7805:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa888366-7bf6-4404-5ee2-08dbc9ae493b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nepsilMrni9djAhC0l5nXPt9UYOH6/jxj1o1tt6ckXwmJ4QLK5y4seNMAGojCe1NN7watBoFnhgIWrwPHwU917C/FN6oL0rzljiOYs8+wp79ixLYqxbACaff1qyGBa0s5z3j5ZxLWbNjFmJR9PBQHRpMT+XBhTNMarNGLJu1ovGThCkiMuEHq1FAwgRroOnRVx5ygvqbhIxB5nfBIXrg6hYvmEPkzzi/fx0dIztI3KJNSBk8g2NQaCE4lSFCwekcpnii8AqF2Dwx6Ibs3uSm0kuywdpC36ruR5tblqtIxJWSQMERfrjE9jGmkyRDKU2My/mtIDQoDLR5+V2XJLmzB4SegC40OpwLp1rerHgHNMOxRaPD8jZxqsJaDbLD57+EEuDVvMbCKrFbDXJfZK+xVpduHMeIuMV255xai8LHj6YZf42xMBEpRLCyOu/cW3txuBrQ+drl0vEzWLxZUupIpQtkIPBFGewR0ulYitvRssFQBdQl0C3XQtH+tgg9+n8vhzKYe6KDNE2XbW4UNv1Dgvk0Ji/88DmfcidXwsKY/dT/Iag+iCTCO5Z/NPYQZbCD1rEgyKJWlXc868LDO/13vd1xHoRqcXOiUzICxnSMKqsIQLeudltZ7n0rbZxUPSjLsqmMh4nTAu6i7kih+ecopg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(376002)(136003)(39860400002)(346002)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(26005)(2616005)(53546011)(8936002)(6506007)(6512007)(8676002)(6666004)(478600001)(4326008)(83380400001)(2906002)(66476007)(5660300002)(66556008)(66946007)(6486002)(44832011)(316002)(966005)(41300700001)(38100700002)(31696002)(107886003)(36756003)(86362001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bjVYa01zUG9lOGd1eGEzWGpzU3drdlhqK0RrZ2djSFdCRlVFc0l2TkhWaStU?=
+ =?utf-8?B?Q3lvazRCWUE2N2pDSFZZYS81eWVCL0hDL083dWpNQ1daaGJLWFF6T0cxam52?=
+ =?utf-8?B?K09MK0g5V0lLNGpnN3RHOUozcE43UzJVZXd0T3d2d0JrTk1QMnY2L3pnV2Zk?=
+ =?utf-8?B?Z3JuZEt1VVBiaTA3Y1d5YWxOZnZHNUlxWEhBeUFXSlljejFleUZUTjAxTlpG?=
+ =?utf-8?B?K3A2OUxiOGw0WVlyTjA4cVBjRnJZYU1GSGlaSXdnQm1BemV1T3lReUZiVDBT?=
+ =?utf-8?B?bFJjN1RMSEhkSXZEbjJXWjNkc2ltdjBaTnRyWTc5VTEybWdCV1NmTUc2d1ps?=
+ =?utf-8?B?MEtTK1RkbUEza0ZmVGh4VFlla3FTTlp6N29CUjhMUW40QmcveEdyWGwyNTcx?=
+ =?utf-8?B?UGxGeGVwL043MnNCMXZGWDlGcytVS2FFTmxQcmh0akRaNGJvcjMzVEFnZnV5?=
+ =?utf-8?B?VGxQb3FmWHNOYkc5YmZkNDYxcHF0amZ4Vk1LRXM0WkZTZjNNaTRSUjZlSXdi?=
+ =?utf-8?B?TVBCblJBMDBMd1dPaFl0RkdxNldRd09ONTI3VmhuK1lVcGE0UFFCNnZHeFd0?=
+ =?utf-8?B?TzlJUmJjK1JQdEhITnp0QjFkWk04ZFpKS3dWaUNuNE1yaWdqQzdZV2FVcXBL?=
+ =?utf-8?B?aHYvR2QreE5qQ2ZUbVNUNVFQbzlvcUduYXZsUk5lNlZkcUM4ZElkYTAxOEp3?=
+ =?utf-8?B?UmpUcU9UOWF1ajNrRHJQMUZqSHk5QktTdlMyZGxIWkRlSDBKaTNFWFd3T3o1?=
+ =?utf-8?B?NTNqSENOeE1kQVduNTlZT3dOZzB6S1NFa3V3S3VpM29VNzBmNTlaVHgrYmQw?=
+ =?utf-8?B?STJTaHBZNXNhenhNMWNTeW5kZUVCNkNDOXFCV1UrMnVtamcxTFk0alJrL2di?=
+ =?utf-8?B?MGJLYWJrWU1pQ3hGZDNwUXhoY0VwMjhRbHpMUGtxMndiKzREMXZhazhoYzcv?=
+ =?utf-8?B?WnBwNHBMb2dRbHZiZXBMcmtxNVZrUkVZbGk1Y3ZZTXZNNnNWS2o5QlZOMVJF?=
+ =?utf-8?B?ajFhR1FXczBENllNeWY0N0cwYVhQUDJxZ0dqM0g5aHJTZGEvUk1hRzVGdXoy?=
+ =?utf-8?B?TWJ5blhBSWl4YjhJenJac0FFWjRUWXNNUUlZYkxKUEtkaXdzQS9QS0dVQm5r?=
+ =?utf-8?B?ajY2U0dGa0hnZWl5K3ZibGlwZThULzcyMFI0bkRMWFVlaUxld1VhUEtGS1hR?=
+ =?utf-8?B?MlR0TUFOMlRSRlcyM1Y0RXR0YVRaNkV2alpiMlVmZDh0Ym1PS3NTamRkalFD?=
+ =?utf-8?B?b1FwQ1dZSzRvZHdxNTZJa3RURlp2ZlpFSm00NnNoaC9teTduUUdyOFErWVp0?=
+ =?utf-8?B?TzZlbmI5a01RZjg3clh6aXJoWUpZd29TNmhjY2tzQ1A3bGg2ZXFpQ0FiREk0?=
+ =?utf-8?B?M1N2ZmdURlhEcVdmUWwxK2JaTkNkNjlyU2MwdHRZV1R5T0ZXOFRnY3M2ME1Z?=
+ =?utf-8?B?eHJ2ZW9lV1lOQTNsSUFpWnJHZHZVbWNob2tDZC9ZUnZQMnNvTkx2ZmtnSGdE?=
+ =?utf-8?B?VE1XMW1DR0dnczFaN0E2TzBQSEJrdzVjcy9Fc1A0M09ZbTF2MVNIRmwrT01G?=
+ =?utf-8?B?Ym50UFFqdUJMd0laN05XYUNuUGJzOEl2bFhHV1MwK0VBeTNhNk5KMTArM29K?=
+ =?utf-8?B?N0xTWnlIWjE4VEsxUXBCRzdrKzZ3NnpYZmJJcTRmdnZxenpXcjJZbEZJSzRY?=
+ =?utf-8?B?Yjc0aXdadS9BUjZZL3hDUncvNlJvTkllRjhxd2g5Z2VBaW01YWhBendKcWNY?=
+ =?utf-8?B?ZnhadEp6QlJmWXl4dWJmL3J2Tkc2di9wd1lma2dDTzBSaVFSSXdxTkZoWjJr?=
+ =?utf-8?B?M2s4U0xoUitycWlKYlhodFZ0L3JCeHd3cTdtejBnRkwxM0llZ052SnA3UVk3?=
+ =?utf-8?B?eTJQb21FQ1F0bHRBSk5Ta0o2UzRVc1RPU3J4V2RhZ1FzRFh0clY5K2RnR29G?=
+ =?utf-8?B?VEkxQVRQTitTTk11ZmFVOHNxNkNpd0hSSmNIRTFQUlJ0U1Z2K2lFUmZSOE5y?=
+ =?utf-8?B?d1NXbXMxN0hQVjVobUhKVXZhS0xQeWVYMGw3RVF3TTdFb3lCTHkyQXY0SXhm?=
+ =?utf-8?B?SDZWZVlRRmtxaW5oZW4zdFlrUmFianZKOTFTaDdodFQ5OElqa3pmVTdZVnZa?=
+ =?utf-8?Q?floKfZFGKpImt8qgAkniOfdyb?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: GzrA0EFmrZsorTFthDzoCgTlu7VmhLXlDjEby7O8tZEJGpQtwn78AhV7i96cOb7oOZqmxOwyGotOfn/RA6FZw5CnMfVgZaDt981bj0/Ji/SoKFgmYS5yHE+lx+GNIsd7M55TeaqPZatT2mrKuH7UI9hJMXf0yhd9Z4RoOdQvQ+MzBBsdw2Gu//C9I/8a5R2+HrO4Ortl9YPPq7nx807NsosexLMhtWGMaVWGIPWicgcNSaFEJ8r8plKwWXBIE9NYdgaIaoLrDw/dzooqJdVe/EFmC5IRHOcYKSVtRo6DFUgG1spvgKIUR2xYTSf2ZiQzudSbxPjx1Jfoy2Gd2s0UH39i8Dv08PB6uVXZwDA/9jO1tIV6tD3nf1FQPti/XeBPjmHvPvbUgNMR+Pl/RmbxokyUxi+x6SoLY3s7MGpCv6t+zRY8l1vxNA7qpyXLgxMVNIx2FPXNTio94IzoA5BJ3s2neAqlWRsoZVegQllYnJAlMOTxjwrlVCwo521IjyzreuAXnDYtHYisbsSYlsqLZj3ju8KnU603zliDFP4+dIu7GAt584ruqUKnpY1KLagkyT+aHfIO1zEn2Vy4s9Sc12GJLukKCgh0PaANfWydsN0gQt/Iwe+RAkHHt85MvP1xc6ZMbmo4CwNU9+Lep63UrjMLbyme1Umeym71S+XfND/fjzhzq4SYvo6+UDKi/5nCdsx2Hg+UDPZLE7KVjBWL5b29/vGszP6VAQvkyFvIJuiGWgM+WEgTWj+G6zvCRHCnbhSnguwMcNFvU9grSCRrA63F+29DfJJiLIEWbXniT5eNJlIRiWltgyy+f4fezDuUEX73cTiS2xjCrCywOTpFRrkOji9sx0jrBOyjkYGPSgspotSX8PpBgHhQrCjPBsvHM3U0H3b33a4/w0fiPismvA==
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa888366-7bf6-4404-5ee2-08dbc9ae493b
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB5481.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9bf9b790-d47b-4df4-24c6-08dbc9aced79
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2023 16:21:15.8205
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 16:30:59.4396
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zYeYciEUG8jE9bCnnJ4U8pCBz79mhmR0RDwMUXpD/GAAc4/zqe5miFNaIjlDAY5q8qMH4L2KF6DX+Cgxd7IOGQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5770
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PJBmCi904Ju4PVzP2t3jtVjOJ7X9K+0ELC8we34Am1Ea1fIMKT7997yAIFCqxzDlacIfUX46n/9hvFS8ngNldg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7805
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-10_12,2023-10-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
+ phishscore=0 adultscore=0 bulkscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310100123
+X-Proofpoint-GUID: P_zuSPrbE_2Idr6O2fC7LbMKP544PziG
+X-Proofpoint-ORIG-GUID: P_zuSPrbE_2Idr6O2fC7LbMKP544PziG
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Maxim,
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Tuesday, October 10, 2023 9:37 PM
->=20
-> On Tue, Oct 10, 2023 at 12:03:29PM -0400, Michael S. Tsirkin wrote:
-> > On Tue, Oct 10, 2023 at 12:59:37PM -0300, Jason Gunthorpe wrote:
-> > > On Tue, Oct 10, 2023 at 11:14:56AM -0400, Michael S. Tsirkin wrote:
-> > >
-> > > > I suggest 3 but call it on the VF. commands will switch to PF
-> > > > internally as needed. For example, intel might be interested in
-> > > > exposing admin commands through a memory BAR of VF itself.
+On 10/10/23 09:13, Maxim Levitsky wrote:
+> У пт, 2023-10-06 у 10:57 -0700, Dongli Zhang пише:
+>> As inspired by the discussion in [1], the boottime wallclock may drift due
+>> to the fact that the masterclock (or host monotonic clock) and kvmclock are
+>> calculated based on the algorithms in different domains.
+>>
+>> This is to introduce a testcase to print the boottime wallclock
+>> periodically to help diagnose the wallclock drift issue in the future.
+>>
+>> The idea is to wrmsr the MSR_KVM_WALL_CLOCK_NEW, and read the boottime
+>> wallclock nanoseconds immediately.
+>>
+>> References:
+>> [1] https://urldefense.com/v3/__https://lore.kernel.org/all/20231001111313.77586-1-nsaenz@amazon.com__;!!ACWV5N9M2RV99hQ!MOnoujF4PlfvZ3SUuyXgIpJC5mWiE5uLUsNW6AWgirGXcObN5uil_fnthRVcYaPA0N2uoNyLChBogHC7ZS6t$ 
+>>
+>> Cc: David Woodhouse <dwmw@amazon.co.uk>
+>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>> ---
+>>  tools/testing/selftests/kvm/Makefile          |   3 +-
+>>  .../selftests/kvm/x86_64/boottime_wallclock.c | 100 ++++++++++++++++++
+>>  2 files changed, 102 insertions(+), 1 deletion(-)
+>>  create mode 100644 tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>> index a3bb36fb3cfc..fea05b0118de 100644
+>> --- a/tools/testing/selftests/kvm/Makefile
+>> +++ b/tools/testing/selftests/kvm/Makefile
+>> @@ -60,7 +60,8 @@ LIBKVM_riscv += lib/riscv/ucall.c
+>>  TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
+>>  
+>>  # Compiled test targets
+>> -TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+>> +TEST_GEN_PROGS_x86_64 = x86_64/boottime_wallclock
+>> +TEST_GEN_PROGS_x86_64 += x86_64/cpuid_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/dirty_log_page_splitting_test
+>>  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+>> diff --git a/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+>> new file mode 100644
+>> index 000000000000..cc48c9b19920
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+>> @@ -0,0 +1,100 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (C) 2023 Oracle and/or its affiliates.
+>> + */
+>> +
+>> +#include <asm/kvm_para.h>
+>> +#include <asm/pvclock-abi.h>
+>> +
+>> +#include "kvm_util.h"
+>> +#include "processor.h"
+>> +
+>> +static int period = 10;
+>> +
+>> +#define GUEST_SYNC_WALLCLOCK(__stage, __val)                        \
+>> +		GUEST_SYNC_ARGS(__stage, __val, 0, 0, 0)
+>> +
+>> +static void guest_main(vm_paddr_t wc_pa, struct pvclock_wall_clock *wc)
+>> +{
+>> +	uint64_t wallclock;
+>> +
+>> +	while (true) {
+>> +		wrmsr(MSR_KVM_WALL_CLOCK_NEW, wc_pa);
+>> +
+>> +		wallclock = wc->sec * NSEC_PER_SEC + wc->nsec;
+>> +
+>> +		GUEST_SYNC_WALLCLOCK(0, wallclock);
+> 
+> Won't this fill the output very fast?
+> Do you think it will be worth it to wait some time (e.g 1 second or at least 1/10 of a second)
+> between each print?
 
-If in the future if one does admin command on the VF memory BAR, there is n=
-o need of cast either.
-vfio-virtio-pci driver can do on the pci vf device directly.
+The wait time is controlled by the VMM side (of selftest) as in below.
 
-(though per VF memory registers would be anti-scale design for real hw; to =
-discuss in other forum).
+In the while loop at VMM side, it sleeps for a period (configurable argument),
+until it runs into the guest again.
+
+Therefore, the user can decide the frequency to print the boottime wallclock.
+
++static void enter_guest(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	while (true) {
++		vcpu_run(vcpu); -----------> to schedule guest vcpu here
++
++		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			handle_sync(&uc);
++			break;
++		case UCALL_ABORT:
++			handle_abort(&uc);
++			return;
++		default:
++			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
++			return;
++		}
++
++		sleep(period);  ------------> sleep here
++	}
++}
+
+Thank you very much!
+
+Dongli Zhang
+
+> 
+>> +	}
+>> +}
+>> +
+>> +static void handle_sync(struct ucall *uc)
+>> +{
+>> +	uint64_t wallclock;
+>> +
+>> +	wallclock = uc->args[2];
+>> +
+>> +	pr_info("Boottime wallclock value: %"PRIu64" ns\n", wallclock);
+>> +}
+>> +
+>> +static void handle_abort(struct ucall *uc)
+>> +{
+>> +	REPORT_GUEST_ASSERT(*uc);
+>> +}
+>> +
+>> +static void enter_guest(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct ucall uc;
+>> +
+>> +	while (true) {
+>> +		vcpu_run(vcpu);
+>> +
+>> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+>> +
+>> +		switch (get_ucall(vcpu, &uc)) {
+>> +		case UCALL_SYNC:
+>> +			handle_sync(&uc);
+>> +			break;
+>> +		case UCALL_ABORT:
+>> +			handle_abort(&uc);
+>> +			return;
+>> +		default:
+>> +			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
+>> +			return;
+>> +		}
+>> +
+>> +		sleep(period);
+>> +	}
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct kvm_vm *vm;
+>> +	vm_vaddr_t wc_gva;
+>> +	vm_paddr_t wc_gpa;
+>> +	int opt;
+>> +
+>> +	while ((opt = getopt(argc, argv, "p:h")) != -1) {
+>> +		switch (opt) {
+>> +		case 'p':
+>> +			period = atoi_positive("The period (seconds)", optarg);
+>> +			break;
+>> +		case 'h':
+>> +		default:
+>> +			pr_info("usage: %s [-p period (seconds)]\n", argv[0]);
+>> +			exit(1);
+>> +		}
+>> +	}
+>> +
+>> +	pr_info("Capture boottime wallclock every %d seconds.\n", period);
+>> +	pr_info("Stop with Ctrl + c.\n\n");
+>> +
+>> +	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+>> +
+>> +	wc_gva = vm_vaddr_alloc(vm, getpagesize(), 0x10000);
+>> +	wc_gpa = addr_gva2gpa(vm, wc_gva);
+>> +	vcpu_args_set(vcpu, 2, wc_gpa, wc_gva);
+>> +
+>> +	enter_guest(vcpu);
+>> +	kvm_vm_free(vm);
+>> +}
+> 
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
