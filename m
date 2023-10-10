@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F9EA7BF60A
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:36:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1366E7BF607
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:36:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442950AbjJJIfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:35:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43754 "EHLO
+        id S1442957AbjJJIfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442901AbjJJIfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:35:36 -0400
+        with ESMTP id S1442910AbjJJIfh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:35:37 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25887AF;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF68E97;
         Tue, 10 Oct 2023 01:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1696926935; x=1728462935;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Oyxf6nVEdFzk2imp0lAzFXWCTZ+GLK4NVgZs/8mH1xk=;
-  b=h/TfGsoWI3gXGMBAzsj1D3lcmGNR3wVpm5s3/r2J9cMng+ZVmkde23Zd
-   5b1KPFmKjNfuhUtVKUTsNpwzkaP04K+WyN8DrfrV14hmU0699oa+w2sZw
-   qy67EJjLwpExlbRBN64vhfkaP6chvlpLLhqzb1um+Cqxb9Fj9c0ZqaWYi
-   zReeakMEIBP5nP0ID98LAcQa2EBJsBtbdaL8mNPo9TCnbfp+hkXbvt4qy
-   UHx2JyYkeDDxFJqrPuV4HaVm8NYhgOBVBUcwHxFCXZNrIyW3+Bl9RPeTe
-   OrFM24RvnUL5ZW07tQAJ8F8U/eczCgZcaEo6Y9lZuXOOyW3IpGCmIAXrC
+  bh=mLhP+/UTxZsFYw+hdN7w9M/CFhBlJ75IonjuoNuiyMg=;
+  b=AepkpjWUuHBO8nzkRSSp42FRTvdQYq5YuTaufHqduPJdyFtcI8Qgc8e+
+   SIPkSM2dksG6HeSZUWfBaKwAC/FplAXwTtHjg7bcRIvcz3lmtVQQNM7Xp
+   uQkG1cGQple2CYdkKya2lsIek+quecTR2TgjLymJwnUEqsRoIVpfMgNVv
+   Q501NhCFNLTIPSl8WXcFssiXDZmAQxOKaLgQtUqF5ReOx2SvhIlRyDgkj
+   XlpFigzFo+VSgOB4MjRiKiM9KEp/ixZo9wusahVgskHN0osdfRf0mRO5x
+   O1N2g2z8E/azkU7dW2WVy+YdX1oDJjV1TgsaEXlSGh5oLPr3G2Six7a1Z
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689798"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689804"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="363689798"
+   d="scan'208";a="363689804"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:33 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687185"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687189"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="1084687185"
+   d="scan'208";a="1084687189"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:33 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:34 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -45,9 +45,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH 04/12] x86/mce: Move and export inject_mce() from inject.c to core.c
-Date:   Tue, 10 Oct 2023 01:35:12 -0700
-Message-Id: <a5109244e6ab4e9a03595a2a8daadd01d13ebc3f.1696926843.git.isaku.yamahata@intel.com>
+Subject: [PATCH 05/12] mm/fadvise: Add flags to inject hwpoison for posix_fadvise()
+Date:   Tue, 10 Oct 2023 01:35:13 -0700
+Message-Id: <8bdfcbdc1b04baba70c25d7f5c3394c6d73f2ff4.1696926843.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1696926843.git.isaku.yamahata@intel.com>
 References: <cover.1696926843.git.isaku.yamahata@intel.com>
@@ -65,156 +65,149 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-X86 MCE support is kernel builtin. CONFIG_X86_MCE=y or n.  The x86 MCE
-injection framework can be kernel builtin or kernel module.
-CONFIG_X86_MCE_INJECT=y, m, or n. We don't want KVM depend on
-CONFIG_X86_MCE_INJECT=y, allow CONFIG_X86_MCE_INJECT=m for KVM mce
-injection.
+For VM-based confidential computing (AMD SEV-SNP and Intel TDX), the KVM
+guest memfd effort [1] is ongoing.  It allows KVM guests to use file
+descriptors and their offset as protected guest memory without user-space
+virtual address mapping.
 
-Move the necessary symbols with rename from
-arch/x86/kernel/cpu/mce/inject.c to arch/x86/kernel/cpu/mce/core.c and
-export symbols for KVM to inject MCE.
+Intel TDX uses machine checks to notify the host OS/VMM that the TDX guest
+consumed corrupted memory.  The KVM/x86 handles machine checks for guest
+vcpu specially.  It sets up the guest so that vcpu exits from running on
+machine check, checks the exit reason, and manually raises the machine
+check by calling do_machine_check().  To test the KVM machine check path,
+KVM wants to poison memory based on file descriptor and its offset.  The
+current memory poisoning is based on the physical address,
+/sys/kernel/debug/hwpoison/{corrupt-pfn, unpoison-pfn}, or the virtual
+address, MADV_HWPOISON and MADV_UNPOISON.
 
-Oppertunistically add lockdep_assert_held(&mce_inject_mutex) to show
-that injectm is protected by mce_inject_mutex.
+Add new flags FADV_HWPOISON, and FADV_UNPOISON to
+posix_fadvise() by following MADV_HWPOISON and MADV_UNPOISON.  9893e49d64a4
+("HWPOISON: Add madvise() based injector for hardware poisoned pages v4")
+
+The possible options would be
+- Add FADV flags for memory poison.  This patch.
+- introduce IOCTL specific to KVM guest memfd
+- introduce debugfs entries for KVM guest memfd
+  /sys/kernel/debug/kvm/<pid>-<vm-fd>/guest-memfd<fd>/hwpoison/
+  {corrupt-offset, unoison-offset}.
+  This options follows /sys/kernel/debug/hwpoison/{corrupt-pfn, unpoison-pfn}
+
+[1] https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.com/
+    KVM guest_memfd() and per-page attributes
+    https://lore.kernel.org/all/20230921203331.3746712-1-seanjc@google.com/
+    [PATCH 00/13] KVM: guest_memfd fixes
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/mce.h       | 10 +++++++++
- arch/x86/kernel/cpu/mce/core.c   | 36 ++++++++++++++++++++++++++++++++
- arch/x86/kernel/cpu/mce/inject.c | 26 +++--------------------
- 3 files changed, 49 insertions(+), 23 deletions(-)
+ include/uapi/linux/fadvise.h |  4 +++
+ mm/fadvise.c                 | 58 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/mce.h b/arch/x86/include/asm/mce.h
-index 180b1cbfcc4e..459066ecd922 100644
---- a/arch/x86/include/asm/mce.h
-+++ b/arch/x86/include/asm/mce.h
-@@ -265,6 +265,16 @@ int mce_notify_irq(void);
+diff --git a/include/uapi/linux/fadvise.h b/include/uapi/linux/fadvise.h
+index 0862b87434c2..3699b4b0adcd 100644
+--- a/include/uapi/linux/fadvise.h
++++ b/include/uapi/linux/fadvise.h
+@@ -19,4 +19,8 @@
+ #define POSIX_FADV_NOREUSE	5 /* Data will be accessed once.  */
+ #endif
  
- DECLARE_PER_CPU(struct mce, injectm);
- 
-+#ifdef CONFIG_X86_MCE
-+void mce_inject_lock(void);
-+void mce_inject_unlock(void);
-+void mce_inject(struct mce *m);
-+#else
-+static inline void mce_inject_lock(void) {}
-+static inline void mce_inject_unlock(void) {}
-+static inline void mce_inject(struct mce *m) {}
-+#endif
++/* Same to MADV_HWPOISON and MADV_SOFT_OFFLINE */
++#define FADV_HWPOISON		100	/* poison a page for testing */
++#define FADV_SOFT_OFFLINE	101	/* soft offline page for testing */
 +
- /* Disable CMCI/polling for MCA bank claimed by firmware */
- extern void mce_disable_bank(int bank);
+ #endif	/* FADVISE_H_INCLUDED */
+diff --git a/mm/fadvise.c b/mm/fadvise.c
+index 6c39d42f16dc..1f028a6e1d90 100644
+--- a/mm/fadvise.c
++++ b/mm/fadvise.c
+@@ -18,11 +18,62 @@
+ #include <linux/writeback.h>
+ #include <linux/syscalls.h>
+ #include <linux/swap.h>
++#include <linux/hugetlb.h>
  
-diff --git a/arch/x86/kernel/cpu/mce/core.c b/arch/x86/kernel/cpu/mce/core.c
-index 6f35f724cc14..6929c3cad278 100644
---- a/arch/x86/kernel/cpu/mce/core.c
-+++ b/arch/x86/kernel/cpu/mce/core.c
-@@ -129,9 +129,45 @@ void mce_setup(struct mce *m)
- 	m->ppin = cpu_data(m->extcpu).ppin;
- 	m->microcode = boot_cpu_data.microcode;
- }
-+EXPORT_SYMBOL_GPL(mce_setup);
+ #include <asm/unistd.h>
  
- DEFINE_PER_CPU(struct mce, injectm);
- EXPORT_PER_CPU_SYMBOL_GPL(injectm);
-+static DEFINE_MUTEX(mce_inject_mutex);
-+
-+void mce_inject_lock(void)
+ #include "internal.h"
+ 
++static int fadvise_inject_error(struct file *file, struct address_space *mapping,
++				loff_t offset, off_t endbyte, int advice)
 +{
-+	mutex_lock(&mce_inject_mutex);
++	pgoff_t start_index, end_index, index, next;
++	struct folio *folio;
++	unsigned int shift;
++	unsigned long pfn;
++	int ret;
++
++	if (!IS_ENABLED(CONFIG_MEMORY_FAILURE))
++		return -EOPNOTSUPP;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	if (is_file_hugepages(file))
++		shift = huge_page_shift(hstate_file(file));
++	else
++		shift = PAGE_SHIFT;
++	start_index = offset >> shift;
++	end_index = endbyte >> shift;
++
++	index = start_index;
++	while (index <= end_index) {
++		folio = filemap_get_folio(mapping, index);
++		if (IS_ERR(folio))
++			return PTR_ERR(folio);
++
++		next = folio_next_index(folio);
++		pfn = folio_pfn(folio);
++		if (advice == FADV_SOFT_OFFLINE) {
++			pr_info("Soft offlining pfn %#lx at file index %#lx\n",
++				pfn, index);
++			ret = soft_offline_page(pfn, MF_COUNT_INCREASED);
++		} else {
++			pr_info("Injecting memory failure for pfn %#lx at file index %#lx\n",
++				pfn, index);
++			ret = memory_failure(pfn, MF_COUNT_INCREASED | MF_SW_SIMULATED);
++			if (ret == -EOPNOTSUPP)
++				ret = 0;
++		}
++
++		if (ret)
++			return ret;
++		index = next;
++	}
++
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(mce_inject_lock);
 +
-+void mce_inject_unlock(void)
-+{
-+	mutex_unlock(&mce_inject_mutex);
-+}
-+EXPORT_SYMBOL_GPL(mce_inject_unlock);
-+
-+/* Update fake mce registers on current CPU. */
-+void mce_inject(struct mce *m)
-+{
-+	struct mce *i = &per_cpu(injectm, m->extcpu);
-+
-+	lockdep_assert_held(&mce_inject_mutex);
-+
-+	/* Make sure no one reads partially written injectm */
-+	i->finished = 0;
-+	mb();
-+	m->finished = 0;
-+	/* First set the fields after finished */
-+	i->extcpu = m->extcpu;
-+	mb();
-+	/* Now write record in order, finished last (except above) */
-+	memcpy(i, m, sizeof(struct mce));
-+	/* Finally activate it */
-+	mb();
-+	i->finished = 1;
-+}
-+EXPORT_SYMBOL_GPL(mce_inject);
+ /*
+  * POSIX_FADV_WILLNEED could set PG_Referenced, and POSIX_FADV_NOREUSE could
+  * deactivate the pages and clear PG_Referenced.
+@@ -57,11 +108,13 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
+ 		case POSIX_FADV_NOREUSE:
+ 		case POSIX_FADV_DONTNEED:
+ 			/* no bad return value, but ignore advice */
++			return 0;
++		case FADV_HWPOISON:
++		case FADV_SOFT_OFFLINE:
+ 			break;
+ 		default:
+ 			return -EINVAL;
+ 		}
+-		return 0;
+ 	}
  
- void mce_log(struct mce *m)
- {
-diff --git a/arch/x86/kernel/cpu/mce/inject.c b/arch/x86/kernel/cpu/mce/inject.c
-index 88603a6c0afe..ae3efbeb78bd 100644
---- a/arch/x86/kernel/cpu/mce/inject.c
-+++ b/arch/x86/kernel/cpu/mce/inject.c
-@@ -126,25 +126,6 @@ static void setup_inj_struct(struct mce *m)
- 	m->microcode = boot_cpu_data.microcode;
- }
- 
--/* Update fake mce registers on current CPU. */
--static void inject_mce(struct mce *m)
--{
--	struct mce *i = &per_cpu(injectm, m->extcpu);
--
--	/* Make sure no one reads partially written injectm */
--	i->finished = 0;
--	mb();
--	m->finished = 0;
--	/* First set the fields after finished */
--	i->extcpu = m->extcpu;
--	mb();
--	/* Now write record in order, finished last (except above) */
--	memcpy(i, m, sizeof(struct mce));
--	/* Finally activate it */
--	mb();
--	i->finished = 1;
--}
--
- static void raise_poll(struct mce *m)
- {
- 	unsigned long flags;
-@@ -176,7 +157,6 @@ static void raise_exception(struct mce *m, struct pt_regs *pregs)
- }
- 
- static cpumask_var_t mce_inject_cpumask;
--static DEFINE_MUTEX(mce_inject_mutex);
- 
- static int mce_raise_notify(unsigned int cmd, struct pt_regs *regs)
- {
-@@ -245,7 +225,7 @@ static void __maybe_unused raise_mce(struct mce *m)
- {
- 	int context = MCJ_CTX(m->inject_flags);
- 
--	inject_mce(m);
-+	mce_inject(m);
- 
- 	if (context == MCJ_CTX_RANDOM)
- 		return;
-@@ -303,9 +283,9 @@ static int mce_inject_raise(struct notifier_block *nb, unsigned long val,
- 	if (!m)
- 		return NOTIFY_DONE;
- 
--	mutex_lock(&mce_inject_mutex);
-+	mce_inject_lock();
- 	raise_mce(m);
--	mutex_unlock(&mce_inject_mutex);
-+	mce_inject_unlock();
- 
- 	return NOTIFY_DONE;
- }
+ 	/*
+@@ -170,6 +223,9 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
+ 			}
+ 		}
+ 		break;
++	case FADV_HWPOISON:
++	case FADV_SOFT_OFFLINE:
++		return fadvise_inject_error(file, mapping, offset, endbyte, advice);
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.25.1
 
