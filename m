@@ -2,125 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9483A7BF53B
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:04:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 468C97BF57B
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:19:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234630AbjJJIE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:04:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
+        id S1442713AbjJJITR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234631AbjJJIE0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:04:26 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2EC6A4;
-        Tue, 10 Oct 2023 01:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696925063; x=1728461063;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=9LiiwaafL7vqK3S5UC+zEZeuqHkrKCe3GV3w9WmVU4k=;
-  b=XtueLShwNhFTt1rfpMfXbn/ayQ6lkipJceGENEZob9WWbOEkhQLyuFQO
-   u24AtSpGBWak0wyABqnpW2Ty//226gZ/q4Em5jko9PwkTzZokxuGZTlBT
-   V1WRmDDetUFnNgTJkFfV3h2hkNTazKE0MJDRbBPskIfdwGXjr9OA8hWoR
-   BbBRzBechS2GhO4qH+pgmaXJ4uq5QrP7f4jmtRAXnBRQcJYLb5cuovGep
-   6k5ECXqiyzbldtqWGd0PIQFe8YeNXk/5rp2ZifKKrfpu4aWQRl/7JL7ar
-   LxdCG9EYez9btVvxaXolKtviW8BLTt68xuZdUF3NJc2zvbaAXqNGPvyJq
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363684569"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="363684569"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:04:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="927050497"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="927050497"
-Received: from pors-mobl3.ger.corp.intel.com (HELO localhost) ([10.252.42.155])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:04:20 -0700
-From:   Jani Nikula <jani.nikula@intel.com>
-To:     Jakub Kicinski <kuba@kernel.org>,
+        with ESMTP id S1379439AbjJJITQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:19:16 -0400
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A0C97;
+        Tue, 10 Oct 2023 01:19:14 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 3F1AE2800A273;
+        Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 3176D58BE4D; Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
+Date:   Tue, 10 Oct 2023 10:19:13 +0200
+From:   Lukas Wunner <lukas@wunner.de>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         Sean Christopherson <seanjc@google.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     pbonzini@redhat.com, workflows@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: deprecate KVM_WERROR in favor of general WERROR
-In-Reply-To: <20231009144944.17c8eba3@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20231006205415.3501535-1-kuba@kernel.org>
- <ZSQ7z8gqIemJQXI6@google.com> <20231009110613.2405ff47@kernel.org>
- <ZSRVoYbCuDXc7aR7@google.com> <20231009144944.17c8eba3@kernel.org>
-Date:   Tue, 10 Oct 2023 11:04:18 +0300
-Message-ID: <87sf6i6gzh.fsf@intel.com>
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 00/12] PCI device authentication
+Message-ID: <20231010081913.GA24050@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+ <20231007100433.GA7596@wunner.de>
+ <20231009123335.00006d3d@Huawei.com>
+ <20231009134950.GA7097@wunner.de>
+ <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 09 Oct 2023, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Mon, 9 Oct 2023 12:33:53 -0700 Sean Christopherson wrote:
->> > We do have sympathy for these folks, we are mostly volunteers after
->> > all. At the same time someone's under-investment should not be causing
->> > pain to those of us who _do_ build test stuff carefully.  
->> 
->> This is a bit over the top.  Yeah, I need to add W=1 to my build scripts, but that's
->> not a lack of investment, just an oversight.  Though in this case it likely wouldn't
->> have made any difference since Paolo grabbed the patches directly and might have
->> even bypassed linux-next.  But again I would argue that's bad process, not a lack
->> of investment.
->
-> If you do invest in build testing automation, why can't your automation
-> count warnings rather than depend on WERROR? I don't understand.
+On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
+> On 10/10/23 00:49, Lukas Wunner wrote:
+> > PCI Firmware Spec would seem to be appropriate.  However this can't
+> > be solved by the kernel community.
+> 
+> How so? It is up to the user to decide whether it is SPDM/CMA in the kernel
+> or   the firmware + coco, both are quite possible (it is IDE which is not
+> possible without the firmware on AMD but we are not there yet).
 
-Because having both CI and the subsystem/driver developers enable a
-local WERROR actually works in keeping the subsystem/driver clean of
-warnings.
-
-For i915, we also enable W=1 warnings and kernel-doc -Werror with it,
-keeping all of them warning clean. I don't much appreciate calling that
-anti-social.
-
->
->> > Rather than tweak stuff I'd prefer if we could agree that local -Werror
->> > is anti-social :(
->> > 
->> > The global WERROR seems to be a good compromise.  
->> 
->> I disagree.  WERROR simply doesn't provide the same coverage.  E.g. it can't be
->> enabled for i386 without tuning FRAME_WARN, which (a) won't be at all obvious to
->> the average contributor and (b) increasing FRAME_WARN effectively reduces the
->> test coverage of KVM i386.
->> 
->> For KVM x86, I want the rules for contributing to be clearly documented, and as
->> simple as possible.  I don't see a sane way to achieve that with WERROR=y.
->
-> Linus, you created the global WERROR option. Do you have an opinion
-> on whether random subsystems should create their own WERROR flags?
-> W=1 warning got in thru KVM and since they have a KVM_WERROR which
-> defaults to enabled it broke build testing in networking.
-> Randomly sprinkled -Werrors are fragile. Can we ask people to stop
-> using them now that the global ERROR exists?
-
-The DRM_I915_WERROR config depends on EXPERT and !COMPILE_TEST, and to
-my knowledge this has never caused issues outside of i915 developers and
-CI.
-
-Maybe the fix to KVM_ERROR config should be
-
--	depends on (X86_64 && !KASAN) || !COMPILE_TEST
--	depends on (X86_64 && !KASAN) && !COMPILE_TEST
+The user can control ownership of CMA-SPDM e.g. through a BIOS knob.
+And that BIOS knob then influences the outcome of the _OSC negotiation
+between platform and OS.
 
 
-BR,
-Jani.
+> But the way SPDM is done now is that if the user (as myself) wants to let
+> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
+> as CMA is not a (un)loadable module or built-in (with some "blacklist"
+> parameters), and does not provide a sysfs knob to control its tentacles.
+
+The problem is every single vendor thinks they can come up with
+their own idea of who owns the SPDM session:
+
+I've looked at the Nvidia driver and they've hacked libspdm into it,
+so their idea is that the device driver owns the SPDM session.
+
+AMD wants the host to proxy DOE but not own the SPDM session.
+
+We have *standards* for a reason.  So that products are interoperable.
+
+If the kernel tries to accommodate to every vendor's idea of SPDM ownership
+we'll end up with an unmaintainable mess of quirks, plus sysfs knobs
+which were once intended as a stopgap but can never be removed because
+they're userspace ABI.
+
+This needs to be solved in the *specification*.
+
+And the existing solution for who owns a particular PCI feature is _OSC.
+Hence this needs to be taken up with the Firmware Working Group at the
+PCISIG.
 
 
--- 
-Jani Nikula, Intel
+> Note, this PSP firmware is not BIOS (which runs on the same core and has
+> same access to PCI as the host OS), it is a separate platform processor
+> which only programs IDE keys to the PCI RC (via some some internal bus
+> mechanism) but does not do anything on the bus itself and relies on the host
+> OS proxying DOE, and there is no APCI between the core and the psp.
+
+Somewhat tangentially, would it be possible in your architecture
+that the host or guest asks PSP to program IDE keys into the Root Port?
+Or alternatively, access the key registers directly without PSP involvement?
+
+Thanks,
+
+Lukas
