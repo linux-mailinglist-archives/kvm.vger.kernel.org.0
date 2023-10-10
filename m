@@ -2,228 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BAC67BFBD3
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 14:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 233747BFCF3
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 15:10:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232073AbjJJMxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 08:53:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41192 "EHLO
+        id S231902AbjJJNKi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 09:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232052AbjJJMxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 08:53:36 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8CAB4;
-        Tue, 10 Oct 2023 05:53:34 -0700 (PDT)
+        with ESMTP id S231400AbjJJNKh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 09:10:37 -0400
+Received: from outbound.mail.protection.outlook.com (mail-bn1nam02on2047.outbound.protection.outlook.com [40.107.212.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3DDA9
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 06:10:34 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fWOiiDDp6Ha+YttfnflYBO20krMzHolBKZOHLgUmXxyDRvCep5Ek6nQhPuZ9UMaHx+dyVdq+uYAx54WHkAXFwZmjFf26OpgGTXTO+b7abLRt28TiIqKJVqc5Kej+cyPAJBwJHu1oZreNfMrakwWFSfvz/bgcpV6TtZmEfs8rjaB3LiwBiPh6yhDY/IAiJNtmbr627AFcW/zibViQfWQJhqaIyQuMA7IbA1PnCRIyAkhUBhjtafU3S7jyBtu/uY5iR4AdHg6hGlgP/Y3VE3a90Zi/C8YwXie39wJDLo7CqqVRUvZK2UT43qgYb8+kV4/C4/DlaZjnTb/aGZ5UCS/BHA==
+ b=OH13JPXSxkAgo87FQuIx9r0pFmrrQgaySfsNfpFDiDWgt0g7LaskNqMqgnhg+Xqfx8zqhJnY/7h1Z8HBKS4y06bdcujU7dFneCDeQ7D8D0mfyldrwO3lhhxd03Tl53fiqh+/A2mZi9nXfam8AHe1fWzuxRqvJ7oL34RY6PrupaDrOXjW4+3kJzPSuBflevszSterS71IxUpuxuCBZnznd1SK91cwEo5Nf1IKSPjnoUxhBgaOGYoFbmsZwTRrouTmNKqjC/Z/udndKROB7LW89tgTPO7bVlMKga01ynowK2EHsshirZXKJiPicYJtvY2nTMp8yPSBVhacTLQSuzVZkA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=feQBOLwSu+tjrOw9JyUuvSfWWF55ZRNCgjceaK/xEHs=;
- b=Ox7T/GgB23YTe9aMzGv9S9IMArkP+zEPlMW5j7RPaysE/L9HcKhoFhdDlW4Cjs8FP6BWZLHdywkSM1ZBDKXmTvoyZOdWQkZIZWZn0AShWzuPkJ83gN+jg6UREJZL1RY6AZz5W00Nj8d5gCJYwvOlARWZ3IFu92f/2YwF+GtaVOLN8xGI7ELoe9f38oV7D3sKi8if2Fr1nD7mKFCwYp9o3NfUvXeVsF8YmmXTMSgu+Eykmf3R3bZp3BjAFii96nUkv9+FqQUXbhoB6qsOuUFuZvP3JxPsUA0/2poECsJRDj8jdUE99p0285JuRBPdosnnZklKp/dUDce8FV1T3jK3ZQ==
+ bh=mCTRYacsz9UwHuVtPR+slclQhXhTGGEzbKBks24qTEQ=;
+ b=Z5Mjrdcm/9Sh6ushxofRB/WfLzGXL1x++gfJti0DvmEpP5un7vlaXhGhdqlUyg/N7dW3BBb5ED4mBaxNLMAWS+GiqZbGP46fQq5KAu044/X+lxl4Gz2mW8biYem0i62S29yl2HAmOPzFJhLf/jKiExNpXfsec8f23SXtgq+KQ6D0l8HNnxxIal8YWV8VVOTQLpM9uROY1JCPUDYkFKK94X0NSAA/NhUHg2ytEcOUhpYBh0C/IydeN2q2DegX88br8ssRYaK2GGp5jGI47SnRX8OBM2vD74cuklPRvpxwvDqsmkL8k3y3UtZlWGeDOALpgQPVKtaBg8O83Q5+pBvV9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=feQBOLwSu+tjrOw9JyUuvSfWWF55ZRNCgjceaK/xEHs=;
- b=0l0f6o0Wko1U7FJ8FcJu63WpR0ZH3wyu6UGEbhosWfyY5JyViAX2YuYvB0ISruQnZ6yOQMy9td2bnhAaVs/UD8UmlInHZmxJbdXCpygox+giNEuJEC6/ll4LPLv5rL0BcXA+IcQpU8sY1jx826JGxR3zPl/j9U+AFCol4fkZ5fs=
+ bh=mCTRYacsz9UwHuVtPR+slclQhXhTGGEzbKBks24qTEQ=;
+ b=JOg3BCuG9gspK7WdqTtRtLKj6JdrftI4QNNcCHzdJkfg+e0h0ALRQi6ePGi0crRj9r/drOIQF4dOPiZPt0DJtgs/2csvl7Tqyv3p3MTdZW8OxEekrNan7FTz75zFrjkiXMe8xeG0T2WdcBbCI95Z4FjaPd8TSDu/lBWNKdkYCWM2Xj5BCWhc7yBJeoGFLWrJEGT6byZnCZzsb4xikCtQi0wE1EDWxPAJ9G4ywhD5GEV88/6qDPvxfXsOnSRxjbtxQzM4pJzeW/wRf2U7PVnhCVgCxvM7pMj6Iqu3uvMMOvvoDUXHFd4VNWZkW0oAV6A0un4EoXXmHsEghosG7q8Fdg==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by DM4PR12MB5389.namprd12.prod.outlook.com (2603:10b6:5:39e::8) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BY5PR12MB4903.namprd12.prod.outlook.com (2603:10b6:a03:1d6::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 10 Oct
- 2023 12:53:31 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::16da:8b28:d454:ad5a]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::16da:8b28:d454:ad5a%3]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 12:53:31 +0000
-Message-ID: <2a21b730-9ad4-4585-b636-9aa139266f94@amd.com>
-Date:   Tue, 10 Oct 2023 23:53:16 +1100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/12] PCI device authentication
-Content-Language: en-US
-To:     Lukas Wunner <lukas@wunner.de>
-Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-References: <cover.1695921656.git.lukas@wunner.de>
- <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
- <20231007100433.GA7596@wunner.de> <20231009123335.00006d3d@Huawei.com>
- <20231009134950.GA7097@wunner.de>
- <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
- <20231010081913.GA24050@wunner.de>
-From:   Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <20231010081913.GA24050@wunner.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0176.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c4::12) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+ 2023 13:10:32 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
+ 13:10:32 +0000
+Date:   Tue, 10 Oct 2023 10:10:31 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
+ virtio device
+Message-ID: <20231010131031.GJ3952@nvidia.com>
+References: <20230921124040.145386-1-yishaih@nvidia.com>
+ <20230921124040.145386-11-yishaih@nvidia.com>
+ <20230922055336-mutt-send-email-mst@kernel.org>
+ <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
+ <20230926072538-mutt-send-email-mst@kernel.org>
+ <ZRpjClKM5mwY2NI0@infradead.org>
+ <20231002151320.GA650762@nvidia.com>
+ <ZR54shUxqgfIjg/p@infradead.org>
+ <20231005111004.GK682044@nvidia.com>
+ <ZSAG9cedvh+B0c0E@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZSAG9cedvh+B0c0E@infradead.org>
+X-ClientProxiedBy: BL0PR02CA0031.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::44) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|DM4PR12MB5389:EE_
-X-MS-Office365-Filtering-Correlation-Id: e8f27cbf-815c-4f94-3790-08dbc98fe7da
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4903:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6fe4a8a-c781-49c2-e7c5-08dbc9924850
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G946Cg5LwMHJbtVSq922vA1lLi74SL0eMxvcOJ88g3k1WsdYOc++PoN39x6Me/7u33DDQv5P6P8QjNrti8kEz9ubPUVCa8174s/J+wrWBz9wE2PUcspNdNx4oj8np19bCyvzMEDYAIjN2Ffd5sAR0tVvMksjFemmb/L1vm+Xxtljy+Y59BE0Ed3gc9tN0kFdV4WxUlXKjYCtltZ7rXWln+hhysyDHS/b00PEAhVJQVIBhsMn82WtgviOLFITLW/qmvp+UpkgPSUZFd2dgt0JedplRi+SRf5XFOfVI2XF4OcdBs2saSZDptv5zur9byHwuQ2RyhGR6magH0uTSER2xoeCNklUNwY7/yd/XIRsACa8E0YRz9QC6bx4pRnKg4KaA+8PKad6gBBTFYLv26frnS4rymQR3tm7cXOv28F/ovdBFKoimycPJn0RZkUKUUrhyRTV7fySVNpklCW9ME6SS/YwpErgIK5KMnrofPHsqRxw8N1NWUxg1lU2qJFNDBlWiXu17r3z8jhny/evMmlvcZQHMNRHjZtbAn0kCbKJ47TMJTzOcrwbUeUno8J2KWVfpy1SDTyghwcH8tkEURL+N6VS5peGZRbRSzRdWrsItkv1EhiqOXR1DavAENHmbkAJF5GSnfcH5QzCZIMKKAMjPA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(136003)(366004)(39860400002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(31686004)(53546011)(6512007)(36756003)(31696002)(38100700002)(26005)(2906002)(7416002)(83380400001)(6486002)(6666004)(2616005)(6506007)(478600001)(316002)(4326008)(6916009)(8936002)(8676002)(41300700001)(5660300002)(66556008)(66946007)(54906003)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: n0EKEREPzMLdYu30LnTofr+fdZ1kOYO/jAhhLjePgcdmiFcsUDzvSORyozdWghqQ3NTnOEVCJIE72AzODda1hWG6ZeEQsgv/F43cLMvYFZXEPH6R/dnpL+SDIDBWIpSXaPwiRefZud4z7rYnpPIeXrYy2hnDGThaqreZl/OGN5HrLRgkXBZcNRUFjoPRG/pnxmePSQoNBM1yRMX3HfvoN7anc4e5WmShpTNKDmR25vnOKNpeR0fg5AOnfjZp2/5WoqXd4OCPGp2iessZPmFswZQjJZQ2JQCeiBgKIod+cASQ1ojC2WY2H1CkQpFzi2CKausFy7rh+KAfHjYZitQyVFftzOgQaQlTO3UqMZ3my685WBeYIEojb1MZiAhGf/8PcK3QKsladP7DJjLpd/DcTFWWo3/a4cUNRCI698FeT9IgUQlFoi9RmNfP2YCawfHE6TF9MkB0sCnqem5++VtCfGAqmji0I9NmouLMyo70ea1hxeE5pZvSso4vnxwL6hsR3Mk47/9wxYQ5JLCGeNtUh3Ymyxpa6U+qEVvIbTex3UCw4DvZfZZWS0JnmLV5Q40X
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(396003)(39860400002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(66899024)(107886003)(1076003)(6512007)(33656002)(36756003)(86362001)(38100700002)(26005)(2906002)(83380400001)(2616005)(6506007)(478600001)(6486002)(4326008)(6916009)(8936002)(8676002)(41300700001)(316002)(5660300002)(54906003)(66946007)(66556008)(66476007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QVl3ZzRQOUVLckljbyt6T2xiNzZuelB2Vm9nZDhIekg5YkZTeGdYUkZidFBV?=
- =?utf-8?B?TC9oVXFZOTdIZUttSUhBdnRwb2NOZldRRTV2UWhRcWk5MGNreEJlbGVjOWFm?=
- =?utf-8?B?UUNKRkNvWERDSDcrMFdIM3NnSkNzaGhQZ3JNMTJESjlCQ01DNllZRmVPVUxX?=
- =?utf-8?B?YjhsZ3Jib0IwUkw0UmtTSWlTV3ZvNVU1dHVWMWxBUGZMNEFjQ2VRam9jdk1H?=
- =?utf-8?B?YVlQK1hKU0JJTVMxemNEWUJIcDhEU1g5MTlLUkhmOWtjUzlIa3JyMzg2WDRZ?=
- =?utf-8?B?SkVsL2p0VEIwbE05STV5UHh6UXVLbENxbVFrWG5pTS91dUl2eGN5Tms1YzVn?=
- =?utf-8?B?UlQ3ZmZqVnBxSzdzTU1KSDlrd2JpYktkUUNRQWhaQi95dXF2MUN6VXNOQndh?=
- =?utf-8?B?QTlIZ1RvRjYzNDl6bGpETi94cE0rYjRBdkxubllLcm50L2tlSkJtbndMU09M?=
- =?utf-8?B?cXJaR0MxU3BzWkQ4czZEM3JYQ2NQdzI5c0FCOWxFQjNlajhzTVlJcjBGSGMy?=
- =?utf-8?B?Mk1zS0JTaXNsUEFhckMvQlk1djhIbW1rNStBNGdCT1hyTEdRZEQxU245LzhS?=
- =?utf-8?B?QmZDcklpWlBybEVvb05NODc4bzR2UEM3R3JoZ3NrdU1rT1ZGN25BWEdRODhX?=
- =?utf-8?B?aDVpbTNQYjYybjIyWm9jdi9vY0VaQUNCSk9sNHhLRjlMZFlYNWZHekNYa3Uz?=
- =?utf-8?B?VkpRVjVEeVBrL1J1YTZFVk5GTGhoNk1DYmhDN3VZNUhzLzh1NFJVdTUwR2lr?=
- =?utf-8?B?SzNCeFpveHR6UmRXT3JSYUtlMlA4dDloM0ZOZjRJcDAvbS83VFN3VTJpWVoy?=
- =?utf-8?B?bzNJUDh0SkF2RS8rM0xjR1dCamdvcFZpVmRUQmdwR3R3WFRCZG0zZmh0RXkv?=
- =?utf-8?B?c0lMUjh1WnVHZWh0b0hrNFI3U0lweW83dTlpVCtaaVJSYlArSVdkRE4xYzcr?=
- =?utf-8?B?bG9WbkxjbXFwU2VSVEg0L2ZnT080R2Z3dGdmK1VkM0NEVENkOGFKRnNZNHA5?=
- =?utf-8?B?bEoweGszQ2ZaYXprcE1GOWRzQ3QzMmlXTEdjVjM3U203WU43bjBVaTRtVHdq?=
- =?utf-8?B?djlQUUdqY1Zlc0dXVGRwb0JkSUQzS3VhcDg4R1JlNlloTzFrYUlXY1NlbEpx?=
- =?utf-8?B?YnZTMGR3QUhFaHBCQmx3U2crUG9pZUVHa29zRHVZQVBLdDNHMHR3eW1LSEpX?=
- =?utf-8?B?aHJxT25QcEtlVytuMTFKUURRVWFhNm5nUy9XclJUMzVLWFIvcDVieUtBajhm?=
- =?utf-8?B?NUgzVnR0NWZZOXUzdkJjT0VyMmt0R3ZsUStNM1diY29ha01sRGhBMUdVaC9q?=
- =?utf-8?B?RTRXU3pUb1VZOVBlMFIwYWZjVHlDTm8wRjR5OExrMFZ3SFlhQTZ5dmNWdlE5?=
- =?utf-8?B?Sk5vR2R1N1Mvd2NwT0ZtNTVsYXNJSVpvaEVMRUlpQ2RJZ29rNVJBNFo2bHV6?=
- =?utf-8?B?WGszcUhlWk9xaXJTcnY2ditSM1RoSDhhVjYrb1VMVXZ5dlcweWxyTk1GU2Vq?=
- =?utf-8?B?c3djMUd3dDFwa0RwM0hvWUFpU3ZieGJtNCtoRVlqK2tyMmNpQ1pDVEEwcTJL?=
- =?utf-8?B?dW9EaEJQOHlWeXV6bmVVeTI0SWhhTmlETy9JVEtjY0srRGJ2VWxrd0dqRnBq?=
- =?utf-8?B?V2h6Q2doUVFZMG1lZ0xHNjd6Zjd3ZmFtNW12OHJJNkpyS210MDdOK3p5ZFdu?=
- =?utf-8?B?K3FNMFRsTG9jUzdvYWltODVlVkxSNTZkTkp0UlFLWWxVK3ZsclM0L3JqNFY5?=
- =?utf-8?B?UGVzWnAvN21NU3hicU0xc3NhNDVldi8yTWg1bktPYzdFbG1GK2U2OXdYdFhy?=
- =?utf-8?B?YWE3UjljUXhhRVRnblFBK2Q4U2xpWHJRdlUreG50UExhZkR2RUhhOFV6SDNS?=
- =?utf-8?B?azhmTlF1WTA3eWEwYlVCa3FYTjZOcUt1RnE5RGhUSWpQMDUzemloM04yS1dh?=
- =?utf-8?B?YmlTc0lDRjdLZ0FldUgrRUZ1YUtRRGM4aDBicE9PTW5pSm41eGk4d21YYlN2?=
- =?utf-8?B?OUhJbUtWTVEra3h1Z0VGdmJud2NNRklKc0prWUdrY3Fmak52eVgrVUtaTVFi?=
- =?utf-8?B?TExPQ0dCNEpuVnNyMzNRem81dEN3M0NGZWxoMWJCaGxid2VaaHR3RWxPUWo0?=
- =?utf-8?Q?VVFLH+6MBev54jtI/mC7EtIv4?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e8f27cbf-815c-4f94-3790-08dbc98fe7da
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bbxMMLDt3OEA/U4JUKQxY2q+MOBbuyJcwr7tqg1bsqmxWSbCu5bseAX2HJbE?=
+ =?us-ascii?Q?HOHtOu5vCJsPg91M0EUCM9ucCR18x4AjmcC6WLK5z0iFY+TVNF3gh1SC+omO?=
+ =?us-ascii?Q?NiD+K6VQzgOwIZlkR4qkrdqpCYl0e0IWvgmTcDFfU+t6xfKfcdxUAJKDxHTw?=
+ =?us-ascii?Q?eqdJVfw8qp+DSNQChnQTLKFr12YwteaOhR1dCzQjTUdjUt2V37r9lQYKQby1?=
+ =?us-ascii?Q?kJHel7mm5pg8xn7jKuWOXT4VGpig4SeZfxTcZwsurOBVwYvFcF5t7GEiTIeS?=
+ =?us-ascii?Q?yZkCjdyqtkgieFmuIAGcVfdUXwVrOaztjDf2qvFeeZcALSN16pvWLTU2a0Ll?=
+ =?us-ascii?Q?DHqB9fJbmZiXKg+KdWBvBBDfIc7Y95jxYTt9EKXjrXNrM/5YITKL7pj4Xk0U?=
+ =?us-ascii?Q?oAxMmnhQuFqlLMZ2J7USzz/ui0HZ8S0utvHgAXcn4s9ADl58YlbZPLUOJPXF?=
+ =?us-ascii?Q?46330sUYaylxoEuqL/vlNihiO+qY3z1OQvDccj24IPz2SIVumtiXBJp1F9Wd?=
+ =?us-ascii?Q?0W80hWcg6zujzGmQD1sRLiOlBu6X9JUolcBUIeD/wz8dplWYXTitm/K5nVbI?=
+ =?us-ascii?Q?2AEj8Q24zbQCBvlzKZuWGDVUA+r5SuG7Rbtr6jFVaMWEBx7fRH+LdHLQx6WG?=
+ =?us-ascii?Q?KmrYPeFAzsELyBx/xhZsMPo6CA/HRo+gJY0jOZgRCcp2HZXzZERmw4SaBhej?=
+ =?us-ascii?Q?f+VC9HjLeHjRn54X7qV7/sHBgQW248y0l1wmgmvMw+8pvOqpegOfsRwZNbeI?=
+ =?us-ascii?Q?1XFDolf8qjVaZAYAE506XUnyF+Xw+NiPFiuM8we46SW2rtE9w8KV9LtiJ98F?=
+ =?us-ascii?Q?B4+ra4UIClRI2/fTeojg62q1Wt/HZb3kluc11t+Vj3M+jI3cU2qiFfw+ts7A?=
+ =?us-ascii?Q?r0XE/hTL31AblI/PRUdIi6lejQeBUnRoFsm5cA5KHsYd3jKk3/gYoy0wTqbj?=
+ =?us-ascii?Q?6hBP6CdhopeNGIX4EIlWfxgPp6aWh8NUYoI1uTzk+XcjILAmrrw6XsD6Hczg?=
+ =?us-ascii?Q?6tqP7RCEIbOJ8BojEsWVvIFh7aVol8t+518wQRRcJjrUK47+ay0BrqM5yhJ5?=
+ =?us-ascii?Q?ySIN/18qn0qJkQX3MU4C2Szu6qSGLy7JRJ6m/ko1hP39x9KWt2hBhjqVztNZ?=
+ =?us-ascii?Q?iNKRc5HGDemWU9IxgKWAALPLk8U+N/tTE5FFISvDLnCJVgGBtzOeqC69aCb3?=
+ =?us-ascii?Q?ZiOkxFNd3pNSaKLHjKQimfdVqOOEoKsUh/knSrw/FjpyWY6dzOZetyg0bjeS?=
+ =?us-ascii?Q?0e0aZ9ohfMAuLEMOPsAJWblSl52BdAYq5Ywg5X3ZCL2kA2SLpiJeMsspJWVB?=
+ =?us-ascii?Q?n4xYjRlmCoJuM5IcTYWuczIN08g/Yhp+Im1MtsU3ypavJ/AtbWKLsTUVe7zw?=
+ =?us-ascii?Q?xA6cVOkxktf5HyGAMNi0WzGD1d+ooV2XhsDwpzie0W+ZX7kMCALWpYoxtCQ7?=
+ =?us-ascii?Q?JBMz/4HLskHp+SBy/U/dFnQMgGg0hmMbX2hlzOmuBp8nsFo9cLO4CrzK7nyp?=
+ =?us-ascii?Q?F7NZ6MBMdzk2xbt5XAFdl87IWgpbY0xBpFuQxRwY4jVBzO1hsEfuU0UOezT0?=
+ =?us-ascii?Q?vyf2lOWhphTwXXk5cirxsTCLfB6IyA+D8O6pzTb9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6fe4a8a-c781-49c2-e7c5-08dbc9924850
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 12:53:31.1923
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 13:10:32.1035
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rtHXf5Cd4YHKeT0xfncnVvUbN794KB74B3cSCz822Iqxm+GEN7apIMcc2ZFLHnOdsE07O687c2QCFx2GV3sb7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5389
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: EzKNg1kUersB50M4H0dEfdA3PUFQ0YZnZ4GfqRIacrK8LpD1L4YlGAMj/k2BQcvB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4903
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_NONE,T_SPF_HELO_TEMPERROR,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 10/10/23 19:19, Lukas Wunner wrote:
-> On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
->> On 10/10/23 00:49, Lukas Wunner wrote:
->>> PCI Firmware Spec would seem to be appropriate.  However this can't
->>> be solved by the kernel community.
->>
->> How so? It is up to the user to decide whether it is SPDM/CMA in the kernel
->> or   the firmware + coco, both are quite possible (it is IDE which is not
->> possible without the firmware on AMD but we are not there yet).
+On Fri, Oct 06, 2023 at 06:09:09AM -0700, Christoph Hellwig wrote:
+> On Thu, Oct 05, 2023 at 08:10:04AM -0300, Jason Gunthorpe wrote:
+> > > But for all the augmented vfio use cases it doesn't, for them the
+> > > augmented vfio functionality is an integral part of the core driver.
+> > > That is true for nvme, virtio and I'd argue mlx5 as well.
+> > 
+> > I don't agree with this. I see the extra functionality as being an
+> > integral part of the VF and VFIO. The PF driver is only providing a
+> > proxied communication channel.
+> > 
+> > It is a limitation of PCI that the PF must act as a proxy.
 > 
-> The user can control ownership of CMA-SPDM e.g. through a BIOS knob.
-> And that BIOS knob then influences the outcome of the _OSC negotiation
-> between platform and OS.
+> For anything live migration it very fundamentally is not, as a function
+> that is visible to a guest by definition can't drive the migration
+> itself.  That isn't really a limitation in PCI, but follows form the
+> fact that something else must control a live migration that is
+> transparent to the guest.
+
+We've talked around ideas like allowing the VF config space to do some
+of the work. For simple devices we could get away with 1 VF config
+space register. (VF config space is owned by the hypervisor, not the
+guest)
+
+Devices that need DMA as part of their migration could be imagined to
+co-opt a VF PASID or something. eg using ENQCMD.
+
+SIOVr2 is discussing more a flexible RID mapping - there is a possible
+route where a "VF" could actually have two RIDs, a hypervisor RID and a
+guest RID.
+
+It really is PCI limitations that force this design of making a PF
+driver do dual duty as a fully functionally normal device and act as a
+communication channel proxy to make a back channel into a SRIOV VF.
+
+My view has always been that the VFIO live migration operations are
+executed logically within the VF as they only effect the VF.
+
+So we have a logical design seperation where VFIO world owns the
+commands and the PF driver supplies the communication channel. This
+works well for devices that already have a robust RPC interface to
+their device FW.
+
+> > ?? We must bind something to the VF's pci_driver, what do you imagine
+> > that is?
 > 
+> The driver that knows this hardware.  In this case the virtio subsystem,
+> in case of nvme the nvme driver, and in case of mlx5 the mlx5 driver.
+
+But those are drivers operating the HW to create kernel devices. Here
+we need a VFIO device. They can't co-exist, if you switch mlx5 from
+normal to vfio you have to tear down the entire normal driver.
+
+> > > E.g. for this case there should be no new vfio-virtio device, but
+> > > instead you should be able to switch the virtio device to an
+> > > fake-legacy vfio mode.
+> > 
+> > Are you aruging about how we reach to vfio_register_XX() and what
+> > directory the file lives?
 > 
->> But the way SPDM is done now is that if the user (as myself) wants to let
->> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
->> as CMA is not a (un)loadable module or built-in (with some "blacklist"
->> parameters), and does not provide a sysfs knob to control its tentacles.
+> No.  That layout logically follows from what codebase the functionality
+> is part of, though.
+
+I don't understand what we are talking about really. Where do you
+imagine the vfio_register_XX() goes?
+
+> > I don't know what "fake-legacy" even means, VFIO is not legacy.
 > 
-> The problem is every single vendor thinks they can come up with
-> their own idea of who owns the SPDM session:
+> The driver we're talking about in this thread fakes up a virtio_pci
+> legacy devie to the guest on top of a "modern" virtio_pci device.
+
+I'm not sure I'd use the word fake, inb/outb are always trapped
+operations in VMs. If the device provided a real IO BAR then VFIO
+common code would trap and relay inb/outb to the device.
+
+All this is doing is changing the inb/outb relay from using a physical
+IO BAR to a DMA command ring.
+
+The motivation is simply because normal IO BAR space is incredibly
+limited and you can't get enough SRIOV functions when using it.
+
+> > There is alot of code in VFIO and the VMM side to take a VF and turn
+> > it into a vPCI function. You can't just trivially duplicate VFIO in a
+> > dozen drivers without creating a giant mess.
 > 
-> I've looked at the Nvidia driver and they've hacked libspdm into it,
-> so their idea is that the device driver owns the SPDM session.
- >
-> AMD wants the host to proxy DOE but not own the SPDM session.
- >
-> We have *standards* for a reason.  So that products are interoperable.
+> I do not advocate for duplicating it.  But the code that calls this
+> functionality belongs into the driver that deals with the compound
+> device that we're doing this work for.
 
-There is no "standard PCI ethernet device", somehow we survive ;)
+On one hand, I don't really care - we can put the code where people
+like.
 
-> If the kernel tries to accommodate to every vendor's idea of SPDM ownership
-> we'll end up with an unmaintainable mess of quirks, plus sysfs knobs
-> which were once intended as a stopgap but can never be removed because
-> they're userspace ABI.
+However - the Intel GPU VFIO driver is such a bad experiance I don't
+want to encourage people to make VFIO drivers, or code that is only
+used by VFIO drivers, that are not under drivers/vfio review.
 
-The host kernel needs to accommodate the idea that it is not trusted, 
-and neither is the BIOS.
-
-> This needs to be solved in the *specification*.
- >
-> And the existing solution for who owns a particular PCI feature is _OSC.
-> Hence this needs to be taken up with the Firmware Working Group at the
-> PCISIG.
-
-I do like the general idea of specifying things, etc but this place does 
-not sound right. The firmware you are talking about has full access to 
-PCI, the PSP firmware does not have any (besides the IDE keys 
-programming), is there any example of such firmware in the PCI Firmware 
-spec? From the BIOS standpoint, the host OS owns DOE and whatever is 
-sent over it (on AMD SEV TIO). The host OS chooses not to compose these 
-SPDM packets itself (while it could) in order to be able to run guests 
-without having them to trust the host OS.
-
->> Note, this PSP firmware is not BIOS (which runs on the same core and has
->> same access to PCI as the host OS), it is a separate platform processor
->> which only programs IDE keys to the PCI RC (via some some internal bus
->> mechanism) but does not do anything on the bus itself and relies on the host
->> OS proxying DOE, and there is no APCI between the core and the psp.
+> > Further, userspace wants consistent ways to operate this stuff. If we
+> > need a dozen ways to activate VFIO for every kind of driver that is
+> > not a positive direction.
 > 
-> Somewhat tangentially, would it be possible in your architecture
-> that the host or guest asks PSP to program IDE keys into the Root Port?
+> We don't need a dozen ways.  We just need a single attribute on the
+> pci (or $OTHERBUS) devide that switches it to vfio mode.
 
-Sure it is possible to implement. But this does not help our primary use 
-case which is confidential VMs where the host OS is not trusted with the 
-keys.
+Well, we sort of do these days, it is just a convoluted bind thing.
 
-> Or alternatively, access the key registers directly without PSP involvement?
+Realistically switching modes requires unprobing the entire normal VF
+driver. Having this be linked to the driver core probe/unprobe flows
+is a good code reuse thing, IMHO.
 
-No afaik, for the reason above.
+We already spent alot of effort making this quite general from the
+userspace perspective. Nobody yet came up with an idea to avoid the
+ugly unbind/bind flow.
 
+Be aware, there is a significant performance concern here. If you want
+to create 1000 VFIO devices (this is a real thing), we *can't* probe a
+normal driver first, it is too slow. We need a path that goes directly
+from creating the RIDs to turning those RIDs into VFIO.
 
-> 
-> Thanks,
-> 
-> Lukas
+mlx5 takes *seconds* to complete its normal probe. We must avoid this.
 
--- 
-Alexey
+Looking a few years into the future, with SIOVr1/2, the flow I want to
+target is some uAPI commands:
+  'create a PCI RID with params XYZ and attach a normal/VFIO/etc driver'
+  'destroy a PCI RID'
 
+We need to get away from this scheme of SRIOV where you bulk create a
+bunch of empty VFs at one time and then have to somehow provision
+them.
 
+Jason
