@@ -2,144 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09DAB7C00ED
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 17:59:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7DBB7C010D
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 18:03:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233742AbjJJP7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 11:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59348 "EHLO
+        id S233687AbjJJQD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 12:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233711AbjJJP7n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 11:59:43 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E14BBA
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:59:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ie9W1/n+0WTxp3RWFhoVgwMEs4tZMwN8Qc/PiuiufVV/2YePr5S4b5LNBq+6mRiPpt4Oh5gvWLmJTSiHR95OQLn5umDmVcG8MTOhUI5vX4LJSPETEu9my4KTLTv4U0p3Lp/lFSnqmZKalHoWP2vqLp5FjdvXCSxcXicLxMIZtCVx/E3xai7O7aqVgQDcIK7oxfp6ZOeEBQlM2QL0oXt+YOIeiXg5zC4b7MJvEqk9LeqEgQm6bxphKLJKSv+iqGbzTvAVKb09JN6CZmk87LMA8/3/zTk/qY0owyazVoDSAvcsDTr9HU//rwhWeAkHWpEEyUaNH/2tshYCCrkTZcfYDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=For5a9pyUD38pr44tCny0cEderMwi2n8mGp9UfgekTc=;
- b=Ks56q8I2QsOWh024Bu4owwL3WnUClfRK9CGuxA5w2cVLb2qu2OL7xo99rbK9UsevUMQ+0CSD6EDfVH0tULsY37XFy5rhpNa7qFvblZ6hjhkKWb+x1CKxn297jZiuocWlX7S64A1+IJZqcVM1nAW1yp8ZTddaXqxVNiAoWHlp94U++24hCJE1f/ata87j0vnOsiJ12rSz2jWJoicig8GEgI4YW9M7/W2CSfAEtVHEJnsvPLRNwpCG8TsQ80OPvyblPr62Cprj865RvvBlJZ8iYCW3orSleIglEUAOCvq1wSNaksnriisy4jI/KjcpHy4LLDZGkhCLoE36spBiD4XJgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=For5a9pyUD38pr44tCny0cEderMwi2n8mGp9UfgekTc=;
- b=KwWom1fEU6HmRzpP7kntbh/Yd6WZf2/GkgU39V1iE+4JFsjAFuL3NxqG4mpuQUPllv38rSzjb9sTP4jRHfp/DNo3BoVnn+1b4EUCzJN3xce9HGlHxSaIWUsmaGLH9lb/nD364yexbJkBnolL8FSzTgyC6Szv/DWZsI5KgknCY1HWxoucppVDdbl9r84chHCx4sT4PzpoW9lYggNlFJgJCI6lUdBBSUx9pRQR8mkEpjVZx+JmBoCKZknyu2piu/HqJ+z2JOhtNuRsYUB/gNhhjdVt0leXEzUDT5vPmnSW+rs1sX+W+CGnpNoze5f4cwMr4KFFdEQkFtzGnnCnxJdYiw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB8463.namprd12.prod.outlook.com (2603:10b6:610:187::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 10 Oct
- 2023 15:59:38 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 15:59:38 +0000
-Date:   Tue, 10 Oct 2023 12:59:37 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        alex.williamson@redhat.com, jasowang@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <20231010155937.GN3952@nvidia.com>
-References: <20231002151320.GA650762@nvidia.com>
- <ZR54shUxqgfIjg/p@infradead.org>
- <20231005111004.GK682044@nvidia.com>
- <ZSAG9cedvh+B0c0E@infradead.org>
- <20231010131031.GJ3952@nvidia.com>
- <20231010094756-mutt-send-email-mst@kernel.org>
- <20231010140849.GL3952@nvidia.com>
- <20231010105339-mutt-send-email-mst@kernel.org>
- <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
- <20231010111339-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010111339-mutt-send-email-mst@kernel.org>
-X-ClientProxiedBy: BL0PR02CA0093.namprd02.prod.outlook.com
- (2603:10b6:208:51::34) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S233676AbjJJQDy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 12:03:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E348CF
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 09:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696953786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5AesHVAQUxcR1GAtYtYzOkU6c6/CTxsVJcL3ikJVYAI=;
+        b=gt3I2Q+cKd7Wd/nZtuk/oFUnxFnSSKkUTKdfFiF5CbRGgr9PeKFZG1jcX91mF+DXaZr/rH
+        9A750s9NhNAUA0vmEuFO3ZARar6hAtLADvqcPW+erdjbtScO7AcX0rPFDXzRyYYXcUtVNa
+        jCa3oCTE6QRzu12PuqELtxzk9nMnxy4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-487-x0HiwtMcPpWoaVmCvGtVbA-1; Tue, 10 Oct 2023 12:03:03 -0400
+X-MC-Unique: x0HiwtMcPpWoaVmCvGtVbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 512A41C11712;
+        Tue, 10 Oct 2023 16:03:02 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.45.226.166])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F386158;
+        Tue, 10 Oct 2023 16:03:01 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org
+Subject: [PATCH RFC 00/11] KVM: x86: Make Hyper-V emulation optional (AKA introduce CONFIG_KVM_HYPERV)
+Date:   Tue, 10 Oct 2023 18:02:49 +0200
+Message-ID: <20231010160300.1136799-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB8463:EE_
-X-MS-Office365-Filtering-Correlation-Id: b140e7e4-b11c-4a36-d48c-08dbc9a9e848
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IYjgUb+bogxVIgzrLso3RqYHAEsXnF1GDz4Po5Rnx5H56ydD7kYjz0duu9WVX0pUkcFMFBaNKCnqbZHHflCKB/iuLVBzpKF3fo4c9JZxl7Ywm3pGlkvAeIyaronb8duV5uWhUdMziDomBhZ/sXfdkOgZGnWQLp1BcnNtUZsVzLak4IY9v2HSffbKpUh0xuD+qkdOoTdU7q/3PEmLaCZ32yqxvsaLCZ6eNzUw8uJtH2gHk7CGO7A5sH3pEdrt1r1VtaFmF5NxqMY5QFl69s677LLYXqKtv6QymoftWJYOdCG49MdBLA0HO4ZfXK5znSnIlA4qQkqd+WuxLMTd3IWpt5UH7xAWeqLfH/9KmmcRuxSiZa1rYvRl6DM0cw8zpmukbxdrO17lsCAaIiFXYeMutnPLD74BAjFimxjwKaOqycYeDYJfyQushtRVg16jhFZew2VMuAF0+9kxlRWqnmwX06hevwqeGTKcnTQba4BKwRZxqdjJRY5P+wPbGi1nY7SCCj2868CKQ4VxT29pqPuHyvEG7ndWYNmbtj0n18TgSvqsAd81WtQhYrT0qjsM7tV1
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(39860400002)(136003)(396003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(33656002)(6512007)(1076003)(107886003)(2616005)(6506007)(478600001)(6486002)(26005)(83380400001)(4744005)(2906002)(5660300002)(54906003)(66476007)(66556008)(66946007)(4326008)(8676002)(8936002)(6916009)(316002)(41300700001)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xXsEbcB8bXD96hTOl5Zpq6b5YiKRfS9VH428UPUj1wC/zexuRAZPCbH4RwWP?=
- =?us-ascii?Q?CCRtjmn+DVpgc5ZFl/WOBlMCLnW5raG2zvSYl3DHyUJQ9MrdV5zH8ab+Yxr4?=
- =?us-ascii?Q?YsA7dOpBCKM2gK1owU9StgtL5nHSTLCGMGubLMho7d5HUlqwcir2YB8Juc8l?=
- =?us-ascii?Q?GOESW54EETMcE1NvrT8c06j6CxoScVUadShSsJomjc2V/SSEzgc0lB7VpnWx?=
- =?us-ascii?Q?6yy2gFVuRMl26bI+ETEiVqKw5Hz3MMvrOmE6rWNHB6oU7IT9injFrJgQOoZY?=
- =?us-ascii?Q?gPTGusm+/XMnFwU5JWd45WEm2LeUQFZMCibglZHg4Wp+3nHggO2z2v8R+ChW?=
- =?us-ascii?Q?hk1UgCzTDueNIW6W1D3uz4NzViJjxo1F94ohT7HKIBD3+Ogy+gD6WhT4kvyU?=
- =?us-ascii?Q?IdN8YJ+Lcpwof2UMwX8N28ZZAdVJenHWoYcwr+xMA7Toi7/7BRSfnDAIro3p?=
- =?us-ascii?Q?WkSZRkopBa4XfK4cgYfmfWzNxiqb6Mf7L2vRn9tepDL5gwiykMFDY/qlMkxs?=
- =?us-ascii?Q?HbjiBQ3MyAaG3/93eqXLeaB6nAPj6cchguWdHx+om3pUEE7i/dSYPeOXtRgI?=
- =?us-ascii?Q?tZUWFDRTji2Pm3Nmla939DjNC9lCfUc4rij58pPCOdenDoFzKDqOcjGqq0pK?=
- =?us-ascii?Q?mLZuZdAccTqclX213RPxGmanDohGGf6aiBdiZg0lEjX/hX1Vgn5lQbiMXOA4?=
- =?us-ascii?Q?lIAIBP13hUqWyA5IAQWpU+TxCkWRJl1BKh67Bcm3b+Ib2ikMCxt06CeU241E?=
- =?us-ascii?Q?ggdDCpLZVcQQiC1jbHtNtE8XLBhNNt+k3jLaDjlMuZyRljlzLUZqs7Qje5wt?=
- =?us-ascii?Q?cqIh8jEJ25yEuuUW2s9DmbqJ6V0sPaSOhY/DM/d4dQgzP+TcdAvYb4JZJkQv?=
- =?us-ascii?Q?5HL0/bXyFERpg3w66wLHsLq1FhPGdP5LxvOV3D6CJSkgGCXr5wgRPi8tjTST?=
- =?us-ascii?Q?JcgItoQgykM0NFiB61SExtt/S01C08cRvOB1kS+RyQfget2XNasee3+r28VN?=
- =?us-ascii?Q?qx2ZqZr1bKb4Mvz/DJRxOdm9T3SM0tVqGXYUNL+SUGwHl5gMsnXjlnYokae+?=
- =?us-ascii?Q?P4q/DvpJpUicqtBSybzUlEG/qr5qnX1+zqFvmaEU/1x4IydVviOMJkTsoYqn?=
- =?us-ascii?Q?ZdyTz7uZP0WIzq4VChCk/tE4PHumZbo34EwowJzfsikgQM1VZy5qd5EgEfrK?=
- =?us-ascii?Q?5lt9KUD8nc/eaMmJQwNagcDiJosraki8WXAs02kpWwkxx3maIn1zJE6EXcRw?=
- =?us-ascii?Q?+CWUyPYOTRj7XeZ87IZUSlLtOSf3SMOES7Q/PXnQQktiKVI1Sji71TRiwOkL?=
- =?us-ascii?Q?ssRzel/cVQMcLqnbGCEChFLiCh5kg4QCudrRAXVuQPAeXDW2izXBD4TMtQEt?=
- =?us-ascii?Q?HtxEK45eSfqbImWwYDC1O8IMdbUlFKLpaG7cH0UphFK2HKUhp2XT6tCe+GzW?=
- =?us-ascii?Q?Nb71cxNbKxEKJ77duVjkDlPMmVuA4Ym9LEJDh+xbIe4m1w/oDZgudvQLRjWZ?=
- =?us-ascii?Q?0H/IR/kHdd6XiP9dryTgvPZzhaRFLqnPbKGTSGdIOih/MFKUr8zJQN1iYQbR?=
- =?us-ascii?Q?XOMEtfA9tiimq+8ryLEJLJNf2oxsCU6NPIzrs3e+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b140e7e4-b11c-4a36-d48c-08dbc9a9e848
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 15:59:38.8243
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LOb/d9S1YRT/Ll+psXCD4q8auWOVAMnJsfczqOaqGPtFwomC2Hw2heJUb2j6CFhR
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8463
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 11:14:56AM -0400, Michael S. Tsirkin wrote:
+Ideas to make Hyper-V emulation by KVM optional were expressed in the past
+so I've decided to take a look at what would it take us to implement it.
+Turns out it's quite a lot of code churn but the gain is also significant.
+Just comparing the resulting module sizes, I can see:
 
-> I suggest 3 but call it on the VF. commands will switch to PF
-> internally as needed. For example, intel might be interested in exposing
-> admin commands through a memory BAR of VF itself.
+    # CONFIG_KVM_HYPERV is not set
+    # CONFIG_HYPERV is not set
 
-FWIW, we have been pushing back on such things in VFIO, so it will
-have to be very carefully security justified.
+    -rw-r--r--. 1 user user 3612632 Oct 10 16:53 arch/x86/kvm/kvm-amd.ko
+    -rw-r--r--. 1 user user 5343968 Oct 10 16:53 arch/x86/kvm/kvm-intel.ko
 
-Probably since that is not standard it should just live in under some
-intel-only vfio driver behavior, not in virtio land.
+    CONFIG_KVM_HYPERV=y
+    # CONFIG_HYPERV is not set
 
-It is also costly to switch between pf/vf, it should not be done
-pointlessly on the fast path.
+    -rw-r--r--. 1 user user 3925704 Oct 10 16:51 arch/x86/kvm/kvm-amd.ko
+    -rw-r--r--. 1 user user 5819192 Oct 10 16:51 arch/x86/kvm/kvm-intel.ko
 
-Jason
+    # CONFIG_KVM_HYPERV is not set
+    CONFIG_HYPERV=m
+
+    -rw-r--r--. 1 user user 3928440 Oct 10 16:40 arch/x86/kvm/kvm-amd.ko
+    -rw-r--r--. 1 user user 8156464 Oct 10 16:40 arch/x86/kvm/kvm-intel.ko
+
+    CONFIG_KVM_HYPERV=y
+    CONFIG_HYPERV=m
+
+    -rw-r--r--. 1 user user 4245440 Oct 10 16:37 arch/x86/kvm/kvm-amd.ko
+    -rw-r--r--. 1 user user 8583872 Oct 10 16:37 arch/x86/kvm/kvm-intel.ko
+
+While code churn is certainly something we can survive, adding more CONFIG
+options always comes with a risk of a broken build somewhere in the future.
+
+Early RFC. I have only compile tested these patches in these four
+configurations and I'd like to get your opinion on whether it's worth it or
+not.
+
+The first patch of the series is not Hyper-V related but as I hide Hyper-V
+emulation context under CONFIG_KVM_HYPERV I think it would make sense to
+do the same for Xen.
+
+Vitaly Kuznetsov (11):
+  KVM: x86: xen: Remove unneeded xen context from struct kvm_arch when
+    !CONFIG_KVM_XEN
+  KVM: x86: hyper-v: Move Hyper-V partition assist page out of Hyper-V
+    emulation context
+  KVM: VMX: Split off vmx_onhyperv.{ch} from hyperv.{ch}
+  KVM: x86: hyper-v: Introduce kvm_hv_synic_auto_eoi_set()
+  KVM: x86: hyper-v: Introduce kvm_hv_synic_has_vector()
+  KVM: VMX: Split off hyperv_evmcs.{ch}
+  KVM: x86: Make Hyper-V emulation optional
+  KVM: nVMX: hyper-v: Introduce nested_vmx_evmptr() accessor
+  KVM: nVMX: hyper-v: Introduce nested_vmx_evmcs() accessor
+  KVM: nVMX: hyper-v: Hide more stuff under CONFIG_KVM_HYPERV
+  KVM: nSVM: hyper-v: Hide more stuff under
+    CONFIG_KVM_HYPERV/CONFIG_HYPERV
+
+ arch/x86/include/asm/kvm_host.h |  11 +-
+ arch/x86/kvm/Kconfig            |   9 +
+ arch/x86/kvm/Makefile           |  19 +-
+ arch/x86/kvm/cpuid.c            |   6 +
+ arch/x86/kvm/hyperv.h           |  39 ++-
+ arch/x86/kvm/irq.c              |   2 +
+ arch/x86/kvm/irq_comm.c         |   9 +-
+ arch/x86/kvm/lapic.c            |   5 +-
+ arch/x86/kvm/svm/hyperv.h       |   7 +
+ arch/x86/kvm/svm/nested.c       |  22 +-
+ arch/x86/kvm/svm/svm.h          |   2 +
+ arch/x86/kvm/svm/svm_onhyperv.c |   2 +-
+ arch/x86/kvm/svm/svm_onhyperv.h |   2 +
+ arch/x86/kvm/vmx/hyperv.c       | 447 --------------------------------
+ arch/x86/kvm/vmx/hyperv.h       | 191 ++------------
+ arch/x86/kvm/vmx/hyperv_evmcs.c | 311 ++++++++++++++++++++++
+ arch/x86/kvm/vmx/hyperv_evmcs.h | 162 ++++++++++++
+ arch/x86/kvm/vmx/nested.c       |  94 ++++---
+ arch/x86/kvm/vmx/nested.h       |   3 +-
+ arch/x86/kvm/vmx/vmx.c          |   6 +-
+ arch/x86/kvm/vmx/vmx.h          |   2 +
+ arch/x86/kvm/vmx/vmx_onhyperv.c |  36 +++
+ arch/x86/kvm/vmx/vmx_onhyperv.h | 125 +++++++++
+ arch/x86/kvm/vmx/vmx_ops.h      |   2 +-
+ arch/x86/kvm/x86.c              |  60 +++--
+ 25 files changed, 885 insertions(+), 689 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/hyperv_evmcs.c
+ create mode 100644 arch/x86/kvm/vmx/hyperv_evmcs.h
+ create mode 100644 arch/x86/kvm/vmx/vmx_onhyperv.c
+ create mode 100644 arch/x86/kvm/vmx/vmx_onhyperv.h
+
+-- 
+2.41.0
+
