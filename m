@@ -2,157 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEC1B7BF9F8
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 13:42:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FC2D7BFA29
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 13:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231449AbjJJLmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 07:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57526 "EHLO
+        id S231480AbjJJLqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 07:46:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231401AbjJJLmG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 07:42:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A6FCA
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696938077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7b+DAP28sjjsKl/NqKK+vQ1oprFAwolNlLR6iIJGZc4=;
-        b=HvtFctf1a1SieULF0Bu+6TDLW/VIJ1ByYXKacfUBQ4upXnP19BylRJf5GgXUSJSz29+lQw
-        /UeRzCYNXUECadrolM3q2FJgjc/RvQE4Qx+aZwxltWrHwPZUS3r99Zr21MO3XXDX5rTixH
-        2d35fnSSGwBJGtuRUzcPBLASR7Rm/cY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-331-DkXunXZoOqKuE6lbaQ6tHA-1; Tue, 10 Oct 2023 07:41:00 -0400
-X-MC-Unique: DkXunXZoOqKuE6lbaQ6tHA-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-537a183caa3so2011802a12.1
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:40:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696938057; x=1697542857;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7b+DAP28sjjsKl/NqKK+vQ1oprFAwolNlLR6iIJGZc4=;
-        b=fWMd6EEL0apnvECrDUPZZkd1bQV+qSWWEsCS66a3pyHVV20ZcVw/wcJTXJrwNGXkcM
-         g4CVneSNZJGoDPhVV5Fu2hIuNjaLl+JxMwkLwMdHKikq6pat/pv61zLdhlTIUdNpaolE
-         2VHV6GmxX9RCd72sb+W4FJUJLLt5GbJ/5x6R4JFj4b7tyq/KKQHsJmOq2rFfdsQoQl9F
-         xieRLDduNFvleknSSXhBFxvE2XhGAwwIPVG9mGIfCP1Wop3CO8bNLvmG+1typ68ciIE7
-         wqLS6zuZsq9X8Q77zZIyH5sHj5PVBD09sZu1XcY2rc1max+Q6EtoGSr/d9nZxWSfehCN
-         iH3A==
-X-Gm-Message-State: AOJu0YyhbXsovumpBKFpbgXabrCHcwDgyCm13oHqq+mDsKfywBqW6yRA
-        +Y1VNLppzQBUH5oXUh8GvnlKwtzTCPmp1Q3Jcsp2ZObH+jKvi5EY1iSD1Yh1TCXOdr0L2fBZk7i
-        NyFeckEKj/4SUNQD5/oys
-X-Received: by 2002:a05:6402:1a28:b0:522:3849:48d8 with SMTP id be8-20020a0564021a2800b00522384948d8mr16557022edb.9.1696938057286;
-        Tue, 10 Oct 2023 04:40:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHPF6rjIP1ClGozgmSVb/QcNq4AcdaAeAz8RfeTFDOEmM1d6yjpTu+LVxF0w32sc6yh+3zyzQ==
-X-Received: by 2002:a05:6402:1a28:b0:522:3849:48d8 with SMTP id be8-20020a0564021a2800b00522384948d8mr16557009edb.9.1696938056965;
-        Tue, 10 Oct 2023 04:40:56 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
-        by smtp.googlemail.com with ESMTPSA id w15-20020aa7cb4f000000b0052a063e52b8sm7516724edt.83.2023.10.10.04.40.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Oct 2023 04:40:56 -0700 (PDT)
-Message-ID: <5c19c422-41ad-430b-664c-15f3e2087922@redhat.com>
-Date:   Tue, 10 Oct 2023 13:40:54 +0200
+        with ESMTP id S231244AbjJJLqh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 07:46:37 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A82CA9
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:46:36 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39ABjObu009919
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:46:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XR38XXyln3LqOwJPbjSF+wE2yZfn5V3hGhlfdU0E6FU=;
+ b=YQG3Ml/dHwVzi9KRH/9koUOwffrPUbVkHyGom3588yVeSZKL9RCdnlaCP7EUzUtkJopf
+ glTmW755tqxORv3sBYdOoBykXxxWK07n+QSzmUxW5uNRD/LnxmxTUTHMY+lmpxqP7nGV
+ GHMb0CLGn/DCwML+qDmCyt8MyUNd2voD7Pv6welY9G6GsAZuTSyk6VahJNJm+gxIF8rC
+ 7U2yiUExAFC8m0s3elSOU5FUVeG6F/qbUyEvQPGeU4XQq812bAUBRUG+mbMm8SU/D0B3
+ yBaJMbVrQoovPq/9u3Ad5wQbmppgyLYFCoATpsVRdXMJ411Z46nfpWIgh0SYAI+Mes+d hQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn6110167-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:46:35 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39ABjcdO011122
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:46:34 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn611014c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Oct 2023 11:46:34 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39A8nCcV001146;
+        Tue, 10 Oct 2023 11:42:35 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvjqmat-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Oct 2023 11:42:35 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39ABgWW69634528
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Oct 2023 11:42:32 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C2A62004B;
+        Tue, 10 Oct 2023 11:42:32 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5FE0420049;
+        Tue, 10 Oct 2023 11:42:32 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Oct 2023 11:42:32 +0000 (GMT)
+Date:   Tue, 10 Oct 2023 13:42:30 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        nsg@linux.ibm.com, nrb@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 1/3] lib: s390x: hw: Provide early detect
+ host
+Message-ID: <20231010134230.0d7a0156@p-imbrenda>
+In-Reply-To: <95f2e807-6b7f-4e24-a018-a041a2f7ce00@linux.ibm.com>
+References: <20231010073855.26319-1-frankja@linux.ibm.com>
+        <20231010073855.26319-2-frankja@linux.ibm.com>
+        <20231010124029.70abcb0a@p-imbrenda>
+        <95f2e807-6b7f-4e24-a018-a041a2f7ce00@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] kvm/sev: make SEV/SEV-ES asids configurable
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Jos=c3=a9_Pekkarinen?= <jose.pekkarinen@foxhound.fi>
-Cc:     seanjc@google.com, skhan@linuxfoundation.org,
-        dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, tglx@linutronix.de,
-        linux-kernel-mentees@lists.linuxfoundation.org
-References: <20231010100441.30950-1-jose.pekkarinen@foxhound.fi>
- <2023101050-scuff-overstay-9b43@gregkh>
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <2023101050-scuff-overstay-9b43@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _GbqoAYQFKLBXdhk8_sAlYH_WwmMK67J
+X-Proofpoint-ORIG-GUID: 4I_nYlmTDY36EvZEKDU5OGcEGSAN54dg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-10_07,2023-10-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ priorityscore=1501 lowpriorityscore=0 impostorscore=0 phishscore=0
+ suspectscore=0 clxscore=1015 mlxscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310100085
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/23 13:35, Greg KH wrote:
-> On Tue, Oct 10, 2023 at 01:04:39PM +0300, José Pekkarinen wrote:
->> There are bioses that doesn't allow to configure the
->> number of asids allocated for SEV/SEV-ES, for those
->> cases, the default behaviour allocates all the asids
->> for SEV, leaving no room for SEV-ES to have some fun.
+On Tue, 10 Oct 2023 13:03:08 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-In addition to what Greg pointed out (and there are many more cases that 
-have to be checked for errors, including possible overflows), why is it 
-correct to just ignore what's in CPUID?
+> On 10/10/23 12:40, Claudio Imbrenda wrote:
+> > On Tue, 10 Oct 2023 07:38:53 +0000
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >   
+> >> For early sclp printing it's necessary to know if we're under LPAR or
+> >> not so we can apply compat SCLP ASCII transformations.
+> >>
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >> ---
+> >>   lib/s390x/hardware.c | 8 ++++++++
+> >>   lib/s390x/hardware.h | 1 +
+> >>   2 files changed, 9 insertions(+)
+> >>
+> >> diff --git a/lib/s390x/hardware.c b/lib/s390x/hardware.c
+> >> index 2bcf9c4c..d5a752c0 100644
+> >> --- a/lib/s390x/hardware.c
+> >> +++ b/lib/s390x/hardware.c
+> >> @@ -52,6 +52,14 @@ static enum s390_host do_detect_host(void *buf)
+> >>   	return HOST_IS_UNKNOWN;
+> >>   }
+> >>   
+> >> +enum s390_host detect_host_early(void)
+> >> +{
+> >> +	if (stsi_get_fc() == 2)
+> >> +		return HOST_IS_LPAR;
+> >> +
+> >> +	return HOST_IS_UNKNOWN;
+> >> +}
+> >> +
+> >>   enum s390_host detect_host(void)
+> >>   {
+> >>   	static enum s390_host host = HOST_IS_UNKNOWN;
+> >> diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
+> >> index 86fe873c..5e5a9d90 100644
+> >> --- a/lib/s390x/hardware.h
+> >> +++ b/lib/s390x/hardware.h
+> >> @@ -24,6 +24,7 @@ enum s390_host {
+> >>   };
+> >>   
+> >>   enum s390_host detect_host(void);
+> >> +enum s390_host detect_host_early(void);  
+> > 
+> > I wonder if it weren't easier to fix detect_host so it can be used
+> > early....
+> >   
+> 
+> Problem is, where do you start and where do you end?
+> 
+> We could statically allocate a page but why did we add the current 
+> version then? (The old version did that if I remember correctly).
 
-Paolo
+the old version also allocated pages, and was a hodgepodge of various
+functions replicating the same behaviour, many calling the others. the
+main goal of the current version was to make it more readable and
+maintainable. 
 
-> "fun"?
-> 
-> Also, please use the full 72 columns for your changelog.
-> 
->> If the user request SEV-ES to be enabled, it will
->> find the kernel just run out of resources and ignored
->> user request. This following patch will address this
->> issue by making the number of asids for SEV/SEV-ES
->> configurable over kernel module parameters.
->>
->> Signed-off-by: José Pekkarinen <jose.pekkarinen@foxhound.fi>
->> ---
->>   arch/x86/kvm/svm/sev.c | 28 +++++++++++++++++++++++-----
->>   1 file changed, 23 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index 07756b7348ae..68a63b42d16a 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -51,9 +51,18 @@
->>   static bool sev_enabled = true;
->>   module_param_named(sev, sev_enabled, bool, 0444);
->>   
->> +/* nr of asids requested for SEV */
->> +static unsigned int requested_sev_asids;
->> +module_param_named(sev_asids, requested_sev_asids, uint, 0444);
->> +
->>   /* enable/disable SEV-ES support */
->>   static bool sev_es_enabled = true;
->>   module_param_named(sev_es, sev_es_enabled, bool, 0444);
->> +
->> +/* nr of asids requested for SEV-ES */
->> +static unsigned int requested_sev_es_asids;
->> +module_param_named(sev_es_asids, requested_sev_asids, uint, 0444);
-> 
-> Why more module parameters?  Why can't this "just work" properly without
-> forcing a user to make manual changes?  This isn't the 1990's anymore.
-> 
-> 
->> +
->>   #else
->>   #define sev_enabled false
->>   #define sev_es_enabled false
->> @@ -2194,6 +2203,11 @@ void __init sev_hardware_setup(void)
->>   	if (!max_sev_asid)
->>   		goto out;
->>   
->> +	if (requested_sev_asids + requested_sev_es_asids > max_sev_asid) {
->> +		pr_info("SEV asids requested more than available: %u ASIDs\n", max_sev_asid);
-> 
-> Why isn't this an error?
-> 
-> thanks,
-> 
-> greg k-h
-> 
+a possible fix could also involve allocating the buffer on the stack of
+do_detect_host(), so it's not taking up memory permanently.
 
+that said, I don't have a strong opinion about this, but maybe it's a
+good idea to not replicate the same behaviour again :)
+
+if you don't want to fix detect_host(), then maybe something like this
+instead?
+
+diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
+index 86fe873c..5e5a9d90 100644
+--- a/lib/s390x/hardware.h
++++ b/lib/s390x/hardware.h
+@@ -24,6 +24,7 @@ enum s390_host {
+ };
+ 
+ enum s390_host detect_host(void);
++enum s390_host detect_host_early(void);
+ 
+ static inline uint16_t get_machine_id(void)
+ {
+diff --git a/lib/s390x/hardware.c b/lib/s390x/hardware.c
+index 2bcf9c4c..b281cf10 100644
+--- a/lib/s390x/hardware.c
++++ b/lib/s390x/hardware.c
+@@ -28,7 +28,7 @@ static enum s390_host do_detect_host(void *buf)
+        if (stsi_get_fc() == 2)
+                return HOST_IS_LPAR;
+ 
+-       if (stsi_get_fc() != 3)
++       if (!buf || stsi_get_fc() != 3)
+                return HOST_IS_UNKNOWN;
+ 
+        if (!stsi(buf, 1, 1, 1)) {
+@@ -67,3 +67,8 @@ enum s390_host detect_host(void)
+        initialized = true;
+        return host;
+ }
++
++enum s390_host detect_host_early(void)
++{
++       return do_detect_host(NULL);
++}
