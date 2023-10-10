@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B2397C022B
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 19:05:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D3C67C022C
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 19:06:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233874AbjJJRFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 13:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53730 "EHLO
+        id S234244AbjJJRGB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 13:06:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234005AbjJJRFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 13:05:35 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACC0B0
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:05:30 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c760b34d25so41212675ad.3
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:05:30 -0700 (PDT)
+        with ESMTP id S233941AbjJJRFl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 13:05:41 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61814FC
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:05:36 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1c60f1a2652so420815ad.0
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:05:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1696957530; x=1697562330; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1696957535; x=1697562335; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4smwE6VqfYxKvfF0tqu7jNc/7OXpVUXHc/+OAD0MBRk=;
-        b=FhwWGb5Xse7nvJyYxyIZeHfhdiov1sPmpAIyzOeoCGEf39LOxkt7wfJ2Z0P8A/m678
-         rZFtelP2j0l+cFV4L9Fd5cfVSWv91bpzgvCS53XnUBi1zh9W1Xz36U8+NoWS9joAjSbI
-         PIzEhCDhs/CTR2GXh1mg5mra4y83r13ciVymQInsYDZrGiCQZaGGVuYTeY9T7kjMtIJK
-         aeud+i6Sr7MfTROpnE4KzDCOMsNYMbUUKOD2aJVn1Xog8btOol7bejKOotidRPs3u8N9
-         cT7AmZcOJCLaEJ70+JIuVaq/Iqpb+vIlh89lPryRr+V5veLBho8HplAufaN1fMW6m+Ks
-         6RwQ==
+        bh=XoCkBvDoaE+G9yGkJwlCtJkOL/TuRqipkz8zh1jvWHI=;
+        b=AA2jQLm6/yeH/yYoMJAer6K2L8kTm74KVZ2ig382ezZ5hfVEIfthok6IseJqgZoOlh
+         vWfEIhzBiGXl3yYiJcNbH4JvQrrLKeqB6xJgDDKho5pYjvnH2TbGu/Ou7ADp/My5B6bc
+         1/Ere0xGHWsk9TFKbg03APmOpAdYBrE2L29GhruQ9gyvWfjZ4tl6ipieikZobQb/6P4O
+         UV4bGnn6r7nn7E3xlaEzqJfcK5dGEnbRDxiO4MCqZS5gEPECi7TMkILDhBlm3CVGIMMg
+         KJxmn91UM4Ptg96wP7F6dyOMQDMA1pqTZFpTMYQxhPdyuPN7bLqOcHaOlG9PdDlPCHZp
+         IG/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696957530; x=1697562330;
+        d=1e100.net; s=20230601; t=1696957535; x=1697562335;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4smwE6VqfYxKvfF0tqu7jNc/7OXpVUXHc/+OAD0MBRk=;
-        b=wRs2R4DoIsfxcEgSaGxFEKtZIT6/1LjQ6+8AMTM84u+pL4Gx26Yg/jFKgiGGsk1pxB
-         3gVnYVuz5NYRMiCinqMLufTufkKX8BwUXDzqYYEniM1u+jLMIFw0gzbzQXb4iicUIWQ+
-         3BgDDuMTOTzviLitPRxSnGyWgeZL3gt6U715ZXUEQqUXfwig/2okCkHHrrQ/4MioL05b
-         SOd7O/oJg9Bd4qmp9wT/dH6aPEJLJuAKomU2qHx1/gEF43hals/vsnzVCRRH/n5Pv+Uu
-         BokiYm/p601LY/y8n3ARqbQuXSc88FlaWslgr2pIzt20i/sWKOE+aGQVimV9WhXS44LS
-         I2VQ==
-X-Gm-Message-State: AOJu0Yyy7YMtzYXa2sronzCU3gWMxgWAB4HFkWXsiFCNo1KNRubvxQbl
-        Niv5aFB4B2g0K+d7YoC6ExQgVg==
-X-Google-Smtp-Source: AGHT+IFYY1cb953bXOW6ABKFWxZoUNl8/jrL5sgqvn5jtayOnZj/D//5h5O6D4FNJ+IJsn/Z4jFWDA==
-X-Received: by 2002:a17:902:a402:b0:1c7:7e00:809e with SMTP id p2-20020a170902a40200b001c77e00809emr15730697plq.67.1696957529924;
-        Tue, 10 Oct 2023 10:05:29 -0700 (PDT)
+        bh=XoCkBvDoaE+G9yGkJwlCtJkOL/TuRqipkz8zh1jvWHI=;
+        b=Tpeh1ox2Xgbty5CjkEq/ERUTjKr+O4qEbZUTCa9hdA05tN0SS8k1vdcURmSM3WZ7r1
+         BP+iiIEAiUHGxpgiYBqWDPXyf3b7KaKaXJUxL++JKZxj/uTNJDq57mr+60j/W0Ce28HD
+         /Y/wsfF2/jWdIPlD7U2Ke1PUTWwJ0IBKAiDsznJ9WBGIKEMfW+tDw28p9h6i4BP5jh72
+         JDLKg/izsCOFwCt+t/PdOByve3NRlyPXvMu1wfcp0NRLhe9QLcgMY4IjCD6mHApLxjjf
+         sx0ZrU8U5zIRAXEf4fAoGUbJHQEo0n1nlHybhMRZ/KLufPNakH3QysPSJjuF0HR+7BMW
+         37gA==
+X-Gm-Message-State: AOJu0YxR1OcaAh6bo0L7qNvrNTlRtPEpnMR0anKEys8YZ4CMta9knRR+
+        XK8ytHV6ubE9mp9aofgYjKtNjA==
+X-Google-Smtp-Source: AGHT+IHpTSgdyOa/WMmXoVeNp80pjqgJQqPCX1bVN2+pKlqZykfXt/hGxysni37Tvg40ZjWZcGGrLw==
+X-Received: by 2002:a17:902:d2ca:b0:1c3:76c4:7242 with SMTP id n10-20020a170902d2ca00b001c376c47242mr26123429plc.22.1696957535339;
+        Tue, 10 Oct 2023 10:05:35 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id w19-20020a1709027b9300b001b89536974bsm11979868pll.202.2023.10.10.10.05.24
+        by smtp.gmail.com with ESMTPSA id w19-20020a1709027b9300b001b89536974bsm11979868pll.202.2023.10.10.10.05.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 10:05:29 -0700 (PDT)
+        Tue, 10 Oct 2023 10:05:34 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>,
@@ -61,9 +61,9 @@ Cc:     Conor Dooley <conor@kernel.org>,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 3/6] RISC-V: KVM: Forward SBI DBCN extension to user-space
-Date:   Tue, 10 Oct 2023 22:35:00 +0530
-Message-Id: <20231010170503.657189-4-apatel@ventanamicro.com>
+Subject: [PATCH 4/6] tty/serial: Add RISC-V SBI debug console based earlycon
+Date:   Tue, 10 Oct 2023 22:35:01 +0530
+Message-Id: <20231010170503.657189-5-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231010170503.657189-1-apatel@ventanamicro.com>
 References: <20231010170503.657189-1-apatel@ventanamicro.com>
@@ -79,95 +79,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SBI DBCN extension needs to be emulated in user-space so let
-us forward console_puts() call to user-space.
+We extend the existing RISC-V SBI earlycon support to use the new
+RISC-V SBI debug console extension.
 
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
- arch/riscv/include/uapi/asm/kvm.h     |  1 +
- arch/riscv/kvm/vcpu_sbi.c             |  4 ++++
- arch/riscv/kvm/vcpu_sbi_replace.c     | 31 +++++++++++++++++++++++++++
- 4 files changed, 37 insertions(+)
+ drivers/tty/serial/Kconfig              |  2 +-
+ drivers/tty/serial/earlycon-riscv-sbi.c | 35 ++++++++++++++++++++++---
+ 2 files changed, 32 insertions(+), 5 deletions(-)
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-index 8d6d4dce8a5e..a85f95eb6e85 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-@@ -69,6 +69,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_ipi;
- extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
- extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
- extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
-+extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
- extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
- extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+index bdc568a4ab66..cec46091a716 100644
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -87,7 +87,7 @@ config SERIAL_EARLYCON_SEMIHOST
  
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 917d8cc2489e..60d3b21dead7 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -156,6 +156,7 @@ enum KVM_RISCV_SBI_EXT_ID {
- 	KVM_RISCV_SBI_EXT_PMU,
- 	KVM_RISCV_SBI_EXT_EXPERIMENTAL,
- 	KVM_RISCV_SBI_EXT_VENDOR,
-+	KVM_RISCV_SBI_EXT_DBCN,
- 	KVM_RISCV_SBI_EXT_MAX,
- };
+ config SERIAL_EARLYCON_RISCV_SBI
+ 	bool "Early console using RISC-V SBI"
+-	depends on RISCV_SBI_V01
++	depends on RISCV_SBI
+ 	select SERIAL_CORE
+ 	select SERIAL_CORE_CONSOLE
+ 	select SERIAL_EARLYCON
+diff --git a/drivers/tty/serial/earlycon-riscv-sbi.c b/drivers/tty/serial/earlycon-riscv-sbi.c
+index 27afb0b74ea7..b1da34e8d8cd 100644
+--- a/drivers/tty/serial/earlycon-riscv-sbi.c
++++ b/drivers/tty/serial/earlycon-riscv-sbi.c
+@@ -10,22 +10,49 @@
+ #include <linux/serial_core.h>
+ #include <asm/sbi.h>
  
-diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index 9cd97091c723..b54fe52c915a 100644
---- a/arch/riscv/kvm/vcpu_sbi.c
-+++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -66,6 +66,10 @@ static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
- 		.ext_idx = KVM_RISCV_SBI_EXT_PMU,
- 		.ext_ptr = &vcpu_sbi_ext_pmu,
- 	},
-+	{
-+		.ext_idx = KVM_RISCV_SBI_EXT_DBCN,
-+		.ext_ptr = &vcpu_sbi_ext_dbcn,
-+	},
- 	{
- 		.ext_idx = KVM_RISCV_SBI_EXT_EXPERIMENTAL,
- 		.ext_ptr = &vcpu_sbi_ext_experimental,
-diff --git a/arch/riscv/kvm/vcpu_sbi_replace.c b/arch/riscv/kvm/vcpu_sbi_replace.c
-index 7c4d5d38a339..347c5856347e 100644
---- a/arch/riscv/kvm/vcpu_sbi_replace.c
-+++ b/arch/riscv/kvm/vcpu_sbi_replace.c
-@@ -175,3 +175,34 @@ const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst = {
- 	.extid_end = SBI_EXT_SRST,
- 	.handler = kvm_sbi_ext_srst_handler,
- };
++#ifdef CONFIG_RISCV_SBI_V01
+ static void sbi_putc(struct uart_port *port, unsigned char c)
+ {
+ 	sbi_console_putchar(c);
+ }
+ 
+-static void sbi_console_write(struct console *con,
+-			      const char *s, unsigned n)
++static void sbi_0_1_console_write(struct console *con,
++				  const char *s, unsigned int n)
+ {
+ 	struct earlycon_device *dev = con->data;
+ 	uart_console_write(&dev->port, s, n, sbi_putc);
+ }
++#endif
 +
-+static int kvm_sbi_ext_dbcn_handler(struct kvm_vcpu *vcpu,
-+				    struct kvm_run *run,
-+				    struct kvm_vcpu_sbi_return *retdata)
++static void sbi_dbcn_console_write(struct console *con,
++				   const char *s, unsigned int n)
 +{
-+	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-+	unsigned long funcid = cp->a6;
++	phys_addr_t pa = __pa(s);
 +
-+	switch (funcid) {
-+	case SBI_EXT_DBCN_CONSOLE_WRITE:
-+	case SBI_EXT_DBCN_CONSOLE_READ:
-+	case SBI_EXT_DBCN_CONSOLE_WRITE_BYTE:
-+		/*
-+		 * The SBI debug console functions are unconditionally
-+		 * forwarded to the userspace.
-+		 */
-+		kvm_riscv_vcpu_sbi_forward(vcpu, run);
-+		retdata->uexit = true;
-+		break;
-+	default:
-+		retdata->err_val = SBI_ERR_NOT_SUPPORTED;
-+	}
-+
-+	return 0;
++	sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE,
++#ifdef CONFIG_32BIT
++		  n, pa, (u64)pa >> 32,
++#else
++		  n, pa, 0,
++#endif
++		  0, 0, 0);
 +}
+ 
+ static int __init early_sbi_setup(struct earlycon_device *device,
+ 				  const char *opt)
+ {
+-	device->con->write = sbi_console_write;
+-	return 0;
++	int ret = 0;
 +
-+const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn = {
-+	.extid_start = SBI_EXT_DBCN,
-+	.extid_end = SBI_EXT_DBCN,
-+	.handler = kvm_sbi_ext_dbcn_handler,
-+};
++	if ((sbi_spec_version >= sbi_mk_version(2, 0)) &&
++	    (sbi_probe_extension(SBI_EXT_DBCN) > 0))
++		device->con->write = sbi_dbcn_console_write;
++	else
++#ifdef CONFIG_RISCV_SBI_V01
++		device->con->write = sbi_0_1_console_write;
++#else
++		ret = -ENODEV;
++#endif
++
++	return ret;
+ }
+ EARLYCON_DECLARE(sbi, early_sbi_setup);
 -- 
 2.34.1
 
