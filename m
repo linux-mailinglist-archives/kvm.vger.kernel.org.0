@@ -2,344 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 055437BF234
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 07:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30C1D7BF264
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 07:46:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376324AbjJJFaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 01:30:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52358 "EHLO
+        id S1442144AbjJJFqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 01:46:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234600AbjJJFaO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 01:30:14 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0324FA4
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 22:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696915812; x=1728451812;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6VJFbVvrQpAOu5bD0WuuWxMpxBE0tMfgXqFvuxiE6O0=;
-  b=OTVDmuuGvGYbnGRNIlGcmWCdC+6ViaofQF6Tb9nn6o0f3oKdRsjvL1O3
-   xohHA6yHOxXTfcskm7rpdF+vXf46PlNze3dUNg3awDOln5uUHp7W3ubwl
-   taeb241rwloYcIuR4rB36HiJIe5dNyORDIWBGIHAShb6q5txNTBWBCzSr
-   pE++L2/gr6Mj4w+mLgbz8QTNjBwyN5WFGHOFxreOdenlOJXfB4IVHSZf9
-   GeH1h1Y7grUU7DvVCq29OVGZpsc4xemTK0/+TwMOPLFt4sibeGAi01Wbt
-   ZU9p74b9asldJAVLFFxg/f+WJ19/BRwH2tujelYQ1QOmpCR0KoZSAZ0qr
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="470575751"
-X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
-   d="scan'208";a="470575751"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 22:30:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="746943652"
-X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
-   d="scan'208";a="746943652"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.19.128]) ([10.93.19.128])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 22:30:01 -0700
-Message-ID: <7e8deb37-4521-090a-cc77-83ece4e3aa19@intel.com>
-Date:   Tue, 10 Oct 2023 13:29:58 +0800
+        with ESMTP id S1442138AbjJJFqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 01:46:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09959E
+        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 22:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696916734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P+I2EY4NGx452ATYzw4Kz0XF6aTAAXvBTqSjZlE93qM=;
+        b=jTETJU7fffNkNwqNbYQgudw0ybhMvBQ0q6fPbx5ol1pT6Y1IMQd3iiXjXu3jqntLc93l+l
+        4qtAqF3I+TfF/oTl3bNxzJzuOc+JT7QfZ4LozTuCiLnAArejahoRHjPyXoh36EN76kGVPo
+        D/KZZNtVyxBFSPmhtOHuGTiPqD8lXPg=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-HNkPVzv6NLegd-9uRlj5VQ-1; Tue, 10 Oct 2023 01:45:26 -0400
+X-MC-Unique: HNkPVzv6NLegd-9uRlj5VQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2c1886908a4so45677951fa.2
+        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 22:45:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696916725; x=1697521525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P+I2EY4NGx452ATYzw4Kz0XF6aTAAXvBTqSjZlE93qM=;
+        b=H6huUt30JE6C8r/w7jqplDwJWw6F22RAigYmhvNa478cDJVGVsam9l72djXLACXn8c
+         Kwq6XB7wTg7rkK/lkh+3BkkXhdhNEszs+YhkGu/OhPyARA/AAj3FFzIJPIHxVH1NkLbt
+         e/IlaeioQ43mSdZNkN+JN+bb1VeqyFpU0oaMOsQkPut38Nq3qvGfjxZY4ozaYowIeZHj
+         94tuYU3Q+0hbMb1dpgKowUFcrEjOKhRHTWjW8TVhFUE0izSbKSAWzzhcjKDL63glRxho
+         IFqJx/KB6kGQ+RyByGnf/JCL0QrK8NqfDEHj5kYCVQSxPrzZBmzyVFulNff25Pv1T32J
+         d5Ig==
+X-Gm-Message-State: AOJu0YyIBpiuIhn3TPiN1f/MCJynSNuBQO5jgKdnud3o5o9ha2h2ArCn
+        Pebn05j/uQ9nXMMegE0fadhVt5Giug+I2vzmrJIxfiTzeFuci+aM6Vz7GsLPznbYodUkvlS8HRq
+        ePA/nkh6LImq+kFwgWCi6yVKQ5SQ7
+X-Received: by 2002:a05:6512:ea9:b0:500:b2f6:592 with SMTP id bi41-20020a0565120ea900b00500b2f60592mr18281185lfb.50.1696916725101;
+        Mon, 09 Oct 2023 22:45:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+pwNtTVbI2Ms4EjKlIUtAy5k+rLiIL3TUr1dcb8YFsqYJmXGlmcetJxkpWxQ3ditYPytVqKZpNg5+JzyWzwk=
+X-Received: by 2002:a05:6512:ea9:b0:500:b2f6:592 with SMTP id
+ bi41-20020a0565120ea900b00500b2f60592mr18281158lfb.50.1696916724673; Mon, 09
+ Oct 2023 22:45:24 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-Subject: Re: [PATCH v2 08/58] i386/tdx: Adjust the supported CPUID based on
- TDX restrictions
-Content-Language: en-US
-To:     Tina Zhang <tina.zhang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-9-xiaoyao.li@intel.com>
- <2175b694-c21f-464e-afee-b9ee9da154c1@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <2175b694-c21f-464e-afee-b9ee9da154c1@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+ <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+ <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com> <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
+ <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com> <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
+ <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com> <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
+ <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com> <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
+ <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com>
+In-Reply-To: <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 10 Oct 2023 13:45:11 +0800
+Message-ID: <CACGkMEv0tpn4YsJhXXnoispYx2-VBimFAtFmf85Uo=5=6taVuw@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
+        gustavoars@kernel.org, herbert@gondor.apana.org.au,
+        steffen.klassert@secunet.com, nogikh@google.com,
+        pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com,
+        elver@google.com, pabeni@redhat.com,
+        Yuri Benditovich <yuri.benditovich@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/2023 9:02 AM, Tina Zhang wrote:
-> Hi,
-> 
-> On 8/18/23 17:49, Xiaoyao Li wrote:
->> According to Chapter "CPUID Virtualization" in TDX module spec, CPUID
->> bits of TD can be classified into 6 types:
->>
->> ------------------------------------------------------------------------
->> 1 | As configured | configurable by VMM, independent of native value;
->> ------------------------------------------------------------------------
->> 2 | As configured | configurable by VMM if the bit is supported natively
->>      (if native)   | Otherwise it equals as native(0).
->> ------------------------------------------------------------------------
->> 3 | Fixed         | fixed to 0/1
->> ------------------------------------------------------------------------
->> 4 | Native        | reflect the native value
->> ------------------------------------------------------------------------
->> 5 | Calculated    | calculated by TDX module.
->> ------------------------------------------------------------------------
->> 6 | Inducing #VE  | get #VE exception
->> ------------------------------------------------------------------------
->>
->> Note:
->> 1. All the configurable XFAM related features and TD attributes related
->>     features fall into type #2. And fixed0/1 bits of XFAM and TD
->>     attributes fall into type #3.
->>
->> 2. For CPUID leaves not listed in "CPUID virtualization Overview" table
->>     in TDX module spec, TDX module injects #VE to TDs when those are
->>     queried. For this case, TDs can request CPUID emulation from VMM via
->>     TDVMCALL and the values are fully controlled by VMM.
->>
->> Due to TDX module has its own virtualization policy on CPUID bits, it 
->> leads
->> to what reported via KVM_GET_SUPPORTED_CPUID diverges from the supported
->> CPUID bits for TDs. In order to keep a consistent CPUID configuration
->> between VMM and TDs. Adjust supported CPUID for TDs based on TDX
->> restrictions.
->>
->> Currently only focus on the CPUID leaves recognized by QEMU's
->> feature_word_info[] that are indexed by a FeatureWord.
->>
->> Introduce a TDX CPUID lookup table, which maintains 1 entry for each
->> FeatureWord. Each entry has below fields:
->>
->>   - tdx_fixed0/1: The bits that are fixed as 0/1;
->>
->>   - vmm_fixup:   The bits that are configurable from the view of TDX 
->> module.
->>                  But they requires emulation of VMM when they are 
->> configured
->>             as enabled. For those, they are not supported if VMM doesn't
->>         report them as supported. So they need be fixed up by
->>         checking if VMM supports them.
->>
->>   - inducing_ve: TD gets #VE when querying this CPUID leaf. The result is
->>                  totally configurable by VMM.
->>
->>   - supported_on_ve: It's valid only when @inducing_ve is true. It 
->> represents
->>             the maximum feature set supported that be emulated
->>             for TDs.
->>
->> By applying TDX CPUID lookup table and TDX capabilities reported from
->> TDX module, the supported CPUID for TDs can be obtained from following
->> steps:
->>
->> - get the base of VMM supported feature set;
->>
->> - if the leaf is not a FeatureWord just return VMM's value without
->>    modification;
->>
->> - if the leaf is an inducing_ve type, applying supported_on_ve mask and
->>    return;
->>
->> - include all native bits, it covers type #2, #4, and parts of type #1.
->>    (it also includes some unsupported bits. The following step will
->>     correct it.)
->>
->> - apply fixed0/1 to it (it covers #3, and rectifies the previous step);
->>
->> - add configurable bits (it covers the other part of type #1);
->>
->> - fix the ones in vmm_fixup;
->>
->> - filter the one has valid .supported field;
->>
->> (Calculated type is ignored since it's determined at runtime).
->>
->> Co-developed-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->>   target/i386/cpu.h     |  16 +++
->>   target/i386/kvm/kvm.c |   4 +
->>   target/i386/kvm/tdx.c | 254 ++++++++++++++++++++++++++++++++++++++++++
->>   target/i386/kvm/tdx.h |   2 +
->>   4 files changed, 276 insertions(+)
->>
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index e0771a10433b..c93dcd274531 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -780,6 +780,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   /* Support RDFSBASE/RDGSBASE/WRFSBASE/WRGSBASE */
->>   #define CPUID_7_0_EBX_FSGSBASE          (1U << 0)
->> +/* Support for TSC adjustment MSR 0x3B */
->> +#define CPUID_7_0_EBX_TSC_ADJUST        (1U << 1)
->>   /* Support SGX */
->>   #define CPUID_7_0_EBX_SGX               (1U << 2)
->>   /* 1st Group of Advanced Bit Manipulation Extensions */
->> @@ -798,8 +800,12 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_EBX_INVPCID           (1U << 10)
->>   /* Restricted Transactional Memory */
->>   #define CPUID_7_0_EBX_RTM               (1U << 11)
->> +/* Cache QoS Monitoring */
->> +#define CPUID_7_0_EBX_PQM               (1U << 12)
->>   /* Memory Protection Extension */
->>   #define CPUID_7_0_EBX_MPX               (1U << 14)
->> +/* Resource Director Technology Allocation */
->> +#define CPUID_7_0_EBX_RDT_A             (1U << 15)
->>   /* AVX-512 Foundation */
->>   #define CPUID_7_0_EBX_AVX512F           (1U << 16)
->>   /* AVX-512 Doubleword & Quadword Instruction */
->> @@ -855,10 +861,16 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_ECX_AVX512VNNI        (1U << 11)
->>   /* Support for VPOPCNT[B,W] and VPSHUFBITQMB */
->>   #define CPUID_7_0_ECX_AVX512BITALG      (1U << 12)
->> +/* Intel Total Memory Encryption */
->> +#define CPUID_7_0_ECX_TME               (1U << 13)
->>   /* POPCNT for vectors of DW/QW */
->>   #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ  (1U << 14)
->> +/* Placeholder for bit 15 */
->> +#define CPUID_7_0_ECX_FZM               (1U << 15)
->>   /* 5-level Page Tables */
->>   #define CPUID_7_0_ECX_LA57              (1U << 16)
->> +/* MAWAU for MPX */
->> +#define CPUID_7_0_ECX_MAWAU             (31U << 17)
->>   /* Read Processor ID */
->>   #define CPUID_7_0_ECX_RDPID             (1U << 22)
->>   /* Bus Lock Debug Exception */
->> @@ -869,6 +881,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_ECX_MOVDIRI           (1U << 27)
->>   /* Move 64 Bytes as Direct Store Instruction */
->>   #define CPUID_7_0_ECX_MOVDIR64B         (1U << 28)
->> +/* ENQCMD and ENQCMDS instructions */
->> +#define CPUID_7_0_ECX_ENQCMD            (1U << 29)
->>   /* Support SGX Launch Control */
->>   #define CPUID_7_0_ECX_SGX_LC            (1U << 30)
->>   /* Protection Keys for Supervisor-mode Pages */
->> @@ -886,6 +900,8 @@ uint64_t 
->> x86_cpu_get_supported_feature_word(FeatureWord w,
->>   #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
->>   /* TSX Suspend Load Address Tracking instruction */
->>   #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
->> +/* PCONFIG instruction */
->> +#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
->>   /* Architectural LBRs */
->>   #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
->>   /* AMX_BF16 instruction */
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index ec5c07bffd38..46a455a1e331 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -539,6 +539,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState 
->> *s, uint32_t function,
->>           ret |= 1U << KVM_HINTS_REALTIME;
->>       }
->> +    if (is_tdx_vm()) {
->> +        tdx_get_supported_cpuid(function, index, reg, &ret);
->> +    }
->> +
->>       return ret;
->>   }
->> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index 56cb826f6125..3198bc9fd5fb 100644
->> --- a/target/i386/kvm/tdx.c
->> +++ b/target/i386/kvm/tdx.c
->> @@ -15,11 +15,129 @@
->>   #include "qemu/error-report.h"
->>   #include "qapi/error.h"
->>   #include "qom/object_interfaces.h"
->> +#include "standard-headers/asm-x86/kvm_para.h"
->>   #include "sysemu/kvm.h"
->> +#include "sysemu/sysemu.h"
->>   #include "hw/i386/x86.h"
->>   #include "kvm_i386.h"
->>   #include "tdx.h"
->> +#include "../cpu-internal.h"
->> +
->> +#define TDX_SUPPORTED_KVM_FEATURES  ((1U << KVM_FEATURE_NOP_IO_DELAY) 
->> | \
->> +                                     (1U << KVM_FEATURE_PV_UNHALT) | \
->> +                                     (1U << KVM_FEATURE_PV_TLB_FLUSH) 
->> | \
->> +                                     (1U << KVM_FEATURE_PV_SEND_IPI) | \
->> +                                     (1U << KVM_FEATURE_POLL_CONTROL) 
->> | \
->> +                                     (1U << 
->> KVM_FEATURE_PV_SCHED_YIELD) | \
->> +                                     (1U << 
->> KVM_FEATURE_MSI_EXT_DEST_ID))
->> +
->> +typedef struct KvmTdxCpuidLookup {
->> +    uint32_t tdx_fixed0;
->> +    uint32_t tdx_fixed1;
->> +
->> +    /*
->> +     * The CPUID bits that are configurable from the view of TDX module
->> +     * but require VMM emulation if configured to enabled by VMM.
->> +     *
->> +     * For those bits, they cannot be enabled actually if VMM 
->> (KVM/QEMU) cannot
->> +     * virtualize them.
->> +     */
->> +    uint32_t vmm_fixup;
->> +
->> +    bool inducing_ve;
->> +    /*
->> +     * The maximum supported feature set for given inducing-#VE leaf.
->> +     * It's valid only when .inducing_ve is true.
->> +     */
->> +    uint32_t supported_on_ve;
->> +} KvmTdxCpuidLookup;
->> +
->> + /*
->> +  * QEMU maintained TDX CPUID lookup tables, which reflects how 
->> CPUIDs are
->> +  * virtualized for guest TDs based on "CPUID virtualization" of TDX 
->> spec.
->> +  *
->> +  * Note:
->> +  *
->> +  * This table will be updated runtime by tdx_caps reported by platform.
->> +  *
->> +  */
->> +static KvmTdxCpuidLookup tdx_cpuid_lookup[FEATURE_WORDS] = {
->> +    [FEAT_1_EDX] = {
->> +        .tdx_fixed0 =
->> +            BIT(10) /* Reserved */ | BIT(20) /* Reserved */ | 
->> CPUID_IA64,
->> +        .tdx_fixed1 =
->> +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_APIC |
->> +            CPUID_MTRR | CPUID_MCA | CPUID_CLFLUSH | CPUID_DTS,
->> +        .vmm_fixup =
->> +            CPUID_ACPI | CPUID_PBE,
-> CPUID_HT might also be needed here, as it's disabled by QEMU when TD 
-> guest only has a single processor core.
+On Tue, Oct 10, 2023 at 9:52=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2023/10/09 19:44, Willem de Bruijn wrote:
+> > On Mon, Oct 9, 2023 at 3:12=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
+nix.com> wrote:
+> >>
+> >> On 2023/10/09 19:06, Willem de Bruijn wrote:
+> >>> On Mon, Oct 9, 2023 at 3:02=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> >>>>
+> >>>> On 2023/10/09 18:57, Willem de Bruijn wrote:
+> >>>>> On Mon, Oct 9, 2023 at 3:57=E2=80=AFAM Akihiko Odaki <akihiko.odaki=
+@daynix.com> wrote:
+> >>>>>>
+> >>>>>> On 2023/10/09 17:04, Willem de Bruijn wrote:
+> >>>>>>> On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko.oda=
+ki@daynix.com> wrote:
+> >>>>>>>>
+> >>>>>>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
+> >>>>>>>>> On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.=
+odaki@daynix.com> wrote:
+> >>>>>>>>>>
+> >>>>>>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
+> >>>>>>>>>>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko=
+.odaki@daynix.com> wrote:
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> virtio-net have two usage of hashes: one is RSS and another =
+is hash
+> >>>>>>>>>>>> reporting. Conventionally the hash calculation was done by t=
+he VMM.
+> >>>>>>>>>>>> However, computing the hash after the queue was chosen defea=
+ts the
+> >>>>>>>>>>>> purpose of RSS.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Another approach is to use eBPF steering program. This appro=
+ach has
+> >>>>>>>>>>>> another downside: it cannot report the calculated hash due t=
+o the
+> >>>>>>>>>>>> restrictive nature of eBPF.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Introduce the code to compute hashes to the kernel in order =
+to overcome
+> >>>>>>>>>>>> thse challenges. An alternative solution is to extend the eB=
+PF steering
+> >>>>>>>>>>>> program so that it will be able to report to the userspace, =
+but it makes
+> >>>>>>>>>>>> little sense to allow to implement different hashing algorit=
+hms with
+> >>>>>>>>>>>> eBPF since the hash value reported by virtio-net is strictly=
+ defined by
+> >>>>>>>>>>>> the specification.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> The hash value already stored in sk_buff is not used and com=
+puted
+> >>>>>>>>>>>> independently since it may have been computed in a way not c=
+onformant
+> >>>>>>>>>>>> with the specification.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>>>>>>>>>> ---
+> >>>>>>>>>>>
+> >>>>>>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D=
+ {
+> >>>>>>>>>>>> +       .max_indirection_table_length =3D
+> >>>>>>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
+> >>>>>>>>>>>> +};
+> >>>>>>>>>>>
+> >>>>>>>>>>> No need to have explicit capabilities exchange like this? Tun=
+ either
+> >>>>>>>>>>> supports all or none.
+> >>>>>>>>>>
+> >>>>>>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
+> >>>>>>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_=
+UDP_EX.
+> >>>>>>>>>>
+> >>>>>>>>>> It is because the flow dissector does not support IPv6 extensi=
+ons. The
+> >>>>>>>>>> specification is also vague, and does not tell how many TLVs s=
+hould be
+> >>>>>>>>>> consumed at most when interpreting destination option header s=
+o I chose
+> >>>>>>>>>> to avoid adding code for these hash types to the flow dissecto=
+r. I doubt
+> >>>>>>>>>> anyone will complain about it since nobody complains for Linux=
+.
+> >>>>>>>>>>
+> >>>>>>>>>> I'm also adding this so that we can extend it later.
+> >>>>>>>>>> max_indirection_table_length may grow for systems with 128+ CP=
+Us, or
+> >>>>>>>>>> types may have other bits for new protocols in the future.
+> >>>>>>>>>>
+> >>>>>>>>>>>
+> >>>>>>>>>>>>               case TUNSETSTEERINGEBPF:
+> >>>>>>>>>>>> -               ret =3D tun_set_ebpf(tun, &tun->steering_pro=
+g, argp);
+> >>>>>>>>>>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering=
+_prog, argp);
+> >>>>>>>>>>>> +               if (IS_ERR(bpf_ret))
+> >>>>>>>>>>>> +                       ret =3D PTR_ERR(bpf_ret);
+> >>>>>>>>>>>> +               else if (bpf_ret)
+> >>>>>>>>>>>> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_=
+HASH_RSS;
+> >>>>>>>>>>>
+> >>>>>>>>>>> Don't make one feature disable another.
+> >>>>>>>>>>>
+> >>>>>>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+> >>>>>>>>>>> functions. If one is enabled the other call should fail, with=
+ EBUSY
+> >>>>>>>>>>> for instance.
+> >>>>>>>>>>>
+> >>>>>>>>>>>> +       case TUNSETVNETHASH:
+> >>>>>>>>>>>> +               len =3D sizeof(vnet_hash);
+> >>>>>>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT=
+) &&
+> >>>>>>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virti=
+o_net_hdr_v1_hash) ||
+> >>>>>>>>>>>> +                     !tun_is_little_endian(tun))) ||
+> >>>>>>>>>>>> +                    vnet_hash.indirection_table_mask >=3D
+> >>>>>>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LEN=
+GTH) {
+> >>>>>>>>>>>> +                       ret =3D -EINVAL;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>>>>>> +               len =3D (vnet_hash.indirection_table_mask + =
+1) * 2;
+> >>>>>>>>>>>> +               if (copy_from_user(vnet_hash_indirection_tab=
+le, argp, len)) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>>>>>> +               len =3D virtio_net_hash_key_length(vnet_hash=
+.types);
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)=
+) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>
+> >>>>>>>>>>> Probably easier and less error-prone to define a fixed size c=
+ontrol
+> >>>>>>>>>>> struct with the max indirection table size.
+> >>>>>>>>>>
+> >>>>>>>>>> I made its size variable because the indirection table and key=
+ may grow
+> >>>>>>>>>> in the future as I wrote above.
+> >>>>>>>>>>
+> >>>>>>>>>>>
+> >>>>>>>>>>> Btw: please trim the CC: list considerably on future patches.
+> >>>>>>>>>>
+> >>>>>>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF cha=
+nge you
+> >>>>>>>>>> proposed.
+> >>>>>>>>>
+> >>>>>>>>> To be clear: please don't just resubmit with that one change.
+> >>>>>>>>>
+> >>>>>>>>> The skb and cb issues are quite fundamental issues that need to=
+ be resolved.
+> >>>>>>>>>
+> >>>>>>>>> I'd like to understand why adjusting the existing BPF feature f=
+or this
+> >>>>>>>>> exact purpose cannot be amended to return the key it produced.
+> >>>>>>>>
+> >>>>>>>> eBPF steering program is not designed for this particular proble=
+m in my
+> >>>>>>>> understanding. It was introduced to derive hash values with an
+> >>>>>>>> understanding of application-specific semantics of packets inste=
+ad of
+> >>>>>>>> generic IP/TCP/UDP semantics.
+> >>>>>>>>
+> >>>>>>>> This problem is rather different in terms that the hash derivati=
+on is
+> >>>>>>>> strictly defined by virtio-net. I don't think it makes sense to
+> >>>>>>>> introduce the complexity of BPF when you always run the same cod=
+e.
+> >>>>>>>>
+> >>>>>>>> It can utilize the existing flow dissector and also make it easi=
+er to
+> >>>>>>>> use for the userspace by implementing this in the kernel.
+> >>>>>>>
+> >>>>>>> Ok. There does appear to be overlap in functionality. But it migh=
+t be
+> >>>>>>> easier to deploy to just have standard Toeplitz available without
+> >>>>>>> having to compile and load an eBPF program.
+> >>>>>>>
+> >>>>>>> As for the sk_buff and cb[] changes. The first is really not need=
+ed.
+> >>>>>>> sk_buff simply would not scale if every edge case needs a few bit=
+s.
+> >>>>>>
+> >>>>>> An alternative is to move the bit to cb[] and clear it for every c=
+ode
+> >>>>>> paths that lead to ndo_start_xmit(), but I'm worried that it is er=
+ror-prone.
+> >>>>>>
+> >>>>>> I think we can put the bit in sk_buff for now. We can implement th=
+e
+> >>>>>> alternative when we are short of bits.
+> >>>>>
+> >>>>> I disagree. sk_buff fields add a cost to every code path. They cann=
+ot
+> >>>>> be added for every edge case.
+> >>>>
+> >>>> It only takes an unused bit and does not grow the sk_buff size so I
+> >>>> think it has practically no cost for now.
+> >>>
+> >>> The problem is that that thinking leads to death by a thousand cuts.
+> >>>
+> >>> "for now" forces the cost of having to think hard how to avoid growin=
+g
+> >>> sk_buff onto the next person. Let's do it right from the start.
+> >>
+> >> I see. I described an alternative to move the bit to cb[] and clear it
+> >> in all code paths that leads to ndo_start_xmit() earlier. Does that
+> >> sound good to you?
+> >
+> > If you use the control block to pass information between
+> > __dev_queue_xmit on the tun device and tun_net_xmit, using gso_skb_cb,
+> > the field can be left undefined in all non-tun paths. tun_select_queue
+> > can initialize.
+>
+> The problem is that tun_select_queue() is not always called.
+> netdev_core_pick_tx() ensures dev->real_num_tx_queues !=3D 1 before
+> calling it, but this variable may change later and result in a race
+> condition. Another case is that XDP with predefined queue.
+>
+> >
+> > I would still use skb->hash to encode the hash. That hash type of that
+> > field is not strictly defined. It can be siphash from ___skb_get_hash
+> > or a device hash, which most likely also uses Toeplitz. Then you also
+> > don't run into the problem of growing the struct size.
+>
+> I'm concerned exactly because it's not strictly defined. Someone may
+> decide to overwrite it later if we are not cautious enough. qdisc_skb_cb
+> also has sufficient space to contain both of the hash value and type.
 
-Add CPUID_HT here seems not correct fix. The root cause is that CPUID_HT 
-is wrongly treated as auto_enabled bit, I will sent a fix separately.
+How about using skb extensions?
 
-> Regards,
-> -Tina
-> 
+Thanks
+
+>
 
