@@ -2,117 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE06A7C00D5
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 17:54:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2F317C00B4
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 17:50:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233403AbjJJPyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 11:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35320 "EHLO
+        id S231982AbjJJPuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 11:50:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233493AbjJJPyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 11:54:06 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F734C4;
-        Tue, 10 Oct 2023 08:54:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LejsAsj6o9ZHDo8jfCj6qsNsEs7MFhgXxjzuIoecEystm/Dg/949QOFa88x4ktyytuoYRq9fyaYIDVlEs1kS43tNUUVotT1GAuLGlWsjFDAfksFiaEoDSFRTHUD6EOO/BhPlv5Mbs4qzCAHcYa3g2jod0BKg4KwOymE4C5KWHZ/1//wqPlS1cNIJ9hrABI2LlKSTliaJUin/fxMa98MRyYi7Jjsj98rgpnvVXw8wPBFWKhAVn//h4VFrRA3JYNPugMcioNGig/DqICmteb61HhWjMMDxjM8FSO8viMq5y2RKaE+TsO0nt125CwFIKnkJ5CesMT6J2xZaGIL/CA6gwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5TTXujzc9zemR/3x1uNnar+O/J4HlYfdAybj+vQAwrE=;
- b=AOjGg60n9rb1+0dsI5VyX9Sbv92E0fdAe31GRjvjkEjJU7sBUwd4ovJ85XR1wIzz0PcogN+UiM1HdMf3YiQqFcIBSxv9FtgpMvl5Tz9Mo5P1wsO3Z9Y2lij4rmPp9VeKkiW16Bes1/WPp9sc7r0E19eAW13N9jwylXrfgkH227Nb1e1XCPKZPUCMe66cXJ3UjYyyG3M89bChNGIW3Pm4o4ALmBbd0OBRUy4SrbgARFsoZNL9JLG6oikjkbkIMxPPOdlnPTpoEaCUWgIHcqavO+aTAZdWsGWn5B/nICQ190jTzAkO4fnMlcV18R0HvQGmMbgwNKHpSseJeRlYs1WYmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=memverge.com; dmarc=pass action=none header.from=memverge.com;
- dkim=pass header.d=memverge.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=memverge.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5TTXujzc9zemR/3x1uNnar+O/J4HlYfdAybj+vQAwrE=;
- b=VmSt4+W+lsB90Bl4KfzRrCVFhM1taTzeCa0RJxInqFatvtqdi510ECYe99gANPJmfnTBED4cY8obAHusdNur+66fs0FO6FcSJEiszsatM9lQjI8JM6dW+OUI763wM85+9KB8YcKw/KwdeZlbrHa+hbthqW01joTeKD8H5cUJyrM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=memverge.com;
-Received: from SJ0PR17MB5512.namprd17.prod.outlook.com (2603:10b6:a03:394::19)
- by PH0PR17MB4504.namprd17.prod.outlook.com (2603:10b6:510:c::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Tue, 10 Oct
- 2023 15:54:01 +0000
-Received: from SJ0PR17MB5512.namprd17.prod.outlook.com
- ([fe80::bdfd:7c88:7f47:2ecd]) by SJ0PR17MB5512.namprd17.prod.outlook.com
- ([fe80::bdfd:7c88:7f47:2ecd%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 15:54:00 +0000
-Date:   Sun, 8 Oct 2023 09:29:09 -0400
-From:   Gregory Price <gregory.price@memverge.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     Davidlohr Bueso <dave@stgolabs.net>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-cxl@vger.kernel.org
-Subject: Re: Accessing emulated CXL memory is unstable
-Message-ID: <ZSKupRw+mRrASUaY@memverge.com>
-References: <CAB=+i9S4NSJ7iNvqguWKvFvo=cMQC21KeNETsqmJoEpj+iDmig@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAB=+i9S4NSJ7iNvqguWKvFvo=cMQC21KeNETsqmJoEpj+iDmig@mail.gmail.com>
-X-ClientProxiedBy: BYAPR07CA0061.namprd07.prod.outlook.com
- (2603:10b6:a03:60::38) To SJ0PR17MB5512.namprd17.prod.outlook.com
- (2603:10b6:a03:394::19)
+        with ESMTP id S231865AbjJJPuP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 11:50:15 -0400
+X-Greylist: delayed 13152 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 08:50:11 PDT
+Received: from 7.mo581.mail-out.ovh.net (7.mo581.mail-out.ovh.net [46.105.43.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F4EA7
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:50:11 -0700 (PDT)
+Received: from director11.ghost.mail-out.ovh.net (unknown [10.108.4.132])
+        by mo581.mail-out.ovh.net (Postfix) with ESMTP id 2FAF928723
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 12:01:58 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-x96xs (unknown [10.111.172.101])
+        by director11.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 71EFA1FEDD;
+        Tue, 10 Oct 2023 12:01:57 +0000 (UTC)
+Received: from RCM-web10.webmail.mail.ovh.net ([151.80.29.18])
+        by ghost-submission-6684bf9d7b-x96xs with ESMTPSA
+        id PiQoGDU9JWXNqgAAoY8iwA
+        (envelope-from <jose.pekkarinen@foxhound.fi>); Tue, 10 Oct 2023 12:01:57 +0000
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR17MB5512:EE_|PH0PR17MB4504:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0719a92e-7e08-485d-88c5-08dbc9a91ed1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +X8IQYixt8+9wwe6GTn3NfiuUQyr/fcvBljf+7DoVwW1ed86jbiaIyik9s/e5ygaioIpdWw/UecxEtrqFT3psffb2Cc75RGYT3nKiMmDg0YRu945AHmvEX0ut3/FPFyyqUR5H511RddN5AcTO+4q69duDQQfY8YpCMbUFpMS6zDUvjKnItNX4zMA3cnUwsprhNFKMy2xhg4deKxtws5Z4ep5BdsbtP+gICCm85nGqqoJHkfiNow2lSS9uz3nUnfY9vatJVfBVQbnOeQ9mdgJ5oyCZ8wujqESkbjUrQfN8Fri49pOhRd1em2OX6b1J+hBUteNXIWB7IXTbzPcY/pkXbg5FIBWFqy7elcB5bHoU2cNBrbtpI6LgRMfMxRtC2NrefPEzANglmVgHGb4m8lPWDpcV8G+30Q/HDoK9+b1wzS2l99TWfbMYd+rc0hvqDAm2RepwNkPMSCqZyGZcvBpgmCPvfq6zwHBJx11KMO4iPLKg58e85BhzE7XWvYN8iQhCO9B6WoCIiZxwZWUMlXNVkrRBQfbEUFXPyjHYwgheY6+kVmKf0I6tYeq+4G8mVCmW9nrB4ogBeCS8X7NzN5PJcWyyGFbdtcbLJW70/jqM+c=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR17MB5512.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(376002)(366004)(39850400004)(136003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(5660300002)(26005)(2616005)(8676002)(8936002)(6512007)(2906002)(478600001)(7416002)(6506007)(44832011)(4326008)(54906003)(66946007)(66556008)(66476007)(41300700001)(6486002)(316002)(6916009)(38100700002)(86362001)(36756003)(83380400001)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OBLfIZaajJ73KNkbNj/yVhIbRMsem4wKo2ioxF7itgGv5hpzTxIl5CpUqeik?=
- =?us-ascii?Q?UFJAPGQiw4xOdTRGCJvozM3Z3ZMW1rvb7qSMmr0OorzxhFkUeE5bHnSzlerM?=
- =?us-ascii?Q?w9pESxBVTGrJjid/oaK5M7vQk/Ri/Tdnx8QOqQDv6J2lHGNnDVsvdU0FsdTT?=
- =?us-ascii?Q?rNwAMKv6+6ft+98aBRe23mnDhC/v60ghxm1GJ229cWAVu/Xg25tVaqIy2BEp?=
- =?us-ascii?Q?UWqqi9wHsrhb8S9rv4c3g5pwxegLubbvdCm4cFuZ3Ria6rKBPHtL8yMcphu9?=
- =?us-ascii?Q?hEhcI9uDR8TDfvpQGvwTcSf61QI+kOsoacNNmYb0EPs0IYCDdIHJwivtLKbc?=
- =?us-ascii?Q?a9aT89bFgeMzbUbq7OWymonbZnAGM+ZowK67yP1oYBiTRsJ/Ed64It3cFJNZ?=
- =?us-ascii?Q?wFV6g8JE3xhZgoG1pKHs6sXwvsLm97azzgrt+Vckoo3kY8uCmCAKspfNYzOg?=
- =?us-ascii?Q?Kc4GXC8Vzc+LfNFxShDbYBj8aJO7I2softtPoUKno93QS5y5dz19U9N+klJQ?=
- =?us-ascii?Q?UhvMaeoN01/IVtRylf4Fn08Ti8X/6FQL/w3NROXkWuEGnqQprr4D+EFNT2Mj?=
- =?us-ascii?Q?OlIixV7hOqnJbSa5eCTtz1pZgBua36K2nuSTQ/pBlcAeXd1ymjTq+OSZAswG?=
- =?us-ascii?Q?uBKxx1+fiPV5dQjF8RKFIPSUgs1sraqk2p4nSjJ4UZduVUwJWfOqHnN1j2y9?=
- =?us-ascii?Q?OwjrELE8robQXmoY9qiFSepkQ/lTBbnG8Tx+bWokcS8lY3COuBK9VPJdbQjs?=
- =?us-ascii?Q?4A86bSAJzeSKnvAvkl2CTTMjXe0S6qXzn2EvTjflcjfM76IYgVDd8eGtocIW?=
- =?us-ascii?Q?C93kSjRqpglpHxCAtoifJib2XowAUzRvy5CXX13E/rvi+viLkr+5PdIKPefv?=
- =?us-ascii?Q?bKHuAlK5jjT8OBvSZRe4xteP9/KIYc5MH1sq6SjQyXTtUbA8ZYLN/VdajSd8?=
- =?us-ascii?Q?JXEbHEDG8f9pMQlWe9Fk8cnJKlXa05jqI1UuuzNESASPcs9GloM6pzopDZpd?=
- =?us-ascii?Q?qe2ht/ja3AGqs3tUdA7lBkr7jTguECNEEp4mNJtVT8N+nWFlJtnKExijakz7?=
- =?us-ascii?Q?0rccXnhdDk8xSKR3XqGEbWPq8HGEdem0rZfNTrWraNyT/dAkogciOQgTEkXX?=
- =?us-ascii?Q?fj+iZHC0xfKFuY+bx9obvVBjcBB6G5zxvIesPGL+X66D/7MDwQ31gfwZfO5B?=
- =?us-ascii?Q?TYNE85sMiSrIxV1GdGxUMtie7l9J5fPTXsn5ZsV3tAiSM8s6tlMROMQlIpdS?=
- =?us-ascii?Q?eIpRJo3bGhMLW0jAR9avSm1ETZ+mCUsf9Qm2WIzshiEyDkZiIVbLrmrtjBtB?=
- =?us-ascii?Q?zz0Q11O88V7H0vi4jn9xyD75ObiP5uxnTFhT9OebIyjKKpx621uVZeb/5Eeq?=
- =?us-ascii?Q?Qu8uRtB/EN4Nk4ls1+iQ8caoRceGvHiAIjq19DgjJlwbfU7Qg2vH8Tcu2oWg?=
- =?us-ascii?Q?6fNn8D/5A7j+qFuigtHofF1U0c3nwAW4DhJDDkGktEwrxOj6aERfYUZMB/3r?=
- =?us-ascii?Q?r7mjqoHG6+IevLEvmSpqOXp6J6LfA53nN1D1eG0VSQDI1FABIrH2UjDhP1wW?=
- =?us-ascii?Q?PwfUwyaBarNTMLHaIaypAWxY25gEliYTvMH7K5rb44J0ZBtnQi4fcItdYdCB?=
- =?us-ascii?Q?8A=3D=3D?=
-X-OriginatorOrg: memverge.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0719a92e-7e08-485d-88c5-08dbc9a91ed1
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR17MB5512.namprd17.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 15:54:00.8165
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 5c90cb59-37e7-4c81-9c07-00473d5fb682
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o8yyRF0Uq5oESQVWrwNAu+lorbRHWC7VDsKzxgGsoGkwfEmfX5Xdv/kVaUQ2OVpQrHlBj13fZC9yiTRYNzLi3AxNn23zFXGD4xeYusan+lQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR17MB4504
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+Date:   Tue, 10 Oct 2023 15:01:56 +0300
+From:   =?UTF-8?Q?Jos=C3=A9_Pekkarinen?= <jose.pekkarinen@foxhound.fi>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     seanjc@google.com, pbonzini@redhat.com, skhan@linuxfoundation.org,
+        dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com, bp@alien8.de,
+        hpa@zytor.com, tglx@linutronix.de,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH] kvm/sev: make SEV/SEV-ES asids configurable
+In-Reply-To: <2023101050-scuff-overstay-9b43@gregkh>
+References: <20231010100441.30950-1-jose.pekkarinen@foxhound.fi>
+ <2023101050-scuff-overstay-9b43@gregkh>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <f4713760f799766717b5a4128e63e135@foxhound.fi>
+X-Sender: jose.pekkarinen@foxhound.fi
+Organization: Foxhound Ltd.
+X-Originating-IP: 185.233.100.23
+X-Webmail-UserID: jose.pekkarinen@foxhound.fi
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 4410712886810617510
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrheehgdegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeggfffhvfevufgjfhgfkfigohhitgfgsehtkehjtddtreejnecuhfhrohhmpeflohhsrocurfgvkhhkrghrihhnvghnuceojhhoshgvrdhpvghkkhgrrhhinhgvnhesfhhogihhohhunhgurdhfiheqnecuggftrfgrthhtvghrnhepkefhgeduudefgedvleegtddvffeghedvtdekveekjeevvdegiedtfeelhedtiedtnecukfhppeduvdejrddtrddtrddupddukeehrddvfeefrddutddtrddvfedpudehuddrkedtrddvledrudeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeojhhoshgvrdhpvghkkhgrrhhinhgvnhesfhhogihhohhunhgurdhfiheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpoffvtefjohhsthepmhhoheekuddpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,
+        RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -120,37 +61,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 10:35:03AM +0900, Hyeonggon Yoo wrote:
-> Hello folks,
+On 2023-10-10 14:35, Greg KH wrote:
+> On Tue, Oct 10, 2023 at 01:04:39PM +0300, José Pekkarinen wrote:
+>> There are bioses that doesn't allow to configure the
+>> number of asids allocated for SEV/SEV-ES, for those
+>> cases, the default behaviour allocates all the asids
+>> for SEV, leaving no room for SEV-ES to have some fun.
 > 
-> I experienced strange application crashes/internal KVM errors
-> while playing with emulated type 3 CXL memory. I would like to know
-> if this is a real issue or I missed something during setup.
+> "fun"?
 > 
-> TL;DR: applications crash when accessing emulated CXL memory,
-> and stressing VM subsystem causes KVM internal error
-> (stressing via stress-ng --bigheap)
->
-...
-> 
-> Hmm... it crashed, and it's 'invalid opcode'.
-> Is this because the fetched instruction is different from what's
-> written to memory during exec()?
+> Also, please use the full 72 columns for your changelog.
 > 
 
-This is a known issue, and the working theory is 2 issues:
+     Alright.
 
-1) CXL devices are implemented on top of an MMIO-style dispatch system
-   and as a result memory from CXL is non-cacheable.  We think there
-   may be an issue with this in KVM but it hasn't been investigated
-   fully.
+>> If the user request SEV-ES to be enabled, it will
+>> find the kernel just run out of resources and ignored
+>> user request. This following patch will address this
+>> issue by making the number of asids for SEV/SEV-ES
+>> configurable over kernel module parameters.
+>> 
+>> Signed-off-by: José Pekkarinen <jose.pekkarinen@foxhound.fi>
+>> ---
+>>  arch/x86/kvm/svm/sev.c | 28 +++++++++++++++++++++++-----
+>>  1 file changed, 23 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 07756b7348ae..68a63b42d16a 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -51,9 +51,18 @@
+>>  static bool sev_enabled = true;
+>>  module_param_named(sev, sev_enabled, bool, 0444);
+>> 
+>> +/* nr of asids requested for SEV */
+>> +static unsigned int requested_sev_asids;
+>> +module_param_named(sev_asids, requested_sev_asids, uint, 0444);
+>> +
+>>  /* enable/disable SEV-ES support */
+>>  static bool sev_es_enabled = true;
+>>  module_param_named(sev_es, sev_es_enabled, bool, 0444);
+>> +
+>> +/* nr of asids requested for SEV-ES */
+>> +static unsigned int requested_sev_es_asids;
+>> +module_param_named(sev_es_asids, requested_sev_asids, uint, 0444);
+> 
+> Why more module parameters?  Why can't this "just work" properly 
+> without
+> forcing a user to make manual changes?  This isn't the 1990's anymore.
 
-2) When we originally got CXL memory support, we discovered an edge case
-   where code pages hosted on CXL memory would cause a crash whenever an
-   instruction spanned across a page barrier.  A similar issue could
-   affect KVM.
+     I could think of setting both cgroup caps to the maximum
+number of asids and then check the code in the module to make
+sure anytime a sev/sev_es asid is reserved both cgroups get
+updated to reflect the remaining asids, or even better, just
+use only one cgroup to keep track of them. That way the parameters
+become redundant, would any of these ideas work for you? Do you,
+or anybody else, have better ideas or preferences in this topic?
 
-We haven't done much research into the problem beyond this.  For now, we
-all just turn KVM off while we continue development.
+>> +
+>>  #else
+>>  #define sev_enabled false
+>>  #define sev_es_enabled false
+>> @@ -2194,6 +2203,11 @@ void __init sev_hardware_setup(void)
+>>  	if (!max_sev_asid)
+>>  		goto out;
+>> 
+>> +	if (requested_sev_asids + requested_sev_es_asids > max_sev_asid) {
+>> +		pr_info("SEV asids requested more than available: %u ASIDs\n", 
+>> max_sev_asid);
+> 
+> Why isn't this an error?
 
-~Gregory
+     Good question, I'll address it in v2.
+
+     Thanks!
+
+     José.
