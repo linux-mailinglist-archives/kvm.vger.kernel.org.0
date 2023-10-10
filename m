@@ -2,153 +2,308 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FF8F7BF0F5
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 04:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3D7C7BF162
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 05:24:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1441916AbjJJCed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Oct 2023 22:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47526 "EHLO
+        id S1442003AbjJJDY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Oct 2023 23:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1441907AbjJJCec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Oct 2023 22:34:32 -0400
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901B1A6
-        for <kvm@vger.kernel.org>; Mon,  9 Oct 2023 19:34:30 -0700 (PDT)
-Received: by mail-oo1-xc29.google.com with SMTP id 006d021491bc7-57bab4e9e1aso3133753eaf.3
-        for <kvm@vger.kernel.org>; Mon, 09 Oct 2023 19:34:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696905270; x=1697510070; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7eyfqJMsAjtR1XTGi5WJSGOZUAbzaEU+L92vGk2MLy8=;
-        b=NZN06aM8AUnsmgvJQy26qFdVqSoD8fJY8Br3ri6MwG0TFBK4RaJ8f9zJNIMDYg31f9
-         zzHJ79Vv+t/GJV/ugm1QMkEVM7IhIzFUxyehxXhZ0TTd5//BbWYnOTMZFmZMqDQW1cRw
-         gbxnxYB4JSffzoLXfc0W3cRNpWF39RgUnHF1kE4dDqhBjT2ID/maRi/5q5Vt50aKntzF
-         +9j8pM5GWUocuTI1tWAPHXiZNoc1XmkOVEYxDepj3ccdg9yuueFXN2VZJ+OvV9VqzLJZ
-         YUQblGXS9L1voCUoueZEKCSQlly/oEpDJybiSKNecq1tBKqubaKnLR2CTYHC4eZBX1OM
-         MkNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696905270; x=1697510070;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eyfqJMsAjtR1XTGi5WJSGOZUAbzaEU+L92vGk2MLy8=;
-        b=uWuQEj92kx6oAKHG81viW15cksM4PFcv8kBRBCmPo+a42OZC1EqGfFVK6KzlO1zbKe
-         Yh7irnihJ7LJ8MAKJp/Ldd1deSoPunkk5+qVPzFYSIzbPIFBkViOdtN92ArWgiCSYzXx
-         rB2kPl+rS6+a4NoO6vrMqZm21zefYXqtIY4pbQNOs23b1QdiRcSnvGmZ/cE5oNztqB/J
-         V4jFGkyW6NjOSNydlbbXruCF2nNR35KQ4/h+LzFRbufsYkQ6MSnrMJRoO26Mv/zSHbiP
-         j5I3es09iTfaVllom6bBh5dRhcamtdbcBehonHVWbTiEj+zDr4m0mjQtjC21Hr+u4n1u
-         SAsA==
-X-Gm-Message-State: AOJu0YyBOKxSLwXdImMSkerMayJ/MXULVLubvg2A5LDqEyjoly8GdHAN
-        ArxvUxgleb8elTC3bcj6wU82DQ==
-X-Google-Smtp-Source: AGHT+IELXt5RxDd99HhYrJ2ArNSDl8Q/Eg48hdKp68VYC8fzBqBQqbw7nJq8UjoTvhZf2i/opBAQ0A==
-X-Received: by 2002:a05:6358:8812:b0:139:cb15:ecd3 with SMTP id hv18-20020a056358881200b00139cb15ecd3mr16915710rwb.8.1696905269713;
-        Mon, 09 Oct 2023 19:34:29 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id fa9-20020a17090af0c900b0027360359b70sm11068223pjb.48.2023.10.09.19.34.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 19:34:29 -0700 (PDT)
-Message-ID: <14ae9e85-38da-4665-8aea-3ce93e280de2@daynix.com>
-Date:   Tue, 10 Oct 2023 11:34:21 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+        with ESMTP id S1441995AbjJJDYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Oct 2023 23:24:25 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109A8CF;
+        Mon,  9 Oct 2023 20:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696908262; x=1728444262;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/ZyTRtEBcZL9Y+8+G6h3FpsBxdhtGk9ASAEH1AMNBOU=;
+  b=m7D5/lAtqc8zLi28ZpHd7TThVS/18tTd9Ol1wazjGDsNNyFFWwKFSQ14
+   DqibzJfnjPenIJ5uqq8s2/mjFgiML+bJdHtXJRdNXOT0nm4o7gmD7g9bC
+   nURXDB/+Mu1YOCNkVDAtbOvMQMAVWJ/BZlFk2m7MVMzrsDmtO+buvhuKk
+   8fsumgGZ5PoD2V+bifjqzcNMBAqXxkCrJEQ3daJmrdGtITEjm01GuvPcC
+   cd7Axm/IpHjQZ2snOxrTmrTT7OttR2/91M7pTGLxvKKse+fCBd7NnSD5j
+   K62iC3zOdbzm33mPdu0w/Yte6oXzEC9CnG5ARg4Mkja3Z7Y2aDQAzXsa3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="5856967"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="5856967"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 20:24:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="877060380"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="877060380"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Oct 2023 20:24:21 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 9 Oct 2023 20:24:20 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 9 Oct 2023 20:24:20 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 9 Oct 2023 20:24:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bSaglG9AO/dVzUAOJkWaXkQV1aw3k5hx0OW0Uq2LOzb1XlCyam2jZh4+NlxvLHwgLVnbiM63/n/CE5Pp08xnG3ixiXAYsJk/k9a+MIjZJzlY1DPzr3nJgNTICDSh444SZr9OfGfW16patnFvT/F4hyLSaKOGwrJwTbhxMNSrLamFbcjyhYF0cDaUZrPRO6yq4bUAWAQqDYgQX/p5Znv7VY8EL1ll1yr4il7kq7VzNImg5behzOQfZpvXXrsdgVHqmFxOURZ7GOLmL1dR95FiQtBiJ39YBHnbh5lCRF+/IGMwQZFAH93OKuWkbLOh58Cu2niCKmLFys7dLNSB4QqOew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0/dUtY7Y6mbppVawRZE362CC3xz3pq5J8VoUG2iYOns=;
+ b=XCE+nt7lmf4Tu02bgo+/zSWlPVLQQnUOIj3ekPQOvMsDoLuk2CTG1ucYJ6T26cz33fhu4wu7/CxPgjcnPerB42en9G4CarRVmg4Urr4SdNjn+ywHsEjcbYqw4+b58vp42Peck4tUePzhe8D/1ieNz6wtM/7bs7VRHc0UqFiAr1YgUFxuVqZHN5khhose9VBiEXaoK3hV2rDOCrWxsgzVUVajUofQ8vVjJdLnaLlpXIElbE4j6J5oUp1DJvMfxpd4s9XuvM5ZBtTuwmRMtIWkI6Tk5vFRJolcYPFwc2UseAVJrgK6mtGO1r5BZEtVIHAcEgLEbw+l57RsTxprWDgjKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CY5PR11MB6236.namprd11.prod.outlook.com (2603:10b6:930:23::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Tue, 10 Oct
+ 2023 03:24:18 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::f8f4:bed2:b2f8:cb6b]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::f8f4:bed2:b2f8:cb6b%3]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
+ 03:24:18 +0000
+Message-ID: <1b27b31a-3eaa-0acc-b9ae-756605170220@intel.com>
+Date:   Tue, 10 Oct 2023 11:26:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [PATCH v4 03/17] iommufd: Unite all kernel-managed members into a
+ struct
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-        davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
-        songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
-        kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
-        gustavoars@kernel.org, herbert@gondor.apana.org.au,
-        steffen.klassert@secunet.com, nogikh@google.com,
-        pablo@netfilter.org, decui@microsoft.com, cai@lca.pw,
-        jakub@cloudflare.com, elver@google.com, pabeni@redhat.com,
-        Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com>
- <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
- <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
- <20231009074840-mutt-send-email-mst@kernel.org>
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20231009074840-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+To:     Yan Zhao <yan.y.zhao@intel.com>
+CC:     <joro@8bytes.org>, <alex.williamson@redhat.com>, <jgg@nvidia.com>,
+        <kevin.tian@intel.com>, <robin.murphy@arm.com>,
+        <baolu.lu@linux.intel.com>, <cohuck@redhat.com>,
+        <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>
+References: <20230921075138.124099-1-yi.l.liu@intel.com>
+ <20230921075138.124099-4-yi.l.liu@intel.com>
+ <ZSEuBcLaSq4NjoC8@yzhao56-desk.sh.intel.com>
+ <c299567a-5be8-f65f-d8ec-ffd3fa183b03@intel.com>
+ <ZSOMCXBzUMRujp89@yzhao56-desk.sh.intel.com>
+From:   Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <ZSOMCXBzUMRujp89@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: KL1PR01CA0115.apcprd01.prod.exchangelabs.com
+ (2603:1096:820:3::31) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CY5PR11MB6236:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7695727c-eb2b-4158-1f14-08dbc940634c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5ZYEM5s1ZGhy2bMVYofB3oHGbjPyfs2cz74wcDFKNUJRXidLGQ4ePDLeBUFq59IL/NjxUadBLhBjc6VVQDPB+PRJ1/yPyNMhlVvsgdtEkkj/oHoEpLyiU6AzyEXZONGsNV3cGO0Z9SHrVOR0je706NZBhR1esDoS/ekj1/DAj+5arFfhdZHc2aVrsJ9lUcpYW5ttmTwnJ/bIiRCfiEXuWcaqogF25PMFKY5ABIcaz+0hUnA1oAXX1OH7gk/xXYYYd96hbCnT6oPCLYDDwUlO/dz2vmsYDEZNfcN4UnI09NwGhB/KbYU17ErULN6QIidbSRVRrTiNt5wnHPOVTDSMq06jcoJxFa1pPqcOUNVUfahlIqCIB32RaadL/pQ3NvRGRSguDLNAruoUD5ELJz3HJNmOFg0BOl2t728nmNQC0oF6paHRhRcv6Decfu4L0zT/5hkVlk1IFo5kGAQy2T5aKB+JyLVQCZFzoDGVK/EWlG3cEUMx2QxuQE8MYqxzcuYj2UF/kpL8IehCrYOEllegQBCNB0IUGYZBr37jgADNDkQzcS7hm07WW8zvhdHBStU/2zPVOVWlEfkGshYmwG4Trb52zHqLD4m5z3P3kV314pDvZY645a96rkTOL/MDwpqcUcJSDU7R2TbNB3A3xJ2VnQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(396003)(376002)(39860400002)(136003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(26005)(2616005)(53546011)(6666004)(8676002)(6512007)(83380400001)(6862004)(7416002)(2906002)(6506007)(478600001)(4326008)(66946007)(66556008)(66476007)(6486002)(5660300002)(8936002)(316002)(37006003)(41300700001)(6636002)(38100700002)(82960400001)(31696002)(86362001)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NVZJUXNQOS8vVnRDMG1WTkp3OS9oYml2a3dCSDdXeG1rM2dNaU8wcFZJTWYz?=
+ =?utf-8?B?QUx4VXNWYk43Nk13QmRaei93ekpSSVFwZzdYeGZpTURqQmJvc24xRmdZV0lU?=
+ =?utf-8?B?NmdBUnRHSmVUaGJoaTZRSzZzVHNqaE96OFdyZlBPOCtreC9QWEF6K3RzZmha?=
+ =?utf-8?B?cmVjdjNxaHdEVVVMUXpLK0lOcHRuL0RWdThwZHNLMjE1SFBweWFOdGQ5UnRp?=
+ =?utf-8?B?QVVlVm9kcHJ3UzRxV2MzMDlKKy9zOGFYRUxYOHBRbTNLR1ZMOURqVnU2dDZy?=
+ =?utf-8?B?NVczeEo3TXViUjN3UWQxL3lIWitzcTFvVEVkZkZ4SUk1V1pXNWQrWmVIRUxz?=
+ =?utf-8?B?aHBzbm04L0dFQ1F6bnlrZk9WK29iTkcwR1Y4d1pKbHVUb3lVR3VuS1Azekc1?=
+ =?utf-8?B?TnZrenc2V0xwVHNjNllhOGtsRlpuekRnQnZ3aEFNOGlRNDJUVFBkWGRyV09h?=
+ =?utf-8?B?d3pPSnFsK3RCOHprVmhRVWNWenZocjhVL1pZdnE4eEdheVFVNnZoSGw2MTla?=
+ =?utf-8?B?MTBUWVVxTTJObm1YeDZCcnhVbFRCejd5cW9FN0ZKYnRZWDBVNVAzOHl1UnIx?=
+ =?utf-8?B?TEVjV0EwUTRYUGczZUdwTzRkeVp0bWF2SmxNWGp4Z09xMHQyTzc0TWdZR0VH?=
+ =?utf-8?B?dEVHbmxrK1FYL3Vzdnc3TWdvL0QvK2FvMitSUHJVWGdIa1VOSmg3MHhPbW9J?=
+ =?utf-8?B?QXZaMDZOYU9XNDllcWtqclRFaUp3RG44U3l2NzloOExTNDBnNlJYOWFOZjhj?=
+ =?utf-8?B?ZGdJTHR1d3V2cEVLekxqR0lhYllrbCtXeXhLMEdRSmF5aEgxeDhiaDZFRmVZ?=
+ =?utf-8?B?WnJ3TzlJaWtWWS9DbmN4WWRpdlRRd0NnWHhuSUh2YStPYW9BbjlVaHFZZHNY?=
+ =?utf-8?B?emlJL1UyQm1EaUtGQThHeW5zUVhrL0U0bXNsUm9Qa2FFVHN6aVpmTTBaMWtR?=
+ =?utf-8?B?MDROVXNtUmU3czQwbDRnRGo2eHl2WVlQMTdHWHFJSFlWRkdLMkhNNVQ5cjQv?=
+ =?utf-8?B?M1hkdmpwUktVODJBQVZ6alBlZUh0NitJMllsSHltanJZeWJ1K3l5SGJvMlUz?=
+ =?utf-8?B?TDI0VEN4WEFLTStVRnViNnR3dm0wYjdHUlI0UWFWRlVPZ3Fxc0U2OStWdWh3?=
+ =?utf-8?B?a3hINDdQRGlYS0tBY3p4YnYycWU0OTJOZFZOYXJWcVZjTFA4bXozNngweHJU?=
+ =?utf-8?B?WmYrUjN1RGI2bS80c3U2RDFLVXFlbUZPYmxGaitoOWFxNXlUeTdSbGdvU3Fp?=
+ =?utf-8?B?YXJ1ZVp0bWdUMmdWamluOVFWQmxlVGpxeGdDMFVGWUVzWTUxaTVsRlNMOE1p?=
+ =?utf-8?B?cFhBSlJrdXNHV0ZKeVY4VHhoUHVMZGVWbDYyZ3JWOGVuS0YvcEQ0ODlYeHVQ?=
+ =?utf-8?B?WWs0R0pnUlROb2ZvQWJPL0JtdFd4UndwRmUzYTYyWVdVd0VHQWg4dDh6VzRr?=
+ =?utf-8?B?R3hFbUVLVG5FWTliMnF1NkwwZlNRZzBlSmJoNlcwTHVSN1dRUGM4ME05ckU4?=
+ =?utf-8?B?eG1pcFBTdGRselFDN2c0UWJiNVlwTUpPQzFqOFNXbVBQVW82VVJKSUtCZmpy?=
+ =?utf-8?B?NGxlb3hqNVNFSk9URFNEVitiL0V0WFNjRXI3UkszRWdKbCswWlE3ZGM0UWRL?=
+ =?utf-8?B?SUx1TjNsaE1qazBTU0gyemlVVjJkVkk5WXlTU1RZRVFqbTU4cUJ3TEVlUUtP?=
+ =?utf-8?B?cStUY2pzai9TdlZmak1pelp3MnFpVmNuWlBDUFVsRnl1eFQyTkpUUGlRRlhT?=
+ =?utf-8?B?U2RsMDZNTGMyTTRnNE9tQnJNOTl1enQ1MjArZml4enlTR3Q5UGcrbktmTGxi?=
+ =?utf-8?B?dyttM1JTSUtMdjdVUk0rZHdGck5DT0tyQUM4TldxTmlrUjc0eVZyQmJpSTE4?=
+ =?utf-8?B?OXRMTHFHT2x2NHRKU1VUVnN5SmNGbHhycGhsK2tNVVhiTmVaUzVXNHgzRlg1?=
+ =?utf-8?B?dFQ5YVl6NzVyQTd4Y2ZCMDlKcWtmTmpVTVUvZ05Bc0p0S0ZUd1VIQ2dBb0pa?=
+ =?utf-8?B?SWlBcGsxbllobU9tUEhPRUErSndIVFpIeU80SVVNSldkU1FkbGdCVDBPdmVa?=
+ =?utf-8?B?UFFUU2NITnY2M0tOZGRUTkdUM0pDR2k0SFBJallBdmVKeEpLNi9rRnBQMHpM?=
+ =?utf-8?Q?NSnDEYJhAzIsLJRHMxaS+S4XZ?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7695727c-eb2b-4158-1f14-08dbc940634c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 03:24:18.7637
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uq50BBWCLhpS/PsIAASEOY+8fcYxfdBBo+lFYOPINjYXwYGS2AOTbzNYvZk4xQwelt+RZAHdV4V1nKWAF3kGaQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6236
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/10/09 20:50, Michael S. Tsirkin wrote:
-> On Mon, Oct 09, 2023 at 05:44:20PM +0900, Akihiko Odaki wrote:
->> On 2023/10/09 17:13, Willem de Bruijn wrote:
->>> On Sun, Oct 8, 2023 at 12:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+On 2023/10/9 13:13, Yan Zhao wrote:
+> On Mon, Oct 09, 2023 at 12:13:52PM +0800, Yi Liu wrote:
+>> On 2023/10/7 18:08, Yan Zhao wrote:
+>>> On Thu, Sep 21, 2023 at 12:51:24AM -0700, Yi Liu wrote:
+>>>> From: Nicolin Chen <nicolinc@nvidia.com>
 >>>>
->>>> virtio-net have two usage of hashes: one is RSS and another is hash
->>>> reporting. Conventionally the hash calculation was done by the VMM.
->>>> However, computing the hash after the queue was chosen defeats the
->>>> purpose of RSS.
+>>>> The struct iommufd_hw_pagetable has been representing a kernel-managed
+>>>> HWPT, yet soon will be reused to represent a user-managed HWPT. These
+>>>> two types of HWPTs has the same IOMMUFD object type and an iommu_domain
+>>>> object, but have quite different attributes/members.
 >>>>
->>>> Another approach is to use eBPF steering program. This approach has
->>>> another downside: it cannot report the calculated hash due to the
->>>> restrictive nature of eBPF.
+>>>> Add a union in struct iommufd_hw_pagetable and group all the existing
+>>>> kernel-managed members. One of the following patches will add another
+>>>> struct for user-managed members.
 >>>>
->>>> Introduce the code to compute hashes to the kernel in order to overcome
->>>> thse challenges. An alternative solution is to extend the eBPF steering
->>>> program so that it will be able to report to the userspace, but it makes
->>>> little sense to allow to implement different hashing algorithms with
->>>> eBPF since the hash value reported by virtio-net is strictly defined by
->>>> the specification.
+>>>> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+>>>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>>>> ---
+>>>>    drivers/iommu/iommufd/iommufd_private.h | 17 +++++++++++------
+>>>>    1 file changed, 11 insertions(+), 6 deletions(-)
 >>>>
->>>> The hash value already stored in sk_buff is not used and computed
->>>> independently since it may have been computed in a way not conformant
->>>> with the specification.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>
->>>> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>           }
->>>>
->>>>           if (vnet_hdr_sz) {
->>>> -               struct virtio_net_hdr gso;
->>>> +               union {
->>>> +                       struct virtio_net_hdr hdr;
->>>> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
->>>> +               } hdr;
->>>> +               int ret;
->>>>
->>>>                   if (iov_iter_count(iter) < vnet_hdr_sz)
->>>>                           return -EINVAL;
->>>>
->>>> -               if (virtio_net_hdr_from_skb(skb, &gso,
->>>> -                                           tun_is_little_endian(tun), true,
->>>> -                                           vlan_hlen)) {
->>>> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_REPORT) &&
->>>> +                   vnet_hdr_sz >= sizeof(hdr.v1_hash_hdr) &&
->>>> +                   skb->tun_vnet_hash) {
->>>
->>> Isn't vnet_hdr_sz guaranteed to be >= hdr.v1_hash_hdr, by virtue of
->>> the set hash ioctl failing otherwise?
->>>
->>> Such checks should be limited to control path where possible
+>>>> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+>>>> index 3064997a0181..947a797536e3 100644
+>>>> --- a/drivers/iommu/iommufd/iommufd_private.h
+>>>> +++ b/drivers/iommu/iommufd/iommufd_private.h
+>>>> @@ -231,13 +231,18 @@ int iommufd_vfio_ioas(struct iommufd_ucmd *ucmd);
+>>>>     */
+>>>>    struct iommufd_hw_pagetable {
+>>>>    	struct iommufd_object obj;
+>>>> -	struct iommufd_ioas *ioas;
+>>>>    	struct iommu_domain *domain;
+>>>> -	bool auto_domain : 1;
+>>>> -	bool enforce_cache_coherency : 1;
+>>>> -	bool msi_cookie : 1;
+>>>> -	/* Head at iommufd_ioas::hwpt_list */
+>>>> -	struct list_head hwpt_item;
+>>>> +
+>>>> +	union {
+>>>> +		struct { /* kernel-managed */
+>>>> +			struct iommufd_ioas *ioas;
+>>>> +			bool auto_domain : 1;
+>>> Will iommufd_hw_pagetable_put() also be called on non-kernel-managed domain?
 >>
->> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz are not
->> read at once.
-> 
-> And then it's a complete mess and you get inconsistent
-> behaviour with packets getting sent all over the place, right?
-> So maybe keep a pointer to this struct so it can be
-> changed atomically then. Maybe even something with rcu I donnu.
+>> yes.
+>>
+>>> If yes, hwpt->user_managed needs to be checked in iommufd_hw_pagetable_put(),
+>>> (e.g. as below).
+>>> Otherwise, this union will lead to hwpt->ioas and hwpt->auto_domain still being
+>>> accessible though invalid.
+>>
+>> not quite get this sentence.
+> I mean with this union, hwpt->auto_domain or hwpt->ioas should only be accessed if and
+> only if hwpt type is kernel-managed.
 
-I think it's a good idea to use RCU for the vnet_hash members, but 
-vnet_hdr_sz is something not specific to vnet_hash so this check will be 
-still necessary.
+ok, I get this part. just not sure about the missing words in your prior 
+comment.
+
+> So, any unconditional access, as in iommufd_hw_pagetable_put() pasted below, is buggy.
+> 
+> Therefore, do you think it's better to add a filed like "bool kernel_managed : 1",
+> and access the union fields under  /* kernel-managed */ only when hwpt->kernel_managed
+> is true.
+> 
+> 
+>>
+>>>
+>>>    static inline void iommufd_hw_pagetable_put(struct iommufd_ctx *ictx,
+>>>                                               struct iommufd_hw_pagetable *hwpt)
+>>>    {
+>>> -       lockdep_assert_not_held(&hwpt->ioas->mutex);
+>>> -       if (hwpt->auto_domain)
+>>> +       if (!hwpt->user_managed)
+>>> +               lockdep_assert_not_held(&hwpt->ioas->mutex);
+>>
+>> this is true. this assert is not needed when hwpt is not kernel managed domain.
+>>
+>>> +
+>>> +       if (!hwpt->user_managed && hwpt->auto_domain)
+>>
+>> actually, checking auto_domain is more precise. There is hwpt which is
+>> neither user managed nor auto.
+> 
+> auto_domain is under union fields marked with kernel-managed only.
+> Access it without type checking is invalid.
+
+I see. yes, should check user_managed as well. :)
+
+> struct iommufd_hw_pagetable {
+>          struct iommufd_object obj;
+>          struct iommu_domain *domain;
+> 
+>          void (*abort)(struct iommufd_object *obj);
+>          void (*destroy)(struct iommufd_object *obj);
+> 
+>          bool user_managed : 1;
+>          union {
+>                  struct { /* user-managed */
+>                          struct iommufd_hw_pagetable *parent;
+>                  };
+>                  struct { /* kernel-managed */
+>                          struct iommufd_ioas *ioas;
+>                          struct mutex mutex;
+>                          bool auto_domain : 1;
+>                          bool enforce_cache_coherency : 1;
+>                          bool msi_cookie : 1;
+>                          bool nest_parent : 1;
+>                          /* Head at iommufd_ioas::hwpt_list */
+>                          struct list_head hwpt_item;
+>                  };
+>          };
+> };
+> 
+>>
+>>>                   iommufd_object_deref_user(ictx, &hwpt->obj);
+>>>           else
+>>>                   refcount_dec(&hwpt->obj.users);
+>>> }
+>>>
+>>>> +			bool enforce_cache_coherency : 1;
+>>>> +			bool msi_cookie : 1;
+>>>> +			/* Head at iommufd_ioas::hwpt_list */
+>>>> +			struct list_head hwpt_item;
+>>>> +		};
+>>>> +	};
+>>>>    };
+>>>>    struct iommufd_hw_pagetable *
+>>>> -- 
+>>>> 2.34.1
+>>>>
+>>
+>> -- 
+>> Regards,
+>> Yi Liu
+
+-- 
+Regards,
+Yi Liu
