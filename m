@@ -2,153 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E647BFACC
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 14:08:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 670F07BFAB6
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 14:04:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231502AbjJJMIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 08:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42174 "EHLO
+        id S231466AbjJJMEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 08:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231311AbjJJMIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 08:08:31 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6530794
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 05:08:28 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39ABJkrH017230
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 12:08:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=jy0+2CaQ51TBnN21+adfVttL2DGOgu/wxuRV9z0g55s=;
- b=ghHtUDkkgQd0UQS3fSjGGgthiFeX96CN8dOssd3TbBhy7wRhjNNcQ0WnTL/qYzfqHiUy
- vWI6kIZqpcvw0kEh0NZQzEGpt8GIKmiNnjr/ihHXvtilneIHSbbTWCMQ5IJRR7ngbZN5
- 3C12IeJzhlWC3CDA+1ik0v74+lJhMStxfkB/RKh9Yo4tgQTAogc3vU2mQ3zJc8/U04GF
- Qy9G/w4iW4jnLHSXJq0L5r2wVFSn0a64Dsbh68DBbUHzZgtd4b1djgbcuazuubyeo2eY
- MHeXzdgh5VoinSA4dAOo9MSgKermnrY/tFS6u+E7BGVO+NNqquNc5oqNSQFmUqOTSzPb hw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn53gjgb2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 12:08:27 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39ABtDdo017688
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 12:08:26 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn53gjg3f-6
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 12:08:26 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39A9kbNX023021;
-        Tue, 10 Oct 2023 11:44:09 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkmc1fh2a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 11:44:09 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39ABi6Fc22938290
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Oct 2023 11:44:06 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31CE420043;
-        Tue, 10 Oct 2023 11:44:06 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05B312004D;
-        Tue, 10 Oct 2023 11:44:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Oct 2023 11:44:05 +0000 (GMT)
-Date:   Tue, 10 Oct 2023 13:44:04 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        nsg@linux.ibm.com, nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 3/3] lib: s390x: sclp: Add line mode
- input handling
-Message-ID: <20231010134404.65a69d01@p-imbrenda>
-In-Reply-To: <8568bef1-e829-40f3-8815-c5ab1e9dc8ef@linux.ibm.com>
-References: <20231010073855.26319-1-frankja@linux.ibm.com>
-        <20231010073855.26319-4-frankja@linux.ibm.com>
-        <20231010123309.4dd54963@p-imbrenda>
-        <8568bef1-e829-40f3-8815-c5ab1e9dc8ef@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S231603AbjJJMEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 08:04:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E19E3
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 05:03:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696939396;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wm6tBfka2KOJVryx3LTaJuJ1+AZaKAQthasMuZ423zk=;
+        b=NVMib6VZl7DECb8cWyGnn9yHskQEzDNVB4pe6DtHFysCDFgT7b5HG4+KtpGVN2Wdk7l4w/
+        wwpZM307wcKbzUpDNYpmIrjQf1z+16pIUTx0G+f7qI8O/GpUSTO3orxzJ9xV+ThwTVpszY
+        8M5Qt4N+WxqP6H8R+LJbOwSUZNpqnEk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-599-JxjhHQizNR6W_fBFEXkX5A-1; Tue, 10 Oct 2023 08:03:15 -0400
+X-MC-Unique: JxjhHQizNR6W_fBFEXkX5A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40652e8cb57so39200755e9.0
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 05:03:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696939394; x=1697544194;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wm6tBfka2KOJVryx3LTaJuJ1+AZaKAQthasMuZ423zk=;
+        b=QsgwfBICmteOGYbsSzTVvz9izqrfShaqHwffoGjV23rzQWn9A5v6wZTAZDe0wb5ANt
+         +UW/P6d8Wqs1M+zYzX/KstcaKbjNDJ4Uo6fr3X9dma6kF7Kbk+vIw1UrMtW4TH4aV7SF
+         uE618JImuWgw2NrOyFYTCm3S7t1o5spTizPJPR/s5dH1xhM6jh11iTMXQKyBwfnZf3rh
+         d0kNtY9KvPSgVW9mox2Y3nZmh21nDAPf29GUUZojZSv/Kikr98oAm1/HmstE0oD/rU9C
+         E9F4D93h5KXCLGaIdSBPnFw5KAyimP5Wn43zRshrwhGBtUIKEGiTYQhvodGBo0/Zxloa
+         YmQA==
+X-Gm-Message-State: AOJu0YxFFiXAh5ldNola0BdNu3fzL8Tcpi0qRbSpfVbyUNpaHpFmrY/a
+        nHuypK/ZBvfxGbt8LiU1tqfUJIVoKXPXe5NgGYZAQqfz0G7tPpRw477jh5eZw/VuGjNgZgv7BJU
+        MneJNw0C1JssqWRkap1LX
+X-Received: by 2002:a7b:ca59:0:b0:406:5359:769f with SMTP id m25-20020a7bca59000000b004065359769fmr15594597wml.0.1696939393738;
+        Tue, 10 Oct 2023 05:03:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHKXVjL0stOS5u0o8lccGU+Zu9av1471E7Ii8gviqT0JII0RuV1vGlMLflT4+oqn2neLP/QHg==
+X-Received: by 2002:a7b:ca59:0:b0:406:5359:769f with SMTP id m25-20020a7bca59000000b004065359769fmr15594575wml.0.1696939393302;
+        Tue, 10 Oct 2023 05:03:13 -0700 (PDT)
+Received: from starship ([89.237.100.246])
+        by smtp.gmail.com with ESMTPSA id e24-20020a05600c219800b004013797efb6sm16222342wme.9.2023.10.10.05.03.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 05:03:12 -0700 (PDT)
+Message-ID: <e348e75dac85efce9186b6b10a6da1c6532a3378.camel@redhat.com>
+Subject: Re: [PATCH] KVM: SVM: Don't intercept IRET when injecting NMI and
+ vNMI is enabled
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>
+Date:   Tue, 10 Oct 2023 15:03:11 +0300
+In-Reply-To: <20231009212919.221810-1-seanjc@google.com>
+References: <20231009212919.221810-1-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sE58HRr1ldJeXvR63z8ZeKAvXzLBF5ku
-X-Proofpoint-GUID: fw_KBUoEHoHIJ--Sx3i6ab1wjSqejFOy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-10_07,2023-10-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- adultscore=0 impostorscore=0 bulkscore=0 clxscore=1015 malwarescore=0
- phishscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310100088
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Oct 2023 13:05:59 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+У пн, 2023-10-09 у 14:29 -0700, Sean Christopherson пише:
+> When vNMI is enabled, rely entirely on hardware to correctly handle NMI
+> blocking, i.e. don't intercept IRET to detect when NMIs are no longer
+> blocked.  KVM already correctly ignores svm->nmi_masked when vNMI is
+> enabled, so the effect of the bug is essentially an unnecessary VM-Exit.
 
-> On 10/10/23 12:33, Claudio Imbrenda wrote:
-> > On Tue, 10 Oct 2023 07:38:55 +0000
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >   
-> >> Time to add line-mode input so we can use input handling under LPAR if
-> >> there's no access to a ASCII console.
-> >>
-> >> Line-mode IO is pretty wild and the documentation could be improved a
-> >> lot. Hence I've copied the input parsing functions from Linux.
-> >>
-> >> For some reason output is a type 2 event but input is a type 1
-> >> event. This also means that the input and output structures are
-> >> different from each other.
-> >>
-> >> The input can consist of multiple structures which don't contain text
-> >> data before the input text data is reached. Hence we need a bunch of
-> >> search functions to retrieve a pointer to the text data.
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>   lib/s390x/sclp-console.c | 180 ++++++++++++++++++++++++++++++++++-----
-> >>   lib/s390x/sclp.h         |  26 +++++-
-> >>   2 files changed, 185 insertions(+), 21 deletions(-)
-> >>
-> >> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> >> index 313be1e4..23c09b70 100644
-> >> --- a/lib/s390x/sclp-console.c
-> >> +++ b/lib/s390x/sclp-console.c
-> >> @@ -1,8 +1,12 @@
-> >>   /* SPDX-License-Identifier: GPL-2.0-or-later */
-> >>   /*
-> >> - * SCLP ASCII access driver
-> >> + * SCLP line mode and ASCII console driver
-> >>    *
-> >>    * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
-> >> + *
-> >> + * Copyright IBM Corp. 1999
-> >> + * Author(s): Martin Peschke <mpeschke@de.ibm.com>
-> >> + *	      Martin Schwidefsky <schwidefsky@de.ibm.com>  
-> > 
-> > from the weird copyright notices that you are adding I deduce that you
-> > copied those functions from the kernel. maybe add a line in the patch
-> > description to say so? or at least explain better in the comment itself.  
-> 
-> You mean this line which is in the patch description?
-> "Hence I've copied the input parsing functions from Linux."
+I would re-phrase this like that:
 
-oufff, I'm blind sorry
+KVM intercepts IRET for two reasons:
+- To track NMI masking to be able to know at any point of time if NMI is masked.
+- To track NMI window (to inject another NMI after IRET finishes executing).
+
+When L1 uses vNMI, both cases are fulfilled by the vNMI hardware:
+- NMI masking state resides in V_NMI_BLOCKING bit of int_ctl and can be read by KVM
+  at will.
+- vNMI hardware injects the NMIs autonomically every time NMI is unblocked.
+
+Thus there is no need to intercept IRET while vNMI is active.
+
+However, even when vNMI is active in L1, the svm_inject_nmi() can still 
+be called to do a direct NMI injection to support the case when KVM is 
+trying to inject two NMIs simultaneously.
+
+In this case there is no need to enable IRET interception.
+
+Note that the effect of this bug is essentially an unnecessary VM-Exit.
+
+Also note that even when vNMI is supported and used, running a nested guest
+disables vNMI of the L1 guest, thus IRET will still be intercepted.
+In this case if the nested VM exit happens before the NMI is delivered,
+an unnecessary VM exit can still happen but this is even less likely.
 
 > 
-> But sure, I could add that after "SCLP line mode and ASCII console driver"
+> Note, per the APM, hardware sets the BLOCKING flag when software directly
+> directly injects an NMI:
+> 
+>   If Event Injection is used to inject an NMI when NMI Virtualization is
+>   enabled, VMRUN sets V_NMI_MASK in the guest state.
 
-yeah that would bring it in line with the rest of the other files which
-have been (partially) copied from the kernel
+I think that this comment is not needed in the commit message. It describes
+a different unrelated concern and can be put somewhere in the code but
+not in the commit message.
+
+> 
+> Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
+> Link: https://lore.kernel.org/all/ZOdnuDZUd4mevCqe@google.como
+> Cc: Santosh Shukla <santosh.shukla@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> Santosh, can you verify that I didn't break vNMI?  I don't have access to the
+> right hardware.  Thanks!
+> 
+>  arch/x86/kvm/svm/svm.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index b7472ad183b9..4f22d12b5d60 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3569,8 +3569,15 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+>  	if (svm->nmi_l1_to_l2)
+>  		return;
+>  
+> -	svm->nmi_masked = true;
+> -	svm_set_iret_intercept(svm);
+> +	/*
+> +	 * No need to manually track NMI masking when vNMI is enabled, hardware
+> +	 * automatically sets V_NMI_BLOCKING_MASK as appropriate, including the
+> +	 * case where software directly injects an NMI.
+> +	 */
+> +	if (!is_vnmi_enabled(svm)) {
+> +		svm->nmi_masked = true;
+> +		svm_set_iret_intercept(svm);
+> +	}
+>  	++vcpu->stat.nmi_injections;
+>  }
+>  
+> 
+> base-commit: 86701e115030e020a052216baa942e8547e0b487
+
+
+Note that while nested, the 'is_vnmi_enabled()' will return false because L1's vnmi is indeed disabled
+(I wonder if is_vnmi_enabled should be renamed is_l1_vnmi_enabled() to clarify this),
+
+So when nested VM exit happens, that intercept can still continue to be true, 
+which should not cause an issue but this is still something to keep in mind.
+
+Best regards,
+	Maxim Levitsky
+
