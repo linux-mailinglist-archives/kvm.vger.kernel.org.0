@@ -2,117 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15F7F7BFF85
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 16:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 088E17BFFCF
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 16:55:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232488AbjJJOq0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 10:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40076 "EHLO
+        id S233237AbjJJOzX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 10:55:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbjJJOqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 10:46:23 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6B9B6
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 07:46:21 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a22eb73cb3so101204197b3.3
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 07:46:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696949180; x=1697553980; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fMAV4Pzyhnv9LKuSwz3p65tBRhFFBxEMfLBcYd0Sf1k=;
-        b=nwanSktsrp/VbW655W3gmdjY4g+LOkt/MhdjOFLEzj5Fz/FTbY4Xttq6H2kbnxuZMB
-         YkSpAhRwGIxGkqZ68HpON+h1MKOeNWLikB8W4JggzrPmWmChEWzXw4OzSWmPQ1EBfQUu
-         qFFCp74TaNB4Cc0fzu/k1eupOM3XrvIJ2q/8HkVD2WxcYsIySz36p1Q4+K18r+6jLq49
-         4BCr5B4+g7DQInfYy7uIVfSL2rcLRJd3WUkGEGlrfu6IiPRe6kLeenWsVBpDDvg/93ua
-         i4lUYAqAX3Bkt4CFtpDBgGixSTPUgcwjCUFDx5J1f1Chflshpnqfcu7iJmL4/agU/ajx
-         7hcw==
+        with ESMTP id S233238AbjJJOzW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 10:55:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756FAA7
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 07:54:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696949670;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vH/MnbtKKOMlCHZOBuk2f+A+YeXj1EEx7KSK3diMmgU=;
+        b=K5nt1xCBh6gzWxWZZ/lt3Q/iNRijQA6yNiCEJ64tSjn1gJ5NpPSoUy3veag54ZwBgbyYsQ
+        9tSLSZ87cTuNubFhczdHV5Ztrn5bGtzKuPthJF6CznsRzJ1lHqqUcfIbtz/8oY/hQhbyjN
+        A1YIYU1ixZ0ZVIaX+KVfD06mTXbu4Pw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583-e9unS-ZMPZW-eBaUcOBogw-1; Tue, 10 Oct 2023 10:54:29 -0400
+X-MC-Unique: e9unS-ZMPZW-eBaUcOBogw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3fe1521678fso44833055e9.1
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 07:54:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696949180; x=1697553980;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fMAV4Pzyhnv9LKuSwz3p65tBRhFFBxEMfLBcYd0Sf1k=;
-        b=IsiJv3t9CpTuFx9I3YVqCimJJrLO5L3siHEx87kYnNZ+PP0ih8F1y841i6Sv5R3zF9
-         FhFFUr90UHBxFW2JWUE9rvirUEbyIMbw5dLAs8xZfzwjH+0pych2n5y/49WdDOENSLKt
-         bwDKlmMiNsIVqPdBVK+tFyA+X9rtrZfohGn8KT0KLO78//IFudJEDS730A++JY1PS/1j
-         tBXBi1i67NzpQ4rV4TNWQwwmpplYDlW5gQ5Jb7gG1rw8XsBEPmZlupr4+vW9/gukcJ3J
-         vm74sHAJ4141EBCGaTfJDyN/aQ3WeAT3Lr5bYpqbf4KWzR6KSv7a9+Ywvy8bJj4gaORA
-         gzOg==
-X-Gm-Message-State: AOJu0YznQt2Ukor6fryRw32HBm2upSgxn3xGdgZgJVDkH8/NL+Pj/PpF
-        jlgUAKdlzYQHkd+gdHl007fs1vZSKzE=
-X-Google-Smtp-Source: AGHT+IE/TXDzI2n2HhZxqazpt+zV8jBYLUVJHzMmOl2AXB81S6e3SfKpYLGnAoOwvxqxaSpO7rgkGtvImlw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c14a:0:b0:5a7:aab1:96a9 with SMTP id
- e10-20020a81c14a000000b005a7aab196a9mr78960ywl.6.1696949180578; Tue, 10 Oct
- 2023 07:46:20 -0700 (PDT)
-Date:   Tue, 10 Oct 2023 07:46:19 -0700
-In-Reply-To: <e348e75dac85efce9186b6b10a6da1c6532a3378.camel@redhat.com>
-Mime-Version: 1.0
-References: <20231009212919.221810-1-seanjc@google.com> <e348e75dac85efce9186b6b10a6da1c6532a3378.camel@redhat.com>
-Message-ID: <ZSVju-lerDbxwamL@google.com>
-Subject: Re: [PATCH] KVM: SVM: Don't intercept IRET when injecting NMI and
- vNMI is enabled
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Santosh Shukla <santosh.shukla@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20230601; t=1696949668; x=1697554468;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vH/MnbtKKOMlCHZOBuk2f+A+YeXj1EEx7KSK3diMmgU=;
+        b=Xi7qhxjol/LQkHTNHAgNEfkzZ7zeb5ydc9v8r5SA9yUlMueMQI4tHmYQAGzwxxgFS1
+         myW4rY3XqgEsMlo8SZyLdyIgqtEK+Av7nX02JGCvk9EMMDXLIRsNnmccEikJUH/fQWly
+         QNCV3Q71MWxYg9ftUXimQix6kQot+q1mJpxaetpWuL4VODssQI+gRuCQQt5THD8nBuc/
+         9ihDMKbVj8hKw0+9Sy3PLM7SWpwAwDjWqjYhkaavEDnmQSquf/MMffaLuwtbmuWhmoVj
+         glbYQsFAxRYuN16bL/rMo6Gl2Qj9hoy2T1M28/CDdZ6zN8tuKpbj464ixOaaE1f01eI5
+         bUAw==
+X-Gm-Message-State: AOJu0YyUQKh3VjZzSYJDguBv+FO1vQcnnof6PMQmr5Ey30c0poAfU1lF
+        fazHkTxMDKqlt2ZAv0dJWzhVfNB2Sh1C3hB8gntS38THxeLXo+WRyo7yOwSyjPyGaG2CdkyhrJE
+        cO4rIX+qq9TEh
+X-Received: by 2002:a05:600c:d1:b0:405:3a3d:6f42 with SMTP id u17-20020a05600c00d100b004053a3d6f42mr16390020wmm.39.1696949668258;
+        Tue, 10 Oct 2023 07:54:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwxS+5Hdl6YIlvPeBVrNrp4ft3RNUHoqkj2WG1fNEpSoTU00S2AQrMpg6XmmwADS1I11lK7w==
+X-Received: by 2002:a05:600c:d1:b0:405:3a3d:6f42 with SMTP id u17-20020a05600c00d100b004053a3d6f42mr16390004wmm.39.1696949667941;
+        Tue, 10 Oct 2023 07:54:27 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
+        by smtp.gmail.com with ESMTPSA id s11-20020a7bc38b000000b003fbe4cecc3bsm16612016wmj.16.2023.10.10.07.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 07:54:27 -0700 (PDT)
+Date:   Tue, 10 Oct 2023 10:54:24 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
+ virtio device
+Message-ID: <20231010105339-mutt-send-email-mst@kernel.org>
+References: <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
+ <20230926072538-mutt-send-email-mst@kernel.org>
+ <ZRpjClKM5mwY2NI0@infradead.org>
+ <20231002151320.GA650762@nvidia.com>
+ <ZR54shUxqgfIjg/p@infradead.org>
+ <20231005111004.GK682044@nvidia.com>
+ <ZSAG9cedvh+B0c0E@infradead.org>
+ <20231010131031.GJ3952@nvidia.com>
+ <20231010094756-mutt-send-email-mst@kernel.org>
+ <20231010140849.GL3952@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231010140849.GL3952@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023, Maxim Levitsky wrote:
-> =D0=A3 =D0=BF=D0=BD, 2023-10-09 =D1=83 14:29 -0700, Sean Christopherson =
-=D0=BF=D0=B8=D1=88=D0=B5:
-> > Note, per the APM, hardware sets the BLOCKING flag when software direct=
-ly
-> > directly injects an NMI:
-> >=20
-> >   If Event Injection is used to inject an NMI when NMI Virtualization i=
-s
-> >   enabled, VMRUN sets V_NMI_MASK in the guest state.
->=20
-> I think that this comment is not needed in the commit message. It describ=
-es
-> a different unrelated concern and can be put somewhere in the code but
-> not in the commit message.
+On Tue, Oct 10, 2023 at 11:08:49AM -0300, Jason Gunthorpe wrote:
+> On Tue, Oct 10, 2023 at 09:56:00AM -0400, Michael S. Tsirkin wrote:
+> 
+> > > However - the Intel GPU VFIO driver is such a bad experiance I don't
+> > > want to encourage people to make VFIO drivers, or code that is only
+> > > used by VFIO drivers, that are not under drivers/vfio review.
+> > 
+> > So if Alex feels it makes sense to add some virtio functionality
+> > to vfio and is happy to maintain or let you maintain the UAPI
+> > then why would I say no? But we never expected devices to have
+> > two drivers like this does, so just exposing device pointer
+> > and saying "use regular virtio APIs for the rest" does not
+> > cut it, the new APIs have to make sense
+> > so virtio drivers can develop normally without fear of stepping
+> > on the toes of this admin driver.
+> 
+> Please work with Yishai to get something that make sense to you. He
+> can post a v2 with the accumulated comments addressed so far and then
+> go over what the API between the drivers is.
+> 
+> Thanks,
+> Jason
 
-I strongly disagree, this blurb in the APM directly affects the patch.  If =
-hardware
-didn't set V_NMI_MASK, then the patch would need to be at least this:
+/me shrugs. I pretty much posted suggestions already. Should not be hard.
+Anything unclear - post on list.
 
---
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b7472ad183b9..d34ee3b8293e 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3569,8 +3569,12 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
- 	if (svm->nmi_l1_to_l2)
- 		return;
-=20
--	svm->nmi_masked =3D true;
--	svm_set_iret_intercept(svm);
-+	if (is_vnmi_enabled(svm)) {
-+		svm->vmcb->control.int_ctl |=3D V_NMI_BLOCKING_MASK;
-+	} else {
-+		svm->nmi_masked =3D true;
-+		svm_set_iret_intercept(svm);
-+	}
- 	++vcpu->stat.nmi_injections;
- }
-=20
+-- 
+MST
 
-base-commit: 86701e115030e020a052216baa942e8547e0b487
---=20
-
-and maybe even more to deal with canceled injection.
