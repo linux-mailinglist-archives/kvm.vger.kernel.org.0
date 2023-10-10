@@ -2,366 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 909637C043D
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 21:15:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F2407C0469
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 21:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234258AbjJJTPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 15:15:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40700 "EHLO
+        id S1343968AbjJJTXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 15:23:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbjJJTPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 15:15:13 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93785AC;
-        Tue, 10 Oct 2023 12:15:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696965310; x=1728501310;
-  h=date:from:to:cc:subject:message-id;
-  bh=3xtiwVkZvQPkX3kPathx7bVZ3F+3M09fD/+72Yn/Tg0=;
-  b=KaG6CEfolqO5B1SMHwQGgftabGYAzxHMo/bT7EdprGhgLuC7x1XE656y
-   uy565uzARhwHJspQwf+FqA1SzMeCZXxhYLKPY9595VnHtbXqiLXDEaY8F
-   zL7KEbjwgqJDWe2GVymJ7uXtnCioblfje0+0DG0S0LUAYkMoreqa+H9E2
-   tLd6cPUmabkzXrS9/Z9qrSvUECn1ClKTkCC6BHH3cV71LM+v7cntyhrDZ
-   xMF1UwLBvtYojZXl0N/S0E+2A59S8ktcO9IXvxxV0jyT6sjGaS21sgL7i
-   ipZguMfBPiSZrpOXLYrbhX0JmI0EQ6z4miJmGarV8t+QAZKyLOjan7LMd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="6049519"
-X-IronPort-AV: E=Sophos;i="6.03,213,1694761200"; 
-   d="scan'208";a="6049519"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 12:15:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="730217522"
-X-IronPort-AV: E=Sophos;i="6.03,213,1694761200"; 
-   d="scan'208";a="730217522"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 10 Oct 2023 12:15:06 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qqIC8-0000xy-0C;
-        Tue, 10 Oct 2023 19:15:04 +0000
-Date:   Wed, 11 Oct 2023 03:14:35 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
-        kunit-dev@googlegroups.com, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [linux-next:master] BUILD REGRESSION
- c0a6edb636cba9c0d1db966a54d910a02e52e4be
-Message-ID: <202310110317.qBxdkqdN-lkp@intel.com>
-User-Agent: s-nail v14.9.24
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234380AbjJJTXA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 15:23:00 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C42110F;
+        Tue, 10 Oct 2023 12:22:48 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 0CF3E100003;
+        Tue, 10 Oct 2023 22:22:45 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 0CF3E100003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+        s=mail; t=1696965765;
+        bh=mBrx4hoWrq6pagTjURDmdZ0qT16EHgb0CnURzu9pdq4=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=IMrdgXLKeTqjxasTJrsPCBD8VnjxXd4L+yyknvgnvCbyBFayBobrxMtoeawtNVfbZ
+         XXXAqEzIOAdyUZkxMOh7VtBoeHlR8EP0JbaZ6B3PeoRbexAVKNQiVO8Gd5wg5NEWfa
+         FDqk6yGvq/6bY7Scu1fNbhMAIFPMgC9aPxKRZdbIDFuN0Z82+mOlJfEilgMJvBj0jm
+         GULbe3454/Jd+olsPSAN9joJC75oBgPu/EjgPnGAx5/GRzGAzTzt9uiOgyaP1VWamq
+         rG6RJ6RnVBSUrXfQhDPi88yUiA/dNyioIdRJTKMyz88MaSC4B8XVzdkCXQMhH2ZXTh
+         NSgXt+kiuaAPw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Tue, 10 Oct 2023 22:22:44 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 10 Oct 2023 22:22:43 +0300
+From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY support
+Date:   Tue, 10 Oct 2023 22:15:12 +0300
+Message-ID: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180515 [Oct 10 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 536 536 1ae19c7800f69da91432b5e67ed4a00b9ade0d03, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;git.kernel.org:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/10/10 18:36:00
+X-KSMG-LinksScanning: Clean, bases: 2023/10/10 18:36:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/10 16:15:00 #22148151
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: c0a6edb636cba9c0d1db966a54d910a02e52e4be  Add linux-next specific files for 20231010
+Hello,
 
-Error/Warning reports:
+this patchset contains second and third parts of another big patchset
+for MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-https://lore.kernel.org/oe-kbuild-all/202309122047.cRi9yJrq-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309160053.sFDnNiu4-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309192314.VBsjiIm5-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309202345.yPRVHW8Q-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309212121.cul1pTRa-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309212339.hxhBu2F1-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310051547.40nm4Sif-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310100409.LrBAYpmk-lkp@intel.com
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
-Error/Warning: (recently discovered and may have been fixed)
+1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
+   link below)
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/. <-- this patchset
+3) Updates for tests and utils. <-- this patchset
 
-drivers/gpu/drm/amd/amdgpu/amdgpu_gmc.c:274: warning: Function parameter or member 'gart_placement' not described in 'amdgpu_gmc_gart_location'
-fs/bcachefs/bcachefs_format.h:215:25: warning: 'p' offset 3 in 'struct bkey' isn't aligned to 4 [-Wpacked-not-aligned]
-fs/bcachefs/bcachefs_format.h:217:25: warning: 'version' offset 27 in 'struct bkey' isn't aligned to 4 [-Wpacked-not-aligned]
-fs/bcachefs/btree_key_cache.c:113:7: warning: result of comparison of constant 9223372036854775807 with expression of type 'u32' (aka 'unsigned int') is always true [-Wtautological-constant-out-of-range-compare]
-include/linux/fortify-string.h:57:33: warning: writing 8 bytes into a region of size 0 [-Wstringop-overflow=]
-kernel/bpf/helpers.c:1909:19: warning: no previous declaration for 'bpf_percpu_obj_new_impl' [-Wmissing-declarations]
-kernel/bpf/helpers.c:1945:18: warning: no previous declaration for 'bpf_percpu_obj_drop_impl' [-Wmissing-declarations]
-kernel/bpf/helpers.c:2480:18: warning: no previous declaration for 'bpf_throw' [-Wmissing-declarations]
-lib/kunit/kunit-test.c:565:25: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+Part 1) was merged:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=19537e125cc7cf2da43a606f5bcebbe0c9aea4cc
 
-arch/x86/kvm/x86.c:9016 x86_emulate_instruction() warn: missing error code? 'r'
-drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm_helpers.c:538:25-29: ERROR: aconnector is NULL but dereferenced.
+Link to v1:
+https://lore.kernel.org/netdev/20230922052428.4005676-1-avkrasnov@salutedevices.com/
+Link to v2:
+https://lore.kernel.org/netdev/20230930210308.2394919-1-avkrasnov@salutedevices.com/
+Link to v3:
+https://lore.kernel.org/netdev/20231007172139.1338644-1-avkrasnov@salutedevices.com/
 
-Error/Warning ids grouped by kconfigs:
+Changelog:                                                              
+ v1 -> v2:                                                              
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---. 
+ v2 -> v3:                                                              
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---. 
+ v3 -> v4:                                                              
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---. 
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- arc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- arm-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- arm64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- csky-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- csky-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-randconfig-051-20231010
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-defconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-randconfig-001-20231010
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- m68k-allmodconfig
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- m68k-allyesconfig
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- microblaze-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- microblaze-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- mips-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- mips-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- mips-loongson3_defconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- openrisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- openrisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- parisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- parisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- powerpc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   |-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- powerpc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   |-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- powerpc-randconfig-003-20231010
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- riscv-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- riscv-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- s390-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   |-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- s390-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   |-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- sparc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- sparc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- sparc64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- sparc64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   |-- fs-bcachefs-bcachefs_format.h:warning:p-offset-in-struct-bkey-isn-t-aligned-to
-|   `-- fs-bcachefs-bcachefs_format.h:warning:version-offset-in-struct-bkey-isn-t-aligned-to
-|-- x86_64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|   `-- include-linux-fortify-string.h:warning:writing-bytes-into-a-region-of-size
-|-- x86_64-randconfig-011-20231010
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_drop_impl
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_new_impl
-|   `-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_throw
-|-- x86_64-randconfig-013-20231010
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_drop_impl
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_new_impl
-|   `-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_throw
-|-- x86_64-randconfig-104-20231010
-|   `-- drivers-gpu-drm-amd-display-amdgpu_dm-amdgpu_dm_helpers.c:ERROR:aconnector-is-NULL-but-dereferenced.
-`-- x86_64-randconfig-161-20231010
-    |-- arch-x86-kvm-x86.c-x86_emulate_instruction()-warn:missing-error-code-r
-    `-- mm-gup.c-pin_user_pages_fd()-warn:unsigned-start-is-never-less-than-zero.
-clang_recent_errors
-`-- arm64-allyesconfig
-    |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-    |-- fs-bcachefs-btree_key_cache.c:warning:result-of-comparison-of-constant-with-expression-of-type-u32-(aka-unsigned-int-)-is-always-true
-    `-- lib-kunit-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+Arseniy Krasnov (12):
+  vsock: set EPOLLERR on non-empty error queue
+  vsock: read from socket's error queue
+  vsock: check for MSG_ZEROCOPY support on send
+  vsock: enable SOCK_SUPPORT_ZC bit
+  vhost/vsock: support MSG_ZEROCOPY for transport
+  vsock/virtio: support MSG_ZEROCOPY for transport
+  vsock/loopback: support MSG_ZEROCOPY for transport
+  vsock: enable setting SO_ZEROCOPY
+  docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+  test/vsock: MSG_ZEROCOPY flag tests
+  test/vsock: MSG_ZEROCOPY support for vsock_perf
+  test/vsock: io_uring rx/tx tests
 
-elapsed time: 773m
-
-configs tested: 118
-configs skipped: 2
-
-tested configs:
-alpha                            alldefconfig   gcc  
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs101_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                            hsdk_defconfig   gcc  
-arc                   randconfig-001-20231010   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                         mv78xx0_defconfig   clang
-arm                        mvebu_v7_defconfig   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   clang
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   clang
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-011-20231010   gcc  
-i386                  randconfig-012-20231010   gcc  
-i386                  randconfig-013-20231010   gcc  
-i386                  randconfig-014-20231010   gcc  
-i386                  randconfig-015-20231010   gcc  
-i386                  randconfig-016-20231010   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231010   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                        m5272c3_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                      loongson3_defconfig   gcc  
-mips                      maltaaprp_defconfig   clang
-mips                        vocore2_defconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-openrisc                       virt_defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-powerpc                   bluestone_defconfig   clang
-powerpc                 mpc8313_rdb_defconfig   clang
-powerpc                      ppc44x_defconfig   clang
-powerpc                      ppc6xx_defconfig   gcc  
-powerpc                     tqm8555_defconfig   gcc  
-powerpc                      tqm8xx_defconfig   gcc  
-powerpc64                        alldefconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                 kfr2r09-romimage_defconfig   gcc  
-sh                          r7780mp_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               alldefconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-011-20231010   gcc  
-x86_64                randconfig-012-20231010   gcc  
-x86_64                randconfig-013-20231010   gcc  
-x86_64                randconfig-076-20231010   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
+ Documentation/networking/msg_zerocopy.rst |  13 +-
+ drivers/vhost/vsock.c                     |   7 +
+ include/linux/socket.h                    |   1 +
+ include/net/af_vsock.h                    |   7 +
+ include/uapi/linux/vm_sockets.h           |  17 +
+ net/vmw_vsock/af_vsock.c                  |  63 +++-
+ net/vmw_vsock/virtio_transport.c          |   7 +
+ net/vmw_vsock/vsock_loopback.c            |   6 +
+ tools/testing/vsock/.gitignore            |   1 +
+ tools/testing/vsock/Makefile              |  11 +-
+ tools/testing/vsock/msg_zerocopy_common.c |  87 ++++++
+ tools/testing/vsock/msg_zerocopy_common.h |  18 ++
+ tools/testing/vsock/util.c                | 133 ++++++++
+ tools/testing/vsock/util.h                |   5 +
+ tools/testing/vsock/vsock_perf.c          |  80 ++++-
+ tools/testing/vsock/vsock_test.c          |  16 +
+ tools/testing/vsock/vsock_test_zerocopy.c | 358 ++++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  15 +
+ tools/testing/vsock/vsock_uring_test.c    | 342 +++++++++++++++++++++
+ 19 files changed, 1170 insertions(+), 17 deletions(-)
+ create mode 100644 tools/testing/vsock/msg_zerocopy_common.c
+ create mode 100644 tools/testing/vsock/msg_zerocopy_common.h
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+ create mode 100644 tools/testing/vsock/vsock_uring_test.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
