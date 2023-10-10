@@ -2,818 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83B207BF61A
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC457BF644
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:42:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1443032AbjJJIgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43836 "EHLO
+        id S229903AbjJJImW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:42:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442932AbjJJIfn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:35:43 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B0DB7;
-        Tue, 10 Oct 2023 01:35:39 -0700 (PDT)
+        with ESMTP id S229741AbjJJImV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:42:21 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5085CA9;
+        Tue, 10 Oct 2023 01:42:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696926939; x=1728462939;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2tZvsMcEGJfe9Tdw0E0f23p4isbP+51/a3sxhYiJi84=;
-  b=euTzzIlpVB0bX2eK9u/U09eu57dubTtiQBXDihFx3buUStXszDW5svKU
-   BH50V+T7uyFXTJjyOnfcFTbWEpbJCL18Hwp0+3cldSKLusSRAx1I5bhaq
-   WKDVYa7a2tZ7njyJQYW6Dn39JwH9Og+9e3LrSHL+CJ+YjDQLafLnnRMMS
-   c6isBboNw3tpO+20JdLQqz67+T9GyegiQ0M1CgF2zrhFDnMt5GLdPIvyK
-   McDpF1wS8InjqCvooQVcksfEuqCADHf4g54qyG30UHlqkIK5oAdM0yEPI
-   hNjVtQjJX0JLNsGZ4BpDcwG9yVsY6ntwAK3EC06q8arGPZOMEeEx8r48P
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689854"
+  t=1696927340; x=1728463340;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/gFCE4Qd65omaVfzD7Nz+2xDxDa3WXvUJYP+a3au63M=;
+  b=c8b8QZJeHdZmiZ3jJikrmwK5Ny85kI0mMIloFneROYdq9ifsi40xHUfp
+   RypgwZx+r6h29tge9aH3ek/zxQomRtdIxVKZv36l3ALBelnnOTcNAsWr9
+   foNKZ+AgybzdwvNH2S8GvdVdMd0CAluGnzy/WRTCwzrjsM+MjUDXnTiff
+   fFCJrQpKbJv8LKmWX1EVHm+L2tIxS+UURIMlqy8/Vohs/WlZ0rWETqL+n
+   +9IKaCq7OEZtiHdPPyIPNnaTkHLYbfkotoBRqMEWa6t9P+6WBQShSIat8
+   XGpwQpDv2oLh9tI4ARrQTV/h4AChKFmwZQ4+Q2pB677C/sMxT75ydbrnR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="387178549"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="363689854"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:37 -0700
+   d="scan'208";a="387178549"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:42:19 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687213"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="730003030"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="1084687213"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:36 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH 12/12] KVM: selftests: hwpoison/mce failure injection
-Date:   Tue, 10 Oct 2023 01:35:20 -0700
-Message-Id: <4bdb845fd5ed073fdeeb521ed0a1843bcb6ebd05.1696926843.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1696926843.git.isaku.yamahata@intel.com>
-References: <cover.1696926843.git.isaku.yamahata@intel.com>
+   d="scan'208";a="730003030"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Oct 2023 01:42:18 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 10 Oct 2023 01:42:18 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 10 Oct 2023 01:42:18 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 10 Oct 2023 01:42:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F4GOslGZW3sDvaZqSfiMOql1nmKw2R5UyLUeu/8xAbJmNhLc+Cassc/3mxM7A/34N5Ifjf3GhBQwatfuuDEcZJNn+qTaUOEAdQiZo4i6PNYwemAXQn7PEKyxOg/o1D1IhZZMFhop1/8PWFr2dV60/CBOL9Oq0efAI89Gk9xxU4qN+T1qkXo2S4I6hEyBnUiwNARaWRFTbHKTMOqCrJmfkyHpqmgT1L5n2a83YGAQkJDBRLiiVwNWsGmdHyxIZFrKqX+Fe205a77XSogXhfJzXfbuCkaPnM2/IEKtBoaZo4HNiBNbnPov4QH3l3q6DVc27Zv15Q1FqgMkyLorYK1+Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/gFCE4Qd65omaVfzD7Nz+2xDxDa3WXvUJYP+a3au63M=;
+ b=LCEflUw3MQXuvs9nYuLf0h+ykQSqhBT85MYiu+RCs/QBAfLCKFjyb84WpuJMINQkXPUg2fliVRp+r0SjHeJdwHmnnttBLQr0qFHe/AgTnEPejH0+HVw1Cyr2kHaZ7V6nlwdAP2nboVqN3drklTI3lf1/p1tCcGu6Eo4wc4ZXcZFy5wAHrDYjHDquxc2KLGX/inFuSXQtknSX4nmOwbcNH7/m+RI6HNZngxyZ320XiYCbc4SZWbSEB9L7XgulHaz2ajX2hC0O17xfhmk0o3NJS9jLoZ+acJ5O+4UXAd/p3BkF3fusGQUcEbVtMamMdf05IRoGOSz5lIip/aDMnsSEgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH8PR11MB6973.namprd11.prod.outlook.com (2603:10b6:510:226::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 10 Oct
+ 2023 08:42:13 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::7116:9866:8367:95b4]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::7116:9866:8367:95b4%3]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
+ 08:42:13 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "ankita@nvidia.com" <ankita@nvidia.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>
+CC:     "aniketa@nvidia.com" <aniketa@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "targupta@nvidia.com" <targupta@nvidia.com>,
+        "vsethi@nvidia.com" <vsethi@nvidia.com>,
+        "Currid, Andy" <acurrid@nvidia.com>,
+        "apopple@nvidia.com" <apopple@nvidia.com>,
+        "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+        "danw@nvidia.com" <danw@nvidia.com>,
+        "anuaggarwal@nvidia.com" <anuaggarwal@nvidia.com>,
+        "dnigam@nvidia.com" <dnigam@nvidia.com>,
+        "udhoke@nvidia.com" <udhoke@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v11 1/1] vfio/nvgpu: Add vfio pci variant module for grace
+ hopper
+Thread-Topic: [PATCH v11 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Thread-Index: AQHZ+VwgDWGk0VCFcUeltplt5s48drBCtrFA
+Date:   Tue, 10 Oct 2023 08:42:13 +0000
+Message-ID: <BN9PR11MB52762EE10CBBDF8AB98A53788CCDA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20231007202254.30385-1-ankita@nvidia.com>
+In-Reply-To: <20231007202254.30385-1-ankita@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH8PR11MB6973:EE_
+x-ms-office365-filtering-correlation-id: 3f87de3c-c21c-485b-84be-08dbc96cccda
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: H9raAZSBzr8pLAHBxC88kAwSDpMFbEKhJ0zYFA7OgduXc1guKTppE5Nbmc+WT4G1FkPhMzeEvDU+7Jjr83EjrkVpGx6ZtUmNuzr8TwT2fVwKz+uapF8lH89fKUIOYbJV0S3pEQPBuh2GcSWdTufCza5zNm1/EpE2NngUBuIA2LiTI3UT4uGcHLefZWJTwYH2NWBsZJAevdNSyuqLeZ/ZeWR5N3TQ7d3lRdoOoEmig/B+aY1wIi9sPxSHMo6sXkkxpFxtoMdOSCGpMndff/wb5E0YCoZZXxlAbj0qbIMIxxUUiWVubAqWwdLv2cbyTd/ar9Kg1rv38VZkMhELh0Y72XuhnBjOiMOqj6sZKmYslSbDjqLeSrL+H71AvPO0PkIPVMP8rJbASMt8OzSyy0XCnfkutxwCodDyphrBQw9nuVHPoN/v36MUlIVMHrIsTwv+sTAEGAICCDU8fyUHuvR2tcVMvJQbqmgYXbMOas4mE66/MhFEGDs05oUebus4pJhKEUzqDuABYcsb0yrI0+M5JSaCNlxZF5Vv41q7aFd8rKGEVsiye+2IqBgMNk6WtPqPRaeDcF3N7qfbYNzkPHZrY6zHpQRsY12gL7okRC5IAwOYIVrXGu/xzAkW1WM9jtdo
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(346002)(39860400002)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(110136005)(316002)(66476007)(66556008)(66446008)(66946007)(64756008)(54906003)(38100700002)(41300700001)(5660300002)(7416002)(8936002)(4326008)(52536014)(76116006)(8676002)(4744005)(33656002)(86362001)(83380400001)(38070700005)(7696005)(6506007)(9686003)(122000001)(2906002)(71200400001)(55016003)(26005)(82960400001)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SYB1oSVUfGUsyJd2aCfi0tSKoV+bHJGX+3l3gfgPh7jDdHQjOCMqm+VfZx/u?=
+ =?us-ascii?Q?3KXG33RRzx+O1c3zWyd+rBrpTp50vdbCh4h4fAxLSfyxuSQ9/5wE4yntOqy1?=
+ =?us-ascii?Q?W9Bpw8dpdpGniJHeMmEEP65Lm8cvxltJKnDpEMMU6mStKQucprRMBn1xr5l/?=
+ =?us-ascii?Q?YyVvOdivphg00FpNjnQPhL0OcC3A80Ys3DDnvVFLJUzprqtgmHTGc8MQ/pOO?=
+ =?us-ascii?Q?1qqraP1QAU0qiu3fR9sr3/LZzPPI0n38T8VV/e7YSBbTKcLBhukRpXhm33Kg?=
+ =?us-ascii?Q?z9Iz09sV81dMkVGxLOqh/xJ9AxuOe6MGdVN0fAvS3b9vjukxDwNZPeOMXl2d?=
+ =?us-ascii?Q?SBlRs2gZiWZOj3y34tvfoucpUVT5HucDn1Wrbkm/mqaqWrs8390GVaquF6SO?=
+ =?us-ascii?Q?cQFe71VPK06wumq45rMMOQVfV73vYLHLTu7ff9agGRNWuOynd20yLrc0vZUl?=
+ =?us-ascii?Q?vq8GSeqXWf+XxGZnk/jkJJUz2AcyU8dF5lfuGUjMgt2U/PGVa91j/NTh+IVN?=
+ =?us-ascii?Q?Zx920FIi24ytudJPsLHl7LZgOWfqz1D4KQugxJmvJXklnv9zpIZexNXUI4Es?=
+ =?us-ascii?Q?7o9krK+X5U/xBWG+IqBwg9M4WlPwSKiC06R8EsvrIN39GaZ9r7knnjXqtyjd?=
+ =?us-ascii?Q?mF9Lz2/MdVwIJ3ohf2FRtA3BWfAbnbN1Ytos7Fc0KpqzMjh5nqiMzixtyZHl?=
+ =?us-ascii?Q?rjeGcrNRhrGKZh8Q75T2ZXi3aByCQnx2ZasKr7cttqL+YTugrCiANHkE3Aun?=
+ =?us-ascii?Q?1vkj0OTiJwBXgaNrpBP6ijpzg/Iv3edcfEblimyUFdUQpYNEiclRu2o+i6Xq?=
+ =?us-ascii?Q?IlgNkMPeE1dglQ/L7ItXq+8VQeiHkJAWE85308JOzmerZHBYqfmZkR3enn0h?=
+ =?us-ascii?Q?eepbta8P3X6oNz13wB3refLtkEv2WZfGqZ4h9SZMyz29qrMIMI1IryAUSh3w?=
+ =?us-ascii?Q?7ZmirwStV/Dp83W/le4KE+A+mE45rLbSpLJlk5bjjQXqFaHJCQboRCxHATer?=
+ =?us-ascii?Q?Ob27VmLNrxqcshdWqKY5mmzIKl/jfDDu39xyKrQxBIMYYbUpUhFwBajkMPNg?=
+ =?us-ascii?Q?xzUUENFqMFMQgH5921F38M9LbTCOmI35yyzRGep8h6NcaVm5xtyuIiKmUuNC?=
+ =?us-ascii?Q?mzSD4yME4GYVZIO+RxwQOEzC1FBtW8FDf/KP0WwzstT4ajG7tbzBm6xWjhdK?=
+ =?us-ascii?Q?gLWML0yd+1+icgkT7k2zEYt/OzOgc4q/YuPatbAs8Jy6YZ9wRk5bxLDFdD1m?=
+ =?us-ascii?Q?+jk690BmlpBkSg9EAQqy1ocveVFVblZ9B5dKr0LJIDo3LOtE8S9iZLoN0lr3?=
+ =?us-ascii?Q?1ItvCgK4oeN5MCirxXSYKo6vdOsyQI7dqb03rtBNe1YHzdrtRghR1XfOOiMU?=
+ =?us-ascii?Q?r9LjoQUsGB8jictdOkh4aXoZXB6Mxp/suQysmlJIcWq//ASrbjoZFCgQyH53?=
+ =?us-ascii?Q?IBjQnNIfvQckrvc9lV/lemk2s8a9mJfyEtszffeVdpsPwH8whcrtneFbctfU?=
+ =?us-ascii?Q?h0Kx44GxVMG7FbH+gqtzXE4J3ny6/J5/cqn9etDj/1ePqvgCMvoWMTc6fUmc?=
+ =?us-ascii?Q?CPw8q64YaP+yoBg+3jJ3j/RqdDtsDcCY0R1KW8h5?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f87de3c-c21c-485b-84be-08dbc96cccda
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2023 08:42:13.3342
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bOXiclflphoJNqTXuSCeutTnfKybfXGNQOW28CRARdt0NGd36H5Lme3soedt2T5IRXr6H4whLRYeDtzMpDtSWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6973
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+> From: ankita@nvidia.com <ankita@nvidia.com>
+> Sent: Sunday, October 8, 2023 4:23 AM
+>=20
+> PCI BAR are aligned to the power-of-2, but the actual memory on the
+> device may not. A read or write access to the physical address from the
+> last device PFN up to the next power-of-2 aligned physical address
+> results in reading ~0 and dropped writes.
+>=20
 
-Add test cases for KVM to inject hwpoison or x86 MCE.  It exercises
-FADV_HWPOISON and KVM/x86 machine check injection.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/mem_hwpoison_test.c | 721 ++++++++++++++++++
- 2 files changed, 722 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/mem_hwpoison_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a3bb36fb3cfc..ec9b4c6f1e75 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -128,6 +128,7 @@ TEST_GEN_PROGS_x86_64 += hardware_disable_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86_64 += kvm_page_table_test
- TEST_GEN_PROGS_x86_64 += max_guest_memory_test
-+TEST_GEN_PROGS_x86_64 += mem_hwpoison_test
- TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += memslot_perf_test
- TEST_GEN_PROGS_x86_64 += rseq_test
-diff --git a/tools/testing/selftests/kvm/mem_hwpoison_test.c b/tools/testing/selftests/kvm/mem_hwpoison_test.c
-new file mode 100644
-index 000000000000..cc4cdc6420fe
---- /dev/null
-+++ b/tools/testing/selftests/kvm/mem_hwpoison_test.c
-@@ -0,0 +1,721 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ * Copyright (C) 2023, Intel Corp.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+
-+#include <pthread.h>
-+#include <signal.h>
-+#include <setjmp.h>
-+
-+#include <linux/fadvise.h>
-+#include <linux/sizes.h>
-+
-+#include <processor.h>
-+
-+#define DATA_SLOT	10
-+#define DATA_GPA	((uint64_t)(1ull << 32))
-+#define DATA_SIZE	((uint64_t)(SZ_2M))
-+
-+enum ucall_syncs {
-+	/* Give kvm a chance to inject mce */
-+	GUEST_NOP,
-+	GUEST_HWPOISON,
-+};
-+
-+static void guest_sync_nop(void)
-+{
-+	ucall(UCALL_SYNC, 1, GUEST_NOP);
-+}
-+
-+static void guest_sync_hwpoison(uint64_t gpa)
-+{
-+	ucall(UCALL_SYNC, 2, GUEST_HWPOISON, gpa);
-+}
-+
-+static void memcmp_g(const char *file, unsigned int line, uint64_t gpa,
-+		     uint8_t pattern, uint64_t size)
-+{
-+	uint8_t *mem = (uint8_t *)gpa;
-+	size_t i;
-+
-+	for (i = 0; i < size; i++) {
-+		if (mem[i] == pattern)
-+			continue;
-+
-+		ucall_assert(UCALL_ABORT, "mem[i] == pattern",
-+			     file, line,
-+			     "Expected 0x%x at offset %lu (gpa 0x%lx), got 0x%x",
-+			     pattern, i, gpa + i, mem[i]);
-+	}
-+}
-+#define MEMCMP_G(gpa, pattern, size)				\
-+	memcmp_g(__FILE__, __LINE__, (gpa), (pattern), (size))
-+
-+static const uint64_t test_offsets[] = {
-+	0,
-+	PAGE_SIZE,
-+};
-+
-+static void guest_code(uint64_t gpa, bool huge_page, bool do_wait)
-+{
-+	const uint8_t init_p = 0xcc;
-+	uint64_t r;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_offsets); i++) {
-+		uint64_t offset = test_offsets[i];
-+		uint64_t base = gpa + offset;
-+
-+		/*
-+		 * Set the test region to non-zero to differentiate it from the
-+		 * page newly assigned.
-+		 */
-+		memset((void *)gpa, init_p, SZ_2M);
-+		if (do_wait)
-+			/* Hold mce injector. */
-+			WRITE_ONCE(*(uint8_t *)gpa, 0);
-+
-+		/* Ask VMM to poison the page. */
-+		guest_sync_hwpoison(base);
-+
-+		if (do_wait) {
-+			/* Allow mce injector to continue. */
-+			WRITE_ONCE(*(uint8_t *)gpa, init_p);
-+
-+			/* Wait for poisoned page zeroed. */
-+			while (READ_ONCE(*(uint8_t *)base) == init_p)
-+				;
-+		}
-+
-+		/* When injecting mce, give KVM a chance to inject it. */
-+		guest_sync_nop();
-+
-+		/* Consume poisoned data. */
-+		r = READ_ONCE(*(uint64_t *)base);
-+		/* VMM discarded the poisoned page and assign a new page. */
-+		GUEST_ASSERT_EQ(r, 0);
-+
-+		/* Check if the page is zeroed or it keeps its contents. */
-+		if (huge_page) {
-+			MEMCMP_G(gpa, 0, SZ_2M);
-+		} else {
-+			if (offset > 0)
-+				MEMCMP_G(gpa, init_p, offset);
-+			MEMCMP_G(base, 0, PAGE_SIZE);
-+			if (offset + PAGE_SIZE < SZ_2M)
-+				MEMCMP_G(gpa + offset + PAGE_SIZE, init_p,
-+					 SZ_2M - (offset + PAGE_SIZE));
-+		}
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+#define MCE_INJECT_DIR		"/sys/kernel/debug/mce-inject/"
-+#define MCE_STATUS		MCE_INJECT_DIR"status"
-+#define MCE_MISC		MCE_INJECT_DIR"misc"
-+#define MCE_BANK		MCE_INJECT_DIR"bank"
-+#define MCE_FLAGS		MCE_INJECT_DIR"flags"
-+#define MCE_MCGSTATUS		MCE_INJECT_DIR"mcgstatus"
-+#define MCE_NOTRIGGER		MCE_INJECT_DIR"notrigger"
-+
-+static void write_buf(const char *path, const char *buf, size_t size)
-+{
-+	ssize_t r;
-+	int fd;
-+
-+	fd = open(path, O_WRONLY);
-+	TEST_ASSERT(fd >= 0, "failed to open %s\n", path);
-+
-+	r = write(fd, buf, size);
-+	TEST_ASSERT(r == size, "failed to write(%s:%s:%zd) = %zd\n",
-+		    path, buf, size, r);
-+
-+	close(fd);
-+}
-+
-+static void mce_write(const char *path, uint64_t val)
-+{
-+	char buf[64];
-+	int len;
-+
-+	len = sprintf(buf, "%"PRIu64"\n", val);
-+	write_buf(path, buf, len);
-+}
-+
-+static void mce_flags(void)
-+{
-+	char *buf = "sw\n";
-+
-+	write_buf(MCE_FLAGS, buf, strlen(buf));
-+}
-+
-+/* From asm/mce.h */
-+/* MCG_STATUS register defines */
-+#define MCG_STATUS_EIPV		BIT_ULL(1)   /* ip points to correct instruction */
-+#define MCG_STATUS_MCIP		BIT_ULL(2)   /* machine check in progress */
-+#define MCG_STATUS_LMCES	BIT_ULL(3)   /* LMCE signaled */
-+
-+/* MCi_STATUS register defines */
-+#define MCI_STATUS_VAL		BIT_ULL(63)  /* valid error */
-+#define MCI_STATUS_UC		BIT_ULL(61)  /* uncorrected error */
-+#define MCI_STATUS_EN		BIT_ULL(60)  /* error enabled */
-+#define MCI_STATUS_MISCV	BIT_ULL(59)  /* misc error reg. valid */
-+#define MCI_STATUS_ADDRV	BIT_ULL(58)  /* addr reg. valid */
-+#define MCI_STATUS_AR		BIT_ULL(55)  /* Action required */
-+#define MCI_STATUS_S		BIT_ULL(56)  /* Signaled machine check */
-+
-+#define MCACOD_DATA		0x0134		/* Data Load */
-+
-+/* MCi_MISC register defines */
-+#define MCI_MISC_ADDR_MODE_SHIFT	6
-+#define  MCI_MISC_ADDR_PHYS		2
-+
-+#define KVM_MCE_INJECT	"/sys/kernel/debug/kvm/%d-%d/vcpu%d/mce-inject"
-+
-+/* Worst case buffer size needed for holding an integer. */
-+#define ITOA_MAX_LEN 12
-+
-+static void vcpu_inject_mce(struct kvm_vcpu *vcpu)
-+{
-+	char path[sizeof(KVM_MCE_INJECT) + ITOA_MAX_LEN * 3 + 1];
-+	char data[] = "0";
-+	ssize_t r;
-+	int fd;
-+
-+	snprintf(path, sizeof(path), KVM_MCE_INJECT,
-+		 getpid(), vcpu->vm->fd, vcpu->id);
-+
-+	fd = open(path, O_WRONLY);
-+	TEST_ASSERT(fd >= 0, "failed to open %s\n", path);
-+
-+	data[0] = '0';
-+	r = write(fd, data, sizeof(data));
-+	TEST_ASSERT(r == -1 && errno == EINVAL,
-+		    "succeeded to write(%s:%s:%zd) = %zd\n",
-+		    path, data, sizeof(data), r);
-+
-+	data[0] = '1';
-+	r = write(fd, data, sizeof(data));
-+	TEST_ASSERT(r == sizeof(data),
-+		    "failed to write(%s:%s:%zd) = %zd\n",
-+		    path, data, sizeof(data), r);
-+
-+	close(fd);
-+}
-+
-+static void inject_mce(struct kvm_vcpu *vcpu, int memfd, uint64_t gpa)
-+{
-+	/* See vm_mem_add() in test_mem_failure() */
-+	uint64_t offset = gpa - DATA_GPA;
-+	int ret;
-+
-+	/* mce-inject in debugfs triggers mce injection. */
-+	mce_write(MCE_NOTRIGGER, 1);
-+
-+	/* FIXME: These values are vendor specific. */
-+	mce_write(MCE_MCGSTATUS,
-+		  MCG_STATUS_EIPV | MCG_STATUS_MCIP | MCG_STATUS_LMCES);
-+	mce_write(MCE_MISC,
-+		  (MCI_MISC_ADDR_PHYS << MCI_MISC_ADDR_MODE_SHIFT) | 3);
-+	/*
-+	 * MCI_STATUS_UC: Uncorrected error:
-+	 * MCI_STATUS_EN | MCI_STATUS_AR | MCI_STATUS_S:
-+	 *   SRAR: Software Recoverable Action Required
-+	 */
-+	mce_write(MCE_STATUS,
-+		  MCACOD_DATA |
-+		  MCI_STATUS_EN | MCI_STATUS_UC | MCI_STATUS_S | MCI_STATUS_AR |
-+		  MCI_STATUS_VAL | MCI_STATUS_MISCV | MCI_STATUS_ADDRV);
-+	mce_flags();
-+	mce_write(MCE_BANK, 0);
-+
-+	/* Set physical address to MCE_ADDR. */
-+	ret = posix_fadvise(memfd, offset, sizeof(u64), FADV_MCE_INJECT);
-+	/* posix_fadvise() doesn't set errno, but returns erorr no. */
-+	if (ret)
-+		errno = ret;
-+	__TEST_REQUIRE(ret != EPERM,
-+		       "Injecting mcet requires CAP_SYS_ADMIN ret %d", ret);
-+	TEST_ASSERT(!ret || ret == EBUSY,
-+		    "posix_fadvise(FADV_MCE_INJECT) should success ret %d", ret);
-+
-+	/* Schedule to fire MCE on the next vcpu run. */
-+	vcpu_inject_mce(vcpu);
-+}
-+
-+static sigjmp_buf sigbuf;
-+static volatile void *fault_addr;
-+
-+static void sigbus_handler(int sig, siginfo_t *info, void *data)
-+{
-+	int lsb = info->si_addr_lsb;
-+
-+	TEST_ASSERT(info->si_signo == SIGBUS,
-+		    "Unknown signal number expected %d received %d\n",
-+		    SIGBUS, info->si_signo);
-+	TEST_ASSERT(info->si_code == BUS_MCEERR_AR,
-+		    "Unknown signal code received expected %d code %d\n",
-+		    BUS_MCEERR_AR, info->si_code);
-+	TEST_ASSERT((info->si_addr_lsb == PAGE_SHIFT ||
-+		     info->si_addr_lsb == HUGEPAGE_SHIFT(2)),
-+		    "Unknown signal addr_lsb expected lsb %d or %d received %d\n",
-+		    PAGE_SHIFT, HUGEPAGE_SHIFT(2), info->si_addr_lsb);
-+	TEST_ASSERT(((intptr_t)info->si_addr >> lsb) == ((intptr_t)fault_addr >> lsb),
-+		    "Unknown signal addr expected %p received %p lsb %d\n",
-+		    fault_addr, info->si_addr, lsb);
-+
-+	fault_addr = NULL;
-+	siglongjmp(sigbuf, 1);
-+}
-+
-+static void sigbus_handler_set(bool set)
-+{
-+	struct sigaction sa;
-+	int r;
-+
-+	if (set)
-+		sa = (struct sigaction) {
-+			.sa_sigaction = sigbus_handler,
-+			.sa_flags = SA_SIGINFO,
-+		};
-+	else
-+		sa = (struct sigaction) {
-+			.sa_handler = SIG_DFL,
-+		};
-+
-+	r = sigaction(SIGBUS, &sa, NULL);
-+	TEST_ASSERT(!r, "sigaction should success");
-+}
-+
-+static void discard_nop(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_run *run = vcpu->run;
-+	struct ucall uc;
-+	uint64_t cmd;
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+		    "Wanted KVM_EXIT_IO, got exit reason: %u (%s)",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+	cmd = get_ucall(vcpu, &uc);
-+	TEST_ASSERT(cmd == UCALL_SYNC, "UCALL_SYNC is expected %lu", cmd);
-+	TEST_ASSERT(uc.args[0] == GUEST_NOP, "GUEST_NOP is expected %lu",
-+		    uc.args[0]);
-+}
-+
-+static void test_madvise(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+			 uint64_t gpa)
-+{
-+	uint8_t *hva = addr_gpa2hva(vcpu->vm, gpa);
-+	int r;
-+
-+	discard_nop(vcpu);
-+	r = madvise(hva, sizeof(u64), MADV_HWPOISON);
-+	__TEST_REQUIRE(!(r == -1 && errno == EPERM),
-+		       "madvise(MADV_HWPOISON) requires CAP_SYS_ADMIN");
-+	TEST_ASSERT(!r, "madvise(MADV_HWPOISON) should succeed");
-+
-+	if (!sigsetjmp(sigbuf, 1)) {
-+		sigbus_handler_set(true);
-+
-+		/* Trigger SIGBUS */
-+		fault_addr = hva;
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+
-+	/*
-+	 * Discard poisoned page and add a new page so that guest vcpu
-+	 * can continue.
-+	 */
-+	if (huge_page) {
-+		void *v;
-+
-+		/*
-+		 * madvise(MADV_FREE) doesn't work for huge page.
-+		 * Resort to munmap() and mmap().
-+		 */
-+		gpa = align_down(gpa, SZ_2M);
-+		hva = addr_gpa2hva(vcpu->vm, gpa);
-+
-+		r = munmap(hva, SZ_2M);
-+		TEST_ASSERT(!r, "munmap() should succeed");
-+
-+		/* Map it again with new page for guest to continue. */
-+		v = mmap(hva, SZ_2M, PROT_READ | PROT_WRITE,
-+			 MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED,
-+			 memfd, gpa - DATA_GPA);
-+		TEST_ASSERT(v != MAP_FAILED,
-+			    __KVM_SYSCALL_ERROR("mmap()",
-+						(int)(unsigned long)MAP_FAILED));
-+		TEST_ASSERT(v == hva, "mmap(MAP_FIXED) v %p hva %p",
-+			    v, hva);
-+	} else {
-+		fault_addr = hva;
-+		r = madvise(hva, PAGE_SIZE, MADV_FREE);
-+		TEST_ASSERT(!r, "madvise(MADV_FREE) should success");
-+	}
-+
-+	sigbus_handler_set(false);
-+}
-+
-+static void punch_hole(struct kvm_vcpu *vcpu, int memfd, uint64_t gpa, uint64_t len)
-+{
-+	int r;
-+
-+	/* Discard poisoned page. */
-+	r = fallocate(memfd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
-+		      gpa - DATA_GPA, len);
-+	TEST_ASSERT(!r || (r == -1 && errno == ENOENT),
-+		    "fallocate(PUNCH_HOLE, PAGE_SIZE) failed at fd = %d, offset = %lx\n",
-+		    memfd, gpa - DATA_GPA);
-+}
-+
-+static void punch_hole_page(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+			 uint64_t gpa)
-+{
-+	/* Discard the poisoned page and assign new page. */
-+	if (huge_page) {
-+		gpa = align_down(gpa, SZ_2M);
-+		punch_hole(vcpu, memfd, gpa, SZ_2M);
-+	} else
-+		punch_hole(vcpu, memfd, gpa, PAGE_SIZE);
-+}
-+
-+static void munmap_hole(struct kvm_vcpu *vcpu, int memfd, uint64_t gpa,
-+			uint64_t len)
-+{
-+	uint8_t *hva = addr_gpa2hva(vcpu->vm, gpa);
-+	void *v;
-+	int r;
-+
-+	/* hwpoison is also recorded in the PTE entry. Clear it. */
-+	r = munmap(hva, len);
-+	TEST_ASSERT(!r, "munmap() should succeed");
-+
-+	/* Map it again with new page for guest to continue. */
-+	v = mmap(hva, len, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED,
-+		 memfd, gpa - DATA_GPA);
-+	TEST_ASSERT(v != MAP_FAILED,
-+		    __KVM_SYSCALL_ERROR("mmap()", (int)(unsigned long)MAP_FAILED));
-+	TEST_ASSERT(v == hva,
-+		    "mmap(MAP_FIXED) v %p hva %p", v, hva);
-+}
-+
-+static void munmap_page(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+				uint64_t gpa)
-+{
-+	if (huge_page) {
-+		gpa = align_down(gpa, SZ_2M);
-+		munmap_hole(vcpu, memfd, gpa, SZ_2M);
-+	} else
-+		munmap_hole(vcpu, memfd, gpa, PAGE_SIZE);
-+}
-+
-+static void test_fadvise(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+			 uint64_t gpa)
-+{
-+	/* See vm_mem_add() in test_mem_failure() */
-+	uint64_t offset = gpa - DATA_GPA;
-+	int ret;
-+
-+	discard_nop(vcpu);
-+	ret = posix_fadvise(memfd, offset, sizeof(u64), FADV_HWPOISON);
-+	/* posix_fadvise() doesn't set errno, but returns erorr no. */
-+	if (ret)
-+		errno = ret;
-+	__TEST_REQUIRE(ret != EPERM,
-+		       "Injecting memory fault requires CAP_SYS_ADMIN ret %d",
-+		       ret);
-+	TEST_ASSERT(!ret || ret == EBUSY,
-+		    "posix_fadvise(FADV_HWPOISON) should success ret %d", ret);
-+
-+	sigbus_handler_set(true);
-+	if (!sigsetjmp(sigbuf, 1)) {
-+		/* Trigger SIGBUS */
-+		fault_addr = addr_gpa2hva(vcpu->vm, gpa);
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+
-+	punch_hole_page(vcpu, memfd, huge_page, gpa);
-+	if (!huge_page && !sigsetjmp(sigbuf, 1)) {
-+		fault_addr = addr_gpa2hva(vcpu->vm, gpa);
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+	munmap_page(vcpu, memfd, huge_page, gpa);
-+	sigbus_handler_set(false);
-+}
-+
-+static void test_mce(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+		     uint64_t gpa)
-+{
-+	inject_mce(vcpu, memfd, gpa);
-+
-+	sigbus_handler_set(true);
-+	if (!sigsetjmp(sigbuf, 1)) {
-+		/* Give KVM a chance to inject MCE and trigger SIGBUS. */
-+		fault_addr = addr_gpa2hva(vcpu->vm, gpa);
-+		discard_nop(vcpu);
-+
-+		/* As the mce framework uses work queue, give it time. */
-+		sleep(1);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+
-+	if (!sigsetjmp(sigbuf, 1)) {
-+		/* Trigger SIGBUS */
-+		fault_addr = addr_gpa2hva(vcpu->vm, gpa);
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+
-+	punch_hole_page(vcpu, memfd, huge_page, gpa);
-+	if (!huge_page && !sigsetjmp(sigbuf, 1)) {
-+		fault_addr = addr_gpa2hva(vcpu->vm, gpa);
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+	munmap_page(vcpu, memfd, huge_page, gpa);
-+	sigbus_handler_set(false);
-+}
-+
-+struct inject_mce_args {
-+	struct kvm_vcpu *vcpu;
-+	uint64_t gpa;
-+	int memfd;
-+};
-+
-+static void *inject_mce_remote(void *args_)
-+{
-+	struct inject_mce_args *args = args_;
-+	struct kvm_vcpu *vcpu = args->vcpu;
-+	uint8_t *hva = addr_gpa2hva(vcpu->vm, DATA_GPA);
-+
-+	/* Wait for vcpu running */
-+	while (!READ_ONCE(*hva))
-+		;
-+
-+	inject_mce(vcpu, args->memfd, args->gpa);
-+	return NULL;
-+}
-+
-+static void test_mce_remote(struct kvm_vcpu *vcpu, int memfd, bool huge_page,
-+			    uint64_t gpa)
-+{
-+	uint64_t *hva = addr_gpa2hva(vcpu->vm, gpa);
-+	struct inject_mce_args args = {
-+		.memfd = memfd,
-+		.vcpu = vcpu,
-+		.gpa = gpa,
-+	};
-+	pthread_t thread;
-+
-+	/* Make another thread inject mce while vcpu running. */
-+	fault_addr = hva;
-+	pthread_create(&thread, NULL, inject_mce_remote, &args);
-+
-+	sigbus_handler_set(true);
-+	if (!sigsetjmp(sigbuf, 1)) {
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+	pthread_join(thread, NULL);
-+
-+	punch_hole_page(vcpu, memfd, huge_page, gpa);
-+	if (!huge_page && !sigsetjmp(sigbuf, 1)) {
-+		fault_addr = hva;
-+		vcpu_run(vcpu);
-+		TEST_FAIL("SIGBUS isn't triggered");
-+	}
-+
-+	munmap_page(vcpu, memfd, huge_page, gpa);
-+	sigbus_handler_set(false);
-+	discard_nop(vcpu);
-+}
-+
-+/* How to inject failure */
-+enum failure_injection {
-+	INJECT_MADVISE,
-+	INJECT_FADVISE,
-+	INJECT_MCE,
-+	INJECT_MCE_REMOTE,
-+};
-+
-+struct test_args {
-+	struct kvm_vcpu *vcpu;
-+	enum failure_injection how;
-+	bool huge_page;
-+	int memfd;
-+};
-+
-+static void *__test_mem_failure(void *args_)
-+{
-+	struct test_args *args = args_;
-+	enum failure_injection how = args->how;
-+	struct kvm_vcpu *vcpu = args->vcpu;
-+	bool huge_page = args->huge_page;
-+	struct kvm_run *run = vcpu->run;
-+	int memfd = args->memfd;
-+	struct ucall uc;
-+
-+	for ( ;; ) {
-+		vcpu_run(vcpu);
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Wanted KVM_EXIT_IO, got exit reason: %u (%s)",
-+			    run->exit_reason, exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC: {
-+			uint64_t gpa = uc.args[1];
-+
-+			if (uc.args[0] == GUEST_NOP)
-+				break;
-+
-+			TEST_ASSERT(uc.args[0] == GUEST_HWPOISON,
-+				    "Unknown sync command '%ld'", uc.args[0]);
-+
-+			switch (how) {
-+			case INJECT_MADVISE:
-+				test_madvise(vcpu, memfd, huge_page, gpa);
-+				break;
-+			case INJECT_FADVISE:
-+				test_fadvise(vcpu, memfd, huge_page, gpa);
-+				break;
-+			case INJECT_MCE:
-+				test_mce(vcpu, memfd, huge_page, gpa);
-+				break;
-+			case INJECT_MCE_REMOTE:
-+				test_mce_remote(vcpu, memfd, huge_page, gpa);
-+				break;
-+			default:
-+				TEST_FAIL("Unknown sync ucall %lu", uc.args[0]);
-+				break;
-+			}
-+			break;
-+		}
-+		case UCALL_DONE:
-+			return NULL;
-+		default:
-+			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void test_mem_failure(enum failure_injection how, bool huge_page)
-+{
-+	enum vm_mem_backing_src_type src_type;
-+	struct userspace_mem_region *region;
-+	struct test_args args;
-+	struct kvm_vcpu *vcpu;
-+	pthread_t thread;
-+	struct kvm_vm *vm;
-+	size_t size;
-+	int r;
-+
-+	if (how == INJECT_MADVISE) {
-+		/* madvise(MADV_FREE) requires anonymous region. */
-+		if (huge_page)
-+			src_type = VM_MEM_SRC_ANONYMOUS_MEMFD_HUGETLB;
-+		else
-+			src_type = VM_MEM_SRC_ANONYMOUS_MEMFD;
-+	} else {
-+		/*
-+		 * Use memfd_create() for fadvise() because * fadvise() doesn't
-+		 * work on private anonymous page.
-+		 */
-+		if (huge_page)
-+			src_type = VM_MEM_SRC_SHARED_HUGETLB;
-+		else
-+			src_type = VM_MEM_SRC_SHMEM;
-+	}
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	/*
-+	 * When poisoning memory, the kernel searches mapped pages and inject
-+	 * sigbus with the virtual address.  Avoid alias mapping for
-+	 * deterministic result.
-+	 */
-+	size = align_up(DATA_SIZE, get_backing_src_pagesz(src_type));
-+	__vm_userspace_mem_region_add(vm, src_type, DATA_GPA, DATA_SLOT,
-+				      size / vm->page_size, 0, false);
-+
-+	region = memslot2region(vm, DATA_SLOT);
-+	if (huge_page) {
-+		r = madvise(region->host_mem, size, MADV_HUGEPAGE);
-+		TEST_ASSERT(!r, "madvise(MADV_HUGEPAGE) should succeed");
-+	} else {
-+		r = madvise(region->host_mem, size, MADV_NOHUGEPAGE);
-+		TEST_ASSERT(!r, "madvise(MADV_NOHUGEPAGE) should succeed");
-+	}
-+
-+	virt_map(vm, DATA_GPA, DATA_GPA, size / vm->page_size);
-+	vcpu_args_set(vcpu, 3, DATA_GPA, huge_page, how == INJECT_MCE_REMOTE);
-+
-+	args = (struct test_args) {
-+		.vcpu = vcpu,
-+		.how = how,
-+		.huge_page = huge_page,
-+		.memfd = region->fd,
-+	};
-+	pthread_create(&thread, NULL, __test_mem_failure, &args);
-+
-+	pthread_join(thread, NULL);
-+	kvm_vm_free(vm);
-+}
-+
-+static void help(const char *prog_name)
-+{
-+	printf("usage: %s [-f] [-h] [-i] [-m] [-r] [-?]\n"
-+	       " -f: use fadvise for memory poison\n"
-+	       " -h: use huge page\n"
-+	       " -i: use mce injection\n"
-+	       " -m: use madvise for memory poison\n"
-+	       " -r: use mce injection remotely\n"
-+	       " -?: print this message\n",
-+	       prog_name);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	enum failure_injection how = INJECT_MADVISE;
-+	bool huge_page = false;
-+	int opt;
-+
-+	while ((opt = getopt(argc, argv, "fhimr?")) != -1) {
-+		switch (opt) {
-+		case 'f':
-+			how = INJECT_FADVISE;
-+			break;
-+		case 'i':
-+			how = INJECT_MCE;
-+			break;
-+		case 'h':
-+			huge_page = true;
-+			break;
-+		case 'm':
-+			how = INJECT_MADVISE;
-+			break;
-+		case 'r':
-+			how = INJECT_MCE_REMOTE;
-+			break;
-+		case '?':
-+		default:
-+			help(argv[0]);
-+			exit(0);
-+		}
-+	}
-+
-+	test_mem_failure(how, huge_page);
-+
-+	return 0;
-+}
--- 
-2.25.1
-
+my question to v10 was not answered. posted again:
+--
+Though the variant driver emulates the access to the offset beyond
+the available memory size, how does the userspace driver or the guest
+learn to know the actual size and avoid using the invalid hole to hold
+valid data?
