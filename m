@@ -2,128 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCA6E7BF610
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:36:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1D87BF5FF
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:35:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442944AbjJJIfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43742 "EHLO
+        id S1442890AbjJJIf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442904AbjJJIfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:35:36 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3700A9;
-        Tue, 10 Oct 2023 01:35:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696926934; x=1728462934;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=P/4mWGyVldhGd+8X9JavsKnqWkSdr5BRdzY15fml+QM=;
-  b=TXtGdIVmyIfDzT0j0xxDxgAhXbLmgFGAG7CP7kOCvDdScSpr+yqifDdn
-   G77awRNEGPB1tib+/yYoa4S/36LoYe2EIfpY98uWGrd/f/4N4rse+jgT4
-   JVTvy6ZB1ktgkHc4N/CdRBd0QOK3r6/9auDfDBbJGaif73i5g3uxKDTvK
-   QrfyvonDpMftCyDQrTPYCirIqyeO6pycWf0mMdI9ghOno4QcFDRDfLxc3
-   JL1eiKYItbu63b7nX9yIIpJ/a72jQwRAf0O5qNt30irQBJTKIYq93jKL0
-   6/+ISSEtMpfG9EzmqQXrK9iOeCQCWwQc1c151b/XyRh/Y67EJ4ChqQTvK
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="387176601"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="387176601"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="730001332"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="730001332"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:32 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH 02/12] X86/mce/inject: Add mcgstatus for mce-inject debugfs
-Date:   Tue, 10 Oct 2023 01:35:10 -0700
-Message-Id: <062049a8ebfaa7bf14fe22ddb5e48f5b660e3332.1696926843.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1696926843.git.isaku.yamahata@intel.com>
-References: <cover.1696926843.git.isaku.yamahata@intel.com>
+        with ESMTP id S1442719AbjJJIfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:35:24 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7F297
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 01:35:19 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39A8YEA8014149
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : to : cc : from : message-id : date; s=pp1;
+ bh=OOjmVU41BxwbnjQAcly2AKSMaNN/72LCKeRVvvqFNbM=;
+ b=AucAaLYU8OWTZmKkOZEy2G0OVXX9z3EHHuuRMDmsrs9j4KhOhBP3pB6U8lIMOyLPUuqK
+ C+9mBfR8E+qGM5J4KfT9WVkvZGXhZDEDu5MGW8QL6KZtuDP9Ptc/GV5W3zqu99dq+6K4
+ oNjavRhLUYh5LL18mpfUIv92cZ6+Cwt/BLS6TrhIJquJKJ8iCzMNCuNrpQyXrdeCbP4J
+ 1XWTmXm0QVJdSnwYN9y+6iF4aT7O8SNBIrPadwnwMcoy4AC+uef8noB/HRhFIa1JXSUM
+ R/dXHmnFVO6Xe6rF6a2u4ldquSRNbuAV2DIVDA3ycjt+/DtyRlzYk6kJq60sIL5e4ghI Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn31w0bj5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:18 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39A8YokR018846
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:18 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn31w0bg8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Oct 2023 08:35:18 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39A6Zcmq023032;
+        Tue, 10 Oct 2023 08:35:16 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkmc1ek8d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Oct 2023 08:35:16 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39A8ZDRM44630290
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Oct 2023 08:35:13 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A19520040;
+        Tue, 10 Oct 2023 08:35:13 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 690B120043;
+        Tue, 10 Oct 2023 08:35:12 +0000 (GMT)
+Received: from t14-nrb (unknown [9.179.21.115])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Oct 2023 08:35:12 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231010073855.26319-3-frankja@linux.ibm.com>
+References: <20231010073855.26319-1-frankja@linux.ibm.com> <20231010073855.26319-3-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 2/3] lib: s390x: sclp: Add compat handling for HMC ASCII consoles
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com,
+        nsg@linux.ibm.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169692691109.15053.11870167586294044363@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 10 Oct 2023 10:35:11 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZSS-qBnYIofbh9DGSSRrxXYzIm22ErPg
+X-Proofpoint-ORIG-GUID: WOHfmrf5AY8euu-3qK4zLEIl6N-uo7cp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-10_04,2023-10-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 suspectscore=0 spamscore=0
+ mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310100063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Quoting Janosch Frank (2023-10-10 09:38:54)
+[...]
+> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+> index 19c74e46..313be1e4 100644
+> --- a/lib/s390x/sclp-console.c
+> +++ b/lib/s390x/sclp-console.c
+[...]
+> +static bool lpar_ascii_compat;
 
-To test KVM x86 to inject machine check with memory failure, it wants to
-to set LMCE_S (local machine check exception signaled) for memory failure
-injection test.  The current code sets mcgstatus based on the other values
-and can't set LMCE_S flag.
+This only toggles adding \r. So why not name it accordingly?
+Something like:
+  ascii_line_end_dos
+or
+  ascii_add_cr_line_end
 
-Add mcgstatus entry to allow to set mcgstatus value.
+>  static char lm_buff[120];
+>  static unsigned char lm_buff_off;
+>  static struct spinlock lm_buff_lock;
+> @@ -97,14 +100,27 @@ static void sclp_print_ascii(const char *str)
+>  {
+>         int len =3D strlen(str);
+>         WriteEventData *sccb =3D (void *)_sccb;
+> +       char *str_dest =3D (char *)&sccb->msg;
+> +       int i =3D 0;
+> =20
+>         sclp_mark_busy();
+>         memset(sccb, 0, sizeof(*sccb));
+> +
+> +       for (; i < len; i++) {
+> +               *str_dest =3D str[i];
+> +               str_dest++;
+> +               /* Add a \r to the \n for HMC ASCII console */
+> +               if (str[i] =3D=3D '\n' && lpar_ascii_compat) {
+> +                       *str_dest =3D '\r';
+> +                       str_dest++;
+> +               }
+> +       }
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kernel/cpu/mce/inject.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Please don't hide the check inside the loop.
+Do:
+if (lpar_ascii_compat)
+  // your loop
+else
+  memcpy()
 
-diff --git a/arch/x86/kernel/cpu/mce/inject.c b/arch/x86/kernel/cpu/mce/inject.c
-index 881898a1d2f4..461858ae18f9 100644
---- a/arch/x86/kernel/cpu/mce/inject.c
-+++ b/arch/x86/kernel/cpu/mce/inject.c
-@@ -72,6 +72,7 @@ static int inj_##reg##_set(void *data, u64 val)				\
- 	return 0;							\
- }
- 
-+MCE_INJECT_SET(mcgstatus);
- MCE_INJECT_SET(status);
- MCE_INJECT_SET(misc);
- MCE_INJECT_SET(addr);
-@@ -86,12 +87,14 @@ static int inj_##reg##_get(void *data, u64 *val)			\
- 	return 0;							\
- }
- 
-+MCE_INJECT_GET(mcgstatus);
- MCE_INJECT_GET(status);
- MCE_INJECT_GET(misc);
- MCE_INJECT_GET(addr);
- MCE_INJECT_GET(synd);
- MCE_INJECT_GET(ipid);
- 
-+DEFINE_SIMPLE_ATTRIBUTE(mcgstatus_fops, inj_mcgstatus_get, inj_mcgstatus_set, "%llx\n");
- DEFINE_SIMPLE_ATTRIBUTE(status_fops, inj_status_get, inj_status_set, "%llx\n");
- DEFINE_SIMPLE_ATTRIBUTE(misc_fops, inj_misc_get, inj_misc_set, "%llx\n");
- DEFINE_SIMPLE_ATTRIBUTE(addr_fops, inj_addr_get, inj_addr_set, "%llx\n");
-@@ -679,6 +682,9 @@ static const char readme_msg[] =
- "\t    APIC interrupt handler to handle the error. \n"
- "\n"
- "ipid:\t IPID (AMD-specific)\n"
-+"\n"
-+"mcgstatus:\t Set MCG_STATUS: the bits in that MSR describes the current state\n"
-+"\t of the processor after the MCE.\n"
- "\n";
- 
- static ssize_t
-@@ -706,6 +712,8 @@ static struct dfs_node {
- 	{ .name = "bank",	.fops = &bank_fops,   .perm = S_IRUSR | S_IWUSR },
- 	{ .name = "flags",	.fops = &flags_fops,  .perm = S_IRUSR | S_IWUSR },
- 	{ .name = "cpu",	.fops = &extcpu_fops, .perm = S_IRUSR | S_IWUSR },
-+	{ .name = "mcgstatus",	.fops = &mcgstatus_fops,
-+						      .perm = S_IRUSR | S_IWUSR },
- 	{ .name = "README",	.fops = &readme_fops, .perm = S_IRUSR | S_IRGRP | S_IROTH },
- };
- 
--- 
-2.25.1
+Also, please add protection against overflowing sccb->msg (max 4088 bytes
+if I looked it up right).
 
+> +       len =3D (uintptr_t)str_dest - (uintptr_t)&sccb->msg;
+
+And when you do the above, it should be easy to get rid of pointer
+subtraction.
+
+[...]
+>  void sclp_console_setup(void)
+>  {
+> +       lpar_ascii_compat =3D detect_host_early() =3D=3D HOST_IS_LPAR;
+> +
+>         /* We send ASCII and line mode. */
+>         sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_M=
+ASK_MSG);
+> +       /* Hard terminal reset to clear screen for HMC ASCII console */
+> +       if (lpar_ascii_compat)
+> +               sclp_print_ascii("\ec");
+
+I have in the past cursed programs which clear the screen, but I can see
+the advantage here. How do others feel about this?
