@@ -2,159 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B1D87BF5FF
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 364187BF603
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:35:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442890AbjJJIf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:35:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
+        id S1442919AbjJJIfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:35:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442719AbjJJIfY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:35:24 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7F297
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 01:35:19 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39A8YEA8014149
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : to : cc : from : message-id : date; s=pp1;
- bh=OOjmVU41BxwbnjQAcly2AKSMaNN/72LCKeRVvvqFNbM=;
- b=AucAaLYU8OWTZmKkOZEy2G0OVXX9z3EHHuuRMDmsrs9j4KhOhBP3pB6U8lIMOyLPUuqK
- C+9mBfR8E+qGM5J4KfT9WVkvZGXhZDEDu5MGW8QL6KZtuDP9Ptc/GV5W3zqu99dq+6K4
- oNjavRhLUYh5LL18mpfUIv92cZ6+Cwt/BLS6TrhIJquJKJ8iCzMNCuNrpQyXrdeCbP4J
- 1XWTmXm0QVJdSnwYN9y+6iF4aT7O8SNBIrPadwnwMcoy4AC+uef8noB/HRhFIa1JXSUM
- R/dXHmnFVO6Xe6rF6a2u4ldquSRNbuAV2DIVDA3ycjt+/DtyRlzYk6kJq60sIL5e4ghI Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn31w0bj5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:18 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39A8YokR018846
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 08:35:18 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn31w0bg8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 08:35:18 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39A6Zcmq023032;
-        Tue, 10 Oct 2023 08:35:16 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkmc1ek8d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 08:35:16 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39A8ZDRM44630290
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Oct 2023 08:35:13 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1A19520040;
-        Tue, 10 Oct 2023 08:35:13 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 690B120043;
-        Tue, 10 Oct 2023 08:35:12 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.21.115])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Oct 2023 08:35:12 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S1442898AbjJJIfg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:35:36 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1450DA4;
+        Tue, 10 Oct 2023 01:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696926934; x=1728462934;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=m7pCDbhKS6+u2jcznAubfaRxlAgJtSYbB0zCkXhtCcE=;
+  b=keJcEqYFaOJEYzUkdJs8Jft5Ct6gYDwV5Lf18cWLvqtj64Kif8BUg2r2
+   1dEaf9aaXoipwdTjWVzuXgdfobvcwluduObiJeCQoLSk3p151Kd0C2iMg
+   6vzMDb+Rh+CBdKeE0F0d6RfRqxJ08xEYm9VFMmGFj2zxcV9MPdrskqYoU
+   2srdz334BLAsk0fpy1PBsE1A+1OwIfVGqsg8Wr3Is1gaV4/Gbeg0h5eTY
+   Q3NA/BDiabkx5f0HO6/ec9HBbokMe3edoknx9tN4qEi1Vie1f+64QI7hw
+   SLKBWbUSf4IbLRsfWduakHttw1NZtQWtgKyBdiy8mhzx9lBm8/9t9ymJh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689792"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="363689792"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687182"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="1084687182"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:33 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
+Subject: [PATCH 03/12] x86/mce/inject: Add notrigger entry to suppress MCE injection
+Date:   Tue, 10 Oct 2023 01:35:11 -0700
+Message-Id: <97809b68e427922948044e33599c2fc7c9f6134c.1696926843.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1696926843.git.isaku.yamahata@intel.com>
+References: <cover.1696926843.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231010073855.26319-3-frankja@linux.ibm.com>
-References: <20231010073855.26319-1-frankja@linux.ibm.com> <20231010073855.26319-3-frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/3] lib: s390x: sclp: Add compat handling for HMC ASCII consoles
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com, david@redhat.com,
-        nsg@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <169692691109.15053.11870167586294044363@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 10 Oct 2023 10:35:11 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZSS-qBnYIofbh9DGSSRrxXYzIm22ErPg
-X-Proofpoint-ORIG-GUID: WOHfmrf5AY8euu-3qK4zLEIl6N-uo7cp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-10_04,2023-10-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 clxscore=1015 priorityscore=1501 suspectscore=0 spamscore=0
- mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310100063
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-10-10 09:38:54)
-[...]
-> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
-> index 19c74e46..313be1e4 100644
-> --- a/lib/s390x/sclp-console.c
-> +++ b/lib/s390x/sclp-console.c
-[...]
-> +static bool lpar_ascii_compat;
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This only toggles adding \r. So why not name it accordingly?
-Something like:
-  ascii_line_end_dos
-or
-  ascii_add_cr_line_end
+The current x86 MCE injection framework injects MCE when writing to
+/sys/kernel/debug/mce-inject/bank.  KVM wants to inject machine check on
+behalf of vcpu context instead of the context of writing to the bank file.
 
->  static char lm_buff[120];
->  static unsigned char lm_buff_off;
->  static struct spinlock lm_buff_lock;
-> @@ -97,14 +100,27 @@ static void sclp_print_ascii(const char *str)
->  {
->         int len =3D strlen(str);
->         WriteEventData *sccb =3D (void *)_sccb;
-> +       char *str_dest =3D (char *)&sccb->msg;
-> +       int i =3D 0;
-> =20
->         sclp_mark_busy();
->         memset(sccb, 0, sizeof(*sccb));
-> +
-> +       for (; i < len; i++) {
-> +               *str_dest =3D str[i];
-> +               str_dest++;
-> +               /* Add a \r to the \n for HMC ASCII console */
-> +               if (str[i] =3D=3D '\n' && lpar_ascii_compat) {
-> +                       *str_dest =3D '\r';
-> +                       str_dest++;
-> +               }
-> +       }
+Because ACPI APEI has a similar requirement and it adds
+/sys/kernel/debug/apei/notrigger to suppress immediate injection.
+By Following it, add /sys/kernel/debug/mce-inject/notrigger to suppress
+MCE injection.
 
-Please don't hide the check inside the loop.
-Do:
-if (lpar_ascii_compat)
-  // your loop
-else
-  memcpy()
+The alternative is add new value "notrigger" to
+/sys/kernel/debug/mce-inject/flags in addition to "sw", "hw", "df", and
+"th".  Because it may break user space ABI, this option follow ACPI APEI
+error injection.
 
-Also, please add protection against overflowing sccb->msg (max 4088 bytes
-if I looked it up right).
+Supposed usage flow:
+$ echo 1 > notrigger
+  ... setup MCE values
+$ echo 0 > bank
+  The last step to setup mce value to inject with MC bank 0.
+  Originally this step injects mce.  With noijnect=1, don't inject.
 
-> +       len =3D (uintptr_t)str_dest - (uintptr_t)&sccb->msg;
+$ echo 1 > /sys/kernel/debug/kvm/<pid>-<fd>/vcpu<N>/mce-inject
+  tell KVM to inject MCE in the context of vcpu.
 
-And when you do the above, it should be easy to get rid of pointer
-subtraction.
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+---
+ arch/x86/kernel/cpu/mce/inject.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-[...]
->  void sclp_console_setup(void)
->  {
-> +       lpar_ascii_compat =3D detect_host_early() =3D=3D HOST_IS_LPAR;
-> +
->         /* We send ASCII and line mode. */
->         sclp_write_event_mask(0, SCLP_EVENT_MASK_MSG_ASCII | SCLP_EVENT_M=
-ASK_MSG);
-> +       /* Hard terminal reset to clear screen for HMC ASCII console */
-> +       if (lpar_ascii_compat)
-> +               sclp_print_ascii("\ec");
+diff --git a/arch/x86/kernel/cpu/mce/inject.c b/arch/x86/kernel/cpu/mce/inject.c
+index 461858ae18f9..88603a6c0afe 100644
+--- a/arch/x86/kernel/cpu/mce/inject.c
++++ b/arch/x86/kernel/cpu/mce/inject.c
+@@ -34,6 +34,7 @@
+ #include "internal.h"
+ 
+ static bool hw_injection_possible;
++static u64 notrigger;
+ 
+ /*
+  * Collect all the MCi_XXX settings
+@@ -598,6 +599,8 @@ static int inj_bank_set(void *data, u64 val)
+ 	}
+ 
+ 	m->bank = val;
++	if (notrigger)
++		return 0;
+ 
+ 	/*
+ 	 * sw-only injection allows to write arbitrary values into the MCA
+@@ -637,6 +640,21 @@ MCE_INJECT_GET(bank);
+ 
+ DEFINE_SIMPLE_ATTRIBUTE(bank_fops, inj_bank_get, inj_bank_set, "%llu\n");
+ 
++static int inj_notrigger_get(void *data, u64 *val)
++{
++	*val = notrigger;
++	return 0;
++}
++
++static int inj_notrigger_set(void *data, u64 val)
++{
++	notrigger = val;
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(notrigger_fops, inj_notrigger_get, inj_notrigger_set,
++			"%llx\n");
++
+ static const char readme_msg[] =
+ "Description of the files and their usages:\n"
+ "\n"
+@@ -685,6 +703,9 @@ static const char readme_msg[] =
+ "\n"
+ "mcgstatus:\t Set MCG_STATUS: the bits in that MSR describes the current state\n"
+ "\t of the processor after the MCE.\n"
++"\n"
++"notrigger:\t Suppress triggering the injection when set to non-zero\n"
++"\t The injection is triggered by other way.\n"
+ "\n";
+ 
+ static ssize_t
+@@ -714,6 +735,8 @@ static struct dfs_node {
+ 	{ .name = "cpu",	.fops = &extcpu_fops, .perm = S_IRUSR | S_IWUSR },
+ 	{ .name = "mcgstatus",	.fops = &mcgstatus_fops,
+ 						      .perm = S_IRUSR | S_IWUSR },
++	{ .name = "notrigger",	.fops = &notrigger_fops,
++						      .perm = S_IRUSR | S_IWUSR },
+ 	{ .name = "README",	.fops = &readme_fops, .perm = S_IRUSR | S_IRGRP | S_IROTH },
+ };
+ 
+-- 
+2.25.1
 
-I have in the past cursed programs which clear the screen, but I can see
-the advantage here. How do others feel about this?
