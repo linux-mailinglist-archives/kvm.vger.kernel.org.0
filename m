@@ -2,106 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E7177C0309
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 19:53:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73CAD7C0363
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 20:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343501AbjJJRxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 13:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
+        id S1343536AbjJJS0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 14:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233999AbjJJRxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 13:53:17 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CAD8A4
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:53:16 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012F1C433C8;
-        Tue, 10 Oct 2023 17:53:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696960396;
-        bh=cx2JxC0iURoRrWYffKAIdyccngOQUSODrrfk6c46CX0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nhVR5y3ImuE6z+RPfhVgYEQnhivVmAi97QFivStdWin4b8hzgp9FcFx0Qiv7k5Wm2
-         tnkTOqWE/sQiYNH8Pxe678vlCddD4B44/Q9wvG2r53eJtg23BqWf7sCgqlwkfGBLhP
-         E/gSvEFy/mgt7p7kLzsB2X/PNIF0Z+Bk0xsdkowb9FVeab53gA40sHtoTmWeMG8Z3A
-         Otc6jznPjdLktcWeP5xM/lQm1lKlyUQDbcyu51BxO9OT3SwK8eCfaSHIbqIknbHgcF
-         CtRDcEKjk1nCMCJP5IpMUuYlql+TSlLv5dKUDqj3zS6NM6q2HlrFltDNBOCLxaYFaA
-         XUNAw21CgYUlw==
-Date:   Tue, 10 Oct 2023 18:53:08 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 3/5] KVM: selftests: Generate sysreg-defs.h and add to
- include path
-Message-ID: <cc827136-c62f-4460-a49e-94d1b42c1f1b@sirena.org.uk>
-References: <20231010011023.2497088-1-oliver.upton@linux.dev>
- <20231010011023.2497088-4-oliver.upton@linux.dev>
+        with ESMTP id S229885AbjJJS0k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 14:26:40 -0400
+X-Greylist: delayed 1200 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 11:26:36 PDT
+Received: from 4.mo576.mail-out.ovh.net (4.mo576.mail-out.ovh.net [46.105.42.102])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5211894
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:26:36 -0700 (PDT)
+Received: from director11.ghost.mail-out.ovh.net (unknown [10.108.4.132])
+        by mo576.mail-out.ovh.net (Postfix) with ESMTP id C0EF827E2C
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 17:48:28 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-stm2z (unknown [10.110.115.58])
+        by director11.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 6CCDA1FD7A;
+        Tue, 10 Oct 2023 17:48:27 +0000 (UTC)
+Received: from foxhound.fi ([37.59.142.96])
+        by ghost-submission-6684bf9d7b-stm2z with ESMTPSA
+        id 8psZFmuOJWW+IgUAE6teJg
+        (envelope-from <jose.pekkarinen@foxhound.fi>); Tue, 10 Oct 2023 17:48:27 +0000
+Authentication-Results: garm.ovh; auth=pass (GARM-96R0014c201574-7c4e-4efe-b59f-e4ee1977f006,
+                    0BECE3FDD040DFF140D1580490AC4D25886584D9) smtp.auth=jose.pekkarinen@foxhound.fi
+X-OVh-ClientIp: 91.157.111.220
+From:   =?UTF-8?q?Jos=C3=A9=20Pekkarinen?= <jose.pekkarinen@foxhound.fi>
+To:     seanjc@google.com, pbonzini@redhat.com, skhan@linuxfoundation.org
+Cc:     =?UTF-8?q?Jos=C3=A9=20Pekkarinen?= <jose.pekkarinen@foxhound.fi>,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH] kvm/sev: remove redundant MISC_CG_RES_SEV_ES
+Date:   Tue, 10 Oct 2023 20:49:13 +0300
+Message-ID: <20231010174932.29769-1-jose.pekkarinen@foxhound.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="zcteXYz5fZJBP43J"
-Content-Disposition: inline
-In-Reply-To: <20231010011023.2497088-4-oliver.upton@linux.dev>
-X-Cookie: I feel partially hydrogenated!
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 10262577655121553062
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrheehgdduudehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpefhvfevufffkffogggtgfesthekredtredtjeenucfhrhhomheplfhoshorucfrvghkkhgrrhhinhgvnhcuoehjohhsvgdrphgvkhhkrghrihhnvghnsehfohighhhouhhnugdrfhhiqeenucggtffrrghtthgvrhhnpeeftdelueetieetvdettdetueeivedujeefffdvteefkeelhefhleelfeetteejjeenucfkphepuddvjedrtddrtddruddpledurdduheejrdduuddurddvvddtpdefjedrheelrddugedvrdelieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehjohhsvgdrphgvkhhkrghrihhnvghnsehfohighhhouhhnugdrfhhiqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehjeeipdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+SEV-ES is an extra encrypted state that shares common resources
+with SEV. Using an extra CG for its purpose doesn't seem to
+provide much value. This patch will clean up the control group
+along with multiple checks that become redundant with it.
 
---zcteXYz5fZJBP43J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The patch will also remove a redundant logic on sev initialization
+that produces SEV-ES to be disabled, while supported by the cpu
+and requested by the user through the sev_es parameter.
 
-On Tue, Oct 10, 2023 at 01:10:20AM +0000, Oliver Upton wrote:
+Signed-off-by: José Pekkarinen <jose.pekkarinen@foxhound.fi>
+---
+ arch/x86/kvm/svm/sev.c      | 18 +++---------------
+ include/linux/misc_cgroup.h |  2 --
+ 2 files changed, 3 insertions(+), 17 deletions(-)
 
-> Start generating sysreg-defs.h for arm64 builds in anticipation of
-> updating sysreg.h to a version that depends on it.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 07756b7348ae..8a06d92187cf 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -37,13 +37,9 @@
+  * this file are not used but this file still gets compiled into the KVM AMD
+  * module.
+  *
+- * We will not have MISC_CG_RES_SEV and MISC_CG_RES_SEV_ES entries in the enum
+- * misc_res_type {} defined in linux/misc_cgroup.h.
+- *
+  * Below macros allow compilation to succeed.
+  */
+ #define MISC_CG_RES_SEV MISC_CG_RES_TYPES
+-#define MISC_CG_RES_SEV_ES MISC_CG_RES_TYPES
+ #endif
+ 
+ #ifdef CONFIG_KVM_AMD_SEV
+@@ -125,13 +121,13 @@ static bool __sev_recycle_asids(int min_asid, int max_asid)
+ 
+ static int sev_misc_cg_try_charge(struct kvm_sev_info *sev)
+ {
+-	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
++	enum misc_res_type type = MISC_CG_RES_SEV;
+ 	return misc_cg_try_charge(type, sev->misc_cg, 1);
+ }
+ 
+ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+ {
+-	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
++	enum misc_res_type type = MISC_CG_RES_SEV;
+ 	misc_cg_uncharge(type, sev->misc_cg, 1);
+ }
+ 
+@@ -2167,7 +2163,7 @@ void __init sev_set_cpu_caps(void)
+ void __init sev_hardware_setup(void)
+ {
+ #ifdef CONFIG_KVM_AMD_SEV
+-	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
++	unsigned int eax, ebx, ecx, edx, sev_asid_count;
+ 	bool sev_es_supported = false;
+ 	bool sev_supported = false;
+ 
+@@ -2236,14 +2232,7 @@ void __init sev_hardware_setup(void)
+ 	if (!boot_cpu_has(X86_FEATURE_SEV_ES))
+ 		goto out;
+ 
+-	/* Has the system been allocated ASIDs for SEV-ES? */
+-	if (min_sev_asid == 1)
+-		goto out;
+-
+-	sev_es_asid_count = min_sev_asid - 1;
+-	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
+ 	sev_es_supported = true;
+-
+ out:
+ 	if (boot_cpu_has(X86_FEATURE_SEV))
+ 		pr_info("SEV %s (ASIDs %u - %u)\n",
+@@ -2271,7 +2260,6 @@ void sev_hardware_unsetup(void)
+ 	bitmap_free(sev_reclaim_asid_bitmap);
+ 
+ 	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
+-	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
+ }
+ 
+ int sev_cpu_init(struct svm_cpu_data *sd)
+diff --git a/include/linux/misc_cgroup.h b/include/linux/misc_cgroup.h
+index c238207d1615..23d3cd153f60 100644
+--- a/include/linux/misc_cgroup.h
++++ b/include/linux/misc_cgroup.h
+@@ -15,8 +15,6 @@ enum misc_res_type {
+ #ifdef CONFIG_KVM_AMD_SEV
+ 	/* AMD SEV ASIDs resource */
+ 	MISC_CG_RES_SEV,
+-	/* AMD SEV-ES ASIDs resource */
+-	MISC_CG_RES_SEV_ES,
+ #endif
+ 	MISC_CG_RES_TYPES
+ };
+-- 
+2.41.0
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
-> +ifeq ($(ARCH),arm64)
-> +arm64_tools_dir := $(top_srcdir)/tools/arch/arm64/tools/
-> +GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
-> +CFLAGS += -I$(GEN_HDRS)
-
-We might want to hoist this up to the top level lib.mk at some point if
-other kselftests want it too but let's not worry about it until it's a
-practical issue.
-
---zcteXYz5fZJBP43J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUlj4QACgkQJNaLcl1U
-h9CG2wf+LXRRosmuRsHr2KwWjh2URdt60VoRwaDmXhh7/pGe09afffuBz2c6/3So
-So6ZdTfUue2ois6c+GACxKsjhcBOYxaNEkXubiv0KrqCNHsALoxTjB6uhD+3+Nuo
-9Xz8ieecM9loqu7AYV+69udmy7bIKyt+aDm6bRtL0OoixTbAuH6qPzfOv1cV2AoK
-ESB9tqrPI1MnK+I5O9peYaBvEevsB1CnI47LU4Mjb9679mN+1I0WeT4cMLmwHN8b
-BWry5Nw7cQpiYosGLCvw3ZBbeBywPcYHc60h/O7DgJ8Ti53tTWsB/ndx1cxvlY/u
-DSOo/pPUSSEO5bTag4/mlztczNALwA==
-=0wtO
------END PGP SIGNATURE-----
-
---zcteXYz5fZJBP43J--
