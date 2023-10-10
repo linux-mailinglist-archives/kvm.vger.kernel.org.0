@@ -2,174 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5963F7BF715
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 11:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 503A97BF7A0
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 11:41:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbjJJJSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 05:18:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56518 "EHLO
+        id S229887AbjJJJlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 05:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbjJJJSg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 05:18:36 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D491A7;
-        Tue, 10 Oct 2023 02:18:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696929515; x=1728465515;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nhMjTskI0kdje3r63TqyWep3YjWnF2MvMNQ53LvDfCs=;
-  b=UN+jLhqfsSbaBaPO9pDGfUUVfbmdIYGRn5IqelQmiBlj8sMfNnv2RX7A
-   7DQ5i+buRfPE5lYFJ6pPrSs7ADpYJgTGaqyRlbT9kJmgqmOl9cN4VOQs7
-   pkCS7fhESPkkF359bWE1jYgnGOhZjEHX/ErC/Wub1u/39QI6SZNvSv884
-   oTOF1CukH2jW5ItoBpRvD+kI6GD4DkYwhqU4LrZ8IBq2BX2SgQvxOfdIe
-   4OtT4DgbcqD6NrIWdfkeuB5qlCqQaLXUU87EYTemH9QyxwSO9xsN/lcfm
-   NeBkspYuVPmdZc/sOvt3YFqH+B0DFzplD06LqQCTzmtZ9FS6+Q7I+d7VK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="364643123"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="364643123"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 02:18:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="844048252"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="844048252"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Oct 2023 02:18:30 -0700
-Date:   Tue, 10 Oct 2023 17:17:36 +0800
-From:   Xu Yilun <yilun.xu@intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6/8] KVM: gmem, x86: Add gmem hook for invalidating
- private memory
-Message-ID: <ZSUWsK8dGPjlrCR1@yilunxu-OptiPlex-7050>
-References: <cover.1692119201.git.isaku.yamahata@intel.com>
- <8c9f0470ba6e5dc122f3f4e37c4dcfb6fb97b184.1692119201.git.isaku.yamahata@intel.com>
+        with ESMTP id S229580AbjJJJlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 05:41:40 -0400
+Received: from mail.xenproject.org (mail.xenproject.org [104.130.215.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8669F;
+        Tue, 10 Oct 2023 02:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+        Subject:To:From; bh=KiG9gq+pmTjiCNH5AMoTyUrDkGdFm9tyOSauoUX5EWE=; b=CSHN0Dsxd
+        GyqSFPEirbfl9CZEngtVS2y9cciXtLcxSnvkEglg4KOvV/GRTscJ9zQwdJYWQNC0P8FupOvDC/uyA
+        IxkMNMigg77/PQ1RcfAwx0JRypFaxMbqWDAaKaGzGPUgxOQXCYHcdXL7WDeLWXxGIa4FIUtcDuk4+
+        GIsYumYE=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qq9El-0004Bm-KY; Tue, 10 Oct 2023 09:41:11 +0000
+Received: from ec2-63-33-11-17.eu-west-1.compute.amazonaws.com ([63.33.11.17] helo=REM-PW02S00X.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <paul@xen.org>)
+        id 1qq9El-0004Ha-7T; Tue, 10 Oct 2023 09:41:11 +0000
+From:   Paul Durrant <paul@xen.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM x86/xen: add an override for PVCLOCK_TSC_STABLE_BIT
+Date:   Tue, 10 Oct 2023 09:40:47 +0000
+Message-Id: <20231010094047.3850928-1-paul@xen.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c9f0470ba6e5dc122f3f4e37c4dcfb6fb97b184.1692119201.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-08-15 at 10:18:53 -0700, isaku.yamahata@intel.com wrote:
-> From: Michael Roth <michael.roth@amd.com>
-> 
-> TODO: add a CONFIG option that can be to completely skip arch
-> invalidation loop and avoid __weak references for arch/platforms that
-> don't need an additional invalidation hook.
-> 
-> In some cases, like with SEV-SNP, guest memory needs to be updated in a
-> platform-specific manner before it can be safely freed back to the host.
-> Add hooks to wire up handling of this sort when freeing memory in
-> response to FALLOC_FL_PUNCH_HOLE operations.
-> 
-> Also issue invalidations of all allocated pages when releasing the gmem
-> file so that the pages are not left in an unusable state when they get
-> freed back to the host.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Link: https://lore.kernel.org/r/20230612042559.375660-3-michael.roth@amd.com
->
+From: Paul Durrant <pdurrant@amazon.com>
 
-[...]
+Unless explicitly told to do so (by passing 'clocksource=tsc' and
+'tsc=stable:socket', and then jumping through some hoops concerning
+potential CPU hotplug) Xen will never use TSC as its clocksource.
+Hence, by default, a Xen guest will not see PVCLOCK_TSC_STABLE_BIT set
+in either the primary or secondary pvclock memory areas. This has
+led to bugs in some guest kernels which only become evident if
+PVCLOCK_TSC_STABLE_BIT *is* set in the pvclocks. Hence, to support
+such guests, give the VMM a new attribute to tell KVM to forcibly
+clear the bit in the Xen pvclocks.
+
+Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+---
+ Documentation/virt/kvm/api.rst  |  9 +++++++++
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 25 ++++++++++++++++++++-----
+ arch/x86/kvm/xen.c              | 13 +++++++++++++
+ include/uapi/linux/kvm.h        |  5 +++++
+ 5 files changed, 48 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 21a7578142a1..d06f971a2ce0 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5544,6 +5544,7 @@ attribute cannot be read.
+ 			__u64 expires_ns;
+ 		} timer;
+ 		__u8 vector;
++		__u32 flags;
+ 	} u;
+   };
  
-> +/* Handle arch-specific hooks needed before releasing guarded pages. */
-> +static void kvm_gmem_issue_arch_invalidate(struct kvm *kvm, struct file *file,
-> +					   pgoff_t start, pgoff_t end)
-> +{
-> +	pgoff_t file_end = i_size_read(file_inode(file)) >> PAGE_SHIFT;
-> +	pgoff_t index = start;
-> +
-> +	end = min(end, file_end);
-> +
-> +	while (index < end) {
-> +		struct folio *folio;
-> +		unsigned int order;
-> +		struct page *page;
-> +		kvm_pfn_t pfn;
-> +
-> +		folio = __filemap_get_folio(file->f_mapping, index,
-> +					    FGP_LOCK, 0);
-> +		if (!folio) {
-> +			index++;
-> +			continue;
-> +		}
-> +
-> +		page = folio_file_page(folio, index);
-> +		pfn = page_to_pfn(page);
-> +		order = folio_order(folio);
-> +
-> +		kvm_arch_gmem_invalidate(kvm, pfn, pfn + min((1ul << order), end - index));
+@@ -5610,6 +5611,14 @@ KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR
+   vector configured with HVM_PARAM_CALLBACK_IRQ. It is disabled by
+   setting the vector to zero.
+ 
++KVM_XEN_VCPU_ATTR_TYPE_PVCLOCK
++  This attribute is available when the KVM_CAP_XEN_HVM ioctl indicates
++  support for KVM_XEN_HVM_CONFIG_PVCLOCK feature. It modifies the
++  pvclock information available to the guest. Currently the only defined
++  flag is KVM_XEN_PVCLOCK_TSC_UNSTABLE. If this flag is set then the
++  PVCLOCK_TSC_STABLE_BIT flag will not be set in any of the Xen pvclock
++  sources. This aligns with Xen's behaviour when it is not using TSC
++  as its clock source, which is the default behaviour.
+ 
+ 4.129 KVM_XEN_VCPU_GET_ATTR
+ ---------------------------
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 17715cb8731d..2edc48e94d56 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -685,6 +685,7 @@ struct kvm_vcpu_xen {
+ 	u64 hypercall_rip;
+ 	u32 current_runstate;
+ 	u8 upcall_vector;
++	bool tsc_is_unstable;
+ 	struct gfn_to_pfn_cache vcpu_info_cache;
+ 	struct gfn_to_pfn_cache vcpu_time_info_cache;
+ 	struct gfn_to_pfn_cache runstate_cache;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9f18b06bbda6..1c6556e14d40 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3096,7 +3096,8 @@ u64 get_kvmclock_ns(struct kvm *kvm)
+ 
+ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+ 				    struct gfn_to_pfn_cache *gpc,
+-				    unsigned int offset)
++				    unsigned int offset,
++				    bool force_tsc_unstable)
+ {
+ 	struct kvm_vcpu_arch *vcpu = &v->arch;
+ 	struct pvclock_vcpu_time_info *guest_hv_clock;
+@@ -3133,6 +3134,10 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+ 	}
+ 
+ 	memcpy(guest_hv_clock, &vcpu->hv_clock, sizeof(*guest_hv_clock));
++
++	if (force_tsc_unstable)
++		guest_hv_clock->flags &= ~PVCLOCK_TSC_STABLE_BIT;
++
+ 	smp_wmb();
+ 
+ 	guest_hv_clock->version = ++vcpu->hv_clock.version;
+@@ -3231,12 +3236,21 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 	vcpu->hv_clock.flags = pvclock_flags;
+ 
+ 	if (vcpu->pv_time.active)
+-		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0);
++		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0, false);
++
++	/*
++	 * For Xen guests we may need to override PVCLOCK_TSC_STABLE_BIT as unless
++	 * explicitly told to use TSC as its clocksource Xen will not set this bit.
++	 * This default behaviour led to bugs in some guest kernels which cause
++	 * problems if they observe PVCLOCK_TSC_STABLE_BIT in the pvclock flags.
++	 */
+ 	if (vcpu->xen.vcpu_info_cache.active)
+ 		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
+-					offsetof(struct compat_vcpu_info, time));
++					offsetof(struct compat_vcpu_info, time),
++					vcpu->xen.tsc_is_unstable);
+ 	if (vcpu->xen.vcpu_time_info_cache.active)
+-		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0);
++		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0,
++					vcpu->xen.tsc_is_unstable);
+ 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+ 	return 0;
+ }
+@@ -4531,7 +4545,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
+ 		    KVM_XEN_HVM_CONFIG_SHARED_INFO |
+ 		    KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL |
+-		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
++		    KVM_XEN_HVM_CONFIG_EVTCHN_SEND |
++		    KVM_XEN_HVM_CONFIG_PVCLOCK;
+ 		if (sched_info_on())
+ 			r |= KVM_XEN_HVM_CONFIG_RUNSTATE |
+ 			     KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG;
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 40edf4d1974c..08e64df2e27d 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -938,6 +938,12 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		}
+ 		break;
+ 
++	case KVM_XEN_VCPU_ATTR_TYPE_PVCLOCK:
++		vcpu->arch.xen.tsc_is_unstable = data->u.flags & KVM_XEN_PVCLOCK_TSC_UNSTABLE;
++		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
++		r = 0;
++		break;
++
+ 	default:
+ 		break;
+ 	}
+@@ -1030,6 +1036,13 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		r = 0;
+ 		break;
+ 
++	case KVM_XEN_VCPU_ATTR_TYPE_PVCLOCK:
++		data->u.flags = 0;
++		if (vcpu->arch.xen.tsc_is_unstable)
++			data->u.flags |= KVM_XEN_PVCLOCK_TSC_UNSTABLE;
++		r = 0;
++		break;
++
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 13065dd96132..a101fe60f2e1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1282,6 +1282,7 @@ struct kvm_x86_mce {
+ #define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL	(1 << 4)
+ #define KVM_XEN_HVM_CONFIG_EVTCHN_SEND		(1 << 5)
+ #define KVM_XEN_HVM_CONFIG_RUNSTATE_UPDATE_FLAG	(1 << 6)
++#define KVM_XEN_HVM_CONFIG_PVCLOCK		(1 << 7)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -1870,6 +1871,8 @@ struct kvm_xen_vcpu_attr {
+ 			__u64 expires_ns;
+ 		} timer;
+ 		__u8 vector;
++		__u32 flags;
++#define KVM_XEN_PVCLOCK_TSC_UNSTABLE (1 << 0)
+ 	} u;
+ };
+ 
+@@ -1884,6 +1887,8 @@ struct kvm_xen_vcpu_attr {
+ #define KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID		0x6
+ #define KVM_XEN_VCPU_ATTR_TYPE_TIMER		0x7
+ #define KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR	0x8
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_PVCLOCK */
++#define KVM_XEN_VCPU_ATTR_TYPE_PVCLOCK		0x9
+ 
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+-- 
+2.39.2
 
-Observed an issue there.
-
-The valid page may not point to the first page in the folio, then the
-range [pfn, pfn + (1ul << order)) expands to the next folio. This makes
-a part of the pages be invalidated again when loop to the next folio.
-
-On TDX, it causes TDH_PHYMEM_PAGE_WBINVD failed.
-
-> +
-> +		index = folio_next_index(folio);
-> +		folio_unlock(folio);
-> +		folio_put(folio);
-> +
-> +		cond_resched();
-> +	}
-> +}
-
-My fix would be:
-
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index e629782d73d5..3665003c3746 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -155,7 +155,7 @@ static void kvm_gmem_issue_arch_invalidate(struct kvm *kvm, struct inode *inode,
-
-        while (index < end) {
-                struct folio *folio;
--               unsigned int order;
-+               pgoff_t ntails;
-                struct page *page;
-                kvm_pfn_t pfn;
-
-@@ -168,9 +168,9 @@ static void kvm_gmem_issue_arch_invalidate(struct kvm *kvm, struct inode *inode,
-
-                page = folio_file_page(folio, index);
-                pfn = page_to_pfn(page);
--               order = folio_order(folio);
-+               ntails = folio_nr_pages(folio) - folio_page_idx(folio, page);
-
--               kvm_arch_gmem_invalidate(kvm, pfn, pfn + min((1ul << order), end - index));
-+               kvm_arch_gmem_invalidate(kvm, pfn, pfn + min(ntails, end - index));
-
-                index = folio_next_index(folio);
-                folio_unlock(folio);
-
-Thanks,
-Yilun
