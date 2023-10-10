@@ -2,92 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01F727BF82A
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 12:04:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D3DF7BF993
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 13:22:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230220AbjJJKEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 06:04:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55510 "EHLO
+        id S231379AbjJJLWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 07:22:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229987AbjJJKEG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 06:04:06 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4978693;
-        Tue, 10 Oct 2023 03:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=0VuAuXHjC6TcrB2Upe0J5kYBATdZNMJL7jMHDwWl1Oc=; b=lNdGO3IQ0dDFm7Nxs4ZgXMdgpL
-        KJozlc2DyNANXv8kN+v0JoGHveW2KI3SmTqQ8lF6pv4fPzNstjiCR/QbxzzQWXnSXM32hqHu9ZiKe
-        nqp8OJsifwiqTiXlM7oFIiq3tDEhie4E1TIe2FNcKGckePUE7qGpFi5RBpBzzP6XMefB8BMw95YQj
-        RPhoml90CO5ZTXLBNfIVp8fQLxpKhulFeMKbLkxE+J4xfrb1ROEXsrsaH+cf07joo4H62b42W7Iq2
-        OuU03P04e6PBTDh7GLgWTqK2r1+v3PMaztXArg3lgcdr+MgZXCf4iQbuBv4a1qRyV/Xn+StFItrsE
-        1BqsBUBA==;
-Received: from [46.18.216.58] (helo=[127.0.0.1])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qq9ag-00GlJC-2H;
-        Tue, 10 Oct 2023 10:03:53 +0000
-Date:   Tue, 10 Oct 2023 11:03:50 +0100
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>
-CC:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v7=5D_KVM=3A_x86/tsc=3A_Don=27t_sync?= =?US-ASCII?Q?_user-written_TSC_against_startup_values?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <169689823852.390348.16203872510226635933.b4-ty@google.com>
-References: <20231008025335.7419-1-likexu@tencent.com> <169689823852.390348.16203872510226635933.b4-ty@google.com>
-Message-ID: <D764860F-5DBC-49DD-8909-D08A3C24BC42@infradead.org>
+        with ESMTP id S231371AbjJJLWR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 07:22:17 -0400
+X-Greylist: delayed 3601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 04:22:14 PDT
+Received: from 6.mo560.mail-out.ovh.net (6.mo560.mail-out.ovh.net [87.98.165.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09ED89E
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:22:13 -0700 (PDT)
+Received: from director8.ghost.mail-out.ovh.net (unknown [10.108.1.232])
+        by mo560.mail-out.ovh.net (Postfix) with ESMTP id 748D626DA4
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 10:03:11 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-dnnmd (unknown [10.110.208.237])
+        by director8.ghost.mail-out.ovh.net (Postfix) with ESMTPS id CCBC51FE50;
+        Tue, 10 Oct 2023 10:03:08 +0000 (UTC)
+Received: from foxhound.fi ([37.59.142.105])
+        by ghost-submission-6684bf9d7b-dnnmd with ESMTPSA
+        id iJQ8KlwhJWUQWgAArvdK0g
+        (envelope-from <jose.pekkarinen@foxhound.fi>); Tue, 10 Oct 2023 10:03:08 +0000
+Authentication-Results: garm.ovh; auth=pass (GARM-105G0061679898a-46f3-4f1d-875a-19332c22c92d,
+                    0BECE3FDD040DFF140D1580490AC4D25886584D9) smtp.auth=jose.pekkarinen@foxhound.fi
+X-OVh-ClientIp: 91.157.111.220
+From:   =?UTF-8?q?Jos=C3=A9=20Pekkarinen?= <jose.pekkarinen@foxhound.fi>
+To:     seanjc@google.com, pbonzini@redhat.com, skhan@linuxfoundation.org
+Cc:     =?UTF-8?q?Jos=C3=A9=20Pekkarinen?= <jose.pekkarinen@foxhound.fi>,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH] kvm/sev: make SEV/SEV-ES asids configurable
+Date:   Tue, 10 Oct 2023 13:04:39 +0300
+Message-ID: <20231010100441.30950-1-jose.pekkarinen@foxhound.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 2404640727859308198
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrheehgddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeflohhsrocurfgvkhhkrghrihhnvghnuceojhhoshgvrdhpvghkkhgrrhhinhgvnhesfhhogihhohhunhgurdhfiheqnecuggftrfgrthhtvghrnhepfedtleeuteeitedvtedtteeuieevudejfeffvdetfeekleehhfelleefteetjeejnecukfhppeduvdejrddtrddtrddupdeluddrudehjedrudduuddrvddvtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehjohhsvgdrphgvkhhkrghrihhnvghnsehfohighhhouhhnugdrfhhiqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehiedtpdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+There are bioses that doesn't allow to configure the
+number of asids allocated for SEV/SEV-ES, for those
+cases, the default behaviour allocates all the asids
+for SEV, leaving no room for SEV-ES to have some fun.
+If the user request SEV-ES to be enabled, it will
+find the kernel just run out of resources and ignored
+user request. This following patch will address this
+issue by making the number of asids for SEV/SEV-ES
+configurable over kernel module parameters.
 
+Signed-off-by: José Pekkarinen <jose.pekkarinen@foxhound.fi>
+---
+ arch/x86/kvm/svm/sev.c | 28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
-On 10 October 2023 01:44:32 BST, Sean Christopherson <seanjc@google=2Ecom>=
- wrote:
->On Sun, 08 Oct 2023 10:53:35 +0800, Like Xu wrote:
->> The legacy API for setting the TSC is fundamentally broken, and only
->> allows userspace to set a TSC "now", without any way to account for
->> time lost to preemption between the calculation of the value, and the
->> kernel eventually handling the ioctl=2E
->>=20
->> To work around this we have had a hack which, if a TSC is set with a
->> value which is within a second's worth of a previous vCPU, assumes that
->> userspace actually intended them to be in sync and adjusts the newly-
->> written TSC value accordingly=2E
->>=20
->> [=2E=2E=2E]
->
->Applied to kvm-x86 misc, thanks!  I massaged away most of the pronouns in=
- the
->changelog=2E  Yes, they bug me that much, and I genuinely had a hard time=
- following
->some of the paragraphs even though I already knew what the patch is doing=
-=2E
->
->Everyone, please take a look and make sure I didn't botch anything=2E  I =
-tried my
->best to keep the existing "voice" and tone of the changelog (sans pronoun=
-s
->obviously)=2E  I definitely don't want to bikeshed this thing any further=
-=2E  If
->I've learned anything by this patch, it's that the only guaranteed outcom=
-e of
->changelog-by-committee is that no one will walk away 100% happy :-)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 07756b7348ae..68a63b42d16a 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -51,9 +51,18 @@
+ static bool sev_enabled = true;
+ module_param_named(sev, sev_enabled, bool, 0444);
+ 
++/* nr of asids requested for SEV */
++static unsigned int requested_sev_asids;
++module_param_named(sev_asids, requested_sev_asids, uint, 0444);
++
+ /* enable/disable SEV-ES support */
+ static bool sev_es_enabled = true;
+ module_param_named(sev_es, sev_es_enabled, bool, 0444);
++
++/* nr of asids requested for SEV-ES */
++static unsigned int requested_sev_es_asids;
++module_param_named(sev_es_asids, requested_sev_asids, uint, 0444);
++
+ #else
+ #define sev_enabled false
+ #define sev_es_enabled false
+@@ -2194,6 +2203,11 @@ void __init sev_hardware_setup(void)
+ 	if (!max_sev_asid)
+ 		goto out;
+ 
++	if (requested_sev_asids + requested_sev_es_asids > max_sev_asid) {
++		pr_info("SEV asids requested more than available: %u ASIDs\n", max_sev_asid);
++		goto out;
++	}
++
+ 	/* Minimum ASID value that should be used for SEV guest */
+ 	min_sev_asid = edx;
+ 	sev_me_mask = 1UL << (ebx & 0x3f);
+@@ -2215,7 +2229,8 @@ void __init sev_hardware_setup(void)
+ 		goto out;
+ 	}
+ 
+-	sev_asid_count = max_sev_asid - min_sev_asid + 1;
++	sev_asid_count = (requested_sev_asids) ? max_sev_asid - min_sev_asid + 1 :
++						 requested_sev_asids;
+ 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV, sev_asid_count));
+ 	sev_supported = true;
+ 
+@@ -2237,10 +2252,11 @@ void __init sev_hardware_setup(void)
+ 		goto out;
+ 
+ 	/* Has the system been allocated ASIDs for SEV-ES? */
+-	if (min_sev_asid == 1)
++	if (max_sev_asid - sev_asid_count <= 1)
+ 		goto out;
+ 
+-	sev_es_asid_count = min_sev_asid - 1;
++	sev_es_asid_count = (requested_sev_es_asids) ? min_sev_asid - 1 :
++						       requested_sev_es_asids;
+ 	WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count));
+ 	sev_es_supported = true;
+ 
+@@ -2248,11 +2264,13 @@ void __init sev_hardware_setup(void)
+ 	if (boot_cpu_has(X86_FEATURE_SEV))
+ 		pr_info("SEV %s (ASIDs %u - %u)\n",
+ 			sev_supported ? "enabled" : "disabled",
+-			min_sev_asid, max_sev_asid);
++			min_sev_asid, sev_asid_count);
+ 	if (boot_cpu_has(X86_FEATURE_SEV_ES))
+ 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+ 			sev_es_supported ? "enabled" : "disabled",
+-			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
++			sev_asid_count,
++			(requested_sev_es_asids) ? 0 :
++						   sev_asid_count + sev_es_asid_count);
+ 
+ 	sev_enabled = sev_supported;
+ 	sev_es_enabled = sev_es_supported;
+-- 
+2.41.0
 
-LGTM=2E I forgive you for not respecting my pronouns=2E :)
-
-Thanks=2E
