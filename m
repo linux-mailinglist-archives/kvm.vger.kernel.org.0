@@ -2,74 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ED207BF921
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 13:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D84E07BF92A
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 13:06:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231154AbjJJLDl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 07:03:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
+        id S230294AbjJJLGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 07:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231222AbjJJLDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 07:03:36 -0400
+        with ESMTP id S229541AbjJJLGH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 07:06:07 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B4D5A9
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:03:29 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39AAsfNx028163
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:03:28 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E849E
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 04:06:05 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39AB4815027174
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:06:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=muarjDPrxrbZuLA4twtIMhdJYVDKfNiFNnLRiH+l4VI=;
- b=QWIQxKZdDyxnIk0JviSrUI27wlml2lV+hHhOT0kIxahi3drHgVbCTPVcWHDlUUExCbRC
- EVe9lcApvqP8k3EazY6ywK/RGAKjUhN4FzORkCUv2asWzuNJSzhbF4Pq/VUHRGW9bT/9
- PPhrIjdbUE81KfCc/msa6GnhXO1EZfW7WLxGDHUzzRa2HFlvnubd1I8AI1ECOgwhJNON
- WYMfrw5RG96FBsMED6CgmfN1Gm+ZPhr9VwqTD87KYOX/WVslVjempkoBq6wfLlIsN9NN
- P19mCA8iYtXSLIaBPYxL5NcYiM3JY5Z1mPKMDn3a0NlOvD+KcRwn1CSbidVRERvqKRAk Ng== 
+ bh=mKX5lL7Nn7BLIDVHrHLzIp9qdAxlP3f2aaWI4niMnoE=;
+ b=gvLzkSjCns3rfr4qQxGPMyDA1zq3SnpOmHr9cv4HJWeTbHbA/FXi11sZMotNMlrrgLIA
+ Fmbibs4fPGT8dmRwcdfh3nPLI8I6+n0doyniyJuUZNweu4uFTnTQP9+W6XHtiWHUoQlY
+ cxC3DUCuWzAuWVuh54yzTyVneKg7fTpmS0xQJn5jp9e/6nODKm2FJudGfWWkUjbhx+9C
+ 3U8MDyQTallLG7sClDn13BODSit0u1yBYPaUy5SqzPugI0mQyAK0uAzr1WFMXkrNw3BI
+ rn3yPpkG9yNOn8AOMP8jg9dTz8hQb9YL7+5OpxpQtrWpIFR8dAIZPp1hCHF0N6druwKt EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn593rej6-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn5dmg215-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:03:26 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39AAtuJk032765
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:03:20 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn593re72-1
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:06:04 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39AB48Qu027194
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 11:06:04 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tn5dmg210-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 11:03:20 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39A9MlkR001270;
-        Tue, 10 Oct 2023 11:03:11 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvjqeb1-1
+        Tue, 10 Oct 2023 11:06:04 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39AA8fl9028633;
+        Tue, 10 Oct 2023 11:06:03 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkj1y01s0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Oct 2023 11:03:11 +0000
+        Tue, 10 Oct 2023 11:06:03 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39AB38nk59769298
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39AB60mg27656818
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Oct 2023 11:03:08 GMT
+        Tue, 10 Oct 2023 11:06:00 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B437820040;
-        Tue, 10 Oct 2023 11:03:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 436772004D;
+        Tue, 10 Oct 2023 11:06:00 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 525C820043;
-        Tue, 10 Oct 2023 11:03:08 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D3FCD20043;
+        Tue, 10 Oct 2023 11:05:59 +0000 (GMT)
 Received: from [9.171.68.35] (unknown [9.171.68.35])
         by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Oct 2023 11:03:08 +0000 (GMT)
-Message-ID: <95f2e807-6b7f-4e24-a018-a041a2f7ce00@linux.ibm.com>
-Date:   Tue, 10 Oct 2023 13:03:08 +0200
+        Tue, 10 Oct 2023 11:05:59 +0000 (GMT)
+Message-ID: <8568bef1-e829-40f3-8815-c5ab1e9dc8ef@linux.ibm.com>
+Date:   Tue, 10 Oct 2023 13:05:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 1/3] lib: s390x: hw: Provide early detect
- host
+Subject: Re: [kvm-unit-tests PATCH 3/3] lib: s390x: sclp: Add line mode input
+ handling
 Content-Language: en-US
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
         nsg@linux.ibm.com, nrb@linux.ibm.com
 References: <20231010073855.26319-1-frankja@linux.ibm.com>
- <20231010073855.26319-2-frankja@linux.ibm.com>
- <20231010124029.70abcb0a@p-imbrenda>
+ <20231010073855.26319-4-frankja@linux.ibm.com>
+ <20231010123309.4dd54963@p-imbrenda>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
  xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -113,20 +113,20 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20231010124029.70abcb0a@p-imbrenda>
+In-Reply-To: <20231010123309.4dd54963@p-imbrenda>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 763qeakAr9eC_YrwAdlNlHNi9E_HqzvS
-X-Proofpoint-ORIG-GUID: uybL2Gt989Q0nKdd7ij5E8OGvkoibaTV
+X-Proofpoint-GUID: MsLOGvM9B-Y1KYHspIy23FucwVh6qrGv
+X-Proofpoint-ORIG-GUID: 9gGNLWAguP0ndkD4OyVpkQgXqlsptgEM
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-10_06,2023-10-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 adultscore=0
- malwarescore=0 spamscore=0 impostorscore=0 mlxlogscore=999 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310100080
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 phishscore=0 mlxlogscore=999
+ impostorscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310100080
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
         RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -137,53 +137,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/23 12:40, Claudio Imbrenda wrote:
-> On Tue, 10 Oct 2023 07:38:53 +0000
+On 10/10/23 12:33, Claudio Imbrenda wrote:
+> On Tue, 10 Oct 2023 07:38:55 +0000
 > Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
->> For early sclp printing it's necessary to know if we're under LPAR or
->> not so we can apply compat SCLP ASCII transformations.
+>> Time to add line-mode input so we can use input handling under LPAR if
+>> there's no access to a ASCII console.
+>>
+>> Line-mode IO is pretty wild and the documentation could be improved a
+>> lot. Hence I've copied the input parsing functions from Linux.
+>>
+>> For some reason output is a type 2 event but input is a type 1
+>> event. This also means that the input and output structures are
+>> different from each other.
+>>
+>> The input can consist of multiple structures which don't contain text
+>> data before the input text data is reached. Hence we need a bunch of
+>> search functions to retrieve a pointer to the text data.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>   lib/s390x/hardware.c | 8 ++++++++
->>   lib/s390x/hardware.h | 1 +
->>   2 files changed, 9 insertions(+)
+>>   lib/s390x/sclp-console.c | 180 ++++++++++++++++++++++++++++++++++-----
+>>   lib/s390x/sclp.h         |  26 +++++-
+>>   2 files changed, 185 insertions(+), 21 deletions(-)
 >>
->> diff --git a/lib/s390x/hardware.c b/lib/s390x/hardware.c
->> index 2bcf9c4c..d5a752c0 100644
->> --- a/lib/s390x/hardware.c
->> +++ b/lib/s390x/hardware.c
->> @@ -52,6 +52,14 @@ static enum s390_host do_detect_host(void *buf)
->>   	return HOST_IS_UNKNOWN;
->>   }
->>   
->> +enum s390_host detect_host_early(void)
->> +{
->> +	if (stsi_get_fc() == 2)
->> +		return HOST_IS_LPAR;
->> +
->> +	return HOST_IS_UNKNOWN;
->> +}
->> +
->>   enum s390_host detect_host(void)
->>   {
->>   	static enum s390_host host = HOST_IS_UNKNOWN;
->> diff --git a/lib/s390x/hardware.h b/lib/s390x/hardware.h
->> index 86fe873c..5e5a9d90 100644
->> --- a/lib/s390x/hardware.h
->> +++ b/lib/s390x/hardware.h
->> @@ -24,6 +24,7 @@ enum s390_host {
->>   };
->>   
->>   enum s390_host detect_host(void);
->> +enum s390_host detect_host_early(void);
+>> diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+>> index 313be1e4..23c09b70 100644
+>> --- a/lib/s390x/sclp-console.c
+>> +++ b/lib/s390x/sclp-console.c
+>> @@ -1,8 +1,12 @@
+>>   /* SPDX-License-Identifier: GPL-2.0-or-later */
+>>   /*
+>> - * SCLP ASCII access driver
+>> + * SCLP line mode and ASCII console driver
+>>    *
+>>    * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
+>> + *
+>> + * Copyright IBM Corp. 1999
+>> + * Author(s): Martin Peschke <mpeschke@de.ibm.com>
+>> + *	      Martin Schwidefsky <schwidefsky@de.ibm.com>
 > 
-> I wonder if it weren't easier to fix detect_host so it can be used
-> early....
-> 
+> from the weird copyright notices that you are adding I deduce that you
+> copied those functions from the kernel. maybe add a line in the patch
+> description to say so? or at least explain better in the comment itself.
 
-Problem is, where do you start and where do you end?
+You mean this line which is in the patch description?
+"Hence I've copied the input parsing functions from Linux."
 
-We could statically allocate a page but why did we add the current 
-version then? (The old version did that if I remember correctly).
+But sure, I could add that after "SCLP line mode and ASCII console driver"
