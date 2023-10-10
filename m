@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B63E37BF615
-	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:37:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EEF27BF61C
+	for <lists+kvm@lfdr.de>; Tue, 10 Oct 2023 10:37:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442937AbjJJIgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 04:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43826 "EHLO
+        id S1443027AbjJJIgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 04:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442920AbjJJIfk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:35:40 -0400
+        with ESMTP id S1442929AbjJJIfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 04:35:41 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F868A9;
-        Tue, 10 Oct 2023 01:35:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9EBB0;
+        Tue, 10 Oct 2023 01:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696926937; x=1728462937;
+  t=1696926939; x=1728462939;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8vd+meAVtjSRzVgDs7zTq2sHPQpNFGGV0ODScm1t1Vs=;
-  b=jOep2cxSlCfUZJ8I8yRb5GqKeoLQ8S+dEodBghJaZTSA0I6/dKb9XBgV
-   sSFFk8Z0qJ4sgnJGuOQpu0THcEQZz4Nv6qUw/qD9uXu6kYBobw1yqzAh0
-   8vnQFQfuDPHwMt7rDitGD0On6MiNTVVZhUcUNf5iz+ZtprG4m6DjesRpb
-   GM9FSPEZrcA4DUW27Fm1eh1N4KUsOVZMFUhqCs1giYDJvw6aJO3APjq08
-   AXd+HXndIv9u5jVJm+eoTbaDBZWxchDW6nmFy/vsUJi5a6kLbWmIRfLr2
-   DvDMhesyEh5owbDILiyXygA5SDvp/YlaNn36hD5jRpb9opMRkfxKtDN0u
+  bh=GQCMPF9yOreHoZSYiAwwtuGF3KN8BZQ7hfFsQ7RV6BI=;
+  b=bXtY4xmIXZHQOZCQV0x2TwrkFm/HEB+plRFOae2y9eARWcxiVOO0SfaR
+   y/cYrF9IniF9MAlZCC5JXVjdVLDTIXz5D1Eczc9RoO40AtJPmBKmSIA7w
+   m0wyW6acZta3qV5+gCM0Ycg1K3AmqTezHn4effwEmr2JCEuuE+Rixqsel
+   hLnyBUEXyo5OCGI0dHMHMVEpAw2D5uMHMRZWLKu9eNDEtzom++6R4oFDz
+   zTAsUQxDp6mSnl5L+AFZRnREXpWKNGDJorcEmjh9JFEmSXxrnJSWbG+FD
+   NRIQT4Nb+8hyhQh1CWpMlOHXoB+mZa94wR7JUUNajY1YA64EFv7N+KYNz
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689836"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="363689842"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="363689836"
+   d="scan'208";a="363689842"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:35 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:36 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687203"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="1084687206"
 X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="1084687203"
+   d="scan'208";a="1084687206"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:35:35 -0700
 From:   isaku.yamahata@intel.com
@@ -45,9 +45,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         linux-coco@lists.linux.dev, Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH 09/12] KVM: X86: Add debugfs to inject machine check on VM exit
-Date:   Tue, 10 Oct 2023 01:35:17 -0700
-Message-Id: <47c8a177d81762e0561fc47cc274076de901edbf.1696926843.git.isaku.yamahata@intel.com>
+Subject: [PATCH 10/12] KVM: selftests: Allow mapping guest memory without host alias
+Date:   Tue, 10 Oct 2023 01:35:18 -0700
+Message-Id: <9e970731a61711acd38b1819ab5d2eaf326e0f0f.1696926843.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1696926843.git.isaku.yamahata@intel.com>
 References: <cover.1696926843.git.isaku.yamahata@intel.com>
@@ -65,137 +65,95 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-The KVM/x86 handles machine-check in the guest specially.  It sets up the
-guest so that vcpu exits from running guests, checks the exit reason and,
-manually raises the machine check by calling do_machine_check().
+For test the KVM hwpoison of memory, the recovery path unmaps the virtual
+memory and send SIGBUS with its address.  If the poisoned page is mapped at
+twice or more in the virtual memory, the address in SIGBUS siginfo isn't
+deterministic.
 
-To test the KVM machine check execution path, KVM wants to inject the
-machine check in the context of vcpu instead of the context of the process
-of MCE injection.  Wire up the MCE injection framework for KVM to trigger
-MCE in the vcpu context.  Add a kvm vcpu debugfs entry for an operator to
-tell KVM to inject MCE.
-
-The operation flow is as follows:
-- Set notrigger to 1 to tell the x86 MCE injector to suppress it from
-  injecting machine check.
-  echo 1 > /sys/kernel/debug/mce-inject/notrigger
-- Set MCE parameters via x86 MCE injector debugfs
-  /sys/kernel/debug/mce-inject/{addr, bank, flags, mcgstatus, misc, status}
-- Tell KVM to inject MCE
-  echo 1 > /sys/kernel/debug/kvm/<pid>-<vm-fd>/vcpu<vcpuid>/mce-inject
+To make the hwpoison test cases deterministic, allow to avoid guest memory
+alias.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/debugfs.c          | 22 ++++++++++++++++++++++
- arch/x86/kvm/x86.c              | 14 ++++++++++++++
- 3 files changed, 37 insertions(+)
+ .../selftests/kvm/include/kvm_util_base.h     |  4 ++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 23 ++++++++++++++-----
+ 2 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 17715cb8731d..9286f3d02f30 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -113,6 +113,7 @@
- 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_HV_TLB_FLUSH \
- 	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_MCE_INJECT		KVM_ARCH_REQ(33)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index ee8c4c3496ed..fee208f30400 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -56,6 +56,22 @@ static int vcpu_get_tsc_scaling_frac_bits(void *data, u64 *val)
- 
- DEFINE_SIMPLE_ATTRIBUTE(vcpu_tsc_scaling_frac_fops, vcpu_get_tsc_scaling_frac_bits, NULL, "%llu\n");
- 
-+static int vcpu_mce_inject_set(void *data, u64 val)
-+{
-+	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index a18db6a7b3cf..e980776a2c94 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -435,6 +435,10 @@ void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
+ 			       uint64_t gpa, uint64_t size, void *hva);
+ int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
+ 				uint64_t gpa, uint64_t size, void *hva);
++void __vm_userspace_mem_region_add(struct kvm_vm *vm,
++	enum vm_mem_backing_src_type src_type,
++	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
++	uint32_t flags, bool alias);
+ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	enum vm_mem_backing_src_type src_type,
+ 	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 7a8af1821f5d..310c3a760cb8 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -691,12 +691,14 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+ 	sparsebit_free(&region->unused_phy_pages);
+ 	ret = munmap(region->mmap_start, region->mmap_size);
+ 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
+-	if (region->fd >= 0) {
+-		/* There's an extra map when using shared memory. */
 +
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+
-+	if (val != 1)
-+		return -EINVAL;
-+	kvm_make_request(KVM_REQ_MCE_INJECT, vcpu);
-+	kvm_vcpu_kick(vcpu);
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(vcpu_mce_inject_fops, NULL, vcpu_mce_inject_set, "%llx\n");
-+
- void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
- {
- 	debugfs_create_file("guest_mode", 0444, debugfs_dentry, vcpu,
-@@ -76,6 +92,12 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- 				    debugfs_dentry, vcpu,
- 				    &vcpu_tsc_scaling_frac_fops);
++	/* There's an extra map when using shared memory. */
++	if (region->mmap_alias) {
+ 		ret = munmap(region->mmap_alias, region->mmap_size);
+ 		TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
+-		close(region->fd);
  	}
-+
-+	if (IS_ENABLED(CONFIG_X86_MCE_INJECT) &&
-+	    boot_cpu_has(X86_FEATURE_MCE) && boot_cpu_has(X86_FEATURE_MCA))
-+		debugfs_create_file("mce-inject", 0200,
-+				    debugfs_dentry, vcpu,
-+				    &vcpu_mce_inject_fops);
++	if (region->fd >= 0)
++		close(region->fd);
+ 
+ 	free(region);
+ }
+@@ -920,10 +922,10 @@ void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
+  * given by slot, which must be unique and < KVM_MEM_SLOTS_NUM.  The
+  * region is created with the flags given by flags.
+  */
+-void vm_userspace_mem_region_add(struct kvm_vm *vm,
++void __vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	enum vm_mem_backing_src_type src_type,
+ 	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
+-	uint32_t flags)
++	uint32_t flags, bool create_alias)
+ {
+ 	int ret;
+ 	struct userspace_mem_region *region;
+@@ -1057,7 +1059,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	hash_add(vm->regions.slot_hash, &region->slot_node, slot);
+ 
+ 	/* If shared memory, create an alias. */
+-	if (region->fd >= 0) {
++	if (region->fd >= 0 && create_alias) {
+ 		region->mmap_alias = mmap(NULL, region->mmap_size,
+ 					  PROT_READ | PROT_WRITE,
+ 					  vm_mem_backing_src_alias(src_type)->flag,
+@@ -1070,6 +1072,15 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+ 	}
  }
  
- /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9f18b06bbda6..e4c63ded4c9a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10496,6 +10496,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	fastpath_t exit_fastpath;
- 
- 	bool req_immediate_exit = false;
-+	bool req_mce_inject = false;
- 
- 	if (kvm_request_pending(vcpu)) {
- 		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
-@@ -10642,6 +10643,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
++void vm_userspace_mem_region_add(struct kvm_vm *vm,
++	enum vm_mem_backing_src_type src_type,
++	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
++	uint32_t flags)
++{
++	__vm_userspace_mem_region_add(vm, src_type, guest_paddr, slot, npages,
++				      flags, true);
++}
 +
-+		req_mce_inject = kvm_check_request(KVM_REQ_MCE_INJECT, vcpu);
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-@@ -10676,6 +10679,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		goto cancel_injection;
- 	}
- 
-+	if (unlikely(req_mce_inject))
-+		mce_inject_lock();
- 	preempt_disable();
- 
- 	static_call(kvm_x86_prepare_switch_to_guest)(vcpu);
-@@ -10721,6 +10726,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		smp_wmb();
- 		local_irq_enable();
- 		preempt_enable();
-+		if (unlikely(req_mce_inject)) {
-+			kvm_make_request(KVM_REQ_MCE_INJECT, vcpu);
-+			mce_inject_unlock();
-+		}
- 		kvm_vcpu_srcu_read_lock(vcpu);
- 		r = 1;
- 		goto cancel_injection;
-@@ -10814,6 +10823,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		fpu_sync_guest_vmexit_xfd_state();
- 
- 	static_call(kvm_x86_handle_exit_irqoff)(vcpu);
-+	if (unlikely(req_mce_inject)) {
-+		mce_call_atomic_injector_chain(smp_processor_id());
-+		kvm_machine_check();
-+		mce_inject_unlock();
-+	}
- 
- 	if (vcpu->arch.guest_fpu.xfd_err)
- 		wrmsrl(MSR_IA32_XFD_ERR, 0);
+ /*
+  * Memslot to region
+  *
 -- 
 2.25.1
 
