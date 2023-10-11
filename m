@@ -2,284 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA17D7C5B98
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 20:47:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4878C7C5DEA
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 21:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbjJKSrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 14:47:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52698 "EHLO
+        id S233369AbjJKT6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 15:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233215AbjJKSrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 14:47:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF8393
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 11:46:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697050010;
+        with ESMTP id S233103AbjJKT6F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 15:58:05 -0400
+Received: from out-197.mta1.migadu.com (out-197.mta1.migadu.com [95.215.58.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEDED94
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 12:58:01 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1697054278;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5HrWpP5EB4erpGzchcXAhQqrC/kAkv5vgdG0+5+I30o=;
-        b=gCnD0oUOHLPATekyG09R/HhGfKz6uGZih+xTZ1xuz3x94atJ/jyK3uJ46DlwQzocbUIVnT
-        i6HnoBhiD8jbbbXBvVDeh0tJpQ5MndMDLRIkPwSmilfe9H5ytp3fx1+uz2O7fkdSEATQpU
-        cwHaPuXVK0IMbCJxc3Mfe/6EjNN+poc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-281-O5HFCZaAMde8AvsCXrEkyQ-1; Wed, 11 Oct 2023 14:46:49 -0400
-X-MC-Unique: O5HFCZaAMde8AvsCXrEkyQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-327cd5c7406so64283f8f.3
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 11:46:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697050008; x=1697654808;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5HrWpP5EB4erpGzchcXAhQqrC/kAkv5vgdG0+5+I30o=;
-        b=mwXLbF8I2gY9Q7Qn3hQVs0dV6FZjxVxZKgu25pvgFcUbkJG36s9gDxUfLqxk0OAi0L
-         g1oXFO3XQtZjMGURFyJplnyA773dhswXA7V2n+0+kdrVq3paeVTqOcTucWkXS2+hU8OG
-         oN985YpebOCv7w54TFJadeYt131lCiwAnpu69myc4Pz1vrU6cYYpVs7sJj47OzHNka55
-         znBOL73XWfCbwgurxnhdCRuqUIlxwftVP44fp1PXQ1Hh8HVaVRG1JgjVjLM13FZqRBgA
-         78MVdCtp+zI2+9RmUirwOS0rzaic3zTNzAP28S9g64+sqCFqmHjumw5WtVQef014N/SH
-         v93A==
-X-Gm-Message-State: AOJu0Ywvy1x//3mpHL2MdwjoPHdzNITokenoCCYNSbAu8sA7YI4bLX/f
-        XkqXIehadaVdQQ1BjRmS5nKm1ehUfK9t+14fKPjWRgiF1o5pxsaAYA1m8j+5IzZkG2Xb4niORzz
-        fJdyIaKeK1tPH
-X-Received: by 2002:adf:f48e:0:b0:324:8239:2873 with SMTP id l14-20020adff48e000000b0032482392873mr21034211wro.37.1697050007828;
-        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHll00uJXuN9WQLFF92LEHQMdfTNDvE9LxgHM+g6OKovYq592nyf2VXzc8O0h6Zhv7JBNMSWg==
-X-Received: by 2002:adf:f48e:0:b0:324:8239:2873 with SMTP id l14-20020adff48e000000b0032482392873mr21034195wro.37.1697050007464;
-        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
-Received: from starship ([89.237.100.246])
-        by smtp.gmail.com with ESMTPSA id bv28-20020a0560001f1c00b0032d402f816csm5004673wrb.98.2023.10.11.11.46.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
-Message-ID: <e2f344bd3c9f096e94889904f85333352dce0bcc.camel@redhat.com>
-Subject: Re: [PATCH 1/1] selftests: KVM: add test to print boottime wallclock
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        shuah@kernel.org, seanjc@google.com, dwmw2@infradead.org,
-        joe.jin@oracle.com
-Date:   Wed, 11 Oct 2023 21:46:45 +0300
-In-Reply-To: <2604fa79-b114-60d9-c28d-0d53cd0dc5c7@oracle.com>
-References: <20231006175715.105517-1-dongli.zhang@oracle.com>
-         <7c2a77bb3ec9f85f684218eb80654adcdfefd60d.camel@redhat.com>
-         <2604fa79-b114-60d9-c28d-0d53cd0dc5c7@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NBdFJkgYJSOzXayzM8jpEgticEipqKrh87vuZZUVqWI=;
+        b=XSVr3Iasililq6Jjf897ZcVr2TR3WCtF3BasDbHQAplqCTJ1uripBA2LHchI2JFxJT+oMa
+        OSAkltHILlIHKi5+ll7X6VeJXzcQCgn6N1v+j61rkzdduSBRK6AooSaccrblDz25LKq/uU
+        Zby2ksf7qO6a7XAzQgLmdkwVmyUnQpE=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     kvm@vger.kernel.org
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 0/5] KVM: selftests: Add ID reg test, update headers
+Date:   Wed, 11 Oct 2023 19:57:35 +0000
+Message-ID: <20231011195740.3349631-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-У вт, 2023-10-10 у 09:31 -0700, Dongli Zhang пише:
-> Hi Maxim,
-> 
-> On 10/10/23 09:13, Maxim Levitsky wrote:
-> > У пт, 2023-10-06 у 10:57 -0700, Dongli Zhang пише:
-> > > As inspired by the discussion in [1], the boottime wallclock may drift due
-> > > to the fact that the masterclock (or host monotonic clock) and kvmclock are
-> > > calculated based on the algorithms in different domains.
-> > > 
-> > > This is to introduce a testcase to print the boottime wallclock
-> > > periodically to help diagnose the wallclock drift issue in the future.
-> > > 
-> > > The idea is to wrmsr the MSR_KVM_WALL_CLOCK_NEW, and read the boottime
-> > > wallclock nanoseconds immediately.
-> > > 
-> > > References:
-> > > [1] https://urldefense.com/v3/__https://lore.kernel.org/all/20231001111313.77586-1-nsaenz@amazon.com__;!!ACWV5N9M2RV99hQ!MOnoujF4PlfvZ3SUuyXgIpJC5mWiE5uLUsNW6AWgirGXcObN5uil_fnthRVcYaPA0N2uoNyLChBogHC7ZS6t$ 
-> > > 
-> > > Cc: David Woodhouse <dwmw@amazon.co.uk>
-> > > Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/Makefile          |   3 +-
-> > >  .../selftests/kvm/x86_64/boottime_wallclock.c | 100 ++++++++++++++++++
-> > >  2 files changed, 102 insertions(+), 1 deletion(-)
-> > >  create mode 100644 tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > > index a3bb36fb3cfc..fea05b0118de 100644
-> > > --- a/tools/testing/selftests/kvm/Makefile
-> > > +++ b/tools/testing/selftests/kvm/Makefile
-> > > @@ -60,7 +60,8 @@ LIBKVM_riscv += lib/riscv/ucall.c
-> > >  TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
-> > >  
-> > >  # Compiled test targets
-> > > -TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
-> > > +TEST_GEN_PROGS_x86_64 = x86_64/boottime_wallclock
-> > > +TEST_GEN_PROGS_x86_64 += x86_64/cpuid_test
-> > >  TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
-> > >  TEST_GEN_PROGS_x86_64 += x86_64/dirty_log_page_splitting_test
-> > >  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
-> > > diff --git a/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
-> > > new file mode 100644
-> > > index 000000000000..cc48c9b19920
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
-> > > @@ -0,0 +1,100 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * Copyright (C) 2023 Oracle and/or its affiliates.
-> > > + */
-> > > +
-> > > +#include <asm/kvm_para.h>
-> > > +#include <asm/pvclock-abi.h>
-> > > +
-> > > +#include "kvm_util.h"
-> > > +#include "processor.h"
-> > > +
-> > > +static int period = 10;
-> > > +
-> > > +#define GUEST_SYNC_WALLCLOCK(__stage, __val)                        \
-> > > +		GUEST_SYNC_ARGS(__stage, __val, 0, 0, 0)
-> > > +
-> > > +static void guest_main(vm_paddr_t wc_pa, struct pvclock_wall_clock *wc)
-> > > +{
-> > > +	uint64_t wallclock;
-> > > +
-> > > +	while (true) {
-> > > +		wrmsr(MSR_KVM_WALL_CLOCK_NEW, wc_pa);
-> > > +
-> > > +		wallclock = wc->sec * NSEC_PER_SEC + wc->nsec;
-> > > +
-> > > +		GUEST_SYNC_WALLCLOCK(0, wallclock);
-> > 
-> > Won't this fill the output very fast?
-> > Do you think it will be worth it to wait some time (e.g 1 second or at least 1/10 of a second)
-> > between each print?
-> 
-> The wait time is controlled by the VMM side (of selftest) as in below.
-> 
-> In the while loop at VMM side, it sleeps for a period (configurable argument),
-> until it runs into the guest again.
-> 
-> Therefore, the user can decide the frequency to print the boottime wallclock.
+v2: https://lore.kernel.org/kvmarm/20231010011023.2497088-1-oliver.upton@linux.dev/
+
+v2 -> v3:
+ - Use the kernel's script/data for generating the header instad of a
+   copy (broonie)
+
+Jing Zhang (2):
+  tools headers arm64: Update sysreg.h with kernel sources
+  KVM: arm64: selftests: Test for setting ID register from usersapce
+
+Oliver Upton (3):
+  tools: arm64: Add a Makefile for generating sysreg-defs.h
+  perf build: Generate arm64's sysreg-defs.h and add to include path
+  KVM: selftests: Generate sysreg-defs.h and add to include path
+
+ tools/arch/arm64/include/.gitignore           |   1 +
+ tools/arch/arm64/include/asm/gpr-num.h        |  26 +
+ tools/arch/arm64/include/asm/sysreg.h         | 839 ++++--------------
+ tools/arch/arm64/tools/Makefile               |  38 +
+ tools/perf/Makefile.perf                      |  15 +-
+ tools/perf/util/Build                         |   2 +-
+ tools/testing/selftests/kvm/Makefile          |  24 +-
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   |   4 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |  12 +-
+ .../selftests/kvm/aarch64/page_fault_test.c   |   6 +-
+ .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++
+ .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+ 12 files changed, 785 insertions(+), 667 deletions(-)
+ create mode 100644 tools/arch/arm64/include/.gitignore
+ create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
+ create mode 100644 tools/arch/arm64/tools/Makefile
+ create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 
 
-Sorry about this, I haven't noticed this code!
-
-
-Best regards,
-	Maxim Levitsky
-> 
-> +static void enter_guest(struct kvm_vcpu *vcpu)
-> +{
-> +	struct ucall uc;
-> +
-> +	while (true) {
-> +		vcpu_run(vcpu); -----------> to schedule guest vcpu here
-> +
-> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_SYNC:
-> +			handle_sync(&uc);
-> +			break;
-> +		case UCALL_ABORT:
-> +			handle_abort(&uc);
-> +			return;
-> +		default:
-> +			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
-> +			return;
-> +		}
-> +
-> +		sleep(period);  ------------> sleep here
-> +	}
-> +}
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
-> > > +	}
-> > > +}
-> > > +
-> > > +static void handle_sync(struct ucall *uc)
-> > > +{
-> > > +	uint64_t wallclock;
-> > > +
-> > > +	wallclock = uc->args[2];
-> > > +
-> > > +	pr_info("Boottime wallclock value: %"PRIu64" ns\n", wallclock);
-> > > +}
-> > > +
-> > > +static void handle_abort(struct ucall *uc)
-> > > +{
-> > > +	REPORT_GUEST_ASSERT(*uc);
-> > > +}
-> > > +
-> > > +static void enter_guest(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct ucall uc;
-> > > +
-> > > +	while (true) {
-> > > +		vcpu_run(vcpu);
-> > > +
-> > > +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-> > > +
-> > > +		switch (get_ucall(vcpu, &uc)) {
-> > > +		case UCALL_SYNC:
-> > > +			handle_sync(&uc);
-> > > +			break;
-> > > +		case UCALL_ABORT:
-> > > +			handle_abort(&uc);
-> > > +			return;
-> > > +		default:
-> > > +			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
-> > > +			return;
-> > > +		}
-> > > +
-> > > +		sleep(period);
-> > > +	}
-> > > +}
-> > > +
-> > > +int main(int argc, char *argv[])
-> > > +{
-> > > +	struct kvm_vcpu *vcpu;
-> > > +	struct kvm_vm *vm;
-> > > +	vm_vaddr_t wc_gva;
-> > > +	vm_paddr_t wc_gpa;
-> > > +	int opt;
-> > > +
-> > > +	while ((opt = getopt(argc, argv, "p:h")) != -1) {
-> > > +		switch (opt) {
-> > > +		case 'p':
-> > > +			period = atoi_positive("The period (seconds)", optarg);
-> > > +			break;
-> > > +		case 'h':
-> > > +		default:
-> > > +			pr_info("usage: %s [-p period (seconds)]\n", argv[0]);
-> > > +			exit(1);
-> > > +		}
-> > > +	}
-> > > +
-> > > +	pr_info("Capture boottime wallclock every %d seconds.\n", period);
-> > > +	pr_info("Stop with Ctrl + c.\n\n");
-> > > +
-> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
-> > > +
-> > > +	wc_gva = vm_vaddr_alloc(vm, getpagesize(), 0x10000);
-> > > +	wc_gpa = addr_gva2gpa(vm, wc_gva);
-> > > +	vcpu_args_set(vcpu, 2, wc_gpa, wc_gva);
-> > > +
-> > > +	enter_guest(vcpu);
-> > > +	kvm_vm_free(vm);
-> > > +}
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > 
-
+base-commit: dafa493dd01d5992f1cb70b08d1741c3ab99e04a
+-- 
+2.42.0.609.gbb76f46606-goog
 
