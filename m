@@ -2,157 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A43747C54DA
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 15:08:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E1377C55B0
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 15:42:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232297AbjJKNIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 09:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54880 "EHLO
+        id S234985AbjJKNl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 09:41:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbjJKNIV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 09:08:21 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE407C6;
-        Wed, 11 Oct 2023 06:08:16 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id A355912000B;
-        Wed, 11 Oct 2023 16:08:12 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A355912000B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1697029692;
-        bh=dP/baYZO5kD6Jow1pKoRT0YdQnHaH2Jq7btNsozjlq0=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=iDe+rNDdKa3j9IX6E3Yv2hjNmYg7ECISUDPpR6O5xdZbFEPPaHA0YC9MQ2W32oCkJ
-         /LkRJ5PDlvEeEr5qP1qFH4kkQzKxY1yOrHmwkWDKwdcKBkT1/91iCNCHzB4eGaDlbC
-         FgoLacwBA0LJLpDoulRg5po//Y8KK4pDddkESGkDKoBXuBTffVE8EpecXuYmTQ8/Dq
-         eiSHfvNDFVfy3kWXUCVAWmmLbIn0osl4HmAQPCK9iDporZYpdecmb2FZ5mzwpsGltj
-         Za5UIQ7h7VGXtJiikLYhhdsZVUqfj4IRLHIzuG/zROJawv8ET7zby6Ze8C9doKKFtG
-         yelUUiD+UuWwA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Wed, 11 Oct 2023 16:08:10 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 11 Oct 2023 16:08:10 +0300
-Message-ID: <a1bcc86e-2f22-89d8-d7e2-f3f6f7663235@salutedevices.com>
-Date:   Wed, 11 Oct 2023 16:01:08 +0300
+        with ESMTP id S234904AbjJKNl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 09:41:57 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4EC6B6;
+        Wed, 11 Oct 2023 06:41:54 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39BDe44M018412;
+        Wed, 11 Oct 2023 13:41:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : to : cc : from : message-id : date; s=pp1;
+ bh=1LRfXvRpB6rL08iXZ89rsQDegbgG+NqiUFR6NwWmpBo=;
+ b=O6fquoKUs+sLmtsnMe3BoW07NMmHcbIvxUZ/SwkHEFrbQfY0DjpnPL8EwArF/vyxb1pQ
+ RzN5wU6X1WFq4j7wKzcYMkrcEGqpogkDFSjZxC7iUpAOv6R5oE0+rFEOy0yWgssAXZmn
+ /AY4exMz0+WjcwGkGOoqcjQtptbEOcWOqw+Mo7yv/eSMsnvk7uDPoT1rpH5iRTIuEkL0
+ biPlpTtdSMoC+PFXJpOV86AJ5cgELJQfwFBlDTrkK0oYEkOf8Six+isN/5JR6nqSTQ9m
+ ZNLl/E+qKVFny8XRrAkP1vDG4LieLiFSgrdGQum22C/5cvAW3BY1YN1doEAsfs2LxObx tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnvstr5b9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 13:41:48 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39BDeIdI019625;
+        Wed, 11 Oct 2023 13:41:47 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnvstr4ar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 13:41:46 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39BC00wc000647;
+        Wed, 11 Oct 2023 13:36:34 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkk5kr250-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 13:36:34 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39BDaV2Q8389178
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Oct 2023 13:36:31 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14CBC2004B;
+        Wed, 11 Oct 2023 13:36:31 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0248C20043;
+        Wed, 11 Oct 2023 13:36:31 +0000 (GMT)
+Received: from t14-nrb (unknown [9.152.224.84])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Oct 2023 13:36:30 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY
- support
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
- <eey4hfz43popgwlwtheapjefzmxea7dk733y3v6aqsrewhq3mq@lcmmhdpwvvzc>
-From:   Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <eey4hfz43popgwlwtheapjefzmxea7dk733y3v6aqsrewhq3mq@lcmmhdpwvvzc>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180531 [Oct 11 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 538 538 68c58b60b94be3a031a44c71e306321381fb1d87, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;git.kernel.org:7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/10/11 12:28:00
-X-KSMG-LinksScanning: Clean, bases: 2023/10/11 12:28:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/11 11:30:00 #22159170
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231011085635.1996346-2-nsg@linux.ibm.com>
+References: <20231011085635.1996346-1-nsg@linux.ibm.com> <20231011085635.1996346-2-nsg@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/9] s390x: topology: Fix report message
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Sean Christopherson <seanjc@google.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169703139080.15053.7484690709413943726@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Wed, 11 Oct 2023 15:36:30 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Yd1eDgG96rXG0ooQC9hh87nPJsNRXIKl
+X-Proofpoint-GUID: XuC6jahXr1rjsx_IopGauKkAECt_Eiqi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-11_09,2023-10-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 clxscore=1011 mlxscore=0 malwarescore=0 mlxlogscore=812
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310110120
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:24)
+> A polarization value of 0 means horizontal polarization.
+>=20
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-
-On 11.10.2023 15:57, Stefano Garzarella wrote:
-> On Tue, Oct 10, 2023 at 10:15:12PM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->> this patchset contains second and third parts of another big patchset
->> for MSG_ZEROCOPY flag support:
->> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
->>
->> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
->> suggested to split it for three parts to simplify review and merging:
->>
->> 1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
->>   link below)
->> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->>   tx completions) and update for Documentation/. <-- this patchset
->> 3) Updates for tests and utils. <-- this patchset
->>
->> Part 1) was merged:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
->>
->> Head for this patchset is:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=19537e125cc7cf2da43a606f5bcebbe0c9aea4cc
->>
->> Link to v1:
->> https://lore.kernel.org/netdev/20230922052428.4005676-1-avkrasnov@salutedevices.com/
->> Link to v2:
->> https://lore.kernel.org/netdev/20230930210308.2394919-1-avkrasnov@salutedevices.com/
->> Link to v3:
->> https://lore.kernel.org/netdev/20231007172139.1338644-1-avkrasnov@salutedevices.com/
->>
->> Changelog:
->> v1 -> v2:
->> * Patchset rebased and tested on new HEAD of net-next (see hash above).
->> * See per-patch changelog after ---.
->> v2 -> v3:
->> * Patchset rebased and tested on new HEAD of net-next (see hash above).
->> * See per-patch changelog after ---.
->> v3 -> v4:
->> * Patchset rebased and tested on new HEAD of net-next (see hash above).
->> * See per-patch changelog after ---.
-> 
-> I think I fully reviewed the series ;-)
-> 
-> Tests are all passing here, including the new ones. I also added
-> vsock_perf and vsock_uring_test to my test suite!
-
-Thanks for review!
-
-> 
-> So for vsock point of view everything looks fine.
-> 
-> Let's see if there is anything about net (MSG_ZEROCOPY flags, etc.)
-
-Yes, let's wait for more comments, because whole patchset is R-b now and
-this finally completes MSG_ZEROCOPY support for virtio/vsock.
-
-Thanks, Arseniy
-
-> 
-> Thanks,
-> Stefano
-> 
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
