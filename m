@@ -2,94 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47D3C7C5A93
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:55:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E31CE7C5AA9
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:58:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233056AbjJKRz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 13:55:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42856 "EHLO
+        id S1345033AbjJKR6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 13:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232553AbjJKRz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 13:55:27 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 195CC8F
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:55:22 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3af5b5d7f16so28603b6e.0
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697046921; x=1697651721; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
-        b=E1y6i2RxlBIrH/wc5JKLr4tjnS07pk7hke+GIXqJZ9Wi7oxTFDqZ5GIAjpendrXkQ1
-         rC27OLEwwjRviagpYxRzbsqSccsceHUkHRaVgieOJzJG1EPgtUQh7mblqqQsJm7T0DJ6
-         ACNQ/vtERU79ARCXRzXRGYwwypcIXh9kgquNd63N8pzxcgEbfCbnjPvJuauH1wSm90y0
-         yL+TOtrV4uNhTiF0pqdmFh5L3OOzeQ/DBR6XJIBYX+fZyyXautmXpRUnkXImo8vmKqhX
-         8Fwg5wCjkDRKZian3tr1XZ+yGr/s08W83/F+SNPnzrq0uQVlndpE90jX5MnTEbKVE4na
-         3/vA==
+        with ESMTP id S234784AbjJKR63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 13:58:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D980A9
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:57:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697047061;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g7j5XITIXrvvxgZyR1Yp67hNUsMKkfoy7Ri4I+RKHjI=;
+        b=NjCgWiK4zRP0YU7fmgvx3APcGVa44+9WMuvfaAIbQ0XGX38FPhhZ98PE1zg5WOWrN2mhV4
+        B3YONyeGvK6KVkDtTqgiyHpeY4g2jLTr/tInS/kJuwiYO4jEd+e/4Z1sTy/35wmO28QWW4
+        Sh0TGvq1G7je2VwvRkGqlEpBuh4hBQI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-EP3KGtCIMfetoGav5UXU5Q-1; Wed, 11 Oct 2023 13:57:39 -0400
+X-MC-Unique: EP3KGtCIMfetoGav5UXU5Q-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9b65b6bcfb7so4834766b.2
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:57:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697046921; x=1697651721;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
-        b=CeXqsJ8odKSlb8L6Vz+5OzdFdRsdAK3fA9RwlNQv2fYges87WvNQ72N2f5JpOEn4c5
-         gK4H/0nG+u7lZAo3V/BvBQoNOy53mr5VIDMcr+gVewzg+t7N91XDh1iqDmI9wQDA2G9b
-         1yjNKXVbDeuJgTEu+tqF3jVZlsdLLd+YzHWtZdM+RVmYJzA4izM7Ru9uHEklXZzwP4Kq
-         /QXsJQ3N+MSqmV/JeUEQvkm0pz1a6ZxjLnxLe0nxzp9/aW1yxo5xG2nupio29sc5lM5Z
-         fHuSk/uO1ftjtnqgJ8mnENuv2arlBgN3Nk7wbdRv/GSXBOY4uaE5dC98vGozNnz/1rKN
-         TERA==
-X-Gm-Message-State: AOJu0YxecsvLVMmTFzJMDrLqhf9kx8ur7T/ga8rzQyI0QIt2CHPccKZt
-        MZmKfvv7Lv0XCxsDnMgnf/QsznSLKFuhmy53gKjeug==
-X-Google-Smtp-Source: AGHT+IH1xR3vjV99+M/LkuCERrf8FFb6dhrZO5dQtTRdGG7+xvAKomWG5ggluYGHUD3vZWhYu7IBXcl8FWzcBM1cD+k=
-X-Received: by 2002:a05:6808:2897:b0:3af:d1d6:8a59 with SMTP id
- eu23-20020a056808289700b003afd1d68a59mr14716017oib.38.1697046921341; Wed, 11
- Oct 2023 10:55:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697047059; x=1697651859;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g7j5XITIXrvvxgZyR1Yp67hNUsMKkfoy7Ri4I+RKHjI=;
+        b=NKEe6HvxZGT1kpOJsPtq7c6cOMe61FCRW2AbHrc5F+yAILZAqekDJvSv8/uOZqmUFY
+         W4TTxzDdVTCUT5faOZ6egymGm8jwYC9/GfvQac/DQ9oO/in4+FXlVSm7JEtlcIWX7Rtf
+         eYU/WMJPguhEpY/NJCxNmq4Yiez1Y4bIi8FUZng3P0JoU4wQIqV2j5A/GZTRwqa7yIhx
+         IlY8y4LOhpqF8DoaBdRJPXBHqnYeSbFyJuKE2zvjNlZbnhk7pTtLDhEIpAcUrYbGW3s9
+         etQMfpWdF2Bgr7Q1ScD+GBLaEMZT+S8vnqhRi+ZKnke4Vbh+hlnfmbzCy0Cl7L9ZUhRk
+         H9oA==
+X-Gm-Message-State: AOJu0Yw9Pk3dBd19/6V9RgeazsuvmhL7MkIQRyJXxqwVBdzXEsy+9cQi
+        ILo1/1HJxe0xTo575zGycbJTeUvVD5zwzRf+IqdqH5XJP3ffVus3tWXrk9ThAxuk5obevUxNpmb
+        NTOVqiMGkYrFp
+X-Received: by 2002:aa7:da44:0:b0:532:aaca:d39d with SMTP id w4-20020aa7da44000000b00532aacad39dmr18583279eds.6.1697047058749;
+        Wed, 11 Oct 2023 10:57:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuUvWbyCMfuD4kRBEJDo03ovo4IRPhoUpjQbapRDtBBQYmkxWQikNgw8Zeu1AqU//bOOU0iQ==
+X-Received: by 2002:aa7:da44:0:b0:532:aaca:d39d with SMTP id w4-20020aa7da44000000b00532aacad39dmr18583271eds.6.1697047058456;
+        Wed, 11 Oct 2023 10:57:38 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
+        by smtp.googlemail.com with ESMTPSA id d13-20020a056402400d00b0053def18ee8bsm578952eda.20.2023.10.11.10.57.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Oct 2023 10:57:37 -0700 (PDT)
+Message-ID: <7c4b1c78-de74-5fff-7327-0863f403eb7e@redhat.com>
+Date:   Wed, 11 Oct 2023 19:57:37 +0200
 MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-10-amoorthy@google.com>
- <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
-In-Reply-To: <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Wed, 11 Oct 2023 10:54:45 -0700
-Message-ID: <CAF7b7mrt-iWduEQusKHhP3TLiWwL1gQjGj0HB=u1R2Vd5yEP0A@mail.gmail.com>
-Subject: Re: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING
- without implementation
-To:     David Matlack <dmatlack@google.com>
-Cc:     seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
-        nadav.amit@gmail.com, isaku.yamahata@gmail.com,
-        kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <169595365500.1386813.6579237770749312873.b4-ty@google.com>
+ <20231009022248.GD800259@ZenIV> <ZSQO4fHaAxDkbGyz@google.com>
+ <20231009200608.GJ800259@ZenIV> <ZSRgdgQe3fseEQpf@google.com>
+ <20231009204037.GK800259@ZenIV> <ZSRwDItBbsn2IfWl@google.com>
+ <20231010000910.GM800259@ZenIV> <ZSSaWPc5wjU9k1Kw@google.com>
+ <20231010003746.GN800259@ZenIV> <ZSXeipdJcWZjLx8k@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH gmem FIXUP] kvm: guestmem: do not use a file system
+In-Reply-To: <ZSXeipdJcWZjLx8k@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Bike Shedding! Maybe KVM_MEM_EXIT_ON_MISSING? "Exiting" has concrete
-> meaning in the KVM UAPI whereas "userfault" doesn't and could suggest
-> going through userfaultfd, which is the opposite of what this
-> capability is doing.
+On 10/11/23 01:30, Sean Christopherson wrote:
+>> E.g. drivers/block/loop.c has this gem
+>> 
+>> 	/* This is safe: open() is still holding a reference. */
+>> 	module_put(THIS_MODULE);
+> 
+> in __loop_clr_fd(), which is invoked from a .release() function.  So open() quite
+> clearly doesn't hold a reference, unless the comment is talking about the reference
+> that was obtained by the core file systems layer and won't be put until after
+> .release() completes.  But then what on earth is the point of doing
+> module_get(THIS_MODULE) and module_put(THIS_MODULE)?
 
-You know, in the three or four names this thing has had, I'm not sure
-if "exit" has ever appeared :D
+Here the module_put() is called not just from .release() in autoclear 
+mode, but also from the LOOP_CLR_FD ioctl.
 
-It is accurate, which is a definite plus. But since the exit in
-question is special due to accompanying EFAULT, I think we've been
-trying to reflect that in the nomenclature ("memory faults" or
-"userfault")- maybe that's not worth doing though.
+So the idea here is that while a /dev/loopN device exists you must keep 
+the module alive, to ensure that the devices don't disappear from /dev. 
+So the point here is to keep the module alive after /dev/loop-control 
+has been closed; but if /dev/loopN is open it will keep the module alive 
+on its own, and this makes module_get/module_put safe in this particular 
+case.
 
-Wrt the current name, I agree w/ you on the potential for userfaultfd
-confusion but I sort of see Sean's argument as well [1]. I see you've
-re-raised the question of the exit accompanying EFAULT in [2] though,
-so we should probably resolve that first.
+In general, safety is guaranteed if module_put is called while the 
+module's reference count is still elevated by someone else, which could 
+be a file descriptor or some core subsystem.  But then you're right that 
+in many case there seems to be no point in doing module_get/module_put. 
+In drivers/watchdog/softdog.c, softdog_stop() is called while the 
+module's reference count is still elevated by the core watchdog code, 
+which makes the code safe.  But why does softdog.c need to have its own 
+reference?  Any attempt to unregister the softdog module will go through 
+hrtimer_cancel(&softdog_ticktock) - which waits for the timer callback 
+to be complete, just like flush_work() in your patch.
 
-[1] https://lore.kernel.org/kvm/20230602161921.208564-1-amoorthy@google.com/T/#t
-[2] https://lore.kernel.org/kvm/CALzav=csPcd3f5CYc=6Fa4JnsYP8UTVeSex0-7LvUBnTDpHxLQ@mail.gmail.com/
+This module_get/module_put _is_ unnecessary.  It was introduced as a 
+bandaid in commit 5889f06bd31d ("watchdog: refuse to unload softdog 
+module when its timer is running", 2015-12-27).  Back then the core code 
+wasn't careful to keep the module refcount elevated if the watchdog was 
+still running in watchdog_release.  When commit ee142889e32f ("watchdog: 
+Introduce WDOG_HW_RUNNING flag", 2016-03-16) fixed the race for real, 
+softdog.c wasn't adjusted.
+
+I agree that in many cases, however, the safety does not seem to be 
+there.  I cannot find a place that ensures that snd-aoa-soundbus-i2sbus 
+is kept alive while i2sbus_private_free runs, for example (though that 
+code is a maze).
+
+Your patch 2 looks good, but perhaps instead of setting the owner we 
+could stash the struct module* in a global, and try_get/put it from open 
+and release respectively?  That is, .owner keeps the kvm module alive 
+and the kvm module keeps kvm-intel/kvm-amd alive.  That would subsume 
+patches 1 and 3.
+
+Paolo
+
