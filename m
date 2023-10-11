@@ -2,110 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 769EF7C5AFD
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 20:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA17D7C5B98
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 20:47:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233187AbjJKSNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 14:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53986 "EHLO
+        id S233233AbjJKSrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 14:47:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230234AbjJKSNs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 14:13:48 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8292A4
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 11:13:46 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42408C433C8;
-        Wed, 11 Oct 2023 18:13:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697048026;
-        bh=Qa05tAAgyS/5aYss7IJ8FsoIgIP2XDxv74PGahPH+tI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PA8d85+bkccWjvLJWiYmqBQJ54HcpwLZQEXbP2IcEDTLrDdjydm30uZB4M3tHChLf
-         od890PMRvjpgnzFUE4CCbdS7KaWmpNaNIV0XGW6QU5mnc4kKh6iJBKslTeIKcauxwj
-         VNUi5tOKu2B+JyyuvgV6jkpYT5zsRS2YAQtUNdwA5qCXiK7abyeJN4TSlTQT8gTT8R
-         WA8I+XqFjult1on0oulrh/7LtZ7+keHJTsEvkNx8kbO9FOOghtWWskQBVDJ2T/oR5f
-         N3sErsvtN1n2VyFmUv9oC2CsvrRiCf6yusFGBt2dixcAZ13VD79pNq0bS2jKNGKPpa
-         qn/ZE7e+UmV+Q==
-Date:   Wed, 11 Oct 2023 19:13:39 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 1/5] tools headers arm64: Copy sysreg-defs generation
- from kernel source
-Message-ID: <a704d2dd-9e42-4b21-bf29-35dd3bb4eefe@sirena.org.uk>
-References: <20231010011023.2497088-1-oliver.upton@linux.dev>
- <20231010011023.2497088-2-oliver.upton@linux.dev>
- <871qe1m79u.wl-maz@kernel.org>
- <cef524b7-ecbc-44c4-a582-e39f495c53db@sirena.org.uk>
- <ZSbj16o2FYOTn9DL@linux.dev>
+        with ESMTP id S233215AbjJKSrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 14:47:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF8393
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 11:46:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697050010;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5HrWpP5EB4erpGzchcXAhQqrC/kAkv5vgdG0+5+I30o=;
+        b=gCnD0oUOHLPATekyG09R/HhGfKz6uGZih+xTZ1xuz3x94atJ/jyK3uJ46DlwQzocbUIVnT
+        i6HnoBhiD8jbbbXBvVDeh0tJpQ5MndMDLRIkPwSmilfe9H5ytp3fx1+uz2O7fkdSEATQpU
+        cwHaPuXVK0IMbCJxc3Mfe/6EjNN+poc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-O5HFCZaAMde8AvsCXrEkyQ-1; Wed, 11 Oct 2023 14:46:49 -0400
+X-MC-Unique: O5HFCZaAMde8AvsCXrEkyQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-327cd5c7406so64283f8f.3
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 11:46:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697050008; x=1697654808;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5HrWpP5EB4erpGzchcXAhQqrC/kAkv5vgdG0+5+I30o=;
+        b=mwXLbF8I2gY9Q7Qn3hQVs0dV6FZjxVxZKgu25pvgFcUbkJG36s9gDxUfLqxk0OAi0L
+         g1oXFO3XQtZjMGURFyJplnyA773dhswXA7V2n+0+kdrVq3paeVTqOcTucWkXS2+hU8OG
+         oN985YpebOCv7w54TFJadeYt131lCiwAnpu69myc4Pz1vrU6cYYpVs7sJj47OzHNka55
+         znBOL73XWfCbwgurxnhdCRuqUIlxwftVP44fp1PXQ1Hh8HVaVRG1JgjVjLM13FZqRBgA
+         78MVdCtp+zI2+9RmUirwOS0rzaic3zTNzAP28S9g64+sqCFqmHjumw5WtVQef014N/SH
+         v93A==
+X-Gm-Message-State: AOJu0Ywvy1x//3mpHL2MdwjoPHdzNITokenoCCYNSbAu8sA7YI4bLX/f
+        XkqXIehadaVdQQ1BjRmS5nKm1ehUfK9t+14fKPjWRgiF1o5pxsaAYA1m8j+5IzZkG2Xb4niORzz
+        fJdyIaKeK1tPH
+X-Received: by 2002:adf:f48e:0:b0:324:8239:2873 with SMTP id l14-20020adff48e000000b0032482392873mr21034211wro.37.1697050007828;
+        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHll00uJXuN9WQLFF92LEHQMdfTNDvE9LxgHM+g6OKovYq592nyf2VXzc8O0h6Zhv7JBNMSWg==
+X-Received: by 2002:adf:f48e:0:b0:324:8239:2873 with SMTP id l14-20020adff48e000000b0032482392873mr21034195wro.37.1697050007464;
+        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
+Received: from starship ([89.237.100.246])
+        by smtp.gmail.com with ESMTPSA id bv28-20020a0560001f1c00b0032d402f816csm5004673wrb.98.2023.10.11.11.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 11:46:47 -0700 (PDT)
+Message-ID: <e2f344bd3c9f096e94889904f85333352dce0bcc.camel@redhat.com>
+Subject: Re: [PATCH 1/1] selftests: KVM: add test to print boottime wallclock
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, seanjc@google.com, dwmw2@infradead.org,
+        joe.jin@oracle.com
+Date:   Wed, 11 Oct 2023 21:46:45 +0300
+In-Reply-To: <2604fa79-b114-60d9-c28d-0d53cd0dc5c7@oracle.com>
+References: <20231006175715.105517-1-dongli.zhang@oracle.com>
+         <7c2a77bb3ec9f85f684218eb80654adcdfefd60d.camel@redhat.com>
+         <2604fa79-b114-60d9-c28d-0d53cd0dc5c7@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="3UfZlHTqfunNo1jj"
-Content-Disposition: inline
-In-Reply-To: <ZSbj16o2FYOTn9DL@linux.dev>
-X-Cookie: What an artist dies with me!
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+У вт, 2023-10-10 у 09:31 -0700, Dongli Zhang пише:
+> Hi Maxim,
+> 
+> On 10/10/23 09:13, Maxim Levitsky wrote:
+> > У пт, 2023-10-06 у 10:57 -0700, Dongli Zhang пише:
+> > > As inspired by the discussion in [1], the boottime wallclock may drift due
+> > > to the fact that the masterclock (or host monotonic clock) and kvmclock are
+> > > calculated based on the algorithms in different domains.
+> > > 
+> > > This is to introduce a testcase to print the boottime wallclock
+> > > periodically to help diagnose the wallclock drift issue in the future.
+> > > 
+> > > The idea is to wrmsr the MSR_KVM_WALL_CLOCK_NEW, and read the boottime
+> > > wallclock nanoseconds immediately.
+> > > 
+> > > References:
+> > > [1] https://urldefense.com/v3/__https://lore.kernel.org/all/20231001111313.77586-1-nsaenz@amazon.com__;!!ACWV5N9M2RV99hQ!MOnoujF4PlfvZ3SUuyXgIpJC5mWiE5uLUsNW6AWgirGXcObN5uil_fnthRVcYaPA0N2uoNyLChBogHC7ZS6t$ 
+> > > 
+> > > Cc: David Woodhouse <dwmw@amazon.co.uk>
+> > > Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> > > ---
+> > >  tools/testing/selftests/kvm/Makefile          |   3 +-
+> > >  .../selftests/kvm/x86_64/boottime_wallclock.c | 100 ++++++++++++++++++
+> > >  2 files changed, 102 insertions(+), 1 deletion(-)
+> > >  create mode 100644 tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+> > > 
+> > > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > > index a3bb36fb3cfc..fea05b0118de 100644
+> > > --- a/tools/testing/selftests/kvm/Makefile
+> > > +++ b/tools/testing/selftests/kvm/Makefile
+> > > @@ -60,7 +60,8 @@ LIBKVM_riscv += lib/riscv/ucall.c
+> > >  TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
+> > >  
+> > >  # Compiled test targets
+> > > -TEST_GEN_PROGS_x86_64 = x86_64/cpuid_test
+> > > +TEST_GEN_PROGS_x86_64 = x86_64/boottime_wallclock
+> > > +TEST_GEN_PROGS_x86_64 += x86_64/cpuid_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/dirty_log_page_splitting_test
+> > >  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
+> > > diff --git a/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+> > > new file mode 100644
+> > > index 000000000000..cc48c9b19920
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/x86_64/boottime_wallclock.c
+> > > @@ -0,0 +1,100 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright (C) 2023 Oracle and/or its affiliates.
+> > > + */
+> > > +
+> > > +#include <asm/kvm_para.h>
+> > > +#include <asm/pvclock-abi.h>
+> > > +
+> > > +#include "kvm_util.h"
+> > > +#include "processor.h"
+> > > +
+> > > +static int period = 10;
+> > > +
+> > > +#define GUEST_SYNC_WALLCLOCK(__stage, __val)                        \
+> > > +		GUEST_SYNC_ARGS(__stage, __val, 0, 0, 0)
+> > > +
+> > > +static void guest_main(vm_paddr_t wc_pa, struct pvclock_wall_clock *wc)
+> > > +{
+> > > +	uint64_t wallclock;
+> > > +
+> > > +	while (true) {
+> > > +		wrmsr(MSR_KVM_WALL_CLOCK_NEW, wc_pa);
+> > > +
+> > > +		wallclock = wc->sec * NSEC_PER_SEC + wc->nsec;
+> > > +
+> > > +		GUEST_SYNC_WALLCLOCK(0, wallclock);
+> > 
+> > Won't this fill the output very fast?
+> > Do you think it will be worth it to wait some time (e.g 1 second or at least 1/10 of a second)
+> > between each print?
+> 
+> The wait time is controlled by the VMM side (of selftest) as in below.
+> 
+> In the while loop at VMM side, it sleeps for a period (configurable argument),
+> until it runs into the guest again.
+> 
+> Therefore, the user can decide the frequency to print the boottime wallclock.
 
---3UfZlHTqfunNo1jj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Wed, Oct 11, 2023 at 06:05:11PM +0000, Oliver Upton wrote:
-> On Wed, Oct 11, 2023 at 05:59:28PM +0100, Mark Brown wrote:
-> > On Wed, Oct 11, 2023 at 05:51:57PM +0100, Marc Zyngier wrote:
+Sorry about this, I haven't noticed this code!
 
-> > > Rather than a copy, which makes the maintenance pretty horrible, why
-> > > don't you just symlink it? Git is perfectly capable of storing them,
-> > > last time I checked.
 
-> > Do we even need to symlink - as I suggested on the previous version can
-> > we not just reference the script and data file directly in the main
-> > kernel tree?  Like I said then there may be some use case for building
+Best regards,
+	Maxim Levitsky
+> 
+> +static void enter_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +
+> +	while (true) {
+> +		vcpu_run(vcpu); -----------> to schedule guest vcpu here
+> +
+> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> +
+> +		switch (get_ucall(vcpu, &uc)) {
+> +		case UCALL_SYNC:
+> +			handle_sync(&uc);
+> +			break;
+> +		case UCALL_ABORT:
+> +			handle_abort(&uc);
+> +			return;
+> +		default:
+> +			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
+> +			return;
+> +		}
+> +
+> +		sleep(period);  ------------> sleep here
+> +	}
+> +}
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
+> 
+> > > +	}
+> > > +}
+> > > +
+> > > +static void handle_sync(struct ucall *uc)
+> > > +{
+> > > +	uint64_t wallclock;
+> > > +
+> > > +	wallclock = uc->args[2];
+> > > +
+> > > +	pr_info("Boottime wallclock value: %"PRIu64" ns\n", wallclock);
+> > > +}
+> > > +
+> > > +static void handle_abort(struct ucall *uc)
+> > > +{
+> > > +	REPORT_GUEST_ASSERT(*uc);
+> > > +}
+> > > +
+> > > +static void enter_guest(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct ucall uc;
+> > > +
+> > > +	while (true) {
+> > > +		vcpu_run(vcpu);
+> > > +
+> > > +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> > > +
+> > > +		switch (get_ucall(vcpu, &uc)) {
+> > > +		case UCALL_SYNC:
+> > > +			handle_sync(&uc);
+> > > +			break;
+> > > +		case UCALL_ABORT:
+> > > +			handle_abort(&uc);
+> > > +			return;
+> > > +		default:
+> > > +			TEST_ASSERT(0, "unhandled ucall: %ld\n", uc.cmd);
+> > > +			return;
+> > > +		}
+> > > +
+> > > +		sleep(period);
+> > > +	}
+> > > +}
+> > > +
+> > > +int main(int argc, char *argv[])
+> > > +{
+> > > +	struct kvm_vcpu *vcpu;
+> > > +	struct kvm_vm *vm;
+> > > +	vm_vaddr_t wc_gva;
+> > > +	vm_paddr_t wc_gpa;
+> > > +	int opt;
+> > > +
+> > > +	while ((opt = getopt(argc, argv, "p:h")) != -1) {
+> > > +		switch (opt) {
+> > > +		case 'p':
+> > > +			period = atoi_positive("The period (seconds)", optarg);
+> > > +			break;
+> > > +		case 'h':
+> > > +		default:
+> > > +			pr_info("usage: %s [-p period (seconds)]\n", argv[0]);
+> > > +			exit(1);
+> > > +		}
+> > > +	}
+> > > +
+> > > +	pr_info("Capture boottime wallclock every %d seconds.\n", period);
+> > > +	pr_info("Stop with Ctrl + c.\n\n");
+> > > +
+> > > +	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
+> > > +
+> > > +	wc_gva = vm_vaddr_alloc(vm, getpagesize(), 0x10000);
+> > > +	wc_gpa = addr_gva2gpa(vm, wc_gva);
+> > > +	vcpu_args_set(vcpu, 2, wc_gpa, wc_gva);
+> > > +
+> > > +	enter_guest(vcpu);
+> > > +	kvm_vm_free(vm);
+> > > +}
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > 
 
-> So long as we aren't going to do any further renames I don't have an
-> issue with this approach.
 
-It doesn't seem likely, and it feels like it's reasonable to ask anyone
-who wants to do them to ensure they take care of the tools/ directory as
-part of it.
-
---3UfZlHTqfunNo1jj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUm5dIACgkQJNaLcl1U
-h9B66Qf+PNE9gjqhpKZhLEkzpPJbVvASlUTrnB3gm/SZwawLW2RwIUQGE8GvNPsi
-LtAPYLp5pkBwCeymMSDJjPN996+mozYIxC4TSMY9NzIeYxdkUUKgmGgaPtoMSKCX
-btj09yEAB1Zw8yDhUJlC+jrc4tXtit7xQaJoKE9yhYphsRmkFkHuaeN9Q/FTQfOp
-IsYywyx/Q0vQ9gU2jFmqdxp45MayCWg38WV0FkLzMY8l90E7fKYIqtmAv8tEOe/D
-wRTJiwOHifz5Lsl/o80HfUKKWGao0cWz1n4lqStkOhQFLjUUqviesExV2tNMXPxB
-yl4aoSX7UmVNTVSKQd9PSxk92zPpfQ==
-=23sl
------END PGP SIGNATURE-----
-
---3UfZlHTqfunNo1jj--
