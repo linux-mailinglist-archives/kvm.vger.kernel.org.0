@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E18C07C5DED
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 21:58:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52E637C5DEE
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 21:58:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346890AbjJKT6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 15:58:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37366 "EHLO
+        id S1346999AbjJKT6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 15:58:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233151AbjJKT6J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 15:58:09 -0400
-Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [IPv6:2001:41d0:203:375::cb])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F799D
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 12:58:07 -0700 (PDT)
+        with ESMTP id S233151AbjJKT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 15:58:13 -0400
+Received: from out-190.mta1.migadu.com (out-190.mta1.migadu.com [IPv6:2001:41d0:203:375::be])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2AC90
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 12:58:10 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697054285;
+        t=1697054289;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jXH7cg8de1dzBGNJz3ypcSLqe/t7Zxe4VVUQ1QtkOqY=;
-        b=WxjqDrIvpFrblECPWQqArHOCHxrD8YmEykhamTxk0Vykx4UURzg+tQCp7tdxqZRGqwcoT5
-        Bp7RcWmDrjyLZIxeIk6y+EKgbvynDaIYs42pMqw8iMG4BAHUMZzQUosPTxeiav0ajxxU77
-        SURBxMijdzhIfPklOg13jr8OIYZfyr0=
+        bh=Mkb88gwthe9rmyJo47XBN/x3y4c76v+Pxc5yvqj8F2U=;
+        b=xc5aeD7G/cBCfO9Y/N5pBIdTlIoH7nbyldyNRr7uA3JrD16RTuHr7bu5iycqSP5iMoplsp
+        ABpWynVHxo+QEzKYxhZhV1AAGPkS4a1ovE1ebiAuEqimw/sVYGKlsC1xKlBad0U8lGgrK1
+        yXA3Mo4Mby0URfi2bKIWPeKJqVdPoG0=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvm@vger.kernel.org
 Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -45,9 +45,9 @@ Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and add to include path
-Date:   Wed, 11 Oct 2023 19:57:37 +0000
-Message-ID: <20231011195740.3349631-3-oliver.upton@linux.dev>
+Subject: [PATCH v3 3/5] KVM: selftests: Generate sysreg-defs.h and add to include path
+Date:   Wed, 11 Oct 2023 19:57:38 +0000
+Message-ID: <20231011195740.3349631-4-oliver.upton@linux.dev>
 In-Reply-To: <20231011195740.3349631-1-oliver.upton@linux.dev>
 References: <20231011195740.3349631-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -63,68 +63,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Start generating sysreg-defs.h in anticipation of updating sysreg.h to a
-version that needs the generated output.
+Start generating sysreg-defs.h for arm64 builds in anticipation of
+updating sysreg.h to a version that depends on it.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/perf/Makefile.perf | 15 +++++++++++++--
- tools/perf/util/Build    |  2 +-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/Makefile | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-index 37af6df7b978..14dedd11a1f5 100644
---- a/tools/perf/Makefile.perf
-+++ b/tools/perf/Makefile.perf
-@@ -443,6 +443,15 @@ drm_ioctl_tbl := $(srctree)/tools/perf/trace/beauty/drm_ioctl.sh
- # Create output directory if not already present
- _dummy := $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(beauty_ioctl_outdir)')
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index a3bb36fb3cfc..07b3f4dc1a77 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -17,6 +17,17 @@ else
+ 	ARCH_DIR := $(ARCH)
+ endif
  
-+arm64_gen_sysreg_dir := $(srctree)/tools/arch/arm64/tools
++ifeq ($(ARCH),arm64)
++arm64_tools_dir := $(top_srcdir)/tools/arch/arm64/tools/
++GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
++CFLAGS += -I$(GEN_HDRS)
 +
-+arm64-sysreg-defs: FORCE
-+	$(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
++prepare:
++	$(MAKE) -C $(arm64_tools_dir)
++else
++prepare:
++endif
 +
-+arm64-sysreg-defs-clean:
-+	$(call QUIET_CLEAN,arm64-sysreg-defs)
-+	$(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
-+
- $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $(drm_ioctl_tbl)
- 	$(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
+ LIBKVM += lib/assert.c
+ LIBKVM += lib/elf.c
+ LIBKVM += lib/guest_modes.c
+@@ -256,13 +267,18 @@ $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+ $(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
  
-@@ -716,7 +725,9 @@ endif
- __build-dir = $(subst $(OUTPUT),,$(dir $@))
- build-dir   = $(or $(__build-dir),.)
+-EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
++EXTRA_CLEAN += $(GEN_HDRS) \
++	       $(LIBKVM_OBJS) \
++	       $(SPLIT_TESTS_OBJS) \
++	       $(TEST_DEP_FILES) \
++	       $(TEST_GEN_OBJ) \
++	       cscope.*
  
--prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders $(drm_ioctl_array) \
-+prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders \
-+	arm64-sysreg-defs \
-+	$(drm_ioctl_array) \
- 	$(fadvise_advice_array) \
- 	$(fsconfig_arrays) \
- 	$(fsmount_arrays) \
-@@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
- bpf-skel-clean:
- 	$(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKELETONS)
+ x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+-$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
++$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c prepare
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
  
--clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
-+clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
- 	$(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)perf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
- 	$(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.cmd' -delete -o -name '\.*.d' -delete
- 	$(Q)$(RM) $(OUTPUT).config-detected
-diff --git a/tools/perf/util/Build b/tools/perf/util/Build
-index 6d657c9927f7..2f76230958ad 100644
---- a/tools/perf/util/Build
-+++ b/tools/perf/util/Build
-@@ -345,7 +345,7 @@ CFLAGS_rbtree.o        += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ET
- CFLAGS_libstring.o     += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
- CFLAGS_hweight.o       += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
- CFLAGS_header.o        += -include $(OUTPUT)PERF-VERSION-FILE
--CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/
-+CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/ -I$(srctree)/tools/arch/arm64/include/generated/
+-$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
++$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S prepare
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
  
- $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
- 	$(call rule_mkdir)
+ # Compile the string overrides as freestanding to prevent the compiler from
+@@ -274,6 +290,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+ x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+ $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+ $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
++$(TEST_GEN_OBJ): prepare
+ 
+ cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+ cscope:
 -- 
 2.42.0.609.gbb76f46606-goog
 
