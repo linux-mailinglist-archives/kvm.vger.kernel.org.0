@@ -2,192 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 397BB7C566D
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 16:11:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 871F77C567C
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 16:16:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232383AbjJKOK6 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 11 Oct 2023 10:10:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
+        id S234995AbjJKOQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 10:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232125AbjJKOK5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 10:10:57 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C3D90;
-        Wed, 11 Oct 2023 07:10:54 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5F6H5xhmz6K6hC;
-        Wed, 11 Oct 2023 22:10:31 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 11 Oct
- 2023 15:10:52 +0100
-Date:   Wed, 11 Oct 2023 15:10:51 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-CC:     Gregory Price <gregory.price@memverge.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        "Ira Weiny" <ira.weiny@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-cxl@vger.kernel.org>, <qemu-devel@nongnu.org>
-Subject: Re: Accessing emulated CXL memory is unstable
-Message-ID: <20231011151051.0000343c@Huawei.com>
-In-Reply-To: <CAB=+i9S_uAUfPWSR2mJ=EzB-O2w-puK232CxbgWn8mx+YpMJCQ@mail.gmail.com>
-References: <CAB=+i9S4NSJ7iNvqguWKvFvo=cMQC21KeNETsqmJoEpj+iDmig@mail.gmail.com>
-        <ZSKupRw+mRrASUaY@memverge.com>
-        <CAB=+i9S_uAUfPWSR2mJ=EzB-O2w-puK232CxbgWn8mx+YpMJCQ@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S234870AbjJKOQK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 10:16:10 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6938CB8;
+        Wed, 11 Oct 2023 07:16:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=h1+bFrTxC9bNpWggJ1/WhAB0lCHgMj17Prrv9vHF3zw=; b=LimFqPKToomKM3ZLamW+/KIPGe
+        FZJLYLU9SZ+I2Tz2YZPKHuBPxyLjsKL/1NrfjN7vtdtt6npXZY64RrPjJR0gGZFjoe6FvTNdHqY0J
+        U/bYopgTCcQ647n9v/bFwel9DWixgUjZvcXP6R6z142PzIYuyKZWQGSxb/FOT/r6TxmoCvCmohxnD
+        se/4tkB5jrGq0Kz9zCrnxkwsEJ87orN6fOdF1aXJxIbb14gjlMxOLHtpNsb8w9hbTWeFPPlL0JlXR
+        ICf4vHeuJRR4Te/5/xgvZP1ZY5QTH8Z8S34GNYkntSo3FXBIJXT546pquCKZlPa7j8hTXhyMjS0A5
+        Bwd3W/oQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qqZzr-00BCga-NG; Wed, 11 Oct 2023 14:15:35 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 64E5D30036C; Wed, 11 Oct 2023 16:15:35 +0200 (CEST)
+Date:   Wed, 11 Oct 2023 16:15:35 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Manali Shukla <manali.shukla@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        David Dunn <daviddunn@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Mingwei Zhang <mizhang@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
+ event
+Message-ID: <20231011141535.GF6307@noisy.programming.kicks-ass.net>
+References: <20231002204017.GB27267@noisy.programming.kicks-ass.net>
+ <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+ <ZRwx7gcY7x1x3a5y@google.com>
+ <20231004112152.GA5947@noisy.programming.kicks-ass.net>
+ <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+ <ZR3eNtP5IVAHeFNC@google.com>
+ <ZR3hx9s1yJBR0WRJ@google.com>
+ <c69a1eb1-e07a-8270-ca63-54949ded433d@gmail.com>
+ <03b7da03-78a1-95b1-3969-634b5c9a5a56@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03b7da03-78a1-95b1-3969-634b5c9a5a56@amd.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 11 Oct 2023 09:50:07 +0900
-Hyeonggon Yoo <42.hyeyoo@gmail.com> wrote:
-
-> On Wed, Oct 11, 2023 at 12:54 AM Gregory Price
-> <gregory.price@memverge.com> wrote:
-> >
-> > On Tue, Oct 10, 2023 at 10:35:03AM +0900, Hyeonggon Yoo wrote:  
-> > > Hello folks,
-> > >
-> > > I experienced strange application crashes/internal KVM errors
-> > > while playing with emulated type 3 CXL memory. I would like to know
-> > > if this is a real issue or I missed something during setup.
-> > >
-> > > TL;DR: applications crash when accessing emulated CXL memory,
-> > > and stressing VM subsystem causes KVM internal error
-> > > (stressing via stress-ng --bigheap)
-> > >  
-> > ...  
-> > >
-> > > Hmm... it crashed, and it's 'invalid opcode'.
-> > > Is this because the fetched instruction is different from what's
-> > > written to memory during exec()?
-> > >  
-> >
-> > This is a known issue, and the working theory is 2 issues:  
+On Mon, Oct 09, 2023 at 10:33:41PM +0530, Manali Shukla wrote:
+> Hi all,
 > 
-> Okay, at least it's a known issue. Thank you for confirming that!
-Yeah - have an outstanding request in my list to at least print a
-warning on this.  There are usecases where you want to use KVM
-and the emulated support but there are gremlins as you discovered.
-
+> I would like to add following things to the discussion just for the awareness of
+> everyone.
 > 
-> >
-> > 1) CXL devices are implemented on top of an MMIO-style dispatch system
-> >    and as a result memory from CXL is non-cacheable.  We think there
-> >    may be an issue with this in KVM but it hasn't been investigated
-> >    fully.
-> >
-> > 2) When we originally got CXL memory support, we discovered an edge case
-> >    where code pages hosted on CXL memory would cause a crash whenever an
-> >    instruction spanned across a page barrier.  A similar issue could
-> >    affect KVM.
-
-The TCG case was thought to be fixed.  KVM will indeed blow up if you
-try to run instructions out of the emulated CXL memory whether or not they
-cross page boundaries.  That could be fixed by a caching layer inbetween
-so KVM thought it was running on page based translation but CXL was
-doing some interesting write back stuff underneath. Can sort of see how
-it might work but it's complex.
-
-> >
-> > We haven't done much research into the problem beyond this.  For now, we
-> > all just turn KVM off while we continue development.  
+> Fully virtualized PMC support is coming to an upcoming AMD SoC and we are
+> working on prototyping it.
 > 
-> Thank you for summarizing the current state of the issue.
-> Hope it will be resolved! ;)
+> As part of virtualized PMC design, the PERF_CTL registers are defined as Swap
+> type C: guest PMC states are loaded at VMRUN automatically but host PMC states
+> are not saved by hardware.
 
-Any resolution whilst retaining the full routing / decoder emulation in
-QEMU is tricky to put it lightly.  No one has taken it on yet as mostly
-TCG get's us going.
+Per the previous discussion, doing this while host has active counters
+that do not have ::exclude_guest=1 is invalid and must result in an
+error.
 
-> 
-> But I'm not sure if turning off KVM solves the problem.
-> `numactl --membind=1 --show` works fine, but other basic UNIX commands like ls
-> crashes QEMU when it's bind to the CXL NUMA node.
+Also, I'm assuming it is all optional, a host can still profile a guest
+if all is configured just so?
 
-Hmm. This is new if KVM is definitely off?
+> If hypervisor is using the performance counters, it
+> is hypervisor's responsibility to save PERF_CTL registers to host save area
+> prior to VMRUN and restore them after VMEXIT. 
 
-> 
-> [root@localhost ~]# numactl --membind=1 --show
-> policy: bind
-> preferred node: 1
-> physcpubind: 0
-> cpubind: 0
-> nodebind: 0
-> membind: 1
-> [root@localhost ~]# numactl --membind=1 ls
-> 
-> qemu: fatal: cpu_io_recompile: could not find TB for pc=(nil)
-> RAX=0000777f80000000 RBX=0000000000000000 RCX=0000000000000028
-> RDX=0000000000000000
-> RSI=0000000000000354 RDI=0000000000000000 RBP=ffff88810628af40
-> RSP=ffffc900008cfd20
-> R8 =ffff88810628af40 R9 =ffffc900008cfcc4 R10=000000000000000d
-> R11=0000000000000000
-> R12=0000000390440000 R13=ffff888107a464c0 R14=0000000000000000
-> R15=ffff88810a49cd18
-> RIP=ffffffff810743e6 RFL=00000007 [-----PC] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =0000 0000000000000000 00000000 00000000
-> CS =0010 0000000000000000 ffffffff 00af9b00 DPL=0 CS64 [-RA]
-> SS =0000 0000000000000000 00000000 00000000
-> DS =0000 0000000000000000 00000000 00000000
-> FS =0000 0000000000000000 00000000 00000000
-> GS =0000 ffff88817bc00000 00000000 00000000
-> LDT=0000 0000000000000000 00000000 00008200 DPL=0 LDT
-> TR =0040 fffffe0000003000 00004087 00008900 DPL=0 TSS64-avl
-> GDT=     fffffe0000001000 0000007f
-> IDT=     fffffe0000000000 00000fff
-> CR0=80050033 CR2=00007fcb2504641c CR3=0000000390440000 CR4=007506f0
-> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
-> DR3=0000000000000000
-> DR6=00000000ffff0ff0 DR7=0000000000000400
-> CCS=0000777f80000000 CCD=0000000390440000 CCO=ADDQ
-> EFER=0000000000000d01
-> FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-> FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-> FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-> FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-> FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-> YMM00=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM01=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM02=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM03=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM04=0000000000000000 0000000000000000 00006968705f6e6f 657800006c6c6577
-> YMM05=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM06=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM07=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM08=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM09=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM10=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM11=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM12=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM13=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM14=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> YMM15=0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> cxl2.sh: line 24:  5386 Aborted                 (core dumped) $QEMU
-> -cpu Cascadelake-Server -smp 1 -M q35,cxl=on -m 4G,maxmem=8G,slots=4
-> -object memory-backend-ram,id=vmem0,share=on,size=4G -device pxb-cc
-> 
-> --
-> Cheers,
-> Hyeonggon
-> 
+Does VMEXIT clear global_ctrl at least?
+
+> In order to tackle PMC overflow
+> interrupts in guest itself, NMI virtualization or AVIC can be used, so that
+> interrupt on PMC overflow in guest will not leak to host.
+
+Can you please clarify -- AMD has this history with very dodgy PMI
+boundaries. See the whole amd_pmu_adjust_nmi_window() crud. Even the
+PMUv2 update didn't fix that nonsense.
+
+How is any virt stuff supposed to fix this? If the hardware is late
+delivering PMI, what guarantees a guest PMI does not land in host
+context and vice-versa?
+
+How does NMI virtualization (what even is that) or AVIC (I'm assuming
+that's a virtual interrupt controller) help?
+
+Please make very sure, with your hardware team, that PMI must not be
+delivered after clearing global_ctrl (preferably) or at the very least,
+there exists a sequence of operations that provides a hard barrier
+to order PMI.
 
