@@ -2,180 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAF627C59B4
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 18:57:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04DCB7C59BA
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 18:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbjJKQ5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 12:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33182 "EHLO
+        id S232406AbjJKQ7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 12:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbjJKQ5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 12:57:53 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042D28F;
-        Wed, 11 Oct 2023 09:57:51 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5Jpv2CChz6K7GN;
-        Thu, 12 Oct 2023 00:57:27 +0800 (CST)
-Received: from localhost (10.126.175.8) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 11 Oct
- 2023 17:57:47 +0100
-Date:   Wed, 11 Oct 2023 17:57:46 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-CC:     Lukas Wunner <lukas@wunner.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231011175746.00003d57@Huawei.com>
-In-Reply-To: <2a21b730-9ad4-4585-b636-9aa139266f94@amd.com>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
-        <20231007100433.GA7596@wunner.de>
-        <20231009123335.00006d3d@Huawei.com>
-        <20231009134950.GA7097@wunner.de>
-        <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
-        <20231010081913.GA24050@wunner.de>
-        <2a21b730-9ad4-4585-b636-9aa139266f94@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S230158AbjJKQ7i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 12:59:38 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62543A9
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 09:59:36 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA494C433C8;
+        Wed, 11 Oct 2023 16:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697043576;
+        bh=e5viJcqN3nJBdRAmO/Kr+eV13Dl29hvxxs7YFH8SvNQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c4ON66BQJRg/M1ESDoc9mENYCcURbt3nEEVsXPZ8yAiq3EiTNX6LeDIxQszm4uezF
+         v9CdDjou5MnnYv49Sfvs4sOBD/dfv4zZvYnzh946KYXmKlovUlstTJvi0AFsnyAeRg
+         KfN9CNUGaG93T0eApVMKhcfGM+OI9Gn74GYevT1tGb23STWh2T8RMANxfYNOFqqToE
+         WM/9CJtrnh7uF5CTaMQC31y33nCpRv8K0W01oYsP+puOYA0soaIC8p+Mhp7CzrU9p1
+         ESr0UBv2YRIYjYs3tZXmv1h7kU4H8mkPaHEuSthynzE9pAUS6jUx/rO/HOg9HX9zca
+         oEeP4lb8OlirQ==
+Date:   Wed, 11 Oct 2023 17:59:28 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 1/5] tools headers arm64: Copy sysreg-defs generation
+ from kernel source
+Message-ID: <cef524b7-ecbc-44c4-a582-e39f495c53db@sirena.org.uk>
+References: <20231010011023.2497088-1-oliver.upton@linux.dev>
+ <20231010011023.2497088-2-oliver.upton@linux.dev>
+ <871qe1m79u.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.175.8]
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="5Wvu08zE1b6F12Gw"
+Content-Disposition: inline
+In-Reply-To: <871qe1m79u.wl-maz@kernel.org>
+X-Cookie: What an artist dies with me!
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Oct 2023 23:53:16 +1100
-Alexey Kardashevskiy <aik@amd.com> wrote:
 
-> On 10/10/23 19:19, Lukas Wunner wrote:
-> > On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:  
-> >> On 10/10/23 00:49, Lukas Wunner wrote:  
-> >>> PCI Firmware Spec would seem to be appropriate.  However this can't
-> >>> be solved by the kernel community.  
-> >>
-> >> How so? It is up to the user to decide whether it is SPDM/CMA in the kernel
-> >> or   the firmware + coco, both are quite possible (it is IDE which is not
-> >> possible without the firmware on AMD but we are not there yet).  
-> > 
-> > The user can control ownership of CMA-SPDM e.g. through a BIOS knob.
-> > And that BIOS knob then influences the outcome of the _OSC negotiation
-> > between platform and OS.
-> > 
-> >   
-> >> But the way SPDM is done now is that if the user (as myself) wants to let
-> >> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
-> >> as CMA is not a (un)loadable module or built-in (with some "blacklist"
-> >> parameters), and does not provide a sysfs knob to control its tentacles.  
-> > 
-> > The problem is every single vendor thinks they can come up with
-> > their own idea of who owns the SPDM session:
-> > 
-> > I've looked at the Nvidia driver and they've hacked libspdm into it,
-> > so their idea is that the device driver owns the SPDM session.
->  >
-> > AMD wants the host to proxy DOE but not own the SPDM session.
->  >
-> > We have *standards* for a reason.  So that products are interoperable.  
-> 
-> There is no "standard PCI ethernet device", somehow we survive ;)
-> 
-> > If the kernel tries to accommodate to every vendor's idea of SPDM ownership
-> > we'll end up with an unmaintainable mess of quirks, plus sysfs knobs
-> > which were once intended as a stopgap but can never be removed because
-> > they're userspace ABI.  
-> 
-> The host kernel needs to accommodate the idea that it is not trusted, 
-> and neither is the BIOS.
-> 
-> > This needs to be solved in the *specification*.
->  >
-> > And the existing solution for who owns a particular PCI feature is _OSC.
-> > Hence this needs to be taken up with the Firmware Working Group at the
-> > PCISIG.  
-> 
-> I do like the general idea of specifying things, etc but this place does 
-> not sound right. The firmware you are talking about has full access to 
-> PCI, the PSP firmware does not have any (besides the IDE keys 
-> programming), is there any example of such firmware in the PCI Firmware 
-> spec? From the BIOS standpoint, the host OS owns DOE and whatever is 
-> sent over it (on AMD SEV TIO). The host OS chooses not to compose these 
-> SPDM packets itself (while it could) in order to be able to run guests 
-> without having them to trust the host OS.
+--5Wvu08zE1b6F12Gw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As a minimum I'd like to see something saying - "keep away from discovery
-protocol on this DOE instance".  An ACPI _OSC or _DSM or similar could do that.
-It won't be needed for every approach, but it might for some.
+On Wed, Oct 11, 2023 at 05:51:57PM +0100, Marc Zyngier wrote:
+> Oliver Upton <oliver.upton@linux.dev> wrote:
 
-Then either firmwware knows what to do, or a specific driver does.
+> > The system register definitions are now generated with a script over in
+> > the kernel sources. Pull a copy into tools in anticipation of updating
+> > dependent header files and add a common makefile for generating the
+> > header.
 
-If your proxy comes up late enough that we've already done (and cached) discovery
-protocols results then this might not be a problem for this particular
-approach as we have no reason to rerun discovery (other than hotplug in which
-case there is lots of other stuff to do anyway).
+> Rather than a copy, which makes the maintenance pretty horrible, why
+> don't you just symlink it? Git is perfectly capable of storing them,
+> last time I checked.
 
-For your case we need some hooks for the PSP to be able to drive the SPDM session
-but that should be easy to allow. I don't think precludes the hypervisor also
-verifying the hardware is trusted by it along the way (though not used for IDE).
-So if you are relying on a host OS proxy I don't thing you need to disable CONFIG_CMA
-(maybe something around resets?)
+Do we even need to symlink - as I suggested on the previous version can
+we not just reference the script and data file directly in the main
+kernel tree?  Like I said then there may be some use case for building
+the tools directory outside the kernel source that I'm not aware of but
+otherwise I'm not clear that the motivations for copying the actual
+headers for use in tools/ apply to these files.
 
-Potentially the host OS tries first (maybe succeeds - that doesn't matter though
-nothing wrong with defense in depth) and then the PSP via a proxy does it all over
-again which is fine.  All we need to do is guarantee ordering and I think we are
-fine for that.
+I think the current approach is *fine* (hence my reviewed by)=20
+given the amount of other copying but it would save a bit of work to not
+copy.
 
-Far too many possible models here but such is life I guess.
+--5Wvu08zE1b6F12Gw
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
-> >> Note, this PSP firmware is not BIOS (which runs on the same core and has
-> >> same access to PCI as the host OS), it is a separate platform processor
-> >> which only programs IDE keys to the PCI RC (via some some internal bus
-> >> mechanism) but does not do anything on the bus itself and relies on the host
-> >> OS proxying DOE, and there is no APCI between the core and the psp.  
-> > 
-> > Somewhat tangentially, would it be possible in your architecture
-> > that the host or guest asks PSP to program IDE keys into the Root Port?  
-> 
-> Sure it is possible to implement. But this does not help our primary use 
-> case which is confidential VMs where the host OS is not trusted with the 
-> keys.
-> 
-> > Or alternatively, access the key registers directly without PSP involvement?  
-> 
-> No afaik, for the reason above.
-> 
-> 
-> > 
-> > Thanks,
-> > 
-> > Lukas  
-> 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUm1G8ACgkQJNaLcl1U
+h9CwFgf/Y112LQjPKLM+hj1TZJ6acrdWLfMbZei2Ous8Xsg06Oq7ikmyXDzjpOYo
+VSlhNSXrwg25eV07F17+nW39F6BLPGdZpXvSavGkcHaJu3KQcjsredI2+rj4E1r9
+/y+A14KZVfY46/pOp7cvHAusvW3+ZpA6xPawTIzmBKlqJQFRTtcCCconI3pAZK/a
+cVlN9kdAplLGKyIRhSebLVCApWVq5boq3OA59HGpYPoqoTIUKbAQ4u631hVKFqLG
+UPHrzGT+6mW6/5N9jYnWSNh/l4FZ7pjDa6cCeRZdxIWXolUJZXecqWVvOckL6hWN
+t7dz6PtJ+q8Hrb55TY2gwFNJgXLKOQ==
+=ZzxH
+-----END PGP SIGNATURE-----
+
+--5Wvu08zE1b6F12Gw--
