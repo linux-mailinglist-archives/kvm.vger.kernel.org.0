@@ -2,62 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D407C4A87
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 08:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC6AD7C4AA4
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 08:32:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345276AbjJKG0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 02:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33932 "EHLO
+        id S1344505AbjJKGcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 02:32:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344357AbjJKG0q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 02:26:46 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CA998
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 23:26:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4TOV1kA6X694rm9ruej+eqRV9h5H17uvOOn7V5rjO4I=; b=4+XiOn1iSoIPsisa+mbG0VftqX
-        xSUAvqRFyXdGPaZwxU/yOsDfFqvJ0ftzeP9CN8OgmCdDyq+pNVyo6O7xpULanhaIZLr2bbZrqXk4F
-        DKgfU8QpeJmhBCXup2NYpeJ6wZl+pJ8qVfHDKF7oiNINTrWEXC5HtwlXYrCXoBXKue5zQoRM15xCl
-        b6oZi6Xkbs07RaU//z+1OoKwk0Dru3gVgZ8rULTFTs5RwkPVQ0GF5xMC8IbqktGkrtevjE1Df0tUi
-        IKP8066H+fK1QQh5vGfmbqQEC9AlpD6n7/VZ1r0n3oq/xO3RZXlKIWJOtvSguX1K3fSpeB2zba80j
-        KRiBkZQA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qqSg6-00EyNL-0m;
-        Wed, 11 Oct 2023 06:26:42 +0000
-Date:   Tue, 10 Oct 2023 23:26:42 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <ZSZAIl06akEvdExM@infradead.org>
-References: <20230921124040.145386-11-yishaih@nvidia.com>
- <20230922055336-mutt-send-email-mst@kernel.org>
- <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
- <20230926072538-mutt-send-email-mst@kernel.org>
- <ZRpjClKM5mwY2NI0@infradead.org>
- <20231002151320.GA650762@nvidia.com>
- <ZR54shUxqgfIjg/p@infradead.org>
- <20231005111004.GK682044@nvidia.com>
- <ZSAG9cedvh+B0c0E@infradead.org>
- <20231010131031.GJ3952@nvidia.com>
+        with ESMTP id S1343606AbjJKGcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 02:32:42 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99E093
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 23:32:40 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-58e119bb28eso505900a12.1
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 23:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697005960; x=1697610760; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qlCvzn9D9MWfXzyAjQXrd2l33CVlRWaoX+EsCqMd6ps=;
+        b=kWTWVPK7N9NCNf2HZ3Fyp42qChTUEHUHU97/4FONyjQgtNtbeeDXBEMNrp4zfUlB2x
+         vX8T9j9s5s/ARkEB/UTWO0sisG0aSIWSqSzC4PvABUFj0ZSX7YtcnAA3sPm/ccNFz1dn
+         Cch+OPNt05lppQURTmvKrfRsnNHKAK2a9/lZzh5RKgkp58iWhKD9slxYcvPXpEznkydo
+         BwuPnbCUXdYJEG6R1oOGbPVpXS9PA9eEBdiFUoU2yfd7jwNOnoF1L81rbqLlouQUA/kc
+         fAi5QEBKkuyqfXDx0cyrFI2nxm61QRBAgtxwQ49npw0Oq4dWd2GyhXTcSgYJ8R4USj+D
+         Vd1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697005960; x=1697610760;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qlCvzn9D9MWfXzyAjQXrd2l33CVlRWaoX+EsCqMd6ps=;
+        b=inUpyjKGpZj2fEAKl8IZ7poCwH8SjppyJsMx6G0JObDI3YJa5b64ErSgCNQ6QaBTUG
+         MZ5ZCuH73UeDZBC94OOO0+jYsqU7ZSeV3Xr6AfXfXKOZeMw55QaZd6tI2/UsCQnVvlci
+         SupWDy1Ni4LBk3GJN3t0QEeT7/qf3Ag47NJRC/XD+f3+ibEHN88RveTasa2WYbUZy/9H
+         crFBkJf/XcLKLgBxgDX5eaYHHPsFosbN1ib3o3ABMRDdhsJ+IpL7NpiycsA66AjCOe05
+         WNCKnStMdK4FO1PflQSkoKoq3t/iveQVg2iSm5mQoz+aQd6eqG5BvO/cCyT/CYn2XfYE
+         ckOA==
+X-Gm-Message-State: AOJu0Yz0+wKadgkp/OY46Mi1pYaKBq4q640IJVXLqAnn2Gm4xmNlXhJG
+        rDbMwESgUVo3uRBTcBDCfwbmJOHUB684xcKQxbhgCA==
+X-Google-Smtp-Source: AGHT+IH0b9pvjz2wUtu97VMbjcxmgb/lTA+sWvTdIT6U1QGtyomZxkrbbJUyvfIkk70xvT4UTjANIh9gr7AwN1M7ntI=
+X-Received: by 2002:a17:90b:4a02:b0:277:61d7:78be with SMTP id
+ kk2-20020a17090b4a0200b0027761d778bemr24784754pjb.14.1697005960055; Tue, 10
+ Oct 2023 23:32:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010131031.GJ3952@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20231010170503.657189-1-apatel@ventanamicro.com>
+ <20231010170503.657189-4-apatel@ventanamicro.com> <2023101048-attach-drift-d77b@gregkh>
+In-Reply-To: <2023101048-attach-drift-d77b@gregkh>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Wed, 11 Oct 2023 12:02:30 +0530
+Message-ID: <CAK9=C2UEcQpHg8WZM3XxLa5yCEZ6wtWJj=8g5_m_0_RkiNMkTA@mail.gmail.com>
+Subject: Re: [PATCH 3/6] RISC-V: KVM: Forward SBI DBCN extension to user-space
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Conor Dooley <conor@kernel.org>,
+        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,126 +77,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 10:10:31AM -0300, Jason Gunthorpe wrote:
-> We've talked around ideas like allowing the VF config space to do some
-> of the work. For simple devices we could get away with 1 VF config
-> space register. (VF config space is owned by the hypervisor, not the
-> guest)
+On Tue, Oct 10, 2023 at 10:45=E2=80=AFPM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+>
+> On Tue, Oct 10, 2023 at 10:35:00PM +0530, Anup Patel wrote:
+> > The SBI DBCN extension needs to be emulated in user-space
+>
+> Why?
 
-Which assumes you're actually using VFs and not multiple PFs, which
-is a very limiting assumption.  It also limits your from actually
-using DMA during the live migration process, which again is major
-limitation once you have a non-tivial amount of state.
+The SBI debug console is similar to a console port available to
+KVM Guest so the KVM user space tool (i.e. QEMU-KVM or
+KVMTOOL) can redirect the input/output of SBI debug console
+wherever it wants (e.g.  telnet, file, stdio, etc).
 
-> SIOVr2 is discussing more a flexible RID mapping - there is a possible
-> route where a "VF" could actually have two RIDs, a hypervisor RID and a
-> guest RID.
+We forward SBI DBCN calls to KVM user space so that the
+in-kernel KVM does not need to be aware of the guest
+console devices.
 
-Well, then you go down the SIOV route, which requires a complex driver
-actually presenting the guest visible device anyway.
+>
+> > so let
+> > us forward console_puts() call to user-space.
+>
+> What could go wrong!
+>
+> Why does userspace have to get involved in a console message?  Why is
+> this needed at all?  The kernel can not handle userspace consoles as
+> obviously they have to be re-entrant and irq safe.
 
-> It really is PCI limitations that force this design of making a PF
-> driver do dual duty as a fully functionally normal device and act as a
-> communication channel proxy to make a back channel into a SRIOV VF.
-> 
-> My view has always been that the VFIO live migration operations are
-> executed logically within the VF as they only effect the VF.
-> 
-> So we have a logical design seperation where VFIO world owns the
-> commands and the PF driver supplies the communication channel. This
-> works well for devices that already have a robust RPC interface to
-> their device FW.
+As mentioned above, these are KVM guest console messages which
+the VMM (i.e. KVM user-space) can choose to manage on its own.
 
-Independent of my above points on the doubts on VF-controlled live
-migration for PCe device I absolutely agree with your that the Linux
-abstraction and user interface should be VF based.  Which further
-reinforeces my point that the VFIO driver for the controlled function
-(PF or VF) and the Linux driver for the controlling function (better
-be a PF in practice) must be very tightly integrated.  And the best
-way to do that is to export the vfio nodes from the Linux driver
-that knowns the hardware and not split out into a separate one.
+This is more about providing flexibility to KVM user-space which
+allows it to manage guest console devices.
 
-> > The driver that knows this hardware.  In this case the virtio subsystem,
-> > in case of nvme the nvme driver, and in case of mlx5 the mlx5 driver.
-> 
-> But those are drivers operating the HW to create kernel devices. Here
-> we need a VFIO device. They can't co-exist, if you switch mlx5 from
-> normal to vfio you have to tear down the entire normal driver.
+>
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
+> >  arch/riscv/include/uapi/asm/kvm.h     |  1 +
+> >  arch/riscv/kvm/vcpu_sbi.c             |  4 ++++
+> >  arch/riscv/kvm/vcpu_sbi_replace.c     | 31 +++++++++++++++++++++++++++
+> >  4 files changed, 37 insertions(+)
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include=
+/asm/kvm_vcpu_sbi.h
+> > index 8d6d4dce8a5e..a85f95eb6e85 100644
+> > --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> > @@ -69,6 +69,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_e=
+xt_ipi;
+> >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
+> >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
+> >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
+> > +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
+> >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
+> >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
+> >
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uap=
+i/asm/kvm.h
+> > index 917d8cc2489e..60d3b21dead7 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -156,6 +156,7 @@ enum KVM_RISCV_SBI_EXT_ID {
+> >       KVM_RISCV_SBI_EXT_PMU,
+> >       KVM_RISCV_SBI_EXT_EXPERIMENTAL,
+> >       KVM_RISCV_SBI_EXT_VENDOR,
+> > +     KVM_RISCV_SBI_EXT_DBCN,
+> >       KVM_RISCV_SBI_EXT_MAX,
+>
+> You just broke a user/kernel ABI here, why?
 
-Yes, absolutey.  And if we're smart enough we structure it in a way
-that we never even initialize the bits of the driver only needed for
-the normal kernel consumers.
+The KVM_RISCV_SBI_EXT_MAX only represents the number
+of entries in "enum KVM_RISCV_SBI_EXT_ID" so we are not
+breaking "enum KVM_RISCV_SBI_EXT_ID" rather appending
+new ID to existing enum.
 
-> > No.  That layout logically follows from what codebase the functionality
-> > is part of, though.
-> 
-> I don't understand what we are talking about really. Where do you
-> imagine the vfio_register_XX() goes?
+>
+> thanks,
+>
+> greg k-h
 
-In the driver controlling the hardware.  E.g. for virtio in
-driver/virtio/ and for nvme in drivers/nvme/ and for mlx5
-in the mlx5 driver directory.
-
-> > > I don't know what "fake-legacy" even means, VFIO is not legacy.
-> > 
-> > The driver we're talking about in this thread fakes up a virtio_pci
-> > legacy devie to the guest on top of a "modern" virtio_pci device.
-> 
-> I'm not sure I'd use the word fake, inb/outb are always trapped
-> operations in VMs. If the device provided a real IO BAR then VFIO
-> common code would trap and relay inb/outb to the device.
-> 
-> All this is doing is changing the inb/outb relay from using a physical
-> IO BAR to a DMA command ring.
-> 
-> The motivation is simply because normal IO BAR space is incredibly
-> limited and you can't get enough SRIOV functions when using it.
-
-The fake is not meant as a judgement.  But it creates a virtio-legacy
-device that in this form does not exist in hardware.  That's what
-I call fake.  If you prefer a different term that's fine with me too.
-
-> > > There is alot of code in VFIO and the VMM side to take a VF and turn
-> > > it into a vPCI function. You can't just trivially duplicate VFIO in a
-> > > dozen drivers without creating a giant mess.
-> > 
-> > I do not advocate for duplicating it.  But the code that calls this
-> > functionality belongs into the driver that deals with the compound
-> > device that we're doing this work for.
-> 
-> On one hand, I don't really care - we can put the code where people
-> like.
-> 
-> However - the Intel GPU VFIO driver is such a bad experiance I don't
-> want to encourage people to make VFIO drivers, or code that is only
-> used by VFIO drivers, that are not under drivers/vfio review.
-
-We can and should require vfio review for users of the vfio API.
-But to be honest code placement was not the problem with i915.  The
-problem was that the mdev APIs (under drivers/vfio) were a complete
-trainwreck when it was written, and that the driver had a horrible
-hypervisor API abstraction.
-
-> Be aware, there is a significant performance concern here. If you want
-> to create 1000 VFIO devices (this is a real thing), we *can't* probe a
-> normal driver first, it is too slow. We need a path that goes directly
-> from creating the RIDs to turning those RIDs into VFIO.
-
-And by calling the vfio funtions from mlx5 you get this easily.
-
-But I think you're totally mixing things up here anyway.
-
-For mdev/SIOV like flows you must call vfio APIs from the main
-driver anyway, as there is no pci_dev to probe on anyway.  That's
-what i915 does btw.
-
-For "classic" vfio that requires a pci_dev (or $otherbus_dev) we need
-to have a similar flow.  And I think the best way is to have the
-bus-level attribute on the device and/or a device-specific side band
-protocol to device how new functions are probed.  With that you
-avoid all the duplicate PCI IDs for the binding, and actually allow to
-sanely establush a communication channel between the functions.
-Because without that there is no way to know how any two functions
-related.  The driver might think they know, but there's all kinds of
-whacky PCI passthough schemes that will break such a logic.
-
+Thanks,
+Anup
