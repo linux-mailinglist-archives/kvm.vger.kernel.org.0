@@ -2,249 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BC987C53FD
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 14:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C861B7C5402
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 14:31:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346768AbjJKM2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 08:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45636 "EHLO
+        id S231955AbjJKMbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 08:31:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346827AbjJKM2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 08:28:13 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F44E8
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 05:28:07 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2c124adf469so78903331fa.0
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 05:28:07 -0700 (PDT)
+        with ESMTP id S231405AbjJKMbv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 08:31:51 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5018F
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 05:31:49 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-523100882f2so11088583a12.2
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 05:31:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philjordan-eu.20230601.gappssmtp.com; s=20230601; t=1697027286; x=1697632086; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJXJz/R1LdTU6nV53gSCaf04TkZrngzuySLoN5TykJg=;
-        b=agquRieSmtbDWBK1KGZ6Ievxh0V8YThvohxILOP2fm8amns+GeCeNHSUD14jJy8rHE
-         A8MSYdL3h1wvrZGtCVM7IRPyVHCJPFHTQtyiId4YjgIVXthzJl7N6Fe+6Jlu0BSL1iSY
-         SOZLccQhhqA9If/fUTw+1f4Ha8sEm05E+9S2f8HPl5HjVJETSXqXB6Z6pLlGrKzotTnz
-         4VoJKtuJeo+Mnd6Ii0pmCYIJAakqge1SHftrXrwqfvh7FXlcXaVrTtUkYcFnTkJGr5LZ
-         scfu4uwolo29YzwJYdn8WlGNoadyvjpVPSFJaOkRf4gYt9C0fCIY6nrcuDZPlGOi40X1
-         8xQg==
+        d=linaro.org; s=google; t=1697027508; x=1697632308; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=recTgP2Y7PcpsL0p5G+CcwbO2WQASP0/e+EofPLlj74=;
+        b=wBUz+S7MJ4YWURqTuj6v3kOH6iYb9OIh1K4Ti10JmcPzl/M9xT4amfbEKAIcNxwoFp
+         IT3OpwZSOpcZZfo8nLxnhB6BdG5XHTLdjUo/4rPjvdYtliWn4AXMqJDDiniu7q9go5Xj
+         FLBja1rvI9gkyp6DaEPidF24jfid6F2EP1+zwgIpIk5SI5ANv4PFVFl6E4F/gB422JFf
+         n4hqvC5hzNm7RdTQzNuLkJ+hEpCB3YTzzhlzwVNGk7xJaflIoi9a93V8TTGVG1tpDtmb
+         y34xnxJIiQK/3t6yz138fcOI7yp35PZeWgJR83eHZrcq3BD4Oax3D6RBMiwMDeVMOQDl
+         nYPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697027286; x=1697632086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QJXJz/R1LdTU6nV53gSCaf04TkZrngzuySLoN5TykJg=;
-        b=suZ9A+IrQyUBHxuDS8unATY+gS5xmfOYo9k0uSXr7cPG+0sJNoykEZYskADYGYZodZ
-         mkY6RzIHIBwCJpX4L4owhZkhafkbtGbz2LAg4FqHnZQz4pQG2D1ywHQlYYysE77Y+STi
-         FBkkIFNnKL+cpQNzFmSng5NPXHcx/Z7Bqvt+UWAVDTyANFVm6BqHwlNm7h1TxPulXQly
-         OUCCCPoi3UqLZ4nAjgIJspzWWqCfx7jl2K9lJSRioNYAC5dbs/t2YDMjbxMMuN8Tw9pp
-         9jFF7jwQVlxwcAq5Cc9SarZ6eNK9SuOle141pDGQNWu3nrvOAfakROlOaCqOIwFCDxcr
-         zH6Q==
-X-Gm-Message-State: AOJu0YzXJB7aj5k8pTVWd8M61gMVgveVl+5H0F9nB51HL5ryd4GbdAux
-        /Ps/4kRZV5iLvTNicolp0A5ZRAuaBv1No5VuRiOHbg==
-X-Google-Smtp-Source: AGHT+IFAWQRLyXJheZtDXMni88vD1awQjaMgwsOG/ZIhYmyFJwYpipBbrS6veKjaFx2XgZdUcmSNj8wrOUwKRdFwp1c=
-X-Received: by 2002:ac2:5d31:0:b0:503:778:9ad2 with SMTP id
- i17-20020ac25d31000000b0050307789ad2mr15795510lfb.19.1697027285851; Wed, 11
- Oct 2023 05:28:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697027508; x=1697632308;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=recTgP2Y7PcpsL0p5G+CcwbO2WQASP0/e+EofPLlj74=;
+        b=ANGPdWlruWtO6dgnI1UtfJzHtEM9wwG0b0xGVJyyyRXAO5nIMqP/jAQk7UnvItuExM
+         gp0WWSPCDStfmAG8Lci4k5X7e3cwkUpMPt5j+igHllwUZlWGZ0LdhZO10UGPUNoukuBu
+         J4tcKzbcACLKX9B/g65YF2mmUA7hs07p90ghguoYj+WBNSHeOSzWdNFJet3cWK26OlKd
+         7Bwb2GjnmbJMxN/C1FBmkGqOpnl4s2WfeTDeJFk0kHC05PTSK4jM6wYY1INxvdeuWDSu
+         p/Sg9Xknn/v15nuRR0zZ100Uc4U8l2jLr04eEQCTQkZPaWebqKxfwBZpVa17JsqKvLS5
+         fo8w==
+X-Gm-Message-State: AOJu0YyUpxJskRXwmCXoHcw835ZGbBDsowlNsSIQTu8Lfc3aFs1wufuQ
+        cpGekaJllM71J/lGLn4/X+v/9w==
+X-Google-Smtp-Source: AGHT+IHKXSzBKMi0yk1tnEqTXKNM0g3SQ4T2hGlPTrVloRNhlJ3IgtkjlrNmhIUwRTXzWQl0jiPkvQ==
+X-Received: by 2002:a17:906:10ce:b0:9a1:e233:e627 with SMTP id v14-20020a17090610ce00b009a1e233e627mr20512374ejv.42.1697027508264;
+        Wed, 11 Oct 2023 05:31:48 -0700 (PDT)
+Received: from [192.168.69.115] (mdq11-h01-176-173-161-48.dsl.sta.abo.bbox.fr. [176.173.161.48])
+        by smtp.gmail.com with ESMTPSA id w13-20020a170906480d00b0098d2d219649sm9868746ejq.174.2023.10.11.05.31.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Oct 2023 05:31:46 -0700 (PDT)
+Message-ID: <e9f0c004-cb23-0985-30ca-394197d6bf94@linaro.org>
+Date:   Wed, 11 Oct 2023 14:31:44 +0200
 MIME-Version: 1.0
-References: <20230923102019.29444-1-phil@philjordan.eu> <ZRGkqY+2QQgt2cVq@google.com>
- <CAGCz3vve7RJ+HE8sHOvq1p5-Wc4RpgZwqp0DiCXiSWq0vUpEVw@mail.gmail.com>
- <ZRMB9HUIBcWWHtwK@google.com> <CAGCz3vuieUoD0UombFzxKYygm8uS4Gr=qkUAKR7oR0Tg+mEnYQ@mail.gmail.com>
- <ZRQ5r0kn5RzDpf0C@google.com> <CAGCz3vsQ9hUkgX5dyy9er8y4_y1rM2eWrfLHkWV0xv6aJwNzeQ@mail.gmail.com>
-In-Reply-To: <CAGCz3vsQ9hUkgX5dyy9er8y4_y1rM2eWrfLHkWV0xv6aJwNzeQ@mail.gmail.com>
-From:   Phil Dennis-Jordan <lists@philjordan.eu>
-Date:   Wed, 11 Oct 2023 14:27:52 +0200
-Message-ID: <CAGCz3vu6o8yv6YxkVFnYr_BTwccrUuqu1hRGVrzvMuwEV5-+Vg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/apic: Gates test_pv_ipi on KVM cpuid,
- not test device
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NEUTRAL
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH RFC v4 0/9] Add loongarch kvm accel support
+Content-Language: en-US
+To:     xianglai li <lixianglai@loongson.cn>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Xiaojuan Yang <yangxiaojuan@loongson.cn>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>,
+        Bibo Mao <maobibo@loongson.cn>, Song Gao <gaosong@loongson.cn>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <cover.1696841645.git.lixianglai@loongson.cn>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <cover.1696841645.git.lixianglai@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I've now got around to testing this patch on Linux/KVM.
+Hi,
 
-The thing I was worried about, my <linux/types.h> wrapper, appears to
-work exactly as intended, everything builds nicely on Linux. So that
-aspect of the patch is now a matter of taste.
+On 9/10/23 11:01, xianglai li wrote:
+> This series add loongarch kvm support, mainly implement
+> some interfaces used by kvm such as kvm_arch_get/set_regs,
+> kvm_arch_handle_exit, kvm_loongarch_set_interrupt, etc.
+> 
+> Currently, we are able to boot LoongArch KVM Linux Guests.
+> In loongarch VM, mmio devices and iocsr devices are emulated
+> in user space such as APIC, IPI, pci devices, etc, other
+> hardwares such as MMU, timer and csr are emulated in kernel.
+> 
+> It is based on temporarily unaccepted linux kvm:
+> https://github.com/loongson/linux-loongarch-kvm
+> And We will remove the RFC flag until the linux kvm patches
+> are merged.
+> 
+> The running environment of LoongArch virt machine:
+> 1. Get the linux source by the above mentioned link.
+>     git checkout kvm-loongarch
+>     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu- loongson3_defconfig
+>     make ARCH=loongarch CROSS_COMPILE=loongarch64-unknown-linux-gnu-
+> 2. Get the qemu source: https://github.com/loongson/qemu
+>     git checkout kvm-loongarch
+>     ./configure --target-list="loongarch64-softmmu"  --enable-kvm
+>     make
+> 3. Get uefi bios of LoongArch virt machine:
+>     Link: https://github.com/tianocore/edk2-platforms/tree/master/Platform/Loongson/LoongArchQemuPkg#readme
+> 4. Also you can access the binary files we have already build:
+>     https://github.com/yangxiaojuan-loongson/qemu-binary
+> 
+> The command to boot loongarch virt machine:
+>     $ qemu-system-loongarch64 -machine virt -m 4G -cpu la464 \
+>     -smp 1 -bios QEMU_EFI.fd -kernel vmlinuz.efi -initrd ramdisk \
+>     -serial stdio   -monitor telnet:localhost:4495,server,nowait \
+>     -append "root=/dev/ram rdinit=/sbin/init console=ttyS0,115200" \
+>     --nographic
 
-However, I *have* run into a minor snag with this proposed change: the
-X86_FEATURE_KVM_PV_SEND_IPI bit isn't actually enabled by default. It
-looks like it needs to be specified explicitly as a +kvm-pv-ipi flag
-in the -cpu option on the Qemu command line. KVM itself still handles
-the IPI hypercall either way, as there's another flag you'd have to
-opt into for only handling advertised hypercalls.
+2 years ago Song helped with an access to a LoongArch 3a5000 machine but
+it stopped working (IP was x.242.206.180).
 
-I think the cleanest way to fix this is probably to add +kvm-pv-ipi to
-the apic-split, x2apic, and xapic test suites in x86/unittests.cfg and
-keep the strict feature flag check in the test code. As I understand
-it, Qemu will filter the feature bit if the underlying KVM
-implementation doesn't support it, so that would appear to give us the
-best compatibility, except perhaps for Qemu versions that predate this
-flag, which will presumably fail to run the test suites altogether.
+Would it be possible to add a Loongarch64 runner to our CI
+(ideally with KVM support, but that can come later)? See:
+https://www.qemu.org/docs/master/devel/ci.html#jobs-on-custom-runners
 
-Alternatively, we could simply check whether we're running on KVM and
-skip the feature bit check entirely - it certainly wouldn't make any
-additional assumptions; as of right now, the master branch already
-assumes we're running on KVM *and* the KVM implementation supports the
-IPI HC. Dropping the feature bit check doesn't make the patch tangibly
-smaller though.
+Regards,
 
-I'll wait a couple of days for any other suggestions or objections,
-and in the absence of such I'll roll your draft patch, my
-modifications, and the x86/unittests.cfg tweaks into a v2 patch and
-re-submit. (And I'll tag it with you, Sean, as Co-authored-by:)
-
-Thanks,
-Phil
-
-On Thu, 5 Oct 2023 at 22:19, Phil Dennis-Jordan <lists@philjordan.eu> wrote=
-:
->
-> On Wed, Sep 27, 2023 at 4:18=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > Gah, sorry.  This is why I usually inline patches, I forget to actually=
- att=3D
-> > ach
-> > the darn things 50% of the time.
->
-> Thanks for that, and apologies for only just getting around to taking
-> a closer look. Out of the box, this doesn't build on macOS at least,
-> as that's missing <linux/types.h>. I tried going down the rabbit hole
-> of pulling that header and its various transitive dependencies in from
-> the Linux tree, but ended up in a horrible mess where those headers
-> try to define things like bool, which libcflat has already pulled in
-> from the standard system headers (on Linux I suspect the libc #include
-> guards match up with the stuff in <linux/*>, so there's no issue).
-> On macOS, the problem is easy to resolve via a cut-down types.h with a
-> minimal set of definitions:
->
-> #include <libcflat.h>
-> typedef u8  __u8;
-> typedef u32 __u32;
-> typedef u64 __u64;
-> typedef s64 __s64;
->
-> =E2=80=A6but I assume that breaks things on Linux. I'm thinking something=
- like
-> this might work:
->
-> #if __LINUX__
-> #include_next <linux/types.h>
-> #else
-> [minimal types.h definitions]
-> #endif
->
-> But I'm unsure if that's really the direction you'd want to go with
-> this? (And I still need to set myself up with a dev environment on a
-> physical Linux box that I can test this all on.)
->
-> Another option might be a symlinked linux/types.h created by
-> ./configure if not running on Linux?
->
->
-> On the substance of the patch itself:
->
-> >         unsigned long a0 =3D 0xFFFFFFFF, a1 =3D 0, a2 =3D 0xFFFFFFFF, a=
-3 =3D 0x0;
-> > -       if (!test_device_enabled())
-> > +       if (!this_cpu_has(X86_FEATURE_KVM_PV_SEND_IPI))
->
-> So this check will (erroneously IMO) succeed if we're running on a
-> non-KVM hypervisor which happens to expose a flag at bit 11 of ecx on
-> CPUID leaf 0x40000001 page 0, right? With this in mind, your earlier
-> idea seems better:
->
->         if (!is_hypervisor_kvm() ||
-> !this_cpu_has(X86_FEATURE_KVM_PV_SEND_IPI)) {
->
-> So I've gone ahead and made an attempt at fixing up your draft
-> implementation of is_hypervisor_kvm() below.
->
-> The partial struct memcmp in get_hypervisor_cpuid_base is a bit icky;
-> I'm not sure if that's worth fixing up at the cost of readability.
->
->
-> Thoughts?
->
-> (I've attached the full set of WIP changes on top of yours as another
-> patch. Feel free to squash it all into one if you decide to run with
-> it.)
->
-> Thanks,
-> Phil
->
->
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 7a7048f9..3d3930c8 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -240,6 +240,7 @@ static inline bool is_intel(void)
->  #define    X86_FEATURE_XSAVE        (CPUID(0x1, 0, ECX, 26))
->  #define    X86_FEATURE_OSXSAVE        (CPUID(0x1, 0, ECX, 27))
->  #define    X86_FEATURE_RDRAND        (CPUID(0x1, 0, ECX, 30))
-> +#define    X86_FEATURE_HYPERVISOR        (CPUID(0x1, 0, ECX, 31))
->  #define    X86_FEATURE_MCE            (CPUID(0x1, 0, EDX, 7))
->  #define    X86_FEATURE_APIC        (CPUID(0x1, 0, EDX, 9))
->  #define    X86_FEATURE_CLFLUSH        (CPUID(0x1, 0, EDX, 19))
-> @@ -286,7 +287,8 @@ static inline bool is_intel(void)
->  #define X86_FEATURE_VNMI        (CPUID(0x8000000A, 0, EDX, 25))
->  #define    X86_FEATURE_AMD_PMU_V2        (CPUID(0x80000022, 0, EAX, 0))
->
-> -#define X86_FEATURE_KVM_PV_SEND_IPI    (CPUID(KVM_CPUID_FEATURES, 0,
-> EAX, KVM_FEATURE_PV_SEND_IPI))
-> +#define X86_FEATURE_KVM_PV_SEND_IPI \
-> +    (CPUID(KVM_CPUID_FEATURES, 0, EAX, KVM_FEATURE_PV_SEND_IPI))
->
->  static inline bool this_cpu_has(u64 feature)
->  {
-> @@ -303,6 +305,40 @@ static inline bool this_cpu_has(u64 feature)
->      return ((*(tmp + (output_reg % 32))) & (1 << bit));
->  }
->
-> +static inline u32 get_hypervisor_cpuid_base(const char *sig)
-> +{
-> +    u32 base;
-> +    struct cpuid signature;
-> +
-> +    if (!this_cpu_has(X86_FEATURE_HYPERVISOR))
-> +        return 0;
-> +
-> +    for (base =3D 0x40000000; base < 0x40010000; base +=3D 0x100) {
-> +        signature =3D cpuid(base);
-> +
-> +        if (!memcmp(sig, &signature.b, 12))
-> +            return base;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static inline bool is_hypervisor_kvm(void)
-> +{
-> +    u32 base =3D get_hypervisor_cpuid_base(KVM_SIGNATURE);
-> +
-> +    if (!base)
-> +        return false;
-> +
-> +    /*
-> +     * Require that KVM be placed at its default base so that macros can=
- be
-> +     * used to query individual KVM feature bits.
-> +     */
-> +    assert_msg(base =3D=3D KVM_CPUID_SIGNATURE,
-> +           "Expect KVM at its default cpuid base (now at: 0x%x)", base);
-> +    return true;
-> +}
-> +
->  struct far_pointer32 {
->      u32 offset;
->      u16 selector;
+Phil.
