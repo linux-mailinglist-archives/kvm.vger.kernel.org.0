@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6D087C59F3
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:04:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8FA57C5A09
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:06:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346971AbjJKREX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 13:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49852 "EHLO
+        id S232917AbjJKRGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 13:06:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346967AbjJKREU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 13:04:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D9B4A4
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:03:31 -0700 (PDT)
+        with ESMTP id S231695AbjJKRGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 13:06:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC695E9
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:05:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697043811;
+        s=mimecast20190719; t=1697043945;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vQwaI6qzCKHaJR2pCcBdNfGrnFseeUjFkznqcANewvA=;
-        b=ImvOrzbhsvv/gYq3gDqJ0zrowNEudqE4iP1Yaws6TfjLv2b+csXTXhrSMJPgWlCTNU0ASv
-        5rlUORmPDx9kWrYogW64KiOoZ9ZlZwxYOkwTLPAxzfnUqzBqdFKZJG5wmCgNwClmYs/J/k
-        wZ1+SFv/FXOp+6ZOzVKXOq5fnIc1w3A=
+        bh=y1brdHaYQR/1KT6dTzx9XTkLz90qgniDtBGmYHkS7B4=;
+        b=aLp42Quk1uTQEEmOflVo5j5ZCHuvluqpOFzEiNsPh7ljgilegvd2/ZeQ3ktBNbXzRyRJc8
+        9wQ4szeI05Sf/2CD9eJ77//YpY1MQXb7I8ojH09oZ684YaZz/D0WwY4oAV8FVdbafPixVu
+        OwV6O0e91yVgHBT7pwEQt9i+rk76seY=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-588-QiH1sQP7M_Oa3wLPF3MTyA-1; Wed, 11 Oct 2023 13:03:14 -0400
-X-MC-Unique: QiH1sQP7M_Oa3wLPF3MTyA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fef3606d8cso725775e9.1
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:03:14 -0700 (PDT)
+ us-mta-591-dFTfQlfJNvKsW8UpB8rspQ-1; Wed, 11 Oct 2023 13:05:33 -0400
+X-MC-Unique: dFTfQlfJNvKsW8UpB8rspQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4063dd6729bso752925e9.2
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:05:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697043793; x=1697648593;
+        d=1e100.net; s=20230601; t=1697043932; x=1697648732;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vQwaI6qzCKHaJR2pCcBdNfGrnFseeUjFkznqcANewvA=;
-        b=HgBwnHkCvMUqjKFaNBOmuuLt3nj5U/5LyZYkf/UN+voaDyDBtGfLUGWa5nE32FEQuH
-         4Rnz0FRd19nQINfaRmTKISbUNch4E+1vgV6TxI2cztL2e1pCjg0Lr+Zjj7WFNh19f+00
-         7CLq+ZFsxYZh06M6yK+GJKmgRQB+dhtgH2003b/MzMIhFYa9xm4u1gBsqFsauGRuRh/W
-         oIIFCFVrunCyX1flYVzsuukD1itOn4StfZuO8YFAnttog+TykZSrUl82dJAcsh3r5GeE
-         alj1EYjTtSjPXrGfQZXdJc4qMIuuux0JErNJxSnixDDsBbX2CdtTRpCYyxbnDbP6dwEH
-         9PrQ==
-X-Gm-Message-State: AOJu0YyHecFpPtRr4oBsrobvPoXKVaAPm4XSLMIBPhBfwsKJ4eKWbPBU
-        INI/rIdPOXTVNBuF/AEksP38N8VMHN9TIlvsFAOU9nT8anCFUXbtwMij2wNrDthUeZEDsxOkvf5
-        c+kctcnP+iQ1N
-X-Received: by 2002:a05:6000:613:b0:329:6d09:61ff with SMTP id bn19-20020a056000061300b003296d0961ffmr16729094wrb.62.1697043793734;
-        Wed, 11 Oct 2023 10:03:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEoqjIfx0YMUmsiEqzUF6aUikcBac9FEtKjQD1Evi5nTkjChgZ9sJaB9Sh0FuZqZOrByFhCQ==
-X-Received: by 2002:a05:6000:613:b0:329:6d09:61ff with SMTP id bn19-20020a056000061300b003296d0961ffmr16729072wrb.62.1697043793440;
-        Wed, 11 Oct 2023 10:03:13 -0700 (PDT)
+        bh=y1brdHaYQR/1KT6dTzx9XTkLz90qgniDtBGmYHkS7B4=;
+        b=VQgjbzAW6lk0Gyq2ev1kAyne8WpC/K5YMOhlEbBJVoB5UbZ6Dl9cUigzKEbUKSKIXs
+         YHGlakLQkpe3erwRsXyibjRSsThmaoXXrChQRSY7URQ/rlMEUwHmed5wn1Pt6ZMTbsxk
+         c0sfXVLsuvpjBZgv3VhBy59OZvAFhP+99GrZ4srWAHvx6FPRrvbK4MsJYfwJxMlnO8ev
+         LC0TwYofHSRpjIVOUPgYpsStq+Xx5+sA3xV9NlyuMIbkTZFsGtQWQnkSetPt5knGVZOE
+         ny68l43WmHqq+e7YJPUSK720Cl5B6n6QALBqb2biYDX3hwHckSJicisZYLcRiPpZ9o7v
+         cFDA==
+X-Gm-Message-State: AOJu0YwYY3tntlxzSCuYcTngWCw3FYwdH1oiWksaYo4v4orFv99qR7Ud
+        qOre4huoS/6TBPcZuhfseZi88pCcmQ1DlbbRwVSk1fwy4dQHGo7Pa8gaoqHaZ9twVLD/G9ZM5Zv
+        RDh/inJIhBDkA
+X-Received: by 2002:a05:600c:b49:b0:406:7232:1431 with SMTP id k9-20020a05600c0b4900b0040672321431mr19337286wmr.33.1697043932490;
+        Wed, 11 Oct 2023 10:05:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkP7tKH7rx3WNL++lr4xFcEO49W8z8lrIDi+0WNMmcJnSlIasAGIk0kmgIQ5uKwF989mkFhg==
+X-Received: by 2002:a05:600c:b49:b0:406:7232:1431 with SMTP id k9-20020a05600c0b4900b0040672321431mr19337264wmr.33.1697043932189;
+        Wed, 11 Oct 2023 10:05:32 -0700 (PDT)
 Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
-        by smtp.gmail.com with ESMTPSA id c14-20020adfed8e000000b00317b0155502sm15903900wro.8.2023.10.11.10.03.10
+        by smtp.gmail.com with ESMTPSA id b5-20020a5d6345000000b0032326908972sm15811545wrw.17.2023.10.11.10.05.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 10:03:11 -0700 (PDT)
-Date:   Wed, 11 Oct 2023 13:03:09 -0400
+        Wed, 11 Oct 2023 10:05:31 -0700 (PDT)
+Date:   Wed, 11 Oct 2023 13:05:28 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Parav Pandit <parav@nvidia.com>,
@@ -72,7 +72,7 @@ Cc:     Parav Pandit <parav@nvidia.com>,
         Maor Gottlieb <maorg@nvidia.com>
 Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
  virtio device
-Message-ID: <20231011130018-mutt-send-email-mst@kernel.org>
+Message-ID: <20231011130317-mutt-send-email-mst@kernel.org>
 References: <20231010105339-mutt-send-email-mst@kernel.org>
  <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
  <20231010111339-mutt-send-email-mst@kernel.org>
@@ -88,9 +88,9 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20231011121849.GV3952@nvidia.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -98,14 +98,11 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Oct 11, 2023 at 09:18:49AM -0300, Jason Gunthorpe wrote:
-> The simple way to be sure is to never touch the PCI function that has
-> DMA assigned to a VM from the hypervisor, except through config space.
+> With VDPA doing the same stuff as vfio I'm not sure who is auditing it
+> for security.
 
-What makes config space different that it's safe though?
-Isn't this more of a "we can't avoid touching config space" than
-that it's safe? The line doesn't look that bright to me -
-if there's e.g. a memory area designed explicitly for
-hypervisor to poke at, that seems fine.
+Check the signed off tags and who sends the pull requests if you want to
+know.
 
 -- 
 MST
