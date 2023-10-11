@@ -2,208 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 876017C509D
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 12:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE537C50A8
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 12:57:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346323AbjJKKyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 06:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36300 "EHLO
+        id S234809AbjJKK5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 06:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231818AbjJKKym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 06:54:42 -0400
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C154B94
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 03:54:40 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-452b0430cc5so2828500137.3
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 03:54:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1697021680; x=1697626480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p4nF6PEutWJBQPD4LIT1skkD09xa4qGsBtRI6mZk9kM=;
-        b=LO+VbWoGycURW0lZWdLoS/PCw4dvNGHkODJzJRAUvngwyubXTbZmkcxI1LxdnqXjQ0
-         tzC3qwSQaqLZW1rIcbypgWPF43TKDA1x2hNTPaSmfshPGmGHGIfnUUu3Mh2xCeMC0x8Y
-         gSlfAMdlmU81u4S4uWARRLJ+Hj/7G+XQkP+vak0jx2ATtR2AuxNGOufYOpgEyXnHcPOx
-         DKFIJAgnbyG63kE2E1j5vdX7aYuwc/0e5+hbcU+4SvPbdzOVjnZmyNHcxgAgSWn5LSwU
-         XPCNgora0K24vvGw5oZHx7cUs3moAhmK07q24JM6Bh8Y1ffUD/nlUQizpL1IxDytNttD
-         GOHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697021680; x=1697626480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p4nF6PEutWJBQPD4LIT1skkD09xa4qGsBtRI6mZk9kM=;
-        b=E+Y/EpL0/tGeNktGN2lRoS7OL4ycf/ybNUVyFclUg/6R47L08T54Tms/r8yd+ZiJuR
-         vwvt+nrA/kaeVtb1kdCvcvyq6Y2ypkkyr4RWI2WfIxZwtWwimDE+SEEhifu9SJSgMhDm
-         EPgUbjpNqdGwgiz9im8YB5PK/Y2lQxpIUSHKyhIsEMMysRSJdllkSWuRTbTn7d+VXIgt
-         yIAvCLt+TCKYwW+YDIl8xOhL2qKIQzosQsBQ7i5LxEPZx1/aDm5Acs5GkeYf04Vlu+rW
-         3o2RC4k00mcT6VOCe9jYXuVTZCe7kIn3gAC1qJGnUQVJRCrP1Rca0ReFZn/vNUI0jBiE
-         a7tg==
-X-Gm-Message-State: AOJu0Yxg7yCdr9Ehp2g1eXGO6H6mbDVanVY+Z8KL/EbXqa3xw2kNjY2M
-        VNxL7IKwkRWiiF1S4++MxtHXI/I1Igl+PhBLbieQmA==
-X-Google-Smtp-Source: AGHT+IFDs94V/aDo55pKyEF+KYMg17r2BTEWfhXQjYPz6s8btDK4mBkRCwVsJWRGGrp60X5u0qqqHYxCDBabIc6c5JU=
-X-Received: by 2002:a67:cd11:0:b0:450:8e58:2de4 with SMTP id
- u17-20020a67cd11000000b004508e582de4mr18396034vsl.7.1697021679643; Wed, 11
- Oct 2023 03:54:39 -0700 (PDT)
+        with ESMTP id S231818AbjJKK5F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 06:57:05 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBE192;
+        Wed, 11 Oct 2023 03:57:03 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39BAtnmU010546;
+        Wed, 11 Oct 2023 10:56:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/hulgYzeB1tinO0QVF5HsEwmb8TbGVqInBWmKQP+bY8=;
+ b=LAk0eSf4hVoeHV4YNC/hQKTTr/9sS8+Xqi7Gx3X/REB6eys0pYEeiYov48RB16AMSTeA
+ 0LJWTVKK2vgRPY+7b/JRxjpgeLXs+fYdlv74U2a22AHRL6fWf/g1mhWcsQsstZI3LJRs
+ LDWBbsYlQkO2/ARzF4yrSCftRlKK7EFvhszExNM24QEFwkHlNSHkS0lsgbjobmqYTTrH
+ 5xCi3mYyKSh0U/Gw1Cj4Rar2OdUGn6yQPTEDmXz23WRVY6Ci9UHIbuhysP0LXh9vvGqP
+ LJXVikk1/DnVjsSsLTzJOqc+aB36SHxwCdKv9dYfn+BM/J7tc4tUnoWKEcCf10cJCiyz bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tntctg1ue-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 10:56:58 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39BAtovC010576;
+        Wed, 11 Oct 2023 10:56:57 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tntctg1tt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 10:56:57 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39BAJhlu023018;
+        Wed, 11 Oct 2023 10:56:56 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkmc1py90-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 10:56:56 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39BAuoe643647730
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Oct 2023 10:56:50 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E8C82004E;
+        Wed, 11 Oct 2023 10:56:50 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDB3C2004B;
+        Wed, 11 Oct 2023 10:56:49 +0000 (GMT)
+Received: from [9.171.88.83] (unknown [9.171.88.83])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Oct 2023 10:56:49 +0000 (GMT)
+Message-ID: <434cdea5-e0a8-43d0-a06f-5c4a1990acf7@linux.ibm.com>
+Date:   Wed, 11 Oct 2023 12:56:49 +0200
 MIME-Version: 1.0
-References: <20231010170503.657189-1-apatel@ventanamicro.com>
- <20231010170503.657189-4-apatel@ventanamicro.com> <2023101048-attach-drift-d77b@gregkh>
- <CAK9=C2UEcQpHg8WZM3XxLa5yCEZ6wtWJj=8g5_m_0_RkiNMkTA@mail.gmail.com> <2023101105-oink-aerospace-989e@gregkh>
-In-Reply-To: <2023101105-oink-aerospace-989e@gregkh>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Wed, 11 Oct 2023 16:24:28 +0530
-Message-ID: <CAK9=C2V3VzCgaJ_dWExvS3mf3QRgeV5tU9t3LsMaHv7xO3wwzA@mail.gmail.com>
-Subject: Re: [PATCH 3/6] RISC-V: KVM: Forward SBI DBCN extension to user-space
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Conor Dooley <conor@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 1/9] s390x: topology: Fix report message
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20231011085635.1996346-1-nsg@linux.ibm.com>
+ <20231011085635.1996346-2-nsg@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20231011085635.1996346-2-nsg@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SZu-o27mb84CBdILDJ5hFwCED3fiGx99
+X-Proofpoint-ORIG-GUID: PVHHhTqu-uniNBAXygBxSnwqic8Jg4nH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-11_08,2023-10-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ spamscore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310110095
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 11, 2023 at 12:56=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Wed, Oct 11, 2023 at 12:02:30PM +0530, Anup Patel wrote:
-> > On Tue, Oct 10, 2023 at 10:45=E2=80=AFPM Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > On Tue, Oct 10, 2023 at 10:35:00PM +0530, Anup Patel wrote:
-> > > > The SBI DBCN extension needs to be emulated in user-space
-> > >
-> > > Why?
-> >
-> > The SBI debug console is similar to a console port available to
-> > KVM Guest so the KVM user space tool (i.e. QEMU-KVM or
-> > KVMTOOL) can redirect the input/output of SBI debug console
-> > wherever it wants (e.g.  telnet, file, stdio, etc).
-> >
-> > We forward SBI DBCN calls to KVM user space so that the
-> > in-kernel KVM does not need to be aware of the guest
-> > console devices.
->
-> Hint, my "Why" was attempting to get you to write a better changelog
-> description, which would include the above information.  Please read the
-> kernel documentation for hints on how to do this so that we know what
-> why changes are being made.
+On 10/11/23 10:56, Nina Schoetterl-Glausch wrote:
+> A polarization value of 0 means horizontal polarization.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Okay, I will improve the commit description and cover-letter.
+Don't we need to remove the entitlement part?
+Entitlement is defined as the degree of vertical polarization.
 
->
-> > > > so let
-> > > > us forward console_puts() call to user-space.
-> > >
-> > > What could go wrong!
-> > >
-> > > Why does userspace have to get involved in a console message?  Why is
-> > > this needed at all?  The kernel can not handle userspace consoles as
-> > > obviously they have to be re-entrant and irq safe.
-> >
-> > As mentioned above, these are KVM guest console messages which
-> > the VMM (i.e. KVM user-space) can choose to manage on its own.
->
-> If it chooses not to, what happens?
+> ---
+>   s390x/topology.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> index 69558236..53838ed1 100644
+> --- a/s390x/topology.c
+> +++ b/s390x/topology.c
+> @@ -275,7 +275,7 @@ static uint8_t *check_tle(void *tc)
+>   	if (!cpus->d)
+>   		report_skip("Not dedicated");
+>   	else
+> -		report(cpus->pp == 3 || cpus->pp == 0, "Dedicated CPUs are either vertically polarized or have high entitlement");
+> +		report(cpus->pp == 3 || cpus->pp == 0, "Dedicated CPUs are either horizontally polarized or have high entitlement");
+>   
+>   	return tc + sizeof(*cpus);
+>   }
 
-If KVM user-space chooses not to handle SBI DBCN calls then it can
-disable SBI DBCN extension for Guest VCPUs using the ONE_REG
-ioctl() interface.
-
->
-> > This is more about providing flexibility to KVM user-space which
-> > allows it to manage guest console devices.
->
-> Why not use the normal virtio console device interface instead of making
-> a riscv-custom one?
-
-The SBI DBCN (or debug console) is only an early console used for
-early prints and bootloaders.
-
-Once the proper console (like virtio console) is detected by the Guest
-kernel, it will switch the debug console to proper console.
-
->
-> Where is the userspace side of this interface at?  Where are the patches
-> to handle this new api you added?
-
-As mentioned in the cover letter, I have implemented it in KVMTOOL first.
-
-The patches can be found in riscv_sbi_dbcn_v1 branch at:
-https://github.com/avpatel/kvmtool.git
-
-More precisely, this commit:
-https://github.com/avpatel/kvmtool/commit/06a373ee8991f882ef79de3845a4c8d63=
-cb189a6
-
->
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > > > ---
-> > > >  arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
-> > > >  arch/riscv/include/uapi/asm/kvm.h     |  1 +
-> > > >  arch/riscv/kvm/vcpu_sbi.c             |  4 ++++
-> > > >  arch/riscv/kvm/vcpu_sbi_replace.c     | 31 +++++++++++++++++++++++=
-++++
-> > > >  4 files changed, 37 insertions(+)
-> > > >
-> > > > diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/inc=
-lude/asm/kvm_vcpu_sbi.h
-> > > > index 8d6d4dce8a5e..a85f95eb6e85 100644
-> > > > --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> > > > +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> > > > @@ -69,6 +69,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_s=
-bi_ext_ipi;
-> > > >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
-> > > >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
-> > > >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
-> > > > +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
-> > > >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experiment=
-al;
-> > > >  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
-> > > >
-> > > > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include=
-/uapi/asm/kvm.h
-> > > > index 917d8cc2489e..60d3b21dead7 100644
-> > > > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > > > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > > > @@ -156,6 +156,7 @@ enum KVM_RISCV_SBI_EXT_ID {
-> > > >       KVM_RISCV_SBI_EXT_PMU,
-> > > >       KVM_RISCV_SBI_EXT_EXPERIMENTAL,
-> > > >       KVM_RISCV_SBI_EXT_VENDOR,
-> > > > +     KVM_RISCV_SBI_EXT_DBCN,
-> > > >       KVM_RISCV_SBI_EXT_MAX,
-> > >
-> > > You just broke a user/kernel ABI here, why?
-> >
-> > The KVM_RISCV_SBI_EXT_MAX only represents the number
-> > of entries in "enum KVM_RISCV_SBI_EXT_ID" so we are not
-> > breaking "enum KVM_RISCV_SBI_EXT_ID" rather appending
-> > new ID to existing enum.
->
-> So you are sure that userspace never actually tests or sends that _MAX
-> value anywhere?  If not, why is it even needed?
->
-> thanks,
->
-> greg k-h
-
-Regards,
-Anup
