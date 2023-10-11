@@ -2,28 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4878C7C5DEA
+	by mail.lfdr.de (Postfix) with ESMTP id 9CF317C5DEB
 	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 21:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbjJKT6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 15:58:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40636 "EHLO
+        id S1345948AbjJKT6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 15:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233103AbjJKT6F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 15:58:05 -0400
-Received: from out-197.mta1.migadu.com (out-197.mta1.migadu.com [95.215.58.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEDED94
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 12:58:01 -0700 (PDT)
+        with ESMTP id S233151AbjJKT6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 15:58:06 -0400
+Received: from out-210.mta1.migadu.com (out-210.mta1.migadu.com [IPv6:2001:41d0:203:375::d2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F169D
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 12:58:03 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697054278;
+        t=1697054281;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NBdFJkgYJSOzXayzM8jpEgticEipqKrh87vuZZUVqWI=;
-        b=XSVr3Iasililq6Jjf897ZcVr2TR3WCtF3BasDbHQAplqCTJ1uripBA2LHchI2JFxJT+oMa
-        OSAkltHILlIHKi5+ll7X6VeJXzcQCgn6N1v+j61rkzdduSBRK6AooSaccrblDz25LKq/uU
-        Zby2ksf7qO6a7XAzQgLmdkwVmyUnQpE=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7iv9v0LVdSGzSsHpdfhFKUOpAMYpmC7eseuWuodo+T0=;
+        b=VLQkkqXJJJr6XE5yBJGB/mhprgXWHZA9+vMrgeLL2SSJZmGl2gixD8qsmhGGXjBUm8exCN
+        wFrHa5/Nka9VOkEevtVXOGYV6xlSXYd4dRH7v+OlnVrFCcBvtXHgHCukYyR4lp0z41YcyP
+        dINv/Tq/IIyT5/brPmhu+4OVGFtXtuM=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvm@vger.kernel.org
 Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -44,9 +45,11 @@ Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 0/5] KVM: selftests: Add ID reg test, update headers
-Date:   Wed, 11 Oct 2023 19:57:35 +0000
-Message-ID: <20231011195740.3349631-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 1/5] tools: arm64: Add a Makefile for generating sysreg-defs.h
+Date:   Wed, 11 Oct 2023 19:57:36 +0000
+Message-ID: <20231011195740.3349631-2-oliver.upton@linux.dev>
+In-Reply-To: <20231011195740.3349631-1-oliver.upton@linux.dev>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -60,41 +63,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v2: https://lore.kernel.org/kvmarm/20231010011023.2497088-1-oliver.upton@linux.dev/
+Use a common Makefile for generating sysreg-defs.h, which will soon be
+needed by perf and KVM selftests. The naming scheme of the generated
+macros is not expected to change, so just refer to the canonical
+script/data in the kernel source rather than copying to tools.
 
-v2 -> v3:
- - Use the kernel's script/data for generating the header instad of a
-   copy (broonie)
-
-Jing Zhang (2):
-  tools headers arm64: Update sysreg.h with kernel sources
-  KVM: arm64: selftests: Test for setting ID register from usersapce
-
-Oliver Upton (3):
-  tools: arm64: Add a Makefile for generating sysreg-defs.h
-  perf build: Generate arm64's sysreg-defs.h and add to include path
-  KVM: selftests: Generate sysreg-defs.h and add to include path
-
- tools/arch/arm64/include/.gitignore           |   1 +
- tools/arch/arm64/include/asm/gpr-num.h        |  26 +
- tools/arch/arm64/include/asm/sysreg.h         | 839 ++++--------------
- tools/arch/arm64/tools/Makefile               |  38 +
- tools/perf/Makefile.perf                      |  15 +-
- tools/perf/util/Build                         |   2 +-
- tools/testing/selftests/kvm/Makefile          |  24 +-
- .../selftests/kvm/aarch64/aarch32_id_regs.c   |   4 +-
- .../selftests/kvm/aarch64/debug-exceptions.c  |  12 +-
- .../selftests/kvm/aarch64/page_fault_test.c   |   6 +-
- .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++
- .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
- 12 files changed, 785 insertions(+), 667 deletions(-)
+Co-developed-by: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ tools/arch/arm64/include/.gitignore |  1 +
+ tools/arch/arm64/tools/Makefile     | 38 +++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
  create mode 100644 tools/arch/arm64/include/.gitignore
- create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
  create mode 100644 tools/arch/arm64/tools/Makefile
- create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 
-
-base-commit: dafa493dd01d5992f1cb70b08d1741c3ab99e04a
+diff --git a/tools/arch/arm64/include/.gitignore b/tools/arch/arm64/include/.gitignore
+new file mode 100644
+index 000000000000..9ab870da897d
+--- /dev/null
++++ b/tools/arch/arm64/include/.gitignore
+@@ -0,0 +1 @@
++generated/
+diff --git a/tools/arch/arm64/tools/Makefile b/tools/arch/arm64/tools/Makefile
+new file mode 100644
+index 000000000000..f867e6036c62
+--- /dev/null
++++ b/tools/arch/arm64/tools/Makefile
+@@ -0,0 +1,38 @@
++# SPDX-License-Identifier: GPL-2.0
++
++ifeq ($(srctree),)
++srctree := $(patsubst %/,%,$(dir $(CURDIR)))
++srctree := $(patsubst %/,%,$(dir $(srctree)))
++srctree := $(patsubst %/,%,$(dir $(srctree)))
++srctree := $(patsubst %/,%,$(dir $(srctree)))
++endif
++
++include $(srctree)/tools/scripts/Makefile.include
++
++AWK	?= awk
++MKDIR	?= mkdir
++RM	?= rm
++
++ifeq ($(V),1)
++Q =
++else
++Q = @
++endif
++
++arm64_tools_dir = $(srctree)/arch/arm64/tools
++arm64_sysreg_tbl = $(arm64_tools_dir)/sysreg
++arm64_gen_sysreg = $(arm64_tools_dir)/gen-sysreg.awk
++arm64_generated_dir = $(srctree)/tools/arch/arm64/include/generated
++arm64_sysreg_defs = $(arm64_generated_dir)/asm/sysreg-defs.h
++
++all: $(arm64_sysreg_defs)
++	@:
++
++$(arm64_sysreg_defs): $(arm64_gen_sysreg) $(arm64_sysreg_tbl)
++	$(Q)$(MKDIR) -p $(dir $@)
++	$(QUIET_GEN)$(AWK) -f $^ > $@
++
++clean:
++	$(Q)$(RM) -rf $(arm64_generated_dir)
++
++.PHONY: all clean
 -- 
 2.42.0.609.gbb76f46606-goog
 
