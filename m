@@ -2,57 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E357B7C5970
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 18:45:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64C957C598F
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 18:52:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235052AbjJKQpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 12:45:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52954 "EHLO
+        id S232496AbjJKQwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 12:52:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235114AbjJKQpk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 12:45:40 -0400
+        with ESMTP id S230158AbjJKQwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 12:52:08 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB60B7;
-        Wed, 11 Oct 2023 09:45:38 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CC1EC433C7;
-        Wed, 11 Oct 2023 16:45:38 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58FF19D
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 09:52:07 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE6AC433C7;
+        Wed, 11 Oct 2023 16:52:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697042738;
-        bh=Gszkr6ytwYAWj77761HPc4xxX6XKWbdeQEVhpa208hM=;
+        s=k20201202; t=1697043127;
+        bh=HhnREBOs8UQzGU+rguc53L2rbgDz2hFlFshHa96ZcyQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=dtxmhkayGxf0TZptHCQp2gsnsvH2XldyeRAADcrby7Ysmpyl05/MP5u9QgwOA2o1P
-         DbRv0VeNO+P7UFFRxSMDOTTK4j213srQCPgK4OQjOuBM17Lz/Yq+6djsegBECYCi9z
-         8i9dJ1K5qKXeOYlMwUeAohGPHNeW3ZmwEM3WWMFz5jz81V7z77a7umSHScM083mgmS
-         SG1xL3eEjuLWPsHm8PxGJn60d+dAWe03wsyNWeSs+K4Hz1L1ZSH1Hs+l9HqLJnGFak
-         +Jy2abvU6Ig10vflOk7hganeEUNBbh1oKJFB0fltA2MmUkYjO9/RSoY1M5oDw5Z6Q0
-         P2KEF0Itn0vKQ==
+        b=eCO367t+WFzNPIf1LGJKHqBJ5Au7P5H/ocmI5Ji9umGbXVD2pLosjg2nr9kfOr2+1
+         hrxKuMKzKVaYYObvN8VkKhwv4+kp1FWiDUBkLgNByRMyW5hipjf6ahnMx5cqt0nDjB
+         rZL+HljKJjczBid6Sm68NA0QW8/1ufjHwLTdKJe53ziQ0N5a02EFq+QgW2mxxrtVK+
+         pLrwF6uCW3UsD7P5XXW9geW+7Hg2grGnSyj9PxKmLTbRGdi/EtWHU+0uJRMwgaO3BP
+         8l5frgVrcnYaaneIu10D/IdujdUIpSYxMZrcfa0gXDR7zV1F3WyWL34Dohwg9ElGmV
+         aaldtTbIaGNJA==
 Received: from [104.132.1.97] (helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qqcL1-003DWa-8a;
-        Wed, 11 Oct 2023 17:45:35 +0100
-Date:   Wed, 11 Oct 2023 17:45:29 +0100
-Message-ID: <8734yhm7km.wl-maz@kernel.org>
+        id 1qqcRI-003DdV-5p;
+        Wed, 11 Oct 2023 17:52:04 +0100
+Date:   Wed, 11 Oct 2023 17:51:57 +0100
+Message-ID: <871qe1m79u.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Tianyi Liu <i.pear@outlook.com>
-Cc:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        mingo@redhat.com, acme@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
-Subject: Re: [PATCH v2 0/5] perf: KVM: Enable callchains for guests
-In-Reply-To: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-References: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 1/5] tools headers arm64: Copy sysreg-defs generation from kernel source
+In-Reply-To: <20231010011023.2497088-2-oliver.upton@linux.dev>
+References: <20231010011023.2497088-1-oliver.upton@linux.dev>
+        <20231010011023.2497088-2-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 104.132.1.97
-X-SA-Exim-Rcpt-To: i.pear@outlook.com, seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, broonie@kernel.org, jingzhangos@google.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, pbonzini@redhat.com, adrian.hunter@intel.com, irogers@google.com, namhyung@kernel.org, jolsa@kernel.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, acme@kernel.org, mingo@redhat.com, peterz@infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -64,75 +75,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 08 Oct 2023 15:48:17 +0100,
-Tianyi Liu <i.pear@outlook.com> wrote:
+On Tue, 10 Oct 2023 02:10:18 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hi there,
-> 
-> This series of patches enables callchains for guests (used by perf kvm),
-> which holds the top spot on the perf wiki TODO list [1]. This allows users
-> to perform guest OS callchain or performance analysis from external
-> using PMU events.
-> 
-> The event processing flow is as follows (shown as backtrace):
->   #0 kvm_arch_vcpu_get_frame_pointer / kvm_arch_vcpu_read_virt (per arch)
->   #1 kvm_guest_get_frame_pointer / kvm_guest_read_virt
->      <callback function pointers in `struct perf_guest_info_callbacks`>
->   #2 perf_guest_get_frame_pointer / perf_guest_read_virt
->   #3 perf_callchain_guest
->   #4 get_perf_callchain
->   #5 perf_callchain
-> 
-> Between #0 and #1 is the interface between KVM and the arch-specific
-> impl, while between #1 and #2 is the interface between Perf and KVM.
-> The 1st patch implements #0. The 2nd patch extends interfaces between #1
-> and #2, while the 3rd patch implements #1. The 4th patch implements #3
-> and modifies #4 #5. The last patch is for userspace utils.
-> 
-> Since arm64 hasn't provided some foundational infrastructure (interface
-> for reading from a virtual address of guest), the arm64 implementation
-> is stubbed for now because it's a bit complex, and will be implemented
-> later.
+> The system register definitions are now generated with a script over in
+> the kernel sources. Pull a copy into tools in anticipation of updating
+> dependent header files and add a common makefile for generating the
+> header.
 
-I hope you realise that such an "interface" would be, by definition,
-fragile and very likely to break in a subtle way. The only existing
-case where we walk the guest's page tables is for NV, and even that is
-extremely fragile.
-
-Given that, I really wonder why this needs to happen in the kernel.
-Userspace has all the required information to interrupt a vcpu and
-walk its current context, without any additional kernel support. What
-are the bits here that cannot be implemented anywhere else?
-
-> 
-> Tested with both 32-bit and 64-bit guest operating systems / unikernels,
-> that `perf script` could correctly show the certain callchains.
-> FlameGraphs can also be generated with this series of patches and [2].
-> 
-> Any feedback will be greatly appreciated.
-> 
-> [1] https://perf.wiki.kernel.org/index.php/Todo
-> [2] https://github.com/brendangregg/FlameGraph
-> 
-> v1:
-> https://lore.kernel.org/kvm/SYYP282MB108686A73C0F896D90D246569DE5A@SYYP282MB1086.AUSP282.PROD.OUTLOOK.COM/
-> 
-> Changes since v1:
-> - v1 only includes partial KVM modifications, while v2 is a complete
-> implementation. Also updated based on Sean's feedback.
-> 
-> Tianyi Liu (5):
->   KVM: Add arch specific interfaces for sampling guest callchains
->   perf kvm: Introduce guest interfaces for sampling callchains
->   KVM: implement new perf interfaces
->   perf kvm: Support sampling guest callchains
->   perf tools: Support PERF_CONTEXT_GUEST_* flags
-> 
->  arch/arm64/kvm/arm.c                | 17 +++++++++
-
-Given that there is more to KVM than just arm64 and x86, I suggest
-that you move the lack of support for this feature into the main KVM
-code.
+Rather than a copy, which makes the maintenance pretty horrible, why
+don't you just symlink it? Git is perfectly capable of storing them,
+last time I checked.
 
 Thanks,
 
