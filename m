@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC8597C4DC3
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 10:57:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 230DC7C4E34
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 11:08:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345615AbjJKI47 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 04:56:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
+        id S230445AbjJKJIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 05:08:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230392AbjJKI45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 04:56:57 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C5AA7;
-        Wed, 11 Oct 2023 01:56:56 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39B8npxW020773;
-        Wed, 11 Oct 2023 08:56:46 GMT
+        with ESMTP id S233082AbjJKJIH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 05:08:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89577113;
+        Wed, 11 Oct 2023 02:01:59 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39B8lRQi026639;
+        Wed, 11 Oct 2023 08:56:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=iQkY72E/ULAP0jO9xOJa81ucrv5Bd02sKU6uZ8jdksY=;
- b=CDzrbLqqHLpNYM138wZz/l1KUXHFC+rzTJCXj2IGnk8iVeTGu2E3rKfrjOEylukNbA2H
- 78aiI+U9uOhrLJxVRevG39c8WuIvNDbm6HYcesAWhoNI6Uk0/yU1CRKYdbdvC4gMXDcY
- sKahwOwX+VDrC4vtRinaaqxWEzuC0Q9t6vo9B+YPn5ZPZwzfnBD9HJKSuOe3+mA33MAS
- geViWi29EjpziyCKEptMuIdd0KQsra8DOj0h+Fe9tUaSv8HHZO+IW7PKzaXlrw5FjUzD
- xskJjXLuURCrYxMMs9HwsUXdFeovNKIBiniUCRMGBY1oLCAFKbthKfUBHEU5t0BVMswn 6g== 
+ bh=BJiQMTRGCzVtbvem4GS+Xox6z6I4L2SDaYeys7zuxzk=;
+ b=n8CDk3WgDleoj69vSN/CL9lbTukost/DsW5pJFNl+2TjKX8BMJ4969vXfL7PgLP52ZUI
+ IF2Qkc66cvbu4JTyvb1138RyAmiBAVL990cvn31G/s/rQ+EATLOJBA6ytUVksD0oUr5O
+ M5LWON4hQL4BgZbegPvBbfkadYVWmilh9Bg1KI5uVOpQveI5AmxBaiLLEmOWicjpaY/m
+ F5BJN9LqF4pR6W+Beqa20xKqHUl464w++gORBBUSghGxkrI3xEsjRrmSuRRO7kQ5DpSj
+ Dq9x6KB1DzVrYQe1x2X0OkmkTX/Yf6Y3qg0lUMfRJVL5K2x1zM+7H+ghMb9KuEdojaeo 5w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnrhng9k0-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnrgg0ac2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Oct 2023 08:56:45 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39B8oZWQ022907;
+        Wed, 11 Oct 2023 08:56:47 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39B8mMO4030164;
+        Wed, 11 Oct 2023 08:56:47 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnrgg0aba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 08:56:47 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39B8jGmn000693;
         Wed, 11 Oct 2023 08:56:45 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnrhng9jn-1
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkk5kpp4s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 11 Oct 2023 08:56:45 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39B7InYJ024465;
-        Wed, 11 Oct 2023 08:56:44 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkhnsq6pv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Oct 2023 08:56:44 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39B8ufnK11928126
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39B8ug3222020616
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Oct 2023 08:56:41 GMT
+        Wed, 11 Oct 2023 08:56:42 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A489F20043;
-        Wed, 11 Oct 2023 08:56:41 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 460E42004B;
+        Wed, 11 Oct 2023 08:56:42 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6DAC820040;
-        Wed, 11 Oct 2023 08:56:41 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0F31D20043;
+        Wed, 11 Oct 2023 08:56:42 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Oct 2023 08:56:41 +0000 (GMT)
+        Wed, 11 Oct 2023 08:56:42 +0000 (GMT)
 From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 To:     Janosch Frank <frankja@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
@@ -67,27 +67,27 @@ Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
         kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
         Colton Lewis <coltonlewis@google.com>,
         Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: [kvm-unit-tests PATCH 4/9] s390x: topology: Don't use non unique message
-Date:   Wed, 11 Oct 2023 10:56:27 +0200
-Message-Id: <20231011085635.1996346-5-nsg@linux.ibm.com>
+        Ricardo Koller <ricarkol@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 5/9] s390x: topology: Refine stsi header test
+Date:   Wed, 11 Oct 2023 10:56:28 +0200
+Message-Id: <20231011085635.1996346-6-nsg@linux.ibm.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231011085635.1996346-1-nsg@linux.ibm.com>
 References: <20231011085635.1996346-1-nsg@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bMfkiFZNjYYr4hOviTJblzPuK-9Yoraf
-X-Proofpoint-GUID: uCv95cGAf0i4oTwCE6WwleAi1j-StHnz
+X-Proofpoint-ORIG-GUID: gX_Hf3xWkwJ4uunxh_Vfze3Bujgj5Xw2
+X-Proofpoint-GUID: r29D9RcrQjsfS3Ou3-Mzw7rgtpdw_TOI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-11_06,2023-10-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0 spamscore=0
- mlxlogscore=999 lowpriorityscore=0 mlxscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310110077
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ clxscore=1015 bulkscore=0 suspectscore=0 phishscore=0 impostorscore=0
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310110078
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -97,71 +97,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we test something, i.e. do a report() we want unique messages,
-otherwise, from the test output, it will appear as if the same test was
-run multiple times, possible with different PASS/FAIL values.
-
-Convert some reports that don't actually test anything topology specific
-into asserts.
-Refine the report message for others.
+Add checks for length field.
+Also minor refactor.
 
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 ---
- s390x/topology.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ s390x/topology.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/s390x/topology.c b/s390x/topology.c
-index 49d6dfeb..5374582f 100644
+index 5374582f..0ba57986 100644
 --- a/s390x/topology.c
 +++ b/s390x/topology.c
-@@ -114,7 +114,7 @@ static void check_polarization_change(void)
- 	report_prefix_push("Polarization change");
+@@ -187,18 +187,22 @@ static void stsi_check_maxcpus(struct sysinfo_15_1_x *info)
+ }
  
- 	/* We expect a clean state through reset */
--	report(diag308_load_reset(1), "load normal reset done");
-+	assert(diag308_load_reset(1));
+ /*
+- * stsi_check_mag
++ * stsi_check_header
+  * @info: Pointer to the stsi information
++ * @sel2: stsi selector 2 value
+  *
+  * MAG field should match the architecture defined containers
+  * when MNEST as returned by SCLP matches MNEST of the SYSIB.
+  */
+-static void stsi_check_mag(struct sysinfo_15_1_x *info)
++static void stsi_check_header(struct sysinfo_15_1_x *info, int sel2)
+ {
+ 	int i;
+ 
+-	report_prefix_push("MAG");
++	report_prefix_push("Header");
+ 
++	report(IS_ALIGNED(info->length, 8), "Length %d multiple of 8", info->length);
++	report(info->length < PAGE_SIZE, "Length %d in bounds", info->length);
++	report(sel2 == info->mnest, "Valid mnest");
+ 	stsi_check_maxcpus(info);
  
  	/*
- 	 * Set vertical polarization to verify that RESET sets
-@@ -123,7 +123,7 @@ static void check_polarization_change(void)
- 	cc = ptf(PTF_REQ_VERTICAL, &rc);
- 	report(cc == 0, "Set vertical polarization.");
+@@ -326,7 +330,6 @@ static int stsi_get_sysib(struct sysinfo_15_1_x *info, int sel2)
  
--	report(diag308_load_reset(1), "load normal reset done");
-+	assert(diag308_load_reset(1));
+ 	if (max_nested_lvl >= sel2) {
+ 		report(!ret, "Valid instruction");
+-		report(sel2 == info->mnest, "Valid mnest");
+ 	} else {
+ 		report(ret, "Invalid instruction");
+ 	}
+@@ -365,7 +368,7 @@ static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info, int sel2)
+ 		goto vertical;
+ 	}
  
- 	cc = ptf(PTF_CHECK, &rc);
- 	report(cc == 0, "Reset should clear topology report");
-@@ -137,25 +137,25 @@ static void check_polarization_change(void)
- 	report(cc == 0, "Change to vertical");
+-	stsi_check_mag(info);
++	stsi_check_header(info, sel2);
+ 	stsi_check_tle_coherency(info);
  
- 	cc = ptf(PTF_CHECK, &rc);
--	report(cc == 1, "Should report");
-+	report(cc == 1, "Should report change after horizontal -> vertical");
+ vertical:
+@@ -378,7 +381,7 @@ vertical:
+ 		goto end;
+ 	}
  
- 	cc = ptf(PTF_REQ_VERTICAL, &rc);
- 	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED, "Double change to vertical");
- 
- 	cc = ptf(PTF_CHECK, &rc);
--	report(cc == 0, "Should not report");
-+	report(cc == 0, "Should not report change after vertical -> vertical");
- 
- 	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
- 	report(cc == 0, "Change to horizontal");
- 
- 	cc = ptf(PTF_CHECK, &rc);
--	report(cc == 1, "Should Report");
-+	report(cc == 1, "Should report change after vertical -> horizontal");
- 
- 	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
- 	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED, "Double change to horizontal");
- 
- 	cc = ptf(PTF_CHECK, &rc);
--	report(cc == 0, "Should not report");
-+	report(cc == 0, "Should not report change after horizontal -> horizontal");
- 
+-	stsi_check_mag(info);
++	stsi_check_header(info, sel2);
+ 	stsi_check_tle_coherency(info);
  	report_prefix_pop();
- }
+ 
 -- 
 2.41.0
 
