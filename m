@@ -2,108 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8FA57C5A09
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:06:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD8B47C5A0D
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:07:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232917AbjJKRGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 13:06:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50764 "EHLO
+        id S235132AbjJKRHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 13:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231695AbjJKRGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 13:06:37 -0400
+        with ESMTP id S235033AbjJKRHh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 13:07:37 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC695E9
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:05:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131318F
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:06:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697043945;
+        s=mimecast20190719; t=1697044011;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y1brdHaYQR/1KT6dTzx9XTkLz90qgniDtBGmYHkS7B4=;
-        b=aLp42Quk1uTQEEmOflVo5j5ZCHuvluqpOFzEiNsPh7ljgilegvd2/ZeQ3ktBNbXzRyRJc8
-        9wQ4szeI05Sf/2CD9eJ77//YpY1MQXb7I8ojH09oZ684YaZz/D0WwY4oAV8FVdbafPixVu
-        OwV6O0e91yVgHBT7pwEQt9i+rk76seY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6zT0LIXBuOC5NElULkdQF6S1xpV1tOLufDMDSGepFKw=;
+        b=W5RgdN3Epax82nKR3d3y4T85o1kIZOaFLO9/HVOLHQbbSrywcQM+l+Dtwye1Qm0iqagzXR
+        j2iOX6np+rtVjsHKIo5F5oTnUvD98fkopLnqv4AAfQMbWRnYzxTkgCBL4+wf0uBGh3voBQ
+        qq96jcaDqkPIoKAiY/dr3348qqR05vk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-dFTfQlfJNvKsW8UpB8rspQ-1; Wed, 11 Oct 2023 13:05:33 -0400
-X-MC-Unique: dFTfQlfJNvKsW8UpB8rspQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4063dd6729bso752925e9.2
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:05:33 -0700 (PDT)
+ us-mta-483-5KsDuoMhOGuAJf8HcSE6_g-1; Wed, 11 Oct 2023 13:06:50 -0400
+X-MC-Unique: 5KsDuoMhOGuAJf8HcSE6_g-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9a9e12a3093so792266b.0
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 10:06:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697043932; x=1697648732;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y1brdHaYQR/1KT6dTzx9XTkLz90qgniDtBGmYHkS7B4=;
-        b=VQgjbzAW6lk0Gyq2ev1kAyne8WpC/K5YMOhlEbBJVoB5UbZ6Dl9cUigzKEbUKSKIXs
-         YHGlakLQkpe3erwRsXyibjRSsThmaoXXrChQRSY7URQ/rlMEUwHmed5wn1Pt6ZMTbsxk
-         c0sfXVLsuvpjBZgv3VhBy59OZvAFhP+99GrZ4srWAHvx6FPRrvbK4MsJYfwJxMlnO8ev
-         LC0TwYofHSRpjIVOUPgYpsStq+Xx5+sA3xV9NlyuMIbkTZFsGtQWQnkSetPt5knGVZOE
-         ny68l43WmHqq+e7YJPUSK720Cl5B6n6QALBqb2biYDX3hwHckSJicisZYLcRiPpZ9o7v
-         cFDA==
-X-Gm-Message-State: AOJu0YwYY3tntlxzSCuYcTngWCw3FYwdH1oiWksaYo4v4orFv99qR7Ud
-        qOre4huoS/6TBPcZuhfseZi88pCcmQ1DlbbRwVSk1fwy4dQHGo7Pa8gaoqHaZ9twVLD/G9ZM5Zv
-        RDh/inJIhBDkA
-X-Received: by 2002:a05:600c:b49:b0:406:7232:1431 with SMTP id k9-20020a05600c0b4900b0040672321431mr19337286wmr.33.1697043932490;
-        Wed, 11 Oct 2023 10:05:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkP7tKH7rx3WNL++lr4xFcEO49W8z8lrIDi+0WNMmcJnSlIasAGIk0kmgIQ5uKwF989mkFhg==
-X-Received: by 2002:a05:600c:b49:b0:406:7232:1431 with SMTP id k9-20020a05600c0b4900b0040672321431mr19337264wmr.33.1697043932189;
-        Wed, 11 Oct 2023 10:05:32 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
-        by smtp.gmail.com with ESMTPSA id b5-20020a5d6345000000b0032326908972sm15811545wrw.17.2023.10.11.10.05.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 10:05:31 -0700 (PDT)
-Date:   Wed, 11 Oct 2023 13:05:28 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <20231011130317-mutt-send-email-mst@kernel.org>
-References: <20231010105339-mutt-send-email-mst@kernel.org>
- <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
- <20231010111339-mutt-send-email-mst@kernel.org>
- <20231010155937.GN3952@nvidia.com>
- <ZSY9Cv5/e3nfA7ux@infradead.org>
- <20231011021454-mutt-send-email-mst@kernel.org>
- <ZSZHzs38Q3oqyn+Q@infradead.org>
- <PH0PR12MB5481336B395F38E875ED11D8DCCCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <20231011040331-mutt-send-email-mst@kernel.org>
- <20231011121849.GV3952@nvidia.com>
+        d=1e100.net; s=20230601; t=1697044009; x=1697648809;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6zT0LIXBuOC5NElULkdQF6S1xpV1tOLufDMDSGepFKw=;
+        b=RUhXU52CKrRYlyP2ooOyJr+Kf9cSOUIpB3SZamaol7tTU2c6yxUXWf8uqViMk+F4YC
+         bnZbeL/5rOw+S8NoPdzSoa59IbewMPRJxpIjeFvKQBF/6S70hd6v7JUORj+4777/lQkQ
+         OkyZmUz7LomEdjN6MIk8X6Xj8Fc9miRqDSz3EVHAzQ3k4GUQTV+ewmht6scbCJLe9wvC
+         44v47XPDrAcgQBkCZt/DU9EJw6ec/otcoQxocnHuw+U1FGOCplnJEoNaJXQqXToL7Db3
+         I6evhCm7HX7ESrMHvUcGXmOThD3PcCPFs//RLAiqmQi2j2ASRr1L/msjPSETakHqMxvu
+         un4Q==
+X-Gm-Message-State: AOJu0YyZ76t3Jx5DgOwRjoEpNTqJfkcQIpZxiMz2CsO4TMjsVkoNoK8Q
+        Uroardil5HB0dpTSYW/sEhvkEq5SAgjHcNRTiPFNQWXRRoAREkaDMETqxUt4NyaztT3ar9XxZxd
+        ZGHMkR5lp4lUe
+X-Received: by 2002:a17:906:112:b0:9ae:659f:4d2f with SMTP id 18-20020a170906011200b009ae659f4d2fmr16048859eje.26.1697044008615;
+        Wed, 11 Oct 2023 10:06:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG110ZfGjqS/lhxCsUEJ9ZUagxghpUIUjj6SDYUbMoZ1DpwrxbCBuPohPB3JOw7GrP4TPWPZw==
+X-Received: by 2002:a17:906:112:b0:9ae:659f:4d2f with SMTP id 18-20020a170906011200b009ae659f4d2fmr16048840eje.26.1697044008229;
+        Wed, 11 Oct 2023 10:06:48 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
+        by smtp.googlemail.com with ESMTPSA id pw1-20020a17090720a100b009ada9f7217asm9898446ejb.88.2023.10.11.10.06.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Oct 2023 10:06:47 -0700 (PDT)
+Message-ID: <3b7bb7a5-a8c9-d5b9-7221-d2a03ce49f84@redhat.com>
+Date:   Wed, 11 Oct 2023 19:06:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011121849.GV3952@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Bartosz Szczepanek <bsz@amazon.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <b46ee4de968733a69117458e9f8f9d2a6682376f.camel@infradead.org>
+ <ZSXdYcMUds-DrHAd@google.com>
+ <7fba6d8fc3de0bcb86bf629a4f5b0217552fe999.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC] KVM: x86: Don't wipe TDP MMU when guest sets %cr4
+In-Reply-To: <7fba6d8fc3de0bcb86bf629a4f5b0217552fe999.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 11, 2023 at 09:18:49AM -0300, Jason Gunthorpe wrote:
-> With VDPA doing the same stuff as vfio I'm not sure who is auditing it
-> for security.
+On 10/11/23 10:20, David Woodhouse wrote:
+> But __kvm_mmu_refresh_passthrough_bits() only refreshes
+> role.base.cr0_wp and not the other two. Do we need this?
+> 
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5159,6 +5159,8 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+>                  return;
+>   
+>          mmu->cpu_role.base.cr0_wp = cr0_wp;
+> +       mmu->cpu_role.base.smep_andnot_wp = mmu->cpu_role.ext.cr4_smep && !cr0_wp;
+> +       mmu->cpu_role.base.smap_andnot_wp = mmu->cpu_role.ext.cr4_smap && !cr0_wp;
+>          reset_guest_paging_metadata(vcpu, mmu);
+>   }
 
-Check the signed off tags and who sends the pull requests if you want to
-know.
+{smep,smap}_andnot_wp only matter for shadow paging.  You can remove 
+them from this function, and instead assign which is not called for 
+shadow paging anyway, and set them in the root_role in kvm_init_shadow_mmu.
 
--- 
-MST
+Paolo
 
