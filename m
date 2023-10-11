@@ -2,113 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04DCB7C59BA
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 18:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 859A47C59BD
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 19:00:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbjJKQ7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 12:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
+        id S232996AbjJKRA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 13:00:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbjJKQ7i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 12:59:38 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62543A9
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 09:59:36 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA494C433C8;
-        Wed, 11 Oct 2023 16:59:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697043576;
-        bh=e5viJcqN3nJBdRAmO/Kr+eV13Dl29hvxxs7YFH8SvNQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=c4ON66BQJRg/M1ESDoc9mENYCcURbt3nEEVsXPZ8yAiq3EiTNX6LeDIxQszm4uezF
-         v9CdDjou5MnnYv49Sfvs4sOBD/dfv4zZvYnzh946KYXmKlovUlstTJvi0AFsnyAeRg
-         KfN9CNUGaG93T0eApVMKhcfGM+OI9Gn74GYevT1tGb23STWh2T8RMANxfYNOFqqToE
-         WM/9CJtrnh7uF5CTaMQC31y33nCpRv8K0W01oYsP+puOYA0soaIC8p+Mhp7CzrU9p1
-         ESr0UBv2YRIYjYs3tZXmv1h7kU4H8mkPaHEuSthynzE9pAUS6jUx/rO/HOg9HX9zca
-         oEeP4lb8OlirQ==
-Date:   Wed, 11 Oct 2023 17:59:28 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 1/5] tools headers arm64: Copy sysreg-defs generation
- from kernel source
-Message-ID: <cef524b7-ecbc-44c4-a582-e39f495c53db@sirena.org.uk>
-References: <20231010011023.2497088-1-oliver.upton@linux.dev>
- <20231010011023.2497088-2-oliver.upton@linux.dev>
- <871qe1m79u.wl-maz@kernel.org>
+        with ESMTP id S232868AbjJKRA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 13:00:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4D998
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 09:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697043577;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5GbYfUjAH5Td6aPeboRpo17r0mDy+ld8mKJnmcV6AoE=;
+        b=iWz+P3FJtJ4k6m7B4Zh/YAIKuhiozaskYEHXEwe03D6kEVHM/qfCj4aqTwAp+TyPE4a4yy
+        o/4xA9zdDgGutakD67s+PMce+5aDi2GUasH/rcQKxCTrbNXvDjO0SUrTxVoQAJl6lsVnbD
+        2Il3nNZIf/VpQQcn3Z1HCNoSBUwxDqk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-A7U7NCOJPlOzjSqqOjQtIA-1; Wed, 11 Oct 2023 12:59:36 -0400
+X-MC-Unique: A7U7NCOJPlOzjSqqOjQtIA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32323283257so21976f8f.2
+        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 09:59:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697043575; x=1697648375;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5GbYfUjAH5Td6aPeboRpo17r0mDy+ld8mKJnmcV6AoE=;
+        b=QhwkFHJwAPebZCmcTyeP2QVWQH0PCIvTBcIMbG1oRj84OEOjkUIZEUbSrJceVMETB5
+         YIFVS3m3eA1V++CRQF9OZZ4WIhPsmadgLCyU+N1Ahoh6NXXmDdkuJLv2+bVA3hrrAbkw
+         tNuUg5ct9AivGO5nzJ32mzUOc1mwQ/bcRWMUPaoaCAYWoll/TqfowGLBfN8Rowfz5JU7
+         OS4OaASM1w2AlfUEYEw3tmA/u3huj1pzdJ+sVO13cflDrE2/qIwVuTnKmbL3ayIofJXL
+         VRrKgn42t2nFEM52aFeNizRax6rVMUZN8xpSVVlfEoj9B7xaVKSJfw/OmfhtYKwmq4Sd
+         AwsQ==
+X-Gm-Message-State: AOJu0YxagLgjaqn4p0/5eEj7gs2sMQT82oVxC9WZ9jDH7qAmNYCsVdpv
+        5WkDw3FB5gPVYwdGODEC90DYrZ5e62V9VdzTXIo5DM81twlybC2ZF1gXTmrqiUckj2H8mVGyvZ/
+        oZ24k2odfWm1U
+X-Received: by 2002:adf:fc4c:0:b0:319:785a:fce0 with SMTP id e12-20020adffc4c000000b00319785afce0mr19279967wrs.26.1697043574867;
+        Wed, 11 Oct 2023 09:59:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzyP3mneqxoCjoaVwVlX+/Yn8WcmOL9NWB8EnPdm+OZJhCgzQEYIYDMSGtTDUAjQGUu+JfyA==
+X-Received: by 2002:adf:fc4c:0:b0:319:785a:fce0 with SMTP id e12-20020adffc4c000000b00319785afce0mr19279953wrs.26.1697043574531;
+        Wed, 11 Oct 2023 09:59:34 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
+        by smtp.gmail.com with ESMTPSA id s4-20020a5d6a84000000b00327bf4f2f14sm15982214wru.88.2023.10.11.09.59.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 09:59:32 -0700 (PDT)
+Date:   Wed, 11 Oct 2023 12:59:30 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, parav@nvidia.com,
+        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
+        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
+ virtio device
+Message-ID: <20231011125426-mutt-send-email-mst@kernel.org>
+References: <ZRpjClKM5mwY2NI0@infradead.org>
+ <20231002151320.GA650762@nvidia.com>
+ <ZR54shUxqgfIjg/p@infradead.org>
+ <20231005111004.GK682044@nvidia.com>
+ <ZSAG9cedvh+B0c0E@infradead.org>
+ <20231010131031.GJ3952@nvidia.com>
+ <ZSZAIl06akEvdExM@infradead.org>
+ <20231011135709.GW3952@nvidia.com>
+ <ZSaudclSEHDEsyDP@infradead.org>
+ <20231011145810.GZ3952@nvidia.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="5Wvu08zE1b6F12Gw"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <871qe1m79u.wl-maz@kernel.org>
-X-Cookie: What an artist dies with me!
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231011145810.GZ3952@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Oct 11, 2023 at 11:58:10AM -0300, Jason Gunthorpe wrote:
+> Trying to put VFIO-only code in virtio is what causes all the
+> issues. If you mis-design the API boundary everything will be painful,
+> no matter where you put the code.
 
---5Wvu08zE1b6F12Gw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Are you implying the whole idea of adding these legacy virtio admin
+commands to virtio spec was a design mistake?
+It was nvidia guys who proposed it, so I'm surprised to hear you say this.
 
-On Wed, Oct 11, 2023 at 05:51:57PM +0100, Marc Zyngier wrote:
-> Oliver Upton <oliver.upton@linux.dev> wrote:
+-- 
+MST
 
-> > The system register definitions are now generated with a script over in
-> > the kernel sources. Pull a copy into tools in anticipation of updating
-> > dependent header files and add a common makefile for generating the
-> > header.
-
-> Rather than a copy, which makes the maintenance pretty horrible, why
-> don't you just symlink it? Git is perfectly capable of storing them,
-> last time I checked.
-
-Do we even need to symlink - as I suggested on the previous version can
-we not just reference the script and data file directly in the main
-kernel tree?  Like I said then there may be some use case for building
-the tools directory outside the kernel source that I'm not aware of but
-otherwise I'm not clear that the motivations for copying the actual
-headers for use in tools/ apply to these files.
-
-I think the current approach is *fine* (hence my reviewed by)=20
-given the amount of other copying but it would save a bit of work to not
-copy.
-
---5Wvu08zE1b6F12Gw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUm1G8ACgkQJNaLcl1U
-h9CwFgf/Y112LQjPKLM+hj1TZJ6acrdWLfMbZei2Ous8Xsg06Oq7ikmyXDzjpOYo
-VSlhNSXrwg25eV07F17+nW39F6BLPGdZpXvSavGkcHaJu3KQcjsredI2+rj4E1r9
-/y+A14KZVfY46/pOp7cvHAusvW3+ZpA6xPawTIzmBKlqJQFRTtcCCconI3pAZK/a
-cVlN9kdAplLGKyIRhSebLVCApWVq5boq3OA59HGpYPoqoTIUKbAQ4u631hVKFqLG
-UPHrzGT+6mW6/5N9jYnWSNh/l4FZ7pjDa6cCeRZdxIWXolUJZXecqWVvOckL6hWN
-t7dz6PtJ+q8Hrb55TY2gwFNJgXLKOQ==
-=ZzxH
------END PGP SIGNATURE-----
-
---5Wvu08zE1b6F12Gw--
