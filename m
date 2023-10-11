@@ -2,112 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CFA97C5693
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 16:17:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C32C57C56A0
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 16:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347019AbjJKORe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Oct 2023 10:17:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
+        id S234938AbjJKOUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Oct 2023 10:20:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347024AbjJKORb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Oct 2023 10:17:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33ED1B8
-        for <kvm@vger.kernel.org>; Wed, 11 Oct 2023 07:17:28 -0700 (PDT)
+        with ESMTP id S232420AbjJKOUX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Oct 2023 10:20:23 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E60A4;
+        Wed, 11 Oct 2023 07:20:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=17Hg6kGHCOgU0Ms0AduR83aFqotdoFUXv6TjFFYWHj0=; b=e4N5pa9Ss2bbnDPRcL2fhVrsX9
-        MTyCngG3sagVj43C48O8opbBPCE9zBiwHi5/52PlVZyBHcj8tMG8H07ntEm3aq7IULjZbDYoL+B3x
-        xH9nF4tYPWB1RJEpRDg1CQvPi/PdTARqpJl0zlAjcXjORDnXOh+r+WcLELiZa7XkypN6o2BVbm6ct
-        sVM+WmfChkm2gssYQYNHYbERaPCuRCmSO2nkmb3a38eWWX19VBVyf80qTIgik1UWDTAfBPTzhxnJy
-        awjWqNnOGP/t/FYvrQW2yt2tTH6Iuzhq6fso1qk0vVee0iDlLc2neGBGNq4AQV6djUakUre4v4Pvu
-        2Ki25qyQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qqa1d-00G4WZ-0N;
-        Wed, 11 Oct 2023 14:17:25 +0000
-Date:   Wed, 11 Oct 2023 07:17:25 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, parav@nvidia.com,
-        feliu@nvidia.com, jiri@nvidia.com, kevin.tian@intel.com,
-        joao.m.martins@oracle.com, leonro@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <ZSaudclSEHDEsyDP@infradead.org>
-References: <c3724e2f-7938-abf7-6aea-02bfb3881151@nvidia.com>
- <20230926072538-mutt-send-email-mst@kernel.org>
- <ZRpjClKM5mwY2NI0@infradead.org>
- <20231002151320.GA650762@nvidia.com>
- <ZR54shUxqgfIjg/p@infradead.org>
- <20231005111004.GK682044@nvidia.com>
- <ZSAG9cedvh+B0c0E@infradead.org>
- <20231010131031.GJ3952@nvidia.com>
- <ZSZAIl06akEvdExM@infradead.org>
- <20231011135709.GW3952@nvidia.com>
+        bh=giWFgglIwvl79cFsu43H0+4WKJFrU3jVnmUoXzCqgBA=; b=BhimHCpistBqcNILTpqmB95VgU
+        7PmFSmnPRvQQyRpFA0g7FVo0LbKL5mLZwxk/6dbjL+y/CSOGsKpPgP9QBf1R85Lcb7iXfpVCC3p9j
+        uQUMiBKlRc+vbq1Fktephy4/45HG9+hQRSjxyNzaWWPv4mBrSIXcl8AqE+imo/sUd6Oia6/wG7jNQ
+        NuVuioo4VIDTezY7pjFo+uV6eqmRDBsi8kf3JlR9roMTFRFib4KOxUv6a04qCfR0BuytGa6g7yzn3
+        0uyvgrPPgjUp3HzKHrRJ4vn9efOIJnnevO4/9BMPcATcav/BS8x5jOrtQNUy6fy3BTyjBA0+5iOwe
+        oBwI4MVg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qqa4C-00BCzx-9t; Wed, 11 Oct 2023 14:20:04 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+        id EE6F130036C; Wed, 11 Oct 2023 16:20:03 +0200 (CEST)
+Date:   Wed, 11 Oct 2023 16:20:03 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mingwei Zhang <mizhang@google.com>, Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Dunn <daviddunn@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics
+ event
+Message-ID: <20231011142003.GF19999@noisy.programming.kicks-ass.net>
+References: <20231002115718.GB13957@noisy.programming.kicks-ass.net>
+ <ZRrF38RGllA04R8o@gmail.com>
+ <ZRroQg6flyGBtZTG@google.com>
+ <20231002204017.GB27267@noisy.programming.kicks-ass.net>
+ <ZRtmvLJFGfjcusQW@google.com>
+ <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+ <ZRwx7gcY7x1x3a5y@google.com>
+ <20231004112152.GA5947@noisy.programming.kicks-ass.net>
+ <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+ <ZR3eNtP5IVAHeFNC@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231011135709.GW3952@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <ZR3eNtP5IVAHeFNC@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 11, 2023 at 10:57:09AM -0300, Jason Gunthorpe wrote:
-> > Independent of my above points on the doubts on VF-controlled live
-> > migration for PCe device I absolutely agree with your that the Linux
-> > abstraction and user interface should be VF based.  Which further
-> > reinforeces my point that the VFIO driver for the controlled function
-> > (PF or VF) and the Linux driver for the controlling function (better
-> > be a PF in practice) must be very tightly integrated.  And the best
-> > way to do that is to export the vfio nodes from the Linux driver
-> > that knowns the hardware and not split out into a separate one.
+On Wed, Oct 04, 2023 at 02:50:46PM -0700, Sean Christopherson wrote:
+
+> Thinking about this more, what if we do a blend of KVM's FPU swapping and debug
+> register swapping?
 > 
-> I'm not sure how we get to "very tightly integrated". We have many
-> examples of live migration vfio drivers now and they do not seem to
-> require tight integration. The PF driver only has to provide a way to
-> execute a small number of proxied operations.
-
-Yes.  And for that I need to know what VF it actually is dealing
-with.  Which is tight integration in my book.
-
-> Regardless, I'm not too fussed about what directory the implementation
-> lives in, though I do prefer the current arrangement where VFIO only
-> stuff is in drivers/vfio. I like the process we have where subsystems
-> are responsible for the code that implements the subsystem ops.
-
-I really don't care about where the code lives (in the directory tree)
-either.  But as you see with virtio trying to split it out into
-an arbitrary module causes all kinds of pain.
-
+>   A. Load guest PMU state in vcpu_enter_guest() after IRQs are disabled
+>   B. Put guest PMU state (and load host state) in vcpu_enter_guest() before IRQs
+>      are enabled, *if and only if* the current CPU has one or perf events that
+>      wants to use the hardware PMU
+>   C. Put guest PMU state at vcpu_put()
+>   D. Add a perf callback that is invoked from IRQ context when perf wants to
+>      configure a new PMU-based events, *before* actually programming the MSRs,
+>      and have KVM's callback put the guest PMU state
 > 
-> E800 also made some significant security mistakes that VFIO side
-> caught. I think would have been missed if it went into a netdev
-> tree.
-> 
-> Even unrelated to mdev, Intel GPU is still not using the vfio side
-> properly, and the way it hacked into KVM to try to get page tracking
-> is totally logically wrong (but Works For Me (tm))
-> 
-> Aside from technical concerns, I do have a big process worry
-> here. vfio is responsible for the security side of the review of
-> things implementing its ops.
 
-Yes, anytjing exposing a vfio node needs vfio review, period.  And
-I don't think where the code lived was the i915 problem.  The problem
-was they they were the first open user of the mdev API, which was
-just a badly deisgned hook for never published code at that time, and
-they then shoehorned it into a weird hypervisor abstraction.  There's
-no good way to succeed with that.
+No real objection, but I would suggest arriving at that solution by
+first building the simple-stupid thing and then making it more
+complicated in additinoal patches. Hmm?
