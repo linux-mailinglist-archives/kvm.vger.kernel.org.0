@@ -2,121 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 873617C45CF
-	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 02:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23E147C45D9
+	for <lists+kvm@lfdr.de>; Wed, 11 Oct 2023 02:08:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344228AbjJKAD1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Oct 2023 20:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S1344262AbjJKAIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Oct 2023 20:08:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjJKAD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Oct 2023 20:03:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A128F
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 17:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696982559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wbEkRtqvEkJnBkKWslIkyHNkNJTQaP9y02JA7x1NPWU=;
-        b=D6tYo0q6YGcCvuCGZpa8iaXpUjdD8VvrPU4tZjgt2uxBzvXO2DJWDOFQbLkx8m1pEe44sv
-        C4BVeBf7UEOVenXfQrzUF1Vx6djnjVzgNUSUfMTRrw1yWZKVH28VjjVpvQ+NeUjJV28IF+
-        4id2dnH5AjxBNvIvYtH1V1j7yKP5ICM=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-216-73Qfw45DOd2Aqbk54NWDog-1; Tue, 10 Oct 2023 20:02:22 -0400
-X-MC-Unique: 73Qfw45DOd2Aqbk54NWDog-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-690bcc80694so5297382b3a.3
-        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 17:02:22 -0700 (PDT)
+        with ESMTP id S229445AbjJKAIL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Oct 2023 20:08:11 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9144A8F
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 17:08:10 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a581346c4so1837129276.0
+        for <kvm@vger.kernel.org>; Tue, 10 Oct 2023 17:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696982890; x=1697587690; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zd/nacEbxpo/jAXF8pqfkyF745LkcXcc4cVmKOG5Cnc=;
+        b=bRa8OQEfYVX+NWc9dsps3hAtbxwl6xhCaCdfGPb87lERItoje9u/wLlc3eTE1P/HKz
+         6ydAbsbZUrgaUXU9Ylm9JRFz403scKolnCxHRBnlLuSrIUuPyEpi5WtanqHUBfqy+21k
+         x/q68oIwG/LOcIFMOnJNYYZ6ypdDEn9NfetUhrylfesVTehhXNAjn51Ds9QnQdRmL74p
+         zjK5F37/623wxaY2VSS5rPwxoRRXrgslMrF4FqSlz5h8fJaQMZkI9akUkbaEe9U9U+6y
+         ssvLfTeJH54fo+yzuWA5dE5c76t4ZLv8xl1gojIT5VYiS3cNPV8NJXG3xVVYtzSW92qA
+         U8fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696982542; x=1697587342;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wbEkRtqvEkJnBkKWslIkyHNkNJTQaP9y02JA7x1NPWU=;
-        b=gGoCsqW50OJnfNgHenTS78/4dSqwyTHzp7bIq4UWxVDgPxv4eJhjWiyGWsqmdLslnp
-         x6Vu5bcBbUX4b1N2yzRF0E4CflB/56FLhXzdgqy51oUiVbaY0jJrUO7pnX9E5cuhlMBr
-         Ek8iyMwaOBWoWKUqbAdRfWZnp10yQ3eUVaSgYMxkRI6eZ0AenAZMsYYZ4EVWF4AcR9Tw
-         vgvCHEYTGaPC8Ha7W7QxXEjMvnb9Mf+VL0zJuAVOy7fpuKmUBmhwW+wfuoDGW0HnK40r
-         ZQEoBAaHg0nc6a5Pdm8aKYbQz4wFghl3akW+SAjLMbfEIwYOmMBc0GvqWlAmj0mul1eP
-         2NfQ==
-X-Gm-Message-State: AOJu0YxrlvMw0Nofp93LshVkPhmci8PoKyZ7cL3AJ4srVzxhsJlUtE0X
-        SZ8hh/Plm31TCtGN18+ihZj16t94Ti6MRus9FZr66x4pbnL5Tct0VWJf81EcPsax7VITvGCIyO7
-        ZKdMyd0hsZtN/
-X-Received: by 2002:a05:6a00:1a0c:b0:68e:2478:d6c9 with SMTP id g12-20020a056a001a0c00b0068e2478d6c9mr17909423pfv.2.1696982541524;
-        Tue, 10 Oct 2023 17:02:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHWhd6XUYIsaQzAZtnZe+ysZHmeM5/iQ/juGbct7YlefUAElw+vf/DSFUZdO4ZklBLPZMC6RQ==
-X-Received: by 2002:a05:6a00:1a0c:b0:68e:2478:d6c9 with SMTP id g12-20020a056a001a0c00b0068e2478d6c9mr17909398pfv.2.1696982541203;
-        Tue, 10 Oct 2023 17:02:21 -0700 (PDT)
-Received: from ?IPV6:2001:8003:e5b0:9f00:b890:3e54:96bb:2a15? ([2001:8003:e5b0:9f00:b890:3e54:96bb:2a15])
-        by smtp.gmail.com with ESMTPSA id d25-20020aa78699000000b0068790c41ca2sm8781183pfo.27.2023.10.10.17.02.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Oct 2023 17:02:20 -0700 (PDT)
-Message-ID: <94951adc-4770-7bba-15c4-f63a5d566d56@redhat.com>
-Date:   Wed, 11 Oct 2023 10:02:16 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 3/3] arm/kvm: convert to read_sys_reg64
-Content-Language: en-US
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20231010142453.224369-1-cohuck@redhat.com>
- <20231010142453.224369-4-cohuck@redhat.com>
-From:   Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20231010142453.224369-4-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20230601; t=1696982890; x=1697587690;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zd/nacEbxpo/jAXF8pqfkyF745LkcXcc4cVmKOG5Cnc=;
+        b=KocDJiSNdRr/p0OLrByAGrzGQOZiVCu5iv957JTeVORSfveVuy+RYaWPDo+GP5oMIg
+         AwesQ1ovC76J3bWiJdS6ZfhC3A1MxQLM2521a1/8JR4tEoonw8Jg+EaKYkGC0ALzEbY2
+         wv8JQs0ByUM3UAysQsWytNXG/kQMrpNfsW28fX46i5OqALbpm4du4d2RLAJc0okaFg+p
+         VYJwlH+6fOkcci70p1L7Sr4z7susxkMQmCfotlyjATEjtv4IVYE7XHbe2C5kaYItCkl6
+         U7RCLZZWJwtWQMDRH2Lq282hZPp8WA+SL6x5ypc2bUFtWJn3RyWmipUAb74cH9SA94v4
+         Ntwg==
+X-Gm-Message-State: AOJu0YxYig3G/VOUwsk5CaFRTyqmoLEHZebo6xf78R1hXaWrqD6UnbhY
+        vYqjzMJfK/AIFBI+R/tkkq+U+pXI09Q=
+X-Google-Smtp-Source: AGHT+IFQ66Ca540lvih4SLhNTTRYCUUNHt9H2N1GvXrlAGsoLUfqbdcMRs9ubpWDRQxYrK7C/D1lL1ukK7c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:514:0:b0:d91:c7f2:764 with SMTP id
+ 20-20020a250514000000b00d91c7f20764mr272449ybf.0.1696982889881; Tue, 10 Oct
+ 2023 17:08:09 -0700 (PDT)
+Date:   Tue, 10 Oct 2023 17:08:08 -0700
+In-Reply-To: <ZSTJEJepdnmC5PA5@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065006.20201-1-yan.y.zhao@intel.com>
+ <553e3a0f-156b-e5d2-037b-2d9acaf52329@gmail.com> <ZSRZ_y64UPXBG6lA@google.com>
+ <ZSRwNO4xWU6Dx1ne@google.com> <ZSTJEJepdnmC5PA5@yzhao56-desk.sh.intel.com>
+Message-ID: <ZSXnaIi454ATEdH0@google.com>
+Subject: Re: [PATCH v4 01/12] KVM: x86/mmu: helpers to return if KVM honors
+ guest MTRRs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>, pbonzini@redhat.com,
+        chao.gao@intel.com, kai.huang@intel.com,
+        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/11/23 00:24, Cornelia Huck wrote:
-> We can use read_sys_reg64 to get the SVE_VLS register instead of
-> calling GET_ONE_REG directly.
+On Tue, Oct 10, 2023, Yan Zhao wrote:
+> BTW, as param "kvm" is now removed from the helper, better to remove the word
+> "second" in comment in patch 4, i.e.
 > 
-> Suggested-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->   target/arm/kvm64.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
+> -        * So, specify the second parameter as true here to indicate
+> -        * non-coherent DMAs are/were involved and TDP zap might be
+> -        * necessary.
+> +        * So, specify the parameter as true here to indicate non-coherent
+> +        * DMAs are/were involved and TDP zap might be necessary.
 > 
+> Sorry and thanks a lot for helps on this series!
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Heh, don't be sorry, it's not your fault I can't get this quite right.  Fixed
+up yet again, hopefully for the last time.  This is what I ended up with for the
+comment:
 
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 558c0b88dd69..d40c89a84752 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -500,10 +500,6 @@ uint32_t kvm_arm_sve_get_vls(CPUState *cs)
->               .target = -1,
->               .features[0] = (1 << KVM_ARM_VCPU_SVE),
->           };
-> -        struct kvm_one_reg reg = {
-> -            .id = KVM_REG_ARM64_SVE_VLS,
-> -            .addr = (uint64_t)&vls[0],
-> -        };
->           int fdarray[3], ret;
->   
->           probed = true;
-> @@ -512,7 +508,7 @@ uint32_t kvm_arm_sve_get_vls(CPUState *cs)
->               error_report("failed to create scratch VCPU with SVE enabled");
->               abort();
->           }
-> -        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
-> +        ret = read_sys_reg64(fdarray[2], &vls[0], KVM_REG_ARM64_SVE_VLS);
->           kvm_arm_destroy_scratch_host_vcpu(fdarray);
->           if (ret) {
->               error_report("failed to get KVM_REG_ARM64_SVE_VLS: %s",
+	/*
+	 * Non-coherent DMA assignment and de-assignment will affect
+	 * whether KVM honors guest MTRRs and cause changes in memtypes
+	 * in TDP.
+	 * So, pass %true unconditionally to indicate non-coherent DMA was,
+	 * or will be involved, and that zapping SPTEs might be necessary.
+	 */
 
+and the hashes:
+
+[1/5] KVM: x86/mmu: Add helpers to return if KVM honors guest MTRRs
+      https://github.com/kvm-x86/linux/commit/1affe455d66d
+[2/5] KVM: x86/mmu: Zap SPTEs when CR0.CD is toggled iff guest MTRRs are honored
+      https://github.com/kvm-x86/linux/commit/7a18c7c2b69a
+[3/5] KVM: x86/mmu: Zap SPTEs on MTRR update iff guest MTRRs are honored
+      https://github.com/kvm-x86/linux/commit/9a3768191d95
+[4/5] KVM: x86/mmu: Zap KVM TDP when noncoherent DMA assignment starts/stops
+      https://github.com/kvm-x86/linux/commit/362ff6dca541
+[5/5] KVM: VMX: drop IPAT in memtype when CD=1 for KVM_X86_QUIRK_CD_NW_CLEARED
+      https://github.com/kvm-x86/linux/commit/c9f65a3f2d92
