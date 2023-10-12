@@ -2,79 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7BCA7C7718
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 21:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B04A7C774F
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 21:50:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442237AbjJLTlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 15:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44684 "EHLO
+        id S1442501AbjJLTud (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 15:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442210AbjJLTlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 15:41:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BAFB7
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 12:40:18 -0700 (PDT)
+        with ESMTP id S1442865AbjJLTuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 15:50:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3001D18E
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 12:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697139617;
+        s=mimecast20190719; t=1697140166;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/aEpIo0n1IBVN9xNbSOBaLKijlMRA9y4VgfaAWRP044=;
-        b=NpuAPUjB1hlMMLkZgukYjyIlC2itsv/lnq3GboO+E4Xgjk58ldHz0mH0eJShFJ5O0wPUOT
-        rc5Th+ef5gs7JHUNYT4JctIYMrF5yI5SfQ9qtrZQRaRQU6CcGJoaXftxdxRVpk8EmhhmCu
-        O4N6VrQFuV2dc+XpD1OJh8PQWtmRqBk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=DIYKj0XHJ7SkNVhrA1VdBHme287zF4NRhJmJp+If7lc=;
+        b=hmn+XRKaE019dzpYqo8L1B1mDovOrmGpJZ6wzwjh7R5JviyAK8DDo3TTki5oiNt6Ernr57
+        sEOnQ6xQg44ZnyxFXy6vkZ7pqdeDDWUtqz6oem8it67HrP7iwWwvI0ES1RyQlOzE2v1TPC
+        AZZmJmxS1PQ4ls0mQrjMLyym2xE+h8E=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-520-Mvcrl8irNVqonqG4DqfSGQ-1; Thu, 12 Oct 2023 15:40:16 -0400
-X-MC-Unique: Mvcrl8irNVqonqG4DqfSGQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-317d5b38194so636117f8f.0
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 12:40:15 -0700 (PDT)
+ us-mta-277-kCFIq_QRN_CQlohK1m-SWQ-1; Thu, 12 Oct 2023 15:49:09 -0400
+X-MC-Unique: kCFIq_QRN_CQlohK1m-SWQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4065d52a83aso8958765e9.1
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 12:49:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697139614; x=1697744414;
+        d=1e100.net; s=20230601; t=1697140148; x=1697744948;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=/aEpIo0n1IBVN9xNbSOBaLKijlMRA9y4VgfaAWRP044=;
-        b=F3SNVKIiyTF2+D42gMk8hY9NwdF+emrkreJULrUzY4RxM6ozZlAyzOtRH5xvRlpBwU
-         JyE4zYfRCDJD38sMcOnwQwk8BnqYcOXmae8B467CoE1g+Tat4N8xHEttqC1SNBsYQTQo
-         qtPUwnkOA12C5k8J3ejCC/rlFED0ZZcLydMNvLZXhhgeyhEOzr+UauArIMRfpYQ1dAOU
-         0Nb0ipvJYEVF5FyMHbgQDvrELXMPPTT2Jo31lk8Ti4ObBESZEQNwnmRWSilkMHBEVWDy
-         NWYBGXGpVNF/GdKCag6h0ahfRb1wnUfUwIToE+6UQp9/uRnJdANnZlRczVRKwU2/mFqt
-         dZmw==
-X-Gm-Message-State: AOJu0YxjjlYZij1XRUxs+adxSt3IG6s1CBy3Wby59P09ImOlWqgBB39V
-        SMQ43zljgE9OeazduiQ3ef6zMkld2n9x8eVNpm43ejRjvNWr9bRd8bYF47xCaMO6c05msruVYa/
-        pBO3rojDkWlAVgnlh6Z2B
-X-Received: by 2002:adf:978a:0:b0:32d:9a1f:479d with SMTP id s10-20020adf978a000000b0032d9a1f479dmr225684wrb.23.1697139614065;
-        Thu, 12 Oct 2023 12:40:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFj67JA9XwFKQp5GdHTlidR7tiTHee1AFyGOXTeXzdEwZ7QkUn8cv7GUZ6ABh//8Vs9yxoZ/g==
-X-Received: by 2002:adf:978a:0:b0:32d:9a1f:479d with SMTP id s10-20020adf978a000000b0032d9a1f479dmr225667wrb.23.1697139613472;
-        Thu, 12 Oct 2023 12:40:13 -0700 (PDT)
+        bh=DIYKj0XHJ7SkNVhrA1VdBHme287zF4NRhJmJp+If7lc=;
+        b=AtXlDWbY4e4ww9Erbm3Tb1i3ozQwdlLvZKJz7MJCxKhDxa+Ng+AiLncHYQ3SXktJ4R
+         Fc9mQj+fZ1lRvnbWeEqsXJZ2sxDFdVare8xka1EhixLv2tXihPn7P2fWlB04nTcn04ou
+         KqeMCH1Uowdpno6jRm1IxH6/ohtspyAzOcfVOrliEuSVz0IQ/cbI/vfYm6FPOWnI5Av2
+         oApNEOc0Hn+LBc5QwfujJGVEdnMs0UGCr/ie6psyAYwj79yXwC5WuK2+c70mFn+Qq1zf
+         3imiNnJf83BkKVSUVrR9XbMdVr4rHCD4KLAZ92x9lqwj608/H5wr05U8WYMAo8WP+tJ0
+         1Nng==
+X-Gm-Message-State: AOJu0YwVaxFhnL1xs8Hb0ttySVSiB0imfkDKkiWGu5/LtAjIYp5Tduln
+        ufgPXauLZbYzf6ckOaUEcpwHM0UgM528D6U2wH0KyJOWkdrqfXEuCfp0ejlR5jwnwtks0foxPsi
+        MywPh1Y2pjEPS
+X-Received: by 2002:a05:600c:28c:b0:406:44e6:15f0 with SMTP id 12-20020a05600c028c00b0040644e615f0mr20913332wmk.5.1697140148448;
+        Thu, 12 Oct 2023 12:49:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH4Pj0MAGL9RKIg9/0VNj39PSrz1+6tG4KcyIe/F0EdR+g4EhVYkgQP1FqqitxeHgQLKrg6Sw==
+X-Received: by 2002:a05:600c:28c:b0:406:44e6:15f0 with SMTP id 12-20020a05600c028c00b0040644e615f0mr20913315wmk.5.1697140147937;
+        Thu, 12 Oct 2023 12:49:07 -0700 (PDT)
 Received: from starship ([89.237.100.246])
-        by smtp.gmail.com with ESMTPSA id k7-20020adfb347000000b0032d8913f3dasm4911076wrd.97.2023.10.12.12.40.12
+        by smtp.gmail.com with ESMTPSA id k18-20020a7bc412000000b00405588aa40asm642631wmi.24.2023.10.12.12.49.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 12:40:13 -0700 (PDT)
-Message-ID: <bc104d65b6b12264b999a5874843766bac0b84be.camel@redhat.com>
-Subject: Re: [PATCH RFC 06/11] KVM: VMX: Split off hyperv_evmcs.{ch}
+        Thu, 12 Oct 2023 12:49:07 -0700 (PDT)
+Message-ID: <708a5bb2dfb0cb085bd9215c2e8e4d0b3db69665.camel@redhat.com>
+Subject: Re: [PATCH RFC 07/11] KVM: x86: Make Hyper-V emulation optional
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
 Cc:     linux-kernel@vger.kernel.org
-Date:   Thu, 12 Oct 2023 22:40:11 +0300
-In-Reply-To: <20231010160300.1136799-7-vkuznets@redhat.com>
+Date:   Thu, 12 Oct 2023 22:49:05 +0300
+In-Reply-To: <20231010160300.1136799-8-vkuznets@redhat.com>
 References: <20231010160300.1136799-1-vkuznets@redhat.com>
-         <20231010160300.1136799-7-vkuznets@redhat.com>
+         <20231010160300.1136799-8-vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,UPPERCASE_50_75 autolearn=no autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -82,1055 +81,697 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 У вт, 2023-10-10 у 18:02 +0200, Vitaly Kuznetsov пише:
-> Some Enlightened VMCS related code is needed both by Hyper-V on KVM and
-> KVM on Hyper-V. As a preparation to making Hyper-V emulation optional,
-> create dedicated 'hyperv_evmcs.{ch}' files which are used by both.
+> Hyper-V emulation in KVM is a fairly big chunk and in some cases it may be
+> desirable to not compile it in to reduce module sizes as well as attack
+> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
 > 
+> Note, there's room for further nVMX/nSVM code optimizations when
+> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
 
-I think it might be a good idea, to put this comment at the start of the 
-hyperv_evmcs.h and/or hyperv_evmcs.c, explaining the fact that this file
-has code that is common for kvm on hyperv and for hyperv on kvm.
+Maybe CONFIG_KVM_HYPERV_GUEST_SUPPORT or CONFIG_HYPERV_ON_KVM instead?
 
+IMHO CONFIG_KVM_HYPERV_GUEST_SUPPORT sounds good.
 
-> No functional change intended.
 > 
 > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 > ---
->  arch/x86/kvm/Makefile           |   2 +-
->  arch/x86/kvm/vmx/hyperv.c       | 308 -------------------------------
->  arch/x86/kvm/vmx/hyperv.h       | 163 +----------------
->  arch/x86/kvm/vmx/hyperv_evmcs.c | 311 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/hyperv_evmcs.h | 162 +++++++++++++++++
->  arch/x86/kvm/vmx/vmx_onhyperv.h |   3 +-
->  6 files changed, 477 insertions(+), 472 deletions(-)
->  create mode 100644 arch/x86/kvm/vmx/hyperv_evmcs.c
->  create mode 100644 arch/x86/kvm/vmx/hyperv_evmcs.h
+>  arch/x86/include/asm/kvm_host.h |  4 +++
+>  arch/x86/kvm/Kconfig            |  9 ++++++
+>  arch/x86/kvm/Makefile           | 17 +++++++---
+>  arch/x86/kvm/cpuid.c            |  6 ++++
+>  arch/x86/kvm/hyperv.h           | 29 +++++++++++++++--
+>  arch/x86/kvm/irq_comm.c         |  9 +++++-
+>  arch/x86/kvm/svm/hyperv.h       |  7 +++++
+>  arch/x86/kvm/svm/nested.c       |  2 ++
+>  arch/x86/kvm/svm/svm_onhyperv.h |  2 ++
+>  arch/x86/kvm/vmx/hyperv.h       |  8 +++++
+>  arch/x86/kvm/vmx/nested.c       | 17 ++++++++++
+>  arch/x86/kvm/x86.c              | 56 +++++++++++++++++++++++----------
+>  12 files changed, 143 insertions(+), 23 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 711dc880a9f0..b0a55b736b47 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1085,6 +1085,7 @@ enum hv_tsc_page_status {
+>  	HV_TSC_PAGE_BROKEN,
+>  };
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  /* Hyper-V emulation context */
+>  struct kvm_hv {
+>  	struct mutex hv_lock;
+> @@ -1117,6 +1118,7 @@ struct kvm_hv {
+>  
+>  	struct kvm_hv_syndbg hv_syndbg;
+>  };
+> +#endif
+>  
+>  struct msr_bitmap_range {
+>  	u32 flags;
+> @@ -1338,7 +1340,9 @@ struct kvm_arch {
+>  	/* reads protected by irq_srcu, writes by irq_lock */
+>  	struct hlist_head mask_notifier_list;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_hv hyperv;
+> +#endif
+>  
+>  #ifdef CONFIG_KVM_XEN
+>  	struct kvm_xen xen;
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index ed90f148140d..a06e19a8a8f6 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -129,6 +129,15 @@ config KVM_SMM
+>  
+>  	  If unsure, say Y.
+>  
+> +config KVM_HYPERV
+> +	bool "Support for Microsoft Hyper-V emulation"
+> +	depends on KVM
+> +	default y
+> +	help
+> +	  Provides KVM support for emulating Microsoft Hypervisor (Hyper-V).
+
+
+It feels to me that the KConfig option can have a longer description.
+
+What do you think about something like that:
+
+"Provides KVM support for emulating Microsoft Hypervisor (Hyper-V).
+
+This makes KVM expose a set of paravirtualized interfaces, 
+documented in the HyperV TLFS, 
+https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs,
+which consists of a subset of paravirtualized interfaces that HyperV exposes
+to its guests.
+
+This improves performance of modern Windows guests.
+
+Say Y, unless you are sure that this kernel will not be used to run Windows guests."
+
+
+> +
+> +	  If unsure, say "Y".
+> +
+>  config KVM_XEN
+>  	bool "Support for Xen hypercall interface"
+>  	depends on KVM
 > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> index a99ffc3f3a3f..8ea872401cd6 100644
+> index 8ea872401cd6..ccd477178f07 100644
 > --- a/arch/x86/kvm/Makefile
 > +++ b/arch/x86/kvm/Makefile
-> @@ -23,7 +23,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+> @@ -11,7 +11,7 @@ include $(srctree)/virt/kvm/Makefile.kvm
+>  
+>  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+>  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+> -			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
+> +			   debugfs.o mmu/mmu.o mmu/page_track.o \
+>  			   mmu/spte.o
+>  
+>  ifdef CONFIG_HYPERV
+> @@ -19,19 +19,28 @@ kvm-y			+= kvm_onhyperv.o
+>  endif
+>  
+>  kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
+> +kvm-$(CONFIG_KVM_HYPERV) += hyperv.o
+>  kvm-$(CONFIG_KVM_XEN)	+= xen.o
 >  kvm-$(CONFIG_KVM_SMM)	+= smm.o
 >  
 >  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
-> -			   vmx/hyperv.o vmx/nested.o vmx/posted_intr.o
-> +			   vmx/hyperv.o vmx/hyperv_evmcs.o vmx/nested.o vmx/posted_intr.o
+> -			   vmx/hyperv.o vmx/hyperv_evmcs.o vmx/nested.o vmx/posted_intr.o
+> +			   vmx/nested.o vmx/posted_intr.o
+> +ifdef CONFIG_KVM_HYPERV
+> +kvm-intel-y		+= vmx/hyperv.o vmx/hyperv_evmcs.o
+> +endif
+> +
 >  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
 >  
 >  ifdef CONFIG_HYPERV
-> diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
-> index de13dc14fe1d..fab6a1ad98dc 100644
-> --- a/arch/x86/kvm/vmx/hyperv.c
-> +++ b/arch/x86/kvm/vmx/hyperv.c
-> @@ -13,314 +13,6 @@
+> -kvm-intel-y		+= vmx/vmx_onhyperv.o
+> +kvm-intel-y		+= vmx/vmx_onhyperv.o vmx/hyperv_evmcs.o
+>  endif
 >  
->  #define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
+>  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o \
+> -			   svm/sev.o svm/hyperv.o
+> +			   svm/sev.o
+> +
+> +ifdef CONFIG_KVM_HYPERV
+> +kvm-amd-y		+= svm/hyperv.o
+> +endif
+
+I think that we can group all the files under one
+'ifdef CONFIG_KVM_HYPERV'.
+
 >  
-> -#define EVMCS1_OFFSET(x) offsetof(struct hv_enlightened_vmcs, x)
-> -#define EVMCS1_FIELD(number, name, clean_field)[ROL16(number, 6)] = \
-> -		{EVMCS1_OFFSET(name), clean_field}
-> -
-> -const struct evmcs_field vmcs_field_to_evmcs_1[] = {
-> -	/* 64 bit rw */
-> -	EVMCS1_FIELD(GUEST_RIP, guest_rip,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(GUEST_RSP, guest_rsp,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> -	EVMCS1_FIELD(GUEST_RFLAGS, guest_rflags,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> -	EVMCS1_FIELD(HOST_IA32_PAT, host_ia32_pat,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_IA32_EFER, host_ia32_efer,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_IA32_PERF_GLOBAL_CTRL, host_ia32_perf_global_ctrl,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_CR0, host_cr0,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_CR3, host_cr3,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_CR4, host_cr4,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_IA32_SYSENTER_ESP, host_ia32_sysenter_esp,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_IA32_SYSENTER_EIP, host_ia32_sysenter_eip,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_RIP, host_rip,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(IO_BITMAP_A, io_bitmap_a,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP),
-> -	EVMCS1_FIELD(IO_BITMAP_B, io_bitmap_b,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP),
-> -	EVMCS1_FIELD(MSR_BITMAP, msr_bitmap,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP),
-> -	EVMCS1_FIELD(GUEST_ES_BASE, guest_es_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_CS_BASE, guest_cs_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_SS_BASE, guest_ss_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_DS_BASE, guest_ds_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_FS_BASE, guest_fs_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GS_BASE, guest_gs_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_LDTR_BASE, guest_ldtr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_TR_BASE, guest_tr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GDTR_BASE, guest_gdtr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_IDTR_BASE, guest_idtr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(TSC_OFFSET, tsc_offset,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> -	EVMCS1_FIELD(VIRTUAL_APIC_PAGE_ADDR, virtual_apic_page_addr,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> -	EVMCS1_FIELD(VMCS_LINK_POINTER, vmcs_link_pointer,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_IA32_DEBUGCTL, guest_ia32_debugctl,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_IA32_PAT, guest_ia32_pat,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_IA32_EFER, guest_ia32_efer,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_IA32_PERF_GLOBAL_CTRL, guest_ia32_perf_global_ctrl,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_PDPTR0, guest_pdptr0,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_PDPTR1, guest_pdptr1,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_PDPTR2, guest_pdptr2,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_PDPTR3, guest_pdptr3,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(CR0_GUEST_HOST_MASK, cr0_guest_host_mask,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(CR4_GUEST_HOST_MASK, cr4_guest_host_mask,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(CR0_READ_SHADOW, cr0_read_shadow,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(CR4_READ_SHADOW, cr4_read_shadow,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(GUEST_CR0, guest_cr0,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(GUEST_CR3, guest_cr3,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(GUEST_CR4, guest_cr4,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(GUEST_DR7, guest_dr7,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> -	EVMCS1_FIELD(HOST_FS_BASE, host_fs_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(HOST_GS_BASE, host_gs_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(HOST_TR_BASE, host_tr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(HOST_GDTR_BASE, host_gdtr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(HOST_IDTR_BASE, host_idtr_base,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(HOST_RSP, host_rsp,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> -	EVMCS1_FIELD(EPT_POINTER, ept_pointer,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT),
-> -	EVMCS1_FIELD(GUEST_BNDCFGS, guest_bndcfgs,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(XSS_EXIT_BITMAP, xss_exit_bitmap,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> -	EVMCS1_FIELD(ENCLS_EXITING_BITMAP, encls_exiting_bitmap,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> -	EVMCS1_FIELD(TSC_MULTIPLIER, tsc_multiplier,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> -	/*
-> -	 * Not used by KVM:
-> -	 *
-> -	 * EVMCS1_FIELD(0x00006828, guest_ia32_s_cet,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	 * EVMCS1_FIELD(0x0000682A, guest_ssp,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> -	 * EVMCS1_FIELD(0x0000682C, guest_ia32_int_ssp_table_addr,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	 * EVMCS1_FIELD(0x00002816, guest_ia32_lbr_ctl,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	 * EVMCS1_FIELD(0x00006C18, host_ia32_s_cet,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	 * EVMCS1_FIELD(0x00006C1A, host_ssp,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	 * EVMCS1_FIELD(0x00006C1C, host_ia32_int_ssp_table_addr,
-> -	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	 */
-> -
-> -	/* 64 bit read only */
-> -	EVMCS1_FIELD(GUEST_PHYSICAL_ADDRESS, guest_physical_address,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(EXIT_QUALIFICATION, exit_qualification,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	/*
-> -	 * Not defined in KVM:
-> -	 *
-> -	 * EVMCS1_FIELD(0x00006402, exit_io_instruction_ecx,
-> -	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> -	 * EVMCS1_FIELD(0x00006404, exit_io_instruction_esi,
-> -	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> -	 * EVMCS1_FIELD(0x00006406, exit_io_instruction_esi,
-> -	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> -	 * EVMCS1_FIELD(0x00006408, exit_io_instruction_eip,
-> -	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> -	 */
-> -	EVMCS1_FIELD(GUEST_LINEAR_ADDRESS, guest_linear_address,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -
-> -	/*
-> -	 * No mask defined in the spec as Hyper-V doesn't currently support
-> -	 * these. Future proof by resetting the whole clean field mask on
-> -	 * access.
-> -	 */
-> -	EVMCS1_FIELD(VM_EXIT_MSR_STORE_ADDR, vm_exit_msr_store_addr,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(VM_EXIT_MSR_LOAD_ADDR, vm_exit_msr_load_addr,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(VM_ENTRY_MSR_LOAD_ADDR, vm_entry_msr_load_addr,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -
-> -	/* 32 bit rw */
-> -	EVMCS1_FIELD(TPR_THRESHOLD, tpr_threshold,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(GUEST_INTERRUPTIBILITY_INFO, guest_interruptibility_info,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> -	EVMCS1_FIELD(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_PROC),
-> -	EVMCS1_FIELD(EXCEPTION_BITMAP, exception_bitmap,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EXCPN),
-> -	EVMCS1_FIELD(VM_ENTRY_CONTROLS, vm_entry_controls,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_ENTRY),
-> -	EVMCS1_FIELD(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> -	EVMCS1_FIELD(VM_ENTRY_EXCEPTION_ERROR_CODE,
-> -		     vm_entry_exception_error_code,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> -	EVMCS1_FIELD(VM_ENTRY_INSTRUCTION_LEN, vm_entry_instruction_len,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> -	EVMCS1_FIELD(HOST_IA32_SYSENTER_CS, host_ia32_sysenter_cs,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> -	EVMCS1_FIELD(VM_EXIT_CONTROLS, vm_exit_controls,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> -	EVMCS1_FIELD(SECONDARY_VM_EXEC_CONTROL, secondary_vm_exec_control,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> -	EVMCS1_FIELD(GUEST_ES_LIMIT, guest_es_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_CS_LIMIT, guest_cs_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_SS_LIMIT, guest_ss_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_DS_LIMIT, guest_ds_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_FS_LIMIT, guest_fs_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GS_LIMIT, guest_gs_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_LDTR_LIMIT, guest_ldtr_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_TR_LIMIT, guest_tr_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GDTR_LIMIT, guest_gdtr_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_IDTR_LIMIT, guest_idtr_limit,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_ES_AR_BYTES, guest_es_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_CS_AR_BYTES, guest_cs_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_SS_AR_BYTES, guest_ss_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_DS_AR_BYTES, guest_ds_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_FS_AR_BYTES, guest_fs_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GS_AR_BYTES, guest_gs_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_LDTR_AR_BYTES, guest_ldtr_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_TR_AR_BYTES, guest_tr_ar_bytes,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_ACTIVITY_STATE, guest_activity_state,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -	EVMCS1_FIELD(GUEST_SYSENTER_CS, guest_sysenter_cs,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> -
-> -	/* 32 bit read only */
-> -	EVMCS1_FIELD(VM_INSTRUCTION_ERROR, vm_instruction_error,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(VM_EXIT_REASON, vm_exit_reason,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(VM_EXIT_INTR_INFO, vm_exit_intr_info,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(VM_EXIT_INTR_ERROR_CODE, vm_exit_intr_error_code,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(IDT_VECTORING_INFO_FIELD, idt_vectoring_info_field,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(IDT_VECTORING_ERROR_CODE, idt_vectoring_error_code,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(VM_EXIT_INSTRUCTION_LEN, vm_exit_instruction_len,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -	EVMCS1_FIELD(VMX_INSTRUCTION_INFO, vmx_instruction_info,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> -
-> -	/* No mask defined in the spec (not used) */
-> -	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MASK, page_fault_error_code_mask,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MATCH, page_fault_error_code_match,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(CR3_TARGET_COUNT, cr3_target_count,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(VM_EXIT_MSR_STORE_COUNT, vm_exit_msr_store_count,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(VM_EXIT_MSR_LOAD_COUNT, vm_exit_msr_load_count,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -	EVMCS1_FIELD(VM_ENTRY_MSR_LOAD_COUNT, vm_entry_msr_load_count,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> -
-> -	/* 16 bit rw */
-> -	EVMCS1_FIELD(HOST_ES_SELECTOR, host_es_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_CS_SELECTOR, host_cs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_SS_SELECTOR, host_ss_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_DS_SELECTOR, host_ds_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_FS_SELECTOR, host_fs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_GS_SELECTOR, host_gs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(HOST_TR_SELECTOR, host_tr_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> -	EVMCS1_FIELD(GUEST_ES_SELECTOR, guest_es_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_CS_SELECTOR, guest_cs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_SS_SELECTOR, guest_ss_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_DS_SELECTOR, guest_ds_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_FS_SELECTOR, guest_fs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_GS_SELECTOR, guest_gs_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_LDTR_SELECTOR, guest_ldtr_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(GUEST_TR_SELECTOR, guest_tr_selector,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> -	EVMCS1_FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id,
-> -		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT),
-> -};
-> -const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
-> -
->  u64 nested_get_evmptr(struct kvm_vcpu *vcpu)
+>  ifdef CONFIG_HYPERV
+>  kvm-amd-y		+= svm/svm_onhyperv.o
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 0544e30b4946..7a3533573f94 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -314,11 +314,15 @@ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+>  
+>  static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
 >  {
->  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_cpuid_entry2 *entry;
+>  
+>  	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
+>  				  KVM_CPUID_INDEX_NOT_SIGNIFICANT);
+>  	return entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX;
+> +#else
+> +	return false;
+> +#endif
+
+Do you think that it might make sense to still complain loudly if the userspace
+still tries to enable hyperv cpuid?
+
+>  }
+>  
+>  static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> @@ -441,11 +445,13 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>  		return 0;
+>  	}
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (kvm_cpuid_has_hyperv(e2, nent)) {
+>  		r = kvm_hv_vcpu_init(vcpu);
+>  		if (r)
+>  			return r;
+>  	}
+> +#endif
+>  
+>  	r = kvm_check_cpuid(vcpu, e2, nent);
+>  	if (r)
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index ddb1d0b019e6..3a6acd8a9fa8 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -24,6 +24,8 @@
+>  #include <linux/kvm_host.h>
+>  #include "x86.h"
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+> +
+>  /* "Hv#1" signature */
+>  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
+>  
+> @@ -247,5 +249,28 @@ static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  int kvm_hv_vcpu_flush_tlb(struct kvm_vcpu *vcpu);
+> -
+> -#endif
+> +#else /* CONFIG_KVM_HYPERV */
+> +static inline void kvm_hv_setup_tsc_page(struct kvm *kvm,
+> +					 struct pvclock_vcpu_time_info *hv_clock) {}
+> +static inline void kvm_hv_request_tsc_page_update(struct kvm *kvm) {}
+> +static inline void kvm_hv_init_vm(struct kvm *kvm) {}
+> +static inline void kvm_hv_destroy_vm(struct kvm *kvm) {}
+> +static inline int kvm_hv_vcpu_init(struct kvm_vcpu *vcpu) { return 0; }
+> +static inline void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> +static inline bool kvm_hv_hypercall_enabled(struct kvm_vcpu *vcpu) { return false; }
+> +static inline int kvm_hv_hypercall(struct kvm_vcpu *vcpu) { return HV_STATUS_ACCESS_DENIED; }
+> +static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_hv_free_pa_page(struct kvm *kvm) {}
+> +static inline bool kvm_hv_synic_has_vector(struct kvm_vcpu *vcpu, int vector) { return false; }
+> +static inline bool kvm_hv_synic_auto_eoi_set(struct kvm_vcpu *vcpu, int vector) { return false; }
+> +static inline void kvm_hv_synic_send_eoi(struct kvm_vcpu *vcpu, int vector) {}
+> +static inline bool kvm_hv_invtsc_suppressed(struct kvm_vcpu *vcpu) { return false; }
+> +static inline void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu, bool hyperv_enabled) {}
+> +static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu) { return false; }
+> +static inline bool kvm_hv_is_tlb_flush_hcall(struct kvm_vcpu *vcpu) { return false; }
+> +static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu) { return false; }
+> +static inline int kvm_hv_verify_vp_assist(struct kvm_vcpu *vcpu) { return 0; }
+> +static inline u32 kvm_hv_get_vpindex(struct kvm_vcpu *vcpu) { return vcpu->vcpu_idx; }
+> +#endif /* CONFIG_KVM_HYPERV */
+> +
+> +#endif /* __ARCH_X86_KVM_HYPERV_H__ */
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 16d076a1b91a..68f3f6c26046 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -144,7 +144,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>  	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
+>  }
+>  
+> -
+> +#ifdef CONFIG_KVM_HYPERV
+>  static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>  		    struct kvm *kvm, int irq_source_id, int level,
+>  		    bool line_status)
+> @@ -154,6 +154,7 @@ static int kvm_hv_set_sint(struct kvm_kernel_irq_routing_entry *e,
+>  
+>  	return kvm_hv_synic_set_irq(kvm, e->hv_sint.vcpu, e->hv_sint.sint);
+>  }
+> +#endif
+>  
+>  int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>  			      struct kvm *kvm, int irq_source_id, int level,
+> @@ -163,9 +164,11 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+>  	int r;
+>  
+>  	switch (e->type) {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_IRQ_ROUTING_HV_SINT:
+>  		return kvm_hv_set_sint(e, kvm, irq_source_id, level,
+>  				       line_status);
+> +#endif
+>  
+>  	case KVM_IRQ_ROUTING_MSI:
+>  		if (kvm_msi_route_invalid(kvm, e))
+> @@ -314,11 +317,13 @@ int kvm_set_routing_entry(struct kvm *kvm,
+>  		if (kvm_msi_route_invalid(kvm, e))
+>  			return -EINVAL;
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_IRQ_ROUTING_HV_SINT:
+>  		e->set = kvm_hv_set_sint;
+>  		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
+>  		e->hv_sint.sint = ue->u.hv_sint.sint;
+>  		break;
+> +#endif
+>  #ifdef CONFIG_KVM_XEN
+>  	case KVM_IRQ_ROUTING_XEN_EVTCHN:
+>  		return kvm_xen_setup_evtchn(kvm, e, ue);
+> @@ -438,5 +443,7 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+>  
+>  void kvm_arch_irq_routing_update(struct kvm *kvm)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	kvm_hv_irq_routing_update(kvm);
+> +#endif
+>  }
+> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+> index 02f4784b5d44..14eec2d9b6be 100644
+> --- a/arch/x86/kvm/svm/hyperv.h
+> +++ b/arch/x86/kvm/svm/hyperv.h
+> @@ -11,6 +11,7 @@
+>  #include "../hyperv.h"
+>  #include "svm.h"
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -41,5 +42,11 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+> +#else /* CONFIG_KVM_HYPERV */
+> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
+> +static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+> +static inline void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu) {}
+> +#endif /* CONFIG_KVM_HYPERV */
+> +
+>  
+>  #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index dd496c9e5f91..4d8cd378a30b 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -487,6 +487,7 @@ static void nested_save_pending_event_to_vmcb12(struct vcpu_svm *svm,
+>  
+>  static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	/*
+>  	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
+>  	 * L2's VP_ID upon request from the guest. Make sure we check for
+> @@ -495,6 +496,7 @@ static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (to_hv_vcpu(vcpu) && npt_enabled)
+>  		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+> +#endif
+>  
+>  	/*
+>  	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
+> diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+> index f85bc617ffe4..c25cf56e6adb 100644
+> --- a/arch/x86/kvm/svm/svm_onhyperv.h
+> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
+> @@ -79,6 +79,7 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
+>  
+>  static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
+>  	u32 vp_index = kvm_hv_get_vpindex(vcpu);
+>  
+> @@ -86,6 +87,7 @@ static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+>  		hve->hv_vp_id = vp_index;
+>  		vmcb_mark_dirty(vmcb, HV_VMCB_NESTED_ENLIGHTENMENTS);
+>  	}
+> +#endif
+>  }
+>  #else
+>  
 > diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index 9401dbfaea7c..d4ed99008518 100644
+> index d4ed99008518..933ef6cad5e6 100644
 > --- a/arch/x86/kvm/vmx/hyperv.h
 > +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -2,170 +2,9 @@
->  #ifndef __KVM_X86_VMX_HYPERV_H
->  #define __KVM_X86_VMX_HYPERV_H
+> @@ -20,6 +20,7 @@ enum nested_evmptrld_status {
+>  	EVMPTRLD_ERROR,
+>  };
 >  
-> -#include <linux/jump_label.h>
-> -
-> -#include <asm/hyperv-tlfs.h>
-> -#include <asm/mshyperv.h>
-> -#include <asm/vmx.h>
-> -
-> -#include "../hyperv.h"
-> -
-> -#include "capabilities.h"
-> -#include "vmcs.h"
-> +#include <linux/kvm_host.h>
->  #include "vmcs12.h"
+> +#ifdef CONFIG_KVM_HYPERV
+>  u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
+>  uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+>  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+> @@ -28,5 +29,12 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
+>  int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
+>  bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
+>  void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline u64 nested_get_evmptr(struct kvm_vcpu *vcpu) { return EVMPTR_INVALID; }
+> +static inline void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata) {}
+> +static inline bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu) { return false; }
+> +static inline int nested_evmcs_check_controls(struct vmcs12 *vmcs12) { return 0; }
+> +#endif
+> +
 >  
-> -#define KVM_EVMCS_VERSION 1
-> -
-> -/*
-> - * Enlightened VMCSv1 doesn't support these:
-> - *
-> - *	POSTED_INTR_NV                  = 0x00000002,
-> - *	GUEST_INTR_STATUS               = 0x00000810,
-> - *	APIC_ACCESS_ADDR		= 0x00002014,
-> - *	POSTED_INTR_DESC_ADDR           = 0x00002016,
-> - *	EOI_EXIT_BITMAP0                = 0x0000201c,
-> - *	EOI_EXIT_BITMAP1                = 0x0000201e,
-> - *	EOI_EXIT_BITMAP2                = 0x00002020,
-> - *	EOI_EXIT_BITMAP3                = 0x00002022,
-> - *	GUEST_PML_INDEX			= 0x00000812,
-> - *	PML_ADDRESS			= 0x0000200e,
-> - *	VM_FUNCTION_CONTROL             = 0x00002018,
-> - *	EPTP_LIST_ADDRESS               = 0x00002024,
-> - *	VMREAD_BITMAP                   = 0x00002026,
-> - *	VMWRITE_BITMAP                  = 0x00002028,
-> - *
-> - *	TSC_MULTIPLIER                  = 0x00002032,
-> - *	PLE_GAP                         = 0x00004020,
-> - *	PLE_WINDOW                      = 0x00004022,
-> - *	VMX_PREEMPTION_TIMER_VALUE      = 0x0000482E,
-> - *
-> - * Currently unsupported in KVM:
-> - *	GUEST_IA32_RTIT_CTL		= 0x00002814,
-> - */
-> -#define EVMCS1_SUPPORTED_PINCTRL					\
-> -	(PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> -	 PIN_BASED_EXT_INTR_MASK |					\
-> -	 PIN_BASED_NMI_EXITING |					\
-> -	 PIN_BASED_VIRTUAL_NMIS)
-> -
-> -#define EVMCS1_SUPPORTED_EXEC_CTRL					\
-> -	(CPU_BASED_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> -	 CPU_BASED_HLT_EXITING |					\
-> -	 CPU_BASED_CR3_LOAD_EXITING |					\
-> -	 CPU_BASED_CR3_STORE_EXITING |					\
-> -	 CPU_BASED_UNCOND_IO_EXITING |					\
-> -	 CPU_BASED_MOV_DR_EXITING |					\
-> -	 CPU_BASED_USE_TSC_OFFSETTING |					\
-> -	 CPU_BASED_MWAIT_EXITING |					\
-> -	 CPU_BASED_MONITOR_EXITING |					\
-> -	 CPU_BASED_INVLPG_EXITING |					\
-> -	 CPU_BASED_RDPMC_EXITING |					\
-> -	 CPU_BASED_INTR_WINDOW_EXITING |				\
-> -	 CPU_BASED_CR8_LOAD_EXITING |					\
-> -	 CPU_BASED_CR8_STORE_EXITING |					\
-> -	 CPU_BASED_RDTSC_EXITING |					\
-> -	 CPU_BASED_TPR_SHADOW |						\
-> -	 CPU_BASED_USE_IO_BITMAPS |					\
-> -	 CPU_BASED_MONITOR_TRAP_FLAG |					\
-> -	 CPU_BASED_USE_MSR_BITMAPS |					\
-> -	 CPU_BASED_NMI_WINDOW_EXITING |					\
-> -	 CPU_BASED_PAUSE_EXITING |					\
-> -	 CPU_BASED_ACTIVATE_SECONDARY_CONTROLS)
-> -
-> -#define EVMCS1_SUPPORTED_2NDEXEC					\
-> -	(SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |			\
-> -	 SECONDARY_EXEC_WBINVD_EXITING |				\
-> -	 SECONDARY_EXEC_ENABLE_VPID |					\
-> -	 SECONDARY_EXEC_ENABLE_EPT |					\
-> -	 SECONDARY_EXEC_UNRESTRICTED_GUEST |				\
-> -	 SECONDARY_EXEC_DESC |						\
-> -	 SECONDARY_EXEC_ENABLE_RDTSCP |					\
-> -	 SECONDARY_EXEC_ENABLE_INVPCID |				\
-> -	 SECONDARY_EXEC_ENABLE_XSAVES |					\
-> -	 SECONDARY_EXEC_RDSEED_EXITING |				\
-> -	 SECONDARY_EXEC_RDRAND_EXITING |				\
-> -	 SECONDARY_EXEC_TSC_SCALING |					\
-> -	 SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |				\
-> -	 SECONDARY_EXEC_PT_USE_GPA |					\
-> -	 SECONDARY_EXEC_PT_CONCEAL_VMX |				\
-> -	 SECONDARY_EXEC_BUS_LOCK_DETECTION |				\
-> -	 SECONDARY_EXEC_NOTIFY_VM_EXITING |				\
-> -	 SECONDARY_EXEC_ENCLS_EXITING)
-> -
-> -#define EVMCS1_SUPPORTED_3RDEXEC (0ULL)
-> -
-> -#define EVMCS1_SUPPORTED_VMEXIT_CTRL					\
-> -	(VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> -	 VM_EXIT_SAVE_DEBUG_CONTROLS |					\
-> -	 VM_EXIT_ACK_INTR_ON_EXIT |					\
-> -	 VM_EXIT_HOST_ADDR_SPACE_SIZE |					\
-> -	 VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |				\
-> -	 VM_EXIT_SAVE_IA32_PAT |					\
-> -	 VM_EXIT_LOAD_IA32_PAT |					\
-> -	 VM_EXIT_SAVE_IA32_EFER |					\
-> -	 VM_EXIT_LOAD_IA32_EFER |					\
-> -	 VM_EXIT_CLEAR_BNDCFGS |					\
-> -	 VM_EXIT_PT_CONCEAL_PIP |					\
-> -	 VM_EXIT_CLEAR_IA32_RTIT_CTL)
-> -
-> -#define EVMCS1_SUPPORTED_VMENTRY_CTRL					\
-> -	(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> -	 VM_ENTRY_LOAD_DEBUG_CONTROLS |					\
-> -	 VM_ENTRY_IA32E_MODE |						\
-> -	 VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |				\
-> -	 VM_ENTRY_LOAD_IA32_PAT |					\
-> -	 VM_ENTRY_LOAD_IA32_EFER |					\
-> -	 VM_ENTRY_LOAD_BNDCFGS |					\
-> -	 VM_ENTRY_PT_CONCEAL_PIP |					\
-> -	 VM_ENTRY_LOAD_IA32_RTIT_CTL)
-> -
-> -#define EVMCS1_SUPPORTED_VMFUNC (0)
-> -
-> -struct evmcs_field {
-> -	u16 offset;
-> -	u16 clean_field;
-> -};
-> -
-> -extern const struct evmcs_field vmcs_field_to_evmcs_1[];
-> -extern const unsigned int nr_evmcs_1_fields;
-> -
-> -static __always_inline int evmcs_field_offset(unsigned long field,
-> -					      u16 *clean_field)
-> -{
-> -	unsigned int index = ROL16(field, 6);
-> -	const struct evmcs_field *evmcs_field;
-> -
-> -	if (unlikely(index >= nr_evmcs_1_fields))
-> -		return -ENOENT;
-> -
-> -	evmcs_field = &vmcs_field_to_evmcs_1[index];
-> -
-> -	/*
-> -	 * Use offset=0 to detect holes in eVMCS. This offset belongs to
-> -	 * 'revision_id' but this field has no encoding and is supposed to
-> -	 * be accessed directly.
-> -	 */
-> -	if (unlikely(!evmcs_field->offset))
-> -		return -ENOENT;
-> -
-> -	if (clean_field)
-> -		*clean_field = evmcs_field->clean_field;
-> -
-> -	return evmcs_field->offset;
-> -}
-> -
-> -static inline u64 evmcs_read_any(struct hv_enlightened_vmcs *evmcs,
-> -				 unsigned long field, u16 offset)
-> -{
-> -	/*
-> -	 * vmcs12_read_any() doesn't care whether the supplied structure
-> -	 * is 'struct vmcs12' or 'struct hv_enlightened_vmcs' as it takes
-> -	 * the exact offset of the required field, use it for convenience
-> -	 * here.
-> -	 */
-> -	return vmcs12_read_any((void *)evmcs, field, offset);
-> -}
-> -
->  #define EVMPTR_INVALID (-1ULL)
->  #define EVMPTR_MAP_PENDING (-2ULL)
+>  #endif /* __KVM_X86_VMX_HYPERV_H */
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index c5ec0ef51ff7..ca7e06759aa3 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -226,6 +226,7 @@ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
 >  
-> diff --git a/arch/x86/kvm/vmx/hyperv_evmcs.c b/arch/x86/kvm/vmx/hyperv_evmcs.c
-> new file mode 100644
-> index 000000000000..57a2e0470ac8
-> --- /dev/null
-> +++ b/arch/x86/kvm/vmx/hyperv_evmcs.c
-> @@ -0,0 +1,311 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include "hyperv_evmcs.h"
-> +
-> +#define EVMCS1_OFFSET(x) offsetof(struct hv_enlightened_vmcs, x)
-> +#define EVMCS1_FIELD(number, name, clean_field)[ROL16(number, 6)] = \
-> +		{EVMCS1_OFFSET(name), clean_field}
-> +
-> +const struct evmcs_field vmcs_field_to_evmcs_1[] = {
-> +	/* 64 bit rw */
-> +	EVMCS1_FIELD(GUEST_RIP, guest_rip,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(GUEST_RSP, guest_rsp,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> +	EVMCS1_FIELD(GUEST_RFLAGS, guest_rflags,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> +	EVMCS1_FIELD(HOST_IA32_PAT, host_ia32_pat,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_IA32_EFER, host_ia32_efer,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_IA32_PERF_GLOBAL_CTRL, host_ia32_perf_global_ctrl,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_CR0, host_cr0,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_CR3, host_cr3,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_CR4, host_cr4,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_IA32_SYSENTER_ESP, host_ia32_sysenter_esp,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_IA32_SYSENTER_EIP, host_ia32_sysenter_eip,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_RIP, host_rip,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(IO_BITMAP_A, io_bitmap_a,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP),
-> +	EVMCS1_FIELD(IO_BITMAP_B, io_bitmap_b,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_IO_BITMAP),
-> +	EVMCS1_FIELD(MSR_BITMAP, msr_bitmap,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP),
-> +	EVMCS1_FIELD(GUEST_ES_BASE, guest_es_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_CS_BASE, guest_cs_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_SS_BASE, guest_ss_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_DS_BASE, guest_ds_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_FS_BASE, guest_fs_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GS_BASE, guest_gs_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_LDTR_BASE, guest_ldtr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_TR_BASE, guest_tr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GDTR_BASE, guest_gdtr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_IDTR_BASE, guest_idtr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(TSC_OFFSET, tsc_offset,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> +	EVMCS1_FIELD(VIRTUAL_APIC_PAGE_ADDR, virtual_apic_page_addr,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> +	EVMCS1_FIELD(VMCS_LINK_POINTER, vmcs_link_pointer,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_IA32_DEBUGCTL, guest_ia32_debugctl,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_IA32_PAT, guest_ia32_pat,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_IA32_EFER, guest_ia32_efer,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_IA32_PERF_GLOBAL_CTRL, guest_ia32_perf_global_ctrl,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_PDPTR0, guest_pdptr0,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_PDPTR1, guest_pdptr1,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_PDPTR2, guest_pdptr2,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_PDPTR3, guest_pdptr3,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_PENDING_DBG_EXCEPTIONS, guest_pending_dbg_exceptions,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_SYSENTER_ESP, guest_sysenter_esp,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_SYSENTER_EIP, guest_sysenter_eip,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(CR0_GUEST_HOST_MASK, cr0_guest_host_mask,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(CR4_GUEST_HOST_MASK, cr4_guest_host_mask,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(CR0_READ_SHADOW, cr0_read_shadow,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(CR4_READ_SHADOW, cr4_read_shadow,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(GUEST_CR0, guest_cr0,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(GUEST_CR3, guest_cr3,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(GUEST_CR4, guest_cr4,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(GUEST_DR7, guest_dr7,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CRDR),
-> +	EVMCS1_FIELD(HOST_FS_BASE, host_fs_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(HOST_GS_BASE, host_gs_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(HOST_TR_BASE, host_tr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(HOST_GDTR_BASE, host_gdtr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(HOST_IDTR_BASE, host_idtr_base,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(HOST_RSP, host_rsp,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_POINTER),
-> +	EVMCS1_FIELD(EPT_POINTER, ept_pointer,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT),
-> +	EVMCS1_FIELD(GUEST_BNDCFGS, guest_bndcfgs,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(XSS_EXIT_BITMAP, xss_exit_bitmap,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> +	EVMCS1_FIELD(ENCLS_EXITING_BITMAP, encls_exiting_bitmap,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> +	EVMCS1_FIELD(TSC_MULTIPLIER, tsc_multiplier,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP2),
-> +	/*
-> +	 * Not used by KVM:
-> +	 *
-> +	 * EVMCS1_FIELD(0x00006828, guest_ia32_s_cet,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	 * EVMCS1_FIELD(0x0000682A, guest_ssp,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> +	 * EVMCS1_FIELD(0x0000682C, guest_ia32_int_ssp_table_addr,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	 * EVMCS1_FIELD(0x00002816, guest_ia32_lbr_ctl,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	 * EVMCS1_FIELD(0x00006C18, host_ia32_s_cet,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	 * EVMCS1_FIELD(0x00006C1A, host_ssp,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	 * EVMCS1_FIELD(0x00006C1C, host_ia32_int_ssp_table_addr,
-> +	 *	     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	 */
-> +
-> +	/* 64 bit read only */
-> +	EVMCS1_FIELD(GUEST_PHYSICAL_ADDRESS, guest_physical_address,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(EXIT_QUALIFICATION, exit_qualification,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	/*
-> +	 * Not defined in KVM:
-> +	 *
-> +	 * EVMCS1_FIELD(0x00006402, exit_io_instruction_ecx,
-> +	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> +	 * EVMCS1_FIELD(0x00006404, exit_io_instruction_esi,
-> +	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> +	 * EVMCS1_FIELD(0x00006406, exit_io_instruction_esi,
-> +	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> +	 * EVMCS1_FIELD(0x00006408, exit_io_instruction_eip,
-> +	 *		HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE);
-> +	 */
-> +	EVMCS1_FIELD(GUEST_LINEAR_ADDRESS, guest_linear_address,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +
-> +	/*
-> +	 * No mask defined in the spec as Hyper-V doesn't currently support
-> +	 * these. Future proof by resetting the whole clean field mask on
-> +	 * access.
-> +	 */
-> +	EVMCS1_FIELD(VM_EXIT_MSR_STORE_ADDR, vm_exit_msr_store_addr,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(VM_EXIT_MSR_LOAD_ADDR, vm_exit_msr_load_addr,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(VM_ENTRY_MSR_LOAD_ADDR, vm_entry_msr_load_addr,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +
-> +	/* 32 bit rw */
-> +	EVMCS1_FIELD(TPR_THRESHOLD, tpr_threshold,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(GUEST_INTERRUPTIBILITY_INFO, guest_interruptibility_info,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_BASIC),
-> +	EVMCS1_FIELD(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_PROC),
-> +	EVMCS1_FIELD(EXCEPTION_BITMAP, exception_bitmap,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EXCPN),
-> +	EVMCS1_FIELD(VM_ENTRY_CONTROLS, vm_entry_controls,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_ENTRY),
-> +	EVMCS1_FIELD(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> +	EVMCS1_FIELD(VM_ENTRY_EXCEPTION_ERROR_CODE,
-> +		     vm_entry_exception_error_code,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> +	EVMCS1_FIELD(VM_ENTRY_INSTRUCTION_LEN, vm_entry_instruction_len,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_EVENT),
-> +	EVMCS1_FIELD(HOST_IA32_SYSENTER_CS, host_ia32_sysenter_cs,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> +	EVMCS1_FIELD(VM_EXIT_CONTROLS, vm_exit_controls,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> +	EVMCS1_FIELD(SECONDARY_VM_EXEC_CONTROL, secondary_vm_exec_control,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_GRP1),
-> +	EVMCS1_FIELD(GUEST_ES_LIMIT, guest_es_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_CS_LIMIT, guest_cs_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_SS_LIMIT, guest_ss_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_DS_LIMIT, guest_ds_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_FS_LIMIT, guest_fs_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GS_LIMIT, guest_gs_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_LDTR_LIMIT, guest_ldtr_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_TR_LIMIT, guest_tr_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GDTR_LIMIT, guest_gdtr_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_IDTR_LIMIT, guest_idtr_limit,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_ES_AR_BYTES, guest_es_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_CS_AR_BYTES, guest_cs_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_SS_AR_BYTES, guest_ss_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_DS_AR_BYTES, guest_ds_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_FS_AR_BYTES, guest_fs_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GS_AR_BYTES, guest_gs_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_LDTR_AR_BYTES, guest_ldtr_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_TR_AR_BYTES, guest_tr_ar_bytes,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_ACTIVITY_STATE, guest_activity_state,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +	EVMCS1_FIELD(GUEST_SYSENTER_CS, guest_sysenter_cs,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP1),
-> +
-> +	/* 32 bit read only */
-> +	EVMCS1_FIELD(VM_INSTRUCTION_ERROR, vm_instruction_error,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(VM_EXIT_REASON, vm_exit_reason,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(VM_EXIT_INTR_INFO, vm_exit_intr_info,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(VM_EXIT_INTR_ERROR_CODE, vm_exit_intr_error_code,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(IDT_VECTORING_INFO_FIELD, idt_vectoring_info_field,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(IDT_VECTORING_ERROR_CODE, idt_vectoring_error_code,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(VM_EXIT_INSTRUCTION_LEN, vm_exit_instruction_len,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +	EVMCS1_FIELD(VMX_INSTRUCTION_INFO, vmx_instruction_info,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
-> +
-> +	/* No mask defined in the spec (not used) */
-> +	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MASK, page_fault_error_code_mask,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MATCH, page_fault_error_code_match,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(CR3_TARGET_COUNT, cr3_target_count,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(VM_EXIT_MSR_STORE_COUNT, vm_exit_msr_store_count,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(VM_EXIT_MSR_LOAD_COUNT, vm_exit_msr_load_count,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +	EVMCS1_FIELD(VM_ENTRY_MSR_LOAD_COUNT, vm_entry_msr_load_count,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
-> +
-> +	/* 16 bit rw */
-> +	EVMCS1_FIELD(HOST_ES_SELECTOR, host_es_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_CS_SELECTOR, host_cs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_SS_SELECTOR, host_ss_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_DS_SELECTOR, host_ds_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_FS_SELECTOR, host_fs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_GS_SELECTOR, host_gs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(HOST_TR_SELECTOR, host_tr_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_HOST_GRP1),
-> +	EVMCS1_FIELD(GUEST_ES_SELECTOR, guest_es_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_CS_SELECTOR, guest_cs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_SS_SELECTOR, guest_ss_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_DS_SELECTOR, guest_ds_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_FS_SELECTOR, guest_fs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_GS_SELECTOR, guest_gs_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_LDTR_SELECTOR, guest_ldtr_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(GUEST_TR_SELECTOR, guest_tr_selector,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2),
-> +	EVMCS1_FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id,
-> +		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_CONTROL_XLAT),
-> +};
-> +const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
-> diff --git a/arch/x86/kvm/vmx/hyperv_evmcs.h b/arch/x86/kvm/vmx/hyperv_evmcs.h
-> new file mode 100644
-> index 000000000000..11d96975e7cc
-> --- /dev/null
-> +++ b/arch/x86/kvm/vmx/hyperv_evmcs.h
-> @@ -0,0 +1,162 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __KVM_X86_VMX_HYPERV_EVMCS_H
-> +#define __KVM_X86_VMX_HYPERV_EVMCS_H
-> +
-> +#include <asm/hyperv-tlfs.h>
-> +
-> +#include "capabilities.h"
-> +#include "vmcs12.h"
-> +
-> +#define KVM_EVMCS_VERSION 1
-> +
-> +/*
-> + * Enlightened VMCSv1 doesn't support these:
-> + *
-> + *	POSTED_INTR_NV                  = 0x00000002,
-> + *	GUEST_INTR_STATUS               = 0x00000810,
-> + *	APIC_ACCESS_ADDR		= 0x00002014,
-> + *	POSTED_INTR_DESC_ADDR           = 0x00002016,
-> + *	EOI_EXIT_BITMAP0                = 0x0000201c,
-> + *	EOI_EXIT_BITMAP1                = 0x0000201e,
-> + *	EOI_EXIT_BITMAP2                = 0x00002020,
-> + *	EOI_EXIT_BITMAP3                = 0x00002022,
-> + *	GUEST_PML_INDEX			= 0x00000812,
-> + *	PML_ADDRESS			= 0x0000200e,
-> + *	VM_FUNCTION_CONTROL             = 0x00002018,
-> + *	EPTP_LIST_ADDRESS               = 0x00002024,
-> + *	VMREAD_BITMAP                   = 0x00002026,
-> + *	VMWRITE_BITMAP                  = 0x00002028,
-> + *
-> + *	TSC_MULTIPLIER                  = 0x00002032,
-> + *	PLE_GAP                         = 0x00004020,
-> + *	PLE_WINDOW                      = 0x00004022,
-> + *	VMX_PREEMPTION_TIMER_VALUE      = 0x0000482E,
-> + *
-> + * Currently unsupported in KVM:
-> + *	GUEST_IA32_RTIT_CTL		= 0x00002814,
-> + */
-> +#define EVMCS1_SUPPORTED_PINCTRL					\
-> +	(PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> +	 PIN_BASED_EXT_INTR_MASK |					\
-> +	 PIN_BASED_NMI_EXITING |					\
-> +	 PIN_BASED_VIRTUAL_NMIS)
-> +
-> +#define EVMCS1_SUPPORTED_EXEC_CTRL					\
-> +	(CPU_BASED_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> +	 CPU_BASED_HLT_EXITING |					\
-> +	 CPU_BASED_CR3_LOAD_EXITING |					\
-> +	 CPU_BASED_CR3_STORE_EXITING |					\
-> +	 CPU_BASED_UNCOND_IO_EXITING |					\
-> +	 CPU_BASED_MOV_DR_EXITING |					\
-> +	 CPU_BASED_USE_TSC_OFFSETTING |					\
-> +	 CPU_BASED_MWAIT_EXITING |					\
-> +	 CPU_BASED_MONITOR_EXITING |					\
-> +	 CPU_BASED_INVLPG_EXITING |					\
-> +	 CPU_BASED_RDPMC_EXITING |					\
-> +	 CPU_BASED_INTR_WINDOW_EXITING |				\
-> +	 CPU_BASED_CR8_LOAD_EXITING |					\
-> +	 CPU_BASED_CR8_STORE_EXITING |					\
-> +	 CPU_BASED_RDTSC_EXITING |					\
-> +	 CPU_BASED_TPR_SHADOW |						\
-> +	 CPU_BASED_USE_IO_BITMAPS |					\
-> +	 CPU_BASED_MONITOR_TRAP_FLAG |					\
-> +	 CPU_BASED_USE_MSR_BITMAPS |					\
-> +	 CPU_BASED_NMI_WINDOW_EXITING |					\
-> +	 CPU_BASED_PAUSE_EXITING |					\
-> +	 CPU_BASED_ACTIVATE_SECONDARY_CONTROLS)
-> +
-> +#define EVMCS1_SUPPORTED_2NDEXEC					\
-> +	(SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |			\
-> +	 SECONDARY_EXEC_WBINVD_EXITING |				\
-> +	 SECONDARY_EXEC_ENABLE_VPID |					\
-> +	 SECONDARY_EXEC_ENABLE_EPT |					\
-> +	 SECONDARY_EXEC_UNRESTRICTED_GUEST |				\
-> +	 SECONDARY_EXEC_DESC |						\
-> +	 SECONDARY_EXEC_ENABLE_RDTSCP |					\
-> +	 SECONDARY_EXEC_ENABLE_INVPCID |				\
-> +	 SECONDARY_EXEC_ENABLE_XSAVES |					\
-> +	 SECONDARY_EXEC_RDSEED_EXITING |				\
-> +	 SECONDARY_EXEC_RDRAND_EXITING |				\
-> +	 SECONDARY_EXEC_TSC_SCALING |					\
-> +	 SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |				\
-> +	 SECONDARY_EXEC_PT_USE_GPA |					\
-> +	 SECONDARY_EXEC_PT_CONCEAL_VMX |				\
-> +	 SECONDARY_EXEC_BUS_LOCK_DETECTION |				\
-> +	 SECONDARY_EXEC_NOTIFY_VM_EXITING |				\
-> +	 SECONDARY_EXEC_ENCLS_EXITING)
-> +
-> +#define EVMCS1_SUPPORTED_3RDEXEC (0ULL)
-> +
-> +#define EVMCS1_SUPPORTED_VMEXIT_CTRL					\
-> +	(VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> +	 VM_EXIT_SAVE_DEBUG_CONTROLS |					\
-> +	 VM_EXIT_ACK_INTR_ON_EXIT |					\
-> +	 VM_EXIT_HOST_ADDR_SPACE_SIZE |					\
-> +	 VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |				\
-> +	 VM_EXIT_SAVE_IA32_PAT |					\
-> +	 VM_EXIT_LOAD_IA32_PAT |					\
-> +	 VM_EXIT_SAVE_IA32_EFER |					\
-> +	 VM_EXIT_LOAD_IA32_EFER |					\
-> +	 VM_EXIT_CLEAR_BNDCFGS |					\
-> +	 VM_EXIT_PT_CONCEAL_PIP |					\
-> +	 VM_EXIT_CLEAR_IA32_RTIT_CTL)
-> +
-> +#define EVMCS1_SUPPORTED_VMENTRY_CTRL					\
-> +	(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR |				\
-> +	 VM_ENTRY_LOAD_DEBUG_CONTROLS |					\
-> +	 VM_ENTRY_IA32E_MODE |						\
-> +	 VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |				\
-> +	 VM_ENTRY_LOAD_IA32_PAT |					\
-> +	 VM_ENTRY_LOAD_IA32_EFER |					\
-> +	 VM_ENTRY_LOAD_BNDCFGS |					\
-> +	 VM_ENTRY_PT_CONCEAL_PIP |					\
-> +	 VM_ENTRY_LOAD_IA32_RTIT_CTL)
-> +
-> +#define EVMCS1_SUPPORTED_VMFUNC (0)
-> +
-> +struct evmcs_field {
-> +	u16 offset;
-> +	u16 clean_field;
-> +};
-> +
-> +extern const struct evmcs_field vmcs_field_to_evmcs_1[];
-> +extern const unsigned int nr_evmcs_1_fields;
-> +
-> +static __always_inline int evmcs_field_offset(unsigned long field,
-> +					      u16 *clean_field)
-> +{
-> +	unsigned int index = ROL16(field, 6);
-> +	const struct evmcs_field *evmcs_field;
-> +
-> +	if (unlikely(index >= nr_evmcs_1_fields))
-> +		return -ENOENT;
-> +
-> +	evmcs_field = &vmcs_field_to_evmcs_1[index];
-> +
-> +	/*
-> +	 * Use offset=0 to detect holes in eVMCS. This offset belongs to
-> +	 * 'revision_id' but this field has no encoding and is supposed to
-> +	 * be accessed directly.
-> +	 */
-> +	if (unlikely(!evmcs_field->offset))
-> +		return -ENOENT;
-> +
-> +	if (clean_field)
-> +		*clean_field = evmcs_field->clean_field;
-> +
-> +	return evmcs_field->offset;
-> +}
-> +
-> +static inline u64 evmcs_read_any(struct hv_enlightened_vmcs *evmcs,
-> +				 unsigned long field, u16 offset)
-> +{
-> +	/*
-> +	 * vmcs12_read_any() doesn't care whether the supplied structure
-> +	 * is 'struct vmcs12' or 'struct hv_enlightened_vmcs' as it takes
-> +	 * the exact offset of the required field, use it for convenience
-> +	 * here.
-> +	 */
-> +	return vmcs12_read_any((void *)evmcs, field, offset);
-> +}
-> +
-> +#endif /* __KVM_X86_VMX_HYPERV_H */
-> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> index 11541d272dbd..eb48153bfd73 100644
-> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> @@ -4,11 +4,12 @@
->  #define __ARCH_X86_KVM_VMX_ONHYPERV_H__
+>  static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>  {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
 >  
->  #include <asm/hyperv-tlfs.h>
-> +#include <asm/mshyperv.h>
+> @@ -241,6 +242,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+>  		hv_vcpu->nested.vm_id = 0;
+>  		hv_vcpu->nested.vp_id = 0;
+>  	}
+> +#endif
+>  }
 >  
->  #include <linux/jump_label.h>
+>  static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+> @@ -1139,6 +1141,7 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
 >  
->  #include "capabilities.h"
-> -#include "hyperv.h"
-> +#include "hyperv_evmcs.h"
->  #include "vmcs12.h"
+> +#ifdef CONFIG_KVM_HYPERV
+>  	/*
+>  	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
+>  	 * L2's VP_ID upon request from the guest. Make sure we check for
+> @@ -1147,6 +1150,7 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>  	 */
+>  	if (to_hv_vcpu(vcpu) && enable_ept)
+>  		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+> +#endif
 >  
->  #define current_evmcs ((struct hv_enlightened_vmcs *)this_cpu_read(current_vmcs))
+>  	/*
+>  	 * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
+> @@ -1576,6 +1580,7 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
+>  	vmcs_load(vmx->loaded_vmcs->vmcs);
+>  }
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields)
+>  {
+>  	struct vmcs12 *vmcs12 = vmx->nested.cached_vmcs12;
+> @@ -2083,6 +2088,10 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+>  
+>  	return EVMPTRLD_SUCCEEDED;
+>  }
+> +#else /* CONFIG_KVM_HYPERV */
+> +static inline void copy_enlightened_to_vmcs12(struct vcpu_vmx *vmx, u32 hv_clean_fields) {}
+> +static inline void copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx) {}
+> +#endif /* CONFIG_KVM_HYPERV */
+>  
+>  void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
+>  {
+> @@ -3161,6 +3170,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> @@ -3188,6 +3198,9 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  
+>  	return true;
+>  }
+> +#else
+> +static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu) { return true; }
+> +#endif
+>  
+>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  {
+> @@ -3558,11 +3571,13 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	if (!nested_vmx_check_permission(vcpu))
+>  		return 1;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	evmptrld_status = nested_vmx_handle_enlightened_vmptrld(vcpu, launch);
+>  	if (evmptrld_status == EVMPTRLD_ERROR) {
+>  		kvm_queue_exception(vcpu, UD_VECTOR);
+>  		return 1;
+>  	}
+> +#endif
+>  
+>  	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_BRANCH_INSTRUCTIONS);
+>  
+> @@ -7096,7 +7111,9 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+>  	.set_state = vmx_set_nested_state,
+>  	.get_nested_state_pages = vmx_get_nested_state_pages,
+>  	.write_log_dirty = nested_vmx_write_pml_buffer,
+> +#ifdef CONFIG_KVM_HYPERV
+>  	.enable_evmcs = nested_enable_evmcs,
+>  	.get_evmcs_version = nested_get_evmcs_version,
+>  	.hv_inject_synthetic_vmexit_post_tlb_flush = vmx_hv_inject_synthetic_vmexit_post_tlb_flush,
+> +#endif
+>  };
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e273ce8e0b3f..78e18d28bc61 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1504,6 +1504,8 @@ static unsigned num_msrs_to_save;
+>  static const u32 emulated_msrs_all[] = {
+>  	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+>  	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+> +
+> +#ifdef CONFIG_KVM_HYPERV
+>  	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+>  	HV_X64_MSR_TIME_REF_COUNT, HV_X64_MSR_REFERENCE_TSC,
+>  	HV_X64_MSR_TSC_FREQUENCY, HV_X64_MSR_APIC_FREQUENCY,
+> @@ -1521,6 +1523,7 @@ static const u32 emulated_msrs_all[] = {
+>  	HV_X64_MSR_SYNDBG_CONTROL, HV_X64_MSR_SYNDBG_STATUS,
+>  	HV_X64_MSR_SYNDBG_SEND_BUFFER, HV_X64_MSR_SYNDBG_RECV_BUFFER,
+>  	HV_X64_MSR_SYNDBG_PENDING_BUFFER,
+> +#endif
+>  
+>  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+>  	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
+> @@ -3914,6 +3917,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		 * the need to ignore the workaround.
+>  		 */
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+> @@ -3926,6 +3930,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case HV_X64_MSR_TSC_INVARIANT_CONTROL:
+>  		return kvm_hv_set_msr_common(vcpu, msr, data,
+>  					     msr_info->host_initiated);
+> +#endif
+>  	case MSR_IA32_BBL_CR_CTL3:
+>  		/* Drop writes to this legacy MSR -- see rdmsr
+>  		 * counterpart for further detail.
+> @@ -4270,6 +4275,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		 */
+>  		msr_info->data = 0x20000000;
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case HV_X64_MSR_GUEST_OS_ID ... HV_X64_MSR_SINT15:
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  	case HV_X64_MSR_SYNDBG_OPTIONS:
+> @@ -4283,6 +4289,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		return kvm_hv_get_msr_common(vcpu,
+>  					     msr_info->index, &msr_info->data,
+>  					     msr_info->host_initiated);
+> +#endif
+>  	case MSR_IA32_BBL_CR_CTL3:
+>  		/* This legacy MSR exists but isn't fully documented in current
+>  		 * silicon.  It is however accessed by winxp in very narrow
+> @@ -4420,6 +4427,7 @@ static inline bool kvm_can_mwait_in_guest(void)
+>  		boot_cpu_has(X86_FEATURE_ARAT);
+>  }
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>  					    struct kvm_cpuid2 __user *cpuid_arg)
+>  {
+> @@ -4440,6 +4448,7 @@ static int kvm_ioctl_get_supported_hv_cpuid(struct kvm_vcpu *vcpu,
+>  
+>  	return 0;
+>  }
+> +#endif
+>  
+>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  {
+> @@ -4764,9 +4773,11 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  	case KVM_GET_MSRS:
+>  		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+>  		break;
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>  		r = kvm_ioctl_get_supported_hv_cpuid(NULL, argp);
+>  		break;
+> +#endif
+>  	case KVM_GET_DEVICE_ATTR: {
+>  		struct kvm_device_attr attr;
+>  		r = -EFAULT;
+> @@ -5580,14 +5591,11 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+>  static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  				     struct kvm_enable_cap *cap)
+>  {
+> -	int r;
+> -	uint16_t vmcs_version;
+> -	void __user *user_ptr;
+> -
+>  	if (cap->flags)
+>  		return -EINVAL;
+>  
+>  	switch (cap->cap) {
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_CAP_HYPERV_SYNIC2:
+>  		if (cap->args[0])
+>  			return -EINVAL;
+> @@ -5599,16 +5607,22 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  		return kvm_hv_activate_synic(vcpu, cap->cap ==
+>  					     KVM_CAP_HYPERV_SYNIC2);
+>  	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
+> -		if (!kvm_x86_ops.nested_ops->enable_evmcs)
+> -			return -ENOTTY;
+> -		r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+> -		if (!r) {
+> -			user_ptr = (void __user *)(uintptr_t)cap->args[0];
+> -			if (copy_to_user(user_ptr, &vmcs_version,
+> -					 sizeof(vmcs_version)))
+> -				r = -EFAULT;
+> +		{
+> +			int r;
+> +			uint16_t vmcs_version;
+> +			void __user *user_ptr;CONFIG_KVM_HYPERV_GUEST_SUPPORT
+> +
+> +			if (!kvm_x86_ops.nested_ops->enable_evmcs)
+> +				return -ENOTTY;
+> +			r = kvm_x86_ops.nested_ops->enable_evmcs(vcpu, &vmcs_version);
+> +			if (!r) {
+> +				user_ptr = (void __user *)(uintptr_t)cap->args[0];
+> +				if (copy_to_user(user_ptr, &vmcs_version,
+> +						 sizeof(vmcs_version)))
+> +					r = -EFAULT;
+> +			}
+> +			return r;
+>  		}
+> -		return r;
+>  	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
+>  		if (!kvm_x86_ops.enable_l2_tlb_flush)
+>  			return -ENOTTY;
+> @@ -5617,6 +5631,7 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  
+>  	case KVM_CAP_HYPERV_ENFORCE_CPUID:
+>  		return kvm_hv_set_enforce_cpuid(vcpu, cap->args[0]);
+> +#endif
+>  
+>  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+>  		vcpu->arch.pv_cpuid.enforce = cap->args[0];
+> @@ -6009,9 +6024,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  		break;
+>  	}
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_GET_SUPPORTED_HV_CPUID:
+>  		r = kvm_ioctl_get_supported_hv_cpuid(vcpu, argp);
+>  		break;
+> +#endif
+>  #ifdef CONFIG_KVM_XEN
+>  	case KVM_XEN_VCPU_GET_ATTR: {
+>  		struct kvm_xen_vcpu_attr xva;
+> @@ -7066,6 +7083,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		r = static_call(kvm_x86_mem_enc_unregister_region)(kvm, &region);
+>  		break;
+>  	}
+> +#ifdef CONFIG_KVM_HYPERV
+>  	case KVM_HYPERV_EVENTFD: {
+>  		struct kvm_hyperv_eventfd hvevfd;
+>  
+> @@ -7075,6 +7093,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+>  		break;
+>  	}
+> +#endif
+>  	case KVM_SET_PMU_EVENT_FILTER:
+>  		r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
+>  		break;
+> @@ -10445,19 +10464,20 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+>  
+>  static void vcpu_load_eoi_exitmap(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 eoi_exit_bitmap[4];
+> -
+>  	if (!kvm_apic_hw_enabled(vcpu->arch.apic))
+>  		return;
+>  
+> +#ifdef CONFIG_KVM_HYPERV
+>  	if (to_hv_vcpu(vcpu)) {
+> +		u64 eoi_exit_bitmap[4];
+> +
+>  		bitmap_or((ulong *)eoi_exit_bitmap,
+>  			  vcpu->arch.ioapic_handled_vectors,
+>  			  to_hv_synic(vcpu)->vec_bitmap, 256);
+>  		static_call_cond(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
+>  		return;
+>  	}
+> -
+> +#endif
+>  	static_call_cond(kvm_x86_load_eoi_exitmap)(
+>  		vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
+>  }
+> @@ -10548,9 +10568,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		 * the flushes are considered "remote" and not "local" because
+>  		 * the requests can be initiated from other vCPUs.
+>  		 */
+> +#ifdef CONFIG_KVM_HYPERV
+>  		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu) &&
+>  		    kvm_hv_vcpu_flush_tlb(vcpu))
+>  			kvm_vcpu_flush_tlb_guest(vcpu);
+> +#endif
+>  
+>  		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
+> @@ -10603,6 +10625,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  			vcpu_load_eoi_exitmap(vcpu);
+>  		if (kvm_check_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu))
+>  			kvm_vcpu_reload_apic_access_page(vcpu);
+> +#ifdef CONFIG_KVM_HYPERV
+>  		if (kvm_check_request(KVM_REQ_HV_CRASH, vcpu)) {
+>  			vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  			vcpu->run->system_event.type = KVM_SYSTEM_EVENT_CRASH;
+> @@ -10633,6 +10656,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		 */
+>  		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
+>  			kvm_hv_process_stimers(vcpu);
+> +#endif
+>  		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
+>  			kvm_vcpu_update_apicv(vcpu);
+>  		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
 
 
-This patch fails the build because of vmx_has_valid_vmcs12() in nested.h which uses EVMPTR_INVALID.
+Looks reasonable, I didn't check everything though, I might have missed something.
 
-vmx/nested.h includes vmx/vmx.h which includes vmx_ops.h, it includes vmx_onhyperv.h which used to include hyperv.h but not anymore.
-
-We can either add hyperv.h to vmx/nested.h, or we can move the code in vmx_has_valid_vmcs12 to hyperv_evmcs.h.
-
-
-Besides the build error,
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
-
-
 
