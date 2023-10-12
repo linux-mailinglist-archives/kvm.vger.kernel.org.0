@@ -2,142 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 200DF7C7190
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 17:33:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F5727C7612
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 20:42:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379202AbjJLPdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 11:33:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
+        id S1441912AbjJLSm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 14:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232023AbjJLPdW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:33:22 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B7BE4B8
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:33:19 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6598D13D5;
-        Thu, 12 Oct 2023 08:33:59 -0700 (PDT)
-Received: from [10.57.3.94] (unknown [10.57.3.94])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B3933F7A6;
-        Thu, 12 Oct 2023 08:33:17 -0700 (PDT)
-Message-ID: <c0c89e79-3fed-7207-8ae1-f84cb461d98e@arm.com>
-Date:   Thu, 12 Oct 2023 16:33:15 +0100
+        with ESMTP id S1379655AbjJLSmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 14:42:55 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3909883
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 11:42:52 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-5333fb34be3so2259021a12.1
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 11:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697136170; x=1697740970; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1ASAniN18QZFRch4hHbbIvuqpTci7nid/Sw0rHmtrIM=;
+        b=Wl1RhfpWa92XIiNqt+V0/SlOMHd9++MTEnn7v1vcjbSUT27BMvzjJy2JVfT6PHosSa
+         jmsV6m6CXWbobJVXeBJEEOk4HrmKnbb0lfQD78wrS3suwCAK4lVITfS93hxJd+z96KjF
+         1PHJVl/0KXFl0wlu7E7lAQm7Iq7Fhpq4j1LYPKBLx3EcLhU2MS5sdypAcgMUfZ/wslDu
+         lP7zE5E+PBBQKiKMi2150dfdDZHFXO8+EheAPTqsTw0ASnO4uHh4SQMlWLoZeFa52sPT
+         liSL0kOY3j33f8cVcYnjwu+DcF+gctaJ33fZsoALkLY2sUFFEGSBUhsnQui6lCQx8ENp
+         bMiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697136170; x=1697740970;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ASAniN18QZFRch4hHbbIvuqpTci7nid/Sw0rHmtrIM=;
+        b=Z9kSNHaYBBuXiFG39Jk15eP2EUKMNyldNWlOchkGlTvX5YQWx9u4C3kjxVLjBDvMSp
+         ANotBN9Fg99zrI8MZRYWzMKDlenhtGOlMsg1XaNcB9igHF0Af7TAfrLrPEpgKdvaOS23
+         AD1aw9RQT112+DdWJeBAvHP5BzHe22DF4sYf02DHYnNoLTXFRR6dqwwe1EFnB4WIZv5Q
+         Ij4p9rYADLS+cI7nva8pjdBkaQWzIpvGsN4v5sMfdAsUqGjQK/Y1dkEpGGWRQJzbbVPs
+         vJQvbTi92Q8VKxdPVM0aa6KtqSaw3y7ISvCb7G+txybC+oa7kJF3eMY2AnI+sGT8rBqC
+         L8hw==
+X-Gm-Message-State: AOJu0YyTBgZ585NDdb3BJZN+aEh+nB6ft4qQZ7zovx3o5kt7bWP2L0lM
+        rry2bbQ4+ZCnGbe0Qg1aYpaVVQ==
+X-Google-Smtp-Source: AGHT+IFWtuhhigFSgsoSTkjgJ41qxJL6r4RxNHmtcIA3n3+G5XfBw7m3mAfLBOf7W8G8wl9JTbmGRg==
+X-Received: by 2002:a05:6402:1cab:b0:53d:f180:3cc5 with SMTP id cz11-20020a0564021cab00b0053df1803cc5mr3854665edb.20.1697136170725;
+        Thu, 12 Oct 2023 11:42:50 -0700 (PDT)
+Received: from [192.168.69.115] (176-131-211-232.abo.bbox.fr. [176.131.211.232])
+        by smtp.gmail.com with ESMTPSA id b25-20020aa7df99000000b0053808d83f0fsm10459023edy.9.2023.10.12.11.42.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Oct 2023 11:42:50 -0700 (PDT)
+Message-ID: <b71e0108-b95e-1182-f0fb-d9aeddc3b3bf@linaro.org>
+Date:   Thu, 12 Oct 2023 20:42:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH 2/2] KVM: arm64: Treat PMEVTYPER<n>_EL0.NSH as RES0
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Clark <james.clark@arm.com>
-References: <20231011081649.3226792-1-oliver.upton@linux.dev>
- <20231011081649.3226792-3-oliver.upton@linux.dev>
- <24d7dda6-888c-141e-3aa0-9319987360d7@arm.com> <ZSbKiXY-LAsfRdlD@linux.dev>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZSbKiXY-LAsfRdlD@linux.dev>
+Subject: Re: [PATCH v2 0/4] target/ppc: Prohibit target specific KVM
+ prototypes on user emulation
+Content-Language: en-US
+To:     qemu-devel@nongnu.org
+Cc:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-ppc@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Michael Tokarev <mjt@tls.msk.ru>, Greg Kurz <groug@kaod.org>,
+        Nicholas Piggin <npiggin@gmail.com>
+References: <20231003070427.69621-1-philmd@linaro.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20231003070427.69621-1-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/2023 17:17, Oliver Upton wrote:
-> On Wed, Oct 11, 2023 at 01:33:16PM +0100, Suzuki K Poulose wrote:
+On 3/10/23 09:04, Philippe Mathieu-Daudé wrote:
+> Since v1:
+> - Addressed Michael review comments,
+> - Added Daniel R-b tag.
 > 
-> [...]
+> Implement Kevin's suggestion to remove KVM declarations
+> for user emulation builds, so if KVM prototype are used
+> we directly get a compile failure.
 > 
->> However, I think we are missing the support for a guest using the
->> combination of PMEVTYPER.NS{K/U} instead of the PMEVTYPER.{P/U} for
->> filtering the events. As per Arm ARM, it is permitted to use the
->> PMEVTYPER.NSK/U (leaving PMEVTYPER.{P,U} == 0) for filtering in Non-Secure
->> EL1.
-> 
-> Ah, good eye. The pseudocode is easy enough to rip off, something like
-> the below diff would get things going. There's an extra step of making
-> these bits RES0 if EL3 isn't present in the guest's ID register values,
-> but not a huge deal.
+> Philippe Mathieu-Daudé (4):
+>    sysemu/kvm: Restrict kvmppc_get_radix_page_info() to ppc targets
+>    hw/ppc/e500: Restrict ppce500_init_mpic_kvm() to KVM
+>    target/ppc: Restrict KVM objects to system emulation
+>    target/ppc: Prohibit target specific KVM prototypes on user emulation
 
-True, the change below looks good to me. Thanks for addressing this.
-
-Suzuki
-
-> 
->> Anyways, for this patch:
->>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com?
-> 
-> Thanks!
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 087764435390..b6df9ba39940 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -585,6 +585,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->   	struct perf_event *event;
->   	struct perf_event_attr attr;
->   	u64 eventsel, reg, data;
-> +	bool p, u, nsk, nsu;
->   
->   	reg = counter_index_to_evtreg(pmc->idx);
->   	data = __vcpu_sys_reg(vcpu, reg);
-> @@ -611,13 +612,18 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->   	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
->   		return;
->   
-> +	p = data & ARMV8_PMU_EXCLUDE_EL1;
-> +	u = data & ARMV8_PMU_EXCLUDE_EL0;
-> +	nsk = data & ARMV8_PMU_EXCLUDE_NS_EL1;
-> +	nsu = data & ARMV8_PMU_EXCLUDE_NS_EL0;
-> +
->   	memset(&attr, 0, sizeof(struct perf_event_attr));
->   	attr.type = arm_pmu->pmu.type;
->   	attr.size = sizeof(attr);
->   	attr.pinned = 1;
->   	attr.disabled = !kvm_pmu_counter_is_enabled(pmc);
-> -	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
-> -	attr.exclude_kernel = data & ARMV8_PMU_EXCLUDE_EL1 ? 1 : 0;
-> +	attr.exclude_user = (u != nsu);
-> +	attr.exclude_kernel = (p != nsk);
->   	attr.exclude_hv = 1; /* Don't count EL2 events */
->   	attr.exclude_host = 1; /* Don't count host events */
->   	attr.config = eventsel;
-> @@ -663,7 +669,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->   	if (!kvm_vcpu_has_pmu(vcpu))
->   		return;
->   
-> -	mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
-> +	mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
-> +	       ARMV8_PMU_EXCLUDE_NS_EL1 | ARMV8_PMU_EXCLUDE_NS_EL0;
->   	mask |= kvm_pmu_event_mask(vcpu->kvm);
->   
->   	reg = counter_index_to_evtreg(pmc->idx);
-> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-> index 753f8dbd9d10..872119cc2bac 100644
-> --- a/include/linux/perf/arm_pmuv3.h
-> +++ b/include/linux/perf/arm_pmuv3.h
-> @@ -235,9 +235,11 @@
->   /*
->    * Event filters for PMUv3
->    */
-> -#define ARMV8_PMU_EXCLUDE_EL1	(1U << 31)
-> -#define ARMV8_PMU_EXCLUDE_EL0	(1U << 30)
-> -#define ARMV8_PMU_INCLUDE_EL2	(1U << 27)
-> +#define ARMV8_PMU_EXCLUDE_EL1		(1U << 31)
-> +#define ARMV8_PMU_EXCLUDE_EL0		(1U << 30)
-> +#define ARMV8_PMU_EXCLUDE_NS_EL1	(1U << 29)
-> +#define ARMV8_PMU_EXCLUDE_NS_EL0	(1U << 28)
-> +#define ARMV8_PMU_INCLUDE_EL2		(1U << 27)
->   
->   /*
->    * PMUSERENR: user enable reg
+Ping?
 
