@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8F107C7830
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A1CD7C7831
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442853AbjJLUyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 16:54:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
+        id S1442858AbjJLUyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 16:54:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442643AbjJLUym (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 16:54:42 -0400
-Received: from out-194.mta1.migadu.com (out-194.mta1.migadu.com [IPv6:2001:41d0:203:375::c2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE01BE
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:40 -0700 (PDT)
+        with ESMTP id S1442850AbjJLUyo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 16:54:44 -0400
+Received: from out-209.mta1.migadu.com (out-209.mta1.migadu.com [95.215.58.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B6BECC
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:42 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697144078;
+        t=1697144080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wRuvR9d20FW3r49LLRBUOztpimezgSu3lq/SWcb2GhI=;
-        b=ZAcW9hZkEswreIr566SiZTk1SfoIHRLbMvYa2gXIxq9U5lKogs+Po51x2Lf5LlGtN+BL4q
-        DXg6qLI6h8xzxs6sew2csXqxK2zOBpGcM3f7QbUyQsi2v0/5FmEBYwyn/iIgXRAiB+0Efa
-        f5nCis7HbMGEJn2Z97IxAXEO38D3s1g=
+        bh=gvdyn9/HRYxuf5tqreNHPv4BH2I6iacI5CzV+SKoaOs=;
+        b=TnlFHtGvUlX7QD7ZisA03W6mwEwiwySJJh0O+dJFdWwtH3pAUR6U3L8xrnyQbu1fSwb7Yr
+        jcyZiFFmJBqspsoOroTqnXlYvdUyr1/+apYiuZuM2fVmT1q6wwD5HxHp0wDWw30PGEPHV3
+        L0jz29fBIUbmf8B8A6QDgH2xo0pMWTU=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -32,9 +32,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 4/5] KVM: arm64: Rename helpers for VHE vCPU load/put
-Date:   Thu, 12 Oct 2023 20:54:21 +0000
-Message-ID: <20231012205422.3924618-5-oliver.upton@linux.dev>
+Subject: [PATCH v2 5/5] KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()
+Date:   Thu, 12 Oct 2023 20:54:22 +0000
+Message-ID: <20231012205422.3924618-6-oliver.upton@linux.dev>
 In-Reply-To: <20231012205422.3924618-1-oliver.upton@linux.dev>
 References: <20231012205422.3924618-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -49,169 +49,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The names for the helpers we expose to the 'generic' KVM code are a bit
-imprecise; we switch the EL0 + EL1 sysreg context and setup trap
-controls that do not need to change for every guest entry/exit. Rename +
-shuffle things around a bit in preparation for loading the stage-2 MMU
-context on vcpu_load().
+To date the VHE code has aggressively reloaded the stage-2 MMU context
+on every guest entry, despite the fact that this isn't necessary. This
+was probably done for consistency with the nVHE code, which needs to
+switch in/out the stage-2 MMU context as both the host and guest run at
+EL1.
+
+Hoist __stage2_load() into kvm_vcpu_load_vhe(), thus avoiding a reload
+on every guest entry/exit. This is likely to be beneficial to systems
+with one of the speculative AT errata, as there is now one fewer context
+synchronization event on the guest entry path. Additionally, it is
+possible that implementations have hitched correctness mitigations on
+writes to VTTBR_EL2, which are now elided on guest re-entry.
+
+Note that __tlb_switch_to_guest() is deliberately left untouched as it
+can be called outside the context of a running vCPU, or possibly be
+called in a MMU notifier that needs to switch to a different stage-2
+context.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h  |  4 ++--
- arch/arm64/include/asm/kvm_hyp.h   |  2 ++
- arch/arm64/kvm/arm.c               |  4 ++--
- arch/arm64/kvm/hyp/vhe/switch.c    | 18 +++++++++++++++---
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 ++++-------
- 5 files changed, 25 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index be0ab101c557..759adee42018 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1109,8 +1109,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
- }
- #endif
- 
--void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
--void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu);
- 
- int __init kvm_set_ipa_limit(void);
- 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 66efd67ea7e8..80c779d1307a 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -93,6 +93,8 @@ void __timer_disable_traps(struct kvm_vcpu *vcpu);
- void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt);
- void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt);
- #else
-+void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu);
-+void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu);
- void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
- void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
- void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3ab904adbd64..584be562b1d4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -448,7 +448,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	kvm_vgic_load(vcpu);
- 	kvm_timer_vcpu_load(vcpu);
- 	if (has_vhe())
--		kvm_vcpu_load_sysregs_vhe(vcpu);
-+		kvm_vcpu_load_vhe(vcpu);
- 	kvm_arch_vcpu_load_fp(vcpu);
- 	kvm_vcpu_pmu_restore_guest(vcpu);
- 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
-@@ -472,7 +472,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	kvm_arch_vcpu_put_debug_state_flags(vcpu);
- 	kvm_arch_vcpu_put_fp(vcpu);
- 	if (has_vhe())
--		kvm_vcpu_put_sysregs_vhe(vcpu);
-+		kvm_vcpu_put_vhe(vcpu);
- 	kvm_timer_vcpu_put(vcpu);
- 	kvm_vgic_put(vcpu);
- 	kvm_vcpu_pmu_restore_host(vcpu);
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 6537f58b1a8c..d05b6a08dcde 100644
+index d05b6a08dcde..b0cafd7c5f8f 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -93,12 +93,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- NOKPROBE_SYMBOL(__deactivate_traps);
- 
- /*
-- * Disable IRQs in {activate,deactivate}_traps_vhe_{load,put}() to
-+ * Disable IRQs in __vcpu_{load,put}_{activate,deactivate}_traps() to
-  * prevent a race condition between context switching of PMUSERENR_EL0
-  * in __{activate,deactivate}_traps_common() and IPIs that attempts to
-  * update PMUSERENR_EL0. See also kvm_set_pmuserenr().
-  */
--void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
-+static void __vcpu_load_activate_traps(struct kvm_vcpu *vcpu)
+@@ -120,6 +120,7 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
  {
- 	unsigned long flags;
- 
-@@ -107,7 +107,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
- 	local_irq_restore(flags);
+ 	__vcpu_load_switch_sysregs(vcpu);
+ 	__vcpu_load_activate_traps(vcpu);
++	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
  }
  
--void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
-+static void __vcpu_put_deactivate_traps(struct kvm_vcpu *vcpu)
- {
- 	unsigned long flags;
+ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+@@ -182,17 +183,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_save_host_state_vhe(host_ctxt);
  
-@@ -116,6 +116,18 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	local_irq_restore(flags);
- }
+ 	/*
+-	 * ARM erratum 1165522 requires us to configure both stage 1 and
+-	 * stage 2 translation for the guest context before we clear
+-	 * HCR_EL2.TGE.
+-	 *
+-	 * We have already configured the guest's stage 1 translation in
+-	 * kvm_vcpu_load_sysregs_vhe above.  We must now call
+-	 * __load_stage2 before __activate_traps, because
+-	 * __load_stage2 configures stage 2 translation, and
+-	 * __activate_traps clear HCR_EL2.TGE (among other things).
++	 * Note that ARM erratum 1165522 requires us to configure both stage 1
++	 * and stage 2 translation for the guest context before we clear
++	 * HCR_EL2.TGE. The stage 1 and stage 2 guest context has already been
++	 * loaded on the CPU in kvm_vcpu_load_vhe().
+ 	 */
+-	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
+ 	__activate_traps(vcpu);
  
-+void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
-+{
-+	__vcpu_load_switch_sysregs(vcpu);
-+	__vcpu_load_activate_traps(vcpu);
-+}
-+
-+void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
-+{
-+	__vcpu_put_deactivate_traps(vcpu);
-+	__vcpu_put_switch_sysregs(vcpu);
-+}
-+
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index b35a178e7e0d..8e1e0d5033b6 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -52,7 +52,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
- 
- /**
-- * kvm_vcpu_load_sysregs_vhe - Load guest system registers to the physical CPU
-+ * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
-  *
-  * @vcpu: The VCPU pointer
-  *
-@@ -62,7 +62,7 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
-  * and loading system register state early avoids having to load them on
-  * every entry to the VM.
-  */
--void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
-+void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
-@@ -92,12 +92,10 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- 	__sysreg_restore_el1_state(guest_ctxt);
- 
- 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
--
--	activate_traps_vhe_load(vcpu);
- }
- 
- /**
-- * kvm_vcpu_put_sysregs_vhe - Restore host system registers to the physical CPU
-+ * __vcpu_put_switch_syregs - Restore host system registers to the physical CPU
-  *
-  * @vcpu: The VCPU pointer
-  *
-@@ -107,13 +105,12 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
-  * and deferring saving system register state until we're no longer running the
-  * VCPU avoids having to save them on every exit from the VM.
-  */
--void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
-+void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
- 
- 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
--	deactivate_traps_vhe_put(vcpu);
- 
- 	__sysreg_save_el1_state(guest_ctxt);
- 	__sysreg_save_user_state(guest_ctxt);
+ 	__kvm_adjust_pc(vcpu);
 -- 
 2.42.0.655.g421f12c284-goog
 
