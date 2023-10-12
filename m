@@ -2,28 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3427B7C782C
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A6107C782D
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442540AbjJLUyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 16:54:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45848 "EHLO
+        id S1442780AbjJLUyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 16:54:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347397AbjJLUyf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 16:54:35 -0400
-Received: from out-199.mta1.migadu.com (out-199.mta1.migadu.com [95.215.58.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC599D
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:33 -0700 (PDT)
+        with ESMTP id S1347397AbjJLUyg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 16:54:36 -0400
+Received: from out-195.mta1.migadu.com (out-195.mta1.migadu.com [95.215.58.195])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6803C9D
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:35 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697144072;
+        t=1697144073;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hH/6ryfUc+/tIlTi+eA+fuz2bDwWb8WV0AB+9dQDmYI=;
-        b=NedOA8L32M+cDyND6QvzqfqcnLdb3In0MFMQTGs+kTKZ3vW7Y7+Kqu+ah1HfZXmKvHctMJ
-        3QmhxnhCYVw7c9KUufz4iJK5WTm5PWLvkwr6wviD258P6i2XvuVUqxKyN0HZOhRagHed05
-        z15uuhYNsvocYxIyG1q2e3jfQEC9aCU=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j8joI2FU7W3rzo87zRemNZDf7BE+155GgP5KVsnPNxg=;
+        b=aXsjxWP8U/V6ZvSQscjtcnXuR5RseopbAzmt1mWVVQduuvKUoigWENFKarAtkCHAJzqVAt
+        Wn8txwL2N8cTvEyFOFAtCVAkFiC+uOLbgq/uWI/82H+/77/u1wvnOJVr+qtm5U2yyr82Oq
+        cHJUg/swJcbsPAxT96M3TWtBlBKvFJg=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -31,9 +32,11 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 0/5] KVM: arm64: Load stage-2 in vcpu_load() on VHE
-Date:   Thu, 12 Oct 2023 20:54:17 +0000
-Message-ID: <20231012205422.3924618-1-oliver.upton@linux.dev>
+Subject: [PATCH v2 1/5] KVM: arm64: Don't zero VTTBR in __tlb_switch_to_host()
+Date:   Thu, 12 Oct 2023 20:54:18 +0000
+Message-ID: <20231012205422.3924618-2-oliver.upton@linux.dev>
+In-Reply-To: <20231012205422.3924618-1-oliver.upton@linux.dev>
+References: <20231012205422.3924618-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
@@ -46,33 +49,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clearly my half-assed attempt at this series needed a bit of TLC.
-Respinning with Marc's diff to make sure the stage-2 is in a consistent
-state after VMID rollover and MMU notifiers triggering TLB invalidation.
+HCR_EL2.TGE=0 is sufficient to disable stage-2 translation, so there's
+no need to explicitly zero VTTBR_EL2.
 
-v2: https://lore.kernel.org/kvmarm/20231006093600.1250986-1-oliver.upton@linux.dev/
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/hyp/vhe/tlb.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Marc Zyngier (2):
-  KVM: arm64: Restore the stage-2 context in VHE's
-    __tlb_switch_to_host()
-  KVM: arm64: Reload stage-2 for VMID change on VHE
-
-Oliver Upton (3):
-  KVM: arm64: Don't zero VTTBR in __tlb_switch_to_host()
-  KVM: arm64: Rename helpers for VHE vCPU load/put
-  KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()
-
- arch/arm64/include/asm/kvm_host.h  |  6 +++---
- arch/arm64/include/asm/kvm_hyp.h   |  2 ++
- arch/arm64/kvm/arm.c               |  9 +++++---
- arch/arm64/kvm/hyp/vhe/switch.c    | 33 ++++++++++++++++++------------
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 ++++------
- arch/arm64/kvm/hyp/vhe/tlb.c       | 18 ++++++++++++----
- arch/arm64/kvm/vmid.c              | 11 +++++++---
- 7 files changed, 57 insertions(+), 33 deletions(-)
-
-
-base-commit: 6465e260f48790807eef06b583b38ca9789b6072
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index 46bd43f61d76..f3f2e142e4f4 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -66,7 +66,6 @@ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
+ 	 * We're done with the TLB operation, let's restore the host's
+ 	 * view of HCR_EL2.
+ 	 */
+-	write_sysreg(0, vttbr_el2);
+ 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+ 	isb();
+ 
 -- 
 2.42.0.655.g421f12c284-goog
 
