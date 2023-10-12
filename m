@@ -2,53 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D4E17C66F5
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 09:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97FB77C687D
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 10:54:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343665AbjJLHv1 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 12 Oct 2023 03:51:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55200 "EHLO
+        id S235478AbjJLIoz convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 12 Oct 2023 04:44:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343618AbjJLHvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 03:51:25 -0400
+        with ESMTP id S235430AbjJLIoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 04:44:54 -0400
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990ECB7
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 00:51:23 -0700 (PDT)
-Received: from lhrpeml500006.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5hbx03fdz6K6nT;
-        Thu, 12 Oct 2023 15:49:16 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859149D;
+        Thu, 12 Oct 2023 01:44:50 -0700 (PDT)
+Received: from lhrpeml100005.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5jnb2WXVz687rH;
+        Thu, 12 Oct 2023 16:42:43 +0800 (CST)
 Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
+ lhrpeml100005.china.huawei.com (7.191.160.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 12 Oct 2023 08:51:20 +0100
+ 15.1.2507.31; Thu, 12 Oct 2023 09:44:46 +0100
 Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
  lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Thu, 12 Oct 2023 08:51:20 +0100
+ Thu, 12 Oct 2023 09:44:46 +0100
 From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-CC:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        zhukeqian <zhukeqian1@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: RE: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty log
-Thread-Topic: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined dirty
- log
-Thread-Index: AQHZ1zeYniphcsNMdESdQqigwTISA7AZEKiAgAEU5SCAAPR6AIAFYYpQgCWUqmA=
-Date:   Thu, 12 Oct 2023 07:51:19 +0000
-Message-ID: <4396b28a9a0a41adbb70f94d98be73ae@huawei.com>
-References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
- <ZQHxm+L890yTpY91@linux.dev> <14eb2648eb594dd9a46a179733cee0df@huawei.com>
- <ZQOm9gUo8un+claf@linux.dev> <853b333084c4462a870bb2a37ec65935@huawei.com>
-In-Reply-To: <853b333084c4462a870bb2a37ec65935@huawei.com>
+To:     Brett Creeley <brett.creeley@amd.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "dan.carpenter@linaro.org" <dan.carpenter@linaro.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: RE: [PATCH v2 vfio 1/3] pds/vfio: Fix spinlock bad magic BUG
+Thread-Topic: [PATCH v2 vfio 1/3] pds/vfio: Fix spinlock bad magic BUG
+Thread-Index: AQHZ/JbkCnaV2OiQRk6iZK1jPCVjpLBF1igQ
+Date:   Thu, 12 Oct 2023 08:44:46 +0000
+Message-ID: <597df40289ac4ee59df04af0349874b7@huawei.com>
+References: <20231011230115.35719-1-brett.creeley@amd.com>
+ <20231011230115.35719-2-brett.creeley@amd.com>
+In-Reply-To: <20231011230115.35719-2-brett.creeley@amd.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -58,93 +51,81 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+
 
 > -----Original Message-----
-> From: linux-arm-kernel
-> [mailto:linux-arm-kernel-bounces@lists.infradead.org] On Behalf Of
-> Shameerali Kolothum Thodi
-> Sent: 18 September 2023 10:55
-> To: Oliver Upton <oliver.upton@linux.dev>
-> Cc: kvmarm@lists.linux.dev; kvm@vger.kernel.org;
-> linux-arm-kernel@lists.infradead.org; maz@kernel.org; will@kernel.org;
-> catalin.marinas@arm.com; james.morse@arm.com;
-> suzuki.poulose@arm.com; yuzenghui <yuzenghui@huawei.com>; zhukeqian
-> <zhukeqian1@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
-> Subject: RE: [RFC PATCH v2 0/8] KVM: arm64: Implement SW/HW combined
-> dirty log
- 
-[...]
-
-> > > Please let me know if there is a specific workload you have in mind.
-> >
-> > No objection to the workload you've chosen, I'm more concerned about
-> the
-> > benchmark finishing before live migration completes.
-> >
-> > What I'm looking for is something like this:
-> >
-> >  - Calculate the ops/sec your benchmark completes in steady state
-> >
-> >  - Do a live migration and sample the rate throughout the benchmark,
-> >    accounting for VM blackout time
-> >
-> >  - Calculate the area under the curve of:
-> >
-> >      y = steady_state_rate - live_migration_rate(t)
-> >
-> >  - Compare the area under the curve for write-protection and your DBM
-> >    approach.
+> From: Brett Creeley [mailto:brett.creeley@amd.com]
+> Sent: 12 October 2023 00:01
+> To: jgg@ziepe.ca; yishaih@nvidia.com; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; kevin.tian@intel.com;
+> alex.williamson@redhat.com; dan.carpenter@linaro.org
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> brett.creeley@amd.com; shannon.nelson@amd.com
+> Subject: [PATCH v2 vfio 1/3] pds/vfio: Fix spinlock bad magic BUG
 > 
-> Ok. Got it.
+> The following BUG was found when running on a kernel with
+> CONFIG_DEBUG_SPINLOCK=y set:
+> 
+> BUG: spinlock bad magic on CPU#2, bash/2481
+>  lock: 0xffff8d6052a88f50, .magic: 00000000, .owner:
+> <none>/-1, .owner_cpu: 0
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x36/0x50
+>  do_raw_spin_lock+0x79/0xc0
+>  pds_vfio_reset+0x1d/0x60 [pds_vfio_pci]
+>  pci_reset_function+0x4b/0x70
+>  reset_store+0x5b/0xa0
+>  kernfs_fop_write_iter+0x137/0x1d0
+>  vfs_write+0x2de/0x410
+>  ksys_write+0x5d/0xd0
+>  do_syscall_64+0x3b/0x90
+>  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> 
+> As shown, the .magic: 00000000, does not match the expected value. This
+> is because spin_lock_init() is never called for the reset_lock. Fix
+> this by calling spin_lock_init(&pds_vfio->reset_lock) when initializing
+> the device.
+> 
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-I attempted to benchmark the performance of this series better as suggested above.
+Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Used memcached/memaslap instead of redis-benchmark as this tool seems to dirty
-memory at a faster rate than redis-benchmark in my setup.
-
-./memaslap -s 127.0.0.1:11211 -S 1s  -F ./memslap.cnf -T 96 -c 96 -t 20m
-
-Please find the google sheet link below for the charts that compare the average
-throughput rates during the migration time window for 6.5-org and
-6.5-kvm-dbm branch.
-
-https://docs.google.com/spreadsheets/d/1T2F94Lsjpx080hW8OSxwbTJXihbXDNlTE1HjWCC0J_4/edit?usp=sharing
-
-Sheet #1 : is with autoconverge=on with default settings(initial-throttle 20 & increment 10).
-
-As you can see from the charts, if you compare the kvm-dbm branch throughput
-during the migration window of original branch, it is considerably higher.
-But the convergence time to finish migration increases almost at the same
-rate for KVM-DBM. This in effect results in a decreased overall avg. 
-throughput if we compare with the same time window of original branch.
-
-Sheet #2: is with autoconverge=on with throttle-increment set to 15 for kvm-dbm branch run.
-
-However, if we increase the migration throttling rate for kvm-dbm branch, 
-it looks to me we can still have better throughput during the migration
-window time and also an overall higher throughput rate with KVM-DBM solution.
- 
-Sheet: #3. Captures the dirty_log_perf_test times vs memory per vCPU. 
-
-This is also in line with the above results. KVM-DBM has better/constant-ish
-dirty memory time compared to linear increase noted for original. 
-But it is just the opposite for Get Dirty log time. 
-
-From the above, it looks to me there is a value addition in using HW DBM
-for write intensive workloads if we adjust the CPU throttling in the user space.
-
-Please take a look and let me know your feedback/thoughts.
+I think this needs to be fixed in HiSilicon driver as well. I will send out a 
+patch.
 
 Thanks,
 Shameer
+
+> ---
+>  drivers/vfio/pci/pds/vfio_dev.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
+> index 649b18ee394b..c351f588fa13 100644
+> --- a/drivers/vfio/pci/pds/vfio_dev.c
+> +++ b/drivers/vfio/pci/pds/vfio_dev.c
+> @@ -155,6 +155,8 @@ static int pds_vfio_init_device(struct vfio_device
+> *vdev)
+> 
+>  	pds_vfio->vf_id = vf_id;
+> 
+> +	spin_lock_init(&pds_vfio->reset_lock);
+> +
+>  	vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
+> VFIO_MIGRATION_P2P;
+>  	vdev->mig_ops = &pds_vfio_lm_ops;
+>  	vdev->log_ops = &pds_vfio_log_ops;
+> --
+> 2.17.1
+
