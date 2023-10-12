@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E0CD7C782F
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8F107C7830
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 22:54:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442834AbjJLUym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 16:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44938 "EHLO
+        id S1442853AbjJLUyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 16:54:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442643AbjJLUyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 16:54:41 -0400
-Received: from out-190.mta1.migadu.com (out-190.mta1.migadu.com [IPv6:2001:41d0:203:375::be])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A2B9D
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:38 -0700 (PDT)
+        with ESMTP id S1442643AbjJLUym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 16:54:42 -0400
+Received: from out-194.mta1.migadu.com (out-194.mta1.migadu.com [IPv6:2001:41d0:203:375::c2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE01BE
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 13:54:40 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697144077;
+        t=1697144078;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G3v4AfwsSErK80a0XO6d3BcxY96LblAlYK4wSGGTqtg=;
-        b=DVOcey/u6dGF+zMqoJNEwFxqJWaT+R159deGlq/dcbbZOJ/s3gE7i78b7JLaAhyjp80snT
-        8POaKn2D940zX70I5tBfUT5mimRPHHJQamBWfHsLhq7VWe1XUcvwKyY3cc1rrPjrZmWh2L
-        LXEd5LCifh+9/T382eZ68HyE4cD7yXE=
+        bh=wRuvR9d20FW3r49LLRBUOztpimezgSu3lq/SWcb2GhI=;
+        b=ZAcW9hZkEswreIr566SiZTk1SfoIHRLbMvYa2gXIxq9U5lKogs+Po51x2Lf5LlGtN+BL4q
+        DXg6qLI6h8xzxs6sew2csXqxK2zOBpGcM3f7QbUyQsi2v0/5FmEBYwyn/iIgXRAiB+0Efa
+        f5nCis7HbMGEJn2Z97IxAXEO38D3s1g=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -32,9 +32,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 3/5] KVM: arm64: Reload stage-2 for VMID change on VHE
-Date:   Thu, 12 Oct 2023 20:54:20 +0000
-Message-ID: <20231012205422.3924618-4-oliver.upton@linux.dev>
+Subject: [PATCH v2 4/5] KVM: arm64: Rename helpers for VHE vCPU load/put
+Date:   Thu, 12 Oct 2023 20:54:21 +0000
+Message-ID: <20231012205422.3924618-5-oliver.upton@linux.dev>
 In-Reply-To: <20231012205422.3924618-1-oliver.upton@linux.dev>
 References: <20231012205422.3924618-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -49,90 +49,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+The names for the helpers we expose to the 'generic' KVM code are a bit
+imprecise; we switch the EL0 + EL1 sysreg context and setup trap
+controls that do not need to change for every guest entry/exit. Rename +
+shuffle things around a bit in preparation for loading the stage-2 MMU
+context on vcpu_load().
 
-Naturally, a change to the VMID for an MMU implies a new value for
-VTTBR. Reload on VMID change in anticipation of loading stage-2 on
-vcpu_load() instead of every guest entry.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              |  5 ++++-
- arch/arm64/kvm/vmid.c             | 11 ++++++++---
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h  |  4 ++--
+ arch/arm64/include/asm/kvm_hyp.h   |  2 ++
+ arch/arm64/kvm/arm.c               |  4 ++--
+ arch/arm64/kvm/hyp/vhe/switch.c    | 18 +++++++++++++++---
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 ++++-------
+ 5 files changed, 25 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index af06ccb7ee34..be0ab101c557 100644
+index be0ab101c557..759adee42018 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1025,7 +1025,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
- extern unsigned int __ro_after_init kvm_arm_vmid_bits;
- int __init kvm_arm_vmid_alloc_init(void);
- void __init kvm_arm_vmid_alloc_free(void);
--void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
-+bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
- void kvm_arm_vmid_clear_active(void);
+@@ -1109,8 +1109,8 @@ static inline bool kvm_set_pmuserenr(u64 val)
+ }
+ #endif
  
- static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+-void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
+-void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu);
++void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
++void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu);
+ 
+ int __init kvm_set_ipa_limit(void);
+ 
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 66efd67ea7e8..80c779d1307a 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -93,6 +93,8 @@ void __timer_disable_traps(struct kvm_vcpu *vcpu);
+ void __sysreg_save_state_nvhe(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_state_nvhe(struct kvm_cpu_context *ctxt);
+ #else
++void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu);
++void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu);
+ void sysreg_save_host_state_vhe(struct kvm_cpu_context *ctxt);
+ void sysreg_restore_host_state_vhe(struct kvm_cpu_context *ctxt);
+ void sysreg_save_guest_state_vhe(struct kvm_cpu_context *ctxt);
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4866b3f7b4ea..3ab904adbd64 100644
+index 3ab904adbd64..584be562b1d4 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -950,7 +950,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 * making a thread's VMID inactive. So we need to call
- 		 * kvm_arm_vmid_update() in non-premptible context.
- 		 */
--		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
-+		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
-+		    has_vhe())
-+			__load_stage2(vcpu->arch.hw_mmu,
-+				      vcpu->arch.hw_mmu->arch);
- 
- 		kvm_pmu_flush_hwstate(vcpu);
- 
-diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
-index 7fe8ba1a2851..806223b7022a 100644
---- a/arch/arm64/kvm/vmid.c
-+++ b/arch/arm64/kvm/vmid.c
-@@ -135,10 +135,11 @@ void kvm_arm_vmid_clear_active(void)
- 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
- }
- 
--void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
-+bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
- {
- 	unsigned long flags;
- 	u64 vmid, old_active_vmid;
-+	bool updated = false;
- 
- 	vmid = atomic64_read(&kvm_vmid->id);
- 
-@@ -156,17 +157,21 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
- 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
- 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
- 					  old_active_vmid, vmid))
--		return;
-+		return false;
- 
- 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
- 
- 	/* Check that our VMID belongs to the current generation. */
- 	vmid = atomic64_read(&kvm_vmid->id);
--	if (!vmid_gen_match(vmid))
-+	if (!vmid_gen_match(vmid)) {
- 		vmid = new_vmid(kvm_vmid);
-+		updated = true;
-+	}
- 
- 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
- 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
-+
-+	return updated;
- }
+@@ -448,7 +448,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_vgic_load(vcpu);
+ 	kvm_timer_vcpu_load(vcpu);
+ 	if (has_vhe())
+-		kvm_vcpu_load_sysregs_vhe(vcpu);
++		kvm_vcpu_load_vhe(vcpu);
+ 	kvm_arch_vcpu_load_fp(vcpu);
+ 	kvm_vcpu_pmu_restore_guest(vcpu);
+ 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+@@ -472,7 +472,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	kvm_arch_vcpu_put_debug_state_flags(vcpu);
+ 	kvm_arch_vcpu_put_fp(vcpu);
+ 	if (has_vhe())
+-		kvm_vcpu_put_sysregs_vhe(vcpu);
++		kvm_vcpu_put_vhe(vcpu);
+ 	kvm_timer_vcpu_put(vcpu);
+ 	kvm_vgic_put(vcpu);
+ 	kvm_vcpu_pmu_restore_host(vcpu);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 6537f58b1a8c..d05b6a08dcde 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -93,12 +93,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ NOKPROBE_SYMBOL(__deactivate_traps);
  
  /*
+- * Disable IRQs in {activate,deactivate}_traps_vhe_{load,put}() to
++ * Disable IRQs in __vcpu_{load,put}_{activate,deactivate}_traps() to
+  * prevent a race condition between context switching of PMUSERENR_EL0
+  * in __{activate,deactivate}_traps_common() and IPIs that attempts to
+  * update PMUSERENR_EL0. See also kvm_set_pmuserenr().
+  */
+-void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
++static void __vcpu_load_activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long flags;
+ 
+@@ -107,7 +107,7 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ 	local_irq_restore(flags);
+ }
+ 
+-void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
++static void __vcpu_put_deactivate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long flags;
+ 
+@@ -116,6 +116,18 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 	local_irq_restore(flags);
+ }
+ 
++void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
++{
++	__vcpu_load_switch_sysregs(vcpu);
++	__vcpu_load_activate_traps(vcpu);
++}
++
++void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
++{
++	__vcpu_put_deactivate_traps(vcpu);
++	__vcpu_put_switch_sysregs(vcpu);
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index b35a178e7e0d..8e1e0d5033b6 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -52,7 +52,7 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+ 
+ /**
+- * kvm_vcpu_load_sysregs_vhe - Load guest system registers to the physical CPU
++ * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+  *
+  * @vcpu: The VCPU pointer
+  *
+@@ -62,7 +62,7 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+  * and loading system register state early avoids having to load them on
+  * every entry to the VM.
+  */
+-void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
++void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -92,12 +92,10 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
+ 	__sysreg_restore_el1_state(guest_ctxt);
+ 
+ 	vcpu_set_flag(vcpu, SYSREGS_ON_CPU);
+-
+-	activate_traps_vhe_load(vcpu);
+ }
+ 
+ /**
+- * kvm_vcpu_put_sysregs_vhe - Restore host system registers to the physical CPU
++ * __vcpu_put_switch_syregs - Restore host system registers to the physical CPU
+  *
+  * @vcpu: The VCPU pointer
+  *
+@@ -107,13 +105,12 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
+  * and deferring saving system register state until we're no longer running the
+  * VCPU avoids having to save them on every exit from the VM.
+  */
+-void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
++void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+ 	struct kvm_cpu_context *host_ctxt;
+ 
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+-	deactivate_traps_vhe_put(vcpu);
+ 
+ 	__sysreg_save_el1_state(guest_ctxt);
+ 	__sysreg_save_user_state(guest_ctxt);
 -- 
 2.42.0.655.g421f12c284-goog
 
