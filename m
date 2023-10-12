@@ -2,83 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD0577C70E3
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 17:02:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDD9A7C7108
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 17:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379176AbjJLPC4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 11:02:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45878 "EHLO
+        id S1379127AbjJLPJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 11:09:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378304AbjJLPCx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:02:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32DB90
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697122924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NqKWWi4N1dQcUV0pCxNw2tgDBfyOJnn+/IdI3vL5BCQ=;
-        b=inCkd4cYvj9SIJvVGJRueB+n4Y4XdXMWGxe0r7wjxr1ByTWESRf96HxZFajIgIWdbAHgmZ
-        /stWSUPz6g33p5DPMhrq/yMD4thVI12f1XsXOrKNqLBxUO/vyq6RbIvNMcHGV/rJj8mmHy
-        v3bozQHtbpVJL99K3lwvStbyzV5OTas=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-193-f46oJHoMOiOQzMflrV8SZw-1; Thu, 12 Oct 2023 11:02:02 -0400
-X-MC-Unique: f46oJHoMOiOQzMflrV8SZw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-65b13c48253so11813556d6.3
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:02:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697122922; x=1697727722;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NqKWWi4N1dQcUV0pCxNw2tgDBfyOJnn+/IdI3vL5BCQ=;
-        b=fkWTdp+1R8da4ViHA+v7YfkT4N4RuYgoQGaiDED1MHq0kN77MCHkrqWUu0Fgv5S6w5
-         qrBOy+Zk2ppeobwl/sbjf3Q3eZLMJdTh95tY3joI9qSiJUHJkM1E0iQ60+B1CSnR0l7y
-         PS32PxieB/XKf9Kccyijc8rnSVbyf9O11JuTYo9+793czLGBDiLghYh+pMo9cM2viudS
-         7g3W2wLAWI8xqOzhBncaOdp4mkyH8Sb//pdaABRFaOTnl7RlqZKYyKR80jPNHrsQnrjT
-         TkQgFRjkUBJ6qhgVRHyzfthp8ndfEk54m6/M/sk7MYGML7ta8WBZQU0Jt4evLXJQOUXr
-         5oFA==
-X-Gm-Message-State: AOJu0YwbyXDQETbWakn9spDKMEBbXA5SAX4xVao2TOEoOP4jiGwzxhwj
-        qpX3/8ZJc/dtNRf7SbgvUBrWzWc5Y3hlqwfFhqmeS7q0yVMy9nrSlfSfIE3SXRXHATClbIUjOpL
-        CQae4WbIMv8Ci
-X-Received: by 2002:a05:6214:5b03:b0:65d:1265:48c5 with SMTP id ma3-20020a0562145b0300b0065d126548c5mr25316340qvb.33.1697122921967;
-        Thu, 12 Oct 2023 08:02:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjRHnSSwx/haWRgrBki1YsFkWJjXmdjCoMi0wMoPVGd/LNcVTz7v5WLv1JGQct9yRT+ZM1Mw==
-X-Received: by 2002:a05:6214:5b03:b0:65d:1265:48c5 with SMTP id ma3-20020a0562145b0300b0065d126548c5mr25316134qvb.33.1697122919236;
-        Thu, 12 Oct 2023 08:01:59 -0700 (PDT)
-Received: from rh (p200300c93f266600211746b64b43cdf8.dip0.t-ipconnect.de. [2003:c9:3f26:6600:2117:46b6:4b43:cdf8])
-        by smtp.gmail.com with ESMTPSA id o15-20020a0cfa8f000000b0066cfbe4e0f4sm2140112qvn.26.2023.10.12.08.01.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 08:01:58 -0700 (PDT)
-Date:   Thu, 12 Oct 2023 17:01:54 +0200 (CEST)
-From:   Sebastian Ott <sebott@redhat.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce vpmu_counter_access
- test
-In-Reply-To: <44608d30-c97a-c725-e8b2-0c5a81440869@redhat.com>
-Message-ID: <65b8bbdb-2187-3c85-0e5d-24befcf01333@redhat.com>
-References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-11-rananta@google.com> <44608d30-c97a-c725-e8b2-0c5a81440869@redhat.com>
+        with ESMTP id S1346441AbjJLPJj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 11:09:39 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E150FC0;
+        Thu, 12 Oct 2023 08:09:36 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5tMX1WhJz67n0t;
+        Thu, 12 Oct 2023 23:09:12 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 12 Oct
+ 2023 16:09:34 +0100
+Date:   Thu, 12 Oct 2023 16:09:33 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Lukas Wunner <lukas@wunner.de>
+CC:     Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        "graf@amazon.com" <graf@amazon.com>,
+        "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "ming4.li@intel.com" <ming4.li@intel.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "helgaas@kernel.org" <helgaas@kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "dave.jiang@intel.com" <dave.jiang@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "aik@amd.com" <aik@amd.com>,
+        "david.e.box@intel.com" <david.e.box@intel.com>,
+        "linuxarm@huawei.com" <linuxarm@huawei.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>
+Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
+Message-ID: <20231012160933.00007c3d@Huawei.com>
+In-Reply-To: <20231012071629.GA6305@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
+        <20231003153937.000034ca@Huawei.com>
+        <caf11c28d21382cc1a81d84a23cbca9e70805a87.camel@wdc.com>
+        <20231012071629.GA6305@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="-1463795790-346822177-1697122918=:6347"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,75 +74,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Thu, 12 Oct 2023 09:16:29 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
----1463795790-346822177-1697122918=:6347
-Content-Type: text/plain; charset=ISO-8859-7; format=flowed
-Content-Transfer-Encoding: 8BIT
+> On Thu, Oct 12, 2023 at 03:26:44AM +0000, Alistair Francis wrote:
+> > On Tue, 2023-10-03 at 15:39 +0100, Jonathan Cameron wrote:  
+> > > On Thu, 28 Sep 2023 19:32:37 +0200 Lukas Wunner <lukas@wunner.de> wrote:  
+> > > > This implementation supports SPDM 1.0 through 1.3 (the latest
+> > > > version).  
+> > > 
+> > > I've no strong objection in allowing 1.0, but I think we do need
+> > > to control min version accepted somehow as I'm not that keen to get
+> > > security folk analyzing old version...  
+> > 
+> > Agreed. I'm not sure we even need to support 1.0  
+> 
+> According to PCIe r6.1 page 115 ("Reference Documents"):
+> 
+>    "CMA requires SPDM Version 1.0 or above.  IDE requires SPDM Version 1.1
+>     or above.  TDISP requires version 1.2 or above."
+> 
+> This could be interpreted as SPDM 1.0 support being mandatory to be
+> spec-compliant.  Even if we drop support for 1.0 from the initial
+> bringup patches, someone could later come along and propose a patch
+> to re-add it on the grounds of the above-quoted spec section.
+> So I think we can't avoid it.
 
-On Thu, 12 Oct 2023, Sebastian Ott wrote:
-> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
->>  +/* Create a VM that has one vCPU with PMUv3 configured. */
->>  +static void create_vpmu_vm(void *guest_code)
->>  +{
->>  +	struct kvm_vcpu_init init;
->>  +	uint8_t pmuver, ec;
->>  +	uint64_t dfr0, irq = 23;
->>  +	struct kvm_device_attr irq_attr = {
->>  +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
->>  +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
->>  +		.addr = (uint64_t)&irq,
->>  +	};
->>  +	struct kvm_device_attr init_attr = {
->>  +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
->>  +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
->>  +	};
->>  +
->>  +	/* The test creates the vpmu_vm multiple times. Ensure a clean state
->>  */
->>  +	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
->>  +
->>  +	vpmu_vm.vm = vm_create(1);
->>  +	vm_init_descriptor_tables(vpmu_vm.vm);
->>  +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
->>  +		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
->>  +					guest_sync_handler);
->>  +	}
->>  +
->>  +	/* Create vCPU with PMUv3 */
->>  +	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
->>  +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
->>  +	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
->>  +	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
->>  +	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
->>  +					GICD_BASE_GPA, GICR_BASE_GPA);
->>  +
->>  +	/* Make sure that PMUv3 support is indicated in the ID register */
->>  +	vcpu_get_reg(vpmu_vm.vcpu,
->>  +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
->>  +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), dfr0);
->>  +	TEST_ASSERT(pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
->>  +		    pmuver >= ID_AA64DFR0_PMUVER_8_0,
->>  +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3",
->>  pmuver);
->>  +
->>  +	/* Initialize vPMU */
->>  +	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
->>  +	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
->>  +}
->
-> This one fails to build for me:
-> aarch64/vpmu_counter_access.c: In function ¡create_vpmu_vm¢:
-> aarch64/vpmu_counter_access.c:456:47: error: ¡ID_AA64DFR0_PMUVER_MASK¢ 
-> undeclared (first use in this function); did you mean 
-> ¡ID_AA64DFR0_EL1_PMUVer_MASK¢?
->   456 |         pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
->   dfr0);
+I checked with some of our security folk and they didn't provide a
+reason to avoid 1.0.  It's not feature complete, but for what it does
+it's fine.  So given the PCI spec line you quote keep it for now.
+We should be careful to require the newer versions for the additional
+features though. Can address that when it's relevant.
 
-Looks like there's a clash with
-"KVM: arm64: selftests: Import automatic generation of sysreg defs"
-from:
- 	https://lore.kernel.org/r/20231003230408.3405722-12-oliver.upton@linux.dev
----1463795790-346822177-1697122918=:6347--
+Jonathan
+> 
+> Thanks,
+> 
+> Lukas
+> 
 
