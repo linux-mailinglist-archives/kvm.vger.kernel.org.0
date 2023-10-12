@@ -2,60 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5267C715A
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 17:25:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07EE37C710F
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 17:11:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347276AbjJLPZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 11:25:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
+        id S1343912AbjJLPL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 11:11:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231680AbjJLPZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:25:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD585E5
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:24:16 -0700 (PDT)
+        with ESMTP id S235737AbjJLPL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 11:11:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E78790
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:10:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697124255;
+        s=mimecast20190719; t=1697123442;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=SnlNYlYys/jeE6yxuOaD+SuptfzaBNLcDxainEQSeO1gzEaOGQU4IuuX70Lu/VBtz8brxR
-        On63J8PWZ9rLAeu4e3DWCa3ZrvPZN0FNOKCi5DKR08tCdxl1MXGMrtCcrVMTHhKnpeSXpt
-        eE6UKjOgvr5n80or/dP6Shmsbuh7lNk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-141-V_tUeBIrO-y31H3CRZvUIA-1; Thu, 12 Oct 2023 11:24:13 -0400
-X-MC-Unique: V_tUeBIrO-y31H3CRZvUIA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4968E81DA99;
-        Thu, 12 Oct 2023 15:24:09 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EB2BC2157F5C;
-        Thu, 12 Oct 2023 15:24:08 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] KVM: SVM: Fix build error when using -Werror=unused-but-set-variable
-Date:   Thu, 12 Oct 2023 11:09:43 -0400
-Message-Id: <20231012150943.1355240-1-pbonzini@redhat.com>
-In-Reply-To: <0da9874b6e9fcbaaa5edeb345d7e2a7c859fc818.1696271334.git.thomas.lendacky@amd.com>
-References: 
+        bh=G902YRH4gMYpL3ZSti9071jAR2nOwc1FYmNDsAZeTg8=;
+        b=fnMmOpbl3MGrUHYHWbeE2DCbxraHe/9yhkH7ZiYreN1QAMOh2OSWs1ZDkMe4pGpXTSauwy
+        IxhyZ6GBqgvlCrPmFtYP3axCWnBBsumsCrutM+xl7jLWnYPfX5bJx5h7UFXK8hM0oVKoka
+        VIE+ghjmZMXfH4bBSRL9asDy3zjSr9Q=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-7TpeddBmMWapG-RJNH3hjQ-1; Thu, 12 Oct 2023 11:10:39 -0400
+X-MC-Unique: 7TpeddBmMWapG-RJNH3hjQ-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3af5b5d816aso1513976b6e.3
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 08:10:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697123437; x=1697728237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G902YRH4gMYpL3ZSti9071jAR2nOwc1FYmNDsAZeTg8=;
+        b=QX4djVb63qBiFN9pkYfNXbvtK+PUSvfk/1yd+dm1qeCXGrG3AQMJFvNIOF9+ceKOdX
+         aeGcB2jYVWfBoJjmbcnNQkfYilh95dFnJjpV4F3ozb8L2VkpQFwiwkNYpYpuxhuU6MCm
+         NSXApcyQjkeFHc4V0AnzZMzDL1JuOWapLdHrGV2TardErw4KEmxA2qCL3wi1taZyRmbI
+         HTBy0gCiRgDjsjcityo8vhNIMY7rifjuNREHeDHD8BcyCShL7U0ftZf9/FpacKNHMJju
+         XP/747HoqKlyDepPgKmh/S3mVsCWKgVDiyl2L/cq2w2XOhi1Xn6ws69vyr5Pk1ByJqXa
+         xdMw==
+X-Gm-Message-State: AOJu0YwnWWfPc23lR4OWACv7LuVSEqUNNk1JwkSPIIAYUeJ5qGnhVfdt
+        0fIYds9BJAoKi3+uEEe3qSqr6ZYy9Jl8eGmaFUBxEv5N3E4+nOisarYolXglue9QlxdPT5pJfT5
+        mLZKuruCib8sTl6n96OMOff0zjR21MFESZ3jJ
+X-Received: by 2002:aca:1c0a:0:b0:3ae:aa6:dc0c with SMTP id c10-20020aca1c0a000000b003ae0aa6dc0cmr25467613oic.9.1697123436912;
+        Thu, 12 Oct 2023 08:10:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJo0OsSsOp3ULotW0l+15UUEJrghdAo4jXz8BKtcULxi61l2Ufj14ZsBlTMojK8MUO2luhwvvfwNeDNima55k=
+X-Received: by 2002:aca:1c0a:0:b0:3ae:aa6:dc0c with SMTP id
+ c10-20020aca1c0a000000b003ae0aa6dc0cmr25467596oic.9.1697123436675; Thu, 12
+ Oct 2023 08:10:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+References: <20230929155706.81033-1-imbrenda@linux.ibm.com>
+In-Reply-To: <20230929155706.81033-1-imbrenda@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 12 Oct 2023 17:10:24 +0200
+Message-ID: <CABgObfa-2YkYuv6agzUfeGA6zzwPa21O74ruDJcsrU=Jo_VGiA@mail.gmail.com>
+Subject: Re: [GIT PULL 0/1] KVM: s390: gisa: one fix for 6.6
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
+        linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,8 +74,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.
+On Fri, Sep 29, 2023 at 5:57=E2=80=AFPM Claudio Imbrenda <imbrenda@linux.ib=
+m.com> wrote:
+>
+> Hi Paolo,
+>
+> a small fix for gisa, please pull :)
+>
+>
+> Claudio
+>
+> The following changes since commit 6465e260f48790807eef06b583b38ca9789b60=
+72:
+>
+>   Linux 6.6-rc3 (2023-09-24 14:31:13 -0700)
+>
+> are available in the Git repository at:
+>
+>   ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.gi=
+t tags/kvm-s390-master-6.6-1
+
+Pulled, but you need to configure separate url/pushurl. :)
 
 Paolo
 
+>
+> for you to fetch changes up to f87ef5723536a6545ed9c43e18b13a9faceb3c80:
+>
+>   KVM: s390: fix gisa destroy operation might lead to cpu stalls (2023-09=
+-25 08:31:47 +0200)
+>
+> ----------------------------------------------------------------
+> One small fix for gisa to avoid stalls.
+>
+> ----------------------------------------------------------------
+>
+> Michael Mueller (1):
+>   KVM: s390: fix gisa destroy operation might lead to cpu stalls
+>
+>  arch/s390/kvm/interrupt.c | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
+>
+> --
+> 2.41.0
+>
 
