@@ -2,102 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FF407C6B23
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 12:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDF797C6B92
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 12:53:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377791AbjJLKal (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 06:30:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52452 "EHLO
+        id S1343795AbjJLKxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 06:53:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235628AbjJLKaj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 06:30:39 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEDD90
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 03:30:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697106638; x=1728642638;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hradNalj6PFxuR3qnMWgd3TgXQ0asLVDZrCofaoeVQI=;
-  b=Iu1maRYcMLqbCk1YVnXA2Dur+P70uFmDRUjRhHJXA/RLpVjti6AEHqJQ
-   eJhlS4ymp8Cr0T5ZOmuZbwjaYPJLGzSMj/KFDN122lLSHZFkIA/HVxQkf
-   vXu4oT88wcNW2E9aOuwuCJ/izPswHt9dnhLs4aPm63tgRWKNlfig8kIPo
-   V4U5U3NjQGbMxO4ZGjmUPC7Z7YXLDUSqpcZQPktRvDm8RIUkpbNWikGTx
-   zq91cEM7d1A9v0kyURTHu+0o3dNuAYAaRzJmqWnHuL45BnTm4WxBi5vd6
-   Iye2dB18wawejK2qsudBynyeoZPtJGOz4V4kQoU0S1DjilrPrXs6RL91D
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="449074060"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="449074060"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:30:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="820085773"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="820085773"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.93.29.0]) ([10.93.29.0])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:30:35 -0700
-Message-ID: <3aaec14f-6b54-6a4c-7fb3-49120607c42c@intel.com>
-Date:   Thu, 12 Oct 2023 18:30:33 +0800
+        with ESMTP id S235665AbjJLKxh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 06:53:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F5694
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 03:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697107969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WCc9mHbY2JlIHfp5VOa+l2dSwNloOuO6MCxzrGGXt3M=;
+        b=hi9u5ioUIuLoP8YX55QHfILRGzOfcUDfWq+2WumE271KiXLiZYgA/GzTRD9o6Y+Vo+ojIx
+        IDE+5jaRJMkHR6Eu0GIOvNXvP0GlvCtvQQ1Xlpbv8oS4dEwhw50yDz9z+/idVcrEEAFlxf
+        Xo3zVqSBwJBENP32Iu4yh4sI8JQrhuw=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-613-mB2sN3A_OEiCNPxsOs2rXA-1; Thu, 12 Oct 2023 06:52:48 -0400
+X-MC-Unique: mB2sN3A_OEiCNPxsOs2rXA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5043c463bf9so878228e87.0
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 03:52:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697107966; x=1697712766;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WCc9mHbY2JlIHfp5VOa+l2dSwNloOuO6MCxzrGGXt3M=;
+        b=Zm+dLDAgfyraFlx1OgreZ3Jk62rMQA/kC4d8hM1qzHrAvSymqHqwQ5zg/w8thJPcH/
+         T3ykCmA5BA0/2Y65jKCPwDKMUV4suElvC3v77NmS6fg/ofsAW0q8r1kvT1oSQx/vfzN7
+         rhMq9NM2580xGtd0bgJ0UNVKaZGE+b7AVZ6Us+enqVYsXgax5/eInaU2pQ72TEVZLtP7
+         5+Jv2iFi+K5JJ3Y/gkJJnQO9qHOEe022A1KKt2eE/Wow2dORnXlnTpd7h21M4s5qkgto
+         5YDPr2PR1C+2MyrjDgviP7StMVdC/2QMl2Qyr7v3j5/jfvaFk+OKr1MJqawVyi2Yk6MM
+         laew==
+X-Gm-Message-State: AOJu0YwIVukuaKwERKaqfKKS8GMynoPLZJz14VuMpFMQYlfKBe7yV8SX
+        LOvwV2g99epcn0m2OT2n/k4Sd52PjjFcaoAMhC7IIPJNSMGUeD1uOYNf/skEStqLezz89doB6Wg
+        EONfrx/ny0avXsVAf++oB
+X-Received: by 2002:a05:6512:ba6:b0:503:2877:67d3 with SMTP id b38-20020a0565120ba600b00503287767d3mr23005974lfv.67.1697107966264;
+        Thu, 12 Oct 2023 03:52:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzbTERUF8xEQetm4cgeqjsxy3FbcXouW9Y3QzwsFZi3a1d6dHvi0j5cXFUujnC5oFhbcHqgw==
+X-Received: by 2002:a05:6512:ba6:b0:503:2877:67d3 with SMTP id b38-20020a0565120ba600b00503287767d3mr23005953lfv.67.1697107965850;
+        Thu, 12 Oct 2023 03:52:45 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
+        by smtp.gmail.com with ESMTPSA id c4-20020a5d4cc4000000b003247d3e5d99sm17990316wrt.55.2023.10.12.03.52.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 03:52:45 -0700 (PDT)
+Date:   Thu, 12 Oct 2023 06:52:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Parav Pandit <parav@nvidia.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Feng Liu <feliu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH vfio 11/11] vfio/virtio: Introduce a vfio driver over
+ virtio devices
+Message-ID: <20231012065008-mutt-send-email-mst@kernel.org>
+References: <20230921152802-mutt-send-email-mst@kernel.org>
+ <20230921195345.GZ13733@nvidia.com>
+ <20230921155834-mutt-send-email-mst@kernel.org>
+ <CACGkMEvD+cTyRtax7_7TBNECQcGPcsziK+jCBgZcLJuETbyjYw@mail.gmail.com>
+ <20230922122246.GN13733@nvidia.com>
+ <PH0PR12MB548127753F25C45B7EFF203DDCFFA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACGkMEuX5HJVBOw9E+skr=K=QzH3oyHK8gk-r0hAvi6Wm7OA7Q@mail.gmail.com>
+ <PH0PR12MB5481ED78F7467EEB0740847EDCFCA@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <20230925141713-mutt-send-email-mst@kernel.org>
+ <PH0PR12MB5481AF4B2F61E96794D7ABC7DCC3A@PH0PR12MB5481.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over virtio
- device
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, maorg@nvidia.com,
-        virtualization@lists.linux-foundation.org,
-        Jason Gunthorpe <jgg@nvidia.com>, jiri@nvidia.com,
-        leonro@nvidia.com
-References: <ZSAG9cedvh+B0c0E@infradead.org>
- <20231010131031.GJ3952@nvidia.com>
- <20231010094756-mutt-send-email-mst@kernel.org>
- <20231010140849.GL3952@nvidia.com>
- <20231010105339-mutt-send-email-mst@kernel.org>
- <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
- <20231010111339-mutt-send-email-mst@kernel.org>
- <20231010155937.GN3952@nvidia.com> <ZSY9Cv5/e3nfA7ux@infradead.org>
- <20231011021454-mutt-send-email-mst@kernel.org>
- <ZSZHzs38Q3oqyn+Q@infradead.org>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <ZSZHzs38Q3oqyn+Q@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH0PR12MB5481AF4B2F61E96794D7ABC7DCC3A@PH0PR12MB5481.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Sep 26, 2023 at 03:45:36AM +0000, Parav Pandit wrote:
+> 
+> 
+> > From: Michael S. Tsirkin <mst@redhat.com>
+> > Sent: Tuesday, September 26, 2023 12:06 AM
+> 
+> > One can thinkably do that wait in hardware, though. Just defer completion until
+> > read is done.
+> >
+> Once OASIS does such new interface and if some hw vendor _actually_ wants to do such complex hw, may be vfio driver can adopt to it.
 
+The reset behaviour I describe is already in the spec. What else do you
+want OASIS to standardize? Virtio currently is just a register map it
+does not yet include suggestions on how exactly do pci express
+transactions look. You feel we should add that?
 
-On 10/11/2023 2:59 PM, Christoph Hellwig wrote:
-> On Wed, Oct 11, 2023 at 02:43:37AM -0400, Michael S. Tsirkin wrote:
->>> Btw, what is that intel thing everyone is talking about?  And why
->>> would the virtio core support vendor specific behavior like that?
->> It's not a thing it's Zhu Lingshan :) intel is just one of the vendors
->> that implemented vdpa support and so Zhu Lingshan from intel is working
->> on vdpa and has also proposed virtio spec extensions for migration.
->> intel's driver is called ifcvf.  vdpa composes all this stuff that is
->> added to vfio in userspace, so it's a different approach.
-> Well, so let's call it virtio live migration instead of intel.
->
-> And please work all together in the virtio committee that you have
-> one way of communication between controlling and controlled functions.
-> If one extension does it one way and the other a different way that's
-> just creating a giant mess.
-I hope so, Jason Wang has proposed a solution to cooperate, but sadly
-rejected...
->
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+-- 
+MST
 
