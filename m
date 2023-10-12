@@ -2,150 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D9687C6FF7
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 16:04:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E7607C7007
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 16:08:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378664AbjJLOEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 10:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51920 "EHLO
+        id S235734AbjJLOII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 10:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235730AbjJLOEl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 10:04:41 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976F1BB
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 07:04:39 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-694ed847889so836331b3a.2
-        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 07:04:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1697119479; x=1697724279; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3ropCljelAQ4xMLZKutsQltAGHtknBuH4fIH4/voyA=;
-        b=CgvDTUxgRcPBjvvF2097VDXV5sKlAs5zL8jKsivI/j+YQ+cl2UaJdgrkQTAbZpzZcq
-         rLHv7TjDQnMa9mWvk9dqsTTWKYNVYcooAGR9cNYYI38hRIwDM4ABa3ilj0e2G5VIf7rl
-         DK6Zg5ZhuQg696sEBw1s7xgzyWFQKLoY1xqq/lDjl3ZM035WZUDNMPjyTAsiZMViqz9X
-         qcUQQ+p/WcjZW+4LHAPM7XQD2IG9BfMImqHvVMK9bn7rL7OzhAfELd3052v8ue1VghJI
-         jvEzKm4kGaimY4UiQzkZAvlAT4XH5UqCYuefNqOSBM2T4sHiaHYUump6qVnX+tPHcVfL
-         VYQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697119479; x=1697724279;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q3ropCljelAQ4xMLZKutsQltAGHtknBuH4fIH4/voyA=;
-        b=m3Hnsi+NJmOVdqrznRYSOHMm/6PewFlVg/+iuehkbBsjOngDFoX5Th0Lz8FkeSF/Y/
-         sJWL4t2XH7jRcvP6M3MdiedmJGG2hUv9M7ZBfx45hLyOErvcRdbXEIt+/NkVImwLnQwL
-         7jDzqERC8LfFWAZeTypV0jFrxP3zCZzyGZfPD0aYnsowGjqXnpqV0d1pIx/w0iPbH4tk
-         /kG+13T5UkWkdnMM7/GhnIO0sS37juX98KRFqkptziFZ8hQNbTu9OKeb7SwbSJQL3aNf
-         CsCbvs5WhdORVuSQPlj77Z8eU7xhM1E6UJKtK8yAHDRwrnBB8FptvbygniQo1VPQ21Gq
-         00KA==
-X-Gm-Message-State: AOJu0Yy4f6Lq9jIHxm2mChwbatpXI2orWpu8qIIGy+cYfOkDMwyqs5cy
-        JKLxwOi0i7YmSOFZAAXHDG83Unqbx313Z3Xc2aSGEQ==
-X-Google-Smtp-Source: AGHT+IFYzz1udWcTeV4meGkJeMqGjEeSeMlU+XeqwQooukBcx18KN/ZD2OzwwabFVNJ4dm5BRlOrQ5y5vfkWL1S6KVI=
-X-Received: by 2002:a05:6a20:c518:b0:14b:7d8b:cbaf with SMTP id
- gm24-20020a056a20c51800b0014b7d8bcbafmr18395717pzb.57.1697119478939; Thu, 12
- Oct 2023 07:04:38 -0700 (PDT)
+        with ESMTP id S235176AbjJLOII (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 10:08:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 771EFB8
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 07:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697119641;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qlCZfTkqNOxM/nWc4shz1NXl1XUnP9vA0JMHEFMp3Tg=;
+        b=de35OaPY9jNt/qkwPYDMmNuUFpHcYd4afeqBdxzR0QPBKQvwA3lnxFjzEwOiyauXu3XZ9M
+        TIyl2DKf6jZcDmGu82vZQznMtmrY99ALe4MgxVEy3q/fs6qWdgZHQlfbPUnUHDO0rOCP95
+        oYdrktYMYRhttMIgck8xieLfbaICx8o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-340-OOkfY9pBPmuKOeVgxWMc5Q-1; Thu, 12 Oct 2023 10:07:17 -0400
+X-MC-Unique: OOkfY9pBPmuKOeVgxWMc5Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D37858DBAEF;
+        Thu, 12 Oct 2023 14:07:15 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B656E4EA48;
+        Thu, 12 Oct 2023 14:07:15 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com
+Subject: [PATCH gmem FIXUP] selftests/kvm: guestmem: check fstat results on guestmem fd
+Date:   Thu, 12 Oct 2023 10:07:15 -0400
+Message-Id: <20231012140715.2445237-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20231003035226.1945725-1-apatel@ventanamicro.com> <CAAhSdy0P=5WiFfFyMHjkd63JKCcjsTsvhLTNgUB+LOCd8A9iOQ@mail.gmail.com>
-In-Reply-To: <CAAhSdy0P=5WiFfFyMHjkd63JKCcjsTsvhLTNgUB+LOCd8A9iOQ@mail.gmail.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 12 Oct 2023 19:34:27 +0530
-Message-ID: <CAAhSdy2XLqB-NPVfqYdO07bPxkc2VXBpethHppiKkBms2ysvZA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/6] KVM RISC-V Conditional Operations
-To:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Conor Dooley <conor@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Anup Patel <apatel@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Palmer,
+Do a basic sanity cheeck for the st_size and st_ino fields of
+a guestmem file descriptor.  The test would fail for example
+if guestmem.c used the innocuous-sounding function
+anon_inode_getfile() instead of the correct one,
+anon_inode_getfile_secure().
 
-On Thu, Oct 5, 2023 at 11:35=E2=80=AFAM Anup Patel <anup@brainfault.org> wr=
-ote:
->
-> On Tue, Oct 3, 2023 at 9:22=E2=80=AFAM Anup Patel <apatel@ventanamicro.co=
-m> wrote:
-> >
-> > This series extends KVM RISC-V to allow Guest/VM discover and use
-> > conditional operations related ISA extensions (namely XVentanaCondOps
-> > and Zicond).
-> >
-> > To try these patches, use KVMTOOL from riscv_zbx_zicntr_smstateen_condo=
-ps_v1
-> > branch at: https://github.com/avpatel/kvmtool.git
-> >
-> > These patches are based upon the latest riscv_kvm_queue and can also be
-> > found in the riscv_kvm_condops_v3 branch at:
-> > https://github.com/avpatel/linux.git
-> >
-> > Changes since v2:
-> >  - Dropped patch1, patch2, and patch5 since these patches don't meet
-> >    the requirements of patch acceptance policy.
-> >
-> > Changes since v1:
-> >  - Rebased the series on riscv_kvm_queue
-> >  - Split PATCH1 and PATCH2 of v1 series into two patches
-> >  - Added separate test configs for XVentanaCondOps and Zicond in PATCH7
-> >    of v1 series.
-> >
-> > Anup Patel (6):
-> >   dt-bindings: riscv: Add Zicond extension entry
-> >   RISC-V: Detect Zicond from ISA string
-> >   RISC-V: KVM: Allow Zicond extension for Guest/VM
-> >   KVM: riscv: selftests: Add senvcfg register to get-reg-list test
-> >   KVM: riscv: selftests: Add smstateen registers to get-reg-list test
-> >   KVM: riscv: selftests: Add condops extensions to get-reg-list test
->
-> Queued this series for Linux-6.7
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ .../testing/selftests/kvm/guest_memfd_test.c  | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-I have created shared tag kvm-riscv-shared-tag-6.7 in the
-KVM RISC-V repo at:
-https://github.com/kvm-riscv/linux.git
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index 75073645aaa1..9805b0f8f26a 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -91,6 +91,31 @@ static void test_fallocate(int fd, size_t page_size, size_t total_size)
+ 	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
+ }
+ 
++static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
++{
++	int fd1, fd2, ret;
++	struct stat st1, st2;
++
++	fd1 = __vm_create_guest_memfd(vm, 4096, 0);
++	TEST_ASSERT(fd1 != -1, "memfd creation should succeed");
++
++	ret = fstat(fd1, &st1);
++	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	TEST_ASSERT(st1.st_size == 4096, "memfd st_size should match requested size");
++
++	fd2 = __vm_create_guest_memfd(vm, 8192, 0);
++	TEST_ASSERT(fd2 != -1, "memfd creation should succeed");
++
++	ret = fstat(fd2, &st2);
++	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	TEST_ASSERT(st2.st_size == 8192, "second memfd st_size should match requested size");
++
++	ret = fstat(fd1, &st1);
++	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	TEST_ASSERT(st1.st_size == 4096, "first memfd st_size should still match requested size");
++	TEST_ASSERT(st1.st_ino != st2.st_ino, "different memfd should have different inode numbers");
++}
++
+ static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+ {
+ 	uint64_t valid_flags = 0;
+@@ -153,6 +178,7 @@ int main(int argc, char *argv[])
+ 	vm = vm_create_barebones();
+ 
+ 	test_create_guest_memfd_invalid(vm);
++	test_create_guest_memfd_multiple(vm);
+ 
+ 	fd = vm_create_guest_memfd(vm, total_size, 0);
+ 
+-- 
+2.39.1
 
-This shared tag is based on 6.6-rc5 and contains following 4 patches:
-dt-bindings: riscv: Add Zicond extension entry
-RISC-V: Detect Zicond from ISA string
-dt-bindings: riscv: Add smstateen entry
-RISC-V: Detect Smstateen extension
-
-Thanks,
-Anup
-
-
-
->
-> Thanks,
-> Anup
->
-> >
-> >  .../devicetree/bindings/riscv/extensions.yaml |  6 +++
-> >  arch/riscv/include/asm/hwcap.h                |  1 +
-> >  arch/riscv/include/uapi/asm/kvm.h             |  1 +
-> >  arch/riscv/kernel/cpufeature.c                |  1 +
-> >  arch/riscv/kvm/vcpu_onereg.c                  |  2 +
-> >  .../selftests/kvm/riscv/get-reg-list.c        | 54 +++++++++++++++++++
-> >  6 files changed, 65 insertions(+)
-> >
-> > --
-> > 2.34.1
-> >
