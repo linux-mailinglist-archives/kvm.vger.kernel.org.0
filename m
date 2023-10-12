@@ -2,103 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C07A47C6940
-	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 11:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95AE87C69E7
+	for <lists+kvm@lfdr.de>; Thu, 12 Oct 2023 11:43:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235564AbjJLJQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Oct 2023 05:16:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
+        id S235593AbjJLJnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Oct 2023 05:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234133AbjJLJP7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Oct 2023 05:15:59 -0400
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C274ED;
-        Thu, 12 Oct 2023 02:15:45 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id DACAF100DCEF1;
-        Thu, 12 Oct 2023 11:15:42 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 8BED2224D1; Thu, 12 Oct 2023 11:15:42 +0200 (CEST)
-Date:   Thu, 12 Oct 2023 11:15:42 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231012091542.GA22596@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
- <20231007100433.GA7596@wunner.de>
- <20231009123335.00006d3d@Huawei.com>
- <20231009134950.GA7097@wunner.de>
- <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+        with ESMTP id S235586AbjJLJnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Oct 2023 05:43:37 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A2730B7
+        for <kvm@vger.kernel.org>; Thu, 12 Oct 2023 02:43:33 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14DDC13D5;
+        Thu, 12 Oct 2023 02:44:14 -0700 (PDT)
+Received: from [10.57.69.218] (unknown [10.57.69.218])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F27153F762;
+        Thu, 12 Oct 2023 02:43:31 -0700 (PDT)
+Message-ID: <2e724a19-1a58-ac6d-1697-c4a2b7a6962a@arm.com>
+Date:   Thu, 12 Oct 2023 10:43:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 2/2] KVM: arm64: Treat PMEVTYPER<n>_EL0.NSH as RES0
+Content-Language: en-US
+To:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>
+References: <20231011081649.3226792-1-oliver.upton@linux.dev>
+ <20231011081649.3226792-3-oliver.upton@linux.dev>
+From:   James Clark <james.clark@arm.com>
+In-Reply-To: <20231011081649.3226792-3-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
-> But the way SPDM is done now is that if the user (as myself) wants to let
-> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
-> as CMA is not a (un)loadable module or built-in (with some "blacklist"
-> parameters), and does not provide a sysfs knob to control its tentacles.
-> Kinda harsh.
 
-On AMD SEV-TIO, does the PSP perform SPDM exchanges with a device
-*before* it is passed through to a guest?  If so, why does it do that?
 
-Dan and I discussed this off-list and Dan is arguing for lazy attestation,
-i.e. the TSM should only have the need to perform SPDM exchanges with
-the device when it is passed through.
+On 11/10/2023 09:16, Oliver Upton wrote:
+> Prevent the guest from setting the NSH bit, which enables event counting
+> while the PE is in EL2. kvm_pmu_create_perf_event() never wired up the
+> bit, nor does it make any sense in the context of a guest without NV.
+> 
+> While at it, build the event type mask using explicit field definitions
+> instead of relying on ARMV8_PMU_EVTYPE_MASK. KVM probably should've been
+> doing this in the first place, as it avoids changes to the
+> aforementioned mask affecting sysreg emulation.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 0666212c0c15..087764435390 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -663,8 +663,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  	if (!kvm_vcpu_has_pmu(vcpu))
+>  		return;
+>  
+> -	mask  =  ARMV8_PMU_EVTYPE_MASK;
 
-So the host enumerates the DOE protocols and authenticates the device.
-When the device is passed through, patch 12/12 ensures that the host
-keeps its hands off of the device, thus affording the TSM exclusive
-SPDM control.
+ARMV8_PMU_EVTYPE_MASK is still used in access_pmu_evtyper() and
+reset_pmevtyper(), although it's not really an issue if you can't set
+the bits in the first place. But it probably makes sense to use the same
+mask everywhere.
 
-I agree that the commit message of 12/12 is utterly misleading in that
-it says "the guest" is granted exclusive control.  It should say "the TSM"
-instead.  (There might be implementations where the guest itself has
-the role of the TSM and authenticates the device on its own behalf,
-but PCIe r6.1 sec 11 uses the term "TSM" so that's what the commit
-message needs to use.)
-
-However apart from the necessary rewrite of the commit message and
-perhaps a rename of the PCI_CMA_OWNED_BY_GUEST flag, I think patch 12/12
-should already be doing exactly what you need -- provided that the
-PSP doesn't perform SPDM exchanges before passthrough.  If it already
-performs them, say, on boot, I'd like to understand the reason.
-
-Thanks,
-
-Lukas
+> -	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
+> +	mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
+>  	mask |= kvm_pmu_event_mask(vcpu->kvm);
+>  
+>  	reg = counter_index_to_evtreg(pmc->idx);
