@@ -2,115 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7F47C7FCB
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 10:17:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE0287C8096
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 10:48:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230039AbjJMIRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 04:17:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58472 "EHLO
+        id S230198AbjJMIsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 04:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbjJMIRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 04:17:16 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F0CB8;
-        Fri, 13 Oct 2023 01:17:13 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39D8EXBO024101;
-        Fri, 13 Oct 2023 08:17:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- subject : from : to : message-id : date; s=pp1;
- bh=YMss3qvH5n5i3zv6eQXuaH84AzGxuWuOERg/VATRoR4=;
- b=bZCwLj7M8YEMkGE93Ap82mJyQ5B8PsXDHhmNjE29NQnmxX4Mpi0SAEDz+Hy+Z98yiL1B
- w22oLh5/MwgJRjbBsJjofJ9WyN9DXFl1aGD14POQbkqAUjBBeQRfLHtgXJR09rjEgFQZ
- GIg6Q9albpqDAqOUt6y2Rz5P4d2MfefjmwD5OMvbI2dcZneUdlU20MdBfnA91YqStVvm
- HWg/rtFj5BCLIAiYc4WXkelYf5+nh30N3QO4qC2xA/CvZsb53ADxalMkpnyzbSO92lYZ
- cqk0A2Ap/FOZ3EHSHHWe7qgGLDK4vmnS15RBxeW5/1CW7FjnkG553MEyxcq7th1DkTJj JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq275r3rh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 08:17:02 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39D8F4UW025800;
-        Fri, 13 Oct 2023 08:17:01 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq275r3r8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 08:17:01 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39D5Kkp8026153;
-        Fri, 13 Oct 2023 08:17:01 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tpt54tjxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 08:17:01 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39D8Gw0822544980
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Oct 2023 08:16:58 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 464CE20043;
-        Fri, 13 Oct 2023 08:16:58 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 02A5E20040;
-        Fri, 13 Oct 2023 08:16:58 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.48.43])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Oct 2023 08:16:57 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230187AbjJMIsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 04:48:00 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF70CE
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 01:47:58 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-4054496bde3so19177025e9.1
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 01:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697186876; x=1697791676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y+COywZA7y0+Apw7N1rtPw8VsMqViKoTFFZDNe6TkQ8=;
+        b=AiHw/S3CwDrJhYjqn/ncuTFdTFbzQxJUUP6WpbDA+LJKrTaGZHRtIT2WDISc3Od0ct
+         1d2W16IGuuw2FCpfOizG+xZRxicFbbAXSnYBJiFHCZT5Stdcx6qCI7gL/Y7X/6viywxH
+         8Wm7ntUYlK2zaZ30yOoGy6gltSW6hN23lyzTURNP/HKzHwI2uSZe7gBpqjR8n/gmy529
+         mcA6tJba40RGcZWQ9Unk4CrpMVSToO9m2Q75J+DEYGULYAXXjLLlqBfP4/ONn1VybpSP
+         leQdaVax9k8XUiaVSEFqAUDfufj8i1pCVfyGT/1N1HfUhsLdgBrW1WZrySL9ajHxTWI8
+         dfzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697186876; x=1697791676;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y+COywZA7y0+Apw7N1rtPw8VsMqViKoTFFZDNe6TkQ8=;
+        b=OnTsYAAJdeCaTJUdy8A0DAWoE8ypV+7b114bS8laNlMxw63ZuTRZahcczi7r311f6Q
+         EyJw4OLBRVowTEzbSo27KOo24rwDQbvD5Oz060m1KqWsAFNRQ01wzYi/ioQye0cuaxJb
+         W7HmxFhFbcI3iUMmUx3V/F27ZvF6cGTGo14O74pJjHKixzyyjIfgnO3N7L/UVpwXyl9y
+         onrh79Pszze6kxhPnRSrOrRe4AFaWQt0txNg8FbhnwJJ3iy3DF0FhOvi0O+WogkkT0QH
+         zCZuWECFL9keiN0tQoqA9RgX1kIc2V2N42/TaLLRu3LbEd+hdjUkq7zwVLbFWInJYGQL
+         cNaA==
+X-Gm-Message-State: AOJu0Ywd5KAQSJmb2VOKVC3Q8/FKWVBXtab70ZPqUVzK2xLaREl2nhg2
+        8BiyadwH0DfrPXA5A6ztmYONVm0+5eEun/4caFQ=
+X-Google-Smtp-Source: AGHT+IGHzEiITjsNBBv2hlXYoWDibsoEESnLabiapiM99BVzEyACgQD6Tcf/PGvLf2OdwpLdmmxbow==
+X-Received: by 2002:adf:e383:0:b0:320:1c4:e213 with SMTP id e3-20020adfe383000000b0032001c4e213mr22789101wrm.1.1697186876712;
+        Fri, 13 Oct 2023 01:47:56 -0700 (PDT)
+Received: from localhost.localdomain (adsl-170.109.242.226.tellas.gr. [109.242.226.170])
+        by smtp.gmail.com with ESMTPSA id v10-20020a5d678a000000b0032d9f32b96csm569185wru.62.2023.10.13.01.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 01:47:56 -0700 (PDT)
+From:   Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>,
+        Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <rbolshakov@ddn.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        kvm@vger.kernel.org (open list:X86 KVM CPUs)
+Subject: [RFC PATCH v3 25/78] target/i386: add fallthrough pseudo-keyword
+Date:   Fri, 13 Oct 2023 11:45:53 +0300
+Message-Id: <76c17deab18b857ea01ed4b7f06a2d56d1977ff6.1697186560.git.manos.pitsidianakis@linaro.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <cover.1697186560.git.manos.pitsidianakis@linaro.org>
+References: <cover.1697186560.git.manos.pitsidianakis@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231011085635.1996346-5-nsg@linux.ibm.com>
-References: <20231011085635.1996346-1-nsg@linux.ibm.com> <20231011085635.1996346-5-nsg@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
-        Colton Lewis <coltonlewis@google.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 4/9] s390x: topology: Don't use non unique message
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Message-ID: <169718501727.15841.5127785267238990595@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 13 Oct 2023 10:16:57 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: l9RxvhO_MokNU0BY24TDKa0UtLUD6vnE
-X-Proofpoint-GUID: PpgITw4z9rD2165P_LQl1amYazvP1lx-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-13_03,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- suspectscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- phishscore=0 impostorscore=0 bulkscore=0 mlxscore=0 adultscore=0
- mlxlogscore=858 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310130067
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:27)
-> When we test something, i.e. do a report() we want unique messages,
-> otherwise, from the test output, it will appear as if the same test was
-> run multiple times, possible with different PASS/FAIL values.
->=20
-> Convert some reports that don't actually test anything topology specific
-> into asserts.
-> Refine the report message for others.
->=20
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+In preparation of raising -Wimplicit-fallthrough to 5, replace all
+fall-through comments with the fallthrough attribute pseudo-keyword.
 
-There is still the "TLE: reserved bits 0000000000000000" message which may
-be duplicate, but I think you fix that in a later patch.
+Signed-off-by: Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>
+---
+ target/i386/cpu.c                | 2 +-
+ target/i386/hvf/x86_decode.c     | 1 +
+ target/i386/kvm/kvm.c            | 4 ++--
+ target/i386/tcg/decode-new.c.inc | 6 +++---
+ target/i386/tcg/emit.c.inc       | 2 +-
+ target/i386/tcg/translate.c      | 8 +++-----
+ 6 files changed, 11 insertions(+), 12 deletions(-)
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index cec5d2b7b6..f73784edca 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6133,7 +6133,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                                         eax, ebx, ecx, edx);
+                     break;
+                 }
+-                /* fall through */
++                fallthrough;
+             default: /* end of info */
+                 *eax = *ebx = *ecx = *edx = 0;
+                 break;
+diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
+index 3728d7705e..7c2e3dab8d 100644
+--- a/target/i386/hvf/x86_decode.c
++++ b/target/i386/hvf/x86_decode.c
+@@ -1886,6 +1886,7 @@ static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
+                 break;
+             }
+             /* fall through when not in long mode */
++            fallthrough;
+         default:
+             decode->len--;
+             return;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index f6c7f7e268..d283d56aa9 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -553,7 +553,7 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+                 value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
+             }
+         }
+-        /* fall through */
++        fallthrough;
+     case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
+     case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
+     case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+@@ -1962,7 +1962,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             if (env->nr_dies < 2) {
+                 break;
+             }
+-            /* fallthrough */
++            fallthrough;
+         case 4:
+         case 0xb:
+         case 0xd:
+diff --git a/target/i386/tcg/decode-new.c.inc b/target/i386/tcg/decode-new.c.inc
+index 7d76f15275..0e663e9124 100644
+--- a/target/i386/tcg/decode-new.c.inc
++++ b/target/i386/tcg/decode-new.c.inc
+@@ -1108,7 +1108,7 @@ static bool decode_op_size(DisasContext *s, X86OpEntry *e, X86OpSize size, MemOp
+             *ot = MO_64;
+             return true;
+         }
+-        /* fall through */
++        fallthrough;
+     case X86_SIZE_ps: /* SSE/AVX packed single precision */
+     case X86_SIZE_pd: /* SSE/AVX packed double precision */
+         *ot = s->vex_l ? MO_256 : MO_128;
+@@ -1220,7 +1220,7 @@ static bool decode_op(DisasContext *s, CPUX86State *env, X86DecodedInsn *decode,
+ 
+     case X86_TYPE_WM:  /* modrm byte selects an XMM/YMM memory operand */
+         op->unit = X86_OP_SSE;
+-        /* fall through */
++        fallthrough;
+     case X86_TYPE_M:  /* modrm byte selects a memory operand */
+         modrm = get_modrm(s, env);
+         if ((modrm >> 6) == 3) {
+@@ -1538,7 +1538,7 @@ static bool validate_vex(DisasContext *s, X86DecodedInsn *decode)
+             (decode->op[2].n == decode->mem.index || decode->op[2].n == decode->op[1].n)) {
+             goto illegal;
+         }
+-        /* fall through */
++        fallthrough;
+     case 6:
+     case 11:
+         if (!(s->prefix & PREFIX_VEX)) {
+diff --git a/target/i386/tcg/emit.c.inc b/target/i386/tcg/emit.c.inc
+index 88793ba988..0e0a2efbf9 100644
+--- a/target/i386/tcg/emit.c.inc
++++ b/target/i386/tcg/emit.c.inc
+@@ -209,7 +209,7 @@ static bool sse_needs_alignment(DisasContext *s, X86DecodedInsn *decode, MemOp o
+             /* MOST legacy SSE instructions require aligned memory operands, but not all.  */
+             return false;
+         }
+-        /* fall through */
++        fallthrough;
+     case 1:
+         return ot >= MO_128;
+ 
+diff --git a/target/i386/tcg/translate.c b/target/i386/tcg/translate.c
+index e42e3dd653..77a8fcc5e1 100644
+--- a/target/i386/tcg/translate.c
++++ b/target/i386/tcg/translate.c
+@@ -1004,7 +1004,7 @@ static CCPrepare gen_prepare_eflags_s(DisasContext *s, TCGv reg)
+     switch (s->cc_op) {
+     case CC_OP_DYNAMIC:
+         gen_compute_eflags(s);
+-        /* FALLTHRU */
++        fallthrough;
+     case CC_OP_EFLAGS:
+     case CC_OP_ADCX:
+     case CC_OP_ADOX:
+@@ -1047,7 +1047,7 @@ static CCPrepare gen_prepare_eflags_z(DisasContext *s, TCGv reg)
+     switch (s->cc_op) {
+     case CC_OP_DYNAMIC:
+         gen_compute_eflags(s);
+-        /* FALLTHRU */
++        fallthrough;
+     case CC_OP_EFLAGS:
+     case CC_OP_ADCX:
+     case CC_OP_ADOX:
+@@ -3298,7 +3298,6 @@ static bool disas_insn(DisasContext *s, CPUState *cpu)
+     case 0x82:
+         if (CODE64(s))
+             goto illegal_op;
+-        /* fall through */
+         fallthrough;
+     case 0x80: /* GRP1 */
+     case 0x81:
+@@ -6733,7 +6732,7 @@ static bool disas_insn(DisasContext *s, CPUState *cpu)
+                 }
+                 break;
+             }
+-            /* fallthru */
++            fallthrough;
+         case 0xf9 ... 0xff: /* sfence */
+             if (!(s->cpuid_features & CPUID_SSE)
+                 || (prefixes & PREFIX_LOCK)) {
+@@ -7047,7 +7046,6 @@ static void i386_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+     case DISAS_EOB_NEXT:
+         gen_update_cc_op(dc);
+         gen_update_eip_cur(dc);
+-        /* fall through */
+         fallthrough;
+     case DISAS_EOB_ONLY:
+         gen_eob(dc);
+-- 
+2.39.2
+
