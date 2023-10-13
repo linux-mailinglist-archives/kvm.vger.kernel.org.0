@@ -2,132 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD9027C8735
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 15:51:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13D927C8749
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 16:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231489AbjJMNvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 09:51:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60838 "EHLO
+        id S231989AbjJMOBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 10:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbjJMNvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 09:51:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A211D95
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 06:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697205041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B+Ghitg1zY89Jip2T1goMJnTgMi5VDf/XGEOeNsAVBs=;
-        b=OUO1XZA79LQxc2cx7on/ay+wGJdkkm22oZ+sb/dYHNmYkG3M1lfANDOyiEqnXpyGm982MJ
-        4u58AkLquwyoYVd0StbjooI8XHsdKjUzo4jxnq3rEuKaO3WsA1DpomwE3WsjRZvzsMVf7u
-        5rzI7ZMdGIVjNrUypyOhPrGLi98WZFQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-ixW8JdNUNTm6Sq-VOFhKeA-1; Fri, 13 Oct 2023 09:50:30 -0400
-X-MC-Unique: ixW8JdNUNTm6Sq-VOFhKeA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31f79595669so1467259f8f.0
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 06:50:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697205029; x=1697809829;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B+Ghitg1zY89Jip2T1goMJnTgMi5VDf/XGEOeNsAVBs=;
-        b=GatuXRT8eGM52HKwAr114bSHaHbs62kmmHIfRXq1xd/rb4U7mC8xQ1g4Q+CZGQCmTa
-         kkT0SOdAHA6XvVrJ6TStUwM9C2RqaT5GXGcxKOHgkw2n8KJ56jikERtymtBYx/pYPjG2
-         oIFdoRPe/8p6CMvAXdLuTej8o9ldc1PoH4G/1Jc6cQj/BzMY/br4B2qYFKM/j+mrFESp
-         Obcbf7YX4AFrxsbZ2zub6bW0M8Y5S4s3BqLcmIuYsKOCpRIRJ+9rW7jFUpzcLF13xxJt
-         wGzm1ywKZsuCoQ4RVapwwre+hj219tlyZLXnpo1JD0K1v9BgGOzKN7zkaKltTNjOQiNS
-         KbLA==
-X-Gm-Message-State: AOJu0YzA9lFO1r+SNQVy8BpsAv2ZF/mNK61zITWuYzIRWG/RZhUj6U2k
-        4qx/hTMFkgl88M7PfyXhTzJK3mDZWiW4RAKHTPe/SJAhXCOGlYdejEtEs1+1jBYfFaVNpJ6rvU4
-        x6WYI5gFHpXOb
-X-Received: by 2002:adf:e412:0:b0:319:5234:5c92 with SMTP id g18-20020adfe412000000b0031952345c92mr120245wrm.35.1697205029099;
-        Fri, 13 Oct 2023 06:50:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFy51rKDdAxtUym1VLRrNj6iWl5I9WPsUhrr6dkM69Wf9Z+UOFeOueRGKhYYJIybHTT8hScQQ==
-X-Received: by 2002:adf:e412:0:b0:319:5234:5c92 with SMTP id g18-20020adfe412000000b0031952345c92mr120230wrm.35.1697205028759;
-        Fri, 13 Oct 2023 06:50:28 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:175:cf7d:d542:c2ef:a65c:aaad])
-        by smtp.gmail.com with ESMTPSA id q14-20020adfcb8e000000b003296b488961sm20135825wrh.31.2023.10.13.06.50.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 06:50:28 -0700 (PDT)
-Date:   Fri, 13 Oct 2023 09:50:24 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Maor Gottlieb <maorg@nvidia.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <20231013094959-mutt-send-email-mst@kernel.org>
-References: <e979dfa2-0733-7f0f-dd17-49ed89ef6c40@nvidia.com>
- <20231010111339-mutt-send-email-mst@kernel.org>
- <20231010155937.GN3952@nvidia.com>
- <ZSY9Cv5/e3nfA7ux@infradead.org>
- <20231011021454-mutt-send-email-mst@kernel.org>
- <ZSZHzs38Q3oqyn+Q@infradead.org>
- <PH0PR12MB5481336B395F38E875ED11D8DCCCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <c75bb669-76fe-ef12-817e-2a8b5f0b317b@intel.com>
- <20231012132749.GK3952@nvidia.com>
- <840d4c6f-4150-4818-a66c-1dbe1474b4c6@intel.com>
+        with ESMTP id S229688AbjJMOB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 10:01:29 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6310F95;
+        Fri, 13 Oct 2023 07:01:27 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8872E11FB;
+        Fri, 13 Oct 2023 07:02:07 -0700 (PDT)
+Received: from FVFF77S0Q05N.cambridge.arm.com (FVFF77S0Q05N.cambridge.arm.com [10.1.34.145])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2A553F762;
+        Fri, 13 Oct 2023 07:01:24 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 15:01:22 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Tianyi Liu <i.pear@outlook.com>
+Cc:     maz@kernel.org, acme@kernel.org, adrian.hunter@intel.com,
+        alexander.shishkin@linux.intel.com, irogers@google.com,
+        jolsa@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, mingo@redhat.com,
+        namhyung@kernel.org, pbonzini@redhat.com, peterz@infradead.org,
+        seanjc@google.com, x86@kernel.org
+Subject: Re: [PATCH v2 0/5] perf: KVM: Enable callchains for guests
+Message-ID: <ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com>
+References: <8734yhm7km.wl-maz@kernel.org>
+ <SY4P282MB108434CA47F2C55E490A1C6B9DD3A@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <840d4c6f-4150-4818-a66c-1dbe1474b4c6@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <SY4P282MB108434CA47F2C55E490A1C6B9DD3A@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 13, 2023 at 06:28:34PM +0800, Zhu, Lingshan wrote:
+On Thu, Oct 12, 2023 at 02:35:42PM +0800, Tianyi Liu wrote:
+> Hi Marc,
 > 
+> On Sun, 11 Oct 2023 16:45:17 +0000, Marc Zyngier wrote:
+> > > The event processing flow is as follows (shown as backtrace):
+> > >   #0 kvm_arch_vcpu_get_frame_pointer / kvm_arch_vcpu_read_virt (per arch)
+> > >   #1 kvm_guest_get_frame_pointer / kvm_guest_read_virt
+> > >      <callback function pointers in `struct perf_guest_info_callbacks`>
+> > >   #2 perf_guest_get_frame_pointer / perf_guest_read_virt
+> > >   #3 perf_callchain_guest
+> > >   #4 get_perf_callchain
+> > >   #5 perf_callchain
+> > >
+> > > Between #0 and #1 is the interface between KVM and the arch-specific
+> > > impl, while between #1 and #2 is the interface between Perf and KVM.
+> > > The 1st patch implements #0. The 2nd patch extends interfaces between #1
+> > > and #2, while the 3rd patch implements #1. The 4th patch implements #3
+> > > and modifies #4 #5. The last patch is for userspace utils.
+> > >
+> > > Since arm64 hasn't provided some foundational infrastructure (interface
+> > > for reading from a virtual address of guest), the arm64 implementation
+> > > is stubbed for now because it's a bit complex, and will be implemented
+> > > later.
+> > 
+> > I hope you realise that such an "interface" would be, by definition,
+> > fragile and very likely to break in a subtle way. The only existing
+> > case where we walk the guest's page tables is for NV, and even that is
+> > extremely fragile.
 > 
-> On 10/12/2023 9:27 PM, Jason Gunthorpe wrote:
-> 
->     On Thu, Oct 12, 2023 at 06:29:47PM +0800, Zhu, Lingshan wrote:
-> 
-> 
->         sorry for the late reply, we have discussed this for weeks in virtio mailing
->         list. I have proposed a live migration solution which is a config space solution.
-> 
->     I'm sorry that can't be a serious proposal - config space can't do
->     DMA, it is not suitable.
-> 
-> config space only controls the live migration process and config the related
-> facilities.
-> We don't use config space to transfer data.
-> 
-> The new added registers work like queue_enable or features.
-> 
-> For example, we use DMA to report dirty pages and MMIO to fetch the dirty data.
-> 
-> I remember in another thread you said:"you can't use DMA for any migration
-> flows"
-> 
-> And I agree to that statement, so we use config space registers to control the
-> flow.
-> 
-> Thanks,
-> Zhu Lingshan
-> 
-> 
->     Jason
-> 
+> For walking the guest's page tables, yes, there're only very few
+> use cases. Most of them are used in nested virtualization and XEN.
 
-If you are using dma then I don't see what's wrong with admin vq.
-dma is all it does.
+The key point isn't the lack of use cases; the key point is that *this is
+fragile*.
 
+Consider that walking guest page tables is only safe because:
+
+(a) The walks happen in the guest-physical / intermiediate-physical address
+    space of the guest, and so are not themselves subject to translation via
+    the guest's page tables.
+
+(b) Special traps were added to the architecture (e.g. for TLB invalidation)
+    which allow the host to avoid race conditions when the guest modifies page
+    tables.
+
+For unwind we'd have to walk structures in the guest's virtual address space,
+which can change under our feet at any time the guest is running, and handling
+that requires much more care.
+
+I think this needs a stronger justification, and an explanation of how you
+handle such races.
+
+Mark.
+
+> > Given that, I really wonder why this needs to happen in the kernel.
+> > Userspace has all the required information to interrupt a vcpu and
+> > walk its current context, without any additional kernel support. What
+> > are the bits here that cannot be implemented anywhere else?
+> 
+> Thanks for pointing this out, I agree with your opinion.
+> Whether it's walking guest's contexts or performing an unwind,
+> user space can indeed accomplish these tasks.
+> The only reasons I see for implementing them in the kernel are performance
+> and the access to a broader range of PMU events.
+> 
+> Consider if I were to implement these functionalities in userspace:
+> I could have `perf kvm` periodically access the guest through the KVM API
+> to retrieve the necessary information. However, interrupting a VCPU
+> through the KVM API from user space might introduce higher latency
+> (not tested specifically), and the overhead of syscalls could also
+> limit the sampling frequency.
+> 
+> Additionally, it seems that user space can only interrupt the VCPU
+> at a certain frequency, without harnessing the richness of the PMU's
+> performance events. And if we incorporate the logic into the kernel,
+> `perf kvm` can bind to various PMU events and sample with a faster
+> performance in PMU interrupts.
+> 
+> So, it appears to be a tradeoff -- whether it's necessary to introduce
+> more complexity in the kernel to gain access to a broader range and more
+> precise performance data with less overhead. In my current use case,
+> I just require simple periodic sampling, which is sufficient for me,
+> so I'm open to both approaches.
+> 
+> > > Tianyi Liu (5):
+> > >   KVM: Add arch specific interfaces for sampling guest callchains
+> > >   perf kvm: Introduce guest interfaces for sampling callchains
+> > >   KVM: implement new perf interfaces
+> > >   perf kvm: Support sampling guest callchains
+> > >   perf tools: Support PERF_CONTEXT_GUEST_* flags
+> > >
+> > >  arch/arm64/kvm/arm.c                | 17 +++++++++
+> > 
+> > Given that there is more to KVM than just arm64 and x86, I suggest
+> > that you move the lack of support for this feature into the main KVM
+> > code.
+> 
+> Currently, sampling for KVM guests is only available for the guest's
+> instruction pointer, and even the support is limited, it is available
+> on only two architectures (x86 and arm64). This functionality relies on
+> a kernel configuration option called `CONFIG_GUEST_PERF_EVENTS`,
+> which will only be enabled on x86 and arm64.
+> Within the main KVM code, these interfaces are enclosed within
+> `#ifdef CONFIG_GUEST_PERF_EVENTS`. Do you think these are enough?
+> 
+> Best regards,
+> Tianyi Liu
