@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A847C8E3E
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 22:25:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CABDF7C8E5A
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 22:28:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232062AbjJMUZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 16:25:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        id S232130AbjJMU2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 16:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbjJMUZI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 16:25:08 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51C4BB
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 13:25:05 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-3514ece5ed4so6585ab.1
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 13:25:05 -0700 (PDT)
+        with ESMTP id S232021AbjJMU2T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 16:28:19 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F44DD9
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 13:28:11 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c9c145bb5bso10635ad.1
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 13:28:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697228705; x=1697833505; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697228891; x=1697833691; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pqAeTW3JeHR2NgxF+OPMVJ48NQjtKJfCWCw4Wwse+lk=;
-        b=YUvVFEkCKzorMIna/Vc6KCU1QJlmsb7SiSv2V9G9SWvpzhnR/IrMOhSjhHBRsMDO4T
-         1EzbPu3QmL9V6WIHayTOH4DvQkeSmH+zJRsBu5OzLQv3GYOmaQkzS585lLVrSKGdBrZN
-         1i4CAAdU2EicMjBaIcKI/AbvaGEmNU2326XqCqaxUkUSrXA8HYF7Owgd54BvMUE2Ra1m
-         7J27Y1nZosMp2ppZwFvwN5218AV1EKzzYfmnNTrbUTSMpUknXtcbfC1uVTsyoSd8G8NK
-         PE60CABFa1cuBuNR1tIA6vstyrVCFz+qWr2LaLphMPktm6V0V5+3EGhgCwFQyY9BS0BO
-         O9aw==
+        bh=hQUYjiIQQuKU5hgKTdO4y33bIv6BP+oihrBBQRGii7o=;
+        b=UYA8RGf51Wm2aL9KLEoBcMOSHOhgyks35se5vv9WlreKNxE3WgsMtlPVMUcq+IxrZU
+         F2CqkLOyuyzm1XTZ/zMScp7bY9uAyYB7ZViTjBDlyGgvby1D/naFJrFTrcW5sf/ysRRZ
+         IKexW0WeDXtOiKJE0RSYvyLXvwNEQ2t9GRWQS7kYUCnAQHCVsp0Nl4MMvUT5mwiJHO1E
+         bX0Ka8j8xIznky4MbbX5FFjE48eST84GA8Hjoqb3wUTDyA+vgXa4KNR+ejkuuU68Dd7C
+         jNWoZtN8YV4P3Cn9sEZ0mQbZt/iySIABLjl2w/r3yyuLcbyPJ3IlDottr7dviW9ITdyJ
+         viXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697228705; x=1697833505;
+        d=1e100.net; s=20230601; t=1697228891; x=1697833691;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pqAeTW3JeHR2NgxF+OPMVJ48NQjtKJfCWCw4Wwse+lk=;
-        b=MYAIaA5hrD/dtU4kc3VLuf/i/xIduR8G+x5hvZH4kyEr+154VRpl5gNYmlizq9X4xY
-         eLyJT7FuuplzPETxv9wdyqDlwwOtFP9wpBoTvg22+T2KntMswmqN7sG7bOjHqRyRi2u8
-         mydX2WWdexov40xV6D/1jD9HYo5c8CHdVgRyBms6wjcXDvtmpsE8mT7dh1b67FB7yggV
-         E3KzDlvOhKBHg60PLBgQbN+gw8cKpPRO7f+Nz+kFLwpOK9oGeG010RfHWmtUsYIQ2trs
-         27rqvsiTL/O/LSZ2bl4ZToLR/bApwGgbY9X7VU2g7jdF5/xstAnyI9vt+eTciNDplrr3
-         zPjQ==
-X-Gm-Message-State: AOJu0YyBYaY6eGYT1esmSbikv8nVgiTPYQiJ1t5dznKc8is9kImhbCkT
-        f8sFy5zhrwioZXL5xrEjsOWXSVe5xa6O4RMhiux0lw==
-X-Google-Smtp-Source: AGHT+IH3FYJ8icPieu2/ai2TXNcA8zCg7+rWyoOf+Iq4ZbCOKrHHuD6XmPVTgbe/B7M4h1eHHImeEnUWJbuZ8PtUB1c=
-X-Received: by 2002:a05:6e02:220e:b0:351:efb:143d with SMTP id
- j14-20020a056e02220e00b003510efb143dmr29195ilf.22.1697228704929; Fri, 13 Oct
- 2023 13:25:04 -0700 (PDT)
+        bh=hQUYjiIQQuKU5hgKTdO4y33bIv6BP+oihrBBQRGii7o=;
+        b=PDIpMaJJyH5v2B7as6gHXMwapC95Zt+dxXg78/RD7CSYIEOrxqINWy/ncI6ts+iMkt
+         v8cIkTA/9qbpwBRa+S22eqAwFiNqt8MCp9oRgu3aZWEA3oIAvKY4lE+Wbg6xefJ0Dm9/
+         78MTQK9g4ht6iwc/ct9hCMFawR1IiYXL8GOBOggSp30nh9X0w7sWdxVZzXqq6k6VFNvg
+         ThF6C9Dv0H+hIFpcYHQickV+LjCaf05Ya5IAlsJwhxYQrSYQy6TPzP1+itLEc/Ys31RY
+         jIIjAaLdAfrhJFPw4srnVtCLoVAi7FZ6BB0Ze/zVIDOBNTjVqmLC16G7YDpSLkhydPgf
+         fi8Q==
+X-Gm-Message-State: AOJu0Ywze9kn5MnnvjAg3BwX9suO3/Wp2Nb29w05grVrJgMIuSnW0MVk
+        CCym47b7z5lhbHGZ+A+IM7YR/KxirjPQUGyc7ZgQXw==
+X-Google-Smtp-Source: AGHT+IF+wbBQUzCClYbIsavRQnVYMQpZNLI2ELD+7IF1suaSE/kY6/BRJ0kMNOpbN7SpoHfHj5jpKNFUpadFhMTbM8Q=
+X-Received: by 2002:a17:903:40c1:b0:1ca:42a:1773 with SMTP id
+ t1-20020a17090340c100b001ca042a1773mr33105pld.12.1697228890595; Fri, 13 Oct
+ 2023 13:28:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-7-rananta@google.com>
- <ZSXQh2P_l5xcj7zS@linux.dev> <ZSjY5XCCoji6MjqC@linux.dev>
-In-Reply-To: <ZSjY5XCCoji6MjqC@linux.dev>
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-3-rananta@google.com>
+ <ZSXPbKH519uWXytf@linux.dev>
+In-Reply-To: <ZSXPbKH519uWXytf@linux.dev>
 From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 13 Oct 2023 13:24:52 -0700
-Message-ID: <CAJHc60yjiuyacbKytTx_ry8=_574CqwzoWdMH7ehBYswCpk5ig@mail.gmail.com>
-Subject: Re: [PATCH v7 06/12] KVM: arm64: PMU: Add a helper to read the number
- of counters
+Date:   Fri, 13 Oct 2023 13:27:58 -0700
+Message-ID: <CAJHc60yBnA00Vv=vVeDuS=ccN-Ak4ZEgYvCfGWcfP3g3Zq+Uzg@mail.gmail.com>
+Subject: Re: [PATCH v7 02/12] KVM: arm64: PMU: Set the default PMU for the
+ guest before vCPU reset
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -72,8 +72,8 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,56 +81,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Thu, Oct 12, 2023 at 10:43=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
+On Tue, Oct 10, 2023 at 3:25=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
 >
-> On Tue, Oct 10, 2023 at 10:30:31PM +0000, Oliver Upton wrote:
-> > On Mon, Oct 09, 2023 at 11:08:52PM +0000, Raghavendra Rao Ananta wrote:
-> > > Add a helper, kvm_arm_get_num_counters(), to read the number
-> > > of counters from the arm_pmu associated to the VM. Make the
-> > > function global as upcoming patches will be interested to
-> > > know the value while setting the PMCR.N of the guest from
-> > > userspace.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/kvm/pmu-emul.c | 17 +++++++++++++++++
-> > >  include/kvm/arm_pmu.h     |  6 ++++++
-> > >  2 files changed, 23 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index a161d6266a5c..84aa8efd9163 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -873,6 +873,23 @@ static bool pmu_irq_is_valid(struct kvm *kvm, in=
-t irq)
-> > >     return true;
-> > >  }
-> > >
-> > > +/**
-> > > + * kvm_arm_get_num_counters - Get the number of general-purpose PMU =
-counters.
-> > > + * @kvm: The kvm pointer
-> > > + */
-> > > +int kvm_arm_get_num_counters(struct kvm *kvm)
+> Hi Raghu,
+>
+> On Mon, Oct 09, 2023 at 11:08:48PM +0000, Raghavendra Rao Ananta wrote:
+> > From: Reiji Watanabe <reijiw@google.com>
 > >
-> > nit: the naming suggests this returns the configured number of PMCs, no=
-t
-> > the limit.
+> > The following patches will use the number of counters information
+> > from the arm_pmu and use this to set the PMCR.N for the guest
+> > during vCPU reset. However, since the guest is not associated
+> > with any arm_pmu until userspace configures the vPMU device
+> > attributes, and a reset can happen before this event, assign a
+> > default PMU to the guest just before doing the reset.
 > >
-> > Maybe kvm_arm_pmu_get_max_counters()?
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/kvm/arm.c      | 20 ++++++++++++++++++++
+> >  arch/arm64/kvm/pmu-emul.c | 12 ++----------
+> >  include/kvm/arm_pmu.h     |  6 ++++++
+> >  3 files changed, 28 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 78b0970eb8e6..708a53b70a7b 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1313,6 +1313,23 @@ static bool kvm_vcpu_init_changed(struct kvm_vcp=
+u *vcpu,
+> >                            KVM_VCPU_MAX_FEATURES);
+> >  }
+> >
+> > +static int kvm_vcpu_set_pmu(struct kvm_vcpu *vcpu)
+> > +{
+> > +     struct kvm *kvm =3D vcpu->kvm;
+> > +
+> > +     if (!kvm_arm_support_pmu_v3())
+> > +             return -EINVAL;
 >
-Sure, kvm_arm_pmu_get_max_counters() it is!
+> This check is pointless; the vCPU feature flags have been sanitised at
+> this point, and a requirement of having PMUv3 is that this predicate is
+> true.
+>
+Oh yes. I'll avoid this in v8.
 
-> Following up on the matter -- please try to avoid sending patches that
-> add helpers without any users. Lifting *existing* logic into a helper
-> and updating the callsites is itself worthy of a separate patch. But
-> adding a new function called by nobody doesn't do much, and can easily
-> be squashed into the patch that consumes the new logic.
+> > +     /*
+> > +      * When the vCPU has a PMU, but no PMU is set for the guest
+> > +      * yet, set the default one.
+> > +      */
+> > +     if (unlikely(!kvm->arch.arm_pmu))
+> > +             return kvm_arm_set_default_pmu(kvm);
+> > +
+> > +     return 0;
+> > +}
+> > +
 >
-Sounds good. I'll squash patches of this type into the caller patches.
+> Apologies, I believe I was unclear last time around as to what I was
+> wanting here. Let's call this thing kvm_setup_vcpu() such that we can
+> add other one-time setup activities to it in the future.
+>
+> Something like:
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 96641e442039..4896a44108e0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1265,19 +1265,17 @@ static bool kvm_vcpu_init_changed(struct kvm_vcpu=
+ *vcpu,
+>                              KVM_VCPU_MAX_FEATURES);
+>  }
+>
+> -static int kvm_vcpu_set_pmu(struct kvm_vcpu *vcpu)
+> +static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm *kvm =3D vcpu->kvm;
+>
+> -       if (!kvm_arm_support_pmu_v3())
+> -               return -EINVAL;
+> -
+>         /*
+>          * When the vCPU has a PMU, but no PMU is set for the guest
+>          * yet, set the default one.
+>          */
+> -       if (unlikely(!kvm->arch.arm_pmu))
+> -               return kvm_arm_set_default_pmu(kvm);
+> +       if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu &&
+> +           kvm_arm_set_default_pmu(kvm))
+> +               return -EINVAL;
+>
+>         return 0;
+>  }
+> @@ -1297,7 +1295,8 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *v=
+cpu,
+>
+>         bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEAT=
+URES);
+>
+> -       if (kvm_vcpu_has_pmu(vcpu) && kvm_vcpu_set_pmu(vcpu))
+> +       ret =3D kvm_setup_vcpu(vcpu);
+> +       if (ret)
+>                 goto out_unlock;
+>
+>         /* Now we know what it is, we can reset it. */
+>
+Introducing kvm_setup_vcpu() seems better than directly calling
+kvm_vcpu_set_pmu(), which feels like it's crashing a party.
 
 Thank you.
 Raghavendra
