@@ -2,121 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A99907C81C6
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 11:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 943797C82A8
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 11:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230402AbjJMJSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 05:18:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49752 "EHLO
+        id S231230AbjJMJ6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 05:58:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230369AbjJMJSc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 05:18:32 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C54395;
-        Fri, 13 Oct 2023 02:18:30 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39D9ERmZ032594;
-        Fri, 13 Oct 2023 09:18:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=LAuOu56vhQ61V5HtfuNWXmXEsG8RHTg2aOXfBU6PuLM=;
- b=PWmJ6L1HytkNjFaBw8+KyE3QmhhON0LZpLx3/lT/fDv+N91fkiSADCnIXalxxmGifgQO
- D/qTqpixiiml5XbxKxaEjMy8vtdEW0k/Rof60OXnwAufPeXpbOwaoBOX+JDlomWcmKWy
- ZZNoplskUN/q/of1TQYR+XneOkJEbkMdHyw0lUPTcy56fsehyUfN2iWHAqzfilrUoYwg
- 3PiS26XJvScCl4DgKN7PXlvtZJ3wxH8fq2A1hL+8qtrcoqkuQOVM9EMru15wD3hl9LNe
- xVi8ymiEn/QdWKHZK6sWxHa0wQp71B2F3nurhD1l3deyRg7vdU2FB+5nXhVDJ4B3Mt/D vQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq339g55c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 09:18:18 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39D9GXRc009097;
-        Fri, 13 Oct 2023 09:18:18 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq339g54f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 09:18:18 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39D8KZsv009102;
-        Fri, 13 Oct 2023 09:18:17 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tpt57jvmv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Oct 2023 09:18:17 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39D9IEVc47513976
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Oct 2023 09:18:14 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5004C20043;
-        Fri, 13 Oct 2023 09:18:14 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ACA5820040;
-        Fri, 13 Oct 2023 09:18:13 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.74.130])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Oct 2023 09:18:13 +0000 (GMT)
-Message-ID: <2172cf228f38150844ddf1af9e4f453238d85a29.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 4/9] s390x: topology: Don't use non
- unique message
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
-        Colton Lewis <coltonlewis@google.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Date:   Fri, 13 Oct 2023 11:18:13 +0200
-In-Reply-To: <169718501727.15841.5127785267238990595@t14-nrb>
-References: <20231011085635.1996346-1-nsg@linux.ibm.com>
-         <20231011085635.1996346-5-nsg@linux.ibm.com>
-         <169718501727.15841.5127785267238990595@t14-nrb>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S231363AbjJMJ6V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 05:58:21 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E446EC9
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 02:58:17 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso3534806a12.3
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 02:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697191096; x=1697795896; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlysa/0HAt7XwTL7Sd4FpaqX2JsJYLCn7DORbQofqo8=;
+        b=oOMpA4RXR0o11JOgKrZ9y5tA2Q/b42jxUUNbnlqH1R4WkXfQWqlGzTMZiESAveKcvw
+         wcvS+CIGmAIOmFrdXOXJL1eRd8TlwOk/nPyISBVDYKHw1A26stgOveoXVl18dh0B5hTu
+         uw+dix3PkS+ZW5Dfw+C/L4poA2Tl+afXpXxno+JcFEx6iqm7RmnvZWKq4JRgxJHvVsJx
+         d+ov7ljdPoly132MDMEuB36JKFNCmm+IYrl/5AFC8NAKte7GjQnVU5GN9482hK1mjSkz
+         eFQykZuMndnbMusmbVVjso8TrGDzdIdezM3BITYytwVre8MyuAurMuP50t+y5MUY3xuc
+         wLbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697191096; x=1697795896;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nlysa/0HAt7XwTL7Sd4FpaqX2JsJYLCn7DORbQofqo8=;
+        b=C56ZV2fz5p/yWTrzBg5JOi4qWg+Hi0zvfAGz5zpUj+uTpYsAODX8KIIkh0ULEScGBo
+         NyUnPAYVzu5LLvAQVkXajMiiKNY7AE9hVUeDMJo4vm8HyqcD+C2wO8vK0+aVR6WsCun9
+         eP8ocdTjaZ/EaqEiL3q7Xh/zLsOX12kWwbN4387hIKnGxGkQTqfGE/oQHr1iwDLtadWG
+         ScRUeS2CuSqbZamIJ/NpVriXpnWdXgd3ohHgiC6/L44BMkZYOWdxuSGgtIQN63M8DeY8
+         FGX7KaEYufgRjhGpYiPR3D1sKHBJIAQ1rHpg0XvxgQZBg26Yc2r8fsZ+YEChd0X8XDIT
+         QKJQ==
+X-Gm-Message-State: AOJu0Yz13zX8lJS4sDCtAvcGUB4shJRS0su2rhpJyAPH0osRm3EpxZz5
+        5groBTcAd29AZWW2bRCNN6zaCIOJY2DWLjFPevU=
+X-Google-Smtp-Source: AGHT+IEguRhdGJwf0aIebN3fBCeHhRTYBl34+o54X7nhqZBgpclVfefxrGnH7qQH1m05Yq6L5Ya53A==
+X-Received: by 2002:aa7:c998:0:b0:530:a226:1f25 with SMTP id c24-20020aa7c998000000b00530a2261f25mr21443281edt.17.1697191096257;
+        Fri, 13 Oct 2023 02:58:16 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id u19-20020a50d513000000b0053e408aec8bsm650498edi.6.2023.10.13.02.58.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 02:58:15 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 11:58:14 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Conor Dooley <conor@kernel.org>
+Cc:     Alexandre Ghiti <alexghiti@rivosinc.com>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        kasan-dev@googlegroups.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-efi@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 4/5] riscv: Suffix all page table entry pointers with 'p'
+Message-ID: <20231013-19d487ddc6b6efd6d6f62f88@orel>
+References: <20231002151031.110551-1-alexghiti@rivosinc.com>
+ <20231002151031.110551-5-alexghiti@rivosinc.com>
+ <20231012-envision-grooving-e6e0461099f1@spud>
+ <20231012-exclusion-moaner-d26780f9eb00@spud>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DQFt8axMDffZIztpenYQEX7ufnk8LA7B
-X-Proofpoint-ORIG-GUID: KLnICVFCtl92vpPcgn0bLzfA-93a0w1M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-13_03,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- adultscore=0 mlxlogscore=935 lowpriorityscore=0 phishscore=0 clxscore=1015
- mlxscore=0 spamscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310130075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012-exclusion-moaner-d26780f9eb00@spud>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-10-13 at 10:16 +0200, Nico Boehr wrote:
-> Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:27)
-> > When we test something, i.e. do a report() we want unique messages,
-> > otherwise, from the test output, it will appear as if the same test was
-> > run multiple times, possible with different PASS/FAIL values.
-> >=20
-> > Convert some reports that don't actually test anything topology specifi=
-c
-> > into asserts.
-> > Refine the report message for others.
-> >=20
-> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->=20
-> There is still the "TLE: reserved bits 0000000000000000" message which ma=
-y
-> be duplicate, but I think you fix that in a later patch.
->=20
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+On Thu, Oct 12, 2023 at 12:35:00PM +0100, Conor Dooley wrote:
+> On Thu, Oct 12, 2023 at 12:33:15PM +0100, Conor Dooley wrote:
+> > Hey Alex,
+> > 
+> > On Mon, Oct 02, 2023 at 05:10:30PM +0200, Alexandre Ghiti wrote:
+> > > That makes it more clear what the underlying type is, no functional
+> > > changes intended.
+> > 
+> > Scanning through stuff on patchwork, this really doesn't seem worth the
+> > churn. I thought this sort of Hungarian notation-esque stuff was a
+> > relic of a time before I could read & our docs even go as far as to
+> 
+> s/go/went/, I see the language got changed in more recent releases of
+> the kernel!
 
-Yes, this isn't comprehensive, the rewrite takes care of the rest.
+The documentation seems to still be against it, but, despite that and
+the two very valid points raised by Marco (backporting and git-blame),
+I think ptep is special and I'm mostly in favor of this change. We may
+not need to s/r every instance, but certainly functions which need to
+refer to both the pte and the ptep representations of entries becomes
+more clear when using the 'p' convention (and then it's nice to have
+ptep used everywhere else too for consistency...)
+
+Anyway, just my 2 cents.
+
+Thanks,
+drew
