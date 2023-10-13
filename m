@@ -2,255 +2,397 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EECDB7C7FCD
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 10:17:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79B4C7C7F93
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 10:09:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbjJMIRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 04:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59762 "EHLO
+        id S229946AbjJMIJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 04:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbjJMIRg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 04:17:36 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2FDD83;
-        Fri, 13 Oct 2023 01:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697185055; x=1728721055;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=rp85he2yYOgdOUk/LqvdG0g8kIj3V4NqZpLb6dFvbrI=;
-  b=bF98QDt92lighxHq/FpqWKaLQr+ReXUG3ylZkxHs+zwuFYoqx7PzKOpT
-   uYqPmu2pVGPK27/GiMxYEU+xpkU3/LY4amB7HE3c9FQVdAXg2NhZWpDry
-   9T0dYy6TiLa+nepWAL+ZRbGbrrOfEohd7oJo3W74Bzu5YRQ4CnHEor+x6
-   QpJcrdCVRhAt4JghsnGcweXkTCYKReHzASqIcFFZaQpznIuNaBF6jAiQ5
-   oIK2p92TFfWDqA6qtontYyoiDKjRen49CfFbL1ykVrBIvbQ2VagF9Yggl
-   bmYUFbaReAtYDRD+eRnsPq49ZJCu4RBoHXNeXhniiD0IJFFHLhUNZGahw
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="471365507"
-X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
-   d="scan'208";a="471365507"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 01:17:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="731276887"
-X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
-   d="scan'208";a="731276887"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Oct 2023 01:17:14 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+        with ESMTP id S229743AbjJMIJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 04:09:53 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12B9BE;
+        Fri, 13 Oct 2023 01:09:50 -0700 (PDT)
+Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S6Jx40TlWzVjqg;
+        Fri, 13 Oct 2023 16:06:16 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm000005.china.huawei.com (7.193.23.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Fri, 13 Oct 2023 01:17:13 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Fri, 13 Oct 2023 01:17:13 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Fri, 13 Oct 2023 01:17:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d0kifJBvhVYKpnw6bU/jWLcqvObhENZYTGlu5HY7sYU8wGa41ONddSC+/Hb5u/2JXe6oK67R1SKtrVAa4pcwKMJtlmUmIl5ml2Rtx8ly6z1F48hHFd4MfthN9fGinIISEEi5VNyy7n83R5l1PvFmKzinAmoYI6ROKoqMCuP8x83OYrI1hVsbbHdixClOR3Prt4i9Iz3D18ApzhmBTiA3CbFarE8NsbsoaqTXdzh3HFN9fvOaNv19vs7UrPTM/ThQ10CT9Ut2MXH0XNhbEudZgvozGKcbFfcCQLbj4NHYBJjGRWZ6Inmd+P92UIoQSLINK6by1helh83rhZ9EVhbQNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ffqutne4y+bTAbYVuUxmcMl9Zp2u59hJiEHvdt6yRIs=;
- b=c6zdN2nj61cW6CIIRlQ+8Rl0otPmAsRqelqcHa39jVpNSoJxTHavkUwBCReIkuMbcudQy6Cu1twgC0xiAIus/SU4I8CoPlaBFjqKceK97X9IcbqsJqwcMHGaYVh5vFo/Y9ToRMRZMp9KUFPzryDD1tvjMbRo9muDu9dgY1AUKeGu9e04P9CIQiTPY5kwyPuiVVkfzt/jznjgwliiCVAjuTZs0mceGPUt6n2XuuEzOWQxZtZ+p3sA2eWq93EqvTAjK0kurPwmocEuWIBEdcpNh3xUmrL9J3OB4T8sjFlSk34XRuZhkdVZY9ett7m1lD+wUODZRe43hnS5c9Aknzm/7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- CY5PR11MB6114.namprd11.prod.outlook.com (2603:10b6:930:2d::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6863.45; Fri, 13 Oct 2023 08:17:11 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::5e79:2d52:51e:f602%6]) with mapi id 15.20.6863.043; Fri, 13 Oct 2023
- 08:17:11 +0000
-Date:   Fri, 13 Oct 2023 15:49:00 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-CC:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v6 00/12] iommu: Prepare to deliver page faults to user
- space
-Message-ID: <ZSj2bIVtqNrLa9ct@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20230928042734.16134-1-baolu.lu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230928042734.16134-1-baolu.lu@linux.intel.com>
-X-ClientProxiedBy: SG2PR02CA0068.apcprd02.prod.outlook.com
- (2603:1096:4:54::32) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ 15.1.2507.31; Fri, 13 Oct 2023 16:09:48 +0800
+Subject: Re: [PATCH v16 1/2] vfio/migration: Add debugfs to live migration
+ driver
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <jonathan.cameron@huawei.com>, <bcreeley@amd.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linuxarm@openeuler.org>
+References: <20230926093356.56014-1-liulongfang@huawei.com>
+ <20230926093356.56014-2-liulongfang@huawei.com>
+ <20231003132630.764d9488.alex.williamson@redhat.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <8a25fd59-0690-cef0-95e2-cdc1a8b54955@huawei.com>
+Date:   Fri, 13 Oct 2023 16:09:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CY5PR11MB6114:EE_
-X-MS-Office365-Filtering-Correlation-Id: 206535af-fb93-40d0-3103-08dbcbc4cc7d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: soUPpV7Pwq076nvciUwVgA1EnFULskSK0jwO52QK4E7zUooi5M9eE6eEVD4nDEp1Dtpnc9TPVzCLeANizEuS+wSFizTNBGrv1/KrIIbRHJsw2txNRFLRXbmkuOdz1WqsHwG+13b2XXkSok5B8nkZGoQBqExHbtNQ/aKJMbkWlKVzCWqyV5YzA9PbHTQL+ZIxcmeLG9GkOUyc5Upu+t1Knml1eCt2MCifH7B8GHQfej/36/4n8Ec/PQ0gdiMAWufHe517gbYK9eeMVi8hdQGPQ3jLJsbgJMK5u6GzYwHTKOWe4kQB3LPy8tdNS7NllXxxXqBwXfUQAYbKvwXfFbOB+zC7e7MG1cmrcp5x+Ni+PuUtDTPol512wLi+JO1TZTAAuvSw71cZuhohf8GCItnsLA/CNX5GtP/ABlywOpkcIIfNyPPATefVZOrPldvXlPWtjDadEDgnsdYGgCWTwrH2v8nY8MTcejP9g+X1jH+RefCeObLt9s1IR9/Aya3td7wKxEoR0+o6/QJfFVY92pQtFD3HkZ0pS5XDtAxeoyntP/h13CnaOi9hlc8J+q/XGetm8ynSu7pB6NkcoJIXP6tCbA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(136003)(346002)(366004)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(26005)(6506007)(6666004)(6512007)(83380400001)(4326008)(7416002)(5660300002)(3450700001)(2906002)(8676002)(478600001)(6486002)(41300700001)(966005)(66476007)(6916009)(66556008)(316002)(54906003)(66946007)(8936002)(82960400001)(38100700002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?H+mP4oJ7m2z8TUqRsLU9CJBbu1JC/mpjDBmLTLeKoXSnnqJ2WB9UqGrzpdmN?=
- =?us-ascii?Q?YZHNVWumNkRTGa3U38irvn9YUR00d7+uvxAaEIVlvaiKW9cMsi9hqsrhtQju?=
- =?us-ascii?Q?Plf0HMktFFJi3RmYA/kNgOsrbv85jpxzxV8fsQhJV4nuWZEGV77lgrIdLgNv?=
- =?us-ascii?Q?N8gnM5YBwji/r01nqwpd1SSYL12HgmIpRTsetVDrGwfJSlVSz3XNDNVwzzoy?=
- =?us-ascii?Q?pfhS8oiVz0IumobN8U4aI/nIfo5s9xtdnRj2SFfaoAKUEEVaiiX080vS1eI/?=
- =?us-ascii?Q?gPB68oBcMAe/IfkaUDVsmoDlTnr/TDEBPXs1UG7pm+v+F6eIiTyJR0STzg/4?=
- =?us-ascii?Q?n1e0iSgI79AhJOpk0zrAYpZXi7ADXIe3rlUs5SjxoIFXD/kPdmOm2t+QEzkg?=
- =?us-ascii?Q?5/QoMaKI53n2L3y0khuEt7TXZoZU/QnQHY7+13Y+C+Gkcq0yzfuTX/G+OjmL?=
- =?us-ascii?Q?7wmeX7Dc+0pe0Sd7t8EDnJ+fHZiN+5LAGtLUdftpU+5pwWE50RZcOALChLIp?=
- =?us-ascii?Q?dB+879SA8uO9RKKOHNxp+HmgnLdprdXNR8aCPRokbwtnCiR1QCxb3IuNPrWA?=
- =?us-ascii?Q?frB5bUv9dy4hIVZp6A3nYSHx9KGIORxF4cSuwIA8zOHRm2JTepwwegwtuW8G?=
- =?us-ascii?Q?3my2XimDHy3L1BhsVTHD9uCfpA2TVHW3MKzmmiNBDP/+WZPacuaeDCRwU/Ls?=
- =?us-ascii?Q?KdOh8oMvPvF7wPieOuv3j/1MQZj5ZPZdVnOHA/I3gezyGr8q07Ismw3r8Htn?=
- =?us-ascii?Q?LRpovsIcj0qByudzIeUQhT5SF4bhE8JL12pTstUfAHlEpfkCxlAjtyGozaPy?=
- =?us-ascii?Q?VpcFbflWATQzCwTb/wpGA93OenPZiQJPtUcXFGssP6WHqoe3EQxkPCHv1av7?=
- =?us-ascii?Q?NR5jhv9s7vNesgIBQc43GHQIhoAd3dUcmnJm6yrVcews3Mjr3WzDcvZMJ/vG?=
- =?us-ascii?Q?4+Y6ecrPeShKkfo0w5FNc92DqPx8UO/zNo4IDq72i1yuBASzUvhQ2yejtak4?=
- =?us-ascii?Q?FUC0KN78+7dPMn+N1ejSibK2ptxeiiRqRMlAx7zwEnEqeVAFsYXRgRjmZ9o7?=
- =?us-ascii?Q?xybADK4f/gNV3z+/C/VlKdL3WetiNUVn6x1qGpABwXeA5Qm7yeqdotdaI9/O?=
- =?us-ascii?Q?788LDw638n3QmdUjIJEEja+gD4UgJ0UQbUMuiP8bQONj2RSYhfkDNhV6QAQP?=
- =?us-ascii?Q?ZknC8A5QHrWCvvkY4uD0v/7hm2AYVs6IvcdK09/ZGHAJjUQ2nfbxSk/BNhTG?=
- =?us-ascii?Q?Qce4y6nQVDFKhPLEdGYb+qteduloBh/sDK6NjzV/tB8XLsJkRk7FM+GTcLeq?=
- =?us-ascii?Q?5kLC4gmxzKMu/uRqVO3zIDpqFKKAxbWEohOPQaPV7Cu9wQZLKm6rEhWlAnGe?=
- =?us-ascii?Q?w5ef0P3N+Tjtve8juCBHaHwx/Yv09mKuRqmELVx52Z0U9cnIQKEy+ewVMHcY?=
- =?us-ascii?Q?Z1iAmFbjuXGjFPA/QqKrledrtpHkVi2QG+m3ReY/fgiv9ocKV7VeAtE9BBpT?=
- =?us-ascii?Q?c6kyNFEmgnnq9B8fSQljdu0i6f3OT+Vdvs/fcorxU0ZRX3uPsJZeVH9ZqxrN?=
- =?us-ascii?Q?O+v/saU7O6GS0RJKctgcsasEDnEa2dbFyXm/OiqM?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 206535af-fb93-40d0-3103-08dbcbc4cc7d
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 08:17:11.3781
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PTm9j5ZFfZMtRDsMzPKrjiX/n+WFqoiYwDGn2JjgOGFgLwpr0EePYdiZL35ANQdK1ghJj+Gm8fYM4wEvPXUy1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6114
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20231003132630.764d9488.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.121.110]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm000005.china.huawei.com (7.193.23.27)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tested and verified that IOPF requests and responses are triggered and
-handled successfully with SVM enabled on DSA on SPR platform. 
+On 2023/10/4 3:26, Alex Williamson wrote:
+> On Tue, 26 Sep 2023 17:33:55 +0800
+> liulongfang <liulongfang@huawei.com> wrote:
+> 
+>> From: Longfang Liu <liulongfang@huawei.com>
+>>
+>> There are multiple devices, software and operational steps involved
+>> in the process of live migration. An error occurred on any node may
+>> cause the live migration operation to fail.
+>> This complex process makes it very difficult to locate and analyze
+>> the cause when the function fails.
+>>
+>> In order to quickly locate the cause of the problem when the
+>> live migration fails, I added a set of debugfs to the vfio
+>> live migration driver.
+>>
+>>     +-------------------------------------------+
+>>     |                                           |
+>>     |                                           |
+>>     |                  QEMU                     |
+>>     |                                           |
+>>     |                                           |
+>>     +---+----------------------------+----------+
+>>         |      ^                     |      ^
+>>         |      |                     |      |
+>>         |      |                     |      |
+>>         v      |                     v      |
+>>      +---------+--+               +---------+--+
+>>      |src vfio_dev|               |dst vfio_dev|
+>>      +--+---------+               +--+---------+
+>>         |      ^                     |      ^
+>>         |      |                     |      |
+>>         v      |                     |      |
+>>    +-----------+----+           +-----------+----+
+>>    |src dev debugfs |           |dst dev debugfs |
+>>    +----------------+           +----------------+
+>>
+>> The entire debugfs directory will be based on the definition of
+>> the CONFIG_DEBUG_FS macro. If this macro is not enabled, the
+>> interfaces in vfio.h will be empty definitions, and the creation
+>> and initialization of the debugfs directory will not be executed.
+>>
+>>    vfio
+>>     |
+>>     +---<dev_name1>
+>>     |    +---migration
+>>     |        +--state
+>>     |
+>>     +---<dev_name2>
+>>          +---migration
+>>              +--state
+>>
+>> debugfs will create a public root directory "vfio" file.
+>> then create a dev_name() file for each live migration device.
+>> First, create a unified state acquisition file of "migration"
+>> in this device directory.
+>> Then, create a public live migration state lookup file "state"
+>> Finally, create a directory file based on the device type,
+>> and then create the device's own debugging files under
+>> this directory file.
+> 
+> We don't actually do the thing claimed in this last statement.
+>  
 
-Tested-by: Yan Zhao <yan.y.zhao@intel.com>
+OK, I will modify it in the next version.
 
-On Thu, Sep 28, 2023 at 12:27:22PM +0800, Lu Baolu wrote:
-> When a user-managed page table is attached to an IOMMU, it is necessary
-> to deliver IO page faults to user space so that they can be handled
-> appropriately. One use case for this is nested translation, which is
-> currently being discussed in the mailing list.
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  drivers/vfio/Makefile       |  1 +
+>>  drivers/vfio/vfio.h         | 14 ++++++
+>>  drivers/vfio/vfio_debugfs.c | 87 +++++++++++++++++++++++++++++++++++++
+>>  drivers/vfio/vfio_main.c    | 14 +++++-
+>>  include/linux/vfio.h        |  7 +++
+>>  5 files changed, 121 insertions(+), 2 deletions(-)
+>>  create mode 100644 drivers/vfio/vfio_debugfs.c
+>>
+>> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+>> index c82ea032d352..7934ac829989 100644
+>> --- a/drivers/vfio/Makefile
+>> +++ b/drivers/vfio/Makefile
+>> @@ -8,6 +8,7 @@ vfio-$(CONFIG_VFIO_GROUP) += group.o
+>>  vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>>  vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>>  vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+>> +vfio-$(CONFIG_DEBUG_FS) += vfio_debugfs.o
 > 
-> I have posted a RFC series [1] that describes the implementation of
-> delivering page faults to user space through IOMMUFD. This series has
-> received several comments on the IOMMU refactoring, which I am trying to
-> address in this series.
+> I see that other subsystems create Kconfig entries allowing more fine
+> grained control of DEBUGFS support.  Wouldn't it make sense to have a
+> VFIO_DEBUGFS config option, similar to IOMMU_DEBUGFS?
+>
+OK, I create a version with VFIO_DEBUGFS
+
+> Also, with our trend towards less redundant file naming, this could
+> just be debugfs.[co].
+>
+
+OK.
+
+>>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+>> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+>> index 307e3f29b527..09b00757d0bb 100644
+>> --- a/drivers/vfio/vfio.h
+>> +++ b/drivers/vfio/vfio.h
+>> @@ -448,4 +448,18 @@ static inline void vfio_device_put_kvm(struct vfio_device *device)
+>>  }
+>>  #endif
+>>  
+>> +#ifdef CONFIG_DEBUG_FS
+>> +void vfio_debugfs_create_root(void);
+>> +void vfio_debugfs_remove_root(void);
+>> +
+>> +void vfio_device_debugfs_init(struct vfio_device *vdev);
+>> +void vfio_device_debugfs_exit(struct vfio_device *vdev);
+>> +#else
+>> +static inline void vfio_debugfs_create_root(void) { }
+>> +static inline void vfio_debugfs_remove_root(void) { }
+>> +
+>> +static inline void vfio_device_debugfs_init(struct vfio_device *vdev) { }
+>> +static inline void vfio_device_debugfs_exit(struct vfio_device *vdev) { }
+>> +#endif /* CONFIG_DEBUG_FS */
+>> +
+>>  #endif
+>> diff --git a/drivers/vfio/vfio_debugfs.c b/drivers/vfio/vfio_debugfs.c
+>> new file mode 100644
+>> index 000000000000..b79bdef08357
+>> --- /dev/null
+>> +++ b/drivers/vfio/vfio_debugfs.c
+>> @@ -0,0 +1,87 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (c) 2023, HiSilicon Ltd.
+>> + */
+>> +
+>> +#include <linux/device.h>
+>> +#include <linux/debugfs.h>
+>> +#include <linux/seq_file.h>
+>> +#include <linux/vfio.h>
+>> +#include "vfio.h"
+>> +
+>> +static struct dentry *vfio_debugfs_root;
+>> +
+>> +static int vfio_device_state_read(struct seq_file *seq, void *data)
+>> +{
+>> +	struct device *vf_dev = seq->private;
+>> +	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
+>> +	enum vfio_device_mig_state state;
+>> +	int ret;
+>> +
+>> +	ret = vdev->mig_ops->migration_get_state(vdev, &state);
+>> +	if (ret)
+>> +		return -EINVAL;
+>> +
+>> +	switch (state) {
+>> +	case VFIO_DEVICE_STATE_STOP:
+>> +		seq_printf(seq, "%s\n", "STOP");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_RUNNING:
+>> +		seq_printf(seq, "%s\n", "RUNNING");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_STOP_COPY:
+>> +		seq_printf(seq, "%s\n", "STOP_COPY");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_RESUMING:
+>> +		seq_printf(seq, "%s\n", "RESUMING");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+>> +		seq_printf(seq, "%s\n", "RUNNING_P2P");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_PRE_COPY:
+>> +		seq_printf(seq, "%s\n", "PRE_COPY");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_PRE_COPY_P2P:
+>> +		seq_printf(seq, "%s\n", "PRE_COPY_P2P");
+>> +		break;
+>> +	case VFIO_DEVICE_STATE_ERROR:
+>              ^^^^^^^^^^^^^^^^^^^^^^^
 > 
-> The major refactoring includes:
+>> +		seq_printf(seq, "%s\n", "ERROR");
+>> +		break;
+>> +	default:
+>> +		seq_printf(seq, "%s\n", "Invalid");
+>> +	}
 > 
-> - [PATCH 01 ~ 04] Move include/uapi/linux/iommu.h to
->   include/linux/iommu.h. Remove the unrecoverable fault data definition.
-> - [PATCH 05 ~ 06] Remove iommu_[un]register_device_fault_handler().
-> - [PATCH 07 ~ 10] Separate SVA and IOPF. Make IOPF a generic page fault
->   handling framework.
-> - [PATCH 11 ~ 12] Improve iopf framework for iommufd use.
+> Not exactly in the order they're defined:
 > 
-> This is also available at github [2].
+> enum vfio_device_mig_state {
+>         VFIO_DEVICE_STATE_ERROR = 0,
+>         ^^^^^^^^^^^^^^^^^^^^^^^
+>         VFIO_DEVICE_STATE_STOP = 1,
+>         VFIO_DEVICE_STATE_RUNNING = 2,
+> 	...
 > 
-> [1] https://lore.kernel.org/linux-iommu/20230530053724.232765-1-baolu.lu@linux.intel.com/
-> [2] https://github.com/LuBaolu/intel-iommu/commits/preparatory-io-pgfault-delivery-v6
+> I also suggested last time some means to keep this in sync with the set
+> of states defined.  Maybe there are better suggestions, but one way to
+> do that could be:
 > 
-> Change log:
-> v6:
->  - [PATCH 09/12] Check IS_ERR() against the iommu domain. [Jingqi/Jason]
->  - [PATCH 12/12] Rename the comments and name of iopf_queue_flush_dev(),
->    no functionality changes. [Kevin]
->  - All patches rebased on the latest iommu/core branch.
+> diff --git a/drivers/vfio/vfio_debugfs.c b/drivers/vfio/vfio_debugfs.c
+> index ee6b1831b3e5..1ec90b90d150 100644
+> --- a/drivers/vfio/vfio_debugfs.c
+> +++ b/drivers/vfio/vfio_debugfs.c
+> @@ -18,6 +18,9 @@ static int vfio_device_state_read(struct seq_file *seq, void *data)
+>         enum vfio_device_mig_state state;
+>         int ret;
+>  
+> +       BUILD_BUG_ON(VFIO_DEVICE_STATE_NR !=
+> +                    VFIO_DEVICE_STATE_PRE_COPY_P2P + 1);
+> +
+>         ret = vdev->mig_ops->migration_get_state(vdev, &state);
+>         if (ret)
+>                 return -EINVAL;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 7f5fb010226d..2b68e6cdf190 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1219,6 +1219,7 @@ enum vfio_device_mig_state {
+>         VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+>         VFIO_DEVICE_STATE_PRE_COPY = 6,
+>         VFIO_DEVICE_STATE_PRE_COPY_P2P = 7,
+> +       VFIO_DEVICE_STATE_NR,
+>  };
+>  
+>  /**
 > 
-> v5: https://lore.kernel.org/linux-iommu/20230914085638.17307-1-baolu.lu@linux.intel.com/
->  - Consolidate per-device fault data management. (New patch 11)
->  - Improve iopf_queue_flush_dev(). (New patch 12)
+> Thanks,
+> Alex
+>
+
+OK, I will modify it in the next version
+
+Thanks,
+Longfang
+
 > 
-> v4: https://lore.kernel.org/linux-iommu/20230825023026.132919-1-baolu.lu@linux.intel.com/
->  - Merge iommu_fault_event and iopf_fault. They are duplicate.
->  - Move iommu_report_device_fault() and iommu_page_response() to
->    io-pgfault.c.
->  - Move iommu_sva_domain_alloc() to iommu-sva.c.
->  - Add group->domain and use it directly in sva fault handler.
->  - Misc code refactoring and refining.
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +void vfio_device_debugfs_init(struct vfio_device *vdev)
+>> +{
+>> +	struct device *dev = &vdev->device;
+>> +
+>> +	vdev->debug_root = debugfs_create_dir(dev_name(vdev->dev), vfio_debugfs_root);
+>> +
+>> +	if (vdev->mig_ops) {
+>> +		struct dentry *vfio_dev_migration = NULL;
+>> +
+>> +		vfio_dev_migration = debugfs_create_dir("migration", vdev->debug_root);
+>> +		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+>> +					  vfio_device_state_read);
+>> +	}
+>> +}
+>> +
+>> +void vfio_device_debugfs_exit(struct vfio_device *vdev)
+>> +{
+>> +	debugfs_remove_recursive(vdev->debug_root);
+>> +}
+>> +
+>> +void vfio_debugfs_create_root(void)
+>> +{
+>> +	vfio_debugfs_root = debugfs_create_dir("vfio", NULL);
+>> +}
+>> +
+>> +void vfio_debugfs_remove_root(void)
+>> +{
+>> +	debugfs_remove_recursive(vfio_debugfs_root);
+>> +	vfio_debugfs_root = NULL;
+>> +}
+>> +
+>> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+>> index cfad824d9aa2..4e3ced20d2d1 100644
+>> --- a/drivers/vfio/vfio_main.c
+>> +++ b/drivers/vfio/vfio_main.c
+>> @@ -309,7 +309,6 @@ static int __vfio_register_dev(struct vfio_device *device,
+>>  
+>>  	/* Refcounting can't start until the driver calls register */
+>>  	refcount_set(&device->refcount, 1);
+>> -
+>>  	vfio_device_group_register(device);
+>>  
+>>  	return 0;
+>> @@ -320,7 +319,15 @@ static int __vfio_register_dev(struct vfio_device *device,
+>>  
+>>  int vfio_register_group_dev(struct vfio_device *device)
+>>  {
+>> -	return __vfio_register_dev(device, VFIO_IOMMU);
+>> +	int ret;
+>> +
+>> +	ret = __vfio_register_dev(device, VFIO_IOMMU);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	vfio_device_debugfs_init(device);
+>> +
+>> +	return 0;
+>>  }
+>>  EXPORT_SYMBOL_GPL(vfio_register_group_dev);
+>>  
+>> @@ -378,6 +385,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>>  		}
+>>  	}
+>>  
+>> +	vfio_device_debugfs_exit(device);
+>>  	/* Balances vfio_device_set_group in register path */
+>>  	vfio_device_remove_group(device);
+>>  }
+>> @@ -1662,6 +1670,7 @@ static int __init vfio_init(void)
+>>  	if (ret)
+>>  		goto err_alloc_dev_chrdev;
+>>  
+>> +	vfio_debugfs_create_root();
+>>  	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>>  	return 0;
+>>  
+>> @@ -1677,6 +1686,7 @@ static int __init vfio_init(void)
+>>  
+>>  static void __exit vfio_cleanup(void)
+>>  {
+>> +	vfio_debugfs_remove_root();
+>>  	ida_destroy(&vfio.device_ida);
+>>  	vfio_cdev_cleanup();
+>>  	class_destroy(vfio.device_class);
+>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>> index 454e9295970c..769d7af86225 100644
+>> --- a/include/linux/vfio.h
+>> +++ b/include/linux/vfio.h
+>> @@ -69,6 +69,13 @@ struct vfio_device {
+>>  	u8 iommufd_attached:1;
+>>  #endif
+>>  	u8 cdev_opened:1;
+>> +#ifdef CONFIG_DEBUG_FS
+>> +	/*
+>> +	 * debug_root is a static property of the vfio_device
+>> +	 * which must be set prior to registering the vfio_device.
+>> +	 */
+>> +	struct dentry *debug_root;
+>> +#endif
+>>  };
+>>  
+>>  /**
 > 
-> v3: https://lore.kernel.org/linux-iommu/20230817234047.195194-1-baolu.lu@linux.intel.com/
->  - Convert the fault data structures from uAPI to kAPI.
->  - Merge iopf_device_param into iommu_fault_param.
->  - Add debugging on domain lifetime for iopf.
->  - Remove patch "iommu: Change the return value of dev_iommu_get()".
->  - Remove patch "iommu: Add helper to set iopf handler for domain".
->  - Misc code refactoring and refining.
-> 
-> v2: https://lore.kernel.org/linux-iommu/20230727054837.147050-1-baolu.lu@linux.intel.com/
->  - Remove unrecoverable fault data definition as suggested by Kevin.
->  - Drop the per-device fault cookie code considering that doesn't make
->    much sense for SVA.
->  - Make the IOMMU page fault handling framework generic. So that it can
->    available for use cases other than SVA.
-> 
-> v1: https://lore.kernel.org/linux-iommu/20230711010642.19707-1-baolu.lu@linux.intel.com/
-> 
-> Lu Baolu (12):
->   iommu: Move iommu fault data to linux/iommu.h
->   iommu/arm-smmu-v3: Remove unrecoverable faults reporting
->   iommu: Remove unrecoverable fault data
->   iommu: Cleanup iopf data structure definitions
->   iommu: Merge iopf_device_param into iommu_fault_param
->   iommu: Remove iommu_[un]register_device_fault_handler()
->   iommu: Merge iommu_fault_event and iopf_fault
->   iommu: Prepare for separating SVA and IOPF
->   iommu: Make iommu_queue_iopf() more generic
->   iommu: Separate SVA and IOPF
->   iommu: Consolidate per-device fault data management
->   iommu: Improve iopf_queue_flush_dev()
-> 
->  include/linux/iommu.h                         | 258 ++++++++---
->  drivers/iommu/intel/iommu.h                   |   2 +-
->  drivers/iommu/iommu-sva.h                     |  71 ---
->  include/uapi/linux/iommu.h                    | 161 -------
->  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  14 +-
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  51 +-
->  drivers/iommu/intel/iommu.c                   |  25 +-
->  drivers/iommu/intel/svm.c                     |   8 +-
->  drivers/iommu/io-pgfault.c                    | 438 +++++++++++-------
->  drivers/iommu/iommu-sva.c                     |  82 +++-
->  drivers/iommu/iommu.c                         | 232 ----------
->  MAINTAINERS                                   |   1 -
->  drivers/iommu/Kconfig                         |   4 +
->  drivers/iommu/Makefile                        |   3 +-
->  drivers/iommu/intel/Kconfig                   |   1 +
->  15 files changed, 578 insertions(+), 773 deletions(-)
->  delete mode 100644 drivers/iommu/iommu-sva.h
->  delete mode 100644 include/uapi/linux/iommu.h
-> 
-> -- 
-> 2.34.1
+> .
 > 
