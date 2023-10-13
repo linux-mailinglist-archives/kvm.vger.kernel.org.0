@@ -2,162 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51F947C8B70
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 18:35:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 070447C8BA2
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 18:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231731AbjJMQbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 12:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47540 "EHLO
+        id S230150AbjJMQhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 12:37:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229679AbjJMQb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 12:31:26 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2072.outbound.protection.outlook.com [40.107.237.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8193210F3
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 09:29:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HtmM8FnEh16ah+NMFgpRr1iFw8avCiD++D7yxIZA3bJFpZigpF+1WR7wNjXtD3R8loTnGafA9qRZcxfqfLMLtYsMyg39b6TW8Ju4Wue+UEfjKdrOh/45y7mqIUtegOl3P9vtwfbzuUA64Y5RnjmVphF58wZ94oce6/fSUiSZrXjlT+g2JiXgBMJ3j/Muuln6U+w6fip1cZkoNEfvUDE1mnsKMikfT0OIIrcd8rkz9yagycWu6EvtEN6FgXOBaUCHSU9oyO4PyiOPtTTGsz/e61TY6l3mzAp6VQ1Tkn+hq0zdwApJUCUUtj8kjZ4jZf+ASTqZ8+6JzFuIWIH/X9nyRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IzrY32RkTfnqhAQnu8J5PFCv47gUx3mawZd4GLLfLQQ=;
- b=SLsgvItAtepBw97pwkZayCnEAPfU4QIl5FTN7V53zdyOYE46btIo7+7o9BIMAwbRvSOZqSURopjSLLzyuVSxB/V51XHQ+M7AswqSbDBYXhpC2gnQJyyGoQrSIp24pzfZ1K56WdNt+u09LchIW6Qr4zHComJW/l3wnYgQl3SlEKKnB54nECOMhqHMgah5KoeBPVbN1lLJu6LYF4H3gRCp0kGH9c8oQZlA/0XCBrTrQYqW+u7Eln0wGcwnXN956Iiq2j+SXX+hRT/5vZeX82a/+tvSVIWSdEKNasC+V2ZSMyorEvEF2SX+IuFVA9vJ3NlQl+yvkUnhYxQHGUg/2n3qzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IzrY32RkTfnqhAQnu8J5PFCv47gUx3mawZd4GLLfLQQ=;
- b=orMM6nno7xvrU2pI3MFfAxV24WXlp32bi6fFgubitz26N/3iJSzW+cH5WoKOM8g4mLJfLG6iEBzXgMpbc0PyNNOTjfqSWSWx1A+ciLQWrGLsiml7e0YigsSZLX+fRujwgdiTHuoFc+WqkPP03J+ilYY5FBxTY9h0u06yNmnFgupc0Gv0uPbQPzs2ysc/C/ERvtD6Hml4Wr0rOJkSSRvzUaUBOeMuhGVDGy86YTZgE1eorf+nNFKL8SIYBuNlIPqU3yprg9gQ6Mq/2YR1Iv/ERi1VG7CeuFzfbp3y77qEyXPCu/MGf7lZa8z5Jh6fob0uxwjCsdYOlArgWvIFAtggPw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB7259.namprd12.prod.outlook.com (2603:10b6:510:207::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Fri, 13 Oct
- 2023 16:29:50 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.046; Fri, 13 Oct 2023
- 16:29:50 +0000
-Date:   Fri, 13 Oct 2023 13:29:49 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Cc:     iommu@lists.linux.dev,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3 00/19] IOMMUFD Dirty Tracking
-Message-ID: <20231013162949.GG3952@nvidia.com>
-References: <20230923012511.10379-1-joao.m.martins@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230923012511.10379-1-joao.m.martins@oracle.com>
-X-ClientProxiedBy: MN2PR04CA0034.namprd04.prod.outlook.com
- (2603:10b6:208:d4::47) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229683AbjJMQht (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 12:37:49 -0400
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A56BB
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 09:37:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697215067; x=1728751067;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lITbt8wLcF8MLZ70qObK0qVfyiYBGVzBj3ZnH/tQlvM=;
+  b=jbH4ydodCHhsTjp49H88BPxCHmG0O6Y/jbOPbRn8FsfGAqKkTMss78zW
+   JUVHQa2919xCmkvHdkAQYIZw0lczPBu0QaA5T+AF4stq01bB/J4sX2tGQ
+   2oingWBPoFQtCQgB4jYEcCwTkKCAE0RDXm011j/dUM/2cdFu+noWOsgpu
+   g=;
+X-IronPort-AV: E=Sophos;i="6.03,222,1694736000"; 
+   d="scan'208";a="361784857"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 16:37:43 +0000
+Received: from EX19D014EUA003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 657FA80F98;
+        Fri, 13 Oct 2023 16:37:42 +0000 (UTC)
+Received: from EX19D047EUB002.ant.amazon.com (10.252.61.57) by
+ EX19D014EUA003.ant.amazon.com (10.252.50.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 13 Oct 2023 16:37:41 +0000
+Received: from dev-dsk-mancio-1b-75107ff4.eu-west-1.amazon.com (172.19.77.28)
+ by EX19D047EUB002.ant.amazon.com (10.252.61.57) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 13 Oct 2023 16:37:38 +0000
+From:   Riccardo Mancini <mancio@amazon.com>
+To:     <vkuznets@redhat.com>
+CC:     <bataloe@amazon.com>, <graf@amazon.de>, <kvm@vger.kernel.org>,
+        <pbonzini@redhat.com>, Riccardo Mancini <mancio@amazon.com>,
+        Greg Farrell <gffarre@amazon.com>
+Subject: [RFC PATCH 4.14] KVM: x86: Backport support for interrupt-based APF page-ready delivery in guest
+Date:   Fri, 13 Oct 2023 16:36:40 +0000
+Message-ID: <20231013163640.14162-1-mancio@amazon.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <877co1cc5d.fsf@redhat.com>
+References: <877co1cc5d.fsf@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB7259:EE_
-X-MS-Office365-Filtering-Correlation-Id: aef6599e-8d5f-4d7f-56dd-08dbcc099f58
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qruPf9KChOpuhQBgN/reTAKFP9b9NCNjgH+WMtSa5m683Wy1WjCRgY8b9V7F2f/n8WzcoMFvAc55wMr1iZu+SHpkiXg3c3bIki8vfgrDkaq2p6kE7Jo0C/666hU1glRbuZe5gYYt2K4az5xL8FU5fzG5dLN0bR8w6zkMjgBqmNlSjYPsu1iWeLU/BXlXPdSCit88b6ciV5zKLFlbe9yNaMG2pTa8Z6jHQl4aL3DFMPIHHA3/4eUi59d/UsOyqQRwWjBV1XcZfe/DhY6Io+1FI0iSazM6g1l5rGbfnL2fOtLw0UCwZnq4U1l6XTbD6yodGa0dg8OdD2KNlXp2T7utTwS4bAoG5HjHdPQTTbLv/Zn/tnn37TMdmk1THKVAaaeoV5xpy4aQJyswhyS2x+dJMQihvYMTEEyB3s5wvUyNpweSt1tbm9O9FZwssLu4OG4NoQO/2GruBgRECDk7wcv81qJozrVvMioEYzJytKsTIvh+Fa/8d2zTjcB0FocWNB+32i61swUdDtv1zJp/j6H/ADnecJvs7wFHe8JRW7eIYEVS/GHfKsGWftMxq2YEgSM3lZyAY2CIIlzIJzxQCq+dgA4ULuyIP8EvYe+wtim7JhU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(366004)(39860400002)(376002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(26005)(33656002)(6506007)(316002)(36756003)(66946007)(83380400001)(66476007)(66556008)(54906003)(110136005)(2616005)(86362001)(38100700002)(1076003)(6512007)(2906002)(6486002)(478600001)(7416002)(5660300002)(8936002)(4326008)(8676002)(41300700001)(14143004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?E/LUhWI+M3iDGJ+udjeS/FS3V0ls2pGJgCsbq3CeQsCRIeqz5Y4JEoCBto1o?=
- =?us-ascii?Q?l4lg+DL//HMOxqqx1fm+RW/qVTuFygKMd+FIpMB9Lwb1NFOryLFLUIPkzAn2?=
- =?us-ascii?Q?qlWOhpKA2zMCU78ctHaFm30Q23YHKfmmPShkWAqpgXcRM2q9mSObOR3W+hmw?=
- =?us-ascii?Q?qi3uxYloX9f98058MRowU7Y4+UcmMmIkXKS5rT4UwOrS0XAgJUOQNeq0+DOP?=
- =?us-ascii?Q?nKDyau053Jm9rsHJ+qypssciG+TBrqIyqyyCD+ebICqVTL4ahKlxDKB52EDm?=
- =?us-ascii?Q?DU03Am0+sjwWKqH9MYKHbbfzZtuHmB3uVIf+E9wYNKNCXLiYJoA1pWHG/8s8?=
- =?us-ascii?Q?MAZkNLgl6cj53j0/nfgAEzqU826KorjBQXjKcCeDdK13Um1GyJwVAyjwbyqZ?=
- =?us-ascii?Q?XpaEZlkrRTNqYsovz5oznxrpsrO6eDedBbrWufvCY9V9e/1YFPwd9bIAU4o2?=
- =?us-ascii?Q?L++kP1LdeVn8s5bzZ/03VvutU7XZX0dfPW5ODBfitHVCQw9HWbMOQvG1IYpr?=
- =?us-ascii?Q?RFmgRmEFPo7eWMBzLtmzNrBSP2FulDfTSmTtk/VjgUkzRAlCQbporwzbP23P?=
- =?us-ascii?Q?htNheP5mqEbJn7GZzUK/PncHaNDJuQeVGwOBhMDcFTsShusvxxzvhr0bKPjo?=
- =?us-ascii?Q?/TJBhZKRB3xO1xXp6Ljdozmb4f/7Sz9SvCX8/uhhPkCEeLDTN2UugWyBsTQQ?=
- =?us-ascii?Q?6KtI6/zZ7XkW2fcijewHGP9eQKl6Y5yDUF77UhUBE1IO6b6Fut4jClzF4Xj3?=
- =?us-ascii?Q?gmpXEfIxLGWQ4O/QKbxcrIzoks/2WBeZFO26YsmUHJ0K/kN9vWzuialAzITI?=
- =?us-ascii?Q?mLGCAnzPl0HUu1SEv7IrhxJVfisi1HLjJvkUwRyFbIFDhxwOEXTAkhfZPAJw?=
- =?us-ascii?Q?8ZS4EA8XwDapZNHdlIJgXj4Vl6Q0xOSvgi1+PkUCBi/1O4yTBOkXr2C7eabQ?=
- =?us-ascii?Q?qVc6nv6fI63LReEpppJUes/iDXirRQn46SgBhBTlC1uofjD+jqUUM32EEbVi?=
- =?us-ascii?Q?v91cjGV6pxzVh949v33DxurSbmDUTWoLPh3uGffRkTNtdoAI1qafRK7mJi/a?=
- =?us-ascii?Q?HaA8FLOCRMN8ewsWVSpWpgtfKGozTl7PgwyP24BxScCJr/liz/tCZzheL/zx?=
- =?us-ascii?Q?wV21IBWFKzz64Cyl99kFD+9QwCC+Ef3tP9ytHcBGUCl3sGnKURKxhlaDBtYY?=
- =?us-ascii?Q?KmPNfBcItNov3KZqc2j3VraSRzc8z8yH3GzsFJzlF8dhMpfvQV8DWmOJ/+Ur?=
- =?us-ascii?Q?K1UvC+XcBmPeqHQdqSeY42K9mCAjBn3Ivori5bnJzP8KBjf+So/k9pqPL8Et?=
- =?us-ascii?Q?qhNtK2ptJ13Ai0WEuLRrxCE3DMpDQPD+NAbzNljkAzofbUAA2V2DqgB4LeT5?=
- =?us-ascii?Q?8UkKUe8zFSW+AWAsTxIIvqr6QqmKkc73gtkAOf8SZ9tzK0jbC38QAjahqLlS?=
- =?us-ascii?Q?sScgGYZE+X9Dv0Bpu1nbdzW0q32248LU71BdN55uO2oVq7oVMvUjTGh9YObe?=
- =?us-ascii?Q?LDmeNmDudJk2QHEDKuY9SVLQG+YYNYSAi5iOHBrYkzwsTe0PcCOwEibnaVUO?=
- =?us-ascii?Q?KMJB+0MqqB2mLrvNxdCAeGXUOTL27KUfOZY1rMBX?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aef6599e-8d5f-4d7f-56dd-08dbcc099f58
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 16:29:50.5206
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WTplSAE7zbWrfuQUmbpZjjpDMQS7d7v4TjBO05hisjbmQty96044RcbygRWttb0A
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7259
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.19.77.28]
+X-ClientProxiedBy: EX19D035UWB002.ant.amazon.com (10.13.138.97) To
+ EX19D047EUB002.ant.amazon.com (10.252.61.57)
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 23, 2023 at 02:24:52AM +0100, Joao Martins wrote:
+Hey Vitaly,
 
-> Joao Martins (19):
->   vfio/iova_bitmap: Export more API symbols
->   vfio: Move iova_bitmap into iommu core
->   iommu: Add iommu_domain ops for dirty tracking
->   iommufd: Add a flag to enforce dirty tracking on attach
->   iommufd/selftest: Expand mock_domain with dev_flags
->   iommufd/selftest: Test IOMMU_HWPT_ALLOC_ENFORCE_DIRTY
->   iommufd: Dirty tracking data support
->   iommufd: Add IOMMU_HWPT_SET_DIRTY
->   iommufd/selftest: Test IOMMU_HWPT_SET_DIRTY
->   iommufd: Add IOMMU_HWPT_GET_DIRTY_IOVA
->   iommufd/selftest: Test IOMMU_HWPT_GET_DIRTY_IOVA
->   iommufd: Add capabilities to IOMMU_GET_HW_INFO
->   iommufd/selftest: Test out_capabilities in IOMMU_GET_HW_INFO
->   iommufd: Add a flag to skip clearing of IOPTE dirty
->   iommufd/selftest: Test IOMMU_GET_DIRTY_IOVA_NO_CLEAR flag
->   iommu/amd: Add domain_alloc_user based domain allocation
->   iommu/amd: Access/Dirty bit support in IOPTEs
->   iommu/amd: Print access/dirty bits if supported
->   iommu/intel: Access/Dirty bit support for SL domains
-
-I read through this and I'm happy with the design - small points aside
-
-Suggest to fix those and resend ASAP.
-
-Kevin, you should check it too
-
-If either AMD or Intel ack the driver part next week I would take it
-this cycle. Otherwise at -rc1.
-
-Also I recommend you push all the selftest to a block of patches at
-the end of the series so the core code reads as one chunk. It doesn't
-seem as large that way :)
+thanks for your suggestion!
+I've backported the guest-side of the patchset to 4.14.326, could you help
+us and take a look at the backport?
+I only backported the original patchset, I'm not sure if there's any
+other patch (bug fix) that needs to be included in the backpotrt.
+We've tested it in our environment and it gets rid of the performance
+regression when running on 5.10 host, with no detected functional issue,
+either on 4.14 or on 5.10.
+I don't think the 4.14 stable tree accepts any patch that adds a feature
+like this one, but we're looking into downstreaming it.
+This patch might also be useful to somebody else hitting our same issue.
 
 Thanks,
-Jason
+Riccardo
+
+Commit follows:
+
+This patch backports support for interrupt-based delivery of Async Page
+Fault notifications in KVM guests from commit b1d405751cd5 ("KVM: x86:
+Switch KVM guest to using interrupts for page ready APF delivery") [1].
+
+Differently from the patchet upstream, this patch does not remove
+support for the legacy #PF-based delivery, and removes unnecessary
+refactoring to limit changes to KVM guest code.
+
+[1] https://lore.kernel.org/kvm/20200525144125.143875-1-vkuznets@redhat.com/
+
+Reviewed-by: Eugene Batalov <bataloe@amazon.com>
+Reviewed-by: Greg Farrell <gffarre@amazon.com>
+Signed-off-by: Riccardo Mancini <mancio@amazon.com>
+
+---
+ arch/x86/entry/entry_32.S            |  5 ++++
+ arch/x86/entry/entry_64.S            |  5 ++++
+ arch/x86/include/asm/hardirq.h       |  2 +-
+ arch/x86/include/asm/kvm_para.h      |  7 +++++
+ arch/x86/include/uapi/asm/kvm_para.h | 16 ++++++++++-
+ arch/x86/kernel/irq.c                |  2 +-
+ arch/x86/kernel/kvm.c                | 42 +++++++++++++++++++++++-----
+ 7 files changed, 69 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
+index 1fdedb2eaef3..460eb7a9981e 100644
+--- a/arch/x86/entry/entry_32.S
++++ b/arch/x86/entry/entry_32.S
+@@ -896,6 +896,11 @@ BUILD_INTERRUPT3(hyperv_callback_vector, HYPERVISOR_CALLBACK_VECTOR,
+ 
+ #endif /* CONFIG_HYPERV */
+ 
++#ifdef CONFIG_KVM_GUEST
++BUILD_INTERRUPT3(kvm_async_pf_vector, HYPERVISOR_CALLBACK_VECTOR,
++		 kvm_async_pf_intr)
++#endif
++
+ ENTRY(page_fault)
+ 	ASM_CLAC
+ 	pushl	$do_page_fault
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 1804ccf52d9b..545d911a2c9e 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -1113,6 +1113,11 @@ apicinterrupt3 HYPERVISOR_CALLBACK_VECTOR \
+ 	hyperv_callback_vector hyperv_vector_handler
+ #endif /* CONFIG_HYPERV */
+ 
++#ifdef CONFIG_KVM_GUEST
++apicinterrupt3 HYPERVISOR_CALLBACK_VECTOR \
++	kvm_async_pf_vector kvm_async_pf_intr
++#endif
++
+ idtentry debug			do_debug		has_error_code=0	paranoid=1 shift_ist=DEBUG_STACK
+ idtentry int3			do_int3			has_error_code=0	create_gap=1
+ idtentry stack_segment		do_stack_segment	has_error_code=1
+diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
+index 486c843273c4..75e51b7c9f50 100644
+--- a/arch/x86/include/asm/hardirq.h
++++ b/arch/x86/include/asm/hardirq.h
+@@ -37,7 +37,7 @@ typedef struct {
+ #ifdef CONFIG_X86_MCE_AMD
+ 	unsigned int irq_deferred_error_count;
+ #endif
+-#if IS_ENABLED(CONFIG_HYPERV) || defined(CONFIG_XEN)
++#if IS_ENABLED(CONFIG_HYPERV) || defined(CONFIG_XEN) || defined(CONFIG_KVM_GUEST)
+ 	unsigned int irq_hv_callback_count;
+ #endif
+ } ____cacheline_aligned irq_cpustat_t;
+diff --git a/arch/x86/include/asm/kvm_para.h b/arch/x86/include/asm/kvm_para.h
+index c373e44049b1..f4806dd3c38d 100644
+--- a/arch/x86/include/asm/kvm_para.h
++++ b/arch/x86/include/asm/kvm_para.h
+@@ -4,6 +4,7 @@
+ 
+ #include <asm/processor.h>
+ #include <asm/alternative.h>
++#include <linux/interrupt.h>
+ #include <uapi/asm/kvm_para.h>
+ 
+ extern void kvmclock_init(void);
+@@ -94,6 +95,12 @@ void kvm_async_pf_task_wake(u32 token);
+ u32 kvm_read_and_reset_pf_reason(void);
+ extern void kvm_disable_steal_time(void);
+ 
++extern __visible void kvm_async_pf_vector(void);
++#ifdef CONFIG_TRACING
++#define trace_kvm_async_pf_vector kvm_async_pf_vector
++#endif
++__visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs);
++
+ #ifdef CONFIG_PARAVIRT_SPINLOCKS
+ void __init kvm_spinlock_init(void);
+ #else /* !CONFIG_PARAVIRT_SPINLOCKS */
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 341db0462b85..29b86e9adc9a 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -26,6 +26,8 @@
+ #define KVM_FEATURE_PV_EOI		6
+ #define KVM_FEATURE_PV_UNHALT		7
+ #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
++#define KVM_FEATURE_ASYNC_PF_INT	14
++#define KVM_FEATURE_MSI_EXT_DEST_ID	15
+ 
+ /* The last 8 bits are used to indicate how to interpret the flags field
+  * in pvclock structure. If no bits are set, all flags are ignored.
+@@ -42,6 +44,8 @@
+ #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
+ #define MSR_KVM_STEAL_TIME  0x4b564d03
+ #define MSR_KVM_PV_EOI_EN      0x4b564d04
++#define MSR_KVM_ASYNC_PF_INT	0x4b564d06
++#define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+ 
+ struct kvm_steal_time {
+ 	__u64 steal;
+@@ -70,6 +74,11 @@ struct kvm_clock_pairing {
+ #define KVM_ASYNC_PF_ENABLED			(1 << 0)
+ #define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
+ #define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
++#define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
++
++/* MSR_KVM_ASYNC_PF_INT */
++#define KVM_ASYNC_PF_VEC_MASK			GENMASK(7, 0)
++
+ 
+ /* Operations for KVM_HC_MMU_OP */
+ #define KVM_MMU_OP_WRITE_PTE            1
+@@ -101,8 +110,13 @@ struct kvm_mmu_op_release_pt {
+ #define KVM_PV_REASON_PAGE_READY 2
+ 
+ struct kvm_vcpu_pv_apf_data {
++	/* Used for 'page not present' events delivered via #PF */
+ 	__u32 reason;
+-	__u8 pad[60];
++
++	/* Used for 'page ready' events delivered via interrupt notification */
++	__u32 token;
++
++	__u8 pad[56];
+ 	__u32 enabled;
+ };
+ 
+diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+index fbcc303fb1f9..d1def86b66bd 100644
+--- a/arch/x86/kernel/irq.c
++++ b/arch/x86/kernel/irq.c
+@@ -134,7 +134,7 @@ int arch_show_interrupts(struct seq_file *p, int prec)
+ 		seq_printf(p, "%10u ", per_cpu(mce_poll_count, j));
+ 	seq_puts(p, "  Machine check polls\n");
+ #endif
+-#if IS_ENABLED(CONFIG_HYPERV) || defined(CONFIG_XEN)
++#if IS_ENABLED(CONFIG_HYPERV) || defined(CONFIG_XEN) || defined(CONFIG_KVM_GUEST)
+ 	if (test_bit(HYPERVISOR_CALLBACK_VECTOR, used_vectors)) {
+ 		seq_printf(p, "%*s: ", prec, "HYP");
+ 		for_each_online_cpu(j)
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 5853eb50138e..50390628342d 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -267,26 +267,46 @@ dotraplinkage void
+ do_async_page_fault(struct pt_regs *regs, unsigned long error_code)
+ {
+ 	enum ctx_state prev_state;
++	u32 reason = kvm_read_and_reset_pf_reason();
+ 
+-	switch (kvm_read_and_reset_pf_reason()) {
+-	default:
++	if (!reason) {
++		/* This is a normal page fault */
+ 		do_page_fault(regs, error_code);
+-		break;
+-	case KVM_PV_REASON_PAGE_NOT_PRESENT:
++	} else if (reason & KVM_PV_REASON_PAGE_NOT_PRESENT) {
+ 		/* page is swapped out by the host. */
+ 		prev_state = exception_enter();
+ 		kvm_async_pf_task_wait((u32)read_cr2(), !user_mode(regs));
+ 		exception_exit(prev_state);
+-		break;
+-	case KVM_PV_REASON_PAGE_READY:
++	} else if (reason & KVM_PV_REASON_PAGE_READY) {
+ 		rcu_irq_enter();
+ 		kvm_async_pf_task_wake((u32)read_cr2());
+ 		rcu_irq_exit();
+-		break;
++	} else {
++		WARN_ONCE(1, "Unexpected async PF flags: %x\n", reason);
+ 	}
+ }
+ NOKPROBE_SYMBOL(do_async_page_fault);
+ 
++__visible void __irq_entry kvm_async_pf_intr(struct pt_regs *regs)
++{
++	u32 token;
++
++	entering_ack_irq();
++
++	inc_irq_stat(irq_hv_callback_count);
++
++	if (__this_cpu_read(apf_reason.enabled)) {
++		token = __this_cpu_read(apf_reason.token);
++		rcu_irq_enter();
++		kvm_async_pf_task_wake(token);
++		rcu_irq_exit();
++		__this_cpu_write(apf_reason.token, 0);
++		wrmsrl(MSR_KVM_ASYNC_PF_ACK, 1);
++	}
++
++	exiting_irq();
++}
++
+ static void __init paravirt_ops_setup(void)
+ {
+ 	pv_info.name = "KVM";
+@@ -344,6 +364,11 @@ static void kvm_guest_cpu_init(void)
+ 		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_VMEXIT))
+ 			pa |= KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT;
+ 
++		if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT)) {
++			pa |= KVM_ASYNC_PF_DELIVERY_AS_INT;
++			wrmsrl(MSR_KVM_ASYNC_PF_INT, HYPERVISOR_CALLBACK_VECTOR);
++		}
++
+ 		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
+ 		__this_cpu_write(apf_reason.enabled, 1);
+ 		printk(KERN_INFO"KVM setup async PF for cpu %d\n",
+@@ -490,6 +515,9 @@ void __init kvm_guest_init(void)
+ 	if (kvmclock_vsyscall)
+ 		kvm_setup_vsyscall_timeinfo();
+ 
++	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT) && kvmapf)
++		alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, kvm_async_pf_vector);
++
+ #ifdef CONFIG_SMP
+ 	smp_ops.smp_prepare_boot_cpu = kvm_smp_prepare_boot_cpu;
+ 	if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "x86/kvm:online",
+-- 
+2.40.1
+
