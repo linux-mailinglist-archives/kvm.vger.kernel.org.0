@@ -2,134 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6247D7C8EA8
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 23:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3347C8EAB
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 23:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232140AbjJMVD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 17:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54378 "EHLO
+        id S232021AbjJMVD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 17:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229679AbjJMVDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231553AbjJMVDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 13 Oct 2023 17:03:25 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15B3AB7;
-        Fri, 13 Oct 2023 14:03:21 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d9ac43d3b71so2385538276.0;
-        Fri, 13 Oct 2023 14:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697231000; x=1697835800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JtiOVCn2uSsz0FoSYRDQt6Ad/oEEDkzUyvmWznVzlSA=;
-        b=azcdS5mk3fTak+nb/eug5AYpCwxC5kpdPWDxsTbKwRaTZsnLV+Lx6RGqcJnIyUdE7E
-         i8mcurTG2K1UAzdKUEP1S6mdqR+ibq2oLmQ3X9nYbM0kG2dZD3+5jy7tWcqTlQuPlXEn
-         YxekVNV3znDqK079lRSP9QXygD9u0NmyD1tg7EsKIgxZZ9rwNdXqbYT+ovXnVO/ci831
-         mgB/pG84f12ARASoT4IyPoOJNm6RHJASuCu6rXvY9sR+TJqwnt77yCRbkYhGzdUBrhXd
-         8X5ZM+bDS4cgt/tdAP3JdjHz4hcbnQ2wJko+oS911py/MlPJdtAAXbYPgvNL5+6cI/+s
-         ivbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697231000; x=1697835800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JtiOVCn2uSsz0FoSYRDQt6Ad/oEEDkzUyvmWznVzlSA=;
-        b=EoOdS6t9q5onboOSajiihDPwrOvD9jjmmZ0TIdOI+n9UUe11Qay6YbTt3flkCOKUJQ
-         ARCPDnwSv6Bs3VDI5IxdZzbQJCIQeqxrf3xuzq1iuv5bwBBeLK+nEebUyPBjCUySqrIR
-         0J68695SPTegha0BBJICgKu6KzXmAdwngFFH/rOG0W2o+RGqynfvOSZaggW1LjGxFCjS
-         3yslMQT6PQGUZSF7jsbLXGalqj48rkF+6H8UV7eBkF7tvXblE7/vRwBvtycqMznRcLJh
-         3l7WnU9pim0Tk9jgbHQv0qJQYzmiG5GIStf3RfL1H0Tt/MyisN30fssYiGCIRgg/Takh
-         049g==
-X-Gm-Message-State: AOJu0YwuMAUa/Yms10yiEquu3Ujskw3v3j1JidWpHUt+4pt3l+aT8B3W
-        QwBTXNyvRLeShvHZLvHa5uEIsTYwQeSGzw8QLec=
-X-Google-Smtp-Source: AGHT+IHWHj9ILTPWExZ8ekeA0/ryyRW0ZV6k5VhEVnOo+k5EpZsvEbKt/nom23K7vTTS2zHZvjjk2tEmm58T8MLLm1U=
-X-Received: by 2002:a5b:64d:0:b0:d9b:3b3e:5a07 with SMTP id
- o13-20020a5b064d000000b00d9b3b3e5a07mr2004058ybq.5.1697230999223; Fri, 13 Oct
- 2023 14:03:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A8FBE;
+        Fri, 13 Oct 2023 14:03:23 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C614C433C9;
+        Fri, 13 Oct 2023 21:03:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697231002;
+        bh=Plf/zX3o6rIrvL3UB/Tp2mhFXD/6OyB/+JAGi9E0v/c=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=OleojuGZ5LGLye6eZ0op0LEpWHQS69DAz/iOIFDBqKztG2EX1a2XXahca+MTQS+GU
+         1N7Sh85xf5dHzuX5QjRJ1OEks4uvkYPHf9EkU8iv6+FqqNWkLEHEw7my2gGZ4+Vj+i
+         msTPnov7b9jpTJD0I9ADQisauHtxpUEvqakMaTMxP6LfR1umthhH4UXNAQXaz7MSBl
+         kviUv4vvTPCN428G7CTFqZ7E6wk3NBiy9ultxWF82ZmfSld43Tey5sl/L8+vML32t4
+         Bp/YlplKFAxVav5HNp4RJqDPd7BvrfbejFitwzpcUQokqOjub9oNgX/ZtTGFSLQw6N
+         8au63rlRqKSAw==
+Message-ID: <0efe3ba3-b62f-4447-a195-2447e1152a22@kernel.org>
+Date:   Fri, 13 Oct 2023 15:03:11 -0600
 MIME-Version: 1.0
-References: <20230807230513.102486-1-vishal.moola@gmail.com>
- <20230807230513.102486-15-vishal.moola@gmail.com> <20231012072505.6160-A-hca@linux.ibm.com>
-In-Reply-To: <20231012072505.6160-A-hca@linux.ibm.com>
-From:   Vishal Moola <vishal.moola@gmail.com>
-Date:   Fri, 13 Oct 2023 14:03:08 -0700
-Message-ID: <CAOzc2px-SFSnmjcPriiB3cm1fNj3+YC8S0VSp4t1QvDR0f4E2A@mail.gmail.com>
-Subject: Re: [PATCH mm-unstable v9 14/31] s390: Convert various pgalloc
- functions to use ptdescs
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-        linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/8] Add printf attribute to kselftest functions
+Content-Language: en-US
+To:     Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+        akpm@linux-foundation.org, christian@kellner.me,
+        fenghua.yu@intel.com, keescook@chromium.org,
+        ndesaulniers@google.com, coltonlewis@google.com,
+        dmatlack@google.com, vipinsh@google.com, seanjc@google.com,
+        brauner@kernel.org, pbonzini@redhat.com, hannes@cmpxchg.org,
+        nphamcs@gmail.com, reinette.chatre@intel.com
+Cc:     ilpo.jarvinen@linux.intel.com, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <cover.1697196663.git.maciej.wieczor-retman@intel.com>
+From:   Shuah <shuah@kernel.org>
+In-Reply-To: <cover.1697196663.git.maciej.wieczor-retman@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 12, 2023 at 12:25=E2=80=AFAM Heiko Carstens <hca@linux.ibm.com>=
- wrote:
->
-> On Mon, Aug 07, 2023 at 04:04:56PM -0700, Vishal Moola (Oracle) wrote:
-> > As part of the conversions to replace pgtable constructor/destructors w=
-ith
-> > ptdesc equivalents, convert various page table functions to use ptdescs=
-.
-> >
-> > Some of the functions use the *get*page*() helper functions. Convert
-> > these to use pagetable_alloc() and ptdesc_address() instead to help
-> > standardize page tables further.
-> >
-> > Acked-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> > ---
-> >  arch/s390/include/asm/pgalloc.h |   4 +-
-> >  arch/s390/include/asm/tlb.h     |   4 +-
-> >  arch/s390/mm/pgalloc.c          | 128 ++++++++++++++++----------------
-> >  3 files changed, 69 insertions(+), 67 deletions(-)
-> ...
-> > diff --git a/arch/s390/mm/pgalloc.c b/arch/s390/mm/pgalloc.c
-> > index d7374add7820..07fc660a24aa 100644
-> > --- a/arch/s390/mm/pgalloc.c
-> > +++ b/arch/s390/mm/pgalloc.c
-> ...
-> > @@ -488,16 +486,20 @@ static void base_pgt_free(unsigned long *table)
-> >  static unsigned long *base_crst_alloc(unsigned long val)
-> >  {
-> >       unsigned long *table;
-> > +     struct ptdesc *ptdesc;
-> >
-> > -     table =3D (unsigned long *)__get_free_pages(GFP_KERNEL, CRST_ALLO=
-C_ORDER);
-> > -     if (table)
-> > -             crst_table_init(table, val);
-> > +     ptdesc =3D pagetable_alloc(GFP_KERNEL & ~__GFP_HIGHMEM, CRST_ALLO=
-C_ORDER);
->
-> I guess I must miss something, but what is the reason to mask out
-> __GFP_HIGHMEM here? It is not part of GFP_KERNEL, nor does s390 support
-> HIGHMEM.
+On 10/13/23 05:36, Maciej Wieczor-Retman wrote:
+> kselftest.h declares many variadic functions that can print some
+> formatted message while also executing selftest logic. These
+> declarations don't have any compiler mechanism to verify if passed
+> arguments are valid in comparison with format specifiers used in
+> printf() calls.
+> 
+> Attribute addition can make debugging easier, the code more consistent
+> and prevent mismatched or missing variables.
+> 
+> The first patch adds __printf() macro and applies it to all functions
+> in kselftest.h that use printf format specifiers. After compiling all
+> selftests using:
+> 	make -C tools/testing/selftests
+> many instances of format specifier mismatching are exposed in the form
+> of -Wformat warnings.
+> 
+> Fix the mismatched format specifiers caught by __printf() attribute in
+> multiple tests.
+> 
+> Series is based on kselftests next branch.
+> 
+> Changelog v6:
+> - Add methodology notes to all patches.
+> - No functional changes in the patches.
+> 
 
-You're not missing anything.
+Applied this series and the following three - all 25 patches are
+in linux-kselftest next for Linux 6.7-rc1.
 
-This was replacing __get_free_pages() which also doesn't support HIGHMEM,
-so I had that in to ensure a non-HIGHMEM allocation in case a
-passed-in gfp_flags
-had it set. In hindsight since we're just passing in the GFP flags
-directly here, we don't
-actually need to mask out GFP_HIGHMEM.
+[1] https://lore.kernel.org/all/cover.1696932728.git.maciej.wieczor-retman@intel.com/
+[2] https://lore.kernel.org/all/20231002094813.6633-1-ilpo.jarvinen@linux.intel.com/
+[3] https://lore.kernel.org/all/20230904095339.11321-1-ilpo.jarvinen@linux.intel.com/
+
+thanks,
+-- Shuah
+
