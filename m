@@ -2,58 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57F407C847D
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 13:36:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6209A7C8492
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 13:38:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231167AbjJMLgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 07:36:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
+        id S231300AbjJMLiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 07:38:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231130AbjJMLg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 07:36:28 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7EBBB7;
-        Fri, 13 Oct 2023 04:36:26 -0700 (PDT)
+        with ESMTP id S231222AbjJMLh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 07:37:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 852A3FC;
+        Fri, 13 Oct 2023 04:37:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697196987; x=1728732987;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3kHNtyQVnjAw9mhsimssz82xFGGV/T8R0wPGXi0ez5k=;
-  b=NjBiBEMjrjd9NqR/lCsxi6uvfS1Ow24iEwNCPXEYcqHAUIkQx65P1el8
-   Yjhrb+ziNL8TuY4gTIZMtztbD2UHeuf4F1Y8giic4pLWYnyul9PZIBpQ2
-   XzLor/tkzlxHWaEwqoDulElMRj9UPqoyONH0sF5DV5qWxjq8gFL1c6nPB
-   56noZfTuyR07pvX3jOiGx+/4eTu1xLw9tM01XAJYF+u3rPQystJENdtC9
-   NETmV8FgV9t8gqVTUp2fsZPxBbFDnKd6IL8qr+pBS0efR9IlSTDTodPhP
-   Dqd72Q5ncfO8bed88pOptbmBQHfd/jP8/Jt4yA/Y3Zj8YX5an1Is9omER
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="382391386"
+  t=1697197075; x=1728733075;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=m/gVC9ZBcqpamFqERfM3Iy1qjZmLaNjWknhhTFyG1+Q=;
+  b=Bi4gxo6ujiWMQOyhQn/CzdQjnIf2WW0k/v9OfHe4xnd/GjbiUhcMZRp0
+   DU8fX29ymcObL8jlH9MQFqn4H467QjqfXVC2hWXYG7HRMbsN+ga9/5+qc
+   iUMM/eGQkGBhd3EKRLKhzoaEg7UFnDZT/odqHSdrLAAK90sdlsDpPKQkV
+   WxTTx4tUItDeb97e5z5i+KLU2FwADyEpKdOF2fRl7aCQkb6/F9tbD2tS7
+   rlr2JIxN4E/Ay8Vif7e3CEAGTcouiCh/lJfrXJ5NqZYraCEx4ixTEa87V
+   L9c6uCKnO9PdFjr2rp0Leaxv62ThvMzO2wEom4Eppq2fEb9Jc9z39aI0Z
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="449353353"
 X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="382391386"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 04:36:25 -0700
+   d="scan'208";a="449353353"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 04:37:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="1001916985"
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="754675807"
 X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="1001916985"
+   d="scan'208";a="754675807"
 Received: from bsankiew-mobl.ger.corp.intel.com (HELO wieczorr-mobl1.intel.com) ([10.213.0.114])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 04:36:18 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 04:37:51 -0700
 From:   Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
-To:     akpm@linux-foundation.org, christian@kellner.me,
-        fenghua.yu@intel.com, keescook@chromium.org,
-        ndesaulniers@google.com, coltonlewis@google.com,
-        dmatlack@google.com, vipinsh@google.com, seanjc@google.com,
-        brauner@kernel.org, pbonzini@redhat.com, shuah@kernel.org,
-        hannes@cmpxchg.org, nphamcs@gmail.com, reinette.chatre@intel.com
-Cc:     ilpo.jarvinen@linux.intel.com, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH v6 0/8] Add printf attribute to kselftest functions
-Date:   Fri, 13 Oct 2023 13:36:04 +0200
-Message-ID: <cover.1697196663.git.maciej.wieczor-retman@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc:     ilpo.jarvinen@linux.intel.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v6 6/8] selftests/kvm: Replace attribute with macro
+Date:   Fri, 13 Oct 2023 13:36:30 +0200
+Message-ID: <e05d7b658c4685957152074d4090e8527da718e1.1697196663.git.maciej.wieczor-retman@intel.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <cover.1697196663.git.maciej.wieczor-retman@intel.com>
+References: <cover.1697196663.git.maciej.wieczor-retman@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -65,83 +60,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kselftest.h declares many variadic functions that can print some
-formatted message while also executing selftest logic. These
-declarations don't have any compiler mechanism to verify if passed
-arguments are valid in comparison with format specifiers used in
-printf() calls.
+The __printf() macro is used in many tools in the linux kernel to
+validate the format specifiers in functions that use printf. The kvm
+selftest uses it without putting it in a macro definition while it
+also imports the kselftests.h header where the macro attribute is
+defined.
 
-Attribute addition can make debugging easier, the code more consistent
-and prevent mismatched or missing variables.
+Use __printf() from kselftests.h instead of the full attribute.
 
-The first patch adds __printf() macro and applies it to all functions
-in kselftest.h that use printf format specifiers. After compiling all
-selftests using:
-	make -C tools/testing/selftests
-many instances of format specifier mismatching are exposed in the form
-of -Wformat warnings.
-
-Fix the mismatched format specifiers caught by __printf() attribute in
-multiple tests.
-
-Series is based on kselftests next branch.
-
+Signed-off-by: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
+---
 Changelog v6:
-- Add methodology notes to all patches.
-- No functional changes in the patches.
-
-Changelog v5:
-- Mention in the cover letter what methodology was used to find the
-  mismatched format specifiers.
-- No functional changes in the patches.
-
-Changelog v4:
-- Fix patch 1/8 subject typo.
-- Add Reinette's reviewed-by tags.
-- Rebase onto new kselftest/next patches.
-
-Changelog v3:
-- Changed git signature from Wieczor-Retman Maciej to Maciej
-  Wieczor-Retman.
-- Added one review tag.
-- Rebased onto updated kselftests next branch.
+- Make the motivation behind the patch more explicit in the patch
+  message.
 
 Changelog v2:
-- Add review and fixes tags to patches.
-- Add two patches with mismatch fixes.
-- Fix missed attribute in selftests/kvm. (Andrew)
-- Fix previously missed issues in selftests/mm (Ilpo)
+- Reword patch message.
+- Use __printf() on test_assert().
 
-[v5] https://lore.kernel.org/all/cover.1697012398.git.maciej.wieczor-retman@intel.com/
-[v4] https://lore.kernel.org/all/cover.1696846568.git.maciej.wieczor-retman@intel.com/
-[v3] https://lore.kernel.org/all/cover.1695373131.git.maciej.wieczor-retman@intel.com/
-[v2] https://lore.kernel.org/all/cover.1693829810.git.maciej.wieczor-retman@intel.com/
-[v1] https://lore.kernel.org/all/cover.1693216959.git.maciej.wieczor-retman@intel.com/
+ tools/testing/selftests/kvm/include/test_util.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Maciej Wieczor-Retman (8):
-  selftests: Add printf attribute to kselftest prints
-  selftests/cachestat: Fix print_cachestat format
-  selftests/openat2: Fix wrong format specifier
-  selftests/pidfd: Fix ksft print formats
-  selftests/sigaltstack: Fix wrong format specifier
-  selftests/kvm: Replace attribute with macro
-  selftests/mm: Substitute attribute with a macro
-  selftests/resctrl: Fix wrong format specifier
-
- .../selftests/cachestat/test_cachestat.c       |  2 +-
- tools/testing/selftests/kselftest.h            | 18 ++++++++++--------
- .../testing/selftests/kvm/include/test_util.h  |  8 ++++----
- tools/testing/selftests/mm/mremap_test.c       |  2 +-
- tools/testing/selftests/mm/pkey-helpers.h      |  2 +-
- tools/testing/selftests/openat2/openat2_test.c |  2 +-
- .../selftests/pidfd/pidfd_fdinfo_test.c        |  2 +-
- tools/testing/selftests/pidfd/pidfd_test.c     | 12 ++++++------
- tools/testing/selftests/resctrl/cache.c        |  2 +-
- tools/testing/selftests/sigaltstack/sas.c      |  2 +-
- 10 files changed, 27 insertions(+), 25 deletions(-)
-
-
-base-commit: 2531f374f922e77ba51f24d1aa6fa11c7f4c36b8
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index 7e614adc6cf4..8e5f413a593d 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -33,7 +33,7 @@ static inline int _no_printf(const char *format, ...) { return 0; }
+ #define pr_info(...) _no_printf(__VA_ARGS__)
+ #endif
+ 
+-void print_skip(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
++void __printf(1, 2) print_skip(const char *fmt, ...);
+ #define __TEST_REQUIRE(f, fmt, ...)				\
+ do {								\
+ 	if (!(f))						\
+@@ -46,9 +46,9 @@ ssize_t test_write(int fd, const void *buf, size_t count);
+ ssize_t test_read(int fd, void *buf, size_t count);
+ int test_seq_read(const char *path, char **bufp, size_t *sizep);
+ 
+-void test_assert(bool exp, const char *exp_str,
+-		 const char *file, unsigned int line, const char *fmt, ...)
+-		__attribute__((format(printf, 5, 6)));
++void __printf(5, 6) test_assert(bool exp, const char *exp_str,
++				const char *file, unsigned int line,
++				const char *fmt, ...);
+ 
+ #define TEST_ASSERT(e, fmt, ...) \
+ 	test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
 -- 
 2.42.0
 
