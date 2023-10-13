@@ -2,115 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8CA07C8F14
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 23:31:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9E667C8F92
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 23:52:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232271AbjJMVbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 17:31:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36574 "EHLO
+        id S231942AbjJMVw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 17:52:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbjJMVbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 17:31:05 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC33595;
-        Fri, 13 Oct 2023 14:31:02 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E7C2C433C8;
-        Fri, 13 Oct 2023 21:31:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697232662;
-        bh=0Gum7gjOtfuDZit2/WIKU/1n82O1xs+XX0sCV0VvldI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=J7yuVPYJzCR6NbD8abpueCRFe/CveVHC96cU21dUsnCAeQwShRM5AkO8xf/Sq4SWL
-         iDqRrdC0eto15WWFm924IklXgogVUqoOEkkKMqiNQhEFE8f96cYhkKEcriVvVas+Tm
-         5fUAOGsyHkH/vxJFK3qFz/VDGifHUw1F6pGvWVKTHEr+fNrakEtFtUFOsZavB6ZHtD
-         E/IN7DvDVKknRV3EW3jgGZuULcbjopABOSHImWjNI0tV6i1KWIOeOATZ60xqgq3/4T
-         NkZ3JPAAMZFeDvqtKoN9dhmHbXxTsSfWepENek3nk/xEf1tg55N2N8onFCVo6L2zc0
-         YfDmNdnX/0fqg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qrPkJ-00403e-Oa;
-        Fri, 13 Oct 2023 22:30:59 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anshuman Khandual <anshuman.khandual@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.6, take #2
-Date:   Fri, 13 Oct 2023 22:30:53 +0100
-Message-Id: <20231013213053.3947696-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229518AbjJMVw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 17:52:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F06B7
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 14:51:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697233899;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GhJ8SRDAsdQr3G0YpWQQAfHmnlmxFLHLMdnMLzMYnow=;
+        b=MO6QtU+woU5EoLDCVexGghosWuGU4xanuUeVUnaQqc/Qmd+RcHCkBendSS6Z8eZjghDOrv
+        5XhN0iW6QzjpShbjhrr/AAR+jnXlek7LPEwbHkGqzUdwKIhJkBF/jSjky0sF3hZWaDTtJz
+        bY9Qp59BU1NbRPd5/kZjfPAAnwekhz4=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-Llhv-FxtMu63eSKT9M-WXw-1; Fri, 13 Oct 2023 17:51:38 -0400
+X-MC-Unique: Llhv-FxtMu63eSKT9M-WXw-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-790d3e93a25so177997339f.0
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 14:51:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697233897; x=1697838697;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GhJ8SRDAsdQr3G0YpWQQAfHmnlmxFLHLMdnMLzMYnow=;
+        b=AxWJ3ZbELvuTsKBj4faVXiTIjxnTDZBlGYgUEipV54tTEDt3neC6BGlguBwZfIERLK
+         czblmMcwAB1lAW9getq9kQoUPI3D7lPdU3Pw+Y+G5Y8BIMH57SmdnTGA9XndC0h4XLKj
+         3DPgVXfsK+YYBCRmEZIuSueWHN1B84VBFdQ1Wa4Sw/8xXb+zVLL7lyp6Fte72TiLOVGQ
+         dzYHMoZISCHiZI1UFFgakqQdM3rOWIh3nN82I0lixC5njwsWbTvxgrh7WMTZriA4OEqu
+         /3CAir2bZvcM6Pc6AtFn8PTkNaG2mKclo7MGPAT/WjF2yoqCwEqOXQhepyuQ3fUVVVBX
+         TwPg==
+X-Gm-Message-State: AOJu0YyPof0E3RoJAxS1AdfFO4ckIydAWs+rvPo9c5q7rXXBldbrPA/j
+        9Xkb12qQyDKTP3CnUmk9aS5yfe7yBk6cs+fRJ79435bZaGUdgLB0s23QcZAPXos28t3CqfFEpq3
+        OhblZLgILj6ZTJqdbN40l
+X-Received: by 2002:a6b:ec17:0:b0:791:7e14:4347 with SMTP id c23-20020a6bec17000000b007917e144347mr31488015ioh.13.1697233897229;
+        Fri, 13 Oct 2023 14:51:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGgJfnAc1pGwIl+LmG0Sg1nTwLSfHLN45ZG0Fc/3K8qEvLlUR3bLmHHistY/nTAfvcNsdo+uw==
+X-Received: by 2002:a6b:ec17:0:b0:791:7e14:4347 with SMTP id c23-20020a6bec17000000b007917e144347mr31488003ioh.13.1697233896987;
+        Fri, 13 Oct 2023 14:51:36 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id f26-20020a056602039a00b0078335414ddesm5036209iov.26.2023.10.13.14.51.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 14:51:36 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 15:51:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 02/19] vfio: Move iova_bitmap into iommu core
+Message-ID: <20231013155134.6180386e.alex.williamson@redhat.com>
+In-Reply-To: <57e8b3ed-4831-40ff-a938-ee266da629c2@oracle.com>
+References: <20230923012511.10379-1-joao.m.martins@oracle.com>
+        <20230923012511.10379-3-joao.m.martins@oracle.com>
+        <20231013154821.GX3952@nvidia.com>
+        <8a70e930-b0ef-4495-9c02-8235bf025f05@oracle.com>
+        <11453aad-5263-4cd2-ac03-97d85b06b68d@oracle.com>
+        <20231013171628.GI3952@nvidia.com>
+        <77579409-c318-4bba-8503-637f4653c220@oracle.com>
+        <20231013144116.32c2c101.alex.williamson@redhat.com>
+        <57e8b3ed-4831-40ff-a938-ee266da629c2@oracle.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, anshuman.khandual@arm.com, gankulkarni@os.amperecomputing.com, james.morse@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- Paolo,
+On Fri, 13 Oct 2023 22:20:31 +0100
+Joao Martins <joao.m.martins@oracle.com> wrote:
 
-Here's a set of additional fixes for 6.6. The most important part is
-the fix for a breakage of the Permission Indirection feature, which is
-a regression. The other (less important) part is a fix for the physical
-timer offset.
+> On 13/10/2023 21:41, Alex Williamson wrote:
+> > On Fri, 13 Oct 2023 18:23:09 +0100
+> > Joao Martins <joao.m.martins@oracle.com> wrote:
+> >   
+> >> On 13/10/2023 18:16, Jason Gunthorpe wrote:  
+> >>> On Fri, Oct 13, 2023 at 06:10:04PM +0100, Joao Martins wrote:    
+> >>>> On 13/10/2023 17:00, Joao Martins wrote:    
+> >>>>> On 13/10/2023 16:48, Jason Gunthorpe wrote:    
+> >>>> But if it's exists an IOMMUFD_DRIVER kconfig, then VFIO_CONTAINER can instead
+> >>>> select the IOMMUFD_DRIVER alone so long as CONFIG_IOMMUFD isn't required? I am
+> >>>> essentially talking about:    
+> >>>
+> >>> Not VFIO_CONTAINER, the dirty tracking code is in vfio_main:
+> >>>
+> >>> vfio_main.c:#include <linux/iova_bitmap.h>
+> >>> vfio_main.c:static int vfio_device_log_read_and_clear(struct iova_bitmap *iter,
+> >>> vfio_main.c:    struct iova_bitmap *iter;
+> >>> vfio_main.c:    iter = iova_bitmap_alloc(report.iova, report.length,
+> >>> vfio_main.c:    ret = iova_bitmap_for_each(iter, device,
+> >>> vfio_main.c:    iova_bitmap_free(iter);
+> >>>
+> >>> And in various vfio device drivers.
+> >>>
+> >>> So the various drivers can select IOMMUFD_DRIVER
+> >>>     
+> >>
+> >> It isn't so much that type1 requires IOMMUFD, but more that it is used together
+> >> with the core code that allows the vfio drivers to do migration. So the concern
+> >> is if we make VFIO core depend on IOMMU that we prevent
+> >> VFIO_CONTAINER/VFIO_GROUP to not be selected. My kconfig read was that we either
+> >> select VFIO_GROUP or VFIO_DEVICE_CDEV but not both  
+> > 
+> > That's not true.  We can have both.  In fact we rely on having both to
+> > support a smooth transition to the cdev interface.  Thanks,  
+> 
+> On a triple look, mixed defaults[0] vs manual config: having IOMMUFD=y|m today
+> it won't select VFIO_CONTAINER, nobody stops one from actually selecting it
+> both. Unless I missed something
 
-Please pull,
+Oh!  I misunderstood your comment, you're referring to default
+selections rather than possible selections.  So yes, if VFIO depends on
+IOMMUFD then suddenly our default configs shift to IOMMUFD/CDEV rather
+than legacy CONTAINER/GROUP.  So perhaps if VFIO selects IOMMUFD, that's
+not exactly harmless currently.
 
-        M.
+I think Jason is describing this would eventually be in a built-in
+portion of IOMMUFD, but I think currently that built-in portion is
+IOMMU.  So until we have this IOMMUFD_DRIVER that enables that built-in
+portion, it seems unnecessarily disruptive to make VFIO select IOMMUFD
+to get this iova bitmap support.  Thanks,
 
-The following changes since commit 373beef00f7d781a000b12c31fb17a5a9c25969c:
+Alex
 
-  KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:07:37 +0100)
+> [0] Ref:
+> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/drivers/vfio/Kconfig
+> 
+> menuconfig VFIO
+> 	[...]
+> 	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=n
+> 	select VFIO_DEVICE_CDEV if !VFIO_GROUP
+> 	select VFIO_CONTAINER if IOMMUFD=n
+> 	[...]
+> 
+> if VFIO
+> config VFIO_DEVICE_CDEV
+> 	[...]
+> 	depends on IOMMUFD && !SPAPR_TCE_IOMMU
+> 	default !VFIO_GROUP
+> [...]
+> config VFIO_GROUP
+> 	default y
+> [...]
+> config VFIO_CONTAINER
+> 	[...]
+> 	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> 	depends on VFIO_GROUP
+> 	default y
+> 
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.6-2
-
-for you to fetch changes up to 9404673293b065cbb16b8915530147cac7e80b4d:
-
-  KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2 (2023-10-12 16:55:21 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.6, take #2
-
-- Fix the handling of the phycal timer offset when FEAT_ECV
-  and CNTPOFF_EL2 are implemented.
-
-- Restore the functionnality of Permission Indirection that
-  was broken by the Fine Grained Trapping rework
-
-- Cleanup some PMU event sharing code
-
-----------------------------------------------------------------
-Anshuman Khandual (1):
-      KVM: arm64: pmu: Drop redundant check for non-NULL kvm_pmu_events
-
-Joey Gouly (2):
-      KVM: arm64: Add nPIR{E0}_EL1 to HFG traps
-      KVM: arm64: POR{E0}_EL1 do not need trap handlers
-
-Marc Zyngier (1):
-      KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2
-
- arch/arm64/include/asm/kvm_arm.h |  4 ++--
- arch/arm64/kvm/arch_timer.c      | 13 +++---------
- arch/arm64/kvm/emulate-nested.c  |  2 ++
- arch/arm64/kvm/hyp/vhe/switch.c  | 44 ++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/pmu.c             |  4 ++--
- arch/arm64/kvm/sys_regs.c        |  4 ++--
- include/kvm/arm_arch_timer.h     |  7 +++++++
- 7 files changed, 62 insertions(+), 16 deletions(-)
