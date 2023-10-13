@@ -2,201 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10B477C8CA4
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 19:57:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFEBA7C8CC9
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 20:07:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231244AbjJMR5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 13:57:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38286 "EHLO
+        id S230347AbjJMSHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 14:07:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjJMR5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 13:57:11 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2084.outbound.protection.outlook.com [40.107.102.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C25783;
-        Fri, 13 Oct 2023 10:57:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jg4oczWE+X5MQZMB9UtVYOQOzWNQvNnq+GM7CkRcScDIpLhkbCUqHSlbQ8qYxdfBku5AZrALuj8Gu+SL904AOlZ9S5U66MG5FdrvabSQ2zgNwH9AptSC0WDyx2FOzpXdTj9jx+R42tOP4j0qRWG6QCg5hb8uMS1/FqWC9gmvrh2VrDqx1FsLDqRIXSHBytyxAv9h2YMwZgqz0KRFIXDGBW/LjX3eP0wziMKebWSkOnC+5y3BFKUiF57/Fb5cnvjWM/ggAgJ6jwcfHTJ3HT+t9blfNpXYOAB4qL2XvlqwvPZ+fKNUB6nloToJusKMhOesvt1qfehnjuMkZilqeWSbDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IU7v3bKAag+fXwMeLevyenwh9wI3QSilzimF+wgn0oA=;
- b=ZHh8QPkW4dF1LpeQ2ViOb3kg8wqfsmTVR70VdwjC5JOzb3Q9pegJQ3Kw1BaQ7USbQPF+CD6LCSYAQvv9ddxQJ9bqgVjzWoRwnaCyC1pPG2OqdJublyfjjhPjq4RdBmrOAgAsYcaFkB4+VLqAVJsUN0uet+MZQTfV1/AMqVzI19O/KtCgJluBtIwecYkB6DH26NGzUYXyFF10e4tGSEIAnZHuvB+UhOnjF+jdgTw5FmJkuYnos1PJaH/yyKoagpCT1A9QoGaqrXWObuGcQcUAVwJWh64WkXxUKStlE4z50pmAfnY1jrsn3KmVSb5SsBQPEQxgJaUqPjaPWEF0VnoGjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IU7v3bKAag+fXwMeLevyenwh9wI3QSilzimF+wgn0oA=;
- b=kLDpSAtuVL6WO9B+oTSPT1342xJXgqJuM8MwJ9OHIEey9HG3T5hEO9oZMHDqlFwvoU9V86/hZciwImxYt82+xFJi0MBTKOYAFDTdHf9Y549EiozmkXKxZiuvNaHbRg4L5X9JBIlWtEiPCS3NcRniAI9RQWwjobtgmjbHTWFUlMzQFo4iZOwAUjCsusFGZjDZt9VWVMNzSSRlCE6UvGyNUEk7i+Rr+h0VMzYNv1O6ADp3jaqCpibP1HwlMCP0nJAk62IaZ54CoF1AndBAmsJJxX3Dpuy/uF68rTFN8mxMILvXpD/46GR+hz5PkMIZrELoay2FOUaqSaTijJNUb5TLBA==
-Received: from DS7PR03CA0010.namprd03.prod.outlook.com (2603:10b6:5:3b8::15)
- by SA1PR12MB7150.namprd12.prod.outlook.com (2603:10b6:806:2b4::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Fri, 13 Oct
- 2023 17:57:08 +0000
-Received: from DS1PEPF0001708E.namprd03.prod.outlook.com
- (2603:10b6:5:3b8:cafe::a4) by DS7PR03CA0010.outlook.office365.com
- (2603:10b6:5:3b8::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.30 via Frontend
- Transport; Fri, 13 Oct 2023 17:57:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DS1PEPF0001708E.mail.protection.outlook.com (10.167.17.134) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.22 via Frontend Transport; Fri, 13 Oct 2023 17:57:07 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 13 Oct
- 2023 10:57:01 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Fri, 13 Oct 2023 10:57:01 -0700
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
- Transport; Fri, 13 Oct 2023 10:57:00 -0700
-Date:   Fri, 13 Oct 2023 10:56:58 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
-        <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
-        <robin.murphy@arm.com>, <baolu.lu@linux.intel.com>,
-        <cohuck@redhat.com>, <eric.auger@redhat.com>,
-        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
-        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
-        <peterx@redhat.com>, <jasowang@redhat.com>,
-        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
-        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <zhenzhong.duan@intel.com>, <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
- domain_alloc_user op
-Message-ID: <ZSmE6unIukqJ3GKu@Asurada-Nvidia>
-References: <20230921075138.124099-1-yi.l.liu@intel.com>
- <20230921075138.124099-2-yi.l.liu@intel.com>
- <20231010165844.GQ3952@nvidia.com>
- <03ba68e9-33ef-35c1-5720-8f559f94f8a1@intel.com>
- <20231012133917.GL3952@nvidia.com>
- <3659d9a7-d9e9-bb73-daf5-41c765e99c8c@intel.com>
- <20231013140456.GR3952@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231013140456.GR3952@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001708E:EE_|SA1PR12MB7150:EE_
-X-MS-Office365-Filtering-Correlation-Id: 386e13bd-37df-4f3f-19ce-08dbcc15d144
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5B+cdDL5Xes3XYaArUtr2me7OKXjwxXEsEycebXJge/1cTEsE6c7+akRVxr299qrPlq1d7UAaW2shDxHOjx4y5rfWY/5HoAbjGD0uR+5qFt4U0eIVU05xmRhD8zEsaCzUUFYItN6Z/Lyztrg3Nco9XlHZtnZ+TC00PnNaTWo1CSdZhDz6pYi++z5b7BlGp5S+IfAK+bya4Hf0HA6m2QIlJcWuXdnCkEranVlFKSgMYYf60b8YXsQIVudfYaAGwt9LvIcHsOzcAkJP4H4Yn+0huJAS5UQnhlXp/kmTRPzEFf7t4GuPDmubRIzvsjsrGWKl0TgEW2C0YE4JeEBAyqsxSs7gllVUIRGJuIJi0ECrilfPgtVdR1416gNHX4oHw/M7HtMknTmSsP5n8mFUBTJr/5zO3fVA8b2X2QLm3Xy8xCDLRxnfTlWBVAT5coU3K5O6ni4oCkTmmFALdaszeUduFk9/NCNZ5meNFBfdPwe59y0cHRzhsJWssKuxMBMSMmFPxcPs1bRzcGxoyzVw8QfyI9Al27Zpm/+IGE3I3ChUNvBjBWvGywYvQVZDffDf3wXIH4+YuLvnJ+y2/cifEAU7IUaIlxmPJBGMVi9KNweGzdUvuYn0AXgxVC8ryWDKtnSDWOatLfBDwdVSEwQBW3VRH/UaqMQX2WnIU6+U2vSWLfFQyET8QO5XXc54a9AHqgQfF0bEMMXU6uBxBCOPlfEjxRuDL2B3WSEMspJZo1aQHvQrQN/XjN+MNr1Jt6SQD+f
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(136003)(346002)(396003)(230922051799003)(451199024)(186009)(1800799009)(82310400011)(64100799003)(40470700004)(46966006)(36840700001)(55016003)(8676002)(8936002)(4326008)(6862004)(41300700001)(40460700003)(5660300002)(7416002)(2906002)(47076005)(86362001)(83380400001)(33716001)(356005)(7636003)(36860700001)(336012)(426003)(26005)(40480700001)(6636002)(82740400003)(316002)(478600001)(70206006)(70586007)(54906003)(9686003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 17:57:07.8931
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 386e13bd-37df-4f3f-19ce-08dbcc15d144
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0001708E.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7150
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229743AbjJMSHs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 14:07:48 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC605BB
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 11:07:46 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a3e5f1742so3441762276.0
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 11:07:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697220466; x=1697825266; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PvKDPaw+QIOESW8HQR3wI94B1SCpRWY2eOMQFgHhpck=;
+        b=nmhyQiCqVql4HRLeehIy6wJ7VM1jYk+Bry3frLK/qUnfQgKwzXeAXeRtUrbKh89Iyj
+         kNy8Iw8uiR3KSxkHRB+5HnuntAZNV/0CQ9msf6/VbUGM1TNtYh4ma1LENo2HJq7ON/aV
+         w0ifyAJUAie2AZN2PnhJPKuhiOfk52uWsmEOOQe9Q+l8f0YdeFaXi0oWEucTFnh+67rE
+         tICqjBek64YO/ALZn+zTB4OcN32BR4pv0LZ+yKP1+7N+AiI8DMCVHfeKq02hx6WT7Wuz
+         kUVOopZJH21ysM+j/KniLUqIG1v6jASWtpzyF0rjmNXKMiGLaDgO1IPwbs2khwIZ7qXT
+         MFQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697220466; x=1697825266;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PvKDPaw+QIOESW8HQR3wI94B1SCpRWY2eOMQFgHhpck=;
+        b=QwW5xVWbNZI1s4M6cFEgILK0aBiejveYHfO3PUbkBKLhayU6RRPPvTP0prVvS9DeRX
+         oxLh/GZP9BcNOF7ae55DNz3bWuEKjGL8IK4xt3FQMp0avH+aSAA/AEGmxrG+Hlrw1OIA
+         RmPe1ff+nuI7LE7VHfqADt79+jJkurtauvarTdRfzVWYiYSEOW4PwAx3f1svl3/wKgMQ
+         Si33p2zxyiwcauRNVk3kFZtxe/Zi6SxX+FU+36F0mvayNpfi8SxaGsekSN2gdGziqDzx
+         qmBfQSH8OTuS1eKl208oN2WJGf+nylagJPIewN7TLmeAl0Y6AMv03VzYBhr/f4xuZX+p
+         IZUg==
+X-Gm-Message-State: AOJu0YwYYc80Gjkj2dmcBU3t9uBnSKJVGS+IIula3T+TYBRWW4mQFHVO
+        oPVk5HlwHWM8VnXmCNmXH6QrfKFqH5w=
+X-Google-Smtp-Source: AGHT+IGCiJa78jVmD9wzZk02a+k13vciXuotJPmPePzI1vR3bESQmSJ6CySHioa8DCCeFY/ISgbeFFQj2ZM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ab24:0:b0:d9a:da96:f9ca with SMTP id
+ u33-20020a25ab24000000b00d9ada96f9camr114009ybi.6.1697220465987; Fri, 13 Oct
+ 2023 11:07:45 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 11:07:44 -0700
+In-Reply-To: <8f3493ca4c0e726d5c3876bb7dd2cfc432d9deaa.camel@infradead.org>
+Mime-Version: 1.0
+References: <ZRrxtagy7vJO5tgU@google.com> <52a3cea2084482fc67e35a0bf37453f84dcd6297.camel@infradead.org>
+ <ZRtl94_rIif3GRpu@google.com> <9975969725a64c2ba2b398244dba3437bff5154e.camel@infradead.org>
+ <ZRysGAgk6W1bpXdl@google.com> <d6dc1242ff731cf0f2826760816081674ade9ff9.camel@infradead.org>
+ <ZR2pwdZtO3WLCwjj@google.com> <34057852-f6c0-d6d5-261f-bbb5fa056425@oracle.com>
+ <ZSXqZOgLYkwLRWLO@google.com> <8f3493ca4c0e726d5c3876bb7dd2cfc432d9deaa.camel@infradead.org>
+Message-ID: <ZSmHcECyt5PdZyIZ@google.com>
+Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 13, 2023 at 11:04:56AM -0300, Jason Gunthorpe wrote:
-> On Fri, Oct 13, 2023 at 12:33:13PM +0800, Yi Liu wrote:
-> 
-> > not really. Below the users of the struct iommu_user_data in my current
-> > iommufd_nesting branch. Only the domain_alloc_user op has type as there
-> > can be multiple vendor specific alloc data types. Basically, I'm ok to
-> > make the change you suggested, just not sure if it is good to add type
-> > as it is only needed by one path.
-> 
-> I don't think we should ever have an opaque data blob without a type
-> tag..
+On Wed, Oct 11, 2023, David Woodhouse wrote:
+> On Tue, 2023-10-10 at 17:20 -0700, Sean Christopherson wrote:
+> > On Wed, Oct 04, 2023, Dongli Zhang wrote:
+> > > > -static void kvm_gen_kvmclock_update(struct kvm_vcpu *v)
+> > > > -{
+> > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm *kvm =3D v->k=
+vm;
+> > > > -
+> > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_make_request(KVM_REQ=
+_CLOCK_UPDATE, v);
+> > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0schedule_delayed_work(&k=
+vm->arch.kvmclock_update_work,
+> > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0KVMCLOCK_UPDATE_DELAY);
+> > > > -}
+> > > > -
+> > > > =C2=A0#define KVMCLOCK_SYNC_PERIOD (300 * HZ)
+> > >=20
+> > > While David mentioned "maximum delta", how about to turn above into a=
+ module
+> > > param with the default 300HZ.
+> > >=20
+> > > BTW, 300HZ should be enough for vCPU hotplug case, unless people pref=
+er 1-hour
+> > > or 1-day.
+> >=20
+> > Hmm, I think I agree with David that it would be better if KVM can take=
+ care of
+> > the gory details and promise a certain level of accuracy.=C2=A0 I'm usu=
+ally a fan of
+> > punting complexity to userspace, but requiring every userspace to figur=
+e out the
+> > ideal sync frequency on every platform is more than a bit unfriendly.=
+=C2=A0 And it
+> > might not even be realistic unless userspace makes assumptions about ho=
+w the kernel
+> > computes CLOCK_MONOTONIC_RAW from TSC cycles.
+> >=20
+>=20
+> I think perhaps I would rather save up my persuasiveness on the topic
+> of "let's not make things too awful for userspace to cope with" for the
+> live update/migration mess. I think I need to dust off that attempt at
+> fixing our 'how to migrate with clocks intact' documentation from
+> https://lore.kernel.org/kvm/13f256ad95de186e3b6bcfcc1f88da5d0ad0cb71.came=
+l@infradead.org/
+> The changes we're discussing here obviously have an effect on migration
+> too.
+>=20
+> Where the host TSC is actually reliable, I would really prefer for the
+> kvmclock to just be a fixed function of the guest TSC and *not* to be
+> arbitrarily yanked back[1] to the host's CLOCK_MONOTONIC periodically.
 
-I can add those "missing" data types, and then a driver will be
-responsible for sanitizing the type along with the data_len.
+CLOCK_MONOTONIC_RAW!  Just wanted to clarify because if kvmclock were tied =
+to the
+non-raw clock, then we'd have to somehow reconcile host NTP updates.
 
-I notice that the enum iommu_hwpt_data_type in the posted patch
-is confined to the alloc_user uAPI. Perhaps we should share it
-with invalidate too:
+I generally support the idea, but I think it needs to an opt-in from usersp=
+ace.
+Essentially a "I pinky swear to give all vCPUs the same TSC frequency, to n=
+ot
+suspend the host, and to not run software/firmware that writes IA32_TSC_ADJ=
+UST".
+AFAICT, there are too many edge cases and assumptions about userspace for K=
+VM to
+safely couple kvmclock to guest TSC by default.
 
-/**
- * enum iommu_hwpt_data_type - IOMMU HWPT Data Type
- * @IOMMU_HWPT_DATA_NONE: no data
- * @IOMMU_HWPT_DATA_VTD_S1: Intel VT-d stage-1 page table
- * @IOMMU_HWPT_DATA_ARM_SMMUV3: ARM SMMUv3 Context Descriptor Table
- */
-enum iommu_hwpt_data_type {
-	IOMMU_HWPT_DATA_NONE,
-	IOMMU_HWPT_DATA_VTD_S1,
-	IOMMU_HWPT_DATA_ARM_SMMUV3,
-};
+> [1] Yes, I believe "back" does happen. I have test failures in my queue
+> to look at, where guests see the "Xen" clock going backwards.
 
-Though inevitably we'd have to define a separate data group for
-things like set_dev_data that is related to idev v.s. hwpt:
+Yeah, I assume "back" can happen based purely on the wierdness of the pvclo=
+ck math.o
 
-// IOMMU_DEV_DATA_TYPE sounds like an IOMMU device, other than a
-// passthrough device, so renaming to "_IDEV_" here. And perhaps
-// "set_dev_data" could be "set_idev_data" too? Any better name?
+What if we add a module param to disable KVM's TSC synchronization crazines=
+s
+entirely?  If we first clean up the peroidic sync mess, then it seems like =
+it'd
+be relatively straightforward to let kill off all of the synchronization, i=
+ncluding
+the synchronization of kvmclock to the host's TSC-based CLOCK_MONOTONIC_RAW=
+.
 
-/**
- * enum iommu_idev_data_type - Data Type for a Device behind an IOMMU
- * @IOMMU_IDEV_DATA_NONE: no data
- * @IOMMU_IDEV_DATA_ARM_SMMUV3: ARM SMMUv3 specific device data
- */
-enum iommu_idev_data_type {
-	IOMMU_IDEV_DATA_NONE,
-	IOMMU_IDEV_DATA_ARM_SMMUV3,
-};
+Not intended to be a functional patch...
 
-/**
- * struct iommu_idev_data_arm_smmuv3 - ARM SMMUv3 specific device data
- * @sid: The Stream ID that is assigned in the user space
- *
- * The SMMUv3 specific user space data for a device that is behind an SMMU HW.
- * The guest-level user data should be linked to the host-level kernel data,
- * which will be used by user space cache invalidation commands.
- */
-struct iommu_idev_data_arm_smmuv3 {
-	__u32 sid;
-};
+---
+ arch/x86/kvm/x86.c | 35 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 32 insertions(+), 3 deletions(-)
 
-/**
- * struct iommu_set_idev_data - ioctl(IOMMU_SET_IDEV_DATA)
- * @size: sizeof(struct iommu_set_idev_data)
- * @dev_id: The device to set an iommu specific device data
- * @data_uptr: User pointer of the device user data
- * @data_len: Length of the device user data
- *
- * The device data must be unset using ioctl(IOMMU_UNSET_IDEV_DATA), before
- * another ioctl(IOMMU_SET_IDEV_DATA) call or before the device itself gets
- * unbind'd from the iommufd context.
- */
-struct iommu_set_idev_data {
-	__u32 size;
-	__u32 dev_id;
-	__aligned_u64 data_uptr;
-	__u32 data_len;
-};
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5b2104bdd99f..75fc6cbaef0d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -157,6 +157,9 @@ module_param(min_timer_period_us, uint, S_IRUGO | S_IWU=
+SR);
+ static bool __read_mostly kvmclock_periodic_sync =3D true;
+ module_param(kvmclock_periodic_sync, bool, S_IRUGO);
+=20
++static bool __read_mostly enable_tsc_sync =3D true;
++module_param_named(tsc_synchronization, enable_tsc_sync, bool, 0444);
++
+ /* tsc tolerance in parts per million - default to 1/2 of the NTP threshol=
+d */
+ static u32 __read_mostly tsc_tolerance_ppm =3D 250;
+ module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
+@@ -2722,6 +2725,12 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcp=
+u, u64 data)
+ 	bool matched =3D false;
+ 	bool synchronizing =3D false;
+=20
++	if (!enable_tsc_sync) {
++		offset =3D kvm_compute_l1_tsc_offset(vcpu, data);
++		kvm_vcpu_write_tsc_offset(vcpu, offset);
++		return;
++	}
++
+ 	raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
+ 	offset =3D kvm_compute_l1_tsc_offset(vcpu, data);
+ 	ns =3D get_kvmclock_base_ns();
+@@ -2967,9 +2976,12 @@ static void pvclock_update_vm_gtod_copy(struct kvm *=
+kvm)
+ 					&ka->master_kernel_ns,
+ 					&ka->master_cycle_now);
+=20
+-	ka->use_master_clock =3D host_tsc_clocksource && vcpus_matched
+-				&& !ka->backwards_tsc_observed
+-				&& !ka->boot_vcpu_runs_old_kvmclock;
++	WARN_ON_ONCE(!host_tsc_clocksource && !enable_tsc_sync);
++
++	ka->use_master_clock =3D host_tsc_clocksource &&
++			       (vcpus_matched || !enable_tsc_sync) &&
++			       !ka->backwards_tsc_observed &&
++			       !ka->boot_vcpu_runs_old_kvmclock;
+=20
+ 	if (ka->use_master_clock)
+ 		atomic_set(&kvm_guest_has_master_clock, 1);
+@@ -3278,6 +3290,9 @@ static void kvmclock_sync_fn(struct work_struct *work=
+)
+=20
+ void kvm_adjust_pv_clock_users(struct kvm *kvm, bool add_user)
+ {
++	if (!enable_tsc_sync)
++		return;
++
+ 	/*
+ 	 * Doesn't need to be a spinlock, but can't be kvm->lock as this is
+ 	 * call while holding a vCPU's mutext.
+@@ -5528,6 +5543,11 @@ static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vc=
+pu,
+ 		if (get_user(offset, uaddr))
+ 			break;
+=20
++		if (!enable_tsc_sync) {
++			kvm_vcpu_write_tsc_offset(vcpu, offset);
++			break;
++		}
++
+ 		raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
+=20
+ 		matched =3D (vcpu->arch.virtual_tsc_khz &&
+@@ -12188,6 +12208,9 @@ int kvm_arch_hardware_enable(void)
+ 	if (ret !=3D 0)
+ 		return ret;
+=20
++	if (!enable_tsc_sync)
++		return 0;
++
+ 	local_tsc =3D rdtsc();
+ 	stable =3D !kvm_check_tsc_unstable();
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+@@ -13670,6 +13693,12 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_proto=
+col_exit);
+=20
+ static int __init kvm_x86_init(void)
+ {
++	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
++		enable_tsc_sync =3D true;
++
++	if (!enable_tsc_sync)
++		kvmclock_periodic_sync =3D false;
++
+ 	kvm_mmu_x86_module_init();
+ 	mitigate_smt_rsb &=3D boot_cpu_has_bug(X86_BUG_SMT_RSB) && cpu_smt_possib=
+le();
+ 	return 0;
 
-Thanks
-Nic
+base-commit: 7d2edad0beb2a6f07f6e6c2d477d5874f5417d6c
+--=20
+
