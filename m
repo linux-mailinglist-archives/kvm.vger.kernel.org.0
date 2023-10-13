@@ -2,185 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED8AC7C8848
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 17:06:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 424617C8871
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 17:19:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232241AbjJMPGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 11:06:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38270 "EHLO
+        id S232326AbjJMPTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 11:19:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230373AbjJMPGD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 11:06:03 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C80195;
-        Fri, 13 Oct 2023 08:06:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697209561; x=1728745561;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to;
-  bh=I9ejgnkc4T1U17W9HiaslETujXXaw9iMHZTTGR4wj6g=;
-  b=CpGBRA+/rCwc7WHWKUo5yeSoNPvXA7dAhVR/paN3eamEwe9rqz4owRZm
-   FgzkUbNT9Poc1pCkxfAhl0287uQXeu7vjdB2y+X0Lj2/YJXnWuMym/3z4
-   Xd8Hrq9NbJuLlsGNpNPRbb/sy9I/6SiOlVyFLwLwQ6YW/AM1PZrnlWiOe
-   GXN/N4P6flvLFocaWa1tz+VEZ6zz5Xz2qCor4Cw/6tRp02vT2pBAO6XN8
-   zMspGX1dobkQRFyIVV8dV4LdNQt1OW5Ha8A5juFGG0eKY703MEGYWhhxr
-   xlihfYOBmtbU1AT2DAV/s5S7TBTT/2fGgEAB+tA3RbwhSn5wP16kAcXEe
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="375552697"
-X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="375552697"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 08:06:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="704676500"
-X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="704676500"
-Received: from marinjul-mobl.amr.corp.intel.com (HELO [10.255.231.41]) ([10.255.231.41])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 08:06:00 -0700
-Content-Type: multipart/mixed; boundary="------------4QAAwMnZ7myaM0IpTAN94Ja9"
-Message-ID: <532fd5c3-dddb-4503-9b81-31c3d07a7119@intel.com>
-Date:   Fri, 13 Oct 2023 08:05:54 -0700
+        with ESMTP id S232270AbjJMPTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 11:19:30 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C150195;
+        Fri, 13 Oct 2023 08:19:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jtBtWrYWOz0QUjKzMqMUJ6IeGt3t++dgAdJdgYmBHOSggEXx/u2UGkg2o/0f2J/nfJbtjh3G09bCS1jPLvB7PanRGAfdvsmIQtf0Njm9PoNUVUZFt+WAMfNs/sBa8AOTV1whr6hQrKSg32L1MgXD1iKYNzj//5Gy9I21oSSc85l2tZts2/JpJWiCsg3UwFYdXyCuU8rwo426FmmIu08bnHnRor+TaUFJ7pftT5zODzlqueB9e33p2Enot8pF0ZQlCk8u1s0bOivHpLB/yNxLGvRUeUJZt74/L6gMviOCPQUpTLxZaBiE5vx4zKCIQxGX44+zsQPwSWK+tsy4bvFE+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zgcIl48qCBFV4P/QIC5nngJPL3QF+MQ7aqeL0zTG+xQ=;
+ b=OllgO0HBUWGGIy63QqrYFaMxgJNiDcAaYnXtTOzh1n30XCbvMz1oqjPxYFRXEiXw2N4SgVq7CDw9SKDp++zGqj+6RCebkgSQ9BhXoJPmVebeNlhPln2YqMzlpSk9EddPRjgExv4FZjfBgm6AJLeXeC1XqhRjFxgEGPhIYOLlJRtfxsCd99Ccv6cguL+qKZWfDCzjyA4tyGZ9ZNz2Ul/zjUb+a9fohfPxYiEGL9wyY6nDl3MvT6HsGRBaVlLoCtq98UTc1XWaH295XP7GO/HqZ3lkHHvgoBrSl7AG+m7R2tEBOFg0J1jW/b9h+gRra/3S8CZKu7PsYjC4T2nBWyPBdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zgcIl48qCBFV4P/QIC5nngJPL3QF+MQ7aqeL0zTG+xQ=;
+ b=QKR/VbH9601HnsLGy/BIAQVtEWb+dzcIoVnIgOW75tavpF7JN0YS+q6V1xpQkHdS42n79rljWMqPSLtNoUolq1QNNBIt4ukdwrMFa6ZwuktcCPXKTzP59Agbf427/4O/QgPKKG4C3NH9N6SI67GEl9+Io/DpoTlwbckWioE/p8W+OX/h2/rCZfVY4sHIE0xHmW7MQHPiWToJgCvnak/OwfLdA7BpdLpAVR2a4qe2EbJhAQIFXy48FFHvZtGj+UuTm027wS7kViToQMwQeUAxIv6VigGduFTKXjeKnjgZ3pw/atP8VZ8hyBIoPxwR95uKdq/nBepEwt85CL2XKxrwFw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5963.namprd12.prod.outlook.com (2603:10b6:8:6a::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6863.45; Fri, 13 Oct 2023 15:19:25 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.046; Fri, 13 Oct 2023
+ 15:19:25 +0000
+Date:   Fri, 13 Oct 2023 12:19:23 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH v4 10/17] iommufd: Support IOMMU_HWPT_ALLOC allocation
+ with user data
+Message-ID: <20231013151923.GV3952@nvidia.com>
+References: <20230921075138.124099-1-yi.l.liu@intel.com>
+ <20230921075138.124099-11-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921075138.124099-11-yi.l.liu@intel.com>
+X-ClientProxiedBy: BL0PR05CA0013.namprd05.prod.outlook.com
+ (2603:10b6:208:91::23) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/12] x86/mce: Fix hw MCE injection feature detection
-Content-Language: en-US
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Smita Koralahalli <Smita.KoralahalliChannabasappa@amd.com>,
-        Borislav Petkov <bp@suse.de>
-References: <cover.1696926843.git.isaku.yamahata@intel.com>
- <23c6fa20777498bccd486aedc435eef9af174748.1696926843.git.isaku.yamahata@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <23c6fa20777498bccd486aedc435eef9af174748.1696926843.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5963:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b420ae5-05da-4ffc-cdd3-08dbcbffc8d9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +uZD0cd7pKDj8XfXnhJaLmlXRk85ddtJIxmc0pau55MFVBlAf42Wyfzby+M9whUwu2KgjcBhqlabiFkLQwcFpgeTXUEe2KTYH4qvlDn9gXLOmceERI9CVxZaoGXUCXdhQW2qSVivl/rvJptyFxEWpX6CXD9OQnB8wTfHRWQEq/4YMdC5I6Lq919MlvW82Kya1SJYsRFuTFLV5G2qNxZZsVwC0tke3bGGR9iVH7Yvk4gVcLRAB9WSNjW7bGDIp4OrnUB82PKKjVWNWHLlI167ttoO754GbdQsLAXG2SVS4Cpw35kddC3GUe434H35TBOJphUHBRjEcJZIMe1MydHxi1tLyX+E34d2zFVWfB2D1f8MHh7IxnqA9AvnceE86Z1s0DG37TnwGfa7dGQgR/WHL4onMv1Uk7pajDPHeoLywiDYXSn7+8OJ2Fy92S7cTXTW8qrNrE2F/nSvjujWrDCxKLG4Joe3iFgvnLYPKHVr0rUwvqLsRAVW3I3EcJ6vxJSzI4uYIQCVOrv2hMoCDVoAgC1iLAvPlHIDBVnhzZNGVSVjtzoY5MUs6+xDzD3Nf5OG
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(346002)(376002)(396003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(6486002)(2616005)(6512007)(1076003)(478600001)(41300700001)(83380400001)(7416002)(6916009)(66476007)(5660300002)(66556008)(66946007)(26005)(8676002)(8936002)(316002)(2906002)(4326008)(38100700002)(86362001)(36756003)(6506007)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r1qUX7mgEy2cLFmQVMoTKwnThiHryRvGRJfVcufocTVSzubuj5z+t5ffRWed?=
+ =?us-ascii?Q?itu5AmbGVOuN0nmc0+E79lFHhgXCNWpqP3ZCu+XtEEMCz+fQmG1SHKzsHFXP?=
+ =?us-ascii?Q?SBvyyTh+1XnCD5vPzFilP3D7eBgYD9WNUJqw53s6iDDiup45Qpqsu2dLC8OC?=
+ =?us-ascii?Q?ElqtvBy1qKEBtknzOet1f8OSsH8uWTBz/R+Pbf193woJujBX64COGvl2I0Wd?=
+ =?us-ascii?Q?SG7ACeOmP2R0pLXpryt6xIRJLwnSg3Oe7U5e7h9CBnJ+pOqX/HnKz0ByMgbK?=
+ =?us-ascii?Q?4SZzzLfBZp2WK6XfjMJHHEefKO7VUd0siQkwVpUPBgj8sFJXKLX22O5V/WA1?=
+ =?us-ascii?Q?Iqhjg4D4tv82j8f17WitQAxtHdoq64y4NIMb3Vo+KUtqf8SndOBBDciuwFOi?=
+ =?us-ascii?Q?uK1cnpXXa2pxoEiJzNP3+jHb++kkfADRoNAIoLgG0nqiTlMGCpYKjR/hxh5B?=
+ =?us-ascii?Q?wAkeHQypEYojTzDxNJ+g4MwgNlMZfjkmGh+dcGr1Y4W9axJW5SDRuVYabgFO?=
+ =?us-ascii?Q?zrz6nGRcDa531zOOr/A3XOwOlNdGyiKRt4AQG3ZCbZDgLRUT9u3G1N77K++8?=
+ =?us-ascii?Q?bTZO7tZtHGahJ11/dWSZ4LjnasMp7Xj9cxPMYAcTJrUPVTACMj3qvOk0MEy3?=
+ =?us-ascii?Q?ZZjBkVnplNKSS2UCaUcq53L6qkwgkT//0rAja8ms4uXPPmtGebGIKvTugEYl?=
+ =?us-ascii?Q?vE8t17sS7CAduZskkE7C3Ez/5oklifSxKXTEZ4k37TpZTX35V0qZTUme6xLu?=
+ =?us-ascii?Q?mlBX67AJufsF/jsHXFmgccKhLQ7gpgqTRCawGGka9d+vJHA8GrH3Yd3QMgda?=
+ =?us-ascii?Q?3edMHhzjZDw62jl8mJ7QR+xmocfGSflTVocjZwZgggTRArWGfL5ciaHLb3aU?=
+ =?us-ascii?Q?AXw+UOkEiACra2yr7khjqMxEwJhyjt4bKSYAx5ppA8DCRA9couNYJUyxcjqh?=
+ =?us-ascii?Q?8exD0j0ZIZPXMb9KBcag0NP4WIOw+uQAp1XyrTM1vwrHxMuft2QZmxdG2s5P?=
+ =?us-ascii?Q?KgEKJU/og92Txbd93ZMQ7gH4zueSt+SxTTbnq7N3wo3Od242aSpxhzFSaSNO?=
+ =?us-ascii?Q?sc6YetsxOmT+rTo8vt9hZPki5RvIuWFDDEUXFd3VqLdhmxxSmQtsBEinR2m0?=
+ =?us-ascii?Q?JGxcPnKX3Q8+u0r476dlIa7yUH8Z3W54Y4YiRUPgnhkDzm/TXqPu8BjTkJTJ?=
+ =?us-ascii?Q?/hdx4Es1eK34m0jfitEtS6hlNqwtxbQzBYaZde9Lm6QRIcA1P/sVM9j3sCIA?=
+ =?us-ascii?Q?6C6V6d89iqm/9n9RdGtQWRqW71NvwDFDSbm1arRMtjiygmS7Ou8oqtxGLmrA?=
+ =?us-ascii?Q?WgwJOR1+2Qf7sYzsvvbGmoC1sA+aMKj9QABIE+fOGIlqT+752Asu2+BxP+R6?=
+ =?us-ascii?Q?8GO/bicxrq/yr/2GWhJQ9vi2c2pvganjmJ1vOf/NNmozThrHKYjwMSdcRlA/?=
+ =?us-ascii?Q?SKV3LJFTQmvvEUdRxSq+8iI+YOCxWm26wCLMnCujTowUiJ7G7ztNdwZwP+PS?=
+ =?us-ascii?Q?wwjSrHWlTdX8fkM+I20hcV1ZP/6jhnnDep1NLo79XC4FHHbMuHjmIRzkOihB?=
+ =?us-ascii?Q?2YYjSZWacyMOvc1mxsgOSyekDZLj4ogYFG7TO3hB?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b420ae5-05da-4ffc-cdd3-08dbcbffc8d9
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 15:19:25.1334
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bAIkwM7oJgohn8JJtkBigh0P/TIOpaaokapjSIyLOLaJkENPJhRr3oF0xcfHRUFq
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5963
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------4QAAwMnZ7myaM0IpTAN94Ja9
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-Isaku, when you report a bug, it would be great to include the folks who
-authored and worked on the original patch that introduced the bug.  I've
-gone ahead and done that for you here.
-
-On 10/10/23 01:35, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Thu, Sep 21, 2023 at 12:51:31AM -0700, Yi Liu wrote:
+> IOMMU_HWPT_ALLOC already supports iommu_domain allocation for usersapce.
+> But it can only allocate a hw_pagetable that associates to a given IOAS,
+> i.e. only a kernel-managed hw_pagetable of IOMMU_HWPT_TYPE_DEFAULT type.
 > 
-> When initializing x86 MCE injection framework, it checks if hardware mce
-> injection is available or not.  When it's not available on AMD, set the
-> boolean variable to false to not use it.  The variable is on by default and
-> the feature is AMD specific based on the code.
+> IOMMU drivers can now support user-managed hw_pagetables, for two-stage
+> translation use cases, that require user data input from the user space.
 > 
-> Because the variable is default on, it is true on Intel platform (probably
-> on other non-AMD x86 platform).  It results in unchecked msr access of
-> MSR_K7_HWCR=0xc0010015 when injecting MCE on Intel platform.  (Probably on
-> other x86 platform.)
+> Extend the IOMMU_HWPT_ALLOC ioctl to accept non-default hwpt_type with a
+> type specified user data. Also, update the @pt_id to accept hwpt_id too
+> besides an ioas_id. Then, pass them to the downstream alloc_fn().
 > 
-> Make the variable of by default, and set the variable on when the hardware
-> feature is usable.
+> Co-developed-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/iommu/iommufd/hw_pagetable.c | 19 ++++++++++++++++++-
+>  include/uapi/linux/iommufd.h         | 23 +++++++++++++++++++++--
+>  2 files changed, 39 insertions(+), 3 deletions(-)
 
-Gah, I'm finding that changelog impenetrable.  Here's what's missing:
+Can we also come with a small vt-d patch that does implement an op for
+this? Or is it too big?
 
-  * The entirety of check_hw_inj_possible() is for AMD hardware:
-    X86_FEATURE_SMCA, the MSRs, hw_injection_possible, everything.
-  * Only AMD systems with SMCA support hardware error injection
-    (anything other than "echo sw > /sys/kernel/debug/mce-inject/flags")
-  * That AMD-only restriction is enforced by 'hw_injection_possible'
-  * 'hw_injection_possible' is true by default and only set to false in
-    check_hw_inj_possible() ... the AMD-only code
+It would be nice if we could wrap IOMMU_HWPT_ALLOC into one
+self-contained series and another series for invalidate.
 
-The end result is that everyone except SMCA-enabled AMD systems (Intel
-included) leaves hw_injection_possible=true.  They are free to try and
-inject hardware errors.  If they do, they'll get errors when writing to
-the MSRs.
-
-To fix this, make disable hw_injection_possible by default.  Only enable
-it on SMCA hardware that actually succeeds in ... whatever:
-
-                wrmsrl_safe(mca_msr_reg(bank, MCA_STATUS), status);
-                rdmsrl_safe(mca_msr_reg(bank, MCA_STATUS), &status);
-
-is doing.
-
-... and don't do it at the top of the function.  Why bother setting it
-to true only to disable it a moment later?
-
-Do something like the following instead.
---------------4QAAwMnZ7myaM0IpTAN94Ja9
-Content-Type: text/x-patch; charset=UTF-8; name="amdmce.patch"
-Content-Disposition: attachment; filename="amdmce.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tlcm5lbC9jcHUvbWNlL2luamVjdC5jIGIvYXJjaC94
-ODYva2VybmVsL2NwdS9tY2UvaW5qZWN0LmMKaW5kZXggNGQ4ZDRiY2Y5MTVkLi4wMWVlODg2
-ZDg1NDAgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2tlcm5lbC9jcHUvbWNlL2luamVjdC5jCisr
-KyBiL2FyY2gveDg2L2tlcm5lbC9jcHUvbWNlL2luamVjdC5jCkBAIC0zMyw3ICszMyw3IEBA
-CiAKICNpbmNsdWRlICJpbnRlcm5hbC5oIgogCi1zdGF0aWMgYm9vbCBod19pbmplY3Rpb25f
-cG9zc2libGUgPSB0cnVlOworc3RhdGljIGJvb2wgaHdfaW5qZWN0aW9uX3Bvc3NpYmxlOwog
-CiAvKgogICogQ29sbGVjdCBhbGwgdGhlIE1DaV9YWFggc2V0dGluZ3MKQEAgLTc0OCw5ICs3
-NDgsMTAgQEAgc3RhdGljIHZvaWQgY2hlY2tfaHdfaW5qX3Bvc3NpYmxlKHZvaWQpCiAJCXJk
-bXNybF9zYWZlKG1jYV9tc3JfcmVnKGJhbmssIE1DQV9TVEFUVVMpLCAmc3RhdHVzKTsKIAog
-CQlpZiAoIXN0YXR1cykgewotCQkJaHdfaW5qZWN0aW9uX3Bvc3NpYmxlID0gZmFsc2U7CiAJ
-CQlwcl93YXJuKCJQbGF0Zm9ybSBkb2VzIG5vdCBhbGxvdyAqaGFyZHdhcmUqIGVycm9yIGlu
-amVjdGlvbi4iCiAJCQkJIlRyeSB1c2luZyBBUEVJIEVJTkogaW5zdGVhZC5cbiIpOworCQl9
-IGVsc2UgeworCQkJaHdfaW5qZWN0aW9uX3Bvc3NpYmxlID0gdHJ1ZTsKIAkJfQogCiAJCXRv
-Z2dsZV9od19tY2VfaW5qZWN0KGNwdSwgZmFsc2UpOwo=
-
---------------4QAAwMnZ7myaM0IpTAN94Ja9--
+Jason
