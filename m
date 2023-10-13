@@ -2,47 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 724417C8161
-	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 11:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A99907C81C6
+	for <lists+kvm@lfdr.de>; Fri, 13 Oct 2023 11:18:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230422AbjJMJIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 05:08:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36720 "EHLO
+        id S230402AbjJMJSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 05:18:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbjJMJIk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 05:08:40 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41387E3;
-        Fri, 13 Oct 2023 02:08:36 -0700 (PDT)
-Received: from kwepemm000005.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S6LDs4fmkzVlYt;
-        Fri, 13 Oct 2023 17:05:01 +0800 (CST)
-Received: from huawei.com (10.50.163.32) by kwepemm000005.china.huawei.com
- (7.193.23.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 13 Oct
- 2023 17:08:33 +0800
-From:   Longfang Liu <liulongfang@huawei.com>
-To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-        <shameerali.kolothum.thodi@huawei.com>,
-        <jonathan.cameron@huawei.com>
-CC:     <bcreeley@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
-        <liulongfang@huawei.com>
-Subject: [PATCH v17 2/2] Documentation: add debugfs description for vfio
-Date:   Fri, 13 Oct 2023 17:04:41 +0800
-Message-ID: <20231013090441.36417-3-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20231013090441.36417-1-liulongfang@huawei.com>
-References: <20231013090441.36417-1-liulongfang@huawei.com>
+        with ESMTP id S230369AbjJMJSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 05:18:32 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C54395;
+        Fri, 13 Oct 2023 02:18:30 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39D9ERmZ032594;
+        Fri, 13 Oct 2023 09:18:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=LAuOu56vhQ61V5HtfuNWXmXEsG8RHTg2aOXfBU6PuLM=;
+ b=PWmJ6L1HytkNjFaBw8+KyE3QmhhON0LZpLx3/lT/fDv+N91fkiSADCnIXalxxmGifgQO
+ D/qTqpixiiml5XbxKxaEjMy8vtdEW0k/Rof60OXnwAufPeXpbOwaoBOX+JDlomWcmKWy
+ ZZNoplskUN/q/of1TQYR+XneOkJEbkMdHyw0lUPTcy56fsehyUfN2iWHAqzfilrUoYwg
+ 3PiS26XJvScCl4DgKN7PXlvtZJ3wxH8fq2A1hL+8qtrcoqkuQOVM9EMru15wD3hl9LNe
+ xVi8ymiEn/QdWKHZK6sWxHa0wQp71B2F3nurhD1l3deyRg7vdU2FB+5nXhVDJ4B3Mt/D vQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq339g55c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Oct 2023 09:18:18 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39D9GXRc009097;
+        Fri, 13 Oct 2023 09:18:18 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tq339g54f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Oct 2023 09:18:18 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39D8KZsv009102;
+        Fri, 13 Oct 2023 09:18:17 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tpt57jvmv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Oct 2023 09:18:17 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39D9IEVc47513976
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Oct 2023 09:18:14 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5004C20043;
+        Fri, 13 Oct 2023 09:18:14 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ACA5820040;
+        Fri, 13 Oct 2023 09:18:13 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.74.130])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Oct 2023 09:18:13 +0000 (GMT)
+Message-ID: <2172cf228f38150844ddf1af9e4f453238d85a29.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 4/9] s390x: topology: Don't use non
+ unique message
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Date:   Fri, 13 Oct 2023 11:18:13 +0200
+In-Reply-To: <169718501727.15841.5127785267238990595@t14-nrb>
+References: <20231011085635.1996346-1-nsg@linux.ibm.com>
+         <20231011085635.1996346-5-nsg@linux.ibm.com>
+         <169718501727.15841.5127785267238990595@t14-nrb>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.50.163.32]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000005.china.huawei.com (7.193.23.27)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DQFt8axMDffZIztpenYQEX7ufnk8LA7B
+X-Proofpoint-ORIG-GUID: KLnICVFCtl92vpPcgn0bLzfA-93a0w1M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-13_03,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=935 lowpriorityscore=0 phishscore=0 clxscore=1015
+ mlxscore=0 spamscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310130075
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -50,60 +100,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-1.Add an debugfs document description file to help users understand
-how to use the accelerator live migration driver's debugfs.
-2.Update the file paths that need to be maintained in MAINTAINERS
+On Fri, 2023-10-13 at 10:16 +0200, Nico Boehr wrote:
+> Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:27)
+> > When we test something, i.e. do a report() we want unique messages,
+> > otherwise, from the test output, it will appear as if the same test was
+> > run multiple times, possible with different PASS/FAIL values.
+> >=20
+> > Convert some reports that don't actually test anything topology specifi=
+c
+> > into asserts.
+> > Refine the report message for others.
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+>=20
+> There is still the "TLE: reserved bits 0000000000000000" message which ma=
+y
+> be duplicate, but I think you fix that in a later patch.
+>=20
+> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- Documentation/ABI/testing/debugfs-vfio | 25 +++++++++++++++++++++++++
- MAINTAINERS                            |  1 +
- 2 files changed, 26 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-vfio
-
-diff --git a/Documentation/ABI/testing/debugfs-vfio b/Documentation/ABI/testing/debugfs-vfio
-new file mode 100644
-index 000000000000..445e9f58f924
---- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-vfio
-@@ -0,0 +1,25 @@
-+What:		/sys/kernel/debug/vfio
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	This debugfs file directory is used for debugging
-+		of vfio devices, it's a common directory for all vfio devices.
-+		Vfio core will create a device subdirectory under this
-+		directory.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	This debugfs file directory is used for debugging
-+		of vfio devices that support live migration.
-+		The debugfs of each vfio device that supports live migration
-+		could be created under this directory.
-+
-+What:		/sys/kernel/debug/vfio/<device>/migration/state
-+Date:		Oct 2023
-+KernelVersion:  6.7
-+Contact:	Longfang Liu <liulongfang@huawei.com>
-+Description:	Read the live migration status of the vfio device.
-+		The contents of the state file reflects the migration state
-+		relative to those defined in the vfio_device_mig_state enum
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b19995690904..a6be3b4219c7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22591,6 +22591,7 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- T:	git https://github.com/awilliam/linux-vfio.git
- F:	Documentation/ABI/testing/sysfs-devices-vfio-dev
-+F:	Documentation/ABI/testing/debugfs-vfio
- F:	Documentation/driver-api/vfio.rst
- F:	drivers/vfio/
- F:	include/linux/vfio.h
--- 
-2.24.0
-
+Yes, this isn't comprehensive, the rewrite takes care of the rest.
