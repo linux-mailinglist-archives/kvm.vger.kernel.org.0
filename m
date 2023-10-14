@@ -2,64 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 769F27C91B8
-	for <lists+kvm@lfdr.de>; Sat, 14 Oct 2023 02:12:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E0DF7C91D2
+	for <lists+kvm@lfdr.de>; Sat, 14 Oct 2023 02:32:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbjJNAMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Oct 2023 20:12:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49928 "EHLO
+        id S232579AbjJNAb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Oct 2023 20:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjJNAMa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Oct 2023 20:12:30 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD58BC0
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 17:12:28 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a81a80097fso20790697b3.3
-        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 17:12:28 -0700 (PDT)
+        with ESMTP id S229958AbjJNAb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Oct 2023 20:31:57 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15F091
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 17:31:55 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a813755ef4so28483597b3.2
+        for <kvm@vger.kernel.org>; Fri, 13 Oct 2023 17:31:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697242348; x=1697847148; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697243515; x=1697848315; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vNBT/XxJh51aLo8zCinPuHFiBU/MXizwbuFmtSl9v9s=;
-        b=PS684/UgZGtmf4lO3PdoxGUkXnB+0fpkAQw2dmFORGuGwbsjEyAERfv5NhlHaxi0H3
-         Iag5vZa8zSgDA7ZcyhFnjMNamAHgXl07MksV+5UxQR0CafWh1aWXkovTknE1rega7cg1
-         96uUcUpiOyf1W3iVCyOzBbaDwarmLOLZZtWcovxQj9ii/k+HI9Rrz0dc71W5mM0AY+c1
-         kBeBugnYOOZcthL/RUpnSGxhUz7ZvUBW9ySdg5pVc5EaEPHcnQrj+5sOGONEGqbCT7ie
-         88xUjj393MyYLsVHdMLscK9tXm/dzYqQEsbjWWF9am5CKh9oo95W8UDq9A2m+dPBSwML
-         7oCQ==
+        bh=wup1ljyUWeQFKZrcp5IVFWzCnbDe777WHGk4V9tmRQM=;
+        b=oKTjSwI5pykMkJKbV5u4ng9pBbEfMVBFAUt+zxT594mUo/2tv/vwQetvtN6vWE59q9
+         phwz6YtUBCyySRCDhy+SxzEWfBrF1GHRmWB90bw9MVG8oigSL/FkURAp+obG7kgeaySD
+         BPKeqXRyUXQ9UrGG0HPLgRvVdQUD64C38azgR1dSC73/c9qGymfrABOVov9XsBlPA0wi
+         AaVDiTrt7nLSxWI9FuvLSsxCDeFDlrblgB768BUeC/78LrDH3Q7W1vEAw0Pk+vMt1epl
+         AyH0gjozHqzDNWFTsPYmpTqDFy+awFxp4/44bZh8W4cgUIyYDY1b3AE+Ac2FOHVbMqln
+         g8Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697242348; x=1697847148;
+        d=1e100.net; s=20230601; t=1697243515; x=1697848315;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vNBT/XxJh51aLo8zCinPuHFiBU/MXizwbuFmtSl9v9s=;
-        b=gjNrmkfQZfliSS79zHuea6rR0/pkEjIWYXO+n/k/F5RGPwDbWDVGetgLSsLteqJkUv
-         e+6BpHNHMDVcvrKWz36rq38oxdNTtwcgnH785jmQ2QYPnHGLudz+Hoc6ZlXmZX9Gz92w
-         BM++9Fa66oQzcf0euxGfkw44zw/peMWPG347nLwy3KwMCUVgFKameke5SlgKGf2NQkg+
-         Zdjr3ik4WkRGdMrRLwBXatzeDOn8eZ3oSsWLH5lhTf9RsXEn/M8UMjAXIwI89DblINtp
-         g9TtcLZph5MW4FXmKafmAUg4P7stT7fPpuyD0nH7rKKuyj5vHNAjESiX1jWS34d7W4Uv
-         6O1Q==
-X-Gm-Message-State: AOJu0YzkZfleMSb7+YutjfQyttIBfHQKyctFVMC7+oIe4qJiMlTqC+5r
-        NdWZ/NGrZi8Zau1B5DnttXK/3D9jNxc=
-X-Google-Smtp-Source: AGHT+IFMhtYqzA7z1kLmqh2MvMe9xABe7yML4yE5nu4ExVyCqhTvqUmCdtBEGpoJznG90pa3WgK6VSCz49o=
+        bh=wup1ljyUWeQFKZrcp5IVFWzCnbDe777WHGk4V9tmRQM=;
+        b=bYBtua2OIGuL7/Kdep4O64fgwjg32j9U/JMkXwtJR3ACShxo/dQBubnuPApWK3NJMn
+         l4ff1yKNd0/Aeltsiwr6CRj7UI/0avOHvjGOlsZu58V49iOpdkr1tTMYuNtoW5saIM8Y
+         N8v7Ln6Un7Tq/sEMG0cwWnyQWN3OY1zXdXHvL5jh7D1LPi8SYmQjw8HdTy6T3D1e4HtZ
+         fCHEfEFrQoVNEgVKbuSgAQnuCoSVK63rSAOwkoaSKDF16I3hRgEYEklw81v4ot/rIP5a
+         oWk6w0piEYnO/EmUCrE2A/SpDjy8cQR+g++nS76q5t8ddxoaitxwhYbRmw8wIgLLon2C
+         1P0g==
+X-Gm-Message-State: AOJu0YzNxfri23GETBAuBY9HbMHeNEXeQJJUmyiEABGuTXcJQCJQgqGz
+        6z7q7OoTYs8IpvN4c7npqemri3iGEJk=
+X-Google-Smtp-Source: AGHT+IHQQYB+851NvjeGmGuKbGvRshCOqjfyFaYJj9UwpSg0M1KsN+HerqjxrMu5GRxGP5xT5pAfjDRedWg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ce07:0:b0:d9a:ca58:b32c with SMTP id
- x7-20020a25ce07000000b00d9aca58b32cmr137296ybe.1.1697242347981; Fri, 13 Oct
- 2023 17:12:27 -0700 (PDT)
-Date:   Fri, 13 Oct 2023 17:12:26 -0700
-In-Reply-To: <7fba6d8fc3de0bcb86bf629a4f5b0217552fe999.camel@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:212:b0:d89:b072:d06f with SMTP id
+ j18-20020a056902021200b00d89b072d06fmr531497ybs.7.1697243514939; Fri, 13 Oct
+ 2023 17:31:54 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 17:31:53 -0700
+In-Reply-To: <20231010200220.897953-7-john.allen@amd.com>
 Mime-Version: 1.0
-References: <b46ee4de968733a69117458e9f8f9d2a6682376f.camel@infradead.org>
- <ZSXdYcMUds-DrHAd@google.com> <7fba6d8fc3de0bcb86bf629a4f5b0217552fe999.camel@infradead.org>
-Message-ID: <ZSnc6lfAlNCMfTxS@google.com>
-Subject: Re: [RFC] KVM: x86: Don't wipe TDP MMU when guest sets %cr4
+References: <20231010200220.897953-1-john.allen@amd.com> <20231010200220.897953-7-john.allen@amd.com>
+Message-ID: <ZSnheYDyzhZ1DOW5@google.com>
+Subject: Re: [PATCH 6/9] KVM: SVM: Add MSR_IA32_XSS to the GHCB for hypervisor kernel
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm@vger.kernel.org, Bartosz Szczepanek <bsz@amazon.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
+To:     John Allen <john.allen@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, weijiang.yang@intel.com,
+        rick.p.edgecombe@intel.com, x86@kernel.org,
+        thomas.lendacky@amd.com, bp@alien8.de
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -71,29 +68,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 11, 2023, David Woodhouse wrote:
-> On Tue, 2023-10-10 at 16:25 -0700, Sean Christopherson wrote:
-> > On Tue, Oct 10, 2023, David Woodhouse wrote:
-> But I'm confused here. Even if I don't go as far as actually making
-> CR4.SMEP a guest-owned bit, and KVM still ends up handling it in
-> kvm_post_load_cr4()... why does KVM need to completely unload and
-> reinit the MMU? Would it not be sufficient just to refresh the role
-> bits, much like __kvm_mmu_refresh_passthrough_bits() does for CR0.WP?
+On Tue, Oct 10, 2023, John Allen wrote:
+> When a guest issues a cpuid instruction for Fn0000000D_x0B
+> (CetUserOffset), KVM will intercept and need to access the guest
+> MSR_IA32_XSS value. For SEV-ES, this is encrypted and needs to be
+> included in the GHCB to be visible to the hypervisor.
+> 
+> Signed-off-by: John Allen <john.allen@amd.com>
+> ---
+> @@ -3032,6 +3037,9 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+>  		if (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP))
+>  			svm_clr_intercept(svm, INTERCEPT_RDTSCP);
+>  	}
+> +
+> +	if (kvm_caps.supported_xss)
+> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_XSS, 1, 1);
 
-Maybe?  It largely hasn't happened simply because no one (yet) cares enough about
-the performance of other bits to force the issue.
- 
-> (And what about flushing the hardware TLB, as Jim mentioned. I guess if
-> it's guest-owned we trust the CPU to do that, and if it's trapped then
-> KVM is required to do so)?
+This creates a giant gaping virtualization hole for the guest to walk through.
+Want to hide shadow stacks from the guest because hardware is broken?  Too bad,
+the guest can still set any and all XFeature bits it wants!  I realize "KVM"
+already creates such a hole by disabling interception of XSETBV, but that doesn't
+make it right.  In quotes because it's not like KVM has a choice for SEV-ES guests.
 
-TBH, I forgot that clearing SMEP architecturally requires a TLB flush for the current
-PCID on Intel.  I *think* it's actually fine so long as TDP is enabled.  Ah, yes,
-it's fine.  Well, either that or kvm_invalidate_pcid() is buggy :-)
+This is another example of SEV-SNP and beyond clearly being designed to work with
+a paravisor, SVM_VMGEXIT_AP_CREATE being the other big one that comes to mind.
 
-Relying on the CPU to flush the hardware TLBs is definitely ok, I was just trying
-to think if there were any KVM artifacts that would need to be flushed/invalidated.
-I can't think of any, e.g. KVM already disable GVA-based MMIO caching when TDP is
-enabled, L1 is responsible for its virtual TLB if L1 is shadowing legacy paging for
-L2, and if L1 is using EPT, i.e. KVM is shadowing L1 EPT and thus has a virtual TLB
-for L2, then the PCID is irrelevant (doesn't affect EPT translations).
+KVM should at least block CET by killing the VM if the guest illegally sets
+CR4.CET.  Ugh, and is that even possible with SVM_VMGEXIT_AP_CREATE?  The guest
+can shove in whatever CR4 it wants, so long as it the value is supported by
+hardware.
+
+At what point do we bite the bullet and require a paravisor?  Because the more I
+see of SNP, the more I'm convinced that it's not entirely safe to run untrusted
+guest code at VMPL0.
