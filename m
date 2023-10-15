@@ -2,466 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E9D57C98BD
-	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 13:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCC117C98DF
+	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 14:00:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229641AbjJOLBi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Oct 2023 07:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34858 "EHLO
+        id S229522AbjJOMAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Oct 2023 08:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjJOLBf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Oct 2023 07:01:35 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC0FC5
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:01:32 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9ad8a822508so561482066b.0
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philjordan-eu.20230601.gappssmtp.com; s=20230601; t=1697367691; x=1697972491; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ffUh7fxz9W34ZnkP6ZwQMiELeYpWQPJqcHK/IvMSuk8=;
-        b=OQOYrSZC3Mg5qlA+q0+Z+pGSVlvZ7y9dfpCIYQy4WsRjsB/uGU/l/hjwPdRy/6qzsm
-         r1iJqh6rrfAuZA2Viodn09sFIik6JOp57j4v/Y6SpfylMjtE9VhJQHthzFTM3LKnBPOu
-         LDlnAvfzbnL5YRw8CHIj5Gn19WJJyYjnVRvc8qGlLkfOCkA2/wAl9CDud8STwloMGizM
-         evpFzwnWUMFFmho4DJcXmEYc5ahWXpTRBVoXje4ynCQb4GOn0Rx+xS7foZBL90OI5mSi
-         fZR0i8XsDRYzjicMxgPaIcMWsOdylpzz1yR3m1Sw+Zkl1Rp98MZ2tBKbKHo6uNzUnT++
-         QmbQ==
+        with ESMTP id S229772AbjJOMAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Oct 2023 08:00:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0CCA3
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:59:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697371161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7odMBbvZWVsldhQpSxACtvJJIZbtETAe+tcSmUnuJjg=;
+        b=KceyIFoiWoiNrl2fzVPzFLKkgeZ3tCQrozeh/pVETfY4poj0AJbwHR3GXhRCGgIPyf59Kz
+        a0Fn0SmsmPpMEYHPDMoH4xaiKynwCCM6Oxyv3PJNwGlyxgYyn33TnyZwutqdaLCso0mTwZ
+        RW4A3mcYlaDrBaZXVTxL/f8Gx7HOv9o=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-E9MqRsmbNcCLWcGbGDapDw-1; Sun, 15 Oct 2023 07:59:19 -0400
+X-MC-Unique: E9MqRsmbNcCLWcGbGDapDw-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-457c02bfb64so805073137.0
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:59:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697367691; x=1697972491;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1697371159; x=1697975959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ffUh7fxz9W34ZnkP6ZwQMiELeYpWQPJqcHK/IvMSuk8=;
-        b=L3x+8bLURLSbUFfBNIcBXkCU5H7KRHyizFnFfbFVincHZs1CfJi+XoH+Llcj6RrMQ4
-         9Yg563IvUnOWgV0mnCU90smGR+xlkrtC0v3t1zS7xaZNbwyjN99e/iH/QfG8WcWeSx/d
-         604Gdjql/QfXrQftFkPqrUlyF+pnE9PHOLFP05gNk53gzkxXbjXALxdwhU9Xjxomx1D9
-         nYw/ObyeP1+x6JmMPA7OsuJMSvvZbm/lvn9u+oLeoUxql+L7NbMy7ucxKtvKrZJ3x06P
-         /79YYZUXSpDgOP5iUkujf9AAnHc8YAPew5Y7YIqSVDCWKAq0s4yf44ZdSbpDkOsi6Lpa
-         z64g==
-X-Gm-Message-State: AOJu0YxZ5eeK+OAdso0SN5q4VSFDPNOJ+NdQzZWmhl0z8s+XDWmhchL1
-        wNrebhEBzgCwLkGbTQXKQE5JtfOPSMJRmcOUC7Y=
-X-Google-Smtp-Source: AGHT+IHHi650BgiDYj0iQyz1CWSruvApg11F1eKH3uFno2SVVNRJ0CHXqxZwEsRbnJok5gQTuMwYSg==
-X-Received: by 2002:a17:907:7f0b:b0:9bf:5696:9153 with SMTP id qf11-20020a1709077f0b00b009bf56969153mr2409044ejc.57.1697367690899;
-        Sun, 15 Oct 2023 04:01:30 -0700 (PDT)
-Received: from localhost.localdomain (89-104-8-249.customer.bnet.at. [89.104.8.249])
-        by smtp.gmail.com with ESMTPSA id l1-20020a170906078100b009928b4e3b9fsm2137412ejc.114.2023.10.15.04.01.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Oct 2023 04:01:30 -0700 (PDT)
-From:   Phil Dennis-Jordan <phil@philjordan.eu>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, lists@philjordan.eu,
-        phil@philjordan.eu
-Subject: [kvm-unit-tests PATCH v2 1/1] x86/apic: test_pv_ipi checks cpuid before issuing KVM Hypercall
-Date:   Sun, 15 Oct 2023 13:01:01 +0200
-Message-Id: <20231015110101.24725-2-phil@philjordan.eu>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20231015110101.24725-1-phil@philjordan.eu>
-References: <20231015110101.24725-1-phil@philjordan.eu>
+        bh=7odMBbvZWVsldhQpSxACtvJJIZbtETAe+tcSmUnuJjg=;
+        b=d1arNhC50FlahsLvz+4NrjvSWaSj9YIcXIRyW1SmmCHA/NQhnfMPmebIy944nC+poM
+         6j6tuvWjou7LXi/6iMNhiBSQ1BGXjXBd1NTPV8wFJR7zBfA1ErHNI2jPhYPWBrQNMXPz
+         W7V2xEd1s0w11u1QpaadX8Gi0e0UVvtzBKsRlosWk19lGpPfLpTy6veS47JPBdQ1+5UB
+         9zhvlJzqdYw340/GcYnkGBtFc1gAyDpPDjFljwpzXXWYdeILudmj+l+BbozZw4Z3/XU6
+         oyF4aHR+K8uVfz3ww8fuwegq/hIzWvG/NNFNGxF/Ut0Hzce6HlCkYcIEB4fVxg8vFyYG
+         Yinw==
+X-Gm-Message-State: AOJu0Yx+kTtSC7+cxXHp3dzmyEFNdiKnb1LbGeX3iNwFRurKNvsr1uP5
+        83AxVkrMg1b+TuYw7UUPKbgGuebhQ2u8+X6IkMfU+slXjl1yCO1V2rKZmtJR8RUhkA0j3L6TVO4
+        tZL5Md9+sE1oNdcKcDNOhhWfq6mPL
+X-Received: by 2002:a67:f918:0:b0:452:8e07:db61 with SMTP id t24-20020a67f918000000b004528e07db61mr28478012vsq.6.1697371158534;
+        Sun, 15 Oct 2023 04:59:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IELKarAPYFoutdt+n5qD/eLZFSa9kKfU3ZxWAZUeTN1sG50XRhX1O35PZcGF5uWUC5f/xEbG8Q271emAppLWM4=
+X-Received: by 2002:a67:f918:0:b0:452:8e07:db61 with SMTP id
+ t24-20020a67f918000000b004528e07db61mr28478004vsq.6.1697371158260; Sun, 15
+ Oct 2023 04:59:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NEUTRAL
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20230914015459.51740-1-sashal@kernel.org>
+In-Reply-To: <20230914015459.51740-1-sashal@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Sun, 15 Oct 2023 13:59:06 +0200
+Message-ID: <CABgObfbKV3TvVeixtVvp6f9Qtr47aiStUBsDH2_c6jrDGiWR_A@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 6.5 1/7] x86/reboot: VMCLEAR active VMCSes before
+ emergency reboot
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, akpm@linux-foundation.org, bhe@redhat.com,
+        eric.devolder@oracle.com, hbathini@linux.ibm.com,
+        sourabhjain@linux.ibm.com, bhelgaas@google.com,
+        kai.huang@intel.com, peterz@infradead.org, jpoimboe@kernel.org,
+        tiwai@suse.de, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The test for KVM PV IPIs previously was conditional on the
-presence of the test device. This is an unreliable check and
-will pass on non-KVM platforms as well, whereas issuing the
-hypercall on such platforms will not have the intended effect.
+On Thu, Sep 14, 2023 at 3:55=E2=80=AFAM Sasha Levin <sashal@kernel.org> wro=
+te:
+>
+> From: Sean Christopherson <seanjc@google.com>
+>
+> [ Upstream commit b23c83ad2c638420ec0608a9de354507c41bec29 ]
+>
+> VMCLEAR active VMCSes before any emergency reboot, not just if the kernel
+> may kexec into a new kernel after a crash.  Per Intel's SDM, the VMX
+> architecture doesn't require the CPU to flush the VMCS cache on INIT.  If
+> an emergency reboot doesn't RESET CPUs, cached VMCSes could theoretically
+> be kept and only be written back to memory after the new kernel is booted=
+,
+> i.e. could effectively corrupt memory after reboot.
+>
+> Opportunistically remove the setting of the global pointer to NULL to mak=
+e
+> checkpatch happy.
 
-With this change, the test case now checks that:
+Intended as a cleanup but I guess it does not hurt, since it was the first =
+patch
+in the large series that included it.
 
- * The test is running on KVM by checking the CPUID signature.
- * The host advertises the PV IPI hypercall CPUID feature bit.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-The test is skipped if either check fails.
+Paolo
 
-The KVM signature and feature bit constants are imported verbatim
-via Linux's kvm_para.h, which further requires some Linux-
-specific sized integer types to be defined in <linux/types.h>.
-A minimal version of that file is added for non-Linux platforms,
-and the real thing is used when building on Linux itself.
 
-Finally, the +kvm-pv-ipi CPU feature flag is added to the Qemu
-command lines for the APIC test suites, so the feature flag is
-indeed advertised on KVM hosts. (Non-KVM hosts silently drop it.)
-
-Co-authored-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
----
- lib/linux/kvm_para.h       |  39 ++++++++++
- lib/linux/types.h          |  15 ++++
- lib/asm-generic/kvm_para.h |   4 +
- lib/x86/asm/kvm_para.h     | 153 +++++++++++++++++++++++++++++++++++++
- lib/x86/processor.h        |  40 ++++++++++
- x86/apic.c                 |   4 +-
- x86/unittests.cfg          |   6 +-
- 7 files changed, 257 insertions(+), 4 deletions(-)
- create mode 100644 lib/linux/kvm_para.h
- create mode 100644 lib/linux/types.h
- create mode 100644 lib/asm-generic/kvm_para.h
- create mode 100644 lib/x86/asm/kvm_para.h
-
-diff --git a/lib/linux/kvm_para.h b/lib/linux/kvm_para.h
-new file mode 100644
-index 00000000..960c7e93
---- /dev/null
-+++ b/lib/linux/kvm_para.h
-@@ -0,0 +1,39 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI__LINUX_KVM_PARA_H
-+#define _UAPI__LINUX_KVM_PARA_H
-+
-+/*
-+ * This header file provides a method for making a hypercall to the host
-+ * Architectures should define:
-+ * - kvm_hypercall0, kvm_hypercall1...
-+ * - kvm_arch_para_features
-+ * - kvm_para_available
-+ */
-+
-+/* Return values for hypercalls */
-+#define KVM_ENOSYS		1000
-+#define KVM_EFAULT		EFAULT
-+#define KVM_EINVAL		EINVAL
-+#define KVM_E2BIG		E2BIG
-+#define KVM_EPERM		EPERM
-+#define KVM_EOPNOTSUPP		95
-+
-+#define KVM_HC_VAPIC_POLL_IRQ		1
-+#define KVM_HC_MMU_OP			2
-+#define KVM_HC_FEATURES			3
-+#define KVM_HC_PPC_MAP_MAGIC_PAGE	4
-+#define KVM_HC_KICK_CPU			5
-+#define KVM_HC_MIPS_GET_CLOCK_FREQ	6
-+#define KVM_HC_MIPS_EXIT_VM		7
-+#define KVM_HC_MIPS_CONSOLE_OUTPUT	8
-+#define KVM_HC_CLOCK_PAIRING		9
-+#define KVM_HC_SEND_IPI		10
-+#define KVM_HC_SCHED_YIELD		11
-+#define KVM_HC_MAP_GPA_RANGE		12
-+
-+/*
-+ * hypercalls use architecture specific
-+ */
-+#include <asm/kvm_para.h>
-+
-+#endif /* _UAPI__LINUX_KVM_PARA_H */
-diff --git a/lib/linux/types.h b/lib/linux/types.h
-new file mode 100644
-index 00000000..67d14ca2
---- /dev/null
-+++ b/lib/linux/types.h
-@@ -0,0 +1,15 @@
-+#ifndef _LIB_LINUX_TYPES_H_
-+
-+#ifdef __linux__
-+/* On Linux, use the real thing */
-+#include_next <linux/types.h>
-+#else /* !defined(__linux__) */
-+/* This is *just* enough for the headers we've pulled in from Linux to compile */
-+#include <libcflat.h>
-+typedef u8  __u8;
-+typedef u32 __u32;
-+typedef u64 __u64;
-+typedef s64 __s64;
-+#endif
-+
-+#endif
-diff --git a/lib/asm-generic/kvm_para.h b/lib/asm-generic/kvm_para.h
-new file mode 100644
-index 00000000..486f0af7
---- /dev/null
-+++ b/lib/asm-generic/kvm_para.h
-@@ -0,0 +1,4 @@
-+/*
-+ * There isn't anything here, but the file must not be empty or patch
-+ * will delete it.
-+ */
-diff --git a/lib/x86/asm/kvm_para.h b/lib/x86/asm/kvm_para.h
-new file mode 100644
-index 00000000..6e64b27b
---- /dev/null
-+++ b/lib/x86/asm/kvm_para.h
-@@ -0,0 +1,153 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef _UAPI_ASM_X86_KVM_PARA_H
-+#define _UAPI_ASM_X86_KVM_PARA_H
-+
-+#include <linux/types.h>
-+
-+/* This CPUID returns the signature 'KVMKVMKVM' in ebx, ecx, and edx.  It
-+ * should be used to determine that a VM is running under KVM.
-+ */
-+#define KVM_CPUID_SIGNATURE	0x40000000
-+#define KVM_SIGNATURE "KVMKVMKVM\0\0\0"
-+
-+/* This CPUID returns two feature bitmaps in eax, edx. Before enabling
-+ * a particular paravirtualization, the appropriate feature bit should
-+ * be checked in eax. The performance hint feature bit should be checked
-+ * in edx.
-+ */
-+#define KVM_CPUID_FEATURES	0x40000001
-+#define KVM_FEATURE_CLOCKSOURCE		0
-+#define KVM_FEATURE_NOP_IO_DELAY	1
-+#define KVM_FEATURE_MMU_OP		2
-+/* This indicates that the new set of kvmclock msrs
-+ * are available. The use of 0x11 and 0x12 is deprecated
-+ */
-+#define KVM_FEATURE_CLOCKSOURCE2        3
-+#define KVM_FEATURE_ASYNC_PF		4
-+#define KVM_FEATURE_STEAL_TIME		5
-+#define KVM_FEATURE_PV_EOI		6
-+#define KVM_FEATURE_PV_UNHALT		7
-+#define KVM_FEATURE_PV_TLB_FLUSH	9
-+#define KVM_FEATURE_ASYNC_PF_VMEXIT	10
-+#define KVM_FEATURE_PV_SEND_IPI	11
-+#define KVM_FEATURE_POLL_CONTROL	12
-+#define KVM_FEATURE_PV_SCHED_YIELD	13
-+#define KVM_FEATURE_ASYNC_PF_INT	14
-+#define KVM_FEATURE_MSI_EXT_DEST_ID	15
-+#define KVM_FEATURE_HC_MAP_GPA_RANGE	16
-+#define KVM_FEATURE_MIGRATION_CONTROL	17
-+
-+#define KVM_HINTS_REALTIME      0
-+
-+/* The last 8 bits are used to indicate how to interpret the flags field
-+ * in pvclock structure. If no bits are set, all flags are ignored.
-+ */
-+#define KVM_FEATURE_CLOCKSOURCE_STABLE_BIT	24
-+
-+#define MSR_KVM_WALL_CLOCK  0x11
-+#define MSR_KVM_SYSTEM_TIME 0x12
-+
-+#define KVM_MSR_ENABLED 1
-+/* Custom MSRs falls in the range 0x4b564d00-0x4b564dff */
-+#define MSR_KVM_WALL_CLOCK_NEW  0x4b564d00
-+#define MSR_KVM_SYSTEM_TIME_NEW 0x4b564d01
-+#define MSR_KVM_ASYNC_PF_EN 0x4b564d02
-+#define MSR_KVM_STEAL_TIME  0x4b564d03
-+#define MSR_KVM_PV_EOI_EN      0x4b564d04
-+#define MSR_KVM_POLL_CONTROL	0x4b564d05
-+#define MSR_KVM_ASYNC_PF_INT	0x4b564d06
-+#define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
-+#define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
-+
-+struct kvm_steal_time {
-+	__u64 steal;
-+	__u32 version;
-+	__u32 flags;
-+	__u8  preempted;
-+	__u8  u8_pad[3];
-+	__u32 pad[11];
-+};
-+
-+#define KVM_VCPU_PREEMPTED          (1 << 0)
-+#define KVM_VCPU_FLUSH_TLB          (1 << 1)
-+
-+#define KVM_CLOCK_PAIRING_WALLCLOCK 0
-+struct kvm_clock_pairing {
-+	__s64 sec;
-+	__s64 nsec;
-+	__u64 tsc;
-+	__u32 flags;
-+	__u32 pad[9];
-+};
-+
-+#define KVM_STEAL_ALIGNMENT_BITS 5
-+#define KVM_STEAL_VALID_BITS ((-1ULL << (KVM_STEAL_ALIGNMENT_BITS + 1)))
-+#define KVM_STEAL_RESERVED_MASK (((1 << KVM_STEAL_ALIGNMENT_BITS) - 1 ) << 1)
-+
-+#define KVM_MAX_MMU_OP_BATCH           32
-+
-+#define KVM_ASYNC_PF_ENABLED			(1 << 0)
-+#define KVM_ASYNC_PF_SEND_ALWAYS		(1 << 1)
-+#define KVM_ASYNC_PF_DELIVERY_AS_PF_VMEXIT	(1 << 2)
-+#define KVM_ASYNC_PF_DELIVERY_AS_INT		(1 << 3)
-+
-+/* MSR_KVM_ASYNC_PF_INT */
-+#define KVM_ASYNC_PF_VEC_MASK			GENMASK(7, 0)
-+
-+/* MSR_KVM_MIGRATION_CONTROL */
-+#define KVM_MIGRATION_READY		(1 << 0)
-+
-+/* KVM_HC_MAP_GPA_RANGE */
-+#define KVM_MAP_GPA_RANGE_PAGE_SZ_4K	0
-+#define KVM_MAP_GPA_RANGE_PAGE_SZ_2M	(1 << 0)
-+#define KVM_MAP_GPA_RANGE_PAGE_SZ_1G	(1 << 1)
-+#define KVM_MAP_GPA_RANGE_ENC_STAT(n)	(n << 4)
-+#define KVM_MAP_GPA_RANGE_ENCRYPTED	KVM_MAP_GPA_RANGE_ENC_STAT(1)
-+#define KVM_MAP_GPA_RANGE_DECRYPTED	KVM_MAP_GPA_RANGE_ENC_STAT(0)
-+
-+/* Operations for KVM_HC_MMU_OP */
-+#define KVM_MMU_OP_WRITE_PTE            1
-+#define KVM_MMU_OP_FLUSH_TLB	        2
-+#define KVM_MMU_OP_RELEASE_PT	        3
-+
-+/* Payload for KVM_HC_MMU_OP */
-+struct kvm_mmu_op_header {
-+	__u32 op;
-+	__u32 pad;
-+};
-+
-+struct kvm_mmu_op_write_pte {
-+	struct kvm_mmu_op_header header;
-+	__u64 pte_phys;
-+	__u64 pte_val;
-+};
-+
-+struct kvm_mmu_op_flush_tlb {
-+	struct kvm_mmu_op_header header;
-+};
-+
-+struct kvm_mmu_op_release_pt {
-+	struct kvm_mmu_op_header header;
-+	__u64 pt_phys;
-+};
-+
-+#define KVM_PV_REASON_PAGE_NOT_PRESENT 1
-+#define KVM_PV_REASON_PAGE_READY 2
-+
-+struct kvm_vcpu_pv_apf_data {
-+	/* Used for 'page not present' events delivered via #PF */
-+	__u32 flags;
-+
-+	/* Used for 'page ready' events delivered via interrupt notification */
-+	__u32 token;
-+
-+	__u8 pad[56];
-+	__u32 enabled;
-+};
-+
-+#define KVM_PV_EOI_BIT 0
-+#define KVM_PV_EOI_MASK (0x1 << KVM_PV_EOI_BIT)
-+#define KVM_PV_EOI_ENABLED KVM_PV_EOI_MASK
-+#define KVM_PV_EOI_DISABLED 0x0
-+
-+#endif /* _UAPI_ASM_X86_KVM_PARA_H */
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 44f4fd1e..3d3930c8 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -7,6 +7,8 @@
- #include <bitops.h>
- #include <stdint.h>
- 
-+#include <linux/kvm_para.h>
-+
- #define NONCANONICAL	0xaaaaaaaaaaaaaaaaull
- 
- #ifdef __x86_64__
-@@ -238,6 +240,7 @@ static inline bool is_intel(void)
- #define	X86_FEATURE_XSAVE		(CPUID(0x1, 0, ECX, 26))
- #define	X86_FEATURE_OSXSAVE		(CPUID(0x1, 0, ECX, 27))
- #define	X86_FEATURE_RDRAND		(CPUID(0x1, 0, ECX, 30))
-+#define	X86_FEATURE_HYPERVISOR		(CPUID(0x1, 0, ECX, 31))
- #define	X86_FEATURE_MCE			(CPUID(0x1, 0, EDX, 7))
- #define	X86_FEATURE_APIC		(CPUID(0x1, 0, EDX, 9))
- #define	X86_FEATURE_CLFLUSH		(CPUID(0x1, 0, EDX, 19))
-@@ -284,6 +287,9 @@ static inline bool is_intel(void)
- #define X86_FEATURE_VNMI		(CPUID(0x8000000A, 0, EDX, 25))
- #define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
- 
-+#define X86_FEATURE_KVM_PV_SEND_IPI \
-+	(CPUID(KVM_CPUID_FEATURES, 0, EAX, KVM_FEATURE_PV_SEND_IPI))
-+
- static inline bool this_cpu_has(u64 feature)
- {
- 	u32 input_eax = feature >> 32;
-@@ -299,6 +305,40 @@ static inline bool this_cpu_has(u64 feature)
- 	return ((*(tmp + (output_reg % 32))) & (1 << bit));
- }
- 
-+static inline u32 get_hypervisor_cpuid_base(const char *sig)
-+{
-+	u32 base;
-+	struct cpuid signature;
-+
-+	if (!this_cpu_has(X86_FEATURE_HYPERVISOR))
-+		return 0;
-+
-+	for (base = 0x40000000; base < 0x40010000; base += 0x100) {
-+		signature = cpuid(base);
-+
-+		if (!memcmp(sig, &signature.b, 12))
-+			return base;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline bool is_hypervisor_kvm(void)
-+{
-+	u32 base = get_hypervisor_cpuid_base(KVM_SIGNATURE);
-+
-+	if (!base)
-+		return false;
-+
-+	/*
-+	 * Require that KVM be placed at its default base so that macros can be
-+	 * used to query individual KVM feature bits.
-+	 */
-+	assert_msg(base == KVM_CPUID_SIGNATURE,
-+		   "Expect KVM at its default cpuid base (now at: 0x%x)", base);
-+	return true;
-+}
-+
- struct far_pointer32 {
- 	u32 offset;
- 	u16 selector;
-diff --git a/x86/apic.c b/x86/apic.c
-index dd7e7834..783fb740 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -658,8 +658,10 @@ static void test_pv_ipi(void)
- 	int ret;
- 	unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
- 
--	if (!test_device_enabled())
-+	if (!is_hypervisor_kvm() || !this_cpu_has(X86_FEATURE_KVM_PV_SEND_IPI)) {
-+		report_skip("PV IPIs testing");
- 		return;
-+	}
- 
- 	asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
- 	report(!ret, "PV IPIs testing");
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 3fe59449..95bd5232 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -28,7 +28,7 @@
- [apic-split]
- file = apic.flat
- smp = 2
--extra_params = -cpu qemu64,+x2apic,+tsc-deadline -machine kernel_irqchip=split
-+extra_params = -cpu qemu64,+x2apic,+tsc-deadline,+kvm-pv-ipi -machine kernel_irqchip=split
- arch = x86_64
- groups = apic
- 
-@@ -41,7 +41,7 @@ groups = apic
- [x2apic]
- file = apic.flat
- smp = 2
--extra_params = -cpu qemu64,+x2apic,+tsc-deadline
-+extra_params = -cpu qemu64,+x2apic,+tsc-deadline,+kvm-pv-ipi
- arch = x86_64
- timeout = 30
- groups = apic
-@@ -51,7 +51,7 @@ groups = apic
- [xapic]
- file = apic.flat
- smp = 2
--extra_params = -cpu qemu64,-x2apic,+tsc-deadline -machine pit=off
-+extra_params = -cpu qemu64,-x2apic,+tsc-deadline,+kvm-pv-ipi -machine pit=off
- arch = x86_64
- timeout = 60
- groups = apic
--- 
-2.36.1
+> Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>
+> Link: https://lore.kernel.org/r/20230721201859.2307736-2-seanjc@google.co=
+m
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+>  arch/x86/include/asm/kexec.h  |  2 --
+>  arch/x86/include/asm/reboot.h |  2 ++
+>  arch/x86/kernel/crash.c       | 31 -------------------------------
+>  arch/x86/kernel/reboot.c      | 22 ++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c        | 10 +++-------
+>  5 files changed, 27 insertions(+), 40 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
+> index 5b77bbc28f969..819046974b997 100644
+> --- a/arch/x86/include/asm/kexec.h
+> +++ b/arch/x86/include/asm/kexec.h
+> @@ -205,8 +205,6 @@ int arch_kimage_file_post_load_cleanup(struct kimage =
+*image);
+>  #endif
+>  #endif
+>
+> -typedef void crash_vmclear_fn(void);
+> -extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
+>  extern void kdump_nmi_shootdown_cpus(void);
+>
+>  #endif /* __ASSEMBLY__ */
+> diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.=
+h
+> index 9177b4354c3f5..dc201724a6433 100644
+> --- a/arch/x86/include/asm/reboot.h
+> +++ b/arch/x86/include/asm/reboot.h
+> @@ -25,6 +25,8 @@ void __noreturn machine_real_restart(unsigned int type)=
+;
+>  #define MRR_BIOS       0
+>  #define MRR_APM                1
+>
+> +typedef void crash_vmclear_fn(void);
+> +extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
+>  void cpu_emergency_disable_virtualization(void);
+>
+>  typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
+> diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+> index cdd92ab43cda4..54cd959cb3160 100644
+> --- a/arch/x86/kernel/crash.c
+> +++ b/arch/x86/kernel/crash.c
+> @@ -48,38 +48,12 @@ struct crash_memmap_data {
+>         unsigned int type;
+>  };
+>
+> -/*
+> - * This is used to VMCLEAR all VMCSs loaded on the
+> - * processor. And when loading kvm_intel module, the
+> - * callback function pointer will be assigned.
+> - *
+> - * protected by rcu.
+> - */
+> -crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss =3D NULL;
+> -EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
+> -
+> -static inline void cpu_crash_vmclear_loaded_vmcss(void)
+> -{
+> -       crash_vmclear_fn *do_vmclear_operation =3D NULL;
+> -
+> -       rcu_read_lock();
+> -       do_vmclear_operation =3D rcu_dereference(crash_vmclear_loaded_vmc=
+ss);
+> -       if (do_vmclear_operation)
+> -               do_vmclear_operation();
+> -       rcu_read_unlock();
+> -}
+> -
+>  #if defined(CONFIG_SMP) && defined(CONFIG_X86_LOCAL_APIC)
+>
+>  static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
+>  {
+>         crash_save_cpu(regs, cpu);
+>
+> -       /*
+> -        * VMCLEAR VMCSs loaded on all cpus if needed.
+> -        */
+> -       cpu_crash_vmclear_loaded_vmcss();
+> -
+>         /*
+>          * Disable Intel PT to stop its logging
+>          */
+> @@ -133,11 +107,6 @@ void native_machine_crash_shutdown(struct pt_regs *r=
+egs)
+>
+>         crash_smp_send_stop();
+>
+> -       /*
+> -        * VMCLEAR VMCSs loaded on this cpu if needed.
+> -        */
+> -       cpu_crash_vmclear_loaded_vmcss();
+> -
+>         cpu_emergency_disable_virtualization();
+>
+>         /*
+> diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+> index 3adbe97015c13..3fa4c6717a1db 100644
+> --- a/arch/x86/kernel/reboot.c
+> +++ b/arch/x86/kernel/reboot.c
+> @@ -787,6 +787,26 @@ void machine_crash_shutdown(struct pt_regs *regs)
+>  }
+>  #endif
+>
+> +/*
+> + * This is used to VMCLEAR all VMCSs loaded on the
+> + * processor. And when loading kvm_intel module, the
+> + * callback function pointer will be assigned.
+> + *
+> + * protected by rcu.
+> + */
+> +crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
+> +EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
+> +
+> +static inline void cpu_crash_vmclear_loaded_vmcss(void)
+> +{
+> +       crash_vmclear_fn *do_vmclear_operation =3D NULL;
+> +
+> +       rcu_read_lock();
+> +       do_vmclear_operation =3D rcu_dereference(crash_vmclear_loaded_vmc=
+ss);
+> +       if (do_vmclear_operation)
+> +               do_vmclear_operation();
+> +       rcu_read_unlock();
+> +}
+>
+>  /* This is the CPU performing the emergency shutdown work. */
+>  int crashing_cpu =3D -1;
+> @@ -798,6 +818,8 @@ int crashing_cpu =3D -1;
+>   */
+>  void cpu_emergency_disable_virtualization(void)
+>  {
+> +       cpu_crash_vmclear_loaded_vmcss();
+> +
+>         cpu_emergency_vmxoff();
+>         cpu_emergency_svm_disable();
+>  }
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index df461f387e20d..f60fb79fea881 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -41,7 +41,7 @@
+>  #include <asm/idtentry.h>
+>  #include <asm/io.h>
+>  #include <asm/irq_remapping.h>
+> -#include <asm/kexec.h>
+> +#include <asm/reboot.h>
+>  #include <asm/perf_event.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/mshyperv.h>
+> @@ -754,7 +754,6 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vm=
+x,
+>         return ret;
+>  }
+>
+> -#ifdef CONFIG_KEXEC_CORE
+>  static void crash_vmclear_local_loaded_vmcss(void)
+>  {
+>         int cpu =3D raw_smp_processor_id();
+> @@ -764,7 +763,6 @@ static void crash_vmclear_local_loaded_vmcss(void)
+>                             loaded_vmcss_on_cpu_link)
+>                 vmcs_clear(v->vmcs);
+>  }
+> -#endif /* CONFIG_KEXEC_CORE */
+>
+>  static void __loaded_vmcs_clear(void *arg)
+>  {
+> @@ -8622,10 +8620,9 @@ static void __vmx_exit(void)
+>  {
+>         allow_smaller_maxphyaddr =3D false;
+>
+> -#ifdef CONFIG_KEXEC_CORE
+>         RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+>         synchronize_rcu();
+> -#endif
+> +
+>         vmx_cleanup_l1d_flush();
+>  }
+>
+> @@ -8674,10 +8671,9 @@ static int __init vmx_init(void)
+>                 pi_init_cpu(cpu);
+>         }
+>
+> -#ifdef CONFIG_KEXEC_CORE
+>         rcu_assign_pointer(crash_vmclear_loaded_vmcss,
+>                            crash_vmclear_local_loaded_vmcss);
+> -#endif
+> +
+>         vmx_check_vmcs12_offsets();
+>
+>         /*
+> --
+> 2.40.1
+>
 
