@@ -2,105 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 544417C98F9
-	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 14:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0108D7C9960
+	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 16:17:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbjJOMaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Oct 2023 08:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53218 "EHLO
+        id S229978AbjJOORQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Oct 2023 10:17:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjJOMa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Oct 2023 08:30:29 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9E24AB;
-        Sun, 15 Oct 2023 05:30:27 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63950C433C9;
-        Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697373027;
-        bh=i1YcrOqbwjKT/jMQfm28HMA/2YUC7i58f8iAS5jZh0Y=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LUz+ocZc5wTID/nfn03/wnOkcADgmXIsDkR0/28y12nztBMcO7eG5uUN2SRzUWiJN
-         2IXM6dukmCdPC0fJa0b8Kt0vus1jukQj0Id9fyJy4UeN55s2JKowKitzDlOo5vBRxh
-         HNiwlGdTEJBI5iq4JWHio5VS7gF32HMpsEQJFTTEg2cwzR/931NZW14XJmyc4dCtE8
-         rY0HylHPxtt4Rj9sPIGFhipxrONFTCbwMyrw04N/Jmh+20TQfv+L86LY+kB+vmaxX0
-         z1eTdFf4/GTZSYvsgsFisN2Vwq97lNa+/5RAGbP1mdR/HuPeiMIXvOt463+Uj22B9h
-         QXdc08sRs0cqw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4945AE1F666;
-        Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229596AbjJOORO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Oct 2023 10:17:14 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19A0D6
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:11 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-692d2e8c003so3531358b3a.1
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1697379431; x=1697984231; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+b0dEMOY183z9dPBZcXWdZ+T7lbIwplG3M4Qto5H1o=;
+        b=oOKWrKzvXwy6Iss50tPht/+1c1HJyTCKCwA46I9tiPP/IHCgdCNzKNIcGQ0J6Gv3M+
+         VHM2g+vzcIOHQrwnU8mEKqiJsjbflHEdg2GpV1SwawE+py0vyHW0/oFH+02d4tKUGAu1
+         6Q+y6T7ZRoJj+E5/pxcm7XtkwaavFP54+G5/l5ZxbmraAuPggemAJtmYWlfFyKkcNDVC
+         XA/piv1AsZaMtRWAZuG7ytz49tnZLSw1zvZZ0OUqa8d6kBcpELJ+wpuO47U+QAGqw5+Q
+         53T+VH0nTLUy0nP9Ac8/nlxctORyojWWh+uL661MD3da5xDNKlPHV+z+5WZBepDGf54s
+         88DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697379431; x=1697984231;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z+b0dEMOY183z9dPBZcXWdZ+T7lbIwplG3M4Qto5H1o=;
+        b=jqzoLYc9JHfbMeH+oogevdHCCws3Q3qSNaUq4u9eYUl8oBBKePzwlmt+0VPsqbm3ra
+         jcHwt7JK8O6ejtFtxbciR7dicVu+bS72beUMJ4d3YI8aIhsDEdo2n6QnzKr8oSguRmOy
+         qA2A/DRskgpDNEQqMu+WlWCSq+9q8Pz1TvpzbOMDcDwQtry/+9ATh5EZrIsYN/+4Z8ct
+         ObQOm9LzoVihHrMf+sCrEkazUt1l9jiqfS/ZM/rx5TSfkjk25q9zVnEs7U/WpOB1fHvx
+         7ubvV9r7vBFItd8rvXbWjjWrNI2NG9FFy0j7uluO2WoDC91rocvZn/8+USyYA1dz1Hhf
+         O5fw==
+X-Gm-Message-State: AOJu0YzlXaxDlDKCvv46ynGEElG1+KEd/WqYpsmrc+EPmbzfjLTPHcSB
+        M+nTLU2xFQ50o0X4awPEzmwjpg==
+X-Google-Smtp-Source: AGHT+IF8ctbxzi/yLoYKR8nfTMdLlPrANNX0a4fFaaxK61sDbvY5BiX2bAhQb9DCFQvUS99Sir6h0g==
+X-Received: by 2002:a05:6a21:6d92:b0:13a:dd47:c31a with SMTP id wl18-20020a056a216d9200b0013add47c31amr6752797pzb.20.1697379431188;
+        Sun, 15 Oct 2023 07:17:11 -0700 (PDT)
+Received: from localhost ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
+        by smtp.gmail.com with UTF8SMTPSA id x6-20020aa78f06000000b006b3dc56c944sm3993752pfr.133.2023.10.15.07.17.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Oct 2023 07:17:10 -0700 (PDT)
+From:   Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>,
+        Yonghong Song <yonghong.song@linux.dev>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+        bpf@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kselftest@vger.kernel.org,
+        Yuri Benditovich <yuri.benditovich@daynix.com>,
+        Andrew Melnychenko <andrew@daynix.com>,
+        Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [RFC PATCH v2 0/7] tun: Introduce virtio-net hashing feature
+Date:   Sun, 15 Oct 2023 23:16:28 +0900
+Message-ID: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY support
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <169737302729.30024.1645018070157688379.git-patchwork-notify@kernel.org>
-Date:   Sun, 15 Oct 2023 12:30:27 +0000
-References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
-In-Reply-To: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
-To:     Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        mst@redhat.com, jasowang@redhat.com, bobby.eshleman@bytedance.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
+virtio-net have two usage of hashes: one is RSS and another is hash
+reporting. Conventionally the hash calculation was done by the VMM.
+However, computing the hash after the queue was chosen defeats the
+purpose of RSS.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Another approach is to use eBPF steering program. This approach has
+another downside: it cannot report the calculated hash due to the
+restrictive nature of eBPF.
 
-On Tue, 10 Oct 2023 22:15:12 +0300 you wrote:
-> Hello,
-> 
-> this patchset contains second and third parts of another big patchset
-> for MSG_ZEROCOPY flag support:
-> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
-> 
-> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
-> suggested to split it for three parts to simplify review and merging:
-> 
-> [...]
+Extend the steering program feature by introducing a dedicated program
+type: BPF_PROG_TYPE_VNET_HASH. This program type is capable to report
+the hash value and the queue to use at the same time.
 
-Here is the summary with links:
-  - [net-next,v4,01/12] vsock: set EPOLLERR on non-empty error queue
-    https://git.kernel.org/netdev/net-next/c/0064cfb44084
-  - [net-next,v4,02/12] vsock: read from socket's error queue
-    https://git.kernel.org/netdev/net-next/c/49dbe25adac4
-  - [net-next,v4,03/12] vsock: check for MSG_ZEROCOPY support on send
-    https://git.kernel.org/netdev/net-next/c/5fbfc7d24334
-  - [net-next,v4,04/12] vsock: enable SOCK_SUPPORT_ZC bit
-    https://git.kernel.org/netdev/net-next/c/dcc55d7bb230
-  - [net-next,v4,05/12] vhost/vsock: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/3719c48d9a20
-  - [net-next,v4,06/12] vsock/virtio: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/e2fcc326b498
-  - [net-next,v4,07/12] vsock/loopback: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/cfdca3904687
-  - [net-next,v4,08/12] vsock: enable setting SO_ZEROCOPY
-    https://git.kernel.org/netdev/net-next/c/e0718bd82e27
-  - [net-next,v4,09/12] docs: net: description of MSG_ZEROCOPY for AF_VSOCK
-    https://git.kernel.org/netdev/net-next/c/bac2cac12c26
-  - [net-next,v4,10/12] test/vsock: MSG_ZEROCOPY flag tests
-    https://git.kernel.org/netdev/net-next/c/bc36442ef3b7
-  - [net-next,v4,11/12] test/vsock: MSG_ZEROCOPY support for vsock_perf
-    https://git.kernel.org/netdev/net-next/c/e846d679ad13
-  - [net-next,v4,12/12] test/vsock: io_uring rx/tx tests
-    https://git.kernel.org/netdev/net-next/c/8d211285c6d4
+This is a rewrite of a RFC patch series submitted by Yuri Benditovich that
+incorporates feedbacks for the series and V1 of this series:
+https://lore.kernel.org/lkml/20210112194143.1494-1-yuri.benditovich@daynix.com/
 
-You are awesome, thank you!
+QEMU patched to use this new feature is available at:
+https://github.com/daynix/qemu/tree/akihikodaki/bpf
+
+The QEMU patches will soon be submitted to the upstream as RFC too.
+
+V1 -> V2:
+  Changed to introduce a new BPF program type.
+
+Akihiko Odaki (7):
+  bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+  bpf: Add vnet_hash members to __sk_buff
+  skbuff: Introduce SKB_EXT_TUN_VNET_HASH
+  virtio_net: Add virtio_net_hdr_v1_hash_from_skb()
+  tun: Support BPF_PROG_TYPE_VNET_HASH
+  selftests/bpf: Test BPF_PROG_TYPE_VNET_HASH
+  vhost_net: Support VIRTIO_NET_F_HASH_REPORT
+
+ Documentation/bpf/bpf_prog_run.rst            |   1 +
+ Documentation/bpf/libbpf/program_types.rst    |   2 +
+ drivers/net/tun.c                             | 158 +++++--
+ drivers/vhost/net.c                           |  16 +-
+ include/linux/bpf_types.h                     |   2 +
+ include/linux/filter.h                        |   7 +
+ include/linux/skbuff.h                        |  10 +
+ include/linux/virtio_net.h                    |  22 +
+ include/uapi/linux/bpf.h                      |   5 +
+ kernel/bpf/verifier.c                         |   6 +
+ net/core/filter.c                             |  86 +++-
+ net/core/skbuff.c                             |   3 +
+ tools/include/uapi/linux/bpf.h                |   5 +
+ tools/lib/bpf/libbpf.c                        |   2 +
+ tools/testing/selftests/bpf/config            |   1 +
+ tools/testing/selftests/bpf/config.aarch64    |   1 -
+ .../selftests/bpf/prog_tests/vnet_hash.c      | 385 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/vnet_hash.c |  16 +
+ 18 files changed, 681 insertions(+), 47 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/vnet_hash.c
+ create mode 100644 tools/testing/selftests/bpf/progs/vnet_hash.c
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.42.0
 
