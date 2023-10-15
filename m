@@ -2,309 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC117C98DF
-	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 14:00:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B97697C98EE
+	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 14:24:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbjJOMAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Oct 2023 08:00:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
+        id S229596AbjJOMYO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Oct 2023 08:24:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229772AbjJOMAH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Oct 2023 08:00:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0CCA3
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:59:21 -0700 (PDT)
+        with ESMTP id S229555AbjJOMYN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Oct 2023 08:24:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86473A9
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 05:23:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697371161;
+        s=mimecast20190719; t=1697372605;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7odMBbvZWVsldhQpSxACtvJJIZbtETAe+tcSmUnuJjg=;
-        b=KceyIFoiWoiNrl2fzVPzFLKkgeZ3tCQrozeh/pVETfY4poj0AJbwHR3GXhRCGgIPyf59Kz
-        a0Fn0SmsmPpMEYHPDMoH4xaiKynwCCM6Oxyv3PJNwGlyxgYyn33TnyZwutqdaLCso0mTwZ
-        RW4A3mcYlaDrBaZXVTxL/f8Gx7HOv9o=
+        bh=MJ81Q5/B7q8cI3s0s8gDvVOoyclQrSAhpuPqTSeggew=;
+        b=f7dcEUtx0+aFToHWdsVjjMWSZxv50Vo9NydFNf4KMSHmtim7scNhmbM+1yEkRaF6SF4Qty
+        ho+JlTeDvUDyp/rb599Y6QfmbnUnZH9k/aEsWAUI9Uf2hXeW2f5RLg2gj/o2X+wYXz4h2O
+        8qkMxBI2aQAvXtLujbMOYYiAoS9lU4g=
 Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
  [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-E9MqRsmbNcCLWcGbGDapDw-1; Sun, 15 Oct 2023 07:59:19 -0400
-X-MC-Unique: E9MqRsmbNcCLWcGbGDapDw-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-457c02bfb64so805073137.0
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 04:59:19 -0700 (PDT)
+ us-mta-314-yZ2VMO2WMCGlhy5gJ51rkQ-1; Sun, 15 Oct 2023 08:23:18 -0400
+X-MC-Unique: yZ2VMO2WMCGlhy5gJ51rkQ-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-457bcc71151so887550137.3
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 05:23:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697371159; x=1697975959;
+        d=1e100.net; s=20230601; t=1697372597; x=1697977397;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7odMBbvZWVsldhQpSxACtvJJIZbtETAe+tcSmUnuJjg=;
-        b=d1arNhC50FlahsLvz+4NrjvSWaSj9YIcXIRyW1SmmCHA/NQhnfMPmebIy944nC+poM
-         6j6tuvWjou7LXi/6iMNhiBSQ1BGXjXBd1NTPV8wFJR7zBfA1ErHNI2jPhYPWBrQNMXPz
-         W7V2xEd1s0w11u1QpaadX8Gi0e0UVvtzBKsRlosWk19lGpPfLpTy6veS47JPBdQ1+5UB
-         9zhvlJzqdYw340/GcYnkGBtFc1gAyDpPDjFljwpzXXWYdeILudmj+l+BbozZw4Z3/XU6
-         oyF4aHR+K8uVfz3ww8fuwegq/hIzWvG/NNFNGxF/Ut0Hzce6HlCkYcIEB4fVxg8vFyYG
-         Yinw==
-X-Gm-Message-State: AOJu0Yx+kTtSC7+cxXHp3dzmyEFNdiKnb1LbGeX3iNwFRurKNvsr1uP5
-        83AxVkrMg1b+TuYw7UUPKbgGuebhQ2u8+X6IkMfU+slXjl1yCO1V2rKZmtJR8RUhkA0j3L6TVO4
-        tZL5Md9+sE1oNdcKcDNOhhWfq6mPL
-X-Received: by 2002:a67:f918:0:b0:452:8e07:db61 with SMTP id t24-20020a67f918000000b004528e07db61mr28478012vsq.6.1697371158534;
-        Sun, 15 Oct 2023 04:59:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IELKarAPYFoutdt+n5qD/eLZFSa9kKfU3ZxWAZUeTN1sG50XRhX1O35PZcGF5uWUC5f/xEbG8Q271emAppLWM4=
-X-Received: by 2002:a67:f918:0:b0:452:8e07:db61 with SMTP id
- t24-20020a67f918000000b004528e07db61mr28478004vsq.6.1697371158260; Sun, 15
- Oct 2023 04:59:18 -0700 (PDT)
+        bh=MJ81Q5/B7q8cI3s0s8gDvVOoyclQrSAhpuPqTSeggew=;
+        b=aGDnlAL4GWffWoler0Ko3PfV7pAL1uUDHOSAuPw6mN01jnKOXIVURyYbQVAyqK279Z
+         frLUjyNXJgUXfTvaxI5gCPmDLIDtbGhfKqsQKT68tbZZgutcygu7jIFBwk7P9Bbx15MU
+         Y4ZZEHJBIs1hGPZQLjYobNBSszFJTN1TRkDBpNyeAnXNHCHVgho8C+vPFBTCv/+8LpbQ
+         2viLzFYro7vos2UlPO3B06Pmt/Qf9oX7GiD3rchY8JQc3O6hPO0ggRFLuC7KYaey8oFB
+         aF0j6EKv86hKkIz9XYXYI+4sLo9tselAjyvm8u8jpo4cKpVGSYih2usu8wbWZD3K1Iau
+         Z6qw==
+X-Gm-Message-State: AOJu0YyFECuaGqc2iRANcNH/ziAPXGIy+9R0dNnD2fugN9s1dEKo4UdV
+        5ZQkmamn1WFPxzidzEJV/A1/fHUzSE4k/Wf4hAM+lrih3SiDXMiIbkKb9dfkSm82x9xspijBEnk
+        e6BM2UnWGvGm9kyMWzu/sbadsKHgs
+X-Received: by 2002:a67:e1c4:0:b0:457:bdbf:8a34 with SMTP id p4-20020a67e1c4000000b00457bdbf8a34mr5510902vsl.29.1697372597589;
+        Sun, 15 Oct 2023 05:23:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHLssNye3K6hgQQYMw1WXAnaq+73MFpiDByXlBI9bAJiL9b103Flr6+4ZBOkqE2VWibhn55BXabT71I1Q4Czc4=
+X-Received: by 2002:a67:e1c4:0:b0:457:bdbf:8a34 with SMTP id
+ p4-20020a67e1c4000000b00457bdbf8a34mr5510883vsl.29.1697372596972; Sun, 15 Oct
+ 2023 05:23:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230914015459.51740-1-sashal@kernel.org>
-In-Reply-To: <20230914015459.51740-1-sashal@kernel.org>
+References: <20231013213053.3947696-1-maz@kernel.org>
+In-Reply-To: <20231013213053.3947696-1-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Sun, 15 Oct 2023 13:59:06 +0200
-Message-ID: <CABgObfbKV3TvVeixtVvp6f9Qtr47aiStUBsDH2_c6jrDGiWR_A@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 6.5 1/7] x86/reboot: VMCLEAR active VMCSes before
- emergency reboot
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Cooper <Andrew.Cooper3@citrix.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, akpm@linux-foundation.org, bhe@redhat.com,
-        eric.devolder@oracle.com, hbathini@linux.ibm.com,
-        sourabhjain@linux.ibm.com, bhelgaas@google.com,
-        kai.huang@intel.com, peterz@infradead.org, jpoimboe@kernel.org,
-        tiwai@suse.de, kvm@vger.kernel.org
+Date:   Sun, 15 Oct 2023 14:23:05 +0200
+Message-ID: <CABgObfYQoepvvB6j7k2gei0DdV+noO-qSfEzqFcmrKLM_URG_Q@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.6, take #2
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Anshuman Khandual <anshuman.khandual@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 3:55=E2=80=AFAM Sasha Levin <sashal@kernel.org> wro=
-te:
+On Fri, Oct 13, 2023 at 11:31=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
+e:
 >
-> From: Sean Christopherson <seanjc@google.com>
+>  Paolo,
 >
-> [ Upstream commit b23c83ad2c638420ec0608a9de354507c41bec29 ]
+> Here's a set of additional fixes for 6.6. The most important part is
+> the fix for a breakage of the Permission Indirection feature, which is
+> a regression. The other (less important) part is a fix for the physical
+> timer offset.
 >
-> VMCLEAR active VMCSes before any emergency reboot, not just if the kernel
-> may kexec into a new kernel after a crash.  Per Intel's SDM, the VMX
-> architecture doesn't require the CPU to flush the VMCS cache on INIT.  If
-> an emergency reboot doesn't RESET CPUs, cached VMCSes could theoretically
-> be kept and only be written back to memory after the new kernel is booted=
-,
-> i.e. could effectively corrupt memory after reboot.
+> Please pull,
 >
-> Opportunistically remove the setting of the global pointer to NULL to mak=
-e
-> checkpatch happy.
+>         M.
+>
+> The following changes since commit 373beef00f7d781a000b12c31fb17a5a9c2596=
+9c:
+>
+>   KVM: arm64: nvhe: Ignore SVE hint in SMCCC function ID (2023-09-12 13:0=
+7:37 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
+marm-fixes-6.6-2
+>
+> for you to fetch changes up to 9404673293b065cbb16b8915530147cac7e80b4d:
+>
+>   KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2 (2023-10=
+-12 16:55:21 +0100)
 
-Intended as a cleanup but I guess it does not hurt, since it was the first =
-patch
-in the large series that included it.
-
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Pulled, thanks.
 
 Paolo
 
-
-> Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>
-> Link: https://lore.kernel.org/r/20230721201859.2307736-2-seanjc@google.co=
-m
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  arch/x86/include/asm/kexec.h  |  2 --
->  arch/x86/include/asm/reboot.h |  2 ++
->  arch/x86/kernel/crash.c       | 31 -------------------------------
->  arch/x86/kernel/reboot.c      | 22 ++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmx.c        | 10 +++-------
->  5 files changed, 27 insertions(+), 40 deletions(-)
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.6, take #2
 >
-> diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
-> index 5b77bbc28f969..819046974b997 100644
-> --- a/arch/x86/include/asm/kexec.h
-> +++ b/arch/x86/include/asm/kexec.h
-> @@ -205,8 +205,6 @@ int arch_kimage_file_post_load_cleanup(struct kimage =
-*image);
->  #endif
->  #endif
+> - Fix the handling of the phycal timer offset when FEAT_ECV
+>   and CNTPOFF_EL2 are implemented.
 >
-> -typedef void crash_vmclear_fn(void);
-> -extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
->  extern void kdump_nmi_shootdown_cpus(void);
+> - Restore the functionnality of Permission Indirection that
+>   was broken by the Fine Grained Trapping rework
 >
->  #endif /* __ASSEMBLY__ */
-> diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.=
-h
-> index 9177b4354c3f5..dc201724a6433 100644
-> --- a/arch/x86/include/asm/reboot.h
-> +++ b/arch/x86/include/asm/reboot.h
-> @@ -25,6 +25,8 @@ void __noreturn machine_real_restart(unsigned int type)=
-;
->  #define MRR_BIOS       0
->  #define MRR_APM                1
+> - Cleanup some PMU event sharing code
 >
-> +typedef void crash_vmclear_fn(void);
-> +extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
->  void cpu_emergency_disable_virtualization(void);
+> ----------------------------------------------------------------
+> Anshuman Khandual (1):
+>       KVM: arm64: pmu: Drop redundant check for non-NULL kvm_pmu_events
 >
->  typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
-> diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
-> index cdd92ab43cda4..54cd959cb3160 100644
-> --- a/arch/x86/kernel/crash.c
-> +++ b/arch/x86/kernel/crash.c
-> @@ -48,38 +48,12 @@ struct crash_memmap_data {
->         unsigned int type;
->  };
+> Joey Gouly (2):
+>       KVM: arm64: Add nPIR{E0}_EL1 to HFG traps
+>       KVM: arm64: POR{E0}_EL1 do not need trap handlers
 >
-> -/*
-> - * This is used to VMCLEAR all VMCSs loaded on the
-> - * processor. And when loading kvm_intel module, the
-> - * callback function pointer will be assigned.
-> - *
-> - * protected by rcu.
-> - */
-> -crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss =3D NULL;
-> -EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
-> -
-> -static inline void cpu_crash_vmclear_loaded_vmcss(void)
-> -{
-> -       crash_vmclear_fn *do_vmclear_operation =3D NULL;
-> -
-> -       rcu_read_lock();
-> -       do_vmclear_operation =3D rcu_dereference(crash_vmclear_loaded_vmc=
-ss);
-> -       if (do_vmclear_operation)
-> -               do_vmclear_operation();
-> -       rcu_read_unlock();
-> -}
-> -
->  #if defined(CONFIG_SMP) && defined(CONFIG_X86_LOCAL_APIC)
+> Marc Zyngier (1):
+>       KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2
 >
->  static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
->  {
->         crash_save_cpu(regs, cpu);
->
-> -       /*
-> -        * VMCLEAR VMCSs loaded on all cpus if needed.
-> -        */
-> -       cpu_crash_vmclear_loaded_vmcss();
-> -
->         /*
->          * Disable Intel PT to stop its logging
->          */
-> @@ -133,11 +107,6 @@ void native_machine_crash_shutdown(struct pt_regs *r=
-egs)
->
->         crash_smp_send_stop();
->
-> -       /*
-> -        * VMCLEAR VMCSs loaded on this cpu if needed.
-> -        */
-> -       cpu_crash_vmclear_loaded_vmcss();
-> -
->         cpu_emergency_disable_virtualization();
->
->         /*
-> diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-> index 3adbe97015c13..3fa4c6717a1db 100644
-> --- a/arch/x86/kernel/reboot.c
-> +++ b/arch/x86/kernel/reboot.c
-> @@ -787,6 +787,26 @@ void machine_crash_shutdown(struct pt_regs *regs)
->  }
->  #endif
->
-> +/*
-> + * This is used to VMCLEAR all VMCSs loaded on the
-> + * processor. And when loading kvm_intel module, the
-> + * callback function pointer will be assigned.
-> + *
-> + * protected by rcu.
-> + */
-> +crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
-> +EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
-> +
-> +static inline void cpu_crash_vmclear_loaded_vmcss(void)
-> +{
-> +       crash_vmclear_fn *do_vmclear_operation =3D NULL;
-> +
-> +       rcu_read_lock();
-> +       do_vmclear_operation =3D rcu_dereference(crash_vmclear_loaded_vmc=
-ss);
-> +       if (do_vmclear_operation)
-> +               do_vmclear_operation();
-> +       rcu_read_unlock();
-> +}
->
->  /* This is the CPU performing the emergency shutdown work. */
->  int crashing_cpu =3D -1;
-> @@ -798,6 +818,8 @@ int crashing_cpu =3D -1;
->   */
->  void cpu_emergency_disable_virtualization(void)
->  {
-> +       cpu_crash_vmclear_loaded_vmcss();
-> +
->         cpu_emergency_vmxoff();
->         cpu_emergency_svm_disable();
->  }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index df461f387e20d..f60fb79fea881 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -41,7 +41,7 @@
->  #include <asm/idtentry.h>
->  #include <asm/io.h>
->  #include <asm/irq_remapping.h>
-> -#include <asm/kexec.h>
-> +#include <asm/reboot.h>
->  #include <asm/perf_event.h>
->  #include <asm/mmu_context.h>
->  #include <asm/mshyperv.h>
-> @@ -754,7 +754,6 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vm=
-x,
->         return ret;
->  }
->
-> -#ifdef CONFIG_KEXEC_CORE
->  static void crash_vmclear_local_loaded_vmcss(void)
->  {
->         int cpu =3D raw_smp_processor_id();
-> @@ -764,7 +763,6 @@ static void crash_vmclear_local_loaded_vmcss(void)
->                             loaded_vmcss_on_cpu_link)
->                 vmcs_clear(v->vmcs);
->  }
-> -#endif /* CONFIG_KEXEC_CORE */
->
->  static void __loaded_vmcs_clear(void *arg)
->  {
-> @@ -8622,10 +8620,9 @@ static void __vmx_exit(void)
->  {
->         allow_smaller_maxphyaddr =3D false;
->
-> -#ifdef CONFIG_KEXEC_CORE
->         RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
->         synchronize_rcu();
-> -#endif
-> +
->         vmx_cleanup_l1d_flush();
->  }
->
-> @@ -8674,10 +8671,9 @@ static int __init vmx_init(void)
->                 pi_init_cpu(cpu);
->         }
->
-> -#ifdef CONFIG_KEXEC_CORE
->         rcu_assign_pointer(crash_vmclear_loaded_vmcss,
->                            crash_vmclear_local_loaded_vmcss);
-> -#endif
-> +
->         vmx_check_vmcs12_offsets();
->
->         /*
-> --
-> 2.40.1
+>  arch/arm64/include/asm/kvm_arm.h |  4 ++--
+>  arch/arm64/kvm/arch_timer.c      | 13 +++---------
+>  arch/arm64/kvm/emulate-nested.c  |  2 ++
+>  arch/arm64/kvm/hyp/vhe/switch.c  | 44 ++++++++++++++++++++++++++++++++++=
+++++++
+>  arch/arm64/kvm/pmu.c             |  4 ++--
+>  arch/arm64/kvm/sys_regs.c        |  4 ++--
+>  include/kvm/arm_arch_timer.h     |  7 +++++++
+>  7 files changed, 62 insertions(+), 16 deletions(-)
 >
 
