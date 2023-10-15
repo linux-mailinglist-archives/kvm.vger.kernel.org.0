@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B59A7C997A
-	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 16:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 301D87C997F
+	for <lists+kvm@lfdr.de>; Sun, 15 Oct 2023 16:18:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbjJOOR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Oct 2023 10:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56690 "EHLO
+        id S230200AbjJOOSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Oct 2023 10:18:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjJOORx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Oct 2023 10:17:53 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B923A134
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:43 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c9bf22fe05so22328455ad.2
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:43 -0700 (PDT)
+        with ESMTP id S229672AbjJOOSA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Oct 2023 10:18:00 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54F60126
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:50 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6c615df24c0so2460167a34.1
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 07:17:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1697379462; x=1697984262; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1697379469; x=1697984269; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kvSWVbZXn/MrVEcGpo16B6JSHdwZ2fR7rly5J6YWZNE=;
-        b=RFS2pRpOPj0Fz3zbI6kHMAvLIv9pOZrbCw4IRXWqTM7IE4gIwhuZ7cMWL1lnx2NzjC
-         JmP2knUtSyyY1syJLyq+qzp3nZc1bh+nyiKBD+XFfVODB9AmKmpspLEWul9jaksfPYFr
-         gBcy3eEG55wtAaa0jTvrgZKvGgbxI3eEu1jJTw5zD9zCWhHyN3HfaBCMAEqTPM9AyP+R
-         1C2HXXFQqdZ7eis759QCNODeaizm5UiraLBG3eSS/s6vVAZlmCMFmyTShNOh4Yb59fRT
-         aHjvrGrh9h5WNqVk4iyDoarINlIy4OjJwRPgwySNoqVkKpXCYwohnBXH/4xDkepnrruM
-         T9hA==
+        bh=Ke33nDzLmipl3SjRyYaM61RMA7lxXnZa/f+yQU5tzpk=;
+        b=kD2bkSBghNq/T2hYpS/+oxZ4nmFIDOx2d5OGFwe4xd0xb4QQaNMZBDnOZUBio8NClX
+         5kkU+58w4ozuf+5ZNbxkVilJolkY2iggu8riVS5yj4k9edM5VFyteazzSKUqHRQHk/df
+         b58toKI0pGRWV1uFJFogEATh0GOr6UovIAo7EyYPaMhN7iSicVDVtNO78297q4NDBGJD
+         kA+8FQPAtWx/p0r4UV1PdALCc7Lzjmqqe/BhxKVM0znwuwv33wLTLexTCiVp3kXXzFwv
+         lkOoHsQDO7IubFJkHlwZNRzsBymWYHu/vf+OFJghENy3RezNTpitcdQwIBtUJkGzf+pn
+         1evg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697379462; x=1697984262;
+        d=1e100.net; s=20230601; t=1697379469; x=1697984269;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kvSWVbZXn/MrVEcGpo16B6JSHdwZ2fR7rly5J6YWZNE=;
-        b=wZKKSTFoJXWoQU3V+G7fX6WECohj18nv2anjrctKS0nbYvYRdy1bOY8mFpTe3u0MhG
-         P351eccPgkZ312nu2IFLNeTKsACgeHOhUbw74L9sprHw85lEqH4r0BfUf2pVN1dPeyMR
-         fQvSIlNYUmTAcerGb+9Kiei+j4btxE/DS/fNPwcg/yDX8G3zzOGu+FIbiRewLlhp1rqR
-         FbWQ0H1R9ov1YGNKVtF4FmvfZ1Kzsg/VtT2K6kDcape95Sq/6UxmevXvMf3BbRHKG2NY
-         ywM1gVDigS53gSUibjrQv3Z+tyTID3JU8xzbrYTPT+rQYy2svh6BFTpokk3tWDxaANfv
-         CTNQ==
-X-Gm-Message-State: AOJu0YwWWieR7zzBdXf2BaQGFx79fiv4WXA6qeyQgNLapLB2xo9PLBR2
-        S6xwWoKeHbY06OR6bUEw5j1i2g==
-X-Google-Smtp-Source: AGHT+IE81It/1ElAFh3WqzA1MDP6+KyM5FALauAhwzot5b7EduhSxG7C2ZYhheRbI8ll3TgU9FJn+A==
-X-Received: by 2002:a17:902:aa48:b0:1c0:bcbc:d5d with SMTP id c8-20020a170902aa4800b001c0bcbc0d5dmr25880675plr.61.1697379461931;
-        Sun, 15 Oct 2023 07:17:41 -0700 (PDT)
+        bh=Ke33nDzLmipl3SjRyYaM61RMA7lxXnZa/f+yQU5tzpk=;
+        b=iy/0Gu4EBzabCbKayAHOKNB0iI/CvTA6tx9k937pzFgLRGQYUwyhnkJMwaqDecT4Gh
+         oInBtxmVzHDP/9a0Ub2MEoZpZsJqZD4opbQ6Pxvf+R5GY1hF3m/cW1kxViWwp5ShQTKn
+         cA0027v6JVhE4nOjuOTVvm/1SK/26tupPkJz+G8+fS0frjrHPdp32XKud60yNPm0wTLF
+         JmST3k3Oeyn18dzFuElXRx7E1xUDwBZ//BMcOtAvndJf+Ja1sfnszhXHpQhTuzy0E84f
+         +mKudOM/hL6LN3W2akziqspmbxRQvwW7bmMCEO+ssRV0BAD9a2kneipIImqeHSTpsXPZ
+         9ihA==
+X-Gm-Message-State: AOJu0YzRNBdFInSKy3mYdG770lgnL1EBf2AgDTLxNG0c7g/ugfGRzPn3
+        ctJy5HX80mPv6BxFDhTdOd2TBw==
+X-Google-Smtp-Source: AGHT+IH7Nqw9l9pQGBIDLc7LROP4B9WO3/Rf0e7rU1BiIDInOq3e6XPZWZv49whJ5GeUl650syvp3w==
+X-Received: by 2002:a05:6830:208:b0:6b8:82ed:ea2e with SMTP id em8-20020a056830020800b006b882edea2emr35127511otb.4.1697379469443;
+        Sun, 15 Oct 2023 07:17:49 -0700 (PDT)
 Received: from localhost ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with UTF8SMTPSA id d8-20020a170903230800b001c62c9d7289sm6869426plh.104.2023.10.15.07.17.36
+        by smtp.gmail.com with UTF8SMTPSA id o14-20020aa7978e000000b006b5922221f4sm3556073pfp.8.2023.10.15.07.17.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Oct 2023 07:17:41 -0700 (PDT)
+        Sun, 15 Oct 2023 07:17:49 -0700 (PDT)
 From:   Akihiko Odaki <akihiko.odaki@daynix.com>
 Cc:     Alexei Starovoitov <ast@kernel.org>,
         Daniel Borkmann <daniel@iogearbox.net>,
@@ -77,17 +77,17 @@ Cc:     Alexei Starovoitov <ast@kernel.org>,
         Yuri Benditovich <yuri.benditovich@daynix.com>,
         Andrew Melnychenko <andrew@daynix.com>,
         Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [RFC PATCH v2 4/7] virtio_net: Add virtio_net_hdr_v1_hash_from_skb()
-Date:   Sun, 15 Oct 2023 23:16:32 +0900
-Message-ID: <20231015141644.260646-5-akihiko.odaki@daynix.com>
+Subject: [RFC PATCH v2 5/7] tun: Support BPF_PROG_TYPE_VNET_HASH
+Date:   Sun, 15 Oct 2023 23:16:33 +0900
+Message-ID: <20231015141644.260646-6-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231015141644.260646-1-akihiko.odaki@daynix.com>
 References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 To:     unlisted-recipients:; (no To-header on input)
@@ -95,45 +95,256 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is identical with virtio_net_hdr_from_skb() except that it
-impelements hash reporting.
+Support BPF_PROG_TYPE_VNET_HASH with TUNSETSTEERINGEBPF ioctl to make
+it possible to report hash values and types when steering packets.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- include/linux/virtio_net.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/net/tun.c | 158 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 117 insertions(+), 41 deletions(-)
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 7b4dd69555e4..01e594b4586b 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -216,4 +216,26 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
- 	return 0;
- }
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 89ab9efe522c..e0b453572a64 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -543,19 +543,37 @@ static u16 tun_automq_select_queue(struct tun_struct *tun, struct sk_buff *skb)
  
-+static inline int virtio_net_hdr_v1_hash_from_skb(const struct sk_buff *skb,
-+						  struct virtio_net_hdr_v1_hash *hdr,
-+						  bool little_endian,
-+						  bool has_data_valid,
-+						  int vlan_hlen,
-+						  u32 hash_value,
-+						  u16 hash_report)
-+{
-+	int ret;
+ static u16 tun_ebpf_select_queue(struct tun_struct *tun, struct sk_buff *skb)
+ {
++	struct bpf_skb_vnet_hash_end *cb = (struct bpf_skb_vnet_hash_end *)skb->cb;
++	struct tun_vnet_hash *ext;
+ 	struct tun_prog *prog;
+ 	u32 numqueues;
+-	u16 ret = 0;
++	u16 queue = 0;
 +
-+	memset(hdr, 0, sizeof(*hdr));
++	BUILD_BUG_ON(sizeof(*cb) > sizeof(skb->cb));
+ 
+ 	numqueues = READ_ONCE(tun->numqueues);
+ 	if (!numqueues)
+ 		return 0;
+ 
+ 	prog = rcu_dereference(tun->steering_prog);
+-	if (prog)
+-		ret = bpf_prog_run_clear_cb(prog->prog, skb);
++	if (prog) {
++		if (prog->prog->type == BPF_PROG_TYPE_VNET_HASH) {
++			memset(skb->cb, 0, sizeof(*cb) - sizeof(struct qdisc_skb_cb));
++			bpf_prog_run_clear_cb(prog->prog, skb);
 +
-+	ret = virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
-+				      little_endian, has_data_valid, vlan_hlen);
-+	if (!ret) {
-+		hdr->hash_value = cpu_to_le32(hash_value);
-+		hdr->hash_report = cpu_to_le16(hash_report);
++			ext = skb_ext_add(skb, SKB_EXT_TUN_VNET_HASH);
++			if (ext) {
++				ext->value = cb->hash_value;
++				ext->report = cb->hash_report;
++			}
+ 
+-	return ret % numqueues;
++			queue = cb->rss_queue;
++		} else {
++			queue = bpf_prog_run_clear_cb(prog->prog, skb);
++		}
 +	}
 +
-+	return ret;
-+}
++	return queue % numqueues;
+ }
+ 
+ static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
+@@ -2116,31 +2134,74 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	}
+ 
+ 	if (vnet_hdr_sz) {
+-		struct virtio_net_hdr gso;
++		struct bpf_skb_vnet_hash_end *cb = (struct bpf_skb_vnet_hash_end *)skb->cb;
++		struct tun_prog *prog;
++		struct tun_vnet_hash *vnet_hash_p;
++		struct tun_vnet_hash vnet_hash;
++		size_t vnet_hdr_content_sz = sizeof(struct virtio_net_hdr);
++		union {
++			struct virtio_net_hdr hdr;
++			struct virtio_net_hdr_v1_hash hdr_v1_hash;
++		} vnet_hdr;
++		int ret;
+ 
+ 		if (iov_iter_count(iter) < vnet_hdr_sz)
+ 			return -EINVAL;
+ 
+-		if (virtio_net_hdr_from_skb(skb, &gso,
+-					    tun_is_little_endian(tun), true,
+-					    vlan_hlen)) {
++		if (vnet_hdr_sz >= sizeof(struct virtio_net_hdr_v1_hash)) {
++			vnet_hash_p = skb_ext_find(skb, SKB_EXT_TUN_VNET_HASH);
++			if (vnet_hash_p) {
++				vnet_hash = *vnet_hash_p;
++				vnet_hdr_content_sz = sizeof(struct virtio_net_hdr_v1_hash);
++			} else {
++				rcu_read_lock();
++				prog = rcu_dereference(tun->steering_prog);
++				if (prog && prog->prog->type == BPF_PROG_TYPE_VNET_HASH) {
++					memset(skb->cb, 0,
++					       sizeof(*cb) - sizeof(struct qdisc_skb_cb));
++					bpf_prog_run_clear_cb(prog->prog, skb);
++					vnet_hash.value = cb->hash_value;
++					vnet_hash.report = cb->hash_report;
++					vnet_hdr_content_sz =
++						sizeof(struct virtio_net_hdr_v1_hash);
++				}
++				rcu_read_unlock();
++			}
++		}
 +
- #endif /* _LINUX_VIRTIO_NET_H */
++		switch (vnet_hdr_content_sz) {
++		case sizeof(struct virtio_net_hdr):
++			ret = virtio_net_hdr_from_skb(skb, &vnet_hdr.hdr,
++						      tun_is_little_endian(tun), true,
++						      vlan_hlen);
++			break;
++
++		case sizeof(struct virtio_net_hdr_v1_hash):
++			ret = virtio_net_hdr_v1_hash_from_skb(skb, &vnet_hdr.hdr_v1_hash,
++							      tun_is_little_endian(tun), true,
++							      vlan_hlen,
++							      vnet_hash.value, vnet_hash.report);
++			break;
++		}
++
++		if (ret) {
+ 			struct skb_shared_info *sinfo = skb_shinfo(skb);
+ 			pr_err("unexpected GSO type: "
+ 			       "0x%x, gso_size %d, hdr_len %d\n",
+-			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
+-			       tun16_to_cpu(tun, gso.hdr_len));
++			       sinfo->gso_type, tun16_to_cpu(tun, vnet_hdr.hdr.gso_size),
++			       tun16_to_cpu(tun, vnet_hdr.hdr.hdr_len));
+ 			print_hex_dump(KERN_ERR, "tun: ",
+ 				       DUMP_PREFIX_NONE,
+ 				       16, 1, skb->head,
+-				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
++				       min((int)tun16_to_cpu(tun, vnet_hdr.hdr.hdr_len), 64), true);
+ 			WARN_ON_ONCE(1);
+ 			return -EINVAL;
+ 		}
+ 
+-		if (copy_to_iter(&gso, sizeof(gso), iter) != sizeof(gso))
++		if (copy_to_iter(&vnet_hdr, vnet_hdr_content_sz, iter) != vnet_hdr_content_sz)
+ 			return -EFAULT;
+ 
+-		iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso));
++		iov_iter_advance(iter, vnet_hdr_sz - vnet_hdr_content_sz);
+ 	}
+ 
+ 	if (vlan_hlen) {
+@@ -2276,13 +2337,13 @@ static void tun_prog_free(struct rcu_head *rcu)
+ {
+ 	struct tun_prog *prog = container_of(rcu, struct tun_prog, rcu);
+ 
+-	bpf_prog_destroy(prog->prog);
++	bpf_prog_put(prog->prog);
+ 	kfree(prog);
+ }
+ 
+-static int __tun_set_ebpf(struct tun_struct *tun,
+-			  struct tun_prog __rcu **prog_p,
+-			  struct bpf_prog *prog)
++static int tun_set_ebpf(struct tun_struct *tun,
++			struct tun_prog __rcu **prog_p,
++			struct bpf_prog *prog)
+ {
+ 	struct tun_prog *old, *new = NULL;
+ 
+@@ -2314,8 +2375,8 @@ static void tun_free_netdev(struct net_device *dev)
+ 	free_percpu(dev->tstats);
+ 	tun_flow_uninit(tun);
+ 	security_tun_dev_free_security(tun->security);
+-	__tun_set_ebpf(tun, &tun->steering_prog, NULL);
+-	__tun_set_ebpf(tun, &tun->filter_prog, NULL);
++	tun_set_ebpf(tun, &tun->steering_prog, NULL);
++	tun_set_ebpf(tun, &tun->filter_prog, NULL);
+ }
+ 
+ static void tun_setup(struct net_device *dev)
+@@ -3007,26 +3068,6 @@ static int tun_set_queue(struct file *file, struct ifreq *ifr)
+ 	return ret;
+ }
+ 
+-static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
+-			void __user *data)
+-{
+-	struct bpf_prog *prog;
+-	int fd;
+-
+-	if (copy_from_user(&fd, data, sizeof(fd)))
+-		return -EFAULT;
+-
+-	if (fd == -1) {
+-		prog = NULL;
+-	} else {
+-		prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
+-		if (IS_ERR(prog))
+-			return PTR_ERR(prog);
+-	}
+-
+-	return __tun_set_ebpf(tun, prog_p, prog);
+-}
+-
+ /* Return correct value for tun->dev->addr_len based on tun->dev->type. */
+ static unsigned char tun_get_addr_len(unsigned short type)
+ {
+@@ -3077,6 +3118,8 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 	struct ifreq ifr;
+ 	kuid_t owner;
+ 	kgid_t group;
++	struct bpf_prog *prog;
++	int fd;
+ 	int sndbuf;
+ 	int vnet_hdr_sz;
+ 	int le;
+@@ -3360,11 +3403,44 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 		break;
+ 
+ 	case TUNSETSTEERINGEBPF:
+-		ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
++		if (copy_from_user(&fd, argp, sizeof(fd))) {
++			ret = -EFAULT;
++			break;
++		}
++
++		if (fd == -1) {
++			prog = NULL;
++		} else {
++			prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_VNET_HASH);
++			if (IS_ERR(prog)) {
++				prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
++				if (IS_ERR(prog)) {
++					ret = PTR_ERR(prog);
++					break;
++				}
++			}
++		}
++
++		ret = tun_set_ebpf(tun, &tun->steering_prog, prog);
+ 		break;
+ 
+ 	case TUNSETFILTEREBPF:
+-		ret = tun_set_ebpf(tun, &tun->filter_prog, argp);
++		if (copy_from_user(&fd, argp, sizeof(fd))) {
++			ret = -EFAULT;
++			break;
++		}
++
++		if (fd == -1) {
++			prog = NULL;
++		} else {
++			prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
++			if (IS_ERR(prog)) {
++				ret = PTR_ERR(prog);
++				break;
++			}
++		}
++
++		ret = tun_set_ebpf(tun, &tun->filter_prog, prog);
+ 		break;
+ 
+ 	case TUNSETCARRIER:
 -- 
 2.42.0
 
