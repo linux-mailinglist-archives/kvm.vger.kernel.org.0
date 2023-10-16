@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68CDD7CAEBB
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:17:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92A237CAF4E
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:31:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233724AbjJPQQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
+        id S233634AbjJPQQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233501AbjJPQQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:16:37 -0400
+        with ESMTP id S232240AbjJPQQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:16:36 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3231AB4;
-        Mon, 16 Oct 2023 09:16:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC1CF0;
+        Mon, 16 Oct 2023 09:16:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697472996; x=1729008996;
+  t=1697472994; x=1729008994;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JKrKXxqRgmu3ytxgnpFElL0CJMFTDVpBWaKhHKDBGWA=;
-  b=gK8yIuHwsO3ROmTwWE+bw+5d8MNDvB4dB/dfP7lPdIoFBUvGEiSui6/k
-   7SREg5d1ovahOEUhhI1SVIHCWjwdGYvQzpPzoAVwXpY497edU4cORTI8B
-   hF99RZq0vDCivdI1e3Fu+2oR2Cq6pImsAiqfJzHOCVmJwaNKTREasE66z
-   MhYJzW5VhGypcnN7XsKU9LMgdOrdLnjtVOMIaQYATdaxZ4EfJnWOY2G3F
-   JQ879wUKgzX8SJBBhZsGtflsz9ymrZa+BJsivrP1UYHgO9XztNxoWJ0bQ
-   LTcmNfdubXLAkHWZ8sp7jWy8DFymoP2UwWTAXjGjs7D9ueYMhudSUTnhW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921734"
+  bh=tBh4x5NVn85tVT3gq0UMO4KHl1axLMCXo4q1WaHLaQI=;
+  b=XibQhhp2lCTDb+SczXJcq6zjZQ9zSXOJrsF6t4l7UKz2hIJpexDjmRxb
+   GS5bXpMegAKC71m1qe2oTVJCFM6yYxhkEhNtCrW4Q2Dw4Ixz35udAcXSP
+   yIN0Qi1i7z5JGSdXKfHlpTLxlfg437NiDYUTa4I/9B3Ynhx2ibIrADDpY
+   bG3vnoUPCZToNvBBTewsbSsBZvCWKa2B+C2dNPEVkrBwvkyZ9hSMdKvnl
+   i/r649Gb+e7K6JencrlHYOi9n7/HHQjbspQ0uBTH/18WtoG6ZPz+0IqNo
+   HAvC8+aLvVRWoPbjm28qo3ZlEQiVBc7ihd775AYTplYFP4Pg5y8FpsQDa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921738"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921734"
+   d="scan'208";a="364921738"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448095"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448098"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448095"
+   d="scan'208";a="846448098"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:41 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 041/116] KVM: x86/tdp_mmu: Init role member of struct kvm_mmu_page at allocation
-Date:   Mon, 16 Oct 2023 09:13:53 -0700
-Message-Id: <b88bdbfd19f8897f77fcd380c71938cb0c3042fb.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 042/116] KVM: x86/mmu: Add a new is_private member for union kvm_mmu_page_role
+Date:   Mon, 16 Oct 2023 09:13:54 -0700
+Message-Id: <515ae014205e4f034df4d5dae53292a14a67cf39.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,186 +68,95 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Refactor tdp_mmu_alloc_sp() and tdp_mmu_init_sp and eliminate
-tdp_mmu_init_child_sp().  Currently tdp_mmu_init_sp() (or
-tdp_mmu_init_child_sp()) sets kvm_mmu_page.role after tdp_mmu_alloc_sp()
-allocating struct kvm_mmu_page and its page table page.  This patch makes
-tdp_mmu_alloc_sp() initialize kvm_mmu_page.role instead of
-tdp_mmu_init_sp().
-
-To handle private page tables, argument of is_private needs to be passed
-down.  Given that already page level is passed down, it would be cumbersome
-to add one more parameter about sp. Instead replace the level argument with
-union kvm_mmu_page_role.  Thus the number of argument won't be increased
-and more info about sp can be passed down.
-
-For private sp, secure page table will be also allocated in addition to
-struct kvm_mmu_page and page table (spt member).  The allocation functions
-(tdp_mmu_alloc_sp() and __tdp_mmu_alloc_sp_for_split()) need to know if the
-allocation is for the conventional page table or private page table.  Pass
-union kvm_mmu_role to those functions and initialize role member of struct
-kvm_mmu_page.
+Because TDX support introduces private mapping, add a new member in union
+kvm_mmu_page_role with access functions to check the member.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/tdp_iter.h | 12 ++++++++++
- arch/x86/kvm/mmu/tdp_mmu.c  | 44 ++++++++++++++++---------------------
- 2 files changed, 31 insertions(+), 25 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 27 +++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/mmu_internal.h |  5 +++++
+ arch/x86/kvm/mmu/spte.h         |  6 ++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index fae559559a80..e1e40e3f5eb7 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -135,4 +135,16 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
- void tdp_iter_next(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3970473d1807..f8664becb1e4 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -341,7 +341,12 @@ union kvm_mmu_page_role {
+ 		unsigned ad_disabled:1;
+ 		unsigned guest_mode:1;
+ 		unsigned passthrough:1;
++#ifdef CONFIG_KVM_MMU_PRIVATE
++		unsigned is_private:1;
++		unsigned :4;
++#else
+ 		unsigned :5;
++#endif
  
-+static inline union kvm_mmu_page_role tdp_iter_child_role(struct tdp_iter *iter)
+ 		/*
+ 		 * This is left at the top of the word so that
+@@ -353,6 +358,28 @@ union kvm_mmu_page_role {
+ 	};
+ };
+ 
++#ifdef CONFIG_KVM_MMU_PRIVATE
++static inline bool kvm_mmu_page_role_is_private(union kvm_mmu_page_role role)
 +{
-+	union kvm_mmu_page_role child_role;
-+	struct kvm_mmu_page *parent_sp;
-+
-+	parent_sp = sptep_to_sp(rcu_dereference(iter->sptep));
-+
-+	child_role = parent_sp->role;
-+	child_role.level--;
-+	return child_role;
++	return !!role.is_private;
 +}
 +
- #endif /* __KVM_X86_MMU_TDP_ITER_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7712b1b86bd2..0c5c7eadb1ba 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -227,24 +227,30 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 		    kvm_mmu_page_as_id(_root) != _as_id) {		\
- 		} else
- 
--static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
-+static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu,
-+					     union kvm_mmu_page_role role)
- {
- 	struct kvm_mmu_page *sp;
- 
- 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-+	sp->role = role;
- 
- 	return sp;
++static inline void kvm_mmu_page_role_set_private(union kvm_mmu_page_role *role)
++{
++	role->is_private = 1;
++}
++#else
++static inline bool kvm_mmu_page_role_is_private(union kvm_mmu_page_role role)
++{
++	return false;
++}
++
++static inline void kvm_mmu_page_role_set_private(union kvm_mmu_page_role *role)
++{
++	WARN_ON_ONCE(1);
++}
++#endif
++
+ /*
+  * kvm_mmu_extended_role complements kvm_mmu_page_role, tracking properties
+  * relevant to the current MMU configuration.   When loading CR0, CR4, or EFER,
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 8de1192b1cca..a510f0a16853 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -145,6 +145,11 @@ static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
+ 	return kvm_mmu_role_as_id(sp->role);
  }
  
- static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
--			    gfn_t gfn, union kvm_mmu_page_role role)
-+			    gfn_t gfn)
++static inline bool is_private_sp(const struct kvm_mmu_page *sp)
++{
++	return kvm_mmu_page_role_is_private(sp->role);
++}
++
+ static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
  {
- 	INIT_LIST_HEAD(&sp->possible_nx_huge_page_link);
- 
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
- 
--	sp->role = role;
-+	/*
-+	 * role must be set before calling this function.  At least role.level
-+	 * is not 0 (PG_LEVEL_NONE).
-+	 */
-+	WARN_ON_ONCE(!sp->role.word);
- 	sp->gfn = gfn;
- 	sp->ptep = sptep;
- 	sp->tdp_mmu_page = true;
-@@ -252,20 +258,6 @@ static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
- 	trace_kvm_mmu_get_page(sp, true);
- }
- 
--static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
--				  struct tdp_iter *iter)
--{
--	struct kvm_mmu_page *parent_sp;
--	union kvm_mmu_page_role role;
--
--	parent_sp = sptep_to_sp(rcu_dereference(iter->sptep));
--
--	role = parent_sp->role;
--	role.level--;
--
--	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
--}
--
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- {
- 	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
-@@ -284,8 +276,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- 			goto out;
- 	}
- 
--	root = tdp_mmu_alloc_sp(vcpu);
--	tdp_mmu_init_sp(root, NULL, 0, role);
-+	root = tdp_mmu_alloc_sp(vcpu, role);
-+	tdp_mmu_init_sp(root, NULL, 0);
- 
  	/*
- 	 * TDP MMU roots are kept until they are explicitly invalidated, either
-@@ -1100,8 +1092,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		 * The SPTE is either non-present or points to a huge page that
- 		 * needs to be split.
- 		 */
--		sp = tdp_mmu_alloc_sp(vcpu);
--		tdp_mmu_init_child_sp(sp, &iter);
-+		sp = tdp_mmu_alloc_sp(vcpu, tdp_iter_child_role(&iter));
-+		tdp_mmu_init_sp(sp, iter.sptep, iter.gfn);
- 
- 		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
- 
-@@ -1339,7 +1331,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
- 	return spte_set;
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1a163aee9ec6..88db32cba0fd 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -264,6 +264,12 @@ static inline struct kvm_mmu_page *root_to_sp(hpa_t root)
+ 	return spte_to_child_sp(root);
  }
  
--static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
-+static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp, union kvm_mmu_page_role role)
++static inline bool is_private_sptep(u64 *sptep)
++{
++	WARN_ON_ONCE(!sptep);
++	return is_private_sp(sptep_to_sp(sptep));
++}
++
+ static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
  {
- 	struct kvm_mmu_page *sp;
- 
-@@ -1349,6 +1341,7 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
- 	if (!sp)
- 		return NULL;
- 
-+	sp->role = role;
- 	sp->spt = (void *)__get_free_page(gfp);
- 	if (!sp->spt) {
- 		kmem_cache_free(mmu_page_header_cache, sp);
-@@ -1362,6 +1355,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 						       struct tdp_iter *iter,
- 						       bool shared)
- {
-+	union kvm_mmu_page_role role = tdp_iter_child_role(iter);
- 	struct kvm_mmu_page *sp;
- 
- 	/*
-@@ -1373,7 +1367,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 	 * If this allocation fails we drop the lock and retry with reclaim
- 	 * allowed.
- 	 */
--	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
-+	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT, role);
- 	if (sp)
- 		return sp;
- 
-@@ -1385,7 +1379,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 		write_unlock(&kvm->mmu_lock);
- 
- 	iter->yielded = true;
--	sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
-+	sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT, role);
- 
- 	if (shared)
- 		read_lock(&kvm->mmu_lock);
-@@ -1480,7 +1474,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 				continue;
- 		}
- 
--		tdp_mmu_init_child_sp(sp, &iter);
-+		tdp_mmu_init_sp(sp, iter.sptep, iter.gfn);
- 
- 		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
- 			goto retry;
+ 	return (spte & shadow_mmio_mask) == kvm->arch.shadow_mmio_value &&
 -- 
 2.25.1
 
