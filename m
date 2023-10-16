@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C39B07C9D58
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 04:11:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB3127C9D61
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 04:25:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231331AbjJPCLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Oct 2023 22:11:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36506 "EHLO
+        id S231168AbjJPCZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Oct 2023 22:25:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231135AbjJPCLD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Oct 2023 22:11:03 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1BFAB
-        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 19:11:01 -0700 (PDT)
+        with ESMTP id S229600AbjJPCZ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Oct 2023 22:25:26 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17571AB
+        for <kvm@vger.kernel.org>; Sun, 15 Oct 2023 19:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697422261; x=1728958261;
+  t=1697423123; x=1728959123;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=wPsnnrZpLtCpjRrtyf6lW/jTyCZ+BEZgbzpRy35IyMc=;
-  b=HuJ1WZyB/TUnpiIll2ofv2Jnxt9JsDtX0SktyVCvy2TNA/LQ/7nEjnyp
-   HXrK99NVvVj2Vg04kOG9VF/15/e/CjeTOA/5TZYSxzN4fSr/yvQkjb6uN
-   VHkuuCTjLD70NWnszD5Y2PK0ajzCEnkgjgKkaJDdByXZOspZGk0/6KRRG
-   ZcvlopruIFAS2IufQQcZv8RROHe6+BxGRMIh4dEhTRNVcXZ0Zrv2P2E70
-   kSsfqgiv9tBD76qgBUjDk09grnmoq1TKH3fBLZg4AbAib/GbZsJsIaZiG
-   IPHt4GGogmvKX72fna2x9MxJwnh4espQr36H5HT4z9xGlnyZbQq9vfOEt
+  bh=kqObKHVKDXZxUOrFR8Ow5sVbkniBlMyVsc2Q+Z/Wwbw=;
+  b=RIu8HYsbJUCdoTjBAnpJQOLxf7zq+jk2hH2PWpkKxPaCGRjfoN/KNHQ1
+   x4Me9vA3YSI3g7XBbXsPLvLLBXHlnYybj7WHNgv2lScqSfQv7+5H1wpzc
+   yuCUUNrcRIIKqzaCQ2QEI7AARMB1YtSNsMG0HvqW9lkWb1k8ZurAcpJi2
+   +4YOymLHV/aqxt5/7DwqU1Dbj+syGpwT06gsWjTohI9uKAdVIkwtskrsL
+   96zkDzWtJMVMl0WLSCHADVKyFCZdweB+E53eriFJkKXsU8wWBpbAZlWzR
+   ZoUE2mZeIh6hO6cGNWEqTl/869LV/TfbyhTa5BYapgcM32xRznLsk0mHo
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="384306972"
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="385270839"
 X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="384306972"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 19:11:01 -0700
+   d="scan'208";a="385270839"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 19:25:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="790651418"
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="705430736"
 X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
-   d="scan'208";a="790651418"
+   d="scan'208";a="705430736"
 Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
-  by orsmga001.jf.intel.com with ESMTP; 15 Oct 2023 19:10:57 -0700
-Message-ID: <d8553024-b880-42db-9f1f-8d2d3591469c@linux.intel.com>
-Date:   Mon, 16 Oct 2023 10:07:20 +0800
+  by orsmga003.jf.intel.com with ESMTP; 15 Oct 2023 19:25:17 -0700
+Message-ID: <6859c129-7366-423c-9348-96c5fff0d3a0@linux.intel.com>
+Date:   Mon, 16 Oct 2023 10:21:40 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
@@ -75,65 +75,130 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On 9/23/23 9:25 AM, Joao Martins wrote:
 [...]
-> +static int intel_iommu_read_and_clear_dirty(struct iommu_domain *domain,
-> +					    unsigned long iova, size_t size,
-> +					    unsigned long flags,
-> +					    struct iommu_dirty_bitmap *dirty)
+> +/*
+> + * Set up dirty tracking on a second only translation type.
+
+Set up dirty tracking on a second only or nested translation type.
+
+> + */
+> +int intel_pasid_setup_dirty_tracking(struct intel_iommu *iommu,
+> +				     struct dmar_domain *domain,
+> +				     struct device *dev, u32 pasid,
+> +				     bool enabled)
 > +{
-> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> +	unsigned long end = iova + size - 1;
-> +	unsigned long pgsize;
-> +	bool ad_enabled;
+> +	struct pasid_entry *pte;
+> +	u16 did, pgtt;
 > +
-> +	spin_lock(&dmar_domain->lock);
-> +	ad_enabled = dmar_domain->dirty_tracking;
-> +	spin_unlock(&dmar_domain->lock);
+> +	spin_lock(&iommu->lock);
+> +
+> +	did = domain_id_iommu(domain, iommu);
+> +	pte = intel_pasid_get_entry(dev, pasid);
+> +	if (!pte) {
+> +		spin_unlock(&iommu->lock);
+> +		dev_err(dev, "Failed to get pasid entry of PASID %d\n", pasid);
 
-The spin lock is to protect the RID and PASID device tracking list. No
-need to use it here.
+Use dev_err_ratelimited() to avoid user DOS attack.
+
+> +		return -ENODEV;
+> +	}
+
+Can we add a check to limit this interface to second-only and nested
+translation types? These are the only valid use cases currently and for
+the foreseeable future.
+
+And, return directly if the pasid bit matches the target state.
+
+[...]
+         spin_lock(&iommu->lock);
+         pte = intel_pasid_get_entry(dev, pasid);
+         if (!pte) {
+                 spin_unlock(&iommu->lock);
+                 dev_err_ratelimited(dev, "Failed to get pasid entry of 
+PASID %d\n", pasid);
+                 return -ENODEV;
+         }
+
+         did = domain_id_iommu(domain, iommu);
+         pgtt = pasid_pte_get_pgtt(pte);
+
+         if (pgtt != PASID_ENTRY_PGTT_SL_ONLY && pgtt != 
+PASID_ENTRY_PGTT_NESTED) {
+                 spin_unlock(&iommu->lock);
+                 dev_err_ratelimited(dev,
+                                     "Dirty tracking not supported on 
+translation type %d\n",
+                                     pgtt);
+                 return -EOPNOTSUPP;
+         }
+
+         if (pasid_get_ssade(pte) == enabled) {
+                 spin_unlock(&iommu->lock);
+                 return 0;
+         }
+
+         if (enabled)
+                 pasid_set_ssade(pte);
+         else
+                 pasid_clear_ssade(pte);
+         spin_unlock(&iommu->lock);
+[...]
 
 > +
-> +	if (!ad_enabled && dirty->bitmap)
-> +		return -EINVAL;
+> +	pgtt = pasid_pte_get_pgtt(pte);
+> +
+> +	if (enabled)
+> +		pasid_set_ssade(pte);
+> +	else
+> +		pasid_clear_ssade(pte);
+> +	spin_unlock(&iommu->lock);
 
-I don't understand above check of "dirty->bitmap". Isn't it always
-invalid to call this if dirty tracking is not enabled on the domain?
 
-The iommu_dirty_bitmap is defined in iommu core. The iommu driver has no
-need to understand it and check its member anyway.
+Add below here:
 
-Or, I overlooked anything?
+         if (!ecap_coherent(iommu->ecap))
+                 clflush_cache_range(pte, sizeof(*pte));
 
 > +
-> +	rcu_read_lock();
-
-Do we really need a rcu lock here? This operation is protected by
-iopt->iova_rwsem. Is it reasonable to remove it? If not, how about put
-some comments around it?
-
-> +	do {
-> +		struct dma_pte *pte;
-> +		int lvl = 0;
+> +	/*
+> +	 * From VT-d spec table 25 "Guidance to Software for Invalidations":
+> +	 *
+> +	 * - PASID-selective-within-Domain PASID-cache invalidation
+> +	 *   If (PGTT=SS or Nested)
+> +	 *    - Domain-selective IOTLB invalidation
+> +	 *   Else
+> +	 *    - PASID-selective PASID-based IOTLB invalidation
+> +	 * - If (pasid is RID_PASID)
+> +	 *    - Global Device-TLB invalidation to affected functions
+> +	 *   Else
+> +	 *    - PASID-based Device-TLB invalidation (with S=1 and
+> +	 *      Addr[63:12]=0x7FFFFFFF_FFFFF) to affected functions
+> +	 */
+> +	pasid_cache_invalidation_with_pasid(iommu, did, pasid);
 > +
-> +		pte = pfn_to_dma_pte(dmar_domain, iova >> VTD_PAGE_SHIFT, &lvl,
-> +				     GFP_ATOMIC);
-> +		pgsize = level_size(lvl) << VTD_PAGE_SHIFT;
-> +		if (!pte || !dma_pte_present(pte)) {
-> +			iova += pgsize;
-> +			continue;
-> +		}
+> +	if (pgtt == PASID_ENTRY_PGTT_SL_ONLY || pgtt == PASID_ENTRY_PGTT_NESTED)
+> +		iommu->flush.flush_iotlb(iommu, did, 0, 0, DMA_TLB_DSI_FLUSH);
+> +	else
+> +		qi_flush_piotlb(iommu, did, pasid, 0, -1, 0);
+
+Only "Domain-selective IOTLB invalidation" is needed here.
+
 > +
-> +		/* It is writable, set the bitmap */
-> +		if (((flags & IOMMU_DIRTY_NO_CLEAR) &&
-> +				dma_sl_pte_dirty(pte)) ||
-> +		    dma_sl_pte_test_and_clear_dirty(pte))
-> +			iommu_dirty_bitmap_record(dirty, iova, pgsize);
-> +		iova += pgsize;
-> +	} while (iova < end);
-> +	rcu_read_unlock();
+> +	/* Device IOTLB doesn't need to be flushed in caching mode. */
+> +	if (!cap_caching_mode(iommu->cap))
+> +		devtlb_invalidation_with_pasid(iommu, dev, pasid);
+
+For the device IOTLB invalidation, need to follow what spec requires.
+
+   If (pasid is RID_PASID)
+    - Global Device-TLB invalidation to affected functions
+   Else
+    - PASID-based Device-TLB invalidation (with S=1 and
+      Addr[63:12]=0x7FFFFFFF_FFFFF) to affected functions
+
 > +
 > +	return 0;
 > +}
+> +
 
 Best regards,
 baolu
