@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 634A37CAF97
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:35:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD6997CAFB7
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:37:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234346AbjJPQfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:35:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35588 "EHLO
+        id S234209AbjJPQh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234369AbjJPQfN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:35:13 -0400
+        with ESMTP id S233737AbjJPQgK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:36:10 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AE3729C;
-        Mon, 16 Oct 2023 09:22:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9432B768C;
+        Mon, 16 Oct 2023 09:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473366; x=1729009366;
+  t=1697473374; x=1729009374;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ESlsFtK7TCNNodzGvNFsc1Y94K335DvZHywlXfgF6Fc=;
-  b=c5btxebfxTmbHeCXU1s2BhIzEuyDJKOP87mO3D4uqqPgJg8BHgUOwYEX
-   xr6F4iWbEhZZCiO2h9RKfCKcqSbaaNYEN2gyGbSWxSghRR1+Ym7grtXnD
-   rA1qsXb40Pz/Bhwl6Dadajdu48pQSNSxp6XudAqvSMcjCTVDtW2a/P1qm
-   EjPYcB8f5NePM1th9i8jFDQX8kkt09tcEzo8r5EYAF5IWXJmymq2soKnN
-   SlWK6ogXEOYrjdpPkOniDszCOqCtF+tl3t6myzdLa+jOwg4nUeLZrNrTu
-   l5Ie4vRN3D8qzYTepviUSJ4gDepKutAChheBx01Sbc0ID8Oi9udc2+/Ym
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365826006"
+  bh=/5zkp3rNm7BgRzQAmi/3rkFYqYcx9+jnzyMWZ6+Iju0=;
+  b=JJ5PL0+3VHETDu70fGiLoa1Bahrl8U7SXdP53xs3ECABGztkulwVFDjB
+   IXm8gLzr+neI/kV0oijvT+lM0tRxZ7LZlORadnbuaPUMBEYPO90yrHZBo
+   dMeOFCrSlsl5147GOdXfa2M/8wnVqJM++uwjRwouV9dtn9hsBRd5WA0+g
+   5kW2LRClucpP9IL6Z+QDrmocIlxwEHFg8JMYqUzL++T+Pey6sdWf7aWiE
+   uMzdczKfdZgYfRwwBK56tZ0bg3J6yW+r6oR2ycmddNq+p55CXY53FB91J
+   Fsoq9GcH6bb4R4ROW2obUS3aQ1PawMDbvAcbmhpgSmTsO7BAlkR0WhfNj
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365826009"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="365826006"
+   d="scan'208";a="365826009"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087126080"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087126086"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1087126080"
+   d="scan'208";a="1087126086"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:32 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:33 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 027/116] [MARKER] The start of TDX KVM patch series: KVM MMU GPA shared bits
-Date:   Mon, 16 Oct 2023 09:13:39 -0700
-Message-Id: <40dbbd8f38bc1c760083a1282ce88d3a671cde45.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 028/116] KVM: x86/mmu: introduce config for PRIVATE KVM MMU
+Date:   Mon, 16 Oct 2023 09:13:40 -0700
+Message-Id: <da12122604c62657567fe0a50112627b0da69740.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,41 +68,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This empty commit is to mark the start of patch series of KVM MMU GPA
-shared bits.
+To keep the case of non TDX intact, introduce a new config option for
+private KVM MMU support.  At the moment, this is synonym for
+CONFIG_INTEL_TDX_HOST && CONFIG_KVM_INTEL.  The config makes it clear
+that the config is only for x86 KVM MMU.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index 25082e9c0b20..8b8186e7bfeb 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -10,6 +10,7 @@ What qemu can do
- ----------------
- - TDX VM TYPE is exposed to Qemu.
- - Qemu can create/destroy guest of TDX vm type.
-+- Qemu can create/destroy vcpu of TDX vm type.
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 4a864dbaa982..e08cc4ad5749 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -168,4 +168,8 @@ config KVM_PROVE_MMU
+ config KVM_EXTERNAL_WRITE_TRACKING
+ 	bool
  
- Patch Layer status
- ------------------
-@@ -18,12 +19,12 @@ Patch Layer status
- * TDX, VMX coexistence:                 Applied
- * TDX architectural definitions:        Applied
- * TD VM creation/destruction:           Applied
--* TD vcpu creation/destruction:         Applying
-+* TD vcpu creation/destruction:         Applied
- * TDX EPT violation:                    Not yet
- * TD finalization:                      Not yet
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
- 
--* KVM MMU GPA shared bits:              Not yet
-+* KVM MMU GPA shared bits:              Applying
- * KVM TDP refactoring for TDX:          Not yet
- * KVM TDP MMU hooks:                    Not yet
++config KVM_MMU_PRIVATE
++	def_bool y
++	depends on INTEL_TDX_HOST && KVM_INTEL
++
+ endif # VIRTUALIZATION
 -- 
 2.25.1
 
