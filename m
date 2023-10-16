@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54BD57CA629
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 12:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 557807CA6B0
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 13:26:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233007AbjJPK6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 06:58:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51228 "EHLO
+        id S231442AbjJPL05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 07:26:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233042AbjJPK6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 06:58:12 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7C7F7
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 03:58:09 -0700 (PDT)
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39G6n0Gh017488;
-        Mon, 16 Oct 2023 10:57:46 GMT
+        with ESMTP id S230090AbjJPL0z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 07:26:55 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D7B8E
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 04:26:53 -0700 (PDT)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39G6n5Z3022868;
+        Mon, 16 Oct 2023 11:26:15 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
  subject : to : cc : references : from : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=Z3J6GaZj5vIL1kGe8YCYgpPegQLSuez1pShF8e+woz8=;
- b=3dt6pOz2tOaLN3EWK0R+MmvY491r9GRyyCZ1vMGSMYan0VPHrQ5ZTqLOAVhtyPRuTwex
- 0vB5PzPi4pdUTG+YyDe5nTBBeegD3kZbeg3xQKVUraamnAtl1ijsmQKe2YKMMiugesyd
- zi4o11F6RU5/SVVZZuo0Ys1Vdd55iXgw6f9P1XASLuFvYVW9ue9Mfl6WFuQstiFQcrde
- MiWfbaPc0nEgPtDXVQqRqe+Q5f782nxtJb8pDw+GhvYES2A3UK5B4WAONHQpyeLZIvUA
- ggAp19eN1W3m5qIW03kUjic3UmzPpcZFSJAeFlExMhrSTu8qy6MkauDItWbDgW0X9VTo fA== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqk28jf7e-1
+ bh=FDrWxR9mxSb4sFesz7tQAEop8FBxn6fqBbJuWMSYKbM=;
+ b=GztloVLNyuApamaMG9zAIA3oMFs3g9kkpRq0aa01qrLZjvZ4g2ThcKPqFf5IQ6da3HNQ
+ Wm4Opy9T1hx3gLA7814fGBpueYaZMJXDEvSn3XbWE4VrE7nShrebzMp4VjVprBBdhSJg
+ HtZFD0fbKHGMmjWcM6PxsD+DLpPrRilnmkFvwBq2RGT11hSF331sExGwfAo2NwlA9fK6
+ 5xS2BlV2xI+F0gLcpwAEYjXwiDcGkjSffZVDB9BYKQLfNc8z8PrxEmWEv/+R+T3QKYma
+ yH91dBWBuR5lFsa8/szn1zVdf+4h3DWxSGqCdt5+ujekZvXoAvYU8iOTXwwCWrdrHwfd DQ== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqk1bjf3e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Oct 2023 10:57:46 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39G9HPXU028611;
-        Mon, 16 Oct 2023 10:57:45 GMT
+        Mon, 16 Oct 2023 11:26:14 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39G9UA6c040635;
+        Mon, 16 Oct 2023 11:26:14 GMT
 Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trfy204p1-1
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3trfyjr4cf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Oct 2023 10:57:45 +0000
+        Mon, 16 Oct 2023 11:26:14 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cGEFWVXKiK4zq/MkQEc6a+MuZuTCjinqvjsRrLprCxddAetqqspE31gPJZBdXRfLW17Fc78Wc1d6ZWrzZ/itrszmG9oTe/r3C/mNuTh0NXx1hzjCM7LWpgQGKzwEl0YyWbmfOL4+OpNRRR6KjNehjbzYd3B9RxdELl5OvBJLEIyAPDodfBj2ztbWJq40GCT3hCmhefz+l2vJHbPSvdKxNrHFkZ/Ozlk0QmHMxtbPtjPoCbgJ9GWCoiuHrXkrGRIyfoHeMnoi0Gob54IXACkgXFnAR06c6U5vszanH8VMd1szTLOfMX9oNMw3f4ZtVmUezc18RbzAcRroekmYiiyXVg==
+ b=jSr2OQKjmj1mTRvRnxGYAnPHEb8QMjRoJdBOEUPsQaH4MN4ZgYfAM/kLBqvzJzQV3dnPsFitvEadftqkbZAGYTqgdQPUFiuACCklwqUu3hvc6Eo2FZNvdKC6up2sDTc1fovYSqoNPwy+3I4udlYlr1T8k4vq16eWhnegaD7j4zAg2a9iljb8OaMNjk+NJGIctxmbVWbZsCLbLYRrZ9JNVTIq9G8tsvhy0sT++2V+p9fNlveKExopBV+DUY+0Op4GSlHC9qZqLZaEAPFCc7dySH/iHlaHjfsPrATHDN3VHQ0k2uK3N1YTa4uHRWWAQjSTf4kVpyYX5uJUoJKF4BBYeg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z3J6GaZj5vIL1kGe8YCYgpPegQLSuez1pShF8e+woz8=;
- b=hfYYZ3P3KB5+7U7GmdBFDsj60A+aACA8b0i1rhfIllKiXcWYfrQLQ4OqIZbr2CsjwUTshu2IOHr3ZeOFtafpwxkGLOb+GDvXjH7bLZu3nTHtknx7++JMU4Q1iiL13E4avPdR636hATilEDnqidCdjChzurWjwSTa0nV8E9YUNnA6qPX2dL5vvz352m3fjGTwYGXOFxQty125XEB64wZoZ08EwhWz+2Axo+zo9UFpRNXmQrdGiJJJrI3SumFEoPk1+eLjEg0Ps77WsEXxT6/Cs0CA6j27Fw8TVgA5e8yiFc3EBCRXRgsypZonWahtfg1Kv1YSvSOpZiHDUWEfmMHPOw==
+ bh=FDrWxR9mxSb4sFesz7tQAEop8FBxn6fqBbJuWMSYKbM=;
+ b=akvtILlI64iwqzhtTJn2EtZVH8ZRg5gixk2JixBRW+411tgDp+0ryB+PlpVitJVmkUXw7doG6SvQICmxqK3xoVd6hfD1Qh9jnJaZyn3BifA5w4VUi98qXSyCYFql/hRLLpwBqr2Ld36lLhic59vstDGzmXSivSaLt5jXP590r1JwSUCyxF9KRKPbBT4AWfccjjjpcHk5k2i83RlPvO5BcdGj9JNouhQ3M2ZQFWl2H8QGVkLq+CnrPO+Y5I+B+e8zdSyeqWtObQsCOwdorbbpkGByHuOQAOV9ibcoNCsuuD2q1O8mr03CnaiF63W9NNfSstRXufQ8fVVz9cqjuTiFNA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z3J6GaZj5vIL1kGe8YCYgpPegQLSuez1pShF8e+woz8=;
- b=iiGxNcNTK40WyA0jH4QIiF+JiuwuwrXivUvX19mSTWehvR3xt7pvE/Bo1Lt5UZsOB+Ic1d6Oc1ueifbc2xX7FcwaIdnbr7SQhqlpeM42tpE3IYDQbZfHKc/sCwcIkb2WBc8BcFwCZveykpbe0SuVv4ZNjPjXzx0bfg5oTJfmbTM=
+ bh=FDrWxR9mxSb4sFesz7tQAEop8FBxn6fqBbJuWMSYKbM=;
+ b=a8WBhUcmPH2IA94DCCCfxpGFSxORYhyq6UwiCkm9sZ3hySGdZIrf6ygjomoxIEH2W3tL3XkeoOpmpiuVuuF17tcqQOgnTqfr2/M1WqsoIyrnqranIYH0lf6FDykk86qixQ4k15RkNTS7uQlyjVoMqECZSH69h2j9IvKuSe0ld/Q=
 Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by PH0PR10MB4616.namprd10.prod.outlook.com (2603:10b6:510:34::10) with
+ by PH8PR10MB6670.namprd10.prod.outlook.com (2603:10b6:510:220::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.46; Mon, 16 Oct
- 2023 10:57:41 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Mon, 16 Oct
+ 2023 11:26:11 +0000
 Received: from BLAPR10MB4835.namprd10.prod.outlook.com
  ([fe80::64b1:cd15:65a5:8e7d]) by BLAPR10MB4835.namprd10.prod.outlook.com
  ([fe80::64b1:cd15:65a5:8e7d%5]) with mapi id 15.20.6886.034; Mon, 16 Oct 2023
- 10:57:41 +0000
-Message-ID: <764f159d-a19c-4a1d-86a6-a2791ff21e10@oracle.com>
-Date:   Mon, 16 Oct 2023 11:57:34 +0100
+ 11:26:11 +0000
+Message-ID: <83f9e278-8249-4f10-8542-031260d43c4c@oracle.com>
+Date:   Mon, 16 Oct 2023 12:26:05 +0100
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
  domains
@@ -82,109 +82,109 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         kvm@vger.kernel.org
 References: <20230923012511.10379-1-joao.m.martins@oracle.com>
  <20230923012511.10379-20-joao.m.martins@oracle.com>
- <c4816f4b-3fde-4adb-901f-4d568a4fd95a@linux.intel.com>
+ <d8553024-b880-42db-9f1f-8d2d3591469c@linux.intel.com>
 From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <c4816f4b-3fde-4adb-901f-4d568a4fd95a@linux.intel.com>
+In-Reply-To: <d8553024-b880-42db-9f1f-8d2d3591469c@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0647.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:296::22) To BLAPR10MB4835.namprd10.prod.outlook.com
+X-ClientProxiedBy: AM0PR04CA0133.eurprd04.prod.outlook.com
+ (2603:10a6:208:55::38) To BLAPR10MB4835.namprd10.prod.outlook.com
  (2603:10b6:208:331::11)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|PH0PR10MB4616:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3a78808-e99b-47d6-2feb-08dbce36b80d
+X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|PH8PR10MB6670:EE_
+X-MS-Office365-Filtering-Correlation-Id: b9151b9d-7222-42e4-05e3-08dbce3ab318
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UcfP0mxVvBoWkjIOfg98zzqZc+Ni+5peHNsRILwI/RwANdlxO/8DK5EeUtbJOzvzSRdcD4ukQwV9OSPazdYVb3q4aM6rM8eU/5TVMXJRF/XKw6gfC+gwwjTqZlKif35U8Seeo8Z6C+8qgALSkKSw9Rl0aQyVEPGm56mYxM2fA0HkdgDEJbJHGxk9MQh7gbbVc41DNMaNhGzZZxjEiJdxFRhKJDyk3q3E996OYwA2A2zXsDuawj/KwEEddq81yeVAgy9e/AGk3yGtN7z9/ZUsErmTmtfQd5DgYrRpPCiUwrgFVTgoYWZtAjsRDaSKurQ8oNAf2cgThVol1UYVitlgfs1xLGsKRiS1TxQk3L303t5l9fB1v5g6nl4eDtUO1bGmCDkso7FM19cWzzXdhh1sPUygAa6cPqCDr1YNyoTrrqgTVbZdl37PqhEmEeLtxG4owdxQ2WmQtiWuJuJ2crMz0Zc52I8whpXBODcMuLHZAUTlgNkswi7tu5oGmtk9KA3P1k4a3nNvxqySsv7UNM//fBBKAQLJFajGJatVaQCyg+srYL/sikRjU3KFhyGHdscA7gjfXOPOcLA0RgiW8tLZHoh0DUoay1TGaNcJw3lDjzMcCUhAfbNuItc0xdrD08KKpYMKp6WqVms4jjRFl29T8EwHwOijfdZmuXPWIrAmmDo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(376002)(39860400002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(53546011)(8676002)(6512007)(38100700002)(26005)(2616005)(41300700001)(478600001)(8936002)(6486002)(5660300002)(7416002)(4326008)(31696002)(86362001)(66946007)(2906002)(316002)(66556008)(66476007)(36756003)(54906003)(6666004)(6506007)(31686004)(83380400001)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: lzgaHdUi0DorOxEPuMMM47kTGzXE8U5qucBSLJaMk1Ug2B31pd6K2G55x5ztkpoy52gcDWuvKtLEE8MZtWoHeBRdwHuOHnx+fIaX4vrJJ1WFbkOTFKQq9NvEyN9Evu+ac01sMr1EMIeFWuavBy39UNDXjacKiJl+NqvsXsA5PPOrM7w24wV0j6RKV0gRYrQe5+3QeU3D8n9XT+j8jx7NRkMcLt3naVNCsV7aqFYcWU3ZH3CMFoLOuMV+1k5HrEIucXKMTadBkAdu5T+LEDBQ62wJYIWwsRVjTXcLo07dvZZrrgfCeuIX5PjJgcLr8HtifgBWBA00ONQX/OZXeO4RcEWJg2cHAjte9tOf9divnCZnM7c8a0EVMOFLXWFCNLHftPl9xLssKLko/06hMkrIV7ivPsPrr18JpjTzGhOOkja6wMEtfyO/1Jvs4229x9r6Rx5kx6uZdHE23eGWd4ukBrerP5BL4KCFsQjakcWA1TAoDMkznieUP2z1ybG0fvL/5zJwjELFtAvK6U+rHNLDwc64BrvupKqTX+stL16l5noxiMrdJyWKu3ZTsZ43OiKxrEkWkt4rGDyuR8pJRkqGXanwnvoV8KigNd+QsYAgIpYFOGtOQ5UwhnXsKG9ozl5KilQM4h5FTepNi1gjWYgU7k3+I7mrXH/nQdHSjGfI2NA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(39860400002)(366004)(136003)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(7416002)(2906002)(36756003)(54906003)(41300700001)(66556008)(66476007)(316002)(66946007)(8676002)(4326008)(5660300002)(8936002)(26005)(38100700002)(53546011)(2616005)(86362001)(6486002)(83380400001)(31686004)(478600001)(31696002)(6666004)(6506007)(6512007)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y2pESWJRb0VvMUtVNHJIR24zOHJ4YytSR0VGNGhMd3lsZFREUlBDWS9pZisy?=
- =?utf-8?B?MTYrU21xOFg3Sm5jbGtXNGtVeU9tZS9EMnRyVGNmZ0JYTXlZWDZSNE1leVNH?=
- =?utf-8?B?djhwOW9sUDIwaEpUZ3Ira0JWTENweERqRjA0dE5ObkZyeUgxS2ZYelhoUjI5?=
- =?utf-8?B?eTkyVVFCMS9icWpOWnhZZTY1SWRSVkVaOWVJNzlpUXZKSllXajJvdEV3cUMr?=
- =?utf-8?B?WFVRcGhZK2MwV1diR0IyelNIbThMRjNEeVFVVVB4YnVGQkNsUjhjY1FxQjZy?=
- =?utf-8?B?eFYxZFpwbWFJR1I5Sk1sT2lxUzNiSCtoZVBtL2VyczhYTnU4cGZWSU14b1dZ?=
- =?utf-8?B?TEhZR3FHQngvRWtYbUhGNVZkMTNta1hLRUFMRXdqZDZyMUpyOTVmOHFvLy9U?=
- =?utf-8?B?QXY1YWhBYklDMmJ0Z1I3Syt4Wmg0czdpV2J1V0o2ZXNkeFNUTkwvU0ovZFZv?=
- =?utf-8?B?UjFKY0l3NCtyRGFweVczZkV1TDlQa0MrNXdoUDZjR0RWcFFsQ0toTm5OU00x?=
- =?utf-8?B?a1o0VDYyQ2ZNL3luRk9UK0twVEp5dmJpUEs3cExPNnBHL3RwRFl3V1BNK2Y2?=
- =?utf-8?B?cDBzc1UxeHh3ZkR5WTRTR0hnMDdOUU84Ujl6ZXhhRDdzajN3SkZ0Z2NyaDk3?=
- =?utf-8?B?cDBDeUNDVlhMWGl1bGd0c3FuWGx0WFN1QTRMM1B5SElabTRsQ0U0bjl5Yzdj?=
- =?utf-8?B?eHJONUpDbTNZRG1BNmpnWnV3UTJpL1FZZkhMSStNcW9YT1JBbSt4c21sQnh1?=
- =?utf-8?B?RGJHLzQ0N1VPZisyRktXcHNia09MWnNTRE5EV2NwZkxGNFU2a0tPUi9iZ1ZD?=
- =?utf-8?B?MjBjT01ESXFMSGIvWWRiSnJoeXVyVzdrVzk4a1RPeE1QTDAvTVpCejZtYTZB?=
- =?utf-8?B?bnVLRis2eFgwTHRudDl3d3hPMGxxQVpFUFp4Mm5yZ3dQZVFpSEJ6TW9vVzd5?=
- =?utf-8?B?MDE2SDBKY0RlK0l4TWZSSHAxU0lhNUw2U05GeTNNc2tTRlFQMHZQM1NvNXIr?=
- =?utf-8?B?WWkySEx1b0FBMXo0a1dYRHg0OVp1U2dNWlJyb0RsZFhlZ3RWY3ltbmYyZEsr?=
- =?utf-8?B?UVZNYUpBd3V4Sm5nK1pQZlhKZVNiczZjYml0Q01BUHlSZUk0Q2srcThkKzh5?=
- =?utf-8?B?WThLT1ZFRzcvZXU5UzRsMHRCMjczWitMZ0RqYmVLVE16Y0RHamxVanNtbVAz?=
- =?utf-8?B?RXRHR2l3OFQvbkRYMjBLbFVwcjVUOUdzWS9XaG5YUFNKMzd6QWNXTzArL3Zm?=
- =?utf-8?B?d2JpZEs1SnNSS3V6cmdoK3IxVHVWVkRkSG9iMjcyQVdPYm0zWGREZ2NwR1RZ?=
- =?utf-8?B?Y2Q4SlVuSW91ZU1oUmYxcmZwTlN0S29WV2Q1TVNGWTlQcDBIU0pqTlZ1NFZz?=
- =?utf-8?B?ZjRualhQYS9zbHI3dCtrcU9sMTRkYThXTmFDVnJ2SDZhRWFyKzRobVRDL0tW?=
- =?utf-8?B?T3FyOXVaRHljOHh3UXZQdFV2aVJsOWlPVXJaZXhmLzhYVW1sWWNPU1h3VzRE?=
- =?utf-8?B?MEE2bXpzMjQxeVprSjZHaVF0NnRkMjI5T0tRcmJqMXRNTS8xNk5KM29iVVVD?=
- =?utf-8?B?R2hPR2d2c05YVm5YMXlrRk5aOVF6NUw1RHVyYUFWVHZraTZjNUxwa1BBQS9o?=
- =?utf-8?B?cnIycFJhSzlsL0lTWldaK3B3bExLcEszZUxYT2lIbFZLWExlaFBWTVd1T0Nh?=
- =?utf-8?B?RHZHczlmcUJUUThBYUJrNkc5eUF6Z0xXeFFqMTJCUWZPVzlYUkRnSjJmbWcw?=
- =?utf-8?B?RkZpNncwVGh3ZUErMFNiQ3hlMkJYTDZGSk1nTW90ekhRbDZWbkNkaStBdDZX?=
- =?utf-8?B?a2twUDYxS00zOGY5TFh1b3IzU3RpNm0rbFczYXV4QWxjaktkSDlWVGE4amsv?=
- =?utf-8?B?MEg0TDljaS9zM1lRRnhndEJrQWwzMFN6R3BOZy96a2xWS0h2UXNnWFcvUWgv?=
- =?utf-8?B?RFdZTFNnNXpLT0xoYUpvU0VFVE9Ic21zR1R6WmluQUJaeEpYbTFNOWxFcUVQ?=
- =?utf-8?B?YWNGbEtoQ2ZXNFNXMytSV3dMbFcvRkJxUzFUWms5TEFaWUVUdWU5aUJjK0ty?=
- =?utf-8?B?SWdCYktrdzZqbmdNUlhzd3B2SGFiQ01WVm95NExXNkR0TmpQaG1rZlU4QWlt?=
- =?utf-8?B?ODhoeUY5Q3BscStWb05ZRnlQYjRvKy9UU25tNjZSejJ5RlFEK0hVYTRENlZj?=
- =?utf-8?B?Qnc9PQ==?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U0hxNThvVm45UFd3L0U5ZzZweFFFd1F5QnphU3gvY1hnd1B5bHVmTkd1ZTAv?=
+ =?utf-8?B?UFg0REJxdVE3Z0NxY3hxVHZ2TEM5WFgvaDUvbVFWOHg0L2ZuemRtbFJiaVB0?=
+ =?utf-8?B?allOZnZHeUVOUWphN0pvb2MydWlXN2JFMDNHMitHSk1ZZW8yZFdLNDZTRjVL?=
+ =?utf-8?B?c3hobnR6bW96enl6Zk9kUGhyWHpNZytyVEc4cTdsNVV6Wm8vZXNMWVV1azJL?=
+ =?utf-8?B?NnZ5TzhyZ0I3VGczaXFQU1ZCT1dsdVExUisxVUxRMDcyOTlMcnZ3aFU1djVN?=
+ =?utf-8?B?U3dVUkdBY0hDMmgzWWdPUnM1L3ZqYVZ0dElVdjJZSlpsMW82WG1GUFRWTnhq?=
+ =?utf-8?B?eGVGYy9mZWVEVlFTajFaZkZmR3k0cnhxQVI4QXp4OWNXWlZ4cGxpa1dMTmli?=
+ =?utf-8?B?RHdyMFg3WklLS00wVHRVTlJiV3NkcEF1TWNUSUQ5NVJ3VzZNV1ZnSjNsYWNE?=
+ =?utf-8?B?Q3o1SkRBcEg4MWxoV3NCWTJHd1dySXdKUkNXQkpScVhubGtoQ3EvcWpkNFlF?=
+ =?utf-8?B?T0RJby9rRXlPUXdldERtNWtLOTVRdk5yMDRRUEcrK1FkUzdrZWljQ0ZDM1Bm?=
+ =?utf-8?B?ZWVUUFJTNzd0Yms4V0l6OFBkbXQ5ZE1Tdm02cXNJRjNGd0UvcFVicUZTYnNR?=
+ =?utf-8?B?RzREVG92MGJOKzB2ZEhLaW1NMUs4ei8vc1U0dHg2SUw0aWpmYit4WDN0WC9I?=
+ =?utf-8?B?YjFMYjZXck1lYWs2aDIyTHZxMStEUERuOGNRTGJ0ZXNCN2RZblkrOVllS3ZE?=
+ =?utf-8?B?S085c2FMZS9HN0k3WGpXWnhvKzhLOGtqVDdDZlpoMGR1ajdJL0dDa2NMK1RJ?=
+ =?utf-8?B?TXlMUzl3TVI5R25zcVRHdDZqYklybTJZeTVTdkxEVWVvZ0Y2TWliREJYUlZn?=
+ =?utf-8?B?RWRYektXVG5qK1A1Lzh5akJ0Rnlxc2t0TVM2bHkzeW12SFpwNGFjeGZPZ0FZ?=
+ =?utf-8?B?NUVPK2orMzVkV1Z4OVVNaFpPNWFwcVZEQTNtT2IyREs2SmtkUW9ocVd4bVU0?=
+ =?utf-8?B?WmgvY0lxcTY0VDU2YUVCRUF5MUJoYzROU2tkYzR5V2FmZkNmY25RNmlZSnB5?=
+ =?utf-8?B?Q0JjdHNSb0RYQXhWdUhsWThWdkMxNSs3OHVNNlpNSGl5OFN4SC8vVThPVmN0?=
+ =?utf-8?B?d0FKWjlqV1VjaG9TS1dnUnp3TWVjN2UyYmJ3a0YxTDdQOWxlT0tzT3NCd2RD?=
+ =?utf-8?B?N2J6bGhjcTlEUWx2Mkh3L283U3d0ZFRtOXZUNXo5ZHVYNVErbmt6L3VIL3l1?=
+ =?utf-8?B?ZGFDUkJiU25XNWRENjZoTkxOMks4c0VlejdwT09UUlNsaUpxb2hlazlsc1Nj?=
+ =?utf-8?B?dHl0djhFc2I2UDdubm5RN0I5Nm5hSjAzWUdVV04zaXdBUWxWZjdXbUJ2T2ps?=
+ =?utf-8?B?Q3Y4eGsvMVJ2N0hyWFhRVmxaNFU5cmZIQW55NjMyVW5MdGg4djZyRWplMGRN?=
+ =?utf-8?B?RFhpZ3lHRjB6MVl4dWV1MEE2MExWNnljNDFYUi9UYkhDakRtQVB6RVJ1d2Zu?=
+ =?utf-8?B?SzN6Z0RuTDIxOWhrcFpCU05xamNyU2FtVyttaE5JbTJZeUZFMVQ3dDJwMVdK?=
+ =?utf-8?B?UVBXTHg2SFJSMUtkeFBXV3k2SHRleFpVZUxYUVZjVU5DNTBmaFNzdkIzTXpt?=
+ =?utf-8?B?UlFjUmV0L0JuTms5OVUxWDNYcGtyVTMxbmFINHFwcUw1OXpFMlNxckZYZ0VV?=
+ =?utf-8?B?dUF2b1FPWkwyekhFYWR1M2hpZjhMNlRobGdJQ3QwallqOEdiNHpIZmlYUEFG?=
+ =?utf-8?B?RnVacnZ4RUo4Z09IUXFOWlRRVWc3bGxPOHdLUDBib3RDUytXT0ozclJ2aG4z?=
+ =?utf-8?B?aTBXSHNOaFg3SGI4TmZTZVFQelRaa1VrR2VxYmxvNkIxU25KOGRwS2lBbG40?=
+ =?utf-8?B?K3Y3elA0T2tMZkkyT0xLdldka2JnR0dzVkRrYituTUdKaEZhUFhKcjl5ZWJX?=
+ =?utf-8?B?czVFN09NSmNKRFhqYmpCSEI1NFZMZHpKa3M5TFJhTjA5QVEwMkNGRUJtNHFv?=
+ =?utf-8?B?VndySnR4T0t5ZXZxdDIrT2xmQkl5QVhGNmVwMjNyLzlaZGpPY3dpRG1GTGxv?=
+ =?utf-8?B?bTltZU50WWtZL25nRmxncnJBaEpTWHJyNHZVdEFMMXJPc2p6YzBXVmtIVWNW?=
+ =?utf-8?B?MnBnMXR0VCtJVlBFZFg2VGFhbWtoaFJZRm5VdDgyRVUrRW1kWWM5dGZ4QnhD?=
+ =?utf-8?B?TUE9PQ==?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?U2h3alFGK3JQNU5rZXlETHJtODJpUTBjZmt3L1Q0YlllRXV3M1Uzc0t0WGVO?=
- =?utf-8?B?czRCd3lTeWVYN2lKVnNRMTRsSjdCdDBZZFJudHBNbUpBcG80T1pBRzhhNUVx?=
- =?utf-8?B?cktZVVNtTjdIVFBKVklXRUhFNkJ2amJLa1J1U241YVdJTHhTYUlTMzJrdDBn?=
- =?utf-8?B?ajZOSDNqM21kczZidTJmRUpnVy9RTjU3T3oyWFMyS293ZnJRdWVMMWFPU1Vi?=
- =?utf-8?B?Y3B4Vi9vSlJhc2ZrSHNEa3lsQ2QzVDIvZ1Fnb2FDSzI2QVJqSk0wdWxLRlI1?=
- =?utf-8?B?WjJScFFoRkJ1QkhwZWhlZG05SnAvcUFOemNzRUlMV01DUXhQTEh4VEt1TCsz?=
- =?utf-8?B?RE83RmcxSzZSQWxoOHg4SkNRbHNSZ3FPUHVTR0FtOWZZWDVqWHZ0Ty9xZDBu?=
- =?utf-8?B?RFB5U25vWnpuL2ZXbForNEo0WDlSekNrZlhuYmVyaFZLanp5dGJSaXRnREt1?=
- =?utf-8?B?RlZyOEhsM01Qa2FidE0xZTE4ZUZuNXIyNnFqZ2R5VnZqYWVHNnNyMlhZR0JB?=
- =?utf-8?B?OFFQL1pSdWwzUlcyN1lvMllvOEloaUNPM0N4aHNmOGo5R0pPL3lob1NINlk1?=
- =?utf-8?B?NVJQQ0RBTnBqOHdqY1Irc1NKQzNLUnBhS0FWcDhkcWhSZEZHQUVQb3pEYms2?=
- =?utf-8?B?bVF2Y2wzdVE5YTc2SzlCeUhZWGdac2FCZ0xUVmVRS3JPZTVOeWxQQjd6WkVM?=
- =?utf-8?B?RDZ0Y1lwY014K3lzSXRWaUprS083Z0ZUQmRmYmdFZ1RFT2RNbk1uc3AyOXo4?=
- =?utf-8?B?NW1CcS95R00zbXdJYVp3bGs2Q0xZcXR0cm56b1RvanF2akFocmpRSktLTHQ5?=
- =?utf-8?B?UDZSMlpjcDJ1MWpJYjV3cUh4aXFkWTJXM25lM1Vhc0JRVEhNYW1Ya3I4Q2ZE?=
- =?utf-8?B?bHE0MVZSYjJub0RIQkozeGF1bWZ0SnJscVdvUlR3bXhmdHN5eVkrL2xtOTRS?=
- =?utf-8?B?dDR6bkc1SjRmOGNmbEM0SnZ1dzR6Yitud3FVTHF2OTdDeCt2TGVMbnVHWk0x?=
- =?utf-8?B?Vmw3SGpQYW5FNDFRUmttTExtMSswc3ZSOUlzVjhXMjcyTU9raGQzZXZuUzRx?=
- =?utf-8?B?dlViVTVpWlBCa3dWZnc5emhlY2tQVnF6NE1DYzh3THdEODlsa2RVbHF5aFNH?=
- =?utf-8?B?V3hzcjBnR0VkY0dIRnpsb0VTNVV0TThqVjBkMGdWUDhFRExGMjBmY1NmUEwv?=
- =?utf-8?B?MlRLYlRqMnN0TFFwWXZTYTFUeHNXa2l6TXEyZWJtZ3BZbHNkMnI2STZsSmRB?=
- =?utf-8?B?VXlGVlBmZmhjelBsRjdud280L2JvaVBrclpFZ2FQZVBUekxrdWtWeWdVT3Q3?=
- =?utf-8?B?ZDVhZWJRZFRnN0lQZG5NejBidWxqQjZTOEt3Z3U4WHl5UlNCUGd2MnNIMDMv?=
- =?utf-8?B?OUxuditIdjBocnBMN2xFQmV2dEJ5NTBoRXdOV0RvZ2ZCdG9jaVdVRVRlVG5V?=
- =?utf-8?Q?eVEZJu7U?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?YUtaNkV3cWhFU25YbWVIUENZY2ZxZ2lVajhDQkRwRndqUHlTR1VGMXlkTXdk?=
+ =?utf-8?B?dDByVFBtbHhIQk9KSUNvUGFQamZ3MjUwQ01NS2pTdlVIZzBGMnJQY0tyUjBk?=
+ =?utf-8?B?UnFJS1lsZEhHb0RtYzBuMVNhNStiNGM5MW9JMnBGSHFUTkdxdHNqTjFwaW1w?=
+ =?utf-8?B?UDBXZ1dDWU9ObEh6MVVpaXNTSFBIOE03UmkwVkhhZmorREE3bmxsR2ZxaTJU?=
+ =?utf-8?B?U3ZiN1pDb3pMN1o2NVJVblc5ZU1PM1Z1dTB1UzRXWEc2NFFzQW1tMThrUXBZ?=
+ =?utf-8?B?cDQ1NkFRSVVBUk5aS0kxTi82WnBPNmlRQ2YwK29BRzhRNFBvRnRWOGRUYjhL?=
+ =?utf-8?B?VWI0NDBoOVBwclY3WWpqYmFCUkMwaHdqaXhwOUsxbkc4RkZWcGVuQWs5TkRH?=
+ =?utf-8?B?WU5YYW9pQkhYWXJ3aDJIQy9xUWRSdGxOeU16alNabUdRYU14N1BLRmFoVFJF?=
+ =?utf-8?B?c2lxUGpaMCtENG5NNmxYamNuanByejZsTSs0SWlsQ0lobE5yQjNrY21vbjBi?=
+ =?utf-8?B?dHlQb2VudG1FU3dkODVXQzJiTVc1ekYxb1BnSktOaStlREZvVHZ0M1B2Z0RZ?=
+ =?utf-8?B?akVHd2xBU2NsaFI5b25TMWJuNjlzSzBWMEJkWUs2WmpoY2wzTmxEZGUreldt?=
+ =?utf-8?B?dXBQTFc2WDh4cGFjS2JRV1MxREErNTFWdTM2NW5nbHBKU2lVOU1oVHcyRFdY?=
+ =?utf-8?B?SVdORTdkbjFYM3ozVVFvbG1ueDRxbW9UbHlYbzhyZFpmbjB6MzdTUUZ4c2M0?=
+ =?utf-8?B?Z2c1NTNVVnpWTkdPZTBEblhxdGlJZHBQVzZqTGVaalRpZVdCT2x3ZjVTRDhh?=
+ =?utf-8?B?R1BHODEyRDVrRDVJQ0htekRoZGpFa1hjU1FOYUc5WDlzV1YyS2s2eVg5T2M1?=
+ =?utf-8?B?eFJzNldvVnl4TzhGM1R3YmpKT2lrMndZdWdxcDRrWFFGRnJEaWdKN0Ezd2Mw?=
+ =?utf-8?B?Mi8vUTZBMGIwbUVtTGluRHpGdk5OR09hVnZTOUhuL1lWZnNiYVhCYU8rRWs1?=
+ =?utf-8?B?ZnY3NFVmd3dlR0lXNVEyTGtKWG10cEZxeEtJM3lqd3ExWkNzR0Yzc1RKYlRt?=
+ =?utf-8?B?bVRoVy9ZUy9lbXBHSytkdlF2QzNTV0U2N29SSWJsUHhoNGxEOXg2Qmsvdm9I?=
+ =?utf-8?B?OVErQlZ6QVNTL2xSR2V1VVlJUkdJZDNUUHlIWWN2TTNiWXhRSnFQRjNmWS9s?=
+ =?utf-8?B?OWkxS2xTNWkyZTJGbXNCVUV3b0dsRDNya1Jpd1JOdHY2NFVSeVovTm9XcCs5?=
+ =?utf-8?B?LzJjdEJyd2lBQUgxSk1XNnBGWkF0R29Qa0ZpSjVJRm95dElJVHpmTWMzaWVz?=
+ =?utf-8?B?SGdPWkh6OVp3bjczSFNSNUVWSTI0OUdpR3pHNjBBeHZ5eDduZXNjSEMzQUdj?=
+ =?utf-8?B?NXJ3QUlsVXBVa0MyT1pQOVlCd0UwRzhhQ3JpeXBoZWsvd2JDVnVScnVoNGlD?=
+ =?utf-8?Q?6J+xC8ch?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3a78808-e99b-47d6-2feb-08dbce36b80d
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9151b9d-7222-42e4-05e3-08dbce3ab318
 X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 10:57:41.6300
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 11:26:11.2884
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iB64BELzNw16LoOdzkuuSCv/RabXEwG+Qj7NezDQGuUTrm6EOUKU9TVLAY3SYsjRrFGvxttHmWzStXF0U3bmmWxg8m1XemuFohWxwmYfQ+4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4616
+X-MS-Exchange-CrossTenant-UserPrincipalName: XzeREWLvdxgjJqnt115ppbYR+/zEnfGs+ipBAZubzVRYqh63t9PWskWCG8H0Rp9SdCxOE32FZCHfG7PDeaa74JXayeO8Mq1h27epw+llnc0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR10MB6670
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-16_03,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 phishscore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 malwarescore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310160095
-X-Proofpoint-ORIG-GUID: QupvxFLmaU_Vfnu4p2QhTSLnqskH4ODE
-X-Proofpoint-GUID: QupvxFLmaU_Vfnu4p2QhTSLnqskH4ODE
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+ definitions=2023-10-16_04,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ phishscore=0 spamscore=0 suspectscore=0 malwarescore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310160100
+X-Proofpoint-GUID: 2CZfLZgRaLOqPetMQif1xOFbH0wvSfvq
+X-Proofpoint-ORIG-GUID: 2CZfLZgRaLOqPetMQif1xOFbH0wvSfvq
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -193,139 +193,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/10/2023 02:37, Baolu Lu wrote:
+
+
+On 16/10/2023 03:07, Baolu Lu wrote:
 > On 9/23/23 9:25 AM, Joao Martins wrote:
 > [...]
->>   +static int intel_iommu_set_dirty_tracking(struct iommu_domain *domain,
->> +                      bool enable)
+>> +static int intel_iommu_read_and_clear_dirty(struct iommu_domain *domain,
+>> +                        unsigned long iova, size_t size,
+>> +                        unsigned long flags,
+>> +                        struct iommu_dirty_bitmap *dirty)
 >> +{
 >> +    struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->> +    struct device_domain_info *info;
->> +    int ret = -EINVAL;
+>> +    unsigned long end = iova + size - 1;
+>> +    unsigned long pgsize;
+>> +    bool ad_enabled;
 >> +
 >> +    spin_lock(&dmar_domain->lock);
->> +    if (!(dmar_domain->dirty_tracking ^ enable) ||
+>> +    ad_enabled = dmar_domain->dirty_tracking;
+>> +    spin_unlock(&dmar_domain->lock);
 > 
-> Just out of curiosity, can we simply write
-> 
-> dmar_domain->dirty_tracking == enable
-> 
-> instead? I am not sure whether the compiler will be happy with this.
-> 
+> The spin lock is to protect the RID and PASID device tracking list. No
+> need to use it here.
+>
+OK
 
-Part of the check above, was just trying to avoid same-state transitions. the
-above you wrote should work (...)
-
->> +        list_empty(&dmar_domain->devices)) {
-> 
- list_for_each_entry is no op if list is empty, so no need to check it.
-> 
-
-Though this is unnecessary yes.
-
->> +        spin_unlock(&dmar_domain->lock);
->> +        return 0;
->> +    }
 >> +
->> +    list_for_each_entry(info, &dmar_domain->devices, link) {
->> +        /* First-level page table always enables dirty bit*/
->> +        if (dmar_domain->use_first_level) {
+>> +    if (!ad_enabled && dirty->bitmap)
+>> +        return -EINVAL;
 > 
-> Since we leave out domain->use_first_level in the user_domain_alloc
-> function, we no longer need to check it here.
+> I don't understand above check of "dirty->bitmap". Isn't it always
+> invalid to call this if dirty tracking is not enabled on the domain?
 > 
->> +            ret = 0;
->> +            break;
+It is spurious (...)
+
+> The iommu_dirty_bitmap is defined in iommu core. The iommu driver has no
+> need to understand it and check its member anyway.
+> 
+
+(...) The iommu driver has no need to understand it. iommu_dirty_bitmap_record()
+already makes those checks in case there's no iova_bitmap to set bits to.
+
+> Or, I overlooked anything?
+> 
+>> +
+>> +    rcu_read_lock();
+> 
+> Do we really need a rcu lock here? This operation is protected by
+> iopt->iova_rwsem. Is it reasonable to remove it? If not, how about put
+> some comments around it?
+> 
+As I had mentioned in an earlier comment, this was not meant to be here.
+
+>> +    do {
+>> +        struct dma_pte *pte;
+>> +        int lvl = 0;
+>> +
+>> +        pte = pfn_to_dma_pte(dmar_domain, iova >> VTD_PAGE_SHIFT, &lvl,
+>> +                     GFP_ATOMIC);
+>> +        pgsize = level_size(lvl) << VTD_PAGE_SHIFT;
+>> +        if (!pte || !dma_pte_present(pte)) {
+>> +            iova += pgsize;
+>> +            continue;
 >> +        }
 >> +
->> +        ret = intel_pasid_setup_dirty_tracking(info->iommu, info->domain,
->> +                             info->dev, IOMMU_NO_PASID,
->> +                             enable);
->> +        if (ret)
->> +            break;
-> 
-> We need to unwind to the previous status here. We cannot leave some
-> devices with status @enable while others do not.
->
-Ugh, yes
-
+>> +        /* It is writable, set the bitmap */
+>> +        if (((flags & IOMMU_DIRTY_NO_CLEAR) &&
+>> +                dma_sl_pte_dirty(pte)) ||
+>> +            dma_sl_pte_test_and_clear_dirty(pte))
+>> +            iommu_dirty_bitmap_record(dirty, iova, pgsize);
+>> +        iova += pgsize;
+>> +    } while (iova < end);
+>> +    rcu_read_unlock();
 >> +
->> +    }
-> 
-> The VT-d driver also support attaching domain to a pasid of a device. We
-> also need to enable dirty tracking on those devices.
-> 
-True. But to be honest, I thought we weren't quite there yet in PASID support
-from IOMMUFD perspective; hence why I didn't aim at it. Or do I have the wrong
-impression? From the code below, it clearly looks the driver does.
-
->> +
->> +    if (!ret)
->> +        dmar_domain->dirty_tracking = enable;
->> +    spin_unlock(&dmar_domain->lock);
->> +
->> +    return ret;
+>> +    return 0;
 >> +}
-> 
-> I have made some changes to the code based on my above comments. Please
-> let me know what you think.
-> 
-
-Looks great; thanks a lot for these changes!
-
-> static int intel_iommu_set_dirty_tracking(struct iommu_domain *domain,
->                                           bool enable)
-> {
->         struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->         struct dev_pasid_info *dev_pasid;
->         struct device_domain_info *info;
->         int ret;
-> 
->         spin_lock(&dmar_domain->lock);
->         if (!(dmar_domain->dirty_tracking ^ enable))
->                 goto out_unlock;
-> 
->         list_for_each_entry(info, &dmar_domain->devices, link) {
->                 ret = intel_pasid_setup_dirty_tracking(info->iommu, dmar_domain,
->                                                        info->dev, IOMMU_NO_PASID,
->                                                        enable);
->                 if (ret)
->                         goto err_unwind;
->         }
-> 
->         list_for_each_entry(dev_pasid, &dmar_domain->dev_pasids, link_domain) {
->                 info = dev_iommu_priv_get(dev_pasid->dev);
->                 ret = intel_pasid_setup_dirty_tracking(info->iommu, dmar_domain,
->                                                        info->dev, dev_pasid->pasid,
->                                                        enable);
->                 if (ret)
->                         goto err_unwind;
->         }
-> 
->         dmar_domain->dirty_tracking = enable;
-> out_unlock:
->         spin_unlock(&dmar_domain->lock);
-> 
->         return 0;
-> 
-> err_unwind:
->         list_for_each_entry(info, &dmar_domain->devices, link)
->                 intel_pasid_setup_dirty_tracking(info->iommu, dmar_domain,
-> info->dev,
->                                                  IOMMU_NO_PASID,
-> 
-> dmar_domain->dirty_tracking);
->         list_for_each_entry(dev_pasid, &dmar_domain->dev_pasids, link_domain) {
->                 info = dev_iommu_priv_get(dev_pasid->dev);
->                 intel_pasid_setup_dirty_tracking(info->iommu, dmar_domain,
->                                                  info->dev, dev_pasid->pasid,
-> 
-> dmar_domain->dirty_tracking);
->         }
->         spin_unlock(&dmar_domain->lock);
-> 
->         return ret;
-> }
 > 
 > Best regards,
 > baolu
