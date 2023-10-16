@@ -2,142 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D77CD7CB2F2
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 20:48:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D6107CB2F5
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 20:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232345AbjJPSsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 14:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56624 "EHLO
+        id S233974AbjJPStX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 14:49:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjJPSsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 14:48:06 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEC2A1;
-        Mon, 16 Oct 2023 11:48:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ngkjl7Z9c/94tmqVOslfKEov+UbJWfMk39yfLf50P6oCBY9TppcshQRa1RJx6kkmSAaGkfHpTS7fBehFEqVcNpHW1aIGdH9oDww0kMeHl+DriI9kxO/K2Xh1BkZlGLRTjOkHwCxMbTiB9EyNTBoi2OEwvMLzvLTelkVSCKDmjDL6SspDvV+kTBir5G94cmWLE8LkpoCS1ubCoucBIQczY1heiOd3sllpsJv1g2PKnGwR9nLOvn78myNK7/GvO+Z0KsoiAf9AEG98hbp0Fm6yacBt4vetMAAJLScaqeog4LfS5RwAcx8fXhvrIo2L4efz2QaVua62CQp77CZvlEgKGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9xZrDzqmgX/ieLod7bDL+GWzsXVuVhe5nA05RIZiXks=;
- b=E64LiGif1aiMASrrDqB3oohuqCb1JKDEmNZ7KYqhm2F+KUDnys7XdhmrFNhoX9atipmXhNCbxEeyqaA2epEKhMZBotkVW6wDNZ52ID3Fp7of+8FgVxxgb2M1/FWU05SDJulAzSBM6Ec2lJsL4Z0Zp//CL+pCzJMFt0uOEtaI8D4yvM2wD9vJx59LVdfJj4pC8nqfS8SiPumxN0iBMd/rNmy+K2H6Wlb9um9VRkSO40vcClrFxuSTAbPRFFLxsq7ctdnZPgl05aW+jEF53MUSR4xFw3OqOIN8WaZIZd0cPQo9uol0t3pPRiYpVuyIYbDsNmhCApzQV36OJetuEiUY1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9xZrDzqmgX/ieLod7bDL+GWzsXVuVhe5nA05RIZiXks=;
- b=fQWs/FrTkQnIIxXFyj6jqYxz/i1LglR1FpS8ZMw+DLhV60kdgLOaQUda384OHER9brzQlL83RciY09DpmP5mU60E4IRe7gSVGmCnll+etdJ9lSnQv0fxGAzJo6eVMiZSRWIuZ+NYneQnueNQU8rWTfbVFuIa/+pPTFdAYlg2G6U=
-Received: from PR1P264CA0096.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:345::11)
- by DS0PR12MB7971.namprd12.prod.outlook.com (2603:10b6:8:14e::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
- 2023 18:48:01 +0000
-Received: from SN1PEPF0002BA4B.namprd03.prod.outlook.com
- (2603:10a6:102:345:cafe::de) by PR1P264CA0096.outlook.office365.com
- (2603:10a6:102:345::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.30 via Frontend
- Transport; Mon, 16 Oct 2023 18:48:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002BA4B.mail.protection.outlook.com (10.167.242.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 18:48:00 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 13:47:59 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <seanjc@google.com>,
-        <pbonzini@redhat.com>, <vannapurve@google.com>
-Subject: [PATCH gmem] KVM: selftests: Fix gmem conversion tests for multiple vCPUs
-Date:   Mon, 16 Oct 2023 13:47:37 -0500
-Message-ID: <20231016184737.1027930-1-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4B:EE_|DS0PR12MB7971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0773d2bf-1aec-4887-0b1d-08dbce786bec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qRYgqWqmbXxiENWxwPa4YcuD+jmHLb3HaNDr5EHFMDimTt8dU+JC5TkkpOaIVQnLW8BVMKcBsW4PPkh0ugpsXojAmVFBXuJD8aMcr/7Pd6RgfDH4iDjvHCr5PwIIzPdgc7zgJS6ph99/HHnZz3aboWm3OGn5OuR4zKsjNGgiLDiZ21eoXtvWPIxvERTkEwj9/QY+MRRhAZyN7t8J2TBXgNoUWJD08JMi/nUkDrpBpqw8+RPlREJ/q4mIg9W8D+phLcIccUeuZrqNJW6ILdYbjgF7Kj03UEU+uHMbawgQ1zsGsvr/hRrNqkIeVCl1JfjatM/3aV4KLtukbujy9pwC7CfZwsSqzeEyD6T6KPhRF15D2E3Z6D+T+UFQshnL0MMYpkgJYHrCSkQRKorc2r8gFpK65O+FQyLrp19xg5wA/yUtX3CPn+uKC+ZTqNIpq5e1TnV4CXjD2PAIeqRXrYuK8EytZuA4+pPRtTsIohfTAOBYHjD4yBK+ZlNfCxehNqWQKYFKQk6GZdXyYNfjpZQrhwXfoLfA9Tn8+XvRHsmwFhEKg1FX0fXSwYtZa2kr4pPowh2A5ZzkQqd+npaf/msr0AFJRiCVXvxRGQ1d+ORF/Xtis3LUujOD2Cx82Pv0eOp6TTTkC3+vUfYvcxHvPj8ihHCANpzucnDDpa4IhMdl4F+gqY7j9U8CG45MZSgWkZP9JpSxZSiHsD1qZdeQNLm5C8tQV4z0OrThoSb5I49gKZ4JID4GCsJrBqo9cZjIjioQX9skxTYSHUU+ZMCNCWWncA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(136003)(376002)(230922051799003)(186009)(1800799009)(82310400011)(451199024)(64100799003)(36840700001)(40470700004)(46966006)(41300700001)(70206006)(478600001)(54906003)(70586007)(6916009)(6666004)(16526019)(1076003)(26005)(426003)(336012)(316002)(2616005)(8936002)(4326008)(8676002)(2906002)(5660300002)(36756003)(44832011)(81166007)(47076005)(36860700001)(83380400001)(82740400003)(356005)(86362001)(40460700003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 18:48:00.4460
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0773d2bf-1aec-4887-0b1d-08dbce786bec
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF0002BA4B.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7971
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S231508AbjJPStV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 14:49:21 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BBDAB
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 11:49:17 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7b9e83b70so36150687b3.0
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 11:49:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697482157; x=1698086957; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAcCmmrGQB8I/RvBQ4RW2J7O69twzM6FPTQwq9j0qgo=;
+        b=sQUXwWJB4uLiO8XNHOFB1l5FoizPEo+PZbBKASXQ6PvNmJgNQRz43U4wwj7Svj/WSO
+         jzSuKhlJhzRgk3AIDZGD9KaSNM/ow5w8TLMXkKrHbmveoKmm8ek8FupGZ56qG1bLx36s
+         Sn1oKWb0WDx/QYEGs+aEsAR3J0n9wf29zLsRM3YaKrnsbcyXMpZMFIVxk0USrJ6Ua3nR
+         y1H53b0VTdZbor9LVRCitechTNkhf3NSCWtw/Uxm0Di4AWfe6VKXJJ8o3Ow/QywmTX4s
+         xcr956MmQSPvfFTdXeD5NIXek4APw04zWSlLh0gVBRkdYn1tbhjHJLYPmRehOMWux/bh
+         PXsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697482157; x=1698086957;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAcCmmrGQB8I/RvBQ4RW2J7O69twzM6FPTQwq9j0qgo=;
+        b=PH0gAAYG3FhQbyrjCZyWcLnp/747+6R3Y9/+6wXiBGdprUnLq/tHvS9R8/rzP+OmKz
+         sTbS4JBL1kpdso6Y3ik+LIrTT45e8PvCA+vTCk4tSnvSNoz4llzmy+Kpl21hr/5Ws8Ui
+         RuR8fmPHl58vn8tiGUc62R4jIhqN2jVIiKTEsoGM4OUZHVjJwIdTLmlOiXTWBtiJr1nB
+         W+dCKLlX170AqXfTOL2nXjqJYB9YPvUTSzC9s99UZtpiKZa8IFDc52ccKOceDgAyuGC/
+         bZQ8MlWsgA7beMAHMTtgizjgpFCHloFYgssSnQwoOQv95bq/6RnQ2UQ6AZXcDTZ8df84
+         OxNw==
+X-Gm-Message-State: AOJu0YyGcq/qhnpX93zay0+kKZzTZWfRlWqCVL8j6aGMeGRX6meCQ0ku
+        I3B56OGd8pC0rgCjKmd7FXb7UpT182k=
+X-Google-Smtp-Source: AGHT+IG9+k+RbsCROZVMJf5NZBS/xEIj+i8wumNbqzyCoFYfIMSmQua6kuhoqp8NAL+vNDBuwq8EBWv8n0s=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:c20e:0:b0:595:8166:7be with SMTP id
+ z14-20020a81c20e000000b00595816607bemr12527ywc.0.1697482157142; Mon, 16 Oct
+ 2023 11:49:17 -0700 (PDT)
+Date:   Mon, 16 Oct 2023 11:49:15 -0700
+In-Reply-To: <03afed7eb3c1e5f4b2b8ecfd8616ae5c6f1819e9.camel@infradead.org>
+Mime-Version: 1.0
+References: <ZR2pwdZtO3WLCwjj@google.com> <34057852-f6c0-d6d5-261f-bbb5fa056425@oracle.com>
+ <ZSXqZOgLYkwLRWLO@google.com> <8f3493ca4c0e726d5c3876bb7dd2cfc432d9deaa.camel@infradead.org>
+ <ZSmHcECyt5PdZyIZ@google.com> <cf2b22fc-78f5-dfb9-f0e6-5c4059a970a2@oracle.com>
+ <ZSnSNVankCAlHIhI@google.com> <BD4C4E71-C743-4B79-93CA-0F3AC5423412@infradead.org>
+ <993cc7f9-a134-8086-3410-b915fe5db7a5@oracle.com> <03afed7eb3c1e5f4b2b8ecfd8616ae5c6f1819e9.camel@infradead.org>
+Message-ID: <ZS2Fq5dr2CeZaBok@google.com>
+Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the private_mem_conversions_test crashes if invoked with the
--n <num_vcpus> option without also specifying multiple memslots via -m.
+On Mon, Oct 16, 2023, David Woodhouse wrote:
+> On Mon, 2023-10-16 at 08:47 -0700, Dongli Zhang wrote:
+> > Suppose we are discussing a non-permanenet solution, I would suggest:
+> > 
+> > 1. Document something to accept that kvm-clock (or pvclock on KVM, including Xen
+> > on KVM) is not good enough in some cases, e.g., vCPU hotplug.
+> 
+> I still don't understand the vCPU hotplug case.
+> 
+> In the case where the TSC is actually sane, why would we need to reset
+> the masterclock on vCPU hotplug? 
+> 
+> The new vCPU gets its TSC synchronised to the others, and its kvmclock
+> parameters (mul/shift/offset based on the guest TSC) can be *precisely*
+> the same as the other vCPUs too, can't they? Why reset anything?
 
-This is because the current implementation assumes -m is specified and
-always sets up the per-vCPU memory with a dedicated memslot for each
-vCPU. When -m is not specified, the test skips setting up
-memslots/memory for secondary vCPUs.
+Aha!  I think I finally figured out why KVM behaves the way it does.
 
-The current code does seem to try to handle using a single memslot for
-multiple vCPUs in some places, e.g. the call-site, but
-test_mem_conversions() is missing the important bit of sizing the single
-memslot appropriately to handle all the per-vCPU memory. Implement that
-handling.
+The unnecessary masterclock updates effectively came from:
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
+  commit 7f187922ddf6b67f2999a76dcb71663097b75497
+  Author: Marcelo Tosatti <mtosatti@redhat.com>
+  Date:   Tue Nov 4 21:30:44 2014 -0200
+
+    KVM: x86: update masterclock values on TSC writes
+    
+    When the guest writes to the TSC, the masterclock TSC copy must be
+    updated as well along with the TSC_OFFSET update, otherwise a negative
+    tsc_timestamp is calculated at kvm_guest_time_update.
+    
+    Once "if (!vcpus_matched && ka->use_master_clock)" is simplified to
+    "if (ka->use_master_clock)", the corresponding "if (!ka->use_master_clock)"
+    becomes redundant, so remove the do_request boolean and collapse
+    everything into a single condition.
+
+Before that, KVM only re-synced the masterclock if it was enabled or disabled,
+i.e. KVM behaved as we want it to behave.  Note, at the time of the above commit,
+VMX synchronized TSC on *guest* writes to MSR_IA32_TSC:
+
+	case MSR_IA32_TSC:
+        	kvm_write_tsc(vcpu, msr_info);
+	        break;
+
+That got changed by commit 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization
+on guest writes"), but I don't think the guest angle is actually relevant to the
+fix.  AFAICT, a write from the host would suffer the same problem.  But knowing
+that KVM synced on guest writes is crucial to understanding the changelog.
+
+In kvm_write_tsc(), except for KVM's wonderful "less than 1 second" hack, KVM
+snapshotted the vCPU's current TSC *and* the current time in nanoseconds, where
+kvm->arch.cur_tsc_nsec is the current host kernel time in nanoseconds.
+
+	ns = get_kernel_ns();
+
+	...
+
+        if (usdiff < USEC_PER_SEC &&
+            vcpu->arch.virtual_tsc_khz == kvm->arch.last_tsc_khz) {
+		...
+        } else {
+                /*
+                 * We split periods of matched TSC writes into generations.
+                 * For each generation, we track the original measured
+                 * nanosecond time, offset, and write, so if TSCs are in
+                 * sync, we can match exact offset, and if not, we can match
+                 * exact software computation in compute_guest_tsc()
+                 *
+                 * These values are tracked in kvm->arch.cur_xxx variables.
+                 */
+                kvm->arch.cur_tsc_generation++;
+                kvm->arch.cur_tsc_nsec = ns;
+                kvm->arch.cur_tsc_write = data;
+                kvm->arch.cur_tsc_offset = offset;
+                matched = false;
+                pr_debug("kvm: new tsc generation %llu, clock %llu\n",
+                         kvm->arch.cur_tsc_generation, data);
+        }
+
+	...
+
+        /* Keep track of which generation this VCPU has synchronized to */
+        vcpu->arch.this_tsc_generation = kvm->arch.cur_tsc_generation;
+        vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
+        vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
+
+Note that the above sets matched to false!  But because kvm_track_tsc_matching()
+looks for matched+1, i.e. doesn't require the first vCPU to match itself, KVM
+would immediately compute vcpus_matched as true for VMs with a single vCPU.  As
+a result, KVM would skip the masterlock update, even though a new TSC generation
+was created.
+
+        vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
+                         atomic_read(&vcpu->kvm->online_vcpus));
+
+        if (vcpus_matched && gtod->clock.vclock_mode == VCLOCK_TSC)
+                if (!ka->use_master_clock)
+                        do_request = 1;
+
+        if (!vcpus_matched && ka->use_master_clock)
+                        do_request = 1;
+
+        if (do_request)
+                kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+
+On hardware without TSC scaling support, vcpu->tsc_catchup is set to true if the
+guest TSC frequency is faster than the host TSC frequency, even if the TSC is
+otherwise stable.  And for that mode, kvm_guest_time_update(), by way of
+compute_guest_tsc(), uses vcpu->arch.this_tsc_nsec, a.k.a. the kernel time at the
+last TSC write, to compute the guest TSC relative to kernel time:
+
+  static u64 compute_guest_tsc(struct kvm_vcpu *vcpu, s64 kernel_ns)
+  {
+	u64 tsc = pvclock_scale_delta(kernel_ns-vcpu->arch.this_tsc_nsec,
+				      vcpu->arch.virtual_tsc_mult,
+				      vcpu->arch.virtual_tsc_shift);
+	tsc += vcpu->arch.this_tsc_write;
+	return tsc;
+  }
+
+Except the @kernel_ns passed to compute_guest_tsc() isn't the current kernel time,
+it's the masterclock snapshot!
+
+        spin_lock(&ka->pvclock_gtod_sync_lock);
+        use_master_clock = ka->use_master_clock;
+        if (use_master_clock) {
+                host_tsc = ka->master_cycle_now;
+                kernel_ns = ka->master_kernel_ns;
+        }
+        spin_unlock(&ka->pvclock_gtod_sync_lock);
+
+	if (vcpu->tsc_catchup) {
+		u64 tsc = compute_guest_tsc(v, kernel_ns);
+		if (tsc > tsc_timestamp) {
+			adjust_tsc_offset_guest(v, tsc - tsc_timestamp);
+			tsc_timestamp = tsc;
+		}
+	}
+
+And so the "kernel_ns-vcpu->arch.this_tsc_nsec" is *guaranteed* to generate a
+negative value, because this_tsc_nsec was captured after ka->master_kernel_ns.
+
+Forcing a masterclock update essentially fudged around that problem, but in a
+heavy handed way that introduced undesirable side effects, i.e. unnecessarily
+forces a masterclock update when a new vCPU joins the party via hotplug.
+
+Compile tested only, but the below should fix the vCPU hotplug case.  Then
+someone (not me) just needs to figure out why kvm_xen_shared_info_init() forces
+a masterclock update.
+
+I still think we should clean up the periodic sync code, but I don't think we
+need to periodically sync the masterclock.
+
 ---
- .../kvm/x86_64/private_mem_conversions_test.c        | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
-index c04e7d61a585..5eb693fead33 100644
---- a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
-@@ -388,10 +388,14 @@ static void test_mem_conversions(enum vm_mem_backing_src_type src_type, uint32_t
- 		gmem_flags = 0;
- 	memfd = vm_create_guest_memfd(vm, memfd_size, gmem_flags);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c54e1133e0d3..f0a607b6fc31 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2510,26 +2510,29 @@ static inline int gtod_is_based_on_tsc(int mode)
+ }
+ #endif
  
--	for (i = 0; i < nr_memslots; i++)
--		vm_mem_add(vm, src_type, BASE_DATA_GPA + size * i,
--			   BASE_DATA_SLOT + i, size / vm->page_size,
--			   KVM_MEM_PRIVATE, memfd, size * i);
-+	if (nr_memslots == 1)
-+		vm_mem_add(vm, src_type, BASE_DATA_GPA, BASE_DATA_SLOT,
-+			   memfd_size / vm->page_size, KVM_MEM_PRIVATE, memfd, 0);
-+	else
-+		for (i = 0; i < nr_memslots; i++)
-+			vm_mem_add(vm, src_type, BASE_DATA_GPA + size * i,
-+				   BASE_DATA_SLOT + i, size / vm->page_size,
-+				   KVM_MEM_PRIVATE, memfd, size * i);
+-static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
++static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu, bool new_generation)
+ {
+ #ifdef CONFIG_X86_64
+-	bool vcpus_matched;
+ 	struct kvm_arch *ka = &vcpu->kvm->arch;
+ 	struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
  
- 	for (i = 0; i < nr_vcpus; i++) {
- 		uint64_t gpa =  BASE_DATA_GPA + i * size;
+-	vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
+-			 atomic_read(&vcpu->kvm->online_vcpus));
++	/*
++	 * To use the masterclock, the host clocksource must be based on TSC
++	 * and all vCPUs must have matching TSCs.  Note, the count for matching
++	 * vCPUs doesn't include the reference vCPU, hence "+1".
++	 */
++	bool use_master_clock = (ka->nr_vcpus_matched_tsc + 1 ==
++				 atomic_read(&vcpu->kvm->online_vcpus)) &&
++				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
+ 
+ 	/*
+-	 * Once the masterclock is enabled, always perform request in
+-	 * order to update it.
+-	 *
+-	 * In order to enable masterclock, the host clocksource must be TSC
+-	 * and the vcpus need to have matched TSCs.  When that happens,
+-	 * perform request to enable masterclock.
++	 * Request a masterclock update if the masterclock needs to be toggled
++	 * on/off, or when starting a new generation and the masterclock is
++	 * enabled (compute_guest_tsc() requires the masterclock snaphot to be
++	 * taken _after_ the new generation is created).
+ 	 */
+-	if (ka->use_master_clock ||
+-	    (gtod_is_based_on_tsc(gtod->clock.vclock_mode) && vcpus_matched))
++	if ((ka->use_master_clock && new_generation) ||
++	    (ka->use_master_clock != use_master_clock))
+ 		kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+ 
+ 	trace_kvm_track_tsc(vcpu->vcpu_id, ka->nr_vcpus_matched_tsc,
+@@ -2706,7 +2709,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
+ 	vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
+ 	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
+ 
+-	kvm_track_tsc_matching(vcpu);
++	kvm_track_tsc_matching(vcpu, !matched);
+ }
+ 
+ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
+
+base-commit: dfdc8b7884b50e3bfa635292973b530a97689f12
 -- 
-2.25.1
-
