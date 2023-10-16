@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A2D007CAEEB
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28C037CAECF
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:19:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234155AbjJPQSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51722 "EHLO
+        id S233786AbjJPQSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:18:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234128AbjJPQRd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:17:33 -0400
+        with ESMTP id S234140AbjJPQRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:17:47 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9420D7D;
-        Mon, 16 Oct 2023 09:17:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C56310E7;
+        Mon, 16 Oct 2023 09:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473027; x=1729009027;
+  t=1697473035; x=1729009035;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zSv/Qjs1vkBoPqliYdnMFyAYn3SAbvDxLgCG1TDMwKs=;
-  b=R9RpNM+nP9onI2d6lymBOfYcrfSaH0oWP82zctk8VnMk5sXqoENDgTyz
-   Q2GNNl5r9sTfuZtjXzAjsVHL2XYlrIJs8yhopbXi1dCG449MAYxIICY5O
-   Anr2WhCs/hRg8zBxF+NNqsN4xVwqiGwpzHlO2Aqh1RV6ooBTQhAxVbhXp
-   LEhNahl1Rq7hvW0KUnF1frLahIvPsssqrsawjod5QGw8OMdats60pxN38
-   g33iK3Zo4r04LhCopeF/F0xe5GyFcAuL/dgJvEXJwPua1/WrJhnquEdrm
-   05iZN6o/eQIKBggnyMI/EFvbf91/1pW7luTgI4N7cl4d3Qr3w+GmaDbMk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921817"
+  bh=te/VzOZA6RdNyTzGAxnR8umZmCmcWLX+cMrw0t3eFuQ=;
+  b=E9+Ine9JCE261LGYWX9axWGBVRNvdq4GlruUXNkAK4wgu8xe2eYhS4MF
+   OfNIxCRvK9cgWqinlGPq3AlVdbzrwFirV1UPf0jkpGrLJkCupyt3y37g1
+   HAp25Mx/DQbmawr5G17rfvzQhg2rJOA5jrVYQdd2FF1AbCmmIJ/kNUEb+
+   Zlj1NzlARH+rvHbaUSofFwphCq55lLdXMt2NAGuIe0DpbGoqWR55F2e5D
+   At4baITnh0iw/MXGkmGouf493AM27H/a/1hamvRw72DXUyqO+ljR+OLuy
+   Hx1p1GXsMdBhn1SccHBSidzORCfE6TfrhfwhTKSlMWiasYolcfuqvDxw/
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921822"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921817"
+   d="scan'208";a="364921822"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:47 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448153"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448157"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448153"
+   d="scan'208";a="846448157"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:46 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:47 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 055/116] KVM: TDX: TDP MMU TDX support
-Date:   Mon, 16 Oct 2023 09:14:07 -0700
-Message-Id: <f85e2089b8a7f78b49082d3f5c85e7754331653e.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 056/116] KVM: TDX: MTRR: implement get_mt_mask() for TDX
+Date:   Mon, 16 Oct 2023 09:14:08 -0700
+Message-Id: <65d13fa6ce67b025ce609aeeaa7f0624c9870c13.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,619 +68,108 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Implement hooks of TDP MMU for TDX backend.  TLB flush, TLB shootdown,
-propagating the change private EPT entry to Secure EPT and freeing Secure
-EPT page. TLB flush handles both shared EPT and private EPT.  It flushes
-shared EPT same as VMX.  It also waits for the TDX TLB shootdown.  For the
-hook to free Secure EPT page, unlinks the Secure EPT page from the Secure
-EPT so that the page can be freed to OS.
+Because TDX virtualize cpuid[0x1].EDX[MTRR: bit 12] to fixed 1, guest TD
+thinks MTRR is supported.  Although TDX supports only WB for private GPA,
+it's desirable to support MTRR for shared GPA.  As guest access to MTRR
+MSRs causes #VE and KVM/x86 tracks the values of MTRR MSRs, the remining
+part is to implement get_mt_mask method for TDX for shared GPA.
 
-Propagate the entry change to Secure EPT.  The possible entry changes are
-present -> non-present(zapping) and non-present -> present(population).  On
-population just link the Secure EPT page or the private guest page to the
-Secure EPT by TDX SEAMCALL. Because TDP MMU allows concurrent
-zapping/population, zapping requires synchronous TLB shoot down with the
-frozen EPT entry.  It zaps the secure entry, increments TLB counter, sends
-IPI to remote vcpus to trigger TLB flush, and then unlinks the private
-guest page from the Secure EPT. For simplicity, batched zapping with
-exclude lock is handled as concurrent zapping.  Although it's inefficient,
-it can be optimized in the future.
+Pass around shared bit from kvm fault handler to get_mt_mask method so that
+it can determine if the gfn is shared or private.  Implement get_mt_mask()
+following vmx case for shared GPA and return WB for private GPA.
+the existing vmx_get_mt_mask() can't be directly used as CPU state(CR0.CD)
+is protected.  GFN passed to kvm_mtrr_check_gfn_range_consistency() should
+include shared bit.
 
-For MMIO SPTE, the spte value changes as follows.
-initial value (suppress VE bit is set)
--> Guest issues MMIO and triggers EPT violation
--> KVM updates SPTE value to MMIO value (suppress VE bit is cleared)
--> Guest MMIO resumes.  It triggers VE exception in guest TD
--> Guest VE handler issues TDG.VP.VMCALL<MMIO>
--> KVM handles MMIO
--> Guest VE handler resumes its execution after MMIO instruction
-
+Suggested-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-
 ---
-v15 -> v16:
-- Add the handling of TD_ATTR_SEPT_VE_DISABLE case.
+ arch/x86/kvm/vmx/main.c    | 10 +++++++++-
+ arch/x86/kvm/vmx/tdx.c     | 23 +++++++++++++++++++++++
+ arch/x86/kvm/vmx/x86_ops.h |  2 ++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
 
-v14 -> v15:
-- Implemented tdx_flush_tlb_current()
-- Removed unnecessary invept in tdx_flush_tlb().  It was carry over
-  from the very old code base.
----
- arch/x86/kvm/mmu/spte.c    |   3 +-
- arch/x86/kvm/vmx/main.c    |  71 +++++++-
- arch/x86/kvm/vmx/tdx.c     | 360 +++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h     |   7 +
- arch/x86/kvm/vmx/x86_ops.h |   6 +
- 5 files changed, 442 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 318135daf685..83926a35ea47 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -74,7 +74,8 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
- 	u64 spte = generation_mmio_spte_mask(gen);
- 	u64 gpa = gfn << PAGE_SHIFT;
- 
--	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value);
-+	WARN_ON_ONCE(!vcpu->kvm->arch.shadow_mmio_value &&
-+		     !kvm_gfn_shared_mask(vcpu->kvm));
- 
- 	access &= shadow_mmio_access_mask;
- 	spte |= vcpu->kvm->arch.shadow_mmio_value | access;
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index fda13fd37cae..077eee12e7b6 100644
+index 077eee12e7b6..22b9d44ee29f 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -28,6 +28,7 @@ static int vt_max_vcpus(struct kvm *kvm)
- 
- 	return kvm->max_vcpus;
+@@ -228,6 +228,14 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
  }
-+static int vt_flush_remote_tlbs(struct kvm *kvm);
  
- static int vt_hardware_enable(void)
++static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
++{
++	if (is_td_vcpu(vcpu))
++		return tdx_get_mt_mask(vcpu, gfn, is_mmio);
++
++	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
++}
++
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
-@@ -70,8 +71,22 @@ static __init int vt_hardware_setup(void)
- 		pr_warn_ratelimited("TDX requires mmio caching.  Please enable mmio caching for TDX.\n");
- 	}
+ 	if (!is_td(kvm))
+@@ -347,7 +355,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
  
-+	/*
-+	 * TDX KVM overrides flush_remote_tlbs method and assumes
-+	 * flush_remote_tlbs_range = NULL that falls back to
-+	 * flush_remote_tlbs.  Disable TDX if there are conflicts.
-+	 */
-+	if (vt_x86_ops.flush_remote_tlbs ||
-+	    vt_x86_ops.flush_remote_tlbs_range) {
-+		enable_tdx = false;
-+		pr_warn_ratelimited("TDX requires baremetal. Not Supported on VMM guest.\n");
-+	}
-+
- 	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+ 	.set_tss_addr = vmx_set_tss_addr,
+ 	.set_identity_map_addr = vmx_set_identity_map_addr,
+-	.get_mt_mask = vmx_get_mt_mask,
++	.get_mt_mask = vt_get_mt_mask,
  
-+	if (enable_tdx)
-+		vt_x86_ops.flush_remote_tlbs = vt_flush_remote_tlbs;
-+
+ 	.get_exit_info = vmx_get_exit_info,
+ 
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index cad6f9beda50..a5f1b3e75764 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -363,6 +363,29 @@ int tdx_vm_init(struct kvm *kvm)
  	return 0;
  }
  
-@@ -154,6 +169,54 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vmx_vcpu_reset(vcpu, init_event);
- }
- 
-+static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
++u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
 +{
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_flush_tlb(vcpu);
-+		return;
-+	}
++	if (is_mmio)
++		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
 +
-+	vmx_flush_tlb_all(vcpu);
-+}
-+
-+static void vt_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_flush_tlb_current(vcpu);
-+		return;
-+	}
-+
-+	vmx_flush_tlb_current(vcpu);
-+}
-+
-+static int vt_flush_remote_tlbs(struct kvm *kvm)
-+{
-+	if (is_td(kvm))
-+		return tdx_sept_flush_remote_tlbs(kvm);
++	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
++		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
 +
 +	/*
-+	 * fallback to KVM_REQ_TLB_FLUSH.
-+	 * See kvm_arch_flush_remote_tlb() and kvm_flush_remote_tlbs().
++	 * TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback.
++	 * TODO: implement MTRR MSR emulation so that
++	 * MTRRCap: SMRR=0: SMRR interface unsupported
++	 *          WC=0: write combining unsupported
++	 *          FIX=0: Fixed range registers unsupported
++	 *          VCNT=0: number of variable range regitsers = 0
++	 * MTRRDefType: E=1, FE=0, type=writeback only. Don't allow other value.
++	 *              E=1: enable MTRR
++	 *              FE=0: disable fixed range MTRRs
++	 *              type: default memory type=writeback
 +	 */
-+	return -EOPNOTSUPP;
++	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
 +}
 +
-+static void vt_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
-+{
-+	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return;
-+
-+	vmx_flush_tlb_gva(vcpu, addr);
-+}
-+
-+static void vt_flush_tlb_guest(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_flush_tlb_guest(vcpu);
-+}
-+
- static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			int pgd_level)
+ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
  {
-@@ -245,10 +308,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.set_rflags = vmx_set_rflags,
- 	.get_if_flag = vmx_get_if_flag,
- 
--	.flush_tlb_all = vmx_flush_tlb_all,
--	.flush_tlb_current = vmx_flush_tlb_current,
--	.flush_tlb_gva = vmx_flush_tlb_gva,
--	.flush_tlb_guest = vmx_flush_tlb_guest,
-+	.flush_tlb_all = vt_flush_tlb_all,
-+	.flush_tlb_current = vt_flush_tlb_current,
-+	.flush_tlb_gva = vt_flush_tlb_gva,
-+	.flush_tlb_guest = vt_flush_tlb_guest,
- 
- 	.vcpu_pre_run = vmx_vcpu_pre_run,
- 	.vcpu_run = vmx_vcpu_run,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index d26b96cf94f9..cad6f9beda50 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -7,6 +7,7 @@
- #include "x86_ops.h"
- #include "mmu.h"
- #include "tdx.h"
-+#include "vmx.h"
- #include "x86.h"
- 
- #undef pr_fmt
-@@ -331,6 +332,22 @@ static int tdx_do_tdh_mng_key_config(void *param)
- 
- int tdx_vm_init(struct kvm *kvm)
- {
-+	/*
-+	 * Because guest TD is protected, VMM can't parse the instruction in TD.
-+	 * Instead, guest uses MMIO hypercall.  For unmodified device driver,
-+	 * #VE needs to be injected for MMIO and #VE handler in TD converts MMIO
-+	 * instruction into MMIO hypercall.
-+	 *
-+	 * SPTE value for MMIO needs to be setup so that #VE is injected into
-+	 * TD instead of triggering EPT MISCONFIG.
-+	 * - RWX=0 so that EPT violation is triggered.
-+	 * - suppress #VE bit is cleared to inject #VE.
-+	 */
-+	kvm_mmu_set_mmio_spte_value(kvm, 0);
-+
-+	/* TODO: Enable 2mb and 1gb large page support. */
-+	kvm->arch.tdp_max_page_level = PG_LEVEL_4K;
-+
- 	/*
- 	 * This function initializes only KVM software construct.  It doesn't
- 	 * initialize TDX stuff, e.g. TDCS, TDR, TDCX, HKID etc.
-@@ -430,6 +447,303 @@ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
- 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
- }
- 
-+static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn)
-+{
-+	struct page *page = pfn_to_page(pfn);
-+
-+	put_page(page);
-+}
-+
-+static int tdx_sept_page_aug(struct kvm *kvm, gfn_t gfn,
-+			     enum pg_level level, kvm_pfn_t pfn)
-+{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	union tdx_sept_level_state level_state;
-+	hpa_t hpa = pfn_to_hpa(pfn);
-+	gpa_t gpa = gfn_to_gpa(gfn);
-+	struct tdx_module_args out;
-+	union tdx_sept_entry entry;
-+	u64 err;
-+
-+	err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, hpa, &out);
-+	if (unlikely(err == TDX_ERROR_SEPT_BUSY)) {
-+		tdx_unpin(kvm, pfn);
-+		return -EAGAIN;
-+	}
-+	if (unlikely(err == (TDX_EPT_ENTRY_NOT_FREE | TDX_OPERAND_ID_RCX))) {
-+		struct tdx_module_args tmpout;
-+		u64 tmp;
-+
-+		/*
-+		 * TDX 1.0 may return TDX_EPT_ENTRY_NOT_FREE without
-+		 * SEPT entry.  TDX 1.5 (or later) returns
-+		 * TDX_EPT_ENTRY_STATE_INCORRECT with SEPT entry value.
-+		 */
-+		tmp = tdh_mem_sept_rd(kvm_tdx->tdr_pa, gpa, tdx_level,
-+					 &tmpout);
-+		if (KVM_BUG_ON(tmp, kvm)) {
-+			pr_tdx_error(TDH_MEM_SEPT_RD, tmp, &tmpout);
-+			tdx_unpin(kvm, pfn);
-+			return -EIO;
-+		}
-+		pr_debug_ratelimited("gfn 0x%llx pg_level %d pfn 0x%llx entry 0x%llx level_stat 0x%llx\n",
-+				     gfn, level, pfn, entry.raw, level_state.raw);
-+
-+		entry.raw = tmpout.rcx;
-+		level_state.raw = tmpout.rdx;
-+		if (level_state.level == tdx_level &&
-+		    level_state.state == TDX_SEPT_PENDING &&
-+		    entry.leaf && entry.pfn == pfn && entry.sve) {
-+			tdx_unpin(kvm, pfn);
-+			WARN_ON_ONCE(!(to_kvm_tdx(kvm)->attributes &
-+				       TDX_TD_ATTR_SEPT_VE_DISABLE));
-+			return -EAGAIN;
-+		}
-+	}
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
-+		tdx_unpin(kvm, pfn);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
-+				     enum pg_level level, kvm_pfn_t pfn)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+
-+	/* TODO: handle large pages. */
-+	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-+		return -EINVAL;
-+
-+	/*
-+	 * Because restricted mem doesn't support page migration with
-+	 * a_ops->migrate_page (yet), no callback isn't triggered for KVM on
-+	 * page migration.  Until restricted mem supports page migration,
-+	 * prevent page migration.
-+	 * TODO: Once restricted mem introduces callback on page migration,
-+	 * implement it and remove get_page/put_page().
-+	 */
-+	get_page(pfn_to_page(pfn));
-+
-+	if (likely(is_td_finalized(kvm_tdx)))
-+		return tdx_sept_page_aug(kvm, gfn, level, pfn);
-+
-+	/* TODO: tdh_mem_page_add() comes here for the initial memory. */
-+
-+	return 0;
-+}
-+
-+static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
-+				       enum pg_level level, kvm_pfn_t pfn)
-+{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	struct tdx_module_args out;
-+	gpa_t gpa = gfn_to_gpa(gfn);
-+	hpa_t hpa = pfn_to_hpa(pfn);
-+	hpa_t hpa_with_hkid;
-+	u64 err;
-+
-+	/* TODO: handle large pages. */
-+	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
-+		return -EINVAL;
-+
-+	if (unlikely(!is_hkid_assigned(kvm_tdx))) {
-+		/*
-+		 * The HKID assigned to this TD was already freed and cache
-+		 * was already flushed. We don't have to flush again.
-+		 */
-+		err = tdx_reclaim_page(hpa);
-+		if (KVM_BUG_ON(err, kvm))
-+			return -EIO;
-+		tdx_unpin(kvm, pfn);
-+		return 0;
-+	}
-+
-+	do {
-+		/*
-+		 * When zapping private page, write lock is held. So no race
-+		 * condition with other vcpu sept operation.  Race only with
-+		 * TDH.VP.ENTER.
-+		 */
-+		err = tdh_mem_page_remove(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
-+	} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_PAGE_REMOVE, err, &out);
-+		return -EIO;
-+	}
-+
-+	hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
-+	do {
-+		/*
-+		 * TDX_OPERAND_BUSY can happen on locking PAMT entry.  Because
-+		 * this page was removed above, other thread shouldn't be
-+		 * repeatedly operating on this page.  Just retry loop.
-+		 */
-+		err = tdh_phymem_page_wbinvd(hpa_with_hkid);
-+	} while (unlikely(err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX)));
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
-+		return -EIO;
-+	}
-+	tdx_clear_page(hpa);
-+	tdx_unpin(kvm, pfn);
-+	return 0;
-+}
-+
-+static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
-+				     enum pg_level level, void *private_spt)
-+{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	gpa_t gpa = gfn_to_gpa(gfn);
-+	hpa_t hpa = __pa(private_spt);
-+	struct tdx_module_args out;
-+	u64 err;
-+
-+	err = tdh_mem_sept_add(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
-+	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-+		return -EAGAIN;
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_SEPT_ADD, err, &out);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
-+				      enum pg_level level)
-+{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
-+	struct tdx_module_args out;
-+	u64 err;
-+
-+	/* This can be called when destructing guest TD after freeing HKID. */
-+	if (unlikely(!is_hkid_assigned(kvm_tdx)))
-+		return 0;
-+
-+	/* For now large page isn't supported yet. */
-+	WARN_ON_ONCE(level != PG_LEVEL_4K);
-+	err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &out);
-+	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-+		return -EAGAIN;
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error(TDH_MEM_RANGE_BLOCK, err, &out);
-+		return -EIO;
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * TLB shoot down procedure:
-+ * There is a global epoch counter and each vcpu has local epoch counter.
-+ * - TDH.MEM.RANGE.BLOCK(TDR. level, range) on one vcpu
-+ *   This blocks the subsequenct creation of TLB translation on that range.
-+ *   This corresponds to clear the present bit(all RXW) in EPT entry
-+ * - TDH.MEM.TRACK(TDR): advances the epoch counter which is global.
-+ * - IPI to remote vcpus
-+ * - TDExit and re-entry with TDH.VP.ENTER on remote vcpus
-+ * - On re-entry, TDX module compares the local epoch counter with the global
-+ *   epoch counter.  If the local epoch counter is older than the global epoch
-+ *   counter, update the local epoch counter and flushes TLB.
-+ */
-+static void tdx_track(struct kvm *kvm)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	u64 err;
-+
-+	KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm);
-+	/* If TD isn't finalized, it's before any vcpu running. */
-+	if (unlikely(!is_td_finalized(kvm_tdx)))
-+		return;
-+
-+	/*
-+	 * tdx_flush_tlb() waits for this function to issue TDH.MEM.TRACK() by
-+	 * the counter.  The counter is used instead of bool because multiple
-+	 * TDH_MEM_TRACK() can be issued concurrently by multiple vcpus.
-+	 */
-+	atomic_inc(&kvm_tdx->tdh_mem_track);
-+	/*
-+	 * KVM_REQ_TLB_FLUSH waits for the empty IPI handler, ack_flush(), with
-+	 * KVM_REQUEST_WAIT.
-+	 */
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
-+
-+	do {
-+		/*
-+		 * kvm_flush_remote_tlbs() doesn't allow to return error and
-+		 * retry.
-+		 */
-+		err = tdh_mem_track(kvm_tdx->tdr_pa);
-+	} while (unlikely((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY));
-+
-+	/* Release remote vcpu waiting for TDH.MEM.TRACK in tdx_flush_tlb(). */
-+	atomic_dec(&kvm_tdx->tdh_mem_track);
-+
-+	if (KVM_BUG_ON(err, kvm))
-+		pr_tdx_error(TDH_MEM_TRACK, err, NULL);
-+
-+}
-+
-+static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
-+				     enum pg_level level, void *private_spt)
-+{
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+
-+	/*
-+	 * The HKID assigned to this TD was already freed and cache was
-+	 * already flushed. We don't have to flush again.
-+	 */
-+	if (!is_hkid_assigned(kvm_tdx))
-+		return tdx_reclaim_page(__pa(private_spt));
-+
-+	/*
-+	 * free_private_spt() is (obviously) called when a shadow page is being
-+	 * zapped.  KVM doesn't (yet) zap private SPs while the TD is active.
-+	 * Note: This function is for private shadow page.  Not for private
-+	 * guest page.   private guest page can be zapped during TD is active.
-+	 * shared <-> private conversion and slot move/deletion.
-+	 */
-+	KVM_BUG_ON(is_hkid_assigned(kvm_tdx), kvm);
-+	return -EINVAL;
-+}
-+
-+int tdx_sept_flush_remote_tlbs(struct kvm *kvm)
-+{
-+	if (unlikely(!is_td(kvm)))
-+		return -EOPNOTSUPP;
-+
-+	if (is_hkid_assigned(to_kvm_tdx(kvm)))
-+		tdx_track(kvm);
-+
-+	return 0;
-+}
-+
-+static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
-+					 enum pg_level level, kvm_pfn_t pfn)
-+{
-+	/*
-+	 * TDX requires TLB tracking before dropping private page.  Do
-+	 * it here, although it is also done later.
-+	 * If hkid isn't assigned, the guest is destroying and no vcpu
-+	 * runs further.  TLB shootdown isn't needed.
-+	 *
-+	 * TODO: Call TDH.MEM.TRACK() only when we have called
-+	 * TDH.MEM.RANGE.BLOCK(), but not call TDH.MEM.TRACK() yet.
-+	 */
-+	if (is_hkid_assigned(to_kvm_tdx(kvm)))
-+		tdx_track(kvm);
-+
-+	return tdx_sept_drop_private_spte(kvm, gfn, level, pfn);
-+}
-+
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx_capabilities __user *user_caps;
-@@ -895,6 +1209,39 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	return ret;
- }
- 
-+void tdx_flush_tlb(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Don't need to flush shared EPTP:
-+	 * "TD VCPU TLB Address Spaced Identifier" in the TDX module spec:
-+	 * The TLB entries for TD are tagged with:
-+	 *  SEAM (1 bit)
-+	 *  VPID
-+	 *  Secure EPT root (51:12 bits) with HKID = 0
-+	 *  PCID
-+	 * for *both* Secure-EPT and Shared-EPT.
-+	 * TLB flush with Secure-EPT root by tdx_track() results in flushing
-+	 * the conversion of both Secure-EPT and Shared-EPT.
-+	 */
-+
-+	/*
-+	 * See tdx_track().  Wait for tlb shootdown initiater to finish
-+	 * TDH_MEM_TRACK() so that shared-EPT/secure-EPT TLB is flushed
-+	 * on the next TDENTER.
-+	 */
-+	while (atomic_read(&to_kvm_tdx(vcpu->kvm)->tdh_mem_track))
-+		cpu_relax();
-+}
-+
-+void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * flush_tlb_current() is used only the first time for the vcpu to run.
-+	 * As it isn't performance critical, keep this function simple.
-+	 */
-+	tdx_track(vcpu->kvm);
-+}
-+
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	struct kvm_tdx_cmd tdx_cmd;
-@@ -1160,8 +1507,21 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
- 	on_each_cpu(vmx_off, &vmx_tdx.vmx_enabled, true);
- 	cpus_read_unlock();
- 	free_cpumask_var(vmx_tdx.vmx_enabled);
-+	if (r)
-+		goto out;
-+
-+	x86_ops->link_private_spt = tdx_sept_link_private_spt;
-+	x86_ops->free_private_spt = tdx_sept_free_private_spt;
-+	x86_ops->set_private_spte = tdx_sept_set_private_spte;
-+	x86_ops->remove_private_spte = tdx_sept_remove_private_spte;
-+	x86_ops->zap_private_spte = tdx_sept_zap_private_spte;
-+
-+	return 0;
- 
- out:
-+	/* kfree() accepts NULL. */
-+	kfree(tdx_mng_key_config_lock);
-+	tdx_mng_key_config_lock = NULL;
- 	return r;
- }
- 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index d92a75c78e6e..57ecb83e2f35 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -18,6 +18,7 @@ struct kvm_tdx {
- 	int hkid;
- 
- 	bool finalized;
-+	atomic_t tdh_mem_track;
- 
- 	u64 tsc_offset;
- };
-@@ -165,6 +166,12 @@ static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 fiel
- 	return out.r8;
- }
- 
-+static __always_inline int pg_level_to_tdx_sept_level(enum pg_level level)
-+{
-+	WARN_ON_ONCE(level == PG_LEVEL_NONE);
-+	return level - 1;
-+}
-+
- #else
- struct kvm_tdx {
- 	struct kvm kvm;
+ 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 36dfdf3f17e7..562e567953c0 100644
+index 562e567953c0..e2a8b59adf2d 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -153,6 +153,9 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+@@ -150,6 +150,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+ int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
++u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
  
  int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
  
-+void tdx_flush_tlb(struct kvm_vcpu *vcpu);
-+void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
-+int tdx_sept_flush_remote_tlbs(struct kvm *kvm);
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- #else
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
-@@ -176,6 +179,9 @@ static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+@@ -176,6 +177,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
+ static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+ static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
++static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
  
  static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
- 
-+static inline void tdx_flush_tlb(struct kvm_vcpu *vcpu) {}
-+static inline void tdx_flush_tlb_current(struct kvm_vcpu *vcpu) {}
-+static inline int tdx_sept_flush_remote_tlbs(struct kvm *kvm) { return 0; }
- static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
- #endif
  
 -- 
 2.25.1
