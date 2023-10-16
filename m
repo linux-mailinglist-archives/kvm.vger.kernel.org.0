@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBBDE7CAA0E
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:43:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C74EA7CAA60
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:49:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233916AbjJPNnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 09:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53660 "EHLO
+        id S233445AbjJPNtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 09:49:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232365AbjJPNnn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 09:43:43 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A341AA;
-        Mon, 16 Oct 2023 06:43:40 -0700 (PDT)
+        with ESMTP id S233864AbjJPNsv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 09:48:51 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2060.outbound.protection.outlook.com [40.107.96.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F32C110;
+        Mon, 16 Oct 2023 06:48:21 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OziGier9QWcAuC5tkgO0vk+FdV7SKYpdDj4XSL9LL9Lo1mpIpLkQAH+DFA4i9dw7tAb74rxOLzKPIMNTKeh+F0uxrMSNmUXzJOUlekarjFMuI4dllS99YFFNwB6GOYnGT3rF3MwBxgAXyF73Qn/+byr2IB51pIf96hmg03OfpUNg01/AfX/oZ5wa+8lL52w1CXH0/nCdK64CM61z1zQugkdyrueKubI1ukClGtyEcTCU7vCySXpfunnMyCQQ7zVgX/XX4X/otXOY7WGywqe5aw6eCQar636rz3y4+Ba78prgvBCnCYDktCvefDnWfKZDdFCUJA9iz9XJIeBvFAGKQQ==
+ b=W75ayojfAnzWRfgUMl3zW5Bj4u94ap7WkL1hQ09KNwfwWlRBNKCmwPr0l9Nlh7LlqJhKBwhJqFgJppW3R8GwUjtRrbZihTUbDD6XV8PsABLXEt135Xv8V2l6QBiX+ayj1jDI+nGNw1KywkFitsHrk13z+VGAlBo6eKxVhQrIb6u+UU8IlMKtUOs676pWkrtH5XcvtbxrfYdVYvkXfFfW3avsUYy5cLMnEkGtvDaqPO2kvMq7UGbmHUw5SNv4LCz17WLPKy/9916TJEtF+kiArcdj9Rjq3ZUS7S2S4bv8wq2v4aBHxpmovM4LQ1HrFHeDQWJ/QKtWwQqR6SnwbwAWsQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ioKmdW5u8oz4n/hSrjYaU7DKRMzHLf2Sn+it5+ignoY=;
- b=PIx/h3EOYbPj95eVLC/qKb1jFu2aiQkhAQ74dkV8Ymugrmp7G4L0Y/W3QEXq2s6m8nli0j94W/9btW3GgXPaZuaSP9c3W0WMx5ZF94CMH+T5DXcaIwJOxcTdjAHgMmH6RqySUfeal+Xolq9IinNpCbs5UFdlqThQ7nntvi4N9sOPvhbZjR8JyaABHZGKi40NUZIeJdUxXluTUZTi3ywPqF+P5vBMrHhWeKcyixDqfBMdFxWKM2VV2S4ruP+tHV/P1c4rkrGtFaXNZZ16w24B39BaBIr4yysa+vLfVfr8CqlckZsTjLbDVni0EjqdbS2OiKL0oI6tVVyQdlrzJ9BAgw==
+ bh=3+JCtj3ASOKkhljKB2Eu8gzmxNkQyvn/YzFk7ZCXbFg=;
+ b=jsN2yZAhdxr1PylZJusjfSMHD5hQ7qbE1toJucjTIVomXZs6mjkdKXPQWP5ORth58DqaoX0swj8QE2G5yuJcZ/MYO78nd/8w+wiDwbCqs3cRSwZU/PGchPxY3gbqS3o7Fu2WGarZrgiBLGLbrdynff2h8jANqjZSFMhBDfGQvuCkkxm4Hnw2slzHPlr5aXadrKTv/1X37i3Ar4o19vvZECuIITcsZY9rLffU+x6f/iYBZ5l688mQwFWgbls0Z1h0QNohCpo5/AjRXg0n6kppJQtRboMsgOSSW6l2B+rY3FOXl+T9BM+/4lOMeulQBn9+84TPmN3aA1jZq8hwvDD2lg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ioKmdW5u8oz4n/hSrjYaU7DKRMzHLf2Sn+it5+ignoY=;
- b=oms8JKIOCW/xd8qNvYdhlF3UZBOBQMePpXci2kc4pMY59veu03uMC/Mwq4QAegWNtJhFcwrfc9v1jT9ZOdBomTRpiIIBh+ykXUWn5Fp7s1atzkejfWWqLfikSsaQ56Mk4DUQYtcGin+Ubu6NNxdjD99PWnkujKfNusEDWgpmuxY=
-Received: from BY3PR03CA0003.namprd03.prod.outlook.com (2603:10b6:a03:39a::8)
- by DS7PR12MB5861.namprd12.prod.outlook.com (2603:10b6:8:78::12) with
+ bh=3+JCtj3ASOKkhljKB2Eu8gzmxNkQyvn/YzFk7ZCXbFg=;
+ b=nMrUdFpayLVy4ZnqWFNDDa3eloJV/yURxbuR0pwbNwOZW6+QUVm5KyKyZd3aaoM1N1RGlEWxFg92EU7KTb1tW7fvDzxEuLEjC4h/93AAJEGltZKJwwRBrp4TRdyWgMEl0NdhHnb1pS6xXbEH9Va1ATcXoPd8YgplPnqnQpmxHUY=
+Received: from BL1PR13CA0139.namprd13.prod.outlook.com (2603:10b6:208:2bb::24)
+ by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.46; Mon, 16 Oct
- 2023 13:43:36 +0000
-Received: from SN1PEPF000252A2.namprd05.prod.outlook.com
- (2603:10b6:a03:39a:cafe::5c) by BY3PR03CA0003.outlook.office365.com
- (2603:10b6:a03:39a::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
- Transport; Mon, 16 Oct 2023 13:43:35 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Mon, 16 Oct
+ 2023 13:48:18 +0000
+Received: from MN1PEPF0000F0E5.namprd04.prod.outlook.com
+ (2603:10b6:208:2bb:cafe::e8) by BL1PR13CA0139.outlook.office365.com
+ (2603:10b6:208:2bb::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.17 via Frontend
+ Transport; Mon, 16 Oct 2023 13:48:18 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A2.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ MN1PEPF0000F0E5.mail.protection.outlook.com (10.167.242.43) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:43:35 +0000
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:48:18 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 08:43:35 -0500
+ 2023 08:48:04 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,10 +71,12 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
         <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
         <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        Alexey Kardashevskiy <aik@amd.com>
-Subject: [PATCH v10 03/50] KVM: SEV: Do not intercept accesses to MSR_IA32_XSS for SEV-ES guests
-Date:   Mon, 16 Oct 2023 08:27:32 -0500
-Message-ID: <20231016132819.1002933-4-michael.roth@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jarkko Sakkinen <jarkko@profian.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>
+Subject: [PATCH v10 04/50] x86/cpufeatures: Add SEV-SNP CPU feature
+Date:   Mon, 16 Oct 2023 08:27:33 -0500
+Message-ID: <20231016132819.1002933-5-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231016132819.1002933-1-michael.roth@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
@@ -86,23 +88,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A2:EE_|DS7PR12MB5861:EE_
-X-MS-Office365-Filtering-Correlation-Id: 122ef2e9-87d3-4050-0962-08dbce4de54c
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E5:EE_|BY5PR12MB4275:EE_
+X-MS-Office365-Filtering-Correlation-Id: d5ef2022-c8c3-4c22-d16c-08dbce4e8dc4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rGaBheoYLRenzJNrFLuyPdNgoNtGtm1+bWO2c/zpabtGOeQhvvlhyskQDrpyb67W3np3JxzwKojtsomG4BIIbkI21ffz02i1Z0cRPKOcs2P2RmhD1w/Kp01Y6QRsL6TBMpV2VtdODodaOrp9T0XTaCAk+zWboNWXrcehwr8nitLW602RcYdaVP9i+ypaTo5myPOonQ5nmVasjRH3itkfC3Etayt+OAIgao6jUNAZHSAdBMww8W3ub2i0HXylw0iwfTKyW2UjFAIHIez0e5y/9v6MTEWiLFn3OTO5uiTQHVa6JavRPbvba6HjMQ92aIUjcYTFXGL5WP7msR6U8d8lh+zbMlErdongym/BOFKi8CTZGnqz4dh0OQ/CIhYeGHV1veFy1Cx8CWJyPZczDzF2ffF/xScRE5Mm/az0Vjdt3EDA5rakPRKYYeOtDTZ04a9JMwmWhkK/JmDEyfcU4+gkxiOVAa/UVqGhb3PS8yR5PFgFUTcUIUtsRmiWvoxy4dr7q7SwF4V9u1wppVX8UiKekNptIPWOL2nYuGvB44ShXgYPKWqXGMGUeAQ1b8ZiRv2uEAbsOqdgp4Ex8HUo0JgY+FM5J+fNEYjorV+gyLA5MHS2QKcih7SgdJvlWF0b2c3IsTNOBXBNfLrl4WDiT+edEp3shb9se7CIAuz34Og1u1VHuZ1oDtsFwB4euFdM+SSTyVKpXndC8lH3KASLTFNInWrctg1tAzj0S9Q/bTKSMspd2S6d0NZelGpS0kXqEC0IuxhkqKCHjWLvgUpBgl8ptg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(39860400002)(136003)(396003)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(82310400011)(40470700004)(46966006)(36840700001)(47076005)(40460700003)(40480700001)(82740400003)(26005)(1076003)(16526019)(81166007)(36756003)(2616005)(356005)(336012)(7406005)(8936002)(70586007)(7416002)(54906003)(316002)(41300700001)(6916009)(70206006)(4326008)(8676002)(6666004)(86362001)(2906002)(478600001)(5660300002)(426003)(44832011)(83380400001)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ioBpLAic7HOUAApfm9MZ5s/sFi4mzT0X4C3CElX2lWX2Dy5ynnyXstwdc+5gvz0nfzSNVPXV+afsBtFysPmlerxPuU7THUGNaH+g/3fUrs/A36G+cOhv9p1kmTVRtksvXy1cBAxI4/e9gKmKlXmyLW3GsIDzdtiA7Ycy5BAAnmFVrotuGqKGVow7JYZ75lGSYxi4fsyfxc4JSaodM4MhU2u/I/rlS8f2qJ5pvS1SOQfM34Uzvmilyz2WUiDKiIRS7i1nXeptcdfecUX5sxKDEX5L+EMJiK4Fkq37mUJT1eD5KaHI7aCPBs49DCsc3NExO8KWf5GqusE2OTR4XpVUyclO6UrG/DeOuMhdkQV8FannJA6ZVt/76X8gM8/lw1E4I3KmRNMv0WqqCWb3/Gm7JYNn9cgheOel45ttoQ20F4Sq0Vy/NnjyQ70bWwmRA9geTbTOB3L/hGJko8PLrbN66hYAs4YvXUUz6CLICQTshD4f/FM1yTJ/aS6u4S6bBhf5iq7I3iA0r/AV8c+Xl0UXOYM9Uudfd4IOhkS8rbfxFY7Ue/p6ZjXtDTrzPhh62psmaeuyX5xXe3nnsJ+Q0zMa19VAHQN9OMPz2Iwzzp0AqPCnU8UGIXWQomGDOQyuFGBJfdZeMLsjBo+berP0oF5AIrH3A5IjCLMFVC8FkKgJMVNEOT9a233Q5GE++ysn5kv1pmGR6eRQH0z0NMnHCFzH0I7EW5EVnUM6hesikXVuQZzmFSqzaiaFuK60CzKBy+zwwpIKWW/J8Qj4AE3oEGJfcQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(346002)(39860400002)(136003)(230922051799003)(186009)(82310400011)(451199024)(1800799009)(64100799003)(36840700001)(40470700004)(46966006)(5660300002)(41300700001)(1076003)(16526019)(426003)(2616005)(26005)(336012)(83380400001)(6666004)(8936002)(47076005)(70206006)(316002)(8676002)(478600001)(7416002)(44832011)(7406005)(6916009)(4326008)(54906003)(70586007)(40480700001)(36756003)(86362001)(81166007)(82740400003)(2906002)(40460700003)(356005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:43:35.7201
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:48:18.3689
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 122ef2e9-87d3-4050-0962-08dbce4de54c
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5ef2022-c8c3-4c22-d16c-08dbce4e8dc4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF000252A2.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: MN1PEPF0000F0E5.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5861
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -113,101 +115,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When intercepts are enabled for MSR_IA32_XSS, the host will swap in/out
-the guest-defined values while context-switching to/from guest mode.
-However, in the case of SEV-ES, vcpu->arch.guest_state_protected is set,
-so the guest-defined value is effectively ignored when switching to
-guest mode with the understanding that the VMSA will handle swapping
-in/out this register state.
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-However, SVM is still configured to intercept these accesses for SEV-ES
-guests, so the values in the initial MSR_IA32_XSS are effectively
-read-only, and a guest will experience undefined behavior if it actually
-tries to write to this MSR. Fortunately, only CET/shadowstack makes use
-of this register on SEV-ES-capable systems currently, which isn't yet
-widely used, but this may become more of an issue in the future.
+Add CPU feature detection for Secure Encrypted Virtualization with
+Secure Nested Paging. This feature adds a strong memory integrity
+protection to help prevent malicious hypervisor-based attacks like
+data replay, memory re-mapping, and more.
 
-Additionally, enabling intercepts of MSR_IA32_XSS results in #VC
-exceptions in the guest in certain paths that can lead to unexpected #VC
-nesting levels. One example is SEV-SNP guests when handling #VC
-exceptions for CPUID instructions involving leaf 0xD, subleaf 0x1, since
-they will access MSR_IA32_XSS as part of servicing the CPUID #VC, then
-generate another #VC when accessing MSR_IA32_XSS, which can lead to
-guest crashes if an NMI occurs at that point in time. Running perf on a
-guest while it is issuing such a sequence is one example where these can
-be problematic.
-
-Address this by disabling intercepts of MSR_IA32_XSS for SEV-ES guests
-if the host/guest configuration allows it. If the host/guest
-configuration doesn't allow for MSR_IA32_XSS, leave it intercepted so
-that it can be caught by the existing checks in
-kvm_{set,get}_msr_common() if the guest still attempts to access it.
-
-Fixes: 376c6d285017 ("KVM: SVM: Provide support for SEV-ES vCPU creation/loading")
-Cc: Alexey Kardashevskiy <aik@amd.com>
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
+Signed-off-by: Ashish Kalra <Ashish.Kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 19 +++++++++++++++++++
- arch/x86/kvm/svm/svm.c |  1 +
- arch/x86/kvm/svm/svm.h |  2 +-
- 3 files changed, 21 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/cpufeatures.h       | 1 +
+ arch/x86/kernel/cpu/amd.c                | 5 +++--
+ tools/arch/x86/include/asm/cpufeatures.h | 1 +
+ 3 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 4900c078045a..6ee925d66648 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2972,6 +2972,25 @@ static void sev_es_vcpu_after_set_cpuid(struct vcpu_svm *svm)
- 
- 		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, v_tsc_aux, v_tsc_aux);
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 58cb9495e40f..1640cedd77f1 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -437,6 +437,7 @@
+ #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+ #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+ #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
++#define X86_FEATURE_SEV_SNP		(19*32+ 4) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+ #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
+ #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+ #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* AMD SEV-ES full debug state swap support */
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index dd8379d84445..14ee7f750cc7 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -630,8 +630,8 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ 	 *	      SME feature (set in scattered.c).
+ 	 *	      If the kernel has not enabled SME via any means then
+ 	 *	      don't advertise the SME feature.
+-	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
+-	 *            SEV and SEV_ES feature (set in scattered.c).
++	 *   For SEV: If BIOS has not enabled SEV then don't advertise SEV and
++	 *	      any additional functionality based on it.
+ 	 *
+ 	 *   In all cases, since support for SME and SEV requires long mode,
+ 	 *   don't advertise the feature under CONFIG_X86_32.
+@@ -666,6 +666,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ clear_sev:
+ 		setup_clear_cpu_cap(X86_FEATURE_SEV);
+ 		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
++		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
  	}
-+
-+	/*
-+	 * For SEV-ES, accesses to MSR_IA32_XSS should not be intercepted if
-+	 * the host/guest supports its use.
-+	 *
-+	 * guest_can_use() checks a number of requirements on the host/guest to
-+	 * ensure that MSR_IA32_XSS is available, but it might report true even
-+	 * if X86_FEATURE_XSAVES isn't configured in the guest to ensure host
-+	 * MSR_IA32_XSS is always properly restored. For SEV-ES, it is better
-+	 * to further check that the guest CPUID actually supports
-+	 * X86_FEATURE_XSAVES so that accesses to MSR_IA32_XSS by misbehaved
-+	 * guests will still get intercepted and caught in the normal
-+	 * kvm_emulate_rdmsr()/kvm_emulated_wrmsr() paths.
-+	 */
-+	if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
-+	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
-+		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_XSS, 1, 1);
-+	else
-+		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_XSS, 0, 0);
  }
  
- void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index aef1ddf0b705..1e7fb1ea45f7 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -103,6 +103,7 @@ static const struct svm_direct_access_msrs {
- 	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
- 	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
- 	{ .index = MSR_IA32_LASTINTTOIP,		.always = false },
-+	{ .index = MSR_IA32_XSS,			.always = false },
- 	{ .index = MSR_EFER,				.always = false },
- 	{ .index = MSR_IA32_CR_PAT,			.always = false },
- 	{ .index = MSR_AMD64_SEV_ES_GHCB,		.always = true  },
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index be67ab7fdd10..c409f934c377 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -30,7 +30,7 @@
- #define	IOPM_SIZE PAGE_SIZE * 3
- #define	MSRPM_SIZE PAGE_SIZE * 2
- 
--#define MAX_DIRECT_ACCESS_MSRS	46
-+#define MAX_DIRECT_ACCESS_MSRS	47
- #define MSRPM_OFFSETS	32
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
+diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
+index 798e60b5454b..669f45eefa0c 100644
+--- a/tools/arch/x86/include/asm/cpufeatures.h
++++ b/tools/arch/x86/include/asm/cpufeatures.h
+@@ -432,6 +432,7 @@
+ #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+ #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+ #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
++#define X86_FEATURE_SEV_SNP		(19*32+ 4) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+ #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
+ #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+ #define X86_FEATURE_DEBUG_SWAP		(19*32+14) /* AMD SEV-ES full debug state swap support */
 -- 
 2.25.1
 
