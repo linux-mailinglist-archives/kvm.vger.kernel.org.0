@@ -2,266 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E7057CB3A2
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 22:03:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AD557CB47B
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 22:17:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjJPUDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 16:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60172 "EHLO
+        id S234136AbjJPURb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 16:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232985AbjJPUDj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 16:03:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDCBA1
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 13:02:52 -0700 (PDT)
+        with ESMTP id S231508AbjJPURa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 16:17:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59BCA1
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 13:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697486571;
+        s=mimecast20190719; t=1697487400;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/cDXCAqtsqnxUo4mK2MChJM/H3xR/+sXfbuPMAFsDcQ=;
-        b=Z3+Akf+5qqdmfQR2NRt0hv2ZUaD4Ng28nbTPiCc627hojUgQ+uh9spLOfgPHgcTfQjkAEX
-        iC/Ux/CsmMA3W55sBg6jwTY0TcgOvVKE2dqEiIvbHJtINAvQ5bNXQ0RK+5Sscw/1mudR3V
-        /mj6/Q0pZ/9PGnZ8GlN2Rf9/7DvXVMo=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=hZtbQXcsubytl4k+2ppLTWsAsX5032GxW5VF2x3Wx24=;
+        b=KwOuwMGiQ74wW1PlmCN/J5h43lZPZXrk2hBtg/aEe5XNepqL3m/yhJTLZ+NCFX0E03p8DW
+        Op4YpZqW60F2Ac1s3Xt9L6VxdJkmCLVOmr249fHJVpBpM75Dk7Oo7eHYECudQBFm5Hkxte
+        YAX4ykJMtt9fu/jHyoRwkDBMxPbdB8w=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-qyFThVBQNCGJ5HccP2AqPg-1; Mon, 16 Oct 2023 16:02:28 -0400
-X-MC-Unique: qyFThVBQNCGJ5HccP2AqPg-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3ae65ecb25aso7855335b6e.2
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 13:02:28 -0700 (PDT)
+ us-mta-590-qTrGhS1uOuGtLaJPT7slIw-1; Mon, 16 Oct 2023 16:16:38 -0400
+X-MC-Unique: qTrGhS1uOuGtLaJPT7slIw-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35278d347bbso32708915ab.3
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 13:16:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697486548; x=1698091348;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/cDXCAqtsqnxUo4mK2MChJM/H3xR/+sXfbuPMAFsDcQ=;
-        b=jVSA+g9tPMEvVEcrwwPm9XquVphWPlS5Jjb1sE2zSstsQET/W9IALDVi+nC+FPUMz8
-         QDkhVWp5Oledv0/PXzOqiWdKaujqfinbjYcw+mlUxGzpgDhcXwU7YliL9bOS/SwifOr+
-         Tg8tBlOuazf4mkp0U/DOzCsasBmtxplvjRD3RqubuWEh2f2KbJDaM6WnbeaGQxfAf6xv
-         QdG9k9z4N738xe6LLjnl3yuUXmv2Pw+TO1jlREBVoKogi/IzWw5qSs8gUPjvWNVdKChU
-         dX+ddZIXq6rsGS198UAhgUSEEQJKO2Fa0Xj97MAqF1Y64cgnLGV3nfDaqRY37vC3oWe1
-         vdtQ==
-X-Gm-Message-State: AOJu0YxVJcwzvYb9Yp6+5G3M6RoCeCeLL3S3IreWMgZR5Q6DDMqDbPEm
-        jr8tSp6Vrwbqz6ypY+SdQmQ4GX4hK6quijl/Q1KHzSaViBT4oqNp5hBnoOtZHXGhskTZeXuPFfp
-        xJ6sz0m+3YwAx
-X-Received: by 2002:a05:6808:4393:b0:3a7:366f:3b01 with SMTP id dz19-20020a056808439300b003a7366f3b01mr322053oib.33.1697486547989;
-        Mon, 16 Oct 2023 13:02:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQQelPzIZ1Z4qpFoQmZhLrek36aSRj6fh76IfyACLJ3DhaFuw1XJRec4cNnk5/qDYgoOfvHw==
-X-Received: by 2002:a05:6808:4393:b0:3a7:366f:3b01 with SMTP id dz19-20020a056808439300b003a7366f3b01mr322029oib.33.1697486547704;
-        Mon, 16 Oct 2023 13:02:27 -0700 (PDT)
-Received: from [192.168.43.95] ([37.170.191.221])
-        by smtp.gmail.com with ESMTPSA id g16-20020ad45110000000b0065b12c7a48dsm3674509qvp.133.2023.10.16.13.02.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 13:02:27 -0700 (PDT)
-Message-ID: <2eb9c70b-1d7d-241b-0818-9340be896519@redhat.com>
-Date:   Mon, 16 Oct 2023 22:02:21 +0200
+        d=1e100.net; s=20230601; t=1697487397; x=1698092197;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hZtbQXcsubytl4k+2ppLTWsAsX5032GxW5VF2x3Wx24=;
+        b=rMGKEvkBG6Tyqt4XUFxeqM4mCFrQx2KM/6rN94AYoDHhSAt3QVdtMl0jD+CNSLgYAw
+         uG/tbxZsPxEWHEN2p1R3m+pofoiSX0tH7N1ekTgBcF/OSgO6KB6OaqtDgJLteIdL22Yk
+         IiMQZZHeJimvqyiMauHP5+eDuJ6poaDzeFgTNqhfLAdcSK1rFU8yUmL84iWbQOEaixx4
+         Vx4BzG2IifGv3TjBVyjWC+luOSK6NoZQ3uX7bkJkG9AmJ3IMwEzLxbiVKw90fDwngqXB
+         mHaN1qYA26mKXG8nusEBj7KDcVKAe0+epoHbI3E3eGfecapX5yUEOcNJyBXO5oOe8c5I
+         Cxhw==
+X-Gm-Message-State: AOJu0Yz1+eIyyBSoDGvAzhbSYS63XlAJGP+XlFtXoLxcCWoUBNDgTvwN
+        yP9Ra59kEbo+DN6/r+GBC4sIbRaUA4EGjWJSetWEpErHiJplU4YYm46Dt++VRjujQ952WqhummC
+        M/QTkTIKWfF5Vzsng9Dxl
+X-Received: by 2002:a05:6e02:1523:b0:357:4ce1:6eaf with SMTP id i3-20020a056e02152300b003574ce16eafmr515005ilu.21.1697487397481;
+        Mon, 16 Oct 2023 13:16:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEzt3MBhdthL2pR/HI283yeCXF3+J3TA9mYTcl6vXV558ii/a/E4Wzo+ubEtZR8DXnkIAXrAQ==
+X-Received: by 2002:a05:6e02:1523:b0:357:4ce1:6eaf with SMTP id i3-20020a056e02152300b003574ce16eafmr514991ilu.21.1697487397226;
+        Mon, 16 Oct 2023 13:16:37 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id l12-20020a92290c000000b0034fe7ae6514sm3610343ilg.75.2023.10.16.13.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 13:16:36 -0700 (PDT)
+Date:   Mon, 16 Oct 2023 14:16:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] vfio/mtty: Fix eventfd leak
+Message-ID: <20231016141635.74f8908e.alex.williamson@redhat.com>
+In-Reply-To: <04d9af1d-e459-4431-bea3-679ade88f7d5@redhat.com>
+References: <20231013195653.1222141-1-alex.williamson@redhat.com>
+        <20231013195653.1222141-2-alex.williamson@redhat.com>
+        <04d9af1d-e459-4431-bea3-679ade88f7d5@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v7 05/12] KVM: arm64: PMU: Add a helper to read a vCPU's
- PMCR_EL0
-Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20231009230858.3444834-1-rananta@google.com>
- <20231009230858.3444834-6-rananta@google.com>
-From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231009230858.3444834-6-rananta@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Raghavendra,
+On Mon, 16 Oct 2023 09:52:41 +0200
+C=C3=A9dric Le Goater <clg@redhat.com> wrote:
 
-On 10/10/23 01:08, Raghavendra Rao Ananta wrote:
-> From: Reiji Watanabe <reijiw@google.com>
-> 
-> Add a helper to read a vCPU's PMCR_EL0, and use it when KVM
-> reads a vCPU's PMCR_EL0.
-> 
-> The PMCR_EL0 value is tracked by a sysreg file per each vCPU.
-file?
-> The following patches will make (only) PMCR_EL0.N track per guest.
-> Having the new helper will be useful to combine the PMCR_EL0.N
-> field (tracked per guest) and the other fields (tracked per vCPU)
-> to provide the value of PMCR_EL0.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Besides
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> On 10/13/23 21:56, Alex Williamson wrote:
+> > Found via kmemleak, eventfd context is leaked if not explicitly torn
+> > down by userspace.  Clear pointers to track released contexts.  Also
+> > remove unused irq_fd field in mtty structure, set but never used. =20
+>=20
+> This could be 2 different patches, one cleanup and one fix.
 
-Eric
-> ---
->  arch/arm64/kvm/arm.c      |  3 +--
->  arch/arm64/kvm/pmu-emul.c | 21 +++++++++++++++------
->  arch/arm64/kvm/sys_regs.c |  6 +++---
->  include/kvm/arm_pmu.h     |  6 ++++++
->  4 files changed, 25 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 708a53b70a7b..0af4d6bbe3d3 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -854,8 +854,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		}
->  
->  		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
-> -			kvm_pmu_handle_pmcr(vcpu,
-> -					    __vcpu_sys_reg(vcpu, PMCR_EL0));
-> +			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
->  
->  		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
->  			kvm_vcpu_pmu_restore_guest(vcpu);
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index cc30c246c010..a161d6266a5c 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -72,7 +72,7 @@ static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
->  
->  static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
->  {
-> -	u64 val = __vcpu_sys_reg(kvm_pmc_to_vcpu(pmc), PMCR_EL0);
-> +	u64 val = kvm_vcpu_read_pmcr(kvm_pmc_to_vcpu(pmc));
->  
->  	return (pmc->idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
->  	       (pmc->idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
-> @@ -250,7 +250,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
->  
->  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
->  {
-> -	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> +	u64 val = kvm_vcpu_read_pmcr(vcpu) >> ARMV8_PMU_PMCR_N_SHIFT;
->  
->  	val &= ARMV8_PMU_PMCR_N_MASK;
->  	if (val == 0)
-> @@ -272,7 +272,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
->  	if (!kvm_vcpu_has_pmu(vcpu))
->  		return;
->  
-> -	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
-> +	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) || !val)
->  		return;
->  
->  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-> @@ -324,7 +324,7 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
->  {
->  	u64 reg = 0;
->  
-> -	if ((__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E)) {
-> +	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
->  		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
->  		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
->  		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-> @@ -426,7 +426,7 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
->  {
->  	int i;
->  
-> -	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
-> +	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E))
->  		return;
->  
->  	/* Weed out disabled counters */
-> @@ -569,7 +569,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->  static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
->  {
->  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> -	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
-> +	return (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) &&
->  	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx));
->  }
->  
-> @@ -1084,3 +1084,12 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
->  					      ID_AA64DFR0_EL1_PMUVer_V3P5);
->  	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
->  }
-> +
-> +/**
-> + * kvm_vcpu_read_pmcr - Read PMCR_EL0 register for the vCPU
-> + * @vcpu: The vcpu pointer
-> + */
-> +u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
-> +{
-> +	return __vcpu_sys_reg(vcpu, PMCR_EL0);
-> +}
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 08af7824e9d8..ff0f7095eaca 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -803,7 +803,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		 * Only update writeable bits of PMCR (continuing into
->  		 * kvm_pmu_handle_pmcr() as well)
->  		 */
-> -		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
-> +		val = kvm_vcpu_read_pmcr(vcpu);
->  		val &= ~ARMV8_PMU_PMCR_MASK;
->  		val |= p->regval & ARMV8_PMU_PMCR_MASK;
->  		if (!kvm_supports_32bit_el0())
-> @@ -811,7 +811,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  		kvm_pmu_handle_pmcr(vcpu, val);
->  	} else {
->  		/* PMCR.P & PMCR.C are RAZ */
-> -		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
-> +		val = kvm_vcpu_read_pmcr(vcpu)
->  		      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
->  		p->regval = val;
->  	}
-> @@ -860,7 +860,7 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
->  {
->  	u64 pmcr, val;
->  
-> -	pmcr = __vcpu_sys_reg(vcpu, PMCR_EL0);
-> +	pmcr = kvm_vcpu_read_pmcr(vcpu);
->  	val = (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
->  	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
->  		kvm_inject_undefined(vcpu);
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 858ed9ce828a..cd980d78b86b 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -103,6 +103,7 @@ void kvm_vcpu_pmu_resync_el0(void);
->  u8 kvm_arm_pmu_get_pmuver_limit(void);
->  int kvm_arm_set_default_pmu(struct kvm *kvm);
->  
-> +u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
->  #else
->  struct kvm_pmu {
->  };
-> @@ -180,6 +181,11 @@ static inline int kvm_arm_set_default_pmu(struct kvm *kvm)
->  	return -ENODEV;
->  }
->  
-> +static inline u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
-> +{
-> +	return 0;
-> +}
-> +
->  #endif
->  
->  #endif
+Of course.
+
+> > Fixes: 9d1a546c53b4 ("docs: Sample driver to demonstrate how to use Med=
+iated device framework.")
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >   samples/vfio-mdev/mtty.c | 28 +++++++++++++++++++++++-----
+> >   1 file changed, 23 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> > index 5af00387c519..0a2760818e46 100644
+> > --- a/samples/vfio-mdev/mtty.c
+> > +++ b/samples/vfio-mdev/mtty.c
+> > @@ -127,7 +127,6 @@ struct serial_port {
+> >   /* State of each mdev device */
+> >   struct mdev_state {
+> >   	struct vfio_device vdev;
+> > -	int irq_fd;
+> >   	struct eventfd_ctx *intx_evtfd;
+> >   	struct eventfd_ctx *msi_evtfd;
+> >   	int irq_index;
+> > @@ -938,8 +937,10 @@ static int mtty_set_irqs(struct mdev_state *mdev_s=
+tate, uint32_t flags,
+> >   		{
+> >   			if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> >   				pr_info("%s: disable INTx\n", __func__);
+> > -				if (mdev_state->intx_evtfd)
+> > +				if (mdev_state->intx_evtfd) {
+> >   					eventfd_ctx_put(mdev_state->intx_evtfd);
+> > +					mdev_state->intx_evtfd =3D NULL;
+> > +				}
+> >   				break;
+> >   			}
+> >  =20
+> > @@ -955,7 +956,6 @@ static int mtty_set_irqs(struct mdev_state *mdev_st=
+ate, uint32_t flags,
+> >   						break;
+> >   					} =20
+>=20
+> Shouln't mdev_state->intx_evtfd value be tested before calling
+> eventfd_ctx() ?
+
+The state of mtty interrupt handling is really quite atrocious, it's a
+pretty significant overhaul to really make it comply with the SET_IRQS
+ioctl.  I'll see what I can do, but it's so broken that I hope you
+won't insist on splitting out each fix.  Thanks,
+
+Alex
+
+> >   					mdev_state->intx_evtfd =3D evt;
+> > -					mdev_state->irq_fd =3D fd;
+> >   					mdev_state->irq_index =3D index;
+> >   					break;
+> >   				}
+> > @@ -971,8 +971,10 @@ static int mtty_set_irqs(struct mdev_state *mdev_s=
+tate, uint32_t flags,
+> >   			break;
+> >   		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> >   			if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> > -				if (mdev_state->msi_evtfd)
+> > +				if (mdev_state->msi_evtfd) {
+> >   					eventfd_ctx_put(mdev_state->msi_evtfd);
+> > +					mdev_state->msi_evtfd =3D NULL;
+> > +				}
+> >   				pr_info("%s: disable MSI\n", __func__);
+> >   				mdev_state->irq_index =3D VFIO_PCI_INTX_IRQ_INDEX;
+> >   				break;
+> > @@ -993,7 +995,6 @@ static int mtty_set_irqs(struct mdev_state *mdev_st=
+ate, uint32_t flags,
+> >   					break;
+> >   				}
+> >   				mdev_state->msi_evtfd =3D evt;
+> > -				mdev_state->irq_fd =3D fd;
+> >   				mdev_state->irq_index =3D index;
+> >   			}
+> >   			break;
+> > @@ -1262,6 +1263,22 @@ static unsigned int mtty_get_available(struct md=
+ev_type *mtype)
+> >   	return atomic_read(&mdev_avail_ports) / type->nr_ports;
+> >   }
+> >  =20
+> > +static void mtty_close(struct vfio_device *vdev)
+> > +{
+> > +	struct mdev_state *mdev_state =3D
+> > +		container_of(vdev, struct mdev_state, vdev);
+> > +
+> > +	if (mdev_state->intx_evtfd) {
+> > +		eventfd_ctx_put(mdev_state->intx_evtfd);
+> > +		mdev_state->intx_evtfd =3D NULL;
+> > +	}
+> > +	if (mdev_state->msi_evtfd) {
+> > +		eventfd_ctx_put(mdev_state->msi_evtfd);
+> > +		mdev_state->msi_evtfd =3D NULL;
+> > +	}
+> > +	mdev_state->irq_index =3D -1;
+> > +}
+> > +
+> >   static const struct vfio_device_ops mtty_dev_ops =3D {
+> >   	.name =3D "vfio-mtty",
+> >   	.init =3D mtty_init_dev,
+> > @@ -1273,6 +1290,7 @@ static const struct vfio_device_ops mtty_dev_ops =
+=3D {
+> >   	.unbind_iommufd	=3D vfio_iommufd_emulated_unbind,
+> >   	.attach_ioas	=3D vfio_iommufd_emulated_attach_ioas,
+> >   	.detach_ioas	=3D vfio_iommufd_emulated_detach_ioas,
+> > +	.close_device	=3D mtty_close,
+> >   };
+> >  =20
+> >   static struct mdev_driver mtty_driver =3D { =20
+>=20
 
