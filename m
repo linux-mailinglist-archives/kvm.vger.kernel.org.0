@@ -2,192 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 634657CA72B
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 13:54:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC8777CA70B
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 13:53:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232839AbjJPLyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 07:54:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        id S232778AbjJPLxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 07:53:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232225AbjJPLyg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 07:54:36 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBAA4134;
-        Mon, 16 Oct 2023 04:54:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FP9Chzl/yRdI9zuUQJ//a4dB0zYcOGRvvERAf2wcUuBLp8ZVsro7+hL5ZXsKcKcjFUf4aaLl7IM6zyby9XcotMysMz+R64n20rP6s//O2IG1B8inSR5T4VaEInP0TIVlfDN1WS1IN5Uxw3KF/YAUWqyRZ985T6gRFKhR2BkAGrgpv60OJMkzgca8Cv6ctFf2xP+/TWWKzXPBk/EeYGmr5cdavTW95LofTilcccbMPKN0FpaiKuu3a6mGvSM/4K1Jd6N2rBqJiXHFc+3LALtxc5HiyejVIOe1Rj8PK9ghxK8B9iBEDNB2XaItvP3ldANPDgyQdGObC1oVW+uiga3XjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wOIYpK8d1FFoOQs5uPVJt/jFrFTrz07zgHXT4XBNINI=;
- b=XkLV4zfwUBF7UEh64mUHR/QMUeX4GQnXLoq8EVR7+ouYDdOOjz52gk7EoL8YV/iWO3xmu24jHQUTAP0AUkxq4BpP2MXs4keme+L771y/fqWeKaeA9HEfXZp2N492rNVXuYRVvxCpQLLKzjJ8S1TEV36E31KIQP/14B3AGr1sZ/maRbgVIXTci1KOmrmzHMvVftBInKrg6uBkRqo1khvaYf0GjvIaBg/RuJAKPNBmXtoxYVzah5haicJ3EbYzGRiCbIHOUSpURg+V8UEAzq0EraMXwXZ/E+KKGgfMbiWdd3Hiz9hBz/3RP1c1u5bjAFP6KsQtf+M6qzRUmnaqphMoQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wOIYpK8d1FFoOQs5uPVJt/jFrFTrz07zgHXT4XBNINI=;
- b=r5PwcGX1EVKZpGIyXCHQMWiXYzser3qVm12min/RKOZD9FkcVKUi+25gZYidt5AnEShsD0m//7pzOnc0BrFrHK6UgeryV4P/hyKwOlcTu8ELXy/Woi9jufMRzIPC9pK0bQRlhtRx3IrHMX11yZyhI53wPaltCYSHtd+mueYcX+k=
-Received: from SN6PR16CA0071.namprd16.prod.outlook.com (2603:10b6:805:ca::48)
- by MN0PR12MB6080.namprd12.prod.outlook.com (2603:10b6:208:3c8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Mon, 16 Oct
- 2023 11:54:30 +0000
-Received: from SA2PEPF000015CC.namprd03.prod.outlook.com
- (2603:10b6:805:ca:cafe::f5) by SN6PR16CA0071.outlook.office365.com
- (2603:10b6:805:ca::48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35 via Frontend
- Transport; Mon, 16 Oct 2023 11:54:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF000015CC.mail.protection.outlook.com (10.167.241.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 11:54:29 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 06:54:29 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>,
-        <isaku.yamahata@intel.com>, <ackerleytng@google.com>,
-        <vbabka@suse.cz>, <ashish.kalra@amd.com>,
-        <nikunj.dadhania@amd.com>, <jroedel@suse.de>,
-        <pankaj.gupta@amd.com>
-Subject: [PATCH RFC gmem v1 8/8] KVM: x86: Determine shared/private faults based on vm_type
-Date:   Mon, 16 Oct 2023 06:50:28 -0500
-Message-ID: <20231016115028.996656-9-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231016115028.996656-1-michael.roth@amd.com>
-References: <20231016115028.996656-1-michael.roth@amd.com>
+        with ESMTP id S232905AbjJPLxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 07:53:04 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329B611D
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 04:52:56 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-323ef9a8b59so4286351f8f.3
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 04:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697457174; x=1698061974; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=StB8x9/9WBld/29xu+feCm7+MvUFzBzwwOhrr6h8fxQ=;
+        b=TvvgpxrAODNkfqvRgxksFPsdhRsTeX5RzPV3FTQq2Bpht5X9EiTaZUT6RjeSTV5OpF
+         bpNEBL5EIVgWDr00NfcO8yE8S3pjAPS8g7XLcusz6Yjf3Snph90Lp1g5Q4sCvPUYjSjY
+         1U+GKcq2xBtv1XnUtQY31h3/w5B5Z5eylBrA8jLlXV9iPYk03ZqzpZjXnCoutYRXZFYD
+         SYaPASplcuhiFjJMC7nIFOOc/XR9j6Lyjtd3YpvX7W8CstFeIR7mzz5JwWD81KVqbgx6
+         a6oe69fREBNF5np22unxVK4ppQTZCWpEcc7ZhFttnTa6KKdy2JxGFB4vspm7Od/EMyqb
+         XCjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697457174; x=1698061974;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=StB8x9/9WBld/29xu+feCm7+MvUFzBzwwOhrr6h8fxQ=;
+        b=vJlPcYTV/wUvUGoxajeA0t/GHz0WRZGbdemR3Harza7NniJ1JvRo5E5b9I3LHwO6K0
+         TXRbiCtXTB4kLGmueuf24h4Cv8WEPpryER8DpZogrIJBmsA3ZeIBeI092A6pxQcUdAQp
+         Fp23t6plhZoWcjLjJl6sH0Bb94HsysyREDHsSP8SdqfBFN/tim7IykDHh7OzNRMXDoF3
+         o+2uVhx/sEslXuZzwC8NWaLT/cCZOqZPIMJX3XbvDCM5jQhzI611nQX1Xpmj9NWP+lhD
+         5YUHtQEdUcNFoSUjDdf2Dgnbv5NFPwVsjA0c/Btb9DVZirASfkw9As56FvCEEF94bmTA
+         ja5w==
+X-Gm-Message-State: AOJu0Yw3FXneWxzJdsjZFyCf09KAQsJeZsZSHOdSlLFPYfp8Rm8r4bAv
+        TcnRrDWr1pHlD7e6Q0BpkEEHCQ==
+X-Google-Smtp-Source: AGHT+IH94EQlZAAethDVX1SA9H6VGn1Ni33angysLvWJSd5hHNiusnayWV7uHHKJsg+CpuOmNRdTdQ==
+X-Received: by 2002:a5d:44cd:0:b0:32d:885f:3f8d with SMTP id z13-20020a5d44cd000000b0032d885f3f8dmr10854951wrr.52.1697457174113;
+        Mon, 16 Oct 2023 04:52:54 -0700 (PDT)
+Received: from myrica ([2a02:c7c:7290:b00:fd32:2b31:6755:400c])
+        by smtp.gmail.com with ESMTPSA id w18-20020a5d5452000000b00323330edbc7sm1244158wrv.20.2023.10.16.04.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 04:52:53 -0700 (PDT)
+Date:   Mon, 16 Oct 2023 12:52:59 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Eduardo Bart <edub4rt@gmail.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org
+Subject: Re: [PATCH kvmtool] virtio: Cancel and join threads when exiting
+ devices
+Message-ID: <20231016115259.GA835650@myrica>
+References: <CABqCASLWAZ5aq27GuQftWsXSf7yLFCKwrJxWMUF-fiV7Bc4LUA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CC:EE_|MN0PR12MB6080:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbbb7028-0f7f-4744-3ab0-08dbce3ea789
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2iUKxxYLuJaF5gNLwGPK/WMGRJpQo0FX/u6b+T+jXyhqU5vvsoQcKipvx8Jux41n2ZQN1fkOZ9ipdKraOTh+29UsoePk/mPlzeJxg6Do0UY11pOghNnVyBQhl/T/W8HFS5zhkjxwLYuUZdhVEUkos8i44+YWnzihvm0pkakrZeF7iclZS5N/Xwydw2rEUvlY7h4F5XzNArRTQeTBcRifFl7SiG4jm6GI3kxrIbjUrVde9ZrTx3UPU8Sgj2PeJQcIOpIsyfFI5sZ4JPHEMZbPNGIR+Zsn0aDtImqK2IGxiHi3TUdp92MR2z9Kiu8rAX0CS7kwBhhSHgwY2mmisLHnfhu5EYyvueHhA2Nt0Hde2oWw0AOPIgdClA2eNe7jzi3EaSsfhcIGu1I/h9gMMZ6zVozMMVbI/iT/b3C0vXne8wzp2+eqfTQktFRSnIfKaNaBNDyh1AKpxqNCu6N+PEakWyrM7B9KY0KX3ybMYJZ7HzVc/kslhppH1+ebeHbw254UUuV2efO9TaVJpof2c5IEB+36bdmsgDhrrdFYNEStjy/BHn80jWpzu0eVu5Gm/oabJ9XvKA92ws74E4Y8nF6tJd70EhlLY33PELgxWQKSWhWHPBcD0B69zNIre2hRpc9J72O8xysUwkB/FbpHKk9GxWoxbsa6dzSP4mk+uwrnLdBNLE6NWQim0cBqp8MMFF3j3nbLnHT43vSOBqLZ9IjQv8UBdAqMospUta/Ui6llkZnmZ2m/YcS1nW/xpSJwOWk+Ao7JtVX8A9S9LvnNkTbRkg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(186009)(1800799009)(82310400011)(451199024)(64100799003)(46966006)(36840700001)(40470700004)(478600001)(70586007)(70206006)(54906003)(6916009)(1076003)(26005)(16526019)(336012)(426003)(2616005)(316002)(4326008)(8936002)(8676002)(7416002)(2906002)(5660300002)(36756003)(44832011)(41300700001)(81166007)(86362001)(47076005)(36860700001)(83380400001)(356005)(82740400003)(66899024)(40460700003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 11:54:29.6514
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbbb7028-0f7f-4744-3ab0-08dbce3ea789
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF000015CC.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6080
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABqCASLWAZ5aq27GuQftWsXSf7yLFCKwrJxWMUF-fiV7Bc4LUA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For KVM_X86_SNP_VM, only the PFERR_GUEST_ENC_MASK flag is needed to
-determine with an #NPF is due to a private/shared access by the guest.
-Implement that handling here. Also add handling needed to deal with
-SNP guests which in some cases will make MMIO accesses with the
-encryption bit.
+Hi Eduardo,
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/kvm/mmu/mmu.c          | 12 ++++++++++--
- arch/x86/kvm/mmu/mmu_internal.h | 20 +++++++++++++++++++-
- 2 files changed, 29 insertions(+), 3 deletions(-)
+(Cc Will who maintains kvmtool)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 686f88c263a9..10c323e2faa4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4327,6 +4327,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
- static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
- 	struct kvm_memory_slot *slot = fault->slot;
-+	bool private_fault = fault->is_private;
- 	bool async;
- 
- 	/*
-@@ -4356,12 +4357,19 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 			return RET_PF_EMULATE;
- 	}
- 
--	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-+	/*
-+	 * In some cases SNP guests will make MMIO accesses with the encryption
-+	 * bit set. Handle these via the normal MMIO fault path.
-+	 */
-+	if (!slot && private_fault && kvm_is_vm_type(vcpu->kvm, KVM_X86_SNP_VM))
-+		private_fault = false;
-+
-+	if (private_fault != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
- 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
- 
--	if (fault->is_private)
-+	if (private_fault)
- 		return kvm_faultin_pfn_private(vcpu, fault);
- 
- 	async = false;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 759c8b718201..e5b973051ad9 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -251,6 +251,24 @@ struct kvm_page_fault {
- 
- int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
- 
-+static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
-+{
-+	bool private_fault = false;
-+
-+	if (kvm_is_vm_type(kvm, KVM_X86_SNP_VM)) {
-+		private_fault = !!(err & PFERR_GUEST_ENC_MASK);
-+	} else if (kvm_is_vm_type(kvm, KVM_X86_SW_PROTECTED_VM)) {
-+		/*
-+		 * This handling is for gmem self-tests and guests that treat
-+		 * userspace as the authority on whether a fault should be
-+		 * private or not.
-+		 */
-+		private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
-+	}
-+
-+	return private_fault;
-+}
-+
- /*
-  * Return values of handle_mmio_page_fault(), mmu.page_fault(), fast_page_fault(),
-  * and of course kvm_mmu_do_page_fault().
-@@ -298,7 +316,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
- 		.req_level = PG_LEVEL_4K,
- 		.goal_level = PG_LEVEL_4K,
--		.is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
-+		.is_private = kvm_mmu_fault_is_private(vcpu->kvm, cr2_or_gpa, err),
- 	};
- 	int r;
- 
--- 
-2.25.1
+On Wed, Oct 04, 2023 at 05:49:45PM -0300, Eduardo Bart wrote:
+> I'm experiencing a segmentation fault in lkvm where it may crash after
+> powering off a guest machine that uses a virtio network device.
+> The crash is hard to reproduce, because looks like it only happens
+> when the guest machine is powering off while extra virtio threads is
+> doing some work,
+> when it happens lkvm crashes in the function virtio_net_rx_thread
+> while attempting to read invalid guest physical memory,
+> because guest physical memory was unmapped.
+> 
+> I've isolated the problem and looks like when lkvm exits it unmaps the
+> guest memory while virtio device extra threads may still be executing.
+> I noticed most virtio devices are not executing pthread_cancel +
+> pthread_join to synchronize extra threads when exiting,
+> to make sure this happens I added explicit calls to the virtio device
+> exit function to all virtio devices,
+> which should cancel and join all threads before unmapping guest
+> physical memory, fixing the crash for me.
+> 
+> Below I'm attaching a patch to fix the issue, feel free to apply or
+> fix the issue some other way.
+> 
+> Signed-off-by: Eduardo Bart <edub4rt@gmail.com>
 
+The patch doesn't apply for some reason, there seems to be whitespace
+issues, tabs replaced by spaces.
+
+Looks correct otherwise. vCPUs are stopped first, then virtio exit, and
+memory is unmapped last. This also fixes runtime virtqueue reset for
+virtio-balloon.
+
+> 
+> ---
+>  include/kvm/virtio-9p.h |  1 +
+>  virtio/9p.c             | 14 ++++++++++++++
+>  virtio/balloon.c        | 11 +++++++++++
+>  virtio/blk.c            |  1 +
+>  virtio/console.c        |  3 +++
+>  virtio/net.c            |  4 ++++
+>  virtio/rng.c            |  8 ++++++++
+>  7 files changed, 42 insertions(+)
+> 
+> diff --git a/include/kvm/virtio-9p.h b/include/kvm/virtio-9p.h
+> index 1dffc95..09f7e46 100644
+> --- a/include/kvm/virtio-9p.h
+> +++ b/include/kvm/virtio-9p.h
+> @@ -70,6 +70,7 @@ int virtio_9p_rootdir_parser(const struct option
+> *opt, const char *arg, int unse
+>  int virtio_9p_img_name_parser(const struct option *opt, const char
+> *arg, int unset);
+>  int virtio_9p__register(struct kvm *kvm, const char *root, const char
+> *tag_name);
+>  int virtio_9p__init(struct kvm *kvm);
+> +int virtio_9p__exit(struct kvm *kvm);
+>  int virtio_p9_pdu_readf(struct p9_pdu *pdu, const char *fmt, ...);
+>  int virtio_p9_pdu_writef(struct p9_pdu *pdu, const char *fmt, ...);
+> 
+> diff --git a/virtio/9p.c b/virtio/9p.c
+> index 513164e..f536d9e 100644
+> --- a/virtio/9p.c
+> +++ b/virtio/9p.c
+> @@ -1562,6 +1562,20 @@ int virtio_9p__init(struct kvm *kvm)
+>  }
+>  virtio_dev_init(virtio_9p__init);
+> 
+> +int virtio_9p__exit(struct kvm *kvm)
+> +{
+> + struct p9_dev *p9dev, *tmp;
+> +
+> + list_for_each_entry_safe(p9dev, tmp, &devs, list) {
+> + list_del(&p9dev->list);
+> + p9dev->vdev.ops->exit(kvm, &p9dev->vdev);
+
+Introducing a virtio_exit(kvm, vdev) helper would look neater. It could
+also check if vdev.ops is set
+
+> + free(p9dev);
+> + }
+> +
+> + return 0;
+> +}
+> +virtio_dev_exit(virtio_9p__exit);
+> +
+>  int virtio_9p__register(struct kvm *kvm, const char *root, const char
+> *tag_name)
+>  {
+>   struct p9_dev *p9dev;
+> diff --git a/virtio/balloon.c b/virtio/balloon.c
+> index 01d1982..a36e50e 100644
+> --- a/virtio/balloon.c
+> +++ b/virtio/balloon.c
+> @@ -221,6 +221,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+>   return 0;
+>  }
+> 
+> +static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
+> +{
+> + struct bln_dev *bdev = dev;
+> +
+> + thread_pool__cancel_job(&bdev->jobs[vq]);
+> +}
+> +
+>  static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+>  {
+>   struct bln_dev *bdev = dev;
+> @@ -258,6 +265,7 @@ struct virtio_ops bln_dev_virtio_ops = {
+>   .get_config_size = get_config_size,
+>   .get_host_features = get_host_features,
+>   .init_vq = init_vq,
+> + .exit_vq = exit_vq,
+>   .notify_vq = notify_vq,
+>   .get_vq = get_vq,
+>   .get_size_vq = get_size_vq,
+> @@ -293,6 +301,9 @@ virtio_dev_init(virtio_bln__init);
+> 
+>  int virtio_bln__exit(struct kvm *kvm)
+>  {
+> + if (bdev.vdev.ops)
+> + bdev.vdev.ops->exit(kvm, &bdev.vdev);
+> +
+>   return 0;
+>  }
+>  virtio_dev_exit(virtio_bln__exit);
+> diff --git a/virtio/blk.c b/virtio/blk.c
+> index a58c745..e34723a 100644
+> --- a/virtio/blk.c
+> +++ b/virtio/blk.c
+> @@ -345,6 +345,7 @@ static int virtio_blk__init_one(struct kvm *kvm,
+> struct disk_image *disk)
+>  static int virtio_blk__exit_one(struct kvm *kvm, struct blk_dev *bdev)
+>  {
+>   list_del(&bdev->list);
+> + bdev->vdev.ops->exit(kvm, &bdev->vdev);
+>   free(bdev);
+> 
+>   return 0;
+> diff --git a/virtio/console.c b/virtio/console.c
+> index ebfbaf0..5a71bbc 100644
+> --- a/virtio/console.c
+> +++ b/virtio/console.c
+> @@ -243,6 +243,9 @@ virtio_dev_init(virtio_console__init);
+> 
+>  int virtio_console__exit(struct kvm *kvm)
+>  {
+> + if (cdev.vdev.ops)
+> + cdev.vdev.ops->exit(kvm, &cdev.vdev);
+> +
+>   return 0;
+>  }
+>  virtio_dev_exit(virtio_console__exit);
+> diff --git a/virtio/net.c b/virtio/net.c
+> index f09dd0a..dc6d89d 100644
+> --- a/virtio/net.c
+> +++ b/virtio/net.c
+> @@ -969,10 +969,14 @@ int virtio_net__exit(struct kvm *kvm)
+>   if (ndev->mode == NET_MODE_TAP &&
+>       strcmp(params->downscript, "none"))
+>   virtio_net_exec_script(params->downscript, ndev->tap_name);
+> + if (ndev->mode != NET_MODE_TAP)
+> + uip_exit(&ndev->info);
+
+virtio_net_stop() might be nicer here
+
+Thanks,
+Jean
+
+> 
+>   list_del(&ndev->list);
+> + ndev->vdev.ops->exit(kvm, &ndev->vdev);
+>   free(ndev);
+>   }
+> +
+>   return 0;
+>  }
+>  virtio_dev_exit(virtio_net__exit);
+> diff --git a/virtio/rng.c b/virtio/rng.c
+> index 6b36655..ebdb455 100644
+> --- a/virtio/rng.c
+> +++ b/virtio/rng.c
+> @@ -122,6 +122,13 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq)
+>   return 0;
+>  }
+> 
+> +static void exit_vq(struct kvm *kvm, void *dev, u32 vq)
+> +{
+> + struct rng_dev *rdev = dev;
+> +
+> + thread_pool__cancel_job(&rdev->jobs[vq].job_id);
+> +}
+> +
+>  static int notify_vq(struct kvm *kvm, void *dev, u32 vq)
+>  {
+>   struct rng_dev *rdev = dev;
+> @@ -159,6 +166,7 @@ static struct virtio_ops rng_dev_virtio_ops = {
+>   .get_config_size = get_config_size,
+>   .get_host_features = get_host_features,
+>   .init_vq = init_vq,
+> + .exit_vq = exit_vq,
+>   .notify_vq = notify_vq,
+>   .get_vq = get_vq,
+>   .get_size_vq = get_size_vq,
+> -- 
+> 2.42.0
