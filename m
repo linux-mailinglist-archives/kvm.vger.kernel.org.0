@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 896CA7CAF74
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:33:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D59467CAFE1
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:39:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232575AbjJPQdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41330 "EHLO
+        id S234300AbjJPQjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234238AbjJPQc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:32:59 -0400
+        with ESMTP id S233737AbjJPQh7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:37:59 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC076FA9;
-        Mon, 16 Oct 2023 09:22:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00236FB8;
+        Mon, 16 Oct 2023 09:22:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473349; x=1729009349;
+  t=1697473355; x=1729009355;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+/vtrN2qIqpj8iGnK5I8dTPlQxj06iJOkKyNTPVE38I=;
-  b=NrS91KvE+XrSCvu/2qwf3cSwNZ2RATKGFoC4wt626ADbx9/qwFJLvutL
-   8Ji25iAaog2v3wQ45MhgS5xhHj1EO5gf+rir32pv6dkr2uXQZPNTG9e2v
-   /Sefuv9Sg3Hksass8oyrqGLVYk1+Wee1YmOOvp6eSN52eHj2OirjApJGl
-   fXcNjitEtZsWXUVMq7ipRZE3Tm6eLTM0jcDiuS0OczCSP2Tv4fmY+7Uo6
-   4ZZYu3QdLidZUsvjaJgByRusf/Zausw4spNbEJXUJqJdCTwEF5O/WZriu
-   z5uyAHnVM91FxLpyoSYlPAU/clIU9IIGE3d9ZS1aXOBwXjjYBXWUXa3KK
+  bh=2snvj39E4RUSDydFJqJQfs08KpJHZVOl5jak2xY1TOs=;
+  b=MIomptm4+4k2hdvAlDGhKzZs9p43nani7WtY/a/ba+kxEoLhgsb0bpwN
+   asmVrawaH2FAMBc/fReU6UjBiACVXA+FAxBUQo8jWjmm3JtfE9nTJt/dT
+   6nL44CG1W5H1zKDtDUH6AG95Ar4xy5EbXDDbS+zxvSbMld5/+5kzwjeR/
+   Jd2vd33UFGjp9AfJQ4Reif50j46/CjQEjLVPrDh3YioVWcg/xnDYQRVB5
+   zNbLcYvSU8elIIPrMNuW5SUp+3NqiaQDnn+znljOY9U38U6SZJ4vG/ZxY
+   nKxmLRIU/0zBJz12Q+biX4tG6WyVULE0YGpd+sGxKglbCowtDzAGFvUC+
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922123"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922127"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364922123"
+   d="scan'208";a="364922127"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:10 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1003006466"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1003006469"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1003006466"
+   d="scan'208";a="1003006469"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:09 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:10 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 104/116] KVM: TDX: Add a method to ignore dirty logging
-Date:   Mon, 16 Oct 2023 09:14:56 -0700
-Message-Id: <52f1c63c3891afb42ebe1641e72b1e5057ce24fa.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 105/116] KVM: TDX: Add methods to ignore VMX preemption timer
+Date:   Mon, 16 Oct 2023 09:14:57 -0700
+Message-Id: <6cbbe56a22774bd24bf25673e350f1f036b1f757.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,43 +68,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Currently TDX KVM doesn't support tracking dirty pages (yet).  Implement a
-method to ignore it.  Because the flag for kvm memory slot to enable dirty
-logging isn't accepted for TDX, warn on the method is called for TDX.
+TDX doesn't support VMX preemption timer.  Implement access methods for VMM
+to ignore VMX preemption timer.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/main.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 5e4091dbf1e8..06eb0896a87a 100644
+index 06eb0896a87a..eb02a73f3bb0 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -843,6 +843,14 @@ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
+@@ -851,6 +851,27 @@ static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ 	vmx_update_cpu_dirty_logging(vcpu);
  }
  
-+static void vt_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
++#ifdef CONFIG_X86_64
++static int vt_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
++			      bool *expired)
 +{
++	/* VMX-preemption timer isn't available for TDX. */
++	if (is_td_vcpu(vcpu))
++		return -EINVAL;
++
++	return vmx_set_hv_timer(vcpu, guest_deadline_tsc, expired);
++}
++
++static void vt_cancel_hv_timer(struct kvm_vcpu *vcpu)
++{
++	/* VMX-preemption timer can't be set.  See vt_set_hv_timer(). */
 +	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
 +		return;
 +
-+	vmx_update_cpu_dirty_logging(vcpu);
++	vmx_cancel_hv_timer(vcpu);
 +}
++#endif
 +
  static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
  	if (!is_td(kvm))
-@@ -986,7 +994,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.sched_in = vt_sched_in,
+@@ -1002,8 +1023,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.pi_start_assignment = vmx_pi_start_assignment,
  
- 	.cpu_dirty_log_size = PML_ENTITY_NUM,
--	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
-+	.update_cpu_dirty_logging = vt_update_cpu_dirty_logging,
+ #ifdef CONFIG_X86_64
+-	.set_hv_timer = vmx_set_hv_timer,
+-	.cancel_hv_timer = vmx_cancel_hv_timer,
++	.set_hv_timer = vt_set_hv_timer,
++	.cancel_hv_timer = vt_cancel_hv_timer,
+ #endif
  
- 	.nested_ops = &vmx_nested_ops,
- 
+ 	.setup_mce = vmx_setup_mce,
 -- 
 2.25.1
 
