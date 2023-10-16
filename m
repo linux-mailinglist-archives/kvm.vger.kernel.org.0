@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F34597CAD3B
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B75E67CAD36
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:19:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233880AbjJPPTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 11:19:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48020 "EHLO
+        id S233772AbjJPPTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 11:19:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233853AbjJPPTq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 11:19:46 -0400
+        with ESMTP id S233725AbjJPPTl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 11:19:41 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DE283
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:19:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790CDF5
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=f7F9SDM1bUdOvNZpQs4iJJJk6zsJmxlOCqdnVelp0m8=; b=JI9Cp5t4Jep1lUjFFL+2rPgVxX
-        C+t5NGWYH8UJ/aniIMYUBrCu0fIU9iTJ+vTpef8EEAB7SClGjGZM/EHHHHvzHfaviA3kVmuw1wCTJ
-        N7L+3vVvqu10dZZELOd1F/uW8Zt80B+gQ/ZJhmZDGhB0DYFzJigrRm1rtICjhe0g+3KEYcdPGyHO9
-        wYtpxo1U140xHjDKeY1hLWRucnyzVL4t3HlKbqhCq7zFNEb1R7eKbY7k1Xudw5PNi5r3ohP/2s063
-        dGaCe88IwhB57Kh2/CRrEW4ABoisGKH9B0hgP5tyFACRikVrXcHTs55vFS4Nh/i/uiTWMq4zN+miS
-        eO7T8Hpg==;
+        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
+        To:From:Reply-To:Content-ID:Content-Description;
+        bh=j10esoq0FJNH76opTx2Ikt3KjCQW6JceQg/cwlpclKs=; b=ZduFMOvoJdtQDogmTwvZyLrQi7
+        L5xONBMXumaxapRtcqiXoK0WZgkbhT065bsjcEyhBGwuMIgptpB+Id+ZQY8bIRlZe9ln/4+PdOeGo
+        sRrlHgzM1xlelgVAmfltZTG1qwyquW2mixVDt8Q3NPEIRXTs5OScTehD4TDup9ceZaeNOVgVKaO/k
+        xfvAmlGJ9gM3gJfpvmnFvi6WybtURPVTOKJDAxxygl85ZTIUgL96GiUP0wtXt84zGw/tALtO/CLco
+        kb3nRQ4/tOtXtXPZJUqhKO2Di+M1vNQXeU8zftYCP05E4/AU8kkLeYHDAoGoofY0asYS/bSwngSOY
+        0rPBEqUA==;
 Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qsPNC-006lqa-6s; Mon, 16 Oct 2023 15:19:14 +0000
+        id 1qsPNC-006lqb-6o; Mon, 16 Oct 2023 15:19:14 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qsPNB-0005nO-2c;
+        id 1qsPNB-0005nS-2q;
         Mon, 16 Oct 2023 16:19:13 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
@@ -45,13 +45,14 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
         Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
         xen-devel@lists.xenproject.org, kvm@vger.kernel.org
-Subject: [PATCH 05/12] hw/xen: populate store frontend nodes with XenStore PFN/port
-Date:   Mon, 16 Oct 2023 16:19:02 +0100
-Message-Id: <20231016151909.22133-6-dwmw2@infradead.org>
+Subject: [PATCH 06/12] hw/xen: add get_frontend_path() method to XenDeviceClass
+Date:   Mon, 16 Oct 2023 16:19:03 +0100
+Message-Id: <20231016151909.22133-7-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231016151909.22133-1-dwmw2@infradead.org>
 References: <20231016151909.22133-1-dwmw2@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -66,44 +67,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-This is kind of redundant since without being able to get these through
-ome other method (HVMOP_get_param) the guest wouldn't be able to access
-XenStore in order to find them. But Xen populates them, and it does
-allow guests to *rebind* to the event channel port after a reset.
+The primary Xen console is special. The guest's side is set up for it by
+the toolstack automatically and not by the standard PV init sequence.
+
+Accordingly, its *frontend* doesn't appear in …/device/console/0 either;
+instead it appears under …/console in the guest's XenStore node.
+
+To allow the Xen console driver to override the frontend path for the
+primary console, add a method to the XenDeviceClass which can be used
+instead of the standard xen_device_get_frontend_path()
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- hw/i386/kvm/xen_xenstore.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ hw/xen/xen-bus.c         | 10 +++++++++-
+ include/hw/xen/xen-bus.h |  2 ++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/kvm/xen_xenstore.c b/hw/i386/kvm/xen_xenstore.c
-index d2b311109b..3300e0614a 100644
---- a/hw/i386/kvm/xen_xenstore.c
-+++ b/hw/i386/kvm/xen_xenstore.c
-@@ -1432,6 +1432,7 @@ static void alloc_guest_port(XenXenstoreState *s)
- int xen_xenstore_reset(void)
+diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
+index ece8ec40cd..cc524ed92c 100644
+--- a/hw/xen/xen-bus.c
++++ b/hw/xen/xen-bus.c
+@@ -711,8 +711,16 @@ static void xen_device_frontend_create(XenDevice *xendev, Error **errp)
  {
-     XenXenstoreState *s = xen_xenstore_singleton;
-+    GList *perms;
-     int err;
+     ERRP_GUARD();
+     XenBus *xenbus = XEN_BUS(qdev_get_parent_bus(DEVICE(xendev)));
++    XenDeviceClass *xendev_class = XEN_DEVICE_GET_CLASS(xendev);
  
-     if (!s) {
-@@ -1459,6 +1460,15 @@ int xen_xenstore_reset(void)
-     }
-     s->be_port = err;
+-    xendev->frontend_path = xen_device_get_frontend_path(xendev);
++    if (xendev_class->get_frontend_path) {
++        xendev->frontend_path = xendev_class->get_frontend_path(xendev, errp);
++        if (!xendev->frontend_path) {
++            return;
++        }
++    } else {
++        xendev->frontend_path = xen_device_get_frontend_path(xendev);
++    }
  
-+    /* Create frontend store nodes */
-+    perms = g_list_append(NULL, xs_perm_as_string(XS_PERM_NONE, DOMID_QEMU));
-+    perms = g_list_append(perms, xs_perm_as_string(XS_PERM_READ, xen_domid));
-+
-+    relpath_printf(s, perms, "store/ring-ref", "%lu", XEN_SPECIAL_PFN(XENSTORE));
-+    relpath_printf(s, perms, "store/port", "%u", s->be_port);
-+
-+    g_list_free_full(perms, g_free);
-+
      /*
-      * We don't actually access the guest's page through the grant, because
-      * this isn't real Xen, and we can just use the page we gave it in the
+      * The frontend area may have already been created by a legacy
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index f435898164..eb440880b5 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -33,6 +33,7 @@ struct XenDevice {
+ };
+ typedef struct XenDevice XenDevice;
+ 
++typedef char *(*XenDeviceGetFrontendPath)(XenDevice *xendev, Error **errp);
+ typedef char *(*XenDeviceGetName)(XenDevice *xendev, Error **errp);
+ typedef void (*XenDeviceRealize)(XenDevice *xendev, Error **errp);
+ typedef void (*XenDeviceFrontendChanged)(XenDevice *xendev,
+@@ -46,6 +47,7 @@ struct XenDeviceClass {
+     /*< public >*/
+     const char *backend;
+     const char *device;
++    XenDeviceGetFrontendPath get_frontend_path;
+     XenDeviceGetName get_name;
+     XenDeviceRealize realize;
+     XenDeviceFrontendChanged frontend_changed;
 -- 
 2.40.1
 
