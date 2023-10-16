@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1CA7CAFB2
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E90487CAFB9
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234139AbjJPQg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
+        id S234593AbjJPQhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233772AbjJPQf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:35:57 -0400
+        with ESMTP id S234502AbjJPQhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:37:13 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A8096A57;
-        Mon, 16 Oct 2023 09:21:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C2E6E90;
+        Mon, 16 Oct 2023 09:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473316; x=1729009316;
+  t=1697473325; x=1729009325;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CKuSpPInfTsyQSZPtZYPThCgg90sYoCDCtZz1uDkXfI=;
-  b=eKQ8Zm4/hLswAPWQwMAOnvxQSMWd4JUvqBh7iKECM/DDls/xDS7pfZPt
-   pNhaZlVqVQUuwkG+guajHy2tQhv79kQGPVMFEo0mVmkrV4zAqAvM1Y2MT
-   YWxUrnjNgyp3Z6TkTyVE8ZdHZnMlRTnGNpL/Ks0Y4NANw8Hp7gg/5LBEY
-   zyK70h82iSn/MDM87yfwdGqAN1M5TKFyGnofovu0s1O1AFsVqPmlihAAR
-   g/PqrANMSqfprjCVDXJFuOpJDtmPhoZ9a82NVKkLNfxp+03Uic9EEmaG2
-   T17J+FDoeB1z/Sjusvilu8Es2+mrE8Hd3JPUmKUKTiTmK2hcJg56yOAeB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922084"
+  bh=5YQZp1sSiqhkabesMMBY2i4LMZtXuxUgcBRjqHLAJ6w=;
+  b=gmMINypXY5VsTSv+barsIAhi12xeru/EQIMB5OC1HIwlYyW5/apfyNKZ
+   1sWHe46dxZeXFbKlLjzxGEeEo6cDFI0KlM4vHsYh27MtWtAym3X35IAUy
+   sxUbBjbHmpKe99mLlCoyi0KM4wgBcykipZqXnKaTk/CNP3rYQ9DChlr3k
+   mTqk0xRuU/Fv7sXKHa4QiAgyvsRogjMVjvHu7zb0/aHQaKuXQfDpCuQ1k
+   h1qgDOCkFEhZe8ZRfpWQeEfrKPm/jwlMEmVPsiGUgeRqTDmaQvb1okqHh
+   Z7c0h41UhMJJtdy9amO4Cl/YZbTtxSiFDq49hsRFFIYq5OMlj+lJ0IwIU
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922095"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364922084"
+   d="scan'208";a="364922095"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:07 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:08 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448332"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448337"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448332"
+   d="scan'208";a="846448337"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:07 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 098/116] KVM: TDX: Handle MSR IA32_FEAT_CTL MSR and IA32_MCG_EXT_CTL
-Date:   Mon, 16 Oct 2023 09:14:50 -0700
-Message-Id: <eec33adef4bb65636e96a3298dfe2af3e052bb3f.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 099/116] KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall
+Date:   Mon, 16 Oct 2023 09:14:51 -0700
+Message-Id: <c20cb16ed8e3f2e25b889cc558e41e444354ab10.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,65 +68,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-MCE and MCA is advertised via cpuid based on the TDX module spec.  Guest
-kernel can access IA32_FEAT_CTL for checking if LMCE is enabled by platform
-and IA32_MCG_EXT_CTL to enable LMCE.  Make TDX KVM handle them.  Otherwise
-guest MSR access to them with TDG.VP.VMCALL<MSR> on VE results in GP in
-guest.
+Implement TDG.VP.VMCALL<GetTdVmCallInfo> hypercall.  If the input value is
+zero, return success code and zero in output registers.
 
-Because LMCE is disabled with qemu by default, "-cpu lmce=on" to qemu
-command line is needed to reproduce it.
+TDG.VP.VMCALL<GetTdVmCallInfo> hypercall is a subleaf of TDG.VP.VMCALL to
+enumerate which TDG.VP.VMCALL sub leaves are supported.  This hypercall is
+for future enhancement of the Guest-Host-Communication Interface (GHCI)
+specification.  The GHCI version of 344426-001US defines it to require
+input R12 to be zero and to return zero in output registers, R11, R12, R13,
+and R14 so that guest TD enumerates no enhancement.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/x86/kvm/vmx/tdx.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 726e28f30354..7f8c89fd556a 100644
+index 7f8c89fd556a..b4a0fa51ee62 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1950,6 +1950,7 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- 		default:
- 			return true;
- 		}
-+	case MSR_IA32_FEAT_CTL:
- 	case MSR_IA32_APICBASE:
- 	case MSR_EFER:
- 		return !write;
-@@ -1964,6 +1965,20 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+@@ -1331,6 +1331,20 @@ static int tdx_emulate_wrmsr(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++static int tdx_get_td_vm_call_info(struct kvm_vcpu *vcpu)
++{
++	if (tdvmcall_a0_read(vcpu))
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
++	else {
++		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
++		kvm_r11_write(vcpu, 0);
++		tdvmcall_a0_write(vcpu, 0);
++		tdvmcall_a1_write(vcpu, 0);
++		tdvmcall_a2_write(vcpu, 0);
++	}
++	return 1;
++}
++
+ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
- 	switch (msr->index) {
-+	case MSR_IA32_FEAT_CTL:
-+		/*
-+		 * MCE and MCA are advertised via cpuid. guest kernel could
-+		 * check if LMCE is enabled or not.
-+		 */
-+		msr->data = FEAT_CTL_LOCKED;
-+		if (vcpu->arch.mcg_cap & MCG_LMCE_P)
-+			msr->data |= FEAT_CTL_LMCE_ENABLED;
-+		return 0;
-+	case MSR_IA32_MCG_EXT_CTL:
-+		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
-+			return 1;
-+		msr->data = vcpu->arch.mcg_ext_ctl;
-+		return 0;
- 	case MSR_MTRRcap:
- 		/*
- 		 * Override kvm_mtrr_get_msr() which hardcodes the value.
-@@ -1982,6 +1997,11 @@ int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- {
- 	switch (msr->index) {
-+	case MSR_IA32_MCG_EXT_CTL:
-+		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
-+			return 1;
-+		vcpu->arch.mcg_ext_ctl = msr->data;
-+		return 0;
- 	case MSR_MTRRdefType:
- 		/*
- 		 * Allow writeback only for all memory.
+ 	if (tdvmcall_exit_type(vcpu))
+@@ -1349,6 +1363,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+ 		return tdx_emulate_rdmsr(vcpu);
+ 	case EXIT_REASON_MSR_WRITE:
+ 		return tdx_emulate_wrmsr(vcpu);
++	case TDG_VP_VMCALL_GET_TD_VM_CALL_INFO:
++		return tdx_get_td_vm_call_info(vcpu);
+ 	default:
+ 		break;
+ 	}
 -- 
 2.25.1
 
