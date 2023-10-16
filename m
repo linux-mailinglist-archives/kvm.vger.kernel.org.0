@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82D427CAFF1
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:40:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3A857CB0D3
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:59:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232812AbjJPQkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:40:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
+        id S234647AbjJPQ76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343557AbjJPQjO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:39:14 -0400
+        with ESMTP id S234092AbjJPQ7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:59:40 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E506198;
-        Mon, 16 Oct 2023 09:22:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5EDD72A2;
+        Mon, 16 Oct 2023 09:22:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473366; x=1729009366;
+  t=1697473368; x=1729009368;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UHZmBIgLIeJh+q9MgrUEsmFTzR5cRp/fpdsAfSuByVw=;
-  b=hGTZKr6206tOuFe4SCn06kyl641BLS5noEqVdFQcj6e0GWwbgMwdEJCW
-   CMMZGYxtas6NkXL9V53k2YDxMfdfiMxcBpLaFWdfyl36eFVNTK8qwhw4H
-   TLQEyRDOnmcTwSH2EJ7cHWUN1bdKwyX3NwAEasGdpvTY/B7s6x3sMI3/N
-   78WqUW2j9OpT14hfr/Z/oB3QN5DQR3IfLXfGTWCR0isqDLJn21BZenh5f
-   kTbx5JmZAzThD10DRG/HovBAkNEqdkUCJGr0x8l5AGeQoGP9vsso2isM+
-   QLPZqOCufZ0RV8z0n1yADGO5d8GpkkmZnKq7jNA2Ptgtarz8AvMxs6pu7
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922146"
+  bh=w2jZkAdIHP1nj2m5XeNSsUCz/xC1Te/t4FJHSSEhalg=;
+  b=lmkkqWcXxrMI4bAuuZAMein6BDDi8AFjEdBUo4WraIz1y3TvTYFn561P
+   kUJQEVkHKi3hIsqRqTuXtDVJ6pIosYZlwCNH5ajVhfVLw+dkQ7ZY6zUnG
+   0wrb9k2Dh0rp7PvKn530rVn6FTMe8JFyxnZY5cL0sPolMzu0tXACjvvm5
+   zSovg3NcnEtBueTuToq2JJgeftXXF/Gmn7Av6G2ZHhaRF+kgcMwTVSfZH
+   htIGmx/wTTtgVnsrwq8VZj2bkWdz9RceOedOwD8tx1Z27RE6xHLmpSXmR
+   /2/ASRu9CXN5N+c+IZWBgbcYnNhAwzAIwzIigmlkSpcCYDKvbWCAES4hO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922152"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364922146"
+   d="scan'208";a="364922152"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1003006481"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1003006484"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1003006481"
+   d="scan'208";a="1003006484"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:11 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:12 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 109/116] KVM: TDX: Add methods to ignore virtual apic related operation
-Date:   Mon, 16 Oct 2023 09:15:01 -0700
-Message-Id: <c87bb2a328baed4bbb583d7db4cb573dd37e2cf0.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 110/116] KVM: TDX: Inhibit APICv for TDX guest
+Date:   Mon, 16 Oct 2023 09:15:02 -0700
+Message-Id: <e71c9b5a0bd8ac145acb4da980a01da070717abb.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,150 +68,75 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX protects TDX guest APIC state from VMM.  Implement access methods of
-TDX guest vAPIC state to ignore them or return zero.
+TDX doesn't support APICV, inhibit APICv for TDX guest.  Follow how SEV
+does it.  Define a new inhibit reason for TDX, set it on TD
+initialization, and add the flag to kvm_x86_ops.required_apicv_inhibits.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c    | 61 ++++++++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/tdx.c     |  6 ++++
- arch/x86/kvm/vmx/x86_ops.h |  3 ++
- 3 files changed, 64 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 9 +++++++++
+ arch/x86/kvm/vmx/main.c         | 3 ++-
+ arch/x86/kvm/vmx/tdx.c          | 6 ++++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 529c7e610d47..f0674ef1c17e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1284,6 +1284,15 @@ enum kvm_apicv_inhibit {
+ 	 * mapping between logical ID and vCPU.
+ 	 */
+ 	APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
++
++	/*********************************************************/
++	/* INHIBITs that are relevant only to the Intel's APICv. */
++	/*********************************************************/
++
++	/*
++	 * APICv is disabled because TDX doesn't support it.
++	 */
++	APICV_INHIBIT_REASON_TDX,
+ };
+ 
+ struct kvm_arch {
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 0d0af3fadc75..eb44f5784f18 100644
+index eb44f5784f18..5d61f5306ae3 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -363,6 +363,14 @@ static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
- 	return vmx_apic_init_signal_blocked(vcpu);
- }
+@@ -1001,7 +1001,8 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	 BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |			\
+ 	 BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |	\
+ 	 BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |		\
+-	 BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED))
++	 BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |		\
++	 BIT(APICV_INHIBIT_REASON_TDX))
  
-+static void vt_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_set_virtual_apic_mode(vcpu);
-+
-+	return vmx_set_virtual_apic_mode(vcpu);
-+}
-+
- static void vt_apicv_post_state_restore(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-@@ -371,6 +379,31 @@ static void vt_apicv_post_state_restore(struct kvm_vcpu *vcpu)
- 	memset(pi->pir, 0, sizeof(pi->pir));
- }
- 
-+static void vt_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	return vmx_hwapic_irr_update(vcpu, max_irr);
-+}
-+
-+static void vt_hwapic_isr_update(int max_isr)
-+{
-+	if (is_td_vcpu(kvm_get_running_vcpu()))
-+		return;
-+
-+	return vmx_hwapic_isr_update(max_isr);
-+}
-+
-+static bool vt_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	/* TDX doesn't support L2 at the moment. */
-+	if (WARN_ON_ONCE(is_td_vcpu(vcpu)))
-+		return false;
-+
-+	return vmx_guest_apic_has_interrupt(vcpu);
-+}
-+
- static int vt_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -824,6 +857,22 @@ static void vt_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
- 	vmx_update_cr8_intercept(vcpu, tpr, irr);
- }
- 
-+static void vt_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_apic_access_page_addr(vcpu);
-+}
-+
-+static void vt_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
-+{
-+	if (WARN_ON_ONCE(is_td_vcpu(vcpu)))
-+		return;
-+
-+	vmx_refresh_apicv_exec_ctrl(vcpu);
-+}
-+
- static void vt_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -1033,15 +1082,15 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.enable_nmi_window = vt_enable_nmi_window,
- 	.enable_irq_window = vt_enable_irq_window,
- 	.update_cr8_intercept = vt_update_cr8_intercept,
--	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
--	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
--	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
-+	.set_virtual_apic_mode = vt_set_virtual_apic_mode,
-+	.set_apic_access_page_addr = vt_set_apic_access_page_addr,
-+	.refresh_apicv_exec_ctrl = vt_refresh_apicv_exec_ctrl,
- 	.load_eoi_exitmap = vt_load_eoi_exitmap,
- 	.apicv_post_state_restore = vt_apicv_post_state_restore,
- 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
--	.hwapic_irr_update = vmx_hwapic_irr_update,
--	.hwapic_isr_update = vmx_hwapic_isr_update,
--	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
-+	.hwapic_irr_update = vt_hwapic_irr_update,
-+	.hwapic_isr_update = vt_hwapic_isr_update,
-+	.guest_apic_has_interrupt = vt_guest_apic_has_interrupt,
- 	.sync_pir_to_irr = vt_sync_pir_to_irr,
- 	.deliver_interrupt = vt_deliver_interrupt,
- 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.name = KBUILD_MODNAME,
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1628e54d816b..527fbcd7e2c5 100644
+index 527fbcd7e2c5..924cbf97404a 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2078,6 +2078,12 @@ void tdx_enable_smi_window(struct kvm_vcpu *vcpu)
- }
- #endif
+@@ -2486,6 +2486,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 		goto teardown;
+ 	}
  
-+void tdx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-+{
-+	/* Only x2APIC mode is supported for TD. */
-+	WARN_ON_ONCE(kvm_get_apic_mode(vcpu) != LAPIC_MODE_X2APIC);
-+}
++	kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_TDX);
 +
- int tdx_get_cpl(struct kvm_vcpu *vcpu)
- {
  	return 0;
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 8dacab1bc3d7..7c377b7d76b9 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -168,6 +168,7 @@ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
- bool tdx_has_emulated_msr(u32 index, bool write);
- int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
- int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
-+void tdx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
  
- int tdx_get_cpl(struct kvm_vcpu *vcpu);
- void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg);
-@@ -220,6 +221,8 @@ static inline bool tdx_has_emulated_msr(u32 index, bool write) { return false; }
- static inline int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
- static inline int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
+ 	/*
+@@ -2849,6 +2851,10 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 	}
  
-+static inline void tdx_set_virtual_apic_mode(struct kvm_vcpu *vcpu) {}
+ 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 +
- static inline int tdx_get_cpl(struct kvm_vcpu *vcpu) { return 0; }
- static inline void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg) {}
- static inline unsigned long tdx_get_rflags(struct kvm_vcpu *vcpu) { return 0; }
++	WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm));
++	vcpu->arch.apic->apicv_active = false;
++
+ 	return 0;
+ 
+ free_tdvpx:
 -- 
 2.25.1
 
