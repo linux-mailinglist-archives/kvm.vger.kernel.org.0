@@ -2,123 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 236E77CAD1F
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:15:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E43107CAD26
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:18:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233564AbjJPPPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 11:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50522 "EHLO
+        id S233539AbjJPPSA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 11:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233517AbjJPPPe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 11:15:34 -0400
+        with ESMTP id S232195AbjJPPR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 11:17:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FC7F1
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:14:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74048B4
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697469287;
+        s=mimecast20190719; t=1697469433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=AVbGnTxHIfBxV5ar+uOFvSn31zZCTLwW6peH+riUAMc=;
-        b=i9vxzWj/BmD9035+xZAkBtMkocLzHwTwIsljUbJoC/D+Sxz90oryDNJN/PMrDNu+7jAdxk
-        otjigqTryXMkX4rHG3iwNCK+xKO8G4TT0y+NgJKDoydej0FwOEJGFYJVHP47d+UjeYPsaW
-        vRYsKQ5EX8oreZRifqliCRVblJfPKeo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+         in-reply-to:in-reply-to:references:references;
+        bh=y4eWOrGel0AHpPuDoogCLtYn6AWGTJZhIutExsyeeH0=;
+        b=dk14ruQNuHTkOlLXftZmnhP6Dlm7zjJGKiuW6FF1puJe5eg1mqK2AukLtPRDWtvCZbSRqP
+        +mcWKz7hM2Tu6acYl1VuovXYga43nB3mWE/5DpFtG4WwCz0LYre/gj32Za9OQsSIgq1C34
+        BSfw+Mr0JhMJeZRJGj40hjnqhG7kfB8=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-RYLwCDTHOdeA20mKK1kvnw-1; Mon, 16 Oct 2023 11:14:45 -0400
-X-MC-Unique: RYLwCDTHOdeA20mKK1kvnw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99bcb13d8ddso346900366b.0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:14:45 -0700 (PDT)
+ us-mta-325-qsJz1s_zMjewEW3uDhYrdw-1; Mon, 16 Oct 2023 11:17:12 -0400
+X-MC-Unique: qsJz1s_zMjewEW3uDhYrdw-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4197fa36adaso39748071cf.1
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:17:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697469284; x=1698074084;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1697469431; x=1698074231;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AVbGnTxHIfBxV5ar+uOFvSn31zZCTLwW6peH+riUAMc=;
-        b=HZ20g14w7yC0AdoBQAomD/L56jg1ry1DlmERRbLNttEU3lmXuocuhmwy+uEn50BzTe
-         BPgnyeX+aEtUN3o+s4+UAf8PbPDqMe7uxobX1pMhEH8fZ3x2kHqA+hbFFsQqvulRGaaR
-         avRe8Gm2n5jImf3VIpWJU7gC1NWK+sitfGr+CCu4FgPmJMBvjJ5oYM7fFYaupjFGrpBU
-         x4uE4k7VtJgZcqEaAgqaLkphuQfYc+DzM5ovkCAa6ITas5VvFMxp7kqtkqgV5st0xFIV
-         JWmSkr5ndsLt1ajuW6lZuLV69mz+Zpuu9ZRxu5Cs5n8v6hSXYgBGzK7n7DN5YMHnIQNR
-         H3DA==
-X-Gm-Message-State: AOJu0YwfgNvFxWNjKbx+cj2N3SrES1DbXf/JhXbo0yht4PclG8ZBjP1b
-        kB6UFKGHM6OltpgTMAqg0/TIgnoxaUAjO7W73MhSIM2fh5PrIeA83mCCxKUdNXrlW4H51L6cqmA
-        QXOU2Y5e3/R9l
-X-Received: by 2002:a17:906:c10e:b0:9bf:d70b:986d with SMTP id do14-20020a170906c10e00b009bfd70b986dmr3683299ejc.77.1697469284338;
-        Mon, 16 Oct 2023 08:14:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGHQjVoOl0YMVhdZjG5b09PwEKWF6Tm2BoXsM+VWMJkqKeR48ZJzib+4YYClZrMCFNdROzIVg==
-X-Received: by 2002:a17:906:c10e:b0:9bf:d70b:986d with SMTP id do14-20020a170906c10e00b009bfd70b986dmr3683281ejc.77.1697469284015;
-        Mon, 16 Oct 2023 08:14:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id vb7-20020a170907d04700b0099ccee57ac2sm4209223ejc.194.2023.10.16.08.14.39
+        bh=y4eWOrGel0AHpPuDoogCLtYn6AWGTJZhIutExsyeeH0=;
+        b=QhRZXxEjiv3EBqq/9GSE3bXJfnEvHDJgxI6byzVTxWNPmdxLfcyqcRUVRrnP9P4Ljz
+         sA+lOtu17cAMFKpjJ10kivOatv7+4WeHb/tqyV4p/i4ecz9rs78iaMAcj0IaD/QFXSiX
+         uLSWIhn1exDX4e4oHpqlI6GD5K7cOPCQbbc0GcgU7j7cXQkA34+KDl/1t4rBu/oJJ50d
+         JE9g4BvOoLUns4qX1W2gjdERuWXdbKMI/XAijwobsfFwGeYUkefMF0PffksrUNhEuIRM
+         HYuMJ/5WjDRSsb3UwW6DvdUYkO7esasDwuV9lHzxBvk9Fs9uUwQLo7HgagzHc7b3jhep
+         yotw==
+X-Gm-Message-State: AOJu0YxCqCTwHgjc8TKQDTQwEl95cT+TiRSmuwkWxHZqY85Mw+0PXiR/
+        16nrwvoZDhoMrjk5qf3EMYKy/JWbKy43DZH0DLt7YBR0VI58j5JL3Fe64vYRka5Uatv9B7D6Dek
+        i1WFa/Rv+tLQG
+X-Received: by 2002:ac8:5b8e:0:b0:418:1002:cfd8 with SMTP id a14-20020ac85b8e000000b004181002cfd8mr35378659qta.67.1697469431495;
+        Mon, 16 Oct 2023 08:17:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHfouO36OI09/bnPKrrFbEXKQZyqqDdVFztdSpdKFFQRJ0n70/L5ty7l/F9dJ4HHUwBGdGjhw==
+X-Received: by 2002:ac8:5b8e:0:b0:418:1002:cfd8 with SMTP id a14-20020ac85b8e000000b004181002cfd8mr35378641qta.67.1697469431041;
+        Mon, 16 Oct 2023 08:17:11 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
+        by smtp.gmail.com with ESMTPSA id r16-20020ac867d0000000b004199c98f87dsm3100752qtp.74.2023.10.16.08.17.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:14:42 -0700 (PDT)
-Message-ID: <359d7c57-2a71-419d-b63f-4c5610f48b0f@redhat.com>
-Date:   Mon, 16 Oct 2023 17:14:38 +0200
+        Mon, 16 Oct 2023 08:17:10 -0700 (PDT)
+Message-ID: <dee481c3-f6bd-4ba9-a2d4-528dfb668159@redhat.com>
+Date:   Mon, 16 Oct 2023 17:17:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 01/50] KVM: SVM: INTERCEPT_RDTSCP is never intercepted
- anyway
+Subject: Re: [PATCH v17 1/2] vfio/migration: Add debugfs to live migration
+ driver
+To:     Longfang Liu <liulongfang@huawei.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        jonathan.cameron@huawei.com
+Cc:     bcreeley@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxarm@openeuler.org
+References: <20231013090441.36417-1-liulongfang@huawei.com>
+ <20231013090441.36417-2-liulongfang@huawei.com>
+From:   =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
 Content-Language: en-US
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        pankaj.gupta@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, stable@vger.kernel.org
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-2-michael.roth@amd.com>
- <2023101627-species-unscrew-2730@gregkh>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <2023101627-species-unscrew-2730@gregkh>
+In-Reply-To: <20231013090441.36417-2-liulongfang@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -131,31 +83,330 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/16/23 17:12, Greg KH wrote:
-> On Mon, Oct 16, 2023 at 08:27:30AM -0500, Michael Roth wrote:
->> From: Paolo Bonzini <pbonzini@redhat.com>
->>
->> svm_recalc_instruction_intercepts() is always called at least once
->> before the vCPU is started, so the setting or clearing of the RDTSCP
->> intercept can be dropped from the TSC_AUX virtualization support.
->>
->> Extracted from a patch by Tom Lendacky.
->>
->> Cc: stable@vger.kernel.org
->> Fixes: 296d5a17e793 ("KVM: SEV-ES: Use V_TSC_AUX if available instead of RDTSC/MSR_TSC_AUX intercepts")
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> (cherry picked from commit e8d93d5d93f85949e7299be289c6e7e1154b2f78)
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> ---
->>   arch/x86/kvm/svm/sev.c | 5 +----
->>   1 file changed, 1 insertion(+), 4 deletions(-)
+Hello Longfang,
+
+On 10/13/23 11:04, Longfang Liu wrote:
+> There are multiple devices, software and operational steps involved
+> in the process of live migration. An error occurred on any node may
+> cause the live migration operation to fail.
+> This complex process makes it very difficult to locate and analyze
+> the cause when the function fails.
 > 
-> What stable tree(s) are you wanting this applied to (same for the others
-> in this series)?  It's already in the 6.1.56 release, and the Fixes tag
-> is for 5.19, so I don't see where it could be missing from?
+> In order to quickly locate the cause of the problem when the
+> live migration fails, I added a set of debugfs to the vfio
+> live migration driver.
+> 
+>      +-------------------------------------------+
+>      |                                           |
+>      |                                           |
+>      |                  QEMU                     |
+>      |                                           |
+>      |                                           |
+>      +---+----------------------------+----------+
+>          |      ^                     |      ^
+>          |      |                     |      |
+>          |      |                     |      |
+>          v      |                     v      |
+>       +---------+--+               +---------+--+
+>       |src vfio_dev|               |dst vfio_dev|
+>       +--+---------+               +--+---------+
+>          |      ^                     |      ^
+>          |      |                     |      |
+>          v      |                     |      |
+>     +-----------+----+           +-----------+----+
+>     |src dev debugfs |           |dst dev debugfs |
+>     +----------------+           +----------------+
+> 
+> The entire debugfs directory will be based on the definition of
+> the CONFIG_DEBUG_FS macro. If this macro is not enabled, the
+> interfaces in vfio.h will be empty definitions, and the creation
+> and initialization of the debugfs directory will not be executed.
+> 
+>     vfio
+>      |
+>      +---<dev_name1>
+>      |    +---migration
+>      |        +--state
+>      |
+>      +---<dev_name2>
+>           +---migration
+>               +--state
+> 
+> debugfs will create a public root directory "vfio" file.
+> then create a dev_name() file for each live migration device.
+> First, create a unified state acquisition file of "migration"
+> in this device directory.
+> Then, create a public live migration state lookup file "state".
+> 
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>   drivers/vfio/Kconfig      | 10 +++++
+>   drivers/vfio/Makefile     |  1 +
+>   drivers/vfio/debugfs.c    | 90 +++++++++++++++++++++++++++++++++++++++
+>   drivers/vfio/vfio.h       | 14 ++++++
+>   drivers/vfio/vfio_main.c  | 14 +++++-
+>   include/linux/vfio.h      |  7 +++
+>   include/uapi/linux/vfio.h |  1 +
+>   7 files changed, 135 insertions(+), 2 deletions(-)
+>   create mode 100644 drivers/vfio/debugfs.c
+> 
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 6bda6dbb4878..ceae52fd7586 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -80,6 +80,16 @@ config VFIO_VIRQFD
+>   	select EVENTFD
+>   	default n
+>   
+> +config VFIO_DEBUGFS
+> +	bool "Export VFIO internals in DebugFS"
+> +	depends on DEBUG_FS
+> +	help
+> +	  Allows exposure of VFIO device internals. This option enables
+> +	  the use of debugfs by VFIO drivers as required. The device can
+> +	  cause the VFIO code create a top-level debug/vfio directory
+> +	  during initialization, and then populate a subdirectory with
+> +	  entries as required.
+> +
+>   source "drivers/vfio/pci/Kconfig"
+>   source "drivers/vfio/platform/Kconfig"
+>   source "drivers/vfio/mdev/Kconfig"
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index c82ea032d352..d43a699d55b1 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -8,6 +8,7 @@ vfio-$(CONFIG_VFIO_GROUP) += group.o
+>   vfio-$(CONFIG_IOMMUFD) += iommufd.o
+>   vfio-$(CONFIG_VFIO_CONTAINER) += container.o
+>   vfio-$(CONFIG_VFIO_VIRQFD) += virqfd.o
+> +vfio-$(CONFIG_VFIO_DEBUGFS) += debugfs.o
+>   
+>   obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>   obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+> diff --git a/drivers/vfio/debugfs.c b/drivers/vfio/debugfs.c
+> new file mode 100644
+> index 000000000000..ae53d6110f47
+> --- /dev/null
+> +++ b/drivers/vfio/debugfs.c
+> @@ -0,0 +1,90 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2023, HiSilicon Ltd.
+> + */
+> +
+> +#include <linux/device.h>
+> +#include <linux/debugfs.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/vfio.h>
+> +#include "vfio.h"
+> +
+> +static struct dentry *vfio_debugfs_root;
+> +
+> +static int vfio_device_state_read(struct seq_file *seq, void *data)
+> +{
+> +	struct device *vf_dev = seq->private;
+> +	struct vfio_device *vdev = container_of(vf_dev, struct vfio_device, device);
+> +	enum vfio_device_mig_state state;
+> +	int ret;
+> +
+> +	BUILD_BUG_ON(VFIO_DEVICE_STATE_NR !=
+> +		VFIO_DEVICE_STATE_PRE_COPY_P2P + 1);
+> +
+> +	ret = vdev->mig_ops->migration_get_state(vdev, &state);
+> +	if (ret)
+> +		return -EINVAL;
+> +
+> +	switch (state) {
+> +	case VFIO_DEVICE_STATE_ERROR:
+> +		seq_printf(seq, "%s\n", "ERROR");
+> +		break;
+> +	case VFIO_DEVICE_STATE_STOP:
+> +		seq_printf(seq, "%s\n", "STOP");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING:
+> +		seq_printf(seq, "%s\n", "RUNNING");
+> +		break;
+> +	case VFIO_DEVICE_STATE_STOP_COPY:
+> +		seq_printf(seq, "%s\n", "STOP_COPY");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RESUMING:
+> +		seq_printf(seq, "%s\n", "RESUMING");
+> +		break;
+> +	case VFIO_DEVICE_STATE_RUNNING_P2P:
+> +		seq_printf(seq, "%s\n", "RUNNING_P2P");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY:
+> +		seq_printf(seq, "%s\n", "PRE_COPY");
+> +		break;
+> +	case VFIO_DEVICE_STATE_PRE_COPY_P2P:
+> +		seq_printf(seq, "%s\n", "PRE_COPY_P2P");
+> +		break;
+> +	default:
+> +		seq_printf(seq, "%s\n", "Invalid");
 
-I tink it's missing in the (destined for 6.7) tree that Michael is 
-basing this series on, so he's cherry picking it from Linus's tree.
+seq_puts() is more appropriate than seq_printf() above.
 
-Paolo
+I would suggest to add an array or some helper, that the VFIO drivers
+could use to debug the migration flow with pr_* primitives. It can be
+done later.
+
+
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev)
+> +{
+> +	struct device *dev = &vdev->device;
+> +
+> +	vdev->debug_root = debugfs_create_dir(dev_name(vdev->dev), vfio_debugfs_root);
+> +
+> +	if (vdev->mig_ops) {
+> +		struct dentry *vfio_dev_migration = NULL;
+
+mig_dir maybe ?
+
+It would be easier to understand the nature of the variable IMHO.
+
+> +
+> +		vfio_dev_migration = debugfs_create_dir("migration", vdev->debug_root);
+> +		debugfs_create_devm_seqfile(dev, "state", vfio_dev_migration,
+> +					  vfio_device_state_read);
+> +	}
+> +}
+> +
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev)
+> +{
+> +	debugfs_remove_recursive(vdev->debug_root);
+> +}
+> +
+> +void vfio_debugfs_create_root(void)
+> +{
+> +	vfio_debugfs_root = debugfs_create_dir("vfio", NULL);
+> +}
+> +
+> +void vfio_debugfs_remove_root(void)
+> +{
+> +	debugfs_remove_recursive(vfio_debugfs_root);
+> +	vfio_debugfs_root = NULL;
+> +}
+> +
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 307e3f29b527..bde84ad344e5 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -448,4 +448,18 @@ static inline void vfio_device_put_kvm(struct vfio_device *device)
+>   }
+>   #endif
+>   
+> +#ifdef CONFIG_VFIO_DEBUGFS
+> +void vfio_debugfs_create_root(void);
+> +void vfio_debugfs_remove_root(void);
+> +
+> +void vfio_device_debugfs_init(struct vfio_device *vdev);
+> +void vfio_device_debugfs_exit(struct vfio_device *vdev);
+> +#else
+> +static inline void vfio_debugfs_create_root(void) { }
+> +static inline void vfio_debugfs_remove_root(void) { }
+> +
+> +static inline void vfio_device_debugfs_init(struct vfio_device *vdev) { }
+> +static inline void vfio_device_debugfs_exit(struct vfio_device *vdev) { }
+> +#endif /* CONFIG_VFIO_DEBUGFS */
+> +
+>   #endif
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index e31e1952d7b8..9aec4c22f051 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -309,7 +309,6 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   
+>   	/* Refcounting can't start until the driver calls register */
+>   	refcount_set(&device->refcount, 1);
+> -
+
+superfluous change.
+
+>   	vfio_device_group_register(device);
+>   
+>   	return 0;
+> @@ -320,7 +319,15 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   
+>   int vfio_register_group_dev(struct vfio_device *device)
+>   {
+> -	return __vfio_register_dev(device, VFIO_IOMMU);
+> +	int ret;
+> +
+> +	ret = __vfio_register_dev(device, VFIO_IOMMU);
+> +	if (ret)
+> +		return ret;
+> +
+> +	vfio_device_debugfs_init(device);
+
+Can it be called from __vfio_register_dev() instead ? and mdev devices
+would get debugfs support also.
+
+Thanks,
+
+C.
+
+> +
+> +	return 0;
+>   }
+>   EXPORT_SYMBOL_GPL(vfio_register_group_dev);
+>   
+> @@ -378,6 +385,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
+>   		}
+>   	}
+>   
+> +	vfio_device_debugfs_exit(device);
+>   	/* Balances vfio_device_set_group in register path */
+>   	vfio_device_remove_group(device);
+>   }
+> @@ -1676,6 +1684,7 @@ static int __init vfio_init(void)
+>   	if (ret)
+>   		goto err_alloc_dev_chrdev;
+>   
+> +	vfio_debugfs_create_root();
+>   	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+>   	return 0;
+>   
+> @@ -1691,6 +1700,7 @@ static int __init vfio_init(void)
+>   
+>   static void __exit vfio_cleanup(void)
+>   {
+> +	vfio_debugfs_remove_root();
+>   	ida_destroy(&vfio.device_ida);
+>   	vfio_cdev_cleanup();
+>   	class_destroy(vfio.device_class);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 454e9295970c..769d7af86225 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -69,6 +69,13 @@ struct vfio_device {
+>   	u8 iommufd_attached:1;
+>   #endif
+>   	u8 cdev_opened:1;
+> +#ifdef CONFIG_DEBUG_FS
+> +	/*
+> +	 * debug_root is a static property of the vfio_device
+> +	 * which must be set prior to registering the vfio_device.
+> +	 */
+> +	struct dentry *debug_root;
+> +#endif
+>   };
+>   
+>   /**
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 7f5fb010226d..2b68e6cdf190 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1219,6 +1219,7 @@ enum vfio_device_mig_state {
+>   	VFIO_DEVICE_STATE_RUNNING_P2P = 5,
+>   	VFIO_DEVICE_STATE_PRE_COPY = 6,
+>   	VFIO_DEVICE_STATE_PRE_COPY_P2P = 7,
+> +	VFIO_DEVICE_STATE_NR,
+>   };
+>   
+>   /**
 
