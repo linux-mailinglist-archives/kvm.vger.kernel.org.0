@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FB277CAFB0
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:36:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B6487CAFA1
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:36:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234376AbjJPQgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:36:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33050 "EHLO
+        id S234222AbjJPQgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234364AbjJPQfq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:35:46 -0400
+        with ESMTP id S234271AbjJPQfi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:35:38 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F27644A0;
-        Mon, 16 Oct 2023 09:19:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F9F44B0;
+        Mon, 16 Oct 2023 09:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473197; x=1729009197;
+  t=1697473199; x=1729009199;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZT0rWw9wfF5GuIj8zOyP9lk3DAHayUecH8rpS7ia4pk=;
-  b=GNacoVmQ1q1gtjX/71ZM4chWJvRP+sdxMF0IhIppDbtIFwxPkAzDT1ZT
-   IZ1h8aqmC/8N0gYJgY5YWrxXW1gKIKcDjCZUqMHLpo8Mfs6MU0+9Fe5nM
-   226iZeBi6VFA7pi+IAE25zTIJvXwXGTOScz0GuQ19DiUBAoKk4CL2fro3
-   ApuafDHtwVY3RP6My/nlp1Jrxxp/Z+P9ewen+ogcgZij/Et4/tLXX0VLq
-   DSes5KczMvzDjxOPp3cROD4CfnJpSENPn8Ho1t9V4TJsuTH+lByTIAPSS
-   MdENzIOxn/MptZlNWJmRUgrdY3cVfpQkwCR0VYFwg2PVUHUzkxAYLhrac
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365825890"
+  bh=gZq/xU5HPMr+7bL2m3UNHQGfAGkvgf+PBtN9vzhZEYs=;
+  b=KWmdNsa2wsp4bphLYkP4G4fMLRLeWwiFYJEkDbAt9AX0q4bny7UB5nIX
+   WCMP0C1of2bui3MZiMBHWGvyMEgTTuflm6ma1XcVHN39vLPZbG20BbPLA
+   f6QLcsOnCd4loVsGawvrcVeP8vQGkT/kbcigPzxO4PFAGIRG+itkppgj+
+   6sjPR9LlBCoth8fiQ+BqoDTSZHFLD3oHOpnIwmZF4wKKd+0QSAk/AJKaL
+   vT4ExxDqh0nDcH3eQnTG+a6bw4Vz8Cin6Rc2iy3vwfvqQL35XKyVLhTjW
+   sQ9W2qy4+QkUTSvtP5uoow+xuEOswBKc2GyfsAlU2L/wPOJ91X5O8t+SH
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365825899"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="365825890"
+   d="scan'208";a="365825899"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:24 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:25 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087125980"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087125984"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1087125980"
+   d="scan'208";a="1087125984"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:23 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:24 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 007/116] KVM: TDX: Make TDX VM type supported
-Date:   Mon, 16 Oct 2023 09:13:19 -0700
-Message-Id: <8db62f1321f6894b0f8132843199bfe5671f7b3a.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 008/116] [MARKER] The start of TDX KVM patch series: TDX architectural definitions
+Date:   Mon, 16 Oct 2023 09:13:20 -0700
+Message-Id: <c7ed370e721ec44750cef13e8bddf7418c30e3d1.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,125 +68,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-NOTE: This patch is in position of the patch series for developers to be
-able to test codes during the middle of the patch series although this
-patch series doesn't provide functional features until the all the patches
-of this patch series.  When merging this patch series, this patch can be
-moved to the end.
-
-As first step TDX VM support, return that TDX VM type supported to device
-model, e.g. qemu.  The callback to create guest TD is vm_init callback for
-KVM_CREATE_VM.
+This empty commit is to mark the start of patch series of TDX architectural
+definitions.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c    | 18 ++++++++++++++++--
- arch/x86/kvm/vmx/tdx.c     |  6 ++++++
- arch/x86/kvm/vmx/vmx.c     |  6 ------
- arch/x86/kvm/vmx/x86_ops.h |  3 ++-
- 4 files changed, 24 insertions(+), 9 deletions(-)
+ Documentation/virt/kvm/index.rst              |  2 ++
+ .../virt/kvm/intel-tdx-layer-status.rst       | 29 +++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+ create mode 100644 Documentation/virt/kvm/intel-tdx-layer-status.rst
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 1d423abd124b..8ca23adfcfb8 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -10,6 +10,12 @@
- static bool enable_tdx __ro_after_init;
- module_param_named(tdx, enable_tdx, bool, 0444);
- 
-+static bool vt_is_vm_type_supported(unsigned long type)
-+{
-+	return __kvm_is_vm_type_supported(type) ||
-+		(enable_tdx && tdx_is_vm_type_supported(type));
-+}
+diff --git a/Documentation/virt/kvm/index.rst b/Documentation/virt/kvm/index.rst
+index ad13ec55ddfe..ccff56dca2b1 100644
+--- a/Documentation/virt/kvm/index.rst
++++ b/Documentation/virt/kvm/index.rst
+@@ -19,3 +19,5 @@ KVM
+    vcpu-requests
+    halt-polling
+    review-checklist
 +
- static int vt_hardware_enable(void)
- {
- 	int ret;
-@@ -37,6 +43,14 @@ static __init int vt_hardware_setup(void)
- 	return 0;
- }
- 
-+static int vt_vm_init(struct kvm *kvm)
-+{
-+	if (is_td(kvm))
-+		return -EOPNOTSUPP;	/* Not ready to create guest TD yet. */
++   intel-tdx-layer-status
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+new file mode 100644
+index 000000000000..f11ea701dc19
+--- /dev/null
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -0,0 +1,29 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+	return vmx_vm_init(kvm);
-+}
++===================================
++Intel Trust Dodmain Extensions(TDX)
++===================================
 +
- #define VMX_REQUIRED_APICV_INHIBITS				\
- 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-@@ -57,9 +71,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.hardware_disable = vmx_hardware_disable,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
--	.is_vm_type_supported = vmx_is_vm_type_supported,
-+	.is_vm_type_supported = vt_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
--	.vm_init = vmx_vm_init,
-+	.vm_init = vt_vm_init,
- 	.vm_destroy = vmx_vm_destroy,
- 
- 	.vcpu_precreate = vmx_vcpu_precreate,
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1c9884164566..9d3f593eacb8 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -24,6 +24,12 @@ static int __init tdx_module_setup(void)
- 	return 0;
- }
- 
-+bool tdx_is_vm_type_supported(unsigned long type)
-+{
-+	/* enable_tdx check is done by the caller. */
-+	return type == KVM_X86_TDX_VM;
-+}
++Layer status
++============
++What qemu can do
++----------------
++- TDX VM TYPE is exposed to Qemu.
++- Qemu can try to create VM of TDX VM type and then fails.
 +
- struct vmx_tdx_enabled {
- 	cpumask_var_t vmx_enabled;
- 	atomic_t err;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d9f2f00af427..0b8bf04e283d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7532,12 +7532,6 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 	return err;
- }
- 
--bool vmx_is_vm_type_supported(unsigned long type)
--{
--	/* TODO: Check if TDX is supported. */
--	return __kvm_is_vm_type_supported(type);
--}
--
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 2c4fe3aff285..99fb6c9c0282 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -28,7 +28,6 @@ void vmx_hardware_unsetup(void);
- int vmx_check_processor_compat(void);
- int vmx_hardware_enable(void);
- void vmx_hardware_disable(void);
--bool vmx_is_vm_type_supported(unsigned long type);
- int vmx_vm_init(struct kvm *kvm);
- void vmx_vm_destroy(struct kvm *kvm);
- int vmx_vcpu_precreate(struct kvm *kvm);
-@@ -137,8 +136,10 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
- 
- #ifdef CONFIG_INTEL_TDX_HOST
- int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
-+bool tdx_is_vm_type_supported(unsigned long type);
- #else
- static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
-+static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
- #endif
- 
- #endif /* __KVM_X86_VMX_X86_OPS_H */
++Patch Layer status
++------------------
++  Patch layer                          Status
++
++* TDX, VMX coexistence:                 Applied
++* TDX architectural definitions:        Applying
++* TD VM creation/destruction:           Not yet
++* TD vcpu creation/destruction:         Not yet
++* TDX EPT violation:                    Not yet
++* TD finalization:                      Not yet
++* TD vcpu enter/exit:                   Not yet
++* TD vcpu interrupts/exit/hypercall:    Not yet
++
++* KVM MMU GPA shared bits:              Not yet
++* KVM TDP refactoring for TDX:          Not yet
++* KVM TDP MMU hooks:                    Not yet
 -- 
 2.25.1
 
