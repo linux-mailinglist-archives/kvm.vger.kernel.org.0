@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C037CAECF
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6347CAED0
 	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:19:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233786AbjJPQSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:18:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60130 "EHLO
+        id S234125AbjJPQR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:17:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234140AbjJPQRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:17:47 -0400
+        with ESMTP id S234122AbjJPQRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:17:32 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C56310E7;
-        Mon, 16 Oct 2023 09:17:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97ABD7E;
+        Mon, 16 Oct 2023 09:17:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473035; x=1729009035;
+  t=1697473027; x=1729009027;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=te/VzOZA6RdNyTzGAxnR8umZmCmcWLX+cMrw0t3eFuQ=;
-  b=E9+Ine9JCE261LGYWX9axWGBVRNvdq4GlruUXNkAK4wgu8xe2eYhS4MF
-   OfNIxCRvK9cgWqinlGPq3AlVdbzrwFirV1UPf0jkpGrLJkCupyt3y37g1
-   HAp25Mx/DQbmawr5G17rfvzQhg2rJOA5jrVYQdd2FF1AbCmmIJ/kNUEb+
-   Zlj1NzlARH+rvHbaUSofFwphCq55lLdXMt2NAGuIe0DpbGoqWR55F2e5D
-   At4baITnh0iw/MXGkmGouf493AM27H/a/1hamvRw72DXUyqO+ljR+OLuy
-   Hx1p1GXsMdBhn1SccHBSidzORCfE6TfrhfwhTKSlMWiasYolcfuqvDxw/
+  bh=TZ+z91imsScQD0p1/VsSa1GqbET/iM4ZKqAoChx+Rzg=;
+  b=eaAYUgD3P8bjoj6TY3a9pEVZniBg28dEVBA6XcDq2ZCadLirbMhMFJFN
+   Ku20MS2aSVh2FapSi9VGY4uYwwb5JxFKVj2Q0PK3tq6nn4hv+VDUfafus
+   hUUukGGFf0ejJkBQZludMUV5jPXett14e6vLtwIADe6BF2uGzwyxKdmBE
+   qqZIN6xDXH5uywB8IU8jc12/um/mpBnXgkWmoPSwdTzMB1TUE7+izhbwR
+   zRzpdqCnE9En0N+73SVzM+K1pw4epyf1aQnXM8qrk75FI1ps8eX11IP3m
+   WMZ5Qma6KmyH3caG0XTgb6SYdVEzrKh/eru4I1UdPxkMw1s/QpP3BbtTG
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921822"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921830"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921822"
+   d="scan'208";a="364921830"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448157"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448163"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448157"
+   d="scan'208";a="846448163"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:47 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 056/116] KVM: TDX: MTRR: implement get_mt_mask() for TDX
-Date:   Mon, 16 Oct 2023 09:14:08 -0700
-Message-Id: <65d13fa6ce67b025ce609aeeaa7f0624c9870c13.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 057/116] [MARKER] The start of TDX KVM patch series: TD finalization
+Date:   Mon, 16 Oct 2023 09:14:09 -0700
+Message-Id: <a62053ef2aaaacbae3ce5b6a5239cc310f425785.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,108 +68,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Because TDX virtualize cpuid[0x1].EDX[MTRR: bit 12] to fixed 1, guest TD
-thinks MTRR is supported.  Although TDX supports only WB for private GPA,
-it's desirable to support MTRR for shared GPA.  As guest access to MTRR
-MSRs causes #VE and KVM/x86 tracks the values of MTRR MSRs, the remining
-part is to implement get_mt_mask method for TDX for shared GPA.
+This empty commit is to mark the start of patch series of TD finalization.
 
-Pass around shared bit from kvm fault handler to get_mt_mask method so that
-it can determine if the gfn is shared or private.  Implement get_mt_mask()
-following vmx case for shared GPA and return WB for private GPA.
-the existing vmx_get_mt_mask() can't be directly used as CPU state(CR0.CD)
-is protected.  GFN passed to kvm_mtrr_check_gfn_range_consistency() should
-include shared bit.
-
-Suggested-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c    | 10 +++++++++-
- arch/x86/kvm/vmx/tdx.c     | 23 +++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  2 ++
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/intel-tdx-layer-status.rst | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 077eee12e7b6..22b9d44ee29f 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -228,6 +228,14 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
- }
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+index c4d67dd9ddf8..46ae049b6b85 100644
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -11,6 +11,7 @@ What qemu can do
+ - TDX VM TYPE is exposed to Qemu.
+ - Qemu can create/destroy guest of TDX vm type.
+ - Qemu can create/destroy vcpu of TDX vm type.
++- Qemu can populate initial guest memory image.
  
-+static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_get_mt_mask(vcpu, gfn, is_mmio);
-+
-+	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
-+}
-+
- static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	if (!is_td(kvm))
-@@ -347,7 +355,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 
- 	.set_tss_addr = vmx_set_tss_addr,
- 	.set_identity_map_addr = vmx_set_identity_map_addr,
--	.get_mt_mask = vmx_get_mt_mask,
-+	.get_mt_mask = vt_get_mt_mask,
- 
- 	.get_exit_info = vmx_get_exit_info,
- 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index cad6f9beda50..a5f1b3e75764 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -363,6 +363,29 @@ int tdx_vm_init(struct kvm *kvm)
- 	return 0;
- }
- 
-+u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
-+{
-+	if (is_mmio)
-+		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
-+
-+	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
-+		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
-+
-+	/*
-+	 * TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback.
-+	 * TODO: implement MTRR MSR emulation so that
-+	 * MTRRCap: SMRR=0: SMRR interface unsupported
-+	 *          WC=0: write combining unsupported
-+	 *          FIX=0: Fixed range registers unsupported
-+	 *          VCNT=0: number of variable range regitsers = 0
-+	 * MTRRDefType: E=1, FE=0, type=writeback only. Don't allow other value.
-+	 *              E=1: enable MTRR
-+	 *              FE=0: disable fixed range MTRRs
-+	 *              type: default memory type=writeback
-+	 */
-+	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
-+}
-+
- int tdx_vcpu_create(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 562e567953c0..e2a8b59adf2d 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -150,6 +150,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
- int tdx_vcpu_create(struct kvm_vcpu *vcpu);
- void tdx_vcpu_free(struct kvm_vcpu *vcpu);
- void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-+u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
- 
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
- 
-@@ -176,6 +177,7 @@ static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOP
- static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
- static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
- static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-+static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
- 
- static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ Patch Layer status
+ ------------------
+@@ -20,8 +21,8 @@ Patch Layer status
+ * TDX architectural definitions:        Applied
+ * TD VM creation/destruction:           Applied
+ * TD vcpu creation/destruction:         Applied
+-* TDX EPT violation:                    Applying
+-* TD finalization:                      Not yet
++* TDX EPT violation:                    Applied
++* TD finalization:                      Applying
+ * TD vcpu enter/exit:                   Not yet
+ * TD vcpu interrupts/exit/hypercall:    Not yet
  
 -- 
 2.25.1
