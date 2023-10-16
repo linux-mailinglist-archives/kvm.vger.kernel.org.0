@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B3E07CB372
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 21:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F1C97CB375
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 21:48:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233449AbjJPTqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 15:46:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35678 "EHLO
+        id S233111AbjJPTsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 15:48:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233299AbjJPTqD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 15:46:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE2FB4
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 12:45:14 -0700 (PDT)
+        with ESMTP id S232055AbjJPTsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 15:48:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A318F
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 12:47:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697485513;
+        s=mimecast20190719; t=1697485650;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xZ+lM6qiUe430iAXN5s22ta/PRg8BuZiUs2eY9X5sX4=;
-        b=TybcCOhhIEEA1rZXE2ppZ2w5ER3UWMZSc+G6GVo/EF4Ys8vY+MYX6gD7zcR2nIkAid+s88
-        PI7HDkNRflqxUCk0FEFGE5SyO+6/t6FgadEIm+hsLblJVj5baW4QQxNlAhMNbwYOl4WG0f
-        Z8FKR7/CK0EYspPGZt0JXQXvRE4NpAQ=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=hIrxwAD379HWttBABnirV+Sle9T8jRy9iSXJzz/TC4U=;
+        b=QdY+FI6r7C5FVetDCc8Gi4cbVJONdtCMfbnN/o7rnz6cJNSMXb5Q+AozZ816b9wzapOy3q
+        LnDXsZepkKu9tZmqDGwv1L9NvgTBAQ9ckkjIoEfFAWemGLRIgNfczmB/ZqeECSoYvANPPL
+        OfppXmyeN7lGPgsZ1f+7GUZfI1tteFM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-t8iQ2S6oPxiKWcj9xNaBQA-1; Mon, 16 Oct 2023 15:45:12 -0400
-X-MC-Unique: t8iQ2S6oPxiKWcj9xNaBQA-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4199725b054so58337061cf.3
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 12:45:12 -0700 (PDT)
+ us-mta-459-eWOABiYcN6KqJHwG5hvA_g-1; Mon, 16 Oct 2023 15:47:29 -0400
+X-MC-Unique: eWOABiYcN6KqJHwG5hvA_g-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7770bfcbdc6so605479185a.0
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 12:47:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697485512; x=1698090312;
+        d=1e100.net; s=20230601; t=1697485648; x=1698090448;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZ+lM6qiUe430iAXN5s22ta/PRg8BuZiUs2eY9X5sX4=;
-        b=mw0PRt51jylJRp1kZxAYq9jcxtjvSvgSYVCyQxMifi3c/xB4nIuBeJPT6mYwbYjUbt
-         mVDvOg8VoKAQgQnK4nbViJBmSrE9Hxb9U/qd3SyP8TblHxKBqJknObyghrCDbC12kytE
-         pn56wUdkx5ktwB3kK+b8dx8F8JTTFybMVlbFbSN2ehFThmpGI//TCfIiBLghSb4icWQR
-         H23KCUjhmgZ6LEBJ7WFj05AyK6AJmMXZKUO8D9z5o7PL0NZ13Ur4MJICSuIWmjSk/0us
-         Fb8kGVq+xPJRYohpWKcM9muJo5QcoMKyFFI3r492lvGXnbEMGwzZPHQvlecfdjPqlUmn
-         4MZg==
-X-Gm-Message-State: AOJu0YwuDt5AiL4jlw0sCtAB8cQ0NsRB0Rx4Ltj16PA1SpjTC3I6bMwb
-        qOC8jyX8+krUtSmY0f5HCCvxxXI5AXmnjFp2FYsYheLVBB61uVcBoV7T+GuTd8B2lk3Gd1xaw0M
-        ueFEIK4p3NSzz
-X-Received: by 2002:a05:622a:1647:b0:40f:ce6d:775e with SMTP id y7-20020a05622a164700b0040fce6d775emr358697qtj.42.1697485511799;
-        Mon, 16 Oct 2023 12:45:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+BVq+KUxheztoApR7LQWN+TLgEn9lkpkOXaqFKlCFxMhMymfU8fkOizIZF+6mTbltVn/Xxg==
-X-Received: by 2002:a05:622a:1647:b0:40f:ce6d:775e with SMTP id y7-20020a05622a164700b0040fce6d775emr358668qtj.42.1697485511520;
-        Mon, 16 Oct 2023 12:45:11 -0700 (PDT)
+        bh=hIrxwAD379HWttBABnirV+Sle9T8jRy9iSXJzz/TC4U=;
+        b=KdFdXFEG0F8VZSQLfSEQomJVSfcA6OHklJ059rDCtV5CnF6l7kb7Mc5WE/9v0wF8dG
+         hgu6deJsnBjX1gWiw6E/YVbtKnuILGuS+/f+PAmLKzLxrAQSIJJ1PD8vrxLiMUdUnXOM
+         LNAkbSLmtaN1CEvYr159cEwxxt2ofyBiMuBcug2nFY0jCfhrVSNmnoCDK4pqRnbn5awl
+         0H/wCElHEsKp8hukIAn2AOenoT92mTsd/xDvDcr4uVMzG6U3+CKa3ZQAgV0MwYXRDhlx
+         SqxJV84TK3QM3y/lUNh+iDFe6Dqjw+4F/BvydjF0Y71MgNHEQ9FTVXMgwiqg/vYubmY8
+         hNgg==
+X-Gm-Message-State: AOJu0YyDyBMUK1Z5dByeSiR5hkXl+r6qrPJptopJF3BLb5mUCA68T8S9
+        wv8MxGjo3b1U3N+HlUStjadv9Tmfv0PhcgemZclgLBwdF4gfsW8NUrs23L+tGkItEpNduffJI0R
+        sjDGF6fKsYgED
+X-Received: by 2002:a05:620a:25ce:b0:777:7240:8de with SMTP id y14-20020a05620a25ce00b00777724008demr147000qko.8.1697485648708;
+        Mon, 16 Oct 2023 12:47:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH3u6I00hayIaOImQeZghUxCl82gdoyvt4Nd2uprPCzUlhJB397PjkrSk4Pvd5jxnjH++cZDQ==
+X-Received: by 2002:a05:620a:25ce:b0:777:7240:8de with SMTP id y14-20020a05620a25ce00b00777724008demr146985qko.8.1697485648421;
+        Mon, 16 Oct 2023 12:47:28 -0700 (PDT)
 Received: from [192.168.43.95] ([37.170.191.221])
-        by smtp.gmail.com with ESMTPSA id h10-20020ac85e0a000000b00418122186ccsm9852qtx.12.2023.10.16.12.45.06
+        by smtp.gmail.com with ESMTPSA id k27-20020a05620a143b00b007742c6823a3sm3226478qkj.108.2023.10.16.12.47.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 12:45:10 -0700 (PDT)
-Message-ID: <76f9ca4a-a805-0b15-78ff-f1a50282abba@redhat.com>
-Date:   Mon, 16 Oct 2023 21:45:04 +0200
+        Mon, 16 Oct 2023 12:47:27 -0700 (PDT)
+Message-ID: <20bdc913-57d2-abe9-d222-d77647281b43@redhat.com>
+Date:   Mon, 16 Oct 2023 21:47:21 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v7 01/12] KVM: arm64: PMU: Introduce helpers to set the
- guest's PMU
+Subject: Re: [PATCH v7 04/12] KVM: arm64: PMU: Don't define the sysreg reset()
+ for PM{USERENR,CCFILTR}_EL0
 Content-Language: en-US
 To:     Raghavendra Rao Ananta <rananta@google.com>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -78,116 +78,68 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 References: <20231009230858.3444834-1-rananta@google.com>
- <20231009230858.3444834-2-rananta@google.com>
+ <20231009230858.3444834-5-rananta@google.com>
 From:   Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231009230858.3444834-2-rananta@google.com>
+In-Reply-To: <20231009230858.3444834-5-rananta@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+Hi,
 
 On 10/10/23 01:08, Raghavendra Rao Ananta wrote:
 > From: Reiji Watanabe <reijiw@google.com>
 > 
-> Introduce new helper functions to set the guest's PMU
-> (kvm->arch.arm_pmu) either to a default probed instance or to a
-> caller requested one, and use it when the guest's PMU needs to
-> be set. These helpers will make it easier for the following
-> patches to modify the relevant code.
+> The default reset function for PMU registers (defined by PMU_SYS_REG)
+> now simply clears a specified register. Use the default one for
+> PMUSERENR_EL0 and PMCCFILTR_EL0, as KVM currently clears those
+> registers on vCPU reset (NOTE: All non-RES0 fields of those
+> registers have UNKNOWN reset values, and the same fields of
+> their AArch32 registers have 0 reset values).
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3dbb7d276b0e..08af7824e9d8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2180,7 +2180,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+>  	 */
+>  	{ PMU_SYS_REG(PMUSERENR_EL0), .access = access_pmuserenr,
+> -	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
+> +	  .reg = PMUSERENR_EL0, },
+>  	{ PMU_SYS_REG(PMOVSSET_EL0),
+>  	  .access = access_pmovs, .reg = PMOVSSET_EL0 },
+>  
+> @@ -2338,7 +2338,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	 * in 32bit mode. Here we choose to reset it as zero for consistency.
+>  	 */
+>  	{ PMU_SYS_REG(PMCCFILTR_EL0), .access = access_pmu_evtyper,
+> -	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+> +	  .reg = PMCCFILTR_EL0, },
+>  
+>  	EL2_REG(VPIDR_EL2, access_rw, reset_unknown, 0),
+>  	EL2_REG(VMPIDR_EL2, access_rw, reset_unknown, 0),
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
+Thanks
+
 Eric
-> ---
->  arch/arm64/kvm/pmu-emul.c | 50 +++++++++++++++++++++++++++------------
->  1 file changed, 35 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 3afb281ed8d2..eb5dcb12dafe 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -874,6 +874,36 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  	return true;
->  }
->  
-> +static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
-> +{
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
-> +	kvm->arch.arm_pmu = arm_pmu;
-> +}
-> +
-> +/**
-> + * kvm_arm_set_default_pmu - No PMU set, get the default one.
-> + * @kvm: The kvm pointer
-> + *
-> + * The observant among you will notice that the supported_cpus
-> + * mask does not get updated for the default PMU even though it
-> + * is quite possible the selected instance supports only a
-> + * subset of cores in the system. This is intentional, and
-> + * upholds the preexisting behavior on heterogeneous systems
-> + * where vCPUs can be scheduled on any core but the guest
-> + * counters could stop working.
-> + */
-> +static int kvm_arm_set_default_pmu(struct kvm *kvm)
-> +{
-> +	struct arm_pmu *arm_pmu = kvm_pmu_probe_armpmu();
-> +
-> +	if (!arm_pmu)
-> +		return -ENODEV;
-> +
-> +	kvm_arm_set_pmu(kvm, arm_pmu);
-> +	return 0;
-> +}
-> +
->  static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -893,7 +923,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
->  				break;
->  			}
->  
-> -			kvm->arch.arm_pmu = arm_pmu;
-> +			kvm_arm_set_pmu(kvm, arm_pmu);
->  			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
->  			ret = 0;
->  			break;
-> @@ -917,20 +947,10 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  		return -EBUSY;
->  
->  	if (!kvm->arch.arm_pmu) {
-> -		/*
-> -		 * No PMU set, get the default one.
-> -		 *
-> -		 * The observant among you will notice that the supported_cpus
-> -		 * mask does not get updated for the default PMU even though it
-> -		 * is quite possible the selected instance supports only a
-> -		 * subset of cores in the system. This is intentional, and
-> -		 * upholds the preexisting behavior on heterogeneous systems
-> -		 * where vCPUs can be scheduled on any core but the guest
-> -		 * counters could stop working.
-> -		 */
-> -		kvm->arch.arm_pmu = kvm_pmu_probe_armpmu();
-> -		if (!kvm->arch.arm_pmu)
-> -			return -ENODEV;
-> +		int ret = kvm_arm_set_default_pmu(kvm);
-> +
-> +		if (ret)
-> +			return ret;
->  	}
->  
->  	switch (attr->attr) {
 
