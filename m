@@ -2,755 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 197917CAB7F
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 16:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C37BD7CAC26
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 16:50:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233528AbjJPOae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 10:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
+        id S233624AbjJPOuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 10:50:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232536AbjJPOac (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 10:30:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F909B
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 07:29:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697466582;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/9DeJrRzQVtFOe1mNsNPjFdgBTi3N3+iWS6VDgRIWYw=;
-        b=dajdLDgcgBUIH09/uhlVEX77YoVQMoMf9Jn7CHql4G9u81XMAhMLLqv0yjSux4ccBjBgVZ
-        dqS4yknKiQCISvgmvX9Dx8lFnrOYNELErAcqLBK8t4wLWodrsWe4vWbgWLiR5J+VXmTg8T
-        45QiP0SawsuGD90AFyy2Q8v/sQfBr0w=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-2ZXWkzV_OJqenB5movOikg-1; Mon, 16 Oct 2023 10:29:40 -0400
-X-MC-Unique: 2ZXWkzV_OJqenB5movOikg-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-418145b6579so43221201cf.2
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 07:29:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697466580; x=1698071380;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9DeJrRzQVtFOe1mNsNPjFdgBTi3N3+iWS6VDgRIWYw=;
-        b=unZ/3rTeSW7dZhuuNlKwB+I0AR4/OU/DB0LG+8M5htoAJcRwajorTxsNC3S6P0ssd1
-         5NwzbJ+COcPPj0YoR3LUcvTK90jy0w/J2J060b0m6id/Rd+NV0Jm9GcaeHMalUxHJsgO
-         Cq900xUeklbWdOR2mqTmAl6yYXH+KRb8Wn5Xjjh0SOOqhID3nENq9CgXStFCML8lk9cD
-         4XKChoEoxp2x+NtNH68H20c1B44cu9sHjzEh9/G8aubH8YwHxUAEmdjWLw2dpfzNC9FQ
-         2tqDEDB4M1B3nC/yQT+j9o7niuBVHT6nehxAFY3ABboOugoBRxDIwdcUpcQc5t4vXZTP
-         7a3g==
-X-Gm-Message-State: AOJu0Yx3L4KYSDsT3ClKRnESgVuYGrjK+S0SzIQLBP/JnJmrprPCHZkA
-        sSCDVj1D7VVy1Swxe11pVgXwmJ9hSa+Ixjk3ESBf0n/uEWMgbwVO7Kcse80qtYu8h9DXNR1J1x6
-        ziojtB4wCUUS3
-X-Received: by 2002:a05:622a:1708:b0:419:5c79:946b with SMTP id h8-20020a05622a170800b004195c79946bmr40512980qtk.45.1697466579037;
-        Mon, 16 Oct 2023 07:29:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEurW++xSwHvgPzM/8PpwC+xlUb1cthkh+Nh0O4I1DjXFp4mEeghkM63G/LbSlmM2YcgJ3kYQ==
-X-Received: by 2002:a05:622a:1708:b0:419:5c79:946b with SMTP id h8-20020a05622a170800b004195c79946bmr40512956qtk.45.1697466578620;
-        Mon, 16 Oct 2023 07:29:38 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id x26-20020ac84d5a000000b0041520676966sm3075725qtv.47.2023.10.16.07.29.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 07:29:38 -0700 (PDT)
-Message-ID: <39773e3f-1fd1-4c0a-ad81-95f5442d4851@redhat.com>
-Date:   Mon, 16 Oct 2023 16:29:36 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] vfio/mtty: Enable migration support
+        with ESMTP id S232959AbjJPOuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 10:50:02 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2085.outbound.protection.outlook.com [40.107.212.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88AF2E1;
+        Mon, 16 Oct 2023 07:50:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nA/SHM9GwNpuGiQMv2LS3Er8tWbgwt7cWkagr7GZ1rq1eysaMa2ftDMbvqGx52ke0xVwBDalBxU6oYnEnsbSg1Rg0m6GmY6s9DB96IRjhs93AlTuS4CkkkNN4dGZXb6tuxsbOKXBHECnhU8EOiE3WPTDzRF418qFYrUTwdRxZAep6fg0Li2DCt2oQJyl/YBfNzI1PdIXL+m+YrJk2+jV2m96voBwKyTQnsAWQJplZHZUambLFLusDtGi5qa6UxnIdZw5Rql+YFnl6Ys7txsIeD4MQ16E6ookx9Q0rNyxoUZiLJ31mQ7wa8b2JQWFCYYaopJJHq5mXnlrNDv/aNvX1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DJnSQ7kV7qNbfJSS9/zX7KAo+oj4Il8d7u9MFAfd2lI=;
+ b=JV+S9pDAZ0M4/iNe5vjRNgGep3LDrX+45dYs8JUItd0p3TnxDxcJqnjTab6GJ+O2/Y1ynzqr30otf9uqkQN+OmNxj3+TTozmwna0ib+xVz/Cmv/9yrLotaiLRybc2/fO9XOlPvUG+kN4zY+sqt1AhixnmdSSHAd/QrSBXOeA72ttkP5LmU+OsRJ/9dV5T02dI28rxvYg2/rewFJ2Hh+zunHT31lZ3Yl9aFzKRjrvLSy46pFHh1/R59wksdzWVy9DKOGn09iXusbkRuFAB8q2wDFEzBcFRkB1/JNLNth0J5NIuzGzVxqdOZjWaJT1P/7G+WrkPcInYF5NgYNo3qsNng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DJnSQ7kV7qNbfJSS9/zX7KAo+oj4Il8d7u9MFAfd2lI=;
+ b=0olcSJy0XW3P3GAPcQmFnn1wWtigns1Q3X8TvgfEtfl8ozC7zaZhSqqUKJTExGEm9vY0yZBPwWrW5VHCxfHUhjtBPZ32grqMoeRi+79mktBrVcNMh55kPW6MRU7EP3UQGSxAWjZp4m5arDulpY44zJ/zLOpb/p5JqnVn8WwtPsQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by BN9PR12MB5242.namprd12.prod.outlook.com (2603:10b6:408:11f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
+ 2023 14:49:57 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::8859:6c1d:e46c:c1b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::8859:6c1d:e46c:c1b2%4]) with mapi id 15.20.6886.034; Mon, 16 Oct 2023
+ 14:49:57 +0000
+Message-ID: <2cd89c2c-96fc-8395-2c44-5804fe5c6594@amd.com>
+Date:   Mon, 16 Oct 2023 07:49:53 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 vfio 0/3] pds/vfio: Fixes for locking bugs
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Brett Creeley <brett.creeley@amd.com>
+Cc:     jgg@ziepe.ca, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        dan.carpenter@linaro.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, shannon.nelson@amd.com
+References: <20231011230115.35719-1-brett.creeley@amd.com>
+ <20231013150940.50804350.alex.williamson@redhat.com>
 Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231013195653.1222141-1-alex.williamson@redhat.com>
- <20231013195653.1222141-3-alex.williamson@redhat.com>
-From:   =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-In-Reply-To: <20231013195653.1222141-3-alex.williamson@redhat.com>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20231013150940.50804350.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: BYAPR07CA0016.namprd07.prod.outlook.com
+ (2603:10b6:a02:bc::29) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|BN9PR12MB5242:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4086bb57-19b1-4587-6891-08dbce572a85
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0VUAiJ66g2f6/KHbGgla3+dATie3OO/IhUigmjXVtC7ggBugySxVQRPJQjXqhOv+ul5UpHMQYG644NjgtdCZIacPnYb2wThFsC9wXuuCoI4icx2YHI08ZsrlsW3n0H4eqaMvT5G+THF7sPoRLL4J/dcjKJxAvEekGAQ29JtvkinL9/ZfQl5XdnJ0nql3AyVo+EtVKcZku09fwbjWOA/h8yG7mKGMUIR99sRd5Ea9niKlO73gBABjqxi82EQqCXlXrRD5nnev4yeyEinL4IbR7YmOrnXCWdP7lOE4JljNMI2BR47mzHFpUYTf60Vl4+iWnlmkyPq3D+rcWxyg/MLoOhJ44YSfoXBEyBJR0hdo7eLgLdiqMCTwEu4x20jZbHDzAjOr8oGFqv/5maEbWbwftIycTIbopcXGUo7bKfn0/6qeBNoqpLPwHEnaXiVqiJsUqqNgH/QYaC2Lf6ul8DIGT5oR+xkGGW2aveDG7JfmY51qJa0GzhlXpaFVnlJqoqlYhTeOJaMuD8QOJqbKG8kL0dE8OR+6s4De+FXbveKjPbikYqcI6FS7ANBVdwk8HSkimbf4DzgBuNxk41czwxZPisOAGBBHuFiTd8lmiCr6HV8EmlxKcgdD8Zpm34lrRox3OXx3yI8U745Tc2/kVbXeKttaWDEYiiwb3GHOYchMgpjIQykLq9uGkzPoRhYkKHM1
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(136003)(39860400002)(346002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(26005)(2616005)(8676002)(8936002)(4326008)(5660300002)(38100700002)(83380400001)(31686004)(41300700001)(478600001)(31696002)(6486002)(966005)(110136005)(2906002)(316002)(6636002)(6666004)(6506007)(6512007)(53546011)(66946007)(36756003)(66556008)(66476007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VTJQYWRQUk05OUczZzdvTTRPcm9wdUROaTFtdXN3TUozaXc3NHFJTitPKzZz?=
+ =?utf-8?B?ckFOeUNRMmlsbk5JTWt6ZjBNSUVhcEtZRi9COUtCU3d0TXF4ZEdKZmlHMnRP?=
+ =?utf-8?B?SGdZVHgwbk05dHdTMlI5T3NTVXNTeWE4dFhhOStYQVEwN2p0VHFoeS8vd2Zk?=
+ =?utf-8?B?QjBuem5udVlGaEhHYXpUN0lvQ0kzWjZKUmpHbWdIb2RDNDU1L0NqYzg3ZnRw?=
+ =?utf-8?B?c3VrclFXZkw3Tm9Pa1ozY0x1U0lQRk10K1ZxbEdpVEJJMHp6UXZjYlZJd1p5?=
+ =?utf-8?B?WEpiUlllTURzR09pZTFZZXplMmVISndsMUYvRXFPQmNvSkJMTzZFcHVrWjVO?=
+ =?utf-8?B?WGl4RnNOME5xS0ZaSmlXUUNjeUl5TmExN0c3YVZOYVFvNmh5TnBsTjl0cEZQ?=
+ =?utf-8?B?RHgxcXl3VXVtTmxQcnFtTG1KYUdaMUVyY3g0Y0tqYU1lSnJ0SzUxNGJFeFV1?=
+ =?utf-8?B?TkM4Z0t2VjZmV1h0YlBGMXJmaEF2Y0J3NFpiSlplMXdsdllPNWN5bmZGdWZu?=
+ =?utf-8?B?TlRKUkwvVEQ0QW9JeXE0NzdmS3hXTEM2azdYUDMrenVxbHR3U1Y0dnVzR3hq?=
+ =?utf-8?B?SGtNQm1WOUUrbC9YaDF0YjNGQmJPZXRUb2tqMDZVc1lNYTRYWEQ3dmdORm41?=
+ =?utf-8?B?SUVlTlNaMUo3MGsvNHZKbmkxaDRzbWRnbTluVGdieEpzSWcrL3U4Z3cyempl?=
+ =?utf-8?B?djdBc3VSemo0ck1tTERmSUxNZmVsNEZ3R0ZFT0tvVXZ4enB4RGdDWE4xQjEz?=
+ =?utf-8?B?OGNZVVcyeWJKVmo3SjVkTGVGRVgrMkFyd1dWTmlVeDZFS1VPb0VTdFpIM2RK?=
+ =?utf-8?B?T0hVSkFsWEMzUDE2YzMwa2ZMaVUyZHBIbmdPclcyL0YwSEZUbDhsT09FUEds?=
+ =?utf-8?B?ZzFxQXZVa2xnYVorSFEyWTNrUk92RlZHWVpDUW9qMk5wSnpmNktpT0c1bmJR?=
+ =?utf-8?B?WUdmRG1ObzJ3TS93Y3RNekR4bEtkTGdtMUNWS05uenAxYkh1ZHRnL1BvMXoy?=
+ =?utf-8?B?aEg3bUtlOVZONkdOaXJGOG80dkIyNHNsSUdKVGJvUGMwVVNCeTh6UElPdzVX?=
+ =?utf-8?B?cXpFYlNFTGRpelFlOEhMeFlRV0FlSVRla2U4Nm9TenJjK2todWhkQUErRTJC?=
+ =?utf-8?B?Ym1yYUJ0QzZyYzdFQ3lidVlrSUpaNkRNL0lJQktXS25hSlN2VWVMQm9RN1RF?=
+ =?utf-8?B?TDNjenUyUndkaEo0Zlk3NjZLTlhQUGZGNXhUQU9wRjN3OEo2MUdicTNMZ3lS?=
+ =?utf-8?B?YnpESXErSUwwWCtYaE8ycCtxSGlXeklxbWVZdldJTllyYjRyODBUaUFwTmE3?=
+ =?utf-8?B?Sm9ha0RvS20yOUxBRi83OTBVbEgrK1dLVUFLeDMyOEVVcEV2eFA5OTN3R3Jn?=
+ =?utf-8?B?c3NKYzdLa1piaWFGd2xrUXUrSCtwNm9OQ1dKV3d0SkhFelIxem01MjBFNVhX?=
+ =?utf-8?B?WUQ4b05aVFAzd1RPZ1JrWk9nTEhwRHdKRkVTMjAyRkN4VVE2cXRCaVY2eTVG?=
+ =?utf-8?B?aXU0RFJPbGRtSFV1dTRYaXRxZGZVT1dtTTJEc3U2Sm83Z2o5RXJ6WDFTYTVL?=
+ =?utf-8?B?TXVjaDBuMXllcFdxMG9UOG1UMzBFNGJjb0R4eSs3Ni9OMml0d2ttSTFoeXJq?=
+ =?utf-8?B?YmlpY2ZkS1Q4VFQ0Q2xhYXBsK0tUYUVIYzZyQWZzQzdzVCtlK0t5cTZMM3ht?=
+ =?utf-8?B?b0hOZWlUbXRwNTJiVXJ1WmhiYVZWM3VkWlQzVHN2MFhLbHNUVDNyVFRkT3hD?=
+ =?utf-8?B?SkFQeEhiMlpFZllLNW8yb1ZoUTRGek9UampQK085V0IxN1lvdm5rV0R4eWU0?=
+ =?utf-8?B?Rk5zWjlYSnhXZTRZZVZnV2NkY0JRRUg2L0haOGxSNy9Henc1eDM5NlFWVlQ5?=
+ =?utf-8?B?QkJsMFJ6Z2N6K0N1WTJwVHRDanRlcTlPSHo0UmMvekZnZjBNekVHOWVMakdJ?=
+ =?utf-8?B?NGpDZG42cWRJNDkzN2psV2dZYms5MDhvQ3ZuTUJvOEw3S3ZTaWpTejYvL2Jq?=
+ =?utf-8?B?UitNbldWeEU0SS9TNjJpSFk2L21QYnE3Nmt2cHRIQlJmVDBNb2RvZ2dsNktq?=
+ =?utf-8?B?VEROVHRlRGpieFhMQ01oMWh3M2F2bFgzWEF0QmRvWHVsc3pISHZXdnJPc0xh?=
+ =?utf-8?Q?u3RhnPYKQi43KZ1vSD6+HME31?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4086bb57-19b1-4587-6891-08dbce572a85
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 14:49:57.5161
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IJwdOj1UPOh3a34yS5MyEkhxFaesHJWcAXoYp7SD6QPduWaTqYEbkMypx0F6SMhZnE4TGUXRrUwWyRnHI7mLrA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5242
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/13/23 21:56, Alex Williamson wrote:
-> The mtty driver exposes a PCI serial device to userspace and therefore
-> makes an easy target for a sample device supporting migration.  The device
-> does not make use of DMA, therefore we can easily claim support for the
-> migration P2P states, as well as dirty logging.  This implementation also
-> makes use of PRE_COPY support in order to provide migration stream
-> compatibility testing, which should generally be considered good practice.
+On 10/13/2023 2:09 PM, Alex Williamson wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
 > 
-> Much of this should look familiar to vfio-pci variant driver developers
-> ;)
+> On Wed, 11 Oct 2023 16:01:12 -0700
+> Brett Creeley <brett.creeley@amd.com> wrote:
+> 
+>> This series contains fixes for locking bugs in the recently introduced
+>> pds-vfio-pci driver. There was an initial bug reported by Dan Carpenter
+>> at:
+>>
+>> https://lore.kernel.org/kvm/1f9bc27b-3de9-4891-9687-ba2820c1b390@moroto.mountain/
+>>
+>> However, more locking bugs were found when looking into the previously
+>> mentioned issue. So, all fixes are included in this series.
+>>
+>> v2:
+>> https://lore.kernel.org/kvm/20230914191540.54946-1-brett.creeley@amd.com/
+>> - Trim the OOPs in the patch commit messages
+>> - Rework patch 3/3 to only unlock the spinlock once
+> 
+> I thought we determined the spinlock, and thus the atomic context, was
+> an arbitrary choice.  I would have figured we simply convert it to a
+> mutex.  Why didn't we take that route?  Thanks,
+> 
+> Alex
 
-
-LGTM, though, I would isolate the part doing the get/set of the device
-state in their own routine to avoid extra noise in mtty_save_device_data()
-and mtty_resume_write(). The size of the state could also be dynamic and
-computed like done in .migration_get_data_size() handler. This is only
-a sample, so it might be worth the extra effort.
-
-That said, this driver could be a summary of the best practice to follow
-when implementing support for VFIO migration.
+Hmm. I guess it wasn't completely clear that was the expected solution 
+even after Jason's response. However, I can resubmit a v3 with that change.
 
 Thanks,
 
-C.
-
+Brett
 > 
->   samples/vfio-mdev/mtty.c | 582 +++++++++++++++++++++++++++++++++++++++
->   1 file changed, 582 insertions(+)
+>> - Destroy the state_mutex in the driver specific vfio_device_ops.release
+>>    callback
+>>
+>> Brett Creeley (3):
+>>    pds/vfio: Fix spinlock bad magic BUG
+>>    pds/vfio: Fix mutex lock->magic != lock warning
+>>    pds/vfio: Fix possible sleep while in atomic context
+>>
+>>   drivers/vfio/pci/pds/vfio_dev.c | 27 ++++++++++++++++++++-------
+>>   1 file changed, 20 insertions(+), 7 deletions(-)
+>>
 > 
-> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-> index 0a2760818e46..572f51342fbd 100644
-> --- a/samples/vfio-mdev/mtty.c
-> +++ b/samples/vfio-mdev/mtty.c
-> @@ -29,6 +29,8 @@
->   #include <linux/serial.h>
->   #include <uapi/linux/serial_reg.h>
->   #include <linux/eventfd.h>
-> +#include <linux/anon_inodes.h>
-> +
->   /*
->    * #defines
->    */
-> @@ -124,6 +126,29 @@ struct serial_port {
->   	u8 intr_trigger_level;  /* interrupt trigger level */
->   };
->   
-> +struct mtty_data {
-> +	u64 magic;
-> +#define MTTY_MAGIC 0x7e9d09898c3e2c4e /* Nothing clever, just random */
-> +	u32 major_ver;
-> +#define MTTY_MAJOR_VER 1
-> +	u32 minor_ver;
-> +#define MTTY_MINOR_VER 0
-> +	u32 nr_ports;
-> +	u32 flags;
-> +	struct serial_port ports[2];
-> +};
-> +
-> +struct mdev_state;
-> +
-> +struct mtty_migration_file {
-> +	struct file *filp;
-> +	struct mutex lock;
-> +	struct mdev_state *mdev_state;
-> +	struct mtty_data data;
-> +	ssize_t filled_size;
-> +	u8 disabled:1;
-> +};
-> +
->   /* State of each mdev device */
->   struct mdev_state {
->   	struct vfio_device vdev;
-> @@ -140,6 +165,12 @@ struct mdev_state {
->   	struct mutex rxtx_lock;
->   	struct vfio_device_info dev_info;
->   	int nr_ports;
-> +	struct mutex state_mutex;
-> +	enum vfio_device_mig_state state;
-> +	struct mutex reset_mutex;
-> +	struct mtty_migration_file *saving_migf;
-> +	struct mtty_migration_file *resuming_migf;
-> +	u8 deferred_reset:1;
->   };
->   
->   static struct mtty_type {
-> @@ -716,6 +747,534 @@ static ssize_t mdev_access(struct mdev_state *mdev_state, u8 *buf, size_t count,
->   	return ret;
->   }
->   
-> +static void mtty_disable_file(struct mtty_migration_file *migf)
-> +{
-> +	mutex_lock(&migf->lock);
-> +	migf->disabled = true;
-> +	migf->filled_size = 0;
-> +	migf->filp->f_pos = 0;
-> +	mutex_unlock(&migf->lock);
-> +}
-> +
-> +static void mtty_disable_files(struct mdev_state *mdev_state)
-> +{
-> +	if (mdev_state->saving_migf) {
-> +		mtty_disable_file(mdev_state->saving_migf);
-> +		fput(mdev_state->saving_migf->filp);
-> +		mdev_state->saving_migf = NULL;
-> +	}
-> +
-> +	if (mdev_state->resuming_migf) {
-> +		mtty_disable_file(mdev_state->resuming_migf);
-> +		fput(mdev_state->resuming_migf->filp);
-> +		mdev_state->resuming_migf = NULL;
-> +	}
-> +}
-> +
-> +static void mtty_state_mutex_unlock(struct mdev_state *mdev_state)
-> +{
-> +again:
-> +	mutex_lock(&mdev_state->reset_mutex);
-> +	if (mdev_state->deferred_reset) {
-> +		mdev_state->deferred_reset = false;
-> +		mutex_unlock(&mdev_state->reset_mutex);
-> +		mdev_state->state = VFIO_DEVICE_STATE_RUNNING;
-> +		mtty_disable_files(mdev_state);
-> +		goto again;
-> +	}
-> +	mutex_unlock(&mdev_state->state_mutex);
-> +	mutex_unlock(&mdev_state->reset_mutex);
-> +}
-> +
-> +static int mtty_release_migf(struct inode *inode, struct file *filp)
-> +{
-> +	struct mtty_migration_file *migf = filp->private_data;
-> +
-> +	mtty_disable_file(migf);
-> +	mutex_destroy(&migf->lock);
-> +	kfree(migf);
-> +
-> +	return 0;
-> +}
-> +
-> +static long mtty_precopy_ioctl(struct file *filp, unsigned int cmd,
-> +			       unsigned long arg)
-> +{
-> +	struct mtty_migration_file *migf = filp->private_data;
-> +	struct mdev_state *mdev_state = migf->mdev_state;
-> +	loff_t *pos = &filp->f_pos;
-> +	struct vfio_precopy_info info = {};
-> +	unsigned long minsz;
-> +	int ret;
-> +
-> +	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
-> +		return -ENOTTY;
-> +
-> +	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
-> +
-> +	if (copy_from_user(&info, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +	if (info.argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&mdev_state->state_mutex);
-> +	if (mdev_state->state != VFIO_DEVICE_STATE_PRE_COPY &&
-> +	    mdev_state->state != VFIO_DEVICE_STATE_PRE_COPY_P2P) {
-> +		ret = -EINVAL;
-> +		goto unlock;
-> +	}
-> +
-> +	mutex_lock(&migf->lock);
-> +
-> +	if (migf->disabled) {
-> +		mutex_unlock(&migf->lock);
-> +		ret = -ENODEV;
-> +		goto unlock;
-> +	}
-> +
-> +	if (*pos > migf->filled_size) {
-> +		mutex_unlock(&migf->lock);
-> +		ret = -EINVAL;
-> +		goto unlock;
-> +	}
-> +
-> +	info.dirty_bytes = 0;
-> +	info.initial_bytes = migf->filled_size - *pos;
-> +	mutex_unlock(&migf->lock);
-> +
-> +	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-> +unlock:
-> +	mtty_state_mutex_unlock(mdev_state);
-> +	return ret;
-> +}
-> +
-> +static ssize_t mtty_save_read(struct file *filp, char __user *buf,
-> +			      size_t len, loff_t *pos)
-> +{
-> +	struct mtty_migration_file *migf = filp->private_data;
-> +	ssize_t ret = 0;
-> +
-> +	if (pos)
-> +		return -ESPIPE;
-> +
-> +	pos = &filp->f_pos;
-> +
-> +	mutex_lock(&migf->lock);
-> +
-> +	dev_dbg(migf->mdev_state->vdev.dev, "%s ask %zu\n", __func__, len);
-> +
-> +	if (migf->disabled) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
-> +	if (*pos > migf->filled_size) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	len = min_t(size_t, migf->filled_size - *pos, len);
-> +	if (len) {
-> +		if (copy_to_user(buf, (void *)&migf->data + *pos, len)) {
-> +			ret = -EFAULT;
-> +			goto out_unlock;
-> +		}
-> +		*pos += len;
-> +		ret = len;
-> +	}
-> +out_unlock:
-> +	dev_dbg(migf->mdev_state->vdev.dev, "%s read %zu\n", __func__, ret);
-> +	mutex_unlock(&migf->lock);
-> +	return ret;
-> +}
-> +
-> +static const struct file_operations mtty_save_fops = {
-> +	.owner = THIS_MODULE,
-> +	.read = mtty_save_read,
-> +	.unlocked_ioctl = mtty_precopy_ioctl,
-> +	.compat_ioctl = compat_ptr_ioctl,
-> +	.release = mtty_release_migf,
-> +	.llseek = no_llseek,
-> +};
-> +
-> +static struct mtty_migration_file *
-> +mtty_save_device_data(struct mdev_state *mdev_state,
-> +		      enum vfio_device_mig_state state)
-> +{
-> +	struct mtty_migration_file *migf = mdev_state->saving_migf;
-> +	struct mtty_migration_file *ret = NULL;
-> +
-> +	if (migf) {
-> +		if (state == VFIO_DEVICE_STATE_STOP_COPY)
-> +			goto fill_data;
-> +		return ret;
-> +	}
-> +
-> +	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
-> +	if (!migf)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	migf->filp = anon_inode_getfile("mtty_mig", &mtty_save_fops,
-> +					migf, O_RDONLY);
-> +	if (IS_ERR(migf->filp)) {
-> +		int rc = PTR_ERR(migf->filp);
-> +
-> +		kfree(migf);
-> +		return ERR_PTR(rc);
-> +	}
-> +
-> +	stream_open(migf->filp->f_inode, migf->filp);
-> +	mutex_init(&migf->lock);
-> +	migf->mdev_state = mdev_state;
-> +
-> +	migf->data.magic = MTTY_MAGIC;
-> +	migf->data.major_ver = MTTY_MAJOR_VER;
-> +	migf->data.minor_ver = MTTY_MINOR_VER;
-> +	migf->data.nr_ports = mdev_state->nr_ports;
-> +
-> +	migf->filled_size = offsetof(struct mtty_data, ports);
-> +
-> +	dev_dbg(mdev_state->vdev.dev, "%s filled header to %zu\n",
-> +		__func__, migf->filled_size);
-> +
-> +	ret = mdev_state->saving_migf = migf;
-> +
-> +fill_data:
-> +	if (state == VFIO_DEVICE_STATE_STOP_COPY) {
-> +		int i;
-> +
-> +		mutex_lock(&migf->lock);
-> +		for (i = 0; i < mdev_state->nr_ports; i++) {
-> +			memcpy(&migf->data.ports[i],
-> +			       &mdev_state->s[i], sizeof(struct serial_port));
-> +			migf->filled_size += sizeof(struct serial_port);
-> +		}
-> +		dev_dbg(mdev_state->vdev.dev, "%s filled to %zu\n",
-> +			__func__, migf->filled_size);
-> +		mutex_unlock(&migf->lock);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +static ssize_t mtty_resume_write(struct file *filp, const char __user *buf,
-> +				 size_t len, loff_t *pos)
-> +{
-> +	struct mtty_migration_file *migf = filp->private_data;
-> +	loff_t requested_length;
-> +	ssize_t ret = 0;
-> +
-> +	if (pos)
-> +		return -ESPIPE;
-> +
-> +	pos = &filp->f_pos;
-> +
-> +	if (*pos < 0 ||
-> +	    check_add_overflow((loff_t)len, *pos, &requested_length))
-> +		return -EINVAL;
-> +
-> +	if (requested_length > sizeof(struct mtty_data))
-> +		return -ENOMEM;
-> +
-> +	mutex_lock(&migf->lock);
-> +
-> +	if (migf->disabled) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
-> +	if (copy_from_user((void *)&migf->data + *pos, buf, len)) {
-> +		ret = -EFAULT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	*pos += len;
-> +	ret = len;
-> +	migf->filled_size += len;
-> +
-> +	dev_dbg(migf->mdev_state->vdev.dev, "%s received %zu, total %zu\n",
-> +		__func__, len, migf->filled_size);
-> +
-> +	if (migf->filled_size >= offsetof(struct mtty_data, ports)) {
-> +		struct mdev_state *mdev_state = migf->mdev_state;
-> +
-> +		if (migf->data.magic != MTTY_MAGIC || migf->data.flags ||
-> +		    migf->data.major_ver != MTTY_MAJOR_VER ||
-> +		    migf->data.minor_ver != MTTY_MINOR_VER ||
-> +		    migf->data.nr_ports != mdev_state->nr_ports) {
-> +			dev_dbg(migf->mdev_state->vdev.dev,
-> +				"%s failed validation\n", __func__);
-> +			ret = -EFAULT;
-> +		} else {
-> +			dev_dbg(migf->mdev_state->vdev.dev,
-> +				"%s header validated\n", __func__);
-> +		}
-> +	}
-> +
-> +out_unlock:
-> +	mutex_unlock(&migf->lock);
-> +	return ret;
-> +}
-> +
-> +static const struct file_operations mtty_resume_fops = {
-> +	.owner = THIS_MODULE,
-> +	.write = mtty_resume_write,
-> +	.release = mtty_release_migf,
-> +	.llseek = no_llseek,
-> +};
-> +
-> +static struct mtty_migration_file *
-> +mtty_resume_device_data(struct mdev_state *mdev_state)
-> +{
-> +	struct mtty_migration_file *migf;
-> +	int ret;
-> +
-> +	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
-> +	if (!migf)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	migf->filp = anon_inode_getfile("mtty_mig", &mtty_resume_fops,
-> +					migf, O_WRONLY);
-> +	if (IS_ERR(migf->filp)) {
-> +		ret = PTR_ERR(migf->filp);
-> +		kfree(migf);
-> +		return ERR_PTR(ret);
-> +	}
-> +
-> +	stream_open(migf->filp->f_inode, migf->filp);
-> +	mutex_init(&migf->lock);
-> +	migf->mdev_state = mdev_state;
-> +
-> +	mdev_state->resuming_migf = migf;
-> +
-> +	return migf;
-> +}
-> +
-> +static int mtty_load_state(struct mdev_state *mdev_state)
-> +{
-> +	struct mtty_migration_file *migf = mdev_state->resuming_migf;
-> +	int i;
-> +
-> +	mutex_lock(&migf->lock);
-> +	/* magic and version already tested by resume write fn */
-> +	if (migf->filled_size < offsetof(struct mtty_data, ports) +
-> +			(mdev_state->nr_ports * sizeof(struct serial_port))) {
-> +		dev_dbg(mdev_state->vdev.dev, "%s expected %zu, got %zu\n",
-> +			__func__, offsetof(struct mtty_data, ports) +
-> +			(mdev_state->nr_ports * sizeof(struct serial_port)),
-> +			migf->filled_size);
-> +		mutex_unlock(&migf->lock);
-> +		return -EINVAL;
-> +	}
-> +
-> +	for (i = 0; i < mdev_state->nr_ports; i++)
-> +		memcpy(&mdev_state->s[i],
-> +		       &migf->data.ports[i], sizeof(struct serial_port));
-> +
-> +	mutex_unlock(&migf->lock);
-> +	return 0;
-> +}
-> +
-> +static struct file *mtty_step_state(struct mdev_state *mdev_state,
-> +				     enum vfio_device_mig_state new)
-> +{
-> +	enum vfio_device_mig_state cur = mdev_state->state;
-> +
-> +	dev_dbg(mdev_state->vdev.dev, "%s: %d -> %d\n", __func__, cur, new);
-> +
-> +	/*
-> +	 * The following state transitions are no-op considering
-> +	 * mtty does not do DMA nor require any explicit start/stop.
-> +	 *
-> +	 *         RUNNING -> RUNNING_P2P
-> +	 *         RUNNING_P2P -> RUNNING
-> +	 *         RUNNING_P2P -> STOP
-> +	 *         PRE_COPY -> PRE_COPY_P2P
-> +	 *         PRE_COPY_P2P -> PRE_COPY
-> +	 *         STOP -> RUNNING_P2P
-> +	 */
-> +	if ((cur == VFIO_DEVICE_STATE_RUNNING &&
-> +	     new == VFIO_DEVICE_STATE_RUNNING_P2P) ||
-> +	    (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
-> +	     (new == VFIO_DEVICE_STATE_RUNNING ||
-> +	      new == VFIO_DEVICE_STATE_STOP)) ||
-> +	    (cur == VFIO_DEVICE_STATE_PRE_COPY &&
-> +	     new == VFIO_DEVICE_STATE_PRE_COPY_P2P) ||
-> +	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P &&
-> +	     new == VFIO_DEVICE_STATE_PRE_COPY) ||
-> +	    (cur == VFIO_DEVICE_STATE_STOP &&
-> +	     new == VFIO_DEVICE_STATE_RUNNING_P2P))
-> +		return NULL;
-> +
-> +	/*
-> +	 * The following state transitions simply close migration files,
-> +	 * with the exception of RESUMING -> STOP, which needs to load
-> +	 * the state first.
-> +	 *
-> +	 *         RESUMING -> STOP
-> +	 *         PRE_COPY -> RUNNING
-> +	 *         PRE_COPY_P2P -> RUNNING_P2P
-> +	 *         STOP_COPY -> STOP
-> +	 */
-> +	if (cur == VFIO_DEVICE_STATE_RESUMING &&
-> +	    new == VFIO_DEVICE_STATE_STOP) {
-> +		int ret;
-> +
-> +		ret = mtty_load_state(mdev_state);
-> +		if (ret)
-> +			return ERR_PTR(ret);
-> +		mtty_disable_files(mdev_state);
-> +		return NULL;
-> +	}
-> +
-> +	if ((cur == VFIO_DEVICE_STATE_PRE_COPY &&
-> +	     new == VFIO_DEVICE_STATE_RUNNING) ||
-> +	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P &&
-> +	     new == VFIO_DEVICE_STATE_RUNNING_P2P) ||
-> +	    (cur == VFIO_DEVICE_STATE_STOP_COPY &&
-> +	     new == VFIO_DEVICE_STATE_STOP)) {
-> +		mtty_disable_files(mdev_state);
-> +		return NULL;
-> +	}
-> +
-> +	/*
-> +	 * The following state transitions return migration files.
-> +	 *
-> +	 *         RUNNING -> PRE_COPY
-> +	 *         RUNNING_P2P -> PRE_COPY_P2P
-> +	 *         STOP -> STOP_COPY
-> +	 *         STOP -> RESUMING
-> +	 *         PRE_COPY_P2P -> STOP_COPY
-> +	 */
-> +	if ((cur == VFIO_DEVICE_STATE_RUNNING &&
-> +	     new == VFIO_DEVICE_STATE_PRE_COPY) ||
-> +	    (cur == VFIO_DEVICE_STATE_RUNNING_P2P &&
-> +	     new == VFIO_DEVICE_STATE_PRE_COPY_P2P) ||
-> +	    (cur == VFIO_DEVICE_STATE_STOP &&
-> +	     new == VFIO_DEVICE_STATE_STOP_COPY) ||
-> +	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P &&
-> +	     new == VFIO_DEVICE_STATE_STOP_COPY)) {
-> +		struct mtty_migration_file *migf;
-> +
-> +		migf = mtty_save_device_data(mdev_state, new);
-> +		if (IS_ERR(migf))
-> +			return ERR_CAST(migf);
-> +
-> +		if (migf) {
-> +			get_file(migf->filp);
-> +
-> +			return migf->filp;
-> +		}
-> +		return NULL;
-> +	}
-> +
-> +	if (cur == VFIO_DEVICE_STATE_STOP &&
-> +	    new == VFIO_DEVICE_STATE_RESUMING) {
-> +		struct mtty_migration_file *migf;
-> +
-> +		migf = mtty_resume_device_data(mdev_state);
-> +		if (IS_ERR(migf))
-> +			return ERR_CAST(migf);
-> +
-> +		get_file(migf->filp);
-> +
-> +		return migf->filp;
-> +	}
-> +
-> +	/* vfio_mig_get_next_state() does not use arcs other than the above */
-> +	WARN_ON(true);
-> +	return ERR_PTR(-EINVAL);
-> +}
-> +
-> +static struct file *mtty_set_state(struct vfio_device *vdev,
-> +				   enum vfio_device_mig_state new_state)
-> +{
-> +	struct mdev_state *mdev_state =
-> +		container_of(vdev, struct mdev_state, vdev);
-> +	struct file *ret = NULL;
-> +
-> +	dev_dbg(vdev->dev, "%s -> %d\n", __func__, new_state);
-> +
-> +	mutex_lock(&mdev_state->state_mutex);
-> +	while (mdev_state->state != new_state) {
-> +		enum vfio_device_mig_state next_state;
-> +		int rc = vfio_mig_get_next_state(vdev, mdev_state->state,
-> +						 new_state, &next_state);
-> +		if (rc) {
-> +			ret = ERR_PTR(rc);
-> +			break;
-> +		}
-> +
-> +		ret = mtty_step_state(mdev_state, next_state);
-> +		if (IS_ERR(ret))
-> +			break;
-> +
-> +		mdev_state->state = next_state;
-> +
-> +		if (WARN_ON(ret && new_state != next_state)) {
-> +			fput(ret);
-> +			ret = ERR_PTR(-EINVAL);
-> +			break;
-> +		}
-> +	}
-> +	mtty_state_mutex_unlock(mdev_state);
-> +	return ret;
-> +}
-> +
-> +static int mtty_get_state(struct vfio_device *vdev,
-> +			  enum vfio_device_mig_state *current_state)
-> +{
-> +	struct mdev_state *mdev_state =
-> +		container_of(vdev, struct mdev_state, vdev);
-> +
-> +	mutex_lock(&mdev_state->state_mutex);
-> +	*current_state = mdev_state->state;
-> +	mtty_state_mutex_unlock(mdev_state);
-> +	return 0;
-> +}
-> +
-> +static int mtty_get_data_size(struct vfio_device *vdev,
-> +			      unsigned long *stop_copy_length)
-> +{
-> +	struct mdev_state *mdev_state =
-> +		container_of(vdev, struct mdev_state, vdev);
-> +
-> +	*stop_copy_length = offsetof(struct mtty_data, ports) +
-> +			(mdev_state->nr_ports * sizeof(struct serial_port));
-> +	return 0;
-> +}
-> +
-> +static const struct vfio_migration_ops mtty_migration_ops = {
-> +	.migration_set_state = mtty_set_state,
-> +	.migration_get_state = mtty_get_state,
-> +	.migration_get_data_size = mtty_get_data_size,
-> +};
-> +
-> +static int mtty_log_start(struct vfio_device *vdev,
-> +			  struct rb_root_cached *ranges,
-> +			  u32 nnodes, u64 *page_size)
-> +{
-> +	return 0;
-> +}
-> +
-> +static int mtty_log_stop(struct vfio_device *vdev)
-> +{
-> +	return 0;
-> +}
-> +
-> +static int mtty_log_read_and_clear(struct vfio_device *vdev,
-> +				   unsigned long iova, unsigned long length,
-> +				   struct iova_bitmap *dirty)
-> +{
-> +	return 0;
-> +}
-> +
-> +static const struct vfio_log_ops mtty_log_ops = {
-> +	.log_start = mtty_log_start,
-> +	.log_stop = mtty_log_stop,
-> +	.log_read_and_clear = mtty_log_read_and_clear,
-> +};
-> +
->   static int mtty_init_dev(struct vfio_device *vdev)
->   {
->   	struct mdev_state *mdev_state =
-> @@ -748,6 +1307,16 @@ static int mtty_init_dev(struct vfio_device *vdev)
->   	mutex_init(&mdev_state->ops_lock);
->   	mdev_state->mdev = mdev;
->   	mtty_create_config_space(mdev_state);
-> +
-> +	mutex_init(&mdev_state->state_mutex);
-> +	mutex_init(&mdev_state->reset_mutex);
-> +	vdev->migration_flags = VFIO_MIGRATION_STOP_COPY |
-> +				VFIO_MIGRATION_P2P |
-> +				VFIO_MIGRATION_PRE_COPY;
-> +	vdev->mig_ops = &mtty_migration_ops;
-> +	vdev->log_ops = &mtty_log_ops;
-> +	mdev_state->state = VFIO_DEVICE_STATE_RUNNING;
-> +
->   	return 0;
->   
->   err_nr_ports:
-> @@ -781,6 +1350,8 @@ static void mtty_release_dev(struct vfio_device *vdev)
->   	struct mdev_state *mdev_state =
->   		container_of(vdev, struct mdev_state, vdev);
->   
-> +	mutex_destroy(&mdev_state->reset_mutex);
-> +	mutex_destroy(&mdev_state->state_mutex);
->   	atomic_add(mdev_state->nr_ports, &mdev_avail_ports);
->   	kfree(mdev_state->vconfig);
->   }
-> @@ -797,6 +1368,15 @@ static int mtty_reset(struct mdev_state *mdev_state)
->   {
->   	pr_info("%s: called\n", __func__);
->   
-> +	mutex_lock(&mdev_state->reset_mutex);
-> +	mdev_state->deferred_reset = true;
-> +	if (!mutex_trylock(&mdev_state->state_mutex)) {
-> +		mutex_unlock(&mdev_state->reset_mutex);
-> +		return 0;
-> +	}
-> +	mutex_unlock(&mdev_state->reset_mutex);
-> +	mtty_state_mutex_unlock(mdev_state);
-> +
->   	return 0;
->   }
->   
-> @@ -1268,6 +1848,8 @@ static void mtty_close(struct vfio_device *vdev)
->   	struct mdev_state *mdev_state =
->   		container_of(vdev, struct mdev_state, vdev);
->   
-> +	mtty_disable_files(mdev_state);
-> +
->   	if (mdev_state->intx_evtfd) {
->   		eventfd_ctx_put(mdev_state->intx_evtfd);
->   		mdev_state->intx_evtfd = NULL;
-
