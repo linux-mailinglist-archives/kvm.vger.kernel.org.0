@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C9EB7CA967
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:30:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 139967CA96B
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:31:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233599AbjJPNaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 09:30:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47320 "EHLO
+        id S233604AbjJPNbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 09:31:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233568AbjJPNaW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 09:30:22 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2069.outbound.protection.outlook.com [40.107.212.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966A8AD;
-        Mon, 16 Oct 2023 06:30:18 -0700 (PDT)
+        with ESMTP id S233613AbjJPNaz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 09:30:55 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2052.outbound.protection.outlook.com [40.107.100.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5BF114;
+        Mon, 16 Oct 2023 06:30:53 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FYpQMrW4zcE5x1Xc0Z5lci7we+lq8y33FQKSpm20V2GvNW7jlPttw9VKCfuuJ1aCfRZUL2Gn1BfUtleAVzPLxeUwOjk894Cw/sgtqEn0wGA2HHw0Ml7zSpcgme0smbN+PoVrnEBKEmxnMlwgaRv97QfZhrPwD02YP9p9qkldX9/ukU+jVvmKkexsj6Iy6+g7DcXwiHf2Kd+o0f0JxZEiSOwSY76Kd9ru7DZlsj4zyUAxwHgjAdxNhfMKjqkJUnw3bC+cl8q/Vq7ZAqFTntAN8EkH7mrSoFrQbatJGjc0kTEUd37W69pwZu8s6SPQh8cnQNIcVW/1DlmwWcGYc8bI7w==
+ b=dvYRiSGtxTPR31VZ9Nz+PSpZZr6Vb76UmTXccXliHSQmZg5m4scWbSrlAikoB2OyoDzDPEH8r/y6S92CN4AC8/fgLhUsHWxKcaY72NaOMrxxhOnYSXIyZObg1KJ/Tqta3ennU6RayJVPYdUW7K5n7rhbCxVPzYVAPVfcvsjpHA30yr6XFItGgsFxGAYuG+tMALrIlji+LpPQA/WlH6Jun9He0dAI3VXnCPx6XMzmcjNTWKCquDJ6rzeK3nUTg0rfDCicD9kZbbqqkGProegxR/wygPXvmzhmpgqpXv3VKN0H4E7+tfh8l8UvZ08KAqmk5vpOKiWNjanpT9wqRjr30Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U1+y3wfu/XrPWjk6IeufF6Nsc1TJN1LoCddCx5qbXng=;
- b=GIY5CYNDckwvsJEyz2LEODUWkKZlyZUId+WB7YWc5hOuIl0RBRzbZw6tlFXmNL6ajOMI15HERBrCYk2qK8se6ZqlPExCp1WzRjp8ncRUX2Tdwktez8OOlBoHQHSjrY+Im0fmzGee15RSNbxxZvTamjOtSW5MO8toeKc0f5kGvHqgKpZVysExQSVvysP6wNB7FoC6+O2DyRyb8oV2l29KoQr2UMeT2laYPI6ZozClUmA8sMF3VlsPmy8cedUfHHOWx86tMIBs0ZiToub//GYYD2cLbIuo7V+HNdudUsu/jJnlMuGSNJXQDvbPExHkTos1vh5qJcy9ap5hBZSvwNgnpg==
+ bh=CYrbyDcHXWtSbej9FlmrAnCuP7pJWHMGL7rWpm0bZ8Q=;
+ b=cAP2gJnBe0k4jI5JlTwRF1cs9UmSUbaMfkMgmsO26eLeePgeRipTTm6u1xq1e7XeqTujgRaMmIDCb1LlNc+9Dy7Y6laFPx+ZQcORsXGzgt2iYO4emNzcO9lb1tzQvjQpdHiU2H4EjYLQG8ahbwFtW3xlGgDgW0daQCkkBXH4k/NQVhsYmQaJ/r1IYNT4wfwnjhqyPbHPxnIqDjer6wHX7JHwWCgQoDevPeeU8FFj++4OQH7Si/uFwCCfYHkBWI8+HAlo8PsBxEw6jIgTUcDrLgFxX7OfhM0jw/aDhBIioyHREBdQsPIlUjGe/43qtHBBykn0RwJgWO8sUWv1rPvVGw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U1+y3wfu/XrPWjk6IeufF6Nsc1TJN1LoCddCx5qbXng=;
- b=Z1d+UQoSClFfkvJ987QxE0Ou5hucEf6bisC7lfAjcEGIVy7J513EUZpqEot/0u8lwxBD2CiattwQqRSEcuXk75eI9EOu5U4xv49PKmfSLM2XWZoWRLFLL14xMoSZa+gkrxMg8ivWqL6IwWVqlmxV/i9NC71omStqlYgNvugBc8A=
-Received: from CYXPR03CA0054.namprd03.prod.outlook.com (2603:10b6:930:d1::24)
- by BY5PR12MB5512.namprd12.prod.outlook.com (2603:10b6:a03:1df::16) with
+ bh=CYrbyDcHXWtSbej9FlmrAnCuP7pJWHMGL7rWpm0bZ8Q=;
+ b=l814euXkGiLDmn6zdj1IvUzUudJv/QHZnZQ+bCTXGsai7y7hQyHiDlAOub9YZqlNgLDOsnsrHWaztnncvSlNLQfvpstKg+VPu6A5S/7fvNNRVRSL4IrrFq1Xqb79uYZL5QQYOK/mMhohmbufV9JGsydgrv2vZFNAcTOQZoX4V8U=
+Received: from CY8PR19CA0038.namprd19.prod.outlook.com (2603:10b6:930:6::26)
+ by MW6PR12MB8664.namprd12.prod.outlook.com (2603:10b6:303:23c::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
- 2023 13:30:15 +0000
-Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
- (2603:10b6:930:d1:cafe::1a) by CYXPR03CA0054.outlook.office365.com
- (2603:10b6:930:d1::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
- Transport; Mon, 16 Oct 2023 13:30:15 +0000
+ 2023 13:30:50 +0000
+Received: from CY4PEPF0000E9DB.namprd05.prod.outlook.com
+ (2603:10b6:930:6:cafe::a6) by CY8PR19CA0038.outlook.office365.com
+ (2603:10b6:930:6::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35 via Frontend
+ Transport; Mon, 16 Oct 2023 13:30:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.83) with Microsoft
+ CY4PEPF0000E9DB.mail.protection.outlook.com (10.167.241.81) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:30:14 +0000
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:30:49 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 08:30:13 -0500
+ 2023 08:30:48 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -72,9 +72,9 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
         <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH v10 11/50] x86/sev: Add helper functions for RMPUPDATE and PSMASH instruction
-Date:   Mon, 16 Oct 2023 08:27:40 -0500
-Message-ID: <20231016132819.1002933-12-michael.roth@amd.com>
+Subject: [PATCH v10 12/50] x86/sev: Invalidate pages from the direct map when adding them to the RMP table
+Date:   Mon, 16 Oct 2023 08:27:41 -0500
+Message-ID: <20231016132819.1002933-13-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231016132819.1002933-1-michael.roth@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
@@ -86,23 +86,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|BY5PR12MB5512:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52558e21-ba98-4b01-ddea-08dbce4c0805
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9DB:EE_|MW6PR12MB8664:EE_
+X-MS-Office365-Filtering-Correlation-Id: 95859bed-5e69-47a4-b395-08dbce4c1cdf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cpW8BjRbu9BRGw8TUleBq2S+6bo1mfCs6/VBy63cNzF5RIiL+o8h1lYVxkPrXlqseyi+cuaNH+7TnIt/iZ5/nREUZz/7zNNHrQTYWnCIUgKfAuLGUsQZ2rx34rrarBG2hF1QiQMMmiPpwdNuNEr5VCxCQ9BlqbpSHOKS6x88+fYJDPSMzsQTLiz7D/TozEZXatTVnlJIYVlji5wj3p45IdDOud5NU0iapewNMhx/Jn9l4JyTUfyoTBe1i2koF320fDT4RDMIKTg0TKLfIqlRKCO5PpQ+PbRPEACo7DA9OLE356B1iPUy4is0SQuBHXV5dJ2iwm/UmzVMCwy6WSPBQ2NRr5Mo1ah2O6cshmj7mIYpduFogVH+RVV0vsVW917vThvxUSVGh+0xj4Z1NJIJXMdpuTIGqQyyrfzmJmR5N2RYEs3GTAj5vgj6ScK2B/yudbUxg7IZ8ID8b3YkM1AgQyuX6i0Ry1dySDw3VH6pJmNnO7ZiA6BBFCvxB1ikBhXVdnzHac3CIIL+HoGelE5lyjKjKz3CPBgazjxz9r83ycYYDx0dZeDXoBmxjeuG4XAQ0FzameYnWD2DQPnd6f3VPU8AFSh0EaRJHWHnO/ik5g5mU+1rlJDULy6nG3C+Eni2utnvh4P2Vl9VA5yHDuleVxhmU7Td4WcXSpevWXay281fgGiK960gIUU0VtL09iVjc7ZpW6R9R9HGW9Oo2KsHqhombxWm1NkiJGCsW94WV+RPXHYkVU44GkilZcWDPBZKlzksPtraE1EAEkkhrQoKxg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(136003)(346002)(396003)(230922051799003)(82310400011)(1800799009)(186009)(64100799003)(451199024)(40470700004)(46966006)(36840700001)(70206006)(70586007)(2616005)(6916009)(54906003)(478600001)(316002)(7406005)(426003)(1076003)(336012)(26005)(16526019)(5660300002)(8676002)(8936002)(4326008)(44832011)(2906002)(7416002)(41300700001)(86362001)(6666004)(36756003)(82740400003)(356005)(47076005)(83380400001)(36860700001)(81166007)(40460700003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: N/mHF0YBqcSVZOmd1jJJHlcYF+JQc+b2AaCLn+U0GfWi/mYkEehsiEOUmUIIProLVf1XDEVBv11UuFyooAC7xby+2xsonMQjvRq6wANNiC6HZxDMrYFE/KZg1dgL/efKGUQXGo8/hVMJg6Tbw2bpX86rqne33DnjTl5R3oZvdcRQTpqhgVATugiQAtqMnN0yRCsF4+5HYbkNXam14rW6A3Mt8abCnvVuZmtDfJI21EAfwB4r0rK4tTlWQFmK3dyELPW2KOoU3BT6iW3/DHNnvoBMmJJh9c/P3SrVXIWuG9PVe+MK0tLJkZnRVb76hnpn/sX0gStTl0Sz9TPCqo2uS/upl0IMPrKtlw7JL5eLDYJ5rC966kHbBb8kpAFVvtbYUqTLJbpj2kpb2x7/Dbwx3/PlGWlEGGxr5pddzZAz1XEpOx5Dc1u0Jl8fFLY5xPY/L3EsdMoL+Uu/FnJ20egwOQQZiYpwsaQNUUhXC/8Bp5uvbZ97TwtcIpnbtEtp7+ZL7iZ0CHGlgeR2rSsIGGc3UCrmUxIfJ8ea5879paxxsG8M+cq/eGFgnPlyyaqxRv+O47m4Udmi6WqlBd5EXKpvGvqBNgGi4u5iAxTZvsoUkdNVvXzyK9X2/vyWGiC0Nq5geGXaJIvluD3X269VZlG2rahdtBNOFc1X2DRcRePPfVDmt7ZWpU2acmN4QE4HT2mN02wozL8Nef8JZe7fGdmT2/Kmlxb5OWDicwoSIvgoYqVlnNMsql9RaXhZm2HlwaYzMlXaspZgTU4yWwzF9SLCBw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(396003)(376002)(39860400002)(230922051799003)(82310400011)(451199024)(1800799009)(186009)(64100799003)(40470700004)(36840700001)(46966006)(40480700001)(5660300002)(44832011)(40460700003)(6666004)(2906002)(1076003)(26005)(36756003)(2616005)(426003)(336012)(83380400001)(16526019)(82740400003)(356005)(81166007)(86362001)(36860700001)(47076005)(7406005)(7416002)(41300700001)(316002)(6916009)(54906003)(70586007)(70206006)(8676002)(4326008)(8936002)(478600001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:30:14.9245
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:30:49.9222
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52558e21-ba98-4b01-ddea-08dbce4c0805
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95859bed-5e69-47a4-b395-08dbce4c1cdf
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9DB.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB5512
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8664
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -115,186 +115,112 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
-hypervisor will use the instruction to add pages to the RMP table. See
-APM3 for details on the instruction operations.
+The integrity guarantee of SEV-SNP is enforced through the RMP table.
+The RMP is used with standard x86 and IOMMU page tables to enforce
+memory restrictions and page access rights. The RMP check is enforced as
+soon as SEV-SNP is enabled globally in the system. When hardware
+encounters an RMP-check failure, it raises a page-fault exception.
 
-The PSMASH instruction expands a 2MB RMP entry into a corresponding set
-of contiguous 4KB-Page RMP entries. The hypervisor will use this
-instruction to adjust the RMP entry without invalidating the previous
-RMP entry.
+The rmp_make_private() and rmp_make_shared() helpers are used to add
+or remove the pages from the RMP table. Improve the rmp_make_private()
+to invalidate state so that pages cannot be used in the direct-map after
+they are added the RMP table, and restored to their default valid
+permission after the pages are removed from the RMP table.
 
-Add the following external interface API functions:
-
-psmash():
-  Used to smash a 2MB aligned page into 4K pages while preserving the
-  Validated bit in the RMP.
-
-rmp_make_private():
-  Used to assign a page to guest using the RMPUPDATE instruction.
-
-rmp_make_shared():
-  Used to transition a page to hypervisor/shared state using the
-  RMPUPDATE instruction.
-
+Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-[mdr: add RMPUPDATE retry logic for transient FAIL_OVERLAP errors]
-Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/include/asm/sev-common.h | 14 +++++
- arch/x86/include/asm/sev-host.h   | 10 ++++
- arch/x86/virt/svm/sev.c           | 89 +++++++++++++++++++++++++++++++
- 3 files changed, 113 insertions(+)
+ arch/x86/virt/svm/sev.c | 62 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 1e6fb93d8ab0..93ec8c12c91d 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -173,8 +173,22 @@ struct snp_psc_desc {
- #define GHCB_ERR_INVALID_INPUT		5
- #define GHCB_ERR_INVALID_EVENT		6
- 
-+/* RMUPDATE detected 4K page and 2MB page overlap. */
-+#define RMPUPDATE_FAIL_OVERLAP		4
-+
- /* RMP page size */
- #define RMP_PG_SIZE_4K			0
-+#define RMP_PG_SIZE_2M			1
- #define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
-+#define X86_TO_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
-+
-+struct rmp_state {
-+	u64 gpa;
-+	u8 assigned;
-+	u8 pagesize;
-+	u8 immutable;
-+	u8 rsvd;
-+	u32 asid;
-+} __packed;
- 
- #endif
-diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
-index bb06c57f2909..1df989411334 100644
---- a/arch/x86/include/asm/sev-host.h
-+++ b/arch/x86/include/asm/sev-host.h
-@@ -16,9 +16,19 @@
- #ifdef CONFIG_KVM_AMD_SEV
- int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
- void sev_dump_hva_rmpentry(unsigned long address);
-+int psmash(u64 pfn);
-+int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
-+int rmp_make_shared(u64 pfn, enum pg_level level);
- #else
- static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return -ENXIO; }
- static inline void sev_dump_hva_rmpentry(unsigned long address) {}
-+static inline int psmash(u64 pfn) { return -ENXIO; }
-+static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid,
-+				   bool immutable)
-+{
-+	return -ENXIO;
-+}
-+static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENXIO; }
- #endif
- 
- #endif
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index cac3e311c38f..24a695af13a5 100644
+index 24a695af13a5..bf9b97046e05 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -367,3 +367,92 @@ void sev_dump_hva_rmpentry(unsigned long hva)
- 	sev_dump_rmpentry(pte_pfn(*pte));
+@@ -395,6 +395,42 @@ int psmash(u64 pfn)
  }
- EXPORT_SYMBOL_GPL(sev_dump_hva_rmpentry);
-+
-+/*
-+ * PSMASH a 2MB aligned page into 4K pages in the RMP table while preserving the
-+ * Validated bit.
-+ */
-+int psmash(u64 pfn)
+ EXPORT_SYMBOL_GPL(psmash);
+ 
++static int restore_direct_map(u64 pfn, int npages)
 +{
-+	unsigned long paddr = pfn << PAGE_SHIFT;
-+	int ret;
++	int i, ret = 0;
 +
-+	pr_debug("%s: PFN: 0x%llx\n", __func__, pfn);
++	for (i = 0; i < npages; i++) {
++		ret = set_direct_map_default_noflush(pfn_to_page(pfn + i));
++		if (ret)
++			break;
++	}
 +
-+	if (!pfn_valid(pfn))
-+		return -EINVAL;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return -ENXIO;
-+
-+	/* Binutils version 2.36 supports the PSMASH mnemonic. */
-+	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
-+		      : "=a"(ret)
-+		      : "a"(paddr)
-+		      : "memory", "cc");
++	if (ret)
++		pr_warn("Failed to restore direct map for pfn 0x%llx, ret: %d\n",
++			pfn + i, ret);
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(psmash);
 +
-+static int rmpupdate(u64 pfn, struct rmp_state *val)
++static int invalidate_direct_map(u64 pfn, int npages)
 +{
-+	unsigned long paddr = pfn << PAGE_SHIFT;
-+	int ret, level, npages;
-+	int attempts = 0;
++	int i, ret = 0;
 +
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return -ENXIO;
-+
-+	do {
-+		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
-+		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-+			     : "=a"(ret)
-+			     : "a"(paddr), "c"((unsigned long)val)
-+			     : "memory", "cc");
-+
-+		attempts++;
-+	} while (ret == RMPUPDATE_FAIL_OVERLAP);
-+
-+	if (ret) {
-+		pr_err("RMPUPDATE failed after %d attempts, ret: %d, pfn: %llx, npages: %d, level: %d\n",
-+		       attempts, ret, pfn, npages, level);
-+		sev_dump_rmpentry(pfn);
-+		dump_stack();
-+		return -EFAULT;
++	for (i = 0; i < npages; i++) {
++		ret = set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
++		if (ret)
++			break;
 +	}
 +
-+	return 0;
++	if (ret) {
++		pr_warn("Failed to invalidate direct map for pfn 0x%llx, ret: %d\n",
++			pfn + i, ret);
++		restore_direct_map(pfn, i);
++	}
++
++	return ret;
 +}
 +
-+/*
-+ * Assign a page to guest using the RMPUPDATE instruction.
-+ */
-+int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable)
-+{
-+	struct rmp_state val;
+ static int rmpupdate(u64 pfn, struct rmp_state *val)
+ {
+ 	unsigned long paddr = pfn << PAGE_SHIFT;
+@@ -404,6 +440,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
+ 	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+ 		return -ENXIO;
+ 
++	level = RMP_TO_X86_PG_LEVEL(val->pagesize);
++	npages = page_level_size(level) / PAGE_SIZE;
 +
-+	memset(&val, 0, sizeof(val));
-+	val.assigned = 1;
-+	val.asid = asid;
-+	val.immutable = immutable;
-+	val.gpa = gpa;
-+	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
++	/*
++	 * If page is getting assigned in the RMP table then unmap it from the
++	 * direct map.
++	 */
++	if (val->assigned) {
++		if (invalidate_direct_map(pfn, npages)) {
++			pr_err("Failed to unmap %d pages at pfn 0x%llx from the direct_map\n",
++			       npages, pfn);
++			return -EFAULT;
++		}
++	}
 +
-+	return rmpupdate(pfn, &val);
-+}
-+EXPORT_SYMBOL_GPL(rmp_make_private);
+ 	do {
+ 		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+ 		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+@@ -422,6 +473,17 @@ static int rmpupdate(u64 pfn, struct rmp_state *val)
+ 		return -EFAULT;
+ 	}
+ 
++	/*
++	 * Restore the direct map after the page is removed from the RMP table.
++	 */
++	if (!val->assigned) {
++		if (restore_direct_map(pfn, npages)) {
++			pr_err("Failed to map %d pages at pfn 0x%llx into the direct_map\n",
++			       npages, pfn);
++			return -EFAULT;
++		}
++	}
 +
-+/*
-+ * Transition a page to hypervisor/shared state using the RMPUPDATE instruction.
-+ */
-+int rmp_make_shared(u64 pfn, enum pg_level level)
-+{
-+	struct rmp_state val;
-+
-+	memset(&val, 0, sizeof(val));
-+	val.pagesize = X86_TO_RMP_PG_LEVEL(level);
-+
-+	return rmpupdate(pfn, &val);
-+}
-+EXPORT_SYMBOL_GPL(rmp_make_shared);
+ 	return 0;
+ }
+ 
 -- 
 2.25.1
 
