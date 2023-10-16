@@ -2,150 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53BEE7CA2B3
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 10:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 539727CA48A
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 11:52:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233053AbjJPIxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 04:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58682 "EHLO
+        id S231180AbjJPJwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 05:52:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232591AbjJPIxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 04:53:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502BAE8
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 01:52:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697446343;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/Hrw2mCbpNBx3OcS5SFnx9OpOefvyyFxXG99mO1HFz0=;
-        b=I5GORQwBW2L+BRjfA+ddIQA5lAXe/yKArZMko8exm2qqn5V1Dqe780YfVDyQBnynWxYCs6
-        JGvO5Ay1rhhhd6knaW+SfI0Km6cuOLfrB85cMbf5RCNGmWMG3Z+t/9IveAUZW0TgpwphVy
-        js5VXzQxTbtawxjOsU4yVU+Yh2s5PEA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-84-ftS4obFuOkOrYzITWzHJrQ-1; Mon, 16 Oct 2023 04:52:11 -0400
-X-MC-Unique: ftS4obFuOkOrYzITWzHJrQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-323334992fbso2641356f8f.1
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 01:52:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697446330; x=1698051130;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Hrw2mCbpNBx3OcS5SFnx9OpOefvyyFxXG99mO1HFz0=;
-        b=lslrJE9UpVI7lOl60jI86+em9Y+bTiVLQPRlGcIoLRsaLJ8Bniw7hYQFjRgnWPopCB
-         RCIp9JouZLPAvAk3JslYYU5LRouqu3UrQzpBhA2GE5drkUbMjUeBVHgctSgEoeT961Sh
-         4cHoKWy1G14TUPAbn99CTewpBWBM8YX22ieACznEPKTJM+NvxnIvwPbzRPR/JJTWXtyr
-         c3/oa6Lsk0PMIFpVHS6GzkqXMrG3k6kLZHYkyBme+vhUrFV9w8ZIZgpGjKX06GiHcyij
-         l0EEXPuTNETfrqGB4Q+nFF26H4xNy7xmNT3WUpEXGoBoKWNy0cdY6G5b5lMboQBcxWFZ
-         c1rw==
-X-Gm-Message-State: AOJu0YwOFd2glN/oSqs3lZ3MKVSGBuxm9dakAD6sA4xL+o7leXypLLEc
-        Q1hgcEJ50AIfXBr5JyiiMXoarYAFwZNuEWRCS59l4Ukj9Y5tbXrODMKtQHoPW+I/DPHPFm6w2D6
-        6n3EPy9DqmiXD
-X-Received: by 2002:a5d:56c8:0:b0:321:4de3:fd5c with SMTP id m8-20020a5d56c8000000b003214de3fd5cmr28286173wrw.51.1697446330046;
-        Mon, 16 Oct 2023 01:52:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFHEdbEdPLPHcD0JmCIqUYkAJJe/RYZ2tIkcF4fsieSA7SiZgzIOKXHz1uInqieWq65N3GLQ==
-X-Received: by 2002:a5d:56c8:0:b0:321:4de3:fd5c with SMTP id m8-20020a5d56c8000000b003214de3fd5cmr28286159wrw.51.1697446329731;
-        Mon, 16 Oct 2023 01:52:09 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:178:f56b:1acf:3cb7:c133:f86d])
-        by smtp.gmail.com with ESMTPSA id n9-20020adff089000000b0031ad2f9269dsm26639385wro.40.2023.10.16.01.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 01:52:08 -0700 (PDT)
-Date:   Mon, 16 Oct 2023 04:52:05 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Maor Gottlieb <maorg@nvidia.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH vfio 10/11] vfio/virtio: Expose admin commands over
- virtio device
-Message-ID: <20231016045050-mutt-send-email-mst@kernel.org>
-References: <20231010155937.GN3952@nvidia.com>
- <ZSY9Cv5/e3nfA7ux@infradead.org>
- <20231011021454-mutt-send-email-mst@kernel.org>
- <ZSZHzs38Q3oqyn+Q@infradead.org>
- <PH0PR12MB5481336B395F38E875ED11D8DCCCA@PH0PR12MB5481.namprd12.prod.outlook.com>
- <c75bb669-76fe-ef12-817e-2a8b5f0b317b@intel.com>
- <20231012132749.GK3952@nvidia.com>
- <840d4c6f-4150-4818-a66c-1dbe1474b4c6@intel.com>
- <20231013094959-mutt-send-email-mst@kernel.org>
- <818c4212-9d9a-4775-80f3-c07e82057be8@intel.com>
+        with ESMTP id S231364AbjJPJww (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 05:52:52 -0400
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB64EB;
+        Mon, 16 Oct 2023 02:52:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697449971; x=1728985971;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ButIDiCErNxytD4vraOH8UFxC3RVH0U5V+UvXPw1a7g=;
+  b=Ssiejja/hK38qWRE9SUEsp772LG8ICprq7eIsIphbjiqmYRc6eM7uGIg
+   fqcXkPLKHKOdm9hNoKOg1DfgKXEZG06Wj3Uz9+fbLsgnDU/IyW2uwHYf0
+   kw+tlTziA9nbb/bjX3sCs1bRdv1H51AsVYgVCoXDjvykENq2sQ6yRYovt
+   4=;
+X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
+   d="scan'208";a="362070535"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:52:37 +0000
+Received: from EX19D004EUC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id 0DFED487FA;
+        Mon, 16 Oct 2023 09:52:33 +0000 (UTC)
+Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
+ by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 09:52:29 +0000
+From:   Nicolas Saenz Julienne <nsaenz@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <vkuznets@redhat.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+        <graf@amazon.de>, <rkagan@amazon.de>,
+        <linux-kernel@vger.kernel.org>,
+        Nicolas Saenz Julienne <nsaenz@amazon.com>
+Subject: [PATCH] KVM: x86: hyper-v: Don't auto-enable stimer during deserialization
+Date:   Mon, 16 Oct 2023 09:52:17 +0000
+Message-ID: <20231016095217.37574-1-nsaenz@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <818c4212-9d9a-4775-80f3-c07e82057be8@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.13.235.138]
+X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 04:33:10PM +0800, Zhu, Lingshan wrote:
-> 
-> 
-> On 10/13/2023 9:50 PM, Michael S. Tsirkin wrote:
-> > On Fri, Oct 13, 2023 at 06:28:34PM +0800, Zhu, Lingshan wrote:
-> > > 
-> > > On 10/12/2023 9:27 PM, Jason Gunthorpe wrote:
-> > > 
-> > >      On Thu, Oct 12, 2023 at 06:29:47PM +0800, Zhu, Lingshan wrote:
-> > > 
-> > > 
-> > >          sorry for the late reply, we have discussed this for weeks in virtio mailing
-> > >          list. I have proposed a live migration solution which is a config space solution.
-> > > 
-> > >      I'm sorry that can't be a serious proposal - config space can't do
-> > >      DMA, it is not suitable.
-> > > 
-> > > config space only controls the live migration process and config the related
-> > > facilities.
-> > > We don't use config space to transfer data.
-> > > 
-> > > The new added registers work like queue_enable or features.
-> > > 
-> > > For example, we use DMA to report dirty pages and MMIO to fetch the dirty data.
-> > > 
-> > > I remember in another thread you said:"you can't use DMA for any migration
-> > > flows"
-> > > 
-> > > And I agree to that statement, so we use config space registers to control the
-> > > flow.
-> > > 
-> > > Thanks,
-> > > Zhu Lingshan
-> > > 
-> > > 
-> > >      Jason
-> > > 
-> > If you are using dma then I don't see what's wrong with admin vq.
-> > dma is all it does.
-> dma != admin vq,
+By not honoring the 'stimer->config.enable' state during stimer
+deserialization we might introduce spurious timer interrupts. For
+example through the following events:
+ - The stimer is configured in auto-enable mode.
+ - The stimer's count is set and the timer enabled.
+ - The stimer expires, an interrupt is injected.
+ - We live migrate the VM.
+ - The stimer config and count are deserialized, auto-enable is ON, the
+   stimer is re-enabled.
+ - The stimer expires right away, and injects an unwarranted interrupt.
 
-Well they share the same issue that they don't work for nesting
-because DMA can not be intercepted.
+So let's not change the stimer's enable state if the MSR write comes
+from user-space.
 
-> and I think we have discussed many details in pros and cons
-> in admin vq live migration proposal in virtio-comment.
-> I am not sure we should span the discussions here, repeat them over again.
-> 
-> Thanks
-> > 
+Fixes: 1f4b34f825e8 ("kvm/x86: Hyper-V SynIC timers")
+Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+---
+ arch/x86/kvm/hyperv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yea let's not.
-
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 7c2dac6824e2..9f1deb6aa131 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -729,7 +729,7 @@ static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
+ 	stimer->count = count;
+ 	if (stimer->count == 0)
+ 		stimer->config.enable = 0;
+-	else if (stimer->config.auto_enable)
++	else if (stimer->config.auto_enable && !host)
+ 		stimer->config.enable = 1;
+ 
+ 	if (stimer->config.enable)
 -- 
-MST
+2.40.1
 
