@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 012FF7CB0CC
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B0387CB11D
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 19:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234527AbjJPQ6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:58:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55710 "EHLO
+        id S234169AbjJPRLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 13:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232709AbjJPQ6E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:58:04 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BA92D75
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 09:55:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a3e5f1742so7021704276.0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 09:55:34 -0700 (PDT)
+        with ESMTP id S233899AbjJPRLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 13:11:02 -0400
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30EE183E7;
+        Mon, 16 Oct 2023 09:58:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697475333; x=1698080133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8GT/z1ak4XuGAz/SY84LFvhbfN3QKtjdD824dfmf1Ho=;
-        b=ktcAhKXJyTjYihST/28QnaiP6mAdSzWiW1Fe5a1ooONlwkCR2fKk+thiDmj5R4uKFt
-         4kvPkdA4MngQqdwovAC+o5PfJRG+m3UIa7+FMGn18kzGAAo1kW97a7YMuYJSCrLpGtx7
-         3knXhDdIsECohJov+rJr77fScYlx2Gft/kq/J06Ffw6Ewszm6hakJK2TuF0PJGwXPKpl
-         bzqgE7Y2ezrMyvPYVyqbpaG6R/Tb9xMhiC1UoUiq26/DoOWcvFQiqDgfxxWU6WdCn6ay
-         27wXFdh2+qjCa0y5xbWZ3xuXk1GAYc682NFXekc36BHgdi5NOu50mQjYEsHiC3d5U8GA
-         L8zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697475333; x=1698080133;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8GT/z1ak4XuGAz/SY84LFvhbfN3QKtjdD824dfmf1Ho=;
-        b=gjfQo37KLCbmI6Ppl28GU7IJuHiWMBMOQEK3G9hlkxYyMwA6kWxQshzgnzCszIuzi2
-         bEfCuZYKLGVrjOTZKFoUh9xTGyovptErNqgRJtLpyzaaWnPm93qCtQsMpcMva1Ju9vxL
-         QFAcCL/o0UYUWcdviaB9ic+1rdVy9zr1ufqgfFAHUO6ZenfqAnLGgIFzY7smZb84E5Px
-         8iW0U4uFfcm4Q3767R2p/0VK3ar8T3Q+/zF9IV0i8C6uEpiAPrm09ayMvSjFr3Oyq4HO
-         CgdSz83IkgTVSmqYHdKHsh5VTRn3fAbhQY5WSuY9Cy2ANM1Gmt6Qv39/JFjnOwZ8XUYg
-         AajA==
-X-Gm-Message-State: AOJu0YyGlj58dZUt3GrOZaudvhdbpvVGz5g2VTAg84C3t/CNa+6eCycw
-        bGBU7ZFgx7KMMYNx1F/NjD+dif7pD+g=
-X-Google-Smtp-Source: AGHT+IFGWqa5ayuh9VVkxZ5Ayl/aVGx+n4GQCBQ9Uczr4uSCdcIZ9w43tae31i5swOOzW2PKhYknuAtm6Vc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:b08f:0:b0:d9a:4a62:69e9 with SMTP id
- f15-20020a25b08f000000b00d9a4a6269e9mr405724ybj.13.1697475333586; Mon, 16 Oct
- 2023 09:55:33 -0700 (PDT)
-Date:   Mon, 16 Oct 2023 09:55:32 -0700
-In-Reply-To: <87edhu8yoj.fsf@redhat.com>
-Mime-Version: 1.0
-References: <20231010160300.1136799-1-vkuznets@redhat.com> <20231010160300.1136799-9-vkuznets@redhat.com>
- <406f20dc55db24dffda2e01a1ccf7a7135c61604.camel@redhat.com> <87edhu8yoj.fsf@redhat.com>
-Message-ID: <ZS1rBKU5nArisdS7@google.com>
-Subject: Re: [PATCH RFC 08/11] KVM: nVMX: hyper-v: Introduce
- nested_vmx_evmptr() accessor
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697475530; x=1729011530;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=auMjyAtIvReWTmo+5WvQGZtqHXOUxJt+w4yHlsfTNX4=;
+  b=YX7cUdTkHdAJj1ncCZjtcpesO/9DeN5pkVaZUCG0Z/2QuTfEyYDpgrhj
+   HOl2Y649umKBaH55iIP5f7nDA/sBF6G/yoRyK1O3VWhLhI3/Av8shKVid
+   Io9YVNNqeu13MukBC7TINgi2mmQotF71qTG2STScVzPUfY1E9SLNzBpcm
+   c=;
+X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
+   d="scan'208";a="613692706"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 16:58:47 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+        by email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com (Postfix) with ESMTPS id 3898B81A9E;
+        Mon, 16 Oct 2023 16:58:45 +0000 (UTC)
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:10860]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.17.26:2525] with esmtp (Farcaster)
+ id 6af131f8-1777-4266-95f4-c22af1c82f27; Mon, 16 Oct 2023 16:58:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 6af131f8-1777-4266-95f4-c22af1c82f27
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:58:39 +0000
+Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
+ by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:58:34 +0000
+From:   Nicolas Saenz Julienne <nsaenz@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <vkuznets@redhat.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+        <graf@amazon.de>, <rkagan@amazon.de>,
+        <linux-kernel@vger.kernel.org>, <anelkz@amazon.de>,
+        Nicolas Saenz Julienne <nsaenz@amazon.com>
+Subject: [PATCH v2] KVM: x86: hyper-v: Don't auto-enable stimer during deserialization
+Date:   Mon, 16 Oct 2023 16:56:19 +0000
+Message-ID: <20231016165616.33442-1-nsaenz@amazon.com>
+X-Mailer: git-send-email 2.40.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.13.235.138]
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004EUC001.ant.amazon.com (10.252.51.190)
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,UNPARSEABLE_RELAY autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,29 +72,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023, Vitaly Kuznetsov wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
->=20
-> > =D0=A3 =D0=B2=D1=82, 2023-10-10 =D1=83 18:02 +0200, Vitaly Kuznetsov =
-=D0=BF=D0=B8=D1=88=D0=B5:
-> >> 'vmx->nested.hv_evmcs_vmptr' accesses are all over the place so hiding
-> >> 'hv_evmcs_vmptr' under 'ifdef CONFIG_KVM_HYPERV' would take a lot of
-> >> ifdefs. Introduce 'nested_vmx_evmptr()' accessor instead.
-> >
-> >
-> > It might also make sense to have 'nested_evmptr_valid(vmx)'
+By not honoring the 'stimer->config.enable' state during stimer
+deserialization we might introduce spurious timer interrupts. For
+example through the following events:
+ - The stimer is configured in auto-enable mode.
+ - The stimer's count is set and the timer enabled.
+ - The stimer expires, an interrupt is injected.
+ - We live migrate the VM.
+ - The stimer config and count are deserialized, auto-enable is ON, the
+   stimer is re-enabled.
+ - The stimer expires right away, and injects an unwarranted interrupt.
 
-"is_valid" please so that it's clear the helper is a check, not a declarati=
-on.
+So let's not change the stimer's enable state if the MSR write comes
+from user-space.
 
-> > so that we could use it instead of 'evmptr_is_valid(nested_vmx_evmptr(v=
-mx))'?
-> >
->=20
-> Makes sense, thanks!
+Fixes: 1f4b34f825e8 ("kvm/x86: Hyper-V SynIC timers")
+Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+---
 
-Would it be accurate to call it nested_vmx_is_evmptr12_valid()?  If so, tha=
-t has
-my vote.  It's a bit verbose, but it should be fully self-explanatory for a=
-nyone
-that's familiar with KVM's vmcs12 and vmcb12 terminology.
+Changes since v1:
+ - Cover all 'stimer->config.enable' updates.
+
+ arch/x86/kvm/hyperv.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 7c2dac6824e2..238afd7335e4 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -727,10 +727,12 @@ static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
+ 
+ 	stimer_cleanup(stimer);
+ 	stimer->count = count;
+-	if (stimer->count == 0)
+-		stimer->config.enable = 0;
+-	else if (stimer->config.auto_enable)
+-		stimer->config.enable = 1;
++	if (!host) {
++		if (stimer->count == 0)
++			stimer->config.enable = 0;
++		else if (stimer->config.auto_enable)
++			stimer->config.enable = 1;
++	}
+ 
+ 	if (stimer->config.enable)
+ 		stimer_mark_pending(stimer, false);
+-- 
+2.40.1
+
