@@ -2,154 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86DE77CAD5C
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 922B37CAD72
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233425AbjJPPWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 11:22:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51926 "EHLO
+        id S233582AbjJPP1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 11:27:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjJPPWO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 11:22:14 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9446AC;
-        Mon, 16 Oct 2023 08:22:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SH8Fr6nG1NXcXesPkoqsB4dkwA/Ns8Thy+iK+565/EWsiT1GX+gG7f67wkcLq5K0uJOs/GK1MdCE7iYQVZgs/ac/hsSDi/NamuSgr5WilN4hjrNqw/+5vMHJymswFB44Q6ke4umuF2zTtFtx8k8pB3ot1JuUoGVd0zPXKbuE3pnzSlmWTBwOOQLI6psXTBwNbruCfx1ET+mKGiwhNJ9a0GnNwa8TT/z+AuqTKmo9c4xMgzO/xkxO6MOy7Xq0CdtSjgIxLiWuWPrSfGuCCjTdUtKwpi5XLDjrTM/pMooNvj8fIBejp2OpCgG0IVD9RKecdr8QIo7yDAZBcZ7aq9nAJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CnOgOgc/xF/znhbhik3tEbOGfsPAveHaNExXmuj1Jmo=;
- b=jcPmj4FKYo2SD6JYJo936UZm9TbOlO7uXQk9uC4jTXgxw1QwYmrLOa2woHHvYrre5pN3JGGCoEm0kwvfJNuDmbLTFdJn3WdjmEOuuGXpq/pGuq6AvUt6XbyMN3au6kAi69iP/Vs0J8WqY9qtbSMAJ7R4qBXSWSdbyGO0BfRd5RTByraag5Rsz2gZtOWWlAB/nlmeMdXEmgAZAuh10dIJNfD3H1YY77Bkyrz2t9oyJXrWbmBCLP0bGq9Qdo3YwG29cflnknKh+2P+GhhyEMn1e7Hw83yxnCFaDcnCU2+W0ONAliuU44XYYFUSZP3dbRSa6grdFga62u+8K2Dn5DMiCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CnOgOgc/xF/znhbhik3tEbOGfsPAveHaNExXmuj1Jmo=;
- b=GvgUPKWPXx9rg7Oinm3/BGmrMipaIMD5RauhBrS/iaxRnR+6QFoI1J11fQvgxsJ4AGgBXhmd/0snVNsw1SWjtN/gjNXSxHcdBH/Ohfvo9gMQhJwVMDNc226E8ahjwOy8mGLqsJAZ3oZrd1o6ZbP6KFUILTpUxNAye8rIMctlOZk=
-Received: from DM6PR03CA0100.namprd03.prod.outlook.com (2603:10b6:5:333::33)
- by CH3PR12MB7524.namprd12.prod.outlook.com (2603:10b6:610:146::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 16 Oct
- 2023 15:22:10 +0000
-Received: from DS3PEPF000099DE.namprd04.prod.outlook.com
- (2603:10b6:5:333:cafe::6e) by DM6PR03CA0100.outlook.office365.com
- (2603:10b6:5:333::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35 via Frontend
- Transport; Mon, 16 Oct 2023 15:22:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099DE.mail.protection.outlook.com (10.167.17.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 15:22:10 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 10:22:09 -0500
-Date:   Mon, 16 Oct 2023 10:21:48 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Greg KH <gregkh@linuxfoundation.org>, <kvm@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <seanjc@google.com>,
-        <vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
-        <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
-        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        <stable@vger.kernel.org>
-Subject: Re: [PATCH v10 01/50] KVM: SVM: INTERCEPT_RDTSCP is never
- intercepted anyway
-Message-ID: <20231016152148.4atqpxd3wnyfp7ri@amd.com>
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-2-michael.roth@amd.com>
- <2023101627-species-unscrew-2730@gregkh>
- <359d7c57-2a71-419d-b63f-4c5610f48b0f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <359d7c57-2a71-419d-b63f-4c5610f48b0f@redhat.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DE:EE_|CH3PR12MB7524:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85fd791b-2960-4e09-dfcc-08dbce5baa83
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3+sJEFckqSoXgwRWjkt+1dxMUc65pQjuXZM3fafq1oWYhxYpFDxjIgjyxWhrkyKvOBt0/kASqfwJgZT5cWlhrCvlcHesHmxS3CRXTW3Kbfmt4DoQi88eXlPKnl/ECDhIz0X1F6cIcQm4QAVntM9X0+a1/+rQFMyLLX6CrwqrjcxzS5p4jKJBkrA8UKnd7nSvOYla8Wh2s8XCw5Y4ZI9ibmQGeZQwRPFO5laffkx4rAwKUEwox6JaGPHhN6d41fhQqTbVA/DXJo+UtU3ftabOyu10hI7MtqNGfyC7H18GO5pvPvrF1OhwzEir+W30e0fomerW4+M5nVbf0sLUHkb77RRUkMl5DKrZ76oTMJHEJge/YYmCidojbf0ojSXysm3weJ024OzFy30R8zB79ACULKWVFSVAvlRIepzxn4/F33HXhNX43ANJDQ2Gr+bSAJtoU7FrpmNoEVN0E2qSEHCUbXsJZ9xYJ7O1kY87s9KXu2wokoii/Q3jeGEgqZ2ph0MrI0rszSPxSH/0hkkzFTRzIKRKJibs3TaH6s7te10uvnLgDhUv7TzjDysPX3HgQvGpb9+Z5gXefOeCoiapfkXu/f0U0VXp+djJV92JFj5+TYLxWsTO5Sz57awtF93+qfs8HD0EFWALLdwq0PA3tJeGSJHGzDWrn13gBOT9Qb54OQClc08AudutMC6B22W3OdAZ/5feU8xSqHAdpcAXJ/CNjOgPMsYWQ6pXxwEhzsTL3vLKXY8NpR1igxrtee5YtT5L/cCyykXKtC48sNKyVkAHbg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(136003)(376002)(346002)(230922051799003)(64100799003)(1800799009)(186009)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(40460700003)(16526019)(336012)(1076003)(26005)(2616005)(426003)(6666004)(53546011)(36860700001)(47076005)(83380400001)(7406005)(44832011)(7416002)(41300700001)(5660300002)(8676002)(4326008)(2906002)(478600001)(8936002)(70586007)(54906003)(70206006)(6916009)(316002)(82740400003)(356005)(81166007)(86362001)(36756003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 15:22:10.0390
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85fd791b-2960-4e09-dfcc-08dbce5baa83
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS3PEPF000099DE.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7524
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S233263AbjJPP1G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 11:27:06 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3A5FA
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:27:04 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7e4745acdso72268827b3.3
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:27:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697470023; x=1698074823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m7ovurzWsjAOASM7f7dWBYIXuRhsMyJ0vUleo7Ukhu8=;
+        b=oY8lXNon3MNCDWtieOhkyu6SWEYrrFXRxVgEqvk47LmcQa9SUPvjdRzZ6dHI2AA6a+
+         J4H+FCWi/OM+61F3vdg4JCyTIHunKmmhxxamQT1PR+xThqd9jB9r469JHkU328FWzmyl
+         NRY6O6gEuAU42hK4p23/W8ywAPf24/0KmxXMl8cIXd7p2BTMLu/evCpXko6Qomtvr+te
+         MSI0i+Z0XdkUp89rJYkKPn7Y3pN/i/Y9R1GZcv8YMq4bTpo8zSP6QqXlskxksgHVWj11
+         YlI+LLL3XOk347NEi84P/c0u9jmZBiOaScoznKuFsYDqCJ9aftNkse8ifEr1n2upFmK4
+         zr1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697470023; x=1698074823;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=m7ovurzWsjAOASM7f7dWBYIXuRhsMyJ0vUleo7Ukhu8=;
+        b=BPFMSkD8xj0lA+aL8jmf0tfxUmjIEw6QBz/orD2NirreR0rvKPEqjY0wV7bLUeqo2X
+         u85HmycTW4deBbTPyZzEotpaAxuYXQ5Rbe/qZbq3TE4AkCjwispB+mR2m2BNaRG59W9z
+         Pzdjn5TCqQ78OxxbVUsTefhmwvy6zX9XPY9uIpnktWqTLtWlzVavdHc98LLJMC8fKEHk
+         wYj1yp3gL26rkiZTc/a3Dii72J7OXN3Q7fsj3Kyhba0hJBtg8mJOkKOhhNv/FOt6eTRH
+         z230y6X6UBo8+pruJEAzIm/hxxCCtyKQ6Hz3NcMXdmk/RNt4LUsqYfc1owzOntSslqVx
+         F3Yg==
+X-Gm-Message-State: AOJu0YxHjfcJzweQUTZeDHK5Qg3Rnq8FMYSpZH2Ik9G3l9ptZUlYqGg8
+        o/KROSHncxrVifACTWDVEYqaWK/MJdU=
+X-Google-Smtp-Source: AGHT+IGShvzCtxVAnanpz2eSSIiN8NfxnaYM7C5IYyqrZLxjyLwGoiwRnr+SGD7F3ikxwIo3NBH/oqaqfg0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:83d0:0:b0:d9a:4421:6ec5 with SMTP id
+ v16-20020a2583d0000000b00d9a44216ec5mr405858ybm.3.1697470023442; Mon, 16 Oct
+ 2023 08:27:03 -0700 (PDT)
+Date:   Mon, 16 Oct 2023 08:27:01 -0700
+In-Reply-To: <87h6mq91al.fsf@redhat.com>
+Mime-Version: 1.0
+References: <20231010160300.1136799-1-vkuznets@redhat.com> <20231010160300.1136799-8-vkuznets@redhat.com>
+ <708a5bb2dfb0cb085bd9215c2e8e4d0b3db69665.camel@redhat.com> <87h6mq91al.fsf@redhat.com>
+Message-ID: <ZS1VGvbcmH93-KyH@google.com>
+Subject: Re: [PATCH RFC 07/11] KVM: x86: Make Hyper-V emulation optional
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 05:14:38PM +0200, Paolo Bonzini wrote:
-> On 10/16/23 17:12, Greg KH wrote:
-> > On Mon, Oct 16, 2023 at 08:27:30AM -0500, Michael Roth wrote:
-> > > From: Paolo Bonzini <pbonzini@redhat.com>
-> > > 
-> > > svm_recalc_instruction_intercepts() is always called at least once
-> > > before the vCPU is started, so the setting or clearing of the RDTSCP
-> > > intercept can be dropped from the TSC_AUX virtualization support.
-> > > 
-> > > Extracted from a patch by Tom Lendacky.
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Fixes: 296d5a17e793 ("KVM: SEV-ES: Use V_TSC_AUX if available instead of RDTSC/MSR_TSC_AUX intercepts")
-> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > (cherry picked from commit e8d93d5d93f85949e7299be289c6e7e1154b2f78)
-> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > ---
-> > >   arch/x86/kvm/svm/sev.c | 5 +----
-> > >   1 file changed, 1 insertion(+), 4 deletions(-)
-> > 
-> > What stable tree(s) are you wanting this applied to (same for the others
-> > in this series)?  It's already in the 6.1.56 release, and the Fixes tag
-> > is for 5.19, so I don't see where it could be missing from?
-> 
-> I tink it's missing in the (destined for 6.7) tree that Michael is basing
-> this series on, so he's cherry picking it from Linus's tree.
+On Mon, Oct 16, 2023, Vitaly Kuznetsov wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>=20
+> > =D0=A3 =D0=B2=D1=82, 2023-10-10 =D1=83 18:02 +0200, Vitaly Kuznetsov =
+=D0=BF=D0=B8=D1=88=D0=B5:
+> >> Hyper-V emulation in KVM is a fairly big chunk and in some cases it ma=
+y be
+> >> desirable to not compile it in to reduce module sizes as well as attac=
+k
+> >> surface. Introduce CONFIG_KVM_HYPERV option to make it possible.
+> >>=20
+> >> Note, there's room for further nVMX/nSVM code optimizations when
+> >> !CONFIG_KVM_HYPERV, this will be done in follow-up patches.
+> >
+> > Maybe CONFIG_KVM_HYPERV_GUEST_SUPPORT or CONFIG_HYPERV_ON_KVM instead?
+> >
+> > IMHO CONFIG_KVM_HYPERV_GUEST_SUPPORT sounds good.
 
-Yes, this and PATCH #2 are both prereqs that have already been applied
-upstream, and are only being included in this series because they are
-preqs for PATCH #3 which is new. Sorry for any confusion.
+Adding GUEST_SUPPORT doesn't disambiguate anything though, as there's no cl=
+ear
+indication of whether KVM or Hyper-V is the guest.  E.g. the umbrella kconf=
+ig for
+Linux-as-a-guest is CONFIG_HYPERVISOR_GUEST.
 
--Mike
+> We already have CONFIG_KVM_XEN so I decided to stay concise. I do
+> understand that 'KVM-on-Hyper-V' and 'Hyper-V-on-KVM' mess which creates
+> the confusion though.
 
-> 
-> Paolo
-> 
+Yeah, matching Xen is probably the best way to minimize confusion, e.g. the=
+ kernel
+has CONFIG_HYPERV and CONFIG_XEN to go with KVM's, CONFIG_KVM_HYPERV and CO=
+NFIG_KVM_XEN.
+
+> >> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> >> index ed90f148140d..a06e19a8a8f6 100644
+> >> --- a/arch/x86/kvm/Kconfig
+> >> +++ b/arch/x86/kvm/Kconfig
+> >> @@ -129,6 +129,15 @@ config KVM_SMM
+> >> =20
+> >>  	  If unsure, say Y.
+> >> =20
+> >> +config KVM_HYPERV
+> >> +	bool "Support for Microsoft Hyper-V emulation"
+> >> +	depends on KVM
+> >> +	default y
+> >> +	help
+> >> +	  Provides KVM support for emulating Microsoft Hypervisor (Hyper-V).
+> >
+> >
+> > It feels to me that the KConfig option can have a longer description.
+> >
+> > What do you think about something like that:
+> >
+> > "Provides KVM support for emulating Microsoft Hypervisor (Hyper-V).
+
+I don't think we should put Hyper-V in parentheses, I haven't seen any docu=
+mentation
+that calls it "Microsoft Hypervisor", i.e. Hyper-V is the full and proper n=
+ame.
+
+> > This makes KVM expose a set of paravirtualized interfaces,
+
+s/makes/allows, since KVM still requires userspace to opt-in to exposing Hy=
+per-V.
+
+> > documented in the HyperV TLFS,=20
+
+s/TLFS/spec?  Readers that aren't already familiar with Hyper-V will have n=
+o idea
+what TLFS is until they click the link.
+
+> > https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/refe=
+rence/tlfs,
+> > which consists of a subset of paravirtualized interfaces that HyperV ex=
+poses
+
+We can trim this paragraph by stating that KVM only supports a subset of th=
+e
+PV interfaces straightaway.
+
+> > to its guests.
+
+E.g.
+
+  Provides KVM support for for emulating Microsoft Hyper-V.  This allows KV=
+M to
+  expose a subset of the paravirtualized interfaces defined in Hyper-V's sp=
+ec:
+  https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/refere=
+nce/tlfs.
+
+> >
+> > This improves performance of modern Windows guests.
+
+Isn't Hyper-V emulation effectively mandatory these days?  IIRC, modern ver=
+sions
+of Windows will fail to boot if they detect a hypervisor but the core Hyper=
+-V
+interfaces aren't supported.
