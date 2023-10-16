@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F19E47CAFC5
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:38:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F457CAEFB
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:21:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234239AbjJPQiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38168 "EHLO
+        id S234169AbjJPQUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:20:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233786AbjJPQgy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:36:54 -0400
+        with ESMTP id S234176AbjJPQUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:20:15 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CA53584;
-        Mon, 16 Oct 2023 09:19:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9214A326E;
+        Mon, 16 Oct 2023 09:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473151; x=1729009151;
+  t=1697473149; x=1729009149;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/H6MAGb0MaVdo9X9PN4Pf7Jpw+oO8feH1xag9EkGjv4=;
-  b=BDjjDAwyzab5guokt/bU7iMhzgVsxq8q0zj0I3nebjQJzQixEUnjx7Nr
-   sLbKGooZIZq7WN90OnWmBtUn+TC2knLnyY2oAjX+OomnhtU4Teenfs/Pd
-   0gR5B2OnXK7+nsIsHrSLkDRN4R0CvIiCkYTCYx1WfFa21VkmBzYW6TiQF
-   g2I8yhn1aQKWGhESFg74MzhYJaXyN4c015uyI28YMd1AAw0Sfhnsgk995
-   W5/TAGEUTftGX51DrA9nk7+UV6s7LGz9Eciblw6PhifUjIC4cIcbxKdkf
-   8JT5/4BrQHcCblQz7amUhiZKxLIFA6o0puZNW2gVf3IaOBFoeLoeNLfGh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921939"
+  bh=N3MTUWC0YOFe2fZ4OP8FZ77HrSgRNuKHigdgdvKoqkY=;
+  b=P05fkXhunHFi4T/Z+olYeRmcp35Yd4DgGsTMIh5TdkivsxrYlSqF6qk7
+   lw8LTrOMoWSeC3+5VfKrYNXUUZ+AZSa56xZo6aYO40urKrQVp2pwLkuWd
+   WkWj2wKe4npbqMJMYUWEWcwCdA4ummDFqgaKIhKW5DZctWN+0c/4c779W
+   cluTOzew+AjaMB2wB7ImGU9frC05WaARf7bTICajITrwDkFcU1e+e2Px4
+   /JHbSHVaZndoLuY2H9QXRLS5uwVZqumz30dGd73e8GQ8/0cG6qXMsIFSK
+   0u20P4QTj2nM3MRhzZldnwBRz/CrlZBhzzK4httiPjv6vd4pmlvzLhC3m
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921944"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921939"
+   d="scan'208";a="364921944"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:56 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448232"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448235"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448232"
+   d="scan'208";a="846448235"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:55 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:56 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 075/116] KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c
-Date:   Mon, 16 Oct 2023 09:14:27 -0700
-Message-Id: <3031e7db7ba26c61fefc429003478205198e45fd.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 076/116] KVM: TDX: Implement interrupt injection
+Date:   Mon, 16 Oct 2023 09:14:28 -0700
+Message-Id: <27e0dbfc44701a594bc50c318694a5955e9aff23.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,219 +68,474 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-As TDX will use posted_interrupt.c, the use of struct vcpu_vmx is a
-blocker.  Because the members of struct pi_desc pi_desc and struct
-list_head pi_wakeup_list are only used in posted_interrupt.c, introduce
-common structure, struct vcpu_pi, make vcpu_vmx and vcpu_tdx has same
-layout in the top of structure.
+TDX supports interrupt inject into vcpu with posted interrupt.  Wire up the
+corresponding kvm x86 operations to posted interrupt.  Move
+kvm_vcpu_trigger_posted_interrupt() from vmx.c to common.h to share the
+code.
 
-To minimize the diff size, avoid code conversion like,
-vmx->pi_desc => vmx->common->pi_desc.  Instead add compile time check
-if the layout is expected.
+VMX can inject interrupt by setting interrupt information field,
+VM_ENTRY_INTR_INFO_FIELD, of VMCS.  TDX supports interrupt injection only
+by posted interrupt.  Ignore the execution path to access
+VM_ENTRY_INTR_INFO_FIELD.
+
+As cpu state is protected and apicv is enabled for the TDX guest, VMM can
+inject interrupt by updating posted interrupt descriptor.  Treat interrupt
+can be injected always.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/posted_intr.c | 41 ++++++++++++++++++++++++++--------
- arch/x86/kvm/vmx/posted_intr.h | 11 +++++++++
- arch/x86/kvm/vmx/tdx.c         |  1 +
- arch/x86/kvm/vmx/tdx.h         |  8 +++++++
- arch/x86/kvm/vmx/vmx.h         | 14 +++++++-----
- 5 files changed, 60 insertions(+), 15 deletions(-)
+ arch/x86/kvm/vmx/common.h      | 71 ++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/main.c        | 93 ++++++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/posted_intr.c |  2 +-
+ arch/x86/kvm/vmx/posted_intr.h |  2 +
+ arch/x86/kvm/vmx/tdx.c         | 25 +++++++++
+ arch/x86/kvm/vmx/vmx.c         | 67 +-----------------------
+ arch/x86/kvm/vmx/x86_ops.h     |  7 ++-
+ 7 files changed, 190 insertions(+), 77 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index af662312fd07..b66add9da0f3 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -11,6 +11,7 @@
- #include "posted_intr.h"
- #include "trace.h"
- #include "vmx.h"
-+#include "tdx.h"
+diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+index 235908f3e044..6f21d0d48809 100644
+--- a/arch/x86/kvm/vmx/common.h
++++ b/arch/x86/kvm/vmx/common.h
+@@ -4,6 +4,7 @@
  
- /*
-  * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-@@ -31,9 +32,29 @@ static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-  */
- static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
+ #include <linux/kvm_host.h>
  
-+/*
-+ * The layout of the head of struct vcpu_vmx and struct vcpu_tdx must match with
-+ * struct vcpu_pi.
-+ */
-+static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-+	      offsetof(struct vcpu_vmx, pi_desc));
-+static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-+	      offsetof(struct vcpu_vmx, pi_wakeup_list));
-+#ifdef CONFIG_INTEL_TDX_HOST
-+static_assert(offsetof(struct vcpu_pi, pi_desc) ==
-+	      offsetof(struct vcpu_tdx, pi_desc));
-+static_assert(offsetof(struct vcpu_pi, pi_wakeup_list) ==
-+	      offsetof(struct vcpu_tdx, pi_wakeup_list));
-+#endif
-+
-+static inline struct vcpu_pi *vcpu_to_pi(struct kvm_vcpu *vcpu)
++#include "posted_intr.h"
+ #include "mmu.h"
+ 
+ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+@@ -30,4 +31,74 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+ }
+ 
++static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
++						     int pi_vec)
 +{
-+	return (struct vcpu_pi *)vcpu;
++#ifdef CONFIG_SMP
++	if (vcpu->mode == IN_GUEST_MODE) {
++		/*
++		 * The vector of the virtual has already been set in the PIR.
++		 * Send a notification event to deliver the virtual interrupt
++		 * unless the vCPU is the currently running vCPU, i.e. the
++		 * event is being sent from a fastpath VM-Exit handler, in
++		 * which case the PIR will be synced to the vIRR before
++		 * re-entering the guest.
++		 *
++		 * When the target is not the running vCPU, the following
++		 * possibilities emerge:
++		 *
++		 * Case 1: vCPU stays in non-root mode. Sending a notification
++		 * event posts the interrupt to the vCPU.
++		 *
++		 * Case 2: vCPU exits to root mode and is still runnable. The
++		 * PIR will be synced to the vIRR before re-entering the guest.
++		 * Sending a notification event is ok as the host IRQ handler
++		 * will ignore the spurious event.
++		 *
++		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
++		 * has already synced PIR to vIRR and never blocks the vCPU if
++		 * the vIRR is not empty. Therefore, a blocked vCPU here does
++		 * not wait for any requested interrupts in PIR, and sending a
++		 * notification event also results in a benign, spurious event.
++		 */
++
++		if (vcpu != kvm_get_running_vcpu())
++			__apic_send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
++		return;
++	}
++#endif
++	/*
++	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
++	 * otherwise do nothing as KVM will grab the highest priority pending
++	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
++	 */
++	kvm_vcpu_wake_up(vcpu);
 +}
 +
- static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
- {
--	return &(to_vmx(vcpu)->pi_desc);
-+	return &vcpu_to_pi(vcpu)->pi_desc;
++/*
++ * Send interrupt to vcpu via posted interrupt way.
++ * 1. If target vcpu is running(non-root mode), send posted interrupt
++ * notification to vcpu and hardware will sync PIR to vIRR atomically.
++ * 2. If target vcpu isn't running(root mode), kick it to pick up the
++ * interrupt from PIR in next vmentry.
++ */
++static inline void __vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu,
++						  struct pi_desc *pi_desc, int vector)
++{
++	if (pi_test_and_set_pir(vector, pi_desc))
++		return;
++
++	/* If a previous notification has sent the IPI, nothing to do.  */
++	if (pi_test_and_set_on(pi_desc))
++		return;
++
++	/*
++	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
++	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
++	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
++	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
++	 */
++	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
++}
++
+ #endif /* __KVM_X86_VMX_COMMON_H */
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 302db8f4afc2..37d28ee08c79 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -239,6 +239,34 @@ static bool vt_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ 	return tdx_protected_apic_has_interrupt(vcpu);
  }
  
- static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
-@@ -52,8 +73,8 @@ static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
- 
- void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
++static void vt_apicv_post_state_restore(struct kvm_vcpu *vcpu)
++{
++	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
++
++	pi_clear_on(pi);
++	memset(pi->pir, 0, sizeof(pi->pir));
++}
++
++static int vt_sync_pir_to_irr(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return -1;
++
++	return vmx_sync_pir_to_irr(vcpu);
++}
++
++static void vt_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
++			   int trig_mode, int vector)
++{
++	if (is_td_vcpu(apic->vcpu)) {
++		tdx_deliver_interrupt(apic, delivery_mode, trig_mode,
++					     vector);
++		return;
++	}
++
++	vmx_deliver_interrupt(apic, delivery_mode, trig_mode, vector);
++}
++
+ static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
  {
--	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-+	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
- 	struct pi_desc old, new;
- 	unsigned long flags;
- 	unsigned int dest;
-@@ -90,7 +111,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
- 		raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--		list_del(&vmx->pi_wakeup_list);
-+		list_del(&vcpu_pi->pi_wakeup_list);
- 		raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 	}
- 
-@@ -145,15 +166,15 @@ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
-  */
- static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- {
--	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vcpu_pi *vcpu_pi = vcpu_to_pi(vcpu);
-+	struct pi_desc *pi_desc = &vcpu_pi->pi_desc;
- 	struct pi_desc old, new;
- 	unsigned long flags;
- 
- 	local_irq_save(flags);
- 
- 	raw_spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
--	list_add_tail(&vmx->pi_wakeup_list,
-+	list_add_tail(&vcpu_pi->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
- 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 
-@@ -190,7 +211,8 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
- 	 * notification vector is switched to the one that calls
- 	 * back to the pi_wakeup_handler() function.
- 	 */
--	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
-+	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
-+		vmx_can_use_vtd_pi(vcpu->kvm);
+ 	if (is_td_vcpu(vcpu)) {
+@@ -306,6 +334,53 @@ static void vt_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ 	vmx_sched_in(vcpu, cpu);
  }
  
- void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
-@@ -200,7 +222,8 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- 	if (!vmx_needs_pi_wakeup(vcpu))
- 		return;
++static void vt_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++	vmx_set_interrupt_shadow(vcpu, mask);
++}
++
++static u32 vt_get_interrupt_shadow(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return 0;
++
++	return vmx_get_interrupt_shadow(vcpu);
++}
++
++static void vt_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_inject_irq(vcpu, reinjected);
++}
++
++static void vt_cancel_injection(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_cancel_injection(vcpu);
++}
++
++static int vt_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
++{
++	if (is_td_vcpu(vcpu))
++		return true;
++
++	return vmx_interrupt_allowed(vcpu, for_injection);
++}
++
++static void vt_enable_irq_window(struct kvm_vcpu *vcpu)
++{
++	if (is_td_vcpu(vcpu))
++		return;
++
++	vmx_enable_irq_window(vcpu);
++}
++
+ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+ 	if (is_td_vcpu(vcpu))
+@@ -404,31 +479,31 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.handle_exit = vmx_handle_exit,
+ 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
+ 	.update_emulated_instruction = vmx_update_emulated_instruction,
+-	.set_interrupt_shadow = vmx_set_interrupt_shadow,
+-	.get_interrupt_shadow = vmx_get_interrupt_shadow,
++	.set_interrupt_shadow = vt_set_interrupt_shadow,
++	.get_interrupt_shadow = vt_get_interrupt_shadow,
+ 	.patch_hypercall = vmx_patch_hypercall,
+-	.inject_irq = vmx_inject_irq,
++	.inject_irq = vt_inject_irq,
+ 	.inject_nmi = vmx_inject_nmi,
+ 	.inject_exception = vmx_inject_exception,
+-	.cancel_injection = vmx_cancel_injection,
+-	.interrupt_allowed = vmx_interrupt_allowed,
++	.cancel_injection = vt_cancel_injection,
++	.interrupt_allowed = vt_interrupt_allowed,
+ 	.nmi_allowed = vmx_nmi_allowed,
+ 	.get_nmi_mask = vmx_get_nmi_mask,
+ 	.set_nmi_mask = vmx_set_nmi_mask,
+ 	.enable_nmi_window = vmx_enable_nmi_window,
+-	.enable_irq_window = vmx_enable_irq_window,
++	.enable_irq_window = vt_enable_irq_window,
+ 	.update_cr8_intercept = vmx_update_cr8_intercept,
+ 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
+ 	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
+ 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
+ 	.load_eoi_exitmap = vmx_load_eoi_exitmap,
+-	.apicv_post_state_restore = vmx_apicv_post_state_restore,
++	.apicv_post_state_restore = vt_apicv_post_state_restore,
+ 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
+ 	.hwapic_irr_update = vmx_hwapic_irr_update,
+ 	.hwapic_isr_update = vmx_hwapic_isr_update,
+ 	.guest_apic_has_interrupt = vmx_guest_apic_has_interrupt,
+-	.sync_pir_to_irr = vmx_sync_pir_to_irr,
+-	.deliver_interrupt = vmx_deliver_interrupt,
++	.sync_pir_to_irr = vt_sync_pir_to_irr,
++	.deliver_interrupt = vt_deliver_interrupt,
+ 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+ 	.protected_apic_has_interrupt = vt_protected_apic_has_interrupt,
  
--	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
-+	if (kvm_vcpu_is_blocking(vcpu) &&
-+	    (is_td_vcpu(vcpu) || !vmx_interrupt_blocked(vcpu)))
- 		pi_enable_wakeup_handler(vcpu);
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index b66add9da0f3..c86768b83f0b 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -52,7 +52,7 @@ static inline struct vcpu_pi *vcpu_to_pi(struct kvm_vcpu *vcpu)
+ 	return (struct vcpu_pi *)vcpu;
+ }
  
- 	/*
+-static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
++struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
+ {
+ 	return &vcpu_to_pi(vcpu)->pi_desc;
+ }
 diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-index 26992076552e..2fe8222308b2 100644
+index 2fe8222308b2..0f9983b6910b 100644
 --- a/arch/x86/kvm/vmx/posted_intr.h
 +++ b/arch/x86/kvm/vmx/posted_intr.h
-@@ -94,6 +94,17 @@ static inline bool pi_test_sn(struct pi_desc *pi_desc)
- 			(unsigned long *)&pi_desc->control);
- }
+@@ -105,6 +105,8 @@ struct vcpu_pi {
+ 	/* Until here common layout betwwn vcpu_vmx and vcpu_tdx. */
+ };
  
-+struct vcpu_pi {
-+	struct kvm_vcpu	vcpu;
-+
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
-+
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here common layout betwwn vcpu_vmx and vcpu_tdx. */
-+};
++struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu);
 +
  void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu);
  void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu);
  void pi_wakeup_handler(void);
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 173a29b36432..81f659e23b78 100644
+index 81f659e23b78..beb3fa2d3e41 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -558,6 +558,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+@@ -7,6 +7,7 @@
  
- 	fpstate_set_confidential(&vcpu->arch.guest_fpu);
- 	vcpu->arch.apic->guest_apic_protected = true;
-+	INIT_LIST_HEAD(&tdx->pi_wakeup_list);
+ #include "capabilities.h"
+ #include "x86_ops.h"
++#include "common.h"
+ #include "mmu.h"
+ #include "tdx.h"
+ #include "vmx.h"
+@@ -577,6 +578,9 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	tdx->host_state_need_save = true;
+ 	tdx->host_state_need_restore = false;
  
- 	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
- 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 4f803814126a..b29fcda2892b 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -4,6 +4,7 @@
- 
- #ifdef CONFIG_INTEL_TDX_HOST
- 
-+#include "posted_intr.h"
- #include "pmu_intel.h"
- #include "tdx_ops.h"
- 
-@@ -67,6 +68,13 @@ union tdx_exit_reason {
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
- 
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
++	tdx->pi_desc.nv = POSTED_INTR_VECTOR;
++	tdx->pi_desc.sn = 1;
 +
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here same layout to struct vcpu_pi. */
+ 	return 0;
+ }
+ 
+@@ -584,6 +588,7 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+ 
++	vmx_vcpu_pi_load(vcpu, cpu);
+ 	if (vcpu->cpu == cpu)
+ 		return;
+ 
+@@ -822,6 +827,12 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	trace_kvm_entry(vcpu);
+ 
++	if (pi_test_on(&tdx->pi_desc)) {
++		apic->send_IPI_self(POSTED_INTR_VECTOR);
 +
- 	unsigned long tdvpr_pa;
- 	unsigned long *tdvpx_pa;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 2847e368c8e6..c89cc546f8df 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -233,6 +233,14 @@ struct nested_vmx {
- 
- struct vcpu_vmx {
- 	struct kvm_vcpu       vcpu;
++		kvm_wait_lapic_expire(vcpu);
++	}
 +
-+	/* Posted interrupt descriptor */
-+	struct pi_desc pi_desc;
+ 	tdx_vcpu_enter_exit(tdx);
+ 
+ 	tdx_user_return_update_cache(vcpu);
+@@ -1207,6 +1218,16 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	return tdx_sept_drop_private_spte(kvm, gfn, level, pfn);
+ }
+ 
++void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
++			   int trig_mode, int vector)
++{
++	struct kvm_vcpu *vcpu = apic->vcpu;
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
 +
-+	/* Used if this vCPU is waiting for PI notification wakeup. */
-+	struct list_head pi_wakeup_list;
-+	/* Until here same layout to struct vcpu_pi. */
++	/* TDX supports only posted interrupt.  No lapic emulation. */
++	__vmx_deliver_posted_interrupt(vcpu, &tdx->pi_desc, vector);
++}
 +
- 	u8                    fail;
- 	u8		      x2apic_msr_bitmap_mode;
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+ {
+ 	struct kvm_tdx_capabilities __user *user_caps;
+@@ -1994,6 +2015,10 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	if (ret)
+ 		return ret;
  
-@@ -302,12 +310,6 @@ struct vcpu_vmx {
++	td_vmcs_write16(tdx, POSTED_INTR_NV, POSTED_INTR_VECTOR);
++	td_vmcs_write64(tdx, POSTED_INTR_DESC_ADDR, __pa(&tdx->pi_desc));
++	td_vmcs_setbit32(tdx, PIN_BASED_VM_EXEC_CONTROL, PIN_BASED_POSTED_INTR);
++
+ 	tdx->initialized = true;
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 82ca1ae3963a..484c3c7b46c8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4161,50 +4161,6 @@ void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+ 		pt_update_intercept_for_msr(vcpu);
+ }
  
- 	union vmx_exit_reason exit_reason;
- 
--	/* Posted interrupt descriptor */
--	struct pi_desc pi_desc;
+-static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+-						     int pi_vec)
+-{
+-#ifdef CONFIG_SMP
+-	if (vcpu->mode == IN_GUEST_MODE) {
+-		/*
+-		 * The vector of the virtual has already been set in the PIR.
+-		 * Send a notification event to deliver the virtual interrupt
+-		 * unless the vCPU is the currently running vCPU, i.e. the
+-		 * event is being sent from a fastpath VM-Exit handler, in
+-		 * which case the PIR will be synced to the vIRR before
+-		 * re-entering the guest.
+-		 *
+-		 * When the target is not the running vCPU, the following
+-		 * possibilities emerge:
+-		 *
+-		 * Case 1: vCPU stays in non-root mode. Sending a notification
+-		 * event posts the interrupt to the vCPU.
+-		 *
+-		 * Case 2: vCPU exits to root mode and is still runnable. The
+-		 * PIR will be synced to the vIRR before re-entering the guest.
+-		 * Sending a notification event is ok as the host IRQ handler
+-		 * will ignore the spurious event.
+-		 *
+-		 * Case 3: vCPU exits to root mode and is blocked. vcpu_block()
+-		 * has already synced PIR to vIRR and never blocks the vCPU if
+-		 * the vIRR is not empty. Therefore, a blocked vCPU here does
+-		 * not wait for any requested interrupts in PIR, and sending a
+-		 * notification event also results in a benign, spurious event.
+-		 */
 -
--	/* Used if this vCPU is waiting for PI notification wakeup. */
--	struct list_head pi_wakeup_list;
+-		if (vcpu != kvm_get_running_vcpu())
+-			__apic_send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+-		return;
+-	}
+-#endif
+-	/*
+-	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
+-	 * otherwise do nothing as KVM will grab the highest priority pending
+-	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
+-	 */
+-	kvm_vcpu_wake_up(vcpu);
+-}
 -
- 	/* Support for a guest hypervisor (nested VMX) */
- 	struct nested_vmx nested;
+ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+ 						int vector)
+ {
+@@ -4257,20 +4213,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+ 	if (!vcpu->arch.apic->apicv_active)
+ 		return -1;
  
+-	if (pi_test_and_set_pir(vector, &vmx->pi_desc))
+-		return 0;
+-
+-	/* If a previous notification has sent the IPI, nothing to do.  */
+-	if (pi_test_and_set_on(&vmx->pi_desc))
+-		return 0;
+-
+-	/*
+-	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
+-	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
+-	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+-	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+-	 */
+-	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
++	__vmx_deliver_posted_interrupt(vcpu, &vmx->pi_desc, vector);
+ 	return 0;
+ }
+ 
+@@ -6947,14 +6890,6 @@ void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+ 	vmcs_write64(EOI_EXIT_BITMAP3, eoi_exit_bitmap[3]);
+ }
+ 
+-void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-
+-	pi_clear_on(&vmx->pi_desc);
+-	memset(vmx->pi_desc.pir, 0, sizeof(vmx->pi_desc.pir));
+-}
+-
+ void vmx_do_interrupt_irqoff(unsigned long entry);
+ void vmx_do_nmi_irqoff(void);
+ 
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 3ab0b270b1f9..454f28099868 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -58,7 +58,6 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu);
+ void vmx_migrate_timers(struct kvm_vcpu *vcpu);
+ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+-void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu);
+ bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason);
+ void vmx_hwapic_irr_update(struct kvm_vcpu *vcpu, int max_irr);
+ void vmx_hwapic_isr_update(int max_isr);
+@@ -158,6 +157,9 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu);
+ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+ 
++void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
++			   int trig_mode, int vector);
++
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+ 
+ void tdx_flush_tlb(struct kvm_vcpu *vcpu);
+@@ -191,6 +193,9 @@ static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu) { return false; }
+ static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
+ 
++static inline void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
++					 int trig_mode, int vector) {}
++
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+ 
+ static inline void tdx_flush_tlb(struct kvm_vcpu *vcpu) {}
 -- 
 2.25.1
 
