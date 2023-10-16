@@ -2,131 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5C447CA7CD
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 14:15:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30BFC7CA824
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 14:39:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbjJPMPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 08:15:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60414 "EHLO
+        id S233036AbjJPMjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 08:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbjJPMPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 08:15:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719C5E8
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 05:14:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697458468;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8K0GBMWi7yuOkB+hNB45NjHQ0h2LLEOcT0QD5ygf2F4=;
-        b=LXqSiwwj+ZyGwYZ0xzV20R0KfE42NgLTc1zlQY7H1518W/Fl7U+DPXvWZUcetpXmBsYiH+
-        /OhRSlWmQc7opVVdGsQnXvwrQc8KHGGGjW19ERJXXGGdk1DYyvTybEYJXioRtfOSE0Ar79
-        l0FNtax2dxRKc6tk5l1iFcDNAZgjjEs=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-639-BY0MRc47OVySaVMQzr9AWQ-1; Mon, 16 Oct 2023 08:14:27 -0400
-X-MC-Unique: BY0MRc47OVySaVMQzr9AWQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-774292d71e3so515724985a.3
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 05:14:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697458467; x=1698063267;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8K0GBMWi7yuOkB+hNB45NjHQ0h2LLEOcT0QD5ygf2F4=;
-        b=K3wJmBP8ymwv4x298xsHZbq1d+4p+Bc8MTfag22Yg6UuYFI0vjOlWSZH6FZVAYPS+Q
-         GUIX67gCBFK1befyucu21V4Iat3IBHAKCwOFS+4Dk9rRquIa9Ynq2Q2pX4cuE7uyv2+q
-         u17+FCSisH/lgMLSSO9pufwfKEs/lkj3Cs3I/H6LDOkohZZ0JRKGHP0AedQipQS82vA1
-         nGLqh+uZpp3ceb9DnO3wqI9Xk9D66/2746R46oyXXEqpzeHh4j6OI+lcQzaAQosp4oSs
-         f8tuWYklrcZjUPNUVux94C06WZhzgkvHUTucpDD6Min91rl1Q6f+Y5DW/mVtmPux/nog
-         UgaA==
-X-Gm-Message-State: AOJu0YymFo+dczg6evA39gqNM+N3LBhUH9qlpIWw5V4TV/fcZiSkzSqQ
-        tK62/6Cr9NZUFOu2XBfFOY/s+E3um9vMutbEymEs300q5y7w4T+5jrGXRIrWlvIhZUjVQ4anwQO
-        Uwsvz3gObrkbR
-X-Received: by 2002:a05:620a:999:b0:76d:ada0:4c0 with SMTP id x25-20020a05620a099900b0076dada004c0mr31781929qkx.76.1697458466917;
-        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGX+nJ0hdk4wSNp3IL6EMf+BSUKobIFwfujXQ3r3+l1dNl+KKT4FZ0JEJkvltb3efykENBxnQ==
-X-Received: by 2002:a05:620a:999:b0:76d:ada0:4c0 with SMTP id x25-20020a05620a099900b0076dada004c0mr31781918qkx.76.1697458466621;
-        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id d4-20020a05620a166400b0077568327b54sm2930591qko.123.2023.10.16.05.14.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, graf@amazon.de, rkagan@amazon.de,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: hyper-v: Don't auto-enable stimer during
- deserialization
-In-Reply-To: <20231016095217.37574-1-nsaenz@amazon.com>
-References: <20231016095217.37574-1-nsaenz@amazon.com>
-Date:   Mon, 16 Oct 2023 14:14:22 +0200
-Message-ID: <87sf6a9335.fsf@redhat.com>
+        with ESMTP id S232929AbjJPMji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 08:39:38 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DA13AB;
+        Mon, 16 Oct 2023 05:39:37 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9FCDA1F37F;
+        Mon, 16 Oct 2023 12:39:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1697459975; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=TrHQ0ELhL7iWzaPXNchammsXfJ1VpjNzr9oy6lA6Krc=;
+        b=YzXXQasXeVaCM4rll76gJ/cRr0gpD70UiJXXyCcxaVKzwc9L4AXNbvBrVwebwOapoEgD/V
+        kOvKYPLYE1drK+oaVua+5/yuA0E3o3tYXm/4BGroCwxVwrDXMIXbHrdl6BnhOJf4Kxonoe
+        BdcUCorSEAPEtsoXqKVKuI5f9GWDvX4=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 27145133B7;
+        Mon, 16 Oct 2023 12:39:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 8jQZCAcvLWX4IgAAMHmgww
+        (envelope-from <jgross@suse.com>); Mon, 16 Oct 2023 12:39:35 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <akaher@vmware.com>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        xen-devel@lists.xenproject.org
+Subject: [PATCH v2 0/4] x86/paravirt: Get rid of paravirt patching
+Date:   Mon, 16 Oct 2023 14:39:29 +0200
+Message-Id: <20231016123933.17284-1-jgross@suse.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out2.suse.de;
+        none
+X-Spam-Score: 4.05
+X-Spamd-Result: default: False [4.05 / 50.00];
+         ARC_NA(0.00)[];
+         RCVD_VIA_SMTP_AUTH(0.00)[];
+         FROM_HAS_DN(0.00)[];
+         TO_DN_SOME(0.00)[];
+         TO_MATCH_ENVRCPT_ALL(0.00)[];
+         R_MISSING_CHARSET(2.50)[];
+         MIME_GOOD(-0.10)[text/plain];
+         BROKEN_CONTENT_TYPE(1.50)[];
+         DKIM_SIGNED(0.00)[suse.com:s=susede1];
+         NEURAL_HAM_SHORT(-0.85)[-0.851];
+         NEURAL_SPAM_LONG(3.00)[1.000];
+         RCPT_COUNT_TWELVE(0.00)[18];
+         MID_CONTAINS_FROM(1.00)[];
+         FROM_EQ_ENVFROM(0.00)[];
+         MIME_TRACE(0.00)[0:+];
+         RCVD_COUNT_TWO(0.00)[2];
+         RCVD_TLS_ALL(0.00)[];
+         BAYES_HAM(-3.00)[100.00%]
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
+This is a small series getting rid of paravirt patching by switching
+completely to alternative patching for the same functionality.
 
-> By not honoring the 'stimer->config.enable' state during stimer
-> deserialization we might introduce spurious timer interrupts. For
-> example through the following events:
->  - The stimer is configured in auto-enable mode.
->  - The stimer's count is set and the timer enabled.
->  - The stimer expires, an interrupt is injected.
->  - We live migrate the VM.
->  - The stimer config and count are deserialized, auto-enable is ON, the
->    stimer is re-enabled.
->  - The stimer expires right away, and injects an unwarranted interrupt.
->
-> So let's not change the stimer's enable state if the MSR write comes
-> from user-space.
->
-> Fixes: 1f4b34f825e8 ("kvm/x86: Hyper-V SynIC timers")
-> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
-> ---
->  arch/x86/kvm/hyperv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 7c2dac6824e2..9f1deb6aa131 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -729,7 +729,7 @@ static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
->  	stimer->count = count;
->  	if (stimer->count == 0)
->  		stimer->config.enable = 0;
+The basic idea is to add the capability to switch from indirect to
+direct calls via a special alternative patching option.
 
-Can this branch be problematic too? E.g. if STIMER[X]_CONFIG is
-deserialized after STIMER[X]_COUNT we may erroneously reset 'enable' to
-0, right? In fact, when MSRs are ordered like this:
+This removes _some_ of the paravirt macro maze, but most of it needs
+to stay due to the need of hiding the call instructions from the
+compiler in order to avoid needless register save/restore.
 
-#define HV_X64_MSR_STIMER0_CONFIG		0x400000B0
-#define HV_X64_MSR_STIMER0_COUNT		0x400000B1
+What is going away is the nasty stacking of alternative and paravirt
+patching and (of course) the special .parainstructions linker section.
 
-I would guess that we always de-serialize 'config' first. With
-auto-enable, the timer will get enabled when writing 'count' but what
-happens in other cases?
+I have tested the series on bare metal and as Xen PV domain to still
+work.
 
-Maybe the whole block needs to go under 'if (!host)' instead?
+Note that objtool might need some changes to cope with the new
+indirect call patching mechanism. Additionally some paravirt handling
+can probably be removed from it.
 
-> -	else if (stimer->config.auto_enable)
-> +	else if (stimer->config.auto_enable && !host)
->  		stimer->config.enable = 1;
->  
->  	if (stimer->config.enable)
+Changes in V2:
+- split last patch into 2
+- rebase of patch 2 as suggested by Peter
+- addressed Peter's comments for patch 3
+
+Juergen Gross (4):
+  x86/paravirt: move some functions and defines to alternative
+  x86/alternative: add indirect call patching
+  x86/paravirt: switch mixed paravirt/alternative calls to alternative_2
+  x86/paravirt: remove no longer needed paravirt patching code
+
+ arch/x86/include/asm/alternative.h        |  26 ++++-
+ arch/x86/include/asm/paravirt.h           |  79 +++++----------
+ arch/x86/include/asm/paravirt_types.h     |  73 +++-----------
+ arch/x86/include/asm/qspinlock_paravirt.h |   4 +-
+ arch/x86/include/asm/text-patching.h      |  12 ---
+ arch/x86/kernel/alternative.c             | 116 ++++++++++------------
+ arch/x86/kernel/callthunks.c              |  17 ++--
+ arch/x86/kernel/kvm.c                     |   4 +-
+ arch/x86/kernel/module.c                  |  20 +---
+ arch/x86/kernel/paravirt.c                |  54 ++--------
+ arch/x86/kernel/vmlinux.lds.S             |  13 ---
+ arch/x86/tools/relocs.c                   |   2 +-
+ arch/x86/xen/irq.c                        |   2 +-
+ 13 files changed, 137 insertions(+), 285 deletions(-)
 
 -- 
-Vitaly
+2.35.3
 
