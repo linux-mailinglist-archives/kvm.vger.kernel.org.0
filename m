@@ -2,288 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D6107CB2F5
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 20:49:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4097CB2FE
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 20:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233974AbjJPStX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 14:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42546 "EHLO
+        id S232934AbjJPSu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 14:50:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231508AbjJPStV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 14:49:21 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BBDAB
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 11:49:17 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7b9e83b70so36150687b3.0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 11:49:17 -0700 (PDT)
+        with ESMTP id S233010AbjJPSu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 14:50:56 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5412AEB
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 11:50:54 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39GIECIT006708;
+        Mon, 16 Oct 2023 18:50:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=tS5fFVWZBY+RjXSBDhGtg0Lj2m5Lvtt3auon5A7wvGw=;
+ b=qD3g/stW4ZD1OIg+RYAIpxIYIg8RsudNk2ZHFp3opoaijTijWIHuN1b39v/i3Shzhnsw
+ qRCvV4hhDXBkq1tWn3TOkaB/TllWqQqYyDJN4L0Gtu9jJIoDC087CUm4hQMAvwiPC8bK
+ pdrV4t/xgJjYQNnbwUu2nOIkBimdqFcvxLk0L9rClf4kLx6Au/xyFCxsCCVDvjVnKeo4
+ mMFaJokEWz8ypnLNNe912pkeB61Yz+mVRx4kBk0fhpsBnAWP2A22AaavITQd/JDuTZG0
+ NqmxY6xByYiTFXMH82PM5tWCCRNhYXmujCGa+Gt3gzYQQ3xWHMDCbKQeUVjuWLGtWBzC sQ== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqjynbgey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Oct 2023 18:50:34 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39GIOF36009572;
+        Mon, 16 Oct 2023 18:50:33 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3trg0ksdc2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Oct 2023 18:50:33 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xbu7rqjDf9dqiCWdtq/xc+5VuB/gWPYGIt0n4ruEWv7WzzB7FHiPqm80ZUBjWfCIkT0X8fxr+mBP8hymhG89vGCq5gGg/myBaJ+G+5+X1oEm4wBcCoh3eA+vJNgBvUQs3wmoIGxBrYyikZQ+1L7sx7sTAKoM9vPcUysdiwbVpm3fTIHHDHHxrlGmHVdEjKPyWZBN2l96Zs3TdMmMze9Npt6MVdb74hzlifjexcUfsApMxK8pVoF22j3JgFEdfQmutJY9iClbwKCsFDB+fT6tDl8KHK3iQrEYQ2dqbsp4gQ6WsnyrlSFotAtMn7bZeCvUVcVtq0YEkHHRbu0CBmGnyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tS5fFVWZBY+RjXSBDhGtg0Lj2m5Lvtt3auon5A7wvGw=;
+ b=jxg7JPMJVGX7RDWfe/BeJjDxgGjC2JUEXaUPLvvuref3a4L1z21SGkJw+IdXPq/FHeh9l2lZtT+hAu+4LWM/JP8x65/kcdJbZykeksdI6tHHAy+jCV5IluIVRKLjscuployGvvtnd6Bqz5moRqdUlbLghuTXnImQARVte0zub/nhYfWeJjGkiiwbqD+9zuvY/LxZT+xNDHLiHNxgwj8tPZhdysJ4EJe1h1AdWCcOXZ3Vnhk3WTTarGAT8dW5e02Zj8aFdjmVIh0EFIsrweFKIEtY6+IX6qqntfYzDSO4FM9BDoMIfa3x18o8GVxRYdr0teH+DJmAHqARXojaZ4EW4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697482157; x=1698086957; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAcCmmrGQB8I/RvBQ4RW2J7O69twzM6FPTQwq9j0qgo=;
-        b=sQUXwWJB4uLiO8XNHOFB1l5FoizPEo+PZbBKASXQ6PvNmJgNQRz43U4wwj7Svj/WSO
-         jzSuKhlJhzRgk3AIDZGD9KaSNM/ow5w8TLMXkKrHbmveoKmm8ek8FupGZ56qG1bLx36s
-         Sn1oKWb0WDx/QYEGs+aEsAR3J0n9wf29zLsRM3YaKrnsbcyXMpZMFIVxk0USrJ6Ua3nR
-         y1H53b0VTdZbor9LVRCitechTNkhf3NSCWtw/Uxm0Di4AWfe6VKXJJ8o3Ow/QywmTX4s
-         xcr956MmQSPvfFTdXeD5NIXek4APw04zWSlLh0gVBRkdYn1tbhjHJLYPmRehOMWux/bh
-         PXsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697482157; x=1698086957;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAcCmmrGQB8I/RvBQ4RW2J7O69twzM6FPTQwq9j0qgo=;
-        b=PH0gAAYG3FhQbyrjCZyWcLnp/747+6R3Y9/+6wXiBGdprUnLq/tHvS9R8/rzP+OmKz
-         sTbS4JBL1kpdso6Y3ik+LIrTT45e8PvCA+vTCk4tSnvSNoz4llzmy+Kpl21hr/5Ws8Ui
-         RuR8fmPHl58vn8tiGUc62R4jIhqN2jVIiKTEsoGM4OUZHVjJwIdTLmlOiXTWBtiJr1nB
-         W+dCKLlX170AqXfTOL2nXjqJYB9YPvUTSzC9s99UZtpiKZa8IFDc52ccKOceDgAyuGC/
-         bZQ8MlWsgA7beMAHMTtgizjgpFCHloFYgssSnQwoOQv95bq/6RnQ2UQ6AZXcDTZ8df84
-         OxNw==
-X-Gm-Message-State: AOJu0YyGcq/qhnpX93zay0+kKZzTZWfRlWqCVL8j6aGMeGRX6meCQ0ku
-        I3B56OGd8pC0rgCjKmd7FXb7UpT182k=
-X-Google-Smtp-Source: AGHT+IG9+k+RbsCROZVMJf5NZBS/xEIj+i8wumNbqzyCoFYfIMSmQua6kuhoqp8NAL+vNDBuwq8EBWv8n0s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c20e:0:b0:595:8166:7be with SMTP id
- z14-20020a81c20e000000b00595816607bemr12527ywc.0.1697482157142; Mon, 16 Oct
- 2023 11:49:17 -0700 (PDT)
-Date:   Mon, 16 Oct 2023 11:49:15 -0700
-In-Reply-To: <03afed7eb3c1e5f4b2b8ecfd8616ae5c6f1819e9.camel@infradead.org>
-Mime-Version: 1.0
-References: <ZR2pwdZtO3WLCwjj@google.com> <34057852-f6c0-d6d5-261f-bbb5fa056425@oracle.com>
- <ZSXqZOgLYkwLRWLO@google.com> <8f3493ca4c0e726d5c3876bb7dd2cfc432d9deaa.camel@infradead.org>
- <ZSmHcECyt5PdZyIZ@google.com> <cf2b22fc-78f5-dfb9-f0e6-5c4059a970a2@oracle.com>
- <ZSnSNVankCAlHIhI@google.com> <BD4C4E71-C743-4B79-93CA-0F3AC5423412@infradead.org>
- <993cc7f9-a134-8086-3410-b915fe5db7a5@oracle.com> <03afed7eb3c1e5f4b2b8ecfd8616ae5c6f1819e9.camel@infradead.org>
-Message-ID: <ZS2Fq5dr2CeZaBok@google.com>
-Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
-        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tS5fFVWZBY+RjXSBDhGtg0Lj2m5Lvtt3auon5A7wvGw=;
+ b=aS6CrWQ0009AzCy3A6k2UH+JctY7dJWNJXlRYuG4aWeAbGEQhmJqCwlW5E19nHS/SwupFZ2pCX7jvMP1sMQTQCVt0odbZ+YDaP4EsOCwrk0aJ730frfyW9vhgQ7i/U+4GmwUnnmxqf5Ev4l7YuqKygDYptszsQWo8RXPvhurKoo=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by BY5PR10MB4195.namprd10.prod.outlook.com (2603:10b6:a03:201::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Mon, 16 Oct
+ 2023 18:50:31 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::64b1:cd15:65a5:8e7d]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::64b1:cd15:65a5:8e7d%5]) with mapi id 15.20.6886.034; Mon, 16 Oct 2023
+ 18:50:30 +0000
+Message-ID: <8b1ff738-6b0d-4095-82a8-206dcaba9ea4@oracle.com>
+Date:   Mon, 16 Oct 2023 19:50:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/19] vfio: Move iova_bitmap into iommu core
+Content-Language: en-US
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>, kvm@vger.kernel.org
+References: <77579409-c318-4bba-8503-637f4653c220@oracle.com>
+ <20231013144116.32c2c101.alex.williamson@redhat.com>
+ <57e8b3ed-4831-40ff-a938-ee266da629c2@oracle.com>
+ <20231013155134.6180386e.alex.williamson@redhat.com>
+ <20231014000220.GK3952@nvidia.com>
+ <1d5b592e-bcb2-4553-b6d8-5043b52a37fa@oracle.com>
+ <20231016163457.GV3952@nvidia.com>
+ <8a13a2e5-9bc1-4aeb-ad39-657ee95d5a21@oracle.com>
+ <20231016180556.GW3952@nvidia.com>
+ <97718661-c892-4cbf-b998-cadd393bdf47@oracle.com>
+ <20231016182049.GX3952@nvidia.com>
+ <6cd99e9b-46d9-47ce-a5d2-d5808b38d946@oracle.com>
+In-Reply-To: <6cd99e9b-46d9-47ce-a5d2-d5808b38d946@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0245.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a7::16) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|BY5PR10MB4195:EE_
+X-MS-Office365-Filtering-Correlation-Id: 295894e4-a78c-427d-81e2-08dbce78c563
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Mao/Hhg7BRdlr24XTwlgmMnCXnq9Zix9MAXafZjpKDELfbN+2DQdEUanYIEHeWo4IrhveVAW3WQ2M+SxlamTDYwYkdhzY/h7MaYLzK7P2+NfGANKigGET7L8hbt6n3ymKqQnZjYna00cr4WfeANQc9FZIcshnyOX1IoX7CaDuvzB5w3HJDIthRHNmpNrtkVRLQaXmuw2l5841eCoXWKiD9MpYgBRalLCHOm845RAmbSjmhb4C+XUL4E7AfjPiPHyvIDKIl3Cx72CMsQSWsqYB/W4sM7OK3NhRIwwq/QDQdfoYZpA4noLzbIkw433aETV/PSupE/eFp6IxphZwxoztFnZtqUqQ89C7YoFqD6Cd0p/PPc78G6ybuUYPdfUvtm2ZKspD+cpKy9sXww1GcJzamNORhGx6lsVl12I13zGW23vbr6ow9keIOci6Nk80FNGz5Aex0eVOEELj8GT5BpLcSKPgyNtcbKjDQPmIgY77Tu22Kj0qSboKuSHoM1HoZgeE23/7VRnKrdiF/Drvshcmj5OQAU/agTeqHClAA4PYv1ssAYeC8lfS/3ObdxGEam5xUoAYj0wHmbI3Ej9teQLnmtJXUR66l23EpIDXoloWaKz28VV/GubQiSSpuHBOqxSUcGs5Uiv3YnR7yl80PEtJA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(39860400002)(136003)(366004)(346002)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(6506007)(2616005)(53546011)(26005)(6666004)(6512007)(83380400001)(5660300002)(4744005)(8936002)(316002)(66946007)(7416002)(478600001)(8676002)(4326008)(54906003)(66476007)(6916009)(6486002)(41300700001)(66556008)(36756003)(86362001)(38100700002)(2906002)(31696002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MlVtcU44NXpodWZZd2F4YkZPVmV3RGdEWHM0TFQvbU9GcUFJS21obHkvSjUr?=
+ =?utf-8?B?UnRvVlNQU1VJdkx4bWpFQ2FSZ3RqczEzaW5QWlo3WUZXQjlDbTVFclh5RUwx?=
+ =?utf-8?B?eXFkSUV1NHo1c283V2RzTDZITFFrQ2lqQnJ0STlFTmpYKzRwYkhQTHJmV1kr?=
+ =?utf-8?B?OGwxV2ZYeE9MSVFWdzlNYTJra1FCL2Y2dWpjaDRNU280dGMrSm04d0NrYURs?=
+ =?utf-8?B?QmtLcDJZK2lqOGFpRFQ2ZStJQU5xWksxNmoyWm1RaFlNQ0RpMEpVOUhZYVds?=
+ =?utf-8?B?QTBqMGJ2cldYNk1QYXNUTFlBSVVQVDBJaS8xMllwWVN1aE1pcWVzNDRMdFdn?=
+ =?utf-8?B?dmJ4ckpyd0ZEVmlpQldMNW9pLzlHWG10QjdRMUJ6aW90S3dtTjVXT3N5S1RH?=
+ =?utf-8?B?ODRZYVVZOWoxOVdWeUdSK2Z5d3F2QUtneUNrUkFPKzVBODY2YVJuaEsxOU5O?=
+ =?utf-8?B?RE40YXZzbVNqU0E1ZnRObFBnNjBiam5MazNLU1VBTlY4bGQ2Tmx3ZGhsOW8r?=
+ =?utf-8?B?bVVCdTZmVjVlaUhVckxmcGRXVEhPamV3M3FSSWxEbm1RV0lTbnc2WXlIdE05?=
+ =?utf-8?B?endEcmJaN3dLVlJWQjYrNEE0OVZyYndNOXpyamw3bTBRanFpcG9JRUplNVdN?=
+ =?utf-8?B?WC9PSm4wSEhZamFVMDhOSzM3ZWtTNmlOOTRaaXo1NFhqNE1pTmd4YVpRZHdE?=
+ =?utf-8?B?SnJRM0xnTU42bjM2QnR3UmlEZWYvbmNoS1k4N2wrc2g0bTZrVW41MzQ4cHdm?=
+ =?utf-8?B?TUxnZDNISjQ0QS9ncWwwR09qdHpRTUtsNEtsNHJKNzNIL1dZM3hqajQ5Uk1T?=
+ =?utf-8?B?cFVWL1hUcWtOODBaV05CMjk5WkxLenhRL2RUbHJGUmM4cHo1eEJuZW5MOGF5?=
+ =?utf-8?B?dW0rWTNlZXZRWlQ2SDNQRTVVdG1TVmY0ZGtnVThwbXc4WDV1NnNXTGN5ZERx?=
+ =?utf-8?B?RmcwYm5aKzNKUTllejY4MXlrTndaRUljY3FGT1NlWlRKNk81Q2xXU2VmMDNM?=
+ =?utf-8?B?c0J1eWtzYTN5dFI5ZTE2VHk2SVBKV0hMcmZVUmwvdGg4WU9MQ2xsMURaYU5s?=
+ =?utf-8?B?K3VGOVVCN1BaTk9BOWkvbFNvMlJFMmo5cFpJazgwTFkzb1BpTU1VSVNZcDBs?=
+ =?utf-8?B?RGU5QndmbWVUNFlwcnlFOW5JeitOM09ENlIzenZLZkhvRGZvWlhLS3JrRkxx?=
+ =?utf-8?B?TkErc2h6b1U0UTRxK05wRkhVVjNOVFE1a2kybzdUeEhLbmw2WWhYNStuZ1dT?=
+ =?utf-8?B?djdULzRWZTZHdjU1Vm5UTmRjaEwyZzlCMTVtZ1duZGxpNGlJQkNlWXpoTFR0?=
+ =?utf-8?B?NXF6TFdTa3d0Ti9NSnR3TU83ZitZUndKdVEvWjJzR2IyVjNpWmMvanFobDE4?=
+ =?utf-8?B?LzRvd2N3VTgyMXNMOFNvdnZtZXB1eUdIbnR0eStKOTJLaXhpOHNzRXFxNmRl?=
+ =?utf-8?B?MC9PeXJhYlFDSjFQbHlObUcxa2d3MHR4MUxmN3hqZzl6Tnl1Ym9nRXNYUWJ6?=
+ =?utf-8?B?VXZ1anA1MGpNMHFybFBFNk5pWGM3OGdkS0g1L0lRMGsxcUpkVHQyR2JCNTdt?=
+ =?utf-8?B?MUdqV2xFOElHazFhSFc2azBWZ2VXSTZJUHhOUWJjeldtS2RsLzBObnM2ZUYv?=
+ =?utf-8?B?K2R6OGNmbWJPZjhZczFSM2d4MXF5MFJnVDlueFZLdnk1V2Z0eTNSVENaSmNV?=
+ =?utf-8?B?UG5PUXdFRlJCbnlOQXROT1NiOE9KcE5sR3poUlVvbkF2VVlGeUo4ZnZvdmRL?=
+ =?utf-8?B?NUtJVXNFc3U2QzFDSmZNeG43bXdGMnpCQU5UOUp6UlRQa1Vqem50bWp4Z2pj?=
+ =?utf-8?B?MmNrdW4yclYzVzJyajJTR1B3NmRMNXBIVjF2VCtkcWhHZTB5ZDB2dForbDgw?=
+ =?utf-8?B?OWRTeFBPL2k1SWtzR3VIWHpzdkJ1Y1JWT3lqRWIrZGJsTWd4YjcyRG9xem1p?=
+ =?utf-8?B?bXJqUjM3WWxpSHJvR0QxSmppRWZ0bC94TWlkQTNWUnZHQVdieTJvcCtqMFdn?=
+ =?utf-8?B?VzFiMWlLZTU4Wms1am5MRGEzSzQxN2VzdFN2VklFbktrQ1NRT09KdXozWEs0?=
+ =?utf-8?B?T1pLdlF5VHIrOVdLZzA3dk9EanBaUEduY3FkckJESjhmQUZEeHpCU2FYemtr?=
+ =?utf-8?B?dFYzcXBkNmRvS2xVUVRhMURsQWFMWVVLaHZjQVI2L1lhUm44cU9pdkE0dk9k?=
+ =?utf-8?B?TGc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?RFlTcGVIbFgyZnJwb1pSMnZSZ2kvb25ockkwOGR5ckNxVklJdCtxbllQOC9Q?=
+ =?utf-8?B?RkRjVzhiNGl6bE16SlpSZ3RQdGtUR09MTEpIdFpBcmU2RjJPcDF3YkJIaFA2?=
+ =?utf-8?B?UlczT256bjNsci82OUQ3ZUFLNWVMNk83NFVjZVRpK0NqWUVEK1VaVk15eWVr?=
+ =?utf-8?B?bXFZZjRMaHd1QVBQem1OS2N3djN0M0hzRE45QmwyV0toQkYzVEhIbjB5bUI4?=
+ =?utf-8?B?V0lxcFNUbzBMcVZ1N3NucDROaWVTSHlXM1ZhOW9DYjZjU0k3ZDFERXdhajNK?=
+ =?utf-8?B?MEZRSnZ6cWNrdlFFTnhIOUgyRm5BWGR0QkRDSTZueGxOSHJKTzdRaXVQbmI2?=
+ =?utf-8?B?akhKcXR6MFJzbmJYSzVWNGYvWTRneGwydHZNaXc5S1l5VVNZNUhzS1BmOXRi?=
+ =?utf-8?B?bXZYNEEvbkNQdkVibXlhTGFQR0JxWC9TYUE4bXo4Rms1SzFSa0o3T2FhbVQz?=
+ =?utf-8?B?cjFqaEhvYm1DdjdaYklYVFJuR0tja3pHM0duRXhZV1J0YTdJSHFCZXhVV3k1?=
+ =?utf-8?B?N3d5TU4zTmQxMXo0M1Y4Y1dYazdRbkVsakQwTkczMmx6d2tKSkNnSXp3ZUhD?=
+ =?utf-8?B?Yzl1U2RwbEp4MjdwV1VsZDFJQ3NEZ1lPVUt3eFM3MWpRMUNxaGFwMVI1T1pL?=
+ =?utf-8?B?czBqVGp4bXdBTVNhOUlDeSsvdnllemVCKzZDdkhURjZFc1lsckUvVUtBYk1V?=
+ =?utf-8?B?MVI2MUcxMVZCMklGQnFWcjN2N042VWFacWVlV3AyNzRhYUF6R214S21xdGtY?=
+ =?utf-8?B?anNOdGNhenVGY21hZHRRaWZYbkpSTHFIR3g5d1FCV3p0QS9HQWpoaDZtVUs4?=
+ =?utf-8?B?bW55WGNYNVBnSzhxSFVsNWcza2tkdjRZZVpmcWdNd08vSEFNcG80aDBrOFZv?=
+ =?utf-8?B?bXB3ZGVjd0M5ODQ4amRNaENlaDN6WloxaFN2S3JCQnVJbXlqUEFRR2xmUS9L?=
+ =?utf-8?B?MUFPWXNVRVUrSEFncFZRRVo1bnNWaGEvQk9zUzl4YlhBcEg5ZlI0ZnowdGpw?=
+ =?utf-8?B?SDVlQnBRRTJhQnBoQU5qbGpaMEprMXZUZDdHdjFqTldMQUk2UTdGK1YzRUpX?=
+ =?utf-8?B?cUhPZU1vTktjSFdDMnlnNXBDRHR4a21kMFQ5TjU1UG5STzZOcFpRMVRvZnRi?=
+ =?utf-8?B?N3F6am4xTDRzd3h4Q2xFRHZDd3djbGMxcW8ya3M4WGdxTklvSW1SNW5aRGlq?=
+ =?utf-8?B?cVV2WWRVREMwWkliKzZUVms2Q2Z2cy81dSt3aWNzK0hQVW9CendRUDlYOHpN?=
+ =?utf-8?B?Y3BzdUNYWDZZKytHYmNUWERBc0NpRDNJL1NFYmdUTXpIaGt1WGxPYkxSZklH?=
+ =?utf-8?B?STdLcjhrbCtvVGw3ZmpldkdJNitFajIvZXRyOVFCTGV0UnVRMC9uanZORjJI?=
+ =?utf-8?B?N1pFRjYzb2doR2QyWjFLelR4MVEwTnRJNUFoWGdmQW1jNUlrdWwzaGVQQ1Mr?=
+ =?utf-8?Q?NG5CEcDX?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 295894e4-a78c-427d-81e2-08dbce78c563
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 18:50:30.8682
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c029Dn2VkG8ldpmNgX+SqwIr6Aakd6haDSP4iTdB+Tr0k/wPK6UvKW2zFms+FhFOxLCJ94U3HErae+Z2ik5RtrpLLJsL2ClM/hs93VAqXkY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4195
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_10,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
+ adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310160164
+X-Proofpoint-GUID: PwkyHMcZvMg78VAfYSV9zaX55RT25Cqe
+X-Proofpoint-ORIG-GUID: PwkyHMcZvMg78VAfYSV9zaX55RT25Cqe
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023, David Woodhouse wrote:
-> On Mon, 2023-10-16 at 08:47 -0700, Dongli Zhang wrote:
-> > Suppose we are discussing a non-permanenet solution, I would suggest:
-> > 
-> > 1. Document something to accept that kvm-clock (or pvclock on KVM, including Xen
-> > on KVM) is not good enough in some cases, e.g., vCPU hotplug.
+On 16/10/2023 19:37, Joao Martins wrote:
+> On 16/10/2023 19:20, Jason Gunthorpe wrote:
+>> On Mon, Oct 16, 2023 at 07:15:10PM +0100, Joao Martins wrote:
+>>
+>>> Here's a diff, naturally AMD/Intel kconfigs would get a select IOMMUFD_DRIVER as
+>>> well later in the series
+>>
+>> It looks OK, the IS_ENABLES are probably overkill once you have
+>> changed the .h file, just saves a few code bytes, not sure we care?
 > 
-> I still don't understand the vCPU hotplug case.
-> 
-> In the case where the TSC is actually sane, why would we need to reset
-> the masterclock on vCPU hotplug? 
-> 
-> The new vCPU gets its TSC synchronised to the others, and its kvmclock
-> parameters (mul/shift/offset based on the guest TSC) can be *precisely*
-> the same as the other vCPUs too, can't they? Why reset anything?
+> I can remove them
 
-Aha!  I think I finally figured out why KVM behaves the way it does.
+Additionally, I don't think I can use the symbol namespace for IOMMUFD, as
+iova-bitmap can be build builtin with a module iommufd, otherwise we get into
+errors like this:
 
-The unnecessary masterclock updates effectively came from:
-
-  commit 7f187922ddf6b67f2999a76dcb71663097b75497
-  Author: Marcelo Tosatti <mtosatti@redhat.com>
-  Date:   Tue Nov 4 21:30:44 2014 -0200
-
-    KVM: x86: update masterclock values on TSC writes
-    
-    When the guest writes to the TSC, the masterclock TSC copy must be
-    updated as well along with the TSC_OFFSET update, otherwise a negative
-    tsc_timestamp is calculated at kvm_guest_time_update.
-    
-    Once "if (!vcpus_matched && ka->use_master_clock)" is simplified to
-    "if (ka->use_master_clock)", the corresponding "if (!ka->use_master_clock)"
-    becomes redundant, so remove the do_request boolean and collapse
-    everything into a single condition.
-
-Before that, KVM only re-synced the masterclock if it was enabled or disabled,
-i.e. KVM behaved as we want it to behave.  Note, at the time of the above commit,
-VMX synchronized TSC on *guest* writes to MSR_IA32_TSC:
-
-	case MSR_IA32_TSC:
-        	kvm_write_tsc(vcpu, msr_info);
-	        break;
-
-That got changed by commit 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization
-on guest writes"), but I don't think the guest angle is actually relevant to the
-fix.  AFAICT, a write from the host would suffer the same problem.  But knowing
-that KVM synced on guest writes is crucial to understanding the changelog.
-
-In kvm_write_tsc(), except for KVM's wonderful "less than 1 second" hack, KVM
-snapshotted the vCPU's current TSC *and* the current time in nanoseconds, where
-kvm->arch.cur_tsc_nsec is the current host kernel time in nanoseconds.
-
-	ns = get_kernel_ns();
-
-	...
-
-        if (usdiff < USEC_PER_SEC &&
-            vcpu->arch.virtual_tsc_khz == kvm->arch.last_tsc_khz) {
-		...
-        } else {
-                /*
-                 * We split periods of matched TSC writes into generations.
-                 * For each generation, we track the original measured
-                 * nanosecond time, offset, and write, so if TSCs are in
-                 * sync, we can match exact offset, and if not, we can match
-                 * exact software computation in compute_guest_tsc()
-                 *
-                 * These values are tracked in kvm->arch.cur_xxx variables.
-                 */
-                kvm->arch.cur_tsc_generation++;
-                kvm->arch.cur_tsc_nsec = ns;
-                kvm->arch.cur_tsc_write = data;
-                kvm->arch.cur_tsc_offset = offset;
-                matched = false;
-                pr_debug("kvm: new tsc generation %llu, clock %llu\n",
-                         kvm->arch.cur_tsc_generation, data);
-        }
-
-	...
-
-        /* Keep track of which generation this VCPU has synchronized to */
-        vcpu->arch.this_tsc_generation = kvm->arch.cur_tsc_generation;
-        vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
-        vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
-
-Note that the above sets matched to false!  But because kvm_track_tsc_matching()
-looks for matched+1, i.e. doesn't require the first vCPU to match itself, KVM
-would immediately compute vcpus_matched as true for VMs with a single vCPU.  As
-a result, KVM would skip the masterlock update, even though a new TSC generation
-was created.
-
-        vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
-                         atomic_read(&vcpu->kvm->online_vcpus));
-
-        if (vcpus_matched && gtod->clock.vclock_mode == VCLOCK_TSC)
-                if (!ka->use_master_clock)
-                        do_request = 1;
-
-        if (!vcpus_matched && ka->use_master_clock)
-                        do_request = 1;
-
-        if (do_request)
-                kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
-
-On hardware without TSC scaling support, vcpu->tsc_catchup is set to true if the
-guest TSC frequency is faster than the host TSC frequency, even if the TSC is
-otherwise stable.  And for that mode, kvm_guest_time_update(), by way of
-compute_guest_tsc(), uses vcpu->arch.this_tsc_nsec, a.k.a. the kernel time at the
-last TSC write, to compute the guest TSC relative to kernel time:
-
-  static u64 compute_guest_tsc(struct kvm_vcpu *vcpu, s64 kernel_ns)
-  {
-	u64 tsc = pvclock_scale_delta(kernel_ns-vcpu->arch.this_tsc_nsec,
-				      vcpu->arch.virtual_tsc_mult,
-				      vcpu->arch.virtual_tsc_shift);
-	tsc += vcpu->arch.this_tsc_write;
-	return tsc;
-  }
-
-Except the @kernel_ns passed to compute_guest_tsc() isn't the current kernel time,
-it's the masterclock snapshot!
-
-        spin_lock(&ka->pvclock_gtod_sync_lock);
-        use_master_clock = ka->use_master_clock;
-        if (use_master_clock) {
-                host_tsc = ka->master_cycle_now;
-                kernel_ns = ka->master_kernel_ns;
-        }
-        spin_unlock(&ka->pvclock_gtod_sync_lock);
-
-	if (vcpu->tsc_catchup) {
-		u64 tsc = compute_guest_tsc(v, kernel_ns);
-		if (tsc > tsc_timestamp) {
-			adjust_tsc_offset_guest(v, tsc - tsc_timestamp);
-			tsc_timestamp = tsc;
-		}
-	}
-
-And so the "kernel_ns-vcpu->arch.this_tsc_nsec" is *guaranteed* to generate a
-negative value, because this_tsc_nsec was captured after ka->master_kernel_ns.
-
-Forcing a masterclock update essentially fudged around that problem, but in a
-heavy handed way that introduced undesirable side effects, i.e. unnecessarily
-forces a masterclock update when a new vCPU joins the party via hotplug.
-
-Compile tested only, but the below should fix the vCPU hotplug case.  Then
-someone (not me) just needs to figure out why kvm_xen_shared_info_init() forces
-a masterclock update.
-
-I still think we should clean up the periodic sync code, but I don't think we
-need to periodically sync the masterclock.
-
----
- arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c54e1133e0d3..f0a607b6fc31 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2510,26 +2510,29 @@ static inline int gtod_is_based_on_tsc(int mode)
- }
- #endif
- 
--static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
-+static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu, bool new_generation)
- {
- #ifdef CONFIG_X86_64
--	bool vcpus_matched;
- 	struct kvm_arch *ka = &vcpu->kvm->arch;
- 	struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
- 
--	vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
--			 atomic_read(&vcpu->kvm->online_vcpus));
-+	/*
-+	 * To use the masterclock, the host clocksource must be based on TSC
-+	 * and all vCPUs must have matching TSCs.  Note, the count for matching
-+	 * vCPUs doesn't include the reference vCPU, hence "+1".
-+	 */
-+	bool use_master_clock = (ka->nr_vcpus_matched_tsc + 1 ==
-+				 atomic_read(&vcpu->kvm->online_vcpus)) &&
-+				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
- 
- 	/*
--	 * Once the masterclock is enabled, always perform request in
--	 * order to update it.
--	 *
--	 * In order to enable masterclock, the host clocksource must be TSC
--	 * and the vcpus need to have matched TSCs.  When that happens,
--	 * perform request to enable masterclock.
-+	 * Request a masterclock update if the masterclock needs to be toggled
-+	 * on/off, or when starting a new generation and the masterclock is
-+	 * enabled (compute_guest_tsc() requires the masterclock snaphot to be
-+	 * taken _after_ the new generation is created).
- 	 */
--	if (ka->use_master_clock ||
--	    (gtod_is_based_on_tsc(gtod->clock.vclock_mode) && vcpus_matched))
-+	if ((ka->use_master_clock && new_generation) ||
-+	    (ka->use_master_clock != use_master_clock))
- 		kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
- 
- 	trace_kvm_track_tsc(vcpu->vcpu_id, ka->nr_vcpus_matched_tsc,
-@@ -2706,7 +2709,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
- 	vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
- 	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
- 
--	kvm_track_tsc_matching(vcpu);
-+	kvm_track_tsc_matching(vcpu, !matched);
- }
- 
- static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
-
-base-commit: dfdc8b7884b50e3bfa635292973b530a97689f12
--- 
+ERROR: modpost: module iommufd uses symbol iova_bitmap_for_each from namespace
+IOMMUFD, but does not import it.
+ERROR: modpost: module iommufd uses symbol iova_bitmap_free from namespace
+IOMMUFD, but does not import it.
+ERROR: modpost: module iommufd uses symbol iova_bitmap_alloc from namespace
+IOMMUFD, but does not import it.
