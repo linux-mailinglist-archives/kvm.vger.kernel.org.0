@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F5BA7CAF62
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:32:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FA167CAFCC
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:38:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234142AbjJPQcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41426 "EHLO
+        id S234366AbjJPQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:38:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232845AbjJPQcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:32:09 -0400
+        with ESMTP id S234469AbjJPQhh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:37:37 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 296C34499;
-        Mon, 16 Oct 2023 09:19:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10BC4684;
+        Mon, 16 Oct 2023 09:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473197; x=1729009197;
+  t=1697473206; x=1729009206;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rWXAJsBXvldwnJdPf0k5N9icvjGGM79jJW+iAC1XCxs=;
-  b=K7A+CE39uH2sTwy5qJ/8M9Q1XAty2u4OhuKl7ZTlj+iVVSRNQs++MRaT
-   gkZKod2Qmr3NrqOj58VWC0X1YPSJi4TGx7C2EUHiBWZzRBewnJIuh084b
-   5RJqpFn7CDt9r2uzw+KZ7Z5Rsvc15XRSgY1i5i8mzg3RsXBxo2OJZZbmf
-   bABiubG/TjxnkxbOngyiEtZIGPTWiBJVl5J2Dig7sDGWrbr8bol254R5C
-   BMFanGYxL57PDRJvrV5tkOw13mHynya+OOqiKB1gKL4SGWNlB6BEhczjU
-   DUWt5Ytev3GCeloWA/TV4cf1palG6REYDbNwzMLEsXTjd1FYgUgwZDIeW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921992"
+  bh=jMjX3i5VILZd+3oydEMQ6MGtayaSTsJxSC4eSsm58dw=;
+  b=ai0vhFYLKo6zzRsoCC6WZG9c+CX6VU+KgxVDQd1l6/3Z3XQOgEs+vp/4
+   R1vxFzeItI9z3cu4s9QNx8Vy5N+Hu3Qa31ENa4Eu4UBZhtVsKgGwLYQPW
+   Hf+0IuVKXLYCKhqjshe1/ikJRsSHYM0WgTmRVsZXxkxFhHhJs/q0qdaXK
+   6SDvYXkBJ3qS/OoyeThn5S3R0BEZFjRieJNLVcp548Gv7Hp+FmEkA9LRd
+   JGDbxBj5ufCStms8JYhNU6EWuFOfMKDzljV5cv0frIUb902KK0isMKX6A
+   yig5BnDWHj0nNlfJE09EqxwzHm63shbqBwWS9CtpeNPIfGoWruDE7tHMq
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921999"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921992"
+   d="scan'208";a="364921999"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:01 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448264"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448267"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448264"
+   d="scan'208";a="846448267"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:00 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:01 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -47,67 +47,68 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        hang.yuan@intel.com, tina.zhang@intel.com,
-        Yao Yuan <yuan.yao@intel.com>
-Subject: [PATCH v16 083/116] KVM: TDX: Handle vmentry failure for INTEL TD guest
-Date:   Mon, 16 Oct 2023 09:14:35 -0700
-Message-Id: <ced8c88adebf220233e27f14ca11aa0158248630.1697471314.git.isaku.yamahata@intel.com>
+        hang.yuan@intel.com, tina.zhang@intel.com
+Subject: [PATCH v16 084/116] KVM: TDX: handle EXIT_REASON_OTHER_SMI
+Date:   Mon, 16 Oct 2023 09:14:36 -0700
+Message-Id: <31a43bf32cb48b408ed447e93b06e2480ca9ab85.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+        lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Yao Yuan <yuan.yao@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX module passes control back to VMM if it failed to vmentry for a TD, use
-same exit reason to notify user space, align with VMX.
-If VMM corrupted TD VMCS, machine check during entry can happens.  vm exit
-reason will be EXIT_REASON_MCE_DURING_VMENTRY.  If VMM corrupted TD VMCS
-with debug TD by TDH.VP.WR, the exit reason would be
-EXIT_REASON_INVALID_STATE or EXIT_REASON_MSR_LOAD_FAIL.
+If the control reaches EXIT_REASON_OTHER_SMI, #SMI is delivered and
+handled right after returning from the TDX module to KVM nothing needs to
+be done in KVM.  Continue TDX vcpu execution.
 
-Signed-off-by: Yao Yuan <yuan.yao@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ arch/x86/include/uapi/asm/vmx.h | 1 +
+ arch/x86/kvm/vmx/tdx.c          | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index a5faf6d88f1b..b3a30ef3efdd 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -34,6 +34,7 @@
+ #define EXIT_REASON_TRIPLE_FAULT        2
+ #define EXIT_REASON_INIT_SIGNAL			3
+ #define EXIT_REASON_SIPI_SIGNAL         4
++#define EXIT_REASON_OTHER_SMI           6
+ 
+ #define EXIT_REASON_INTERRUPT_WINDOW    7
+ #define EXIT_REASON_NMI_WINDOW          8
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index be73b8322a66..306d555dda35 100644
+index 306d555dda35..618c2ecec26a 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1314,6 +1314,28 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
- 		goto unhandled_exit;
- 	}
- 
-+	/*
-+	 * When TDX module saw VMEXIT_REASON_FAILED_VMENTER_MC etc, TDH.VP.ENTER
-+	 * returns with TDX_SUCCESS | exit_reason with failed_vmentry = 1.
-+	 * Because TDX module maintains TD VMCS correctness, usually vmentry
-+	 * failure shouldn't happen.  In some corner cases it can happen.  For
-+	 * example
-+	 * - machine check during entry: EXIT_REASON_MCE_DURING_VMENTRY
-+	 * - TDH.VP.WR with debug TD.  VMM can corrupt TD VMCS
-+	 *   - EXIT_REASON_INVALID_STATE
-+	 *   - EXIT_REASON_MSR_LOAD_FAIL
-+	 */
-+	if (unlikely(exit_reason.failed_vmentry)) {
-+		pr_err("TDExit: exit_reason 0x%016llx qualification=%016lx ext_qualification=%016lx\n",
-+		       exit_reason.full, tdexit_exit_qual(vcpu), tdexit_ext_exit_qual(vcpu));
-+		vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
-+		vcpu->run->fail_entry.hardware_entry_failure_reason
-+			= exit_reason.full;
-+		vcpu->run->fail_entry.cpu = vcpu->arch.last_vmentry_cpu;
-+
-+		return 0;
-+	}
-+
+@@ -1339,6 +1339,13 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
  	WARN_ON_ONCE(fastpath != EXIT_FASTPATH_NONE);
  
  	switch (exit_reason.basic) {
++	case EXIT_REASON_OTHER_SMI:
++		/*
++		 * If reach here, it's not a Machine Check System Management
++		 * Interrupt(MSMI).  #SMI is delivered and handled right after
++		 * SEAMRET, nothing needs to be done in KVM.
++		 */
++		return 1;
+ 	default:
+ 		break;
+ 	}
 -- 
 2.25.1
 
