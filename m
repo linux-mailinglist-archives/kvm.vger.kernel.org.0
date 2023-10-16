@@ -2,163 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8AEB7CA7B0
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 14:05:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5C447CA7CD
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 14:15:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233326AbjJPMFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 08:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40064 "EHLO
+        id S232764AbjJPMPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 08:15:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231819AbjJPMFL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 08:05:11 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7647FE3;
-        Mon, 16 Oct 2023 05:05:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fte0x3OgPBYf4CI5jkHxr1Kc2tsVkX2LBR9iGn2Z2DXGVj8AC38xc56fdH9Dh9PFVcwh0a+GO2QI5RF1Fw7AaEgI/A8M8XO0v7AxwtG7saxV73NHmrUqS34WV0Oa+gVNmlh3Lv2EUo5ARfBk9tV/ek/UiZCEhd5YaeC9VKsO63Rt2Xd5ALFbAiLIl3P03hdwoXB0aPmGaDec9VfTXTovCYuOUQauljpnL3sGK6Hgul0j6k/UMlgk2azDmw9L7uOIog0JQjYIhR1kxM6r2UMH6WYXjOwfotomDPmkkcyBS+TX39d2CG4bz0yGPfycATV4n1ckkB5Sz9Ve6E4VQHyaGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tzwmAtmOmC+swrHDVaarrd/NDG/3+QSSo56Kh1bC7RI=;
- b=UCC708BTmIQtLdSUvrK3GGkTXRSf+HC/gSqHNm/vnk2SVIi+cxw43NeQ7mjN7IDJE6oOV9irO9oE0A3QHllFgmcXwxV3edBj3tcobDYTkWpAZDW1mpICbIU+ZS6Yu6jR/QJlJlT9RTR8Pb/HkZtPQCtaZBv/4ZIXfh6c/G8R6A7sa8pWKt7xhhoQ0dAnleMOaYDH3CEVIBruO6H4tx8us7P7CgSGYU9ikCBAv9miGmic9V9EG3pNXaJ8vRVPQUHVWHq5iiJeYlKnC9Dm1VL8izP3yWblBbT2FcP35RnU6LHSqZNqtSXodowM3udr+Fdz4+Xx+IvN751LYiNB/JhScg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tzwmAtmOmC+swrHDVaarrd/NDG/3+QSSo56Kh1bC7RI=;
- b=gfJbs+hZYijJYdd0VDhV7A00pmf5Dj7Gq/doQJTmHQN2GI5Z1OTp/K2roUzoGzWkuQaBaSBFHS9K+gu+xnxpxRExa5u4S0w4gBsQ8xJweE7Uj2IqNPt4mLJsV1XxJBK/Gm7SxvuGIfRg80ngE2O8+wD40P6z2inNTvlG0xNrzi7FjoUtulWd4E1sFPBhd+tYUjSQPh2Rp66L6iz88WvDEk1YOHj9D6+UyHutRKjL2We5tl3kWAkvs3xSsIKt+CvP2GUMFdzwOx/tBSZxvELmVJIbGwfa6BgkIF34If2c/CVj9WBMmDMlqkk4cymPjaaZ7DfTV1/eo/cAzJ4PxgoeBw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB8920.namprd12.prod.outlook.com (2603:10b6:806:38e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
- 2023 12:04:55 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.046; Mon, 16 Oct 2023
- 12:04:55 +0000
-Date:   Mon, 16 Oct 2023 09:04:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "zhenzhong.duan@intel.com" <zhenzhong.duan@intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v2 1/6] iommu: Add new iommu op to create domains owned
- by userspace
-Message-ID: <20231016120454.GS3952@nvidia.com>
-References: <20230928071528.26258-1-yi.l.liu@intel.com>
- <20230928071528.26258-2-yi.l.liu@intel.com>
- <ZSuROTyaxePoVFA+@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSuROTyaxePoVFA+@Asurada-Nvidia>
-X-ClientProxiedBy: BL1PR13CA0077.namprd13.prod.outlook.com
- (2603:10b6:208:2b8::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S232143AbjJPMPN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 08:15:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719C5E8
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 05:14:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697458468;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8K0GBMWi7yuOkB+hNB45NjHQ0h2LLEOcT0QD5ygf2F4=;
+        b=LXqSiwwj+ZyGwYZ0xzV20R0KfE42NgLTc1zlQY7H1518W/Fl7U+DPXvWZUcetpXmBsYiH+
+        /OhRSlWmQc7opVVdGsQnXvwrQc8KHGGGjW19ERJXXGGdk1DYyvTybEYJXioRtfOSE0Ar79
+        l0FNtax2dxRKc6tk5l1iFcDNAZgjjEs=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-639-BY0MRc47OVySaVMQzr9AWQ-1; Mon, 16 Oct 2023 08:14:27 -0400
+X-MC-Unique: BY0MRc47OVySaVMQzr9AWQ-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-774292d71e3so515724985a.3
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 05:14:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697458467; x=1698063267;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8K0GBMWi7yuOkB+hNB45NjHQ0h2LLEOcT0QD5ygf2F4=;
+        b=K3wJmBP8ymwv4x298xsHZbq1d+4p+Bc8MTfag22Yg6UuYFI0vjOlWSZH6FZVAYPS+Q
+         GUIX67gCBFK1befyucu21V4Iat3IBHAKCwOFS+4Dk9rRquIa9Ynq2Q2pX4cuE7uyv2+q
+         u17+FCSisH/lgMLSSO9pufwfKEs/lkj3Cs3I/H6LDOkohZZ0JRKGHP0AedQipQS82vA1
+         nGLqh+uZpp3ceb9DnO3wqI9Xk9D66/2746R46oyXXEqpzeHh4j6OI+lcQzaAQosp4oSs
+         f8tuWYklrcZjUPNUVux94C06WZhzgkvHUTucpDD6Min91rl1Q6f+Y5DW/mVtmPux/nog
+         UgaA==
+X-Gm-Message-State: AOJu0YymFo+dczg6evA39gqNM+N3LBhUH9qlpIWw5V4TV/fcZiSkzSqQ
+        tK62/6Cr9NZUFOu2XBfFOY/s+E3um9vMutbEymEs300q5y7w4T+5jrGXRIrWlvIhZUjVQ4anwQO
+        Uwsvz3gObrkbR
+X-Received: by 2002:a05:620a:999:b0:76d:ada0:4c0 with SMTP id x25-20020a05620a099900b0076dada004c0mr31781929qkx.76.1697458466917;
+        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGX+nJ0hdk4wSNp3IL6EMf+BSUKobIFwfujXQ3r3+l1dNl+KKT4FZ0JEJkvltb3efykENBxnQ==
+X-Received: by 2002:a05:620a:999:b0:76d:ada0:4c0 with SMTP id x25-20020a05620a099900b0076dada004c0mr31781918qkx.76.1697458466621;
+        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id d4-20020a05620a166400b0077568327b54sm2930591qko.123.2023.10.16.05.14.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 05:14:26 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Nicolas Saenz Julienne <nsaenz@amazon.com>, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, graf@amazon.de, rkagan@amazon.de,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: hyper-v: Don't auto-enable stimer during
+ deserialization
+In-Reply-To: <20231016095217.37574-1-nsaenz@amazon.com>
+References: <20231016095217.37574-1-nsaenz@amazon.com>
+Date:   Mon, 16 Oct 2023 14:14:22 +0200
+Message-ID: <87sf6a9335.fsf@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB8920:EE_
-X-MS-Office365-Filtering-Correlation-Id: fb0c1aad-f645-4a1f-3e5c-08dbce401c3d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZRKhEpFuTaIlRdgpAKq/EIt0gNiRM7/Y0KQ1PH4B/JcrvznPQMgU1RCJqvBv9Z5d2/0/8W2P2XyO9uGy4yz8wWMl+csHJ0HAThcuzsDANrzPclHNjNiUXrQPst0gwiSKO+epkgCcl77CzV+n7tyJzkofyHLQpbZ/7hz740ax4LeuxMYnLFRc1MMb1jKCcCM5eKNaFASCOPQ+XaoC27k/3ACKeen8+/yvLlMrKive3F/Vjij2t02uJsUexPWfy7MyAHGfqwJx51wHv5qepRJ4EYLMXUdli9R2dI2X6G2EExlIXv+nmZohuCaC2SCyfm1peAUZJOiPLoTV/uIGBcWROSVFxjH1D3k+0ABQhmNDyn8SAIhjYGZ/6tN90OkGO9bKiT16PpG6JVMEz2Q0yT/3DgkIZQ36SAHH7NlIfeyyOPLhMrskytGW/g7Di3u9yxblCc3gO69Hlp1XjsEXlxIKdE7VHiv4102PUKcc/PyI4J2ubB3WZZSTZIdVs8OTqBNhKkDsqKTi+fyHnHCHSuNtO89zrUns81QbUyq0bOMKpQU43opC70QwLQxULQbrG95H
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(346002)(366004)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(478600001)(66946007)(6636002)(66556008)(66476007)(54906003)(37006003)(6486002)(41300700001)(83380400001)(86362001)(38100700002)(316002)(6512007)(2616005)(26005)(1076003)(107886003)(6506007)(5660300002)(36756003)(33656002)(6862004)(7416002)(8936002)(8676002)(4326008)(4744005)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OsPIdv6fOvrB/wWly+wS22jA1YtkIc00UTSNIEDZQzGkshX0+XmuqaXREvZY?=
- =?us-ascii?Q?cqBo5R+bI06EKEkOHba3ZGp7d3mmacWxIpiFS5L/buTMeZpJUVUHSnrUKu8O?=
- =?us-ascii?Q?BSgr5atAp6nh77T4xnk5SjzXmTXDk8C9F+S1hSdm2gSPk1rRqvnaDFfmowKy?=
- =?us-ascii?Q?L45dcGsG9+I0TdiZ+ll1O/iOW8KREcFWzbFaqJJm3WUREDEJRMh3WD1yEZUD?=
- =?us-ascii?Q?lRZzl6KUILdOKVf04UmG4qq8CsKdapPx2jp9cM1Obrj2Vfo4EO+J5hk05+BV?=
- =?us-ascii?Q?Vf2plxqnxiCXUxHPyAS6yWZko9LNP9chyoi0jPARH163BLQNiKWl0SHxn4JP?=
- =?us-ascii?Q?n0MfBszEfIbWZ3dpWzV52Pp1JK9ABhmK7VpSmNYSASa8NAK2K/Q7Z3mpO45C?=
- =?us-ascii?Q?PLFu9R/MONFZAgcW7OpGSNtoZ2SN57a9J+w4+tXfst9tCvYI9mlA29ydg31a?=
- =?us-ascii?Q?uBZCG7QeDcQs4ANcWPdot/GSw4plKkvEQ4iLNNoyvrTb9GqHvwFHv+e2ftDN?=
- =?us-ascii?Q?cF2lTgY2Aee8I0sY0gXKhOGLCZcHgJFjJUaR7Ww+2rMaSrvIQAsf4r8sZMor?=
- =?us-ascii?Q?CznMYvg2TO7mBsgTVky19LSiP6PShZhWTURm6xXxyF56WDJWCARhKza07JXI?=
- =?us-ascii?Q?TqdR2d21cLAhj8j7crLtRPMy2vXggktqup/SuNhxH8m/iR1z12O5WlY3oC4P?=
- =?us-ascii?Q?cKpmx2lTD5nSyiP3B0aEs2JAbT4OuuoiTlIWKstKtXhYQmgO8DCVu+Hi51pb?=
- =?us-ascii?Q?+dUlUxj9NnVVwvp3Y5eTCbpKEGSLOXH0AbCDNBMrUrPhzNNjyjFiYluut5l/?=
- =?us-ascii?Q?ZWH01x916OVF1Yc/09dl9JK485diZQTwpO7oNW88hSYs6gDy8HVnGMnHsnP/?=
- =?us-ascii?Q?JzzT/QokmuN5YYmePIVwDEGnQTnRR3T+pdGz52M6CeyD0uQSLj/o9QofvRqe?=
- =?us-ascii?Q?9JJqohVV7B+YAaoKzcSDlfj9qG+KgV1zJznIAzcDr7zdrxWV46an92tBGRAq?=
- =?us-ascii?Q?gribG/wlevIHq79bcigQZHyycgzyoVHBBPK7+NA5s0ANidTL5aEKJotpOtQZ?=
- =?us-ascii?Q?KGVhUhHtFyztFMqmj5yesq5b2+SdoUO4/1Uw23OIgqOZnoH+J67T59eEuzNY?=
- =?us-ascii?Q?+aW3Nf03E8cwl0Euj3E+4Mi6Hc/6k/w8J1A81B8YnP+ulUi9RqQnuZmmb5m6?=
- =?us-ascii?Q?s3ueSkaHoFdUhiCsztDuIhjPbHBGvaYF3XIdfxSySxiYcZiVKSf1fm+y3Brv?=
- =?us-ascii?Q?SmTlfcROpKd28NMeDjPx51LTbdTWt/e8X/auH97Ye9V9J9EfY5YzIyj9iE6O?=
- =?us-ascii?Q?dRnWSTvT67pQLAzCH1S2DJaL9o9bg1tSDKDnpF1DAwJDkZADSJNIZBoD7His?=
- =?us-ascii?Q?2D0Xs68pdNE4qtrHlCwambXyrA9RYnySZe69qEx+nF1cMtQPBj/tmYZZ590o?=
- =?us-ascii?Q?9QMDE/gID3T9Fgbqjm8UgzcBuK4ydLq6uQpXjGHTN6K1PfjTjPOBcBUKj8G+?=
- =?us-ascii?Q?TdQfrfxSqHuc7Naa36TtpMYOuHdlfu7S+QhMiSlxywGr1r1GAbv9QibJMy4G?=
- =?us-ascii?Q?PHSwNLEtxzdF8MUl+gK9ReLItb0mWeCYELI037rY?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb0c1aad-f645-4a1f-3e5c-08dbce401c3d
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 12:04:55.1422
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YYGWNAHbF+DdybVHlSmusXav3GDgz5FCW3+TUwihkHWbzmS0a9MN2FGpj2wPuZOi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8920
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,
+        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 15, 2023 at 12:14:01AM -0700, Nicolin Chen wrote:
-> On Thu, Sep 28, 2023 at 12:15:23AM -0700, Yi Liu wrote:
-> 
-> > diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-> > index b4ba0c0cbab6..4a7c5c8fdbb4 100644
-> > --- a/include/uapi/linux/iommufd.h
-> > +++ b/include/uapi/linux/iommufd.h
-> > @@ -347,10 +347,20 @@ struct iommu_vfio_ioas {
-> >  };
-> >  #define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
-> > 
-> > +/**
-> > + * enum iommufd_hwpt_alloc_flags - Flags for HWPT allocation
-> > + * @IOMMU_HWPT_ALLOC_NEST_PARENT: If set, allocate a domain which can serve
-> > + *                                as the parent domain in the nesting
-> > + *                                configuration.
-> 
-> I just noticed a nit here: we should probably align with other
-> parts of this file by using "HWPT" v.s. "domain"? I.e.
-> 
-> + * @IOMMU_HWPT_ALLOC_NEST_PARENT: If set, allocate a HWPT which can serve
-> + *                                as the parent HWPT in the nesting
-> + *                                configuration.
+Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
 
-Yes
+> By not honoring the 'stimer->config.enable' state during stimer
+> deserialization we might introduce spurious timer interrupts. For
+> example through the following events:
+>  - The stimer is configured in auto-enable mode.
+>  - The stimer's count is set and the timer enabled.
+>  - The stimer expires, an interrupt is injected.
+>  - We live migrate the VM.
+>  - The stimer config and count are deserialized, auto-enable is ON, the
+>    stimer is re-enabled.
+>  - The stimer expires right away, and injects an unwarranted interrupt.
+>
+> So let's not change the stimer's enable state if the MSR write comes
+> from user-space.
+>
+> Fixes: 1f4b34f825e8 ("kvm/x86: Hyper-V SynIC timers")
+> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 7c2dac6824e2..9f1deb6aa131 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -729,7 +729,7 @@ static int stimer_set_count(struct kvm_vcpu_hv_stimer *stimer, u64 count,
+>  	stimer->count = count;
+>  	if (stimer->count == 0)
+>  		stimer->config.enable = 0;
 
-Jason
+Can this branch be problematic too? E.g. if STIMER[X]_CONFIG is
+deserialized after STIMER[X]_COUNT we may erroneously reset 'enable' to
+0, right? In fact, when MSRs are ordered like this:
+
+#define HV_X64_MSR_STIMER0_CONFIG		0x400000B0
+#define HV_X64_MSR_STIMER0_COUNT		0x400000B1
+
+I would guess that we always de-serialize 'config' first. With
+auto-enable, the timer will get enabled when writing 'count' but what
+happens in other cases?
+
+Maybe the whole block needs to go under 'if (!host)' instead?
+
+> -	else if (stimer->config.auto_enable)
+> +	else if (stimer->config.auto_enable && !host)
+>  		stimer->config.enable = 1;
+>  
+>  	if (stimer->config.enable)
+
+-- 
+Vitaly
+
