@@ -2,145 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1BF07CB559
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 23:36:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 548C37CB5D5
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 23:58:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbjJPVgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 17:36:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
+        id S233698AbjJPV6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 17:58:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232873AbjJPVgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 17:36:07 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B286A7
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 14:36:05 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-419b53acc11so44651cf.0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 14:36:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697492164; x=1698096964; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gG0OkIWDPYdZRvQuvf3btCaImiKQgqO1e18TbAYg8Pg=;
-        b=0hHW1d/7AzYtGkXWKlamJWLlz+dMcyRD4KvAOQfrXkAwAu7uewBUozkfLwYDcPSQzq
-         ToUFpDvEm2ghWHmqgesqcR4/DO2oIC4fzBM0AVj5ukCdgijehzH4eDbXeMgADxSKUR/r
-         0YoG4m5wY0xHsIQQN4jP7RLmn43GxJJLfRi2mQwmX2LyyeNDbOmF1I75D7KpwPCDxDCb
-         Ax303E9zMx7ZWfXlUcahck+XF9sv9X/zjzsd2CUsSTo8d2UeFjbOVfiV7+8XQD7m0Q9S
-         5bsmdZ2CT3gn4m4ZyenjTTEjaWyhBHWXl1IC25CFJzn83HDbCCrSesuf0AcAW19FwZgG
-         qORQ==
+        with ESMTP id S232845AbjJPV6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 17:58:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 357369B
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 14:57:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697493461;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=tVT3RQmbEPAnJ6AuCvqmJQKzjg/BeKl9AJogP6t7wVs=;
+        b=hBW6RcAllZ5ctDPySsrhgsnUCwrKQXNjn7nmB1iPMqk8I8U5hSyjirTk/7OnTErcqYsK1g
+        FUvKHA4knVBMsHTGEHM8fOPV2dY3YDWWBWpDcgi+5zP2U2GHnYYVfr4eDxkAcOmBqisrl9
+        YKhv43MTuqYyZ0pvKIrfuGnSytuuaTo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-536-LKvdEKPSNHCglB8-FnRo_A-1; Mon, 16 Oct 2023 17:57:34 -0400
+X-MC-Unique: LKvdEKPSNHCglB8-FnRo_A-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9ae686dafedso363074866b.3
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 14:57:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697492164; x=1698096964;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gG0OkIWDPYdZRvQuvf3btCaImiKQgqO1e18TbAYg8Pg=;
-        b=nh7DQnmGXKn3SeWkOlNrH6iDsydLyexciqTQy0oHVEV2OoPaeroBdcXNt8bPXS9alU
-         PoXOR6YUhgigbwG4LCyvUDnddZDgvPB+VEunr+iVF8LEk4etpx2OUx0yZZCAMAcAXkLC
-         jHCU7GWWUSn8VIkAgR37oGI8tKw/TiNvE8hIU0xqNVIEH76/s1IkyvxieUx80MflQcWy
-         O4sFkEy+krsPO/exlb3F8vMi3p1SosJXTMKHzEOTRvj14A+ECPoWpwswoswW0gkVG10H
-         FaY5RQdqo9bRMUfUm7tfZ3IQHfaE5H5QrqarrVCymS1JbtWogUkYN9vMhEHEVZbdsMdK
-         uFBA==
-X-Gm-Message-State: AOJu0YxckxJKbmOgfxcRMZl9TyTjXVcpNq3cD1k+DOMPRHxJZSsJCCRl
-        Ozq5A2+XF/8QBZjDlMszGDli4VUnjQ5VP2impwnwFQ==
-X-Google-Smtp-Source: AGHT+IGiZ5BGU5400y71INeUK7EWTSUyP0Peqa8/UWdHZGXz4uUZXSH6XpGpm7cIwuhSjMBV95+dfOrxfv9aNZqsJTg=
-X-Received: by 2002:a05:622a:760f:b0:410:9855:acd with SMTP id
- kg15-20020a05622a760f00b0041098550acdmr76659qtb.14.1697492164218; Mon, 16 Oct
- 2023 14:36:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697493453; x=1698098253;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tVT3RQmbEPAnJ6AuCvqmJQKzjg/BeKl9AJogP6t7wVs=;
+        b=wJZocci6yAZZmSgO3MM0X+FNsrrpVMvazMnQaHYaAwRf9gPePuv8gNSYY9fOBbly6e
+         wQzkBxQj13FfNdEpKC6qhOT0Ab3IZbA8+b9r2exDhlOF8OE4WVYc22sC8q66UiFGgGLz
+         BatNScWlwWw4QfO9XXtxwzBpPqU70w2qt/nooIYxunZa0WTAknDPOG46kFObOyazDBP1
+         /Jr0AzyOWg4pgZaq2MEFT6wHlxVuWohJrkJyOpMTbKo9DhGW+0h4ua6PZZIEXwAFY9yd
+         VYPUkIyeqt6RaI0CKfIV49GuRErkmXoy+1gPZ/ggFuYiOfqfHDxFCPRZTsnVHD/Moo0W
+         O2eQ==
+X-Gm-Message-State: AOJu0YzAvIyr6Inf1hOnpnoz+AXfEPuXg5wM2MMZB1HeQeqz+VV6X5f5
+        bMa5LrHEth6Aq9arY59Lve2hPJ7a89lbOQgJ7MqP/PCQ8I7U5R4yv/Rf9kWA2N6Odo/6vcyFHz/
+        SH381tnwjGaN1
+X-Received: by 2002:a17:907:6093:b0:9b6:550c:71cb with SMTP id ht19-20020a170907609300b009b6550c71cbmr230887ejc.52.1697493453621;
+        Mon, 16 Oct 2023 14:57:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGe3chqMntXaEoNKREA/lVw1WsppNYDcnvOsG4u/56RSzqp7qbBZeUjBBKfBXwvI7lfv80xjQ==
+X-Received: by 2002:a17:907:6093:b0:9b6:550c:71cb with SMTP id ht19-20020a170907609300b009b6550c71cbmr230870ejc.52.1697493453204;
+        Mon, 16 Oct 2023 14:57:33 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id hv7-20020a17090760c700b009bd96eceeb3sm36982ejc.94.2023.10.16.14.57.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 14:57:32 -0700 (PDT)
+Message-ID: <62e17c67-953d-469f-84cf-a998a15a8926@redhat.com>
+Date:   Mon, 16 Oct 2023 23:57:30 +0200
 MIME-Version: 1.0
-References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-8-rananta@google.com>
- <b4739328-5dba-a3a6-54ef-2db2d34201d8@redhat.com> <CAJHc60zpH8Y8h72=jUbshGoqye20FaHRcsb+TFDxkk7rhJAUxQ@mail.gmail.com>
- <ZS2L6uIlUtkltyrF@linux.dev>
-In-Reply-To: <ZS2L6uIlUtkltyrF@linux.dev>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 16 Oct 2023 14:35:52 -0700
-Message-ID: <CAJHc60wvMSHuLuRsZJOn7+r7LxZ661xEkDfqxGHed5Y+95Fxeg@mail.gmail.com>
-Subject: Re: [PATCH v7 07/12] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based
- on the associated PMU
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 4.14] KVM: x86: Backport support for interrupt-based
+ APF page-ready delivery in guest
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Riccardo Mancini <mancio@amazon.com>
+Cc:     bataloe@amazon.com, graf@amazon.de, kvm@vger.kernel.org,
+        Greg Farrell <gffarre@amazon.com>
+References: <877co1cc5d.fsf@redhat.com>
+ <20231013163640.14162-1-mancio@amazon.com> <87a5si8xcu.fsf@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <87a5si8xcu.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 12:16=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> On Mon, Oct 16, 2023 at 12:02:27PM -0700, Raghavendra Rao Ananta wrote:
-> > On Mon, Oct 16, 2023 at 6:35=E2=80=AFAM Sebastian Ott <sebott@redhat.co=
-m> wrote:
-> > >
-> > > On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
-> > > > u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
-> > > > {
-> > > > -     return __vcpu_sys_reg(vcpu, PMCR_EL0);
-> > > > +     u64 pmcr =3D __vcpu_sys_reg(vcpu, PMCR_EL0) &
-> > > > +                     ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_S=
-HIFT);
-> > > > +
-> > > > +     return pmcr | ((u64)vcpu->kvm->arch.pmcr_n << ARMV8_PMU_PMCR_=
-N_SHIFT);
-> > > > }
-> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > > index ff0f7095eaca..c750722fbe4a 100644
-> > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > @@ -745,12 +745,8 @@ static u64 reset_pmcr(struct kvm_vcpu *vcpu, c=
-onst struct sys_reg_desc *r)
-> > > > {
-> > > >       u64 pmcr;
-> > > >
-> > > > -     /* No PMU available, PMCR_EL0 may UNDEF... */
-> > > > -     if (!kvm_arm_support_pmu_v3())
-> > > > -             return 0;
-> > > > -
-> > > >       /* Only preserve PMCR_EL0.N, and reset the rest to 0 */
-> > > > -     pmcr =3D read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << AR=
-MV8_PMU_PMCR_N_SHIFT);
-> > > > +     pmcr =3D kvm_vcpu_read_pmcr(vcpu) & (ARMV8_PMU_PMCR_N_MASK <<=
- ARMV8_PMU_PMCR_N_SHIFT);
-> > >
-> > > pmcr =3D ((u64)vcpu->kvm->arch.pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
-> > > Would that maybe make it more clear what is done here?
-> > >
-> > Since we require the entire PMCR register, and not just the PMCR.N
-> > field, I think using kvm_vcpu_read_pmcr() would be technically
-> > correct, don't you think?
->
-> No, this isn't using the entire PMCR value, it is just grabbing
-> PMCR_EL0.N.
->
-Oh sorry, my bad.
-> What's the point of doing this in the first place? The implementation of
-> kvm_vcpu_read_pmcr() is populating PMCR_EL0.N using the VM-scoped value.
->
-I guess originally the change replaced read_sysreg(pmcr_el0) with
-kvm_vcpu_read_pmcr(vcpu) to maintain consistency with others.
-But if you and Sebastian feel that it's an overkill and directly
-getting the value via vcpu->kvm->arch.pmcr_n is more readable, I'm
-happy to make the change.
+On 10/16/23 16:18, Vitaly Kuznetsov wrote:
+> In case keeping legacy mechanism is a must, I would suggest you somehow 
+> record the fact that the guest has opted for interrupt-based delivery 
+> (e.g. set a global variable or use a static key) and short-circuit 
+> do_async_page_fault() to immediately return and not do anything in this 
+> case.
 
-Thank you.
-Raghavendra
-> --
-> Thanks,
-> Oliver
+I guess you mean "not do anything for KVM_PV_REASON_PAGE_READY in this 
+case"?
+
+Paolo
+
