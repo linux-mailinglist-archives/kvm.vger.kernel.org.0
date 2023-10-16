@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DACC07CAF80
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:34:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B4357CAF3F
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:31:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234103AbjJPQeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:34:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41370 "EHLO
+        id S234017AbjJPQbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:31:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234283AbjJPQdr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:33:47 -0400
+        with ESMTP id S234006AbjJPQa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:30:59 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F441619B;
-        Mon, 16 Oct 2023 09:22:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04BFE6FA0;
+        Mon, 16 Oct 2023 09:22:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473335; x=1729009335;
+  t=1697473347; x=1729009347;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=A8lZrJHTl8+v1/pILIIOXToCjpGkNFl5j8wdxfh1M74=;
-  b=KFx8V7Y2BPG3+rNVVpFsW/WK+VtGum03TOQyXkOToFj2XRvZWRdHvDeo
-   kGVj37RAAbOTJ7JppYvTFz26yu1i2l5geL05FJs90DLj+fKOxGq0wZK2g
-   ie5AzgZxq0GEKxQvQkzPTS+wCS3/pXDle2rDQL2gw/Uy/1c64Q7Njsgm/
-   I2ib2iL/SG/tXgm7vaSpywCOfSF8cCA6c0neM1gfTkYoO3xHTnBh15bBw
-   QAwQ6E7ms7R5w3rTfpm8brx1x7a+UOzkT2IweeVjD4KB1ffjyytHaKIsO
-   80TbF2WIlHrnbkWyKtkhMKjW6xN+Knvi68KHObfpwp72JHDOVfuHAoNrM
+  bh=J1xAk2C46i6NBPbFLk16aUmdSLB7AICkCifvUxpMYUc=;
+  b=KL+mBNmY96SVnLg6VfrizYQi4iY1kCE54pDrtZYWX9FJ1QF9gGvguD4i
+   f0HEonuCx3mn2SIGn5Rb75eo0rr1Ke77Nal/5mztMF6XEHhYqkw0rBEZa
+   lscKwUpNi6WKT+g6XeEhGp/DPMY7ePHWItrVB9hY7tG3d3dX7mQ7m8FaM
+   vpIbNwUHggUGCCVbq36PeldxN9AB7gtnwuZCzQ6ed6eH94D1ppZ9cVyKf
+   YqohjsSVoXy40Q5HNrdEAqNYxxFZuihxAovLniDoYRhQjJoxvvSpeMIGk
+   kln/uw7t8YwPr+WkLlSkTg3qE4rkgHY4pyK8J1EP+cw/g6IyV4mqbddM1
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922112"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364922117"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364922112"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+   d="scan'208";a="364922117"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448353"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1003006462"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448353"
+   d="scan'208";a="1003006462"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:09 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:16:09 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 102/116] KVM: TDX: Add methods to ignore accesses to CPU state
-Date:   Mon, 16 Oct 2023 09:14:54 -0700
-Message-Id: <22136402da10093da1ae2539c7d580ea78045dcc.1697471314.git.isaku.yamahata@intel.com>
+Subject: [PATCH v16 103/116] KVM: TDX: Add methods to ignore guest instruction emulation
+Date:   Mon, 16 Oct 2023 09:14:55 -0700
+Message-Id: <9a64faeebf36ed6d83af3650f63bd0be2f99b3eb.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -68,467 +68,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX protects TDX guest state from VMM.  Implement access methods for TDX
-guest state to ignore them or return zero.  Because those methods can be
-called by kvm ioctls to set/get cpu registers, they don't have KVM_BUG_ON
-except one method.
+Because TDX protects TDX guest state from VMM, instructions in guest memory
+cannot be emulated.  Implement methods to ignore guest instruction
+emulator.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/main.c    | 289 +++++++++++++++++++++++++++++++++----
- arch/x86/kvm/vmx/tdx.c     |  48 +++++-
- arch/x86/kvm/vmx/x86_ops.h |  13 ++
- 3 files changed, 321 insertions(+), 29 deletions(-)
+ arch/x86/kvm/vmx/main.c | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index dd050a6196ae..582fea1b60b6 100644
+index 582fea1b60b6..5e4091dbf1e8 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -386,6 +386,200 @@ static void vt_vcpu_deliver_init(struct kvm_vcpu *vcpu)
- 	kvm_vcpu_deliver_init(vcpu);
+@@ -331,6 +331,30 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
  }
+ #endif
  
-+static void vt_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_vcpu_after_set_cpuid(vcpu);
-+}
-+
-+static void vt_update_exception_bitmap(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_update_exception_bitmap(vcpu);
-+}
-+
-+static u64 vt_get_segment_base(struct kvm_vcpu *vcpu, int seg)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_get_segment_base(vcpu, seg);
-+
-+	return vmx_get_segment_base(vcpu, seg);
-+}
-+
-+static void vt_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var,
-+			      int seg)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_get_segment(vcpu, var, seg);
-+		return;
-+	}
-+
-+	vmx_get_segment(vcpu, var, seg);
-+}
-+
-+static void vt_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var,
-+			      int seg)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_segment(vcpu, var, seg);
-+}
-+
-+static int vt_get_cpl(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_get_cpl(vcpu);
-+
-+	return vmx_get_cpl(vcpu);
-+}
-+
-+static void vt_get_cs_db_l_bits(struct kvm_vcpu *vcpu, int *db, int *l)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		*db = 0;
-+		*l = 0;
-+		return;
-+	}
-+
-+	vmx_get_cs_db_l_bits(vcpu, db, l);
-+}
-+
-+static bool vt_is_valid_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return true;
-+
-+	return vmx_is_valid_cr0(vcpu, cr0);
-+}
-+
-+static void vt_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_cr0(vcpu, cr0);
-+}
-+
-+static bool vt_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return true;
-+
-+	return vmx_is_valid_cr4(vcpu, cr4);
-+}
-+
-+static void vt_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_cr4(vcpu, cr4);
-+}
-+
-+static int vt_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return 0;
-+
-+	return vmx_set_efer(vcpu, efer);
-+}
-+
-+static void vt_get_idt(struct kvm_vcpu *vcpu, struct desc_ptr *dt)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		memset(dt, 0, sizeof(*dt));
-+		return;
-+	}
-+
-+	vmx_get_idt(vcpu, dt);
-+}
-+
-+static void vt_set_idt(struct kvm_vcpu *vcpu, struct desc_ptr *dt)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_idt(vcpu, dt);
-+}
-+
-+static void vt_get_gdt(struct kvm_vcpu *vcpu, struct desc_ptr *dt)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		memset(dt, 0, sizeof(*dt));
-+		return;
-+	}
-+
-+	vmx_get_gdt(vcpu, dt);
-+}
-+
-+static void vt_set_gdt(struct kvm_vcpu *vcpu, struct desc_ptr *dt)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_gdt(vcpu, dt);
-+}
-+
-+static void vt_set_dr7(struct kvm_vcpu *vcpu, unsigned long val)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_dr7(vcpu, val);
-+}
-+
-+static void vt_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * MOV-DR exiting is always cleared for TD guest, even in debug mode.
-+	 * Thus KVM_DEBUGREG_WONT_EXIT can never be set and it should never
-+	 * reach here for TD vcpu.
-+	 */
-+	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
-+		return;
-+
-+	vmx_sync_dirty_debug_regs(vcpu);
-+}
-+
-+static void vt_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
-+{
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_cache_reg(vcpu, reg);
-+		return;
-+	}
-+
-+	vmx_cache_reg(vcpu, reg);
-+}
-+
-+static unsigned long vt_get_rflags(struct kvm_vcpu *vcpu)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return tdx_get_rflags(vcpu);
-+
-+	return vmx_get_rflags(vcpu);
-+}
-+
-+static void vt_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_set_rflags(vcpu, rflags);
-+}
-+
-+static bool vt_get_if_flag(struct kvm_vcpu *vcpu)
++static bool vt_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
++				       void *insn, int insn_len)
 +{
 +	if (is_td_vcpu(vcpu))
 +		return false;
 +
-+	return vmx_get_if_flag(vcpu);
++	return vmx_can_emulate_instruction(vcpu, emul_type, insn, insn_len);
 +}
 +
- static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
- {
- 	if (is_td_vcpu(vcpu)) {
-@@ -530,6 +724,14 @@ static void vt_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
- 	vmx_inject_irq(vcpu, reinjected);
- }
- 
-+static void vt_inject_exception(struct kvm_vcpu *vcpu)
++static int vt_check_intercept(struct kvm_vcpu *vcpu,
++				 struct x86_instruction_info *info,
++				 enum x86_intercept_stage stage,
++				 struct x86_exception *exception)
 +{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_inject_exception(vcpu);
-+}
-+
- static void vt_cancel_injection(struct kvm_vcpu *vcpu)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -576,6 +778,39 @@ static void vt_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
- 	vmx_get_exit_info(vcpu, reason, info1, info2, intr_info, error_code);
- }
- 
-+
-+static void vt_update_cr8_intercept(struct kvm_vcpu *vcpu, int tpr, int irr)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_update_cr8_intercept(vcpu, tpr, irr);
-+}
-+
-+static void vt_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
-+{
-+	if (is_td_vcpu(vcpu))
-+		return;
-+
-+	vmx_load_eoi_exitmap(vcpu, eoi_exit_bitmap);
-+}
-+
-+static int vt_set_tss_addr(struct kvm *kvm, unsigned int addr)
-+{
-+	if (is_td(kvm))
-+		return 0;
-+
-+	return vmx_set_tss_addr(kvm, addr);
-+}
-+
-+static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
-+{
-+	if (is_td(kvm))
-+		return 0;
-+
-+	return vmx_set_identity_map_addr(kvm, ident_addr);
-+}
-+
- static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- {
- 	if (is_td_vcpu(vcpu))
-@@ -639,30 +874,30 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.vcpu_load = vt_vcpu_load,
- 	.vcpu_put = vt_vcpu_put,
- 
--	.update_exception_bitmap = vmx_update_exception_bitmap,
-+	.update_exception_bitmap = vt_update_exception_bitmap,
- 	.get_msr_feature = vmx_get_msr_feature,
- 	.get_msr = vt_get_msr,
- 	.set_msr = vt_set_msr,
--	.get_segment_base = vmx_get_segment_base,
--	.get_segment = vmx_get_segment,
--	.set_segment = vmx_set_segment,
--	.get_cpl = vmx_get_cpl,
--	.get_cs_db_l_bits = vmx_get_cs_db_l_bits,
--	.is_valid_cr0 = vmx_is_valid_cr0,
--	.set_cr0 = vmx_set_cr0,
--	.is_valid_cr4 = vmx_is_valid_cr4,
--	.set_cr4 = vmx_set_cr4,
--	.set_efer = vmx_set_efer,
--	.get_idt = vmx_get_idt,
--	.set_idt = vmx_set_idt,
--	.get_gdt = vmx_get_gdt,
--	.set_gdt = vmx_set_gdt,
--	.set_dr7 = vmx_set_dr7,
--	.sync_dirty_debug_regs = vmx_sync_dirty_debug_regs,
--	.cache_reg = vmx_cache_reg,
--	.get_rflags = vmx_get_rflags,
--	.set_rflags = vmx_set_rflags,
--	.get_if_flag = vmx_get_if_flag,
-+	.get_segment_base = vt_get_segment_base,
-+	.get_segment = vt_get_segment,
-+	.set_segment = vt_set_segment,
-+	.get_cpl = vt_get_cpl,
-+	.get_cs_db_l_bits = vt_get_cs_db_l_bits,
-+	.is_valid_cr0 = vt_is_valid_cr0,
-+	.set_cr0 = vt_set_cr0,
-+	.is_valid_cr4 = vt_is_valid_cr4,
-+	.set_cr4 = vt_set_cr4,
-+	.set_efer = vt_set_efer,
-+	.get_idt = vt_get_idt,
-+	.set_idt = vt_set_idt,
-+	.get_gdt = vt_get_gdt,
-+	.set_gdt = vt_set_gdt,
-+	.set_dr7 = vt_set_dr7,
-+	.sync_dirty_debug_regs = vt_sync_dirty_debug_regs,
-+	.cache_reg = vt_cache_reg,
-+	.get_rflags = vt_get_rflags,
-+	.set_rflags = vt_set_rflags,
-+	.get_if_flag = vt_get_if_flag,
- 
- 	.flush_tlb_all = vt_flush_tlb_all,
- 	.flush_tlb_current = vt_flush_tlb_current,
-@@ -679,7 +914,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.patch_hypercall = vmx_patch_hypercall,
- 	.inject_irq = vt_inject_irq,
- 	.inject_nmi = vt_inject_nmi,
--	.inject_exception = vmx_inject_exception,
-+	.inject_exception = vt_inject_exception,
- 	.cancel_injection = vt_cancel_injection,
- 	.interrupt_allowed = vt_interrupt_allowed,
- 	.nmi_allowed = vt_nmi_allowed,
-@@ -687,11 +922,11 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.set_nmi_mask = vt_set_nmi_mask,
- 	.enable_nmi_window = vt_enable_nmi_window,
- 	.enable_irq_window = vt_enable_irq_window,
--	.update_cr8_intercept = vmx_update_cr8_intercept,
-+	.update_cr8_intercept = vt_update_cr8_intercept,
- 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
- 	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
- 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
--	.load_eoi_exitmap = vmx_load_eoi_exitmap,
-+	.load_eoi_exitmap = vt_load_eoi_exitmap,
- 	.apicv_post_state_restore = vt_apicv_post_state_restore,
- 	.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
- 	.hwapic_irr_update = vmx_hwapic_irr_update,
-@@ -702,13 +937,13 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
- 	.protected_apic_has_interrupt = vt_protected_apic_has_interrupt,
- 
--	.set_tss_addr = vmx_set_tss_addr,
--	.set_identity_map_addr = vmx_set_identity_map_addr,
-+	.set_tss_addr = vt_set_tss_addr,
-+	.set_identity_map_addr = vt_set_identity_map_addr,
- 	.get_mt_mask = vt_get_mt_mask,
- 
- 	.get_exit_info = vt_get_exit_info,
- 
--	.vcpu_after_set_cpuid = vmx_vcpu_after_set_cpuid,
-+	.vcpu_after_set_cpuid = vt_vcpu_after_set_cpuid,
- 
- 	.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
- 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 14ab1450dda4..1628e54d816b 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -613,8 +613,15 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.tsc_offset = to_kvm_tdx(vcpu->kvm)->tsc_offset;
- 	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
--	vcpu->arch.guest_state_protected =
--		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
 +	/*
-+	 * TODO: support off-TD debug.  If TD DEBUG is enabled, guest state
-+	 * can be accessed. guest_state_protected = false. and kvm ioctl to
-+	 * access CPU states should be usable for user space VMM (e.g. qemu).
-+	 *
-+	 * vcpu->arch.guest_state_protected =
-+	 *	!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
++	 * This call back is triggered by the x86 instruction emulator. TDX
++	 * doesn't allow guest memory inspection.
 +	 */
-+	vcpu->arch.guest_state_protected = true;
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return X86EMUL_UNHANDLEABLE;
++
++	return vmx_check_intercept(vcpu, info, stage, exception);
++}
++
+ static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ {
+ 	if (is_td_vcpu(vcpu))
+@@ -954,7 +978,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
  
- 	if ((kvm_tdx->xfam & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE)
- 		vcpu->arch.xfd_no_write_intercept = true;
-@@ -2071,6 +2078,43 @@ void tdx_enable_smi_window(struct kvm_vcpu *vcpu)
- }
+ 	.load_mmu_pgd = vt_load_mmu_pgd,
+ 
+-	.check_intercept = vmx_check_intercept,
++	.check_intercept = vt_check_intercept,
+ 	.handle_exit_irqoff = vt_handle_exit_irqoff,
+ 
+ 	.request_immediate_exit = vt_request_immediate_exit,
+@@ -983,7 +1007,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.enable_smi_window = vt_enable_smi_window,
  #endif
  
-+int tdx_get_cpl(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+
-+void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
-+{
-+	kvm_register_mark_available(vcpu, reg);
-+	switch (reg) {
-+	case VCPU_REGS_RSP:
-+	case VCPU_REGS_RIP:
-+	case VCPU_EXREG_PDPTR:
-+	case VCPU_EXREG_CR0:
-+	case VCPU_EXREG_CR3:
-+	case VCPU_EXREG_CR4:
-+		break;
-+	default:
-+		KVM_BUG_ON(1, vcpu->kvm);
-+		break;
-+	}
-+}
-+
-+unsigned long tdx_get_rflags(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+
-+u64 tdx_get_segment_base(struct kvm_vcpu *vcpu, int seg)
-+{
-+	return 0;
-+}
-+
-+void tdx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
-+{
-+	memset(var, 0, sizeof(*var));
-+}
-+
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
- {
- 	struct kvm_tdx_capabilities __user *user_caps;
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 092676b50dc2..8dacab1bc3d7 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -169,6 +169,12 @@ bool tdx_has_emulated_msr(u32 index, bool write);
- int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
- int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr);
+-	.can_emulate_instruction = vmx_can_emulate_instruction,
++	.can_emulate_instruction = vt_can_emulate_instruction,
+ 	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
+ 	.migrate_timers = vmx_migrate_timers,
  
-+int tdx_get_cpl(struct kvm_vcpu *vcpu);
-+void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg);
-+unsigned long tdx_get_rflags(struct kvm_vcpu *vcpu);
-+u64 tdx_get_segment_base(struct kvm_vcpu *vcpu, int seg);
-+void tdx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
-+
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
- 
- void tdx_flush_tlb(struct kvm_vcpu *vcpu);
-@@ -214,6 +220,13 @@ static inline bool tdx_has_emulated_msr(u32 index, bool write) { return false; }
- static inline int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
- static inline int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr) { return 1; }
- 
-+static inline int tdx_get_cpl(struct kvm_vcpu *vcpu) { return 0; }
-+static inline void tdx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg) {}
-+static inline unsigned long tdx_get_rflags(struct kvm_vcpu *vcpu) { return 0; }
-+static inline u64 tdx_get_segment_base(struct kvm_vcpu *vcpu, int seg) { return 0; }
-+static inline void tdx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var,
-+				   int seg) {}
-+
- static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
- 
- static inline void tdx_flush_tlb(struct kvm_vcpu *vcpu) {}
 -- 
 2.25.1
 
