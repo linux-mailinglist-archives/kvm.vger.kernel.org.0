@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 312A57CAA19
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:44:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D75387CAA1D
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 15:45:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233904AbjJPNol (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 09:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53466 "EHLO
+        id S233803AbjJPNpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 09:45:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233604AbjJPNoj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 09:44:39 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B918EB;
-        Mon, 16 Oct 2023 06:44:38 -0700 (PDT)
+        with ESMTP id S233708AbjJPNpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 09:45:17 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2071.outbound.protection.outlook.com [40.107.94.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D6B181;
+        Mon, 16 Oct 2023 06:45:15 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B6i9oj1qw/BuLddivuz3FKVkSxluZFvWv6HsNeCGcji9JnRG8+BmyyDGjS2goDXpf8305Znp6Xx8NFr2HdjAQMyVXfBy6M7CyPeW5zt0nstbffmw0QHbajO/8CoafGzEDfZCq48mRHE65cyaoDDgtBU+YN1ivsALnHq1kFKOy38jJjGopa9uGtulNr9uuOY9DwwgQfcwliyKfPoK6P5uxCSKaXNHR98nI7K7Pphwru6GiAWDFSc8ZzQ1CXR97vTz53E96hQUwrGf9LEzy4gDytTJywsecHRgOGqs9Ou+oAZOxFm/nUmNAkYcwMo92E7a5oSrIXz3qaB3aFg8au7YSA==
+ b=NW7a/Rn0j5mtiZeNq7rfqLh+HOdFZpjz1soCAgSi3/2RstS60P0MmoI7hXtnxykT0jn6pq2JTGrMzWmiXXccMwtHNlsF6bVJZaJrPeq6acIr46+3ayBATvF/E7taluDrxGPhECInYZdT6PSKS1/U+rr8275h5+C4HF+0gvPmQAMj0FOGIWp3tUXS1rj/XOzFf6OnwnBDwfNqrdG83OX7r7i2g/vsSu+aZNyx/FaYmD+k6+UvXcq0SZQjgzGPD66mvn7zOZhj12RAeIwCDdn1b/u6vJopIDuXJ8VsBqNgowX4f8+4GNdjCarwRHEL4uruxBfBWFdXHiJxOUVJdFSGTQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l/XXYKvsa7V/ySbrTiRvd6QMpQ3il+5mLsa616zGqX8=;
- b=oEYCiTb/q+gJNTxQsiFeZtk9hNOGjNXhYLoH0zl9CPS2JTD9Rpv3XdQpGwsvs+GBVGdrI2Zxyk8jtp0F97HbVtx6Dz1VIsdA0Qq2MrjHQHU69hzsYuQ3GfaASar4WvZLhW0rV02ju8wcdH6lJHHcuHsIU6P0ToGj53nQ2OD2dxfupe5uQOeg/60vS7wMcr+zJr9Kl4nW3BpFTYG/D32D9xelbRlT0gApq2NMrJ1TEz32yRKBdA5AfdNeuiBl/27T3KG1oHLwczDtFmGHZV3FnV/OxSGAvN4T6cNdKh+rdOyTZB40PsUOLIc29gCedaJgV7HGGhEl9dmCwSHpNaRriQ==
+ bh=Wn6oZhIubfwD460mmy6EzHlgZAJwJei5Qlwu7zMEaUc=;
+ b=EdHWATlDjPfwGIjf7ediyIn/C63QfWibF0Wo14DR3+vnUz44uxeOVGlFbQwxglUYpEZ5Rc8lbmHJoBYBhagmY3qUiLtvfCp/+2I9aRmCmsIVTT0eVF/2TKS/Yd1okkjdL4ln0CwRQ+z0V6XOo900r0foVjGwST2GXfVwaqLz3WMsXafMx3iLtBsJ0mNy6JtwjjjL99tD6daZb1EN1JBhJn4x9sBkP/Cx7972/ajJotnMKcoRJROTvndo1QhVHAAjzH5s8b2AOZBIIV6/zCss4pI1cgGRiU7fy2zAu4pp0luJYh4GwJBmGkf0fzO/VlAYtJP9vsbwh3R/DOqCCJf9aQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l/XXYKvsa7V/ySbrTiRvd6QMpQ3il+5mLsa616zGqX8=;
- b=kq7uP5PgyHCkiCsYh4bylR7x1ApL+q1X5zAoo5YjvAR/+wZzd9iXhxVqrA68ur8I63+u5busCqMlFOB1adT9k6pro4TNeZ1wRPa24Hnkc/wNkVM0TFyWbONWPc6oc+kKnPhdjR6/Sb3epPaNknX/E5M21tIpmQiPcA3E9S60o88=
-Received: from SN6PR05CA0007.namprd05.prod.outlook.com (2603:10b6:805:de::20)
- by DS0PR12MB8502.namprd12.prod.outlook.com (2603:10b6:8:15b::16) with
+ bh=Wn6oZhIubfwD460mmy6EzHlgZAJwJei5Qlwu7zMEaUc=;
+ b=fVx0knoeiJA6wADXijerP92Iew9vjUVgKfB27qofb7288O9KvjyTaA6NXblPe2CCwzAqQd86gBatXaBQ4sfOAn2BeObNXjGwiscmKk/A3FrPGzgYWDdDVWHM1yMaOH6OANRGk/j3TuSKK3MDNgVunwzUrfmsiuQA/a4BYVhx0G0=
+Received: from PH8PR15CA0003.namprd15.prod.outlook.com (2603:10b6:510:2d2::25)
+ by PH0PR12MB5632.namprd12.prod.outlook.com (2603:10b6:510:14c::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 16 Oct
- 2023 13:44:36 +0000
-Received: from SN1PEPF000252A2.namprd05.prod.outlook.com
- (2603:10b6:805:de:cafe::a2) by SN6PR05CA0007.outlook.office365.com
- (2603:10b6:805:de::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.18 via Frontend
- Transport; Mon, 16 Oct 2023 13:44:36 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
+ 2023 13:45:13 +0000
+Received: from SN1PEPF0002529F.namprd05.prod.outlook.com
+ (2603:10b6:510:2d2:cafe::d1) by PH8PR15CA0003.outlook.office365.com
+ (2603:10b6:510:2d2::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
+ Transport; Mon, 16 Oct 2023 13:45:12 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF000252A2.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SN1PEPF0002529F.mail.protection.outlook.com (10.167.242.6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:44:35 +0000
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:45:12 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 08:44:33 -0500
+ 2023 08:45:07 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -70,10 +70,11 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
         <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
-        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
-Subject: [PATCH v10 42/50] KVM: SEV: Avoid WBINVD for HVA-based MMU notifications for SNP
-Date:   Mon, 16 Oct 2023 08:28:11 -0500
-Message-ID: <20231016132819.1002933-43-michael.roth@amd.com>
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH v10 43/50] KVM: SVM: Add module parameter to enable the SEV-SNP
+Date:   Mon, 16 Oct 2023 08:28:12 -0500
+Message-ID: <20231016132819.1002933-44-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231016132819.1002933-1-michael.roth@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
@@ -85,23 +86,23 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A2:EE_|DS0PR12MB8502:EE_
-X-MS-Office365-Filtering-Correlation-Id: b24c572f-aedb-4a22-1748-08dbce4e08f5
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002529F:EE_|PH0PR12MB5632:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00a42e22-6fd2-430c-3be3-08dbce4e1f34
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kQ0NY/9WTT71MmlBSjOZraYdQNW80eJHxejxVnqMtrxLROsVcFVZCbZibyPc88apBaMbnvIO8lyBcLs2F80GPlkSeq+88PXII+ukshErhy5dMNHzImiDsxiLvpSInDtZe1lEb1D7GGGhD6pn7OcyXr+ASVLL7O36FWrsclnmyHD10TUBc7Fw6ipFodkthUjEZd/pP+boeeN65cMpRM6/7ZEhxKZfHVhbbAuJx4H/PW5R246rd4N0VG0jxtXBHHcf5QLVP0n97Q+5IAQgcyrdzVXjppOU8zbp5lOw3lmp/+eRFcd1d249ksUFueH0QZmCdKvMgubeNQTDe225xSAHcv3y1pCnRB7f6bJW+0ZsSV7+Dfdqntwo2fD1OmkDP4AbebET1rMzsr+5mYLMvVwti0GtlToc7ixvrBjSA7M6YCb3Pm01XulsMSweJPeOQDCMFwhj2lLTk5uHEtFlNXJcdy+my6u4DkkYiLwbzOXBIZwhIsZ+vGBT/Tw2f66hLtBLRBdwfA381jPv8VGmk2BB8/Dw5Q2g2T5hWoHHJAjv+0G/Z3WZZTSzd0E2L/LkqLhgglm2Ohs5ii0LYqprZbksWQF6YsOd8/JASi7E5dAqJ5CMYJp3qeXcLyShkLcpza2t9kUKxFD03q+BITogJ0Qk3IqVokECQb/VTubIumv5chJdwlWan9BJ5+Y95Em212yHy4N35gJ9fODAv6bs8UtiLa1qxfLgf7nYuUk0d7T9R5qBzsUkOfjIg4IT1tbuoBrds3u0+Yn1qDhK9wjl54xmhQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(376002)(136003)(230922051799003)(186009)(1800799009)(64100799003)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(1076003)(81166007)(26005)(356005)(2616005)(82740400003)(16526019)(47076005)(316002)(70586007)(70206006)(54906003)(6916009)(478600001)(336012)(426003)(83380400001)(6666004)(36860700001)(8676002)(4326008)(8936002)(5660300002)(41300700001)(2906002)(7416002)(7406005)(40460700003)(44832011)(40480700001)(36756003)(86362001)(15650500001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: taYt3IUZQZ2aT1MT6570IjErHCJno++QfAnwehwAl1TAFpqm81DrKix1oLcczhbinAZfDAK5Qm4rRt8+sgVKPv0HLE//3sl840crs5YJHKJdbCHRB6FBGWA8MZKbdFh7Y0G51p+uUoGBKqISbBLnT1JYMXYsB2g5A+Ps+32RgSOZZ3KetTV6yG9nUSFKc8EigdbXd2M0VRSCx/2Ssn87hK5ShDk6AAHza9PuyJe5lChQDw093OMUSGiUBeQrt4+zYFVASSWgxIn5EontMwn7MgThRjgMm3R0Gbqn0VisMsxiJf2Jn5D+T+3hG/Ukp0QnzOp7Tt3Z2F4vSkz5Qq3ayu7xNIw/t4erW0BEAeOvstt//Erk9+mrj6xbxv94yFjcNdW5sPlekIF6zCqkJqslVv+bUHCrcQeqjBcZN4Yyca7xcvSxIHJlAJTbWUv6I8eX5/dwwZXOz7SFpZXN5RG2RMbaqSJdLIkQ+cbav5Rx1DqLfaER6WV2T4UQBUHvPyBFSOt9nyc68ze+cfIIZDfEv7/7/zspeyxVyeDMIzuQQ4OwUJObOA8PuYAG9Al/qsw+yYVQcaw5RbuuoPKFxXuO49OUSMHPqr61FtxF2t0Wjn9+fz2aIlbS3zih1/SaDy1gObYLbZlaF+lk5f0lm+Q2vqxz1ceSuRGNAt075Db4pdszjsrj5ZhZoNkhIdErxQnsVhgfO5jN0GBWr14fEJxp6zj6XeYd2YYQVqID220k6Tj/+/UUDu/e1qPcLU3Cp1pn6XD/cjR6oP4PwP8LbmMQvw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(186009)(82310400011)(1800799009)(451199024)(64100799003)(40470700004)(36840700001)(46966006)(41300700001)(70206006)(478600001)(70586007)(54906003)(6666004)(6916009)(1076003)(26005)(16526019)(336012)(426003)(316002)(2616005)(7406005)(8936002)(7416002)(4326008)(8676002)(4744005)(2906002)(5660300002)(36756003)(44832011)(81166007)(86362001)(47076005)(36860700001)(83380400001)(82740400003)(356005)(40460700003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:44:35.4545
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:45:12.8563
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b24c572f-aedb-4a22-1748-08dbce4e08f5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00a42e22-6fd2-430c-3be3-08dbce4e1f34
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF000252A2.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF0002529F.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8502
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5632
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -112,41 +113,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-With SNP/guest_memfd, private/encrypted memory should not be mappable,
-and MMU notifications for HVA-mapped memory will only be relevant to
-unencrypted guest memory. Therefore, the rationale behind issuing a
-wbinvd_on_all_cpus() in sev_guest_memory_reclaimed() should not apply
-for SNP guests and can be ignored.
+Add a module parameter than can be used to enable or disable the SEV-SNP
+feature. Now that KVM contains the support for the SNP set the GHCB
+hypervisor feature flag to indicate that SNP is supported.
 
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-[mdr: Add some clarifications in commit]
-Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6c6d5a320d72..f027def3a79e 100644
+index f027def3a79e..efe879524b6c 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2852,7 +2852,14 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
+@@ -62,7 +62,8 @@ static bool sev_es_debug_swap_enabled = true;
+ module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
  
- void sev_guest_memory_reclaimed(struct kvm *kvm)
- {
--	if (!sev_guest(kvm))
-+	/*
-+	 * With SNP+gmem, private/encrypted memory should be
-+	 * unreachable via the hva-based mmu notifiers. Additionally,
-+	 * for shared->private translations, H/W coherency will ensure
-+	 * first guest access to the page would clear out any existing
-+	 * dirty copies of that cacheline.
-+	 */
-+	if (!sev_guest(kvm) || sev_snp_guest(kvm))
- 		return;
- 
- 	wbinvd_on_all_cpus();
+ /* enable/disable SEV-SNP support */
+-static bool sev_snp_enabled;
++static bool sev_snp_enabled = true;
++module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
+ #else
+ #define sev_enabled false
+ #define sev_es_enabled false
 -- 
 2.25.1
 
