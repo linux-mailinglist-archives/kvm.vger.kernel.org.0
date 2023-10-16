@@ -2,231 +2,869 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA227CAE67
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:01:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E27107CAF03
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:21:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231508AbjJPQBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34138 "EHLO
+        id S233969AbjJPQVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:21:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbjJPQBQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:01:16 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7661183
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 09:01:13 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39GCdP9h007847;
-        Mon, 16 Oct 2023 16:00:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=KltHQAmD3uV+Wwr65B92hOcqeH/kTe1OsUYAr82qZCw=;
- b=kjCcTmjCTabnzaZ09oSAKS8p1r/AIl8CWmEcg+sZ9u1BkcFpb386XAc6LNqhsJiV4b2V
- BepYh1JcYCzMnNXR7hLu3YjzTSXzEtm5tcTbla53bwIemGooOaHQJOJEpG3Efc0sVOK6
- PwuHxOtIPxacdWqpPbyUy2wlrPv7V5nBwA65eapbnirR8221S0tbbf+Q2nY1KGf3Qffc
- 63hSdBWmDzDDoZLMAMfLnuZ127w2YDVQHRZnx1/domBShN0VWZLa7VK1GN/nasYAY4fK
- D6s0ufX6fhHmY1OkpuL/97QCun1ZOPWmsn/2AiUd23VRazeSf7jccdHDBzZMgJ3hkuSo ig== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqjy1b4k5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Oct 2023 16:00:41 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39GF9OXa021602;
-        Mon, 16 Oct 2023 16:00:40 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trg4ysvmd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Oct 2023 16:00:40 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a8b1NxqBpFDJcvA8Wxx4oof2OzXA6cGS4FDHT3yShFd91at8BunJx5il7tqVGn5kz87WYbKcf4ZRx/kSsPBsDJFTweBOjJEue2Ko1rtMDETqQ4lKo5pNc45k7EtSn6fSeDRzC5IRgTnCenI5B2iNsnoz/OuuZMWMHjsjqSFWpKoRCjCdrO0j/FHVSbwnTTWQ8fFFmO3li0MH+pWeXVWT6LNYpSfCFe8pJFMrfTqNIjivsLN1glM9Npgd1RDvZ5Ll0Xmu5YdS+VyBA7JV0aGo70enfrsxKqWZVLEQmiEq01sGOV5OSAH61jrY2GRUyj2RECAUvlQmCFy1iqwo4+sAJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KltHQAmD3uV+Wwr65B92hOcqeH/kTe1OsUYAr82qZCw=;
- b=h4IHy61k7en08i0Mf7+rs8J648O4IfBCZlBfNI969nlrz4wSNkqjX/pRNVymZJG1db/BW5mxXMxDjVzwqgwwFoArmrS/Y9lQk4j06/1PyPQEHS6GkohZJFv7Gs7VPMjPSFh05GdmhyIlSjvYKlZWhNsLJwNLr6YkOXKOeyIGvzPX8LgZhUdk70w+T5qTsgocUofGUJ1xx30QwACsO16ZoN7WNNwY5mGA8B78kSjNflFBzKxEqc3DHUf2uOswCrOT3CzUwkoe1Vljjk8OcKR6zLSb3SxIBl9NW1kOY5jjf+pNkclqpT1VWv+8klNdi/l1bIH7Mo/p+nEEWrVEZonNiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KltHQAmD3uV+Wwr65B92hOcqeH/kTe1OsUYAr82qZCw=;
- b=bCyweC6TFAVkjh2U7IqEwlJqLmSJCVII3ecGva/AvbenWNABAylP7LsDWcguU0nh5pDHsfYTe1pB3eBgnzpFWL+wGbZa0v/E/G+xXN9vkuaOKmiCV1aeUYY0Aeyh9g+uPnREfn/Z+ZhfE7AfFUVk48Df1gJ8qVPVkKDUC/C1wOc=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by IA1PR10MB6074.namprd10.prod.outlook.com (2603:10b6:208:3ae::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
- 2023 16:00:38 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::64b1:cd15:65a5:8e7d]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::64b1:cd15:65a5:8e7d%5]) with mapi id 15.20.6886.034; Mon, 16 Oct 2023
- 16:00:38 +0000
-Message-ID: <10bb7484-baaf-4d32-b40d-790f56267489@oracle.com>
-Date:   Mon, 16 Oct 2023 17:00:31 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
- domains
-Content-Language: en-US
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-References: <20230923012511.10379-1-joao.m.martins@oracle.com>
- <20230923012511.10379-20-joao.m.martins@oracle.com>
- <d8553024-b880-42db-9f1f-8d2d3591469c@linux.intel.com>
- <83f9e278-8249-4f10-8542-031260d43c4c@oracle.com>
-In-Reply-To: <83f9e278-8249-4f10-8542-031260d43c4c@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0069.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:153::20) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+        with ESMTP id S233918AbjJPQUn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:20:43 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1B483868;
+        Mon, 16 Oct 2023 09:19:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697473162; x=1729009162;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=huFqF5u3MIW9YkVkwccarNXZerfje20hSYSS1BiSlfw=;
+  b=AxACcWqTXhr05gs6KcgoBBeVBdOhb7KUbeR51Ap7QaorJVwTjPNsrR9Q
+   DsnJ9CiTQvKkCriDZOCciQbPsLrpRuVH57BO3O8r9QBcSvWEXFYDXMing
+   wap3LlRXpfj+y5ZhNnLMorGpB7KKEhWCkj8rPHSRoStbVBZK5WGXZWv+/
+   2sQ8gz4fro/AGPx+wF7+Xjthd632cY5T2nwQXSwoH/PsleN1QHZAnIDe0
+   1gbh5DJOjojWqGMMtDPw3h0TVcSWlP7TOO2hXVLC+k3GKSfoTuft1ULCz
+   ssUH0DgFLcisbnjvwIilAHAvMXHzILVaJjTMzcGFKs/0JA6+s46Fxd8Uo
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365825850"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="365825850"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087125944"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="1087125944"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:20 -0700
+From:   isaku.yamahata@intel.com
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        hang.yuan@intel.com, tina.zhang@intel.com
+Subject: [PATCH v16 000/116] KVM TDX basic feature support
+Date:   Mon, 16 Oct 2023 09:13:12 -0700
+Message-Id: <cover.1697471314.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|IA1PR10MB6074:EE_
-X-MS-Office365-Filtering-Correlation-Id: ccc39c97-7e05-4ec9-f421-08dbce610a1f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XIWbW8qTM9BLQRErd/h0TB5cse/T6zVLpohDbRCpqrPwM6N6hd8Wd0VOWtzpmiLbjIjF5IwVr1pfqE+2zERS3zvP9wvSw/KA1Hp5ORYFV4cpnCSrvLQGVTTn9qokJP6yoKZwqWEXeNjBPp2B4d0UHKcxavmD7hMYa5EMu7dFwKHzGHMwX8ajpyfEmnDgxMSXIbCN8l5+OpJhJjo+ggMUGpY95+FZdBvl36vQZEFZc1lIwoYlny/KxG+hwGO7RCS7RZWBEs41Lxlh7vVdTgJOTDXCIUIpgVxnb9WkS7PcAfQHhwueE2Mk9ldA4Pn/di7ejrgLqLMPCBqFOnLy0eWJEfjEs6JnWtrkugOKOsautD9PGd/nN0Z2OIwbjICosUH3H2qLkYQwzcETGH9OK5hBpkGUMeOoKfk7CFj5yVNt1ElBv690RDNeV7ngkX88wSiyCCPulg8UpWfeUIuLcxCnUxDDjwcIl4215fGdVs5CW3NYOTC+oHWrNIfDFfCBXB1lMYcjhujIRV/W8CUZEPpz+OqxKnMMkI4eXwzp/kKgqCGhFCDgUn7CWhNp/qPB0sGwW52UuemhItpBuC1KEyS+gBVPAco2+o5oTFrlHNSXMCbzC8+jOrdzv/tzeJcn/8SFURA7FPQZe7x8E+eWvgFO6nz7uYN+KEc3hYvpuvzgNJE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(6506007)(53546011)(5660300002)(6666004)(2906002)(26005)(36756003)(2616005)(83380400001)(38100700002)(86362001)(31696002)(6512007)(7416002)(6486002)(478600001)(54906003)(66946007)(66476007)(66556008)(41300700001)(316002)(8676002)(8936002)(4326008)(31686004)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RDl1WWd2cW82ZDAwMnNVYXV1MTlLa2wrd0hGU1pHVUV2SytlWTcyUktVbjNi?=
- =?utf-8?B?TGZ4aEwwV2dZdHRkSExnTGxIVVZWNnJzMkRvQmhaay9ieHNaYTJySCtHYU1z?=
- =?utf-8?B?VFA3TjNJUU52K0V1MFJVVXJBSXkxYUN2aDNvdllodlYyTXovZ2wwMEUwb2ky?=
- =?utf-8?B?UXhybHpvMGVVUWtxdjNCaFJhcVNXZjZLcVpmV1FYemJBMEZhZEVJTUEyMmtu?=
- =?utf-8?B?bjFQVnlRQXVRN1pRZXVSbCtUZ2pHQ2hZNWxWZ3U2dFE5NVBpQ1p2bWVQZkZW?=
- =?utf-8?B?VzNSVXYwRHdpYkZGaExlNVd1ejlHMHdvNmtZM2luQnptMFhNejFoRkk2d200?=
- =?utf-8?B?d0MwVit3Vy9iWE9hc3dUUDRrckNQcGdxTC9iYVAxbFdVRnNjWnNkZlhkQ0hX?=
- =?utf-8?B?ZWd1QlJrZVBWaXo2c1hyK3hlbkRQUjBEalNjZE9wVW1BNUF4MnNOR0ZnUERu?=
- =?utf-8?B?Mjl5b0xBVTFhcG1JaFAwZklLcXlHM3h5dDVlc2IxS0ZYSTZBNHRIcFVwdjlw?=
- =?utf-8?B?MGJkUkF3aDZtdksxU0JVUnJVYm9Mc3N3VVRpemN5am5VVUREK0pKY2Foa05S?=
- =?utf-8?B?QlQyaDNLZUszaXRnQzBMb2RDTEZTOGFrVHdaYlFXNGMySkFPQ21DSC8xUkFT?=
- =?utf-8?B?b0FwRklmbTFaNHVjNTJ5cnRPT05nLzlZSmt2SU5UN1ZxM05GcjFKVVdUUDF4?=
- =?utf-8?B?VEFqMkRlSTdqSlJSUlFrY0pNVWxKcWZNNDZ3MVVZQXZqUGk1RThRcnpjZGhn?=
- =?utf-8?B?NE9QTGVuZmhtbzBjL3RSd1h0Qlo1cWpjWE85ZC9OSlZXd1dRY2gxOEN2RDFh?=
- =?utf-8?B?N0JJZUZZdGo0aTZ3T0F3RUlCNlloR0kvcmZGN1o1d015UnFsQ09ab0gwRE1C?=
- =?utf-8?B?eW5GZjRvenFTOHJDaWhpVk9zVTAwbnBLNXV1emdFeUVrajhlcjRLYm83WlJo?=
- =?utf-8?B?RVdyVVBjUDRhUlM1N0puTXliSHExMFEwc3ZOclpRVDVadHhram43NXdvaDVC?=
- =?utf-8?B?c2oyY2Y2TG1HMVpwU2Iyd2owRmlzMXRMNjh6YU5xaTQ1V0pUWmM5bnlWdU5F?=
- =?utf-8?B?TXBvZzY3bG80NWZUQkp1blV2SUFJY1I1TkFOMDhpaXk2aXZnSkh5aC9BOHBz?=
- =?utf-8?B?TkR0Z2xiWXA2SWtLWFFTdGpLUENNN0xsRk92SXZGTkNjd1puNXZMYWMwSjJj?=
- =?utf-8?B?S3UzZ2YyZXZaOHRTRUsrNG4vbnY4QVRKM1Z2eUVaSUM0T1ZoYjd1bXVzNG9h?=
- =?utf-8?B?Uml2bWFWK2pjUmJGWHVqcnBSWnhpRERkU3k1ZlBBMVl4aEZncUJkOThQcVE1?=
- =?utf-8?B?NHZ3M0tpUEVjQWhLUlBnc2Q0Wk5sZGtneW4zQ0JITDd5WVc2UXBIa0ZJUUUr?=
- =?utf-8?B?cWgvNTJuODYwQVlBQUp4b0VxMzN0V09lY1htRERNVHYrNXlFalN3ZzJNd3lV?=
- =?utf-8?B?TER6V1hVVVY5R21PSGw4aGZkYThmMnVobGpQQklLa2JjVlFIdnFtSElPSDgz?=
- =?utf-8?B?Vm5RcjcyOWIxb0tFcktCN2Q0QW5lVmk2L3NCRWJmSUkzR0hCazZmNnkwdWVB?=
- =?utf-8?B?ZEtTRFdjUGhHTkZXVDdvRENGSW9FZkYybDNuc1Z3YUU1UENXdnVuOHdqOW9n?=
- =?utf-8?B?RjR2cFlWSStVS3g0MithNit6d0NQQ2pOUThSOElYOWxwUnF6dGxkY1FSeEtX?=
- =?utf-8?B?VzdGd0pVd1lBa2N2NSszaTVHK204SFpZeUUwMDd5N1FkRWJ2WHZjdFhhU2Fv?=
- =?utf-8?B?bmh3NlYyTDVFWVNKTGJGOEZnY3ZoZVBzSTUvbGZ5QURFcXhHa2tEeHovTzFC?=
- =?utf-8?B?WmZrZzM2dXhmV1grd1h5UDdiSFJlSmI0UkEzUzdJYWNNQktQNVZBWEMrYjB3?=
- =?utf-8?B?ZFNJNGlobGtmTTNvSmk3Z2RmRGRrWmt5bGhXYTgrM1AwQnlHcU5HYWFSN2lU?=
- =?utf-8?B?WTFEbFNlZDc2UFBJRkJ2SXBLamJKUGZhK0ZnYXlvV2dVL3BETXNPbWtXYVZl?=
- =?utf-8?B?VHFVVTRKRVNoU0pkWDZPWFVkV294Nng4Q0NqaWJEcmlzRHBBZFhPYyt6a3lR?=
- =?utf-8?B?a0xYZ214QlRlcjZ2T1BMalV0SlhMVWVCLzZBYUM3Z283QnBxa3hoUHh2VS8v?=
- =?utf-8?B?UWI0R01WMjdBTzZHdEprRk1BR3BVZ2JKRkVIa1pDMXNrbS9DdUpyQW1BT2hx?=
- =?utf-8?B?S1E9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?ZFRoWE5RTWVLQ2JVUEJoK0xpU3pTQ3F4MmJHclc4ek5QS1FNbWpGTHNVMGdL?=
- =?utf-8?B?ZWxVUG9HbjU4RndyR3dSZm1JTmZLWHR4ME5QRFByc091NklwaThtZ1BLVE5u?=
- =?utf-8?B?OG5ydTlpTEdxQ0JHV0RldGhGVlZtUC9RZTFkODNpRUpCcGlGYzduT1lVcGQ0?=
- =?utf-8?B?b3I5bWJJc3Z6RENoeE9EQ29LWWZXUnhTcmJSYWNxbHJ5aVpKQjFOOGxFMm01?=
- =?utf-8?B?ak53WnhrUUdiTU1IdEZOMDZ6eTQvL0drZkk5U3lueGhmTjRaOTU2Z0RQTnBH?=
- =?utf-8?B?NHB5OUlGc0s2MW95SmxFM1hmRzNxWks5NjdLUnUzZFlyeHJTRzZQOVQ1ZkFO?=
- =?utf-8?B?NHRRYlliZjNLZjVTNlViQ3NuMEVUeUtuN0lXMUNHQ3FYRStUYXhLeWpvTWYz?=
- =?utf-8?B?bGJHUlpLT09Ha3Y3Y0lXSVBZTlFhVUtCSUFrMTNFTldscEFCUkY1MUtsVEFM?=
- =?utf-8?B?YjZwOVBrYWY4N0lienNiYnZoS3Z3SkJ0NTRDK1FIRG9CalZsaXVZT2h3VWNU?=
- =?utf-8?B?SDFGSCtYbERvYjh0c0d1NVhBLy9tSDU2dFUzbWlGSHlHejc4LzJhNVk0NTNn?=
- =?utf-8?B?RzhRakp0UEI2OXlqaE9MOHBWWDdvbWpNcUN5ZlV2Z2RyTDRPQnF5c3J6aUZO?=
- =?utf-8?B?RGs5WVBldWRKcFFKSFBQaTN0YkV5WFBTaTVJY2hHTi9XRy9qeFQwMTduSTlw?=
- =?utf-8?B?c1NMM200Z2g2Q2ZBdGxLRktROWExU2pqNVFQSlRmSVFqRXppQnVBb3NUUlF2?=
- =?utf-8?B?bmN6a2MvNXFPMUJiSms2Vk5nWFM3UEtzS25pNk9ZNGYxZUN2c0VySWVRTmcv?=
- =?utf-8?B?L0pDZ1lkOGFiSTlIYUVlTEl0bU9NeFpUS0IrQzVxTVpFZG1OYy9jbHBLMmw4?=
- =?utf-8?B?VWdLcm5RekNHWkh6RHgrTzQ2NVp2c0ZsTGV0Njh6WFlmd0w2RjVpN1Nrd1Jq?=
- =?utf-8?B?Wm14Rk8xbnNaTGVmRHJHc1Y0MkVmeGZaeVZwa0diSG9VQVV3U1pTU0k0OStn?=
- =?utf-8?B?ZG11UTlpd3lZWW44SGQ5S2NuV3dSSHVWb1JnT3pxMFhWcGZEZmJCTmJjcGlp?=
- =?utf-8?B?VHhoSmdYTnJReUVaSU96Ni95MlVUWENaa3djZHA5UHF3WnpFWjFuU2FvUjkz?=
- =?utf-8?B?aXpGS29oR3B5cVo3Z2FwNFZ6NVhDQXlWUWVHNlRTTVR4ejZoajBKOFhzSDlH?=
- =?utf-8?B?YmlkR0tndkdYMmRUQzJ3dkkwVUdobFBhczVYbDBQR1BTWGRFLzN2bnBBTG16?=
- =?utf-8?B?enpuMHhGOG1MNnpVSWk0Mkd3TDBZV2xJSkZKRG16V1VISjhEV1lYK3RkNzhD?=
- =?utf-8?B?TUxaM1hFeHNCWjVGRWlIRlFNRUs1QWNUUFJtYXBJb0pXNkNEVTVHWDZnaC8w?=
- =?utf-8?B?d0pzVEI2aWdrZ0lOeE5uQ1dvZUthcFhsNTNTR292amg0OU9mVnQzajJCdVBi?=
- =?utf-8?Q?9TucOerO?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ccc39c97-7e05-4ec9-f421-08dbce610a1f
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 16:00:38.3299
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sDiG6fYjn+QVPNeLZmMjdDy5amD0WtwuKixFdfePfhWH1aM6f4s9JLGQ0iu1z11fGuIEMziJ/H471WBjigvn5so1pkG5SqTdwasmcurT3qo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB6074
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-16_10,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0 spamscore=0
- mlxscore=0 phishscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310160139
-X-Proofpoint-GUID: 5FR52-XLWit725g0p8Qt91WxFqEGZZuz
-X-Proofpoint-ORIG-GUID: 5FR52-XLWit725g0p8Qt91WxFqEGZZuz
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/10/2023 12:26, Joao Martins wrote:
-> On 16/10/2023 03:07, Baolu Lu wrote:
->> On 9/23/23 9:25 AM, Joao Martins wrote:
->>> +
->>> +    if (!ad_enabled && dirty->bitmap)
->>> +        return -EINVAL;
->>
->> I don't understand above check of "dirty->bitmap". Isn't it always
->> invalid to call this if dirty tracking is not enabled on the domain?
->>
-> It is spurious (...)
-> 
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-I take this back;
+KVM TDX basic feature support
 
->> The iommu_dirty_bitmap is defined in iommu core. The iommu driver has no
->> need to understand it and check its member anyway.
->>
-> 
-> (...) The iommu driver has no need to understand it. iommu_dirty_bitmap_record()
-> already makes those checks in case there's no iova_bitmap to set bits to.
-> 
+Hello.  This is v16 the patch series vof KVM TDX support.  This is based on
+v6.6-rc2 + the following patch series + minor fixes.
 
-This is all true but the reason I am checking iommu_dirty_bitmap::bitmap is to
-essentially not record anything in the iova bitmap and just clear the dirty bits
-from the IOPTEs, all when dirty tracking is technically disabled. This is done
-internally only when starting dirty tracking, and thus to ensure that we cleanup
-all dirty bits before we enable dirty tracking to have a consistent snapshot as
-opposed to inheriting dirties from the past.
+Related patch series This patch is based on:
+- v12 KVM: guest_memfd() and per-page attributes
+  https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.com/
 
-Some alternative ways to do this: 1) via the iommu_dirty_bitmap structure, where
-I add one field which if true then iommufd core is able to call into iommu
-driver on a "clear IOPTE" manner or 2)  via the ::flags ... the thing is that
-::flags values is UAPI, so it feels weird to use these flags for internal purposes.
+- KVM: guest_memfd fixes
+  https://lore.kernel.org/all/20230921203331.3746712-1-seanjc@google.com/
 
-	Joao
+- TDX host kernel support v13
+  https://lore.kernel.org/all/cover.1692962263.git.kai.huang@intel.com/
+
+The tree can be found at https://github.com/intel/tdx/tree/kvm-upstream
+The corresponding qemu branch is found at
+https://github.com/yamahata/qemu/tree/tdx/qemu-upm
+How to run/test: It's describe at https://github.com/intel/tdx/wiki/TDX-KVM
+
+More features tree is found at
+https://github.com/intel/tdx/tree/kvm-upstream-workaround
+
+Isaku Yamahata
+
+Changes from v15:
+- Added KVM_TDX_RELEASE_VM to reduce the destruction time
+- Catch up the TDX module interface to use struct tdx_module_args
+  instead of struct tdx_module_output
+- Add tdh_mem_sept_rd() for SEPT_VE_DISABLE=1 and handle Secure-EPT violation
+  with SEPT_VE_DISABLE case.
+- Simplified tdx_reclaim_page()
+- Reorganize the locking of tdx_release_hkid(), and use smp_call_mask()
+  instead of smp_call_on_cpu() to hold spinlock to race with invalidation
+  on releasing guest memfd
+- Removed AMX check as the KVM upstream supports AMX.
+- Added CET flag to guest supported xss
+- add check if nr_pages isn't large with
+  (nr_page << PAGE_SHIFT) >> PAGE_SHIFT
+- use __seamcall_saved_ret()
+- As struct tdx_module_args doesn't match with vcpu.arch.regs, copy regs
+  before/after calling __seamcall_saved_ret().
+
+Changes from v14:
+https://lore.kernel.org/all/cover.1685333727.git.isaku.yamahata@intel.com/
+- rebased to v6.5-rc2, v11 KVM guest_memfd(), v11 TDX host kernel support
+- ABI change to add reserved member for future compatibility, dropped unused
+  member.
+- handle EXIT_REASON_OTHER_SMI
+- handle FEAT_CTL MSR access
+
+Changes from v13:
+- rbased to v6.4-rc3
+- Make use of KVM gmem.
+- Added check_cpuid callback for KVM_SET_CPUID2 as RFC patch.
+- ABI change of KVM_TDX_VM_INIT as VM scoped KVM ioctl.
+- Make TDX initialization non-depend on kvm hardware_enable.
+  Use vmx_hardware_enable directly.
+- Drop a patch to prohibit dirty logging as new KVM gmem code base
+- Drop parameter only checking for some TDG.VP.VMCALL. Just default part
+
+Changes from v12:
+- ABI change of KVM_TDX_VM_INIT
+- Rename kvm_gfn_{private, shared} to kvm_gfn_to_{private, shared}
+- Move APIC BASE MSI initialization to KVM_TDX_VCPU_INIT
+- Fix MTRR patch
+- Make MapGpa hypercall always pass it to user space VMM
+- Split hooks to TDP MMU into two part. populating and zapping.
+
+Changes from v11:
+- ABI change of KVM_TDX_VM_INIT
+- Split the hook of TDP MMU to not modify handle_changed_spte()
+- Enhanced commit message on mtrr patch
+- Made KVM_CAP_MAX_VCPUS to x86 specific
+
+Changes from v10:
+- rebased to v6.2-rc3
+- support mtrr with its own patches
+- Integrated fd-based private page v10
+- Integrated TDX host kernel support v8
+- Integrated kvm_init rework v2
+- removed struct tdx_td_page and its initialization logic
+- cleaned up mmio spte and require enable_mmio_caching=true for TDX
+- removed dubious WARN_ON_ONCE()
+- split a patch adding methods as nop into several patches
+
+Changes from v9:
+- rebased to v6.1-rc2
+- Integrated fd-based private page v9 as prerequisite.
+- Integrated TDX host kernel support v6
+- TDP MMU: Make handle_change_spte() return value.
+- TDX: removed seamcall_lock and return -EAGAIN so that TDP MMU can retry
+
+Changes from v8:
+- rebased to v6.0-rc7
+- Integrated with kvm hardware initialization.  Check all packages has at least
+  one online CPU when creating guest TD and refuse cpu offline during guest TDs
+  are running.
+- Integrated fd-based private page v8 as prerequisite.
+- TDP MMU: Introduced more callbacks instead of single callback.
+
+Changes from v7:
+- Use xarray to track whether GFN is private or shared. Drop SPTE_SHARED_MASK.
+  The complex state machine with SPTE_SHARED_MASK was ditched.
+- Large page support is implemented. But will be posted as independent RFC patch.
+- fd-based private page v7 is integrated. This is mostly same to Chao's patches.
+  It's in github.
+
+Changes from v6:
+- rebased to v5.19
+
+Changes from v5:
+- export __seamcall and use it
+- move mutex lock from callee function of smp_call_on_cpu to the caller.
+- rename mmu_prezap => flush_shadow_all_private() and tdx_mmu_release_hkid
+- updated comment
+- drop the use of tdh_mng_key.reclaimid(): as the function is for backward
+  compatibility to only return success
+- struct kvm_tdx_cmd: metadata => flags, added __u64 error.
+- make this ioctl systemwide ioctl
+- ABI change to struct kvm_init_vm
+- guest_tsc_khz: use kvm->arch.default_tsc_khz
+- rename BUILD_BUG_ON_MEMCPY to MEMCPY_SAME_SIZE
+- drop exporting kvm_set_tsc_khz().
+- fix kvm_tdp_page_fault() for mtrr emulation
+- rename it to kvm_gfn_shared_mask(), dropped kvm_gpa_shared_mask()
+- drop kvm_is_private_gfn(), kept kvm_is_private_gpa()
+  keep kvm_{gfn, gpa}_private(), kvm_gpa_private()
+- update commit message
+- rename shadow_init_value => shadow_nonprsent_value
+- added ept_violation_ve_test mode
+- shadow_nonpresent_value => SHADOW_NONPRESENT_VALUE in tdp_mmu.c
+- legacy MMU case
+  => - mmu_topup_shadow_page_cache(), kvm_mmu_create()
+     - FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+- #VE warning:
+- rename: REMOVED_SPTE => __REMOVED_SPTE, SHADOW_REMOVED_SPTE => REMOVED_SPTE
+- merge into Like we discussed, this patch should be merged with patch
+  "KVM: x86/mmu: Allow non-zero init value for shadow PTE".
+- fix pointed by Sagi. check !is_private check => (kvm_gfn_shared_mask && !is_private)
+- introduce kvm_gfn_for_root(kvm, root, gfn)
+- add only_shared argument to kvm_tdp_mmu_handle_gfn()
+- use kvm_arch_dirty_log_supported()
+- rename SPTE_PRIVATE_PROHIBIT to SPTE_SHARED_MASK.
+- rename: is_private_prohibit_spte() => spte_shared_mask()
+- fix: shadow_nonpresent_value => SHADOW_NONPRESENT_VALUE in comment
+- dropped this patch as the change was merged into kvm/queue
+- update vt_apicv_post_state_restore()
+- use is_64_bit_hypercall()
+- comment: expand MSMI -> Machine Check System Management Interrupt
+- fixed TDX_SEPT_PFERR
+- tdvmcall_p[1234]_{write, read}() => tdvmcall_a[0123]_{read,write}()
+- rename tdmvcall_exit_readon() => tdvmcall_leaf()
+- remove optional zero check of argument.
+- do a check for static_call(kvm_x86_has_emulated_msr)(kvm, MSR_IA32_SMBASE)
+   in kvm_vcpu_ioctl_smi and __apic_accept_irq.
+- WARN_ON_ONCE in tdx_smi_allowed and tdx_enable_smi_window.
+- introduce vcpu_deliver_init to x86_ops
+- sprinkeled KVM_BUG_ON()
+
+Changes from v4:
+- rebased to TDX host kernel patch series.
+- include all the patches to make this patch series working.
+- add [MARKER] patches to mark the patch layer clear.
+
+---
+* What's TDX?
+TDX stands for Trust Domain Extensions, which extends Intel Virtual Machines
+Extensions (VMX) to introduce a kind of virtual machine guest called a Trust
+Domain (TD) for confidential computing.
+
+A TD runs in a CPU mode that is designed to protect the confidentiality of its
+memory contents and its CPU state from any other software, including the hosting
+Virtual Machine Monitor (VMM), unless explicitly shared by the TD itself.
+
+We have more detailed explanations below (***).
+We have the high-level design of TDX KVM below (****).
+
+In this patch series, we use "TD" or "guest TD" to differentiate it from the
+current "VM" (Virtual Machine), which is supported by KVM today.
+
+* The organization of this patch series
+This patch series is on top of the patches series "TDX host kernel support":
+https://lore.kernel.org/lkml/cover.1646007267.git.kai.huang@intel.com/
+
+This patch series is available at
+https://github.com/intel/tdx/tree/kvm-upstream
+
+The related repositories (TDX qemu, TDX OVMF(tdvf) etc) are described at
+https://github.com/intel/tdx/wiki/TDX-KVM
+
+The relations of the layers are depicted as follows.
+The arrows below show the order of patch reviews we would like to have.
+
+The below layers are chosen so that the device model, for example, qemu can
+exercise each layering step by step.  Check if TDX is supported, create TD VM,
+create TD vcpu, allow vcpu running, populate TD guest private memory, and handle
+vcpu exits/hypercalls/interrupts to run TD fully.
+
+  TDX vcpu
+  interrupt/exits/hypercall<------------\
+        ^                               |
+        |                               |
+  TD finalization                       |
+        ^                               |
+        |                               |
+  TDX EPT violation<------------\       |
+        ^                       |       |
+        |                       |       |
+  TD vcpu enter/exit            |       |
+        ^                       |       |
+        |                       |       |
+  TD vcpu creation/destruction  |       \-------KVM TDP MMU MapGPA
+        ^                       |                       ^
+        |                       |                       |
+  TD VM creation/destruction    \---------------KVM TDP MMU hooks
+        ^                                               ^
+        |                                               |
+  TDX architectural definitions                 KVM TDP refactoring for TDX
+        ^                                               ^
+        |                                               |
+   TDX, VMX    <--------TDX host kernel         KVM MMU GPA stolen bits
+   coexistence          support
+
+
+The followings are explanations of each layer.  Each layer has a dummy commit
+that starts with [MARKER] in subject.  It is intended to help to identify where
+each layer starts.
+
+TDX host kernel support:
+        https://lore.kernel.org/lkml/cover.1646007267.git.kai.huang@intel.com/
+        The guts of system-wide initialization of TDX module.  There is an
+        independent patch series for host x86.  TDX KVM patches call functions
+        this patch series provides to initialize the TDX module.
+
+TDX, VMX coexistence:
+        Infrastructure to allow TDX to coexist with VMX and trigger the
+        initialization of the TDX module.
+        This layer starts with
+        "KVM: VMX: Move out vmx_x86_ops to 'main.c' to wrap VMX and TDX"
+TDX architectural definitions:
+        Add TDX architectural definitions and helper functions
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TDX architectural definitions".
+TD VM creation/destruction:
+        Guest TD creation/destroy allocation and releasing of TDX specific vm
+        and vcpu structure.  Create an initial guest memory image with TDX
+        measurement.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD VM creation/destruction".
+TD vcpu creation/destruction:
+        guest TD creation/destroy Allocation and releasing of TDX specific vm
+        and vcpu structure.  Create an initial guest memory image with TDX
+        measurement.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu creation/destruction"
+TDX EPT violation:
+        Create an initial guest memory image with TDX measurement.  Handle
+        secure EPT violations to populate guest pages with TDX SEAMCALLs.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TDX EPT violation"
+TD vcpu enter/exit:
+        Allow TDX vcpu to enter into TD and exit from TD.  Save CPU state before
+        entering into TD.  Restore CPU state after exiting from TD.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu enter/exit"
+TD vcpu interrupts/exit/hypercall:
+        Handle various exits/hypercalls and allow interrupts to be injected so
+        that TD vcpu can continue running.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: TD vcpu exits/interrupts/hypercalls"
+
+KVM MMU GPA shared bit:
+        Introduce framework to handle shared bit repurposed bit of GPA TDX
+        repurposed a bit of GPA to indicate shared or private. If it's shared,
+        it's the same as the conventional VMX EPT case.  VMM can access shared
+        guest pages.  If it's private, it's handled by Secure-EPT and the guest
+        page is encrypted.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM MMU GPA stolen bits"
+KVM TDP refactoring for TDX:
+        TDX Secure EPT requires different constants. e.g. initial value EPT
+        entry value etc. Various refactoring for those differences.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX"
+KVM TDP MMU hooks:
+        Introduce framework to TDP MMU to add hooks in addition to direct EPT
+        access TDX added Secure EPT which is an enhancement to VMX EPT.  Unlike
+        conventional VMX EPT, CPU can't directly read/write Secure EPT. Instead,
+        use TDX SEAMCALLs to operate on Secure EPT.
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks"
+KVM TDP MMU MapGPA:
+        Introduce framework to handle switching guest pages from private/shared
+        to shared/private.  For a given GPA, a guest page can be assigned to a
+        private GPA or a shared GPA exclusively.  With TDX MapGPA hypercall,
+        guest TD converts GPA assignments from private (or shared) to shared (or
+        private).
+        This layer starts with
+        "[MARKER] The start of TDX KVM patch series: KVM TDP MMU MapGPA "
+
+KVM guest private memory: (not shown in the above diagram)
+[PATCH v4 00/12] KVM: mm: fd-based approach for supporting KVM guest private
+memory: https://lkml.org/lkml/2022/1/18/395
+        Guest private memory requires different memory management in KVM.  The
+        patch proposes a way for it.  Integration with TDX KVM.
+
+(***)
+* TDX module
+A CPU-attested software module called the "TDX module" is designed to implement
+the TDX architecture, and it is loaded by the UEFI firmware today. It can be
+loaded by the kernel or driver at runtime, but in this patch series we assume
+that the TDX module is already loaded and initialized.
+
+The TDX module provides two main new logical modes of operation built upon the
+new SEAM (Secure Arbitration Mode) root and non-root CPU modes added to the VMX
+architecture. TDX root mode is mostly identical to the VMX root operation mode,
+and the TDX functions (described later) are triggered by the new SEAMCALL
+instruction with the desired interface function selected by an input operand
+(leaf number, in RAX). TDX non-root mode is used for TD guest operation.  TDX
+non-root operation (i.e. "guest TD" mode) is similar to the VMX non-root
+operation (i.e. guest VM), with changes and restrictions to better assure that
+no other software or hardware has direct visibility of the TD memory and state.
+
+TDX transitions between TDX root operation and TDX non-root operation include TD
+Entries, from TDX root to TDX non-root mode, and TD Exits from TDX non-root to
+TDX root mode.  A TD Exit might be asynchronous, triggered by some external
+event (e.g., external interrupt or SMI) or an exception, or it might be
+synchronous, triggered by a TDCALL (TDG.VP.VMCALL) function.
+
+TD VCPUs can be entered using SEAMCALL(TDH.VP.ENTER) by KVM. TDH.VP.ENTER is one
+of the TDX interface functions as mentioned above, and "TDH" stands for Trust
+Domain Host. Those host-side TDX interface functions are categorized into
+various areas just for better organization, such as SYS (TDX module management),
+MNG (TD management), VP (VCPU), PHYSMEM (physical memory), MEM (private memory),
+etc. For example, SEAMCALL(TDH.SYS.INFO) returns the TDX module information.
+
+TDCS (Trust Domain Control Structure) is the main control structure of a guest
+TD, and encrypted (using the guest TD's ephemeral private key).  At a high
+level, TDCS holds information for controlling TD operation as a whole,
+execution, EPTP, MSR bitmaps, etc that KVM needs to set it up.  Note that MSR
+bitmaps are held as part of TDCS (unlike VMX) because they are meant to have the
+same value for all VCPUs of the same TD.
+
+Trust Domain Virtual Processor State (TDVPS) is the root control structure of a
+TD VCPU.  It helps the TDX module control the operation of the VCPU, and holds
+the VCPU state while the VCPU is not running. TDVPS is opaque to software and
+DMA access, accessible only by using the TDX module interface functions (such as
+TDH.VP.RD, TDH.VP.WR). TDVPS includes TD VMCS, and TD VMCS auxiliary structures,
+such as virtual APIC page, virtualization exception information, etc.
+
+Several VMX control structures (such as Shared EPT and Posted interrupt
+descriptor) are directly managed and accessed by the host VMM.  These control
+structures are pointed to by fields in the TD VMCS.
+
+The above means that 1) KVM needs to allocate different data structures for TDs,
+2) KVM can reuse the existing code for TDs for some operations, 3) it needs to
+define TD-specific handling for others.  3) Redirect operations to .  3)
+Redirect operations to the TDX specific callbacks, like "if (is_td_vcpu(vcpu))
+tdx_callback() else vmx_callback();".
+
+*TD Private Memory
+TD private memory is designed to hold TD private content, encrypted by the CPU
+using the TD ephemeral key. An encryption engine holds a table of encryption
+keys, and an encryption key is selected for each memory transaction based on a
+Host Key Identifier (HKID). By design, the host VMM does not have access to the
+encryption keys.
+
+In the first generation of MKTME, HKID is "stolen" from the physical address by
+allocating a configurable number of bits from the top of the physical
+address. The HKID space is partitioned into shared HKIDs for legacy MKTME
+accesses and private HKIDs for SEAM-mode-only accesses. We use 0 for the shared
+HKID on the host so that MKTME can be opaque or bypassed on the host.
+
+During TDX non-root operation (i.e. guest TD), memory accesses can be qualified
+as either shared or private, based on the value of a new SHARED bit in the Guest
+Physical Address (GPA).  The CPU translates shared GPAs using the usual VMX EPT
+(Extended Page Table) or "Shared EPT" (in this document), which resides in host
+VMM memory. The Shared EPT is directly managed by the host VMM - the same as
+with the current VMX. Since guest TDs usually require I/O, and the data exchange
+needs to be done via shared memory, thus KVM needs to use the current EPT
+functionality even for TDs.
+
+* Secure EPT and Minoring using the TDP code
+The CPU translates private GPAs using a separate Secure EPT.  The Secure EPT
+pages are encrypted and integrity-protected with the TD's ephemeral private
+key.  Secure EPT can be managed _indirectly_ by the host VMM, using the TDX
+interface functions, and thus conceptually Secure EPT is a subset of EPT (why
+"subset"). Since execution of such interface functions takes much longer time
+than accessing memory directly, in KVM we use the existing TDP code to minor the
+Secure EPT for the TD.
+
+This way, we can effectively walk Secure EPT without using the TDX interface
+functions.
+
+* VM life cycle and TDX specific operations
+The userspace VMM, such as QEMU, needs to build and treat TDs differently.  For
+example, a TD needs to boot in private memory, and the host software cannot copy
+the initial image to private memory.
+
+* TSC Virtualization
+The TDX module helps TDs maintain reliable TSC (Time Stamp Counter) values
+(e.g. consistent among the TD VCPUs) and the virtual TSC frequency is determined
+by TD configuration, i.e. when the TD is created, not per VCPU.  The current KVM
+owns TSC virtualization for VMs, but the TDX module does for TDs.
+
+* MCE support for TDs
+The TDX module doesn't allow VMM to inject MCE.  Instead PV way is needed for TD
+to communicate with VMM.  For now, KVM silently ignores MCE request by VMM.  MSRs
+related to MCE (e.g, MCE bank registers) can be naturally emulated by
+paravirtualizing MSR access.
+
+[1] For details, the specifications, [2], [3], [4], [5], [6], [7], are
+available.
+
+* Restrictions or future work
+Some features are not included to reduce patch size.  Those features are
+addressed as future independent patch series.
+- large page (2M, 1G)
+- qemu gdb stub
+- guest PMU
+- and more
+
+* Prerequisites
+It's required to load the TDX module and initialize it.  It's out of the scope
+of this patch series.  Another independent patch for the common x86 code is
+planned.  It defines CONFIG_INTEL_TDX_HOST and this patch series uses
+CONFIG_INTEL_TDX_HOST.  It's assumed that With CONFIG_INTEL_TDX_HOST=y, the TDX
+module is initialized and ready for KVM to use the TDX module APIs for TDX guest
+life cycle like tdh.mng.init are ready to use.
+
+Concretely Global initialization, LP (Logical Processor) initialization, global
+configuration, the key configuration, and TDMR and PAMT initialization are done.
+The state of the TDX module is SYS_READY.  Please refer to the TDX module
+specification, the chapter Intel TDX Module Lifecycle State Machine
+
+** Detecting the TDX module readiness.
+TDX host patch series implements the detection of the TDX module availability
+and its initialization so that KVM can use it.  Also it manages Host KeyID
+(HKID) assigned to guest TD.
+The assumed APIs the TDX host patch series provides are
+- const struct tdsysinfo_struct *tdx_get_sysinfo(void);
+  Return the system wide information about the TDX module.  NULL if the TDX
+  isn't initialized.
+- int tdx_enable(void);
+  Initialization of TDX module so that the TDX module is ready for KVM to use.
+- extern u32 tdx_global_keyid __read_mostly;
+  global host key id that is used for the TDX module itself.
+- u32 tdx_get_num_keyid(void);
+  return the number of available TDX private host key id.
+- int tdx_keyid_alloc(void);
+  Allocate HKID for guest TD.
+- void tdx_keyid_free(int keyid);
+  Free HKID for guest TD.
+
+(****)
+* TDX KVM high-level design
+- Host key ID management
+Host Key ID (HKID) needs to be assigned to each TDX guest for memory encryption.
+It is assumed The TDX host patch series implements necessary functions,
+u32 tdx_get_global_keyid(void), int tdx_keyid_alloc(void) and,
+void tdx_keyid_free(int keyid).
+
+- Data structures and VM type
+Because TDX is different from VMX, define its own VM/VCPU structures, struct
+kvm_tdx and struct vcpu_tdx instead of struct kvm_vmx and struct vcpu_vmx.  To
+identify the VM, introduce VM-type to specify which VM type, VMX (default) or
+TDX, is used.
+
+- VM life cycle and TDX specific operations
+Re-purpose the existing KVM_MEMORY_ENCRYPT_OP to add TDX specific operations.
+New commands are used to get the TDX system parameters, set TDX specific VM/VCPU
+parameters, set initial guest memory and measurement.
+
+The creation of TDX VM requires five additional operations in addition to the
+conventional VM creation.
+  - Get KVM system capability to check if TDX VM type is supported
+  - VM creation (KVM_CREATE_VM)
+  - New: Get the TDX specific system parameters.  KVM_TDX_GET_CAPABILITY.
+  - New: Set TDX specific VM parameters.  KVM_TDX_INIT_VM.
+  - VCPU creation (KVM_CREATE_VCPU)
+  - New: Set TDX specific VCPU parameters.  KVM_TDX_INIT_VCPU.
+  - New: Initialize guest memory as boot state and extend the measurement with
+    the memory.  KVM_TDX_INIT_MEM_REGION.
+  - New: Finalize VM. KVM_TDX_FINALIZE. Complete measurement of the initial
+    TDX VM contents.
+  - VCPU RUN (KVM_VCPU_RUN)
+
+- Protected guest state
+Because the guest state (CPU state and guest memory) is protected, the KVM VMM
+can't operate on them.  For example, accessing CPU registers, injecting
+exceptions, and accessing guest memory.  Those operations are handled as
+silently ignored, returning zero or initial reset value when it's requested via
+KVM API ioctls.
+
+    VM/VCPU state and callbacks for TDX specific operations.
+    Define tdx specific VM state and VCPU state instead of VMX ones.  Redirect
+    operations to TDX specific callbacks.  "if (tdx) tdx_op() else vmx_op()".
+
+    Operations on the CPU state
+    silently ignore operations on the guest state.  For example, the write to
+    CPU registers is ignored and the read from CPU registers returns 0.
+
+    . ignore access to CPU registers except for allowed ones.
+    . TSC: add a check if tsc is immutable and return an error.  Because the KVM
+      implementation updates the internal tsc state and it's difficult to back
+      out those changes.  Instead, skip the logic.
+    . dirty logging: add check if dirty logging is supported.
+    . exceptions/SMI/MCE/SIPI/INIT: silently ignore
+
+    Note: virtual external interrupt and NMI can be injected into TDX guests.
+
+- KVM MMU integration
+One bit of the guest physical address (bit 51 or 47) is repurposed to indicate if
+the guest physical address is private (the bit is cleared) or shared (the bit is
+set).  The bits are called stolen bits.
+
+  - Stolen bits framework
+    systematically tracks which guest physical address, shared or private, is
+    used.
+
+  - Shared EPT and secure EPT
+    There are two EPTs. Shared EPT (the conventional one) and Secure
+    EPT(the new one). Shared EPT is handled the same for the stolen
+    bit set.  Secure EPT points to private guest pages.  To resolve
+    EPT violation, KVM walks one of two EPTs based on faulted GPA.
+    Because it's costly to access secure EPT during walking EPTs with
+    SEAMCALLs for the private guest physical address, another private
+    EPT is used as a shadow of Secure-EPT with the existing logic at
+    the cost of extra memory.
+
+The following depicts the relationship.
+
+                    KVM                             |       TDX module
+                     |                              |           |
+        -------------+----------                    |           |
+        |                      |                    |           |
+        V                      V                    |           |
+     shared GPA           private GPA               |           |
+  CPU shared EPT pointer  KVM private EPT pointer   |  CPU secure EPT pointer
+        |                      |                    |           |
+        |                      |                    |           |
+        V                      V                    |           V
+  shared EPT                private EPT--------mirror----->Secure EPT
+        |                      |                    |           |
+        |                      \--------------------+------\    |
+        |                                           |      |    |
+        V                                           |      V    V
+  shared guest page                                 |    private guest page
+                                                    |
+                                                    |
+                              non-encrypted memory  |    encrypted memory
+                                                    |
+
+  - Operating on Secure EPT
+    Use the TDX module APIs to operate on Secure EPT.  To call the TDX API
+    during resolving EPT violation, add hooks to additional operation and wiring
+    it to TDX backend.
+
+* References
+
+[1] TDX specification
+   https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+[2] Intel Trust Domain Extensions (Intel TDX)
+   https://cdrdv2.intel.com/v1/dl/getContent/726790
+[3] Intel CPU Architectural Extensions Specification
+   https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
+[4] Intel TDX Module 1.0 Specification
+   https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1.0-public-spec-v0.931.pdf
+[5] Intel TDX Loader Interface Specification
+  https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
+[6] Intel TDX Guest-Hypervisor Communication Interface
+   https://cdrdv2.intel.com/v1/dl/getContent/726790
+[7] Intel TDX Virtual Firmware Design Guide
+   https://www.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.01.pdf
+[8] intel public github
+   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
+   TDX guest branch: https://github.com/intel/tdx/tree/guest
+   qemu TDX https://github.com/intel/qemu-tdx
+[9] TDVF
+    https://github.com/tianocore/edk2-staging/tree/TDVF
+    This was merged into EDK2 main branch. https://github.com/tianocore/edk2
+
+Chao Gao (2):
+  KVM: x86/mmu: Assume guest MMIOs are shared
+  KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o
+    wrmsr
+
+Isaku Yamahata (93):
+  KVM: x86/vmx: initialize loaded_vmcss_on_cpu in vmx_hardware_setup()
+  KVM: x86/vmx: Refactor KVM VMX module init/exit functions
+  KVM: VMX: Reorder vmx initialization with kvm vendor initialization
+  KVM: TDX: Initialize the TDX module when loading the KVM intel kernel
+    module
+  KVM: TDX: Add placeholders for TDX VM/vcpu structure
+  KVM: TDX: Make TDX VM type supported
+  [MARKER] The start of TDX KVM patch series: TDX architectural
+    definitions
+  KVM: TDX: Define TDX architectural definitions
+  KVM: TDX: Add C wrapper functions for SEAMCALLs to the TDX module
+  KVM: TDX: Retry SEAMCALL on the lack of entropy error
+  KVM: TDX: Add helper functions to print TDX SEAMCALL error
+  [MARKER] The start of TDX KVM patch series: TD VM creation/destruction
+  x86/cpu: Add helper functions to allocate/free TDX private host key id
+  x86/virt/tdx: Add a helper function to return system wide info about
+    TDX module
+  KVM: TDX: Add place holder for TDX VM specific mem_enc_op ioctl
+  KVM: x86, tdx: Make KVM_CAP_MAX_VCPUS backend specific
+  KVM: TDX: create/destroy VM structure
+  KVM: TDX: initialize VM with TDX specific parameters
+  KVM: TDX: Make pmu_intel.c ignore guest TD case
+  KVM: TDX: Refuse to unplug the last cpu on the package
+  [MARKER] The start of TDX KVM patch series: TD vcpu
+    creation/destruction
+  KVM: TDX: allocate/free TDX vcpu structure
+  KVM: TDX: Do TDX specific vcpu initialization
+  [MARKER] The start of TDX KVM patch series: KVM MMU GPA shared bits
+  KVM: x86/mmu: introduce config for PRIVATE KVM MMU
+  KVM: x86/mmu: Add address conversion functions for TDX shared bit of
+    GPA
+  [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for
+    TDX
+  KVM: x86/mmu: Replace hardcoded value 0 for the initial value for SPTE
+  KVM: x86/mmu: Add Suppress VE bit to
+    shadow_mmio_mask/shadow_present_mask
+  KVM: x86/mmu: Track shadow MMIO value on a per-VM basis
+  KVM: x86/mmu: Disallow fast page fault on private GPA
+  KVM: VMX: Introduce test mode related to EPT violation VE
+  [MARKER] The start of TDX KVM patch series: KVM TDP MMU hooks
+  KVM: x86/tdp_mmu: Init role member of struct kvm_mmu_page at
+    allocation
+  KVM: x86/mmu: Add a new is_private member for union kvm_mmu_page_role
+  KVM: x86/mmu: Add a private pointer to struct kvm_mmu_page
+  KVM: x86/tdp_mmu: Sprinkle __must_check
+  KVM: x86/tdp_mmu: Support TDX private mapping for TDP MMU
+  [MARKER] The start of TDX KVM patch series: TDX EPT violation
+  KVM: TDX: Add accessors VMX VMCS helpers
+  KVM: TDX: Require TDP MMU and mmio caching for TDX
+  KVM: TDX: TDP MMU TDX support
+  KVM: TDX: MTRR: implement get_mt_mask() for TDX
+  [MARKER] The start of TDX KVM patch series: TD finalization
+  KVM: TDX: Create initial guest memory
+  KVM: TDX: Finalize VM initialization
+  [MARKER] The start of TDX KVM patch series: TD vcpu enter/exit
+  KVM: TDX: Implement TDX vcpu enter/exit path
+  KVM: TDX: vcpu_run: save/restore host state(host kernel gs)
+  KVM: TDX: restore host xsave state when exit from the guest TD
+  KVM: TDX: restore user ret MSRs
+  [MARKER] The start of TDX KVM patch series: TD vcpu
+    exits/interrupts/hypercalls
+  KVM: TDX: complete interrupts after tdexit
+  KVM: TDX: restore debug store when TD exit
+  KVM: TDX: handle vcpu migration over logical processor
+  KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
+    behavior
+  KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c
+  KVM: TDX: Implement interrupt injection
+  KVM: TDX: Implements vcpu request_immediate_exit
+  KVM: TDX: Implement methods to inject NMI
+  KVM: TDX: Add a place holder to handle TDX VM exit
+  KVM: TDX: handle EXIT_REASON_OTHER_SMI
+  KVM: TDX: handle ept violation/misconfig exit
+  KVM: TDX: handle EXCEPTION_NMI and EXTERNAL_INTERRUPT
+  KVM: TDX: Handle EXIT_REASON_OTHER_SMI with MSMI
+  KVM: TDX: Add a place holder for handler of TDX hypercalls
+    (TDG.VP.VMCALL)
+  KVM: TDX: handle KVM hypercall with TDG.VP.VMCALL
+  KVM: TDX: Add KVM Exit for TDX TDG.VP.VMCALL
+  KVM: TDX: Handle TDX PV CPUID hypercall
+  KVM: TDX: Handle TDX PV HLT hypercall
+  KVM: TDX: Handle TDX PV port io hypercall
+  KVM: TDX: Implement callbacks for MSR operations for TDX
+  KVM: TDX: Handle TDX PV rdmsr/wrmsr hypercall
+  KVM: TDX: Handle MSR MTRRCap and MTRRDefType access
+  KVM: TDX: Handle MSR IA32_FEAT_CTL MSR and IA32_MCG_EXT_CTL
+  KVM: TDX: Handle TDG.VP.VMCALL<GetTdVmCallInfo> hypercall
+  KVM: TDX: Silently discard SMI request
+  KVM: TDX: Silently ignore INIT/SIPI
+  KVM: TDX: Add methods to ignore accesses to CPU state
+  KVM: TDX: Add methods to ignore guest instruction emulation
+  KVM: TDX: Add a method to ignore dirty logging
+  KVM: TDX: Add methods to ignore VMX preemption timer
+  KVM: TDX: Add methods to ignore accesses to TSC
+  KVM: TDX: Ignore setting up mce
+  KVM: TDX: Add a method to ignore for TDX to ignore hypercall patch
+  KVM: TDX: Add methods to ignore virtual apic related operation
+  KVM: TDX: Inhibit APICv for TDX guest
+  Documentation/virt/kvm: Document on Trust Domain Extensions(TDX)
+  KVM: x86: design documentation on TDX support of x86 KVM TDP MMU
+  KVM: TDX: Add hint TDX ioctl to release Secure-EPT
+  RFC: KVM: x86: Add x86 callback to check cpuid
+  RFC: KVM: x86, TDX: Add check for KVM_SET_CPUID2
+  [MARKER] the end of (the first phase of) TDX KVM patch series
+
+Sean Christopherson (17):
+  KVM: VMX: Move out vmx_x86_ops to 'main.c' to wrap VMX and TDX
+  KVM: TDX: Add TDX "architectural" error codes
+  KVM: TDX: x86: Add ioctl to get TDX systemwide parameters
+  KVM: Allow page-sized MMU caches to be initialized with custom 64-bit
+    values
+  KVM: x86/mmu: Allow non-zero value for non-present SPTE and removed
+    SPTE
+  KVM: x86/mmu: Allow per-VM override of the TDP max page level
+  KVM: x86/tdp_mmu: Don't zap private pages for unsupported cases
+  KVM: VMX: Split out guts of EPT violation to common/exposed function
+  KVM: VMX: Move setting of EPT MMU masks to common VT-x code
+  KVM: TDX: Add load_mmu_pgd method for TDX
+  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+  KVM: TDX: Add support for find pending IRQ in a protected local APIC
+  KVM: x86: Assume timer IRQ was injected if APIC state is proteced
+  KVM: VMX: Modify NMI and INTR handlers to take intr_info as function
+    argument
+  KVM: VMX: Move NMI/exception handler to common helper
+  KVM: x86: Split core of hypercall emulation to helper function
+  KVM: TDX: Handle TDX PV MMIO hypercall
+
+Yan Zhao (1):
+  KVM: x86/mmu: TDX: Do not enable page track for TD guest
+
+Yang Weijiang (1):
+  KVM: TDX: Add TSX_CTRL msr into uret_msrs list
+
+Yao Yuan (1):
+  KVM: TDX: Handle vmentry failure for INTEL TD guest
+
+Yuan Yao (1):
+  KVM: TDX: Retry seamcall when TDX_OPERAND_BUSY with operand SEPT
+
+ Documentation/virt/kvm/api.rst             |    9 +-
+ Documentation/virt/kvm/index.rst           |    1 +
+ Documentation/virt/kvm/x86/index.rst       |    2 +
+ Documentation/virt/kvm/x86/intel-tdx.rst   |  362 +++
+ Documentation/virt/kvm/x86/tdx-tdp-mmu.rst |  443 +++
+ arch/x86/events/intel/ds.c                 |    1 +
+ arch/x86/include/asm/asm-prototypes.h      |    1 +
+ arch/x86/include/asm/kvm-x86-ops.h         |   17 +-
+ arch/x86/include/asm/kvm_host.h            |   84 +-
+ arch/x86/include/asm/tdx.h                 |   85 +
+ arch/x86/include/asm/vmx.h                 |   14 +
+ arch/x86/include/uapi/asm/kvm.h            |   89 +
+ arch/x86/include/uapi/asm/vmx.h            |    5 +-
+ arch/x86/kvm/Kconfig                       |    6 +
+ arch/x86/kvm/Makefile                      |    3 +-
+ arch/x86/kvm/cpuid.c                       |   27 +-
+ arch/x86/kvm/cpuid.h                       |    2 +
+ arch/x86/kvm/irq.c                         |    3 +
+ arch/x86/kvm/lapic.c                       |   33 +-
+ arch/x86/kvm/lapic.h                       |    2 +
+ arch/x86/kvm/mmu.h                         |   31 +
+ arch/x86/kvm/mmu/mmu.c                     |  196 +-
+ arch/x86/kvm/mmu/mmu_internal.h            |  109 +-
+ arch/x86/kvm/mmu/page_track.c              |    3 +
+ arch/x86/kvm/mmu/paging_tmpl.h             |    2 +-
+ arch/x86/kvm/mmu/spte.c                    |   17 +-
+ arch/x86/kvm/mmu/spte.h                    |   27 +-
+ arch/x86/kvm/mmu/tdp_iter.h                |   14 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                 |  421 ++-
+ arch/x86/kvm/mmu/tdp_mmu.h                 |    7 +-
+ arch/x86/kvm/smm.h                         |    7 +-
+ arch/x86/kvm/svm/svm.c                     |    1 +
+ arch/x86/kvm/vmx/common.h                  |  166 +
+ arch/x86/kvm/vmx/main.c                    | 1239 ++++++++
+ arch/x86/kvm/vmx/pmu_intel.c               |   46 +-
+ arch/x86/kvm/vmx/pmu_intel.h               |   28 +
+ arch/x86/kvm/vmx/posted_intr.c             |   43 +-
+ arch/x86/kvm/vmx/posted_intr.h             |   13 +
+ arch/x86/kvm/vmx/tdx.c                     | 3229 ++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h                     |  272 ++
+ arch/x86/kvm/vmx/tdx_arch.h                |  221 ++
+ arch/x86/kvm/vmx/tdx_errno.h               |   43 +
+ arch/x86/kvm/vmx/tdx_error.c               |   20 +
+ arch/x86/kvm/vmx/tdx_ops.h                 |  267 ++
+ arch/x86/kvm/vmx/vmcs.h                    |    5 +
+ arch/x86/kvm/vmx/vmx.c                     |  676 ++--
+ arch/x86/kvm/vmx/vmx.h                     |   52 +-
+ arch/x86/kvm/vmx/x86_ops.h                 |  257 ++
+ arch/x86/kvm/x86.c                         |  117 +-
+ arch/x86/kvm/x86.h                         |    2 +
+ arch/x86/virt/vmx/tdx/seamcall.S           |    4 +
+ arch/x86/virt/vmx/tdx/tdx.c                |   48 +-
+ arch/x86/virt/vmx/tdx/tdx.h                |   51 -
+ include/linux/kvm_host.h                   |    1 +
+ include/linux/kvm_types.h                  |    1 +
+ include/uapi/linux/kvm.h                   |   87 +
+ tools/arch/x86/include/uapi/asm/kvm.h      |   96 +
+ virt/kvm/kvm_main.c                        |   31 +-
+ 58 files changed, 8280 insertions(+), 759 deletions(-)
+ create mode 100644 Documentation/virt/kvm/x86/intel-tdx.rst
+ create mode 100644 Documentation/virt/kvm/x86/tdx-tdp-mmu.rst
+ create mode 100644 arch/x86/kvm/vmx/common.h
+ create mode 100644 arch/x86/kvm/vmx/main.c
+ create mode 100644 arch/x86/kvm/vmx/pmu_intel.h
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
+ create mode 100644 arch/x86/kvm/vmx/tdx.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_error.c
+ create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
+ create mode 100644 arch/x86/kvm/vmx/x86_ops.h
+
+-- 
+2.25.1
+
