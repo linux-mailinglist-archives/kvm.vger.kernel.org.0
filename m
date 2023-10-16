@@ -2,135 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C624E7CB125
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 19:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8907CB183
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 19:46:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbjJPRQZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 13:16:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
+        id S232198AbjJPRqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 13:46:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232985AbjJPRQN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 13:16:13 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA636181
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 10:07:43 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-3296b3f03e5so4126974f8f.2
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 10:07:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697476062; x=1698080862; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0+zQrYEvXnLCHkkOB8VHblH7XpBcPGsp++uxmjtzIDQ=;
-        b=R5q5if37bmR9W0Obgf+OkjD3jRitvtuP7yWFnjCjVRl6OxOIcEMUQEKMD5pdkK3bmU
-         /8GIdFp6zGwT7ytd+2t7X9eBL38eef9g3qqPMAIKbztCkpZyXWn/ZbbEl3uSAt/IAfyt
-         PTatdPbs7dgfm+dEMBWB0OdwV3igSVocR8Sebt11vmj06zTawLLp7q950KbqajENhaaz
-         L/sxxXTgdSpv9YpS0KkZHIpvZnROGRFuYgGtimVCeImL5zuA/ygH5dMrEZgpK4o1zWvc
-         rjFvGxWvK2jHVY/LFmlX4FrBoDchHCnSXcdeZ/GlGAp6/HWfxFefk/23wZHTyTr1yu/r
-         oyJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697476062; x=1698080862;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0+zQrYEvXnLCHkkOB8VHblH7XpBcPGsp++uxmjtzIDQ=;
-        b=BjFEmdSJPuYwWbrUtLie4ak65LWbegWql/GeIPwPJlMaiSBk/CuBLgVoYcAFQDbiET
-         scvWDbOvjuqlfsTQ4E9c71EIGCYTVbmMp4JluSpJcu4o0GXdbctMLr144cq/ENUgrCBs
-         4U/aNACyZFb7txKrI94o2Ooko/AytB/QkiWRBctmzFm4fiSad5/1hGo+cp0DhGg+wPCg
-         F5XI19hNA181cdRCzmpnyezFjq2/5zBbK61CVinRuDcTNJeVtHvKqbWjviUcy0BZ7Dp6
-         RZ4Yq1vco42toWB74/bjRuVvEgo2rzKJBhn4nY2Qunx5Af2JIz9sIE+iFCe6dIGbLzSx
-         KKkQ==
-X-Gm-Message-State: AOJu0YwB7tqtRliJHFVHF32WvOKgJDsYmM1AjDzlcXfX59keypBiihHq
-        6zb3CvQ63QS3s8C0GSUbe6ckMTgxiXMrIf4MQmN2bg==
-X-Google-Smtp-Source: AGHT+IFK6RKBNEvODd5aHPnTEVKQvQycQVUxoXfxKTVAtpxKSS6i088tsqV/S0xtwtYtI9wGd7+5xo/c/eRvSQ8KRHg=
-X-Received: by 2002:a5d:5247:0:b0:32d:9585:8680 with SMTP id
- k7-20020a5d5247000000b0032d95858680mr36710wrc.4.1697476062129; Mon, 16 Oct
- 2023 10:07:42 -0700 (PDT)
+        with ESMTP id S230271AbjJPRqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 13:46:31 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248889F;
+        Mon, 16 Oct 2023 10:46:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZOPlksfz7hYbLFVufRRDspDkQWoIPWJkp929ZOb36sJL0OxW4d6WNfELsTpjYUmBW19TsI+Qqdn+gaf79k/S5c+6bUxncuqFCAJXd1Gi08fl26N9syElcUdP+hwWZAowaeXHg/D1eWsiJ9FDpfeIBoeGgRlR0I/46+jrYYRsK3YV9srL6W5xYeZYpS2b1cv+n0Zb4gYWSy7BTfmH740VeZJTcMazSdCJXVc3aaC8kbXJFaUp5i1QEkciLRZ5ehQM/WZZJotRqz/OV0iYndHN+wobJ/qNUM6g9QdakuzCjiInEO7z3JGPZn9deArLIv39T7OueRpoPoFFBVAEIy/ztQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=15uE4DSkg2AyvMelVDkZH4tovHTZJdm2K71GECmLDu4=;
+ b=cS8WASBCwfA5zhSGbpM3hcmN8AMFtmhrtN86AxgXps/VODmkD9vdTbNrE/JnsYxWDUtj8fVJw8Nw+T/iLenlgnHORh1oPU0qv2wpfWH5+MmRkS28Zaztm9N7JClIPlqmQQVaMH7hVk6Ilc4ZWqjKSWNywKWVnWRhMcYYLhtII04r8wmwJA89fkDEo9pogzBYYBemk8yBB4gxqRKEKKzpZmFeKJ+aU0hOerVqRPlhCBAlnPsEeBkNDHeBN7UXHBJjSX3Vu/W2HCQdDtyCkdXOozkjAzqy8rkzD+r+h1llBsbKm9/wDuy2pd9G4WgkTsWEcugCDiTddVu3c/nUAQ8GJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=15uE4DSkg2AyvMelVDkZH4tovHTZJdm2K71GECmLDu4=;
+ b=VEiIKzB0CJrIM3nD4O1EgM7wr5e6uegutDC11YQS5UGNOwse3M9hyVZzZuZNIWFuL68/PdGPiuttY5MUzwEiYu4COsqRK/hmDP/a855BhPpiEYM1HCTDWRwGYml04QVq+0mDHEHuvsfDSrJlIpnFfMedlIYojkIeFFhkw5mHtGmVyty+ARimF+Y4MAkfeHni2q1/WTJ75gcWnIOHV7zPf+Xc4vgSQt379B2B+6HaMpV+zp4JyYZdWSxCzmSz0Evq7TUPfGhE1OFtlAtmsgsPyOH5+/DcwUZ6pLrWItzhvYgKAiD+Hbfq36iNdHDEkCoLNKaSHqEF/Fat7AqQeBwEbQ==
+Received: from DM6PR02CA0112.namprd02.prod.outlook.com (2603:10b6:5:1b4::14)
+ by BL1PR12MB5142.namprd12.prod.outlook.com (2603:10b6:208:312::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Mon, 16 Oct
+ 2023 17:46:27 +0000
+Received: from DS3PEPF000099E2.namprd04.prod.outlook.com
+ (2603:10b6:5:1b4:cafe::b6) by DM6PR02CA0112.outlook.office365.com
+ (2603:10b6:5:1b4::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36 via Frontend
+ Transport; Mon, 16 Oct 2023 17:46:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF000099E2.mail.protection.outlook.com (10.167.17.201) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 17:46:26 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 16 Oct
+ 2023 10:46:13 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 16 Oct
+ 2023 10:46:13 -0700
+Received: from Asurada-Nvidia (10.127.8.9) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Mon, 16 Oct 2023 10:46:12 -0700
+Date:   Mon, 16 Oct 2023 10:46:10 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Yi Liu <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "zhenzhong.duan@intel.com" <zhenzhong.duan@intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
+Subject: Re: [PATCH v2 1/6] iommu: Add new iommu op to create domains owned
+ by userspace
+Message-ID: <ZS124n0LYj4kl/4c@Asurada-Nvidia>
+References: <20230928071528.26258-1-yi.l.liu@intel.com>
+ <20230928071528.26258-2-yi.l.liu@intel.com>
+ <ZSuROTyaxePoVFA+@Asurada-Nvidia>
+ <20231016120454.GS3952@nvidia.com>
 MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
- <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com> <ZSXg2CjvVb0ugikT@google.com>
-In-Reply-To: <ZSXg2CjvVb0ugikT@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 16 Oct 2023 10:07:12 -0700
-Message-ID: <CALzav=fX+cCXQBXhxvRx0KZvHP=GdbP88Kvk9pnx=Ndsf9awEw@mail.gmail.com>
-Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
-        ricarkol@google.com, axelrasmussen@google.com, peterx@redhat.com,
-        nadav.amit@gmail.com, isaku.yamahata@gmail.com,
-        kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231016120454.GS3952@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099E2:EE_|BL1PR12MB5142:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d3ce442-29b6-4531-eb0c-08dbce6fd251
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cVOR8PcYm+gaXAOJv3Thn+1sfMsAxjdQ0ilQPJNakSL9agIkDRGDt+mYIBgIaXURzXX8SX7mCaL7J054SjUivuihzMUUffj4GLqfzeGp/cuoStGIE5ECX+mLXlZ158n2M2joD6R1Kysz9Xdi/eBe7ZlOBr/yue4tC7QLOwEyk+TR1QdFs0VUbh8936mVa3r+h1ALZMaTAu38i8vaPPD9GGHJtWk391QLFHLUW05kRBHVZ/sF7Bp/TYiRIQqAkD8aBCQfg7EdzUtHHSOX58U5oiiHMlfNDNkicYYmrwzY/opFTKKI4WgIRSQodqEbq+kFPfu2SQbhgw9Xdm4VHjcXG8iRYeYEIinQPV4LECtDhfLootnPGp/CtpGpbEXBW5LsbQ4PGuCsMTa0eVBk05CvbhMayRo/E5EpY1y47OUy+l/ndCuPi8KaYIiOm4APEUZHihyELseNXcl3Viuf8cght4qfFKmhLAx7LZ9PoXvaRQ5TsIr4Iq7MwVKIzipEg/aM0RqQ3xhJdXTYDkRWlhX/JnIQ0B1ygmAlO1gDTHiI3rtVV8errAwIgNIxtbAJTm4BlXN1Raj06mA1tlUCXz/AJjMqVYrqwF3i5+XpiF+meqdumBAAdYGWaIREbT0lmJ5ZnTWS1B6CNI5WGVohB1yM7ZLvOfUGNva9rrx8e9hpwpdovqZNw1cLvf15Wx2cBg7kFOIeVboYfH5LA9B0ekpMSBqR2J2LTWva+WvWaq9vnt7B/qSi23r0/O1Bw/vA0MHD
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(396003)(346002)(39860400002)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(82310400011)(40470700004)(46966006)(36840700001)(83380400001)(336012)(26005)(426003)(5660300002)(4326008)(41300700001)(6862004)(8676002)(8936002)(40460700003)(86362001)(7636003)(356005)(40480700001)(55016003)(82740400003)(36860700001)(33716001)(47076005)(2906002)(478600001)(316002)(7416002)(54906003)(6636002)(70206006)(70586007)(9686003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 17:46:26.6926
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d3ce442-29b6-4531-eb0c-08dbce6fd251
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS3PEPF000099E2.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5142
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Oct 10, 2023, David Matlack wrote:
-> > On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.c=
-om> wrote:
-> > >
-> > > +::
-> > > +       union {
-> > > +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
-> > > +               struct {
-> > > +                       __u64 flags;
-> > > +                       __u64 gpa;
-> > > +                       __u64 len; /* in bytes */
-> >
-> > I wonder if `gpa` and `len` should just be replaced with `gfn`.
-> >
-> > - We don't seem to care about returning an exact `gpa` out to
-> > userspace since this series just returns gpa =3D gfn * PAGE_SIZE out to
-> > userspace.
-> > - The len we return seems kind of arbitrary. PAGE_SIZE on x86 and
-> > vma_pagesize on ARM64. But at the end of the day we're not asking the
-> > kernel to fault in any specific length of mapping. We're just asking
-> > for gfn-to-pfn for a specific gfn.
-> > - I'm not sure userspace will want to do anything with this information=
-.
->
-> Extending ABI is tricky.  E.g. if a use case comes along that needs/wants=
- to
-> return a range, then we'd need to add a flag and also update userspace to=
- actually
-> do the right thing.
->
-> The page fault path doesn't need such information because hardware gives =
-a very
-> precise faulting address.  But if we ever get to a point where KVM provid=
-es info
-> for uaccess failures, then we'll likely want to provide the range.  E.g. =
-if a
-> uaccess splits a page, on x86, we'd either need to register our own excep=
-tion
-> fixup and use custom uaccess macros (eww), or convice the world that exte=
-nding
-> ex_handler_uaccess() and all of the uaccess macros that they need to prov=
-ide the
-> exact address that failed.
+On Mon, Oct 16, 2023 at 09:04:54AM -0300, Jason Gunthorpe wrote:
+> On Sun, Oct 15, 2023 at 12:14:01AM -0700, Nicolin Chen wrote:
+> > On Thu, Sep 28, 2023 at 12:15:23AM -0700, Yi Liu wrote:
+> > 
+> > > diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+> > > index b4ba0c0cbab6..4a7c5c8fdbb4 100644
+> > > --- a/include/uapi/linux/iommufd.h
+> > > +++ b/include/uapi/linux/iommufd.h
+> > > @@ -347,10 +347,20 @@ struct iommu_vfio_ioas {
+> > >  };
+> > >  #define IOMMU_VFIO_IOAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_VFIO_IOAS)
+> > > 
+> > > +/**
+> > > + * enum iommufd_hwpt_alloc_flags - Flags for HWPT allocation
+> > > + * @IOMMU_HWPT_ALLOC_NEST_PARENT: If set, allocate a domain which can serve
+> > > + *                                as the parent domain in the nesting
+> > > + *                                configuration.
+> > 
+> > I just noticed a nit here: we should probably align with other
+> > parts of this file by using "HWPT" v.s. "domain"? I.e.
+> > 
+> > + * @IOMMU_HWPT_ALLOC_NEST_PARENT: If set, allocate a HWPT which can serve
+> > + *                                as the parent HWPT in the nesting
+> > + *                                configuration.
+> 
+> Yes
 
-I wonder if userspace might need a precise fault address in some
-situations? e.g. If KVM returns -HWPOISON for an access that spans a
-page boundary, userspace won't know which is poisoned. Maybe SNP/TDX
-need precise fault addresses as well? I don't know enough about how
-SNP and TDX plan to use this UAPI.
-
-
->
-> And for SNP and TDX, I believe the range will be used when the guest uses=
- a
-> hardware-vendor-defined hypercall to request conversions between private =
-and
-> shared.  Or maybe the plan is to funnel those into KVM_HC_MAP_GPA_RANGE?
+Should we resend? Or would it be possible for you to update it
+in your for-next tree?
