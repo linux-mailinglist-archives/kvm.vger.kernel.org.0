@@ -2,137 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5009F7CAD50
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:20:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86DE77CAD5C
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 17:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233684AbjJPPUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 11:20:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57294 "EHLO
+        id S233425AbjJPPWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 11:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233582AbjJPPUt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 11:20:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1781F0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:20:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697469606;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=AEix8IoCjFYipbhyqgKL2qJL2YZHCFj9VqmEx2SLGiw=;
-        b=SpPhvC8TmWVrm6zy97d3BY/Umc8wwkcRv+Z3VVTSz207GNwayu2FANcUQYHsIJuaDVdhKk
-        5pufUMsi22pR8hFCos6WSubruc88AghGZpSwYptVPZk8uhEQnOYJIr6mlDk3yI0Opvl9m0
-        mH4hhuS53EDUEfSBkEvxufz1EFhHNsI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-_6jHJ399OXanytTzmoicVQ-1; Mon, 16 Oct 2023 11:20:00 -0400
-X-MC-Unique: _6jHJ399OXanytTzmoicVQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9b95fa56bd5so324556466b.0
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 08:19:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697469599; x=1698074399;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AEix8IoCjFYipbhyqgKL2qJL2YZHCFj9VqmEx2SLGiw=;
-        b=rNE51lF2m1uegcQRe86SZFODHS4BRtKCdDs4yHg0qJkIn4pkO6kQWI3/e4mMGycdvL
-         h4QVh1GC+ASv8Js4GRdPvYPP/t+BwIhhRjy9lyM46KJTs0uM7345RPuIV9/pjoHr6fOe
-         lb657SpIro2OykzNAIkgKLXc+PY8aD9Fj90CILBX9msZ2GvOCu+JMVF7rWzSEmncQ+RO
-         2RXApiRSUrurUtzyJTHG4c6nf57szigclq8QdFVdOKwB3fbAJXiiAGSbT4p7n/qUk8u1
-         JOQ0fhU3hdodJGpU1cAN+OqGc9kb3WSqHfxNO6dlbHWfBDzeyfR2nhfsC0mvwGFbUvZI
-         Umfw==
-X-Gm-Message-State: AOJu0YygyQd5vA3KgCzSyvBELmXTmgRk1377eCJ6p/Exf0C57QxQmhgy
-        gLtXQIRjcsIx54fW9GibM6P4ExoiekHxFi+1pIB92WKPg9cEr6JcyqLf1vAKuGpIUPHpq23AgoI
-        Yru86IOqY2xG+
-X-Received: by 2002:a17:906:2109:b0:9ba:65e:750e with SMTP id 9-20020a170906210900b009ba065e750emr20293556ejt.32.1697469598876;
-        Mon, 16 Oct 2023 08:19:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEb9fPiHlPImABzViiZVbA7Y0gtuhzGOpmK/RHwaaH407PNB9TewIyWSMoP3jZFn9L9XkN9ig==
-X-Received: by 2002:a17:906:2109:b0:9ba:65e:750e with SMTP id 9-20020a170906210900b009ba065e750emr20293542ejt.32.1697469598512;
-        Mon, 16 Oct 2023 08:19:58 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id z4-20020a1709064e0400b00982a352f078sm4274087eju.124.2023.10.16.08.19.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:19:57 -0700 (PDT)
-Message-ID: <c46606c8-fb6d-4e81-843c-47a0443bebc1@redhat.com>
-Date:   Mon, 16 Oct 2023 17:19:56 +0200
+        with ESMTP id S229459AbjJPPWO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 11:22:14 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2073.outbound.protection.outlook.com [40.107.237.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9446AC;
+        Mon, 16 Oct 2023 08:22:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SH8Fr6nG1NXcXesPkoqsB4dkwA/Ns8Thy+iK+565/EWsiT1GX+gG7f67wkcLq5K0uJOs/GK1MdCE7iYQVZgs/ac/hsSDi/NamuSgr5WilN4hjrNqw/+5vMHJymswFB44Q6ke4umuF2zTtFtx8k8pB3ot1JuUoGVd0zPXKbuE3pnzSlmWTBwOOQLI6psXTBwNbruCfx1ET+mKGiwhNJ9a0GnNwa8TT/z+AuqTKmo9c4xMgzO/xkxO6MOy7Xq0CdtSjgIxLiWuWPrSfGuCCjTdUtKwpi5XLDjrTM/pMooNvj8fIBejp2OpCgG0IVD9RKecdr8QIo7yDAZBcZ7aq9nAJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CnOgOgc/xF/znhbhik3tEbOGfsPAveHaNExXmuj1Jmo=;
+ b=jcPmj4FKYo2SD6JYJo936UZm9TbOlO7uXQk9uC4jTXgxw1QwYmrLOa2woHHvYrre5pN3JGGCoEm0kwvfJNuDmbLTFdJn3WdjmEOuuGXpq/pGuq6AvUt6XbyMN3au6kAi69iP/Vs0J8WqY9qtbSMAJ7R4qBXSWSdbyGO0BfRd5RTByraag5Rsz2gZtOWWlAB/nlmeMdXEmgAZAuh10dIJNfD3H1YY77Bkyrz2t9oyJXrWbmBCLP0bGq9Qdo3YwG29cflnknKh+2P+GhhyEMn1e7Hw83yxnCFaDcnCU2+W0ONAliuU44XYYFUSZP3dbRSa6grdFga62u+8K2Dn5DMiCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CnOgOgc/xF/znhbhik3tEbOGfsPAveHaNExXmuj1Jmo=;
+ b=GvgUPKWPXx9rg7Oinm3/BGmrMipaIMD5RauhBrS/iaxRnR+6QFoI1J11fQvgxsJ4AGgBXhmd/0snVNsw1SWjtN/gjNXSxHcdBH/Ohfvo9gMQhJwVMDNc226E8ahjwOy8mGLqsJAZ3oZrd1o6ZbP6KFUILTpUxNAye8rIMctlOZk=
+Received: from DM6PR03CA0100.namprd03.prod.outlook.com (2603:10b6:5:333::33)
+ by CH3PR12MB7524.namprd12.prod.outlook.com (2603:10b6:610:146::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 16 Oct
+ 2023 15:22:10 +0000
+Received: from DS3PEPF000099DE.namprd04.prod.outlook.com
+ (2603:10b6:5:333:cafe::6e) by DM6PR03CA0100.outlook.office365.com
+ (2603:10b6:5:333::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35 via Frontend
+ Transport; Mon, 16 Oct 2023 15:22:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099DE.mail.protection.outlook.com (10.167.17.200) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 15:22:10 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
+ 2023 10:22:09 -0500
+Date:   Mon, 16 Oct 2023 10:21:48 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Greg KH <gregkh@linuxfoundation.org>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <seanjc@google.com>,
+        <vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
+        <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+        <stable@vger.kernel.org>
+Subject: Re: [PATCH v10 01/50] KVM: SVM: INTERCEPT_RDTSCP is never
+ intercepted anyway
+Message-ID: <20231016152148.4atqpxd3wnyfp7ri@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-2-michael.roth@amd.com>
+ <2023101627-species-unscrew-2730@gregkh>
+ <359d7c57-2a71-419d-b63f-4c5610f48b0f@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH gmem FIXUP] kvm: guestmem: do not use a file system
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <ZSQO4fHaAxDkbGyz@google.com> <20231009200608.GJ800259@ZenIV>
- <ZSRgdgQe3fseEQpf@google.com> <20231009204037.GK800259@ZenIV>
- <ZSRwDItBbsn2IfWl@google.com> <20231010000910.GM800259@ZenIV>
- <ZSSaWPc5wjU9k1Kw@google.com> <20231010003746.GN800259@ZenIV>
- <ZSXeipdJcWZjLx8k@google.com>
- <7c4b1c78-de74-5fff-7327-0863f403eb7e@redhat.com>
- <ZSl2hdfF8XSXss3h@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZSl2hdfF8XSXss3h@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <359d7c57-2a71-419d-b63f-4c5610f48b0f@redhat.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DE:EE_|CH3PR12MB7524:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85fd791b-2960-4e09-dfcc-08dbce5baa83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3+sJEFckqSoXgwRWjkt+1dxMUc65pQjuXZM3fafq1oWYhxYpFDxjIgjyxWhrkyKvOBt0/kASqfwJgZT5cWlhrCvlcHesHmxS3CRXTW3Kbfmt4DoQi88eXlPKnl/ECDhIz0X1F6cIcQm4QAVntM9X0+a1/+rQFMyLLX6CrwqrjcxzS5p4jKJBkrA8UKnd7nSvOYla8Wh2s8XCw5Y4ZI9ibmQGeZQwRPFO5laffkx4rAwKUEwox6JaGPHhN6d41fhQqTbVA/DXJo+UtU3ftabOyu10hI7MtqNGfyC7H18GO5pvPvrF1OhwzEir+W30e0fomerW4+M5nVbf0sLUHkb77RRUkMl5DKrZ76oTMJHEJge/YYmCidojbf0ojSXysm3weJ024OzFy30R8zB79ACULKWVFSVAvlRIepzxn4/F33HXhNX43ANJDQ2Gr+bSAJtoU7FrpmNoEVN0E2qSEHCUbXsJZ9xYJ7O1kY87s9KXu2wokoii/Q3jeGEgqZ2ph0MrI0rszSPxSH/0hkkzFTRzIKRKJibs3TaH6s7te10uvnLgDhUv7TzjDysPX3HgQvGpb9+Z5gXefOeCoiapfkXu/f0U0VXp+djJV92JFj5+TYLxWsTO5Sz57awtF93+qfs8HD0EFWALLdwq0PA3tJeGSJHGzDWrn13gBOT9Qb54OQClc08AudutMC6B22W3OdAZ/5feU8xSqHAdpcAXJ/CNjOgPMsYWQ6pXxwEhzsTL3vLKXY8NpR1igxrtee5YtT5L/cCyykXKtC48sNKyVkAHbg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(136003)(376002)(346002)(230922051799003)(64100799003)(1800799009)(186009)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(40460700003)(16526019)(336012)(1076003)(26005)(2616005)(426003)(6666004)(53546011)(36860700001)(47076005)(83380400001)(7406005)(44832011)(7416002)(41300700001)(5660300002)(8676002)(4326008)(2906002)(478600001)(8936002)(70586007)(54906003)(70206006)(6916009)(316002)(82740400003)(356005)(81166007)(86362001)(36756003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 15:22:10.0390
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85fd791b-2960-4e09-dfcc-08dbce5baa83
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS3PEPF000099DE.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7524
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/13/23 18:55, Sean Christopherson wrote:
-> On Wed, Oct 11, 2023, Paolo Bonzini wrote:
->> Your patch 2 looks good, but perhaps instead of setting the owner we could
->> stash the struct module* in a global, and try_get/put it from open and
->> release respectively?  That is, .owner keeps the kvm module alive and the
->> kvm module keeps kvm-intel/kvm-amd alive.  That would subsume patches 1 and 3.
+On Mon, Oct 16, 2023 at 05:14:38PM +0200, Paolo Bonzini wrote:
+> On 10/16/23 17:12, Greg KH wrote:
+> > On Mon, Oct 16, 2023 at 08:27:30AM -0500, Michael Roth wrote:
+> > > From: Paolo Bonzini <pbonzini@redhat.com>
+> > > 
+> > > svm_recalc_instruction_intercepts() is always called at least once
+> > > before the vCPU is started, so the setting or clearing of the RDTSCP
+> > > intercept can be dropped from the TSC_AUX virtualization support.
+> > > 
+> > > Extracted from a patch by Tom Lendacky.
+> > > 
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: 296d5a17e793 ("KVM: SEV-ES: Use V_TSC_AUX if available instead of RDTSC/MSR_TSC_AUX intercepts")
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > (cherry picked from commit e8d93d5d93f85949e7299be289c6e7e1154b2f78)
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >   arch/x86/kvm/svm/sev.c | 5 +----
+> > >   1 file changed, 1 insertion(+), 4 deletions(-)
+> > 
+> > What stable tree(s) are you wanting this applied to (same for the others
+> > in this series)?  It's already in the 6.1.56 release, and the Fixes tag
+> > is for 5.19, so I don't see where it could be missing from?
 > 
-> I don't think that would be a net positive.  We'd have to implement .open() for
-> several file types just to get a reference to the sub-module.  At that point, the
-> odds of forgetting to implement .open() are about the same as forgetting to set
-> .owner when adding a new file type, e.g. guest_memfd.
+> I tink it's missing in the (destined for 6.7) tree that Michael is basing
+> this series on, so he's cherry picking it from Linus's tree.
 
-Fair enough, it's true that many fops don't have a .open callback already.
+Yes, this and PATCH #2 are both prereqs that have already been applied
+upstream, and are only being included in this series because they are
+preqs for PATCH #3 which is new. Sorry for any confusion.
 
-Paolo
+-Mike
 
+> 
+> Paolo
+> 
