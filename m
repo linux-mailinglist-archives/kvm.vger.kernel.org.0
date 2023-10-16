@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 560947CB002
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F78B7CAF98
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:35:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234472AbjJPQko (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38130 "EHLO
+        id S234017AbjJPQfp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:35:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234265AbjJPQj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:39:28 -0400
+        with ESMTP id S234379AbjJPQfO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:35:14 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F391F769A;
-        Mon, 16 Oct 2023 09:22:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630E67A81;
+        Mon, 16 Oct 2023 09:22:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473374; x=1729009374;
+  t=1697473377; x=1729009377;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yjhldKEQtesjhUjBNJ+oTjkD2MK7pTp/AR1/NzqWdyI=;
-  b=YB9RM6D1RvWYUGJU/3jpXpZF5jPYE8LHGykxuSm9gn+m+W5GKW4AC1Qk
-   4d7As7Bq5S8GfzJrWqJqzxNyqLCrxadmwHHvNFzx704nP8NFiAFV+3FMF
-   Ig8A62Q6IKLhZ4Xh4HuUbX+K618ywq3ll5Zg8DZdoB6dK5Vs2mSikFA/j
-   6YAvhzYzVqf7jcriIm5U7TICXuZxZDSVmG69V29KLZxW8LWoRe9iMP2hl
-   wErV375DY2syEqFPSCzC3miQ0GKtVtbs2uTTGSEH963geyt/xA3bln3sW
-   zwSBkRvvdD+X5181GAGlzmnJ73ssReg4hGxneQyTAQzaYHA2od3KnIlwl
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365826019"
+  bh=zdJ2GT4ARrSNbJp3F6eaxutpQ4DdrmPtIT6M7sepMRw=;
+  b=UWEPnxqfG2Wo4D1BesVo2Q4KyVIALQuEFO/wqngkynQTkOGNV0FsGLEG
+   sWP2LeA2aLDLluof+rThkzb7mVCsEL673Vs0x4OZaz7ifsUsWU5yA25Uq
+   pr0q81Vush4mO6AIIrEW0JgGLYGAHG9m2oX1phfhS2y+6Gut56sxCj8Bs
+   lEdNgS1Lw7wTSqVg4SmAAUR91sBE90R2m7iVS/hXRc2Zuoi4arb0hNQdt
+   sxdVPhMipuWGrNJWnCPUPMLi42BdDKmt+FYiK7DsZkCH+aaRn/tcqTuYR
+   W1FVxZwa21e8bU3LYUlILKzUjehn6zaNWt17tGM/cOZTu78WLhGW3/5nj
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="365826025"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="365826019"
+   d="scan'208";a="365826025"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:36 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087126092"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087126095"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1087126092"
+   d="scan'208";a="1087126095"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:34 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:35 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -47,11 +47,10 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        hang.yuan@intel.com, tina.zhang@intel.com,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: [PATCH v16 029/116] KVM: x86/mmu: Add address conversion functions for TDX shared bit of GPA
-Date:   Mon, 16 Oct 2023 09:13:41 -0700
-Message-Id: <007c6dfc17bb785ec874b94afa0db1aa4410b96b.1697471314.git.isaku.yamahata@intel.com>
+        hang.yuan@intel.com, tina.zhang@intel.com
+Subject: [PATCH v16 030/116] [MARKER] The start of TDX KVM patch series: KVM TDP refactoring for TDX
+Date:   Mon, 16 Oct 2023 09:13:42 -0700
+Message-Id: <81e800b47b5068a4cc7ae0b07b1107c0caf5b571.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -69,97 +68,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX repurposes one GPA bit (51 bit or 47 bit based on configuration) to
-indicate the GPA is private(if cleared) or shared (if set) with VMM.  If
-GPA.shared is set, GPA is covered by the existing conventional EPT pointed
-by EPTP.  If GPA.shared bit is cleared, GPA is covered by TDX module.
-VMM has to issue SEAMCALLs to operate.
+This empty commit is to mark the start of patch series of KVM TDP
+refactoring for TDX.
 
-Add a member to remember GPA shared bit for each guest TDs, add address
-conversion functions between private GPA and shared GPA and test if GPA
-is private.
-
-Because struct kvm_arch (or struct kvm which includes struct kvm_arch. See
-kvm_arch_alloc_vm() that passes __GPF_ZERO) is zero-cleared when allocated,
-the new member to remember GPA shared bit is guaranteed to be zero with
-this patch unless it's initialized explicitly.
-
-Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 ++++
- arch/x86/kvm/mmu.h              | 27 +++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.c          |  5 +++++
- 3 files changed, 36 insertions(+)
+ Documentation/virt/kvm/intel-tdx-layer-status.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index a21c060ffc68..742e97f23573 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1467,6 +1467,10 @@ struct kvm_arch {
- 	 */
- #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
- 	struct kvm_mmu_memory_cache split_desc_cache;
-+
-+#ifdef CONFIG_KVM_MMU_PRIVATE
-+	gfn_t gfn_shared_mask;
-+#endif
- };
+diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+index 8b8186e7bfeb..e893a3d714c7 100644
+--- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
++++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
+@@ -25,6 +25,6 @@ Patch Layer status
+ * TD vcpu enter/exit:                   Not yet
+ * TD vcpu interrupts/exit/hypercall:    Not yet
  
- struct kvm_vm_stat {
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 253fb2093d5d..f5ba6cf589aa 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -304,4 +304,31 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
- 		return gpa;
- 	return translate_nested_gpa(vcpu, gpa, access, exception);
- }
-+
-+static inline gfn_t kvm_gfn_shared_mask(const struct kvm *kvm)
-+{
-+#ifdef CONFIG_KVM_MMU_PRIVATE
-+	return kvm->arch.gfn_shared_mask;
-+#else
-+	return 0;
-+#endif
-+}
-+
-+static inline gfn_t kvm_gfn_to_shared(const struct kvm *kvm, gfn_t gfn)
-+{
-+	return gfn | kvm_gfn_shared_mask(kvm);
-+}
-+
-+static inline gfn_t kvm_gfn_to_private(const struct kvm *kvm, gfn_t gfn)
-+{
-+	return gfn & ~kvm_gfn_shared_mask(kvm);
-+}
-+
-+static inline bool kvm_is_private_gpa(const struct kvm *kvm, gpa_t gpa)
-+{
-+	gfn_t mask = kvm_gfn_shared_mask(kvm);
-+
-+	return mask && !(gpa_to_gfn(gpa) & mask);
-+}
-+
- #endif
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index c1a8560981a3..fe793425d393 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -878,6 +878,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	kvm_tdx->attributes = td_params->attributes;
- 	kvm_tdx->xfam = td_params->xfam;
- 
-+	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
-+		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(51));
-+	else
-+		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(47));
-+
- out:
- 	/* kfree() accepts NULL. */
- 	kfree(init_vm);
+-* KVM MMU GPA shared bits:              Applying
+-* KVM TDP refactoring for TDX:          Not yet
++* KVM MMU GPA shared bits:              Applied
++* KVM TDP refactoring for TDX:          Applying
+ * KVM TDP MMU hooks:                    Not yet
 -- 
 2.25.1
 
