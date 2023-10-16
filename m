@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A7057CAED3
-	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0E5E7CAED7
+	for <lists+kvm@lfdr.de>; Mon, 16 Oct 2023 18:19:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234044AbjJPQRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 12:17:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51646 "EHLO
+        id S233997AbjJPQRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 12:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233657AbjJPQRD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 12:17:03 -0400
+        with ESMTP id S233990AbjJPQRI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 12:17:08 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D85133;
-        Mon, 16 Oct 2023 09:16:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7191AC;
+        Mon, 16 Oct 2023 09:16:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697473013; x=1729009013;
+  t=1697473016; x=1729009016;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7q2PCtImM/JaM02G7jQMfIFieP59b4RsodnEKsHhXcM=;
-  b=CmlP5yyzX/kX3e04O/8fXFNgdsCSEaNhDUdT2u3Pyy8YuERLkB/Yzham
-   wg6e7J6oNQ8jEuD69kLVBmvxeb0xH0lfvuFEaVDQhObmEKPuZwajLA+Hb
-   pXsOyoznI3gezR2lAXoRpc0JkILm3oPfJwx/AYzFAld0c52XYzYBTQa7u
-   kA/LkUZyIWbt1tS9AIjc956J+/qDlsICd7LJ6RFR7eEEqbBoVzYUhEQPn
-   75A61xJZbI8uSFry7QXMVJpR5TLOWQ7HoD/kg06hDj5eGwp8AmYSD9URN
-   ekhpDICFbkgmYdmyUHUEyKjGBGimXcpaDIX1MS1UC91es0fzOMzMRMEhs
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921796"
+  bh=70DIAkp5H9Twm+1DpLwjBl0Q+s4DGDKiXxLUxtSLxFI=;
+  b=EMukjmBwDlS1d/b8eWRx7J4dtKXgx8hWjlmr+Aza9iiaFaYNExgi1LSd
+   R58YfqgdqZWWyOgglrVZHCcbeMdQAyJQdSFo4Aqqj72uTlpE3J6NanFMi
+   iF2RPUoKQtnSCWoRb/HYzWLOhGTGml2PweuWkF69gtka9eS4+axBLQfgO
+   v6B941f12orJQEi2Pn+weayZQ61sJO6LHTakTvHx1nguRy7Gc8g8yScqK
+   Fa+Hm8tdK9QTPxUBNoAUIUZOatg8rGBSD7gQHi+GVxF+TVg0t6JF3pO8D
+   rtdamULwajQO3x2WE3WWjojf37mOs8+dFZCJ20usSHPnrFum+DaCiwTUl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364921804"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364921796"
+   d="scan'208";a="364921804"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:45 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:46 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448133"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="846448138"
 X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="846448133"
+   d="scan'208";a="846448138"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:15:45 -0700
 From:   isaku.yamahata@intel.com
@@ -47,10 +47,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v16 051/116] KVM: TDX: Add accessors VMX VMCS helpers
-Date:   Mon, 16 Oct 2023 09:14:03 -0700
-Message-Id: <93a62133f20b0a4b450b6a4389ae2e6e4991ca1f.1697471314.git.isaku.yamahata@intel.com>
+        hang.yuan@intel.com, tina.zhang@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v16 052/116] KVM: TDX: Add load_mmu_pgd method for TDX
+Date:   Mon, 16 Oct 2023 09:14:04 -0700
+Message-Id: <232ab65437c856c6217fd7ef9f6d473fb5ed1091.1697471314.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1697471314.git.isaku.yamahata@intel.com>
 References: <cover.1697471314.git.isaku.yamahata@intel.com>
@@ -66,122 +67,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TDX defines SEAMCALL APIs to access TDX control structures corresponding to
-the VMX VMCS.  Introduce helper accessors to hide its SEAMCALL ABI details.
+For virtual IO, the guest TD shares guest pages with VMM without
+encryption.  Shared EPT is used to map guest pages in unprotected way.
 
+Add the VMCS field encoding for the shared EPTP, which will be used by
+TDX to have separate EPT walks for private GPAs (existing EPTP) versus
+shared GPAs (new shared EPTP).
+
+Set shared EPT pointer value for the TDX guest to initialize TDX MMU.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/tdx.h | 95 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ arch/x86/include/asm/vmx.h |  1 +
+ arch/x86/kvm/vmx/main.c    | 13 ++++++++++++-
+ arch/x86/kvm/vmx/tdx.c     |  5 +++++
+ arch/x86/kvm/vmx/x86_ops.h |  4 ++++
+ 4 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 961a7da2452a..d92a75c78e6e 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -57,6 +57,101 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
- 	return container_of(vcpu, struct vcpu_tdx, vcpu);
+diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+index f703bae0c4ac..9deb663a42e3 100644
+--- a/arch/x86/include/asm/vmx.h
++++ b/arch/x86/include/asm/vmx.h
+@@ -236,6 +236,7 @@ enum vmcs_field {
+ 	TSC_MULTIPLIER_HIGH             = 0x00002033,
+ 	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
+ 	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
++	SHARED_EPT_POINTER		= 0x0000203C,
+ 	PID_POINTER_TABLE		= 0x00002042,
+ 	PID_POINTER_TABLE_HIGH		= 0x00002043,
+ 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index eab31d389916..17d119f3c4a8 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -143,6 +143,17 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vmx_vcpu_reset(vcpu, init_event);
  }
  
-+static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
++static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
++			int pgd_level)
 +{
-+#define VMCS_ENC_ACCESS_TYPE_MASK	0x1UL
-+#define VMCS_ENC_ACCESS_TYPE_FULL	0x0UL
-+#define VMCS_ENC_ACCESS_TYPE_HIGH	0x1UL
-+#define VMCS_ENC_ACCESS_TYPE(field)	((field) & VMCS_ENC_ACCESS_TYPE_MASK)
++	if (is_td_vcpu(vcpu)) {
++		tdx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
++		return;
++	}
 +
-+	/* TDX is 64bit only.  HIGH field isn't supported. */
-+	BUILD_BUG_ON_MSG(__builtin_constant_p(field) &&
-+			 VMCS_ENC_ACCESS_TYPE(field) == VMCS_ENC_ACCESS_TYPE_HIGH,
-+			 "Read/Write to TD VMCS *_HIGH fields not supported");
-+
-+	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
-+
-+#define VMCS_ENC_WIDTH_MASK	GENMASK(14, 13)
-+#define VMCS_ENC_WIDTH_16BIT	(0UL << 13)
-+#define VMCS_ENC_WIDTH_64BIT	(1UL << 13)
-+#define VMCS_ENC_WIDTH_32BIT	(2UL << 13)
-+#define VMCS_ENC_WIDTH_NATURAL	(3UL << 13)
-+#define VMCS_ENC_WIDTH(field)	((field) & VMCS_ENC_WIDTH_MASK)
-+
-+	/* TDX is 64bit only.  i.e. natural width = 64bit. */
-+	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
-+			 (VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_64BIT ||
-+			  VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_NATURAL),
-+			 "Invalid TD VMCS access for 64-bit field");
-+	BUILD_BUG_ON_MSG(bits != 32 && __builtin_constant_p(field) &&
-+			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_32BIT,
-+			 "Invalid TD VMCS access for 32-bit field");
-+	BUILD_BUG_ON_MSG(bits != 16 && __builtin_constant_p(field) &&
-+			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_16BIT,
-+			 "Invalid TD VMCS access for 16-bit field");
++	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
 +}
 +
-+static __always_inline void tdvps_state_non_arch_check(u64 field, u8 bits) {}
-+static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
-+
-+#define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
-+static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
-+							u32 field)		\
-+{										\
-+	struct tdx_module_args out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_rd(tdx->tdvpr_pa, TDVPS_##uclass(field), &out);		\
-+	if (KVM_BUG_ON(err, tdx->vcpu.kvm)) {					\
-+		pr_err("TDH_VP_RD["#uclass".0x%x] failed: 0x%llx\n",		\
-+		       field, err);						\
-+		return 0;							\
-+	}									\
-+	return (u##bits)out.r8;							\
-+}										\
-+static __always_inline void td_##lclass##_write##bits(struct vcpu_tdx *tdx,	\
-+						      u32 field, u##bits val)	\
-+{										\
-+	struct tdx_module_args out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), val,		\
-+		      GENMASK_ULL(bits - 1, 0), &out);				\
-+	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] = 0x%llx failed: 0x%llx\n",	\
-+		       field, (u64)val, err);					\
-+}										\
-+static __always_inline void td_##lclass##_setbit##bits(struct vcpu_tdx *tdx,	\
-+						       u32 field, u64 bit)	\
-+{										\
-+	struct tdx_module_args out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), bit, bit, &out);	\
-+	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] |= 0x%llx failed: 0x%llx\n",	\
-+		       field, bit, err);					\
-+}										\
-+static __always_inline void td_##lclass##_clearbit##bits(struct vcpu_tdx *tdx,	\
-+							 u32 field, u64 bit)	\
-+{										\
-+	struct tdx_module_args out;						\
-+	u64 err;								\
-+										\
-+	tdvps_##lclass##_check(field, bits);					\
-+	err = tdh_vp_wr(tdx->tdvpr_pa, TDVPS_##uclass(field), 0, bit, &out);	\
-+	if (KVM_BUG_ON(err, tdx->vcpu.kvm))					\
-+		pr_err("TDH_VP_WR["#uclass".0x%x] &= ~0x%llx failed: 0x%llx\n",	\
-+		       field, bit,  err);					\
-+}
-+
-+TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
-+TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
-+TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
-+
- static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
+ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
  {
- 	struct tdx_module_args out;
+ 	if (!is_td(kvm))
+@@ -275,7 +286,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.write_tsc_offset = vmx_write_tsc_offset,
+ 	.write_tsc_multiplier = vmx_write_tsc_multiplier,
+ 
+-	.load_mmu_pgd = vmx_load_mmu_pgd,
++	.load_mmu_pgd = vt_load_mmu_pgd,
+ 
+ 	.check_intercept = vmx_check_intercept,
+ 	.handle_exit_irqoff = vmx_handle_exit_irqoff,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index fe793425d393..d26b96cf94f9 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -425,6 +425,11 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	 */
+ }
+ 
++void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
++{
++	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
++}
++
+ static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
+ {
+ 	struct kvm_tdx_capabilities __user *user_caps;
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 88e117db748c..36dfdf3f17e7 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -152,6 +152,8 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+ 
+ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
++
++void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+ #else
+ static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return -EOPNOTSUPP; }
+ static inline void tdx_hardware_unsetup(void) {}
+@@ -173,6 +175,8 @@ static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+ 
+ static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
++
++static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.25.1
 
