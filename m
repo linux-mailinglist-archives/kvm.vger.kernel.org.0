@@ -2,70 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB9797CB6AE
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 00:48:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88DFC7CB6B7
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 00:51:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233775AbjJPWsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 18:48:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45662 "EHLO
+        id S233854AbjJPWv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 18:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232345AbjJPWsa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 18:48:30 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42332F7
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 15:48:23 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6be1065cc81so1583693b3a.3
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 15:48:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697496502; x=1698101302; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=84aTo4Tf+aZUy0HcQ/Zqt9HQ4tRBchQvuwbCa4iyIjE=;
-        b=s/nWiyMENdy1hEDXEZO9QIdBcRB83YoiDaOJjVCPukUwiRsZ93UEmU/M18N246xNUC
-         TxzzQQQ+5f50/G8G1sjra8hC217UR+/ZugynQQtAmwx5bzkdRmWRyiLL8gclO52W9ORA
-         x+Y4jDXKpvqhJRSRYuq3GS8x39BxBefpwHRQMtfeROUX+zQoUAEanTiO8d3zvgUfoztQ
-         rFUnOuG6fxdcM4dyhv9WJpkrvCG+XqGHBvXJloxnKNeO6/a7XHpG9HSVPRDepQubgaFw
-         Q2GNJYD9UviNF7k82Lmc2lHlksAMoTw+W8dcTqLuI+jfYFRgcKME0RWtzK4GpvMmcFn+
-         oV5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697496502; x=1698101302;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=84aTo4Tf+aZUy0HcQ/Zqt9HQ4tRBchQvuwbCa4iyIjE=;
-        b=Yl/DNkelpA0YG8P4HLk7k3c5KwSZ0yu77DIKCYFJBYtrAsAISPwU4WbmAKqiPeTUZU
-         FUudf5JOLQg7rt9dCvDwpixj7RUyHktOXWZlN0SNHiXbJHwqeg1BT2uxv6wkt9WQGUYV
-         TbrUHVwbnOPQcbvU3VueJwLRJoET1a3wSJW07B3skNZGGTZKWbjAZP9cKBZSgDoILYpC
-         SMKYVDwo/5cR4ohiMytVY/h0joDIfw7iPQoGH3XExwcVOYN3T3sXe7Ti+BNrDTr2+Qme
-         vCrOflBGQiS0RUx5JgKPVIqNsOb8F6K4pkNcq+C9Y/kl5pAyFVZrLXSz+3/6UEwbngVb
-         /V8Q==
-X-Gm-Message-State: AOJu0YxGblpSv0gTmqut60y6TGU7VkPNQ2VtCiNTW9IkDh5kCuNGEjL/
-        TfvL2N+3smR3qzqnCIa683NtjdHIpPY=
-X-Google-Smtp-Source: AGHT+IF0TmBQ7Ykmhy2UUdvxRB8M72Fy7i6DMqyApsOvlfciXQg+hCzL0X1i1/bPqE+coJRrJ66yG2/lo0U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:d5b:b0:68e:24fe:d9a with SMTP id
- n27-20020a056a000d5b00b0068e24fe0d9amr13672pfv.2.1697496502682; Mon, 16 Oct
- 2023 15:48:22 -0700 (PDT)
-Date:   Mon, 16 Oct 2023 15:48:21 -0700
-In-Reply-To: <b3721f33-d5b0-79db-8500-d6b93dded0c1@oracle.com>
-Mime-Version: 1.0
-References: <ZSXqZOgLYkwLRWLO@google.com> <8f3493ca4c0e726d5c3876bb7dd2cfc432d9deaa.camel@infradead.org>
- <ZSmHcECyt5PdZyIZ@google.com> <cf2b22fc-78f5-dfb9-f0e6-5c4059a970a2@oracle.com>
- <ZSnSNVankCAlHIhI@google.com> <BD4C4E71-C743-4B79-93CA-0F3AC5423412@infradead.org>
- <993cc7f9-a134-8086-3410-b915fe5db7a5@oracle.com> <03afed7eb3c1e5f4b2b8ecfd8616ae5c6f1819e9.camel@infradead.org>
- <ZS2Fq5dr2CeZaBok@google.com> <b3721f33-d5b0-79db-8500-d6b93dded0c1@oracle.com>
-Message-ID: <ZS29teniU3xer0Xu@google.com>
-Subject: Re: [PATCH RFC 1/1] KVM: x86: add param to update master clock periodically
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     David Woodhouse <dwmw2@infradead.org>,
-        Joe Jin <joe.jin@oracle.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        with ESMTP id S233655AbjJPWv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 18:51:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99370EB
+        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 15:50:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697496642;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VENdWJ/1K/LhZn05aMbcDMWsUZa2DzjCrYdCwNyN6Jk=;
+        b=SU4wQx3DbHg4e55vfjVAf4+3ERquFHtkjeRHeGhTP7g5wzV4HU/Mct9iR4T1tButjeLWni
+        j15h15wFZDjCoz5FOK9rc3NT60lO/rRURvr0eZZ/Sx08/s7UzQu6OKFogEJfZhldNQU/s2
+        uS61MAz2JCBDHChoJ1TT9m30vPmy/3o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-218-DeF4ZF5lOd6b04SejMqsSA-1; Mon, 16 Oct 2023 18:50:39 -0400
+X-MC-Unique: DeF4ZF5lOd6b04SejMqsSA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC9478E8C64;
+        Mon, 16 Oct 2023 22:50:38 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DEC1492BFA;
+        Mon, 16 Oct 2023 22:50:38 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 6.6-rc7
+Date:   Mon, 16 Oct 2023 18:50:38 -0400
+Message-Id: <20231016225038.2829334-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,91 +55,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023, Dongli Zhang wrote:
-> Hi Sean,
-> 
-> On 10/16/23 11:49, Sean Christopherson wrote:
-> > Compile tested only, but the below should fix the vCPU hotplug case.  Then
-> > someone (not me) just needs to figure out why kvm_xen_shared_info_init() forces
-> > a masterclock update.
-> > 
-> > I still think we should clean up the periodic sync code, but I don't think we
-> > need to periodically sync the masterclock.
-> 
-> This looks good to me. The core idea is to not update master clock for the
-> synchronized cases.
-> 
-> 
-> How about the negative value case? I see in the linux code it is still there?
+The following changes since commit 401644852d0b2a278811de38081be23f74b5bb04:
 
-See below.  
+  Merge tag 'fs_for_v6.6-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs (2023-10-11 14:21:15 -0700)
 
-> (It is out of the scope of my expectation as I do not need to run vCPUs in
-> different tsc freq as host)
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
-> > 
-> > ---
-> >  arch/x86/kvm/x86.c | 29 ++++++++++++++++-------------
-> >  1 file changed, 16 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index c54e1133e0d3..f0a607b6fc31 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -2510,26 +2510,29 @@ static inline int gtod_is_based_on_tsc(int mode)
-> >  }
-> >  #endif
-> >  
-> > -static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
-> > +static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu, bool new_generation)
-> >  {
-> >  #ifdef CONFIG_X86_64
-> > -	bool vcpus_matched;
-> >  	struct kvm_arch *ka = &vcpu->kvm->arch;
-> >  	struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
-> >  
-> > -	vcpus_matched = (ka->nr_vcpus_matched_tsc + 1 ==
-> > -			 atomic_read(&vcpu->kvm->online_vcpus));
-> > +	/*
-> > +	 * To use the masterclock, the host clocksource must be based on TSC
-> > +	 * and all vCPUs must have matching TSCs.  Note, the count for matching
-> > +	 * vCPUs doesn't include the reference vCPU, hence "+1".
-> > +	 */
-> > +	bool use_master_clock = (ka->nr_vcpus_matched_tsc + 1 ==
-> > +				 atomic_read(&vcpu->kvm->online_vcpus)) &&
-> > +				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
-> >  
-> >  	/*
-> > -	 * Once the masterclock is enabled, always perform request in
-> > -	 * order to update it.
-> > -	 *
-> > -	 * In order to enable masterclock, the host clocksource must be TSC
-> > -	 * and the vcpus need to have matched TSCs.  When that happens,
-> > -	 * perform request to enable masterclock.
-> > +	 * Request a masterclock update if the masterclock needs to be toggled
-> > +	 * on/off, or when starting a new generation and the masterclock is
-> > +	 * enabled (compute_guest_tsc() requires the masterclock snaphot to be
-> > +	 * taken _after_ the new generation is created).
-> >  	 */
-> > -	if (ka->use_master_clock ||
-> > -	    (gtod_is_based_on_tsc(gtod->clock.vclock_mode) && vcpus_matched))
-> > +	if ((ka->use_master_clock && new_generation) ||
-> > +	    (ka->use_master_clock != use_master_clock))
-> >  		kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
-> >  
-> >  	trace_kvm_track_tsc(vcpu->vcpu_id, ka->nr_vcpus_matched_tsc,
-> > @@ -2706,7 +2709,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
-> >  	vcpu->arch.this_tsc_nsec = kvm->arch.cur_tsc_nsec;
-> >  	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
-> >  
-> > -	kvm_track_tsc_matching(vcpu);
-> > +	kvm_track_tsc_matching(vcpu, !matched);
+are available in the Git repository at:
 
-If my analysis of how the negative timestamp occurred is correct, the problematic
-scenario was if cur_tsc_nsec/cur_tsc_write were updated without a masterclock update.
-Passing !matched for @new_generation means that KVM will force a masterclock update
-if cur_tsc_nsec/cur_tsc_write are changed, i.e. prevent the negative timestamp bug.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 2b3f2325e71f09098723727d665e2e8003d455dc:
+
+  Merge tag 'kvm-x86-selftests-6.6-fixes' of https://github.com/kvm-x86/linux into HEAD (2023-10-15 08:25:18 -0400)
+
+----------------------------------------------------------------
+ARM:
+
+- Fix the handling of the phycal timer offset when FEAT_ECV
+  and CNTPOFF_EL2 are implemented.
+
+- Restore the functionnality of Permission Indirection that
+  was broken by the Fine Grained Trapping rework
+
+- Cleanup some PMU event sharing code
+
+MIPS:
+
+- Fix W=1 build.
+
+s390:
+
+- One small fix for gisa to avoid stalls.
+
+x86:
+
+- Truncate writes to PMU counters to the counter's width to avoid spurious
+  overflows when emulating counter events in software.
+
+- Set the LVTPC entry mask bit when handling a PMI (to match Intel-defined
+  architectural behavior).
+
+- Treat KVM_REQ_PMI as a wake event instead of queueing host IRQ work to
+  kick the guest out of emulated halt.
+
+- Fix for loading XSAVE state from an old kernel into a new one.
+
+- Fixes for AMD AVIC
+
+selftests:
+
+- Play nice with %llx when formatting guest printf and assert statements.
+
+- Clean up stale test metadata.
+
+- Zero-initialize structures in memslot perf test to workaround a suspected
+  "may be used uninitialized" false positives from GCC.
+
+----------------------------------------------------------------
+Anshuman Khandual (1):
+      KVM: arm64: pmu: Drop redundant check for non-NULL kvm_pmu_events
+
+Jim Mattson (2):
+      KVM: x86: Mask LVTPC when handling a PMI
+      KVM: x86/pmu: Synthesize at most one PMI per VM-exit
+
+Joey Gouly (2):
+      KVM: arm64: Add nPIR{E0}_EL1 to HFG traps
+      KVM: arm64: POR{E0}_EL1 do not need trap handlers
+
+Like Xu (1):
+      KVM: selftests: Remove obsolete and incorrect test case metadata
+
+Marc Zyngier (1):
+      KVM: arm64: timers: Correctly handle TGE flip with CNTPOFF_EL2
+
+Maxim Levitsky (3):
+      x86: KVM: SVM: always update the x2avic msr interception
+      x86: KVM: SVM: add support for Invalid IPI Vector interception
+      x86: KVM: SVM: refresh AVIC inhibition in svm_leave_nested()
+
+Michael Mueller (1):
+      KVM: s390: fix gisa destroy operation might lead to cpu stalls
+
+Paolo Bonzini (5):
+      Merge tag 'kvm-s390-master-6.6-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
+      KVM: MIPS: fix -Wunused-but-set-variable warning
+      Merge tag 'kvmarm-fixes-6.6-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge tag 'kvm-x86-pmu-6.6-fixes' of https://github.com/kvm-x86/linux into HEAD
+      Merge tag 'kvm-x86-selftests-6.6-fixes' of https://github.com/kvm-x86/linux into HEAD
+
+Roman Kagan (1):
+      KVM: x86/pmu: Truncate counter value to allowed width on write
+
+Sean Christopherson (7):
+      KVM: selftests: Treat %llx like %lx when formatting guest printf
+      KVM: selftests: Zero-initialize entire test_result in memslot perf test
+      x86/fpu: Allow caller to constrain xfeatures when copying to uabi buffer
+      KVM: x86: Constrain guest-supported xfeatures only at KVM_GET_XSAVE{2}
+      KVM: selftests: Touch relevant XSAVE state in guest for state test
+      KVM: selftests: Load XSAVE state into untouched vCPU during state test
+      KVM: selftests: Force load all supported XSAVE state in state test
+
+Tom Lendacky (1):
+      KVM: SVM: Fix build error when using -Werror=unused-but-set-variable
+
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/kvm/arch_timer.c                        |  13 +--
+ arch/arm64/kvm/emulate-nested.c                    |   2 +
+ arch/arm64/kvm/hyp/vhe/switch.c                    |  44 +++++++++
+ arch/arm64/kvm/pmu.c                               |   4 +-
+ arch/arm64/kvm/sys_regs.c                          |   4 +-
+ arch/mips/kvm/mmu.c                                |   3 +-
+ arch/s390/kvm/interrupt.c                          |  16 ++-
+ arch/x86/include/asm/fpu/api.h                     |   3 +-
+ arch/x86/include/asm/kvm_host.h                    |   1 -
+ arch/x86/include/asm/svm.h                         |   1 +
+ arch/x86/kernel/fpu/core.c                         |   5 +-
+ arch/x86/kernel/fpu/xstate.c                       |  12 +--
+ arch/x86/kernel/fpu/xstate.h                       |   3 +-
+ arch/x86/kvm/cpuid.c                               |   8 --
+ arch/x86/kvm/lapic.c                               |   8 +-
+ arch/x86/kvm/pmu.c                                 |  27 +----
+ arch/x86/kvm/pmu.h                                 |   6 ++
+ arch/x86/kvm/svm/avic.c                            |   5 +-
+ arch/x86/kvm/svm/nested.c                          |   3 +
+ arch/x86/kvm/svm/pmu.c                             |   2 +-
+ arch/x86/kvm/svm/svm.c                             |   5 +-
+ arch/x86/kvm/vmx/pmu_intel.c                       |   4 +-
+ arch/x86/kvm/x86.c                                 |  40 +++++---
+ include/kvm/arm_arch_timer.h                       |   7 ++
+ tools/testing/selftests/kvm/include/ucall_common.h |   2 -
+ .../selftests/kvm/include/x86_64/processor.h       |  23 +++++
+ tools/testing/selftests/kvm/lib/guest_sprintf.c    |   7 ++
+ tools/testing/selftests/kvm/lib/x86_64/apic.c      |   2 -
+ tools/testing/selftests/kvm/memslot_perf_test.c    |   9 +-
+ .../testing/selftests/kvm/x86_64/hyperv_svm_test.c |   2 -
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c      |   2 -
+ .../selftests/kvm/x86_64/nx_huge_pages_test.sh     |   1 -
+ tools/testing/selftests/kvm/x86_64/state_test.c    | 110 ++++++++++++++++++++-
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c        |   4 -
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |   4 -
+ 36 files changed, 276 insertions(+), 120 deletions(-)
+
