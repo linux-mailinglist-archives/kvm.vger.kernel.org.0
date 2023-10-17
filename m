@@ -2,113 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D0807CC9C6
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 19:22:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D57787CC9D7
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 19:26:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343650AbjJQRWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 13:22:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
+        id S234752AbjJQR0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 13:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjJQRWT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 13:22:19 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D5994;
-        Tue, 17 Oct 2023 10:22:18 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DDEC433C7;
-        Tue, 17 Oct 2023 17:22:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697563338;
-        bh=AqQvqXpBdDwQ1bSutr+7JjsmD9aFJQI9wkzLVRowwi4=;
-        h=From:Date:Subject:To:Cc:From;
-        b=p1azuokVOEAWEJdrYmvKxX0sn1rYFF2CFBrJOlyv+k1ZcOYVlvMngX7VJKOzq0r3h
-         eRev0ON4tkw/z3lUf/be+0sRlGXalz4Dk6nFPQ75rtNK5hq33f6GsvWRjxGsRnySUX
-         8YebPiV6t5F7eAUyNjm0apondcJKDTuFtPfWEai1qcsSuP0UnmMcvDuAmwC/vys3kx
-         L5cYLC6I21b7yQBz573ZlPH96K8sNLzpQR1NfAXa1llYEE/vSqSbqolHWd8R8Gyuxh
-         bFHoVN5S+j+zMi9u+BIBL9gKclwN3yusCM4lrYrjFqAT6wXA6755j739vNrtGnCTku
-         KoSwjoeAruK0w==
-From:   Mark Brown <broonie@kernel.org>
-Date:   Tue, 17 Oct 2023 18:22:01 +0100
-Subject: [PATCH v2] KVM: selftests: Initialise dynamically allocated
- configuration names
+        with ESMTP id S231444AbjJQR0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 13:26:05 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C0B4A4
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 10:26:04 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c9b70b9671so8415ad.1
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 10:26:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697563563; x=1698168363; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b98W+/GnlYMBBaEIRZ/yrKu+yROp6z3ItYJheiFNfWY=;
+        b=IcWaZ8Ml2sZHN2wMskXKVM0XboPKGtGNZV7nlTe2aTVAET9PeNJjDE7SrhtEGqaXvm
+         eiWLw7pnM/2cpziBS/u/J/Eg4LIR1k9vD1EPhz3EzQC0rlkkCIpjEByHTpY1VVU7n+QR
+         8IOeQCluFNpf7gdPgSCJAC0JB3o94DprII7OTZ8h6LCt8sM85wkWV7VgXsw3JThye543
+         USCCubBT6AiDZ2jB8XwJsTzgwJUZGQv1UgCJwLDFmIFc3J9Y6mShx5ZjwKh1T3dyuyQO
+         WyfOi8wDVczgcVEaeyUdiVClkVEn9WeGiXHrUr2sCpdYaU6che/bHCejXrVTPWv8wUmf
+         QYnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697563563; x=1698168363;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b98W+/GnlYMBBaEIRZ/yrKu+yROp6z3ItYJheiFNfWY=;
+        b=Yj2WfhFMFu+CRy/WoAp4hmrYFyvLjjBI51srW/l1azw5WtPsywHMQdy4C/onl9J6un
+         MGYz3YnCdrDi0LFetlaStNEmsHj5s4z11X7Wi7QmeqXLUIe7UfEgzVYYkHTj95LvcZBe
+         OJiwIp2vKXpBdsH1mxvov/Sto8M8s1PzazJDhGnTrlyQ9DHdz0nmUcFVWtpjCc/rQXJm
+         vVMd/TDs/Dj4me6U8w0wsPFKXuDivW9oJ9duQVFH4Wr73C/BAscwHudQAzZ/Ccrlx70P
+         T1NztmZjPHSqx/ubMNnAcySpukwD1iiW0e2HHg2qGC9pzsmIRqk7cG3ei2eSG/hbb5mV
+         1qWw==
+X-Gm-Message-State: AOJu0YyrU9GlfGIuJkC72GwQGIDl3OuZHYRln5VifYzwRG/KXX0eGWPT
+        VQEjeuO8ZzXJnwFA8NyTVlo0N/mjCq8GE7CDnzsTMw==
+X-Google-Smtp-Source: AGHT+IHb5B0YZuQ8upjbjeL9ha316DU4/zeX9v9YItDefLh84Iu+cQVZ7EJdEAX5vIIp6CqyfVqxyGhsl1ayop2hEX8=
+X-Received: by 2002:a17:902:f611:b0:1b8:b564:b528 with SMTP id
+ n17-20020a170902f61100b001b8b564b528mr8101plg.7.1697563563148; Tue, 17 Oct
+ 2023 10:26:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20231017-kvm-get-reg-list-str-init-v2-1-ee30b1df3e50@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALjCLmUC/32NzQ6CMBCEX4X07Jr+EEBPvofhgLAtG7CQbdNoC
- O9uJfHq8ZvMfLOJgEwYxLXYBGOiQIvPoE+F6MfOOwQaMgsttVFSaZjSExxGYHQwU4gQIgN5ilB
- XfYNDieoyVCLvV0ZLr8N9bzOPub3w+7hK6pv+rOaPNSlQIE1pTS2tbbrHbUL2OJ8XdqLd9/0D1
- /s0g8MAAAA=
-To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Haibo Xu <haibo1.xu@intel.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1595; i=broonie@kernel.org;
- h=from:subject:message-id; bh=AqQvqXpBdDwQ1bSutr+7JjsmD9aFJQI9wkzLVRowwi4=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlLsLGqB2SxRIjasfLDomMD3wyf0dEHwGneDeBeeGt
- 1upbc0iJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZS7CxgAKCRAk1otyXVSH0N5eB/
- sEcJpkSMLVRTIa8dZjGtSsrneIR07N4VVGdxY/8NuKNsBOyYifRdrL+bQ9oJaFbOM4ixxcGxBxxGqW
- qGOxZIOPrHQ00IE46XNnvVRKR93Mf8MgDFqjfNjL37sfB8i7GSmE22XXmQCdrGk+BosOIV+U41+KAL
- deH/BJL6KwLSbj4jmqUOK7Ww1ft1J9qex7wHrYX/XfEErR4ZzE59Rf3YySzpVAYRqOruNw7AJFvssP
- VfdOIqu9riy+T0eLH8WGhIptLiZPc5za7GG3MY94Qyj/PQqFH2yJe9xKxyqOwUNhp8PnOF6Trmy+uO
- +GsaaE5m/KV7L9jN93tJdi9ZbCOt35
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-8-rananta@google.com>
+ <b4739328-5dba-a3a6-54ef-2db2d34201d8@redhat.com> <CAJHc60zpH8Y8h72=jUbshGoqye20FaHRcsb+TFDxkk7rhJAUxQ@mail.gmail.com>
+ <ZS2L6uIlUtkltyrF@linux.dev> <CAJHc60wvMSHuLuRsZJOn7+r7LxZ661xEkDfqxGHed5Y+95Fxeg@mail.gmail.com>
+ <ZS4hGL5RIIuI1KOC@linux.dev> <CAJHc60zQb0akx2Opbh3_Q8JShBC_9NFNvtAE+bPNi9QqXUGncA@mail.gmail.com>
+ <ZS6_tdkS6GyNlt4l@linux.dev>
+In-Reply-To: <ZS6_tdkS6GyNlt4l@linux.dev>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 17 Oct 2023 10:25:50 -0700
+Message-ID: <CAJHc60w-CsqdYX8JG-CRutwg0UyWmvk1TyoR-y9JBV_mqWUVKw@mail.gmail.com>
+Subject: Re: [PATCH v7 07/12] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based
+ on the associated PMU
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we dynamically generate a name for a configuration in get-reg-list
-we use strcat() to append to a buffer allocated using malloc() but we
-never initialise that buffer. Since malloc() offers no guarantees
-regarding the contents of the memory it returns this can lead to us
-corrupting, and likely overflowing, the buffer:
+On Tue, Oct 17, 2023 at 10:09=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Tue, Oct 17, 2023 at 09:58:08AM -0700, Raghavendra Rao Ananta wrote:
+> > On Mon, Oct 16, 2023 at 10:52=E2=80=AFPM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+> > >
+> > > On Mon, Oct 16, 2023 at 02:35:52PM -0700, Raghavendra Rao Ananta wrot=
+e:
+> > >
+> > > [...]
+> > >
+> > > > > What's the point of doing this in the first place? The implementa=
+tion of
+> > > > > kvm_vcpu_read_pmcr() is populating PMCR_EL0.N using the VM-scoped=
+ value.
+> > > > >
+> > > > I guess originally the change replaced read_sysreg(pmcr_el0) with
+> > > > kvm_vcpu_read_pmcr(vcpu) to maintain consistency with others.
+> > > > But if you and Sebastian feel that it's an overkill and directly
+> > > > getting the value via vcpu->kvm->arch.pmcr_n is more readable, I'm
+> > > > happy to make the change.
+> > >
+> > > No, I'd rather you delete the line where PMCR_EL0.N altogether.
+> > > reset_pmcr() tries to initialize the field, but your
+> > > kvm_vcpu_read_pmcr() winds up replacing it with pmcr_n.
+> > >
+> > I didn't get this comment. We still do initialize pmcr, but using the
+> > pmcr.n read via kvm_vcpu_read_pmcr() instead of the actual system
+> > register.
+>
+> You have two bits of code trying to do the exact same thing:
+>
+>  1) reset_pmcr() initializes __vcpu_sys_reg(vcpu, PMCR_EL0) with the N
+>     field set up.
+>
+>  2) kvm_vcpu_read_pmcr() takes whatever is in __vcpu_sys_reg(vcpu, PMCR_E=
+L0),
+>     *masks out* the N field and re-initializes it with vcpu->kvm->arch.pm=
+cr_n
+>
+> Why do you need (1) if you do (2)?
+>
+Okay, I see what you mean now. In that case, let reset_pmcr():
+- Initialize 'pmcr' using  vcpu->kvm->arch.pmcr_n
+- Set ARMV8_PMU_PMCR_LC as appropriate in 'pmcr'
+- Write 'pmcr' to the vcpu reg
 
-  vregs: PASS
-  vregs+pmu: PASS
-  sve: PASS
-  sve+pmu: PASS
-  vregs+pauth_address+pauth_generic: PASS
-  X�vr+gspauth_addre+spauth_generi+pmu: PASS
+From here on out, kvm_vcpu_read_pmcr() would read off of this
+initialized value, unless of course, userspace updates the pmcr.n.
+Is this the flow that you were suggesting?
 
-Initialise the buffer to an empty string to avoid this.
+Thank you.
+Raghavendra
 
-Fixes: 2f9ace5d4557 ("KVM: arm64: selftests: get-reg-list: Introduce vcpu configs")
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-Changes in v2:
-- Update Fixes: tag.
-- Link to v1: https://lore.kernel.org/r/20231013-kvm-get-reg-list-str-init-v1-1-034f370ff8ab@kernel.org
----
- tools/testing/selftests/kvm/get-reg-list.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
-index be7bf5224434..dd62a6976c0d 100644
---- a/tools/testing/selftests/kvm/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/get-reg-list.c
-@@ -67,6 +67,7 @@ static const char *config_name(struct vcpu_reg_list *c)
- 
- 	c->name = malloc(len);
- 
-+	c->name[0] = '\0';
- 	len = 0;
- 	for_each_sublist(c, s) {
- 		if (!strcmp(s->name, "base"))
-
----
-base-commit: 6465e260f48790807eef06b583b38ca9789b6072
-change-id: 20231012-kvm-get-reg-list-str-init-76c8ed4e19d6
-
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
-
+> --
+> Thanks,
+> Oliver
