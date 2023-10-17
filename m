@@ -2,150 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E36527CD001
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 00:23:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B750E7CD01B
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 00:55:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343896AbjJQWXz convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 17 Oct 2023 18:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37540 "EHLO
+        id S1344094AbjJQWzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 18:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234700AbjJQWXy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 18:23:54 -0400
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78CAE95;
-        Tue, 17 Oct 2023 15:23:52 -0700 (PDT)
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-27d5fe999caso2045931a91.1;
-        Tue, 17 Oct 2023 15:23:52 -0700 (PDT)
+        with ESMTP id S234819AbjJQWzc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 18:55:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55A1D3
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 15:54:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697583287;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2MaCWNFBz4u+icJNQE4+/xyS8E2y+prkl+CkqV9Oy3s=;
+        b=dkd3QJB4esqH5sFufF7Wq6isDoyykwxjCVUmDdGukC3XwLf0ebqPX7CDPw5CjNm/OvdmBJ
+        Y6bUjCy6HnyBr+226pvVYzeyvtWndVZo6QR/9N6a9AMkjuhgnsp+0JQVLoS7mB7Gv5Gh5q
+        stH+0ES5PGSkwKyMnuNZ0UBX7imyMeI=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-b152B3CyPxG6-cDyvqxuDA-1; Tue, 17 Oct 2023 18:54:40 -0400
+X-MC-Unique: b152B3CyPxG6-cDyvqxuDA-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7a16fe687aaso467854939f.3
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 15:54:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697581432; x=1698186232;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1697583280; x=1698188080;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+bAkXYEq4fBPkfmCJqbJ3IX/vaNNycxeQ/xhF0uP4i4=;
-        b=snP77pJMUjxYB8V97R00ETZZxG0D1YfpLdBe+9D96htfwA8fZ1RJeeplppA4PuFE8s
-         zzFM158BTwYT79CFRDOTPiHqOAS4v/u91DRfNfKSXb0d2sHTykgBFqHMWqFT5pcqjOqX
-         kf4OD/KjLJi6sH3bRGT0zF/HpLJy3TSbhEvj9mo+RorkvjvOq4DDiAzfR6O1gdq4a5Zi
-         m2OlroATnkB7LI0YB5txONYNuukYKidLp78CnNvu/WRZFIiBLkjd+D+wowiLSvS0MU/h
-         X1oA0tJ5tM6PVPbRyN+PMr1r6r52bp3rkIIe0Vc3Q2wRdN83B89MLD+lDJ3sAIT3ZszL
-         NRLQ==
-X-Gm-Message-State: AOJu0YyinzZpEVw0Qcdp2/WfPIUTk0cxj2JKXrlZr8sigOtfSrJwOLSt
-        25MxXlbNF03cBL2Y7Kxn7lkH24fj6jqsOHAMLdA=
-X-Google-Smtp-Source: AGHT+IFC3WJU3Bl9lB+KohU+H2GaxX+RDO7Ndvc2AuCxV9afR7nK4iClEDOuI4e9OJy0Xrt5XoNvpQezBQZRvDhYI9A=
-X-Received: by 2002:a17:90a:e381:b0:27d:5c9d:def6 with SMTP id
- b1-20020a17090ae38100b0027d5c9ddef6mr3358539pjz.5.1697581431799; Tue, 17 Oct
- 2023 15:23:51 -0700 (PDT)
+        bh=2MaCWNFBz4u+icJNQE4+/xyS8E2y+prkl+CkqV9Oy3s=;
+        b=TBODGu1GU40Dgiw8jRfzBwItklug3CJM+xQ2y7ojZP+KPnlwdS4RVk77HJLVWafDV8
+         JtG1XQBCG3zteb5UFiHBuWG2BeyBYR001Im2qopn9RIEset1O9PQo134so0SzUlyd8Yz
+         o6tD3hzlTvvBm70wiuPeYkB7rScdkWuOZiLo6Pr4GRFzY+53jGKXe9QG3ZlfY+vttVWD
+         zOl0WibRR+h+r5sbtplfiGzTcuWKE5ESxgZWSeDlabtkCnDTqVqOdh6J4uuTy5jAzY3D
+         IY0nOTYjs+/jnTjkTrf35XYkUADadYMJPIBvhnOzMn4q1TN/w/sRlAj1q51R+fFJmlP4
+         whCA==
+X-Gm-Message-State: AOJu0YxSQUNBfOQUFgVYdfVa2f0chZcqzteYQNBHpCajpFUWrRjfM+O8
+        6o7kGpCVtd1GMfamigCiFlgBw1ccsR8LZg+n9u0XXT2uS1WG60hhnSXUwEjf2KUf3ihc9lk07u7
+        nVRVQFviSIGWo
+X-Received: by 2002:a05:6602:14c4:b0:783:7275:9c47 with SMTP id b4-20020a05660214c400b0078372759c47mr4267789iow.7.1697583279929;
+        Tue, 17 Oct 2023 15:54:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVlkSqh1AH0+o2hIeBFlVJRTmRnhiYLw2H0/wB2Zp9iEyPUwvVgGvJjUIM6bMQltqejAYEzQ==
+X-Received: by 2002:a05:6602:14c4:b0:783:7275:9c47 with SMTP id b4-20020a05660214c400b0078372759c47mr4267774iow.7.1697583279691;
+        Tue, 17 Oct 2023 15:54:39 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id c16-20020a5ea810000000b0079fd98bbe9bsm30159ioa.15.2023.10.17.15.54.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 15:54:39 -0700 (PDT)
+Date:   Tue, 17 Oct 2023 16:54:37 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     <ankita@nvidia.com>
+Cc:     <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+        <targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+        <apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+        <anuaggarwal@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v12 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20231017165437.69a84f0c.alex.williamson@redhat.com>
+In-Reply-To: <20231015163047.20391-1-ankita@nvidia.com>
+References: <20231015163047.20391-1-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20231011195740.3349631-1-oliver.upton@linux.dev> <20231011195740.3349631-3-oliver.upton@linux.dev>
-In-Reply-To: <20231011195740.3349631-3-oliver.upton@linux.dev>
-From:   Namhyung Kim <namhyung@kernel.org>
-Date:   Tue, 17 Oct 2023 15:23:40 -0700
-Message-ID: <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and add
- to include path
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-
-On Wed, Oct 11, 2023 at 12:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> Start generating sysreg-defs.h in anticipation of updating sysreg.h to a
-> version that needs the generated output.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-
-It seems we also need this on non-ARM archs to process ARM SPE data.
-
-Acked-by: Namhyung Kim <namhyung@kernel.org>
-
-Thanks,
-Namhyung
-
-
-> ---
->  tools/perf/Makefile.perf | 15 +++++++++++++--
->  tools/perf/util/Build    |  2 +-
->  2 files changed, 14 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-> index 37af6df7b978..14dedd11a1f5 100644
-> --- a/tools/perf/Makefile.perf
-> +++ b/tools/perf/Makefile.perf
-> @@ -443,6 +443,15 @@ drm_ioctl_tbl := $(srctree)/tools/perf/trace/beauty/drm_ioctl.sh
->  # Create output directory if not already present
->  _dummy := $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(beauty_ioctl_outdir)')
->
-> +arm64_gen_sysreg_dir := $(srctree)/tools/arch/arm64/tools
+On Sun, 15 Oct 2023 22:00:47 +0530
+<ankita@nvidia.com> wrote:
+> +static ssize_t nvgrace_gpu_vfio_pci_read(struct vfio_device *core_vdev,
+> +					  char __user *buf, size_t count, loff_t *ppos)
+> +{
+> +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> +	struct nvgrace_gpu_vfio_pci_core_device *nvdev = container_of(
+> +		core_vdev, struct nvgrace_gpu_vfio_pci_core_device, core_device.vdev);
+> +	int ret;
 > +
-> +arm64-sysreg-defs: FORCE
-> +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
+> +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> +		ret = nvgrace_gpu_memmap(nvdev);
+> +		if (ret)
+> +			return ret;
 > +
-> +arm64-sysreg-defs-clean:
-> +       $(call QUIET_CLEAN,arm64-sysreg-defs)
-> +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
+> +		return nvgrace_gpu_read_mem(buf, count, ppos, nvdev);
+> +	}
+
+After looking at Yishai's virtio-vfio-pci driver where BAR0 is emulated
+as an IO Port BAR, it occurs to me that there's no config space
+emulation of BAR2 (or BAR3) here.  Doesn't this mean that QEMU registers
+the BAR as 32-bit, non-prefetchable?  ie. VFIOBAR.type & .mem64 are
+wrong?
+
+I'd certainly expect this to be emulated as a 64-bit, prefetchable BAR
+and the commit log indicates the intention is that this is exposed as a
+64-bit BAR.
+
+We also need to decide how strictly variant drivers need to emulate
+vfio_pci_config_rw with respect to BAR sizing, where the core code
+provides emulation of sizing and Yishai's virtio driver only emulates
+the IO port indicator bit.  QEMU doesn't really need this, but the
+vfio-pci implementation sets the precedent that this behavior is
+provided and could be used by other userspace drivers.  It's essentially
+just providing a masked buffer to service reads and writes to the BAR2
+and BAR3 config address here.  Thanks,
+
+Alex
+
 > +
->  $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $(drm_ioctl_tbl)
->         $(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
->
-> @@ -716,7 +725,9 @@ endif
->  __build-dir = $(subst $(OUTPUT),,$(dir $@))
->  build-dir   = $(or $(__build-dir),.)
->
-> -prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders $(drm_ioctl_array) \
-> +prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders \
-> +       arm64-sysreg-defs \
-> +       $(drm_ioctl_array) \
->         $(fadvise_advice_array) \
->         $(fsconfig_arrays) \
->         $(fsmount_arrays) \
-> @@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
->  bpf-skel-clean:
->         $(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKELETONS)
->
-> -clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
-> +clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
->         $(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)perf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
->         $(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.cmd' -delete -o -name '\.*.d' -delete
->         $(Q)$(RM) $(OUTPUT).config-detected
-> diff --git a/tools/perf/util/Build b/tools/perf/util/Build
-> index 6d657c9927f7..2f76230958ad 100644
-> --- a/tools/perf/util/Build
-> +++ b/tools/perf/util/Build
-> @@ -345,7 +345,7 @@ CFLAGS_rbtree.o        += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ET
->  CFLAGS_libstring.o     += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
->  CFLAGS_hweight.o       += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
->  CFLAGS_header.o        += -include $(OUTPUT)PERF-VERSION-FILE
-> -CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/
-> +CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/ -I$(srctree)/tools/arch/arm64/include/generated/
->
->  $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
->         $(call rule_mkdir)
-> --
-> 2.42.0.609.gbb76f46606-goog
->
+> +	return vfio_pci_core_read(core_vdev, buf, count, ppos);
+> +}
+
