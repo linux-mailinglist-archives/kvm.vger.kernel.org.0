@@ -2,272 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92B367CC4B4
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 15:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15B697CC4C2
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 15:29:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343806AbjJQNYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 09:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54498 "EHLO
+        id S1343860AbjJQN3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 09:29:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234843AbjJQNYK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 09:24:10 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEC8EA;
-        Tue, 17 Oct 2023 06:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697549048; x=1729085048;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=uszfRUn9BLweBrg2Qb9HUI53y7cKRyD27NThnz/706Y=;
-  b=HQTIAEhw9lZKrBLZINbJzwCPtcz/N+q+tpCdIOi5WUP08TNDfaRUF0hc
-   mNSi1AUazAGxbeUOJgasRmfzm5YRPDVtuXQMgoDZWdR8H7qD+j/NqkOHb
-   YAzbjPw/UDL+/Ffht4veAZiu4oiwh1L6bG9IBYV6BgYMpSGwqi8QgfdMf
-   8CABl15H91SvYOh2dLyouq/TfL3M1h8YAJJcE+WuYZD2DsdlyiDT1/kI5
-   qsw7T8BcT7j9nLKS/yDo3MGKo6D36NKFAIoppdAchnl3FkmAJOTDZJKIm
-   Vn17dzVmKIHIaYRIUy+PtH4EEm6v6cGAaZAwYT7WGG8gxlDzLScpB7kAz
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="370846525"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="370846525"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 06:24:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="826438449"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="826438449"
-Received: from nmdsouza-mobl1.amr.corp.intel.com (HELO [10.209.106.102]) ([10.209.106.102])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 06:24:02 -0700
-Message-ID: <9dcd49ba-66a6-4f1f-aadc-3d4c6ce16d15@linux.intel.com>
-Date:   Tue, 17 Oct 2023 06:24:02 -0700
+        with ESMTP id S1343794AbjJQN33 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 09:29:29 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D35B5EA;
+        Tue, 17 Oct 2023 06:29:27 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HDRKGA026063;
+        Tue, 17 Oct 2023 13:29:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : cc : to : from : message-id : date; s=pp1;
+ bh=/G50PTyPk1sf3k/tPQcbY3p7/yzoDDZIrTqn/r9khvw=;
+ b=tFCjOkShtjeUY2UeKNtPRXwd9m4ZGO5DeWhPhPCPQKGaBdEQmwcauQqm/sVI7eAabuLV
+ PPPHbbUiGmZhoPQr1il3P5GFNxluJcym1Hlpas6UrzMsVI4d0oXixE7I1seOm+6B1OQr
+ dgLdcMdtW6VR8prxDZmeepHbO+MHfPvRezhyk2iXV8bg4m7051NCHkHZIxsVhFAYdRB0
+ s1fh4aHE7EFy/dyDFOCGi2BmYIG8cPqxuCGs4Op8jdP5bwlpR5R0wq/5ptAT0u8GS/HN
+ ZYvUVfzKSn+imeIi72JBsXTiG06uCupEHUudJlSuXV1Sy6huu/BL4bkheaK0uZC66B5E 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsu5t04p8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 13:29:21 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39HDSRPY000949;
+        Tue, 17 Oct 2023 13:29:21 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsu5t04m8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 13:29:21 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39HBeBuQ020150;
+        Tue, 17 Oct 2023 13:29:20 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tr6an13a4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 13:29:19 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39HDTG7x4653644
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Oct 2023 13:29:16 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A45E320049;
+        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 793EB20040;
+        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.66.53])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 01/23] x86/virt/tdx: Detect TDX during kernel boot
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, peterz@infradead.org,
-        tony.luck@intel.com, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, rafael@kernel.org, david@redhat.com,
-        dan.j.williams@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
-        imammedo@redhat.com
-References: <cover.1697532085.git.kai.huang@intel.com>
- <121aab11b48b4e6550cfe6d23b4daab744ee2076.1697532085.git.kai.huang@intel.com>
-From:   Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <121aab11b48b4e6550cfe6d23b4daab744ee2076.1697532085.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231011085635.1996346-8-nsg@linux.ibm.com>
+References: <20231011085635.1996346-1-nsg@linux.ibm.com> <20231011085635.1996346-8-nsg@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 7/9] s390x: topology: Rewrite topology list test
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169754935612.81646.10599656708946436495@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 17 Oct 2023 15:29:16 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mndcA9zcLWf0GgQNGfietp5PyIZ4Cy3M
+X-Proofpoint-GUID: 4quASyOogIKsToOYCaSofu4tHkb6RH8M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-17_02,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 lowpriorityscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310170114
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10/17/2023 3:14 AM, Kai Huang wrote:
-> Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
-> host and certain physical attacks.  A CPU-attested software module
-> called 'the TDX module' runs inside a new isolated memory range as a
-> trusted hypervisor to manage and run protected VMs.
-> 
-> Pre-TDX Intel hardware has support for a memory encryption architecture
-> called MKTME.  The memory encryption hardware underpinning MKTME is also
-> used for Intel TDX.  TDX ends up "stealing" some of the physical address
-> space from the MKTME architecture for crypto-protection to VMs.  The
-> BIOS is responsible for partitioning the "KeyID" space between legacy
-> MKTME and TDX.  The KeyIDs reserved for TDX are called 'TDX private
-> KeyIDs' or 'TDX KeyIDs' for short.
-> 
-> During machine boot, TDX microcode verifies that the BIOS programmed TDX
-> private KeyIDs consistently and correctly programmed across all CPU
-> packages.  The MSRs are locked in this state after verification.  This
-> is why MSR_IA32_MKTME_KEYID_PARTITIONING gets used for TDX enumeration:
-> it indicates not just that the hardware supports TDX, but that all the
-> boot-time security checks passed.
-> 
-> The TDX module is expected to be loaded by the BIOS when it enables TDX,
-> but the kernel needs to properly initialize it before it can be used to
-> create and run any TDX guests.  The TDX module will be initialized by
-> the KVM subsystem when KVM wants to use TDX.
-> 
-> Add a new early_initcall(tdx_init) to detect the TDX by detecting TDX
-> private KeyIDs.  Also add a function to report whether TDX is enabled by
-> the BIOS.  Similar to AMD SME, kexec() will use it to determine whether
-> cache flush is needed.
-> 
-> The TDX module itself requires one TDX KeyID as the 'TDX global KeyID'
-> to protect its metadata.  Each TDX guest also needs a TDX KeyID for its
-> own protection.  Just use the first TDX KeyID as the global KeyID and
-> leave the rest for TDX guests.  If no TDX KeyID is left for TDX guests,
-> disable TDX as initializing the TDX module alone is useless.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
-> ---
-
-Looks good to me.
-
-Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
-
-> 
-> v13 -> v14:
->  - "tdx:" -> "virt/tdx:" (internal)
->  - Add Dave's tag
->  
-> ---
->  arch/x86/include/asm/msr-index.h |  3 ++
->  arch/x86/include/asm/tdx.h       |  4 ++
->  arch/x86/virt/vmx/tdx/Makefile   |  2 +-
->  arch/x86/virt/vmx/tdx/tdx.c      | 90 ++++++++++++++++++++++++++++++++
->  4 files changed, 98 insertions(+), 1 deletion(-)
->  create mode 100644 arch/x86/virt/vmx/tdx/tdx.c
-> 
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 1d111350197f..7a44cac70e9f 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -535,6 +535,9 @@
->  #define MSR_RELOAD_PMC0			0x000014c1
->  #define MSR_RELOAD_FIXED_CTR0		0x00001309
->  
-> +/* KeyID partitioning between MKTME and TDX */
-> +#define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
-> +
->  /*
->   * AMD64 MSRs. Not complete. See the architecture manual for a more
->   * complete list.
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index adcbe3f1de30..a252328734c7 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -81,6 +81,10 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  u64 __seamcall(u64 fn, struct tdx_module_args *args);
->  u64 __seamcall_ret(u64 fn, struct tdx_module_args *args);
->  u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args);
-> +
-> +bool platform_tdx_enabled(void);
-> +#else
-> +static inline bool platform_tdx_enabled(void) { return false; }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/virt/vmx/tdx/Makefile b/arch/x86/virt/vmx/tdx/Makefile
-> index 46ef8f73aebb..90da47eb85ee 100644
-> --- a/arch/x86/virt/vmx/tdx/Makefile
-> +++ b/arch/x86/virt/vmx/tdx/Makefile
-> @@ -1,2 +1,2 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> -obj-y += seamcall.o
-> +obj-y += seamcall.o tdx.o
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> new file mode 100644
-> index 000000000000..13d22ea2e2d9
-> --- /dev/null
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -0,0 +1,90 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright(c) 2023 Intel Corporation.
-> + *
-> + * Intel Trusted Domain Extensions (TDX) support
-> + */
-> +
-> +#define pr_fmt(fmt)	"virt/tdx: " fmt
-> +
-> +#include <linux/types.h>
-> +#include <linux/cache.h>
-> +#include <linux/init.h>
-> +#include <linux/errno.h>
-> +#include <linux/printk.h>
-> +#include <asm/msr-index.h>
-> +#include <asm/msr.h>
-> +#include <asm/tdx.h>
-> +
-> +static u32 tdx_global_keyid __ro_after_init;
-> +static u32 tdx_guest_keyid_start __ro_after_init;
-> +static u32 tdx_nr_guest_keyids __ro_after_init;
-> +
-> +static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
-> +					    u32 *nr_tdx_keyids)
+Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:30)
+> Rewrite recursion with separate functions for checking containers,
+> containers containing CPUs and CPUs.
+> This improves comprehension and allows for more tests.
+> We now also test for ordering of CPU TLEs and number of child entries.
+>=20
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+[...]
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> index c1f6520f..9838434c 100644
+> --- a/s390x/topology.c
+> +++ b/s390x/topology.c
+[...]
+> +static union topology_container *check_child_cpus(struct sysinfo_15_1_x =
+*info,
+> +                                                 union topology_containe=
+r *cont,
+> +                                                 union topology_cpu *chi=
+ld,
+> +                                                 int *cpus_in_masks)
 > +{
-> +	u32 _nr_mktme_keyids, _tdx_keyid_start, _nr_tdx_keyids;
-> +	int ret;
-> +
-> +	/*
-> +	 * IA32_MKTME_KEYID_PARTIONING:
-> +	 *   Bit [31:0]:	Number of MKTME KeyIDs.
-> +	 *   Bit [63:32]:	Number of TDX private KeyIDs.
-> +	 */
-> +	ret = rdmsr_safe(MSR_IA32_MKTME_KEYID_PARTITIONING, &_nr_mktme_keyids,
-> +			&_nr_tdx_keyids);
-> +	if (ret)
-> +		return -ENODEV;
-> +
-> +	if (!_nr_tdx_keyids)
-> +		return -ENODEV;
-> +
-> +	/* TDX KeyIDs start after the last MKTME KeyID. */
-> +	_tdx_keyid_start = _nr_mktme_keyids + 1;
-> +
-> +	*tdx_keyid_start = _tdx_keyid_start;
-> +	*nr_tdx_keyids = _nr_tdx_keyids;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init tdx_init(void)
-> +{
-> +	u32 tdx_keyid_start, nr_tdx_keyids;
-> +	int err;
-> +
-> +	err = record_keyid_partitioning(&tdx_keyid_start, &nr_tdx_keyids);
-> +	if (err)
-> +		return err;
-> +
-> +	pr_info("BIOS enabled: private KeyID range [%u, %u)\n",
-> +			tdx_keyid_start, tdx_keyid_start + nr_tdx_keyids);
-> +
-> +	/*
-> +	 * The TDX module itself requires one 'global KeyID' to protect
-> +	 * its metadata.  If there's only one TDX KeyID, there won't be
-> +	 * any left for TDX guests thus there's no point to enable TDX
-> +	 * at all.
-> +	 */
-> +	if (nr_tdx_keyids < 2) {
-> +		pr_err("initialization failed: too few private KeyIDs available.\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	/*
-> +	 * Just use the first TDX KeyID as the 'global KeyID' and
-> +	 * leave the rest for TDX guests.
-> +	 */
-> +	tdx_global_keyid = tdx_keyid_start;
-> +	tdx_guest_keyid_start = tdx_keyid_start + 1;
-> +	tdx_nr_guest_keyids = nr_tdx_keyids - 1;
-> +
-> +	return 0;
-> +}
-> +early_initcall(tdx_init);
-> +
-> +/* Return whether the BIOS has enabled TDX */
-> +bool platform_tdx_enabled(void)
-> +{
-> +	return !!tdx_global_keyid;
-> +}
+> +       void *last =3D ((void *)info) + info->length;
+> +       union topology_cpu *prev_cpu =3D NULL;
+> +       int cpus =3D 0;
 
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+I know __builtin_popcountl returns int, but maybe it makes sense to make
+this and cpus_in_masks an unsigned type?
+
+> +       for (; (void *)child < last && child->nl =3D=3D 0; child++) {
+
+Personal preference, I prefer simply iterating over a counter, but its up
+to you.
