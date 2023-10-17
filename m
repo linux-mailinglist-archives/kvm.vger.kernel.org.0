@@ -2,113 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 983A77CC305
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BC777CC2BA
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:14:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343697AbjJQMWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 08:22:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48422 "EHLO
+        id S1343796AbjJQMOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 08:14:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343641AbjJQMWa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 08:22:30 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A310C30C2
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:09:27 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53f3609550bso123195a12.1
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697544559; x=1698149359; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZH0F3f+uCOPEXSYjYgewFnE5Faf1m9Z5ZRrf3gXOZSQ=;
-        b=n1jy87sF3XvyBSjSEDGKN8FNYu5wWf2ctIRpEdwKtzNhj777VY3f6huvCmd5RSirJN
-         +Ab7EekjMzIb5ZmK5pImFzXmrr9B+mmJiweOXrFPjvoUJ1Xhj+GmCITxyiNpv07YwvuT
-         V7ybt0auEnWHmWVKGl9MrwalNQN5RjUzpE6QNcxa12DqmPBtb/AsaU78w8yJgyAkHPqb
-         DkM1iW5bvaGn/Qp/KvWiVbl+KEV3GXWv8VfX0pTUZLixSfemZUKVEe04XCMPNBtHLATc
-         mGZsPHslqnEn8b3KSXdJfW8kl+6ZREqZYYZakvmloN/I7i9Dz6rjLGUiRwJkS/Gn/L25
-         FK3w==
+        with ESMTP id S230045AbjJQMOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 08:14:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948A8D098
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:12:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697544758;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r9V3JZLaxEikaF62tX1Et7+9WXZYKD3fD3akx4xUFJo=;
+        b=apKWdoyatzharZ2rP0puV6c1HY1Qzqk9pOTFB3fuPAp7Uo5rT6VbsReHzdfE6a9IVK1ljn
+        GUGfOuj99ax+Nd/3cgf6w0MoSsMLU/jVC2B9yYGm8mAlrd9v3EWtzZa+QEFDzvKNmBj4nA
+        8OdXx91X6ddMK2ZQgv1e+NKK8hTnUZs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-4eX7Fb3ePAqDLMCAVO8yTA-1; Tue, 17 Oct 2023 08:12:37 -0400
+X-MC-Unique: 4eX7Fb3ePAqDLMCAVO8yTA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40768556444so37266175e9.3
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:12:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697544559; x=1698149359;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZH0F3f+uCOPEXSYjYgewFnE5Faf1m9Z5ZRrf3gXOZSQ=;
-        b=PH5Ya1mVZI5/W0s4Le86YOW0Tc6S9Pem1uuLecpDNIwip64pRkiwcdKsZYOvWVy1iQ
-         CafYmbegEqc55nPpYGqP9wlAI9pUbdYL7Qn3Vr5AKnsTAs0kGkUnOA2kNQp9DqO/KU20
-         uF3w0z6sZNfaMTEpPPLbJ9I2LMAyzJoKrEXyiZ3Nas+otZ+BAnbw7niTx5dC/L/t91yG
-         qz3+2t2kKcx2La45sX6bl0NkHzcUR+wYWgxBGCYy99iWqotSglHEhiejI5RGuNfGVp/4
-         /6k8VZ48iUkmCKxOI1OsBd7V+/iBLQwxaKpW7bFV2Sn6fuJKvg7EkxUpcYzlR1zEv9GY
-         OrFg==
-X-Gm-Message-State: AOJu0YyjV8I9ZfEz+IRDrQy2QbS5SfWuHuqdozjPxXoORCM4IlNMcHNW
-        SGlWAHwnvPIz5exob2Rl0jNwDrAPsNCelFfvAekw4w==
-X-Google-Smtp-Source: AGHT+IE2K/jx6F/ccMe+2Nr4uzND2KYEgDenap1j6wu8HI14c9LkVAzKww/ddi7gIjkhtF68YjnF7I+dfY9RVUoPZh8=
-X-Received: by 2002:a50:9e24:0:b0:53d:a0c9:dbd4 with SMTP id
- z33-20020a509e24000000b0053da0c9dbd4mr1427326ede.21.1697544559610; Tue, 17
- Oct 2023 05:09:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20231010142453.224369-1-cohuck@redhat.com> <20231010142453.224369-4-cohuck@redhat.com>
-In-Reply-To: <20231010142453.224369-4-cohuck@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 17 Oct 2023 13:09:08 +0100
-Message-ID: <CAFEAcA88O-VDq2rRfVhZ_6OShFq1ANEMmHWHVtNS5hCPQNYtdg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] arm/kvm: convert to read_sys_reg64
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Gavin Shan <gshan@redhat.com>,
-        qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
+        d=1e100.net; s=20230601; t=1697544756; x=1698149556;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r9V3JZLaxEikaF62tX1Et7+9WXZYKD3fD3akx4xUFJo=;
+        b=MCKLMGs+5Zx0fig8x4RTvLri4Fo3rhJAf8G6AXpjyhZ4o7XhYycVMyYx+tB/LkUcLv
+         fno3y6betEVKEklUHGU7xp3Vwan6mrhUy6km1mvg0/1AY9j+Pg86JUwF2i4yezoalpSO
+         fWEmUDPhqbbuTzNNn1q5Iuo7Jtqhp9kzhJ5n3DUW5FxFas+VCB3lB55C7cpsNV7bXAue
+         qlo1jjMsNKSfueMEuPh5xfYbnF5DnqGcsDyb608zMfGejGOo5WQ9/Ye/78eSsoQ9C4vT
+         4MS8cfQbEyBhyLgBCE3ho7NaNVo2i7zdFok8Tk9RdCT44A30EwJU1c3JvrCTgwceyMlg
+         K5wA==
+X-Gm-Message-State: AOJu0YweXMJCBrOtLpuGLboIhKHmj8cUy2+7nKxFbUB/9xML0UzYa2v2
+        rqJXq+2Jp8dORJz7ifHaXO+n1UXfcqP0XJrxLwld1I3mMCPsRJPHq0Aga/QHmuzTarCVnRZ2pf8
+        LlEAiN0LeT1D+roM++DmMkzu8kbpZGe21r4b9p2CHkb1C5xZKdkRkjXfCmU7mHI0S8XxSKDXu
+X-Received: by 2002:a05:600c:4f49:b0:405:3b1f:968b with SMTP id m9-20020a05600c4f4900b004053b1f968bmr1448012wmq.21.1697544755937;
+        Tue, 17 Oct 2023 05:12:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdNVrUKpGFWzYWzpJA3u4GNUxiXwvGPYPJmW5sHSupRjNla2BA+OtyrKXba8/emikrXq1zTA==
+X-Received: by 2002:a05:600c:4f49:b0:405:3b1f:968b with SMTP id m9-20020a05600c4f4900b004053b1f968bmr1447992wmq.21.1697544755573;
+        Tue, 17 Oct 2023 05:12:35 -0700 (PDT)
+Received: from starship ([89.237.100.246])
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c4f8700b00406408dc788sm9886178wmq.44.2023.10.17.05.12.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 05:12:35 -0700 (PDT)
+Message-ID: <d37b9d54a92226185caa427a6dba8dfb947e312d.camel@redhat.com>
+Subject: Re: [PATCH v3 0/4] KVM: x86: tracepoint updates
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>
+Date:   Tue, 17 Oct 2023 15:12:33 +0300
+In-Reply-To: <20230928103640.78453-1-mlevitsk@redhat.com>
+References: <20230928103640.78453-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Oct 2023 at 15:25, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> We can use read_sys_reg64 to get the SVE_VLS register instead of
-> calling GET_ONE_REG directly.
->
-> Suggested-by: Gavin Shan <gshan@redhat.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  target/arm/kvm64.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 558c0b88dd69..d40c89a84752 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -500,10 +500,6 @@ uint32_t kvm_arm_sve_get_vls(CPUState *cs)
->              .target = -1,
->              .features[0] = (1 << KVM_ARM_VCPU_SVE),
->          };
-> -        struct kvm_one_reg reg = {
-> -            .id = KVM_REG_ARM64_SVE_VLS,
-> -            .addr = (uint64_t)&vls[0],
-> -        };
->          int fdarray[3], ret;
->
->          probed = true;
-> @@ -512,7 +508,7 @@ uint32_t kvm_arm_sve_get_vls(CPUState *cs)
->              error_report("failed to create scratch VCPU with SVE enabled");
->              abort();
->          }
-> -        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
-> +        ret = read_sys_reg64(fdarray[2], &vls[0], KVM_REG_ARM64_SVE_VLS);
->          kvm_arm_destroy_scratch_host_vcpu(fdarray);
->          if (ret) {
->              error_report("failed to get KVM_REG_ARM64_SVE_VLS: %s",
+У чт, 2023-09-28 у 13:36 +0300, Maxim Levitsky пише:
+> This patch series is intended to add some selected information
+> to the kvm tracepoints to make it easier to gather insights about
+> running nested guests.
+> 
+> This patch series was developed together with a new x86 performance analysis tool
+> that I developed recently (https://gitlab.com/maximlevitsky/kvmon)
+> which aims to be a better kvm_stat, and allows you at glance
+> to see what is happening in a VM, including nesting.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (4):
+>   KVM: x86: refactor req_immediate_exit logic
+>   KVM: x86: add more information to the kvm_entry tracepoint
+>   KVM: x86: add information about pending requests to kvm_exit
+>     tracepoint
+>   KVM: x86: add new nested vmexit tracepoints
+> 
+>  arch/x86/include/asm/kvm-x86-ops.h |   2 +-
+>  arch/x86/include/asm/kvm_host.h    |  10 +--
+>  arch/x86/kvm/svm/nested.c          |  22 ++++++
+>  arch/x86/kvm/svm/svm.c             |  22 +++++-
+>  arch/x86/kvm/trace.h               | 105 +++++++++++++++++++++++++++--
+>  arch/x86/kvm/vmx/nested.c          |  27 ++++++++
+>  arch/x86/kvm/vmx/vmx.c             |  30 +++++----
+>  arch/x86/kvm/vmx/vmx.h             |   2 -
+>  arch/x86/kvm/x86.c                 |  34 +++++-----
+>  9 files changed, 208 insertions(+), 46 deletions(-)
+> 
+> -- 
+> 2.26.3
 
-read_sys_reg64() asserts that the register you're trying to
-read is 64 bits, but KVM_REG_ARM64_SVE_VLS is not, it's 512 bits:
 
-#define KVM_REG_ARM64_SVE_VLS           (KVM_REG_ARM64 | KVM_REG_ARM64_SVE | \
-                                         KVM_REG_SIZE_U512 | 0xffff)
+Ping on this patch series.
 
-So this change would trip the assert on a host where SVE
-is supported and enabled.
+Best regards,
+	Maxim Levitsky
 
-thanks
--- PMM
