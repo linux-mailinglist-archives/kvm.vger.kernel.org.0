@@ -2,177 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A62EE7CB885
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 04:39:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 892A77CB91F
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 05:21:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234070AbjJQCjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 22:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52424 "EHLO
+        id S234086AbjJQDVP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 23:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234086AbjJQCjM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Oct 2023 22:39:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2E6EB
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 19:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697510305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jLFBGnIpAzynaCLSWbQnRiqRNf9pByil8XHxQ2oSj4w=;
-        b=TAwWxrYVcjmAlh5A74EoDab5QRJI/RWV8q5Ivqcd5N+z9gZtGV2h4QzwZ5q4RhsGgMBHjG
-        niGusauG7xBt7/a9iFicQ9KjmyM1hOmYyzoErwVW+LaWkhz50jsY1Oba9ips5DLa4aidoG
-        2xrv2odmAf4LhWi3eH7zjyhTnafV9zs=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-E2T_9DdFObyTEmSZUJqJ8Q-1; Mon, 16 Oct 2023 22:38:14 -0400
-X-MC-Unique: E2T_9DdFObyTEmSZUJqJ8Q-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5079a66711eso3413856e87.1
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 19:38:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697510292; x=1698115092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jLFBGnIpAzynaCLSWbQnRiqRNf9pByil8XHxQ2oSj4w=;
-        b=nDFBxBCUeBnXuMdwZaOKi+YXIdwidSFsTG3otLl2IM7UfVFYzvWuyDk0FGa/olkr5N
-         OX9IPU634vvvYt3LRhdPfm08oXDMVnuv6JJYs+tKC03dvR7Ub9fjaanX9KsSKMbjqdA1
-         I6bGVRaUNOsGQ+2fcSgYZb7K1Ne6DCeenkATCv33Ll8LZxVsT4XLPGoQGyaygO8CU+uA
-         Zj+/rp+fDD/tAiwhQ/wE+YlyT1ee9LFpDeLdPZFF457EYgouug74PQgHSus1zv18XFf3
-         J7vLu53tC3KShgKQivvVXga6D6f2jO+eYNpqBb6VU8D0YjsuQ2gD/rd64Ofv1rOx1KC7
-         G/Ng==
-X-Gm-Message-State: AOJu0Yzz7TNRV/1jUADe+81HqgLD1uuRu9Ki/3x9Sxzcpe42vrQu5y0q
-        bp29egzfpzLpNbdT26gUjctMjWlSkNNTuCLe23bX+C2toMdMqEuV2D8KhVclrAUq9wW9hiIpwq0
-        btINLYDu9LI3BGWm+GuNNQ1OdMgyAJdarrCojTxk=
-X-Received: by 2002:a19:7616:0:b0:506:8e27:7ce9 with SMTP id c22-20020a197616000000b005068e277ce9mr773833lff.16.1697510292108;
-        Mon, 16 Oct 2023 19:38:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwD5883Y6d40R7U3CghOpbHBfm9xN2dxJWP8byeoC8zFnDP5U2UV48wLUupwqJd40JvPd+TfwSf9k5qjsrlt4=
-X-Received: by 2002:a19:7616:0:b0:506:8e27:7ce9 with SMTP id
- c22-20020a197616000000b005068e277ce9mr773811lff.16.1697510291790; Mon, 16 Oct
- 2023 19:38:11 -0700 (PDT)
+        with ESMTP id S232701AbjJQDVL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Oct 2023 23:21:11 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588A49F;
+        Mon, 16 Oct 2023 20:21:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697512869; x=1729048869;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=laaAssHt8V3R6F9hNgPsAVESR40dtu6/j3R2Nhzmd3s=;
+  b=LsokCLPHq56br8Inw/AMe2M2Iai6F4VcIPTn4HF4LmamTAIqQlMvgqGV
+   s3P9uSv+CiPiLAdaWU2EQVlx99zd+ieiDrNuXPHmjLFvB2tVIsCQ+L2r1
+   C3WbEZBNNaS6mnZ/qnbo9d+DURinfYx0vb/sVlJoxLfP526nx0+gQFEX1
+   h7STgWUuJb7rYRXLTznyolpf95ZwqIq388mlWGtE9F3jCI/ojAucE1ekm
+   599lbKCiMiHrl6lLJ2Pif/EuiM45GF4lKlSWwFNFiTR2L+V9+K1gpkOl8
+   CcTpMf7aDpv7WCWPnCR/1Ip9TIPrSedH8OD2LIyBK4fkZ1c+wdRproCYp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="389560769"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="389560769"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 20:21:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826269892"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="826269892"
+Received: from sqa-gate.sh.intel.com (HELO spr-2s5.tsp.org) ([10.239.48.212])
+  by fmsmga004.fm.intel.com with ESMTP; 16 Oct 2023 20:21:05 -0700
+From:   Tina Zhang <tina.zhang@intel.com>
+To:     iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Tina Zhang <tina.zhang@intel.com>
+Subject: [RFC PATCH 00/12] iommu/vt-d: Remove superfluous IOMMU IOTLB invalidations
+Date:   Tue, 17 Oct 2023 11:20:32 +0800
+Message-Id: <20231017032045.114868-1-tina.zhang@intel.com>
+X-Mailer: git-send-email 2.39.3
 MIME-Version: 1.0
-References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
- <20231015141644.260646-2-akihiko.odaki@daynix.com> <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
- <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com> <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
-In-Reply-To: <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 17 Oct 2023 10:38:00 +0800
-Message-ID: <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
-To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc:     Akihiko Odaki <akihiko.odaki@daynix.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>,
-        Yonghong Song <yonghong.song@linux.dev>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-        bpf <bpf@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Yuri Benditovich <yuri.benditovich@daynix.com>,
-        Andrew Melnychenko <andrew@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 17, 2023 at 7:53=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Sun, Oct 15, 2023 at 10:10=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
-nix.com> wrote:
-> >
-> > On 2023/10/16 1:07, Alexei Starovoitov wrote:
-> > > On Sun, Oct 15, 2023 at 7:17=E2=80=AFAM Akihiko Odaki <akihiko.odaki@=
-daynix.com> wrote:
-> > >>
-> > >> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > >> index 0448700890f7..298634556fab 100644
-> > >> --- a/include/uapi/linux/bpf.h
-> > >> +++ b/include/uapi/linux/bpf.h
-> > >> @@ -988,6 +988,7 @@ enum bpf_prog_type {
-> > >>          BPF_PROG_TYPE_SK_LOOKUP,
-> > >>          BPF_PROG_TYPE_SYSCALL, /* a program that can execute syscal=
-ls */
-> > >>          BPF_PROG_TYPE_NETFILTER,
-> > >> +       BPF_PROG_TYPE_VNET_HASH,
-> > >
-> > > Sorry, we do not add new stable program types anymore.
-> > >
-> > >> @@ -6111,6 +6112,10 @@ struct __sk_buff {
-> > >>          __u8  tstamp_type;
-> > >>          __u32 :24;              /* Padding, future use. */
-> > >>          __u64 hwtstamp;
-> > >> +
-> > >> +       __u32 vnet_hash_value;
-> > >> +       __u16 vnet_hash_report;
-> > >> +       __u16 vnet_rss_queue;
-> > >>   };
-> > >
-> > > we also do not add anything to uapi __sk_buff.
-> > >
-> > >> +const struct bpf_verifier_ops vnet_hash_verifier_ops =3D {
-> > >> +       .get_func_proto         =3D sk_filter_func_proto,
-> > >> +       .is_valid_access        =3D sk_filter_is_valid_access,
-> > >> +       .convert_ctx_access     =3D bpf_convert_ctx_access,
-> > >> +       .gen_ld_abs             =3D bpf_gen_ld_abs,
-> > >> +};
-> > >
-> > > and we don't do ctx rewrites like this either.
-> > >
-> > > Please see how hid-bpf and cgroup rstat are hooking up bpf
-> > > in _unstable_ way.
-> >
-> > Can you describe what "stable" and "unstable" mean here? I'm new to BPF
-> > and I'm worried if it may mean the interface stability.
-> >
-> > Let me describe the context. QEMU bundles an eBPF program that is used
-> > for the "eBPF steering program" feature of tun. Now I'm proposing to
-> > extend the feature to allow to return some values to the userspace and
-> > vhost_net. As such, the extension needs to be done in a way that ensure=
-s
-> > interface stability.
->
-> bpf is not an option then.
-> we do not add stable bpf program types or hooks any more.
+This series based on "Share sva" patch-set[1], aims to remove superfluous
+IOMMU IOTLB invalidations in VT-d driver.
 
-Does this mean eBPF could not be used for any new use cases other than
-the existing ones?
+In the current VT-d driver, IOMMU IOTLB invalidation commands and
+device-TLB commands are performed per device, which leads to superfluous
+IOTLB invalidations. For example, if there are four devices behind a IOMMU
+are attached to one sva domain (which could be a common case in
+virtualization scenarios where one virtual IOMMU working for all the
+virtual devices), four IOTLB invalidation commands and four device-IOTLB
+invalidation commands will be issued. However, only one IOTLB invalidation
+command and four device-IOTLB invalidation commands are necessary.
+Superfluous IOMMU IOTLB invalidations impact run-time performance.
 
-> If a kernel subsystem wants to use bpf it needs to accept the fact
-> that such bpf extensibility will be unstable and subsystem maintainers
-> can decide to remove such bpf support in the future.
+Although the goal could be built straight-forwardly in the current VT-d
+driver, some refactoring works are considered necessary before landing the
+one solving the problem of redundant IOTLB invalidations:
 
-I don't see how it is different from the existing ones.
+1) VT-d driver uses different structures to keep attached device info.
+For default domain, it uses struct dev_pasids_info and some related fields
+of struct dmar_domain. For sva domain, it uses struct intel_svm and
+struct intel_svm_dev. The reason of it is because previously the sva
+domain is not shared among devices behind different IOMMUs and
+therefore dmar_domain and its fields cannot be used globally to keep
+all attached device info. After the patch-set[1] gets acceptance, sva
+domain is global to the attached devices. Thus, retiring struct
+intel_svm/intel_svm_dev is the main refactoring work of this patch-set.
 
-Thanks
+2) Most logic of intel_svm_set_dev_pasid() can be covered by
+intel_iommu_set_dev_pasid(). Refactoring both intel_svm_set_dev_pasid()
+and intel_iommu_set_dev_pasid() and let the former call the latter for
+set_dev_pasid operation to avoid duplicating code.
 
->
+3) Last but not least, struct mmu_notifier is proposed to iommu_domain.
+This is a change to IOMMU core, which helps to centralize info required by
+sva to sva domain and therefore can help cleanup the code in IOMMU drivers.
+
+This patchset is on github per-iommu_IOTLB_invalidation branch[2].
+
+[1]: https://lore.kernel.org/linux-iommu/20231017004802.109618-1-tina.zhang@intel.com/
+[2]: https://github.com/TinaZhangZW/linux/tree/per-iommu_IOTLB_invalidation
+
+Tina Zhang (12):
+  iommu/vt-d: Retire the treatment for revoking PASIDs with pending
+    pgfaults
+  iommu/vt-d: Remove initialization for dynamically heap-allocated
+    rcu_head
+  iommu/vt-d: Retire intel_svm_bind_mm()
+  iommu/vt-d: Make dev_to_intel_iommu() helper global
+  iommu/vt-d: Retire struct intel_svm_dev
+  iommu: Add mmu_notifier to sva domain
+  iommu/vt-d: Retire struct intel_svm
+  iommu/vt-d: Use RCU for dev_pasids list updates in
+    set/remove_dev_pasid()
+  iommu/vt-d: Refactor intel_iommu_set_dev_pasid()
+  iommu/vt-d: Refactor intel_iommu_remove_dev_pasid()
+  iommu/vt-d: Use intel_iommu_set_dev_pasid() for sva domain
+  iommu/vt-d: Remove superfluous IOMMU IOTLB invalidations
+
+ drivers/iommu/intel/iommu.c |  91 +++++++++----
+ drivers/iommu/intel/iommu.h |  30 ++---
+ drivers/iommu/intel/svm.c   | 261 ++++++++----------------------------
+ include/linux/iommu.h       |   2 +
+ 4 files changed, 128 insertions(+), 256 deletions(-)
+
+-- 
+2.39.3
 
