@@ -2,84 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F1557CC365
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:42:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1104A7CC338
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231868AbjJQMl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 08:41:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50962 "EHLO
+        id S1343641AbjJQMcU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 08:32:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234896AbjJQMQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 08:16:29 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29CDA6A40
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:15:30 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53ebf429b4fso3868368a12.1
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:15:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697544929; x=1698149729; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RYJFy+a6sx3s6+zSIv8CY0p4W3xeTRNrNo9sBoS0Q1I=;
-        b=kb81ADSXPes80XxomdZXxsQH2vgipSj96hSt60qQD7o6/hMPAlkqbRu5Ic/b4EM0Y4
-         XILFJ/NG4Zi/aLjeGRXv0UbY2CCzM5qnzrpG1QOt9ONPqEoBo1jAtpbWTcAUlmsCL5rv
-         9ByqjFdbGQoMyHfXA//IessedT3Khr5uU2Nr6tWFwIEij9P8Ez5W4vV5D0jPCCh8xnL1
-         sS/LZTQaf1SA/Z4Ve75cSXqJkUyUY1Q8CmLxMOGhZYfmcz1MvZX9OF00NjXlb/rnRfWx
-         aj/uJodT2v1joSpR12FFLgcQSIaq+vQryqiY7XSTpsyNDzf80rL/cY0Xt/pLNvdtQxiQ
-         gsAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697544929; x=1698149729;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RYJFy+a6sx3s6+zSIv8CY0p4W3xeTRNrNo9sBoS0Q1I=;
-        b=Y4g9M9tllTsOVDuQN4IVsf/+bxHXOWNLVuovJ8iPu9VhATCMLWwvcf7H/MJFPb8wmj
-         m2FO/oydcKEE0ktx8WjC27Xxeoqr5/3ocdp4L4WCDKME6LRH1N78WeHsBQjbC4zE7LFr
-         1nBawtzBR8RhKKTK0794BJTq5Xmyj/NfB0lxyXL3s0Prfv1FssQqKBuozn6RkJzTIWBo
-         Nnob9z0uCNXMFsEye+PbBZ/gnvkGcvlF034wFgpeDbCBAkjofji2CKIxFW0gDi9/77Lx
-         0QDGhMgL/WxUxBFV5B/XY4Yc7DEKBJZyexiqbMgA7mQCk1iubiQXVo/QyNPhV9lEAetb
-         DPGA==
-X-Gm-Message-State: AOJu0Yxtb04ycfdmkpA8Bgg98IeMK3GzY8TqfLFutNUvP28who1OnwKS
-        UmBgTFWQacpwSVfA2w2UyFjvKTt8ELliKYZHMoCG0LJ6C1sIKok6
-X-Google-Smtp-Source: AGHT+IFrFohaoeVJXzgdVCjVBnTyftrl6MTwgfE6/9BPXMAOGWvWK/OPob4dQh7LMdjndQIllX2J8m/t7bZwQ2wlpJk=
-X-Received: by 2002:a50:cc9c:0:b0:53d:f180:3cc5 with SMTP id
- q28-20020a50cc9c000000b0053df1803cc5mr1744853edi.20.1697544928848; Tue, 17
- Oct 2023 05:15:28 -0700 (PDT)
+        with ESMTP id S234647AbjJQMcT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 08:32:19 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B73995;
+        Tue, 17 Oct 2023 05:32:17 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HCA20r025050;
+        Tue, 17 Oct 2023 12:32:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references :
+ subject : cc : to : from : message-id : date; s=pp1;
+ bh=3jYBblpQmTnyPbk5ecIa6Ffw4/vEZXpk2tAFD54T+AM=;
+ b=p01rbc9+PHQJheDgRqv8j9uUTvySG2ZX/aoO/hjvc+ndL2v0vF5nMxqyLIQ7m3RJLZp3
+ Ld7Ui2wM7RNP8KxbXP55JWHMInWTNYNzq4KNSHTkPR3nxEjaYTCIhA6A9x1IA+1dDR8l
+ cPeUTMP750SlTBezEjz+KFO9NqSml7sjKzd4E+tJk0OxgSIOPKiCvBbgBAk87U9KaVn0
+ OB10i+gGurvpVIvyCRInsz0D3fN7TEVZlE8Zk4FqJeAU+g+ucyo080331+7JH1RKiEj+
+ zZlbIIp1IzmcJ6S3rI3weSSnYrr8io5TfmgGT/yNpUOO1Qc7sLA3NbYRbtbydrQQ0KuM 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tst1krmwd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 12:32:06 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39HCAO0x025750;
+        Tue, 17 Oct 2023 12:32:06 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tst1krmut-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 12:32:05 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39HAq4qe026885;
+        Tue, 17 Oct 2023 12:32:04 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tr5as9485-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Oct 2023 12:32:04 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39HCW1Nh14156490
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Oct 2023 12:32:01 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC66520040;
+        Tue, 17 Oct 2023 12:32:01 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 05E9220043;
+        Tue, 17 Oct 2023 12:32:01 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.66.53])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Oct 2023 12:32:00 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20231010142453.224369-1-cohuck@redhat.com>
-In-Reply-To: <20231010142453.224369-1-cohuck@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 17 Oct 2023 13:15:17 +0100
-Message-ID: <CAFEAcA9cLZ-Q5-oPqSgt2GdR=J4yGo6BD4nWoeNnwj-ZXfBHaw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] arm/kvm: use kvm_{get,set}_one_reg
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Gavin Shan <gshan@redhat.com>,
-        qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <37a91515-38d9-420f-89e9-cf18ab1ef997@linux.ibm.com>
+References: <20231011085635.1996346-1-nsg@linux.ibm.com> <20231011085635.1996346-6-nsg@linux.ibm.com> <fc59fb56-4848-4282-bec5-bdef40c817ff@linux.ibm.com> <58d8c91480041e3516837ec2d26562de656ea7b9.camel@linux.ibm.com> <37a91515-38d9-420f-89e9-cf18ab1ef997@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 5/9] s390x: topology: Refine stsi header test
+Cc:     David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Sean Christopherson <seanjc@google.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Message-ID: <169754591970.81646.12090809106412524268@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 17 Oct 2023 14:31:59 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0meEgO7eMybKEVqACH-oWVBmCXb-QTjr
+X-Proofpoint-ORIG-GUID: tUsUy22fE63dt6pj_rNtkN1ysabKdRHs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_13,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 spamscore=0 phishscore=0
+ clxscore=1015 mlxscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310170105
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Oct 2023 at 15:25, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> I sent this cleanup first... in mid-July (ugh). But better late than never, I guess.
->
-> From v1:
-> - fix buglets (thanks Gavin)
-> - add patch 3 on top
->
-> The kvm_{get,set}_one_reg functions have been around for a very long
-> time, and using them instead of open-coding the ioctl invocations
-> saves lines of code, and gives us a tracepoint as well. They cannot
-> be used by invocations of the ioctl not acting on a CPUState, but
-> that still leaves a lot of conversions in the target/arm code.
+Quoting Janosch Frank (2023-10-11 13:22:03)
+> On 10/11/23 13:19, Nina Schoetterl-Glausch wrote:
+> > On Wed, 2023-10-11 at 13:16 +0200, Janosch Frank wrote:
+> >> On 10/11/23 10:56, Nina Schoetterl-Glausch wrote:
+> >>> Add checks for length field.
+> >>> Also minor refactor.
+> >>>
+> >>> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> >>> ---
+> >>>    s390x/topology.c | 15 +++++++++------
+> >>>    1 file changed, 9 insertions(+), 6 deletions(-)
+> >>>
+> >>> diff --git a/s390x/topology.c b/s390x/topology.c
+> >>> index 5374582f..0ba57986 100644
+> >>> --- a/s390x/topology.c
+> >>> +++ b/s390x/topology.c
+> >>> @@ -187,18 +187,22 @@ static void stsi_check_maxcpus(struct sysinfo_1=
+5_1_x *info)
+> >>>    }
+> >>>   =20
+> >>>    /*
+> >>> - * stsi_check_mag
+> >>> + * stsi_check_header
+> >>>     * @info: Pointer to the stsi information
+> >>> + * @sel2: stsi selector 2 value
+> >>>     *
+> >>>     * MAG field should match the architecture defined containers
+> >>>     * when MNEST as returned by SCLP matches MNEST of the SYSIB.
+> >>>     */
+> >>> -static void stsi_check_mag(struct sysinfo_15_1_x *info)
+> >>> +static void stsi_check_header(struct sysinfo_15_1_x *info, int sel2)
+> >>>    {
+> >>>     int i;
+> >>>   =20
+> >>> -   report_prefix_push("MAG");
+> >>> +   report_prefix_push("Header");
+> >>>   =20
+> >>> +   report(IS_ALIGNED(info->length, 8), "Length %d multiple of 8", in=
+fo->length);
+> >>
+> >> STSI 15 works on Words, not DWords, no?
+> >> So we need to check length against 4, not 8.
+> >=20
+> > The header is 16 bytes.
+> > Topology list entries are 8 or 16, so it must be a multiple of 8 at lea=
+st.
+>=20
+> Fair enough
 
-I've applied patches 1 and 2 to target-arm.next.
+Since I had the same question, can we have a comment here?
 
-thanks
--- PMM
+This isn't perfect but good enough IMO:
+
+/* PoP mandates 4-byte alignment, but header is 16 bytes, TLEs are 8 or 16 =
+bytes, so check for 8 byte align */
+
+Otherwise:
+
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
