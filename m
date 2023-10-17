@@ -2,224 +2,981 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E3097CBF55
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 11:29:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B52CA7CBF85
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 11:34:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234940AbjJQJ3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 05:29:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56350 "EHLO
+        id S1343506AbjJQJeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 05:34:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234958AbjJQJ3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 05:29:34 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDDFE19A3;
-        Tue, 17 Oct 2023 02:28:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697534933; x=1729070933;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RL1aNBhAi8Of6uCxhRzuiehyjjf7OYTMx2EPf1bb4ZE=;
-  b=AOJH78cRtuIscMgk3GR1cUyacCGQp35+fMC0ixACzceU1eon2+9qwwnP
-   jZmx6Issa8KZGX0gz8BfbE1JcuneK8CaQzSh8tQ1EO434yW5iRIC1xAeE
-   2oaWT2MQPlTEu2hQvMBo9Iuv0C68SQ4O2rVUx+UsPpN0R4ALUyV+zyW0f
-   F7njzo2cShnA1fZ/8zNIPesYstRV9OHvpP/wJmiUKNNfajbU1D8mWIIKk
-   w6jfkytRA+f0NVe+h8WwQv4UtihZ2HjIgkg2jC2SI1kwMq2ipetEAklii
-   yp+tpKstTgqRcFPeU4BCShJMooVK/MQ0XDQ+SCKExRtWw0SNuH3Aq+1Sy
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="471964695"
-X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="471964695"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:28:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="1087436189"
-X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="1087436189"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Oct 2023 02:28:50 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 17 Oct 2023 02:28:51 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 17 Oct 2023 02:28:51 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 17 Oct 2023 02:28:51 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I+odTH6a3X4t2mqX5UJPSUGllBWpcyI3vc/IPdnjyhiA6rZ279uQOwfaK9hfyJ/wIGOoa0iVkw+Qjfr1INyZD01sgzvWRksYinmWnw8hycsj99fnRegTPLGbkrLT0wAgsdliPaXxaVdDdIsP6GTl7NZ3bn/LLW+B85L10azpe2VsaXi18v+SKYuH09z+VIMfSLm2Wf8vZFmHm+aQOZ/o0CU03q2/KJfnIVsdAGIfc6OwxSnGn7NnCUUzkZRZDWVGLZnl4bGLgBmRt1tEhOsKJC6nZT8O87XNvhwHvmkganLzoDS1ZaimSvkhvV5lkRQhd0v4NdDLOluOuOTLJOjpQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RL1aNBhAi8Of6uCxhRzuiehyjjf7OYTMx2EPf1bb4ZE=;
- b=Mn4u2r+tb/+03rr4FzY2rBekirIzWJ6u4daE/1i9OiBcNhuImgeY02g8HwUxYv+WEXUXwcxb82NzTml97AjsUKnKKBHk98RwwLsF1zFs+OhrPw+zLUgBTPFQVFbHMdBZsdXATn6Rkhn+BYBVV7bdaP/gHp9kTBImspkI9HuLkhl3m6Udh7fUDEw/9eHAha0uQ5T5RZxTZOioE/vt56flTR50DE8WmXYFJbeI71qHC55PAuNNgWml/ja53tej9C9J++iIavY7+/PZdrgHwCpuOttIK1mvs96s9qOKgCx6dts9ZAAR+B/D/jCif2EV4JSsWL3dQCGPB1mhqlQS+COQbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BL1PR11MB5335.namprd11.prod.outlook.com (2603:10b6:208:31b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
- 2023 09:28:48 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::7116:9866:8367:95b4]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::7116:9866:8367:95b4%3]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 09:28:48 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: RE: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
- domain_alloc_user op
-Thread-Topic: [PATCH v4 01/17] iommu: Add hwpt_type with user_data for
- domain_alloc_user op
-Thread-Index: AQHZ7GCQqMA2D6hFIkG8of68DC8uNLBDXUwAgAKiBoCAAErqgIAA+cOAgACfvQCAAEDUAIADxEeAgACNVoCAAGs9AIAA9B4AgAAJZrA=
-Date:   Tue, 17 Oct 2023 09:28:48 +0000
-Message-ID: <BN9PR11MB527671149ECD3DF3696A39988CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230921075138.124099-1-yi.l.liu@intel.com>
- <20230921075138.124099-2-yi.l.liu@intel.com>
- <20231010165844.GQ3952@nvidia.com>
- <03ba68e9-33ef-35c1-5720-8f559f94f8a1@intel.com>
- <20231012133917.GL3952@nvidia.com>
- <3659d9a7-d9e9-bb73-daf5-41c765e99c8c@intel.com>
- <20231013140456.GR3952@nvidia.com> <ZSmE6unIukqJ3GKu@Asurada-Nvidia>
- <79f0cab5-39ad-3d98-3896-6e1ba7b8db21@intel.com>
- <20231016115407.GO3952@nvidia.com> <ZS1+VMEo+0bCecui@Asurada-Nvidia>
- <2a86074f-94a9-667d-6e94-c582d49b7588@intel.com>
-In-Reply-To: <2a86074f-94a9-667d-6e94-c582d49b7588@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BL1PR11MB5335:EE_
-x-ms-office365-filtering-correlation-id: 9fe81958-5622-4b54-8d06-08dbcef377d3
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /guwPkzOxIvmv+LbgkSL0zg0OivaDD11FIpDKWYOg23Al6ZEhiqdU9STL2Q6MrZEPQ7PQ2J7/HaVPiWiGeiwVQc/iLlsFYaXyGAkH1VuDBO9b6HjZ74X0MHUpb8fslizZrd908j1SQrXDDPTJbHh9GlektbXaDE4ddYR821MrRoO5SXTnwqL0l2zV5S9piYuegBnGBTK8q3+gmPmV5b/8pQ/Rj8I7q20vwwWP7RRiZQtjmEVus8wUflAc7Noe7/Pixz5+Pe/vbgsrHqfhvNbv8Uf0czFfbCb30Dzkc7X3da3PuaA2S+w6CROkggxeTyQ8LeWFxNLfg2M+IGH+2AazGbiZLEb0w+Fy6rGqSgP3OQG2EHQAgDrtXFC8CCMw7VmLkYuB5WgfWq1TSMEErDqSltmkyT4bEZaCl1U+tWDnHCWXEU0zuYzOcYyPTReJbkJEySqiSBQozvreNGXj/N1yo5fWdIZHaQEa3FmGdfJbGsv8TqKQL1+pfGniS4vTF6cjsUzlwNnu5Q50pnnSr2TyUYsDN9xFLoEcWnmgqz7KdML36zGfe33ZRw6nGtlgxjeGzIiIHSpJTvZJJPfY6ZSyBLfaEEqkqy4NO6sGG60ZDx++nhpyecdlmNZW8m19Qun
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(366004)(376002)(396003)(136003)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(33656002)(41300700001)(7416002)(55016003)(4326008)(8676002)(5660300002)(8936002)(52536014)(2906002)(86362001)(38100700002)(7696005)(82960400001)(26005)(6506007)(53546011)(478600001)(38070700005)(9686003)(83380400001)(316002)(122000001)(66446008)(64756008)(66476007)(66556008)(54906003)(71200400001)(110136005)(76116006)(66946007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NTU0VUtpaDVuQ0xnT1NsRkxBRUpOT1FaSTZzWHpsY1FwcUVsc0l4cmFmS1BI?=
- =?utf-8?B?UExMbEdCWFdaN3g1bzJZM0gxcDAxTEJybFB2eC9XZzlTclRKSjZYQnp6dHg4?=
- =?utf-8?B?RDlVeW5maTBEWGloZGNLU2QwTzNzWGNsZEJNWWFNeGY1T1l5eUFIbHVZZW5P?=
- =?utf-8?B?U0crd2VhUWE0QkpudFdtN0tyWXNWM0ZpRGV1S255OEE3bk56cHdGNEpSVXht?=
- =?utf-8?B?UE1EMDZNQWxpeVdkeklNajNNNyt5ME1mTVNXSWErUW1oaGhCWnBNNHpieTF5?=
- =?utf-8?B?SmEzMDlBUFc0RDZvOVRnOGd5V1V6Y3g5cjhHM1djRDdJV0ljNkZ0dWtSZDNn?=
- =?utf-8?B?NXlaWVBiYXNCdEdZL1BPcEJFR2VlMEV0Vm43V2V1c29lTHFsU2JMOVpQOE53?=
- =?utf-8?B?ZnVJSWNVbnNTbXRJVHVOMXhnS0NxcGVTSDBsYVRHamQ4VW1TYXp6NlRKNWVx?=
- =?utf-8?B?anZHenlnb09aOFgvdHZhWDVBUnJ0d09xTUI3eW5IOXZFZWhJbkJTSXFFTkpz?=
- =?utf-8?B?Zmo2U0hKVEt5V1kxSUJvUmFWVnhuN25jOVNwWFZxaXhKaEY5ckFDZEF4KzVm?=
- =?utf-8?B?ZFVWZWVoamE0SFUyanl6ZW16TVJaMzY3OWRsbFFYNU1RZXMyYzJYb3BsTTBJ?=
- =?utf-8?B?MWdBZmNSNytXSlRidUttWGhkbWNhWnZFck5rTE5rUk91bUVVa1hINnZLeDds?=
- =?utf-8?B?bzFiWHVlNGNzZFJHa0k5bng3WWErYW9lU2VIVDRoWWhmSWFva1VFN3l2U0FT?=
- =?utf-8?B?SC9waDBidGd5dUJFNTN3SWg1NHNybENOUFhtSTJUdjNZWE5tR2Q3Z0R5Ym5n?=
- =?utf-8?B?NS9GbmhvQU9UZ2Qxck96a2ZYRFVnNUNDNWcwbWw0b01Fc1ZXQU9FQ0xaMmdR?=
- =?utf-8?B?SG5rbjJyQnV4enllc0x4TDR2RVRoRVp6WHVyY2FuSk1UeXlRRXUyZlg1UU9s?=
- =?utf-8?B?NGluWk8rTU5EZU1CRlJpdzJpVE81WGxIYk1vVGNTSTVRNmRiYjYrR1F5bjFK?=
- =?utf-8?B?QWdlYzdkRy9QNStkWlFWSGUzcm5uQTVaYnZmdzRXL3dZVC82a2tWc3FYa2Rx?=
- =?utf-8?B?SGZEbnJWMFhDd2tYM3QrZDBzdUVtbXcrTzZUVHFCZ1NBWTVpSTQzVlNiakhl?=
- =?utf-8?B?N3V1K2FzZXNKZjUvL042YlM4aG9wRmk5Y0NTTVNZK1hlNFA2NzRZSVdBWjBI?=
- =?utf-8?B?RkdxMHViQmw1QnNMMjY5QkNMS1UwVFJraytXUmtIRGZDeGdDUGQwSWFoL2Ev?=
- =?utf-8?B?RTRSQ2pqUG9UYmpMb2Z1Y2NtTmdUbFR2eCtJRkFzQWdHd3BjTUM1VzBUQjBH?=
- =?utf-8?B?cFI1ajN1ZkV6RlAvR1B1TzhoUlROM2NDTVBHdUViOW9rcnVJU3hUMCsvLzB6?=
- =?utf-8?B?clJyQm4yUmVKMmd1eDJORW1QWFh6NVhIeUpxY01UQk9rc1d6YVJ2cS8rOXNU?=
- =?utf-8?B?Q2hUTnRtbC9hdklxU1FvaSs5a3IzczMzc093dHJjRURRN2E5MndMd2NNYWJ6?=
- =?utf-8?B?cllpai85UUt3ekNMaUdBM1ltUWJaaG5JZkplbWk5b21pRmdpYVF6czFvL2sy?=
- =?utf-8?B?TFdGN3N4M3lnL0pPN1BGODJOQmJFQ21RU3Ird1prWC91VFc1U29xS3N1WlJm?=
- =?utf-8?B?akgxV3J2RFVGU0pJWnBaYzdoN2w2b0I0alhsbVRDUUtId2FNcEpqdmZwOFZJ?=
- =?utf-8?B?QzBjemdzNTVWaGdubHhSK1FwTDVZYU5YU3ZicGE0VGVJOC9hQVBFcXFIRmxx?=
- =?utf-8?B?S09aYWpMdU9lRFQwNy9LY1ZqWEttN2lqUi9jdkpUcWlrS21EWUNRZWx0blJi?=
- =?utf-8?B?TG9hMEd5UmpWd0UycG1JOFdmcFN3RnltWFlHSXNTbDRPNzZTbFVWYnhzbVN5?=
- =?utf-8?B?NU1DM0ZoY2JDZ2dQdS9VSFZwRnpNLy9KZFpkVDZYTXMxVU9peDJqOWFWU3Jr?=
- =?utf-8?B?NVM2K2RxdTliYzZUNWtGQVo0a1lydjR2bWRhclBtckVSd2FHZjlJMmUvbDZk?=
- =?utf-8?B?MUJjT09XQkdrZ2IyRUt3eWVIN0VtelJCZ1dCV0FleFZjTGhnVU5HeUZpNXM0?=
- =?utf-8?B?Z0k3SCtCNFR1clNWL2MzU2E5eGVSd1JVMHRmWmdJMzJYdjBFWEhsODBuaW9h?=
- =?utf-8?Q?img+AhsISu9rLUyiU0yCMPf/c?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S1343747AbjJQJeH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 05:34:07 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8939DF7;
+        Tue, 17 Oct 2023 02:33:55 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c9d407bb15so45647325ad.0;
+        Tue, 17 Oct 2023 02:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697535235; x=1698140035; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rfykykDvSR3lgn/h7SgbJEFcK1W+zU64G3sv5ZleFao=;
+        b=F9/TPO+jJQUPD6OeVtQY9dqyRs1mV1HrsGTTbnzV9ewfEp7qeoc+BThAxITpSdw2Wk
+         Cmq/JZ3bz/degCX1tNCm5sYKM+6m4eUVGcQtw62gYCJ/DTi0hj/VEeGWlvoKir7KHKIr
+         tYeIEAJikpbPBZ2aQKv8bVB7RgwJ9p28MjPGBGMwgOClX+ki2bZ90QmCWluuRxqUry44
+         Za240ya+RRXsDvxj9Rv4InPWKvafyPLCfcrag5IBp42pqKEfmGfH2WE89Rp4/k+PZjjn
+         OESdCtH82GcgXgyeALl3+yQLvZ3qqPMyxyiZJkNTgQ17o5gDqmXlFVNxeXCHaglESMJ8
+         hsIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697535235; x=1698140035;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rfykykDvSR3lgn/h7SgbJEFcK1W+zU64G3sv5ZleFao=;
+        b=q/IfyF2QjfAUtrG29lW8BwOkGuc2culfNVInrxgP0LtGT/ZiAWq+57Dj0flruVLsFq
+         7cnrXQNLDB/w4/8zArhGXgdr7bhyHu1NqFHANs56IZOs3Lx5IAVvsFgX5UxpB/Fs6Z1H
+         IVBInQmtkezsamoJOpi6sGUIqKP4yucu+d0C82f0OT+F3PeOkD+NkfqrCm/ioJEEExlj
+         OWqA4lZAHHz+jJtvW9XKW00aXZi/L5P//K4KknAKA9DwtEYQPo8ubo2B092P8NXG323J
+         8SDGHIP5OyUihz+od1kTNrygeS//bGnthRCX1277UPBp9N8bqhk7z6KxH7+EHwLfhJpd
+         8kQw==
+X-Gm-Message-State: AOJu0Yx/W74uJN3uqJ5LQ9r9UnEuPlWtj1I2HOHSijeyynl4gCZlhR3+
+        v3R2JJy4HLc9c413vlITg0w=
+X-Google-Smtp-Source: AGHT+IFR9LmZdCC9OR0TUaODi5nFR7AToyyJqTqNHgbMqhADT6R9U1v3Px32u12INXd9dO01q6Hy4A==
+X-Received: by 2002:a17:902:c404:b0:1ca:3e64:2378 with SMTP id k4-20020a170902c40400b001ca3e642378mr2349965plk.4.1697535234682;
+        Tue, 17 Oct 2023 02:33:54 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id je3-20020a170903264300b001c9c5a1b477sm1054752plb.169.2023.10.17.02.33.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 02:33:53 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH] KVM: x86: Clean up included but non-essential header declarations
+Date:   Tue, 17 Oct 2023 17:33:35 +0800
+Message-ID: <20231017093335.18216-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9fe81958-5622-4b54-8d06-08dbcef377d3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2023 09:28:48.5336
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Knx3Y7Yogpe6OLjooQYwaktmIGUk25urpujw9ITd+Gu3ZS8iYZhbD5He56x5VR9n1MeVcvXXck5pZLqrn6csRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5335
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU2VudDogVHVlc2RheSwg
-T2N0b2JlciAxNywgMjAyMyA0OjUyIFBNDQo+IA0KPiBPbiAyMDIzLzEwLzE3IDAyOjE3LCBOaWNv
-bGluIENoZW4gd3JvdGU6DQo+ID4gT24gTW9uLCBPY3QgMTYsIDIwMjMgYXQgMDg6NTQ6MDdBTSAt
-MDMwMCwgSmFzb24gR3VudGhvcnBlIHdyb3RlOg0KPiA+PiBPbiBNb24sIE9jdCAxNiwgMjAyMyBh
-dCAxMToyODoxNUFNICswODAwLCBZaSBMaXUgd3JvdGU6DQo+ID4+PiBPbiAyMDIzLzEwLzE0IDAx
-OjU2LCBOaWNvbGluIENoZW4gd3JvdGU6DQo+ID4+Pj4gT24gRnJpLCBPY3QgMTMsIDIwMjMgYXQg
-MTE6MDQ6NTZBTSAtMDMwMCwgSmFzb24gR3VudGhvcnBlIHdyb3RlOg0KPiA+Pj4+PiBPbiBGcmks
-IE9jdCAxMywgMjAyMyBhdCAxMjozMzoxM1BNICswODAwLCBZaSBMaXUgd3JvdGU6DQo+ID4+Pj4+
-DQo+ID4+Pj4+PiBub3QgcmVhbGx5LiBCZWxvdyB0aGUgdXNlcnMgb2YgdGhlIHN0cnVjdCBpb21t
-dV91c2VyX2RhdGEgaW4gbXkNCj4gY3VycmVudA0KPiA+Pj4+Pj4gaW9tbXVmZF9uZXN0aW5nIGJy
-YW5jaC4gT25seSB0aGUgZG9tYWluX2FsbG9jX3VzZXIgb3AgaGFzIHR5cGUgYXMNCj4gdGhlcmUN
-Cj4gPj4+Pj4+IGNhbiBiZSBtdWx0aXBsZSB2ZW5kb3Igc3BlY2lmaWMgYWxsb2MgZGF0YSB0eXBl
-cy4gQmFzaWNhbGx5LCBJJ20gb2sgdG8NCj4gPj4+Pj4+IG1ha2UgdGhlIGNoYW5nZSB5b3Ugc3Vn
-Z2VzdGVkLCBqdXN0IG5vdCBzdXJlIGlmIGl0IGlzIGdvb2QgdG8gYWRkIHR5cGUNCj4gPj4+Pj4+
-IGFzIGl0IGlzIG9ubHkgbmVlZGVkIGJ5IG9uZSBwYXRoLg0KPiA+Pj4+Pg0KPiA+Pj4+PiBJIGRv
-bid0IHRoaW5rIHdlIHNob3VsZCBldmVyIGhhdmUgYW4gb3BhcXVlIGRhdGEgYmxvYiB3aXRob3V0
-IGEgdHlwZQ0KPiA+Pj4+PiB0YWcuLg0KPiA+Pj4+DQo+ID4+Pj4gSSBjYW4gYWRkIHRob3NlICJt
-aXNzaW5nIiBkYXRhIHR5cGVzLCBhbmQgdGhlbiBhIGRyaXZlciB3aWxsIGJlDQo+ID4+Pj4gcmVz
-cG9uc2libGUgZm9yIHNhbml0aXppbmcgdGhlIHR5cGUgYWxvbmcgd2l0aCB0aGUgZGF0YV9sZW4u
-DQo+ID4+Pj4NCj4gPj4+PiBJIG5vdGljZSB0aGF0IHRoZSBlbnVtIGlvbW11X2h3cHRfZGF0YV90
-eXBlIGluIHRoZSBwb3N0ZWQgcGF0Y2gNCj4gPj4+PiBpcyBjb25maW5lZCB0byB0aGUgYWxsb2Nf
-dXNlciB1QVBJLiBQZXJoYXBzIHdlIHNob3VsZCBzaGFyZSBpdA0KPiA+Pj4+IHdpdGggaW52YWxp
-ZGF0ZSB0b286DQo+ID4+Pg0KPiA+Pj4gaW52YWxpZGF0aW9uIHBhdGggZG9lcyBub3QgbmVlZCBh
-IHR5cGUgZmllbGQgdG9kYXkgYXMgdGhlIGRhdGENCj4gPj4+IHR5cGUgaXMgdmVuZG9yIHNwZWNp
-ZmljLCB2ZW5kb3IgZHJpdmVyIHNob3VsZCBrbm93IHRoZSBkYXRhIHR5cGUNCj4gPj4+IHdoZW4g
-Y2FsbHMgaW4uDQo+ID4+DQo+ID4+IEknbSBub3Qga2VlbiBvbiB0aGF0LCB3aGF0IGlmIGEgZHJp
-dmVyIG5lZWRzIGFub3RoZXIgdHlwZSBpbiB0aGUNCj4gPj4gZnV0dXJlPyAgWW91J2Qgd2FudCB0
-byBtYWtlIHRoZSBpbnZhbGlkYXRpb24gZGF0YSBmb3JtYXQgcGFydCBvZiB0aGUNCj4gPj4gZG9t
-YWluIGFsbG9jYXRpb24/DQo+ID4NCj4gPiBUaGUgaW52YWxpZGF0aW9uIGRhdGEgaGFzIGh3cHRf
-aWQgc28gaXQncyB0aWVkIHRvIGEgaHdwdCBhbmQgaXRzDQo+ID4gaHdwdC0+ZG9tYWluLiBXb3Vs
-ZCBpdCBiZSByZWFzb25hYmxlIHRvIGhhdmUgYSBkaWZmZXJlbnQgdHlwZSBvZg0KPiA+IGludmFs
-aWRhdGlvbiBkYXRhIGZvciB0aGUgc2FtZSB0eXBlIG9mIGh3cHQ/DQo+IA0KPiB0aGlzIHNlZW1z
-IGxpa2Ugd2hhdCBKYXNvbiBhc2tzLiBBIHR5cGUgb2YgaHdwdCBjYW4gaGF2ZSB0d28ga2luZHMN
-Cj4gb2YgaW52YWxpZGF0aW9uIGRhdGEgdHlwZXMuIElzIGl0IHJlYWxseSBwb3NzaWJsZT8NCj4g
-DQoNCmUuZy4gdmhvc3QtaW9tbXUgbWF5IHdhbnQgaXRzIG93biB2ZW5kb3ItYWdub3N0aWMgZm9y
-bWF0IGZyb20NCnByZXZpb3VzIGRpc2N1c3Npb24uLi4NCg==
+From: Like Xu <likexu@tencent.com>
+
+Clean up some headers declarations within the kvm/x86 tree that are
+no longer needed or duplicately included more or less.
+
+It is difficult for the naked eye to discern the most basic and effective
+header declarations required for each C file, and it's easy to get stuck in
+"Dependency Hell [*]" on finding the state-of-art declaration. The strategy
+used here is to take advantage of a LLVM tool "include-what-you-use [**]",
+which allows any CI to use "make LLVM=1 C=1 CHECK=include-what-you-use" to
+quickly find header declarations that may be removable, but the results are
+fraught with false positives. Thus, automated compilation (x86_64/i386)
+testing is applied to validate each header declaration removal proposal.
+
+Removing these declarations as part of KVM code refactoring can also (when
+the compiler isn't so smart) reduce compile time, compile warnings, and the
+size of compiled artefacts, and more importantly can help developers better
+consider decoupling when adding/refactoring unmerged code, thus relieving
+some of the burden on the code review process.
+
+Specific header declaration is supposed to be retained if it makes more
+sense for reviewers to understand. No functional changes intended.
+
+[*] https://lore.kernel.org/all/YdIfz+LMewetSaEB@gmail.com/
+[**] https://include-what-you-use.org/
+
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/cpuid.c           |  3 ---
+ arch/x86/kvm/cpuid.h           |  1 -
+ arch/x86/kvm/emulate.c         |  2 --
+ arch/x86/kvm/hyperv.c          |  3 ---
+ arch/x86/kvm/i8259.c           |  1 -
+ arch/x86/kvm/ioapic.c          | 10 ----------
+ arch/x86/kvm/irq.c             |  3 ---
+ arch/x86/kvm/irq.h             |  3 ---
+ arch/x86/kvm/irq_comm.c        |  2 --
+ arch/x86/kvm/lapic.c           |  8 --------
+ arch/x86/kvm/mmu.h             |  1 -
+ arch/x86/kvm/mmu/mmu.c         | 11 -----------
+ arch/x86/kvm/mmu/spte.c        |  1 -
+ arch/x86/kvm/mmu/tdp_iter.h    |  1 -
+ arch/x86/kvm/mmu/tdp_mmu.c     |  3 ---
+ arch/x86/kvm/mmu/tdp_mmu.h     |  4 ----
+ arch/x86/kvm/smm.c             |  1 -
+ arch/x86/kvm/smm.h             |  3 ---
+ arch/x86/kvm/svm/avic.c        |  2 --
+ arch/x86/kvm/svm/hyperv.h      |  2 --
+ arch/x86/kvm/svm/nested.c      |  2 --
+ arch/x86/kvm/svm/pmu.c         |  4 ----
+ arch/x86/kvm/svm/sev.c         |  7 -------
+ arch/x86/kvm/svm/svm.c         | 29 -----------------------------
+ arch/x86/kvm/svm/svm.h         |  3 ---
+ arch/x86/kvm/vmx/hyperv.c      |  4 ----
+ arch/x86/kvm/vmx/hyperv.h      |  7 -------
+ arch/x86/kvm/vmx/nested.c      |  2 --
+ arch/x86/kvm/vmx/nested.h      |  1 -
+ arch/x86/kvm/vmx/pmu_intel.c   |  1 -
+ arch/x86/kvm/vmx/posted_intr.c |  1 -
+ arch/x86/kvm/vmx/sgx.h         |  5 -----
+ arch/x86/kvm/vmx/vmx.c         | 11 -----------
+ arch/x86/kvm/x86.c             | 17 -----------------
+ arch/x86/kvm/xen.c             |  1 -
+ virt/kvm/async_pf.c            |  2 --
+ virt/kvm/binary_stats.c        |  1 -
+ virt/kvm/coalesced_mmio.h      |  2 --
+ virt/kvm/eventfd.c             |  2 --
+ virt/kvm/irqchip.c             |  1 -
+ virt/kvm/kvm_main.c            | 13 -------------
+ virt/kvm/pfncache.c            |  1 -
+ virt/kvm/vfio.c                |  2 --
+ 43 files changed, 184 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 464b23ac5f93..ca4e640e8076 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -12,13 +12,10 @@
+ 
+ #include <linux/kvm_host.h>
+ #include "linux/lockdep.h"
+-#include <linux/export.h>
+-#include <linux/vmalloc.h>
+ #include <linux/uaccess.h>
+ #include <linux/sched/stat.h>
+ 
+ #include <asm/processor.h>
+-#include <asm/user.h>
+ #include <asm/fpu/xstate.h>
+ #include <asm/sgx.h>
+ #include <asm/cpuid.h>
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 0b90532b6e26..f13eff330b38 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -5,7 +5,6 @@
+ #include "x86.h"
+ #include "reverse_cpuid.h"
+ #include <asm/cpu.h>
+-#include <asm/processor.h>
+ #include <uapi/asm/kvm_para.h>
+ 
+ extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 2673cd5c46cb..c4f450a4860c 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -20,9 +20,7 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+ #include <linux/kvm_host.h>
+-#include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+-#include <linux/stringify.h>
+ #include <asm/debugreg.h>
+ #include <asm/nospec-branch.h>
+ #include <asm/ibt.h>
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 7c2dac6824e2..ab221264f1f5 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -21,15 +21,12 @@
+ 
+ #include "x86.h"
+ #include "lapic.h"
+-#include "ioapic.h"
+ #include "cpuid.h"
+ #include "hyperv.h"
+ #include "mmu.h"
+ #include "xen.h"
+ 
+-#include <linux/cpu.h>
+ #include <linux/kvm_host.h>
+-#include <linux/highmem.h>
+ #include <linux/sched/cputime.h>
+ #include <linux/spinlock.h>
+ #include <linux/eventfd.h>
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 8dec646e764b..293baea22a1d 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -28,7 +28,6 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/mm.h>
+ #include <linux/slab.h>
+ #include <linux/bitops.h>
+ #include "irq.h"
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 995eb5054360..c1324314a9e0 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -29,18 +29,8 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+ #include <linux/kvm_host.h>
+-#include <linux/kvm.h>
+-#include <linux/mm.h>
+-#include <linux/highmem.h>
+-#include <linux/smp.h>
+-#include <linux/hrtimer.h>
+-#include <linux/io.h>
+ #include <linux/slab.h>
+-#include <linux/export.h>
+ #include <linux/nospec.h>
+-#include <asm/processor.h>
+-#include <asm/page.h>
+-#include <asm/current.h>
+ #include <trace/events/kvm.h>
+ 
+ #include "ioapic.h"
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index b2c397dd2bc6..8a9284e376b8 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -9,12 +9,9 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/export.h>
+ #include <linux/kvm_host.h>
+ 
+ #include "irq.h"
+-#include "i8254.h"
+-#include "x86.h"
+ #include "xen.h"
+ 
+ /*
+diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+index c2d7cfe82d00..f4dd4ace9370 100644
+--- a/arch/x86/kvm/irq.h
++++ b/arch/x86/kvm/irq.h
+@@ -10,10 +10,7 @@
+ #ifndef __IRQ_H
+ #define __IRQ_H
+ 
+-#include <linux/mm_types.h>
+-#include <linux/hrtimer.h>
+ #include <linux/kvm_host.h>
+-#include <linux/spinlock.h>
+ 
+ #include <kvm/iodev.h>
+ #include "lapic.h"
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 16d076a1b91a..1a76c452c6ec 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -11,8 +11,6 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+ #include <linux/kvm_host.h>
+-#include <linux/slab.h>
+-#include <linux/export.h>
+ #include <linux/rculist.h>
+ 
+ #include <trace/events/kvm.h>
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 245b20973cae..ca5e55fd8644 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -20,18 +20,10 @@
+ #include <linux/kvm_host.h>
+ #include <linux/kvm.h>
+ #include <linux/mm.h>
+-#include <linux/highmem.h>
+-#include <linux/smp.h>
+ #include <linux/hrtimer.h>
+-#include <linux/io.h>
+-#include <linux/export.h>
+ #include <linux/math64.h>
+-#include <linux/slab.h>
+-#include <asm/processor.h>
+ #include <asm/mce.h>
+ #include <asm/msr.h>
+-#include <asm/page.h>
+-#include <asm/current.h>
+ #include <asm/apicdef.h>
+ #include <asm/delay.h>
+ #include <linux/atomic.h>
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index bb8c86eefac0..6d3e27ae697b 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -4,7 +4,6 @@
+ 
+ #include <linux/kvm_host.h>
+ #include "kvm_cache_regs.h"
+-#include "cpuid.h"
+ 
+ extern bool __read_mostly enable_mmio_caching;
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5d3dc7119e57..2012ea028fe0 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -16,8 +16,6 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include "irq.h"
+-#include "ioapic.h"
+ #include "mmu.h"
+ #include "mmu_internal.h"
+ #include "tdp_mmu.h"
+@@ -33,25 +31,16 @@
+ #include <linux/types.h>
+ #include <linux/string.h>
+ #include <linux/mm.h>
+-#include <linux/highmem.h>
+ #include <linux/moduleparam.h>
+-#include <linux/export.h>
+-#include <linux/swap.h>
+-#include <linux/hugetlb.h>
+-#include <linux/compiler.h>
+ #include <linux/srcu.h>
+ #include <linux/slab.h>
+ #include <linux/sched/signal.h>
+-#include <linux/uaccess.h>
+ #include <linux/hash.h>
+-#include <linux/kern_levels.h>
+ #include <linux/kstrtox.h>
+ #include <linux/kthread.h>
+ 
+ #include <asm/page.h>
+-#include <asm/memtype.h>
+ #include <asm/cmpxchg.h>
+-#include <asm/io.h>
+ #include <asm/set_memory.h>
+ #include <asm/vmx.h>
+ 
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 4a599130e9c9..0cbf5f828d4d 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -12,7 +12,6 @@
+ #include <linux/kvm_host.h>
+ #include "mmu.h"
+ #include "mmu_internal.h"
+-#include "x86.h"
+ #include "spte.h"
+ 
+ #include <asm/e820/api.h>
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index fae559559a80..873a087f1f39 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -5,7 +5,6 @@
+ 
+ #include <linux/kvm_host.h>
+ 
+-#include "mmu.h"
+ #include "spte.h"
+ 
+ /*
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6cd4dd631a2f..6e2a92b6d2c4 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -8,9 +8,6 @@
+ #include "tdp_mmu.h"
+ #include "spte.h"
+ 
+-#include <asm/cmpxchg.h>
+-#include <trace/events/kvm.h>
+-
+ /* Initializes the TDP MMU for the VM, if enabled. */
+ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+ {
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 733a3aef3a96..66afdf3e262a 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -3,10 +3,6 @@
+ #ifndef __KVM_X86_MMU_TDP_MMU_H
+ #define __KVM_X86_MMU_TDP_MMU_H
+ 
+-#include <linux/kvm_host.h>
+-
+-#include "spte.h"
+-
+ void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+ 
+diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+index dc3d95fdca7d..3c8979ef87ef 100644
+--- a/arch/x86/kvm/smm.c
++++ b/arch/x86/kvm/smm.c
+@@ -2,7 +2,6 @@
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+ #include <linux/kvm_host.h>
+-#include "x86.h"
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ #include "smm.h"
+diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+index a1cf2ac5bd78..3e067ce1ea1d 100644
+--- a/arch/x86/kvm/smm.h
++++ b/arch/x86/kvm/smm.h
+@@ -2,11 +2,8 @@
+ #ifndef ASM_KVM_SMM_H
+ #define ASM_KVM_SMM_H
+ 
+-#include <linux/build_bug.h>
+-
+ #ifdef CONFIG_KVM_SMM
+ 
+-
+ /*
+  * 32 bit KVM's emulated SMM layout. Based on Intel P6 layout
+  * (https://www.sandpile.org/x86/smm.htm).
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 2092db892d7d..e5dea4230347 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -14,7 +14,6 @@
+ 
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/kvm_types.h>
+ #include <linux/hashtable.h>
+ #include <linux/amd-iommu.h>
+ #include <linux/kvm_host.h>
+@@ -23,7 +22,6 @@
+ 
+ #include "trace.h"
+ #include "lapic.h"
+-#include "x86.h"
+ #include "irq.h"
+ #include "svm.h"
+ 
+diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+index 02f4784b5d44..f546736ce0b3 100644
+--- a/arch/x86/kvm/svm/hyperv.h
++++ b/arch/x86/kvm/svm/hyperv.h
+@@ -6,8 +6,6 @@
+ #ifndef __ARCH_X86_KVM_SVM_HYPERV_H__
+ #define __ARCH_X86_KVM_SVM_HYPERV_H__
+ 
+-#include <asm/mshyperv.h>
+-
+ #include "../hyperv.h"
+ #include "svm.h"
+ 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index dd496c9e5f91..ca525c440b63 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -16,10 +16,8 @@
+ 
+ #include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
+-#include <linux/kernel.h>
+ 
+ #include <asm/msr-index.h>
+-#include <asm/debugreg.h>
+ 
+ #include "kvm_emulate.h"
+ #include "trace.h"
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index 373ff6a6687b..1c5f2d3e7248 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -13,12 +13,8 @@
+ 
+ #include <linux/types.h>
+ #include <linux/kvm_host.h>
+-#include <linux/perf_event.h>
+-#include "x86.h"
+ #include "cpuid.h"
+-#include "lapic.h"
+ #include "pmu.h"
+-#include "svm.h"
+ 
+ enum pmu_type {
+ 	PMU_TYPE_COUNTER = 0,
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 4900c078045a..f0ef5f3ecb85 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -8,27 +8,20 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
+ #include <linux/kernel.h>
+-#include <linux/highmem.h>
+ #include <linux/psp.h>
+ #include <linux/psp-sev.h>
+-#include <linux/pagemap.h>
+ #include <linux/swap.h>
+ #include <linux/misc_cgroup.h>
+-#include <linux/processor.h>
+-#include <linux/trace_events.h>
+ 
+ #include <asm/pkru.h>
+-#include <asm/trapnr.h>
+ #include <asm/fpu/xcr.h>
+ #include <asm/debugreg.h>
+ 
+ #include "mmu.h"
+ #include "x86.h"
+ #include "svm.h"
+-#include "svm_ops.h"
+ #include "cpuid.h"
+ #include "trace.h"
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b7472ad183b9..50641dd810b0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -9,46 +9,17 @@
+ #include "smm.h"
+ #include "cpuid.h"
+ #include "pmu.h"
+-
+-#include <linux/module.h>
+-#include <linux/mod_devicetable.h>
+-#include <linux/kernel.h>
+-#include <linux/vmalloc.h>
+-#include <linux/highmem.h>
+-#include <linux/amd-iommu.h>
+-#include <linux/sched.h>
+-#include <linux/trace_events.h>
+-#include <linux/slab.h>
+-#include <linux/hashtable.h>
+-#include <linux/objtool.h>
+-#include <linux/psp-sev.h>
+-#include <linux/file.h>
+-#include <linux/pagemap.h>
+-#include <linux/swap.h>
+ #include <linux/rwsem.h>
+-#include <linux/cc_platform.h>
+-#include <linux/smp.h>
+-
+-#include <asm/apic.h>
+-#include <asm/perf_event.h>
+-#include <asm/tlbflush.h>
+-#include <asm/desc.h>
+-#include <asm/debugreg.h>
+-#include <asm/kvm_para.h>
+-#include <asm/irq_remapping.h>
+ #include <asm/spec-ctrl.h>
+ #include <asm/cpu_device_id.h>
+ #include <asm/traps.h>
+ #include <asm/reboot.h>
+-#include <asm/fpu/api.h>
+ 
+ #include <trace/events/ipi.h>
+ 
+ #include "trace.h"
+-
+ #include "svm.h"
+ #include "svm_ops.h"
+-
+ #include "kvm_onhyperv.h"
+ #include "svm_onhyperv.h"
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index be67ab7fdd10..1f4ef7a12975 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -15,10 +15,7 @@
+ #ifndef __SVM_SVM_H
+ #define __SVM_SVM_H
+ 
+-#include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
+-#include <linux/bits.h>
+-
+ #include <asm/svm.h>
+ #include <asm/sev-common.h>
+ 
+diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
+index 313b8bb5b8a7..4b0a0abcc9f1 100644
+--- a/arch/x86/kvm/vmx/hyperv.c
++++ b/arch/x86/kvm/vmx/hyperv.c
+@@ -1,13 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/errno.h>
+-#include <linux/smp.h>
+-
+ #include "../cpuid.h"
+ #include "hyperv.h"
+ #include "nested.h"
+-#include "vmcs.h"
+ #include "vmx.h"
+ #include "trace.h"
+ 
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index 9623fe1651c4..6a3dd2ee893c 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -2,15 +2,8 @@
+ #ifndef __KVM_X86_VMX_HYPERV_H
+ #define __KVM_X86_VMX_HYPERV_H
+ 
+-#include <linux/jump_label.h>
+-
+-#include <asm/hyperv-tlfs.h>
+ #include <asm/mshyperv.h>
+-#include <asm/vmx.h>
+ 
+-#include "../hyperv.h"
+-
+-#include "capabilities.h"
+ #include "vmcs.h"
+ #include "vmcs12.h"
+ 
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index c5ec0ef51ff7..5899d5bc4c5a 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1,8 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/objtool.h>
+-#include <linux/percpu.h>
+ 
+ #include <asm/debugreg.h>
+ #include <asm/mmu_context.h>
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index b4b9d51438c6..432743d66bb0 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -2,7 +2,6 @@
+ #ifndef __KVM_X86_VMX_NESTED_H
+ #define __KVM_X86_VMX_NESTED_H
+ 
+-#include "kvm_cache_regs.h"
+ #include "vmcs12.h"
+ #include "vmx.h"
+ 
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 820d3e1f6b4f..64f1e395acbf 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -16,7 +16,6 @@
+ #include <asm/perf_event.h>
+ #include "x86.h"
+ #include "cpuid.h"
+-#include "lapic.h"
+ #include "nested.h"
+ #include "pmu.h"
+ 
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index af662312fd07..cfb61921e322 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -4,7 +4,6 @@
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/irq_remapping.h>
+-#include <asm/cpu.h>
+ 
+ #include "lapic.h"
+ #include "irq.h"
+diff --git a/arch/x86/kvm/vmx/sgx.h b/arch/x86/kvm/vmx/sgx.h
+index a400888b376d..3c8af99d3d4c 100644
+--- a/arch/x86/kvm/vmx/sgx.h
++++ b/arch/x86/kvm/vmx/sgx.h
+@@ -2,11 +2,6 @@
+ #ifndef __KVM_X86_SGX_H
+ #define __KVM_X86_SGX_H
+ 
+-#include <linux/kvm_host.h>
+-
+-#include "capabilities.h"
+-#include "vmx_ops.h"
+-
+ #ifdef CONFIG_X86_SGX_KVM
+ extern bool __read_mostly enable_sgx;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 86ce9efe6c66..9814569c0b37 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -14,7 +14,6 @@
+  */
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#include <linux/highmem.h>
+ #include <linux/hrtimer.h>
+ #include <linux/kernel.h>
+ #include <linux/kvm_host.h>
+@@ -22,12 +21,8 @@
+ #include <linux/moduleparam.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/mm.h>
+-#include <linux/objtool.h>
+ #include <linux/sched.h>
+ #include <linux/sched/smt.h>
+-#include <linux/slab.h>
+-#include <linux/tboot.h>
+-#include <linux/trace_events.h>
+ #include <linux/entry-kvm.h>
+ 
+ #include <asm/apic.h>
+@@ -36,17 +31,11 @@
+ #include <asm/cpu_device_id.h>
+ #include <asm/debugreg.h>
+ #include <asm/desc.h>
+-#include <asm/fpu/api.h>
+-#include <asm/fpu/xstate.h>
+-#include <asm/idtentry.h>
+ #include <asm/io.h>
+-#include <asm/irq_remapping.h>
+ #include <asm/reboot.h>
+ #include <asm/perf_event.h>
+ #include <asm/mmu_context.h>
+ #include <asm/mshyperv.h>
+-#include <asm/mwait.h>
+-#include <asm/spec-ctrl.h>
+ #include <asm/vmx.h>
+ 
+ #include "capabilities.h"
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 530d4bc2259b..be0b77835e6f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -22,7 +22,6 @@
+ #include "ioapic.h"
+ #include "mmu.h"
+ #include "i8254.h"
+-#include "tss.h"
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ #include "mmu/page_track.h"
+@@ -35,33 +34,22 @@
+ #include "smm.h"
+ 
+ #include <linux/clocksource.h>
+-#include <linux/interrupt.h>
+ #include <linux/kvm.h>
+ #include <linux/fs.h>
+-#include <linux/vmalloc.h>
+-#include <linux/export.h>
+ #include <linux/moduleparam.h>
+ #include <linux/mman.h>
+ #include <linux/highmem.h>
+-#include <linux/iommu.h>
+ #include <linux/cpufreq.h>
+ #include <linux/user-return-notifier.h>
+-#include <linux/srcu.h>
+-#include <linux/slab.h>
+ #include <linux/perf_event.h>
+-#include <linux/uaccess.h>
+ #include <linux/hash.h>
+ #include <linux/pci.h>
+ #include <linux/timekeeper_internal.h>
+-#include <linux/pvclock_gtod.h>
+ #include <linux/kvm_irqfd.h>
+ #include <linux/irqbypass.h>
+-#include <linux/sched/stat.h>
+ #include <linux/sched/isolation.h>
+-#include <linux/mem_encrypt.h>
+ #include <linux/entry-kvm.h>
+ #include <linux/suspend.h>
+-#include <linux/smp.h>
+ 
+ #include <trace/events/ipi.h>
+ #include <trace/events/kvm.h>
+@@ -71,18 +59,13 @@
+ #include <asm/desc.h>
+ #include <asm/mce.h>
+ #include <asm/pkru.h>
+-#include <linux/kernel_stat.h>
+ #include <asm/fpu/api.h>
+ #include <asm/fpu/xcr.h>
+-#include <asm/fpu/xstate.h>
+ #include <asm/pvclock.h>
+-#include <asm/div64.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/mshyperv.h>
+ #include <asm/hypervisor.h>
+-#include <asm/tlbflush.h>
+ #include <asm/intel_pt.h>
+-#include <asm/emulate_prefix.h>
+ #include <asm/sgx.h>
+ #include <clocksource/hyperv_timer.h>
+ 
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index e53fad915a62..4c82d084852e 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -16,7 +16,6 @@
+ #include <linux/kvm_host.h>
+ #include <linux/sched/stat.h>
+ 
+-#include <trace/events/kvm.h>
+ #include <xen/interface/xen.h>
+ #include <xen/interface/vcpu.h>
+ #include <xen/interface/version.h>
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index e033c79d528e..d3c4751ec8c6 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -10,8 +10,6 @@
+ 
+ #include <linux/kvm_host.h>
+ #include <linux/slab.h>
+-#include <linux/module.h>
+-#include <linux/mmu_context.h>
+ #include <linux/sched/mm.h>
+ 
+ #include "async_pf.h"
+diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
+index eefca6c69f51..77cbbf6c2aba 100644
+--- a/virt/kvm/binary_stats.c
++++ b/virt/kvm/binary_stats.c
+@@ -7,7 +7,6 @@
+ 
+ #include <linux/kvm_host.h>
+ #include <linux/kvm.h>
+-#include <linux/errno.h>
+ #include <linux/uaccess.h>
+ 
+ /**
+diff --git a/virt/kvm/coalesced_mmio.h b/virt/kvm/coalesced_mmio.h
+index 36f84264ed25..40b07fb3ed61 100644
+--- a/virt/kvm/coalesced_mmio.h
++++ b/virt/kvm/coalesced_mmio.h
+@@ -13,8 +13,6 @@
+ 
+ #ifdef CONFIG_KVM_MMIO
+ 
+-#include <linux/list.h>
+-
+ struct kvm_coalesced_mmio_dev {
+ 	struct list_head list;
+ 	struct kvm_io_device dev;
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 89912a17f5d5..f7863a0ce75f 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -13,13 +13,11 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_irqfd.h>
+ #include <linux/workqueue.h>
+-#include <linux/syscalls.h>
+ #include <linux/wait.h>
+ #include <linux/poll.h>
+ #include <linux/file.h>
+ #include <linux/list.h>
+ #include <linux/eventfd.h>
+-#include <linux/kernel.h>
+ #include <linux/srcu.h>
+ #include <linux/slab.h>
+ #include <linux/seqlock.h>
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 1e567d1f6d3d..f3bfa56bb0dc 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -15,7 +15,6 @@
+ #include <linux/kvm_host.h>
+ #include <linux/slab.h>
+ #include <linux/srcu.h>
+-#include <linux/export.h>
+ #include <trace/events/kvm.h>
+ 
+ int kvm_irq_map_gsi(struct kvm *kvm,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 486800a7024b..aff195e03bfc 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -19,42 +19,29 @@
+ #include <linux/kvm.h>
+ #include <linux/module.h>
+ #include <linux/errno.h>
+-#include <linux/percpu.h>
+ #include <linux/mm.h>
+ #include <linux/miscdevice.h>
+ #include <linux/vmalloc.h>
+-#include <linux/reboot.h>
+ #include <linux/debugfs.h>
+-#include <linux/highmem.h>
+ #include <linux/file.h>
+ #include <linux/syscore_ops.h>
+ #include <linux/cpu.h>
+ #include <linux/sched/signal.h>
+ #include <linux/sched/mm.h>
+-#include <linux/sched/stat.h>
+ #include <linux/cpumask.h>
+ #include <linux/smp.h>
+ #include <linux/anon_inodes.h>
+-#include <linux/profile.h>
+-#include <linux/kvm_para.h>
+-#include <linux/pagemap.h>
+-#include <linux/mman.h>
+ #include <linux/swap.h>
+-#include <linux/bitops.h>
+ #include <linux/spinlock.h>
+ #include <linux/compat.h>
+ #include <linux/srcu.h>
+ #include <linux/hugetlb.h>
+ #include <linux/slab.h>
+-#include <linux/sort.h>
+ #include <linux/bsearch.h>
+ #include <linux/io.h>
+ #include <linux/lockdep.h>
+ #include <linux/kthread.h>
+ #include <linux/suspend.h>
+-
+-#include <asm/processor.h>
+-#include <asm/ioctl.h>
+ #include <linux/uaccess.h>
+ 
+ #include "coalesced_mmio.h"
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 2d6aba677830..805e51f35d73 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -12,7 +12,6 @@
+  */
+ 
+ #include <linux/kvm_host.h>
+-#include <linux/kvm.h>
+ #include <linux/highmem.h>
+ #include <linux/module.h>
+ #include <linux/errno.h>
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index ca24ce120906..de410402da8c 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -6,14 +6,12 @@
+  *     Author: Alex Williamson <alex.williamson@redhat.com>
+  */
+ 
+-#include <linux/errno.h>
+ #include <linux/file.h>
+ #include <linux/kvm_host.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/slab.h>
+-#include <linux/uaccess.h>
+ #include <linux/vfio.h>
+ #include "vfio.h"
+ 
+
+base-commit: 2bf2d3d16b8d7fe346a88569b6d786a3b18913dc
+-- 
+2.42.0
+
