@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 111927CB933
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 05:22:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DB567CB935
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 05:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234609AbjJQDW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Oct 2023 23:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
+        id S234632AbjJQDW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Oct 2023 23:22:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234535AbjJQDWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S234613AbjJQDWK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 16 Oct 2023 23:22:10 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53CEAD5E;
-        Mon, 16 Oct 2023 20:21:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24C9D76;
+        Mon, 16 Oct 2023 20:21:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697512899; x=1729048899;
+  t=1697512901; x=1729048901;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rIP4lGeh4l++76KLDIftiMSwqqH2jZrP09tAxFYTrFc=;
-  b=crPElB6nP4LYtoSQdKRUeQg6WyDq65K+8nc2sfN7skGa6au6SQmibSmh
-   OA7Bfp1JacUr6Nn1o7RfMt3qmlsOD6ulflrioRUTCu2wocU/gz5Vntc8v
-   2C3ISssR15vGDzSUVYaz2p1NVUSjaOrBSkXRwR65QfFH3nrr5gGiUFz49
-   MHvX+NX0cIVmvkCUNruuxCvm+nncF9xZpXK3e1NcNnsuUttA4QIgXSkvs
-   2nkBmjaRW3lkqoHVqpwhE5Uyjt1uVUDcmKgWf0BHzUnv3BrOdegvhk38u
-   8O4XpRjN8P+PoYmmB98KKMNWg/840HCFn86e8oVQ0qLcZ5cgkIgX8BqHD
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="389560895"
+  bh=4nxTmLQvKKPzHqteeuuuNrIO9LndgZ0wCZAz7jCVpac=;
+  b=Ba25vZa4FESxziTn+RJmkvfOKUs6MbncPQw6N3pUjjMavWafRfHELOJ3
+   oRW+MMSxul6ok5fNlgXh9xXE26JLgAnkNV7A5n6zQ2EzNS7Ao/LuYbPSA
+   jfDnAEokJswZtvOzTmzCcRnkhzBZjyVb/Dg9fvQvkUtmsLWYX3M1I7Kbw
+   dPblkaiddGjzqABq+oVcrmmxGskLf7lz/FNanXyY5Shu6/fqNCeHKGS1N
+   IBhZx/QLU6Vij/MEfkv9T6mKiG/zzd6aV4L9h/6WWhQfjpYCnaIZ0gqDk
+   xVoA2CCekyOVEJmfFE4rh933hNgRC6J6PsLbUJnM1bZBo7bJT3XDAsqN5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="389560907"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="389560895"
+   d="scan'208";a="389560907"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 20:21:38 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 20:21:40 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826270102"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826270114"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="826270102"
+   d="scan'208";a="826270114"
 Received: from sqa-gate.sh.intel.com (HELO spr-2s5.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Oct 2023 20:21:35 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 16 Oct 2023 20:21:38 -0700
 From:   Tina Zhang <tina.zhang@intel.com>
 To:     iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -46,9 +46,9 @@ Cc:     David Woodhouse <dwmw2@infradead.org>,
         Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@ziepe.ca>,
         Kevin Tian <kevin.tian@intel.com>,
         Tina Zhang <tina.zhang@intel.com>
-Subject: [RFC PATCH 11/12] iommu/vt-d: Use intel_iommu_set_dev_pasid() for sva domain
-Date:   Tue, 17 Oct 2023 11:20:44 +0800
-Message-Id: <20231017032045.114868-13-tina.zhang@intel.com>
+Subject: [RFC PATCH 12/12] iommu/vt-d: Remove superfluous IOMMU IOTLB invalidations
+Date:   Tue, 17 Oct 2023 11:20:45 +0800
+Message-Id: <20231017032045.114868-14-tina.zhang@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231017032045.114868-1-tina.zhang@intel.com>
 References: <20231017032045.114868-1-tina.zhang@intel.com>
@@ -64,85 +64,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let intel_svm_set_dev_pasid() use intel_iommu_set_dev_pasid() for
-set_dev_pasid operation.
+Devices behind different IOMMUs can be bound to one sva domain. When a
+range of a sva domain address is being invalidated, vt-d driver needs to
+issue IOMMU IOTLB and Dev-IOTLB invalidation commands to ask IOMMU
+hardware and related devices to invalidate their caches.
+
+The current logic issues both IOTLB invalidation command and device-TLB
+command per device, which leads to superfluous IOTLB invalidation (e.g.,
+if there are four devices behind a IOMMU are attached to one sva domain.
+In the current logic, during handing intel_invalidate_range(), four IOTLB
+invalidation commands and four Dev-IOTLB invalidation commands will be
+issued. However, only one IOTLB invalidation command and four Dev-IOTLB
+invalidation command are necessary.), and therefore impacts run-time
+performance.
+
+The patch removes the redundant IOMMU IOTLB invalidations by allowing
+issuing IOMMU IOTLB invalidation command per iommu instead of per device.
 
 Signed-off-by: Tina Zhang <tina.zhang@intel.com>
 ---
- drivers/iommu/intel/svm.c | 44 +++++++--------------------------------
- 1 file changed, 8 insertions(+), 36 deletions(-)
+ drivers/iommu/intel/svm.c | 56 +++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-index 7f98c8acd04f..c9a703935908 100644
+index c9a703935908..f684b92a1241 100644
 --- a/drivers/iommu/intel/svm.c
 +++ b/drivers/iommu/intel/svm.c
-@@ -231,13 +231,9 @@ static const struct mmu_notifier_ops intel_mmuops = {
- static int intel_svm_set_dev_pasid(struct iommu_domain *domain,
- 				   struct device *dev, ioasid_t pasid)
+@@ -135,32 +135,41 @@ void intel_svm_check(struct intel_iommu *iommu)
+ 	iommu->flags |= VTD_FLAG_SVM_CAPABLE;
+ }
+ 
+-static void __flush_svm_range_dev(struct dmar_domain *domain,
+-				  struct dev_pasid_info *dev_pasid,
++static void __flush_svm_range(struct iommu_domain *domain,
+ 				  unsigned long address,
+ 				  unsigned long pages, int ih)
  {
--	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
--	struct device_domain_info *info = dev_iommu_priv_get(dev);
--	struct intel_iommu *iommu = info->iommu;
- 	struct mm_struct *mm = domain->mm;
--	struct dev_pasid_info *dev_pasid;
--	unsigned long sflags;
--	int ret = 0;
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	int ret;
+-	struct device_domain_info *info = dev_iommu_priv_get(dev_pasid->dev);
+-	struct intel_iommu *iommu = dev_to_intel_iommu(dev_pasid->dev);
+-	u32 pasid = mm_get_enqcmd_pasid(domain->domain.mm);
++	u32 pasid = mm_get_enqcmd_pasid(domain->mm);
++	struct device_domain_info *dev_info;
++	struct iommu_domain_info *iommu_info;
++	struct dev_pasid_info *dev_pasid;
++	struct intel_iommu *iommu;
++	unsigned long idx;
  
- 	/*
- 	 * The sva domain can be shared among multiple devices. Make sure
-@@ -250,37 +246,11 @@ static int intel_svm_set_dev_pasid(struct iommu_domain *domain,
- 			return ret;
- 	}
+ 	if (WARN_ON(!pages))
+ 		return;
  
--	dev_pasid = kzalloc(sizeof(*dev_pasid), GFP_KERNEL);
--	if (!dev_pasid) {
--		ret = -ENOMEM;
--		goto out_unregister;
--	}
--
--	dev_pasid->dev = dev;
--	dev_pasid->sid = PCI_DEVID(info->bus, info->devfn);
+-	qi_flush_piotlb(iommu, FLPT_DEFAULT_DID, pasid, address, pages, ih);
 -	if (info->ats_enabled) {
--		dev_pasid->qdep = info->ats_qdep;
--		if (dev_pasid->qdep >= QI_DEV_EIOTLB_MAX_INVS)
--			dev_pasid->qdep = 0;
-+	ret = intel_iommu_set_dev_pasid(domain, dev, pasid);
-+	if (ret) {
-+		if (list_empty(&dmar_domain->dev_pasids))
-+			mmu_notifier_unregister(&domain->notifier, mm);
+-		qi_flush_dev_iotlb_pasid(iommu, dev_pasid->sid, info->pfsid,
+-					 pasid, dev_pasid->qdep, address,
+-					 order_base_2(pages));
+-		quirk_extra_dev_tlb_flush(info, address, order_base_2(pages),
+-					  pasid, dev_pasid->qdep);
++	rcu_read_lock();
++	xa_for_each(&to_dmar_domain(domain)->iommu_array, idx, iommu_info)
++		qi_flush_piotlb(iommu_info->iommu, FLPT_DEFAULT_DID,
++				pasid, address, pages, ih);
++
++	list_for_each_entry_rcu(dev_pasid, &to_dmar_domain(domain)->dev_pasids, link_domain) {
++		dev_info = dev_iommu_priv_get(dev_pasid->dev);
++		iommu = dev_to_intel_iommu(dev_pasid->dev);
++		if (dev_info->ats_enabled) {
++			qi_flush_dev_iotlb_pasid(iommu, dev_pasid->sid, dev_info->pfsid,
++						 pasid, dev_pasid->qdep, address,
++						 order_base_2(pages));
++			quirk_extra_dev_tlb_flush(dev_info, address, order_base_2(pages),
++						  pasid, dev_pasid->qdep);
++		}
  	}
--
--	/* Setup the pasid table: */
--	sflags = cpu_feature_enabled(X86_FEATURE_LA57) ? PASID_FLAG_FL5LP : 0;
--	ret = intel_pasid_setup_first_level(iommu, dev, mm->pgd, pasid,
--					    FLPT_DEFAULT_DID, sflags);
--	if (ret)
--		goto out_free_dev_pasid;
--
--	list_add_rcu(&dev_pasid->link_domain, &dmar_domain->dev_pasids);
--
--	return 0;
--
--out_free_dev_pasid:
--	kfree(dev_pasid);
--out_unregister:
--	if (list_empty(&dmar_domain->dev_pasids))
--		mmu_notifier_unregister(&domain->notifier, mm);
--
- 	return ret;
++	rcu_read_unlock();
  }
  
-@@ -696,6 +666,8 @@ struct iommu_domain *intel_svm_domain_alloc(void)
- 		return NULL;
- 	domain->domain.ops = &intel_svm_domain_ops;
- 	INIT_LIST_HEAD(&domain->dev_pasids);
-+	spin_lock_init(&domain->lock);
-+	xa_init(&domain->iommu_array);
+-static void intel_flush_svm_range_dev(struct dmar_domain *domain,
+-				      struct dev_pasid_info *dev_pasid,
+-				      unsigned long address,
+-				      unsigned long pages, int ih)
++static void intel_flush_svm_range(struct iommu_domain *domain, unsigned long address,
++				unsigned long pages, int ih)
+ {
+ 	unsigned long shift = ilog2(__roundup_pow_of_two(pages));
+ 	unsigned long align = (1ULL << (VTD_PAGE_SHIFT + shift));
+@@ -168,22 +177,11 @@ static void intel_flush_svm_range_dev(struct dmar_domain *domain,
+ 	unsigned long end = ALIGN(address + (pages << VTD_PAGE_SHIFT), align);
  
- 	return &domain->domain;
+ 	while (start < end) {
+-		__flush_svm_range_dev(domain, dev_pasid, start, align >> VTD_PAGE_SHIFT, ih);
++		__flush_svm_range(domain, start, align >> VTD_PAGE_SHIFT, ih);
+ 		start += align;
+ 	}
  }
+ 
+-static void intel_flush_svm_range(struct dmar_domain *domain, unsigned long address,
+-				unsigned long pages, int ih)
+-{
+-	struct dev_pasid_info *dev_pasid;
+-
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(dev_pasid, &domain->dev_pasids, link_domain)
+-		intel_flush_svm_range_dev(domain, dev_pasid, address, pages, ih);
+-	rcu_read_unlock();
+-}
+-
+ /* Pages have been freed at this point */
+ static void intel_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
+ 					struct mm_struct *mm,
+@@ -191,7 +189,7 @@ static void intel_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
+ {
+ 	struct iommu_domain *domain = container_of(mn, struct iommu_domain, notifier);
+ 
+-	intel_flush_svm_range(to_dmar_domain(domain), start,
++	intel_flush_svm_range(domain, start,
+ 			      (end - start + PAGE_SIZE - 1) >> VTD_PAGE_SHIFT, 0);
+ }
+ 
 -- 
 2.39.3
 
