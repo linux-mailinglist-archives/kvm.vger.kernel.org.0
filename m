@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC4337CC05E
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 12:16:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0A267CC060
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 12:16:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235026AbjJQKQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 06:16:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
+        id S1343683AbjJQKQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 06:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343651AbjJQKQM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 06:16:12 -0400
+        with ESMTP id S1343702AbjJQKQQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 06:16:16 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1C1D7B;
-        Tue, 17 Oct 2023 03:15:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E38E129;
+        Tue, 17 Oct 2023 03:15:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697537748; x=1729073748;
+  t=1697537754; x=1729073754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=khH+PTzzUhnQaCIW8iP29HhJPCv6yM/74X8f573Y+/w=;
-  b=E7LcrnjYuWRBnnHQlI7g6NICAqMhRyJSdh8nqh94hMJQB6nyQWZPfRAu
-   4X6ZkLsZFZzozJlfY2JR1AwpIFwuvRQF5MIPXJJPTrZ8EL3pn5+98mxmh
-   HRqAbHN6pWYRvE4wehiwE4tStQvrOnSFIW4uXGHxv0P8Ew2W9fjVXuJzB
-   cmH7vKLeOTiaS27BTTjYGGOC2lMq4T4EloHK+RR9DTEnCrnuyf9STFABq
-   81LLKBKtJuace7QpJ3sIJ4BKdWjiXnRWMlLu+U/9zd3xquhH/cjUZFlpE
-   aEMzL+W2c/IQNFiDbRX9P/0QAJws9IyvIPcgZVJ8cLiU2I/PCA1rbiKNE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="452226819"
+  bh=e1uTa2H5Z7R0c9eEVYABnYt1akVnOfTLvml2iXOGIs0=;
+  b=d3J4BfEBJ2rKottUtWX5Wknnf47ouxu+11r3bxSLJCPwMrlq5skedZvc
+   q6mWsT+usBWKRTfHABlkprDP2qxGTb/f+spH+Gdi5bEAEEUsWdd9FniL/
+   jVWb++TKiXh1L+dYWJfsrS/babJaO2s+RlVAMoO8CilApfrAy3WvfhdfE
+   3XtCsP4SvTVVzs8uOUrCfuTEzxnWXqoOk94FNU6aM0ZGAns07TsZEwuwv
+   pHIwR5FfhWPR4i8joyEWeTsd9ItwlyBvEADvTyxOY4L/d2JBOTsCDUjVR
+   0bOxtWt4Z0j7xmyyR5ujRrwYbTgRTVEERpmJ3tNLlGzpZZIVGRLyHIyE2
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="452226840"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="452226819"
+   d="scan'208";a="452226840"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:15:47 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:15:53 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503551"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503578"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="872503551"
+   d="scan'208";a="872503578"
 Received: from chowe-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.64])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:15:40 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:15:47 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     x86@kernel.org, dave.hansen@intel.com,
@@ -50,9 +50,9 @@ Cc:     x86@kernel.org, dave.hansen@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v14 07/23] x86/virt/tdx: Add skeleton to enable TDX on demand
-Date:   Tue, 17 Oct 2023 23:14:31 +1300
-Message-ID: <4fd10771907ae276548140cf7f8746e2eb38821c.1697532085.git.kai.huang@intel.com>
+Subject: [PATCH v14 08/23] x86/virt/tdx: Get information about TDX module and TDX-capable memory
+Date:   Tue, 17 Oct 2023 23:14:32 +1300
+Message-ID: <8c4f4f25ab24aa7267e3274b756a3cbc082f49d0.1697532085.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697532085.git.kai.huang@intel.com>
 References: <cover.1697532085.git.kai.huang@intel.com>
@@ -68,383 +68,298 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To enable TDX the kernel needs to initialize TDX from two perspectives:
-1) Do a set of SEAMCALLs to initialize the TDX module to make it ready
-to create and run TDX guests; 2) Do the per-cpu initialization SEAMCALL
-on one logical cpu before the kernel wants to make any other SEAMCALLs
-on that cpu (including those involved during module initialization and
-running TDX guests).
+Start to transit out the "multi-steps" to initialize the TDX module.
 
-The TDX module can be initialized only once in its lifetime.  Instead
-of always initializing it at boot time, this implementation chooses an
-"on demand" approach to initialize TDX until there is a real need (e.g
-when requested by KVM).  This approach has below pros:
+TDX provides increased levels of memory confidentiality and integrity.
+This requires special hardware support for features like memory
+encryption and storage of memory integrity checksums.  Not all memory
+satisfies these requirements.
 
-1) It avoids consuming the memory that must be allocated by kernel and
-given to the TDX module as metadata (~1/256th of the TDX-usable memory),
-and also saves the CPU cycles of initializing the TDX module (and the
-metadata) when TDX is not used at all.
+As a result, TDX introduced the concept of a "Convertible Memory Region"
+(CMR).  During boot, the firmware builds a list of all of the memory
+ranges which can provide the TDX security guarantees.
 
-2) The TDX module design allows it to be updated while the system is
-running.  The update procedure shares quite a few steps with this "on
-demand" initialization mechanism.  The hope is that much of "on demand"
-mechanism can be shared with a future "update" mechanism.  A boot-time
-TDX module implementation would not be able to share much code with the
-update mechanism.
+CMRs tell the kernel which memory is TDX compatible.  The kernel takes
+CMRs (plus a little more metadata) and constructs "TD Memory Regions"
+(TDMRs).  TDMRs let the kernel grant TDX protections to some or all of
+the CMR areas.
 
-3) Making SEAMCALL requires VMX to be enabled.  Currently, only the KVM
-code mucks with VMX enabling.  If the TDX module were to be initialized
-separately from KVM (like at boot), the boot code would need to be
-taught how to muck with VMX enabling and KVM would need to be taught how
-to cope with that.  Making KVM itself responsible for TDX initialization
-lets the rest of the kernel stay blissfully unaware of VMX.
+The TDX module also reports necessary information to let the kernel
+build TDMRs and run TDX guests in structure 'tdsysinfo_struct'.  The
+list of CMRs, along with the TDX module information, is available to
+the kernel by querying the TDX module.
 
-Similar to module initialization, also make the per-cpu initialization
-"on demand" as it also depends on VMX being enabled.
+As a preparation to construct TDMRs, get the TDX module information and
+the list of CMRs.  Print out CMRs to help user to decode which memory
+regions are TDX convertible.
 
-Add two functions, tdx_enable() and tdx_cpu_enable(), to enable the TDX
-module and enable TDX on local cpu respectively.  For now tdx_enable()
-is a placeholder.  The TODO list will be pared down as functionality is
-added.
-
-Export both tdx_cpu_enable() and tdx_enable() for KVM use.
-
-In tdx_enable() use a state machine protected by mutex to make sure the
-initialization will only be done once, as tdx_enable() can be called
-multiple times (i.e. KVM module can be reloaded) and may be called
-concurrently by other kernel components in the future.
-
-The per-cpu initialization on each cpu can only be done once during the
-module's life time.  Use a per-cpu variable to track its status to make
-sure it is only done once in tdx_cpu_enable().
-
-Also, a SEAMCALL to do TDX module global initialization must be done
-once on any logical cpu before any per-cpu initialization SEAMCALL.  Do
-it inside tdx_cpu_enable() too (if hasn't been done).
-
-tdx_enable() can potentially invoke SEAMCALLs on any online cpus.  The
-per-cpu initialization must be done before those SEAMCALLs are invoked
-on some cpu.  To keep things simple, in tdx_cpu_enable(), always do the
-per-cpu initialization regardless of whether the TDX module has been
-initialized or not.  And in tdx_enable(), don't call tdx_cpu_enable()
-but assume the caller has disabled CPU hotplug, done VMXON and
-tdx_cpu_enable() on all online cpus before calling tdx_enable().
+The 'tdsysinfo_struct' is fairly large (1024 bytes) and contains a lot
+of info about the TDX module.  Fully define the entire structure, but
+only use the fields necessary to build the TDMRs and pr_info() some
+basics about the module.  The rest of the fields will get used by KVM.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
 
 v13 -> v14:
- - Use lockdep_assert_irqs_off() in try_init_model_global() (Nikolay),
-   but still keep the comment (Kirill).
- - Add code to print "module not loaded" in the first SEAMCALL.
- - If SYS.INIT fails, stop calling LP.INIT in other tdx_cpu_enable()s.
- - Added Kirill's tag
+ - Added Kirill's tag.
 
 v12 -> v13:
- - Made tdx_cpu_enable() always be called with IRQ disabled via IPI
-   funciton call (Peter, Kirill).
+ - Allocate TDSYSINFO and CMR array separately. (Kirill)
+ - Added comment around TDH.SYS.INFO. (Peter)
 
 v11 -> v12:
- - Simplified TDX module global init and lp init status tracking (David).
- - Added comment around try_init_module_global() for using
-   raw_spin_lock() (Dave).
- - Added one sentence to changelog to explain why to expose tdx_enable()
-   and tdx_cpu_enable() (Dave).
- - Simplifed comments around tdx_enable() and tdx_cpu_enable() to use
-   lockdep_assert_*() instead. (Dave)
- - Removed redundent "TDX" in error message (Dave).
+ - Changed to use dynamic allocation for TDSYSINFO_STRUCT and CMR array
+   (Kirill).
+ - Keep SEAMCALL leaf macro definitions in order (Kirill)
+ - Removed is_cmr_empty() but open code directly (David)
+ - 'atribute' -> 'attribute' (David)
 
 v10 -> v11:
- - Return -NODEV instead of -EINVAL when CONFIG_INTEL_TDX_HOST is off.
- - Return the actual error code for tdx_enable() instead of -EINVAL.
- - Added Isaku's Reviewed-by.
+ - No change.
 
 v9 -> v10:
- - Merged the patch to handle per-cpu initialization to this patch to
-   tell the story better.
- - Changed how to handle the per-cpu initialization to only provide a
-   tdx_cpu_enable() function to let the user of TDX to do it when the
-   user wants to run TDX code on a certain cpu.
- - Changed tdx_enable() to not call cpus_read_lock() explicitly, but
-   call lockdep_assert_cpus_held() to assume the caller has done that.
- - Improved comments around tdx_enable() and tdx_cpu_enable().
- - Improved changelog to tell the story better accordingly.
+ - Added back "start to transit out..." as now per-cpu init has been
+   moved out from tdx_enable().
 
 v8 -> v9:
- - Removed detailed TODO list in the changelog (Dave).
- - Added back steps to do module global initialization and per-cpu
-   initialization in the TODO list comment.
- - Moved the 'enum tdx_module_status_t' from tdx.c to local tdx.h
+ - Removed "start to trransit out ..." part in changelog since this patch
+   is no longer the first step anymore.
+ - Changed to declare 'tdsysinfo' and 'cmr_array' as local static, and
+   changed changelog accordingly (Dave).
+ - Improved changelog to explain why to declare  'tdsysinfo_struct' in
+   full but only use a few members of them (Dave).
 
-v7 -> v8:
- - Refined changelog (Dave).
- - Removed "all BIOS-enabled cpus" related code (Peter/Thomas/Dave).
- - Add a "TODO list" comment in init_tdx_module() to list all steps of
-   initializing the TDX Module to tell the story (Dave).
- - Made tdx_enable() unverisally return -EINVAL, and removed nonsense
-   comments (Dave).
- - Simplified __tdx_enable() to only handle success or failure.
- - TDX_MODULE_SHUTDOWN -> TDX_MODULE_ERROR
- - Removed TDX_MODULE_NONE (not loaded) as it is not necessary.
- - Improved comments (Dave).
- - Pointed out 'tdx_module_status' is software thing (Dave).
+v7 -> v8: (Dave)
+ - Improved changelog to tell this is the first patch to transit out the
+   "multi-steps" init_tdx_module().
+ - Removed all CMR check/trim code but to depend on later SEAMCALL.
+ - Variable 'vertical alignment' in print TDX module information.
+ - Added DECLARE_PADDED_STRUCT() for padded structure.
+ - Made tdx_sysinfo and tdx_cmr_array[] to be function local variable
+   (and rename them accordingly), and added -Wframe-larger-than=4096 flag
+   to silence the build warning.
 
  ...
 
 ---
- arch/x86/include/asm/tdx.h  |   4 +
- arch/x86/virt/vmx/tdx/tdx.c | 167 ++++++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h |  30 +++++++
- 3 files changed, 201 insertions(+)
- create mode 100644 arch/x86/virt/vmx/tdx/tdx.h
+ arch/x86/virt/vmx/tdx/tdx.c | 94 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.h | 64 +++++++++++++++++++++++++
+ 2 files changed, 156 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 984efd3114ed..3cfd64f8a2b5 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -110,8 +110,12 @@ static inline u64 sc_retry(sc_func_t func, u64 fn,
- #define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
- 
- bool platform_tdx_enabled(void);
-+int tdx_cpu_enable(void);
-+int tdx_enable(void);
- #else
- static inline bool platform_tdx_enabled(void) { return false; }
-+static inline int tdx_cpu_enable(void) { return -ENODEV; }
-+static inline int tdx_enable(void)  { return -ENODEV; }
- #endif	/* CONFIG_INTEL_TDX_HOST */
- 
- #endif /* !__ASSEMBLY__ */
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 52fb14e0195f..36db33133cd5 100644
+index 36db33133cd5..b18f1e9c92dc 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -12,14 +12,24 @@
- #include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/printk.h>
-+#include <linux/cpu.h>
-+#include <linux/spinlock.h>
-+#include <linux/percpu-defs.h>
-+#include <linux/mutex.h>
+@@ -16,8 +16,11 @@
+ #include <linux/spinlock.h>
+ #include <linux/percpu-defs.h>
+ #include <linux/mutex.h>
++#include <linux/slab.h>
++#include <linux/math.h>
  #include <asm/msr-index.h>
  #include <asm/msr.h>
++#include <asm/page.h>
  #include <asm/tdx.h>
-+#include "tdx.h"
+ #include "tdx.h"
  
- static u32 tdx_global_keyid __ro_after_init;
- static u32 tdx_guest_keyid_start __ro_after_init;
- static u32 tdx_nr_guest_keyids __ro_after_init;
+@@ -162,12 +165,91 @@ int tdx_cpu_enable(void)
+ }
+ EXPORT_SYMBOL_GPL(tdx_cpu_enable);
  
-+static DEFINE_PER_CPU(bool, tdx_lp_initialized);
++static void print_cmrs(struct cmr_info *cmr_array, int nr_cmrs)
++{
++	int i;
 +
-+static enum tdx_module_status_t tdx_module_status;
-+static DEFINE_MUTEX(tdx_module_lock);
++	for (i = 0; i < nr_cmrs; i++) {
++		struct cmr_info *cmr = &cmr_array[i];
 +
- typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
- 
- static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
-@@ -72,6 +82,163 @@ static inline int sc_retry_prerr(sc_func_t func, sc_err_func_t err_func,
- #define seamcall_prerr_ret(__fn, __args)					\
- 	sc_retry_prerr(__seamcall_ret, seamcall_err_ret, (__fn), (__args))
- 
-+/*
-+ * Do the module global initialization once and return its result.
-+ * It can be done on any cpu.  It's always called with interrupts
-+ * disabled.
-+ */
-+static int try_init_module_global(void)
++		/*
++		 * The array of CMRs reported via TDH.SYS.INFO can
++		 * contain tail empty CMRs.  Don't print them.
++		 */
++		if (!cmr->size)
++			break;
++
++		pr_info("CMR: [0x%llx, 0x%llx)\n", cmr->base,
++				cmr->base + cmr->size);
++	}
++}
++
++static int get_tdx_sysinfo(struct tdsysinfo_struct *tdsysinfo,
++			   struct cmr_info *cmr_array)
 +{
 +	struct tdx_module_args args = {};
-+	static DEFINE_RAW_SPINLOCK(sysinit_lock);
-+	static bool sysinit_done;
-+	static int sysinit_ret;
++	int ret;
 +
-+	lockdep_assert_irqs_disabled();
++	/*
++	 * TDH.SYS.INFO writes the TDSYSINFO_STRUCT and the CMR array
++	 * to the buffers provided by the kernel (via RCX and R8
++	 * respectively).  The buffer size of the TDSYSINFO_STRUCT
++	 * (via RDX) and the maximum entries of the CMR array (via R9)
++	 * passed to this SEAMCALL must be at least the size of
++	 * TDSYSINFO_STRUCT and MAX_CMRS respectively.
++	 *
++	 * Upon a successful return, R9 contains the actual entries
++	 * written to the CMR array.
++	 */
++	args.rcx = __pa(tdsysinfo);
++	args.rdx = TDSYSINFO_STRUCT_SIZE;
++	args.r8 = __pa(cmr_array);
++	args.r9 = MAX_CMRS;
++	ret = seamcall_prerr_ret(TDH_SYS_INFO, &args);
++	if (ret)
++		return ret;
 +
-+	raw_spin_lock(&sysinit_lock);
++	pr_info("TDX module: attributes 0x%x, vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
++		tdsysinfo->attributes,    tdsysinfo->vendor_id,
++		tdsysinfo->major_version, tdsysinfo->minor_version,
++		tdsysinfo->build_date,    tdsysinfo->build_num);
 +
-+	if (sysinit_done)
++	print_cmrs(cmr_array, args.r9);
++
++	return 0;
++}
++
+ static int init_tdx_module(void)
+ {
++	struct tdsysinfo_struct *tdsysinfo;
++	struct cmr_info *cmr_array;
++	int tdsysinfo_size;
++	int cmr_array_size;
++	int ret;
++
++	tdsysinfo_size = round_up(TDSYSINFO_STRUCT_SIZE,
++			TDSYSINFO_STRUCT_ALIGNMENT);
++	tdsysinfo = kzalloc(tdsysinfo_size, GFP_KERNEL);
++	if (!tdsysinfo)
++		return -ENOMEM;
++
++	cmr_array_size = sizeof(struct cmr_info) * MAX_CMRS;
++	cmr_array_size = round_up(cmr_array_size, CMR_INFO_ARRAY_ALIGNMENT);
++	cmr_array = kzalloc(cmr_array_size, GFP_KERNEL);
++	if (!cmr_array) {
++		kfree(tdsysinfo);
++		return -ENOMEM;
++	}
++
++
++	/* Get the TDSYSINFO_STRUCT and CMRs from the TDX module. */
++	ret = get_tdx_sysinfo(tdsysinfo, cmr_array);
++	if (ret)
 +		goto out;
 +
-+	/* RCX is module attributes and all bits are reserved */
-+	args.rcx = 0;
-+	sysinit_ret = seamcall_prerr(TDH_SYS_INIT, &args);
-+
-+	/*
-+	 * The first SEAMCALL also detects the TDX module, thus
-+	 * it can fail due to the TDX module is not loaded.
-+	 * Dump message to let the user know.
-+	 */
-+	if (sysinit_ret == -ENODEV)
-+		pr_err("module not loaded\n");
-+
-+	sysinit_done = true;
+ 	/*
+ 	 * TODO:
+ 	 *
+-	 *  - Get TDX module information and TDX-capable memory regions.
+ 	 *  - Build the list of TDX-usable memory regions.
+ 	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
+ 	 *    all TDX-usable memory regions.
+@@ -177,7 +259,15 @@ static int init_tdx_module(void)
+ 	 *
+ 	 *  Return error before all steps are done.
+ 	 */
+-	return -EINVAL;
++	ret = -EINVAL;
 +out:
-+	raw_spin_unlock(&sysinit_lock);
-+	return sysinit_ret;
-+}
-+
-+/**
-+ * tdx_cpu_enable - Enable TDX on local cpu
-+ *
-+ * Do one-time TDX module per-cpu initialization SEAMCALL (and TDX module
-+ * global initialization SEAMCALL if not done) on local cpu to make this
-+ * cpu be ready to run any other SEAMCALLs.
-+ *
-+ * Always call this function via IPI function calls.
-+ *
-+ * Return 0 on success, otherwise errors.
-+ */
-+int tdx_cpu_enable(void)
-+{
-+	struct tdx_module_args args = {};
-+	int ret;
-+
-+	if (!platform_tdx_enabled())
-+		return -ENODEV;
-+
-+	lockdep_assert_irqs_disabled();
-+
-+	if (__this_cpu_read(tdx_lp_initialized))
-+		return 0;
-+
 +	/*
-+	 * The TDX module global initialization is the very first step
-+	 * to enable TDX.  Need to do it first (if hasn't been done)
-+	 * before the per-cpu initialization.
++	 * For now both @sysinfo and @cmr_array are only used during
++	 * module initialization, so always free them.
 +	 */
-+	ret = try_init_module_global();
-+	if (ret)
-+		return ret;
-+
-+	ret = seamcall_prerr(TDH_SYS_LP_INIT, &args);
-+	if (ret)
-+		return ret;
-+
-+	__this_cpu_write(tdx_lp_initialized, true);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(tdx_cpu_enable);
-+
-+static int init_tdx_module(void)
-+{
-+	/*
-+	 * TODO:
-+	 *
-+	 *  - Get TDX module information and TDX-capable memory regions.
-+	 *  - Build the list of TDX-usable memory regions.
-+	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
-+	 *    all TDX-usable memory regions.
-+	 *  - Configure the TDMRs and the global KeyID to the TDX module.
-+	 *  - Configure the global KeyID on all packages.
-+	 *  - Initialize all TDMRs.
-+	 *
-+	 *  Return error before all steps are done.
-+	 */
-+	return -EINVAL;
-+}
-+
-+static int __tdx_enable(void)
-+{
-+	int ret;
-+
-+	ret = init_tdx_module();
-+	if (ret) {
-+		pr_err("module initialization failed (%d)\n", ret);
-+		tdx_module_status = TDX_MODULE_ERROR;
-+		return ret;
-+	}
-+
-+	pr_info("module initialized\n");
-+	tdx_module_status = TDX_MODULE_INITIALIZED;
-+
-+	return 0;
-+}
-+
-+/**
-+ * tdx_enable - Enable TDX module to make it ready to run TDX guests
-+ *
-+ * This function assumes the caller has: 1) held read lock of CPU hotplug
-+ * lock to prevent any new cpu from becoming online; 2) done both VMXON
-+ * and tdx_cpu_enable() on all online cpus.
-+ *
-+ * This function can be called in parallel by multiple callers.
-+ *
-+ * Return 0 if TDX is enabled successfully, otherwise error.
-+ */
-+int tdx_enable(void)
-+{
-+	int ret;
-+
-+	if (!platform_tdx_enabled())
-+		return -ENODEV;
-+
-+	lockdep_assert_cpus_held();
-+
-+	mutex_lock(&tdx_module_lock);
-+
-+	switch (tdx_module_status) {
-+	case TDX_MODULE_UNINITIALIZED:
-+		ret = __tdx_enable();
-+		break;
-+	case TDX_MODULE_INITIALIZED:
-+		/* Already initialized, great, tell the caller. */
-+		ret = 0;
-+		break;
-+	default:
-+		/* Failed to initialize in the previous attempts */
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	mutex_unlock(&tdx_module_lock);
-+
++	kfree(tdsysinfo);
++	kfree(cmr_array);
 +	return ret;
-+}
-+EXPORT_SYMBOL_GPL(tdx_enable);
-+
- static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
- 					    u32 *nr_tdx_keyids)
- {
+ }
+ 
+ static int __tdx_enable(void)
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-new file mode 100644
-index 000000000000..a3c52270df5b
---- /dev/null
+index a3c52270df5b..fff36af71448 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -0,0 +1,30 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _X86_VIRT_TDX_H
-+#define _X86_VIRT_TDX_H
+@@ -2,6 +2,10 @@
+ #ifndef _X86_VIRT_TDX_H
+ #define _X86_VIRT_TDX_H
+ 
++#include <linux/types.h>
++#include <linux/stddef.h>
++#include <linux/compiler_attributes.h>
++
+ /*
+  * This file contains both macros and data structures defined by the TDX
+  * architecture and Linux defined software data structures and functions.
+@@ -12,9 +16,69 @@
+ /*
+  * TDX module SEAMCALL leaf functions
+  */
++#define TDH_SYS_INFO		32
+ #define TDH_SYS_INIT		33
+ #define TDH_SYS_LP_INIT		35
+ 
++struct cmr_info {
++	u64	base;
++	u64	size;
++} __packed;
++
++#define MAX_CMRS	32
++#define CMR_INFO_ARRAY_ALIGNMENT	512
++
++struct cpuid_config {
++	u32	leaf;
++	u32	sub_leaf;
++	u32	eax;
++	u32	ebx;
++	u32	ecx;
++	u32	edx;
++} __packed;
++
++#define TDSYSINFO_STRUCT_SIZE		1024
++#define TDSYSINFO_STRUCT_ALIGNMENT	1024
 +
 +/*
-+ * This file contains both macros and data structures defined by the TDX
-+ * architecture and Linux defined software data structures and functions.
-+ * The two should not be mixed together for better readability.  The
-+ * architectural definitions come first.
++ * The size of this structure itself is flexible.  The actual structure
++ * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE bytes
++ * and TDSYSINFO_STRUCT_ALIGNMENT bytes aligned.
 + */
++struct tdsysinfo_struct {
++	/* TDX-SEAM Module Info */
++	u32	attributes;
++	u32	vendor_id;
++	u32	build_date;
++	u16	build_num;
++	u16	minor_version;
++	u16	major_version;
++	u8	reserved0[14];
++	/* Memory Info */
++	u16	max_tdmrs;
++	u16	max_reserved_per_tdmr;
++	u16	pamt_entry_size;
++	u8	reserved1[10];
++	/* Control Struct Info */
++	u16	tdcs_base_size;
++	u8	reserved2[2];
++	u16	tdvps_base_size;
++	u8	tdvps_xfam_dependent_size;
++	u8	reserved3[9];
++	/* TD Capabilities */
++	u64	attributes_fixed0;
++	u64	attributes_fixed1;
++	u64	xfam_fixed0;
++	u64	xfam_fixed1;
++	u8	reserved4[32];
++	u32	num_cpuid_config;
++	/*
++	 * The actual number of CPUID_CONFIG depends on above
++	 * 'num_cpuid_config'.
++	 */
++	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
++} __packed;
 +
-+/*
-+ * TDX module SEAMCALL leaf functions
-+ */
-+#define TDH_SYS_INIT		33
-+#define TDH_SYS_LP_INIT		35
-+
-+/*
-+ * Do not put any hardware-defined TDX structure representations below
-+ * this comment!
-+ */
-+
-+/* Kernel defined TDX module status during module initialization. */
-+enum tdx_module_status_t {
-+	TDX_MODULE_UNINITIALIZED,
-+	TDX_MODULE_INITIALIZED,
-+	TDX_MODULE_ERROR
-+};
-+
-+#endif
+ /*
+  * Do not put any hardware-defined TDX structure representations below
+  * this comment!
 -- 
 2.41.0
 
