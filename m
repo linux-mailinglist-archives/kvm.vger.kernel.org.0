@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 625327CC078
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 12:18:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 165607CC07A
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 12:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343771AbjJQKSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 06:18:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32918 "EHLO
+        id S1343884AbjJQKSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 06:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343758AbjJQKRk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 06:17:40 -0400
+        with ESMTP id S1343774AbjJQKRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 06:17:41 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D38D71;
-        Tue, 17 Oct 2023 03:16:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8797410C6;
+        Tue, 17 Oct 2023 03:16:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697537808; x=1729073808;
+  t=1697537814; x=1729073814;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=e3OEQmPhdi+AgT8pJCWMf8X2DtqH5+9i6q9MakSExHE=;
-  b=S9SvJbfBHyKlevzndwoJmJJnsH2TysUbY2MH+P1pSmSbwKw8dHynAwhN
-   ajd/R6UuQWjLIZKvLF5qJN3hH1a4jw2VBVgPTw+wEBX7iMtwpzgUUkM/A
-   1PZuUT+ixe+gEU1r/u4hov0c3Nt17JllNORw7CHm2+s9yolHSaM+N6aNZ
-   wip1aJI25rpEjm5u8/cL1vcSajUsCaEBNmvNnH/DnhmvM/sCWLys9bNGU
-   hcfbjfu2uQ1gZQqIvZDBIqnOR/b4Gb3DzuVyv18yiG6Lho80hd7m9VDCG
-   6vY42QwzsrvyKAts6eDXeOpzj0nTCgP/TwN0dnw1RXVzhQTvXRWL0EXiW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="471972528"
+  bh=IW2joqa43yE+gdm/hHMD0E7KRPOslCtHQymG4aQhmYo=;
+  b=JXnfxopOXaRIsK/rg+06t745tLyRUThRSXWLHxRUjme5Kwpe4YFLOOGr
+   yrnsQUo5DLBSBrrdex0AuLnq+tq2Ht603mh/Zt8hhRn56yD7B/sjX9JTJ
+   4vx4Af7mQZEiQP7dumO+BpeOw+dyi77Infs1JOP0HAMaoTMzghn37g3E4
+   X70S1YPGYd7ZR+z8f4Rvy7KzoPgSsV4w5gBOPBLDU6KMMcYLmFNHjW9sQ
+   r7z06ITY+MzBK/8OJB2TyZRDHAE1JMy9Os6072vpH3w2GiRxsqw000Xw2
+   W/sOffLoH/m8yxLBz3B2MgpAF8XlAhdln5W76SN2JAxDEM1idmojk0YtQ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="471972561"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="471972528"
+   d="scan'208";a="471972561"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:48 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503821"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503860"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="872503821"
+   d="scan'208";a="872503860"
 Received: from chowe-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.64])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:42 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:48 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     x86@kernel.org, dave.hansen@intel.com,
@@ -50,9 +50,9 @@ Cc:     x86@kernel.org, dave.hansen@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v14 17/23] x86/kexec: Flush cache of TDX private memory
-Date:   Tue, 17 Oct 2023 23:14:41 +1300
-Message-ID: <da8c976d1fd2530d55ab4164429b513aca1b9efc.1697532085.git.kai.huang@intel.com>
+Subject: [PATCH v14 18/23] x86/virt/tdx: Keep TDMRs when module initialization is successful
+Date:   Tue, 17 Oct 2023 23:14:42 +1300
+Message-ID: <d3fd97f6fa08e213ed4d74354f65369df7e75bdd.1697532085.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697532085.git.kai.huang@intel.com>
 References: <cover.1697532085.git.kai.huang@intel.com>
@@ -67,116 +67,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are two problems in terms of using kexec() to boot to a new kernel
-when the old kernel has enabled TDX: 1) Part of the memory pages are
-still TDX private pages; 2) There might be dirty cachelines associated
-with TDX private pages.
+On the platforms with the "partial write machine check" erratum, the
+kexec() needs to convert all TDX private pages back to normal before
+booting to the new kernel.  Otherwise, the new kernel may get unexpected
+machine check.
 
-The first problem doesn't matter on the platforms w/o the "partial write
-machine check" erratum.  KeyID 0 doesn't have integrity check.  If the
-new kernel wants to use any non-zero KeyID, it needs to convert the
-memory to that KeyID and such conversion would work from any KeyID.
-
-However the old kernel needs to guarantee there's no dirty cacheline
-left behind before booting to the new kernel to avoid silent corruption
-from later cacheline writeback (Intel hardware doesn't guarantee cache
-coherency across different KeyIDs).
-
-There are two things that the old kernel needs to do to achieve that:
-
-1) Stop accessing TDX private memory mappings:
-   a. Stop making TDX module SEAMCALLs (TDX global KeyID);
-   b. Stop TDX guests from running (per-guest TDX KeyID).
-2) Flush any cachelines from previous TDX private KeyID writes.
-
-For 2), use wbinvd() to flush cache in stop_this_cpu(), following SME
-support.  And in this way 1) happens for free as there's no TDX activity
-between wbinvd() and the native_halt().
-
-Flushing cache in stop_this_cpu() only flushes cache on remote cpus.  On
-the rebooting cpu which does kexec(), unlike SME which does the cache
-flush in relocate_kernel(), flush the cache right after stopping remote
-cpus in machine_shutdown().
-
-There are two reasons to do so: 1) For TDX there's no need to defer
-cache flush to relocate_kernel() because all TDX activities have been
-stopped.  2) On the platforms with the above erratum the kernel must
-convert all TDX private pages back to normal before booting to the new
-kernel in kexec(), and flushing cache early allows the kernel to convert
-memory early rather than having to muck with the relocate_kernel()
-assembly.
-
-Theoretically, cache flush is only needed when the TDX module has been
-initialized.  However initializing the TDX module is done on demand at
-runtime, and it takes a mutex to read the module status.  Just check
-whether TDX is enabled by the BIOS instead to flush cache.
+There's no existing infrastructure to track TDX private pages.  Keep
+TDMRs when module initialization is successful so that they can be used
+to find PAMTs.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
 
 v13 -> v14:
- - No change
+ - "Change to keep" -> "Keep" (Kirill)
+ - Add Kirill/Rick's tags
+
+v12 -> v13:
+  - Split "improve error handling" part out as a separate patch.
+
+v11 -> v12 (new patch):
+  - Defer keeping TDMRs logic to this patch for better review
+  - Improved error handling logic (Nikolay/Kirill in patch 15)
 
 ---
- arch/x86/kernel/process.c |  8 +++++++-
- arch/x86/kernel/reboot.c  | 15 +++++++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
-index 9f0909142a0a..c197be03ea06 100644
---- a/arch/x86/kernel/process.c
-+++ b/arch/x86/kernel/process.c
-@@ -830,8 +830,14 @@ void __noreturn stop_this_cpu(void *dummy)
- 	 *
- 	 * Test the CPUID bit directly because the machine might've cleared
- 	 * X86_FEATURE_SME due to cmdline options.
-+	 *
-+	 * The TDX module or guests might have left dirty cachelines
-+	 * behind.  Flush them to avoid corruption from later writeback.
-+	 * Note that this flushes on all systems where TDX is possible,
-+	 * but does not actually check that TDX was in use.
- 	 */
--	if (c->extended_cpuid_level >= 0x8000001f && (cpuid_eax(0x8000001f) & BIT(0)))
-+	if ((c->extended_cpuid_level >= 0x8000001f && (cpuid_eax(0x8000001f) & BIT(0)))
-+			|| platform_tdx_enabled())
- 		native_wbinvd();
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index 4f55da1853a9..9a02b9237612 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -46,6 +46,8 @@ static DEFINE_MUTEX(tdx_module_lock);
+ /* All TDX-usable memory regions.  Protected by mem_hotplug_lock. */
+ static LIST_HEAD(tdx_memlist);
  
- 	/*
-diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index 830425e6d38e..e1a4fa8de11d 100644
---- a/arch/x86/kernel/reboot.c
-+++ b/arch/x86/kernel/reboot.c
-@@ -31,6 +31,7 @@
- #include <asm/realmode.h>
- #include <asm/x86_init.h>
- #include <asm/efi.h>
-+#include <asm/tdx.h>
++static struct tdmr_info_list tdx_tdmr_list;
++
+ typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
  
- /*
-  * Power off function, if any
-@@ -741,6 +742,20 @@ void native_machine_shutdown(void)
- 	local_irq_disable();
- 	stop_other_cpus();
- #endif
-+	/*
-+	 * stop_other_cpus() has flushed all dirty cachelines of TDX
-+	 * private memory on remote cpus.  Unlike SME, which does the
-+	 * cache flush on _this_ cpu in the relocate_kernel(), flush
-+	 * the cache for _this_ cpu here.  This is because on the
-+	 * platforms with "partial write machine check" erratum the
-+	 * kernel needs to convert all TDX private pages back to normal
-+	 * before booting to the new kernel in kexec(), and the cache
-+	 * flush must be done before that.  If the kernel took SME's way,
-+	 * it would have to muck with the relocate_kernel() assembly to
-+	 * do memory conversion.
-+	 */
-+	if (platform_tdx_enabled())
-+		native_wbinvd();
+ static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
+@@ -1058,7 +1060,6 @@ static int init_tdmrs(struct tdmr_info_list *tdmr_list)
+ static int init_tdx_module(void)
+ {
+ 	struct tdsysinfo_struct *tdsysinfo;
+-	struct tdmr_info_list tdmr_list;
+ 	struct cmr_info *cmr_array;
+ 	int tdsysinfo_size;
+ 	int cmr_array_size;
+@@ -1101,17 +1102,17 @@ static int init_tdx_module(void)
+ 		goto out_put_tdxmem;
  
- 	lapic_shutdown();
- 	restore_boot_irq_mode();
+ 	/* Allocate enough space for constructing TDMRs */
+-	ret = alloc_tdmr_list(&tdmr_list, tdsysinfo);
++	ret = alloc_tdmr_list(&tdx_tdmr_list, tdsysinfo);
+ 	if (ret)
+ 		goto out_free_tdxmem;
+ 
+ 	/* Cover all TDX-usable memory regions in TDMRs */
+-	ret = construct_tdmrs(&tdx_memlist, &tdmr_list, tdsysinfo);
++	ret = construct_tdmrs(&tdx_memlist, &tdx_tdmr_list, tdsysinfo);
+ 	if (ret)
+ 		goto out_free_tdmrs;
+ 
+ 	/* Pass the TDMRs and the global KeyID to the TDX module */
+-	ret = config_tdx_module(&tdmr_list, tdx_global_keyid);
++	ret = config_tdx_module(&tdx_tdmr_list, tdx_global_keyid);
+ 	if (ret)
+ 		goto out_free_pamts;
+ 
+@@ -1131,7 +1132,7 @@ static int init_tdx_module(void)
+ 		goto out_reset_pamts;
+ 
+ 	/* Initialize TDMRs to complete the TDX module initialization */
+-	ret = init_tdmrs(&tdmr_list);
++	ret = init_tdmrs(&tdx_tdmr_list);
+ out_reset_pamts:
+ 	if (ret) {
+ 		/*
+@@ -1148,20 +1149,17 @@ static int init_tdx_module(void)
+ 		 * back to normal.  But do the conversion anyway here
+ 		 * as suggested by the TDX spec.
+ 		 */
+-		tdmrs_reset_pamt_all(&tdmr_list);
++		tdmrs_reset_pamt_all(&tdx_tdmr_list);
+ 	}
+ out_free_pamts:
+ 	if (ret)
+-		tdmrs_free_pamt_all(&tdmr_list);
++		tdmrs_free_pamt_all(&tdx_tdmr_list);
+ 	else
+ 		pr_info("%lu KBs allocated for PAMT\n",
+-				tdmrs_count_pamt_kb(&tdmr_list));
++				tdmrs_count_pamt_kb(&tdx_tdmr_list));
+ out_free_tdmrs:
+-	/*
+-	 * Always free the buffer of TDMRs as they are only used during
+-	 * module initialization.
+-	 */
+-	free_tdmr_list(&tdmr_list);
++	if (ret)
++		free_tdmr_list(&tdx_tdmr_list);
+ out_free_tdxmem:
+ 	if (ret)
+ 		free_tdx_memlist(&tdx_memlist);
 -- 
 2.41.0
 
