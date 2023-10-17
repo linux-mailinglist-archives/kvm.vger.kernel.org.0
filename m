@@ -2,181 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B59377CC8BD
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 18:27:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABF7C7CC910
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 18:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234752AbjJQQ1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 12:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41834 "EHLO
+        id S232593AbjJQQtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 12:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232228AbjJQQ1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 12:27:16 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEEAA4
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 09:27:14 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7b9e83b70so44466457b3.0
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 09:27:14 -0700 (PDT)
+        with ESMTP id S231560AbjJQQtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 12:49:22 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF04EED
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 09:49:20 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1c9c145bb5bso1585ad.1
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 09:49:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697560034; x=1698164834; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/hJkp0YS8fbA60ZiTgrrQsXxvsEIWpcMYoRPyADSAvk=;
-        b=jrTMKvDr1Hg704ewDQlJ+UCCk/hnsJ7RVeMNwG4u/vTQ1e5UOmgndiqAF0kiuY7L0o
-         nzlvNGzkO1tJGUS4dxrI417G7xVLDSNEUz26YJXIo8Qfiawf2E02c8s5F/wIqvnRqrVR
-         DtKldZha+539ZyJXzamt+VnlluQzv2Yw6M3Ao54WBLCwTJ09yUqdTsV0lXH6UFAxXGpr
-         vPRb3io31z7NYbfyS1c9VCBBWtxyD2Y8itQZGxB/76w7ZeebS0fE3DdHB5WT7LDeFD/y
-         shGb0kqg+opv/0vNhAw/WdrMUfF15nGh+YZzB6zQIr/2O31z3uGSO8YJbYX04mGe0Taa
-         HWVg==
+        d=google.com; s=20230601; t=1697561360; x=1698166160; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lbOnMkAmys4ATC1jemLgDhyPYnDB7jZJzNIoSnmf3pM=;
+        b=0MlnR9pSqpGABMZCepnMMmTm1gy7ENMSm68zmr4+HVzNdosZ4NR14K7cWf+J1Ep7eH
+         x1qLn6urc5oEimxUWg6bFtaIsqJ2oDaRp8u1DlSpI53grKVcfCz047VYox3nKZcrFt/d
+         TrYe3qQPV9TrxoaNbMdrWOHPqL7tjZ0ct4dL+zmK9vrBdi7w/rJs/eM90BixrkwMXv1F
+         PN09J1OgrU9pek3UX/oWTSHn4xyCEW8r55hKBhZizPsuo1PeE11d2AHy1B1apLfZXDOp
+         dwStLSMcP40AHM0PhL89ywTO3AbjfHb9dfGqcj5KBn273ZxV4fT5Fi33KlsMitceQOxa
+         4nbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697560034; x=1698164834;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/hJkp0YS8fbA60ZiTgrrQsXxvsEIWpcMYoRPyADSAvk=;
-        b=s5y2zuTdO6QTM3/gFBfXtPkgYfBQHIsEvVHDIbs0onKNbMMOhKdiCIDD6yK938r1HX
-         qlw/7uACKBHa39niH0RoLaIis+k3sYgBU9ImVt8gGyUIJO+SrL4SkB6YKcgZ5SfrdQay
-         DtveSiXNU/jNsxJKAboyYME2ZVjITnBPDfWaL7fqyKx9MQeD4UwyI5yQR25ZW7atCNun
-         0CAdT/Z2K23JSjOOUPRYWHrvzUMV61g9/KaHOWKsChPg+Mb4ap7EejgPUM6ZIhBPYQPg
-         QjFqiB0qi2JoSedU8oI3oLHQAAOdPIvhDy/RNHJhFVGhTiYKXPK9fiqUze0NDszDX0IB
-         T5xQ==
-X-Gm-Message-State: AOJu0Yx9eF+Rb4K4/ykQtFhoTJyUU10msHPEZKaGOU+BTBy/guYrkfdV
-        6C17EXRuTbRgCvqwrrZWqmZwkzNnmmM=
-X-Google-Smtp-Source: AGHT+IHTqfMaDOaUACBBNjywMbrRhxv3au8SZnqO5B/WdcHe7acDDk0Hy7ETXXqWEiO/SZnVQovTmDtZn3c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:88a:b0:5a7:b87d:9825 with SMTP id
- cd10-20020a05690c088a00b005a7b87d9825mr74938ywb.5.1697560034031; Tue, 17 Oct
- 2023 09:27:14 -0700 (PDT)
-Date:   Tue, 17 Oct 2023 09:27:12 -0700
-In-Reply-To: <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
-Mime-Version: 1.0
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-49-michael.roth@amd.com> <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
-Message-ID: <ZS614OSoritrE1d2@google.com>
-Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        pankaj.gupta@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20230601; t=1697561360; x=1698166160;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lbOnMkAmys4ATC1jemLgDhyPYnDB7jZJzNIoSnmf3pM=;
+        b=M8ZWpfWXIcltsRIQe0L5jr438rB6vbAmdfVpxxQLHyhe/6DL9As+klqPzY7Ab9Vjzd
+         NDab8gtIFnKmjztwnSrtaGV/qdXwbtVANkV3OTzQ6P8VLOdt/NE+xmyhLlUsYLkSWOXO
+         Q5VeRntVE+uHN/xn6aOvo/0TdaE/+4wKfDvAS27m9fSdwI2oH6mK3d11AiYp0pJmjeHv
+         a18P0MgOK1pAEfSMpfWH7gRt0xhyGv9ppl0ZZv28KQwrBZ929a71K1zqMe/eWbPDPlrG
+         WBbdeBfQoGtus7Oz0MRuR3UROkfg85P6JVzml+piB0w/UX0l6ETm8I2F9I0nfjr41z33
+         yrog==
+X-Gm-Message-State: AOJu0YzEhxniT8ibwK6IXRFOEaEq0CbgIiYhzShi6wgPRHsjBX0Ixn/u
+        3vHSR8gEDJOfBWu85JDJElgCIdA+u8vOtEozD6BNiQ==
+X-Google-Smtp-Source: AGHT+IHBs3xzGbOBxozI0mr9y6ZRlkWvaDBFuz2bQqZAf7GpLb7JfbwGUaiEHntwkG/81KgXoUiV2DoZ3Q51zSTkyZo=
+X-Received: by 2002:a17:903:290:b0:1ca:16b8:b541 with SMTP id
+ j16-20020a170903029000b001ca16b8b541mr2851plr.24.1697561359975; Tue, 17 Oct
+ 2023 09:49:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-9-rananta@google.com>
+ <5d35c9f3-455e-6aa9-fd6a-4433cf70803a@redhat.com>
+In-Reply-To: <5d35c9f3-455e-6aa9-fd6a-4433cf70803a@redhat.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 17 Oct 2023 09:49:07 -0700
+Message-ID: <CAJHc60z7U1-irTy-6URb_V0PTW+TYS4qodf2akSg33_7CJgjyw@mail.gmail.com>
+Subject: Re: [PATCH v7 08/12] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+To:     Sebastian Ott <sebott@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
+On Tue, Oct 17, 2023 at 8:52=E2=80=AFAM Sebastian Ott <sebott@redhat.com> w=
+rote:
+>
+> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
+> > +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *=
+r,
+> > +                 u64 val)
+> > +{
+> > +     struct kvm *kvm =3D vcpu->kvm;
+> > +     u64 new_n, mutable_mask;
 > > +
-> > +       /*
-> > +        * If a VMM-specific certificate blob hasn't been provided, grab the
-> > +        * host-wide one.
-> > +        */
-> > +       snp_certs = sev_snp_certs_get(sev->snp_certs);
-> > +       if (!snp_certs)
-> > +               snp_certs = sev_snp_global_certs_get();
+> > +     mutex_lock(&kvm->arch.config_lock);
 > > +
-> 
-> This is where the generation I suggested adding would get checked. If
-> the instance certs' generation is not the global generation, then I
-> think we need a way to return to the VMM to make that right before
-> continuing to provide outdated certificates.
-> This might be an unreasonable request, but the fact that the certs and
-> reported_tcb can be set while a VM is running makes this an issue.
+> > +     /*
+> > +      * Make PMCR immutable once the VM has started running, but do
+> > +      * not return an error (-EBUSY) to meet the existing expectations=
+.
+> > +      */
+>
+> Why should we mention which error we're _not_ returning?
+>
+Oh, it's not to break the existing userspace expectations. Before this
+series, any 'write' from userspace was possible. Returning -EBUSY all
+of a sudden might tamper with this expectation.
 
-Before we get that far, the changelogs need to explain why the kernel is storing
-userspace blobs in the first place.  The whole thing is a bit of a mess.
-
-sev_snp_global_certs_get() has data races that could lead to variations of TOCTOU
-bugs: sev_ioctl_snp_set_config() can overwrite psp_master->sev_data->snp_certs
-while sev_snp_global_certs_get() is running.  If the compiler reloads snp_certs
-between bumping the refcount and grabbing the pointer, KVM will end up leaking a
-refcount and consuming a pointer without a refcount.
-
-	if (!kref_get_unless_zero(&certs->kref))
-		return NULL;
-
-	return certs;
-
-If allocating memory for the certs fails, the kernel will have set the config
-but not store the corresponding certs.
-
-	ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
-		if (ret)
-			goto e_free;
-
-		memcpy(&sev->snp_config, &config, sizeof(config));
-	}
-
-	/*
-	 * If the new certs are passed then cache it else free the old certs.
-	 */
-	if (input.certs_len) {
-		snp_certs = sev_snp_certs_new(certs, input.certs_len);
-		if (!snp_certs) {
-			ret = -ENOMEM;
-			goto e_free;
-		}
-	}
-
-Reasoning about ordering is also difficult, e.g. what is KVM's contract with
-userspace in terms of recognizing new global certs?
-
-I don't understand why the kernel needs to manage the certs.  AFAICT the so called
-global certs aren't an input to SEV_CMD_SNP_CONFIG, i.e. SNP_SET_EXT_CONFIG is
-purely a software defined thing.
-
-The easiest solution I can think of is to have KVM provide a chunk of memory in
-kvm_sev_info for SNP guests that userspace can mmap(), a la vcpu->run.
-
-	struct sev_snp_certs {
-		u8 data[KVM_MAX_SEV_SNP_CERT_SIZE];
-		u32 size;
-		u8 pad[<size to make the struct page aligned>];
-	};
-
-When the guest requests the certs, KVM does something like:
-
-	certs_size = READ_ONCE(sev->snp_certs->size);
-	if (certs_size > sizeof(sev->snp_certs->data) ||
-	    !IS_ALIGNED(certs_size, PAGE_SIZE))
-		certs_size = 0;
-
-	if (certs_size && (data_npages << PAGE_SHIFT) < certs_size) {
-		vcpu->arch.regs[VCPU_REGS_RBX] = certs_size >> PAGE_SHIFT;
-		exitcode = SNP_GUEST_VMM_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN);
-		goto cleanup;
-	}
-
-	...
-
-	if (certs_size &&
-	    kvm_write_guest(kvm, data_gpa, sev->snp_certs->data, certs_size))
-		exitcode = SEV_RET_INVALID_ADDRESS;
-
-If userspace wants to provide garbage to the guest, so be it, not KVM's problem.
-That way, whether the VM gets the global cert or a per-VM cert is purely a userspace
-concern.
-
-If userspace needs to *stall* cert requests, e.g. while the certs are being updated,
-then that's a different issue entirely.  If the GHCB allows telling the guest to
-retry the request, then it should be trivially easy to solve, e.g. add a flag in
-sev_snp_certs.  If KVM must "immediately" handle the request, then we'll need more
-elaborate uAPI.
+Thank you.
+Raghavendra
+>
+> > +     if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> > +             mutex_unlock(&kvm->arch.config_lock);
+> > +             return 0;
+> > +     }
+>
