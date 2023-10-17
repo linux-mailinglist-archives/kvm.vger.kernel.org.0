@@ -2,200 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B21037CCA5E
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 20:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79FDE7CCA63
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 20:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344066AbjJQSI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 14:08:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37578 "EHLO
+        id S234966AbjJQSLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 14:11:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234891AbjJQSI6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 14:08:58 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 302B190;
-        Tue, 17 Oct 2023 11:08:56 -0700 (PDT)
-Received: from [192.168.4.26] (unknown [47.186.13.91])
-        by linux.microsoft.com (Postfix) with ESMTPSA id D7CD520B74C0;
-        Tue, 17 Oct 2023 11:08:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D7CD520B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1697566135;
-        bh=NvMLHFub5RqmwlTRrKAUpbaqyKFGOPEO1aUbNfXtibk=;
-        h=Date:Subject:To:References:From:In-Reply-To:From;
-        b=Dg6z3WIAsikWdJ5JYDib/5orzmxLG7FfdddMhGnQb2WDKtAlvVEonusFHHds/U6x2
-         gChzgrVbb8Mqh4ehGGNzLTW1D92G800MTwlA9BraTayqtt69R+FMkcGt2GgurOoKJ+
-         gkJ5iINocZdX2dCZrIPk0j5lhnD9Kow8og+Q++fM=
-Message-ID: <76917285-d9b1-48af-ac5f-49c2d327e729@linux.microsoft.com>
-Date:   Tue, 17 Oct 2023 13:08:53 -0500
+        with ESMTP id S233170AbjJQSLE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 14:11:04 -0400
+Received: from out-199.mta0.migadu.com (out-199.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7FF93
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 11:11:01 -0700 (PDT)
+Date:   Tue, 17 Oct 2023 18:10:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1697566259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ble/vKiEcpM72A7rR+OClTCj96F4vXSttqGzdO7ZD1c=;
+        b=oPq/EYmfHdlh036e6RWnrEtArG16BZIDe5PDwfwTVTKKB6ijtLpxWKk3qLhZ1if0XQdp2p
+        g/cssnyCW7z4DRWItbStBeVDeOLuSNvAIskBgpNdOwK7tZp0/RGo4tTrLX/NQS/hhhEaH5
+        9WFFubE7ueM5bThbHHz39o5JCFcn0fA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 07/12] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based
+ on the associated PMU
+Message-ID: <ZS7OLRy6BwJljOV8@linux.dev>
+References: <20231009230858.3444834-1-rananta@google.com>
+ <20231009230858.3444834-8-rananta@google.com>
+ <b4739328-5dba-a3a6-54ef-2db2d34201d8@redhat.com>
+ <CAJHc60zpH8Y8h72=jUbshGoqye20FaHRcsb+TFDxkk7rhJAUxQ@mail.gmail.com>
+ <ZS2L6uIlUtkltyrF@linux.dev>
+ <CAJHc60wvMSHuLuRsZJOn7+r7LxZ661xEkDfqxGHed5Y+95Fxeg@mail.gmail.com>
+ <ZS4hGL5RIIuI1KOC@linux.dev>
+ <CAJHc60zQb0akx2Opbh3_Q8JShBC_9NFNvtAE+bPNi9QqXUGncA@mail.gmail.com>
+ <ZS6_tdkS6GyNlt4l@linux.dev>
+ <CAJHc60w-CsqdYX8JG-CRutwg0UyWmvk1TyoR-y9JBV_mqWUVKw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 00/10] mm/prmem: Implement the
- Persistent-Across-Kexec memory feature (prmem)
-To:     Alexander Graf <graf@amazon.de>, gregkh@linuxfoundation.org,
-        pbonzini@redhat.com, rppt@kernel.org, jgowans@amazon.com,
-        arnd@arndb.de, keescook@chromium.org,
-        stanislav.kinsburskii@gmail.com, anthony.yznaga@oracle.com,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        jamorris@linux.microsoft.com,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        kvm <kvm@vger.kernel.org>
-References: <1b1bc25eb87355b91fcde1de7c2f93f38abb2bf9>
- <20231016233215.13090-1-madvenka@linux.microsoft.com>
- <8f9d81a8-1071-43ca-98cd-e9c1eab8e014@amazon.de>
-Content-Language: en-US
-From:   "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
-In-Reply-To: <8f9d81a8-1071-43ca-98cd-e9c1eab8e014@amazon.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,SPF_HELO_PASS,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <CAJHc60w-CsqdYX8JG-CRutwg0UyWmvk1TyoR-y9JBV_mqWUVKw@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Alex,
+On Tue, Oct 17, 2023 at 10:25:50AM -0700, Raghavendra Rao Ananta wrote:
+> On Tue, Oct 17, 2023 at 10:09 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Tue, Oct 17, 2023 at 09:58:08AM -0700, Raghavendra Rao Ananta wrote:
+> > > On Mon, Oct 16, 2023 at 10:52 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > >
+> > > > On Mon, Oct 16, 2023 at 02:35:52PM -0700, Raghavendra Rao Ananta wrote:
+> > > >
+> > > > [...]
+> > > >
+> > > > > > What's the point of doing this in the first place? The implementation of
+> > > > > > kvm_vcpu_read_pmcr() is populating PMCR_EL0.N using the VM-scoped value.
+> > > > > >
+> > > > > I guess originally the change replaced read_sysreg(pmcr_el0) with
+> > > > > kvm_vcpu_read_pmcr(vcpu) to maintain consistency with others.
+> > > > > But if you and Sebastian feel that it's an overkill and directly
+> > > > > getting the value via vcpu->kvm->arch.pmcr_n is more readable, I'm
+> > > > > happy to make the change.
+> > > >
+> > > > No, I'd rather you delete the line where PMCR_EL0.N altogether.
+> > > > reset_pmcr() tries to initialize the field, but your
+> > > > kvm_vcpu_read_pmcr() winds up replacing it with pmcr_n.
+> > > >
+> > > I didn't get this comment. We still do initialize pmcr, but using the
+> > > pmcr.n read via kvm_vcpu_read_pmcr() instead of the actual system
+> > > register.
+> >
+> > You have two bits of code trying to do the exact same thing:
+> >
+> >  1) reset_pmcr() initializes __vcpu_sys_reg(vcpu, PMCR_EL0) with the N
+> >     field set up.
+> >
+> >  2) kvm_vcpu_read_pmcr() takes whatever is in __vcpu_sys_reg(vcpu, PMCR_EL0),
+> >     *masks out* the N field and re-initializes it with vcpu->kvm->arch.pmcr_n
+> >
+> > Why do you need (1) if you do (2)?
+> >
+> Okay, I see what you mean now. In that case, let reset_pmcr():
+> - Initialize 'pmcr' using  vcpu->kvm->arch.pmcr_n
+> - Set ARMV8_PMU_PMCR_LC as appropriate in 'pmcr'
+> - Write 'pmcr' to the vcpu reg
+> 
+> From here on out, kvm_vcpu_read_pmcr() would read off of this
+> initialized value, unless of course, userspace updates the pmcr.n.
+> Is this the flow that you were suggesting?
 
-Thanks a lot for your comments!
+Just squash this in:
 
-On 10/17/23 03:31, Alexander Graf wrote:
-> Hey Madhavan!
-> 
-> This patch set looks super exciting - thanks a lot for putting it together. We've been poking at a very similar direction for a while as well and will discuss the fundamental problem of how to persist kernel metadata across kexec at LPC:
-> 
->   https://lpc.events/event/17/contributions/1485/
-> 
-> It would be great to have you in the room as well then.
-> 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d1db1f292645..7b54c7843bef 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -743,10 +743,8 @@ static u64 reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 
+ static u64 reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+-	u64 pmcr;
++	u64 pmcr = 0;
+ 
+-	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+-	pmcr = kvm_vcpu_read_pmcr(vcpu) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+ 	if (!kvm_supports_32bit_el0())
+ 		pmcr |= ARMV8_PMU_PMCR_LC;
+ 
 
-Yes. I am planning to attend. But I am attending virtually as I am not able to travel.
-
-> Some more comments inline.
-> 
-> On 17.10.23 01:32, madvenka@linux.microsoft.com wrote:
->> From: "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>
->>
->> Introduction
->> ============
->>
->> This feature can be used to persist kernel and user data across kexec reboots
->> in RAM for various uses. E.g., persisting:
->>
->>          - cached data. E.g., database caches.
->>          - state. E.g., KVM guest states.
->>          - historical information since the last cold boot. E.g., events, logs
->>            and journals.
->>          - measurements for integrity checks on the next boot.
->>          - driver data.
->>          - IOMMU mappings.
->>          - MMIO config information.
->>
->> This is useful on systems where there is no non-volatile storage or
->> non-volatile storage is too small or too slow.
-> 
-> 
-> This is useful in more situations. We for example need it to do a kexec while a virtual machine is in suspended state, but has IOMMU mappings intact (Live Update). For that, we need to ensure DMA can still reach the VM memory and that everything gets reassembled identically and without interruptions on the receiving end.
-> 
-> 
-
-I see.
-
->> The following sections describe the implementation.
->>
->> I have enhanced the ram disk block device driver to provide persistent ram
->> disks on which any filesystem can be created. This is for persisting user data.
->> I have also implemented DAX support for the persistent ram disks.
-> 
-> 
-> This is probably the least interesting of the enablements, right? You can already today reserve RAM on boot as DAX block device and use it for that purpose.
-> 
-
-Yes. pmem provides that functionality.
-
-There are a few differences though. However, I don't have a good feel for how important these differences are to users. May be, they are not very significant. E.g,
-
-	- pmem regions need some setup using the ndctl command.
-	- IIUC, one needs to specify a starting address and a size for a pmem region. Having to specify a starting address may make it somewhat less flexible from a configuration point of view.
-	- In the case of pmem, the entire range of memory is set aside. In the case of the prmem persistent ram disk, pages are allocated as needed. So, persistent memory is shared among multiple
-	  consumers more flexibly.
-
-Also Greg H. wanted to see a filesystem based use case to be presented for persistent memory so we can see how it all comes together. I am working on prmemfs (a special FS tailored for persistence). But that will take some time. So, I wanted to present this ram disk use case as a more flexible alternative to pmem.
-
-But you are right. They are equivalent for all practical purposes.
-
-> 
->> I am also working on making ZRAM persistent.
->>
->> I have also briefly discussed the following use cases:
->>
->>          - Persisting IOMMU mappings
->>          - Remembering DMA pages
->>          - Reserving pages that encounter memory errors
->>          - Remembering IMA measurements for integrity checks
->>          - Remembering MMIO config info
->>          - Implementing prmemfs (special filesystem tailored for persistence)
->>
->> Allocate metadata
->> =================
->>
->> Define a metadata structure to store all persistent memory related information.
->> The metadata fits into one page. On a cold boot, allocate and initialize the
->> metadata page.
->>
->> Allocate data
->> =============
->>
->> On a cold boot, allocate some memory for storing persistent data. Call it
->> persistent memory. Specify the size in a command line parameter:
->>
->>          prmem=size[KMG][,max_size[KMG]]
->>
->>          size            Initial amount of memory allocated to prmem during boot
->>          max_size        Maximum amount of memory that can be allocated to prmem
->>
->> When the initial memory is exhaused via allocations, expand prmem dynamically
->> up to max_size. Expansion is done by allocating from the buddy allocator.
->> Record all allocations in the metadata.
-> 
-> 
-> I don't understand why we need a separate allocator. Why can't we just use normal Linux allocations and serialize their location for handover? We would obviously still need to find a large contiguous piece of memory for the target kernel to bootstrap itself into until it can read which pages it can and can not use, but we can do that allocation in the source environment using CMA, no?
-> 
-> What I'm trying to say is: I think we're better off separating the handover mechanism from the allocation mechanism. If we can implement handover without a new allocator, we can use it for simple things with a slight runtime penalty. To accelerate the handover then, we can later add a compacting allocator that can use the handover mechanism we already built to persist itself.
-> 
-> 
-> 
-> I have a WIP branch where I'm toying with such a handover mechanism that uses device tree to serialize/deserialize state. By standardizing the property naming, we can in the receiving kernel mark all persistent allocations as reserved and then slowly either free them again or mark them as in-use one by one:
-> 
-> https://github.com/agraf/linux/commit/fd5736a21d549a9a86c178c91acb29ed7f364f42
-> 
-> I used ftrace as example payload to persist: With the handover mechanism in place, we serialize/deserialize ftrace ring buffer metadata and are thus able to read traces of the previous system after kexec. This way, you can for example profile the kexec exit path.
-> 
-> It's not even in RFC state yet, there are a few things where I would need a couple days to think hard about data structures, layouts and other problems :). But I believe from the patch you get the idea.
-> 
-> One such user of kho could be a new allocator like prmem and each subsystem's serialization code could choose to rely on the prmem subsystem to persist data instead of doing it themselves. That way you get a very non-intrusive enablement path for kexec handover, easily amendable data structures that can change compatibly over time as well as the ability to recreate ephemeral data structure based on persistent information - which will be necessary to persist VFIO containers.
-> 
-
-OK. I will study your changes and your comments. I will send my feedback as well.
-
-Thanks again!
-
-Madhavan
-
-> 
-> Alex
-> 
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
+-- 
+Thanks,
+Oliver
