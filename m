@@ -2,69 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9FC57CC5DA
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 16:24:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 930CE7CC5E2
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 16:26:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344097AbjJQOYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 10:24:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
+        id S1343740AbjJQO0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 10:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343820AbjJQOYc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 10:24:32 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC42F0;
-        Tue, 17 Oct 2023 07:24:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697552670; x=1729088670;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=U5OUflLELrprG9g66ZWayMVs2SUvEfq7ER4nGW9CB4o=;
-  b=Yaaphfg6B0QlphWmr4TdEH1flXZI7VVa6HbbmKkYk1Yjs2AhkbdXToBz
-   9q3KQP56eRgow3fvno4JFUsLF39bDMqngzYwAj4x8j47sLIrNeKqt+rZT
-   O3pVUjFD+y6WBjDwvBeR7/zetULM6xX0N5LnYA1wW2Dhi+xi+zNhti0Kx
-   z981ke6gI+7aej1NXrMttAoGx1dKnHpzdHmezkxTjB3PedOJiROhFqVTu
-   K/pCrx1UyajlscSyl44VzsmjGLxMPI1bXXm9m8SU2QnVBsjBwyfk5U5D7
-   5Sfvn97ONgWdYAGCZwCN43iFn0Frm4SDcRBRjUYHIpL+BvZM6W1cNUnfg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="4392293"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="4392293"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 07:24:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="879834670"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="879834670"
-Received: from nmdsouza-mobl1.amr.corp.intel.com (HELO [10.209.106.102]) ([10.209.106.102])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 07:24:28 -0700
-Message-ID: <c3622d89-28d8-4917-9385-67b4cabaccd0@linux.intel.com>
-Date:   Tue, 17 Oct 2023 07:24:29 -0700
-MIME-Version: 1.0
+        with ESMTP id S234424AbjJQO0L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 10:26:11 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC05F92
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 07:26:09 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HEDr9h024287;
+        Tue, 17 Oct 2023 14:25:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=f2/HIgNojsTCGPjK1395LNUVH4JLGpfb9aDGUV8cVcA=;
+ b=MLoW+oy9ANSs2LKBgbyMN2g4qajWDcJyACYqIfgVQTPgvx10FwyMDsb4WqJKR758rC1u
+ gjPlEkiascJhSU/GcTlxrhgDNASVBF+syt8finwRKfFgXfEVl/baaEMEmpQfj0i+BWGt
+ uvxOrlgRBqQ2if8T7llEWzTkIv4BUCL+lg3EKcWShLv2WsWB5KRLQs//Pw8xVzlJEz/7
+ 34EeXf4FlzVqjJczx2z8Qt5zX7B8aeChL4U+xGWk/HH4lgmnQKlPHzrTYU9VzAr7agtR
+ +skm2BaJ318zwbwsuOwa9CTNZnvFl8055vCtvvJmXmC9lbC5qecfo4GUb22iVvq7ITfq qw== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqk1cw96t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Oct 2023 14:25:45 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39HDmToe028598;
+        Tue, 17 Oct 2023 14:25:44 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trfy3nfse-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Oct 2023 14:25:44 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nBG+Y8J0KkrAnwove/RZyh76UJ008jYrGioBRvjuKbnm8dG+8UUt2pepY9rD07z84KjZ5lzgNjxM6fOIJSfUf6W783cbO9WqjeazV73UXFI+is0XVxCZQvOXkTQcIsX11FBZxspeZH2lRr2LDalSUeqLtoxBLo4Fuj0dxMiJQZQlu5EVLZwxCWXzaCfa2qfIe8tN15So7ozRFh3I7VnOqZwBr04fo442Pe6ZuXIX3CREumEFf92iaA32OxtzwHN4gjMxlFyRCF0d32D9MaG5JLpOMnaT4pIVKLvO99RFoaak+Y8RKX2JTTE9EFQV0GNMbgfVuo2jwoA1HgtYy89j8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f2/HIgNojsTCGPjK1395LNUVH4JLGpfb9aDGUV8cVcA=;
+ b=X6Z6wp6GwTWSU2MXiY8OLnBsM9HNXk48ZQT1esXAFbu6omWWA2GYtSusDziaZaeYeysgHJICqfW1SnMadL1214nKZ3fMFHliqIOT+p97+H110kT4Zrpbm8ik7+uOEDXgvCYTBisrP5ELK+vDgSOmwhc4fIBufkhrTuPlrtORAvINLYS7/YmGhXTjmMQwG0riv6yl096vVc0iz5hg2auHVIhJZ0pWbu+THd1BWK7WZQvk8KjbcsOBNgXBDhz01q07udBx3o9T13QHe8qmuxuXDSyBraZV6jx8mrQih6ctFB9d5JHU7yPB5VTrlF6MDYhCubYT1onQV7M1nhDVUibd1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f2/HIgNojsTCGPjK1395LNUVH4JLGpfb9aDGUV8cVcA=;
+ b=Z5279pTMuoCAXMxCM6pMKfUDJU800Fea6JcKVo3a7HvhlSz7tqjkaVQM7xNgKzze7R4qE2GeYlnCDbBP6E3wIz1bGgg337p9DEqpuep77P54HuozhzsdHgkWfnztvDxeNMuiUKuP9hvp4aNLfYYRVXPfmCbw6ztmsYc2+aMAdcM=
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by DS0PR10MB6701.namprd10.prod.outlook.com (2603:10b6:8:137::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Tue, 17 Oct
+ 2023 14:25:42 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::64b1:cd15:65a5:8e7d]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::64b1:cd15:65a5:8e7d%5]) with mapi id 15.20.6886.038; Tue, 17 Oct 2023
+ 14:25:42 +0000
+Message-ID: <db5d7ebf-496d-47df-aa1c-3db2f12edc19@oracle.com>
+Date:   Tue, 17 Oct 2023 15:25:22 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 07/23] x86/virt/tdx: Add skeleton to enable TDX on
- demand
+Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
+ domains
 Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, peterz@infradead.org,
-        tony.luck@intel.com, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, rafael@kernel.org, david@redhat.com,
-        dan.j.williams@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
-        imammedo@redhat.com
-References: <cover.1697532085.git.kai.huang@intel.com>
- <4fd10771907ae276548140cf7f8746e2eb38821c.1697532085.git.kai.huang@intel.com>
-From:   Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <4fd10771907ae276548140cf7f8746e2eb38821c.1697532085.git.kai.huang@intel.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     Baolu Lu <baolu.lu@linux.intel.com>
+Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
+References: <20230923012511.10379-1-joao.m.martins@oracle.com>
+ <20230923012511.10379-20-joao.m.martins@oracle.com>
+ <c4816f4b-3fde-4adb-901f-4d568a4fd95a@linux.intel.com>
+ <764f159d-a19c-4a1d-86a6-a2791ff21e10@oracle.com>
+ <20231016114210.GM3952@nvidia.com>
+ <037d2917-51a2-acae-dc06-65940a054880@linux.intel.com>
+ <20231016125941.GT3952@nvidia.com>
+ <3e30e72a-c1c6-55a6-8e52-6a6250d2d8de@linux.intel.com>
+ <4cc0c4a0-3c00-4b29-a43b-ddfc57f2e4c0@oracle.com>
+ <81bd3937-482c-23be-840f-6766ca0ec65d@linux.intel.com>
+ <8e5d944f-d89e-4618-a6c6-0eb096354e2d@oracle.com>
+In-Reply-To: <8e5d944f-d89e-4618-a6c6-0eb096354e2d@oracle.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SGAP274CA0009.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::21)
+ To BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|DS0PR10MB6701:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c62dcd5-df82-449f-82c9-08dbcf1cf171
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7XKkKdDxjUefsu3VLDnoZQr/tolZCRtxgMmTddy/Cq52nVK9Au5NaOrF46AHBzPfxIx58gD4y7LFsbzfj/NGiC2N/yPHQHOCrIDy16Ykqtbzdf2I0CgGIGyhlfFklyqAb6Qg0CkKqq86yMqVJNU2dTYZIPQg3IhUt19IcCvYIBh1CBUMUQUby5HBz+arFGviu9qa+ldQ1vFHOsUsPesXGY6JktKLLbfb4x6Nb3CxhGHHFE2LtXrix5nQ1cteJVFkeKOs7YvDh11b6fc8EJjF6beRCam7IRcHJDCrdXW2Przmga+KDp8c+08Jkct4E22ha1X9p1WZtaECdloCF/VMg3+QD2cBE4DGVuO91xs1xEBBXBe/AvS+p4v4D11JnuKIyOD2eN7WG27X/z1tvddEZyL3BVRrDQak9y5vzK2PB/7+8YLhX5Z1ok0BJ544l9faAtsjMmL6+qj1eEXKspYK9B1AAFfyep9tMyOxVKK+GhcgF9rEcOoS7zVxHVq24xygr7nut6dVJgVnc0Lkc/qPXgQTG5yqcBOBicNUad0GE2jqlwINOi20GIHBRNbuc/7Uh0oni0rAZOUtpSs/UOuizjW2mBe+GrUy9ZniSIByHbHoPqrQKeH/24PAQ2J9i9UL2FUAZSDxNVy5ix7gQsc0N/v4crdcLQ0GEJAEGrURkYA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(346002)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(31686004)(66946007)(478600001)(54906003)(6916009)(66476007)(66556008)(6486002)(2616005)(83380400001)(31696002)(86362001)(6666004)(38100700002)(6512007)(316002)(41300700001)(26005)(53546011)(6506007)(36756003)(5660300002)(7416002)(8676002)(2906002)(4326008)(8936002)(14143004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0tCc1U4eGNJSW96WGpFc3RteHFxcldoZDQzMXkrSm8rVkk1UDBLRXpxcDd1?=
+ =?utf-8?B?WkEvYjZybkFPdWVHWFJWMGVKcHdkSXlLT0Z2SjRFRHhuT3hRdmh4R09zNnVX?=
+ =?utf-8?B?b0g4V0NHRUJraXFZZTV6T1Rzcnlqam9oV25lWUdjMEgzaHJDd29DdE1oTzJE?=
+ =?utf-8?B?SmFDTS9rMWUxMlRJRjUxRldFODc2MitrdXk4d2xOeHdaYTNJczkzZWRlaS9i?=
+ =?utf-8?B?RG5id3VhNjhYaFdFQmpXendWc3dEZHVERytRcGdKMkpMNkJMMDRBT1lwZHpr?=
+ =?utf-8?B?S1VMUUV4UHRXSEt5c2JBcjdCQXlYU2RGMU9wbkxIL3F4MzR2ZXdOUG1ZYmVR?=
+ =?utf-8?B?dU13ZEdRNmh0UGVDNzBHVjJMYlM3L2J0RDNSbTl4bkwxYXFZaU15d3FEekha?=
+ =?utf-8?B?OFd1MGFYT3A3T1c1bmthY2NkTU15L2tVcCszQXVlYUhuc2Y5Nk1vZGlzNnlp?=
+ =?utf-8?B?S25keEc2WXMyZytsQjBYTXNQUStqZ2pNVlk5UFpCLzdib21wOUphSTY1aTBJ?=
+ =?utf-8?B?S1B1WVd0L0xjVnFWOVp6czlHMmRONnp5a2pSeWxuU3ltMFdOcXJKSmU5ckxo?=
+ =?utf-8?B?NU9ZekJmQnRlRVFSTk04aTZsQ053TkNTRlFZSkJWc04vRE9pbnF4WGpsNExr?=
+ =?utf-8?B?YWdlSWR5Yy9jdCtwQldYa1lLZlgzNWJpSitCaWMwdlZEamhvTWU2ekV6aVJH?=
+ =?utf-8?B?VXA0bXRLNGNSTjJjOU15T3UycFZyODVJQllhWFQvaXJDdFM5eXE4bWYyWFRQ?=
+ =?utf-8?B?RUkrV3RlMW0ydmZUODNBWFQzcC9EVllEWHY0ZmE1NVRYcTRZbHphTkU4YkE0?=
+ =?utf-8?B?SC9uU3FuMjJYZmVkenJmd29Ga2k4MERpc09OZlN5VmVLdkFCeEVIYkF3Q05I?=
+ =?utf-8?B?dU5NZ2xIWVBMZWgvcWFDM294ZGp5dERNS3l3MkFMaHhieGI4dlNqeTFPWW5I?=
+ =?utf-8?B?aC9wOW14VHNjeWl6aHhOdEx6SzF2OHF6WGk4QTh5MG1FSHJHeW5LREh3VXJT?=
+ =?utf-8?B?Y3pzQmdvc0RMRXZVNXlhWGdlU01pNHpiK0I4M2t0T05KS0dmQVlhKzJXZi92?=
+ =?utf-8?B?aUVvdGpRRlpnQlpORlZoOXA5Y3BzUzN3VFNTWVBwejRzc2NmTXd2TXhEQjA5?=
+ =?utf-8?B?RysxRkZXUzhLbUMyMUV1NG83K2FkdGhQUjc0L0xkUitLSCszMzNXcC9VMi9i?=
+ =?utf-8?B?cXIvUjdlUlBqb1oyc1lIOTNHL01JNS92aUM0c3QzaHNycmk1ZGdFbCtHbk5D?=
+ =?utf-8?B?S0c3cEc4WFpyai9md2JZd1I5Y1JrUkdqQ094Z2tRdy9DNkJvL3EwZ01vSndL?=
+ =?utf-8?B?TGthWkowakJiTGllTWxJNTR3Y1p4SWhlZnBvd2l0R3V0OUVaVDFKMHdvcVdo?=
+ =?utf-8?B?R1ZPQUkvMHdWczNna3lKWEpYK0hLYmNkQ2xZNlJzeS82S0RKdTRyRHBMRUFo?=
+ =?utf-8?B?TU1xSW51L1FkeXhXeUZCckIrM1hwa2MrZnc1R3R5aDJCYldNcTNqV21DRy9z?=
+ =?utf-8?B?QmtDQmxwcFBZZ1NSUTdRNmVEckliY3pKOGlQWldYeVZoWlNUMnVjWVAzN0lD?=
+ =?utf-8?B?WHdaekpyamFzdW1DTDdXZE9TdC8wQmF1VVBBMHZyL2hTaUxXWU11aGRPQ1Rt?=
+ =?utf-8?B?bkJnV2RoT1p5L2UyeGhkQWhYRnlWQTgyYmtxbFA4L2hlcU1KUjRwNlRwaVRG?=
+ =?utf-8?B?RXdvYnJzb0YxdFVPQis4czNzMUtsdlN4RllNeWdVVW83STl0OVVKOVJOdHBo?=
+ =?utf-8?B?bGI3Q2dGY1FyOWlpRkZpSmw1cjlnV0JvOHEvVTNNekRUMXVyRFFhRklVMHh5?=
+ =?utf-8?B?RFZ6MUwraDF1T2xNU0IwWjdYUXlpRHRuK0RTcGVubG5TTVcxT3BBdTVvU3Rv?=
+ =?utf-8?B?U2VvK0NsUWppcTFhSmpLdzJIaElLTXZJTkxlWVB3QU0vUllJZWVGS0RCK05T?=
+ =?utf-8?B?YkxxL1oxUzB6RFAydVNkcFJKQmt1T0JFTTAxRmNJTDM3UktnRnROMXNuQTVU?=
+ =?utf-8?B?QjBvSGUxdjNkblV2Ym9WMmRCV21zSUE5a09vWXd1L1prTjZuV0JJdWlCU0Q1?=
+ =?utf-8?B?MUVOOEh1QncxclhRVDc0TUg2cTcvTDBsMTJNS2dIMGt1cnM4RTBCY040N25F?=
+ =?utf-8?B?cFVwT1VvUnR4aFA4T1NCNmMyNERmUS8yaUJEV0trR1JhSEcrN0RrQURZWkZl?=
+ =?utf-8?B?eEE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?TFlYSEJwTzRNbmVuaWtLV0creThqQW8yejRzV1VDQlh1R3B4d3VRMG9mRWRH?=
+ =?utf-8?B?eFFGMHZlQ1QrSm04eWhPM3ZDN1RvZVdRNXp2eFN6MXR4dmpTaVhrQk9RUlVn?=
+ =?utf-8?B?WnhEK2pLYzEvQjhuZHFCbW40QjVIeXRRRlVqb0FJc216MVlCZjEzekpsRTN1?=
+ =?utf-8?B?K1NlNm85UVNxNTRPTnQ5ZGtqVHdGd3ZSNHJSVkVOdm42QXFYaTBsb2JzOUVC?=
+ =?utf-8?B?NnpuYy9GYmtYVy9MVDRMaTF1SVN2ZWh2aDVpbzk1T0hkQXM1cVVob0NvR3A5?=
+ =?utf-8?B?TzVFTU84Si9KRFZRaTZTbjFkcFA4empjT3VSUlZBbEJMZGJNRmQyL1padEFh?=
+ =?utf-8?B?UmNDMUx1RmZQWE5ZNC9qUEJvUXFzQ0tIV2ZrSEpQNk5RNVNtYTRLd3BNY3Rj?=
+ =?utf-8?B?andYMGpPZFU0eldmVHVQTCtyTUQ3QUlpWnhadTZMTStuYjUyeERhYnA2UktL?=
+ =?utf-8?B?ZUEvRmpFRDZkL1NvWnlFSjZJZGJKb2RaR21yUDhBL1F6SU5JQU5idjgvUXpt?=
+ =?utf-8?B?Qlg2NEVIemc3cUdCcTluMUdwVVdNb20wZy8xSzJzeUFLZldEdEJjN3hSMWFw?=
+ =?utf-8?B?bnRnaHFJOEduVk9uVzdvaExRN1plVisrRUk1dEwxZGxvNVJVSHRRMk9QUUFv?=
+ =?utf-8?B?Y3NHMXV3U2NHa241aHg2Ykhqb3ByYlVrdTNLSE9WNk12ajZUenZubkZYVUdF?=
+ =?utf-8?B?TTJ6ZGw5TFpGb2xWUFd3NFIvZURnazVnaW5YazFhZVhFSEdiK0tYOENvbEFP?=
+ =?utf-8?B?a0tjeXk1dmRDUnlUNUszM2E3YmFTMnV6Z3ZLVkFUaFhHcEJTQkFnY250anlF?=
+ =?utf-8?B?bUFJUEsydmFMMTJ1MVJHbjhrOFRkdzNIZjRnSGplZWRIYSs0OVRVNERsaUJL?=
+ =?utf-8?B?QlpndjVBcEFaTWh6UG84OFhBSEhGeUVDVmE2bG1ySElNQTM4QStMSy9MZkhU?=
+ =?utf-8?B?NUJzdUlXYytlWTMvLy9KU3IyNndMbmVlcFR1N3JrUXRwZEJsdjlGWXhNbW5l?=
+ =?utf-8?B?NzhhVDlONUVWQm55ZzdXU1NtMzFFSGxPUTM2d1ovT3ovRXZkSnVub3FndThm?=
+ =?utf-8?B?Q3Back40ZlNlUkRRUisrSHZFLzE2SXhGK2JlTTF5THF1WnZxT0VFVStUdWFS?=
+ =?utf-8?B?SllHOG9rZStCSUE3UC9OQWZhSmxlN3YxWWFtamVGbDVjWGxqcnhLV0lRUFBz?=
+ =?utf-8?B?STA3dENvelpEVFVSZnlZTGR3aTZJUmZibUNkaWQxaXdDQ1JzSzdCK2lKR0Vj?=
+ =?utf-8?B?MURBeFI3cVBpRWt4eFplczFic21TMStkSUd5c2dCOCsxUUhZQ2drb1JaOUJN?=
+ =?utf-8?B?dTNnbmFBMWtLYldTTVMyU29GMTZDd05haHpCd2NEUE13UUk2bFg3MXBYTk51?=
+ =?utf-8?B?aHRNWVlEOEJiMXhweTVTZnVka09xVVQySkFVVy9FL2VBa1laY0ptdlVTVW5B?=
+ =?utf-8?Q?dK1gLI5O?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c62dcd5-df82-449f-82c9-08dbcf1cf171
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 14:25:42.3152
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Hl27LUB4d0ThzqJNroR7wojFd9iygYCEXqgHo154flOJ1o3Mx68+EbX82tH2yBKyTrJmrUhbTd41VRAu+Aea9TP9No9AWZlC+7R8JQ8MrAo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6701
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-17_03,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 suspectscore=0 malwarescore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310170122
+X-Proofpoint-GUID: xihCU0egZgRxeiLDmX14d5ooPlnvCVbx
+X-Proofpoint-ORIG-GUID: xihCU0egZgRxeiLDmX14d5ooPlnvCVbx
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,393 +199,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10/17/2023 3:14 AM, Kai Huang wrote:
-> To enable TDX the kernel needs to initialize TDX from two perspectives:
-> 1) Do a set of SEAMCALLs to initialize the TDX module to make it ready
-> to create and run TDX guests; 2) Do the per-cpu initialization SEAMCALL
-> on one logical cpu before the kernel wants to make any other SEAMCALLs
-> on that cpu (including those involved during module initialization and
-> running TDX guests).
+On 17/10/2023 15:16, Joao Martins wrote:
+> On 17/10/2023 13:41, Baolu Lu wrote:
+>> On 2023/10/17 18:51, Joao Martins wrote:
+>>> On 16/10/2023 14:01, Baolu Lu wrote:
+>>>> On 2023/10/16 20:59, Jason Gunthorpe wrote:
+>>>>> On Mon, Oct 16, 2023 at 08:58:42PM +0800, Baolu Lu wrote:
+>>>>>> On 2023/10/16 19:42, Jason Gunthorpe wrote:
+>>>>>>> On Mon, Oct 16, 2023 at 11:57:34AM +0100, Joao Martins wrote:
+>>>>>>>
+>>>>>>>> True. But to be honest, I thought we weren't quite there yet in PASID
+>>>>>>>> support
+>>>>>>>> from IOMMUFD perspective; hence why I didn't aim at it. Or do I have the
+>>>>>>>> wrong
+>>>>>>>> impression? From the code below, it clearly looks the driver does.
+>>>>>>> I think we should plan that this series will go before the PASID
+>>>>>>> series
+>>>>>> I know that PASID support in IOMMUFD is not yet available, but the VT-d
+>>>>>> driver already supports attaching a domain to a PASID, as required by
+>>>>>> the idxd driver for kernel DMA with PASID. Therefore, from the driver's
+>>>>>> perspective, dirty tracking should also be enabled for PASIDs.
+>>>>> As long as the driver refuses to attach a dirty track enabled domain
+>>>>> to PASID it would be fine for now.
+>>>> Yes. This works.
+>>> Baolu Lu, I am blocking PASID attachment this way; let me know if this matches
+>>> how would you have the driver refuse dirty tracking on PASID.
+>>
+>> Joao, how about blocking pasid attachment in intel_iommu_set_dev_pasid()
+>> directly?
+>>
+>> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+>> index c86ba5a3e75c..392b6ca9ce90 100644
+>> --- a/drivers/iommu/intel/iommu.c
+>> +++ b/drivers/iommu/intel/iommu.c
+>> @@ -4783,6 +4783,9 @@ static int intel_iommu_set_dev_pasid(struct iommu_domain
+>> *domain,
+>>         if (context_copied(iommu, info->bus, info->devfn))
+>>                 return -EBUSY;
+>>
+>> +       if (domain->dirty_ops)
+>> +               return -EOPNOTSUPP;
+>> +
+>>         ret = prepare_domain_attach_device(domain, dev);
+>>         if (ret)
+>>                 return ret;
 > 
-> The TDX module can be initialized only once in its lifetime.  Instead
-> of always initializing it at boot time, this implementation chooses an
-> "on demand" approach to initialize TDX until there is a real need (e.g
-> when requested by KVM).  This approach has below pros:
+> I was trying to centralize all the checks, but I can place it here if you prefer
+> this way.
 > 
-> 1) It avoids consuming the memory that must be allocated by kernel and
-> given to the TDX module as metadata (~1/256th of the TDX-usable memory),
-> and also saves the CPU cycles of initializing the TDX module (and the
-> metadata) when TDX is not used at all.
-> 
-> 2) The TDX module design allows it to be updated while the system is
-> running.  The update procedure shares quite a few steps with this "on
-> demand" initialization mechanism.  The hope is that much of "on demand"
-> mechanism can be shared with a future "update" mechanism.  A boot-time
-> TDX module implementation would not be able to share much code with the
-> update mechanism.
-> 
-> 3) Making SEAMCALL requires VMX to be enabled.  Currently, only the KVM
-> code mucks with VMX enabling.  If the TDX module were to be initialized
-> separately from KVM (like at boot), the boot code would need to be
-> taught how to muck with VMX enabling and KVM would need to be taught how
-> to cope with that.  Making KVM itself responsible for TDX initialization
-> lets the rest of the kernel stay blissfully unaware of VMX.
-> 
-> Similar to module initialization, also make the per-cpu initialization
-> "on demand" as it also depends on VMX being enabled.
-> 
-> Add two functions, tdx_enable() and tdx_cpu_enable(), to enable the TDX
-> module and enable TDX on local cpu respectively.  For now tdx_enable()
-> is a placeholder.  The TODO list will be pared down as functionality is
-> added.
-> 
-> Export both tdx_cpu_enable() and tdx_enable() for KVM use.
-> 
-> In tdx_enable() use a state machine protected by mutex to make sure the
-> initialization will only be done once, as tdx_enable() can be called
-> multiple times (i.e. KVM module can be reloaded) and may be called
-> concurrently by other kernel components in the future.
-> 
-> The per-cpu initialization on each cpu can only be done once during the
-> module's life time.  Use a per-cpu variable to track its status to make
-> sure it is only done once in tdx_cpu_enable().
-> 
-> Also, a SEAMCALL to do TDX module global initialization must be done
-> once on any logical cpu before any per-cpu initialization SEAMCALL.  Do
-> it inside tdx_cpu_enable() too (if hasn't been done).
-> 
-> tdx_enable() can potentially invoke SEAMCALLs on any online cpus.  The
-> per-cpu initialization must be done before those SEAMCALLs are invoked
-> on some cpu.  To keep things simple, in tdx_cpu_enable(), always do the
-> per-cpu initialization regardless of whether the TDX module has been
-> initialized or not.  And in tdx_enable(), don't call tdx_cpu_enable()
-> but assume the caller has disabled CPU hotplug, done VMXON and
-> tdx_cpu_enable() on all online cpus before calling tdx_enable().
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
-> 
-> v13 -> v14:
->  - Use lockdep_assert_irqs_off() in try_init_model_global() (Nikolay),
->    but still keep the comment (Kirill).
->  - Add code to print "module not loaded" in the first SEAMCALL.
->  - If SYS.INIT fails, stop calling LP.INIT in other tdx_cpu_enable()s.
->  - Added Kirill's tag
-> 
-> v12 -> v13:
->  - Made tdx_cpu_enable() always be called with IRQ disabled via IPI
->    funciton call (Peter, Kirill).
-> 
-> v11 -> v12:
->  - Simplified TDX module global init and lp init status tracking (David).
->  - Added comment around try_init_module_global() for using
->    raw_spin_lock() (Dave).
->  - Added one sentence to changelog to explain why to expose tdx_enable()
->    and tdx_cpu_enable() (Dave).
->  - Simplifed comments around tdx_enable() and tdx_cpu_enable() to use
->    lockdep_assert_*() instead. (Dave)
->  - Removed redundent "TDX" in error message (Dave).
-> 
-> v10 -> v11:
->  - Return -NODEV instead of -EINVAL when CONFIG_INTEL_TDX_HOST is off.
->  - Return the actual error code for tdx_enable() instead of -EINVAL.
->  - Added Isaku's Reviewed-by.
-> 
-> v9 -> v10:
->  - Merged the patch to handle per-cpu initialization to this patch to
->    tell the story better.
->  - Changed how to handle the per-cpu initialization to only provide a
->    tdx_cpu_enable() function to let the user of TDX to do it when the
->    user wants to run TDX code on a certain cpu.
->  - Changed tdx_enable() to not call cpus_read_lock() explicitly, but
->    call lockdep_assert_cpus_held() to assume the caller has done that.
->  - Improved comments around tdx_enable() and tdx_cpu_enable().
->  - Improved changelog to tell the story better accordingly.
-> 
-> v8 -> v9:
->  - Removed detailed TODO list in the changelog (Dave).
->  - Added back steps to do module global initialization and per-cpu
->    initialization in the TODO list comment.
->  - Moved the 'enum tdx_module_status_t' from tdx.c to local tdx.h
-> 
-> v7 -> v8:
->  - Refined changelog (Dave).
->  - Removed "all BIOS-enabled cpus" related code (Peter/Thomas/Dave).
->  - Add a "TODO list" comment in init_tdx_module() to list all steps of
->    initializing the TDX Module to tell the story (Dave).
->  - Made tdx_enable() unverisally return -EINVAL, and removed nonsense
->    comments (Dave).
->  - Simplified __tdx_enable() to only handle success or failure.
->  - TDX_MODULE_SHUTDOWN -> TDX_MODULE_ERROR
->  - Removed TDX_MODULE_NONE (not loaded) as it is not necessary.
->  - Improved comments (Dave).
->  - Pointed out 'tdx_module_status' is software thing (Dave).
-> 
->  ...
-> 
-> ---
->  arch/x86/include/asm/tdx.h  |   4 +
->  arch/x86/virt/vmx/tdx/tdx.c | 167 ++++++++++++++++++++++++++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.h |  30 +++++++
->  3 files changed, 201 insertions(+)
->  create mode 100644 arch/x86/virt/vmx/tdx/tdx.h
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 984efd3114ed..3cfd64f8a2b5 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -110,8 +110,12 @@ static inline u64 sc_retry(sc_func_t func, u64 fn,
->  #define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
->  
->  bool platform_tdx_enabled(void);
-> +int tdx_cpu_enable(void);
-> +int tdx_enable(void);
->  #else
->  static inline bool platform_tdx_enabled(void) { return false; }
-> +static inline int tdx_cpu_enable(void) { return -ENODEV; }
-> +static inline int tdx_enable(void)  { return -ENODEV; }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->  
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 52fb14e0195f..36db33133cd5 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -12,14 +12,24 @@
->  #include <linux/init.h>
->  #include <linux/errno.h>
->  #include <linux/printk.h>
-> +#include <linux/cpu.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/percpu-defs.h>
-> +#include <linux/mutex.h>
->  #include <asm/msr-index.h>
->  #include <asm/msr.h>
->  #include <asm/tdx.h>
-> +#include "tdx.h"
->  
->  static u32 tdx_global_keyid __ro_after_init;
->  static u32 tdx_guest_keyid_start __ro_after_init;
->  static u32 tdx_nr_guest_keyids __ro_after_init;
->  
-> +static DEFINE_PER_CPU(bool, tdx_lp_initialized);
-> +
-> +static enum tdx_module_status_t tdx_module_status;
-> +static DEFINE_MUTEX(tdx_module_lock);
-> +
->  typedef void (*sc_err_func_t)(u64 fn, u64 err, struct tdx_module_args *args);
->  
->  static inline void seamcall_err(u64 fn, u64 err, struct tdx_module_args *args)
-> @@ -72,6 +82,163 @@ static inline int sc_retry_prerr(sc_func_t func, sc_err_func_t err_func,
->  #define seamcall_prerr_ret(__fn, __args)					\
->  	sc_retry_prerr(__seamcall_ret, seamcall_err_ret, (__fn), (__args))
->  
-> +/*
-> + * Do the module global initialization once and return its result.
-> + * It can be done on any cpu.  It's always called with interrupts
-> + * disabled.
-> + */
-> +static int try_init_module_global(void)
-> +{
-> +	struct tdx_module_args args = {};
-> +	static DEFINE_RAW_SPINLOCK(sysinit_lock);
-> +	static bool sysinit_done;
-> +	static int sysinit_ret;
-> +
-> +	lockdep_assert_irqs_disabled();
-> +
-> +	raw_spin_lock(&sysinit_lock);
-> +
-> +	if (sysinit_done)
-> +		goto out;
-> +
-> +	/* RCX is module attributes and all bits are reserved */
-> +	args.rcx = 0;
-
-Isn't args.rcx already initialized to 0, why explixitly set it?
-
-> +	sysinit_ret = seamcall_prerr(TDH_SYS_INIT, &args);
-> +
-> +	/*
-> +	 * The first SEAMCALL also detects the TDX module, thus
-> +	 * it can fail due to the TDX module is not loaded.
-> +	 * Dump message to let the user know.
-> +	 */
-> +	if (sysinit_ret == -ENODEV)
-> +		pr_err("module not loaded\n");
-> +
-> +	sysinit_done = true;
-> +out:
-> +	raw_spin_unlock(&sysinit_lock);
-> +	return sysinit_ret;
-> +}
-> +
-> +/**
-> + * tdx_cpu_enable - Enable TDX on local cpu
-> + *
-> + * Do one-time TDX module per-cpu initialization SEAMCALL (and TDX module
-> + * global initialization SEAMCALL if not done) on local cpu to make this
-> + * cpu be ready to run any other SEAMCALLs.
-> + *
-> + * Always call this function via IPI function calls.
-> + *
-> + * Return 0 on success, otherwise errors.
-> + */
-> +int tdx_cpu_enable(void)
-> +{
-> +	struct tdx_module_args args = {};
-> +	int ret;
-> +
-> +	if (!platform_tdx_enabled())
-> +		return -ENODEV;
-> +
-> +	lockdep_assert_irqs_disabled();
-> +
-> +	if (__this_cpu_read(tdx_lp_initialized))
-> +		return 0;
-> +
-> +	/*
-> +	 * The TDX module global initialization is the very first step
-> +	 * to enable TDX.  Need to do it first (if hasn't been done)
-> +	 * before the per-cpu initialization.
-> +	 */
-> +	ret = try_init_module_global();
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = seamcall_prerr(TDH_SYS_LP_INIT, &args);
-
-If you have more usage of zero intialized args variant, do you want to add a helper for it?
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	__this_cpu_write(tdx_lp_initialized, true);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_cpu_enable);
-> +
-> +static int init_tdx_module(void)
-> +{
-> +	/*
-> +	 * TODO:
-> +	 *
-> +	 *  - Get TDX module information and TDX-capable memory regions.
-> +	 *  - Build the list of TDX-usable memory regions.
-> +	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
-> +	 *    all TDX-usable memory regions.
-> +	 *  - Configure the TDMRs and the global KeyID to the TDX module.
-> +	 *  - Configure the global KeyID on all packages.
-> +	 *  - Initialize all TDMRs.
-> +	 *
-> +	 *  Return error before all steps are done.
-> +	 */
-> +	return -EINVAL;
-> +}
-> +
-> +static int __tdx_enable(void)
-> +{
-> +	int ret;
-> +
-> +	ret = init_tdx_module();
-> +	if (ret) {
-> +		pr_err("module initialization failed (%d)\n", ret);
-> +		tdx_module_status = TDX_MODULE_ERROR;
-> +		return ret;
-> +	}
-> +
-> +	pr_info("module initialized\n");
-> +	tdx_module_status = TDX_MODULE_INITIALIZED;
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * tdx_enable - Enable TDX module to make it ready to run TDX guests
-> + *
-> + * This function assumes the caller has: 1) held read lock of CPU hotplug
-> + * lock to prevent any new cpu from becoming online; 2) done both VMXON
-> + * and tdx_cpu_enable() on all online cpus.
-> + *
-> + * This function can be called in parallel by multiple callers.
-> + *
-> + * Return 0 if TDX is enabled successfully, otherwise error.
-> + */
-> +int tdx_enable(void)
-> +{
-> +	int ret;
-> +
-> +	if (!platform_tdx_enabled())
-> +		return -ENODEV;
-> +
-> +	lockdep_assert_cpus_held();
-> +
-> +	mutex_lock(&tdx_module_lock);
-> +
-> +	switch (tdx_module_status) {
-> +	case TDX_MODULE_UNINITIALIZED:
-> +		ret = __tdx_enable();
-> +		break;
-> +	case TDX_MODULE_INITIALIZED:
-> +		/* Already initialized, great, tell the caller. */
-> +		ret = 0;
-> +		break;
-> +	default:
-> +		/* Failed to initialize in the previous attempts */
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	mutex_unlock(&tdx_module_lock);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_enable);
-> +
->  static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
->  					    u32 *nr_tdx_keyids)
->  {
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> new file mode 100644
-> index 000000000000..a3c52270df5b
-> --- /dev/null
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -0,0 +1,30 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _X86_VIRT_TDX_H
-> +#define _X86_VIRT_TDX_H
-> +
-> +/*
-> + * This file contains both macros and data structures defined by the TDX
-> + * architecture and Linux defined software data structures and functions.
-> + * The two should not be mixed together for better readability.  The
-> + * architectural definitions come first.
-> + */
-> +
-> +/*
-> + * TDX module SEAMCALL leaf functions
-> + */
-> +#define TDH_SYS_INIT		33
-> +#define TDH_SYS_LP_INIT		35
-> +
-> +/*
-> + * Do not put any hardware-defined TDX structure representations below
-> + * this comment!
-> + */
-> +
-> +/* Kernel defined TDX module status during module initialization. */
-> +enum tdx_module_status_t {
-> +	TDX_MODULE_UNINITIALIZED,
-> +	TDX_MODULE_INITIALIZED,
-> +	TDX_MODULE_ERROR
-> +};
-> +
-> +#endif
-
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+Minor change, I'm changing error code to -EINVAL to align with non-PASID case.
