@@ -2,89 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FA397CBA69
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 07:55:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 491F67CBCF0
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 09:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234480AbjJQFz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 01:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60716 "EHLO
+        id S234661AbjJQH7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 03:59:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234467AbjJQFzX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 01:55:23 -0400
-Received: from out-204.mta1.migadu.com (out-204.mta1.migadu.com [95.215.58.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 806ACA2
-        for <kvm@vger.kernel.org>; Mon, 16 Oct 2023 22:55:21 -0700 (PDT)
-Date:   Tue, 17 Oct 2023 05:55:14 +0000
+        with ESMTP id S232134AbjJQH7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 03:59:08 -0400
+Received: from out-194.mta0.migadu.com (out-194.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7575F93
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 00:59:06 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697522119;
+        t=1697529544;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PDw0gF01ql4reoKKcsChe+eJJjJlQChkycqYZXo087I=;
-        b=CpzQZCPjIgSyy+TVXsiZSJsljM+rypsTxolK50cQs8vm+k+ybPDlpClfb7BT2iAujvoHed
-        MBbHByMOp1dlPjF7/HOTbHrGb7hqfxuFjnIXVqzTeRx/KERpa7yQxgFbtLfEEvIV6eu0ch
-        4fh5JVCsa8Eo9h1i/BNSxRDHPv+OTVg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+        bh=8wO3vSl0A/4QjUqKCic92wzMg8jg3zFJaYhjGnZWDLw=;
+        b=Hl8QQsfnTSD3UC0+SFB3YuAzxdU0WT1NtWd3i5GRouPeGkG4Id4GdK2Dh29gTXxjWyrqcC
+        uFiXIkDbWrFW5ac9Vm2E+M+JIcW8DxvuF1Pw+14k8IoOvJgdkY+7HoxtxdblRlpVQLezZP
+        aywmcoMAK8/stZhtSPFmy6JuQXeJWBo=
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
+To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 07/12] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based
- on the associated PMU
-Message-ID: <ZS4hwr4Y4b-9aFYy@linux.dev>
-References: <20231009230858.3444834-1-rananta@google.com>
- <20231009230858.3444834-8-rananta@google.com>
- <b4739328-5dba-a3a6-54ef-2db2d34201d8@redhat.com>
- <CAJHc60zpH8Y8h72=jUbshGoqye20FaHRcsb+TFDxkk7rhJAUxQ@mail.gmail.com>
- <ZS2L6uIlUtkltyrF@linux.dev>
- <CAJHc60wvMSHuLuRsZJOn7+r7LxZ661xEkDfqxGHed5Y+95Fxeg@mail.gmail.com>
- <ZS4hGL5RIIuI1KOC@linux.dev>
+        James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Move VTCR_EL2 into struct s2_mmu
+Date:   Tue, 17 Oct 2023 07:58:45 +0000
+Message-ID: <169752952219.1493360.11796864762419741247.b4-ty@linux.dev>
+In-Reply-To: <20231012205108.3937270-1-maz@kernel.org>
+References: <20231012205108.3937270-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZS4hGL5RIIuI1KOC@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 17, 2023 at 05:52:24AM +0000, Oliver Upton wrote:
-> On Mon, Oct 16, 2023 at 02:35:52PM -0700, Raghavendra Rao Ananta wrote:
+On Thu, 12 Oct 2023 21:51:08 +0100, Marc Zyngier wrote:
+> We currently have a global VTCR_EL2 value for each guest, even
+> if the guest uses NV. This implies that the guest's own S2 must
+> fit in the host's. This is odd, for multiple reasons:
+> 
+> - the PARange values and the number of IPA bits don't necessarily
+>   match: you can have 33 bits of IPA space, and yet you can only
+>   describe 32 or 36 bits of PARange
 > 
 > [...]
-> 
-> > > What's the point of doing this in the first place? The implementation of
-> > > kvm_vcpu_read_pmcr() is populating PMCR_EL0.N using the VM-scoped value.
-> > >
-> > I guess originally the change replaced read_sysreg(pmcr_el0) with
-> > kvm_vcpu_read_pmcr(vcpu) to maintain consistency with others.
-> > But if you and Sebastian feel that it's an overkill and directly
-> > getting the value via vcpu->kvm->arch.pmcr_n is more readable, I'm
-> > happy to make the change.
-> 
-> No, I'd rather you delete the line where PMCR_EL0.N altogether.
 
-... where we set up ...
+Applied to kvmarm/next, thanks!
 
-> reset_pmcr() tries to initialize the field, but your
-> kvm_vcpu_read_pmcr() winds up replacing it with pmcr_n.
+[1/1] KVM: arm64: Move VTCR_EL2 into struct s2_mmu
+      https://git.kernel.org/kvmarm/kvmarm/c/bff4906ad66a
 
--- 
-Thanks,
+--
+Best,
 Oliver
