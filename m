@@ -2,130 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15B697CC4C2
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 15:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 400177CC4D2
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 15:34:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343860AbjJQN3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 09:29:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
+        id S1343819AbjJQNek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 09:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343794AbjJQN33 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 09:29:29 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D35B5EA;
-        Tue, 17 Oct 2023 06:29:27 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HDRKGA026063;
-        Tue, 17 Oct 2023 13:29:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : to : from : message-id : date; s=pp1;
- bh=/G50PTyPk1sf3k/tPQcbY3p7/yzoDDZIrTqn/r9khvw=;
- b=tFCjOkShtjeUY2UeKNtPRXwd9m4ZGO5DeWhPhPCPQKGaBdEQmwcauQqm/sVI7eAabuLV
- PPPHbbUiGmZhoPQr1il3P5GFNxluJcym1Hlpas6UrzMsVI4d0oXixE7I1seOm+6B1OQr
- dgLdcMdtW6VR8prxDZmeepHbO+MHfPvRezhyk2iXV8bg4m7051NCHkHZIxsVhFAYdRB0
- s1fh4aHE7EFy/dyDFOCGi2BmYIG8cPqxuCGs4Op8jdP5bwlpR5R0wq/5ptAT0u8GS/HN
- ZYvUVfzKSn+imeIi72JBsXTiG06uCupEHUudJlSuXV1Sy6huu/BL4bkheaK0uZC66B5E 0w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsu5t04p8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Oct 2023 13:29:21 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39HDSRPY000949;
-        Tue, 17 Oct 2023 13:29:21 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsu5t04m8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Oct 2023 13:29:21 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39HBeBuQ020150;
-        Tue, 17 Oct 2023 13:29:20 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tr6an13a4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Oct 2023 13:29:19 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39HDTG7x4653644
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Oct 2023 13:29:16 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A45E320049;
-        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 793EB20040;
-        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.66.53])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 17 Oct 2023 13:29:16 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S1343642AbjJQNej (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 09:34:39 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F26F0;
+        Tue, 17 Oct 2023 06:34:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697549678; x=1729085678;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ar0hHvQvp5BFk8tVIHGjdWvXPxmhKvWwhrPxeliAhfE=;
+  b=TcEpRaS6vWObVnrtBzjLkhzX9Gn7uH6Q4ndMDu1y+tSMlK3iFBoInoAd
+   K9Jyog0H6fKQxewzqdzS2bloe8GDzKpN+2wLP1agXBl2tSX7ahDOJDKZH
+   FxlolW7yf3yY25w9DGxpmYT9KK8V5map5vjRAPDUDW35EB69Wmmrs558S
+   wXYGWV9KTIl6rYDINwQc5jEXRE52IiFwmwciQ8AU/tfe+pVYXPSP7B7IZ
+   e1S7pdJw5mmeLDEc/W4RiCKvJiMDSejGRYxgkApa3GjwJHSzIHJU/SYdJ
+   4kCSbazK4Pt8U6uKwb//kBw1O0KZPSBA6xMbF44Z4zoa9OoB+hkcHHAV+
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="383005035"
+X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
+   d="scan'208";a="383005035"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 06:34:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="1087502716"
+X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
+   d="scan'208";a="1087502716"
+Received: from nmdsouza-mobl1.amr.corp.intel.com (HELO [10.209.106.102]) ([10.209.106.102])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 06:34:35 -0700
+Message-ID: <736a6745-3ba7-4a0e-a00c-bb36fa1cc51c@linux.intel.com>
+Date:   Tue, 17 Oct 2023 06:34:36 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231011085635.1996346-8-nsg@linux.ibm.com>
-References: <20231011085635.1996346-1-nsg@linux.ibm.com> <20231011085635.1996346-8-nsg@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 7/9] s390x: topology: Rewrite topology list test
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
-        Colton Lewis <coltonlewis@google.com>,
-        Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <169754935612.81646.10599656708946436495@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 17 Oct 2023 15:29:16 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mndcA9zcLWf0GgQNGfietp5PyIZ4Cy3M
-X-Proofpoint-GUID: 4quASyOogIKsToOYCaSofu4tHkb6RH8M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-17_02,2023-10-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 impostorscore=0 phishscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 spamscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310170114
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 05/23] x86/virt/tdx: Handle SEAMCALL no entropy error
+ in common code
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     x86@kernel.org, dave.hansen@intel.com,
+        kirill.shutemov@linux.intel.com, peterz@infradead.org,
+        tony.luck@intel.com, tglx@linutronix.de, bp@alien8.de,
+        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, rafael@kernel.org, david@redhat.com,
+        dan.j.williams@intel.com, len.brown@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
+        nik.borisov@suse.com, bagasdotme@gmail.com, sagis@google.com,
+        imammedo@redhat.com
+References: <cover.1697532085.git.kai.huang@intel.com>
+ <cf05bd02c7d33375965c2647ce3689ae786aa97d.1697532085.git.kai.huang@intel.com>
+From:   Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+In-Reply-To: <cf05bd02c7d33375965c2647ce3689ae786aa97d.1697532085.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Nina Schoetterl-Glausch (2023-10-11 10:56:30)
-> Rewrite recursion with separate functions for checking containers,
-> containers containing CPUs and CPUs.
-> This improves comprehension and allows for more tests.
-> We now also test for ordering of CPU TLEs and number of child entries.
->=20
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-[...]
-> diff --git a/s390x/topology.c b/s390x/topology.c
-> index c1f6520f..9838434c 100644
-> --- a/s390x/topology.c
-> +++ b/s390x/topology.c
-[...]
-> +static union topology_container *check_child_cpus(struct sysinfo_15_1_x =
-*info,
-> +                                                 union topology_containe=
-r *cont,
-> +                                                 union topology_cpu *chi=
-ld,
-> +                                                 int *cpus_in_masks)
+
+
+On 10/17/2023 3:14 AM, Kai Huang wrote:
+> Some SEAMCALLs use the RDRAND hardware and can fail for the same reasons
+> as RDRAND.  Use the kernel RDRAND retry logic for them.
+> 
+> There are three __seamcall*() variants.  Do the SEAMCALL retry in common
+> code and add a wrapper for each of them.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Reviewed-by: Kirill A. Shutemov <kirll.shutemov@linux.intel.com>
+> ---
+> 
+> v13 -> v14:
+>  - Use real function sc_retry() instead of using macros. (Dave)
+>  - Added Kirill's tag.
+> 
+> v12 -> v13:
+>  - New implementation due to TDCALL assembly series.
+> ---
+
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com
+
+>  arch/x86/include/asm/tdx.h | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index a252328734c7..d624aa25aab0 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -24,6 +24,11 @@
+>  #define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+>  #define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
+>  
+> +/*
+> + * TDX module SEAMCALL leaf function error codes
+> + */
+> +#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
+> +
+>  #ifndef __ASSEMBLY__
+>  
+>  /*
+> @@ -82,6 +87,27 @@ u64 __seamcall(u64 fn, struct tdx_module_args *args);
+>  u64 __seamcall_ret(u64 fn, struct tdx_module_args *args);
+>  u64 __seamcall_saved_ret(u64 fn, struct tdx_module_args *args);
+>  
+> +#include <asm/archrandom.h>
+> +
+> +typedef u64 (*sc_func_t)(u64 fn, struct tdx_module_args *args);
+> +
+> +static inline u64 sc_retry(sc_func_t func, u64 fn,
+> +			   struct tdx_module_args *args)
 > +{
-> +       void *last =3D ((void *)info) + info->length;
-> +       union topology_cpu *prev_cpu =3D NULL;
-> +       int cpus =3D 0;
+> +	int retry = RDRAND_RETRY_LOOPS;
+> +	u64 ret;
+> +
+> +	do {
+> +		ret = func(fn, args);
+> +	} while (ret == TDX_RND_NO_ENTROPY && --retry);
+> +
+> +	return ret;
+> +}
+> +
+> +#define seamcall(_fn, _args)		sc_retry(__seamcall, (_fn), (_args))
+> +#define seamcall_ret(_fn, _args)	sc_retry(__seamcall_ret, (_fn), (_args))
+> +#define seamcall_saved_ret(_fn, _args)	sc_retry(__seamcall_saved_ret, (_fn), (_args))
+> +
+>  bool platform_tdx_enabled(void);
+>  #else
+>  static inline bool platform_tdx_enabled(void) { return false; }
 
-I know __builtin_popcountl returns int, but maybe it makes sense to make
-this and cpus_in_masks an unsigned type?
-
-> +       for (; (void *)child < last && child->nl =3D=3D 0; child++) {
-
-Personal preference, I prefer simply iterating over a counter, but its up
-to you.
+-- 
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
