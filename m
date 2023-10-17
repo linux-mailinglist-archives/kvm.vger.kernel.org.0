@@ -2,81 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B5F7CBCF1
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 09:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D9677CBD06
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 10:03:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234689AbjJQH7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 03:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43370 "EHLO
+        id S234708AbjJQIDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 04:03:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232134AbjJQH7N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 03:59:13 -0400
-Received: from out-206.mta0.migadu.com (out-206.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ce])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55D493
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 00:59:11 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+        with ESMTP id S232134AbjJQIDW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 04:03:22 -0400
+Received: from out-204.mta0.migadu.com (out-204.mta0.migadu.com [IPv6:2001:41d0:1004:224b::cc])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2185A95
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 01:03:21 -0700 (PDT)
+Date:   Tue, 17 Oct 2023 08:03:12 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1697529550;
+        t=1697529798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G1kYh2Q4VYYngM8yqVtVdbokk228ME22Rcp9maAMl5I=;
-        b=RmBkn54ovRBxvCVKMh/lfW/h28uMK+pcDzuvheqUTV8vNPJJhF2W1iUI4ylHE8oFF1oeOy
-        b5YYXzXXJd73eDKY3CbXyfWJSJuuG0xtYhS/rAmQpxtruEZTmG3346uCYzxFmkxZGFGFGE
-        +Or7kh+7R1VSk9MiNdp9zps65RDrbIY=
+        bh=X41/o5bczvtn2r8r9l6vgC27CyrOUvCR36syb0XC5bs=;
+        b=UM5zdtV751wdwKI/Wqjsx9D6o9Ry46UF+LP/DwUf+aJ3hMmNjco/o3FyR68ou4P+IDOxqL
+        PJB3/NrbCLGk/n6EWyRDvB7ts1fy4wHu38hWOk7TaX5IdJKUjiEKpajU5M6w7s9wHh3sBa
+        LCA9ccbRxTh6daV0+xAJocAcyFtH8MY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 0/5] KVM: arm64: Load stage-2 in vcpu_load() on VHE
-Date:   Tue, 17 Oct 2023 07:58:46 +0000
-Message-ID: <169752952219.1493360.2687310984257403037.b4-ty@linux.dev>
-In-Reply-To: <20231012205422.3924618-1-oliver.upton@linux.dev>
-References: <20231012205422.3924618-1-oliver.upton@linux.dev>
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
+ register from usersapce
+Message-ID: <ZS4_wGJPg3G8dA7Z@linux.dev>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-6-oliver.upton@linux.dev>
+ <87fs2aegap.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87fs2aegap.fsf@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,TO_EQ_FM_DIRECT_MX autolearn=ham
-        autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Oct 2023 20:54:17 +0000, Oliver Upton wrote:
-> Clearly my half-assed attempt at this series needed a bit of TLC.
-> Respinning with Marc's diff to make sure the stage-2 is in a consistent
-> state after VMID rollover and MMU notifiers triggering TLB invalidation.
+On Mon, Oct 16, 2023 at 05:30:06PM +0200, Cornelia Huck wrote:
+> On Wed, Oct 11 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> v2: https://lore.kernel.org/kvmarm/20231006093600.1250986-1-oliver.upton@linux.dev/
+> > From: Jing Zhang <jingzhangos@google.com>
+> >
+> > Add tests to verify setting ID registers from userspace is handled
+> > correctly by KVM. Also add a test case to use ioctl
+> > KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++++++++++
+> >  2 files changed, 480 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 > 
-> Marc Zyngier (2):
->   KVM: arm64: Restore the stage-2 context in VHE's
->     __tlb_switch_to_host()
->   KVM: arm64: Reload stage-2 for VMID change on VHE
+> (...)
 > 
-> [...]
+> > +static void test_user_set_reg(struct kvm_vcpu *vcpu, bool aarch64_only)
+> > +{
+> > +	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
+> > +	struct reg_mask_range range = {
+> > +		.addr = (__u64)masks,
+> > +	};
+> > +	int ret;
+> > +
+> > +	/* KVM should return error when reserved field is not zero */
+> > +	range.reserved[0] = 1;
+> > +	ret = __vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
+> > +	TEST_ASSERT(ret, "KVM doesn't check invalid parameters.");
+> 
+> I think the code should first check for
+> KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES -- newer kselftests are supposed
+> to be able to run on older kernels, and we should just skip all of this
+> if the API isn't there.
 
-Applied to kvmarm/next, thanks!
+Ah, thanks! I'll apply the following on top:
 
-[1/5] KVM: arm64: Don't zero VTTBR in __tlb_switch_to_host()
-      https://git.kernel.org/kvmarm/kvmarm/c/65221c1f57f6
-[2/5] KVM: arm64: Restore the stage-2 context in VHE's __tlb_switch_to_host()
-      https://git.kernel.org/kvmarm/kvmarm/c/35a647ce2419
-[3/5] KVM: arm64: Reload stage-2 for VMID change on VHE
-      https://git.kernel.org/kvmarm/kvmarm/c/052166906b67
-[4/5] KVM: arm64: Rename helpers for VHE vCPU load/put
-      https://git.kernel.org/kvmarm/kvmarm/c/8f7d6be28d46
-[5/5] KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()
-      https://git.kernel.org/kvmarm/kvmarm/c/0556bbf8a5ed
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index 5c0718fd1705..bac05210b539 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -452,6 +452,8 @@ int main(void)
+ 	uint64_t val, el0;
+ 	int ftr_cnt;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES));
++
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 
+ 	/* Check for AARCH64 only system */
 
---
-Best,
+-- 
+Thanks,
 Oliver
