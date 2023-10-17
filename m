@@ -2,305 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 863A57CC3A6
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:50:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B99AE7CC3D6
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 14:58:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234760AbjJQMuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 08:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50988 "EHLO
+        id S1343728AbjJQM6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 08:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234544AbjJQMuI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 08:50:08 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1F1DB
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:50:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697547006; x=1729083006;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rCYipY6by1RxlRi5NR03UHjm72t/xN2/Z+rpPJNJHik=;
-  b=kduwgWXHCyq81QUhMvJlYD1CNBui0ySvH4/wA5Gwh4N/G6Wt7RN2encr
-   hW1VGSFOT6gksrfHvWJT4g9VLx0VGgyvdabA6lzsrBVBB/bcHDJ0N8icx
-   gJ//tAHrW3KY2PX/mW31qdkSmftebGoGdDFGxsNeo5oHzkxDNAnGymYmv
-   qTvKfxu4MLoMQu/S6ppyg/rnRdiks7TP94MKEwF/y/xR0EZJG3zhLhYGh
-   aNSnLXKuETTmCM79G5XtSYYQcJN5t3askMuYPcggjAXybvPDKHLHlYmo8
-   VC7VkhbH+wwzmBaVWUFdzRZ7xrz8QErQ35Ezwhl4dDLVB1rFEeBo6Zd/9
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="366033201"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="366033201"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 05:50:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826427850"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="826427850"
-Received: from wangxue2-mobl.ccr.corp.intel.com (HELO [10.254.212.22]) ([10.254.212.22])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 05:50:02 -0700
-Message-ID: <4b5cd75a-c0cd-c9bd-0d08-8c889861d48f@linux.intel.com>
-Date:   Tue, 17 Oct 2023 20:49:59 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
+        with ESMTP id S1343496AbjJQM6r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 08:58:47 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6229FA
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 05:58:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NaQTuWOgSIcqN58B6TDV4QFYI67BR+B4I2q0vBhNox5S246eIWlC5xUfxg6977g8emVdHtyhYaKoWX8T9BV+a5J+yQmKWND23OxizRwriE1jIrHryPmF93uiQtYQQScLk9jJo6b7ci3dPGzhrNIAYimtzSIQs5vjUXnQcB4p+AhkcxjhNoAIJOEOvkVqOL8RL3Z4BollvWlINCBVU4NIA5zn+pVxHpyOq245dU3XaqXiOo8SFmuAHG4PzxNL5xyR21lR8xZsYOgruhrwI97UvL5MX1G7QsFOW0wDdv0K4xx2TAum+J8+CFy1/UumZu/h4qmxycBrfyEwJ51mQBFoFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E47Bxlpym1Ghc7DJEgrbIOkINaFe+ItM9fHrJ21uAYo=;
+ b=NrhNlVNiM/+deBggsX8SRy3+59T1RBIqVKdAjCS+ktPgWJiB2y7vRtZ6UPGLRnkdunF+pOS4iiGRSDC2mgNEmtn/kkYPKk+zi0B8sjTA+KGTw3q+OJkxkDZmTWEUHa+vgYv5yicPZ5wtX2Wtt5jux1UlwAwslQLUdwzBaaOvp/nLNDSpLtREHdR512sS1NEtCv2HupLR4CHmEUjSg5uKBHMDt3rkV+hIbVFxjl3iCTmkYB02hMPjQSPaHSg9fiIBSQEmZS36uJ5yjGk5kiM205Dh/3GqvE0741BfReC9UUXOV579BAHcQka3CuZuod/FdDYQgZm8pN/RYikVthNJ+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E47Bxlpym1Ghc7DJEgrbIOkINaFe+ItM9fHrJ21uAYo=;
+ b=ZUExKiM5X63SLtDamqMozFCu5GgaSFRvRTNfNSuUV/28o2eCsmieK54tDJNWCEjd6HVyUN8i5+Tzi/laewK8hBGyKVzzBqLNdeDSGziwQ8w3ymvVsYkLHQoekcADZumsRo5mD3ujQxgkP46S08RxN00ZCAvcw6UdAbpoyUDwlvAMvBaLdI7h6a4YrStZSwPL0lcyE+Oxf795/M9vbCuvGuRiA3zFX0UzeqWtoCPb3Erydyfn07cIJfvL89z+py2NjtvhlneK4062TkrnytQMT3qWopdqvdRF+YaHrjC9Qa+TkN0NWXW2CUkbK7l4zSn/0UAz7YOBvi4KIJ7Va7CytA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA1PR12MB8886.namprd12.prod.outlook.com (2603:10b6:806:375::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
+ 2023 12:58:43 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 12:58:42 +0000
+Date:   Tue, 17 Oct 2023 09:58:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
         Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
         Nicolin Chen <nicolinc@nvidia.com>,
         Joerg Roedel <joro@8bytes.org>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
- domains
-Content-Language: en-US
-To:     Joao Martins <joao.m.martins@oracle.com>, iommu@lists.linux.dev
-References: <20230923012511.10379-1-joao.m.martins@oracle.com>
- <20230923012511.10379-20-joao.m.martins@oracle.com>
- <d8553024-b880-42db-9f1f-8d2d3591469c@linux.intel.com>
- <83f9e278-8249-4f10-8542-031260d43c4c@oracle.com>
- <10bb7484-baaf-4d32-b40d-790f56267489@oracle.com>
- <a83cb9a7-88de-41af-8ef0-1e739eab12c2@linux.intel.com>
- <e797b35b-6a17-4114-a886-95e6402ad03c@oracle.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <e797b35b-6a17-4114-a886-95e6402ad03c@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Robin Murphy <robin.murphy@arm.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 02/19] vfio: Move iova_bitmap into iommu core
+Message-ID: <20231017125841.GY3952@nvidia.com>
+References: <20231013155134.6180386e.alex.williamson@redhat.com>
+ <20231014000220.GK3952@nvidia.com>
+ <1d5b592e-bcb2-4553-b6d8-5043b52a37fa@oracle.com>
+ <20231016163457.GV3952@nvidia.com>
+ <8a13a2e5-9bc1-4aeb-ad39-657ee95d5a21@oracle.com>
+ <20231016180556.GW3952@nvidia.com>
+ <97718661-c892-4cbf-b998-cadd393bdf47@oracle.com>
+ <20231016182049.GX3952@nvidia.com>
+ <6cd99e9b-46d9-47ce-a5d2-d5808b38d946@oracle.com>
+ <8b1ff738-6b0d-4095-82a8-206dcaba9ea4@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b1ff738-6b0d-4095-82a8-206dcaba9ea4@oracle.com>
+X-ClientProxiedBy: BL1PR13CA0314.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::19) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB8886:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2c9c23a4-a3ba-4d0e-8849-08dbcf10ca51
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dDvdSZqDpaSFHzCUp6drQC2xiesjhmxDANwbkmyi6RHas5ndgOB4inksJoXPy2n7TFs/LQoz1Rj+UAwpzV3zeAyvwnQEfB2RckpL3JYXFQOaR1mhaNS5ZB40Dc++nmDZZFsbitxQ+2ZdMmdhv3euEw7JPKbrXgDoKS+6Fj+cd11XkRcDKrPT9M8AKb0Nsy4odLF+yUOO5gZ4qARgAhiDOlXMuzFOESHnVM8j8zw/RFwXfRfIC72DY1uYSl3iy1QjR0/KqKD6a3o2EKxov+46Gti7qUBxmZ+u5MVoZx6oiws4RNCc8F6B1zL1fLn6B6yk05v4Zw4hm+DIoz6cbEp32qhLBQjH7KJ0IEIy+3fjyDnYV5AOgxf3E9O0uVdfh6USKEd7Vg8vT/CINuVlZE0iJ0/YEXyIixo0m1RE4+ekgIJmTMvulXEf0f08ZNx3d94CoSCZHQIiq+DInXA80AQN+MstFi0Q3U2JgAVGSqhH8zXkjknilOD/MAerG9WTv4UZArltRzhijpNiDYcF+i2d8TIkg+g7tWnO6EIm63xYYo3/L7XzNQ7ifTCP46/PJLBF
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(39860400002)(376002)(346002)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(6506007)(5660300002)(53546011)(83380400001)(2906002)(36756003)(26005)(2616005)(33656002)(38100700002)(86362001)(6512007)(7416002)(66476007)(6486002)(478600001)(1076003)(41300700001)(6916009)(316002)(66556008)(66946007)(54906003)(4326008)(8676002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FewQ/N84NgbldH9OR3lUa6bwUDxRHdxgkhNraLCM5lNS7bCeoY+FA5j/IUdB?=
+ =?us-ascii?Q?m8ydj4mO+za6msI1KUvdl1C/mHgH7x9CmaqSql+eBs+M7Fv+uRR2cUGYljrT?=
+ =?us-ascii?Q?az0oy/D70EignQ3UuX5aWvDm7Wi62TaJyMVwREm5tC0pRWCYC+gBMeMl1fN+?=
+ =?us-ascii?Q?SnUYo4aaRhOkAGGkaVALpELyoLvCGZJqz/C8IQhTKHN1zBnxP6KxcmFnbn7S?=
+ =?us-ascii?Q?pzFZTX9FDrmRVSMIXB++GYRaCeLbp6+0r4Et3r/Pp1kDL27aCeze0lQYUw4Z?=
+ =?us-ascii?Q?1wgXRli0pPCecPVg34Xehr7K3fVx3boLb8spMBIdioUNwR2WePAWbxpx23ll?=
+ =?us-ascii?Q?YqVTbOUNiQNRIwFEL250v7nDTwr5b7ukw1wnQwoWp/nkgsQsVMpLdNSbFfU5?=
+ =?us-ascii?Q?ZO67nxa2SmP8jsw7RjeCvx+ZZLp0ANEyCmtvHehMOFV352AcC04TbfHlvsuG?=
+ =?us-ascii?Q?FvWdJaxecaZUL9yLLhNrYAcKEpCwYRWuAzf2nWGpNKyazvZNLqhk+tpc0M3V?=
+ =?us-ascii?Q?8EJK4YCty9PeyvEDwymavCMJvQoDj1OWWCovqvEsNDD99jRn6zoABcKaPHV5?=
+ =?us-ascii?Q?OkDZ1TH+qiBoZIoiH4E7dASs0PNETwFcyIjqK+KUXQVpioxz+AikyR8IoudE?=
+ =?us-ascii?Q?FdpKyQ3X6mchoe2epzIwccvD6reACZi0+PwBt/FCYY6vFEMA+0nCelamH1Ml?=
+ =?us-ascii?Q?bwOM+Ekb6HwUgeJ0T9eRWdlPCAGMIQDI7Ymk8eGA8yWpRORGssSny8G982Af?=
+ =?us-ascii?Q?9TDjfEqDvGL0xJeLdtqNZqUmj6s2vW2Wwqryc0bNAeLvGg3UNOJTZ4eZwz8N?=
+ =?us-ascii?Q?QJGZ6nj3ZQiCJuLDpmQysYWidN9rSTi6WUfxd9AkQjpRE2CiapcBbj42pNjs?=
+ =?us-ascii?Q?DZYanx1pyKorXEeENB338IGrIzFXGs2vJkbIUgYiPPTk4T1fls5kUALKSWBI?=
+ =?us-ascii?Q?gP4fHWdaQFetXq1J3w/88bH9UTT4+ivqGP3wXS9jHLFPrv/vbcxnZUFPtiym?=
+ =?us-ascii?Q?i/dBpRhdaNOyZkAIcL0fa2hzAMvhD4c7i6AZrBAOjHEHOKHE5+86/OP57rV2?=
+ =?us-ascii?Q?OiUNlEbAMF59q8L6njyO0gXX2MisVAoEjP6qygG8VAVEF7M6TIPoQQLMcbio?=
+ =?us-ascii?Q?oOHQyyZR005acTmkwrZ0enSIZWuxlKuFzoB0ezaHtWBj4TDdDglRISfUh8FI?=
+ =?us-ascii?Q?6V7yfz71fAbrKvNCc4NdGe6xe3pUcPMBf05rGom1L1F7g51eFRwfmNKGb2Pg?=
+ =?us-ascii?Q?cwQ/ZXvzk/pKg7QsW3tpBLzpaMr+45/b81dgLxy69DHaN11M6DcvtIGxPgok?=
+ =?us-ascii?Q?r41mntP1GKVwCtzyiF+5QOLns8bBf1J4DzzH1jwYjIm3ZhkbHUeixun5umBX?=
+ =?us-ascii?Q?kpeNWUon/V7DpWDOwULK/UVbdit4XXuBeLysdn2lA3fbFZdvfu/HCUh0EBD9?=
+ =?us-ascii?Q?YHHyI1TggTsTiRRrPIK9bdrzCQHEh1CmpIKro9ohQSlCe7wZdOcic9kIoUGA?=
+ =?us-ascii?Q?R1GawzL/kjkANvaOuH63/O20doOTaTauYW+xLT8mA73WiHrQ7DTUHHsE83GI?=
+ =?us-ascii?Q?gqwpKiduXWRgDKr8KSkobTcBOF3W23/fZUBGwRnI?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c9c23a4-a3ba-4d0e-8849-08dbcf10ca51
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 12:58:42.5578
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SOvzFJRbyTLKz7H7PS0xirfK0GczQgqEzMkVIa3OmP3JkZR7nkRjpBL/xbV5Gd9v
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8886
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/10/17 19:22, Joao Martins wrote:
-> On 17/10/2023 03:08, Baolu Lu wrote:
->> On 10/17/23 12:00 AM, Joao Martins wrote:
->>>>> The iommu_dirty_bitmap is defined in iommu core. The iommu driver has no
->>>>> need to understand it and check its member anyway.
->>>>>
->>>> (...) The iommu driver has no need to understand it. iommu_dirty_bitmap_record()
->>>> already makes those checks in case there's no iova_bitmap to set bits to.
->>>>
->>> This is all true but the reason I am checking iommu_dirty_bitmap::bitmap is to
->>> essentially not record anything in the iova bitmap and just clear the dirty bits
->>> from the IOPTEs, all when dirty tracking is technically disabled. This is done
->>> internally only when starting dirty tracking, and thus to ensure that we cleanup
->>> all dirty bits before we enable dirty tracking to have a consistent snapshot as
->>> opposed to inheriting dirties from the past.
->>
->> It's okay since it serves a functional purpose. Can you please add some
->> comments around the code to explain the rationale.
->>
+On Mon, Oct 16, 2023 at 07:50:25PM +0100, Joao Martins wrote:
+> On 16/10/2023 19:37, Joao Martins wrote:
+> > On 16/10/2023 19:20, Jason Gunthorpe wrote:
+> >> On Mon, Oct 16, 2023 at 07:15:10PM +0100, Joao Martins wrote:
+> >>
+> >>> Here's a diff, naturally AMD/Intel kconfigs would get a select IOMMUFD_DRIVER as
+> >>> well later in the series
+> >>
+> >> It looks OK, the IS_ENABLES are probably overkill once you have
+> >> changed the .h file, just saves a few code bytes, not sure we care?
+> > 
+> > I can remove them
 > 
-> I added this comment below:
+> Additionally, I don't think I can use the symbol namespace for IOMMUFD, as
+> iova-bitmap can be build builtin with a module iommufd, otherwise we get into
+> errors like this:
 > 
-> +       /*
-> +        * IOMMUFD core calls into a dirty tracking disabled domain without an
-> +        * IOVA bitmap set in order to clean dirty bits in all PTEs that might
-> +        * have occured when we stopped dirty tracking. This ensures that we
-> +        * never inherit dirtied bits from a previous cycle.
-> +        */
-> 
+> ERROR: modpost: module iommufd uses symbol iova_bitmap_for_each from namespace
+> IOMMUFD, but does not import it.
+> ERROR: modpost: module iommufd uses symbol iova_bitmap_free from namespace
+> IOMMUFD, but does not import it.
+> ERROR: modpost: module iommufd uses symbol iova_bitmap_alloc from namespace
+> IOMMUFD, but does not import it.
 
-Yes. It's clear. Thank you!
+You cannot self-import the namespace? I'm not that familiar with this stuff
 
-> Also fixed an issue where I could theoretically clear the bit with
-> IOMMU_NO_CLEAR. Essentially passed the read_and_clear_dirty flags and let
-> dma_sl_pte_test_and_clear_dirty() to test and test-and-clear, similar to AMD:
-> 
-> @@ -781,6 +788,16 @@ static inline bool dma_pte_present(struct dma_pte *pte)
->          return (pte->val & 3) != 0;
->   }
-> 
-> +static inline bool dma_sl_pte_test_and_clear_dirty(struct dma_pte *pte,
-> +                                                  unsigned long flags)
-> +{
-> +       if (flags & IOMMU_DIRTY_NO_CLEAR)
-> +               return (pte->val & DMA_SL_PTE_DIRTY) != 0;
-> +
-> +       return test_and_clear_bit(DMA_SL_PTE_DIRTY_BIT,
-> +                                 (unsigned long *)&pte->val);
-> +}
-> +
-
-Yes. Sure.
-
-> Anyhow, see below the full diff compared to this patch. Some things are in tree
-> that is different to submitted from this patch.
-
-[...]
-
-> @@ -4113,7 +4123,7 @@ static void intel_iommu_domain_free(struct iommu_domain
-> *domain)
->   }
-> 
->   static int prepare_domain_attach_device(struct iommu_domain *domain,
-> -					struct device *dev)
-> +					struct device *dev, ioasid_t pasid)
-
-How about blocking pasid attaching in intel_iommu_set_dev_pasid().
-
->   {
->   	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->   	struct intel_iommu *iommu;
-> @@ -4126,7 +4136,8 @@ static int prepare_domain_attach_device(struct
-> iommu_domain *domain,
->   	if (dmar_domain->force_snooping && !ecap_sc_support(iommu->ecap))
->   		return -EINVAL;
-> 
-> -	if (domain->dirty_ops && !intel_iommu_slads_supported(iommu))
-> +	if (domain->dirty_ops &&
-> +	    (!slads_supported(iommu) || pasid != IOMMU_NO_PASID))
->   		return -EINVAL;
-> 
->   	/* check if this iommu agaw is sufficient for max mapped address */
-
-[...]
-
-> 
-> @@ -4886,14 +4897,16 @@ static int intel_iommu_read_and_clear_dirty(struct
-> iommu_domain *domain,
->   	unsigned long pgsize;
->   	bool ad_enabled;
-> 
-> -	spin_lock(&dmar_domain->lock);
-> +	/*
-> +	 * IOMMUFD core calls into a dirty tracking disabled domain without an
-> +	 * IOVA bitmap set in order to clean dirty bits in all PTEs that might
-> +	 * have occured when we stopped dirty tracking. This ensures that we
-> +	 * never inherit dirtied bits from a previous cycle.
-> +	 */
->   	ad_enabled = dmar_domain->dirty_tracking;
-> -	spin_unlock(&dmar_domain->lock);
-> -
->   	if (!ad_enabled && dirty->bitmap)
-
-How about
-	if (!dmar_domain->dirty_tracking && dirty->bitmap)
-		return -EINVAL;
-?
-
->   		return -EINVAL;
-> 
-> -	rcu_read_lock();
->   	do {
->   		struct dma_pte *pte;
->   		int lvl = 0;
-> @@ -4906,14 +4919,10 @@ static int intel_iommu_read_and_clear_dirty(struct
-> iommu_domain *domain,
->   			continue;
->   		}
-> 
-> -		/* It is writable, set the bitmap */
-> -		if (((flags & IOMMU_DIRTY_NO_CLEAR) &&
-> -				dma_sl_pte_dirty(pte)) ||
-> -		    dma_sl_pte_test_and_clear_dirty(pte))
-> +		if (dma_sl_pte_test_and_clear_dirty(pte, flags))
->   			iommu_dirty_bitmap_record(dirty, iova, pgsize);
->   		iova += pgsize;
->   	} while (iova < end);
-> -	rcu_read_unlock();
-> 
->   	return 0;
->   }
-> diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-> index bccd44db3316..0b390d9e669b 100644
-> --- a/drivers/iommu/intel/iommu.h
-> +++ b/drivers/iommu/intel/iommu.h
-> @@ -542,6 +542,9 @@ enum {
->   #define sm_supported(iommu)	(intel_iommu_sm && ecap_smts((iommu)->ecap))
->   #define pasid_supported(iommu)	(sm_supported(iommu) &&			\
->   				 ecap_pasid((iommu)->ecap))
-> +#define slads_supported(iommu) (sm_supported(iommu) &&                 \
-> +                                ecap_slads((iommu)->ecap))
-> +
-> 
->   struct pasid_entry;
->   struct pasid_state_entry;
-> @@ -785,13 +788,12 @@ static inline bool dma_pte_present(struct dma_pte *pte)
->   	return (pte->val & 3) != 0;
->   }
-> 
-> -static inline bool dma_sl_pte_dirty(struct dma_pte *pte)
-> +static inline bool dma_sl_pte_test_and_clear_dirty(struct dma_pte *pte,
-> +						   unsigned long flags)
->   {
-> -	return (pte->val & DMA_SL_PTE_DIRTY) != 0;
-> -}
-> +	if (flags & IOMMU_DIRTY_NO_CLEAR)
-> +		return (pte->val & DMA_SL_PTE_DIRTY) != 0;
-> 
-> -static inline bool dma_sl_pte_test_and_clear_dirty(struct dma_pte *pte)
-> -{
->   	return test_and_clear_bit(DMA_SL_PTE_DIRTY_BIT,
->   				  (unsigned long *)&pte->val);
->   }
-> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
-> index 03814942d59c..785384a59d55 100644
-> --- a/drivers/iommu/intel/pasid.c
-> +++ b/drivers/iommu/intel/pasid.c
-> @@ -686,15 +686,29 @@ int intel_pasid_setup_dirty_tracking(struct intel_iommu
-> *iommu,
-> 
->   	spin_lock(&iommu->lock);
-> 
-> -	did = domain_id_iommu(domain, iommu);
->   	pte = intel_pasid_get_entry(dev, pasid);
->   	if (!pte) {
->   		spin_unlock(&iommu->lock);
-> -		dev_err(dev, "Failed to get pasid entry of PASID %d\n", pasid);
-> +		dev_err_ratelimited(dev,
-> +				    "Failed to get pasid entry of PASID %d\n",
-> +				    pasid);
->   		return -ENODEV;
->   	}
-> 
-> +	did = domain_id_iommu(domain, iommu);
->   	pgtt = pasid_pte_get_pgtt(pte);
-> +	if (pgtt != PASID_ENTRY_PGTT_SL_ONLY && pgtt != PASID_ENTRY_PGTT_NESTED) {
-> +		spin_unlock(&iommu->lock);
-> +		dev_err_ratelimited(dev,
-> +				    "Dirty tracking not supported on translation type %d\n",
-> +				    pgtt);
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (pasid_get_ssade(pte) == enabled) {
-> +		spin_unlock(&iommu->lock);
-> +		return 0;
-> +	}
-> 
->   	if (enabled)
->   		pasid_set_ssade(pte);
-> @@ -702,6 +716,9 @@ int intel_pasid_setup_dirty_tracking(struct intel_iommu *iommu,
->   		pasid_clear_ssade(pte);
->   	spin_unlock(&iommu->lock);
-> 
-> +	if (!ecap_coherent(iommu->ecap))
-> +		clflush_cache_range(pte, sizeof(*pte));
-> +
->   	/*
->   	 * From VT-d spec table 25 "Guidance to Software for Invalidations":
->   	 *
-> @@ -720,8 +737,6 @@ int intel_pasid_setup_dirty_tracking(struct intel_iommu *iommu,
-> 
->   	if (pgtt == PASID_ENTRY_PGTT_SL_ONLY || pgtt == PASID_ENTRY_PGTT_NESTED)
->   		iommu->flush.flush_iotlb(iommu, did, 0, 0, DMA_TLB_DSI_FLUSH);
-> -	else
-> -		qi_flush_piotlb(iommu, did, pasid, 0, -1, 0);
-> 
->   	/* Device IOTLB doesn't need to be flushed in caching mode. */
->   	if (!cap_caching_mode(iommu->cap))
-
-Others look good to me. Thanks a lot.
-
-Best regards,
-baolu
+Jason
