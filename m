@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66D447CC16E
-	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 13:03:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E4C47CC067
+	for <lists+kvm@lfdr.de>; Tue, 17 Oct 2023 12:17:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234819AbjJQLD4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 07:03:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51714 "EHLO
+        id S1343631AbjJQKRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 06:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343645AbjJQKQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 06:16:37 -0400
+        with ESMTP id S1343710AbjJQKQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 06:16:56 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89AB182;
-        Tue, 17 Oct 2023 03:16:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB87AED;
+        Tue, 17 Oct 2023 03:16:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697537765; x=1729073765;
+  t=1697537771; x=1729073771;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9dY6RLECRCet1JBs9dKs8gG3/dlOSjz1bQVPNQeewz0=;
-  b=h6T/X97qbXQiDhKsfY9twg8KdNCEbVIaYGDVSWs1usM4W/w8FUcfdC/x
-   xuz7F151Fpg7AYX/Xp1iVa7ErgE/xjX7kcvcRDZO888WBY2zCcspn5zSk
-   CCmWViGxI3SXRVA2t+hnP/MIv9b1/aftqL+sm1E+ZV9ln+wZF5GWA+IRr
-   7zsC5F2qDwWIt0aftLh/uOGP3fvcXZodzrnD5tiGsbDv7eKnbv+Rd5f7h
-   TiJnyLOvr7jHuKiVhAL7Uq0TXRAA3AmJUlpycNdXqAarX7uznA2Zy2MJI
-   lnGCHvveJ4BZpdaaYkyWl1D+GVAy3bvqN7VSBlzoUI8YIJxyaQZdPF1pB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="471972374"
+  bh=+SfivUCYbdTg+Nz3SrNJg6w4OhV0FV9TY5y/jlHe+q4=;
+  b=biZAGmYP1L6GSe6SmezwdUjFEA8l5NV7CCLmaycMmyuHV3VVu5QWf1aO
+   IUaPBGjj2EkuLifJP9Zp2+RUSc0ADrBe1/+vqaUNr6IzKldV5ReiJ6DX7
+   rBhnsHU21+fpxzlgqJxD2C8VXfKjBj2Ik+VzZaZUNjqh4dvz/FiN+dV2W
+   ZZyyQUoncaPeHO5x4wr1E4ws1TQMRHSSiexGFXNV1zYdMFzbOCMVD9Ged
+   jqf4GXiOsjmxi52KlImlnqoGBnRTVwj/zQc09l0AE8PsTjcGTCmQWqULQ
+   zPC3e/AISjVAGZLrlVPFsic2LqQ7JlNjiEflR9RphXNu2LB3qFP1Bn2UL
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="471972405"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="471972374"
+   d="scan'208";a="471972405"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:05 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503630"
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872503645"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="872503630"
+   d="scan'208";a="872503645"
 Received: from chowe-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.64])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:15:59 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:16:05 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     x86@kernel.org, dave.hansen@intel.com,
@@ -50,9 +50,9 @@ Cc:     x86@kernel.org, dave.hansen@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v14 10/23] x86/virt/tdx: Add placeholder to construct TDMRs to cover all TDX memory regions
-Date:   Tue, 17 Oct 2023 23:14:34 +1300
-Message-ID: <0e1b79c227b5cfef94a632ae9b5b94643593126b.1697532085.git.kai.huang@intel.com>
+Subject: [PATCH v14 11/23] x86/virt/tdx: Fill out TDMRs to cover all TDX memory regions
+Date:   Tue, 17 Oct 2023 23:14:35 +1300
+Message-ID: <5f5c66b7826df280437b832dfc59d32ba2bfc93b.1697532085.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697532085.git.kai.huang@intel.com>
 References: <cover.1697532085.git.kai.huang@intel.com>
@@ -67,316 +67,208 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After the kernel selects all TDX-usable memory regions, the kernel needs
-to pass those regions to the TDX module via data structure "TD Memory
-Region" (TDMR).
+Start to transit out the "multi-steps" to construct a list of "TD Memory
+Regions" (TDMRs) to cover all TDX-usable memory regions.
 
-Add a placeholder to construct a list of TDMRs (in multiple steps) to
-cover all TDX-usable memory regions.
+The kernel configures TDX-usable memory regions by passing a list of
+TDMRs "TD Memory Regions" (TDMRs) to the TDX module.  Each TDMR contains
+the information of the base/size of a memory region, the base/size of the
+associated Physical Address Metadata Table (PAMT) and a list of reserved
+areas in the region.
 
-=== Long Version ===
+Do the first step to fill out a number of TDMRs to cover all TDX memory
+regions.  To keep it simple, always try to use one TDMR for each memory
+region.  As the first step only set up the base/size for each TDMR.
 
-TDX provides increased levels of memory confidentiality and integrity.
-This requires special hardware support for features like memory
-encryption and storage of memory integrity checksums.  Not all memory
-satisfies these requirements.
+Each TDMR must be 1G aligned and the size must be in 1G granularity.
+This implies that one TDMR could cover multiple memory regions.  If a
+memory region spans the 1GB boundary and the former part is already
+covered by the previous TDMR, just use a new TDMR for the remaining
+part.
 
-As a result, TDX introduced the concept of a "Convertible Memory Region"
-(CMR).  During boot, the firmware builds a list of all of the memory
-ranges which can provide the TDX security guarantees.  The list of these
-ranges is available to the kernel by querying the TDX module.
+TDX only supports a limited number of TDMRs.  Disable TDX if all TDMRs
+are consumed but there is more memory region to cover.
 
-The TDX architecture needs additional metadata to record things like
-which TD guest "owns" a given page of memory.  This metadata essentially
-serves as the 'struct page' for the TDX module.  The space for this
-metadata is not reserved by the hardware up front and must be allocated
-by the kernel and given to the TDX module.
-
-Since this metadata consumes space, the VMM can choose whether or not to
-allocate it for a given area of convertible memory.  If it chooses not
-to, the memory cannot receive TDX protections and can not be used by TDX
-guests as private memory.
-
-For every memory region that the VMM wants to use as TDX memory, it sets
-up a "TD Memory Region" (TDMR).  Each TDMR represents a physically
-contiguous convertible range and must also have its own physically
-contiguous metadata table, referred to as a Physical Address Metadata
-Table (PAMT), to track status for each page in the TDMR range.
-
-Unlike a CMR, each TDMR requires 1G granularity and alignment.  To
-support physical RAM areas that don't meet those strict requirements,
-each TDMR permits a number of internal "reserved areas" which can be
-placed over memory holes.  If PAMT metadata is placed within a TDMR it
-must be covered by one of these reserved areas.
-
-Let's summarize the concepts:
-
- CMR - Firmware-enumerated physical ranges that support TDX.  CMRs are
-       4K aligned.
-TDMR - Physical address range which is chosen by the kernel to support
-       TDX.  1G granularity and alignment required.  Each TDMR has
-       reserved areas where TDX memory holes and overlapping PAMTs can
-       be represented.
-PAMT - Physically contiguous TDX metadata.  One table for each page size
-       per TDMR.  Roughly 1/256th of TDMR in size.  256G TDMR = ~1G
-       PAMT.
-
-As one step of initializing the TDX module, the kernel configures
-TDX-usable memory regions by passing a list of TDMRs to the TDX module.
-
-Constructing the list of TDMRs consists below steps:
-
-1) Fill out TDMRs to cover all memory regions that the TDX module will
-   use for TD memory.
-2) Allocate and set up PAMT for each TDMR.
-3) Designate reserved areas for each TDMR.
-
-Add a placeholder to construct TDMRs to do the above steps.  To keep
-things simple, just allocate enough space to hold maximum number of
-TDMRs up front.  Always free the buffer of TDMRs since they are only
-used during module initialization.
+There are fancier things that could be done like trying to merge
+adjacent TDMRs.  This would allow more pathological memory layouts to be
+supported.  But, current systems are not even close to exhausting the
+existing TDMR resources in practice.  For now, keep it simple.
 
 Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
 Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
 
-v13 -> v14:
- - No change.
+v13 -> v14: 
+ - No change
 
 v12 -> v13:
- - No change.
+ - Added Yuan's tag.
 
 v11 -> v12:
- - Added tags from Dave/Kirill.
+ - Improved comments around looping over TDX memblock to create TDMRs.
+   (Dave).
+ - Added code to pr_warn() when consumed TDMRs reaching maximum TDMRs
+   (Dave).
+ - BIT_ULL(30) -> SZ_1G (Kirill)
+ - Removed unused TDMR_PFN_ALIGNMENT (Sathy)
+ - Added tags from Kirill/Sathy
 
 v10 -> v11:
- - Changed to keep TDMRs after module initialization to deal with TDX
-   erratum in future patches. 
+ - No update
 
 v9 -> v10:
- - Changed the TDMR list from static variable back to local variable as
-   now TDX module isn't disabled when tdx_cpu_enable() fails.
+ - No change.
 
 v8 -> v9:
- - Changes around 'struct tdmr_info_list' (Dave):
-   - Moved the declaration from tdx.c to tdx.h.
-   - Renamed 'first_tdmr' to 'tdmrs'.
-   - 'nr_tdmrs' -> 'nr_consumed_tdmrs'.
-   - Changed 'tdmrs' to 'void *'.
-   - Improved comments for all structure members.
- - Added a missing empty line in alloc_tdmr_list() (Dave).
 
-v7 -> v8:
- - Improved changelog to tell this is one step of "TODO list" in
-   init_tdx_module().
- - Other changelog improvement suggested by Dave (with "Create TDMRs" to
-   "Fill out TDMRs" to align with the code).
- - Added a "TODO list" comment to lay out the steps to construct TDMRs,
-   following the same idea of "TODO list" in tdx_module_init().
- - Introduced 'struct tdmr_info_list' (Dave)
- - Further added additional members (tdmr_sz/max_tdmrs/nr_tdmrs) to
-   simplify getting TDMR by given index, and reduce passing arguments
-   around functions.
- - Added alloc_tdmr_list()/free_tdmr_list() accordingly, which internally
-   uses tdmr_size_single() (Dave).
- - tdmr_num -> nr_tdmrs (Dave).
-
-v6 -> v7:
- - Improved commit message to explain 'int' overflow cannot happen
-   in cal_tdmr_size() and alloc_tdmr_array(). -- Andy/Dave.
-
-  ...
+ - Added the last paragraph in the changelog (Dave).
+ - Removed unnecessary type cast in tdmr_entry() (Dave).
 
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 97 ++++++++++++++++++++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx.h | 32 ++++++++++++
- 2 files changed, 127 insertions(+), 2 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 103 +++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.h |   3 ++
+ 2 files changed, 105 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 24fa8020cc7a..675c37123d45 100644
+index 675c37123d45..9a179ff32ac7 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -24,6 +24,7 @@
- #include <linux/minmax.h>
- #include <linux/sizes.h>
- #include <linux/pfn.h>
-+#include <linux/align.h>
- #include <asm/msr-index.h>
- #include <asm/msr.h>
- #include <asm/page.h>
-@@ -301,9 +302,84 @@ static int build_tdx_memlist(struct list_head *tmb_list)
- 	return ret;
+@@ -355,6 +355,102 @@ static void free_tdmr_list(struct tdmr_info_list *tdmr_list)
+ 			tdmr_list->max_tdmrs * tdmr_list->tdmr_sz);
  }
  
-+/* Calculate the actual TDMR size */
-+static int tdmr_size_single(u16 max_reserved_per_tdmr)
++/* Get the TDMR from the list at the given index. */
++static struct tdmr_info *tdmr_entry(struct tdmr_info_list *tdmr_list,
++				    int idx)
 +{
-+	int tdmr_sz;
++	int tdmr_info_offset = tdmr_list->tdmr_sz * idx;
 +
-+	/*
-+	 * The actual size of TDMR depends on the maximum
-+	 * number of reserved areas.
-+	 */
-+	tdmr_sz = sizeof(struct tdmr_info);
-+	tdmr_sz += sizeof(struct tdmr_reserved_area) * max_reserved_per_tdmr;
-+
-+	return ALIGN(tdmr_sz, TDMR_INFO_ALIGNMENT);
++	return (void *)tdmr_list->tdmrs + tdmr_info_offset;
 +}
 +
-+static int alloc_tdmr_list(struct tdmr_info_list *tdmr_list,
-+			   struct tdsysinfo_struct *sysinfo)
++#define TDMR_ALIGNMENT		SZ_1G
++#define TDMR_ALIGN_DOWN(_addr)	ALIGN_DOWN((_addr), TDMR_ALIGNMENT)
++#define TDMR_ALIGN_UP(_addr)	ALIGN((_addr), TDMR_ALIGNMENT)
++
++static inline u64 tdmr_end(struct tdmr_info *tdmr)
 +{
-+	size_t tdmr_sz, tdmr_array_sz;
-+	void *tdmr_array;
++	return tdmr->base + tdmr->size;
++}
 +
-+	tdmr_sz = tdmr_size_single(sysinfo->max_reserved_per_tdmr);
-+	tdmr_array_sz = tdmr_sz * sysinfo->max_tdmrs;
-+
-+	/*
-+	 * To keep things simple, allocate all TDMRs together.
-+	 * The buffer needs to be physically contiguous to make
-+	 * sure each TDMR is physically contiguous.
-+	 */
-+	tdmr_array = alloc_pages_exact(tdmr_array_sz,
-+			GFP_KERNEL | __GFP_ZERO);
-+	if (!tdmr_array)
-+		return -ENOMEM;
-+
-+	tdmr_list->tdmrs = tdmr_array;
++/*
++ * Take the memory referenced in @tmb_list and populate the
++ * preallocated @tdmr_list, following all the special alignment
++ * and size rules for TDMR.
++ */
++static int fill_out_tdmrs(struct list_head *tmb_list,
++			  struct tdmr_info_list *tdmr_list)
++{
++	struct tdx_memblock *tmb;
++	int tdmr_idx = 0;
 +
 +	/*
-+	 * Keep the size of TDMR to find the target TDMR
-+	 * at a given index in the TDMR list.
++	 * Loop over TDX memory regions and fill out TDMRs to cover them.
++	 * To keep it simple, always try to use one TDMR to cover one
++	 * memory region.
++	 *
++	 * In practice TDX supports at least 64 TDMRs.  A 2-socket system
++	 * typically only consumes less than 10 of those.  This code is
++	 * dumb and simple and may use more TMDRs than is strictly
++	 * required.
 +	 */
-+	tdmr_list->tdmr_sz = tdmr_sz;
-+	tdmr_list->max_tdmrs = sysinfo->max_tdmrs;
-+	tdmr_list->nr_consumed_tdmrs = 0;
++	list_for_each_entry(tmb, tmb_list, list) {
++		struct tdmr_info *tdmr = tdmr_entry(tdmr_list, tdmr_idx);
++		u64 start, end;
++
++		start = TDMR_ALIGN_DOWN(PFN_PHYS(tmb->start_pfn));
++		end   = TDMR_ALIGN_UP(PFN_PHYS(tmb->end_pfn));
++
++		/*
++		 * A valid size indicates the current TDMR has already
++		 * been filled out to cover the previous memory region(s).
++		 */
++		if (tdmr->size) {
++			/*
++			 * Loop to the next if the current memory region
++			 * has already been fully covered.
++			 */
++			if (end <= tdmr_end(tdmr))
++				continue;
++
++			/* Otherwise, skip the already covered part. */
++			if (start < tdmr_end(tdmr))
++				start = tdmr_end(tdmr);
++
++			/*
++			 * Create a new TDMR to cover the current memory
++			 * region, or the remaining part of it.
++			 */
++			tdmr_idx++;
++			if (tdmr_idx >= tdmr_list->max_tdmrs) {
++				pr_warn("initialization failed: TDMRs exhausted.\n");
++				return -ENOSPC;
++			}
++
++			tdmr = tdmr_entry(tdmr_list, tdmr_idx);
++		}
++
++		tdmr->base = start;
++		tdmr->size = end - start;
++	}
++
++	/* @tdmr_idx is always the index of the last valid TDMR. */
++	tdmr_list->nr_consumed_tdmrs = tdmr_idx + 1;
++
++	/*
++	 * Warn early that kernel is about to run out of TDMRs.
++	 *
++	 * This is an indication that TDMR allocation has to be
++	 * reworked to be smarter to not run into an issue.
++	 */
++	if (tdmr_list->max_tdmrs - tdmr_list->nr_consumed_tdmrs < TDMR_NR_WARN)
++		pr_warn("consumed TDMRs reaching limit: %d used out of %d\n",
++				tdmr_list->nr_consumed_tdmrs,
++				tdmr_list->max_tdmrs);
 +
 +	return 0;
 +}
 +
-+static void free_tdmr_list(struct tdmr_info_list *tdmr_list)
-+{
-+	free_pages_exact(tdmr_list->tdmrs,
-+			tdmr_list->max_tdmrs * tdmr_list->tdmr_sz);
-+}
-+
-+/*
-+ * Construct a list of TDMRs on the preallocated space in @tdmr_list
-+ * to cover all TDX memory regions in @tmb_list based on the TDX module
-+ * information in @sysinfo.
-+ */
-+static int construct_tdmrs(struct list_head *tmb_list,
-+			   struct tdmr_info_list *tdmr_list,
-+			   struct tdsysinfo_struct *sysinfo)
-+{
-+	/*
-+	 * TODO:
-+	 *
-+	 *  - Fill out TDMRs to cover all TDX memory regions.
-+	 *  - Allocate and set up PAMTs for each TDMR.
-+	 *  - Designate reserved areas for each TDMR.
-+	 *
-+	 * Return -EINVAL until constructing TDMRs is done
-+	 */
-+	return -EINVAL;
-+}
-+
- static int init_tdx_module(void)
+ /*
+  * Construct a list of TDMRs on the preallocated space in @tdmr_list
+  * to cover all TDX memory regions in @tmb_list based on the TDX module
+@@ -364,10 +460,15 @@ static int construct_tdmrs(struct list_head *tmb_list,
+ 			   struct tdmr_info_list *tdmr_list,
+ 			   struct tdsysinfo_struct *sysinfo)
  {
- 	struct tdsysinfo_struct *tdsysinfo;
-+	struct tdmr_info_list tdmr_list;
- 	struct cmr_info *cmr_array;
- 	int tdsysinfo_size;
- 	int cmr_array_size;
-@@ -345,11 +421,19 @@ static int init_tdx_module(void)
- 	if (ret)
- 		goto out_put_tdxmem;
- 
-+	/* Allocate enough space for constructing TDMRs */
-+	ret = alloc_tdmr_list(&tdmr_list, tdsysinfo);
-+	if (ret)
-+		goto out_free_tdxmem;
++	int ret;
 +
-+	/* Cover all TDX-usable memory regions in TDMRs */
-+	ret = construct_tdmrs(&tdx_memlist, &tdmr_list, tdsysinfo);
++	ret = fill_out_tdmrs(tmb_list, tdmr_list);
 +	if (ret)
-+		goto out_free_tdmrs;
++		return ret;
 +
  	/*
  	 * TODO:
  	 *
--	 *  - Construct a list of "TD Memory Regions" (TDMRs) to cover
--	 *    all TDX-usable memory regions.
- 	 *  - Configure the TDMRs and the global KeyID to the TDX module.
- 	 *  - Configure the global KeyID on all packages.
- 	 *  - Initialize all TDMRs.
-@@ -357,6 +441,15 @@ static int init_tdx_module(void)
- 	 *  Return error before all steps are done.
- 	 */
- 	ret = -EINVAL;
-+out_free_tdmrs:
-+	/*
-+	 * Always free the buffer of TDMRs as they are only used during
-+	 * module initialization.
-+	 */
-+	free_tdmr_list(&tdmr_list);
-+out_free_tdxmem:
-+	if (ret)
-+		free_tdx_memlist(&tdx_memlist);
- out_put_tdxmem:
- 	/*
- 	 * @tdx_memlist is written here and read at memory hotplug time.
+-	 *  - Fill out TDMRs to cover all TDX memory regions.
+ 	 *  - Allocate and set up PAMTs for each TDMR.
+ 	 *  - Designate reserved areas for each TDMR.
+ 	 *
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 39c9c6fdc11e..536d89928cd6 100644
+index 536d89928cd6..15afd6a56fdc 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -79,6 +79,29 @@ struct tdsysinfo_struct {
- 	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
- } __packed;
- 
-+struct tdmr_reserved_area {
-+	u64 offset;
-+	u64 size;
-+} __packed;
-+
-+#define TDMR_INFO_ALIGNMENT	512
-+
-+struct tdmr_info {
-+	u64 base;
-+	u64 size;
-+	u64 pamt_1g_base;
-+	u64 pamt_1g_size;
-+	u64 pamt_2m_base;
-+	u64 pamt_2m_size;
-+	u64 pamt_4k_base;
-+	u64 pamt_4k_size;
-+	/*
-+	 * Actual number of reserved areas depends on
-+	 * 'struct tdsysinfo_struct'::max_reserved_per_tdmr.
-+	 */
-+	DECLARE_FLEX_ARRAY(struct tdmr_reserved_area, reserved_areas);
-+} __packed __aligned(TDMR_INFO_ALIGNMENT);
-+
- /*
-  * Do not put any hardware-defined TDX structure representations below
-  * this comment!
-@@ -97,4 +120,13 @@ struct tdx_memblock {
+@@ -120,6 +120,9 @@ struct tdx_memblock {
  	unsigned long end_pfn;
  };
  
-+struct tdmr_info_list {
-+	void *tdmrs;	/* Flexible array to hold 'tdmr_info's */
-+	int nr_consumed_tdmrs;	/* How many 'tdmr_info's are in use */
++/* Warn if kernel has less than TDMR_NR_WARN TDMRs after allocation */
++#define TDMR_NR_WARN 4
 +
-+	/* Metadata for finding target 'tdmr_info' and freeing @tdmrs */
-+	int tdmr_sz;	/* Size of one 'tdmr_info' */
-+	int max_tdmrs;	/* How many 'tdmr_info's are allocated */
-+};
-+
- #endif
+ struct tdmr_info_list {
+ 	void *tdmrs;	/* Flexible array to hold 'tdmr_info's */
+ 	int nr_consumed_tdmrs;	/* How many 'tdmr_info's are in use */
 -- 
 2.41.0
 
