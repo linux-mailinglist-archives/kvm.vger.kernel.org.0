@@ -2,460 +2,368 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C7777CE88A
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:08:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D0E87CE8C8
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:28:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231733AbjJRUIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 16:08:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50184 "EHLO
+        id S231984AbjJRU2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 16:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjJRUIj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 16:08:39 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A34A4;
-        Wed, 18 Oct 2023 13:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697659715; x=1729195715;
-  h=date:from:to:cc:subject:message-id;
-  bh=puIumT9JOurPcyiE4yOEbMFKWDCJhBN5ZKyxpK9WT2I=;
-  b=lINf4+gURvVIOhLbqldD7oBa16y9D+MsR8tPsveWNxLY4clv3wAQCiW0
-   SaZZOO+fdTg8khhLcpCvvWF1JmKQK7FNn4rCfE9NDCvz7B61/0D8gzT/m
-   PcKTBx02USR4llGKfXfOx/wqRo5HDl+mlnmAgqZijsrhCvfjLOivpq54P
-   YJhC1NuaKnn6OIKmV1TREYZeZtFy37KdfxCQ/Ld+cNq36HUq/iCmtZUA5
-   NYBPpDOzFzTV5gB5eiIQrL3mLIm0m4P/d+74c0cThcdwlSSeWh++4ao/p
-   n7qwtsco5Eng+IIM4V/mRRPY6WLybQY4oyIuFWYps6jSsBAOXU2WMQQFM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="472335034"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="472335034"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 13:08:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="706589755"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="706589755"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 18 Oct 2023 13:08:21 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qtCq2-0000yE-2y;
-        Wed, 18 Oct 2023 20:08:18 +0000
-Date:   Thu, 19 Oct 2023 04:07:35 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        amd-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [linux-next:master] BUILD REGRESSION
- 2dac75696c6da3c848daa118a729827541c89d33
-Message-ID: <202310190456.pryB092r-lkp@intel.com>
-User-Agent: s-nail v14.9.24
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232043AbjJRU14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 16:27:56 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20891B6
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:27:49 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39IImvn4006155;
+        Wed, 18 Oct 2023 20:27:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-03-30; bh=vjuod6Mrz81O+ncHnrxQFRx9QTR1U+kMGkjnZj8rcRM=;
+ b=Cyu/1FHruawQcajF3ECaf1Eu5lU8YuwJJ28YrTWTLbAAVl0bEmJqGwwdC3hULdi2jUup
+ IhlW6BcfplgI9nnEvXzyefAJitGI/4xOxH5UwKUYrtEnQd0ZbEwIGFSLYXDR64dUYY1f
+ kYB8p4vLUwvABmzVEhrmOsC1/V0NlpodW4wc53WOZpjIBFUgbQ1XmQFBI/e85rm3Ie5L
+ YA1kzcn2Zo2xLEXaGsrN0jJJzJGVP+x+Jc4sqsbAW+ZW6O6qMPtC17Aho+WXlnCqzlOS
+ LOoPcSnhKEvIvhcPrj5vdFkKoVhEetz+78bhUakMEZ7NxUFTNGSZjiiiZudnJdE7ofN0 bw== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqjynghrp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Oct 2023 20:27:26 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39IIUaoD009854;
+        Wed, 18 Oct 2023 20:27:26 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3trg0ps6s8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Oct 2023 20:27:26 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39IKRP5N040635;
+        Wed, 18 Oct 2023 20:27:25 GMT
+Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-176-41.vpn.oracle.com [10.175.176.41])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3trg0ps6qp-1;
+        Wed, 18 Oct 2023 20:27:25 +0000
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     iommu@lists.linux.dev
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH v4 00/18] IOMMUFD Dirty Tracking
+Date:   Wed, 18 Oct 2023 21:26:57 +0100
+Message-Id: <20231018202715.69734-1-joao.m.martins@oracle.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-18_18,2023-10-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
+ adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310180168
+X-Proofpoint-GUID: l7Kejr4kKARJDmN673gLe7Y5aGj8sEGK
+X-Proofpoint-ORIG-GUID: l7Kejr4kKARJDmN673gLe7Y5aGj8sEGK
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 2dac75696c6da3c848daa118a729827541c89d33  Add linux-next specific files for 20231018
+Presented herewith is a series that extends IOMMUFD to have IOMMU
+hardware support for dirty bit in the IOPTEs.
 
-Error/Warning reports:
+Today, AMD Milan (or more recent) supports it while ARM SMMUv3.2
+alongside VT-D rev3.x also do support.  One intended use-case (but not
+restricted!) is to support Live Migration with SR-IOV, specially useful
+for live migrateable PCI devices that can't supply its own dirty
+tracking hardware blocks amongst others.
 
-https://lore.kernel.org/oe-kbuild-all/202309200103.grXWDKTx-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310121802.CDAGVdF2-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310170132.IrOpHglA-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310171905.azfrKoID-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310181800.Bh66q0T1-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310181854.pKtHd7fD-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310182303.V3tTgNQZ-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310190002.uTcOpMyF-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310190116.5JjceoZJ-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310190201.4wyYJ6j5-lkp@intel.com
+At a quick glance, IOMMUFD lets the userspace create the IOAS with a
+set of a IOVA ranges mapped to some physical memory composing an IO
+pagetable. This is then created via HWPT_ALLOC or attached to a
+particular device/hwpt, consequently creating the IOMMU domain and share
+a common IO page table representing the endporint DMA-addressable guest
+address space. In IOMMUFD Dirty tracking (since v2 of the series) it
+will require via the HWPT_ALLOC model only, as opposed to simpler
+autodomains model.
 
-Error/Warning: (recently discovered and may have been fixed)
+The result is an hw_pagetable which represents the
+iommu_domain which will be directly manipulated. The IOMMUFD UAPI,
+and the iommu/iommufd kAPI are then extended to provide:
 
-arch/powerpc/kvm/powerpc.c:1061:9: error: implicit declaration of function 'kvmppc_get_vsx_vr'; did you mean 'kvmppc_get_sr'? [-Werror=implicit-function-declaration]
-arch/powerpc/kvm/powerpc.c:1063:9: error: implicit declaration of function 'kvmppc_set_vsx_vr'; did you mean 'kvmppc_set_sr'? [-Werror=implicit-function-declaration]
-arch/powerpc/kvm/powerpc.c:1729:52: error: implicit declaration of function 'kvmppc_get_vscr'; did you mean 'kvmppc_get_sr'? [-Werror=implicit-function-declaration]
-arch/powerpc/kvm/powerpc.c:1732:52: error: implicit declaration of function 'kvmppc_get_vrsave'; did you mean 'kvmppc_get_sr'? [-Werror=implicit-function-declaration]
-arch/powerpc/kvm/powerpc.c:1780:25: error: implicit declaration of function 'kvmppc_set_vscr'; did you mean 'kvmppc_set_sr'? [-Werror=implicit-function-declaration]
-arch/powerpc/kvm/powerpc.c:1787:25: error: implicit declaration of function 'kvmppc_set_vrsave'; did you mean 'kvmppc_set_sr'? [-Werror=implicit-function-declaration]
-arch/s390/include/asm/ctlreg.h:129:9: warning: array subscript 0 is outside array bounds of 'struct ctlreg[0]' [-Warray-bounds=]
-arch/s390/include/asm/ctlreg.h:80:9: warning: array subscript 0 is outside array bounds of 'struct ctlreg[0]' [-Warray-bounds=]
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu13/smu_v13_0_6_ppt.c:286:52: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-drivers/gpu/drm/amd/amdgpu/../pm/swsmu/smu14/smu_v14_0.c:72:52: warning: '%s' directive output may be truncated writing up to 29 bytes into a region of size 23 [-Wformat-truncation=]
-fs/bcachefs/journal_seq_blacklist.c:110:18: warning: array subscript 'i' is outside the bounds of an interior zero-length array 'struct journal_seq_blacklist_entry[0]' [-Wzero-length-bounds]
-fs/bcachefs/journal_seq_blacklist.c:148:26: warning: array subscript <unknown> is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.c:148:26: warning: array subscript idx is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.c:159:26: warning: array subscript <unknown> is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.c:159:26: warning: array subscript idx is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.c:176:27: warning: array subscript i is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.c:176:64: warning: array subscript '(unsigned int) _33 + 4294967295' is outside the bounds of an interior zero-length array 'struct journal_seq_blacklist_entry[0]' [-Wzero-length-bounds]
-fs/bcachefs/journal_seq_blacklist.c:189:27: warning: array subscript i is outside array bounds of 'struct journal_seq_blacklist_table_entry[0]' [-Warray-bounds=]
-fs/bcachefs/journal_seq_blacklist.h:9:56: warning: array subscript 0 is outside the bounds of an interior zero-length array 'struct journal_seq_blacklist_entry[0]' [-Wzero-length-bounds]
-fs/bcachefs/snapshot.c:118:66: warning: array subscript <unknown> is outside array bounds of 'struct snapshot_t[0]' [-Warray-bounds=]
-fs/bcachefs/snapshot.c:134:70: warning: array subscript <unknown> is outside array bounds of 'struct snapshot_t[0]' [-Warray-bounds=]
-fs/bcachefs/snapshot.c:168:16: warning: array subscript idx is outside array bounds of 'struct snapshot_t[0]' [-Warray-bounds=]
-fs/bcachefs/snapshot.c:181:16: warning: array subscript idx is outside array bounds of 'struct snapshot_t[0]' [-Warray-bounds=]
-fs/bcachefs/snapshot.h:36:21: warning: array subscript <unknown> is outside array bounds of 'struct snapshot_t[0]' [-Warray-bounds=]
-include/asm-generic/rwonce.h:44:26: warning: array subscript 0 is outside array bounds of '__u8[0]' {aka 'unsigned char[]'} [-Warray-bounds=]
-qcom-rng.c:(.text+0x378): undefined reference to `devm_hwrng_register'
-sound/soc/rockchip/rockchip_i2s_tdm.c:1315:34: warning: 'rockchip_i2s_tdm_match' defined but not used [-Wunused-const-variable=]
+1) Enforcement that only devices with dirty tracking support are attached
+to an IOMMU domain, to cover the case where this isn't all homogenous in
+the platform. While initially this is more aimed at possible heterogenous nature
+of ARM while x86 gets future proofed, should any such ocasion occur.
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+The device dirty tracking enforcement on attach_dev is made whether the
+dirty_ops are set or not. Given that attach always checks for dirty
+ops and IOMMU_CAP_DIRTY, while writing this it almost wanted this to
+move to upper layer but semantically iommu driver should do the
+checking.
 
-Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml:
-Documentation/devicetree/bindings/mfd/qcom-pm8xxx.yaml:
-fs/tracefs/event_inode.c:782:11-21: ERROR: ei is NULL but dereferenced.
+2) Toggling of Dirty Tracking on the iommu_domain. We model as the most
+common case of changing hardware translation control structures dynamically
+(x86) while making it easier to have an always-enabled mode. In the
+RFCv1, the ARM specific case is suggested to be always enabled instead of
+having to enable the per-PTE DBM control bit (what I previously called
+"range tracking"). Here, setting/clearing tracking means just clearing the
+dirty bits at start. The 'real' tracking of whether dirty
+tracking is enabled is stored in the IOMMU driver, hence no new
+fields are added to iommufd pagetable structures, except for the
+iommu_domain dirty ops part via adding a dirty_ops field to
+iommu_domain. We use that too for IOMMUFD to know if dirty tracking
+is supported and toggleable without having iommu drivers replicate said
+checks.
 
-Error/Warning ids grouped by kconfigs:
+3) Add a capability probing for dirty tracking, leveraging the
+per-device iommu_capable() and adding a IOMMU_CAP_DIRTY. It extends
+the GET_HW_INFO ioctl which takes a device ID to return some generic
+capabilities *in addition*. Possible values enumarated by `enum
+iommufd_hw_capabilities`.
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- alpha-defconfig
-|   `-- include-asm-generic-rwonce.h:warning:array-subscript-is-outside-array-bounds-of-__u8-aka-unsigned-char
-|-- arc-allmodconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- arc-allyesconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- arm-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- arm64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- arm64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- arm64-randconfig-004-20231018
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- csky-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- csky-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- i386-allmodconfig
-|   `-- fs-bcachefs-journal_seq_blacklist.h:warning:array-subscript-is-outside-the-bounds-of-an-interior-zero-length-array-struct-journal_seq_blacklist_entry
-|-- i386-allyesconfig
-|   `-- fs-bcachefs-journal_seq_blacklist.h:warning:array-subscript-is-outside-the-bounds-of-an-interior-zero-length-array-struct-journal_seq_blacklist_entry
-|-- i386-buildonly-randconfig-003-20231018
-|   `-- sound-soc-rockchip-rockchip_i2s_tdm.c:warning:rockchip_i2s_tdm_match-defined-but-not-used
-|-- i386-randconfig-052-20231018
-|   `-- fs-tracefs-event_inode.c:ERROR:ei-is-NULL-but-dereferenced.
-|-- loongarch-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- loongarch-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- loongarch-defconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- loongarch-randconfig-001-20231018
-|   |-- Documentation-devicetree-bindings-mfd-qcom-pm8xxx.yaml:
-|   |-- Documentation-devicetree-bindings-mfd-qcom-tcsr.yaml:
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- m68k-allmodconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- m68k-allyesconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- microblaze-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- microblaze-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- mips-allmodconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- mips-allyesconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- nios2-allmodconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- nios2-allyesconfig
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- nios2-defconfig
-|   `-- include-asm-generic-rwonce.h:warning:array-subscript-is-outside-array-bounds-of-__u8-aka-unsigned-char
-|-- nios2-randconfig-001-20231018
-|   `-- qcom-rng.c:(.text):undefined-reference-to-devm_hwrng_register
-|-- openrisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- openrisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- parisc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- parisc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- powerpc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- powerpc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- powerpc-randconfig-003-20231018
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   `-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|-- powerpc64-randconfig-r011-20211214
-|   |-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_get_vrsave
-|   |-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_get_vscr
-|   |-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_get_vsx_vr
-|   |-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_set_vrsave
-|   |-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_set_vscr
-|   `-- arch-powerpc-kvm-powerpc.c:error:implicit-declaration-of-function-kvmppc_set_vsx_vr
-|-- riscv-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- riscv-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- s390-allmodconfig
-|   |-- arch-s390-include-asm-ctlreg.h:warning:array-subscript-is-outside-array-bounds-of-struct-ctlreg
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- s390-allyesconfig
-|   |-- arch-s390-include-asm-ctlreg.h:warning:array-subscript-is-outside-array-bounds-of-struct-ctlreg
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   `-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|-- s390-buildonly-randconfig-r004-20220731
-|   `-- arch-s390-include-asm-ctlreg.h:warning:array-subscript-is-outside-array-bounds-of-struct-ctlreg
-|-- s390-defconfig
-|   `-- arch-s390-include-asm-ctlreg.h:warning:array-subscript-is-outside-array-bounds-of-struct-ctlreg
-|-- sparc-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- sparc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- sparc64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|-- sparc64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-journal_seq_blacklist_table_entry
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-idx-is-outside-array-bounds-of-struct-snapshot_t
-|   |-- fs-bcachefs-snapshot.c:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-|   `-- fs-bcachefs-snapshot.h:warning:array-subscript-unknown-is-outside-array-bounds-of-struct-snapshot_t
-`-- x86_64-allyesconfig
-    |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu13-smu_v13_0_6_ppt.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-    |-- drivers-gpu-drm-amd-amdgpu-..-pm-swsmu-smu14-smu_v14_0.c:warning:s-directive-output-may-be-truncated-writing-up-to-bytes-into-a-region-of-size
-    |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-(unsigned-int)-_33-is-outside-the-bounds-of-an-interior-zero-length-array-struct-journal_seq_blacklist_entry
-    |-- fs-bcachefs-journal_seq_blacklist.c:warning:array-subscript-i-is-outside-the-bounds-of-an-interior-zero-length-array-struct-journal_seq_blacklist_entry
-    `-- fs-bcachefs-journal_seq_blacklist.h:warning:array-subscript-is-outside-the-bounds-of-an-interior-zero-length-array-struct-journal_seq_blacklist_entry
+4) Read the I/O PTEs and marshal its dirtyiness into a bitmap. The bitmap
+indexes on a page_size basis the IOVAs that got written by the device.
+While performing the marshalling also drivers need to clear the dirty bits
+from IOPTE and allow the kAPI caller to batch the much needed IOTLB flush.
+There's no copy of bitmaps to userspace backed memory, all is zerocopy
+based to not add more cost to the iommu driver IOPT walker. This shares
+functionality with VFIO device dirty tracking via the IOVA bitmap APIs. So
+far this is a test-and-clear kind of interface given that the IOPT walk is
+going to be expensive. In addition this also adds the ability to read dirty
+bit info without clearing the PTE info. This is meant to cover the
+unmap-and-read-dirty use-case, and avoid the second IOTLB flush.
 
-elapsed time: 865m
+The only dependency is:
+* Have domain_alloc_user() API with flags [2] already queued (iommufd/for-next).
 
-configs tested: 100
-configs skipped: 2
+The series is organized as follows:
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231018   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20231018   gcc  
-i386         buildonly-randconfig-002-20231018   gcc  
-i386         buildonly-randconfig-003-20231018   gcc  
-i386         buildonly-randconfig-004-20231018   gcc  
-i386         buildonly-randconfig-006-20231018   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-016-20231018   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20231018   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-006-20231018   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20231018   gcc  
-x86_64                randconfig-002-20231018   gcc  
-x86_64                randconfig-003-20231018   gcc  
-x86_64                randconfig-016-20231018   gcc  
-x86_64                randconfig-076-20231018   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
+* Patches 1-4: Takes care of the iommu domain operations to be added.
+The idea is to abstract iommu drivers from any idea of how bitmaps are
+stored or propagated back to the caller, as well as allowing
+control/batching over IOTLB flush. So there's a data structure and an
+helper that only tells the upper layer that an IOVA range got dirty.
+This logic is shared with VFIO and it's meant to walking the bitmap
+user memory, and kmap-ing plus setting bits as needed. IOMMU driver
+just has an idea of a 'dirty bitmap state' and recording an IOVA as
+dirty.
+
+* Patches 5-9, 13-18: Adds the UAPIs for IOMMUFD, and selftests. The
+selftests cover some corner cases on boundaries handling of the bitmap
+and various bitmap sizes that exercise. I haven't included huge IOVA
+ranges to avoid risking the selftests failing to execute due to OOM
+issues of mmaping big buffers.
+
+* Patches 10-11: AMD IOMMU implementation, particularly on those having
+HDSup support. Tested with a Qemu amd-iommu with HDSUp emulated[0]. And
+tested with live migration with VFs (but with IOMMU dirty tracking).
+
+* Patches 12: Intel IOMMU rev3.x+ implementation. Tested with a Qemu
+based intel-iommu vIOMMU with SSADS emulation support[0].
+
+On AMD/Intel I have tested this with emulation and then live migration in
+AMD hardware; 
+
+The qemu iommu emulation bits are to increase coverage of this code and
+hopefully make this more broadly available for fellow contributors/devs,
+old version[1]; it uses Yi's 2 commits to have hw_info() supported (still
+needs a bit of cleanup) on top of a recent Zhenzhong series of IOMMUFD
+QEMU bringup work: see here[0]. It includes IOMMUFD dirty tracking for
+Live migration and with live migration tested. I won't be exactly
+following up a v2 of QEMU patches until IOMMUFD tracking lands.
+
+Feedback or any comments are very much appreciated.
+
+Thanks!
+        Joao
+
+[0] https://github.com/jpemartins/qemu/commits/iommufd-v3
+[1] https://lore.kernel.org/qemu-devel/20220428211351.3897-1-joao.m.martins@oracle.com/
+[2] https://lore.kernel.org/linux-iommu/20230919092523.39286-1-yi.l.liu@intel.com/
+[3] https://github.com/jpemartins/linux/commits/iommufd-v3
+[4] https://lore.kernel.org/linux-iommu/20230518204650.14541-1-joao.m.martins@oracle.com/
+[5] https://lore.kernel.org/kvm/20220428210933.3583-1-joao.m.martins@oracle.com/
+[6] https://github.com/jpemartins/linux/commits/smmu-iommufd-v3
+[7] https://lore.kernel.org/linux-iommu/20230923012511.10379-1-joao.m.martins@oracle.com/
+
+Changes since v3[7]:
+* Consolidate previous patch 9 and 10 into a single patch,
+while removing iommufd_dirty_bitmap structure to instead use
+the UAPI defined structure iommu_hwpt_get_dirty_iova and
+pass around internally in iommufd.
+* Iterate over areas from within the IOVA bitmap iterator
+* Drop check for specific flags in hw_pagetable
+* Drop assignment that calculates iopt_alignment, to instead
+use iopt_alignment directly
+* Move IOVA bitmap into iommufd and introduce IOMMUFD_DRIVER
+bool kconfig which designates the usage of dirty tracking related
+bitmaps (i.e. VFIO and IOMMU drivers right now).
+* Update IOVA bitmap header files to account for IOMMUFD_DRIVER
+being disabled
+* Sort new IOMMUFD ioctls accordingly
+* Move IOVA bitmap symbols to IOMMUFD namespace and update its
+users by importing new namespace (new patch 3)
+* Remove AMD IOMMU kernel log feature printing from series
+* Remove struct amd_iommu from do_iommu_domain_alloc() function
+and derive it from within do_iommu_domain_alloc().
+* Consolidate pte_test_dirty() and pte_test_and_clear_dirty()
+by passing flags and deciding whether to test or test_and_clear.
+* Add a comment on top of the -EINVAL attach_device() failure when
+dirty tracking is enforcement but IOMMU does not support dirty tracking
+* Add Reviewed-by given by Suravee
+* Select IOMMUFD_DRIVER if IOMMUFD is enabled on supported IOMMU drivers
+* Remove spurious rcu_read_{,un}lock() from Intel/AMD iommus
+* Fix unwinding in dirty tracking set failure case in intel-iommu
+* Avoid unnecesary locking when checking dmar_domain::dirty_tracking
+* Rename intel_iommu_slads_supported() to a slads_supported() macro
+following intel-iommu style
+* Change the XOR check into a == in set_dirty_tracking iommu op
+* Consolidate PTE test or test-and-clear into single helper
+* Improve intel_pasid_setup_dirty_tracking() to: use rate limited printk;
+avoid unnecessary update if state is already the desired one;
+do a clflush on non-coherent devices; remove the qi_flush_piotlb(); and
+fail on unsupported pgtts.
+* Remove the first_level support and always fail domain_alloc_user on those
+cases with it being no use case ATM. Doing so lets us remove some code
+for such handling in set_dirty_tracking
+* Error out the pasid device attach when dirty tracking is enforced
+as we don't support that either.
+* Reorganize the series to have selftests at the end, and core/driver
+enablement first.
+
+Changes since RFCv2[4]:
+* Testing has always occured on the new code, but now it has seen
+Live Migration coverage with extra QEMU work on AMD hardware.
+* General commit message improvements
+* Remove spurious headers in selftests
+* Exported some symbols to actually allow things to build when IOMMUFD
+is built as a module. (Alex Williamson)
+* Switch the enforcing to be done on IOMMU domain allocation via
+domain_alloc_user (Jason, Robin, Lu Baolu)
+* Removed RCU series from Lu Baolu (Jason)
+* Switch set_dirty/read_dirty/clear_dirty to down_read() (Jason)
+* Make sure it check for area::pages (Jason)
+* Move clearing dirties before set dirty a helper (Jason)
+* Avoid breaking IOMMUFD selftests UAPI (Jason)
+* General improvements to testing
+* Add coverage to new out_capabilities support in HW_INFO.
+* Address Shameer/Robin comments in smmu-v3 (code is on a branch[6])
+  - Properly check for FEAT_HD together with COHERENCY
+  - Remove the pgsize_bitmap check
+  - Limit the quirk set to s1 pgtbl_cfg.
+  - Fix commit message on dubious sentence on DBM usecase
+
+Changes since RFCv1[5]:
+Too many changes but the major items were:
+* Majorirty of the changes from Jason/Kevin/Baolu/Suravee:
+- Improve structure and rework most commit messages
+- Drop all of the VFIO-compat series
+- Drop the unmap-get-dirty API
+- Tie this to HWPT only, no more autodomains handling;
+- Rework the UAPI widely by:
+  - Having a IOMMU_DEVICE_GET_CAPS which allows to fetching capabilities
+    of devices, specifically test dirty tracking support for an individual
+    device
+  - Add a enforce-dirty flag to the IOMMU domain via HWPT_ALLOC
+  - SET_DIRTY now clears dirty tracking before asking iommu driver to do so;
+  - New GET_DIRTY_IOVA flag that does not clear dirty bits
+  - Add coverage for all added APIs
+  - Expand GET_DIRTY_IOVA tests to cover IOVA bitmap corner cases tests
+  that I had in separate; I only excluded the Terabyte IOVA range
+  usecases (which test bitmaps 2M+) because those will most likely fail
+  to be run as selftests (not sure yet how I can include those). I am
+  not exactly sure how I can cover those, unless I do 'fake IOVA maps'
+  *somehow* which do not necessarily require real buffers.
+- Handle most comments in intel-iommu. Only remaining one for v3 is the
+  PTE walker which will be done better.
+- Handle all comments in amd-iommu, most of which regarding locking.
+  Only one remaining is v3 same as Intel;
+- Reflect the UAPI changes into iommu driver implementations, including
+persisting dirty tracking enabling in new attach_dev calls, as well as
+enforcing attach_dev enforces the requested domain flags;
+* Comments from Yi Sun in making sure that dirty tracking isn't
+restricted into SS only, so relax the check for FL support because it's
+always enabled. (Yi Sun)
+* Most of code that was in v1 for dirty bitmaps got rewritten and
+repurpose to also cover VFIO case; so reuse this infra here too for both.
+(Jason)
+* Take Robin's suggestion of always enabling dirty tracking and set_dirty
+just clearing bits on 'activation', and make that a generic property to
+ensure we always get accurate results between starting and stopping
+tracking. (Robin Murphy)
+* Address all comments from SMMUv3 into how we enable/test the DBM, or the
+bits in the context descriptor with io-pgtable::quirks, etc
+(Robin, Shameerali)
+
+Joao Martins (18):
+  vfio/iova_bitmap: Export more API symbols
+  vfio: Move iova_bitmap into iommufd
+  iommufd/iova_bitmap: Move symbols to IOMMUFD namespace
+  iommu: Add iommu_domain ops for dirty tracking
+  iommufd: Add a flag to enforce dirty tracking on attach
+  iommufd: Add IOMMU_HWPT_SET_DIRTY
+  iommufd: Add IOMMU_HWPT_GET_DIRTY_IOVA
+  iommufd: Add capabilities to IOMMU_GET_HW_INFO
+  iommufd: Add a flag to skip clearing of IOPTE dirty
+  iommu/amd: Add domain_alloc_user based domain allocation
+  iommu/amd: Access/Dirty bit support in IOPTEs
+  iommu/intel: Access/Dirty bit support for SL domains
+  iommufd/selftest: Expand mock_domain with dev_flags
+  iommufd/selftest: Test IOMMU_HWPT_ALLOC_ENFORCE_DIRTY
+  iommufd/selftest: Test IOMMU_HWPT_SET_DIRTY
+  iommufd/selftest: Test IOMMU_HWPT_GET_DIRTY_IOVA
+  iommufd/selftest: Test out_capabilities in IOMMU_GET_HW_INFO
+  iommufd/selftest: Test IOMMU_GET_DIRTY_IOVA_NO_CLEAR flag
+
+ drivers/iommu/amd/Kconfig                     |   1 +
+ drivers/iommu/amd/amd_iommu_types.h           |  12 +
+ drivers/iommu/amd/io_pgtable.c                |  69 ++++++
+ drivers/iommu/amd/iommu.c                     | 143 +++++++++++-
+ drivers/iommu/intel/Kconfig                   |   1 +
+ drivers/iommu/intel/iommu.c                   | 104 ++++++++-
+ drivers/iommu/intel/iommu.h                   |  17 ++
+ drivers/iommu/intel/pasid.c                   | 109 +++++++++
+ drivers/iommu/intel/pasid.h                   |   4 +
+ drivers/iommu/iommufd/Kconfig                 |   4 +
+ drivers/iommu/iommufd/Makefile                |   1 +
+ drivers/iommu/iommufd/device.c                |   4 +
+ drivers/iommu/iommufd/hw_pagetable.c          |  80 ++++++-
+ drivers/iommu/iommufd/io_pagetable.c          | 151 ++++++++++++
+ drivers/iommu/iommufd/iommufd_private.h       |  22 ++
+ drivers/iommu/iommufd/iommufd_test.h          |  21 ++
+ drivers/{vfio => iommu/iommufd}/iova_bitmap.c |   5 +-
+ drivers/iommu/iommufd/main.c                  |   7 +
+ drivers/iommu/iommufd/selftest.c              | 171 +++++++++++++-
+ drivers/vfio/Makefile                         |   3 +-
+ drivers/vfio/pci/mlx5/Kconfig                 |   1 +
+ drivers/vfio/pci/mlx5/main.c                  |   1 +
+ drivers/vfio/pci/pds/Kconfig                  |   1 +
+ drivers/vfio/pci/pds/pci_drv.c                |   1 +
+ drivers/vfio/vfio_main.c                      |   1 +
+ include/linux/io-pgtable.h                    |   4 +
+ include/linux/iommu.h                         |  56 +++++
+ include/linux/iova_bitmap.h                   |  26 +++
+ include/uapi/linux/iommufd.h                  |  79 +++++++
+ tools/testing/selftests/iommu/iommufd.c       | 216 ++++++++++++++++++
+ .../selftests/iommu/iommufd_fail_nth.c        |   2 +-
+ tools/testing/selftests/iommu/iommufd_utils.h | 184 ++++++++++++++-
+ 32 files changed, 1482 insertions(+), 19 deletions(-)
+ rename drivers/{vfio => iommu/iommufd}/iova_bitmap.c (98%)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.17.2
+
