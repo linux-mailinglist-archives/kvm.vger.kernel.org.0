@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D24B97CE8E3
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:29:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4AEC7CE8DA
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:29:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232604AbjJRU3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 16:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
+        id S232262AbjJRU3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 16:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233025AbjJRU2q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 16:28:46 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48B613A
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:28:26 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39IIn3Zk027673;
-        Wed, 18 Oct 2023 20:27:56 GMT
+        with ESMTP id S232958AbjJRU2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 16:28:38 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D8210D9
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:28:24 -0700 (PDT)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39IIp76g019570;
+        Wed, 18 Oct 2023 20:28:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=P90Ug4iPNVGjufdicIfkDu6z4Pc4XYWcaDcCi9DFTEA=;
- b=cuj6YusRQF9BTj2qUo1WLgTXikTf98/o1XS8XBfemS48Uy3p7QW9mMbUQG97FxGNn8Lh
- 4flQCgnR2TPIOxLCBjEmALDF952tUbG1mhEWPNw7szvS8m3VcQugREP5SClxRQ/iTFj7
- TjcsyHcWpufEaxPph1glRv3E06uYBTfOB1n+cIyJSxXL8/Gf7+6aUhKT7J3S6co3sWjo
- ycXEQ9dAidX677fkMJQnWY4ZBSECh/byqBENq0TvPi981fJQni2P+bXilg349VbiPhH/
- TtTz6q+VcnhLqOroATG0Ld5ybY9RjgijgrWtp5BRQU/3GhkpHymGuLc961ggvRjTbto2 yw== 
+ bh=/iu5gyFwtuq9qhF+9bAgBnxh5Ty4EXki7ipg5WJ1q+8=;
+ b=N8sNHanNEhFNLqAgo12IW1/G65jT/flds5Zn1sjXUx+iz2yHeWyh2VOTjD3mh+5yF/P9
+ McnkKCI1bHlC27a8rjyklvzZdJ55DwH0/ct0wrU59di01jg+vjnPd1kzv1nSfKvg61bq
+ cS7PLO+Dg2cwWHWiYIMbvElWYkNyWNySIqGA0uWu1yDCgO8+B4HrZ4MVzHm3nU5Qnpkc
+ YArmM62gevMV1dmrx2xXQfBBSoQNmxJ6zKv8MyRGdMe5ldHE69yeuTd72RVR6OrXaY8K
+ +xNv5DBi5+QIOCLWcRWK8sWaDsIRK1gUeQwLS6HxQ1BFKKTAjnE7xcYIyMdKGneh/613 Ug== 
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqk1breme-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqjy1gfu7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Oct 2023 20:27:56 +0000
+        Wed, 18 Oct 2023 20:28:00 +0000
 Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39IKHACo009750;
-        Wed, 18 Oct 2023 20:27:55 GMT
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39IIhq3W009747;
+        Wed, 18 Oct 2023 20:27:59 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3trg0ps776-1
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3trg0ps78v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Oct 2023 20:27:55 +0000
+        Wed, 18 Oct 2023 20:27:59 +0000
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39IKRP5d040635;
-        Wed, 18 Oct 2023 20:27:55 GMT
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39IKRP5f040635;
+        Wed, 18 Oct 2023 20:27:58 GMT
 Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-176-41.vpn.oracle.com [10.175.176.41])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3trg0ps6qp-9;
-        Wed, 18 Oct 2023 20:27:54 +0000
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3trg0ps6qp-10;
+        Wed, 18 Oct 2023 20:27:58 +0000
 From:   Joao Martins <joao.m.martins@oracle.com>
 To:     iommu@lists.linux.dev
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -59,9 +59,9 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Zhenzhong Duan <zhenzhong.duan@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH v4 08/18] iommufd: Add capabilities to IOMMU_GET_HW_INFO
-Date:   Wed, 18 Oct 2023 21:27:05 +0100
-Message-Id: <20231018202715.69734-9-joao.m.martins@oracle.com>
+Subject: [PATCH v4 09/18] iommufd: Add a flag to skip clearing of IOPTE dirty
+Date:   Wed, 18 Oct 2023 21:27:06 +0100
+Message-Id: <20231018202715.69734-10-joao.m.martins@oracle.com>
 In-Reply-To: <20231018202715.69734-1-joao.m.martins@oracle.com>
 References: <20231018202715.69734-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
@@ -70,11 +70,11 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-18_18,2023-10-18_01,2023-05-22_02
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 malwarescore=0
- adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=998 bulkscore=0
+ adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=907 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
  definitions=main-2310180168
-X-Proofpoint-GUID: OQmcAF2Jy0S3R2Ht5_PG_E-fBQUv3Rt7
-X-Proofpoint-ORIG-GUID: OQmcAF2Jy0S3R2Ht5_PG_E-fBQUv3Rt7
+X-Proofpoint-GUID: 5tE5BXGSYBnHBDiLhMx5BGNtM1Wem4l3
+X-Proofpoint-ORIG-GUID: 5tE5BXGSYBnHBDiLhMx5BGNtM1Wem4l3
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
@@ -85,70 +85,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extend IOMMUFD_CMD_GET_HW_INFO op to query generic iommu capabilities for a
-given device.
+VFIO has an operation where it unmaps an IOVA while returning a bitmap with
+the dirty data. In reality the operation doesn't quite query the IO
+pagetables that the PTE was dirty or not. Instead it marks as dirty on
+anything that was mapped, and doing so in one syscall.
 
-Capabilities are IOMMU agnostic and use device_iommu_capable() API passing
-one of the IOMMU_CAP_*. Enumerate IOMMU_CAP_DIRTY for now in the
-out_capabilities field returned back to userspace.
+In IOMMUFD the equivalent is done in two operations by querying with
+GET_DIRTY_IOVA followed by UNMAP_IOVA. However, this would incur two TLB
+flushes given that after clearing dirty bits IOMMU implementations require
+invalidating their IOTLB, plus another invalidation needed for the UNMAP.
+To allow dirty bits to be queried faster, add a flag
+(IOMMU_GET_DIRTY_IOVA_NO_CLEAR) that requests to not clear the dirty bits
+from the PTE (but just reading them), under the expectation that the next
+operation is the unmap. An alternative is to unmap and just perpectually
+mark as dirty as that's the same behaviour as today. So here equivalent
+functionally can be provided with unmap alone, and if real dirty info is
+required it will amortize the cost while querying.
+
+There's still a race against DMA where in theory the unmap of the IOVA
+(when the guest invalidates the IOTLB via emulated iommu) would race
+against the VF performing DMA on the same IOVA. As discussed in [0], we are
+accepting to resolve this race as throwing away the DMA and it doesn't
+matter if it hit physical DRAM or not, the VM can't tell if we threw it
+away because the DMA was blocked or because we failed to copy the DRAM.
+
+[0] https://lore.kernel.org/linux-iommu/20220502185239.GR8364@nvidia.com/
 
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 ---
- drivers/iommu/iommufd/device.c |  4 ++++
- include/uapi/linux/iommufd.h   | 11 +++++++++++
- 2 files changed, 15 insertions(+)
+ drivers/iommu/iommufd/hw_pagetable.c |  3 ++-
+ drivers/iommu/iommufd/io_pagetable.c |  9 +++++++--
+ include/uapi/linux/iommufd.h         | 12 ++++++++++++
+ 3 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index e88fa73a45e6..71ee22dc1a85 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -1185,6 +1185,10 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
- 	 */
- 	cmd->data_len = data_len;
+diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+index c954f91c3b7b..23a5e52b4755 100644
+--- a/drivers/iommu/iommufd/hw_pagetable.c
++++ b/drivers/iommu/iommufd/hw_pagetable.c
+@@ -252,7 +252,8 @@ int iommufd_hwpt_get_dirty_iova(struct iommufd_ucmd *ucmd)
+ 	struct iommufd_ioas *ioas;
+ 	int rc = -EOPNOTSUPP;
  
-+	cmd->out_capabilities = 0;
-+	if (device_iommu_capable(idev->dev, IOMMU_CAP_DIRTY))
-+		cmd->out_capabilities |= IOMMU_HW_CAP_DIRTY_TRACKING;
+-	if ((cmd->flags || cmd->__reserved))
++	if ((cmd->flags & ~(IOMMU_GET_DIRTY_IOVA_NO_CLEAR)) ||
++	    cmd->__reserved)
+ 		return -EOPNOTSUPP;
+ 
+ 	hwpt = iommufd_get_hwpt(ucmd, cmd->hwpt_id);
+diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
+index 0c08b3df1b6f..835d54876b45 100644
+--- a/drivers/iommu/iommufd/io_pagetable.c
++++ b/drivers/iommu/iommufd/io_pagetable.c
+@@ -414,6 +414,7 @@ int iopt_map_user_pages(struct iommufd_ctx *ictx, struct io_pagetable *iopt,
+ }
+ 
+ struct iova_bitmap_fn_arg {
++	unsigned long flags;
+ 	struct io_pagetable *iopt;
+ 	struct iommu_domain *domain;
+ 	struct iommu_dirty_bitmap *dirty;
+@@ -430,6 +431,7 @@ static int __iommu_read_and_clear_dirty(struct iova_bitmap *bitmap,
+ 	struct iommu_dirty_bitmap *dirty = arg->dirty;
+ 	const struct iommu_dirty_ops *ops = domain->dirty_ops;
+ 	unsigned long last_iova = iova + length - 1;
++	unsigned long flags = arg->flags;
+ 	int ret = -EINVAL;
+ 
+ 	iopt_for_each_contig_area(&iter, area, arg->iopt, iova, last_iova) {
+@@ -437,7 +439,7 @@ static int __iommu_read_and_clear_dirty(struct iova_bitmap *bitmap,
+ 
+ 		ret = ops->read_and_clear_dirty(domain, iter.cur_iova,
+ 						last - iter.cur_iova + 1,
+-						0, dirty);
++						flags, dirty);
+ 		if (ret)
+ 			break;
+ 	}
+@@ -470,12 +472,15 @@ static int iommu_read_and_clear_dirty(struct iommu_domain *domain,
+ 
+ 	iommu_dirty_bitmap_init(&dirty, iter, &gather);
+ 
++	arg.flags = flags;
+ 	arg.iopt = iopt;
+ 	arg.domain = domain;
+ 	arg.dirty = &dirty;
+ 	iova_bitmap_for_each(iter, &arg, __iommu_read_and_clear_dirty);
+ 
+-	iommu_iotlb_sync(domain, &gather);
++	if (!(flags & IOMMU_DIRTY_NO_CLEAR))
++		iommu_iotlb_sync(domain, &gather);
 +
- 	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
- out_free:
- 	kfree(data);
+ 	iova_bitmap_free(iter);
+ 
+ 	return ret;
 diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index efeb12c1aaeb..91de0043e73f 100644
+index 91de0043e73f..8b372b43ffc0 100644
 --- a/include/uapi/linux/iommufd.h
 +++ b/include/uapi/linux/iommufd.h
-@@ -419,6 +419,14 @@ enum iommu_hw_info_type {
- 	IOMMU_HW_INFO_TYPE_INTEL_VTD,
+@@ -492,6 +492,18 @@ struct iommu_hwpt_set_dirty {
  };
+ #define IOMMU_HWPT_SET_DIRTY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_SET_DIRTY)
  
 +/**
-+ * enum iommufd_hw_info_capabilities
-+ * @IOMMU_CAP_DIRTY_TRACKING: IOMMU hardware support for dirty tracking
++ * enum iommufd_get_dirty_iova_flags - Flags for getting dirty bits
++ * @IOMMU_GET_DIRTY_IOVA_NO_CLEAR: Just read the PTEs without clearing any dirty
++ *                                 bits metadata. This flag can be passed in the
++ *                                 expectation where the next operation is
++ *                                 an unmap of the same IOVA range.
++ *
 + */
-+enum iommufd_hw_capabilities {
-+	IOMMU_HW_CAP_DIRTY_TRACKING = 1 << 0,
++enum iommufd_hwpt_get_dirty_iova_flags {
++	IOMMU_GET_DIRTY_IOVA_NO_CLEAR = 1,
 +};
 +
  /**
-  * struct iommu_hw_info - ioctl(IOMMU_GET_HW_INFO)
-  * @size: sizeof(struct iommu_hw_info)
-@@ -430,6 +438,8 @@ enum iommu_hw_info_type {
-  *             the iommu type specific hardware information data
-  * @out_data_type: Output the iommu hardware info type as defined in the enum
-  *                 iommu_hw_info_type.
-+ * @out_capabilities: Output the iommu capability info type as defined in the
-+ *                    enum iommu_hw_capabilities.
-  * @__reserved: Must be 0
-  *
-  * Query an iommu type specific hardware information data from an iommu behind
-@@ -454,6 +464,7 @@ struct iommu_hw_info {
- 	__aligned_u64 data_uptr;
- 	__u32 out_data_type;
- 	__u32 __reserved;
-+	__aligned_u64 out_capabilities;
- };
- #define IOMMU_GET_HW_INFO _IO(IOMMUFD_TYPE, IOMMUFD_CMD_GET_HW_INFO)
- 
+  * struct iommu_hwpt_get_dirty_iova - ioctl(IOMMU_HWPT_GET_DIRTY_IOVA)
+  * @size: sizeof(struct iommu_hwpt_get_dirty_iova)
 -- 
 2.17.2
 
