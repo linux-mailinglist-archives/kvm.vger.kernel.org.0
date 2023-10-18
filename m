@@ -2,89 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42B4A7CDD79
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 15:38:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBA407CDDAF
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 15:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231809AbjJRNix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 09:38:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
+        id S1344717AbjJRNo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 09:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231652AbjJRNit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 09:38:49 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7A883;
-        Wed, 18 Oct 2023 06:38:48 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39IDWKad010627;
-        Wed, 18 Oct 2023 13:38:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=ABZn9qKONJ6zRIGJSu6qk4lm2aWQ1K7ZAdwLu4s+AL0=;
- b=mo9J+5Vk7So4y48hPVocFSubGUnNGthROWMwD83Ew+EuSbRpCKzYK70VXPbN/IC0zLK0
- 0SIxmXNCyW9wDOK3VSGOsiU9IjyCtxEiPY+bYamdqHIPgmas88Ec+nsvXPiJAUDaCj9b
- hUPHiFaUaNK6L6tNxkPaREi7JtH8Guu5dNfJobEiUTRcht7mB9/xh7OGGYgEDyU/jnM7
- DPr1cLkj+oWhV/UupfNbHACx3faIIzKwO20pkxymi0/7i+ysGjvdAQqq9ADmt3EgXTaW
- tofe2spDPsPFBki01iKEMzarDJFOmBcKJVxn3rG1T0TdjQdXGHvb8iYtWsFlhjXiXdbr nQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ttgb389ws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Oct 2023 13:38:47 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39IDWROJ011520;
-        Wed, 18 Oct 2023 13:38:46 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ttgb389gy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Oct 2023 13:38:45 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39IDOoQc027190;
-        Wed, 18 Oct 2023 13:38:36 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tr6tkgkwt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Oct 2023 13:38:36 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39IDcZAW17826394
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Oct 2023 13:38:35 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 74A3858050;
-        Wed, 18 Oct 2023 13:38:35 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6216B5805E;
-        Wed, 18 Oct 2023 13:38:34 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.47.87])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Oct 2023 13:38:34 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: [PATCH v2 3/3] s390/vfio-ap: improve reaction to response code 07 from PQAP(AQIC) command
-Date:   Wed, 18 Oct 2023 09:38:25 -0400
-Message-ID: <20231018133829.147226-4-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231018133829.147226-1-akrowiak@linux.ibm.com>
-References: <20231018133829.147226-1-akrowiak@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ioNrpGu6ssS0kVVyUCM67ZswCA7AbsdL
-X-Proofpoint-GUID: k7QBsco6NLprPtkV1jcDNk8PzfILkzmP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-18_12,2023-10-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 adultscore=0 clxscore=1015 mlxscore=0 phishscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2309180000 definitions=main-2310180113
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S231741AbjJRNoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 09:44:25 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3439BA
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 06:44:23 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FBDBC433C9;
+        Wed, 18 Oct 2023 13:44:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697636663;
+        bh=tk2pN35ZJP+EWEWBlpI/t5YOxXbiGuK2ZtVtS+2hss0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dhGxXuvlTPbEEQ5Q91TRA104d6zYfnYcFkL5J+Oc28zttXJKqE5zR2YgAq+/QaEQC
+         ABNg8oFOPJnGkq3MRiKQ1DAza4hS8ro5tk3zHW111Jnwd/juSzRIQLubI1PZpek+mb
+         5lTNU85UJV9QiZTdDOp5CWsCd5f4m2dgeHQ4Y8DYB+8idZQ414zJC/9fLnFiEbBQWW
+         QIoek9eYAfucGCsZ5nRj5BvDAeubmQU1AV2zu94u1TdeZJYVhpkaLSRUcIZCVoE67d
+         SZU9U/Z0cRqqtbjC29Ox0RZH7xBsMTBMIl1x2dCVgV31q8BBjA0St0XolTcnbKtbpO
+         VMBtzsFhtQAcQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qt6qT-005N6Q-0V;
+        Wed, 18 Oct 2023 14:44:21 +0100
+Date:   Wed, 18 Oct 2023 14:44:19 +0100
+Message-ID: <86mswgm4ek.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v3 0/5] KVM: selftests: Add ID reg test, update headers
+In-Reply-To: <20231011195740.3349631-1-oliver.upton@linux.dev>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, broonie@kernel.org, jingzhangos@google.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, james.morse@arm.com, pbonzini@redhat.com, adrian.hunter@intel.com, irogers@google.com, namhyung@kernel.org, jolsa@kernel.org, alexander.shishkin@linux.intel.com, mark.rutland@arm.com, acme@kernel.org, mingo@redhat.com, peterz@infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,39 +74,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's improve the vfio_ap driver's reaction to reception of response code
-07 from the PQAP(AQIC) command when enabling interrupts on behalf of a
-guest:
+On Wed, 11 Oct 2023 20:57:35 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> v2: https://lore.kernel.org/kvmarm/20231010011023.2497088-1-oliver.upton@linux.dev/
+> 
+> v2 -> v3:
+>  - Use the kernel's script/data for generating the header instad of a
+>    copy (broonie)
+> 
+> Jing Zhang (2):
+>   tools headers arm64: Update sysreg.h with kernel sources
+>   KVM: arm64: selftests: Test for setting ID register from usersapce
+> 
+> Oliver Upton (3):
+>   tools: arm64: Add a Makefile for generating sysreg-defs.h
+>   perf build: Generate arm64's sysreg-defs.h and add to include path
+>   KVM: selftests: Generate sysreg-defs.h and add to include path
+> 
+>  tools/arch/arm64/include/.gitignore           |   1 +
+>  tools/arch/arm64/include/asm/gpr-num.h        |  26 +
+>  tools/arch/arm64/include/asm/sysreg.h         | 839 ++++--------------
+>  tools/arch/arm64/tools/Makefile               |  38 +
+>  tools/perf/Makefile.perf                      |  15 +-
+>  tools/perf/util/Build                         |   2 +-
+>  tools/testing/selftests/kvm/Makefile          |  24 +-
+>  .../selftests/kvm/aarch64/aarch32_id_regs.c   |   4 +-
+>  .../selftests/kvm/aarch64/debug-exceptions.c  |  12 +-
+>  .../selftests/kvm/aarch64/page_fault_test.c   |   6 +-
+>  .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++
+>  .../selftests/kvm/lib/aarch64/processor.c     |   6 +-
+>  12 files changed, 785 insertions(+), 667 deletions(-)
+>  create mode 100644 tools/arch/arm64/include/.gitignore
+>  create mode 100644 tools/arch/arm64/include/asm/gpr-num.h
+>  create mode 100644 tools/arch/arm64/tools/Makefile
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
 
-* Unregister the guest's ISC before the pages containing the notification
-  indicator bytes are unpinned.
+With Cornelia's comment addressed,
 
-* Capture the return code from the kvm_s390_gisc_unregister function and
-  log a DBF warning if it fails.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Suggested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+	M.
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 25d7ce2094f8..4e80c211ba47 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -476,8 +476,11 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
- 		break;
- 	case AP_RESPONSE_OTHERWISE_CHANGED:
- 		/* We could not modify IRQ settings: clear new configuration */
-+		ret = kvm_s390_gisc_unregister(kvm, isc);
-+		if (ret)
-+			VFIO_AP_DBF_WARN("%s: kvm_s390_gisc_unregister: rc=%d isc=%d, apqn=%#04x\n",
-+					 __func__, ret, isc, q->apqn);
- 		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
--		kvm_s390_gisc_unregister(kvm, isc);
- 		break;
- 	default:
- 		pr_warn("%s: apqn %04x: response: %02x\n", __func__, q->apqn,
 -- 
-2.41.0
-
+Without deviation from the norm, progress is not possible.
