@@ -2,176 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 73C7A7CDB30
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 14:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DB5C7CDB4E
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 14:08:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbjJRMDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 08:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60866 "EHLO
+        id S231428AbjJRMIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 08:08:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230267AbjJRMDs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 08:03:48 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2067.outbound.protection.outlook.com [40.107.244.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F131120
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 05:03:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GiiVe8kUHVmMKg+Lmj5EJL0UJDM3VaEkKrQsY2smPF2/zCJwOIl85VzP0kebCgdfN53xkx0yuD+L7oNgy3s8mfWHODVixX1BucbTTNzcIFfD1xQm2dAgucxaoo7qlYkDzCEvoNQjYN5kQ+SMz02virnK/NelWS6Cof2IRyeUlyC92r+2muSFyom+Cpz+l4Lc/mz5+Gr04ZxAi7yye5EgYN5bM65vaew2wUCYuuX3GL3R20/UO7h7JNgJmHEFMK1KDkn17D6Xr2WRjjJlX5qLum9o4rkUSarp92veTZFjuZpfLFLiO+TXyqaneaut5VwwwtGOcUFgOkRHnkq2pXbmew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZQXrUc0cEfftVIoC669HYWHeQm2QpEFkNePcgI+773o=;
- b=lnUbogESXwi3XGMf5fp66zqfVii0sYujZBQjgf/b8eheK4ob6PZg0JF1u4jadzj33vWtxNfiOyGF21nXq4RLr+QvmwpcwjfNWgvQWTavIP1cPaeRLcpOuqrqgX8DTIaCEt0kfgXR2AHMjTD7OD2SeYn9COmZGVfx+Ba13IXMtP+nSZ0z2rX3k/2KCuGDQswTPaMh05tHPrz4WwFCDcGUMN3MmNxwtrjSwmip4iv76u2ucPxzQsuBRGUg/HoL1MMDMZqfyaFVipscg4L76c6dHDXc0WjknmGE8mEoYdUeqnc8YS1dhpulmhZjYsvVFeRlnn3pmQc3HiDrYg2v+iNzEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZQXrUc0cEfftVIoC669HYWHeQm2QpEFkNePcgI+773o=;
- b=uVVFdxJ30teI4fq83ACga7VgWvkGUdgeRIq291YP4MzzkdMtJnx5O7tRO2MmGlmSuQ5tRiO3NvTh5Iov2FUdsgzDTx/9rarpdlpwqrJWHUzQSxPqxUjsYZSSkkdEtzkAbirt2lp5vQ6D6MRQyZO28Ikxbk0pJV2U0EihOYAQbJkrUFX1vKsvOnge5cXqeK+Hpap4RXmm28MplAdOhiHGj57eQdVc4NU7XV/oDB+GkQQJSa/HrzgbkCrNcFsYzQx0/7iT0ti6jvPxl2zFh8x0Dhs9CC3Rbaw/OXrY1HVcsT/xvcvjKSVf8iuHR9/xIbbB26b7gS2onzuQuPMabPwCJA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV3PR12MB9437.namprd12.prod.outlook.com (2603:10b6:408:21d::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Wed, 18 Oct
- 2023 12:03:42 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
- 12:03:42 +0000
-Date:   Wed, 18 Oct 2023 09:03:39 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 02/19] vfio: Move iova_bitmap into iommu core
-Message-ID: <20231018120339.GR3952@nvidia.com>
-References: <77579409-c318-4bba-8503-637f4653c220@oracle.com>
- <20231013144116.32c2c101.alex.williamson@redhat.com>
- <57e8b3ed-4831-40ff-a938-ee266da629c2@oracle.com>
- <20231013155134.6180386e.alex.williamson@redhat.com>
- <20231014000220.GK3952@nvidia.com>
- <1d5b592e-bcb2-4553-b6d8-5043b52a37fa@oracle.com>
- <20231016163457.GV3952@nvidia.com>
- <8a13a2e5-9bc1-4aeb-ad39-657ee95d5a21@oracle.com>
- <20231016180556.GW3952@nvidia.com>
- <5ecbeadb-2b95-4832-989d-fddef9718dbb@oracle.com>
+        with ESMTP id S230193AbjJRMIE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 08:08:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D20F5112
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 05:07:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697630830;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wp+nnpbqnoeHwlS/BrzRice9iJcDcyyrfWzNC6gGiZ0=;
+        b=Gd0bkWOnE7WMOsxPN2CNASvlxOmAH8n729EjXWaIeJ3CwCXKi82hdByQ5Sj1GdD8kzkay8
+        Nw695GgqmS5nrOwy6jsrBJZwOvo7SncciiIP+9yyN/Y//GtG8rupCuOzv/32mqdLuPjQPt
+        wiO7hAoH2Z47Ic/hOtwHbX3PIzKcZRI=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-IUAbKrm_Mwe0riYYSyAsDA-1; Wed, 18 Oct 2023 08:06:57 -0400
+X-MC-Unique: IUAbKrm_Mwe0riYYSyAsDA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9ae7663e604so286822666b.3
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 05:06:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697630816; x=1698235616;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wp+nnpbqnoeHwlS/BrzRice9iJcDcyyrfWzNC6gGiZ0=;
+        b=DXjqaXGFGmrNj6br1gQEEJcbZqV66MvIdKK5G+yk02sfGne9agIPKN+UI2hXqOe9ba
+         n47r5nMlaTGzo8iKFbTg4dEBZJ+Q+zQ0M8ngX7R61xPlu9j4ogFQ3YzD0FCgeYKVAdIl
+         sdZ8+saomKb/NJniU5mY5oXJbIluibLTjysKR5DYi444R5E8+eyiNj+3v+3IcS5HcxTZ
+         zCS0wbKKUOriwqdVScwplPoANzLzspnChymp6tKyfDUXMJd06k5hDMKzU19jCt4+zKxk
+         3O+MVWZa1qpTOsrOc9cFHHBHsjbh+CXC9pGuBLsv34ihTWTeB7EVk+H1cAtF/nz8bI3S
+         uMVw==
+X-Gm-Message-State: AOJu0Yy0AU438N8GT0QeRxNc93+tQsfGW8JzPp+0wkCFzwNFj65stYAw
+        n2GZbsR2hwbIBuHsq0qLGrqYAAgPSoeZBP4hdvoteQQBb3K/Pb+tpRLmingwprNBKyIv9Fz1kCE
+        tnKxLst/YYmQE
+X-Received: by 2002:a17:907:d48d:b0:9c6:7ec2:e129 with SMTP id vj13-20020a170907d48d00b009c67ec2e129mr2478576ejc.42.1697630815813;
+        Wed, 18 Oct 2023 05:06:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYjgZUkH5zaoIxdkrnpv0y6okj95EUGDpmRG5ruQ8aDmWHLiSig5IWNr6XNPBZ6aU7s9zldw==
+X-Received: by 2002:a17:907:d48d:b0:9c6:7ec2:e129 with SMTP id vj13-20020a170907d48d00b009c67ec2e129mr2478549ejc.42.1697630815284;
+        Wed, 18 Oct 2023 05:06:55 -0700 (PDT)
+Received: from redhat.com ([193.142.201.38])
+        by smtp.gmail.com with ESMTPSA id lm18-20020a170906981200b009929d998abcsm1522415ejb.209.2023.10.18.05.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 05:06:54 -0700 (PDT)
+Date:   Wed, 18 Oct 2023 08:06:47 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Zhao Liu <zhao1.liu@linux.intel.com>
+Cc:     Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Babu Moger <babu.moger@amd.com>, Zhao Liu <zhao1.liu@intel.com>
+Subject: Re: [PATCH v4 00/21] Support smp.clusters for x86 in QEMU
+Message-ID: <20231018080635-mutt-send-email-mst@kernel.org>
+References: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5ecbeadb-2b95-4832-989d-fddef9718dbb@oracle.com>
-X-ClientProxiedBy: SJ0PR03CA0034.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::9) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV3PR12MB9437:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d3e30df-5d9b-4fc0-f889-08dbcfd245b6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PW1lNjqTB4Ach6ywoG3x4/XgnjuJyq/JXSIh0HOE6F7wJx4f9F8wJmskNxiLEWcfK1I7ZZS0AtSr/+Rc1SYKFazJkx5JR2xP5DlW1OA1r9+3RzKG2P4irtSG5nZlr411H7sCnj0Q1O4wVws7XrsuDydvC2UjdHML+j3yQRZ0rr8knhheabKY5noUCtDkBLDS1N2H4GEv8M91CNkoyyaqohzHFVr8zVuv3hhBNrM16Xd8zbPuxSrlXBH4hmU2qjvW7n7I8NUqqCAzQ4OlCIuazrLIyqXEX7iDxyZSV0nhG+T/Pfp5lSSs8Z39+bfcRi8k2hQ+unJFy6LZ8Y9Bo5H4B8QbbnwmD98Ft+NxMHxre91tMEf0Fk34dkB0lVgbVcWV/eTDrUZ31uT030dugP+WgrQvpDNjL3Cy76XEa8uK2NssHWj9a9jT00P8CqBey7/6k8b/cxNsdVkEml6qGlp2UmLjmKayS22FpU74mbwDWDdcPnKh+Ta/MjNCwvER2qZXNE7PY7BUB/l3U3XmL382pk4jFqGz/Y0M4IaKWl74jsNQ+d1cfsR3oGQD+s++8lkC
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(346002)(396003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(38100700002)(2616005)(36756003)(33656002)(26005)(1076003)(478600001)(4326008)(66556008)(8676002)(6486002)(66476007)(5660300002)(66946007)(6916009)(316002)(54906003)(53546011)(6512007)(41300700001)(6666004)(7416002)(86362001)(2906002)(6506007)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fSs1vrKpbUA0/w3ezGFzQb86PCe6Ze/CUFxI93+atPp0ImU9V8G4EgYUfJh5?=
- =?us-ascii?Q?Hz8tDvHBkU9pEn8HSu8zzkqIh0lfDwRz+4WPwhGvU5O2EwYKGIFJi6Tkq6cj?=
- =?us-ascii?Q?ZzzXSd94ejD6TO45nTHEXqcq1kfQO43F0o8eKDHEKa4plSTcfdRkHxQRPe/1?=
- =?us-ascii?Q?W6r4KCV3Ps6bHZVJDraJhFJL2Yv0Hd3T3fZOnmnFFWQtFnCvb9Oy3RaUSt9e?=
- =?us-ascii?Q?8tOVwh1pxTLcdMPbln31q2FuUn3O121hxVF+g9S6V7/EQV6jVfucaKi7uKkM?=
- =?us-ascii?Q?+RUPHjNI5fjl+Fc0zVRpaCQTUhCuYDtq7YWBL4Rkb3q8UPo5lHEUzfBwLrcl?=
- =?us-ascii?Q?c5g2usy47LC27F6QAkowe/WweuMDHjb9jEQRKgesbZdA+Utxz97NH3dhO1ZL?=
- =?us-ascii?Q?sMvoz8zGr8oFUTQES+0nBiZoie10Cw5CESgMNmmreRi+Jqad2E09izBhQpEj?=
- =?us-ascii?Q?kdeJ+nCQ14JMcLs/diYOMgBjBLjHfjgcCoS/CFnCxxJ3uLDmW95hQDsD4Vl1?=
- =?us-ascii?Q?j83ueCSiYE2zdeFyD5ELrIJesd6EH2dcBA1eyh3qi/n/59BIGXIUD2xDIGe7?=
- =?us-ascii?Q?CvWeSeT2sgg/uEtxl2RkQwah6cYkfhN7iJbpIVYDjhtViqjsdxFdE26lEkg6?=
- =?us-ascii?Q?+ODUOv38y8JeaIGCrTBhgx1Gia0zj0R5mT9HqvoY+fgGbXwpUi7Kj/uTRP3k?=
- =?us-ascii?Q?QCsvy7qtpUFsd2F3C+mzvHSwhix5Cde3y2YJ73raQXOo3JUYNwAmAikCsekp?=
- =?us-ascii?Q?s7pokDEjN7bI0GB5MRDjQrsiLRFzGvakzdkSCdx41C4HUqbthZn1WKR4adwU?=
- =?us-ascii?Q?CtEJBLS4HUmxDQKOy6wus17OsNT8/tLvt8tu16DhM130Nma8ARz7uFBMz0Xf?=
- =?us-ascii?Q?gIctsK+Y2In0CFEz94XM1EWMDkOF2s0LSmrYktoLsord+9HT6TWNJFidCpz+?=
- =?us-ascii?Q?8cXdMV7s/qSxoZrPLdV1d0BddN1deJwtPBSL6DncnByeCkKma7tk/OqrBjbW?=
- =?us-ascii?Q?JK7HrawUvdpjDntlHwDWYqypmoYB97yVPZ+YCHGL3BYVMQcbs90hXsJk0PNN?=
- =?us-ascii?Q?FWK5xibECOhBtWSDDNdJ8eT63bO5kxl9QTylDXR4u1qjlqPgVlYZ/6ZdE1Mk?=
- =?us-ascii?Q?kER3lsTT2I3yC/fMvdDQpAZF+kch38hsJVsGFnWJdno0dOod/OAywIFHgNXA?=
- =?us-ascii?Q?hf9D6t8AzvaggPN0saen+G91Bw3QeBWjL20fEGptHM0pd6GEn23Zr809bDQw?=
- =?us-ascii?Q?3QxBkOFUKu4h1BG1ocIsM2+ycZclHuTP2Kr1BB+aTOQAe4qxH/FFFZ6YFvWg?=
- =?us-ascii?Q?DpnNLCA0ltHy7JepKksGhbSODqClob2j6pzbt0xLVTPNGDV2/x5WO9xdUB5r?=
- =?us-ascii?Q?LTbN256dJc3VbzAW88DNq92r0DR/nTNIUNDtY9HURHPP9IsKPashWt+SqtNa?=
- =?us-ascii?Q?hcDag8LPqpCxqib98jmarvUKLQGolzezU/Swr3Aj1ZsKERwsy9j84TQ5a6wY?=
- =?us-ascii?Q?nRgmMUoAzvl1+BqfpXE4u8gXpNJcblqKEajyPRFaDSyEIqGf1KsJVwQovtRt?=
- =?us-ascii?Q?VWWNHsQdlVBiVZy9eYKV0ILsj61azR9UgDsVETY3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d3e30df-5d9b-4fc0-f889-08dbcfd245b6
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 12:03:42.3781
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oyjgpvp9I33fI51AzQm0vxcZCI25QyFOzxK0bNQ1CF13ZJwMjOwS2/uXKvWBBWFi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9437
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 18, 2023 at 11:19:07AM +0100, Joao Martins wrote:
-> On 16/10/2023 19:05, Jason Gunthorpe wrote:
-> > On Mon, Oct 16, 2023 at 06:52:50PM +0100, Joao Martins wrote:
-> >> On 16/10/2023 17:34, Jason Gunthorpe wrote:
-> >>> On Mon, Oct 16, 2023 at 05:25:16PM +0100, Joao Martins wrote:
-> >>>> diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
-> >>>> index 99d4b075df49..96ec013d1192 100644
-> >>>> --- a/drivers/iommu/iommufd/Kconfig
-> >>>> +++ b/drivers/iommu/iommufd/Kconfig
-> >>>> @@ -11,6 +11,13 @@ config IOMMUFD
-> >>>>
-> >>>>           If you don't know what to do here, say N.
-> >>>>
-> >>>> +config IOMMUFD_DRIVER
-> >>>> +       bool "IOMMUFD provides iommu drivers supporting functions"
-> >>>> +       default IOMMU_API
-> >>>> +       help
-> >>>> +         IOMMUFD will provides supporting data structures and helpers to IOMMU
-> >>>> +         drivers.
-> >>>
-> >>> It is not a 'user selectable' kconfig, just make it
-> >>>
-> >>> config IOMMUFD_DRIVER
-> >>>        tristate
-> >>>        default n
-> >>>
-> >> tristate? More like a bool as IOMMU drivers aren't modloadable
-> > 
-> > tristate, who knows what people will select. If the modular drivers
-> > use it then it is forced to a Y not a M. It is the right way to use kconfig..
-> > 
-> Making it tristate will break build bisection in this module with errors like this:
+On Thu, Sep 14, 2023 at 03:21:38PM +0800, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
 > 
-> [I say bisection, because aftewards when we put IOMMU drivers in the mix, these
-> are always builtin, so it ends up selecting IOMMU_DRIVER=y.]
+> Hi list,
 > 
-> ERROR: modpost: missing MODULE_LICENSE() in drivers/iommu/iommufd/iova_bitmap.o
+> (CC kvm@vger.kernel.org for better browsing.)
 > 
-> iova_bitmap is no module, and making it tristate allows to build it as a module
-> as long as one of the selectors of is a module. 'bool' is actually more accurate
-> to what it is builtin or not.
+> This is the our v4 patch series, rebased on the master branch at the
+> commit 9ef497755afc2 ("Merge tag 'pull-vfio-20230911' of
+> https://github.com/legoater/qemu into staging").
+> 
+> Comparing with v3 [1], v4 mainly refactors the CPUID[0x1F] encoding and
+> exposes module level in CPUID[0x1F] with these new patches:
+> 
+> * [PATCH v4 08/21] i386: Split topology types of CPUID[0x1F] from the
+> definitions of CPUID[0xB]
+> * [PATCH v4 09/21] i386: Decouple CPUID[0x1F] subleaf with specific
+> topology level
+> * [PATCH v4 12/21] i386: Expose module level in CPUID[0x1F]
+> 
+> v4 also fixes compile warnings and fixes cache topology uninitialization
+> bugs for some AMD CPUs.
+> 
+> Welcome your comments!
 
-It is a module if you make it tristate, add the MODULE_LICENSE
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Jason
+
+> 
+> # Introduction
+> 
+> This series add the cluster support for x86 PC machine, which allows
+> x86 can use smp.clusters to configure the module level CPU topology
+> of x86.
+> 
+> And since the compatibility issue (see section: ## Why not share L2
+> cache in cluster directly), this series also introduce a new command
+> to adjust the topology of the x86 L2 cache.
+> 
+> Welcome your comments!
+> 
+> 
+> # Background
+> 
+> The "clusters" parameter in "smp" is introduced by ARM [2], but x86
+> hasn't supported it.
+> 
+> At present, x86 defaults L2 cache is shared in one core, but this is
+> not enough. There're some platforms that multiple cores share the
+> same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
+> Atom cores [3], that is, every four Atom cores shares one L2 cache.
+> Therefore, we need the new CPU topology level (cluster/module).
+> 
+> Another reason is for hybrid architecture. cluster support not only
+> provides another level of topology definition in x86, but would also
+> provide required code change for future our hybrid topology support.
+> 
+> 
+> # Overview
+> 
+> ## Introduction of module level for x86
+> 
+> "cluster" in smp is the CPU topology level which is between "core" and
+> die.
+> 
+> For x86, the "cluster" in smp is corresponding to the module level [4],
+> which is above the core level. So use the "module" other than "cluster"
+> in x86 code.
+> 
+> And please note that x86 already has a cpu topology level also named
+> "cluster" [4], this level is at the upper level of the package. Here,
+> the cluster in x86 cpu topology is completely different from the
+> "clusters" as the smp parameter. After the module level is introduced,
+> the cluster as the smp parameter will actually refer to the module level
+> of x86.
+> 
+> 
+> ## Why not share L2 cache in cluster directly
+> 
+> Though "clusters" was introduced to help define L2 cache topology
+> [2], using cluster to define x86's L2 cache topology will cause the
+> compatibility problem:
+> 
+> Currently, x86 defaults that the L2 cache is shared in one core, which
+> actually implies a default setting "cores per L2 cache is 1" and
+> therefore implicitly defaults to having as many L2 caches as cores.
+> 
+> For example (i386 PC machine):
+> -smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
+> 
+> Considering the topology of the L2 cache, this (*) implicitly means "1
+> core per L2 cache" and "2 L2 caches per die".
+> 
+> If we use cluster to configure L2 cache topology with the new default
+> setting "clusters per L2 cache is 1", the above semantics will change
+> to "2 cores per cluster" and "1 cluster per L2 cache", that is, "2
+> cores per L2 cache".
+> 
+> So the same command (*) will cause changes in the L2 cache topology,
+> further affecting the performance of the virtual machine.
+> 
+> Therefore, x86 should only treat cluster as a cpu topology level and
+> avoid using it to change L2 cache by default for compatibility.
+> 
+> 
+> ## module level in CPUID
+> 
+> Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
+> erroneous smp_num_siblings on Intel Hybrid platforms") is able to
+> handle platforms with Module level enumerated via CPUID.1F.
+> 
+> Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
+> has more than 1 modules since v3.
+> 
+> We can configure CPUID.04H.02H (L2 cache topology) with module level by
+> a new command:
+> 
+>         "-cpu,x-l2-cache-topo=cluster"
+> 
+> More information about this command, please see the section: "## New
+> property: x-l2-cache-topo".
+> 
+> 
+> ## New cache topology info in CPUCacheInfo
+> 
+> Currently, by default, the cache topology is encoded as:
+> 1. i/d cache is shared in one core.
+> 2. L2 cache is shared in one core.
+> 3. L3 cache is shared in one die.
+> 
+> This default general setting has caused a misunderstanding, that is, the
+> cache topology is completely equated with a specific cpu topology, such
+> as the connection between L2 cache and core level, and the connection
+> between L3 cache and die level.
+> 
+> In fact, the settings of these topologies depend on the specific
+> platform and are not static. For example, on Alder Lake-P, every
+> four Atom cores share the same L2 cache [2].
+> 
+> Thus, in this patch set, we explicitly define the corresponding cache
+> topology for different cpu models and this has two benefits:
+> 1. Easy to expand to new CPU models in the future, which has different
+>    cache topology.
+> 2. It can easily support custom cache topology by some command (e.g.,
+>    x-l2-cache-topo).
+> 
+> 
+> ## New property: x-l2-cache-topo
+> 
+> The property x-l2-cache-topo will be used to change the L2 cache
+> topology in CPUID.04H.
+> 
+> Now it allows user to set the L2 cache is shared in core level or
+> cluster level.
+> 
+> If user passes "-cpu x-l2-cache-topo=[core|cluster]" then older L2 cache
+> topology will be overrode by the new topology setting.
+> 
+> Since CPUID.04H is used by Intel CPUs, this property is available on
+> Intel CPUs as for now.
+> 
+> When necessary, it can be extended to CPUID[0x8000001D] for AMD CPUs.
+> 
+> 
+> # Patch description
+> 
+> patch 1-2 Cleanups about coding style and test name.
+> 
+> patch 3-5 Fixes about x86 topology and Intel l1 cache topology.
+> 
+> patch 6-7 Cleanups about topology related CPUID encoding and QEMU
+>           topology variables.
+> 
+> patch 8-9 Refactor CPUID[0x1F] encoding to prepare to introduce module
+>           level.
+> 
+> patch 10-16 Add the module as the new CPU topology level in x86, and it
+>             is corresponding to the cluster level in generic code.
+> 
+> patch 17,18,20 Add cache topology information in cache models.
+> 
+> patch 19 Update AMD CPUs' cache topology encoding.
+> 
+> patch 21 Introduce a new command to configure L2 cache topology.
+> 
+> 
+> [1]: https://lists.gnu.org/archive/html/qemu-devel/2023-08/msg00022.html
+> [2]: https://patchew.org/QEMU/20211228092221.21068-1-wangyanan55@huawei.com/
+> [3]: https://www.intel.com/content/www/us/en/products/platforms/details/alder-lake-p.html
+> [4]: SDM, vol.3, ch.9, 9.9.1 Hierarchical Mapping of Shared Resources.
+> 
+> Best Regards,
+> Zhao
+> ---
+> Changelog:
+> 
+> Changes since v3 (main changes):
+>  * Expose module level in CPUID[0x1F].
+>  * Fix compile warnings. (Babu)
+>  * Fixes cache topology uninitialization bugs for some AMD CPUs. (Babu)
+> 
+> Changes since v2:
+>  * Add "Tested-by", "Reviewed-by" and "ACKed-by" tags.
+>  * Use newly added wrapped helper to get cores per socket in
+>    qemu_init_vcpu().
+> 
+> Changes since v1:
+>  * Reordered patches. (Yanan)
+>  * Deprecated the patch to fix comment of machine_parse_smp_config().
+>    (Yanan)
+>  * Rename test-x86-cpuid.c to test-x86-topo.c. (Yanan)
+>  * Split the intel's l1 cache topology fix into a new separate patch.
+>    (Yanan)
+>  * Combined module_id and APIC ID for module level support into one
+>    patch. (Yanan)
+>  * Make cache_into_passthrough case of cpuid 0x04 leaf in
+>  * cpu_x86_cpuid() use max_processor_ids_for_cache() and
+>    max_core_ids_in_package() to encode CPUID[4]. (Yanan)
+>  * Add the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
+>    (Yanan)
+> ---
+> Zhao Liu (14):
+>   i386: Fix comment style in topology.h
+>   tests: Rename test-x86-cpuid.c to test-x86-topo.c
+>   hw/cpu: Update the comments of nr_cores and nr_dies
+>   i386/cpu: Fix i/d-cache topology to core level for Intel CPU
+>   i386/cpu: Use APIC ID offset to encode cache topo in CPUID[4]
+>   i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
+>   i386: Split topology types of CPUID[0x1F] from the definitions of
+>     CPUID[0xB]
+>   i386: Decouple CPUID[0x1F] subleaf with specific topology level
+>   i386: Expose module level in CPUID[0x1F]
+>   i386: Add cache topology info in CPUCacheInfo
+>   i386: Use CPUCacheInfo.share_level to encode CPUID[4]
+>   i386: Use offsets get NumSharingCache for CPUID[0x8000001D].EAX[bits
+>     25:14]
+>   i386: Use CPUCacheInfo.share_level to encode
+>     CPUID[0x8000001D].EAX[bits 25:14]
+>   i386: Add new property to control L2 cache topo in CPUID.04H
+> 
+> Zhuocheng Ding (7):
+>   softmmu: Fix CPUSTATE.nr_cores' calculation
+>   i386: Introduce module-level cpu topology to CPUX86State
+>   i386: Support modules_per_die in X86CPUTopoInfo
+>   i386: Support module_id in X86CPUTopoIDs
+>   i386/cpu: Introduce cluster-id to X86CPU
+>   tests: Add test case of APIC ID for module level parsing
+>   hw/i386/pc: Support smp.clusters for x86 PC machine
+> 
+>  MAINTAINERS                                   |   2 +-
+>  hw/i386/pc.c                                  |   1 +
+>  hw/i386/x86.c                                 |  49 ++-
+>  include/hw/core/cpu.h                         |   2 +-
+>  include/hw/i386/topology.h                    |  68 ++--
+>  qemu-options.hx                               |  10 +-
+>  softmmu/cpus.c                                |   2 +-
+>  target/i386/cpu.c                             | 322 ++++++++++++++----
+>  target/i386/cpu.h                             |  46 ++-
+>  target/i386/kvm/kvm.c                         |   2 +-
+>  tests/unit/meson.build                        |   4 +-
+>  .../{test-x86-cpuid.c => test-x86-topo.c}     |  58 ++--
+>  12 files changed, 437 insertions(+), 129 deletions(-)
+>  rename tests/unit/{test-x86-cpuid.c => test-x86-topo.c} (73%)
+> 
+> -- 
+> 2.34.1
+
