@@ -2,95 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DEEA77CD1BC
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 03:17:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3482C7CD227
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 04:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344392AbjJRBRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 21:17:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35056 "EHLO
+        id S229477AbjJRCJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 22:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344371AbjJRBRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 21:17:11 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28A7BFA
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 18:17:09 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c9e0b9b96cso44699285ad.2
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 18:17:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697591828; x=1698196628; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3n3bprVeIQuT2Ng9Lf574qnCGv4o8+z0VKTT/COmX9Q=;
-        b=KmHbK/G2xmikzjtcHD7dGMJdB8+tRHOpRptRNALPHyL2DYqRgOH1bMIeGUqK1EbOGP
-         4to8W9LqBAcFOwilHbSGVGTEi587ddTy0EQOrVOWET1/H4QeGAC062OMsd/CHUpWES8y
-         nWAh21q4LbZpK+VPwFb9Ib92KqvgZzqYj807pOIph20AD0SItjG/cLyBKCaG+GB5EeQ8
-         ZdZbswWNo+UUBxT3LC3Jf6+hjZU9GO25jQjV0LIrgeOJA61S7rmgPFyuQvfPq4XNRMYg
-         dlThAVfEkhPELdowbkI5Q2ozJEX3HWN+qpfgkwpb+vZOOogRN7NAkRf3V8ViPKhyeMCa
-         B+gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697591828; x=1698196628;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3n3bprVeIQuT2Ng9Lf574qnCGv4o8+z0VKTT/COmX9Q=;
-        b=oavjoIW88UMWNiyyNsEGiEPEmMzYDB39lOdS/VdPcIX2T66sa1p6kDzG46TSUGkp6b
-         sAQaTh2zsT2FVQzDEwYPFD2pQip87BuPd6PNksZg5J8sqZP4yqa8p82Gq27H2DJjDDuo
-         fWWZ+Tl7Nd54y+pt738cLwli4A9dKzZyrQNDKnOLq+G3MhzzlSNmZMI9zF3nNa0xcSIB
-         Itm32mF49PZDb8oBCxLzfeyaAgKKAqNl6prATY1ZYriCK0/st/h5ARu72Lii+3Drxfkb
-         RzhPfvBWStuudqBFhcBE4tIIsk0cE6wp9U3ujLjOuCpkNxH7Svh5FxOR6tjA445OqG4o
-         yDkA==
-X-Gm-Message-State: AOJu0Yw4V9gy1LeDJqj+Jm2C+ZrLRbVSToFbfSKPaRujDlytB5BkVxb8
-        xP5lqBAJTVfqM0TSbUsBeESZgAhx9A0=
-X-Google-Smtp-Source: AGHT+IH/h6VBuLNlyY3uWvKQWh9avfftGmDa316dg+vgdu/+7muqIhPyBmlDCjLij/7M4rsy1Exn781Z6iA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f14c:b0:1c9:dbcf:a87c with SMTP id
- d12-20020a170902f14c00b001c9dbcfa87cmr63061plb.3.1697591828655; Tue, 17 Oct
- 2023 18:17:08 -0700 (PDT)
-Date:   Tue, 17 Oct 2023 18:16:20 -0700
-In-Reply-To: <20231017155101.40677-1-nsaenz@amazon.com>
-Mime-Version: 1.0
-References: <20231017155101.40677-1-nsaenz@amazon.com>
-X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <169759163972.1787364.3932584247097617727.b4-ty@google.com>
-Subject: Re: [PATCH v3] KVM: x86: hyper-v: Don't auto-enable stimer on write
- from user-space
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc:     vkuznets@redhat.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, graf@amazon.de, rkagan@amazon.de,
-        linux-kernel@vger.kernel.org, anelkz@amazon.de,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229460AbjJRCJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 22:09:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AA8FA
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 19:09:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697594997; x=1729130997;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CWfYXO9YG2yfmLl8n6WbRtsy+sID2wgUiX8Hew6Sflo=;
+  b=FGM4RPwOVewE6VDgeALm42qfLc4VB2XeWa0wvRfHa5UDaRONK0C739vL
+   CMXs999HCrXdOgSr5i7u/eo+6sQ5xtnl2s2Js62Zo7LefS7/ZcvgImAet
+   YQcYvasDmPauS1Jejozd9YvC9BqaRXJ9briNKEONYDs24dRhp66WjObQF
+   qhiawt+NswRmtM53r0mf1BbTz7Q+JQs0BVnLw5tKtkEVRIc+tHS+Bwubr
+   JFJkNh8Ke942HSP3sV2T4eqbgNOiKLzVySN89dVznyO6MhhBXyIbs7qHs
+   nMWX+w7I1+zl6332QTpdYoHKvAWiDU/2ntD+jvElWck5hW6WqKG3h+SWr
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384798689"
+X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
+   d="scan'208";a="384798689"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 19:09:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="1087721657"
+X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
+   d="scan'208";a="1087721657"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Oct 2023 19:09:53 -0700
+Message-ID: <22958804-ad42-4ea4-a8f7-cf1c5c3a5532@linux.intel.com>
+Date:   Wed, 18 Oct 2023 10:06:13 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc:     baolu.lu@linux.intel.com, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v3 19/19] iommu/intel: Access/Dirty bit support for SL
+ domains
+Content-Language: en-US
+To:     Joao Martins <joao.m.martins@oracle.com>
+References: <20230923012511.10379-1-joao.m.martins@oracle.com>
+ <20230923012511.10379-20-joao.m.martins@oracle.com>
+ <c4816f4b-3fde-4adb-901f-4d568a4fd95a@linux.intel.com>
+ <764f159d-a19c-4a1d-86a6-a2791ff21e10@oracle.com>
+ <20231016114210.GM3952@nvidia.com>
+ <037d2917-51a2-acae-dc06-65940a054880@linux.intel.com>
+ <20231016125941.GT3952@nvidia.com>
+ <3e30e72a-c1c6-55a6-8e52-6a6250d2d8de@linux.intel.com>
+ <4cc0c4a0-3c00-4b29-a43b-ddfc57f2e4c0@oracle.com>
+ <81bd3937-482c-23be-840f-6766ca0ec65d@linux.intel.com>
+ <8e5d944f-d89e-4618-a6c6-0eb096354e2d@oracle.com>
+ <db5d7ebf-496d-47df-aa1c-3db2f12edc19@oracle.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <db5d7ebf-496d-47df-aa1c-3db2f12edc19@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 Oct 2023 15:51:02 +0000, Nicolas Saenz Julienne wrote:
-> Don't apply the stimer's counter side effects when modifying its
-> value from user-space, as this may trigger spurious interrupts.
-> 
-> For example:
->  - The stimer is configured in auto-enable mode.
->  - The stimer's count is set and the timer enabled.
->  - The stimer expires, an interrupt is injected.
->  - The VM is live migrated.
->  - The stimer config and count are deserialized, auto-enable is ON, the
->    stimer is re-enabled.
->  - The stimer expires right away, and injects an unwarranted interrupt.
-> 
-> [...]
+On 10/17/23 10:25 PM, Joao Martins wrote:
+> On 17/10/2023 15:16, Joao Martins wrote:
+>> On 17/10/2023 13:41, Baolu Lu wrote:
+>>> On 2023/10/17 18:51, Joao Martins wrote:
+>>>> On 16/10/2023 14:01, Baolu Lu wrote:
+>>>>> On 2023/10/16 20:59, Jason Gunthorpe wrote:
+>>>>>> On Mon, Oct 16, 2023 at 08:58:42PM +0800, Baolu Lu wrote:
+>>>>>>> On 2023/10/16 19:42, Jason Gunthorpe wrote:
+>>>>>>>> On Mon, Oct 16, 2023 at 11:57:34AM +0100, Joao Martins wrote:
+>>>>>>>>
+>>>>>>>>> True. But to be honest, I thought we weren't quite there yet in PASID
+>>>>>>>>> support
+>>>>>>>>> from IOMMUFD perspective; hence why I didn't aim at it. Or do I have the
+>>>>>>>>> wrong
+>>>>>>>>> impression? From the code below, it clearly looks the driver does.
+>>>>>>>> I think we should plan that this series will go before the PASID
+>>>>>>>> series
+>>>>>>> I know that PASID support in IOMMUFD is not yet available, but the VT-d
+>>>>>>> driver already supports attaching a domain to a PASID, as required by
+>>>>>>> the idxd driver for kernel DMA with PASID. Therefore, from the driver's
+>>>>>>> perspective, dirty tracking should also be enabled for PASIDs.
+>>>>>> As long as the driver refuses to attach a dirty track enabled domain
+>>>>>> to PASID it would be fine for now.
+>>>>> Yes. This works.
+>>>> Baolu Lu, I am blocking PASID attachment this way; let me know if this matches
+>>>> how would you have the driver refuse dirty tracking on PASID.
+>>>
+>>> Joao, how about blocking pasid attachment in intel_iommu_set_dev_pasid()
+>>> directly?
+>>>
+>>> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+>>> index c86ba5a3e75c..392b6ca9ce90 100644
+>>> --- a/drivers/iommu/intel/iommu.c
+>>> +++ b/drivers/iommu/intel/iommu.c
+>>> @@ -4783,6 +4783,9 @@ static int intel_iommu_set_dev_pasid(struct iommu_domain
+>>> *domain,
+>>>          if (context_copied(iommu, info->bus, info->devfn))
+>>>                  return -EBUSY;
+>>>
+>>> +       if (domain->dirty_ops)
+>>> +               return -EOPNOTSUPP;
+>>> +
+>>>          ret = prepare_domain_attach_device(domain, dev);
+>>>          if (ret)
+>>>                  return ret;
+>>
+>> I was trying to centralize all the checks, but I can place it here if you prefer
+>> this way.
 
-Applied to kvm-x86 misc, thanks!
+We will soon remove this check when pasid is supported in iommufd. So
+less code change is better for future work.
 
-[1/1] KVM: x86: hyper-v: Don't auto-enable stimer on write from user-space
-      https://github.com/kvm-x86/linux/commit/d6800af51c76
+>>
+> Minor change, I'm changing error code to -EINVAL to align with non-PASID case.
 
---
-https://github.com/kvm-x86/linux/tree/next
+Yes. Make sense. -EINVAL means "not compatible". The caller can retry.
+
+Best regards,
+baolu
