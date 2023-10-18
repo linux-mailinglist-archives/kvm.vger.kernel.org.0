@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49DE87CE958
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D06A87CE951
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:46:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232165AbjJRUql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 16:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
+        id S232467AbjJRUqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 16:46:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232221AbjJRUqh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 16:46:37 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEC49B
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:35 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7be940fe1so117680807b3.2
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:35 -0700 (PDT)
+        with ESMTP id S232279AbjJRUqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 16:46:39 -0400
+Received: from mail-oi1-x24a.google.com (mail-oi1-x24a.google.com [IPv6:2607:f8b0:4864:20::24a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60290FE
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:37 -0700 (PDT)
+Received: by mail-oi1-x24a.google.com with SMTP id 5614622812f47-3b2e2d3560bso2670043b6e.2
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697661995; x=1698266795; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697661996; x=1698266796; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=w+Tq8ZbDqZnNACP1ZGd4eGNbYVTAqWG4yMn2szlYYbk=;
-        b=T98kk+jNDwt/ZiuSK4thE7SNRmSmHKpNUjbVFTUOUn1zp7roA0T/GxYtAivo2NfBRp
-         iSok0N2azlFKcVN4CBiS6e/ST5N5Qfbc2K6a9737JC+ra4WSrvNb74LU20wMm4A8emdm
-         uPM8dmBoUr9ZFKz4C9oiTP9DIR01oYLTL6QGFfMMIwG3CFyGBUYGU3CGT0y6L05aA1ay
-         0OikiUefL/VdGER5iJKu+15WKaK6Xu6B6Nm+qkr/7lJETspWuQDyLSsoXwdkBcqSkpWA
-         5jQ52I8t7dt9ka/SHKX7tCKAOfhYpCtpkPL1qrqY/B10qsAAQIAp0wSbn4jKeWl/80nC
-         rcvg==
+        bh=AxQtUaL497jm8Kvv+JzkijCCW6oqSLgiPCMTJq7eWjY=;
+        b=qHUULQsSo3Ub018clPnEeoGy1KFO9nj/b12yYOWutZRQBYALkbLj/B2C+oF0XuLbcR
+         NLeJjUPJAz0tFXBku3c22stWEspn5R2O4ncJx0EvYY7DolE9X5pB3I+LJWgZcuLKloqt
+         PiT7noNmG96kEbTH0XsmnICSTFzgyoRdU1F3MhtJe4koukZUBoikGDcr1D+WJX1mmb2h
+         73HmsFByuSSZnPR6AQQdzUeqpc7x54czTNbpa5Zk9BjWN8+l3z/jO9xXwPI60qqAp8OW
+         +Yqed/Fmzo0XRFg1nG4AVH8v3UiV6MTSiMx+oZ36n8hhz7F7kVQ28Wwvk+5en1RPGiGn
+         IkHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697661995; x=1698266795;
+        d=1e100.net; s=20230601; t=1697661996; x=1698266796;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=w+Tq8ZbDqZnNACP1ZGd4eGNbYVTAqWG4yMn2szlYYbk=;
-        b=vYKZN8WOiSOjj07UA3Jf3Nlo6ZmslGPnE6JMGLW13mssTlxelHvhGDb4D5yKF/EVJm
-         veSZnkAoU+J9BCLZDlrQU5i40MHAZSYXK319SzfVnwm/ORdArJXX4hZfVweP2/ZeBNNl
-         PjETNg2XH0EZL/5KmRqxIWejkjjH/u8D9l6ywT1EabBfovRa2rL9Xt/P4VEhbohiZHmE
-         fTliOL6M2tEUNqiowaik7F5Z3DNDcseqsP13LGMr7FIOi8suAVcJL9ZX9mjGcDmxmcEI
-         UyKgQ/J+3iQ/xB/CLrtQQFzTeLKgnoNoQODzXoUbxG/ZWnO6RK/5vgFql4B9ugp+OJnW
-         57IQ==
-X-Gm-Message-State: AOJu0YwuK32wtxQSeRXkwKnoqcGjNIw80QPDnfFjueVEdIgPA3hMj2DE
-        oQJbrRN1zNT57AJFBfUMspgwa2nu10s=
-X-Google-Smtp-Source: AGHT+IExHueZ801GZYJL9D6wPlfFWNcPEOuWicVaYleJkmF6NjxQ6GVvUBqt4HcS+UjO0Bnn4V8/N0OPneU=
+        bh=AxQtUaL497jm8Kvv+JzkijCCW6oqSLgiPCMTJq7eWjY=;
+        b=uFzkSdVSUNAhz4IHVUKHF1zASOdTZD8NbPEd9X5qA3c+NBapcu5TdRMGHb2ieRDwkV
+         lOo7/f+uqWTpDxHyvLJZH9SfKvQzAtvpIMa+E5hwSWRC+D4l7Z8aKp109A1dHovjRwe/
+         /xJOAQ+d64tL+HlxJp5PMQSPh3mRevvQU8qxMquurGCOjAVDk+y1qD+LW+BxYtiRIK2C
+         bg6sq0EuLyeKfBlSSxBV/9oFEJQiD+ztY7RAEZHAyN709z2XC1ePeblaroxeLn0eXdmD
+         dX35rihQoYavuji2zyOdpeG7mpHfxJDfkKENUy2WIktb9bx6kJpBIg5AwXIkB+s4Fpwg
+         Jl3g==
+X-Gm-Message-State: AOJu0YzdXct0Fn3HP/5ePFqQJEAAcS5VPKPrQ7HvFMb6btfc6Ax5HDwJ
+        Mz4fctMU2fTvUYJ26qxr/LPFTapS+UY=
+X-Google-Smtp-Source: AGHT+IE+HSvc8NfeaZoWmMmsZSX78eAKPODu7osocTukqqL8LuYcEH25gkg/9rvnxgtnl9ETHnlyRSBM6Fo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:cb89:0:b0:5a7:7683:995d with SMTP id
- n131-20020a0dcb89000000b005a77683995dmr11570ywd.5.1697661995065; Wed, 18 Oct
- 2023 13:46:35 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6808:1884:b0:3a9:d030:5023 with SMTP id
+ bi4-20020a056808188400b003a9d0305023mr94020oib.3.1697661996735; Wed, 18 Oct
+ 2023 13:46:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 18 Oct 2023 13:46:23 -0700
+Date:   Wed, 18 Oct 2023 13:46:24 -0700
 In-Reply-To: <20231018204624.1905300-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20231018204624.1905300-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231018204624.1905300-3-seanjc@google.com>
-Subject: [PATCH 2/3] KVM: Always flush async #PF workqueue when vCPU is being destroyed
+Message-ID: <20231018204624.1905300-4-seanjc@google.com>
+Subject: [PATCH 3/3] Revert "KVM: Prevent module exit until all VMs are freed"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -64,135 +64,78 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Always flush the per-vCPU async #PF workqueue when a vCPU is clearing its
-completion queue, i.e. when a VM and all its vCPUs is being destroyed.
-KVM must ensure that none of its workqueue callbacks is running when the
-last reference to the KVM _module_ is put.  Gifting a reference to the
-associated VM prevents the workqueue callback from dereferencing freed
-vCPU/VM memory, but does not prevent the KVM module from being unloaded
-before the callback completes.
+Revert KVM's misguided attempt to "fix" a use-after-module-unload bug that
+was actually due to failure to flush a workqueue, not a lack of module
+refcounting.  Pinning the KVM module until kvm_vm_destroy() doesn't
+prevent use-after-free due to the module being unloaded, as userspace can
+invoke delete_module() the instant the last reference to KVM is put, i.e.
+can cause all KVM code to be unmapped while KVM is actively executing said
+code.
 
-Drop the misguided VM refcount gifting, as calling kvm_put_kvm() from
-async_pf_execute() if kvm_put_kvm() flushes the async #PF workqueue will
-result in deadlock.  async_pf_execute() can't return until kvm_put_kvm()
-finishes, and kvm_put_kvm() can't return until async_pf_execute() finishes:
+Generally speaking, the many instances of module_put(THIS_MODULE)
+notwithstanding, outside of a few special paths, a module can never safely
+put the last reference to itself without creating deadlock, i.e. something
+external to the module *must* put the last reference.  In other words,
+having VMs grab a reference to the KVM module is futile, pointless, and as
+evidenced by the now-reverted commit 70375c2d8fa3 ("Revert "KVM: set owner
+of cpu and vm file operations""), actively dangerous.
 
- WARNING: CPU: 8 PID: 251 at virt/kvm/kvm_main.c:1435 kvm_put_kvm+0x2d/0x320 [kvm]
- Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel kvm irqbypass
- CPU: 8 PID: 251 Comm: kworker/8:1 Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
- Workqueue: events async_pf_execute [kvm]
- RIP: 0010:kvm_put_kvm+0x2d/0x320 [kvm]
- Call Trace:
-  <TASK>
-  async_pf_execute+0x198/0x260 [kvm]
-  process_one_work+0x145/0x2d0
-  worker_thread+0x27e/0x3a0
-  kthread+0xba/0xe0
-  ret_from_fork+0x2d/0x50
-  ret_from_fork_asm+0x11/0x20
-  </TASK>
- ---[ end trace 0000000000000000 ]---
- INFO: task kworker/8:1:251 blocked for more than 120 seconds.
-       Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
- "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
- task:kworker/8:1     state:D stack:0     pid:251   ppid:2      flags:0x00004000
- Workqueue: events async_pf_execute [kvm]
- Call Trace:
-  <TASK>
-  __schedule+0x33f/0xa40
-  schedule+0x53/0xc0
-  schedule_timeout+0x12a/0x140
-  __wait_for_common+0x8d/0x1d0
-  __flush_work.isra.0+0x19f/0x2c0
-  kvm_clear_async_pf_completion_queue+0x129/0x190 [kvm]
-  kvm_arch_destroy_vm+0x78/0x1b0 [kvm]
-  kvm_put_kvm+0x1c1/0x320 [kvm]
-  async_pf_execute+0x198/0x260 [kvm]
-  process_one_work+0x145/0x2d0
-  worker_thread+0x27e/0x3a0
-  kthread+0xba/0xe0
-  ret_from_fork+0x2d/0x50
-  ret_from_fork_asm+0x11/0x20
-  </TASK>
+This reverts commit 405294f29faee5de8c10cb9d4a90e229c2835279 and commit
+5f6de5cbebee925a612856fce6f9182bb3eee0db.
 
-If kvm_clear_async_pf_completion_queue() actually flushes the workqueue,
-then there's no need to gift async_pf_execute() a reference because all
-invocations of async_pf_execute() will be forced to complete before the
-vCPU and its VM are destroyed/freed.  And that in turn fixes the module
-unloading bug as __fput() won't do module_put() on the last vCPU reference
-until the vCPU has been freed, e.g. if closing the vCPU file also puts the
-last reference to the KVM module.
-
-Note, commit 5f6de5cbebee ("KVM: Prevent module exit until all VMs are
-freed") *tried* to fix the module refcounting issue by having VMs grab a
-reference to the module, but that only made the bug slightly harder to hit
-as it gave async_pf_execute() a bit more time to complete before the KVM
-module could be unloaded.
-
-Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
-Cc: stable@vger.kernel.org
-Cc: David Matlack <dmatlack@google.com>
+Fixes: 405294f29fae ("KVM: Unconditionally get a ref to /dev/kvm module when creating a VM")
+Fixes: 5f6de5cbebee ("KVM: Prevent module exit until all VMs are freed")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/async_pf.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ virt/kvm/kvm_main.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index e033c79d528e..7aeb9d1f43b1 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -87,7 +87,6 @@ static void async_pf_execute(struct work_struct *work)
- 	__kvm_vcpu_wake_up(vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 1e65a506985f..3b1b9e8dd70c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -115,8 +115,6 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
  
- 	mmput(mm);
--	kvm_put_kvm(vcpu->kvm);
+ static const struct file_operations stat_fops_per_vm;
+ 
+-static struct file_operations kvm_chardev_ops;
+-
+ static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+ 			   unsigned long arg);
+ #ifdef CONFIG_KVM_COMPAT
+@@ -1157,9 +1155,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+ 	if (!kvm)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	/* KVM is pinned via open("/dev/kvm"), the fd passed to this ioctl(). */
+-	__module_get(kvm_chardev_ops.owner);
+-
+ 	KVM_MMU_LOCK_INIT(kvm);
+ 	mmgrab(current->mm);
+ 	kvm->mm = current->mm;
+@@ -1279,7 +1274,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+ out_err_no_srcu:
+ 	kvm_arch_free_vm(kvm);
+ 	mmdrop(current->mm);
+-	module_put(kvm_chardev_ops.owner);
+ 	return ERR_PTR(r);
  }
  
- void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
-@@ -114,7 +113,6 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
- #else
- 		if (cancel_work_sync(&work->work)) {
- 			mmput(work->mm);
--			kvm_put_kvm(vcpu->kvm); /* == work->vcpu->kvm */
- 			kmem_cache_free(async_pf_cache, work);
- 		}
- #endif
-@@ -126,7 +124,19 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
- 			list_first_entry(&vcpu->async_pf.done,
- 					 typeof(*work), link);
- 		list_del(&work->link);
-+
-+		spin_unlock(&vcpu->async_pf.lock);
-+
-+		/*
-+		 * The async #PF is "done", but KVM must wait for the work item
-+		 * itself, i.e. async_pf_execute(), to run to completion.  If
-+		 * KVM is a module, KVM must ensure *no* code owned by the KVM
-+		 * (the module) can be run after the last call to module_put(),
-+		 * i.e. after the last reference to the last vCPU's file is put.
-+		 */
-+		flush_work(&work->work);
- 		kmem_cache_free(async_pf_cache, work);
-+		spin_lock(&vcpu->async_pf.lock);
- 	}
- 	spin_unlock(&vcpu->async_pf.lock);
+@@ -1348,7 +1342,6 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	preempt_notifier_dec();
+ 	hardware_disable_all();
+ 	mmdrop(mm);
+-	module_put(kvm_chardev_ops.owner);
+ }
  
-@@ -186,7 +196,6 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	work->arch = *arch;
- 	work->mm = current->mm;
- 	mmget(work->mm);
--	kvm_get_kvm(work->vcpu->kvm);
- 
- 	INIT_WORK(&work->work, async_pf_execute);
- 
+ void kvm_get_kvm(struct kvm *kvm)
 -- 
 2.42.0.655.g421f12c284-goog
 
