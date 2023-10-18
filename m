@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD5507CE954
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:46:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49DE87CE958
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 22:46:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232241AbjJRUqh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 16:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34272 "EHLO
+        id S232165AbjJRUql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 16:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232098AbjJRUqf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 16:46:35 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB17A4
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9cafa90160so102944276.2
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:34 -0700 (PDT)
+        with ESMTP id S232221AbjJRUqh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 16:46:37 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEC49B
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:35 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7be940fe1so117680807b3.2
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 13:46:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697661993; x=1698266793; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697661995; x=1698266795; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=0NC3yqMcGjhIZrhf7725DJ1Gf8NkzsIha09da8LPGz0=;
-        b=SmAaQ7putaQ3J9cjAp0JVUn0Kcd12FMuMq4Sl67CevF4CgsKROoWDvmmhp3kRKmGLQ
-         3QMt7nCvyNMn7/TFbNaLtmuM7W+jWyrJx6vhg9hOs//AB0sYdKhmYfjuvEDYhfHy+/ju
-         hqMbQ99fiBxOGENlnGXhYSN1A2GlE19mlS2vnmOs0GdbeNYKPaYrs/2LZWJ/ohWYLZ6R
-         RGqPv03UwwsBO6mI5aqAQQYJa8ot68Pq5M12HKzDhajzxXBa2DsN/Bxc0gXxGr7gxWgn
-         eR6jmqBHFekWlaHqzNduMj7a5id4JgQewCu1IAA474hxqINCASw/k/HGprLiHz7ytne+
-         Rtsg==
+        bh=w+Tq8ZbDqZnNACP1ZGd4eGNbYVTAqWG4yMn2szlYYbk=;
+        b=T98kk+jNDwt/ZiuSK4thE7SNRmSmHKpNUjbVFTUOUn1zp7roA0T/GxYtAivo2NfBRp
+         iSok0N2azlFKcVN4CBiS6e/ST5N5Qfbc2K6a9737JC+ra4WSrvNb74LU20wMm4A8emdm
+         uPM8dmBoUr9ZFKz4C9oiTP9DIR01oYLTL6QGFfMMIwG3CFyGBUYGU3CGT0y6L05aA1ay
+         0OikiUefL/VdGER5iJKu+15WKaK6Xu6B6Nm+qkr/7lJETspWuQDyLSsoXwdkBcqSkpWA
+         5jQ52I8t7dt9ka/SHKX7tCKAOfhYpCtpkPL1qrqY/B10qsAAQIAp0wSbn4jKeWl/80nC
+         rcvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697661993; x=1698266793;
+        d=1e100.net; s=20230601; t=1697661995; x=1698266795;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0NC3yqMcGjhIZrhf7725DJ1Gf8NkzsIha09da8LPGz0=;
-        b=dcOKgJxzmQ9jBS7F6yMX89RwtJXtDiNqPCqiLern9wOZ1AND6UPKGVk990/jNT7Uv1
-         q5USJjnomRhMmRLSsJPONNH8CxiI7bvMc62lVc3ERH3qnzQbu49ml9OJE/825L/zHTpD
-         GFzFk7zDN0MtRGFV37TmSKaxoW8W7asi3f2MP5xmJH1dnnirx/ypQf+fGERFv0Jhlihb
-         bY941DJmKuS0k8yp9EGjfXbSSUiYTLos6rMHy4NrVnxzIsIZG2EvXXaaoW79wQKJNuqL
-         4u1IO5VLT5O7rEO5tgyAR0lPjs6/WupLIoV4fHu0Nf9nykjEUCpvsijpQh6ozfIygdic
-         KaAA==
-X-Gm-Message-State: AOJu0Yz2OukAUaR3aND1jCQL0dZzSqSYl88cv6CDipdu7hfIfSZwiGXJ
-        ML1/y8kwXuYRw6YMb+jZNr6A16H+l0w=
-X-Google-Smtp-Source: AGHT+IG+aew8QqUeKJhMjafkL3+AfUCVwG2CQNeHZsBiKSQcnY9Z1RYn+qlTT/sPLTnhnGPz3wPUHZUiY+E=
+        bh=w+Tq8ZbDqZnNACP1ZGd4eGNbYVTAqWG4yMn2szlYYbk=;
+        b=vYKZN8WOiSOjj07UA3Jf3Nlo6ZmslGPnE6JMGLW13mssTlxelHvhGDb4D5yKF/EVJm
+         veSZnkAoU+J9BCLZDlrQU5i40MHAZSYXK319SzfVnwm/ORdArJXX4hZfVweP2/ZeBNNl
+         PjETNg2XH0EZL/5KmRqxIWejkjjH/u8D9l6ywT1EabBfovRa2rL9Xt/P4VEhbohiZHmE
+         fTliOL6M2tEUNqiowaik7F5Z3DNDcseqsP13LGMr7FIOi8suAVcJL9ZX9mjGcDmxmcEI
+         UyKgQ/J+3iQ/xB/CLrtQQFzTeLKgnoNoQODzXoUbxG/ZWnO6RK/5vgFql4B9ugp+OJnW
+         57IQ==
+X-Gm-Message-State: AOJu0YwuK32wtxQSeRXkwKnoqcGjNIw80QPDnfFjueVEdIgPA3hMj2DE
+        oQJbrRN1zNT57AJFBfUMspgwa2nu10s=
+X-Google-Smtp-Source: AGHT+IExHueZ801GZYJL9D6wPlfFWNcPEOuWicVaYleJkmF6NjxQ6GVvUBqt4HcS+UjO0Bnn4V8/N0OPneU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:134a:b0:d9a:58e0:c7c7 with SMTP id
- g10-20020a056902134a00b00d9a58e0c7c7mr11788ybu.1.1697661993300; Wed, 18 Oct
- 2023 13:46:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0d:cb89:0:b0:5a7:7683:995d with SMTP id
+ n131-20020a0dcb89000000b005a77683995dmr11570ywd.5.1697661995065; Wed, 18 Oct
+ 2023 13:46:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 18 Oct 2023 13:46:22 -0700
+Date:   Wed, 18 Oct 2023 13:46:23 -0700
 In-Reply-To: <20231018204624.1905300-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20231018204624.1905300-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231018204624.1905300-2-seanjc@google.com>
-Subject: [PATCH 1/3] KVM: Set file_operations.owner appropriately for all such structures
+Message-ID: <20231018204624.1905300-3-seanjc@google.com>
+Subject: [PATCH 2/3] KVM: Always flush async #PF workqueue when vCPU is being destroyed
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -62,116 +62,137 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set .owner for all KVM-owned filed types so that the KVM module is pinned
-until any files with callbacks back into KVM are completely freed.  Using
-"struct kvm" as a proxy for the module, i.e. keeping KVM-the-module alive
-while there are active VMs, doesn't provide full protection.
+Always flush the per-vCPU async #PF workqueue when a vCPU is clearing its
+completion queue, i.e. when a VM and all its vCPUs is being destroyed.
+KVM must ensure that none of its workqueue callbacks is running when the
+last reference to the KVM _module_ is put.  Gifting a reference to the
+associated VM prevents the workqueue callback from dereferencing freed
+vCPU/VM memory, but does not prevent the KVM module from being unloaded
+before the callback completes.
 
-Userspace can invoke delete_module() the instant the last reference to KVM
-is put.  If KVM itself puts the last reference, e.g. via kvm_destroy_vm(),
-then it's possible for KVM to be preempted and deleted/unloaded before KVM
-fully exits, e.g. when the task running kvm_destroy_vm() is scheduled back
-in, it will jump to a code page that is no longer mapped.
+Drop the misguided VM refcount gifting, as calling kvm_put_kvm() from
+async_pf_execute() if kvm_put_kvm() flushes the async #PF workqueue will
+result in deadlock.  async_pf_execute() can't return until kvm_put_kvm()
+finishes, and kvm_put_kvm() can't return until async_pf_execute() finishes:
 
-Note, file types that can call into sub-module code, e.g. kvm-intel.ko or
-kvm-amd.ko on x86, must use the module pointer passed to kvm_init(), not
-THIS_MODULE (which points at kvm.ko).  KVM assumes that if /dev/kvm is
-reachable, e.g. VMs are active, then the vendor module is loaded.
+ WARNING: CPU: 8 PID: 251 at virt/kvm/kvm_main.c:1435 kvm_put_kvm+0x2d/0x320 [kvm]
+ Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel kvm irqbypass
+ CPU: 8 PID: 251 Comm: kworker/8:1 Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+ Workqueue: events async_pf_execute [kvm]
+ RIP: 0010:kvm_put_kvm+0x2d/0x320 [kvm]
+ Call Trace:
+  <TASK>
+  async_pf_execute+0x198/0x260 [kvm]
+  process_one_work+0x145/0x2d0
+  worker_thread+0x27e/0x3a0
+  kthread+0xba/0xe0
+  ret_from_fork+0x2d/0x50
+  ret_from_fork_asm+0x11/0x20
+  </TASK>
+ ---[ end trace 0000000000000000 ]---
+ INFO: task kworker/8:1:251 blocked for more than 120 seconds.
+       Tainted: G        W          6.6.0-rc1-e7af8d17224a-x86/gmem-vm #119
+ "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+ task:kworker/8:1     state:D stack:0     pid:251   ppid:2      flags:0x00004000
+ Workqueue: events async_pf_execute [kvm]
+ Call Trace:
+  <TASK>
+  __schedule+0x33f/0xa40
+  schedule+0x53/0xc0
+  schedule_timeout+0x12a/0x140
+  __wait_for_common+0x8d/0x1d0
+  __flush_work.isra.0+0x19f/0x2c0
+  kvm_clear_async_pf_completion_queue+0x129/0x190 [kvm]
+  kvm_arch_destroy_vm+0x78/0x1b0 [kvm]
+  kvm_put_kvm+0x1c1/0x320 [kvm]
+  async_pf_execute+0x198/0x260 [kvm]
+  process_one_work+0x145/0x2d0
+  worker_thread+0x27e/0x3a0
+  kthread+0xba/0xe0
+  ret_from_fork+0x2d/0x50
+  ret_from_fork_asm+0x11/0x20
+  </TASK>
 
-To reduce the probability of forgetting to set .owner entirely, use
-THIS_MODULE for stats files where KVM does not call back into vendor code.
+If kvm_clear_async_pf_completion_queue() actually flushes the workqueue,
+then there's no need to gift async_pf_execute() a reference because all
+invocations of async_pf_execute() will be forced to complete before the
+vCPU and its VM are destroyed/freed.  And that in turn fixes the module
+unloading bug as __fput() won't do module_put() on the last vCPU reference
+until the vCPU has been freed, e.g. if closing the vCPU file also puts the
+last reference to the KVM module.
 
-This reverts commit 70375c2d8fa3fb9b0b59207a9c5df1e2e1205c10, and fixes
-several other file types that have been buggy since their introduction.
+Note, commit 5f6de5cbebee ("KVM: Prevent module exit until all VMs are
+freed") *tried* to fix the module refcounting issue by having VMs grab a
+reference to the module, but that only made the bug slightly harder to hit
+as it gave async_pf_execute() a bit more time to complete before the KVM
+module could be unloaded.
 
-Fixes: 70375c2d8fa3 ("Revert "KVM: set owner of cpu and vm file operations"")
-Fixes: 3bcd0662d66f ("KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs file")
-Reported-by: Al Viro <viro@zeniv.linux.org.uk>
-Link: https://lore.kernel.org/all/20231010003746.GN800259@ZenIV
+Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+Cc: stable@vger.kernel.org
+Cc: David Matlack <dmatlack@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/debugfs.c |  1 +
- virt/kvm/kvm_main.c    | 11 ++++++++---
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ virt/kvm/async_pf.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-index ee8c4c3496ed..eea6ea7f14af 100644
---- a/arch/x86/kvm/debugfs.c
-+++ b/arch/x86/kvm/debugfs.c
-@@ -182,6 +182,7 @@ static int kvm_mmu_rmaps_stat_release(struct inode *inode, struct file *file)
+diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+index e033c79d528e..7aeb9d1f43b1 100644
+--- a/virt/kvm/async_pf.c
++++ b/virt/kvm/async_pf.c
+@@ -87,7 +87,6 @@ static void async_pf_execute(struct work_struct *work)
+ 	__kvm_vcpu_wake_up(vcpu);
+ 
+ 	mmput(mm);
+-	kvm_put_kvm(vcpu->kvm);
  }
  
- static const struct file_operations mmu_rmaps_stat_fops = {
-+	.owner		= THIS_MODULE,
- 	.open		= kvm_mmu_rmaps_stat_open,
- 	.read		= seq_read,
- 	.llseek		= seq_lseek,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 486800a7024b..1e65a506985f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3887,7 +3887,7 @@ static int kvm_vcpu_release(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
--static const struct file_operations kvm_vcpu_fops = {
-+static struct file_operations kvm_vcpu_fops = {
- 	.release        = kvm_vcpu_release,
- 	.unlocked_ioctl = kvm_vcpu_ioctl,
- 	.mmap           = kvm_vcpu_mmap,
-@@ -4081,6 +4081,7 @@ static int kvm_vcpu_stats_release(struct inode *inode, struct file *file)
- }
- 
- static const struct file_operations kvm_vcpu_stats_fops = {
-+	.owner = THIS_MODULE,
- 	.read = kvm_vcpu_stats_read,
- 	.release = kvm_vcpu_stats_release,
- 	.llseek = noop_llseek,
-@@ -4431,7 +4432,7 @@ static int kvm_device_release(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
--static const struct file_operations kvm_device_fops = {
-+static struct file_operations kvm_device_fops = {
- 	.unlocked_ioctl = kvm_device_ioctl,
- 	.release = kvm_device_release,
- 	KVM_COMPAT(kvm_device_ioctl),
-@@ -4759,6 +4760,7 @@ static int kvm_vm_stats_release(struct inode *inode, struct file *file)
- }
- 
- static const struct file_operations kvm_vm_stats_fops = {
-+	.owner = THIS_MODULE,
- 	.read = kvm_vm_stats_read,
- 	.release = kvm_vm_stats_release,
- 	.llseek = noop_llseek,
-@@ -5060,7 +5062,7 @@ static long kvm_vm_compat_ioctl(struct file *filp,
- }
+ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+@@ -114,7 +113,6 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+ #else
+ 		if (cancel_work_sync(&work->work)) {
+ 			mmput(work->mm);
+-			kvm_put_kvm(vcpu->kvm); /* == work->vcpu->kvm */
+ 			kmem_cache_free(async_pf_cache, work);
+ 		}
  #endif
+@@ -126,7 +124,19 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+ 			list_first_entry(&vcpu->async_pf.done,
+ 					 typeof(*work), link);
+ 		list_del(&work->link);
++
++		spin_unlock(&vcpu->async_pf.lock);
++
++		/*
++		 * The async #PF is "done", but KVM must wait for the work item
++		 * itself, i.e. async_pf_execute(), to run to completion.  If
++		 * KVM is a module, KVM must ensure *no* code owned by the KVM
++		 * (the module) can be run after the last call to module_put(),
++		 * i.e. after the last reference to the last vCPU's file is put.
++		 */
++		flush_work(&work->work);
+ 		kmem_cache_free(async_pf_cache, work);
++		spin_lock(&vcpu->async_pf.lock);
+ 	}
+ 	spin_unlock(&vcpu->async_pf.lock);
  
--static const struct file_operations kvm_vm_fops = {
-+static struct file_operations kvm_vm_fops = {
- 	.release        = kvm_vm_release,
- 	.unlocked_ioctl = kvm_vm_ioctl,
- 	.llseek		= noop_llseek,
-@@ -6095,6 +6097,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 		goto err_async_pf;
+@@ -186,7 +196,6 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	work->arch = *arch;
+ 	work->mm = current->mm;
+ 	mmget(work->mm);
+-	kvm_get_kvm(work->vcpu->kvm);
  
- 	kvm_chardev_ops.owner = module;
-+	kvm_vm_fops.owner = module;
-+	kvm_vcpu_fops.owner = module;
-+	kvm_device_fops.owner = module;
+ 	INIT_WORK(&work->work, async_pf_execute);
  
- 	kvm_preempt_ops.sched_in = kvm_sched_in;
- 	kvm_preempt_ops.sched_out = kvm_sched_out;
 -- 
 2.42.0.655.g421f12c284-goog
 
