@@ -2,185 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2D317CDE2D
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 16:01:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B44C27CDED0
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 16:14:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344811AbjJROBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 10:01:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47260 "EHLO
+        id S1344988AbjJROOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 10:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231822AbjJROBA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 10:01:00 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CCE9119
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 07:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697637658; x=1729173658;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PZSpbvjgwAY4YZBoKxKFoin1sX3JYllTNPMx6/Mbh5o=;
-  b=FjhWynOlW7Sa0lqFqQCAiDjVpAFoC8gvKi33hLx+7g1S8LromeiGFlp1
-   ad8yznqTmgWIwHuFw8KGfh/fWECUj+7+stG2KAjQ1Ab5aFT0mZPg96jmI
-   RTcbMqNxICPLUUSCMPMMahvJH16plVMqcAfLNTa8qFUpIQ15lHQP2HkVM
-   Po4R07u2ywkp1i3OISgj+mh1c6EJBD6seFp86kz/4qM1aeIjj1nNwU/BD
-   lrXFGaHlTmzqgAL2yTxnbgUyX1onWJ0CKP2s+0r7EGGyRDo4sqDDC9gsq
-   euERTGLf4DeBdEKiCkK6bsHVyQSFrlw0/BXhpOcFs2sMWVF49UPwa5Fuz
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="371080265"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="371080265"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 07:00:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="760230362"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="760230362"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmsmga007.fm.intel.com with ESMTP; 18 Oct 2023 07:00:53 -0700
-Date:   Wed, 18 Oct 2023 22:12:30 +0800
-From:   Zhao Liu <zhao1.liu@linux.intel.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Philippe =?utf-8?B?TWF0aGlldS1EYXVk77+9?= <philmd@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
+        with ESMTP id S1345116AbjJRONm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 10:13:42 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B3310DB
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 07:12:57 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D05EC433C9;
+        Wed, 18 Oct 2023 14:12:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697638376;
+        bh=51fIDWCVKB8uS2JBPxXFm+H74EFZkbMSdzM2pSNC22c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=W+Gvms76pV5hSiJAOrI7JIk44J4aJD7XIdf7yMDCPx20skfodeyV+Cp8GCsFRftJh
+         qz+RiAq7N/TbfgTkm1dyIZ4LCHrmPMhyJYbYbzSGW4OnqNp1Ht5FdCWP0knGAjbLNw
+         ukttiawgU6pYBeK4MaphTHoLfctNQ/ntcCNwaHhFwLCVyn7UT4NZu82tLUXFk+JBAh
+         2mI8IKAxvFfmhVvoUNrHiABrwtp9a07fXKQC1xmVXku52jGP4l0nF9YllHc33owMIw
+         JRL/RW9l5ne/Prnc1Dk6oMQFiEs1CLsbeWW3uiGULtPDGvHGoRWDp0Xv05zBckuotp
+         FGdLs3ivRIO5Q==
+Received: by quaco.ghostprotocols.net (Postfix, from userid 1000)
+        id A57F140016; Wed, 18 Oct 2023 11:12:53 -0300 (-03)
+Date:   Wed, 18 Oct 2023 11:12:53 -0300
+From:   Arnaldo Carvalho de Melo <acme@kernel.org>
+To:     Namhyung Kim <namhyung@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Zhenyu Wang <zhenyu.z.wang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Babu Moger <babu.moger@amd.com>,
-        Zhao Liu <zhao1.liu@intel.com>,
-        Yongwei Ma <yongwei.ma@intel.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v4 21/21] i386: Add new property to control L2 cache topo
- in CPUID.04H
-Message-ID: <ZS/nzpLD/ZmEnpGb@liuzhao-OptiPlex-7080>
-References: <20230914072159.1177582-1-zhao1.liu@linux.intel.com>
- <20230914072159.1177582-22-zhao1.liu@linux.intel.com>
- <75ea5477-ca1b-7016-273c-abd6c36f4be4@linaro.org>
- <ZQQNddiCky/cImAz@liuzhao-OptiPlex-7080>
- <20231003085516-mutt-send-email-mst@kernel.org>
- <ZSA3mfmOz+RZcmct@liuzhao-OptiPlex-7080>
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and
+ add to include path
+Message-ID: <ZS/n5dqo6dZE40HE@kernel.org>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-3-oliver.upton@linux.dev>
+ <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZSA3mfmOz+RZcmct@liuzhao-OptiPlex-7080>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
+X-Url:  http://acmel.wordpress.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Michael,
+Em Tue, Oct 17, 2023 at 03:23:40PM -0700, Namhyung Kim escreveu:
+> Hello,
+> 
+> On Wed, Oct 11, 2023 at 12:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Start generating sysreg-defs.h in anticipation of updating sysreg.h to a
+> > version that needs the generated output.
+> >
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> It seems we also need this on non-ARM archs to process ARM SPE data.
+> 
+> Acked-by: Namhyung Kim <namhyung@kernel.org>
 
-On Sat, Oct 07, 2023 at 12:36:41AM +0800, Zhao Liu wrote:
-> Date: Sat, 7 Oct 2023 00:36:41 +0800
-> From: Zhao Liu <zhao1.liu@linux.intel.com>
-> Subject: Re: [PATCH v4 21/21] i386: Add new property to control L2 cache
->  topo in CPUID.04H
-> 
-> Hi Michael,
-> 
-> On Tue, Oct 03, 2023 at 08:57:27AM -0400, Michael S. Tsirkin wrote:
-> > Date: Tue, 3 Oct 2023 08:57:27 -0400
-> > From: "Michael S. Tsirkin" <mst@redhat.com>
-> > Subject: Re: [PATCH v4 21/21] i386: Add new property to control L2 cache
-> >  topo in CPUID.04H
-> > 
-> > On Fri, Sep 15, 2023 at 03:53:25PM +0800, Zhao Liu wrote:
-> > > Hi Philippe,
-> > > 
-> > > On Thu, Sep 14, 2023 at 09:41:30AM +0200, Philippe Mathieu-Daud? wrote:
-> > > > Date: Thu, 14 Sep 2023 09:41:30 +0200
-> > > > From: Philippe Mathieu-Daud? <philmd@linaro.org>
-> > > > Subject: Re: [PATCH v4 21/21] i386: Add new property to control L2 cache
-> > > >  topo in CPUID.04H
-> > > > 
-> > > > On 14/9/23 09:21, Zhao Liu wrote:
-> > > > > From: Zhao Liu <zhao1.liu@intel.com>
-> > > > > 
-> > > > > The property x-l2-cache-topo will be used to change the L2 cache
-> > > > > topology in CPUID.04H.
-> > > > > 
-> > > > > Now it allows user to set the L2 cache is shared in core level or
-> > > > > cluster level.
-> > > > > 
-> > > > > If user passes "-cpu x-l2-cache-topo=[core|cluster]" then older L2 cache
-> > > > > topology will be overrode by the new topology setting.
-> > > > > 
-> > > > > Here we expose to user "cluster" instead of "module", to be consistent
-> > > > > with "cluster-id" naming.
-> > > > > 
-> > > > > Since CPUID.04H is used by intel CPUs, this property is available on
-> > > > > intel CPUs as for now.
-> > > > > 
-> > > > > When necessary, it can be extended to CPUID.8000001DH for AMD CPUs.
-> > > > > 
-> > > > > (Tested the cache topology in CPUID[0x04] leaf with "x-l2-cache-topo=[
-> > > > > core|cluster]", and tested the live migration between the QEMUs w/ &
-> > > > > w/o this patch series.)
-> > > > > 
-> > > > > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > > > > Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> > > > > ---
-> > > > > Changes since v3:
-> > > > >   * Add description about test for live migration compatibility. (Babu)
-> > > > > 
-> > > > > Changes since v1:
-> > > > >   * Rename MODULE branch to CPU_TOPO_LEVEL_MODULE to match the previous
-> > > > >     renaming changes.
-> > > > > ---
-> > > > >   target/i386/cpu.c | 34 +++++++++++++++++++++++++++++++++-
-> > > > >   target/i386/cpu.h |  2 ++
-> > > > >   2 files changed, 35 insertions(+), 1 deletion(-)
-> > > > 
-> > > > 
-> > > > > @@ -8079,6 +8110,7 @@ static Property x86_cpu_properties[] = {
-> > > > >                        false),
-> > > > >       DEFINE_PROP_BOOL("x-intel-pt-auto-level", X86CPU, intel_pt_auto_level,
-> > > > >                        true),
-> > > > > +    DEFINE_PROP_STRING("x-l2-cache-topo", X86CPU, l2_cache_topo_level),
-> > > > 
-> > > > We use the 'x-' prefix for unstable features, is it the case here?
-> > > 
-> > > I thought that if we can have a more general CLI way to define cache
-> > > topology in the future, then this option can be removed.
-> > > 
-> > > I'm not sure if this option could be treated as unstable, what do you
-> > > think?
-> > > 
-> > > 
-> > > Thanks,
-> > > Zhao
-> > 
-> > Then, please work on this new generic thing.
-> > What we don't want is people relying on unstable options.
-> > 
-> 
-> Okay, I'll remove this option in the next refresh.
-> 
-> BTW, about the generic cache topology, what about porting this option to
-> smp? Just like:
-> 
-> -smp cpus=4,sockets=2,cores=2,threads=1, \
->      l3-cache=socket,l2-cache=core,l1-i-cache=core,l1-d-cache=core
-> 
-> From the previous discussion [1] with Jonathan, it seems this format
-> could also meet the requirement for ARM.
-> 
-> If you like this, I'll move forward in this direction. ;-)
-> 
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2023-08/msg03997.html
+When building with CORESIGHT=1, yes.
 
-Let me get this thread warmed up again.
+I have it in my tests and:
 
-Could I get your initial thoughts on the general cache topology idea
-above?
+⬢[acme@toolbox perf-tools-next]$ ls -la /tmp/build/perf-tools-next/util/arm-spe.o
+-rw-r--r--. 1 acme acme 135432 Oct 17 16:49 /tmp/build/perf-tools-next/util/arm-spe.o
+⬢[acme@toolbox perf-tools-next]$ ldd /tmp/build/perf-tools-next/perf | grep csd
+	libopencsd_c_api.so.1 => /lib64/libopencsd_c_api.so.1 (0x00007f36bfca5000)
+	libopencsd.so.1 => /lib64/libopencsd.so.1 (0x00007f36be2e0000)
+⬢[acme@toolbox perf-tools-next]$ rpm -qf /lib64/libopencsd.so.1
+opencsd-1.3.3-1.fc38.x86_64
+⬢[acme@toolbox perf-tools-next]$ rpm -q --qf "%{summary}\n" opencsd
+An open source CoreSight(tm) Trace Decode library
+⬢[acme@toolbox perf-tools-next]$
 
-Thanks,
-Zhao
+Well, double checked and arm-spe.o is built by default, only way to
+disable it is using NO_AUXTRACE=1 in the make command line, but then
+IIRC one needs linking with opencsd to decode all those traces, right?
+
+Anyway:
+
+Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+
+- Arnaldo
+ 
+> Thanks,
+> Namhyung
+> 
+> 
+> > ---
+> >  tools/perf/Makefile.perf | 15 +++++++++++++--
+> >  tools/perf/util/Build    |  2 +-
+> >  2 files changed, 14 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
+> > index 37af6df7b978..14dedd11a1f5 100644
+> > --- a/tools/perf/Makefile.perf
+> > +++ b/tools/perf/Makefile.perf
+> > @@ -443,6 +443,15 @@ drm_ioctl_tbl := $(srctree)/tools/perf/trace/beauty/drm_ioctl.sh
+> >  # Create output directory if not already present
+> >  _dummy := $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(beauty_ioctl_outdir)')
+> >
+> > +arm64_gen_sysreg_dir := $(srctree)/tools/arch/arm64/tools
+> > +
+> > +arm64-sysreg-defs: FORCE
+> > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
+> > +
+> > +arm64-sysreg-defs-clean:
+> > +       $(call QUIET_CLEAN,arm64-sysreg-defs)
+> > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
+> > +
+> >  $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $(drm_ioctl_tbl)
+> >         $(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
+> >
+> > @@ -716,7 +725,9 @@ endif
+> >  __build-dir = $(subst $(OUTPUT),,$(dir $@))
+> >  build-dir   = $(or $(__build-dir),.)
+> >
+> > -prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders $(drm_ioctl_array) \
+> > +prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders \
+> > +       arm64-sysreg-defs \
+> > +       $(drm_ioctl_array) \
+> >         $(fadvise_advice_array) \
+> >         $(fsconfig_arrays) \
+> >         $(fsmount_arrays) \
+> > @@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
+> >  bpf-skel-clean:
+> >         $(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKELETONS)
+> >
+> > -clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
+> > +clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
+> >         $(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)perf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
+> >         $(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.cmd' -delete -o -name '\.*.d' -delete
+> >         $(Q)$(RM) $(OUTPUT).config-detected
+> > diff --git a/tools/perf/util/Build b/tools/perf/util/Build
+> > index 6d657c9927f7..2f76230958ad 100644
+> > --- a/tools/perf/util/Build
+> > +++ b/tools/perf/util/Build
+> > @@ -345,7 +345,7 @@ CFLAGS_rbtree.o        += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ET
+> >  CFLAGS_libstring.o     += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
+> >  CFLAGS_hweight.o       += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
+> >  CFLAGS_header.o        += -include $(OUTPUT)PERF-VERSION-FILE
+> > -CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/
+> > +CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/ -I$(srctree)/tools/arch/arm64/include/generated/
+> >
+> >  $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
+> >         $(call rule_mkdir)
+> > --
+> > 2.42.0.609.gbb76f46606-goog
+> >
+
+-- 
+
+- Arnaldo
