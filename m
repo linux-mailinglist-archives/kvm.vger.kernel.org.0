@@ -2,143 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB9F17CE79A
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 21:20:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F8487CE7A5
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 21:23:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231341AbjJRTU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 15:20:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
+        id S231521AbjJRTXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 15:23:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbjJRTU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 15:20:26 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48C6114
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:20:24 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9e994fd94so47220475ad.3
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:20:24 -0700 (PDT)
+        with ESMTP id S230477AbjJRTXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 15:23:33 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DB611D
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:23:31 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7d261a84bso111877337b3.3
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697656824; x=1698261624; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697657010; x=1698261810; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=H7ppnBIIrbmfIJgnyx9B9RiTitNvmGmwskuXYW2Y3sk=;
-        b=Eh+lgmU/yLFcI4f/ahRmW3zanjUCZG9OkK3vNWgq1j9GrPbUBhq09t376RbY1BBXDo
-         JbspcSvDp2LYTk/d4EXp/e17UBoGy/w1vjEOGKf24/ZOQHfJ6++hoO1pVb2Fj5HAAJFG
-         zzBNeEQqFXeitii8VRQ0+lQ6uP/aZd83yq24Fd0fWwARrYErbsgspqURWOaA1MQpMBR0
-         aj5jhWZUBIX27A0ThvrEoq/onaw3UnjKlK1I9jdKhm9p90xZ/9L6JsBQ8MgPuF+pCakc
-         XvKdftOY3ezawUHR1D1a03Y8+rOxPbSsN+lUJ70bfNId7wasXeEQ4vjWoT9EUafYnezx
-         I6lg==
+        bh=nodpH4C4bQ/gNaICo1hh4M7XTXxxvuUKNCjUFbiep9I=;
+        b=p8oqL8104jOuVWELkmr4wobfylJAOtjigEl/yNhBatjRBxW2x+UxdzB4p1PjD2dSba
+         ow8UjseMnh9Ba4IaOJY5Gs0pblrrDhGXFxDi41+RU4fZKH8J+CSCoelJOkOxwbNanXro
+         XWvyOAaS1JZklMBtUzzw/Z7FwSvcJZG3Q2CL7FMUclLzQzH59JQyKsm/ScVOePVz6q0R
+         GjlsKPIVLGzEKjMlnq3mKL5r8sxFtMv0kna8cEbVu8qntXKl9Qa4wUxttqHnp8Y5pieU
+         m06iXzXmX9hL6DYoG7EzuLWsD+cTnj5823jD+11pUEvyaTyulHEJCAWd2+HyQaUve9oP
+         qYug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697656824; x=1698261624;
+        d=1e100.net; s=20230601; t=1697657010; x=1698261810;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7ppnBIIrbmfIJgnyx9B9RiTitNvmGmwskuXYW2Y3sk=;
-        b=iIOKcO5Ry0RI2qWYVDTrMeZoCEkPGXn1zhbo8SfFCxbvks0hCx/t3DbnEhfO5jqZ2C
-         v4Z+CKtBoegj3kmIPIGH4UGgE18OJOk3iD7zZbX/Qa9wILC3BeVtGMyZ0E3p5unpME3J
-         CA4HoBg1/bIa1jH9aTDpuS4KWnKdHJkqo9Mmn7DBDwT9yJQbgsRC2tiKMR+jC9hlyrX/
-         +L7rkRugYObC4oy/mf5bYYVhMeqn3QT0FaQqHGDswVVFItC0dFMkGD7/HIe82xur8l7Q
-         Ab5f5z/+zeMKOiD2RUlVWwr+OsM9r35IkWF7xwCPxSe9c952va2mFTviYhFncFT9C8qq
-         kqHQ==
-X-Gm-Message-State: AOJu0YxvhJDVkOqJjj/1DHgmACfSQaHR61LkHyAaYcWe33x+lANbhQLh
-        oaxnyOcGLn76HGHhirCg2JuD+eKg84I=
-X-Google-Smtp-Source: AGHT+IF8fprxOwg9NLxhNoiGVvB0E6ikGR9g208TVUDNojr9nRxzSrwsgdHktxGZJqj/q79lONDYyGyPxWM=
+        bh=nodpH4C4bQ/gNaICo1hh4M7XTXxxvuUKNCjUFbiep9I=;
+        b=D1FRD0D/gXPRVhoa4wec8GMs6g73QGfRWhdFB7AQv49nJFusBOiWMp/KP2mHQ9Ff+r
+         R/Pd0MUHNP5b5nCc8rx7rLLUvUQmVdHD6HEoP2tIY3pgtPRE+0DfWYBKkOOzILNpAuIe
+         0Gn5EhN8CwRQ6XaqH3mVK6Q7xPMvLXbfylS6uuM8jntdz2M8bzSfXZcmVSb2UJUzhQyI
+         Fs4nbZeK8klDznCVkX/hR7g6QnMUkfjBAaemaw1fFjB5dspt5v1LhFtM745pd7gFnHIx
+         ii31e9AoiYW54Vis2hyc4Y/JF1JnVg52jBsIRhADgaXszKgKfaJ2V/l+e3E/fHaTxghN
+         3h8Q==
+X-Gm-Message-State: AOJu0YxT4WaVfBy8gRiWWQ9WGg0u2yGin410zsKk+xAQ5isuFLdU7GNH
+        VRZucGIwVB86xwFg+T+oXG0tXDx4SI0=
+X-Google-Smtp-Source: AGHT+IFmGxaXOt4/cBpfYV39xsYcl21XLtTTYlfhhkHY00t9wInu5pOx40L8w/7hPanWGs0YbTQEg8QQDMI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c9c4:b0:1ca:a382:7fc1 with SMTP id
- q4-20020a170902c9c400b001caa3827fc1mr6069pld.12.1697656824132; Wed, 18 Oct
- 2023 12:20:24 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:6c4f:0:b0:592:8069:540a with SMTP id
+ h76-20020a816c4f000000b005928069540amr4397ywc.8.1697657010698; Wed, 18 Oct
+ 2023 12:23:30 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 18 Oct 2023 12:20:21 -0700
+Date:   Wed, 18 Oct 2023 12:23:25 -0700
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231018192021.1893261-1-seanjc@google.com>
-Subject: [PATCH v2] KVM: SVM: Don't intercept IRET when injecting NMI and vNMI
- is enabled
+Message-ID: <20231018192325.1893896-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Declare flush_remote_tlbs{_range}() hooks iff HYPERV!=n
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Santosh Shukla <santosh.shukla@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When vNMI is enabled, rely entirely on hardware to correctly handle NMI
-blocking, i.e. don't intercept IRET to detect when NMIs are no longer
-blocked.  KVM already correctly ignores svm->nmi_masked when vNMI is
-enabled, so the effect of the bug is essentially an unnecessary VM-Exit.
+Declare the kvm_x86_ops hooks used to wire up paravirt TLB flushes when
+running under Hyper-V if and only if CONFIG_HYPERV!=n.  Wrapping yet more
+code with IS_ENABLED(CONFIG_HYPERV) eliminates a handful of conditional
+branches, and makes it super obvious why the hooks *might* be valid.
 
-KVM intercepts IRET for two reasons:
- - To track NMI masking to be able to know at any point of time if NMI
-   is masked.
- - To track NMI windows (to inject another NMI after the guest executes
-   IRET, i.e. unblocks NMIs)
-
-When vNMI is enabled, both cases are handled by hardware:
-- NMI masking state resides in int_ctl.V_NMI_BLOCKING and can be read by
-  KVM at will.
-- Hardware automatically "injects" pending virtual NMIs when virtual NMIs
-  become unblocked.
-
-However, even though pending a virtual NMI for hardware to handle is the
-most common way to synthesize a guest NMI, KVM may still directly inject
-an NMI via when KVM is handling two "simultaneous" NMIs (see comments in
-process_nmi() for details on KVM's simultaneous NMI handling).  Per AMD's
-APM, hardware sets the BLOCKING flag when software directly injects an NMI
-as well, i.e. KVM doesn't need to manually mark vNMIs as blocked:
-
-  If Event Injection is used to inject an NMI when NMI Virtualization is
-  enabled, VMRUN sets V_NMI_MASK in the guest state.
-
-Note, it's still possible that KVM could trigger a spurious IRET VM-Exit.
-When running a nested guest, KVM disables vNMI for L2 and thus will enable
-IRET interception (in both vmcb01 and vmcb02) while running L2 reason.  If
-a nested VM-Exit happens before L2 executes IRET, KVM can end up running
-L1 with vNMI enable and IRET intercepted.  This is also a benign bug, and
-even less likely to happen, i.e. can be safely punted to a future fix.
-
-Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
-Link: https://lore.kernel.org/all/ZOdnuDZUd4mevCqe@google.como
-Cc: Santosh Shukla <santosh.shukla@amd.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
+ arch/x86/include/asm/kvm-x86-ops.h |  2 ++
+ arch/x86/include/asm/kvm_host.h    | 12 ++++++++++++
+ arch/x86/kvm/mmu/mmu.c             | 12 ++++--------
+ 3 files changed, 18 insertions(+), 8 deletions(-)
 
-v2: Expand changelog to explain the various behaviors and combos. [Maxim]
-
-v1: https://lore.kernel.org/all/20231009212919.221810-1-seanjc@google.com
-
- arch/x86/kvm/svm/svm.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 1785de7dc98b..517a12e0f1fd 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3568,8 +3568,15 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
- 	if (svm->nmi_l1_to_l2)
- 		return;
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 26b628d84594..f482216bbdb8 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -55,8 +55,10 @@ KVM_X86_OP(set_rflags)
+ KVM_X86_OP(get_if_flag)
+ KVM_X86_OP(flush_tlb_all)
+ KVM_X86_OP(flush_tlb_current)
++#if IS_ENABLED(CONFIG_HYPERV)
+ KVM_X86_OP_OPTIONAL(flush_remote_tlbs)
+ KVM_X86_OP_OPTIONAL(flush_remote_tlbs_range)
++#endif
+ KVM_X86_OP(flush_tlb_gva)
+ KVM_X86_OP(flush_tlb_guest)
+ KVM_X86_OP(vcpu_pre_run)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7c228ae05df0..f0d1ac871465 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1614,9 +1614,11 @@ struct kvm_x86_ops {
  
--	svm->nmi_masked = true;
--	svm_set_iret_intercept(svm);
-+	/*
-+	 * No need to manually track NMI masking when vNMI is enabled, hardware
-+	 * automatically sets V_NMI_BLOCKING_MASK as appropriate, including the
-+	 * case where software directly injects an NMI.
-+	 */
-+	if (!is_vnmi_enabled(svm)) {
-+		svm->nmi_masked = true;
-+		svm_set_iret_intercept(svm);
-+	}
- 	++vcpu->stat.nmi_injections;
+ 	void (*flush_tlb_all)(struct kvm_vcpu *vcpu);
+ 	void (*flush_tlb_current)(struct kvm_vcpu *vcpu);
++#if IS_ENABLED(CONFIG_HYPERV)
+ 	int  (*flush_remote_tlbs)(struct kvm *kvm);
+ 	int  (*flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
+ 					gfn_t nr_pages);
++#endif
+ 
+ 	/*
+ 	 * Flush any TLB entries associated with the given GVA.
+@@ -1825,6 +1827,7 @@ static inline struct kvm *kvm_arch_alloc_vm(void)
+ #define __KVM_HAVE_ARCH_VM_FREE
+ void kvm_arch_free_vm(struct kvm *kvm);
+ 
++#if IS_ENABLED(CONFIG_HYPERV)
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+ {
+@@ -1836,6 +1839,15 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
  }
  
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
++static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn,
++						   u64 nr_pages)
++{
++	if (!kvm_x86_ops.flush_remote_tlbs_range)
++		return -EOPNOTSUPP;
++
++	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
++}
++#endif /* CONFIG_HYPERV */
+ 
+ #define kvm_arch_pmi_in_guest(vcpu) \
+ 	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5d3dc7119e57..0702f5234d69 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -271,15 +271,11 @@ static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu,
+ 
+ static inline bool kvm_available_flush_remote_tlbs_range(void)
+ {
++#if IS_ENABLED(CONFIG_HYPERV)
+ 	return kvm_x86_ops.flush_remote_tlbs_range;
+-}
+-
+-int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
+-{
+-	if (!kvm_x86_ops.flush_remote_tlbs_range)
+-		return -EOPNOTSUPP;
+-
+-	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
++#else
++	return false;
++#endif
+ }
+ 
+ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
 
 base-commit: 437bba5ad2bba00c2056c896753a32edf80860cc
 -- 
