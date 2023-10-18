@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3F417CEB26
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 00:26:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 932317CEB28
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 00:26:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbjJRW0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 18:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53658 "EHLO
+        id S231629AbjJRW0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 18:26:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbjJRW0g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 18:26:36 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2066.outbound.protection.outlook.com [40.107.94.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844AC95
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 15:26:34 -0700 (PDT)
+        with ESMTP id S231567AbjJRW0q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 18:26:46 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E878113
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 15:26:44 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G6JRUvrC6lcjZUeJz7SBUkiZfkbCxr8AiXJC2iA4bC2a6LVVoeySWjKJMyAa0cYcSRuYco0LEH1FSiqrq6y5uondSqamvobcBIBz0IMory5ZI6rblWfasYEngTfPgb8IBKKUg0wqM6rCRboh6way3CM5INW8Z4fUH57ZL9NWhI0gCELKqkN8Uv9TViv3YOWmMmtGTVlD16TOpFon4BN6JonJf6o3RSYOhr7dmoc5Qt0HEbTj0Eumf4kGBhZErOrcUCc9uAqnExkcbQHoNwJwXD700J4SjslZPhTHFXHOMD0YipoVeivdK80uwaqXmsEKDQ44Y5/7G4pLHhulTcjSLg==
+ b=ih/oybiz9m9j8gct/BYinPn5ESHX9MFhdtvXubooDk+iVNEBlB3Igg7WQ3yfhlyrJGeop85ZdBggJGDC82EZ8k+Kj3RqdEpc/OpzcjS9PXwbGN91/ag3S0IVuJ1sEtNRJk1eYEt0B2JzcsK/fdUeH5lr19jnobAvbeICoOo5yeksqe+vp8qwDcLrun4B9pxia9/UY/RVubQxidmT3aDp5Hueyvvuqua05ifWg7POhUj1ABgriTuQhu74zzaX3/uyFSGsWIpNFtiJMd1ygftFaPbJ0pZWzQL3mIn3dTb1IbOL+PyQh7fVZblBauw4NWtqTcolbFYOIp3+PqrqMOgquw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+T+Cnxmf2Tz0PsTCg91cH5NyMlPvuC3f+aX2EAmv0IU=;
- b=YN4taU512PoDNfzDeo12ZMnOsdpIf9gC0t0i4MdzQCm46fYG2+WASAkWc6MNVKR8f+ndauAw4OxaBJRKfS7hga3jPuwcRqYNJiiWve5nlPAeNaIxbtrHPxb46SXaxR4lgJNn9oIDzE+znOp2Zuft6yV+VxIu+Z9FYmssukMXJvx5UcGlNZZFVGR/YrFl6v+aAKAVdUTheVBIrRxmVUCT8bl8vHAr3aT+FvINi8TbksvCSNtavQ9xR1cOwcIvjnoo2zM3nbmpxiVQcfNPFkACwLiQsIByOVcKDtyhHd8tZimTNr7DN3ii5mQi0Dxt8TVaPrsMnhqfK9pX6FuDVqapXQ==
+ bh=MKRpdjWKnFfkYeGqteI0Ywq4g5S8bIHz97B9o6Mefm0=;
+ b=RGsYgy70wweX2s6DHnBgHs3JPE15CWXiEziMG9WvQ2ivtMZaWlbakkewqsdPovAxSun0YmS2RH10G8fUtrKjJ5Qms0rDisZHhZ/x3eem6gCL4wO1in0ATH5IlAHG7NCcTmsEng1J9dyERU+TJG7JjUu4NCPvr+5jtfiyLEPwj1+UXoJk9di6fB44yqlO3lgUl42eeMnEl1rJlEWLv+B6cMqaXJSIFttMYuWLaULRlb5+v6WzDhi4q3P+FGnDKuECcUgSUVlaMwC+7K6mU8WnC/KJuX1ILTcaNezwSU25TeRQA/VypBPvspB3bQ3bdir4TDgF/CzF4W8q+SscSBy30w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+T+Cnxmf2Tz0PsTCg91cH5NyMlPvuC3f+aX2EAmv0IU=;
- b=f0sIlcwOqjYviAEHMzQf95UL5o+5tBZvMBCOet1M+ui2gliwkzo1eqDUUEOCYWZmE9e1PWLTdc9TM7anAVoCsfEJEgP8wRSe4J6hdiKRmGih4ap008R18i8u/niG5mDtaQUGsZ05ENFKoasYg6NIGdSTbSZOov2IbIAvuXPU1xkUslF7hlwr4ZdZFwUdbgpd5y4pnvK4cd8vDas83wmeDHsgsTkwtrsR9y3u/wGEAKRkpwpS0tkCc5MjOtkcR3j0kNRQbZC7iDla+sA0ZPgIkqBhRTEcDOVeWcCjwEit3UTkXR81cVTETxYkdm8GauxWzsk1CrHkt8Cvkv3TSLlTSQ==
+ bh=MKRpdjWKnFfkYeGqteI0Ywq4g5S8bIHz97B9o6Mefm0=;
+ b=X7SwtcL3f0UO9Hhzab7oKnhFEB8/R3k/iYaOkBotWZquegxsfbn3DSnKysKHYYaH7PnUzkEKCmXGKxZ2aXIH7a9resd+cTWPNhr6FGLTB36EYIzzujwPwcptkZU26OcnFrlggsBrNg/0sM9tzXC+nsFeRYeQtg6orZjDR3Y387CsZLud+ry+CTR8mDsNPVU0rsZY34JPLCoryy4N7urrxnuaLoJbwPd16DZ7g6Zr6Felm/o+qiK/H5n9834nJxg+eD6/PW+wnwoHII/eyM6wfgh/eG9MU/Aiz2MKhxWsK2NLs4N/rEHc7NzXrgviwuwArcsLLH158GO2n4gSJU4kCQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by IA0PR12MB7697.namprd12.prod.outlook.com (2603:10b6:208:433::19) with
+ by BL1PR12MB5969.namprd12.prod.outlook.com (2603:10b6:208:398::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Wed, 18 Oct
- 2023 22:26:31 +0000
+ 2023 22:26:41 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
- 22:26:31 +0000
-Date:   Wed, 18 Oct 2023 19:26:29 -0300
+ 22:26:41 +0000
+Date:   Wed, 18 Oct 2023 19:26:38 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
@@ -56,64 +56,64 @@ Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
         Zhenzhong Duan <zhenzhong.duan@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH v4 05/18] iommufd: Add a flag to enforce dirty tracking
- on attach
-Message-ID: <20231018222629.GI3952@nvidia.com>
+Subject: Re: [PATCH v4 04/18] iommu: Add iommu_domain ops for dirty tracking
+Message-ID: <20231018222638.GJ3952@nvidia.com>
 References: <20231018202715.69734-1-joao.m.martins@oracle.com>
- <20231018202715.69734-6-joao.m.martins@oracle.com>
+ <20231018202715.69734-5-joao.m.martins@oracle.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231018202715.69734-6-joao.m.martins@oracle.com>
-X-ClientProxiedBy: BYAPR01CA0019.prod.exchangelabs.com (2603:10b6:a02:80::32)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+In-Reply-To: <20231018202715.69734-5-joao.m.martins@oracle.com>
+X-ClientProxiedBy: SJ0PR05CA0025.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b::30) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA0PR12MB7697:EE_
-X-MS-Office365-Filtering-Correlation-Id: c2904790-05c0-440b-8901-08dbd029479c
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5969:EE_
+X-MS-Office365-Filtering-Correlation-Id: bdbb2e66-b499-46fb-3763-08dbd0294d1b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rbzVqM3XXMBQFD+nk+c+Bezb0LrEyZUN3y+CotGPHvXILbYL8pR+As4W5szAZ/zLfCxXndwpNpCcwbAbX5dHfT+x0CB1+/uXmsAQtQlCaOzRIciNEayh8VplFmSM6snqBhBDz2sKF/bkN1i46rgEvXI3Et+LDCFbUiZw5Zvvx9hAg5HSolk7Jk+ecv5FM+LToD0QaTCf4GJADa15VkGYToDknDzh24pzSDOO0ozNzvVEcBl3xtCMGZlyoFWZjvhMQbYgSjPZXmBuf/YVrF55NeJ1D4g5JLQOeexlTfRwynqbFz0T2faah1viCj4kyoU418WCAa5ZTkuqW10yDtJlPxp9lKUxnqCbYqG6SIdQHI4HWM98+ihqU09eZ/+7vDezoB9kn1pwm7KhjktskPyLMz8nLjFcJCmglY8Z1DjUwv/f2pmRZ4JA7qgtiL0wK4lmlXtVRunortWAvwUjxX8Gk9eWI9EvBmPj/+mGC736e4QhsU6NRdVt8gC4iKVAH2vclFucud9r+eLELrnNIWUWmL+0UJC2kmE6DQazY5I9bci6xiQUC91H9W8s2HeLhsnaPdAqOr8TaDAe9s+bGNXLZ2dha94EZF1NCrFCdzIvGDPFwRnH87P8yZ0zPusB+cyGYsE2VgFKVtQw9OZFtvm9AA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(396003)(366004)(376002)(136003)(230922051799003)(64100799003)(1800799009)(451199024)(186009)(5660300002)(66556008)(83380400001)(26005)(66946007)(478600001)(54906003)(966005)(6486002)(6916009)(6506007)(1076003)(316002)(6512007)(2906002)(4326008)(41300700001)(8676002)(36756003)(7416002)(33656002)(8936002)(86362001)(66476007)(38100700002)(2616005)(14143004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: U+/WLZb/IMD5xyeIc2Bp6uAjwN12FLIumbFuIBoXBieoGvYs2RSKdUoUUksSbT+AurYBSvS+5GhpFE+LDVmpL4o/D1fimUpz892FK8m3TMOF7ahKckBfUtalBzvmLPJrqeRAGTg3u9R+JJpzvdTJjmFFCNTv62YB/FIcG8ThpWft1lXyUiUyyKMs+6QYNo7+EBJq7lyee7DPWYaE2d21ZTXshDsn8s6S1NIcKppvR8b/IvChsPleDAfis8eyEuiOrwm1lYhik0eeg3Sqd42FhFfRNe7kDTURo5fyxUNMoPL0WW+3et8FnsiJkWjuthKjz+/gmK0pGMJsdPDZbSpIc3Phpz2IPUE6/jYLJKz6Om37T3qu19TD7Nz6pDuLdWYDheEaxWjynBrwHDpwDk+Ckx4yB7lJSkhrAbKU4U1bvLIidudFyOk6fQ9+6a7uSXEFtiEgFRtvbK9y4wd4pEXTiaD9oVnUMEmsXL2TiWT7wxzKGafA1yccvY+MSBl80mn+QYo+CrLwFxdngDA/Z5n3Qn3it4nbHtrKmJ/xmqXVEZW5dICi5wHM73x2BmHuDKz4psVUh/gxpbyOB5ZGW0WTw0uVeSArUTrvZUzG2Av+DlU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(396003)(39860400002)(376002)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(1076003)(26005)(6666004)(4326008)(6506007)(83380400001)(8936002)(2616005)(8676002)(5660300002)(41300700001)(7416002)(2906002)(478600001)(6486002)(6916009)(54906003)(66476007)(316002)(66556008)(38100700002)(86362001)(66946007)(36756003)(33656002)(6512007)(14143004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tSXwWr+wUQYHxbJrD9tMfBDY19YkRyzYv6jlneuzQ/inWzCY+kWBE81/I8Ch?=
- =?us-ascii?Q?NXUZXbawOn8abvcivsqDoY0C00wBnc3T8S1MRt3Xvg6KjbZLzU/3KjE7rY+D?=
- =?us-ascii?Q?voBCtg0s2yJeTlfQOQTV57olw00l02TqDqCJ5D9ppPlMLXCRDM27MsKfAClP?=
- =?us-ascii?Q?bnfS2vDBf9l9r65xCwYrBfyAVPZ6mx6Shd/uDYGdn39f6LsAG5oJDb8MIF78?=
- =?us-ascii?Q?9gzyKDiFrSx5HMJBIgQ5pvC7ngd1J1K74+OuAkVUw9GvG1kyAUoNM3KVHUAG?=
- =?us-ascii?Q?O1DHZZ9sqFy2sQpEhd1efjatOtGIWAeXC7wQIEpID4opWry2krAgd8DGXKnZ?=
- =?us-ascii?Q?ZCIt3UVFyp90urNxvy695IxNC7wZDhiLc+SUCQZPJsFSYJNAiG5/qAWmhHtB?=
- =?us-ascii?Q?jXib/D4zroavmqW14SdWnwScU1Ya41bpR6hBzGJz6cwDQxYc3Me4bxmSM2kY?=
- =?us-ascii?Q?4CXZLrcedVEMAF4kot8YKvrA6FiXLQB571hgRJlU4sAP72zNmpuwjKH4eGcG?=
- =?us-ascii?Q?JIZ4SkkCoS4+9mMTV3aL2y0OKpH8Moj+sZ+D8KLMxLaJeo+MRlLhu2iC+UDH?=
- =?us-ascii?Q?aLaRqcbLkNhQWN6g0zuZ+jbe+WSncPSfZWwzR47wSlFfruj2CcjfjyYE/HNH?=
- =?us-ascii?Q?vfIiBK4/oPIoxO/6lAD8N0R+7Q5Qfs6gueTGT0neGoKwdbsNsLPrubnQJCAx?=
- =?us-ascii?Q?qbTUM+SwCy6iFBf0KhzO/A0NCRGX85RoBC6pzDRVoBNN6sh1oXW3N9XCPj9H?=
- =?us-ascii?Q?pIAnWzCdsUxbfpuflUj7K89Au0uHxMoFruBaVNqU5QQyjaBBYMM6yVWrhTy3?=
- =?us-ascii?Q?tuswRF42CAdLh3Mcddh8aSKrN63ns/HCEfPz9O6c7miiWkz6xdbjBuxp515a?=
- =?us-ascii?Q?5uyzwWSKqU7uKUdoUyZbeAU119Wg2H+eZkx/2NcM4ZvNPSevVEVH0l+pGnTD?=
- =?us-ascii?Q?oBlb4E3E/knZz3qj0cZRyBYQRBvrh+sC5DVVO0hqt1m7W76dNrVbckmqTtW5?=
- =?us-ascii?Q?/M2o+Wqbw5yKQiC/nfIRtOa9U/yUS2jEgcKkqp9fbzJQJg5m6ExjHMA5/w0T?=
- =?us-ascii?Q?toDDRXFOXB0ZEHzAi6qCN5Jkyel52//QPBSHaOsjWx5jHGNJBx+sm8l6u2Qa?=
- =?us-ascii?Q?kISZbNo1oj0i33khqd+1HpDBShky+KSYZod+qPy6HT/bxwg/a0CReHw77/YE?=
- =?us-ascii?Q?sC91F5GvvXLnl7DVN0MWGZreofsqFJvuUR7VC7HlWq0KXFFAtD9pAD1Kyloy?=
- =?us-ascii?Q?usRDsWVEkejNjTGeNmsAZODbeIlgd5NT+/sQup7pB5rjGXPBeGPLyWEhqSOP?=
- =?us-ascii?Q?pdD4U4wspFT4QB3z99TUV/YK4bbVPKy2HH6CGnx83NGYYQAQD/YbC5hYtUgf?=
- =?us-ascii?Q?KIzwtybrCyY7txcWBI2rQm23k7N6dy1y2es4aP9K1MHiv7zROhqb0ALHAOtI?=
- =?us-ascii?Q?WmOYP4C+KAFJf5sy+n1MuV7RZh9zroiktTK7kzrgSp//bOuR7K3vzOnORgFv?=
- =?us-ascii?Q?u32UVnr0JeCQ3slR+cmU98cO5a+3e76b8DDOVyEE/6qtAVgLmp/gr4CmLG4G?=
- =?us-ascii?Q?r5KvkrXvbJ4zgp3U1eSpGTtDd26Jqk3HIt8XojGB?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?7kkZBSUkrCJtFFqFKgQjq7FX8O2xVem+SzOz6G4Z9HXa1wB5hyBy2VcgCxhv?=
+ =?us-ascii?Q?6rcsCg+u8vZv4BzkgbddJOhx2U3rEbes1BUzRrjq8FOLDp7+qBBsCD7qYFQj?=
+ =?us-ascii?Q?cbku2iRpgCwEXu6+t3wOPNXF6+JVjOWxIr82QQ3mEKhU+sa3H5KG1c5mgFMm?=
+ =?us-ascii?Q?1jF3HUejWP+psqkmKNLeI7CJW/8eELgTpBbXRFDUJY0F3E1Lci/YhVPStQiM?=
+ =?us-ascii?Q?vhgZz4iXba+k3GaR9z3tguCsOqax8YEp/SEpzivyHV7/FfBsBrIg/9aHVEN8?=
+ =?us-ascii?Q?KFGp+vtedVBiqzMNyyrYA21EjGZ0WbUEyyIyxL0kH38q/G/7HxIuIve4SCYo?=
+ =?us-ascii?Q?WS9K+CRJSi5BwSHue8fx8Rozhn4+SrHHbvwkLJkpQYD3ykSvfnoUQ+usNVud?=
+ =?us-ascii?Q?L3W25RqcitO/3VA5twF3iaIb337e7h+KVWbtTFgVB7G1mRqWTauJ89Wyteae?=
+ =?us-ascii?Q?2tApSj4JtRqGHqGeVc4H/AkKmTwPJ8PY7R2PBNJZdQ7qViyAv7xvVKvfN1Tw?=
+ =?us-ascii?Q?BrBi5/9oz4MVGd9Mv3kfMiKg77KvjxSvwvd8jkWaDr72UVCMq/Ig69f3faGP?=
+ =?us-ascii?Q?ykVyQm/SAFG/0+g1uVoQWYcwo2MReLRZjsFWStWgGYz8f2xYyj5MaRziWiEr?=
+ =?us-ascii?Q?GYoEeNreccbBVQS4Y5z3+LmcHFKB7q7SzFfEfIeO0CspCsvw4OjgO5XWQ9iQ?=
+ =?us-ascii?Q?KAFDoKHsNcIrYQi6LhQ/JN5uBB42CHSWPngI9o2ZPuU7TPKc581JHLUiEgfw?=
+ =?us-ascii?Q?5IzsXi+L1knDpVbGJc7hiAmCyCU+bBJ3yrXXgLMSM+jSdUPPB/HMbm5HXU2y?=
+ =?us-ascii?Q?oh0mQJf9mtb+XuAJrl5H50ur320wrGPVazwTb3YHvvxFRc6mSkCifikJb4RV?=
+ =?us-ascii?Q?mPxIxD36oetv/gVdB3eTXKPEsvc1TO+/QTpEZq+Fa7P6grJ9jOQNScUBvLt3?=
+ =?us-ascii?Q?uKeHaiYv6xFTNKyoNaWqbEVvDbH+fz2Bt+Z5em9siXMhDiWXcLtuF0ML/I9J?=
+ =?us-ascii?Q?b/pzODtrhUnMoj+C8ARbAGB86jsyrCZj+9yZCJhT6uHm3bfVKLP7FZb8m9lI?=
+ =?us-ascii?Q?x+fpG2773z00VUtRJhEtMQcc5gtcU52mIJnx0P9zZztq/A0z3yUBomQqxzRM?=
+ =?us-ascii?Q?eKT5xB9rMhUewsQ1z7Uy/GMWOH3wkhI0SHD2Vgf4mncTbqFRRma+Ha6fBlk7?=
+ =?us-ascii?Q?lO+WpEYndKPmgfBXumzvu3JjKYOHf2p+hVCjI2qOWAis0QfLuZMH18lF7V7A?=
+ =?us-ascii?Q?UHzANmPpsDwnR5AtIeuUMccxluCrTrHpICDXYN6hOpBYzJfv+BhBKViPlmg6?=
+ =?us-ascii?Q?3GiaEgNtKW+eRTO4mgVItwUVNIwNzcwJx1dbWf2lzzvEqY6SHRnXuxaDIt6q?=
+ =?us-ascii?Q?wovmzQS5HmnWY8JuZF3buug0ABEWi5Di10BHJ+EVTUk+rjt7AKOxl8gXi7bM?=
+ =?us-ascii?Q?M7sQ5JIZOIrK6kJnZ0bLqRGkZQTjOKyQlZoz2A1E4AW6k6E5Tpqv9w8HSnYk?=
+ =?us-ascii?Q?P+xmwl0WIMAiWCcLtMyYTl35RRn+/LYwvsxbbn/Aaw6FMohyXtHGmxQBsWG0?=
+ =?us-ascii?Q?sjUjUqcKo92s1NOwOQyyAlKQC0tI/CQ1M51uyaS5?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2904790-05c0-440b-8901-08dbd029479c
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdbb2e66-b499-46fb-3763-08dbd0294d1b
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 22:26:31.7745
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 22:26:40.9909
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: miQ+JWd/JAyB88yTtoKbLn4OODFhWwWwDf4AH/sjSHJyTAQVAYrlP7MyE3IrVcFV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7697
+X-MS-Exchange-CrossTenant-UserPrincipalName: tePHsUlqQTlshb9Gp8BprDkz/dx7aNjbvKfklrmibyu72n9AReDcylkPkdsPrV5m
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5969
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -124,30 +124,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 18, 2023 at 09:27:02PM +0100, Joao Martins wrote:
-> Throughout IOMMU domain lifetime that wants to use dirty tracking, some
-> guarantees are needed such that any device attached to the iommu_domain
-> supports dirty tracking.
+On Wed, Oct 18, 2023 at 09:27:01PM +0100, Joao Martins wrote:
+> Add to iommu domain operations a set of callbacks to perform dirty
+> tracking, particulary to start and stop tracking and to read and clear the
+> dirty data.
 > 
-> The idea is to handle a case where IOMMU in the system are assymetric
-> feature-wise and thus the capability may not be supported for all devices.
-> The enforcement is done by adding a flag into HWPT_ALLOC namely:
+> Drivers are generally expected to dynamically change its translation
+> structures to toggle the tracking and flush some form of control state
+> structure that stands in the IOVA translation path. Though it's not
+> mandatory, as drivers can also enable dirty tracking at boot, and just
+> clear the dirty bits before setting dirty tracking. For each of the newly
+> added IOMMU core APIs:
 > 
-> 	IOMMUFD_HWPT_ALLOC_ENFORCE_DIRTY
+> iommu_cap::IOMMU_CAP_DIRTY: new device iommu_capable value when probing for
+> capabilities of the device.
 > 
-> .. Passed in HWPT_ALLOC ioctl() flags. The enforcement is done by creating
-> a iommu_domain via domain_alloc_user() and validating the requested flags
-> with what the device IOMMU supports (and failing accordingly) advertised).
-> Advertising the new IOMMU domain feature flag requires that the individual
-> iommu driver capability is supported when a future device attachment
-> happens.
+> .set_dirty_tracking(): an iommu driver is expected to change its
+> translation structures and enable dirty tracking for the devices in the
+> iommu_domain. For drivers making dirty tracking always-enabled, it should
+> just return 0.
 > 
-> Link: https://lore.kernel.org/kvm/20220721142421.GB4609@nvidia.com/
+> .read_and_clear_dirty(): an iommu driver is expected to walk the pagetables
+> for the iova range passed in and use iommu_dirty_bitmap_record() to record
+> dirty info per IOVA. When detecting that a given IOVA is dirty it should
+> also clear its dirty state from the PTE, *unless* the flag
+> IOMMU_DIRTY_NO_CLEAR is passed in -- flushing is steered from the caller of
+> the domain_op via iotlb_gather. The iommu core APIs use the same data
+> structure in use for dirty tracking for VFIO device dirty (struct
+> iova_bitmap) abstracted by iommu_dirty_bitmap_record() helper function.
+> 
+> domain::dirty_ops: IOMMU domains will store the dirty ops depending on
+> whether the iommu device supports dirty tracking or not. iommu drivers can
+> then use this field to figure if the dirty tracking is supported+enforced
+> on attach. The enforcement is enable via domain_alloc_user() which is done
+> via IOMMUFD hwpt flag introduced later.
+> 
 > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 > ---
->  drivers/iommu/iommufd/hw_pagetable.c | 4 +++-
->  include/uapi/linux/iommufd.h         | 3 +++
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  include/linux/io-pgtable.h |  4 +++
+>  include/linux/iommu.h      | 56 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 60 insertions(+)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
