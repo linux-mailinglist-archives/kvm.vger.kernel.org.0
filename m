@@ -2,98 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA557CD0B8
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 01:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 938EA7CD11C
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 02:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343819AbjJQX0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Oct 2023 19:26:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56276 "EHLO
+        id S233849AbjJRACE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Oct 2023 20:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235048AbjJQX0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Oct 2023 19:26:30 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C67A103
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 16:26:22 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5893cd18b10so3521198a12.0
-        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 16:26:22 -0700 (PDT)
+        with ESMTP id S229459AbjJRACD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Oct 2023 20:02:03 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0359F
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 17:02:01 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-66d1a05b816so37958546d6.1
+        for <kvm@vger.kernel.org>; Tue, 17 Oct 2023 17:02:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697585182; x=1698189982; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bv6pLgT3niI5QMgEV9JgHmwHVkKxDi1wi/ZrGYG6pjg=;
-        b=ohfoXsCT8bR51uGwjI55KdZCgfmNKHTNVLSmGsjppICBxaOBPCt1rr4xA2KvjSgjp8
-         5CUsKzAiwOzJlqGH0+Py4lcxfQiTOS2YLGZGgoODppsv2N4sFblP8fnCf3yvnV67nc+G
-         PiGYpm0yvBYG8PY3VUWvHQMn69UJQydb3P+Lhx+CEfztuPI1NEXgxeFprFi+0ZvccSM6
-         dzSezuv1nmch6G6t174IkhCiOQB6vFpKnzi1rXSdQBXBQgPLxN/TocczZSqkm327xeFY
-         LtBFEUaUfmV5d8I2FFdhttupWoIKLacIQbla2+RAvbSZPUK2HjlzMGhERYVEXhSqm4iz
-         88Nw==
+        d=google.com; s=20230601; t=1697587321; x=1698192121; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E/603XVHKaUaM8lugP87JFe8YYdPyptNnYZAmeymCgY=;
+        b=majv7qatmKp5hGEMBDnrcA/xbS7deDukIQnOFM9dOmjfsR5yTtI/fh9vZqOeE6a3+I
+         zHB0ptmqwmSjHEjaNF1bHyj76vG+mHkTb8CzzmS0CLSl8vW/xrdR+oeYtV3NDPbkhJuk
+         eY9HfyzB3w8lKw22JBZALwsrMiVe0RQZ25wlVz4MruYuL0n9R6oiiqsUYSUo5sKCw35h
+         hkSl5piDBIhaw1Ol1kWt61AdwUpalXYQUf66tmKAKa3PGAYdYe7bffojY0/2XCFfYaaJ
+         Ek0QEgKSijvvlu0E+gHtOBCONzYD26k37W0AaIfIwtP6iBUMeUJ5wd2jCo/8vqNTA2LB
+         Tx9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697585182; x=1698189982;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bv6pLgT3niI5QMgEV9JgHmwHVkKxDi1wi/ZrGYG6pjg=;
-        b=vnppz1PfKRav0n6DtoNh/BXhQKWsbsNTYlpTuq8dLFjFKX0gLQ5NxPlLWgjWph1jvI
-         v4neRCQdE0O1WmUXp0ecohQJSJWWBgQvrXVansjATuRyfnU+PJ4Fmp+1hfXDVFzolm5P
-         5YXNebNnqRH+EF+LZibsfLIDIqCZUFt6EgtW/AYbTdRP18fcvmhPceyHZj9dOpW7MsD4
-         1v5v+enr0wEBjuU3loU35CF2EDdb6exFHj7UvvfVhQ93q2IQ5c25QZYM/TNtn+6gTwYN
-         SvV4TWYBbk4OxISgh57kLgqw4fbNJCwuM+4ZBevIkjMjahqSUe6z6I51uNpEpAUTsR+t
-         tHSA==
-X-Gm-Message-State: AOJu0YwzKKcefCKH6xUQBfWjCDl5AJoihd4Exj02ItMpbFJoSxojoo1H
-        xv98LlFT2Gt4uQigcxbamtnmXGt9yKB7
-X-Google-Smtp-Source: AGHT+IHobD1UfT/vL/XwFh2pm8crYWO3oS0sT9ep5edXvwbbNrgraJv3wFMyWgNVhRQEDNotpD5JOEsnu1BF
-X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a05:6a02:710:b0:5ab:f060:34b5 with SMTP id
- cb16-20020a056a02071000b005abf06034b5mr80449pgb.6.1697585181809; Tue, 17 Oct
- 2023 16:26:21 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 17 Oct 2023 23:26:10 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231017232610.4008690-1-mizhang@google.com>
-Subject: [PATCH] KVM: x86: Update the variable naming in kvm_x86_ops.sched_in()
+        d=1e100.net; s=20230601; t=1697587321; x=1698192121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E/603XVHKaUaM8lugP87JFe8YYdPyptNnYZAmeymCgY=;
+        b=XQspBADrZfAR3dH8L8XdIvQZ9saQWM/66pq3MAudGPVyCzK8SuwtmfgeQLhkgHOvX3
+         42lgT9kWRGy+1nL8VcRj2mLZcS+Tb7z2GArYqi7TaZXVSSoNCdP4Y3Xr0TGg8wSbdpVL
+         w6QTjDFl89J1CI8JkGk/RTRzo2/F9LooT68D8/in2ksfJszGpLcJMbeb9pe500EEXJdv
+         4sPDRcO8pC40AO3SGR2/BeEmTZ59lbldk3NSiXiFGr3/NjZyvtkvEjBUUgDYAUzz0S2B
+         kl4s0++WY/tQNpdyWPUgTv+1MGR1hEfpA2EnymAa3tAG4kRsFmvgGbM/ZKsPjj3Op/OF
+         bf2Q==
+X-Gm-Message-State: AOJu0Yww+7PWa8HC25TQLqMpYeOnKqAWpX8DUrxHGZfSZZ+rO8Bzuf/f
+        N+2UGgbwDjMAQ1/UzJfQyDMfVEUqYwVXKB0Ygw9z5w==
+X-Google-Smtp-Source: AGHT+IESc2jTZ14IErCtSD+XcH0XpFOrhUBDLZawZQWz8lF0Jn33Z5ZeUHxOsx7dhaVo+vey71zFifxSwADdtIjWyu0=
+X-Received: by 2002:a05:6214:2aa1:b0:66d:3c8b:5f44 with SMTP id
+ js1-20020a0562142aa100b0066d3c8b5f44mr4336406qvb.27.1697587320791; Tue, 17
+ Oct 2023 17:02:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231002204017.GB27267@noisy.programming.kicks-ass.net>
+ <ZRtmvLJFGfjcusQW@google.com> <20231003081616.GE27267@noisy.programming.kicks-ass.net>
+ <ZRwx7gcY7x1x3a5y@google.com> <20231004112152.GA5947@noisy.programming.kicks-ass.net>
+ <CAL715W+RgX2JfeRsenNoU4TuTWwLS5H=P+vrZK_GQVQmMkyraw@mail.gmail.com>
+ <ZR3eNtP5IVAHeFNC@google.com> <ZR3hx9s1yJBR0WRJ@google.com>
+ <c69a1eb1-e07a-8270-ca63-54949ded433d@gmail.com> <03b7da03-78a1-95b1-3969-634b5c9a5a56@amd.com>
+ <20231011141535.GF6307@noisy.programming.kicks-ass.net> <b2bfead3-0f48-d832-daee-e7c2069dae5d@amd.com>
+ <CAL715WLhJ_xSL-cR+ppoJA+dwWK2gwCPb2ZqfToRYm-ShqkmEw@mail.gmail.com>
+In-Reply-To: <CAL715WLhJ_xSL-cR+ppoJA+dwWK2gwCPb2ZqfToRYm-ShqkmEw@mail.gmail.com>
 From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 17 Oct 2023 17:01:23 -0700
+Message-ID: <CAL715WLuO0WFumyTuahXoxxirFRknN4+nU_zNxbumuQjEVxfow@mail.gmail.com>
+Subject: Re: [Patch v4 07/13] perf/x86: Add constraint for guest perf metrics event
+To:     Manali Shukla <manali.shukla@amd.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        David Dunn <daviddunn@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>,
+        Like Xu <like.xu.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the variable with name 'kvm' in kvm_x86_ops.sched_in() to 'vcpu' to
-avoid confusions. Variable naming in KVM has a clear convention that 'kvm'
-refers to pointer of type 'struct kvm *', while 'vcpu' refers to pointer of
-type 'struct kvm_vcpu *'.
+On Tue, Oct 17, 2023 at 9:58=E2=80=AFAM Mingwei Zhang <mizhang@google.com> =
+wrote:
+>
+> On Tue, Oct 17, 2023 at 3:24=E2=80=AFAM Manali Shukla <manali.shukla@amd.=
+com> wrote:
+> >
+> > On 10/11/2023 7:45 PM, Peter Zijlstra wrote:
+> > > On Mon, Oct 09, 2023 at 10:33:41PM +0530, Manali Shukla wrote:
+> > >> Hi all,
+> > >>
+> > >> I would like to add following things to the discussion just for the =
+awareness of
+> > >> everyone.
+> > >>
+> > >> Fully virtualized PMC support is coming to an upcoming AMD SoC and w=
+e are
+> > >> working on prototyping it.
+> > >>
+> > >> As part of virtualized PMC design, the PERF_CTL registers are define=
+d as Swap
+> > >> type C: guest PMC states are loaded at VMRUN automatically but host =
+PMC states
+> > >> are not saved by hardware.
+> > >
+> > > Per the previous discussion, doing this while host has active counter=
+s
+> > > that do not have ::exclude_guest=3D1 is invalid and must result in an
+> > > error.
+> > >
+> >
+> > Yeah, exclude_guest should be enforced on host, while host has active P=
+MC
+> > counters and VPMC is enabled.
+> >
+> > > Also, I'm assuming it is all optional, a host can still profile a gue=
+st
+> > > if all is configured just so?
+> > >
+> >
+> > Correct, host should be able to profile guest, if VPMC is not enabled.
+> >
+> > >> If hypervisor is using the performance counters, it
+> > >> is hypervisor's responsibility to save PERF_CTL registers to host sa=
+ve area
+> > >> prior to VMRUN and restore them after VMEXIT.
+> > >
+> > > Does VMEXIT clear global_ctrl at least?
+> > >
+> >
+> > global_ctrl will be initialized to reset value(0x3F) during VMEXIT. Sim=
+ilarly,
+> > all the perf_ctl and perf_ctr are initialized to reset values(0) at VME=
+XIT.
+>
+> Are these guest values (automatically) saved in the guest area of VMCB
+> on VMEXIT?
+>
 
-Fix this 9-year old naming issue for fun.
+Never mind on this one. So, if both values are in Type C, then they
+should be saved to the guest area of VMCB on VMEXIT (according to APM
+vol 2 Table B-3). So, this means KVM does not need to intercept these
+MSRs on pass-through implementation.
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
+-Mingwei
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7c228ae05df0..394e1a31c02c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1703,7 +1703,7 @@ struct kvm_x86_ops {
- 
- 	void (*request_immediate_exit)(struct kvm_vcpu *vcpu);
- 
--	void (*sched_in)(struct kvm_vcpu *kvm, int cpu);
-+	void (*sched_in)(struct kvm_vcpu *vcpu, int cpu);
- 
- 	/*
- 	 * Size of the CPU's dirty log buffer, i.e. VMX's PML buffer.  A zero
-
-base-commit: 437bba5ad2bba00c2056c896753a32edf80860cc
--- 
-2.42.0.655.g421f12c284-goog
-
+-Mingwei
