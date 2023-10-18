@@ -2,155 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20D487CE6AB
-	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 20:33:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB9F17CE79A
+	for <lists+kvm@lfdr.de>; Wed, 18 Oct 2023 21:20:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344824AbjJRSdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Oct 2023 14:33:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45494 "EHLO
+        id S231341AbjJRTU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Oct 2023 15:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232603AbjJRSde (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Oct 2023 14:33:34 -0400
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2130.outbound.protection.outlook.com [40.107.13.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31312114;
-        Wed, 18 Oct 2023 11:33:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dbdE2xi4ItJvpZsQt76xwj9f5cm8bIrTzOf1fS32U7L07KH2GQNKrfKJeMe5ryEV5qFlb19nTK341xyTpxTGg/MM4AXdVUFSw6NiGms2MwBl0A3Jp/tVsx9wkNjD9QBUpxfqZ3v72pp3tOrB2/hotpFSRrZfh8cBe3qoxFvbwjtYpww4j0oENpkJf8fFANF39/Ofev0+OhvMP5UJwOqHMj3bChufKaT+TkPjgRDV1gw4lOtXhlcsHfYiu/2FYFuelQnhMbS4zQVt5F74DEcevf2vKBpDrJ/PwY2vGipsqBISFlwIa2ZMqHjzr1BHtRAJrx/3aTC2LDrsugqlsr0WAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=evUAGQf5IYhFKWZHAxtq8BuJvPx+ARK5yZPGDZy0KCE=;
- b=Hh0N9xzHLMPuAA51qU/Vi5EAkeeMXb5GLzNQMTX/DIs9x9xHfvVSHgqxPlUwDhsXVBFYTnBJCckjL3COc5cRVwqcdaO3R3CC8Qx0jn1e4rwFGdgLFAHhXbwBaMvjEdnhvhaolwVtx+0mghFzQyW2jT/MnCR4brbUfxyF9ByGz6G4ksT0HmVaccSE2ayvgJi77Yb1LE1xPkZVhsBmj2reVUAjXdTyzdrQPspAtTuehVxJcerY0Xqpm3+arU5QxQokz7ZtXDXa6x27eHP8prKQmsLlepVcHMYQ9zpienFgFqm/ce99jrmLpzT8D6Ee1gRAlOrl4/rpiftdEsEhhzP6iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=uipath.com; dmarc=pass action=none header.from=uipath.com;
- dkim=pass header.d=uipath.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uipath.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=evUAGQf5IYhFKWZHAxtq8BuJvPx+ARK5yZPGDZy0KCE=;
- b=dLj+9AkjYHjvpChYDRqREaK2t73MKH81OXUuGKA+hB+UYMbrCuWXvK+XPGPryYABqeOs9hEKVqHJgVt6kJM95I8KSE+YDk2HgK9NfA/pnC78u5xT3XMKhvD1to8ypXnXLw8tJ5bdPEVoau5IBA8YFIatPJJ/2EQjOxqzhPnDZi8mGEPVFwWAXsA7dUv6uxuk068FFML1jZ+uW2LnCdWEcgYozam/LT16o96akn2nUMmrXFfjay8YiShYQrkb2yrJa5dXl6O2QHGL94kgn/cd5ybkCuTRxRmocJxXWXkmMH0Q+5k0EmSPf+SGuM+aDsnDJM49bEjlOidQp6aRVfaAQw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=uipath.com;
-Received: from DB7PR02MB4521.eurprd02.prod.outlook.com (2603:10a6:10:65::25)
- by AS2PR02MB9191.eurprd02.prod.outlook.com (2603:10a6:20b:5fb::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.22; Wed, 18 Oct
- 2023 18:33:27 +0000
-Received: from DB7PR02MB4521.eurprd02.prod.outlook.com
- ([fe80::c3aa:5631:dfe9:e09c]) by DB7PR02MB4521.eurprd02.prod.outlook.com
- ([fe80::c3aa:5631:dfe9:e09c%4]) with mapi id 15.20.6907.022; Wed, 18 Oct 2023
- 18:33:27 +0000
-From:   Alexandru Matei <alexandru.matei@uipath.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alexandru Matei <alexandru.matei@uipath.com>,
-        Mihai Petrisor <mihai.petrisor@uipath.com>,
-        Viorel Canja <viorel.canja@uipath.com>
-Subject: [PATCH] vsock: initialize the_virtio_vsock before using VQs
-Date:   Wed, 18 Oct 2023 21:32:47 +0300
-Message-Id: <20231018183247.1827-1-alexandru.matei@uipath.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR0102CA0033.eurprd01.prod.exchangelabs.com
- (2603:10a6:802::46) To DB7PR02MB4521.eurprd02.prod.outlook.com
- (2603:10a6:10:65::25)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB7PR02MB4521:EE_|AS2PR02MB9191:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c7cefad-7339-4899-8dae-08dbd008b837
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qHbdFQoZWtccWB8ItB/6jW7p6jJDHEPwb/oS1LGJpsAkGBUTp65rrJh2SX72GpWfmZnxIHe+lyEXxpm3TA3xrSQY3dQXW7G68z/LXpkVcBE9BKx/1LlbdYBFWdi4uqCGwFKIYKkbRoqvKxZthAzBuyG/Tc5bFS+QR2KwAeVBoGDC3TOKHnSJb1HvuMGKoPm34g9jvSbFvYAVQgmAIDsmNk6fdOBO9GwUX93n0rXIIYSoIPz4gKnJ9a8vM+lIyTCyNH44I3chFNSTx5sbRtEAFNHS3J545LFEu5uRquUhekUH/YbOt4UxKFxtZmO9YeneH7oDoGhDDzr02nbYHWVhd1x211hvj1vqcOgkxkC+syJKd2M4QZvfnJqXtpH9lCQ0W9W9KjasaGqGD5bdK50Zhu38D1jcLpZnYuDKt52z9EEuCh5tjVpBVSekHGbWM+ow/mjmyTxsUMeUX7aW92ObdJZAlUvUaV8iHNQ3ei9HXVW8F3G+rAqJYaFsxqL6rBfxqHUk5CgQvhnozgJ6FxzgOg6hKj/p/GWyJP7iVDuaBBgp3+LfPMqe8R2P5XU9wjwa
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR02MB4521.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(376002)(396003)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(83380400001)(38100700002)(107886003)(2616005)(36756003)(6512007)(44832011)(316002)(66556008)(478600001)(110136005)(66476007)(2906002)(54906003)(7416002)(66946007)(1076003)(8676002)(8936002)(4326008)(5660300002)(6506007)(6666004)(86362001)(6486002)(41300700001)(26005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?D4wUM33fliEQFIk3XKu9k/rXam/yrTmqERYGmkvbScA9uGvkautfn9PhqevN?=
- =?us-ascii?Q?zxy+LiwNlVFht5oN2A2wK5DQCuHc8Mv2FdDQiCn3wdB8IvE8Qi/epKIvaiW0?=
- =?us-ascii?Q?LIPCZIO3flEL9k0oQpRiIz+vSxkC+ltEeqyUHnPt/p6Jd+S1AqSjxS3BHyEx?=
- =?us-ascii?Q?2rdg+QhHPd/WbW0lVKcErikC6ZtUIb739IA83S+uK95geCKFhDzUHyNJersL?=
- =?us-ascii?Q?7nsKjavF6yaaoD6EqkkoPeupMgr7wctQl3w9rKjEvv844FQObBI1NNd4vUdM?=
- =?us-ascii?Q?kJ1FsSp3DFxjnFA43020HHciOuZyII4zB7fW3Kfz792lZ96So7H9Rzc/+obY?=
- =?us-ascii?Q?Gip10U+/xH4D+bq4rf25Rv2Z8pcENpVbL1a1etHvap33RHgx3jNfuQb6M2gm?=
- =?us-ascii?Q?lr2EQ3Z8ZtDMkaRd+6LJdfw2YdEsTrmBByO9E9hpkgAJPpopqU/KHS8PDTYi?=
- =?us-ascii?Q?TunVAA6JcoQwwvPtPYuu+ewd4Mjn3bI9s7ZNcW2YWaHC3/uAHvL6/kzTlYfQ?=
- =?us-ascii?Q?iX3WcS8ZWVsdbkrf7URj9XBGwPdgkWoMPmov7LkkVaXy0I35DgUtBI8PnTdQ?=
- =?us-ascii?Q?5ATFjOI12uabO2M7IDy6rYOzQnYHWe0BdIBJy3vhVPwd6rGt98lFZ807uUaZ?=
- =?us-ascii?Q?fJjsIYo2ol8/iSE3tiMR4k8BNnojDAkqzzfychPx8RQ1YfQ96JZNVBWRyKzw?=
- =?us-ascii?Q?eOj+AyVR2Lcrad/8jZ0f/fjJ3sXL3ApKJQlmDCtF7qL2GZlYhy9NPHvCBt6l?=
- =?us-ascii?Q?SJbIVzs412P9NiX5pm/ad9jLpQiweIDOowc8/of+R0XozEn9QyF6ipzWLC44?=
- =?us-ascii?Q?6vmlQbM8C/tmcAzOfJV4dg9p6z5FBXhy1tcs2pekCo8ZDVZ6YMGZsDGl/mQQ?=
- =?us-ascii?Q?w//2EYoghejPJyrJIaEldKEGWExnDrXlepYsrVuWU8LWrelIKZh3j270tCNh?=
- =?us-ascii?Q?zSFPfRYh46E1EVIutW06+PeEifUX2EG9MlC1WmwM6rrrZ1ZhzNg6Vah2qz9n?=
- =?us-ascii?Q?g5bBhpRIleDSYTGfrgWvOCo3DwXimolmZsAPFeS7A5/rl1NanEdUq4SIhdXP?=
- =?us-ascii?Q?KWj1fTVHX75COWIkSVVR2qGarNzxYz1Ogrn5i23xBHEnXhILjWEgM/Fi4w6E?=
- =?us-ascii?Q?4w1o8bdt4R3usX0i/DR9S60fRqgXTbC7VeXblKKuAn2iwoKrHyBvTyvIrYQt?=
- =?us-ascii?Q?JiFWpHNVatxyUr+Z6laWaoadVdl2742Gp/l5wYiNrrY4at8qMXBP3sJs9yRr?=
- =?us-ascii?Q?Q+iBh+rYtkynvSTJ21R2XallvpYoShi4tv+mQMSNgOCSd/fijiVm10lKhxQq?=
- =?us-ascii?Q?SP7G5ZIeeOm5OeOfN5lnYHIb59njf6v6lWQv/gHb/Kn2AX7I9b/0H7DaKCkD?=
- =?us-ascii?Q?DzZnLCUfzXgxJBAwvMYg9qDGTtDm8kPIwURFmtRV08G4dvB9B0j3YfWU2mW4?=
- =?us-ascii?Q?VfubE9MtPMGlAom5hgapLxZRDVBWPvKQ5DZcCp/3nr89nylKKNS4gSYzlQVq?=
- =?us-ascii?Q?+9ieUFq7s7G3aoLsCi52pIpQ79JUP206fx3txCrWqyhpJxu3MxwMaSmxdOAk?=
- =?us-ascii?Q?NGMRwjRIV+1/8Los/rofSkPTTqg2YgQj3uitHWERgIhPFvPK+hw7YN/reHnA?=
- =?us-ascii?Q?bQ=3D=3D?=
-X-OriginatorOrg: uipath.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c7cefad-7339-4899-8dae-08dbd008b837
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR02MB4521.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 18:33:27.3743
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d8353d2a-b153-4d17-8827-902c51f72357
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rs5kvZ68z56DeECIZL+WVU4kdZCiNU/AL9ekh3zrldQVfZE1OQ8FkIjk//vCAPpDZpou5UpFCichbY9+pkgJm4iIaJOrl6NQt+NER2IyrTY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR02MB9191
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S230147AbjJRTU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Oct 2023 15:20:26 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48C6114
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:20:24 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9e994fd94so47220475ad.3
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 12:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697656824; x=1698261624; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H7ppnBIIrbmfIJgnyx9B9RiTitNvmGmwskuXYW2Y3sk=;
+        b=Eh+lgmU/yLFcI4f/ahRmW3zanjUCZG9OkK3vNWgq1j9GrPbUBhq09t376RbY1BBXDo
+         JbspcSvDp2LYTk/d4EXp/e17UBoGy/w1vjEOGKf24/ZOQHfJ6++hoO1pVb2Fj5HAAJFG
+         zzBNeEQqFXeitii8VRQ0+lQ6uP/aZd83yq24Fd0fWwARrYErbsgspqURWOaA1MQpMBR0
+         aj5jhWZUBIX27A0ThvrEoq/onaw3UnjKlK1I9jdKhm9p90xZ/9L6JsBQ8MgPuF+pCakc
+         XvKdftOY3ezawUHR1D1a03Y8+rOxPbSsN+lUJ70bfNId7wasXeEQ4vjWoT9EUafYnezx
+         I6lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697656824; x=1698261624;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H7ppnBIIrbmfIJgnyx9B9RiTitNvmGmwskuXYW2Y3sk=;
+        b=iIOKcO5Ry0RI2qWYVDTrMeZoCEkPGXn1zhbo8SfFCxbvks0hCx/t3DbnEhfO5jqZ2C
+         v4Z+CKtBoegj3kmIPIGH4UGgE18OJOk3iD7zZbX/Qa9wILC3BeVtGMyZ0E3p5unpME3J
+         CA4HoBg1/bIa1jH9aTDpuS4KWnKdHJkqo9Mmn7DBDwT9yJQbgsRC2tiKMR+jC9hlyrX/
+         +L7rkRugYObC4oy/mf5bYYVhMeqn3QT0FaQqHGDswVVFItC0dFMkGD7/HIe82xur8l7Q
+         Ab5f5z/+zeMKOiD2RUlVWwr+OsM9r35IkWF7xwCPxSe9c952va2mFTviYhFncFT9C8qq
+         kqHQ==
+X-Gm-Message-State: AOJu0YxvhJDVkOqJjj/1DHgmACfSQaHR61LkHyAaYcWe33x+lANbhQLh
+        oaxnyOcGLn76HGHhirCg2JuD+eKg84I=
+X-Google-Smtp-Source: AGHT+IF8fprxOwg9NLxhNoiGVvB0E6ikGR9g208TVUDNojr9nRxzSrwsgdHktxGZJqj/q79lONDYyGyPxWM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:c9c4:b0:1ca:a382:7fc1 with SMTP id
+ q4-20020a170902c9c400b001caa3827fc1mr6069pld.12.1697656824132; Wed, 18 Oct
+ 2023 12:20:24 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 18 Oct 2023 12:20:21 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
+Message-ID: <20231018192021.1893261-1-seanjc@google.com>
+Subject: [PATCH v2] KVM: SVM: Don't intercept IRET when injecting NMI and vNMI
+ is enabled
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Santosh Shukla <santosh.shukla@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Once VQs are filled with empty buffers and we kick the host, it can send
-connection requests. If 'the_virtio_vsock' is not initialized before,
-replies are silently dropped and do not reach the host.
+When vNMI is enabled, rely entirely on hardware to correctly handle NMI
+blocking, i.e. don't intercept IRET to detect when NMIs are no longer
+blocked.  KVM already correctly ignores svm->nmi_masked when vNMI is
+enabled, so the effect of the bug is essentially an unnecessary VM-Exit.
 
-Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
-Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
+KVM intercepts IRET for two reasons:
+ - To track NMI masking to be able to know at any point of time if NMI
+   is masked.
+ - To track NMI windows (to inject another NMI after the guest executes
+   IRET, i.e. unblocks NMIs)
+
+When vNMI is enabled, both cases are handled by hardware:
+- NMI masking state resides in int_ctl.V_NMI_BLOCKING and can be read by
+  KVM at will.
+- Hardware automatically "injects" pending virtual NMIs when virtual NMIs
+  become unblocked.
+
+However, even though pending a virtual NMI for hardware to handle is the
+most common way to synthesize a guest NMI, KVM may still directly inject
+an NMI via when KVM is handling two "simultaneous" NMIs (see comments in
+process_nmi() for details on KVM's simultaneous NMI handling).  Per AMD's
+APM, hardware sets the BLOCKING flag when software directly injects an NMI
+as well, i.e. KVM doesn't need to manually mark vNMIs as blocked:
+
+  If Event Injection is used to inject an NMI when NMI Virtualization is
+  enabled, VMRUN sets V_NMI_MASK in the guest state.
+
+Note, it's still possible that KVM could trigger a spurious IRET VM-Exit.
+When running a nested guest, KVM disables vNMI for L2 and thus will enable
+IRET interception (in both vmcb01 and vmcb02) while running L2 reason.  If
+a nested VM-Exit happens before L2 executes IRET, KVM can end up running
+L1 with vNMI enable and IRET intercepted.  This is also a benign bug, and
+even less likely to happen, i.e. can be safely punted to a future fix.
+
+Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
+Link: https://lore.kernel.org/all/ZOdnuDZUd4mevCqe@google.como
+Cc: Santosh Shukla <santosh.shukla@amd.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- net/vmw_vsock/virtio_transport.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index e95df847176b..eae0867133f8 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -658,12 +658,13 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 		vsock->seqpacket_allow = true;
+v2: Expand changelog to explain the various behaviors and combos. [Maxim]
+
+v1: https://lore.kernel.org/all/20231009212919.221810-1-seanjc@google.com
+
+ arch/x86/kvm/svm/svm.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 1785de7dc98b..517a12e0f1fd 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3568,8 +3568,15 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+ 	if (svm->nmi_l1_to_l2)
+ 		return;
  
- 	vdev->priv = vsock;
-+	rcu_assign_pointer(the_virtio_vsock, vsock);
- 
- 	ret = virtio_vsock_vqs_init(vsock);
--	if (ret < 0)
-+	if (ret < 0) {
-+		rcu_assign_pointer(the_virtio_vsock, NULL);
- 		goto out;
--
--	rcu_assign_pointer(the_virtio_vsock, vsock);
+-	svm->nmi_masked = true;
+-	svm_set_iret_intercept(svm);
++	/*
++	 * No need to manually track NMI masking when vNMI is enabled, hardware
++	 * automatically sets V_NMI_BLOCKING_MASK as appropriate, including the
++	 * case where software directly injects an NMI.
++	 */
++	if (!is_vnmi_enabled(svm)) {
++		svm->nmi_masked = true;
++		svm_set_iret_intercept(svm);
 +	}
+ 	++vcpu->stat.nmi_injections;
+ }
  
- 	mutex_unlock(&the_virtio_vsock_mutex);
- 
+
+base-commit: 437bba5ad2bba00c2056c896753a32edf80860cc
 -- 
-2.34.1
+2.42.0.655.g421f12c284-goog
 
