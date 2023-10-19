@@ -2,183 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA6F07CF215
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A9A7CF282
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232846AbjJSILP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 04:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
+        id S235268AbjJSI1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 04:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232788AbjJSILN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 04:11:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749BA126
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697703023;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=gFzBQsQLH3SD8BE7XzDKm6uTkm7oXxwAL1t7dApRKz4=;
-        b=KKqEAYOowz2THnapD/jTUYaUPRaD7Y4b+rDCUeFi2RfUr2QAsNzJgQwzYKLCt/C9dLRhcB
-        BMXWlkovLTNpnXlQzeUjWZHnwlVF2gFUoNRzNkK3utkIM++XRZkNd2atBP3Ya/u6uVfK0w
-        UoY5Yyfc5cVYXEoK68xN+lDvEoarhwM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-287-S0bIwj-HMuG8yB_4f53tiw-1; Thu, 19 Oct 2023 04:10:21 -0400
-X-MC-Unique: S0bIwj-HMuG8yB_4f53tiw-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7788fb069abso87823085a.0
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:10:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697703021; x=1698307821;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFzBQsQLH3SD8BE7XzDKm6uTkm7oXxwAL1t7dApRKz4=;
-        b=GyFCuXF4lVpzMn2VBEGVzDngT06/BjAnb2pNvanrozCU43DhXzCgs9c8Sct1kjsKXv
-         qndXpxDoIMoJg1svBSddCI92kE0d4W4OZ+KySn1SBYRrpuDKsoGrKTpayk81sBfg7R2J
-         h0iEideg9LJUUfs9yJZzxAyANOh107fNcXHuBoWpIw18PYQRp7V1/35x/KSA2gjeBmeY
-         TLicfVeNd0X957OTkgSaZpQnsZ+vOewbNVsEbu/6W1QOccAh0WbXh9TkdX2DSPfqZO96
-         st2V1kbFUIFfzir+2hkXAQOp+EEOB2zU7Cq0wf1lER5VpF9rPIDG+70XP8pp/3YPtVct
-         gh/w==
-X-Gm-Message-State: AOJu0Yzo2Q2vuz13m/SZqdgLJWYrqaOwvC9uKCiCeSYHBBku63h3bTyw
-        d3Xsx1mdMeCsGTQqzT762O/pVnrRTTfw3qj1asMkfcXfd7znDkr0K+rd6gqn+dtE7WTRPgl4JQv
-        A0nEMNHvFch6e
-X-Received: by 2002:a05:620a:371a:b0:777:6c53:c090 with SMTP id de26-20020a05620a371a00b007776c53c090mr1481624qkb.24.1697703021131;
-        Thu, 19 Oct 2023 01:10:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGuufvg4wrGtnNVLBhAL7c2lwZgJsbUsO0jM9ANTEHwmyZZZYM4d96g+fAOwnRBVzVSXmF2wA==
-X-Received: by 2002:a05:620a:371a:b0:777:6c53:c090 with SMTP id de26-20020a05620a371a00b007776c53c090mr1481608qkb.24.1697703020859;
-        Thu, 19 Oct 2023 01:10:20 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-176-141.web.vodafone.de. [109.43.176.141])
-        by smtp.gmail.com with ESMTPSA id o8-20020a0cc388000000b0065b0d9b4ee7sm602221qvi.20.2023.10.19.01.10.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 01:10:20 -0700 (PDT)
-Message-ID: <78f0966b-a4a9-4f9b-9bc9-5fa0ecbad934@redhat.com>
-Date:   Thu, 19 Oct 2023 10:10:17 +0200
+        with ESMTP id S235216AbjJSI1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 04:27:01 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1382C130;
+        Thu, 19 Oct 2023 01:26:58 -0700 (PDT)
+Received: from [192.168.7.187] ([76.103.185.250])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39J8Q8Ld647733
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Thu, 19 Oct 2023 01:26:09 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39J8Q8Ld647733
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023101201; t=1697703970;
+        bh=qC604qCWixi6qsUg2/vSLQ4O7LWbdngoJ3dxnuhZYvA=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=TlgSLd9TI0qJpEMVFbiIXJbJqGDxigCpfHI+LdG1Exh6lnuv2ayGdeyUboAEt/JKK
+         AJQva+NPHcu1JOWsLAwG6zlQBrjfkuewFb6ZjGAbqbK0OJ1D9zbYRsJvcz1kHvVZha
+         E9smW1diVC54KW88eh/am5aDKy8E6VuKit7oM73rshM/qf/9U+Ihm2oFvIYGxKR6Cv
+         hc5a/jFFXIsI/byF/ba5C035UZsVVT9FRHnCjfHE30K5QytYHjih3qHY1nQfbVJUmX
+         9w5oVQgFdjuoyByhfrAlapJThqEm6TOfjEIip7Q6kg4tw4zzIC9UN7Nr/eLlUbPnyl
+         V8Yf/2/eL8Mog==
+Message-ID: <20bb3005-bf6c-4fe1-bf0d-6d37e0ce1a77@zytor.com>
+Date:   Thu, 19 Oct 2023 01:26:06 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 2/3] migration: Fix test harness hang if
- source does not reach migration point
+Subject: Re: [PATCH 1/1] KVM: VMX: Cleanup VMX basic information defines and
+ usages
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, weijiang.yang@intel.com
+References: <20230927230811.2997443-1-xin@zytor.com>
+ <ZTBJO75Zu1JBsqvw@google.com>
 Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>
-References: <20230725033937.277156-1-npiggin@gmail.com>
- <20230725033937.277156-3-npiggin@gmail.com>
- <169052965551.15205.2179571087904012453@t14-nrb>
- <CUFF6E1RB78K.QT91UG08M495@wheely>
- <169564046337.31925.7932230191015216618@t14-nrb>
- <880f77b3-2af1-43fb-bfa9-a80a7fc8053c@redhat.com>
- <169770213169.68756.904215339391644985@t14-nrb>
-From:   Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <169770213169.68756.904215339391644985@t14-nrb>
+From:   Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <ZTBJO75Zu1JBsqvw@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/10/2023 09.55, Nico Boehr wrote:
-> Quoting Thomas Huth (2023-10-16 20:32:47)
->> On 25/09/2023 13.14, Nico Boehr wrote:
->>> Quoting Nicholas Piggin (2023-07-30 12:03:36)
->>>> On Fri Jul 28, 2023 at 5:34 PM AEST, Nico Boehr wrote:
->>>>> Quoting Nicholas Piggin (2023-07-25 05:39:36)
->>>>>> After starting the test, the harness waits polling for "migrate" in the
->>>>>> output. If the test does not print for some reason, the harness hangs.
->>>>>>
->>>>>> Test that the pid is still alive while polling to fix this hang.
->>>>>>
->>>>>> While here, wait for the full string "Now migrate the VM", which I think
->>>>>> makes it more obvious to read and could avoid an unfortunate collision
->>>>>> with some debugging output in a test case.
->>>>>>
->>>>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>>>>
->>>>> Thanks for attempting to fix this!
->>>>>
->>>>>> ---
->>>>>>    scripts/arch-run.bash | 10 +++++++++-
->>>>>>    1 file changed, 9 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
->>>>>> index 518607f4..30e535c7 100644
->>>>>> --- a/scripts/arch-run.bash
->>>>>> +++ b/scripts/arch-run.bash
->>>>>> @@ -142,6 +142,7 @@ run_migration ()
->>>>>>    
->>>>>>           eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
->>>>>>                   -mon chardev=mon1,mode=control | tee ${migout1} &
->>>>>> +       live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
->>>>>
->>>>> Pardon my ignorance, but why would $! not work here?
->>>>
->>>> My mastery of bash is poor, I copied the incoming_pid line. It seems
->>>> to work, but if you think $! is better I can try it.
->>>
->>> Sorry, this fell off of my radar after going to summer holiday...
->>>
->>> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
->>
->>    Hi Nicholas & Nico,
->>
->> do you want me to pick up this patch as is, or do you want to respin with $!
->> instead?
+On 10/18/2023 2:08 PM, Sean Christopherson wrote:
+
+>> Add IA32_VMX_BASIC MSR bitfield shift macros and use them to define VMX
+>> basic information bitfields.
 > 
-> Let's not discuss too much and get this fixed, I am fine with this as-is.
-> Thanks.
+> Why?  Unless something actually uses the shift independently, just define the
+> BIT_ULL(...) straightaway.
 
-Ok, pushed it now.
+Well, reading "BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |" is hard.
 
-  Thomas
+But Lemme remove those shifts not being used now.
+
+>> Add VMX_BASIC_FEATURES and VMX_BASIC_RESERVED_BITS to form a valid bitmask
+>> of IA32_VMX_BASIC MSR. As a result, to add a new VMX basic feature bit,
+>> just change the 2 new macros in the header file.
+> 
+> Not if a new feature bit lands in the middle of one of the reserved ranges, then
+> the developer will have to update at least three macros, and add a new one. More
+> below.
+
+yes, it is the case for VMX nested exception feature bit.
+
+
+> 
+>> Also replace hardcoded VMX basic numbers with the new VMX basic macros.
+>>
+>> Tested-by: Shan Kang <shan.kang@intel.com>
+>> Signed-off-by: Xin Li <xin3.li@intel.com>
+>> ---
+>>   arch/x86/include/asm/msr-index.h       | 31 ++++++++++++++++++++------
+>>   arch/x86/kvm/vmx/nested.c              | 10 +++------
+>>   arch/x86/kvm/vmx/vmx.c                 |  2 +-
+>>   tools/arch/x86/include/asm/msr-index.h | 31 ++++++++++++++++++++------
+> 
+> Please drop the tools/ update, copying kernel headers into tools is a perf tools
+> thing that I want no part of.
+> 
+> https://lore.kernel.org/all/Y8bZ%2FJ98V5i3wG%2Fv@google.com
+
+why can't we simply remove tools/arch/x86/include/asm/msr-index.h?
+
+
+> 
+>>   4 files changed, 52 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+>> index 1d111350197f..4607448ff805 100644
+>> --- a/arch/x86/include/asm/msr-index.h
+>> +++ b/arch/x86/include/asm/msr-index.h
+>> @@ -1084,13 +1084,30 @@
+>>   #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+>>   
+>>   /* VMX_BASIC bits and bitmasks */
+>> -#define VMX_BASIC_VMCS_SIZE_SHIFT	32
+>> -#define VMX_BASIC_TRUE_CTLS		(1ULL << 55)
+>> -#define VMX_BASIC_64		0x0001000000000000LLU
+>> -#define VMX_BASIC_MEM_TYPE_SHIFT	50
+>> -#define VMX_BASIC_MEM_TYPE_MASK	0x003c000000000000LLU
+>> -#define VMX_BASIC_MEM_TYPE_WB	6LLU
+>> -#define VMX_BASIC_INOUT		0x0040000000000000LLU
+>> +#define VMX_BASIC_VMCS_SIZE_SHIFT		32
+>> +#define VMX_BASIC_ALWAYS_0			BIT_ULL(31)
+>> +#define VMX_BASIC_RESERVED_RANGE_1		GENMASK_ULL(47, 45)
+>> +#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT	48
+>> +#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT)
+>> +#define VMX_BASIC_DUAL_MONITOR_TREATMENT_SHIFT	49
+>> +#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(VMX_BASIC_DUAL_MONITOR_TREATMENT_SHIFT)
+>> +#define VMX_BASIC_MEM_TYPE_SHIFT		50
+>> +#define VMX_BASIC_MEM_TYPE_WB			6LLU
+>> +#define VMX_BASIC_INOUT_SHIFT			54
+>> +#define VMX_BASIC_INOUT				BIT_ULL(VMX_BASIC_INOUT_SHIFT)
+>> +#define VMX_BASIC_TRUE_CTLS_SHIFT		55
+>> +#define VMX_BASIC_TRUE_CTLS			BIT_ULL(VMX_BASIC_TRUE_CTLS_SHIFT)
+>> +#define VMX_BASIC_RESERVED_RANGE_2		GENMASK_ULL(63, 56)
+>> +
+>> +#define VMX_BASIC_FEATURES			\
+> 
+> Maybe VMX_BASIC_FEATURES_MASK to make it more obvious it's a mask of multiple
+> bits?
+
+This is better!
+
+
+> 
+>> +	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
+>> +	 VMX_BASIC_INOUT |			\
+>> +	 VMX_BASIC_TRUE_CTLS)
+>> +
+>> +#define VMX_BASIC_RESERVED_BITS			\
+>> +	(VMX_BASIC_ALWAYS_0 |			\
+>> +	 VMX_BASIC_RESERVED_RANGE_1 |		\
+>> +	 VMX_BASIC_RESERVED_RANGE_2)
+> 
+> I don't see any value in defining VMX_BASIC_RESERVED_RANGE_1 and
+> VMX_BASIC_RESERVED_RANGE_2 separately.   Or VMX_BASIC_ALWAYS_0 for the matter.
+> And I don't think these macros need to go in msr-index.h, e.g. just define them
+> above vmx_restore_vmx_basic() as that's likely going to be the only user, ever.
+
+hmm, I'm overusing macros, better do:
+#define VMX_BASIC_RESERVED_BITS			\
+	(BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56))
+
+Probably should also move VMX MSR field defs from msr-index.h to
+a vmx header file.
+
+> 
+> And what's really missing is a static_assert() or BUILD_BUG_ON() to ensure that
+> VMX_BASIC_FEATURES doesn't overlap with VMX_BASIC_RESERVED_BITS.
+
+good idea, human beings are not good at such jobs by staring at it.
+
+> 
+>>   /* Resctrl MSRs: */
+>>   /* - Intel: */
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index c5ec0ef51ff7..5280ba944c87 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -1203,21 +1203,17 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+>>   
+>>   static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+>>   {
+>> -	const u64 feature_and_reserved =
+>> -		/* feature (except bit 48; see below) */
+>> -		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
+>> -		/* reserved */
+>> -		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
+>>   	u64 vmx_basic = vmcs_config.nested.basic;
+>>   
+>> -	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
+>> +	if (!is_bitwise_subset(vmx_basic, data,
+>> +			       VMX_BASIC_FEATURES | VMX_BASIC_RESERVED_BITS))
+>>   		return -EINVAL;
+>>   
+>>   	/*
+>>   	 * KVM does not emulate a version of VMX that constrains physical
+>>   	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
+>>   	 */
+>> -	if (data & BIT_ULL(48))
+>> +	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+>>   		return -EINVAL;
+>>   
+>>   	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 72e3943f3693..f597243d6a72 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -2701,7 +2701,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>   
+>>   #ifdef CONFIG_X86_64
+>>   	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
+>> -	if (vmx_msr_high & (1u<<16))
+>> +	if (vmx_msr_high & (1u << (VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT - 32)))
+> 
+> In all honestly, I find the existing code easier to read.  I'm definitely not
+> saying the existing code is good, but IMO this is at best a wash.
+> 
+> I would much rather we do something like this and move away from the hi/lo crud
+> entirely:
+
+I ever saw a TDX patch does most of this cleanup.
+
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 86ce9efe6c66..f103980c3d02 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2693,28 +2693,28 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>                  _vmexit_control &= ~x_ctrl;
+>          }
+>   
+> -       rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
+> +       rdmsrl(MSR_IA32_VMX_BASIC, vmx_msr);
+>   
+>          /* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
+> -       if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
+> +       if ((VMX_BASIC_VMCS_SIZE(vmx_msr) > PAGE_SIZE)
+>                  return -EIO;
+>   
+>   #ifdef CONFIG_X86_64
+>          /* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
+> -       if (vmx_msr_high & (1u<<16))
+> +       if (vmx_msr & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
+>                  return -EIO;
+>   #endif
+>   
+>          /* Require Write-Back (WB) memory type for VMCS accesses. */
+> -       if (((vmx_msr_high >> 18) & 15) != 6)
+> +       if (VMX_BASIC_VMCS_MEMTYPE(vmx_msr) != VMX_BASIC_MEM_TYPE_WB)
+>                  return -EIO;
+>   
+>          rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
+>   
+> -       vmcs_conf->size = vmx_msr_high & 0x1fff;
+> -       vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
+> +       vmcs_conf->size = VMX_BASIC_VMCS_SIZE(vmx_msr);
+> +       vmcs_conf->basic_cap = ????(vmx_msr);
+>   
+> -       vmcs_conf->revision_id = vmx_msr_low;
+> +       vmcs_conf->revision_id = (u32)vmx_msr;
+>   
+>          vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
+>          vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
+> 
+
+-- 
+Thanks!
+     Xin
 
