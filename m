@@ -2,69 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A7F47CF070
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 08:52:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 525C57CF09C
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 09:02:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232858AbjJSGwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 02:52:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42218 "EHLO
+        id S232890AbjJSHCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 03:02:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232583AbjJSGwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 02:52:04 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08218116
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 23:51:59 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32d9552d765so5917765f8f.2
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 23:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1697698317; x=1698303117; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mw4Ufl/cOqWrZrf06coK8u2YQD70TRL1KhrXVtvZNrw=;
-        b=nsUsNCHZFTEW7NrHc+xLEg94MIbZEvhG0XTqLEf4/mQVG826I9Zx6/dJjVJ2XTE1dK
-         U4ezwvNwlGi70f4bRGI5jo5RvcFWCkzz8TFj0n/ymYdItVbq7H1cbm62uSaIaRarkYDe
-         IoYLkzdC1sMQ+OXGGAULWL11HQ+0//3zL3A614dvTxMT2+Va2XUttM3PiyWdhK0i4XU3
-         OqlfQhVf7tBd/itKq5ScC8o/GDuCXzQapUoCjZgWPWKKPHMLnl1loQaQ3gLlFUJiQUvi
-         ArgyVvSZaiXH/AxQAPrzH4LgarMhNNH1zNCtqfvPXtIsdE8KtA6nUEbtaVxGmaAizjXF
-         sMpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697698317; x=1698303117;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mw4Ufl/cOqWrZrf06coK8u2YQD70TRL1KhrXVtvZNrw=;
-        b=feKD15wBlUGsyzBN2MBXLmeNfBNn2UioppTRTkBtj80NXwH/ZqLtmiWd7sZkMRa3q8
-         xdJUTZ4SLA4pPpRvUm9NYAHP+bF/SX2Eb1Jr1yMxagQzr4NB1SACXM3BZeqPOQShABSm
-         QmCZ1Y3M413bIVpJjf2vNUmpDRWMntaLrOYfu6KehEsXPsr3pHuToF/aKvwE+rbstswK
-         EQo+0H945sbGZWtDToQUNFv2/SGJwqMvfccvaDvj+t5YaPGyzKH6H9Oh4PjNT1+CpNra
-         wSyepKCTZQR3K5hl1k2NFP/UiZXCFusZqOKaNuxSTyyc8l8cu4QMxlh2gkEMERtmOy6O
-         SuEA==
-X-Gm-Message-State: AOJu0YwMCj25EiM9zWPcq9cJaUeMkLldDVG27C8dSTz/QgVjXtbP8mRG
-        7F6LpE2ZCb/2U+hnTbxFh7GrqqlNUP0BoHqrg3U=
-X-Google-Smtp-Source: AGHT+IFGx0X/DCQzpamvzML5eVZXREJOW7/gfUas0fSutEbwJ26Qfuw+v6wfWgMQ1KlpLCIJu+0MUg==
-X-Received: by 2002:a5d:630d:0:b0:32d:87c8:b54e with SMTP id i13-20020a5d630d000000b0032d87c8b54emr860927wru.1.1697698317404;
-        Wed, 18 Oct 2023 23:51:57 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id i3-20020a5d6303000000b0032db4e660d9sm3710915wru.56.2023.10.18.23.51.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 23:51:56 -0700 (PDT)
-Date:   Thu, 19 Oct 2023 08:51:55 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, shuah@kernel.org, dwmw2@infradead.org,
-        joe.jin@oracle.com
-Subject: Re: [PATCH 1/1] selftests: KVM: add test to print boottime wallclock
-Message-ID: <20231019-f96a45af9c235d89be644e67@orel>
-References: <20231006175715.105517-1-dongli.zhang@oracle.com>
- <ZTA3W-f4sOX3LHfi@google.com>
+        with ESMTP id S232752AbjJSHC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 03:02:27 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D79183
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 00:02:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D473C433C7
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 07:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697698944;
+        bh=+HjpsRyqe/ieStRS3LlNy4DWdaHvgJqWEBaxS9kS+5Y=;
+        h=From:To:Subject:Date:From;
+        b=ukCdPK5GZbc7OLKnD4Anx6wg5UD3NNDNDWt1682kwlzOaLr4uHreUsxEAs8I9PixU
+         e2hKHmsB9LcuxH8mRjuS0GG8rJz735edaCS9JzRta+Oo2eZAq65ip5X1bQiNZSZsO5
+         un1Z9xWqJuDubODdcxkZeYosO+0k38YMAA/C7OL3GsPl5hHG63T7fikP0zLuGQ2tpu
+         H4k9L8+07agVDCI7nMBseIQmbXpd9sF0AsVCV5kvMbqEPEJzvQBo0xurEHPFaM+wr2
+         wuwBbzJ5SmC3Aw4gWd6ktlnVbf/oIjlmrLINb3L+0evu5kDNp7jkZ3WalMTEgPG8g6
+         GQzTVlQUDUgWg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 73744C53BD0; Thu, 19 Oct 2023 07:02:24 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 218026] New: Compile failure in kvm-unit-tests about "ld:
+ Error: unable to disambiguate: -no-pie"
+Date:   Thu, 19 Oct 2023 07:02:24 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: ruifeng.gao@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218026-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTA3W-f4sOX3LHfi@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -73,38 +66,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 18, 2023 at 12:51:55PM -0700, Sean Christopherson wrote:
-> On Fri, Oct 06, 2023, Dongli Zhang wrote:
-> > As inspired by the discussion in [1], the boottime wallclock may drift due
-> > to the fact that the masterclock (or host monotonic clock) and kvmclock are
-> > calculated based on the algorithms in different domains.
-> > 
-> > This is to introduce a testcase to print the boottime wallclock
-> > periodically to help diagnose the wallclock drift issue in the future.
-> > 
-> > The idea is to wrmsr the MSR_KVM_WALL_CLOCK_NEW, and read the boottime
-> > wallclock nanoseconds immediately.
-> 
-> This doesn't actually test anything of interest though.  IIUC, it requires a human
-> looking at the output for it to provide any value.  And it requires a manual
-> cancelation, which makes it even less suitable for selftests.
-> 
-> I like the idea, e.g. I bet there are more utilities that could be written that
-> utilize the selftests infrastructure, just not sure what to do with this (assuming
-> it can't be massaged into an actual test).
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218026
 
-Yes, there's definitely code overlap between selftests and [debug/test]
-utilities. For example, I snuck a utility into [1]. For that one, without
-any command line parameters it runs as a typical test. Given command line
-input, it behaves as a utility (which developers may use for additional
-platform-specific testing). It seems like we need a way to build and
-organize these types of things separately, i.e. a utility should probably
-be in tools/$DIR not tools/testing/selftests/$DIR. For [1], I don't have
-much of an excuse for not just splitting the two functionalities into two
-files, but, for KVM selftests, we'd need to find a way to share the
-framework.
+            Bug ID: 218026
+           Summary: Compile failure in kvm-unit-tests about "ld: Error:
+                    unable to disambiguate: -no-pie"
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: high
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: ruifeng.gao@intel.com
+        Regression: No
 
-[1] https://lore.kernel.org/all/20231011135610.122850-14-ajones@ventanamicro.com/
+Environment:
+CPU Architecture: x86_64
+Host OS: CentOS Stream 9
+binutils: binutils-2.36.1-4.el9.x86_64
+kvm-unit-tests source: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+Branch: master
+Commit: 09e8c119b4cd7b615ea0ece16c92c79054dfb38d
 
-Thanks,
-drew
+Bug Detailed Description:
+kvm-unit-tests can not be compiled due to "ld: Error: unable to disambiguat=
+e:
+-no-pie".=20
+Checked ld version:
+[root@emr-2s7 kvm-unit-tests]# ld --version
+GNU ld version 2.36.1-4.el9
+With older version (i.e., GNU ld version 2.35.2-39.el9), it can be compiled
+well. Initially suspected, it should be a compiling issue.
+
+Reproducing Steps:
+git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+cd kvm-unit-tests
+./configure
+make standalone
+
+Actual Result:
+...
+rotector    -Wno-frame-address   -fno-pic  -Wclobbered=20
+-Wunused-but-set-parameter  -Wmissing-parameter-type  -Wold-style-declarati=
+on
+-Woverride-init -Wmissing-prototypes -Wstrict-prototypes -std=3Dgnu99
+-ffreestanding -I /root/grf/kvm-unit-tests/lib -I
+/root/grf/kvm-unit-tests/lib/x86 -I lib   -c -o x86/vmexit.o x86/vmexit.c
+gcc -mno-red-zone -mno-sse -mno-sse2  -fcf-protection=3Dfull -m64 -O1 -g -M=
+MD -MP
+-MF x86/.cstart64.d -fno-strict-aliasing -fno-common -Wall -Wwrite-strings
+-Wempty-body -Wuninitialized -Wignored-qualifiers -Wno-missing-braces -Werr=
+or=20
+-fno-omit-frame-pointer  -fno-stack-protector    -Wno-frame-address   -fno-=
+pic=20
+-Wclobbered  -Wunused-but-set-parameter  -Wmissing-parameter-type=20
+-Wold-style-declaration -Woverride-init -Wmissing-prototypes
+-Wstrict-prototypes -std=3Dgnu99 -ffreestanding -I /root/grf/kvm-unit-tests=
+/lib
+-I /root/grf/kvm-unit-tests/lib/x86 -I lib -c -nostdlib -o x86/cstart64.o
+x86/cstart64.S
+ld -nostdlib  -no-pie -z noexecstack -m elf_x86_64 -T
+/root/grf/kvm-unit-tests/x86/flat.lds -o x86/vmexit.elf \
+        x86/vmexit.o x86/cstart64.o lib/libcflat.a
+ld: Error: unable to disambiguate: -no-pie (did you mean --no-pie ?)
+make: *** [/root/grf/kvm-unit-tests/x86/Makefile.common:70: x86/vmexit.elf]
+Error 1
+
+
+Expected Result:
+The kvm-unit-tests suite should be compiled successfully.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
