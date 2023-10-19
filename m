@@ -2,71 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F6947CF60F
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 13:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 558937CF630
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 13:08:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345280AbjJSLEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 07:04:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
+        id S1344861AbjJSLIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 07:08:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233155AbjJSLEU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 07:04:20 -0400
+        with ESMTP id S233104AbjJSLIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 07:08:22 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FD0FA
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 04:03:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32B8FA
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 04:07:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697713416;
+        s=mimecast20190719; t=1697713661;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=1oLThQA7BoG9TrrlukhY6YwYjjcU/Mz40wCk9uHQpIc=;
-        b=gIOS2cZZNzHbBWkVQT2iwg2hrkINL5RhWOsU+IJbTppCovbNIqTsDallcmTdiM34mu46O1
-        1A/APGn9+/d92CaQoHSHXmIedVvYdM0qHJsA+L7jegsYhP6HgpCuN9ttAI/i98NkX4ObXy
-        G9sza+HgG8g8naN5LbzwvNuMUpc1WFs=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=eoGSw7myfxej/yusXZHvf1QE56XHty8R52geB5tarDY=;
+        b=jDwWYoG8AClMtJsq93yaO6dBeVavmzpFGsZ8qTVp5EtsCCkyo6HZl71XjYVMpwURjtvE6S
+        ASXxtX3vGUFaaPyhDVTPpi056JnyoeTCkvn/80Cw2TE6rhYT/BsvXFvVnx60Wvxp6iV4Mh
+        6GSx9Yje9DpQO1i1h6EMnN8t9i++YAo=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-348-SCQO9Lx1PuKCQfK0fsbfQw-1; Thu, 19 Oct 2023 07:03:34 -0400
-X-MC-Unique: SCQO9Lx1PuKCQfK0fsbfQw-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7788fb06a43so257524485a.1
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 04:03:34 -0700 (PDT)
+ us-mta-54-Gmtw96kOPWWXVn05P96MSA-1; Thu, 19 Oct 2023 07:07:40 -0400
+X-MC-Unique: Gmtw96kOPWWXVn05P96MSA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-66cffe51b07so92166746d6.3
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 04:07:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697713414; x=1698318214;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1oLThQA7BoG9TrrlukhY6YwYjjcU/Mz40wCk9uHQpIc=;
-        b=TSwMr1OsDMbL9ypAMqNKXLavylzdmVrm2Ge6IcU6q/e9CctP3/JLD5O3+DAV6GGi2x
-         82GbJ0ZlKnEFZbW2PKAhcUYkMKyTzhfNd1cElNIPp8057+bstEafLuAg6ThFhHlWTNtj
-         +lbZouCOSzbtHMsbzueKtELCG/mk2SC0OOJG0lV/w5t+t9Ay8V5fcQ07X3oqQNReC2Wy
-         xLL12CZjEAjjpYaPquSKsT2hnlnnGCDeIkxj6+BOOzTrp75HnqhTjHKyce9OaTSC4I0c
-         Yhat2A8iEwNxesxn+uXRQOct8mN0UVcGOx6VWSyAj59RK1t6r5JuJj40JLuSNPBKaC97
-         Ef1w==
-X-Gm-Message-State: AOJu0YxRNt1FTYXLep5YBDc6eajqQ6mNEFWFe1q4JiOfZmVHEATBH/cp
-        StKziAXAlAetKdYVYXn+uyDLQxXx6Bt3tds8zoeUME2dS0oDj3WnHtt72OA7bJ+oB0TLIb631CT
-        ApkgKLxzmMOOx
-X-Received: by 2002:a05:6214:300f:b0:658:8f94:5e61 with SMTP id ke15-20020a056214300f00b006588f945e61mr1869260qvb.43.1697713414165;
-        Thu, 19 Oct 2023 04:03:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEIN22pIwoGMlPi4MdidjtdTo2+V3WNcldbTz7yWQ8AxhGyCJshvoazbLvE+wZx3aify8baA==
-X-Received: by 2002:a05:6214:300f:b0:658:8f94:5e61 with SMTP id ke15-20020a056214300f00b006588f945e61mr1869248qvb.43.1697713413927;
-        Thu, 19 Oct 2023 04:03:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697713660; x=1698318460;
+        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
+         :from:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eoGSw7myfxej/yusXZHvf1QE56XHty8R52geB5tarDY=;
+        b=D/06fgOi3uPbSYYaLi3h86ao5nthQ+CfxssYRdf9Jdg1WVzwP1hMWjIbXFd+r7wUzU
+         PcOJZcNQLhyXWkCLFlz1ZvN/DpQD+rr4NjXwOvt8hf8tT2tCLefGXdx+1adv6cG5C2oj
+         HNcOR1LPJt3M9+cMqtB50keXyf4cs5xM6SniAPBNb+CnnhrFmC+Y5+OgjdxIEi/7fMld
+         9ldvZhQ72eNjoDmjZ2ijpJMx9g34WpakSSyuVqmubFjhpfKdex3bZtXPTlp9YE9+c1rr
+         /X1csY/65Mosb9ae/B97I04CHSbodHF3WoSaWgD0HjRY/FguoqXoQVu3X8aSSHZTf4U1
+         20jw==
+X-Gm-Message-State: AOJu0YxlZae4K0qR19BSbG60ivtx07+tm/GHFwc7g6r0JaOQUX0NjCc6
+        0C1tkX2YSUPDXGy5ilIE0gwKl/1Q/2zr6XIZSPkobJ0yHMPBw12mr7W5mUtUSalalY2yH4DoFSI
+        sdPRPDTsFAUam
+X-Received: by 2002:a05:6214:21a5:b0:66d:253c:9a80 with SMTP id t5-20020a05621421a500b0066d253c9a80mr1862214qvc.54.1697713660043;
+        Thu, 19 Oct 2023 04:07:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEdlBkiHx44JA86hoLjfb3I2zpti4iKFmKHjHmZUNWFjbqvIXO6hG5FqbQttysEBq/3Z42oZA==
+X-Received: by 2002:a05:6214:21a5:b0:66d:253c:9a80 with SMTP id t5-20020a05621421a500b0066d253c9a80mr1862194qvc.54.1697713659740;
+        Thu, 19 Oct 2023 04:07:39 -0700 (PDT)
 Received: from [192.168.0.5] (ip-109-43-176-141.web.vodafone.de. [109.43.176.141])
-        by smtp.gmail.com with ESMTPSA id mk12-20020a056214580c00b0065b151d5d12sm690832qvb.126.2023.10.19.04.03.32
+        by smtp.gmail.com with ESMTPSA id v9-20020a0ccd89000000b0065b02eaeee7sm694340qvm.83.2023.10.19.04.07.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 04:03:33 -0700 (PDT)
-Message-ID: <25e03ac5-19d4-41c1-82b1-5821433bf5b8@redhat.com>
-Date:   Thu, 19 Oct 2023 13:03:30 +0200
+        Thu, 19 Oct 2023 04:07:39 -0700 (PDT)
+Message-ID: <e46d0f37-44f3-4f35-8eb8-e73b4b7b3abe@redhat.com>
+Date:   Thu, 19 Oct 2023 13:07:37 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [kvm-unit-tests PATCH v2 1/7] lib: s390x: Add ap library
 Content-Language: en-US
+From:   Thomas Huth <thuth@redhat.com>
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     imbrenda@linux.ibm.com, david@redhat.com, nsg@linux.ibm.com,
         nrb@linux.ibm.com
 References: <20231010084936.70773-1-frankja@linux.ibm.com>
  <20231010084936.70773-2-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
+ <25e03ac5-19d4-41c1-82b1-5821433bf5b8@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -109,9 +111,9 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20231010084936.70773-2-frankja@linux.ibm.com>
+In-Reply-To: <25e03ac5-19d4-41c1-82b1-5821433bf5b8@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
@@ -122,44 +124,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/2023 10.49, Janosch Frank wrote:
-> Add functions and definitions needed to test the Adjunct
-> Processor (AP) crypto interface.
+On 19/10/2023 13.03, Thomas Huth wrote:
+> On 10/10/2023 10.49, Janosch Frank wrote:
+>> Add functions and definitions needed to test the Adjunct
+>> Processor (AP) crypto interface.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   lib/s390x/ap.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   lib/s390x/ap.h | 88 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/Makefile |  1 +
+>>   3 files changed, 181 insertions(+)
+>>   create mode 100644 lib/s390x/ap.c
+>>   create mode 100644 lib/s390x/ap.h
+>>
+>> diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
+>> new file mode 100644
+>> index 00000000..4af3cdee
+>> --- /dev/null
+>> +++ b/lib/s390x/ap.c
+> ...
+>> +bool ap_check(void)
+>> +{
+>> +    /*
+>> +     * Base AP support has no STFLE or SCLP feature bit but the
+>> +     * PQAP QCI support is indicated via stfle bit 12. As this
+>> +     * library relies on QCI we bail out if it's not available.
+>> +     */
+>> +    if (!test_facility(12))
+>> +        return false;
+>> +
+>> +    return true;
+>> +}
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   lib/s390x/ap.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   lib/s390x/ap.h | 88 +++++++++++++++++++++++++++++++++++++++++++++++
->   s390x/Makefile |  1 +
->   3 files changed, 181 insertions(+)
->   create mode 100644 lib/s390x/ap.c
->   create mode 100644 lib/s390x/ap.h
+> Easier:
 > 
-> diff --git a/lib/s390x/ap.c b/lib/s390x/ap.c
-> new file mode 100644
-> index 00000000..4af3cdee
-> --- /dev/null
-> +++ b/lib/s390x/ap.c
-...
-> +bool ap_check(void)
-> +{
-> +	/*
-> +	 * Base AP support has no STFLE or SCLP feature bit but the
-> +	 * PQAP QCI support is indicated via stfle bit 12. As this
-> +	 * library relies on QCI we bail out if it's not available.
-> +	 */
-> +	if (!test_facility(12))
-> +		return false;
-> +
-> +	return true;
-> +}
+>      return test_facility(12);
+> 
+> ... but with that in mind, I wonder why you need a wrapper function for this 
+> at all - why not simply checking test_facility(12) at the calling side instead?
 
-Easier:
-
-	return test_facility(12);
-
-... but with that in mind, I wonder why you need a wrapper function for this 
-at all - why not simply checking test_facility(12) at the calling side instead?
+Ok, I now see, you're changing this again in a later patch. So never mind.
+Or maybe immediately call this function ap_setup(), and add a comment here 
+that it will be extended later?
 
   Thomas
 
