@@ -2,137 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCDE57CF359
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:55:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDC937CF385
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 11:07:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344994AbjJSIzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 04:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34466 "EHLO
+        id S1345017AbjJSJG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 05:06:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235251AbjJSIzR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 04:55:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCD89F
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697705670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wEAJ+VDUrNVXU5xbHG/3Z3vLqN5pIVSHhZmt7Niw3wo=;
-        b=NqtpNseF/ro67oDdwHxRPxrvti6lW2IjbvU708bshs34mJMSwCwyNsxtITXl6pZsztDbir
-        stfhdd3ral3HkAQc6RDE8IO4LWHyV9z5Tt2bO+GOSV+F/A10qRgOZQaI5mkhG8xQRJGzBX
-        V313ThuZdXz7h5TRrJzryxTWuaap6L4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-y-SFnJTRP_GTqQheLmlPyg-1; Thu, 19 Oct 2023 04:54:29 -0400
-X-MC-Unique: y-SFnJTRP_GTqQheLmlPyg-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-53db0df5b7cso6236388a12.1
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:54:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697705668; x=1698310468;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        with ESMTP id S1344977AbjJSJG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 05:06:57 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71EEFA
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 02:06:54 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40838915cecso16449865e9.2
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 02:06:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1697706413; x=1698311213; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wEAJ+VDUrNVXU5xbHG/3Z3vLqN5pIVSHhZmt7Niw3wo=;
-        b=PUOUNSdvFo8u9UrL+qP1SUT7wrGuTE+1zv34RNNYkk6xfQ7HgvF3+TEblyjTKjGfeN
-         t+a2rWoZaZDlLq0h2EqLW6pQDAIsUqC6cunBlWsnP58UYn3qa+ulNPZI0KF0SOLXRe6V
-         b+PxDUxtTpXOiR0L8Y+sQGind7YNzdH7GPuLolgV94mxNhzMAUT7mD/JtG5BP+k3zf6S
-         iQrivLlsc8x/71ZL/0uytvwByxpGPA2i7YTd0Xn/MgF5TViSIIZYASE/hOFVABIOQyVg
-         2uPDfSRNZ2G1UqPiiDEJwx9sVC2PgSVbkGHYanOkzv8P4OFDNq2Ga8hUeVDRjgfk6fuL
-         osVg==
-X-Gm-Message-State: AOJu0YyWKcmkzaEF7pdwfs3M8qCeX+dW476A9uwLo0hZdq3VlnhBfbmG
-        dLl7EQGlNmc97ud/oIH4CsQzbKOrhBix/SZngfzEwzZBCV3PDES62B7b57O3CFEbo4ctGQdWvTT
-        qw2KTyamjLxgg
-X-Received: by 2002:a05:6402:3483:b0:53e:3fce:251 with SMTP id v3-20020a056402348300b0053e3fce0251mr1126835edc.0.1697705668240;
-        Thu, 19 Oct 2023 01:54:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFACpGM/rzsBWnQw0oghgETBEoNMcsod/FUAw+yf7qyqXIbwEBgi5TL8hRsdtikCm2vUW/WVg==
-X-Received: by 2002:a05:6402:3483:b0:53e:3fce:251 with SMTP id v3-20020a056402348300b0053e3fce0251mr1126810edc.0.1697705667920;
-        Thu, 19 Oct 2023 01:54:27 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-185-56.business.telecomitalia.it. [87.12.185.56])
-        by smtp.gmail.com with ESMTPSA id v23-20020a50d597000000b0053e2a64b5f8sm4088664edi.14.2023.10.19.01.54.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 01:54:27 -0700 (PDT)
-Date:   Thu, 19 Oct 2023 10:54:21 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Alexandru Matei <alexandru.matei@uipath.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Mihai Petrisor <mihai.petrisor@uipath.com>,
-        Viorel Canja <viorel.canja@uipath.com>
-Subject: Re: [PATCH] vsock: initialize the_virtio_vsock before using VQs
-Message-ID: <a5lw3t5uaqoeeu5j3ertyoprgsyxxrsfqawyuqxjkkbsuxjywh@vh7povjz2s2c>
-References: <20231018183247.1827-1-alexandru.matei@uipath.com>
+        bh=yTzH6q/KHuyR0ZINbw+hcjZ5+0x6X/p2cjmFJ06sw1g=;
+        b=d65+L4mh9pZwErGX3oVoWaQdFL63XZeAQHi/pUp2L5XSdRkkVTY4uxHcNTUC8Xac5T
+         aSH+MCjYoqmwWxBAD2ohaPKxBCc5CiEVIvm5zPPKdF6yV0zhpa2B50MkAmia7l08xkZq
+         76Z3WkoZiEi+uDpCJVKypBuQ/hdc9f9gze1TTwdociCtzuHtSDTF+fi9M+ZlgfkbXncs
+         q27xu3r2nMymlSkVXE6U/RxJAyi00GhN2ni9mI5+6IdAy1loyIQ2tCk/BNwPSPUPw1py
+         AwGresZqeYx+qOnVoRtNj5GLVBVDEWJSpLS/GyMKO7w6wW8N7ewxebVtePrWFHYYSM7d
+         Ww0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697706413; x=1698311213;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yTzH6q/KHuyR0ZINbw+hcjZ5+0x6X/p2cjmFJ06sw1g=;
+        b=ugkpM6Njkak2NsLvpeJQPij1kGlT5er3Oy5bbIBP2gxUKEVUnKHzxRr5rRENGXM9ti
+         5bP4BGyyHHqR812KQ7R5gfitYFlanIW14rG0bx4C9VgOKKrClLnaEBbpxJgSkBNkp3Vc
+         jvRHiYjp2CROC5uN9SpYcxQOiAiMGDhRlMd9KbPFbqRqJ/2SQRuZubgoJiyBPGQX6nxo
+         aDHOn4psj1QqiNhwiNbcw1J+edJVO6/o+GdB4JZaVs/hE3iCsh+Wz4IytCy7dst5uBXI
+         zeJBFqiczdo+OV9cLNLoeZ49EHOTfthJFZSQ4Zee/Ld7OEPafP+jFocRwfEAgbgHj8HU
+         0RQQ==
+X-Gm-Message-State: AOJu0Yz+hkDMOI6fAy1Q3nefGZZCw5enauTEBd8HtIeHjAvLLbM3mawn
+        hmPJgB5O/FsAg+v1BtpqYIgjTN/YsndyZaHQv6mIxw==
+X-Google-Smtp-Source: AGHT+IHSkQS9qNtpAIEMi6sxLaFTkgi+j6Rf7WXRtDe59N4GEvIdt/PZ1MtRQGPplsiQPNtP0AvAANDdTsTJLGZENEE=
+X-Received: by 2002:adf:db4b:0:b0:32d:b06c:80b5 with SMTP id
+ f11-20020adfdb4b000000b0032db06c80b5mr1127928wrj.2.1697706413344; Thu, 19 Oct
+ 2023 02:06:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20231018183247.1827-1-alexandru.matei@uipath.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20231002151031.110551-1-alexghiti@rivosinc.com>
+ <20231002151031.110551-5-alexghiti@rivosinc.com> <20231012-envision-grooving-e6e0461099f1@spud>
+ <20231012-exclusion-moaner-d26780f9eb00@spud> <20231013-19d487ddc6b6efd6d6f62f88@orel>
+In-Reply-To: <20231013-19d487ddc6b6efd6d6f62f88@orel>
+From:   Alexandre Ghiti <alexghiti@rivosinc.com>
+Date:   Thu, 19 Oct 2023 11:06:42 +0200
+Message-ID: <CAHVXubgZ12x5O4Uo404u8uL2qhrtdN5w-DQFvnBib3XhhtrK1Q@mail.gmail.com>
+Subject: Re: [PATCH 4/5] riscv: Suffix all page table entry pointers with 'p'
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Conor Dooley <conor@kernel.org>,
+        Ryan Roberts <ryan.roberts@arm.com>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        kasan-dev@googlegroups.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-efi@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 18, 2023 at 09:32:47PM +0300, Alexandru Matei wrote:
->Once VQs are filled with empty buffers and we kick the host, it can send
->connection requests. If 'the_virtio_vsock' is not initialized before,
->replies are silently dropped and do not reach the host.
+Hi Conor, Marco, Andrew,
 
-Are replies really dropped or we just miss the notification?
+On Fri, Oct 13, 2023 at 11:58=E2=80=AFAM Andrew Jones <ajones@ventanamicro.=
+com> wrote:
+>
+> On Thu, Oct 12, 2023 at 12:35:00PM +0100, Conor Dooley wrote:
+> > On Thu, Oct 12, 2023 at 12:33:15PM +0100, Conor Dooley wrote:
+> > > Hey Alex,
+> > >
+> > > On Mon, Oct 02, 2023 at 05:10:30PM +0200, Alexandre Ghiti wrote:
+> > > > That makes it more clear what the underlying type is, no functional
+> > > > changes intended.
+> > >
+> > > Scanning through stuff on patchwork, this really doesn't seem worth t=
+he
+> > > churn. I thought this sort of Hungarian notation-esque stuff was a
+> > > relic of a time before I could read & our docs even go as far as to
+> >
+> > s/go/went/, I see the language got changed in more recent releases of
+> > the kernel!
+>
+> The documentation seems to still be against it, but, despite that and
+> the two very valid points raised by Marco (backporting and git-blame),
+> I think ptep is special and I'm mostly in favor of this change. We may
+> not need to s/r every instance, but certainly functions which need to
+> refer to both the pte and the ptep representations of entries becomes
+> more clear when using the 'p' convention (and then it's nice to have
+> ptep used everywhere else too for consistency...)
+>
+> Anyway, just my 2 cents.
 
-Could the reverse now happen, i.e., the guest wants to send a connection 
-request, finds the pointer assigned but can't use virtqueues because 
-they haven't been initialized yet?
+I started changing that in one function and another one, and another
+one...etc up to every instance. I still think that it makes things
+clearer, but that's subjective, you raised valid points and I'd really
+like to see this land in 6.7 so I'll revert this patch and send a v2.
 
-Perhaps to avoid your problem, we could just queue vsock->rx_work at the 
-bottom of the probe to see if anything was queued in the meantime.
+Thanks for your feedbacks,
 
-Nit: please use "vsock/virtio" to point out that this problem is of the 
-virtio transport.
-
-Thanks,
-Stefano
+Alex
 
 >
->Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
->Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
->---
-> net/vmw_vsock/virtio_transport.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index e95df847176b..eae0867133f8 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -658,12 +658,13 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 		vsock->seqpacket_allow = true;
->
-> 	vdev->priv = vsock;
->+	rcu_assign_pointer(the_virtio_vsock, vsock);
->
-> 	ret = virtio_vsock_vqs_init(vsock);
->-	if (ret < 0)
->+	if (ret < 0) {
->+		rcu_assign_pointer(the_virtio_vsock, NULL);
-> 		goto out;
->-
->-	rcu_assign_pointer(the_virtio_vsock, vsock);
->+	}
->
-> 	mutex_unlock(&the_virtio_vsock_mutex);
->
->-- 
->2.34.1
->
->
-
+> Thanks,
+> drew
