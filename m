@@ -2,316 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 942557CF3C1
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 11:15:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F337CF3D7
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 11:17:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345102AbjJSJPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 05:15:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50210 "EHLO
+        id S232976AbjJSJRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 05:17:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232976AbjJSJPe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 05:15:34 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ADB212A;
-        Thu, 19 Oct 2023 02:15:31 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 4A9781FD92;
-        Thu, 19 Oct 2023 09:15:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1697706929; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8SktsBRaT0WfP83H70+6Aqz0kX9lsT33YwrE6d/KceQ=;
-        b=FcVlmKJsbSHxticTnIdtzCbL2oQKZUcqvXe4WAEaEeCOkyevWwBkkNALq1+gE5AYLYmNC3
-        aCyKGz4j9u9FzkaHGOMXneWE2CNgrLOoOl3khGMNRzvlFPdFsN6kCroPou4nothpcyeGFl
-        y3UVWNUZekaHj/f7QFu+mE6S68dzyek=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C2494139C2;
-        Thu, 19 Oct 2023 09:15:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id n7wLLrDzMGXFVAAAMHmgww
-        (envelope-from <jgross@suse.com>); Thu, 19 Oct 2023 09:15:28 +0000
-From:   Juergen Gross <jgross@suse.com>
-To:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <akaher@vmware.com>,
-        Alexey Makhalov <amakhalov@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        xen-devel@lists.xenproject.org,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v3 1/5] x86/paravirt: move some functions and defines to alternative
-Date:   Thu, 19 Oct 2023 11:15:16 +0200
-Message-Id: <20231019091520.14540-2-jgross@suse.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20231019091520.14540-1-jgross@suse.com>
-References: <20231019091520.14540-1-jgross@suse.com>
+        with ESMTP id S235216AbjJSJRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 05:17:32 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4996C12D
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 02:17:30 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-32dc9ff4a8fso1594054f8f.1
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 02:17:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697707048; x=1698311848; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bcsnYpAdLM0em0FjxCCFcChvrh3CN3lWApFF37wa+JE=;
+        b=BPG/BIKe8y/kUb1c1997E4CB0SJBH8lvMMeUOwxjLgg3PdHnKFLeEa1b9P15H+Ygn6
+         GZTakKl79VFLDWgSLF4ZhkcgDXn1hxlqU7thbIqvtYNANxLHnbLVWU3C1u5sR9+jfetr
+         fsq3kEAydfAH8CcAocGVpMUHKTDZxhwxNVFBL/vzNjawjNXTkwy+rQR258xT23FY8gxD
+         0w5sBPWW9Juj+umlRSFYMzPLHbWCWrRDHpDVhAgm3JyIesa90vcakvBHDCuvTjyYp2p+
+         W/Ns/NOL4kmFtbmI2B2jhUaVKipdb5g5/6E9dCmVD8SDfa9LvpjRwcnaBRRk5E13ITV+
+         vKJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697707048; x=1698311848;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bcsnYpAdLM0em0FjxCCFcChvrh3CN3lWApFF37wa+JE=;
+        b=GI4WHs6EjRqECejrbdjTMRYXLaQ2+Cz6tgKLmZYOuG4wcem+LVZRmuHk28XABD5C85
+         Iu7kbuJKJfN43OVKsqY2tytmJhPP203MaeY4OwboNfGA9NeAN2lvFXeSh5pPcbo/igIa
+         qWL7UV9rnQkVfnaK8BPBNt6wR8B32nSfI1Odwm6mSHR5vCSuJ+NRolNiYo3uASddU2W1
+         D4e5og9kCTJvsa7mxFtqcwCm4/I6FJ9/ke2Lu6+z3CQpZGRnBaflR28eA3W3ijtzgaj/
+         PJCW2KvWLHvQiKCjITqYwtxVr0D81CL4hqF/ONkMzn4YlSWlKTUEn7XhEMQ3Rm7JBOUI
+         vlFQ==
+X-Gm-Message-State: AOJu0Yx2DHw+hZqLAOnbeJO73u834ez8E/vVWhKaf4Qj88XDAVBRq1GH
+        6YaWu3YdT/ZHDSrJJl0/uan+Fg==
+X-Google-Smtp-Source: AGHT+IG8jOCLnI027DgY6Yx/fVy/qYUq7DqIReW1lUlcofpdY/Llx77hEFpM5sP3dOt6SenXND9+/w==
+X-Received: by 2002:adf:f74d:0:b0:32d:8da0:48d0 with SMTP id z13-20020adff74d000000b0032d8da048d0mr923979wrp.68.1697707048600;
+        Thu, 19 Oct 2023 02:17:28 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id x8-20020adfec08000000b0032dbf6bf7a2sm3994451wrn.97.2023.10.19.02.17.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 02:17:27 -0700 (PDT)
+Date:   Thu, 19 Oct 2023 11:17:26 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Conor Dooley <conor@kernel.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/8] RISC-V: KVM: Forward SBI DBCN extension to
+ user-space
+Message-ID: <20231019-7471d3927d94ab7158d61c6b@orel>
+References: <20231012051509.738750-1-apatel@ventanamicro.com>
+ <20231012051509.738750-5-apatel@ventanamicro.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-        none
-X-Spam-Level: 
-X-Spam-Score: -6.10
-X-Spamd-Result: default: False [-6.10 / 50.00];
-         ARC_NA(0.00)[];
-         RCVD_VIA_SMTP_AUTH(0.00)[];
-         FROM_HAS_DN(0.00)[];
-         TO_DN_SOME(0.00)[];
-         TO_MATCH_ENVRCPT_ALL(0.00)[];
-         R_MISSING_CHARSET(2.50)[];
-         MIME_GOOD(-0.10)[text/plain];
-         REPLY(-4.00)[];
-         BROKEN_CONTENT_TYPE(1.50)[];
-         NEURAL_HAM_LONG(-3.00)[-1.000];
-         DKIM_SIGNED(0.00)[suse.com:s=susede1];
-         NEURAL_HAM_SHORT(-1.00)[-1.000];
-         RCPT_COUNT_TWELVE(0.00)[19];
-         MID_CONTAINS_FROM(1.00)[];
-         FROM_EQ_ENVFROM(0.00)[];
-         MIME_TRACE(0.00)[0:+];
-         RCVD_COUNT_TWO(0.00)[2];
-         RCVD_TLS_ALL(0.00)[];
-         BAYES_HAM(-3.00)[100.00%]
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012051509.738750-5-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a preparation for replacing paravirt patching completely by
-alternative patching, move some backend functions and #defines to
-alternative code and header.
+On Thu, Oct 12, 2023 at 10:45:05AM +0530, Anup Patel wrote:
+> The frozen SBI v2.0 specification defines the SBI debug console
+> (DBCN) extension which replaces the legacy SBI v0.1 console
+> functions namely sbi_console_getchar() and sbi_console_putchar().
+> 
+> The SBI DBCN extension needs to be emulated in the KVM user-space
+> (i.e. QEMU-KVM or KVMTOOL) so we forward SBI DBCN calls from KVM
+> guest to the KVM user-space which can then redirect the console
+> input/output to wherever it wants (e.g. telnet, file, stdio, etc).
+> 
+> The SBI debug console is simply a early console available to KVM
+> guest for early prints and it does not intend to replace the proper
+> console devices such as 8250, VirtIO console, etc.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
+>  arch/riscv/include/uapi/asm/kvm.h     |  1 +
+>  arch/riscv/kvm/vcpu_sbi.c             |  4 ++++
+>  arch/riscv/kvm/vcpu_sbi_replace.c     | 32 +++++++++++++++++++++++++++
+>  4 files changed, 38 insertions(+)
+> 
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> index c02bda5559d7..6a453f7f8b56 100644
+> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> @@ -73,6 +73,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_ipi;
+>  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
+>  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
+>  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
+> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
+>  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
+>  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
+>  
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> index 917d8cc2489e..60d3b21dead7 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -156,6 +156,7 @@ enum KVM_RISCV_SBI_EXT_ID {
+>  	KVM_RISCV_SBI_EXT_PMU,
+>  	KVM_RISCV_SBI_EXT_EXPERIMENTAL,
+>  	KVM_RISCV_SBI_EXT_VENDOR,
+> +	KVM_RISCV_SBI_EXT_DBCN,
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- arch/x86/include/asm/alternative.h        | 16 ++++++++++++
- arch/x86/include/asm/paravirt.h           | 12 ---------
- arch/x86/include/asm/paravirt_types.h     |  4 +--
- arch/x86/include/asm/qspinlock_paravirt.h |  4 +--
- arch/x86/kernel/alternative.c             | 10 ++++++++
- arch/x86/kernel/kvm.c                     |  4 +--
- arch/x86/kernel/paravirt.c                | 30 +++++++----------------
- arch/x86/xen/irq.c                        |  2 +-
- 8 files changed, 41 insertions(+), 41 deletions(-)
+We should add this new register to the get-reg-list kselftest, i.e.
 
-diff --git a/arch/x86/include/asm/alternative.h b/arch/x86/include/asm/alternative.h
-index 9c4da699e11a..67e50bd40bb8 100644
---- a/arch/x86/include/asm/alternative.h
-+++ b/arch/x86/include/asm/alternative.h
-@@ -330,6 +330,22 @@ static inline int alternatives_text_reserved(void *start, void *end)
-  */
- #define ASM_NO_INPUT_CLOBBER(clbr...) "i" (0) : clbr
- 
-+/* Macro for creating assembler functions avoiding any C magic. */
-+#define DEFINE_ASM_FUNC(func, instr, sec)		\
-+	asm (".pushsection " #sec ", \"ax\"\n"		\
-+	     ".global " #func "\n\t"			\
-+	     ".type " #func ", @function\n\t"		\
-+	     ASM_FUNC_ALIGN "\n"			\
-+	     #func ":\n\t"				\
-+	     ASM_ENDBR					\
-+	     instr "\n\t"				\
-+	     ASM_RET					\
-+	     ".size " #func ", . - " #func "\n\t"	\
-+	     ".popsection")
-+
-+void x86_BUG(void);
-+void x86_nop(void);
-+
- #else /* __ASSEMBLY__ */
- 
- #ifdef CONFIG_SMP
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index 6c8ff12140ae..ed5c7342f2ef 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -726,18 +726,6 @@ static __always_inline unsigned long arch_local_irq_save(void)
- #undef PVOP_VCALL4
- #undef PVOP_CALL4
- 
--#define DEFINE_PARAVIRT_ASM(func, instr, sec)		\
--	asm (".pushsection " #sec ", \"ax\"\n"		\
--	     ".global " #func "\n\t"			\
--	     ".type " #func ", @function\n\t"		\
--	     ASM_FUNC_ALIGN "\n"			\
--	     #func ":\n\t"				\
--	     ASM_ENDBR					\
--	     instr "\n\t"				\
--	     ASM_RET					\
--	     ".size " #func ", . - " #func "\n\t"	\
--	     ".popsection")
--
- extern void default_banner(void);
- void native_pv_lock_init(void) __init;
- 
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index 772d03487520..9f84dc074f88 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -542,8 +542,6 @@ int paravirt_disable_iospace(void);
- 	__PVOP_VCALL(op, PVOP_CALL_ARG1(arg1), PVOP_CALL_ARG2(arg2),	\
- 		     PVOP_CALL_ARG3(arg3), PVOP_CALL_ARG4(arg4))
- 
--void _paravirt_nop(void);
--void paravirt_BUG(void);
- unsigned long paravirt_ret0(void);
- #ifdef CONFIG_PARAVIRT_XXL
- u64 _paravirt_ident_64(u64);
-@@ -553,7 +551,7 @@ void pv_native_irq_enable(void);
- unsigned long pv_native_read_cr2(void);
- #endif
- 
--#define paravirt_nop	((void *)_paravirt_nop)
-+#define paravirt_nop	((void *)x86_nop)
- 
- extern struct paravirt_patch_site __parainstructions[],
- 	__parainstructions_end[];
-diff --git a/arch/x86/include/asm/qspinlock_paravirt.h b/arch/x86/include/asm/qspinlock_paravirt.h
-index 85b6e3609cb9..ef9697f20129 100644
---- a/arch/x86/include/asm/qspinlock_paravirt.h
-+++ b/arch/x86/include/asm/qspinlock_paravirt.h
-@@ -56,8 +56,8 @@ __PV_CALLEE_SAVE_REGS_THUNK(__pv_queued_spin_unlock_slowpath, ".spinlock.text");
- 	"pop    %rdx\n\t"						\
- 	FRAME_END
- 
--DEFINE_PARAVIRT_ASM(__raw_callee_save___pv_queued_spin_unlock,
--		    PV_UNLOCK_ASM, .spinlock.text);
-+DEFINE_ASM_FUNC(__raw_callee_save___pv_queued_spin_unlock,
-+		PV_UNLOCK_ASM, .spinlock.text);
- 
- #else /* CONFIG_64BIT */
- 
-diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
-index 73be3931e4f0..1c8dd8e05f3f 100644
---- a/arch/x86/kernel/alternative.c
-+++ b/arch/x86/kernel/alternative.c
-@@ -385,6 +385,16 @@ apply_relocation(u8 *buf, size_t len, u8 *dest, u8 *src, size_t src_len)
- 	}
- }
- 
-+/* Low-level backend functions usable from alternative code replacements. */
-+DEFINE_ASM_FUNC(x86_nop, "", .entry.text);
-+EXPORT_SYMBOL_GPL(x86_nop);
-+
-+noinstr void x86_BUG(void)
-+{
-+	BUG();
-+}
-+EXPORT_SYMBOL_GPL(x86_BUG);
-+
- /*
-  * Replace instructions with better alternatives for this CPU type. This runs
-  * before SMP is initialized to avoid SMP problems with self modifying code.
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index b8ab9ee5896c..4ca59dccc15a 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -803,8 +803,8 @@ extern bool __raw_callee_save___kvm_vcpu_is_preempted(long);
-  "cmpb   $0, " __stringify(KVM_STEAL_TIME_preempted) "+steal_time(%rax)\n\t" \
-  "setne  %al\n\t"
- 
--DEFINE_PARAVIRT_ASM(__raw_callee_save___kvm_vcpu_is_preempted,
--		    PV_VCPU_PREEMPTED_ASM, .text);
-+DEFINE_ASM_FUNC(__raw_callee_save___kvm_vcpu_is_preempted,
-+		PV_VCPU_PREEMPTED_ASM, .text);
- #endif
- 
- static void __init kvm_guest_init(void)
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index 97f1436c1a20..32792b033de2 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -34,14 +34,8 @@
- #include <asm/io_bitmap.h>
- #include <asm/gsseg.h>
- 
--/*
-- * nop stub, which must not clobber anything *including the stack* to
-- * avoid confusing the entry prologues.
-- */
--DEFINE_PARAVIRT_ASM(_paravirt_nop, "", .entry.text);
--
- /* stub always returning 0. */
--DEFINE_PARAVIRT_ASM(paravirt_ret0, "xor %eax,%eax", .entry.text);
-+DEFINE_ASM_FUNC(paravirt_ret0, "xor %eax,%eax", .entry.text);
- 
- void __init default_banner(void)
- {
-@@ -49,12 +43,6 @@ void __init default_banner(void)
- 	       pv_info.name);
- }
- 
--/* Undefined instruction for dealing with missing ops pointers. */
--noinstr void paravirt_BUG(void)
--{
--	BUG();
--}
--
- static unsigned paravirt_patch_call(void *insn_buff, const void *target,
- 				    unsigned long addr, unsigned len)
- {
-@@ -64,11 +52,11 @@ static unsigned paravirt_patch_call(void *insn_buff, const void *target,
- }
- 
- #ifdef CONFIG_PARAVIRT_XXL
--DEFINE_PARAVIRT_ASM(_paravirt_ident_64, "mov %rdi, %rax", .text);
--DEFINE_PARAVIRT_ASM(pv_native_save_fl, "pushf; pop %rax", .noinstr.text);
--DEFINE_PARAVIRT_ASM(pv_native_irq_disable, "cli", .noinstr.text);
--DEFINE_PARAVIRT_ASM(pv_native_irq_enable, "sti", .noinstr.text);
--DEFINE_PARAVIRT_ASM(pv_native_read_cr2, "mov %cr2, %rax", .noinstr.text);
-+DEFINE_ASM_FUNC(_paravirt_ident_64, "mov %rdi, %rax", .text);
-+DEFINE_ASM_FUNC(pv_native_save_fl, "pushf; pop %rax", .noinstr.text);
-+DEFINE_ASM_FUNC(pv_native_irq_disable, "cli", .noinstr.text);
-+DEFINE_ASM_FUNC(pv_native_irq_enable, "sti", .noinstr.text);
-+DEFINE_ASM_FUNC(pv_native_read_cr2, "mov %cr2, %rax", .noinstr.text);
- #endif
- 
- DEFINE_STATIC_KEY_TRUE(virt_spin_lock_key);
-@@ -96,9 +84,9 @@ unsigned int paravirt_patch(u8 type, void *insn_buff, unsigned long addr,
- 	unsigned ret;
- 
- 	if (opfunc == NULL)
--		/* If there's no function, patch it with paravirt_BUG() */
--		ret = paravirt_patch_call(insn_buff, paravirt_BUG, addr, len);
--	else if (opfunc == _paravirt_nop)
-+		/* If there's no function, patch it with x86_BUG() */
-+		ret = paravirt_patch_call(insn_buff, x86_BUG, addr, len);
-+	else if (opfunc == x86_nop)
- 		ret = 0;
- 	else
- 		/* Otherwise call the function. */
-diff --git a/arch/x86/xen/irq.c b/arch/x86/xen/irq.c
-index 6092fea7d651..5d132f5a5d7d 100644
---- a/arch/x86/xen/irq.c
-+++ b/arch/x86/xen/irq.c
-@@ -45,7 +45,7 @@ static const typeof(pv_ops) xen_irq_ops __initconst = {
- 		/* Initial interrupt flag handling only called while interrupts off. */
- 		.save_fl = __PV_IS_CALLEE_SAVE(paravirt_ret0),
- 		.irq_disable = __PV_IS_CALLEE_SAVE(paravirt_nop),
--		.irq_enable = __PV_IS_CALLEE_SAVE(paravirt_BUG),
-+		.irq_enable = __PV_IS_CALLEE_SAVE(x86_BUG),
- 
- 		.safe_halt = xen_safe_halt,
- 		.halt = xen_halt,
--- 
-2.35.3
+diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+index 234006d035c9..4a0f8a8cfbf8 100644
+--- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
++++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+@@ -565,6 +565,7 @@ static __u64 base_regs[] = {
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_SRST,
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_HSM,
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_PMU,
++	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_DBCN,
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_EXPERIMENTAL,
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_VENDOR,
+ 	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_MULTI_EN | 0,
 
+Thanks,
+drew
