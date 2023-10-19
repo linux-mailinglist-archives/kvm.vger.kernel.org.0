@@ -2,183 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C73DD7CF310
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B0F7CF31C
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:45:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235396AbjJSInb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 04:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33242 "EHLO
+        id S231792AbjJSIpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 04:45:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345115AbjJSInF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 04:43:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2B1AB
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:42:05 -0700 (PDT)
+        with ESMTP id S232975AbjJSIo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 04:44:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4124D7D
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:43:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697704924;
+        s=mimecast20190719; t=1697705026;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vGK+hSgFfYjiRKwMyBTzzh6ZEkWcBlSDg4646KYldsk=;
-        b=QqKY2OWFAEH68SFQ1OJ3PiN03R+txtGgkUmJGC0KcRgUZpIX/ZMoMzV85piKgIwVEZ8VL/
-        WkGhqkqsHD8snf3coHadL1GCdujlMBn6irgPyk6o2KObm/WT9+8JpNMePNXAJ0Lfb75ENA
-        88B4EDxqnOGJqEIICa0cu96gE/KAAW4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=sNhtEDb46cdwd0UeanpUYMMLzJiY9Fo2EaQX8hX2fF8=;
+        b=DGEHFAGPn454pIpiRLi6q1arlo8C9Reup1r6INOaW3X/pHnjYbXBeHaRf5K96fk0xH7BKR
+        DPA3JGnvx3TMY4eRMbggMN0mAIe2V+4cTFD/vWvQENHnVjkiBMqRCjajCqHigoRAwaFTzj
+        lg/6wukUCxrloZSbQh38vZhVVuhTZDU=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-503-rx9mZEvHPE6zC-E8EvfTnQ-1; Thu, 19 Oct 2023 04:42:02 -0400
-X-MC-Unique: rx9mZEvHPE6zC-E8EvfTnQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a9e12a3093so64197366b.0
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:42:02 -0700 (PDT)
+ us-mta-652-gkJ8pLk2NUSe0HitWLqJhg-1; Thu, 19 Oct 2023 04:43:40 -0400
+X-MC-Unique: gkJ8pLk2NUSe0HitWLqJhg-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-66d35dda745so60844716d6.0
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:43:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697704921; x=1698309721;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vGK+hSgFfYjiRKwMyBTzzh6ZEkWcBlSDg4646KYldsk=;
-        b=AY7DTdd76rWHJqBOMMiwxUPkKGFpKepD/9TVU2OBvtedAiUE+B8D2IBhJxeZPbxw5T
-         mM+4Jv8B7XFIBNVmt0Cj2QuJ8OATFRvGGIAz+RCRj6ZSnXRRqzSAHKgmvA8Ovig5dP89
-         SBI6+SmI8163LWLt3DRO9EKOHmd3nqUKtQgXSpJm1HoL2gswg8UDJfDatlZq9u7/u5ZC
-         VdC/D+rmXpDZwiagX5Mc1FbAjDP8ll7KGthJ1A8Ov4l6pZmiCbq9o/3Gcwb2n6PIxt5Y
-         wg1n0CQ4pOED6LVMSFrwgdZ07rrhTgjkN7sVlowHG8o4l74dF4Wlqc8RTvh2pemFwFPl
-         7Uhg==
-X-Gm-Message-State: AOJu0YytjeMvUxsNOfiiHmHT3oIuKNAkXZtATd3bU8BSHGwAhRwVjqJF
-        lDjsVoE57WwywAuN+nNha2HvoSjbSwqOmmSlP7y2Tzo+O5ePcRcLyyK2ECngU/iXZRegRaJoFwO
-        QonamKZ2VM7uE
-X-Received: by 2002:a17:906:7951:b0:9b2:be5e:3674 with SMTP id l17-20020a170906795100b009b2be5e3674mr1197946ejo.36.1697704921613;
-        Thu, 19 Oct 2023 01:42:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGQ1BG4b6jNv9iIaBTLiXVkoHYtlB43Tr9jZFdJbu5AO5W4UbtvXIvAh56Wk8wNUVrypXZoPg==
-X-Received: by 2002:a17:906:7951:b0:9b2:be5e:3674 with SMTP id l17-20020a170906795100b009b2be5e3674mr1197925ejo.36.1697704921302;
-        Thu, 19 Oct 2023 01:42:01 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id y4-20020a1709064b0400b009b947aacb4bsm3117049eju.191.2023.10.19.01.42.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 01:42:00 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: Declare flush_remote_tlbs{_range}() hooks
- iff HYPERV!=n
-In-Reply-To: <20231018192325.1893896-1-seanjc@google.com>
-References: <20231018192325.1893896-1-seanjc@google.com>
-Date:   Thu, 19 Oct 2023 10:41:59 +0200
-Message-ID: <87wmvj57hk.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1697705020; x=1698309820;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNhtEDb46cdwd0UeanpUYMMLzJiY9Fo2EaQX8hX2fF8=;
+        b=NVEmN3IHFiTP7iS/5g10NI0AvAs3olqMfnIg0MXcmdejWReNrKCPeY0/+NCnJV9FyD
+         XcLAQKPo+Oivh+1G7rmloSRemTT2H5Yw+7YG6lPZNdrz+RG1x7NaS0pAplCwlfT7o269
+         sVcbrFjjzqaPLjDVhYSBlNk/JFNSmJp5mhf8SA3ex4CErIRrts9yfvyxsSlNZatrGXNu
+         TtTSM/4Ex9juKVQItunQG/Fqnc3Mf8vVjQGAvr5y8KXNgTBALUd7Sl5DIXI1ymCEiBNF
+         Nmba9Ikex/gKCFG9tY7R4yY3NRnnwwZUmxkQ4vkzQKOv8jVEvctVMNJRyl8AShe8VUZf
+         4cuA==
+X-Gm-Message-State: AOJu0Yyn1IbVLzRset5XH+s+oeGJ+47KkTvzTzC3lt/UtoIe8w/y5Og3
+        HChXA5V44oe/Mzm62nzjar1mC2ZOVz1Sa642uBA19I+VqhJt/cNNrUzD5g4T+qfE39Qwut1oD5M
+        O2yj3rd/dh3Ey
+X-Received: by 2002:ad4:5fcd:0:b0:66c:ffe1:e244 with SMTP id jq13-20020ad45fcd000000b0066cffe1e244mr2186140qvb.62.1697705020215;
+        Thu, 19 Oct 2023 01:43:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IETbfgv/8+88fGni1xgnaMxsBgnNEdj2B+ZY0ZeQEa62JYNYio5HxIOk7eFGTP20cQ6OiiUgQ==
+X-Received: by 2002:ad4:5fcd:0:b0:66c:ffe1:e244 with SMTP id jq13-20020ad45fcd000000b0066cffe1e244mr2186118qvb.62.1697705019902;
+        Thu, 19 Oct 2023 01:43:39 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id t6-20020a056214118600b0066d11c1f578sm625981qvv.97.2023.10.19.01.43.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Oct 2023 01:43:39 -0700 (PDT)
+Message-ID: <48d09c9f-78d9-e5eb-d85a-e75a6df81396@redhat.com>
+Date:   Thu, 19 Oct 2023 10:43:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 4/5] tools headers arm64: Update sysreg.h with kernel
+ sources
+Content-Language: en-US
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Mark Brown <broonie@kernel.org>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org,
+        Jing Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-5-oliver.upton@linux.dev>
+ <73b94274-4561-1edd-6b1e-8c6245133af2@redhat.com>
+ <3c5332b0-9035-4cb8-96ce-7a9b8d513c3a@sirena.org.uk>
+ <8baca35a-9154-97e6-d682-032fc69d2da6@redhat.com>
+ <ZTBzAR1KsWuurob7@linux.dev>
+From:   Eric Auger <eauger@redhat.com>
+In-Reply-To: <ZTBzAR1KsWuurob7@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Oliver,
 
-> Declare the kvm_x86_ops hooks used to wire up paravirt TLB flushes when
-> running under Hyper-V if and only if CONFIG_HYPERV!=n.  Wrapping yet more
-> code with IS_ENABLED(CONFIG_HYPERV) eliminates a handful of conditional
-> branches, and makes it super obvious why the hooks *might* be valid.
->
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  2 ++
->  arch/x86/include/asm/kvm_host.h    | 12 ++++++++++++
->  arch/x86/kvm/mmu/mmu.c             | 12 ++++--------
->  3 files changed, 18 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 26b628d84594..f482216bbdb8 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -55,8 +55,10 @@ KVM_X86_OP(set_rflags)
->  KVM_X86_OP(get_if_flag)
->  KVM_X86_OP(flush_tlb_all)
->  KVM_X86_OP(flush_tlb_current)
-> +#if IS_ENABLED(CONFIG_HYPERV)
->  KVM_X86_OP_OPTIONAL(flush_remote_tlbs)
->  KVM_X86_OP_OPTIONAL(flush_remote_tlbs_range)
-> +#endif
->  KVM_X86_OP(flush_tlb_gva)
->  KVM_X86_OP(flush_tlb_guest)
->  KVM_X86_OP(vcpu_pre_run)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 7c228ae05df0..f0d1ac871465 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1614,9 +1614,11 @@ struct kvm_x86_ops {
->  
->  	void (*flush_tlb_all)(struct kvm_vcpu *vcpu);
->  	void (*flush_tlb_current)(struct kvm_vcpu *vcpu);
-> +#if IS_ENABLED(CONFIG_HYPERV)
->  	int  (*flush_remote_tlbs)(struct kvm *kvm);
->  	int  (*flush_remote_tlbs_range)(struct kvm *kvm, gfn_t gfn,
->  					gfn_t nr_pages);
-> +#endif
->  
->  	/*
->  	 * Flush any TLB entries associated with the given GVA.
-> @@ -1825,6 +1827,7 @@ static inline struct kvm *kvm_arch_alloc_vm(void)
->  #define __KVM_HAVE_ARCH_VM_FREE
->  void kvm_arch_free_vm(struct kvm *kvm);
->  
-> +#if IS_ENABLED(CONFIG_HYPERV)
->  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
->  static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->  {
-> @@ -1836,6 +1839,15 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->  }
->  
->  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn,
-> +						   u64 nr_pages)
-> +{
-> +	if (!kvm_x86_ops.flush_remote_tlbs_range)
-> +		return -EOPNOTSUPP;
-> +
-> +	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
-> +}
-> +#endif /* CONFIG_HYPERV */
->  
->  #define kvm_arch_pmi_in_guest(vcpu) \
->  	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 5d3dc7119e57..0702f5234d69 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -271,15 +271,11 @@ static inline unsigned long kvm_mmu_get_guest_pgd(struct kvm_vcpu *vcpu,
->  
->  static inline bool kvm_available_flush_remote_tlbs_range(void)
->  {
-> +#if IS_ENABLED(CONFIG_HYPERV)
->  	return kvm_x86_ops.flush_remote_tlbs_range;
-> -}
-> -
-> -int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
-> -{
-> -	if (!kvm_x86_ops.flush_remote_tlbs_range)
-> -		return -EOPNOTSUPP;
-> -
-> -	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
-> +#else
-> +	return false;
-> +#endif
->  }
->  
->  static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
->
-> base-commit: 437bba5ad2bba00c2056c896753a32edf80860cc
+On 10/19/23 02:06, Oliver Upton wrote:
+> Hi Eric,
+> 
+> Thanks for reviewing the series.
+> 
+> On Wed, Oct 18, 2023 at 03:06:12PM +0200, Eric Auger wrote:
+>> Hi Mark, Oliver,
+>>
+>> On 10/18/23 14:16, Mark Brown wrote:
+>>> On Wed, Oct 18, 2023 at 01:57:31PM +0200, Eric Auger wrote:
+>>>> On 10/11/23 21:57, Oliver Upton wrote:
+>>>
+>>>>>  #define set_pstate_pan(x)		asm volatile(SET_PSTATE_PAN(x))
+>>>>>  #define set_pstate_uao(x)		asm volatile(SET_PSTATE_UAO(x))
+>>>>>  #define set_pstate_ssbs(x)		asm volatile(SET_PSTATE_SSBS(x))
+>>>>> +#define set_pstate_dit(x)		asm volatile(SET_PSTATE_DIT(x))
+>>>
+>>>> could you comment on the *DIT* addictions, what is it for?
+>>>
+>>> DIT is data independent timing, this tells the processor to ensure that
+>>> instructions take a constant time regardless of the data they are
+>>> handling.
+>>
+>>>
+>>> Note that this file is just a copy of arch/arm64/include/asm/gpr-num.h,
+>>> the main purpose here is to sync with the original.
+>>
+>> Ah thanks. that's helpful for me to understand where this gpr-num.h
+>> comes from. This could be documented in the commit msg though.
+>>
+>> Something like:
+>>
+>> adding tools/arch/arm64/include/asm/gpr-num.h matching linux
+>> arch/arm64/include/asm/gpr-num.h
+>>
+>> and syncing tools/arch/arm64/include/asm/sysreg.h with the fellow header
+>> in the linux tree.
+> 
+> Yeah, I could've spelled it out a bit more. I already cracked this off
+> of an even larger patch from before I picked up the series because the
+> diff was massive.
+> 
+>> tbh I did not initially understand that all this diffstat was aimed to
+>> match the linux arch/arm64/include/asm/sysreg.h. Now diffing both I have
+>> some diffs. Doesn't it need a refresh?
+> 
+> I'm worried it is a fool's errand at this point to keep the two in sync,
+> as I'm sure there will be more in -rc1. The tools copy of sysreg.h isn't
+> a verbatim copy either, there are some deliberate deletions in there as
+> well.
+> 
+> I've taken this as is, we can always come back and update the headers
+> afterwards if we find a need for it
 
-Makes sense,
+OK np. I did not notice you picked the series up and I jumped in too
+late. Anyway that was worthwhile for my education ;-)
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-I can take it to my CONFIG_KVM_HYPERV series but it doesn't seem to
-intersect with it so I guess there's no need for that.
-
--- 
-Vitaly
+Eric
+> 
 
