@@ -2,229 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C04EA7CF0A4
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 09:06:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9ACB7CF10C
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 09:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232791AbjJSHGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 03:06:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48000 "EHLO
+        id S232858AbjJSHVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 03:21:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232752AbjJSHGD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 03:06:03 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D9CC11D
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 00:06:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697699161; x=1729235161;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2vYYdaSNvFufGJ5UaXHzxeWsXskL7X0l8axOdiEA3k8=;
-  b=L+1NXyPu+seYOa+c0U2HzuHjBlG9O2Hzx8lc8Py1QlPC2UbailI/oKAR
-   IJ8eGY1jKqgmZm0054Tox8qaNqGiEZzqdtrxcYCc6k+CXy4RB6N/0UeQn
-   Dl8OjDmAPilpOkhjCDcN3RixUlixkWTJXDLWPJoqol/QkiDGjF4mn9wMD
-   I5DBm13D7v6YLHTgk8KxYYhveIwbkOo6gqMCvGOjCsWjwIjgL7xl2fGB4
-   GiOe3LCoMS1jxg3XP5gtqYxYi1jPCg9IqNoZ+S65wIj48/0Cq2KMDOb4H
-   OdPnrKPF4LVXpNs9CSZxtuDRtxxraV1fah/ecBJ2CrNVvPituDPSjIRhZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="7741500"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="7741500"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 00:06:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="827219863"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="827219863"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Oct 2023 00:05:58 -0700
-Date:   Thu, 19 Oct 2023 15:17:35 +0800
-From:   Zhao Liu <zhao1.liu@intel.com>
-To:     Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>
-Cc:     qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>,
-        Roman Bolshakov <rbolshakov@ddn.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "open list:X86 KVM CPUs" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH v3 25/78] target/i386: add fallthrough pseudo-keyword
-Message-ID: <ZTDYD5yadW7Fw+R6@liuzhao-OptiPlex-7080>
-References: <cover.1697186560.git.manos.pitsidianakis@linaro.org>
- <76c17deab18b857ea01ed4b7f06a2d56d1977ff6.1697186560.git.manos.pitsidianakis@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76c17deab18b857ea01ed4b7f06a2d56d1977ff6.1697186560.git.manos.pitsidianakis@linaro.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232990AbjJSHVC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 03:21:02 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB69130
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 00:21:01 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88366C433C7;
+        Thu, 19 Oct 2023 07:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697700060;
+        bh=SnrFhaZSmD0ROC/5wAvVn37d5U+f00s0nr48yYL0B7Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Bc9aJd28kZcrmmhY3ZE+yvl4piKSjOreHFgx0llEh9qlEBaB9bn/DV581gLKIycHP
+         2g6JEAsLvlC+D2mq/p3GBZw+EZ4EP/m24Jni2fw4ZkU7aJ9e7UHUaAYDzdKNDBhWPZ
+         okfp2bNeqOJ9/tAnhfVpROr2V6/atcojntTaaZGRJkD1sL4cMtyN2+a18fEEA01NKF
+         xGRtLMnF5Qk/n5gN8BEbwof/BZSeQJvfmzDTNuuG743kLUyQn21Z37A8gEdhj9olHy
+         RwFnte0Kj1vl5OEwbKoTN80yVcOkYlqsTmz7WKgmUVIEkq1wfgZk5+vqmk+DYqGZG8
+         94HTQB1UHeR4g==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qtNKz-005eIo-SA;
+        Thu, 19 Oct 2023 08:20:58 +0100
+Date:   Thu, 19 Oct 2023 08:20:56 +0100
+Message-ID: <871qdr6pt3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Virtualise PMEVTYPER<n>_EL1.{NSU,NSK}
+In-Reply-To: <ZTAiy7Ijq2UmySyX@linux.dev>
+References: <20231013052901.170138-1-oliver.upton@linux.dev>
+        <20231013052901.170138-3-oliver.upton@linux.dev>
+        <86o7gwm50g.wl-maz@kernel.org>
+        <ZTAiy7Ijq2UmySyX@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 13, 2023 at 11:45:53AM +0300, Emmanouil Pitsidianakis wrote:
-> Date: Fri, 13 Oct 2023 11:45:53 +0300
-> From: Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>
-> Subject: [RFC PATCH v3 25/78] target/i386: add fallthrough pseudo-keyword
-> X-Mailer: git-send-email 2.39.2
+On Wed, 18 Oct 2023 19:24:11 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> In preparation of raising -Wimplicit-fallthrough to 5, replace all
-> fall-through comments with the fallthrough attribute pseudo-keyword.
+> On Wed, Oct 18, 2023 at 02:31:11PM +0100, Marc Zyngier wrote:
+> > On Fri, 13 Oct 2023 06:29:01 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Suzuki noticed that KVM's PMU emulation is oblivious to the NSU and NSK
+> > > event filter bits. On systems that have EL3 these bits modify the
+> > > filter behavior in non-secure EL0 and EL1, respectively. Even though the
+> > > kernel doesn't use these bits, it is entirely possible some other guest
+> > > OS does.
+> > 
+> > But what does it mean for KVM itself? We have no EL3 to speak of as
+> > far as a guest is concerned. And the moment we allow things like
+> > NSU/NSK to be set, why don't we allow M as well?
 > 
-> Signed-off-by: Emmanouil Pitsidianakis <manos.pitsidianakis@linaro.org>
+> Yeah, we need to have a think about all these extra bits TBH.
+> 
+> KVM doesn't filter the advertised ELs in PFR0, so from the guest POV
+> both EL2 and EL3 could potentially be implemented by the vCPU. Based
+> on that I think the bits at least need to be stateful, even though KVM's
+> emulation will never let the guest count events in a higher EL.
+> 
+> My patches aren't even consistent with the above statement, as NSH gets
+> RES0 treatment and the NS{U,K} bits do not. So how about this:
+> 
+>  - If EL3 is advertised in the guest's ID registers NS{U,K}, and M can
+>    be set. NS{U,K} work as proposed, M is ignored in KVM emulation.
+> 
+>  - If EL2 is advertised in the guest's ID registers NSH can be set but
+>    is ignored in KVM emulation.
+> 
+> Thoughts?
 
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+This would be consistent with the pseudocode (and what KVM can
+reasonably achieve at this stage).
 
-> ---
->  target/i386/cpu.c                | 2 +-
->  target/i386/hvf/x86_decode.c     | 1 +
->  target/i386/kvm/kvm.c            | 4 ++--
->  target/i386/tcg/decode-new.c.inc | 6 +++---
->  target/i386/tcg/emit.c.inc       | 2 +-
->  target/i386/tcg/translate.c      | 8 +++-----
->  6 files changed, 11 insertions(+), 12 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index cec5d2b7b6..f73784edca 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -6133,7 +6133,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->                                          eax, ebx, ecx, edx);
->                      break;
->                  }
-> -                /* fall through */
-> +                fallthrough;
->              default: /* end of info */
->                  *eax = *ebx = *ecx = *edx = 0;
->                  break;
-> diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
-> index 3728d7705e..7c2e3dab8d 100644
-> --- a/target/i386/hvf/x86_decode.c
-> +++ b/target/i386/hvf/x86_decode.c
-> @@ -1886,6 +1886,7 @@ static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
->                  break;
->              }
->              /* fall through when not in long mode */
-> +            fallthrough;
->          default:
->              decode->len--;
->              return;
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index f6c7f7e268..d283d56aa9 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -553,7 +553,7 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
->                  value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
->              }
->          }
-> -        /* fall through */
-> +        fallthrough;
->      case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
->      case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
->      case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
-> @@ -1962,7 +1962,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->              if (env->nr_dies < 2) {
->                  break;
->              }
-> -            /* fallthrough */
-> +            fallthrough;
->          case 4:
->          case 0xb:
->          case 0xd:
-> diff --git a/target/i386/tcg/decode-new.c.inc b/target/i386/tcg/decode-new.c.inc
-> index 7d76f15275..0e663e9124 100644
-> --- a/target/i386/tcg/decode-new.c.inc
-> +++ b/target/i386/tcg/decode-new.c.inc
-> @@ -1108,7 +1108,7 @@ static bool decode_op_size(DisasContext *s, X86OpEntry *e, X86OpSize size, MemOp
->              *ot = MO_64;
->              return true;
->          }
-> -        /* fall through */
-> +        fallthrough;
->      case X86_SIZE_ps: /* SSE/AVX packed single precision */
->      case X86_SIZE_pd: /* SSE/AVX packed double precision */
->          *ot = s->vex_l ? MO_256 : MO_128;
-> @@ -1220,7 +1220,7 @@ static bool decode_op(DisasContext *s, CPUX86State *env, X86DecodedInsn *decode,
->  
->      case X86_TYPE_WM:  /* modrm byte selects an XMM/YMM memory operand */
->          op->unit = X86_OP_SSE;
-> -        /* fall through */
-> +        fallthrough;
->      case X86_TYPE_M:  /* modrm byte selects a memory operand */
->          modrm = get_modrm(s, env);
->          if ((modrm >> 6) == 3) {
-> @@ -1538,7 +1538,7 @@ static bool validate_vex(DisasContext *s, X86DecodedInsn *decode)
->              (decode->op[2].n == decode->mem.index || decode->op[2].n == decode->op[1].n)) {
->              goto illegal;
->          }
-> -        /* fall through */
-> +        fallthrough;
->      case 6:
->      case 11:
->          if (!(s->prefix & PREFIX_VEX)) {
-> diff --git a/target/i386/tcg/emit.c.inc b/target/i386/tcg/emit.c.inc
-> index 88793ba988..0e0a2efbf9 100644
-> --- a/target/i386/tcg/emit.c.inc
-> +++ b/target/i386/tcg/emit.c.inc
-> @@ -209,7 +209,7 @@ static bool sse_needs_alignment(DisasContext *s, X86DecodedInsn *decode, MemOp o
->              /* MOST legacy SSE instructions require aligned memory operands, but not all.  */
->              return false;
->          }
-> -        /* fall through */
-> +        fallthrough;
->      case 1:
->          return ot >= MO_128;
->  
-> diff --git a/target/i386/tcg/translate.c b/target/i386/tcg/translate.c
-> index e42e3dd653..77a8fcc5e1 100644
-> --- a/target/i386/tcg/translate.c
-> +++ b/target/i386/tcg/translate.c
-> @@ -1004,7 +1004,7 @@ static CCPrepare gen_prepare_eflags_s(DisasContext *s, TCGv reg)
->      switch (s->cc_op) {
->      case CC_OP_DYNAMIC:
->          gen_compute_eflags(s);
-> -        /* FALLTHRU */
-> +        fallthrough;
->      case CC_OP_EFLAGS:
->      case CC_OP_ADCX:
->      case CC_OP_ADOX:
-> @@ -1047,7 +1047,7 @@ static CCPrepare gen_prepare_eflags_z(DisasContext *s, TCGv reg)
->      switch (s->cc_op) {
->      case CC_OP_DYNAMIC:
->          gen_compute_eflags(s);
-> -        /* FALLTHRU */
-> +        fallthrough;
->      case CC_OP_EFLAGS:
->      case CC_OP_ADCX:
->      case CC_OP_ADOX:
-> @@ -3298,7 +3298,6 @@ static bool disas_insn(DisasContext *s, CPUState *cpu)
->      case 0x82:
->          if (CODE64(s))
->              goto illegal_op;
-> -        /* fall through */
->          fallthrough;
->      case 0x80: /* GRP1 */
->      case 0x81:
-> @@ -6733,7 +6732,7 @@ static bool disas_insn(DisasContext *s, CPUState *cpu)
->                  }
->                  break;
->              }
-> -            /* fallthru */
-> +            fallthrough;
->          case 0xf9 ... 0xff: /* sfence */
->              if (!(s->cpuid_features & CPUID_SSE)
->                  || (prefixes & PREFIX_LOCK)) {
-> @@ -7047,7 +7046,6 @@ static void i386_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
->      case DISAS_EOB_NEXT:
->          gen_update_cc_op(dc);
->          gen_update_eip_cur(dc);
-> -        /* fall through */
->          fallthrough;
->      case DISAS_EOB_ONLY:
->          gen_eob(dc);
-> -- 
-> 2.39.2
-> 
+Care to respin it?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
