@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A663A7D0567
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 01:32:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F17F77D0570
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 01:38:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346716AbjJSXbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 19:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38952 "EHLO
+        id S1346724AbjJSXiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 19:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233335AbjJSXbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 19:31:50 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C93A4
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 16:31:47 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9e0b9b96cso1745575ad.2
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 16:31:47 -0700 (PDT)
+        with ESMTP id S233335AbjJSXiG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 19:38:06 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 005F711B
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 16:38:04 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7b53a48e5so2455777b3.1
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 16:38:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697758307; x=1698363107; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697758684; x=1698363484; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7+Elkl44+KhMKOCIVv0dZ9zYCtH1iO9gSzmzJrjL9s=;
-        b=Wkam4lj8L0hDAyZfHTC/5VSRjPrwiYhKRnP/5j4gyRzNkkb6RsoQDzXga3Zw0cdHCn
-         TBBjKQ0Y5j8gFQO0BICsPn0so+uO+aMkvi8EOvW6+qX4i7vc9ntTQVrS8R45mK4cgMEf
-         GNt4J4zC8ftuVXs2I90mM5aTyxMfCJaxZhtYCkvyh8hGf0njz0fIRBP9gCxzWtbZ0ANl
-         ePDoMRbD8oTQd4m1XTAz21OVCEXSd6mK9VzMi6pl4p9C4LT/Dx6vLLsOJFJfib8bl+0y
-         KqcnMmezYPm74vqqnkbe5opKVa+kzGQnAclHQFvZkySe569IMi8q+cAARf8jNVeHHWK8
-         JP2A==
+        bh=I2j7Yik+YMnC6aoXUwQPLVmjtMCU4QZmyK+G7ptrz2o=;
+        b=Ndhe4/17LqjbxLKvfEL/deGW3JZbXkip+ASFK5zz13jciVr9b41vKxrG0Bn+WloX57
+         GqlhG0jIuv4RfNshWab/CLHIzLjvm9TeUahPzhYB3iSrsdIspGTSTpAV84DugnzVscHo
+         B6CfpktSIZHDt0lbGwcuD1ry7jKmDm9LKM1/PknyTX5WstZhTYmE2sioJhHcDfD30Zt4
+         Wg55yy3UQUlw45ZiyDVKKMAqVoCCiNdEGuOwZT+tCQr0Wm8PsVwt8H0B5OofdwYdsith
+         eBP822DI7JmUFt6SiuK9W7WWuybvHAY5cCBOJROCVLVF1rMPVxDy6QqmUInfvf4p2JpH
+         gJVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697758307; x=1698363107;
+        d=1e100.net; s=20230601; t=1697758684; x=1698363484;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7+Elkl44+KhMKOCIVv0dZ9zYCtH1iO9gSzmzJrjL9s=;
-        b=mVJPRkEzFvgWz97VQgPUcN/h9OVXkbRQYXeqmhXqMcNtx6MzaflGcXbYcbyaxHR3tO
-         lOIqbhMNFOHzqqeB1Cv4q72xQNk8Ag5rin9c1+8V8zc49e6laZh1/JKzrwRQKD9sccFU
-         6DjqDvpxUI5bPhOiJLaCJvjXo8PFtFfX30+i43DL3NOi0K2lG3dK8g5L1Nb4XfejyqfG
-         cxmKnzIgKSsOxUQ4m52ktJU/HkDFefgYZ/ZcfRCHYKCshHik99WVefIms7buDGgSpKhg
-         hMF8R0rjtUlo8wmP8mUt5KoK+bf8jgDF2HSGAwfH9X1YaHqkQcm1294UlBSAaOlnneLW
-         ZMvA==
-X-Gm-Message-State: AOJu0YyIF4G+FzdgluABIqovyggmk28Mam4fdwk05nDBdWIYaOo4Plrh
-        F+EPz8PkdNuJu/IHqK+YTpne0Rwr2+g=
-X-Google-Smtp-Source: AGHT+IGfiik4T0pp2bAdi7fl/A2Ybf8rd5afRqonRoYRiLzA+F/Cxqz4LErg87j5nc4RDJlYbACsBUVnxq8=
+        bh=I2j7Yik+YMnC6aoXUwQPLVmjtMCU4QZmyK+G7ptrz2o=;
+        b=glqL6dci05ujyBd2vucSHl0ZfR50VTmMpzsXyeHgfIojk/+/ZB9oF6h7jq7Y9UCJEf
+         EPm2zEm5SGM/l2Yyg3dulWZviZ7L1ZXnIcFwyUVzGk2aHV+Yda5g7rxSCotDbZ5cQhyv
+         92N9B3xiTlZR4FM09rjTjcn3ikZ1PIpLc0f7MhLBzbmD1LwpNkydROc68csZrNLcAJ8B
+         1kutkJMygYjme75jxvl8xYY7E/Xue5DiyKYm9B2Vy+65bVHe5VXhtKKNd86RLdwy1zr0
+         /yGAqkds2114pYHlpSP6elvB2oU4epIB5zsCXY9jjf4GJ0yw3RdhcCzyLW1ws4DItD1K
+         GD6w==
+X-Gm-Message-State: AOJu0YzDihu1RC0izPFvoh/PsY8ebhXB46I/Cir6jUrHUUj/BD+P/sVQ
+        G+u5aKWaYLroKaM1jI7U7adab3PVwBc=
+X-Google-Smtp-Source: AGHT+IEeuZ0b1JLc+AMvcAMKU7edL/eRstuDinRvzcXhzvpXL/aWjymFHDX99YcRicSv3/gfMvOlXaAClmc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:23cc:b0:1ca:4d35:b2f9 with SMTP id
- o12-20020a17090323cc00b001ca4d35b2f9mr6729plh.8.1697758307328; Thu, 19 Oct
- 2023 16:31:47 -0700 (PDT)
-Date:   Thu, 19 Oct 2023 16:31:45 -0700
-In-Reply-To: <20230911114347.85882-3-cloudliang@tencent.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:d806:0:b0:59b:ea2e:23e5 with SMTP id
+ a6-20020a0dd806000000b0059bea2e23e5mr9284ywe.7.1697758684176; Thu, 19 Oct
+ 2023 16:38:04 -0700 (PDT)
+Date:   Thu, 19 Oct 2023 16:38:02 -0700
+In-Reply-To: <20230911114347.85882-4-cloudliang@tencent.com>
 Mime-Version: 1.0
-References: <20230911114347.85882-1-cloudliang@tencent.com> <20230911114347.85882-3-cloudliang@tencent.com>
-Message-ID: <ZTG8YdrL98MEYo-p@google.com>
-Subject: Re: [PATCH v4 2/9] KVM: selftests: Extend this_pmu_has() and
- kvm_pmu_has() to check arch events
+References: <20230911114347.85882-1-cloudliang@tencent.com> <20230911114347.85882-4-cloudliang@tencent.com>
+Message-ID: <ZTG92uzYFEAAyAPK@google.com>
+Subject: Re: [PATCH v4 3/9] KVM: selftests: Add pmu.h for PMU events and
+ common masks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jinrong Liang <ljr.kernel@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
@@ -64,7 +64,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,123 +72,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Shortlog should call out lib/pmu.c (or just say "a library", but naming files is
+fine).
+
 On Mon, Sep 11, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> The kvm_x86_pmu_feature struct has been updated to use the more
-> descriptive name "pmu_feature" instead of "anti_feature".
-> 
-> Extend this_pmu_has() and kvm_pmu_has() functions to better support
-> checking for Intel architectural events. Rename this_pmu_has() and
-> kvm_pmu_has() to this_pmu_has_arch_event() and kvm_pmu_has_arch_event().
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  | 38 ++++++++++++++-----
->  .../kvm/x86_64/pmu_event_filter_test.c        |  2 +-
->  2 files changed, 29 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 6b146e1c6736..ede433eb6541 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -280,12 +280,12 @@ struct kvm_x86_cpu_property {
->   * architectural event is supported.
->   */
->  struct kvm_x86_pmu_feature {
-> -	struct kvm_x86_cpu_feature anti_feature;
-> +	struct kvm_x86_cpu_feature pmu_feature;
+> +#define PMU_CAP_FW_WRITES				BIT_ULL(13)
+> +#define PMU_CAP_LBR_FMT				0x3f
+> +
+> +enum intel_pmu_architectural_events {
+> +	/*
+> +	 * The order of the architectural events matters as support for each
+> +	 * event is enumerated via CPUID using the index of the event.
+> +	 */
+> +	INTEL_ARCH_CPU_CYCLES,
+> +	INTEL_ARCH_INSTRUCTIONS_RETIRED,
+> +	INTEL_ARCH_REFERENCE_CYCLES,
+> +	INTEL_ARCH_LLC_REFERENCES,
+> +	INTEL_ARCH_LLC_MISSES,
+> +	INTEL_ARCH_BRANCHES_RETIRED,
+> +	INTEL_ARCH_BRANCHES_MISPREDICTED,
+> +
+> +	NR_REAL_INTEL_ARCH_EVENTS,
+> +
+> +	/*
+> +	 * Pseudo-architectural event used to implement IA32_FIXED_CTR2, a.k.a.
+> +	 * TSC reference cycles. The architectural reference cycles event may
+> +	 * or may not actually use the TSC as the reference, e.g. might use the
+> +	 * core crystal clock or the bus clock (yeah, "architectural").
+> +	 */
+> +	PSEUDO_ARCH_REFERENCE_CYCLES = NR_REAL_INTEL_ARCH_EVENTS,
+> +	NR_INTEL_ARCH_EVENTS,
+> +};
 
-Eh, looking at this with fresh eyes, let's just use a single character to keep
-the line lengths as short as possible.  There was value in the anti_feature name,
-but pmu_feature doesn't add anything IMO.
+...
 
->  };
->  #define	KVM_X86_PMU_FEATURE(name, __bit)					\
->  ({										\
->  	struct kvm_x86_pmu_feature feature = {					\
-> -		.anti_feature = KVM_X86_CPU_FEATURE(0xa, 0, EBX, __bit),	\
-> +		.pmu_feature = KVM_X86_CPU_FEATURE(0xa, 0, EBX, __bit),		\
+> +/* Definitions for Architectural Performance Events */
+> +#define ARCH_EVENT(select, umask) (((select) & 0xff) | ((umask) & 0xff) << 8)
+> +
+> +const uint64_t intel_pmu_arch_events[] = {
+> +	[INTEL_ARCH_CPU_CYCLES]			= ARCH_EVENT(0x3c, 0x0),
+> +	[INTEL_ARCH_INSTRUCTIONS_RETIRED]	= ARCH_EVENT(0xc0, 0x0),
+> +	[INTEL_ARCH_REFERENCE_CYCLES]		= ARCH_EVENT(0x3c, 0x1),
+> +	[INTEL_ARCH_LLC_REFERENCES]		= ARCH_EVENT(0x2e, 0x4f),
+> +	[INTEL_ARCH_LLC_MISSES]			= ARCH_EVENT(0x2e, 0x41),
+> +	[INTEL_ARCH_BRANCHES_RETIRED]		= ARCH_EVENT(0xc4, 0x0),
+> +	[INTEL_ARCH_BRANCHES_MISPREDICTED]	= ARCH_EVENT(0xc5, 0x0),
+> +	[PSEUDO_ARCH_REFERENCE_CYCLES]		= ARCH_EVENT(0xa4, 0x1),
 
-This needs to take in the register (EBX vs. ECX) for this helper to be useful.
+Argh, seriously, why!?!?!  0xa4, 0x1 is Topdown Slots, not TSC reference cycles.
+There is _zero_ reason to carry over KVM's godawful pseudo-architectural event
+crud that exists purely because KVM uses perf events to virtualized PMCs.
 
->  	};									\
->  										\
->  	feature;								\
-> @@ -681,12 +681,21 @@ static __always_inline bool this_cpu_has_p(struct kvm_x86_cpu_property property)
->  	return max_leaf >= property.function;
->  }
->  
-> -static inline bool this_pmu_has(struct kvm_x86_pmu_feature feature)
-> +static inline bool this_pmu_has_arch_event(struct kvm_x86_pmu_feature feature)
+And peeking forward at the usage, the whole thing is completely nonsensical, as
+the selftest will set expectations on the TSC reference cycles behavior based
+on whether or not the Topdown Slots event is supported.
 
-Why?  I don't see the point.  And it's confusing for fixed counters.  Yeah, fixed
-counters count architectural events, but the code is asking if a _counter_ is
-supported, not if the associated event is supported.  And the darn name gets too
-long, too.
-
->  {
-> -	uint32_t nr_bits = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
-> +	uint32_t nr_bits;
->  
-> -	return nr_bits > feature.anti_feature.bit &&
-> -	       !this_cpu_has(feature.anti_feature);
-> +	if (feature.pmu_feature.reg == KVM_CPUID_EBX) {
-> +		nr_bits = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
-> +		return nr_bits > feature.pmu_feature.bit &&
-> +			!this_cpu_has(feature.pmu_feature);
-> +	} else if (feature.pmu_feature.reg == KVM_CPUID_ECX) {
-> +		nr_bits = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-> +		return nr_bits > feature.pmu_feature.bit ||
-> +			this_cpu_has(feature.pmu_feature);
-> +	} else {
-> +		TEST_FAIL("Invalid register in kvm_x86_pmu_feature");
-
-This needs to be a GUEST_ASSERT(), as the primary usage is in the guest.
-
-And again looking at this with fresh eyes, I'd rather do
-
-	uint32_t nr_bits;
-
-	if (feature.f.reg == KVM_CPUID_EBX) {
-		nr_bits = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
-		return nr_bits > feature.f.bit && !this_cpu_has(feature.f);
-	}
-
-	GUEST_ASSERT(feature.f.reg == KVM_CPUID_ECX);
-	nr_bits = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-	return nr_bits > feature.f.bit || this_cpu_has(feature.f);
-
-so that the bogus register is printed out on failure.
-
-> +	}
->  }
->  
->  static __always_inline uint64_t this_cpu_supported_xcr0(void)
-> @@ -900,12 +909,21 @@ static __always_inline bool kvm_cpu_has_p(struct kvm_x86_cpu_property property)
->  	return max_leaf >= property.function;
->  }
->  
-> -static inline bool kvm_pmu_has(struct kvm_x86_pmu_feature feature)
-> +static inline bool kvm_pmu_has_arch_event(struct kvm_x86_pmu_feature feature)
->  {
-> -	uint32_t nr_bits = kvm_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
-> +	uint32_t nr_bits;
->  
-> -	return nr_bits > feature.anti_feature.bit &&
-> -	       !kvm_cpu_has(feature.anti_feature);
-> +	if (feature.pmu_feature.reg == KVM_CPUID_EBX) {
-> +		nr_bits = kvm_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
-> +		return nr_bits > feature.pmu_feature.bit &&
-> +			!kvm_cpu_has(feature.pmu_feature);
-> +	} else if (feature.pmu_feature.reg == KVM_CPUID_ECX) {
-> +		nr_bits = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-> +		return nr_bits > feature.pmu_feature.bit ||
-> +			kvm_cpu_has(feature.pmu_feature);
-> +	} else {
-> +		TEST_FAIL("Invalid register in kvm_x86_pmu_feature");
-
-Same thing here.
-
-> +	}
+Grr.
