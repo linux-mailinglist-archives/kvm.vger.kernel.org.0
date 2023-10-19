@@ -2,130 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B0A47CF031
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 08:38:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A7F47CF070
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 08:52:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232782AbjJSGiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 02:38:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+        id S232858AbjJSGwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 02:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232676AbjJSGiK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 02:38:10 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3427510F
-        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 23:38:09 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D27DEC433C7
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 06:38:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697697488;
-        bh=/s+lAViYlWUGD/q0g+yim62CdDApJ2r/a0DHnG06VEU=;
-        h=From:To:Subject:Date:From;
-        b=Rxrwa+ZWV9F0NC5SqUpo4luv0Y1LlRUjukh9ok/fCbmUDezVECgC0QoJV09vvBK07
-         iguiw+4bntQ75gbax2/nlI2A21d/g9Q+xat3ShFg5V9RrzFWfEjzxEBrWOMb35en5f
-         sQxM7kDZ8zxzUhj/yqbgLr+5YMl0esDikZ2MeWRFcNV+hDUAH9fJmNQxwdhin7OALr
-         k9sGKuyJoEKPo5GrqqFo90UtF8QBLdzV5EYDoFlpthw5gS2kaYRBuvHC5jPWQ4/2jb
-         Y9yFHb7JZvMpP8Zd7WV3SHMqT5ArOQ6KeJ18AAAQIsXH6bAHDnDTl0gIx7ylM8BcWe
-         JLXPznwh9BvhQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B8BE6C53BD2; Thu, 19 Oct 2023 06:38:08 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 218025] New: Assertion Failure happens in kvm selftest
- vmx_preemption_timer_test
-Date:   Thu, 19 Oct 2023 06:38:08 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ruifeng.gao@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-218025-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S232583AbjJSGwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 02:52:04 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08218116
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 23:51:59 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32d9552d765so5917765f8f.2
+        for <kvm@vger.kernel.org>; Wed, 18 Oct 2023 23:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697698317; x=1698303117; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mw4Ufl/cOqWrZrf06coK8u2YQD70TRL1KhrXVtvZNrw=;
+        b=nsUsNCHZFTEW7NrHc+xLEg94MIbZEvhG0XTqLEf4/mQVG826I9Zx6/dJjVJ2XTE1dK
+         U4ezwvNwlGi70f4bRGI5jo5RvcFWCkzz8TFj0n/ymYdItVbq7H1cbm62uSaIaRarkYDe
+         IoYLkzdC1sMQ+OXGGAULWL11HQ+0//3zL3A614dvTxMT2+Va2XUttM3PiyWdhK0i4XU3
+         OqlfQhVf7tBd/itKq5ScC8o/GDuCXzQapUoCjZgWPWKKPHMLnl1loQaQ3gLlFUJiQUvi
+         ArgyVvSZaiXH/AxQAPrzH4LgarMhNNH1zNCtqfvPXtIsdE8KtA6nUEbtaVxGmaAizjXF
+         sMpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697698317; x=1698303117;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mw4Ufl/cOqWrZrf06coK8u2YQD70TRL1KhrXVtvZNrw=;
+        b=feKD15wBlUGsyzBN2MBXLmeNfBNn2UioppTRTkBtj80NXwH/ZqLtmiWd7sZkMRa3q8
+         xdJUTZ4SLA4pPpRvUm9NYAHP+bF/SX2Eb1Jr1yMxagQzr4NB1SACXM3BZeqPOQShABSm
+         QmCZ1Y3M413bIVpJjf2vNUmpDRWMntaLrOYfu6KehEsXPsr3pHuToF/aKvwE+rbstswK
+         EQo+0H945sbGZWtDToQUNFv2/SGJwqMvfccvaDvj+t5YaPGyzKH6H9Oh4PjNT1+CpNra
+         wSyepKCTZQR3K5hl1k2NFP/UiZXCFusZqOKaNuxSTyyc8l8cu4QMxlh2gkEMERtmOy6O
+         SuEA==
+X-Gm-Message-State: AOJu0YwMCj25EiM9zWPcq9cJaUeMkLldDVG27C8dSTz/QgVjXtbP8mRG
+        7F6LpE2ZCb/2U+hnTbxFh7GrqqlNUP0BoHqrg3U=
+X-Google-Smtp-Source: AGHT+IFGx0X/DCQzpamvzML5eVZXREJOW7/gfUas0fSutEbwJ26Qfuw+v6wfWgMQ1KlpLCIJu+0MUg==
+X-Received: by 2002:a5d:630d:0:b0:32d:87c8:b54e with SMTP id i13-20020a5d630d000000b0032d87c8b54emr860927wru.1.1697698317404;
+        Wed, 18 Oct 2023 23:51:57 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id i3-20020a5d6303000000b0032db4e660d9sm3710915wru.56.2023.10.18.23.51.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 23:51:56 -0700 (PDT)
+Date:   Thu, 19 Oct 2023 08:51:55 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, shuah@kernel.org, dwmw2@infradead.org,
+        joe.jin@oracle.com
+Subject: Re: [PATCH 1/1] selftests: KVM: add test to print boottime wallclock
+Message-ID: <20231019-f96a45af9c235d89be644e67@orel>
+References: <20231006175715.105517-1-dongli.zhang@oracle.com>
+ <ZTA3W-f4sOX3LHfi@google.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTA3W-f4sOX3LHfi@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218025
+On Wed, Oct 18, 2023 at 12:51:55PM -0700, Sean Christopherson wrote:
+> On Fri, Oct 06, 2023, Dongli Zhang wrote:
+> > As inspired by the discussion in [1], the boottime wallclock may drift due
+> > to the fact that the masterclock (or host monotonic clock) and kvmclock are
+> > calculated based on the algorithms in different domains.
+> > 
+> > This is to introduce a testcase to print the boottime wallclock
+> > periodically to help diagnose the wallclock drift issue in the future.
+> > 
+> > The idea is to wrmsr the MSR_KVM_WALL_CLOCK_NEW, and read the boottime
+> > wallclock nanoseconds immediately.
+> 
+> This doesn't actually test anything of interest though.  IIUC, it requires a human
+> looking at the output for it to provide any value.  And it requires a manual
+> cancelation, which makes it even less suitable for selftests.
+> 
+> I like the idea, e.g. I bet there are more utilities that could be written that
+> utilize the selftests infrastructure, just not sure what to do with this (assuming
+> it can't be massaged into an actual test).
 
-            Bug ID: 218025
-           Summary: Assertion Failure happens in kvm selftest
-                    vmx_preemption_timer_test
-           Product: Virtualization
-           Version: unspecified
-          Hardware: Intel
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: ruifeng.gao@intel.com
-        Regression: No
+Yes, there's definitely code overlap between selftests and [debug/test]
+utilities. For example, I snuck a utility into [1]. For that one, without
+any command line parameters it runs as a typical test. Given command line
+input, it behaves as a utility (which developers may use for additional
+platform-specific testing). It seems like we need a way to build and
+organize these types of things separately, i.e. a utility should probably
+be in tools/$DIR not tools/testing/selftests/$DIR. For [1], I don't have
+much of an excuse for not just splitting the two functionalities into two
+files, but, for KVM selftests, we'd need to find a way to share the
+framework.
 
-Created attachment 305265
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D305265&action=3Dedit
-KERNEL_CONFIG
+[1] https://lore.kernel.org/all/20231011135610.122850-14-ajones@ventanamicro.com/
 
-Environment:
-CPU Architecture: x86_64, Sapphire Rapids, Intel(R) Xeon(R) Platinum 8487C
-Host OS: CentOS Stream 9
-Host kernel: Linux Kernel v6.6-rc6
-Host kernel source:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-Branch: master
-Commit: 58720809f52779dc0f08e53e54b014209d13eebb
-Tag: v6.6-rc6
-
-Bug Detailed Description:
-Assertion failure happened after executing kvm selftest
-vmx_preemption_timer_test.
-
-Reproducing Steps:
-git clone https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-git checkout v6.6-rc6
-cd linux/tools/testing/selftests/kvm && make
-cd x86_64 && ./vmx_preemption_timer_test
-
-Actual Result:
-[root@spr-2s2 x86_64]# ./vmx_preemption_timer_test
-Stage 2: L1 PT expiry TSC (3202723296) , L1 TSC deadline (3202657792)
-Stage 2: L2 PT expiry TSC (3202694752) , L2 TSC deadline (3202678752)
-=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-  x86_64/vmx_preemption_timer_test.c:221: uc.args[4] < uc.args[5]
-  pid=3D23920 tid=3D23920 errno=3D4 - Interrupted system call
-     1  0x0000000000402874: main at vmx_preemption_timer_test.c:221
-     2  0x00007f06c2e3feaf: ?? ??:0
-     3  0x00007f06c2e3ff5f: ?? ??:0
-     4  0x00000000004028e4: _start at ??:?
-  Stage 2: L2 PT expiry TSC (3202694752) > L2 TSC deadline (3202678752)
-
-
-Expected result:
-[root@spr-2s2 x86_64]# ./vmx_preemption_timer_test
-[root@spr-2s2 x86_64]#
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+drew
