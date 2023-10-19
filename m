@@ -2,301 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95A9A7CF282
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 757B07CF285
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 10:27:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235268AbjJSI1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 04:27:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38716 "EHLO
+        id S235308AbjJSI10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 04:27:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235216AbjJSI1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 04:27:01 -0400
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1382C130;
-        Thu, 19 Oct 2023 01:26:58 -0700 (PDT)
-Received: from [192.168.7.187] ([76.103.185.250])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 39J8Q8Ld647733
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Thu, 19 Oct 2023 01:26:09 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 39J8Q8Ld647733
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023101201; t=1697703970;
-        bh=qC604qCWixi6qsUg2/vSLQ4O7LWbdngoJ3dxnuhZYvA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=TlgSLd9TI0qJpEMVFbiIXJbJqGDxigCpfHI+LdG1Exh6lnuv2ayGdeyUboAEt/JKK
-         AJQva+NPHcu1JOWsLAwG6zlQBrjfkuewFb6ZjGAbqbK0OJ1D9zbYRsJvcz1kHvVZha
-         E9smW1diVC54KW88eh/am5aDKy8E6VuKit7oM73rshM/qf/9U+Ihm2oFvIYGxKR6Cv
-         hc5a/jFFXIsI/byF/ba5C035UZsVVT9FRHnCjfHE30K5QytYHjih3qHY1nQfbVJUmX
-         9w5oVQgFdjuoyByhfrAlapJThqEm6TOfjEIip7Q6kg4tw4zzIC9UN7Nr/eLlUbPnyl
-         V8Yf/2/eL8Mog==
-Message-ID: <20bb3005-bf6c-4fe1-bf0d-6d37e0ce1a77@zytor.com>
-Date:   Thu, 19 Oct 2023 01:26:06 -0700
+        with ESMTP id S235288AbjJSI1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 04:27:24 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A79186
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:27:22 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-408425c7c10so6770195e9.0
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 01:27:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697704040; x=1698308840; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aS9ZmATMA5UdrpXcs84XzGO/WomcKSWd4ogsdFNAVRI=;
+        b=XeWRh86NjQnJhCBd8Cr+Vl4dZlXoiCz0GwycngbJlR16x1ywvojIjh/UUDdn7MHnNq
+         VqwtW1qQGPrXZ0fZQGGc9U6ybwc8y0HmfLDerpVU6QRjNXeJqRRm3vFTXkwfUZRHtslf
+         4XNr+sqxHbvhiVFOkgO4gz+YtI8lfSRtdtDbaCJFydbNfCfwaGgHdqmjgg2SWbGvvPgH
+         AF46fUdxRtIY8bpcoxoCHrZE0EkVj0HdWLotshF/LILmyJ4y2GLpprUfpXNaigkLPe4+
+         Ro549X/Nx3m0SnNguhOZJbl3GRqXuyP7ZJokkFvtKjMDu5xvFKoPfeSnJ6C3bKDpR7R9
+         iS8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697704040; x=1698308840;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aS9ZmATMA5UdrpXcs84XzGO/WomcKSWd4ogsdFNAVRI=;
+        b=UM4d/7kJjEy/A6X6y0wbEmMLkQNr31sS2ZAzLe6xyo4ec7nULgL0eWNJ1MsNflgnG7
+         5ldG73PuchLKSzw0pQMm3vSgy31tT/5ickzBXZCcHBwKRWhh0uERXOObivSGA5wTTxvJ
+         GjSGYCAFmSjFb6BzOJ9Sa4uCEafDRe2NGMVbVQ+syL/Eefmzv/jOJ2lT3ysCP05GJq9G
+         KdIuLdrrjMCIhPsXIOkewS6hEXP7nmHLX3anKYq8+b0J8bhE8N2T5yqhs3a4JkKwEgH3
+         xVLdXuVU4YdbpCbzCsMSxyZRG+51YGpVKgMMIFGxVURARDODn7hc41zJK92jYqvBM2h3
+         L9XQ==
+X-Gm-Message-State: AOJu0YxlyxrSIOqk8DsppKanFeqj/9EwMUymkNn+ZapgCyRRKTwSN9fi
+        /5GPZxUzh2Hu85DyKYDfxa3n7I28bkh1X9nIZ8o=
+X-Google-Smtp-Source: AGHT+IHskKNqI6cyPtwKoTi5Al9ucFLHv3VeiXwM9dmzqt6kOBsKQXH4yfubGN4sdMpzP0jv+CThYA==
+X-Received: by 2002:a05:600c:3542:b0:401:73b2:f039 with SMTP id i2-20020a05600c354200b0040173b2f039mr1228282wmq.7.1697704040501;
+        Thu, 19 Oct 2023 01:27:20 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id o36-20020a05600c512400b00405959469afsm3842187wms.3.2023.10.19.01.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 01:27:19 -0700 (PDT)
+Date:   Thu, 19 Oct 2023 10:27:13 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Conor Dooley <conor@kernel.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/8] tty/serial: Add RISC-V SBI debug console based
+ earlycon
+Message-ID: <20231019-f3c3768f5e95e747e1457c49@orel>
+References: <20231012051509.738750-1-apatel@ventanamicro.com>
+ <20231012051509.738750-7-apatel@ventanamicro.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] KVM: VMX: Cleanup VMX basic information defines and
- usages
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, weijiang.yang@intel.com
-References: <20230927230811.2997443-1-xin@zytor.com>
- <ZTBJO75Zu1JBsqvw@google.com>
-Content-Language: en-US
-From:   Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <ZTBJO75Zu1JBsqvw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012051509.738750-7-apatel@ventanamicro.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/18/2023 2:08 PM, Sean Christopherson wrote:
-
->> Add IA32_VMX_BASIC MSR bitfield shift macros and use them to define VMX
->> basic information bitfields.
+On Thu, Oct 12, 2023 at 10:45:07AM +0530, Anup Patel wrote:
+> We extend the existing RISC-V SBI earlycon support to use the new
+> RISC-V SBI debug console extension.
 > 
-> Why?  Unless something actually uses the shift independently, just define the
-> BIT_ULL(...) straightaway.
-
-Well, reading "BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |" is hard.
-
-But Lemme remove those shifts not being used now.
-
->> Add VMX_BASIC_FEATURES and VMX_BASIC_RESERVED_BITS to form a valid bitmask
->> of IA32_VMX_BASIC MSR. As a result, to add a new VMX basic feature bit,
->> just change the 2 new macros in the header file.
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  drivers/tty/serial/Kconfig              |  2 +-
+>  drivers/tty/serial/earlycon-riscv-sbi.c | 32 +++++++++++++++++++++----
+>  2 files changed, 29 insertions(+), 5 deletions(-)
 > 
-> Not if a new feature bit lands in the middle of one of the reserved ranges, then
-> the developer will have to update at least three macros, and add a new one. More
-> below.
+> diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+> index bdc568a4ab66..cec46091a716 100644
+> --- a/drivers/tty/serial/Kconfig
+> +++ b/drivers/tty/serial/Kconfig
+> @@ -87,7 +87,7 @@ config SERIAL_EARLYCON_SEMIHOST
+>  
+>  config SERIAL_EARLYCON_RISCV_SBI
+>  	bool "Early console using RISC-V SBI"
+> -	depends on RISCV_SBI_V01
+> +	depends on RISCV_SBI
+>  	select SERIAL_CORE
+>  	select SERIAL_CORE_CONSOLE
+>  	select SERIAL_EARLYCON
+> diff --git a/drivers/tty/serial/earlycon-riscv-sbi.c b/drivers/tty/serial/earlycon-riscv-sbi.c
+> index 27afb0b74ea7..c21cdef254e7 100644
+> --- a/drivers/tty/serial/earlycon-riscv-sbi.c
+> +++ b/drivers/tty/serial/earlycon-riscv-sbi.c
+> @@ -15,17 +15,41 @@ static void sbi_putc(struct uart_port *port, unsigned char c)
+>  	sbi_console_putchar(c);
+>  }
+>  
+> -static void sbi_console_write(struct console *con,
+> -			      const char *s, unsigned n)
+> +static void sbi_0_1_console_write(struct console *con,
+> +				  const char *s, unsigned int n)
+>  {
+>  	struct earlycon_device *dev = con->data;
+>  	uart_console_write(&dev->port, s, n, sbi_putc);
+>  }
+>  
+> +static void sbi_dbcn_console_write(struct console *con,
+> +				   const char *s, unsigned int n)
+> +{
+> +	phys_addr_t pa = __pa(s);
+> +
+> +	if (IS_ENABLED(CONFIG_32BIT))
+> +		sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE,
+> +			  n, lower_32_bits(pa), upper_32_bits(pa), 0, 0, 0);
+> +	else
+> +		sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE,
+> +			  n, pa, 0, 0, 0, 0);
+> +}
+> +
+>  static int __init early_sbi_setup(struct earlycon_device *device,
+>  				  const char *opt)
+>  {
+> -	device->con->write = sbi_console_write;
+> -	return 0;
+> +	int ret = 0;
+> +
+> +	if ((sbi_spec_version >= sbi_mk_version(2, 0)) &&
+> +	    (sbi_probe_extension(SBI_EXT_DBCN) > 0)) {
+> +		device->con->write = sbi_dbcn_console_write;
+> +	} else {
+> +		if (IS_ENABLED(CONFIG_RISCV_SBI_V01))
+> +			device->con->write = sbi_0_1_console_write;
+> +		else
+> +			ret = -ENODEV;
+> +	}
+> +
+> +	return ret;
+>  }
+>  EARLYCON_DECLARE(sbi, early_sbi_setup);
+> -- 
+> 2.34.1
+>
 
-yes, it is the case for VMX nested exception feature bit.
-
-
-> 
->> Also replace hardcoded VMX basic numbers with the new VMX basic macros.
->>
->> Tested-by: Shan Kang <shan.kang@intel.com>
->> Signed-off-by: Xin Li <xin3.li@intel.com>
->> ---
->>   arch/x86/include/asm/msr-index.h       | 31 ++++++++++++++++++++------
->>   arch/x86/kvm/vmx/nested.c              | 10 +++------
->>   arch/x86/kvm/vmx/vmx.c                 |  2 +-
->>   tools/arch/x86/include/asm/msr-index.h | 31 ++++++++++++++++++++------
-> 
-> Please drop the tools/ update, copying kernel headers into tools is a perf tools
-> thing that I want no part of.
-> 
-> https://lore.kernel.org/all/Y8bZ%2FJ98V5i3wG%2Fv@google.com
-
-why can't we simply remove tools/arch/x86/include/asm/msr-index.h?
-
-
-> 
->>   4 files changed, 52 insertions(+), 22 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
->> index 1d111350197f..4607448ff805 100644
->> --- a/arch/x86/include/asm/msr-index.h
->> +++ b/arch/x86/include/asm/msr-index.h
->> @@ -1084,13 +1084,30 @@
->>   #define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
->>   
->>   /* VMX_BASIC bits and bitmasks */
->> -#define VMX_BASIC_VMCS_SIZE_SHIFT	32
->> -#define VMX_BASIC_TRUE_CTLS		(1ULL << 55)
->> -#define VMX_BASIC_64		0x0001000000000000LLU
->> -#define VMX_BASIC_MEM_TYPE_SHIFT	50
->> -#define VMX_BASIC_MEM_TYPE_MASK	0x003c000000000000LLU
->> -#define VMX_BASIC_MEM_TYPE_WB	6LLU
->> -#define VMX_BASIC_INOUT		0x0040000000000000LLU
->> +#define VMX_BASIC_VMCS_SIZE_SHIFT		32
->> +#define VMX_BASIC_ALWAYS_0			BIT_ULL(31)
->> +#define VMX_BASIC_RESERVED_RANGE_1		GENMASK_ULL(47, 45)
->> +#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT	48
->> +#define VMX_BASIC_32BIT_PHYS_ADDR_ONLY		BIT_ULL(VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT)
->> +#define VMX_BASIC_DUAL_MONITOR_TREATMENT_SHIFT	49
->> +#define VMX_BASIC_DUAL_MONITOR_TREATMENT	BIT_ULL(VMX_BASIC_DUAL_MONITOR_TREATMENT_SHIFT)
->> +#define VMX_BASIC_MEM_TYPE_SHIFT		50
->> +#define VMX_BASIC_MEM_TYPE_WB			6LLU
->> +#define VMX_BASIC_INOUT_SHIFT			54
->> +#define VMX_BASIC_INOUT				BIT_ULL(VMX_BASIC_INOUT_SHIFT)
->> +#define VMX_BASIC_TRUE_CTLS_SHIFT		55
->> +#define VMX_BASIC_TRUE_CTLS			BIT_ULL(VMX_BASIC_TRUE_CTLS_SHIFT)
->> +#define VMX_BASIC_RESERVED_RANGE_2		GENMASK_ULL(63, 56)
->> +
->> +#define VMX_BASIC_FEATURES			\
-> 
-> Maybe VMX_BASIC_FEATURES_MASK to make it more obvious it's a mask of multiple
-> bits?
-
-This is better!
-
-
-> 
->> +	(VMX_BASIC_DUAL_MONITOR_TREATMENT |	\
->> +	 VMX_BASIC_INOUT |			\
->> +	 VMX_BASIC_TRUE_CTLS)
->> +
->> +#define VMX_BASIC_RESERVED_BITS			\
->> +	(VMX_BASIC_ALWAYS_0 |			\
->> +	 VMX_BASIC_RESERVED_RANGE_1 |		\
->> +	 VMX_BASIC_RESERVED_RANGE_2)
-> 
-> I don't see any value in defining VMX_BASIC_RESERVED_RANGE_1 and
-> VMX_BASIC_RESERVED_RANGE_2 separately.   Or VMX_BASIC_ALWAYS_0 for the matter.
-> And I don't think these macros need to go in msr-index.h, e.g. just define them
-> above vmx_restore_vmx_basic() as that's likely going to be the only user, ever.
-
-hmm, I'm overusing macros, better do:
-#define VMX_BASIC_RESERVED_BITS			\
-	(BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56))
-
-Probably should also move VMX MSR field defs from msr-index.h to
-a vmx header file.
-
-> 
-> And what's really missing is a static_assert() or BUILD_BUG_ON() to ensure that
-> VMX_BASIC_FEATURES doesn't overlap with VMX_BASIC_RESERVED_BITS.
-
-good idea, human beings are not good at such jobs by staring at it.
-
-> 
->>   /* Resctrl MSRs: */
->>   /* - Intel: */
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index c5ec0ef51ff7..5280ba944c87 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -1203,21 +1203,17 @@ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
->>   
->>   static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
->>   {
->> -	const u64 feature_and_reserved =
->> -		/* feature (except bit 48; see below) */
->> -		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
->> -		/* reserved */
->> -		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
->>   	u64 vmx_basic = vmcs_config.nested.basic;
->>   
->> -	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
->> +	if (!is_bitwise_subset(vmx_basic, data,
->> +			       VMX_BASIC_FEATURES | VMX_BASIC_RESERVED_BITS))
->>   		return -EINVAL;
->>   
->>   	/*
->>   	 * KVM does not emulate a version of VMX that constrains physical
->>   	 * addresses of VMX structures (e.g. VMCS) to 32-bits.
->>   	 */
->> -	if (data & BIT_ULL(48))
->> +	if (data & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
->>   		return -EINVAL;
->>   
->>   	if (vmx_basic_vmcs_revision_id(vmx_basic) !=
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 72e3943f3693..f597243d6a72 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2701,7 +2701,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   
->>   #ifdef CONFIG_X86_64
->>   	/* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
->> -	if (vmx_msr_high & (1u<<16))
->> +	if (vmx_msr_high & (1u << (VMX_BASIC_32BIT_PHYS_ADDR_ONLY_SHIFT - 32)))
-> 
-> In all honestly, I find the existing code easier to read.  I'm definitely not
-> saying the existing code is good, but IMO this is at best a wash.
-> 
-> I would much rather we do something like this and move away from the hi/lo crud
-> entirely:
-
-I ever saw a TDX patch does most of this cleanup.
-
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 86ce9efe6c66..f103980c3d02 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2693,28 +2693,28 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->                  _vmexit_control &= ~x_ctrl;
->          }
->   
-> -       rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
-> +       rdmsrl(MSR_IA32_VMX_BASIC, vmx_msr);
->   
->          /* IA-32 SDM Vol 3B: VMCS size is never greater than 4kB. */
-> -       if ((vmx_msr_high & 0x1fff) > PAGE_SIZE)
-> +       if ((VMX_BASIC_VMCS_SIZE(vmx_msr) > PAGE_SIZE)
->                  return -EIO;
->   
->   #ifdef CONFIG_X86_64
->          /* IA-32 SDM Vol 3B: 64-bit CPUs always have VMX_BASIC_MSR[48]==0. */
-> -       if (vmx_msr_high & (1u<<16))
-> +       if (vmx_msr & VMX_BASIC_32BIT_PHYS_ADDR_ONLY)
->                  return -EIO;
->   #endif
->   
->          /* Require Write-Back (WB) memory type for VMCS accesses. */
-> -       if (((vmx_msr_high >> 18) & 15) != 6)
-> +       if (VMX_BASIC_VMCS_MEMTYPE(vmx_msr) != VMX_BASIC_MEM_TYPE_WB)
->                  return -EIO;
->   
->          rdmsrl(MSR_IA32_VMX_MISC, misc_msr);
->   
-> -       vmcs_conf->size = vmx_msr_high & 0x1fff;
-> -       vmcs_conf->basic_cap = vmx_msr_high & ~0x1fff;
-> +       vmcs_conf->size = VMX_BASIC_VMCS_SIZE(vmx_msr);
-> +       vmcs_conf->basic_cap = ????(vmx_msr);
->   
-> -       vmcs_conf->revision_id = vmx_msr_low;
-> +       vmcs_conf->revision_id = (u32)vmx_msr;
->   
->          vmcs_conf->pin_based_exec_ctrl = _pin_based_exec_control;
->          vmcs_conf->cpu_based_exec_ctrl = _cpu_based_exec_control;
-> 
-
--- 
-Thanks!
-     Xin
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
