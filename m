@@ -2,131 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A87847CFD69
-	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 16:58:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D75227CFE18
+	for <lists+kvm@lfdr.de>; Thu, 19 Oct 2023 17:39:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345800AbjJSO6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 10:58:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
+        id S1346351AbjJSPjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 11:39:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235423AbjJSO57 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 10:57:59 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13A5119
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 07:57:57 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9c4ae201e0so778531276.1
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 07:57:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697727477; x=1698332277; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NoyDzNpmGMgG5vgnElNw+7wjvKQootkU5+NZTuzV+xg=;
-        b=Gm6Qujx2s3EY83BV15eUeFcUqAef5IzNanVHwEQKSMwkYUZhwHtMI1CBTcaAjLscOv
-         Asxymdyuh5WM5kAmXD3PlbMiZyORfahnX1iJMkqtXtoI2n/vCkt4ZF1Hzo+XMplrVLgB
-         kDn8sIa8BDM8hvzdQfztTy8op70DcFUvR9V4qQCw0yIX5H8BDZsVDBgWELP+rUYtfVsy
-         G+HebzaqlTZ30KZphvY3Tzgb5nk32VUBwY06OlOKzawj+yPr5CEsHypA3F7pMUZMKVeW
-         8b6QOMPcQ5MM7oEilfJHfFbzOGn5ztKJgPk16qT6J+z9Zyoxha4EYCwBEcJKtxAKpCa/
-         3CLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697727477; x=1698332277;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NoyDzNpmGMgG5vgnElNw+7wjvKQootkU5+NZTuzV+xg=;
-        b=jePf7sQyaNt/Fmprd/cooSJBrM4N+viFtNYYwNMbAAJ+eflpHv1GGvWfofUWxPNlHb
-         +FByjD55n8EW7sAq4aZS45t3hwaIPsTkszJF1FTUk/icjWO344UzZ21VPNz/gJJQubtU
-         h1mehMjAxmr6sxF7ZqbPzIWox9u5acbRLufN228i/QYFrfwVgRFyBdvW5eYkgxHqXGX+
-         3PLzlMixRIvqETEQIHTaZTzazwnYTY6gJ8Hyaa+8V063u+rBZfQ07fr9XA44mLC8S/zt
-         uySgqRQ1qqpe2ax8EDcejSARZRbaooW7zVG4xaZc4Bo6FGVRG6Kawlvv1jtWZv6/aFSf
-         W2xg==
-X-Gm-Message-State: AOJu0YylucSjNvU770VluDsA1Z8rBH5D2J+lm6xHLIjs6xCNHNVPkxjb
-        WNzusDh83MS8e8wZz1EfYlJDgrI7mhM=
-X-Google-Smtp-Source: AGHT+IGGSi1A+odVH3et/CwWq4QLFvjNrU7TNfsn6fh/fjXnuZNCRYjqcrZpE1GRu0FMfXKhYQGxJgbQ8Z4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1202:b0:d9a:b81b:fd66 with SMTP id
- s2-20020a056902120200b00d9ab81bfd66mr66949ybu.2.1697727477216; Thu, 19 Oct
- 2023 07:57:57 -0700 (PDT)
-Date:   Thu, 19 Oct 2023 07:57:55 -0700
-In-Reply-To: <924b755a-977a-4476-9525-a7626d728e18@amd.com>
-Mime-Version: 1.0
-References: <20231016132819.1002933-1-michael.roth@amd.com>
- <20231016132819.1002933-49-michael.roth@amd.com> <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
- <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
- <ZS_iS4UOgBbssp7Z@google.com> <924b755a-977a-4476-9525-a7626d728e18@amd.com>
-Message-ID: <ZTFD8y5T9nPOpCyX@google.com>
-Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        pankaj.gupta@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1346030AbjJSPjT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 11:39:19 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851AE9E;
+        Thu, 19 Oct 2023 08:39:18 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39JFadhM006435;
+        Thu, 19 Oct 2023 15:38:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=j0R1Ga/kpGsfsZxYDsOKQGw5axBGZpmFvBJQOoMUbIU=;
+ b=GbHccPC3f5652sKQHy/rCTbSwZdvRDqPhlrZARyg/uBbQ3htwghs01EZk9vQXiMZ1GmD
+ 9sy8xQmnlZFD74BQGG05Ueb9OI9WAAf1IrmHHwUNxQC332qnzyY4Tj+n2jpoRmxrYkc2
+ WeDa1Dm0/td6cjlpgWmHK0pft+fPJJvwVAlf0/MWeX5LT36I+Bk9YW25QvxV16rU/xfo
+ 8AWWem0HqL791Vq5LTm3YbSspcyMHAGUgz5QoELfYCzbHvwuoS+rO8A2Md4aoeS5Xmt2
+ mR8bisLHydthj/dLUvxrgr/2ltm5GP0Mrls12vdWfQ4ODDTWQ7qopib6tQ4JlOHELK13 sg== 
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tu71q0thp-10
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Oct 2023 15:38:09 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39JEin6J030742;
+        Thu, 19 Oct 2023 15:32:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tr7hk1bbd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Oct 2023 15:32:09 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39JFW8NC44368204
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Oct 2023 15:32:08 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE89020043;
+        Thu, 19 Oct 2023 15:32:07 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5A2FE20040;
+        Thu, 19 Oct 2023 15:32:07 +0000 (GMT)
+Received: from osiris (unknown [9.171.41.136])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu, 19 Oct 2023 15:32:07 +0000 (GMT)
+Date:   Thu, 19 Oct 2023 17:32:05 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        amd-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 2dac75696c6da3c848daa118a729827541c89d33
+Message-ID: <20231019153205.9160-A-hca@linux.ibm.com>
+References: <202310190456.pryB092r-lkp@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202310190456.pryB092r-lkp@intel.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: pLCVHeZl1pGGUcpHU0HZgqokDhWlFOun
+X-Proofpoint-GUID: pLCVHeZl1pGGUcpHU0HZgqokDhWlFOun
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-19_14,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ phishscore=0 spamscore=0 impostorscore=0 mlxlogscore=702
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 clxscore=1011
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310190130
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 19, 2023, Alexey Kardashevskiy wrote:
-> 
-> On 19/10/23 00:48, Sean Christopherson wrote:
-> > static int snp_handle_ext_guest_request(struct vcpu_svm *svm)
-> > {
-> > 	struct kvm_vcpu *vcpu = &svm->vcpu;
-> > 	struct kvm *kvm = vcpu->kvm;
-> > 	struct kvm_sev_info *sev;
-> > 	unsigned long exitcode;
-> > 	u64 data_gpa;
-> > 
-> > 	if (!sev_snp_guest(vcpu->kvm)) {
-> > 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_GUEST);
-> > 		return 1;
-> > 	}
-> > 
-> > 	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-> > 	if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
-> > 		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_ADDRESS);
-> > 		return 1;
-> > 	}
-> > 
-> > 	vcpu->run->hypercall.nr		 = KVM_HC_SNP_GET_CERTS;
-> > 	vcpu->run->hypercall.args[0]	 = data_gpa;
-> > 	vcpu->run->hypercall.args[1]	 = vcpu->arch.regs[VCPU_REGS_RBX];
-> > 	vcpu->run->hypercall.flags	 = KVM_EXIT_HYPERCALL_LONG_MODE;
-> 
-> btw why is it _LONG_MODE and not just _64? :)
+On Thu, Oct 19, 2023 at 04:07:35AM +0800, kernel test robot wrote:
+> arch/s390/include/asm/ctlreg.h:129:9: warning: array subscript 0 is outside array bounds of 'struct ctlreg[0]' [-Warray-bounds=]
+> arch/s390/include/asm/ctlreg.h:80:9: warning: array subscript 0 is outside array bounds of 'struct ctlreg[0]' [-Warray-bounds=]
+...
+> |-- s390-defconfig
+> |   `-- arch-s390-include-asm-ctlreg.h:warning:array-subscript-is-outside-array-bounds-of-struct-ctlreg
+...
+> s390                                defconfig   gcc  
 
-I'm pretty sure it got copied from Xen when KVM started adding supporting for
-emulating Xen's hypercalls.  I assume Xen PV actually has a need for identifying
-long mode as opposed to just 64-bit mode, but KVM, not so much.
+I'm wondering how this warning can appear in the builds. array-bounds
+warnings are explicitly disabled, see init/Kconfig: CC_NO_ARRAY_BOUNDS. And
+as expected, if I compile the kernel with gcc, defconfig, and with or
+without W=1 the option -Wno-array-bounds is passed to the compiler.
 
-> > 	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_request;
-> > 	return 0;
-> > }
-> 
-> This should work the KVM stored certs nicely but not for the global certs.
-> Although I am not all convinced that global certs is all that valuable but I
-> do not know the history of that, happened before I joined so I let others to
-> comment on that. Thanks,
+And also as expected I do not see the above warnings.
 
-Aren't the global certs provided by userspace too though?  If all certs are
-ultimately controlled by userspace, I don't see any reason to make the kernel a
-middle-man.
+So something is quite odd here.
