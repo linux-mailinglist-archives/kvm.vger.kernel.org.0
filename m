@@ -2,144 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D30B7D10A4
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 15:40:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE8C17D10BE
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 15:47:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377424AbjJTNki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 09:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47366 "EHLO
+        id S1377466AbjJTNrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 09:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377421AbjJTNkg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 09:40:36 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB7FD6B
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 06:40:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ahR5WPYvFKKFki9ZHDuVEkcWC4v0a1N2QtB1VtXMKf6m2P6DfT/XIi0osLZqojMeo/Oovp0nJ7bbOkCgKpLnfHHNsHgnIjIP6Ul9jMr8Y68050hXK1PfYIO8kfe+LiatIje3c47aWE84/kRl0XPHRhuzfXZpr8YFyH1YGLfH/yJn9tQsrLpxabwM/g8Vkbu4LvnJqD2cERKopeKqOU7gv8EtyFvRb97pd1CDHlkHMz3q39qEHkHSwnDyt6ZWAzKG/v+/YukrTDdQ3lsYa3nhLcA8NgbBUCYTQqcA0NWitP0GUd5pwtKisnwjX0203XJg9bfeXCd7V7hvl5FkEuzxLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oRgontKNpjEUGD1cskBPBoMY4tluTvQ1MdXuil1REIs=;
- b=Q8lNrlVcyNYBXkMG1AiN0EEMtu/GhhCZvgdH6LJE8X0sUj/MNMcMXLwsOY4pbXfEZ/kwHL9vH3Hn865pTT/h2N7jJLAQcxAwTDluF1zI69hfQOeaNoVE7aho1ybxGcIcjaXdpT4AXtys+JzL0uQs6SjYXM0iEdHlJYKh+6avMe3RBO1bBeamJUL7GChcUVVMHIGJsjkEljqEKVaFdBPUlLNqF0ez635L/PW1xxvQm5b8qBVdrfZsdi4ucIt/m6G54faugzIbXZlzSG7iGR99klbd0cpvMxQ7AKWg/mvdH2XdEJyhGgpikFsv1lBtaXvbxXonnIN/FbC2jTzBL+Py7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oRgontKNpjEUGD1cskBPBoMY4tluTvQ1MdXuil1REIs=;
- b=PYO9hQv7bFIy0f3vmuMjzUtsaaQzk7KETb+P5cEafezuXvpL6WHzL42UY8gR7knyjKOggOi4W4ZLX72jUf+uljoyL47KYbWih5EHorBLVm/xiAn046BgVasmSSNZWPWhctsql4uz3fTifmMrKHhFuFn5UstRQtoFB9Zf2Jji2Zetdnowhyfg43Etv9RB5n9QlRTcSIj8BLt6m6dXXaoE1CUAmiE4GNVpXk4tzec+IkCjHUXDQETEMYQzn81R5JoLWwtsx8p3fLO/k8wE/FXNj+7gvfaVyumD83LOWG6IbTMPU7KJxP7qQuy2ziKPhgKrH/ID9UzWBcnKdxVzL4aZGA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA0PR12MB4367.namprd12.prod.outlook.com (2603:10b6:806:94::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Fri, 20 Oct
- 2023 13:40:28 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Fri, 20 Oct 2023
- 13:40:28 +0000
-Date:   Fri, 20 Oct 2023 10:40:26 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v4 07/18] iommufd: Add IOMMU_HWPT_GET_DIRTY_IOVA
-Message-ID: <20231020134026.GF3952@nvidia.com>
-References: <20231018202715.69734-1-joao.m.martins@oracle.com>
- <20231018202715.69734-8-joao.m.martins@oracle.com>
- <BN9PR11MB5276E0546391A87457258D368CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <cec5aba3-6e25-43e4-9aee-1342a369ece4@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cec5aba3-6e25-43e4-9aee-1342a369ece4@oracle.com>
-X-ClientProxiedBy: BL1PR13CA0222.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S1377372AbjJTNrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 09:47:20 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4FDDA3
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 06:47:16 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5a9bc2ec556so583233a12.0
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 06:47:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1697809636; x=1698414436; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ujFKaHWQlVUmMQlPTcdZIic60Ioy7TSqQ3nDhHoDDn0=;
+        b=P6hJA9XHLrlREANM92ye5l+V/OvcbTs9+UCzklsxfA+8AWC2JFc3ImCtV4ectOGTkh
+         ABMJoNI3/T1b90RNFNBMNHvPEyZ5mcPXcGCP+OjLVezORt1WOZeJhjXp4D7Fdu+BmDt2
+         736ngLQ/QdC6O0hRN+h8OzjY2f4Ba+vmCBJjrLMBOoRu49V/QyPAZX33coy7A7VaCjCF
+         4zyAGQA91ak6Q6I3bYsdbGrFTZ9NFWiIdUE07XMVb8M0+KTF+785ac3Czh1ic/9ArUtD
+         4TjOavBfPz7YIGHs3zm1hwp/hI1OGwboG22n3JL0bkksqaCoTjCfvQvzqKDjyFQli1Sh
+         c5JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697809636; x=1698414436;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ujFKaHWQlVUmMQlPTcdZIic60Ioy7TSqQ3nDhHoDDn0=;
+        b=Fp+39MLxU31ooZsAsYyaVJXcwMJtFfUxNCjmRrofMm49ELktIVmT0MA6rye67h3Kre
+         R7MGkuCJVZ9mVwpzEQPn3UIgK9RlY6pDr235kwhl/3Xvoi90BDNf4z40CrDjfjR2jY3E
+         9sked9a48Q3bIq31/ouL9oP4yFMHdaN8mG+T4PIbukwMWNcjskWLAgdwuQFgFnYDJJqZ
+         fmtvAYX0DzeczzXXClQIAMttPYbhrKtO1ddjNThdN07k52dUASU1NwlG/dWk8wL0Xkc9
+         fQfl6Jtq4a2xceRnw+P+/F/mNy40DXIQCFNFC8MgR4sJDl3fHp9RqOm7Jyqp4+A8DtyQ
+         kZgA==
+X-Gm-Message-State: AOJu0YxU67FAbQMmzAKw+XMxS6JTcTH9GmdKBVz5UMEhddRUmO+CS9gx
+        IkE8wLI3YYbsX8Ogy9TDeJMzjSmOQ1V0Qhdbt40Lcw==
+X-Google-Smtp-Source: AGHT+IEe1qO4q6kLy01GbxGxRAix8XMIPBN+082Nf7nryQBHvgSvHroABh+Pz6NLehEhxMDygq9zBHrYtbpZO8gR1/0=
+X-Received: by 2002:a05:6a21:66cb:b0:172:f4e:5104 with SMTP id
+ ze11-20020a056a2166cb00b001720f4e5104mr1738132pzb.20.1697809636011; Fri, 20
+ Oct 2023 06:47:16 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA0PR12MB4367:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4af8cc4c-1496-47cc-eac8-08dbd1721f29
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OOZxLNnpavNw0+UIa6rHfnasuHQrSIR0Mwn9sRATIoGpIqeLW6irhnPq6s07oYU2FsYXTRzlSwg6gM6pQTKga0DVBp43fuz0zQrj3bkcGJWCot+krAavp76LaTn+P8yQuUczKIFF8Whjx8YVhlmw/bnB5doTEOYzx2gRRu9Dcs9PJ6WU6kzffc/VD5fhEAC9XJZkcbNx6TcR1D/qXYtyn8OdVm10K6aGKYg6gWactYFeG8kvp6UeUJYOMlu+eNt8j4dwayprCyE3HQm8PMSWmzfJzxpSDZ4gGihChimFS96O/0dNFaQ9ApgXT/Q/b0unmJdw40pMQxuqlMP/tJOto/5bQ4psNPE43gWSS2zx3sbu77Z/ZVl4DzRHsRqqIqnqnCT1H6X4zqw6rgc3sBPqPLoBIfhQlEdCbz4vL82zHLjYvT0wDQi8Ir4OqwvoEMKmRVPUgsAqldHhpTSNLwfAtgVp0FHdP4kBYw4eow3AaD+xLlOHMJulH7adAfUQFiIh7pAC8VYtgE0iT88fSsQKbNtCt2d75GK9g4VRbNMHnSlGzRcdkye09lbBcBCSw/H+GCG1lakmPF50GcISjo3AlTLamHrBzc3/Awpmr+JeZtU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(39860400002)(376002)(366004)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(2616005)(1076003)(6506007)(26005)(8936002)(4744005)(6512007)(6916009)(4326008)(41300700001)(7416002)(6486002)(5660300002)(2906002)(8676002)(478600001)(54906003)(66556008)(316002)(66946007)(38100700002)(66476007)(86362001)(33656002)(36756003)(14143004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qtfuWXUiXxnHqGHY1ZfWxpXYrr/vN+8+WeR7KpyGTNx64PNOR74vBNE6JKq8?=
- =?us-ascii?Q?QH55do4nK8fj7psi0TayLtRKMQeY4ZlwaGCiZ1NxiHzeqNSA7rRsqLX0m7gf?=
- =?us-ascii?Q?O7LaCpA7MWc2dvn/l/W83pUpjThZgtW1+wYuQulcOc3VVQIxgNEaRhoShcBc?=
- =?us-ascii?Q?UvuiCLrzygNHoB3bxkylt1lTkZnTK+Cy1rlGzWRxO1hWHGHMeC28JmcmUHHs?=
- =?us-ascii?Q?cmAsWoB4s4/SDTk/Q8LXVX1uRhZQoDU8aDNWjQyvEbEr907Rkj/heNQRHZjj?=
- =?us-ascii?Q?BA/8uno0zd6ceTL53p0bsaPNzoOqWAAg2SDcmej5x1C14XNxjJbA5JIuJ64O?=
- =?us-ascii?Q?ZNRnwSAGgEb7Ngh3VZ4tb7JKMeIl31L4mR0mFON7m4GnR9JTG0d1lnZ6boB6?=
- =?us-ascii?Q?cNrSDz+xqPCagoircah6NZwRxvMZ6Y1ggMVPh3DtpxOZyb9aymYs77ebBQXj?=
- =?us-ascii?Q?YC/XceviKCexlQtMPc7XzOgFvrpObLPSjR5JrhGmoNU1aTZJZLGJYBm9BWGS?=
- =?us-ascii?Q?/JCVF0CkQeoBwVrP6YP9x+FtyHtu0vQIeJ+ilqMBduQey4ETSsIHZFCGT3fU?=
- =?us-ascii?Q?XMd6jWv8kk8zLBRHHLChMiRqr2fPsURibkEZaK/uVVvNeinc0l5nMlSNG0XO?=
- =?us-ascii?Q?r9222IfkEPCNLqH0F3ixEQgV0SEy/opSfQqbqQ1aa5+l4GUeD29yP1IsV+2T?=
- =?us-ascii?Q?Gif8PGVeA8ZC8brkG7lWgBL3jbZmI+QERBFSIdy3JBp4AE4wImezeT+ppjom?=
- =?us-ascii?Q?19+FQk6nMSvVSEDHnivndX1czWUwOaczozpQpNmycibPwuIO0QJXdGhAmKMW?=
- =?us-ascii?Q?pzEEBt6pc+cRDwbj99gmBbdfiIV9yrHtkgYmdId8HyG0ztEFGzMN+qFQVTpy?=
- =?us-ascii?Q?V+TfpJ1dOy6UUYkh2vZyfr8iyYYc98XZE12GiAli349OhizwV7Zsk1opOC/S?=
- =?us-ascii?Q?IFsDb1gQ7GorCxAkmJyOeefmCIBl+jfJaJdac5VlI9MDBknZx02ji0m8cx2c?=
- =?us-ascii?Q?gV12h50IJ2+t7H7Gh9utDT45nKB6ePv5Q0Ivg1lyFtzI0kVZerOKH6a4vVns?=
- =?us-ascii?Q?AL6U3FGf+XKTl463risE5igDmkrnOrxVyV+KHcrTairV6AqlI+oBjDdU+/Dh?=
- =?us-ascii?Q?ML549pR4oHGet7qxc33O0TbkMF2BDwMrTgY/bwlMuJVdwnqFvdmkWMtMavYE?=
- =?us-ascii?Q?zZRLF+ForRewRP4fgit2ylPGJz8BoQapCgs36X9/kBhe8QBjSyTXJnaY+ae7?=
- =?us-ascii?Q?YMroCHYqHIfpGXa8DBxGq9MarmZDUXhvWkAPEWrRHjEbCowztSG34VTvNi3h?=
- =?us-ascii?Q?Mtu0UcykREjE3o8SX2D7jhc49cYeOQLl9jmrZ6xJImqjHt5yIBd5d7DAu2Ou?=
- =?us-ascii?Q?jSrM2kSsspQ5tKq4GIC7+AOBfeEKBHhvnVIIgWL3zwFv4QTN2iZKsdFzac6x?=
- =?us-ascii?Q?kDSgUP9/WyPJTkegPDJbxfZY8jvyLPk1GwAoUs9gi9EQtJ6nMfzcvXdjy4Nq?=
- =?us-ascii?Q?R8AKg20uNc702JFReihMKzxVAKHI5w4wlxbdTQbTa108/Yc7skUc6hQwaccB?=
- =?us-ascii?Q?xDMfcKSMXO8DDCKWLXM2XRaFOXZ6Ahet4cJnHSHL?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4af8cc4c-1496-47cc-eac8-08dbd1721f29
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 13:40:28.3356
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hZeUdMR/BSxj9V62kOj2WoDk/+8FLi/GdhlBy5a+sHGmt+L0SOni+/3DIzGU6ZO3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4367
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20231020072140.900967-1-apatel@ventanamicro.com>
+ <20231020072140.900967-9-apatel@ventanamicro.com> <20231020-f1ec2b7e384a4cfeae39966f@orel>
+In-Reply-To: <20231020-f1ec2b7e384a4cfeae39966f@orel>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Fri, 20 Oct 2023 19:17:03 +0530
+Message-ID: <CAK9=C2Vg8O_6OaND_s1MhpBHpm1petoU7DNXOOaSOxXYUY1iAw@mail.gmail.com>
+Subject: Re: [PATCH v3 8/9] tty: Add SBI debug console support to HVC SBI driver
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Conor Dooley <conor@kernel.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 12:53:36PM +0100, Joao Martins wrote:
+On Fri, Oct 20, 2023 at 4:16=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Fri, Oct 20, 2023 at 12:51:39PM +0530, Anup Patel wrote:
+> > From: Atish Patra <atishp@rivosinc.com>
+> >
+> > RISC-V SBI specification supports advanced debug console
+> > support via SBI DBCN extension.
+> >
+> > Extend the HVC SBI driver to support it.
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  drivers/tty/hvc/Kconfig         |  2 +-
+> >  drivers/tty/hvc/hvc_riscv_sbi.c | 82 ++++++++++++++++++++++++++++++---
+> >  2 files changed, 76 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/drivers/tty/hvc/Kconfig b/drivers/tty/hvc/Kconfig
+> > index 4f9264d005c0..6e05c5c7bca1 100644
+> > --- a/drivers/tty/hvc/Kconfig
+> > +++ b/drivers/tty/hvc/Kconfig
+> > @@ -108,7 +108,7 @@ config HVC_DCC_SERIALIZE_SMP
+> >
+> >  config HVC_RISCV_SBI
+> >       bool "RISC-V SBI console support"
+> > -     depends on RISCV_SBI_V01
+> > +     depends on RISCV_SBI
+> >       select HVC_DRIVER
+> >       help
+> >         This enables support for console output via RISC-V SBI calls, w=
+hich
+> > diff --git a/drivers/tty/hvc/hvc_riscv_sbi.c b/drivers/tty/hvc/hvc_risc=
+v_sbi.c
+> > index 31f53fa77e4a..56da1a4b5aca 100644
+> > --- a/drivers/tty/hvc/hvc_riscv_sbi.c
+> > +++ b/drivers/tty/hvc/hvc_riscv_sbi.c
+> > @@ -39,21 +39,89 @@ static int hvc_sbi_tty_get(uint32_t vtermno, char *=
+buf, int count)
+> >       return i;
+> >  }
+> >
+> > -static const struct hv_ops hvc_sbi_ops =3D {
+> > +static const struct hv_ops hvc_sbi_v01_ops =3D {
+> >       .get_chars =3D hvc_sbi_tty_get,
+> >       .put_chars =3D hvc_sbi_tty_put,
+> >  };
+> >
+> > -static int __init hvc_sbi_init(void)
+> > +static int hvc_sbi_dbcn_tty_put(uint32_t vtermno, const char *buf, int=
+ count)
+> >  {
+> > -     return PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_ops, 16));
+> > +     phys_addr_t pa;
+> > +     struct sbiret ret;
+> > +
+> > +     if (is_vmalloc_addr(buf)) {
+> > +             pa =3D page_to_phys(vmalloc_to_page(buf)) + offset_in_pag=
+e(buf);
+> > +             if (PAGE_SIZE < (offset_in_page(buf) + count))
+>
+> I thought checkpatch complained about uppercase constants being on the
+> left in comparisons.
 
-> >> + * struct iommu_hwpt_get_dirty_iova -
-> >> ioctl(IOMMU_HWPT_GET_DIRTY_IOVA)
-> > 
-> > IOMMU_HWPT_GET_DIRTY_BITMAP? IOVA usually means one address
-> > but here we talk about a bitmap of which one bit represents a page.
-> > 
-> My reading of 'IOVA' was actually in the plural form -- Probably my bad english.
-> 
-> HWPT_GET_DIRTY_BITMAP is OK too (maybe better); I guess more explicit
-> on how it's structured the reporting/returning data.
+Nope checkpatch does not complain about this.
 
-I tend to agree
+>
+> > +                     count =3D PAGE_SIZE - offset_in_page(buf);
+> > +     } else {
+> > +             pa =3D __pa(buf);
+> > +     }
+> > +
+> > +     if (IS_ENABLED(CONFIG_32BIT))
+> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRIT=
+E,
+> > +                             count, lower_32_bits(pa), upper_32_bits(p=
+a),
+> > +                             0, 0, 0);
+> > +     else
+> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRIT=
+E,
+> > +                             count, pa, 0, 0, 0, 0);
+> > +     if (ret.error)
+> > +             return 0;
+> > +
+> > +     return count;
+>
+> Shouldn't we return ret.value here in case it's less than count? I see we
+> already do that below in get().
 
-Jason
+Ahh, yes. Good catch, I will update.
+
+>
+> >  }
+> > -device_initcall(hvc_sbi_init);
+> >
+> > -static int __init hvc_sbi_console_init(void)
+> > +static int hvc_sbi_dbcn_tty_get(uint32_t vtermno, char *buf, int count=
+)
+> >  {
+> > -     hvc_instantiate(0, 0, &hvc_sbi_ops);
+> > +     phys_addr_t pa;
+> > +     struct sbiret ret;
+> > +
+> > +     if (is_vmalloc_addr(buf)) {
+> > +             pa =3D page_to_phys(vmalloc_to_page(buf)) + offset_in_pag=
+e(buf);
+> > +             if (PAGE_SIZE < (offset_in_page(buf) + count))
+> > +                     count =3D PAGE_SIZE - offset_in_page(buf);
+> > +     } else {
+> > +             pa =3D __pa(buf);
+> > +     }
+> > +
+> > +     if (IS_ENABLED(CONFIG_32BIT))
+> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_READ=
+,
+> > +                             count, lower_32_bits(pa), upper_32_bits(p=
+a),
+> > +                             0, 0, 0);
+> > +     else
+> > +             ret =3D sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_READ=
+,
+> > +                             count, pa, 0, 0, 0, 0);
+> > +     if (ret.error)
+> > +             return 0;
+> > +
+> > +     return ret.value;
+> > +}
+> > +
+> > +static const struct hv_ops hvc_sbi_dbcn_ops =3D {
+> > +     .put_chars =3D hvc_sbi_dbcn_tty_put,
+> > +     .get_chars =3D hvc_sbi_dbcn_tty_get,
+> > +};
+> > +
+> > +static int __init hvc_sbi_init(void)
+> > +{
+> > +     int err;
+> > +
+> > +     if ((sbi_spec_version >=3D sbi_mk_version(2, 0)) &&
+> > +         (sbi_probe_extension(SBI_EXT_DBCN) > 0)) {
+> > +             err =3D PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_dbcn_ops=
+, 16));
+>
+> Why an outbuf size of only 16?
+
+The output buffer size of 16 is a very common choice across
+HVC drivers. The next best choice is 256.
+
+I guess 256 is better so I will go with that.
+
+>
+> > +             if (err)
+> > +                     return err;
+> > +             hvc_instantiate(0, 0, &hvc_sbi_dbcn_ops);
+> > +     } else {
+> > +             if (IS_ENABLED(CONFIG_RISCV_SBI_V01)) {
+> > +                     err =3D PTR_ERR_OR_ZERO(hvc_alloc(0, 0, &hvc_sbi_=
+v01_ops, 16));
+> > +                     if (err)
+> > +                             return err;
+> > +                     hvc_instantiate(0, 0, &hvc_sbi_v01_ops);
+> > +             } else {
+> > +                     return -ENODEV;
+> > +             }
+> > +     }
+> >
+> >       return 0;
+> >  }
+> > -console_initcall(hvc_sbi_console_init);
+> > +device_initcall(hvc_sbi_init);
+> > --
+> > 2.34.1
+> >
+>
+> Thanks,
+> drew
+
+Regards,
+Anup
