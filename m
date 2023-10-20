@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D647D1845
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 23:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 920CB7D1853
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 23:42:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345325AbjJTVlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 17:41:17 -0400
+        id S1345482AbjJTVld (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 17:41:33 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233203AbjJTVlP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 17:41:15 -0400
-Received: from mail-ot1-x34a.google.com (mail-ot1-x34a.google.com [IPv6:2607:f8b0:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F8110CE
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:03 -0700 (PDT)
-Received: by mail-ot1-x34a.google.com with SMTP id 46e09a7af769-6ccedabb330so1722826a34.1
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:03 -0700 (PDT)
+        with ESMTP id S1345176AbjJTVlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 17:41:16 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD095D6C
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:04 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a839b31a0dso23806467b3.0
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697838063; x=1698442863; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697838064; x=1698442864; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UZTHdI73LjJ+tdCxtrSBfoEJbDPL8Ytb4Ns2eCXo9P0=;
-        b=y4zAW0/8BWDmc5grsWpujLKF33jqLDUDBjqO2j8ZOTZ9c/5vdN2eihPbiSEjbqbb1H
-         Ui8QCxbwM9KPrucINuKUGmXUDtDd+XhTZA/v/iXhN61NVOujbwq2jLLCPtEcEz0ExEif
-         0VXARZ/p81STmhb+F3YlypqKStCVotnefWOGcFrb/UZqVIe4ZAQHqca5q1cf851+LNFn
-         j0ge9azxGnkfe89wFvCZYXld2uGCG49KxAT0aS6B1k2k9B+6mSarlrUJ5PuY1shrlySf
-         u2ucrS8uxGYAJPtSebpaBzFCI7P9Mq1O9Qp96Pd8KllgBMNncyb0R/DkPVOlwgvT5Nmk
-         eaQw==
+        bh=eWANe28YHA3Ik3VAhdhi3PR1V7Sp1rEPcSjU6me6VYQ=;
+        b=a3L9/DSrY46+hFW6OWnAMjHUl4Pp3cU/gldU1GxusgQ6LJZAVnFAKj8P7cV8PiRBoH
+         QO3CafgU6K9E/fmFMzorI7Upx/9HslLzXUbJ9TLf/M658DNiO2TugLhdGkfXdukXqfLi
+         4dbKUFX1XitYSuG6FOioOvb90SHtxW/0XTu68g+nNw+GHlnW8JrZzu4b2ElItAqqm7m7
+         F6271x05jMLSN8+IRRFzkMsZ81ltdgHty7NoFJblpLXrSx9yCy4BAW6KVW/t7xjGNlyk
+         q/KjOENjWK/QYiIllmoBIUflDvTVXRXvGxeyZz4KU1kA2c7/k/HKMJy0nQN/9NusqyqK
+         iulQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697838063; x=1698442863;
+        d=1e100.net; s=20230601; t=1697838064; x=1698442864;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UZTHdI73LjJ+tdCxtrSBfoEJbDPL8Ytb4Ns2eCXo9P0=;
-        b=WLDoFXZeei2ECAESAayUIn043sSW+g8lbhGLTXxFD1aYIU7QKFsBMpMJkZA7y7bBnG
-         JivRbz7xx2AbfHRq+hNwsCXxuh/gfsa54Y3CcdUip/W3suG/uBK2LUymbK+Xsh5Z+6o9
-         MXJlN5SR92RNIARj5ZSs42U41MIflks5d/pi6AINj51AufI52k2nB0+RfF3PV6TvGAuj
-         sDiAXrr68rsLRJ5S2kFIxLpRA16DQt58z+SCgzl8FRHhdcJlwKqH3SrrqCQX6qFoZ4gZ
-         XO0uICd6qCiwLecMMww4Fnxm6uzV6yQe5lk9BZnMWlrpN+khPMk+DdrGCGfX4z6ayL3e
-         weTQ==
-X-Gm-Message-State: AOJu0YyPGONnGu5QdJbo8z4ujSJPwh98pgolD6fnoPyf0v8IHd72Nw8t
-        248+XR8Y92czUqwJtRBH7HwqnJj5jfVr
-X-Google-Smtp-Source: AGHT+IGmQUtWN2yXPx1W8N9ywV18/lF8tjnlx7PJ7Cm9muwl3a03ohwjxnNV0mAYCF4av1euZ/wFeeKf4Clv
+        bh=eWANe28YHA3Ik3VAhdhi3PR1V7Sp1rEPcSjU6me6VYQ=;
+        b=wbTJKRXmzh99BQ4k3tuheSaT4Rea9IMOmrjp5kIjIRZKabN7bMS2SlNkG2w/OYmPYN
+         p+JGVC2WtQEpltcXz49jMefxZvq+fBxzTOp3B3Fn1nOfS+XdK9gXtGIpGRHCO7BUPGxQ
+         Ud3L9ScbEHxlE/r+gD/OvjMJMePfpWDc/uIK0osbcTjYXC4beFhh3V/Zo9l7bOyCLhl5
+         HeJ5Ypx9MKTCVrFDPWqENJClf6EWfi+DAHlcjGLmt0nWUvmV9qv4dA3W2VilZeNhlWUG
+         2dGIyWf7X64WjnYzXXq4Y3O3iMh3Ev/g9yL4j8ppc1Vg6dZDAfpqM6l2SoX38oY0l29M
+         IKQw==
+X-Gm-Message-State: AOJu0YwEILZjuPdo/qtWbYoSP6StSnSM3CpDgfhHan834jvTXn7YGIuY
+        oL1psGstpXN94EHEfOybXOLWH6Dy61/J
+X-Google-Smtp-Source: AGHT+IGdgdjVHKqx6Bu9LPm2rggnnmwoBhDoh8QKCazmacm9yfZUPsDbAbEK8fK3ImY6VtPJpzzcreKswMJJ
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a05:6830:33c2:b0:6b9:182b:cebc with SMTP
- id q2-20020a05683033c200b006b9182bcebcmr795333ott.7.1697838063058; Fri, 20
- Oct 2023 14:41:03 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 21:40:46 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c946:c18c with SMTP
+ id v3-20020a056902108300b00d9ac946c18cmr92087ybu.6.1697838063913; Fri, 20 Oct
+ 2023 14:41:03 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 21:40:47 +0000
 In-Reply-To: <20231020214053.2144305-1-rananta@google.com>
 Mime-Version: 1.0
 References: <20231020214053.2144305-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231020214053.2144305-7-rananta@google.com>
-Subject: [PATCH v8 06/13] KVM: arm64: Sanitize PM{C,I}NTEN{SET,CLR},
- PMOVS{SET,CLR} before first run
+Message-ID: <20231020214053.2144305-8-rananta@google.com>
+Subject: [PATCH v8 07/13] KVM: arm64: PMU: Allow userspace to limit PMCR_EL0.N
+ for the guest
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>
@@ -72,81 +72,112 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For unimplemented counters, the registers PM{C,I}NTEN{SET,CLR}
-and PMOVS{SET,CLR} are expected to have the corresponding bits RAZ.
-Hence to ensure correct KVM's PMU emulation, mask out the bits in
-these registers for these unimplemented counters before the first
-vCPU run.
+From: Reiji Watanabe <reijiw@google.com>
 
+KVM does not yet support userspace modifying PMCR_EL0.N (With
+the previous patch, KVM ignores what is written by userspace).
+Add support userspace limiting PMCR_EL0.N.
+
+Disallow userspace to set PMCR_EL0.N to a value that is greater
+than the host value as KVM doesn't support more event counters
+than what the host HW implements. Also, make this register
+immutable after the VM has started running. To maintain the
+existing expectations, instead of returning an error, KVM
+returns a success for these two cases.
+
+Finally, ignore writes to read-only bits that are cleared on
+vCPU reset, and RES{0,1} bits (including writable bits that
+KVM doesn't support yet), as those bits shouldn't be modified
+(at least with the current KVM).
+
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/kvm/arm.c      |  2 +-
- arch/arm64/kvm/pmu-emul.c | 11 +++++++++++
- include/kvm/arm_pmu.h     |  2 ++
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 57 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 55 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e3074a9e23a8b..3c0bb80483fb1 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -857,7 +857,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		}
- 
- 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
--			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
-+			kvm_vcpu_handle_request_reload_pmu(vcpu);
- 
- 		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
- 			kvm_vcpu_pmu_restore_guest(vcpu);
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 9e24581206c24..31e4933293b76 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -788,6 +788,17 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- 	return val & mask;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2e5d497596ef8..a2c5f210b3d6b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1176,6 +1176,59 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+ 	return 0;
  }
  
-+void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu)
++static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
++		    u64 val)
 +{
-+	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++	struct kvm *kvm = vcpu->kvm;
++	u64 new_n, mutable_mask;
 +
-+	kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
++	mutex_lock(&kvm->arch.config_lock);
 +
-+	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= mask;
-+	__vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= mask;
-+	__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= mask;
++	/*
++	 * Make PMCR immutable once the VM has started running, but
++	 * do not return an error to meet the existing expectations.
++	 */
++	if (kvm_vm_has_ran_once(vcpu->kvm)) {
++		mutex_unlock(&kvm->arch.config_lock);
++		return 0;
++	}
++
++	new_n = (val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
++	if (new_n != kvm->arch.pmcr_n) {
++		u8 pmcr_n_limit = kvm_arm_pmu_get_max_counters(kvm);
++
++		/*
++		 * The vCPU can't have more counters than the PMU hardware
++		 * implements. Ignore this error to maintain compatibility
++		 * with the existing KVM behavior.
++		 */
++		if (new_n <= pmcr_n_limit)
++			kvm->arch.pmcr_n = new_n;
++	}
++	mutex_unlock(&kvm->arch.config_lock);
++
++	/*
++	 * Ignore writes to RES0 bits, read only bits that are cleared on
++	 * vCPU reset, and writable bits that KVM doesn't support yet.
++	 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
++	 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
++	 * But, we leave the bit as it is here, as the vCPU's PMUver might
++	 * be changed later (NOTE: the bit will be cleared on first vCPU run
++	 * if necessary).
++	 */
++	mutable_mask = (ARMV8_PMU_PMCR_MASK |
++			(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT));
++	val &= mutable_mask;
++	val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
++
++	/* The LC bit is RES1 when AArch32 is not supported */
++	if (!kvm_supports_32bit_el0())
++		val |= ARMV8_PMU_PMCR_LC;
++
++	__vcpu_sys_reg(vcpu, r->reg) = val;
++	return 0;
 +}
 +
- int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
- {
- 	if (!kvm_vcpu_has_pmu(vcpu))
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 2e90f38090e6d..567dc288a5ddb 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -63,6 +63,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx);
-+void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu);
- int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
- 			    struct kvm_device_attr *attr);
- int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
-@@ -142,6 +143,7 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
- 						  u64 data, u64 select_idx) {}
-+static inline void vm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu) {}
- static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
- 					  struct kvm_device_attr *attr)
- {
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+@@ -2309,8 +2362,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+ 	{ SYS_DESC(SYS_SVCR), undef_access },
+ 
+-	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr,
+-	  .reset = reset_pmcr, .reg = PMCR_EL0, .get_user = get_pmcr },
++	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
++	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0,
+ 	  .get_user = get_pmcnten, .set_user = set_pmcnten },
 -- 
 2.42.0.655.g421f12c284-goog
 
