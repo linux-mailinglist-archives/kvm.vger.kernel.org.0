@@ -2,192 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69BF37D1606
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 20:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 219917D1617
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 21:07:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbjJTS7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 14:59:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59702 "EHLO
+        id S230061AbjJTTHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 15:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbjJTS7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 14:59:31 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178DFD70;
-        Fri, 20 Oct 2023 11:59:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ve6JK0qztnEsW2XhC8TXM4wsm25mKpw+4Htd2mJt9im0qzrQrvEYbcs7oaFSUhJG/sCxLnZdBmRPHSIdxNeDxbawMjscMw/iocqaFeChZSjdjg8WJGTn4OgpebXusNxincROfP+tLNk0xdFlsOTQ7nYwOPVUNwKU+pYkGDKIDMPAoAMbUyBS9IPypYMy6mcfT1EiqMcqes2E69yvjpaQ2GHFv8lLqzwu+lkBSvbmONNuMUPwyPK5ovV0Xs8kzvblZMsNozQr1Ms+fsIxB3P9uzYxQhHoDeTbGt0AbWXEYbsvWbiAFnnubmGQPFh/PKZwrhWqbI0IKYISFMrh0erb5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I1sntpRSYS4mEFqBki+vFeXsoVmLmMSCA9/ZbuFyYRg=;
- b=hUJnqGBlaJX1XaLcPR8bP66/2AEuRC40Xo4SS2zU6+cUP7V4tSzBH54hX4wMVa1+hxcj8G/axYFUgr7R9lfqLeWbMf7wBj9Q6R1wZ1wQz3T/7MurAHWQkw9qEhmBMNoQTEtmlzbiSmYj6YC/+l0LEd8hr+WQmQUG8Xdn9OchY3VkWMrRGXMp8vnVUMKL/5kaEtRTGI0z+iZVhDkk33Coaz1qmwrInEGjTV0SEyGdzBJSPWLMRFRocCsLJeT+96WqlUyn6+3HwWTNFkVasaHTphKHpjlJ9T8J0hWbJEaTy+EBsSqst/rlzb1YkyIx66yaA6ydl/WwkHw6jC+nHbC4SQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I1sntpRSYS4mEFqBki+vFeXsoVmLmMSCA9/ZbuFyYRg=;
- b=aw8qAwqApw9ZoorRFA1Q7Qukrnif111cD3KvF1LgLbOupcGskAmYYVYb1m/YBTZoWQJN/gUXYc/9n7sYzWLiW1yZ8AIwoMr7D+xbOaHZx/bQsYDK0ebGV7IPV8yVdRK2SSNkOihb6B3CILLgfVADbShvJSIb5GPSOBubCsSAFnXnvAP9OJjFnkXj72cp2hvUwr3SuXtKJ4ztgYAFsbmgN+fBVVhJClCNW356wGrVg9eIVaEm2PuGzvFaWpNbIQ3Vti7AmUgBx2GsuWLFCVslgVDwbCXDO0H/j30b0IUIUPJH5DcZYqIlreSpuC5bfgiF1ZqB0rH7bZNSS7xd6wa6lA==
-Received: from BLAPR05CA0032.namprd05.prod.outlook.com (2603:10b6:208:335::13)
- by CH0PR12MB5075.namprd12.prod.outlook.com (2603:10b6:610:e2::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Fri, 20 Oct
- 2023 18:59:27 +0000
-Received: from MN1PEPF0000F0E0.namprd04.prod.outlook.com
- (2603:10b6:208:335:cafe::6f) by BLAPR05CA0032.outlook.office365.com
- (2603:10b6:208:335::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.7 via Frontend
- Transport; Fri, 20 Oct 2023 18:59:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MN1PEPF0000F0E0.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.22 via Frontend Transport; Fri, 20 Oct 2023 18:59:26 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 20 Oct
- 2023 11:59:16 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 20 Oct
- 2023 11:59:15 -0700
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
- Transport; Fri, 20 Oct 2023 11:59:14 -0700
-Date:   Fri, 20 Oct 2023 11:59:13 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v4 08/17] iommufd: Always setup MSI and anforce cc on
- kernel-managed domains
-Message-ID: <ZTLOAQK/KcjAJb3y@Asurada-Nvidia>
-References: <BN9PR11MB52763227866603ED7795AA068CD7A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231016115736.GP3952@nvidia.com>
- <BN9PR11MB5276FDC375685CE04A7AD93B8CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231017155301.GH3952@nvidia.com>
- <ZS7nb+mKanGFXhZY@Asurada-Nvidia>
- <20231018165113.GB3952@nvidia.com>
- <BN9PR11MB5276B9994AD06E91E07B7EF08CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231019235350.GY3952@nvidia.com>
- <BN9PR11MB5276A64DA68586AEFB6561148CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231020135501.GG3952@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231020135501.GG3952@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E0:EE_|CH0PR12MB5075:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e9220de-c3c0-46dc-c9d3-08dbd19eaed4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WWzxJVAMmxDRQOKqvRoQxXPonmAJp37qB3TEe6drWr/YT9lI4low8cfT/qmVmY2n6Rb5Xc0UXQ9Po6stDoz261kwA3nlHK2DwZekoL5YPam2ts0h+JZCJPSIcrZynD96ymtrksVrZYy2aI26ZUxDVOLt0DWnEd47TYcPqHhTXdwtl4c2ZAwSmra8NtFr9G0cwVxwBHLQ0U0WCgtKYhQSvKXrD89aRtQwAB469d0obRk7xoqWFaVjB+E8WRnSM1c4qxnP2+GkJAu0ckjP3sIn9Th6YLBihAKLwEzPDboBMouaYbhHhOmPdaM+HIgj4hUh+0Aw6sDOVsLJhRCKMTNcX1DA3QmbKLMszAD+FIu/VH+GAjvkeQnmhbVNIruq63/jjECMcSKIKziGlH6oIxmlDmCuNmzhjnxd9JdgQ8bAsc4q+SSN3n11FK06T44WbxoVR9xIxi2QD5AlRUwOEEN+LovVQf7060MmoMiI/0P6gSepGhMC2w0C2l2Ta1c33iJMYeWcloflj2uMGqgp6znk3j2D40VnSQXEH6rjcaPy2gwtGeOVkR4ZxV1ZcBcaViVD8OKR19LMYpEtV+1nv1irGxuznFY59s02uYYAC+ldOY44B/gq8G6r4nsVqyG+KN84WUbgstUfyseCZd0ofU+q764DhoSBztE2ooPGRTVzPYNw3UIMeQCAy68l2w/i0GBOLhF2ax3YumzOE6JaUsf8aP3xSqLAFSmWhFIbQzcR5VpoZmEG9J0paWU9r9HNNBcL
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(346002)(376002)(230922051799003)(451199024)(1800799009)(64100799003)(82310400011)(186009)(46966006)(40470700004)(36840700001)(86362001)(4326008)(40460700003)(55016003)(478600001)(70586007)(70206006)(54906003)(6636002)(316002)(8676002)(8936002)(5660300002)(41300700001)(6862004)(7416002)(2906002)(7636003)(47076005)(26005)(36860700001)(426003)(83380400001)(356005)(336012)(9686003)(40480700001)(82740400003)(33716001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 18:59:26.9088
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e9220de-c3c0-46dc-c9d3-08dbd19eaed4
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: MN1PEPF0000F0E0.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5075
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229954AbjJTTG4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 15:06:56 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B65FD63
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 12:06:54 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7aa161b2fso15147557b3.2
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 12:06:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697828813; x=1698433613; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJMiGrIhknpVYB+lLA3TXzIajTqOeaWLMLUUQN9BbMk=;
+        b=Wmj6A+bLcsIAm1sAyB9SiKTyAe/xF4yGTsuzgHhla78U+m78X9HLczAgVW9fdt1hz4
+         eUP/Ed9vn77cDvPwBq3mIS9g9tDknUcXszNrxz55l/hfRIE7/Ho6H2MVvgeZMqnp8Hu7
+         VUgFPcJwPA+v4HwRgt3f7YKej1k4zvL+CncCqGHJwEvc4qgkEAUhm9Ad9iKgfng7GHzh
+         0NT5gLdiEeLXMYNmxZi5TOrMBPwLMsYVNWt36c+s5UPIa9TBBxfUBNPrYt3QaWaYVM+p
+         kOCzH7QUvDm0jL82WgX/3W+cGsu3FuHrfFY69jfoWX77YjnW5phMe/oYTHjEQabilxN0
+         w10A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697828813; x=1698433613;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJMiGrIhknpVYB+lLA3TXzIajTqOeaWLMLUUQN9BbMk=;
+        b=vXmnrBDu0eQW2Ec6/jUBgIB/SGXqHc8mLmEFDTJNj1tXzfT5FFXoU4mNfcU/q9y4Mg
+         ZgFiM2mBkYw+qYcGgvIEqhGd+oQkahVvaPTl8FU0sT6AhADCLvMgbugazS9UWIz+g6Kw
+         zy4g9bLD7U7GpjfchesAv2JVuvua0W5amN//qPh2h+7sq2VxSuvDLVP6OZeKPAhpU/D/
+         dyaY4cH83hC9Q2SElBiVzYwRiS5vr6VS5Tpvg2cKii8fhmp7wwPD0meuvkcMGgSeHhRn
+         B3LO4zhhV+eumNYpM4gBGdrmcvL18p8Tf7jVyE2txCgsputsTjS/GBmMia67+UsfZWz+
+         mneQ==
+X-Gm-Message-State: AOJu0Yw/zZRDNzKaLqNKJV8H6M+5w9xImhBQ5kBo+bgDi5IFnGN+ThGZ
+        5DxHwFuJQmanONuKneoaQwlucBjTQms=
+X-Google-Smtp-Source: AGHT+IGIgsmKl9/EeQe6qAywriK9UwbK/k300V7nBKfGTSYuUwbuxCBVs3ZRc3wOXbeQIlmP3vxDbl1J5EU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d05:0:b0:d9a:5b63:a682 with SMTP id
+ 5-20020a250d05000000b00d9a5b63a682mr51644ybn.13.1697828813642; Fri, 20 Oct
+ 2023 12:06:53 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 12:06:51 -0700
+In-Reply-To: <20230911114347.85882-9-cloudliang@tencent.com>
+Mime-Version: 1.0
+References: <20230911114347.85882-1-cloudliang@tencent.com> <20230911114347.85882-9-cloudliang@tencent.com>
+Message-ID: <ZTLPy9SYzJmgMxw9@google.com>
+Subject: Re: [PATCH v4 8/9] KVM: selftests: Test Intel supported fixed
+ counters bit mask
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 10:55:01AM -0300, Jason Gunthorpe wrote:
-> On Fri, Oct 20, 2023 at 02:43:58AM +0000, Tian, Kevin wrote:
+On Mon, Sep 11, 2023, Jinrong Liang wrote:
+> From: Jinrong Liang <cloudliang@tencent.com>
 > 
-> > What we want to prevent is attaching a non-CC device to a CC domain
-> > or upgrade a non-CC domain to CC since in both case the non-CC
-> > device will be broken due to incompatible page table format.
+> Add a test to check that fixed counters enabled via guest
+> CPUID.0xA.ECX (instead of EDX[04:00]) work as normal as usual.
 > 
-> [..]
+> Co-developed-by: Like Xu <likexu@tencent.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> ---
+>  .../selftests/kvm/x86_64/pmu_counters_test.c  | 54 +++++++++++++++++++
+>  1 file changed, 54 insertions(+)
 > 
-> > Who cares about such consistency? sure the result is different due to order:
-> > 
-> > 1) creating hwpt for dev1 (non-CC) then later attaching hwpt to
-> >     dev2 (CC) will succeed;
-> > 
-> > 2) creating hwpt for dev2 (CC) then later attaching hwpt to
-> >     dev1 (non-CC) will fail then the user should create a new hwpt
-> >     for dev1;
-> 
-> AH... So really what the Intel driver wants is not upgrade to CC but
-> *downgrade* from CC.
-> 
-> non-CC is the type that is universally applicable, so if we come
-> across a non-CC capable device the proper/optimal thing is to degrade
-> the HWPT and re-use it, not allocate a new HWPT.
-> 
-> So the whole thing is upside down.
-> 
-> As changing the IOPTEs in flight seems hard, and I don't want to see
-> the Intel driver get slowed down to accomodate this, I think you are
-> right to say this should be a creation time property only.
-> 
-> I still think userspace should be able to select it so it can minimize
-> the number of HWPTs required.
-> 
-> > But the user shouldn't assume such explicit consistency since it's not
-> > defined in our uAPI. All we defined is that the attaching may
-> > fail due to incompatibility for whatever reason then the user can
-> > always try creating a new hwpt for the to-be-attached device. From
-> > this regard I don't see providing consistency of result is
-> > necessary. 😊
-> 
-> Anyhow, OK, lets add a comment summarizing your points and remove the
-> cc upgrade at attach time (sorry Nicolin/Yi!)
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> index df76f0f2bfd0..12c00bf94683 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> @@ -301,6 +301,59 @@ static void test_intel_counters_num(void)
+>  	test_oob_fixed_ctr(nr_fixed_counters + 1);
+>  }
+>  
+> +static void fixed_counters_guest_code(void)
+> +{
+> +	uint64_t supported_bitmask = this_cpu_property(X86_PROPERTY_PMU_FIXED_COUNTERS_BITMASK);
+> +	uint32_t nr_fixed_counter = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
+> +	uint64_t msr_val;
+> +	unsigned int i;
+> +	bool expected;
+> +
+> +	for (i = 0; i < nr_fixed_counter; i++) {
+> +		expected = supported_bitmask & BIT_ULL(i) || i < nr_fixed_counter;
+> +
+> +		wrmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+> +		wrmsr_safe(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * i));
+> +		wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL, BIT_ULL(PMC_IDX_FIXED + i));
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+> +		wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +		rdmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, &msr_val);
 
-Ack. I will send a small removal series. I assume it should CC
-stable tree also? And where should we add this comment? Kdoc of
-the alloc uAPI?
+Y'all are making this way harder than it needs to be.  The previous patch already
+created a testcase to verify fixed counters, just use that!  Then test case verify
+that trying to enable unsupported fixed counters results in #GP, as opposed to the
+above which doesn't do any actual checking, e.g. KVM could completely botch the
+{RD,WR}MSR emulation but pass the test by not programming up a counter in perf.
 
-Thanks!
-Nicolin
+I.e. rather than have a separate test for the supported bitmask goofiness, have
+the fixed counters test iterate over the bitmask.  And then add a patch to verify
+the counters can be enabled and actually count.
 
-> It is easy to add a HWPT flag for this later if someone wants to
-> optimize it.
-> 
-> Jason
+And peeking ahead at the vPMU version test, it's the exact same story there.
+Instead of hardcoding one-off tests, iterate on the version.  The end result is
+that the test provides _more_ coverage with _less_ code.  And without any of the
+hardcoded magic that takes a crystal ball to understand.
+
+*sigh* 
+
+And even more importantly, this test is complete garbage.  The SDM clearly states
+that 
+
+  With Architectural Performance Monitoring Version 5, register CPUID.0AH.ECX
+  indicates Fixed Counter enumeration. It is a bit mask which enumerates the
+  supported Fixed Counters in a processor. If bit 'i' is set, it implies that
+  Fixed Counter 'i' is supported.
+
+*sigh*
+
+The test passes because it only iterates over counters < nr_fixed_counter.  So
+as written, the test worse than useless.  It provides no meaningful value and is
+actively misleading.
+
+	for (i = 0; i < nr_fixed_counter; i++) {
+
+Maybe I haven't been explicit enough: the point of writing tests is to find and
+prevent bugs, not to get the tests passing.  That isn't to say we don't want a
+clean testgrid, but writing a "test" that doesn't actually test anything is a
+waste of everyone's time.
+
+I appreciate that the PMU is subtle and complex (understatement), but things like
+this, where observing that the result of "supported_bitmask & BIT_ULL(i)" doesn't
+actually affect anything, doesn't require PMU knowledge.
+
+	for (i = 0; i < nr_fixed_counter; i++) {                                
+		expected = supported_bitmask & BIT_ULL(i) || i < nr_fixed_counter;
+
+A concrete suggestion for writing tests: introduce bugs in what you're testing
+and verify that the test actually detects the bugs.  If you tried to do that for
+the above bitmask test you would have discovered you can't break KVM because KVM
+doesn't support this!  And if your test doesn't detect the bugs, that should also
+be a big clue that something isn't quite right.
