@@ -2,112 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBBCE7D0B33
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 11:11:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF3B7D0B42
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 11:16:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376593AbjJTJLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 05:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60744 "EHLO
+        id S1376621AbjJTJQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 05:16:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376523AbjJTJLx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 05:11:53 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324C3D49;
-        Fri, 20 Oct 2023 02:11:51 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso812504a12.1;
-        Fri, 20 Oct 2023 02:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697793109; x=1698397909; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X/i6Fw+r194GHmzLf5s0/R2GunByWxbzISKNUr2Ewbs=;
-        b=WK273gnNBgQqtxS19+jYkmOUl/PUmlEIEavgAfKHtTxfPBGa1PIwsFZaaR+CkE1VAJ
-         T6NUdNNx3tHeO3ejL/cFtG5yRgJOeO/+Gqcy65AyL+D8LVgkFoq7ocDNsu1f2mynPjFR
-         B6GMy3EAOU4r5IXNC4OsMi1p11u8Ta41NMSbIvJVh4APkrTnh2mqWb4UWvwycH6B4ndx
-         wBK2o/UG03KGD2SdIe2M4j5MHXEC2EyZ4sQFrdz8ZUXIZ2l9oxEzACss2xEGweiVPH+i
-         W6EcEoE66mQVVXWA3pc/YzPxSafac/hcW58qM7lvc48s+TLXnsQWVjmAjZiAcT4Jm3Ga
-         PdDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697793109; x=1698397909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X/i6Fw+r194GHmzLf5s0/R2GunByWxbzISKNUr2Ewbs=;
-        b=NRPrTHhXPaTtly2Zb1pLPdNyrs60dZwqkHWCCqyTLg9N8qzb2O8lfikAOgChEoo6ix
-         zyANZhI6pOZpriBYdtLsMuwi99d/j8tFQ91RppsCKVBEZNLTtRThk62UJHRLOVhaaUgC
-         opL6dXLV94PBFIBTqYhGpTUS8idrpHy6KmpefEmC/9IUh+8Uv+dbROWZmji9glL3e2tM
-         oMLEWw0HRWUkgGGVRSkZQseMfb5lakrqYBUrouDfBMIiLlSGdiqp7y0+oOdsKn8Zv4SD
-         MYrilo4981faaoQ5hy9LFE33mZMkuiqsGe7b80YNZ2p6nMwNrYsjfcYJJIas4AGLq7N9
-         8dAw==
-X-Gm-Message-State: AOJu0YyNtFpxQ0wbNtSvDtq/3XTEpk+8Z9gYwyDTmMKlkdnmLZXn30NN
-        xqKikEIgeI/Xiyad4xfV2TbtTZIL44uvzVfgbd4=
-X-Google-Smtp-Source: AGHT+IE8NvcGYuTH2X4TAtkNajqUfVispERe7ssyHACJl3CPrCBjy+Mr7xKL/Px/u1PKsPdLHsoLIX397B80GJJ4fXc=
-X-Received: by 2002:a50:aad2:0:b0:525:6c74:5e58 with SMTP id
- r18-20020a50aad2000000b005256c745e58mr1002625edc.23.1697793109383; Fri, 20
- Oct 2023 02:11:49 -0700 (PDT)
+        with ESMTP id S1376634AbjJTJQA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 05:16:00 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36FEBD68
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 02:15:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697793356; x=1729329356;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4+a2ILPohMQTXxfbC3HF+IYd8bX72UjjME/Xtoh+uo8=;
+  b=Pfa3Z5vNn4H3nKxkVzHivy3JT+MUCNUKvNtbqLCDholxTxv23u7Sa3xn
+   aq4HQumgA1+BW9yDijRphhxZsPEXcbXAk5qJsR2sjOyMi2EATzUNAM/Nn
+   T7Ccau7jtsW94onku8OZibNGSWHZ3+JJYUICmMDWXy4AXIrZFVSF6WqqI
+   HvrBv0WHMg5k5GpncUg/8XhKv2mT6mmiUhPM+pNMBuQKCakb6/X3YRYLP
+   IvWiyThnL0E7/HVg6nmYNNLjjB6evWGC+cQ+sFsyU/xNX68NiaPkiX0tE
+   ew4Y5Laf1Cp7MOtWu/k9exjBw1xHjTkUF6RV69+qX/KOGm3jgo89Dc1YN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="452941053"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="452941053"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 02:15:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="786726195"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="786726195"
+Received: from lingxu-mobl.ccr.corp.intel.com (HELO [10.254.211.102]) ([10.254.211.102])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 02:15:35 -0700
+Message-ID: <001ad25b-f7c2-4a7f-8266-8a7c104c9975@linux.intel.com>
+Date:   Fri, 20 Oct 2023 17:15:33 +0800
 MIME-Version: 1.0
-References: <20230911114347.85882-1-cloudliang@tencent.com> <ZTHJvQm-nDNkvldM@google.com>
-In-Reply-To: <ZTHJvQm-nDNkvldM@google.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Fri, 20 Oct 2023 17:11:37 +0800
-Message-ID: <CAFg_LQVsXjcnpnDFnP1rrypXD4N0DD3kYq_vxXK8SRzGjEjA1A@mail.gmail.com>
-Subject: Re: [PATCH v4 0/9] KVM: selftests: Test the consistency of the PMU's
- CPUID and its features
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 12/18] iommu/intel: Access/Dirty bit support for SL
+ domains
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>
+References: <20231018202715.69734-1-joao.m.martins@oracle.com>
+ <20231018202715.69734-13-joao.m.martins@oracle.com>
+ <BN9PR11MB527658ABE413A50034647D9A8CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Language: en-US
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB527658ABE413A50034647D9A8CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B410=E6=9C=8820=
-=E6=97=A5=E5=91=A8=E4=BA=94 08:28=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Sep 11, 2023, Jinrong Liang wrote:
-> > Jinrong Liang (9):
-> >   KVM: selftests: Add vcpu_set_cpuid_property() to set properties
-> >   KVM: selftests: Extend this_pmu_has() and kvm_pmu_has() to check arch
-> >     events
-> >   KVM: selftests: Add pmu.h for PMU events and common masks
-> >   KVM: selftests: Test Intel PMU architectural events on gp counters
-> >   KVM: selftests: Test Intel PMU architectural events on fixed counters
-> >   KVM: selftests: Test consistency of CPUID with num of gp counters
-> >   KVM: selftests: Test consistency of CPUID with num of fixed counters
-> >   KVM: selftests: Test Intel supported fixed counters bit mask
-> >   KVM: selftests: Test consistency of PMU MSRs with Intel PMU version
->
-> I've pushed a modified version to
->
->   https://github.com/sean-jc/linux/branches x86/pmu_counter_tests
->
-> which also has fixes for KVM's funky handling of fixed counters.  I'll wa=
-it for
-> you to respond, but will tentatively plan on posting the above branch as =
-v5
-> some time next week.
+On 2023/10/20 15:53, Tian, Kevin wrote:
+>> From: Joao Martins<joao.m.martins@oracle.com>
+>> Sent: Thursday, October 19, 2023 4:27 AM
+>>
+>> +
+>> +	if (!IS_ERR(domain) && enforce_dirty) {
+>> +		if (to_dmar_domain(domain)->use_first_level) {
+>> +			iommu_domain_free(domain);
+>> +			return ERR_PTR(-EOPNOTSUPP);
+>> +		}
+>> +		domain->dirty_ops = &intel_dirty_ops;
+>> +	}
+> I don't understand why we should check use_first_level here. It's
+> a dead condition as alloc_user() only uses 2nd level. Later when
+> nested is introduced then we explicitly disallow enforce_dirty
+> on a nested user domain.
 
-I truly appreciate your time and effort in reviewing my patches and
-making the necessary modifications. I've carefully examined the
-updated code in the branch you kindly provided:
+This is to restrict dirty tracking to the second level page table
+*explicitly*. If we have a need to enable dirty tracking on the first
+level in the future, we can remove this check.
 
-https://github.com/sean-jc/linux/branches x86/pmu_counter_tests
-
-I completely agree with the changes you made. Please feel free to post
-the modified branch as v5 next week. I will add AMD counters related
-selftests after this patch set is merged.
-
-Thank you once again for your time and guidance.
+Best regards,
+baolu
