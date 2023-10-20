@@ -2,111 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC0ED7D196D
-	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 00:58:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEA0C7D197F
+	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 01:13:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbjJTW6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 18:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41672 "EHLO
+        id S230142AbjJTXNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 19:13:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbjJTW6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 18:58:43 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C466D7C
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:58:32 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d99ec34829aso1634599276.1
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:58:32 -0700 (PDT)
+        with ESMTP id S229559AbjJTXNR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 19:13:17 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5625FD52
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 16:13:15 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-6bd00edc63fso1246585b3a.0
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 16:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697842711; x=1698447511; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697843595; x=1698448395; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nV7hUiXwTHfWM008m9tGJ1YLn/BzCMBzf+rjk0AGTB0=;
-        b=qR9abIwpBYqeCJa+5pUkw3oT4J+WVdXGTIhNJLjANGmOSEvuNKiTXeDEIGEeEQw9u+
-         BkAkETn5320gYhgmgXmse6GwZbQz5kidYKUB6iG5kHinHtYt+Biq09qRbd2BndnrHVcU
-         lvXc9B3eL0rmfVlFwYVLe8eI+WtbozDtV/kBt9iqZ6ixErvPysc0+2n3FTCvrbTpVuTm
-         PMcmhVuf8Nm2CZ+kz1Uk7ewYSJYgdYjojzkFzlEI3TMMwfc/V5+Jmv0APWmuC/M9jZ5q
-         s0P14fBL5U0p4fWnvE71WtC+Q0QrIlRUV6Pvtb/hrpP5FDUwgdXXNTEuMT99WGRfz748
-         /MEA==
+        bh=CgAVXy/axx8rbE3S2sz/Fpl+Q5PtMzZyyI0NieynS1Q=;
+        b=3dzEKRkQ3gyICAewppe2ffS6ZcMlYJNYdSp0UhbUUy9GAMvGPZSTOBDQBYOvfNPb8q
+         /aO3YepGbcj1wHzD60P6vX61zRnFjr8Sn32IIAlzvbWDrrHH5sqsTav6I8eyTxe+YRnR
+         Pa3A3j1/YJRXX87xGouWpsID1BeypQFBeq0Sa10b042o6IOLXZ2hmOExcuOqsE6KH5YF
+         gVtVGvMPwGLfrhEUJdrPmA9NKcRn+pbf1UhmzQbNri+SO6tmFlR4TYSILZjmic3cp79T
+         mR62nI6y3qkkL7kZ77ISvQdCFQ4g/wKBnhYkUaiNyhRfcsOASyAuEV66smJ82chJpOe7
+         SQaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697842711; x=1698447511;
+        d=1e100.net; s=20230601; t=1697843595; x=1698448395;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nV7hUiXwTHfWM008m9tGJ1YLn/BzCMBzf+rjk0AGTB0=;
-        b=rH8glwrPjeMrlJTN/II5vOsbAddAaT8g4DR6oKFcJ0u0cCwUYsO7GuzNRsA0SmbAnE
-         e/kcTMqgOtoUD6/6A1MFiIb69XxO12nAIUiJ0u/gX4VmoCbcP4OFafgmmUL76jsM3+SV
-         PtaSJLtBX7PMXckOGeMpLMrh9r2ItyY0Lyy+ucEwGXRYWSbg46TUV87WQ4NRgXVp1E1V
-         YtUbzDPT4TuWCxhxMf4oKBuqmOUXUgLNqmtddktCbt1YF8fDvsKKmxXQwO7W7LGvxN/M
-         Y3MsMAA3gYzbyAvs9XmjWhYai3C8xY5E74HV/BEBi8YhSCrZVUEEuRZCCEhrYtwwpK2+
-         bVyg==
-X-Gm-Message-State: AOJu0Yw7z35lnKGXv4X5IYvceHknmm0l23ZUiAU6vdcWWCbKDeFXgHMU
-        +fVxNMK4NrWQjrlxEB9YYLAQdERA4iU=
-X-Google-Smtp-Source: AGHT+IEAaQ9vGQXrDQ7YTSPaOgbWm4DgSvaj703/FKyK96m8YdUpJyMR/+YqbEiDiU0UsL/ZLPV3DFG2q3E=
+        bh=CgAVXy/axx8rbE3S2sz/Fpl+Q5PtMzZyyI0NieynS1Q=;
+        b=jUbUENuAiUhoOyjPeDJglr6BHQi4d6eiwmdmrpnkY/YhW9iHzSrzUawBLk3pHib8pD
+         dL7hsqBbXUxjqNwCRWq8uIZOVtjJsBGtj+Ait5wQ8HJhIh8Egllnv0/4yvDDWlRvZJiy
+         yfEPx1q1ieLFWLMac4Sgf/dnf/q2H4xm7y4Kx0PHA8tBdGoevoT5/49JiZDQ94GBybJl
+         fWr5QPGeu5oXZ81lWy6WhglHoQBadw9poBNLV4YSAqg+CBkcEEi5XmXf5f0UTg9TmEPP
+         uh0o0fRZaD8+iYeBIozl+T54KLAmLG7jR2DwxFqWm2S2VG7bDeVEdTLoYXdAlu5Fu3+s
+         9AHQ==
+X-Gm-Message-State: AOJu0YxuUDnMZvqI5cykQVJIBv7AGJmOvEvKa8mfde/4MMbuzg5/OyWn
+        2DfVIfG1ZN8BwbgcG2xDPkQrMG2oKJE=
+X-Google-Smtp-Source: AGHT+IEb+B01P1bRaoNxc8joEn7AXOfNyBKk3u3HcHvMNx5bY4rK4asGL8wTgvrzbJpYbbyCzWgKi6MQfSk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:938c:0:b0:d9a:37cf:c22b with SMTP id
- a12-20020a25938c000000b00d9a37cfc22bmr69932ybm.1.1697842711533; Fri, 20 Oct
- 2023 15:58:31 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 15:56:29 -0700
-In-Reply-To: <20231002040839.2630027-1-mizhang@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:26e4:b0:6bc:ff89:a30e with SMTP id
+ p36-20020a056a0026e400b006bcff89a30emr86478pfw.3.1697843594765; Fri, 20 Oct
+ 2023 16:13:14 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 16:13:13 -0700
+In-Reply-To: <20231020-delay-verw-v1-1-cff54096326d@linux.intel.com>
 Mime-Version: 1.0
-References: <20231002040839.2630027-1-mizhang@google.com>
-X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <169766419668.1911126.2774635531681023250.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Service NMI requests after PMI requests in
- VM-Enter path
+References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com> <20231020-delay-verw-v1-1-cff54096326d@linux.intel.com>
+Message-ID: <ZTMJiVsEeyu6Vd8E@google.com>
+Subject: Re: [PATCH  1/6] x86/bugs: Add asm helpers for executing VERW
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Like Xu <likexu@tencent.com>, Kan Liang <kan.liang@intel.com>,
-        Dapeng1 Mi <dapeng1.mi@intel.com>, Xin Li <xin@zytor.com>
-Content-Type: text/plain; charset="utf-8"
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com,
+        Alyssa Milburn <alyssa.milburn@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 02 Oct 2023 04:08:39 +0000, Mingwei Zhang wrote:
-> Service NMI requests after PMI requests in vcpu_enter_guest() so that KVM
-> does not need to cancel and redo the VM-Enter. Because APIC emulation
-> "injects" NMIs via KVM_REQ_NMI, handling PMI requests after NMI requests
-> means KVM won't detect the pending NMI request until the final check for
-> outstanding requests. Detecting requests at the final stage is costly as
-> KVM has already loaded guest state, potentially queued events for
-> injection, disabled IRQs, dropped SRCU, etc., most of which needs to be
-> unwound.
-> 
-> [...]
+On Fri, Oct 20, 2023, Pawan Gupta wrote:
+> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> index c55cc243592e..e1b623a27e1b 100644
+> --- a/arch/x86/include/asm/nospec-branch.h
+> +++ b/arch/x86/include/asm/nospec-branch.h
+> @@ -111,6 +111,24 @@
+>  #define RESET_CALL_DEPTH_FROM_CALL
+>  #endif
+>  
+> +/*
+> + * Macro to execute VERW instruction to mitigate transient data sampling
+> + * attacks such as MDS. On affected systems a microcode update overloaded VERW
+> + * instruction to also clear the CPU buffers.
+> + *
+> + * Note: Only the memory operand variant of VERW clears the CPU buffers. To
+> + * handle the case when VERW is executed after user registers are restored, use
+> + * RIP to point the memory operand to a part NOPL instruction that contains
+> + * __KERNEL_DS.
+> + */
+> +#define __EXEC_VERW(m)	verw _ASM_RIP(m)
+> +
+> +#define EXEC_VERW				\
+> +	__EXEC_VERW(551f);			\
+> +	/* nopl __KERNEL_DS(%rax) */		\
+> +	.byte 0x0f, 0x1f, 0x80, 0x00, 0x00;	\
+> +551:	.word __KERNEL_DS;			\
 
-Applied to kvm-x86 pmu, thanks!
+Why are there so many macro layers?  Nothing jumps out to justfying two layers,
+let alone three.
 
-I made a tweak to the code and massaged one part of the changelog.  For the
-code, I hoisted PMU/PMI above SMI too, mainly to keep SMI+NMI together, but
-also because *technically* the guest could configure LVTPC to send an SMI (LOL).
+> +
+>  /*
+>   * Fill the CPU return stack buffer.
+>   *
+> @@ -329,6 +347,13 @@
+>  #endif
+>  .endm
+>  
+> +/* Clear CPU buffers before returning to user */
+> +.macro USER_CLEAR_CPU_BUFFERS
+> +	ALTERNATIVE "jmp .Lskip_verw_\@;", "", X86_FEATURE_USER_CLEAR_CPU_BUF
+> +	EXEC_VERW
 
-Regarding the changelog, I replaced the justification about correctness with
-this:
+Rather than a NOP after VERW, why not something like this?
 
-    Note that changing the order of request processing doesn't change the end
-    result, as KVM's final check for outstanding requests prevents entering
-    the guest until all requests are serviced.  I.e. KVM will ultimately
-    coalesce events (or not) regardless of the ordering.
-    
-The architectural behavior of NMIs and KVM's unintuitive simultaneous NMI
-handling simply doesn't matter as far as this patch is concerned, especially
-when considering the SMI technicality.  E.g. the net effect would be the same
-even if KVM allowed only a single NMIs.
+/* Clear CPU buffers before returning to user */
+.macro USER_CLEAR_CPU_BUFFERS
+                ALTERNATIVE "jmp .Lskip_verw_\@;", "jmp .Ldo_verw_\@;", X86_FEATURE_USER_CLEAR_CPU_BUF
+551:            .word __KERNEL_DS
+.Ldo_verw_\@:   verw _ASM_RIP(551b)
+.Lskip_verw_\@:
+.endm
 
-Please holler if you disagree with either/both of the above changes.
-
-[1/1] KVM: x86: Service NMI requests after PMI requests in VM-Enter path
-      https://github.com/kvm-x86/linux/commit/4b09cc132a59
-
---
-https://github.com/kvm-x86/linux/tree/next
+> +.Lskip_verw_\@:
+> +.endm
