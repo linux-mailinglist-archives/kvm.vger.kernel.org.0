@@ -2,270 +2,404 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C934E7D157D
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 20:09:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18E9D7D15E7
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 20:37:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377973AbjJTSJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 14:09:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45166 "EHLO
+        id S229719AbjJTShg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 14:37:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377936AbjJTSI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 14:08:59 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4569ED5D
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 11:08:57 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a824ef7a83so14812197b3.0
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 11:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697825336; x=1698430136; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDarGDP1RT+TJzzdOkpOOWFxKR5bBC0tLy2rKhn8u+E=;
-        b=jvDTw4y2oDqUcjrKw/wKn6IyuBofLwbYUs+HoHVg7GkHJ8CanFTRfDvvOFsHXVT2Lq
-         nogDFcPfJmlmfsjogxdZ6ZBrkzopeAUBwmhm0f/Pipw7aK6fwMy8EEjmVhHSaCQfzJB+
-         HzO/S4IffrXHIaMUmoIPs9rJwb6sno6bbDLlVErEfgTF6oy5wQ4riaB9nUEGNZlLJ7s7
-         uM5oWJdiwajbZUVaEqimYlFvtu+VRjy9p19Dk7av5JA9UYCAbJ+jJUhH9tcRuKIYpd4A
-         QDIIIRdQQhkrSEYEnhd90sm3z/THbnCgedCx3+OGDIXbXDDCZ91lNxutUaHEe7tLj4GY
-         0rXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697825336; x=1698430136;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDarGDP1RT+TJzzdOkpOOWFxKR5bBC0tLy2rKhn8u+E=;
-        b=TcdffdfloOtO7Jj5qaRSGvLH9mIBZWy7s2qAoHjzQDIuccMZjqWB4xGH9kQ7ahTAZZ
-         ss0qG4deb45cH5MEvqsQU2o3VclECEama7/L1sbR/D1xWf6p1BrrQgHRTbiRRLSFakaR
-         V3SefD660EfyPXObd2qiV0dwBjgyVMWbdAWzUH//M/XMEGUvDwnrnnzqSqZBqmVlYXi7
-         LnN3gc9SfySZrOtzMFCmlHL5hOLiF+hB8ukM0T0GAE4Lz3kR4SUSdzczsD/JS8zUxBrZ
-         hL+MoEtTvmdktxA6ShceO/mift1tvdb1v5hweoJrvrN/t3br26aD9JXVFotNEQHq2Hoi
-         o6Dw==
-X-Gm-Message-State: AOJu0YwCfsAOyyGbQIAZFwtZN+1d4RjztiZ0FAPicdUXJpu9VcEJk4a8
-        EG/nVjjxYUnuUHgTHjkeo6x+NA5ELJU=
-X-Google-Smtp-Source: AGHT+IEgWy41pC/eTi/gJfRGC3ZhDUWXjAXPp8I/V7gc3dlmhMC6N2x8SU2flh6zFey7F1gX8cPCtljTf8k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:cac6:0:b0:5a7:b543:7f0c with SMTP id
- m189-20020a0dcac6000000b005a7b5437f0cmr65661ywd.10.1697825336424; Fri, 20 Oct
- 2023 11:08:56 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 11:08:55 -0700
-In-Reply-To: <20230911114347.85882-7-cloudliang@tencent.com>
-Mime-Version: 1.0
-References: <20230911114347.85882-1-cloudliang@tencent.com> <20230911114347.85882-7-cloudliang@tencent.com>
-Message-ID: <ZTLCN8HW0jcD6LaN@google.com>
-Subject: Re: [PATCH v4 6/9] KVM: selftests: Test consistency of CPUID with num
- of gp counters
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229437AbjJTShf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 14:37:35 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B9BD55;
+        Fri, 20 Oct 2023 11:37:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IKsxWv4lAumzVV/nsUtJCAA+9gu8L5IrPAvoTKjtLqvRSDZv6PWwxFYW/cvOWFTjZ2QKyNys+U1Di5FLND4qwHtELOOyRQ1BGP2TpQo8xGe9tyoHCqtciwFRNL+OlmkC1aSXjx7SqzyADnpYV8pQi3S/u9j6qQqKsT3JjsxKwz560Qjod3OcYZmEB8LfPSwnit5O/zWE0Yn7EbzobjfBjQFI0ZMDHexeRs+IwZtD4A1F1xnjUVSELniA35aj6aqyLKEPGucQUOmO56RtexZeSNYySyoR4n90k5r55Q2Nc/4uow7RLGGaCd1MRka81Zs9UlQpOJ2esMZ3X3u7e9YzDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NdyxsrFaOegbYF5Rb7uHY2DvUr4ng5P7TFHi6Lev14I=;
+ b=gpH8MabggigeCogFTkTXfgiO5tAk43vQLNjTjfozhhWFhX1eXPQvwOVjw/kuKjIpRZRRqUiJUdtxIsLIS2F1Cia0SylsT3pR5Up4OsvhCN1FUoj13uUI+LJeVdhqVAw+COaG3PgUfI1RrIGvN1bax+VTKYb1R0Oqd8sZxwgOllRi0ihrdymUSfTGyfy16s/UuaBdNq0/1ZCrujdyoLiGDHOkg7tlMDOLfXS0hlX42fm2Ig+URucKnlyz58PILJXx7HAQ99aKHCXUf5ZDqk7I1jnl0UphPyssEisFnOPz+qDlEEELsJCb7LibYBrJlrYj0AdcZTqLyyT7MZsE288fFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NdyxsrFaOegbYF5Rb7uHY2DvUr4ng5P7TFHi6Lev14I=;
+ b=1M7/i/QMIp4n/4JSaVTm704hjHL8Fjm2v+yL8AvIiqnNnOe45h2Z6q9q9Ycl1+h84XfxT/Hfzrfz21cLDOBv9mvpXKvUltMfvJckD6A2ozopkrK/vSO8JDYForBIAIkSpxb/RRIRGfMg19pnYdMzhgBllyZ/gcyQHnXuAuMUfaM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by LV3PR12MB9096.namprd12.prod.outlook.com (2603:10b6:408:198::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Fri, 20 Oct
+ 2023 18:37:27 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf%4]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
+ 18:37:27 +0000
+Message-ID: <397ff410-e649-c2c8-aa8a-d8f9e40df10d@amd.com>
+Date:   Fri, 20 Oct 2023 13:37:20 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+Content-Language: en-US
+To:     Alexey Kardashevskiy <aik@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+        pankaj.gupta@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-49-michael.roth@amd.com>
+ <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com> <924b755a-977a-4476-9525-a7626d728e18@amd.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <924b755a-977a-4476-9525-a7626d728e18@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DM6PR11CA0064.namprd11.prod.outlook.com
+ (2603:10b6:5:14c::41) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|LV3PR12MB9096:EE_
+X-MS-Office365-Filtering-Correlation-Id: c280eb62-6646-4f0d-bd82-08dbd19b9bfa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xXPX59oYo+D8/qMKcTdWOxMLe3FhYkEPhbsHNL6WqT4/kYc6VO+Jnr6D4+KVZ0Q53FXXYV6/97/sPXnxfFaPej9sD+ILqLiz6CybwCDMAcz4Zqeh0dMKe4gvcO3Qs3s7p/WgWVaqGOWQCGvCtjhb4pbqgNN20qbY8xinCVwYeBn6PhghNN626B/RCudElZoeA/+URJe66NSf5HBatRdUjtumvAgQPUigOu0IhJDwOmhuzpc+lAxeCya5iAh/UWJ3qNBt1Yaku5FToRJcnQLva9WGTe2vi3Ki6fV/zci+b9oITeZ1Dqc2PQXPkyg8xEeLdo8xFFsFBoFB1HzGF5U12TUzsfPAYf3GwmrLnYzHMAbiaX4RrFn5/fwe0+UwqDQsIvD/GE0vugHWjwJAPUIQyBsHNipDiIScOMcooSIE7/q11ut/sOkghcfYE8K8iPyS1MsgFO0GD2LQQ/KstiQY6Nz2Es4HkUFTjh4UGWIbzzvM7I3afX4GywF0VTb09LP8IkYND6j0W18Vb+BTbA+HXxsoIyZk2oNrUmfJoyXhT4c4BwkNiiLbRCg7JXaRPi43u4MdbYQhriLcTbkfu8br6SqfPXyEALJe3ji3QEoOpZ8yge7c+0K9y4Cdt0Xe8TQkUP3eJp+1kKYw66z1zb3IAw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(366004)(376002)(136003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(83380400001)(53546011)(26005)(2616005)(6512007)(6506007)(6666004)(36756003)(31686004)(86362001)(31696002)(38100700002)(6486002)(4326008)(41300700001)(8936002)(8676002)(478600001)(5660300002)(2906002)(7416002)(7406005)(66946007)(54906003)(66556008)(66476007)(110136005)(316002)(66899024)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWFIR3praStCRzV3VnJFNkJtRnU1UGRCTkpWQ2hmNnBYVURnWnJLY1ZIUkQ0?=
+ =?utf-8?B?VTNFdFRRK1BSbnJSTm9reEQyRXVjTUtpVU9pelFZampwUGd1b1NzcmJpMnFS?=
+ =?utf-8?B?d0hsSmE3S0MwSjBhQktuQ2kyUnpGcTQrb3pJTldjUGhKVmRySWtITkZJaFJp?=
+ =?utf-8?B?M0FiUFdSY1BhUnh5WVRYOFEwMXVBOTZTenNnU1d2UW5WNitqMDAvTGJFYmNG?=
+ =?utf-8?B?SzBNcFRMOUVVTFdvbEpGbVk1UzhIeFpsVU8xWGo5bCtDWmhEUnQ3RnAvMUEw?=
+ =?utf-8?B?YTJzOW5uNlg2WVhWNm5rYXd1eFlGNXpvL2xncU9QTTc1bExEL1JaVVcyckFp?=
+ =?utf-8?B?akM0aUNmMlI0clhMbEJ1UWJicC8zRys3NVEzZ1BycjRsbUhGVldyZU02Nmwx?=
+ =?utf-8?B?Wk8yb2pZdW9PUXFhS2ZpU0Z3NGFySXNYK0YzYStLa2dFYU5PMW5GdHZUN2Jq?=
+ =?utf-8?B?Mmk4bnc1QlV0YkNJQmNCWXRwUmtlZkdpMnFNYXdJZlRrMEhBdldKTFFUU0Ev?=
+ =?utf-8?B?MDVKVjZVU0kvTXdvY1pweFMrd2lqVitrUC9GY084YXgydHF0RmwyVG1Ja0Ns?=
+ =?utf-8?B?REdlVlhXZWlmOVhMa2N5eFhBNzRRSllya0Zlam1uUnVMYWVZV2pqbHI5YURz?=
+ =?utf-8?B?dGRDcGlwQzQrWW5tYWFnMGdKN3A2ejQwT1BqaHVESE56L3BOVlRXU3NqQUMz?=
+ =?utf-8?B?OTlIdGllcFBWV1ZObWVqQlc4T1NRak85a0N5MVU1M2VTOVhGeVk1Y2loQ0xr?=
+ =?utf-8?B?MjVwS1ZXdjUyamZJWTE2NENuMHNtQ2tOTmF1M1ZWR0VrbXhzT2xoeFBmZC9v?=
+ =?utf-8?B?ZTF5S3VXcnFGbDhvRWtZS05TdEJoRGRBYm8xclNweGtnbWNWSUNXbDdKNUdI?=
+ =?utf-8?B?TGsxaFVQYVFwYUovRG5JYTlkcWdpaGJuUXRnblZhd1hPeFB0OXp0Rm1KSlNW?=
+ =?utf-8?B?UEpsVHd2UUQxMHNQbEtvYnppZDI4WkhFaHlIVE9LL096eG0xd0dUZkhaRzFT?=
+ =?utf-8?B?VkJ2L3dicm56UzROd3NSRUMyU1d0Z0U0QXgwcnFHWktpeE81ay9KRTYvY2xO?=
+ =?utf-8?B?TnEyQk1JcUhaRWp6dkN2SzRFakNQUk1BZHpOTDBNMlJSaHZLYWU2UXFDR1U1?=
+ =?utf-8?B?RDhrOXlzQTgyYXJCaDFUcXRONlBBOFU2MlByTUY2Y0VWaE1QMnUwek82VzJC?=
+ =?utf-8?B?WVU1ODhoY2NXbHZITTJoRGhlZDBXdVFDOVVSam5yNUJBc0tsK0FzU0tPZW5y?=
+ =?utf-8?B?bGdhZU5md0JJa3VLa3VjQVgyM1lLR3RVclczRy9YVmlpOFdvbjgyclFvbFZQ?=
+ =?utf-8?B?bzlKWEZwa1lvbXJjRUFvTDZlOGFJUWV2Mk14VTdnZU1FMDRVeGdod1BlWUZE?=
+ =?utf-8?B?SWh5LzBRMWY0bTFGVXJPZVJHU1p1SDF0RG5FNDIyVzBicXZBMWhheFR1ekJC?=
+ =?utf-8?B?bEZ2MGdrbjdKRXRHUVJPY3VvdThucE1pUmEwM0lUT2hYQ3BsWTVubkdQbnlt?=
+ =?utf-8?B?Y2JYbGRTa29SZUpMOVJuanc1dlE4NkVmakx1ekVwa1hLOEM0ejBxK2VMZmRV?=
+ =?utf-8?B?N1NCanUwczdzR1JCOEtpdUw3cjN2TjdqLy8wVlNkbXJQVk9HZ0x0dXkzdGdi?=
+ =?utf-8?B?MThqQ3diTFNzQXdobmhLakRJa1FwbER2N3ZlT3N6NVZZNlJqUFV2bnZIN1ZK?=
+ =?utf-8?B?NHdZb0RlSjEyWnVyRUg3UGwzQU1PeGtLUDJLRzRyWVRrcFhkaWgxcGZ2bHZ0?=
+ =?utf-8?B?RDVweURqWm4yLzJhOVdTbFg5V3E3TFBjSWErc1lpMDJlVFU4aStlaWZ1bWVs?=
+ =?utf-8?B?Q1AvUXlXcmQ1cVlUSjZTejhuSS9mcThsSFZiQmxMSG50a0tFNjh1RlkzbTRv?=
+ =?utf-8?B?SWpRRU9kS212dFF3TmxCZXEzczNLOVB3Y09JVjBWbEgrZVVhMDhCMnFSWC9J?=
+ =?utf-8?B?dnd3UlhaU29RWjYyMGFkOEloMzV0MlhPaVRQWGVBQnhNWlRMQzk5Wkd6aG5G?=
+ =?utf-8?B?ZyttNXpheWpTV3d3WkRFUzZtSVJjMjJXYXNIekNQNENIN3M1eTRJbjR5UFJv?=
+ =?utf-8?B?MTArd00zUFZvMGJCeFVJY3pndlE2Qkt5ejQ4R2dmYzNza1ZmUDFqS3U5Vnlm?=
+ =?utf-8?Q?HMxo6PS2P/DD3lPVg1rLgJWGk?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c280eb62-6646-4f0d-bd82-08dbd19b9bfa
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 18:37:27.1530
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cXssPszTqQfBpr5tSf2hPaVK/3HT1SNYIry3byB3avGgXaIKvjasb0RAhTcgoByl71EPA16aVAzf/99p9BksGg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9096
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 11, 2023, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
+On 10/18/23 21:48, Alexey Kardashevskiy wrote:
 > 
-> Add test to check if non-existent counters can be accessed in guest after
-> determining the number of Intel generic performance counters by CPUID.
-> When the num of counters is less than 3, KVM does not emulate #GP if
-> a counter isn't present due to compatibility MSR_P6_PERFCTRx handling.
-> Nor will the KVM emulate more counters than it can support.
+> On 19/10/23 00:48, Sean Christopherson wrote:
+>> On Wed, Oct 18, 2023, Alexey Kardashevskiy wrote:
+>>>
+>>> On 18/10/23 03:27, Sean Christopherson wrote:
+>>>> On Mon, Oct 16, 2023, Dionna Amalie Glaze wrote:
+>>>>>> +
+>>>>>> +       /*
+>>>>>> +        * If a VMM-specific certificate blob hasn't been provided, 
+>>>>>> grab the
+>>>>>> +        * host-wide one.
+>>>>>> +        */
+>>>>>> +       snp_certs = sev_snp_certs_get(sev->snp_certs);
+>>>>>> +       if (!snp_certs)
+>>>>>> +               snp_certs = sev_snp_global_certs_get();
+>>>>>> +
+>>>>>
+>>>>> This is where the generation I suggested adding would get checked. If
+>>>>> the instance certs' generation is not the global generation, then I
+>>>>> think we need a way to return to the VMM to make that right before
+>>>>> continuing to provide outdated certificates.
+>>>>> This might be an unreasonable request, but the fact that the certs and
+>>>>> reported_tcb can be set while a VM is running makes this an issue.
+>>>>
+>>>> Before we get that far, the changelogs need to explain why the kernel 
+>>>> is storing
+>>>> userspace blobs in the first place.  The whole thing is a bit of a mess.
+>>>>
+>>>> sev_snp_global_certs_get() has data races that could lead to 
+>>>> variations of TOCTOU
+>>>> bugs: sev_ioctl_snp_set_config() can overwrite 
+>>>> psp_master->sev_data->snp_certs
+>>>> while sev_snp_global_certs_get() is running.  If the compiler reloads 
+>>>> snp_certs
+>>>> between bumping the refcount and grabbing the pointer, KVM will end up 
+>>>> leaking a
+>>>> refcount and consuming a pointer without a refcount.
+>>>>
+>>>>     if (!kref_get_unless_zero(&certs->kref))
+>>>>         return NULL;
+>>>>
+>>>>     return certs;
+>>>
+>>> I'm missing something here. The @certs pointer is on the stack,
+>>
+>> No, nothing guarantees that @certs is on the stack and will never be 
+>> reloaded.
+>> sev_snp_certs_get() is in full view of sev_snp_global_certs_get(), so 
+>> it's entirely
+>> possible that it can be inlined.  Then you end up with:
+>>
+>>     struct sev_device *sev;
+>>
+>>     if (!psp_master || !psp_master->sev_data)
+>>         return NULL;
+>>
+>>     sev = psp_master->sev_data;
+>>     if (!sev->snp_initialized)
+>>         return NULL;
+>>
+>>     if (!sev->snp_certs)
+>>         return NULL;
+>>
+>>     if (!kref_get_unless_zero(&sev->snp_certs->kref))
+>>         return NULL;
+>>
+>>     return sev->snp_certs;
+>>
+>> At which point the compiler could choose to omit a local variable 
+>> entirely, it
+>> could store @certs in a register and reload after 
+>> kref_get_unless_zero(), etc.
+>> If psp_master->sev_data->snp_certs is changed at any point, odd thing 
+>> can happen.
+>>
+>> That atomic operation in kref_get_unless_zero() might prevent a reload 
+>> between
+>> getting the kref and the return, but it wouldn't prevent a reload 
+>> between the
+>> !NULL check and kref_get_unless_zero().
 > 
-> Co-developed-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../selftests/kvm/x86_64/pmu_counters_test.c  | 85 +++++++++++++++++++
->  1 file changed, 85 insertions(+)
+> Oh. The function is exported so I thought gcc would not go that far but 
+> yeah it is possible. So this needs an explicit READ_ONCE barrier.
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index fe9f38a3557e..e636323e202c 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -17,6 +17,11 @@
->  /* Guest payload for any performance counter counting */
->  #define NUM_BRANCHES		10
->  
-> +static const uint64_t perf_caps[] = {
-> +	0,
-> +	PMU_CAP_FW_WRITES,
-> +};
+> 
+>>>> If userspace wants to provide garbage to the guest, so be it, not 
+>>>> KVM's problem.
+>>>> That way, whether the VM gets the global cert or a per-VM cert is 
+>>>> purely a userspace
+>>>> concern.
+>>>
+>>> The global cert lives in CCP (/dev/sev), the per VM cert lives in 
+>>> kvmvm_fd.
+>>> "A la vcpu->run" is fine for the latter but for the former we need 
+>>> something
+>>> else.
+>>
+>> Why?  The cert ultimately comes from userspace, no?  Make userspace deal 
+>> with it.
+>>
+>>> And there is scenario when one global certs blob is what is needed and
+>>> copying it over multiple VMs seems suboptimal.
+>>
+>> That's a solvable problem.  I'm not sure I like the most obvious 
+>> solution, but it
+>> is a solution: let userspace define a KVM-wide blob pointer, either via 
+>> .mmap()
+>> or via an ioctl().
+>>
+>> FWIW, there's no need to do .mmap() shenanigans, e.g. an ioctl() to set the
+>> userspace pointer would suffice.  The benefit of a kernel controlled 
+>> pointer is
+>> that it doesn't require copying to a kernel buffer (or special code to 
+>> copy from
+>> userspace into guest).
+> 
+> Just to clarify - like, a small userspace non-qemu program which just 
+> holds a pointer with the certs blob, or embed it into libvirt or systemd?
+> 
+> 
+>> Actually, looking at the flow again, AFAICT there's nothing special 
+>> about the
+>> target DATA_PAGE.  It must be SHARED *before* 
+>> SVM_VMGEXIT_EXT_GUEST_REQUEST, i.e.
+>> KVM doesn't need to do conversions, there's no kernel priveleges 
+>> required, etc.
+>> And the GHCB doesn't dictate ordering between storing the certificates 
+>> and doing
+>> the request.  That means the certificate stuff can be punted entirely to 
+>> usersepace.
+> 
+> All true.
+> 
+>> Heh, typing up the below, there's another bug: KVM will incorrectly 
+>> "return" '0'
+>> for non-SNP guests:
+>>
+>>     unsigned long exitcode = 0;
+>>     u64 data_gpa;
+>>     int err, rc;
+>>
+>>     if (!sev_snp_guest(vcpu->kvm)) {
+>>         rc = SEV_RET_INVALID_GUEST; <= sets "rc", not "exitcode"
+>>         goto e_fail;
+>>     }
+>>
+>> e_fail:
+>>     ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, exitcode);
+>>
+>> Which really highlights that we need to get test infrastructure up and 
+>> running
+>> for SEV-ES, SNP, and TDX.
+>>
+>> Anyways, back to punting to userspace.  Here's a rough sketch.  The only 
+>> new uAPI
+>> is the definition of KVM_HC_SNP_GET_CERTS and its arguments.
+>>
+>> static void snp_handle_guest_request(struct vcpu_svm *svm)
+>> {
+>>     struct vmcb_control_area *control = &svm->vmcb->control;
+>>     struct sev_data_snp_guest_request data = {0};
+>>     struct kvm_vcpu *vcpu = &svm->vcpu;
+>>     struct kvm *kvm = vcpu->kvm;
+>>     struct kvm_sev_info *sev;
+>>     gpa_t req_gpa = control->exit_info_1;
+>>     gpa_t resp_gpa = control->exit_info_2;
+>>     unsigned long rc;
+>>     int err;
+>>
+>>     if (!sev_snp_guest(vcpu->kvm)) {
+>>         rc = SEV_RET_INVALID_GUEST;
+>>         goto e_fail;
+>>     }
+>>
+>>     sev = &to_kvm_svm(kvm)->sev_info;
+>>
+>>     mutex_lock(&sev->guest_req_lock);
+>>
+>>     rc = snp_setup_guest_buf(svm, &data, req_gpa, resp_gpa);
+>>     if (rc)
+>>         goto unlock;
+>>
+>>     rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &err);
+>>     if (rc)
+>>         /* Ensure an error value is returned to guest. */
+>>         rc = err ? err : SEV_RET_INVALID_ADDRESS;
+>>
+>>     snp_cleanup_guest_buf(&data, &rc);
+>>
+>> unlock:
+>>     mutex_unlock(&sev->guest_req_lock);
+>>
+>> e_fail:
+>>     ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, rc);
+>> }
+>>
+>> static int snp_complete_ext_guest_request(struct kvm_vcpu *vcpu)
+>> {
+>>     u64 certs_exitcode = vcpu->run->hypercall.args[2];
+>>     struct vcpu_svm *svm = to_svm(vcpu);
+>>
+>>     if (certs_exitcode)
+>>         ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, certs_exitcode);
+>>     else
+>>         snp_handle_guest_request(svm);
+>>     return 1;
+>> }
+>>
+>> static int snp_handle_ext_guest_request(struct vcpu_svm *svm)
+>> {
+>>     struct kvm_vcpu *vcpu = &svm->vcpu;
+>>     struct kvm *kvm = vcpu->kvm;
+>>     struct kvm_sev_info *sev;
+>>     unsigned long exitcode;
+>>     u64 data_gpa;
+>>
+>>     if (!sev_snp_guest(vcpu->kvm)) {
+>>         ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_GUEST);
+>>         return 1;
+>>     }
+>>
+>>     data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
+>>     if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
+>>         ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SEV_RET_INVALID_ADDRESS);
+>>         return 1;
+>>     }
+>>
+>>     vcpu->run->hypercall.nr         = KVM_HC_SNP_GET_CERTS;
+>>     vcpu->run->hypercall.args[0]     = data_gpa;
+>>     vcpu->run->hypercall.args[1]     = vcpu->arch.regs[VCPU_REGS_RBX];
+>>     vcpu->run->hypercall.flags     = KVM_EXIT_HYPERCALL_LONG_MODE;
+> 
+> btw why is it _LONG_MODE and not just _64? :)
+> 
+>>     vcpu->arch.complete_userspace_io = snp_complete_ext_guest_request;
+>>     return 0;
+>> }
+> 
+> This should work the KVM stored certs nicely but not for the global certs. 
+> Although I am not all convinced that global certs is all that valuable but 
+> I do not know the history of that, happened before I joined so I let 
+> others to comment on that. Thanks,
 
-Put this on the stack in the one testcase that uses it.  Placing the array super
-far away from its use makes it unnecessarily difficult to see that the testcase
-is simply running with and without full-width writes.
+Global certs was the original implementation because it was intended to 
+provide the VCEK, ASK, and ARK. These will be the same for all SNP guests 
+that are launched. The original intention was also to not make the kernel 
+have to manage multiple certificates and instead just treat the data as a 
+blob provided from user-space.
 
->  static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
->  						  void *guest_code)
->  {
-> @@ -189,6 +194,85 @@ static void test_intel_arch_events(void)
->  	}
->  }
->  
-> +static void __guest_wrmsr_rdmsr(uint32_t counter_msr, uint8_t nr_msrs,
-> +				bool expect_gp)
+The per-VM change was added to allow a per-VM certificates. If a provider 
+has no need to use this, then only the global certs blob is needed which 
+reduces the amount of memory needed for the VM.
 
-Rather than pass in "expect_gp", compute it in here.  It's easy enough to explicitly
-check for MSR_P6_PERFCTR[0|1]
+Thanks,
+Tom
 
-> +{
-> +	uint64_t msr_val;
-> +	uint8_t vector;
-> +
-> +	vector = wrmsr_safe(counter_msr + nr_msrs, 0xffff);
-
-Doing all this work to test _one_ MSR at a time is silly.  And I see no reason
-to do only negative testing.  Sure, postive testing might be redundant with other
-tests (I truly don't know), but _not_ hardcoding one-off tests often ends up
-requiring less code, and almost always results in more self-documenting code.
-E.g. it took me far too much staring to understand why the "no #GP" case expects
-to read back '0'.
-
-> +	__GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,
-> +		       "Expected GP_VECTOR");
-
-Print the actual vector!  And the MSR!  One of my pet peeves with KVM's tests is
-not providing information on failure.  Having to hack a test or do interactive
-debug just to figure out which MSR failed is *super* frustrating.
-
-And I think it's worth providing a macro to handle the assertion+message, that
-way it'll be easier to add more sub-tests, e.g. that the MSR can be written back
-to '0'.
-
-> +
-> +	vector = rdmsr_safe(counter_msr + nr_msrs, &msr_val);
-> +	__GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,
-> +		       "Expected GP_VECTOR");
-> +
-> +	if (!expect_gp)
-> +		GUEST_ASSERT_EQ(msr_val, 0);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void guest_rd_wr_gp_counter(void)
-> +{
-> +	uint8_t nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
-> +	uint64_t perf_capabilities = rdmsr(MSR_IA32_PERF_CAPABILITIES);
-> +	uint32_t counter_msr;
-> +	bool expect_gp = true;
-> +
-> +	if (perf_capabilities & PMU_CAP_FW_WRITES) {
-> +		counter_msr = MSR_IA32_PMC0;
-> +	} else {
-> +		counter_msr = MSR_IA32_PERFCTR0;
-> +
-> +		/* KVM drops writes to MSR_P6_PERFCTR[0|1]. */
-> +		if (nr_gp_counters == 0)
-> +			expect_gp = false;
-> +	}
-> +
-> +	__guest_wrmsr_rdmsr(counter_msr, nr_gp_counters, expect_gp);
-> +}
-> +
-> +/* Access the first out-of-range counter register to trigger #GP */
-> +static void test_oob_gp_counter(uint8_t eax_gp_num, uint64_t perf_cap)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_rd_wr_gp_counter);
-> +
-> +	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_NR_GP_COUNTERS,
-> +				eax_gp_num);
-> +	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, perf_cap);
-> +
-> +	run_vcpu(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +static void test_intel_counters_num(void)
-> +{
-> +	uint8_t nr_gp_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
-> +	unsigned int i;
-> +
-> +	TEST_REQUIRE(nr_gp_counters > 2);
-
-This is beyond silly.  Just iterate over all possible counter values.  Again,
-hardcoding values is almost never the best way to do things.
-
-> +
-> +	for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
-> +		/*
-> +		 * For compatibility reasons, KVM does not emulate #GP
-> +		 * when MSR_P6_PERFCTR[0|1] is not present, but it doesn't
-> +		 * affect checking the presence of MSR_IA32_PMCx with #GP.
-> +		 */
-> +		test_oob_gp_counter(0, perf_caps[i]);
-> +		test_oob_gp_counter(2, perf_caps[i]);
-> +		test_oob_gp_counter(nr_gp_counters, perf_caps[i]);
-> +
-> +		/* KVM doesn't emulate more counters than it can support. */
-> +		test_oob_gp_counter(nr_gp_counters + 1, perf_caps[i]);
-
-Hmm, so I think we should avoid blindly testing undefined MSRs.  I don't disagree
-that expecting #GP is reasonable, but I don't think this is the right place to
-test for architecturally undefined MSRs.  E.g. if Intel defines some completely
-unrelated MSR at 0xc3 or 0x4c9 then this test will fail.
-
-Rather than assume anything about "nr_gp_counters + 1", I think we should test up
-to what Intel has architecturally defined, e.g. define the max number of counters
-and then pass that in as the "possible" counters:
-
-#define GUEST_ASSERT_PMC_MSR_ACCESS(insn, msr, expect_gp, vector)		\
-__GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,			\
-	       "Expected %s on " #insn "(0x%x), got vector %u",			\
-	       expect_gp ? "#GP" : "no fault", msr, vector)			\
-
-static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters,
-				 uint8_t nr_counters, uint32_t or_mask)
-{
-	uint8_t i;
-
-	for (i = 0; i < nr_possible_counters; i++) {
-		const uint32_t msr = base_msr + i;
-
-		/*
-		 * Fixed counters are supported if the counter is less than the
-		 * number of enumerated contiguous counters *or* the counter is
-		 * explicitly enumerated in the supported counters mask.
-		 */
-		const bool expect_success = i < nr_counters || (or_mask & BIT(i));
-
-		/*
-		 * KVM drops writes to MSR_P6_PERFCTR[0|1] if the counters are
-		 * unsupported, i.e. doesn't #GP and reads back '0'.
-		 */
-		const uint64_t expected_val = expect_success ? 0xffff : 0;
-		const bool expect_gp = !expect_success && msr != MSR_P6_PERFCTR0 &&
-				       msr != MSR_P6_PERFCTR1;
-		uint8_t vector;
-		uint64_t val;
-
-		vector = wrmsr_safe(msr, 0xffff);
-		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, msr, expect_gp, vector);
-
-		vector = rdmsr_safe(msr, &val);
-		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, msr, expect_gp, vector);
-
-		/* On #GP, the result of RDMSR is undefined. */
-		if (!expect_gp)
-			__GUEST_ASSERT(val == expected_val,
-				       "Expected RDMSR(0x%x) to yield 0x%lx, got 0x%lx",
-				       msr, expected_val, val);
-
-		vector = wrmsr_safe(msr, 0);
-		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, msr, expect_gp, vector);
-	}
-}
+> 
+> 
