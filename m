@@ -2,79 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A6437D1966
-	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 00:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB78B7D1969
+	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 00:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229664AbjJTW5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 18:57:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
+        id S229803AbjJTW6G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 18:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbjJTW5E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 18:57:04 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B09CD78
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:56:57 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7ed6903a6so17840047b3.2
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:56:57 -0700 (PDT)
+        with ESMTP id S230241AbjJTW6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 18:58:04 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53F9D76
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:58:02 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-27cf48e7d37so1214698a91.1
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:58:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697842616; x=1698447416; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697842682; x=1698447482; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBorPAF5YM6f/ewkW/XoPGAnJG2YiyHkn8S2mtLJ9Tg=;
-        b=rH+D/C4iOEYBe1XPrZ4cbMokvMrCvVqkAaPd7IZQ8hfFdq5mJcga5rkLPp5hBlyJQD
-         UCJhjou2uR6TWaTcXGU7thcvIWa0mo8LDHN6dZ1vOWWNhw+rGbGqJfsiMJF8gFQeNnav
-         kK7q6BTI2WjRu8opEUQTiXNsJFo4wXRTe3FzsCu3v9yCJObejKLZ8TODsJQvkaeziMAb
-         UU5eKcvulY9ZT0vZjVKdUDT1rTiPFjeu2zIfaDhy6TOJqALSYSzLIpAVQEmnEdC/F/CO
-         6ifJal9AfVFHwH+wNxBh6OSpm3ZrgAE7oPiYm335g3gpjL68Ny7/rPuZbECPcNsAZXeB
-         irkA==
+        bh=3YJUbXLc41eB4MhMk4dwKPTxYx78Ax4qZ5YkFcbOnrU=;
+        b=g52c0ASOETzdo/gVmHylVla5THW3yVGVj08JVffS735RQPUzH0/F2tbA1xZ+MWz+YS
+         QCXTvJT/ylvBacMZUATKxaI7EAkn5zglv0t82S0oKDvCIsUjY6LTlyrXcqVJY2Pp638H
+         3MhbBWzbXO2RcImP75cK0yOnSfYFsvFMxHqWGSyyu3Zn33qAOhF9R6TG6zbQ9e/uC8O+
+         cK35FJl+AmCFkZatdzqM67tcChmr1Rwrp4g5GcvmKg7Ny/bMfj3CdPrcDYnEsy4WuiYf
+         cbF55Up3i4jQnSmYF0mY72Z7ZXZ4dnvw9v083Z/GZ2zqCrPYYcusxhLByEVe9EIsZbl2
+         Y48g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697842616; x=1698447416;
+        d=1e100.net; s=20230601; t=1697842682; x=1698447482;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBorPAF5YM6f/ewkW/XoPGAnJG2YiyHkn8S2mtLJ9Tg=;
-        b=Wd2pmYndL+cG5QPT7RLvp0BV5ZVi4lsMrNJAvNh03oIiRK0rhsASErUIqkhMTV3NhM
-         5gBVmsz+EqIiHHQB1kWCVwsrGNt0APZkSzom4ZOpyFaycp8xROTEXgYT5C3xybtVsFo9
-         4JySHIybh1hHpfC70rQgMLUd4hbX+gpeqq/lNiUnLkeE6+pSCNBVpa67itAzSzehsusr
-         4kk+z/5qAQT5P2FRqdqF8mecsYORztSk988sxcb/PNo1vM+9hwIMKHRvKGa2v6bxvh+d
-         RzOPoFABc0icJ7jXMa/pWCTOM5gHGtWkIp4Zdj2QMetn40qpkQXO21HczccXrkzmDoqe
-         GRXQ==
-X-Gm-Message-State: AOJu0YzjXMNepC/o443DRmX5I1I+/VFpMMIAxQTiE5pz3WXuCjO10Kjo
-        16z2F3W9ftnI6I6P85EqrY+k9nKcUfA=
-X-Google-Smtp-Source: AGHT+IFMaxIjPJYCd3kxYxbiADUpGTt63hGGpTu90ol6tTPoEvRJBzrQgOtGBV5ldguzLt8WKQ0RhnTdKuA=
+        bh=3YJUbXLc41eB4MhMk4dwKPTxYx78Ax4qZ5YkFcbOnrU=;
+        b=FI7FCth2LBTG7abgRUlQ5F3RNplisE1OzsrQ/mAsCvcOB3pZdhUoduSYoynwxwj/Yc
+         u1h0A8s9DiKoWslhVb1DgsUgFBe6ub9V/R7gOprL+BqHDPt3N/yd47jXXYhtoSWXDdtp
+         9v+Vx5hru7T6dE643Tp3VKfNQRhSCmj7ArH3DAosnRcgNiRexXXqBKAOFDtLfcF8zJGf
+         S3bA48zTYbzoUVB/kxgwrzDe5NnLoQ5wk2EPHHMoIZi7t4ecWR/KJ3g4OemiZmEfY/Mb
+         B+JOreTnwzxRMBkOjw+6ZIzSAUz7pxpuTDkUSr2cvyE7ZyylT6qKfUEBHCVsRha/27z9
+         USng==
+X-Gm-Message-State: AOJu0YxXAujOpcPvPQEwc/dW6hPPHJZBBemyz2+7N6Ouz0R5rtUjKBOQ
+        UYRR5WE8VziykM0XnUmumDEH8VcS48s=
+X-Google-Smtp-Source: AGHT+IGfYZWevFY4LmuyPUFyRmMlkbI4CYl3i++HdLF4sX1XJI0e/0I3e9txRYNsBFnmgQ94Pj9gzteLP7Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ac89:0:b0:d9a:bfd1:2c49 with SMTP id
- x9-20020a25ac89000000b00d9abfd12c49mr68347ybi.0.1697842616647; Fri, 20 Oct
- 2023 15:56:56 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 15:56:23 -0700
-In-Reply-To: <20231019043336.8998-1-liangchen.linux@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3788:b0:27d:3b44:86fc with SMTP id
+ mz8-20020a17090b378800b0027d3b4486fcmr74085pjb.7.1697842681955; Fri, 20 Oct
+ 2023 15:58:01 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 15:56:25 -0700
+In-Reply-To: <1ce85d9c7c9e9632393816cf19c902e0a3f411f1.1697731406.git.maciej.szmigiero@oracle.com>
 Mime-Version: 1.0
-References: <20231019043336.8998-1-liangchen.linux@gmail.com>
+References: <1ce85d9c7c9e9632393816cf19c902e0a3f411f1.1697731406.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <169773016212.2012031.11160812861776407782.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: remove the unused assigned_dev_head from kvm_arch
+Message-ID: <169773243871.2018423.1481448432661434673.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Ignore MSR_AMD64_TW_CFG access
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        Liang Chen <liangchen.linux@gmail.com>
-Cc:     kvm@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Oct 2023 12:33:36 +0800, Liang Chen wrote:
-> Legacy device assignment was dropped years ago. This field is not used
-> anymore.
+On Thu, 19 Oct 2023 18:06:57 +0200, Maciej S. Szmigiero wrote:
+> Hyper-V enabled Windows Server 2022 KVM VM cannot be started on Zen1 Ryzen
+> since it crashes at boot with SYSTEM_THREAD_EXCEPTION_NOT_HANDLED +
+> STATUS_PRIVILEGED_INSTRUCTION (in other words, because of an unexpected #GP
+> in the guest kernel).
+> 
+> This is because Windows tries to set bit 8 in MSR_AMD64_TW_CFG and can't
+> handle receiving a #GP when doing so.
+> 
+> [...]
 
-Applied to kvm-x86 misc, thanks!
+Applied to kvm-x86 misc, thanks!  I added a paragraph at the end of the
+changelog to capture the gist of the discussion on why we agreed that having
+KVM eat MSR accesses is the least awful option.  I also tagged this for stable.
 
-[1/1] KVM: x86: remove the unused assigned_dev_head from kvm_arch
-      https://github.com/kvm-x86/linux/commit/122ae01c5159
+Paolo, holler if you want to grab this for v6.6 and I'll drop my copy.
+
+[1/1] KVM: x86: Ignore MSR_AMD64_TW_CFG access
+      https://github.com/kvm-x86/linux/commit/2770d4722036
 
 --
 https://github.com/kvm-x86/linux/tree/next
