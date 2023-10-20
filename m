@@ -2,115 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97FFE7D0A59
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 10:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBBCE7D0B33
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 11:11:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235683AbjJTIPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 04:15:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40118 "EHLO
+        id S1376593AbjJTJLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 05:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233391AbjJTIPM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 04:15:12 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3FA115
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 01:15:09 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53d9f001b35so672098a12.2
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 01:15:09 -0700 (PDT)
+        with ESMTP id S1376523AbjJTJLx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 05:11:53 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324C3D49;
+        Fri, 20 Oct 2023 02:11:51 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso812504a12.1;
+        Fri, 20 Oct 2023 02:11:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1697789708; x=1698394508; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I9mLk3QRlIYO5dYhhdXhtQWG8pCu0/EaP/qTEbU6WOs=;
-        b=or4kQJYHBDCG6v6ilXxgAtz/QWahpgm8w3WD6dliDwJT6rl7XyPisP+SdbR6HOXOO6
-         QCJ6OkaA/d4SvjkcBibK1R39AzHOVEL+gZMEvCZikXGVBnBBiPh8K+t7zju1UbwFgkA2
-         W1Y/S4LiGQmtprW7ecf/LGKykJAUa9tJRLXLNBFxr2LYnJwbVcc6OMzReC0+oIaH/Zug
-         UmnDjQyvdAHFU9QW2Dr2xiw4amF08b8S167KzAr0dgc7Yky8SwwMz6pWhV5UAXtHk87K
-         m3Bk4DoZGbQZn9VMRt0vsF7INoLyIAJh9yrlBGsVP4RtwwrOah2qiUsamlIA2R6NkYEE
-         DXvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697789708; x=1698394508;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1697793109; x=1698397909; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I9mLk3QRlIYO5dYhhdXhtQWG8pCu0/EaP/qTEbU6WOs=;
-        b=AvZEIoKpv78jCosQNa0aFy4z0WOVbRegxHbdqw3Z2e1EoqErx5o8ZP309MJ4daEegG
-         f6c8/XoBShQgWF/J0uATpej/3u8ndjxdbZjCyzHqs5N5dEWk1KnXz4lJLhquo52H7lMT
-         xeDmQG5t9sb3iPPLxZwGXpB3JePWomsP3YGtJ0SraDnFJV1I3afhJOBhkFiTT9wioHsd
-         6D7vJ9T4nErFMLMjEMgiNG/KLR3m9k5Ycl8jztuGb2fjuiubQce4ZkMPIV5YDuGZiGDd
-         z04+sYs2KilE1MTqz0uUg9V0F977wCaFYohZl2yop57bfBalSFitHi9tudpYDkDBa4LV
-         wGdw==
-X-Gm-Message-State: AOJu0YyLz1fXLyAE75WBVd3EYmNLeGE4dlqY2GqpQX2BzA87CsnSPXaE
-        bV8XkwQQCiINGY3T7q7vAc6OxxlDPmblEXgTmBY=
-X-Google-Smtp-Source: AGHT+IFxDBdUK0jjgrdu/5lSvIddhM3Qd3L9VVDVSECPo1+jfo3eLrczA0b0wVyjpO8bPpxHApIM6Q==
-X-Received: by 2002:a17:906:ef0e:b0:9b2:bb02:a543 with SMTP id f14-20020a170906ef0e00b009b2bb02a543mr922414ejs.74.1697789707967;
-        Fri, 20 Oct 2023 01:15:07 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id h25-20020a170906261900b0099cc36c4681sm994192ejc.157.2023.10.20.01.15.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 01:15:07 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 10:15:06 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Conor Dooley <conor@kernel.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-serial@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/9] KVM: riscv: selftests: Add SBI DBCN extension to
- get-reg-list test
-Message-ID: <20231020-825e5e2e7d355330a93f1194@orel>
-References: <20231020072140.900967-1-apatel@ventanamicro.com>
- <20231020072140.900967-6-apatel@ventanamicro.com>
+        bh=X/i6Fw+r194GHmzLf5s0/R2GunByWxbzISKNUr2Ewbs=;
+        b=WK273gnNBgQqtxS19+jYkmOUl/PUmlEIEavgAfKHtTxfPBGa1PIwsFZaaR+CkE1VAJ
+         T6NUdNNx3tHeO3ejL/cFtG5yRgJOeO/+Gqcy65AyL+D8LVgkFoq7ocDNsu1f2mynPjFR
+         B6GMy3EAOU4r5IXNC4OsMi1p11u8Ta41NMSbIvJVh4APkrTnh2mqWb4UWvwycH6B4ndx
+         wBK2o/UG03KGD2SdIe2M4j5MHXEC2EyZ4sQFrdz8ZUXIZ2l9oxEzACss2xEGweiVPH+i
+         W6EcEoE66mQVVXWA3pc/YzPxSafac/hcW58qM7lvc48s+TLXnsQWVjmAjZiAcT4Jm3Ga
+         PdDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697793109; x=1698397909;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X/i6Fw+r194GHmzLf5s0/R2GunByWxbzISKNUr2Ewbs=;
+        b=NRPrTHhXPaTtly2Zb1pLPdNyrs60dZwqkHWCCqyTLg9N8qzb2O8lfikAOgChEoo6ix
+         zyANZhI6pOZpriBYdtLsMuwi99d/j8tFQ91RppsCKVBEZNLTtRThk62UJHRLOVhaaUgC
+         opL6dXLV94PBFIBTqYhGpTUS8idrpHy6KmpefEmC/9IUh+8Uv+dbROWZmji9glL3e2tM
+         oMLEWw0HRWUkgGGVRSkZQseMfb5lakrqYBUrouDfBMIiLlSGdiqp7y0+oOdsKn8Zv4SD
+         MYrilo4981faaoQ5hy9LFE33mZMkuiqsGe7b80YNZ2p6nMwNrYsjfcYJJIas4AGLq7N9
+         8dAw==
+X-Gm-Message-State: AOJu0YyNtFpxQ0wbNtSvDtq/3XTEpk+8Z9gYwyDTmMKlkdnmLZXn30NN
+        xqKikEIgeI/Xiyad4xfV2TbtTZIL44uvzVfgbd4=
+X-Google-Smtp-Source: AGHT+IE8NvcGYuTH2X4TAtkNajqUfVispERe7ssyHACJl3CPrCBjy+Mr7xKL/Px/u1PKsPdLHsoLIX397B80GJJ4fXc=
+X-Received: by 2002:a50:aad2:0:b0:525:6c74:5e58 with SMTP id
+ r18-20020a50aad2000000b005256c745e58mr1002625edc.23.1697793109383; Fri, 20
+ Oct 2023 02:11:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231020072140.900967-6-apatel@ventanamicro.com>
+References: <20230911114347.85882-1-cloudliang@tencent.com> <ZTHJvQm-nDNkvldM@google.com>
+In-Reply-To: <ZTHJvQm-nDNkvldM@google.com>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Fri, 20 Oct 2023 17:11:37 +0800
+Message-ID: <CAFg_LQVsXjcnpnDFnP1rrypXD4N0DD3kYq_vxXK8SRzGjEjA1A@mail.gmail.com>
+Subject: Re: [PATCH v4 0/9] KVM: selftests: Test the consistency of the PMU's
+ CPUID and its features
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=no autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 12:51:36PM +0530, Anup Patel wrote:
-> We have a new SBI debug console (DBCN) extension supported by in-kernel
-> KVM so let us add this extension to get-reg-list test.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index 234006d035c9..6bedaea95395 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -394,6 +394,7 @@ static const char *sbi_ext_single_id_to_str(__u64 reg_off)
->  		KVM_SBI_EXT_ARR(KVM_RISCV_SBI_EXT_PMU),
->  		KVM_SBI_EXT_ARR(KVM_RISCV_SBI_EXT_EXPERIMENTAL),
->  		KVM_SBI_EXT_ARR(KVM_RISCV_SBI_EXT_VENDOR),
-> +		KVM_SBI_EXT_ARR(KVM_RISCV_SBI_EXT_DBCN),
->  	};
->  
->  	if (reg_off >= ARRAY_SIZE(kvm_sbi_ext_reg_name))
-> @@ -567,6 +568,7 @@ static __u64 base_regs[] = {
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_PMU,
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_EXPERIMENTAL,
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_VENDOR,
-> +	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_DBCN,
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_MULTI_EN | 0,
->  	KVM_REG_RISCV | KVM_REG_SIZE_ULONG | KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_MULTI_DIS | 0,
->  };
-> -- 
-> 2.34.1
+Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B410=E6=9C=8820=
+=E6=97=A5=E5=91=A8=E4=BA=94 08:28=E5=86=99=E9=81=93=EF=BC=9A
 >
+> On Mon, Sep 11, 2023, Jinrong Liang wrote:
+> > Jinrong Liang (9):
+> >   KVM: selftests: Add vcpu_set_cpuid_property() to set properties
+> >   KVM: selftests: Extend this_pmu_has() and kvm_pmu_has() to check arch
+> >     events
+> >   KVM: selftests: Add pmu.h for PMU events and common masks
+> >   KVM: selftests: Test Intel PMU architectural events on gp counters
+> >   KVM: selftests: Test Intel PMU architectural events on fixed counters
+> >   KVM: selftests: Test consistency of CPUID with num of gp counters
+> >   KVM: selftests: Test consistency of CPUID with num of fixed counters
+> >   KVM: selftests: Test Intel supported fixed counters bit mask
+> >   KVM: selftests: Test consistency of PMU MSRs with Intel PMU version
+>
+> I've pushed a modified version to
+>
+>   https://github.com/sean-jc/linux/branches x86/pmu_counter_tests
+>
+> which also has fixes for KVM's funky handling of fixed counters.  I'll wa=
+it for
+> you to respond, but will tentatively plan on posting the above branch as =
+v5
+> some time next week.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+I truly appreciate your time and effort in reviewing my patches and
+making the necessary modifications. I've carefully examined the
+updated code in the branch you kindly provided:
+
+https://github.com/sean-jc/linux/branches x86/pmu_counter_tests
+
+I completely agree with the changes you made. Please feel free to post
+the modified branch as v5 next week. I will add AMD counters related
+selftests after this patch set is merged.
+
+Thank you once again for your time and guidance.
