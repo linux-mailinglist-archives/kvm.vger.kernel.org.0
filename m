@@ -2,166 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FC097D05A4
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 01:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 379197D05B2
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 02:14:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346738AbjJSX7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Oct 2023 19:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44410 "EHLO
+        id S1346735AbjJTAN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Oct 2023 20:13:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233285AbjJSX7j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Oct 2023 19:59:39 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2063.outbound.protection.outlook.com [40.107.96.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C09114
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 16:59:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VEGhPcNsTrSFJEhFQ1zS2a29f71YHaJfJwGBN23m96My/c6xmzDiVPCe2IBlsQZvS91ByvcU7QZzGjmZS1988eLSfezm8skmtgU5Xjvg547mZXzOrLOeVCTxCvgOek0dBEfBba96sf3D/b2GAAD9ZGb2vVdqb3r/WJr7Nzp7m/nrBv40CL9iCoQ1YmrwesXDwg+hbl4P55UKfhUQDvan/iEjnO5yz6vbXMIPmR6fjujoOzWfEQVClN3M5tsIQLkiLRJtNBR9nWATb4PNZg7rcfjdrEBSLSrvcFU4EIEGFH9Cdd6s9csd6HFuXga1uLeP5CM7UPxPMHR1Ry3XM+687A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/aByiIG7Oxcpdc9Xkl6JwFk49+DqV4Q+IyOiAn2DdSg=;
- b=n7vvNGgh9Dsj3OcB3zzFnHmvsC154qRc3LTpS8YXStqFN0zoHCeQN412wS4INv+hjKYb9eOnJOrJYoMOygZH3S/6pfLa/9sWW2Y0LbGtq8fy0qQ7UT4tEZ+lhVUriy6jRwcdDPRCqMoVzGAJwUr0wH0F9Nusiya02eqTPBRhc3yXAcsAlsWxmY5i/5bnrd8qf9fu9wQUP+5mvLrCRBI9gmboacf8dI0dqyXoNe+KxSMGlV13p7hdER3rn8oR14gtUQw2Mns7mFZKBt0YtllieENvIWRb3zaBvu9b3K+S19zbm5z2eopnAI9qsr1RBV33HW+KOvsntKMGLENI8Iil/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/aByiIG7Oxcpdc9Xkl6JwFk49+DqV4Q+IyOiAn2DdSg=;
- b=jLnSotPz86RXqMyaGQpiPLZ9MJvBCuuRiCJfiMW7uf9ZXMt7ON9ao0/g5C05ZLl96lz+24AkBMfEBBjsgt31zk0D+MYzXIogwBtFd1UexbN72oc9yOodhiVhQMhusXORU3vKipvbEK9sgqcPtBvTWC+D/ExHXBIUxgK0eKsNKmsS185qU1dVSJmdDW3uwPDb90JOJ+k1AchgKo1mF6C4voyoU0y3hcYiCBpIaMkCZ/E2LfT8v8mNBEme78UeIfyt/4bE4GmxR5qKQvVbTFHwOyA/xvLb1Gprd7RTj8GS63G6u3dDo+lVr36l5wP4tHd40T+CBzrs7sggcZNuQKp+OQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL1PR12MB5222.namprd12.prod.outlook.com (2603:10b6:208:31e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.25; Thu, 19 Oct
- 2023 23:59:35 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Thu, 19 Oct 2023
- 23:59:35 +0000
-Date:   Thu, 19 Oct 2023 20:59:33 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, Kevin Tian <kevin.tian@intel.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v4 11/18] iommu/amd: Access/Dirty bit support in IOPTEs
-Message-ID: <20231019235933.GB3952@nvidia.com>
-References: <20231018202715.69734-1-joao.m.martins@oracle.com>
- <20231018202715.69734-12-joao.m.martins@oracle.com>
- <20231018231111.GP3952@nvidia.com>
- <2a8b0362-7185-4bca-ba06-e6a4f8de940b@oracle.com>
- <f2109ca9-b194-43f2-bed0-077d03242d1a@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2109ca9-b194-43f2-bed0-077d03242d1a@oracle.com>
-X-ClientProxiedBy: BN9P220CA0022.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:408:13e::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5222:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7916fcd9-fcf3-416a-530c-08dbd0ff71f9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rcvKQCYz+Y1hoH42Vda7z9hbYMt0cxv4GpqqwD7a3+sLeRXD4wAYnPRjFxjmb4cIoonvJi0ewmJw2i4sHaBCcO9U6/Na+074zyEmFIlOy6j4DbOBu73E/d9v7+OvTGMq8pkGPEy4nYOMmVgjaMpqOHneWIyNglbezyCARES6qF6YcsC2EJ4gjYS44Q28gL2FqydYOSvk4rT9nZASeqDCkMzgILfJthp1SO8x7IEFY6m9O3bWp4nGDYncrDWIE7CfgzxDnChQzeVEkWeRMTylnvqtA8VZQcA8PSRPvPFqpa67Xcr0QtVilYY1/0xMrvyqcynObWxU0WcCXDgwIGkuAkIwm2c/2zglQmqHLoA3+ZvL+YonwH1Moy241ckg6W25C6wcqQkCGKrmptUjaPCZ8gKSn9IfppI3z6aQWfQamwucKn4VuxG5hhi3pccK1BEmtCVXroF7hiGHPEdkQG+uCvCc+p02ycM8TPj8VQlz1xI5Pieu7xY1c2yVBwriOCYwz9HeuU/0XNMrjAIY+Gwz0audjCaFB4HVgfSY75JsF+gMxjJoxtifL7Oipvxt3sHzBsvlMCH0x5K1zTdg+LVgKETpuzfvLpEEqWg72j6g+pY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(366004)(396003)(346002)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(5660300002)(41300700001)(8676002)(4326008)(8936002)(2906002)(7416002)(6506007)(6512007)(36756003)(38100700002)(26005)(2616005)(1076003)(83380400001)(6916009)(316002)(66556008)(66946007)(54906003)(478600001)(86362001)(66476007)(33656002)(6486002)(14143004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yyfNbhoHuM3sXYeD8gSre54OF9sh5stSCBnBDFLfK1p8jFVOKBA0c8hRyPdc?=
- =?us-ascii?Q?FrJAMm9Dl5305IyATBvbOOGIVqDPXnM6IwCd0EYVZatD21USpg8MRuN6Jkz9?=
- =?us-ascii?Q?9yF0Q5Tgdl+AGTw+EYF2j9k9fgvX09e4R1t8ibZkTw/66hwU0qP3dqvc+oEk?=
- =?us-ascii?Q?O7MR7l1nFQTogx9uu78qvAYEnRaX3BHUwm1XzFRiTw0f/jgmkCIv/gHwEvsn?=
- =?us-ascii?Q?mP6o0TKKTQzGlfAJrLro3M8VcFizzmnQv+iGPY1F9njZPE9SZqjJj78e5PT+?=
- =?us-ascii?Q?Kit/L11ACyR7qcFF7lG3/5uM+LjP6HUBU1sutE1CyoptOXOlD71FBD3LLDba?=
- =?us-ascii?Q?M0tGjNqK/TBq/g1/7MKKB/f84bZO6tKnV726kYQG47JHicIyA2RzRFQmdeTp?=
- =?us-ascii?Q?+/Uc6NcKOOvi9rJNIpeIyIIQLS0vG9lzAu5DYRsTg3pUGrG3gktF/m9g5v2J?=
- =?us-ascii?Q?61x6N6WS50zMm+xnJBDEgZEEeGFwxHk+cg2QwDDUWJk8G1ShfjsovM4Y9+vL?=
- =?us-ascii?Q?Stx1dvzKKTNAdDHA17Sw1e/tceJ5AuFvZvhSRR24Cug1kEFQk57nNiOI0+1c?=
- =?us-ascii?Q?kCDVs4NwGpECaI99DEQsbM8M8xvtOB4MiR+civ0/60cgpqjOlHeRWPmWRZFl?=
- =?us-ascii?Q?XLQvMszlirpRSraPYg3SyfDOtL2jwvmmOoHurlR43tD1uiE+oBK2wRBGW21X?=
- =?us-ascii?Q?Q0dQNjnkdiFjI2mpLubiwnd1tHc07i7mV+szTLhuQaVWp51Cb+Wy7rYvZuJk?=
- =?us-ascii?Q?t+JVqnVXygLiTOAK5ad73xF+mlw8IiBaeMQIq97iODVXd4rPCSiIxbNJuOIX?=
- =?us-ascii?Q?U4LA1kCYPTgY4tFso7mwf8rwizIPbslSgE7x1tIumQso0rhE+6efr0Tkf76s?=
- =?us-ascii?Q?5QwCwk5/fCNXOHz7Mi6Ga95xe6Mtwu5dHrR+KMJVxoGpslSsgiK8zLG2S4FJ?=
- =?us-ascii?Q?VgvLVLUYjMct+Cv4sxKkJiTmr9rkcsIf+1aUOlKGK8UXwAxK6au46EptFuhb?=
- =?us-ascii?Q?kAI1odrGZ6vJcpl6jhoiZXeQH+qa+LNYNa5qiZQnEsqk1no3mke4FPDPv6nR?=
- =?us-ascii?Q?YodFC25AcBeOXjHOykjbCxY2ob+sly1hvkjTYViyGzd2LvfxDl0bfncZCPXw?=
- =?us-ascii?Q?nvGWdedpjxawPvgsjaPxeKUFflPEjTg4yYJFbsYeI3CXD7v4+1aWfuoZEbAi?=
- =?us-ascii?Q?/9YFiH8Xg49JStuu96pnRIWu8R1dCE8nbWX864CMljoyOd+ByQQqEU4VXCrP?=
- =?us-ascii?Q?eBgk9I8npT4CXMz/jd87woxT1UfivFPhFdAb4oj7HMFt7b5MOERT0YAJU0bv?=
- =?us-ascii?Q?RS8dbc8IN7JyZOFsIBEhpQnJA2P+XJ7TtiPwWYknelf+eGXi/TehW99eYlw1?=
- =?us-ascii?Q?S+Rc1GHEVb+EWJwV6rsrB4Momqwo67+u9bRI1bcrUregm6b30x9iWG1MnPNl?=
- =?us-ascii?Q?TEE3rbMwR70mdHYYBnMUQ03penmFKXEZYU1w9ma0Z1FOzR759lk+t3cr+JFD?=
- =?us-ascii?Q?I+Ba4Bppusc3tLskHsjynVIFOAX0aDJ7NqrSAXleYpFdt8L8/F9XV06QCDsO?=
- =?us-ascii?Q?brkljjqnKR7DAwVSy5puYct9IYDXtWVxbB/tYY5D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7916fcd9-fcf3-416a-530c-08dbd0ff71f9
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 23:59:35.1521
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: viNhMYhQHioEOJ0wGiee13UufO/9hx9OTxWbjbEvMsWs9dO9GXGlwsIZ3GKTAgi0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5222
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S1346738AbjJTANz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Oct 2023 20:13:55 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A8C5113
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 17:13:52 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9c6f9e4d2so1734075ad.2
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 17:13:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697760832; x=1698365632; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MAD0GymonKhVp5idan/hQP/ZSGOOIuiLDIayqa/R+JY=;
+        b=2PECyDyB+Qu9lWhVXjvMnHhzoXxM04gb0I6EkHTVW1pwNnLi7OR9wyJ6KXhLmW9Kkf
+         wAJURCMzLGerdlKzO4lbr9FcIRlXb2CHCW+Cqp5aNgAr/5WFTTb6kmDyIMnQ4iZLh30v
+         KU4bnLi8GRXm4NNrq/iOeUPXwzHzGjX+FlJ1RyPedS8xBtJle4HwnXDQLzVpyiOi70SW
+         3qR2rdiZRI8r/rDFF1TbgFJaAk+XU0BHxVY8IVZugQm4JVvHfLSmiz/3a6a5cRPG0rMt
+         mhfb5X6vLShzc26UhwgV6FRYgsUXBAc1W8ygTicufFhc71pC20S1rnDPAdvoSVZ9V9x1
+         4RDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697760832; x=1698365632;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MAD0GymonKhVp5idan/hQP/ZSGOOIuiLDIayqa/R+JY=;
+        b=e3EAdpratv9PlIAcdaDgJ9FgyeJp/2XUVaeRAXCIvPOioe4KPzGW6UxxRRDtLq6hQ6
+         mQVK7SD3XlQxCDxgX8vPW4jljF7qizyCn4eRBGtP+HrKyPy29efZvpMs+NjzmUF8fl54
+         V1AA2j6lLMGCxuj75DkrmN03eBmcrL0vpsG8BW3/L70Hd/9GGwGR1CPG/VYyGi7UKF/x
+         zEiuE5Gx+bpQwn3pDq0bqpnuTtYZ9z8V3Cjon5EizM7UqtUT5JJ6pki5/vD+DuKdGP4w
+         ILzAj3x83Nr/sxwFsNyszWuwQkRlPj7AjXU5MToOJ/MnMqG6r/HZNlrKxbRRTlOJHesT
+         nHWg==
+X-Gm-Message-State: AOJu0YzcH+pggUH4POYO7DoWyCFctFaLTo2YrPylT9jZSDehE9TxEWxK
+        ifVbzoXiixICOaqgKEX6a9MM0J8e0jI=
+X-Google-Smtp-Source: AGHT+IFyYxrvznGGGQlvwIi5BcnD4kPqU6aMry2TjpSLSB2IZR8/8bU6BC4niY0jsoo5JMNhR/z1HTzXD5I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ab03:b0:1c3:4d70:6ed9 with SMTP id
+ ik3-20020a170902ab0300b001c34d706ed9mr9607plb.3.1697760831964; Thu, 19 Oct
+ 2023 17:13:51 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 00:13:50 +0000
+In-Reply-To: <2034624b-579f-482e-8a7a-0dfc91740d7e@amd.com>
+Mime-Version: 1.0
+References: <20231016132819.1002933-1-michael.roth@amd.com>
+ <20231016132819.1002933-49-michael.roth@amd.com> <CAAH4kHb=hNH88poYw-fj+ewYgt8F-hseZcRuLDdvbgpSQ5FDZQ@mail.gmail.com>
+ <ZS614OSoritrE1d2@google.com> <b9da2fed-b527-4242-a588-7fc3ee6c9070@amd.com>
+ <ZS_iS4UOgBbssp7Z@google.com> <924b755a-977a-4476-9525-a7626d728e18@amd.com>
+ <ZTFD8y5T9nPOpCyX@google.com> <2034624b-579f-482e-8a7a-0dfc91740d7e@amd.com>
+Message-ID: <ZTHGPlTXvLnEDbmd@google.com>
+Subject: Re: [PATCH v10 48/50] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+        pankaj.gupta@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 19, 2023 at 12:58:29PM +0100, Joao Martins wrote:
+On Fri, Oct 20, 2023, Alexey Kardashevskiy wrote:
+> 
+> On 20/10/23 01:57, Sean Christopherson wrote:
+> > On Thu, Oct 19, 2023, Alexey Kardashevskiy wrote:
+> > > > 	vcpu->arch.complete_userspace_io = snp_complete_ext_guest_request;
+> > > > 	return 0;
+> > > > }
+> > > 
+> > > This should work the KVM stored certs nicely but not for the global certs.
+> > > Although I am not all convinced that global certs is all that valuable but I
+> > > do not know the history of that, happened before I joined so I let others to
+> > > comment on that. Thanks,
+> > 
+> > Aren't the global certs provided by userspace too though?  If all certs are
+> > ultimately controlled by userspace, I don't see any reason to make the kernel a
+> > middle-man.
+> 
+> The max blob size is 32KB or so and for 200 VMs it is:
 
-> Sigh, I realized that Intel's pfn_to_dma_pte() (main lookup function for
-> map/unmap/iova_to_phys) does something a little off when it finds a non-present
-> PTE. It allocates a page table to it; which is not OK in this specific case (I
-> would argue it's neither for iova_to_phys but well maybe I misunderstand the
-> expectation of that API).
+Not according to include/linux/psp-sev.h:
 
-Oh :(
- 
-> AMD has no such behaviour, though that driver per your earlier suggestion might
-> need to wait until -rc1 for some of the refactorings get merged. Hopefully we
-> don't need to wait for the last 3 series of AMD Driver refactoring (?) to be
-> done as that looks to be more SVA related; Unless there's something more
-> specific you are looking for prior to introducing AMD's domain_alloc_user().
+#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
 
-I don't think we need to wait, it just needs to go on the cleaning list.
- 
-> Anyhow, let me fix this, and post an update. Perhaps it's best I target this for
-> -rc1 and have improved page-table walkers all at once [the iommufd_log_perf
-> thingie below unlikely to be part of this set right away]. I have been playing
-> with the AMD driver a lot more on baremetal, so I am getting confident on the
-> snippet below (even with big IOVA ranges). I'm also retrying to see in-house if
-> there's now a rev3.0 Intel machine that I can post results for -rc1 (last time
-> in v2 I didn't; but things could have changed).
+Ugh, and I see in another patch:
 
-I'd rather you keep it simple and send the walkers as followups to the
-driver maintainers directly.
+  Also increase the SEV_FW_BLOB_MAX_SIZE another 4K page to allow space
+  for an extra certificate.
 
-> > for themselves; so more and more I need to work on something like
-> > iommufd_log_perf tool under tools/testing that is similar to the gup_perf to make all
-> > performance work obvious and 'standardized'
+-#define SEV_FW_BLOB_MAX_SIZE   0x4000  /* 16KB */
++#define SEV_FW_BLOB_MAX_SIZE   0x5000  /* 20KB */
 
-We have a mlx5 vfio driver in rdma-core and I have been thinking it
-would be a nice basis for building an iommufd tester/benchmarker as it
-has a wide set of "easilly" triggered functionality.
+That's gross and just asking for ABI problems, because then there's this:
 
-Jason
++::
++
++       struct kvm_sev_snp_set_certs {
++               __u64 certs_uaddr;
++               __u64 certs_len
++       };
++
++The certs_len field may not exceed SEV_FW_BLOB_MAX_SIZE.
+
+> - 6.5MB, all in the userspace so swappable  vs
+> - 32KB but in the kernel so not swappable.
+> Sure, a box capable of running 200 VMs must have plenty of RAM but still :)
+
+That's making quite a few assumptions.
+
+  1) That the global cert will be 32KiB (which clearly isn't the case today).
+  2) That every VM will want the global cert.
+  3) That userspace can't figure out a way to share the global cert.
+
+Even in that absolutely worst case scenario, I am not remotely convinced that it
+justifies taking on the necessary complexity to manage certs in-kernel.
+
+> Plus, GHCB now has to go via the userspace before talking to the PSP which
+> was not the case so far (though I cannot think of immediate implication
+> right now).
+
+Any argument along the lines of "because that's how we've always done it" is going
+to fall on deaf ears.  If there's a real performance bottleneck with kicking out
+to userspace, then I'll happily work to figure out a solution.  If.
