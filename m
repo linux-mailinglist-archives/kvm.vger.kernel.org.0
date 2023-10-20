@@ -2,163 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BE3A7D174F
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 22:45:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91DCB7D1768
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 22:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231228AbjJTUp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 16:45:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
+        id S230430AbjJTUsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 16:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbjJTUpp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 16:45:45 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 264701717;
-        Fri, 20 Oct 2023 13:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697834732; x=1729370732;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=efcm4OHP2Uz572Un+YAEz/A+CIucgALlZ4w/Rew7Rqg=;
-  b=F/rxuNemKnaWdJ9lk7HdzRn0wZJOjnk0pEjMJE2qTWjQYYbfxpO9ni6z
-   stLc0qUV/lcjFfZubfAZirqtcbolK1gCJ8aVvhfqHc+A5z1QzGruG6RFr
-   B7HWY9JJSzKbDI36O7KjjwaFlg7zp5X6IFNnks6c24/xD9z34v6HrdH6R
-   FK01NAw09dGSJp1dEZut39X7CGRJDRdMaDc4v4YzoOM9XqrNEOUSYqshw
-   ZECUt0iyK9UUuLd2E0WsRiSziaKCYsdIqdZpOlUVuybAkmVETWrUetOR8
-   ZxnpYG0JqA57GH6bnBV5i4cvBDdMpQ0KKot8/tyjr3OgyP/uzKWVJSgVl
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="365909446"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="365909446"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 13:45:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="848201802"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="848201802"
-Received: from hkchanda-mobl.amr.corp.intel.com (HELO desk) ([10.209.90.113])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 13:45:30 -0700
-Date:   Fri, 20 Oct 2023 13:45:29 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com
-Cc:     linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Subject: [PATCH  6/6] KVM: VMX: Move VERW closer to VMentry for MDS mitigation
-Message-ID: <20231020-delay-verw-v1-6-cff54096326d@linux.intel.com>
-X-Mailer: b4 0.12.3
-References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
+        with ESMTP id S230117AbjJTUsp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 16:48:45 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92EDBF;
+        Fri, 20 Oct 2023 13:48:43 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39KKgCbT002542;
+        Fri, 20 Oct 2023 20:48:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Yhoq0dxrpX3TpGKNPe1ltxOKvYmmrUr2BhsB7idTqzQ=;
+ b=MgUhH2r2QfQlDEGIbVSvyCdO1A2nYvtMWTzIaki9sbvYYFklfWgDCRoQNC5Nay4t2L7/
+ H7xL4dV8IBZNww2AghZRAQ5Ko+ziYMur7JvQqk8ghzoXlDtnSrREjR5392yJih4jufmI
+ z+2AJBurlsttEWzQkQN3X/1PNF6rO8Oa8zzG4HnbAiLnLDffncfnVSM7y9rR1ZTQAMQM
+ JYAr++RngRbUWcIHDljnubEkiO1olxxmONYhcYDKx9hrNcAwN6XmqoQtn6gYKWIFrs52
+ /znAzi1b+PMfjimX5E/FOD5bsXc51iNI91FcPsKYvN/+f+ukpInP64yPxg4Kv1AYZG8Q ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tv0tk07ty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Oct 2023 20:48:43 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39KKglu0004392;
+        Fri, 20 Oct 2023 20:48:42 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tv0tk07t6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Oct 2023 20:48:42 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39KKIR77024205;
+        Fri, 20 Oct 2023 20:48:41 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tuc2977h2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Oct 2023 20:48:41 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39KKmeci27263626
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 Oct 2023 20:48:40 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4ACA35805D;
+        Fri, 20 Oct 2023 20:48:40 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C50F58059;
+        Fri, 20 Oct 2023 20:48:39 +0000 (GMT)
+Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.ibm.com.com (unknown [9.61.44.83])
+        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Oct 2023 20:48:39 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, stable@vger.kernel.org
+Subject: [PATCH] s390/vfio-ap: fix sysfs status attribute for AP queue devices
+Date:   Fri, 20 Oct 2023 16:48:35 -0400
+Message-ID: <20231020204838.409521-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ptKSrGG7XvvzpbUdR3T97HTB6g-QQpxD
+X-Proofpoint-ORIG-GUID: mVxkVwVB00tUJmAdfDS7gFvl3AyJMGQd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-20_10,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 malwarescore=0 phishscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=999 clxscore=1015 spamscore=0 lowpriorityscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310170001 definitions=main-2310200176
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-During VMentry VERW is executed to mitigate MDS. After VERW, any memory
-access like register push onto stack may put host data in MDS affected
-CPU buffers. A guest can then use MDS to sample host data.
+The 'status' attribute for AP queue devices bound to the vfio_ap device
+driver displays incorrect status when the mediated device is attached to a
+guest, but the queue device is not passed through. In the current
+implementation, the status displayed is 'in_use' which is not correct; it
+should be 'assigned'. This can happen if one of the queue devices
+associated with a given adapter is not bound to the vfio_ap device driver.
+For example:
 
-Although likelihood of secrets surviving in registers at current VERW
-callsite is less, but it can't be ruled out. Harden the MDS mitigation
-by moving the VERW mitigation late in VMentry path.
+Queues listed in /sys/bus/ap/drivers/vfio_ap:
+14.0005
+14.0006
+14.000d
+16.0006
+16.000d
 
-Note that VERW for MMIO Stale Data mitigation is unchanged because of
-the complexity of per-guest conditional VERW which is not easy to handle
-that late in asm with no GPRs available. If the CPU is also affected by
-MDS, VERW is unconditionally executed late in asm regardless of guest
-having MMIO access.
+Queues listed in /sys/devices/vfio_ap/matrix/$UUID/matrix
+14.0005
+14.0006
+14.000d
+16.0005
+16.0006
+16.000d
 
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Queues listed in /sys/devices/vfio_ap/matrix/$UUID/guest_matrix
+14.0005
+14.0006
+14.000d
+
+The reason no queues for adapter 0x16 are listed in the guest_matrix is
+because queue 16.0005 is not bound to the vfio_ap device driver, so no
+queue associated with the adapter is passed through to the guest;
+therefore, each queue device for adapter 0x16 should display 'assigned'
+instead of 'in_use', because those queues are not in use by a guest, but
+only assigned to the mediated device.
+
+Let's check the AP configuration for the guest to determine whether a
+queue device is passed through before displaying a status of 'in_use'.
+
+Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Fixes: f139862b92cf ("s390/vfio-ap: add status attribute to AP queue device's sysfs dir")
+Cc: stable@vger.kernel.org
 ---
- arch/x86/kvm/vmx/vmenter.S |  9 +++++++++
- arch/x86/kvm/vmx/vmx.c     | 10 +++++++---
- 2 files changed, 16 insertions(+), 3 deletions(-)
+ drivers/s390/crypto/vfio_ap_ops.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index be275a0410a8..efa716cf4727 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <linux/linkage.h>
- #include <asm/asm.h>
-+#include <asm/segment.h>
- #include <asm/bitsperlong.h>
- #include <asm/kvm_vcpu_regs.h>
- #include <asm/nospec-branch.h>
-@@ -31,6 +32,8 @@
- #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
- #endif
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 4db538a55192..871c14a6921f 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -1976,6 +1976,7 @@ static ssize_t status_show(struct device *dev,
+ {
+ 	ssize_t nchars = 0;
+ 	struct vfio_ap_queue *q;
++	unsigned long apid, apqi;
+ 	struct ap_matrix_mdev *matrix_mdev;
+ 	struct ap_device *apdev = to_ap_dev(dev);
  
-+#define GUEST_CLEAR_CPU_BUFFERS		USER_CLEAR_CPU_BUFFERS
-+
- .macro VMX_DO_EVENT_IRQOFF call_insn call_target
- 	/*
- 	 * Unconditionally create a stack frame, getting the correct RSP on the
-@@ -177,10 +180,16 @@ SYM_FUNC_START(__vmx_vcpu_run)
-  * the 'vmx_vmexit' label below.
-  */
- .Lvmresume:
-+	/* Mitigate CPU data sampling attacks .e.g. MDS */
-+	GUEST_CLEAR_CPU_BUFFERS
-+
- 	vmresume
- 	jmp .Lvmfail
+@@ -1984,7 +1985,11 @@ static ssize_t status_show(struct device *dev,
+ 	matrix_mdev = vfio_ap_mdev_for_queue(q);
  
- .Lvmlaunch:
-+	/* Mitigate CPU data sampling attacks .e.g. MDS */
-+	GUEST_CLEAR_CPU_BUFFERS
-+
- 	vmlaunch
- 	jmp .Lvmfail
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c16297a49e4d..e3d0eda292c3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7226,13 +7226,17 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- 	guest_state_enter_irqoff();
- 
--	/* L1D Flush includes CPU buffer clear to mitigate MDS */
-+	/*
-+	 * L1D Flush includes CPU buffer clear to mitigate MDS, but VERW
-+	 * mitigation for MDS is done late in VMentry and is still executed
-+	 * inspite of L1D Flush. This is because an extra VERW should not matter
-+	 * much after the big hammer L1D Flush.
-+	 */
- 	if (static_branch_unlikely(&vmx_l1d_should_flush))
- 		vmx_l1d_flush(vcpu);
--	else if (cpu_feature_enabled(X86_FEATURE_USER_CLEAR_CPU_BUF))
--		mds_clear_cpu_buffers();
- 	else if (static_branch_unlikely(&mmio_stale_data_clear) &&
- 		 kvm_arch_has_assigned_device(vcpu->kvm))
-+		/* MMIO mitigation is mutually exclusive to MDS mitigation later in asm */
- 		mds_clear_cpu_buffers();
- 
- 	vmx_disable_fb_clear(vmx);
-
+ 	if (matrix_mdev) {
+-		if (matrix_mdev->kvm)
++		apid = AP_QID_CARD(q->apqn);
++		apqi = AP_QID_QUEUE(q->apqn);
++		if (matrix_mdev->kvm &&
++		    test_bit_inv(apid, matrix_mdev->shadow_apcb.apm) &&
++		    test_bit_inv(apqi, matrix_mdev->shadow_apcb.aqm))
+ 			nchars = scnprintf(buf, PAGE_SIZE, "%s\n",
+ 					   AP_QUEUE_IN_USE);
+ 		else
 -- 
-2.34.1
-
+2.41.0
 
