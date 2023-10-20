@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DE967D191B
-	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 00:29:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D3EE7D1927
+	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 00:29:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232856AbjJTW3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 18:29:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38758 "EHLO
+        id S232938AbjJTW3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 18:29:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbjJTW31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 18:29:27 -0400
+        with ESMTP id S232366AbjJTW3g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 18:29:36 -0400
 Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A85D69
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:29:24 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39KL45He020931;
-        Fri, 20 Oct 2023 22:29:04 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E77B010E3
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 15:29:27 -0700 (PDT)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39KL9Jqo030393;
+        Fri, 20 Oct 2023 22:29:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-03-30;
- bh=7/OSVRxScjEFHnB2NqlyjFt2HmL8hh1YqvPnN92sgbE=;
- b=XACxO36z5/is0aglMUdKmu6y+ldcWbZ2RUAsDHCJHu44iW5RyPPzjf+kyzODkqwyWFIf
- fr7YCx19pG9tqK3XUzKvV01QanwIZl+7tyOrvyytdauyRa8/IrrWBYILZpZxJc6pyyo3
- ToizqSr0Uaol6Zm9U+Qc+vNKbrBNBeG/PMOu5FCjorl9udMiQs/MhtoGqN/Xmhz+DwYm
- Qhz+4B2UrkDp832x8X8n2iPQGBF74QsO3Jn+0INN0HRQRQQhZyW6e1aL/poM6Ad7CWjh
- 19efIfUcRGp0e4g2NRJNtK1ngZO2c+3l6MVe1Ortk7S2YEQNDqr0OAK5vU9BdNa+qcfg 3A== 
+ bh=pfs1jH2FUT9Rysmfg8lwy9UqmKESs/j0fbJpUGlzv9U=;
+ b=ENPZjbIEHfyr6MKeKVTkU0yDkeAA0E4d30u1kQj34mI6gZkrsDp3BuIWo3n+6MBa0kBM
+ xPPtfQzedHetr7qGXqoEwgHAIogdWP9JgvGHewuvpM3i/JwEzYigUc/d+61hBoT9WwLK
+ tDoQ1RNQbyZtiD1YIwf/dsT7/68nnZpwZO5+wLa/T4db966faZpGhpPn4Jxq2A2uAYyE
+ u8nteO7NkHgNbfUxABp1p6/FNbthG6rhJC8JGL1h5TdMvhiJSe7Iw3N6ViEfZ9sbn55z
+ 49FWhqL3GuFjR0P+8/2saupgsjCw5pF6QnpIc/hyxolapDMz7tWGFzRuI2GYZGeq807s pg== 
 Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tubwc2tgj-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tubwdau3w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Oct 2023 22:29:03 +0000
+        Fri, 20 Oct 2023 22:29:07 +0000
 Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39KLYaEF025980;
-        Fri, 20 Oct 2023 22:29:02 GMT
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39KKrolX025876;
+        Fri, 20 Oct 2023 22:29:05 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tubwdud3r-1
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tubwdud5e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Oct 2023 22:29:02 +0000
+        Fri, 20 Oct 2023 22:29:05 +0000
 Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39KMSAsM018735;
-        Fri, 20 Oct 2023 22:29:01 GMT
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39KMSAsO018735;
+        Fri, 20 Oct 2023 22:29:05 GMT
 Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-179-153.vpn.oracle.com [10.175.179.153])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3tubwduch3-15;
-        Fri, 20 Oct 2023 22:29:01 +0000
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3tubwduch3-16;
+        Fri, 20 Oct 2023 22:29:05 +0000
 From:   Joao Martins <joao.m.martins@oracle.com>
 To:     iommu@lists.linux.dev
 Cc:     Jason Gunthorpe <jgg@nvidia.com>,
@@ -59,9 +59,9 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Zhenzhong Duan <zhenzhong.duan@intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         kvm@vger.kernel.org, Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH v5 14/18] iommufd/selftest: Test IOMMU_HWPT_ALLOC_DIRTY_TRACKING
-Date:   Fri, 20 Oct 2023 23:28:00 +0100
-Message-Id: <20231020222804.21850-15-joao.m.martins@oracle.com>
+Subject: [PATCH v5 15/18] iommufd/selftest: Test IOMMU_HWPT_SET_DIRTY_TRACKING
+Date:   Fri, 20 Oct 2023 23:28:01 +0100
+Message-Id: <20231020222804.21850-16-joao.m.martins@oracle.com>
 In-Reply-To: <20231020222804.21850-1-joao.m.martins@oracle.com>
 References: <20231020222804.21850-1-joao.m.martins@oracle.com>
 MIME-Version: 1.0
@@ -73,8 +73,8 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 b
  malwarescore=0 phishscore=0 mlxscore=0 adultscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310170001
  definitions=main-2310200191
-X-Proofpoint-GUID: 6ZbSBmdkKOmMNO6dpfL3JX2xW_YWoAEq
-X-Proofpoint-ORIG-GUID: 6ZbSBmdkKOmMNO6dpfL3JX2xW_YWoAEq
+X-Proofpoint-ORIG-GUID: rqDDuhJ2gbhk0IbgqXBSwNo6AACj901h
+X-Proofpoint-GUID: rqDDuhJ2gbhk0IbgqXBSwNo6AACj901h
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
@@ -85,171 +85,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to selftest the iommu domain dirty enforcing implement the
-mock_domain necessary support and add a new dev_flags to test that the
-hwpt_alloc/attach_device fails as expected.
-
-Expand the existing mock_domain fixture with a enforce_dirty test that
-exercises the hwpt_alloc and device attachment.
+Change mock_domain to supporting dirty tracking and add tests to exercise
+the new SET_DIRTY_TRACKING API in the iommufd_dirty_tracking selftest
+fixture.
 
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/iommu/iommufd/selftest.c              | 39 ++++++++++++++-
- tools/testing/selftests/iommu/iommufd.c       | 49 +++++++++++++++++++
- tools/testing/selftests/iommu/iommufd_utils.h |  3 ++
- 3 files changed, 90 insertions(+), 1 deletion(-)
+ drivers/iommu/iommufd/selftest.c              | 17 +++++++++++++++++
+ tools/testing/selftests/iommu/iommufd.c       | 15 +++++++++++++++
+ tools/testing/selftests/iommu/iommufd_utils.h | 17 +++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
 diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index bd3704b28bfb..99fee9a13232 100644
+index 99fee9a13232..c93b19e20c59 100644
 --- a/drivers/iommu/iommufd/selftest.c
 +++ b/drivers/iommu/iommufd/selftest.c
-@@ -119,6 +119,12 @@ static void mock_domain_blocking_free(struct iommu_domain *domain)
- static int mock_domain_nop_attach(struct iommu_domain *domain,
- 				  struct device *dev)
+@@ -24,6 +24,7 @@ static struct platform_device *selftest_iommu_dev;
+ size_t iommufd_test_memory_limit = 65536;
+ 
+ enum {
++	MOCK_DIRTY_TRACK = 1,
+ 	MOCK_IO_PAGE_SIZE = PAGE_SIZE / 2,
+ 
+ 	/*
+@@ -86,6 +87,7 @@ void iommufd_test_syz_conv_iova_id(struct iommufd_ucmd *ucmd,
+ }
+ 
+ struct mock_iommu_domain {
++	unsigned long flags;
+ 	struct iommu_domain domain;
+ 	struct xarray pfns;
+ };
+@@ -156,6 +158,21 @@ static void *mock_domain_hw_info(struct device *dev, u32 *length, u32 *type)
+ static int mock_domain_set_dirty_tracking(struct iommu_domain *domain,
+ 					  bool enable)
  {
-+	struct mock_dev *mdev = container_of(dev, struct mock_dev, dev);
++	struct mock_iommu_domain *mock =
++		container_of(domain, struct mock_iommu_domain, domain);
++	unsigned long flags = mock->flags;
 +
-+	if (domain->dirty_ops &&
-+	    (mdev->flags & MOCK_FLAGS_DEVICE_NO_DIRTY))
++	if (enable && !domain->dirty_ops)
 +		return -EINVAL;
 +
++	/* No change? */
++	if (!(enable ^ !!(flags & MOCK_DIRTY_TRACK)))
++		return 0;
++
++	flags = (enable ?
++		 flags | MOCK_DIRTY_TRACK : flags & ~MOCK_DIRTY_TRACK);
++
++	mock->flags = flags;
  	return 0;
  }
  
-@@ -147,6 +153,26 @@ static void *mock_domain_hw_info(struct device *dev, u32 *length, u32 *type)
- 	return info;
- }
- 
-+static int mock_domain_set_dirty_tracking(struct iommu_domain *domain,
-+					  bool enable)
-+{
-+	return 0;
-+}
-+
-+static int mock_domain_read_and_clear_dirty(struct iommu_domain *domain,
-+					    unsigned long iova, size_t size,
-+					    unsigned long flags,
-+					    struct iommu_dirty_bitmap *dirty)
-+{
-+	return 0;
-+}
-+
-+const struct iommu_dirty_ops dirty_ops = {
-+	.set_dirty_tracking = mock_domain_set_dirty_tracking,
-+	.read_and_clear_dirty = mock_domain_read_and_clear_dirty,
-+};
-+
-+
- static const struct iommu_ops mock_ops;
- 
- static struct iommu_domain *mock_domain_alloc(unsigned int iommu_domain_type)
-@@ -174,12 +200,20 @@ static struct iommu_domain *mock_domain_alloc(unsigned int iommu_domain_type)
- static struct iommu_domain *
- mock_domain_alloc_user(struct device *dev, u32 flags)
- {
-+	struct mock_dev *mdev = container_of(dev, struct mock_dev, dev);
- 	struct iommu_domain *domain;
- 
--	if (flags & (~IOMMU_HWPT_ALLOC_NEST_PARENT))
-+	if (flags & (~(IOMMU_HWPT_ALLOC_NEST_PARENT|
-+		       IOMMU_HWPT_ALLOC_DIRTY_TRACKING)))
-+		return ERR_PTR(-EOPNOTSUPP);
-+
-+	if ((flags & IOMMU_HWPT_ALLOC_DIRTY_TRACKING) &&
-+	    (mdev->flags & MOCK_FLAGS_DEVICE_NO_DIRTY))
- 		return ERR_PTR(-EOPNOTSUPP);
- 
- 	domain = mock_domain_alloc(IOMMU_DOMAIN_UNMANAGED);
-+	if (domain && !(mdev->flags & MOCK_FLAGS_DEVICE_NO_DIRTY))
-+		domain->dirty_ops = &dirty_ops;
- 	if (!domain)
- 		domain = ERR_PTR(-ENOMEM);
- 	return domain;
-@@ -387,6 +421,9 @@ static struct mock_dev *mock_dev_create(unsigned long dev_flags)
- 	struct mock_dev *mdev;
- 	int rc;
- 
-+	if (dev_flags & ~(MOCK_FLAGS_DEVICE_NO_DIRTY))
-+		return ERR_PTR(-EINVAL);
-+
- 	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
- 	if (!mdev)
- 		return ERR_PTR(-ENOMEM);
 diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 6323153d277b..e35274582b78 100644
+index e35274582b78..c921b50eddc8 100644
 --- a/tools/testing/selftests/iommu/iommufd.c
 +++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -1433,6 +1433,55 @@ TEST_F(iommufd_mock_domain, alloc_hwpt)
- 	}
+@@ -1482,6 +1482,21 @@ TEST_F(iommufd_dirty_tracking, enforce_dirty)
+ 	test_ioctl_destroy(stddev_id);
  }
  
-+FIXTURE(iommufd_dirty_tracking)
++TEST_F(iommufd_dirty_tracking, set_dirty_tracking)
 +{
-+	int fd;
-+	uint32_t ioas_id;
++	uint32_t stddev_id;
 +	uint32_t hwpt_id;
-+	uint32_t stdev_id;
-+	uint32_t idev_id;
-+};
 +
-+FIXTURE_SETUP(iommufd_dirty_tracking)
-+{
-+	self->fd = open("/dev/iommu", O_RDWR);
-+	ASSERT_NE(-1, self->fd);
-+
-+	test_ioctl_ioas_alloc(&self->ioas_id);
-+	test_cmd_mock_domain(self->ioas_id, &self->stdev_id,
-+			     &self->hwpt_id, &self->idev_id);
-+}
-+
-+FIXTURE_TEARDOWN(iommufd_dirty_tracking)
-+{
-+	teardown_iommufd(self->fd, _metadata);
-+}
-+
-+TEST_F(iommufd_dirty_tracking, enforce_dirty)
-+{
-+	uint32_t ioas_id, stddev_id, idev_id;
-+	uint32_t hwpt_id, _hwpt_id;
-+	uint32_t dev_flags;
-+
-+	/* Regular case */
-+	dev_flags = MOCK_FLAGS_DEVICE_NO_DIRTY;
 +	test_cmd_hwpt_alloc(self->idev_id, self->ioas_id,
 +			    IOMMU_HWPT_ALLOC_DIRTY_TRACKING, &hwpt_id);
 +	test_cmd_mock_domain(hwpt_id, &stddev_id, NULL, NULL);
-+	test_err_mock_domain_flags(EINVAL, hwpt_id, dev_flags,
-+				   &stddev_id, NULL);
++	test_cmd_set_dirty_tracking(hwpt_id, true);
++	test_cmd_set_dirty_tracking(hwpt_id, false);
++
 +	test_ioctl_destroy(stddev_id);
 +	test_ioctl_destroy(hwpt_id);
-+
-+	/* IOMMU device does not support dirty tracking */
-+	test_ioctl_ioas_alloc(&ioas_id);
-+	test_cmd_mock_domain_flags(ioas_id, dev_flags,
-+				   &stddev_id, &_hwpt_id, &idev_id);
-+	test_err_hwpt_alloc(EOPNOTSUPP, idev_id, ioas_id,
-+			    IOMMU_HWPT_ALLOC_DIRTY_TRACKING, &hwpt_id);
-+	test_ioctl_destroy(stddev_id);
 +}
 +
  /* VFIO compatibility IOCTLs */
  
  TEST_F(iommufd, simple_ioctls)
 diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 8e84d2592f2d..930edfe693c7 100644
+index 930edfe693c7..757781d5c5a2 100644
 --- a/tools/testing/selftests/iommu/iommufd_utils.h
 +++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -99,6 +99,9 @@ static int _test_cmd_mock_domain_flags(int fd, unsigned int ioas_id,
- 		*idev_id = cmd.mock_domain_flags.out_idev_id;
- 	return 0;
- }
-+#define test_cmd_mock_domain_flags(ioas_id, flags, stdev_id, hwpt_id, idev_id)       \
-+	ASSERT_EQ(0, _test_cmd_mock_domain_flags(self->fd, ioas_id, flags, \
-+						 stdev_id, hwpt_id, idev_id))
- #define test_err_mock_domain_flags(_errno, ioas_id, flags, stdev_id, hwpt_id) \
- 	EXPECT_ERRNO(_errno, _test_cmd_mock_domain_flags(self->fd, ioas_id, \
- 							 flags, stdev_id, \
+@@ -180,6 +180,23 @@ static int _test_cmd_access_replace_ioas(int fd, __u32 access_id,
+ #define test_cmd_access_replace_ioas(access_id, ioas_id) \
+ 	ASSERT_EQ(0, _test_cmd_access_replace_ioas(self->fd, access_id, ioas_id))
+ 
++static int _test_cmd_set_dirty_tracking(int fd, __u32 hwpt_id, bool enabled)
++{
++	struct iommu_hwpt_set_dirty_tracking cmd = {
++		.size = sizeof(cmd),
++		.flags = enabled ? IOMMU_HWPT_DIRTY_TRACKING_ENABLE : 0,
++		.hwpt_id = hwpt_id,
++	};
++	int ret;
++
++	ret = ioctl(fd, IOMMU_HWPT_SET_DIRTY_TRACKING, &cmd);
++	if (ret)
++		return -errno;
++	return 0;
++}
++#define test_cmd_set_dirty_tracking(hwpt_id, enabled) \
++	ASSERT_EQ(0, _test_cmd_set_dirty_tracking(self->fd, hwpt_id, enabled))
++
+ static int _test_cmd_create_access(int fd, unsigned int ioas_id,
+ 				   __u32 *access_id, unsigned int flags)
+ {
 -- 
 2.17.2
 
