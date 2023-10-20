@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A047D7D1458
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 18:45:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BBA17D1457
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 18:45:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377921AbjJTQpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 12:45:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48734 "EHLO
+        id S1377868AbjJTQpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 12:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377932AbjJTQpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 12:45:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED53D60
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 09:44:33 -0700 (PDT)
+        with ESMTP id S229896AbjJTQpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 12:45:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100F1197
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 09:44:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697820273;
+        s=mimecast20190719; t=1697820271;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sPFyuOWJqUveUc8l2XCgspugPvgpFubu2e7MafdWhC0=;
-        b=KUz/rGKrD/k+5gdS078wjZe6AbbqY95qLwqQcN5mCChSaRSwQYmNODj8alfLa1CBEOL7DA
-        gXYurAze6Vye3WDcCupko0LiSKcG32H5Z71ERnVoysX9hce5c8OuuHGBZHAA24Ul4Dekie
-        3gvhp3DT+TkgResVELqa82MOF15uKg0=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=aMAA1wMWvircrEJMOG5j/39HJSPTO4z+wh6TBaHy/FU=;
+        b=fquq7d64BrBc+B9mqQ6AztXMiZsxMlSsO7HmbiJVTnzskg+eGljHxK4FHHIxtppmKFB+BE
+        R1e6Le5Of+66MDeUU8v3vaBx39jMl/cXtrL+Xo2fZAxdNkkrNswhYVVWeOpNjzuHRzvafF
+        bYaaA2MvbqFECvxoUHufHkFFdqw+uXE=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-442-6bbpjbqwOF2AOC6Ou5bIsw-1; Fri, 20 Oct 2023 12:44:16 -0400
-X-MC-Unique: 6bbpjbqwOF2AOC6Ou5bIsw-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7a2ca09ebedso102055339f.0
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 09:44:16 -0700 (PDT)
+ us-mta-135-3pXz9uNtP3KVzxWG0RicJA-1; Fri, 20 Oct 2023 12:44:19 -0400
+X-MC-Unique: 3pXz9uNtP3KVzxWG0RicJA-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35740de180aso9502365ab.2
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 09:44:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697820256; x=1698425056;
+        d=1e100.net; s=20230601; t=1697820259; x=1698425059;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sPFyuOWJqUveUc8l2XCgspugPvgpFubu2e7MafdWhC0=;
-        b=jxqdjohrEuVLkwsNRw2f1dOCD/qFFrvjhUJGx4/mCN1wBMwQQELbx1dkHOvwiDLGgj
-         PdHftDz3EkA28wKdSTRMLEF7qn7gNXcXRT7LVrAReI8feMu50grF7VAuhX0c/ETZRN4U
-         78TnvPPEH8a3dZMjwodFeWuaZjmMHSLW7Hcv3o5sHOqVGKjpDaqUL7PminQBtoWavrSB
-         rHoenpAdXjvYTemuCGbuG++Bu3g0vjv8fiiWEZ+vCKMimrLUDJfdY9i4GCaaD1HxcFpR
-         wiUzVnYl6gnObxJBw8hN+uTEqCFBQW2cUnN4rsf3uZeqDys2v9W8pk1w1S/+Z3K4s1US
-         w00A==
-X-Gm-Message-State: AOJu0YwafXwMkmsfw3qQokH5dFd6a799LWAvUiVqD0w+YEyu8KFWYHi8
-        /SF6LFrSG6MdY2BzGOk2+u9/HyKP17gK+/Q/gtVvgwBYCl+CS9WgYxCNkm7D0cLvYxK4FaCEstf
-        tPVekLQ5yKVxk
-X-Received: by 2002:a05:6602:2acf:b0:79f:97b6:76de with SMTP id m15-20020a0566022acf00b0079f97b676demr3020879iov.3.1697820255915;
-        Fri, 20 Oct 2023 09:44:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFlOgE8X7iAGQGbOsY4Fjo3eMZSbzyX6P/GI5FxULHU/1UhmMgWPGNGxD8ZZcMSdhX0MhoiQg==
-X-Received: by 2002:a05:6602:2acf:b0:79f:97b6:76de with SMTP id m15-20020a0566022acf00b0079f97b676demr3020862iov.3.1697820255661;
-        Fri, 20 Oct 2023 09:44:15 -0700 (PDT)
+        bh=aMAA1wMWvircrEJMOG5j/39HJSPTO4z+wh6TBaHy/FU=;
+        b=we7ydUKFkGu6NU0zT0VxCAiIECapJZKgek0shFBJVLEW4q8Gr9E+xfc4BG7oRGUMpZ
+         OxI5eC6dhoGKOAUiOKYv5a7zBg+PGFMDJNvu9UghNK4xp0DQc4tPLIBEYKEntjZLyRbf
+         yT1ZrDvduTR8cogVUuFmGMuH1Hr+9jRgNl+bsRbWTiKOa5/XPcY+a62vgVUL+oSIhaPp
+         iqDRkYLDxzU/+44zR9Eq3G5ppi97Hcwi+hZsZybVyH7ICLQxImeWucO1F22N/M3zYxEk
+         PNwHmGZ/LFarRbn4XWvoKW60M/b74PLh3F5trTttqRQb/hVPOZLuNhLSRG/ihOnbopCc
+         EiWg==
+X-Gm-Message-State: AOJu0YyQB3btjsXvFSULNZWHM4eBVL2TZCl4bgM6lKbEMfw+aRVEQoYr
+        ET+pXIs9XG2CpR0VVUKv8aT84VF8ga0A6alZHRza53KTlBUkkkqXF+OAkTdcxo+vFpG1+q9/O/7
+        gRrm+AGoyW3FO
+X-Received: by 2002:a92:ce0f:0:b0:357:43f9:7cd3 with SMTP id b15-20020a92ce0f000000b0035743f97cd3mr2818984ilo.19.1697820258848;
+        Fri, 20 Oct 2023 09:44:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjlAr/6whJcCAcwaHbLC1LI969MhkVBkP6O7Vf1x7JsQrJ9u+Z0KIYfnZf6F1DmPbkzHOE+w==
+X-Received: by 2002:a92:ce0f:0:b0:357:43f9:7cd3 with SMTP id b15-20020a92ce0f000000b0035743f97cd3mr2818972ilo.19.1697820258596;
+        Fri, 20 Oct 2023 09:44:18 -0700 (PDT)
 Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id ay7-20020a056638410700b0042b03d40279sm628248jab.80.2023.10.20.09.44.14
+        by smtp.gmail.com with ESMTPSA id u14-20020a056e021a4e00b0035745066abfsm684255ilv.21.2023.10.20.09.44.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 09:44:15 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 10:44:14 -0600
+        Fri, 20 Oct 2023 09:44:18 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 10:44:17 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     iommu@lists.linux.dev, Jason Gunthorpe <jgg@nvidia.com>,
@@ -72,18 +72,19 @@ Cc:     iommu@lists.linux.dev, Jason Gunthorpe <jgg@nvidia.com>,
         Zhenzhong Duan <zhenzhong.duan@intel.com>, kvm@vger.kernel.org,
         Brett Creeley <brett.creeley@amd.com>,
         Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH v4 02/18] vfio: Move iova_bitmap into iommufd
-Message-ID: <20231020104414.5c76e5c1.alex.williamson@redhat.com>
-In-Reply-To: <20231018202715.69734-3-joao.m.martins@oracle.com>
+Subject: Re: [PATCH v4 03/18] iommufd/iova_bitmap: Move symbols to IOMMUFD
+ namespace
+Message-ID: <20231020104417.5849664f.alex.williamson@redhat.com>
+In-Reply-To: <20231018202715.69734-4-joao.m.martins@oracle.com>
 References: <20231018202715.69734-1-joao.m.martins@oracle.com>
-        <20231018202715.69734-3-joao.m.martins@oracle.com>
+        <20231018202715.69734-4-joao.m.martins@oracle.com>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,150 +92,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 18 Oct 2023 21:26:59 +0100
+On Wed, 18 Oct 2023 21:27:00 +0100
 Joao Martins <joao.m.martins@oracle.com> wrote:
 
-> Both VFIO and IOMMUFD will need iova bitmap for storing dirties and walking
-> the user bitmaps, so move to the common dependency into IOMMUFD.  In doing
-> so, create the symbol IOMMUFD_DRIVER which designates the builtin code that
-> will be used by drivers when selected. Today this means MLX5_VFIO_PCI and
-> PDS_VFIO_PCI. IOMMU drivers will do the same (in future patches) when
-> supporting dirty tracking and select IOMMUFD_DRIVER accordingly.
+> Have the IOVA bitmap exported symbols adhere to the IOMMUFD symbol
+> export convention i.e. using the IOMMUFD namespace. In doing so,
+> import the namespace in the current users. This means VFIO and the
+> vfio-pci drivers that use iova_bitmap_set().
 > 
-> Given that the symbol maybe be disabled, add header definitions in
-> iova_bitmap.h for when IOMMUFD_DRIVER=n
-> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 > Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 > ---
->  drivers/iommu/iommufd/Kconfig                 |  4 +++
->  drivers/iommu/iommufd/Makefile                |  1 +
->  drivers/{vfio => iommu/iommufd}/iova_bitmap.c |  0
->  drivers/vfio/Makefile                         |  3 +--
->  drivers/vfio/pci/mlx5/Kconfig                 |  1 +
->  drivers/vfio/pci/pds/Kconfig                  |  1 +
->  include/linux/iova_bitmap.h                   | 26 +++++++++++++++++++
->  7 files changed, 34 insertions(+), 2 deletions(-)
->  rename drivers/{vfio => iommu/iommufd}/iova_bitmap.c (100%)
-
+>  drivers/iommu/iommufd/iova_bitmap.c | 8 ++++----
+>  drivers/vfio/pci/mlx5/main.c        | 1 +
+>  drivers/vfio/pci/pds/pci_drv.c      | 1 +
+>  drivers/vfio/vfio_main.c            | 1 +
+>  4 files changed, 7 insertions(+), 4 deletions(-)
+> 
 
 Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 
 
-> 
-> diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
-> index 99d4b075df49..1fa543204e89 100644
-> --- a/drivers/iommu/iommufd/Kconfig
-> +++ b/drivers/iommu/iommufd/Kconfig
-> @@ -11,6 +11,10 @@ config IOMMUFD
+> diff --git a/drivers/iommu/iommufd/iova_bitmap.c b/drivers/iommu/iommufd/iova_bitmap.c
+> index f54b56388e00..0a92c9eeaf7f 100644
+> --- a/drivers/iommu/iommufd/iova_bitmap.c
+> +++ b/drivers/iommu/iommufd/iova_bitmap.c
+> @@ -268,7 +268,7 @@ struct iova_bitmap *iova_bitmap_alloc(unsigned long iova, size_t length,
+>  	iova_bitmap_free(bitmap);
+>  	return ERR_PTR(rc);
+>  }
+> -EXPORT_SYMBOL_GPL(iova_bitmap_alloc);
+> +EXPORT_SYMBOL_NS_GPL(iova_bitmap_alloc, IOMMUFD);
 >  
->  	  If you don't know what to do here, say N.
+>  /**
+>   * iova_bitmap_free() - Frees an IOVA bitmap object
+> @@ -290,7 +290,7 @@ void iova_bitmap_free(struct iova_bitmap *bitmap)
 >  
-> +config IOMMUFD_DRIVER
-> +	bool
-> +	default n
-> +
->  if IOMMUFD
->  config IOMMUFD_VFIO_CONTAINER
->  	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
-> diff --git a/drivers/iommu/iommufd/Makefile b/drivers/iommu/iommufd/Makefile
-> index 8aeba81800c5..34b446146961 100644
-> --- a/drivers/iommu/iommufd/Makefile
-> +++ b/drivers/iommu/iommufd/Makefile
-> @@ -11,3 +11,4 @@ iommufd-y := \
->  iommufd-$(CONFIG_IOMMUFD_TEST) += selftest.o
+>  	kfree(bitmap);
+>  }
+> -EXPORT_SYMBOL_GPL(iova_bitmap_free);
+> +EXPORT_SYMBOL_NS_GPL(iova_bitmap_free, IOMMUFD);
 >  
->  obj-$(CONFIG_IOMMUFD) += iommufd.o
-> +obj-$(CONFIG_IOMMUFD_DRIVER) += iova_bitmap.o
-> diff --git a/drivers/vfio/iova_bitmap.c b/drivers/iommu/iommufd/iova_bitmap.c
-> similarity index 100%
-> rename from drivers/vfio/iova_bitmap.c
-> rename to drivers/iommu/iommufd/iova_bitmap.c
-> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-> index c82ea032d352..68c05705200f 100644
-> --- a/drivers/vfio/Makefile
-> +++ b/drivers/vfio/Makefile
-> @@ -1,8 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  obj-$(CONFIG_VFIO) += vfio.o
+>  /*
+>   * Returns the remaining bitmap indexes from mapped_total_index to process for
+> @@ -389,7 +389,7 @@ int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
 >  
-> -vfio-y += vfio_main.o \
-> -	  iova_bitmap.o
-> +vfio-y += vfio_main.o
->  vfio-$(CONFIG_VFIO_DEVICE_CDEV) += device_cdev.o
->  vfio-$(CONFIG_VFIO_GROUP) += group.o
->  vfio-$(CONFIG_IOMMUFD) += iommufd.o
-> diff --git a/drivers/vfio/pci/mlx5/Kconfig b/drivers/vfio/pci/mlx5/Kconfig
-> index 7088edc4fb28..c3ced56b7787 100644
-> --- a/drivers/vfio/pci/mlx5/Kconfig
-> +++ b/drivers/vfio/pci/mlx5/Kconfig
-> @@ -3,6 +3,7 @@ config MLX5_VFIO_PCI
->  	tristate "VFIO support for MLX5 PCI devices"
->  	depends on MLX5_CORE
->  	select VFIO_PCI_CORE
-> +	select IOMMUFD_DRIVER
->  	help
->  	  This provides migration support for MLX5 devices using the VFIO
->  	  framework.
-> diff --git a/drivers/vfio/pci/pds/Kconfig b/drivers/vfio/pci/pds/Kconfig
-> index 407b3fd32733..fff368a8183b 100644
-> --- a/drivers/vfio/pci/pds/Kconfig
-> +++ b/drivers/vfio/pci/pds/Kconfig
-> @@ -5,6 +5,7 @@ config PDS_VFIO_PCI
->  	tristate "VFIO support for PDS PCI devices"
->  	depends on PDS_CORE
->  	select VFIO_PCI_CORE
-> +	select IOMMUFD_DRIVER
->  	help
->  	  This provides generic PCI support for PDS devices using the VFIO
->  	  framework.
-> diff --git a/include/linux/iova_bitmap.h b/include/linux/iova_bitmap.h
-> index c006cf0a25f3..1c338f5e5b7a 100644
-> --- a/include/linux/iova_bitmap.h
-> +++ b/include/linux/iova_bitmap.h
-> @@ -7,6 +7,7 @@
->  #define _IOVA_BITMAP_H_
+>  	return ret;
+>  }
+> -EXPORT_SYMBOL_GPL(iova_bitmap_for_each);
+> +EXPORT_SYMBOL_NS_GPL(iova_bitmap_for_each, IOMMUFD);
 >  
->  #include <linux/types.h>
-> +#include <linux/errno.h>
+>  /**
+>   * iova_bitmap_set() - Records an IOVA range in bitmap
+> @@ -423,4 +423,4 @@ void iova_bitmap_set(struct iova_bitmap *bitmap,
+>  		cur_bit += nbits;
+>  	} while (cur_bit <= last_bit);
+>  }
+> -EXPORT_SYMBOL_GPL(iova_bitmap_set);
+> +EXPORT_SYMBOL_NS_GPL(iova_bitmap_set, IOMMUFD);
+> diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+> index 42ec574a8622..5cf2b491d15a 100644
+> --- a/drivers/vfio/pci/mlx5/main.c
+> +++ b/drivers/vfio/pci/mlx5/main.c
+> @@ -1376,6 +1376,7 @@ static struct pci_driver mlx5vf_pci_driver = {
 >  
->  struct iova_bitmap;
+>  module_pci_driver(mlx5vf_pci_driver);
 >  
-> @@ -14,6 +15,7 @@ typedef int (*iova_bitmap_fn_t)(struct iova_bitmap *bitmap,
->  				unsigned long iova, size_t length,
->  				void *opaque);
+> +MODULE_IMPORT_NS(IOMMUFD);
+>  MODULE_LICENSE("GPL");
+>  MODULE_AUTHOR("Max Gurtovoy <mgurtovoy@nvidia.com>");
+>  MODULE_AUTHOR("Yishai Hadas <yishaih@nvidia.com>");
+> diff --git a/drivers/vfio/pci/pds/pci_drv.c b/drivers/vfio/pci/pds/pci_drv.c
+> index ab4b5958e413..dd8c00c895a2 100644
+> --- a/drivers/vfio/pci/pds/pci_drv.c
+> +++ b/drivers/vfio/pci/pds/pci_drv.c
+> @@ -204,6 +204,7 @@ static struct pci_driver pds_vfio_pci_driver = {
 >  
-> +#if IS_ENABLED(CONFIG_IOMMUFD_DRIVER)
->  struct iova_bitmap *iova_bitmap_alloc(unsigned long iova, size_t length,
->  				      unsigned long page_size,
->  				      u64 __user *data);
-> @@ -22,5 +24,29 @@ int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
->  			 iova_bitmap_fn_t fn);
->  void iova_bitmap_set(struct iova_bitmap *bitmap,
->  		     unsigned long iova, size_t length);
-> +#else
-> +static inline struct iova_bitmap *iova_bitmap_alloc(unsigned long iova,
-> +						    size_t length,
-> +						    unsigned long page_size,
-> +						    u64 __user *data)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void iova_bitmap_free(struct iova_bitmap *bitmap)
-> +{
-> +}
-> +
-> +static inline int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
-> +				       iova_bitmap_fn_t fn)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static inline void iova_bitmap_set(struct iova_bitmap *bitmap,
-> +				   unsigned long iova, size_t length)
-> +{
-> +}
-> +#endif
+>  module_pci_driver(pds_vfio_pci_driver);
 >  
->  #endif
+> +MODULE_IMPORT_NS(IOMMUFD);
+>  MODULE_DESCRIPTION(PDS_VFIO_DRV_DESCRIPTION);
+>  MODULE_AUTHOR("Brett Creeley <brett.creeley@amd.com>");
+>  MODULE_LICENSE("GPL");
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 40732e8ed4c6..a96d97da367d 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1693,6 +1693,7 @@ static void __exit vfio_cleanup(void)
+>  module_init(vfio_init);
+>  module_exit(vfio_cleanup);
+>  
+> +MODULE_IMPORT_NS(IOMMUFD);
+>  MODULE_VERSION(DRIVER_VERSION);
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_AUTHOR(DRIVER_AUTHOR);
 
