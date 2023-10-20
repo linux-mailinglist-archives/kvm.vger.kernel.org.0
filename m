@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 294217D184F
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 23:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5E1C7D1854
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 23:42:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345542AbjJTVln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 17:41:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44894 "EHLO
+        id S1345528AbjJTVll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 17:41:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345409AbjJTVlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1345410AbjJTVlY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 20 Oct 2023 17:41:24 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B0810DC
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:09 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7b9e83b70so10820197b3.0
-        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A22D10DF
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:10 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7bbe0a453so18181107b3.0
+        for <kvm@vger.kernel.org>; Fri, 20 Oct 2023 14:41:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697838068; x=1698442868; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697838069; x=1698442869; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wxdPIo7k8IJbvmMmlNhkE3/rZQV8LNj5jffuDILKrU=;
-        b=e9RVXNWtKq2+MI7F/B1H7WjTVtCHOfQxBYl6r6HwKz1FuueWQAP3H2yDaAcySy5Mzc
-         NqAzf5vZPJ0H8mV75jUXd0KzjeqipwNZvWiA/4bznZNdohSMoeAct/jcgZttMDCU5hhQ
-         9F2HTenNt/MLMxmcGLxXSMYxL8zTsBue/gkH672v7zr9MZntEaH6SKpGdkEM84HEeGG6
-         prbvo/mijehL6sCML7IrZKT09YRveLdhBpmDjtttfeBRbdMoohSll//2IzZ2pXfSgEF5
-         n7C1yfmrmOpQZM8EkI+cS6Q64OZSdhC4r4BON2sZPOEwhAU9EYu659v9g7uaKs/Oez63
-         mscA==
+        bh=OrkUb5e6f7M9UeNAstnZgH452akYrJ8pbLmUt7I8ZGI=;
+        b=m0LOjaqsJG6WUA44qmHUQgL1iVXJNlpjFv5iS7kgiv5VRMueTW40/ijPGiGAa8YGf+
+         UwYIm/s/Zbs0JLSvKVKCtNBGZZfU9Aq8hLQnaTrafefCS9v+cv0jXAAhC+m+HStmp0vp
+         0lUg0FOQd1CfD5Ou9aLZw2IAAu71FcDwMeD8+VCQVjNP9EMZ1pudVomeVpSKj6d3qrBG
+         aQpGIfhrO29hevkrrO/EJQcB4xXod8jy9MJOjETEDbcLBvIcT1DpAPLNlEDc8uUYuAoW
+         Xu2GKPNllhFaG3WrwDsojg1uTmgnll2e3/qsr2uM5rA0w1dAsLfE2YNRzYRzMeSxdJr/
+         dsEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697838068; x=1698442868;
+        d=1e100.net; s=20230601; t=1697838069; x=1698442869;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wxdPIo7k8IJbvmMmlNhkE3/rZQV8LNj5jffuDILKrU=;
-        b=AIxGrtEoK/N1LeMqlkCXVkZktyYHv8JFI5/hSYexMxVFo78xJxINFER/yI81e8pLAJ
-         xiIhxG4B4ofjFC2AIwMZGm76+wwDv+ofmLEnqIkDuy7Nr0hj7akzo+uoKhZgE2fp0uHA
-         dWd3vCrfv1zNyVMc71jKyMXv2o7eRhGd0Fv5waH7zy59yhA8SovzrQcliz1Mj8hwVaEx
-         CT6QZ8yf2aV2wF+o/rjRyE9B5/9kd3TusvjqjS4k702XH+8+vHcIecHUgeAwlUs4YPqt
-         +BCrB+TAl/AylKxD3R1mhgAyffDDA0Y1vOyAiEqVCX4AIVSUc0vjkE1SXNYPmJV+hsEy
-         tVNg==
-X-Gm-Message-State: AOJu0YyD7bDugxBHPggdlB1WiPwgWhxO+MQ2l+yhGHTUcsOFq93sVwq6
-        YEWnTyHPoctsJK0wlZRNOQ1mhqU8ckou
-X-Google-Smtp-Source: AGHT+IEULiFO21+dHH0b0ROgjE4Z7TEImGseE8FLXI46Z1/spsev4ZP3rz8+bMFoLN226OvPc4WV10YeF0cN
+        bh=OrkUb5e6f7M9UeNAstnZgH452akYrJ8pbLmUt7I8ZGI=;
+        b=F/LbXZxBnUiKqM7AHn+Ne+gW+VrPgf5JQyUdYBcqxNKS0xBeCD6k/r8FoLqABxHSz/
+         FiG0lVWwGgxhMXGeX4rDEJQMV+6ECxfkCH7GHvja4XXYFyatZ+H2wLPfrXIlVErnbVzg
+         MWa4ybe5hOYNVjv7SkORovgz17Gd/XuY7T1O3yzGz0XKduvcIJprJ+JoS1UjMXBCo5Fh
+         3wAFFeLsMNIpWaS+08VdpfnYgsmpIGtfD9lLHuHWP/OyaWIKecoptOdSKR8rCas3HUVp
+         TE8dDZ8bpP8f7Bd8iIKFoLfzR30zI8uRtVrXkIvxIbxAl91qVE3O+bUGcmk3nah/YmOf
+         DTEw==
+X-Gm-Message-State: AOJu0YyQ5gZkyD23GDdaMRfJd6u12OvLZpfvCFaxs/vqm0Jk9tZCOycm
+        esyJX3AIFUGz9oVuHt9LfgknzV38WDdH
+X-Google-Smtp-Source: AGHT+IF8vIJpYXDnhqI5NKgDVDHoabvTZ450+oSs7hhl9zUr4cDiZmkB1WBSoXWjbK4iwRe+sAFoloM6sPH/
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a81:4852:0:b0:5a4:fd03:2516 with SMTP id
- v79-20020a814852000000b005a4fd032516mr87740ywa.1.1697838068747; Fri, 20 Oct
- 2023 14:41:08 -0700 (PDT)
-Date:   Fri, 20 Oct 2023 21:40:52 +0000
+ (user=rananta job=sendgmr) by 2002:a81:6cc3:0:b0:5a7:b8d1:ef65 with SMTP id
+ h186-20020a816cc3000000b005a7b8d1ef65mr73650ywc.3.1697838069760; Fri, 20 Oct
+ 2023 14:41:09 -0700 (PDT)
+Date:   Fri, 20 Oct 2023 21:40:53 +0000
 In-Reply-To: <20231020214053.2144305-1-rananta@google.com>
 Mime-Version: 1.0
 References: <20231020214053.2144305-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231020214053.2144305-13-rananta@google.com>
-Subject: [PATCH v8 12/13] KVM: selftests: aarch64: vPMU test for validating
- user accesses
+Message-ID: <20231020214053.2144305-14-rananta@google.com>
+Subject: [PATCH v8 13/13] KVM: selftests: aarch64: vPMU test for immutability
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>
@@ -71,7 +70,7 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,150 +78,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a vPMU test scenario to validate the userspace accesses for
-the registers PM{C,I}NTEN{SET,CLR} and PMOVS{SET,CLR} to ensure
-that KVM honors the architectural definitions of these registers
-for a given PMCR.N.
+KVM marks some of the vPMU registers as immutable to
+userspace once the vCPU has started running. Add a test
+scenario to check this behavior.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../kvm/aarch64/vpmu_counter_access.c         | 87 ++++++++++++++++++-
- 1 file changed, 86 insertions(+), 1 deletion(-)
+ .../kvm/aarch64/vpmu_counter_access.c         | 47 ++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index d5143925690db..2b697b144e677 100644
+index 2b697b144e677..f87d76c614e8b 100644
 --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -8,6 +8,8 @@
-  * counters (PMCR_EL0.N) that userspace sets, if the guest can access
+@@ -9,7 +9,8 @@
   * those counters, and if the guest is prevented from accessing any
   * other counters.
-+ * It also checks if the userspace accesses to the PMU regsisters honor the
-+ * PMCR.N value that's set for the guest.
+  * It also checks if the userspace accesses to the PMU regsisters honor the
+- * PMCR.N value that's set for the guest.
++ * PMCR.N value that's set for the guest and if these accesses are immutable
++ * after KVM has run once.
   * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
   */
  #include <kvm_util.h>
-@@ -20,6 +22,9 @@
- /* The max number of the PMU event counters (excluding the cycle counter) */
- #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
- 
-+/* The cycle counter bit position that's common among the PMU registers */
-+#define ARMV8_PMU_CYCLE_IDX		31
-+
- struct vpmu_vm {
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
-@@ -28,6 +33,13 @@ struct vpmu_vm {
- 
- static struct vpmu_vm vpmu_vm;
- 
-+struct pmreg_sets {
-+	uint64_t set_reg_id;
-+	uint64_t clr_reg_id;
-+};
-+
-+#define PMREG_SET(set, clr) {.set_reg_id = set, .clr_reg_id = clr}
-+
- static uint64_t get_pmcr_n(uint64_t pmcr)
- {
- 	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
-@@ -39,6 +51,15 @@ static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
- 	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
- }
- 
-+static uint64_t get_counters_mask(uint64_t n)
-+{
-+	uint64_t mask = BIT(ARMV8_PMU_CYCLE_IDX);
-+
-+	if (n)
-+		mask |= GENMASK(n - 1, 0);
-+	return mask;
-+}
-+
- /* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
- static inline unsigned long read_sel_evcntr(int sel)
- {
-@@ -552,6 +573,68 @@ static void run_access_test(uint64_t pmcr_n)
+@@ -648,6 +649,48 @@ static void run_error_test(uint64_t pmcr_n)
  	destroy_vpmu_vm();
  }
  
-+static struct pmreg_sets validity_check_reg_sets[] = {
-+	PMREG_SET(SYS_PMCNTENSET_EL0, SYS_PMCNTENCLR_EL0),
-+	PMREG_SET(SYS_PMINTENSET_EL1, SYS_PMINTENCLR_EL1),
-+	PMREG_SET(SYS_PMOVSSET_EL0, SYS_PMOVSCLR_EL0),
++static uint64_t immutable_regs[] = {
++	SYS_PMCR_EL0,
++	SYS_PMCNTENSET_EL0,
++	SYS_PMCNTENCLR_EL0,
++	SYS_PMINTENSET_EL1,
++	SYS_PMINTENCLR_EL1,
++	SYS_PMOVSSET_EL0,
++	SYS_PMOVSCLR_EL0,
 +};
 +
 +/*
-+ * Create a VM, and check if KVM handles the userspace accesses of
-+ * the PMU register sets in @validity_check_reg_sets[] correctly.
++ * Create a guest with one vCPU, run it, and then make an attempt to update
++ * the registers in @immutable_regs[] (with their complements). KVM shouldn't
++ * allow updating these registers once vCPU starts running. Hence, the test
++ * fails if that's not the case.
 + */
-+static void run_pmregs_validity_test(uint64_t pmcr_n)
++static void run_immutable_test(uint64_t pmcr_n)
 +{
 +	int i;
 +	struct kvm_vcpu *vcpu;
-+	uint64_t set_reg_id, clr_reg_id, reg_val;
-+	uint64_t valid_counters_mask, max_counters_mask;
++	uint64_t reg_id, reg_val, reg_val_orig;
 +
-+	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
++	create_vpmu_vm(guest_code);
 +	vcpu = vpmu_vm.vcpu;
 +
-+	valid_counters_mask = get_counters_mask(pmcr_n);
-+	max_counters_mask = get_counters_mask(ARMV8_PMU_MAX_COUNTERS);
++	run_vcpu(vcpu, pmcr_n);
 +
-+	for (i = 0; i < ARRAY_SIZE(validity_check_reg_sets); i++) {
-+		set_reg_id = validity_check_reg_sets[i].set_reg_id;
-+		clr_reg_id = validity_check_reg_sets[i].clr_reg_id;
++	for (i = 0; i < ARRAY_SIZE(immutable_regs); i++) {
++		reg_id = immutable_regs[i];
 +
-+		/*
-+		 * Test if the 'set' and 'clr' variants of the registers
-+		 * are initialized based on the number of valid counters.
-+		 */
-+		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(set_reg_id), &reg_val);
-+		TEST_ASSERT((reg_val & (~valid_counters_mask)) == 0,
-+			    "Initial read of set_reg: 0x%llx has unimplemented counters enabled: 0x%lx\n",
-+			    KVM_ARM64_SYS_REG(set_reg_id), reg_val);
++		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(reg_id), &reg_val_orig);
++		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(reg_id), ~reg_val_orig);
++		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(reg_id), &reg_val);
 +
-+		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(clr_reg_id), &reg_val);
-+		TEST_ASSERT((reg_val & (~valid_counters_mask)) == 0,
-+			    "Initial read of clr_reg: 0x%llx has unimplemented counters enabled: 0x%lx\n",
-+			    KVM_ARM64_SYS_REG(clr_reg_id), reg_val);
-+
-+		/*
-+		 * Using the 'set' variant, force-set the register to the
-+		 * max number of possible counters and test if KVM discards
-+		 * the bits for unimplemented counters as it should.
-+		 */
-+		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(set_reg_id), max_counters_mask);
-+
-+		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(set_reg_id), &reg_val);
-+		TEST_ASSERT((reg_val & (~valid_counters_mask)) == 0,
-+			    "Read of set_reg: 0x%llx has unimplemented counters enabled: 0x%lx\n",
-+			    KVM_ARM64_SYS_REG(set_reg_id), reg_val);
-+
-+		vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(clr_reg_id), &reg_val);
-+		TEST_ASSERT((reg_val & (~valid_counters_mask)) == 0,
-+			    "Read of clr_reg: 0x%llx has unimplemented counters enabled: 0x%lx\n",
-+			    KVM_ARM64_SYS_REG(clr_reg_id), reg_val);
++		TEST_ASSERT(reg_val == reg_val_orig,
++			    "Register 0x%llx value updated after vCPU run: 0x%lx; expected: 0x%lx\n",
++			    KVM_ARM64_SYS_REG(reg_id), reg_val, reg_val_orig);
 +	}
 +
 +	destroy_vpmu_vm();
 +}
 +
  /*
-  * Create a guest with one vCPU, and attempt to set the PMCR_EL0.N for
-  * the vCPU to @pmcr_n, which is larger than the host value.
-@@ -586,8 +669,10 @@ int main(void)
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
- 
- 	pmcr_n = get_pmcr_n_limit();
--	for (i = 0; i <= pmcr_n; i++)
-+	for (i = 0; i <= pmcr_n; i++) {
- 		run_access_test(i);
-+		run_pmregs_validity_test(i);
-+	}
- 
+  * Return the default number of implemented PMU event counters excluding
+  * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
+@@ -677,5 +720,7 @@ int main(void)
  	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
  		run_error_test(i);
+ 
++	run_immutable_test(pmcr_n);
++
+ 	return 0;
+ }
 -- 
 2.42.0.655.g421f12c284-goog
 
