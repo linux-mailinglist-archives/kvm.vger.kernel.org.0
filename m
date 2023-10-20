@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DDD7D0901
-	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 09:00:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 166FD7D0906
+	for <lists+kvm@lfdr.de>; Fri, 20 Oct 2023 09:00:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376319AbjJTHAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 03:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52586 "EHLO
+        id S1376408AbjJTHAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 03:00:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376395AbjJTHAD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 03:00:03 -0400
+        with ESMTP id S1376396AbjJTHAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 03:00:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1046D98
-        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 23:59:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB1C1BF
+        for <kvm@vger.kernel.org>; Thu, 19 Oct 2023 23:59:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697785160;
+        s=mimecast20190719; t=1697785167;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UvqeZdhYhfKzgLjBZRcYvls2Y57BmP1MiE49zKSMaRk=;
-        b=GldEs7uGJ0WZdJFAUe2giJoxRoeFAUdEqWNIGS5ui5tdRIg/e9heOUFyy61I2zMlEEd7uX
-        6b1Vff9LG2f8p8/d7LhKKkyGrfhKX73dfy9sjFVKJffcMgKvW/5bmvB0pXqZiW6PeZ8xdV
-        p/p3iPfQHdMSbu/OHdbGcqPsgkTHFEo=
+        bh=NSgHyHEZfPE9cd1uGtechBOjRxN9vNPYJYi2OtzuiQ0=;
+        b=EKXfj/P24IleonGVrlwyaSRLhmjMjWg0gmYr1qP980ethvAnQSx4V2w7qBVWyQWn9F3m58
+        y4WvpWLrPVbJ3DJPQyAFf25cJjlXa+H7NrvyoMZljKQWs2B5ZVOnBglpBgsRQgTX3ZX+Gc
+        hdw4zN8m1Xp3Kmoa46Mxi4rl189O/u4=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-495-MNOE15wlNZmcK9X0buzJ3g-1; Fri, 20 Oct 2023 02:59:06 -0400
-X-MC-Unique: MNOE15wlNZmcK9X0buzJ3g-1
+ us-mta-395-A4rH87AqMS-35XtixiB6ZQ-1; Fri, 20 Oct 2023 02:59:13 -0400
+X-MC-Unique: A4rH87AqMS-35XtixiB6ZQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B251E2810D45;
-        Fri, 20 Oct 2023 06:59:04 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C07C29AA2C2;
+        Fri, 20 Oct 2023 06:59:11 +0000 (UTC)
 Received: from secure.mitica (unknown [10.39.194.127])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 84BE825C0;
-        Fri, 20 Oct 2023 06:58:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 06B3725C0;
+        Fri, 20 Oct 2023 06:59:04 +0000 (UTC)
 From:   Juan Quintela <quintela@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     qemu-s390x@nongnu.org,
@@ -79,9 +79,9 @@ Cc:     qemu-s390x@nongnu.org,
         Fabiano Rosas <farosas@suse.de>,
         Daniel Henrique Barboza <danielhb413@gmail.com>,
         Greg Kurz <groug@kaod.org>, qemu-block@nongnu.org
-Subject: [PULL 09/17] tests/qtest: Introduce qtest_has_machine_with_env
-Date:   Fri, 20 Oct 2023 08:57:43 +0200
-Message-ID: <20231020065751.26047-10-quintela@redhat.com>
+Subject: [PULL 10/17] tests/qtest: Introduce qtest_resolve_machine_alias
+Date:   Fri, 20 Oct 2023 08:57:44 +0200
+Message-ID: <20231020065751.26047-11-quintela@redhat.com>
 In-Reply-To: <20231020065751.26047-1-quintela@redhat.com>
 References: <20231020065751.26047-1-quintela@redhat.com>
 MIME-Version: 1.0
@@ -99,70 +99,76 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Fabiano Rosas <farosas@suse.de>
 
-Add a variant of qtest_has_machine() that receives an environment
-variable containing an alternate QEMU binary path.
+The migration tests are being enhanced to test migration between
+different QEMU versions. A requirement of migration is that the
+machine type between source and destination matches, including the
+version.
+
+We cannot hardcode machine types in the tests because those change
+with each release. QEMU provides a machine type alias that has a fixed
+name, but points to the latest machine type at each release.
+
+Add a helper to resolve the alias into the exact machine
+type. E.g. "-machine pc" resolves to "pc-i440fx-8.2"
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Fabiano Rosas <farosas@suse.de>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Message-ID: <20231018192741.25885-5-farosas@suse.de>
+Message-ID: <20231018192741.25885-6-farosas@suse.de>
 ---
- tests/qtest/libqtest.h | 9 +++++++++
- tests/qtest/libqtest.c | 9 +++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ tests/qtest/libqtest.h | 10 ++++++++++
+ tests/qtest/libqtest.c | 16 ++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/tests/qtest/libqtest.h b/tests/qtest/libqtest.h
-index 76fc195f1c..d16deb9891 100644
+index d16deb9891..6e3d3525bf 100644
 --- a/tests/qtest/libqtest.h
 +++ b/tests/qtest/libqtest.h
-@@ -930,6 +930,15 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
-  */
- bool qtest_has_machine(const char *machine);
+@@ -922,6 +922,16 @@ void qtest_qmp_fds_assert_success(QTestState *qts, int *fds, size_t nfds,
+ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
+                                 bool skip_old_versioned);
  
 +/**
-+ * qtest_has_machine_with_env:
++ * qtest_resolve_machine_alias:
 + * @var: Environment variable from where to take the QEMU binary
-+ * @machine: The machine to look for
++ * @alias: The alias to resolve
 + *
-+ * Returns: true if the machine is available in the specified binary.
++ * Returns: the machine type corresponding to the alias if any,
++ * otherwise NULL.
 + */
-+bool qtest_has_machine_with_env(const char *var, const char *machine);
++char *qtest_resolve_machine_alias(const char *var, const char *alias);
 +
  /**
-  * qtest_has_device:
-  * @device: The device to look for
+  * qtest_has_machine:
+  * @machine: The machine to look for
 diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
-index 3cc7bf3076..603d900e7d 100644
+index 603d900e7d..c843c41188 100644
 --- a/tests/qtest/libqtest.c
 +++ b/tests/qtest/libqtest.c
-@@ -1565,12 +1565,12 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
+@@ -1565,6 +1565,22 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine),
      }
  }
  
--bool qtest_has_machine(const char *machine)
-+bool qtest_has_machine_with_env(const char *var, const char *machine)
- {
-     struct MachInfo *machines;
-     int i;
- 
--    machines = qtest_get_machines(NULL);
-+    machines = qtest_get_machines(var);
- 
-     for (i = 0; machines[i].name != NULL; i++) {
-         if (g_str_equal(machine, machines[i].name) ||
-@@ -1582,6 +1582,11 @@ bool qtest_has_machine(const char *machine)
-     return false;
- }
- 
-+bool qtest_has_machine(const char *machine)
++char *qtest_resolve_machine_alias(const char *var, const char *alias)
 +{
-+    return qtest_has_machine_with_env(NULL, machine);
++    struct MachInfo *machines;
++    int i;
++
++    machines = qtest_get_machines(var);
++
++    for (i = 0; machines[i].name != NULL; i++) {
++        if (machines[i].alias && g_str_equal(alias, machines[i].alias)) {
++            return g_strdup(machines[i].name);
++        }
++    }
++
++    return NULL;
 +}
 +
- bool qtest_has_device(const char *device)
+ bool qtest_has_machine_with_env(const char *var, const char *machine)
  {
-     static QList *list;
+     struct MachInfo *machines;
 -- 
 2.41.0
 
