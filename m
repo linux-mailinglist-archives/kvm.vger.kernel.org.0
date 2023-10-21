@@ -2,69 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3929E7D1C50
-	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 11:58:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30AA07D1D46
+	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 15:40:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbjJUJ6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Oct 2023 05:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
+        id S229621AbjJUNkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Oct 2023 09:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjJUJ6a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Oct 2023 05:58:30 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2E51A4;
-        Sat, 21 Oct 2023 02:58:27 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id 4fb4d7f45d1cf-53f6ccea1eeso2397648a12.3;
-        Sat, 21 Oct 2023 02:58:27 -0700 (PDT)
+        with ESMTP id S229478AbjJUNkc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Oct 2023 09:40:32 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D43E7
+        for <kvm@vger.kernel.org>; Sat, 21 Oct 2023 06:40:29 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40859c46447so2869505e9.1
+        for <kvm@vger.kernel.org>; Sat, 21 Oct 2023 06:40:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697882306; x=1698487106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1p+SZNKsZJwWwe/OiDFcu5HQt0qGCn56Wthh9+M5hU0=;
-        b=ERTH3yXklY/bkYThWzjBnlEMnzjwIL1OQdpv1r/uYyCrduPwJTnZdfor2cuEBKP3Yp
-         Qy1pzkmZn9rZCg8dKCPg0LpVHW8np3Wud6nKMDdkDuj1pfxs+tTAu2X79s+hSepgzbn8
-         zBbRwcb4+hs0fpvXx3RX2K1PE4vB7RPYG9zb/ROTBrZaJI7RPqkF1uL7iwMGqaWQMaQE
-         QHGMNuBkEAEv+U8BXVvTnGQ/iQlreIMNsn9BqN1t/uBwqBdWPecS8V1cUH8BWd/+Z+Nn
-         LvfJCuyEWnQsnak4mtGPPQi9Lq3gIqs0kvIJYjbWuGGkmhDW2ZHe49Hpr6UId5hp2Lyt
-         Eh3A==
+        d=gmail.com; s=20230601; t=1697895628; x=1698500428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=At1jsVLlupIiRvoiq5by/aHnfQWBZjYV5W5vgE3NJa4=;
+        b=HZcUSNORVdothOXHfmQ0Wy9zEUWu8ULYajyrlD8QSihElUSVoXamsyp6DKfuQvij10
+         MNo9CfJDZNycgIPOEinLI0HDHpxg0cWifRcRNRKFnKwg1QUSpkLVVb56fIG9qmUJTgXU
+         7MXewzJYEOYF1/RuAtzOaBqzksVpi5vKvU6KtZxJbY9qgyQUeQFeukYLt7WSi+bAQHTA
+         w0rYGMfTDE/YxF9actqc1jg/Ndi78txGpwF3zsv60urTCVyqyRd/KCs4Bvo4KWCUhiY6
+         looQb9B0JYxretZyKyJLSX1UrDxfxHx83LJzRFtxqBJJmZrYhK/3Pof+V+OySf1JeOGh
+         3osA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697882306; x=1698487106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1p+SZNKsZJwWwe/OiDFcu5HQt0qGCn56Wthh9+M5hU0=;
-        b=GTjYOaGL7v0D9wamHTW1/0zRAEfWe8F5Q++RVmrDEp2JzROY9dmeVyb6ZCqDSv463d
-         7Di7nXV4aOuNmRpSBU22HNsYoCVPOvWDFZr5O1Sx19wWijI0QHYNJEpDLGSTH8PdkWEc
-         0lXpupXlhuqhByht0YxvnT/RfdW0U+Tq2GvbEa+AY/vnaPBb8KAjCBJgh14OjF7RwSbu
-         XOk388/N3x1Ut0sWp7+UjVpZas9AiBitC1qXpEcFORhRTllH4CaZzQ8jb6z/e869svx0
-         VhdhsEiQ1E98mR1MHygZ/z/QZHW8etUMAE9tcyPX/9TYu5yCYg31An/sgINIcNJ7KbwH
-         ZD7g==
-X-Gm-Message-State: AOJu0YyDpDTZJkYbArSlsmQKRHplO9Y24i7ij50igVxvQlI8lvGQldql
-        Ly6GDW+Llw2+zVQ0oikXc++FMYRHrzqLHGBP8WA=
-X-Google-Smtp-Source: AGHT+IGW4eucEcJPD3vvV1GcCgDDiQS8IluIqklKbt1eRIGgRmoxjZVZzbyOo0mc9JKhDPRfyZU4bq+xBEI5j/9Coqg=
-X-Received: by 2002:a05:6402:3512:b0:53e:775e:9761 with SMTP id
- b18-20020a056402351200b0053e775e9761mr3544911edd.36.1697882305562; Sat, 21
- Oct 2023 02:58:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697895628; x=1698500428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=At1jsVLlupIiRvoiq5by/aHnfQWBZjYV5W5vgE3NJa4=;
+        b=cmUg1n8P3EG10sUeb2wf2JsUac3xwozXyF1ORjXVtZOLRPu/1Y4B2thzzRr7cXM/Iv
+         BAhOmQj3LrxM8mSXJdUJI1ipBYN+sLBOmLMrJRiB8Gwj5UfEdxdky5PlGsCNc5Ttfsbx
+         NjmmdpfW9s71TLAXIt3LU8yXO/rRLgnofJhJPWu6zyywK+X8BNw1Ap+eh8QajADY8Muz
+         afmkYBayI2DO7SKQj5i64DOEV3aWukFd09nAtr7dhUPZ1ooddyHSPoyYBgjiPPJIx516
+         Y7NT7h7CtgbsQazs4sNg4nM0JBcn31OLAkp5TqaZ+dhrZHnCoysqQ9fYpwmnesc83hAZ
+         UNzQ==
+X-Gm-Message-State: AOJu0YySMO7/KKWR2GMpEZSsbpi5LOzn7OoJdbibLsxNiAEgkAyCV5bm
+        5/M94QJm8qsj00HylGy/Km8=
+X-Google-Smtp-Source: AGHT+IEnZ/0NJLa2Gx/dyL23Jh+pUGPX2QqVxWhvvc8m5QJWNV2Sl/aI/LuNDM2hajRdioanaI2evA==
+X-Received: by 2002:a05:600c:4f45:b0:407:7e7a:6017 with SMTP id m5-20020a05600c4f4500b004077e7a6017mr3625970wmq.11.1697895627615;
+        Sat, 21 Oct 2023 06:40:27 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:a03f:864b:8201:e534:34f4:1c34:8de7])
+        by smtp.googlemail.com with ESMTPSA id e7-20020a05600c218700b00407efbc4361sm9302948wme.9.2023.10.21.06.40.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Oct 2023 06:40:26 -0700 (PDT)
+From:   Daan De Meyer <daan.j.demeyer@gmail.com>
+To:     qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: [PATCH] Add class property to configure KVM device node to use
+Date:   Sat, 21 Oct 2023 15:40:15 +0200
+Message-ID: <20231021134015.1119597-1-daan.j.demeyer@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-References: <20230911114347.85882-1-cloudliang@tencent.com>
- <20230911114347.85882-9-cloudliang@tencent.com> <ZTLPy9SYzJmgMxw9@google.com>
-In-Reply-To: <ZTLPy9SYzJmgMxw9@google.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Sat, 21 Oct 2023 17:58:14 +0800
-Message-ID: <CAFg_LQXZ4k+K7paWXVFSpXvaqBY-2s1DNh=t91-pRBc8efwt9w@mail.gmail.com>
-Subject: Re: [PATCH v4 8/9] KVM: selftests: Test Intel supported fixed
- counters bit mask
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -75,135 +68,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B410=E6=9C=8821=
-=E6=97=A5=E5=91=A8=E5=85=AD 03:06=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Sep 11, 2023, Jinrong Liang wrote:
-> > From: Jinrong Liang <cloudliang@tencent.com>
-> >
-> > Add a test to check that fixed counters enabled via guest
-> > CPUID.0xA.ECX (instead of EDX[04:00]) work as normal as usual.
-> >
-> > Co-developed-by: Like Xu <likexu@tencent.com>
-> > Signed-off-by: Like Xu <likexu@tencent.com>
-> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> > ---
-> >  .../selftests/kvm/x86_64/pmu_counters_test.c  | 54 +++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/t=
-ools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> > index df76f0f2bfd0..12c00bf94683 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> > @@ -301,6 +301,59 @@ static void test_intel_counters_num(void)
-> >       test_oob_fixed_ctr(nr_fixed_counters + 1);
-> >  }
-> >
-> > +static void fixed_counters_guest_code(void)
-> > +{
-> > +     uint64_t supported_bitmask =3D this_cpu_property(X86_PROPERTY_PMU=
-_FIXED_COUNTERS_BITMASK);
-> > +     uint32_t nr_fixed_counter =3D this_cpu_property(X86_PROPERTY_PMU_=
-NR_FIXED_COUNTERS);
-> > +     uint64_t msr_val;
-> > +     unsigned int i;
-> > +     bool expected;
-> > +
-> > +     for (i =3D 0; i < nr_fixed_counter; i++) {
-> > +             expected =3D supported_bitmask & BIT_ULL(i) || i < nr_fix=
-ed_counter;
-> > +
-> > +             wrmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-> > +             wrmsr_safe(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * i));
-> > +             wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL, BIT_ULL(PMC_IDX_FIX=
-ED + i));
-> > +             __asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES})=
-);
-> > +             wrmsr_safe(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> > +             rdmsr_safe(MSR_CORE_PERF_FIXED_CTR0 + i, &msr_val);
->
-> Y'all are making this way harder than it needs to be.  The previous patch=
- already
-> created a testcase to verify fixed counters, just use that!  Then test ca=
-se verify
-> that trying to enable unsupported fixed counters results in #GP, as oppos=
-ed to the
-> above which doesn't do any actual checking, e.g. KVM could completely bot=
-ch the
-> {RD,WR}MSR emulation but pass the test by not programming up a counter in=
- perf.
->
-> I.e. rather than have a separate test for the supported bitmask goofiness=
-, have
-> the fixed counters test iterate over the bitmask.  And then add a patch t=
-o verify
-> the counters can be enabled and actually count.
->
-> And peeking ahead at the vPMU version test, it's the exact same story the=
-re.
-> Instead of hardcoding one-off tests, iterate on the version.  The end res=
-ult is
-> that the test provides _more_ coverage with _less_ code.  And without any=
- of the
-> hardcoded magic that takes a crystal ball to understand.
->
-> *sigh*
->
-> And even more importantly, this test is complete garbage.  The SDM clearl=
-y states
-> that
->
->   With Architectural Performance Monitoring Version 5, register CPUID.0AH=
-.ECX
->   indicates Fixed Counter enumeration. It is a bit mask which enumerates =
-the
->   supported Fixed Counters in a processor. If bit 'i' is set, it implies =
-that
->   Fixed Counter 'i' is supported.
->
-> *sigh*
->
-> The test passes because it only iterates over counters < nr_fixed_counter=
-.  So
-> as written, the test worse than useless.  It provides no meaningful value=
- and is
-> actively misleading.
->
->         for (i =3D 0; i < nr_fixed_counter; i++) {
->
-> Maybe I haven't been explicit enough: the point of writing tests is to fi=
-nd and
-> prevent bugs, not to get the tests passing.  That isn't to say we don't w=
-ant a
-> clean testgrid, but writing a "test" that doesn't actually test anything =
-is a
-> waste of everyone's time.
->
-> I appreciate that the PMU is subtle and complex (understatement), but thi=
-ngs like
-> this, where observing that the result of "supported_bitmask & BIT_ULL(i)"=
- doesn't
-> actually affect anything, doesn't require PMU knowledge.
->
->         for (i =3D 0; i < nr_fixed_counter; i++) {
->                 expected =3D supported_bitmask & BIT_ULL(i) || i < nr_fix=
-ed_counter;
->
-> A concrete suggestion for writing tests: introduce bugs in what you're te=
-sting
-> and verify that the test actually detects the bugs.  If you tried to do t=
-hat for
-> the above bitmask test you would have discovered you can't break KVM beca=
-use KVM
-> doesn't support this!  And if your test doesn't detect the bugs, that sho=
-uld also
-> be a big clue that something isn't quite right.
+This allows passing the KVM device node to use as a file
+descriptor via /dev/fdset/XX. Passing the device node to
+use as a file descriptor allows running qemu unprivileged
+even when the user running qemu is not in the kvm group
+on distributions where access to /dev/kvm is gated behind
+membership of the kvm group (as long as the process invoking
+qemu is able to open /dev/kvm and passes the file descriptor
+to qemu).
 
-Thank you for your detailed feedback on my patch series. I truly
-appreciate the time and effort you've put into identifying the issues
-in my code and providing valuable suggestions for improvement.
+Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+---
+ accel/kvm/kvm-all.c      | 25 ++++++++++++++++++++++++-
+ include/sysemu/kvm_int.h |  1 +
+ qemu-options.hx          |  8 +++++++-
+ 3 files changed, 32 insertions(+), 2 deletions(-)
 
-Your guidance have been instrumental in helping me understand the
-selftests. I will make sure to strive to create more meaningful and
-effective contribution in the future.
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 72e1d1141c..3e0b2d00e9 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2478,7 +2478,7 @@ static int kvm_init(MachineState *ms)
+     QTAILQ_INIT(&s->kvm_sw_breakpoints);
+ #endif
+     QLIST_INIT(&s->kvm_parked_vcpus);
+-    s->fd = qemu_open_old("/dev/kvm", O_RDWR);
++    s->fd = qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
+     if (s->fd == -1) {
+         fprintf(stderr, "Could not access KVM kernel module: %m\n");
+         ret = -errno;
+@@ -3775,6 +3775,24 @@ static void kvm_set_dirty_ring_size(Object *obj, Visitor *v,
+     s->kvm_dirty_ring_size = value;
+ }
+ 
++static char *kvm_get_device(Object *obj,
++                            Error **errp G_GNUC_UNUSED)
++{
++    KVMState *s = KVM_STATE(obj);
++
++    return g_strdup(s->device);
++}
++
++static void kvm_set_device(Object *obj,
++                           const char *value,
++                           Error **errp G_GNUC_UNUSED)
++{
++    KVMState *s = KVM_STATE(obj);
++
++    g_free(s->device);
++    s->device = g_strdup(value);
++}
++
+ static void kvm_accel_instance_init(Object *obj)
+ {
+     KVMState *s = KVM_STATE(obj);
+@@ -3793,6 +3811,7 @@ static void kvm_accel_instance_init(Object *obj)
+     s->xen_version = 0;
+     s->xen_gnttab_max_frames = 64;
+     s->xen_evtchn_max_pirq = 256;
++    s->device = NULL;
+ }
+ 
+ /**
+@@ -3833,6 +3852,10 @@ static void kvm_accel_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "dirty-ring-size",
+         "Size of KVM dirty page ring buffer (default: 0, i.e. use bitmap)");
+ 
++    object_class_property_add_str(oc, "device", kvm_get_device, kvm_set_device);
++    object_class_property_set_description(oc, "device",
++        "Path to the device node to use (default: /dev/kvm)");
++
+     kvm_arch_accel_class_init(oc);
+ }
+ 
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index a5b9122cb8..19a5364a4b 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -124,6 +124,7 @@ struct KVMState
+     uint32_t xen_caps;
+     uint16_t xen_gnttab_max_frames;
+     uint16_t xen_evtchn_max_pirq;
++    char *device;
+ };
+ 
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 54a7e94970..40ad15a9da 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -188,7 +188,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
+     "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+-    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
++    "                thread=single|multi (enable multi-threaded TCG)\n"
++    "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
+ SRST
+ ``-accel name[,prop=value[,...]]``
+     This is used to enable an accelerator. Depending on the target
+@@ -269,6 +270,11 @@ SRST
+         open up for a specified of time (i.e. notify-window).
+         Default: notify-vmexit=run,notify-window=0.
+ 
++    ``device=path``
++        Sets the path to the KVM device node. Defaults to ``/dev/kvm``. This
++        option can be used to pass the KVM device to use via a file descriptor
++        by setting the value to ``/dev/fdset/NN``.
++
+ ERST
+ 
+ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+-- 
+2.41.0
+
