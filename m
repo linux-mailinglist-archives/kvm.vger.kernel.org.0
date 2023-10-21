@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 146247D1A3F
-	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 03:19:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92CA47D1A49
+	for <lists+kvm@lfdr.de>; Sat, 21 Oct 2023 03:28:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbjJUBTO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Oct 2023 21:19:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38730 "EHLO
+        id S232860AbjJUB20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Oct 2023 21:28:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjJUBTN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Oct 2023 21:19:13 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3526BD67;
-        Fri, 20 Oct 2023 18:19:08 -0700 (PDT)
+        with ESMTP id S229500AbjJUB2Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Oct 2023 21:28:25 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24622D68;
+        Fri, 20 Oct 2023 18:28:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697851148; x=1729387148;
+  t=1697851704; x=1729387704;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=czgDYYnGMR+x6IWe3MoUs9kSDZkqARZu11lHJOx2X7w=;
-  b=bqTLis+SD8VPoBFNPZmTqWEaHYUC/5bhprHxghuFu9y0J/EToCBfZqNe
-   X8yxzE6QcgIa8uDzrrYI7AaDOKCvQwBfAfcqFA9SUTMwaZw32YbXtH2DI
-   DhNYc8hd7Q+Z/E+//Q8kZPM5QOPQTn15Gv/V11z3z3FUP+YIRP7JoHLiN
-   UITYBpYHdwx3tRtreV60os912VwjsBxbj/GBDRjS2pjdSx9YzIxj5yc4T
-   kX7YU8btB1USQ6Z2HELCAbzh+VfQXLmzY7KFXrF5yyfoHBu5GXp9L+asX
-   Ou/iLx6PC8nJ2odqQTbr+mU68Audt8nSwnI1h9GNec4TEqD5VSQS3wn++
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="417732654"
+  bh=mUdZYVXimImfRLdgMfRGzWaY3JrjlP3m7bhFqgBKk8k=;
+  b=BNXqtnlDZAOoc4pm/ZziKCBLkJ1HK8gnKNgcmCMio+Uqx9WCEqqSOrcx
+   Qm2WXm3tmsPKL9TtpW4Ez004xS+9sC599Wn6cBtDdA6I5l3XQ4xIhJFYl
+   VWnKrdkZ+S6qdgqKHxoVxDvnTETtPTg0ZsRjT2gsyqAi+VMmFhEFT/cl7
+   AjJcQxXrGkGfI+nxlD11MvY9W28ZvG16Jc8OhrO69cHV9coT+ci887Wuz
+   vgqWGF7cYfwtH7LnSJoG06gk/31xPNqmLQFqzsqw0p3XYPDC/ZaVtOSlp
+   Y4o6dct2r4nNFW2eGB8BsfEmpiwVcpcJHGQt5Rx3x1oIZdcafpeo6AYsm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="389453049"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="417732654"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 18:19:07 -0700
+   d="scan'208";a="389453049"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 18:28:23 -0700
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="823428780"
 X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="5268375"
+   d="scan'208";a="823428780"
 Received: from hkchanda-mobl.amr.corp.intel.com (HELO desk) ([10.209.90.113])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 18:17:55 -0700
-Date:   Fri, 20 Oct 2023 18:18:59 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 18:28:22 -0700
+Date:   Fri, 20 Oct 2023 18:28:11 -0700
 From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Andrew Cooper <andrew.cooper3@citrix.com>
+To:     Andi Kleen <ak@linux.intel.com>
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
@@ -50,24 +51,23 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
+        tim.c.chen@linux.intel.com, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
         Alyssa Milburn <alyssa.milburn@linux.intel.com>,
         Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com,
-        Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [RESEND][PATCH 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231021011859.c2rtc4vl7l2cl4q6@desk>
+        antonio.gomez.iglesias@linux.intel.com
+Subject: Re: [PATCH  3/6] x86/entry_32: Add VERW just before userspace
+ transition
+Message-ID: <20231021012744.3yz7lpo2w6gyvytr@desk>
 References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-1-cff54096326d@linux.intel.com>
- <f620c7d4-6345-4ad0-8a45-c8089e3c34df@citrix.com>
+ <20231020-delay-verw-v1-3-cff54096326d@linux.intel.com>
+ <ZTMSDkBzUZBiTBoG@tassilo>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f620c7d4-6345-4ad0-8a45-c8089e3c34df@citrix.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+In-Reply-To: <ZTMSDkBzUZBiTBoG@tassilo>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -76,48 +76,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 21, 2023 at 12:55:45AM +0100, Andrew Cooper wrote:
-> On 20/10/2023 9:44 pm, Pawan Gupta wrote:
-> > +#define EXEC_VERW				\
-> > +	__EXEC_VERW(551f);			\
-> > +	/* nopl __KERNEL_DS(%rax) */		\
-> > +	.byte 0x0f, 0x1f, 0x80, 0x00, 0x00;	\
-> > +551:	.word __KERNEL_DS;			\
+On Fri, Oct 20, 2023 at 04:49:34PM -0700, Andi Kleen wrote:
+> On Fri, Oct 20, 2023 at 01:45:09PM -0700, Pawan Gupta wrote:
+> > As done for entry_64, add support for executing VERW late in exit to
+> > user path for 32-bit mode.
+> > 
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > ---
+> >  arch/x86/entry/entry_32.S | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/x86/entry/entry_32.S b/arch/x86/entry/entry_32.S
+> > index 6e6af42e044a..bbf77d2aab2e 100644
+> > --- a/arch/x86/entry/entry_32.S
+> > +++ b/arch/x86/entry/entry_32.S
+> > @@ -886,6 +886,9 @@ SYM_FUNC_START(entry_SYSENTER_32)
+> >  	popfl
+> >  	popl	%eax
+> >  
+> > +	/* Mitigate CPU data sampling attacks .e.g. MDS */
+> > +	USER_CLEAR_CPU_BUFFERS
+> > +
+> >  	/*
+> >  	 * Return back to the vDSO, which will pop ecx and edx.
+> >  	 * Don't bother with DS and ES (they already contain __USER_DS).
 > 
-> Is this actually wise from a perf point of view?
-> 
-> You're causing a data access to the instruction stream, and not only
-> that, the immediate next instruction.  Some parts don't take kindly to
-> snoops hitting L1I.
+> Did you forget the INT 0x80 entry point?
 
-I suspected the same and asked CPU architects, they did not anticipate
-reads being interpreted as part of self modifying code. The perf numbers
-do not indicate a problem, but they dont speak for all the parts. It
-could be an issue with some parts.
+I do have VERW in the INT80 path, the diff is showing just the label
+restore_all_switch_stack. Below is the sequence:
 
-> A better option would be to simply have
-> 
-> .section .text.entry
-> .align CACHELINE
-> mds_verw_sel:
->     .word __KERNEL_DS
->     int3
-> .align CACHELINE
-> 
-> 
-> And then just have EXEC_VERW be
-> 
->     verw mds_verw_sel(%rip)
-> 
-> in the fastpaths.  That keeps the memory operand in .text.entry it works
-> on Meltdown-vulnerable CPUs, but creates effectively a data cacheline
-> that isn't mixed into anywhere in the frontend, which also gets far
-> better locality of reference rather than having it duplicated in 9
-> different places.
+SYM_FUNC_START(entry_INT80_32)
+	ASM_CLAC
+	pushl	%eax			/* pt_regs->orig_ax */
 
-> Also it avoids playing games with hiding data inside an instruction.
-> It's a neat trick, but the neater trick is avoid it whenever possible.
+	SAVE_ALL pt_regs_ax=$-ENOSYS switch_stacks=1	/* save rest */
 
-Thanks for the pointers. I think verw in 32-bit mode won't be able to
-address the operand outside of 4GB range. Maybe this is fine or could it
-be a problem addressing from e.g. KVM module?
+	movl	%esp, %eax
+	call	do_int80_syscall_32
+.Lsyscall_32_done:
+	STACKLEAK_ERASE
+
+restore_all_switch_stack:
+	SWITCH_TO_ENTRY_STACK
+	CHECK_AND_APPLY_ESPFIX
+
+	/* Switch back to user CR3 */
+	SWITCH_TO_USER_CR3 scratch_reg=%eax
+
+	BUG_IF_WRONG_CR3
+
+	/* Restore user state */
+	RESTORE_REGS pop=4			# skip orig_eax/error_code
+
+	/* Mitigate CPU data sampling attacks .e.g. MDS */
+	USER_CLEAR_CPU_BUFFERS
+	^^^^^^^^^^^^^^^^^^^^^^
