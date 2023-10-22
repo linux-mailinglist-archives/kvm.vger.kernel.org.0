@@ -2,347 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5C5E7D209E
-	for <lists+kvm@lfdr.de>; Sun, 22 Oct 2023 03:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 613D37D219B
+	for <lists+kvm@lfdr.de>; Sun, 22 Oct 2023 09:10:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbjJVBPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Oct 2023 21:15:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42856 "EHLO
+        id S229500AbjJVHIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Oct 2023 03:08:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjJVBPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Oct 2023 21:15:45 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A1ACD52
-        for <kvm@vger.kernel.org>; Sat, 21 Oct 2023 18:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697937340; x=1729473340;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RaBJhY6Noscr6BKqNP3rnbzAtIyQU+7PO2jqJX1CmRA=;
-  b=C8Odru9qAZfjecL36YWTiD50VYhXfRrIxr1RS0I3HHw/8a3atNY7v/pv
-   sLxr/9wMBde2gRSLy6Bj9nyaeM0iE2ksEKxWVnghBtP16WCJFDoGXsDDE
-   p8UQo1uv5gQeBWrBLFhikfZOd2J6pXFnkdJzgxu9X1b5vmwpSyJV50A7p
-   orGId/aG1Pj7en/0djhr6Tms7GYL5Y3WqB/C1XEdHtVW60TQYo6mLlYl6
-   H7IvoErN387aSD+tQUUGbl2qfJrQ8IcvyrCzkaBKeejtYE7RX1qXiBtQK
-   pvSVpF/Xsa3eW8tlkdoKDx4tQR6iwPAyep973P+IUUbSFAYvptzJUAt63
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10870"; a="383872723"
-X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
-   d="scan'208";a="383872723"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2023 18:15:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
-   d="scan'208";a="5713592"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 21 Oct 2023 18:15:32 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1quN40-0005S2-2v;
-        Sun, 22 Oct 2023 01:15:32 +0000
-Date:   Sun, 22 Oct 2023 09:14:41 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yishai Hadas <yishaih@nvidia.com>, alex.williamson@redhat.com,
-        mst@redhat.com, jasowang@redhat.com, jgg@nvidia.com
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com,
-        si-wei.liu@oracle.com, leonro@nvidia.com, yishaih@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH V1 vfio 6/9] virtio-pci: Introduce APIs to execute legacy
- IO admin commands
-Message-ID: <202310220842.ADAIiZsO-lkp@intel.com>
-References: <20231017134217.82497-7-yishaih@nvidia.com>
+        with ESMTP id S229452AbjJVHIM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Oct 2023 03:08:12 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9DBE9
+        for <kvm@vger.kernel.org>; Sun, 22 Oct 2023 00:08:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PZrMzBjwyoDAQtkXE83AyJlqy/O90NDObv0limFP0AlivuHVhbWVueh4e3jJtvbacUbBTiW2WSqaGUaEOrlM2LyimH+jDv/QSnWcWfDgApPfnZYizTkwZGuJXzclr+WD3Yll5jZ+pz2LV+mrWHPNnAwR812oLmRFuzH6wwNnewlb44DO8BY11Gu+0gbClU8gO9Qxo0k6KBKreNuwwBTJR8HmvhnkY06eLNN1YvuPFSxUa9ZJW4g4878w7RNrLcmN+CLcb6uWjc394Ay6luXi2DcBmj6fFzUxlTjBiuY6qk4N7o9jSir2qRXbapTO5+LpLTPg+6EPq+DIZtCp2zvxQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eWf7m4wjWtpRK6UiHcvNofDvywttYo1I5LSoxiiBFcI=;
+ b=MOeK0deI/ZJJDbZv8K/ktFfyHGbuJPpzTyw7FvuXwYYEx0UZ+PV81yGlyWssrGD+jH1AfNR4tw1rRLoja+YqXREwjwiN2JJf9kxhp4b6Jhi3BbyY2g8h7qEAHSVZeFaYESP3M+VrCZBDkYB/u52ghE6BKtZrJ07RwiL+dWM2QOzHhQ+NQo7fjtm/UWzcdpsLT2k8s+0VK6rGJFvLq43ppi1tRWAfEjN7T/B0F8kGUiVXp9R8DIkexTvVNXMvyfW98DCXmSLMkwy5deX9T625H8LUxiPgjkHfpzk57q84CwXCu6YUN5n+c3bBaffA7qloZ/AikQCIekic0V057Mit9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eWf7m4wjWtpRK6UiHcvNofDvywttYo1I5LSoxiiBFcI=;
+ b=mbDaLkAg6H+DikZUczTMDtwqP9F/JFg2WSeRU0VSt8xnaTRc0ysmufSbMDUVEIGc8v4dS0f4GmTgCi/InGJRutxgp3xm7IqIDwh0zhpbtdSgTB7WiqONRxlCzxtZhag9pvW0gs05ElDvNopm8JN92ig3vFe8uckBwcAKls9wFNUjlzjF9aL/WUVxwdwxXsmRwonLsi1kTnHYc+OlutBHqDS0fYzHf+Gy7GpZjOjOQ0vcMrvwZHsV3LXxuy4TnE87ke10t6BZIqjeYZaIzb0HtK3WsnR53A0i0mu1alwDg6ZaazhDWc8CbhguqtfQY072Jbsncz/W+FETxb301j91Ww==
+Received: from MW4PR03CA0071.namprd03.prod.outlook.com (2603:10b6:303:b6::16)
+ by SJ1PR12MB6052.namprd12.prod.outlook.com (2603:10b6:a03:489::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Sun, 22 Oct
+ 2023 07:08:06 +0000
+Received: from CO1PEPF000044EE.namprd05.prod.outlook.com
+ (2603:10b6:303:b6:cafe::93) by MW4PR03CA0071.outlook.office365.com
+ (2603:10b6:303:b6::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31 via Frontend
+ Transport; Sun, 22 Oct 2023 07:08:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044EE.mail.protection.outlook.com (10.167.241.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6933.15 via Frontend Transport; Sun, 22 Oct 2023 07:08:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 22 Oct
+ 2023 00:07:57 -0700
+Received: from [172.27.13.77] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 22 Oct
+ 2023 00:07:52 -0700
+Message-ID: <b95ff308-9ce3-ede6-dadd-b90344695e8b@nvidia.com>
+Date:   Sun, 22 Oct 2023 10:07:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017134217.82497-7-yishaih@nvidia.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v4 11/18] iommu/amd: Access/Dirty bit support in IOPTEs
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+CC:     <iommu@lists.linux.dev>, Kevin Tian <kevin.tian@intel.com>,
+        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Zhenzhong Duan" <zhenzhong.duan@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <kvm@vger.kernel.org>
+References: <20231018202715.69734-1-joao.m.martins@oracle.com>
+ <20231018202715.69734-12-joao.m.martins@oracle.com>
+ <20231018231111.GP3952@nvidia.com>
+ <2a8b0362-7185-4bca-ba06-e6a4f8de940b@oracle.com>
+ <f2109ca9-b194-43f2-bed0-077d03242d1a@oracle.com>
+ <20231019235933.GB3952@nvidia.com>
+ <a8c478f1-209e-46b0-9b91-7cd8afccd7ca@oracle.com>
+ <20231021161443.GI3952@nvidia.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20231021161443.GI3952@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044EE:EE_|SJ1PR12MB6052:EE_
+X-MS-Office365-Filtering-Correlation-Id: e15041d0-69b0-4aad-bc07-08dbd2cda40e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dqFG4/XM/+YQdh/PwnsBYRIBiltKm5ynRIS2y5YOnzL+/HX4j2eaI2QIXksEEEeJnbkCEaugP3MtD10kCl9CbdWlp64aA3F6mpUxnIud+cetIckiRbeS20IQX3QVcweaP91ynAY4um30IAlJ5JUMUfaIxX3dOVHujCexOjJEwd4Ghdz5gc1vxPhAzy6AH4eokINIi819vcYxM2w+1OtdQlXFL93d242JVYrrmUaX+sbW+j7/cnqfj67y/Nl0MlHAe2EyW+d6+A/6G+3iyoY+v5YQ93Lkfl7AFAxhhkGiDcWpUgwJ9pYNtwvwrN+B9lvG4wBC3ViLtioWI0N0gRA7mjrfrRMLMZMsdHG87w3vtCVVLY2Ox+LX/3hAvgOVGx3qduYrh/QLd+mbHcsYnz6VBAeHF/Ydr7+UrH/ZlN540ZBstoBdaBhNYAd2fCUtm2QOwV0jj+8WD059pz9UQ7mkRtBxLnvCE01ZV+mmfbYNPC5Z1pzqVlMVyjG/l5aKMvk2eFMaAuU+yB5yYYHU/EFcYaUMQwODa55/yXggEYs3vdreQHvxivE8UF7itwaZd0vWMXE5r/nQdXgM7tgAVl6l3KlUBvUNf/3ujsqQ4rRzmM09DRup82WLqSBqDfF3OAiBxU79WRZW83W1Nuu/eVVf58nifgnC2q9FXahKvw8zk8/VNFTXisMwyCXZKckNSx3RXaNh3z76i0SASyiujwo+UhaSSz2A0nsJjlTU6D00gLZTiZudOhLHecVLNi6G1km+TMUAzdOh/1mnkBfOc6542m48zisEH4WGKEFdpxkLdRs=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(376002)(136003)(39860400002)(230922051799003)(1800799009)(186009)(64100799003)(82310400011)(451199024)(36840700001)(40470700004)(46966006)(336012)(31686004)(53546011)(47076005)(426003)(54906003)(82740400003)(16526019)(26005)(356005)(70586007)(110136005)(70206006)(36860700001)(478600001)(83380400001)(2616005)(316002)(16576012)(7636003)(8936002)(8676002)(5660300002)(40460700003)(2906002)(31696002)(40480700001)(41300700001)(36756003)(4326008)(7416002)(86362001)(14143004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2023 07:08:06.4677
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e15041d0-69b0-4aad-bc07-08dbd2cda40e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044EE.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6052
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yishai,
+On 21/10/2023 19:14, Jason Gunthorpe wrote:
+> On Fri, Oct 20, 2023 at 03:43:57PM +0100, Joao Martins wrote:
+>> On 20/10/2023 00:59, Jason Gunthorpe wrote:
+>>> On Thu, Oct 19, 2023 at 12:58:29PM +0100, Joao Martins wrote:
+>>>> AMD has no such behaviour, though that driver per your earlier suggestion might
+>>>> need to wait until -rc1 for some of the refactorings get merged. Hopefully we
+>>>> don't need to wait for the last 3 series of AMD Driver refactoring (?) to be
+>>>> done as that looks to be more SVA related; Unless there's something more
+>>>> specific you are looking for prior to introducing AMD's domain_alloc_user().
+>>> I don't think we need to wait, it just needs to go on the cleaning list.
+>>>
+>> I am not sure I followed. This suggests an post-merge cleanups, which goes in
+>> different direction of your original comment? But maybe I am just not parsing it
+>> right (sorry, just confused)
+> Yes post merge for the weirdo alloc flow
+>
+>>>>> for themselves; so more and more I need to work on something like
+>>>>> iommufd_log_perf tool under tools/testing that is similar to the gup_perf to make all
+>>>>> performance work obvious and 'standardized'
+>>> We have a mlx5 vfio driver in rdma-core and I have been thinking it
+>>> would be a nice basis for building an iommufd tester/benchmarker as it
+>>> has a wide set of "easilly" triggered functionality.
+>> Oh woah, that's quite awesome; I'll take a closer look; I thought rdma-core
+>> support for mlx5-vfio was to do direct usage of the firmware interface, but it
+>> appears to be for regular RDMA apps as well. I do use some RDMA to exercise
+>> iommu dirty tracking; but it's more like a rudimentary test inside the guest,
+>> not something self-contained.
+> I can't remember anymore how much is supported, but supporting more is
+> not hard work. With a simple QP/CQ you can do all sorts of interesting
+> DMA.
+>
+> Yishai would remember if QP/CQ got fully wired up
 
-kernel test robot noticed the following build warnings:
+For now, QP/CQ are supported only over the DEVX API (i.e. 
+mlx5dv_devx_obj_create()) of the mlx5-vfio driver in rdma-core.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.6-rc6]
-[cannot apply to next-20231020]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+In that case, data-path for RDMA applications should be done by the 
+application itself based on the mlx5 specification.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yishai-Hadas/virtio-pci-Fix-common-config-map-for-modern-device/20231017-214450
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231017134217.82497-7-yishaih%40nvidia.com
-patch subject: [PATCH V1 vfio 6/9] virtio-pci: Introduce APIs to execute legacy IO admin commands
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20231022/202310220842.ADAIiZsO-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231022/202310220842.ADAIiZsO-lkp@intel.com/reproduce)
+Yishai
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310220842.ADAIiZsO-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/virtio/virtio_pci_modern.c:731:5: warning: no previous prototype for function 'virtio_pci_admin_list_query' [-Wmissing-prototypes]
-   int virtio_pci_admin_list_query(struct pci_dev *pdev, u8 *buf, int buf_size)
-       ^
-   drivers/virtio/virtio_pci_modern.c:731:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_pci_admin_list_query(struct pci_dev *pdev, u8 *buf, int buf_size)
-   ^
-   static 
->> drivers/virtio/virtio_pci_modern.c:758:5: warning: no previous prototype for function 'virtio_pci_admin_list_use' [-Wmissing-prototypes]
-   int virtio_pci_admin_list_use(struct pci_dev *pdev, u8 *buf, int buf_size)
-       ^
-   drivers/virtio/virtio_pci_modern.c:758:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_pci_admin_list_use(struct pci_dev *pdev, u8 *buf, int buf_size)
-   ^
-   static 
->> drivers/virtio/virtio_pci_modern.c:786:5: warning: no previous prototype for function 'virtio_pci_admin_legacy_io_write' [-Wmissing-prototypes]
-   int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
-       ^
-   drivers/virtio/virtio_pci_modern.c:786:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
-   ^
-   static 
->> drivers/virtio/virtio_pci_modern.c:831:5: warning: no previous prototype for function 'virtio_pci_admin_legacy_io_read' [-Wmissing-prototypes]
-   int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
-       ^
-   drivers/virtio/virtio_pci_modern.c:831:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
-   ^
-   static 
->> drivers/virtio/virtio_pci_modern.c:877:5: warning: no previous prototype for function 'virtio_pci_admin_legacy_io_notify_info' [-Wmissing-prototypes]
-   int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
-       ^
-   drivers/virtio/virtio_pci_modern.c:877:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
-   ^
-   static 
-   5 warnings generated.
+>
+> Jason
 
 
-vim +/virtio_pci_admin_list_query +731 drivers/virtio/virtio_pci_modern.c
-
-   721	
-   722	/*
-   723	 * virtio_pci_admin_list_query - Provides to driver list of commands
-   724	 * supported for the PCI VF.
-   725	 * @dev: VF pci_dev
-   726	 * @buf: buffer to hold the returned list
-   727	 * @buf_size: size of the given buffer
-   728	 *
-   729	 * Returns 0 on success, or negative on failure.
-   730	 */
- > 731	int virtio_pci_admin_list_query(struct pci_dev *pdev, u8 *buf, int buf_size)
-   732	{
-   733		struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
-   734		struct virtio_admin_cmd cmd = {};
-   735		struct scatterlist result_sg;
-   736	
-   737		if (!virtio_dev)
-   738			return -ENODEV;
-   739	
-   740		sg_init_one(&result_sg, buf, buf_size);
-   741		cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_QUERY);
-   742		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-   743		cmd.result_sg = &result_sg;
-   744	
-   745		return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-   746	}
-   747	EXPORT_SYMBOL_GPL(virtio_pci_admin_list_query);
-   748	
-   749	/*
-   750	 * virtio_pci_admin_list_use - Provides to device list of commands
-   751	 * used for the PCI VF.
-   752	 * @dev: VF pci_dev
-   753	 * @buf: buffer which holds the list
-   754	 * @buf_size: size of the given buffer
-   755	 *
-   756	 * Returns 0 on success, or negative on failure.
-   757	 */
- > 758	int virtio_pci_admin_list_use(struct pci_dev *pdev, u8 *buf, int buf_size)
-   759	{
-   760		struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
-   761		struct virtio_admin_cmd cmd = {};
-   762		struct scatterlist data_sg;
-   763	
-   764		if (!virtio_dev)
-   765			return -ENODEV;
-   766	
-   767		sg_init_one(&data_sg, buf, buf_size);
-   768		cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LIST_USE);
-   769		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-   770		cmd.data_sg = &data_sg;
-   771	
-   772		return vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-   773	}
-   774	EXPORT_SYMBOL_GPL(virtio_pci_admin_list_use);
-   775	
-   776	/*
-   777	 * virtio_pci_admin_legacy_io_write - Write legacy registers of a member device
-   778	 * @dev: VF pci_dev
-   779	 * @opcode: op code of the io write command
-   780	 * @offset: starting byte offset within the registers to write to
-   781	 * @size: size of the data to write
-   782	 * @buf: buffer which holds the data
-   783	 *
-   784	 * Returns 0 on success, or negative on failure.
-   785	 */
- > 786	int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
-   787					     u8 offset, u8 size, u8 *buf)
-   788	{
-   789		struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
-   790		struct virtio_admin_cmd_legacy_wr_data *data;
-   791		struct virtio_admin_cmd cmd = {};
-   792		struct scatterlist data_sg;
-   793		int vf_id;
-   794		int ret;
-   795	
-   796		if (!virtio_dev)
-   797			return -ENODEV;
-   798	
-   799		vf_id = pci_iov_vf_id(pdev);
-   800		if (vf_id < 0)
-   801			return vf_id;
-   802	
-   803		data = kzalloc(sizeof(*data) + size, GFP_KERNEL);
-   804		if (!data)
-   805			return -ENOMEM;
-   806	
-   807		data->offset = offset;
-   808		memcpy(data->registers, buf, size);
-   809		sg_init_one(&data_sg, data, sizeof(*data) + size);
-   810		cmd.opcode = cpu_to_le16(opcode);
-   811		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-   812		cmd.group_member_id = cpu_to_le64(vf_id + 1);
-   813		cmd.data_sg = &data_sg;
-   814		ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-   815	
-   816		kfree(data);
-   817		return ret;
-   818	}
-   819	EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_write);
-   820	
-   821	/*
-   822	 * virtio_pci_admin_legacy_io_read - Read legacy registers of a member device
-   823	 * @dev: VF pci_dev
-   824	 * @opcode: op code of the io read command
-   825	 * @offset: starting byte offset within the registers to read from
-   826	 * @size: size of the data to be read
-   827	 * @buf: buffer to hold the returned data
-   828	 *
-   829	 * Returns 0 on success, or negative on failure.
-   830	 */
- > 831	int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
-   832					    u8 offset, u8 size, u8 *buf)
-   833	{
-   834		struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
-   835		struct virtio_admin_cmd_legacy_rd_data *data;
-   836		struct scatterlist data_sg, result_sg;
-   837		struct virtio_admin_cmd cmd = {};
-   838		int vf_id;
-   839		int ret;
-   840	
-   841		if (!virtio_dev)
-   842			return -ENODEV;
-   843	
-   844		vf_id = pci_iov_vf_id(pdev);
-   845		if (vf_id < 0)
-   846			return vf_id;
-   847	
-   848		data = kzalloc(sizeof(*data), GFP_KERNEL);
-   849		if (!data)
-   850			return -ENOMEM;
-   851	
-   852		data->offset = offset;
-   853		sg_init_one(&data_sg, data, sizeof(*data));
-   854		sg_init_one(&result_sg, buf, size);
-   855		cmd.opcode = cpu_to_le16(opcode);
-   856		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-   857		cmd.group_member_id = cpu_to_le64(vf_id + 1);
-   858		cmd.data_sg = &data_sg;
-   859		cmd.result_sg = &result_sg;
-   860		ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-   861	
-   862		kfree(data);
-   863		return ret;
-   864	}
-   865	EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_read);
-   866	
-   867	/*
-   868	 * virtio_pci_admin_legacy_io_notify_info - Read the queue notification
-   869	 * information for legacy interface
-   870	 * @dev: VF pci_dev
-   871	 * @req_bar_flags: requested bar flags
-   872	 * @bar: on output the BAR number of the member device
-   873	 * @bar_offset: on output the offset within bar
-   874	 *
-   875	 * Returns 0 on success, or negative on failure.
-   876	 */
- > 877	int virtio_pci_admin_legacy_io_notify_info(struct pci_dev *pdev,
-   878						   u8 req_bar_flags, u8 *bar,
-   879						   u64 *bar_offset)
-   880	{
-   881		struct virtio_device *virtio_dev = virtio_pci_vf_get_pf_dev(pdev);
-   882		struct virtio_admin_cmd_notify_info_result *result;
-   883		struct virtio_admin_cmd cmd = {};
-   884		struct scatterlist result_sg;
-   885		int vf_id;
-   886		int ret;
-   887	
-   888		if (!virtio_dev)
-   889			return -ENODEV;
-   890	
-   891		vf_id = pci_iov_vf_id(pdev);
-   892		if (vf_id < 0)
-   893			return vf_id;
-   894	
-   895		result = kzalloc(sizeof(*result), GFP_KERNEL);
-   896		if (!result)
-   897			return -ENOMEM;
-   898	
-   899		sg_init_one(&result_sg, result, sizeof(*result));
-   900		cmd.opcode = cpu_to_le16(VIRTIO_ADMIN_CMD_LEGACY_NOTIFY_INFO);
-   901		cmd.group_type = cpu_to_le16(VIRTIO_ADMIN_GROUP_TYPE_SRIOV);
-   902		cmd.group_member_id = cpu_to_le64(vf_id + 1);
-   903		cmd.result_sg = &result_sg;
-   904		ret = vp_modern_admin_cmd_exec(virtio_dev, &cmd);
-   905		if (!ret) {
-   906			struct virtio_admin_cmd_notify_info_data *entry;
-   907			int i;
-   908	
-   909			ret = -ENOENT;
-   910			for (i = 0; i < VIRTIO_ADMIN_CMD_MAX_NOTIFY_INFO; i++) {
-   911				entry = &result->entries[i];
-   912				if (entry->flags == VIRTIO_ADMIN_CMD_NOTIFY_INFO_FLAGS_END)
-   913					break;
-   914				if (entry->flags != req_bar_flags)
-   915					continue;
-   916				*bar = entry->bar;
-   917				*bar_offset = le64_to_cpu(entry->offset);
-   918				ret = 0;
-   919				break;
-   920			}
-   921		}
-   922	
-   923		kfree(result);
-   924		return ret;
-   925	}
-   926	EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_io_notify_info);
-   927	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
