@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B60C7D3DA4
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 19:29:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D580F7D3E0C
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 19:43:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233710AbjJWR2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 13:28:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38966 "EHLO
+        id S231530AbjJWRm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 13:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232700AbjJWR2m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 13:28:42 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BEE10D8
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 10:28:35 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id e9e14a558f8ab-3529f5f5dadso5075ab.0
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 10:28:34 -0700 (PDT)
+        with ESMTP id S231236AbjJWRm5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 13:42:57 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC37194
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 10:42:55 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3575da42138so5295ab.1
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 10:42:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698082114; x=1698686914; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698082975; x=1698687775; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hh5gbGTjwswNSJut0j41J9mky6NNqMMsm33VLdUTGQU=;
-        b=ARHEb9Uw32OUtRDh2U8KGmEmLIl89Gy+AiTgHDj3OL8gOv24T7ht8nGPr6WLw5PnnP
-         edUWMjzneYNV2Bqv8P9EP6f3dw5EXLPe87B/qWDwumYEVVFFGWf+LuZuK1uBGf5jXGmI
-         Z/Ibc2Ft9Wfd/nBto4G3HFa72tzTR+xSZNgWbYcpSH6v65/G55EqDGgeQ/CJNJJHxV/n
-         l1javPbmR9OnkrYu6WHRfDhqjS+I4QsXnyfoahEWHqoNu46qur0vFJbklD+4XdQVFsPf
-         USo2u+jxbGkLyWZeQWDEZ4Fw2S0W4zeaTdc0U1aYIr5J3+4NbbO5hUf+IPTc2G2hwUFD
-         6s3w==
+        bh=DBXLA8TPJ+R5jc8eUaCSA4IRG8aS6kWKghdqJo/ZP+w=;
+        b=MyBRMZ8aL+M1xm4sQaq725/OwJxZs39kxOTDUvj1YHFwwe7m3DWwe6I5qDY7W8zQaG
+         u4Oo+3wKV7EDYXG9Oq8wHp9zvzmZCbVEKydwUAHUm5jH703anK6brH8iP1ewLFrVS4my
+         hCnfR6Jb13fp6Tu2LaDDE3lcSN9TMHZ4/vtSRV+cOZMBXBtoQ2qdoRbjEkLSxQ8sW14P
+         0Y4JVHYVW0vPKopQzhvJWw8M0lxKYJGvrVEAJcPu4ixonBaNs7ayKVh/mDQj8oLeq2Ob
+         LHO3AR0m/FTCAzAWy8wAoOkI1fqJtgEya+A74JhlcYuxIL4ezNQGH8A3vpg/05rv2rdc
+         6Nyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698082114; x=1698686914;
+        d=1e100.net; s=20230601; t=1698082975; x=1698687775;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hh5gbGTjwswNSJut0j41J9mky6NNqMMsm33VLdUTGQU=;
-        b=j6bM3njPG4ctRtP2DHozqfy+taukV7e6HMk5Y7GQAsz61fnoMgqiadm+A7Y15zJQhK
-         qdK+I4Zous3ihg/u9zV6sffFKaafkoHBwi6j8WZDWCVV27JKm2CMlVIW0f0iPGZ5PpIl
-         6tPK1VKso175SmA1Nr3MzySVe/I7uFkd01AKn1ZpUD7GQGIqkb4PwY/FSjjk2wG7yD+w
-         OCK0Zf4sejRSUNlp18Q+E3v9EgTciLds1RdDBRfVKiJ5lWbu0anUCFk+2K3V/dBZ3LDB
-         UAF+PYs+dW1U+O9aukmQqJm7sIFDKFEOcRNOpDsiohCuIOIXigP4eU4aVWZs9QQW8H0n
-         SO+w==
-X-Gm-Message-State: AOJu0YzLRiLo2DJ4x8FB7uoA/zqGwg7BrDkp6+XqxNbMJwDjHop6kvkm
-        7z+Ki3DAcF1AGs655XmMuIojDIisy1zuazWGtr9jQw==
-X-Google-Smtp-Source: AGHT+IGVUVY7CGh97Fb45OyO1PzaUAleRd5IyCXNtJ+bUNq5F5zhjHvvOXBRC7PVZbE40qgq9FQjlIBjiiboUleG7b8=
-X-Received: by 2002:a92:ac07:0:b0:351:ad4:85b with SMTP id r7-20020a92ac07000000b003510ad4085bmr27471ilh.4.1698082113782;
- Mon, 23 Oct 2023 10:28:33 -0700 (PDT)
+        bh=DBXLA8TPJ+R5jc8eUaCSA4IRG8aS6kWKghdqJo/ZP+w=;
+        b=t2VudIfEattGjBSsqslboai1XkgOwqIOsvBAkpcBgJ2qGujOy/SunYnj8Qd2DmPjoF
+         2VELMqN2I/ssKIEvlqmB8oiGMzUedzfw+HpCYsikyHvKjOiYB9gpesgOYvTGzhcz9HPk
+         BHzc0JkeWxWgLvyDtrchqD4b72zUhI0XWOIe0G79krjvsqvS1elGKtt3vhuqbCis5P6A
+         H8JC/O8FnMm4PaVi8W+r6gsJL29bnjOq2CQr9xYvNfGc0K0+Qmdyu+DkD8JZdsKHPp3H
+         BvBkLdUbWq+9p/9Qk/f5X91IIsBv/ofMt+iJP/dF3aAWIFYkx6ouFREWYvyxNYTIHLZv
+         ptyw==
+X-Gm-Message-State: AOJu0YxeDpDVS1d3b2uyXpHhxQnMq7m+v/XVLEsMJfGkwoofSqPk1QgW
+        uadCo+WO3wu28vQpvYoF9vqPMgW1swpV9h0D/ua7Qg==
+X-Google-Smtp-Source: AGHT+IFOLMLfZ/CbMtl3aYr9wCDJJ/AkWXKomQ1ThhlnhF2P9M/9E+1cO1Nj9S7F060LZgwP9Ug5HzsRJ/45KmsTmjY=
+X-Received: by 2002:a05:6e02:1d0a:b0:357:ca4f:a275 with SMTP id
+ i10-20020a056e021d0a00b00357ca4fa275mr13270ila.29.1698082975047; Mon, 23 Oct
+ 2023 10:42:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231020214053.2144305-1-rananta@google.com> <20231020214053.2144305-6-rananta@google.com>
- <86zg094j1o.wl-maz@kernel.org>
-In-Reply-To: <86zg094j1o.wl-maz@kernel.org>
+References: <20231020214053.2144305-1-rananta@google.com> <20231020214053.2144305-7-rananta@google.com>
+ <86y1ft4ijm.wl-maz@kernel.org>
+In-Reply-To: <86y1ft4ijm.wl-maz@kernel.org>
 From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 23 Oct 2023 10:28:21 -0700
-Message-ID: <CAJHc60z97PZ5adQEzW-m2GyTPf2=f5RECMQ5P-2e-rObr1LbaQ@mail.gmail.com>
-Subject: Re: [PATCH v8 05/13] KVM: arm64: Add {get,set}_user for
- PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+Date:   Mon, 23 Oct 2023 10:42:43 -0700
+Message-ID: <CAJHc60xijk_QpxK-eDzdY2g2OXXaQ3En=fBfBe45hAjuJMFNUw@mail.gmail.com>
+Subject: Re: [PATCH v8 06/13] KVM: arm64: Sanitize PM{C,I}NTEN{SET,CLR},
+ PMOVS{SET,CLR} before first run
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -80,261 +81,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 23, 2023 at 5:31=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+On Mon, Oct 23, 2023 at 5:42=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
 :
 >
-> On Fri, 20 Oct 2023 22:40:45 +0100,
+> On Fri, 20 Oct 2023 22:40:46 +0100,
 > Raghavendra Rao Ananta <rananta@google.com> wrote:
 > >
-> > For unimplemented counters, the bits in PM{C,I}NTEN{SET,CLR} and
-> > PMOVS{SET,CLR} registers are expected to RAZ. To honor this,
-> > explicitly implement the {get,set}_user functions for these
-> > registers to mask out unimplemented counters for userspace reads
-> > and writes.
+> > For unimplemented counters, the registers PM{C,I}NTEN{SET,CLR}
+> > and PMOVS{SET,CLR} are expected to have the corresponding bits RAZ.
+> > Hence to ensure correct KVM's PMU emulation, mask out the bits in
+> > these registers for these unimplemented counters before the first
+> > vCPU run.
 > >
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 91 ++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 85 insertions(+), 6 deletions(-)
+> >  arch/arm64/kvm/arm.c      |  2 +-
+> >  arch/arm64/kvm/pmu-emul.c | 11 +++++++++++
+> >  include/kvm/arm_pmu.h     |  2 ++
+> >  3 files changed, 14 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index faf97878dfbbb..2e5d497596ef8 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -987,6 +987,45 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vc=
-pu, struct sys_reg_params *p,
-> >       return true;
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e3074a9e23a8b..3c0bb80483fb1 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -857,7 +857,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcp=
+u)
+> >               }
+> >
+> >               if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+> > -                     kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu=
+));
+> > +                     kvm_vcpu_handle_request_reload_pmu(vcpu);
+>
+> Please rename this to kvm_vcpu_reload_pmu(). That's long enough. But
+> see below.
+>
+Sounds good.
+
+> >
+> >               if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+> >                       kvm_vcpu_pmu_restore_guest(vcpu);
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 9e24581206c24..31e4933293b76 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -788,6 +788,17 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool=
+ pmceid1)
+> >       return val & mask;
 > >  }
 > >
-> > +static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
-> > +                                       u64 reg, u64 val, bool set)
-> > +{
-> > +     struct kvm *kvm =3D vcpu->kvm;
-> > +
-> > +     mutex_lock(&kvm->arch.config_lock);
-> > +
-> > +     /* Make the register immutable once the VM has started running */
-> > +     if (kvm_vm_has_ran_once(kvm)) {
-> > +             mutex_unlock(&kvm->arch.config_lock);
-> > +             return;
-> > +     }
-> > +
-> > +     val &=3D kvm_pmu_valid_counter_mask(vcpu);
-> > +     mutex_unlock(&kvm->arch.config_lock);
-> > +
-> > +     if (set)
-> > +             __vcpu_sys_reg(vcpu, reg) |=3D val;
-> > +     else
-> > +             __vcpu_sys_reg(vcpu, reg) &=3D ~val;
-> > +}
-> > +
-> > +static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_des=
-c *r,
-> > +                     u64 *val)
+> > +void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu)
 > > +{
 > > +     u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
 > > +
-> > +     *val =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
-> > +     return 0;
-> > +}
+> > +     kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
 > > +
-> > +static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_des=
-c *r,
-> > +                     u64 val)
-> > +{
-> > +     /* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
-> > +     set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & =
-0x1);
-> > +     return 0;
+> > +     __vcpu_sys_reg(vcpu, PMOVSSET_EL0) &=3D mask;
+> > +     __vcpu_sys_reg(vcpu, PMINTENSET_EL1) &=3D mask;
+> > +     __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &=3D mask;
 > > +}
 >
-> Huh, this is really ugly. Why the explosion of pointless helpers when
-> the whole design of the sysreg infrastructure to have *common* helpers
-> for registers that behave the same way?
+> Why is this done on a vcpu request? Why can't it be done upfront, when
+> we're requesting the reload? Or when assigning the PMU? Or when
+> setting PMCR_EL0?
 >
-> I'd expect something like the hack below instead.
->
->         M.
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index a2c5f210b3d6..8f560a2496f2 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -987,42 +987,46 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcp=
-u, struct sys_reg_params *p,
->         return true;
->  }
->
-> -static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
-> -                                         u64 reg, u64 val, bool set)
-> +static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-, u64 val)
->  {
->         struct kvm *kvm =3D vcpu->kvm;
-> +       bool set;
->
->         mutex_lock(&kvm->arch.config_lock);
->
->         /* Make the register immutable once the VM has started running */
->         if (kvm_vm_has_ran_once(kvm)) {
->                 mutex_unlock(&kvm->arch.config_lock);
-> -               return;
-> +               return 0;
->         }
->
->         val &=3D kvm_pmu_valid_counter_mask(vcpu);
->         mutex_unlock(&kvm->arch.config_lock);
->
-> +       switch(r->reg) {
-> +       case PMOVSSET_EL0:
-> +               /* CRm[1] being set indicates a SET register, and CLR oth=
-erwise */
-> +               set =3D r->CRm & 2;
-> +               break;
-> +       default:
-> +               /* Op2[0] being set indicates a SET register, and CLR oth=
-erwise */
-> +               set =3D r->Op2 & 1;
-> +               break;
-> +       }
-> +
->         if (set)
-> -               __vcpu_sys_reg(vcpu, reg) |=3D val;
-> +               __vcpu_sys_reg(vcpu, r->reg) |=3D val;
->         else
-> -               __vcpu_sys_reg(vcpu, reg) &=3D ~val;
-> -}
-> -
-> -static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r,
-> -                       u64 *val)
-> -{
-> -       u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
-> +               __vcpu_sys_reg(vcpu, r->reg) &=3D ~val;
->
-> -       *val =3D __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
->         return 0;
->  }
->
-> -static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r,
-> -                       u64 val)
-> +static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-, u64 *val)
->  {
-> -       /* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
-> -       set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & =
-0x1);
-> +       u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
-> +
-> +       *val =3D __vcpu_sys_reg(vcpu, r->reg) & mask;
->         return 0;
->  }
->
-> @@ -1054,23 +1058,6 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, =
-struct sys_reg_params *p,
->         return true;
->  }
->
-> -static int get_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r,
-> -                       u64 *val)
-> -{
-> -       u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
-> -
-> -       *val =3D __vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
-> -       return 0;
-> -}
-> -
-> -static int set_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r,
-> -                       u64 val)
-> -{
-> -       /* r->Op2 & 0x1: true for PMINTENSET_EL1, else PMINTENCLR_EL1 */
-> -       set_pmreg_for_valid_counters(vcpu, PMINTENSET_EL1, val, r->Op2 & =
-0x1);
-> -       return 0;
-> -}
-> -
->  static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params =
-*p,
->                            const struct sys_reg_desc *r)
->  {
-> @@ -1095,23 +1082,6 @@ static bool access_pminten(struct kvm_vcpu *vcpu, =
-struct sys_reg_params *p,
->         return true;
->  }
->
-> -static int set_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-,
-> -                     u64 val)
-> -{
-> -       /* r->CRm & 0x2: true for PMOVSSET_EL0, else PMOVSCLR_EL0 */
-> -       set_pmreg_for_valid_counters(vcpu, PMOVSSET_EL0, val, r->CRm & 0x=
-2);
-> -       return 0;
-> -}
-> -
-> -static int get_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-,
-> -                     u64 *val)
-> -{
-> -       u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
-> -
-> -       *val =3D __vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
-> -       return 0;
-> -}
-> -
->  static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p=
-,
->                          const struct sys_reg_desc *r)
->  {
-> @@ -2311,10 +2281,10 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->
->         { PMU_SYS_REG(PMINTENSET_EL1),
->           .access =3D access_pminten, .reg =3D PMINTENSET_EL1,
-> -         .get_user =3D get_pminten, .set_user =3D set_pminten },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->         { PMU_SYS_REG(PMINTENCLR_EL1),
->           .access =3D access_pminten, .reg =3D PMINTENSET_EL1,
-> -         .get_user =3D get_pminten, .set_user =3D set_pminten },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->         { SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
->
->         { SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 =
-},
-> @@ -2366,13 +2336,13 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->           .reg =3D PMCR_EL0, .get_user =3D get_pmcr, .set_user =3D set_pm=
-cr },
->         { PMU_SYS_REG(PMCNTENSET_EL0),
->           .access =3D access_pmcnten, .reg =3D PMCNTENSET_EL0,
-> -         .get_user =3D get_pmcnten, .set_user =3D set_pmcnten },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->         { PMU_SYS_REG(PMCNTENCLR_EL0),
->           .access =3D access_pmcnten, .reg =3D PMCNTENSET_EL0,
-> -         .get_user =3D get_pmcnten, .set_user =3D set_pmcnten },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->         { PMU_SYS_REG(PMOVSCLR_EL0),
->           .access =3D access_pmovs, .reg =3D PMOVSSET_EL0,
-> -         .get_user =3D get_pmovs, .set_user =3D set_pmovs },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->         /*
->          * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
->          * previously (and pointlessly) advertised in the past...
-> @@ -2401,7 +2371,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->           .reset =3D reset_val, .reg =3D PMUSERENR_EL0, .val =3D 0 },
->         { PMU_SYS_REG(PMOVSSET_EL0),
->           .access =3D access_pmovs, .reg =3D PMOVSSET_EL0,
-> -         .get_user =3D get_pmovs, .set_user =3D set_pmovs },
-> +         .get_user =3D get_pmreg, .set_user =3D set_pmreg },
->
->         { SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
->         { SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
->
+The idea was to do this only once, after userspace has configured the
+PMCR.N (and has no option to change it), but before we run the guest
+for the first time. So, I guess this can be done when we are
+requesting the reload, if you prefer.
 
-Thanks for the suggestion. I'll consider this in the next iteration.
+When assigning the PMU, it could be too early to sanitize as the
+userspace would not have configured the PMCR.N yet.
+It can probably be done when userspace configures PMCR.N, but since
+this field is per-guest, we may have to apply the setting for all the
+vCPUs during the ioctl, which may get a little ugly.
 
-- Raghavendra
+Thank you.
+Raghavendra
