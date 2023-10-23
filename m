@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4BB27D2F5A
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 12:00:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F3EE7D2F65
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 12:03:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjJWJ7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 05:59:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36500 "EHLO
+        id S229618AbjJWKDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 06:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233618AbjJWJ7g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 05:59:36 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AFF41993
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 02:59:29 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53e70b0a218so4615506a12.2
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 02:59:29 -0700 (PDT)
+        with ESMTP id S229572AbjJWKDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 06:03:08 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6611E8
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:03:05 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9c41e95efcbso439047666b.3
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:03:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1698055167; x=1698659967; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1698055384; x=1698660184; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=F2RqADPHi/ODAXFTyOZSWwkmYe5FsXVHIx8g7uPzN3k=;
-        b=TxzHXgFnllwfWEQGStaMkXTLsJzqZy7uSwFyIB2YKCiVqAk8sIO63vab/4J3mPvPS0
-         vC18Om7qqbvbqBCVaOWvzeo6vl1dNRSNZqqB9DvCgeZYCNBSS+j4CNklulQ+SYfU+ECm
-         fP8YZt9/nGGR3w9A5hvdHnRQYb498lbiLaqaHiGtPc8yBkkP2IhQWdKJ0X2jY+EXh+65
-         ha8BClBS/cQIabJG43sz7UR0fsBTMKZy/uYdnQKHUmd889vnnMwdx26Qs2p266zJh6lC
-         ElkUg0eDtVUPzHQNLcaez6uzOijA+5D6uW3mbwQIe52Vj2qGcK3tbT1rd4nZrbbOtjK6
-         cLwQ==
+        bh=Ip92rbHjEjBMgAx7FNr3A0maZqLC50ltIPpQtdwaJ28=;
+        b=iwdzWjLqRcJDEE6EiAYlfHeoXZW0f2G1ZaRFE5/9fa+UVRCfSXiIbf5HmsBm4nttqV
+         1w9iSdeEIqcW7fo36L+4KQWJfohTe5O5AWZFlG+qZ0a83yyhIgCB4ITaXE8CVqK1SUDn
+         UpPNrnG2C5bGfTsQ2UGc89hmF3g+XG7x9slyEnxJkI2sW3MncUHNX7scPVjPYKeE2UHD
+         0dI2XyJjC8M9NMEXGFcjO6Fgv5BdODaucjmtJSWqK3upGy/uysIASayjqqH8euraW5xO
+         duUk2BUe2EDga7S/wHzqYYI2LIQwZ9DDejtJL7AuXRa/BYLaK2GC/ZliJ+GLFYWQnWHG
+         HCAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698055167; x=1698659967;
+        d=1e100.net; s=20230601; t=1698055384; x=1698660184;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F2RqADPHi/ODAXFTyOZSWwkmYe5FsXVHIx8g7uPzN3k=;
-        b=N6TeywFJZzZZWm06bLlb2vJ5uKS/p93jtoubVW3Dgqc0h9N9WxP35c0RxfFLVKzRxj
-         VdQZ7XFqjdUdbp9sxffFGbuLn62NiZTcDS5YZ4TkIMZ89wGTu1Wz0h4sevVyt246uZfd
-         w0XXHxOROxkwO2QKLqqxMvkOxzHnlhzppGA1+X45whp1zfBxe5D2/HfPQ/PB/u+eZ50o
-         nYgCoBxU07JM5V/sOudZvFnKnA7rZmTXDMB4yyw6RNvg82obSLO4aU2pyB8O77SqCpjY
-         edYKG/HkOqukjfM3RtspVJ28gLHm3Jptsn/mItkoy2Pm/csGun+wyXf/3Q+EIK24UosK
-         pjcA==
-X-Gm-Message-State: AOJu0YyaJBqOQN/rg6+/yt/4qPiqP/b0tK9g5cxmnesL61T9WKffSJ+S
-        v+Ts96/jDhIcJ5CrCmUHRs36nA==
-X-Google-Smtp-Source: AGHT+IEaFDXbVnpKg4vFgDf/2pwx6Ih0ZQZiABFfnw7I7V0bf3GiPKkismdRN7VeOpN7PH5sK8Co7w==
-X-Received: by 2002:a05:6402:51cf:b0:53e:4cd9:2df6 with SMTP id r15-20020a05640251cf00b0053e4cd92df6mr7118888edd.25.1698055167819;
-        Mon, 23 Oct 2023 02:59:27 -0700 (PDT)
+        bh=Ip92rbHjEjBMgAx7FNr3A0maZqLC50ltIPpQtdwaJ28=;
+        b=T2ojQ/zbEPcUXp2HiL/nzrpk1iO7i+Oyl6iEhBl+oS69jhcg32WcJnq9pD3gGrVQuY
+         agciiZqiyz3ONjmPDv8EIVRkpYfGeOlxpRYbmHC4N4MBYFhze3ryAZtQLJZEWacWv+h8
+         BRYypmITEhy69b/5v6feJPzAgTnrKiC30kVAyopwJcRHDyKCNWoZlljoWvnQ6sCi8wK3
+         pXvLh1PjdpZIJkTlnRFeepjV/caZ5iBnKXq54TMEwJkiteh0mi3GNHyyRCuQnhZmc5uk
+         +HhTjOR7gf9GYCuysvYOPE4+EGalpmrGbKdps1lnpA9lPX5DesnUnZI1ybkCJ3xUh0io
+         u1+g==
+X-Gm-Message-State: AOJu0YyR8MHNd4r/Ck3TF9DdnTBspwfuhB8yqRj86sFTOxjBgmubbtnr
+        2qK+x6SLgCmjFbw+PvZ/66fmvQ==
+X-Google-Smtp-Source: AGHT+IHbP1iRP01wtTj0lGIg97SfHpaSuq3jc10bBcdA9nz/72Ux0bRd2wnzPV3aAOMKFVCBoQdHEA==
+X-Received: by 2002:a17:907:1b11:b0:9bf:d70b:9873 with SMTP id mp17-20020a1709071b1100b009bfd70b9873mr7388887ejc.39.1698055384364;
+        Mon, 23 Oct 2023 03:03:04 -0700 (PDT)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id x7-20020aa7d6c7000000b0053ebafe7a60sm6153661edr.59.2023.10.23.02.59.27
+        by smtp.gmail.com with ESMTPSA id p26-20020a170906229a00b009b65a698c16sm6401969eja.220.2023.10.23.03.03.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 02:59:27 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 11:59:26 +0200
+        Mon, 23 Oct 2023 03:03:04 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 12:03:03 +0200
 From:   Andrew Jones <ajones@ventanamicro.com>
 To:     =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
 Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
@@ -59,41 +59,65 @@ Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
         Atish Patra <atishp@atishpatra.org>,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 1/5] riscv: use ".L" local labels in assembly when
- applicable
-Message-ID: <20231023-8397e25545716f7f168e9007@orel>
+Subject: Re: [PATCH 3/5] riscv: kernel: Use correct SYM_DATA_*() macro for
+ data
+Message-ID: <20231023-153a19dd516176d3d3b9334e@orel>
 References: <20231004143054.482091-1-cleger@rivosinc.com>
- <20231004143054.482091-2-cleger@rivosinc.com>
+ <20231004143054.482091-4-cleger@rivosinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231004143054.482091-2-cleger@rivosinc.com>
+In-Reply-To: <20231004143054.482091-4-cleger@rivosinc.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 04, 2023 at 04:30:50PM +0200, Clément Léger wrote:
-> For the sake of coherency, use local labels in assembly when
-> applicable. This also avoid kprobes being confused when applying a
-> kprobe since the size of function is computed by checking where the
-> next visible symbol is located. This might end up in computing some
-> function size to be way shorter than expected and thus failing to apply
-> kprobes to the specified offset.
+On Wed, Oct 04, 2023 at 04:30:52PM +0200, Clément Léger wrote:
+> Some data were incorrectly annotated with SYM_FUNC_*() instead of
+> SYM_DATA_*() ones. Use the correct ones.
 > 
 > Signed-off-by: Clément Léger <cleger@rivosinc.com>
 > ---
->  arch/riscv/kernel/entry.S  | 10 +++----
->  arch/riscv/kernel/head.S   | 18 ++++++-------
->  arch/riscv/kernel/mcount.S | 10 +++----
->  arch/riscv/lib/memmove.S   | 54 +++++++++++++++++++-------------------
->  4 files changed, 46 insertions(+), 46 deletions(-)
+>  arch/riscv/kernel/entry.S | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
+> index 64ac0dd6176b..a7aa2fd599d6 100644
+> --- a/arch/riscv/kernel/entry.S
+> +++ b/arch/riscv/kernel/entry.S
+> @@ -324,7 +324,7 @@ SYM_FUNC_END(__switch_to)
+>  	.section ".rodata"
+>  	.align LGREG
+>  	/* Exception vector table */
+> -SYM_CODE_START(excp_vect_table)
+> +SYM_DATA_START_LOCAL(excp_vect_table)
+>  	RISCV_PTR do_trap_insn_misaligned
+>  	ALT_INSN_FAULT(RISCV_PTR do_trap_insn_fault)
+>  	RISCV_PTR do_trap_insn_illegal
+> @@ -342,12 +342,11 @@ SYM_CODE_START(excp_vect_table)
+>  	RISCV_PTR do_page_fault   /* load page fault */
+>  	RISCV_PTR do_trap_unknown
+>  	RISCV_PTR do_page_fault   /* store page fault */
+> -excp_vect_table_end:
+> -SYM_CODE_END(excp_vect_table)
+> +SYM_DATA_END_LABEL(excp_vect_table, SYM_L_LOCAL, excp_vect_table_end)
+>  
+>  #ifndef CONFIG_MMU
+> -SYM_CODE_START(__user_rt_sigreturn)
+> +SYM_DATA_START(__user_rt_sigreturn)
+>  	li a7, __NR_rt_sigreturn
+>  	ecall
+> -SYM_CODE_END(__user_rt_sigreturn)
+> +SYM_DATA_END(__user_rt_sigreturn)
+>  #endif
+> -- 
+> 2.42.0
 >
 
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
