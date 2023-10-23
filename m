@@ -2,91 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C905B7D3F12
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 20:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC0437D3F2E
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 20:24:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233298AbjJWSWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 14:22:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46132 "EHLO
+        id S233412AbjJWSYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 14:24:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjJWSWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 14:22:16 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 828BC8E;
-        Mon, 23 Oct 2023 11:22:14 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56641C433C9;
-        Mon, 23 Oct 2023 18:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698085334;
-        bh=DuXRKNTPP+oxmrxXIzF8KREEatSCS8sUp02WksFrGHg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=joEFNxBAGlFzt7+m9GSg8uOSLPPf/HstBuyv+wpoc82ZVPcmKOjVpkea0MN1e7CGo
-         YdTtmzBOmG3lDwrNZmnbbPlA3I02u+TjXLBwapbyYIZEjmMVMG9nwbiZ9ELOCmdbK9
-         GF9xiST4DIUhMBxcqsMz0ZuG8QqGN/XEgxtVTsG0T1RwCW39WA18gDk1JDRJ4mBOXn
-         HB+IxTp3mXU0z23EWRuDI8oGeSslGA3l2xK/djKgYdyhF9RjdLaOstpDl1FsXijOV4
-         dAgXubZrFZIt3WIAcX6IvJuxfbKVF2TuFjY/GEtzD3l1E4adXKnuIiDO3+D4VZJPAb
-         5fahPDLQmdc3Q==
-Date:   Mon, 23 Oct 2023 11:22:11 -0700
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com,
-        Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH  2/6] x86/entry_64: Add VERW just before userspace
- transition
-Message-ID: <20231023182211.5ojm2rsoqqqwqg46@treble>
-References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-2-cff54096326d@linux.intel.com>
+        with ESMTP id S232985AbjJWSYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 14:24:23 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA2F9B
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 11:24:21 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so2718978b3a.3
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 11:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698085461; x=1698690261; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pRUzO+vkA/3Zt2fqE2RqLUfgJAG2Koxv6V/JjBYAdSo=;
+        b=udM3V4sCt/BN1axuSpiL9PRQuAI/CqASmIvE7/B9TXdV4y3TsnKD2CvHq95xhG4QhE
+         8+Y6dhFkrLPjnnseMaXF05ub93djmLvwcxdpCK4wuCKKeLGn5iV/3egrkPQQSV8mwFTO
+         jB/Ka3G9+jbkSnhohuCim6yXdN4lywd+NUVKIRSa/SB9hZ7MA+rQgQYphzvWcC9Sw6uy
+         5SBt9o+oTrPXDk2/6Jt/ZBJvp5IFwawPPi2dSac38KtqNvIHUwyzkBOiI/b7s+eT8vjC
+         fxzEaeonMUx56SlZTjAwU0KQUsv/uW49CLwp43Ue5mNkvjfz6f0L+RTPJiGD/HWHhW9P
+         ZnKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698085461; x=1698690261;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pRUzO+vkA/3Zt2fqE2RqLUfgJAG2Koxv6V/JjBYAdSo=;
+        b=AgIWnAgg63eSv4qH/DRKWpVrDM+LviyNeuJCGauMG9rd9GWpCNfP8YTCv0T63tLtYp
+         qTG8/Qb/rvB006jcal9dJF8Ts/cc+Y2u13hSdtXjJ9an+86CGtSUEAmyKvwQL2v2H7DG
+         R6Q/BjfrIK9zk81qXuMfowJzrFqu6hGnhNczFQKEyqDTtiOA1+q6FqLsi0V2iUjtK/Fq
+         uATCRcwp31sHmRqQH0UM/WKkeL7/2p+CQRQEtqc1XvLifPPd+lHECi6NUmzh1y2sWLTl
+         2xXuRivQceKkUZOeh3l/dV54VpZUW22m492fN7gEyGnviN6Z22jvHP6HzOzBCbeOvZEj
+         Sw+w==
+X-Gm-Message-State: AOJu0YyouCePHFTXcJ1anXxmcxGLm4yp84KSAhdmdKrcIyMYptoe0PAq
+        RKP2+ZZYCfRaHKjagZnwWAaOtV691JJXB2fmBDlOnA==
+X-Google-Smtp-Source: AGHT+IGARxHq2zVxQ8Iid/WtBfTcT6aevXTje9qZk79/sXfRA5kbrUniRfbW0USHrmplTwKRjh9edQ==
+X-Received: by 2002:a05:6a20:c19d:b0:16b:aad0:effe with SMTP id bg29-20020a056a20c19d00b0016baad0effemr358243pzb.62.1698085460734;
+        Mon, 23 Oct 2023 11:24:20 -0700 (PDT)
+Received: from google.com (175.199.125.34.bc.googleusercontent.com. [34.125.199.175])
+        by smtp.gmail.com with ESMTPSA id p9-20020a63e649000000b0057412d84d25sm6055619pgj.4.2023.10.23.11.24.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 11:24:19 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 11:24:15 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH 2/3] KVM: Always flush async #PF workqueue when vCPU is
+ being destroyed
+Message-ID: <ZTa6TxJS2erGBxgp@google.com>
+References: <20231018204624.1905300-1-seanjc@google.com>
+ <20231018204624.1905300-3-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231020-delay-verw-v1-2-cff54096326d@linux.intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231018204624.1905300-3-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 01:45:03PM -0700, Pawan Gupta wrote:
-> +	/* Mitigate CPU data sampling attacks .e.g. MDS */
-> +	USER_CLEAR_CPU_BUFFERS
-> +
->  	jmp	.Lnative_iret
->  
->  
-> @@ -774,6 +780,9 @@ native_irq_return_ldt:
->  	 */
->  	popq	%rax				/* Restore user RAX */
->  
-> +	/* Mitigate CPU data sampling attacks .e.g. MDS */
-> +	USER_CLEAR_CPU_BUFFERS
-> +
+On 2023-10-18 01:46 PM, Sean Christopherson wrote:
+> Always flush the per-vCPU async #PF workqueue when a vCPU is clearing its
+> completion queue, i.e. when a VM and all its vCPUs is being destroyed.
 
-I'm thinking the comments add unnecessary noise here.  The macro name is
-self-documenting enough.
+nit:
 
-The detail about what mitigations are being done can go above the macro
-definition itself, which the reader can refer to if they want more
-detail about what the macro is doing and why.
+  ... or when the guest toggles CR0.PG or async_pf support.
 
-Speaking of the macro name, I think just "CLEAR_CPU_BUFFERS" is
-sufficient.  The "USER_" prefix makes it harder to read IMO.
+> KVM must ensure that none of its workqueue callbacks is running when the
+> last reference to the KVM _module_ is put.  Gifting a reference to the
+> associated VM prevents the workqueue callback from dereferencing freed
+> vCPU/VM memory, but does not prevent the KVM module from being unloaded
+> before the callback completes.
+> 
+> Drop the misguided VM refcount gifting, as calling kvm_put_kvm() from
+> async_pf_execute() if kvm_put_kvm() flushes the async #PF workqueue will
+> result in deadlock.  async_pf_execute() can't return until kvm_put_kvm()
+> finishes, and kvm_put_kvm() can't return until async_pf_execute() finishes:
+>
+[...]
+> 
+> Note, commit 5f6de5cbebee ("KVM: Prevent module exit until all VMs are
+> freed") *tried* to fix the module refcounting issue by having VMs grab a
+> reference to the module, but that only made the bug slightly harder to hit
+> as it gave async_pf_execute() a bit more time to complete before the KVM
+> module could be unloaded.
 
--- 
-Josh
+Blegh! Thanks for the fix.
+
+> 
+> Fixes: af585b921e5d ("KVM: Halt vcpu if page it tries to access is swapped out")
+> Cc: stable@vger.kernel.org
+> Cc: David Matlack <dmatlack@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: David Matlack <dmatlack@google.com>
