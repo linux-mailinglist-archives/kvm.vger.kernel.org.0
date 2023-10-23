@@ -2,182 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3FC27D3882
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 15:55:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F937D38AF
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 15:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbjJWNzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 09:55:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35902 "EHLO
+        id S231207AbjJWN7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 09:59:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjJWNzC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 09:55:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3D2C2;
-        Mon, 23 Oct 2023 06:55:00 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NDmPXA015890;
-        Mon, 23 Oct 2023 13:54:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=cJbwg2By3UMhLJDVKdBqmyJ5FfX444IdMU802RfnSA4=;
- b=VzmHAbxaejgr7gyIFmCorNgJntdcOZ+uuFUOfN9MU+w9T8VQTUaX7pi+fnqWuE26Kvql
- EEA885UKrdU3Y/fs5I5Rnn7zRC0aoaQWAXVHTbOPZJ/P2+pA+LjdhHGgyF0YxCESGpAt
- RVBtnxctDV5QB99Lf4ccG6CYsTF+Cz/CDEH7fH47JxndtUp8gqz8R1ufWEp4imrySkvd
- jz/JYeH311cXYczJTFMJEocRnykrHz3t7G7uSScvJBqb60iyFHBZLcTg4WgPQEd/I07M
- hRArv4wsZ/NXwrMmFV0P6LqcyS7Vmverq/k92BBFCoHR4ZFQSA3ZiANAgkYjRzjORd0g +w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twsfm9kbg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Oct 2023 13:54:05 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39NDmQ6c016082;
-        Mon, 23 Oct 2023 13:54:04 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twsfm9kaq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Oct 2023 13:54:04 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39NCWngn010250;
-        Mon, 23 Oct 2023 13:54:03 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsby95q6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Oct 2023 13:54:03 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39NDs1xJ12714750
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Oct 2023 13:54:01 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 583192004D;
-        Mon, 23 Oct 2023 13:54:01 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2FBC120043;
-        Mon, 23 Oct 2023 13:54:00 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.11.96])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Oct 2023 13:54:00 +0000 (GMT)
-Message-ID: <d625c6b75a7ec5508470517b6744afbb95e22657.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 3/5] KVM: selftests: Generate sysreg-defs.h and add
- to include path
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
-Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Date:   Mon, 23 Oct 2023 15:53:59 +0200
-In-Reply-To: <20231011195740.3349631-4-oliver.upton@linux.dev>
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
-         <20231011195740.3349631-4-oliver.upton@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S230110AbjJWN7m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 09:59:42 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2086.outbound.protection.outlook.com [40.107.244.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5244B103;
+        Mon, 23 Oct 2023 06:59:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kd2dh6BB21Ah9lsoQ9T8qMLiYTUwtAah7QmXmzwGQJ0V2+LxxFVd/ezKrTQqw1jo7d0ecr3ujJzKezKixmjgYP9Yd4B3U9NaZpQacBESmCjZJ8Nm/u991K0czESKMXY2JIax+vN+pN0plKbr9+qVoAI2zZgaM7J1Gh+FGog47TmjcLIzhF1OJQ+u66EhDt+k6o5Z5wlQMuMcJY0ZeAsfKYNJ4JhakBOI0LO1ISpIhHIVUxzK2D7KKDKTyHYbgCf529VkS0CwFtUjeMt4YriGrqKKqXDbe6ZEWC3oZ7i/FEG4FjD1Rinyu7zhmhpsxLYtfGhs/o1KSTyry/xwff53/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j1HecblvzQk5TGSI2Sf8SPoQF+dlsvZIu7XytIipQPc=;
+ b=TVv6sIdlsN6ssWRIOxHZf+mn2kLEeoqoOittooVrmDOjTtxdR8A5xh4guoS7tiTughVzD3OQXO66r3akmJQwdrn3KNz48PvymJoS+sW5GVMDM4GQutCguJs0iuL6kRSvKMP0b7A/b7IudagtAXZLztZOXF5fBa714YTz70P6Q4FF+Wpm9JKXM4uF5YbgQuHbMbt4Hdl1x4uwBmiaAHcR11jTG93t16s4Uj6OhWrFK/3L4g2mSyZOE9JY2Da7mSEZZf+GlCoCEmChGzeOr8a5jnQ74B/k+i5wdaClIZKQo3UYkRupAWidvlVIiviuEsSPAmRpyMHwBwVRzecU2qMUog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j1HecblvzQk5TGSI2Sf8SPoQF+dlsvZIu7XytIipQPc=;
+ b=lagBeR2v5VVgt8PwaumCAMZ03IZu53C9Kjimof/10cGV96yY1KtHgnljRFyYnL0pslPtb5IsnrZPNyPOn+TqpioitEKWnbJBE0FW82FdOrNSk30vibwHSI2XnB5GXFlwYJwaKRO4GPrdp9lfIccGNC3DEzVkT4cbXmFZ84IdNUii8m7y5jRJ+9mzDTK1jIBIb3YHuxN6CrRTXSkeaXj9USscDCFx9MJu0h6GHGbHg/RDlDkab9lUfRpMyGEhFeSorbs81HUFsVto+nRQ1+V+1Kbf2iyQ6vZrP72YKrINJ2+qJI821TMLkhOYepZoTZBG7XIdcOp0SQgByedWHMExLQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB6374.namprd12.prod.outlook.com (2603:10b6:8:a3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Mon, 23 Oct
+ 2023 13:59:37 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Mon, 23 Oct 2023
+ 13:59:36 +0000
+Date:   Mon, 23 Oct 2023 10:59:35 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>
+Subject: Re: [PATCH v4 08/17] iommufd: Always setup MSI and anforce cc on
+ kernel-managed domains
+Message-ID: <20231023135935.GW3952@nvidia.com>
+References: <20231017155301.GH3952@nvidia.com>
+ <ZS7nb+mKanGFXhZY@Asurada-Nvidia>
+ <20231018165113.GB3952@nvidia.com>
+ <BN9PR11MB5276B9994AD06E91E07B7EF08CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231019235350.GY3952@nvidia.com>
+ <BN9PR11MB5276A64DA68586AEFB6561148CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231020135501.GG3952@nvidia.com>
+ <ZTLOAQK/KcjAJb3y@Asurada-Nvidia>
+ <20231021163804.GL3952@nvidia.com>
+ <ZTWabb6AbOTFNgaw@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTWabb6AbOTFNgaw@Asurada-Nvidia>
+X-ClientProxiedBy: DS7PR03CA0151.namprd03.prod.outlook.com
+ (2603:10b6:5:3b2::6) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NQWui_XPNTrQ_ku4TOM8zKHuT3yfYgfR
-X-Proofpoint-GUID: lkYEi09Gk5C1VfTU80ylIwFXaEls-a29
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-23_12,2023-10-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 mlxlogscore=999 bulkscore=0 spamscore=0 phishscore=0
- adultscore=0 clxscore=1011 suspectscore=0 lowpriorityscore=0
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2310170001 definitions=main-2310230121
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6374:EE_
+X-MS-Office365-Filtering-Correlation-Id: ed4d824d-a6a8-460e-9b7f-08dbd3d04ae3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bRlk0Nw6di45DL4T8QqtB2DlC7iYqPQyBc2I2ehfpGe3633LkaJF40yupaTjL3rADs5lhb63rdlscyPDnEFKHBwdJbYzYJuNM1/qUVTvVZONqH0Xf9xvcd/nuNsIFr6+dhSciMhpjMNgmszh59WtkTuFDKKwa9R6cEbm9X5/USdBzjORXDQd5mNY9HhCZN8pg3DFkEQF9aNk5wdMx35UiDFbsc1oTvMaLekk8Mx34fFKWJraa4AD6LAMZ2OdclF6o2yw53wZ/OvkIJxBk7qIxaYb5cVTL0+6o3bAiJokOulT62G3DLwIaqtd/WFTqyBkR/I5vvVMHkGkc/wktbDuWSFjUko+hjqkEUBLCVq/fB1I2cQrC3wf0/Nu/JYUIxr292bmjOirQ9u6m0kaLJn6Rk1An8Hln9xzceWuw+6wtouHWHGXw/AHdwivm9EYP68VdVWvTXopBUCJCc+FMMUJSVoynuv7tisb0sK82onaeo2S5Zs6uzLsWgx/ED4EyB7bJg1vRC1M7e3YZwgw6HAGbyz0buzm+XH3HYMiOU7j+qNo0BrOYFR2yppFnqcqw/Up
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(366004)(346002)(396003)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(38100700002)(6512007)(66556008)(66476007)(66946007)(316002)(6636002)(54906003)(37006003)(7416002)(2906002)(4744005)(33656002)(36756003)(478600001)(6486002)(86362001)(6506007)(1076003)(6862004)(4326008)(8936002)(5660300002)(26005)(41300700001)(2616005)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?n7OnO53z08ct+KCbspNCLLYtQoQ17OSINFHSxajswshdtccVDGrJKSbe5Y2W?=
+ =?us-ascii?Q?M6Gj7iilq+FMQxkEUdRnpdrqKVgfxpRu0IGO9bXPxZfaXtACc84D5QZT7iDd?=
+ =?us-ascii?Q?zINuC8pXMSQRokMUXf+2r/p7UxRrvaqD/C/2GmmZaAqgqr2lwoY2nhpyjrqK?=
+ =?us-ascii?Q?9FNnLJLM746HDmld4UtwvwGDVdBGloOIgqnCP3LflIPkRcHWyqB9LGbAyryL?=
+ =?us-ascii?Q?bKuKsPsv3UwYSqwER8qGoV96ndXTQ017pbz3OHS7YSrBKN3EvFdsUhWe1AbR?=
+ =?us-ascii?Q?e6F6MQfNn3nFc+CHpZdjgqHoz2bg8Z6wZWaIwUcsxgHtdMo+NEEKYP728RGM?=
+ =?us-ascii?Q?QRhl4kRZra26P+DifEkUIYMSFgqjD+mnAj7cRY1BTkBZk6IJa/Y4Cpi1orV7?=
+ =?us-ascii?Q?IQ8N/Mb7upOYsuBN3A2mFHuQukukLU4X7o+vipqTOvug8k/MO9mQv1Hd+NC4?=
+ =?us-ascii?Q?R/V+f1CLGqvjQKtIJ5+0udyCV4r4AWJSthdP+Y0wj7JmN0h8wmNR1YYjXwJY?=
+ =?us-ascii?Q?n4Xq3KUbpcA+tcBEquI7oYZH4OExqJPe8ag0AlZE/dJ/GqNI3S2Ar0AmFmrF?=
+ =?us-ascii?Q?zLrscHqFU4K+8XymRPc+ha9Yk8ayygvrKYH1AUStt8H9k1NGzfyEsYPtRGUP?=
+ =?us-ascii?Q?3EAJ2dVCY9T/oozf9l2F7qk+AmNbViVrPeGHosYNMu+C+wOiwfDSWecwO4h5?=
+ =?us-ascii?Q?urvXiScMJM9v5NBmO0AFQzn+5aaOc1s/T9RuBnfuozOGqK2vOmvyH6AFjFOP?=
+ =?us-ascii?Q?Uuw757DAK1CUPZx77Wd3aW9QQkz5ETp5nwXjWlWRJoz/x5LqsuirJj5tA+LF?=
+ =?us-ascii?Q?aItf0J9rxnEcOPj8eb+KPy5a5BVx0eLktmzsMo/N6VhEunWQMHGDX1bLa+lY?=
+ =?us-ascii?Q?MDmo+sylVz7V3sjNxFsoc1Lu9gBZ4Bo70nDI+qmbWV5F0qAXIiJVC8Hbe19a?=
+ =?us-ascii?Q?3QfsiPYvBO5auCsVzB/LukOvm3erGH7l0w/xiw101FSsN8lbEBun72rWzQPy?=
+ =?us-ascii?Q?Jv7Nlr8tbwZw2/IO9K12O1hnSNFi8f9ONbVDaXua3c4zHGXOkFAnRoC0iFQB?=
+ =?us-ascii?Q?Lp57tu0YbDdAxkoorGO1g2MRKBBX4e/Z9sdGrK1+vhuyJ1IgsIAv7OGp5yOP?=
+ =?us-ascii?Q?E6sCbKI2maGyuBsKCNQrrIK0/enu1vbqHgUhZAoZZWDdvt3kt9W3WFn2Zr5W?=
+ =?us-ascii?Q?On3X0qfNvkoxwwN4pP3K/NKhfmbEn9Fug/hVrI8VrVfCY4XC1mfRC6EiqZbM?=
+ =?us-ascii?Q?RQ6OvYoLFlEs4Q9/hTpkGysiHbzt2hwJqvdLbHvUqgTcfydQ5jqXX7e9mkcB?=
+ =?us-ascii?Q?pJR69pBFx/1MXoEe4zayI67jLIgK+k+xsVIpGsmfc1X68/s6UQQ3rij6WESx?=
+ =?us-ascii?Q?oi5mEl2lDbfM/dXJvAPuj/t1ZJ81ibCkbRkT+Lzw61ExV6LX6GT70Q35m/Aa?=
+ =?us-ascii?Q?GmQGsiwuWAYnHYKmMuhG+vDdvwIJc8bDc7vPbvRezyj+6xZC1Xg525GEOshD?=
+ =?us-ascii?Q?sPmYa25vM+kSyXMypP6X3VLjG2k9YzbZnj4Mbn1vDch06HNg05qEGTaZFDuA?=
+ =?us-ascii?Q?jHLtOPYpaqjHPulPj8YpHowYlJtCxARNFY7c9ne7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed4d824d-a6a8-460e-9b7f-08dbd3d04ae3
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 13:59:36.7777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RQX1wqJuXG0/tM68+r5mqWSUT5b42UniPWI9UwK+ZnH6lag7AOdN8iWPgX7MBh47
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6374
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-10-11 at 19:57 +0000, Oliver Upton wrote:
-> Start generating sysreg-defs.h for arm64 builds in anticipation of
-> updating sysreg.h to a version that depends on it.
->=20
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  tools/testing/selftests/kvm/Makefile | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
-ts/kvm/Makefile
-> index a3bb36fb3cfc..07b3f4dc1a77 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -17,6 +17,17 @@ else
->  	ARCH_DIR :=3D $(ARCH)
->  endif
->=20
-> +ifeq ($(ARCH),arm64)
-> +arm64_tools_dir :=3D $(top_srcdir)/tools/arch/arm64/tools/
-> +GEN_HDRS :=3D $(top_srcdir)/tools/arch/arm64/include/generated/
-> +CFLAGS +=3D -I$(GEN_HDRS)
-> +
-> +prepare:
-> +	$(MAKE) -C $(arm64_tools_dir)
-> +else
-> +prepare:
+On Sun, Oct 22, 2023 at 05:18:03PM -0700, Nicolin Chen wrote:
 
-This is a force target, all targets depending on this one will always have =
-their recipe run,
-so we'll pretty much rebuild everything.
-Is this intentional?
+> > > And where should we add this comment? Kdoc of
+> > > the alloc uAPI?
+> > 
+> > Maybe right in front of the only enforce_cc op callback?
+> 
+> OK. How about this? Might be a bit verbose though:
+> 	/*
+> 	 * enforce_cache_coherenc must be determined during the HWPT allocation.
+> 	 * Note that a HWPT (non-CC) created for a device (non-CC) can be later
+> 	 * reused by another device (either non-CC or CC). However, A HWPT (CC)
+> 	 * created for a device (CC) cannot be reused by another device (non-CC)
+> 	 * but only devices (CC). Instead user space in this case would need to
+> 	 * allocate a separate HWPT (non-CC).
+> 	 */
 
-> +endif
-> +
->  LIBKVM +=3D lib/assert.c
->  LIBKVM +=3D lib/elf.c
->  LIBKVM +=3D lib/guest_modes.c
-> @@ -256,13 +267,18 @@ $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
->  $(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
->  	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $=
-@
->=20
-> -EXTRA_CLEAN +=3D $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLI=
-T_TESTS_OBJS) cscope.*
-> +EXTRA_CLEAN +=3D $(GEN_HDRS) \
-> +	       $(LIBKVM_OBJS) \
-> +	       $(SPLIT_TESTS_OBJS) \
-> +	       $(TEST_DEP_FILES) \
-> +	       $(TEST_GEN_OBJ) \
-> +	       cscope.*
->=20
->  x :=3D $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
-> -$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
-> +$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c prepare
->  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
->=20
-> -$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
-> +$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S prepare
->  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
->=20
->  # Compile the string overrides as freestanding to prevent the compiler f=
-rom
-> @@ -274,6 +290,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
->  x :=3D $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
->  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
->  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
-> +$(TEST_GEN_OBJ): prepare
->=20
->  cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) includ=
-e lib ..
->  cscope:
+Ok, fix the spello in enforce_cache_coherenc
 
+Jason
