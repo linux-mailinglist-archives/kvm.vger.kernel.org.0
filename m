@@ -2,121 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C92207D2444
-	for <lists+kvm@lfdr.de>; Sun, 22 Oct 2023 18:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D02E87D2773
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 02:18:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231981AbjJVQQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Oct 2023 12:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
+        id S232885AbjJWASR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Oct 2023 20:18:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjJVQQi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Oct 2023 12:16:38 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D99E1;
-        Sun, 22 Oct 2023 09:16:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=0kocVwQoUwGiyQuImeQDWp0cHvDVXBacQM1Z7EfsYZE=; b=dVCavni3/f+jfYr49EBBt4bQfT
-        g6xlVVoj9XmqAdZn2LJc5meaMTfCkNPK/jmCOacsz6c7MDmiP54UKVi+PwZC8kRH90pYe6QnctrTj
-        DU9O6YNcQQsj32M4CVh4IR3wbIABtTHVU43VfZdzLOhG5tdZIP+f7Bht20YOyLlqTfy7MGwFjltuI
-        htL3dX8VtdsauivO7zrfPZeExPUwqtrZ7jkh+OdBf169U96s8M6TWzhq6SWLFJmVA5o+hQGcmbQUI
-        kM6IAAkV8RHVQFhZvptAR0Aq9Z9LuYqDIAebBArjJq2rZso9NUV6WSceRck+F/p88+eRhlA5Zdabr
-        mPIiS/1g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qub7R-008ZJr-T7; Sun, 22 Oct 2023 16:16:01 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8941F300473; Sun, 22 Oct 2023 18:16:01 +0200 (CEST)
-Date:   Sun, 22 Oct 2023 18:16:01 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Andrew Cooper <andrew.cooper3@citrix.com>
-Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com,
-        Alyssa Milburn <alyssa.milburn@intel.com>
-Subject: Re: [PATCH 1/6] x86/bugs: Add asm helpers for executing VERW
-Message-ID: <20231022161601.GE31411@noisy.programming.kicks-ass.net>
-References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-1-cff54096326d@linux.intel.com>
- <6439a094-23a6-4de3-aa41-bd033163e044@citrix.com>
+        with ESMTP id S229500AbjJWASO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Oct 2023 20:18:14 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D78DC;
+        Sun, 22 Oct 2023 17:18:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iKiNWAAwM5U1qqEu1KyiXbQ2Z2rhRCSeuyGXlZSSmT8/q4taGFObnoJjG8pJZNamKghu/GCuFMIN3onWv0LvsZXcCTPLcYdii2GF4dTzu7kR30sy7pDmey4ntmEPqM2sc0vHTqPPFLqxP5fdU55KXdMRLCBDyMf5S5sD2cZ8vr+r2QvdZy1b3LmPKihdl0REHhDzSO8T3rXCk/ccGb1F+rFMGsipDNCPRiBiWw07rbMpQnEP0ratJ7yH77qVHmABehB67iX0uxrjC7Vahk1Ids69x86ZJ9GPbWJLCzkpBTumWy6YgDnbAemHR2TWCUwmL885l3hK6vkNez6e2MhbAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+c9+A4oYI7HqE1XgBgBzhelXS4DN2/kC/dQ5UeZgvhs=;
+ b=KA6xAnvWtixahQyP9Mif5mLEF9GxLBVi7wecUvGhTQAoyVSKQhmXA0eMT9sL8SckZd0XBKT3Xcvjff2X3o18lhk2+Tag5mEoB5xPKrtkoFfbgc1lhGjQ5b7tPY0IpVjX9rfle/KZ/DU/ulsqueYmYqO5YGAbIXlMVsnbGgudse8qhHRDh/kFunZa92pO6XsP7Jngew43iq8XxNteQ5pJexKzkgt5vfddME+k0SiJaX3FgnxnaLJT4SjRCZWGRHekEcm5nrghgASFyIPXu1lFluiW0F8IBmVlwfjL58z8zYD27NHYcaOEwwfv8KQgmxknLvPYLJbOzxEGGLVX/JtCRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+c9+A4oYI7HqE1XgBgBzhelXS4DN2/kC/dQ5UeZgvhs=;
+ b=E7ZNo6LW2agmA7j9IRjYjmYA4R8q8MPz+lnluFWEPtBN5idbFLU0HNP+yQthSn7QioABwZjJnyTZItnMrt4tDlD/k+wAeaqy+twUDVEMSoMusifTRDiJpmKrQJdfNdOt+LHho6ryPrFV39oPhhtQh3CrBBhbiirvCLqXuBKMrSk4CCtD1Hv7QS8lh9s5jomAsCgCOag7wSdCoyTDPi04HEyBJi+63WYCw9CP8wDO3tdOeztSDTkaVnr4KVN2NhQoj9Q4ts3lqBQWtsH5/2FYW7OZ7J3QGvIsruXJMteYP7qDvxYC8gz5A81HhdQ1y0DkrRz3jcqnBv3yJ6RSMRaqXA==
+Received: from DS7PR03CA0159.namprd03.prod.outlook.com (2603:10b6:5:3b2::14)
+ by DS7PR12MB8369.namprd12.prod.outlook.com (2603:10b6:8:eb::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Mon, 23 Oct
+ 2023 00:18:07 +0000
+Received: from DS1PEPF00017090.namprd03.prod.outlook.com
+ (2603:10b6:5:3b2:cafe::4b) by DS7PR03CA0159.outlook.office365.com
+ (2603:10b6:5:3b2::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33 via Frontend
+ Transport; Mon, 23 Oct 2023 00:18:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6933.15 via Frontend Transport; Mon, 23 Oct 2023 00:18:07 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 22 Oct
+ 2023 17:18:06 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Sun, 22 Oct 2023 17:18:05 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
+ Transport; Sun, 22 Oct 2023 17:18:04 -0700
+Date:   Sun, 22 Oct 2023 17:18:03 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "Martins, Joao" <joao.m.martins@oracle.com>
+Subject: Re: [PATCH v4 08/17] iommufd: Always setup MSI and anforce cc on
+ kernel-managed domains
+Message-ID: <ZTWabb6AbOTFNgaw@Asurada-Nvidia>
+References: <BN9PR11MB5276FDC375685CE04A7AD93B8CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231017155301.GH3952@nvidia.com>
+ <ZS7nb+mKanGFXhZY@Asurada-Nvidia>
+ <20231018165113.GB3952@nvidia.com>
+ <BN9PR11MB5276B9994AD06E91E07B7EF08CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231019235350.GY3952@nvidia.com>
+ <BN9PR11MB5276A64DA68586AEFB6561148CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20231020135501.GG3952@nvidia.com>
+ <ZTLOAQK/KcjAJb3y@Asurada-Nvidia>
+ <20231021163804.GL3952@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6439a094-23a6-4de3-aa41-bd033163e044@citrix.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231021163804.GL3952@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|DS7PR12MB8369:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7de6bdf0-d408-4b6a-a13c-08dbd35d8827
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: T6XmP+jioJGCuN6dQpU8ffmuEYHoUbYaO6RG/bupssSU5ljegl0ocwBIIPC2GSpTfZYOO1kBNnBAMCb0nkMwV8goao4sydXt2RG4nv1eFLpttxP3iBZDSCPMUqw/ApsvteAbEiutaU65hWtCucttWqdRRyZ3DlnGXBmkgJO0NVIFQSjLXnwtOf5G6Zao+j1VDyf/2Li4GyiN5w/h8P8IOW0bwcdn9eCE0Lteh/4ALWdSKvDtMVON2hrpMYwGmpZ7CCvwuvZxDr0zrWX431iIcEJn6j88Yb8xXWMX8q54G1Rlwai3obx9nRBwbV4dVaB7uyOc0yu+upY55JasQvIOJrjaV0D/73mnbfgCTtaUR8Q+J5GfQycE62EjCNX4q8GN6qgwP8rVRKmNnP8HGV31Otzs4UR8TClx6xVpujel0sbdvo1a+uGD9kiqsNdcxA/PVQKLTGatXV9n/u7kGQGT/JyYA1zlNna9fLcjn7S0cLUZDksZTYVfWjY46RBUdWUftHCbBaNOQThUdjqOh/7fX1NWP6LT6QyMWAIYg+prb0CwpLV3usUKOgcs7zVr8VyFbG79qPLx2bA3HmW+mB9Y0nlAorotnQgyONRiQmqEiWVX/oai/qKFJ3Q5H5Jl1t+uX7cQOp/CfU5KkBYjPvS5jO7RUzsZmNwJup3JXRSibcCZZjiVWQVoZVOr082w7zlNqgzRmWhMpd5lvEyfMjNhCyCIMPGdzL/60rh7UrIUDi7myk7P51OyXuys4mAe8OooA4uPPQ0V8EvnsusdH1uVXDAqAPPdCtR63XDnyzUSWS4=
+X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(346002)(39850400004)(376002)(230922051799003)(451199024)(186009)(1800799009)(82310400011)(64100799003)(40470700004)(46966006)(36840700001)(2906002)(55016003)(86362001)(40460700003)(4326008)(966005)(5660300002)(6636002)(110136005)(70586007)(70206006)(54906003)(316002)(8936002)(478600001)(41300700001)(83380400001)(356005)(8676002)(40480700001)(7416002)(47076005)(36860700001)(82740400003)(336012)(9686003)(426003)(7636003)(26005)(33716001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 00:18:07.1212
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7de6bdf0-d408-4b6a-a13c-08dbd35d8827
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017090.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8369
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 21, 2023 at 12:50:37AM +0100, Andrew Cooper wrote:
-> On 20/10/2023 9:44 pm, Pawan Gupta wrote:
-> > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> > index c55cc243592e..e1b623a27e1b 100644
-> > --- a/arch/x86/include/asm/nospec-branch.h
-> > +++ b/arch/x86/include/asm/nospec-branch.h
-> > @@ -111,6 +111,24 @@
-> >  #define RESET_CALL_DEPTH_FROM_CALL
-> >  #endif
-> >  
-> > +/*
-> > + * Macro to execute VERW instruction to mitigate transient data sampling
-> > + * attacks such as MDS. On affected systems a microcode update overloaded VERW
-> > + * instruction to also clear the CPU buffers.
-> > + *
-> > + * Note: Only the memory operand variant of VERW clears the CPU buffers. To
-> > + * handle the case when VERW is executed after user registers are restored, use
-> > + * RIP to point the memory operand to a part NOPL instruction that contains
-> > + * __KERNEL_DS.
-> > + */
-> > +#define __EXEC_VERW(m)	verw _ASM_RIP(m)
-> > +
-> > +#define EXEC_VERW				\
-> > +	__EXEC_VERW(551f);			\
-> > +	/* nopl __KERNEL_DS(%rax) */		\
-> > +	.byte 0x0f, 0x1f, 0x80, 0x00, 0x00;	\
-> > +551:	.word __KERNEL_DS;			\
-> > +
+On Sat, Oct 21, 2023 at 01:38:04PM -0300, Jason Gunthorpe wrote:
+> On Fri, Oct 20, 2023 at 11:59:13AM -0700, Nicolin Chen wrote:
+> > On Fri, Oct 20, 2023 at 10:55:01AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Oct 20, 2023 at 02:43:58AM +0000, Tian, Kevin wrote:
+> > > 
+> > > > What we want to prevent is attaching a non-CC device to a CC domain
+> > > > or upgrade a non-CC domain to CC since in both case the non-CC
+> > > > device will be broken due to incompatible page table format.
+> > > 
+> > > [..]
+> > > 
+> > > > Who cares about such consistency? sure the result is different due to order:
+> > > > 
+> > > > 1) creating hwpt for dev1 (non-CC) then later attaching hwpt to
+> > > >     dev2 (CC) will succeed;
+> > > > 
+> > > > 2) creating hwpt for dev2 (CC) then later attaching hwpt to
+> > > >     dev1 (non-CC) will fail then the user should create a new hwpt
+> > > >     for dev1;
+> > > 
+> > > AH... So really what the Intel driver wants is not upgrade to CC but
+> > > *downgrade* from CC.
+> > > 
+> > > non-CC is the type that is universally applicable, so if we come
+> > > across a non-CC capable device the proper/optimal thing is to degrade
+> > > the HWPT and re-use it, not allocate a new HWPT.
+> > > 
+> > > So the whole thing is upside down.
+> > > 
+> > > As changing the IOPTEs in flight seems hard, and I don't want to see
+> > > the Intel driver get slowed down to accomodate this, I think you are
+> > > right to say this should be a creation time property only.
+> > > 
+> > > I still think userspace should be able to select it so it can minimize
+> > > the number of HWPTs required.
+> > > 
+> > > > But the user shouldn't assume such explicit consistency since it's not
+> > > > defined in our uAPI. All we defined is that the attaching may
+> > > > fail due to incompatibility for whatever reason then the user can
+> > > > always try creating a new hwpt for the to-be-attached device. From
+> > > > this regard I don't see providing consistency of result is
+> > > > necessary. ðŸ˜Š
+> > > 
+> > > Anyhow, OK, lets add a comment summarizing your points and remove the
+> > > cc upgrade at attach time (sorry Nicolin/Yi!)
+> > 
+> > Ack. I will send a small removal series. I assume it should CC
+> > stable tree also? 
 > 
-> Is this actually wise from a perf point of view?
-> 
-> You're causing a data access to the instruction stream, and not only
-> that, the immediate next instruction.  Some parts don't take kindly to
-> snoops hitting L1I.
-> 
-> A better option would be to simply have
-> 
-> .section .text.entry
-> .align CACHELINE
-> mds_verw_sel:
->     .word __KERNEL_DS
->     int3
-> .align CACHELINE
-> 
-> 
-> And then just have EXEC_VERW be
-> 
->     verw mds_verw_sel(%rip)
+> No, it seems more like tidying that fixing a functional issue, do I
+> misunderstand?
 
-	ALTERNATIVE "", "verw mds_verw_sel(%rip)", X86_FEATURE_USER_CLEAR_CPU_BUF
+Hmm. Maybe the misunderstanding is mine -- Kevin was asking if
+it was already a bug and you answered yes:
+https://lore.kernel.org/linux-iommu/20231016115736.GP3952@nvidia.com/
 
-But yeah, his seems like the sanest form.
+If this shouldn't be a bug fix, I could just merge them into a
+single tidying patch and add the comments you suggested below.
+
+> > And where should we add this comment? Kdoc of
+> > the alloc uAPI?
+> 
+> Maybe right in front of the only enforce_cc op callback?
+
+OK. How about this? Might be a bit verbose though:
+	/*
+	 * enforce_cache_coherenc must be determined during the HWPT allocation.
+	 * Note that a HWPT (non-CC) created for a device (non-CC) can be later
+	 * reused by another device (either non-CC or CC). However, A HWPT (CC)
+	 * created for a device (CC) cannot be reused by another device (non-CC)
+	 * but only devices (CC). Instead user space in this case would need to
+	 * allocate a separate HWPT (non-CC).
+	 */
+
+Thanks
+Nic
