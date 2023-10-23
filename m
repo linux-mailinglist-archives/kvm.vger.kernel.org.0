@@ -2,108 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B4B87D2EB7
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 11:43:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0557D7D2F16
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 11:55:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbjJWJni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 05:43:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37606 "EHLO
+        id S233592AbjJWJzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 05:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjJWJng (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 05:43:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5619E99
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 02:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=QJnLNJLIKQ/1yQL84M0rKohbw6CIp8aEbajAdE1XPdk=; b=CUdLWyALBJqmFbDGesKzP61pFX
-        yMyqMvl8eVP0caNQqIuXFssX8lBUzWgpK0Cz1fE8ycmQ7Zc364gqWYFOTEzYFjujFruaRGkPf/g16
-        2GvuZQFH7+oO5B5p06BuB9jm6y2Zb0P3hOi7BsVk8I5q9ZzHdu8NlWI5fNR9PAEQX1FoAvUwcQygR
-        BrsvhK9U4XPB2XlRKtxIRyatSt0Ur8ot4pBTYRH2JCADNdaRtv6ro02JzxVUyyL4XCxYYdUYirxQk
-        sSvo6tPiHXwM1MjlSxzPFY4mccQVObrvA0FIliR8oJ5LExfja1ipELp+yx7XX+ndJ15ku4AvAk9s8
-        aSwfOOyQ==;
-Received: from [31.94.4.150] (helo=[IPv6:::1])
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qurSo-00D2s3-IS; Mon, 23 Oct 2023 09:43:10 +0000
-Date:   Mon, 23 Oct 2023 10:42:58 +0100
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Igor Mammedov <imammedo@redhat.com>
-CC:     qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?ISO-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        =?ISO-8859-1?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_11/12=5D_hw/xen=3A_automaticall?= =?US-ASCII?Q?y_assign_device_index_to_block_devices?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20231023113002.0e83c209@imammedo.users.ipa.redhat.com>
-References: <20231016151909.22133-1-dwmw2@infradead.org> <20231016151909.22133-12-dwmw2@infradead.org> <20231018093239.3d525fd8@imammedo.users.ipa.redhat.com> <3f3487af227dcdce7afb37e8406d5ce8dcdbf55f.camel@infradead.org> <20231023113002.0e83c209@imammedo.users.ipa.redhat.com>
-Message-ID: <8CBFDABE-6BD7-4924-BB69-EF5EAA04A34D@infradead.org>
+        with ESMTP id S232598AbjJWJzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 05:55:08 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FE8170C
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 02:54:54 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30753C433C8;
+        Mon, 23 Oct 2023 09:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698054893;
+        bh=RGhMAQKKfN2krCGCzw9mQvKPycHDxrGCVceRB8YfGKo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Wtqxxl0nTlsUCc7PzdITXbEblfZij1vIQpJJNoKoX4sGke945Clc6kl9hHyv9YOn9
+         d30ihSG2g3hdfeibXvBKZb39NJyoCk+VyxLVXOa4zapdF9qFn4My2jCwH2onDiJby9
+         sMf98hWL3hDWD2y7NPzcE9g8bLAcnJhY9XpYYL/kSxjUfcAPm+YAih+2mjHJit793B
+         zIdYDRe77etZYFITRbryElN9S6RTiJVX37XqEHzxCkUAUL0lzIfb68Ka6O9U4VAjuU
+         f2WI+Oe7Cx1RdwECWulJCxvxeDOCxYee/gHP87GLKBx1mH1sKYmIkJOSiWe205ik1w
+         CA7TfkJ0eFOmA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qure6-006nPT-Pk;
+        Mon, 23 Oct 2023 10:54:50 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 0/5] KVM: arm64: NV trap forwarding fixes
+Date:   Mon, 23 Oct 2023 10:54:39 +0100
+Message-Id: <20231023095444.1587322-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com, miguel.luis@oracle.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+As Miguel was reworking some of the NV trap list, it became clear that
+the 32bit handling didn't get much love. So I've taken Miguel's
+series, massaged it a bit, and added my own stuff.
 
+Apart from the last patch, the all have been on the list and reviewed.
+I was hoping to take it into 6.6, but some of the late rework and the
+required testing have made it impossible.
 
-On 23 October 2023 10:30:02 BST, Igor Mammedov <imammedo@redhat=2Ecom> wro=
-te:
->On Wed, 18 Oct 2023 09:32:47 +0100
->David Woodhouse <dwmw2@infradead=2Eorg> wrote:
->
->> On Wed, 2023-10-18 at 09:32 +0200, Igor Mammedov wrote:
->> > On Mon, 16 Oct 2023 16:19:08 +0100
->> > David Woodhouse <dwmw2@infradead=2Eorg> wrote:
->> >  =20
->> > > From: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->> > >  =20
->> >=20
->> > is this index a user (guest) visible? =20
->>=20
->> Yes=2E It defines what block device (e=2Eg=2E /dev/xvda) the disk appea=
-rs as
->> in the guest=2E In the common case, it literally encodes the Linux
->> major/minor numbers=2E So xvda (major 202) is 0xca00, xvdb is 0xca10 et=
-c=2E
->
->that makes 'index' an implicit ABI and a subject to versioning
->when the way it's assigned changes (i=2Ee=2E one has to use versioned
->machine types to keep older versions working the they used to)=2E
->
->From what I remember it's discouraged to make QEMU invent
->various IDs that are part of ABI (guest or mgmt side)=2E
->Instead it's preferred for mgmt side/user to provide that explicitly=2E
->
->Basically you are trading off manageability/simplicity at QEMU
->level with CLI usability for human user=2E
->I don't care much as long as it is hidden within xen code base,
->but maybe libvirt does=2E
+Oliver, if you're happy with the shape of it, I'd appreciate it if you
+could take it into 6.7.
 
-Well, it can still be set explicitly=2E So not so much a "trade-off" as ad=
-ding the option for the user to choose the simple way=2E
+Thanks,
 
-Yes, in a way it's an ABI, just like the dynamic assignment of PCI devfn f=
-or network devices added with "-nic"=2E And I think also for virtio block d=
-evices too? And for the ISA ne2000=2E
+	M.
 
-But it seems unlikely that we'll ever really want to change "the first one=
- is xvda, the second is xvdb=2E=2E=2E=2E"
+Marc Zyngier (2):
+  KVM: arm64: Do not let a L1 hypervisor access the *32_EL2 sysregs
+  KVM: arm64: Handle AArch32 SPSR_{irq,abt,und,fiq} as RAZ/WI
+
+Miguel Luis (3):
+  arm64: Add missing _EL12 encodings
+  arm64: Add missing _EL2 encodings
+  KVM: arm64: Refine _EL2 system register list that require trap
+    reinjection
+
+ arch/arm64/include/asm/sysreg.h | 45 +++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c | 77 ++++++++++++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c       | 24 +++++++---
+ 3 files changed, 133 insertions(+), 13 deletions(-)
+
+-- 
+2.39.2
+
