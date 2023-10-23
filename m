@@ -2,106 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A0E57D363B
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 14:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8700F7D3699
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 14:31:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbjJWMSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 08:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51116 "EHLO
+        id S231362AbjJWMbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 08:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229594AbjJWMST (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 08:18:19 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB96DFD;
-        Mon, 23 Oct 2023 05:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698063497; x=1729599497;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ER/XKUMDi6yIOgyLhD9h2AQXUmEiCID1DQSal1iAvEQ=;
-  b=G6H3/aChEXL/Pxf7m+vpobEZxpDhZtQdkTlffHkKPj8KbvZjafEJBshT
-   qOs/1S2BhwVLg9IakokaoIhKFnpNZDlk0wxO6ZYfy0rQ/HgFH+lJik2w8
-   HyjAebYBRBty5f1jJz46fUayBA6+FaqaG1VUy1HtcuLx+MQ/kycPmBkiI
-   o1bVHCfvTswL0VMuAtnPaOlir31kHkVPMIIItmS9nrIO4DMilIqlWNOix
-   UHmw/bSE/XhHS28YbcJWWBgdUhy4wNGCK9QqK++r1+/NR70Ragowr5fyC
-   LQ4fNrX2wMWRnyBAxFPdTq+KHmOhJALFIwG/VDFRHtdXoKL4GpH71aEOW
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="473040356"
-X-IronPort-AV: E=Sophos;i="6.03,244,1694761200"; 
-   d="scan'208";a="473040356"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 05:18:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="734649672"
-X-IronPort-AV: E=Sophos;i="6.03,244,1694761200"; 
-   d="scan'208";a="734649672"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.211.100]) ([10.254.211.100])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 05:18:10 -0700
-Message-ID: <f041d424-ade2-4959-a677-01e3d7dd699b@linux.intel.com>
-Date:   Mon, 23 Oct 2023 20:18:08 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "Zeng, Xin" <xin.zeng@intel.com>
-Subject: Re: [PATCH v6 8/8] iommu/vt-d: Disallow read-only mappings to nest
- parent domain
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-References: <20231020093246.17015-1-yi.l.liu@intel.com>
- <20231020093246.17015-9-yi.l.liu@intel.com>
- <23133231-c6d7-469e-8f55-2e7667acb097@linux.intel.com>
- <DS0PR11MB752977275A0791296C115FE6C3D8A@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Language: en-US
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <DS0PR11MB752977275A0791296C115FE6C3D8A@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229575AbjJWMbX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 08:31:23 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0146EFF;
+        Mon, 23 Oct 2023 05:31:20 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F5CC433C7;
+        Mon, 23 Oct 2023 12:31:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698064280;
+        bh=vqvwI154cshBBrMmUKheC5NCWQ1/ynR+UUV9qp6rkWs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=sV+BPrw7l9ZhjUGycj3+FYdcbY68ckuSY7HLf1EVSUhRtd99ldUqoBawO4+QzZJgm
+         QhRrVUpePvLrb69JIVagjnGuMgJ+PEMVeoYH8Hfiux/b+qR2/yOmMAcDfrawH40+kz
+         fuj5FzsfODCV+CFLn9IdrFaDcA9lwFQUPO+h74EuaSv/q+am1Bz48hOwrx69HMCveb
+         OARvfJhlnfqvSqVMlFoGgEqlAkXi20V3wKiYV1BkFQ4ryiv5dRelvcjQmFiEY02q2I
+         6yazLzhr4EgoV83KazEcHAOJX+CjnJWz2K3HK97W/zlwJ8M/ZTVErMey7aWCQd/64z
+         lDLb9ppYc0Q5Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1quu5W-006q35-25;
+        Mon, 23 Oct 2023 13:31:18 +0100
+Date:   Mon, 23 Oct 2023 13:31:15 +0100
+Message-ID: <86zg094j1o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v8 05/13] KVM: arm64: Add {get,set}_user for PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+In-Reply-To: <20231020214053.2144305-6-rananta@google.com>
+References: <20231020214053.2144305-1-rananta@google.com>
+        <20231020214053.2144305-6-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, yuzenghui@huawei.com, shahuang@redhat.com, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/10/23 19:15, Liu, Yi L wrote:
->> I would also prefer to introduce is_nested_parent_domain to the user
->> domain allocation patch (patch 7/8). This field should be checked when
->> allocating a nested user domain.
-> A ctually, no need. This should be a common check, so iommufd core already
-> has the check. So the parent should be a nest parent domain, otherwise already
-> returned in iommufd.
+On Fri, 20 Oct 2023 22:40:45 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> +	if (!parent->nest_parent)
-> +		return ERR_PTR(-EINVAL);
+> For unimplemented counters, the bits in PM{C,I}NTEN{SET,CLR} and
+> PMOVS{SET,CLR} registers are expected to RAZ. To honor this,
+> explicitly implement the {get,set}_user functions for these
+> registers to mask out unimplemented counters for userspace reads
+> and writes.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 91 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 85 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index faf97878dfbbb..2e5d497596ef8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -987,6 +987,45 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	return true;
+>  }
+>  
+> +static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
+> +					  u64 reg, u64 val, bool set)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	/* Make the register immutable once the VM has started running */
+> +	if (kvm_vm_has_ran_once(kvm)) {
+> +		mutex_unlock(&kvm->arch.config_lock);
+> +		return;
+> +	}
+> +
+> +	val &= kvm_pmu_valid_counter_mask(vcpu);
+> +	mutex_unlock(&kvm->arch.config_lock);
+> +
+> +	if (set)
+> +		__vcpu_sys_reg(vcpu, reg) |= val;
+> +	else
+> +		__vcpu_sys_reg(vcpu, reg) &= ~val;
+> +}
+> +
+> +static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +			u64 *val)
+> +{
+> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+> +
+> +	*val = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +	return 0;
+> +}
+> +
+> +static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +			u64 val)
+> +{
+> +	/* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
+> +	set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & 0x1);
+> +	return 0;
+> +}
 
-I know this will not cause errors in the code. But since you are
-introducing is_parent property in the vt-d driver. The integrity of the
-property should be ensured. In this way, it will make the code more
-readable and maintainable.
+Huh, this is really ugly. Why the explosion of pointless helpers when
+the whole design of the sysreg infrastructure to have *common* helpers
+for registers that behave the same way?
 
-Best regards,
-baolu
+I'd expect something like the hack below instead.
+
+	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a2c5f210b3d6..8f560a2496f2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -987,42 +987,46 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
+-					  u64 reg, u64 val, bool set)
++static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 val)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
++	bool set;
+ 
+ 	mutex_lock(&kvm->arch.config_lock);
+ 
+ 	/* Make the register immutable once the VM has started running */
+ 	if (kvm_vm_has_ran_once(kvm)) {
+ 		mutex_unlock(&kvm->arch.config_lock);
+-		return;
++		return 0;
+ 	}
+ 
+ 	val &= kvm_pmu_valid_counter_mask(vcpu);
+ 	mutex_unlock(&kvm->arch.config_lock);
+ 
++	switch(r->reg) {
++	case PMOVSSET_EL0:
++		/* CRm[1] being set indicates a SET register, and CLR otherwise */
++	        set = r->CRm & 2;
++		break;
++	default:
++		/* Op2[0] being set indicates a SET register, and CLR otherwise */
++	        set = r->Op2 & 1;
++		break;
++	}
++
+ 	if (set)
+-		__vcpu_sys_reg(vcpu, reg) |= val;
++		__vcpu_sys_reg(vcpu, r->reg) |= val;
+ 	else
+-		__vcpu_sys_reg(vcpu, reg) &= ~val;
+-}
+-
+-static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++		__vcpu_sys_reg(vcpu, r->reg) &= ~val;
+ 
+-	*val = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+ 	return 0;
+ }
+ 
+-static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 val)
++static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 *val)
+ {
+-	/* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
+-	set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & 0x1);
++	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++
++	*val = __vcpu_sys_reg(vcpu, r->reg) & mask;
+ 	return 0;
+ }
+ 
+@@ -1054,23 +1058,6 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static int get_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+-
+-	*val = __vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
+-	return 0;
+-}
+-
+-static int set_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 val)
+-{
+-	/* r->Op2 & 0x1: true for PMINTENSET_EL1, else PMINTENCLR_EL1 */
+-	set_pmreg_for_valid_counters(vcpu, PMINTENSET_EL1, val, r->Op2 & 0x1);
+-	return 0;
+-}
+-
+ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+ {
+@@ -1095,23 +1082,6 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static int set_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-		      u64 val)
+-{
+-	/* r->CRm & 0x2: true for PMOVSSET_EL0, else PMOVSCLR_EL0 */
+-	set_pmreg_for_valid_counters(vcpu, PMOVSSET_EL0, val, r->CRm & 0x2);
+-	return 0;
+-}
+-
+-static int get_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-		      u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+-
+-	*val = __vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
+-	return 0;
+-}
+-
+ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+ {
+@@ -2311,10 +2281,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ PMU_SYS_REG(PMINTENSET_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1,
+-	  .get_user = get_pminten, .set_user = set_pminten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMINTENCLR_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1,
+-	  .get_user = get_pminten, .set_user = set_pminten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+@@ -2366,13 +2336,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0,
+-	  .get_user = get_pmcnten, .set_user = set_pmcnten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMCNTENCLR_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0,
+-	  .get_user = get_pmcnten, .set_user = set_pmcnten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMOVSCLR_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0,
+-	  .get_user = get_pmovs, .set_user = set_pmovs },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	/*
+ 	 * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
+ 	 * previously (and pointlessly) advertised in the past...
+@@ -2401,7 +2371,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
+ 	{ PMU_SYS_REG(PMOVSSET_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0,
+-	  .get_user = get_pmovs, .set_user = set_pmovs },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 
+ 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
+ 	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
+
+-- 
+Without deviation from the norm, progress is not possible.
