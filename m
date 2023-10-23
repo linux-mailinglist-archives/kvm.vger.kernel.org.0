@@ -2,73 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 339A27D3CD5
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 18:47:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98A1F7D3BD1
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 18:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbjJWQry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 12:47:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47448 "EHLO
+        id S230338AbjJWQKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 12:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbjJWQrv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 12:47:51 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AD65E5;
-        Mon, 23 Oct 2023 09:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698079668; x=1729615668;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=k5NUL4mpopozZ11ahoVTd3kwFnCjQG+h6jR8y0XkgV8=;
-  b=miqrnXXKpUr0FcBV8La3i1TZHXoIXlLzNhDWjIlboYSZi8JZx+h54hM/
-   oJOrQaQTLed4fu7mq+M8NdWOrTTnCUNEeKHaJsMXi7QSK60X2JqU/VIpB
-   SmEUXGwjjCAWtIl/RDU9Pmhf38lKxhjmoAlBWpDcsUcFgtcBI7q75YLOS
-   nM0+/6fqn5Swil75jH7fxW4SBHaVlRIUAKsMclGwuyOH9P9X5Nb4tFrMd
-   kFe+tKT3frn+vN7POe2wZ2xTcSvGp2a+qoBhbFRymuO6YP8dcHdheJoL3
-   i8v5emn9O/OpIvG6m5uN/ySIbkUUfPz5p0owT+qj0yX0tFEOGDNa0932+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="389729889"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="389729889"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 09:47:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="758184082"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="758184082"
-Received: from unknown (HELO windy) ([10.241.244.107])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 09:47:39 -0700
-Date:   Mon, 23 Oct 2023 09:06:59 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Nikolay Borisov <nik.borisov@suse.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
-        ak@linux.intel.com, tim.c.chen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com
-Subject: Re: [PATCH 5/6] x86/bugs: Cleanup mds_user_clear
-Message-ID: <20231023160659.cfa37wlcqfty43rp@windy>
-References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-5-cff54096326d@linux.intel.com>
- <56c57e1a-bb08-4ac8-9d3b-bdc649640cfb@suse.com>
+        with ESMTP id S231159AbjJWQKP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 12:10:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779E510C3
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 09:09:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698077362;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bqqE5czpXMxH5iFgmUcq2irlpONgu0FEk0Dvm4SVDQU=;
+        b=R86D1YbVnJUc4OOS5bZrRpCufNR1t+Ab/85A1S/+z2Vdsftx+foBFcvNn8tDQHQnzssQq6
+        6UWEJXSnhc85rzjHs73ApL4z2y2a0nBfVlka9bUGIC1K2eiUWBaVazKrMulIW6Tt6fPXti
+        n8dJShZKQbdNQOnQv26Jtc/G+lhqvrM=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-204-qAkLXVbtPsaUuR1koXffXA-1; Mon, 23 Oct 2023 12:09:16 -0400
+X-MC-Unique: qAkLXVbtPsaUuR1koXffXA-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-79fd91b8494so471451339f.3
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 09:09:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698077355; x=1698682155;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bqqE5czpXMxH5iFgmUcq2irlpONgu0FEk0Dvm4SVDQU=;
+        b=ZT6GYkkzozpB98Kf56RmkPijUknjcwVzDFiNinCRnRi+AeJ1u32v20zeYG6pL3mjrc
+         K7aTfzZWLrJL+OR9377ZLmiBLs0ffHGAoKaX9CvCVv20NQYC7l+Uxojk5XPrIwTNNffD
+         zsMGfjKE4ByLJskBzzHdJiJfQs5a6lRZmB0gHL7I4bfBoUjAigq9pu0mE0W2JnYG3Nf5
+         LXb25L7KOLry78yTYemPekNixNKdMlTSNS1pNM7U+FobSc7x6kCv60uUPXlWJHkyyi0a
+         kOageIwckNu0oYHNNbsgj3Olbm/bZag5nAndVnQ5lsLA/RkZJ1v71Garmvaaf6vWqRBH
+         LAKQ==
+X-Gm-Message-State: AOJu0YywrO4P4HPt18vEnBaKvRmg99v5TxOxJwv5j3GSrtGDa8fKH6e3
+        LIKVuGdnhc7SD2BtvIEOQftiNMmxjQ9sWYs3xq1MvhLGTqmt48pfp51fvcyjbp/K5yUZCGvjO5a
+        8LCe7LY5DjfEM
+X-Received: by 2002:a05:6602:150d:b0:7a9:5ac1:549e with SMTP id g13-20020a056602150d00b007a95ac1549emr4219050iow.8.1698077355388;
+        Mon, 23 Oct 2023 09:09:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEMh98OjQBLUxNybkpE1MPJ4Xw+W2v26Ibokh2vgJ0Hf/IrBfQpSS6ukaHHKPqIszxXCSSIOw==
+X-Received: by 2002:a05:6602:150d:b0:7a9:5ac1:549e with SMTP id g13-20020a056602150d00b007a95ac1549emr4219022iow.8.1698077355151;
+        Mon, 23 Oct 2023 09:09:15 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id fw13-20020a0566381d8d00b0042b4b55f46fsm2275798jab.117.2023.10.23.09.09.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 09:09:14 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 10:09:13 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
+        kevin.tian@intel.com, joao.m.martins@oracle.com,
+        si-wei.liu@oracle.com, leonro@nvidia.com, maorg@nvidia.com,
+        jasowang@redhat.com
+Subject: Re: [PATCH V1 vfio 0/9] Introduce a vfio driver over virtio devices
+Message-ID: <20231023100913.39dcefba.alex.williamson@redhat.com>
+In-Reply-To: <20231023154257.GZ3952@nvidia.com>
+References: <20231017134217.82497-1-yishaih@nvidia.com>
+        <6e2c79c2-5d1d-3f3b-163b-29403c669049@nvidia.com>
+        <20231023093323.2a20b67c.alex.williamson@redhat.com>
+        <20231023154257.GZ3952@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <56c57e1a-bb08-4ac8-9d3b-bdc649640cfb@suse.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,16 +85,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 23, 2023 at 11:51:39AM +0300, Nikolay Borisov wrote:
-> 
-> 
-> On 20.10.23 г. 23:45 ч., Pawan Gupta wrote:
-> > There are no more users of mds_user_clear static key, remove it.
-> > 
-> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> 
-> This patch can be squashed into the previous one. You've already done the
-> bulk of the work to eliminate usage of mds_user_clear there.
+On Mon, 23 Oct 2023 12:42:57 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Yes, it can be squashed, into previous one. Will do that in next
-revision.
+> On Mon, Oct 23, 2023 at 09:33:23AM -0600, Alex Williamson wrote:
+> 
+> > > Alex,
+> > > Are you fine to leave the provisioning of the VF including the control 
+> > > of its transitional capability in the device hands as was suggested by 
+> > > Jason ?  
+> > 
+> > If this is the standard we're going to follow, ie. profiling of a
+> > device is expected to occur prior to the probe of the vfio-pci variant
+> > driver, then we should get the out-of-tree NVIDIA vGPU driver on board
+> > with this too.  
+> 
+> Those GPU drivers are using mdev not vfio-pci..
+
+The SR-IOV mdev vGPUs rely on the IOMMU backing device support which
+was removed from upstream.  They only exist in the mdev form on
+downstreams which have retained this interface for compatibility and
+continuity.  I'm not aware of any other means by which the SR-IOV RID
+can be used in the mdev model, therefore only the pre-SR-IOV GPUs
+should continue to use the mdev interface.
+
+> mdev doesn't have a way in its uapi to configure the mdev before it is
+> created.
+
+Of course.  Thanks,
+
+Alex
+
