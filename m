@@ -2,133 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D02E87D2773
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 02:18:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BB777D280F
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 03:37:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232885AbjJWASR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Oct 2023 20:18:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57080 "EHLO
+        id S233005AbjJWBhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Oct 2023 21:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjJWASO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Oct 2023 20:18:14 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D78DC;
-        Sun, 22 Oct 2023 17:18:11 -0700 (PDT)
+        with ESMTP id S229457AbjJWBhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Oct 2023 21:37:07 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BFAF1
+        for <kvm@vger.kernel.org>; Sun, 22 Oct 2023 18:37:04 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iKiNWAAwM5U1qqEu1KyiXbQ2Z2rhRCSeuyGXlZSSmT8/q4taGFObnoJjG8pJZNamKghu/GCuFMIN3onWv0LvsZXcCTPLcYdii2GF4dTzu7kR30sy7pDmey4ntmEPqM2sc0vHTqPPFLqxP5fdU55KXdMRLCBDyMf5S5sD2cZ8vr+r2QvdZy1b3LmPKihdl0REHhDzSO8T3rXCk/ccGb1F+rFMGsipDNCPRiBiWw07rbMpQnEP0ratJ7yH77qVHmABehB67iX0uxrjC7Vahk1Ids69x86ZJ9GPbWJLCzkpBTumWy6YgDnbAemHR2TWCUwmL885l3hK6vkNez6e2MhbAw==
+ b=KjxpP4cO2f6jRUlzWR0nFmNI3vNiFk8HoNs1MqAonrilpLK4OvJH/QEqgX06yHIljMNMnHOur+u+7rRZTznYc2BDewuffufnGaQ7qMZ63MP8nuwxK3DLvN08NKQa+PdQ5carTD0wbPcqE0P2gS49vbMjG1pZcpW5RmHTTLBqU2TSL+N28rVADFyUDr+F17nXXQjXCsEtJy5A4kmLH2fnuljHx3LxVqExzUM61iXgbhNv/d/OFvBzsG0h4RVwsVKIZMg7sA/S8EPN/9dBTU6ARi9uwfJSimXAzmbRNtLNBgPrFHCEGWqwzQB6yBpY2cnxEaIhCiNM1SSHMfETGsGhGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+c9+A4oYI7HqE1XgBgBzhelXS4DN2/kC/dQ5UeZgvhs=;
- b=KA6xAnvWtixahQyP9Mif5mLEF9GxLBVi7wecUvGhTQAoyVSKQhmXA0eMT9sL8SckZd0XBKT3Xcvjff2X3o18lhk2+Tag5mEoB5xPKrtkoFfbgc1lhGjQ5b7tPY0IpVjX9rfle/KZ/DU/ulsqueYmYqO5YGAbIXlMVsnbGgudse8qhHRDh/kFunZa92pO6XsP7Jngew43iq8XxNteQ5pJexKzkgt5vfddME+k0SiJaX3FgnxnaLJT4SjRCZWGRHekEcm5nrghgASFyIPXu1lFluiW0F8IBmVlwfjL58z8zYD27NHYcaOEwwfv8KQgmxknLvPYLJbOzxEGGLVX/JtCRw==
+ bh=1sIUGJ/DwEuMlY/pMBPwWjVZPK83b9v9modSQbQMMOY=;
+ b=MFIYfMKQ0zF4wwNjPOLdBa9KYHt3/wJ5Juv9fP3crCWwhUOR9d3jZKrqhIm7r1BPXLMWpi59cW0Fii4dFxMHNsVqQ53CYk3CwQNaOA/UbiwyvCRPvWP6e593UJALD1R77dZN5Kfx5SGbHDKfR36hkGLEQ0EHmDrimBuBXLSg2UtbEgUtxPlXYsTZ9+W852s4XF50bWYXnyB3aGtiHcH9GTKZ6XmDnCsVG0CsmR1McMdqV60C5c5Li8QL21SbN5hCcHHrvUWAUf8eUSIXQThLsdznFRRhuZljWTf5aCjoQ55YiDwmWxyeQA3kNxpapJ/IHyaO3ULRL+5qwG7pO4n4Qg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+c9+A4oYI7HqE1XgBgBzhelXS4DN2/kC/dQ5UeZgvhs=;
- b=E7ZNo6LW2agmA7j9IRjYjmYA4R8q8MPz+lnluFWEPtBN5idbFLU0HNP+yQthSn7QioABwZjJnyTZItnMrt4tDlD/k+wAeaqy+twUDVEMSoMusifTRDiJpmKrQJdfNdOt+LHho6ryPrFV39oPhhtQh3CrBBhbiirvCLqXuBKMrSk4CCtD1Hv7QS8lh9s5jomAsCgCOag7wSdCoyTDPi04HEyBJi+63WYCw9CP8wDO3tdOeztSDTkaVnr4KVN2NhQoj9Q4ts3lqBQWtsH5/2FYW7OZ7J3QGvIsruXJMteYP7qDvxYC8gz5A81HhdQ1y0DkrRz3jcqnBv3yJ6RSMRaqXA==
-Received: from DS7PR03CA0159.namprd03.prod.outlook.com (2603:10b6:5:3b2::14)
- by DS7PR12MB8369.namprd12.prod.outlook.com (2603:10b6:8:eb::18) with
+ bh=1sIUGJ/DwEuMlY/pMBPwWjVZPK83b9v9modSQbQMMOY=;
+ b=pvuASusjGGSH/xKt6W/43TSJHW38T5xAAyOFqemUuWBg0VoYz9jYW3q/m8V94ZyWcK3HvEXWVIBBDqnRLrKw+EWd9Fz3NFs3GrNRjXQL39Eq4w//774iYG2SkxOLw8BejJm+61SG9/LAAb4iJFh3Km46tSMrXVPIWt4/USDrcJpQNejW5j/FeT/E0e3v0PBI1WD8dyXBxVC6SUVXRMQCMGZC/UIxs5X3Dw6UnmI+7jv9WgitpvTFtmkA3gENHu6RS+YmV6eLSwx+HiLnx9lIz62okBwsvmyh14YjFG8Apd4j2+RjyJ/8uukV0mLybDcJgJ5o2rBYyh6JwEUBzo4bVg==
+Received: from BN9PR03CA0229.namprd03.prod.outlook.com (2603:10b6:408:f8::24)
+ by CH2PR12MB4938.namprd12.prod.outlook.com (2603:10b6:610:34::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Mon, 23 Oct
- 2023 00:18:07 +0000
-Received: from DS1PEPF00017090.namprd03.prod.outlook.com
- (2603:10b6:5:3b2:cafe::4b) by DS7PR03CA0159.outlook.office365.com
- (2603:10b6:5:3b2::14) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 01:37:02 +0000
+Received: from SA2PEPF0000150B.namprd04.prod.outlook.com
+ (2603:10b6:408:f8:cafe::b0) by BN9PR03CA0229.outlook.office365.com
+ (2603:10b6:408:f8::24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33 via Frontend
- Transport; Mon, 23 Oct 2023 00:18:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ Transport; Mon, 23 Oct 2023 01:37:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF0000150B.mail.protection.outlook.com (10.167.242.43) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.15 via Frontend Transport; Mon, 23 Oct 2023 00:18:07 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6933.15 via Frontend Transport; Mon, 23 Oct 2023 01:37:01 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 22 Oct
- 2023 17:18:06 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Sun, 22 Oct 2023 17:18:05 -0700
-Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 18:36:39 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 22 Oct
+ 2023 18:36:39 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41 via Frontend
- Transport; Sun, 22 Oct 2023 17:18:04 -0700
-Date:   Sun, 22 Oct 2023 17:18:03 -0700
+ Transport; Sun, 22 Oct 2023 18:36:38 -0700
+Date:   Sun, 22 Oct 2023 18:36:36 -0700
 From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
+To:     Joao Martins <joao.m.martins@oracle.com>,
         Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-        "Martins, Joao" <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v4 08/17] iommufd: Always setup MSI and anforce cc on
- kernel-managed domains
-Message-ID: <ZTWabb6AbOTFNgaw@Asurada-Nvidia>
-References: <BN9PR11MB5276FDC375685CE04A7AD93B8CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231017155301.GH3952@nvidia.com>
- <ZS7nb+mKanGFXhZY@Asurada-Nvidia>
- <20231018165113.GB3952@nvidia.com>
- <BN9PR11MB5276B9994AD06E91E07B7EF08CD4A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231019235350.GY3952@nvidia.com>
- <BN9PR11MB5276A64DA68586AEFB6561148CDBA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20231020135501.GG3952@nvidia.com>
- <ZTLOAQK/KcjAJb3y@Asurada-Nvidia>
- <20231021163804.GL3952@nvidia.com>
+CC:     <iommu@lists.linux.dev>, Kevin Tian <kevin.tian@intel.com>,
+        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH v5 00/18] IOMMUFD Dirty Tracking
+Message-ID: <ZTXOJGKefAwH70M4@Asurada-Nvidia>
+References: <20231020222804.21850-1-joao.m.martins@oracle.com>
+ <20231021162321.GK3952@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231021163804.GL3952@nvidia.com>
+In-Reply-To: <20231021162321.GK3952@nvidia.com>
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|DS7PR12MB8369:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7de6bdf0-d408-4b6a-a13c-08dbd35d8827
+X-MS-TrafficTypeDiagnostic: SA2PEPF0000150B:EE_|CH2PR12MB4938:EE_
+X-MS-Office365-Filtering-Correlation-Id: a63965c2-f861-47aa-8d19-08dbd3688e52
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: T6XmP+jioJGCuN6dQpU8ffmuEYHoUbYaO6RG/bupssSU5ljegl0ocwBIIPC2GSpTfZYOO1kBNnBAMCb0nkMwV8goao4sydXt2RG4nv1eFLpttxP3iBZDSCPMUqw/ApsvteAbEiutaU65hWtCucttWqdRRyZ3DlnGXBmkgJO0NVIFQSjLXnwtOf5G6Zao+j1VDyf/2Li4GyiN5w/h8P8IOW0bwcdn9eCE0Lteh/4ALWdSKvDtMVON2hrpMYwGmpZ7CCvwuvZxDr0zrWX431iIcEJn6j88Yb8xXWMX8q54G1Rlwai3obx9nRBwbV4dVaB7uyOc0yu+upY55JasQvIOJrjaV0D/73mnbfgCTtaUR8Q+J5GfQycE62EjCNX4q8GN6qgwP8rVRKmNnP8HGV31Otzs4UR8TClx6xVpujel0sbdvo1a+uGD9kiqsNdcxA/PVQKLTGatXV9n/u7kGQGT/JyYA1zlNna9fLcjn7S0cLUZDksZTYVfWjY46RBUdWUftHCbBaNOQThUdjqOh/7fX1NWP6LT6QyMWAIYg+prb0CwpLV3usUKOgcs7zVr8VyFbG79qPLx2bA3HmW+mB9Y0nlAorotnQgyONRiQmqEiWVX/oai/qKFJ3Q5H5Jl1t+uX7cQOp/CfU5KkBYjPvS5jO7RUzsZmNwJup3JXRSibcCZZjiVWQVoZVOr082w7zlNqgzRmWhMpd5lvEyfMjNhCyCIMPGdzL/60rh7UrIUDi7myk7P51OyXuys4mAe8OooA4uPPQ0V8EvnsusdH1uVXDAqAPPdCtR63XDnyzUSWS4=
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(346002)(39850400004)(376002)(230922051799003)(451199024)(186009)(1800799009)(82310400011)(64100799003)(40470700004)(46966006)(36840700001)(2906002)(55016003)(86362001)(40460700003)(4326008)(966005)(5660300002)(6636002)(110136005)(70586007)(70206006)(54906003)(316002)(8936002)(478600001)(41300700001)(83380400001)(356005)(8676002)(40480700001)(7416002)(47076005)(36860700001)(82740400003)(336012)(9686003)(426003)(7636003)(26005)(33716001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: MH+YdofEQnvraN/+Q2Ec/RTQ+QVnm4jPy1Pv3/BVPvz1yfZI6ka++6zVqyUjkeDNIJKAxXaUaWgyTnx3+O8Ex1XL8yi0LLrKCbUx5NWGH7TylPsgpJs/MkJqesrhbUTebk9vqCt8YAi5s7SXW+CqW/jXacb7ZjlIDxNxLRge5Eq+QhAxXw2XPYUx9W7QIfOgYKYVTdT9EOT3azAkHNqi529Ai+LAsTOskPamZK0sy42X7dMltSJxTRpOLMFRCpxWpEbctBk3GcAxRXelND7nUUiAI+I8s0B1Oq98EQS114aXb0gXtZKTMLSe8V9ZEZ5TSfmwXoWZhZ+m9pISW32HODgYHzwHLlZKwGfkffoxhm9UQ7D4gtbFzyDmR5rYN9XvzgLlraWbCsNhFqlYl5tNW4Y4gi+PdQxlbm6uU0ElSZzEAKG+YeQr2ezFsVaJG85bQyrmay1JLdJQr46MEMM/Kg8SxwdWl4Q2iYJ5J5d1CBfpizMHOSQUzP4rlKF5xQPIOr6Dt8mjpi5m6cEsaKeQWuara2nqe5aMcl+cRbWxe+e/4ktqFGspqJcYBdaDuneOltLiZYgnYsNgkxd/8vSsAAS/L+TdjFoTU9fkbFrKs7Chw92Vgme3HDYEgNZFL9it04Jl6vMvmLisj1lEQq/QyeWYHTmTLE9R+cteKbBqaDL5IsuMGPrdC/fAH6Q6LHk3z+PhDcfN8523l+Ao1PyKsiNUmJ+NWSCOIVZeC6RDw9y9+9HKAc3zcw+mXMcgSoRG1tp+2opE0L55FSkausfnOw==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(39860400002)(346002)(230922051799003)(64100799003)(186009)(82310400011)(451199024)(1800799009)(40470700004)(46966006)(36840700001)(40480700001)(5660300002)(40460700003)(8936002)(8676002)(4326008)(47076005)(83380400001)(7416002)(2906002)(26005)(336012)(426003)(82740400003)(86362001)(9686003)(33716001)(7636003)(356005)(36860700001)(55016003)(54906003)(478600001)(6636002)(316002)(110136005)(70586007)(70206006)(41300700001)(14143004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 00:18:07.1212
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 01:37:01.9485
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7de6bdf0-d408-4b6a-a13c-08dbd35d8827
+X-MS-Exchange-CrossTenant-Network-Message-Id: a63965c2-f861-47aa-8d19-08dbd3688e52
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00017090.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF0000150B.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8369
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4938
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
         autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -136,79 +115,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 21, 2023 at 01:38:04PM -0300, Jason Gunthorpe wrote:
-> On Fri, Oct 20, 2023 at 11:59:13AM -0700, Nicolin Chen wrote:
-> > On Fri, Oct 20, 2023 at 10:55:01AM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Oct 20, 2023 at 02:43:58AM +0000, Tian, Kevin wrote:
-> > > 
-> > > > What we want to prevent is attaching a non-CC device to a CC domain
-> > > > or upgrade a non-CC domain to CC since in both case the non-CC
-> > > > device will be broken due to incompatible page table format.
-> > > 
-> > > [..]
-> > > 
-> > > > Who cares about such consistency? sure the result is different due to order:
-> > > > 
-> > > > 1) creating hwpt for dev1 (non-CC) then later attaching hwpt to
-> > > >     dev2 (CC) will succeed;
-> > > > 
-> > > > 2) creating hwpt for dev2 (CC) then later attaching hwpt to
-> > > >     dev1 (non-CC) will fail then the user should create a new hwpt
-> > > >     for dev1;
-> > > 
-> > > AH... So really what the Intel driver wants is not upgrade to CC but
-> > > *downgrade* from CC.
-> > > 
-> > > non-CC is the type that is universally applicable, so if we come
-> > > across a non-CC capable device the proper/optimal thing is to degrade
-> > > the HWPT and re-use it, not allocate a new HWPT.
-> > > 
-> > > So the whole thing is upside down.
-> > > 
-> > > As changing the IOPTEs in flight seems hard, and I don't want to see
-> > > the Intel driver get slowed down to accomodate this, I think you are
-> > > right to say this should be a creation time property only.
-> > > 
-> > > I still think userspace should be able to select it so it can minimize
-> > > the number of HWPTs required.
-> > > 
-> > > > But the user shouldn't assume such explicit consistency since it's not
-> > > > defined in our uAPI. All we defined is that the attaching may
-> > > > fail due to incompatibility for whatever reason then the user can
-> > > > always try creating a new hwpt for the to-be-attached device. From
-> > > > this regard I don't see providing consistency of result is
-> > > > necessary. 😊
-> > > 
-> > > Anyhow, OK, lets add a comment summarizing your points and remove the
-> > > cc upgrade at attach time (sorry Nicolin/Yi!)
-> > 
-> > Ack. I will send a small removal series. I assume it should CC
-> > stable tree also? 
+On Sat, Oct 21, 2023 at 01:23:21PM -0300, Jason Gunthorpe wrote:
+> On Fri, Oct 20, 2023 at 11:27:46PM +0100, Joao Martins wrote:
+> > Changes since v4[8]:
+> > * Rename HWPT_SET_DIRTY to HWPT_SET_DIRTY_TRACKING 
+> > * Rename IOMMU_CAP_DIRTY to IOMMU_CAP_DIRTY_TRACKING
+> > * Rename HWPT_GET_DIRTY_IOVA to HWPT_GET_DIRTY_BITMAP
+> > * Rename IOMMU_HWPT_ALLOC_ENFORCE_DIRTY to IOMMU_HWPT_ALLOC_DIRTY_TRACKING
+> >   including commit messages, code comments. Additionally change the
+> >   variable in drivers from enforce_dirty to dirty_tracking.
+> > * Reflect all the mass renaming in commit messages/structs/docs.
+> > * Fix the enums prefix to be IOMMU_HWPT like everyone else
+> > * UAPI docs fixes/spelling and minor consistency issues/adjustments
+> > * Change function exit style in __iommu_read_and_clear_dirty to return
+> >   right away instead of storing ret and returning at the end.
+> > * Check 0 page_size and replace find-first-bit + left-shift with a
+> >   simple divide in iommufd_check_iova_range()
+> > * Handle empty iommu domains when setting dirty tracking in intel-iommu;
+> >   Verified and amd-iommu was already the case.
+> > * Remove unnecessary extra check for PGTT type
+> > * Fix comment on function clearing the SLADE bit
+> > * Fix wrong check that validates domain_alloc_user()
+> >   accepted flags in amd-iommu driver
+> > * Skip IOTLB domain flush if no devices exist on the iommu domain,
+> > while setting dirty tracking in amd-iommu driver.
+> > * Collect Reviewed-by tags by Jason, Lu Baolu, Brett, Kevin, Alex
 > 
-> No, it seems more like tidying that fixing a functional issue, do I
-> misunderstand?
+> I put this toward linux-next, let's see if we need a v6 next week with
+> any remaining items.
 
-Hmm. Maybe the misunderstanding is mine -- Kevin was asking if
-it was already a bug and you answered yes:
-https://lore.kernel.org/linux-iommu/20231016115736.GP3952@nvidia.com/
+The selftest seems to be broken with this series:
 
-If this shouldn't be a bug fix, I could just merge them into a
-single tidying patch and add the comments you suggested below.
+In file included from iommufd.c:10:0:
+iommufd_utils.h:12:10: fatal error: linux/bitmap.h: No such file or directory
+ #include <linux/bitmap.h>
+          ^~~~~~~~~~~~~~~~
+In file included from iommufd.c:10:0:
+iommufd_utils.h:12:10: fatal error: linux/bitops.h: No such file or directory
+ #include <linux/bitops.h>
+          ^~~~~~~~~~~~~~~~
+compilation terminated.
 
-> > And where should we add this comment? Kdoc of
-> > the alloc uAPI?
-> 
-> Maybe right in front of the only enforce_cc op callback?
-
-OK. How about this? Might be a bit verbose though:
-	/*
-	 * enforce_cache_coherenc must be determined during the HWPT allocation.
-	 * Note that a HWPT (non-CC) created for a device (non-CC) can be later
-	 * reused by another device (either non-CC or CC). However, A HWPT (CC)
-	 * created for a device (CC) cannot be reused by another device (non-CC)
-	 * but only devices (CC). Instead user space in this case would need to
-	 * allocate a separate HWPT (non-CC).
-	 */
+Some of the tests are using kernel functions from these two headers
+so I am not sure how to do any quick fix...
 
 Thanks
-Nic
+Nicolin
