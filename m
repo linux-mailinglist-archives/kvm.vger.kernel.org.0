@@ -2,74 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 026CE7D3F53
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 20:35:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6347D3F55
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 20:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233324AbjJWSfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 14:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42216 "EHLO
+        id S229462AbjJWSfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 14:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbjJWSfb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 14:35:31 -0400
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B67C8F
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 11:35:29 -0700 (PDT)
-Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3b2e72fe47fso2541217b6e.1
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 11:35:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1698086128; x=1698690928; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IIoRI2ARPSz8WtQUlc5itQT0gMoQCkpLJtTDznyytSc=;
-        b=hCCbONk9aeS3MscLtPA1VLgVMXvUWrQ1ohu9W3XXuT6+KjK/QXVNPCIMNPG09W2MCW
-         TsOfEVCohg4FmVYJwXu8D4DTGqpVIyVIFy+lfBywKl0XRHEpZOrlahyM4RVPZVjcr3Hd
-         PonBM4simvyuMYbArJwX/8HHFxhnB/eLbKvQIgAtFd7KsE7/JfYknP+HPDfhjE07D9U1
-         J1Ot2I450c7zleH8zZcRKt+lhyxw9yxsZHY2re+Sxg1e6rrCpkPBthM69MMg0x4Hu0Up
-         X1LHnkcaqokwnxcellEI1Uk0AnakrTGR8nG+tR4jl/5ad7HtG+3WjTWDmSS29dKKiP/U
-         OmBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698086128; x=1698690928;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IIoRI2ARPSz8WtQUlc5itQT0gMoQCkpLJtTDznyytSc=;
-        b=hSwfoyluwJu+CFo77qqoFSQ+a8624OyQhRDad7Krg7ruG0BOMuPj1O3vjF1Pll95an
-         2NHhLfoucp8UM4rhm3DDr1TCDiOli7Y4Yhg+36d9WcrfbLqafyOuRVVxmJvGIBRp3ptI
-         ct+XU+tmCa5Mv/6839aJxRGaJG3DeMeH/WG97cYGR7JYFyulADI8miayTvpQmt/BXJc7
-         go9PcgNOewQciLPcvSCbuRpYS6Pi+2ZZvwLSHAX6DEh9OPwJfhp7eJFjL3XT4NeXFmtJ
-         hE5Cb+zENi4+5pJeBLlvfpSBjYtkWr1jkEhwHv7q9kPb+tZhgTO9m0dX/kHgPCdpuD96
-         HGmA==
-X-Gm-Message-State: AOJu0Ywdef6UtEWvVpweWjYa9teETgSXa0CkdWNHymNFmPhWGpLqoiTd
-        LJPqo+yALGJzqYnVjVKYzBV+RuHjMOUA4HyUYrY=
-X-Google-Smtp-Source: AGHT+IF87A5sAEPwDGGscH4VZHk76YpcDJFB/PbHnNeeeYrEYuSNJeTyvaSasLb7bG0Tzfme5ZXN0A==
-X-Received: by 2002:a05:6808:158c:b0:3af:9848:1590 with SMTP id t12-20020a056808158c00b003af98481590mr12228373oiw.6.1698086128598;
-        Mon, 23 Oct 2023 11:35:28 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id bj6-20020a056808198600b003adcaf28f61sm1593859oib.41.2023.10.23.11.35.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 11:35:28 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1quzlv-003jZ6-6w;
-        Mon, 23 Oct 2023 15:35:27 -0300
-Date:   Mon, 23 Oct 2023 15:35:27 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Tina Zhang <tina.zhang@intel.com>
-Cc:     iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [RFC PATCH 06/12] iommu: Add mmu_notifier to sva domain
-Message-ID: <20231023183527.GM691768@ziepe.ca>
-References: <20231017032045.114868-1-tina.zhang@intel.com>
- <20231017032045.114868-8-tina.zhang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017032045.114868-8-tina.zhang@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        with ESMTP id S231449AbjJWSfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 14:35:52 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F09F101;
+        Mon, 23 Oct 2023 11:35:49 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFA2DC433C8;
+        Mon, 23 Oct 2023 18:35:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698086148;
+        bh=WHd8d0jouAtFnRWy/nehrEIWGuiFo70FfejIW0lR98A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=mlQCUgXeOkPMlnOORKfW4wTzAB9yX6aLvM8bFtJnCnu1mb5WFxPIBxUqj1qe4Qsh7
+         bu2yE1Vsr00HNYUm6H6MQLvvYST4rv/4fuyDKI3B8SykvQOzqK902lHfArSePy7ZuC
+         hhO5V9fn8/QVlnILo2gLIbv+Q5iIMREzal9jg/45QPGdH85o862bpvaX1Ct9xGekDd
+         rlRS4mn+z52AmZaw8sor+R+9QUh2XsfWoEfGe7RuknUp9bX4mVhaONDRp69UCSyFnN
+         z6ABjEtA/6tBeMdpoTG/hPFGYmilsFUkl/9NFbexXXAhSIrmuTfUIy+ccq36aregQl
+         t2L2eUwE8jDxw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1quzmE-006x8t-7w;
+        Mon, 23 Oct 2023 19:35:46 +0100
+Date:   Mon, 23 Oct 2023 19:35:44 +0100
+Message-ID: <86r0ll4267.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v8 00/13] KVM: arm64: PMU: Allow userspace to limit the number of PMCs on vCPU
+In-Reply-To: <20231020214053.2144305-1-rananta@google.com>
+References: <20231020214053.2144305-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, yuzenghui@huawei.com, shahuang@redhat.com, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,32 +69,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On Tue, Oct 17, 2023 at 11:20:39AM +0800, Tina Zhang wrote:
-> Devices attached to shared virtual addressing (SVA) domain are allowed to
-> use the same virtual addresses with processor, and this functionality is
-> called shared virtual memory. When shared virtual memory is being used,
-> it's the sva domain's responsibility to keep device TLB cache and the CPU
-> cache in sync. Hence add mmu_notifier to sva domain.
+On Fri, 20 Oct 2023 22:40:40 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> ---
->  include/linux/iommu.h | 2 ++
->  1 file changed, 2 insertions(+)
+> Hello,
+> 
+> The goal of this series is to allow userspace to limit the number
+> of PMU event counters on the vCPU.  We need this to support migration
+> across systems that implement different numbers of counters.
 
-You should look at how arm smmuv3 ended up after I went over it to
-make similar changes, I think you should take this patch
+FWIW, I've pushed out a branch[1] with a set of fixes that address
+some of the comments I had on this series. Feel free to squash them in
+your series as you see fit.
 
-https://lore.kernel.org/linux-iommu/20-v1-afbb86647bbd+5-smmuv3_newapi_p2_jgg@nvidia.com/
+	M.
 
-into this series (maybe drop the arm part)
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu_pmcr_n
 
-And copy the same basic structure for how the mmu notifier works.
-
-It would also be nice if alot of the 'if_sva' tests could be avoided,
-smmu didn't end up with those..
-
-In the guts of the pasid handling sva shouldn't be special beyond a
-different source for the pgd.
-
-Jason
+-- 
+Without deviation from the norm, progress is not possible.
