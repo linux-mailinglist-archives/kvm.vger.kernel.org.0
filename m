@@ -2,56 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D2557D2F6A
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 12:04:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AF9C7D2F77
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 12:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232316AbjJWKEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 06:04:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41612 "EHLO
+        id S229750AbjJWKIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 06:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233225AbjJWKEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 06:04:04 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9F0F7
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:04:01 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9bdf5829000so456988266b.0
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:04:01 -0700 (PDT)
+        with ESMTP id S229568AbjJWKIb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 06:08:31 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4D9DA
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:08:28 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9bf941607d4so93414866b.1
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 03:08:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1698055440; x=1698660240; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zx08EZvgl0rut/KB9vhuv+Y1Cl0tPVpq0Bjph7cTE4E=;
-        b=f8Glfo9eKGIQASwVtPipy4T/HwESX9sKomR5Q3TqSTIRmYLmTZr/Q83yhnVqVOB0TL
-         Fu92vbKCdfGdkG7Y8zsv6Y7hX1UY698G8rnT8OlWPCBsMo9LbfU6WHiD79q4ZUjYiBUw
-         x4pxS7+Wvlu74hlujb8wd4OgotHASBQJVeonzIPXus9C01LvjrI5hY2/a59ahUwoyCqQ
-         GCK4egN2FgpbDEoGTP9uhgzqOVWdtt5H99HJO9WzjWxmV25+XnisIkGJ7jaz2BVa4E2H
-         xkTTLWzt9AXYC+fOFQytggNUh45PVTsr0bP0edIx9/HMs0jVlm3uQX5e1+MusGC4kM8Z
-         B/sA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1698055707; x=1698660507; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1aEOfuIyiwkOnqlQnKYH2Ng5EBPcZk7vfkvoKG6EFyM=;
+        b=tthll7qrPLWYb5bp/TNK3iB1mja4LCgJTBjBgfF6PXf8JkoVIovDMpL0tjv2Hezvsa
+         28AIKGn9YfDrpJTl102HX+LF2CzQq6xkqoGdwPoA6d5blR6r9bYjJrdFWmnILYpEJl1/
+         Vp91LzOD01OPQp+rp5sNNwSX7+YLddGWuUT8SUzyX/9J0N9SHCy2M4S8XBLh4Ky5rzCg
+         hS0lQhGa0jnGnkmOPB/HJc5xx+qdlW+Qpn6O5wdekf+FIotGmm76sbnpY34nZGgixLfs
+         aoI4SNadY2peAP7linbc7aoh4tIW2uJ5f1v9syTmC7TkkE/iB0s6dk//Ih3AF3y1qC/d
+         Yixg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698055440; x=1698660240;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1698055707; x=1698660507;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zx08EZvgl0rut/KB9vhuv+Y1Cl0tPVpq0Bjph7cTE4E=;
-        b=oubZmJvZpXIizPd7mBtxJ8MlYn3jqgshyaKlEGq1nYn5fb80d7MZg8D9v8Fu2CjG67
-         RFYfCApN7XL7kyhEhKmjfU2vvl+/jzrRskdkE32/RPrB7WLQZVEuKW2nQo7KduvpQIy8
-         DKXTB/uzgVGlKFB5e5PjKo8Qk/TGhvyRLngSi1koH5Ls/DEA0dKLPRtznt3+WY8sv516
-         RaLlZYY51qn40trEPfFJ6JNUMgNyfy5OYD4aGYfbH9T4oa2uYiYiP1MA7dsuyW6HTFdF
-         pzQdlzI1lA68CKcTUIB4azFL3v07/IpFvh0OpAo13M6JdmWTwwaxWB/1/apCl/Z3GoWb
-         K/NA==
-X-Gm-Message-State: AOJu0YyBbm1K21wNATaiLKBe4kCaZiIqEYY5TRezolJFfPjJWPOxgB33
-        YvGFM84W4CX/aWEXMKP/qimjviEA/xlaF4+sg5Q=
-X-Google-Smtp-Source: AGHT+IG3sS2mYytSxxYKysZeeec9WpQOjDiBbVsMrjyLfRgQIGoY7P02CFsd+W2kTdU6GUmUHdU71w==
-X-Received: by 2002:a17:907:3f17:b0:9be:77cd:4c2c with SMTP id hq23-20020a1709073f1700b009be77cd4c2cmr6056230ejc.28.1698055440453;
-        Mon, 23 Oct 2023 03:04:00 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id pj19-20020a170906d79300b009ad829ed144sm6355041ejb.130.2023.10.23.03.03.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 03:04:00 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 12:03:59 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+        bh=1aEOfuIyiwkOnqlQnKYH2Ng5EBPcZk7vfkvoKG6EFyM=;
+        b=VY8Rp7K/nEfMhFCP+wc3HftiAocT7obJ7e3Jgk8nR6C2DP0cXi73UILHzkX0zrwDEn
+         8fh3JFHDOimvT0+JvX5l1FQLNnWmnO/C1MoLLnFVtSYWKudYC4UCIPa7zSTN15hhpDtH
+         cwPLD8/2E+9764NOOHWnrNnal+rjz6DSdkceQTg3ScsQ8bGW/5TijGwu9sACBA0j/WbV
+         qIoSzvXQtd/HMC841pRNVjr5Kk2vaImbinSJfVSnu4t13f0JzLYHyA0g5QJ/ocZ88Io8
+         qt3TnOuBb93fCtSI/SdZJps7eiE1SZsgQ7QB2F6jxn6OaO4bXt2rMka1elVi88Z14awk
+         vitg==
+X-Gm-Message-State: AOJu0YwqZMkTxyeTGeeZfe6nOCupEMXobfk8nrEiK7s4Vh5Gq6fiFpYN
+        ei1CxUK+AKk6CrNUeKuQP/k9k5oSUdYvlqn7vgZbbw==
+X-Google-Smtp-Source: AGHT+IF0AGitdQJUS/4bR8okkah9gJ8ur6YNsJ9+3rz+vlExwWE6UKBsdxQZQMbHsSgKlRITPAhqDQ==
+X-Received: by 2002:adf:a30e:0:b0:32d:c312:49af with SMTP id c14-20020adfa30e000000b0032dc31249afmr5895229wrb.6.1698055686818;
+        Mon, 23 Oct 2023 03:08:06 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:17bb:4fd9:531:a7cc? ([2a01:e0a:999:a3a0:17bb:4fd9:531:a7cc])
+        by smtp.gmail.com with ESMTPSA id k13-20020a5d628d000000b0032daf848f68sm7437719wru.59.2023.10.23.03.08.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 03:08:06 -0700 (PDT)
+Message-ID: <435519d9-e569-4714-b50b-f46ac281478e@rivosinc.com>
+Date:   Mon, 23 Oct 2023 12:08:05 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] riscv: Use SYM_*() assembly macros instead of
+ deprecated ones
+Content-Language: en-US
+To:     Andrew Jones <ajones@ventanamicro.com>
 Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
@@ -59,63 +64,172 @@ Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
         Atish Patra <atishp@atishpatra.org>,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 5/5] riscv: kvm: use ".L" local labels in assembly when
- applicable
-Message-ID: <20231023-c9629db3ee7d3e845030bc26@orel>
 References: <20231004143054.482091-1-cleger@rivosinc.com>
- <20231004143054.482091-6-cleger@rivosinc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+ <20231004143054.482091-3-cleger@rivosinc.com>
+ <20231023-136cad6e15a2c5c27b6176af@orel>
+From:   =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20231023-136cad6e15a2c5c27b6176af@orel>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231004143054.482091-6-cleger@rivosinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 04, 2023 at 04:30:54PM +0200, Clément Léger wrote:
-> For the sake of coherency, use local labels in assembly when
-> applicable. This also avoid kprobes being confused when applying a
-> kprobe since the size of function is computed by checking where the
-> next visible symbol is located. This might end up in computing some
-> function size to be way shorter than expected and thus failing to apply
-> kprobes to the specified offset.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  arch/riscv/kvm/vcpu_switch.S | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/vcpu_switch.S b/arch/riscv/kvm/vcpu_switch.S
-> index 8b18473780ac..0c26189aa01c 100644
-> --- a/arch/riscv/kvm/vcpu_switch.S
-> +++ b/arch/riscv/kvm/vcpu_switch.S
-> @@ -45,7 +45,7 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
->  	REG_L	t0, (KVM_ARCH_GUEST_SSTATUS)(a0)
->  	REG_L	t1, (KVM_ARCH_GUEST_HSTATUS)(a0)
->  	REG_L	t2, (KVM_ARCH_GUEST_SCOUNTEREN)(a0)
-> -	la	t4, __kvm_switch_return
-> +	la	t4, .Lkvm_switch_return
->  	REG_L	t5, (KVM_ARCH_GUEST_SEPC)(a0)
->  
->  	/* Save Host and Restore Guest SSTATUS */
-> @@ -113,7 +113,7 @@ SYM_FUNC_START(__kvm_riscv_switch_to)
->  
->  	/* Back to Host */
->  	.align 2
-> -__kvm_switch_return:
-> +.Lkvm_switch_return:
->  	/* Swap Guest A0 with SSCRATCH */
->  	csrrw	a0, CSR_SSCRATCH, a0
->  
-> -- 
-> 2.42.0
->
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+On 23/10/2023 11:59, Andrew Jones wrote:
+> On Wed, Oct 04, 2023 at 04:30:51PM +0200, ClÃ©ment LÃ©ger wrote:
+> ...
+>> diff --git a/arch/riscv/lib/memmove.S b/arch/riscv/lib/memmove.S
+>> index 1930b388c3a0..5130033e3e02 100644
+>> --- a/arch/riscv/lib/memmove.S
+>> +++ b/arch/riscv/lib/memmove.S
+>> @@ -7,7 +7,6 @@
+>>  #include <asm/asm.h>
+>>  
+>>  SYM_FUNC_START(__memmove)
+>> -SYM_FUNC_START_WEAK(memmove)
+>>  	/*
+>>  	 * Returns
+>>  	 *   a0 - dest
+>> @@ -314,5 +313,6 @@ SYM_FUNC_START_WEAK(memmove)
+>>  
+>>  SYM_FUNC_END(memmove)
+> 
+> Should this one above be removed?
+
+Hugh :/ yeah, thanks for catching this.
+
+> 
+>>  SYM_FUNC_END(__memmove)
+>> +SYM_FUNC_ALIAS_WEAK(memmove, __memmove)
+>>  SYM_FUNC_ALIAS(__pi_memmove, __memmove)
+>>  SYM_FUNC_ALIAS(__pi___memmove, __memmove)
+>> diff --git a/arch/riscv/lib/memset.S b/arch/riscv/lib/memset.S
+>> index 34c5360c6705..35f358e70bdb 100644
+>> --- a/arch/riscv/lib/memset.S
+>> +++ b/arch/riscv/lib/memset.S
+>> @@ -8,8 +8,7 @@
+>>  #include <asm/asm.h>
+>>  
+>>  /* void *memset(void *, int, size_t) */
+>> -ENTRY(__memset)
+>> -WEAK(memset)
+>> +SYM_FUNC_START(__memset)
+>>  	move t0, a0  /* Preserve return value */
+>>  
+>>  	/* Defer to byte-oriented fill for small sizes */
+>> @@ -110,4 +109,5 @@ WEAK(memset)
+>>  	bltu t0, a3, 5b
+>>  6:
+>>  	ret
+>> -END(__memset)
+>> +SYM_FUNC_END(__memset)
+>> +SYM_FUNC_ALIAS_WEAK(memset, __memset)
+>> diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
+>> index 09b47ebacf2e..3ab438f30d13 100644
+>> --- a/arch/riscv/lib/uaccess.S
+>> +++ b/arch/riscv/lib/uaccess.S
+>> @@ -10,8 +10,7 @@
+>>  	_asm_extable	100b, \lbl
+>>  	.endm
+>>  
+>> -ENTRY(__asm_copy_to_user)
+>> -ENTRY(__asm_copy_from_user)
+>> +SYM_FUNC_START(__asm_copy_to_user)
+>>  
+>>  	/* Enable access to user memory */
+>>  	li t6, SR_SUM
+>> @@ -181,13 +180,13 @@ ENTRY(__asm_copy_from_user)
+>>  	csrc CSR_STATUS, t6
+>>  	sub a0, t5, a0
+>>  	ret
+>> -ENDPROC(__asm_copy_to_user)
+>> -ENDPROC(__asm_copy_from_user)
+>> +SYM_FUNC_END(__asm_copy_to_user)
+>>  EXPORT_SYMBOL(__asm_copy_to_user)
+>> +SYM_FUNC_ALIAS(__asm_copy_from_user, __asm_copy_to_user)
+> 
+> IIUC, we'll only have debug information for __asm_copy_to_user. I'm not
+> sure what that means for debugging. Is it possible to generate something
+> confusing?
+
+I'll check that with GDB to be sure we don't have anything fancy here.
+
+> 
+>>  EXPORT_SYMBOL(__asm_copy_from_user)
+>>  
+>>  
+>> -ENTRY(__clear_user)
+>> +SYM_FUNC_START(__clear_user)
+>>  
+>>  	/* Enable access to user memory */
+>>  	li t6, SR_SUM
+>> @@ -233,5 +232,5 @@ ENTRY(__clear_user)
+>>  	csrc CSR_STATUS, t6
+>>  	sub a0, a3, a0
+>>  	ret
+>> -ENDPROC(__clear_user)
+>> +SYM_FUNC_END(__clear_user)
+>>  EXPORT_SYMBOL(__clear_user)
+>> diff --git a/arch/riscv/purgatory/entry.S b/arch/riscv/purgatory/entry.S
+>> index 0194f4554130..7befa276fb01 100644
+>> --- a/arch/riscv/purgatory/entry.S
+>> +++ b/arch/riscv/purgatory/entry.S
+>> @@ -7,15 +7,11 @@
+>>   * Author: Li Zhengyu (lizhengyu3@huawei.com)
+>>   *
+>>   */
+>> -
+>> -.macro	size, sym:req
+>> -	.size \sym, . - \sym
+>> -.endm
+>> +#include <linux/linkage.h>
+>>  
+>>  .text
+>>  
+>> -.globl purgatory_start
+>> -purgatory_start:
+>> +SYM_CODE_START(purgatory_start)
+>>  
+>>  	lla	sp, .Lstack
+>>  	mv	s0, a0	/* The hartid of the current hart */
+>> @@ -28,8 +24,7 @@ purgatory_start:
+>>  	mv	a1, s1
+>>  	ld	a2, riscv_kernel_entry
+>>  	jr	a2
+>> -
+>> -size purgatory_start
+>> +SYM_CODE_END(purgatory_start)
+>>  
+>>  .align 4
+>>  	.rept	256
+>> @@ -39,9 +34,8 @@ size purgatory_start
+>>  
+>>  .data
+>>  
+>> -.globl riscv_kernel_entry
+>> -riscv_kernel_entry:
+>> +SYM_DATA_START(riscv_kernel_entry)
+>>  	.quad	0
+>> -size riscv_kernel_entry
+>> +SYM_DATA_END(riscv_kernel_entry)
+> 
+> I think we could also use the shorthand version for this one-liner.
+> 
+> SYM_DATA(riscv_kernel_entry, quad 0)
+
+Oh yes, nice catch.
+
+Thanks,
+
+ClÃ©ment
+
+> 
+> Thanks,
+> drew
