@@ -2,139 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C8827D3CD0
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 18:46:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 444987D3D07
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 19:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjJWQqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 12:46:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44542 "EHLO
+        id S229615AbjJWRFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 13:05:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjJWQqr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 12:46:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7682BDB
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 09:45:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698079553;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sasvEpHKXFoCs30KM81UDEqwxjrVxOBDKbKNXA3uCdU=;
-        b=Jd+Wt/Ddz1Hx8k57U3JEGzdVAP+6dDcZn3VsXadbDsKs9aMGIvwZj56Gz0Y/wFVnZA0uii
-        9LxRod3PPNJZlCgfJ4k1CgQTDGrQH8f9w3I7dkadIaFYVQKtKgnHb1fYB8MV3de8YtnUXZ
-        OCiGhW8OlRVGtH6KsL6Q4qPTdnmFkOI=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-YmIM3vYZM-usCUqBqNOM9w-1; Mon, 23 Oct 2023 12:45:51 -0400
-X-MC-Unique: YmIM3vYZM-usCUqBqNOM9w-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7a67da1c761so426543339f.0
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 09:45:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698079550; x=1698684350;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sasvEpHKXFoCs30KM81UDEqwxjrVxOBDKbKNXA3uCdU=;
-        b=omS2YblZ+6xiy8BsoXXvIlwk8FtV1NXWr2gSxJLUe5N3lmWSzCc1b+xg+W3HTUuLDH
-         KfiY5ul+2fWIz090UejhbMmvPBWHqy5h97sGmNNzDwgh+a6supHyspDkYWoqN+3dNNlD
-         KeKU/xy1A6dySTIaHjLquPvrv+WpAS+kiLl3Pnxq0bpZvfFBs52lJTIXba6VDJDroF5x
-         gcYJsRcUd+NNbtq4FxJFFiLyaub0iEn5t7Up4mwRde0cGFpAU7My+jdN/5N8ebhuBP8C
-         AXEhHUw5VpFOcV9h14+W2tSi3oAWT+iKWyc7EnMcFioVkD3q7dmsCxZK7GaZHrqH0TaF
-         tM+Q==
-X-Gm-Message-State: AOJu0YyQg8pk+6Lwtn0hKXDhODw/vIIWNMmdKsqnhw7G+148xjiIj5W6
-        DpJRDKGS+ipHlbCawjDP/BngVeUvDVyFZtNuFdMVl7NUh8ZgvfkRF5fFOQQkG4ZObcBIqTg95/g
-        IiO9ArakId7UF
-X-Received: by 2002:a05:6602:2e10:b0:7a9:77ac:5454 with SMTP id o16-20020a0566022e1000b007a977ac5454mr1132001iow.18.1698079550390;
-        Mon, 23 Oct 2023 09:45:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFlB5w95pzdyyFq/skony0Xw8FWcM6R9TpGxpduAvW6SMAcXEhPV1NPlwaAbHqxy2xPUHjyQg==
-X-Received: by 2002:a05:6602:2e10:b0:7a9:77ac:5454 with SMTP id o16-20020a0566022e1000b007a977ac5454mr1131979iow.18.1698079550147;
-        Mon, 23 Oct 2023 09:45:50 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id dx20-20020a0566381d1400b0042b3ad1656bsm2396260jab.45.2023.10.23.09.45.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 09:45:49 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 10:45:48 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        parav@nvidia.com, feliu@nvidia.com, jiri@nvidia.com,
-        kevin.tian@intel.com, joao.m.martins@oracle.com,
-        si-wei.liu@oracle.com, leonro@nvidia.com, maorg@nvidia.com,
-        jasowang@redhat.com
-Subject: Re: [PATCH V1 vfio 0/9] Introduce a vfio driver over virtio devices
-Message-ID: <20231023104548.07b3aa19.alex.williamson@redhat.com>
-In-Reply-To: <20231023162043.GB3952@nvidia.com>
-References: <20231017134217.82497-1-yishaih@nvidia.com>
-        <6e2c79c2-5d1d-3f3b-163b-29403c669049@nvidia.com>
-        <20231023093323.2a20b67c.alex.williamson@redhat.com>
-        <20231023154257.GZ3952@nvidia.com>
-        <20231023100913.39dcefba.alex.williamson@redhat.com>
-        <20231023162043.GB3952@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229476AbjJWRFW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 13:05:22 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715B794;
+        Mon, 23 Oct 2023 10:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698080719; x=1729616719;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zwazxV2v2G4q0zaiWjYMDu8qcaaTQb+HDKTqL3vinjQ=;
+  b=b43KMaZfzU5P9cvi7FSbio+QH6sP+zFCYMCAyMuI6adivF74pMtB2E7r
+   mNWry4bEZpl/bkAbur0XbVEpvFIbhYgnfNuvrxRqMUdQPsfJ5TnWoUR2r
+   8M8GN6x9+uoKOyB8dFbBESxRxB9A8hLi/eADCpOemNvAMLFQpblTG4KYh
+   HzX28ouRuLkqN1IHdqCX8MG9IU9cFvrSpeSr12aBk1gpqssjd+WlGwtoe
+   ojBm4/yFM3Tzw9Bek9iXo+Q0oCTU5lzNrfHkdN+RhI/zm6C9oq+Qxkofq
+   grz9dw0adgLPyHEcYnpTe3swbJPISvGx9Bc5YxsLAAWDBY4B0DDtAAD2b
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="366230253"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="366230253"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 10:05:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="793194889"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="793194889"
+Received: from qwilliam-mobl.amr.corp.intel.com (HELO desk) ([10.212.150.186])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 10:05:18 -0700
+Date:   Mon, 23 Oct 2023 10:05:10 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>, tony.luck@intel.com,
+        ak@linux.intel.com, tim.c.chen@linux.intel.com,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Alyssa Milburn <alyssa.milburn@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        antonio.gomez.iglesias@linux.intel.com
+Subject: Re: [PATCH  6/6] KVM: VMX: Move VERW closer to VMentry for MDS
+ mitigation
+Message-ID: <20231023170510.ayk3f5vosyh6skmg@desk>
+References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
+ <20231020-delay-verw-v1-6-cff54096326d@linux.intel.com>
+ <ZTMFS8I2s8EroSNe@google.com>
+ <20231021004633.ymughma7zijosku5@desk>
+ <ZTaKMdZqq2R1xXFh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTaKMdZqq2R1xXFh@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Oct 2023 13:20:43 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Mon, Oct 23, 2023 at 10:09:13AM -0600, Alex Williamson wrote:
-> > On Mon, 23 Oct 2023 12:42:57 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Mon, Oct 23, 2023 at 09:33:23AM -0600, Alex Williamson wrote:
-> > >   
-> > > > > Alex,
-> > > > > Are you fine to leave the provisioning of the VF including the control 
-> > > > > of its transitional capability in the device hands as was suggested by 
-> > > > > Jason ?    
+On Mon, Oct 23, 2023 at 07:58:57AM -0700, Sean Christopherson wrote:
+> On Fri, Oct 20, 2023, Pawan Gupta wrote:
+> > On Fri, Oct 20, 2023 at 03:55:07PM -0700, Sean Christopherson wrote:
+> > > On Fri, Oct 20, 2023, Pawan Gupta wrote:
+> > > > During VMentry VERW is executed to mitigate MDS. After VERW, any memory
+> > > > access like register push onto stack may put host data in MDS affected
+> > > > CPU buffers. A guest can then use MDS to sample host data.
 > > > > 
-> > > > If this is the standard we're going to follow, ie. profiling of a
-> > > > device is expected to occur prior to the probe of the vfio-pci variant
-> > > > driver, then we should get the out-of-tree NVIDIA vGPU driver on board
-> > > > with this too.    
+> > > > Although likelihood of secrets surviving in registers at current VERW
+> > > > callsite is less, but it can't be ruled out. Harden the MDS mitigation
+> > > > by moving the VERW mitigation late in VMentry path.
+> > > > 
+> > > > Note that VERW for MMIO Stale Data mitigation is unchanged because of
+> > > > the complexity of per-guest conditional VERW which is not easy to handle
+> > > > that late in asm with no GPRs available. If the CPU is also affected by
+> > > > MDS, VERW is unconditionally executed late in asm regardless of guest
+> > > > having MMIO access.
+> > > > 
+> > > > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> > > > ---
+> > > >  arch/x86/kvm/vmx/vmenter.S |  9 +++++++++
+> > > >  arch/x86/kvm/vmx/vmx.c     | 10 +++++++---
+> > > >  2 files changed, 16 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> > > > index be275a0410a8..efa716cf4727 100644
+> > > > --- a/arch/x86/kvm/vmx/vmenter.S
+> > > > +++ b/arch/x86/kvm/vmx/vmenter.S
+> > > > @@ -1,6 +1,7 @@
+> > > >  /* SPDX-License-Identifier: GPL-2.0 */
+> > > >  #include <linux/linkage.h>
+> > > >  #include <asm/asm.h>
+> > > > +#include <asm/segment.h>
+> > > >  #include <asm/bitsperlong.h>
+> > > >  #include <asm/kvm_vcpu_regs.h>
+> > > >  #include <asm/nospec-branch.h>
+> > > > @@ -31,6 +32,8 @@
+> > > >  #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
+> > > >  #endif
+> > > >  
+> > > > +#define GUEST_CLEAR_CPU_BUFFERS		USER_CLEAR_CPU_BUFFERS
+> > > > +
+> > > >  .macro VMX_DO_EVENT_IRQOFF call_insn call_target
+> > > >  	/*
+> > > >  	 * Unconditionally create a stack frame, getting the correct RSP on the
+> > > > @@ -177,10 +180,16 @@ SYM_FUNC_START(__vmx_vcpu_run)
+> > > >   * the 'vmx_vmexit' label below.
+> > > >   */
+> > > >  .Lvmresume:
+> > > > +	/* Mitigate CPU data sampling attacks .e.g. MDS */
+> > > > +	GUEST_CLEAR_CPU_BUFFERS
 > > > 
-> > > Those GPU drivers are using mdev not vfio-pci..  
+> > > I have a very hard time believing that it's worth duplicating the mitigation
+> > > for VMRESUME vs. VMLAUNCH just to land it after a Jcc.
 > > 
-> > The SR-IOV mdev vGPUs rely on the IOMMU backing device support which
-> > was removed from upstream.    
+> > VERW modifies the flags, so it either needs to be after Jcc or we
+> > push/pop flags that adds 2 extra memory operations. Please let me know
+> > if there is a better option.
 > 
-> It wasn't, but it changed forms.
+> Ugh, I assumed that piggybacking VERW overrode the original behavior entirely, I
+> didn't realize it sacrifices EFLAGS.ZF on the altar of mitigations.
 > 
-> mdev is a sysfs framework for managing lifecycle with GUIDs only.
+> Luckily, this is easy to solve now that VMRESUME vs. VMLAUNCH uses a flag instead
+> of a dedicated bool.
+
+Thats great.
+
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Mon, 23 Oct 2023 07:44:35 -0700
+> Subject: [PATCH] KVM: VMX: Use BT+JNC, i.e. EFLAGS.CF to select VMRESUME vs.
+>  VMLAUNCH
 > 
-> The thing using mdev can call vfio_register_emulated_iommu_dev() or
-> vfio_register_group_dev(). 
+> Use EFLAGS.CF instead of EFLAGS.ZF to track whether to use VMRESUME versus
+> VMLAUNCH.  Freeing up EFLAGS.ZF will allow doing VERW, which clobbers ZF,
+> for MDS mitigations as late as possible without needing to duplicate VERW
+> for both paths.
 > 
-> It doesn't matter to the mdev stuff.
-> 
-> The thing using mdev is responsible to get the struct device to pass
-> to vfio_register_group_dev()
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Are we describing what can be done (possibly limited to out-of-tree
-drivers) or what should be done and would be accepted upstream?
-
-I'm under the impression that mdev has been redefined to be more
-narrowly focused for emulated IOMMU devices and that devices based
-around a PCI VF should be making use of a vfio-pci variant driver.
-
-Are you suggesting it's the vendor's choice based on whether they want
-the mdev lifecycle support?
-
-We've defined certain aspects of the vfio-mdev interface as only
-available for emulated IOMMU devices, ex. page pinning.  Thanks,
-
-Alex
-
+Thanks for the patch, I will include it in the next revision.
