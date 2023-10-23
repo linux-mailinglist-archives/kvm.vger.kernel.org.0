@@ -2,34 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20FCA7D3F9E
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 20:56:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9E9A7D3FDB
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 21:10:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbjJWS4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 14:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S230347AbjJWTKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 15:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230171AbjJWS4r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 14:56:47 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1943E110;
-        Mon, 23 Oct 2023 11:56:46 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CF3C433C8;
-        Mon, 23 Oct 2023 18:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698087405;
-        bh=RKQ1pbNtIiiIYv1ffY3rTP4iIBSITuSmtnVZMc7D0fA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l94/Yqjx0pS0ri8nG0RUzL16OruKvi8dMjYHWpDbZtbBjoRaONTmJH1o9kqKijb4G
-         RGVM0arXQFOZ8fQH8q0aSuTWtbq/HnAgEgjEEBHol0EnvaBTCG9x37m9Oq9HLWhGBa
-         kAe75jrQ/W4rMZyRJ6Bt//lkfj18Ou++/4cBHqeWE9DzYkjm+tISl63ya7seszPfyi
-         zlFz+hnann6vD2dM3v7vxtvf8BIB1SbGRGEnE/+i6tGNnIB/Il8Qdipu/O+vE8A29d
-         kqLJDb0oWum0AuGWjBnnEzV1OwWCV7jTNGNNqwhc7r4v+NVsmPsUQ/jHAByHIQ2GF3
-         pdUhuOiRVCkYw==
-Date:   Mon, 23 Oct 2023 11:56:43 -0700
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        with ESMTP id S229462AbjJWTKD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 15:10:03 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D708D94;
+        Mon, 23 Oct 2023 12:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698088201; x=1729624201;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=6FMUuDYUTlK2LKUY1b0PZ+zy98w+sI48pzxcDNADCi0=;
+  b=fAZcs097bdJYP5PZWkn4oYp5f3l4akvhyvN1Zhk4m/9/HQk4nebf7qQp
+   fJSqnist22IDwDkKvrjIp/NI+4aSeQ+WP8LLdYdJAMSzqhALEi1UnGO10
+   6r1Joxy90vrWpiqdtVYu13g+DDtVqvvEvXZ8wsvr+NPFlZtzmvn7Y5tSh
+   nbM8giiUmBcS8x6A1G7i1INzF+QptL0v6hRA5O08slx5snFiTLLNyWc/O
+   LZJaLQk+EF/VxNU/8U5Dl4QOeJo5TAXTTkJwl3xz/tlfwJQREpoZ6LAOr
+   Pax4nXFY1xjfRR3DiKxYOGx9UGBJ8tY4/Naoc4c96XnkxjisDw/sTrwjG
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="386718669"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="386718669"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 12:10:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="824055761"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="824055761"
+Received: from qwilliam-mobl.amr.corp.intel.com (HELO desk) ([10.212.150.186])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 12:10:00 -0700
+Date:   Mon, 23 Oct 2023 12:09:49 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Andrew Cooper <andrew.cooper3@citrix.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
@@ -43,33 +56,58 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         kvm@vger.kernel.org,
         Alyssa Milburn <alyssa.milburn@linux.intel.com>,
         Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        antonio.gomez.iglesias@linux.intel.com
-Subject: Re: [PATCH  6/6] KVM: VMX: Move VERW closer to VMentry for MDS
- mitigation
-Message-ID: <20231023185643.oyd4irw43ztdqtps@treble>
+        antonio.gomez.iglesias@linux.intel.com,
+        Alyssa Milburn <alyssa.milburn@intel.com>
+Subject: Re: [RESEND][PATCH 1/6] x86/bugs: Add asm helpers for executing VERW
+Message-ID: <20231023190949.2gdrqisype5metpj@desk>
 References: <20231020-delay-verw-v1-0-cff54096326d@linux.intel.com>
- <20231020-delay-verw-v1-6-cff54096326d@linux.intel.com>
+ <20231020-delay-verw-v1-1-cff54096326d@linux.intel.com>
+ <f620c7d4-6345-4ad0-8a45-c8089e3c34df@citrix.com>
+ <20231021011859.c2rtc4vl7l2cl4q6@desk>
+ <bdfefc38-c010-4423-b129-3f153078fd67@citrix.com>
+ <20231021022134.kbey242xq7n754rg@desk>
+ <20231023180806.udbnt4nx3r2bdyi3@treble>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231020-delay-verw-v1-6-cff54096326d@linux.intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231023180806.udbnt4nx3r2bdyi3@treble>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 20, 2023 at 01:45:29PM -0700, Pawan Gupta wrote:
-> @@ -31,6 +32,8 @@
->  #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
->  #endif
->  
-> +#define GUEST_CLEAR_CPU_BUFFERS		USER_CLEAR_CPU_BUFFERS
+On Mon, Oct 23, 2023 at 11:08:06AM -0700, Josh Poimboeuf wrote:
+> On Fri, Oct 20, 2023 at 07:21:34PM -0700, Pawan Gupta wrote:
+> > On Sat, Oct 21, 2023 at 02:33:47AM +0100, Andrew Cooper wrote:
+> > > On 21/10/2023 2:18 am, Pawan Gupta wrote:
+> > > > On Sat, Oct 21, 2023 at 12:55:45AM +0100, Andrew Cooper wrote:
+> > > >> Also it avoids playing games with hiding data inside an instruction.
+> > > >> It's a neat trick, but the neater trick is avoid it whenever possible.
+> > > > Thanks for the pointers. I think verw in 32-bit mode won't be able to
+> > > > address the operand outside of 4GB range.
+> > > 
+> > > And?  In a 32bit kernel, what lives outside of a 4G range?
+> > > 
+> > > > Maybe this is fine or could it
+> > > > be a problem addressing from e.g. KVM module?
+> > > 
+> > > RIP-relative addressing is disp32.  Which is the same as it is for
+> > > direct calls.
+> > > 
+> > > So if your module is far enough away for VERW to have issues, you've got
+> > > far more basic problems to solve first.
+> > 
+> > Sorry, I raised the wrong problem. In 64-bit mode, verww only has 32-bit
+> > of relative addressing, so memory operand has to be within 4GB of
+> > callsite. That could be a constraint.
+> 
+> Even on x86-64, modules are mapped within 4GB of the kernel, so I don't
+> think that's a concern.
 
-I don't think the extra macro buys anything here.
-
--- 
-Josh
+You are correct, modules are indeed mapped within 4GB of the kernel. So
+what Andrew suggested is feasible. Is that your preference?
