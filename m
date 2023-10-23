@@ -2,76 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 968147D2988
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 07:03:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D111C7D2B63
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 09:34:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbjJWFDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 01:03:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44378 "EHLO
+        id S229838AbjJWHeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 03:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjJWFDI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 01:03:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F28AF
-        for <kvm@vger.kernel.org>; Sun, 22 Oct 2023 22:02:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698037339;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=VYWewINA58ufsweAbU1fUSU48ieD3onMLop08pEtwvU=;
-        b=YLYvH7mwQZa3vlqNv8F44T1TBrq3pq+hONJicoCQlmM9nHnFj2RYKFhADPAwMG6slpa+pc
-        KKiWNGrASS4dwENbxigdKKiLkckx6ciu8NLpXM28S89DGZYj/na/s6sLVkjLJkorC33iuh
-        2ZrntvHkhI84OIG+7aoTrtuVlusvjbQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-503-3YqoIy0fO-mLMLvyEtS2Jg-1; Mon, 23 Oct 2023 01:02:17 -0400
-X-MC-Unique: 3YqoIy0fO-mLMLvyEtS2Jg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4084001846eso20723295e9.1
-        for <kvm@vger.kernel.org>; Sun, 22 Oct 2023 22:02:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698037336; x=1698642136;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VYWewINA58ufsweAbU1fUSU48ieD3onMLop08pEtwvU=;
-        b=IwoMzbhm5lm6cva4elZEjvZQAAPIfg+EljSAEY4IbUhJz2Gr+n8Wzwcnp+9Ztd78Wl
-         Lbufc7gTHUrABGff8eSmt+30Tx5EXR8Rod7jmvL5jj3adH2WHNmOIKGm0b6ccykygjiU
-         66WNlBixmXvB4a8bbBsyLxBMH2mR3nG9oO3vxf+yiorzgI9Z1u7SbCHxln8Wzjx5L96Q
-         F7nC7Lxa8ndHD8WjdTWUqszcgmIAMkhC3oGFLYdRe7ApTT1GH+uFrqmuqwvxXYeEET/N
-         +J+lkd4vcBKcnh6JX9rl1gz/rUbmpH/GU3LWCmr9L/JzcxlIHeldlNt/1ua0CrIqIeb3
-         kfEg==
-X-Gm-Message-State: AOJu0Yw75I8Frfd1NT/0omKqRL3x4spMdJ/KKk3LgWuPIet0WWThs7rG
-        dbazYDN+wgsJefLTSONUQhSeD2cOE31A0HJyHv9dBjL2w1T2rRP3xUXFj4jSNk/yBUK17Vy62R0
-        P2a42FDcHJs2p
-X-Received: by 2002:a05:600c:188a:b0:406:7021:7d8 with SMTP id x10-20020a05600c188a00b00406702107d8mr6243041wmp.20.1698037335961;
-        Sun, 22 Oct 2023 22:02:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEE93zO060dPvm0mbGcpCvz5k2sh+CIGfA4Q3Qp53GzxNdWjPayH2r0nxenrW1QoZUESLwnA==
-X-Received: by 2002:a05:600c:188a:b0:406:7021:7d8 with SMTP id x10-20020a05600c188a00b00406702107d8mr6242988wmp.20.1698037335303;
-        Sun, 22 Oct 2023 22:02:15 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f2:e88f:2c2c:db43:583d:d30e])
-        by smtp.gmail.com with ESMTPSA id 1-20020a05600c028100b004077219aed5sm13079549wmk.6.2023.10.22.22.02.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Oct 2023 22:02:14 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 01:02:07 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        arei.gonglei@huawei.com, catalin.marinas@arm.com,
-        dtatulea@nvidia.com, eric.auger@redhat.com, gshan@redhat.com,
-        jasowang@redhat.com, liming.wu@jaguarmicro.com, mheyne@amazon.de,
-        mst@redhat.com, pasic@linux.ibm.com, pizhenwei@bytedance.com,
-        shawn.shao@jaguarmicro.com, xuanzhuo@linux.alibaba.com,
-        zhenyzha@redhat.com
-Subject: [GIT PULL] virtio: last minute fixes
-Message-ID: <20231023010207-mutt-send-email-mst@kernel.org>
+        with ESMTP id S229450AbjJWHeI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 03:34:08 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E40FC5
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 00:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HKQ5JVMatgd8OuCRkCWTeEvf0MBUDfN7TzBIzlhyezc=; b=uJE6bVxwDB0+A9LshW0+DPz/zc
+        E7n9HVigYzD53/s27BbmELQuwhbblzkZzLqY50g5W3cL7PbDlsaihpFGtVG4r4rneiMRJBt9KsWoi
+        0MIhMGFpfsy9HAkZGrWR1UJOZ+uRhmC+zVwum6Q573Vm++R7RnmG0/3P+QlCuqE30GbBDsnAr0Bqz
+        HnZaiQlvVVU2+nd5PmfPz4/ki/t3u3FhM93GSx23TLvu8Y2l2EQgyJyHTPosHGMWEedGlEyZcFkb2
+        6PswEDe+7cwOdzF6IHQi6+YD6tQCzqkoWru7wcC5wvwXOiSiyJWZY/7MipweygFrrXg8iLunJGnfY
+        R3J1fepQ==;
+Received: from [2001:8b0:10b:5:538b:aaf9:4fe2:8340] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qupRK-00CTJI-Up; Mon, 23 Oct 2023 07:33:31 +0000
+Message-ID: <3367eb2979e8591e8fa5748c88a0536cd2afb84e.camel@infradead.org>
+Subject: Re: [PATCH v2 22/24] tests/avocado: switch to using xen-net-device
+ for Xen guest tests
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     qemu-devel@nongnu.org
+Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Paul Durrant <paul@xen.org>,
+        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Cleber Rosa <crosa@redhat.com>,
+        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Beraldo Leal <bleal@redhat.com>, qemu-block@nongnu.org,
+        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+        Bernhard Beschow <shentey@gmail.com>,
+        Joel Upham <jupham125@gmail.com>
+Date:   Mon, 23 Oct 2023 08:33:30 +0100
+In-Reply-To: <20231019154020.99080-23-dwmw2@infradead.org>
+References: <20231019154020.99080-1-dwmw2@infradead.org>
+         <20231019154020.99080-23-dwmw2@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-L0zOQYgOfKD0CsgOo4aB"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,62 +69,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 58720809f52779dc0f08e53e54b014209d13eebb:
 
-  Linux 6.6-rc6 (2023-10-15 13:34:39 -0700)
+--=-L0zOQYgOfKD0CsgOo4aB
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-are available in the Git repository at:
+T24gVGh1LCAyMDIzLTEwLTE5IGF0IDE2OjQwICswMTAwLCBEYXZpZCBXb29kaG91c2Ugd3JvdGU6
+Cj4gRnJvbTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KPiAKPiBGaXggdGhl
+IGZpbGVuYW1lIGluIHRoZSBNQUlOVEFJTkVSUyBmaWxlIHRvby4KPiAKPiBTaWduZWQtb2ZmLWJ5
+OiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVrPgo+IC0tLQo+IMKgTUFJTlRBSU5F
+UlPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIgKy0KPiDCoHRlc3Rz
+L2F2b2NhZG8va3ZtX3hlbl9ndWVzdC5weSB8IDIgKy0KPiDCoDIgZmlsZXMgY2hhbmdlZCwgMiBp
+bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS9NQUlOVEFJTkVS
+UyBiL01BSU5UQUlORVJTCj4gaW5kZXggOWJkNGZlMzc4ZC4uZDc0MDQzZDhhOSAxMDA2NDQKPiAt
+LS0gYS9NQUlOVEFJTkVSUwo+ICsrKyBiL01BSU5UQUlORVJTCj4gQEAgLTQ3Niw3ICs0NzYsNyBA
+QCBTOiBTdXBwb3J0ZWQKPiDCoEY6IGluY2x1ZGUvc3lzZW11L2t2bV94ZW4uaAo+IMKgRjogdGFy
+Z2V0L2kzODYva3ZtL3hlbioKPiDCoEY6IGh3L2kzODYva3ZtL3hlbioKPiAtRjogdGVzdHMvYXZv
+Y2Fkby94ZW5fZ3Vlc3QucHkKPiArRjogdGVzdHMvYXZvY2Fkby9rdm1feGVuX2d1ZXN0LnB5Cj4g
+wqAKPiDCoEd1ZXN0IENQVSBDb3JlcyAob3RoZXIgYWNjZWxlcmF0b3JzKQo+IMKgLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL2F2b2NhZG8v
+a3ZtX3hlbl9ndWVzdC5weSBiL3Rlc3RzL2F2b2NhZG8va3ZtX3hlbl9ndWVzdC5weQo+IGluZGV4
+IDUzOTEyODMxMTMuLmYwOTgwMjhlZWIgMTAwNjQ0Cj4gLS0tIGEvdGVzdHMvYXZvY2Fkby9rdm1f
+eGVuX2d1ZXN0LnB5Cj4gKysrIGIvdGVzdHMvYXZvY2Fkby9rdm1feGVuX2d1ZXN0LnB5Cj4gQEAg
+LTYxLDcgKzYxLDcgQEAgZGVmIHJ1bl9hbmRfY2hlY2soc2VsZik6Cj4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgJy1hcHBlbmQnLCBzZWxmLmtlcm5l
+bF9wYXJhbXMsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgJy1kcml2ZScswqAgZiJmaWxlPXtzZWxmLnJvb3Rmc30saWY9bm9uZSxmb3JtYXQ9cmF3
+LGlkPWRydjAiLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgICctZGV2aWNlJywgJ3hlbi1kaXNrLGRyaXZlPWRydjAsdmRldj14dmRhJywKPiAtwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICctZGV2aWNlJywg
+J3ZpcnRpby1uZXQtcGNpLG5ldGRldj11bmV0JywKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICctZGV2aWNlJywgJ3hlbi1uZXQtZGV2aWNlLG5ldGRl
+dj11bmV0JywKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCAnLW5ldGRldicsICd1c2VyLGlkPXVuZXQsaG9zdGZ3ZD06MTI3LjAuMC4xOjAtOjIyJykK
+PiDCoAo+IMKgwqDCoMKgwqDCoMKgwqAgdHJ5OgoKQWN0dWFsbHkgSSdtIGdvaW5nIHRvIGRyb3Ag
+dGhpcyBvbmUuIFRlc3RpbmcgUENJIElOVHggYW5kIE1TSSBkZWxpdmVyeQp0aHJvdWdoIGk4MjU5
+LCBJL08gQVBJQyBhbmQgWGVuIFBJUlFzIGlzIGFjdHVhbGx5ICptdWNoKiBtb3JlCmVudGVydGFp
+bmluZyB0aGFuIHRlc3RpbmcgdGhlIFhlbiBQViBkcml2ZXIgc3R1ZmYgd2hpY2ggaXMgZXhlcmNp
+c2VkIGJ5Cnhlbi1ibG9jayBpbiB0aGVzZSB0ZXN0cyBhbnl3YXkuCgo=
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-for you to fetch changes up to 061b39fdfe7fd98946e67637213bcbb10a318cca:
+--=-L0zOQYgOfKD0CsgOo4aB
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-  virtio_pci: fix the common cfg map size (2023-10-18 11:30:12 -0400)
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDIzMDczMzMwWjAvBgkqhkiG9w0BCQQxIgQgHcKTMl/L
+uHv2gGb8gH52AMOF7ZMi1g+dLJikGXj3rXgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAcHvPVMEIU0BbQX2ILXNZLUctz1YpB1nzz
+8vI6Z2HqD/nh00b3jkxHXtIT0+y+RVId/xcBJf9soywRy03BdikPxAmpJnV1ioKVP7jWXtThvsEX
+Q6xZMjhUoi4DuivIDZ8rY+jezKrkj1AjDkTiX8/feeWRgnVWBlfQrC6NNtPqB+Pkyl3nRd/4MlsR
+UjfZPgMUxAXmCwPlt9AFKA4JJpk08N4TRcG4erU61s6C/C4kgS2RyghKATlVuhDPFfCwVozH/RmL
+YHpSoAhf2IYEl/t0aJSAc0Ec5s84gGukPrwWSFWC7JyR15g2tEsjfXD16lIH2uWMvjFVOxvAaVaW
+pZzxx8jyoufibCyUSs+EhkP0B4JXZx10UaMi1NrpoguRAq6Z988eNPpb89rCUnc0+k5edGxjOY9/
+Y4CsvqWumaxKXtZssTqr3xc9ODUub1rrAS5T917fyCKwFKVnnkImHBqhnRR03AAuiTXh32/GJG0e
+PwSAFwSY+HEqqGsdQzOK5n+ZJLesgF0OtE+QcipXK0Mqlo5qUsZzoOFxtysbB2sUSbJ2wIuSgTUY
+s0rJut68MvXwNonKvI/bpPgMAeEbmkrdqXIg9fZJGz8Pdggfgs9tSYZJ8xGJ82nJL+LcKyvTa776
+YUjK3IV463s17gZ6kARaFAFCuoACz+brOBBhTrmpAwAAAAAAAA==
 
-----------------------------------------------------------------
-virtio: last minute fixes
 
-a collection of small fixes that look like worth having in
-this release.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Dragos Tatulea (2):
-      vdpa/mlx5: Fix double release of debugfs entry
-      vdpa/mlx5: Fix firmware error on creation of 1k VQs
-
-Eric Auger (1):
-      vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
-
-Gavin Shan (1):
-      virtio_balloon: Fix endless deflation and inflation on arm64
-
-Liming Wu (1):
-      tools/virtio: Add dma sync api for virtio test
-
-Maximilian Heyne (1):
-      virtio-mmio: fix memory leak of vm_dev
-
-Shawn.Shao (1):
-      vdpa_sim_blk: Fix the potential leak of mgmt_dev
-
-Xuan Zhuo (1):
-      virtio_pci: fix the common cfg map size
-
-zhenwei pi (1):
-      virtio-crypto: handle config changed by work queue
-
- drivers/crypto/virtio/virtio_crypto_common.h |  3 ++
- drivers/crypto/virtio/virtio_crypto_core.c   | 14 +++++-
- drivers/vdpa/mlx5/net/debug.c                |  5 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c            | 70 ++++++++++++++++++++++------
- drivers/vdpa/mlx5/net/mlx5_vnet.h            | 11 ++++-
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c         |  5 +-
- drivers/vhost/vhost.c                        |  4 +-
- drivers/virtio/virtio_balloon.c              |  6 ++-
- drivers/virtio/virtio_mmio.c                 | 19 ++++++--
- drivers/virtio/virtio_pci_modern_dev.c       |  2 +-
- tools/virtio/linux/dma-mapping.h             | 12 +++++
- 11 files changed, 121 insertions(+), 30 deletions(-)
-
+--=-L0zOQYgOfKD0CsgOo4aB--
