@@ -2,117 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F34627D370F
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 14:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF327D370D
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 14:42:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230073AbjJWMmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 08:42:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56776 "EHLO
+        id S229844AbjJWMmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 08:42:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbjJWMmS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 08:42:18 -0400
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D67D7C
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 05:42:15 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 096F55C02A0;
-        Mon, 23 Oct 2023 08:42:12 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Mon, 23 Oct 2023 08:42:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1698064932; x=1698151332; bh=OR
-        ikYydWrWL8WqH+mJzNdmmSF0PKOctvYSDbut1fkXI=; b=dX9qslR1Y6fMq8gtxt
-        vtD16EnkKc+26tTBT/m2OxTI1dR7fupNYO1wa2zawKLsLhsjsXECmH5aqFk3aPBp
-        2aTo07idjRj0O/E+omdvwqL//dRnSC3qO1s8U9pSbC3H1Ghycg6z7V7Lb4MiuOR3
-        WK6W3e8perdLC5QhRwQn2/54gWVxELdabzDqXgkYR5wmaNT9AaC1CogyVmcdPLqX
-        ZEVY6CQDdjMBH1D0eofnpEklymGYIH5QVQWhV2EkrmRbj16YXwZ6qj1UlLkfXnVu
-        1iNyJwUL0rniQl7vMwsMQvCPDhIuX43dbQY/ssqrpS6UgJtj/p3ZiyLrrZqv3Fcs
-        xRYQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1698064932; x=1698151332; bh=ORikYydWrWL8W
-        qH+mJzNdmmSF0PKOctvYSDbut1fkXI=; b=HE4S3X2H+JSr74QskoVt8c1iD5Fbm
-        h360Zru1b1bDK770BBTTHwK3jL1QDZUPyMIOXr/MElqyrdgpevla/Mvsx3Nrlbl+
-        a8PC06PkwIpQ6k61GSw9jXpuXv8XItu6uvgMR6t5U6qhnRUfFOu7Th0ttodwnoCc
-        2ktcRHB7kIrcol9HL4E/o/lLygzwZdtmhG/VVfpYVt3pvRh9mXpz2aV273h1rAxi
-        InufK3QK4SGKUlNtQDhT/brWcPHjqoi6qJkJN1n9b8NmkEd5onsAUDfukk41qrAe
-        vVUyudMx/vb8g1CpGHA0CukbzxvapR2dniJsKN7XqDzrrPx8BiT3CHcQg==
-X-ME-Sender: <xms:Imo2Zb9g_fcRiuYAdrJPQ-RmJI1dWR_-ciVR8YXPrf-hn7Q4jCwe0Q>
-    <xme:Imo2ZXvn11XhI-rNnbr3QJJy6t8I3u_5HvYKF663qD14UDZsuyXdJTY8CHglaIa7c
-    AMrPM3omilMSsoiY8c>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrkeeigdehgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:Imo2ZZBpqo0cq0L-HVTsyJlR-O0jdTNyITIalF_9RKiTVKUg0NRChg>
-    <xmx:Imo2ZXe-CeIb1kcB-jOjFTjW06_N2uoYDwwa_fOx8-tEqwAJ0ZQEiw>
-    <xmx:Imo2ZQPHPANtLC8D7VsmYIZJWuUFW_BYwMkgxk3C715fFhszxc7Jzw>
-    <xmx:JGo2ZSuW7vrtIMh6vgfxDwUbPynvR0xc_DcmwXwJKSybvw6Sdz54NA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id C6170B60089; Mon, 23 Oct 2023 08:42:10 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1048-g9229b632c5-fm-20231019.001-g9229b632
-MIME-Version: 1.0
-Message-Id: <5a809f02-f102-4488-9fb2-bd4eb1c94999@app.fastmail.com>
-In-Reply-To: <20231023121013.GQ3952@nvidia.com>
-References: <20231020222804.21850-1-joao.m.martins@oracle.com>
- <20231020222804.21850-8-joao.m.martins@oracle.com>
- <b7834d1e-d198-45ee-b15d-12bd235bc57f@app.fastmail.com>
- <d65cb92a-8d2c-41a3-83b1-899310db1a20@oracle.com>
- <20231023121013.GQ3952@nvidia.com>
-Date:   Mon, 23 Oct 2023 14:41:50 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Jason Gunthorpe" <jgg@nvidia.com>,
-        "Joao Martins" <joao.m.martins@oracle.com>
-Cc:     iommu@lists.linux.dev, "Kevin Tian" <kevin.tian@intel.com>,
-        "Shameerali Kolothum Thodi" <shameerali.kolothum.thodi@huawei.com>,
-        "Baolu Lu" <baolu.lu@linux.intel.com>,
-        "Yi Liu" <yi.l.liu@intel.com>, "Yi Y Sun" <yi.y.sun@intel.com>,
-        "Nicolin Chen" <nicolinc@nvidia.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        "Suravee Suthikulpanit" <suravee.suthikulpanit@amd.com>,
-        "Will Deacon" <will@kernel.org>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        "Zhenzhong Duan" <zhenzhong.duan@intel.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 07/18] iommufd: Add IOMMU_HWPT_GET_DIRTY_BITMAP
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230011AbjJWMmM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 08:42:12 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5790F10C0;
+        Mon, 23 Oct 2023 05:42:09 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5ACC433C7;
+        Mon, 23 Oct 2023 12:42:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698064928;
+        bh=Lqif46mCRudQTevrOAA5L+KHe8oQGS7ZwXRLj3li2O8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qb0gkoNJydStCtXvnfiV44i4BWgozYdKqkJxBXoEuWoRMPNp4AvUYSSfDGVCJ1Vve
+         Tys7uXBu0KZExUsZ5bkLSXKbzPPJlI7zeXExCDKTAN87vlZhGOMWxQQGdk8eiGSwz6
+         eS4XsX90bmuIrZq+8WzG7zmwarYZrf8ULgwPt2N9vZZ5ngwTDVr8Hb4gxtqipm2oLV
+         VlYH4HbeuCvEMoWqhWVZk8vO1ss3H6uSmw0BW2qaZ2K+td71WeeZgPMAK1DYnz2JWL
+         mkTru2RbfWD22adftaZQ3N6bk4ezfRP7IaTXhL6/ghsXnYiONTeZMIR/3BF8P7qipv
+         onMQM8KIODqdg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1quuFy-006qEF-A7;
+        Mon, 23 Oct 2023 13:42:06 +0100
+Date:   Mon, 23 Oct 2023 13:42:05 +0100
+Message-ID: <86y1ft4ijm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v8 06/13] KVM: arm64: Sanitize PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR} before first run
+In-Reply-To: <20231020214053.2144305-7-rananta@google.com>
+References: <20231020214053.2144305-1-rananta@google.com>
+        <20231020214053.2144305-7-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, yuzenghui@huawei.com, shahuang@redhat.com, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 23, 2023, at 14:10, Jason Gunthorpe wrote:
-> On Mon, Oct 23, 2023 at 10:28:13AM +0100, Joao Martins wrote:
->> > so it's probably
->> > best to add a range check plus type cast, rather than an
->> > expensive div_u64() here.
->> 
->> OK
+On Fri, 20 Oct 2023 22:40:46 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> For unimplemented counters, the registers PM{C,I}NTEN{SET,CLR}
+> and PMOVS{SET,CLR} are expected to have the corresponding bits RAZ.
+> Hence to ensure correct KVM's PMU emulation, mask out the bits in
+> these registers for these unimplemented counters before the first
+> vCPU run.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/arm.c      |  2 +-
+>  arch/arm64/kvm/pmu-emul.c | 11 +++++++++++
+>  include/kvm/arm_pmu.h     |  2 ++
+>  3 files changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e3074a9e23a8b..3c0bb80483fb1 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -857,7 +857,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+> -			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
+> +			kvm_vcpu_handle_request_reload_pmu(vcpu);
+
+Please rename this to kvm_vcpu_reload_pmu(). That's long enough. But
+see below.
+
 >
-> Just keep it simple, we don't need to optimize for 32 bit. div_u64
-> will make the compiler happy.
+>  		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+>  			kvm_vcpu_pmu_restore_guest(vcpu);
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 9e24581206c24..31e4933293b76 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -788,6 +788,17 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  	return val & mask;
+>  }
+>  
+> +void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+> +
+> +	kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
+> +
+> +	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= mask;
+> +	__vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= mask;
+> +	__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= mask;
+> +}
 
-Fair enough. FWIW, I tried adding just the range check to see
-if that would make the compiler turn it into a 32-bit division,
-but that didn't work.
+Why is this done on a vcpu request? Why can't it be done upfront, when
+we're requesting the reload? Or when assigning the PMU? Or when
+setting PMCR_EL0?
 
-Some type of range check might still be good to have for
-unrelated reasons.
+	M.
 
-    Arnd
+-- 
+Without deviation from the norm, progress is not possible.
