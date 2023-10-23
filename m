@@ -2,223 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D111C7D2B63
-	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 09:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAACF7D2BAB
+	for <lists+kvm@lfdr.de>; Mon, 23 Oct 2023 09:46:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbjJWHeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 03:34:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
+        id S233409AbjJWHqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 03:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjJWHeI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 03:34:08 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E40FC5
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 00:34:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HKQ5JVMatgd8OuCRkCWTeEvf0MBUDfN7TzBIzlhyezc=; b=uJE6bVxwDB0+A9LshW0+DPz/zc
-        E7n9HVigYzD53/s27BbmELQuwhbblzkZzLqY50g5W3cL7PbDlsaihpFGtVG4r4rneiMRJBt9KsWoi
-        0MIhMGFpfsy9HAkZGrWR1UJOZ+uRhmC+zVwum6Q573Vm++R7RnmG0/3P+QlCuqE30GbBDsnAr0Bqz
-        HnZaiQlvVVU2+nd5PmfPz4/ki/t3u3FhM93GSx23TLvu8Y2l2EQgyJyHTPosHGMWEedGlEyZcFkb2
-        6PswEDe+7cwOdzF6IHQi6+YD6tQCzqkoWru7wcC5wvwXOiSiyJWZY/7MipweygFrrXg8iLunJGnfY
-        R3J1fepQ==;
-Received: from [2001:8b0:10b:5:538b:aaf9:4fe2:8340] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qupRK-00CTJI-Up; Mon, 23 Oct 2023 07:33:31 +0000
-Message-ID: <3367eb2979e8591e8fa5748c88a0536cd2afb84e.camel@infradead.org>
-Subject: Re: [PATCH v2 22/24] tests/avocado: switch to using xen-net-device
- for Xen guest tests
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     qemu-devel@nongnu.org
-Cc:     Kevin Wolf <kwolf@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Paul Durrant <paul@xen.org>,
-        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau 
-        <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Cleber Rosa <crosa@redhat.com>,
-        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Beraldo Leal <bleal@redhat.com>, qemu-block@nongnu.org,
-        xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
-        Bernhard Beschow <shentey@gmail.com>,
-        Joel Upham <jupham125@gmail.com>
-Date:   Mon, 23 Oct 2023 08:33:30 +0100
-In-Reply-To: <20231019154020.99080-23-dwmw2@infradead.org>
-References: <20231019154020.99080-1-dwmw2@infradead.org>
-         <20231019154020.99080-23-dwmw2@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-L0zOQYgOfKD0CsgOo4aB"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S229650AbjJWHqt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 03:46:49 -0400
+X-Greylist: delayed 183 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Oct 2023 00:46:46 PDT
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.162])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA811CC
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 00:46:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1698047021; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=FVh7E6OnMtic4teXvvhKaKXGe+recMVaZWNr+Y4OnrkKGUcbzfBiZ2JHoBUJkG2kvs
+    OLnrEPqZGk7J4VJxTJh9FOxnbeEdeZ1hxkLL7M+M+5PkU3oy0lG3li9RrnIY+hdmdSGI
+    KyRjWBRtVtFmL61/nX06UNr6MIA3DRID0h58V9wDsdw1VdsIOxgsxl+42z5SuO1yq4tH
+    Tsqo78j99yFw2dd1pLBZrZ1Ke2BQzzIvJzL+0kIxs46g3GwZ2eLBSU5Clze6HWcGIcdo
+    ycMF0SIkavtA+GOBS7yh51jus6Wad04sXtIV4lVTiOAW3+pX9gTyY2z/n+8sHBo/G2OT
+    WARw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1698047021;
+    s=strato-dkim-0002; d=strato.com;
+    h=Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
+    bh=1sEe+xsIeFr6Rc19BhgndoMCNIQVZui+7gYwzPVE/1A=;
+    b=Rx8igaVFCMwy/LDi7fyMLycRsgsWM3FT8lScVjk86HF4M297T0Iqj2asYImpFyp4Qh
+    y3y5w21acQlF6b0G9GqD+0BhR956cc9YsQ14hs3asKkzc4gvP56ebijndeEgf8aOMepC
+    DWfKFPNImZig0CpyNoxNIj0OF4E97oP7x8KeiEIgjxy/ebARbcmvcUS7itda6GlLuhQG
+    BIv5ub/pxsVARwsNX90SzE9yYvkM95/sncoGk72Dxn1eh+dR6wuy+vdOmOBGfXVIx129
+    lL7o1nZAftNDbzLykKjd2J73ANPmhqh/HrTg0Gt/pWtHEM2JsUmYSjyKUGPahgotWuJ7
+    xabg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1698047021;
+    s=strato-dkim-0002; d=itsslomma.de;
+    h=Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
+    bh=1sEe+xsIeFr6Rc19BhgndoMCNIQVZui+7gYwzPVE/1A=;
+    b=p6Q0hz7XOSb+M+xxjTvypElK5HICSz36PTlevvbq1gk/BRl1+2l8May4sFZ2I473rj
+    zzatUMcaY/vkLI94kYAcAkckJb1Hje6EUCdSKSv9tkCD+zi+mqQO40sn1k6rFFOu/A2D
+    fU5LeXdsd1ZzVeLdxis1/jZ/z3bYMA2zWylUQupva9e3CwivKQ7qvCZPbFomOXZRddIk
+    hjoRdDtWKofLS1MLwFaf9A6YkanNAfOobrtD0+yCg6iGjb+7ia8qWVqr84uWRid29Ouz
+    4S7hEZXlv8LHxZS5BBjujs2rFY7kFMUoeHUwcp2inPmvdtpPa2DxRmbwhO9Dwv7CFYgm
+    nV8w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1698047021;
+    s=strato-dkim-0003; d=itsslomma.de;
+    h=Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
+    bh=1sEe+xsIeFr6Rc19BhgndoMCNIQVZui+7gYwzPVE/1A=;
+    b=oFNxKVdaWDZW+MhqZJ+bJRW5gjWiZZ8yfIIKz/NwVEWELxSoBIERdq9Zlr0/rWVI9o
+    /9H9WFRfRKoBlcpDLFAw==
+X-RZG-AUTH: ":K2kWZ0m8NexQ+Y5NHnuAyP6+fJVZHx77D7CeOHU7oISihBj/J0bZiA5AdKGpnrwIizPqxHz0RPs4V+S71giZM4QZ/6yUw1U4CWhRxO0IVYOYOEQfPLs="
+Received: from [IPV6:2a02:8109:b301:9000:de87:d577:37a0:f2e2]
+    by smtp.strato.de (RZmta 49.9.0 AUTH)
+    with ESMTPSA id z33ba8z9N7hfYpl
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate)
+    for <kvm@vger.kernel.org>;
+    Mon, 23 Oct 2023 09:43:41 +0200 (CEST)
+Message-ID: <326f3f16-66f8-4394-ab49-5d943f43f25e@itsslomma.de>
+Date:   Mon, 23 Oct 2023 09:43:41 +0200
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To:     kvm@vger.kernel.org
+From:   Gerrit Slomma <gerrit.slomma@itsslomma.de>
+Subject: odd behaviour of virtualized CPUs
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello
 
---=-L0zOQYgOfKD0CsgOo4aB
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+I came upon following behaviour, i think this is a bug, but where to 
+file it?
+I filed it against qemu-kvm at Red Hat-jira for the time being, but this 
+is a closed environment as it seems.
 
-T24gVGh1LCAyMDIzLTEwLTE5IGF0IDE2OjQwICswMTAwLCBEYXZpZCBXb29kaG91c2Ugd3JvdGU6
-Cj4gRnJvbTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KPiAKPiBGaXggdGhl
-IGZpbGVuYW1lIGluIHRoZSBNQUlOVEFJTkVSUyBmaWxlIHRvby4KPiAKPiBTaWduZWQtb2ZmLWJ5
-OiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVrPgo+IC0tLQo+IMKgTUFJTlRBSU5F
-UlPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIgKy0KPiDCoHRlc3Rz
-L2F2b2NhZG8va3ZtX3hlbl9ndWVzdC5weSB8IDIgKy0KPiDCoDIgZmlsZXMgY2hhbmdlZCwgMiBp
-bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS9NQUlOVEFJTkVS
-UyBiL01BSU5UQUlORVJTCj4gaW5kZXggOWJkNGZlMzc4ZC4uZDc0MDQzZDhhOSAxMDA2NDQKPiAt
-LS0gYS9NQUlOVEFJTkVSUwo+ICsrKyBiL01BSU5UQUlORVJTCj4gQEAgLTQ3Niw3ICs0NzYsNyBA
-QCBTOiBTdXBwb3J0ZWQKPiDCoEY6IGluY2x1ZGUvc3lzZW11L2t2bV94ZW4uaAo+IMKgRjogdGFy
-Z2V0L2kzODYva3ZtL3hlbioKPiDCoEY6IGh3L2kzODYva3ZtL3hlbioKPiAtRjogdGVzdHMvYXZv
-Y2Fkby94ZW5fZ3Vlc3QucHkKPiArRjogdGVzdHMvYXZvY2Fkby9rdm1feGVuX2d1ZXN0LnB5Cj4g
-wqAKPiDCoEd1ZXN0IENQVSBDb3JlcyAob3RoZXIgYWNjZWxlcmF0b3JzKQo+IMKgLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gZGlmZiAtLWdpdCBhL3Rlc3RzL2F2b2NhZG8v
-a3ZtX3hlbl9ndWVzdC5weSBiL3Rlc3RzL2F2b2NhZG8va3ZtX3hlbl9ndWVzdC5weQo+IGluZGV4
-IDUzOTEyODMxMTMuLmYwOTgwMjhlZWIgMTAwNjQ0Cj4gLS0tIGEvdGVzdHMvYXZvY2Fkby9rdm1f
-eGVuX2d1ZXN0LnB5Cj4gKysrIGIvdGVzdHMvYXZvY2Fkby9rdm1feGVuX2d1ZXN0LnB5Cj4gQEAg
-LTYxLDcgKzYxLDcgQEAgZGVmIHJ1bl9hbmRfY2hlY2soc2VsZik6Cj4gwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgJy1hcHBlbmQnLCBzZWxmLmtlcm5l
-bF9wYXJhbXMsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgJy1kcml2ZScswqAgZiJmaWxlPXtzZWxmLnJvb3Rmc30saWY9bm9uZSxmb3JtYXQ9cmF3
-LGlkPWRydjAiLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgICctZGV2aWNlJywgJ3hlbi1kaXNrLGRyaXZlPWRydjAsdmRldj14dmRhJywKPiAtwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICctZGV2aWNlJywg
-J3ZpcnRpby1uZXQtcGNpLG5ldGRldj11bmV0JywKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICctZGV2aWNlJywgJ3hlbi1uZXQtZGV2aWNlLG5ldGRl
-dj11bmV0JywKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCAnLW5ldGRldicsICd1c2VyLGlkPXVuZXQsaG9zdGZ3ZD06MTI3LjAuMC4xOjAtOjIyJykK
-PiDCoAo+IMKgwqDCoMKgwqDCoMKgwqAgdHJ5OgoKQWN0dWFsbHkgSSdtIGdvaW5nIHRvIGRyb3Ag
-dGhpcyBvbmUuIFRlc3RpbmcgUENJIElOVHggYW5kIE1TSSBkZWxpdmVyeQp0aHJvdWdoIGk4MjU5
-LCBJL08gQVBJQyBhbmQgWGVuIFBJUlFzIGlzIGFjdHVhbGx5ICptdWNoKiBtb3JlCmVudGVydGFp
-bmluZyB0aGFuIHRlc3RpbmcgdGhlIFhlbiBQViBkcml2ZXIgc3R1ZmYgd2hpY2ggaXMgZXhlcmNp
-c2VkIGJ5Cnhlbi1ibG9jayBpbiB0aGVzZSB0ZXN0cyBhbnl3YXkuCgo=
+Sourcecode first:
+#include <stdio.h>
+#include <string.h>
+#include <immintrin.h>
 
+void main(void) {
+         __m256i test1 = _mm256_set_epi32(1,2,3,4,5,6,7,8);
+         __m256i test2 = _mm256_set_epi32(1,2,3,4,5,6,7,8);
 
---=-L0zOQYgOfKD0CsgOo4aB
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+         for (int count = 0; count < 8; count++) {
+                 printf("[%d] %d ", count, *((int*)(&test1) + count));
+         }
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMxMDIzMDczMzMwWjAvBgkqhkiG9w0BCQQxIgQgHcKTMl/L
-uHv2gGb8gH52AMOF7ZMi1g+dLJikGXj3rXgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAcHvPVMEIU0BbQX2ILXNZLUctz1YpB1nzz
-8vI6Z2HqD/nh00b3jkxHXtIT0+y+RVId/xcBJf9soywRy03BdikPxAmpJnV1ioKVP7jWXtThvsEX
-Q6xZMjhUoi4DuivIDZ8rY+jezKrkj1AjDkTiX8/feeWRgnVWBlfQrC6NNtPqB+Pkyl3nRd/4MlsR
-UjfZPgMUxAXmCwPlt9AFKA4JJpk08N4TRcG4erU61s6C/C4kgS2RyghKATlVuhDPFfCwVozH/RmL
-YHpSoAhf2IYEl/t0aJSAc0Ec5s84gGukPrwWSFWC7JyR15g2tEsjfXD16lIH2uWMvjFVOxvAaVaW
-pZzxx8jyoufibCyUSs+EhkP0B4JXZx10UaMi1NrpoguRAq6Z988eNPpb89rCUnc0+k5edGxjOY9/
-Y4CsvqWumaxKXtZssTqr3xc9ODUub1rrAS5T917fyCKwFKVnnkImHBqhnRR03AAuiTXh32/GJG0e
-PwSAFwSY+HEqqGsdQzOK5n+ZJLesgF0OtE+QcipXK0Mqlo5qUsZzoOFxtysbB2sUSbJ2wIuSgTUY
-s0rJut68MvXwNonKvI/bpPgMAeEbmkrdqXIg9fZJGz8Pdggfgs9tSYZJ8xGJ82nJL+LcKyvTa776
-YUjK3IV463s17gZ6kARaFAFCuoACz+brOBBhTrmpAwAAAAAAAA==
+         printf("\n");
 
+         for (int count = 0; count < 8; count++) {
+                 printf("[%d] %d ", count, *((int*)(&test2) + count));
+         }
 
---=-L0zOQYgOfKD0CsgOo4aB--
+         printf("\n");
+         test1 = _mm256_add_epi32(test1, test2);
+         test2 = _mm256_mullo_epi32(test1, test2);
+
+         for (int count = 0; count < 8; count++) {
+                 printf("[%d] %d ", count, *((int*)(&test1) + count));
+         }
+
+         printf("\n");
+
+         for (int count = 0; count < 8; count++) {
+                 printf("[%d] %d ", count, *((int*)(&test2) + count));
+         }
+
+         printf("\n");
+}
+
+Compilation with "gcc -mavx -i avx2 avx2.c" fails, due to used 
+intrinsics are AVX2-intrinsics.
+When compiled with "gcc -mavx2 -o avx2 avx2.c" an run on a E7-4880v2 
+this yields "illegal instruction".
+When run on a KVM-virtualized "Sandy Bridge"-CPU, but the underlying CPU 
+is capable of AVX2 (i.e. Haswell or Skylake) this runs, despite 
+advertised flag is only avx:
+$ ./avx2
+[0] 8 [1] 7 [2] 6 [3] 5 [4] 4 [5] 3 [6] 2 [7] 1
+[0] 8 [1] 7 [2] 6 [3] 5 [4] 4 [5] 3 [6] 2 [7] 1
+[0] 16 [1] 14 [2] 12 [3] 10 [4] 8 [5] 6 [6] 4 [7] 2
+[0] 128 [1] 98 [2] 72 [3] 50 [4] 32 [5] 18 [6] 8 [7] 2
+
+this holds for FMA3-instructions (i used intrinsic is 
+_mm256_fmadd_pd(a,b,c).)
+
+When i emulate the CPU as Westmere it yields "illegal instruction".
+
+Regards, Gerrit
