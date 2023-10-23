@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6A267D431E
-	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 01:14:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C4F77D4339
+	for <lists+kvm@lfdr.de>; Tue, 24 Oct 2023 01:30:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbjJWXOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Oct 2023 19:14:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43226 "EHLO
+        id S231458AbjJWXap (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Oct 2023 19:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjJWXO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Oct 2023 19:14:29 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02343C0
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:14:28 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a39444700so4787359276.0
-        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:14:27 -0700 (PDT)
+        with ESMTP id S230147AbjJWXao (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Oct 2023 19:30:44 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65715DE
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:30:42 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1caaaa873efso27675395ad.3
+        for <kvm@vger.kernel.org>; Mon, 23 Oct 2023 16:30:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698102867; x=1698707667; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698103842; x=1698708642; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4z50vjcy/AVIRiRa1A7triZs8e3DwANWNspQc12b2o=;
-        b=diDbnbtQYvQbgRBmelnZJOOuVj/TmMeu4hxvkT2Z6zsveR8K+v4Ej5/5OtgqRt0B8T
-         6An+lgU3VvvCW7OTRCJkMM0gCSMVM3Uu957zaSE7QXZGlvsYf33s4hgp7vau4Iu8uKHc
-         C0WYdfFn58uV4JcVN9X1i3JGI7WOdp7Rd0BXo01mv6x2b8wqIn4iURvfYxgzAvY/PEU1
-         HtX8hBTB/ZCVugwMavmHGkYUwV5DrtzpriaX0wLl8M5FRM21xnrbTAMdh/40cc/rFcdz
-         nC+D94q8gMcrJGiQoG9P81e2bXEmwF1l9qkE2sr0d4IS34pf8N4Vh0T54T8ok7apxunE
-         7ZQg==
+        bh=j5fYbMEb1JvOsD0gc/Ytx1EglN9OvlUjCB+MaPjp4wM=;
+        b=RMMnmn0W3ZppTZKLq1/q0ZtwsaA4YyQLnYnSMx2mf7ofI0xKATF5hoCu3sf9eIw/kc
+         /NANMzwkj4msMAknT2DzobBoyKdHl6CWenjJem4sYq4OsnqL4D6C1iYLlpGi/+c6mnEI
+         t6YvW8jgOs8RzzTlYnPy53MXG/u8/m8+Ce6Qt5or+7Vby5RaobexWSptQjaHyetiPWmq
+         QoqV5dUETnsWvUjxGIH6mskGkMheCAubauLcafiRB+20GoamAnvgoAXezMxLtzE/Rgwj
+         UDvOgPF9huXfLIlO53Px7OUMLjjlKB0ALk8u83aekHXMmMvnMyPIN0p9GXZRYIirOO9r
+         N6uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698102867; x=1698707667;
+        d=1e100.net; s=20230601; t=1698103842; x=1698708642;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4z50vjcy/AVIRiRa1A7triZs8e3DwANWNspQc12b2o=;
-        b=wOGHpzMzuho1jlMVS572EOIGoRl10j+scevMA5cqf02T3sYbTywyrlo3b1UpXBu274
-         LjE9Miq7hK1HA+YADtcehfTlTOMLHT9v0BkaSazAt54/k+HmdNsjP6Dh/Xu9hZwgAbV9
-         SdhBZZFupitcWBEbKpc5JfFveY9vQ6oSr2YcfO8nSb9vjXYUgEgxI8XmMY/iqm1fojRf
-         LpNYazCR/kGh3uYtybkPeWPK7Qut1Kg1cpXGuHcsIv83hDYgFBXmWydsPDpbHj1OkI8x
-         AGZ/Dc9IoTSeaqiTBKQUh0w2LdljSLXG1fmShJ+hHFCn4/MbJ4bmOaTg08XWaZPY5w8k
-         Nr6A==
-X-Gm-Message-State: AOJu0YxQk0lN4VvPPF4TU1lG4liSDbO7gODAcZmMf7c+zy1agZJM05bP
-        8vCRUKqWSrgmCGHQI1+NqE7XUDPruwE=
-X-Google-Smtp-Source: AGHT+IHkMFj4kxDJUf60dyKoH+kC2G8zlRJAkjUr1kpTT6iYxmji/FBt4cPJOfuMeEfkMIUPTpii3qixX2o=
+        bh=j5fYbMEb1JvOsD0gc/Ytx1EglN9OvlUjCB+MaPjp4wM=;
+        b=w4jmLu/X1/RR9KbbqySXKz149vmOCFL/e5kB224tuSNb/416hiJBCjAA4GNa+Tx10H
+         sAbC+cruuTmHdnh0dcd6zrN1fH+2VkxCr5CP4xe6gR4blG0QHqDydwQLvF0UXFeBu29u
+         SDiOUTVEVv8ORNCf2z0vjUHiPzd+AHmwt4f7g+SxtCMKgv/RaX+O9ULZxUf/3N6Zjir4
+         PkDbcW5ahzjjDDm/LCPMKfIyGEeue2MRJG4UI+KsSciBqp0Au9z2LBDeYvAiQT3UKSZR
+         awzi4JPGOfppD8MSYjU/EN6s6Il/v+VUx/FAFk4w8dyClxADAb5zgPcGW72TIMLJxTuA
+         hieA==
+X-Gm-Message-State: AOJu0YxhvitIuMh6F3SEJHf8iNkqhUPToUIb7YwY/i4Tbj3l9nmQSQJk
+        dzHQazgOGVxvV0wG+z70x89zk9l+X/E=
+X-Google-Smtp-Source: AGHT+IED9DGGHxqn6OYymLHC4FdJmMHhUaKhQoF2QicyRZM3rGefSGhnzRC82+BZ/3PYOSfYTyZtuKP0T0Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:34d1:0:b0:d9a:6360:485b with SMTP id
- b200-20020a2534d1000000b00d9a6360485bmr320353yba.2.1698102867294; Mon, 23 Oct
- 2023 16:14:27 -0700 (PDT)
-Date:   Mon, 23 Oct 2023 16:14:25 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:902:e214:b0:1c9:db23:706e with SMTP id
+ u20-20020a170902e21400b001c9db23706emr176623plb.5.1698103841720; Mon, 23 Oct
+ 2023 16:30:41 -0700 (PDT)
+Date:   Mon, 23 Oct 2023 16:30:40 -0700
 In-Reply-To: <20230913124227.12574-9-binbin.wu@linux.intel.com>
 Mime-Version: 1.0
 References: <20230913124227.12574-1-binbin.wu@linux.intel.com> <20230913124227.12574-9-binbin.wu@linux.intel.com>
-Message-ID: <ZTb-UbBrMkmvyFMg@google.com>
+Message-ID: <ZTcCIPHMeX84auh-@google.com>
 Subject: Re: [PATCH v11 08/16] KVM: x86: Introduce get_untagged_addr() in
  kvm_x86_ops and call it in emulator
 From:   Sean Christopherson <seanjc@google.com>
@@ -60,9 +60,9 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         guang.zeng@intel.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -70,16 +70,39 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Sep 13, 2023, Binbin Wu wrote:
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index e3054e3e46d5..179931b73876 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -134,6 +134,7 @@ KVM_X86_OP(msr_filter_changed)
->  KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> +KVM_X86_OP(get_untagged_addr)
+> Introduce a new interface get_untagged_addr() to kvm_x86_ops to untag
+> the metadata from linear address.  Call the interface in linearization
+> of instruction emulator for 64-bit mode.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ea48ba87dacf..e03313287816 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8308,6 +8308,15 @@ static void emulator_vm_bugged(struct x86_emulate_ctxt *ctxt)
+>  		kvm_vm_bugged(kvm);
+>  }
+>  
+> +static gva_t emulator_get_untagged_addr(struct x86_emulate_ctxt *ctxt,
+> +					gva_t addr, unsigned int flags)
+> +{
+> +	if (!kvm_x86_ops.get_untagged_addr)
+> +		return addr;
+> +
+> +	return static_call(kvm_x86_get_untagged_addr)(emul_to_vcpu(ctxt), addr, flags);
+> +}
+> +
+>  static const struct x86_emulate_ops emulate_ops = {
+>  	.vm_bugged           = emulator_vm_bugged,
+>  	.read_gpr            = emulator_read_gpr,
+> @@ -8352,6 +8361,7 @@ static const struct x86_emulate_ops emulate_ops = {
+>  	.leave_smm           = emulator_leave_smm,
+>  	.triple_fault        = emulator_triple_fault,
+>  	.set_xcr             = emulator_set_xcr,
+> +	.get_untagged_addr   = emulator_get_untagged_addr,
 
-This needs to be KVM_X86_OP_OPTIONAL(), otherwise kvm_ops_update() will complain
-about SVM not implementing the hook.  Hooray for useful warns! (I missed this in
-review).
+Oh, and for posterity because I've now thought about this on two separate occasions:
+
+We _could_ nullify .get_untagged_addr() if LAM isn't supported, e.g. to save a
+RETPOLINE when applicable, but that would require making emulate_ops non-const,
+and so I think it's worth eating the indirect call.  I suppose we could gate it
+on CONFIG_ADDRESS_MASKING, but then we'd have to carry a bunch of #ifdefs in the
+VMX code, so I don't think that's worth doing either.
